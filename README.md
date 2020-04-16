@@ -1,5 +1,4 @@
 <img src="internals/img/asgardex-banner.png" width="100%" />
-
 <br>
 
 <p>
