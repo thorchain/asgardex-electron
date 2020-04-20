@@ -131,27 +131,6 @@
     "binance chain"
   ],
   "homepage": "https://thorchain.org",
-  "jest": {
-    "testURL": "http://localhost/",
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
-      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
-    },
-    "moduleFileExtensions": [
-      "js",
-      "jsx",
-      "ts",
-      "tsx",
-      "json"
-    ],
-    "moduleDirectories": [
-      "node_modules",
-      "app/node_modules"
-    ],
-    "setupFiles": [
-      "./internals/scripts/CheckBuildsExist.js"
-    ]
-  },
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
@@ -288,29 +267,9 @@
     "npm": ">=4.x",
     "yarn": ">=0.21.3"
   },
-  "browserslist": [
-    "extends browserslist-config-erb"
-  ],
-  "prettier": {
-    "overrides": [
-      {
-        "files": [".prettierrc", ".babelrc", ".eslintrc", ".stylelintrc"],
-        "options": {
-          "parser": "json"
-        }
-      }
-    ],
-    "singleQuote": true
-  },
-  "stylelint": {
-    "extends": ["stylelint-config-standard", "stylelint-config-prettier"]
-  },
   "renovate": {
-    "extends": ["bliss"]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "extends": [
+      "bliss"
+    ]
   }
 }
