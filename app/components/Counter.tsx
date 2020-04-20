@@ -17,7 +17,7 @@ export default function Counter(props: Props) {
     incrementIfOdd,
     incrementAsync,
     decrement,
-    counter
+    counter,
   } = props;
 
   return (
