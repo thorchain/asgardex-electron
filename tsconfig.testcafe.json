@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig",
+  // https://devexpress.github.io/testcafe/documentation/test-api/typescript-support.html#customize-compiler-options
+  "compilerOptions": {
+    "sourceMap": false,
+    "strict": false
+  }
+}
