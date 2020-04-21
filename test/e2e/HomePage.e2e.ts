@@ -4,10 +4,10 @@ import { getPageUrl } from './helpers';
 
 const getPageTitle = ClientFunction(() => document.title);
 const connectSelector = Selector('[data-tid="connect"]');
-const clickToConnectLink = (t) =>
+const clickToConnectLink = (t: TestController) =>
   t.click(Selector('a').withExactText('Connect Wallet'));
 const getConnectText = () => connectSelector().innerText;
-const assertNoConsoleErrors = async (t) => {
+const assertNoConsoleErrors = async (t: TestController) => {
   const { error } = await t.getBrowserConsoleMessages();
   await t.expect(error).eql([]);
 };

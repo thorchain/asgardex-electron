@@ -7,7 +7,7 @@ import {
 describe('reducers', () => {
   describe('counter', () => {
     it('should handle initial state', () => {
-      expect(counter(undefined, {})).toMatchSnapshot();
+      expect(counter(undefined, { type: '' })).toMatchSnapshot();
     });
 
     it('should handle INCREMENT_COUNTER', () => {
