@@ -27,7 +27,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-#         yarn package-ci (failing)
           yarn lint
           yarn ts
 
