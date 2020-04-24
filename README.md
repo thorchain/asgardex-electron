@@ -2,7 +2,7 @@
 <br>
 
 <p>
-  ASGARDEX uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/redux">Redux</a>, <a href="https://github.com/reactjs/react-router">React Router</a>, <a href="https://webpack.github.io/docs/">Webpack</a> and <a href="https://github.com/gaearon/react-hot-loader">React Hot Loader</a> for rapid application development (HMR).
+  ASGARDEX uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/redux">Redux</a>, <a href="https://github.com/reactjs/react-router">React Router</a> and <a href="https://webpack.github.io/docs/">Webpack</a>.
 </p>
 
 <br>
@@ -16,13 +16,12 @@
   <a href="https://facebook.github.io/jest/"><img src="./internals/img/jest-padded-90.png" /></a>
   <a href="https://yarnpkg.com/"><img src="./internals/img/yarn-padded-90.png" /></a>
 </div>
-
+y
 <hr />
 
 <br />
 
 <div align="center">
-
 
 [![Build Status][github-actions-status]](github-actions-status)
 [![Dependency Status][david-image]][david-url]
@@ -47,27 +46,19 @@
 
 ## Install
 
-- **If you have installation or compilation issues with this project, please see [the debugging guide]()**
-
-First, clone the repo via git and install dependencies:
-
 ```bash
-git clone --depth 1 --single-branch https://github.com/thorchain/asgardex.git asgardex
+git clone https://github.com/thorchain/asgardex.git asgardex
 cd asgardex
 yarn
 ```
 
-## Starting Development
-
-Start the app in the `dev` environment. This starts the renderer process in [**hot-module-replacement**](https://webpack.js.org/guides/hmr-react/) mode and starts a webpack dev server that sends hot updates to the renderer process:
+## Development
 
 ```bash
 yarn dev
 ```
 
-## Packaging for Production
-
-To package apps for your local platform:
+## Packaging
 
 ```bash
 yarn package

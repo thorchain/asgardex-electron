@@ -1,0 +1,54 @@
+{
+  "productName": "ASGARDEX",
+  "appId": "org.thorchain.asgardex",
+  "copyright": "Copyright © 2020 ${author}",
+  "files": ["build/**/*", "assets/**/*"],
+  "directories": {
+    "buildResources": "assets",
+    "output": "release"
+  },
+  "mac": {
+    "target": ["dmg"]
+  },
+  "dmg": {
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ]
+  },
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ]
+  },
+  "linux": {
+    "target": [
+      {
+        "target": "deb",
+        "arch": ["x64"]
+      },
+      {
+        "target": "AppImage",
+        "arch": ["x64"]
+      }
+    ],
+    "category": "Development"
+  },
+  "publish": {
+    "provider": "github",
+    "owner": "thorchain",
+    "repo": "asgardex-electron",
+    "private": false
+  }
+}
