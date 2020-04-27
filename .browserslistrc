@@ -1,5 +1,1 @@
-[production]
-last 2 electron version
-
-[development]
-last electron version
+electron 8.2.3

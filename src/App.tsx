@@ -1,20 +1,32 @@
-import React from 'react'
-import logo from './logo.svg'
-import './App.css'
+import React, { useState } from 'react'
+import { Button, Layout } from 'antd'
+import { AppWrapper } from './App.style'
+import Header from './AppHeader'
+import { BrowserRouter as Router } from 'react-router-dom'
+import AppContent from './AppContent'
 
-function App() {
+type Props = {}
+
+const App: React.FC<Props> = (_): JSX.Element => {
+  const [wide, setWide] = useState(false)
+  const toggleSpace = (_: React.MouseEvent<HTMLElement>) => {
+    setWide((current) => !current)
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          HELLO ASGARDEX
-        </a>
-      </header>
-    </div>
+    <Router>
+      <AppWrapper space={wide ? 'wide' : 'no'}>
+        <Layout>
+          <Header />
+          <AppContent />
+          <Layout.Footer style={{ backgroundColor: '#000' }}>
+            <Button type="primary" size="large" onClick={toggleSpace}>
+              Toggle Space
+            </Button>
+          </Layout.Footer>
+        </Layout>
+      </AppWrapper>
+    </Router>
   )
 }
 

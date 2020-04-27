@@ -8,7 +8,7 @@
     "start:web": "craco start",
     "dev": "concurrently --kill-others --success first \"yarn:dev:*\"",
     "dev:app": "cross-env BROWSER=none yarn start:web",
-    "dev:electron": "wait-on http://localhost:3000 && nodemon -I --watch ./electron/ --watch ./src/ --ext ts --exec electron ./public/dev.js",
+    "dev:electron": "wait-on http://localhost:3000 && nodemon -I --watch ./electron/ --exec electron ./public/dev.js",
     "build": "cross-env PUBLIC_URL=./ craco build",
     "prebuild": "tsc -p ./electron/tsconfig.json",
     "test": "craco test",
@@ -46,11 +46,14 @@
   "homepage": "https://thorchain.org",
   "dependencies": {
     "@craco/craco": "^5.6.4",
+    "antd": "^4.1.5",
     "electron-debug": "^3.0.1",
     "electron-log": "^4.1.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
+    "styled-components": "^5.1.0",
     "typescript": "^3.8.3"
   },
   "devDependencies": {
@@ -62,6 +65,8 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
+    "@types/react-router-dom": "^5.1.5",
+    "@types/styled-components": "^5.1.0",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
     "concurrently": "^5.1.0",
