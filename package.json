@@ -3,6 +3,7 @@
   "productName": "ASGARDEX",
   "version": "0.0.1",
   "description": "WALLET AND EXCHANGE CLIENT FOR THORCHAIN",
+  "main": "public/electron.js",
   "scripts": {
     "start:web": "craco start",
     "dev": "concurrently --kill-others --success first \"yarn:dev:*\"",
