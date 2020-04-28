@@ -1,0 +1,17 @@
+{
+  "overrides": [
+    {
+      "files": [".prettierrc", ".babelrc", ".eslintrc", ".stylelintrc", ".huskyrc", ".lintstagedrc"],
+      "options": {
+        "parser": "json"
+      }
+    }
+  ],
+  "useTabs": false,
+  "printWidth": 120,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "trailingComma": "none",
+  "jsxBracketSameLine": true,
+  "semi": false
+}
