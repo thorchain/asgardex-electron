@@ -1,10 +1,11 @@
 import React from 'react'
-import { Layout, Button } from 'antd'
+import { Button } from 'antd'
 import { useHistory } from 'react-router-dom'
+import View from '../View'
 
 type Props = {}
 
-const NoContent: React.FC<Props> = (_): JSX.Element => {
+const WalletHomeView: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
 
   const clickHandler = () => {
@@ -12,11 +13,11 @@ const NoContent: React.FC<Props> = (_): JSX.Element => {
   }
 
   return (
-    <Layout.Content>
-      <h1>404</h1>
+    <View>
+      <h1>Wallet Home</h1>
       <Button onClick={clickHandler}>Back</Button>
-    </Layout.Content>
+    </View>
   )
 }
 
-export default NoContent
+export default WalletHomeView

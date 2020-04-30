@@ -1,13 +1,11 @@
 import React from 'react'
 import { Layout, Button } from 'antd'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 type Props = {}
 
-const ContentB: React.FC<Props> = (_): JSX.Element => {
+const NoContentView: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
-
-  const { slug } = useParams()
 
   const clickHandler = () => {
     history.goBack()
@@ -15,10 +13,10 @@ const ContentB: React.FC<Props> = (_): JSX.Element => {
 
   return (
     <Layout.Content>
-      <h1>Content B {slug ? ` (${slug})` : ''}</h1>
+      <h1>404</h1>
       <Button onClick={clickHandler}>Back</Button>
     </Layout.Content>
   )
 }
 
-export default ContentB
+export default NoContentView
