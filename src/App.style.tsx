@@ -8,7 +8,6 @@ export type AppWrapperProps = {
   space: Space
 }
 
-type Props = AppWrapperProps & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
-export const AppWrapper = styled.div<Props>`
-  padding: ${(props) => (props.space === 'no' ? '0' : '30px')};
+export const AppWrapper = styled.div<AppWrapperProps>`
+  padding: ${(props) => (props.space === 'no' ? '0' : '10px')};
 `

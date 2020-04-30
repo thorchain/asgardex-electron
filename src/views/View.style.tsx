@@ -1,7 +1,9 @@
 import styled from 'styled-components'
+import { Layout } from 'antd'
 
-import 'antd/dist/antd.css'
-
-export const HomeViewStyles = styled.div`
-  padding: 30px;
+export const ViewWrapper = styled(Layout.Content)`
+  background-color: white;
+  padding: 20px 50px;
+  margin-top: 50px;
+  min-height: 580px;
 `

@@ -1,9 +1,9 @@
 import React from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch, Redirect } from 'react-router-dom'
 import SwapHomeView from './swap/SwapHomeView'
 import StakeHomeView from './stake/StakeHomeView'
 import NoContentView from './NoContentView'
-import { swapHomeRoute, stakeHomeRoute, swapRoute, stakeRoute, walletHomeRoute } from '../routes'
+import { swapHomeRoute, stakeHomeRoute, swapRoute, stakeRoute, walletHomeRoute, homeRoute } from '../routes'
 import SwapView from './swap/SwapView'
 import StakeView from './stake/StakeView'
 import WalletHomeView from './wallet/WalletHomeView'
@@ -11,6 +11,9 @@ import WalletHomeView from './wallet/WalletHomeView'
 const ViewRoutes: React.FC<{}> = (): JSX.Element => {
   return (
     <Switch>
+      <Route path={homeRoute.path()} exact>
+        <Redirect to={swapHomeRoute.path()} />
+      </Route>
       <Route path={swapHomeRoute.template} exact>
         <SwapHomeView />
       </Route>

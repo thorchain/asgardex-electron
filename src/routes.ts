@@ -9,6 +9,13 @@ type Route<P> = {
   path: (p: P) => string
 }
 
+export const homeRoute: Route<void> = {
+  template: '/',
+  path() {
+    return this.template
+  }
+}
+
 export const swapHomeRoute: Route<void> = {
   template: '/swap/',
   path() {

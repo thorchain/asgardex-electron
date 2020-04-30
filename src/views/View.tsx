@@ -1,6 +1,5 @@
 import React from 'react'
-import { HomeViewStyles } from './View.style'
-import { Layout } from 'antd'
+import { ViewWrapper } from './View.style'
 
 type Props = {
   children?: React.ReactNode
@@ -8,11 +7,7 @@ type Props = {
 
 const View: React.FC<Props> = (props: Props): JSX.Element => {
   const { children } = props
-  return (
-    <Layout.Content>
-      <HomeViewStyles>{children}</HomeViewStyles>
-    </Layout.Content>
-  )
+  return <ViewWrapper>{children}</ViewWrapper>
 }
 
 export default View

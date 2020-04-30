@@ -1,5 +1,6 @@
 import React from 'react'
-import { Button, Layout } from 'antd'
+import { Button } from 'antd'
+import { FooterWrapper } from './Footer.style'
 
 type Props = {
   clickButtonHandler?: () => void
@@ -15,11 +16,12 @@ const Footer: React.FC<Props> = (props): JSX.Element => {
   }
 
   return (
-    <Layout.Footer>
-      <Button type="primary" size="large" onClick={clickHandler}>
-        Toggle Space
+    <FooterWrapper>
+      Footer
+      <Button type="link" size="small" onClick={clickHandler}>
+        Toggle padding
       </Button>
-    </Layout.Footer>
+    </FooterWrapper>
   )
 }
 
