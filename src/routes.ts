@@ -9,22 +9,42 @@ type Route<P> = {
   path: (p: P) => string
 }
 
-/**
- * Example for a route w/o parameter
- * template === path
- */
-export const contentARoute: Route<void> = {
+export const homeRoute: Route<void> = {
   template: '/',
   path() {
     return this.template
   }
 }
 
-/**
- * Example of a route w/ parameter
- */
-type ContentBParams = { slug: string }
-export const contentBRoute: Route<ContentBParams> = {
-  template: '/content-b/:slug',
-  path: ({ slug }) => `/content-b/${slug}`
+export const swapHomeRoute: Route<void> = {
+  template: '/swap/',
+  path() {
+    return this.template
+  }
+}
+
+export type SwapRouteParams = { source: string; target: string }
+export const swapRoute: Route<SwapRouteParams> = {
+  template: '/swap/:source-:target',
+  path: ({ source, target }) => `/swap/${source}-${target}`
+}
+
+export const stakeHomeRoute: Route<void> = {
+  template: '/stake/',
+  path() {
+    return this.template
+  }
+}
+
+export type StakeRouteParams = { asset: string }
+export const stakeRoute: Route<StakeRouteParams> = {
+  template: '/stake/:asset',
+  path: ({ asset }) => `/stake/${asset}`
+}
+
+export const walletHomeRoute: Route<void> = {
+  template: '/wallet/',
+  path() {
+    return this.template
+  }
 }
