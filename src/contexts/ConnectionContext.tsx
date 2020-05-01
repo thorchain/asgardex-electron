@@ -1,4 +1,4 @@
-import { fromEvent, merge, Observable } from 'rxjs'
+import * as Rx from 'rxjs'
 import { startWith, mapTo } from 'rxjs/operators'
 import React, { createContext, useContext } from 'react'
 
@@ -10,24 +10,18 @@ export enum OnlineStatus {
 // Check online status
 // https://www.electronjs.org/docs/tutorial/online-offline-events
 
-const online$ = fromEvent(window, 'online').pipe(mapTo(OnlineStatus.ON))
-const offline$ = fromEvent(window, 'offline').pipe(mapTo(OnlineStatus.OFF))
-const onlineStatus$ = merge(online$, offline$).pipe(startWith(navigator.onLine ? OnlineStatus.ON : OnlineStatus.OFF))
+const online$ = Rx.fromEvent(window, 'online').pipe(mapTo(OnlineStatus.ON))
+const offline$ = Rx.fromEvent(window, 'offline').pipe(mapTo(OnlineStatus.OFF))
+const onlineStatus$ = Rx.merge(online$, offline$).pipe(startWith(navigator.onLine ? OnlineStatus.ON : OnlineStatus.OFF))
 
-const connectionContext = createContext<Observable<OnlineStatus> | null>(null)
+const ConnectionContext = createContext<Rx.Observable<OnlineStatus>>(onlineStatus$)
 
 type Props = {
   children: React.ReactNode
 }
 
 export const ConnectionProvider: React.FC<Props> = ({ children }: Props): JSX.Element => (
-  <connectionContext.Provider value={onlineStatus$}>{children}</connectionContext.Provider>
+  <ConnectionContext.Provider value={onlineStatus$}>{children}</ConnectionContext.Provider>
 )
 
-export const useConnection = () => {
-  const context = useContext(connectionContext)
-  if (!context) {
-    throw new Error('context must be used within a ConnectionProvider.')
-  }
-  return context
-}
+export const useConnectionContext = () => useContext(ConnectionContext)

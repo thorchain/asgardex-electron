@@ -5,7 +5,7 @@ import { Menu } from 'antd'
 import { CheckCircleOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from 'react-router-dom'
 import { walletHomeRoute, swapHomeRoute, stakeHomeRoute } from '../routes'
-import { useConnection, OnlineStatus } from '../contexts/ConnectionContext'
+import { useConnectionContext, OnlineStatus } from '../contexts/ConnectionContext'
 import { HeaderWrapper } from './Header.style'
 
 type Props = {}
@@ -25,7 +25,7 @@ type MenuItem = {
 const Header: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
 
-  const connection$ = useConnection()
+  const connection$ = useConnectionContext()
   const onlineStatus = useObservableState<OnlineStatus>(connection$)
 
   const isOnline = onlineStatus === OnlineStatus.ON
