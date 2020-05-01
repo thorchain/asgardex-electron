@@ -1,8 +1,12 @@
 import React, { useMemo, useCallback } from 'react'
+import { useObservableState } from 'observable-hooks'
 
-import { Layout, Menu } from 'antd'
+import { Menu } from 'antd'
+import { CheckCircleOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from 'react-router-dom'
 import { walletHomeRoute, swapHomeRoute, stakeHomeRoute } from '../routes'
+import { useConnection, OnlineStatus } from '../contexts/ConnectionContext'
+import { HeaderWrapper } from './Header.style'
 
 type Props = {}
 
@@ -20,6 +24,11 @@ type MenuItem = {
 
 const Header: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
+
+  const connection$ = useConnection()
+  const onlineStatus = useObservableState<OnlineStatus>(connection$)
+
+  const isOnline = onlineStatus === OnlineStatus.ON
 
   const matchSwapRoute = useRouteMatch(swapHomeRoute.path())
   const matchStakeRoute = useRouteMatch(stakeHomeRoute.path())
@@ -55,7 +64,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   )
 
   return (
-    <Layout.Header>
+    <HeaderWrapper>
       <Menu selectedKeys={[activeKey]} theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
         {items.map(({ label, path, key }) => {
           return (
@@ -65,7 +74,9 @@ const Header: React.FC<Props> = (_): JSX.Element => {
           )
         })}
       </Menu>
-    </Layout.Header>
+      {isOnline && <CheckCircleOutlined style={{ color: '#a0d911', fontSize: '1.5em' }} />}
+      {!isOnline && <MinusCircleOutlined style={{ color: '#ffa940', fontSize: '1.5em' }} />}
+    </HeaderWrapper>
   )
 }
 
