@@ -6,7 +6,7 @@ import Footer from './components/Footer'
 import { BrowserRouter as Router } from 'react-router-dom'
 import ViewRoutes from './views/ViewRoutes'
 import { ConnectionProvider } from './contexts/ConnectionContext'
-import { PoolsProvider } from './contexts/PoolsContext'
+import { MidgardProvider } from './contexts/MidgardContext'
 
 type Props = {}
 
@@ -18,7 +18,7 @@ const App: React.FC<Props> = (_): JSX.Element => {
 
   return (
     <ConnectionProvider>
-      <PoolsProvider>
+      <MidgardProvider>
         <Router>
           <AppWrapper space={wide ? 'wide' : 'no'}>
             <Layout>
@@ -28,7 +28,7 @@ const App: React.FC<Props> = (_): JSX.Element => {
             </Layout>
           </AppWrapper>
         </Router>
-      </PoolsProvider>
+      </MidgardProvider>
     </ConnectionProvider>
   )
 }
