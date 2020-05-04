@@ -1,10 +1,16 @@
 import * as Rx from 'rxjs'
-import { ajax, AjaxResponse } from 'rxjs/ajax'
-import { retry, mergeMap, catchError, startWith, exhaustMap, map } from 'rxjs/operators'
+import { retry, mergeMap, catchError, startWith, exhaustMap } from 'rxjs/operators'
 import * as RD from '@devexperts/remote-data-ts'
 import byzantine from '@thorchain/byzantine-module'
+import { DefaultApi } from '../types/generated/midgard/apis'
+import { Configuration } from '../types/generated/midgard/runtime'
 
 export type PoolsRD = RD.RemoteData<Error, string[]>
+
+/**
+ * Helper to get `DefaultApi` instance for Midgard using custom basePath
+ */
+const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
 /**
  * Endpoint provided by Byzantine
@@ -14,9 +20,12 @@ const byzantine$ = Rx.from(byzantine()).pipe(retry(5))
 /**
  * Load pools
  */
-const loadPools$ = byzantine$.pipe(mergeMap((endpoint) => ajax(`${endpoint}/v1/pools`))).pipe(
-  retry(3),
-  map(({ response }: AjaxResponse) => response as string[])
+const loadPools$ = byzantine$.pipe(
+  mergeMap((endpoint) => {
+    const api = getMidgardDefaultApi(endpoint as string)
+    return api.getPools()
+  }),
+  retry(3)
 )
 
 /**
