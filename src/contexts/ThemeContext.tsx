@@ -40,7 +40,7 @@ type ThemeContextValue = {
   toggleTheme: () => void
 }
 
-const initialContext: ThemeContextValue = {
+export const initialContext: ThemeContextValue = {
   theme$,
   themeType$: selectedTheme$$.asObservable(),
   toggleTheme
