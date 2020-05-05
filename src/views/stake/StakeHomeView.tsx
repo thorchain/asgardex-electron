@@ -12,7 +12,7 @@ type Props = {}
 const StakeHomeView: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
 
-  const { pools$, reloadPools: refreshPools } = useMidgardContext()
+  const { pools$, reloadPools } = useMidgardContext()
   const pools = useObservableState(pools$, RD.initial)
 
   const clickHandler = (asset: string) => {
@@ -50,7 +50,7 @@ const StakeHomeView: React.FC<Props> = (_): JSX.Element => {
     <View>
       <h1>Stake Home</h1>
       {renderPools}
-      <Button onClick={() => refreshPools()}>Reload pools</Button>
+      <Button onClick={() => reloadPools()}>Reload pools</Button>
       <Button onClick={() => clickHandler('BNB')}>BNB</Button>
       <Button onClick={() => clickHandler('TUSDB-000')}>TUSDB</Button>
     </View>
