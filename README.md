@@ -2,7 +2,7 @@
 <br>
 
 <p>
-  ASGARDEX uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/redux">Redux</a>, <a href="https://github.com/reactjs/react-router">React Router</a> and <a href="https://webpack.github.io/docs/">Webpack</a>.
+  ASGARDEX uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/react-router">React Router</a> and <a href="https://webpack.github.io/docs/">Webpack</a>.
 </p>
 
 <br>
@@ -23,16 +23,7 @@ y
 
 <div align="center">
 
-[![Build Status][github-actions-status]](github-actions-status)
-[![Dependency Status][david-image]][david-url]
-[![DevDependency Status][david-dev-image]][david-dev-url]
-[![Github Tag][github-tag-image]][github-tag-url]
-
-<!-- [![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/electron-react-blpt)
-[![OpenCollective](https://opencollective.com/electron-react-boilerplate/backers/badge.svg)](#backers)
-[![OpenCollective](https://opencollective.com/electron-react-boilerplate/sponsors/badge.svg)](#sponsors)
-[![Good first issues open][good-first-issue-image]][good-first-issue-url]
-[![StackOverflow][stackoverflow-img]][stackoverflow-url] -->
+![.github/workflows/test.yml](https://github.com/thorchain/asgardex-electron/workflows/.github/workflows/test.yml/badge.svg)
 
 </div>
 
