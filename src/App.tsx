@@ -14,9 +14,9 @@ type Props = {}
 const App: React.FC<Props> = (_): JSX.Element => {
   return (
     <ConnectionProvider>
-      <ThemeProvider>
-        <MidgardProvider>
-          <Router>
+      <MidgardProvider>
+        <Router>
+          <ThemeProvider>
             <AppWrapper>
               <Layout>
                 <Header />
@@ -24,9 +24,9 @@ const App: React.FC<Props> = (_): JSX.Element => {
                 <Footer></Footer>
               </Layout>
             </AppWrapper>
-          </Router>
-        </MidgardProvider>
-      </ThemeProvider>
+          </ThemeProvider>
+        </Router>
+      </MidgardProvider>
     </ConnectionProvider>
   )
 }

@@ -6,7 +6,9 @@ import { theme as darkTheme } from '../themes/dark'
 import { theme as lightTheme } from '../themes/light'
 import { map } from 'rxjs/operators'
 import { useObservableState } from 'observable-hooks'
-import { GlobalStyle } from '../App.style'
+
+import 'antd/dist/antd.dark.css'
+import 'antd/dist/antd.css'
 
 export enum ThemeType {
   DARK = 'DARK_THEME',
@@ -38,8 +40,6 @@ type ThemeContextValue = {
   toggleTheme: () => void
 }
 
-const themeType$ = selectedTheme$$.asObservable()
-
 const initialContext: ThemeContextValue = {
   theme$,
   themeType$: selectedTheme$$.asObservable(),
@@ -54,12 +54,9 @@ type Props = {
 
 export const ThemeProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
   const theme = useObservableState(theme$)
-  const themeType = useObservableState(themeType$)
-  const isLight = themeType === ThemeType.LIGHT
   return (
     <ThemeContext.Provider value={initialContext}>
       <SC.ThemeProvider theme={{ theme }}>{children}</SC.ThemeProvider>
-      <GlobalStyle isLight={isLight} />
     </ThemeContext.Provider>
   )
 }
