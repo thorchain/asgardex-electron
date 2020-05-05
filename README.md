@@ -1,6 +1,8 @@
 <img src="internals/img/asgardex-banner.png" width="100%" />
 <br>
 
+![.github/workflows/test.yml](https://github.com/thorchain/asgardex-electron/workflows/.github/workflows/test.yml/badge.svg)
+
 <p>
   ASGARDEX uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/redux">Redux</a>, <a href="https://github.com/reactjs/react-router">React Router</a> and <a href="https://webpack.github.io/docs/">Webpack</a>.
 </p>
