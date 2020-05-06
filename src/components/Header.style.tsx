@@ -5,4 +5,8 @@ export const HeaderWrapper = styled(Layout.Header)`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  .select-locale {
+    margin-right: 20px;
+  }
 `
