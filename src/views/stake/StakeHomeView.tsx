@@ -6,11 +6,14 @@ import * as RD from '@devexperts/remote-data-ts'
 import View from '../View'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 
 type Props = {}
 
 const StakeHomeView: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
+
+  const intl = useIntl()
 
   const { pools$, reloadPools } = useMidgardContext()
   const pools = useObservableState(pools$, RD.initial)
@@ -31,15 +34,21 @@ const StakeHomeView: React.FC<Props> = (_): JSX.Element => {
           // error state
           (error: Error) => <h3>`Loading of pools failed ${error?.message ?? ''}`</h3>,
           // success state
-          (data: string[]): JSX.Element => (
-            <>
-              <ul>
-                {data.map((pool: string, index: number) => (
-                  <li key={index}>{pool}</li>
-                ))}
-              </ul>
-            </>
-          )
+          (pools: string[]): JSX.Element => {
+            const hasPools = pools.length > 0
+            return (
+              <>
+                {!hasPools && <h3>No pools available.</h3>}
+                {hasPools && (
+                  <ul>
+                    {pools.map((pool: string, index: number) => (
+                      <li key={index}>{pool}</li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            )
+          }
         )(pools)}
       </>
     ),
@@ -48,6 +57,7 @@ const StakeHomeView: React.FC<Props> = (_): JSX.Element => {
 
   return (
     <View>
+      <h1>{intl.formatMessage({ id: 'common.greeting' }, { name: 'ASGARDEX' })}</h1>
       <h1>Stake Home</h1>
       {renderPools}
       <Button onClick={() => reloadPools()}>Reload pools</Button>
