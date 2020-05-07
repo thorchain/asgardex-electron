@@ -2,20 +2,14 @@ import React, { createContext, useContext } from 'react'
 import * as SC from 'styled-components'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { Theme } from '../themes/types'
-import { theme as darkTheme } from '../themes/dark'
-import { theme as lightTheme } from '../themes/light'
 import { map } from 'rxjs/operators'
 import { useObservableState } from 'observable-hooks'
+import themes, { ThemeType } from '@thorchain/asgardex-theme'
 
 import 'antd/dist/antd.dark.css'
 import 'antd/dist/antd.css'
 
-export enum ThemeType {
-  DARK = 'DARK_THEME',
-  LIGHT = 'LIGHT_THEME'
-}
-
-const THEME_TYPE = 'THEME_TYPE'
+const THEME_TYPE = 'asgdx-theme'
 
 const initialTheme = (): ThemeType => (localStorage.getItem(THEME_TYPE) as ThemeType) || ThemeType.LIGHT
 
@@ -29,8 +23,8 @@ const toggleTheme = () => {
 
 const theme$ = selectedTheme$$.pipe(
   map((type) => {
-    if (type === ThemeType.LIGHT) return lightTheme
-    else return darkTheme
+    if (type === ThemeType.LIGHT) return themes.light
+    else return themes.dark
   })
 )
 
