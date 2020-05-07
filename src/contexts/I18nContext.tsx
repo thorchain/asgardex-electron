@@ -5,7 +5,7 @@ import { IntlProvider } from 'react-intl'
 import { Locale } from '../i18n/types'
 import { useObservableState } from 'observable-hooks'
 
-const LOCALE_KEY = 'locale'
+const LOCALE_KEY = 'asgdx-locale'
 
 const initialLocale = (): Locale => {
   const lang = navigator.language.split(/[-_]/)[0]

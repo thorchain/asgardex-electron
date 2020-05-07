@@ -1,8 +1,8 @@
 import React, { useMemo, useCallback } from 'react'
 import { useObservableState } from 'observable-hooks'
 
-import { Menu, Select } from 'antd'
-import { CheckCircleOutlined, MinusCircleOutlined } from '@ant-design/icons'
+import { Menu, Select, Row, Col } from 'antd'
+import { CheckCircleOutlined, MinusCircleOutlined, AlertOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from 'react-router-dom'
 import { walletBaseRoute, walletHomeRoute, swapHomeRoute, stakeHomeRoute } from '../routes'
 import { useConnectionContext, OnlineStatus } from '../contexts/ConnectionContext'
@@ -10,6 +10,8 @@ import { HeaderWrapper } from './Header.style'
 import { useI18nContext } from '../contexts/I18nContext'
 import { Locale } from '../i18n/types'
 import { LOCALES } from '../i18n'
+import { useThemeContext } from '../contexts/ThemeContext'
+import { palette } from 'styled-theme'
 
 type Props = {}
 
@@ -27,6 +29,12 @@ type MenuItem = {
 
 const Header: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
+
+  const { toggleTheme, theme$ } = useThemeContext()
+  const theme = useObservableState(theme$)
+  const clickSwitchThemeHandler = () => {
+    toggleTheme()
+  }
 
   const connection$ = useConnectionContext()
   const onlineStatus = useObservableState<OnlineStatus>(connection$)
@@ -77,7 +85,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   )
 
   return (
-    <HeaderWrapper>
+    <HeaderWrapper theme={theme}>
       <Menu selectedKeys={[activeKey]} theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
         {items.map(({ label, path, key }) => {
           return (
@@ -87,17 +95,27 @@ const Header: React.FC<Props> = (_): JSX.Element => {
           )
         })}
       </Menu>
-      <div>
-        <Select defaultValue={currentLocale} onChange={changeLocaleHandler} className="select-locale">
-          {LOCALES.map((locale: Locale) => (
-            <Select.Option value={locale} key={locale}>
-              {locale.toUpperCase()}
-            </Select.Option>
-          ))}
-        </Select>
-        {isOnline && <CheckCircleOutlined style={{ color: '#a0d911', fontSize: '1.5em' }} />}
-        {!isOnline && <MinusCircleOutlined style={{ color: '#ffa940', fontSize: '1.5em' }} />}
-      </div>
+      <Row align="middle" gutter={10}>
+        <Col>
+          <Select defaultValue={currentLocale} onChange={changeLocaleHandler} className="select-locale">
+            {LOCALES.map((locale: Locale) => (
+              <Select.Option value={locale} key={locale}>
+                {locale.toUpperCase()}
+              </Select.Option>
+            ))}
+          </Select>
+        </Col>
+        <Col>
+          {isOnline && <CheckCircleOutlined style={{ color: '#a0d911', fontSize: '1.5em' }} />}
+          {!isOnline && <MinusCircleOutlined style={{ color: '#ffa940', fontSize: '1.5em' }} />}
+        </Col>
+        <Col>
+          <AlertOutlined
+            onClick={clickSwitchThemeHandler}
+            style={{ color: palette('text', 0)({ theme }), fontSize: '1.5em' }}
+          />
+        </Col>
+      </Row>
     </HeaderWrapper>
   )
 }

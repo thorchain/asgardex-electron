@@ -1,27 +1,15 @@
 import React from 'react'
-import { Button } from 'antd'
 import { FooterWrapper } from './Footer.style'
 import { useObservableState } from 'observable-hooks'
 import { useThemeContext } from '../contexts/ThemeContext'
 
 type Props = {}
 
-const Footer: React.FC<Props> = (_: Props): JSX.Element => {
-  const { toggleTheme, themeType$ } = useThemeContext()
-  const themeType = useObservableState(themeType$)
-  const clickHandler = () => {
-    toggleTheme()
-  }
+const Footer: React.FC<Props> = (): JSX.Element => {
+  const { theme$ } = useThemeContext()
+  const theme = useObservableState(theme$)
 
-  return (
-    <FooterWrapper>
-      Footer
-      <Button type="link" size="small" onClick={clickHandler}>
-        Toggle theme
-      </Button>
-      {themeType}
-    </FooterWrapper>
-  )
+  return <FooterWrapper theme={theme}>Footer</FooterWrapper>
 }
 
 export default Footer
