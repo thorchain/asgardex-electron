@@ -61,3 +61,15 @@ export const walletAssetsRoute: Route<void> = {
     return this.template
   }
 }
+export const walletStakesRoute: Route<void> = {
+  template: `${walletBaseRoute.template}/stakes`,
+  path() {
+    return this.template
+  }
+}
+export const walletBondsRoute: Route<void> = {
+  template: `${walletBaseRoute.template}/bonds`,
+  path() {
+    return this.template
+  }
+}
