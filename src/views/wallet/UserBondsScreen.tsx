@@ -33,16 +33,16 @@ const UserBondsScreen: React.FC = (): JSX.Element => {
   return (
     <Row>
       <Col span={24}>
-        <Table dataSource={assets} pagination={false}>
+        <Table dataSource={assets} rowKey="_id" pagination={false}>
           <Table.Column title="Icon" dataIndex="symbol" key="icon" render={symbol => (
             <>
               <DynamicCoin type={symbol} size={'normal'}/>
             </>
           )}/>
-          <Table.Column title="Name" dataIndex="name" key="name" />
-          <Table.Column title="Symbol" dataIndex="symbol" key="symbol" />
-          <Table.Column title="Locked" dataIndex="locked" key="locked" />
-          <Table.Column title="Value" dataIndex="value" key="value" width={1}/>
+          <Table.Column title="Name" dataIndex="name"/>
+          <Table.Column title="Symbol" dataIndex="symbol"/>
+          <Table.Column title="Locked" dataIndex="locked"/>
+          <Table.Column title="Value" dataIndex="value" width={1}/>
         </Table>
 
       </Col>
