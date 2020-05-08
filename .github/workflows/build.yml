@@ -41,11 +41,6 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Remove previous artifacts
-        run: rm -r -- ./*
-        shell: bash
-        working-directory: ./release
-
       - name: Publish Windows or Linux binaries
         if: runner.os != 'macOS'
         run: yarn package:ci
@@ -64,6 +59,11 @@ jobs:
       #     SIGNING_APPLE_ID: ${{ secrets.SIGNING_APPLE_ID }}
       #     SIGNING_APP_PASSWORD: ${{ secrets.SIGNING_APP_PASSWORD }}
       #     SIGNING_TEAM_ID: ${{ secrets.SIGNING_TEAM_ID }}
+
+      - name: Remove previous artifacts
+        run: rm -r -- ./*
+        shell: bash
+        working-directory: ./release
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v1
