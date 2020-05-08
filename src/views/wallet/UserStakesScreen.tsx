@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Row, Col, Typography, Table } from 'antd'
+import { Row, Col, Table } from 'antd'
 import DynamicCoin from '../../components/shared/CoinIcons/DynamicCoin'
-const { Title } = Typography
 
 type UserAssetType = {
   _id: string;
@@ -34,7 +33,6 @@ const UserStakesScreen: React.FC = (): JSX.Element => {
   return (
     <Row>
       <Col span={24}>
-        <Title level={4}>User Stakes</Title>
         <Table dataSource={assets} pagination={false}>
           <Table.Column title="Icon" dataIndex="symbol" key="icon" render={symbol => (
             <>
