@@ -1,0 +1,69 @@
+name: Loki Electron Wallet Build
+
+on:
+  push:
+    # TODO (Veado) Change it to master
+    branches:
+      - issue-14/packaging
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest],
+        node-version: [13]
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v2
+        # TODO(Veado) change it to master
+        with:
+          ref: issue-14/packaging
+
+      - name: Get yarn cache
+        id: yarn-cache
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache node_modules
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.yarn-cache.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-yarn-
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Publish window and linux binaries
+        if: runner.os != 'macOS'
+        run: yarn package:ci
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # TODO (Veado) Enable build of macOS release
+      # - name: Publish mac binaries
+      #   if: runner.os == 'macOS'
+      #   run: yarn package:ci release
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     CSC_LINK: ${{ secrets.MAC_CERTIFICATE }}
+      #     CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+      #     SIGNING_APPLE_ID: ${{ secrets.SIGNING_APPLE_ID }}
+      #     SIGNING_APP_PASSWORD: ${{ secrets.SIGNING_APP_PASSWORD }}
+      #     SIGNING_TEAM_ID: ${{ secrets.SIGNING_TEAM_ID }}
+
+      - name: Remove previous artifacts
+        run: rm -r -- ./*/
+        shell: bash
+        working-directory: ./release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ runner.OS }}
+          path: release
