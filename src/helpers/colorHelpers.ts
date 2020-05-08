@@ -1,5 +1,5 @@
-export const rainbowStop = (h:any) => {
-  const f = (n:any, k = (n + h * 12) % 12) =>
+export const rainbowStop = (h:number) => {
+  const f = (n:number, k = (n + h * 12) % 12) =>
     0.5 - 0.5 * Math.max(Math.min(k - 3, 9 - k, 1), -1);
   const rgb2hex = (r:number, g:number, b:number) =>
     '#' +
