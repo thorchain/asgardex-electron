@@ -41,7 +41,8 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Publish Windows and Linux binaries
+      # Publish Windows or Linux binaries
+      - name: Publish ${{ runner.os }} binaries
         if: runner.os != 'macOS'
         run: yarn package:ci
         env:
@@ -70,3 +71,6 @@ jobs:
         with:
           name: ${{ runner.OS }}
           path: release
+
+      - name: List artifacts
+        run: ls ./release
