@@ -12,7 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macOS-latest, ubuntu-latest]
+        # TODO (Veado) Enable macOS
+        # os: [windows-latest, macOS-latest, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest]
         node_version: [13]
     steps:
       - name: Checkout git repo
@@ -39,14 +41,15 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Publish window and linux binaries
+      - name: Publish Windows and Linux binaries
         if: runner.os != 'macOS'
         run: yarn package:ci
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # TODO (Veado) Enable build of macOS release
-      # - name: Publish mac binaries
+      # TODO (Veado) Enable build of macOS release,
+      # we have to add `secrets` to GitHub first
+      # - name: Publish macOS binaries
       #   if: runner.os == 'macOS'
       #   run: yarn package:ci release
       #   env:
@@ -58,7 +61,7 @@ jobs:
       #     SIGNING_TEAM_ID: ${{ secrets.SIGNING_TEAM_ID }}
 
       - name: Remove previous artifacts
-        run: rm -r -- ./*/
+        run: rm -r -- ./*
         shell: bash
         working-directory: ./release
 
