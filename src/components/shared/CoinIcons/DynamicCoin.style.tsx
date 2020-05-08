@@ -1,19 +1,21 @@
 import styled, { StyledComponent } from 'styled-components'
 import { palette } from 'styled-theme';
 
-const sizes:any = {
+type SizeType = { [key: string]: string}
+const sizes: SizeType = {
   big: '58px',
   normal: '42px',
   small: '32px',
 };
 
-const fontSizes:any = {
+type FontSizeType = { [key: string]: string}
+const fontSizes:FontSizeType = {
   big: '16px',
   normal: '12px',
   small: '9px',
 };
 
-interface Props {
+type Props = {
   type: string,
   size: string,
 }
