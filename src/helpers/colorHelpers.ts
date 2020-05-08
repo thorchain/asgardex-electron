@@ -1,4 +1,5 @@
-export const rainbowStop = (h:number) => {
+export const rainbowStop = (val:string) => {
+  const h:number = parseFloat(val)
   const f = (n:number, k = (n + h * 12) % 12) =>
     0.5 - 0.5 * Math.max(Math.min(k - 3, 9 - k, 1), -1);
   const rgb2hex = (r:number, g:number, b:number) =>
@@ -14,7 +15,7 @@ export const rainbowStop = (h:number) => {
   return rgb2hex(f(0), f(8), f(4));
 };
 
-export const getIntFromName = (str:string) => {
+export const getIntFromName = (str:string): string[] => {
   const inputStr = String(str).toUpperCase();
 
   const div = 22;
