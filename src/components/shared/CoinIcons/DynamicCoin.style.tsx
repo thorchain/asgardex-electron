@@ -1,4 +1,4 @@
-import styled, { StyledComponent } from 'styled-components'
+import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 type SizeType = { [key: string]: string }
