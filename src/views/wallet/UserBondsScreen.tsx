@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import { Row, Col, Table } from 'antd'
 import DynamicCoin from '../../components/shared/CoinIcons/DynamicCoin'
 
@@ -19,6 +20,7 @@ const UserAssets: UserAssetType[] = [
 ]
 
 const UserBondsScreen: React.FC = (): JSX.Element => {
+  const history = useHistory()
   const [assets, setAssets] = useState<UserAssetType[]>([])
 
   function setData() {
@@ -33,7 +35,17 @@ const UserBondsScreen: React.FC = (): JSX.Element => {
   return (
     <Row>
       <Col span={24}>
-        <Table dataSource={assets} rowKey="_id" pagination={false}>
+        <Table
+          dataSource={assets}
+          rowKey="_id"
+          pagination={false}
+          onRow={(record) => {
+            return {
+              onClick: () => {
+                history.push(`/wallet/asset-details/${record.symbol}`)
+              }
+            }
+          }}>
           <Table.Column
             title="Icon"
             dataIndex="symbol"
