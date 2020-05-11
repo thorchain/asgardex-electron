@@ -1,4 +1,6 @@
 import React from 'react'
+import { useParams } from 'react-router-dom'
+import { WalletAssetDetailsRouteParams } from '../../routes'
 import TransactionsTable, { UserTransactionTypes } from '../../components/wallet/UserTransactionsTable'
 import DynamicCoin from '../../components/shared/CoinIcons/DynamicCoin'
 import { shortSymbol } from '../../helpers/tokenHelpers'
@@ -16,6 +18,7 @@ type UserAssetType = {
   name: string
   value: string
 }
+// Dummy data
 const txs: UserTransactionTypes[] = [
   {
     _id: 0,
@@ -41,13 +44,15 @@ const txs: UserTransactionTypes[] = [
 ]
 
 const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
+  const { symbol } = useParams<WalletAssetDetailsRouteParams>()
+  // Dummy data
   const asset: UserAssetType = {
     _id: '2',
     free: 1034,
     frozen: 38,
     locked: 101,
-    symbol: 'RUNE-1E0',
-    name: 'Rune',
+    symbol: symbol,
+    name: shortSymbol(symbol),
     value: '0.25',
     full: 1173
   }
@@ -57,8 +62,8 @@ const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
     <Row>
       <Col span={24} md={{ span: 16, offset: 4 }} lg={{ span: 12, offset: 6 }}>
         <Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{margin:"24px"}}>
-            <DynamicCoin type={asset.symbol} size="big"/>
+          <div style={{ margin: '24px' }}>
+            <DynamicCoin type={asset.symbol} size="big" />
           </div>
           <Title level={4}>NAME: {shortSymbol(asset.symbol)}</Title>
           <div>{asset.symbol}</div>
@@ -107,12 +112,7 @@ const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
 
           <Col span={12}>
             <Card bordered={false}>
-              <Button
-                type="ghost"
-                shape="round"
-                size="large"
-                block
-                onClick={() => console.log('walletReceive')}>
+              <Button type="ghost" shape="round" size="large" block onClick={() => console.log('walletReceive')}>
                 Receive
               </Button>
             </Card>
