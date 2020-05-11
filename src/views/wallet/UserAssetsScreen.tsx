@@ -42,8 +42,6 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
           onRow={(record) => {
             return {
               onClick: () => {
-                console.log(`clicking row... ${record.symbol}`)
-
                 history.push(`/wallet/asset-details/${record.symbol}`)
               }
             }

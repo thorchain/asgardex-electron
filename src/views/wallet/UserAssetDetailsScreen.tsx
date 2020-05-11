@@ -118,7 +118,7 @@ const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
         </Row>
       </Col>
       <Divider />
-      <Col>
+      <Col span={24}>
         <TransactionsTable transactions={txs} />
       </Col>
     </Row>
