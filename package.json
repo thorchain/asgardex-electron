@@ -45,7 +45,15 @@
   "bugs": {
     "url": "https://github.com/thorchain/asgardex/issues"
   },
-  "keywords": ["thorchain", "asgardex", "bepswap", "thornode", "bitcoin", "ethereum", "binance chain"],
+  "keywords": [
+    "thorchain",
+    "asgardex",
+    "bepswap",
+    "thornode",
+    "bitcoin",
+    "ethereum",
+    "binance chain"
+  ],
   "homepage": "https://thorchain.org",
   "dependencies": {
     "@ant-design/icons": "^4.1.0",
