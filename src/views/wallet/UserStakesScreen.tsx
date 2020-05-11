@@ -18,7 +18,7 @@ const UserAssets: UserAssetType[] = [
   { _id: '2', free: 1034, frozen: 38, locked: 101, symbol: 'RUNE-1E0', name: 'Rune', value: '0.25' }
 ]
 
-const UserAssetsScreen: React.FC = (): JSX.Element => {
+const UserStakesScreen: React.FC = (): JSX.Element => {
   const [assets, setAssets] = useState<UserAssetType[]>([])
 
   function setData() {
@@ -42,7 +42,7 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
           />
           <Table.Column title="Name" dataIndex="name" />
           <Table.Column title="Symbol" dataIndex="symbol" />
-          <Table.Column title="Balance" dataIndex="free" />
+          <Table.Column title="Frozen" dataIndex="frozen" />
           <Table.Column title="Value" dataIndex="value" width={1} />
         </Table>
       </Col>
@@ -50,4 +50,4 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
   )
 }
 
-export default UserAssetsScreen
+export default UserStakesScreen
