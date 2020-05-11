@@ -42,7 +42,6 @@ export const stakeRoute: Route<StakeRouteParams> = {
   path: ({ asset }) => `/stake/${asset}`
 }
 
-
 export const walletBaseRoute: Route<void> = {
   template: '/wallet',
   path() {
