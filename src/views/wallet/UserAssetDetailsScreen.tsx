@@ -1,19 +1,44 @@
 import React from 'react'
+import TransactionsTable, { UserTransactionTypes } from '../../components/wallet/UserTransactionsTable'
 import DynamicCoin from '../../components/shared/CoinIcons/DynamicCoin'
 import { shortSymbol } from '../../helpers/tokenHelpers'
 import { Row, Col, Typography, Divider, Button, Card } from 'antd'
+
 const { Title } = Typography
 
 type UserAssetType = {
   _id: string
   free: number
-  full: number
+  full?: number
   frozen: number
   locked: number
   symbol: string
   name: string
   value: string
 }
+const txs: UserTransactionTypes[] = [
+  {
+    _id: 0,
+    blockHeight: 74645396,
+    code: 0,
+    confirmBlocks: 0,
+    data: null,
+    fromAddr: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
+    memo: '',
+    orderId: null,
+    proposalId: null,
+    sequence: 29,
+    source: 0,
+    timeStamp: '2020-04-01T03:46:55.786Z',
+    toAddr: null,
+    txAge: 1578666,
+    txAsset: 'RUNE-A1F',
+    txFee: '0.00500000',
+    txHash: '320C31E9B5E5D21B4912BBC09C4A6F04EC4666698D6EAEBBBA3DBFAA7B9D17B3',
+    txType: 'FREEZE_TOKEN',
+    value: '12.00000000'
+  }
+]
 
 const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
   const asset: UserAssetType = {
@@ -24,10 +49,8 @@ const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
     symbol: 'RUNE-1E0',
     name: 'Rune',
     value: '0.25',
-    full: 201
+    full: 1173
   }
-  const freezable = () => asset.free > 0
-  const unfreezable = () => asset.frozen > 0
   const sendable = () => asset.free > 0
 
   return (
@@ -38,7 +61,7 @@ const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
           <Title level={4}>NAME: {shortSymbol(asset.symbol)}</Title>
           <div>{asset.symbol}</div>
           <Title level={3}>
-            {asset.full.toLocaleString()} <small>{shortSymbol(asset.symbol)}</small>
+            {asset.full?.toLocaleString()} <small>{shortSymbol(asset.symbol)}</small>
           </Title>
         </Card>
       </Col>
@@ -67,37 +90,37 @@ const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
       <Col span={24} md={{ span: 16, offset: 4 }} lg={{ span: 12, offset: 6 }}>
         <Row>
           <Col span={12}>
-            <Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Card bordered={false}>
               <Button
                 type="primary"
+                shape="round"
                 size="large"
                 block
                 disabled={!sendable()}
                 onClick={() => console.log('walletSend')}>
                 Send
               </Button>
-              <Button type="link" block disabled={!freezable()} onClick={() => console.log('walletFreeze')}>
-                Freeze
-              </Button>
-              <small>Freeze assets on address</small>
             </Card>
           </Col>
 
           <Col span={12}>
-            <Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Button type="primary" size="large" block onClick={() => console.log('walletReceive')}>
+            <Card bordered={false}>
+              <Button
+                type="ghost"
+                shape="round"
+                size="large"
+                block
+                onClick={() => console.log('walletReceive')}>
                 Receive
               </Button>
-              <Button type="link" block disabled={!unfreezable()} onClick={() => console.log('walletUnfreeze')}>
-                Unfreeze
-              </Button>
-              <small>Unfreeze assets on address</small>
             </Card>
           </Col>
         </Row>
       </Col>
       <Divider />
-      <Col>{/* <TransactionsTable transactions={txs} /> */}</Col>
+      <Col>
+        <TransactionsTable transactions={txs} />
+      </Col>
     </Row>
   )
 }
