@@ -1,5 +1,5 @@
 import React from 'react'
-import { Switch, Route, Redirect, Link } from "react-router-dom";
+import { Switch, Route, Redirect, Link } from 'react-router-dom'
 
 import { walletBondsRoute, walletStakesRoute, walletAssetsRoute, walletHomeRoute } from '../../routes'
 
@@ -7,7 +7,7 @@ import View from '../View'
 import UserAssetsScreen from './UserAssetsScreen'
 import UserStakesScreen from './UserStakesScreen'
 import UserBondsScreen from './UserBondsScreen'
-import { Menu } from 'antd';
+import { Menu } from 'antd'
 
 const WalletView: React.FC = (): JSX.Element => {
   return (
