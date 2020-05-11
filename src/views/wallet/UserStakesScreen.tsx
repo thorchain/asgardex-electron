@@ -21,7 +21,7 @@ const UserAssets: UserAssetType[] = [
 const UserStakesScreen: React.FC = (): JSX.Element => {
   const [assets, setAssets] = useState<UserAssetType[]>([])
 
-  async function setData() {
+  function setData() {
     const res = UserAssets
     if (res.length > 0) {
       setAssets(res)
