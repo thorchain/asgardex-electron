@@ -35,15 +35,19 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
   return (
     <Row>
       <Col span={24}>
-        <Table dataSource={assets} rowKey="_id" pagination={false}
-          onRow={(record, rowIndex) => {
-            return { onClick: event => {
-              console.log(`clicking row... ${record.symbol}`)
+        <Table
+          dataSource={assets}
+          rowKey="_id"
+          pagination={false}
+          onRow={(record) => {
+            return {
+              onClick: () => {
+                console.log(`clicking row... ${record.symbol}`)
 
-              history.push(`/wallet/asset-details/${record.symbol}`)
-            }}
-          }}
-        >
+                history.push(`/wallet/asset-details/${record.symbol}`)
+              }
+            }
+          }}>
           <Table.Column
             title="Icon"
             dataIndex="symbol"
