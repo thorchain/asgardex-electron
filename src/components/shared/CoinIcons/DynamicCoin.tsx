@@ -13,7 +13,6 @@ const CircleIcon: React.FC<Props> = (props): JSX.Element => {
     return 'linear-gradient(45deg,' + start + ', ' + stop + ')'
   }
   const backgroundStyle = {
-    // Conditionally set icon image file here(?)
     backgroundImage: gradientColors()
   }
   return (

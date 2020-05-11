@@ -57,7 +57,9 @@ const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
     <Row>
       <Col span={24} md={{ span: 16, offset: 4 }} lg={{ span: 12, offset: 6 }}>
         <Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <DynamicCoin type={asset.symbol} size="big" />
+          <div style={{margin:"24px"}}>
+            <DynamicCoin type={asset.symbol} size="big"/>
+          </div>
           <Title level={4}>NAME: {shortSymbol(asset.symbol)}</Title>
           <div>{asset.symbol}</div>
           <Title level={3}>

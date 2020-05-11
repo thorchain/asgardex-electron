@@ -65,7 +65,7 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
         }}
       />
       <Table.Column
-        title="noType"
+        title="Party"
         dataIndex="Type"
         render={(value, tx: UserTransactionTypes) => {
           const p = party(tx)
@@ -73,7 +73,7 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
         }}
       />
       <Table.Column
-        title="With"
+        title="Address"
         dataIndex="txFrom"
         render={(value, tx: UserTransactionTypes) => {
           const p = party(tx)
