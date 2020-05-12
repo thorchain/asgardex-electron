@@ -1,10 +1,41 @@
 import React, { useMemo, useCallback } from 'react'
-import { Row, Col, Typography, Button, Card } from 'antd'
+import { Row, Col, Typography, Button, Card, List } from 'antd'
+import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
+import { UserAccountType } from '../../types/wallet'
 const { Title, Text, Paragraph } = Typography
 
 // Dummy Data
+const UserAccounts: UserAccountType[] = [
+  {
+    chainName: 'Binancechain',
+    accounts: [
+      {
+        name: 'Main',
+        address: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
+        type: 'internal'
+      },
+      {
+        name: 'Ledger',
+        address: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
+        type: 'external'
+      }
+    ]
+  },
+  {
+    chainName: 'EthereumClassic',
+    accounts: [
+      {
+        name: 'Metamask',
+        address: '0x910286F93b230E221384844C4ae18a14c474E74E',
+        type: 'external'
+      },
+    ]
+
+  }
+
+]
+// Dummy data... types not confirmed
 const userAccount = {
-  _id: 'MTbyhYhWysp25TDBy',
   address: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
   keystore: {
     version: 1,
@@ -96,7 +127,23 @@ const UserAccountsScreen: React.FC = (): JSX.Element => {
 
           <Col sm={{ span: 24 }} md={{ span: 12 }} lg={{ span: 12 }} xl={{ span: 12 }}>
             <Paragraph strong>Manage Accounts</Paragraph>
-            <Card title="Accounts">{/* List of accounts goes here */}</Card>
+            <Card title="Accounts">
+              <List
+                dataSource={UserAccounts}
+                renderItem={(item,i:number) => (
+                  <List.Item style={{flexDirection:'column',alignItems:'start'}}key={i}>
+                    <Text strong>{item.chainName}</Text>
+                    {item.accounts.map((acc,j) => (<>
+                      <Text type="secondary">{acc.name}</Text>
+                      <Paragraph ellipsis key={j}>{acc.address}
+                        {acc.type === 'external' && (<Button type="link" danger><CloseCircleOutlined /></Button>)}
+                      </Paragraph>
+                    </>))}
+                  </List.Item>
+                )}
+            />
+            <Button type="link"><PlusCircleFilled/>Add Device</Button>
+            </Card>
           </Col>
         </Row>
       </Col>
