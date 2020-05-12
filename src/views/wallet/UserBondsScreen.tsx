@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom'
 import { walletAssetDetailsRoute } from '../../routes'
 import { UserAssetType } from '../../types/wallet'
 import { Row, Col, Table } from 'antd'
-import DynamicCoin from '../../components/shared/CoinIcons/DynamicCoin'
+import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 
 // Dummy data
 const UserAssets: UserAssetType[] = [

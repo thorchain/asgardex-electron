@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { WalletAssetDetailsRouteParams } from '../../routes'
 import TransactionsTable from '../../components/wallet/UserTransactionsTable'
 import { UserTransactionType, UserAssetType } from '../../types/wallet'
-import DynamicCoin from '../../components/shared/CoinIcons/DynamicCoin'
+import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 import { shortSymbol } from '../../helpers/tokenHelpers'
 import { Row, Col, Typography, Divider, Button, Card } from 'antd'
 const { Title } = Typography
