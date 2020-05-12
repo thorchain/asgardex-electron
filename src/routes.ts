@@ -73,9 +73,8 @@ export const walletBondsRoute: Route<void> = {
   }
 }
 export type WalletAssetDetailsRouteParams = { symbol: string }
-export const walletAssetDetailsRoute: Route<void> = {
+export const walletAssetDetailsRoute: Route<WalletAssetDetailsRouteParams> = {
   template: `${walletBaseRoute.template}/asset-details/:symbol`,
-  path() {
-    return this.template
-  }
+  path: ({ symbol }) => `${walletBaseRoute.template}/asset-details/${symbol}`
+
 }
