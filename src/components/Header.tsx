@@ -2,9 +2,9 @@ import React, { useMemo, useCallback } from 'react'
 import { useObservableState } from 'observable-hooks'
 
 import { Menu, Select, Row, Col } from 'antd'
-import { CheckCircleOutlined, MinusCircleOutlined, AlertOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, MinusCircleOutlined, AlertOutlined, SettingOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from 'react-router-dom'
-import { walletBaseRoute, walletHomeRoute, swapHomeRoute, stakeHomeRoute } from '../routes'
+import { walletBaseRoute, walletHomeRoute, walletSettingsRoute, swapHomeRoute, stakeHomeRoute } from '../routes'
 import { useConnectionContext, OnlineStatus } from '../contexts/ConnectionContext'
 import { HeaderWrapper } from './Header.style'
 import { useI18nContext } from '../contexts/I18nContext'
@@ -112,6 +112,12 @@ const Header: React.FC<Props> = (_): JSX.Element => {
         <Col>
           <AlertOutlined
             onClick={clickSwitchThemeHandler}
+            style={{ color: palette('text', 0)({ theme }), fontSize: '1.5em' }}
+          />
+        </Col>
+        <Col>
+          <SettingOutlined
+            onClick={() => history.push(walletSettingsRoute.path())}
             style={{ color: palette('text', 0)({ theme }), fontSize: '1.5em' }}
           />
         </Col>

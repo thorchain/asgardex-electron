@@ -54,6 +54,12 @@ export const walletHomeRoute: Route<void> = {
     return this.template
   }
 }
+export const walletSettingsRoute: Route<void> = {
+  template: `${walletBaseRoute.template}/settings`,
+  path() {
+    return this.template
+  }
+}
 export const walletAssetsRoute: Route<void> = {
   template: `${walletBaseRoute.template}/assets`,
   path() {

@@ -1,7 +1,9 @@
 import React from 'react'
-import { Switch, Route, Redirect, Link } from 'react-router-dom'
+import { Switch, Route, Redirect } from 'react-router-dom'
+import WalletViewNav from './WalletViewNav'
 
 import {
+  walletSettingsRoute,
   walletBondsRoute,
   walletStakesRoute,
   walletAssetsRoute,
@@ -10,37 +12,32 @@ import {
 } from '../../routes'
 
 import View from '../View'
+import WalletSettingsScreen from './WalletSettingsScreen'
 import UserAssetsScreen from './UserAssetsScreen'
 import UserStakesScreen from './UserStakesScreen'
 import UserBondsScreen from './UserBondsScreen'
 import UserAssetDetailsScreen from './UserAssetDetailsScreen'
-import { Menu } from 'antd'
 
 const WalletView: React.FC = (): JSX.Element => {
   return (
     <View>
-      <Menu mode="horizontal">
-        <Menu.Item key={0}>
-          <Link to={walletAssetsRoute.path()}>Assets</Link>
-        </Menu.Item>
-        <Menu.Item key={1}>
-          <Link to={walletStakesRoute.path()}>Stakes</Link>
-        </Menu.Item>
-        <Menu.Item key={2}>
-          <Link to={walletBondsRoute.path()}>Bonds</Link>
-        </Menu.Item>
-      </Menu>
       <Switch>
         <Route path={walletHomeRoute.template} exact>
           <Redirect to={walletAssetsRoute.path()} />
         </Route>
+        <Route path={walletSettingsRoute.template} exact>
+          <WalletSettingsScreen />
+        </Route>
         <Route path={walletAssetsRoute.template} exact>
+          <WalletViewNav />
           <UserAssetsScreen />
         </Route>
         <Route path={walletStakesRoute.template} exact>
+          <WalletViewNav />
           <UserStakesScreen />
         </Route>
         <Route path={walletBondsRoute.template} exact>
+          <WalletViewNav />
           <UserBondsScreen />
         </Route>
         <Route path={walletAssetDetailsRoute.template} exact>
