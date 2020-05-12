@@ -1,6 +1,6 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import { WalletAssetDetailsRouteParams } from '../../routes'
+import { AssetDetailsRouteParams } from '../../routes/wallet'
 import TransactionsTable from '../../components/wallet/UserTransactionsTable'
 import { UserTransactionType, UserAssetType } from '../../types/wallet'
 import DynamicCoin from '../../components/shared/icons/DynamicCoin'
@@ -34,7 +34,7 @@ const txs: UserTransactionType[] = [
 ]
 
 const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
-  const { symbol } = useParams<WalletAssetDetailsRouteParams>()
+  const { symbol } = useParams<AssetDetailsRouteParams>()
   // Dummy data
   const asset: UserAssetType = {
     _id: '2',

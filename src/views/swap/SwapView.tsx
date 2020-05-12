@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from 'antd'
 import { useHistory, useParams } from 'react-router-dom'
-import { SwapRouteParams } from '../../routes'
+import { SwapRouteParams } from '../../routes/swap'
 import View from '../View'
 
 type Props = {}

@@ -2,14 +2,7 @@ import React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import WalletViewNav from './WalletViewNav'
 
-import {
-  walletSettingsRoute,
-  walletBondsRoute,
-  walletStakesRoute,
-  walletAssetsRoute,
-  walletAssetDetailsRoute,
-  walletHomeRoute
-} from '../../routes'
+import * as walletRoutes from '../../routes/wallet'
 
 import View from '../View'
 import WalletSettingsScreen from './WalletSettingsScreen'
@@ -22,25 +15,25 @@ const WalletView: React.FC = (): JSX.Element => {
   return (
     <View>
       <Switch>
-        <Route path={walletHomeRoute.template} exact>
-          <Redirect to={walletAssetsRoute.path()} />
+        <Route path={walletRoutes.base.template} exact>
+          <Redirect to={walletRoutes.assets.path()} />
         </Route>
-        <Route path={walletSettingsRoute.template} exact>
+        <Route path={walletRoutes.settings.template} exact>
           <WalletSettingsScreen />
         </Route>
-        <Route path={walletAssetsRoute.template} exact>
+        <Route path={walletRoutes.assets.template} exact>
           <WalletViewNav />
           <UserAssetsScreen />
         </Route>
-        <Route path={walletStakesRoute.template} exact>
+        <Route path={walletRoutes.stakes.template} exact>
           <WalletViewNav />
           <UserStakesScreen />
         </Route>
-        <Route path={walletBondsRoute.template} exact>
+        <Route path={walletRoutes.bonds.template} exact>
           <WalletViewNav />
           <UserBondsScreen />
         </Route>
-        <Route path={walletAssetDetailsRoute.template} exact>
+        <Route path={walletRoutes.assetDetails.template} exact>
           <UserAssetDetailsScreen />
         </Route>
       </Switch>

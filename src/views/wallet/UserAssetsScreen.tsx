@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { walletAssetDetailsRoute } from '../../routes'
+import * as walletRoutes from '../../routes/wallet'
 import { UserAssetType } from '../../types/wallet'
 import { Row, Col, Table } from 'antd'
 import DynamicCoin from '../../components/shared/icons/DynamicCoin'
@@ -34,7 +34,7 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
           onRow={(record) => {
             return {
               onClick: () => {
-                history.push(walletAssetDetailsRoute.path({ symbol: record.symbol }))
+                history.push(walletRoutes.assetDetails.path({ symbol: record.symbol }))
               }
             }
           }}>
