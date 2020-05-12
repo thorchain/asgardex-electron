@@ -4,7 +4,9 @@ import { useObservableState } from 'observable-hooks'
 import { Menu, Select, Row, Col } from 'antd'
 import { CheckCircleOutlined, MinusCircleOutlined, AlertOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from 'react-router-dom'
-import { walletBaseRoute, walletHomeRoute, swapHomeRoute, stakeHomeRoute } from '../routes'
+import * as walletRoutes from '../routes/wallet'
+import * as swapRoutes from '../routes/swap'
+import * as stakeRoutes from '../routes/stake'
 import { useConnectionContext, OnlineStatus } from '../contexts/ConnectionContext'
 import { HeaderWrapper } from './Header.style'
 import { useI18nContext } from '../contexts/I18nContext'
@@ -44,9 +46,9 @@ const Header: React.FC<Props> = (_): JSX.Element => {
 
   const isOnline = onlineStatus === OnlineStatus.ON
 
-  const matchSwapRoute = useRouteMatch(swapHomeRoute.path())
-  const matchStakeRoute = useRouteMatch(stakeHomeRoute.path())
-  const matchWalletRoute = useRouteMatch(walletBaseRoute.path())
+  const matchSwapRoute = useRouteMatch(swapRoutes.base.path())
+  const matchStakeRoute = useRouteMatch(stakeRoutes.base.path())
+  const matchWalletRoute = useRouteMatch(walletRoutes.base.path())
 
   const activeKey: MENU_ITEM_KEY = useMemo(() => {
     if (matchSwapRoute) {
@@ -77,9 +79,9 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const items = useMemo(
     () =>
       [
-        { key: MENU_ITEM_KEY.SWAP, label: 'Swap', path: swapHomeRoute.path() },
-        { key: MENU_ITEM_KEY.STAKE, label: 'Stake', path: stakeHomeRoute.path() },
-        { key: MENU_ITEM_KEY.WALLET, label: 'Wallet', path: walletHomeRoute.path() }
+        { key: MENU_ITEM_KEY.SWAP, label: 'Swap', path: swapRoutes.base.path() },
+        { key: MENU_ITEM_KEY.STAKE, label: 'Stake', path: stakeRoutes.base.path() },
+        { key: MENU_ITEM_KEY.WALLET, label: 'Wallet', path: walletRoutes.base.path() }
       ] as MenuItem[],
     []
   )
