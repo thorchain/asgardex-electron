@@ -10,7 +10,7 @@
     "output": "release"
   },
   "mac": {
-    "target": ["dmg", "zip"],
+    "target": ["dmg"],
     "icon": "resources/icons/icon.icns",
     "category": "public.app-category.finance",
     "hardenedRuntime": true,
