@@ -39,11 +39,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Publish Windows or Linux binaries
-        if: runner.os != 'macOS'
-        run: yarn package:ci
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # TODO (@veado) Enable win/linux builds
+      # - name: Publish Windows or Linux binaries
+      #   if: runner.os != 'macOS'
+      #   run: yarn package:ci
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish macOS binaries
         if: runner.os == 'macOS'
