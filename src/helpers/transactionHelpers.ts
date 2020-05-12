@@ -1,5 +1,5 @@
-import { UserTransactionTypes } from '../components/wallet/UserTransactionsTable'
-export const txParty = (address: string, tx: UserTransactionTypes) => {
+import { UserTransactionType } from '../types/wallet'
+export const txParty = (address: string, tx: UserTransactionType) => {
   const from = tx.fromAddr
   const to = tx.toAddr
   switch (tx.txType) {
@@ -21,6 +21,6 @@ export const txParty = (address: string, tx: UserTransactionTypes) => {
       }
 
     default:
-      return { msg: 'pending', label: '', address: '', color: '', op: '' }
+      return { msg: 'unkown', label: 'NA', address: '', color: '', op: '' }
   }
 }

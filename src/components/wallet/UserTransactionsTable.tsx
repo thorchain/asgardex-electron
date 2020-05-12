@@ -1,35 +1,14 @@
 import React from 'react'
 import { shortSymbol } from '../../helpers/tokenHelpers'
 import { txParty } from '../../helpers/transactionHelpers'
+import { UserTransactionType } from '../../types/wallet'
 import { Typography, Table } from 'antd'
 const { Text } = Typography
 
-export type UserTransactionTypes = {
-  _id?: number
-  blockHeight?: number
-  code?: number
-  confirmBlocks?: number
-  data?: string | null
-  fromAddr?: string | null
-  memo?: string
-  orderId?: number | null
-  proposalId?: string | null
-  sequence?: number
-  source?: number
-  timeStamp?: string
-  toAddr?: string | null
-  txAge?: number
-  txAsset: string
-  txFee: string
-  txHash: string
-  txType: string
-  value: string
-}
-
-type Props = { transactions: UserTransactionTypes[] }
+type Props = { transactions: UserTransactionType[] }
 const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
   const address = 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y'
-  const party = (tx: UserTransactionTypes) => {
+  const party = (tx: UserTransactionType) => {
     return txParty(address, tx)
   }
   return (
@@ -38,7 +17,7 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
         title="Type"
         dataIndex="txType"
         width="1px"
-        render={(value, tx: UserTransactionTypes) => {
+        render={(value, tx: UserTransactionType) => {
           const p = party(tx)
           return <span style={{ textTransform: 'uppercase' }}>{p.msg}</span>
         }}
@@ -46,7 +25,7 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
       <Table.Column
         title="Party"
         dataIndex="Type"
-        render={(value, tx: UserTransactionTypes) => {
+        render={(value, tx: UserTransactionType) => {
           const p = party(tx)
           return <Text strong>{p.label}:&nbsp;</Text>
         }}
@@ -54,7 +33,7 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
       <Table.Column
         title="Address"
         dataIndex="txFrom"
-        render={(value, tx: UserTransactionTypes) => {
+        render={(value, tx: UserTransactionType) => {
           const p = party(tx)
           return (
             <Text ellipsis style={{ fontFamily: 'monospace' }}>
@@ -68,7 +47,7 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
         dataIndex="txValue"
         align="right"
         width="1px"
-        render={(value, tx: UserTransactionTypes) => {
+        render={(value, tx: UserTransactionType) => {
           const p = party(tx)
           return (
             <Text>

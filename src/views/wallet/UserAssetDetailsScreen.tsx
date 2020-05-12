@@ -1,25 +1,15 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import { WalletAssetDetailsRouteParams } from '../../routes'
-import TransactionsTable, { UserTransactionTypes } from '../../components/wallet/UserTransactionsTable'
+import TransactionsTable from '../../components/wallet/UserTransactionsTable'
+import { UserTransactionType, UserAssetType } from '../../types/wallet'
 import DynamicCoin from '../../components/shared/CoinIcons/DynamicCoin'
 import { shortSymbol } from '../../helpers/tokenHelpers'
 import { Row, Col, Typography, Divider, Button, Card } from 'antd'
-
 const { Title } = Typography
 
-type UserAssetType = {
-  _id: string
-  free: number
-  full?: number
-  frozen: number
-  locked: number
-  symbol: string
-  name: string
-  value: string
-}
 // Dummy data
-const txs: UserTransactionTypes[] = [
+const txs: UserTransactionType[] = [
   {
     _id: 0,
     blockHeight: 74645396,
@@ -53,7 +43,6 @@ const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
     locked: 101,
     symbol: symbol,
     name: shortSymbol(symbol),
-    value: '0.25',
     full: 1173
   }
   const sendable = () => asset.free > 0

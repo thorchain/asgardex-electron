@@ -1,22 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
+import { walletAssetDetailsRoute } from '../../routes'
+import { UserAssetType } from '../../types/wallet'
 import { Row, Col, Table } from 'antd'
 import DynamicCoin from '../../components/shared/CoinIcons/DynamicCoin'
 
-type UserAssetType = {
-  _id: string
-  free: number
-  frozen: number
-  locked: number
-  symbol: string
-  name: string
-  value: string
-}
-
 // Dummy data
 const UserAssets: UserAssetType[] = [
-  { _id: '1', free: 99, frozen: 11, locked: 21, symbol: 'BNB-JST', name: 'Binance', value: '0.99' },
-  { _id: '2', free: 1034, frozen: 38, locked: 101, symbol: 'RUNE-1E0', name: 'Rune', value: '0.25' }
+  { _id: '1', free: 99, frozen: 11, locked: 21, symbol: 'BNB-JST', name: 'Binance', value: 0.99 },
+  { _id: '2', free: 1034, frozen: 38, locked: 101, symbol: 'RUNE-1E0', name: 'Rune', value: 0.25 }
 ]
 
 const UserBondsScreen: React.FC = (): JSX.Element => {
@@ -42,7 +34,7 @@ const UserBondsScreen: React.FC = (): JSX.Element => {
           onRow={(record) => {
             return {
               onClick: () => {
-                history.push(`/wallet/asset-details/${record.symbol}`)
+                history.push(walletAssetDetailsRoute.path({ symbol: record.symbol }))
               }
             }
           }}>
