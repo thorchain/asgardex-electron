@@ -1,7 +1,13 @@
 import React from 'react'
 import { Switch, Route, Redirect, Link } from 'react-router-dom'
 
-import { walletBondsRoute, walletStakesRoute, walletAssetsRoute, walletAssetDetailsRoute, walletHomeRoute } from '../../routes'
+import {
+  walletBondsRoute,
+  walletStakesRoute,
+  walletAssetsRoute,
+  walletAssetDetailsRoute,
+  walletHomeRoute
+} from '../../routes'
 
 import View from '../View'
 import UserAssetsScreen from './UserAssetsScreen'

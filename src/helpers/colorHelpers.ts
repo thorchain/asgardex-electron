@@ -14,7 +14,6 @@ export const rgb2hex = (r: number, g: number, b: number) =>
     )
     .join('')
 
-
 export const getIntFromName = (str: string): string[] => {
   const inputStr = String(str).toUpperCase()
 

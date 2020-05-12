@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { walletAssetDetailsRoute, WalletAssetDetailsRouteParams } from '../../routes'
+import { walletAssetDetailsRoute } from '../../routes'
 import { Row, Col, Table } from 'antd'
 import DynamicCoin from '../../components/shared/CoinIcons/DynamicCoin'
 
