@@ -28,11 +28,9 @@ const UserAccounts: UserAccountType[] = [
         name: 'Metamask',
         address: '0x910286F93b230E221384844C4ae18a14c474E74E',
         type: 'external'
-      },
+      }
     ]
-
   }
-
 ]
 // Dummy data... types not confirmed
 const userAccount = {
@@ -130,19 +128,29 @@ const UserAccountsScreen: React.FC = (): JSX.Element => {
             <Card title="Accounts">
               <List
                 dataSource={UserAccounts}
-                renderItem={(item,i:number) => (
-                  <List.Item style={{flexDirection:'column',alignItems:'start'}}key={i}>
+                renderItem={(item, i: number) => (
+                  <List.Item style={{ flexDirection: 'column', alignItems: 'start' }} key={i}>
                     <Text strong>{item.chainName}</Text>
-                    {item.accounts.map((acc,j) => (<>
-                      <Text type="secondary">{acc.name}</Text>
-                      <Paragraph ellipsis key={j}>{acc.address}
-                        {acc.type === 'external' && (<Button type="link" danger><CloseCircleOutlined /></Button>)}
-                      </Paragraph>
-                    </>))}
+                    {item.accounts.map((acc, j) => (
+                      <>
+                        <Text type="secondary">{acc.name}</Text>
+                        <Paragraph ellipsis key={j}>
+                          {acc.address}
+                          {acc.type === 'external' && (
+                            <Button type="link" danger>
+                              <CloseCircleOutlined />
+                            </Button>
+                          )}
+                        </Paragraph>
+                      </>
+                    ))}
                   </List.Item>
                 )}
-            />
-            <Button type="link"><PlusCircleFilled/>Add Device</Button>
+              />
+              <Button type="link">
+                <PlusCircleFilled />
+                Add Device
+              </Button>
             </Card>
           </Col>
         </Row>
