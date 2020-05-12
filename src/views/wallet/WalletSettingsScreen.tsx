@@ -132,9 +132,9 @@ const UserAccountsScreen: React.FC = (): JSX.Element => {
                   <List.Item style={{ flexDirection: 'column', alignItems: 'start' }} key={i}>
                     <Text strong>{item.chainName}</Text>
                     {item.accounts.map((acc, j) => (
-                      <>
+                      <div key={j}>
                         <Text type="secondary">{acc.name}</Text>
-                        <Paragraph ellipsis key={j}>
+                        <Paragraph ellipsis>
                           {acc.address}
                           {acc.type === 'external' && (
                             <Button type="link" danger>
@@ -142,7 +142,7 @@ const UserAccountsScreen: React.FC = (): JSX.Element => {
                             </Button>
                           )}
                         </Paragraph>
-                      </>
+                      </div>
                     ))}
                   </List.Item>
                 )}
