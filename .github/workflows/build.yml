@@ -47,7 +47,7 @@ jobs:
 
       - name: Publish macOS binaries
         if: runner.os == 'macOS'
-        run: yarn package:ci release
+        run: yarn package:ci
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SIGNING_APPLE_ID: ${{ secrets.SIGNING_APPLE_ID }}
