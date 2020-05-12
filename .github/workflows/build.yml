@@ -12,9 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # TODO (Veado) Enable macOS
-        # os: [windows-latest, macOS-latest, ubuntu-latest]
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-latest, macOS-latest, ubuntu-latest]
         node_version: [13]
     steps:
       - name: Checkout git repo
@@ -47,18 +45,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # TODO (Veado) Enable build of macOS release,
-      # we have to add `secrets` to GitHub first
-      # - name: Publish macOS binaries
-      #   if: runner.os == 'macOS'
-      #   run: yarn package:ci release
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     CSC_LINK: ${{ secrets.MAC_CERTIFICATE }}
-      #     CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
-      #     SIGNING_APPLE_ID: ${{ secrets.SIGNING_APPLE_ID }}
-      #     SIGNING_APP_PASSWORD: ${{ secrets.SIGNING_APP_PASSWORD }}
-      #     SIGNING_TEAM_ID: ${{ secrets.SIGNING_TEAM_ID }}
+      - name: Publish macOS binaries
+        if: runner.os == 'macOS'
+        run: yarn package:ci release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SIGNING_APPLE_ID: ${{ secrets.SIGNING_APPLE_ID }}
+          SIGNING_APP_PASSWORD: ${{ secrets.SIGNING_APP_PASSWORD }}
 
       - name: Remove previous artifacts
         run: rm -r -- ./*
