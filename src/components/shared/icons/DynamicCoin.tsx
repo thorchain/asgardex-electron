@@ -4,7 +4,7 @@ import { shortSymbol } from '../../../helpers/tokenHelpers'
 import { DynamicCoinWrapper } from './DynamicCoin.style'
 
 type Props = { type: string; size: string }
-const CircleIcon: React.FC<Props> = (props): JSX.Element => {
+const DynamicCoin: React.FC<Props> = (props): JSX.Element => {
   const symbol = shortSymbol(props.type)
   const gradientColors = () => {
     const numbers = getIntFromName(symbol)
@@ -13,7 +13,6 @@ const CircleIcon: React.FC<Props> = (props): JSX.Element => {
     return 'linear-gradient(45deg,' + start + ', ' + stop + ')'
   }
   const backgroundStyle = {
-    // Conditionally set icon image file here(?)
     backgroundImage: gradientColors()
   }
   return (
@@ -22,4 +21,4 @@ const CircleIcon: React.FC<Props> = (props): JSX.Element => {
     </DynamicCoinWrapper>
   )
 }
-export default CircleIcon
+export default DynamicCoin

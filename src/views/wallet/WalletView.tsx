@@ -1,12 +1,19 @@
 import React from 'react'
 import { Switch, Route, Redirect, Link } from 'react-router-dom'
 
-import { walletBondsRoute, walletStakesRoute, walletAssetsRoute, walletHomeRoute } from '../../routes'
+import {
+  walletBondsRoute,
+  walletStakesRoute,
+  walletAssetsRoute,
+  walletAssetDetailsRoute,
+  walletHomeRoute
+} from '../../routes'
 
 import View from '../View'
 import UserAssetsScreen from './UserAssetsScreen'
 import UserStakesScreen from './UserStakesScreen'
 import UserBondsScreen from './UserBondsScreen'
+import UserAssetDetailsScreen from './UserAssetDetailsScreen'
 import { Menu } from 'antd'
 
 const WalletView: React.FC = (): JSX.Element => {
@@ -35,6 +42,9 @@ const WalletView: React.FC = (): JSX.Element => {
         </Route>
         <Route path={walletBondsRoute.template} exact>
           <UserBondsScreen />
+        </Route>
+        <Route path={walletAssetDetailsRoute.template} exact>
+          <UserAssetDetailsScreen />
         </Route>
       </Switch>
     </View>
