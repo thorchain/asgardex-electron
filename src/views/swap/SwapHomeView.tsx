@@ -1,7 +1,8 @@
 import React from 'react'
 import { Button } from 'antd'
 import { useHistory } from 'react-router-dom'
-import { swapRoute, SwapRouteParams } from '../../routes'
+import * as swapRoutes from '../../routes/swap'
+import { SwapRouteParams } from '../../routes/swap'
 import View from '../View'
 import { useObservableState } from 'observable-hooks'
 import * as RD from '@devexperts/remote-data-ts'
@@ -13,7 +14,7 @@ const SwapHomeView: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
 
   const clickHandler = (p: SwapRouteParams) => {
-    history.push(swapRoute.path(p))
+    history.push(swapRoutes.swap.path(p))
   }
   const { pools$ } = useMidgardContext()
   const pools = useObservableState(pools$, RD.initial)
