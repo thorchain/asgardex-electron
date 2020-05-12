@@ -1,6 +1,6 @@
 import React from 'react'
 import { shortSymbol } from '../../helpers/tokenHelpers'
-import { txParty } from '../../helpers/transactionHelpers'
+import { transactionParty } from '../../helpers/transactionHelpers'
 import { UserTransactionType } from '../../types/wallet'
 import { Typography, Table } from 'antd'
 const { Text } = Typography
@@ -9,7 +9,7 @@ type Props = { transactions: UserTransactionType[] }
 const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
   const address = 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y'
   const party = (tx: UserTransactionType) => {
-    return txParty(address, tx)
+    return transactionParty(address, tx)
   }
   return (
     <Table size="small" dataSource={transactions} rowKey="_id" pagination={false}>

@@ -30,3 +30,11 @@ export type UserTransactionType = {
   txType: string
   value: string
 }
+
+export type TransactionPartyType = {
+  msg: string
+  label: string
+  address?: string | null
+  color: string
+  op: string
+}

@@ -1,5 +1,5 @@
-import { UserTransactionType } from '../types/wallet'
-export const txParty = (address: string, tx: UserTransactionType) => {
+import { UserTransactionType, TransactionPartyType } from '../types/wallet'
+export const transactionParty = (address: string, tx: UserTransactionType): TransactionPartyType => {
   const from = tx.fromAddr
   const to = tx.toAddr
   switch (tx.txType) {
