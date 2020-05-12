@@ -12,7 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macOS-latest, ubuntu-latest]
+        # TODO (@veado) Enable win/linux builds
+        # os: [windows-latest, macOS-latest, ubuntu-latest]
+        os: [macOS-latest]
         node_version: [13]
     steps:
       - name: Checkout git repo
@@ -39,12 +41,11 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # TODO (@veado) Enable win/linux builds
-      # - name: Publish Windows or Linux binaries
-      #   if: runner.os != 'macOS'
-      #   run: yarn package:ci
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish Windows or Linux binaries
+        if: runner.os != 'macOS'
+        run: yarn package:ci
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish macOS binaries
         if: runner.os == 'macOS'
