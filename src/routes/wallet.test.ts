@@ -1,4 +1,4 @@
-import { base, assets, stakes, bonds, assetDetails } from './wallet'
+import { base, settings, assets, stakes, bonds, assetDetails } from './wallet'
 
 describe('Wallet routes', () => {
   describe('base routes', () => {
@@ -7,6 +7,14 @@ describe('Wallet routes', () => {
     })
     it('path', () => {
       expect(base.path()).toEqual('/wallet')
+    })
+  })
+  describe('settings route', () => {
+    it('template', () => {
+      expect(settings.template).toEqual('/wallet/settings')
+    })
+    it('path', () => {
+      expect(settings.path()).toEqual('/wallet/settings')
     })
   })
   describe('assets route', () => {
