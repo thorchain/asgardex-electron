@@ -1,7 +1,7 @@
 {
   "name": "asgardex",
   "productName": "ASGARDEX",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "WALLET AND EXCHANGE CLIENT FOR THORCHAIN",
   "main": "public/electron.js",
   "scripts": {
@@ -12,10 +12,9 @@
     "build": "cross-env PUBLIC_URL=./ craco build",
     "prebuild": "tsc -p ./electron/tsconfig.json",
     "test": "craco test",
-    "release:electron": "yarn build && electron-builder --publish=always",
     "package": "yarn build && yarn package:electron",
     "package:electron": "electron-builder build -c.extraMetadata.main=build/electron.js --config .electronbuildrc",
-    "package:ci": "yarn postinstall && yarn build && yarn package:electron --publish onTagOrDraft",
+    "package:ci": "yarn postinstall && yarn build && yarn package:electron --publish always",
     "postinstall": "electron-builder install-app-deps",
     "lint": "eslint '{src,electron,e2e,}/**/*.{ts,tsx}' --fix",
     "eject": "craco eject",
@@ -45,15 +44,7 @@
   "bugs": {
     "url": "https://github.com/thorchain/asgardex/issues"
   },
-  "keywords": [
-    "thorchain",
-    "asgardex",
-    "bepswap",
-    "thornode",
-    "bitcoin",
-    "ethereum",
-    "binance chain"
-  ],
+  "keywords": ["thorchain", "asgardex", "bepswap", "thornode", "bitcoin", "ethereum", "binance chain"],
   "homepage": "https://thorchain.org",
   "dependencies": {
     "@ant-design/icons": "^4.1.0",
@@ -93,8 +84,9 @@
     "concurrently": "^5.1.0",
     "cross-env": "^7.0.2",
     "electron": "^8.2.3",
-    "electron-builder": "^22.5.1",
+    "electron-builder": "^22.6.0",
     "electron-devtools-installer": "^3.0.0",
+    "electron-notarize": "^0.3.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.3",
     "eslint-plugin-react": "^7.19.0",

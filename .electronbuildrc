@@ -1,14 +1,22 @@
 {
-  "productName": "ASGARDEX",
   "appId": "org.thorchain.asgardex",
+  "productName": "ASGARDEX",
   "copyright": "Copyright © 2020 ${author}",
+  "artifactName": "${productName}-${version}-${os}.${ext}",
+  "afterSign": "./scripts/notarize.js",
   "files": ["build/**/*", "assets/**/*"],
   "directories": {
     "buildResources": "assets",
     "output": "release"
   },
   "mac": {
-    "target": ["dmg"]
+    "target": ["dmg"],
+    "icon": "resources/icons/icon.icns",
+    "category": "public.app-category.finance",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "resources/mac/entitlements.mac.plist",
+    "entitlementsInherit": "resources/mac/entitlements.mac.plist"
   },
   "dmg": {
     "contents": [
@@ -25,6 +33,7 @@
     ]
   },
   "win": {
+    "icon": "resources/icon.ico",
     "target": [
       {
         "target": "nsis",
@@ -33,6 +42,9 @@
     ]
   },
   "linux": {
+    "category": "Finance",
+    "packageCategory": "wallet",
+    "icon": "resources/icons",
     "target": [
       {
         "target": "deb",
@@ -43,7 +55,15 @@
         "arch": ["x64"]
       }
     ],
-    "category": "Development"
+    "desktop": {
+      "Comment": "ASGARDEX",
+      "Icon": "asgardex",
+      "Name": "ASGARDEX",
+      "StartupNotify": "true",
+      "Terminal": "false",
+      "Type": "Application",
+      "Categories": "Finance"
+    }
   },
   "publish": {
     "provider": "github",
