@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Button } from 'antd'
 import { useHistory } from 'react-router-dom'
-import { stakeRoute } from '../../routes'
+import * as stakeRoutes from '../../routes/stake'
 import * as RD from '@devexperts/remote-data-ts'
 import View from '../View'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -19,7 +19,7 @@ const StakeHomeView: React.FC<Props> = (_): JSX.Element => {
   const pools = useObservableState(pools$, RD.initial)
 
   const clickHandler = (asset: string) => {
-    history.push(stakeRoute.path({ asset }))
+    history.push(stakeRoutes.asset.path({ asset }))
   }
 
   const renderPools = useMemo(

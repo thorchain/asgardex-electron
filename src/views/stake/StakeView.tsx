@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from 'antd'
 import { useHistory, useParams } from 'react-router-dom'
-import { StakeRouteParams } from '../../routes'
+import { AssetRouteParams as StakeAssetRouteParams } from '../../routes/stake'
 import View from '../View'
 
 type Props = {}
@@ -9,7 +9,7 @@ type Props = {}
 const StakeView: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
 
-  const { asset } = useParams<StakeRouteParams>()
+  const { asset } = useParams<StakeAssetRouteParams>()
 
   const clickHandler = () => {
     history.goBack()
