@@ -54,10 +54,10 @@ const UserAccountsScreen: React.FC = (): JSX.Element => {
 
   const fileName = (): string => userAccount.address.concat('-keystore.txt')
 
-  const lockWallet = useCallback(async () => {
+  const lockWallet = useCallback(() => {
     console.log('locking wallet...')
   }, [])
-  const removeWallet = useCallback(async () => {
+  const removeWallet = useCallback(() => {
     console.log('removing wallet...')
   }, [])
 
@@ -66,7 +66,7 @@ const UserAccountsScreen: React.FC = (): JSX.Element => {
       <Title level={3}>Settings</Title>
       <Col span={24}>
         <Row gutter={[16, 16]}>
-          <Col md={{ span: 12 }} lg={{ span: 12 }} xl={{ span: 12 }}>
+          <Col span={12}>
             <Paragraph strong>Wallet Management</Paragraph>
             <Card>
               <Row>
@@ -123,7 +123,7 @@ const UserAccountsScreen: React.FC = (): JSX.Element => {
             </Card>
           </Col>
 
-          <Col sm={{ span: 24 }} md={{ span: 12 }} lg={{ span: 12 }} xl={{ span: 12 }}>
+          <Col sm={{ span: 24 }} md={{ span: 12 }}>
             <Paragraph strong>Manage Accounts</Paragraph>
             <Card title="Accounts">
               <List
