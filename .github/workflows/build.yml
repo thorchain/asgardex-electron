@@ -2,9 +2,8 @@ name: Electron build
 
 on:
   push:
-    # TODO (Veado) Change it to master
     branches:
-      - issue-14/packaging
+      - master
 
 jobs:
   build:
@@ -17,9 +16,8 @@ jobs:
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v2
-        # TODO(Veado) change it to master
         with:
-          ref: issue-14/packaging
+          ref: master
 
       - name: Get yarn cache
         id: yarn-cache
