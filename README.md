@@ -46,11 +46,17 @@ yarn dev
 yarn test
 ```
 
-## Packaging (coming soon)
+## Packaging
 
-```bash
-yarn package
+**Important note** for `macOS` users: Please follow guide of ["How to package `ASGARDEX` on macOS"](./PACKAGE_MACOS.md) before running following command.
+
 ```
+yarn package:electron
+```
+
+## Releasing
+
+See [RELEASE.md](./REALEASE.md)
 
 ## Docs
 
