@@ -9,6 +9,17 @@ export type UserAssetType = {
   locked: number
 }
 
+type AccountType = {
+  name: string
+  address: string
+  type: string
+}
+export type UserAccountType = {
+  _id?: number
+  chainName: string
+  accounts: AccountType[]
+}
+
 export type UserTransactionType = {
   _id?: number
   blockHeight?: number | null
