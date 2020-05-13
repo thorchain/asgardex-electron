@@ -1,11 +1,31 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useCallback } from 'react'
 import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined } from '@ant-design/icons'
-import { FooterWrapper, FooterContainer, FooterItem } from './Footer.style'
+import { FooterContainer, FooterLink, FooterIconWrapper } from './Footer.style'
 import { useObservableState } from 'observable-hooks'
 import { useThemeContext } from '../contexts/ThemeContext'
-import TelegramIcon from './shared/icons/Telegram'
 import { ReactComponent as ThorChainIcon } from '../assets/svg/logo-thorchain.svg'
+import { ReactComponent as TelegramIcon } from '../assets/svg/telegram.svg'
+import { Row, Col } from 'antd'
+const { shell } = window.require('electron')
+
+type IconProps = {
+  url: string
+  children: React.ReactNode
+  theme?: unknown
+}
+
+const FooterIcon: React.FC<IconProps> = (props: IconProps): JSX.Element => {
+  const { children, url, theme } = props
+  const clickHandler = useCallback(() => {
+    shell.openExternal(url)
+  }, [url])
+
+  return (
+    <FooterIconWrapper theme={theme} onClick={clickHandler}>
+      {children}
+    </FooterIconWrapper>
+  )
+}
 
 type Props = {
   commitHash?: string
@@ -18,41 +38,44 @@ const Footer: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <FooterContainer theme={theme}>
-      <FooterWrapper>
-        <FooterItem>
-          <a href="https://thorchain.org" target="_blank" rel="noopener noreferrer">
+      <Row justify="space-between" align="middle">
+        <Col xs={24} md={3}>
+          <FooterIcon theme={theme} url="https://thorchain.org">
             <ThorChainIcon />
-          </a>
-        </FooterItem>
-        <FooterItem>
-          <div className="footer-links-bar">
-            <Link to="/stats">STATS</Link>
-            <Link to="/network">NETWORK</Link>
-            <Link to="/faqs">FAQS</Link>
-          </div>
-        </FooterItem>
-        <FooterItem>
-          <div className="footer-social-bar">
-            <a href="https://twitter.com/thorchain_org" target="_blank" rel="noopener noreferrer">
+          </FooterIcon>
+        </Col>
+        <Col xs={24} md={18}>
+          <Row justify="center" align="middle">
+            <FooterLink theme={theme} to="/stats">
+              STATS
+            </FooterLink>
+            <FooterLink theme={theme} to="/network">
+              NETWORK
+            </FooterLink>
+            <FooterLink theme={theme} to="/faqs">
+              FAQS
+            </FooterLink>
+          </Row>
+        </Col>
+        <Col xs={24} md={3}>
+          <Row justify="end" align="middle">
+            <FooterIcon url="https://twitter.com/thorchain_org">
               <TwitterOutlined />
-            </a>
-            <a href="https://t.me/thorchain_org" target="_blank" rel="noopener noreferrer">
+            </FooterIcon>
+            <FooterIcon url="https://t.me/thorchain_org">
               <Icon component={TelegramIcon} />
-            </a>
-            <a href="https://github.com/thorchain" target="_blank" rel="noopener noreferrer">
+            </FooterIcon>
+            <FooterIcon url="https://github.com/thorchain">
               <GithubOutlined />
-            </a>
+            </FooterIcon>
             {commitHash && (
-              <a
-                href={`https://gitlab.com/thorchain/bepswap/bepswap-web-ui/-/commit/${commitHash}`}
-                target="_blank"
-                rel="noopener noreferrer">
+              <FooterIcon url={`https://github.com/thorchain/asgardex-electron/commit/${commitHash}`}>
                 <BranchesOutlined />
-              </a>
+              </FooterIcon>
             )}
-          </div>
-        </FooterItem>
-      </FooterWrapper>
+          </Row>
+        </Col>
+      </Row>
     </FooterContainer>
   )
 }

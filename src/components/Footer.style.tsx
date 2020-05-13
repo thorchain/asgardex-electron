@@ -1,89 +1,51 @@
 import styled from 'styled-components'
-import { palette, size, key } from 'styled-theme'
+import { palette, key } from 'styled-theme'
 import { Layout } from 'antd'
 import { media } from '../helpers/styleHelper'
-
-export const FooterItem = styled.div`
-  .footer-logo {
-    #Thorchain_logo-copy {
-      > :not(:first-child) {
-        fill: ${palette('text', 1)};
-      }
-    }
-  }
-`
+import { Link } from 'react-router-dom'
 
 export const FooterContainer = styled(Layout.Footer)`
-  padding: 0;
-
-  ${media.xl`
-    padding: 24px 0px;
-    margin-top: 40px;
-  `}
-`
-
-export const FooterWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: column;
-  width: 100vw;
   padding: 40px 20px;
 
-  > ${FooterItem} {
-    margin-bottom: 20px;
-  }
-
-  ${media.sm`
-    > ${FooterItem} {
-      margin-bottom: 0;
-    }
-    flex-direction: row;
-    position: fixed;
-    bottom: 0;
-    z-index: 1000;
-    height: ${size('footerHeight', '50px')};
-    padding: 0 30px;
+  ${media.md`
+    padding: 13px 64px;
   `}
 
   background-color: ${palette('background', 0)};
-
-  /* TODO: Refactor these to avoid using classnames */
-  .footer-logo {
-    cursor: pointer;
-    img {
-      height: 30px;
-    }
+`
+export const FooterIconWrapper = styled.div`
+  display: inline;
+  font-size: 18px;
+  > :first-child {
+    color: ${palette('text', 1)};
+  }
+  color: ${palette('text', 1)};
+  cursor: pointer;
+  margin-left: 12px;
+  :first-child {
+    margin-left: 0;
   }
 
-  .footer-links-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-
-    a {
-      font-size: ${key('sizes.font.normal', '12px')};
-      font-weight: bold;
-      color: ${palette('text', 1)};
-      letter-spacing: 1px;
-      cursor: pointer;
-      padding-left: 50px;
-    }
-    a:first-child {
-      padding-left: 0;
+  /* id defined in svg */
+  #thorchain_logo {
+    > :not(:first-child) {
+      fill: ${palette('text', 1)};
     }
   }
-  .footer-social-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 200px;
+`
 
-    a {
-      font-size: 18px;
-      color: ${palette('text', 1)};
-      cursor: pointer;
-    }
+export const FooterLink = styled(Link)`
+  font-size: ${key('sizes.font.normal', '16px')};
+  font-weight: bold;
+  color: ${palette('text', 1)};
+  letter-spacing: 2px;
+  cursor: pointer;
+  padding-left: 40px;
+  :first-child {
+    padding-left: 0;
   }
+  display: block;
+  ${media.md`
+    display: inline-block;
+  `}
 `
