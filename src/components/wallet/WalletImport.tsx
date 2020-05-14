@@ -1,25 +1,24 @@
-import React, { useState, useCallback } from 'react'
-
+import React, { useCallback } from 'react'
 import { Row, Col, Typography, Tabs } from 'antd'
-const { Title } = Typography
-const { TabPane } = Tabs;
-
 import ImportMnemonicForm from './forms/ImportMnemonicForm'
+const { Title, Text } = Typography
+const { TabPane } = Tabs
 
 const ImportScreen: React.FC = (): JSX.Element => {
-  const [activeTab, setActiveTab] = useState('1')
-  const handleTabsChange = useCallback((activeKey:string) => { setActiveTab(activeKey) },[activeTab])
-  const isActiveTab = (keynum:string) => { return (keynum === activeTab) }
+  const handleTabsChange = useCallback((activeKey: string) => {
+    console.log('changed tabs...')
+    console.log(activeKey)
+  }, [])
   return (
     <Row>
-      <Col md={{span:16,offset:4}}>
-        <Title level={4}>Import Existing</Title>
+      <Col md={{ span: 16, offset: 4 }}>
+        <Title level={4}>New Wallet</Title>
         <Tabs defaultActiveKey="1" size="large" onChange={handleTabsChange}>
-          <TabPane tab="Keystore" key="1">
-            <h3>tab1</h3>
+          <TabPane tab="Import" key="1">
+            <ImportMnemonicForm />
           </TabPane>
-          <TabPane tab="Mnemonic" key="2">
-            <ImportMnemonicForm activetab={isActiveTab('2')}/>
+          <TabPane tab="Existing" key="2">
+            <Text type="secondary">Placeholder for new mnemonic </Text>
           </TabPane>
         </Tabs>
       </Col>
@@ -27,5 +26,3 @@ const ImportScreen: React.FC = (): JSX.Element => {
   )
 }
 export default ImportScreen
-
-

@@ -1,10 +1,10 @@
 import React, { useMemo, useCallback } from 'react'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
-const { Title, Text, Paragraph } = Typography
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
-
 import { UserAccountType } from '../../types/wallet'
+const { Text, Paragraph } = Typography
 
+// Dummy Data
 const UserAccounts: UserAccountType[] = [
   {
     chainName: 'Binancechain',
@@ -148,7 +148,6 @@ const WalletManage: React.FC = (): JSX.Element => {
         </Card>
       </Col>
     </Row>
-
   )
 }
 
