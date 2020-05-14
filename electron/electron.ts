@@ -64,8 +64,8 @@ const setupDevEnv = async () => {
 
 const initMainWindow = async () => {
   mainWindow = new BrowserWindow({
-    width: IS_DEV ? 1600 : 800,
-    height: IS_DEV ? 800 : 600,
+    width: IS_DEV ? 1600 : 1200,
+    height: IS_DEV ? 1000 : 800,
     icon: join(APP_ROOT, 'assets', 'icon.png'),
     webPreferences: {
       nodeIntegration: true

@@ -1,15 +1,73 @@
-import React from 'react'
-import { FooterWrapper } from './Footer.style'
-import { useObservableState } from 'observable-hooks'
-import { useThemeContext } from '../contexts/ThemeContext'
+import React, { useCallback } from 'react'
+import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined } from '@ant-design/icons'
+import { FooterContainer, FooterLink, FooterIconWrapper, FooterLinkWrapper } from './Footer.style'
+import { ReactComponent as ThorChainIcon } from '../assets/svg/logo-thorchain.svg'
+import { ReactComponent as TelegramIcon } from '../assets/svg/telegram.svg'
+import { Row, Col, Grid } from 'antd'
+const { shell } = window.require('electron')
 
-type Props = {}
+type IconProps = {
+  url: string
+  children: React.ReactNode
+}
 
-const Footer: React.FC<Props> = (): JSX.Element => {
-  const { theme$ } = useThemeContext()
-  const theme = useObservableState(theme$)
+const FooterIcon: React.FC<IconProps> = (props: IconProps): JSX.Element => {
+  const { children, url } = props
 
-  return <FooterWrapper theme={theme}>Footer</FooterWrapper>
+  const clickHandler = useCallback(() => {
+    shell.openExternal(url)
+  }, [url])
+
+  return <FooterIconWrapper onClick={clickHandler}>{children}</FooterIconWrapper>
+}
+
+type Props = {
+  commitHash?: string
+}
+
+const Footer: React.FC<Props> = (props: Props): JSX.Element => {
+  const { commitHash } = props
+
+  const screens = Grid.useBreakpoint()
+
+  return (
+    <FooterContainer>
+      <Row justify="space-between" align="middle">
+        <Col span={24} sm={4}>
+          <Row justify={screens.sm ? 'start' : 'center'}>
+            <FooterIcon url="https://thorchain.org">
+              <ThorChainIcon />
+            </FooterIcon>
+          </Row>
+        </Col>
+        <Col span={24} sm={16}>
+          <FooterLinkWrapper justify="center">
+            <FooterLink to="/stats">STATS</FooterLink>
+            <FooterLink to="/network">NETWORK</FooterLink>
+            <FooterLink to="/faqs">FAQS</FooterLink>
+          </FooterLinkWrapper>
+        </Col>
+        <Col span={24} sm={4}>
+          <Row justify={screens.sm ? 'end' : 'center'}>
+            <FooterIcon url="https://twitter.com/thorchain_org">
+              <TwitterOutlined />
+            </FooterIcon>
+            <FooterIcon url="https://t.me/thorchain_org">
+              <Icon component={TelegramIcon} />
+            </FooterIcon>
+            <FooterIcon url="https://github.com/thorchain">
+              <GithubOutlined />
+            </FooterIcon>
+            {commitHash && (
+              <FooterIcon url={`https://github.com/thorchain/asgardex-electron/commit/${commitHash}`}>
+                <BranchesOutlined />
+              </FooterIcon>
+            )}
+          </Row>
+        </Col>
+      </Row>
+    </FooterContainer>
+  )
 }
 
 export default Footer
