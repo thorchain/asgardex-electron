@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react'
 
 import { Form, Input, Button } from 'antd'
 import { Store } from 'antd/lib/form/interface'
+import { delay } from '@thorchain/asgardex-util'
 
 const ImportMnemonicForm: React.FC = (): JSX.Element => {
   const [loadingMsg, setLoadingMsg] = useState<string>('')
@@ -13,18 +14,17 @@ const ImportMnemonicForm: React.FC = (): JSX.Element => {
     console.log(`network: ${network}; mnemonic: ${mnemonic}; password: ${password}`)
   }
 
-  const handleImportFormSubmit = useCallback((vals: Store) => {
+  const handleImportFormSubmit = useCallback(async (vals: Store) => {
     setLoadingMsg('Generating wallet')
     // Delay to allow for UI render DOM update before CPU takes over keystore/cryto processing
-    setTimeout(() => {
-      try {
-        console.log('trying...')
-        importMnemonicWallet(vals.mnemonic, vals.password)
-      } catch (err) {
-        setLoadingMsg('')
-        console.log(err)
-      }
-    }, 200)
+    await delay(200)
+    try {
+      console.log('trying...')
+      importMnemonicWallet(vals.mnemonic, vals.password)
+    } catch (err) {
+      setLoadingMsg('')
+      console.log(err)
+    }
   }, [])
   return (
     <Form form={form} onFinish={handleImportFormSubmit} labelCol={{ span: 24 }}>
