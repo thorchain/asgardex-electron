@@ -8,12 +8,13 @@ import * as walletRoutes from '../routes/wallet'
 import * as swapRoutes from '../routes/swap'
 import * as stakeRoutes from '../routes/stake'
 import { useConnectionContext, OnlineStatus } from '../contexts/ConnectionContext'
-import { HeaderWrapper } from './Header.style'
+import { HeaderContainer } from './Header.style'
 import { useI18nContext } from '../contexts/I18nContext'
 import { Locale } from '../i18n/types'
 import { LOCALES } from '../i18n'
 import { useThemeContext } from '../contexts/ThemeContext'
 import { palette } from 'styled-theme'
+import { ReactComponent as AsgardexLogo } from '../assets/svg/logo-asgardex.svg'
 
 type Props = {}
 
@@ -69,6 +70,8 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     [history]
   )
 
+  const clickSettingsHandler = useCallback(() => history.push(walletRoutes.settings.path()), [history])
+
   const changeLocaleHandler = useCallback(
     (locale: Locale) => {
       changeLocale(locale)
@@ -86,45 +89,55 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     []
   )
 
+  const iconStyle = useMemo(() => ({ color: palette('text', 0)({ theme }), fontSize: '1.5em' }), [theme])
+
   return (
-    <HeaderWrapper>
-      <Menu selectedKeys={[activeKey]} theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
-        {items.map(({ label, path, key }) => {
-          return (
-            <Menu.Item key={key} onClick={() => itemClickHandler(path)}>
-              {label}
-            </Menu.Item>
-          )
-        })}
-      </Menu>
-      <Row align="middle" gutter={10}>
-        <Col>
-          <Select defaultValue={currentLocale} onChange={changeLocaleHandler} className="select-locale">
-            {LOCALES.map((locale: Locale) => (
-              <Select.Option value={locale} key={locale}>
-                {locale.toUpperCase()}
-              </Select.Option>
-            ))}
-          </Select>
+    <HeaderContainer>
+      <Row justify="space-between" align="middle">
+        <Col span={6}>
+          <Row justify="space-between" align="middle">
+            <AsgardexLogo />
+            <h2>Net</h2>
+          </Row>
         </Col>
-        <Col>
-          {isOnline && <CheckCircleOutlined style={{ color: '#a0d911', fontSize: '1.5em' }} />}
-          {!isOnline && <MinusCircleOutlined style={{ color: '#ffa940', fontSize: '1.5em' }} />}
+        <Col span={12}>
+          <Row justify="center" align="bottom">
+            <Menu selectedKeys={[activeKey]} theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
+              {items.map(({ label, path, key }) => {
+                return (
+                  <Menu.Item key={key} onClick={() => itemClickHandler(path)}>
+                    {label}
+                  </Menu.Item>
+                )
+              })}
+            </Menu>
+          </Row>
         </Col>
-        <Col>
-          <AlertOutlined
-            onClick={clickSwitchThemeHandler}
-            style={{ color: palette('text', 0)({ theme }), fontSize: '1.5em' }}
-          />
-        </Col>
-        <Col>
-          <SettingOutlined
-            onClick={() => history.push(walletRoutes.settings.path())}
-            style={{ color: palette('text', 0)({ theme }), fontSize: '1.5em' }}
-          />
+        <Col span={6}>
+          <Row align="middle" gutter={10}>
+            <Col>
+              <Select defaultValue={currentLocale} onChange={changeLocaleHandler} className="select-locale">
+                {LOCALES.map((locale: Locale) => (
+                  <Select.Option value={locale} key={locale}>
+                    {locale.toUpperCase()}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Col>
+            <Col>
+              {isOnline && <CheckCircleOutlined style={{ color: '#a0d911', fontSize: '1.5em' }} />}
+              {!isOnline && <MinusCircleOutlined style={{ color: '#ffa940', fontSize: '1.5em' }} />}
+            </Col>
+            <Col>
+              <AlertOutlined onClick={clickSwitchThemeHandler} style={iconStyle} />
+            </Col>
+            <Col>
+              <SettingOutlined onClick={clickSettingsHandler} style={iconStyle} />
+            </Col>
+          </Row>
         </Col>
       </Row>
-    </HeaderWrapper>
+    </HeaderContainer>
   )
 }
 

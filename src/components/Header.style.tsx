@@ -1,15 +1,19 @@
 import styled from 'styled-components'
 import { Layout } from 'antd'
-import { palette } from 'styled-theme'
+import { palette, size } from 'styled-theme'
+import { Z_INDEX_MAP } from '../helpers/styleHelper'
 
-export const HeaderWrapper = styled(Layout.Header)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
+export const HeaderContainer = styled(Layout.Header)`
+  position: fixed;
+  z-index: ${Z_INDEX_MAP.header};
+  height: ${size('headerHeight', '50px')};
+  width: 100vw;
   background-color: ${palette('background', 0)};
 
-  .select-locale {
-    margin-right: 20px;
+  /* Make sure following id is defined in svg */
+  #asgardex_logo {
+    > :not(:first-child) {
+      fill: ${palette('text', 1)};
+    }
   }
 `

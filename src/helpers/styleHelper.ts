@@ -41,3 +41,12 @@ export const media: Media = Object.keys(mediaQueries).reduce((acc, segment) => {
     [segment]: styledMediaFunction
   }
 }, {} as Media)
+
+type ZIndexKey = 'footer' | 'header'
+type ZIndexMap = {
+  [key in ZIndexKey]: number
+}
+export const Z_INDEX_MAP: ZIndexMap = {
+  header: 1001,
+  footer: 1000
+}
