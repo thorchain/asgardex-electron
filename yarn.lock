@@ -445,8 +445,6 @@
     "@babel/traverse" "^7.9.6"
     "@babel/types" "^7.9.6"
 
-<<<<<<< HEAD
-=======
 "@babel/helpers@^7.9.6":
   version "7.9.6"
   resolved "https://registry.yarnpkg.com/@babel/helpers/-/helpers-7.9.6.tgz#092c774743471d0bb6c7de3ad465ab3d3486d580"
@@ -456,13 +454,10 @@
     "@babel/traverse" "^7.9.6"
     "@babel/types" "^7.9.6"
 
->>>>>>> 6973c7018a620fa8a923835a27845b23b380ba7a
 "@babel/highlight@^7.0.0":
   version "7.9.0"
   resolved "https://registry.yarnpkg.com/@babel/highlight/-/highlight-7.9.0.tgz#4e9b45ccb82b79607271b2979ad82c7b68163079"
   integrity sha512-lJZPilxX7Op3Nv/2cvFdnlepPXDxi29wxteT57Q965oc5R9v86ztx0jfxVrTcBk8C2kcPkkDa2Z4T3ZsPPVWsQ==
-<<<<<<< HEAD
-=======
   dependencies:
     "@babel/helper-validator-identifier" "^7.9.0"
     chalk "^2.0.0"
@@ -472,7 +467,6 @@
   version "7.8.3"
   resolved "https://registry.yarnpkg.com/@babel/highlight/-/highlight-7.8.3.tgz#28f173d04223eaaa59bc1d439a3836e6d1265797"
   integrity sha512-PX4y5xQUvy0fnEVHrYOarRPXVWafSjTW9T0Hab8gVIawpl2Sj0ORyrygANq+KjcNlSSTw0YCLSNA8OyZ1I4yEg==
->>>>>>> 6973c7018a620fa8a923835a27845b23b380ba7a
   dependencies:
     "@babel/helper-validator-identifier" "^7.9.0"
     chalk "^2.0.0"
@@ -7353,8 +7347,6 @@ es-abstract@^1.17.0-next.0, es-abstract@^1.17.4:
     string.prototype.trimleft "^2.1.1"
     string.prototype.trimright "^2.1.1"
 
-<<<<<<< HEAD
-=======
 es-abstract@^1.17.0-next.0, es-abstract@^1.17.4:
   version "1.17.5"
   resolved "https://registry.yarnpkg.com/es-abstract/-/es-abstract-1.17.5.tgz#d8c9d1d66c8981fb9200e2251d799eee92774ae9"
@@ -7372,7 +7364,6 @@ es-abstract@^1.17.0-next.0, es-abstract@^1.17.4:
     string.prototype.trimleft "^2.1.1"
     string.prototype.trimright "^2.1.1"
 
->>>>>>> 6973c7018a620fa8a923835a27845b23b380ba7a
 es-array-method-boxes-properly@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/es-array-method-boxes-properly/-/es-array-method-boxes-properly-1.0.0.tgz#873f3e84418de4ee19c5be752990b2e44718d09e"
