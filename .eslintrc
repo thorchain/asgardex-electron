@@ -17,6 +17,9 @@
     "prettier/@typescript-eslint",
     "prettier"
   ],
+  "globals": {
+    "$COMMIT_HASH": true
+  },
   "settings": {
     "react": {
       "version": "detect"

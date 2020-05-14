@@ -1,3 +1,6 @@
+const webpack = require('webpack')
+const GitRevisionPlugin = require('git-revision-webpack-plugin')
+
 module.exports = {
   webpack: {
     configure: (webpackConfig) => {
@@ -6,6 +9,19 @@ module.exports = {
       // support hot reload of hooks
       webpackConfig.resolve.alias['react-dom'] = '@hot-loader/react-dom'
       return webpackConfig
+    },
+    plugins: [
+      new webpack.DefinePlugin({
+        $COMMIT_HASH: JSON.stringify(new GitRevisionPlugin().commithash())
+      })
+    ]
+  },
+  jest: {
+    configure: {
+      preset: 'ts-jest',
+      globals: {
+        $COMMIT_HASH: true
+      }
     }
   }
 }
