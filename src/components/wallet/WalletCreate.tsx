@@ -4,8 +4,9 @@ import ImportMnemonicForm from './forms/ImportMnemonicForm'
 const { Title, Text } = Typography
 const { TabPane } = Tabs
 
-const ImportScreen: React.FC = (): JSX.Element => {
+const WalletCreate: React.FC = (): JSX.Element => {
   const handleTabsChange = useCallback((activeKey: string) => {
+    // use this placeholder method to reset forms is necessary
     console.log('changed tabs...')
     console.log(activeKey)
   }, [])
@@ -17,7 +18,7 @@ const ImportScreen: React.FC = (): JSX.Element => {
           <TabPane tab="Import" key="1">
             <ImportMnemonicForm />
           </TabPane>
-          <TabPane tab="Existing" key="2">
+          <TabPane tab="Create" key="2">
             <Text type="secondary">Placeholder for new mnemonic </Text>
           </TabPane>
         </Tabs>
@@ -25,4 +26,4 @@ const ImportScreen: React.FC = (): JSX.Element => {
     </Row>
   )
 }
-export default ImportScreen
+export default WalletCreate

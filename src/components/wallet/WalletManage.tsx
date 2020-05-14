@@ -2,7 +2,7 @@ import React, { useMemo, useCallback } from 'react'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
 import { UserAccountType } from '../../types/wallet'
-const { Text, Paragraph } = Typography
+const { Title, Text, Paragraph } = Typography
 
 // Dummy Data
 const UserAccounts: UserAccountType[] = [
@@ -61,6 +61,7 @@ const WalletManage: React.FC = (): JSX.Element => {
   return (
     <Row gutter={[16, 16]}>
       <Col span={12}>
+        <Title level={4}>Settings</Title>
         <Paragraph strong>Wallet Management</Paragraph>
         <Card>
           <Row>

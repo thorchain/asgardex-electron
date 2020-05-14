@@ -1,7 +1,7 @@
 import React from 'react'
 import { Row, Col, Tabs, Tag } from 'antd'
 import WalleteManage from '../../components/wallet/WalletManage'
-import WalletImport from '../../components/wallet/WalletImport'
+import WalletCreate from '../../components/wallet/WalletCreate'
 const { TabPane } = Tabs
 
 const UserAccountsScreen: React.FC = (): JSX.Element => {
@@ -10,8 +10,8 @@ const UserAccountsScreen: React.FC = (): JSX.Element => {
       <Col span={24}>
         {/* These tabs for for convenience during development. TODO: Replace with routeing/rendering logic */}
         <Tabs defaultActiveKey="1" size="large" tabBarExtraContent={<Tag>temporary</Tag>}>
-          <TabPane tab="Create New" key="1">
-            <WalletImport />
+          <TabPane tab="New Wallet" key="1">
+            <WalletCreate />
           </TabPane>
           <TabPane tab="Settings" key="2">
             <WalleteManage />

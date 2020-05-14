@@ -15,7 +15,7 @@ const ImportMnemonicForm: React.FC = (): JSX.Element => {
 
   const handleImportFormSubmit = useCallback((vals: Store) => {
     setLoadingMsg('Generating wallet')
-    // Delay to allow for UI render DOM update before CPU takes over keystore processing
+    // Delay to allow for UI render DOM update before CPU takes over keystore/cryto processing
     setTimeout(() => {
       try {
         console.log('trying...')
