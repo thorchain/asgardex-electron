@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import { Row, Col, Typography, Tabs } from 'antd'
 import ImportMnemonicForm from './forms/ImportMnemonicForm'
+import NewMnemonic from './NewMnemonic'
 const { Title, Text } = Typography
 const { TabPane } = Tabs
 
@@ -19,7 +20,7 @@ const WalletCreate: React.FC = (): JSX.Element => {
             <ImportMnemonicForm />
           </TabPane>
           <TabPane tab="Create" key="2">
-            <Text type="secondary">Placeholder for new mnemonic </Text>
+            <NewMnemonic />
           </TabPane>
         </Tabs>
       </Col>
