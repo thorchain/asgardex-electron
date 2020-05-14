@@ -1,30 +1,24 @@
 import React, { useCallback } from 'react'
 import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined } from '@ant-design/icons'
-import { FooterContainer, FooterLink, FooterIconWrapper } from './Footer.style'
-import { useObservableState } from 'observable-hooks'
-import { useThemeContext } from '../contexts/ThemeContext'
+import { FooterContainer, FooterLink, FooterIconWrapper, FooterLinkWrapper } from './Footer.style'
 import { ReactComponent as ThorChainIcon } from '../assets/svg/logo-thorchain.svg'
 import { ReactComponent as TelegramIcon } from '../assets/svg/telegram.svg'
-import { Row, Col } from 'antd'
+import { Row, Col, Grid } from 'antd'
 const { shell } = window.require('electron')
 
 type IconProps = {
   url: string
   children: React.ReactNode
-  theme?: unknown
 }
 
 const FooterIcon: React.FC<IconProps> = (props: IconProps): JSX.Element => {
-  const { children, url, theme } = props
+  const { children, url } = props
+
   const clickHandler = useCallback(() => {
     shell.openExternal(url)
   }, [url])
 
-  return (
-    <FooterIconWrapper theme={theme} onClick={clickHandler}>
-      {children}
-    </FooterIconWrapper>
-  )
+  return <FooterIconWrapper onClick={clickHandler}>{children}</FooterIconWrapper>
 }
 
 type Props = {
@@ -33,32 +27,28 @@ type Props = {
 
 const Footer: React.FC<Props> = (props: Props): JSX.Element => {
   const { commitHash } = props
-  const { theme$ } = useThemeContext()
-  const theme = useObservableState(theme$)
+
+  const screens = Grid.useBreakpoint()
 
   return (
-    <FooterContainer theme={theme}>
+    <FooterContainer>
       <Row justify="space-between" align="middle">
-        <Col xs={24} md={3}>
-          <FooterIcon theme={theme} url="https://thorchain.org">
-            <ThorChainIcon />
-          </FooterIcon>
-        </Col>
-        <Col xs={24} md={18}>
-          <Row justify="center" align="middle">
-            <FooterLink theme={theme} to="/stats">
-              STATS
-            </FooterLink>
-            <FooterLink theme={theme} to="/network">
-              NETWORK
-            </FooterLink>
-            <FooterLink theme={theme} to="/faqs">
-              FAQS
-            </FooterLink>
+        <Col span={24} sm={4}>
+          <Row justify={screens.sm ? 'start' : 'center'}>
+            <FooterIcon url="https://thorchain.org">
+              <ThorChainIcon />
+            </FooterIcon>
           </Row>
         </Col>
-        <Col xs={24} md={3}>
-          <Row justify="end" align="middle">
+        <Col span={24} sm={16}>
+          <FooterLinkWrapper justify="center">
+            <FooterLink to="/stats">STATS</FooterLink>
+            <FooterLink to="/network">NETWORK</FooterLink>
+            <FooterLink to="/faqs">FAQS</FooterLink>
+          </FooterLinkWrapper>
+        </Col>
+        <Col span={24} sm={4}>
+          <Row justify={screens.sm ? 'end' : 'center'}>
             <FooterIcon url="https://twitter.com/thorchain_org">
               <TwitterOutlined />
             </FooterIcon>

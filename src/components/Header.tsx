@@ -87,7 +87,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   )
 
   return (
-    <HeaderWrapper theme={theme}>
+    <HeaderWrapper>
       <Menu selectedKeys={[activeKey]} theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
         {items.map(({ label, path, key }) => {
           return (

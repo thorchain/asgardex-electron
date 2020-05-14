@@ -1,10 +1,9 @@
 import React, { createContext, useContext } from 'react'
 import * as SC from 'styled-components'
 import { BehaviorSubject, Observable } from 'rxjs'
-import { Theme } from '../themes/types'
 import { map } from 'rxjs/operators'
 import { useObservableState } from 'observable-hooks'
-import themes, { ThemeType } from '@thorchain/asgardex-theme'
+import themes, { ThemeType, Theme } from '@thorchain/asgardex-theme'
 
 import 'antd/dist/antd.dark.css'
 import 'antd/dist/antd.css'
@@ -50,7 +49,7 @@ export const ThemeProvider: React.FC<Props> = ({ children }: Props): JSX.Element
   const theme = useObservableState(theme$)
   return (
     <ThemeContext.Provider value={initialContext}>
-      <SC.ThemeProvider theme={{ theme }}>{children}</SC.ThemeProvider>
+      <SC.ThemeProvider theme={{ ...theme }}>{children}</SC.ThemeProvider>
     </ThemeContext.Provider>
   )
 }
