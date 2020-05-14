@@ -23,7 +23,9 @@
     "test:cafe": "cross-env NODE_ENV=production testcafe electron:./ ./e2e/**/*.e2e.ts",
     "generate:types": "yarn clean:types:midgard && yarn generate:types:midgard",
     "generate:types:midgard": "openapi-generator generate -i http://159.89.252.210:8080/v1/swagger.json -g typescript-rxjs -o ./src/types/generated/midgard --reserved-words-mappings in=in",
-    "clean:types:midgard": "rm -rf ./src/types/generated/midgard"
+    "clean:types:midgard": "rm -rf ./src/types/generated/midgard",
+    "storybook": "start-storybook -p 9009 -s public",
+    "build-storybook": "build-storybook -s public"
   },
   "repository": {
     "type": "git",
@@ -45,15 +47,7 @@
   "bugs": {
     "url": "https://github.com/thorchain/asgardex/issues"
   },
-  "keywords": [
-    "thorchain",
-    "asgardex",
-    "bepswap",
-    "thornode",
-    "bitcoin",
-    "ethereum",
-    "binance chain"
-  ],
+  "keywords": ["thorchain", "asgardex", "bepswap", "thornode", "bitcoin", "ethereum", "binance chain"],
   "homepage": "https://thorchain.org",
   "dependencies": {
     "@ant-design/icons": "^4.1.0",
@@ -78,6 +72,14 @@
   },
   "devDependencies": {
     "@hot-loader/react-dom": "^16.13.0",
+    "@storybook/addon-actions": "^5.3.18",
+    "@storybook/addon-knobs": "^5.3.18",
+    "@storybook/addon-links": "^5.3.18",
+    "@storybook/addon-viewport": "^5.3.18",
+    "@storybook/addons": "^5.3.18",
+    "@storybook/preset-create-react-app": "^2.1.2",
+    "@storybook/react": "^5.3.18",
+    "@storybook/theming": "^5.3.18",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
