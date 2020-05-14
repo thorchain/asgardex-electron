@@ -9,6 +9,7 @@ import { ConnectionProvider } from './contexts/ConnectionContext'
 import { MidgardProvider } from './contexts/MidgardContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { I18nProvider } from './contexts/I18nContext'
+import { envOrDefault } from './helpers/envHelper'
 
 type Props = {}
 
@@ -23,7 +24,7 @@ const App: React.FC<Props> = (_): JSX.Element => {
                 <Layout>
                   <Header />
                   <ViewRoutes />
-                  <Footer></Footer>
+                  <Footer commitHash={envOrDefault($COMMIT_HASH, '')}></Footer>
                 </Layout>
               </AppWrapper>
             </ThemeProvider>
