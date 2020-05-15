@@ -34,7 +34,7 @@ const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
     }
   }
 
-  function shuffledWords (words:WordType[]) {
+  function shuffledWords(words: WordType[]) {
     const shuffler = (arr: WordType[]) => {
       const newArr = arr.slice()
       for (let i = newArr.length - 1; i > 0; i--) {
