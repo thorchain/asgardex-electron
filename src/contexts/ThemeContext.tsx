@@ -42,14 +42,16 @@ export const initialContext: ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 type Props = {
+  theme?: Theme // needed for storybook only
   children: React.ReactNode
 }
 
-export const ThemeProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
-  const theme = useObservableState(theme$)
+export const ThemeProvider: React.FC<Props> = ({ children, theme }: Props): JSX.Element => {
+  const themeFromObservable = useObservableState(theme$)
+  const selectedTheme = theme || themeFromObservable
   return (
     <ThemeContext.Provider value={initialContext}>
-      <SC.ThemeProvider theme={{ ...theme }}>{children}</SC.ThemeProvider>
+      <SC.ThemeProvider theme={{ ...selectedTheme }}>{children}</SC.ThemeProvider>
     </ThemeContext.Provider>
   )
 }
