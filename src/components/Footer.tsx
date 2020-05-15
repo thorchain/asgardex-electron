@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined } from '@ant-design/icons'
 import { FooterContainer, FooterLink, FooterIconWrapper, FooterLinkWrapper } from './Footer.style'
 import { ReactComponent as ThorChainIcon } from '../assets/svg/logo-thorchain.svg'
-import { ReactComponent as TelegramIcon } from '../assets/svg/telegram.svg'
+import { ReactComponent as TelegramIcon } from '../assets/svg/icon-telegram.svg'
 import { Row, Col, Grid } from 'antd'
 const { shell } = window.require('electron')
 

@@ -1,34 +1,38 @@
 import React, { useMemo, useCallback } from 'react'
 import { useObservableState } from 'observable-hooks'
 
-import { Menu, Select, Row, Col } from 'antd'
+import { Select, Row, Col, Tabs } from 'antd'
 import { CheckCircleOutlined, MinusCircleOutlined, AlertOutlined, SettingOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from 'react-router-dom'
 import * as walletRoutes from '../routes/wallet'
 import * as swapRoutes from '../routes/swap'
 import * as stakeRoutes from '../routes/stake'
 import { useConnectionContext, OnlineStatus } from '../contexts/ConnectionContext'
-import { HeaderContainer } from './Header.style'
+import { HeaderContainer, TabLink } from './Header.style'
 import { useI18nContext } from '../contexts/I18nContext'
 import { Locale } from '../i18n/types'
 import { LOCALES } from '../i18n'
 import { useThemeContext } from '../contexts/ThemeContext'
 import { palette } from 'styled-theme'
 import { ReactComponent as AsgardexLogo } from '../assets/svg/logo-asgardex.svg'
+import { ReactComponent as SwapIcon } from '../assets/svg/icon-swap.svg'
+import { ReactComponent as StakeIcon } from '../assets/svg/icon-stake.svg'
+import { ReactComponent as WalletIcon } from '../assets/svg/icon-wallet.svg'
 
-type Props = {}
-
-enum MENU_ITEM_KEY {
+enum TabKey {
   SWAP = 'swap',
   STAKE = 'stake',
   WALLET = 'wallet'
 }
 
-type MenuItem = {
-  key: MENU_ITEM_KEY
+type Tab = {
+  key: TabKey
   label: string
   path: string
+  icon: typeof SwapIcon // all icon types are as same as `SwapIcon`
 }
+
+type Props = {}
 
 const Header: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
@@ -51,24 +55,17 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const matchStakeRoute = useRouteMatch(stakeRoutes.base.path())
   const matchWalletRoute = useRouteMatch(walletRoutes.base.path())
 
-  const activeKey: MENU_ITEM_KEY = useMemo(() => {
+  const activeKey: TabKey = useMemo(() => {
     if (matchSwapRoute) {
-      return MENU_ITEM_KEY.SWAP
+      return TabKey.SWAP
     } else if (matchStakeRoute) {
-      return MENU_ITEM_KEY.STAKE
+      return TabKey.STAKE
     } else if (matchWalletRoute) {
-      return MENU_ITEM_KEY.WALLET
+      return TabKey.WALLET
     } else {
-      return MENU_ITEM_KEY.SWAP
+      return TabKey.SWAP
     }
   }, [matchStakeRoute, matchSwapRoute, matchWalletRoute])
-
-  const itemClickHandler = useCallback(
-    (path: string) => {
-      history.push(path)
-    },
-    [history]
-  )
 
   const clickSettingsHandler = useCallback(() => history.push(walletRoutes.settings.path()), [history])
 
@@ -82,11 +79,28 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const items = useMemo(
     () =>
       [
-        { key: MENU_ITEM_KEY.SWAP, label: 'Swap', path: swapRoutes.base.path() },
-        { key: MENU_ITEM_KEY.STAKE, label: 'Stake', path: stakeRoutes.base.path() },
-        { key: MENU_ITEM_KEY.WALLET, label: 'Wallet', path: walletRoutes.base.path() }
-      ] as MenuItem[],
+        { key: TabKey.SWAP, label: 'Swap', path: swapRoutes.base.path(), icon: SwapIcon },
+        { key: TabKey.STAKE, label: 'Stake', path: stakeRoutes.base.path(), icon: StakeIcon },
+        { key: TabKey.WALLET, label: 'Wallet', path: walletRoutes.base.path(), icon: WalletIcon }
+      ] as Tab[],
     []
+  )
+
+  const tabs = useMemo(
+    () =>
+      items.map(({ label, key, path, icon: Icon }) => (
+        <Tabs.TabPane
+          key={key}
+          tab={
+            <TabLink to={path}>
+              <Row align="middle">
+                <Icon style={{ paddingRight: '5px' }} />
+                {label}
+              </Row>
+            </TabLink>
+          }></Tabs.TabPane>
+      )),
+    [items]
   )
 
   const iconStyle = useMemo(() => ({ color: palette('text', 0)({ theme }), fontSize: '1.5em' }), [theme])
@@ -102,15 +116,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
         </Col>
         <Col span={12}>
           <Row justify="center" align="bottom">
-            <Menu selectedKeys={[activeKey]} theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
-              {items.map(({ label, path, key }) => {
-                return (
-                  <Menu.Item key={key} onClick={() => itemClickHandler(path)}>
-                    {label}
-                  </Menu.Item>
-                )
-              })}
-            </Menu>
+            <Tabs activeKey={activeKey}>{tabs}</Tabs>
           </Row>
         </Col>
         <Col span={6}>
