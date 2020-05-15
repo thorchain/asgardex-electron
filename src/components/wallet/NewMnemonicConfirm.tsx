@@ -14,6 +14,7 @@ const mnemonic = 'real debris regret sea auto random agree police uncover gloom 
 
 const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
   const [wordsList, setWordsList] = useState<WordType[]>([])
+  const [shuffledWordsList, setShuffledWordsList] = useState<WordType[]>([])
   const [loadingMsg] = useState<string>('')
   const [mnemonicError, setMnemonicError] = useState<string>('')
   const [initialized, setInitialized] = useState<boolean>(false)
@@ -28,8 +29,21 @@ const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
       // NOTE: This is assumed to enter in a predictable order (mini-Mongo should be consistent)
       // wordsList.batchInsert(words) // TODO: Define type for this method
       setWordsList(res)
+      setShuffledWordsList(shuffledWords(res))
       setInitialized(true)
     }
+  }
+
+  function shuffledWords (words:WordType[]) {
+    const shuffler = (arr: WordType[]) => {
+      const newArr = arr.slice()
+      for (let i = newArr.length - 1; i > 0; i--) {
+        const rand = Math.floor(Math.random() * (i + 1))
+        ;[newArr[i], newArr[rand]] = [newArr[rand], newArr[i]]
+      }
+      return newArr
+    }
+    return words.length > 0 ? shuffler(words) : []
   }
 
   function sortedSelectedWords(): WordType[] {
@@ -48,22 +62,6 @@ const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
   }
 
   init()
-
-  const shuffledWords = useMemo(() => {
-    const shuffledArr = (arr: WordType[]) => {
-      const newArr = arr.slice()
-      for (let i = newArr.length - 1; i > 0; i--) {
-        const rand = Math.floor(Math.random() * (i + 1))
-        ;[newArr[i], newArr[rand]] = [newArr[rand], newArr[i]]
-      }
-      return newArr
-    }
-    if (initialized && wordsList.length > 0) {
-      return shuffledArr(wordsList)
-    } else {
-      return []
-    }
-  }, [initialized])
 
   const selectedWords = useMemo(() => {
     return sortedSelectedWords()
@@ -193,7 +191,7 @@ const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
             </>
           }>
           <Row>
-            {shuffledWords.map((word: WordType) => (
+            {shuffledWordsList.map((word: WordType) => (
               <Col sm={{ span: 12 }} md={{ span: 8 }} key={word._id} style={{ padding: '6px' }}>
                 <Button type="primary" disabled={isSelected(word._id)} block onClick={() => handleAddWord(word._id)}>
                   {word.text}
