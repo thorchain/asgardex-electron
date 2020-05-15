@@ -3,7 +3,7 @@ import { Card, Tag, Button, Typography } from 'antd'
 const { Paragraph, Text } = Typography
 
 // dummy data. actuall testnet wallet seed
-const mnemonic: string = 'real debris regret sea auto random agree police uncover gloom cloud ribbon'
+const mnemonic = 'real debris regret sea auto random agree police uncover gloom cloud ribbon'
 const NewMnemonic: React.FC = (): JSX.Element => {
   const wordsList = () => {
     return mnemonic.length ? mnemonic.split(' ') : []
