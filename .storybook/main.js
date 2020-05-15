@@ -6,5 +6,6 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/addon-viewport',
     '@storybook/addon-knobs',
+    '@react-theming/storybook-addon/register'
   ],
 };
