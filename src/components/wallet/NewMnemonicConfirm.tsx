@@ -26,8 +26,6 @@ const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
         const uniqueId = Math.random().toString(36).substring(2) + Date.now().toString(36)
         return { text: e, _id: uniqueId }
       })
-      // NOTE: This is assumed to enter in a predictable order (mini-Mongo should be consistent)
-      // wordsList.batchInsert(words) // TODO: Define type for this method
       setWordsList(res)
       setShuffledWordsList(shuffledWords(res))
       setInitialized(true)
