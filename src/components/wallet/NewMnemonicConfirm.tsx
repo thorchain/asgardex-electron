@@ -61,10 +61,6 @@ const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
 
   init()
 
-  const selectedWords = useMemo(() => {
-    return sortedSelectedWords()
-  }, [wordsList])
-
   const isSelected = (id: string) => {
     const res: WordType | undefined = wordsList.find((e: WordType) => e._id === id)
     return !!res?.selected
@@ -163,7 +159,7 @@ const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
             <Col span={24}>
               <Card bodyStyle={{ padding: '6px', minHeight: '100px' }}>
                 <div>
-                  {selectedWords.map((word: WordType) => (
+                  {sortedSelectedWords().map((word: WordType) => (
                     <Button
                       key={word._id}
                       disabled={!!loadingMsg}
