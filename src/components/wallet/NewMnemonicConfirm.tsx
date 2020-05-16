@@ -135,17 +135,18 @@ const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
     console.log('submitting form')
     console.log(formData)
 
-    checkPhraseConfirmWords()
+    const checkwords = checkPhraseConfirmWords()
 
-    // The submitted phrase as a string for passing to wallet methods
-    const repeatPhrase = wordsList
-      .filter((e: WordType) => e.selected === true)
-      .map((f: WordType) => {
-        return f.text
-      })
-      .join(' ')
-
-    console.log(repeatPhrase)
+    if (checkwords) {
+      // The submitted phrase as a string for passing to wallet methods
+      const repeatPhrase = wordsList
+        .filter((e: WordType) => e.selected === true)
+        .map((f: WordType) => {
+          return f.text
+        })
+        .join(' ')
+      console.log(repeatPhrase)
+    }
   }
   return (
     <>
