@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Clipboard from 'clipboard'
 import QRCode from 'qrcode'
 import { Row, Col, Typography, Card, Button } from 'antd'
 import { CopyOutlined } from '@ant-design/icons'
@@ -15,6 +14,7 @@ const UserAccount = {
 
 const RecieveFundsView: React.FC = (): JSX.Element => {
   const [copyMsg, setCopyMsg] = useState<string>('')
+  const [timer, setTimer] = useState<number | null>(null)
   const userAccount = () => {
     // Placeholder
     return UserAccount
@@ -26,32 +26,32 @@ const RecieveFundsView: React.FC = (): JSX.Element => {
       const container = document.getElementById('qr-container')
       container?.appendChild(canvas)
     })
-    const clipboard = new Clipboard('#clipboard-btn')
-    let timer: number | null = null
-    clipboard.on('success', (e: Clipboard.Event) => {
-      if (timer !== null) {
+  }, [UserAccount])
+  useEffect(() => {
+    // Cleanup timer on 'onmount'
+    return function cleanup() {
+      if (timer) {
         clearTimeout(timer)
-        timer = null
-        setCopyMsg('')
       }
-      setCopyMsg('Address copied...')
-      timer = setTimeout(() => {
-        setCopyMsg('')
-      }, 3000)
-      e.clearSelection()
-    })
+    }
+  }, [timer])
 
-    clipboard.on('error', function (e: Clipboard.Event) {
-      // Verbose logging since an extreme edge case(?)
-      console.log('error copying to clipboard')
-      console.error('Action:', e.action)
-      console.error('Trigger:', e.trigger)
-    })
-  }, [])
+  const handleCopyAddress = () => {
+    navigator.clipboard.writeText(userAccount().address)
+    setCopyMsg('Address copied..')
+    if (timer) {
+      clearTimeout(timer)
+    }
+    const tmr = setTimeout(() => {
+      console.log('timing out...')
+      setCopyMsg('')
+    }, 3000)
+    setTimer(tmr)
+  }
 
   return (
     <Row>
-      <Col sm={{ span: 24 }} md={{ span: 16, offset: 4 }} lg={{ span: 14, offset: 5 }} xl={{ span: 9, offset: 0 }}>
+      <Col sm={{ span: 24 }} md={{ span: 16, offset: 4 }} lg={{ span: 14, offset: 5 }}>
         <Title level={3} style={{ textAlign: 'center' }}>
           Receive Funds
         </Title>
@@ -59,14 +59,14 @@ const RecieveFundsView: React.FC = (): JSX.Element => {
           <div style={{ display: 'flex', justifyContent: 'center' }} id="qr-container"></div>
         </Card>
       </Col>
-      <Col sm={{ span: 24 }} md={{ span: 16, offset: 4 }} lg={{ span: 14, offset: 5 }} xl={{ span: 9, offset: 0 }}>
+      <Col sm={{ span: 24 }} md={{ span: 16, offset: 4 }} lg={{ span: 14, offset: 5 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <label htmlFor="clipboard-btn">
             <Title level={4} ellipsis code>
               {userAccount().address}
             </Title>
           </label>
-          <Button id="clipboard-btn" type="primary" size="large" data-clipboard-text={userAccount().address}>
+          <Button type="primary" size="large" onClick={handleCopyAddress}>
             Copy&nbsp;
             <CopyOutlined />
           </Button>
