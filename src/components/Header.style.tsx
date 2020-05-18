@@ -25,13 +25,40 @@ export const HeaderContainer = styled(Layout.Header)`
       fill: ${palette('text', 1)};
     }
   }
+
+  .ant-tabs-bar {
+    border-bottom: 0;
+  }
+
+  .ant-tabs-tab {
+    padding: 0 10px;
+  }
+
+  .ant-tabs-ink-bar {
+    height: 3px;
+    background: ${palette('gradient', 0)};
+  }
 `
 
 export const TabLink = styled(Link)`
   border-bottom-width: '3px';
   border-color: ${palette('primary', 0)};
   color: ${palette('text', 1)};
-  > * {
+  transition: none;
+
+  &:hover,
+  &:active {
+    color: ${palette('primary', 0)};
+    #swap_icon,
+    #stake_icon,
+    #wallet_icon {
+      > * {
+        fill: ${palette('primary', 0)};
+      }
+    }
+  }
+  & > * {
+    text-transform: uppercase;
     font-size: ${key('sizes.font.big', '15px')};
   }
 `

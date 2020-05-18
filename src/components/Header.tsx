@@ -13,7 +13,7 @@ import { useI18nContext } from '../contexts/I18nContext'
 import { Locale } from '../i18n/types'
 import { LOCALES } from '../i18n'
 import { useThemeContext } from '../contexts/ThemeContext'
-import { palette } from 'styled-theme'
+import { palette, size } from 'styled-theme'
 import { ReactComponent as AsgardexLogo } from '../assets/svg/logo-asgardex.svg'
 import { ReactComponent as SwapIcon } from '../assets/svg/icon-swap.svg'
 import { ReactComponent as StakeIcon } from '../assets/svg/icon-stake.svg'
@@ -93,14 +93,14 @@ const Header: React.FC<Props> = (_): JSX.Element => {
           key={key}
           tab={
             <TabLink to={path}>
-              <Row align="middle">
+              <Row align="middle" style={{ height: size('headerHeight', '50px')({ theme }) }}>
                 <Icon style={{ paddingRight: '5px' }} />
                 {label}
               </Row>
             </TabLink>
           }></Tabs.TabPane>
       )),
-    [items]
+    [items, theme]
   )
 
   const iconStyle = useMemo(() => ({ color: palette('text', 0)({ theme }), fontSize: '1.5em' }), [theme])
