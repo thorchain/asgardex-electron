@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
+import AccountSelector from '../../components/wallet/AccountSelector'
 import { Row, Col, Typography, Card, Button } from 'antd'
 import { CopyOutlined } from '@ant-design/icons'
 const { Title, Text } = Typography
+
 
 // Dummmy data
 const UserAccount = {
@@ -15,6 +17,7 @@ const UserAccount = {
 const RecieveFundsView: React.FC = (): JSX.Element => {
   const [copyMsg, setCopyMsg] = useState<string>('')
   const [timer, setTimer] = useState<number | null>(null)
+  const [account, setAccount ] = useState<string>()
   const userAccount = () => {
     // Placeholder
     return UserAccount
@@ -53,8 +56,9 @@ const RecieveFundsView: React.FC = (): JSX.Element => {
     <Row>
       <Col sm={{ span: 24 }} md={{ span: 16, offset: 4 }} lg={{ span: 14, offset: 5 }}>
         <Title level={3} style={{ textAlign: 'center' }}>
-          Receive Funds
+          Receive Funds To: {account}
         </Title>
+        <AccountSelector onChange={(s:string) => setAccount(s)} />
         <Card bordered={false}>
           <div style={{ display: 'flex', justifyContent: 'center' }} id="qr-container"></div>
         </Card>
