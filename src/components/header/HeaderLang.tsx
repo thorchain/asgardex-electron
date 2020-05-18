@@ -5,7 +5,6 @@ import { palette } from 'styled-theme'
 import Menu from '../shared/Menu'
 import { useObservableState } from 'observable-hooks'
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
-import Paragraph from 'antd/lib/typography/Paragraph'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import { HeaderLangWrapper } from './HeaderLang.style'
 
@@ -32,6 +31,7 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
   )
 
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
+  const itemStyle = { color, fontSize: '18px' }
 
   const menu = useMemo(() => {
     return (
@@ -45,31 +45,24 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
                 padding: '8px 10px'
               }}
               key={locale}>
-              <Paragraph
-                strong
-                style={{
-                  color
-                }}>
+              <Text strong style={itemStyle}>
                 {locale.toUpperCase()}
-              </Paragraph>
+              </Text>
             </Menu.Item>
           )
         })}
       </Menu>
     )
-  }, [changeLang, color])
+  }, [changeLang, itemStyle])
 
   return (
     <HeaderLangWrapper>
       <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+        {/* `ant-dropdown-link` does need a height to give dropdown content an offset - dont't remove it! */}
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+        <a className="ant-dropdown-link" style={{ height: '40px' }} onClick={(e) => e.preventDefault()}>
           <Row justify="space-between" align="middle">
-            <Text
-              strong
-              style={{
-                color
-              }}>
+            <Text strong style={itemStyle}>
               {currentLocale?.toUpperCase()}
             </Text>
             <DownIcon />

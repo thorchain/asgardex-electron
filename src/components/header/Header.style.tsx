@@ -29,6 +29,7 @@ export const HeaderContainer = styled(Layout.Header)`
 
   /* Make sure following id's are defined in svg */
   #theme_switch_icon,
+  #lock_icon,
   #settings_icon {
     cursor: pointer;
   }
@@ -44,7 +45,7 @@ export const HeaderContainer = styled(Layout.Header)`
   }
 
   .ant-tabs-tab {
-    padding: 0 10px;
+    padding: 0 20px;
   }
 
   .ant-tabs-tab-active {

@@ -17,6 +17,7 @@ import { ReactComponent as StakeIcon } from '../../assets/svg/icon-stake.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as ThemeIcon } from '../../assets/svg/icon-theme-switch.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/icon-settings.svg'
+import { ReactComponent as LockIcon } from '../../assets/svg/icon-lock.svg'
 import HeaderLang from './HeaderLang'
 
 enum TabKey {
@@ -61,6 +62,10 @@ const Header: React.FC<Props> = (_): JSX.Element => {
 
   const clickSettingsHandler = useCallback(() => history.push(walletRoutes.settings.path()), [history])
 
+  const clickLockHandler = useCallback(() => {
+    // has to be implemented
+  }, [])
+
   const items = useMemo(
     () =>
       [
@@ -90,9 +95,8 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     [items, activeKey, headerHeight]
   )
 
-  const iconStyle = useMemo(() => ({ color: palette('text', 0)({ theme }), fontSize: '1.5em', marginLeft: '10px' }), [
-    theme
-  ])
+  const color = useMemo(() => palette('text', 0)({ theme }), [theme])
+  const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
 
   return (
     <HeaderContainer>
@@ -110,9 +114,10 @@ const Header: React.FC<Props> = (_): JSX.Element => {
         </Col>
         <Col>
           <Row align="middle">
+            <ThemeIcon onClick={clickSwitchThemeHandler} style={{ color, ...iconStyle }} />
+            <SettingsIcon onClick={clickSettingsHandler} style={{ color, ...iconStyle }} />
+            <LockIcon onClick={clickLockHandler} style={{ ...iconStyle }} />
             <HeaderLang />
-            <ThemeIcon onClick={clickSwitchThemeHandler} style={iconStyle} />
-            <SettingsIcon onClick={clickSettingsHandler} style={iconStyle} />
           </Row>
         </Col>
       </Row>
