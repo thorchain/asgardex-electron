@@ -2,7 +2,7 @@ import React, { useMemo, useCallback } from 'react'
 import { useObservableState } from 'observable-hooks'
 
 import { Select, Row, Col, Tabs } from 'antd'
-import { CheckCircleOutlined, MinusCircleOutlined, AlertOutlined, SettingOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, MinusCircleOutlined, SettingOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from 'react-router-dom'
 import * as walletRoutes from '../routes/wallet'
 import * as swapRoutes from '../routes/swap'
@@ -18,6 +18,7 @@ import { ReactComponent as AsgardexLogo } from '../assets/svg/logo-asgardex.svg'
 import { ReactComponent as SwapIcon } from '../assets/svg/icon-swap.svg'
 import { ReactComponent as StakeIcon } from '../assets/svg/icon-stake.svg'
 import { ReactComponent as WalletIcon } from '../assets/svg/icon-wallet.svg'
+import { ReactComponent as ThemeIcon } from '../assets/svg/icon-theme-switch.svg'
 
 enum TabKey {
   SWAP = 'swap',
@@ -135,7 +136,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               {!isOnline && <MinusCircleOutlined style={{ color: '#ffa940', fontSize: '1.5em' }} />}
             </Col>
             <Col>
-              <AlertOutlined onClick={clickSwitchThemeHandler} style={iconStyle} />
+              <ThemeIcon onClick={clickSwitchThemeHandler} style={iconStyle} />
             </Col>
             <Col>
               <SettingOutlined onClick={clickSettingsHandler} style={iconStyle} />

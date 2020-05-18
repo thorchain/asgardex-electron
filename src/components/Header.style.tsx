@@ -13,15 +13,19 @@ export const HeaderContainer = styled(Layout.Header)`
 
   /* Make sure following id is defined in svg */
   #asgardex_logo {
+    cursor: pointer;
     > :not(:first-child) {
       fill: ${palette('text', 1)};
     }
   }
+
   /* Make sure following id's are defined in svg */
   #swap_icon,
   #stake_icon,
-  #wallet_icon {
-    > * {
+  #wallet_icon,
+  #theme_switch_icon {
+    cursor: pointer;
+    & > * {
       fill: ${palette('text', 1)};
     }
   }
