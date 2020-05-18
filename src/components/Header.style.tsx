@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { Layout } from 'antd'
-import { palette, size, key } from 'styled-theme'
+import { palette, size } from 'styled-theme'
 import { Z_INDEX_MAP } from '../helpers/styleHelper'
 import { Link } from 'react-router-dom'
 
@@ -47,16 +47,23 @@ export const HeaderContainer = styled(Layout.Header)`
     padding: 0 10px;
   }
 
+  .ant-tabs-tab-active {
+  }
+
   .ant-tabs-ink-bar {
     height: 3px;
     background: ${palette('gradient', 0)};
   }
 `
 
+type TabLinkProps = {
+  selected: boolean
+}
+
 export const TabLink = styled(Link)`
   border-bottom-width: '3px';
   border-color: ${palette('primary', 0)};
-  color: ${palette('text', 1)};
+  color: ${(props: TabLinkProps) => (props.selected ? palette('text', 1) : palette('text', 2))};
   transition: none;
 
   &:hover,
@@ -72,6 +79,7 @@ export const TabLink = styled(Link)`
   }
   & > * {
     text-transform: uppercase;
-    font-size: ${key('sizes.font.big', '15px')};
+    font-family: 'MainFontSemiBold';
+    font-size: '18px';
   }
 `

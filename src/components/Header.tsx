@@ -94,7 +94,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
         <Tabs.TabPane
           key={key}
           tab={
-            <TabLink to={path}>
+            <TabLink to={path} selected={activeKey === key}>
               <Row align="middle" style={{ height: size('headerHeight', '50px')({ theme }) }}>
                 <Icon style={{ paddingRight: '5px' }} />
                 {label}
@@ -102,7 +102,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
             </TabLink>
           }></Tabs.TabPane>
       )),
-    [items, theme]
+    [items, theme, activeKey]
   )
 
   const iconStyle = useMemo(() => ({ color: palette('text', 0)({ theme }), fontSize: '1.5em' }), [theme])
