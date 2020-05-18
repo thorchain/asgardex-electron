@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { Layout } from 'antd'
 import { palette, size } from 'styled-theme'
-import { Z_INDEX_MAP } from '../helpers/styleHelper'
+import { Z_INDEX_MAP } from '../../helpers/styleHelper'
 import { Link } from 'react-router-dom'
 
 export const HeaderContainer = styled(Layout.Header)`
@@ -11,13 +11,7 @@ export const HeaderContainer = styled(Layout.Header)`
   width: 100vw;
   background-color: ${palette('background', 0)};
 
-  /* Make sure following id's are defined in svg */
-  #asgardex_logo,
-  #theme_switch_icon,
-  #settings_icon {
-    cursor: pointer;
-  }
-
+  /* id's defined in svg */
   #asgardex_logo {
     > :not(:first-child) {
       fill: ${palette('text', 1)};
@@ -31,6 +25,12 @@ export const HeaderContainer = styled(Layout.Header)`
     & > * {
       fill: ${palette('text', 1)};
     }
+  }
+
+  /* Make sure following id's are defined in svg */
+  #theme_switch_icon,
+  #settings_icon {
+    cursor: pointer;
   }
 
   #settings_icon {

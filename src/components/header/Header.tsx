@@ -2,24 +2,23 @@ import React, { useMemo, useCallback } from 'react'
 import { useObservableState } from 'observable-hooks'
 
 import { Select, Row, Col, Tabs } from 'antd'
-import { CheckCircleOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from 'react-router-dom'
-import * as walletRoutes from '../routes/wallet'
-import * as swapRoutes from '../routes/swap'
-import * as stakeRoutes from '../routes/stake'
-import { useConnectionContext, OnlineStatus } from '../contexts/ConnectionContext'
+import * as walletRoutes from '../../routes/wallet'
+import * as swapRoutes from '../../routes/swap'
+import * as stakeRoutes from '../../routes/stake'
 import { HeaderContainer, TabLink } from './Header.style'
-import { useI18nContext } from '../contexts/I18nContext'
-import { Locale } from '../i18n/types'
-import { LOCALES } from '../i18n'
-import { useThemeContext } from '../contexts/ThemeContext'
+import { useI18nContext } from '../../contexts/I18nContext'
+import { Locale } from '../../i18n/types'
+import { LOCALES } from '../../i18n'
+import { useThemeContext } from '../../contexts/ThemeContext'
 import { palette, size } from 'styled-theme'
-import { ReactComponent as AsgardexLogo } from '../assets/svg/logo-asgardex.svg'
-import { ReactComponent as SwapIcon } from '../assets/svg/icon-swap.svg'
-import { ReactComponent as StakeIcon } from '../assets/svg/icon-stake.svg'
-import { ReactComponent as WalletIcon } from '../assets/svg/icon-wallet.svg'
-import { ReactComponent as ThemeIcon } from '../assets/svg/icon-theme-switch.svg'
-import { ReactComponent as SettingsIcon } from '../assets/svg/icon-settings.svg'
+import HeaderNetStatus from './HeaderNetStatus'
+import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
+import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
+import { ReactComponent as StakeIcon } from '../../assets/svg/icon-stake.svg'
+import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
+import { ReactComponent as ThemeIcon } from '../../assets/svg/icon-theme-switch.svg'
+import { ReactComponent as SettingsIcon } from '../../assets/svg/icon-settings.svg'
 
 enum TabKey {
   SWAP = 'swap',
@@ -45,13 +44,8 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     toggleTheme()
   }
 
-  const connection$ = useConnectionContext()
-  const onlineStatus = useObservableState<OnlineStatus>(connection$)
-
   const { changeLocale, locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$)
-
-  const isOnline = onlineStatus === OnlineStatus.ON
 
   const matchSwapRoute = useRouteMatch(swapRoutes.base.path())
   const matchStakeRoute = useRouteMatch(stakeRoutes.base.path())
@@ -88,6 +82,8 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     []
   )
 
+  const headerHeight = useMemo(() => size('headerHeight', '50px')({ theme }), [theme])
+
   const tabs = useMemo(
     () =>
       items.map(({ label, key, path, icon: Icon }) => (
@@ -95,53 +91,45 @@ const Header: React.FC<Props> = (_): JSX.Element => {
           key={key}
           tab={
             <TabLink to={path} selected={activeKey === key}>
-              <Row align="middle" style={{ height: size('headerHeight', '50px')({ theme }) }}>
+              <Row align="middle" style={{ height: headerHeight }}>
                 <Icon style={{ paddingRight: '5px' }} />
                 {label}
               </Row>
             </TabLink>
           }></Tabs.TabPane>
       )),
-    [items, theme, activeKey]
+    [items, activeKey, headerHeight]
   )
 
-  const iconStyle = useMemo(() => ({ color: palette('text', 0)({ theme }), fontSize: '1.5em' }), [theme])
+  const iconStyle = useMemo(() => ({ color: palette('text', 0)({ theme }), fontSize: '1.5em', marginLeft: '10px' }), [
+    theme
+  ])
 
   return (
     <HeaderContainer>
-      <Row justify="space-between" align="middle">
-        <Col span={6}>
-          <Row justify="space-between" align="middle">
+      <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
+        <Col>
+          <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
             <AsgardexLogo />
-            <h2>Net</h2>
+            <HeaderNetStatus />
           </Row>
         </Col>
-        <Col span={12}>
-          <Row justify="center" align="bottom">
+        <Col span="auto">
+          <Row justify="center" align="bottom" style={{ height: headerHeight }}>
             <Tabs activeKey={activeKey}>{tabs}</Tabs>
           </Row>
         </Col>
-        <Col span={6}>
-          <Row align="middle" gutter={10}>
-            <Col>
-              <Select defaultValue={currentLocale} onChange={changeLocaleHandler} className="select-locale">
-                {LOCALES.map((locale: Locale) => (
-                  <Select.Option value={locale} key={locale}>
-                    {locale.toUpperCase()}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Col>
-            <Col>
-              {isOnline && <CheckCircleOutlined style={{ color: '#a0d911', fontSize: '1.5em' }} />}
-              {!isOnline && <MinusCircleOutlined style={{ color: '#ffa940', fontSize: '1.5em' }} />}
-            </Col>
-            <Col>
-              <ThemeIcon onClick={clickSwitchThemeHandler} style={iconStyle} />
-            </Col>
-            <Col>
-              <SettingsIcon onClick={clickSettingsHandler} style={iconStyle} />
-            </Col>
+        <Col>
+          <Row align="middle" style={{ height: headerHeight }}>
+            <Select defaultValue={currentLocale} onChange={changeLocaleHandler} className="select-locale">
+              {LOCALES.map((locale: Locale) => (
+                <Select.Option value={locale} key={locale}>
+                  {locale.toUpperCase()}
+                </Select.Option>
+              ))}
+            </Select>
+            <ThemeIcon onClick={clickSwitchThemeHandler} style={iconStyle} />
+            <SettingsIcon onClick={clickSettingsHandler} style={iconStyle} />
           </Row>
         </Col>
       </Row>
