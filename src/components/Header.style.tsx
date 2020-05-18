@@ -80,6 +80,6 @@ export const TabLink = styled(Link)`
   & > * {
     text-transform: uppercase;
     font-family: 'MainFontSemiBold';
-    font-size: '18px';
+    font-size: 18px;
   }
 `
