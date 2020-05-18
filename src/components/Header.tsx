@@ -2,7 +2,7 @@ import React, { useMemo, useCallback } from 'react'
 import { useObservableState } from 'observable-hooks'
 
 import { Select, Row, Col, Tabs } from 'antd'
-import { CheckCircleOutlined, MinusCircleOutlined, SettingOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from 'react-router-dom'
 import * as walletRoutes from '../routes/wallet'
 import * as swapRoutes from '../routes/swap'
@@ -19,6 +19,7 @@ import { ReactComponent as SwapIcon } from '../assets/svg/icon-swap.svg'
 import { ReactComponent as StakeIcon } from '../assets/svg/icon-stake.svg'
 import { ReactComponent as WalletIcon } from '../assets/svg/icon-wallet.svg'
 import { ReactComponent as ThemeIcon } from '../assets/svg/icon-theme-switch.svg'
+import { ReactComponent as SettingsIcon } from '../assets/svg/icon-settings.svg'
 
 enum TabKey {
   SWAP = 'swap',
@@ -139,7 +140,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               <ThemeIcon onClick={clickSwitchThemeHandler} style={iconStyle} />
             </Col>
             <Col>
-              <SettingOutlined onClick={clickSettingsHandler} style={iconStyle} />
+              <SettingsIcon onClick={clickSettingsHandler} style={iconStyle} />
             </Col>
           </Row>
         </Col>

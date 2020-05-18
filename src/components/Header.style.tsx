@@ -11,22 +11,31 @@ export const HeaderContainer = styled(Layout.Header)`
   width: 100vw;
   background-color: ${palette('background', 0)};
 
-  /* Make sure following id is defined in svg */
-  #asgardex_logo {
+  /* Make sure following id's are defined in svg */
+  #asgardex_logo,
+  #theme_switch_icon,
+  #settings_icon {
     cursor: pointer;
+  }
+
+  #asgardex_logo {
     > :not(:first-child) {
       fill: ${palette('text', 1)};
     }
   }
-
   /* Make sure following id's are defined in svg */
   #swap_icon,
   #stake_icon,
   #wallet_icon,
   #theme_switch_icon {
-    cursor: pointer;
     & > * {
       fill: ${palette('text', 1)};
+    }
+  }
+
+  #settings_icon {
+    & > * {
+      fill: ${palette('primary', 0)};
     }
   }
 
