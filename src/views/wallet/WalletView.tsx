@@ -12,6 +12,7 @@ import UserBondsScreen from './UserBondsScreen'
 import UserAssetDetailsScreen from './UserAssetDetailsScreen'
 
 import FundsReceiveScreen from './FundsReceiveScreen'
+import FundsSendScreen from './FundsSendScreen'
 
 const WalletView: React.FC = (): JSX.Element => {
   return (
@@ -37,6 +38,9 @@ const WalletView: React.FC = (): JSX.Element => {
         </Route>
         <Route path={walletRoutes.fundsReceive.template} exact>
           <FundsReceiveScreen />
+        </Route>
+        <Route path={walletRoutes.fundsSend.template} exact>
+          <FundsSendScreen />
         </Route>
         <Route path={walletRoutes.assetDetails.template} exact>
           <UserAssetDetailsScreen />
