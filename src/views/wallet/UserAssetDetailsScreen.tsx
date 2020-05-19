@@ -1,10 +1,11 @@
 import React from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import { AssetDetailsRouteParams } from '../../routes/wallet'
 import TransactionsTable from '../../components/wallet/UserTransactionsTable'
 import { UserTransactionType, UserAssetType } from '../../types/wallet'
 import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 import { shortSymbol } from '../../helpers/tokenHelpers'
+import * as walletRoutes from '../../routes/wallet'
 import { Row, Col, Typography, Divider, Button, Card } from 'antd'
 const { Title } = Typography
 
@@ -35,6 +36,7 @@ const txs: UserTransactionType[] = [
 
 const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
   const { symbol } = useParams<AssetDetailsRouteParams>()
+  const history = useHistory()
   // Dummy data
   const asset: UserAssetType = {
     _id: '2',
@@ -101,7 +103,12 @@ const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
 
           <Col span={12}>
             <Card bordered={false}>
-              <Button type="ghost" shape="round" size="large" block onClick={() => console.log('walletReceive')}>
+              <Button
+                type="ghost"
+                shape="round"
+                size="large"
+                block
+                onClick={() => history.push(walletRoutes.fundsReceive.path())}>
                 Receive
               </Button>
             </Card>
