@@ -2315,6 +2315,11 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-7.2.1.tgz#2ad4e844175a3738cb9e7064be5ea070b8863a1c"
   integrity sha512-oZ0Ib5I4Z2pUEcoo95cT1cr6slco9WY7yiPpG+RGNkj8YcYgJnM7pXmYmorNOReh8MIGcKSqXyeGjxnr8YiZbA==
 
+"@thorchain/asgardex-binance@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-binance/-/asgardex-binance-0.1.0.tgz#72b4170cfc6ed7b590a5071f54f9cd20634b4a78"
+  integrity sha512-BnWxP7l0jLQOtyAmz9JHXX/mmWE+7C8Jm3GpXtivxct5bvCtThYe38/k7o/P0MFPeBW26fIDTbm8B5rEAicyDg==
+
 "@thorchain/asgardex-theme@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@thorchain/asgardex-theme/-/asgardex-theme-0.1.0.tgz#1c45efcdb6c00a170d7ef2448d91d96cca28829c"
