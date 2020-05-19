@@ -15,16 +15,16 @@ const FundsSendScreen: React.FC = (): JSX.Element => {
         <AccountSelector />
         <Form onFinish={onSubmit} labelCol={{ span: 24 }}>
           <Form.Item name="recipient" label="recipient">
-            <Input />
+            <Input size="large" />
           </Form.Item>
           <Form.Item name="amount" label="amount">
-            <Input />
+            <Input size="large" />
           </Form.Item>
           <Form.Item name="password" label="password">
-            <Input type="password" />
+            <Input type="password" size="large" />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
+            <Button type="primary" htmlType="submit" size="large" block>
               Submit
             </Button>
           </Form.Item>
