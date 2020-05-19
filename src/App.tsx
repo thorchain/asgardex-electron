@@ -1,7 +1,8 @@
 import React from 'react'
 import { Layout } from 'antd'
 import { AppWrapper } from './App.style'
-import Header from './components/Header'
+import GlobalStyle from './Global.style'
+import Header from './components/header/Header'
 import Footer from './components/Footer'
 import { BrowserRouter as Router } from 'react-router-dom'
 import ViewRoutes from './views/ViewRoutes'
@@ -13,6 +14,21 @@ import { envOrDefault } from './helpers/envHelper'
 
 type Props = {}
 
+const AppView: React.FC<Props> = (_): JSX.Element => {
+  return (
+    <>
+      <GlobalStyle />
+      <AppWrapper>
+        <Layout>
+          <Header />
+          <ViewRoutes />
+          <Footer commitHash={envOrDefault($COMMIT_HASH, '')}></Footer>
+        </Layout>
+      </AppWrapper>
+    </>
+  )
+}
+
 const App: React.FC<Props> = (_): JSX.Element => {
   return (
     <ConnectionProvider>
@@ -20,13 +36,7 @@ const App: React.FC<Props> = (_): JSX.Element => {
         <I18nProvider>
           <Router>
             <ThemeProvider>
-              <AppWrapper>
-                <Layout>
-                  <Header />
-                  <ViewRoutes />
-                  <Footer commitHash={envOrDefault($COMMIT_HASH, '')}></Footer>
-                </Layout>
-              </AppWrapper>
+              <AppView />
             </ThemeProvider>
           </Router>
         </I18nProvider>

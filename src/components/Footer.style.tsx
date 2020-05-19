@@ -1,14 +1,19 @@
 import styled from 'styled-components'
-import { palette, key } from 'styled-theme'
+import { palette, key, size } from 'styled-theme'
 import { Layout, Row } from 'antd'
-import { media } from '../helpers/styleHelper'
+import { media, Z_INDEX_MAP } from '../helpers/styleHelper'
 import { Link } from 'react-router-dom'
 
 export const FooterContainer = styled(Layout.Footer)`
+  position: fixed;
+  bottom: 0;
+  z-index: ${Z_INDEX_MAP.footer};
+  width: 100vw;
   padding: 20px 20px;
 
   ${media.sm`
-    padding: 13px 64px;
+    padding: 10px 64px;
+    height: ${size('footerHeight')};
   `}
 
   background-color: ${palette('background', 0)};
