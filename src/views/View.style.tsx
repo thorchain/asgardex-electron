@@ -1,9 +1,11 @@
 import styled from 'styled-components'
 import { Layout } from 'antd'
+import { size } from 'styled-theme'
 
 export const ViewWrapper = styled(Layout.Content)`
-  background-color: white;
-  padding: 20px 50px;
-  margin: 50px 0;
-  min-height: 580px;
+  padding: 70px 50px;
+  width: 100vw;
+  margin-top: ${size('headerHeight')};
+  margin-bottom: ${size('footerHeight')};
+  min-height: calc(100vh - ${size('headerHeight')} - ${size('footerHeight')});
 `
