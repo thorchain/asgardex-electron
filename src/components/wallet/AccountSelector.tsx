@@ -20,7 +20,7 @@ const AccountSelector: React.FC<Props> = ({ symbol, onChange, size }): JSX.Eleme
     if (typeof onChange === 'function') {
       onChange(symb)
     }
-  }, [symb])
+  }, [symb, onChange])
   const menu = () => (
     <Menu>
       {UserAssets.map((asset: UserAssetType, i: number) => (
@@ -40,8 +40,10 @@ const AccountSelector: React.FC<Props> = ({ symbol, onChange, size }): JSX.Eleme
         <div>
           <DynamicCoin type={symb} size={size || 'normal'} />
         </div>
-        <div style={{display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
-          <Title level={4} style={{marginLeft:"18px",marginBottom:"0"}}>{shortSymbol(symb)}</Title>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <Title level={4} style={{ marginLeft: '18px', marginBottom: '0' }}>
+            {shortSymbol(symb)}
+          </Title>
 
           <Dropdown overlay={menu} trigger={['click']}>
             <Button type="link">
