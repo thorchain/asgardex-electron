@@ -48,7 +48,6 @@ const RecieveFundsView: React.FC = (): JSX.Element => {
       clearTimeout(timer)
     }
     const tmr = setTimeout(() => {
-      console.log('timing out...')
       setCopyMsg('')
     }, 3000)
     setTimer(tmr)

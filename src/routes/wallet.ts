@@ -42,6 +42,13 @@ export const fundsReceive: Route<void> = {
     return this.template
   }
 }
+export const fundsSend: Route<void> = {
+  // TODO: Add support for asset/symbol
+  template: `${base.template}/funds-send`,
+  path() {
+    return this.template
+  }
+}
 
 export type AssetDetailsRouteParams = { symbol: string }
 export const assetDetails: Route<AssetDetailsRouteParams> = {

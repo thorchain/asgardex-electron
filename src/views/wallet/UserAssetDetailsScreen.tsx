@@ -95,7 +95,7 @@ const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
                 size="large"
                 block
                 disabled={!sendable()}
-                onClick={() => console.log('walletSend')}>
+                onClick={() => history.push(walletRoutes.fundsSend.path())}>
                 Send
               </Button>
             </Card>
