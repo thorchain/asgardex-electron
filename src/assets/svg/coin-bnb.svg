@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
+    <title>coin/bnb</title>
+    <desc>Created with Sketch.</desc>
+    <g id="coin/bnb" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bnb">
+            <circle id="Oval" fill="#F3BA2F" cx="16" cy="16" r="16"></circle>
+            <path d="M12.116,14.404 L16,10.52 L19.886,14.406 L22.146,12.146 L16,6 L9.856,12.144 L12.116,14.404 Z M6,16 L8.26,13.74 L10.52,16 L8.26,18.26 L6,16 Z M12.116,17.596 L16,21.48 L19.886,17.594 L22.146,19.853 L16,26 L9.856,19.856 L9.853,19.853 L12.116,17.596 Z M21.48,16 L23.74,13.74 L26,16 L23.74,18.26 L21.48,16 Z M18.292,15.998 L18.294,15.998 L18.294,16 L16,18.294 L13.709,16.004 L13.705,16 L13.709,15.997 L14.11,15.595 L14.305,15.4 L16,13.706 L18.293,15.999 L18.292,15.998 Z" id="Shape" fill="#FFFFFF" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
