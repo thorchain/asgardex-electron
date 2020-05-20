@@ -1,14 +1,15 @@
 import React, { createContext, useContext } from 'react'
-import { subscribeTransfers, subscribeTickers } from '../services/binance'
+import { subscribeTransfers, miniTickers$, MiniTickersEventData } from '../services/binance'
+import { Observable } from 'rxjs'
 
 type BinanceContextValue = {
   subscribeTransfers: typeof subscribeTransfers
-  subscribeTickers: typeof subscribeTickers
+  miniTickers$: Observable<MiniTickersEventData[]>
 }
 
 const initialContext: BinanceContextValue = {
   subscribeTransfers,
-  subscribeTickers
+  miniTickers$
 }
 const BinanceContext = createContext<BinanceContextValue | null>(null)
 

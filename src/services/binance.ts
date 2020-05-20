@@ -38,13 +38,18 @@ const getEndpoint = (net: Net) => {
 /**
  * All types of incoming messages, which can be different
  */
-type WSInMsg = TransferEvent | TickersEvent
+type WSInMsg = TransferEvent | MiniTickersEvent
 
 const ws$ = webSocket<WSInMsg>(getEndpoint(currentNet))
 
 /**
  * Observable for subscribing / unsubscribing transfers by given address
  * https://docs.binance.org/api-reference/dex-api/ws-streams.html#3-transfer
+ *
+ * Note: No need to serialize / deserialize messages.
+ * By default `WebSocketSubjectConfig` is going to apply `JSON.parse` to each message comming from the Server.
+ * and applies `JSON.stringify` by default to messages sending to the server.
+ * @see https://rxjs-dev.firebaseapp.com/api/webSocket/WebSocketSubjectConfig#properties
  *
  * @param address Address to listen for transfers
  */
@@ -53,21 +58,19 @@ export const subscribeTransfers = (address: string) => {
     topic: 'transfers',
     address
   }
-  const subscribeMsg = JSON.stringify({
-    method: 'subscribe',
-    ...msg
-  })
-  const unSubscribeMsg = JSON.stringify({
-    method: 'unsubscribe',
-    ...msg
-  })
-
   return ws$
     .multiplex(
-      () => subscribeMsg,
-      () => unSubscribeMsg,
+      // By default deserializer is going to apply JSON.parse to each message comming from the Server.
+      () => ({
+        method: 'subscribe',
+        ...msg
+      }),
+      () => ({
+        method: 'unsubscribe',
+        ...msg
+      }),
       // filter out messages if data is not available
-      (e) => (e as TickersEvent).data !== undefined
+      (e) => (e as TransferEvent).data !== undefined
     )
     .pipe(
       tap((msg) => console.log('transfer msg', msg)),
@@ -78,51 +81,62 @@ export const subscribeTransfers = (address: string) => {
 }
 
 /**
- * JUST for DEBUGGING - we don't need such a <subscription
+ * JUST for DEBUGGING - we don't need a subscription of 'allTickers'
  *
  * Observable for subscribing / unsubscribing all tickers
  *
  * 24hr Ticker statistics for a all symbols are pushed every second.
- * https://docs.binance.org/api-reference/dex-api/ws-streams.html#9-all-symbols-ticker-streams
+ * https://docs.binance.org/api-reference/dex-api/ws-streams.html#11-all-symbols-mini-ticker-streams
  */
-export const subscribeTickers = () => {
-  const msg = {
-    topic: 'allTickers',
-    symbols: ['$all']
-  }
-  const subscribeMsg = JSON.stringify({
-    method: 'subscribe',
-    ...msg
-  })
-  const unSubscribeMsg = JSON.stringify({
-    method: 'unsubscribe',
-    ...msg
-  })
 
-  return ws$
-    .multiplex(
-      () => subscribeMsg,
-      () => unSubscribeMsg,
-      // filter out messages if data is not available
-      (e) => (e as TickersEvent).data !== undefined
-    )
-    .pipe(
-      tap((ev) => console.log('tickers msg', ev)),
-      // we know that data is available here, so type it again
-      map((event: TickersEvent) => event.data as TickersEventData)
-    )
+const allMiniTickersMsg = {
+  topic: 'allMiniTickers',
+  symbols: ['$all']
 }
 
-type TickersEvent = {
+export const miniTickers$ = ws$
+  .multiplex(
+    () => ({
+      method: 'subscribe',
+      ...allMiniTickersMsg
+    }),
+    () => ({
+      method: 'unsubscribe',
+      ...allMiniTickersMsg
+    }),
+    // filter out messages if data is not available
+    (e) => (e as MiniTickersEvent).data !== undefined
+  )
+  .pipe(
+    tap((ev) => console.log('mini tickers msg', ev)),
+    // Since we filtered out messages before,
+    // we know that data is available here,
+    // but we have to do a type cast again
+    map((event: MiniTickersEvent) => event?.data as MiniTickersEventData[])
+  )
+
+type MiniTickersEvent = {
   stream: string
-  data?: TickersEventData
+  data?: MiniTickersEventData[]
 }
 
-type TickersEventData = {
+export type MiniTickersEventData = {
+  // Event type
   e: string
+  // Event time
   E: number
+  // Symbol
   s: string
-  p: string
-  P: string
-  // ... and others
+  // Current day's close price
+  c: string
+  // Open price
+  o: string
+  // High price
+  h: string
+  // Low price
+  l: string
+  // Total traded base asset volume
+  v: string
+  // Total traded quote asset volume
+  q: string
 }

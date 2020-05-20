@@ -11,6 +11,7 @@ import { MidgardProvider } from './contexts/MidgardContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { I18nProvider } from './contexts/I18nContext'
 import { envOrDefault } from './helpers/envHelper'
+import { BinanceProvider } from './contexts/BinanceContext'
 
 type Props = {}
 
@@ -32,15 +33,17 @@ const AppView: React.FC<Props> = (_): JSX.Element => {
 const App: React.FC<Props> = (_): JSX.Element => {
   return (
     <ConnectionProvider>
-      <MidgardProvider>
-        <I18nProvider>
-          <Router>
-            <ThemeProvider>
-              <AppView />
-            </ThemeProvider>
-          </Router>
-        </I18nProvider>
-      </MidgardProvider>
+      <BinanceProvider>
+        <MidgardProvider>
+          <I18nProvider>
+            <Router>
+              <ThemeProvider>
+                <AppView />
+              </ThemeProvider>
+            </Router>
+          </I18nProvider>
+        </MidgardProvider>
+      </BinanceProvider>
     </ConnectionProvider>
   )
 }
