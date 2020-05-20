@@ -1,4 +1,4 @@
-import { TransferEvent, TransferEventData } from '@thorchain/asgardex-binance'
+import { WS } from '@thorchain/asgardex-binance'
 
 import { envOrDefault } from '../helpers/envHelper'
 
@@ -38,7 +38,7 @@ const getEndpoint = (net: Net) => {
 /**
  * All types of incoming messages, which can be different
  */
-type WSInMsg = TransferEvent | MiniTickersEvent
+type WSInMsg = WS.TransferEvent | WS.MiniTickersEvent
 
 const ws$ = webSocket<WSInMsg>(getEndpoint(currentNet))
 
@@ -70,13 +70,13 @@ export const subscribeTransfers = (address: string) => {
         ...msg
       }),
       // filter out messages if data is not available
-      (e) => (e as TransferEvent).data !== undefined
+      (e) => (e as WS.TransferEvent).data !== undefined
     )
     .pipe(
       tap((msg) => console.log('transfer msg', msg)),
       // Since we filtered messages before,
       // we know that data is available here, but it needs to be typed again
-      map((event: TransferEvent) => event.data as TransferEventData)
+      map((event: WS.TransferEvent) => event.data as WS.Transfer)
     )
 }
 
@@ -105,38 +105,12 @@ export const miniTickers$ = ws$
       ...allMiniTickersMsg
     }),
     // filter out messages if data is not available
-    (e) => (e as MiniTickersEvent).data !== undefined
+    (e) => (e as WS.MiniTickersEvent).data !== undefined
   )
   .pipe(
     tap((ev) => console.log('mini tickers msg', ev)),
-    // Since we filtered out messages before,
-    // we know that data is available here,
+    // Since we have filtered messages out before,
+    // we know that `data` is available here,
     // but we have to do a type cast again
-    map((event: MiniTickersEvent) => event?.data as MiniTickersEventData[])
+    map((event: WS.MiniTickersEvent) => event?.data as WS.MiniTickers)
   )
-
-type MiniTickersEvent = {
-  stream: string
-  data?: MiniTickersEventData[]
-}
-
-export type MiniTickersEventData = {
-  // Event type
-  e: string
-  // Event time
-  E: number
-  // Symbol
-  s: string
-  // Current day's close price
-  c: string
-  // Open price
-  o: string
-  // High price
-  h: string
-  // Low price
-  l: string
-  // Total traded base asset volume
-  v: string
-  // Total traded quote asset volume
-  q: string
-}

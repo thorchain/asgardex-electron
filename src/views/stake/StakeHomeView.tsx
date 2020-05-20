@@ -1,12 +1,14 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
+import { WS } from '@thorchain/asgardex-binance'
 import { Button } from 'antd'
 import { useHistory } from 'react-router-dom'
 import * as stakeRoutes from '../../routes/stake'
 import * as RD from '@devexperts/remote-data-ts'
 import View from '../View'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { useObservableState } from 'observable-hooks'
+import { useObservableState, useSubscription, useObservable } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import { useBinanceContext } from '../../contexts/BinanceContext'
 
 type Props = {}
 
@@ -14,6 +16,26 @@ const StakeHomeView: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
 
   const intl = useIntl()
+
+  const { subscribeTransfers } = useBinanceContext()
+
+  const [memo, setMemo] = useState('')
+
+  // For debugging only - address will be provided by wallet
+  const address = 'tbnb13egw96d95lldrhwu56dttrpn2fth6cs0axzaad'
+
+  // 1. Create observable for incoming transfer messages of given address
+  const transfers$ = useObservable<WS.Transfer>(() => subscribeTransfers(address))
+
+  // 2. Define callback for handling incoming transfer messages
+  const transferHandler = useCallback((transfer: WS.Transfer) => {
+    // Do anything with transfer data
+    // we just store memo here - just to demonstrate
+    setMemo(transfer.M)
+  }, [])
+
+  // 3. Subscribe to incoming transfer events
+  useSubscription(transfers$, transferHandler)
 
   const { pools$, reloadPools } = useMidgardContext()
   const pools = useObservableState(pools$, RD.initial)
@@ -25,6 +47,7 @@ const StakeHomeView: React.FC<Props> = (_): JSX.Element => {
   const renderPools = useMemo(
     () => (
       <>
+        <h3>MEMO: {memo}</h3>
         <h3>Pools</h3>
         {RD.fold(
           // initial state
@@ -52,7 +75,7 @@ const StakeHomeView: React.FC<Props> = (_): JSX.Element => {
         )(pools)}
       </>
     ),
-    [pools]
+    [memo, pools]
   )
 
   return (
