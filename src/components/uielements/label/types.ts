@@ -12,17 +12,5 @@ export type FontSettings = {
 }
 
 export type Colors = {
-  [key: string]: string
-}
-
-export type SizeOptions = {
-  [key: string]: Size
-}
-
-export type WeightOptions = {
-  [key: string]: string
-}
-
-export type ColorOptions = {
-  [key: string]: Color
+  [key in Color]: string
 }
