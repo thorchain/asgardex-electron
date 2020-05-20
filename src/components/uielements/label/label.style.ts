@@ -1,8 +1,17 @@
 import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
-import { Props } from './label'
-import { FontSettings, Colors } from './types'
+import { Size, Color, FontSettings, Colors } from './types'
+
+type Props = {
+  size?: Size
+  color?: Color
+  weight?: string
+  className?: string
+  children?: React.ReactNode
+  loading?: boolean
+  onClick?: () => void
+}
 
 const fontSettings: FontSettings = {
   tiny: {
@@ -28,7 +37,6 @@ const fontSettings: FontSettings = {
 }
 
 const colors: Colors = {
-  gradient: palette('gradient', 0),
   primary: palette('primary', 0),
   success: palette('success', 0),
   warning: palette('warning', 0),
