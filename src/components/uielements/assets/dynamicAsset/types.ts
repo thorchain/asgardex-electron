@@ -1,9 +1,9 @@
 export type Size = 'small' | 'normal' | 'big'
 
 export type Sizes = {
-  [key: string]: string
+  [key in Size]: string
 }
 
 export type FontSizes = {
-  [key: string]: string
+  [key in Size]: string
 }

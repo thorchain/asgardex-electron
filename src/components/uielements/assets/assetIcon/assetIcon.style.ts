@@ -1,30 +1,32 @@
 import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
-import { Props } from './assetIcon'
+import { Size } from './types'
 
-const sizes: {
-  [key: string]: string
-} = {
+type Sizes = {
+  [key in Size]: string
+}
+
+const sizes: Sizes = {
   big: key('sizes.coin.big', '40px'),
   small: key('sizes.coin.small', '30px')
 }
 
 export const AssetIconWrapper = styled.div`
-  width: ${(props: Props) => sizes[props.size || 'big']};
-  height: ${(props: Props) => sizes[props.size || 'big']};
+  width: ${({ size }: { size: Size }) => sizes[size || 'big']};
+  height: ${({ size }: { size: Size }) => sizes[size || 'big']};
 
   img {
-    width: ${(props: Props) => sizes[props.size || 'big']};
-    height: ${(props: Props) => sizes[props.size || 'big']};
+    width: ${({ size }: { size: Size }) => sizes[size || 'big']};
+    height: ${({ size }: { size: Size }) => sizes[size || 'big']};
     border-radius: 50%;
     box-shadow: 0px 2px 4px ${palette('secondary', 1)};
     vertical-align: top; /* bug in coin alignment */
   }
 
   .blue-circle {
-    width: ${(props: Props) => sizes[props.size || 'big']};
-    height: ${(props: Props) => sizes[props.size || 'big']};
+    width: ${({ size }: { size: Size }) => sizes[size || 'big']};
+    height: ${({ size }: { size: Size }) => sizes[size || 'big']};
     background-color: ${palette('secondary', 0)};
     border-radius: 50%;
   }
@@ -32,8 +34,8 @@ export const AssetIconWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    width: ${(props: Props) => sizes[props.size || 'big']};
-    height: ${(props: Props) => sizes[props.size || 'big']};
+    width: ${({ size }: { size: Size }) => sizes[size || 'big']};
+    height: ${({ size }: { size: Size }) => sizes[size || 'big']};
     background-color: ${palette('success', 0)};
     border-radius: 50%;
     svg {

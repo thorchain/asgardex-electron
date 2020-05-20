@@ -35,7 +35,7 @@ const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
   }
 
   return (
-    <AssetIconWrapper type={type} size={size} className={`AssetIcon-wrapper ${className}`} {...otherProps}>
+    <AssetIconWrapper size={size} className={`AssetIcon-wrapper ${className}`} {...otherProps}>
       {renderAssetIcon()}
     </AssetIconWrapper>
   )

@@ -1,8 +1,13 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { Props as ComponentProps } from './dynamicAsset'
-import { Sizes, FontSizes } from './types'
+import { Size, Sizes, FontSizes } from './types'
+
+type ComponentProps = {
+  type?: string
+  size?: Size
+  className?: string
+}
 
 type ExtraProps = {
   startCol: string
