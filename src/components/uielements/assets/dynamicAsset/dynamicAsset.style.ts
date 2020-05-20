@@ -3,18 +3,13 @@ import { palette } from 'styled-theme'
 
 import { Size, Sizes, FontSizes } from './types'
 
-type ComponentProps = {
+type Props = {
   type?: string
   size?: Size
   className?: string
-}
-
-type ExtraProps = {
   startCol: string
   stopCol: string
 }
-
-type Props = ComponentProps & ExtraProps
 
 const sizes: Sizes = {
   big: '40px',
