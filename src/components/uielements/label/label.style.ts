@@ -7,9 +7,6 @@ type Props = {
   size?: Size
   color?: Color
   weight?: string
-  className?: string
-  children?: React.ReactNode
-  loading?: boolean
   onClick?: () => void
 }
 
