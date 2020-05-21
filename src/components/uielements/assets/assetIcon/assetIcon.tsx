@@ -8,7 +8,7 @@ import { Size } from './types'
 
 export type Props = {
   type?: string
-  size: Size
+  size?: Size
   className?: string
 }
 
