@@ -60,7 +60,6 @@ export const subscribeTransfers = (address: string) => {
   }
   return ws$
     .multiplex(
-      // By default deserializer is going to apply JSON.parse to each message comming from the Server.
       () => ({
         method: 'subscribe',
         ...msg

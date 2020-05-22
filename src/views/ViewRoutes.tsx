@@ -7,9 +7,11 @@ import * as appRoutes from '../routes/app'
 import * as walletRoutes from '../routes/wallet'
 import * as swapRoutes from '../routes/swap'
 import * as stakeRoutes from '../routes/stake'
+import * as playgroundRoutes from '../routes/playground'
 import SwapView from './swap/SwapView'
 import StakeView from './stake/StakeView'
 import WalletView from './wallet/WalletView'
+import PlaygroundView from './playground/PlaygroundView'
 
 const ViewRoutes: React.FC<{}> = (): JSX.Element => {
   return (
@@ -31,6 +33,9 @@ const ViewRoutes: React.FC<{}> = (): JSX.Element => {
       </Route>
       <Route path={walletRoutes.base.template}>
         <WalletView />
+      </Route>
+      <Route path={playgroundRoutes.base.template}>
+        <PlaygroundView />
       </Route>
       <Route path="*">
         <NoContentView />

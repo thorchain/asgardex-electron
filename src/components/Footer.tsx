@@ -1,9 +1,11 @@
 import React, { useCallback } from 'react'
-import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined } from '@ant-design/icons'
+import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined, BugOutlined } from '@ant-design/icons'
 import { FooterContainer, FooterLink, FooterIconWrapper, FooterLinkWrapper } from './Footer.style'
 import { ReactComponent as ThorChainIcon } from '../assets/svg/logo-thorchain.svg'
 import { ReactComponent as TelegramIcon } from '../assets/svg/icon-telegram.svg'
 import { Row, Col, Grid } from 'antd'
+import { useHistory } from 'react-router-dom'
+import * as playgroundRoutes from '../routes/playground'
 const { shell } = window.require('electron')
 
 type IconProps = {
@@ -28,7 +30,10 @@ type Props = {
 const Footer: React.FC<Props> = (props: Props): JSX.Element => {
   const { commitHash } = props
 
+  const history = useHistory()
   const screens = Grid.useBreakpoint()
+
+  const gotoPlayground = useCallback(() => history.push(playgroundRoutes.base.path()), [history])
 
   return (
     <FooterContainer>
@@ -63,6 +68,10 @@ const Footer: React.FC<Props> = (props: Props): JSX.Element => {
                 <BranchesOutlined />
               </FooterIcon>
             )}
+            {/* TODO (@Veado) Just for debugging - Remove it if we don't need it anymore */}
+            <FooterIconWrapper onClick={gotoPlayground}>
+              <BugOutlined />
+            </FooterIconWrapper>
           </Row>
         </Col>
       </Row>
