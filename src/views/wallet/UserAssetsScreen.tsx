@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, ReactText } from 'react'
 import { useHistory } from 'react-router-dom'
 import * as walletRoutes from '../../routes/wallet'
 import { UserAssetType } from '../../types/wallet'
 import { Row, Col, Table } from 'antd'
 import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 
+import { client } from '@thorchain/asgardex-binance'
+
+import { Balance } from '@thorchain/asgardex-binance/lib/types/binance'
 // Dummy data
 const UserAssets: UserAssetType[] = [
   { _id: '1', free: 99, frozen: 11, locked: 21, symbol: 'BNB-JST', name: 'Binance', value: 0.99 },
@@ -13,12 +16,15 @@ const UserAssets: UserAssetType[] = [
 
 const UserAssetsScreen: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const [assets, setAssets] = useState<UserAssetType[]>([])
-
-  function setData() {
-    const res = UserAssets
-    if (res.length > 0) {
-      setAssets(res)
+  const [assets, setAssets] = useState<any>()
+  async function setData() {
+    const ct = await client()
+    const address = localStorage.getItem('address')
+    if (address) {
+      const res = await ct.getBalance(address)
+      if (res) {
+        setAssets(res)
+      }
     }
   }
   useEffect(() => {
@@ -29,7 +35,9 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
       <Col span={24}>
         <Table
           dataSource={assets}
-          rowKey="_id"
+          rowKey={(_, i: any) => {
+            return i
+          }}
           pagination={false}
           onRow={(record) => {
             return {

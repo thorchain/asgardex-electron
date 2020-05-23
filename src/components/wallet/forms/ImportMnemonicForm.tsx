@@ -24,16 +24,10 @@ const ImportMnemonicForm: React.FC = (): JSX.Element => {
   }
 
   const checkMnemonic = (_: any, value: any) => {
-    console.log('validating something?')
-    // console.log(rule)
-    console.log(value)
     if (!value) {
       return Promise.reject('required tettster')
     }
     return BIP39.validateMnemonic(value) ? Promise.resolve() : Promise.reject('Invalid mnemonic seed phrase')
-  }
-  const checkPasswords = (_: any, value: any) => {
-    console.log('checking passwords')
   }
   const handleImportFormSubmit = useCallback(async (vals: Store) => {
     setLoadingMsg('Generating wallet')
@@ -70,7 +64,7 @@ const ImportMnemonicForm: React.FC = (): JSX.Element => {
         rules={[
           { required: true },
           ({ getFieldValue }) => ({
-            validator(rule, value) {
+            validator(_, value) {
               if (!value || getFieldValue('password') === value) {
                 return Promise.resolve()
               }
