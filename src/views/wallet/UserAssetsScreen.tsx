@@ -1,18 +1,12 @@
 import React, { useEffect, useState, ReactText } from 'react'
 import { useHistory } from 'react-router-dom'
 import * as walletRoutes from '../../routes/wallet'
-import { UserAssetType } from '../../types/wallet'
 import { Row, Col, Table } from 'antd'
 import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 
 import { client } from '@thorchain/asgardex-binance'
 
-import { Balance } from '@thorchain/asgardex-binance/lib/types/binance'
-// Dummy data
-const UserAssets: UserAssetType[] = [
-  { _id: '1', free: 99, frozen: 11, locked: 21, symbol: 'BNB-JST', name: 'Binance', value: 0.99 },
-  { _id: '2', free: 1034, frozen: 38, locked: 101, symbol: 'RUNE-1E0', name: 'Rune', value: 0.25 }
-]
+// import { Balance } from '@thorchain/asgardex-binance/lib/types/binance'
 
 const UserAssetsScreen: React.FC = (): JSX.Element => {
   const history = useHistory()
