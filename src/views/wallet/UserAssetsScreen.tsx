@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ReactText } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import * as walletRoutes from '../../routes/wallet'
 import { Row, Col, Table } from 'antd'
