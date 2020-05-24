@@ -5,6 +5,7 @@ import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
 
 import { Form, Input, Button } from 'antd'
 import { Store } from 'antd/lib/form/interface'
+import { Rule } from 'antd/lib/form'
 import { delay } from '@thorchain/asgardex-util'
 
 const ImportMnemonicForm: React.FC = (): JSX.Element => {
@@ -23,7 +24,7 @@ const ImportMnemonicForm: React.FC = (): JSX.Element => {
     localStorage.setItem('keystore', JSON.stringify(keystore))
   }
 
-  const checkMnemonic = (_: any, value: any) => {
+  const checkMnemonic = (_: Rule, value: string) => {
     if (!value) {
       return Promise.reject('required tettster')
     }

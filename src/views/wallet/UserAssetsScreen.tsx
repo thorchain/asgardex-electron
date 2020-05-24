@@ -6,19 +6,21 @@ import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 
 import { client } from '@thorchain/asgardex-binance'
 
-// import { Balance } from '@thorchain/asgardex-binance/lib/types/binance'
+import { Balance } from '@thorchain/asgardex-binance/lib/types/binance'
 
 const UserAssetsScreen: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const [assets, setAssets] = useState<any>()
+  const [assets, setAssets] = useState<Balance[]>() // Balance is an object, see below
   async function setData() {
     const ct = await client()
     const address = localStorage.getItem('address')
     if (address) {
-      const res = await ct.getBalance(address)
-      if (res) {
-        setAssets(res)
-      }
+      // Temporary disabled as type returned is not array
+      // Issue here: https://gitlab.com/thorchain/asgardex-common/asgardex-binance/-/issues/1
+      /*eslint-disable*/
+      const res: any = await ct.getBalance(address)
+      if (res) setAssets(res)
+      /*eslint-enable*/
     }
   }
   useEffect(() => {
@@ -29,8 +31,8 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
       <Col span={24}>
         <Table
           dataSource={assets}
-          rowKey={(_, i: any) => {
-            return i
+          rowKey={({ symbol }) => {
+            return symbol
           }}
           pagination={false}
           onRow={(record) => {
