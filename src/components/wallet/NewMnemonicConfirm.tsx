@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { Card, Col, Row, Button, Input, Form } from 'antd'
+import { Card, Col, Row, Button, Form } from 'antd'
 import { RedoOutlined } from '@ant-design/icons'
 import { Store } from 'antd/lib/form/interface'
+import { v4 as uuidv4 } from 'uuid'
 
 type WordType = {
   text: string
@@ -10,9 +11,11 @@ type WordType = {
   error?: boolean
   selected?: boolean
 }
-const mnemonic = 'real debris regret sea auto random agree police uncover gloom cloud ribbon'
 
-const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
+const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }> = ({
+  mnemonic,
+  onConfirm
+}): JSX.Element => {
   const [wordsList, setWordsList] = useState<WordType[]>([])
   const [shuffledWordsList, setShuffledWordsList] = useState<WordType[]>([])
   const [loadingMsg] = useState<string>('')
@@ -23,7 +26,7 @@ const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
     const words = mnemonic.split(' ')
     if (words && !initialized) {
       const res = words.map((e: string) => {
-        const uniqueId = Math.random().toString(36).substring(2) + Date.now().toString(36)
+        const uniqueId = uuidv4()
         return { text: e, _id: uniqueId }
       })
       setWordsList(res)
@@ -139,6 +142,7 @@ const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
 
     if (checkwords) {
       // The submitted phrase as a string for passing to wallet methods
+      onConfirm()
       const repeatPhrase = wordsList
         .filter((e: WordType) => e.selected === true)
         .map((f: WordType) => {
@@ -195,15 +199,9 @@ const MnemonicConfirmScreen: React.FC = (): JSX.Element => {
             ))}
           </Row>
         </Form.Item>
-        <Form.Item name="password" label="New Password">
-          <Input size="large" type="password" />
-        </Form.Item>
-        <Form.Item name="repeatPassword" label="Repeat Password">
-          <Input size="large" type="password" />
-        </Form.Item>
         <Form.Item>
           <Button size="large" type="primary" htmlType="submit" block>
-            {loadingMsg || 'Generate'}
+            {loadingMsg || 'Confirm'}
           </Button>
         </Form.Item>
       </Form>

@@ -10,7 +10,7 @@ import { Balance } from '@thorchain/asgardex-binance/lib/types/binance'
 
 const UserAssetsScreen: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const [assets, setAssets] = useState<Balance[]>() // Balance is an object, see below
+  const [assets, setAssets] = useState<Balance[]>([]) // Balance is an object, see below
   async function setData() {
     const ct = await client()
     const address = localStorage.getItem('address')
@@ -31,6 +31,7 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
       <Col span={24}>
         <Table
           dataSource={assets}
+          loading={assets.length <= 0}
           rowKey={({ symbol }) => {
             return symbol
           }}

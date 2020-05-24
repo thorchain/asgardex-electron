@@ -13,15 +13,17 @@ const ImportMnemonicForm: React.FC = (): JSX.Element => {
   const [form] = Form.useForm()
 
   const importMnemonicWallet = (mnemonic: string, password: string) => {
-    const network = 'testnet'
-    console.log('importing mnemonic...')
-    console.log(`network: ${network}; mnemonic: ${mnemonic}; password: ${password}`)
-    const privKey: string = crypto.getPrivateKeyFromMnemonic(mnemonic)
-    const keystore: KeyStore = crypto.generateKeyStore(privKey, password)
-    const address: string = crypto.getAddressFromPrivateKey(privKey)
-    // Temporary store during development
-    localStorage.setItem('address', address)
-    localStorage.setItem('keystore', JSON.stringify(keystore))
+    if (!localStorage.getItem('keystore')) {
+      const privKey: string = crypto.getPrivateKeyFromMnemonic(mnemonic)
+      const keystore: KeyStore = crypto.generateKeyStore(privKey, password)
+      // TODO: dynamically set network for client, default is testnet
+      const address: string = crypto.getAddressFromPrivateKey(privKey)
+      // Temporary store during development
+      localStorage.setItem('address', address)
+      localStorage.setItem('keystore', JSON.stringify(keystore))
+    } else {
+      throw Error('keystore already exists')
+    }
   }
 
   const checkMnemonic = (_: Rule, value: string) => {

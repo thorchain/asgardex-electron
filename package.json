@@ -81,7 +81,8 @@
     "rxjs": "^6.5.5",
     "styled-components": "^5.1.0",
     "styled-theme": "^0.3.3",
-    "typescript": "^3.9.2"
+    "typescript": "^3.9.2",
+    "uuid": "^8.1.0"
   },
   "devDependencies": {
     "@hot-loader/react-dom": "^16.13.0",
