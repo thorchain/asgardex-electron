@@ -1,5 +1,5 @@
 import * as Rx from 'rxjs'
-import { retry, mergeMap, catchError, startWith, exhaustMap } from 'rxjs/operators'
+import { retry, mergeMap, catchError, startWith, exhaustMap, shareReplay } from 'rxjs/operators'
 import * as RD from '@devexperts/remote-data-ts'
 import byzantine from '@thorchain/byzantine-module'
 import { DefaultApi } from '../types/generated/midgard/apis'
@@ -47,4 +47,7 @@ export const reloadPools = () => reloadPools$$.next(0)
 /**
  * Pool data
  */
-export const pools$ = reloadPools$$.pipe(exhaustMap((_) => poolsRD$))
+export const pools$ = reloadPools$$.pipe(
+  exhaustMap((_) => poolsRD$),
+  shareReplay()
+)

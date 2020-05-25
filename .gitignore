@@ -16,3 +16,6 @@ yarn-error.log*
 .eslintcache
 
 /public/electron.js
+
+# don't share .env, but .env.sample
+.env
