@@ -1,4 +1,4 @@
-import React, { useState, useEffect, } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Row, Col } from 'antd'
 import WalleteManage from '../../components/wallet/WalletManage'
 import WalletCreate from '../../components/wallet/WalletCreate'
@@ -8,18 +8,12 @@ const UserAccountsScreen: React.FC = (): JSX.Element => {
   const [isWallet, setIsWallet] = useState(!!keystore)
   useEffect(() => {
     if (localStorage.getItem('keystore')) {
-      // setIsWallet(true)
+      setIsWallet(true)
     }
-  }, [isWallet]);
+  }, [isWallet])
   return (
     <Row>
-      <Col span={24}>
-        {isWallet ? (
-          <WalleteManage />
-        ) : (
-          <WalletCreate />
-        )}
-      </Col>
+      <Col span={24}>{isWallet ? <WalleteManage /> : <WalletCreate />}</Col>
     </Row>
   )
 }
