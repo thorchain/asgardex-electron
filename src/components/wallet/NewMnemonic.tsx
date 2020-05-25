@@ -1,15 +1,10 @@
 import React from 'react'
-import { Card, Tag, Button, Typography } from 'antd'
+import { Card, Tag, Typography } from 'antd'
 const { Paragraph, Text } = Typography
 
-// dummy data. actuall testnet wallet seed
-const mnemonic = 'real debris regret sea auto random agree police uncover gloom cloud ribbon'
-const NewMnemonic: React.FC = (): JSX.Element => {
+const NewMnemonic: React.FC<{ mnemonic: string }> = ({ mnemonic }): JSX.Element => {
   const wordsList = () => {
-    return mnemonic.length ? mnemonic.split(' ') : []
-  }
-  const handleBtnClick = () => {
-    console.log('go to next step...')
+    return mnemonic.split(' ')
   }
   return (
     <>
@@ -23,9 +18,6 @@ const NewMnemonic: React.FC = (): JSX.Element => {
         This is the phrase used to seed your wallet accounts. Record and keep this in a safe place. If you loose access
         to your wallet and backups, your account can <Text strong>only</Text> be recovered using this phrase.
       </Paragraph>
-      <Button type="primary" size="large" block onClick={handleBtnClick}>
-        Next
-      </Button>
     </>
   )
 }

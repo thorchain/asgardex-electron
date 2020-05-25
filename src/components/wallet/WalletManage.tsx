@@ -1,7 +1,8 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useState, useEffect } from 'react'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
 import { UserAccountType } from '../../types/wallet'
+import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
 const { Title, Text, Paragraph } = Typography
 
 // Dummy Data
@@ -33,30 +34,34 @@ const UserAccounts: UserAccountType[] = [
   }
 ]
 // Dummy data... types not confirmed
-const userAccount = {
-  address: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
-  keystore: {
-    version: 1,
-    id: '84a9e412-90a1-4076-8e7c-e516f78059ee',
-    crypto: {}
-  }
-}
 
 const WalletManage: React.FC = (): JSX.Element => {
-  type ClientTypes = { network: string; chainId: string }
-  const client: ClientTypes = useMemo(() => {
-    return { chainId: 'testing', network: 'testing' }
+  const [keystore, setKeystore] = useState<KeyStore>()
+  const [network, setNetwork] = useState<string | null>()
+  const [chainId, setChainId] = useState<string | null>()
+  const [address, setAddress] = useState<string | null>('')
+  async function setData() {
+    const key: string | null = localStorage.getItem('keystore')
+    if (key) {
+      setKeystore(JSON.parse(key))
+    }
+    // Temporary network client settings placeholders
+    setNetwork('testnet')
+    setChainId('Binance-Nile')
+    setAddress(localStorage.getItem('address'))
+  }
+  useEffect(() => {
+    setData()
   }, [])
-  const fileName = (): string => userAccount.address.concat('-keystore.txt')
+  const fileName = (): string | undefined => address?.concat('-keystore.txt')
   const downloadLink: string = useMemo(() => {
-    const keystore: string = window.localStorage.getItem('binance') || ''
-    return 'data:text/plain;charset=utf-8,' + encodeURIComponent(keystore)
-  }, [])
-  const lockWallet = useCallback(() => {
-    console.log('locking wallet...')
+    const keystring: string = localStorage.getItem('keystore') || ''
+    return 'data:text/plain;charset=utf-8,' + encodeURIComponent(keystring)
   }, [])
   const removeWallet = useCallback(() => {
     console.log('removing wallet...')
+    localStorage.removeItem('keystore')
+    localStorage.removeItem('address')
   }, [])
   return (
     <Row gutter={[16, 16]}>
@@ -74,7 +79,7 @@ const WalletManage: React.FC = (): JSX.Element => {
             </Col>
             <Col span={12}>
               <Card bordered={false}>
-                <Button type="ghost" shape="round" block onClick={lockWallet}>
+                <Button type="ghost" shape="round" block>
                   Lock Wallet
                 </Button>
               </Card>
@@ -99,20 +104,20 @@ const WalletManage: React.FC = (): JSX.Element => {
         <Card>
           <Row>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
-              <Text strong>Account:</Text>
-              <Paragraph ellipsis>{userAccount.address}</Paragraph>
+              <Text strong>Client Address:</Text>
+              <Paragraph ellipsis>{address}</Paragraph>
             </Col>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Keystore Version:</Text>
-              <Paragraph>{userAccount.keystore.version}</Paragraph>
+              <Paragraph>{keystore?.version}</Paragraph>
             </Col>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Type:</Text>
-              <Paragraph>{client.network}</Paragraph>
+              <Paragraph>{network}</Paragraph>
             </Col>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Chain ID:</Text>
-              <Paragraph>{client.chainId}</Paragraph>
+              <Paragraph>{chainId}</Paragraph>
             </Col>
           </Row>
         </Card>

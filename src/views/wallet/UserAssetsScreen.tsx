@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import * as walletRoutes from '../../routes/wallet'
-import { UserAssetType } from '../../types/wallet'
 import { Row, Col, Table } from 'antd'
 import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 
-// Dummy data
-const UserAssets: UserAssetType[] = [
-  { _id: '1', free: 99, frozen: 11, locked: 21, symbol: 'BNB-JST', name: 'Binance', value: 0.99 },
-  { _id: '2', free: 1034, frozen: 38, locked: 101, symbol: 'RUNE-1E0', name: 'Rune', value: 0.25 }
-]
+import { client } from '@thorchain/asgardex-binance'
+
+import { Balance } from '@thorchain/asgardex-binance/lib/types/binance'
 
 const UserAssetsScreen: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const [assets, setAssets] = useState<UserAssetType[]>([])
-
-  function setData() {
-    const res = UserAssets
-    if (res.length > 0) {
-      setAssets(res)
+  const [assets, setAssets] = useState<Balance[]>([]) // Balance is an object, see below
+  async function setData() {
+    const ct = await client()
+    const address = localStorage.getItem('address')
+    if (address) {
+      // Temporary disabled as type returned is not array
+      // Issue here: https://gitlab.com/thorchain/asgardex-common/asgardex-binance/-/issues/1
+      /*eslint-disable*/
+      const res: any = await ct.getBalance(address)
+      if (res) setAssets(res)
+      /*eslint-enable*/
     }
   }
   useEffect(() => {
@@ -29,7 +31,10 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
       <Col span={24}>
         <Table
           dataSource={assets}
-          rowKey="_id"
+          loading={assets.length <= 0}
+          rowKey={({ symbol }) => {
+            return symbol
+          }}
           pagination={false}
           onRow={(record) => {
             return {

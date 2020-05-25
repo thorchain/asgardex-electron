@@ -50,6 +50,7 @@
   "homepage": "https://thorchain.org",
   "dependencies": {
     "@ant-design/icons": "^4.1.0",
+    "@binance-chain/javascript-sdk": "^3.0.2",
     "@craco/craco": "^5.6.4",
     "@devexperts/remote-data-ts": "^2.0.3",
     "@openapitools/openapi-generator-cli": "^1.0.13-4.3.1",
@@ -72,7 +73,8 @@
     "rxjs": "^6.5.5",
     "styled-components": "^5.1.0",
     "styled-theme": "^0.3.3",
-    "typescript": "^3.9.2"
+    "typescript": "^3.9.2",
+    "uuid": "^8.1.0"
   },
   "devDependencies": {
     "@hot-loader/react-dom": "^16.13.0",

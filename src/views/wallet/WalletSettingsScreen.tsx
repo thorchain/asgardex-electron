@@ -1,23 +1,19 @@
-import React from 'react'
-import { Row, Col, Tabs, Tag } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { Row, Col } from 'antd'
 import WalleteManage from '../../components/wallet/WalletManage'
 import WalletCreate from '../../components/wallet/WalletCreate'
-const { TabPane } = Tabs
 
 const UserAccountsScreen: React.FC = (): JSX.Element => {
+  const keystore = localStorage.getItem('keystore')
+  const [isWallet, setIsWallet] = useState(!!keystore)
+  useEffect(() => {
+    if (localStorage.getItem('keystore')) {
+      setIsWallet(true)
+    }
+  }, [isWallet])
   return (
     <Row>
-      <Col span={24}>
-        {/* These tabs for for convenience during development. TODO: Replace with routeing/rendering logic */}
-        <Tabs defaultActiveKey="1" size="large" tabBarExtraContent={<Tag>temporary</Tag>}>
-          <TabPane tab="New Wallet" key="1">
-            <WalletCreate />
-          </TabPane>
-          <TabPane tab="Settings" key="2">
-            <WalleteManage />
-          </TabPane>
-        </Tabs>
-      </Col>
+      <Col span={24}>{isWallet ? <WalleteManage /> : <WalletCreate />}</Col>
     </Row>
   )
 }
