@@ -40,8 +40,6 @@ While environment variables are not required (defaults are set), you can configu
 
 ## Development
 
-First, create `.env` file and copy all content of `.env.example` into it. `.env.examples` includes all `ENV`'s you might want to change for your needs.
-
 ```bash
 yarn dev
 ```
