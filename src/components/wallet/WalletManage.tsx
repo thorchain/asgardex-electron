@@ -2,8 +2,6 @@ import React, { useMemo, useCallback, useState, useEffect } from 'react'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
 import { UserAccountType } from '../../types/wallet'
-import { client as binance } from '@thorchain/asgardex-binance'
-import { BinanceClient } from '@thorchain/asgardex-binance/lib/index'
 import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
 const { Title, Text, Paragraph } = Typography
 
@@ -43,15 +41,13 @@ const WalletManage: React.FC = (): JSX.Element => {
   const [chainId, setChainId] = useState<string | null>()
   const [address, setAddress] = useState<string | null>('')
   async function setData() {
-    const key: string | null = localStorage.getItem('binance')
+    const key: string | null = localStorage.getItem('keystore')
     if (key) {
       setKeystore(JSON.parse(key))
     }
-    const ct: BinanceClient = await binance()
-    if (ct) {
-      setNetwork('testnet')
-      setChainId('Binance-Nile')
-    }
+    // Temporary network client settings placeholders
+    setNetwork('testnet')
+    setChainId('Binance-Nile')
     setAddress(localStorage.getItem('address'))
   }
   useEffect(() => {
@@ -59,12 +55,12 @@ const WalletManage: React.FC = (): JSX.Element => {
   }, [])
   const fileName = (): string | undefined => address?.concat('-keystore.txt')
   const downloadLink: string = useMemo(() => {
-    const keystring: string = localStorage.getItem('binance') || ''
+    const keystring: string = localStorage.getItem('keystore') || ''
     return 'data:text/plain;charset=utf-8,' + encodeURIComponent(keystring)
   }, [])
   const removeWallet = useCallback(() => {
     console.log('removing wallet...')
-    localStorage.removeItem('binance')
+    localStorage.removeItem('keystore')
     localStorage.removeItem('address')
   }, [])
   return (
