@@ -1,7 +1,8 @@
-import * as Rx from 'rxjs'
-import { retry, mergeMap, catchError, startWith, exhaustMap, shareReplay } from 'rxjs/operators'
 import * as RD from '@devexperts/remote-data-ts'
 import byzantine from '@thorchain/byzantine-module'
+import * as Rx from 'rxjs'
+import { retry, mergeMap, catchError, startWith, exhaustMap, shareReplay } from 'rxjs/operators'
+
 import { DefaultApi } from '../types/generated/midgard/apis'
 import { Configuration } from '../types/generated/midgard/runtime'
 

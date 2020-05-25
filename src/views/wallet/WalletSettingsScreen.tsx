@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
+
 import { Row, Col } from 'antd'
-import WalleteManage from '../../components/wallet/WalletManage'
+
 import WalletCreate from '../../components/wallet/WalletCreate'
+import WalleteManage from '../../components/wallet/WalletManage'
 
 const UserAccountsScreen: React.FC = (): JSX.Element => {
   const keystore = localStorage.getItem('keystore')

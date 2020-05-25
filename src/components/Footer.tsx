@@ -1,11 +1,13 @@
 import React, { useCallback } from 'react'
+
 import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined, BugOutlined } from '@ant-design/icons'
-import { FooterContainer, FooterLink, FooterIconWrapper, FooterLinkWrapper } from './Footer.style'
-import { ReactComponent as ThorChainIcon } from '../assets/svg/logo-thorchain.svg'
-import { ReactComponent as TelegramIcon } from '../assets/svg/icon-telegram.svg'
 import { Row, Col, Grid } from 'antd'
 import { useHistory } from 'react-router-dom'
+
+import { ReactComponent as TelegramIcon } from '../assets/svg/icon-telegram.svg'
+import { ReactComponent as ThorChainIcon } from '../assets/svg/logo-thorchain.svg'
 import * as playgroundRoutes from '../routes/playground'
+import { FooterContainer, FooterLink, FooterIconWrapper, FooterLinkWrapper } from './Footer.style'
 const { shell } = window.require('electron')
 
 type IconProps = {

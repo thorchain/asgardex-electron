@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom'
-import * as walletRoutes from '../../routes/wallet'
-import { Row, Col, Table } from 'antd'
-import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 
 import { Balances } from '@thorchain/asgardex-binance'
+import { Row, Col, Table } from 'antd'
+import { useHistory } from 'react-router-dom'
+
+import DynamicCoin from '../../components/shared/icons/DynamicCoin'
+import * as walletRoutes from '../../routes/wallet'
 
 const UserAssetsScreen: React.FC = (): JSX.Element => {
   const history = useHistory()

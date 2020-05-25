@@ -1,6 +1,6 @@
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 
+import { storiesOf } from '@storybook/react'
 import { bn } from '@thorchain/asgardex-util'
 
 import Trend from './trend'

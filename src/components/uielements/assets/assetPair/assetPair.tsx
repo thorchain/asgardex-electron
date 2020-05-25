@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { AssetPairWrapper } from './assetPair.style'
 import AssetIcon from '../assetIcon'
+import { AssetPairWrapper } from './assetPair.style'
 import { Size } from './types'
 
 export type Props = {

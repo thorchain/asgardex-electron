@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { ViewWrapper } from './View.style'
 
 type Props = {

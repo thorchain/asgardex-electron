@@ -1,6 +1,6 @@
-import { Locale, Messages } from './types'
-import fr from './fr'
 import en from './en'
+import fr from './fr'
+import { Locale, Messages } from './types'
 
 export const LOCALES = [Locale.EN, Locale.FR]
 

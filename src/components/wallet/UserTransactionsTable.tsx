@@ -1,8 +1,10 @@
 import React from 'react'
+
+import { Typography, Table } from 'antd'
+
 import { shortSymbol } from '../../helpers/tokenHelpers'
 import { transactionParty } from '../../helpers/transactionHelpers'
 import { UserTransactionType } from '../../types/wallet'
-import { Typography, Table } from 'antd'
 const { Text } = Typography
 
 type Props = { transactions: UserTransactionType[] }

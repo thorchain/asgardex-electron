@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import DynamicCoin from '../shared/icons/DynamicCoin'
-import { UserAssetType } from '../../types/wallet'
-import { shortSymbol } from '../../helpers/tokenHelpers'
 
-import { Menu, Dropdown, Button, Card, Typography } from 'antd'
 import { DownOutlined } from '@ant-design/icons'
+import { Menu, Dropdown, Button, Card, Typography } from 'antd'
+
+import { shortSymbol } from '../../helpers/tokenHelpers'
+import { UserAssetType } from '../../types/wallet'
+import DynamicCoin from '../shared/icons/DynamicCoin'
+
 const { Title } = Typography
 // Multi-use 'account selector' component will have a data context
 // Dummy data

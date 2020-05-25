@@ -1,6 +1,6 @@
+import { Table } from 'antd'
 import styled from 'styled-components'
 import { key, palette } from 'styled-theme'
-import { Table } from 'antd'
 
 export const TableWrapper = styled(Table)`
   .ant-table-thead > tr > th {

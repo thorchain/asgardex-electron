@@ -1,15 +1,16 @@
 import React, { useMemo } from 'react'
+
 import { Dropdown, Row, Col } from 'antd'
+import Paragraph from 'antd/lib/typography/Paragraph'
+import { useObservableState } from 'observable-hooks'
 import { palette } from 'styled-theme'
 
-import Menu from '../shared/Menu'
-import ConnectionStatus from '../shared/icons/ConnectionStatus'
-import { useConnectionContext, OnlineStatus } from '../../contexts/ConnectionContext'
-import { useObservableState } from 'observable-hooks'
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
-import { HeaderNetStatusWrapper } from './HeaderNetStatus.style'
-import Paragraph from 'antd/lib/typography/Paragraph'
+import { useConnectionContext, OnlineStatus } from '../../contexts/ConnectionContext'
 import { useThemeContext } from '../../contexts/ThemeContext'
+import ConnectionStatus from '../shared/icons/ConnectionStatus'
+import Menu from '../shared/Menu'
+import { HeaderNetStatusWrapper } from './HeaderNetStatus.style'
 
 type MenuItem = {
   key: string

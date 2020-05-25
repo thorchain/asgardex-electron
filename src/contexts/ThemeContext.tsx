@@ -1,9 +1,10 @@
 import React, { createContext, useContext } from 'react'
-import * as SC from 'styled-components'
+
+import themes, { ThemeType, Theme } from '@thorchain/asgardex-theme'
+import { useObservableState } from 'observable-hooks'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { useObservableState } from 'observable-hooks'
-import themes, { ThemeType, Theme } from '@thorchain/asgardex-theme'
+import * as SC from 'styled-components'
 
 import 'antd/dist/antd.dark.css'
 import 'antd/dist/antd.css'

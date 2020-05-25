@@ -1,6 +1,7 @@
 import React from 'react'
-import { storiesOf } from '@storybook/react'
+
 import { text, radios } from '@storybook/addon-knobs'
+import { storiesOf } from '@storybook/react'
 
 import Label from './label'
 import { Color, Size } from './types'

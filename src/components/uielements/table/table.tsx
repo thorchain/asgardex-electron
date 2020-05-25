@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
+
 import { TableProps } from 'antd/lib/table'
 
 import { TableWrapper } from './table.style'

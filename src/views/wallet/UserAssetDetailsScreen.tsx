@@ -1,12 +1,14 @@
 import React from 'react'
-import { useParams, useHistory } from 'react-router-dom'
-import { AssetDetailsRouteParams } from '../../routes/wallet'
-import TransactionsTable from '../../components/wallet/UserTransactionsTable'
-import { UserTransactionType, UserAssetType } from '../../types/wallet'
-import DynamicCoin from '../../components/shared/icons/DynamicCoin'
-import { shortSymbol } from '../../helpers/tokenHelpers'
-import * as walletRoutes from '../../routes/wallet'
+
 import { Row, Col, Typography, Divider, Button, Card } from 'antd'
+import { useParams, useHistory } from 'react-router-dom'
+
+import DynamicCoin from '../../components/shared/icons/DynamicCoin'
+import TransactionsTable from '../../components/wallet/UserTransactionsTable'
+import { shortSymbol } from '../../helpers/tokenHelpers'
+import { AssetDetailsRouteParams } from '../../routes/wallet'
+import * as walletRoutes from '../../routes/wallet'
+import { UserTransactionType, UserAssetType } from '../../types/wallet'
 const { Title } = Typography
 
 // Dummy data

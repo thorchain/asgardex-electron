@@ -1,9 +1,8 @@
 import { WS } from '@thorchain/asgardex-binance'
+import { map, tap } from 'rxjs/operators'
+import { webSocket } from 'rxjs/webSocket'
 
 import { envOrDefault } from '../helpers/envHelper'
-
-import { webSocket } from 'rxjs/webSocket'
-import { map, tap } from 'rxjs/operators'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,

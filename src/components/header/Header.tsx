@@ -1,24 +1,24 @@
 import React, { useMemo, useCallback } from 'react'
-import { useObservableState } from 'observable-hooks'
 
 import { Row, Col, Tabs } from 'antd'
+import { useObservableState } from 'observable-hooks'
 import { useHistory, useRouteMatch } from 'react-router-dom'
-import * as walletRoutes from '../../routes/wallet'
-import * as swapRoutes from '../../routes/swap'
-import * as stakeRoutes from '../../routes/stake'
-import { HeaderContainer, TabLink } from './Header.style'
-
-import { useThemeContext } from '../../contexts/ThemeContext'
 import { palette, size } from 'styled-theme'
-import HeaderNetStatus from './HeaderNetStatus'
-import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
-import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
-import { ReactComponent as StakeIcon } from '../../assets/svg/icon-stake.svg'
-import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
-import { ReactComponent as ThemeIcon } from '../../assets/svg/icon-theme-switch.svg'
-import { ReactComponent as SettingsIcon } from '../../assets/svg/icon-settings.svg'
+
 import { ReactComponent as LockIcon } from '../../assets/svg/icon-lock.svg'
+import { ReactComponent as SettingsIcon } from '../../assets/svg/icon-settings.svg'
+import { ReactComponent as StakeIcon } from '../../assets/svg/icon-stake.svg'
+import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
+import { ReactComponent as ThemeIcon } from '../../assets/svg/icon-theme-switch.svg'
+import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
+import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
+import { useThemeContext } from '../../contexts/ThemeContext'
+import * as stakeRoutes from '../../routes/stake'
+import * as swapRoutes from '../../routes/swap'
+import * as walletRoutes from '../../routes/wallet'
+import { HeaderContainer, TabLink } from './Header.style'
 import HeaderLang from './HeaderLang'
+import HeaderNetStatus from './HeaderNetStatus'
 
 enum TabKey {
   SWAP = 'swap',

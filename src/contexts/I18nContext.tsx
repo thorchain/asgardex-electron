@@ -1,9 +1,11 @@
-import * as Rx from 'rxjs'
 import React, { createContext, useContext, useMemo } from 'react'
-import { getLocaleFromString, getMessagesByLocale } from '../i18n'
-import { IntlProvider } from 'react-intl'
-import { Locale } from '../i18n/types'
+
 import { useObservableState } from 'observable-hooks'
+import { IntlProvider } from 'react-intl'
+import * as Rx from 'rxjs'
+
+import { getLocaleFromString, getMessagesByLocale } from '../i18n'
+import { Locale } from '../i18n/types'
 
 const LOCALE_KEY = 'asgdx-locale'
 

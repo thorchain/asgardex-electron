@@ -1,8 +1,9 @@
-import styled from 'styled-components'
 import { Layout } from 'antd'
-import { palette, size } from 'styled-theme'
-import { Z_INDEX_MAP } from '../../helpers/styleHelper'
 import { Link } from 'react-router-dom'
+import styled from 'styled-components'
+import { palette, size } from 'styled-theme'
+
+import { Z_INDEX_MAP } from '../../helpers/styleHelper'
 
 export const HeaderContainer = styled(Layout.Header)`
   position: fixed;

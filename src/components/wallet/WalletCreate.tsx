@@ -1,6 +1,8 @@
-import * as BIP39 from 'bip39'
 import React, { useState, useEffect } from 'react'
+
 import { Row, Col, Typography, Tabs, Steps, Button } from 'antd'
+import * as BIP39 from 'bip39'
+
 import ImportMnemonicForm from './forms/ImportMnemonicForm'
 import NewMnemonic from './NewMnemonic'
 import NewMnemonicConfirm from './NewMnemonicConfirm'

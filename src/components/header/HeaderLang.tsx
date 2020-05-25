@@ -1,18 +1,18 @@
 import React, { useMemo, useCallback } from 'react'
+
 import { Row, Dropdown } from 'antd'
+import { ClickParam } from 'antd/lib/menu'
+import Text from 'antd/lib/typography/Text'
+import { useObservableState } from 'observable-hooks'
 import { palette } from 'styled-theme'
 
-import Menu from '../shared/Menu'
-import { useObservableState } from 'observable-hooks'
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
-import { useThemeContext } from '../../contexts/ThemeContext'
-import { HeaderLangWrapper } from './HeaderLang.style'
-
-import { Locale } from '../../i18n/types'
-import { LOCALES } from '../../i18n'
-import Text from 'antd/lib/typography/Text'
 import { useI18nContext } from '../../contexts/I18nContext'
-import { ClickParam } from 'antd/lib/menu'
+import { useThemeContext } from '../../contexts/ThemeContext'
+import { LOCALES } from '../../i18n'
+import { Locale } from '../../i18n/types'
+import Menu from '../shared/Menu'
+import { HeaderLangWrapper } from './HeaderLang.style'
 
 type Props = {}
 
