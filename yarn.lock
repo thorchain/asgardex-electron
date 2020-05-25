@@ -2433,10 +2433,11 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-7.2.1.tgz#2ad4e844175a3738cb9e7064be5ea070b8863a1c"
   integrity sha512-oZ0Ib5I4Z2pUEcoo95cT1cr6slco9WY7yiPpG+RGNkj8YcYgJnM7pXmYmorNOReh8MIGcKSqXyeGjxnr8YiZbA==
 
-"@thorchain/asgardex-binance@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-binance/-/asgardex-binance-0.1.0.tgz#72b4170cfc6ed7b590a5071f54f9cd20634b4a78"
-  integrity sha512-BnWxP7l0jLQOtyAmz9JHXX/mmWE+7C8Jm3GpXtivxct5bvCtThYe38/k7o/P0MFPeBW26fIDTbm8B5rEAicyDg==
+"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#b582c9b4b1c40555a4e69b60a3b22bb8789cadeb":
+  version "1.0.0"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#b582c9b4b1c40555a4e69b60a3b22bb8789cadeb"
+  dependencies:
+    "@binance-chain/javascript-sdk" "^3.0.2"
 
 "@thorchain/asgardex-theme@^0.1.0":
   version "0.1.0"
@@ -2522,9 +2523,9 @@
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
 "@types/crypto-js@^3.1.43":
-  version "3.1.46"
-  resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-3.1.46.tgz#7469f88b6a574046d7e1265a4d043c57a2c61778"
-  integrity sha512-w1rUo6jY6dhNQXOl85UAvJHPX8pIqzfUH2E1+HxU3Z4HsuAaiYPkogEplJqD5QmtDtWC5MUkULtJEvpX5501xQ==
+  version "3.1.47"
+  resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-3.1.47.tgz#36e549dd3f1322742a3a738e7c113ebe48221860"
+  integrity sha512-eI6gvpcGHLk3dAuHYnRCAjX+41gMv1nz/VP55wAe5HtmAKDOoPSfr3f6vkMc08ov1S0NsjvUBxDtHHxqQY1LGA==
 
 "@types/debug@^4.1.5":
   version "4.1.5"

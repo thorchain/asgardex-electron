@@ -23,7 +23,8 @@ import HeaderLang from './HeaderLang'
 enum TabKey {
   SWAP = 'swap',
   STAKE = 'stake',
-  WALLET = 'wallet'
+  WALLET = 'wallet',
+  UNKNOWN = 'unknown'
 }
 
 type Tab = {
@@ -56,7 +57,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     } else if (matchWalletRoute) {
       return TabKey.WALLET
     } else {
-      return TabKey.SWAP
+      return TabKey.UNKNOWN
     }
   }, [matchStakeRoute, matchSwapRoute, matchWalletRoute])
 

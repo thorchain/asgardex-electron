@@ -34,6 +34,10 @@ cd asgardex
 yarn
 ```
 
+## Environment variables
+
+While environment variables are not required (defaults are set), you can configure them. Create an `.env` file by copying all content of `.env.sample` and change these for your needs.
+
 ## Development
 
 ```bash
