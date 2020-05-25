@@ -1,7 +1,9 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import * as walletRoutes from '../../routes/wallet'
+
 import { Menu } from 'antd'
+import { Link } from 'react-router-dom'
+
+import * as walletRoutes from '../../routes/wallet'
 export const WalletViewNav: React.FC = (): JSX.Element => {
   return (
     <Menu mode="horizontal">

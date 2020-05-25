@@ -1,6 +1,8 @@
 import React, { useMemo, useCallback } from 'react'
-import { Row, Col, Typography, Button, Card, List } from 'antd'
+
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
+import { Row, Col, Typography, Button, Card, List } from 'antd'
+
 import { UserAccountType } from '../../types/wallet'
 const { Title, Text, Paragraph } = Typography
 

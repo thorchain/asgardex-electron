@@ -1,10 +1,10 @@
-import electronDebug from 'electron-debug'
-import log from 'electron-log'
-import { BrowserWindow, app, remote } from 'electron'
 import { join } from 'path'
-import { warn } from 'electron-log'
 
+import { BrowserWindow, app, remote } from 'electron'
+import electronDebug from 'electron-debug'
 import isDev from 'electron-is-dev'
+import log from 'electron-log'
+import { warn } from 'electron-log'
 
 export const IS_DEV = isDev && process.env.NODE_ENV !== 'production'
 export const APP_ROOT = join(__dirname, '..', '..')

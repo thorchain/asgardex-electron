@@ -1,8 +1,9 @@
+import { Layout, Row } from 'antd'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { palette, key, size } from 'styled-theme'
-import { Layout, Row } from 'antd'
+
 import { media, Z_INDEX_MAP } from '../helpers/styleHelper'
-import { Link } from 'react-router-dom'
 
 export const FooterContainer = styled(Layout.Footer)`
   position: fixed;

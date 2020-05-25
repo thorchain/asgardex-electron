@@ -1,4 +1,5 @@
 import { ThemeType } from '@thorchain/asgardex-theme'
+
 import { initialContext } from './ThemeContext'
 
 const { themeType$, toggleTheme } = initialContext

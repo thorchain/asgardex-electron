@@ -1,9 +1,10 @@
 import React from 'react'
-import { CheckOutlined } from '@ant-design/icons'
-import DynamicCoin from '../dynamicAsset'
 
-import { AssetIconWrapper } from './assetIcon.style'
+import { CheckOutlined } from '@ant-design/icons'
+
 import { assetIconGroup } from '../../../icons/assetIcons'
+import DynamicCoin from '../dynamicAsset'
+import { AssetIconWrapper } from './assetIcon.style'
 import { Size } from './types'
 
 export type Props = {

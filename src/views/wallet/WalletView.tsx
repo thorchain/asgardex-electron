@@ -1,18 +1,17 @@
 import React from 'react'
+
 import { Switch, Route, Redirect } from 'react-router-dom'
-import WalletViewNav from './WalletViewNav'
 
 import * as walletRoutes from '../../routes/wallet'
-
 import View from '../View'
-import WalletSettingsScreen from './WalletSettingsScreen'
-import UserAssetsScreen from './UserAssetsScreen'
-import UserStakesScreen from './UserStakesScreen'
-import UserBondsScreen from './UserBondsScreen'
-import UserAssetDetailsScreen from './UserAssetDetailsScreen'
-
 import FundsReceiveScreen from './FundsReceiveScreen'
 import FundsSendScreen from './FundsSendScreen'
+import UserAssetDetailsScreen from './UserAssetDetailsScreen'
+import UserAssetsScreen from './UserAssetsScreen'
+import UserBondsScreen from './UserBondsScreen'
+import UserStakesScreen from './UserStakesScreen'
+import WalletSettingsScreen from './WalletSettingsScreen'
+import WalletViewNav from './WalletViewNav'
 
 const WalletView: React.FC = (): JSX.Element => {
   return (

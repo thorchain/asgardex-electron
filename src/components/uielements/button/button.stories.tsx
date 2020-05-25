@@ -1,9 +1,10 @@
 import React from 'react'
-import { storiesOf } from '@storybook/react'
-import { text, radios, boolean } from '@storybook/addon-knobs'
-import styled from 'styled-components'
-import { Row } from 'antd'
+
 import { ArrowRightOutlined } from '@ant-design/icons'
+import { text, radios, boolean } from '@storybook/addon-knobs'
+import { storiesOf } from '@storybook/react'
+import { Row } from 'antd'
+import styled from 'styled-components'
 
 import Button from './button'
 import { ButtonSize, ButtonColor, ButtonType } from './types'

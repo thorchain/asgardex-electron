@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react'
 
+import { delay } from '@thorchain/asgardex-util'
 import { Form, Input, Button } from 'antd'
 import { Store } from 'antd/lib/form/interface'
-import { delay } from '@thorchain/asgardex-util'
 
 const ImportMnemonicForm: React.FC = (): JSX.Element => {
   const [loadingMsg, setLoadingMsg] = useState<string>('')

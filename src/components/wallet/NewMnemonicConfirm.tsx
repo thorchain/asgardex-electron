@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Card, Col, Row, Button, Input, Form } from 'antd'
+
 import { RedoOutlined } from '@ant-design/icons'
+import { Card, Col, Row, Button, Input, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 
 type WordType = {

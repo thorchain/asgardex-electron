@@ -1,7 +1,9 @@
 import React from 'react'
+
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons'
-import BigNumber from 'bignumber.js'
 import { bn, isValidBN, formatBN } from '@thorchain/asgardex-util'
+import BigNumber from 'bignumber.js'
+
 import Label from '../label'
 import { TrendWrapper } from './trend.style'
 

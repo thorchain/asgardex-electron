@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
+
+import { Row, Col, Table } from 'antd'
 import { useHistory } from 'react-router-dom'
+
+import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 import * as walletRoutes from '../../routes/wallet'
 import { UserAssetType } from '../../types/wallet'
-import { Row, Col, Table } from 'antd'
-import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 
 // Dummy data
 const UserAssets: UserAssetType[] = [

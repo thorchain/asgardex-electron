@@ -1,4 +1,5 @@
 import { css } from 'styled-components'
+
 import { media } from './styleHelper'
 
 describe('helpers/styleHelpers', () => {

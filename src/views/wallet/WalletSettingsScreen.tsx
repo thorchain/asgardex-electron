@@ -1,7 +1,9 @@
 import React from 'react'
+
 import { Row, Col, Tabs, Tag } from 'antd'
-import WalleteManage from '../../components/wallet/WalletManage'
+
 import WalletCreate from '../../components/wallet/WalletCreate'
+import WalleteManage from '../../components/wallet/WalletManage'
 const { TabPane } = Tabs
 
 const UserAccountsScreen: React.FC = (): JSX.Element => {

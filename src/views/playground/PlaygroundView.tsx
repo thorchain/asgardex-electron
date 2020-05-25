@@ -1,12 +1,14 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
-import { WS } from '@thorchain/asgardex-binance'
+
 import * as RD from '@devexperts/remote-data-ts'
-import View from '../View'
-import { useMidgardContext } from '../../contexts/MidgardContext'
+import { WS } from '@thorchain/asgardex-binance'
+import { Button } from 'antd'
 import { useObservableState, useSubscription, useObservable } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+
 import { useBinanceContext } from '../../contexts/BinanceContext'
-import { Button } from 'antd'
+import { useMidgardContext } from '../../contexts/MidgardContext'
+import View from '../View'
 
 type Props = {}
 

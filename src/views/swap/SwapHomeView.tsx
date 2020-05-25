@@ -1,6 +1,8 @@
 import React from 'react'
+
 import { Button } from 'antd'
 import { useHistory } from 'react-router-dom'
+
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import View from '../View'

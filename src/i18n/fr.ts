@@ -1,4 +1,5 @@
 import antdData from 'antd/lib/locale-provider/fr_FR'
+
 import { CommonMessages, StakeMessages, SwapMessages, WalletMessages, Messages } from './types'
 
 const common: CommonMessages = {

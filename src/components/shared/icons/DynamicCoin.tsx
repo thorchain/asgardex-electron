@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { rainbowStop, getIntFromName } from '../../../helpers/colorHelpers'
 import { shortSymbol } from '../../../helpers/tokenHelpers'
 import { DynamicCoinWrapper } from './DynamicCoin.style'
