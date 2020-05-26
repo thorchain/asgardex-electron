@@ -6,6 +6,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { AppWrapper } from './App.style'
 import Footer from './components/Footer'
 import Header from './components/header/Header'
+import { DatastoreProvider } from './contexts/WalletDatastore/DataStoreContext'
 import { BinanceProvider } from './contexts/BinanceContext'
 import { ConnectionProvider } from './contexts/ConnectionContext'
 import { I18nProvider } from './contexts/I18nContext'
@@ -34,6 +35,7 @@ const AppView: React.FC<Props> = (_): JSX.Element => {
 
 const App: React.FC<Props> = (_): JSX.Element => {
   return (
+    <DatastoreProvider>
     <ConnectionProvider>
       <BinanceProvider>
         <MidgardProvider>
@@ -47,6 +49,7 @@ const App: React.FC<Props> = (_): JSX.Element => {
         </MidgardProvider>
       </BinanceProvider>
     </ConnectionProvider>
+    </DatastoreProvider>
   )
 }
 

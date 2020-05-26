@@ -7,18 +7,53 @@ import { Form, Input, Button } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import * as BIP39 from 'bip39'
+import { AssetService } from '../../../contexts/WalletDatastore/storage/assetsService';
+import { AccountService } from '../../../contexts/WalletDatastore/storage/accountsService';
+const BnbApiClient = require('@binance-chain/javascript-sdk');
+const bnb = BnbApiClient
+
+
+
+// import { idbCon } from '../../../contexts/WalletDatastore/storage/idbService'
 
 const ImportMnemonicForm: React.FC = (): JSX.Element => {
   const [loadingMsg, setLoadingMsg] = useState<string>('')
   const [form] = Form.useForm()
 
-  const importMnemonicWallet = (mnemonic: string, password: string) => {
+  const importMnemonicWallet = async (mnemonic: string, password: string) => {
     if (!localStorage.getItem('keystore')) {
       const privKey: string = crypto.getPrivateKeyFromMnemonic(mnemonic)
       const keystore: KeyStore = crypto.generateKeyStore(privKey, password)
       // TODO: dynamically set network for client, default is testnet
       const address: string = crypto.getAddressFromPrivateKey(privKey)
       // Temporary store during development
+      const UserAccount = new AccountService()
+      const UserAssets = new AssetService()
+      const b = new bnb('https://testnet-dex.binance.org/')
+
+      // b.getBalance(address)
+      let balances
+      b.getBalance(address).then(async (e:any) => {
+        balances = e.map(function(elem:any) {
+          // elem.shortSymbol = elem.symbol.split("-")[0].substr(0,4)
+          elem.free = parseFloat(elem.free)
+          elem.frozen = parseFloat(elem.frozen)
+          elem.locked = parseFloat(elem.locked)
+          return elem
+        })
+        console.log('GOT THE BALANCES')
+        console.log(typeof e[0].free)
+
+        if (balances.length > 0) {
+          // const doc = UserAccount.findOne();
+          // await UserAccount.update({where:{id:user.id}, set: {assets: balances}})
+          await UserAssets.insert(balances)
+        }
+      }).catch((e:any) => {
+        console.log(e)
+      })
+      b.getAccount(address).then((r:any)=> console.log(r))
+
       localStorage.setItem('address', address)
       localStorage.setItem('keystore', JSON.stringify(keystore))
     } else {

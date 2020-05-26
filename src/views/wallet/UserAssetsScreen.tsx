@@ -6,18 +6,16 @@ import { useHistory } from 'react-router-dom'
 
 import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 import * as walletRoutes from '../../routes/wallet'
+import { idbCon } from '../../contexts/WalletDatastore/storage/idbService'
 
 const UserAssetsScreen: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const [assets] = useState<Balances>([])
+  const [assets, setAssets] = useState<Balances>([])
   async function setData() {
-    // Add network + phrase
-    // const ct = new Client()
-    // await ct.init()
     const address = localStorage.getItem('address')
     if (address) {
-      // const res: any = await ct.getBalance(address)
-      // if (res) setAssets(res)
+      const res:any = await idbCon.select({from:'Assets'})
+      setAssets(res)
     }
   }
   useEffect(() => {

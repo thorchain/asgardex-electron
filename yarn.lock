@@ -11080,6 +11080,11 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+jsstore@^3.9.2:
+  version "3.9.2"
+  resolved "https://registry.yarnpkg.com/jsstore/-/jsstore-3.9.2.tgz#cc013af82a1e7ab70f818f7f6ef37d374875832e"
+  integrity sha512-jLmNztrrEjlruFG2XwL9GmEZjxcsT5/3/IHq3Tr43j6Rm71VwRt3jL2/piMxB+jWcJguFUyy91OWPUFmPgSW1w==
+
 jsx-ast-utils@^2.2.1, jsx-ast-utils@^2.2.3:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/jsx-ast-utils/-/jsx-ast-utils-2.2.3.tgz#8a9364e402448a3ce7f14d357738310d9248054f"
