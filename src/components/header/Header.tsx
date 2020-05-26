@@ -85,14 +85,14 @@ const Header: React.FC<Props> = (_): JSX.Element => {
           key={key}
           tab={
             <TabLink to={path} selected={activeKey === key}>
-              <Row align="middle">
+              <Row align="middle" style={{ height: headerHeight }}>
                 <Icon style={{ paddingRight: '5px' }} />
                 {label}
               </Row>
             </TabLink>
           }></Tabs.TabPane>
       )),
-    [items, activeKey]
+    [items, activeKey, headerHeight]
   )
 
   const links = items.map(({ label, key, path, icon: Icon }) => (

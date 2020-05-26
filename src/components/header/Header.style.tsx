@@ -44,12 +44,10 @@ export const HeaderContainer = styled(Layout.Header)`
 
   .ant-tabs-bar {
     border-bottom: 0;
-    margin: 0;
   }
 
   .ant-tabs-tab {
     padding: 0 20px;
-    height: 50px;
   }
 
   .ant-tabs-tab-active {
@@ -58,10 +56,6 @@ export const HeaderContainer = styled(Layout.Header)`
   .ant-tabs-ink-bar {
     height: 3px;
     background: ${palette('gradient', 0)};
-  }
-
-  .ant-drawer-body {
-    padding: 0px !important;
   }
 
   padding: 0 5px;
