@@ -17,5 +17,8 @@ yarn-error.log*
 
 /public/electron.js
 
+# storybook static
+/storybook-static
+
 # don't share .env, but .env.sample
 .env
