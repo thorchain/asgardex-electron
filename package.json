@@ -9,7 +9,7 @@
     "dev": "concurrently --kill-others --success first \"yarn:dev:*\"",
     "dev:app": "cross-env BROWSER=none yarn start:web",
     "dev:electron": "wait-on http://localhost:3000 && nodemon -I --watch ./electron/ --exec electron ./public/dev.js",
-    "build": "cross-env PUBLIC_URL=./ craco build",
+    "build": "cross-env CI=false PUBLIC_URL=./ craco build",
     "prebuild": "tsc -p ./electron/tsconfig.json",
     "test": "craco test",
     "package": "yarn build && yarn package:electron",
