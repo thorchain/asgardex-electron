@@ -3,10 +3,7 @@ name: Electron build
 on:
   push:
     branches:
-      # just for debugging
-      - issue-105/fix-build2
-      # TODO (@Veado) Revert it ^ to build on master only
-      # - master
+      - master
 
 jobs:
   build:
@@ -20,9 +17,7 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@v2
         with:
-          ref: issue-105/fix-build2
-          # TODO (@Veado) Revert it ^ to build on master only
-          # ref: master
+          ref: master
 
       - name: Get yarn cache
         id: yarn-cache
