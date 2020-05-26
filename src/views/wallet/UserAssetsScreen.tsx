@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 
-import { Balances } from '@thorchain/asgardex-binance'
+import { Client as BinanceClient, Balances } from '@thorchain/asgardex-binance'
 import { Row, Col, Table } from 'antd'
 import { useHistory } from 'react-router-dom'
 
@@ -9,20 +9,22 @@ import * as walletRoutes from '../../routes/wallet'
 
 const UserAssetsScreen: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const [assets] = useState<Balances>([])
-  async function setData() {
-    // Add network + phrase
-    // const ct = new Client()
-    // await ct.init()
-    const address = localStorage.getItem('address')
-    if (address) {
-      // const res: any = await ct.getBalance(address)
-      // if (res) setAssets(res)
-    }
-  }
+
+  // TODO (@Veado) Add network to Client
+  const ct = useMemo(() => new BinanceClient(), [])
+  const [assets, setAssets] = useState<Balances>([])
+
   useEffect(() => {
+    const setData = async () => {
+      await ct.init()
+      const address = localStorage.getItem('address')
+      if (address) {
+        const res: Balances = await ct.getBalance(address)
+        if (res) setAssets(res)
+      }
+    }
     setData()
-  }, [])
+  }, [ct])
   return (
     <Row>
       <Col span={24}>

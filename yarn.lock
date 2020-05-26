@@ -2435,9 +2435,7 @@
 
 "@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#fix/build-packages":
   version "1.0.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#92987bd14ae23c48243aae68e204ab7eb6999291"
-  dependencies:
-    "@binance-chain/javascript-sdk" "^3.0.2"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#34ec23cb97b56d6c3455fbcf5fd6254977cbb304"
 
 "@thorchain/asgardex-theme@^0.1.0":
   version "0.1.0"

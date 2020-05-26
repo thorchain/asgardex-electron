@@ -3,7 +3,10 @@ name: Electron build
 on:
   push:
     branches:
-      - master
+      # just for debugging
+      - issue-105/fix-build2
+      # TODO (@Veado) Revert it ^ to build on master only
+      # - master
 
 jobs:
   build:
