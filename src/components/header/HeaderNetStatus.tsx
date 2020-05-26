@@ -10,6 +10,7 @@ import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { HeaderNetStatusWrapper } from './HeaderNetStatus.style'
 import Paragraph from 'antd/lib/typography/Paragraph'
 import { useThemeContext } from '../../contexts/ThemeContext'
+import { HeaderDrawerItem, HeaderDrawerItemNoBorder } from './Header.style'
 
 type MenuItem = {
   key: string
@@ -90,17 +91,64 @@ const HeaderNetStatus: React.FC<Props> = (_: Props): JSX.Element => {
     )
   }, [menuItems, theme])
 
+  type RootItemProps = { children: React.ReactNode }
+
+  const menuMobile = menuItems.map((item, i) => {
+    const { label, key, url } = item
+    const color = palette('text', 0)({ theme })
+    const RootElement = (props: RootItemProps) =>
+      i === menuItems.length - 1 ? (
+        <HeaderDrawerItemNoBorder>{props.children}</HeaderDrawerItemNoBorder>
+      ) : (
+        <HeaderDrawerItem>{props.children}</HeaderDrawerItem>
+      )
+    return (
+      <RootElement key={key}>
+        <Row align="middle" style={{ marginLeft: '15px', marginRight: '15px' }}>
+          <ConnectionStatus color={url ? 'green' : 'yellow'} />
+        </Row>
+        <Row>
+          <Col>
+            <Paragraph
+              strong
+              style={{
+                textTransform: 'capitalize',
+                color,
+                marginBottom: 0
+              }}>
+              {label}
+            </Paragraph>
+            <Paragraph
+              style={{
+                paddingLeft: '10px',
+                textTransform: 'lowercase',
+                color,
+                marginBottom: 0
+              }}>
+              {url || 'unknown'}
+            </Paragraph>
+          </Col>
+        </Row>
+      </RootElement>
+    )
+  })
+
   return (
     <HeaderNetStatusWrapper>
-      <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
-        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
-          <Row justify="space-between" align="middle">
-            <ConnectionStatus color={onlineStatusColor} />
-            <DownIcon />
-          </Row>
-        </a>
-      </Dropdown>
+      <Col xs={0} sm={0} md={0} lg={24}>
+        <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+            <Row justify="space-between" align="middle">
+              <ConnectionStatus color={onlineStatusColor} />
+              <DownIcon />
+            </Row>
+          </a>
+        </Dropdown>
+      </Col>
+      <Col lg={0} xl={0} style={{ width: '100%' }}>
+        {menuMobile}
+      </Col>
     </HeaderNetStatusWrapper>
   )
 }

@@ -13,6 +13,7 @@ import { LOCALES } from '../../i18n'
 import Text from 'antd/lib/typography/Text'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { ClickParam } from 'antd/lib/menu'
+import { MobileWrapper } from './Header.style'
 
 type Props = {}
 
@@ -61,11 +62,24 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
         {/* `ant-dropdown-link` does need a height to give dropdown content an offset - dont't remove it! */}
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a className="ant-dropdown-link" style={{ height: '40px' }} onClick={(e) => e.preventDefault()}>
-          <Row justify="space-between" align="middle">
-            <Text strong style={itemStyle}>
-              {currentLocale?.toUpperCase()}
-            </Text>
-            <DownIcon />
+          <Row
+            style={{
+              justifyContent: 'space-between',
+              paddingLeft: '15px',
+              paddingRight: '15px',
+              height: '60px',
+              alignItems: 'center',
+              width: '100%'
+            }}>
+            <MobileWrapper>
+              <Text style={{ color }}>LANGUAGE</Text>
+            </MobileWrapper>
+            <Row style={{ alignItems: 'center' }}>
+              <Text strong style={itemStyle}>
+                {currentLocale?.toUpperCase()}
+              </Text>
+              <DownIcon />
+            </Row>
           </Row>
         </a>
       </Dropdown>

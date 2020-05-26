@@ -1,7 +1,7 @@
 import styled from 'styled-components'
-import { Layout } from 'antd'
+import { Layout, Row, Drawer } from 'antd'
 import { palette, size } from 'styled-theme'
-import { Z_INDEX_MAP } from '../../helpers/styleHelper'
+import { Z_INDEX_MAP, media } from '../../helpers/styleHelper'
 import { Link } from 'react-router-dom'
 
 export const HeaderContainer = styled(Layout.Header)`
@@ -21,6 +21,8 @@ export const HeaderContainer = styled(Layout.Header)`
   #swap_icon,
   #stake_icon,
   #wallet_icon,
+  #menu_icon,
+  #close_icon,
   #theme_switch_icon {
     & > * {
       fill: ${palette('text', 1)};
@@ -42,10 +44,12 @@ export const HeaderContainer = styled(Layout.Header)`
 
   .ant-tabs-bar {
     border-bottom: 0;
+    margin: 0;
   }
 
   .ant-tabs-tab {
     padding: 0 20px;
+    height: 50px;
   }
 
   .ant-tabs-tab-active {
@@ -55,6 +59,16 @@ export const HeaderContainer = styled(Layout.Header)`
     height: 3px;
     background: ${palette('gradient', 0)};
   }
+
+  .ant-drawer-body {
+    padding: 0px !important;
+  }
+
+  padding: 0 5px;
+
+  ${media.lg`
+      padding: 0 50px;
+    `}
 `
 
 type TabLinkProps = {
@@ -83,4 +97,61 @@ export const TabLink = styled(Link)`
     font-family: 'MainFontSemiBold';
     font-size: 18px;
   }
+`
+
+export const HeaderDrawer = styled(Drawer)`
+  ${media.lg`
+      display: none;
+    `}
+
+  .ant-drawer-body {
+    margin: 4px 4px 0px 4px;
+    padding: 0;
+    border-radius: 5px;
+  }
+
+  .ant-drawer-content {
+    background-color: transparent;
+  }
+
+  /* Make sure following id's are defined in svg */
+  #swap_icon,
+  #stake_icon,
+  #wallet_icon {
+    & > * {
+      fill: ${palette('text', 1)};
+    }
+  }
+`
+
+export const HeaderDrawerItem = styled(Row)`
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-color: ${palette('background', 2)};
+  background-color: ${palette('background', 0)};
+  align-items: center;
+  transition: none;
+  height: 60px;
+  display: flex;
+  text-transform: uppercase;
+  font-family: 'MainFontSemiBold';
+  font-size: 18px;
+  color: ${palette('text', 1)};
+`
+export const HeaderDrawerItemNoBorder = styled(Row)`
+  background-color: ${palette('background', 0)};
+  align-items: center;
+  transition: none;
+  min-height: 60px;
+  display: flex;
+  text-transform: uppercase;
+  font-family: 'MainFontSemiBold';
+  font-size: 18px;
+  color: ${palette('text', 1)};
+`
+
+export const MobileWrapper = styled.div`
+  ${media.lg`
+    display: none !important;
+    `}
 `

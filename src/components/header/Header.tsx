@@ -1,24 +1,25 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useObservableState } from 'observable-hooks'
-
+import { palette } from 'styled-theme'
 import { Row, Col, Tabs } from 'antd'
-import { useHistory, useRouteMatch } from 'react-router-dom'
+import { useRouteMatch, Link } from 'react-router-dom'
 import * as walletRoutes from '../../routes/wallet'
 import * as swapRoutes from '../../routes/swap'
 import * as stakeRoutes from '../../routes/stake'
-import { HeaderContainer, TabLink } from './Header.style'
-
+import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem, HeaderDrawerItemNoBorder } from './Header.style'
 import { useThemeContext } from '../../contexts/ThemeContext'
-import { palette, size } from 'styled-theme'
+import { size } from 'styled-theme'
 import HeaderNetStatus from './HeaderNetStatus'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as StakeIcon } from '../../assets/svg/icon-stake.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
-import { ReactComponent as ThemeIcon } from '../../assets/svg/icon-theme-switch.svg'
-import { ReactComponent as SettingsIcon } from '../../assets/svg/icon-settings.svg'
-import { ReactComponent as LockIcon } from '../../assets/svg/icon-lock.svg'
+import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
+import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
 import HeaderLang from './HeaderLang'
+import HeaderTheme from './HeaderTheme'
+import HeaderSettings from './HeaderSettings'
+import HeaderLock from './HeaderLock'
 
 enum TabKey {
   SWAP = 'swap',
@@ -37,12 +38,16 @@ type Tab = {
 type Props = {}
 
 const Header: React.FC<Props> = (_): JSX.Element => {
-  const history = useHistory()
-
-  const { toggleTheme, theme$ } = useThemeContext()
+  const [menuVisible, setMenuVisible] = useState(false)
+  const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
-  const clickSwitchThemeHandler = () => {
-    toggleTheme()
+
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible)
+  }
+
+  const closeMenu = () => {
+    setMenuVisible(false)
   }
 
   const matchSwapRoute = useRouteMatch(swapRoutes.base.path())
@@ -60,12 +65,6 @@ const Header: React.FC<Props> = (_): JSX.Element => {
       return TabKey.UNKNOWN
     }
   }, [matchStakeRoute, matchSwapRoute, matchWalletRoute])
-
-  const clickSettingsHandler = useCallback(() => history.push(walletRoutes.settings.path()), [history])
-
-  const clickLockHandler = useCallback(() => {
-    // has to be implemented
-  }, [])
 
   const items = useMemo(
     () =>
@@ -86,42 +85,102 @@ const Header: React.FC<Props> = (_): JSX.Element => {
           key={key}
           tab={
             <TabLink to={path} selected={activeKey === key}>
-              <Row align="middle" style={{ height: headerHeight }}>
+              <Row align="middle">
                 <Icon style={{ paddingRight: '5px' }} />
                 {label}
               </Row>
             </TabLink>
           }></Tabs.TabPane>
       )),
-    [items, activeKey, headerHeight]
+    [items, activeKey]
   )
 
-  const color = useMemo(() => palette('text', 0)({ theme }), [theme])
+  const links = items.map(({ label, key, path, icon: Icon }) => (
+    <Link key={key} to={path} onClick={closeMenu}>
+      <HeaderDrawerItem>
+        <Icon style={{ marginLeft: '12px', marginRight: '12px' }} />
+        {label}
+      </HeaderDrawerItem>
+    </Link>
+  ))
+
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
+  const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
   return (
     <HeaderContainer>
-      <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
-        <Col>
-          <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
-            <AsgardexLogo />
-            <HeaderNetStatus />
-          </Row>
-        </Col>
-        <Col span="auto">
-          <Row justify="center" align="bottom" style={{ height: headerHeight }}>
-            <Tabs activeKey={activeKey}>{tabs}</Tabs>
-          </Row>
-        </Col>
-        <Col>
-          <Row align="middle">
-            <ThemeIcon onClick={clickSwitchThemeHandler} style={{ color, ...iconStyle }} />
-            <SettingsIcon onClick={clickSettingsHandler} style={{ color, ...iconStyle }} />
-            <LockIcon onClick={clickLockHandler} style={{ ...iconStyle }} />
+      <>
+        <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
+          <Col xs={0} sm={0} md={0} lg={24}>
+            <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
+              <Col>
+                <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
+                  <AsgardexLogo />
+                  <HeaderNetStatus />
+                </Row>
+              </Col>
+              <Col span="auto">
+                <Row justify="center" align="bottom" style={{ height: headerHeight }}>
+                  <Tabs activeKey={activeKey}>{tabs}</Tabs>
+                </Row>
+              </Col>
+              <Col>
+                <Row align="middle">
+                  <HeaderTheme />
+                  <HeaderSettings />
+                  <HeaderLock />
+                  <HeaderLang />
+                </Row>
+              </Col>
+            </Row>
+          </Col>
+          <Col lg={0} xl={0}>
+            <Row justify="space-between" align="middle" style={{ height: headerHeight, width: '100vw' }}>
+              <Col>
+                <Row align="middle" style={{ height: headerHeight }}>
+                  <AsgardexLogo />
+                </Row>
+              </Col>
+              <Col>
+                <Row align="middle" style={{ height: headerHeight, cursor: 'pointer' }} onClick={toggleMenu}>
+                  {menuVisible ? (
+                    <CloseIcon style={{ color, ...iconStyle }} />
+                  ) : (
+                    <MenuIcon style={{ color, ...iconStyle }} />
+                  )}
+                </Row>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <HeaderDrawer
+          style={{ marginTop: headerHeight, backgroundColor: 'transparent' }}
+          bodyStyle={{ backgroundColor: 'transparent' }}
+          drawerStyle={{ backgroundColor: 'transparent' }}
+          maskStyle={{ backgroundColor: 'transparent' }}
+          placement="top"
+          closable={false}
+          height="auto"
+          visible={menuVisible}
+          key="top">
+          {links}
+          <HeaderDrawerItem>
+            <HeaderTheme onPress={() => closeMenu()} />
+          </HeaderDrawerItem>
+          <HeaderDrawerItem>
+            <HeaderLock onPress={() => closeMenu()} />
+          </HeaderDrawerItem>
+          <HeaderDrawerItem>
+            <HeaderSettings onPress={() => closeMenu()} />
+          </HeaderDrawerItem>
+          <HeaderDrawerItem>
             <HeaderLang />
-          </Row>
-        </Col>
-      </Row>
+          </HeaderDrawerItem>
+          <HeaderDrawerItemNoBorder>
+            <HeaderNetStatus />
+          </HeaderDrawerItemNoBorder>
+        </HeaderDrawer>
+      </>
     </HeaderContainer>
   )
 }

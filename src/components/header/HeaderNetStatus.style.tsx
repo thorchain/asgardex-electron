@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
+import { media } from '../../helpers/styleHelper'
 import { Row } from 'antd'
 
 export const HeaderNetStatusWrapper = styled(Row)`
@@ -11,4 +12,9 @@ export const HeaderNetStatusWrapper = styled(Row)`
       fill: ${palette('primary', 0)};
     }
   }
+
+  width: 100%;
+  ${media.lg`
+  width: auto;
+    `}
 `
