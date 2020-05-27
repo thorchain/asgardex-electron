@@ -23,7 +23,7 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
 
   const { changeLocale, locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$)
-  const screens = Grid.useBreakpoint()
+  const isDesktopView = Grid.useBreakpoint().lg
 
   const changeLang = useCallback(
     ({ key }: ClickParam) => {
@@ -72,7 +72,7 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
               alignItems: 'center',
               width: '100%'
             }}>
-            {!screens.lg && !screens.xl && !screens.xxl && <Text style={{ color }}>LANGUAGE</Text>}
+            {!isDesktopView && <Text style={{ color }}>LANGUAGE</Text>}
             <Row style={{ alignItems: 'center' }}>
               <Text strong style={itemStyle}>
                 {currentLocale?.toUpperCase()}

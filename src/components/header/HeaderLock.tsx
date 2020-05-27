@@ -16,7 +16,7 @@ const HeaderLock: React.FC<Props> = (props: Props): JSX.Element => {
   const theme = useObservableState(theme$)
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
   const iconStyle = { fontSize: '1.5em', marginLeft: '20px' }
-  const screens = Grid.useBreakpoint()
+  const isDesktopView = Grid.useBreakpoint().lg
 
   const clickHandler = useCallback(() => {
     // has to be implemented
@@ -25,7 +25,7 @@ const HeaderLock: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <HeaderLockWrapper onClick={() => clickHandler()}>
-      {!screens.lg && !screens.xl && !screens.xxl && 'LOCK WALLET'}
+      {!isDesktopView && 'LOCK WALLET'}
       <SettingsIcon style={{ color, ...iconStyle }} />
     </HeaderLockWrapper>
   )

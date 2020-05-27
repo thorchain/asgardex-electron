@@ -41,7 +41,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const [menuVisible, setMenuVisible] = useState(false)
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
-  const screens = Grid.useBreakpoint()
+  const isDesktopView = Grid.useBreakpoint().lg
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible)
@@ -116,7 +116,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     <HeaderContainer>
       <>
         <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
-          {(screens.lg || screens.xl || screens.xxl) && (
+          {isDesktopView && (
             <>
               <Col>
                 <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
@@ -139,7 +139,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               </Col>
             </>
           )}
-          {!screens.lg && !screens.xl && !screens.xxl && (
+          {!isDesktopView && (
             <>
               <Col>
                 <Row align="middle" style={{ height: headerHeight }}>
@@ -158,7 +158,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
             </>
           )}
         </Row>
-        {!screens.lg && !screens.xl && !screens.xxl && (
+        {!isDesktopView && (
           <HeaderDrawer
             style={{ marginTop: headerHeight, backgroundColor: 'transparent' }}
             bodyStyle={{ backgroundColor: 'transparent' }}

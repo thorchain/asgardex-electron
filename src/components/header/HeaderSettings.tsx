@@ -18,7 +18,7 @@ const HeaderSettings: React.FC<Props> = (props: Props): JSX.Element => {
   const theme = useObservableState(theme$)
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
   const iconStyle = { fontSize: '1.5em', marginLeft: '20px' }
-  const screens = Grid.useBreakpoint()
+  const isDesktopView = Grid.useBreakpoint().lg
 
   const history = useHistory()
   const clickSettingsHandler = useCallback(() => {
@@ -28,7 +28,7 @@ const HeaderSettings: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <HeaderSettingsWrapper onClick={() => clickSettingsHandler()}>
-      {!screens.lg && !screens.xl && !screens.xxl && 'SETTINGS'}
+      {!isDesktopView && 'SETTINGS'}
       <SettingsIcon style={{ color, ...iconStyle }} />
     </HeaderSettingsWrapper>
   )

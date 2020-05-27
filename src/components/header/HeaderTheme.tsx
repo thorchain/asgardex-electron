@@ -16,7 +16,7 @@ const HeaderTheme: React.FC<Props> = (props: Props): JSX.Element => {
   const theme = useObservableState(theme$)
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
   const iconStyle = { fontSize: '1.5em', marginLeft: '20px' }
-  const screens = Grid.useBreakpoint()
+  const isDesktopView = Grid.useBreakpoint().lg
 
   const clickSwitchThemeHandler = () => {
     toggleTheme()
@@ -25,10 +25,7 @@ const HeaderTheme: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <HeaderThemeWrapper onClick={() => clickSwitchThemeHandler()}>
-      {!screens.lg &&
-        !screens.xl &&
-        !screens.xxl &&
-        (palette('background', 0)({ theme }) === '#fff' ? 'DAY MODE' : 'NIGHT MODE')}
+      {!isDesktopView && (palette('background', 0)({ theme }) === '#fff' ? 'DAY MODE' : 'NIGHT MODE')}
       <ThemeIcon style={{ color, ...iconStyle }} />
     </HeaderThemeWrapper>
   )
