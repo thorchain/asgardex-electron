@@ -13,7 +13,7 @@ import { LOCALES } from '../../i18n'
 import Text from 'antd/lib/typography/Text'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { ClickParam } from 'antd/lib/menu'
-import { MobileWrapper } from './Header.style'
+import { Grid } from 'antd'
 
 type Props = {}
 
@@ -23,6 +23,7 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
 
   const { changeLocale, locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$)
+  const screens = Grid.useBreakpoint()
 
   const changeLang = useCallback(
     ({ key }: ClickParam) => {
@@ -71,9 +72,7 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
               alignItems: 'center',
               width: '100%'
             }}>
-            <MobileWrapper>
-              <Text style={{ color }}>LANGUAGE</Text>
-            </MobileWrapper>
+            {!screens.lg && !screens.xl && !screens.xxl && <Text style={{ color }}>LANGUAGE</Text>}
             <Row style={{ alignItems: 'center' }}>
               <Text strong style={itemStyle}>
                 {currentLocale?.toUpperCase()}

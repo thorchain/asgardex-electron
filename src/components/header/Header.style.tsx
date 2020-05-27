@@ -94,10 +94,6 @@ export const TabLink = styled(Link)`
 `
 
 export const HeaderDrawer = styled(Drawer)`
-  ${media.lg`
-      display: none;
-    `}
-
   .ant-drawer-body {
     margin: 4px 4px 0px 4px;
     padding: 0;
@@ -131,21 +127,7 @@ export const HeaderDrawerItem = styled(Row)`
   font-family: 'MainFontSemiBold';
   font-size: 18px;
   color: ${palette('text', 1)};
-`
-export const HeaderDrawerItemNoBorder = styled(Row)`
-  background-color: ${palette('background', 0)};
-  align-items: center;
-  transition: none;
-  min-height: 60px;
-  display: flex;
-  text-transform: uppercase;
-  font-family: 'MainFontSemiBold';
-  font-size: 18px;
-  color: ${palette('text', 1)};
-`
-
-export const MobileWrapper = styled.div`
-  ${media.lg`
-    display: none !important;
-    `}
+  &.last {
+    border: none;
+  }
 `

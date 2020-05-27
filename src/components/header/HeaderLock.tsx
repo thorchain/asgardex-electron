@@ -4,27 +4,28 @@ import { useObservableState } from 'observable-hooks'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import { HeaderLockWrapper } from './HeaderLock.style'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/icon-lock.svg'
-import { MobileWrapper } from './Header.style'
+import { Grid } from 'antd'
 
 type Props = {
   onPress?: () => void
 }
 
-const HeaderLock: React.FC<Props> = (_: Props): JSX.Element => {
+const HeaderLock: React.FC<Props> = (props: Props): JSX.Element => {
+  const { onPress = () => {} } = props
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
-
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
   const iconStyle = { fontSize: '1.5em', marginLeft: '20px' }
+  const screens = Grid.useBreakpoint()
 
   const clickHandler = useCallback(() => {
     // has to be implemented
-    _.onPress && _.onPress()
-  }, [_])
+    onPress()
+  }, [onPress])
 
   return (
     <HeaderLockWrapper onClick={() => clickHandler()}>
-      <MobileWrapper>LOCK WALLET</MobileWrapper>
+      {!screens.lg && !screens.xl && !screens.xxl && 'LOCK WALLET'}
       <SettingsIcon style={{ color, ...iconStyle }} />
     </HeaderLockWrapper>
   )

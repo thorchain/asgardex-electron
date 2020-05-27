@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react'
 import { useObservableState } from 'observable-hooks'
 import { palette } from 'styled-theme'
-import { Row, Col, Tabs } from 'antd'
+import { Row, Col, Tabs, Grid } from 'antd'
 import { useRouteMatch, Link } from 'react-router-dom'
 import * as walletRoutes from '../../routes/wallet'
 import * as swapRoutes from '../../routes/swap'
 import * as stakeRoutes from '../../routes/stake'
-import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem, HeaderDrawerItemNoBorder } from './Header.style'
+import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import { size } from 'styled-theme'
 import HeaderNetStatus from './HeaderNetStatus'
@@ -41,6 +41,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const [menuVisible, setMenuVisible] = useState(false)
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
+  const screens = Grid.useBreakpoint()
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible)
@@ -95,14 +96,18 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     [items, activeKey, headerHeight]
   )
 
-  const links = items.map(({ label, key, path, icon: Icon }) => (
-    <Link key={key} to={path} onClick={closeMenu}>
-      <HeaderDrawerItem>
-        <Icon style={{ marginLeft: '12px', marginRight: '12px' }} />
-        {label}
-      </HeaderDrawerItem>
-    </Link>
-  ))
+  const links = useMemo(
+    () =>
+      items.map(({ label, key, path, icon: Icon }) => (
+        <Link key={key} to={path} onClick={closeMenu}>
+          <HeaderDrawerItem>
+            <Icon style={{ marginLeft: '12px', marginRight: '12px' }} />
+            {label}
+          </HeaderDrawerItem>
+        </Link>
+      )),
+    [items]
+  )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
@@ -111,8 +116,8 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     <HeaderContainer>
       <>
         <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
-          <Col xs={0} sm={0} md={0} lg={24}>
-            <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
+          {(screens.lg || screens.xl || screens.xxl) && (
+            <>
               <Col>
                 <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
                   <AsgardexLogo />
@@ -132,10 +137,10 @@ const Header: React.FC<Props> = (_): JSX.Element => {
                   <HeaderLang />
                 </Row>
               </Col>
-            </Row>
-          </Col>
-          <Col lg={0} xl={0}>
-            <Row justify="space-between" align="middle" style={{ height: headerHeight, width: '100vw' }}>
+            </>
+          )}
+          {!screens.lg && !screens.xl && !screens.xxl && (
+            <>
               <Col>
                 <Row align="middle" style={{ height: headerHeight }}>
                   <AsgardexLogo />
@@ -150,36 +155,36 @@ const Header: React.FC<Props> = (_): JSX.Element => {
                   )}
                 </Row>
               </Col>
-            </Row>
-          </Col>
+            </>
+          )}
         </Row>
-        <HeaderDrawer
-          style={{ marginTop: headerHeight, backgroundColor: 'transparent' }}
-          bodyStyle={{ backgroundColor: 'transparent' }}
-          drawerStyle={{ backgroundColor: 'transparent' }}
-          maskStyle={{ backgroundColor: 'transparent' }}
-          placement="top"
-          closable={false}
-          height="auto"
-          visible={menuVisible}
-          key="top">
-          {links}
-          <HeaderDrawerItem>
-            <HeaderTheme onPress={() => closeMenu()} />
-          </HeaderDrawerItem>
-          <HeaderDrawerItem>
-            <HeaderLock onPress={() => closeMenu()} />
-          </HeaderDrawerItem>
-          <HeaderDrawerItem>
-            <HeaderSettings onPress={() => closeMenu()} />
-          </HeaderDrawerItem>
-          <HeaderDrawerItem>
-            <HeaderLang />
-          </HeaderDrawerItem>
-          <HeaderDrawerItemNoBorder>
+        {!screens.lg && !screens.xl && !screens.xxl && (
+          <HeaderDrawer
+            style={{ marginTop: headerHeight, backgroundColor: 'transparent' }}
+            bodyStyle={{ backgroundColor: 'transparent' }}
+            drawerStyle={{ backgroundColor: 'transparent' }}
+            maskStyle={{ backgroundColor: 'transparent' }}
+            placement="top"
+            closable={false}
+            height="auto"
+            visible={menuVisible}
+            key="top">
+            {links}
+            <HeaderDrawerItem>
+              <HeaderTheme />
+            </HeaderDrawerItem>
+            <HeaderDrawerItem>
+              <HeaderLock onPress={() => closeMenu()} />
+            </HeaderDrawerItem>
+            <HeaderDrawerItem>
+              <HeaderSettings onPress={() => closeMenu()} />
+            </HeaderDrawerItem>
+            <HeaderDrawerItem>
+              <HeaderLang />
+            </HeaderDrawerItem>
             <HeaderNetStatus />
-          </HeaderDrawerItemNoBorder>
-        </HeaderDrawer>
+          </HeaderDrawer>
+        )}
       </>
     </HeaderContainer>
   )

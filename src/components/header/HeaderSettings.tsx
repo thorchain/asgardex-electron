@@ -6,28 +6,29 @@ import { useThemeContext } from '../../contexts/ThemeContext'
 import { HeaderSettingsWrapper } from './HeaderSettings.style'
 import * as walletRoutes from '../../routes/wallet'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/icon-settings.svg'
-import { MobileWrapper } from './Header.style'
+import { Grid } from 'antd'
 
 type Props = {
   onPress?: () => void
 }
 
-const HeaderSettings: React.FC<Props> = (_: Props): JSX.Element => {
+const HeaderSettings: React.FC<Props> = (props: Props): JSX.Element => {
+  const { onPress = () => {} } = props
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
-
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
   const iconStyle = { fontSize: '1.5em', marginLeft: '20px' }
+  const screens = Grid.useBreakpoint()
 
   const history = useHistory()
   const clickSettingsHandler = useCallback(() => {
     history.push(walletRoutes.settings.path())
-    _.onPress && _.onPress()
-  }, [_, history])
+    onPress()
+  }, [onPress, history])
 
   return (
     <HeaderSettingsWrapper onClick={() => clickSettingsHandler()}>
-      <MobileWrapper>SETTINGS</MobileWrapper>
+      {!screens.lg && !screens.xl && !screens.xxl && 'SETTINGS'}
       <SettingsIcon style={{ color, ...iconStyle }} />
     </HeaderSettingsWrapper>
   )

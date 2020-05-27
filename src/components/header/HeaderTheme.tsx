@@ -4,26 +4,31 @@ import { useObservableState } from 'observable-hooks'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import { HeaderThemeWrapper } from './HeaderTheme.style'
 import { ReactComponent as ThemeIcon } from '../../assets/svg/icon-theme-switch.svg'
-import { MobileWrapper } from './Header.style'
+import { Grid } from 'antd'
 
 type Props = {
   onPress?: () => void
 }
 
-const HeaderTheme: React.FC<Props> = (_: Props): JSX.Element => {
+const HeaderTheme: React.FC<Props> = (props: Props): JSX.Element => {
+  const { onPress = () => {} } = props
   const { toggleTheme, theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
-
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
   const iconStyle = { fontSize: '1.5em', marginLeft: '20px' }
+  const screens = Grid.useBreakpoint()
 
   const clickSwitchThemeHandler = () => {
     toggleTheme()
-    // _.onPress && _.onPress()
+    onPress()
   }
+
   return (
     <HeaderThemeWrapper onClick={() => clickSwitchThemeHandler()}>
-      <MobileWrapper>{palette('background', 0)({ theme }) === '#fff' ? 'DAY MODE' : 'NIGHT MODE'}</MobileWrapper>
+      {!screens.lg &&
+        !screens.xl &&
+        !screens.xxl &&
+        (palette('background', 0)({ theme }) === '#fff' ? 'DAY MODE' : 'NIGHT MODE')}
       <ThemeIcon style={{ color, ...iconStyle }} />
     </HeaderThemeWrapper>
   )

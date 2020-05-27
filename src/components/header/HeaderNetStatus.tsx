@@ -10,7 +10,7 @@ import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { HeaderNetStatusWrapper } from './HeaderNetStatus.style'
 import Paragraph from 'antd/lib/typography/Paragraph'
 import { useThemeContext } from '../../contexts/ThemeContext'
-import { HeaderDrawerItem, HeaderDrawerItemNoBorder } from './Header.style'
+import { HeaderDrawerItem } from './Header.style'
 
 type MenuItem = {
   key: string
@@ -96,14 +96,8 @@ const HeaderNetStatus: React.FC<Props> = (_: Props): JSX.Element => {
   const menuMobile = menuItems.map((item, i) => {
     const { label, key, url } = item
     const color = palette('text', 0)({ theme })
-    const RootElement = (props: RootItemProps) =>
-      i === menuItems.length - 1 ? (
-        <HeaderDrawerItemNoBorder>{props.children}</HeaderDrawerItemNoBorder>
-      ) : (
-        <HeaderDrawerItem>{props.children}</HeaderDrawerItem>
-      )
     return (
-      <RootElement key={key}>
+      <HeaderDrawerItem key={key} className={i === menuItems.length - 1 ? 'last' : 'headerdraweritem'}>
         <Row align="middle" style={{ marginLeft: '15px', marginRight: '15px' }}>
           <ConnectionStatus color={url ? 'green' : 'yellow'} />
         </Row>
@@ -129,7 +123,7 @@ const HeaderNetStatus: React.FC<Props> = (_: Props): JSX.Element => {
             </Paragraph>
           </Col>
         </Row>
-      </RootElement>
+      </HeaderDrawerItem>
     )
   })
 
