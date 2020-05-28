@@ -1,6 +1,8 @@
 import React from 'react'
+
 import { Button } from 'antd'
 import { useHistory } from 'react-router-dom'
+
 import * as stakeRoutes from '../../routes/stake'
 import View from '../View'
 

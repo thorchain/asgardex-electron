@@ -1,12 +1,14 @@
 import React, { useMemo, useCallback } from 'react'
-import { palette } from 'styled-theme'
+
+import { Grid } from 'antd'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
-import { useThemeContext } from '../../contexts/ThemeContext'
-import { HeaderSettingsWrapper } from './HeaderSettings.style'
-import * as walletRoutes from '../../routes/wallet'
+import { palette } from 'styled-theme'
+
 import { ReactComponent as SettingsIcon } from '../../assets/svg/icon-settings.svg'
-import { Grid } from 'antd'
+import { useThemeContext } from '../../contexts/ThemeContext'
+import * as walletRoutes from '../../routes/wallet'
+import { HeaderSettingsWrapper } from './HeaderSettings.style'
 
 type Props = {
   onPress?: () => void

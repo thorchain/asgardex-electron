@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { Size } from './types'
-import { DynamicCoinWrapper } from './dynamicAsset.style'
 import { rainbowStop, getIntFromName } from '../../../../helpers/colorHelpers'
+import { DynamicCoinWrapper } from './dynamicAsset.style'
+import { Size } from './types'
 
 export type Props = {
   type?: string

@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react'
-import { crypto } from '@binance-chain/javascript-sdk'
-import * as BIP39 from 'bip39'
-import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
 
-import { Form, Input, Button } from 'antd'
-import { Store } from 'antd/lib/form/interface'
-import { Rule } from 'antd/lib/form'
+import { crypto } from '@binance-chain/javascript-sdk'
+import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
 import { delay } from '@thorchain/asgardex-util'
+import { Form, Input, Button } from 'antd'
+import { Rule } from 'antd/lib/form'
+import { Store } from 'antd/lib/form/interface'
+import * as BIP39 from 'bip39'
 
 const ImportMnemonicForm: React.FC = (): JSX.Element => {
   const [loadingMsg, setLoadingMsg] = useState<string>('')

@@ -1,6 +1,7 @@
+import React, { createContext, useContext } from 'react'
+
 import * as Rx from 'rxjs'
 import { startWith, mapTo } from 'rxjs/operators'
-import React, { createContext, useContext } from 'react'
 
 export enum OnlineStatus {
   ON,

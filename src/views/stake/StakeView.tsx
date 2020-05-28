@@ -1,6 +1,8 @@
 import React from 'react'
+
 import { Button } from 'antd'
 import { useHistory, useParams } from 'react-router-dom'
+
 import { AssetRouteParams as StakeAssetRouteParams } from '../../routes/stake'
 import View from '../View'
 

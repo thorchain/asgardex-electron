@@ -1,10 +1,10 @@
+import React, { useState, useCallback } from 'react'
+
 import { crypto } from '@binance-chain/javascript-sdk'
 import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
 import { delay } from '@thorchain/asgardex-util'
-import { Store } from 'antd/lib/form/interface'
-
-import React, { useState, useCallback } from 'react'
 import { Form, Input, Button } from 'antd'
+import { Store } from 'antd/lib/form/interface'
 
 const NewMnemonicGenerate: React.FC<{ mnemonic: string }> = ({ mnemonic }): JSX.Element => {
   const [loadingMsg, setLoadingMsg] = useState<string>('')

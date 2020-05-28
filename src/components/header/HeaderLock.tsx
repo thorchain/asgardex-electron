@@ -1,10 +1,12 @@
 import React, { useMemo, useCallback } from 'react'
-import { palette } from 'styled-theme'
+
+import { Grid } from 'antd'
 import { useObservableState } from 'observable-hooks'
+import { palette } from 'styled-theme'
+
+import { ReactComponent as SettingsIcon } from '../../assets/svg/icon-lock.svg'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import { HeaderLockWrapper } from './HeaderLock.style'
-import { ReactComponent as SettingsIcon } from '../../assets/svg/icon-lock.svg'
-import { Grid } from 'antd'
 
 type Props = {
   onPress?: () => void

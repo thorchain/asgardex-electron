@@ -1,7 +1,8 @@
+import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
+
 import { media } from '../../helpers/styleHelper'
-import { Row } from 'antd'
 
 export const HeaderNetStatusWrapper = styled(Row)`
   margin-bottom: 5px;

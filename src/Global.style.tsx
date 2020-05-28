@@ -1,7 +1,7 @@
 import { createGlobalStyle } from 'styled-components'
 
-import Exo2Regular from './assets/fonts/Exo2-Regular.otf'
 import Exo2Bold from './assets/fonts/Exo2-Bold.otf'
+import Exo2Regular from './assets/fonts/Exo2-Regular.otf'
 import Exo2SemiBold from './assets/fonts/Exo2-SemiBold.otf'
 
 const GlobalStyle = createGlobalStyle`

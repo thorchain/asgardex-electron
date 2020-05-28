@@ -1,6 +1,7 @@
 import styled from 'styled-components'
-import { media } from '../../helpers/styleHelper'
 import { palette } from 'styled-theme'
+
+import { media } from '../../helpers/styleHelper'
 
 export const HeaderLangWrapper = styled.div`
   width: 100%;

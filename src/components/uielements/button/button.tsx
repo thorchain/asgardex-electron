@@ -1,8 +1,9 @@
 import React from 'react'
+
 import { ButtonProps } from 'antd/lib/button'
-import { ButtonColor, ButtonSize, ButtonWeight, ButtonType } from './types'
 
 import { ButtonWrapper } from './button.style'
+import { ButtonColor, ButtonSize, ButtonWeight, ButtonType } from './types'
 
 type ComponentProps = {
   sizevalue?: ButtonSize

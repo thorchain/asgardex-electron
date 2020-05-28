@@ -1,5 +1,5 @@
-import styled from 'styled-components'
 import { Layout } from 'antd'
+import styled from 'styled-components'
 import { size } from 'styled-theme'
 
 export const ViewWrapper = styled(Layout.Content)`

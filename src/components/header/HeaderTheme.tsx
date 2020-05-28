@@ -1,10 +1,12 @@
 import React, { useMemo } from 'react'
-import { palette } from 'styled-theme'
+
+import { Grid } from 'antd'
 import { useObservableState } from 'observable-hooks'
+import { palette } from 'styled-theme'
+
+import { ReactComponent as ThemeIcon } from '../../assets/svg/icon-theme-switch.svg'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import { HeaderThemeWrapper } from './HeaderTheme.style'
-import { ReactComponent as ThemeIcon } from '../../assets/svg/icon-theme-switch.svg'
-import { Grid } from 'antd'
 
 type Props = {
   onPress?: () => void

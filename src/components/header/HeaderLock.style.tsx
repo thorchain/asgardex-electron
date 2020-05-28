@@ -1,6 +1,7 @@
-import styled from 'styled-components'
-import { media } from '../../helpers/styleHelper'
 import { Row } from 'antd'
+import styled from 'styled-components'
+
+import { media } from '../../helpers/styleHelper'
 
 export const HeaderLockWrapper = styled(Row)`
   cursor: pointer;

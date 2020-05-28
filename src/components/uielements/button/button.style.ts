@@ -1,7 +1,8 @@
-import styled from 'styled-components'
-import { palette, key } from 'styled-theme'
 import { Button } from 'antd'
 import { ButtonProps } from 'antd/lib/button'
+import styled from 'styled-components'
+import { palette, key } from 'styled-theme'
+
 import { ButtonColor, ButtonSize, ButtonWeight, ButtonType } from './types'
 
 const fontSettings = {

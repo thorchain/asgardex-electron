@@ -6,6 +6,7 @@
 </div>
 
 ![Test](https://github.com/thorchain/asgardex-electron/workflows/Test/badge.svg)
+![Electron build](https://github.com/thorchain/asgardex-electron/workflows/Electron%20build/badge.svg)
 
 ## ASGARDEX uses following libraries, frameworks and more:
 
