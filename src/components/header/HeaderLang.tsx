@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from 'react'
 
 import { Row, Dropdown } from 'antd'
+import { Grid } from 'antd'
 import { ClickParam } from 'antd/lib/menu'
 import Text from 'antd/lib/typography/Text'
 import { useObservableState } from 'observable-hooks'
@@ -22,6 +23,7 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
 
   const { changeLocale, locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$)
+  const isDesktopView = Grid.useBreakpoint().lg
 
   const changeLang = useCallback(
     ({ key }: ClickParam) => {
@@ -33,8 +35,8 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
   const itemStyle = { color, fontSize: '18px' }
 
-  const menu = useMemo(() => {
-    return (
+  const menu = useMemo(
+    () => (
       <Menu onClick={changeLang}>
         {LOCALES.map((locale: Locale) => {
           return (
@@ -52,8 +54,9 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
           )
         })}
       </Menu>
-    )
-  }, [changeLang, itemStyle])
+    ),
+    [changeLang, itemStyle]
+  )
 
   return (
     <HeaderLangWrapper>
@@ -61,11 +64,22 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
         {/* `ant-dropdown-link` does need a height to give dropdown content an offset - dont't remove it! */}
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a className="ant-dropdown-link" style={{ height: '40px' }} onClick={(e) => e.preventDefault()}>
-          <Row justify="space-between" align="middle">
-            <Text strong style={itemStyle}>
-              {currentLocale?.toUpperCase()}
-            </Text>
-            <DownIcon />
+          <Row
+            style={{
+              justifyContent: 'space-between',
+              paddingLeft: '15px',
+              paddingRight: '15px',
+              height: '60px',
+              alignItems: 'center',
+              width: '100%'
+            }}>
+            {!isDesktopView && <Text style={{ color }}>LANGUAGE</Text>}
+            <Row style={{ alignItems: 'center' }}>
+              <Text strong style={itemStyle}>
+                {currentLocale?.toUpperCase()}
+              </Text>
+              <DownIcon />
+            </Row>
           </Row>
         </a>
       </Dropdown>

@@ -1,24 +1,26 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useState } from 'react'
 
-import { Row, Col, Tabs } from 'antd'
+import { Row, Col, Tabs, Grid } from 'antd'
 import { useObservableState } from 'observable-hooks'
-import { useHistory, useRouteMatch } from 'react-router-dom'
+import { useRouteMatch, Link } from 'react-router-dom'
 import { palette, size } from 'styled-theme'
 
-import { ReactComponent as LockIcon } from '../../assets/svg/icon-lock.svg'
-import { ReactComponent as SettingsIcon } from '../../assets/svg/icon-settings.svg'
+import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
+import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as StakeIcon } from '../../assets/svg/icon-stake.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
-import { ReactComponent as ThemeIcon } from '../../assets/svg/icon-theme-switch.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
 import * as walletRoutes from '../../routes/wallet'
-import { HeaderContainer, TabLink } from './Header.style'
+import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
 import HeaderLang from './HeaderLang'
+import HeaderLock from './HeaderLock'
 import HeaderNetStatus from './HeaderNetStatus'
+import HeaderSettings from './HeaderSettings'
+import HeaderTheme from './HeaderTheme'
 
 enum TabKey {
   SWAP = 'swap',
@@ -37,12 +39,17 @@ type Tab = {
 type Props = {}
 
 const Header: React.FC<Props> = (_): JSX.Element => {
-  const history = useHistory()
-
-  const { toggleTheme, theme$ } = useThemeContext()
+  const [menuVisible, setMenuVisible] = useState(false)
+  const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
-  const clickSwitchThemeHandler = () => {
-    toggleTheme()
+  const isDesktopView = Grid.useBreakpoint().lg
+
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible)
+  }
+
+  const closeMenu = () => {
+    setMenuVisible(false)
   }
 
   const matchSwapRoute = useRouteMatch(swapRoutes.base.path())
@@ -60,12 +67,6 @@ const Header: React.FC<Props> = (_): JSX.Element => {
       return TabKey.UNKNOWN
     }
   }, [matchStakeRoute, matchSwapRoute, matchWalletRoute])
-
-  const clickSettingsHandler = useCallback(() => history.push(walletRoutes.settings.path()), [history])
-
-  const clickLockHandler = useCallback(() => {
-    // has to be implemented
-  }, [])
 
   const items = useMemo(
     () =>
@@ -96,32 +97,96 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     [items, activeKey, headerHeight]
   )
 
-  const color = useMemo(() => palette('text', 0)({ theme }), [theme])
+  const links = useMemo(
+    () =>
+      items.map(({ label, key, path, icon: Icon }) => (
+        <Link key={key} to={path} onClick={closeMenu}>
+          <HeaderDrawerItem>
+            <Icon style={{ marginLeft: '12px', marginRight: '12px' }} />
+            {label}
+          </HeaderDrawerItem>
+        </Link>
+      )),
+    [items]
+  )
+
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
+  const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
   return (
     <HeaderContainer>
-      <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
-        <Col>
-          <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
-            <AsgardexLogo />
+      <>
+        <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
+          {isDesktopView && (
+            <>
+              <Col>
+                <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
+                  <AsgardexLogo />
+                  <HeaderNetStatus />
+                </Row>
+              </Col>
+              <Col span="auto">
+                <Row justify="center" align="bottom" style={{ height: headerHeight }}>
+                  <Tabs activeKey={activeKey}>{tabs}</Tabs>
+                </Row>
+              </Col>
+              <Col>
+                <Row align="middle">
+                  <HeaderTheme />
+                  <HeaderSettings />
+                  <HeaderLock />
+                  <HeaderLang />
+                </Row>
+              </Col>
+            </>
+          )}
+          {!isDesktopView && (
+            <>
+              <Col>
+                <Row align="middle" style={{ height: headerHeight }}>
+                  <AsgardexLogo />
+                </Row>
+              </Col>
+              <Col>
+                <Row align="middle" style={{ height: headerHeight, cursor: 'pointer' }} onClick={toggleMenu}>
+                  {menuVisible ? (
+                    <CloseIcon style={{ color, ...iconStyle }} />
+                  ) : (
+                    <MenuIcon style={{ color, ...iconStyle }} />
+                  )}
+                </Row>
+              </Col>
+            </>
+          )}
+        </Row>
+        {!isDesktopView && (
+          <HeaderDrawer
+            style={{ marginTop: headerHeight, backgroundColor: 'transparent' }}
+            bodyStyle={{ backgroundColor: 'transparent' }}
+            drawerStyle={{ backgroundColor: 'transparent' }}
+            maskStyle={{ backgroundColor: 'transparent' }}
+            placement="top"
+            closable={false}
+            height="auto"
+            visible={menuVisible}
+            key="top">
+            {links}
+            <HeaderDrawerItem>
+              <HeaderTheme />
+            </HeaderDrawerItem>
+            <HeaderDrawerItem>
+              <HeaderLock onPress={() => closeMenu()} />
+            </HeaderDrawerItem>
+            <HeaderDrawerItem>
+              <HeaderSettings onPress={() => closeMenu()} />
+            </HeaderDrawerItem>
+            <HeaderDrawerItem>
+              <HeaderLang />
+            </HeaderDrawerItem>
             <HeaderNetStatus />
-          </Row>
-        </Col>
-        <Col span="auto">
-          <Row justify="center" align="bottom" style={{ height: headerHeight }}>
-            <Tabs activeKey={activeKey}>{tabs}</Tabs>
-          </Row>
-        </Col>
-        <Col>
-          <Row align="middle">
-            <ThemeIcon onClick={clickSwitchThemeHandler} style={{ color, ...iconStyle }} />
-            <SettingsIcon onClick={clickSettingsHandler} style={{ color, ...iconStyle }} />
-            <LockIcon onClick={clickLockHandler} style={{ ...iconStyle }} />
-            <HeaderLang />
-          </Row>
-        </Col>
-      </Row>
+          </HeaderDrawer>
+        )}
+      </>
     </HeaderContainer>
   )
 }

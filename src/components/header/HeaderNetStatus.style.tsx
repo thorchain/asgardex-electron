@@ -2,6 +2,8 @@ import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { media } from '../../helpers/styleHelper'
+
 export const HeaderNetStatusWrapper = styled(Row)`
   margin-bottom: 5px;
   /* id defined in svg */
@@ -11,4 +13,9 @@ export const HeaderNetStatusWrapper = styled(Row)`
       fill: ${palette('primary', 0)};
     }
   }
+
+  width: 100%;
+  ${media.lg`
+  width: auto;
+    `}
 `
