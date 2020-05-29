@@ -2,6 +2,8 @@ import { Popover } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { transition } from '../../../settings/style-util'
+
 type AddressInputWrapperProps = {
   status: boolean
 }
@@ -9,7 +11,7 @@ type AddressInputWrapperProps = {
 export const AddressInputWrapper = styled.div`
   display: flex;
 
-  transition: all 0.1s cubic-bezier(0.215, 0.61, 0.355, 1);
+  ${transition()}
 
   .ant-popover-arrow {
     border-top: none;
