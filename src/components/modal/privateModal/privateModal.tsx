@@ -6,7 +6,7 @@ import { Form } from 'antd'
 import Input from '../../uielements/input'
 import { StyledModal } from './privateModal.style'
 
-interface Props {
+type Props = {
   visible: boolean
   invalidPassword: boolean
   validatingPassword: boolean
