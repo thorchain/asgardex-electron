@@ -1,15 +1,15 @@
 import React from 'react'
 
+import { AssetAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
-import { useIntl } from 'react-intl'
 
 import Label from '../label'
 import Trend from '../trend'
 import { PoolStatusWrapper } from './PoolStatus.style'
 
 type Props = {
-  amount: BigNumber
+  amount: AssetAmount
   asset: string
   label: string
   target: string
@@ -18,8 +18,6 @@ type Props = {
 
 const PoolStatus: React.FC<Props> = (props: Props): JSX.Element => {
   const { amount, asset, label, target, trend } = props
-  const intl = useIntl()
-  const amountVal = intl.formatNumber(amount.toNumber(), { currency: 'USD', style: 'currency' })
 
   return (
     <PoolStatusWrapper {...props}>
@@ -28,7 +26,7 @@ const PoolStatus: React.FC<Props> = (props: Props): JSX.Element => {
         <Trend amount={trend} />
       </Row>
       <Label size="big" className="amount">
-        {amountVal}
+        {formatAssetAmountCurrency(amount)}
       </Label>
       <Label color="light">{label}</Label>
     </PoolStatusWrapper>
