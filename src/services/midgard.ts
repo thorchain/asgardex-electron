@@ -1,12 +1,24 @@
 import * as RD from '@devexperts/remote-data-ts'
 import byzantine from '@thorchain/byzantine-module'
 import * as Rx from 'rxjs'
-import { retry, mergeMap, catchError, startWith, exhaustMap, shareReplay } from 'rxjs/operators'
+import { retry, mergeMap, catchError, exhaustMap, shareReplay, concatMap, tap } from 'rxjs/operators'
 
+import { AssetDetail } from '../types/generated/midgard'
 import { DefaultApi } from '../types/generated/midgard/apis'
 import { Configuration } from '../types/generated/midgard/runtime'
 
-export type PoolsRD = RD.RemoteData<Error, string[]>
+type Pools = string[]
+
+type AssetDetails = AssetDetail[]
+
+export type State = {
+  assetDetails: AssetDetails
+  pools: Pools
+}
+
+export type StateRD = RD.RemoteData<Error, State>
+
+const poolState$$ = new Rx.BehaviorSubject<StateRD>(RD.initial)
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
@@ -19,36 +31,67 @@ const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configurat
 const byzantine$ = Rx.from(byzantine()).pipe(retry(5))
 
 /**
- * Load pools
+ * Same as `byzantine$`, but as a cached value
  */
-const loadPools$ = byzantine$.pipe(
+const byzantineShared$ = byzantine$.pipe(shareReplay())
+
+/**
+ * Loading queue to get all needed data for pools
+ */
+const loadPools$ = byzantineShared$.pipe(
   mergeMap((endpoint) => {
-    const api = getMidgardDefaultApi(endpoint as string)
-    return api.getPools()
+    //
+    let state = {}
+    return Rx.pipe(
+      // set `pending` state
+      tap((_) => poolState$$.next(RD.pending)),
+      // load `Pools`
+      concatMap((_) => getPools$(endpoint)),
+      // store `Pools` temporary
+      tap((pools) => (state = { ...state, pools })),
+      // load `AssetDetails`
+      concatMap((pools: string[]) => getAssetInfo$(endpoint, pools)),
+      // store `AssetDetails` temporary
+      tap((assetDetails) => (state = { ...state, assetDetails })),
+      // set `success` state
+      tap((_) => poolState$$.next(RD.success(state as State))),
+      catchError((error: Error) => {
+        // set `error` state
+        poolState$$.next(RD.failure(error))
+        return Rx.of('error while fetchting data for pool')
+      })
+    )
   }),
   retry(3)
 )
 
 /**
- * Merge result of loadPools into RemoteData
- **/
-const poolsRD$: Rx.Observable<PoolsRD> = loadPools$.pipe(
-  mergeMap((response) => Rx.of(RD.success(response) as PoolsRD)),
-  catchError((error: Error) => Rx.of(RD.failure(error))),
-  startWith(RD.initial)
-)
-
-const reloadPools$$ = new Rx.BehaviorSubject(0)
+ * Get data of `Pools`
+ */
+const getPools$ = (endpoint: string) => {
+  const api = getMidgardDefaultApi(endpoint)
+  return api.getPools()
+}
 
 /**
- * Triggers a reload of pools
+ * Get data of `AssetDetails`
  */
-export const reloadPools = () => reloadPools$$.next(0)
+const getAssetInfo$ = (endpoint: string, pools: string[]) => {
+  const api = getMidgardDefaultApi(endpoint)
+  return api.getAssetInfo({ asset: pools.join() })
+}
+
+const reloadPoolData$$ = new Rx.BehaviorSubject(0)
 
 /**
- * Pool data
+ * Triggers a reload of all pool data
  */
-export const pools$ = reloadPools$$.pipe(
-  exhaustMap((_) => poolsRD$),
-  shareReplay()
+export const reloadPoolData = () => reloadPoolData$$.next(0)
+
+/**
+ * State of all pool data
+ */
+export const poolState$: Rx.Observable<StateRD> = reloadPoolData$$.pipe(
+  mergeMap((_) => loadPools$),
+  exhaustMap((_) => poolState$$.asObservable())
 )
