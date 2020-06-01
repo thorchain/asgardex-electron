@@ -2,7 +2,7 @@ import React from 'react'
 
 import { storiesOf } from '@storybook/react'
 
-import DynamicCoin from './dynamicCoin'
+import DynamicCoin from './DynamicCoin'
 
 storiesOf('Components/Coins/DynamicCoin', module).add('default', () => {
   return (

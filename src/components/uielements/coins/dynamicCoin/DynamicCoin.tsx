@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { rainbowStop, getIntFromName } from '../../../../helpers/colorHelpers'
-import { DynamicCoinWrapper } from './dynamicCoin.style'
+import { DynamicCoinWrapper } from './DynamicCoin.style'
 import { Size } from './types'
 
 type Props = {
