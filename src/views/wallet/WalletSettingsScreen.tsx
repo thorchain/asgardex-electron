@@ -9,7 +9,7 @@ const UserAccountsScreen: React.FC = (): JSX.Element => {
   const keystore = localStorage.getItem('keystore')
   const [isWallet, setIsWallet] = useState(!!keystore)
   useEffect(() => {
-    if (localStorage.getItem('keystore')) {
+    if (localStorage.getItem('binance_keystore')) {
       setIsWallet(true)
     }
   }, [isWallet])

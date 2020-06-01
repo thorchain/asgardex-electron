@@ -1,6 +1,7 @@
-import { DATA_TYPE } from 'jsstore';
-export const UserAccountsTable = {
-  name: 'UserAccounts',
+import { DATA_TYPE } from 'jsstore'
+export const tableName = 'Wallet_Account'
+const WalletAccountsTable = {
+  name: tableName,
   columns: {
     _id: {
       primaryKey: true,
@@ -16,4 +17,5 @@ export const UserAccountsTable = {
       dataType: DATA_TYPE.String
     }
   }
-};
+}
+export default WalletAccountsTable

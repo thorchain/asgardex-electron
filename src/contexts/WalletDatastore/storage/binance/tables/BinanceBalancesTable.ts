@@ -1,10 +1,15 @@
-import { DATA_TYPE } from 'jsstore';
-export const UserAssetsTable = {
-  name: 'UserAssets',
+import { DATA_TYPE } from 'jsstore'
+export const tableName = 'Binance_Balances'
+const BinanceBalancesTable = {
+  name: tableName,
   columns: {
     _id: {
       primaryKey: true,
       autoIncrement: true
+    },
+    // relational key for multiple accounts support
+    address: {
+      dataType: DATA_TYPE.String
     },
     free: {
       dataType: DATA_TYPE.String
@@ -19,4 +24,5 @@ export const UserAssetsTable = {
       dataType: DATA_TYPE.String
     }
   }
-};
+}
+export default BinanceBalancesTable

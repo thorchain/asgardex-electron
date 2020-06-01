@@ -1,29 +1,30 @@
 import { EventEmitter } from "events";
-// import { UserAccount, UserAssets, UserTransactions, TokenData, MarketData } from '/imports/api/collections/client_collections'
-import { TransactionService } from '../../storage/transactionsService';
-import { AssetService } from '../../storage/assetsService';
-import { AccountService } from '../../storage/accountsService';
-import { TokenService } from "../../storage/tokensService";
-import Binance from '../binance';
+
+import { BinanceBalancesService } from '../../storage/binance/services/BinanceBalancesService'
+import { BinanceTransactionsService } from '../../storage/binance/services/BinanceTransactionsService'
+import { BinanceTokensService } from '../../storage/binance/services/BinanceTokensService'
+import { UserSettingsService } from '../../storage/services/userSettingsService'
+
+import Binance from './binance';
 import { crypto } from '@binance-chain/javascript-sdk'
-export const BNB = new Binance();
 const bcrypt = require('bcryptjs');
+export const BNB = new Binance();
 
 export default class WalletController extends EventEmitter{
   constructor () {
     super()
+    console.log("INSTANCE OF WALLET CONTROLLER")
     let locked = true
     this.getIsUnlocked = function () { return !locked }
     this.setIsUnlocked = function (v) { locked = v === true ? false : true }
     let connected = navigator.onLine || false
     this.getConnected = function () { return connected }
     this.setConnected = function (v) { connected = v === true ? true : false }
-    this.UserAccount = new AccountService()
-    this.UserAssets = new AssetService()
-    this.UserTransactions = new TransactionService()
-    this.TokenData = new TokenService()
+    this.UserAccount = new UserSettingsService()
+    this.UserAssets = new BinanceBalancesService()
+    this.UserTransactions = new BinanceTransactionsService()
+    this.TokenData = new BinanceTokensService()
   }
-  // isUnlocked () { return this.getIsUnlocked() }
 
   async generateUserAuth (pw) {
     console.log("calling to generate user auth")
@@ -35,10 +36,11 @@ export default class WalletController extends EventEmitter{
       // SECURITY: Using bcrypt for now. Confirm needed upgrade to argon2? (issues in client?)
       // The UserAccount collection should never need be synced with a server
       const pwHash = bcrypt.hashSync(pw, 8)
+      console.log('here is where it breaks... right?')
       const res = await this.UserAccount.updateOne(user._id,{pwHash:pwHash})
       console.log('updated user?')
       // console.log(user[0])
-      // console.log(res)
+      console.log(res)
     } else {
       throw Error('Unable to intialize account auth')
     }
@@ -295,7 +297,7 @@ export default class WalletController extends EventEmitter{
           return !(oldTokens.find(f => {return e.symbol === f.symbol}))
         })
         // TokenData.batchInsert(addTokens)
-        TokenData.insert(addTokens)
+        this.TokenData.insert(addTokens)
       }
       // UserAccount.update({_id: account._id}, {$set: {assets: assets}})
       this.updateUserAssetsStore(assets)
@@ -334,10 +336,11 @@ export default class WalletController extends EventEmitter{
     await BNB.getBalances(account.address).then(async (e) => {
       if (e.length > 0) {
         assets = e.map(function(elem) {
-          elem.shortSymbol = elem.symbol.split("-")[0].substr(0,4)
-          elem.free = parseFloat(elem.free)
-          elem.frozen = parseFloat(elem.frozen)
-          elem.locked = parseFloat(elem.locked)
+          // elem.shortSymbol = elem.symbol.split("-")[0].substr(0,4)
+          // elem.free = parseFloat(elem.free)
+          // elem.frozen = parseFloat(elem.frozen)
+          // elem.locked = parseFloat(elem.locked)
+          elem.address = account.address // relational key
           return elem
         })
       }
@@ -354,7 +357,7 @@ export default class WalletController extends EventEmitter{
 
   initializeVault (keystore) {
     console.log("initializing vault...")
-    window.localStorage.setItem("binance", JSON.stringify(keystore));
+    window.localStorage.setItem("binance_keystore", JSON.stringify(keystore));
   }
 
 
@@ -390,7 +393,7 @@ export default class WalletController extends EventEmitter{
     return new Promise(async (resolve, reject) => {
       // do a thing, possibly async, then…
       // TODO: below, refactor to store agnostic method call adapter
-      const vault = window.localStorage.getItem("binance");
+      const vault = window.localStorage.getItem("binance_keystore");
       let account
 
       // SECURITY: Prevent overwrite of existing vault
@@ -449,7 +452,7 @@ export default class WalletController extends EventEmitter{
     }
     const account = await this.UserAccount.findOne()
     if (account && account._id) {
-      await this.UserAccount.update({where:{id:account.id},set: {locked: true}})
+      await this.UserAccount.update({where:{_id:account._id},set: {locked: true}})
     }
     this.setIsUnlocked(false)
     return true
@@ -462,7 +465,7 @@ export default class WalletController extends EventEmitter{
       // await BNB.initializeClient() // pubkey only?
       this.setIsUnlocked(true) // SECURITY: leave last
       const account = await this.UserAccount.findOne()
-      await this.UserAccount.update({where:{id:account.id},set: {locked: false}})
+      await this.UserAccount.update({where:{_id:account._id},set: {locked: false}})
     } else {
 
       throw Error("Incorrect password")
@@ -499,7 +502,7 @@ export default class WalletController extends EventEmitter{
   }
 
   async updateUserBalances () {
-    const user = await this.UserAccount.findOne({id:0})
+    const user = await this.UserAccount.findOne({_id:0})
     let balances = {}
     await BNB.getBalances(user.address).then(async (e) => {
       balances = e.map(function(elem) {
@@ -512,7 +515,7 @@ export default class WalletController extends EventEmitter{
 
       if (balances.length > 0) {
         // const doc = UserAccount.findOne();
-        await this.UserAccount.update({where:{id:user.id}, set: {assets: balances}})
+        await this.UserAccount.update({where:{_id:user._id}, set: {assets: balances}})
         await this.updateUserAssetsStore(balances)
       }
     }).catch(e => {
@@ -536,7 +539,7 @@ export default class WalletController extends EventEmitter{
       await this.UserAssets.removeAll()
       console.log('removed asset data!')
       // await MarketData.remove({})
-      await window.localStorage.removeItem("binance"); // vault
+      await window.localStorage.removeItem("binance_keystore"); // vault
       console.log('removed vault!')
       // await localforage.clear(); // persistant store
       return true
@@ -549,7 +552,7 @@ export default class WalletController extends EventEmitter{
     const userAccount = await this.UserAccount.findOne()
 
     try {
-      let keystore = window.localStorage.getItem("binance")
+      let keystore = window.localStorage.getItem("binance_keystore")
 
       let privateKey = await BNB.sdk.crypto.getPrivateKeyFromKeyStore(keystore, password)
       password = null // SECURITY: unset

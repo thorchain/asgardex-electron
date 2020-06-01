@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useEffect } from 'react'
 import { initJsStore } from './storage/idbService'
+import WalletController from './wallet/WalletController/wallet'
 
 
+export const WALLET = new WalletController()
 const WalletDatastoreContext = createContext<any>(null)
 // const initialContext: any = { }
 

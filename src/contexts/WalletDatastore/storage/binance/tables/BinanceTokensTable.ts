@@ -1,27 +1,30 @@
 import { DATA_TYPE } from 'jsstore'
-export const tableName = "User_Settings"
-const UserSettingsTable = {
+export const tableName = 'Binance_Tokens'
+const BinanceTokensTable = {
   name: tableName,
   columns: {
     _id: {
       primaryKey: true,
       autoIncrement: true
     },
-    locked: {
+    mintable: {
       dataType: DATA_TYPE.Boolean
     },
-    pwHash: {
+    name: {
       dataType: DATA_TYPE.String
     },
-    theme: {
+    original_symbol: {
       dataType: DATA_TYPE.String
     },
-    locale: {
+    symbol: {
       dataType: DATA_TYPE.String
     },
-    baseCurrency: {
+    owner: {
+      dataType: DATA_TYPE.String
+    },
+    total_supply: {
       dataType: DATA_TYPE.String
     }
   }
 }
-export default UserSettingsTable
+export default BinanceTokensTable

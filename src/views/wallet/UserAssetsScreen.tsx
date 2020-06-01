@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react'
-
-import { Balances } from '@thorchain/asgardex-binance'
 import { Row, Col, Table } from 'antd'
 import { useHistory } from 'react-router-dom'
+import { BinanceBalancesService } from '../../contexts/WalletDatastore/storage/binance/services/BinanceBalancesService'
+import { UserSettingsService } from '../../contexts/WalletDatastore/storage/services/userSettingsService'
+import { BinanceBalanceType as BalanceType } from '../../contexts/WalletDatastore/storage/binance/types/BinanceBalanceType'
 
 import DynamicCoin from '../../components/shared/icons/DynamicCoin'
 import * as walletRoutes from '../../routes/wallet'
-import { idbCon } from '../../contexts/WalletDatastore/storage/idbService'
 
 const UserAssetsScreen: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const [assets, setAssets] = useState<Balances>([])
+  const [assets, setAssets] = useState<BalanceType[]>([])
+  const user = new UserSettingsService()
   async function setData() {
-    const address = localStorage.getItem('address')
-    if (address) {
-      const res:any = await idbCon.select({from:'Assets'})
+    const usr = await user.findOne()
+    if (usr) {
+      console.log('we go the user')
+      const balances = new BinanceBalancesService()
+      const res = await balances.findAll<BalanceType>()
       setAssets(res)
     }
   }
