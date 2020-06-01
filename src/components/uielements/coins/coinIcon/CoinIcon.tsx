@@ -7,13 +7,13 @@ import DynamicCoin from '../dynamicCoin'
 import { CoinIconWrapper } from './CoinIcon.style'
 import { Size } from './types'
 
-type Props = {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
   size?: Size
   type?: string
 }
 
-const CoinIcon: React.FC<Props> = ({ className = '', size = 'big', type = 'bnb' }: Props): JSX.Element => {
+const CoinIcon: React.FC<Props> = ({ className = '', size = 'big', type = 'bnb', ...rest }: Props): JSX.Element => {
   const renderCoinIcon = () => {
     const coinIcon = coinIconGroup[type.toLowerCase()] || ''
 
@@ -35,7 +35,7 @@ const CoinIcon: React.FC<Props> = ({ className = '', size = 'big', type = 'bnb' 
   }
 
   return (
-    <CoinIconWrapper size={size} className={`coinIcon-wrapper ${className}`}>
+    <CoinIconWrapper size={size} className={`coinIcon-wrapper ${className}`} {...rest}>
       {renderCoinIcon()}
     </CoinIconWrapper>
   )
