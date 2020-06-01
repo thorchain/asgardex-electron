@@ -4,7 +4,7 @@ import { LockOutlined } from '@ant-design/icons'
 import { Form } from 'antd'
 
 import Input from '../../uielements/input'
-import { StyledModal } from './privateModal.style'
+import { StyledModal } from './PrivateModal.style'
 
 type Props = {
   visible: boolean

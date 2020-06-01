@@ -2,7 +2,7 @@ import React from 'react'
 
 import { storiesOf } from '@storybook/react'
 
-import PrivateModal from './privateModal'
+import PrivateModal from './PrivateModal'
 
 storiesOf('Components/Private Modal', module)
   .add('default', () => {

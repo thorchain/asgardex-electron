@@ -1,3 +1,3 @@
-import PrivateModal from './privateModal'
+import PrivateModal from './PrivateModal'
 
 export default PrivateModal
