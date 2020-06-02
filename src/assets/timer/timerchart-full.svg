@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="202px" viewBox="0 0 200 202" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 57 (83077) - https://sketch.com -->
+    <title>timerchart-full</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Desktop" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="timerchart-full" transform="translate(100.000000, 101.000000) scale(-1, 1) translate(-100.000000, -101.000000) ">
+            <path d="M100,101.042957 C100,34.3762906 100,1.0429573 100,1.0429573 C45,1.0429573 0,45.8144823 0,101.042957 C0,101.042957 33.3333333,101.042957 100,101.042957 Z" id="Oval" fill="#33CCFF"></path>
+            <path d="M100,201.042957 C100,134.376291 100,101.042957 100,101.042957 C44,101.042957 0,145.814482 0,201.042957 C0,201.042957 33.3333333,201.042957 100,201.042957 Z" id="Oval" fill="#50E3C2" transform="translate(50.000000, 151.042957) scale(1, -1) translate(-50.000000, -151.042957) "></path>
+            <path d="M200.042957,101 C200.042957,34.3333333 200.042957,1 200.042957,1 C150.042957,1 97.5429573,41 100.042957,101 C100.042957,101 133.376291,101 200.042957,101 Z" id="Oval-Copy" fill="#EE5366" transform="translate(150.000000, 51.000000) rotate(90.000000) translate(-150.000000, -51.000000) "></path>
+            <path d="M200,201.042957 C200,134.376291 200,101.042957 200,101.042957 C150,101.042957 100,141.542957 100,201.042957 C100,201.042957 133.333333,201.042957 200,201.042957 Z" id="Oval-Copy-2" fill="#F5A623" transform="translate(150.000000, 151.042957) scale(1, -1) rotate(90.000000) translate(-150.000000, -151.042957) "></path>
+        </g>
+    </g>
+</svg>
