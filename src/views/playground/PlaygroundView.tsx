@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl'
 
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { State as PoolState } from '../../services/midgard'
+import { PoolsState } from '../../services/midgard/types'
 import View from '../View'
 
 type Props = {}
@@ -22,9 +22,9 @@ const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
 
   const tickers = useObservableState(miniTickers$, [])
 
-  useEffect(() => {
-    console.log('tickers', tickers[0]?.s)
-  }, [tickers])
+  // useEffect(() => {
+  //   console.log('tickers', tickers[0]?.s)
+  // }, [tickers])
 
   // For debugging only - address will be provided by wallet
   const address = 'tbnb13egw96d95lldrhwu56dttrpn2fth6cs0axzaad'
@@ -42,8 +42,18 @@ const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
   // 3. Subscribe to incoming transfer events
   useSubscription(transfers$, transferHandler)
 
-  const { poolState$, reloadPoolData } = useMidgardContext()
-  const poolState = useObservableState(poolState$, RD.initial)
+  const { service: midgardService } = useMidgardContext()
+  const poolState = useObservableState(midgardService.poolState$, RD.initial)
+
+  useEffect(() => {
+    const sub = midgardService.poolState$.subscribe(
+      (v) => console.log('sub poolState value', v),
+      (e) => console.log('sub poolState error', e),
+      () => console.log('sub poolState complete')
+    )
+
+    return () => sub.unsubscribe()
+  }, [midgardService])
 
   const renderPools = useMemo(
     () =>
@@ -55,14 +65,14 @@ const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
         // error state
         (error: Error) => <h3>`Loading of pool data failed ${error?.message ?? ''}`</h3>,
         // success state
-        (s: PoolState): JSX.Element => {
-          const hasPools = s.pools.length > 0
+        (s: PoolsState): JSX.Element => {
+          const hasPools = s.poolAssets.length > 0
           return (
             <>
               {!hasPools && <h3>No pools available.</h3>}
               {hasPools && (
                 <ul>
-                  {s.pools.map((pool: string, index: number) => (
+                  {s.poolAssets.map((pool: string, index: number) => (
                     <li key={index}>{pool}</li>
                   ))}
                 </ul>
@@ -84,7 +94,7 @@ const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
       {renderPools}
       <h1>Ticker</h1>
       <h2>{tickers[0]?.s}</h2>
-      <Button onClick={() => reloadPoolData()}>Reload pools</Button>
+      <Button onClick={() => midgardService.reloadPoolsState()}>Reload pools</Button>
       <h1>Memo</h1>
       <h2>{memo}</h2>
     </View>
