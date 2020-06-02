@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import byzantine from '@thorchain/byzantine-module'
 import * as Rx from 'rxjs'
-import { retry, catchError, shareReplay, concatMap, tap, map, exhaustMap, mergeMap } from 'rxjs/operators'
+import { retry, catchError, concatMap, tap, exhaustMap, mergeMap } from 'rxjs/operators'
 
 import { BASE_TOKEN_TICKER } from '../../const'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
@@ -22,11 +22,6 @@ const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configurat
 const byzantine$ = Rx.from(byzantine()).pipe(retry(BYZANTINE_MAX_RETRY))
 
 /**
- * Same as `byzantine$`, but as a cached value
- */
-const byzantineShared$ = byzantine$.pipe(shareReplay())
-
-/**
  * Subject to provide state of pools data
  */
 const poolsState$$ = new Rx.BehaviorSubject<PoolsStateRD>(RD.initial)
@@ -36,19 +31,14 @@ const poolsState$$ = new Rx.BehaviorSubject<PoolsStateRD>(RD.initial)
  */
 const getPoolsState$ = () => {
   let state: PoolsState
-  let endpoint: string
+  // Update `PoolState` to `pending`
+  poolsState$$.next(RD.pending)
   // start queue of requests to get all pool data
-  return byzantineShared$.pipe(
-    // set endpoint to make it available in other observables in this "pipe"
-    map((ep: string) => (endpoint = ep)),
-    // Update `PoolState` to `pending`
-    tap((_) => poolsState$$.next(RD.pending)),
-    // load `Pools`
-    concatMap(() => apiGetPools$(endpoint)),
+  return apiGetPools$.pipe(
     // set `PoolAssets` into state
     tap((poolAssets) => (state = { ...state, poolAssets })),
     // load `AssetDetails`
-    concatMap((poolAssets) => apiGetAssetInfo$(endpoint, poolAssets)),
+    concatMap((poolAssets) => apiGetAssetInfo$(poolAssets)),
     // store `AssetDetails`
     tap((assetDetails) => (state = { ...state, assetDetails })),
     // Derive + store `assetDetailIndex`
@@ -61,7 +51,7 @@ const getPoolsState$ = () => {
       state = { ...state, priceIndex }
     }),
     //
-    concatMap((_) => apiGetPoolsData$(endpoint, state.poolAssets)),
+    concatMap((_) => apiGetPoolsData$(state.poolAssets)),
     // Derive + store `poolDetails`
     tap((poolDetails: PoolDetails) => (state = { ...state, poolDetails: toPoolDetailsMap(poolDetails) })),
     // set everything into a `success` state
@@ -79,26 +69,34 @@ const getPoolsState$ = () => {
 /**
  * Get data of `Pools` from Midgard
  */
-const apiGetPools$ = (endpoint: string) => {
-  const api = getMidgardDefaultApi(endpoint)
-  return api.getPools()
-}
+const apiGetPools$ = byzantine$.pipe(
+  concatMap((endpoint) => {
+    const api = getMidgardDefaultApi(endpoint)
+    return api.getPools()
+  })
+)
 
 /**
  * Get data of `AssetDetails` from Midgard
  */
-const apiGetAssetInfo$ = (endpoint: string, poolAssets: string[]) => {
-  const api = getMidgardDefaultApi(endpoint)
-  return api.getAssetInfo({ asset: poolAssets.join() })
-}
+const apiGetAssetInfo$ = (poolAssets: string[]) =>
+  byzantine$.pipe(
+    concatMap((endpoint) => {
+      const api = getMidgardDefaultApi(endpoint)
+      return api.getAssetInfo({ asset: poolAssets.join() })
+    })
+  )
 
 /**
  * Get `PoolDetails` data from Midgard
  */
-const apiGetPoolsData$ = (endpoint: string, poolAssets: string[]) => {
-  const api = getMidgardDefaultApi(endpoint)
-  return api.getPoolsData({ asset: poolAssets.join() })
-}
+const apiGetPoolsData$ = (poolAssets: string[]) =>
+  byzantine$.pipe(
+    concatMap((endpoint) => {
+      const api = getMidgardDefaultApi(endpoint)
+      return api.getPoolsData({ asset: poolAssets.join() })
+    })
+  )
 
 // Subject to trigger reload of pools state
 const reloadPoolsState$$ = new Rx.BehaviorSubject(0)
