@@ -66,6 +66,7 @@
     "observable-hooks": "^2.3.5",
     "qrcode": "^1.4.4",
     "react": "^16.13.1",
+    "react-circular-progressbar": "^2.0.3",
     "react-dom": "^16.13.1",
     "react-draggable": "^4.4.2",
     "react-intl": "^4.5.3",
