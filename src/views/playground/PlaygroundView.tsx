@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState, useEffect } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { WS } from '@thorchain/asgardex-binance'
@@ -44,16 +44,6 @@ const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const poolState = useObservableState(midgardService.poolState$, RD.initial)
-
-  useEffect(() => {
-    const sub = midgardService.poolState$.subscribe(
-      (v) => console.log('sub poolState value', v),
-      (e) => console.log('sub poolState error', e),
-      () => console.log('sub poolState complete')
-    )
-
-    return () => sub.unsubscribe()
-  }, [midgardService])
 
   const renderPools = useMemo(
     () =>
