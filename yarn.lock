@@ -14641,6 +14641,14 @@ react-draggable@^4.0.3:
     classnames "^2.2.5"
     prop-types "^15.6.0"
 
+react-draggable@^4.4.2:
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-4.4.2.tgz#f3cefecee25f467f865144cda0d066e5f05f94a0"
+  integrity sha512-zLQs4R4bnBCGnCVTZiD8hPsHtkiJxgMpGDlRESM+EHQo8ysXhKJ2GKdJ8UxxLJdRVceX1j19jy+hQS2wHislPQ==
+  dependencies:
+    classnames "^2.2.5"
+    prop-types "^15.6.0"
+
 react-error-overlay@^6.0.3, react-error-overlay@^6.0.7:
   version "6.0.7"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.7.tgz#1dcfb459ab671d53f660a991513cb2f0a0553108"
