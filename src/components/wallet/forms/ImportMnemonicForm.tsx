@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react'
 
-import { crypto } from '@binance-chain/javascript-sdk'
 import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
+
+import { crypto } from '@binance-chain/javascript-sdk'
 import { delay } from '@thorchain/asgardex-util'
 import { Form, Input, Button } from 'antd'
 import { Rule } from 'antd/lib/form'
