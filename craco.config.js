@@ -1,5 +1,5 @@
-const webpack = require('webpack')
 const GitRevisionPlugin = require('git-revision-webpack-plugin')
+const webpack = require('webpack')
 
 module.exports = {
   webpack: {
