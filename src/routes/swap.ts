@@ -14,9 +14,8 @@ export const swap: Route<SwapRouteParams> = {
   path: ({ source, target }) => {
     if (source && target) {
       return `${base.template}/${source.toLowerCase()}-${target.toLowerCase()}`
-    } else {
-      // Redirect to base route if passed params are empty
-      return base.path()
     }
+    // Redirect to base route if passed params are empty
+    return base.path()
   }
 }

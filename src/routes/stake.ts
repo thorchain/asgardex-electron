@@ -13,9 +13,8 @@ export const stake: Route<StakeRouteParams> = {
   path: ({ asset }) => {
     if (asset) {
       return `${base.template}/${asset.toLowerCase()}`
-    } else {
-      // Redirect to base route if asset param is empty
-      return base.path()
     }
+    // Redirect to base route if asset param is empty
+    return base.path()
   }
 }
