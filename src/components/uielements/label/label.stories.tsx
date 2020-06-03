@@ -36,7 +36,7 @@ storiesOf('Components/Label', module).add('properties', () => {
     normal: 'normal',
     light: 'light',
     dark: 'dark',
-    input: 'gray',
+    input: 'input',
     gray: 'gray',
     white: 'white'
   }
