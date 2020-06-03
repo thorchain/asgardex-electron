@@ -107,9 +107,9 @@ const TxTimer: React.FC<Props> = (props): JSX.Element => {
           strokeWidth={7}
           counterClockwise
           styles={buildStyles({
-            textColor: theme.dark.palette.primary,
+            textColor: theme.dark.palette.primary[0],
             textSize: '14px',
-            pathColor: theme.dark.palette.primary,
+            pathColor: theme.dark.palette.primary[0],
             trailColor: theme.dark.palette.background[2],
             pathTransition: 'stroke-dashoffset 0.5s linear 0s'
           })}

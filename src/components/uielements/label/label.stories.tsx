@@ -36,6 +36,8 @@ storiesOf('Components/Label', module).add('properties', () => {
     normal: 'normal',
     light: 'light',
     dark: 'dark',
+    input: 'gray',
+    gray: 'gray',
     white: 'white'
   }
   const weightOptions: WeightOptions = {

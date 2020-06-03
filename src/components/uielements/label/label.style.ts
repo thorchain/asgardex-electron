@@ -41,6 +41,8 @@ const colors: Colors = {
   normal: palette('text', 0),
   light: palette('text', 2),
   dark: palette('text', 1),
+  gray: palette('text', 2),
+  input: palette('text', 2),
   white: '#fff'
 }
 
