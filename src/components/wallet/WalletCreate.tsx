@@ -7,6 +7,7 @@ import ImportMnemonicForm from './forms/ImportMnemonicForm'
 import NewMnemonic from './NewMnemonic'
 import NewMnemonicConfirm from './NewMnemonicConfirm'
 import NewMnemonicGenerate from './NewMnemonicGenerate'
+
 const { Title } = Typography
 const { Step } = Steps
 const { TabPane } = Tabs

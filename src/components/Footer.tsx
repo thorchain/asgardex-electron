@@ -8,6 +8,7 @@ import { ReactComponent as TelegramIcon } from '../assets/svg/icon-telegram.svg'
 import { ReactComponent as ThorChainIcon } from '../assets/svg/logo-thorchain.svg'
 import * as playgroundRoutes from '../routes/playground'
 import { FooterContainer, FooterLink, FooterIconWrapper, FooterLinkWrapper } from './Footer.style'
+
 const { shell } = window.require('electron')
 
 type IconProps = {
