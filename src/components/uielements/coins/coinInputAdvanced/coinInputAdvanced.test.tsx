@@ -1,6 +1,8 @@
-import { renderHook, act } from '@testing-library/react-hooks'
+import { renderHook, act, RenderHookResult } from '@testing-library/react-hooks'
 import { bn } from '@thorchain/asgardex-util'
+import BigNumber from 'bignumber.js'
 
+import { FixmeType } from '../../../../types/asgardex.d'
 import { useCoinCardInputBehaviour, isBroadcastable } from './coinInputAdvanced'
 
 // Unit testing is really required to ensure a complex component
@@ -16,12 +18,27 @@ test('isBroadcastable', () => {
   expect(isBroadcastable('.1')).toBeTruthy()
 })
 
-function getLastCallValue(mockFn) {
+function getLastCallValue(mockFn: jest.Mock<void, [BigNumber]>) {
   const lastCall = mockFn.mock.calls.slice(-1)[0]
   return lastCall && lastCall[0]
 }
 
-const simulateControlledBlur = ({ hook, mockEvent, onChangeValue }) => () => {
+type SimulateProps = {
+  hook: RenderHookResult<
+    { value: BigNumber; onChangeValue: jest.Mock<void, [BigNumber]> },
+    {
+      onBlur: (event: FixmeType) => void
+      onFocus: (event: FixmeType) => void
+      onChange: (event: FixmeType) => void
+      onPressEnter: (event: FixmeType) => void
+      value: string
+    }
+  >
+  mockEvent: { target: { select: jest.Mock<void, [BigNumber]>; blur: jest.Mock<void, [BigNumber]> } }
+  onChangeValue: jest.Mock<void, [BigNumber]>
+}
+
+const simulateControlledBlur = ({ hook, mockEvent, onChangeValue }: SimulateProps) => () => {
   const value = hook.result.current.value
   act(() => {
     hook.result.current.onBlur({
@@ -33,10 +50,10 @@ const simulateControlledBlur = ({ hook, mockEvent, onChangeValue }) => () => {
     })
     // need to rerender so blur useEffects get broadcast
   })
-  hook.rerender({ value, onChangeValue })
+  hook.rerender({ value: bn(value), onChangeValue })
 }
 
-const simulateControlledFocus = ({ hook, mockEvent }) => () => {
+const simulateControlledFocus = ({ hook, mockEvent }: SimulateProps) => () => {
   const value = hook.result.current.value
   act(() => {
     hook.result.current.onFocus({
@@ -50,7 +67,7 @@ const simulateControlledFocus = ({ hook, mockEvent }) => () => {
 }
 
 // This function simulates a controlled component.
-const simulateControlledChange = ({ onChangeValue, hook }) => (value) => {
+const simulateControlledChange = ({ onChangeValue, hook }: SimulateProps) => (value: string) => {
   const oldCallCount = onChangeValue.mock.calls.length
 
   // hook.onChange is sent to the raw input so calling it like
@@ -66,11 +83,11 @@ const simulateControlledChange = ({ onChangeValue, hook }) => (value) => {
   if (handlerHasBeenCalled && getLastCallValue(onChangeValue) === bn(value)) {
     // pass in a new value from outslide the component
     // as if the component was a controlled one
-    hook.rerender({ value, onChangeValue })
+    hook.rerender({ value: bn(value), onChangeValue })
   }
 }
 
-function setup(initValue) {
+function setup(initValue: number) {
   const onChangeValue = jest.fn()
   const eventSelect = jest.fn()
   const eventBlur = jest.fn()
@@ -85,7 +102,9 @@ function setup(initValue) {
     ({ value, onChangeValue }) => {
       return useCoinCardInputBehaviour({
         amount: bn(value),
-        onChangeValue
+        onChangeValue,
+        onFocus: undefined,
+        minimumFractionDigits: undefined
       })
     },
     {
@@ -95,6 +114,7 @@ function setup(initValue) {
 
   const simulateTypingInInput = simulateControlledChange({
     hook,
+    mockEvent,
     onChangeValue
   })
   const simulateBlur = simulateControlledBlur({
@@ -102,7 +122,7 @@ function setup(initValue) {
     mockEvent,
     onChangeValue
   })
-  const simulateFocus = simulateControlledFocus({ hook, mockEvent })
+  const simulateFocus = simulateControlledFocus({ hook, mockEvent, onChangeValue })
   return {
     hook,
     onChangeValue,
@@ -165,9 +185,6 @@ describe('useCoinCardInputBehaviour', () => {
   })
 
   it('should default to 0', () => {
-    expect(setup(undefined).hook.result.current.value).toBe('0.00')
-    expect(setup(false).hook.result.current.value).toBe('0.00')
-    expect(setup(null).hook.result.current.value).toBe('0.00')
     expect(setup(NaN).hook.result.current.value).toBe('0.00')
   })
 

@@ -27,19 +27,21 @@ export const AssetInputWrapper = styled.div`
       font-size: 11px;
       color: ${palette('text', 2)};
       letter-spacing: 1px;
+      margin-bottom: 2px;
     }
 
     .asset-input-header-label {
       font-size: 11px;
       color: ${palette('success', 1)};
       letter-spacing: 1px;
+      margin-bottom: 2px;
     }
   }
 
   .asset-input-content {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
 
     .asset-amount-label {
       white-space: nowrap;

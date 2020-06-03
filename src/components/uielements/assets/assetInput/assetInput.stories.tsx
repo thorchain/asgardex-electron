@@ -5,7 +5,7 @@ import { tokenAmount } from '@thorchain/asgardex-token'
 
 import AssetInput from './assetInput'
 
-storiesOf('Components/Tokens/TokenInput', module).add('default', () => {
+storiesOf('Components/Assets/AssetInput', module).add('default', () => {
   return (
     <div style={{ padding: '20px' }}>
       <AssetInput

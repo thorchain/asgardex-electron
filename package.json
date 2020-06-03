@@ -71,6 +71,7 @@
     "react-intl": "^4.5.3",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "react-test-renderer": "^16.13.1",
     "rxjs": "^6.5.5",
     "styled-components": "^5.1.0",
     "styled-theme": "^0.3.3",

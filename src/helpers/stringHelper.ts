@@ -1,12 +1,12 @@
-import { Maybe, Nothing, Pair } from '../types/asgardex'
+import { Maybe, Nothing, Pair } from '../types/asgardex.d'
 
 export const getPair = (info?: string): Pair => ({
   source: info?.split('-')[0]?.toLowerCase() ?? Nothing,
   target: info?.split('-')[1]?.toLowerCase() ?? Nothing
 })
 
-export const getTickerFormat = (symbol?: Maybe<string>): string => {
-  if (!symbol) return ''
+export const getTickerFormat = (symbol?: Maybe<string>): string | null => {
+  if (!symbol) return null
   if (symbol.includes('.')) {
     return symbol.split('.')[1].split('-')[0].toLowerCase()
   }

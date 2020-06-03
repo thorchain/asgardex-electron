@@ -5,14 +5,14 @@ import BigNumber from 'bignumber.js'
 import { Maybe, FixmeType } from '../../../../types/asgardex'
 import CoinInputAdvanced from '../../coins/coinInputAdvanced'
 import { AssetInputWrapper } from './assetInput.style'
-import { TokenInputProps } from './types'
+import { AssetInputProps } from './types'
 
 type Props = {
   title: string
   status: Maybe<string>
   amount: BigNumber
   label: string
-  inputProps?: TokenInputProps
+  inputProps?: AssetInputProps
   onChange: (value: BigNumber) => void
   className?: string
 }

@@ -5,7 +5,7 @@ import { BigNumber } from 'bignumber.js'
 
 import { CoinInputAdvanced } from './coinInputAdvanced'
 
-function CoinCardInputStory() {
+function RenderCoinCardInput() {
   const [value, setValue] = React.useState(1002.34)
 
   const handleChange = React.useCallback(
@@ -33,6 +33,6 @@ function CoinCardInputStory() {
   )
 }
 
-storiesOf('Components/Coins/CoinCardInput', module).add('default', () => {
-  return <CoinCardInputStory />
+storiesOf('Components/Coins/CoinInputAdvanced', module).add('default', () => {
+  return <RenderCoinCardInput />
 })

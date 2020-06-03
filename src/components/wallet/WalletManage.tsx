@@ -1,8 +1,7 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 
-import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
-
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
+import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
 
 import { UserAccountType } from '../../types/wallet'
