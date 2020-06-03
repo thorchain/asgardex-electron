@@ -22,10 +22,6 @@ const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
 
   const tickers = useObservableState(miniTickers$, [])
 
-  // useEffect(() => {
-  //   console.log('tickers', tickers[0]?.s)
-  // }, [tickers])
-
   // For debugging only - address will be provided by wallet
   const address = 'tbnb13egw96d95lldrhwu56dttrpn2fth6cs0axzaad'
 
