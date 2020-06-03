@@ -9,6 +9,7 @@ import { shortSymbol } from '../../helpers/tokenHelpers'
 import { AssetDetailsRouteParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { UserTransactionType, UserAssetType } from '../../types/wallet'
+
 const { Title } = Typography
 
 // Dummy data

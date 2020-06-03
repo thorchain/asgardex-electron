@@ -1,8 +1,8 @@
 import { WS } from '@thorchain/asgardex-binance'
-import { map, tap } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
-import { envOrDefault } from '../helpers/envHelper'
+import { envOrDefault } from '../../helpers/envHelper'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -71,7 +71,7 @@ export const subscribeTransfers = (address: string) => {
       (e) => (e as WS.TransferEvent).data !== undefined
     )
     .pipe(
-      tap((msg) => console.log('transfer msg', msg)),
+      // tap((msg) => console.log('transfer msg', msg)),
       // Since we filtered messages before,
       // we know that data is available here, but it needs to be typed again
       map((event: WS.TransferEvent) => event.data as WS.Transfer)
@@ -106,7 +106,7 @@ export const miniTickers$ = ws$
     (e) => (e as WS.MiniTickersEvent).data !== undefined
   )
   .pipe(
-    tap((ev) => console.log('mini tickers msg', ev)),
+    // tap((ev) => console.log('mini tickers msg', ev)),
     // Since we have filtered messages out before,
     // we know that `data` is available here,
     // but we have to do a type cast again

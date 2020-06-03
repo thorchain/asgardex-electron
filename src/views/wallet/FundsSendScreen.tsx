@@ -4,6 +4,7 @@ import { Row, Col, Form, Input, Button, Typography } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 
 import AccountSelector from '../../components/wallet/AccountSelector'
+
 const { Title } = Typography
 
 const FundsSendScreen: React.FC = (): JSX.Element => {

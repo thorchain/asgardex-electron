@@ -19,10 +19,10 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   return (
     <View>
+      <Button onClick={clickHandler}>Back</Button>
       <h1>
         Swap {source.toUpperCase()} -&gt; {target.toUpperCase()}
       </h1>
-      <Button onClick={clickHandler}>Back</Button>
     </View>
   )
 }

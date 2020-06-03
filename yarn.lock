@@ -2466,10 +2466,10 @@
   dependencies:
     "@thorchain/asgardex-util" "^0.1.1"
 
-"@thorchain/asgardex-util@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.1.0.tgz#f0f836d530e4f80dc3fb97bf600779773e5a2d24"
-  integrity sha512-anzylv3+31i/r2eijkB78ak1DB+ZCRzNo11CqqmGIfdvdfmAQB16O6kv+tb+D1GikN/PMBDTeRZf8CT5R358Ug==
+"@thorchain/asgardex-util@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.1.3.tgz#66e0e79dc45b0176ab7aad3b7f27453d1c13c684"
+  integrity sha512-wTck5pfRNfPkVQ5CnssINSBG2/Mw4Q5fmGIlHhrRo+ycuSL5XjNDOt7bYJW6RBf/iEegtyi0qKPq1yuvI8ywmg==
 
 "@thorchain/asgardex-util@^0.1.1":
   version "0.1.1"
@@ -14571,6 +14571,11 @@ react-base16-styling@^0.6.0:
     lodash.flow "^3.3.0"
     pure-color "^1.2.0"
 
+react-circular-progressbar@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/react-circular-progressbar/-/react-circular-progressbar-2.0.3.tgz#fa8eb59f8db168d2904bae4590641792c80f5991"
+  integrity sha512-YKN+xAShXA3gYihevbQZbavfiJxo83Dt1cUxqg/cltj4VVsRQpDr7Fg1mvjDG3x1KHGtd9NmYKvJ2mMrPwbKyw==
+
 react-clientside-effect@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/react-clientside-effect/-/react-clientside-effect-1.2.2.tgz#6212fb0e07b204e714581dd51992603d1accc837"
@@ -14679,6 +14684,14 @@ react-draggable@^4.0.3:
   version "4.4.1"
   resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-4.4.1.tgz#125447d11e8a77be554330ead4d83cd4b09fc2f5"
   integrity sha512-3SgX519qV+PM/leh7HIvvqoheXGWKgGGHQhpc9+gf+KGwcvzwOMIi8Uiw9wAq5iWL4GBc0ljXVeGky77MW6aKg==
+  dependencies:
+    classnames "^2.2.5"
+    prop-types "^15.6.0"
+
+react-draggable@^4.4.2:
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-4.4.2.tgz#f3cefecee25f467f865144cda0d066e5f05f94a0"
+  integrity sha512-zLQs4R4bnBCGnCVTZiD8hPsHtkiJxgMpGDlRESM+EHQo8ysXhKJ2GKdJ8UxxLJdRVceX1j19jy+hQS2wHislPQ==
   dependencies:
     classnames "^2.2.5"
     prop-types "^15.6.0"

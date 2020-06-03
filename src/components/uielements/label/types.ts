@@ -1,6 +1,16 @@
 export type Size = 'tiny' | 'small' | 'normal' | 'big' | 'large'
 
-export type Color = 'primary' | 'success' | 'warning' | 'error' | 'normal' | 'light' | 'dark' | 'white'
+export type Color =
+  | 'primary'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'normal'
+  | 'light'
+  | 'dark'
+  | 'gray'
+  | 'input'
+  | 'white'
 
 type FontSetting = {
   size: string

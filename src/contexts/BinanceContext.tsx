@@ -3,7 +3,7 @@ import React, { createContext, useContext } from 'react'
 import { WS } from '@thorchain/asgardex-binance'
 import { Observable } from 'rxjs'
 
-import { subscribeTransfers, miniTickers$ } from '../services/binance'
+import { subscribeTransfers, miniTickers$ } from '../services/binance/service'
 
 type BinanceContextValue = {
   subscribeTransfers: typeof subscribeTransfers
