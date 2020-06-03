@@ -7,13 +7,11 @@ import { palette, size } from 'styled-theme'
 
 import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
 import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
-import { ReactComponent as StakeIcon } from '../../assets/svg/icon-stake.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
 import { useThemeContext } from '../../contexts/ThemeContext'
-import * as stakeRoutes from '../../routes/stake'
-import * as swapRoutes from '../../routes/swap'
+import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
 import HeaderLang from './HeaderLang'
@@ -23,8 +21,7 @@ import HeaderSettings from './HeaderSettings'
 import HeaderTheme from './HeaderTheme'
 
 enum TabKey {
-  SWAP = 'swap',
-  STAKE = 'stake',
+  POOLS = 'pools',
   WALLET = 'wallet',
   UNKNOWN = 'unknown'
 }
@@ -52,27 +49,23 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     setMenuVisible(false)
   }
 
-  const matchSwapRoute = useRouteMatch(swapRoutes.base.path())
-  const matchStakeRoute = useRouteMatch(stakeRoutes.base.path())
+  const matchPoolsRoute = useRouteMatch(poolsRoutes.base.path())
   const matchWalletRoute = useRouteMatch(walletRoutes.base.path())
 
   const activeKey: TabKey = useMemo(() => {
-    if (matchSwapRoute) {
-      return TabKey.SWAP
-    } else if (matchStakeRoute) {
-      return TabKey.STAKE
+    if (matchPoolsRoute) {
+      return TabKey.POOLS
     } else if (matchWalletRoute) {
       return TabKey.WALLET
     } else {
       return TabKey.UNKNOWN
     }
-  }, [matchStakeRoute, matchSwapRoute, matchWalletRoute])
+  }, [matchPoolsRoute, matchWalletRoute])
 
   const items = useMemo(
     () =>
       [
-        { key: TabKey.SWAP, label: 'Swap', path: swapRoutes.base.path(), icon: SwapIcon },
-        { key: TabKey.STAKE, label: 'Stake', path: stakeRoutes.base.path(), icon: StakeIcon },
+        { key: TabKey.POOLS, label: 'Pools', path: poolsRoutes.base.path(), icon: SwapIcon },
         { key: TabKey.WALLET, label: 'Wallet', path: walletRoutes.base.path(), icon: WalletIcon }
       ] as Tab[],
     []

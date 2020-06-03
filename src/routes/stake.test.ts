@@ -1,23 +1,23 @@
-import { base, asset } from './stake'
+import { base, stake } from './stake'
 
 describe('Stake routes', () => {
   describe('base routes', () => {
     it('template', () => {
-      expect(base.template).toEqual('/stake')
+      expect(base.template).toEqual('/pools/stake')
     })
     it('path', () => {
-      expect(base.path()).toEqual('/stake')
+      expect(base.path()).toEqual('/pools/stake')
     })
   })
   describe('asset route', () => {
     it('template', () => {
-      expect(asset.template).toEqual('/stake/:asset')
+      expect(stake.template).toEqual('/pools/stake/:asset')
     })
     it('returns path by given asset parameter', () => {
-      expect(asset.path({ asset: 'BNB' })).toEqual('/stake/bnb')
+      expect(stake.path({ asset: 'BNB' })).toEqual('/pools/stake/bnb')
     })
     it('redirects to base path if asset is empty', () => {
-      expect(asset.path({ asset: '' })).toEqual(base.path())
+      expect(stake.path({ asset: '' })).toEqual(base.path())
     })
   })
 })
