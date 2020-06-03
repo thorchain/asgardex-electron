@@ -8,7 +8,7 @@ describe('tokenHelper', () => {
     it('returns TUSD', () => {
       expect(shortSymbol('TUSDB-000')).toEqual('TUSD')
     })
-    it('returns empty string if now symbol available', () => {
+    it('returns an empty string for an empty symbol string', () => {
       expect(shortSymbol('')).toEqual('')
     })
   })
