@@ -2,7 +2,7 @@ import React, { useRef, useCallback } from 'react'
 
 import BigNumber from 'bignumber.js'
 
-import { Maybe, FixmeType } from '../../../../types/asgardex'
+import { Maybe, FixmeType } from '../../../../types/asgardex.d'
 import CoinInputAdvanced from '../../coins/coinInputAdvanced'
 import { AssetInputWrapper } from './assetInput.style'
 import { AssetInputProps } from './types'
