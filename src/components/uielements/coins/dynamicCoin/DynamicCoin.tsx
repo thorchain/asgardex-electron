@@ -11,7 +11,7 @@ type Props = {
 }
 
 const DynamicCoin: React.FC<Props> = ({ type = 'bnb', size = 'big', className = '' }: Props): JSX.Element => {
-  const numbers: string[] = getIntFromName(type)
+  const numbers = getIntFromName(type)
   const startCol = rainbowStop(numbers[0])
   const stopCol = rainbowStop(numbers[1])
   const coinName = type.length > 4 ? type.substr(0, 4) : type

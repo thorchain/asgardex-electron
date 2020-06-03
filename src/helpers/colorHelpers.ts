@@ -1,20 +1,12 @@
-export const rainbowStop = (val: string) => {
-  const h: number = parseFloat(val)
+export const rainbowStop = (h: number) => {
   const f = (n: number, k = (n + h * 12) % 12) => 0.5 - 0.5 * Math.max(Math.min(k - 3, 9 - k, 1), -1)
-  return rgb2hex(f(0), f(8), f(4))
+  return rgb2hex(f(0) * 255, f(8) * 255, f(4) * 255)
 }
 
 export const rgb2hex = (r: number, g: number, b: number) =>
-  '#' +
-  [r, g, b]
-    .map((x) =>
-      Math.round(x * 255)
-        .toString(16)
-        .padStart(2, '0')
-    )
-    .join('')
+  `#${((r << 16) + (g << 8) + b).toString(16).padStart(6, '0')}`
 
-export const getIntFromName = (str: string): string[] => {
+export const getIntFromName = (str: string): number[] => {
   const inputStr = String(str).toUpperCase()
 
   const div = 22
@@ -22,5 +14,5 @@ export const getIntFromName = (str: string): string[] => {
   const firstInt = (inputStr.charCodeAt(0) - 'A'.charCodeAt(0)) / div
   const secondInt = inputStr.length > 1 ? (inputStr.charCodeAt(1) - 'A'.charCodeAt(0)) / div : 0
 
-  return [firstInt.toFixed(2), secondInt.toFixed(2)]
+  return [Number(firstInt.toFixed(2)), Number(secondInt.toFixed(2))]
 }
