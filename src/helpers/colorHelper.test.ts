@@ -18,11 +18,11 @@ describe('colorHelper', () => {
   })
 
   describe('getIntFromName', () => {
-    it('should return a valid value', () => {
+    it('returns a valid value for RUNE (uppercase)', () => {
       const result = getIntFromName('RUNE')
       expect(result).toEqual([0.77, 0.91])
     })
-    it('should return a valid value', () => {
+    it('returns a valid value for rune (lowercase)', () => {
       const result = getIntFromName('rune')
       expect(result).toEqual([0.77, 0.91])
     })
