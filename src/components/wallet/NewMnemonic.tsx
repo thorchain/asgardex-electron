@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Card, Tag, Typography } from 'antd'
+
 const { Paragraph, Text } = Typography
 
 const NewMnemonic: React.FC<{ mnemonic: string }> = ({ mnemonic }): JSX.Element => {

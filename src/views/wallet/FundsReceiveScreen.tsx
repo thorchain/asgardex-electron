@@ -5,6 +5,7 @@ import { Row, Col, Typography, Card, Button } from 'antd'
 import QRCode from 'qrcode'
 
 import AccountSelector from '../../components/wallet/AccountSelector'
+
 const { Title, Text } = Typography
 
 // Dummmy data
