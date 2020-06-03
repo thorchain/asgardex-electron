@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react'
 
+import theme from '@thorchain/asgardex-theme'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 
 import useInterval, { INACTIVE_INTERVAL } from '../../../hooks/useInterval'
@@ -106,10 +107,10 @@ const TxTimer: React.FC<Props> = (props): JSX.Element => {
           strokeWidth={7}
           counterClockwise
           styles={buildStyles({
-            textColor: '#23DCC8',
+            textColor: theme.dark.palette.primary,
             textSize: '14px',
-            pathColor: '#23DCC8',
-            trailColor: '#F3F4F4',
+            pathColor: theme.dark.palette.primary,
+            trailColor: theme.dark.palette.background[2],
             pathTransition: 'stroke-dashoffset 0.5s linear 0s'
           })}
         />
