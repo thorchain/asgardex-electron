@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 
-import { Grid } from 'antd'
+import Text from 'antd/lib/typography/Text'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 import { palette } from 'styled-theme'
@@ -12,15 +12,15 @@ import { HeaderSettingsWrapper } from './HeaderSettings.style'
 
 type Props = {
   onPress?: () => void
+  isDesktopView: boolean
 }
 
 const HeaderSettings: React.FC<Props> = (props: Props): JSX.Element => {
-  const { onPress = () => {} } = props
+  const { onPress = () => {}, isDesktopView } = props
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
   const iconStyle = { fontSize: '1.5em', marginLeft: '20px' }
-  const isDesktopView = Grid.useBreakpoint().lg
 
   const history = useHistory()
   const clickSettingsHandler = useCallback(() => {
@@ -30,7 +30,7 @@ const HeaderSettings: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <HeaderSettingsWrapper onClick={() => clickSettingsHandler()}>
-      {!isDesktopView && 'SETTINGS'}
+      {!isDesktopView && <Text style={{ color }}>SETTINGS</Text>}
       <SettingsIcon style={{ color, ...iconStyle }} />
     </HeaderSettingsWrapper>
   )
