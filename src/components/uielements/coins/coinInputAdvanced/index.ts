@@ -1,3 +1,3 @@
-import { CoinInputAdvanced } from './coinInputAdvanced'
+import { CoinInputAdvanced } from './CoinInputAdvanced'
 
 export default CoinInputAdvanced
