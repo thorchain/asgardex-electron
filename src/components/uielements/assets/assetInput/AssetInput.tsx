@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js'
 
 import { Maybe, FixmeType } from '../../../../types/asgardex.d'
 import CoinInputAdvanced from '../../coins/coinInputAdvanced'
-import { AssetInputWrapper } from './assetInput.style'
+import { AssetInputWrapper } from './AssetInput.style'
 import { AssetInputProps } from './types'
 
 type Props = {
@@ -30,7 +30,7 @@ const AssetInput: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   const handleClickWrapper = useCallback(() => {
-    inputRef.current.firstChild.focus()
+    inputRef.current?.firstChild?.focus()
   }, [])
 
   return (

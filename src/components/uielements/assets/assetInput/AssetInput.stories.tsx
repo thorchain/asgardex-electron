@@ -1,9 +1,9 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { tokenAmount } from '@thorchain/asgardex-token'
+import { bn } from '@thorchain/asgardex-util'
 
-import AssetInput from './assetInput'
+import AssetInput from './AssetInput'
 
 storiesOf('Components/Assets/AssetInput', module).add('default', () => {
   return (
@@ -11,7 +11,7 @@ storiesOf('Components/Assets/AssetInput', module).add('default', () => {
       <AssetInput
         title="swap amount"
         status="slip 2%"
-        amount={tokenAmount(12345).amount()}
+        amount={bn(12345)}
         label="$usd 217.29"
         onChange={(value) => {
           console.log('value ', value.toString())

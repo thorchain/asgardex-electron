@@ -3,7 +3,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { BigNumber } from 'bignumber.js'
 
-import { CoinInputAdvanced } from './coinInputAdvanced'
+import { CoinInputAdvanced } from './CoinInputAdvanced'
 
 function RenderCoinCardInput() {
   const [value, setValue] = React.useState(1002.34)

@@ -5,7 +5,7 @@ import { SizeType } from 'antd/lib/config-provider/SizeContext'
 import BigNumber from 'bignumber.js'
 
 import { emptyString } from '../../../../helpers/stringHelper'
-import { CoinInputAdvancedView } from './coinInputAdvanced.style'
+import { CoinInputAdvancedView } from './CoinInputAdvanced.style'
 
 const formatNumber = (value: string, minimumFractionDigits: number) => {
   return Number(value || 0).toLocaleString(undefined, {

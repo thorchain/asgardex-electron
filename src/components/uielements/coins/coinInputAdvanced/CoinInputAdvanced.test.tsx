@@ -3,7 +3,7 @@ import { bn } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
 import { FixmeType } from '../../../../types/asgardex.d'
-import { useCoinCardInputBehaviour, isBroadcastable } from './coinInputAdvanced'
+import { useCoinCardInputBehaviour, isBroadcastable } from './CoinInputAdvanced'
 
 // Unit testing is really required to ensure a complex component
 // like this actually works as expected.
