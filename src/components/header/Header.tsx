@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
 
 import { Row, Col, Tabs, Grid } from 'antd'
 import { useObservableState } from 'observable-hooks'
 import { useRouteMatch, Link } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { palette, size } from 'styled-theme'
 
 import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
@@ -40,6 +41,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
   const isDesktopView = Grid.useBreakpoint().lg
+  const history = useHistory()
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible)
@@ -103,6 +105,13 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     [items]
   )
 
+  const clickSettingsHandler = useCallback(() => {
+    if (!isDesktopView) {
+      closeMenu()
+    }
+    history.push(walletRoutes.settings.path())
+  }, [history, isDesktopView])
+
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
@@ -126,7 +135,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               <Col>
                 <Row align="middle">
                   <HeaderTheme />
-                  <HeaderSettings />
+                  <HeaderSettings onPress={clickSettingsHandler} />
                   <HeaderLock />
                   <HeaderLang />
                 </Row>
@@ -171,7 +180,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               <HeaderLock onPress={() => closeMenu()} />
             </HeaderDrawerItem>
             <HeaderDrawerItem>
-              <HeaderSettings onPress={() => closeMenu()} />
+              <HeaderSettings onPress={clickSettingsHandler} />
             </HeaderDrawerItem>
             <HeaderDrawerItem>
               <HeaderLang />

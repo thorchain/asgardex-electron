@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo } from 'react'
 
 import { Grid } from 'antd'
 import { useObservableState } from 'observable-hooks'
@@ -20,13 +20,10 @@ const HeaderLock: React.FC<Props> = (props: Props): JSX.Element => {
   const iconStyle = { fontSize: '1.5em', marginLeft: '20px' }
   const isDesktopView = Grid.useBreakpoint().lg
 
-  const clickHandler = useCallback(() => {
-    // has to be implemented
-    onPress()
-  }, [onPress])
+  const clickHandler = (_: React.MouseEvent) => onPress()
 
   return (
-    <HeaderLockWrapper onClick={() => clickHandler()}>
+    <HeaderLockWrapper onClick={clickHandler}>
       {!isDesktopView && 'LOCK WALLET'}
       <SettingsIcon style={{ color, ...iconStyle }} />
     </HeaderLockWrapper>

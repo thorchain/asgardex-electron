@@ -2433,9 +2433,9 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-7.2.1.tgz#2ad4e844175a3738cb9e7064be5ea070b8863a1c"
   integrity sha512-oZ0Ib5I4Z2pUEcoo95cT1cr6slco9WY7yiPpG+RGNkj8YcYgJnM7pXmYmorNOReh8MIGcKSqXyeGjxnr8YiZbA==
 
-"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#03ce1dfa3ae1c8f0a8a8c650d4b5abb12687bb11":
+"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#21ab061366f74aef7836ce98ff38712b0b96bbbf":
   version "1.0.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#03ce1dfa3ae1c8f0a8a8c650d4b5abb12687bb11"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#21ab061366f74aef7836ce98ff38712b0b96bbbf"
 
 "@thorchain/asgardex-theme@^0.1.0":
   version "0.1.0"
