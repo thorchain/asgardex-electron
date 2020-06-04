@@ -61,27 +61,25 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
   return (
     <HeaderLangWrapper>
       <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
-        {/* `ant-dropdown-link` does need a height to give dropdown content an offset - dont't remove it! */}
-        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <a className="ant-dropdown-link" style={{ height: '40px' }} onClick={(e) => e.preventDefault()}>
-          <Row
-            style={{
-              justifyContent: 'space-between',
-              paddingLeft: '15px',
-              paddingRight: '15px',
-              height: '60px',
-              alignItems: 'center',
-              width: '100%'
-            }}>
-            {!isDesktopView && <Text style={{ color }}>LANGUAGE</Text>}
-            <Row style={{ alignItems: 'center' }}>
-              <Text strong style={itemStyle}>
-                {currentLocale?.toUpperCase()}
-              </Text>
-              <DownIcon />
-            </Row>
+        {/* No need to have an anchor here */}
+        <Row
+          style={{
+            justifyContent: 'space-between',
+            paddingLeft: '15px',
+            paddingRight: '15px',
+            height: '60px',
+            alignItems: 'center',
+            width: '100%',
+            cursor: 'pointer'
+          }}>
+          {!isDesktopView && <Text style={{ color }}>LANGUAGE</Text>}
+          <Row style={{ alignItems: 'center' }}>
+            <Text strong style={itemStyle}>
+              {currentLocale?.toUpperCase()}
+            </Text>
+            <DownIcon />
           </Row>
-        </a>
+        </Row>
       </Dropdown>
     </HeaderLangWrapper>
   )
