@@ -40,8 +40,8 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const [menuVisible, setMenuVisible] = useState(false)
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
-  const isDesktopView = Grid.useBreakpoint().lg
   const history = useHistory()
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible)
@@ -134,10 +134,10 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               </Col>
               <Col>
                 <Row align="middle">
-                  <HeaderTheme />
-                  <HeaderSettings onPress={clickSettingsHandler} />
-                  <HeaderLock />
-                  <HeaderLang />
+                  <HeaderTheme isDesktopView={isDesktopView} />
+                  <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} />
+                  <HeaderLock isDesktopView={isDesktopView} />
+                  <HeaderLang isDesktopView={isDesktopView} />
                 </Row>
               </Col>
             </>
@@ -174,16 +174,16 @@ const Header: React.FC<Props> = (_): JSX.Element => {
             key="top">
             {links}
             <HeaderDrawerItem>
-              <HeaderTheme />
+              <HeaderTheme isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
             <HeaderDrawerItem>
-              <HeaderLock onPress={() => closeMenu()} />
+              <HeaderLock onPress={() => closeMenu()} isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
             <HeaderDrawerItem>
-              <HeaderSettings onPress={clickSettingsHandler} />
+              <HeaderSettings onPress={clickSettingsHandler} isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
             <HeaderDrawerItem>
-              <HeaderLang />
+              <HeaderLang isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
             <HeaderNetStatus />
           </HeaderDrawer>

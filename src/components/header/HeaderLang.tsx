@@ -1,7 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 
 import { Row, Dropdown } from 'antd'
-import { Grid } from 'antd'
 import { ClickParam } from 'antd/lib/menu'
 import Text from 'antd/lib/typography/Text'
 import { useObservableState } from 'observable-hooks'
@@ -15,15 +14,17 @@ import { Locale } from '../../i18n/types'
 import Menu from '../shared/Menu'
 import { HeaderLangWrapper } from './HeaderLang.style'
 
-type Props = {}
+type Props = {
+  isDesktopView: boolean
+}
 
-const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
+const HeaderLang: React.FC<Props> = (props: Props): JSX.Element => {
+  const { isDesktopView } = props
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
 
   const { changeLocale, locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$)
-  const isDesktopView = Grid.useBreakpoint().lg
 
   const changeLang = useCallback(
     ({ key }: ClickParam) => {
