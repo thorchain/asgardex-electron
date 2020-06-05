@@ -1,51 +1,32 @@
 import React, { useState, useCallback } from 'react'
 
-import { crypto } from '@binance-chain/javascript-sdk'
-import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
-import { delay } from '@thorchain/asgardex-util'
+import { Client as BinanceClient } from '@thorchain/asgardex-binance'
 import { Form, Input, Button } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 
-const NewMnemonicGenerate: React.FC<{ mnemonic: string }> = ({ mnemonic }): JSX.Element => {
+type Props = {}
+const NewMnemonicGenerate: React.FC<Props> = (_: Props): JSX.Element => {
   const [loadingMsg, setLoadingMsg] = useState<string>('')
 
-  const createMnemonicWallet = (mnemonic: string, password: string) => {
-    if (!localStorage.getItem('keystore')) {
-      const privKey: string = crypto.getPrivateKeyFromMnemonic(mnemonic)
-      const keystore: KeyStore = crypto.generateKeyStore(privKey, password)
-      // TODO: dynamically set network for client, default is testnet
-      const address: string = crypto.getAddressFromPrivateKey(privKey)
-      // Temporary store during development
-      localStorage.setItem('address', address)
-      localStorage.setItem('keystore', JSON.stringify(keystore))
-    } else {
-      throw Error('keystore already exists')
-    }
+  const createMnemonicWallet = () => {
+    const phrase = BinanceClient.generatePhrase()
+    // TODO (@Veado) Extract this into helper
+    localStorage.setItem('phrase', phrase)
   }
-  const handleFormFinish = useCallback(
-    async (vals: Store) => {
-      await delay(200)
-      try {
-        setLoadingMsg('Creating wallet...')
-        createMnemonicWallet(mnemonic, vals.password)
-      } catch (err) {
-        setLoadingMsg('')
-        console.log(err)
-      }
-    },
-    [mnemonic]
-  )
+
+  const handleFormFinish = useCallback(async (_: Store) => {
+    try {
+      setLoadingMsg('Creating wallet...')
+      createMnemonicWallet()
+    } catch (err) {
+      setLoadingMsg('')
+    }
+  }, [])
+
   return (
     <>
       <h1>Generate the new mnemonic wallet</h1>
       <Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>
-        <Form.Item
-          name="password"
-          label="New Password"
-          rules={[{ required: true }]}
-          validateTrigger={['onSubmit', 'onChange']}>
-          <Input size="large" type="password" />
-        </Form.Item>
         <Form.Item
           name="repeatPassword"
           label="Repeat Password"

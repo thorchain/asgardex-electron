@@ -3,6 +3,6 @@
     "dbaeumer.vscode-eslint",
     "EditorConfig.EditorConfig",
     "esbenp.prettier-vscode",
-    "styled-components.vscode-styled-components"
+    "jpoissonnier.vscode-styled-components"
   ]
 }

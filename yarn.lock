@@ -2448,9 +2448,9 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-7.2.1.tgz#2ad4e844175a3738cb9e7064be5ea070b8863a1c"
   integrity sha512-oZ0Ib5I4Z2pUEcoo95cT1cr6slco9WY7yiPpG+RGNkj8YcYgJnM7pXmYmorNOReh8MIGcKSqXyeGjxnr8YiZbA==
 
-"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#03ce1dfa3ae1c8f0a8a8c650d4b5abb12687bb11":
+"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#1612a8ec92ec66603b5dce819b01e6cd635e1035":
   version "1.0.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#03ce1dfa3ae1c8f0a8a8c650d4b5abb12687bb11"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#1612a8ec92ec66603b5dce819b01e6cd635e1035"
 
 "@thorchain/asgardex-theme@^0.1.0":
   version "0.1.0"
@@ -2466,15 +2466,15 @@
   dependencies:
     "@thorchain/asgardex-util" "^0.1.1"
 
-"@thorchain/asgardex-util@^0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.1.3.tgz#66e0e79dc45b0176ab7aad3b7f27453d1c13c684"
-  integrity sha512-wTck5pfRNfPkVQ5CnssINSBG2/Mw4Q5fmGIlHhrRo+ycuSL5XjNDOt7bYJW6RBf/iEegtyi0qKPq1yuvI8ywmg==
-
 "@thorchain/asgardex-util@^0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.1.1.tgz#f54b606719ef06889305ea54a697195ce2d943b6"
   integrity sha512-d76kkbXCF1B/LhLP7Jpy5LJ/bx5yufuRcl+rn2ZvcxiuToBU1KjDJi2sIVlX7Nk/OALWuz1yM/oJuL15dDYJRA==
+
+"@thorchain/asgardex-util@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.1.3.tgz#66e0e79dc45b0176ab7aad3b7f27453d1c13c684"
+  integrity sha512-wTck5pfRNfPkVQ5CnssINSBG2/Mw4Q5fmGIlHhrRo+ycuSL5XjNDOt7bYJW6RBf/iEegtyi0qKPq1yuvI8ywmg==
 
 "@thorchain/byzantine-module@^0.1.1":
   version "0.1.1"

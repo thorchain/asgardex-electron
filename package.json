@@ -54,7 +54,7 @@
     "@craco/craco": "^5.6.4",
     "@devexperts/remote-data-ts": "^2.0.3",
     "@openapitools/openapi-generator-cli": "^1.0.13-4.3.1",
-    "@thorchain/asgardex-binance": "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#03ce1dfa3ae1c8f0a8a8c650d4b5abb12687bb11",
+    "@thorchain/asgardex-binance": "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#1612a8ec92ec66603b5dce819b01e6cd635e1035",
     "@thorchain/asgardex-theme": "^0.1.0",
     "@thorchain/asgardex-token": "^0.1.0",
     "@thorchain/asgardex-util": "^0.1.3",
