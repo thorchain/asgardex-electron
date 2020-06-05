@@ -70,7 +70,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
       key: 'pool',
       title: 'pool',
       dataIndex: 'pool',
-      render: ({ target }: { asset: string; target: string }) => <Coin type="rune" over={target} size="big" />
+      render: ({ target }: { asset: string; target: string }) => <Coin type="rune" over={target} />
     },
     {
       key: 'asset',
@@ -150,7 +150,6 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const renderPools = useMemo(
     () => (
       <>
-        <h3>Pools</h3>
         {RD.fold(
           // initial state
           () => renderTable([]),
@@ -172,12 +171,8 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   return (
     <View>
-      <h1>Pools overview</h1>
+      <h1>AVAILABLE POOLS</h1>
       {renderPools}
-      <Button onClick={() => clickSwapHandler({ source: 'rune', target: 'bnb' })}>Swap RUNE -&gt; BNB</Button>
-      <Button onClick={() => clickSwapHandler({ source: 'rune', target: 'tusdb' })}>Swap RUNE -&gt; TUSDB</Button>
-      <Button onClick={() => clickStakeHandler('BNB')}>Stake BNB</Button>
-      <Button onClick={() => clickStakeHandler('TUSDB-000')}>Stake TUSDB</Button>
     </View>
   )
 }
