@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 
-import { Grid } from 'antd'
 import { useObservableState } from 'observable-hooks'
 import { palette } from 'styled-theme'
 
@@ -10,15 +9,15 @@ import { HeaderThemeWrapper } from './HeaderTheme.style'
 
 type Props = {
   onPress?: () => void
+  isDesktopView: boolean
 }
 
 const HeaderTheme: React.FC<Props> = (props: Props): JSX.Element => {
-  const { onPress = () => {} } = props
+  const { onPress = () => {}, isDesktopView } = props
   const { toggleTheme, theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
   const iconStyle = { fontSize: '1.5em', marginLeft: '20px' }
-  const isDesktopView = Grid.useBreakpoint().lg
 
   const clickSwitchThemeHandler = () => {
     toggleTheme()

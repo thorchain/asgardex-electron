@@ -7,6 +7,20 @@ export const base: Route<void> = {
   }
 }
 
+export const imports: Route<void> = {
+  template: `${base.template}/imports`,
+  path() {
+    return this.template
+  }
+}
+
+export const create: Route<void> = {
+  template: `${base.template}/create`,
+  path() {
+    return this.template
+  }
+}
+
 export const settings: Route<void> = {
   template: `${base.template}/settings`,
   path() {

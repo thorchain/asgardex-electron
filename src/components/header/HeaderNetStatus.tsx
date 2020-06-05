@@ -92,8 +92,6 @@ const HeaderNetStatus: React.FC<Props> = (_: Props): JSX.Element => {
     )
   }, [menuItems, theme])
 
-  type RootItemProps = { children: React.ReactNode }
-
   const menuMobile = menuItems.map((item, i) => {
     const { label, key, url } = item
     const color = palette('text', 0)({ theme })
