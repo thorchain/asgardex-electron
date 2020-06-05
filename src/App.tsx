@@ -11,6 +11,7 @@ import { ConnectionProvider } from './contexts/ConnectionContext'
 import { I18nProvider } from './contexts/I18nContext'
 import { MidgardProvider } from './contexts/MidgardContext'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { WalletProvider } from './contexts/WalletContext'
 import GlobalStyle from './Global.style'
 import { envOrDefault } from './helpers/envHelper'
 import ViewRoutes from './views/ViewRoutes'
@@ -37,13 +38,15 @@ const App: React.FC<Props> = (_): JSX.Element => {
     <ConnectionProvider>
       <BinanceProvider>
         <MidgardProvider>
-          <I18nProvider>
-            <Router>
-              <ThemeProvider>
-                <AppView />
-              </ThemeProvider>
-            </Router>
-          </I18nProvider>
+          <WalletProvider>
+            <I18nProvider>
+              <Router>
+                <ThemeProvider>
+                  <AppView />
+                </ThemeProvider>
+              </Router>
+            </I18nProvider>
+          </WalletProvider>
         </MidgardProvider>
       </BinanceProvider>
     </ConnectionProvider>

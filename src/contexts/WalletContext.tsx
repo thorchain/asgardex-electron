@@ -1,11 +1,14 @@
 import React, { createContext, useContext } from 'react'
 
+import { phrase } from '../services/wallet/service'
+import { PhraseService } from '../services/wallet/types'
+
 type WalletContextValue = {
-  phrase: string
+  phrase: PhraseService
 }
 
 const initialContext: WalletContextValue = {
-  phrase: ''
+  phrase
 }
 const WalletContext = createContext<WalletContextValue | null>(null)
 
