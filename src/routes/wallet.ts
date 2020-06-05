@@ -14,6 +14,13 @@ export const imports: Route<void> = {
   }
 }
 
+export const locked: Route<void> = {
+  template: `${base.template}/locked`,
+  path() {
+    return this.template
+  }
+}
+
 export const create: Route<void> = {
   template: `${base.template}/create`,
   path() {

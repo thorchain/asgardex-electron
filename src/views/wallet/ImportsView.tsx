@@ -4,7 +4,6 @@ import { Tabs, Button } from 'antd'
 import { useHistory } from 'react-router-dom'
 
 import ImportPhrase from '../../components/wallet/ImportPhrase'
-import View from '../View'
 
 enum TabKey {
   PHRASE = 'phrase',
@@ -17,7 +16,7 @@ type Tab = {
   content: React.ReactNode
 }
 
-const WalletCreate: React.FC = (): JSX.Element => {
+const ImportsView: React.FC = (): JSX.Element => {
   const history = useHistory()
 
   const clickHandler = () => {
@@ -37,13 +36,13 @@ const WalletCreate: React.FC = (): JSX.Element => {
   )
 
   return (
-    <View>
+    <>
       <Button onClick={clickHandler}>Back</Button>
       <h1>Import Existing Wallet</h1>
       <Tabs activeKey={TabKey.PHRASE} size="large">
         {tabs}
       </Tabs>
-    </View>
+    </>
   )
 }
-export default WalletCreate
+export default ImportsView

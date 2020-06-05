@@ -33,6 +33,7 @@ export const HeaderContainer = styled(Layout.Header)`
   /* Make sure following id's are defined in svg */
   #theme_switch_icon,
   #lock_icon,
+  #unlock_icon,
   #settings_icon {
     cursor: pointer;
   }

@@ -7,5 +7,6 @@ import HeaderLock from './HeaderLock'
 
 storiesOf('Components/HeaderLock', module).add('desktop / mobile', () => {
   const isDesktopView = boolean('isDesktopView', false)
-  return <HeaderLock isDesktopView={isDesktopView} />
+  const isLocked = boolean('isLocked', false)
+  return <HeaderLock isDesktopView={isDesktopView} isLocked={isLocked} />
 })
