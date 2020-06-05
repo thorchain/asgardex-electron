@@ -43,7 +43,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
 
-  const { isLocked$, lock, unlock } = useWalletContext()
+  const { isLocked$, lock } = useWalletContext()
   const isLocked = useObservableState(isLocked$)
 
   const [menuVisible, setMenuVisible] = useState(false)
@@ -120,14 +120,13 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   }, [closeMenu, history])
 
   const clickLockHandler = useCallback(() => {
-    // toggle wallets lock state
-    if (isLocked) {
-      unlock()
-    } else {
+    // lock if needed
+    if (!isLocked) {
       lock()
     }
+    history.push(walletRoutes.locked.path())
     closeMenu()
-  }, [closeMenu, isLocked, lock, unlock])
+  }, [closeMenu, history, isLocked, lock])
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
