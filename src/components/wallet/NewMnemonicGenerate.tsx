@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react'
 
 import { Client as BinanceClient } from '@thorchain/asgardex-binance'
-import { delay } from '@thorchain/asgardex-util'
 import { Form, Input, Button } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 
@@ -16,7 +15,6 @@ const NewMnemonicGenerate: React.FC<Props> = (_: Props): JSX.Element => {
   }
 
   const handleFormFinish = useCallback(async (_: Store) => {
-    await delay(200)
     try {
       setLoadingMsg('Creating wallet...')
       createMnemonicWallet()
