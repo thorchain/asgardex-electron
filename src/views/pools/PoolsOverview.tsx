@@ -8,7 +8,7 @@ import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
 import Button from '../../components/uielements/button'
-import CoinPair from '../../components/uielements/coins/coinPair'
+import Coin from '../../components/uielements/coins/coin'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -70,7 +70,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
       key: 'pool',
       title: 'pool',
       dataIndex: 'pool',
-      render: ({ asset, target }: { asset: string; target: string }) => <CoinPair from={asset} to={target} />
+      render: ({ target }: { asset: string; target: string }) => <Coin type="rune" over={target} size="big" />
     },
     {
       key: 'asset',
