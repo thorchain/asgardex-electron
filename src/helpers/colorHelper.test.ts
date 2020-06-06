@@ -37,5 +37,9 @@ describe('colorHelper', () => {
       const result = rainbowStop(0.3)
       expect(result).toEqual('#33ff00')
     })
+    it('hex of something pink like color', () => {
+      const result = rainbowStop(0.86)
+      expect(result).toEqual('#ff00d6')
+    })
   })
 })
