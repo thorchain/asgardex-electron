@@ -1,8 +1,8 @@
 import { baseAmount, formatBaseAsTokenAmount } from '@thorchain/asgardex-token'
 import { validBNOrZero, bn } from '@thorchain/asgardex-util'
 
-import { getAssetFromString } from '../../helpers/tokenHelpers'
 import { PriceDataIndex } from '../../services/midgard/types'
+import { getAssetFromString } from '../../services/midgard/utils'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PoolDataType } from './types'
 
