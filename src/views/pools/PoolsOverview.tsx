@@ -12,7 +12,7 @@ import Coin from '../../components/uielements/coins/coin'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { getAssetFromString } from '../../helpers/tokenHelpers'
+import { getPoolViewData } from '../../helpers/poolHelper'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
@@ -20,7 +20,6 @@ import { PoolsState } from '../../services/midgard/types'
 import View from '../View'
 import { ActionColumn, TableAction } from './PoolsOverview.style'
 import { PoolRowType } from './types'
-import { getPoolData } from './utils'
 
 type Props = {}
 
@@ -126,19 +125,6 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     },
     btnCol
   ]
-
-  const getPoolViewData = (pools: PoolsState): PoolRowType[] => {
-    const { poolDetails, priceIndex } = pools
-
-    const poolViewData = Object.keys(poolDetails).map((poolName: string) => {
-      const poolData = poolDetails[poolName]
-      const { symbol = '' } = getAssetFromString(poolName)
-
-      return { ...getPoolData(symbol, poolData, priceIndex, 'RUNE'), key: poolName }
-    })
-
-    return poolViewData
-  }
 
   const renderTable = useCallback(
     (tableData: PoolRowType[], loading = false) => (
