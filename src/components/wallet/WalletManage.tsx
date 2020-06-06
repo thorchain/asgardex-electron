@@ -4,6 +4,7 @@ import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
 import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
 
+import { useWalletContext } from '../../contexts/WalletContext'
 import { UserAccountType } from '../../types/wallet'
 
 const { Title, Text, Paragraph } = Typography
@@ -43,6 +44,9 @@ const WalletManage: React.FC = (): JSX.Element => {
   const [network, setNetwork] = useState<string | null>()
   const [chainId, setChainId] = useState<string | null>()
   const [address, setAddress] = useState<string | null>('')
+
+  const { lock, phrase } = useWalletContext()
+
   async function setData() {
     const key: string | null = localStorage.getItem('keystore')
     if (key) {
@@ -61,11 +65,15 @@ const WalletManage: React.FC = (): JSX.Element => {
     const keystring: string = localStorage.getItem('keystore') || ''
     return 'data:text/plain;charset=utf-8,' + encodeURIComponent(keystring)
   }, [])
+
+  const lockWallet = useCallback(() => {
+    lock()
+  }, [lock])
+
   const removeWallet = useCallback(() => {
-    console.log('removing wallet...')
-    localStorage.removeItem('keystore')
-    localStorage.removeItem('address')
-  }, [])
+    phrase.remove()
+  }, [phrase])
+
   return (
     <Row gutter={[16, 16]}>
       <Col span={12}>
@@ -82,7 +90,7 @@ const WalletManage: React.FC = (): JSX.Element => {
             </Col>
             <Col span={12}>
               <Card bordered={false}>
-                <Button type="ghost" shape="round" block>
+                <Button type="ghost" shape="round" block onClick={lockWallet}>
                   Lock Wallet
                 </Button>
               </Card>

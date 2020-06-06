@@ -1,5 +1,7 @@
 import * as Rx from 'rxjs'
+import { map } from 'rxjs/operators'
 
+import { Nothing, Maybe } from '../../types/asgardex.d'
 import { Phrase, PhraseService } from './types'
 
 // Important note:
@@ -9,9 +11,9 @@ import { Phrase, PhraseService } from './types'
 
 const PHRASE_KEY = 'asgdx-phrase'
 
-const initialPhrase = localStorage.getItem(PHRASE_KEY) || ''
+const initialPhrase = localStorage.getItem(PHRASE_KEY) || Nothing
 
-const phrase$$ = new Rx.BehaviorSubject(initialPhrase)
+const phrase$$ = new Rx.BehaviorSubject<Maybe<Phrase>>(initialPhrase)
 
 const addPhrase = (p: Phrase) => {
   localStorage.setItem(PHRASE_KEY, p)
@@ -20,7 +22,7 @@ const addPhrase = (p: Phrase) => {
 
 const removePhrase = () => {
   localStorage.removeItem(PHRASE_KEY)
-  phrase$$.next('')
+  phrase$$.next(Nothing)
 }
 
 export const phrase: PhraseService = {
@@ -28,3 +30,11 @@ export const phrase: PhraseService = {
   remove: removePhrase,
   current$: phrase$$.asObservable()
 }
+
+const locked$$ = new Rx.BehaviorSubject(false)
+const locked$ = locked$$.asObservable()
+
+export const isLocked$ = locked$.pipe(map((value) => !!value))
+
+export const lock = () => locked$$.next(true)
+export const unlock = () => locked$$.next(false)

@@ -1,14 +1,22 @@
 import React, { createContext, useContext } from 'react'
 
-import { phrase } from '../services/wallet/service'
+import { Observable } from 'rxjs'
+
+import { phrase, lock, unlock, isLocked$ } from '../services/wallet/service'
 import { PhraseService } from '../services/wallet/types'
 
 type WalletContextValue = {
   phrase: PhraseService
+  isLocked$: Observable<boolean>
+  lock: () => void
+  unlock: () => void
 }
 
 const initialContext: WalletContextValue = {
-  phrase
+  phrase,
+  isLocked$,
+  lock,
+  unlock
 }
 const WalletContext = createContext<WalletContextValue | null>(null)
 

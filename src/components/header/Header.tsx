@@ -12,6 +12,7 @@ import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
 import { useThemeContext } from '../../contexts/ThemeContext'
+import { useWalletContext } from '../../contexts/WalletContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
@@ -37,19 +38,27 @@ type Tab = {
 type Props = {}
 
 const Header: React.FC<Props> = (_): JSX.Element => {
-  const [menuVisible, setMenuVisible] = useState(false)
+  const history = useHistory()
+
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
-  const history = useHistory()
+
+  const { isLocked$, lock } = useWalletContext()
+  const isLocked = useObservableState(isLocked$)
+
+  const [menuVisible, setMenuVisible] = useState(false)
+
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible)
   }
 
-  const closeMenu = () => {
-    setMenuVisible(false)
-  }
+  const closeMenu = useCallback(() => {
+    if (!isDesktopView) {
+      setMenuVisible(false)
+    }
+  }, [isDesktopView])
 
   const matchPoolsRoute = useRouteMatch(poolsRoutes.base.path())
   const matchWalletRoute = useRouteMatch(walletRoutes.base.path())
@@ -102,15 +111,22 @@ const Header: React.FC<Props> = (_): JSX.Element => {
           </HeaderDrawerItem>
         </Link>
       )),
-    [items]
+    [closeMenu, items]
   )
 
   const clickSettingsHandler = useCallback(() => {
-    if (!isDesktopView) {
-      closeMenu()
-    }
+    closeMenu()
     history.push(walletRoutes.settings.path())
-  }, [history, isDesktopView])
+  }, [closeMenu, history])
+
+  const clickLockHandler = useCallback(() => {
+    // lock if needed
+    if (!isLocked) {
+      lock()
+    }
+    history.push(walletRoutes.locked.path())
+    closeMenu()
+  }, [closeMenu, history, isLocked, lock])
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
@@ -135,8 +151,8 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               <Col>
                 <Row align="middle">
                   <HeaderTheme isDesktopView={isDesktopView} />
+                  <HeaderLock isDesktopView={isDesktopView} isLocked={!!isLocked} onPress={clickLockHandler} />
                   <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} />
-                  <HeaderLock isDesktopView={isDesktopView} />
                   <HeaderLang isDesktopView={isDesktopView} />
                 </Row>
               </Col>
@@ -177,7 +193,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               <HeaderTheme isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
             <HeaderDrawerItem>
-              <HeaderLock onPress={() => closeMenu()} isDesktopView={isDesktopView} />
+              <HeaderLock onPress={clickLockHandler} isLocked={!!isLocked} isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
             <HeaderDrawerItem>
               <HeaderSettings onPress={clickSettingsHandler} isDesktopView={isDesktopView} />
