@@ -1,9 +1,8 @@
 import React from 'react'
 
-import { Layout } from 'antd'
 import { BrowserRouter as Router } from 'react-router-dom'
 
-import { AppWrapper } from './App.style'
+import { AppWrapper, AppLayout } from './App.style'
 import Footer from './components/Footer'
 import Header from './components/header/Header'
 import { BinanceProvider } from './contexts/BinanceContext'
@@ -23,11 +22,11 @@ const AppView: React.FC<Props> = (_): JSX.Element => {
     <>
       <GlobalStyle />
       <AppWrapper>
-        <Layout>
+        <AppLayout>
           <Header />
           <ViewRoutes />
           <Footer commitHash={envOrDefault($COMMIT_HASH, '')}></Footer>
-        </Layout>
+        </AppLayout>
       </AppWrapper>
     </>
   )

@@ -3,15 +3,19 @@ import React, { useCallback, useMemo } from 'react'
 import { SyncOutlined, SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { bn } from '@thorchain/asgardex-util'
+import { Grid, Row } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
+import { palette } from 'styled-theme'
 
+import ErrorView from '../../components/shared/error/ErrorView'
 import Button from '../../components/uielements/button'
 import Coin from '../../components/uielements/coins/coin'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThemeContext } from '../../contexts/ThemeContext'
 import { getPoolViewData } from '../../helpers/poolHelper'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
@@ -27,16 +31,25 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
 
   const { service: midgardService } = useMidgardContext()
-  const pools = useObservableState(midgardService.poolState$, RD.initial)
+  const pools = useObservableState(midgardService.poolState$, RD.pending)
+
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+
+  const { theme$ } = useThemeContext()
+  const theme = useObservableState(theme$)
+
+  const textColor = useMemo(() => palette('text', 0)({ theme }), [theme])
 
   const clickSwapHandler = (p: SwapRouteParams) => {
     history.push(swapRoutes.swap.path(p))
   }
+
   const clickStakeHandler = (asset: string) => {
     history.push(stakeRoutes.stake.path({ asset }))
   }
+
   const btnCol = {
-    key: 'swap',
+    key: 'refresh',
     title: (
       <ActionColumn>
         <Button onClick={() => {}} typevalue="outline">
@@ -45,18 +58,18 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         </Button>
       </ActionColumn>
     ),
-    render: (text: string, record: PoolRowType) => {
+    render: (_: string, record: PoolRowType) => {
       const {
         pool: { asset, target }
       } = record
 
       return (
         <TableAction>
-          <Button round onClick={() => clickStakeHandler(target)} typevalue="outline">
+          <Button round="true" onClick={() => clickStakeHandler(target)} typevalue="outline">
             <PlusOutlined />
             liquidity
           </Button>
-          <Button round onClick={() => clickSwapHandler({ source: asset, target: target })}>
+          <Button round="true" onClick={() => clickSwapHandler({ source: asset, target: target })}>
             <SwapOutlined />
             swap
           </Button>
@@ -64,7 +77,22 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
       )
     }
   }
-  const columns: ColumnsType<PoolRowType> = [
+
+  const mobileColumns: ColumnsType<PoolRowType> = [
+    {
+      key: 'pool',
+      title: 'pool',
+      dataIndex: 'pool',
+      render: ({ target }: { asset: string; target: string }) => (
+        <Row justify="center" align="middle">
+          <Coin type="rune" over={target} />
+        </Row>
+      )
+    },
+    btnCol
+  ]
+
+  const desktopColumns: ColumnsType<PoolRowType> = [
     {
       key: 'pool',
       title: 'pool',
@@ -127,10 +155,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   ]
 
   const renderTable = useCallback(
-    (tableData: PoolRowType[], loading = false) => (
-      <Table columns={columns} dataSource={tableData} loading={loading} rowKey="key" />
-    ),
-    [columns]
+    (tableData: PoolRowType[], loading = false) => {
+      const columns = isDesktopView ? desktopColumns : mobileColumns
+      return <Table columns={columns} dataSource={tableData} loading={loading} rowKey="key" />
+    },
+    [isDesktopView, desktopColumns, mobileColumns]
   )
 
   const renderPools = useMemo(
@@ -138,15 +167,17 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
       <>
         {RD.fold(
           // initial state
-          () => renderTable([]),
+          () => renderTable([], true),
           // loading state
           () => renderTable([], true),
           // error state
-          () => renderTable([]),
+          (error: Error) => {
+            const msg = error?.toString() ?? ''
+            return <ErrorView message={msg} />
+          },
           // success state
           (pools: PoolsState): JSX.Element => {
             const poolViewData = getPoolViewData(pools)
-
             return renderTable(poolViewData)
           }
         )(pools)}
@@ -157,7 +188,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   return (
     <View>
-      <h1>AVAILABLE POOLS</h1>
+      <h1 style={{ color: textColor }}>AVAILABLE POOLS</h1>
       {renderPools}
     </View>
   )

@@ -3,7 +3,7 @@ import React from 'react'
 import { ButtonProps } from 'antd/lib/button'
 
 import { ButtonWrapper } from './button.style'
-import { ButtonColor, ButtonSize, ButtonWeight, ButtonType } from './types'
+import { ButtonColor, ButtonSize, ButtonWeight, ButtonType, ButtonRound } from './types'
 
 type ComponentProps = {
   sizevalue?: ButtonSize
@@ -11,7 +11,7 @@ type ComponentProps = {
   weight?: ButtonWeight
   typevalue?: ButtonType
   focused?: boolean
-  round?: boolean
+  round?: ButtonRound
   className?: string
 }
 
@@ -24,7 +24,7 @@ const Button: React.FC<Props> = (props: Props): JSX.Element => {
     color = 'primary',
     typevalue = 'default',
     weight = '500',
-    round = false,
+    round = 'false',
     focused = false,
     className = '',
     ...otherProps
