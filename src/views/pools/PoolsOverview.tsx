@@ -7,20 +7,20 @@ import { Grid, Row } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
-import { palette } from 'styled-theme'
 
 import ErrorView from '../../components/shared/error/ErrorView'
 import Button from '../../components/uielements/button'
 import Coin from '../../components/uielements/coins/coin'
+import Label from '../../components/uielements/label'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { useThemeContext } from '../../contexts/ThemeContext'
 import { getPoolViewData } from '../../helpers/poolHelper'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { PoolsState } from '../../services/midgard/types'
+import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import View from '../View'
 import { ActionColumn, TableAction } from './PoolsOverview.style'
 import { PoolRowType } from './types'
@@ -34,11 +34,6 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const pools = useObservableState(midgardService.poolState$, RD.pending)
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
-
-  const { theme$ } = useThemeContext()
-  const theme = useObservableState(theme$)
-
-  const textColor = useMemo(() => palette('text', 0)({ theme }), [theme])
 
   const clickSwapHandler = (p: SwapRouteParams) => {
     history.push(swapRoutes.swap.path(p))
@@ -177,7 +172,31 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           },
           // success state
           (pools: PoolsState): JSX.Element => {
-            const poolViewData = getPoolViewData(pools)
+            const poolViewData = getPoolViewData(pools, PoolDetailStatusEnum.Enabled)
+            return renderTable(poolViewData)
+          }
+        )(pools)}
+      </>
+    ),
+    [pools, renderTable]
+  )
+
+  const renderPendingPools = useMemo(
+    () => (
+      <>
+        {RD.fold(
+          // initial state
+          () => renderTable([], true),
+          // loading state
+          () => renderTable([], true),
+          // error state
+          (error: Error) => {
+            const msg = error?.toString() ?? ''
+            return <ErrorView message={msg} />
+          },
+          // success state
+          (pools: PoolsState): JSX.Element => {
+            const poolViewData = getPoolViewData(pools, PoolDetailStatusEnum.Bootstrapped)
             return renderTable(poolViewData)
           }
         )(pools)}
@@ -188,8 +207,15 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   return (
     <View>
-      <h1 style={{ color: textColor }}>AVAILABLE POOLS</h1>
+      <Label size="big" weight="bold" color="normal" textTransform="uppercase">
+        Available Pools
+      </Label>
       {renderPools}
+
+      <Label size="big" weight="bold" color="normal" textTransform="uppercase">
+        Pending Pools
+      </Label>
+      {renderPendingPools}
     </View>
   )
 }

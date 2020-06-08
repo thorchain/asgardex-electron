@@ -3,7 +3,7 @@ import { validBNOrZero, bn } from '@thorchain/asgardex-util'
 
 import { PriceDataIndex } from '../../services/midgard/types'
 import { getAssetFromString } from '../../services/midgard/utils'
-import { PoolDetail } from '../../types/generated/midgard'
+import { PoolDetail, PoolDetailStatusEnum } from '../../types/generated/midgard'
 import { PoolDataType } from './types'
 
 export const getPoolData = (
@@ -32,6 +32,7 @@ export const getPoolData = (
   const slipAsString = slip.toString()
   const trade = bn(poolDetail?.swappingTxCount ?? 0)
   const tradeAsString = trade.toString()
+  const status = poolDetail?.status ?? PoolDetailStatusEnum.Disabled
 
   return {
     pool: {
@@ -44,6 +45,7 @@ export const getPoolData = (
     transaction: transactionAsString,
     slip: slipAsString,
     trade: tradeAsString,
+    status,
     raw: {
       depth,
       volume,
