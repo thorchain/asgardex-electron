@@ -3,7 +3,7 @@ import { ButtonProps } from 'antd/lib/button'
 import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
-import { ButtonColor, ButtonSize, ButtonWeight, ButtonType } from './types'
+import { ButtonColor, ButtonRound, ButtonSize, ButtonWeight, ButtonType } from './types'
 
 const fontSettings = {
   small: {
@@ -181,7 +181,7 @@ const getThemeValue = (color: ButtonColor, typeValue: ButtonType) => {
 }
 
 export type ButtonWrapperProps = {
-  round: boolean
+  round: ButtonRound
   color: ButtonColor
   sizevalue: ButtonSize
   weight: ButtonWeight

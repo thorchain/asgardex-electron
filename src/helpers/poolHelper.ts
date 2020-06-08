@@ -1,3 +1,4 @@
+import { BASE_TOKEN_TICKER } from '../const'
 import { PoolsState } from '../services/midgard/types'
 import { getAssetFromString } from '../services/midgard/utils'
 import { PoolRowType } from '../views/pools/types'
@@ -10,7 +11,7 @@ export const getPoolViewData = (pools: PoolsState): PoolRowType[] => {
     const poolData = poolDetails[poolName]
     const { symbol = '' } = getAssetFromString(poolName)
 
-    return { ...getPoolData(symbol, poolData, priceIndex, 'RUNE'), key: poolName }
+    return { ...getPoolData(symbol, poolData, priceIndex, BASE_TOKEN_TICKER), key: poolName }
   })
 
   return poolViewData

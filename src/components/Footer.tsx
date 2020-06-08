@@ -41,22 +41,22 @@ const Footer: React.FC<Props> = (props: Props): JSX.Element => {
   return (
     <FooterContainer>
       <Row justify="space-between" align="middle">
-        <Col span={24} sm={4}>
-          <Row justify={screens.sm ? 'start' : 'center'}>
+        <Col span={24} md={4}>
+          <Row justify={screens.md ? 'start' : 'center'}>
             <FooterIcon url="https://thorchain.org">
               <ThorChainIcon />
             </FooterIcon>
           </Row>
         </Col>
-        <Col span={24} sm={16}>
+        <Col span={24} md={14}>
           <FooterLinkWrapper justify="center">
             <FooterLink to="/stats">STATS</FooterLink>
             <FooterLink to="/network">NETWORK</FooterLink>
             <FooterLink to="/faqs">FAQS</FooterLink>
           </FooterLinkWrapper>
         </Col>
-        <Col span={24} sm={4}>
-          <Row justify={screens.sm ? 'end' : 'center'}>
+        <Col span={24} md={6}>
+          <Row justify={screens.md ? 'end' : 'center'}>
             <FooterIcon url="https://twitter.com/thorchain_org">
               <TwitterOutlined />
             </FooterIcon>
