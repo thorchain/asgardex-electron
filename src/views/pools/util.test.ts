@@ -1,6 +1,5 @@
 // import { baseAmount } from '@thorchain/asgardex-token'
 import { bn } from '@thorchain/asgardex-util'
-import BigNumber from 'bignumber.js'
 
 import { PriceDataIndex } from '../../services/midgard/types'
 import { PoolDetail, PoolDetailStatusEnum } from '../../types/generated/midgard/models/PoolDetail'
@@ -107,12 +106,12 @@ describe('poolUtil', () => {
         slip: '0',
         trade: '0',
         raw: {
-          depth: new BigNumber(200000),
-          volume: new BigNumber(0),
-          transaction: new BigNumber(0),
-          slip: new BigNumber(0),
-          trade: new BigNumber(0),
-          poolPrice: new BigNumber(2)
+          depth: bn(200000),
+          volume: bn(0),
+          transaction: bn(0),
+          slip: bn(0),
+          trade: bn(0),
+          poolPrice: bn(2)
         }
       }
       const result = getPoolData('RUNE', fsnPoolDetail, priceIndex, 'RUNE')
@@ -147,12 +146,12 @@ describe('poolUtil', () => {
         slip: '50100000',
         trade: '1',
         raw: {
-          depth: new BigNumber(199999799),
-          volume: new BigNumber(0),
-          transaction: new BigNumber(16193),
-          slip: new BigNumber(50100000),
-          trade: new BigNumber(1),
-          poolPrice: new BigNumber(0)
+          depth: bn(199999799),
+          volume: bn(0),
+          transaction: bn(16193),
+          slip: bn(50100000),
+          trade: bn(1),
+          poolPrice: bn(0)
         }
       }
       const result = getPoolData('RUNE', bnbPoolDetail, priceIndex, 'RUNE')
