@@ -1,8 +1,8 @@
 import { bn } from '@thorchain/asgardex-util'
 
-import { ThorchainEndpoint, PoolDetail } from '../../types/generated/midgard'
+import { ThorchainEndpoint } from '../../types/generated/midgard'
 import { PriceDataIndex } from './types'
-import { getAssetFromString, getAssetDetailIndex, getPriceIndex, toPoolDetailsMap } from './utils'
+import { getAssetFromString, getAssetDetailIndex, getPriceIndex } from './utils'
 
 type PoolDataMock = { asset?: string }
 
@@ -89,24 +89,6 @@ describe('services/midgard/utils/', () => {
     it('returns an asset without any values if the passing value is undefined', () => {
       const result = getAssetFromString(undefined)
       expect(result).toEqual({})
-    })
-  })
-
-  describe('toPoolDetailsMap', () => {
-    const bnb: PoolDetail = { asset: 'BNB.BNB' }
-    const tusdb: PoolDetail = { asset: 'BNB.TUSDB-000' }
-    const tcan: PoolDetail = { asset: 'BNB.TCAN-014' }
-    const details = [bnb, tusdb, tcan]
-
-    it('creates a PoolDetailsMap ', () => {
-      const expected = { BNB: bnb, 'TUSDB-000': tusdb, 'TCAN-014': tcan }
-      const result = toPoolDetailsMap(details)
-      expect(result).toEqual(expected)
-    })
-    it('creates an empty PoolDetailsMap from empty details', () => {
-      const expected = {}
-      const result = toPoolDetailsMap([])
-      expect(result).toEqual(expected)
     })
   })
 })

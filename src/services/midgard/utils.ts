@@ -1,7 +1,6 @@
 import { bn } from '@thorchain/asgardex-util'
 
-import { PoolDetail } from '../../types/generated/midgard'
-import { Asset, AssetDetails, AssetDetailMap, PriceDataIndex, PoolDetails, PoolDetailsMap } from './types'
+import { Asset, AssetDetails, AssetDetailMap, PriceDataIndex } from './types'
 
 export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} => {
   let assetDataIndex = {}
@@ -88,17 +87,3 @@ export const getAssetFromString = (s?: string): Asset => {
   }
   return { chain, symbol, ticker }
 }
-
-/**
- * Transforms `PoolDetails` into `PoolDetailsMap`
- */
-export const toPoolDetailsMap = (poolDetails: PoolDetails): PoolDetailsMap =>
-  poolDetails.reduce((acc, poolDetail: PoolDetail) => {
-    const { symbol } = getAssetFromString(poolDetail.asset)
-    return symbol
-      ? {
-          ...acc,
-          [symbol]: poolDetail
-        }
-      : acc
-  }, {} as PoolDetailsMap)

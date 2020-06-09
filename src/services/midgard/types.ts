@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import BigNumber from 'bignumber.js'
 
-import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
+import { AssetDetail, PoolDetail, NetworkInfo } from '../../types/generated/midgard'
 
 export type PoolAsset = string
 export type PoolAssets = string[]
@@ -13,14 +13,6 @@ export type AssetDetailMap = {
 }
 
 export type PoolDetails = PoolDetail[]
-
-/**
- * `PoolDetail[]` transformed as a HashMap
- * Previously `PoolDataMap` in BEPSwap
- */
-export type PoolDetailsMap = {
-  [symbol: string]: PoolDetail
-}
 
 export type PriceDataIndex = {
   [symbol: string]: BigNumber
@@ -37,7 +29,9 @@ export type PoolsState = {
   poolAssets: PoolAssets
   assetDetailIndex: AssetDetailMap
   priceIndex: PriceDataIndex
-  poolDetails: PoolDetailsMap
+  poolDetails: PoolDetails
 }
 
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
+
+export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
