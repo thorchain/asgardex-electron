@@ -27,3 +27,5 @@ export type PoolDataType = {
 }
 
 export type PoolRowType = PoolDataType & { key: number | string }
+
+export type PoolRowTypeList = PoolRowType[]
