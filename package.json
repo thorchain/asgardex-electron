@@ -21,7 +21,7 @@
     "test:e2e": "yarn build && yarn test:cafe",
     "test:cafe": "cross-env NODE_ENV=production testcafe electron:./ ./e2e/**/*.e2e.ts",
     "generate:types": "yarn clean:types:midgard && yarn generate:types:midgard",
-    "generate:types:midgard": "openapi-generator generate -i http://159.89.252.210:8080/v1/swagger.json -g typescript-rxjs -o ./src/types/generated/midgard --reserved-words-mappings in=in",
+    "generate:types:midgard": "openapi-generator generate -i https://midgard.bepswap.com/v1/swagger.json -g typescript-rxjs -o ./src/types/generated/midgard --reserved-words-mappings in=in",
     "clean:types:midgard": "rm -rf ./src/types/generated/midgard",
     "storybook": "start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public"

@@ -45,6 +45,11 @@ export interface StakersAssetData {
      */
     dateFirstStaked?: number;
     /**
+     * @type {number}
+     * @memberof StakersAssetData
+     */
+    heightLastStaked?: number;
+    /**
      * Total value of earnings (in RUNE).
      * @type {string}
      * @memberof StakersAssetData

@@ -54,6 +54,12 @@ export interface NetworkInfo {
      */
     nextChurnHeight?: string;
     /**
+     * The remaining time of pool activation (in seconds)
+     * @type {number}
+     * @memberof NetworkInfo
+     */
+    poolActivationCountdown?: number;
+    /**
      * @type {string}
      * @memberof NetworkInfo
      */
