@@ -1,9 +1,6 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-type AssetDataWrapperProps = {
-  target?: boolean
-}
 export const AssetDataWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -17,7 +14,7 @@ export const AssetDataWrapper = styled.div`
   }
 
   .coinData-coin-avatar {
-    margin-right: ${(props: AssetDataWrapperProps) => (props.target ? '0px' : '12px')};
+    margin-right: 12px;
   }
 
   .coinData-asset-label {

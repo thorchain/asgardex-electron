@@ -15,10 +15,10 @@ type Props = {
 }
 
 const AssetData: React.FC<Props> = (props: Props): JSX.Element => {
-  const { asset, priceValue, priceUnit, size = 'big', className = '', ...otherProps } = props
+  const { asset, priceValue, priceUnit, size = 'big', className = '' } = props
 
   return (
-    <AssetDataWrapper className={`assetData-wrapper ${className}`} {...otherProps}>
+    <AssetDataWrapper className={`assetData-wrapper ${className}`}>
       <Coin className="coinData-coin-avatar" type={asset} size={size} />
       <div className="coinData-asset-label">{asset}</div>
       <div className="asset-price-info">
