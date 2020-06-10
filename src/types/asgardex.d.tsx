@@ -11,3 +11,8 @@ export type Pair = {
   source: Maybe<string>
   target: Maybe<string>
 }
+
+export type AssetPair = {
+  asset: string
+  [key: string]: FixmeType
+}

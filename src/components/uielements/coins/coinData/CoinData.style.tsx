@@ -1,13 +1,15 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { Maybe } from '../../../../types/asgardex.d'
+
 export type CoinDataWrapperSize = 'small' | 'big'
 export type CoinDataWrapperType = 'wallet' | 'normal'
 
 type CoinDataWrapperProps = {
   size: CoinDataWrapperSize
   type: CoinDataWrapperType
-  target?: string
+  target?: Maybe<string>
 }
 
 export const CoinDataWrapper = styled.div`

@@ -4,16 +4,17 @@ import { TokenAmount, formatTokenAmount } from '@thorchain/asgardex-token'
 import { bn, formatBN } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
+import { Maybe, Nothing } from '../../../../types/asgardex.d'
 import Label from '../../label'
 import Coin from '../coin'
 import { CoinDataWrapper, CoinDataWrapperType, CoinDataWrapperSize } from './CoinData.style'
 
 type Props = {
   'data-test'?: string
-  asset?: string
-  assetValue?: TokenAmount
-  target?: string
-  targetValue?: TokenAmount
+  asset?: Maybe<string>
+  assetValue?: Maybe<TokenAmount>
+  target?: Maybe<string>
+  targetValue?: Maybe<TokenAmount>
   price?: BigNumber
   priceUnit?: string
   priceValid?: boolean
@@ -25,9 +26,9 @@ type Props = {
 const CoinData: React.FC<Props> = (props: Props): JSX.Element => {
   const {
     asset = 'bnb',
-    assetValue = null,
-    target = undefined,
-    targetValue = null,
+    assetValue = Nothing,
+    target = Nothing,
+    targetValue = Nothing,
     price = bn(0),
     priceUnit = 'RUNE',
     priceValid = true,
