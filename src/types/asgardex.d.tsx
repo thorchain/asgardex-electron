@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FixmeType = any
 
@@ -14,5 +16,5 @@ export type Pair = {
 
 export type AssetPair = {
   asset: string
-  [key: string]: FixmeType
+  price: BigNumber
 }

@@ -29,12 +29,12 @@ storiesOf('Components/FilterMenu', module).add('coins example', () => {
       cellRenderer={cellRenderer}
       asset="TOMOB-1E1"
       data={[
-        { asset: 'FSN-F1B', assetValue: 99, price: bn(1) },
-        { asset: 'FTM-585', assetValue: 993, price: bn(1) },
-        { asset: 'LOK-3C0', assetValue: 3971, price: bn(0) },
-        { asset: 'TCAN-014', assetValue: 8935, price: bn(1) },
-        { asset: 'TOMOB-1E1', assetValue: 198, price: bn(1) },
-        { asset: 'BNB', assetValue: 200.01, price: bn(0.00387) }
+        { asset: 'FSN-F1B', price: bn(1) },
+        { asset: 'FTM-585', price: bn(1) },
+        { asset: 'LOK-3C0', price: bn(0) },
+        { asset: 'TCAN-014', price: bn(1) },
+        { asset: 'TOMOB-1E1', price: bn(1) },
+        { asset: 'BNB', price: bn(0.00387) }
       ]}
     />
   )
@@ -44,16 +44,16 @@ storiesOf('Components/FilterMenu', module).add('general use', () => {
     <FilterMenu
       searchEnabled
       filterFunction={filterFunction}
-      cellRenderer={({ name }) => ({
+      cellRenderer={({ asset }) => ({
         key: `${Math.random()}-name`,
-        node: <div>{name}</div>
+        node: <div>{asset}</div>
       })}
       asset="paul"
       data={[
-        { asset: 'John', name: 'John', price: bn(1) },
-        { asset: 'Paul', name: 'Paul', price: bn(2) },
-        { asset: 'George', name: 'George', price: bn(3) },
-        { asset: 'Ringo', name: 'Ringo', price: bn(4) }
+        { asset: 'John', price: bn(1) },
+        { asset: 'Paul', price: bn(2) },
+        { asset: 'George', price: bn(3) },
+        { asset: 'Ringo', price: bn(4) }
       ]} // AssetPair[]
     />
   )

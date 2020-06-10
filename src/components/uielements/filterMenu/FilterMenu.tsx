@@ -25,8 +25,7 @@ const FilterMenu: React.FC<Props> = ({
   filterFunction,
   cellRenderer,
   disableItemFilter = (_) => false,
-  placeholder = 'Search Token ...',
-  ...otherProps
+  placeholder = 'Search Token ...'
 }): JSX.Element => {
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -52,7 +51,7 @@ const FilterMenu: React.FC<Props> = ({
   )
 
   return (
-    <Menu {...otherProps} onClick={handleClick}>
+    <Menu onClick={handleClick}>
       {searchEnabled && (
         <Menu.Item disabled key="_search">
           <Input

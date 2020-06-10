@@ -7,14 +7,14 @@ import { CoinWrapper, CoinsWrapper } from './Coin.style'
 import { CoinSize, coinGroup } from './types'
 
 type Props = {
-  type: Maybe<string>
+  type: string
   over?: Maybe<string>
   size?: CoinSize
   className?: string
 }
 
 const Coin: React.FC<Props> = (props: Props): JSX.Element => {
-  const { type, size = 'big', over = Nothing, className = '', ...otherProps } = props
+  const { type, size = 'big', over = Nothing, className = '' } = props
 
   const isDynamicIcon = useMemo(() => !coinGroup.includes(type.toLowerCase()), [type])
 
@@ -22,7 +22,7 @@ const Coin: React.FC<Props> = (props: Props): JSX.Element => {
     const isDynamicIconOver = !coinGroup.includes(over.toLowerCase())
 
     return (
-      <CoinsWrapper size={size} className={`coin-wrapper ${className}`} {...otherProps}>
+      <CoinsWrapper size={size} className={`coin-wrapper ${className}`}>
         {isDynamicIcon && <DynamicCoin className="dynamic-bottom" type={type} size={size} />}
         {!isDynamicIcon && (
           <div className="coin-bottom">
@@ -42,7 +42,7 @@ const Coin: React.FC<Props> = (props: Props): JSX.Element => {
     return <DynamicCoin type={type} size={size} />
   }
   return (
-    <CoinWrapper size={size} className={`coin-wrapper ${className}`} {...otherProps}>
+    <CoinWrapper size={size} className={`coin-wrapper ${className}`}>
       <CoinIcon type={type} size={size} />
     </CoinWrapper>
   )
