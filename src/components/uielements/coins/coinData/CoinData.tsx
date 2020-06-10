@@ -34,19 +34,13 @@ const CoinData: React.FC<Props> = (props: Props): JSX.Element => {
     priceValid = true,
     size = 'small',
     className = '',
-    type = 'normal',
-    ...otherProps
+    type = 'normal'
   } = props
 
   const priceLabel = priceValid ? `${priceUnit.toUpperCase()} ${formatBN(price)}` : 'NOT LISTED'
 
   return (
-    <CoinDataWrapper
-      size={size}
-      target={target}
-      type={type}
-      className={`coinData-wrapper ${className}`}
-      {...otherProps}>
+    <CoinDataWrapper size={size} target={target} type={type} className={`coinData-wrapper ${className}`}>
       <Coin className="coinData-coin-avatar" type={asset} over={target} size={size} />
       <div className="coinData-asset-info" data-test="coin-data-asset-info">
         <Label className="coinData-asset-label" data-test="coin-data-asset-label" weight="600">
