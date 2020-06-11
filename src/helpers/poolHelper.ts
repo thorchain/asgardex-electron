@@ -8,7 +8,10 @@ import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
 import { PoolRowType } from '../views/pools/types'
 import { getPoolData } from '../views/pools/utils'
 
-export const getPoolViewData = (pools: PoolsState, poolStatus: PoolDetailStatusEnum): PoolRowType[] => {
+export const getPoolViewData = (
+  pools: Pick<PoolsState, 'poolDetails' | 'priceIndex'>,
+  poolStatus: PoolDetailStatusEnum
+): PoolRowType[] => {
   const { poolDetails, priceIndex } = pools
   const deepestPool = getDeepestPool(poolDetails)
   const { symbol: deepestPoolSymbol } = getAssetFromString(deepestPool?.asset)
