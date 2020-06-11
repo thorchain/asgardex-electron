@@ -23,23 +23,3 @@ export const compareShallowStr = (str1: string, str2: string): boolean => {
 }
 
 export const emptyString = ''
-
-/**
- * Formats time in HH:MM:SS by given seconds
- *
- * @param sec number Time in seconds
- */
-export const formatTimeFromSeconds = (sec: number) => {
-  // return "empty" string for NaN values
-  if (isNaN(sec)) {
-    return '--:--:--'
-  }
-
-  const padZero = (value: number) => (value < 10 ? `0${value}` : value)
-
-  const hours = Math.floor(sec / 3600)
-  const minutes = Math.floor((sec - hours * 3600) / 60)
-  const seconds = sec - hours * 3600 - minutes * 60
-
-  return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`
-}

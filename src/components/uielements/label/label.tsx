@@ -7,6 +7,7 @@ export type ComponentProps = {
   children?: React.ReactNode
   loading?: boolean
   onClick?: () => void
+  style?: React.CSSProperties
 }
 
 type Props = ComponentProps & StyledProps
@@ -20,7 +21,7 @@ const Label: React.FC<Props> = (props: Props): JSX.Element => {
     textTransform = 'none',
     children,
     className = '',
-    ...otherProps
+    style
   } = props
 
   return (
@@ -30,7 +31,7 @@ const Label: React.FC<Props> = (props: Props): JSX.Element => {
       color={color}
       weight={weight}
       textTransform={textTransform}
-      {...otherProps}>
+      style={style}>
       {loading && '...'}
       {!loading && children}
     </LabelWrapper>

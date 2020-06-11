@@ -21,13 +21,13 @@ export const getPoolData = (
 
   // formula: poolDetail.runeDepth * runePrice
   const depth = bn(poolDetail?.runeDepth ?? 0).multipliedBy(runePrice)
-  const depthAsString = `${basePriceAsset} ${formatBaseAsTokenAmount(baseAmount(depth))}`
+  const depthAsString = formatBaseAsTokenAmount(baseAmount(depth))
   // formula: poolDetail.poolVolume24hr * runePrice
   const volume = bn(poolDetail?.poolVolume24hr ?? 0).multipliedBy(runePrice)
-  const volumeAsString = `${basePriceAsset} ${formatBaseAsTokenAmount(baseAmount(volume))}`
+  const volumeAsString = formatBaseAsTokenAmount(baseAmount(volume))
   // formula: poolDetail.poolTxAverage * runePrice
   const transaction = bn(poolDetail?.poolTxAverage ?? 0).multipliedBy(runePrice)
-  const transactionAsString = `${basePriceAsset} ${formatBaseAsTokenAmount(baseAmount(transaction))}`
+  const transactionAsString = formatBaseAsTokenAmount(baseAmount(transaction))
   const slip = bn(poolDetail?.poolSlipAverage ?? 0).multipliedBy(100)
   const slipAsString = slip.toString()
   const trade = bn(poolDetail?.swappingTxCount ?? 0)

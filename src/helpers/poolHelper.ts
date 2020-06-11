@@ -11,7 +11,7 @@ import { getPoolData } from '../views/pools/utils'
 export const getPoolViewData = (pools: PoolsState, poolStatus: PoolDetailStatusEnum): PoolRowType[] => {
   const { poolDetails, priceIndex } = pools
   const deepestPool = getDeepestPool(poolDetails)
-  const deepestPoolSymbol = getAssetFromString(deepestPool?.asset)
+  const { symbol: deepestPoolSymbol } = getAssetFromString(deepestPool?.asset)
   // Transform `PoolDetails` -> PoolRowType
   const poolViewData = poolDetails.map((poolDetail, index) => {
     const { symbol = '' } = getAssetFromString(poolDetail.asset)

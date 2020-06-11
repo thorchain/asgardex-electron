@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useRef } from 'react'
+import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
 
 import { SyncOutlined, SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
@@ -15,8 +15,7 @@ import Label from '../../components/uielements/label'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { getPoolViewData /* hasPendingPools */ } from '../../helpers/poolHelper'
-import { formatTimeFromSeconds } from '../../helpers/stringHelper'
+import { getPoolViewData, hasPendingPools } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
@@ -25,7 +24,7 @@ import { PoolsState } from '../../services/midgard/types'
 import { Maybe, Nothing } from '../../types/asgardex.d'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import View from '../View'
-import { ActionColumn, TableAction, TimerLabel } from './PoolsOverview.style'
+import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
 import { PoolRowType, PoolRowTypeList } from './types'
 
 type Props = {}
@@ -37,46 +36,31 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const poolsRD = useObservableState(midgardService.poolState$, RD.pending)
   const networkInfoRD = useObservableState(midgardService.networkInfo$, RD.pending)
 
-  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+  const [blocksLeft, setBlocksLeft] = useState('')
 
-  // countdown in seconds
-  const [pendingCountdown, setPendingCountdown] = useState(0)
-  // calculated pending time
-  const [pendingTime, setPendingTime] = useState(NaN)
+  useEffect(() => {
+    const networkInfo = RD.toNullable(networkInfoRD)
+    if (networkInfo) {
+      setBlocksLeft(networkInfo?.poolActivationCountdown?.toString() ?? '')
+    }
+  }, [networkInfoRD])
+
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   // store previous data of pools to render these while reloading
   const previousPools = useRef<Maybe<PoolRowTypeList>>(Nothing)
   // store previous data of pending pools to render these while reloading
   const previousPendingPools = useRef<Maybe<PoolRowTypeList>>(Nothing)
 
-  // Value of  `poolActivationCountdown` from `NetworkInfoRD` (remote data)
-  // It returns NaN if no data is available
-  const pendingSecondsLeft = useMemo(() => {
-    const networkInfo = RD.toNullable(networkInfoRD)
-    if (networkInfo) {
-      return networkInfo?.poolActivationCountdown ?? NaN
-    }
-    return NaN
-  }, [networkInfoRD])
-
   const pendingCountdownHandler = useCallback(() => {
-    if (!isNaN(pendingSecondsLeft)) {
-      const nextPendingCountdown = pendingCountdown + 1
-      setPendingCountdown(nextPendingCountdown)
-      const nextPendingTime = pendingSecondsLeft > nextPendingCountdown ? pendingSecondsLeft - nextPendingCountdown : 0
-      setPendingTime(nextPendingTime)
-    }
-  }, [pendingCountdown, pendingSecondsLeft])
+    midgardService.reloadNetworkInfo()
+  }, [midgardService])
 
   const pendingCountdownInterval = useMemo(() => {
     const pools = RD.toNullable(poolsRD)
-    const networkInfo = RD.toNullable(networkInfoRD)
     // start countdown if we do have pending pools available only
-    // TODO(@Veado): Bring `hasPendingPools` back to live
-    // return pools && networkInfo && hasPendingPools(pools.poolDetails) ? 1000 : INACTIVE_INTERVAL
-    // just for debugging...
-    return pools && networkInfo && true ? 1000 : INACTIVE_INTERVAL
-  }, [networkInfoRD, poolsRD])
+    return pools && hasPendingPools(pools.poolDetails) ? 5000 : INACTIVE_INTERVAL
+  }, [poolsRD])
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
 
@@ -105,6 +89,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const btnPoolsColumn = {
     key: 'btn',
     title: renderBtnColTitle,
+    width: 280,
     render: (_: string, record: PoolRowType) => {
       const {
         pool: { asset, target }
@@ -129,6 +114,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'pool',
     title: 'pool',
     dataIndex: 'pool',
+    width: 100,
     render: ({ target }: { asset: string; target: string }) => <Coin type="rune" over={target} />
   }
 
@@ -137,7 +123,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     title: 'pool',
     dataIndex: 'pool',
     render: ({ target }: { asset: string; target: string }) => (
-      <Row justify="center" align="middle">
+      <Row justify="center" align="middle" style={{ width: '100%' }}>
         <Coin type="rune" over={target} />
       </Row>
     )
@@ -147,14 +133,14 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'asset',
     title: 'asset',
     dataIndex: 'pool',
-    render: ({ target }: { target: string }) => <p>{target}</p>,
+    render: ({ target }: { target: string }) => <Label>{target}</Label>,
     sorter: (a: PoolRowType, b: PoolRowType) => a.pool.target.localeCompare(b.pool.target),
     sortDirections: ['descend', 'ascend']
   }
 
   const priceColumn: ColumnType<PoolRowType> = {
     key: 'poolprice',
-    title: 'pool price',
+    title: 'price',
     dataIndex: 'poolPrice',
     sorter: (a: PoolRowType, b: PoolRowType) => a.raw.poolPrice.minus(b.raw.poolPrice).toNumber(),
     sortDirections: ['descend', 'ascend'],
@@ -179,7 +165,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   const transactionColumn: ColumnType<PoolRowType> = {
     key: 'transaction',
-    title: 'avg. transaction',
+    title: 'avg. size',
     dataIndex: 'transaction',
     sorter: (a: PoolRowType, b: PoolRowType) => a.raw.transaction.minus(b.raw.transaction).toNumber(),
     sortDirections: ['descend', 'ascend']
@@ -196,7 +182,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   const tradeColumn: ColumnType<PoolRowType> = {
     key: 'trade',
-    title: 'no. of trades',
+    title: 'trades',
     dataIndex: 'trade',
     sorter: (a: PoolRowType, b: PoolRowType) => a.raw.trade.minus(b.raw.trade).toNumber(),
     sortDirections: ['descend', 'ascend']
@@ -254,21 +240,34 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   const btnPendingPoolsColumn = {
     key: 'btn',
-    title: renderBtnColTitle,
+    title: '',
+    width: 200,
     render: (_: string, record: PoolRowType) => {
       const {
-        pool: { target },
-        deepest
+        pool: { target }
       } = record
 
-      const timerLabel = deepest ? formatTimeFromSeconds(pendingTime) : ''
       return (
         <TableAction>
           <Button round="true" onClick={() => clickStakeHandler(target)} typevalue="outline">
             <PlusOutlined />
             liquidity
           </Button>
-          <TimerLabel>{timerLabel}</TimerLabel>
+        </TableAction>
+      )
+    }
+  }
+
+  const blockLeftColumn = {
+    key: 'blocks',
+    title: 'blocks left',
+    width: 80,
+    render: (_: string, record: PoolRowType) => {
+      const { deepest } = record
+
+      return (
+        <TableAction>
+          <BlockLeftLabel size="normal">{deepest ? blocksLeft.toString() : ''}</BlockLeftLabel>
         </TableAction>
       )
     }
@@ -279,10 +278,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     assetColumn,
     priceColumn,
     depthColumn,
-    volumeColumn,
-    transactionColumn,
-    slipColumn,
-    tradeColumn,
+    blockLeftColumn,
     btnPendingPoolsColumn
   ]
 
@@ -327,6 +323,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         Available Pools
       </Label>
       {renderPools}
+      <Label size="big" weight="bold" color="normal" textTransform="uppercase" style={{ marginTop: '40px' }}>
+        Pending Pools
+      </Label>
       {renderPendingPools}
     </View>
   )

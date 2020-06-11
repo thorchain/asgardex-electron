@@ -13,11 +13,11 @@ export const TableAction = styled.div`
 
 export const ActionColumn = styled.div`
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 `
 
-export const TimerLabel = styled(Label)`
+export const BlockLeftLabel = styled(Label)`
   display: inline-block;
   width: 100px;
 `
