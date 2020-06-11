@@ -99,10 +99,10 @@ describe('poolUtil', () => {
           asset: 'RUNE',
           target: 'FSN'
         },
-        poolPrice: 'RUNE 2.000',
-        depth: 'RUNE 0.00',
-        volume: 'RUNE 0.00',
-        transaction: 'RUNE 0.00',
+        poolPrice: '2.000',
+        depth: '0.00',
+        volume: '0.00',
+        transaction: '0.00',
         slip: '0',
         trade: '0',
         raw: {
@@ -139,10 +139,10 @@ describe('poolUtil', () => {
           asset: 'RUNE',
           target: 'BNB'
         },
-        poolPrice: 'RUNE 0.000',
-        depth: 'RUNE 2.00',
-        volume: 'RUNE 0.00',
-        transaction: 'RUNE 0.00',
+        poolPrice: '0.000',
+        depth: '2.00',
+        volume: '0.00',
+        transaction: '0.00',
         slip: '50100000',
         trade: '1',
         raw: {
