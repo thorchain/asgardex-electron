@@ -4,20 +4,20 @@ import { storiesOf } from '@storybook/react'
 import { bn } from '@thorchain/asgardex-util'
 
 import { getTickerFormat } from '../../../helpers/stringHelper'
-import { AssetPair } from '../../../types/asgardex.d'
+import { AssetPair, Nothing } from '../../../types/asgardex.d'
 import CoinData from '../coins/coinData'
 import FilterMenu from './FilterMenu'
 
 const filterFunction = (item: AssetPair, searchTerm: string) => {
   const tokenName = getTickerFormat(item.asset)
-  if (tokenName === null) return false
-  return tokenName.indexOf(searchTerm.toLowerCase()) === 0
+  if (tokenName === Nothing) return false
+  return tokenName?.indexOf(searchTerm.toLowerCase()) === 0
 }
 
 const cellRenderer = (data: AssetPair) => {
   const { asset: key, price } = data
   const tokenName = getTickerFormat(key)
-  const node = <CoinData asset={tokenName} price={price} />
+  const node = <CoinData asset={tokenName || ''} price={price} />
   return { key, node }
 }
 

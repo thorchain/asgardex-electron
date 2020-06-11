@@ -4,27 +4,26 @@ import { TokenAmount, formatTokenAmount } from '@thorchain/asgardex-token'
 import { bn, formatBN } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
-import { Maybe } from '../../../../types/asgardex.d'
 import Label from '../../label'
 import Coin from '../coin'
 import { CoinDataWrapper, CoinDataWrapperType, CoinDataWrapperSize } from './CoinData.style'
 
 type Props = {
-  asset?: Maybe<string>
-  assetValue?: Maybe<TokenAmount>
-  target?: Maybe<string>
-  targetValue?: Maybe<TokenAmount>
+  asset?: string
+  assetValue?: TokenAmount
+  target?: string
+  targetValue?: TokenAmount
   price?: BigNumber
   priceUnit?: string
   priceValid?: boolean
   size?: CoinDataWrapperSize
   className?: string
-  type?: CoinDataWrapperType | undefined
+  type?: CoinDataWrapperType
 }
 
 const CoinData: React.FC<Props> = (props: Props): JSX.Element => {
   const {
-    asset = 'bnb',
+    asset,
     assetValue,
     target,
     targetValue,
@@ -40,7 +39,7 @@ const CoinData: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <CoinDataWrapper size={size} target={target} type={type} className={`coinData-wrapper ${className}`}>
-      <Coin className="coinData-coin-avatar" type={asset || ''} over={target} size={size} />
+      {asset && <Coin className="coinData-coin-avatar" type={asset} over={target} size={size} />}
       <div className="coinData-asset-info" data-test="coin-data-asset-info">
         <Label className="coinData-asset-label" data-test="coin-data-asset-label" weight="600">
           {`${asset} ${target ? ':' : ''}`}

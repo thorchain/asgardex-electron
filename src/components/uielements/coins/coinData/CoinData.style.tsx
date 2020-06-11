@@ -1,18 +1,16 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { Maybe } from '../../../../types/asgardex.d'
-
 export type CoinDataWrapperSize = 'small' | 'big'
 export type CoinDataWrapperType = 'wallet' | 'normal'
 
 type CoinDataWrapperProps = {
   size: CoinDataWrapperSize
   type: CoinDataWrapperType
-  target?: Maybe<string>
+  target?: string
 }
 
-export const CoinDataWrapper = styled.div`
+export const CoinDataWrapper = styled.div<CoinDataWrapperProps>`
   display: flex;
   align-items: center;
   width: 100%;
@@ -24,17 +22,17 @@ export const CoinDataWrapper = styled.div`
   }
 
   .coinData-coin-avatar {
-    margin-right: ${(props: CoinDataWrapperProps) => (props.target ? '0px' : '12px')};
+    margin-right: ${(props) => (props.target ? '0px' : '12px')};
   }
 
   .coinData-asset-info {
-    margin-left: ${(props: CoinDataWrapperProps) => (props.target ? '0px' : '4px')} !important;
+    margin-left: ${(props) => (props.target ? '0px' : '4px')} !important;
   }
 
   .coinData-asset-info,
   .coinData-target-info {
     display: flex;
-    flex-direction: ${(props: CoinDataWrapperProps) => (props.type === 'normal' ? 'column' : 'row')};
+    flex-direction: ${(props) => (props.type === 'normal' ? 'column' : 'row')};
     margin: 0 4px;
   }
 
@@ -43,9 +41,9 @@ export const CoinDataWrapper = styled.div`
     flex-grow: 1;
     justify-content: flex-end;
 
-    ${(props: CoinDataWrapperProps) => props.size === 'big' && 'height: 32px;'}
+    ${(props) => props.size === 'big' && 'height: 32px;'}
     .label-wrapper {
-      ${(props: CoinDataWrapperProps) =>
+      ${(props) =>
         props.size === 'big' &&
         `display: flex;
           align-items: flex-end;`}
@@ -60,6 +58,6 @@ export const CoinDataWrapper = styled.div`
   }
 
   .coinData-asset-label {
-    margin-right: ${(props: CoinDataWrapperProps) => (props.type !== 'normal' ? '4px' : 0)};
+    margin-right: ${(props) => (props.type !== 'normal' ? '4px' : 0)};
   }
 `

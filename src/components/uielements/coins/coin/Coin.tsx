@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 
-import { Nothing, Maybe } from '../../../../types/asgardex.d'
 import CoinIcon from '../coinIcon'
 import DynamicCoin from '../dynamicCoin'
 import { CoinWrapper, CoinsWrapper } from './Coin.style'
@@ -8,13 +7,13 @@ import { CoinSize, coinGroup } from './types'
 
 type Props = {
   type: string
-  over?: Maybe<string>
+  over?: string
   size?: CoinSize
   className?: string
 }
 
 const Coin: React.FC<Props> = (props: Props): JSX.Element => {
-  const { type, size = 'big', over = Nothing, className = '' } = props
+  const { type, size = 'big', over, className = '' } = props
 
   const isDynamicIcon = useMemo(() => !coinGroup.includes(type.toLowerCase()), [type])
 

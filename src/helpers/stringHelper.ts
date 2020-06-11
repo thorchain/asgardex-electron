@@ -5,8 +5,8 @@ export const getPair = (info?: string): Pair => ({
   target: info?.split('-')[1]?.toLowerCase() ?? Nothing
 })
 
-export const getTickerFormat = (symbol?: Maybe<string>): string | null => {
-  if (!symbol) return null
+export const getTickerFormat = (symbol?: string): Maybe<string> => {
+  if (!symbol) return Nothing
   if (symbol.includes('.')) {
     return symbol.split('.')[1].split('-')[0].toLowerCase()
   }
