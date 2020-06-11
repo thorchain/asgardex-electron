@@ -1,5 +1,7 @@
 import BigNumber from 'bignumber.js'
 
+import { PoolDetailStatusEnum } from '../../types/generated/midgard'
+
 type PoolRawValueType = {
   depth: BigNumber
   volume: BigNumber
@@ -20,7 +22,11 @@ export type PoolDataType = {
   transaction: string
   slip: string
   trade: string
+  status: PoolDetailStatusEnum
   raw: PoolRawValueType
+  deepest: boolean
 }
 
 export type PoolRowType = PoolDataType & { key: number | string }
+
+export type PoolRowTypeList = PoolRowType[]

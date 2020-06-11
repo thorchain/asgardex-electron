@@ -5,8 +5,8 @@ import { retry, catchError, concatMap, tap, exhaustMap, mergeMap } from 'rxjs/op
 
 import { BASE_TOKEN_TICKER } from '../../const'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
-import { PoolsStateRD, PoolsState, PoolDetails } from './types'
-import { getAssetDetailIndex, getPriceIndex, toPoolDetailsMap } from './utils'
+import { PoolsStateRD, PoolsState, PoolDetails, NetworkInfoRD } from './types'
+import { getAssetDetailIndex, getPriceIndex } from './utils'
 
 export const MIDGARD_MAX_RETRY = 3
 export const BYZANTINE_MAX_RETRY = 5
@@ -53,7 +53,9 @@ const getPoolsState$ = () => {
     //
     concatMap((_) => apiGetPoolsData$(state.poolAssets)),
     // Derive + store `poolDetails`
-    tap((poolDetails: PoolDetails) => (state = { ...state, poolDetails: toPoolDetailsMap(poolDetails) })),
+    tap((poolDetails: PoolDetails) => {
+      state = { ...state, poolDetails }
+    }),
     // set everything into a `success` state
     tap((_) => poolsState$$.next(RD.success(state))),
     // catch any errors if there any
@@ -117,11 +119,62 @@ const poolState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$$.pipe(
 )
 
 /**
+ * API request to get data of `NetworkInfo`
+ */
+const apiGetNetworkData$ = byzantine$.pipe(
+  concatMap((endpoint) => {
+    const api = getMidgardDefaultApi(endpoint)
+    return api.getNetworkData()
+  })
+)
+
+const networkInfo$$ = new Rx.BehaviorSubject<NetworkInfoRD>(RD.initial)
+
+/**
+ * Loads data of `NetworkInfo`
+ */
+const getNetworkData$ = () => {
+  // Update `PoolState` to `pending`
+  networkInfo$$.next(RD.pending)
+  return apiGetNetworkData$.pipe(
+    // store result
+    tap((info) => networkInfo$$.next(RD.success(info))),
+    // catch any errors if there any
+    catchError((error: Error) => {
+      // set `error` state
+      networkInfo$$.next(RD.failure(error))
+      return Rx.of('error while fetchting data for pool')
+    }),
+    retry(MIDGARD_MAX_RETRY)
+  )
+}
+
+// Subject to trigger reload of `NetworkInfo`
+const reloadNetworkInfo$$ = new Rx.BehaviorSubject(0)
+
+/**
+ * Helper to reload `NetworkInfo`
+ */
+const reloadNetworkInfo = () => reloadNetworkInfo$$.next(0)
+
+/**
+ * State of `NetworkInfo`
+ */
+const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$$.pipe(
+  // start request
+  exhaustMap((_) => getNetworkData$()),
+  // return state of pool data
+  mergeMap((_) => networkInfo$$.asObservable())
+)
+
+/**
  * Service object with all "public" functions and observables we want provide
  */
 const service = {
   poolState$,
-  reloadPoolsState
+  reloadPoolsState,
+  networkInfo$,
+  reloadNetworkInfo
 }
 
 // Default

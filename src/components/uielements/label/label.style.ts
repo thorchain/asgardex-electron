@@ -1,12 +1,13 @@
 import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
-import { Size, Color, FontSettings, Colors } from './types'
+import { Size, Color, FontSettings, Colors, TextTransform } from './types'
 
-type Props = {
+export type Props = {
   size?: Size
   color?: Color
   weight?: string
+  textTransform?: TextTransform
   onClick?: () => void
 }
 
@@ -46,11 +47,12 @@ const colors: Colors = {
   white: '#fff'
 }
 
-export const LabelWrapper = styled.div`
+export const LabelWrapper = styled.div<Props>`
   padding: 10px 0;
-  font-size: ${(props: Props) => fontSettings[props.size || 'normal'].size};
-  font-weight: ${(props: Props) => props.weight};
-  letter-spacing: ${(props: Props) => fontSettings[props.size || 'normal'].spacing};
-  color: ${(props: Props) => colors[props.color || 'normal']};
-  cursor: ${(props: Props) => props.onClick && 'pointer'};
+  font-size: ${({ size = 'normal' }) => fontSettings[size].size};
+  text-transform: ${({ textTransform = 'none' }) => textTransform};
+  font-weight: ${({ weight }) => weight};
+  letter-spacing: ${({ size = 'normal' }) => fontSettings[size].spacing};
+  color: ${({ color }) => colors[color || 'normal']};
+  cursor: ${({ onClick }) => onClick && 'pointer'};
 `

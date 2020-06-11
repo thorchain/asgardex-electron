@@ -24,3 +24,5 @@ export type FontSettings = {
 export type Colors = {
   [key in Color]: string
 }
+
+export type TextTransform = 'none' | 'uppercase' | 'lowercase' | 'capitalize'

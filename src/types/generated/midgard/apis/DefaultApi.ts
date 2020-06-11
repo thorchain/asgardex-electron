@@ -16,7 +16,9 @@ import { BaseAPI, HttpQuery, throwIfNullOrUndefined, encodeURI } from '../runtim
 import {
     AssetDetail,
     InlineResponse200,
+    InlineResponse2001,
     NetworkInfo,
+    NodeKey,
     PoolDetail,
     StakersAddressData,
     StakersAssetData,
@@ -77,8 +79,8 @@ export class DefaultApi extends BaseAPI {
      * Returns an object containing the health response of the API.
      * Get Health
      */
-    getHealth = (): Observable<void> => {
-        return this.request<void>({
+    getHealth = (): Observable<InlineResponse200> => {
+        return this.request<InlineResponse200>({
             path: '/v1/health',
             method: 'GET',
         });
@@ -91,6 +93,17 @@ export class DefaultApi extends BaseAPI {
     getNetworkData = (): Observable<NetworkInfo> => {
         return this.request<NetworkInfo>({
             path: '/v1/network',
+            method: 'GET',
+        });
+    };
+
+    /**
+     * Returns an object containing Node public keys
+     * Get Node public keys
+     */
+    getNodes = (): Observable<Array<NodeKey>> => {
+        return this.request<Array<NodeKey>>({
+            path: '/v1/nodes',
             method: 'GET',
         });
     };
@@ -193,7 +206,7 @@ export class DefaultApi extends BaseAPI {
      * Return an array containing the event details
      * Get details of a tx by address, asset or tx-id
      */
-    getTxDetails = ({ offset, limit, address, txid, asset, type }: GetTxDetailsRequest): Observable<InlineResponse200> => {
+    getTxDetails = ({ offset, limit, address, txid, asset, type }: GetTxDetailsRequest): Observable<InlineResponse2001> => {
         throwIfNullOrUndefined(offset, 'getTxDetails');
         throwIfNullOrUndefined(limit, 'getTxDetails');
 
@@ -207,7 +220,7 @@ export class DefaultApi extends BaseAPI {
         if (asset != null) { query['asset'] = asset; }
         if (type != null) { query['type'] = type; }
 
-        return this.request<InlineResponse200>({
+        return this.request<InlineResponse2001>({
             path: '/v1/txs',
             method: 'GET',
             query,

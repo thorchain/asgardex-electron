@@ -13,22 +13,19 @@
 
 /**
  * @export
- * @interface InlineResponse200
+ * @interface NodeKey
  */
-export interface InlineResponse200 {
+export interface NodeKey {
     /**
-     * @type {boolean}
-     * @memberof InlineResponse200
+     * ed25519 public key
+     * @type {string}
+     * @memberof NodeKey
      */
-    catching_up?: boolean;
+    ed25519?: string;
     /**
-     * @type {boolean}
-     * @memberof InlineResponse200
+     * secp256k1 public key
+     * @type {string}
+     * @memberof NodeKey
      */
-    database?: boolean;
-    /**
-     * @type {number}
-     * @memberof InlineResponse200
-     */
-    scannerHeight?: number;
+    secp256k1?: string;
 }
