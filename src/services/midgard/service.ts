@@ -4,7 +4,7 @@ import * as Rx from 'rxjs'
 import { retry, catchError, concatMap, tap, exhaustMap, mergeMap } from 'rxjs/operators'
 
 import { BASE_TOKEN_TICKER } from '../../const'
-import { Configuration, DefaultApi, PoolDetailStatusEnum } from '../../types/generated/midgard'
+import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PoolsStateRD, PoolsState, PoolDetails, NetworkInfoRD } from './types'
 import { getAssetDetailIndex, getPriceIndex } from './utils'
 
@@ -54,12 +54,7 @@ const getPoolsState$ = () => {
     concatMap((_) => apiGetPoolsData$(state.poolAssets)),
     // Derive + store `poolDetails`
     tap((poolDetails: PoolDetails) => {
-      const result = [...poolDetails]
-      result[0].status = PoolDetailStatusEnum.Bootstrapped
-      result[1].status = PoolDetailStatusEnum.Bootstrapped
-      result[2].status = PoolDetailStatusEnum.Bootstrapped
-      state = { ...state, poolDetails: result }
-      // state = { ...state, poolDetails }
+      state = { ...state, poolDetails }
     }),
     // set everything into a `success` state
     tap((_) => poolsState$$.next(RD.success(state))),
