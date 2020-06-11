@@ -49,7 +49,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   // store previous data of pending pools to render these while reloading
   const previousPendingPools = useRef<Maybe<PoolRowTypeList>>(Nothing)
 
-  // helper to get  `poolActivationCountdown` from `NetworkInfoRD` (remote data)
+  // Value of  `poolActivationCountdown` from `NetworkInfoRD` (remote data)
   // It returns NaN if no data is available
   const pendingSecondsLeft = useMemo(() => {
     const networkInfo = RD.toNullable(networkInfoRD)
@@ -147,11 +147,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'asset',
     title: 'asset',
     dataIndex: 'pool',
-    render: ({ target }: { target: string }) => (
-      <p>
-        {target} {pendingTime}
-      </p>
-    ),
+    render: ({ target }: { target: string }) => <p>{target}</p>,
     sorter: (a: PoolRowType, b: PoolRowType) => a.pool.target.localeCompare(b.pool.target),
     sortDirections: ['descend', 'ascend']
   }
@@ -261,16 +257,18 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     title: renderBtnColTitle,
     render: (_: string, record: PoolRowType) => {
       const {
-        pool: { target }
+        pool: { target },
+        deepest
       } = record
 
+      const timerLabel = deepest ? formatTimeFromSeconds(pendingTime) : ''
       return (
         <TableAction>
           <Button round="true" onClick={() => clickStakeHandler(target)} typevalue="outline">
             <PlusOutlined />
             liquidity
           </Button>
-          <TimerLabel>{pendingTime}</TimerLabel>
+          <TimerLabel>{timerLabel}</TimerLabel>
         </TableAction>
       )
     }
@@ -329,9 +327,6 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         Available Pools
       </Label>
       {renderPools}
-      <Label size="big" weight="bold" color="normal" textTransform="uppercase">
-        Pending Pools (available in {formatTimeFromSeconds(pendingTime)})
-      </Label>
       {renderPendingPools}
     </View>
   )

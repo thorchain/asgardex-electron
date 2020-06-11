@@ -10,10 +10,17 @@ import { getPoolData } from '../views/pools/utils'
 
 export const getPoolViewData = (pools: PoolsState, poolStatus: PoolDetailStatusEnum): PoolRowType[] => {
   const { poolDetails, priceIndex } = pools
+  const deepestPool = getDeepestPool(poolDetails)
+  const deepestPoolSymbol = getAssetFromString(deepestPool?.asset)
   // Transform `PoolDetails` -> PoolRowType
   const poolViewData = poolDetails.map((poolDetail, index) => {
     const { symbol = '' } = getAssetFromString(poolDetail.asset)
-    return { ...getPoolData(symbol, poolDetail, priceIndex, BASE_TOKEN_TICKER), key: poolDetail?.asset || index }
+    const deepest = symbol && deepestPoolSymbol && symbol === deepestPoolSymbol
+    return {
+      ...getPoolData(symbol, poolDetail, priceIndex, BASE_TOKEN_TICKER),
+      deepest,
+      key: poolDetail?.asset || index
+    } as PoolRowType
   })
   return poolViewData.filter((poolData) => poolData.status === poolStatus)
 }

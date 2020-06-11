@@ -11,7 +11,7 @@ export const getPoolData = (
   poolDetail: PoolDetail,
   priceIndex: PriceDataIndex,
   basePriceAsset: string
-): PoolDataType => {
+): Omit<PoolDataType, 'deepest'> => {
   const { ticker: target = '' } = getAssetFromString(poolDetail?.asset)
 
   const runePrice = validBNOrZero(priceIndex?.RUNE)

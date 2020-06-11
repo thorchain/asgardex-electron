@@ -24,6 +24,7 @@ export type PoolDataType = {
   trade: string
   status: PoolDetailStatusEnum
   raw: PoolRawValueType
+  deepest: boolean
 }
 
 export type PoolRowType = PoolDataType & { key: number | string }
