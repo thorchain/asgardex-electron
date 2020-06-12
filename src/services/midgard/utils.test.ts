@@ -1,8 +1,6 @@
-import { bn } from '@thorchain/asgardex-util'
-
-import { ThorchainEndpoint } from '../../types/generated/midgard'
-import { PriceDataIndex } from './types'
-import { getAssetFromString, getAssetDetailIndex, getPriceIndex } from './utils'
+import { RUNE_TICKER } from '../../const'
+import { ThorchainEndpoint, AssetDetail } from '../../types/generated/midgard'
+import { getAssetFromString, getAssetDetailIndex, getAssetDetail } from './utils'
 
 type PoolDataMock = { asset?: string }
 
@@ -30,41 +28,6 @@ describe('services/midgard/utils/', () => {
     })
   })
 
-  describe('getPriceIndex', () => {
-    it('should return prices indexes based on RUNE price', () => {
-      const result = getPriceIndex(
-        [
-          { asset: 'BNB.TOMOB-1E1', priceRune: '0.3333333333333333' },
-          { asset: 'BNB.BBB', priceRune: '2206.896551724138' }
-        ],
-        'AAA'
-      )
-      const expected: PriceDataIndex = {
-        RUNE: bn(1),
-        TOMOB: bn('0.3333333333333333'),
-        BBB: bn('2206.896551724138')
-      }
-      expect(result).toEqual(expected)
-    })
-    it('should return a prices indexes based on BBB price', () => {
-      const result = getPriceIndex(
-        [
-          { asset: 'AAA.AAA-AAA', priceRune: '4' },
-          { asset: 'BBB.BBB-BBB', priceRune: '2' },
-          { asset: 'CCC.CCC-CCC', priceRune: '10' }
-        ],
-        'BBB'
-      )
-      const expected: PriceDataIndex = {
-        RUNE: bn(0.5),
-        AAA: bn(2),
-        BBB: bn(1),
-        CCC: bn(5)
-      }
-      expect(result).toEqual(expected)
-    })
-  })
-
   describe('getAssetFromString', () => {
     it('should return an asset with all values', () => {
       const result = getAssetFromString('BNB.RUNE-B1A')
@@ -89,6 +52,20 @@ describe('services/midgard/utils/', () => {
     it('returns an asset without any values if the passing value is undefined', () => {
       const result = getAssetFromString(undefined)
       expect(result).toEqual({})
+    })
+  })
+
+  describe('getDetail', () => {
+    const runeDetail: AssetDetail = { asset: 'BNB.RUNE-B1A' }
+    const bnbDetail: AssetDetail = { asset: 'BNB.BNB' }
+
+    it('returns details of RUNE', () => {
+      const result = getAssetDetail([runeDetail, bnbDetail], RUNE_TICKER)
+      expect(result).toEqual(runeDetail)
+    })
+    it('returns Nothing if no RUNE details available', () => {
+      const result = getAssetDetail([bnbDetail], 'TOMOB')
+      expect(result).toBeNothing()
     })
   })
 })

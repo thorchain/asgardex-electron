@@ -1,1 +1,1 @@
-export const BASE_TOKEN_TICKER = 'RUNE'
+export const RUNE_TICKER = 'RUNE'
