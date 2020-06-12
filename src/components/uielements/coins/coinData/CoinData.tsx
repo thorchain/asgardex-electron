@@ -9,7 +9,7 @@ import Coin from '../coin'
 import { CoinDataWrapper, CoinDataWrapperType, CoinDataWrapperSize } from './CoinData.style'
 
 type Props = {
-  asset?: string
+  asset?: string | null
   assetValue?: TokenAmount
   target?: string
   targetValue?: TokenAmount

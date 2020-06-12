@@ -1,4 +1,9 @@
+import React from 'react'
+
+import { omit } from 'lodash'
 import { css, SimpleInterpolation, FlattenSimpleInterpolation } from 'styled-components'
+
+import { FixmeType } from '../types/asgardex.d'
 
 type MediaKey = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
 
@@ -50,3 +55,6 @@ export const Z_INDEX_MAP: ZIndexMap = {
   header: 1001,
   footer: 1000
 }
+
+export const cleanTag = (component: FixmeType, tagList = ['']) => (props: FixmeType) =>
+  React.createElement(component, omit(props, tagList))
