@@ -6,7 +6,6 @@ import { DividerProps } from 'antd/lib/divider'
 import styled, { css } from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { cleanTag } from '../../../../helpers/styleHelper'
 import Label from '../../label'
 import AssetIcon from '../assetIcon'
 
@@ -48,8 +47,7 @@ export const AssetCardFooter = styled.div`
   align-items: center;
 `
 
-const IconBase = cleanTag(CaretDownOutlined, ['open'])
-export const DropdownIcon = styled(IconBase)`
+export const DropdownIcon = styled(CaretDownOutlined)`
   transition: transform 0.2s ease-in-out;
   ${({ open }) => (open ? 'transform: rotate(180deg);' : 'transform: rotate(0);')}
   font-size: 18px;

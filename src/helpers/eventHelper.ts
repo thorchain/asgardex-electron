@@ -1,9 +1,7 @@
-import { FixmeType } from '../types/asgardex.d'
-
-export function clickedInsideNode(ref: FixmeType, e: MouseEvent) {
-  return ref.current.contains(e.target)
+export function clickedInsideNode<T extends Element>(ref: T, e: MouseEvent) {
+  return ref.contains(e.target as T)
 }
 
-export function clickedOutsideNode(ref: FixmeType, e: MouseEvent) {
-  return !ref.current.contains(e.target)
+export function clickedOutsideNode<T extends Element>(ref: T, e: MouseEvent) {
+  return !ref.contains(e.target as T)
 }

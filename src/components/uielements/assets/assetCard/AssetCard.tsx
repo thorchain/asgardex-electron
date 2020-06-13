@@ -74,8 +74,8 @@ type Props = {
 const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
   const [openDropdown, setOpenDropdown] = useState(false)
   const [percentButtonSelected, setPercentButtonSelected] = useState(0)
-  const ref = useRef(null)
-  const menuRef = useRef(null)
+  const ref = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const {
     asset = 'bnb',
@@ -98,16 +98,24 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     'data-test': dataTest
   } = props
 
+  const handleDocumentClick = useCallback(
+    (e: MouseEvent) => {
+      if (
+        ref.current &&
+        clickedOutsideNode(ref.current, e) &&
+        !!menuRef.current &&
+        clickedOutsideNode(menuRef.current, e)
+      ) {
+        setOpenDropdown(false)
+      }
+    },
+    [ref, menuRef]
+  )
+
   useEffect(() => {
     document.addEventListener('click', handleDocumentClick)
     return () => document.removeEventListener('click', handleDocumentClick)
-  })
-
-  const handleDocumentClick = (e: MouseEvent) => {
-    if (ref && clickedOutsideNode(ref, e) && clickedOutsideNode(menuRef, e)) {
-      setOpenDropdown(false)
-    }
-  }
+  }, [handleDocumentClick])
 
   const handleVisibleChange = (openDropdown: boolean) => {
     setOpenDropdown(openDropdown)
