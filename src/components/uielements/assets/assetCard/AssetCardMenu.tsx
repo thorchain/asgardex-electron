@@ -46,7 +46,12 @@ const AssetCardMenu: React.FC<Props> = (props: Props): JSX.Element => {
       const price = validBNOrZero(priceIndex[ticker])
 
       const node = (
-        <CoinData data-test={`AssetCard-menu-item-${tokenName}`} asset={tokenName} price={price} priceUnit={unit} />
+        <CoinData
+          data-test={`AssetCard-menu-item-${tokenName}`}
+          asset={tokenName || ''}
+          price={price}
+          priceUnit={unit}
+        />
       )
       return { key, node }
     },
