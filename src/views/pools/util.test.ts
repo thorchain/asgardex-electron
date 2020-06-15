@@ -6,7 +6,7 @@ import { PoolTableRowData } from './types'
 import { getPoolTableRowData } from './utils'
 
 describe('poolUtil', () => {
-  describe('getPoolData', () => {
+  describe('getPoolTableRowData', () => {
     const lokPoolDetail: PoolDetail = {
       asset: 'BNB.LOK-3C0',
       assetDepth: '11000000000',
@@ -31,8 +31,8 @@ describe('poolUtil', () => {
         },
         poolPrice: assetToBase(assetAmount(2)),
         depthPrice: assetToBase(assetAmount(1000)),
-        volumePrice: assetToBase(assetAmount('909.0909091')),
-        transactionPrice: assetToBase(assetAmount('909.0909091')),
+        volumePrice: assetToBase(assetAmount(1000)),
+        transactionPrice: assetToBase(assetAmount(1000)),
         slip: bn('0.11'),
         trades: bn(123),
         status: PoolDetailStatusEnum.Enabled,
