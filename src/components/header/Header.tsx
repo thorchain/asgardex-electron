@@ -16,6 +16,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
+import HeaderCurrency from './HeaderCurrency'
 import HeaderLang from './HeaderLang'
 import HeaderLock from './HeaderLock'
 import HeaderNetStatus from './HeaderNetStatus'
@@ -128,6 +129,20 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     closeMenu()
   }, [closeMenu, history, isLocked, lock])
 
+  // TODO(@Veado) Hardcoded values - just for a moment,
+  // will be removed later by another PR for using real data
+  const currencies = [
+    { label: 'ᚱ RUNE', value: 'RUNE' },
+    { label: '₿ BTC', value: 'BTC' },
+    { label: 'Ξ ETH', value: 'ETH' },
+    { label: '$ USD', value: 'USD' }
+  ]
+
+  const currencyChangeHandler = useCallback((value: string) => {
+    // TODO(@Veado) Do something here
+    console.log('value:', value)
+  }, [])
+
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
@@ -150,6 +165,11 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               </Col>
               <Col>
                 <Row align="middle">
+                  <HeaderCurrency
+                    isDesktopView={isDesktopView}
+                    items={currencies}
+                    changeHandler={currencyChangeHandler}
+                  />
                   <HeaderTheme isDesktopView={isDesktopView} />
                   <HeaderLock isDesktopView={isDesktopView} isLocked={!!isLocked} onPress={clickLockHandler} />
                   <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} />
@@ -189,6 +209,9 @@ const Header: React.FC<Props> = (_): JSX.Element => {
             visible={menuVisible}
             key="top">
             {links}
+            <HeaderDrawerItem>
+              <HeaderCurrency isDesktopView={isDesktopView} items={currencies} changeHandler={currencyChangeHandler} />
+            </HeaderDrawerItem>
             <HeaderDrawerItem>
               <HeaderTheme isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
