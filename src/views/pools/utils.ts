@@ -5,12 +5,12 @@ import {
   getValueOfAsset1InAsset2,
   baseAmount,
   getValueOfRuneInAsset,
-  assetToBase
+  assetToBase,
+  getAssetFromString
 } from '@thorchain/asgardex-util'
 
 import { RUNE_TICKER } from '../../const'
 import { toPoolData } from '../../helpers/poolHelper'
-import { getAssetFromString } from '../../services/midgard/utils'
 import { PoolDetail, PoolDetailStatusEnum } from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './types'
 
