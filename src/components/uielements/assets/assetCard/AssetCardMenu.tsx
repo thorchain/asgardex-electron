@@ -45,14 +45,7 @@ const AssetCardMenu: React.FC<Props> = (props: Props): JSX.Element => {
       const ticker = getTickerFormat(asset)?.toUpperCase() ?? ''
       const price = validBNOrZero(priceIndex[ticker])
 
-      const node = (
-        <CoinData
-          data-test={`AssetCard-menu-item-${tokenName}`}
-          asset={tokenName || ''}
-          price={price}
-          priceUnit={unit}
-        />
-      )
+      const node = <CoinData asset={tokenName || ''} price={price} priceUnit={unit} />
       return { key, node }
     },
     [priceIndex, unit]

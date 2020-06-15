@@ -65,10 +65,6 @@ type Props = {
   dataTestWrapper?: string
   dataTestInput?: string
   children?: React.ReactNode
-  inputProps?: {
-    'data-test': string
-  }
-  'data-test'?: string
 }
 
 const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
@@ -162,7 +158,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
   function renderDropDownButton() {
     const disabled = assetData.length === 0
     return (
-      <AssetDropdownButton data-test="Asset-dropdown-button" disabled={disabled} onClick={handleDropdownButtonClicked}>
+      <AssetDropdownButton disabled={disabled} onClick={handleDropdownButtonClicked}>
         <AssetDropdownAsset type={asset} size="big" />
         {!disabled ? (
           <AssetDropdownVerticalColumn>

@@ -43,7 +43,6 @@ const PrivateModal: React.FC<Props> = (props): JSX.Element => {
           className={invalidPassword ? 'has-error' : ''}
           extra={validatingPassword ? 'Validating password ...' : ''}>
           <Input
-            data-test="password-confirmation-input"
             type="password"
             typevalue="ghost"
             sizevalue="big"
