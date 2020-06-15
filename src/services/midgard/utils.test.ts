@@ -1,6 +1,6 @@
 import { RUNE_TICKER } from '../../const'
 import { ThorchainEndpoint, AssetDetail } from '../../types/generated/midgard'
-import { getAssetFromString, getAssetDetailIndex, getAssetDetail } from './utils'
+import { getAssetDetailIndex, getAssetDetail } from './utils'
 
 type PoolDataMock = { asset?: string }
 
@@ -25,33 +25,6 @@ describe('services/midgard/utils/', () => {
       const data = [emptyAsset, emptyAssetSymbol, emptyAssetSymbol, emptyAssetSymbol, emptyAsset] as Array<PoolDataMock>
       const result = getAssetDetailIndex(data)
       expect(result).toStrictEqual({})
-    })
-  })
-
-  describe('getAssetFromString', () => {
-    it('should return an asset with all values', () => {
-      const result = getAssetFromString('BNB.RUNE-B1A')
-      expect(result).toEqual({
-        chain: 'BNB',
-        symbol: 'RUNE-B1A',
-        ticker: 'RUNE'
-      })
-    })
-    it('should return an asset with all values, even if chain and symbol are provided only', () => {
-      const result = getAssetFromString('BNB.RUNE')
-      expect(result).toEqual({ chain: 'BNB', symbol: 'RUNE', ticker: 'RUNE' })
-    })
-    it('should return an asset with a value for chain only', () => {
-      const result = getAssetFromString('BNB')
-      expect(result).toEqual({ chain: 'BNB' })
-    })
-    it('returns an asset without any values if the passing value is an empty string', () => {
-      const result = getAssetFromString('')
-      expect(result).toEqual({})
-    })
-    it('returns an asset without any values if the passing value is undefined', () => {
-      const result = getAssetFromString(undefined)
-      expect(result).toEqual({})
     })
   })
 
