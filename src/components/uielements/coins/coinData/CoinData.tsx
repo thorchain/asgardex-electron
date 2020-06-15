@@ -40,12 +40,12 @@ const CoinData: React.FC<Props> = (props: Props): JSX.Element => {
   return (
     <CoinDataWrapper size={size} target={target} type={type} className={`coinData-wrapper ${className}`}>
       {asset && <Coin className="coinData-coin-avatar" type={asset} over={target} size={size} />}
-      <div className="coinData-asset-info" data-test="coin-data-asset-info">
-        <Label className="coinData-asset-label" data-test="coin-data-asset-label" weight="600">
+      <div className="coinData-asset-info">
+        <Label className="coinData-asset-label" weight="600">
           {`${asset} ${target ? ':' : ''}`}
         </Label>
         {assetValue && (
-          <Label className="coinData-asset-value" data-test="coin-data-asset-value" weight="600">
+          <Label className="coinData-asset-value" weight="600">
             {formatTokenAmount(assetValue)}
           </Label>
         )}

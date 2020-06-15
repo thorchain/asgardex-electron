@@ -138,16 +138,10 @@ const Drag: React.FC<Props> = ({
     <div className={`drag-wrapper ${className}`}>
       <DragWrapper overlap={overlap} success={success} missed={missed} dragging={dragging} {...rest}>
         <Draggable position={pos} axis="x" bounds={dragBounds} {...dragHandlers}>
-          <CoinIcon
-            onMouseEnter={handleFocus}
-            onMouseLeave={handleBlur}
-            className="source-asset"
-            data-test="source-asset"
-            type={source}
-          />
+          <CoinIcon onMouseEnter={handleFocus} onMouseLeave={handleBlur} className="source-asset" type={source} />
         </Draggable>
         {title && <TitleLabel color="input">{title}</TitleLabel>}
-        <CoinIcon className="target-asset" data-test="target-asset" type={target} />
+        <CoinIcon className="target-asset" type={target} />
       </DragWrapper>
     </div>
   )

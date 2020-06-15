@@ -144,7 +144,6 @@ type Props = {
   size?: SizeType
   minimumFractionDigits?: number
   disabled?: boolean
-  'data-test'?: string
 }
 
 export const CoinInputAdvanced: React.FC<Props> = ({
@@ -153,14 +152,12 @@ export const CoinInputAdvanced: React.FC<Props> = ({
   onFocus,
   className = '',
   minimumFractionDigits = 2,
-  size,
-  ...otherProps
+  size
 }: Props): JSX.Element => {
   return (
     <CoinInputAdvancedView
       className={className}
       size={size}
-      {...otherProps}
       {...useCoinCardInputBehaviour({
         amount: value,
         onChangeValue,
