@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import BigNumber from 'bignumber.js'
 
 import { AssetDetail, PoolDetail, NetworkInfo } from '../../types/generated/midgard'
 
@@ -14,10 +13,6 @@ export type AssetDetailMap = {
 
 export type PoolDetails = PoolDetail[]
 
-export type PriceDataIndex = {
-  [symbol: string]: BigNumber
-}
-
 export type Asset = {
   chain?: string
   symbol?: string
@@ -27,8 +22,6 @@ export type Asset = {
 export type PoolsState = {
   assetDetails: AssetDetails
   poolAssets: PoolAssets
-  assetDetailIndex: AssetDetailMap
-  priceIndex: PriceDataIndex
   poolDetails: PoolDetails
 }
 

@@ -3,10 +3,8 @@ import byzantine from '@thorchain/byzantine-module'
 import * as Rx from 'rxjs'
 import { retry, catchError, concatMap, tap, exhaustMap, mergeMap } from 'rxjs/operators'
 
-import { BASE_TOKEN_TICKER } from '../../const'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PoolsStateRD, PoolsState, PoolDetails, NetworkInfoRD } from './types'
-import { getAssetDetailIndex, getPriceIndex } from './utils'
 
 export const MIDGARD_MAX_RETRY = 3
 export const BYZANTINE_MAX_RETRY = 5
@@ -42,14 +40,7 @@ const getPoolsState$ = () => {
     // store `AssetDetails`
     tap((assetDetails) => (state = { ...state, assetDetails })),
     // Derive + store `assetDetailIndex`
-    tap((assetDetails) => (state = { ...state, assetDetailIndex: getAssetDetailIndex(assetDetails) })),
-    // Derive + store `priceIndex`
-    tap((assetDetails) => {
-      // TODO (@Veado) Get token ticker from persistent storage (issue https://github.com/thorchain/asgardex-electron/issues/127)
-      // const baseTokenTicker = getBasePriceAsset() || BASE_TOKEN_TICKER;
-      const priceIndex = getPriceIndex(assetDetails, BASE_TOKEN_TICKER)
-      state = { ...state, priceIndex }
-    }),
+    tap((assetDetails) => (state = { ...state, assetDetails })),
     //
     concatMap((_) => apiGetPoolsData$(state.poolAssets)),
     // Derive + store `poolDetails`

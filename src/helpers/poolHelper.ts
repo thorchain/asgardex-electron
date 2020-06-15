@@ -1,31 +1,30 @@
-import { bnOrZero } from '@thorchain/asgardex-util'
+import { bnOrZero, baseAmount, PoolData } from '@thorchain/asgardex-util'
 
-import { BASE_TOKEN_TICKER } from '../const'
-import { PoolsState, PoolDetails } from '../services/midgard/types'
+import { PoolDetails } from '../services/midgard/types'
 import { getAssetFromString } from '../services/midgard/utils'
 import { Nothing, Maybe } from '../types/asgardex.d'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
-import { PoolRowType } from '../views/pools/types'
-import { getPoolData } from '../views/pools/utils'
+import { PoolTableRowData, PoolTableRowsData } from '../views/pools/types'
+import { getPoolTableRowData } from '../views/pools/utils'
 
-export const getPoolViewData = (
-  pools: Pick<PoolsState, 'poolDetails' | 'priceIndex'>,
+export const getPoolTableRowsData = (
+  poolDetails: PoolDetails,
+  pricePool: PoolData,
   poolStatus: PoolDetailStatusEnum
-): PoolRowType[] => {
-  const { poolDetails, priceIndex } = pools
-  const deepestPool = getDeepestPool(poolDetails)
+): PoolTableRowsData => {
+  const poolDetailsFiltered = poolDetails.filter((detail) => detail?.status === poolStatus)
+  const deepestPool = getDeepestPool(poolDetailsFiltered)
   const { symbol: deepestPoolSymbol } = getAssetFromString(deepestPool?.asset)
   // Transform `PoolDetails` -> PoolRowType
-  const poolViewData = poolDetails.map((poolDetail, index) => {
+  return poolDetailsFiltered.map((poolDetail, index) => {
     const { symbol = '' } = getAssetFromString(poolDetail.asset)
     const deepest = symbol && deepestPoolSymbol && symbol === deepestPoolSymbol
     return {
-      ...getPoolData(symbol, poolDetail, priceIndex, BASE_TOKEN_TICKER),
+      ...getPoolTableRowData(poolDetail, pricePool),
       deepest,
       key: poolDetail?.asset || index
-    } as PoolRowType
+    } as PoolTableRowData
   })
-  return poolViewData.filter((poolData) => poolData.status === poolStatus)
 }
 
 export const filterPendingPools = (pools: PoolDetails) =>
@@ -41,3 +40,16 @@ export const getDeepestPool = (pools: PoolDetails) =>
     const runeDepth = bnOrZero(pool.runeDepth)
     return runeDepth.isGreaterThanOrEqualTo(bnOrZero(acc?.runeDepth)) ? pool : acc
   }, Nothing)
+
+/**
+ * Transforms `PoolDetail` into `PoolData`
+ * Needed for misc. pool calculations using `asgardex-util`
+ */
+export const toPoolData = (detail: PoolDetail) => {
+  const assetDepth = bnOrZero(detail.assetDepth)
+  const runeDepth = bnOrZero(detail.runeDepth)
+  return {
+    assetBalance: baseAmount(assetDepth),
+    runeBalance: baseAmount(runeDepth)
+  } as PoolData
+}

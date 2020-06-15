@@ -2,9 +2,17 @@ import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
 
 import { SyncOutlined, SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { bn } from '@thorchain/asgardex-util'
+import {
+  PoolData,
+  assetAmount,
+  formatAssetAmount,
+  assetToBase,
+  BaseAmount,
+  baseToAsset
+} from '@thorchain/asgardex-util'
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
+import BigNumber from 'bignumber.js'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
@@ -15,7 +23,7 @@ import Label from '../../components/uielements/label'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { getPoolViewData, hasPendingPools } from '../../helpers/poolHelper'
+import { getPoolTableRowsData, hasPendingPools } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
@@ -25,7 +33,7 @@ import { Maybe, Nothing } from '../../types/asgardex.d'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import View from '../View'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
-import { PoolRowType, PoolRowTypeList } from './types'
+import { PoolTableRowData, PoolTableRowsData } from './types'
 
 type Props = {}
 
@@ -41,6 +49,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   useEffect(() => {
     const networkInfo = RD.toNullable(networkInfoRD)
     if (networkInfo) {
+      console.log('networkInfo?.poolActivationCountdown?.toString():', networkInfo?.poolActivationCountdown?.toString())
       setBlocksLeft(networkInfo?.poolActivationCountdown?.toString() ?? '')
     }
   }, [networkInfoRD])
@@ -48,9 +57,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   // store previous data of pools to render these while reloading
-  const previousPools = useRef<Maybe<PoolRowTypeList>>(Nothing)
+  const previousPools = useRef<Maybe<PoolTableRowsData>>(Nothing)
   // store previous data of pending pools to render these while reloading
-  const previousPendingPools = useRef<Maybe<PoolRowTypeList>>(Nothing)
+  const previousPendingPools = useRef<Maybe<PoolTableRowsData>>(Nothing)
 
   const pendingCountdownHandler = useCallback(() => {
     midgardService.reloadNetworkInfo()
@@ -63,6 +72,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }, [poolsRD])
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
+
+  // Hardcoded "price" pool amounts - temporary and for debugging only
+  // Will be removed by https://github.com/thorchain/asgardex-electron/issues/173
+  const oneAsset = assetToBase(assetAmount(1))
+  const pricePool: PoolData = { runeBalance: oneAsset, assetBalance: oneAsset }
 
   const clickSwapHandler = (p: SwapRouteParams) => {
     history.push(swapRoutes.swap.path(p))
@@ -90,7 +104,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'btn',
     title: renderBtnColTitle,
     width: 280,
-    render: (_: string, record: PoolRowType) => {
+    render: (_: string, record: PoolTableRowData) => {
       const {
         pool: { asset, target }
       } = record
@@ -110,7 +124,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     }
   }
 
-  const poolColumn: ColumnType<PoolRowType> = {
+  const poolColumn: ColumnType<PoolTableRowData> = {
     key: 'pool',
     title: 'pool',
     dataIndex: 'pool',
@@ -118,7 +132,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     render: ({ target }: { asset: string; target: string }) => <Coin type="rune" over={target} />
   }
 
-  const poolColumnMobile: ColumnType<PoolRowType> = {
+  const poolColumnMobile: ColumnType<PoolTableRowData> = {
     key: 'pool',
     title: 'pool',
     dataIndex: 'pool',
@@ -129,66 +143,91 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     )
   }
 
-  const assetColumn: ColumnType<PoolRowType> = {
+  const assetColumn: ColumnType<PoolTableRowData> = {
     key: 'asset',
     title: 'asset',
     dataIndex: 'pool',
     render: ({ target }: { target: string }) => <Label>{target}</Label>,
-    sorter: (a: PoolRowType, b: PoolRowType) => a.pool.target.localeCompare(b.pool.target),
+    sorter: (a: PoolTableRowData, b: PoolTableRowData) => a.pool.target.localeCompare(b.pool.target),
     sortDirections: ['descend', 'ascend']
   }
 
-  const priceColumn: ColumnType<PoolRowType> = {
+  const priceColumn: ColumnType<PoolTableRowData> = {
     key: 'poolprice',
     title: 'price',
     dataIndex: 'poolPrice',
-    sorter: (a: PoolRowType, b: PoolRowType) => a.raw.poolPrice.minus(b.raw.poolPrice).toNumber(),
+    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price), 3)}</Label>,
+    sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
+      const aAmount = a.poolPrice.amount()
+      const bAmount = b.poolPrice.amount()
+      return aAmount.minus(bAmount).toNumber()
+    },
     sortDirections: ['descend', 'ascend'],
     defaultSortOrder: 'descend'
   }
 
-  const depthColumn: ColumnType<PoolRowType> = {
+  const depthColumn: ColumnType<PoolTableRowData> = {
     key: 'depth',
     title: 'depth',
-    dataIndex: 'depth',
-    sorter: (a: PoolRowType, b: PoolRowType) => a.raw.depth.minus(b.raw.depth).toNumber(),
+    dataIndex: 'depthPrice',
+    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price))}</Label>,
+    sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
+      const aAmount = a.depthPrice.amount()
+      const bAmount = b.depthPrice.amount()
+      return aAmount.minus(bAmount).toNumber()
+    },
     sortDirections: ['descend', 'ascend']
   }
 
-  const volumeColumn: ColumnType<PoolRowType> = {
+  const volumeColumn: ColumnType<PoolTableRowData> = {
     key: 'vol',
     title: '24h vol',
-    dataIndex: 'volume',
-    sorter: (a: PoolRowType, b: PoolRowType) => a.raw.volume.minus(b.raw.volume).toNumber(),
+    dataIndex: 'volumePrice',
+    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price))}</Label>,
+    sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
+      const aAmount = a.volumePrice.amount()
+      const bAmount = b.volumePrice.amount()
+      return aAmount.minus(bAmount).toNumber()
+    },
     sortDirections: ['descend', 'ascend']
   }
 
-  const transactionColumn: ColumnType<PoolRowType> = {
+  const transactionColumn: ColumnType<PoolTableRowData> = {
     key: 'transaction',
     title: 'avg. size',
-    dataIndex: 'transaction',
-    sorter: (a: PoolRowType, b: PoolRowType) => a.raw.transaction.minus(b.raw.transaction).toNumber(),
+    dataIndex: 'transactionPrice',
+    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price))}</Label>,
+    sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
+      const aAmount = a.transactionPrice.amount()
+      const bAmount = b.transactionPrice.amount()
+      return aAmount.minus(bAmount).toNumber()
+    },
     sortDirections: ['descend', 'ascend']
   }
 
-  const slipColumn: ColumnType<PoolRowType> = {
+  const slipColumn: ColumnType<PoolTableRowData> = {
     key: 'slip',
     title: 'avg. slip',
     dataIndex: 'slip',
-    render: (slip: string) => <Trend amount={bn(slip)} />,
-    sorter: (a: PoolRowType, b: PoolRowType) => a.raw.slip.minus(b.raw.slip).toNumber(),
+    render: (slip: BigNumber) => <Trend amount={slip} />,
+    sorter: (a: PoolTableRowData, b: PoolTableRowData) => a.slip.minus(b.slip).toNumber(),
     sortDirections: ['descend', 'ascend']
   }
 
-  const tradeColumn: ColumnType<PoolRowType> = {
+  const tradeColumn: ColumnType<PoolTableRowData> = {
     key: 'trade',
     title: 'trades',
-    dataIndex: 'trade',
-    sorter: (a: PoolRowType, b: PoolRowType) => a.raw.trade.minus(b.raw.trade).toNumber(),
+    dataIndex: 'trades',
+    render: (trades: BigNumber) => <Label>{trades.toString()}</Label>,
+    sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
+      const aAmount = a.trades
+      const bAmount = b.trades
+      return aAmount.minus(bAmount).toNumber()
+    },
     sortDirections: ['descend', 'ascend']
   }
 
-  const desktopPoolsColumns: ColumnsType<PoolRowType> = [
+  const desktopPoolsColumns: ColumnsType<PoolTableRowData> = [
     poolColumn,
     assetColumn,
     priceColumn,
@@ -200,10 +239,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     btnPoolsColumn
   ]
 
-  const mobilePoolsColumns: ColumnsType<PoolRowType> = [poolColumnMobile, btnPoolsColumn]
+  const mobilePoolsColumns: ColumnsType<PoolTableRowData> = [poolColumnMobile, btnPoolsColumn]
 
   const renderPoolsTable = useCallback(
-    (tableData: PoolRowType[], loading = false) => {
+    (tableData: PoolTableRowData[], loading = false) => {
       const columns = isDesktopView ? desktopPoolsColumns : mobilePoolsColumns
       return <Table columns={columns} dataSource={tableData} loading={loading} rowKey="key" />
     },
@@ -228,21 +267,21 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           },
           // success state
           (pools: PoolsState): JSX.Element => {
-            const poolViewData = getPoolViewData(pools, PoolDetailStatusEnum.Enabled)
+            const poolViewData = getPoolTableRowsData(pools.poolDetails, pricePool, PoolDetailStatusEnum.Enabled)
             previousPools.current = poolViewData
             return renderPoolsTable(poolViewData)
           }
         )(poolsRD)}
       </>
     ),
-    [poolsRD, renderPoolsTable]
+    [poolsRD, pricePool, renderPoolsTable]
   )
 
   const btnPendingPoolsColumn = {
     key: 'btn',
     title: '',
     width: 200,
-    render: (_: string, record: PoolRowType) => {
+    render: (_: string, record: PoolTableRowData) => {
       const {
         pool: { target }
       } = record
@@ -262,18 +301,18 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'blocks',
     title: 'blocks left',
     width: 80,
-    render: (_: string, record: PoolRowType) => {
+    render: (_: string, record: PoolTableRowData) => {
       const { deepest } = record
 
       return (
         <TableAction>
-          <BlockLeftLabel size="normal">{deepest ? blocksLeft.toString() : ''}</BlockLeftLabel>
+          <BlockLeftLabel>{deepest ? blocksLeft.toString() : ''}</BlockLeftLabel>
         </TableAction>
       )
     }
   }
 
-  const desktopPendingPoolsColumns: ColumnsType<PoolRowType> = [
+  const desktopPendingPoolsColumns: ColumnsType<PoolTableRowData> = [
     poolColumn,
     assetColumn,
     priceColumn,
@@ -282,10 +321,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     btnPendingPoolsColumn
   ]
 
-  const mobilePendingPoolsColumns: ColumnsType<PoolRowType> = [poolColumnMobile, btnPendingPoolsColumn]
+  const mobilePendingPoolsColumns: ColumnsType<PoolTableRowData> = [poolColumnMobile, btnPendingPoolsColumn]
 
   const renderPendingPoolsTable = useCallback(
-    (tableData: PoolRowType[], loading = false) => {
+    (tableData: PoolTableRowData[], loading = false) => {
       const columns = isDesktopView ? desktopPendingPoolsColumns : mobilePendingPoolsColumns
       return <Table columns={columns} dataSource={tableData} loading={loading} rowKey="key" />
     },
@@ -306,15 +345,15 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           // error state - we just show an empty table, an error will be shown on pools table
           (_: Error) => renderPendingPoolsTable([]),
           // success state
-          (pools: PoolsState): JSX.Element => {
-            const poolViewData = getPoolViewData(pools, PoolDetailStatusEnum.Bootstrapped)
+          (state: PoolsState): JSX.Element => {
+            const poolViewData = getPoolTableRowsData(state.poolDetails, pricePool, PoolDetailStatusEnum.Bootstrapped)
             previousPendingPools.current = poolViewData
             return renderPendingPoolsTable(poolViewData)
           }
         )(poolsRD)}
       </>
     ),
-    [poolsRD, renderPendingPoolsTable]
+    [poolsRD, renderPendingPoolsTable, pricePool]
   )
 
   return (

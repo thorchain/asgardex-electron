@@ -1,58 +1,54 @@
-import { baseAmount, formatBaseAsTokenAmount } from '@thorchain/asgardex-token'
-import { validBNOrZero, bn } from '@thorchain/asgardex-util'
+import {
+  bnOrZero,
+  PoolData,
+  assetAmount,
+  getValueOfAsset1InAsset2,
+  baseAmount,
+  getValueOfRuneInAsset,
+  assetToBase
+} from '@thorchain/asgardex-util'
 
-import { PriceDataIndex } from '../../services/midgard/types'
+import { RUNE_TICKER } from '../../const'
+import { toPoolData } from '../../helpers/poolHelper'
 import { getAssetFromString } from '../../services/midgard/utils'
 import { PoolDetail, PoolDetailStatusEnum } from '../../types/generated/midgard'
-import { PoolDataType } from './types'
+import { PoolTableRowData, Pool } from './types'
 
-export const getPoolData = (
-  asset: string,
-  poolDetail: PoolDetail,
-  priceIndex: PriceDataIndex,
-  basePriceAsset: string
-): Omit<PoolDataType, 'deepest'> => {
-  const { ticker: target = '' } = getAssetFromString(poolDetail?.asset)
+export const getPoolTableRowData = (poolDetail: PoolDetail, pricePoolData: PoolData): PoolTableRowData => {
+  const { ticker = '' } = getAssetFromString(poolDetail?.asset)
 
-  const runePrice = validBNOrZero(priceIndex?.RUNE)
+  const poolData = toPoolData(poolDetail)
 
-  const poolPrice = validBNOrZero(priceIndex[target.toUpperCase()])
-  const poolPriceString = `${basePriceAsset} ${poolPrice.toFixed(3)}`
+  const oneAsset = assetToBase(assetAmount(1))
+  const poolPrice = getValueOfAsset1InAsset2(oneAsset, poolData, pricePoolData)
 
-  // formula: poolDetail.runeDepth * runePrice
-  const depth = bn(poolDetail?.runeDepth ?? 0).multipliedBy(runePrice)
-  const depthAsString = formatBaseAsTokenAmount(baseAmount(depth))
-  // formula: poolDetail.poolVolume24hr * runePrice
-  const volume = bn(poolDetail?.poolVolume24hr ?? 0).multipliedBy(runePrice)
-  const volumeAsString = formatBaseAsTokenAmount(baseAmount(volume))
-  // formula: poolDetail.poolTxAverage * runePrice
-  const transaction = bn(poolDetail?.poolTxAverage ?? 0).multipliedBy(runePrice)
-  const transactionAsString = formatBaseAsTokenAmount(baseAmount(transaction))
-  const slip = bn(poolDetail?.poolSlipAverage ?? 0).multipliedBy(100)
-  const slipAsString = slip.toString()
-  const trade = bn(poolDetail?.swappingTxCount ?? 0)
-  const tradeAsString = trade.toString()
+  const depthAmount = baseAmount(bnOrZero(poolDetail?.runeDepth))
+  const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
+
+  const volumeAmount = baseAmount(bnOrZero(poolDetail?.poolVolume24hr))
+  const volumePrice = getValueOfRuneInAsset(volumeAmount, pricePoolData)
+
+  const transaction = baseAmount(bnOrZero(poolDetail?.poolTxAverage))
+  const transactionPrice = getValueOfRuneInAsset(transaction, pricePoolData)
+
+  const slip = bnOrZero(poolDetail?.poolSlipAverage).multipliedBy(100)
+  const trades = bnOrZero(poolDetail?.swappingTxCount)
   const status = poolDetail?.status ?? PoolDetailStatusEnum.Disabled
 
+  const pool: Pool = {
+    asset: RUNE_TICKER,
+    target: ticker
+  }
+
   return {
-    pool: {
-      asset,
-      target
-    },
-    poolPrice: poolPriceString,
-    depth: depthAsString,
-    volume: volumeAsString,
-    transaction: transactionAsString,
-    slip: slipAsString,
-    trade: tradeAsString,
+    pool,
+    poolPrice,
+    depthPrice,
+    volumePrice,
+    transactionPrice,
+    slip,
+    trades,
     status,
-    raw: {
-      depth,
-      volume,
-      transaction,
-      slip,
-      trade,
-      poolPrice
-    }
+    key: ticker
   }
 }

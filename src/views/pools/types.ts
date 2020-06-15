@@ -1,32 +1,24 @@
+import { BaseAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 
-type PoolRawValueType = {
-  depth: BigNumber
-  volume: BigNumber
-  transaction: BigNumber
+export type Pool = {
+  asset: string
+  target: string
+}
+
+export type PoolTableRowData = {
+  pool: Pool
+  depthPrice: BaseAmount
+  volumePrice: BaseAmount
+  transactionPrice: BaseAmount
+  poolPrice: BaseAmount
   slip: BigNumber
-  trade: BigNumber
-  poolPrice: BigNumber
-}
-
-export type PoolDataType = {
-  pool: {
-    asset: string
-    target: string
-  }
-  poolPrice: string
-  depth: string
-  volume: string
-  transaction: string
-  slip: string
-  trade: string
+  trades: BigNumber
   status: PoolDetailStatusEnum
-  raw: PoolRawValueType
-  deepest: boolean
+  deepest?: boolean
+  key: string
 }
 
-export type PoolRowType = PoolDataType & { key: number | string }
-
-export type PoolRowTypeList = PoolRowType[]
+export type PoolTableRowsData = PoolTableRowData[]
