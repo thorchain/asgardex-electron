@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react'
+import React, { useCallback, useRef, useState, RefObject } from 'react'
 
 import { TokenAmount, tokenAmount } from '@thorchain/asgardex-token'
 import { bn, delay, formatBN } from '@thorchain/asgardex-util'
@@ -6,7 +6,7 @@ import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import { sortBy as _sortBy } from 'lodash'
 
-import { clickedOutsideNode } from '../../../../helpers/eventHelper'
+import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetPair } from '../../../../types/asgardex.d'
 import CoinInputAdvanced from '../../coins/coinInputAdvanced'
@@ -68,11 +68,6 @@ type Props = {
 }
 
 const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
-  const [openDropdown, setOpenDropdown] = useState(false)
-  const [percentButtonSelected, setPercentButtonSelected] = useState(0)
-  const ref = useRef<HTMLDivElement>(null)
-  const menuRef = useRef<HTMLDivElement>(null)
-
   const {
     asset = 'bnb',
     assetData = [],
@@ -92,35 +87,19 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     children = null
   } = props
 
-  const handleDocumentClick = useCallback(
-    (e: MouseEvent) => {
-      if (
-        ref.current &&
-        clickedOutsideNode(ref.current, e) &&
-        !!menuRef.current &&
-        clickedOutsideNode(menuRef.current, e)
-      ) {
-        setOpenDropdown(false)
-      }
-    },
-    [ref, menuRef]
-  )
+  const [openDropdown, setOpenDropdown] = useState(false)
+  const [percentButtonSelected, setPercentButtonSelected] = useState(0)
+  const ref: RefObject<HTMLDivElement> = useRef(null)
 
-  useEffect(() => {
-    document.addEventListener('click', handleDocumentClick)
-    return () => document.removeEventListener('click', handleDocumentClick)
-  }, [handleDocumentClick])
-
-  const handleVisibleChange = (openDropdown: boolean) => {
-    setOpenDropdown(openDropdown)
-  }
+  useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
 
   const handleResetPercentButtons = () => {
     setPercentButtonSelected(0)
   }
 
   const handleDropdownButtonClicked = () => {
-    handleVisibleChange(!openDropdown)
+    // toggle open state
+    setOpenDropdown((value) => !value)
   }
 
   const handlePercentSelected = (percentButtonSelected: number) => {
@@ -141,17 +120,15 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     const sortedAssetData = _sortBy(assetData, ['asset'])
 
     return (
-      <div ref={menuRef}>
-        <AssetCardMenu
-          assetData={sortedAssetData}
-          asset={asset}
-          priceIndex={priceIndex}
-          unit={unit}
-          withSearch={withSearch}
-          searchDisable={searchDisable}
-          onSelect={handleChangeAsset}
-        />
-      </div>
+      <AssetCardMenu
+        assetData={sortedAssetData}
+        asset={asset}
+        priceIndex={priceIndex}
+        unit={unit}
+        withSearch={withSearch}
+        searchDisable={searchDisable}
+        onSelect={handleChangeAsset}
+      />
     )
   }
 
