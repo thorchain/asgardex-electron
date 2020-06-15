@@ -158,6 +158,6 @@ export const FooterLabel = styled(Label).attrs({
   color: 'light',
   weight: 'normal'
 })`
-  letter-spacing: 0.416667px;
+  letter-spacing: 0.4px;
   padding: 0;
 `

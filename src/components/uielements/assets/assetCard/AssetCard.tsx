@@ -93,9 +93,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     onSelect = (_: number) => {},
     onChange = (_: BigNumber) => {},
     onChangeAsset = (_: string) => {},
-    children = null,
-    inputProps = { 'data-test': '' },
-    'data-test': dataTest
+    children = null
   } = props
 
   const handleDocumentClick = useCallback(
@@ -149,7 +147,6 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     return (
       <div ref={menuRef}>
         <AssetCardMenu
-          data-test={dataTest}
           assetData={sortedAssetData}
           asset={asset}
           priceIndex={priceIndex}
@@ -190,7 +187,6 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
                 size="large"
                 value={amount.amount()}
                 onChangeValue={onChange}
-                {...inputProps}
               />
               <HorizontalDivider color="primary" />
               <AssetCardFooter>

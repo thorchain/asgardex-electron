@@ -22,21 +22,10 @@ type Props = {
   searchDisable: string[]
   withSearch: boolean
   onSelect: (value: string) => void
-  'data-test'?: string
 }
 
 const AssetCardMenu: React.FC<Props> = (props: Props): JSX.Element => {
-  const {
-    assetData,
-    asset,
-    priceIndex = {},
-    unit,
-    withSearch,
-    searchDisable = [],
-    onSelect = () => {},
-    'data-test': dataTest = '',
-    ...otherProps // (Rudi) need to pass props for antd to provide box shadow
-  } = props
+  const { assetData, asset, priceIndex = {}, unit, withSearch, searchDisable = [], onSelect = () => {} } = props
 
   const filteredData = useMemo(
     () =>
@@ -74,8 +63,6 @@ const AssetCardMenu: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <FilterMenu
-      {...otherProps}
-      data-test={[dataTest, 'AssetCard-menu'].join('-')}
       searchEnabled={withSearch}
       filterFunction={filterFunction}
       cellRenderer={cellRenderer}

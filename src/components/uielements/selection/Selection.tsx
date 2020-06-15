@@ -8,13 +8,13 @@ type Props = {
   className?: string
 }
 
-const Selection: React.FC<Props> = ({ selected = 0, onSelect, className = '', ...otherProps }): JSX.Element => {
+const Selection: React.FC<Props> = ({ selected = 0, onSelect, className = '' }): JSX.Element => {
   function handleClick(value: number) {
     onSelect(value)
   }
 
   return (
-    <SelectionWrapper className={`selection-wrapper ${className}`} {...otherProps}>
+    <SelectionWrapper className={`selection-wrapper ${className}`}>
       <Button data-test="selection-button-25" onClick={() => handleClick(25)} focused={selected === 25} tabIndex={-1}>
         25%
       </Button>
