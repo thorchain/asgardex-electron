@@ -1,5 +1,5 @@
 // import { baseAmount } from '@thorchain/asgardex-token'
-import { bn, assetAmount, PoolData } from '@thorchain/asgardex-util'
+import { bn, assetAmount, PoolData, assetToBase } from '@thorchain/asgardex-util'
 
 import { PoolDetail, PoolDetailStatusEnum } from '../../types/generated/midgard/models/PoolDetail'
 import { PoolTableRowData } from './types'
@@ -18,7 +18,10 @@ describe('poolUtil', () => {
       status: PoolDetailStatusEnum.Bootstrapped
     }
 
-    const pricePoolData: PoolData = { runeBalance: assetAmount(10), assetBalance: assetAmount(100) }
+    const pricePoolData: PoolData = {
+      runeBalance: assetToBase(assetAmount(10)),
+      assetBalance: assetToBase(assetAmount(100))
+    }
 
     it('transforms data for a LOK pool', () => {
       const expected: PoolTableRowData = {
@@ -26,10 +29,10 @@ describe('poolUtil', () => {
           asset: 'RUNE',
           target: 'LOK'
         },
-        poolPrice: assetAmount(2),
-        depthPrice: assetAmount(1000),
-        volumePrice: assetAmount('909.0909091'),
-        transactionPrice: assetAmount('909.0909091'),
+        poolPrice: assetToBase(assetAmount(2)),
+        depthPrice: assetToBase(assetAmount(1000)),
+        volumePrice: assetToBase(assetAmount('909.0909091')),
+        transactionPrice: assetToBase(assetAmount('909.0909091')),
         slip: bn('0.11'),
         trades: bn(123),
         status: PoolDetailStatusEnum.Enabled,

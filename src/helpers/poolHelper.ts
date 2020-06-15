@@ -1,4 +1,4 @@
-import { bnOrZero, baseToAsset, baseAmount, PoolData } from '@thorchain/asgardex-util'
+import { bnOrZero, baseAmount, PoolData } from '@thorchain/asgardex-util'
 
 import { PoolDetails } from '../services/midgard/types'
 import { getAssetFromString } from '../services/midgard/utils'
@@ -12,10 +12,11 @@ export const getPoolTableRowsData = (
   pricePool: PoolData,
   poolStatus: PoolDetailStatusEnum
 ): PoolTableRowsData => {
-  const deepestPool = getDeepestPool(poolDetails)
+  const poolDetailsFiltered = poolDetails.filter((detail) => detail?.status === poolStatus)
+  const deepestPool = getDeepestPool(poolDetailsFiltered)
   const { symbol: deepestPoolSymbol } = getAssetFromString(deepestPool?.asset)
   // Transform `PoolDetails` -> PoolRowType
-  const poolViewData = poolDetails.map((poolDetail, index) => {
+  return poolDetailsFiltered.map((poolDetail, index) => {
     const { symbol = '' } = getAssetFromString(poolDetail.asset)
     const deepest = symbol && deepestPoolSymbol && symbol === deepestPoolSymbol
     return {
@@ -24,7 +25,6 @@ export const getPoolTableRowsData = (
       key: poolDetail?.asset || index
     } as PoolTableRowData
   })
-  return poolViewData.filter((poolData) => poolData.status === poolStatus)
 }
 
 export const filterPendingPools = (pools: PoolDetails) =>
@@ -49,7 +49,7 @@ export const toPoolData = (detail: PoolDetail) => {
   const assetDepth = bnOrZero(detail.assetDepth)
   const runeDepth = bnOrZero(detail.runeDepth)
   return {
-    assetBalance: baseToAsset(baseAmount(assetDepth)),
-    runeBalance: baseToAsset(baseAmount(runeDepth))
+    assetBalance: baseAmount(assetDepth),
+    runeBalance: baseAmount(runeDepth)
   } as PoolData
 }

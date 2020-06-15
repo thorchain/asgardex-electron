@@ -2,7 +2,14 @@ import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
 
 import { SyncOutlined, SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { PoolData, assetAmount, AssetAmount, formatAssetAmount } from '@thorchain/asgardex-util'
+import {
+  PoolData,
+  assetAmount,
+  formatAssetAmount,
+  assetToBase,
+  BaseAmount,
+  baseToAsset
+} from '@thorchain/asgardex-util'
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import BigNumber from 'bignumber.js'
@@ -42,6 +49,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   useEffect(() => {
     const networkInfo = RD.toNullable(networkInfoRD)
     if (networkInfo) {
+      console.log('networkInfo?.poolActivationCountdown?.toString():', networkInfo?.poolActivationCountdown?.toString())
       setBlocksLeft(networkInfo?.poolActivationCountdown?.toString() ?? '')
     }
   }, [networkInfoRD])
@@ -67,7 +75,8 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   // Hardcoded "price" pool amounts - temporary and for debugging only
   // Will be removed by https://github.com/thorchain/asgardex-electron/issues/173
-  const pricePool: PoolData = { runeBalance: assetAmount(1), assetBalance: assetAmount(1) }
+  const oneAsset = assetToBase(assetAmount(1))
+  const pricePool: PoolData = { runeBalance: oneAsset, assetBalance: oneAsset }
 
   const clickSwapHandler = (p: SwapRouteParams) => {
     history.push(swapRoutes.swap.path(p))
@@ -147,7 +156,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'poolprice',
     title: 'price',
     dataIndex: 'poolPrice',
-    render: (price: AssetAmount) => <Label>{formatAssetAmount(price, 3)}</Label>,
+    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price), 3)}</Label>,
     sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
       const aAmount = a.poolPrice.amount()
       const bAmount = b.poolPrice.amount()
@@ -161,7 +170,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'depth',
     title: 'depth',
     dataIndex: 'depthPrice',
-    render: (price: AssetAmount) => <Label>{formatAssetAmount(price)}</Label>,
+    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price))}</Label>,
     sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
       const aAmount = a.depthPrice.amount()
       const bAmount = b.depthPrice.amount()
@@ -174,7 +183,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'vol',
     title: '24h vol',
     dataIndex: 'volumePrice',
-    render: (price: AssetAmount) => <Label>{formatAssetAmount(price)}</Label>,
+    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price))}</Label>,
     sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
       const aAmount = a.volumePrice.amount()
       const bAmount = b.volumePrice.amount()
@@ -187,7 +196,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'transaction',
     title: 'avg. size',
     dataIndex: 'transactionPrice',
-    render: (price: AssetAmount) => <Label>{formatAssetAmount(price)}</Label>,
+    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price))}</Label>,
     sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
       const aAmount = a.transactionPrice.amount()
       const bAmount = b.transactionPrice.amount()
@@ -297,7 +306,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
       return (
         <TableAction>
-          <BlockLeftLabel size="large">{deepest ? blocksLeft.toString() : ''}</BlockLeftLabel>
+          <BlockLeftLabel>{deepest ? blocksLeft.toString() : ''}</BlockLeftLabel>
         </TableAction>
       )
     }

@@ -3,10 +3,9 @@ import {
   PoolData,
   assetAmount,
   getValueOfAsset1InAsset2,
-  // getValueOfRuneInAsset,
   baseAmount,
-  baseToAsset,
-  getValueOfRuneInAsset
+  getValueOfRuneInAsset,
+  assetToBase
 } from '@thorchain/asgardex-util'
 
 import { RUNE_TICKER } from '../../const'
@@ -20,16 +19,17 @@ export const getPoolTableRowData = (poolDetail: PoolDetail, pricePoolData: PoolD
 
   const poolData = toPoolData(poolDetail)
 
-  const poolPrice = getValueOfAsset1InAsset2(assetAmount(1), poolData, pricePoolData)
+  const oneAsset = assetToBase(assetAmount(1))
+  const poolPrice = getValueOfAsset1InAsset2(oneAsset, poolData, pricePoolData)
 
   const depthAmount = baseAmount(bnOrZero(poolDetail?.runeDepth))
-  const depthPrice = getValueOfRuneInAsset(baseToAsset(depthAmount), pricePoolData)
+  const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
 
   const volumeAmount = baseAmount(bnOrZero(poolDetail?.poolVolume24hr))
-  const volumePrice = getValueOfAsset1InAsset2(baseToAsset(volumeAmount), poolData, pricePoolData)
+  const volumePrice = getValueOfRuneInAsset(volumeAmount, pricePoolData)
 
   const transaction = baseAmount(bnOrZero(poolDetail?.poolTxAverage))
-  const transactionPrice = getValueOfAsset1InAsset2(baseToAsset(transaction), poolData, pricePoolData)
+  const transactionPrice = getValueOfRuneInAsset(transaction, pricePoolData)
 
   const slip = bnOrZero(poolDetail?.poolSlipAverage).multipliedBy(100)
   const trades = bnOrZero(poolDetail?.swappingTxCount)

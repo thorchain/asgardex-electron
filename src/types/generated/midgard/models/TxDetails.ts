@@ -95,6 +95,7 @@ export enum TxDetailsTypeEnum {
     Add = 'add',
     Pool = 'pool',
     Gas = 'gas',
-    Refund = 'refund'
+    Refund = 'refund',
+    DoubleSwap = 'doubleSwap'
 }
 

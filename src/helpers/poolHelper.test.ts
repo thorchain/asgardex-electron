@@ -1,4 +1,4 @@
-import { PoolData, assetAmount } from '@thorchain/asgardex-util'
+import { PoolData, assetAmount, assetToBase } from '@thorchain/asgardex-util'
 
 import { PoolDetails } from '../services/midgard/types'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
@@ -70,7 +70,10 @@ describe('helpers/poolHelper/', () => {
       }
     ]
 
-    const pricePoolData: PoolData = { runeBalance: assetAmount(110), assetBalance: assetAmount(100) }
+    const pricePoolData: PoolData = {
+      runeBalance: assetToBase(assetAmount(110)),
+      assetBalance: assetToBase(assetAmount(100))
+    }
 
     it('returns data for pending pools', () => {
       const result = getPoolTableRowsData(poolDetails, pricePoolData, PoolDetailStatusEnum.Bootstrapped)
@@ -88,14 +91,14 @@ describe('helpers/poolHelper/', () => {
 
   describe('getPoolViewData', () => {
     const poolDetail: PoolDetail = {
-      assetDepth: '1000000000',
-      runeDepth: '100000000'
+      assetDepth: '11000000000',
+      runeDepth: '10000000000'
     }
 
     it('transforms `PoolData', () => {
       const result = toPoolData(poolDetail)
-      expect(result.assetBalance.amount().toNumber()).toEqual(10)
-      expect(result.runeBalance.amount().toNumber()).toEqual(1)
+      expect(result.assetBalance.amount().toNumber()).toEqual(11000000000)
+      expect(result.runeBalance.amount().toNumber()).toEqual(10000000000)
     })
   })
 })

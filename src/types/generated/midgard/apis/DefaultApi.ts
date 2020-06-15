@@ -49,7 +49,7 @@ export interface GetTxDetailsRequest {
     address?: string;
     txid?: string;
     asset?: string;
-    type?: GetTxDetailsTypeEnum;
+    type?: string;
 }
 
 /**
@@ -227,16 +227,4 @@ export class DefaultApi extends BaseAPI {
         });
     };
 
-}
-
-/**
- * @export
- * @enum {string}
- */
-export enum GetTxDetailsTypeEnum {
-    Swap = 'swap',
-    Stake = 'stake',
-    Unstake = 'unstake',
-    Add = 'add',
-    Refund = 'refund'
 }
