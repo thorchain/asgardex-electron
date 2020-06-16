@@ -8,6 +8,27 @@ export type Pool = {
   target: string
 }
 
+// Assets
+export enum PoolAsset {
+  RUNE = 'BNB.RUNE-A1A',
+  BNB = 'BNB.BNB',
+  ETH = 'ETH.ETH',
+  BTC = 'BTC.BTC',
+  TUSDB = 'BNB.TUSDB-000'
+}
+
+// List of assets used for pricing
+export type PoolPriceAsset = PoolAsset.RUNE | PoolAsset.ETH | PoolAsset.BTC | PoolAsset.TUSDB
+export type PoolPriceAssets = PoolPriceAsset[]
+
+export type CurrencySymbols = {
+  [asset in PoolPriceAsset]: string
+}
+
+export type CurrencyWeights = {
+  [asset in PoolPriceAsset]: number
+}
+
 export type PoolTableRowData = {
   pool: Pool
   depthPrice: BaseAmount

@@ -4,6 +4,7 @@ import { Row, Dropdown } from 'antd'
 import { ClickParam } from 'antd/lib/menu'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
+import { PoolPriceAsset } from '../../views/pools/types'
 import Menu from '../shared/Menu'
 import {
   HeaderDropdownMenuItem,
@@ -15,7 +16,7 @@ import {
 
 export type HeaderCurrencyItem = {
   label: string
-  value: string
+  value: PoolPriceAsset
 }
 
 export type HeaderCurrencyItems = HeaderCurrencyItem[]

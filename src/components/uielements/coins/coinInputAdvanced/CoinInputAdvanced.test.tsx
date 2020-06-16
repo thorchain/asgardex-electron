@@ -2,7 +2,7 @@ import { renderHook, act, RenderHookResult } from '@testing-library/react-hooks'
 import { bn } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
-import { FixmeType } from '../../../../types/asgardex.d'
+import { FixmeType } from '../../../../types/asgardex'
 import { useCoinCardInputBehaviour, isBroadcastable } from './CoinInputAdvanced'
 
 // Unit testing is really required to ensure a complex component

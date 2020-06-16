@@ -49,7 +49,6 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   useEffect(() => {
     const networkInfo = RD.toNullable(networkInfoRD)
     if (networkInfo) {
-      console.log('networkInfo?.poolActivationCountdown?.toString():', networkInfo?.poolActivationCountdown?.toString())
       setBlocksLeft(networkInfo?.poolActivationCountdown?.toString() ?? '')
     }
   }, [networkInfoRD])

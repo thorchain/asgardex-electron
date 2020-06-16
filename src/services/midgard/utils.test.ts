@@ -1,5 +1,6 @@
 import { RUNE_TICKER } from '../../const'
 import { ThorchainEndpoint, AssetDetail } from '../../types/generated/midgard'
+import { PoolAsset } from '../../views/pools/types'
 import { getAssetDetailIndex, getAssetDetail } from './utils'
 
 type PoolDataMock = { asset?: string }
@@ -29,8 +30,8 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('getDetail', () => {
-    const runeDetail: AssetDetail = { asset: 'BNB.RUNE-B1A' }
-    const bnbDetail: AssetDetail = { asset: 'BNB.BNB' }
+    const runeDetail: AssetDetail = { asset: PoolAsset.RUNE }
+    const bnbDetail: AssetDetail = { asset: PoolAsset.BNB }
 
     it('returns details of RUNE', () => {
       const result = getAssetDetail([runeDetail, bnbDetail], RUNE_TICKER)

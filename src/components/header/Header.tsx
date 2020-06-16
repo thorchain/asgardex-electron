@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid } from 'antd'
 import { useObservableState } from 'observable-hooks'
 import { useRouteMatch, Link } from 'react-router-dom'
@@ -11,12 +12,14 @@ import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
+import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
+import { PoolAsset } from '../../views/pools/types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
-import HeaderCurrency from './HeaderCurrency'
+import HeaderCurrency, { HeaderCurrencyItems } from './HeaderCurrency'
 import HeaderLang from './HeaderLang'
 import HeaderLock from './HeaderLock'
 import HeaderNetStatus from './HeaderNetStatus'
@@ -46,6 +49,9 @@ const Header: React.FC<Props> = (_): JSX.Element => {
 
   const { isLocked$, lock } = useWalletContext()
   const isLocked = useObservableState(isLocked$)
+
+  const { service: midgardService } = useMidgardContext()
+  const _poolsRD = useObservableState(midgardService.poolState$, RD.pending)
 
   const [menuVisible, setMenuVisible] = useState(false)
 
@@ -131,11 +137,11 @@ const Header: React.FC<Props> = (_): JSX.Element => {
 
   // TODO(@Veado) Hardcoded values - just for a moment,
   // will be removed later by another PR for using real data
-  const currencies = [
-    { label: 'ᚱ RUNE', value: 'RUNE' },
-    { label: '₿ BTC', value: 'BTC' },
-    { label: 'Ξ ETH', value: 'ETH' },
-    { label: '$ USD', value: 'USD' }
+  const currencies: HeaderCurrencyItems = [
+    { label: 'ᚱ RUNE', value: PoolAsset.RUNE },
+    { label: '₿ BTC', value: PoolAsset.BTC },
+    { label: 'Ξ ETH', value: PoolAsset.ETH },
+    { label: '$ USD', value: PoolAsset.TUSDB }
   ]
 
   const currencyChangeHandler = useCallback((value: string) => {

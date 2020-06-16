@@ -3,13 +3,14 @@ import React from 'react'
 import { boolean } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 
+import { PoolAsset } from '../../views/pools/types'
 import HeaderCurrency, { HeaderCurrencyItems } from './HeaderCurrency'
 
 const items: HeaderCurrencyItems = [
-  { label: 'ᚱ RUNE', value: 'RUNE' },
-  { label: '₿ BTC', value: 'BTC' },
-  { label: 'Ξ ETH', value: 'ETH' },
-  { label: '$ USD', value: 'USD' }
+  { label: 'ᚱ RUNE', value: PoolAsset.RUNE },
+  { label: '₿ BTC', value: PoolAsset.BTC },
+  { label: 'Ξ ETH', value: PoolAsset.ETH },
+  { label: '$ USD', value: PoolAsset.TUSDB }
 ]
 
 storiesOf('Components/HeaderCurrency', module).add('desktop / mobile', () => {
