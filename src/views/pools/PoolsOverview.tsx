@@ -2,14 +2,7 @@ import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
 
 import { SyncOutlined, SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import {
-  PoolData,
-  assetAmount,
-  formatAssetAmount,
-  assetToBase,
-  BaseAmount,
-  baseToAsset
-} from '@thorchain/asgardex-util'
+import { BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import BigNumber from 'bignumber.js'
@@ -22,6 +15,7 @@ import Coin from '../../components/uielements/coins/coin'
 import Label from '../../components/uielements/label'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
+import { RUNE_PRICE_POOL } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getPoolTableRowsData, hasPendingPools } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
@@ -72,10 +66,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
 
-  // Hardcoded "price" pool amounts - temporary and for debugging only
-  // Will be removed by https://github.com/thorchain/asgardex-electron/issues/173
-  const oneAsset = assetToBase(assetAmount(1))
-  const pricePool: PoolData = { runeBalance: oneAsset, assetBalance: oneAsset }
+  const pricePool = useMemo(() => {
+    const pools = RD.toNullable(poolsRD)
+    return pools?.selectedPricePool ?? RUNE_PRICE_POOL
+  }, [poolsRD])
 
   const clickSwapHandler = (p: SwapRouteParams) => {
     history.push(swapRoutes.swap.path(p))
@@ -155,7 +149,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'poolprice',
     title: 'price',
     dataIndex: 'poolPrice',
-    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price), 3)}</Label>,
+    render: (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset, 3)}</Label>,
     sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
       const aAmount = a.poolPrice.amount()
       const bAmount = b.poolPrice.amount()
@@ -169,7 +163,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'depth',
     title: 'depth',
     dataIndex: 'depthPrice',
-    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price))}</Label>,
+    render: (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
     sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
       const aAmount = a.depthPrice.amount()
       const bAmount = b.depthPrice.amount()
@@ -182,7 +176,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'vol',
     title: '24h vol',
     dataIndex: 'volumePrice',
-    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price))}</Label>,
+    render: (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
     sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
       const aAmount = a.volumePrice.amount()
       const bAmount = b.volumePrice.amount()
@@ -195,7 +189,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'transaction',
     title: 'avg. size',
     dataIndex: 'transactionPrice',
-    render: (price: BaseAmount) => <Label>{formatAssetAmount(baseToAsset(price))}</Label>,
+    render: (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
     sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
       const aAmount = a.transactionPrice.amount()
       const bAmount = b.transactionPrice.amount()
@@ -266,7 +260,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           },
           // success state
           (pools: PoolsState): JSX.Element => {
-            const poolViewData = getPoolTableRowsData(pools.poolDetails, pricePool, PoolDetailStatusEnum.Enabled)
+            const poolViewData = getPoolTableRowsData(
+              pools.poolDetails,
+              pricePool.poolData,
+              PoolDetailStatusEnum.Enabled
+            )
             previousPools.current = poolViewData
             return renderPoolsTable(poolViewData)
           }
@@ -345,7 +343,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           (_: Error) => renderPendingPoolsTable([]),
           // success state
           (state: PoolsState): JSX.Element => {
-            const poolViewData = getPoolTableRowsData(state.poolDetails, pricePool, PoolDetailStatusEnum.Bootstrapped)
+            const poolViewData = getPoolTableRowsData(
+              state.poolDetails,
+              pricePool.poolData,
+              PoolDetailStatusEnum.Bootstrapped
+            )
             previousPendingPools.current = poolViewData
             return renderPendingPoolsTable(poolViewData)
           }

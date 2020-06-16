@@ -6,7 +6,7 @@ import { retry, catchError, concatMap, tap, exhaustMap, mergeMap } from 'rxjs/op
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
-import { PricePoolAsset } from '../../views/pools/types'
+import { PricePoolAsset, PoolAsset, PricePool } from '../../views/pools/types'
 import { PoolsStateRD, PoolsState, PoolDetails, NetworkInfoRD } from './types'
 import { getPricePools } from './utils'
 
@@ -61,12 +61,18 @@ const getPoolsState$ = () => {
       const prevAsset = localStorage.getItem(PRICE_POOL_KEY) as PricePoolAsset
       // Check if this pool still available
       const prevPool = state.pricePools.find((pool) => pool.asset === prevAsset)
-      // Use previous selection or use first pool (always "RUNE pool")
-      const selectedPricePool = prevPool ? prevPool : state.pricePools[0]
-      // update storage
-      localStorage.setItem(PRICE_POOL_KEY, selectedPricePool.asset)
+      let selectedPricePool: PricePool
+      if (prevPool) {
+        selectedPricePool = prevPool
+      } else {
+        // Use TUSDB or use first pool (always "RUNE pool") as default
+        const tusdbPool = state.pricePools.find((pool) => pool.asset === PoolAsset.TUSDB)
+        selectedPricePool = tusdbPool || state.pricePools[0]
+      }
       // update state
       state = { ...state, selectedPricePool }
+      // update storage
+      localStorage.setItem(PRICE_POOL_KEY, selectedPricePool.asset)
     }),
     // set everything into a `success` state
     tap((_) => poolsState$$.next(RD.success(state))),
