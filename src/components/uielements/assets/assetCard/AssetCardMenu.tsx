@@ -1,7 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 
 import { validBNOrZero } from '@thorchain/asgardex-util'
-import { get as _get } from 'lodash'
 
 import { getTickerFormat } from '../../../../helpers/stringHelper'
 import { PriceDataIndex } from '../../../../services/midgard/types'

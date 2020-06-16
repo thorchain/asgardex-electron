@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { PoolData } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
 import { AssetDetail, PoolDetail, NetworkInfo } from '../../types/generated/midgard'
@@ -27,3 +28,10 @@ export type PoolsState = {
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
 
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
+
+export type PoolCurrency = {
+  symbol: string
+  name: string
+  poolData: PoolData
+}
+export type PoolCurrencies = PoolCurrency

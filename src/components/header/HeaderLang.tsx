@@ -2,17 +2,20 @@ import React, { useMemo, useCallback } from 'react'
 
 import { Row, Dropdown } from 'antd'
 import { ClickParam } from 'antd/lib/menu'
-import Text from 'antd/lib/typography/Text'
 import { useObservableState } from 'observable-hooks'
-import { palette } from 'styled-theme'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { useI18nContext } from '../../contexts/I18nContext'
-import { useThemeContext } from '../../contexts/ThemeContext'
 import { LOCALES } from '../../i18n'
 import { Locale } from '../../i18n/types'
 import Menu from '../shared/Menu'
-import { HeaderLangWrapper } from './HeaderLang.style'
+import {
+  HeaderDropdownWrapper,
+  HeaderDropdownMenuItem,
+  HeaderDropdownContentWrapper,
+  HeaderDropdownMenuItemText,
+  HeaderDropdownTitle
+} from './HeaderMenu.style'
 
 type Props = {
   isDesktopView: boolean
@@ -20,8 +23,6 @@ type Props = {
 
 const HeaderLang: React.FC<Props> = (props: Props): JSX.Element => {
   const { isDesktopView } = props
-  const { theme$ } = useThemeContext()
-  const theme = useObservableState(theme$)
 
   const { changeLocale, locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$)
@@ -33,56 +34,33 @@ const HeaderLang: React.FC<Props> = (props: Props): JSX.Element => {
     [changeLocale]
   )
 
-  const color = useMemo(() => palette('text', 0)({ theme }), [theme])
-  const itemStyle = { color, fontSize: '18px' }
-
   const menu = useMemo(
     () => (
       <Menu onClick={changeLang}>
         {LOCALES.map((locale: Locale) => {
           return (
-            <Menu.Item
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '8px 10px'
-              }}
-              key={locale}>
-              <Text strong style={itemStyle}>
-                {locale.toUpperCase()}
-              </Text>
-            </Menu.Item>
+            <HeaderDropdownMenuItem key={locale}>
+              <HeaderDropdownMenuItemText strong>{locale}</HeaderDropdownMenuItemText>
+            </HeaderDropdownMenuItem>
           )
         })}
       </Menu>
     ),
-    [changeLang, itemStyle]
+    [changeLang]
   )
 
   return (
-    <HeaderLangWrapper>
+    <HeaderDropdownWrapper>
       <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
-        {/* No need to have an anchor here */}
-        <Row
-          style={{
-            justifyContent: 'space-between',
-            paddingLeft: '15px',
-            paddingRight: '15px',
-            height: '60px',
-            alignItems: 'center',
-            width: '100%',
-            cursor: 'pointer'
-          }}>
-          {!isDesktopView && <Text style={{ color }}>LANGUAGE</Text>}
+        <HeaderDropdownContentWrapper>
+          {!isDesktopView && <HeaderDropdownTitle>Language</HeaderDropdownTitle>}
           <Row style={{ alignItems: 'center' }}>
-            <Text strong style={itemStyle}>
-              {currentLocale?.toUpperCase()}
-            </Text>
+            <HeaderDropdownMenuItemText strong>{currentLocale || ''}</HeaderDropdownMenuItemText>
             <DownIcon />
           </Row>
-        </Row>
+        </HeaderDropdownContentWrapper>
       </Dropdown>
-    </HeaderLangWrapper>
+    </HeaderDropdownWrapper>
   )
 }
 
