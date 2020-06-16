@@ -1,6 +1,6 @@
 import { getAssetFromString } from '@thorchain/asgardex-util'
 
-import { Maybe, Nothing } from '../../types/asgardex.d'
+import { Maybe, Nothing } from '../../types/asgardex'
 import { AssetDetail } from '../../types/generated/midgard'
 import { AssetDetails, AssetDetailMap } from './types'
 

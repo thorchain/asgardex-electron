@@ -1,4 +1,4 @@
-import { Maybe, Nothing } from './types/asgardex.d'
+import { Maybe, Nothing } from './types/asgardex'
 // jest-dom adds custom jest matchers for asserting on DOM nodes.
 // allows you to do things like:
 // expect(element).toHaveTextContent(/react/i)

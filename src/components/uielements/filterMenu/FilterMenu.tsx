@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { SearchOutlined } from '@ant-design/icons'
 import { ClickParam } from 'antd/lib/menu'
 
-import { AssetPair } from '../../../types/asgardex.d'
+import { AssetPair } from '../../../types/asgardex'
 import Input from '../input'
 import { Menu, MenuItem } from './FilterMenu.style'
 
