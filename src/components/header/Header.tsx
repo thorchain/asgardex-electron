@@ -174,7 +174,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
       <HeaderCurrency
         disabled={!hasPricePools}
         isDesktopView={isDesktopView}
-        selectedItem={selectedPricePool}
+        selectedPool={selectedPricePool}
         pools={pricePools}
         changeHandler={currencyChangeHandler}
       />

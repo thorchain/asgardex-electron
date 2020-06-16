@@ -40,7 +40,7 @@ export const getPricePools = (pools: PoolDetails, whitelist: PricePoolAssets): P
     pricePools
       .map((detail: PoolDetail) => {
         // Since we have filtered pools based on whitelist before ^,
-        // we can type asset as PriceAsset now
+        // we can type asset as `PricePoolAsset` now
         const asset = (detail?.asset ?? '') as PricePoolAsset
         return {
           asset,

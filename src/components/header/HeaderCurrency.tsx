@@ -19,12 +19,12 @@ type Props = {
   isDesktopView: boolean
   pools: PricePools
   disabled?: boolean
-  selectedItem?: PricePool
+  selectedPool?: PricePool
   changeHandler?: (asset: PricePoolAsset) => void
 }
 
 const HeaderCurrency: React.FC<Props> = (props: Props): JSX.Element => {
-  const { pools, selectedItem, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
+  const { pools, selectedPool, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
 
   const changeItem = useCallback(
     (param: ClickParam) => {
@@ -49,7 +49,7 @@ const HeaderCurrency: React.FC<Props> = (props: Props): JSX.Element => {
     [changeItem, pools]
   )
 
-  const title = useMemo(() => (selectedItem ? toHeaderCurrencyLabel(selectedItem.asset) : '--'), [selectedItem])
+  const title = useMemo(() => (selectedPool ? toHeaderCurrencyLabel(selectedPool.asset) : '--'), [selectedPool])
   return (
     <HeaderDropdownWrapper>
       <Dropdown disabled={disabled} overlay={menu} trigger={['click']} placement="bottomCenter">

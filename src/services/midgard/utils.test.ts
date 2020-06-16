@@ -85,7 +85,7 @@ describe('services/midgard/utils/', () => {
       expect(btcPool.asset).toEqual(PoolAsset.BTC)
     })
 
-    it('returns RUNE price pool only if no other "price" pool is available', () => {
+    it('returns RUNE price pool only if another "price" pool is not available', () => {
       const result = getPricePools([tomob, lok], PRICE_POOLS_WHITELIST)
       expect(result.length).toEqual(1)
       // RUNE pool

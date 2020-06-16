@@ -59,7 +59,7 @@ const getPoolsState$ = () => {
     tap((_) => {
       // check storage
       const prevAsset = localStorage.getItem(PRICE_POOL_KEY) as PricePoolAsset
-      // Check if this pool still available
+      // Check if prev. selected pool is still available
       const prevPool = state.pricePools.find((pool) => pool.asset === prevAsset)
       let selectedPricePool: PricePool
       if (prevPool) {
