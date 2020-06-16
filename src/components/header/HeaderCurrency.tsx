@@ -4,7 +4,7 @@ import { Row, Dropdown } from 'antd'
 import { ClickParam } from 'antd/lib/menu'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
-import { PoolPriceAsset } from '../../views/pools/types'
+import { PricePool, PricePools, PricePoolAsset } from '../../views/pools/types'
 import Menu from '../shared/Menu'
 import {
   HeaderDropdownMenuItem,
@@ -13,28 +13,23 @@ import {
   HeaderDropdownWrapper,
   HeaderDropdownTitle
 } from './HeaderMenu.style'
-
-export type HeaderCurrencyItem = {
-  label: string
-  value: PoolPriceAsset
-}
-
-export type HeaderCurrencyItems = HeaderCurrencyItem[]
+import { toHeaderCurrencyLabel } from './util'
 
 type Props = {
   isDesktopView: boolean
-  items: HeaderCurrencyItems
+  pools: PricePools
   disabled?: boolean
-  selectedItem?: HeaderCurrencyItem
-  changeHandler?: (value: string) => void
+  selectedItem?: PricePool
+  changeHandler?: (asset: PricePoolAsset) => void
 }
 
 const HeaderCurrency: React.FC<Props> = (props: Props): JSX.Element => {
-  const { items, selectedItem, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
+  const { pools, selectedItem, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
 
   const changeItem = useCallback(
-    ({ key }: ClickParam) => {
-      changeHandler(key)
+    (param: ClickParam) => {
+      const asset = param.key as PricePoolAsset
+      changeHandler(asset)
     },
     [changeHandler]
   )
@@ -42,25 +37,26 @@ const HeaderCurrency: React.FC<Props> = (props: Props): JSX.Element => {
   const menu = useMemo(
     () => (
       <Menu onClick={changeItem}>
-        {items.map(({ label, value }: HeaderCurrencyItem) => {
+        {pools.map(({ asset }) => {
           return (
-            <HeaderDropdownMenuItem key={value}>
-              <HeaderDropdownMenuItemText strong>{label}</HeaderDropdownMenuItemText>
+            <HeaderDropdownMenuItem key={asset}>
+              <HeaderDropdownMenuItemText strong>{toHeaderCurrencyLabel(asset)}</HeaderDropdownMenuItemText>
             </HeaderDropdownMenuItem>
           )
         })}
       </Menu>
     ),
-    [changeItem, items]
+    [changeItem, pools]
   )
 
+  const title = useMemo(() => (selectedItem ? toHeaderCurrencyLabel(selectedItem.asset) : '--'), [selectedItem])
   return (
     <HeaderDropdownWrapper>
       <Dropdown disabled={disabled} overlay={menu} trigger={['click']} placement="bottomCenter">
         <HeaderDropdownContentWrapper>
           {!isDesktopView && <HeaderDropdownTitle>Currency</HeaderDropdownTitle>}
           <Row style={{ alignItems: 'center' }}>
-            <HeaderDropdownMenuItemText strong>{selectedItem?.label ?? items[0]?.label}</HeaderDropdownMenuItemText>
+            <HeaderDropdownMenuItemText strong>{title}</HeaderDropdownMenuItemText>
             <DownIcon />
           </Row>
         </HeaderDropdownContentWrapper>

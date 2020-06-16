@@ -1,4 +1,4 @@
-import { BaseAmount } from '@thorchain/asgardex-util'
+import { BaseAmount, PoolData } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
@@ -8,7 +8,7 @@ export type Pool = {
   target: string
 }
 
-// Assets
+// Pool assets
 export enum PoolAsset {
   RUNE = 'BNB.RUNE-A1A',
   BNB = 'BNB.BNB',
@@ -18,16 +18,23 @@ export enum PoolAsset {
 }
 
 // List of assets used for pricing
-export type PoolPriceAsset = PoolAsset.RUNE | PoolAsset.ETH | PoolAsset.BTC | PoolAsset.TUSDB
-export type PoolPriceAssets = PoolPriceAsset[]
+export type PricePoolAsset = PoolAsset.RUNE | PoolAsset.ETH | PoolAsset.BTC | PoolAsset.TUSDB
+export type PricePoolAssets = PricePoolAsset[]
 
-export type CurrencySymbols = {
-  [asset in PoolPriceAsset]: string
+export type PricePoolCurrencySymbols = {
+  [asset in PricePoolAsset]: string
 }
 
-export type CurrencyWeights = {
-  [asset in PoolPriceAsset]: number
+export type PricePoolCurrencyWeights = {
+  [asset in PricePoolAsset]: number
 }
+
+export type PricePool = {
+  asset: PricePoolAsset
+  poolData: PoolData
+}
+
+export type PricePools = PricePool[]
 
 export type PoolTableRowData = {
   pool: Pool

@@ -1,27 +1,26 @@
-import { PRICE_POOLS_WHITELIST } from '../../const'
-import { PoolDetails } from '../../services/midgard/types'
 import { PoolAsset } from '../../views/pools/types'
-import { HeaderCurrencyItem } from './HeaderCurrency'
-import { toHeaderCurrencyItems } from './util'
+import { toHeaderCurrencyLabel } from './util'
 
 describe('header/util', () => {
-  describe('toHeaderCurrencyItems', () => {
-    const pools: PoolDetails = [
-      { asset: 'BNB.TOMOB-1E1' },
-      { asset: 'ETH.ETH' },
-      { asset: 'BNB.TUSDB-000' },
-      { asset: 'BTC.BTC' },
-      { asset: 'BNB.LOK-3C0' }
-    ]
+  describe('toHeaderCurrencyItem', () => {
+    it('returns label for RUNE', () => {
+      const result = toHeaderCurrencyLabel(PoolAsset.RUNE)
+      expect(result).toEqual('ᚱ RUNE')
+    })
 
-    const runeItem: HeaderCurrencyItem = { label: 'ᚱ RUNE', value: PoolAsset.RUNE }
-    const usdItem: HeaderCurrencyItem = { label: '$ USD', value: PoolAsset.TUSDB }
-    const ethItem: HeaderCurrencyItem = { label: 'Ξ ETH', value: PoolAsset.ETH }
-    const btcItem: HeaderCurrencyItem = { label: '₿ BTC', value: PoolAsset.BTC }
+    it('returns label for BTC', () => {
+      const result = toHeaderCurrencyLabel(PoolAsset.BTC)
+      expect(result).toEqual('₿ BTC')
+    })
 
-    it('returns list of CurrencyItems', () => {
-      const result = toHeaderCurrencyItems(pools, PRICE_POOLS_WHITELIST)
-      expect(result).toEqual([runeItem, btcItem, ethItem, usdItem])
+    it('returns label for ETH', () => {
+      const result = toHeaderCurrencyLabel(PoolAsset.ETH)
+      expect(result).toEqual('Ξ ETH')
+    })
+
+    it('returns label for TUSDB', () => {
+      const result = toHeaderCurrencyLabel(PoolAsset.TUSDB)
+      expect(result).toEqual('$ USD')
     })
   })
 })
