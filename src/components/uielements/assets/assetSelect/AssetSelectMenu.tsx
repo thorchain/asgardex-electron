@@ -54,7 +54,7 @@ const AssetSelectMenu: React.FC<Props> = (props: Props): JSX.Element => {
   const disableItemFilterHandler = useCallback(
     (item: AssetPair) => {
       const tokenName = getTickerFormat(item.asset)?.toLowerCase()
-      return searchDisable.indexOf(tokenName ?? '') > -1
+      return searchDisable.indexOf(tokenName || '') > -1
     },
     [searchDisable]
   )
