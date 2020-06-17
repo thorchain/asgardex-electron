@@ -17,7 +17,7 @@ import { useThemeContext } from '../../contexts/ThemeContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/types'
+import { PricePoolAsset, PricePoolAssets } from '../../views/pools/types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
 import HeaderCurrency from './HeaderCurrency'
 import HeaderLang from './HeaderLang'
@@ -54,29 +54,29 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const poolsRD = useObservableState(midgardService.poolState$, RD.pending)
 
   // store previous data to render it while reloading new data
-  const prevPricePools = useRef<PricePools>()
-  const prevSelectedPricePool = useRef<PricePool>()
+  const prevPricePoolAssets = useRef<PricePoolAssets>()
+  const prevSelectedPricePool = useRef<PricePoolAsset>()
 
-  const pricePools = useMemo(() => {
+  const pricePoolAssets = useMemo(() => {
     const pools = RD.toNullable(poolsRD)
     if (!pools) {
-      return prevPricePools?.current ?? []
+      return prevPricePoolAssets?.current ?? []
     }
-    const pricePools = pools.pricePools
-    prevPricePools.current = pricePools
-    return pricePools
+    const assets = pools.pricePools.map((pool) => pool.asset)
+    prevPricePoolAssets.current = assets
+    return assets
   }, [poolsRD])
 
-  const hasPricePools = useMemo(() => pricePools.length > 0, [pricePools])
+  const hasPricePools = useMemo(() => pricePoolAssets.length > 0, [pricePoolAssets])
 
-  const selectedPricePool = useMemo(() => {
+  const selectedPricePoolAsset = useMemo(() => {
     const pools = RD.toNullable(poolsRD)
     if (!pools) {
       return prevSelectedPricePool.current
     }
-    const selectedPricePool = pools.selectedPricePool
-    prevSelectedPricePool.current = selectedPricePool
-    return selectedPricePool
+    const selected = pools.selectedPricePool.asset
+    prevSelectedPricePool.current = selected
+    return selected
   }, [poolsRD])
 
   const [menuVisible, setMenuVisible] = useState(false)
@@ -173,12 +173,12 @@ const Header: React.FC<Props> = (_): JSX.Element => {
       <HeaderCurrency
         disabled={!hasPricePools}
         isDesktopView={isDesktopView}
-        selectedPool={selectedPricePool}
-        pools={pricePools}
+        selectedAsset={selectedPricePoolAsset}
+        assets={pricePoolAssets}
         changeHandler={currencyChangeHandler}
       />
     ),
-    [hasPricePools, isDesktopView, selectedPricePool, pricePools, currencyChangeHandler]
+    [hasPricePools, isDesktopView, selectedPricePoolAsset, pricePoolAssets, currencyChangeHandler]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
