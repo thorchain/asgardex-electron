@@ -19,10 +19,10 @@ import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { PricePoolAsset, PricePoolAssets } from '../../views/pools/types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
-import HeaderCurrency from './HeaderCurrency'
 import HeaderLang from './HeaderLang'
 import HeaderLock from './HeaderLock'
 import HeaderNetStatus from './HeaderNetStatus'
+import HeaderPriceSelector from './HeaderPriceSelector'
 import HeaderSettings from './HeaderSettings'
 import HeaderTheme from './HeaderTheme'
 
@@ -170,7 +170,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
 
   const renderHeaderCurrency = useMemo(
     () => (
-      <HeaderCurrency
+      <HeaderPriceSelector
         disabled={!hasPricePools}
         isDesktopView={isDesktopView}
         selectedAsset={selectedPricePoolAsset}

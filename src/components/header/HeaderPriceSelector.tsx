@@ -23,7 +23,7 @@ type Props = {
   changeHandler?: (asset: PricePoolAsset) => void
 }
 
-const HeaderCurrency: React.FC<Props> = (props: Props): JSX.Element => {
+const HeaderPriceSelector: React.FC<Props> = (props: Props): JSX.Element => {
   const { assets, selectedAsset, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
 
   const changeItem = useCallback(
@@ -65,4 +65,4 @@ const HeaderCurrency: React.FC<Props> = (props: Props): JSX.Element => {
   )
 }
 
-export default HeaderCurrency
+export default HeaderPriceSelector
