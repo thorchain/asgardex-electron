@@ -2,6 +2,8 @@ import React, { useMemo, useState, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid } from 'antd'
+import * as O from 'fp-ts/lib/Option'
+import { Option, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useRouteMatch, Link } from 'react-router-dom'
 import { useHistory } from 'react-router-dom'
@@ -17,12 +19,12 @@ import { useThemeContext } from '../../contexts/ThemeContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/types'
+import { PricePoolAsset, PricePoolAssets, PoolAsset } from '../../views/pools/types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
-import HeaderCurrency from './HeaderCurrency'
 import HeaderLang from './HeaderLang'
 import HeaderLock from './HeaderLock'
 import HeaderNetStatus from './HeaderNetStatus'
+import HeaderPriceSelector from './HeaderPriceSelector'
 import HeaderSettings from './HeaderSettings'
 import HeaderTheme from './HeaderTheme'
 
@@ -51,33 +53,27 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const isLocked = useObservableState(isLocked$)
 
   const { service: midgardService } = useMidgardContext()
-  const poolsRD = useObservableState(midgardService.poolState$, RD.pending)
+  const poolsRD = useObservableState(midgardService.poolsState$, RD.pending)
+  const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
+    midgardService.selectedPricePoolAsset$,
+    some(PoolAsset.RUNE)
+  )
 
   // store previous data to render it while reloading new data
-  const prevPricePools = useRef<PricePools>()
-  const prevSelectedPricePool = useRef<PricePool>()
+  const prevPricePoolAssets = useRef<PricePoolAssets>()
 
-  const pricePools = useMemo(() => {
+  const pricePoolAssets = useMemo(() => {
     const pools = RD.toNullable(poolsRD)
     if (!pools) {
-      return prevPricePools?.current ?? []
+      return prevPricePoolAssets?.current ?? []
     }
-    const pricePools = pools.pricePools
-    prevPricePools.current = pricePools
-    return pricePools
+    const pricePools = O.toNullable(pools.pricePools)
+    const assets = (pricePools && pricePools.map((pool) => pool.asset)) || []
+    prevPricePoolAssets.current = assets
+    return assets
   }, [poolsRD])
 
-  const hasPricePools = useMemo(() => pricePools.length > 0, [pricePools])
-
-  const selectedPricePool = useMemo(() => {
-    const pools = RD.toNullable(poolsRD)
-    if (!pools) {
-      return prevSelectedPricePool.current
-    }
-    const selectedPricePool = pools.selectedPricePool
-    prevSelectedPricePool.current = selectedPricePool
-    return selectedPricePool
-  }, [poolsRD])
+  const hasPricePools = useMemo(() => pricePoolAssets.length > 0, [pricePoolAssets])
 
   const [menuVisible, setMenuVisible] = useState(false)
 
@@ -170,15 +166,15 @@ const Header: React.FC<Props> = (_): JSX.Element => {
 
   const renderHeaderCurrency = useMemo(
     () => (
-      <HeaderCurrency
+      <HeaderPriceSelector
         disabled={!hasPricePools}
         isDesktopView={isDesktopView}
-        selectedPool={selectedPricePool}
-        pools={pricePools}
+        selectedAsset={O.toUndefined(selectedPricePoolAsset)}
+        assets={pricePoolAssets}
         changeHandler={currencyChangeHandler}
       />
     ),
-    [hasPricePools, isDesktopView, selectedPricePool, pricePools, currencyChangeHandler]
+    [hasPricePools, isDesktopView, selectedPricePoolAsset, pricePoolAssets, currencyChangeHandler]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
