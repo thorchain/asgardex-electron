@@ -39,7 +39,7 @@ const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
   useSubscription(transfers$, transferHandler)
 
   const { service: midgardService } = useMidgardContext()
-  const poolState = useObservableState(midgardService.poolState$, RD.initial)
+  const poolState = useObservableState(midgardService.poolsState$, RD.initial)
 
   const renderPools = useMemo(
     () =>

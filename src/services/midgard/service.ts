@@ -6,6 +6,7 @@ import * as Rx from 'rxjs'
 import { retry, catchError, concatMap, tap, exhaustMap, mergeMap } from 'rxjs/operators'
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
+import { observableState } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
 import { PoolsStateRD, PoolsState, PoolDetails, NetworkInfoRD } from './types'
@@ -25,17 +26,17 @@ const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configurat
 const byzantine$ = Rx.from(byzantine()).pipe(retry(BYZANTINE_MAX_RETRY))
 
 /**
- * Subject to provide state of pools data
+ * State of pools data
  */
-const poolsState$$ = new Rx.BehaviorSubject<PoolsStateRD>(RD.initial)
+export const { get$: getPoolsState$, set: setPoolState } = observableState<PoolsStateRD>(RD.initial)
 
 /**
  * Loading queue to get all needed data for `PoolsState`
  */
-const getPoolsState$ = () => {
+const loadPoolsStateData$ = () => {
   let state: PoolsState
   // Update `PoolState` to `pending`
-  poolsState$$.next(RD.pending)
+  setPoolState(RD.pending)
   // start queue of requests to get all pool data
   return apiGetPools$.pipe(
     // set `PoolAssets` into state
@@ -59,7 +60,7 @@ const getPoolsState$ = () => {
     // Update selected `PricePoolAsset`
     tap((_) => {
       // check storage
-      const prevAsset = selectedPricePoolAsset$$.getValue()
+      const prevAsset = selectedPricePoolAsset()
       const pricePools = O.toNullable(state.pricePools)
       if (pricePools) {
         const selectedPricePool = selectedPricePoolSelector(pricePools, prevAsset)
@@ -67,11 +68,11 @@ const getPoolsState$ = () => {
       }
     }),
     // set everything into a `success` state
-    tap((_) => poolsState$$.next(RD.success(state))),
+    tap((_) => setPoolState(RD.success(state))),
     // catch any errors if there any
     catchError((error: Error) => {
       // set `error` state
-      poolsState$$.next(RD.failure(error))
+      setPoolState(RD.failure(error))
       return Rx.of('error while fetchting data for pool')
     }),
     retry(MIDGARD_MAX_RETRY)
@@ -121,26 +122,29 @@ const reloadPoolsState = () => reloadPoolsState$$.next(0)
 /**
  * State of all pool data
  */
-const poolState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$$.pipe(
+const poolsState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$$.pipe(
   // start loading queue
-  exhaustMap((_) => getPoolsState$()),
+  exhaustMap((_) => loadPoolsStateData$()),
   // return state of pool data
-  mergeMap((_) => poolsState$$.asObservable())
+  mergeMap((_) => getPoolsState$)
 )
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
 
 export const getSelectedPricePool = () => O.fromNullable(localStorage.getItem(PRICE_POOL_KEY) as PricePoolAsset)
 
-const selectedPricePoolAsset$$ = new Rx.BehaviorSubject<O.Option<PricePoolAsset>>(getSelectedPricePool())
-const selectedPricePoolAsset$ = selectedPricePoolAsset$$.asObservable()
+export const {
+  get$: selectedPricePoolAsset$,
+  get: selectedPricePoolAsset,
+  set: updateSelectedPricePoolAsset
+} = observableState<O.Option<PricePoolAsset>>(getSelectedPricePool())
 
 /**
  * Update selected `PricePoolAsset`
  */
 export const setSelectedPricePoolAsset = (asset: PricePoolAsset) => {
   localStorage.setItem(PRICE_POOL_KEY, asset)
-  selectedPricePoolAsset$$.next(some(asset))
+  updateSelectedPricePoolAsset(some(asset))
 }
 
 /**
@@ -196,7 +200,7 @@ const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$$.pipe(
  * Service object with all "public" functions and observables we want provide
  */
 const service = {
-  poolState$,
+  poolsState$,
   reloadPoolsState,
   networkInfo$,
   reloadNetworkInfo,

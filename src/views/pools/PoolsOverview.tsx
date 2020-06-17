@@ -38,7 +38,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
 
   const { service: midgardService } = useMidgardContext()
-  const poolsRD = useObservableState(midgardService.poolState$, RD.pending)
+  const poolsRD = useObservableState(midgardService.poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
     midgardService.selectedPricePoolAsset$,
     some(PoolAsset.RUNE)
