@@ -2,22 +2,20 @@ import React from 'react'
 
 import { storiesOf } from '@storybook/react'
 import { bn } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { getTickerFormat } from '../../../helpers/stringHelper'
-import { AssetPair, Nothing } from '../../../types/asgardex'
+import { AssetPair } from '../../../types/asgardex'
 import CoinData from '../coins/coinData'
 import FilterMenu from './FilterMenu'
 
-const filterFunction = (item: AssetPair, searchTerm: string) => {
-  const tokenName = getTickerFormat(item.asset)
-  if (tokenName === Nothing) return false
-  return tokenName?.indexOf(searchTerm.toLowerCase()) === 0
-}
+const filterFunction = (item: AssetPair, searchTerm: string) =>
+  O.toNullable(getTickerFormat(item.asset))?.indexOf(searchTerm.toLowerCase()) === 0 ?? false
 
 const cellRenderer = (data: AssetPair) => {
   const { asset: key, price } = data
-  const tokenName = getTickerFormat(key)
-  const node = <CoinData asset={tokenName || ''} price={price} />
+  const tokenName = O.toNullable(getTickerFormat(key)) || ''
+  const node = <CoinData asset={tokenName} price={price} />
   return { key, node }
 }
 

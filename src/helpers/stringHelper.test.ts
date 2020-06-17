@@ -1,3 +1,5 @@
+import { some } from 'fp-ts/lib/Option'
+
 import { Pair } from '../types/asgardex'
 import { getTickerFormat, getPair, compareShallowStr } from './stringHelper'
 
@@ -7,23 +9,23 @@ describe('helpers/stringHelper/', () => {
   describe('getTickerFormat', () => {
     it('should get a ticker from pool and symbol', () => {
       const result = getTickerFormat('BNB.TUSDB-000')
-      expect(result).toEqual('tusdb')
+      expect(result).toEqual(some('tusdb'))
     })
     it('should get a ticker from symbol', () => {
       const result = getTickerFormat('TUSDB-000')
-      expect(result).toEqual('tusdb')
+      expect(result).toEqual(some('tusdb'))
     })
     it('should parse a pair ', () => {
       const result = getTickerFormat('STAKE:TUSDB-000')
-      expect(result).toEqual('stake:tusdb')
+      expect(result).toEqual(some('stake:tusdb'))
     })
     it('should returns null of no symbol given ', () => {
       const result = getTickerFormat()
-      expect(result).toBe(null)
+      expect(result).toBeNone()
     })
     it('should lowercase ticker only ', () => {
       const result = getTickerFormat('XXX000')
-      expect(result).toEqual('xxx000')
+      expect(result).toEqual(some('xxx000'))
     })
   })
 
@@ -32,17 +34,17 @@ describe('helpers/stringHelper/', () => {
   describe('getPair', () => {
     it('returns a valid value pair for "-" separated strings', () => {
       const result: Pair = getPair('HELLO-WORLD')
-      expect(result).toEqual({ source: 'hello', target: 'world' })
+      expect(result).toEqual({ source: some('hello'), target: some('world') })
     })
     it('returns a valid source value for non "-" separated strings', () => {
       const result: Pair = getPair('HELLO')
-      expect(result.source).toEqual('hello')
-      expect(result.target).toBeNothing()
+      expect(result.source).toEqual(some('hello'))
+      expect(result.target).toBeNone()
     })
     it('returns a null value pair if no value entered', () => {
       const result: Pair = getPair()
-      expect(result.source).toBeNothing()
-      expect(result.target).toBeNothing()
+      expect(result.source).toBeNone()
+      expect(result.target).toBeNone()
     })
   })
 

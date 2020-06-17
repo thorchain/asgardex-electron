@@ -2,14 +2,14 @@ import React, { useRef, useCallback } from 'react'
 
 import BigNumber from 'bignumber.js'
 
-import { Maybe, FixmeType } from '../../../../types/asgardex'
+import { FixmeType } from '../../../../types/asgardex'
 import CoinInputAdvanced from '../../coins/coinInputAdvanced'
 import { AssetInputWrapper } from './AssetInput.style'
 import { AssetInputProps } from './types'
 
 type Props = {
   title: string
-  status: Maybe<string>
+  status?: string
   amount: BigNumber
   label: string
   inputProps?: AssetInputProps

@@ -1,4 +1,5 @@
 import { PoolData, assetAmount, assetToBase } from '@thorchain/asgardex-util'
+import { some } from 'fp-ts/lib/Option'
 
 import { PoolDetails } from '../services/midgard/types'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
@@ -44,13 +45,13 @@ describe('helpers/poolHelper/', () => {
     it('returns deepest pool', () => {
       const pools = [pool1, pool2, pool4, pool3]
       const result = getDeepestPool(pools)
-      expect(result).toEqual(pool4)
+      expect(result).toEqual(some(pool4))
     })
 
     it('does not return a deepest pool by given an empty list of pools', () => {
       const pools: PoolDetails = []
       const result = getDeepestPool(pools)
-      expect(result).toBeNothing()
+      expect(result).toBeNone()
     })
   })
 

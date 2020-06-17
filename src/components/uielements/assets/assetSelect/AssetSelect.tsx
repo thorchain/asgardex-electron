@@ -8,7 +8,7 @@ import { sortBy as _sortBy } from 'lodash'
 
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
-import { AssetPair } from '../../../../types/asgardex.d'
+import { AssetPair } from '../../../../types/asgardex'
 import {
   AssetSelectWrapper,
   AssetDropdownButton,

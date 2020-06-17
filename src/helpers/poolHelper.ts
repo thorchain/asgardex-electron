@@ -1,7 +1,8 @@
 import { bnOrZero, baseAmount, PoolData, getAssetFromString } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
+import { none, Option, some } from 'fp-ts/lib/Option'
 
 import { PoolDetails } from '../services/midgard/types'
-import { Nothing, Maybe } from '../types/asgardex'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData } from '../views/pools/types'
 import { getPoolTableRowData } from '../views/pools/utils'
@@ -12,7 +13,7 @@ export const getPoolTableRowsData = (
   poolStatus: PoolDetailStatusEnum
 ): PoolTableRowsData => {
   const poolDetailsFiltered = poolDetails.filter((detail) => detail?.status === poolStatus)
-  const deepestPool = getDeepestPool(poolDetailsFiltered)
+  const deepestPool = O.toNullable(getDeepestPool(poolDetailsFiltered))
   const { symbol: deepestPoolSymbol } = getAssetFromString(deepestPool?.asset)
   // Transform `PoolDetails` -> PoolRowType
   return poolDetailsFiltered.map((poolDetail, index) => {
@@ -34,11 +35,12 @@ export const hasPendingPools = (pools: PoolDetails) => filterPendingPools(pools)
 /**
  * Filters a pool out with hightest value of run
  */
-export const getDeepestPool = (pools: PoolDetails) =>
-  pools.reduce((acc: Maybe<PoolDetail>, pool: PoolDetail) => {
+export const getDeepestPool = (pools: PoolDetails): Option<PoolDetail> =>
+  pools.reduce((acc: Option<PoolDetail>, pool: PoolDetail) => {
     const runeDepth = bnOrZero(pool.runeDepth)
-    return runeDepth.isGreaterThanOrEqualTo(bnOrZero(acc?.runeDepth)) ? pool : acc
-  }, Nothing)
+    const prev = O.toNullable(acc)
+    return runeDepth.isGreaterThanOrEqualTo(bnOrZero(prev?.runeDepth)) ? some(pool) : acc
+  }, none)
 
 /**
  * Transforms `PoolDetail` into `PoolData`

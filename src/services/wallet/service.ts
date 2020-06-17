@@ -1,7 +1,8 @@
+import * as O from 'fp-ts/lib/Option'
+import { Option, none, some } from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { map } from 'rxjs/operators'
 
-import { Nothing, Maybe } from '../../types/asgardex'
 import { Phrase, PhraseService } from './types'
 
 // Important note:
@@ -11,18 +12,18 @@ import { Phrase, PhraseService } from './types'
 
 const PHRASE_KEY = 'asgdx-phrase'
 
-const initialPhrase = localStorage.getItem(PHRASE_KEY) || Nothing
+const initialPhrase = O.fromNullable(localStorage.getItem(PHRASE_KEY))
 
-const phrase$$ = new Rx.BehaviorSubject<Maybe<Phrase>>(initialPhrase)
+const phrase$$ = new Rx.BehaviorSubject<Option<Phrase>>(initialPhrase)
 
 const addPhrase = (p: Phrase) => {
   localStorage.setItem(PHRASE_KEY, p)
-  phrase$$.next(p)
+  phrase$$.next(some(p))
 }
 
 const removePhrase = () => {
   localStorage.removeItem(PHRASE_KEY)
-  phrase$$.next(Nothing)
+  phrase$$.next(none)
 }
 
 export const phrase: PhraseService = {

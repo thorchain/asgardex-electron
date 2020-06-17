@@ -38,11 +38,11 @@ describe('services/midgard/utils/', () => {
 
     it('returns details of RUNE', () => {
       const result = getAssetDetail([runeDetail, bnbDetail], RUNE_TICKER)
-      expect(result).toEqual(runeDetail)
+      expect(result).toEqual(some(runeDetail))
     })
-    it('returns Nothing if no RUNE details available', () => {
+    it('returns None if no RUNE details available', () => {
       const result = getAssetDetail([bnbDetail], 'TOMOB')
-      expect(result).toBeNothing()
+      expect(result).toBeNone()
     })
   })
 

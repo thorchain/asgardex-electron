@@ -7,7 +7,7 @@ import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
-import { Option, some } from 'fp-ts/lib/Option'
+import { Option, none, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
@@ -26,7 +26,6 @@ import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { PoolsState } from '../../services/midgard/types'
 import { selectedPricePoolSelector } from '../../services/midgard/utils'
-import { Maybe, Nothing } from '../../types/asgardex'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import View from '../View'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
@@ -57,9 +56,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   // store previous data of pools to render these while reloading
-  const previousPools = useRef<Maybe<PoolTableRowsData>>(Nothing)
+  const previousPools = useRef<Option<PoolTableRowsData>>(none)
   // store previous data of pending pools to render these while reloading
-  const previousPendingPools = useRef<Maybe<PoolTableRowsData>>(Nothing)
+  const previousPendingPools = useRef<Option<PoolTableRowsData>>(none)
 
   const pendingCountdownHandler = useCallback(() => {
     midgardService.reloadNetworkInfo()
@@ -258,7 +257,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           () => renderPoolsTable([], true),
           // loading state
           () => {
-            const pools = previousPools.current || []
+            const pools = O.getOrElse(() => [] as PoolTableRowsData)(previousPools.current)
             return renderPoolsTable(pools, true)
           },
           // error state
@@ -273,7 +272,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
               pricePool.poolData,
               PoolDetailStatusEnum.Enabled
             )
-            previousPools.current = poolViewData
+            previousPools.current = some(poolViewData)
             return renderPoolsTable(poolViewData)
           }
         )(poolsRD)}
@@ -344,7 +343,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           () => renderPendingPoolsTable([], true),
           // loading state
           () => {
-            const pools = previousPendingPools.current || []
+            const pools = O.getOrElse(() => [] as PoolTableRowsData)(previousPendingPools.current)
             return renderPendingPoolsTable(pools, true)
           },
           // error state - we just show an empty table, an error will be shown on pools table
@@ -356,7 +355,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
               pricePool.poolData,
               PoolDetailStatusEnum.Bootstrapped
             )
-            previousPendingPools.current = poolViewData
+            previousPendingPools.current = some(poolViewData)
             return renderPendingPoolsTable(poolViewData)
           }
         )(poolsRD)}
