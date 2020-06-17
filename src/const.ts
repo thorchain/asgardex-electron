@@ -19,8 +19,8 @@ export const CURRENCY_SYMBOLS: PricePoolCurrencySymbols = {
   [PoolAsset.TUSDB]: '$'
 }
 
-// Weight of currencies to use for pricing in application
-// The hihgher the value the higher the weight
+// Weight of currencies needed for pricing
+// The higher the value the higher the weight
 export const CURRENCY_WHEIGHTS: PricePoolCurrencyWeights = {
   [PoolAsset.TUSDB]: 0,
   [PoolAsset.ETH]: 1,

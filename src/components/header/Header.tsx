@@ -53,7 +53,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const { service: midgardService } = useMidgardContext()
   const poolsRD = useObservableState(midgardService.poolState$, RD.pending)
 
-  // store previous some data to render these while reloading data
+  // store previous data to render it while reloading new data
   const prevPricePools = useRef<PricePools>()
   const prevSelectedPricePool = useRef<PricePool>()
 
@@ -163,7 +163,6 @@ const Header: React.FC<Props> = (_): JSX.Element => {
 
   const currencyChangeHandler = useCallback(
     (asset: PricePoolAsset) => {
-      console.log('value:', asset)
       midgardService.setSelectedPricePool(asset)
     },
     [midgardService]

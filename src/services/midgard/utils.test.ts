@@ -74,7 +74,7 @@ describe('services/midgard/utils/', () => {
       expect(tusdPool.poolData.assetBalance.amount().toNumber()).toEqual(3)
     })
 
-    it('returns RUNE price pool and btc in a right order', () => {
+    it('returns RUNE price and btc pools in a right order', () => {
       const result = getPricePools([tomob, lok, btc], PRICE_POOLS_WHITELIST)
       expect(result.length).toEqual(2)
       // RUNE pool
