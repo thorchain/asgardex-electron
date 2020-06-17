@@ -1,8 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
 import BigNumber from 'bignumber.js'
+import { Option } from 'fp-ts/lib/Option'
 
 import { AssetDetail, PoolDetail, NetworkInfo } from '../../types/generated/midgard'
-import { PricePools, PricePool } from '../../views/pools/types'
+import { PricePools } from '../../views/pools/types'
 
 export type PoolAsset = string
 export type PoolAssets = string[]
@@ -23,8 +24,7 @@ export type PoolsState = {
   assetDetails: AssetDetails
   poolAssets: PoolAssets
   poolDetails: PoolDetails
-  pricePools: PricePools
-  selectedPricePool: PricePool
+  pricePools: Option<PricePools>
 }
 
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>

@@ -4,7 +4,7 @@ import { Row, Dropdown } from 'antd'
 import { ClickParam } from 'antd/lib/menu'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
-import { PricePool, PricePools, PricePoolAsset } from '../../views/pools/types'
+import { PricePoolAsset, PricePoolAssets } from '../../views/pools/types'
 import Menu from '../shared/Menu'
 import {
   HeaderDropdownMenuItem,
@@ -17,14 +17,14 @@ import { toHeaderCurrencyLabel } from './util'
 
 type Props = {
   isDesktopView: boolean
-  pools: PricePools
+  assets: PricePoolAssets
   disabled?: boolean
-  selectedPool?: PricePool
+  selectedAsset?: PricePoolAsset
   changeHandler?: (asset: PricePoolAsset) => void
 }
 
-const HeaderCurrency: React.FC<Props> = (props: Props): JSX.Element => {
-  const { pools, selectedPool, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
+const HeaderPriceSelector: React.FC<Props> = (props: Props): JSX.Element => {
+  const { assets, selectedAsset, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
 
   const changeItem = useCallback(
     (param: ClickParam) => {
@@ -37,7 +37,7 @@ const HeaderCurrency: React.FC<Props> = (props: Props): JSX.Element => {
   const menu = useMemo(
     () => (
       <Menu onClick={changeItem}>
-        {pools.map(({ asset }) => {
+        {assets.map((asset) => {
           return (
             <HeaderDropdownMenuItem key={asset}>
               <HeaderDropdownMenuItemText strong>{toHeaderCurrencyLabel(asset)}</HeaderDropdownMenuItemText>
@@ -46,10 +46,10 @@ const HeaderCurrency: React.FC<Props> = (props: Props): JSX.Element => {
         })}
       </Menu>
     ),
-    [changeItem, pools]
+    [changeItem, assets]
   )
 
-  const title = useMemo(() => (selectedPool ? toHeaderCurrencyLabel(selectedPool.asset) : '--'), [selectedPool])
+  const title = useMemo(() => (selectedAsset ? toHeaderCurrencyLabel(selectedAsset) : '--'), [selectedAsset])
   return (
     <HeaderDropdownWrapper>
       <Dropdown disabled={disabled} overlay={menu} trigger={['click']} placement="bottomCenter">
@@ -65,4 +65,4 @@ const HeaderCurrency: React.FC<Props> = (props: Props): JSX.Element => {
   )
 }
 
-export default HeaderCurrency
+export default HeaderPriceSelector

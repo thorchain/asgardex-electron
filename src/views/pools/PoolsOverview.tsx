@@ -25,10 +25,11 @@ import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { PoolsState } from '../../services/midgard/types'
+import { selectedPricePoolSelector } from '../../services/midgard/utils'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import View from '../View'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
-import { PoolTableRowData, PoolTableRowsData } from './types'
+import { PoolTableRowData, PoolTableRowsData, PricePoolAsset, PoolAsset } from './types'
 
 type Props = {}
 
@@ -36,7 +37,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
 
   const { service: midgardService } = useMidgardContext()
-  const poolsRD = useObservableState(midgardService.poolState$, RD.pending)
+  const poolsRD = useObservableState(midgardService.poolsState$, RD.pending)
+  const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
+    midgardService.selectedPricePoolAsset$,
+    some(PoolAsset.RUNE)
+  )
   const networkInfoRD = useObservableState(midgardService.networkInfo$, RD.pending)
 
   const [blocksLeft, setBlocksLeft] = useState('')
@@ -69,8 +74,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   const pricePool = useMemo(() => {
     const pools = RD.toNullable(poolsRD)
-    return pools?.selectedPricePool ?? RUNE_PRICE_POOL
-  }, [poolsRD])
+    const pricePools = pools && O.toNullable(pools.pricePools)
+    return (pricePools && selectedPricePoolSelector(pricePools, selectedPricePoolAsset)) || RUNE_PRICE_POOL
+  }, [poolsRD, selectedPricePoolAsset])
 
   const clickSwapHandler = (p: SwapRouteParams) => {
     history.push(swapRoutes.swap.path(p))
