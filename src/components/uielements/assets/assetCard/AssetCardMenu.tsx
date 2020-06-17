@@ -4,7 +4,7 @@ import { validBNOrZero } from '@thorchain/asgardex-util'
 
 import { getTickerFormat } from '../../../../helpers/stringHelper'
 import { PriceDataIndex } from '../../../../services/midgard/types'
-import { AssetPair } from '../../../../types/asgardex.d'
+import { AssetPair } from '../../../../types/asgardex'
 import CoinData from '../../coins/coinData'
 import FilterMenu from '../../filterMenu'
 

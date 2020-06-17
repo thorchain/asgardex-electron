@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs'
 
-import { Maybe } from '../../types/asgardex.d'
+import { Maybe } from '../../types/asgardex'
 
 export type Phrase = string
 

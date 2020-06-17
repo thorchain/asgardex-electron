@@ -1,8 +1,11 @@
 import { getAssetFromString } from '@thorchain/asgardex-util'
 
-import { Maybe, Nothing } from '../../types/asgardex.d'
-import { AssetDetail } from '../../types/generated/midgard'
-import { AssetDetails, AssetDetailMap } from './types'
+import { RUNE_PRICE_POOL, CURRENCY_WHEIGHTS } from '../../const'
+import { toPoolData } from '../../helpers/poolHelper'
+import { Maybe, Nothing } from '../../types/asgardex'
+import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
+import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/types'
+import { AssetDetails, AssetDetailMap, PoolDetails } from './types'
 
 export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} => {
   let assetDataIndex = {}
@@ -28,3 +31,25 @@ export const getAssetDetail = (assets: AssetDetails, ticker: string) =>
     }
     return acc
   }, Nothing)
+
+export const getPricePools = (pools: PoolDetails, whitelist: PricePoolAssets): PricePools => {
+  const pricePools = pools.filter(
+    (detail) => whitelist.find((asset) => detail.asset && detail.asset === asset) !== undefined
+  )
+  return (
+    pricePools
+      .map((detail: PoolDetail) => {
+        // Since we have filtered pools based on whitelist before ^,
+        // we can type asset as `PricePoolAsset` now
+        const asset = (detail?.asset ?? '') as PricePoolAsset
+        return {
+          asset,
+          poolData: toPoolData(detail)
+        } as PricePool
+      })
+      // add RUNE pool
+      .concat([RUNE_PRICE_POOL])
+      // sort by weights (high weight wins)
+      .sort((a, b) => CURRENCY_WHEIGHTS[b.asset] - CURRENCY_WHEIGHTS[a.asset])
+  )
+}

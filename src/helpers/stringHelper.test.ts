@@ -1,4 +1,4 @@
-import { Pair } from '../types/asgardex.d'
+import { Pair } from '../types/asgardex'
 import { getTickerFormat, getPair, compareShallowStr } from './stringHelper'
 
 describe('helpers/stringHelper/', () => {

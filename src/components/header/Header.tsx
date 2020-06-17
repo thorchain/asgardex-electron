@@ -1,5 +1,6 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback, useRef } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid } from 'antd'
 import { useObservableState } from 'observable-hooks'
 import { useRouteMatch, Link } from 'react-router-dom'
@@ -11,10 +12,12 @@ import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
+import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
+import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
 import HeaderCurrency from './HeaderCurrency'
 import HeaderLang from './HeaderLang'
@@ -46,6 +49,35 @@ const Header: React.FC<Props> = (_): JSX.Element => {
 
   const { isLocked$, lock } = useWalletContext()
   const isLocked = useObservableState(isLocked$)
+
+  const { service: midgardService } = useMidgardContext()
+  const poolsRD = useObservableState(midgardService.poolState$, RD.pending)
+
+  // store previous data to render it while reloading new data
+  const prevPricePools = useRef<PricePools>()
+  const prevSelectedPricePool = useRef<PricePool>()
+
+  const pricePools = useMemo(() => {
+    const pools = RD.toNullable(poolsRD)
+    if (!pools) {
+      return prevPricePools?.current ?? []
+    }
+    const pricePools = pools.pricePools
+    prevPricePools.current = pricePools
+    return pricePools
+  }, [poolsRD])
+
+  const hasPricePools = useMemo(() => pricePools.length > 0, [pricePools])
+
+  const selectedPricePool = useMemo(() => {
+    const pools = RD.toNullable(poolsRD)
+    if (!pools) {
+      return prevSelectedPricePool.current
+    }
+    const selectedPricePool = pools.selectedPricePool
+    prevSelectedPricePool.current = selectedPricePool
+    return selectedPricePool
+  }, [poolsRD])
 
   const [menuVisible, setMenuVisible] = useState(false)
 
@@ -129,19 +161,25 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     closeMenu()
   }, [closeMenu, history, isLocked, lock])
 
-  // TODO(@Veado) Hardcoded values - just for a moment,
-  // will be removed later by another PR for using real data
-  const currencies = [
-    { label: 'ᚱ RUNE', value: 'RUNE' },
-    { label: '₿ BTC', value: 'BTC' },
-    { label: 'Ξ ETH', value: 'ETH' },
-    { label: '$ USD', value: 'USD' }
-  ]
+  const currencyChangeHandler = useCallback(
+    (asset: PricePoolAsset) => {
+      midgardService.setSelectedPricePool(asset)
+    },
+    [midgardService]
+  )
 
-  const currencyChangeHandler = useCallback((value: string) => {
-    // TODO(@Veado) Do something here
-    console.log('value:', value)
-  }, [])
+  const renderHeaderCurrency = useMemo(
+    () => (
+      <HeaderCurrency
+        disabled={!hasPricePools}
+        isDesktopView={isDesktopView}
+        selectedPool={selectedPricePool}
+        pools={pricePools}
+        changeHandler={currencyChangeHandler}
+      />
+    ),
+    [hasPricePools, isDesktopView, selectedPricePool, pricePools, currencyChangeHandler]
+  )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
@@ -165,11 +203,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               </Col>
               <Col>
                 <Row align="middle">
-                  <HeaderCurrency
-                    isDesktopView={isDesktopView}
-                    items={currencies}
-                    changeHandler={currencyChangeHandler}
-                  />
+                  {renderHeaderCurrency}
                   <HeaderTheme isDesktopView={isDesktopView} />
                   <HeaderLock isDesktopView={isDesktopView} isLocked={!!isLocked} onPress={clickLockHandler} />
                   <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} />
@@ -209,9 +243,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
             visible={menuVisible}
             key="top">
             {links}
-            <HeaderDrawerItem>
-              <HeaderCurrency isDesktopView={isDesktopView} items={currencies} changeHandler={currencyChangeHandler} />
-            </HeaderDrawerItem>
+            <HeaderDrawerItem>{renderHeaderCurrency}</HeaderDrawerItem>
             <HeaderDrawerItem>
               <HeaderTheme isDesktopView={isDesktopView} />
             </HeaderDrawerItem>

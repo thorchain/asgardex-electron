@@ -1,7 +1,7 @@
 import * as Rx from 'rxjs'
 import { map } from 'rxjs/operators'
 
-import { Nothing, Maybe } from '../../types/asgardex.d'
+import { Nothing, Maybe } from '../../types/asgardex'
 import { Phrase, PhraseService } from './types'
 
 // Important note:

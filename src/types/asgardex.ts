@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js'
 export type FixmeType = any
 
 // Very simple way to provide a `Maybe` thing
-// Again, it's not a Monad or so, just a very simple TS type :)
 export type Nothing = null | undefined
 export const Nothing = null as Nothing
 export type Maybe<T> = T | Nothing

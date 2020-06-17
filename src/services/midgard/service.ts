@@ -1,10 +1,14 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { success } from '@devexperts/remote-data-ts'
 import byzantine from '@thorchain/byzantine-module'
 import * as Rx from 'rxjs'
 import { retry, catchError, concatMap, tap, exhaustMap, mergeMap } from 'rxjs/operators'
 
+import { PRICE_POOLS_WHITELIST } from '../../const'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
+import { PricePoolAsset, PoolAsset, PricePool } from '../../views/pools/types'
 import { PoolsStateRD, PoolsState, PoolDetails, NetworkInfoRD } from './types'
+import { getPricePools } from './utils'
 
 export const MIDGARD_MAX_RETRY = 3
 export const BYZANTINE_MAX_RETRY = 5
@@ -41,11 +45,34 @@ const getPoolsState$ = () => {
     tap((assetDetails) => (state = { ...state, assetDetails })),
     // Derive + store `assetDetailIndex`
     tap((assetDetails) => (state = { ...state, assetDetails })),
-    //
+    // load `PoolDetails`
     concatMap((_) => apiGetPoolsData$(state.poolAssets)),
     // Derive + store `poolDetails`
     tap((poolDetails: PoolDetails) => {
       state = { ...state, poolDetails }
+    }),
+    // Derive + store `pricePools`
+    tap((poolDetails: PoolDetails) => {
+      state = { ...state, pricePools: getPricePools(poolDetails, PRICE_POOLS_WHITELIST) }
+    }),
+    // Derive + store `pricePools`
+    tap((_) => {
+      // check storage
+      const prevAsset = localStorage.getItem(PRICE_POOL_KEY) as PricePoolAsset
+      // Check if prev. selected pool is still available
+      const prevPool = state.pricePools.find((pool) => pool.asset === prevAsset)
+      let selectedPricePool: PricePool
+      if (prevPool) {
+        selectedPricePool = prevPool
+      } else {
+        // Use TUSDB or use first pool (always "RUNE pool") as default
+        const tusdbPool = state.pricePools.find((pool) => pool.asset === PoolAsset.TUSDB)
+        selectedPricePool = tusdbPool || state.pricePools[0]
+      }
+      // update state
+      state = { ...state, selectedPricePool }
+      // update storage
+      localStorage.setItem(PRICE_POOL_KEY, selectedPricePool.asset)
     }),
     // set everything into a `success` state
     tap((_) => poolsState$$.next(RD.success(state))),
@@ -109,6 +136,24 @@ const poolState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$$.pipe(
   mergeMap((_) => poolsState$$.asObservable())
 )
 
+const PRICE_POOL_KEY = 'asgdx-price-pool'
+
+/**
+ * Update price pool
+ */
+export const setSelectedPricePool = (asset: PricePoolAsset) => {
+  const stateRD = poolsState$$.getValue()
+  // We can update pricePool in a "success" state only
+  const state = RD.toNullable(stateRD)
+  if (state) {
+    const selectedPricePool = state.pricePools.find((pools) => pools.asset === asset)
+    if (selectedPricePool) {
+      localStorage.setItem(PRICE_POOL_KEY, asset)
+      poolsState$$.next(success({ ...state, selectedPricePool }))
+    }
+  }
+}
+
 /**
  * API request to get data of `NetworkInfo`
  */
@@ -165,7 +210,8 @@ const service = {
   poolState$,
   reloadPoolsState,
   networkInfo$,
-  reloadNetworkInfo
+  reloadNetworkInfo,
+  setSelectedPricePool
 }
 
 // Default

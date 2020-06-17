@@ -1,4 +1,4 @@
-import { Maybe, Nothing, Pair } from '../types/asgardex.d'
+import { Maybe, Nothing, Pair } from '../types/asgardex'
 
 export const getPair = (info?: string): Pair => ({
   source: info?.split('-')[0]?.toLowerCase() ?? Nothing,

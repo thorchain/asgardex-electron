@@ -4,7 +4,7 @@ import { storiesOf } from '@storybook/react'
 import { bn } from '@thorchain/asgardex-util'
 
 import { getTickerFormat } from '../../../helpers/stringHelper'
-import { AssetPair, Nothing } from '../../../types/asgardex.d'
+import { AssetPair, Nothing } from '../../../types/asgardex'
 import CoinData from '../coins/coinData'
 import FilterMenu from './FilterMenu'
 

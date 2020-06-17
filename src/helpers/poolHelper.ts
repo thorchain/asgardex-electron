@@ -1,7 +1,7 @@
 import { bnOrZero, baseAmount, PoolData, getAssetFromString } from '@thorchain/asgardex-util'
 
 import { PoolDetails } from '../services/midgard/types'
-import { Nothing, Maybe } from '../types/asgardex.d'
+import { Nothing, Maybe } from '../types/asgardex'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData } from '../views/pools/types'
 import { getPoolTableRowData } from '../views/pools/utils'
