@@ -1,3 +1,5 @@
+import { some } from 'fp-ts/lib/Option'
+
 import { RUNE_TICKER, PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT } from '../../const'
 import { ThorchainEndpoint, AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PoolAsset } from '../../views/pools/types'
@@ -35,11 +37,11 @@ describe('services/midgard/utils/', () => {
 
     it('returns details of RUNE', () => {
       const result = getAssetDetail([runeDetail, bnbDetail], RUNE_TICKER)
-      expect(result).toEqual(runeDetail)
+      expect(result).toEqual(some(runeDetail))
     })
-    it('returns Nothing if no RUNE details available', () => {
+    it('returns None if no RUNE details available', () => {
       const result = getAssetDetail([bnbDetail], 'TOMOB')
-      expect(result).toBeNothing()
+      expect(result).toBeNone()
     })
   })
 

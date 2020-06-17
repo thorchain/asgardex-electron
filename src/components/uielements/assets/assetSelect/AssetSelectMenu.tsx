@@ -1,16 +1,16 @@
 import React, { useMemo, useCallback } from 'react'
 
 import { validBNOrZero } from '@thorchain/asgardex-util'
-import { get as _get } from 'lodash'
+import * as O from 'fp-ts/lib/Option'
 
 import { getTickerFormat } from '../../../../helpers/stringHelper'
 import { PriceDataIndex } from '../../../../services/midgard/types'
-import { AssetPair } from '../../../../types/asgardex.d'
+import { AssetPair } from '../../../../types/asgardex'
 import CoinData from '../../coins/coinData'
 import FilterMenu from '../../filterMenu'
 
 const filterFunction = (item: AssetPair, searchTerm: string) => {
-  const tokenName = getTickerFormat(item.asset)
+  const tokenName = O.toNullable(getTickerFormat(item.asset))
   return tokenName?.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0
 }
 
@@ -30,7 +30,7 @@ const AssetSelectMenu: React.FC<Props> = (props: Props): JSX.Element => {
   const filteredData = useMemo(
     () =>
       assetData.filter((item) => {
-        const tokenName = getTickerFormat(item.asset)
+        const tokenName = O.toNullable(getTickerFormat(item.asset))
         return tokenName?.toLowerCase() !== asset.toLowerCase()
       }),
     [assetData, asset]
@@ -40,12 +40,12 @@ const AssetSelectMenu: React.FC<Props> = (props: Props): JSX.Element => {
     (data: AssetPair) => {
       const { asset } = data
       const key = asset || 'unknown-key'
-      const tokenName = getTickerFormat(asset)
+      const tokenName = O.toUndefined(getTickerFormat(asset))
 
-      const ticker = getTickerFormat(asset)?.toUpperCase() ?? ''
+      const ticker = O.toNullable(getTickerFormat(asset))?.toUpperCase() ?? ''
       const price = validBNOrZero(priceIndex[ticker])
 
-      const node = <CoinData asset={tokenName || ''} price={price} priceUnit={unit} />
+      const node = <CoinData asset={tokenName} price={price} priceUnit={unit} />
       return { key, node }
     },
     [priceIndex, unit]
@@ -53,8 +53,8 @@ const AssetSelectMenu: React.FC<Props> = (props: Props): JSX.Element => {
 
   const disableItemFilterHandler = useCallback(
     (item: AssetPair) => {
-      const tokenName = getTickerFormat(item.asset)?.toLowerCase()
-      return searchDisable.indexOf(tokenName || '') > -1
+      const tokenName = O.toNullable(getTickerFormat(item.asset))?.toLowerCase() || ''
+      return searchDisable.indexOf(tokenName) > -1
     },
     [searchDisable]
   )

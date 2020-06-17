@@ -1,8 +1,8 @@
 import { getAssetFromString } from '@thorchain/asgardex-util'
+import { Option, none, some, isNone } from 'fp-ts/lib/Option'
 
 import { RUNE_PRICE_POOL, CURRENCY_WHEIGHTS } from '../../const'
 import { toPoolData } from '../../helpers/poolHelper'
-import { Maybe, Nothing } from '../../types/asgardex'
 import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/types'
 import { AssetDetails, AssetDetailMap, PoolDetails } from './types'
@@ -22,15 +22,15 @@ export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} =
   return assetDataIndex
 }
 
-export const getAssetDetail = (assets: AssetDetails, ticker: string) =>
-  assets.reduce((acc: Maybe<AssetDetail>, asset: AssetDetail) => {
-    if (!acc) {
+export const getAssetDetail = (assets: AssetDetails, ticker: string): Option<AssetDetail> =>
+  assets.reduce((acc: Option<AssetDetail>, asset: AssetDetail) => {
+    if (isNone(acc)) {
       const { asset: a = '' } = asset
       const { ticker: t } = getAssetFromString(a)
-      return ticker === t ? asset : Nothing
+      return ticker === t ? some(asset) : none
     }
     return acc
-  }, Nothing)
+  }, none)
 
 export const getPricePools = (pools: PoolDetails, whitelist: PricePoolAssets): PricePools => {
   const pricePools = pools.filter(
