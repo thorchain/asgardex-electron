@@ -1,7 +1,10 @@
-import { RUNE_TICKER, PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT } from '../../const'
+import { some } from 'fp-ts/lib/Option'
+
+import { RUNE_TICKER, PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, RUNE_PRICE_POOL } from '../../const'
+import { toPoolData } from '../../helpers/poolHelper'
 import { ThorchainEndpoint, AssetDetail, PoolDetail } from '../../types/generated/midgard'
-import { PoolAsset } from '../../views/pools/types'
-import { getAssetDetailIndex, getAssetDetail, getPricePools } from './utils'
+import { PoolAsset, PricePool } from '../../views/pools/types'
+import { getAssetDetailIndex, getAssetDetail, getPricePools, selectedPricePoolSelector } from './utils'
 
 type PoolDataMock = { asset?: string }
 
@@ -91,6 +94,28 @@ describe('services/midgard/utils/', () => {
       // RUNE pool
       const pool0 = result[0]
       expect(pool0.asset).toEqual(PoolAsset.RUNE)
+    })
+  })
+
+  describe('selectedPricePoolSelector', () => {
+    const poolData = toPoolData({})
+    const eth: PricePool = { asset: PoolAsset.ETH, poolData }
+    const tusdb: PricePool = { asset: PoolAsset.TUSDB, poolData }
+    const btc: PricePool = { asset: PoolAsset.BTC, poolData }
+
+    it('selects ETH asset', () => {
+      const pool = selectedPricePoolSelector([RUNE_PRICE_POOL, eth, tusdb, btc], some(PoolAsset.ETH))
+      expect(pool.asset).toEqual(PoolAsset.ETH)
+    })
+
+    it('selects TUSDB pool if ETH pool is not available', () => {
+      const pool = selectedPricePoolSelector([RUNE_PRICE_POOL, tusdb, btc], some(PoolAsset.ETH))
+      expect(pool.asset).toEqual(PoolAsset.TUSDB)
+    })
+
+    it('selects RUNE if ETH + TUSDB pools are not available', () => {
+      const pool = selectedPricePoolSelector([RUNE_PRICE_POOL, btc], some(PoolAsset.ETH))
+      expect(pool.asset).toEqual(PoolAsset.RUNE)
     })
   })
 })
