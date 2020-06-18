@@ -1,41 +1,52 @@
-import * as O from 'fp-ts/lib/Option'
-import { Option, none, some } from 'fp-ts/lib/Option'
-import * as Rx from 'rxjs'
+import * as path from 'path'
+
+import { encryptToKeyStore, decryptFromKeystore, Keystore } from '@thorchain/asgardex-crypto'
+import { app } from 'electron'
+import { none, some, Option } from 'fp-ts/lib/Option'
+import * as fs from 'fs-extra'
 import { map } from 'rxjs/operators'
 
+import { observableState } from '../../helpers/stateHelper'
 import { Phrase, PhraseService } from './types'
 
-// Important note:
-// As a temporary workaround, we store phrase into `local-storage` as plain text,
-// but it has to be decrypted before. It will be done by another PR.
-// See https://github.com/thorchain/asgardex-electron/issues/148
+const STORAGE_DIR = 'storage'
 
-const PHRASE_KEY = 'asgdx-phrase'
+// Storage dir
+// https://www.electronjs.org/docs/api/app#appgetpathname
+export const KEY_FILE = path.join(app.getPath('userData'), STORAGE_DIR, 'key.txt')
 
-const initialPhrase = O.fromNullable(localStorage.getItem(PHRASE_KEY))
+const { get$: getPhrase$, set: setPhrase } = observableState<Option<string>>(none)
 
-const phrase$$ = new Rx.BehaviorSubject<Option<Phrase>>(initialPhrase)
-
-const addPhrase = (p: Phrase) => {
-  localStorage.setItem(PHRASE_KEY, p)
-  phrase$$.next(some(p))
+const addPhrase = async (p: Phrase, password: string) => {
+  const keystore: Keystore = await encryptToKeyStore(p, password)
+  await fs.writeJSON(KEY_FILE, keystore)
+  setPhrase(some(p))
 }
 
-const removePhrase = () => {
-  localStorage.removeItem(PHRASE_KEY)
-  phrase$$.next(none)
+const _getPhrase = async (password: string) => {
+  try {
+    const keystore: Keystore = await fs.readJSON(KEY_FILE)
+    const phrase = await decryptFromKeystore(keystore, password)
+    return some(phrase)
+  } catch (_) {
+    return none
+  }
+}
+
+const removePhrase = async () => {
+  await fs.remove(KEY_FILE)
+  setPhrase(none)
 }
 
 export const phrase: PhraseService = {
   add: addPhrase,
   remove: removePhrase,
-  current$: phrase$$.asObservable()
+  current$: getPhrase$
 }
 
-const locked$$ = new Rx.BehaviorSubject(false)
-const locked$ = locked$$.asObservable()
+const { get$: locked$, set: setLocked } = observableState(false)
 
 export const isLocked$ = locked$.pipe(map((value) => !!value))
 
-export const lock = () => locked$$.next(true)
-export const unlock = () => locked$$.next(false)
+export const lock = () => setLocked(true)
+export const unlock = () => setLocked(false)
