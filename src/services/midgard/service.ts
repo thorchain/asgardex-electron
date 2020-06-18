@@ -3,10 +3,10 @@ import byzantine from '@thorchain/byzantine-module'
 import * as O from 'fp-ts/lib/Option'
 import { some } from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { retry, catchError, concatMap, tap, exhaustMap, mergeMap } from 'rxjs/operators'
+import { retry, catchError, concatMap, tap, exhaustMap, mergeMap, shareReplay } from 'rxjs/operators'
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
-import { observableState } from '../../helpers/stateHelper'
+import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
 import { PoolsStateRD, PoolsState, PoolDetails, NetworkInfoRD } from './types'
@@ -111,22 +111,19 @@ const apiGetPoolsData$ = (poolAssets: string[]) =>
     })
   )
 
-// Subject to trigger reload of pools state
-const reloadPoolsState$$ = new Rx.BehaviorSubject(0)
-
-/**
- * Helper to reload of data of PoolState
- */
-const reloadPoolsState = () => reloadPoolsState$$.next(0)
+// `TriggerStream` to reload data of pools
+const { stream$: reloadPoolsState$, trigger: reloadPoolsState } = triggerStream()
 
 /**
  * State of all pool data
  */
-const poolsState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$$.pipe(
+const poolsState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$.pipe(
   // start loading queue
   exhaustMap((_) => loadPoolsStateData$()),
   // return state of pool data
-  mergeMap((_) => getPoolsState$)
+  mergeMap((_) => getPoolsState$),
+  // cache it to avoid reloading data by every subscription
+  shareReplay()
 )
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
@@ -157,43 +154,43 @@ const apiGetNetworkData$ = byzantine$.pipe(
   })
 )
 
-const networkInfo$$ = new Rx.BehaviorSubject<NetworkInfoRD>(RD.initial)
+/**
+ * State of NetworkInfoRD
+ */
+export const { get$: getNetworkInfo$, set: setNetworkInfo } = observableState<NetworkInfoRD>(RD.initial)
 
 /**
  * Loads data of `NetworkInfo`
  */
-const getNetworkData$ = () => {
+const loadNetworkData$ = () => {
   // Update `PoolState` to `pending`
-  networkInfo$$.next(RD.pending)
+  setNetworkInfo(RD.pending)
   return apiGetNetworkData$.pipe(
     // store result
-    tap((info) => networkInfo$$.next(RD.success(info))),
+    tap((info) => setNetworkInfo(RD.success(info))),
     // catch any errors if there any
     catchError((error: Error) => {
       // set `error` state
-      networkInfo$$.next(RD.failure(error))
+      setNetworkInfo(RD.failure(error))
       return Rx.of('error while fetchting data for pool')
     }),
     retry(MIDGARD_MAX_RETRY)
   )
 }
 
-// Subject to trigger reload of `NetworkInfo`
-const reloadNetworkInfo$$ = new Rx.BehaviorSubject(0)
+// `TriggerStream` to reload `NetworkInfo`
+const { stream$: reloadNetworkInfo$, trigger: reloadNetworkInfo } = triggerStream()
 
 /**
- * Helper to reload `NetworkInfo`
+ * State of `NetworkInfo`, it will load data by first subscription only
  */
-const reloadNetworkInfo = () => reloadNetworkInfo$$.next(0)
-
-/**
- * State of `NetworkInfo`
- */
-const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$$.pipe(
+const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
   // start request
-  exhaustMap((_) => getNetworkData$()),
+  exhaustMap((_) => loadNetworkData$()),
   // return state of pool data
-  mergeMap((_) => networkInfo$$.asObservable())
+  mergeMap((_) => getNetworkInfo$),
+  // cache it to avoid reloading data by every subscription
+  shareReplay()
 )
 
 /**

@@ -1,6 +1,6 @@
 import { Observable, BehaviorSubject } from 'rxjs'
 
-type ObservableState<T> = {
+export type ObservableState<T> = {
   get$: Observable<T>
   get: () => T
   set: (value: T) => void
@@ -34,5 +34,23 @@ export const observableState = <T>(initial: T): ObservableState<T> => {
     get$: subject$$.asObservable(),
     get: () => subject$$.getValue(),
     set: (newValue: T) => subject$$.next(newValue)
+  }
+}
+
+export type TriggerStream = {
+  stream$: Observable<string>
+  trigger: () => void
+}
+
+/**
+ * Helper to create a stream, which can trigger changes of it
+ *
+ * It might be handy to trigger other, depending streams in a queue to do something
+ */
+export const triggerStream = (): TriggerStream => {
+  const subject$$ = new BehaviorSubject('')
+  return {
+    stream$: subject$$.asObservable(),
+    trigger: () => subject$$.next('trigger')
   }
 }
