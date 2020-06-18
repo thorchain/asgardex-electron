@@ -111,7 +111,7 @@ const apiGetPoolsData$ = (poolAssets: string[]) =>
     })
   )
 
-// TriggerStream to reload data of pools
+// `TriggerStream` to reload data of pools
 const { stream$: reloadPoolsState$, trigger: reloadPoolsState } = triggerStream()
 
 /**
@@ -178,11 +178,11 @@ const loadNetworkData$ = () => {
   )
 }
 
-// TriggerStream to reload `NetworkInfo`
+// `TriggerStream` to reload `NetworkInfo`
 const { stream$: reloadNetworkInfo$, trigger: reloadNetworkInfo } = triggerStream()
 
 /**
- * State of `NetworkInfo`, it will load data by first subscription
+ * State of `NetworkInfo`, it will load data by first subscription only
  */
 const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
   // start request

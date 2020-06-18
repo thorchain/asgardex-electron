@@ -45,7 +45,7 @@ export type TriggerStream = {
 /**
  * Helper to create a stream, which can trigger changes of it
  *
- * It might be helpfull to trigger other, depending streams in a queue to do something
+ * It might be handy to trigger other, depending streams in a queue to do something
  */
 export const triggerStream = (): TriggerStream => {
   const subject$$ = new BehaviorSubject('')
