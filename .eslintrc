@@ -33,8 +33,10 @@
     "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
     "no-undef": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-use-before-define": "warn",
     "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/ban-ts-ignore": "off",
     "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-var-requires": "off",
