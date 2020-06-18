@@ -55,8 +55,8 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   useEffect(
     () => {
-      // Reload pools data whenever PoolsOverview has been entered
-      // BUT if PoolsOverview is visible as "start"
+      // Reload pools data whenever PoolsOverview has been entered,
+      // but NOT if PoolsOverview is "visible" as a "home screen"
       if (history.length > 1) {
         midgardService.reloadPoolsState()
       }
