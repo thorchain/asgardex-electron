@@ -24,7 +24,7 @@ type Props = {
   onSelect: (value: string) => void
 }
 
-const AssetCardMenu: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
   const { assetData, asset, priceIndex = {}, unit, withSearch, searchDisable = [], onSelect = () => {} } = props
 
   const filteredData = useMemo(
@@ -71,4 +71,4 @@ const AssetCardMenu: React.FC<Props> = (props: Props): JSX.Element => {
   )
 }
 
-export default AssetCardMenu
+export default AssetMenu

@@ -12,6 +12,7 @@ import { AssetPair } from '../../../../types/asgardex'
 import CoinInputAdvanced from '../../coins/coinInputAdvanced'
 import Label from '../../label'
 import Selection from '../../selection'
+import AssetMenu from '../assetMenu'
 import {
   AssetCardFooter,
   AssetData,
@@ -27,7 +28,6 @@ import {
   FooterLabel,
   HorizontalDivider
 } from './AssetCard.style'
-import AssetCardMenu from './AssetCardMenu'
 
 type DropdownCarretProps = {
   open: boolean
@@ -120,7 +120,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     const sortedAssetData = _sortBy(assetData, ['asset'])
 
     return (
-      <AssetCardMenu
+      <AssetMenu
         assetData={sortedAssetData}
         asset={asset}
         priceIndex={priceIndex}
