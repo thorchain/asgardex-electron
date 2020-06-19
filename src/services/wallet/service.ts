@@ -15,7 +15,6 @@ import { Phrase, PhraseService } from './types'
 const getKeyFilePath = async () => {
   const keyFilePath = path.join(STORAGE_DIR, 'key.json')
   await fs.ensureFile(keyFilePath)
-  console.log('path', keyFilePath)
   return keyFilePath
 }
 
@@ -36,7 +35,6 @@ const addPhrase = async (phrase: Phrase, password: string) => {
 const getPhrase = async (password: string) => {
   try {
     const keyfile = await getKeyFilePath()
-    console.log('xxx getPhrase:', keyfile)
     const keystore: Keystore = await fs.readJSON(keyfile)
     const phrase = await decryptFromKeystore(keystore, password)
     return some(phrase)
@@ -74,24 +72,13 @@ export const isLocked$ = locked$.pipe(
   )
 )
 
-// export const lockedError$ = locked$.pipe(
-//   map((valueE) =>
-//     E.fold(
-//       (error: Error) => some(error),
-//       () => none
-//     )(valueE)
-//   )
-// )
-
 export const lock = () => {
   setPhrase(none)
   setLocked(right(true))
 }
 
 export const unlock = async (password: string) => {
-  console.log('xxx unlock:', password)
   const phrase = await getPhrase(password)
-  console.log('xxx unlock:', phrase)
   const locked = isSome(phrase) ? right(false) : left(new Error('Wrong password to unlock'))
   setLocked(locked)
   setPhrase(phrase)

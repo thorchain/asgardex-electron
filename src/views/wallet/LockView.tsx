@@ -27,7 +27,6 @@ const LockView: React.FC = (): JSX.Element => {
     E.fold(
       (_) => {},
       (isLocked) => {
-        console.log('xxx useEffect isLocked:', isLocked)
         if (!isLocked && !!validPassword) {
           const from = location.state?.from?.pathname ?? walletRoutes.assets.template
           history.push(from)
