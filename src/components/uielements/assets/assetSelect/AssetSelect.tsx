@@ -9,6 +9,7 @@ import { sortBy as _sortBy } from 'lodash'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetPair } from '../../../../types/asgardex'
+import AssetMenu from '../assetMenu'
 import {
   AssetSelectWrapper,
   AssetDropdownButton,
@@ -17,7 +18,6 @@ import {
   DropdownIcon
 } from './AssetSelect.style'
 import AssetSelectData from './AssetSelectData'
-import AssetSelectMenu from './AssetSelectMenu'
 
 type DropdownCarretProps = {
   className?: string
@@ -84,7 +84,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
 
     return (
       <AssetSelectMenuWrapper>
-        <AssetSelectMenu
+        <AssetMenu
           assetData={sortedAssetData}
           asset={asset}
           priceIndex={priceIndex}
