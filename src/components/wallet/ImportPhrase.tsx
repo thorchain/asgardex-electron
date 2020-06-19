@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 
-import { Client as BinanceClient } from '@thorchain/asgardex-binance'
+import * as crypto from '@thorchain/asgardex-crypto'
 import { Form, Button, Input } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
@@ -15,22 +15,47 @@ const ImportPhrase: React.FC = (): JSX.Element => {
   const [form] = Form.useForm()
   const { phrase } = useWalletContext()
 
-  const [validForm, setValidForm] = useState(false)
+  const [validPhrase, setValidPhrase] = useState(false)
+  const [validPassword, setValidPassword] = useState(false)
 
-  const validatePhrase = (_: Rule, value: string): Promise<void> => {
+  const mockPw = 'password'
+  const mockPhrase = 'empower exit air ring level siren firm puzzle cross lemon few already'
+
+  const phraseValidator = async (_: Rule, value: string) => {
     if (!value) {
       return Promise.reject('Value for phrase required')
     }
-    const valid = BinanceClient.validatePhrase(value)
-    setValidForm(valid)
+    const valid = crypto.validatePhrase(value)
+    setValidPhrase(valid)
     return valid ? Promise.resolve() : Promise.reject('Invalid mnemonic seed phrase')
   }
 
+  const passwordValidator = async (_: Rule, value: string) => {
+    if (!value) {
+      setValidPassword(false)
+      return Promise.reject('Value for password required')
+    }
+    if (value.length < 5) {
+      setValidPassword(false)
+      return Promise.reject('Password needs to have 5 character at least')
+    }
+    setValidPassword(true)
+    return Promise.resolve()
+  }
+
+  const onReset = () => {
+    form.resetFields()
+  }
+
   const submitForm = useCallback(
-    ({ phrase: newPhrase }: Store) => {
-      phrase.add(newPhrase)
-      // redirect to wallets assets view
-      history.push(walletRoutes.assets.template)
+    async ({ phrase: newPhrase, password }: Store) => {
+      try {
+        await phrase.add(newPhrase, password)
+        // redirect to wallets assets view
+        history.push(walletRoutes.assets.template)
+      } catch (error) {
+        console.error('could not submit phrase', error)
+      }
     },
     [history, phrase]
   )
@@ -39,14 +64,23 @@ const ImportPhrase: React.FC = (): JSX.Element => {
     <Form form={form} onFinish={submitForm} labelCol={{ span: 24 }}>
       <Form.Item
         name="phrase"
-        rules={[{ required: true, validator: validatePhrase }]}
+        rules={[{ required: true, validator: phraseValidator }]}
         validateTrigger={['onSubmit', 'onChange']}>
         <Input.Password placeholder="Enter your phrase" size="large" />
       </Form.Item>
+      <Form.Item
+        name="password"
+        rules={[{ required: true, validator: passwordValidator }]}
+        validateTrigger={['onSubmit', 'onChange']}>
+        <Input.Password placeholder="Enter your password" size="large" />
+      </Form.Item>
 
       <Form.Item>
-        <Button size="large" type="primary" htmlType="submit" block disabled={!validForm}>
+        <Button size="large" type="primary" htmlType="submit" block disabled={!validPassword || !validPhrase}>
           Import
+        </Button>
+        <Button size="large" type="primary" onClick={onReset}>
+          Reset
         </Button>
       </Form.Item>
 
@@ -54,7 +88,8 @@ const ImportPhrase: React.FC = (): JSX.Element => {
       TODO (@Veado) Remove it!
       Random phrase (just for debugging and lazy testers - it will be removed with any of next PRs...,
       */}
-      <Paragraph strong>empower exit air ring level siren firm puzzle cross lemon few already</Paragraph>
+      <Paragraph strong>{mockPhrase}</Paragraph>
+      <Paragraph strong>{mockPw}</Paragraph>
     </Form>
   )
 }

@@ -2472,6 +2472,19 @@
     hdkey "^2.0.1"
     uuid "^8.1.0"
 
+"@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#get-it-work-in-asgardex":
+  version "0.1.0"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#3343bc03f12e03cfb2d95f1c3c6e5cd090e1f20d"
+  dependencies:
+    "@types/crypto-js" "^3.1.47"
+    "@types/hdkey" "^0.7.1"
+    bech32 "^1.1.4"
+    bip39 "^3.0.2"
+    crypto-js "^4.0.0"
+    foundry-primitives "^0.2.1"
+    hdkey "^2.0.1"
+    uuid "^8.1.0"
+
 "@thorchain/asgardex-theme@^0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@thorchain/asgardex-theme/-/asgardex-theme-0.1.1.tgz#b32e29e234d16b060f00b9b3aa5451945d7fd439"

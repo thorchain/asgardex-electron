@@ -1,31 +1,43 @@
 import * as path from 'path'
 
 import { encryptToKeyStore, decryptFromKeystore, Keystore } from '@thorchain/asgardex-crypto'
-import { app } from 'electron'
-import { none, some, Option } from 'fp-ts/lib/Option'
+import * as E from 'fp-ts/lib/Either'
+import { Either, right, left } from 'fp-ts/lib/Either'
+import { none, some, Option, isSome } from 'fp-ts/lib/Option'
 import * as fs from 'fs-extra'
 import { map } from 'rxjs/operators'
 
+import { STORAGE_DIR } from '../../const'
 import { observableState } from '../../helpers/stateHelper'
 import { Phrase, PhraseService } from './types'
 
-const STORAGE_DIR = 'storage'
-
-// Storage dir
-// https://www.electronjs.org/docs/api/app#appgetpathname
-export const KEY_FILE = path.join(app.getPath('userData'), STORAGE_DIR, 'key.txt')
+// Key file
+const getKeyFilePath = async () => {
+  const keyFilePath = path.join(STORAGE_DIR, 'key.json')
+  await fs.ensureFile(keyFilePath)
+  console.log('path', keyFilePath)
+  return keyFilePath
+}
 
 const { get$: getPhrase$, set: setPhrase } = observableState<Option<string>>(none)
 
-const addPhrase = async (p: Phrase, password: string) => {
-  const keystore: Keystore = await encryptToKeyStore(p, password)
-  await fs.writeJSON(KEY_FILE, keystore)
-  setPhrase(some(p))
+const addPhrase = async (phrase: Phrase, password: string) => {
+  try {
+    const keystore: Keystore = await encryptToKeyStore(phrase, password)
+    const keyfile = await getKeyFilePath()
+    await fs.writeJSON(keyfile, keystore)
+    setPhrase(some(phrase))
+    return Promise.resolve()
+  } catch (error) {
+    return Promise.reject(error)
+  }
 }
 
-const _getPhrase = async (password: string) => {
+const getPhrase = async (password: string) => {
   try {
-    const keystore: Keystore = await fs.readJSON(KEY_FILE)
+    const keyfile = await getKeyFilePath()
+    console.log('xxx getPhrase:', keyfile)
+    const keystore: Keystore = await fs.readJSON(keyfile)
     const phrase = await decryptFromKeystore(keystore, password)
     return some(phrase)
   } catch (_) {
@@ -34,7 +46,8 @@ const _getPhrase = async (password: string) => {
 }
 
 const removePhrase = async () => {
-  await fs.remove(KEY_FILE)
+  const keyfile = await getKeyFilePath()
+  await fs.remove(keyfile)
   setPhrase(none)
 }
 
@@ -44,9 +57,42 @@ export const phrase: PhraseService = {
   current$: getPhrase$
 }
 
-const { get$: locked$, set: setLocked } = observableState(false)
+type Locked = boolean
+type LockedE = Either<Error, Locked>
+const { get$: locked$, set: setLocked } = observableState<LockedE>(right(false))
 
-export const isLocked$ = locked$.pipe(map((value) => !!value))
+// re-export locked$
+export { locked$ }
 
-export const lock = () => setLocked(true)
-export const unlock = () => setLocked(false)
+// helper stream to get unlock state
+export const isLocked$ = locked$.pipe(
+  map((valueE) =>
+    E.fold(
+      (_) => false, // error means it's still unlocked
+      (value) => !!value // check value
+    )(valueE)
+  )
+)
+
+// export const lockedError$ = locked$.pipe(
+//   map((valueE) =>
+//     E.fold(
+//       (error: Error) => some(error),
+//       () => none
+//     )(valueE)
+//   )
+// )
+
+export const lock = () => {
+  setPhrase(none)
+  setLocked(right(true))
+}
+
+export const unlock = async (password: string) => {
+  console.log('xxx unlock:', password)
+  const phrase = await getPhrase(password)
+  console.log('xxx unlock:', phrase)
+  const locked = isSome(phrase) ? right(false) : left(new Error('Wrong password to unlock'))
+  setLocked(locked)
+  setPhrase(phrase)
+}

@@ -4,7 +4,7 @@ import * as Rx from 'rxjs'
 export type Phrase = string
 
 export type PhraseService = {
-  add: (phrase: Phrase, password: string) => void
+  add: (phrase: Phrase, password: string) => Promise<void>
   remove: () => void
   current$: Rx.Observable<Option<Phrase>>
 }

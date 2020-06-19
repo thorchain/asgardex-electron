@@ -1,4 +1,7 @@
+import * as path from 'path'
+
 import { getAssetFromString, assetToBase, assetAmount } from '@thorchain/asgardex-util'
+import { remote } from 'electron'
 
 import {
   PricePoolCurrencySymbols,
@@ -39,3 +42,6 @@ export const RUNE_PRICE_POOL: PricePool = {
 
 // Whitelist of pools for pricing things
 export const PRICE_POOLS_WHITELIST: PricePoolAssets = [PoolAsset.BTC, PoolAsset.ETH, PoolAsset.TUSDB]
+
+export const APP_DIR = path.join(remote.app.getPath('appData'), 'ASGARDEX' /* remote.app.name does not work */)
+export const STORAGE_DIR = path.join(APP_DIR, 'storage')

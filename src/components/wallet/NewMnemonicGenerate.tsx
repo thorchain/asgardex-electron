@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
 
-import { Client as BinanceClient } from '@thorchain/asgardex-binance'
+import { generatePhrase } from '@thorchain/asgardex-crypto'
 import { Form, Input, Button } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 
@@ -9,7 +9,7 @@ const NewMnemonicGenerate: React.FC<Props> = (_: Props): JSX.Element => {
   const [loadingMsg, setLoadingMsg] = useState<string>('')
 
   const createMnemonicWallet = () => {
-    const phrase = BinanceClient.generatePhrase()
+    const phrase = generatePhrase()
     // TODO (@Veado) Extract this into helper
     localStorage.setItem('phrase', phrase)
   }
