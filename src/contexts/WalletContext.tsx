@@ -3,15 +3,16 @@ import React, { createContext, useContext } from 'react'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
-import { phrase, lock, unlock, locked$, isLocked$ } from '../services/wallet/service'
+import { phrase, lock, unlock, isLocked$, keyStoreFileExists$, removeKeystore } from '../services/wallet/service'
 import { PhraseService } from '../services/wallet/types'
 
 type WalletContextValue = {
   phrase: PhraseService
   isLocked$: typeof isLocked$
-  locked$: typeof locked$
   lock: typeof lock
   unlock: typeof unlock
+  keyStoreFileExists$: typeof keyStoreFileExists$
+  removeKeystore: typeof removeKeystore
 }
 
 const initialContext: WalletContextValue = {
@@ -19,7 +20,8 @@ const initialContext: WalletContextValue = {
   isLocked$,
   lock,
   unlock,
-  locked$
+  removeKeystore,
+  keyStoreFileExists$
 }
 const WalletContext = createContext<Option<WalletContextValue>>(none)
 

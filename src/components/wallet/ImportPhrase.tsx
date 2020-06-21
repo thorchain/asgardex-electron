@@ -1,10 +1,11 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 
 import * as crypto from '@thorchain/asgardex-crypto'
 import { Form, Button, Input } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
+import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -13,13 +14,21 @@ import * as walletRoutes from '../../routes/wallet'
 const ImportPhrase: React.FC = (): JSX.Element => {
   const history = useHistory()
   const [form] = Form.useForm()
-  const { phrase } = useWalletContext()
+  const { phrase, isLocked$ } = useWalletContext()
+  const isLocked = useObservableState(isLocked$, true)
 
   const [validPhrase, setValidPhrase] = useState(false)
   const [validPassword, setValidPassword] = useState(false)
 
   const mockPw = 'password'
   const mockPhrase = 'empower exit air ring level siren firm puzzle cross lemon few already'
+
+  useEffect(() => {
+    // redirect to wallets assets view
+    if (!isLocked) {
+      history.push(walletRoutes.assets.template)
+    }
+  }, [history, isLocked])
 
   const phraseValidator = async (_: Rule, value: string) => {
     if (!value) {
@@ -52,12 +61,11 @@ const ImportPhrase: React.FC = (): JSX.Element => {
       try {
         await phrase.add(newPhrase, password)
         // redirect to wallets assets view
-        history.push(walletRoutes.assets.template)
       } catch (error) {
         console.error('could not submit phrase', error)
       }
     },
-    [history, phrase]
+    [phrase]
   )
 
   return (
@@ -79,7 +87,7 @@ const ImportPhrase: React.FC = (): JSX.Element => {
         <Button size="large" type="primary" htmlType="submit" block disabled={!validPassword || !validPhrase}>
           Import
         </Button>
-        <Button size="large" type="primary" onClick={onReset}>
+        <Button size="large" type="primary" block onClick={onReset}>
           Reset
         </Button>
       </Form.Item>

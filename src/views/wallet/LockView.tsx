@@ -1,10 +1,9 @@
-import React, { useCallback, useMemo, useState, useEffect } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 
 import { Form, Input, Button } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import Text from 'antd/lib/typography/Text'
-import * as E from 'fp-ts/lib/Either'
 import { useObservableState } from 'observable-hooks'
 import { useHistory, useLocation } from 'react-router-dom'
 
@@ -17,23 +16,20 @@ const LockView: React.FC = (): JSX.Element => {
   const location = useLocation<RedirectRouteState>()
   const [form] = Form.useForm()
 
-  const { unlock, locked$ } = useWalletContext()
+  const { unlock, isLocked$ } = useWalletContext()
 
   const [validPassword, setValidPassword] = useState(false)
-  const locked = useObservableState(locked$, E.right(true))
+  const isLocked = useObservableState(isLocked$, true)
+  const [isLockedError, setIsLockedError] = useState(false)
 
   // Re-direct to previous view after unlocking the wallet
   useEffect(() => {
-    E.fold(
-      (_) => {},
-      (isLocked) => {
-        if (!isLocked && !!validPassword) {
-          const from = location.state?.from?.pathname ?? walletRoutes.assets.template
-          history.push(from)
-        }
-      }
-    )(locked)
-  }, [locked, validPassword, location, history])
+    if (!isLocked && !!validPassword) {
+      console.log('location.state?.from?.pathname:', location.state?.from?.pathname)
+      const from = location.state?.from?.pathname ?? walletRoutes.assets.template
+      history.push(from)
+    }
+  }, [isLocked, validPassword, location, history])
 
   const passwordValidator = async (_: Rule, value: string) => {
     if (!value) {
@@ -50,7 +46,12 @@ const LockView: React.FC = (): JSX.Element => {
 
   const submitForm = useCallback(
     async ({ password }: Store) => {
-      await unlock(password)
+      setIsLockedError(false)
+      try {
+        await unlock(password)
+      } catch (_) {
+        setIsLockedError(true)
+      }
     },
     [unlock]
   )
@@ -58,13 +59,6 @@ const LockView: React.FC = (): JSX.Element => {
   const onReset = () => {
     form.resetFields()
   }
-
-  const renderLockedError = useMemo(() => {
-    return E.fold(
-      (error: Error) => <Text>Error while trying to unlock the wallet: {error.toString()}</Text>,
-      (_) => <></>
-    )(locked)
-  }, [locked])
 
   return (
     <Form form={form} onFinish={submitForm}>
@@ -74,12 +68,12 @@ const LockView: React.FC = (): JSX.Element => {
         validateTrigger={['onSubmit', 'onChange']}>
         <Input.Password placeholder="Enter your password" size="large" />
       </Form.Item>
-      {renderLockedError}
+      {isLockedError && <Text>Error while trying to unlock the wallet. Check your password and try it again.</Text>}
       <Form.Item>
-        <Button size="large" type="primary" htmlType="submit" disabled={!validPassword}>
+        <Button size="large" type="primary" block htmlType="submit" disabled={!validPassword}>
           Unlock wallet
         </Button>
-        <Button size="large" type="primary" onClick={onReset}>
+        <Button size="large" type="primary" block onClick={onReset}>
           Reset
         </Button>
       </Form.Item>

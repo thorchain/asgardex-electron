@@ -49,8 +49,9 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
 
-  const { isLocked$, lock } = useWalletContext()
+  const { isLocked$, lock, keyStoreFileExists$ } = useWalletContext()
   const isLocked = useObservableState(isLocked$)
+  const keyStoreFileExists = useObservableState(keyStoreFileExists$)
 
   const { service: midgardService } = useMidgardContext()
   const poolsRD = useObservableState(midgardService.poolsState$, RD.pending)
@@ -152,8 +153,8 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     // lock if needed
     if (!isLocked) {
       lock()
+      history.push(walletRoutes.locked.path())
     }
-    history.push(walletRoutes.locked.path())
     closeMenu()
   }, [closeMenu, history, isLocked, lock])
 
@@ -175,6 +176,18 @@ const Header: React.FC<Props> = (_): JSX.Element => {
       />
     ),
     [hasPricePools, isDesktopView, selectedPricePoolAsset, pricePoolAssets, currencyChangeHandler]
+  )
+
+  const renderHeaderLock = useMemo(
+    () => (
+      <HeaderLock
+        isDesktopView={isDesktopView}
+        isLocked={!!isLocked}
+        onPress={clickLockHandler}
+        disabled={!keyStoreFileExists}
+      />
+    ),
+    [isDesktopView, isLocked, clickLockHandler, keyStoreFileExists]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
@@ -201,7 +214,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
                 <Row align="middle">
                   {renderHeaderCurrency}
                   <HeaderTheme isDesktopView={isDesktopView} />
-                  <HeaderLock isDesktopView={isDesktopView} isLocked={!!isLocked} onPress={clickLockHandler} />
+                  {renderHeaderLock}
                   <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} />
                   <HeaderLang isDesktopView={isDesktopView} />
                 </Row>
@@ -243,9 +256,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
             <HeaderDrawerItem>
               <HeaderTheme isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
-            <HeaderDrawerItem>
-              <HeaderLock onPress={clickLockHandler} isLocked={!!isLocked} isDesktopView={isDesktopView} />
-            </HeaderDrawerItem>
+            <HeaderDrawerItem>{renderHeaderLock}</HeaderDrawerItem>
             <HeaderDrawerItem>
               <HeaderSettings onPress={clickSettingsHandler} isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
