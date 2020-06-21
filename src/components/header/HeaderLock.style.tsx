@@ -8,7 +8,7 @@ import { media } from '../../helpers/styleHelper'
 
 type Props = RowProps & { disabled: boolean }
 
-const Wrapper: React.FC<Props> = (props) => <Row {...props}>{props.children}</Row>
+const Wrapper: React.FC<Props> = ({ children, ...otherProps }) => <Row {...otherProps}>{children}</Row>
 
 export const HeaderLockWrapper = styled(Wrapper)`
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
