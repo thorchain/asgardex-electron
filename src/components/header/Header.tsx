@@ -3,7 +3,7 @@ import React, { useMemo, useState, useCallback, useRef } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid } from 'antd'
 import * as O from 'fp-ts/lib/Option'
-import { Option, some } from 'fp-ts/lib/Option'
+import { Option, some, none } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useRouteMatch, Link } from 'react-router-dom'
 import { useHistory } from 'react-router-dom'
@@ -19,6 +19,7 @@ import { useThemeContext } from '../../contexts/ThemeContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
+import { isLocked, hasImportedKeystore } from '../../services/wallet/util'
 import { PricePoolAsset, PricePoolAssets, PoolAsset } from '../../views/pools/types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
 import HeaderLang from './HeaderLang'
@@ -49,9 +50,8 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
 
-  const { isLocked$, lock, keyStoreFileExists$ } = useWalletContext()
-  const isLocked = useObservableState(isLocked$)
-  const keyStoreFileExists = useObservableState(keyStoreFileExists$)
+  const { keystoreService } = useWalletContext()
+  const keystore = useObservableState(keystoreService.keystore$, none)
 
   const { service: midgardService } = useMidgardContext()
   const poolsRD = useObservableState(midgardService.poolsState$, RD.pending)
@@ -151,12 +151,12 @@ const Header: React.FC<Props> = (_): JSX.Element => {
 
   const clickLockHandler = useCallback(() => {
     // lock if needed
-    if (!isLocked) {
-      lock()
+    if (!isLocked(keystore)) {
+      keystoreService.lock()
       history.push(walletRoutes.locked.path())
     }
     closeMenu()
-  }, [closeMenu, history, isLocked, lock])
+  }, [closeMenu, history, keystore, keystoreService])
 
   const currencyChangeHandler = useCallback(
     (asset: PricePoolAsset) => {
@@ -182,12 +182,12 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     () => (
       <HeaderLock
         isDesktopView={isDesktopView}
-        isLocked={!!isLocked}
+        isLocked={isLocked(keystore)}
         onPress={clickLockHandler}
-        disabled={!keyStoreFileExists}
+        disabled={!hasImportedKeystore(keystore)}
       />
     ),
-    [isDesktopView, isLocked, clickLockHandler, keyStoreFileExists]
+    [isDesktopView, clickLockHandler, keystore]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }

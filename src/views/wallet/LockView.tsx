@@ -4,32 +4,34 @@ import { Form, Input, Button } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import Text from 'antd/lib/typography/Text'
+import { none } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useHistory, useLocation } from 'react-router-dom'
 
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
+import { isLocked } from '../../services/wallet/util'
 
 const LockView: React.FC = (): JSX.Element => {
   const history = useHistory()
   const location = useLocation<RedirectRouteState>()
   const [form] = Form.useForm()
 
-  const { unlock, isLocked$ } = useWalletContext()
+  const { keystoreService } = useWalletContext()
 
   const [validPassword, setValidPassword] = useState(false)
-  const isLocked = useObservableState(isLocked$, true)
+  const keystore = useObservableState(keystoreService.keystore$, none)
   const [isLockedError, setIsLockedError] = useState(false)
 
   // Re-direct to previous view after unlocking the wallet
   useEffect(() => {
-    if (!isLocked && !!validPassword) {
-      console.log('location.state?.from?.pathname:', location.state?.from?.pathname)
+    console.log('!isLocked(keystore):', !isLocked(keystore))
+    if (!isLocked(keystore) && !!validPassword) {
       const from = location.state?.from?.pathname ?? walletRoutes.assets.template
       history.push(from)
     }
-  }, [isLocked, validPassword, location, history])
+  }, [keystore, validPassword, location, history])
 
   const passwordValidator = async (_: Rule, value: string) => {
     if (!value) {
@@ -48,12 +50,15 @@ const LockView: React.FC = (): JSX.Element => {
     async ({ password }: Store) => {
       setIsLockedError(false)
       try {
-        await unlock(password)
-      } catch (_) {
+        console.log('before:', !isLocked(keystore))
+        await keystoreService.unlock(keystore, password)
+        console.log('after:', !isLocked(keystore))
+      } catch (error) {
+        console.log('error:', error)
         setIsLockedError(true)
       }
     },
-    [unlock]
+    [keystoreService, keystore]
   )
 
   const onReset = () => {

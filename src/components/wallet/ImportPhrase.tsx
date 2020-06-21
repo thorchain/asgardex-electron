@@ -5,17 +5,20 @@ import { Form, Button, Input } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
+import { none } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as walletRoutes from '../../routes/wallet'
+import { isLocked } from '../../services/wallet/util'
 
 const ImportPhrase: React.FC = (): JSX.Element => {
   const history = useHistory()
   const [form] = Form.useForm()
-  const { phrase, isLocked$ } = useWalletContext()
-  const isLocked = useObservableState(isLocked$, true)
+
+  const { keystoreService } = useWalletContext()
+  const keystore = useObservableState(keystoreService.keystore$, none)
 
   const [validPhrase, setValidPhrase] = useState(false)
   const [validPassword, setValidPassword] = useState(false)
@@ -25,10 +28,10 @@ const ImportPhrase: React.FC = (): JSX.Element => {
 
   useEffect(() => {
     // redirect to wallets assets view
-    if (!isLocked) {
+    if (!isLocked(keystore)) {
       history.push(walletRoutes.assets.template)
     }
-  }, [history, isLocked])
+  }, [history, keystore])
 
   const phraseValidator = async (_: Rule, value: string) => {
     if (!value) {
@@ -59,13 +62,13 @@ const ImportPhrase: React.FC = (): JSX.Element => {
   const submitForm = useCallback(
     async ({ phrase: newPhrase, password }: Store) => {
       try {
-        await phrase.add(newPhrase, password)
+        await keystoreService.addKeystore(newPhrase, password)
         // redirect to wallets assets view
       } catch (error) {
         console.error('could not submit phrase', error)
       }
     },
-    [phrase]
+    [keystoreService]
   )
 
   return (

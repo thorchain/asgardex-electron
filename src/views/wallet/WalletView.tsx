@@ -1,13 +1,14 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState, useEffect } from 'react'
 
+import { none } from 'fp-ts/lib/Option'
 import * as H from 'history'
-import { useSubscription, useObservable } from 'observable-hooks'
+import { useObservableState } from 'observable-hooks'
 import { Switch, Route, Redirect } from 'react-router-dom'
-import { combineLatest } from 'rxjs'
 
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
+import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import View from '../View'
 import FundsReceiveScreen from './FundsReceiveScreen'
 import FundsSendScreen from './FundsSendScreen'
@@ -28,36 +29,28 @@ enum NextView {
 }
 
 const WalletView: React.FC = (): JSX.Element => {
-  const { isLocked$, keyStoreFileExists$ } = useWalletContext()
+  const { keystoreService } = useWalletContext()
+  const keystore = useObservableState(keystoreService.keystore$, none)
+
   const [nextView, setNextView] = useState(NextView.NONE)
 
-  const updateView = useCallback(({ keyStoreFileExists, isLocked }) => {
+  const _updateView = useEffect(() => {
+    const keyStoreFileExists = hasImportedKeystore(keystore)
     console.log('XXX useSubscription keyStoreFileExists', keyStoreFileExists)
-    console.log('XXX useSubscription isLocked', isLocked)
+    const locked = isLocked(keystore)
+    console.log('XXX useSubscription isLocked', locked)
+
     if (!keyStoreFileExists) {
       console.log('XXX set IMPORT_VIEW')
       setNextView(NextView.IMPORT_VIEW)
-    }
-
-    if (isLocked) {
+    } else if (locked) {
       console.log('XXX set LOCK_VIEW')
       setNextView(NextView.LOCK_VIEW)
-    }
-
-    if (!!keyStoreFileExists && !isLocked) {
+    } else {
       console.log('XXX set OTHER_VIEW')
       setNextView(NextView.OTHER_VIEW)
     }
-  }, [])
-
-  const updateView$ = useObservable(() =>
-    combineLatest(keyStoreFileExists$, isLocked$, (keyStoreFileExists, isLocked) => {
-      console.log('useSubscription tap', keyStoreFileExists, isLocked)
-      return { keyStoreFileExists, isLocked }
-    })
-  )
-
-  useSubscription(updateView$, updateView)
+  }, [keystore])
 
   // Following routes are accessable only,
   // if an user has a phrase imported and wallet has not been locked
