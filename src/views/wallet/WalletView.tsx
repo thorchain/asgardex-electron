@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { none } from 'fp-ts/lib/Option'
 import * as H from 'history'
 import { useObservableState } from 'observable-hooks'
 import { Switch, Route, Redirect } from 'react-router-dom'
@@ -23,7 +22,12 @@ import WalletViewNav from './WalletViewNav'
 
 const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
-  const keystore = useObservableState(keystoreService.keystore$, none)
+
+  // Important note:
+  // Since `useObservableState` is set after first render
+  // and Route.render is called before first render,
+  // we have to add 'undefined'  as default value
+  const keystore = useObservableState(keystoreService.keystore$, undefined)
 
   // Following routes are accessable only,
   // if an user has a phrase imported and wallet has not been locked
@@ -65,6 +69,11 @@ const WalletView: React.FC = (): JSX.Element => {
   const renderWalletRoute = useCallback(
     // Redirect if  an user has not a phrase imported or wallet has been locked
     ({ location }: { location: H.Location }) => {
+      // Special case: keystore can be `undefined` (see comment at its definition using `useObservableState`)
+      if (keystore === undefined) {
+        return React.Fragment
+      }
+
       if (!hasImportedKeystore(keystore)) {
         return (
           <Redirect
