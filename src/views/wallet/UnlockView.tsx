@@ -13,7 +13,7 @@ import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { isLocked } from '../../services/wallet/util'
 
-const LockView: React.FC = (): JSX.Element => {
+const UnlockView: React.FC = (): JSX.Element => {
   const history = useHistory()
   const location = useLocation<RedirectRouteState>()
   const [form] = Form.useForm()
@@ -82,4 +82,4 @@ const LockView: React.FC = (): JSX.Element => {
     </Form>
   )
 }
-export default LockView
+export default UnlockView
