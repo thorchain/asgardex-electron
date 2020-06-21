@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useEffect } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import { none } from 'fp-ts/lib/Option'
 import * as H from 'history'
@@ -21,36 +21,9 @@ import UserStakesScreen from './UserStakesScreen'
 import WalletSettingsScreen from './WalletSettingsScreen'
 import WalletViewNav from './WalletViewNav'
 
-enum NextView {
-  IMPORT_VIEW,
-  LOCK_VIEW,
-  OTHER_VIEW,
-  NONE
-}
-
 const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const keystore = useObservableState(keystoreService.keystore$, none)
-
-  const [nextView, setNextView] = useState(NextView.NONE)
-
-  const _updateView = useEffect(() => {
-    const keyStoreFileExists = hasImportedKeystore(keystore)
-    console.log('XXX useSubscription keyStoreFileExists', keyStoreFileExists)
-    const locked = isLocked(keystore)
-    console.log('XXX useSubscription isLocked', locked)
-
-    if (!keyStoreFileExists) {
-      console.log('XXX set IMPORT_VIEW')
-      setNextView(NextView.IMPORT_VIEW)
-    } else if (locked) {
-      console.log('XXX set LOCK_VIEW')
-      setNextView(NextView.LOCK_VIEW)
-    } else {
-      console.log('XXX set OTHER_VIEW')
-      setNextView(NextView.OTHER_VIEW)
-    }
-  }, [keystore])
 
   // Following routes are accessable only,
   // if an user has a phrase imported and wallet has not been locked
@@ -92,11 +65,9 @@ const WalletView: React.FC = (): JSX.Element => {
   const renderWalletRoute = useCallback(
     // Redirect if  an user has not a phrase imported or wallet has been locked
     ({ location }: { location: H.Location }) => {
-      if (nextView === NextView.NONE) return React.Fragment
-
       console.log('location:', location)
 
-      if (nextView === NextView.IMPORT_VIEW) {
+      if (!hasImportedKeystore(keystore)) {
         return (
           <Redirect
             to={{
@@ -108,7 +79,7 @@ const WalletView: React.FC = (): JSX.Element => {
       }
 
       // check lock status
-      if (nextView === NextView.LOCK_VIEW) {
+      if (isLocked(keystore)) {
         return (
           <Redirect
             to={{
@@ -121,12 +92,11 @@ const WalletView: React.FC = (): JSX.Element => {
 
       return renderWalletRoutes
     },
-    [nextView, renderWalletRoutes]
+    [renderWalletRoutes, keystore]
   )
 
   return (
     <View>
-      <div>nextView: {nextView}</div>
       <Switch>
         <Route path={walletRoutes.locked.template} exact>
           <LockView />
