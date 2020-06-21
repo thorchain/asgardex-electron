@@ -26,7 +26,6 @@ const LockView: React.FC = (): JSX.Element => {
 
   // Re-direct to previous view after unlocking the wallet
   useEffect(() => {
-    console.log('!isLocked(keystore):', !isLocked(keystore))
     if (!isLocked(keystore) && !!validPassword) {
       const from = location.state?.from?.pathname ?? walletRoutes.assets.template
       history.push(from)
@@ -50,11 +49,8 @@ const LockView: React.FC = (): JSX.Element => {
     async ({ password }: Store) => {
       setIsLockedError(false)
       try {
-        console.log('before:', !isLocked(keystore))
         await keystoreService.unlock(keystore, password)
-        console.log('after:', !isLocked(keystore))
       } catch (error) {
-        console.log('error:', error)
         setIsLockedError(true)
       }
     },
