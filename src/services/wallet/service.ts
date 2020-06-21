@@ -11,7 +11,7 @@ import { Phrase, KeystoreService, KeystoreState } from './types'
 import { hasImportedKeystore } from './util'
 
 // key file path
-const KEY_FILE = path.join(STORAGE_DIR, 'key.json')
+const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
 
 const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(none)
 
