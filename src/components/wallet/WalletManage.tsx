@@ -45,7 +45,7 @@ const WalletManage: React.FC = (): JSX.Element => {
   const [chainId, setChainId] = useState<string | null>()
   const [address, setAddress] = useState<string | null>('')
 
-  const { lock, phrase } = useWalletContext()
+  const { keystoreService } = useWalletContext()
 
   async function setData() {
     const key: string | null = localStorage.getItem('keystore')
@@ -67,12 +67,12 @@ const WalletManage: React.FC = (): JSX.Element => {
   }, [])
 
   const lockWallet = useCallback(() => {
-    lock()
-  }, [lock])
+    keystoreService.lock()
+  }, [keystoreService])
 
   const removeWallet = useCallback(() => {
-    phrase.remove()
-  }, [phrase])
+    keystoreService.removeKeystore()
+  }, [keystoreService])
 
   return (
     <Row gutter={[16, 16]}>

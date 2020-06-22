@@ -13,17 +13,18 @@ type Props = {
   isLocked: boolean
   onPress?: () => void
   isDesktopView: boolean
+  disabled?: boolean
 }
 
 const HeaderLock: React.FC<Props> = (props: Props): JSX.Element => {
-  const { isLocked, onPress = () => {}, isDesktopView } = props
+  const { isLocked, onPress = () => {}, isDesktopView, disabled = false } = props
 
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
 
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
-  const iconStyle = { fontSize: '1.5em', marginLeft: '20px' }
+  const iconStyle = { fontSize: '1.5em', marginLeft: '20px', cursor: disabled ? 'not-allowed' : 'pointer' }
 
   const clickHandler = (_: React.MouseEvent) => onPress()
 
@@ -52,7 +53,7 @@ const HeaderLock: React.FC<Props> = (props: Props): JSX.Element => {
   }, [color, iconStyle, isDesktopView, isLocked])
 
   return (
-    <HeaderLockWrapper onClick={clickHandler}>
+    <HeaderLockWrapper onClick={clickHandler} disabled={disabled}>
       {!isDesktopView && mobileView}
       {isDesktopView && desktopView}
     </HeaderLockWrapper>

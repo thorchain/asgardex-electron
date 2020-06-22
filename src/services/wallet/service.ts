@@ -1,41 +1,72 @@
-import * as O from 'fp-ts/lib/Option'
-import { Option, none, some } from 'fp-ts/lib/Option'
-import * as Rx from 'rxjs'
-import { map } from 'rxjs/operators'
+import * as path from 'path'
 
-import { Phrase, PhraseService } from './types'
+import { encryptToKeyStore, decryptFromKeystore, Keystore as CryptoKeystore } from '@thorchain/asgardex-crypto'
+// import { Either, right, left } from 'fp-ts/lib/Either'
+import { none, some } from 'fp-ts/lib/Option'
+import * as fs from 'fs-extra'
 
-// Important note:
-// As a temporary workaround, we store phrase into `local-storage` as plain text,
-// but it has to be decrypted before. It will be done by another PR.
-// See https://github.com/thorchain/asgardex-electron/issues/148
+import { STORAGE_DIR } from '../../const'
+import { observableState } from '../../helpers/stateHelper'
+import { Phrase, KeystoreService, KeystoreState } from './types'
+import { hasImportedKeystore } from './util'
 
-const PHRASE_KEY = 'asgdx-phrase'
+// key file path
+const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
 
-const initialPhrase = O.fromNullable(localStorage.getItem(PHRASE_KEY))
+const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(none)
 
-const phrase$$ = new Rx.BehaviorSubject<Option<Phrase>>(initialPhrase)
-
-const addPhrase = (p: Phrase) => {
-  localStorage.setItem(PHRASE_KEY, p)
-  phrase$$.next(some(p))
+/**
+ * Creates a keystore and saves it to disk
+ */
+const addKeystore = async (phrase: Phrase, password: string) => {
+  try {
+    const keystore: CryptoKeystore = await encryptToKeyStore(phrase, password)
+    await fs.ensureFile(KEY_FILE)
+    await fs.writeJSON(KEY_FILE, keystore)
+    setKeystoreState(some(some(phrase)))
+    return Promise.resolve()
+  } catch (error) {
+    return Promise.reject(error)
+  }
 }
 
+export const removeKeystore = async () => {
+  await fs.remove(KEY_FILE)
+  setKeystoreState(none)
+}
+
+const addPhrase = async (state: KeystoreState, password: string) => {
+  // make sure
+  if (!hasImportedKeystore(state)) {
+    return Promise.reject('Keystore has to be imported first')
+  }
+
+  // make sure file still exists
+  const exists = await fs.pathExists(KEY_FILE)
+  if (!exists) {
+    return Promise.reject('Keystore has to be imported first')
+  }
+
+  // decrypt phrase from keystore
+  try {
+    const keystore: CryptoKeystore = await fs.readJSON(KEY_FILE)
+    const phrase = await decryptFromKeystore(keystore, password)
+    setKeystoreState(some(some(phrase)))
+    return Promise.resolve()
+  } catch (error) {
+    return Promise.reject(`Could not decrypt phrase from keystore: ${error}`)
+  }
+}
+
+// * Note: It does not remove keystore from filesystem!
 const removePhrase = () => {
-  localStorage.removeItem(PHRASE_KEY)
-  phrase$$.next(none)
+  setKeystoreState(some(none))
 }
 
-export const phrase: PhraseService = {
-  add: addPhrase,
-  remove: removePhrase,
-  current$: phrase$$.asObservable()
+export const keystoreService: KeystoreService = {
+  keystore$: getKeystoreState$,
+  addKeystore,
+  removeKeystore,
+  lock: removePhrase,
+  unlock: addPhrase
 }
-
-const locked$$ = new Rx.BehaviorSubject(false)
-const locked$ = locked$$.asObservable()
-
-export const isLocked$ = locked$.pipe(map((value) => !!value))
-
-export const lock = () => locked$$.next(true)
-export const unlock = () => locked$$.next(false)

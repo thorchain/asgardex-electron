@@ -1,35 +1,29 @@
 import React, { createContext, useContext } from 'react'
 
-import { Observable } from 'rxjs'
+import * as O from 'fp-ts/lib/Option'
+import { none, Option, some } from 'fp-ts/lib/Option'
 
-import { phrase, lock, unlock, isLocked$ } from '../services/wallet/service'
-import { PhraseService } from '../services/wallet/types'
+import { keystoreService } from '../services/wallet/service'
 
 type WalletContextValue = {
-  phrase: PhraseService
-  isLocked$: Observable<boolean>
-  lock: () => void
-  unlock: () => void
+  keystoreService: typeof keystoreService
 }
 
 const initialContext: WalletContextValue = {
-  phrase,
-  isLocked$,
-  lock,
-  unlock
+  keystoreService: keystoreService
 }
-const WalletContext = createContext<WalletContextValue | null>(null)
+const WalletContext = createContext<Option<WalletContextValue>>(none)
 
 type Props = {
   children: React.ReactNode
 }
 
 export const WalletProvider: React.FC<Props> = ({ children }: Props): JSX.Element => (
-  <WalletContext.Provider value={initialContext}>{children}</WalletContext.Provider>
+  <WalletContext.Provider value={some(initialContext)}>{children}</WalletContext.Provider>
 )
 
 export const useWalletContext = () => {
-  const context = useContext(WalletContext)
+  const context = O.toNullable(useContext(WalletContext))
   if (!context) {
     throw new Error('Context must be used within a WalletProvider.')
   }

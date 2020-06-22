@@ -1,10 +1,17 @@
+import * as React from 'react'
+
 import { Row } from 'antd'
+import { RowProps } from 'antd/lib/row'
 import styled from 'styled-components'
 
 import { media } from '../../helpers/styleHelper'
 
-export const HeaderLockWrapper = styled(Row)`
-  cursor: pointer;
+type Props = RowProps & { disabled: boolean }
+
+const Wrapper: React.FC<Props> = ({ children, ...otherProps }) => <Row {...otherProps}>{children}</Row>
+
+export const HeaderLockWrapper = styled(Wrapper)`
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   justify-content: space-between;
   width: 100vw;
   padding: 0 15px;

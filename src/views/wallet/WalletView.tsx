@@ -7,11 +7,12 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
+import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import View from '../View'
 import FundsReceiveScreen from './FundsReceiveScreen'
 import FundsSendScreen from './FundsSendScreen'
 import ImportsView from './ImportsView'
-import LockView from './LockView'
+import UnlockView from './UnlockView'
 import UserAssetDetailsScreen from './UserAssetDetailsScreen'
 import UserAssetsScreen from './UserAssetsScreen'
 import UserBondsScreen from './UserBondsScreen'
@@ -20,9 +21,13 @@ import WalletSettingsScreen from './WalletSettingsScreen'
 import WalletViewNav from './WalletViewNav'
 
 const WalletView: React.FC = (): JSX.Element => {
-  const { isLocked$, phrase } = useWalletContext()
-  const isLocked = useObservableState(isLocked$)
-  const importedPhrase = useObservableState(phrase.current$)
+  const { keystoreService } = useWalletContext()
+
+  // Important note:
+  // Since `useObservableState` is set after first render
+  // and Route.render is called before first render,
+  // we have to add 'undefined'  as default value
+  const keystore = useObservableState(keystoreService.keystore$, undefined)
 
   // Following routes are accessable only,
   // if an user has a phrase imported and wallet has not been locked
@@ -64,10 +69,13 @@ const WalletView: React.FC = (): JSX.Element => {
   const renderWalletRoute = useCallback(
     // Redirect if  an user has not a phrase imported or wallet has been locked
     ({ location }: { location: H.Location }) => {
-      if (!isLocked) {
-        return importedPhrase ? (
-          renderWalletRoutes
-        ) : (
+      // Special case: keystore can be `undefined` (see comment at its definition using `useObservableState`)
+      if (keystore === undefined) {
+        return React.Fragment
+      }
+
+      if (!hasImportedKeystore(keystore)) {
+        return (
           <Redirect
             to={{
               pathname: walletRoutes.imports.path(),
@@ -75,7 +83,10 @@ const WalletView: React.FC = (): JSX.Element => {
             }}
           />
         )
-      } else {
+      }
+
+      // check lock status
+      if (isLocked(keystore)) {
         return (
           <Redirect
             to={{
@@ -85,15 +96,17 @@ const WalletView: React.FC = (): JSX.Element => {
           />
         )
       }
+
+      return renderWalletRoutes
     },
-    [isLocked, renderWalletRoutes, importedPhrase]
+    [renderWalletRoutes, keystore]
   )
 
   return (
     <View>
       <Switch>
         <Route path={walletRoutes.locked.template} exact>
-          <LockView />
+          <UnlockView />
         </Route>
         <Route path={walletRoutes.imports.template} exact>
           <ImportsView />
