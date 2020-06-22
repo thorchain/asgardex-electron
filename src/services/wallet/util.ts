@@ -4,7 +4,7 @@ import { isSome, none, Option } from 'fp-ts/lib/Option'
 
 import { KeystoreState, Phrase } from './types'
 
-export const getPhrase = (state: KeystoreState): Option<Phrase> =>
+export const getKeystoreContent = (state: KeystoreState): Option<{ phrase: Phrase }> =>
   pipe(
     state,
     O.fold(
@@ -13,8 +13,8 @@ export const getPhrase = (state: KeystoreState): Option<Phrase> =>
     )
   )
 
-export const hasPhrase = (state: KeystoreState): boolean => isSome(getPhrase(state))
+export const hasKeystoreContent = (state: KeystoreState): boolean => isSome(getKeystoreContent(state))
 
 export const hasImportedKeystore = (state: KeystoreState): boolean => isSome(state)
 
-export const isLocked = (state: KeystoreState): boolean => !hasImportedKeystore(state) || !hasPhrase(state)
+export const isLocked = (state: KeystoreState): boolean => !hasImportedKeystore(state) || !hasKeystoreContent(state)

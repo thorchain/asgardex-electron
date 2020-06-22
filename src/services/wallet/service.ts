@@ -1,7 +1,6 @@
 import * as path from 'path'
 
 import { encryptToKeyStore, decryptFromKeystore, Keystore as CryptoKeystore } from '@thorchain/asgardex-crypto'
-// import { Either, right, left } from 'fp-ts/lib/Either'
 import { none, some } from 'fp-ts/lib/Option'
 import * as fs from 'fs-extra'
 
@@ -13,7 +12,9 @@ import { hasImportedKeystore } from './util'
 // key file path
 const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
 
-const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(none)
+const initialKeystoreState = () => (fs.pathExistsSync(KEY_FILE) ? some(none) : none)
+
+const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(initialKeystoreState())
 
 /**
  * Creates a keystore and saves it to disk
@@ -23,7 +24,7 @@ const addKeystore = async (phrase: Phrase, password: string) => {
     const keystore: CryptoKeystore = await encryptToKeyStore(phrase, password)
     await fs.ensureFile(KEY_FILE)
     await fs.writeJSON(KEY_FILE, keystore)
-    setKeystoreState(some(some(phrase)))
+    setKeystoreState(some(some({ phrase })))
     return Promise.resolve()
   } catch (error) {
     return Promise.reject(error)
@@ -51,7 +52,7 @@ const addPhrase = async (state: KeystoreState, password: string) => {
   try {
     const keystore: CryptoKeystore = await fs.readJSON(KEY_FILE)
     const phrase = await decryptFromKeystore(keystore, password)
-    setKeystoreState(some(some(phrase)))
+    setKeystoreState(some(some({ phrase })))
     return Promise.resolve()
   } catch (error) {
     return Promise.reject(`Could not decrypt phrase from keystore: ${error}`)
