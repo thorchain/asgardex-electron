@@ -2,6 +2,7 @@ import React, { useCallback } from 'react'
 
 import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined, BugOutlined } from '@ant-design/icons'
 import { Row, Col, Grid } from 'antd'
+import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { ReactComponent as TelegramIcon } from '../assets/svg/icon-telegram.svg'
@@ -33,6 +34,8 @@ type Props = {
 const Footer: React.FC<Props> = (props: Props): JSX.Element => {
   const { commitHash } = props
 
+  const intl = useIntl()
+
   const history = useHistory()
   const screens = Grid.useBreakpoint()
 
@@ -50,9 +53,9 @@ const Footer: React.FC<Props> = (props: Props): JSX.Element => {
         </Col>
         <Col span={24} md={14}>
           <FooterLinkWrapper justify="center">
-            <FooterLink to="/stats">STATS</FooterLink>
-            <FooterLink to="/network">NETWORK</FooterLink>
-            <FooterLink to="/faqs">FAQS</FooterLink>
+            <FooterLink to="/stats">{intl.formatMessage({ id: 'common.stats' })}</FooterLink>
+            <FooterLink to="/network">{intl.formatMessage({ id: 'common.network' })}</FooterLink>
+            <FooterLink to="/faqs">{intl.formatMessage({ id: 'common.faqs' })}</FooterLink>
           </FooterLinkWrapper>
         </Col>
         <Col span={24} md={6}>

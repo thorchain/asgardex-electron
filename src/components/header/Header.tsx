@@ -5,6 +5,7 @@ import { Row, Col, Tabs, Grid } from 'antd'
 import * as O from 'fp-ts/lib/Option'
 import { Option, some, none } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useRouteMatch, Link } from 'react-router-dom'
 import { useHistory } from 'react-router-dom'
 import { palette, size } from 'styled-theme'
@@ -45,6 +46,8 @@ type Tab = {
 type Props = {}
 
 const Header: React.FC<Props> = (_): JSX.Element => {
+  const intl = useIntl()
+
   const history = useHistory()
 
   const { theme$ } = useThemeContext()
@@ -106,10 +109,20 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const items = useMemo(
     () =>
       [
-        { key: TabKey.POOLS, label: 'Pools', path: poolsRoutes.base.path(), icon: SwapIcon },
-        { key: TabKey.WALLET, label: 'Wallet', path: walletRoutes.base.path(), icon: WalletIcon }
+        {
+          key: TabKey.POOLS,
+          label: intl.formatMessage({ id: 'pools.title' }),
+          path: poolsRoutes.base.path(),
+          icon: SwapIcon
+        },
+        {
+          key: TabKey.WALLET,
+          label: intl.formatMessage({ id: 'wallet.title' }),
+          path: walletRoutes.base.path(),
+          icon: WalletIcon
+        }
       ] as Tab[],
-    []
+    [intl]
   )
 
   const headerHeight = useMemo(() => size('headerHeight', '50px')({ theme }), [theme])
