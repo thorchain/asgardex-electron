@@ -8,10 +8,11 @@ export type Phrase = string
  *
  * (1) `None` -> DEFAULT (keystore needs to be imported at start of application or after shutdown of app)
  * (2) `Some<None>` -> LOCKED STATUS (keystore file, but no phrase)
- * (3) `Some<Some<Phrase>>` -> UNLOCKED + IMPORTED STATUS (keystore file + phrase)
+ * (3) `Some<Some<KeystoreContent>>` -> UNLOCKED + IMPORTED STATUS (keystore file + phrase)
  */
-// export type KeystoreState = Option<Option<Phrase>>
-export type KeystoreState = Option<Option<Phrase>>
+
+export type KeystoreContent = { phrase: Phrase }
+export type KeystoreState = Option<Option<KeystoreContent>>
 
 export type KeystoreService = {
   keystore$: Observable<KeystoreState>
