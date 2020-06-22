@@ -2460,24 +2460,10 @@
   version "1.0.0"
   resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#1612a8ec92ec66603b5dce819b01e6cd635e1035"
 
-"@thorchain/asgardex-crypto@file:../asgardex-crypto":
+"@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#1b18e4af3108a5f41e74ff034ad31a5ac619e91d":
   version "0.1.0"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#1b18e4af3108a5f41e74ff034ad31a5ac619e91d"
   dependencies:
-    "@types/crypto-js" "^3.1.47"
-    "@types/hdkey" "^0.7.1"
-    bech32 "^1.1.4"
-    bip39 "^3.0.2"
-    crypto-js "^4.0.0"
-    foundry-primitives "^0.2.1"
-    hdkey "^2.0.1"
-    uuid "^8.1.0"
-
-"@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#get-it-work-in-asgardex":
-  version "0.1.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#3343bc03f12e03cfb2d95f1c3c6e5cd090e1f20d"
-  dependencies:
-    "@types/crypto-js" "^3.1.47"
-    "@types/hdkey" "^0.7.1"
     bech32 "^1.1.4"
     bip39 "^3.0.2"
     crypto-js "^4.0.0"
@@ -2580,7 +2566,7 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
-"@types/crypto-js@^3.1.43", "@types/crypto-js@^3.1.47":
+"@types/crypto-js@^3.1.43":
   version "3.1.47"
   resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-3.1.47.tgz#36e549dd3f1322742a3a738e7c113ebe48221860"
   integrity sha512-eI6gvpcGHLk3dAuHYnRCAjX+41gMv1nz/VP55wAe5HtmAKDOoPSfr3f6vkMc08ov1S0NsjvUBxDtHHxqQY1LGA==
@@ -2632,13 +2618,6 @@
   integrity sha512-VgNIkxK+j7Nz5P7jvUZlRvhuPSmsEfS03b0alKcq5V/STUKAa3Plemsn5mrQUO7am6OErJ4rhGEGJbACclrtRA==
   dependencies:
     "@types/minimatch" "*"
-    "@types/node" "*"
-
-"@types/hdkey@^0.7.1":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@types/hdkey/-/hdkey-0.7.1.tgz#9bc63ebbe96b107b277b65ea7a95442a677d0d61"
-  integrity sha512-4Kkr06hq+R8a9EzVNqXGOY2x1xA7dhY6qlp6OvaZ+IJy1BCca1Cv126RD9X7CMJoXoLo8WvAizy8gQHpqW6K0Q==
-  dependencies:
     "@types/node" "*"
 
 "@types/history@*":
