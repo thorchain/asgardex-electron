@@ -1,7 +1,6 @@
 import * as path from 'path'
 
 import { encryptToKeyStore, decryptFromKeystore, Keystore as CryptoKeystore } from '@thorchain/asgardex-crypto'
-// import { Either, right, left } from 'fp-ts/lib/Either'
 import { none, some } from 'fp-ts/lib/Option'
 import * as fs from 'fs-extra'
 
@@ -13,7 +12,9 @@ import { hasImportedKeystore } from './util'
 // key file path
 const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
 
-const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(none)
+const initialKeystoreState = () => (fs.pathExistsSync(KEY_FILE) ? some(none) : none)
+
+const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(initialKeystoreState())
 
 /**
  * Creates a keystore and saves it to disk
