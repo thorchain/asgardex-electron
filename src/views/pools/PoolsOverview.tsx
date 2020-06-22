@@ -30,6 +30,7 @@ import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import View from '../View'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
 import { PoolTableRowData, PoolTableRowsData, PricePoolAsset, PoolAsset } from './types'
+import { getBlocksLeftForPendingPoolAsString } from './utils'
 
 type Props = {}
 
@@ -42,23 +43,26 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     midgardService.selectedPricePoolAsset$,
     some(PoolAsset.RUNE)
   )
-  const networkInfoRD = useObservableState(midgardService.networkInfo$, RD.pending)
+  const thorchainLastblockRD = useObservableState(midgardService.thorchainLastblockState$, RD.pending)
+  const thorchainConstantsRD = useObservableState(midgardService.thorchainConstantsState$, RD.pending)
 
   const [blocksLeft, setBlocksLeft] = useState('')
 
   useEffect(() => {
-    const networkInfo = RD.toNullable(networkInfoRD)
-    if (networkInfo) {
-      setBlocksLeft(networkInfo?.poolActivationCountdown?.toString() ?? '')
+    const lastblock = RD.toNullable(thorchainLastblockRD)
+    const constants = RD.toNullable(thorchainConstantsRD)
+    if (lastblock && constants) {
+      setBlocksLeft(getBlocksLeftForPendingPoolAsString(constants, lastblock))
     }
-  }, [networkInfoRD])
+  }, [thorchainConstantsRD, thorchainLastblockRD])
 
   useEffect(
     () => {
-      // Reload pools data whenever PoolsOverview has been entered,
+      // Reload pools + lastblock data whenever PoolsOverview has been entered,
       // but NOT if PoolsOverview is "visible" as a "home screen"
       if (history.length > 1) {
         midgardService.reloadPoolsState()
+        midgardService.reloadThorchainLastblock()
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,7 +77,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const previousPendingPools = useRef<Option<PoolTableRowsData>>(none)
 
   const pendingCountdownHandler = useCallback(() => {
-    midgardService.reloadNetworkInfo()
+    midgardService.reloadThorchainLastblock()
   }, [midgardService])
 
   const pendingCountdownInterval = useMemo(() => {
