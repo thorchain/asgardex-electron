@@ -70,7 +70,7 @@ export const HeaderContainer = styled(Layout.Header)`
   padding: 0 5px;
 
   ${media.lg`
-    padding: 0 50px;
+    padding: 0 20px;
   `}
 `
 

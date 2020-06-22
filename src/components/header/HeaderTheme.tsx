@@ -17,7 +17,7 @@ const HeaderTheme: React.FC<Props> = (props: Props): JSX.Element => {
   const { toggleTheme, theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
-  const iconStyle = { fontSize: '1.5em', marginLeft: '20px' }
+  const iconStyle = { fontSize: '1.5em' }
 
   const clickSwitchThemeHandler = () => {
     toggleTheme()

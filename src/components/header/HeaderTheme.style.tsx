@@ -1,25 +1,12 @@
-import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { media } from '../../helpers/styleHelper'
+import { HeaderIconWrapper } from './HeaderIcon.style'
 
-export const HeaderThemeWrapper = styled(Row)`
-  cursor: pointer;
-  justify-content: space-between;
-  width: 100vw;
-  padding: 0 15px;
-  height: 60px;
-  align-items: center;
-
+export const HeaderThemeWrapper = styled(HeaderIconWrapper)`
   #theme_switch_icon {
     & > * {
       fill: ${palette('text', 1)};
     }
   }
-
-  ${media.lg`
-    width: auto;
-    padding: 0;
-  `}
 `

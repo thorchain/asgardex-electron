@@ -203,6 +203,11 @@ const Header: React.FC<Props> = (_): JSX.Element => {
     [isDesktopView, clickLockHandler, keystore]
   )
 
+  const renderHeaderSettings = useMemo(
+    () => <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} disabled={isLocked(keystore)} />,
+    [isDesktopView, clickSettingsHandler, keystore]
+  )
+
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
@@ -228,7 +233,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
                   {renderHeaderCurrency}
                   <HeaderTheme isDesktopView={isDesktopView} />
                   {renderHeaderLock}
-                  <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} />
+                  {renderHeaderSettings}
                   <HeaderLang isDesktopView={isDesktopView} />
                 </Row>
               </Col>
@@ -270,9 +275,7 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               <HeaderTheme isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
             <HeaderDrawerItem>{renderHeaderLock}</HeaderDrawerItem>
-            <HeaderDrawerItem>
-              <HeaderSettings onPress={clickSettingsHandler} isDesktopView={isDesktopView} />
-            </HeaderDrawerItem>
+            <HeaderDrawerItem>{renderHeaderSettings}</HeaderDrawerItem>
             <HeaderDrawerItem>
               <HeaderLang isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
