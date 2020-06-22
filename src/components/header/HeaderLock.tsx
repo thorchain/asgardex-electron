@@ -7,7 +7,7 @@ import { palette } from 'styled-theme'
 import { ReactComponent as LockIcon } from '../../assets/svg/icon-lock.svg'
 import { ReactComponent as UnlockIcon } from '../../assets/svg/icon-unlock.svg'
 import { useThemeContext } from '../../contexts/ThemeContext'
-import { HeaderLockWrapper } from './HeaderLock.style'
+import { HeaderIconWrapper } from './HeaderIcon.style'
 
 type Props = {
   isLocked: boolean
@@ -24,7 +24,7 @@ const HeaderLock: React.FC<Props> = (props: Props): JSX.Element => {
 
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
-  const iconStyle = { fontSize: '1.5em', marginLeft: '20px', cursor: disabled ? 'not-allowed' : 'pointer' }
+  const iconStyle = { fontSize: '1.5em', cursor: disabled ? 'not-allowed' : 'pointer' }
 
   const clickHandler = (_: React.MouseEvent) => onPress()
 
@@ -39,24 +39,22 @@ const HeaderLock: React.FC<Props> = (props: Props): JSX.Element => {
     [iconStyle, isLocked]
   )
 
-  // Mobile view is different, it does not show current lock status.
-  // It includes a label + icon of a lock status an user can switch to
   const mobileView = useMemo(() => {
     const label = isLocked ? 'Unlock wallet' : 'Lock wallet'
     return (
       <>
         {!isDesktopView && <Text style={{ color, textTransform: 'uppercase' }}>{label}</Text>}
-        {!isLocked && <LockIcon style={iconStyle} />}
-        {isLocked && <UnlockIcon style={iconStyle} />}
+        {!isLocked && <UnlockIcon style={iconStyle} />}
+        {isLocked && <LockIcon style={iconStyle} />}
       </>
     )
   }, [color, iconStyle, isDesktopView, isLocked])
 
   return (
-    <HeaderLockWrapper onClick={clickHandler} disabled={disabled}>
+    <HeaderIconWrapper onClick={clickHandler} disabled={disabled}>
       {!isDesktopView && mobileView}
       {isDesktopView && desktopView}
-    </HeaderLockWrapper>
+    </HeaderIconWrapper>
   )
 }
 
