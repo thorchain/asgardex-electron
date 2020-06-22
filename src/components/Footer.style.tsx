@@ -56,6 +56,7 @@ export const FooterLink = styled(Link)`
   display: block;
   width: 100%;
   text-align: center;
+  text-transform: uppercase;
 
   margin-bottom: 10px;
 
