@@ -19,8 +19,8 @@ import {
 } from './types'
 import { getPricePools, selectedPricePoolSelector } from './utils'
 
-export const MIDGARD_MAX_RETRY = 3
-export const BYZANTINE_MAX_RETRY = 5
+const MIDGARD_MAX_RETRY = 3
+const BYZANTINE_MAX_RETRY = 5
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
@@ -35,7 +35,7 @@ const byzantine$ = Rx.from(byzantine()).pipe(retry(BYZANTINE_MAX_RETRY))
 /**
  * State of pools data
  */
-export const { get$: getPoolsState$, set: setPoolState } = observableState<PoolsStateRD>(RD.initial)
+const { get$: getPoolsState$, set: setPoolState } = observableState<PoolsStateRD>(RD.initial)
 
 /**
  * Loading queue to get all needed data for `PoolsState`
@@ -136,9 +136,9 @@ const poolsState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$.pipe(
 /**
  * State of `lastblock` endpoint
  */
-export const { get$: getThorchainLastblockState$, set: setThorchainLastblockState } = observableState<
-  ThorchainLastblockRD
->(RD.initial)
+const { get$: getThorchainLastblockState$, set: setThorchainLastblockState } = observableState<ThorchainLastblockRD>(
+  RD.initial
+)
 
 /**
  * Get `ThorchainLastblock` data from Midgard
@@ -187,9 +187,9 @@ const thorchainLastblockState$: Rx.Observable<ThorchainLastblockRD> = reloadThor
 /**
  * State of thorchain constants
  */
-export const { get$: getThorchainConstantsState$, set: setThorchainConstantsState } = observableState<
-  ThorchainConstantsRD
->(RD.initial)
+const { get$: getThorchainConstantsState$, set: setThorchainConstantsState } = observableState<ThorchainConstantsRD>(
+  RD.initial
+)
 
 /**
  * Get `ThorchainConstants` data from Midgard
@@ -234,7 +234,7 @@ const PRICE_POOL_KEY = 'asgdx-price-pool'
 
 export const getSelectedPricePool = () => O.fromNullable(localStorage.getItem(PRICE_POOL_KEY) as PricePoolAsset)
 
-export const {
+const {
   get$: selectedPricePoolAsset$,
   get: selectedPricePoolAsset,
   set: updateSelectedPricePoolAsset
@@ -243,7 +243,7 @@ export const {
 /**
  * Update selected `PricePoolAsset`
  */
-export const setSelectedPricePoolAsset = (asset: PricePoolAsset) => {
+const setSelectedPricePoolAsset = (asset: PricePoolAsset) => {
   localStorage.setItem(PRICE_POOL_KEY, asset)
   updateSelectedPricePoolAsset(some(asset))
 }
@@ -298,9 +298,9 @@ const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
 )
 
 /**
- * Service object with all "public" functions and observables we want provide
+ * Service object with all "public" functions and observables we want to provide
  */
-const service = {
+export const service = {
   poolsState$,
   reloadPoolsState,
   networkInfo$,
@@ -311,6 +311,3 @@ const service = {
   setSelectedPricePool: setSelectedPricePoolAsset,
   selectedPricePoolAsset$
 }
-
-// Default
-export default service

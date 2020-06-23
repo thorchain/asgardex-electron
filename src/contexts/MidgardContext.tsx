@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react'
 
-import service from '../services/midgard/service'
+import { service } from '../services/midgard/service'
 
 type MidgardContextValue = {
   service: typeof service
