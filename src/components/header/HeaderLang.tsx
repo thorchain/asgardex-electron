@@ -1,29 +1,31 @@
 import React, { useMemo, useCallback } from 'react'
 
 import { Row, Dropdown } from 'antd'
-import { Grid } from 'antd'
 import { ClickParam } from 'antd/lib/menu'
-import Text from 'antd/lib/typography/Text'
 import { useObservableState } from 'observable-hooks'
-import { palette } from 'styled-theme'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { useI18nContext } from '../../contexts/I18nContext'
-import { useThemeContext } from '../../contexts/ThemeContext'
 import { LOCALES } from '../../i18n'
 import { Locale } from '../../i18n/types'
 import Menu from '../shared/Menu'
-import { HeaderLangWrapper } from './HeaderLang.style'
+import {
+  HeaderDropdownWrapper,
+  HeaderDropdownMenuItem,
+  HeaderDropdownContentWrapper,
+  HeaderDropdownMenuItemText,
+  HeaderDropdownTitle
+} from './HeaderMenu.style'
 
-type Props = {}
+type Props = {
+  isDesktopView: boolean
+}
 
-const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
-  const { theme$ } = useThemeContext()
-  const theme = useObservableState(theme$)
+const HeaderLang: React.FC<Props> = (props: Props): JSX.Element => {
+  const { isDesktopView } = props
 
   const { changeLocale, locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$)
-  const isDesktopView = Grid.useBreakpoint().lg
 
   const changeLang = useCallback(
     ({ key }: ClickParam) => {
@@ -32,58 +34,33 @@ const HeaderLang: React.FC<Props> = (_: Props): JSX.Element => {
     [changeLocale]
   )
 
-  const color = useMemo(() => palette('text', 0)({ theme }), [theme])
-  const itemStyle = { color, fontSize: '18px' }
-
   const menu = useMemo(
     () => (
       <Menu onClick={changeLang}>
         {LOCALES.map((locale: Locale) => {
           return (
-            <Menu.Item
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '8px 10px'
-              }}
-              key={locale}>
-              <Text strong style={itemStyle}>
-                {locale.toUpperCase()}
-              </Text>
-            </Menu.Item>
+            <HeaderDropdownMenuItem key={locale}>
+              <HeaderDropdownMenuItemText strong>{locale}</HeaderDropdownMenuItemText>
+            </HeaderDropdownMenuItem>
           )
         })}
       </Menu>
     ),
-    [changeLang, itemStyle]
+    [changeLang]
   )
 
   return (
-    <HeaderLangWrapper>
+    <HeaderDropdownWrapper>
       <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
-        {/* `ant-dropdown-link` does need a height to give dropdown content an offset - dont't remove it! */}
-        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <a className="ant-dropdown-link" style={{ height: '40px' }} onClick={(e) => e.preventDefault()}>
-          <Row
-            style={{
-              justifyContent: 'space-between',
-              paddingLeft: '15px',
-              paddingRight: '15px',
-              height: '60px',
-              alignItems: 'center',
-              width: '100%'
-            }}>
-            {!isDesktopView && <Text style={{ color }}>LANGUAGE</Text>}
-            <Row style={{ alignItems: 'center' }}>
-              <Text strong style={itemStyle}>
-                {currentLocale?.toUpperCase()}
-              </Text>
-              <DownIcon />
-            </Row>
+        <HeaderDropdownContentWrapper>
+          {!isDesktopView && <HeaderDropdownTitle>Language</HeaderDropdownTitle>}
+          <Row style={{ alignItems: 'center' }}>
+            <HeaderDropdownMenuItemText strong>{currentLocale || ''}</HeaderDropdownMenuItemText>
+            <DownIcon />
           </Row>
-        </a>
+        </HeaderDropdownContentWrapper>
       </Dropdown>
-    </HeaderLangWrapper>
+    </HeaderDropdownWrapper>
   )
 }
 

@@ -1,7 +1,12 @@
-import { bn } from '@thorchain/asgardex-util'
+import { getAssetFromString } from '@thorchain/asgardex-util'
+import { head } from 'fp-ts/lib/NonEmptyArray'
+import { Option, toNullable, none, some, isNone } from 'fp-ts/lib/Option'
 
-import { PoolDetail } from '../../types/generated/midgard'
-import { Asset, AssetDetails, AssetDetailMap, PriceDataIndex, PoolDetails, PoolDetailsMap } from './types'
+import { RUNE_PRICE_POOL, CURRENCY_WHEIGHTS } from '../../const'
+import { toPoolData } from '../../helpers/poolHelper'
+import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
+import { PricePoolAssets, PricePools, PricePoolAsset, PricePool, PoolAsset } from '../../views/pools/types'
+import { AssetDetails, AssetDetailMap, PoolDetails } from './types'
 
 export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} => {
   let assetDataIndex = {}
@@ -18,87 +23,45 @@ export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} =
   return assetDataIndex
 }
 
-export const getPriceIndex = (assets: AssetDetails, baseTokenTicker: string): PriceDataIndex => {
-  let baseTokenPrice = bn(0)
-
-  if (baseTokenTicker.toLowerCase() === 'rune') {
-    baseTokenPrice = bn(1)
-  }
-
-  const baseTokenInfo = assets.find((assetInfo) => {
-    const { asset = '' } = assetInfo
-    const { ticker } = getAssetFromString(asset)
-    return ticker === baseTokenTicker.toUpperCase()
-  })
-  baseTokenPrice = bn(baseTokenInfo?.priceRune ?? 1)
-
-  let priceDataIndex: PriceDataIndex = {
-    // formula: 1 / baseTokenPrice
-    RUNE: bn(1).div(baseTokenPrice)
-  }
-
-  assets.forEach((assetInfo) => {
-    const { asset = '', priceRune } = assetInfo
-
-    let price = bn(0)
-    if (priceRune && baseTokenPrice) {
-      // formula: 1 / baseTokenPrice) * priceRune
-      price = bn(1).div(baseTokenPrice).multipliedBy(priceRune)
+export const getAssetDetail = (assets: AssetDetails, ticker: string): Option<AssetDetail> =>
+  assets.reduce((acc: Option<AssetDetail>, asset: AssetDetail) => {
+    if (isNone(acc)) {
+      const { asset: a = '' } = asset
+      const { ticker: t } = getAssetFromString(a)
+      return ticker === t ? some(asset) : none
     }
+    return acc
+  }, none)
 
-    const { ticker } = getAssetFromString(asset)
-    if (ticker) {
-      priceDataIndex = { ...priceDataIndex, [ticker]: price }
-    }
-  })
+export const getPricePools = (pools: PoolDetails, whitelist: PricePoolAssets): PricePools => {
+  const poolDetails = pools.filter(
+    (detail) => whitelist.find((asset) => detail.asset && detail.asset === asset) !== undefined
+  )
 
-  return priceDataIndex
+  const pricePools = poolDetails
+    .map((detail: PoolDetail) => {
+      // Since we have filtered pools based on whitelist before ^,
+      // we can type asset as `PricePoolAsset` now
+      const asset = (detail?.asset ?? '') as PricePoolAsset
+      return {
+        asset,
+        poolData: toPoolData(detail)
+      } as PricePool
+    })
+    // sort by weights (high weight wins)
+    .sort((a, b) => CURRENCY_WHEIGHTS[b.asset] - CURRENCY_WHEIGHTS[a.asset])
+  return [RUNE_PRICE_POOL, ...pricePools]
 }
 
-/**
- * Creates an `Asset` by a given string
- *
- * The string has following naming convention:
- * `AAA.BBB-CCC`
- * where
- * chain: `AAA`
- * ticker (optional): `BBB`
- * symbol: `BBB-CCC`
- * or
- * symbol: `CCC` (if no ticker available)
- *
- * Image: ^ https://files.slack.com/files-pri/TBFG8JBBQ-F0147D6PBJA/image.png
- *
- */
-export const getAssetFromString = (s?: string): Asset => {
-  let chain
-  let symbol
-  let ticker
-  // We still use this function in plain JS world,
-  // so we have to check the type of s here...
-  if (s && typeof s === 'string') {
-    const data = s.split('.')
-    chain = data[0]
-    const ss = data[1]
-    if (ss) {
-      symbol = ss
-      // grab `ticker` from string or reference to `symbol` as `ticker`
-      ticker = ss.split('-')[0]
-    }
+export const selectedPricePoolSelector = (pools: PricePools, oAsset: Option<PricePoolAsset>) => {
+  const asset = toNullable(oAsset)
+  // Check if prev. selected pool is still available
+  const prevPool = asset && pools.find((pool) => pool.asset === asset)
+  if (prevPool) {
+    return prevPool
   }
-  return { chain, symbol, ticker }
-}
 
-/**
- * Transforms `PoolDetails` into `PoolDetailsMap`
- */
-export const toPoolDetailsMap = (poolDetails: PoolDetails): PoolDetailsMap =>
-  poolDetails.reduce((acc, poolDetail: PoolDetail) => {
-    const { symbol } = getAssetFromString(poolDetail.asset)
-    return symbol
-      ? {
-          ...acc,
-          [symbol]: poolDetail
-        }
-      : acc
-  }, {} as PoolDetailsMap)
+  // Use TUSDB or use "RUNE" pool (which is always the first pool")
+  const tusdbPool = pools.find((pool) => pool.asset === PoolAsset.TUSDB)
+  return tusdbPool || head(pools)
+}

@@ -11,23 +11,24 @@
  * Do not edit the class manually.
  */
 
-import {
-    TxDetails,
-} from './';
-
 /**
  * @export
  * @interface InlineResponse200
  */
 export interface InlineResponse200 {
     /**
+     * @type {boolean}
+     * @memberof InlineResponse200
+     */
+    catching_up?: boolean;
+    /**
+     * @type {boolean}
+     * @memberof InlineResponse200
+     */
+    database?: boolean;
+    /**
      * @type {number}
      * @memberof InlineResponse200
      */
-    count?: number;
-    /**
-     * @type {Array<TxDetails>}
-     * @memberof InlineResponse200
-     */
-    txs?: Array<TxDetails>;
+    scannerHeight?: number;
 }

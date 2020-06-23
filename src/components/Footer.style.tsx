@@ -12,9 +12,9 @@ export const FooterContainer = styled(Layout.Footer)`
   width: 100vw;
   padding: 20px 20px;
 
-  ${media.sm`
-    padding: 10px 64px;
-    height: ${size('footerHeight')};
+  ${media.md`
+    padding: 20px 64px;
+    height: ${size('footerHeight')}px;
   `}
 
   background-color: ${palette('background', 0)};
@@ -56,14 +56,15 @@ export const FooterLink = styled(Link)`
   display: block;
   width: 100%;
   text-align: center;
+  text-transform: uppercase;
 
   margin-bottom: 10px;
 
   :last-child {
-    margin-botton: 0;
+    margin-bottom: 0;
   }
 
-  ${media.sm`
+  ${media.md`
     margin-bottom: 0;
     padding-left: 40px;
     :first-child {

@@ -3,7 +3,7 @@ import { ButtonProps } from 'antd/lib/button'
 import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
-import { ButtonColor, ButtonSize, ButtonWeight, ButtonType } from './types'
+import { ButtonColor, ButtonRound, ButtonSize, ButtonWeight, ButtonType } from './types'
 
 const fontSettings = {
   small: {
@@ -181,7 +181,7 @@ const getThemeValue = (color: ButtonColor, typeValue: ButtonType) => {
 }
 
 export type ButtonWrapperProps = {
-  round: boolean
+  round: ButtonRound
   color: ButtonColor
   sizevalue: ButtonSize
   weight: ButtonWeight
@@ -196,7 +196,7 @@ export const ButtonWrapper = styled(Button)<Props>`
     justify-content: space-around;
     align-items: center;
 
-    border-radius: ${(props) => (props.round ? sizes[props.sizevalue].height : '3px')};
+    border-radius: ${(props) => (props.round === 'true' ? sizes[props.sizevalue].height : '3px')};
     min-width: ${(props) => sizes[props.sizevalue].width};
     height: ${(props) => sizes[props.sizevalue].height};
     font-size: ${(props) => fontSettings[props.sizevalue].size};

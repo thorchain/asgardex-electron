@@ -14,7 +14,7 @@ type Props = {
 }
 
 const AddressInput: React.FC<Props> = (props: Props): JSX.Element => {
-  const { value = '', status: initialStatus = false, onStatusChange, onChange, className = '', ...otherProps } = props
+  const { value = '', status: initialStatus = false, onStatusChange, onChange, className = '' } = props
 
   const [status, setStatus] = useState(initialStatus)
 
@@ -42,12 +42,7 @@ const AddressInput: React.FC<Props> = (props: Props): JSX.Element => {
   }
 
   return (
-    <AddressInputWrapper
-      status={status}
-      className={`addressInput-wrapper ${className}`}
-      onClick={onClickWrapper}
-      data-test="add-recipient-address-button"
-      {...otherProps}>
+    <AddressInputWrapper status={status} className={`addressInput-wrapper ${className}`} onClick={onClickWrapper}>
       {!status && (
         <PopoverContainer
           getPopupContainer={getPopupContainer}
@@ -59,7 +54,7 @@ const AddressInput: React.FC<Props> = (props: Props): JSX.Element => {
             animationDuration: '0s !important',
             animation: 'none !important'
           }}>
-          <div className="addressInput-icon" data-test="add-recipient-address-button">
+          <div className="addressInput-icon">
             <PlusOutlined />
           </div>
         </PopoverContainer>
@@ -76,7 +71,6 @@ const AddressInput: React.FC<Props> = (props: Props): JSX.Element => {
             value={value}
             onChange={onChangeHandler}
             placeholder="Enter Recipient Address"
-            data-test="recipient-address-field"
           />
         </>
       )}

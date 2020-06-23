@@ -1,4 +1,4 @@
-import { base, settings, assets, stakes, bonds, assetDetails, fundsSend, fundsReceive } from './wallet'
+import { base, imports, locked, settings, assets, stakes, bonds, assetDetails, fundsSend, fundsReceive } from './wallet'
 
 describe('Wallet routes', () => {
   describe('base routes', () => {
@@ -9,6 +9,25 @@ describe('Wallet routes', () => {
       expect(base.path()).toEqual('/wallet')
     })
   })
+
+  describe('imports route', () => {
+    it('template', () => {
+      expect(imports.template).toEqual('/wallet/imports')
+    })
+    it('path', () => {
+      expect(imports.path()).toEqual('/wallet/imports')
+    })
+  })
+
+  describe('locked route', () => {
+    it('template', () => {
+      expect(locked.template).toEqual('/wallet/locked')
+    })
+    it('path', () => {
+      expect(locked.path()).toEqual('/wallet/locked')
+    })
+  })
+
   describe('settings route', () => {
     it('template', () => {
       expect(settings.template).toEqual('/wallet/settings')
@@ -17,6 +36,7 @@ describe('Wallet routes', () => {
       expect(settings.path()).toEqual('/wallet/settings')
     })
   })
+
   describe('assets route', () => {
     it('template', () => {
       expect(assets.template).toEqual('/wallet/assets')

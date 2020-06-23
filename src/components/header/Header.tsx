@@ -1,8 +1,13 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useCallback, useRef } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid } from 'antd'
+import * as O from 'fp-ts/lib/Option'
+import { Option, some, none } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useRouteMatch, Link } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { palette, size } from 'styled-theme'
 
 import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
@@ -10,13 +15,18 @@ import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
+import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThemeContext } from '../../contexts/ThemeContext'
+import { useWalletContext } from '../../contexts/WalletContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
+import { isLocked, hasImportedKeystore } from '../../services/wallet/util'
+import { PricePoolAsset, PricePoolAssets, PoolAsset } from '../../views/pools/types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Header.style'
 import HeaderLang from './HeaderLang'
 import HeaderLock from './HeaderLock'
 import HeaderNetStatus from './HeaderNetStatus'
+import HeaderPriceSelector from './HeaderPriceSelector'
 import HeaderSettings from './HeaderSettings'
 import HeaderTheme from './HeaderTheme'
 
@@ -36,18 +46,52 @@ type Tab = {
 type Props = {}
 
 const Header: React.FC<Props> = (_): JSX.Element => {
-  const [menuVisible, setMenuVisible] = useState(false)
+  const intl = useIntl()
+
+  const history = useHistory()
+
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
-  const isDesktopView = Grid.useBreakpoint().lg
+
+  const { keystoreService } = useWalletContext()
+  const keystore = useObservableState(keystoreService.keystore$, none)
+
+  const { service: midgardService } = useMidgardContext()
+  const poolsRD = useObservableState(midgardService.poolsState$, RD.pending)
+  const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
+    midgardService.selectedPricePoolAsset$,
+    some(PoolAsset.RUNE)
+  )
+
+  // store previous data to render it while reloading new data
+  const prevPricePoolAssets = useRef<PricePoolAssets>()
+
+  const pricePoolAssets = useMemo(() => {
+    const pools = RD.toNullable(poolsRD)
+    if (!pools) {
+      return prevPricePoolAssets?.current ?? []
+    }
+    const pricePools = O.toNullable(pools.pricePools)
+    const assets = (pricePools && pricePools.map((pool) => pool.asset)) || []
+    prevPricePoolAssets.current = assets
+    return assets
+  }, [poolsRD])
+
+  const hasPricePools = useMemo(() => pricePoolAssets.length > 0, [pricePoolAssets])
+
+  const [menuVisible, setMenuVisible] = useState(false)
+
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible)
   }
 
-  const closeMenu = () => {
-    setMenuVisible(false)
-  }
+  const closeMenu = useCallback(() => {
+    if (!isDesktopView) {
+      setMenuVisible(false)
+    }
+  }, [isDesktopView])
 
   const matchPoolsRoute = useRouteMatch(poolsRoutes.base.path())
   const matchWalletRoute = useRouteMatch(walletRoutes.base.path())
@@ -65,10 +109,20 @@ const Header: React.FC<Props> = (_): JSX.Element => {
   const items = useMemo(
     () =>
       [
-        { key: TabKey.POOLS, label: 'Pools', path: poolsRoutes.base.path(), icon: SwapIcon },
-        { key: TabKey.WALLET, label: 'Wallet', path: walletRoutes.base.path(), icon: WalletIcon }
+        {
+          key: TabKey.POOLS,
+          label: intl.formatMessage({ id: 'pools.title' }),
+          path: poolsRoutes.base.path(),
+          icon: SwapIcon
+        },
+        {
+          key: TabKey.WALLET,
+          label: intl.formatMessage({ id: 'wallet.title' }),
+          path: walletRoutes.base.path(),
+          icon: WalletIcon
+        }
       ] as Tab[],
-    []
+    [intl]
   )
 
   const headerHeight = useMemo(() => size('headerHeight', '50px')({ theme }), [theme])
@@ -100,7 +154,58 @@ const Header: React.FC<Props> = (_): JSX.Element => {
           </HeaderDrawerItem>
         </Link>
       )),
-    [items]
+    [closeMenu, items]
+  )
+
+  const clickSettingsHandler = useCallback(() => {
+    closeMenu()
+    history.push(walletRoutes.settings.path())
+  }, [closeMenu, history])
+
+  const clickLockHandler = useCallback(() => {
+    // lock if needed
+    if (!isLocked(keystore)) {
+      keystoreService.lock()
+      history.push(walletRoutes.locked.path())
+    }
+    closeMenu()
+  }, [closeMenu, history, keystore, keystoreService])
+
+  const currencyChangeHandler = useCallback(
+    (asset: PricePoolAsset) => {
+      midgardService.setSelectedPricePool(asset)
+    },
+    [midgardService]
+  )
+
+  const renderHeaderCurrency = useMemo(
+    () => (
+      <HeaderPriceSelector
+        disabled={!hasPricePools}
+        isDesktopView={isDesktopView}
+        selectedAsset={O.toUndefined(selectedPricePoolAsset)}
+        assets={pricePoolAssets}
+        changeHandler={currencyChangeHandler}
+      />
+    ),
+    [hasPricePools, isDesktopView, selectedPricePoolAsset, pricePoolAssets, currencyChangeHandler]
+  )
+
+  const renderHeaderLock = useMemo(
+    () => (
+      <HeaderLock
+        isDesktopView={isDesktopView}
+        isLocked={isLocked(keystore)}
+        onPress={clickLockHandler}
+        disabled={!hasImportedKeystore(keystore)}
+      />
+    ),
+    [isDesktopView, clickLockHandler, keystore]
+  )
+
+  const renderHeaderSettings = useMemo(
+    () => <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} disabled={isLocked(keystore)} />,
+    [isDesktopView, clickSettingsHandler, keystore]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
@@ -125,10 +230,11 @@ const Header: React.FC<Props> = (_): JSX.Element => {
               </Col>
               <Col>
                 <Row align="middle">
-                  <HeaderTheme />
-                  <HeaderSettings />
-                  <HeaderLock />
-                  <HeaderLang />
+                  {renderHeaderCurrency}
+                  <HeaderTheme isDesktopView={isDesktopView} />
+                  {renderHeaderLock}
+                  {renderHeaderSettings}
+                  <HeaderLang isDesktopView={isDesktopView} />
                 </Row>
               </Col>
             </>
@@ -164,17 +270,14 @@ const Header: React.FC<Props> = (_): JSX.Element => {
             visible={menuVisible}
             key="top">
             {links}
+            <HeaderDrawerItem>{renderHeaderCurrency}</HeaderDrawerItem>
             <HeaderDrawerItem>
-              <HeaderTheme />
+              <HeaderTheme isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
+            <HeaderDrawerItem>{renderHeaderLock}</HeaderDrawerItem>
+            <HeaderDrawerItem>{renderHeaderSettings}</HeaderDrawerItem>
             <HeaderDrawerItem>
-              <HeaderLock onPress={() => closeMenu()} />
-            </HeaderDrawerItem>
-            <HeaderDrawerItem>
-              <HeaderSettings onPress={() => closeMenu()} />
-            </HeaderDrawerItem>
-            <HeaderDrawerItem>
-              <HeaderLang />
+              <HeaderLang isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
             <HeaderNetStatus />
           </HeaderDrawer>

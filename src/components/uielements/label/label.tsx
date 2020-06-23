@@ -1,18 +1,16 @@
 import React from 'react'
 
-import { LabelWrapper } from './label.style'
-import { Size, Color, TextAlignment } from './types'
+import { LabelWrapper, Props as StyledProps } from './label.style'
 
-export type Props = {
-  align?: TextAlignment
-  size?: Size
-  color?: Color
-  weight?: string
+export type ComponentProps = {
   className?: string
   children?: React.ReactNode
   loading?: boolean
   onClick?: () => void
+  style?: React.CSSProperties
 }
+
+type Props = ComponentProps & StyledProps
 
 const Label: React.FC<Props> = (props: Props): JSX.Element => {
   const {
@@ -21,31 +19,25 @@ const Label: React.FC<Props> = (props: Props): JSX.Element => {
     size = 'normal',
     color = 'normal',
     weight = 'normal',
+    textTransform = 'none',
     children,
     className = '',
-    ...otherProps
+    style
   } = props
 
   return (
     <LabelWrapper
       className={`label-wrapper ${className}`}
-      align={align}
       size={size}
       color={color}
       weight={weight}
-      {...otherProps}>
+      textTransform={textTransform}
+      style={style}
+      align={align}>
       {loading && '...'}
       {!loading && children}
     </LabelWrapper>
   )
-}
-
-Label.defaultProps = {
-  align: 'left',
-  size: 'normal',
-  color: 'normal',
-  weight: 'normal',
-  loading: false
 }
 
 export default Label

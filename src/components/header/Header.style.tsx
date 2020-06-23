@@ -33,6 +33,7 @@ export const HeaderContainer = styled(Layout.Header)`
   /* Make sure following id's are defined in svg */
   #theme_switch_icon,
   #lock_icon,
+  #unlock_icon,
   #settings_icon {
     cursor: pointer;
   }
@@ -40,6 +41,13 @@ export const HeaderContainer = styled(Layout.Header)`
   #settings_icon {
     & > * {
       fill: ${palette('primary', 0)};
+    }
+  }
+
+  .ant-tabs-nav {
+    &::before {
+      /* hide border */
+      border-bottom: 0;
     }
   }
 
@@ -55,15 +63,15 @@ export const HeaderContainer = styled(Layout.Header)`
   }
 
   .ant-tabs-ink-bar {
-    height: 3px;
+    height: 5px;
     background: ${palette('gradient', 0)};
   }
 
   padding: 0 5px;
 
   ${media.lg`
-      padding: 0 50px;
-    `}
+    padding: 0 20px;
+  `}
 `
 
 type TabLinkProps = {
@@ -71,7 +79,7 @@ type TabLinkProps = {
 }
 
 export const TabLink = styled(Link)`
-  border-bottom-width: '3px';
+  border-bottom-width: 3px;
   border-color: ${palette('primary', 0)};
   color: ${(props: TabLinkProps) => (props.selected ? palette('text', 1) : palette('text', 2))};
   transition: none;
