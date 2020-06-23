@@ -9,7 +9,14 @@ import { PRICE_POOLS_WHITELIST } from '../../const'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
-import { PoolsStateRD, PoolsState, PoolDetails, NetworkInfoRD } from './types'
+import {
+  PoolsStateRD,
+  PoolsState,
+  PoolDetails,
+  NetworkInfoRD,
+  ThorchainLastblockRD,
+  ThorchainConstantsRD
+} from './types'
 import { getPricePools, selectedPricePoolSelector } from './utils'
 
 export const MIDGARD_MAX_RETRY = 3
@@ -73,7 +80,7 @@ const loadPoolsStateData$ = () => {
     catchError((error: Error) => {
       // set `error` state
       setPoolState(RD.failure(error))
-      return Rx.of('error while fetchting data for pool')
+      return Rx.of('Error while fetching data for pools')
     }),
     retry(MIDGARD_MAX_RETRY)
   )
@@ -126,6 +133,103 @@ const poolsState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$.pipe(
   shareReplay()
 )
 
+/**
+ * State of `lastblock` endpoint
+ */
+export const { get$: getThorchainLastblockState$, set: setThorchainLastblockState } = observableState<
+  ThorchainLastblockRD
+>(RD.initial)
+
+/**
+ * Get `ThorchainLastblock` data from Midgard
+ */
+const apiGetThorchainLastblock$ = byzantine$.pipe(
+  concatMap((endpoint) => {
+    const api = getMidgardDefaultApi(endpoint)
+    return api.getThorchainProxiedLastblock()
+  })
+)
+
+// `TriggerStream` to reload data of `ThorchainLastblock`
+const { stream$: reloadThorchainLastblock$, trigger: reloadThorchainLastblock } = triggerStream()
+
+/**
+ * Loads data of `ThorchainLastblock`
+ */
+const loadThorchainLastblock$ = () => {
+  // Update state to `pending`
+  setThorchainLastblockState(RD.pending)
+  return apiGetThorchainLastblock$.pipe(
+    // store result
+    tap((result) => setThorchainLastblockState(RD.success(result))),
+    // catch any errors if there any
+    catchError((error: Error) => {
+      // set `error` state
+      setThorchainLastblockState(RD.failure(error))
+      return Rx.of("Error while fetching Thorchain's data for lastblock")
+    }),
+    retry(MIDGARD_MAX_RETRY)
+  )
+}
+
+/**
+ * State of `ThorchainLastblock`, it will be loaded data by first subscription only
+ */
+const thorchainLastblockState$: Rx.Observable<ThorchainLastblockRD> = reloadThorchainLastblock$.pipe(
+  // start request
+  exhaustMap((_) => loadThorchainLastblock$()),
+  // return state of pool data
+  mergeMap((_) => getThorchainLastblockState$),
+  // cache it to avoid reloading data by every subscription
+  shareReplay()
+)
+
+/**
+ * State of thorchain constants
+ */
+export const { get$: getThorchainConstantsState$, set: setThorchainConstantsState } = observableState<
+  ThorchainConstantsRD
+>(RD.initial)
+
+/**
+ * Get `ThorchainConstants` data from Midgard
+ */
+const apiGetThorchainConstants$ = byzantine$.pipe(
+  concatMap((endpoint) => {
+    const api = getMidgardDefaultApi(endpoint)
+    return api.getThorchainProxiedConstants()
+  })
+)
+
+/**
+ * Loads data of `ThorchainConstants`
+ */
+const loadThorchainConstants$ = () => {
+  // Update state to `pending`
+  setThorchainConstantsState(RD.pending)
+  return apiGetThorchainConstants$.pipe(
+    // store result
+    tap((result) => setThorchainConstantsState(RD.success(result))),
+    // catch any errors if there any
+    catchError((error: Error) => {
+      // set `error` state
+      setThorchainConstantsState(RD.failure(error))
+      return Rx.of("Error while fetching Thorchain's data for constants")
+    }),
+    retry(MIDGARD_MAX_RETRY)
+  )
+}
+
+/**
+ * State of `ThorchainConstants`, its data will be loaded only once and by first subscription only
+ */
+const thorchainConstantsState$: Rx.Observable<ThorchainConstantsRD> = loadThorchainConstants$().pipe(
+  // return state of pool data
+  exhaustMap((_) => getThorchainConstantsState$),
+  // cache it to avoid reloading data by every subscription
+  shareReplay()
+)
+
 const PRICE_POOL_KEY = 'asgdx-price-pool'
 
 export const getSelectedPricePool = () => O.fromNullable(localStorage.getItem(PRICE_POOL_KEY) as PricePoolAsset)
@@ -163,7 +267,7 @@ export const { get$: getNetworkInfo$, set: setNetworkInfo } = observableState<Ne
  * Loads data of `NetworkInfo`
  */
 const loadNetworkData$ = () => {
-  // Update `PoolState` to `pending`
+  // Update to `pending` state
   setNetworkInfo(RD.pending)
   return apiGetNetworkData$.pipe(
     // store result
@@ -172,7 +276,7 @@ const loadNetworkData$ = () => {
     catchError((error: Error) => {
       // set `error` state
       setNetworkInfo(RD.failure(error))
-      return Rx.of('error while fetchting data for pool')
+      return Rx.of('Error while fetching data of network')
     }),
     retry(MIDGARD_MAX_RETRY)
   )
@@ -182,7 +286,7 @@ const loadNetworkData$ = () => {
 const { stream$: reloadNetworkInfo$, trigger: reloadNetworkInfo } = triggerStream()
 
 /**
- * State of `NetworkInfo`, it will load data by first subscription only
+ * State of `NetworkInfo`, it will be loaded data by first subscription only
  */
 const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
   // start request
@@ -201,6 +305,9 @@ const service = {
   reloadPoolsState,
   networkInfo$,
   reloadNetworkInfo,
+  thorchainConstantsState$,
+  thorchainLastblockState$,
+  reloadThorchainLastblock,
   setSelectedPricePool: setSelectedPricePoolAsset,
   selectedPricePoolAsset$
 }

@@ -1,9 +1,11 @@
 // import { baseAmount } from '@thorchain/asgardex-token'
 import { bn, assetAmount, PoolData, assetToBase } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 
+import { ThorchainConstants, ThorchainLastblock } from '../../types/generated/midgard'
 import { PoolDetail, PoolDetailStatusEnum } from '../../types/generated/midgard/models/PoolDetail'
 import { PoolTableRowData } from './types'
-import { getPoolTableRowData } from './utils'
+import { getPoolTableRowData, getBlocksLeftForPendingPool, getBlocksLeftForPendingPoolAsString } from './utils'
 
 describe('poolUtil', () => {
   describe('getPoolTableRowData', () => {
@@ -49,6 +51,56 @@ describe('poolUtil', () => {
       expect(result.transactionPrice.amount().toNumber()).toEqual(expected.transactionPrice.amount().toNumber())
       expect(result.slip.toNumber()).toEqual(expected.slip.toNumber())
       expect(result.trades.toNumber()).toEqual(expected.trades.toNumber())
+    })
+  })
+
+  describe('getBlocksLeftForPendingPool', () => {
+    const constants: ThorchainConstants = {
+      int_64_values: { NewPoolCycle: 3001 }
+    }
+    const lastblock: ThorchainLastblock = {
+      thorchain: 2000
+    }
+    it('returns number of blocks left', () => {
+      const result = O.toNullable(getBlocksLeftForPendingPool(constants, lastblock))
+      expect(result).toEqual(1001)
+    })
+    it('returns None if NewPoolCycle is not available', () => {
+      const constants2: ThorchainConstants = {
+        int_64_values: {}
+      }
+      const result = getBlocksLeftForPendingPool(constants2, lastblock)
+      expect(result).toBeNone()
+    })
+    it('returns NOne if lastblock (thorchain) is not available', () => {
+      const lastblock2: ThorchainLastblock = {}
+      const result = getBlocksLeftForPendingPool(constants, lastblock2)
+      expect(result).toBeNone()
+    })
+  })
+
+  describe('getBlocksLeftForPendingPoolAsString', () => {
+    const constants: ThorchainConstants = {
+      int_64_values: { NewPoolCycle: 1234 }
+    }
+    const lastblock: ThorchainLastblock = {
+      thorchain: 1000
+    }
+    it('returns number of blocks left', () => {
+      const result = getBlocksLeftForPendingPoolAsString(constants, lastblock)
+      expect(result).toEqual('234')
+    })
+    it('returns empty string if NewPoolCycle is not available', () => {
+      const constants2: ThorchainConstants = {
+        int_64_values: {}
+      }
+      const result = getBlocksLeftForPendingPoolAsString(constants2, lastblock)
+      expect(result).toEqual('')
+    })
+    it('returns empty string if lastblock (thorchain) is not available', () => {
+      const lastblock2: ThorchainLastblock = {}
+      const result = getBlocksLeftForPendingPoolAsString(constants, lastblock2)
+      expect(result).toEqual('')
     })
   })
 })

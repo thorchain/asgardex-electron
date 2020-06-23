@@ -8,10 +8,13 @@ import {
   assetToBase,
   getAssetFromString
 } from '@thorchain/asgardex-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
+import { none, Option, some } from 'fp-ts/lib/Option'
 
 import { RUNE_TICKER } from '../../const'
 import { toPoolData } from '../../helpers/poolHelper'
-import { PoolDetail, PoolDetailStatusEnum } from '../../types/generated/midgard'
+import { PoolDetail, PoolDetailStatusEnum, ThorchainLastblock, ThorchainConstants } from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './types'
 
 export const getPoolTableRowData = (poolDetail: PoolDetail, pricePoolData: PoolData): PoolTableRowData => {
@@ -52,3 +55,27 @@ export const getPoolTableRowData = (poolDetail: PoolDetail, pricePoolData: PoolD
     key: ticker
   }
 }
+
+export const getBlocksLeftForPendingPool = (
+  constants: ThorchainConstants,
+  lastblock: ThorchainLastblock
+): Option<number> => {
+  const newPoolCycle = constants?.int_64_values?.NewPoolCycle
+  const lastHeight = lastblock?.thorchain
+
+  if (!newPoolCycle || !lastHeight) return none
+
+  return some(newPoolCycle - (lastHeight % newPoolCycle))
+}
+
+export const getBlocksLeftForPendingPoolAsString = (
+  constants: ThorchainConstants,
+  lastblock: ThorchainLastblock
+): string =>
+  FP.pipe(
+    getBlocksLeftForPendingPool(constants, lastblock),
+    O.fold(
+      () => '',
+      (blocksLeft) => blocksLeft.toString()
+    )
+  )

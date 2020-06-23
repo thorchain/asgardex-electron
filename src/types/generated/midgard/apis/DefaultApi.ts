@@ -23,7 +23,9 @@ import {
     StakersAddressData,
     StakersAssetData,
     StatsData,
+    ThorchainConstants,
     ThorchainEndpoints,
+    ThorchainLastblock,
 } from '../models';
 
 export interface GetAssetInfoRequest {
@@ -192,12 +194,34 @@ export class DefaultApi extends BaseAPI {
     };
 
     /**
+     * Returns a proxied endpoint for the constants endpoint from a local thornode
+     * Get the Proxied THORChain Constants
+     */
+    getThorchainProxiedConstants = (): Observable<ThorchainConstants> => {
+        return this.request<ThorchainConstants>({
+            path: '/v1/thorchain/constants',
+            method: 'GET',
+        });
+    };
+
+    /**
      * Returns a proxied endpoint for the pool_addresses endpoint from a local thornode
      * Get the Proxied Pool Addresses
      */
     getThorchainProxiedEndpoints = (): Observable<ThorchainEndpoints> => {
         return this.request<ThorchainEndpoints>({
             path: '/v1/thorchain/pool_addresses',
+            method: 'GET',
+        });
+    };
+
+    /**
+     * Returns a proxied endpoint for the lastblock endpoint from a local thornode
+     * Get the Proxied THORChain Lastblock
+     */
+    getThorchainProxiedLastblock = (): Observable<ThorchainLastblock> => {
+        return this.request<ThorchainLastblock>({
+            path: '/v1/thorchain/lastblock',
             method: 'GET',
         });
     };
