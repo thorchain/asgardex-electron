@@ -46,6 +46,12 @@ export const CoinDataWrapper = styled.div`
 export const CoinDataContainer = styled.div`
   display: flex;
   flex-direction: column;
+
+  .coinData-wrapper {
+    &:first-child {
+      padding-bottom: 20px;
+    }
+  }
 `
 
 export const SwapInfoWrapper = styled(Row)`
