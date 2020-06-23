@@ -1,13 +1,15 @@
 import React, { useCallback, useState } from 'react'
 
 import * as crypto from '@thorchain/asgardex-crypto'
-import { Form, Button, Input } from 'antd'
+import { Form } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import { useHistory } from 'react-router-dom'
 
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as walletRoutes from '../../routes/wallet'
+import Button from '../uielements/button'
+import Input from '../uielements/input'
 
 const ImportPhrase: React.FC = (): JSX.Element => {
   const history = useHistory()
@@ -40,10 +42,6 @@ const ImportPhrase: React.FC = (): JSX.Element => {
     return Promise.resolve()
   }
 
-  const onReset = () => {
-    form.resetFields()
-  }
-
   const submitForm = useCallback(
     async ({ phrase: newPhrase, password }: Store) => {
       try {
@@ -63,23 +61,18 @@ const ImportPhrase: React.FC = (): JSX.Element => {
         name="phrase"
         rules={[{ required: true, validator: phraseValidator }]}
         validateTrigger={['onSubmit', 'onChange']}>
-        <Input.Password placeholder="Enter your phrase" size="large" />
+        <Input placeholder="ENTER PHRASE" size="large" security="password" />
       </Form.Item>
       <Form.Item
         name="password"
         rules={[{ required: true, validator: passwordValidator }]}
         validateTrigger={['onSubmit', 'onChange']}>
-        <Input.Password placeholder="Enter your password" size="large" />
+        <Input placeholder="PASSWORD" size="large" />
       </Form.Item>
 
-      <Form.Item>
-        <Button size="large" type="primary" htmlType="submit" block disabled={!validPassword || !validPhrase}>
-          Import
-        </Button>
-        <Button size="large" type="primary" block onClick={onReset}>
-          Reset
-        </Button>
-      </Form.Item>
+      <Button size="middle" type="link" htmlType="submit" block disabled={!validPassword || !validPhrase}>
+        Import
+      </Button>
     </Form>
   )
 }
