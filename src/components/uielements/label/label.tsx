@@ -1,9 +1,10 @@
 import React from 'react'
 
 import { LabelWrapper } from './label.style'
-import { Size, Color } from './types'
+import { Size, Color, TextAlignment } from './types'
 
 export type Props = {
+  align?: TextAlignment
   size?: Size
   color?: Color
   weight?: string
@@ -16,6 +17,7 @@ export type Props = {
 const Label: React.FC<Props> = (props: Props): JSX.Element => {
   const {
     loading = false,
+    align = 'left',
     size = 'normal',
     color = 'normal',
     weight = 'normal',
@@ -25,7 +27,13 @@ const Label: React.FC<Props> = (props: Props): JSX.Element => {
   } = props
 
   return (
-    <LabelWrapper className={`label-wrapper ${className}`} size={size} color={color} weight={weight} {...otherProps}>
+    <LabelWrapper
+      className={`label-wrapper ${className}`}
+      align={align}
+      size={size}
+      color={color}
+      weight={weight}
+      {...otherProps}>
       {loading && '...'}
       {!loading && children}
     </LabelWrapper>
@@ -33,6 +41,7 @@ const Label: React.FC<Props> = (props: Props): JSX.Element => {
 }
 
 Label.defaultProps = {
+  align: 'left',
   size: 'normal',
   color: 'normal',
   weight: 'normal',

@@ -1,25 +1,25 @@
 import React from 'react'
 
-import { formatBN } from '@thorchain/asgardex-util'
+import { formatBN, AssetAmount, formatAssetAmount } from '@thorchain/asgardex-util'
+import { Row, Col } from 'antd'
 import BigNumber from 'bignumber.js'
 
 import Label from '../label'
-import Status from '../status'
-import { PoolShareWrapper } from './PoolShare.style'
+import { PoolShareWrapper, BorderWrapper, BorderShareWrapper, DetailsWrapper, ValuesWrapper } from './PoolShare.style'
 
 type Props = {
   source: string
   target: string
-  runeStakedShare?: string
-  runeStakedPrice?: string
+  runeStakedShare: AssetAmount
+  runeStakedPrice: AssetAmount
   loading?: boolean
-  basePriceAsset?: string
-  assetStakedShare?: string
-  assetStakedPrice?: string
-  assetEarnedAmount?: string
-  assetEarnedPrice?: string
-  runeEarnedAmount?: string
-  runeEarnedPrice?: string
+  basePriceAsset: string
+  assetStakedShare: AssetAmount
+  assetStakedPrice: AssetAmount
+  assetEarnedAmount: AssetAmount
+  assetEarnedPrice: AssetAmount
+  runeEarnedAmount: AssetAmount
+  runeEarnedPrice: AssetAmount
   poolShare: BigNumber
 }
 
@@ -39,56 +39,85 @@ const PoolShare: React.FC<Props> = (props: Props): JSX.Element => {
     runeEarnedPrice,
     poolShare
   } = props
+
   return (
     <PoolShareWrapper>
-      <div className="your-share-wrapper">
-        <Label className="share-info-title" size="normal">
-          Your total share of the pool
+      <Label align="center">YOUR TOTAL SHARE OF THE POOL</Label>
+      <BorderWrapper>
+        <DetailsWrapper accent="primary">
+          <Col span={6}>
+            <Label align="center" loading={loading}>
+              {source.toUpperCase()}
+            </Label>
+          </Col>
+          <Col span={6}>
+            <Label align="center" loading={loading}>
+              {target.toUpperCase()}
+            </Label>
+          </Col>
+        </DetailsWrapper>
+        <Row justify="space-around">
+          <ValuesWrapper span={6}>
+            <Label align="center" loading={loading} color="dark">
+              {formatAssetAmount(runeStakedShare)}
+            </Label>
+            <Label align="center" size="normal" color="light" loading={loading}>
+              {`${basePriceAsset} ${formatAssetAmount(runeStakedPrice)}`}
+            </Label>
+          </ValuesWrapper>
+          <ValuesWrapper span={6}>
+            <Label align="center" loading={loading} color="dark">
+              {formatAssetAmount(assetStakedShare)}
+            </Label>
+            <Label align="center" size="normal" color="light" loading={loading}>
+              {`${basePriceAsset} ${formatAssetAmount(assetStakedPrice)}`}
+            </Label>
+          </ValuesWrapper>
+        </Row>
+      </BorderWrapper>
+      <BorderShareWrapper>
+        <Label align="center" loading={loading}>
+          POOL SHARE
         </Label>
-        <div className="your-share-info-wrapper">
-          <div className="share-info-row">
-            <div className="your-share-info">
-              <Status title={source.toUpperCase()} value={runeStakedShare} loading={loading} />
-              <Label className="your-share-price-label" size="normal" color="gray" loading={loading}>
-                {`${basePriceAsset} ${runeStakedPrice}`}
-              </Label>
-            </div>
-            <div className="your-share-info">
-              <Status title={target.toUpperCase()} value={assetStakedShare} loading={loading} />
-
-              <Label className="your-share-price-label" size="normal" color="gray" loading={loading}>
-                {`${basePriceAsset} ${assetStakedPrice}`}
-              </Label>
-            </div>
-          </div>
-          <div className="share-info-row">
-            <div className="your-share-info pool-share-info">
-              <Status title="Pool Share" value={poolShare ? `${formatBN(poolShare)}%` : '...'} loading={loading} />
-            </div>
-          </div>
-        </div>
-        <div className="your-share-wrapper">
-          <Label className="share-info-title" size="normal">
-            Your total earnings from the pool
-          </Label>
-          <div className="your-share-info-wrapper">
-            <div className="share-info-row">
-              <div className="your-share-info">
-                <Status title={source.toUpperCase()} value={runeEarnedAmount} loading={loading} />
-                <Label className="your-share-price-label" size="normal" color="gray" loading={loading}>
-                  {basePriceAsset} {runeEarnedPrice}
-                </Label>
-              </div>
-              <div className="your-share-info">
-                <Status title={target.toUpperCase()} value={assetEarnedAmount} loading={loading} />
-                <Label className="your-share-price-label" size="normal" color="gray" loading={loading}>
-                  {basePriceAsset} {assetEarnedPrice}
-                </Label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        <Label align="center" size="normal" color="dark" loading={loading}>
+          {poolShare ? `${formatBN(poolShare)}%` : '...'}
+        </Label>
+      </BorderShareWrapper>
+      <Label align="center" color="dark">
+        YOUR TOTAL EARNINGS FROM THE POOL
+      </Label>
+      <BorderWrapper>
+        <DetailsWrapper accent="secondary">
+          <Col span={6}>
+            <Label align="center" loading={loading}>
+              {source.toUpperCase()}
+            </Label>
+          </Col>
+          <Col span={6}>
+            <Label align="center" loading={loading}>
+              {target.toUpperCase()}
+            </Label>
+          </Col>
+        </DetailsWrapper>
+        <Row justify="space-around">
+          <ValuesWrapper span={6}>
+            <Label align="center" loading={loading} color="dark">
+              {formatAssetAmount(runeEarnedAmount)}
+            </Label>
+            <Label align="center" size="normal" color="light" loading={loading}>
+              {`${basePriceAsset} ${formatAssetAmount(runeEarnedPrice)}`}
+            </Label>
+          </ValuesWrapper>
+          <ValuesWrapper span={6}>
+            <Label align="center" loading={loading} color="dark">
+              {formatAssetAmount(assetEarnedAmount)}
+            </Label>
+            <Label align="center" size="normal" color="light" loading={loading}>
+              {`${basePriceAsset} ${formatAssetAmount(assetEarnedPrice)}`}
+            </Label>
+          </ValuesWrapper>
+        </Row>
+      </BorderWrapper>
     </PoolShareWrapper>
   )
 }

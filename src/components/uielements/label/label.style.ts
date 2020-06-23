@@ -1,9 +1,10 @@
 import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
-import { Size, Color, FontSettings, Colors } from './types'
+import { Size, Color, FontSettings, Colors, TextAlignment } from './types'
 
 type Props = {
+  align?: TextAlignment
   size?: Size
   color?: Color
   weight?: string
@@ -48,6 +49,7 @@ const colors: Colors = {
 
 export const LabelWrapper = styled.div`
   padding: 10px 0;
+  text-align: ${(props: Props) => props.align};
   font-size: ${(props: Props) => fontSettings[props.size || 'normal'].size};
   font-weight: ${(props: Props) => props.weight};
   letter-spacing: ${(props: Props) => fontSettings[props.size || 'normal'].spacing};

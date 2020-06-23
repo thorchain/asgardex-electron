@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn } from '@thorchain/asgardex-util'
+import { bn, assetAmount } from '@thorchain/asgardex-util'
 
 import PoolShare from './PoolShare'
 
@@ -12,16 +12,16 @@ storiesOf('Components/PoolShare', module).add('default', () => {
         source="RUNE"
         target="CAN"
         poolShare={bn(100)}
-        assetEarnedAmount={'200'}
-        assetEarnedPrice={'300'}
-        assetStakedPrice="120.10"
-        assetStakedShare={'500'}
+        assetEarnedAmount={assetAmount(200)}
+        assetEarnedPrice={assetAmount(300)}
+        assetStakedPrice={assetAmount(120.1)}
+        assetStakedShare={assetAmount(500)}
         basePriceAsset="$USD"
         loading={false}
-        runeEarnedAmount="200"
-        runeEarnedPrice="300"
-        runeStakedPrice="400"
-        runeStakedShare="500"
+        runeEarnedAmount={assetAmount(200)}
+        runeEarnedPrice={assetAmount(300)}
+        runeStakedPrice={assetAmount(400)}
+        runeStakedShare={assetAmount(500)}
       />
     </div>
   )
