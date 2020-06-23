@@ -32,10 +32,6 @@ const ImportPhrase: React.FC = (): JSX.Element => {
       setValidPassword(false)
       return Promise.reject('Value for password required')
     }
-    if (value.length < 5) {
-      setValidPassword(false)
-      return Promise.reject('Password needs to have 5 character at least')
-    }
     setValidPassword(true)
     return Promise.resolve()
   }
