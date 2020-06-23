@@ -49,7 +49,7 @@ const colors: Colors = {
 
 export const LabelWrapper = styled.div`
   padding: 10px 0;
-  text-align: ${(props: Props) => props.align};
+  text-align: ${(props: Props) => props.align || 'left'};
   font-size: ${(props: Props) => fontSettings[props.size || 'normal'].size};
   font-weight: ${(props: Props) => props.weight};
   letter-spacing: ${(props: Props) => fontSettings[props.size || 'normal'].spacing};

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { formatBN, AssetAmount, formatAssetAmount } from '@thorchain/asgardex-util'
+import { formatBN, BaseAmount, baseToAsset, formatAssetAmount } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import BigNumber from 'bignumber.js'
 
@@ -10,16 +10,16 @@ import { PoolShareWrapper, BorderWrapper, BorderShareWrapper, DetailsWrapper, Va
 type Props = {
   source: string
   target: string
-  runeStakedShare: AssetAmount
-  runeStakedPrice: AssetAmount
+  runeStakedShare: BaseAmount
+  runeStakedPrice: BaseAmount
   loading?: boolean
   basePriceAsset: string
-  assetStakedShare: AssetAmount
-  assetStakedPrice: AssetAmount
-  assetEarnedAmount: AssetAmount
-  assetEarnedPrice: AssetAmount
-  runeEarnedAmount: AssetAmount
-  runeEarnedPrice: AssetAmount
+  assetStakedShare: BaseAmount
+  assetStakedPrice: BaseAmount
+  assetEarnedAmount: BaseAmount
+  assetEarnedPrice: BaseAmount
+  runeEarnedAmount: BaseAmount
+  runeEarnedPrice: BaseAmount
   poolShare: BigNumber
 }
 
@@ -59,18 +59,18 @@ const PoolShare: React.FC<Props> = (props: Props): JSX.Element => {
         <Row justify="space-around">
           <ValuesWrapper span={6}>
             <Label align="center" loading={loading} color="dark">
-              {formatAssetAmount(runeStakedShare)}
+              {formatAssetAmount(baseToAsset(runeStakedShare))}
             </Label>
             <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceAsset} ${formatAssetAmount(runeStakedPrice)}`}
+              {`${basePriceAsset} ${formatAssetAmount(baseToAsset(runeStakedPrice))}`}
             </Label>
           </ValuesWrapper>
           <ValuesWrapper span={6}>
             <Label align="center" loading={loading} color="dark">
-              {formatAssetAmount(assetStakedShare)}
+              {formatAssetAmount(baseToAsset(assetStakedShare))}
             </Label>
             <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceAsset} ${formatAssetAmount(assetStakedPrice)}`}
+              {`${basePriceAsset} ${formatAssetAmount(baseToAsset(assetStakedPrice))}`}
             </Label>
           </ValuesWrapper>
         </Row>
@@ -102,18 +102,18 @@ const PoolShare: React.FC<Props> = (props: Props): JSX.Element => {
         <Row justify="space-around">
           <ValuesWrapper span={6}>
             <Label align="center" loading={loading} color="dark">
-              {formatAssetAmount(runeEarnedAmount)}
+              {formatAssetAmount(baseToAsset(runeEarnedAmount))}
             </Label>
             <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceAsset} ${formatAssetAmount(runeEarnedPrice)}`}
+              {`${basePriceAsset} ${formatAssetAmount(baseToAsset(runeEarnedPrice))}`}
             </Label>
           </ValuesWrapper>
           <ValuesWrapper span={6}>
             <Label align="center" loading={loading} color="dark">
-              {formatAssetAmount(assetEarnedAmount)}
+              {formatAssetAmount(baseToAsset(assetEarnedAmount))}
             </Label>
             <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceAsset} ${formatAssetAmount(assetEarnedPrice)}`}
+              {`${basePriceAsset} ${formatAssetAmount(baseToAsset(assetEarnedPrice))}`}
             </Label>
           </ValuesWrapper>
         </Row>
