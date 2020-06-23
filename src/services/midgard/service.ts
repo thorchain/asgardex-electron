@@ -80,7 +80,7 @@ const loadPoolsStateData$ = () => {
     catchError((error: Error) => {
       // set `error` state
       setPoolState(RD.failure(error))
-      return Rx.of('error while fetchting data for pool')
+      return Rx.of('Error while fetching data for pools')
     }),
     retry(MIDGARD_MAX_RETRY)
   )
@@ -166,7 +166,7 @@ const loadThorchainLastblock$ = () => {
     catchError((error: Error) => {
       // set `error` state
       setThorchainLastblockState(RD.failure(error))
-      return Rx.of('error while fetchting data of lastblock')
+      return Rx.of("Error while fetching Thorchain's data for lastblock")
     }),
     retry(MIDGARD_MAX_RETRY)
   )
@@ -214,7 +214,7 @@ const loadThorchainConstants$ = () => {
     catchError((error: Error) => {
       // set `error` state
       setThorchainConstantsState(RD.failure(error))
-      return Rx.of('error while fetchting data of lastblock')
+      return Rx.of("Error while fetching Thorchain's data for constants")
     }),
     retry(MIDGARD_MAX_RETRY)
   )
@@ -267,7 +267,7 @@ export const { get$: getNetworkInfo$, set: setNetworkInfo } = observableState<Ne
  * Loads data of `NetworkInfo`
  */
 const loadNetworkData$ = () => {
-  // Update `PoolState` to `pending`
+  // Update to `pending` state
   setNetworkInfo(RD.pending)
   return apiGetNetworkData$.pipe(
     // store result
@@ -276,7 +276,7 @@ const loadNetworkData$ = () => {
     catchError((error: Error) => {
       // set `error` state
       setNetworkInfo(RD.failure(error))
-      return Rx.of('error while fetchting data for pool')
+      return Rx.of('Error while fetching data of network')
     }),
     retry(MIDGARD_MAX_RETRY)
   )
