@@ -21,16 +21,16 @@ addDecorator(withKnobs)
 
 const providerFn = ({ theme, children }) => (
   <ConnectionProvider>
-    <MidgardProvider>
-      <WalletProvider>
+    <WalletProvider>
+      <MidgardProvider>
         <I18nProvider>
           <ThemeProvider theme={theme}>
             <GlobalStyle />
             <AppWrapper>{children}</AppWrapper>
           </ThemeProvider>
         </I18nProvider>
-      </WalletProvider>
-    </MidgardProvider>
+      </MidgardProvider>
+    </WalletProvider>
   </ConnectionProvider>
 )
 

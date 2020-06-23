@@ -35,9 +35,9 @@ const AppView: React.FC<Props> = (_): JSX.Element => {
 const App: React.FC<Props> = (_): JSX.Element => {
   return (
     <ConnectionProvider>
-      <BinanceProvider>
-        <MidgardProvider>
-          <WalletProvider>
+      <WalletProvider>
+        <BinanceProvider>
+          <MidgardProvider>
             <I18nProvider>
               <Router>
                 <ThemeProvider>
@@ -45,9 +45,9 @@ const App: React.FC<Props> = (_): JSX.Element => {
                 </ThemeProvider>
               </Router>
             </I18nProvider>
-          </WalletProvider>
-        </MidgardProvider>
-      </BinanceProvider>
+          </MidgardProvider>
+        </BinanceProvider>
+      </WalletProvider>
     </ConnectionProvider>
   )
 }
