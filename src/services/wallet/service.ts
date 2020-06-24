@@ -21,6 +21,8 @@ const { get$: getKeystoreState$, set: setKeystoreState } = observableState<Keyst
  */
 const addKeystore = async (phrase: Phrase, password: string) => {
   try {
+    // remove previous keystore before adding a new one to trigger changes of `KeystoreState
+    await removeKeystore()
     const keystore: CryptoKeystore = await encryptToKeyStore(phrase, password)
     await fs.ensureFile(KEY_FILE)
     await fs.writeJSON(KEY_FILE, keystore)
@@ -32,6 +34,8 @@ const addKeystore = async (phrase: Phrase, password: string) => {
 }
 
 export const removeKeystore = async () => {
+  // If `KEY_FILE' does not exist, `fs.remove` silently does nothing.
+  // ^ see https://github.com/jprichardson/node-fs-extra/blob/master/docs/remove.md
   await fs.remove(KEY_FILE)
   setKeystoreState(none)
 }

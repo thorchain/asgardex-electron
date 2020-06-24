@@ -1,9 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { WS, BinanceClient, Client, Network } from '@thorchain/asgardex-binance'
+import { WS, BinanceClient, Client, Network, Balances } from '@thorchain/asgardex-binance'
+import { right, left, Either, isRight, fold } from 'fp-ts/lib/Either'
+import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
-import { Option, none } from 'fp-ts/lib/Option'
+import { Option, none, some } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
-import { some } from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, tap, filter, catchError, retry, exhaustMap, shareReplay } from 'rxjs/operators'
@@ -13,7 +14,7 @@ import { envOrDefault } from '../../helpers/envHelper'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
-import { BalancesRD } from './types'
+import { BalancesRD, BinanceClientState, BinanceClientReadyState } from './types'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -128,18 +129,21 @@ const { get$: getKeystoreState$, set: setKeystoreState } = observableState<Keyst
 
 /**
  * Stream to create an observable BinanceClient depending on existing phrase in keystore
- * A client won't be created as long as no phrase is available
+ * Whenever a phrase has been added to keystore, a new BinanceClient will be created as well
+ * By the other hand: Whenever a phrase has been removed, the client is set to `none`
+ * A BinanceClient will never be created as long as no phrase is available
  */
-const client$ = getKeystoreState$.pipe(
-  tap((keystore) => console.log('keystore changed ', keystore)),
+const clientInstance$ = getKeystoreState$.pipe(
+  tap((ks) => console.log('getKeystoreState', ks)),
   mergeMap(
     (keystore) =>
       Observable.create((observer: Observer<Option<BinanceClient>>) => {
         const client = FP.pipe(
           getPhrase(keystore),
           O.fold(
+            // Whenever a phrase has been removed, previous client will "be removed" by setting it to `none`
             () => none,
-            // TODO (@Veado): Network will depend on network state in AppContext
+            // TODO (@Veado): `BinanceClient` will depend on network state in AppContext
             // For now we use testnet only ...
             // see https://github.com/thorchain/asgardex-electron/issues/209
             (phrase) => some(new Client(Network.TESTNET, phrase))
@@ -151,18 +155,56 @@ const client$ = getKeystoreState$.pipe(
 )
 
 /**
- * Whenever a new BinanceClient has been created and it will be subscribed,
- * it's init() has to be called first (that's needed by design of `asgardex-binance` ...)
+ * Whenever a new BinanceClient has been created,
+ * it's init() has to be called (that's needed by design of `asgardex-binance` ...)
+ *
+ * Note: To catch any errors and not close this stream, we map BinanceClient into an `Either` to provide still errors (needed for views).
  */
-const readyClient$ = client$.pipe(
-  // check whether client has been created before
+const initializedClient$: Observable<Either<Error, BinanceClient>> = clientInstance$.pipe(
+  tap((client) => console.log('createClient$ client:', client)),
+  // Initialize the client only if it has been created before
   filter(O.isSome),
   mergeMap((client) =>
     FP.pipe(
       client,
       O.fold(
         () => Rx.NEVER,
-        (client) => Rx.from(client.init())
+        (client) =>
+          Rx.from(client.init()).pipe(
+            map((client) => right(client)),
+            // Catch inner observable to have the outer stream never been closed
+            catchError((error: Error) => {
+              // Map `error` to  Left`
+              return Rx.of(left(error))
+            })
+          )
+      )
+    )
+  ),
+  shareReplay()
+)
+
+/**
+ * Helper stream to provide "ready-to-go" state of latest `BinanceClient`
+ * It's needed by views, but we don't want to expose the `BinanceClient`.
+ * That's we map any successfully created BinanceClient into a simple 'ready' string
+ */
+const clientState$: Observable<BinanceClientState> = initializedClient$.pipe(
+  map((c) => E.map((_) => 'ready' as BinanceClientReadyState)(c))
+)
+
+/**
+ * Helper stream to provide a ready-to-go BinanceClient.
+ * It provides the latest BinanceClient, which is needed for any API call
+ */
+const readyClient$ = initializedClient$.pipe(
+  filter(isRight),
+  mergeMap((ŕClient) =>
+    FP.pipe(
+      ŕClient,
+      fold(
+        () => Rx.NEVER,
+        (client) => Rx.of(client)
       )
     )
   )
@@ -188,10 +230,10 @@ const loadBalances$ = () => {
     // store result
     tap((balances) => setBalanceState(RD.success(balances))),
     // catch errors
-    catchError((error: Error) => {
+    catchError((error: Error, caught: Observable<Balances>) => {
       // `error` state
       setBalanceState(RD.failure(error))
-      return Rx.of('Error while fetching balances')
+      return caught
     }),
     retry(BINANCE_MAX_RETRY)
   )
@@ -203,7 +245,7 @@ const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
 /**
  * State of `Balances`, it will be loaded data by first subscription only
  */
-const balancesState$: Rx.Observable<BalancesRD> = reloadBalances$.pipe(
+const balancesState$: Observable<BalancesRD> = reloadBalances$.pipe(
   // start request
   exhaustMap((_) => loadBalances$()),
   // return state
@@ -215,4 +257,4 @@ const balancesState$: Rx.Observable<BalancesRD> = reloadBalances$.pipe(
 /**
  * Object with all "public" functions and observables
  */
-export { miniTickers$, subscribeTransfers, setKeystoreState, balancesState$, reloadBalances }
+export { miniTickers$, subscribeTransfers, setKeystoreState, clientState$, balancesState$, reloadBalances }

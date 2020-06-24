@@ -7,13 +7,15 @@ import {
   miniTickers$,
   reloadBalances,
   balancesState$,
-  setKeystoreState
+  setKeystoreState,
+  clientState$
 } from '../services/binance/service'
 import { useWalletContext } from './WalletContext'
 
 type BinanceContextValue = {
   subscribeTransfers: typeof subscribeTransfers
   miniTickers$: typeof miniTickers$
+  clientState$: typeof clientState$
   reloadBalances: typeof reloadBalances
   balancesState$: typeof balancesState$
 }
@@ -21,6 +23,7 @@ type BinanceContextValue = {
 const initialContext = {
   subscribeTransfers,
   miniTickers$,
+  clientState$,
   reloadBalances,
   balancesState$
 }
