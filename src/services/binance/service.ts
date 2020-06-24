@@ -173,10 +173,8 @@ const initializedClient$: Observable<Either<Error, BinanceClient>> = clientInsta
           Rx.from(client.init()).pipe(
             map((client) => right(client)),
             // Catch inner observable to have the outer stream never been closed
-            catchError((error: Error) => {
-              // Map `error` to  Left`
-              return Rx.of(left(error))
-            })
+            // and map `error` to  Left`
+            catchError((error: Error) => Rx.of(left(error)))
           )
       )
     )
