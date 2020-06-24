@@ -15,6 +15,7 @@ type Props = ComponentProps & StyledProps
 const Label: React.FC<Props> = (props: Props): JSX.Element => {
   const {
     loading = false,
+    align = 'left',
     size = 'normal',
     color = 'normal',
     weight = 'normal',
@@ -31,7 +32,8 @@ const Label: React.FC<Props> = (props: Props): JSX.Element => {
       color={color}
       weight={weight}
       textTransform={textTransform}
-      style={style}>
+      style={style}
+      align={align}>
       {loading && '...'}
       {!loading && children}
     </LabelWrapper>
