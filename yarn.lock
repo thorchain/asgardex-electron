@@ -2456,10 +2456,6 @@
   dependencies:
     "@babel/runtime" "^7.10.2"
 
-"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#1612a8ec92ec66603b5dce819b01e6cd635e1035":
-  version "1.0.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#1612a8ec92ec66603b5dce819b01e6cd635e1035"
-
 "@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#issue-5/ready-4-asgardex":
   version "1.0.0"
   resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#fb362a362d8a5d55d47340160979e91de2ccf272"
@@ -2467,6 +2463,17 @@
 "@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#1b18e4af3108a5f41e74ff034ad31a5ac619e91d":
   version "0.1.0"
   resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#1b18e4af3108a5f41e74ff034ad31a5ac619e91d"
+  dependencies:
+    bech32 "^1.1.4"
+    bip39 "^3.0.2"
+    crypto-js "^4.0.0"
+    foundry-primitives "^0.2.1"
+    hdkey "^2.0.1"
+    uuid "^8.1.0"
+
+"@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#fe65898b370639143c3db629393f7abfa516c5b6":
+  version "0.1.0"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#fe65898b370639143c3db629393f7abfa516c5b6"
   dependencies:
     bech32 "^1.1.4"
     bip39 "^3.0.2"

@@ -43,12 +43,14 @@ export const removeKeystore = async () => {
 const addPhrase = async (state: KeystoreState, password: string) => {
   // make sure
   if (!hasImportedKeystore(state)) {
+    // TODO(@Veado) i18m
     return Promise.reject('Keystore has to be imported first')
   }
 
   // make sure file still exists
   const exists = await fs.pathExists(KEY_FILE)
   if (!exists) {
+    // TODO(@Veado) i18m
     return Promise.reject('Keystore has to be imported first')
   }
 
@@ -57,8 +59,8 @@ const addPhrase = async (state: KeystoreState, password: string) => {
     const keystore: CryptoKeystore = await fs.readJSON(KEY_FILE)
     const phrase = await decryptFromKeystore(keystore, password)
     setKeystoreState(some(some({ phrase })))
-    return Promise.resolve()
   } catch (error) {
+    // TODO(@Veado) i18m
     return Promise.reject(`Could not decrypt phrase from keystore: ${error}`)
   }
 }

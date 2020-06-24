@@ -1,10 +1,12 @@
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
 import { Form, Input, Button } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
+import Paragraph from 'antd/lib/typography/Paragraph'
 import Text from 'antd/lib/typography/Text'
-import { none } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
+import { none, Option, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useHistory, useLocation } from 'react-router-dom'
 
@@ -22,7 +24,7 @@ const UnlockView: React.FC = (): JSX.Element => {
 
   const [validPassword, setValidPassword] = useState(false)
   const keystore = useObservableState(keystoreService.keystore$, none)
-  const [isLockedError, setIsLockedError] = useState(false)
+  const [unlockError, setUnlockError] = useState<Option<Error>>(none)
 
   // Re-direct to previous view after unlocking the wallet
   useEffect(() => {
@@ -43,12 +45,10 @@ const UnlockView: React.FC = (): JSX.Element => {
 
   const submitForm = useCallback(
     async ({ password }: Store) => {
-      setIsLockedError(false)
-      try {
-        await keystoreService.unlock(keystore, password)
-      } catch (error) {
-        setIsLockedError(true)
-      }
+      setUnlockError(none)
+      keystoreService.unlock(keystore, password).catch((error) => {
+        setUnlockError(some(error))
+      })
     },
     [keystoreService, keystore]
   )
@@ -56,6 +56,15 @@ const UnlockView: React.FC = (): JSX.Element => {
   const onReset = () => {
     form.resetFields()
   }
+
+  const renderError = useMemo(
+    () =>
+      O.fold(
+        () => <></>,
+        (error: Error) => <Paragraph>{error.toString()}</Paragraph>
+      )(unlockError),
+    [unlockError]
+  )
 
   return (
     <Form form={form} onFinish={submitForm}>
@@ -65,7 +74,7 @@ const UnlockView: React.FC = (): JSX.Element => {
         validateTrigger={['onSubmit', 'onChange']}>
         <Input.Password placeholder="Enter your password" size="large" />
       </Form.Item>
-      {isLockedError && <Text>Error while trying to unlock the wallet. Check your password and try it again.</Text>}
+      {renderError}
       <Form.Item>
         <Button size="large" type="primary" block htmlType="submit" disabled={!validPassword}>
           Unlock wallet
