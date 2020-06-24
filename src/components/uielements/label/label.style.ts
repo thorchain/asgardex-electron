@@ -56,5 +56,5 @@ export const LabelWrapper = styled.div<Props>`
   letter-spacing: ${({ size = 'normal' }) => fontSettings[size].spacing};
   color: ${({ color }) => colors[color || 'normal']};
   cursor: ${({ onClick }) => onClick && 'pointer'};
-  text-align: ${(props: Props) => props.align || 'left'};
+  text-align: ${({ align = 'left' }) => align};
 `
