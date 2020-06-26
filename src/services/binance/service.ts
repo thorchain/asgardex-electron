@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { WS, Client, Balances } from '@thorchain/asgardex-binance'
+import { WS, Client } from '@thorchain/asgardex-binance'
 import { right, left } from 'fp-ts/lib/Either'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
@@ -7,7 +7,7 @@ import { none, some } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, tap, filter, catchError, retry, exhaustMap, shareReplay } from 'rxjs/operators'
+import { map, mergeMap, tap, filter, catchError, retry, shareReplay, concatMap } from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
 import { envOrDefault } from '../../helpers/envHelper'
@@ -134,7 +134,6 @@ const { get$: getKeystoreState$, set: setKeystoreState } = observableState<Keyst
  * A BinanceClient will never be created as long as no phrase is available
  */
 const clientState$ = getKeystoreState$.pipe(
-  tap((ks) => console.log('getKeystoreState', ks)),
   mergeMap(
     (keystore) =>
       Observable.create((observer: Observer<BinanceClientState>) => {
@@ -159,7 +158,6 @@ const clientState$ = getKeystoreState$.pipe(
         observer.next(client)
       }) as Observable<BinanceClientState>
   ),
-  tap((t) => console.log('getKeystoreState', t)),
   shareReplay()
 )
 
@@ -235,7 +233,7 @@ const { get$: getBalanceState$, set: setBalanceState } = observableState<Balance
 /**
  * Observable to load balances from Binance API endpoint
  */
-const getBalances$ = client$.pipe(mergeMap((client) => Rx.from(client.getBalance())))
+const getBalances$ = client$.pipe(concatMap((client) => Rx.from(client.getBalance())))
 
 /**
  * Helper to load data of `Balances`
@@ -247,10 +245,10 @@ const loadBalances$ = () => {
     // store result
     tap((balances) => setBalanceState(RD.success(balances))),
     // catch errors
-    catchError((error: Error, caught: Observable<Balances>) => {
+    catchError((error: Error) => {
       // `error` state
       setBalanceState(RD.failure(error))
-      return caught
+      return Rx.of('Error while load balances')
     }),
     retry(BINANCE_MAX_RETRY)
   )
@@ -264,7 +262,7 @@ const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
  */
 const balancesState$: Observable<BalancesRD> = reloadBalances$.pipe(
   // start request
-  exhaustMap((_) => loadBalances$()),
+  mergeMap((_) => loadBalances$()),
   // return state
   mergeMap((_) => getBalanceState$),
   // cache it to avoid reloading data by every subscription
