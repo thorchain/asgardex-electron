@@ -5,8 +5,6 @@ import { Form, Button, Input, Spin } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
-import { right } from 'fp-ts/lib/Either'
-import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
@@ -15,8 +13,6 @@ import { useHistory } from 'react-router-dom'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as walletRoutes from '../../routes/wallet'
-import { BinanceClientReadyState, BinanceClientState } from '../../services/binance/types'
-import { isLocked } from '../../services/wallet/util'
 
 const ImportPhrase: React.FC = (): JSX.Element => {
   const history = useHistory()
@@ -25,30 +21,24 @@ const ImportPhrase: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const keystore = useObservableState(keystoreService.keystore$, none)
 
-  const { clientState$ } = useBinanceContext()
-  const clientState = useObservableState(clientState$, right('notready' as BinanceClientReadyState))
+  const { clientViewState$ } = useBinanceContext()
+  const clientViewState = useObservableState(clientViewState$, 'notready')
   const [importing, setImporting] = useState(false)
   const [importError, setImportError] = useState<Option<Error>>(none)
 
   useEffect(() => {
-    E.fold(
-      // handle error while trying to instantiate `BinanceClient`
-      (error: Error) => {
-        setImporting(false)
-        setImportError(some(error))
-      },
-      (value: BinanceClientReadyState) => {
-        // reset states
-        setImporting(false)
-        setImportError(none)
-        // TODO(@Veado): Fix `clientState` to avoid check of `isLocked` which causes rendering issues
-        if (value === 'ready' && !isLocked(keystore)) {
-          // redirect to wallets assets view
-          history.push(walletRoutes.assets.template)
-        }
-      }
-    )(clientState as BinanceClientState)
-  }, [clientState, history, keystore])
+    if (clientViewState === 'error') {
+      setImporting(false)
+      setImportError(some(new Error('Could not create instance of BinanceClient')))
+    }
+    if (clientViewState === 'ready') {
+      // reset states
+      setImporting(false)
+      setImportError(none)
+      // redirect to wallets assets view
+      history.push(walletRoutes.assets.template)
+    }
+  }, [clientViewState, history, keystore])
 
   const [validPhrase, setValidPhrase] = useState(false)
   const [validPassword, setValidPassword] = useState(false)
