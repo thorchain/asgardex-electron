@@ -15,7 +15,8 @@ import {
   PoolDetails,
   NetworkInfoRD,
   ThorchainLastblockRD,
-  ThorchainConstantsRD
+  ThorchainConstantsRD,
+  SelectedPricePoolAsset
 } from './types'
 import { getPricePools, selectedPricePoolSelector } from './utils'
 
@@ -238,7 +239,7 @@ export const {
   get$: selectedPricePoolAsset$,
   get: selectedPricePoolAsset,
   set: updateSelectedPricePoolAsset
-} = observableState<O.Option<PricePoolAsset>>(getSelectedPricePool())
+} = observableState<SelectedPricePoolAsset>(getSelectedPricePool())
 
 /**
  * Update selected `PricePoolAsset`

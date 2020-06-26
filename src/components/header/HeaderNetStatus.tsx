@@ -10,7 +10,7 @@ import { useConnectionContext, OnlineStatus } from '../../contexts/ConnectionCon
 import { useThemeContext } from '../../contexts/ThemeContext'
 import ConnectionStatus from '../shared/icons/ConnectionStatus'
 import Menu from '../shared/Menu'
-import { HeaderDrawerItem } from './Header.style'
+import { HeaderDrawerItem } from './HeaderComponent.style'
 import { HeaderNetStatusWrapper } from './HeaderNetStatus.style'
 
 type MenuItem = {
