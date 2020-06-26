@@ -9,7 +9,7 @@ import {
   ThorchainLastblock,
   ThorchainConstants
 } from '../../types/generated/midgard'
-import { PricePools } from '../../views/pools/types'
+import { PricePools, PricePoolAsset } from '../../views/pools/types'
 
 export type PoolAsset = string
 export type PoolAssets = string[]
@@ -33,6 +33,7 @@ export type PoolsState = {
   pricePools: Option<PricePools>
 }
 
+export type SelectedPricePoolAsset = Option<PricePoolAsset>
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
 
 export type ThorchainLastblockRD = RD.RemoteData<Error, ThorchainLastblock>

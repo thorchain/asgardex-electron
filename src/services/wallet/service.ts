@@ -4,8 +4,8 @@ import { encryptToKeyStore, decryptFromKeystore, Keystore as CryptoKeystore } fr
 import { none, some } from 'fp-ts/lib/Option'
 import * as fs from 'fs-extra'
 
-import { STORAGE_DIR } from '../../const'
 import { observableState } from '../../helpers/stateHelper'
+import { STORAGE_DIR } from '../const'
 import { Phrase, KeystoreService, KeystoreState } from './types'
 import { hasImportedKeystore } from './util'
 
