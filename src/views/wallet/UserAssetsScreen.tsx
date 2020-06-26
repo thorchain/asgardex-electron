@@ -33,24 +33,28 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
 
   const iconColumn: ColumnType<Balance> = {
     key: 'icon',
+    // TODO(@Veado): i18n
     title: 'icon',
     dataIndex: 'symbol',
     render: (_, { symbol }) => <DynamicCoin type={symbol} size={'normal'} />
   }
 
   const nameColumn: ColumnType<Balance> = {
+    // TODO(@Veado): i18n
     title: 'Name',
     dataIndex: 'symbol',
     render: (_, { symbol }) => <Label>{symbol}</Label>
   }
 
   const tickerColumn: ColumnType<Balance> = {
+    // TODO(@Veado): i18n
     title: 'Ticker',
     dataIndex: 'symbol',
     render: (_, { symbol }) => <Label>{getAssetFromString(`.${symbol}`)?.ticker ?? ''}</Label>
   }
 
   const balanceColumn: ColumnType<Balance> = {
+    // TODO(@Veado): i18n
     title: 'Balance',
     dataIndex: 'free',
     render: (_, { free }) => {
@@ -62,6 +66,7 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
   }
 
   const priceColumn: ColumnType<Balance> = {
+    // TODO(@Veado): i18n
     title: 'Asset Price',
     dataIndex: 'free',
     render: () => <Label>TODO</Label>

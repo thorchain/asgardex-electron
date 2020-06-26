@@ -61,7 +61,12 @@ const UnlockView: React.FC = (): JSX.Element => {
     () =>
       O.fold(
         () => <></>,
-        (error: Error) => <Paragraph>{error.toString()}</Paragraph>
+
+        (_: Error) => (
+          <Paragraph>
+            {/* TODO(@Veado): i18n */}Could not unlock the wallet. Please check you password and try it again
+          </Paragraph>
+        )
       )(unlockError),
     [unlockError]
   )
