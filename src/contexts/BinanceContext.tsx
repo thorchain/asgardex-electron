@@ -1,28 +1,46 @@
 import React, { createContext, useContext } from 'react'
 
-import { WS } from '@thorchain/asgardex-binance'
-import { Observable } from 'rxjs'
+import { useSubscription } from 'observable-hooks'
 
-import { subscribeTransfers, miniTickers$ } from '../services/binance/service'
+import {
+  subscribeTransfers,
+  miniTickers$,
+  reloadBalances,
+  balancesState$,
+  setKeystoreState,
+  clientViewState$
+} from '../services/binance/service'
+import { useWalletContext } from './WalletContext'
 
 type BinanceContextValue = {
   subscribeTransfers: typeof subscribeTransfers
-  miniTickers$: Observable<WS.MiniTickers>
+  miniTickers$: typeof miniTickers$
+  clientViewState$: typeof clientViewState$
+  reloadBalances: typeof reloadBalances
+  balancesState$: typeof balancesState$
 }
 
-const initialContext: BinanceContextValue = {
+const initialContext = {
   subscribeTransfers,
-  miniTickers$
+  miniTickers$,
+  clientViewState$,
+  reloadBalances,
+  balancesState$
 }
+
 const BinanceContext = createContext<BinanceContextValue | null>(null)
 
 type Props = {
   children: React.ReactNode
 }
 
-export const BinanceProvider: React.FC<Props> = ({ children }: Props): JSX.Element => (
-  <BinanceContext.Provider value={initialContext}>{children}</BinanceContext.Provider>
-)
+export const BinanceProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
+  const { keystoreService } = useWalletContext()
+  // Note: Service does need to subscribe to latest state of keystore!
+  useSubscription(keystoreService.keystore$, (keystore) => setKeystoreState(keystore))
+
+  return <BinanceContext.Provider value={initialContext}>{children}</BinanceContext.Provider>
+}
 
 export const useBinanceContext = () => {
   const context = useContext(BinanceContext)

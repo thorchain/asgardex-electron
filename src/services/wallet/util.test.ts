@@ -1,7 +1,7 @@
 import { some, none } from 'fp-ts/lib/Option'
 
 import { KeystoreState, KeystoreContent } from './types'
-import { getKeystoreContent, hasKeystoreContent, hasImportedKeystore, isLocked } from './util'
+import { getKeystoreContent, hasKeystoreContent, hasImportedKeystore, isLocked, getPhrase } from './util'
 
 describe('services/wallet/util/', () => {
   describe('getKeystoreContent', () => {
@@ -18,6 +18,25 @@ describe('services/wallet/util/', () => {
     })
     it('returns None if keystore is not available', () => {
       const result = getKeystoreContent(none)
+      expect(result).toBeNone()
+    })
+  })
+
+  describe('getPhrase', () => {
+    it('returns phrase if available of keystore state', () => {
+      const phrase = 'any-phrase'
+      const content: KeystoreContent = { phrase }
+      const state: KeystoreState = some(some(content))
+      const result = getPhrase(state)
+      expect(result).toEqual(some(phrase))
+    })
+    it('returns None if content is not available', () => {
+      const state: KeystoreState = some(none)
+      const result = getPhrase(state)
+      expect(result).toBeNone()
+    })
+    it('returns None if keystore is not available', () => {
+      const result = getPhrase(none)
       expect(result).toBeNone()
     })
   })

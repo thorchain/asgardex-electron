@@ -1176,10 +1176,9 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@binance-chain/javascript-sdk@^3.0.2":
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/@binance-chain/javascript-sdk/-/javascript-sdk-3.0.2.tgz#db5ffa990f74901a17306f551daa01aa34a69da6"
-  integrity sha512-uTk5bt80HsFyhxoGqrVmcd9djvMJ8Il3VlLw7NE6JtNAlJ/UMMs6SOfSNiFhsQce+IXG1y2Ba8qZa8IROEvkRw==
+"@binance-chain/javascript-sdk@https://github.com/veado/javascript-sdk.git#fix/ts-declarations-bundled":
+  version "3.0.2-alpha.8"
+  resolved "https://github.com/veado/javascript-sdk.git#bd52354dc8e6d4cce19e371189e88673bd6933ce"
   dependencies:
     "@babel/runtime" "^7.9.2"
     "@ledgerhq/hw-transport-u2f" "^5.9.0"
@@ -2456,13 +2455,13 @@
   dependencies:
     "@babel/runtime" "^7.10.2"
 
-"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#1612a8ec92ec66603b5dce819b01e6cd635e1035":
+"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#issue-5/ready-4-asgardex":
   version "1.0.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#1612a8ec92ec66603b5dce819b01e6cd635e1035"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#c714de79f801f8bd9901d2b0142a45a8298a35a6"
 
-"@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#1b18e4af3108a5f41e74ff034ad31a5ac619e91d":
+"@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#fe65898b370639143c3db629393f7abfa516c5b6":
   version "0.1.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#1b18e4af3108a5f41e74ff034ad31a5ac619e91d"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#fe65898b370639143c3db629393f7abfa516c5b6"
   dependencies:
     bech32 "^1.1.4"
     bip39 "^3.0.2"
