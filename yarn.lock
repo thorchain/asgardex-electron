@@ -2457,7 +2457,7 @@
 
 "@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#issue-5/ready-4-asgardex":
   version "1.0.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#fb362a362d8a5d55d47340160979e91de2ccf272"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#c714de79f801f8bd9901d2b0142a45a8298a35a6"
 
 "@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#fe65898b370639143c3db629393f7abfa516c5b6":
   version "0.1.0"
