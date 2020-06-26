@@ -1,7 +1,6 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
-import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
 
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -40,7 +39,6 @@ const UserAccounts: UserAccountType[] = [
 // Dummy data... types not confirmed
 
 const WalletManage: React.FC = (): JSX.Element => {
-  const [keystore, setKeystore] = useState<KeyStore>()
   const [network, setNetwork] = useState<string | null>()
   const [chainId, setChainId] = useState<string | null>()
   const [address, setAddress] = useState<string | null>('')
@@ -48,10 +46,6 @@ const WalletManage: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
 
   async function setData() {
-    const key: string | null = localStorage.getItem('keystore')
-    if (key) {
-      setKeystore(JSON.parse(key))
-    }
     // Temporary network client settings placeholders
     setNetwork('testnet')
     setChainId('Binance-Nile')
@@ -120,7 +114,7 @@ const WalletManage: React.FC = (): JSX.Element => {
             </Col>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Keystore Version:</Text>
-              <Paragraph>{keystore?.version}</Paragraph>
+              <Paragraph></Paragraph>
             </Col>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Type:</Text>
