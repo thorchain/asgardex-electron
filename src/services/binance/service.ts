@@ -11,6 +11,7 @@ import { webSocket } from 'rxjs/webSocket'
 
 import { envOrDefault } from '../../helpers/envHelper'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
+import { Network } from '../app/types'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { BalancesRD, BinanceClientStateForViews, BinanceClientState } from './types'
@@ -23,32 +24,28 @@ const BINANCE_TESTNET_WS_URI = envOrDefault(
 
 const BINANCE_MAINET_WS_URI = envOrDefault(process.env.REACT_APP_BINANCE_MAINNET_WS_URI, 'wss://dex.binance.org/api/ws')
 
-// TODO (@Veado) Extract following stuff into `AppContext` or so...
-enum Net {
-  TEST = 'testent',
-  MAIN = 'mainnet'
-}
+/**
+ * Observable state of `Network`
+ */
+const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(Network.TEST)
 
-const currentNet = Net.TEST
-
-// #END TODO
-
-const getEndpoint = (net: Net) => {
-  switch (net) {
-    case Net.MAIN:
-      return BINANCE_MAINET_WS_URI
+/**
+ * Websocket endpoint depending on `Network`
+ */
+const wsEndpoint$ = getNetworkState$.pipe(
+  mergeMap((network) => {
+    if (network === Network.MAIN) return Rx.of(BINANCE_MAINET_WS_URI)
     // all other networks use testnet url for now
-    default:
-      return BINANCE_TESTNET_WS_URI
-  }
-}
+    return Rx.of(BINANCE_TESTNET_WS_URI)
+  })
+)
 
 /**
  * All types of incoming messages, which can be different
  */
 type WSInMsg = WS.TransferEvent | WS.MiniTickersEvent
 
-const ws$ = webSocket<WSInMsg>(getEndpoint(currentNet))
+const ws$ = wsEndpoint$.pipe(map((endpoint) => webSocket<WSInMsg>(endpoint)))
 
 /**
  * Observable for subscribing / unsubscribing transfers by given address
@@ -66,24 +63,28 @@ const subscribeTransfers = (address: string) => {
     topic: 'transfers',
     address
   }
-  return ws$
-    .multiplex(
-      () => ({
-        method: 'subscribe',
-        ...msg
-      }),
-      () => ({
-        method: 'unsubscribe',
-        ...msg
-      }),
-      // filter out messages if data is not available
-      (e) => (e as WS.TransferEvent).data !== undefined
+  return ws$.pipe(
+    switchMap((ws) =>
+      ws
+        .multiplex(
+          () => ({
+            method: 'subscribe',
+            ...msg
+          }),
+          () => ({
+            method: 'unsubscribe',
+            ...msg
+          }),
+          // filter out messages if data is not available
+          (e) => (e as WS.TransferEvent).data !== undefined
+        )
+        .pipe(
+          // Since we filtered messages before,
+          // we know that data is available here, but it needs to be typed again
+          map((event: WS.TransferEvent) => event.data as WS.Transfer)
+        )
     )
-    .pipe(
-      // Since we filtered messages before,
-      // we know that data is available here, but it needs to be typed again
-      map((event: WS.TransferEvent) => event.data as WS.Transfer)
-    )
+  )
 }
 
 /**
@@ -100,25 +101,29 @@ const allMiniTickersMsg = {
   symbols: ['$all']
 }
 
-const miniTickers$ = ws$
-  .multiplex(
-    () => ({
-      method: 'subscribe',
-      ...allMiniTickersMsg
-    }),
-    () => ({
-      method: 'unsubscribe',
-      ...allMiniTickersMsg
-    }),
-    // filter out messages if data is not available
-    (e) => (e as WS.MiniTickersEvent).data !== undefined
+const miniTickers$ = ws$.pipe(
+  switchMap((ws) =>
+    ws
+      .multiplex(
+        () => ({
+          method: 'subscribe',
+          ...allMiniTickersMsg
+        }),
+        () => ({
+          method: 'unsubscribe',
+          ...allMiniTickersMsg
+        }),
+        // filter out messages if data is not available
+        (e) => (e as WS.MiniTickersEvent).data !== undefined
+      )
+      .pipe(
+        // Since we have filtered messages out before,
+        // we know that `data` is available here,
+        // but we have to do a type cast again
+        map((event: WS.MiniTickersEvent) => event?.data as WS.MiniTickers)
+      )
   )
-  .pipe(
-    // Since we have filtered messages out before,
-    // we know that `data` is available here,
-    // but we have to do a type cast again
-    map((event: WS.MiniTickersEvent) => event?.data as WS.MiniTickers)
-  )
+)
 
 const BINANCE_MAX_RETRY = 3
 
@@ -220,4 +225,12 @@ const balancesState$: Observable<BalancesRD> = reloadBalances$.pipe(
 /**
  * Object with all "public" functions and observables
  */
-export { miniTickers$, subscribeTransfers, setKeystoreState, clientViewState$, balancesState$, reloadBalances }
+export {
+  miniTickers$,
+  subscribeTransfers,
+  setNetworkState,
+  setKeystoreState,
+  clientViewState$,
+  balancesState$,
+  reloadBalances
+}
