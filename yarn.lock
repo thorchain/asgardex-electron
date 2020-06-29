@@ -2459,9 +2459,9 @@
   version "1.0.0"
   resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#c714de79f801f8bd9901d2b0142a45a8298a35a6"
 
-"@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#fe65898b370639143c3db629393f7abfa516c5b6":
+"@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git":
   version "0.1.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#fe65898b370639143c3db629393f7abfa516c5b6"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git#f1be70bf45de2a154825ae457aee4e9210db9043"
   dependencies:
     bech32 "^1.1.4"
     bip39 "^3.0.2"
