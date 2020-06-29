@@ -1,14 +1,16 @@
 import React, { createContext, useContext } from 'react'
 
-import { onlineStatus$, network$ } from '../services/app/service'
+import { onlineStatus$, network$, changeNetwork } from '../services/app/service'
 
 type AppContextValue = {
   onlineStatus$: typeof onlineStatus$
   network$: typeof network$
+  changeNetwork: typeof changeNetwork
 }
 const initialContext: AppContextValue = {
   onlineStatus$,
-  network$
+  network$,
+  changeNetwork
 }
 
 const AppContext = createContext<AppContextValue | null>(null)
