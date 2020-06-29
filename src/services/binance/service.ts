@@ -1,7 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { WS, Client } from '@thorchain/asgardex-binance'
 import { right, left } from 'fp-ts/lib/Either'
-import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import { none, some } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
@@ -15,6 +14,7 @@ import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { BalancesRD, BinanceClientStateForViews, BinanceClientState } from './types'
+import { hasBinanceClientState, getBinanceClientStateForViews, getBinanceClientState } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -166,22 +166,7 @@ const clientState$ = getKeystoreState$.pipe(
  * It's needed by views only.
  */
 const clientViewState$: Observable<BinanceClientStateForViews> = clientState$.pipe(
-  map((client) =>
-    FP.pipe(
-      client,
-      O.fold(
-        () => 'notready',
-        (eClient) =>
-          FP.pipe(
-            eClient,
-            E.fold(
-              (_) => 'error',
-              (_) => 'ready'
-            )
-          )
-      )
-    )
-  )
+  map((clientState) => getBinanceClientStateForViews(clientState))
 )
 
 /**
@@ -190,36 +175,16 @@ const clientViewState$: Observable<BinanceClientStateForViews> = clientState$.pi
  */
 const client$ = clientState$.pipe(
   // Filter out instantiated `BinanceClient` only
-  filter((clientState) =>
-    FP.pipe(
-      clientState,
-      // check outer Option of `BinanceClientState
-      O.fold(
-        () => false,
-        // check inner Either of `BinanceClientState`
-        (eClient) =>
-          E.fold(
-            (_) => false,
-            (_) => true
-          )(eClient)
-      )
-    )
-  ),
+  filter(hasBinanceClientState),
   mergeMap((clientState) =>
     FP.pipe(
       clientState,
-      // check outer Option of `BinanceClientState
+      // unpack `BinanceClientState` from inner Either
+      getBinanceClientState,
       O.fold(
+        // will never happen due filter before
         () => Rx.NEVER,
-        // check inner Either of `BinanceClientState`
-        (eClient) =>
-          FP.pipe(
-            eClient,
-            E.fold(
-              (_) => Rx.NEVER,
-              (client) => Rx.of(client)
-            )
-          )
+        (client) => Rx.of(client)
       )
     )
   )
