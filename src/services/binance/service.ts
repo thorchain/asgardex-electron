@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { WS, Client } from '@thorchain/asgardex-binance'
+import { WS, Client, Network as BinanceNetwork } from '@thorchain/asgardex-binance'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import { none, some } from 'fp-ts/lib/Option'
@@ -128,6 +128,17 @@ const miniTickers$ = ws$.pipe(
 const BINANCE_MAX_RETRY = 3
 
 /**
+ * Binannce network depending on `Network`
+ */
+const binanceNetwork$: Observable<BinanceNetwork> = getNetworkState$.pipe(
+  mergeMap((network) => {
+    if (network === Network.MAIN) return Rx.of('mainnet' as BinanceNetwork)
+    // all other networks use testnet url for now
+    return Rx.of('testnet' as BinanceNetwork)
+  })
+)
+
+/**
  * Observable state of `KeystoreState`
  */
 const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(none)
@@ -138,9 +149,9 @@ const { get$: getKeystoreState$, set: setKeystoreState } = observableState<Keyst
  * By the other hand: Whenever a phrase has been removed, the client is set to `none`
  * A BinanceClient will never be created as long as no phrase is available
  */
-const clientState$ = getKeystoreState$.pipe(
+const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
   mergeMap(
-    (keystore) =>
+    ([keystore, binanceNetwork]) =>
       Observable.create((observer: Observer<BinanceClientState>) => {
         const client = FP.pipe(
           getPhrase(keystore),
@@ -152,7 +163,7 @@ const clientState$ = getKeystoreState$.pipe(
             // see https://github.com/thorchain/asgardex-electron/issues/209
             (phrase: string) => {
               try {
-                const client = new Client(phrase, 'testnet')
+                const client = new Client(phrase, binanceNetwork)
                 return some(right(client))
               } catch (error) {
                 return some(left(error))
