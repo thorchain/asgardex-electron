@@ -9,6 +9,7 @@ import { PRICE_POOLS_WHITELIST } from '../../const'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
+import { Network } from '../app/types'
 import {
   PoolsStateRD,
   PoolsState,
@@ -24,6 +25,11 @@ const MIDGARD_MAX_RETRY = 3
 const BYZANTINE_MAX_RETRY = 5
 
 /**
+ * Observable state of `Network`
+ */
+const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(Network.TEST)
+
+/**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
  */
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
@@ -31,7 +37,12 @@ const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configurat
 /**
  * Endpoint provided by Byzantine
  */
-const byzantine$ = Rx.from(byzantine()).pipe(retry(BYZANTINE_MAX_RETRY))
+const byzantine$ = getNetworkState$.pipe(
+  mergeMap((network) => {
+    return Rx.from(byzantine(network === Network.MAIN))
+  }),
+  retry(BYZANTINE_MAX_RETRY)
+)
 
 /**
  * State of pools data
@@ -249,6 +260,7 @@ const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
  * Service object with all "public" functions and observables we want to provide
  */
 export const service = {
+  setNetworkState,
   poolsState$,
   reloadPoolsState,
   networkInfo$,
