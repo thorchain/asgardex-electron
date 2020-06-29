@@ -3,7 +3,7 @@ import byzantine from '@thorchain/byzantine-module'
 import * as O from 'fp-ts/lib/Option'
 import { some } from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { retry, catchError, concatMap, tap, exhaustMap, mergeMap, shareReplay } from 'rxjs/operators'
+import { retry, catchError, concatMap, tap, exhaustMap, mergeMap, shareReplay, startWith } from 'rxjs/operators'
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
@@ -135,13 +135,6 @@ const poolsState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$.pipe(
 )
 
 /**
- * State of `lastblock` endpoint
- */
-const { get$: getThorchainLastblockState$, set: setThorchainLastblockState } = observableState<ThorchainLastblockRD>(
-  RD.initial
-)
-
-/**
  * Get `ThorchainLastblock` data from Midgard
  */
 const apiGetThorchainLastblock$ = byzantine$.pipe(
@@ -157,21 +150,15 @@ const { stream$: reloadThorchainLastblock$, trigger: reloadThorchainLastblock } 
 /**
  * Loads data of `ThorchainLastblock`
  */
-const loadThorchainLastblock$ = () => {
-  // Update state to `pending`
-  setThorchainLastblockState(RD.pending)
-  return apiGetThorchainLastblock$.pipe(
+const loadThorchainLastblock$ = () =>
+  apiGetThorchainLastblock$.pipe(
     // store result
-    tap((result) => setThorchainLastblockState(RD.success(result))),
+    concatMap((result) => Rx.of(RD.success(result))),
     // catch any errors if there any
-    catchError((error: Error) => {
-      // set `error` state
-      setThorchainLastblockState(RD.failure(error))
-      return Rx.of("Error while fetching Thorchain's data for lastblock")
-    }),
+    catchError((error: Error) => Rx.of(RD.failure(error))),
+    startWith(RD.pending),
     retry(MIDGARD_MAX_RETRY)
   )
-}
 
 /**
  * State of `ThorchainLastblock`, it will be loaded data by first subscription only
@@ -179,17 +166,8 @@ const loadThorchainLastblock$ = () => {
 const thorchainLastblockState$: Rx.Observable<ThorchainLastblockRD> = reloadThorchainLastblock$.pipe(
   // start request
   exhaustMap((_) => loadThorchainLastblock$()),
-  // return state of pool data
-  mergeMap((_) => getThorchainLastblockState$),
   // cache it to avoid reloading data by every subscription
   shareReplay()
-)
-
-/**
- * State of thorchain constants
- */
-const { get$: getThorchainConstantsState$, set: setThorchainConstantsState } = observableState<ThorchainConstantsRD>(
-  RD.initial
 )
 
 /**
@@ -203,31 +181,13 @@ const apiGetThorchainConstants$ = byzantine$.pipe(
 )
 
 /**
- * Loads data of `ThorchainConstants`
+ * Provides data of `ThorchainConstants`
  */
-const loadThorchainConstants$ = () => {
-  // Update state to `pending`
-  setThorchainConstantsState(RD.pending)
-  return apiGetThorchainConstants$.pipe(
-    // store result
-    tap((result) => setThorchainConstantsState(RD.success(result))),
-    // catch any errors if there any
-    catchError((error: Error) => {
-      // set `error` state
-      setThorchainConstantsState(RD.failure(error))
-      return Rx.of("Error while fetching Thorchain's data for constants")
-    }),
-    retry(MIDGARD_MAX_RETRY)
-  )
-}
-
-/**
- * State of `ThorchainConstants`, its data will be loaded only once and by first subscription only
- */
-const thorchainConstantsState$: Rx.Observable<ThorchainConstantsRD> = loadThorchainConstants$().pipe(
-  // return state of pool data
-  exhaustMap((_) => getThorchainConstantsState$),
-  // cache it to avoid reloading data by every subscription
+const thorchainConstantsState$: Rx.Observable<ThorchainConstantsRD> = apiGetThorchainConstants$.pipe(
+  concatMap((result) => Rx.of(RD.success(result))),
+  catchError((error: Error) => Rx.of(RD.failure(error))),
+  startWith(RD.pending),
+  retry(MIDGARD_MAX_RETRY),
   shareReplay()
 )
 
@@ -260,28 +220,17 @@ const apiGetNetworkData$ = byzantine$.pipe(
 )
 
 /**
- * State of NetworkInfoRD
- */
-export const { get$: getNetworkInfo$, set: setNetworkInfo } = observableState<NetworkInfoRD>(RD.initial)
-
-/**
  * Loads data of `NetworkInfo`
  */
-const loadNetworkData$ = () => {
-  // Update to `pending` state
-  setNetworkInfo(RD.pending)
-  return apiGetNetworkData$.pipe(
+const loadNetworkInfo$ = (): Rx.Observable<NetworkInfoRD> =>
+  apiGetNetworkData$.pipe(
     // store result
-    tap((info) => setNetworkInfo(RD.success(info))),
+    concatMap((info) => Rx.of(RD.success(info))),
     // catch any errors if there any
-    catchError((error: Error) => {
-      // set `error` state
-      setNetworkInfo(RD.failure(error))
-      return Rx.of('Error while fetching data of network')
-    }),
+    catchError((error: Error) => Rx.of(RD.failure(error))),
+    startWith(RD.pending),
     retry(MIDGARD_MAX_RETRY)
   )
-}
 
 // `TriggerStream` to reload `NetworkInfo`
 const { stream$: reloadNetworkInfo$, trigger: reloadNetworkInfo } = triggerStream()
@@ -291,9 +240,7 @@ const { stream$: reloadNetworkInfo$, trigger: reloadNetworkInfo } = triggerStrea
  */
 const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
   // start request
-  exhaustMap((_) => loadNetworkData$()),
-  // return state of pool data
-  mergeMap((_) => getNetworkInfo$),
+  exhaustMap((_) => loadNetworkInfo$()),
   // cache it to avoid reloading data by every subscription
   shareReplay()
 )
