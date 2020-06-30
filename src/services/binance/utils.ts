@@ -5,11 +5,11 @@ import * as O from 'fp-ts/lib/Option'
 
 import { BinanceClientState, BinanceClientStateM, BinanceClientStateForViews } from './types'
 
-export const getBinanceClientState = (clientState: BinanceClientState): O.Option<BinanceClient> =>
+export const getBinanceClient = (clientState: BinanceClientState): O.Option<BinanceClient> =>
   BinanceClientStateM.getOrElse(clientState, () => O.none)
 
-export const hasBinanceClientState = (clientState: BinanceClientState): boolean =>
-  FP.pipe(clientState, getBinanceClientState, O.isSome)
+export const hasBinanceClient = (clientState: BinanceClientState): boolean =>
+  FP.pipe(clientState, getBinanceClient, O.isSome)
 
 export const getBinanceClientStateForViews = (clientState: BinanceClientState): BinanceClientStateForViews =>
   FP.pipe(
