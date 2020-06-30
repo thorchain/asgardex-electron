@@ -24,13 +24,7 @@ const ImportsView: React.FC = (): JSX.Element => {
   const tabs = useMemo(
     () =>
       items.map(({ label, key, content }) => (
-        <Tabs.TabPane
-          tab={
-            <Row>
-              <Label style={{ padding: 0, paddingLeft: 20, paddingRight: 20 }}>{label}</Label>
-            </Row>
-          }
-          key={key}>
+        <Tabs.TabPane tab={<Label style={{ padding: 0, paddingLeft: 20, paddingRight: 20 }}>{label}</Label>} key={key}>
           {content}
         </Tabs.TabPane>
       )),
@@ -47,8 +41,8 @@ const ImportsView: React.FC = (): JSX.Element => {
           IMPORT EXISTING WALLET
         </Label>
       </Row>
-      <div>
-        <Tabs activeKey={TabKey.PHRASE} size="large" tabBarStyle={{ justifyItems: 'center' }}>
+      <div style={{ backgroundColor: 'white', height: '95%' }}>
+        <Tabs activeKey={TabKey.PHRASE} size="large">
           {tabs}
         </Tabs>
       </div>

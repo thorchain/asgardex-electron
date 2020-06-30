@@ -10,6 +10,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import * as walletRoutes from '../../routes/wallet'
 import Button from '../uielements/button'
 import Input from '../uielements/input'
+import InputTextArea from '../uielements/input/InputTextArea'
 
 const ImportPhrase: React.FC = (): JSX.Element => {
   const history = useHistory()
@@ -56,23 +57,35 @@ const ImportPhrase: React.FC = (): JSX.Element => {
   )
 
   return (
-    <Form form={form} onFinish={submitForm} labelCol={{ span: 24 }}>
+    <Form
+      form={form}
+      onFinish={submitForm}
+      labelCol={{ span: 24 }}
+      style={{ paddingLeft: 30, paddingRight: 30, paddingBottom: 30 }}>
+      <span>PHRASE</span>
       <Form.Item
         name="phrase"
         rules={[{ required: true, validator: phraseValidator }]}
         validateTrigger={['onSubmit', 'onChange']}>
-        <Input placeholder="ENTER PHRASE" size="large" security="password" />
+        <InputTextArea placeholder="ENTER PHRASE" rows={5} />
       </Form.Item>
       <Form.Item
         name="password"
         rules={[{ required: true, validator: passwordValidator }]}
         validateTrigger={['onSubmit', 'onChange']}>
-        <Input placeholder="PASSWORD" size="large" />
+        <Input placeholder="PASSWORD" security="password" size="small" style={{ width: 280 }} />
       </Form.Item>
-
-      <Button size="middle" type="link" htmlType="submit" block disabled={!validPassword || !validPhrase}>
-        Import
-      </Button>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Button
+          size="middle"
+          type="link"
+          htmlType="submit"
+          style={{ width: 150, alignSelf: 'flex-end' }}
+          block
+          disabled={!validPassword || !validPhrase}>
+          Import
+        </Button>
+      </div>
     </Form>
   )
 }

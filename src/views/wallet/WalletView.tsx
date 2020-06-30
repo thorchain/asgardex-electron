@@ -109,7 +109,9 @@ const WalletView: React.FC = (): JSX.Element => {
           <UnlockView />
         </Route>
         <Route path={walletRoutes.imports.template} exact>
-          <ImportsView />
+          <div style={{ display: 'flex' }}>
+            <ImportsView />
+          </div>
         </Route>
         <Route path={walletRoutes.base.template} render={renderWalletRoute} />
       </Switch>

@@ -5,6 +5,7 @@ import { storiesOf } from '@storybook/react'
 import { Row } from 'antd'
 
 import Input from './Input'
+import InputTextArea from './InputTextArea'
 import { Color, Size } from './types'
 
 type ColorOptions = {
@@ -33,6 +34,8 @@ storiesOf('Components/Input', module)
         <Input color="success" sizevalue="big" value="this is text!" />
         <Input color="warning" sizevalue="big" value="this is text!" />
         <Input color="error" sizevalue="big" value="this is text!" />
+        <InputTextArea color="error" sizevalue="big" value="this is text area!" />
+        <Input color="error" sizevalue="big" security="password" value="this is password!" />
       </Row>
     )
   })

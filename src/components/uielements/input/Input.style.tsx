@@ -1,5 +1,5 @@
 import { Input } from 'antd'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { palette, key } from 'styled-theme'
 
 import { Color, Colors, FontSettings, InputType, Size, Sizes } from './types'
@@ -38,7 +38,7 @@ const colors: Colors = {
   error: palette('error', 0)
 }
 
-export const InputWrapper = styled(Input)`
+const inputStyle = css`
   &.ant-input-affix-wrapper,
   &.ant-input {
     height: ${(props: InputWrapperProps) => sizes[props.sizevalue]};
@@ -64,4 +64,15 @@ export const InputWrapper = styled(Input)`
         props.typevalue === 'ghost' ? 'none' : '0 0 0 2px ' + colors[props.color]};
     }
   }
+`
+export const InputWrapper = styled(Input)`
+  ${inputStyle}
+`
+
+export const InputPasswordWrapper = styled(Input.Password)`
+  ${inputStyle}
+`
+
+export const InputTextAreaWrapper = styled(Input.TextArea)`
+  ${inputStyle}
 `
