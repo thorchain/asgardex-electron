@@ -8,8 +8,10 @@ import {
   reloadBalances,
   balancesState$,
   setKeystoreState,
-  clientViewState$
+  clientViewState$,
+  setNetworkState
 } from '../services/binance/service'
+import { useAppContext } from './AppContext'
 import { useWalletContext } from './WalletContext'
 
 type BinanceContextValue = {
@@ -36,7 +38,9 @@ type Props = {
 
 export const BinanceProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
   const { keystoreService } = useWalletContext()
-  // Note: Service does need to subscribe to latest state of keystore!
+  const { network$ } = useAppContext()
+  // Note: Service does need to subscribe to latest state of keystore and network!
+  useSubscription(network$, (network) => setNetworkState(network))
   useSubscription(keystoreService.keystore$, (keystore) => setKeystoreState(keystore))
 
   return <BinanceContext.Provider value={initialContext}>{children}</BinanceContext.Provider>

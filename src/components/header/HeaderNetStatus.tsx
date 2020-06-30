@@ -6,8 +6,9 @@ import { useObservableState } from 'observable-hooks'
 import { palette } from 'styled-theme'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
-import { useConnectionContext, OnlineStatus } from '../../contexts/ConnectionContext'
+import { useAppContext } from '../../contexts/AppContext'
 import { useThemeContext } from '../../contexts/ThemeContext'
+import { OnlineStatus } from '../../services/app/types'
 import ConnectionStatus from '../shared/icons/ConnectionStatus'
 import Menu from '../shared/Menu'
 import { HeaderDrawerItem } from './HeaderComponent.style'
@@ -26,8 +27,8 @@ type Props = {
 const HeaderNetStatus: React.FC<Props> = (_: Props): JSX.Element => {
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
-  const connection$ = useConnectionContext()
-  const onlineStatus = useObservableState<OnlineStatus>(connection$)
+  const { onlineStatus$ } = useAppContext()
+  const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$)
   const onlineStatusColor = onlineStatus === OnlineStatus.ON ? 'green' : 'red'
 
   const menuItems: MenuItem[] = useMemo(

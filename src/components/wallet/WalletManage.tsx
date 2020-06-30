@@ -2,8 +2,11 @@ import React, { useMemo, useCallback, useState, useEffect } from 'react'
 
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
+import { useObservableState } from 'observable-hooks'
 
+import { useAppContext } from '../../contexts/AppContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { Network } from '../../services/app/types'
 import { UserAccountType } from '../../types/wallet'
 
 const { Title, Text, Paragraph } = Typography
@@ -39,15 +42,16 @@ const UserAccounts: UserAccountType[] = [
 // Dummy data... types not confirmed
 
 const WalletManage: React.FC = (): JSX.Element => {
-  const [network, setNetwork] = useState<string | null>()
   const [chainId, setChainId] = useState<string | null>()
   const [address, setAddress] = useState<string | null>('')
 
   const { keystoreService } = useWalletContext()
+  const { network$, changeNetwork } = useAppContext()
+
+  const network = useObservableState(network$, Network.TEST)
 
   async function setData() {
     // Temporary network client settings placeholders
-    setNetwork('testnet')
     setChainId('Binance-Nile')
     setAddress(localStorage.getItem('address'))
   }
@@ -63,6 +67,11 @@ const WalletManage: React.FC = (): JSX.Element => {
   const lockWallet = useCallback(() => {
     keystoreService.lock()
   }, [keystoreService])
+
+  const changeNetworkHandler = useCallback(() => {
+    const newNetwork = network === Network.MAIN ? Network.TEST : Network.MAIN
+    changeNetwork(newNetwork)
+  }, [changeNetwork, network])
 
   const removeWallet = useCallback(() => {
     keystoreService.removeKeystore()
@@ -123,6 +132,11 @@ const WalletManage: React.FC = (): JSX.Element => {
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Chain ID:</Text>
               <Paragraph>{chainId}</Paragraph>
+            </Col>
+            <Col md={{ span: 24 }} lg={{ span: 12 }}>
+              <Button onClick={changeNetworkHandler}>
+                Change to {network === Network.MAIN ? 'testnet' : 'mainnet'}
+              </Button>
             </Col>
           </Row>
         </Card>

@@ -5,8 +5,8 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { AppWrapper, AppLayout } from './App.style'
 import Footer from './components/Footer'
 import Header from './components/header/Header'
+import { AppProvider } from './contexts/AppContext'
 import { BinanceProvider } from './contexts/BinanceContext'
-import { ConnectionProvider } from './contexts/ConnectionContext'
 import { I18nProvider } from './contexts/I18nContext'
 import { MidgardProvider } from './contexts/MidgardContext'
 import { ThemeProvider } from './contexts/ThemeContext'
@@ -34,7 +34,7 @@ const AppView: React.FC<Props> = (_): JSX.Element => {
 
 const App: React.FC<Props> = (_): JSX.Element => {
   return (
-    <ConnectionProvider>
+    <AppProvider>
       <WalletProvider>
         <BinanceProvider>
           <MidgardProvider>
@@ -48,7 +48,7 @@ const App: React.FC<Props> = (_): JSX.Element => {
           </MidgardProvider>
         </BinanceProvider>
       </WalletProvider>
-    </ConnectionProvider>
+    </AppProvider>
   )
 }
 
