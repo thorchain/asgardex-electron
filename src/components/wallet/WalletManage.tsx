@@ -1,14 +1,11 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
+import { Address } from '@thorchain/asgardex-binance'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { useObservableState } from 'observable-hooks'
 
-import { useAppContext } from '../../contexts/AppContext'
-import { useBinanceContext } from '../../contexts/BinanceContext'
-import { useWalletContext } from '../../contexts/WalletContext'
 import { Network } from '../../services/app/types'
 import { UserAccountType } from '../../types/wallet'
 
@@ -44,15 +41,18 @@ const UserAccounts: UserAccountType[] = [
 ]
 // Dummy data... types not confirmed
 
-const WalletManage: React.FC = (): JSX.Element => {
+type Props = {
+  network: Network
+  changeNetwork?: (network: Network) => void
+  address: O.Option<Address>
+  lockWallet?: () => void
+  removeKeystore?: () => void
+}
+
+const WalletManage: React.FC<Props> = (props: Props): JSX.Element => {
+  const { network, changeNetwork = (_) => {}, address, lockWallet = () => {}, removeKeystore = () => {} } = props
+
   const [chainId, setChainId] = useState<string | null>()
-
-  const { keystoreService } = useWalletContext()
-  const { network$, changeNetwork } = useAppContext()
-  const { address$ } = useBinanceContext()
-
-  const network = useObservableState(network$, Network.TEST)
-  const address = useObservableState(address$, O.none)
 
   async function setData() {
     // Temporary network client settings placeholders
@@ -67,18 +67,14 @@ const WalletManage: React.FC = (): JSX.Element => {
     return 'data:text/plain;charset=utf-8,' + encodeURIComponent(keystring)
   }, [])
 
-  const lockWallet = useCallback(() => {
-    keystoreService.lock()
-  }, [keystoreService])
-
   const changeNetworkHandler = useCallback(() => {
     const newNetwork = network === Network.MAIN ? Network.TEST : Network.MAIN
     changeNetwork(newNetwork)
   }, [changeNetwork, network])
 
   const removeWallet = useCallback(() => {
-    keystoreService.removeKeystore()
-  }, [keystoreService])
+    removeKeystore()
+  }, [removeKeystore])
 
   return (
     <Row gutter={[16, 16]}>
