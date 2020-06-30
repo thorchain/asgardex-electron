@@ -3,7 +3,17 @@ import byzantine from '@thorchain/byzantine-module'
 import * as O from 'fp-ts/lib/Option'
 import { some } from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { retry, catchError, concatMap, tap, exhaustMap, mergeMap, shareReplay, startWith } from 'rxjs/operators'
+import {
+  retry,
+  catchError,
+  concatMap,
+  tap,
+  mergeMap,
+  shareReplay,
+  startWith,
+  switchMap,
+  distinctUntilChanged
+} from 'rxjs/operators'
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
@@ -38,9 +48,12 @@ const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configurat
  * Endpoint provided by Byzantine
  */
 const byzantine$ = getNetworkState$.pipe(
-  mergeMap((network) => {
-    return Rx.from(byzantine(network === Network.MAIN))
-  }),
+  // Since `getNetworkState` is created by `observableState` and it takes an initial value,
+  // this stream might emit same values and we do need a "dirty check"
+  // to avoid to create another instance of byzantine by having same `Network`
+  distinctUntilChanged(),
+  switchMap((network) => Rx.from(byzantine(network === Network.MAIN, true))),
+  shareReplay(),
   retry(BYZANTINE_MAX_RETRY)
 )
 
@@ -138,7 +151,7 @@ const { stream$: reloadPoolsState$, trigger: reloadPoolsState } = triggerStream(
  */
 const poolsState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$.pipe(
   // start loading queue
-  exhaustMap((_) => loadPoolsStateData$()),
+  switchMap((_) => loadPoolsStateData$()),
   // return state of pool data
   mergeMap((_) => getPoolsState$),
   // cache it to avoid reloading data by every subscription
@@ -176,7 +189,7 @@ const loadThorchainLastblock$ = () =>
  */
 const thorchainLastblockState$: Rx.Observable<ThorchainLastblockRD> = reloadThorchainLastblock$.pipe(
   // start request
-  exhaustMap((_) => loadThorchainLastblock$()),
+  switchMap((_) => loadThorchainLastblock$()),
   // cache it to avoid reloading data by every subscription
   shareReplay()
 )
@@ -251,7 +264,7 @@ const { stream$: reloadNetworkInfo$, trigger: reloadNetworkInfo } = triggerStrea
  */
 const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
   // start request
-  exhaustMap((_) => loadNetworkInfo$()),
+  switchMap((_) => loadNetworkInfo$()),
   // cache it to avoid reloading data by every subscription
   shareReplay()
 )
