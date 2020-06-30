@@ -15,6 +15,11 @@ const onlineStatus$ = Rx.merge(online$, offline$).pipe(startWith(navigator.onLin
 /**
  * State of `Network`
  */
-const { get$: network$, set: changeNetwork } = observableState(Network.TEST)
+const { get$: network$, get: getNetwork, set: changeNetwork } = observableState(Network.TEST)
 
-export { onlineStatus$, network$, changeNetwork }
+const toggleNetwork = () => {
+  const next = getNetwork() === Network.MAIN ? Network.TEST : Network.MAIN
+  changeNetwork(next)
+}
+
+export { onlineStatus$, network$, toggleNetwork }

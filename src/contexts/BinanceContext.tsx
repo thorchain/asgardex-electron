@@ -9,7 +9,8 @@ import {
   balancesState$,
   setKeystoreState,
   clientViewState$,
-  setNetworkState
+  setNetworkState,
+  address$
 } from '../services/binance/service'
 import { useAppContext } from './AppContext'
 import { useWalletContext } from './WalletContext'
@@ -20,6 +21,7 @@ type BinanceContextValue = {
   clientViewState$: typeof clientViewState$
   reloadBalances: typeof reloadBalances
   balancesState$: typeof balancesState$
+  address$: typeof address$
 }
 
 const initialContext = {
@@ -27,7 +29,8 @@ const initialContext = {
   miniTickers$,
   clientViewState$,
   reloadBalances,
-  balancesState$
+  balancesState$,
+  address$
 }
 
 const BinanceContext = createContext<BinanceContextValue | null>(null)

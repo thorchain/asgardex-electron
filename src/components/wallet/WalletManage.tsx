@@ -1,11 +1,11 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
+import { Address } from '@thorchain/asgardex-binance'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
-import { useObservableState } from 'observable-hooks'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 
-import { useAppContext } from '../../contexts/AppContext'
-import { useWalletContext } from '../../contexts/WalletContext'
 import { Network } from '../../services/app/types'
 import { UserAccountType } from '../../types/wallet'
 
@@ -41,41 +41,35 @@ const UserAccounts: UserAccountType[] = [
 ]
 // Dummy data... types not confirmed
 
-const WalletManage: React.FC = (): JSX.Element => {
+type Props = {
+  network: Network
+  toggleNetwork?: () => void
+  address: O.Option<Address>
+  lockWallet?: () => void
+  removeKeystore?: () => void
+}
+
+const WalletManage: React.FC<Props> = (props: Props): JSX.Element => {
+  const { network, toggleNetwork = () => {}, address, lockWallet = () => {}, removeKeystore = () => {} } = props
+
   const [chainId, setChainId] = useState<string | null>()
-  const [address, setAddress] = useState<string | null>('')
-
-  const { keystoreService } = useWalletContext()
-  const { network$, changeNetwork } = useAppContext()
-
-  const network = useObservableState(network$, Network.TEST)
 
   async function setData() {
     // Temporary network client settings placeholders
-    setChainId('Binance-Nile')
-    setAddress(localStorage.getItem('address'))
+    setChainId('unknown')
   }
   useEffect(() => {
     setData()
   }, [])
-  const fileName = (): string | undefined => address?.concat('-keystore.txt')
+
   const downloadLink: string = useMemo(() => {
     const keystring: string = localStorage.getItem('keystore') || ''
     return 'data:text/plain;charset=utf-8,' + encodeURIComponent(keystring)
   }, [])
 
-  const lockWallet = useCallback(() => {
-    keystoreService.lock()
-  }, [keystoreService])
-
-  const changeNetworkHandler = useCallback(() => {
-    const newNetwork = network === Network.MAIN ? Network.TEST : Network.MAIN
-    changeNetwork(newNetwork)
-  }, [changeNetwork, network])
-
   const removeWallet = useCallback(() => {
-    keystoreService.removeKeystore()
-  }, [keystoreService])
+    removeKeystore()
+  }, [removeKeystore])
 
   return (
     <Row gutter={[16, 16]}>
@@ -86,7 +80,7 @@ const WalletManage: React.FC = (): JSX.Element => {
           <Row>
             <Col span={12}>
               <Card bordered={false}>
-                <Button type="ghost" shape="round" block href={downloadLink} download={fileName()}>
+                <Button type="ghost" shape="round" block href={downloadLink} download={''}>
                   Export Keystore
                 </Button>
               </Card>
@@ -119,7 +113,12 @@ const WalletManage: React.FC = (): JSX.Element => {
           <Row>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Client Address:</Text>
-              <Paragraph ellipsis>{address}</Paragraph>
+              <Paragraph>
+                {FP.pipe(
+                  address,
+                  O.getOrElse(() => '')
+                )}
+              </Paragraph>
             </Col>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Keystore Version:</Text>
@@ -134,9 +133,7 @@ const WalletManage: React.FC = (): JSX.Element => {
               <Paragraph>{chainId}</Paragraph>
             </Col>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
-              <Button onClick={changeNetworkHandler}>
-                Change to {network === Network.MAIN ? 'testnet' : 'mainnet'}
-              </Button>
+              <Button onClick={toggleNetwork}>Change to {network === Network.MAIN ? 'testnet' : 'mainnet'}</Button>
             </Col>
           </Row>
         </Card>

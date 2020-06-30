@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { WS, Client, Network as BinanceNetwork, BinanceClient } from '@thorchain/asgardex-binance'
+import { WS, Client, Network as BinanceNetwork, BinanceClient, Address } from '@thorchain/asgardex-binance'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import { none, some } from 'fp-ts/lib/Option'
@@ -145,8 +145,9 @@ const { get$: getKeystoreState$, set: setKeystoreState } = observableState<Keyst
 
 /**
  * Stream to create an observable BinanceClient depending on existing phrase in keystore
- * Whenever a phrase has been added to keystore, a new BinanceClient will be created as well
- * By the other hand: Whenever a phrase has been removed, the client is set to `none`
+ *
+ * Whenever a phrase has been added to keystore, a new BinanceClient will be created.
+ * By the other hand: Whenever a phrase has been removed, the client is set to `None`
  * A BinanceClient will never be created as long as no phrase is available
  */
 const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
@@ -155,21 +156,14 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
       Observable.create((observer: Observer<BinanceClientState>) => {
         const client = FP.pipe(
           getPhrase(keystore),
-          O.fold(
-            // Whenever a phrase has been removed, previous client will "be removed" by setting it to `none`
-            () => none,
-            // TODO (@Veado): `BinanceClient` will depend on network state in AppContext
-            // For now we use testnet only ...
-            // see https://github.com/thorchain/asgardex-electron/issues/209
-            (phrase: string) => {
-              try {
-                const client = new Client(phrase, binanceNetwork)
-                return some(right(client))
-              } catch (error) {
-                return some(left(error))
-              }
+          O.chain((phrase) => {
+            try {
+              const client = new Client(phrase, binanceNetwork)
+              return some(right(client)) as BinanceClientState
+            } catch (error) {
+              return some(left(error))
             }
-          )
+          })
         )
         observer.next(client)
       }) as Observable<BinanceClientState>
@@ -182,6 +176,24 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
  */
 const clientViewState$: Observable<BinanceClientStateForViews> = clientState$.pipe(
   map((clientState) => getBinanceClientStateForViews(clientState))
+)
+
+/**
+ * Current `Address` depending on selected network
+ *
+ * If a client is not available (e.g. by removing keystore), it returns `None`
+ *
+ */
+const address$: Observable<O.Option<Address>> = clientState$.pipe(
+  mergeMap((clientState) =>
+    Rx.of(
+      FP.pipe(
+        getBinanceClient(clientState),
+        O.chain((client) => some(client.getAddress()))
+      )
+    )
+  ),
+  shareReplay()
 )
 
 /**
@@ -232,5 +244,6 @@ export {
   setKeystoreState,
   clientViewState$,
   balancesState$,
-  reloadBalances
+  reloadBalances,
+  address$
 }
