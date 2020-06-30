@@ -43,14 +43,14 @@ const UserAccounts: UserAccountType[] = [
 
 type Props = {
   network: Network
-  changeNetwork?: (network: Network) => void
+  toggleNetwork?: () => void
   address: O.Option<Address>
   lockWallet?: () => void
   removeKeystore?: () => void
 }
 
 const WalletManage: React.FC<Props> = (props: Props): JSX.Element => {
-  const { network, changeNetwork = (_) => {}, address, lockWallet = () => {}, removeKeystore = () => {} } = props
+  const { network, toggleNetwork = () => {}, address, lockWallet = () => {}, removeKeystore = () => {} } = props
 
   const [chainId, setChainId] = useState<string | null>()
 
@@ -66,11 +66,6 @@ const WalletManage: React.FC<Props> = (props: Props): JSX.Element => {
     const keystring: string = localStorage.getItem('keystore') || ''
     return 'data:text/plain;charset=utf-8,' + encodeURIComponent(keystring)
   }, [])
-
-  const changeNetworkHandler = useCallback(() => {
-    const newNetwork = network === Network.MAIN ? Network.TEST : Network.MAIN
-    changeNetwork(newNetwork)
-  }, [changeNetwork, network])
 
   const removeWallet = useCallback(() => {
     removeKeystore()
@@ -138,9 +133,7 @@ const WalletManage: React.FC<Props> = (props: Props): JSX.Element => {
               <Paragraph>{chainId}</Paragraph>
             </Col>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
-              <Button onClick={changeNetworkHandler}>
-                Change to {network === Network.MAIN ? 'testnet' : 'mainnet'}
-              </Button>
+              <Button onClick={toggleNetwork}>Change to {network === Network.MAIN ? 'testnet' : 'mainnet'}</Button>
             </Col>
           </Row>
         </Card>

@@ -13,7 +13,7 @@ import { Network } from '../../services/app/types'
 const WalletSettingsScreen: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { lock, removeKeystore } = keystoreService
-  const { network$, changeNetwork } = useAppContext()
+  const { network$, toggleNetwork } = useAppContext()
   const { address$ } = useBinanceContext()
 
   const network = useObservableState(network$, Network.TEST)
@@ -24,7 +24,7 @@ const WalletSettingsScreen: React.FC = (): JSX.Element => {
       <Col span={24}>
         <WalleteManage
           network={network}
-          changeNetwork={changeNetwork}
+          toggleNetwork={toggleNetwork}
           address={address}
           lockWallet={lock}
           removeKeystore={removeKeystore}
