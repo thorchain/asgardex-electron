@@ -1,12 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { WS, Client, Network as BinanceNetwork } from '@thorchain/asgardex-binance'
+import { WS, Client, Network as BinanceNetwork, BinanceClient } from '@thorchain/asgardex-binance'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import { none, some } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, filter, catchError, retry, shareReplay, startWith, switchMap } from 'rxjs/operators'
+import { map, mergeMap, catchError, retry, shareReplay, startWith, switchMap } from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
 import { envOrDefault } from '../../helpers/envHelper'
@@ -15,7 +15,7 @@ import { Network } from '../app/types'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { BalancesRD, BinanceClientStateForViews, BinanceClientState } from './types'
-import { hasBinanceClient, getBinanceClientStateForViews, getBinanceClient } from './utils'
+import { getBinanceClientStateForViews, getBinanceClient } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -185,35 +185,12 @@ const clientViewState$: Observable<BinanceClientStateForViews> = clientState$.pi
 )
 
 /**
- * Helper stream to provide a ready-to-go BinanceClient.
- * It provides the latest BinanceClient, which is needed for any API call
- */
-const client$ = clientState$.pipe(
-  // Filter out instantiated `BinanceClient` only
-  filter(hasBinanceClient),
-  mergeMap((clientState) =>
-    FP.pipe(
-      clientState,
-      // unpack `BinanceClientState` from inner Either
-      getBinanceClient,
-      O.fold(
-        // will never happen due filter before
-        () => Rx.NEVER,
-        (client) => Rx.of(client)
-      )
-    )
-  )
-)
-
-/**
  * Observable to load balances from Binance API endpoint
+ * If client is not available, it returns an `initial` state
  */
-const loadBalances$ = (): Observable<BalancesRD> =>
-  client$.pipe(
-    mergeMap((client) => Rx.from(client.getBalance())),
-    // store result
-    map((balances) => RD.success(balances)),
-    // catch errors
+const loadBalances$ = (client: BinanceClient): Observable<BalancesRD> =>
+  Rx.from(client.getBalance()).pipe(
+    mergeMap((balances) => Rx.of(RD.success(balances))),
     catchError((error) => Rx.of(RD.failure(error))),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
@@ -223,11 +200,24 @@ const loadBalances$ = (): Observable<BalancesRD> =>
 const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
 
 /**
- * State of `Balances`, it will be loaded data by first subscription only
+ * State of `Balances`
+ *
+ * Data will be loaded by first subscription only
+ * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const balancesState$: Observable<BalancesRD> = reloadBalances$.pipe(
-  // start request and return state
-  switchMap((_) => loadBalances$()),
+const balancesState$: Observable<BalancesRD> = Rx.combineLatest(reloadBalances$, clientState$).pipe(
+  mergeMap(([_, clientState]) => {
+    const client = getBinanceClient(clientState)
+    return FP.pipe(
+      client,
+      O.fold(
+        // if a client is available, "reset" state to "initial"
+        () => Rx.of(RD.initial),
+        // or start request and return state
+        loadBalances$
+      )
+    )
+  }),
   // cache it to avoid reloading data by every subscription
   shareReplay()
 )
