@@ -1,14 +1,10 @@
 import { pipe, identity } from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { isSome, none, Option } from 'fp-ts/lib/Option'
+import { isSome, Option } from 'fp-ts/lib/Option'
 
 import { KeystoreState, KeystoreContent, Phrase } from './types'
 
-export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> =>
-  pipe(
-    state,
-    O.fold(() => none, identity)
-  )
+export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> => pipe(state, O.chain(identity))
 
 export const getPhrase = (state: KeystoreState): Option<Phrase> =>
   pipe(
