@@ -15,7 +15,7 @@ import { Network } from '../app/types'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { BalancesRD, BinanceClientStateForViews, BinanceClientState } from './types'
-import { hasBinanceClientState, getBinanceClientStateForViews, getBinanceClientState } from './utils'
+import { hasBinanceClient, getBinanceClientStateForViews, getBinanceClient } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -173,8 +173,7 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
         )
         observer.next(client)
       }) as Observable<BinanceClientState>
-  ),
-  shareReplay()
+  )
 )
 
 /**
@@ -191,12 +190,12 @@ const clientViewState$: Observable<BinanceClientStateForViews> = clientState$.pi
  */
 const client$ = clientState$.pipe(
   // Filter out instantiated `BinanceClient` only
-  filter(hasBinanceClientState),
+  filter(hasBinanceClient),
   mergeMap((clientState) =>
     FP.pipe(
       clientState,
       // unpack `BinanceClientState` from inner Either
-      getBinanceClientState,
+      getBinanceClient,
       O.fold(
         // will never happen due filter before
         () => Rx.NEVER,
