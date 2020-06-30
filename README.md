@@ -16,6 +16,7 @@ _(in alphabetical order)_
 - [Create React App](https://github.com/facebook/create-react-app)
 - [ESLint](https://github.com/eslint/eslint)
 - [Electron](https://github.com/electron/electron/)
+- [fp-ts](https://gcanti.github.io/fp-ts/)
 - [Jest](https://github.com/facebook/jest)
 - [Observable Hooks](https://observable-hooks.js.org/)
 - [Prettier](https://github.com/prettier/prettier)
