@@ -2,9 +2,12 @@ import React, { useMemo, useCallback, useState, useEffect } from 'react'
 
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
 import { useAppContext } from '../../contexts/AppContext'
+import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { Network } from '../../services/app/types'
 import { UserAccountType } from '../../types/wallet'
@@ -43,22 +46,22 @@ const UserAccounts: UserAccountType[] = [
 
 const WalletManage: React.FC = (): JSX.Element => {
   const [chainId, setChainId] = useState<string | null>()
-  const [address, setAddress] = useState<string | null>('')
 
   const { keystoreService } = useWalletContext()
   const { network$, changeNetwork } = useAppContext()
+  const { address$ } = useBinanceContext()
 
   const network = useObservableState(network$, Network.TEST)
+  const address = useObservableState(address$, O.none)
 
   async function setData() {
     // Temporary network client settings placeholders
-    setChainId('Binance-Nile')
-    setAddress(localStorage.getItem('address'))
+    setChainId('unknown')
   }
   useEffect(() => {
     setData()
   }, [])
-  const fileName = (): string | undefined => address?.concat('-keystore.txt')
+
   const downloadLink: string = useMemo(() => {
     const keystring: string = localStorage.getItem('keystore') || ''
     return 'data:text/plain;charset=utf-8,' + encodeURIComponent(keystring)
@@ -86,7 +89,7 @@ const WalletManage: React.FC = (): JSX.Element => {
           <Row>
             <Col span={12}>
               <Card bordered={false}>
-                <Button type="ghost" shape="round" block href={downloadLink} download={fileName()}>
+                <Button type="ghost" shape="round" block href={downloadLink} download={''}>
                   Export Keystore
                 </Button>
               </Card>
@@ -119,7 +122,12 @@ const WalletManage: React.FC = (): JSX.Element => {
           <Row>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Client Address:</Text>
-              <Paragraph ellipsis>{address}</Paragraph>
+              <Paragraph>
+                {FP.pipe(
+                  address,
+                  O.getOrElse(() => '')
+                )}
+              </Paragraph>
             </Col>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Keystore Version:</Text>
