@@ -16,6 +16,7 @@ _(in alphabetical order)_
 - [Create React App](https://github.com/facebook/create-react-app)
 - [ESLint](https://github.com/eslint/eslint)
 - [Electron](https://github.com/electron/electron/)
+- [fp-ts](https://gcanti.github.io/fp-ts/)
 - [Jest](https://github.com/facebook/jest)
 - [Observable Hooks](https://observable-hooks.js.org/)
 - [Prettier](https://github.com/prettier/prettier)
@@ -58,6 +59,39 @@ yarn test
 ```
 yarn package:electron
 ```
+
+## Keystore
+
+By creating a new wallet or importing an existing one, ASGARDEX is saving wallet's phrase encrypted in `keystore.json` on your machine in [Electron's `appData` folder](https://www.electronjs.org/docs/api/app#appgetpathname) at following location:
+
+### Windows
+
+```bash
+# ASGARDEX installed from *.exe
+%APPDATA%/ASGARDEX/storage/keystore.json
+# ASGARDEX built and run locally
+%APPDATA%/Electron/storage/keystore.json
+```
+
+### macOS
+
+```bash
+# ASGARDEX installed from *.dmg
+~/Library/Application Support/ASGARDEX/storage/keystore.json
+# ASGARDEX built and run locally
+~/Library/Application Support/Electron/storage/keystore.json
+```
+
+### Linux
+
+```bash
+# ASGARDEX installed from *.deb
+~/.config/ASGARDEX/storage/keystore.json
+# ASGARDEX built and run locally
+~/.config/Electron/storage/keystore.json
+```
+
+`keystore.json` can be removed in ASGARDEX by clicking "Remove wallet" in `Wallet -> Settings` or by removing it manually.
 
 ## Releasing
 
