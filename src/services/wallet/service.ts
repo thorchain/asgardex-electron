@@ -59,6 +59,7 @@ const addPhrase = async (state: KeystoreState, password: string) => {
     const keystore: CryptoKeystore = await fs.readJSON(KEY_FILE)
     const phrase = await decryptFromKeystore(keystore, password)
     setKeystoreState(some(some({ phrase })))
+    return Promise.resolve()
   } catch (error) {
     // TODO(@Veado) i18m
     return Promise.reject(`Could not decrypt phrase from keystore: ${error}`)
