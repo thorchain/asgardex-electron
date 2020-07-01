@@ -28,6 +28,7 @@ export const StyledMenu = styled(Menu)`
 
   .ant-menu-item a {
     color: ${palette('text', 0)};
+    text-transform: uppercase;
   }
 
   .ant-menu-item a:hover {

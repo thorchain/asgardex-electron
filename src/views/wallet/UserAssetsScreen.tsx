@@ -8,6 +8,7 @@ import { ColumnType } from 'antd/lib/table'
 import { Option, some, none } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import ErrorView from '../../components/shared/error/ErrorView'
@@ -19,6 +20,7 @@ import { TableWrapper } from './UserAssetsScreen.style'
 
 const UserAssetsScreen: React.FC = (): JSX.Element => {
   const history = useHistory()
+  const intl = useIntl()
 
   const { balancesState$ } = useBinanceContext()
   const balancesRD = useObservableState(balancesState$, RD.initial)
@@ -28,7 +30,6 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
 
   const iconColumn: ColumnType<Balance> = {
     key: 'icon',
-    // TODO(@Veado): i18n
     title: '',
     width: 1,
     dataIndex: 'symbol',
@@ -36,24 +37,21 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
   }
 
   const nameColumn: ColumnType<Balance> = {
-    // TODO(@Veado): i18n
-    title: 'Name',
+    title: intl.formatMessage({ id: 'wallet.column.name' }),
     align: 'left',
     dataIndex: 'symbol',
     render: (_, { symbol }) => <Label>{symbol}</Label>
   }
 
   const tickerColumn: ColumnType<Balance> = {
-    // TODO(@Veado): i18n
-    title: 'Ticker',
+    title: intl.formatMessage({ id: 'wallet.column.ticker' }),
     align: 'left',
     dataIndex: 'symbol',
     render: (_, { symbol }) => <Label>{getAssetFromString(`.${symbol}`)?.ticker ?? ''}</Label>
   }
 
   const balanceColumn: ColumnType<Balance> = {
-    // TODO(@Veado): i18n
-    title: 'Balance',
+    title: intl.formatMessage({ id: 'wallet.column.balance' }),
     align: 'left',
     dataIndex: 'free',
     render: (_, { free }) => {
@@ -65,8 +63,7 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
   }
 
   const priceColumn: ColumnType<Balance> = {
-    // TODO(@Veado): i18n
-    title: 'Value',
+    title: intl.formatMessage({ id: 'wallet.column.value' }),
     align: 'left',
     dataIndex: 'free',
     render: () => <Label>TODO</Label>
