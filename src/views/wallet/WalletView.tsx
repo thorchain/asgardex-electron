@@ -9,6 +9,7 @@ import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import View from '../View'
+import BondsView from './BondsView'
 import FundsReceiveScreen from './FundsReceiveScreen'
 import FundsSendScreen from './FundsSendScreen'
 import ImportsView from './ImportsView'
@@ -16,7 +17,6 @@ import StakesView from './StakesView'
 import UnlockView from './UnlockView'
 import UserAssetDetailsScreen from './UserAssetDetailsScreen'
 import UserAssetsScreen from './UserAssetsScreen'
-import UserBondsScreen from './UserBondsScreen'
 import WalletSettingsScreen from './WalletSettingsScreen'
 import WalletViewNav from './WalletViewNav'
 
@@ -50,7 +50,7 @@ const WalletView: React.FC = (): JSX.Element => {
         </Route>
         <Route path={walletRoutes.bonds.template} exact>
           <WalletViewNav />
-          <UserBondsScreen />
+          <BondsView />
         </Route>
         <Route path={walletRoutes.fundsReceive.template} exact>
           <FundsReceiveScreen />
