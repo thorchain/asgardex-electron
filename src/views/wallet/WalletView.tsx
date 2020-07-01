@@ -14,10 +14,10 @@ import BondsView from './BondsView'
 import FundsReceiveScreen from './FundsReceiveScreen'
 import FundsSendScreen from './FundsSendScreen'
 import ImportsView from './ImportsView'
+import SettingsView from './SettingsView'
 import StakesView from './StakesView'
 import UnlockView from './UnlockView'
 import UserAssetDetailsScreen from './UserAssetDetailsScreen'
-import WalletSettingsScreen from './WalletSettingsScreen'
 import WalletViewNav from './WalletViewNav'
 
 const WalletView: React.FC = (): JSX.Element => {
@@ -38,7 +38,7 @@ const WalletView: React.FC = (): JSX.Element => {
           <Redirect to={walletRoutes.assets.path()} />
         </Route>
         <Route path={walletRoutes.settings.template} exact>
-          <WalletSettingsScreen />
+          <SettingsView />
         </Route>
         <Route path={walletRoutes.assets.template} exact>
           <WalletViewNav />

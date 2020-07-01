@@ -10,7 +10,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { Network } from '../../services/app/types'
 
-const WalletSettingsScreen: React.FC = (): JSX.Element => {
+const SettingsView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { lock, removeKeystore } = keystoreService
   const { network$, toggleNetwork } = useAppContext()
@@ -34,4 +34,4 @@ const WalletSettingsScreen: React.FC = (): JSX.Element => {
   )
 }
 
-export default WalletSettingsScreen
+export default SettingsView
