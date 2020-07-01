@@ -7,23 +7,26 @@ import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
 import { Option, some, none } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
-import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import ErrorView from '../../components/shared/error/ErrorView'
 import Coin from '../../components/uielements/coins/coin'
 import Label from '../../components/uielements/label'
-import { useBinanceContext } from '../../contexts/BinanceContext'
 import * as walletRoutes from '../../routes/wallet'
-import { TableWrapper } from './UserAssetsScreen.style'
+import { BalancesRD } from '../../services/binance/types'
+import Button from '../uielements/button'
+import { TableWrapper } from './AssetsTable.style'
 
-const UserAssetsScreen: React.FC = (): JSX.Element => {
+type Props = {
+  balances: BalancesRD
+  reloadBalancesHandler?: () => void
+}
+
+const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
+  const { balances: balancesRD, reloadBalancesHandler = () => {} } = props
   const history = useHistory()
   const intl = useIntl()
-
-  const { balancesState$ } = useBinanceContext()
-  const balancesRD = useObservableState(balancesState$, RD.initial)
 
   // store previous data of balances to still render these while reloading new data
   const previousBalances = useRef<Option<Balances>>(none)
@@ -120,10 +123,13 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
   )
 
   return (
-    <Row>
-      <Col span={24}>{renderAssets}</Col>
-    </Row>
+    <>
+      <Button onClick={reloadBalancesHandler}>Refresh</Button>
+      <Row>
+        <Col span={24}>{renderAssets}</Col>
+      </Row>
+    </>
   )
 }
 
-export default UserAssetsScreen
+export default AssetsTable
