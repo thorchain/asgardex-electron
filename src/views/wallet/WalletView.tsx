@@ -4,6 +4,7 @@ import * as H from 'history'
 import { useObservableState } from 'observable-hooks'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
+import AssetsNav from '../../components/wallet/AssetsNav'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
@@ -13,12 +14,11 @@ import AssetDetailsView from './AssetDetailsView'
 import AssetsView from './AssetsView'
 import BondsView from './BondsView'
 import FundsReceiveScreen from './FundsReceiveScreen'
-import FundsSendScreen from './FundsSendScreen'
 import ImportsView from './ImportsView'
+import SendView from './SendView'
 import SettingsView from './SettingsView'
 import StakesView from './StakesView'
 import UnlockView from './UnlockView'
-import WalletViewNav from './WalletViewNav'
 
 const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
@@ -41,22 +41,22 @@ const WalletView: React.FC = (): JSX.Element => {
           <SettingsView />
         </Route>
         <Route path={walletRoutes.assets.template} exact>
-          <WalletViewNav />
+          <AssetsNav />
           <AssetsView />
         </Route>
         <Route path={walletRoutes.stakes.template} exact>
-          <WalletViewNav />
+          <AssetsNav />
           <StakesView />
         </Route>
         <Route path={walletRoutes.bonds.template} exact>
-          <WalletViewNav />
+          <AssetsNav />
           <BondsView />
         </Route>
         <Route path={walletRoutes.fundsReceive.template} exact>
           <FundsReceiveScreen />
         </Route>
         <Route path={walletRoutes.fundsSend.template} exact>
-          <FundsSendScreen />
+          <SendView />
         </Route>
         <Route path={walletRoutes.assetDetails.template} exact>
           <AssetDetailsView />
