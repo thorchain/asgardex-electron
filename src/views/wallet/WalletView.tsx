@@ -4,21 +4,21 @@ import * as H from 'history'
 import { useObservableState } from 'observable-hooks'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
+import AssetsNav from '../../components/wallet/AssetsNav'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import View from '../View'
+import AssetDetailsView from './AssetDetailsView'
 import AssetsView from './AssetsView'
 import BondsView from './BondsView'
-import FundsReceiveScreen from './FundsReceiveScreen'
-import FundsSendScreen from './FundsSendScreen'
 import ImportsView from './ImportsView'
+import ReceiveView from './ReceiveView'
+import SendView from './SendView'
+import SettingsView from './SettingsView'
 import StakesView from './StakesView'
 import UnlockView from './UnlockView'
-import UserAssetDetailsScreen from './UserAssetDetailsScreen'
-import WalletSettingsScreen from './WalletSettingsScreen'
-import WalletViewNav from './WalletViewNav'
 
 const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
@@ -38,28 +38,28 @@ const WalletView: React.FC = (): JSX.Element => {
           <Redirect to={walletRoutes.assets.path()} />
         </Route>
         <Route path={walletRoutes.settings.template} exact>
-          <WalletSettingsScreen />
+          <SettingsView />
         </Route>
         <Route path={walletRoutes.assets.template} exact>
-          <WalletViewNav />
+          <AssetsNav />
           <AssetsView />
         </Route>
         <Route path={walletRoutes.stakes.template} exact>
-          <WalletViewNav />
+          <AssetsNav />
           <StakesView />
         </Route>
         <Route path={walletRoutes.bonds.template} exact>
-          <WalletViewNav />
+          <AssetsNav />
           <BondsView />
         </Route>
         <Route path={walletRoutes.fundsReceive.template} exact>
-          <FundsReceiveScreen />
+          <ReceiveView />
         </Route>
         <Route path={walletRoutes.fundsSend.template} exact>
-          <FundsSendScreen />
+          <SendView />
         </Route>
         <Route path={walletRoutes.assetDetails.template} exact>
-          <UserAssetDetailsScreen />
+          <AssetDetailsView />
         </Route>
       </Switch>
     ),

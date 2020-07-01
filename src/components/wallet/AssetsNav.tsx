@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl'
 import { useRouteMatch, Link } from 'react-router-dom'
 
 import * as walletRoutes from '../../routes/wallet'
-import { StyledMenu } from './WalletViewNav.style'
+import { StyledMenu } from './AssetsNav.style'
 
 enum MenuKey {
   ASSETS = 'assets',
@@ -20,7 +20,7 @@ type MenuType = {
   path: string
 }
 
-export const WalletViewNav: React.FC = (): JSX.Element => {
+export const AssetsNav: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
   const menuItems = useMemo(
@@ -71,4 +71,4 @@ export const WalletViewNav: React.FC = (): JSX.Element => {
     </StyledMenu>
   )
 }
-export default WalletViewNav
+export default AssetsNav

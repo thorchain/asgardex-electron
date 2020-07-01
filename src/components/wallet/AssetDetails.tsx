@@ -3,12 +3,12 @@ import React from 'react'
 import { Row, Col, Typography, Divider, Button, Card } from 'antd'
 import { useParams, useHistory } from 'react-router-dom'
 
-import DynamicCoin from '../../components/shared/icons/DynamicCoin'
-import TransactionsTable from '../../components/wallet/UserTransactionsTable'
 import { shortSymbol } from '../../helpers/tokenHelpers'
 import { AssetDetailsRouteParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { UserTransactionType, UserAssetType } from '../../types/wallet'
+import DynamicCoin from '../shared/icons/DynamicCoin'
+import TransactionsTable from './UserTransactionsTable'
 
 const { Title } = Typography
 
@@ -37,7 +37,7 @@ const txs: UserTransactionType[] = [
   }
 ]
 
-const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
+const AssetDetails: React.FC = (): JSX.Element => {
   const { symbol } = useParams<AssetDetailsRouteParams>()
   const history = useHistory()
   // Dummy data
@@ -125,4 +125,4 @@ const UserAssetDetailsScreen: React.FC = (): JSX.Element => {
     </Row>
   )
 }
-export default UserAssetDetailsScreen
+export default AssetDetails
