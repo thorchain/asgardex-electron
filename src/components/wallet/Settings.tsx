@@ -49,7 +49,7 @@ type Props = {
   removeKeystore?: () => void
 }
 
-const WalletManage: React.FC<Props> = (props: Props): JSX.Element => {
+const Settings: React.FC<Props> = (props: Props): JSX.Element => {
   const { network, toggleNetwork = () => {}, address, lockWallet = () => {}, removeKeystore = () => {} } = props
 
   const [chainId, setChainId] = useState<string | null>()
@@ -173,4 +173,4 @@ const WalletManage: React.FC<Props> = (props: Props): JSX.Element => {
   )
 }
 
-export default WalletManage
+export default Settings

@@ -4,7 +4,7 @@ import { Row, Col } from 'antd'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
-import WalleteManage from '../../components/wallet/WalletManage'
+import Settings from '../../components/wallet/Settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -22,7 +22,7 @@ const SettingsView: React.FC = (): JSX.Element => {
   return (
     <Row>
       <Col span={24}>
-        <WalleteManage
+        <Settings
           network={network}
           toggleNetwork={toggleNetwork}
           address={address}
