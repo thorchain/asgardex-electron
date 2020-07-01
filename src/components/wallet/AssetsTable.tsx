@@ -8,27 +8,29 @@ import { Row, Col, Table } from 'antd'
 import { ColumnType } from 'antd/lib/table'
 import { Option, some, none } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
-import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
-import ErrorView from '../../components/shared/error/ErrorView'
-import DynamicCoin from '../../components/shared/icons/DynamicCoin'
-import Button from '../../components/uielements/button'
-import Label from '../../components/uielements/label'
-import { useBinanceContext } from '../../contexts/BinanceContext'
 import * as walletRoutes from '../../routes/wallet'
+import { BalancesRD } from '../../services/binance/types'
+import ErrorView from '../shared/error/ErrorView'
+import DynamicCoin from '../shared/icons/DynamicCoin'
+import Button from '../uielements/button'
+import Label from '../uielements/label'
 
-const UserAssetsScreen: React.FC = (): JSX.Element => {
+type Props = {
+  balances: BalancesRD
+  reloadBalancesHandler?: () => void
+}
+
+const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
+  const { balances: balancesRD, reloadBalancesHandler = () => {} } = props
   const history = useHistory()
-
-  const { balancesState$, reloadBalances } = useBinanceContext()
-  const balancesRD = useObservableState(balancesState$, RD.initial)
 
   // store previous data of balances to still render these while reloading new data
   const previousBalances = useRef<Option<Balances>>(none)
 
   const clickReloadHandler = () => {
-    reloadBalances()
+    reloadBalancesHandler()
   }
 
   const iconColumn: ColumnType<Balance> = {
@@ -135,4 +137,4 @@ const UserAssetsScreen: React.FC = (): JSX.Element => {
   )
 }
 
-export default UserAssetsScreen
+export default AssetsTable
