@@ -11,7 +11,6 @@ import { I18nProvider } from './contexts/I18nContext'
 import { MidgardProvider } from './contexts/MidgardContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { WalletProvider } from './contexts/WalletContext'
-import GlobalStyle from './Global.style'
 import { envOrDefault } from './helpers/envHelper'
 import ViewRoutes from './views/ViewRoutes'
 
@@ -20,7 +19,6 @@ type Props = {}
 const AppView: React.FC<Props> = (_): JSX.Element => {
   return (
     <>
-      <GlobalStyle />
       <AppWrapper>
         <AppLayout>
           <Header />
