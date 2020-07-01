@@ -7,7 +7,7 @@ import AccountSelector from './AccountSelector'
 
 const { Title } = Typography
 
-const SendForm: React.FC = (): JSX.Element => {
+const Send: React.FC = (): JSX.Element => {
   const onSubmit = (data: Store) => {
     console.log(data)
   }
@@ -37,4 +37,4 @@ const SendForm: React.FC = (): JSX.Element => {
   )
 }
 
-export default SendForm
+export default Send

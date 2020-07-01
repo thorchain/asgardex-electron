@@ -1,9 +1,9 @@
 import React from 'react'
 
-import SendForm from '../../components/wallet/SendForm'
+import Send from '../../components/wallet/Send'
 
 const SendView: React.FC = (): JSX.Element => {
-  return <SendForm />
+  return <Send />
 }
 
 export default SendView
