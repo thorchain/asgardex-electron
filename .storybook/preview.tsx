@@ -10,7 +10,6 @@ import { AppProvider } from '../src/contexts/AppContext'
 import { ThemeProvider } from '../src/contexts/ThemeContext'
 import { I18nProvider } from '../src/contexts/I18nContext'
 import { AppWrapper } from '../src/App.style'
-import GlobalStyle from '../src/Global.style'
 
 const lightTheme = { name: 'Light', ...themes.light }
 const darkTheme = { name: 'Dark', ...themes.dark }
@@ -21,7 +20,6 @@ const providerFn = ({ theme, children }) => (
   <AppProvider>
     <I18nProvider>
       <ThemeProvider theme={theme}>
-        <GlobalStyle />
         <AppWrapper>{children}</AppWrapper>
       </ThemeProvider>
     </I18nProvider>

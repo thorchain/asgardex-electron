@@ -1,11 +1,29 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
-    'Droid Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/*
+Since `createGlobalStyle` of `styled-components` re-loads fonts in some cases (and for unknown reasons),
+which ends up in flickering texts, we do defined all fonts and other "global" styles here
+*/
+
+@font-face {
+  font-family: 'MainFontRegular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('MainFontBold'), url(./assets/fonts/Exo2-Regular.otf) format('opentype');
+}
+@font-face {
+  font-family: 'MainFontBold';
+  font-style: normal;
+  font-weight: normal;
+  src: local('MainFontBold'), url(./assets/fonts/Exo2-Bold.otf) format('opentype');
+}
+@font-face {
+  font-family: 'MainFontSemiBold';
+  font-style: normal;
+  font-weight: normal;
+  src: local('MainFontSemiBold'), url(./assets/fonts/Exo2-SemiBold.otf) format('opentype');
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+html,
+body {
+  margin: 0;
+  font-family: 'MainFontRegular';
 }
