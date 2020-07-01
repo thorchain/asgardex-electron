@@ -13,8 +13,8 @@ import View from '../View'
 import AssetDetailsView from './AssetDetailsView'
 import AssetsView from './AssetsView'
 import BondsView from './BondsView'
-import FundsReceiveScreen from './FundsReceiveScreen'
 import ImportsView from './ImportsView'
+import ReceiveView from './ReceiveView'
 import SendView from './SendView'
 import SettingsView from './SettingsView'
 import StakesView from './StakesView'
@@ -53,7 +53,7 @@ const WalletView: React.FC = (): JSX.Element => {
           <BondsView />
         </Route>
         <Route path={walletRoutes.fundsReceive.template} exact>
-          <FundsReceiveScreen />
+          <ReceiveView />
         </Route>
         <Route path={walletRoutes.fundsSend.template} exact>
           <SendView />
