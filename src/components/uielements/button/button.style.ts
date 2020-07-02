@@ -14,6 +14,10 @@ const fontSettings = {
     size: key('sizes.font.normal', '11px'),
     spacing: '2.5px'
   },
+  xnormal: {
+    size: key('sizes.font.xnormal', '16px'),
+    spacing: '2.5px'
+  },
   big: {
     size: key('sizes.font.large', '18px'),
     spacing: '2.5px'
@@ -29,6 +33,11 @@ const sizes = {
   normal: {
     width: key('sizes.button.normal.width', '100px'),
     height: key('sizes.button.normal.height', '30px'),
+    borderBottom: '3px'
+  },
+  xnormal: {
+    width: key('sizes.button.xnormal.width', '180px'),
+    height: key('sizes.button.xnormal.height', '38px'),
     borderBottom: '3px'
   },
   big: {

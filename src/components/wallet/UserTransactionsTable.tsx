@@ -1,80 +1,85 @@
 import React from 'react'
 
-import { Typography, Table } from 'antd'
+import { Table } from 'antd'
+import { useIntl } from 'react-intl'
 
 import { shortSymbol } from '../../helpers/tokenHelpers'
 import { transactionParty } from '../../helpers/transactionHelpers'
 import { UserTransactionType } from '../../types/wallet'
+import { StyledTable, StyledText, StyledLink } from './UserTransactionTable.style'
 
-const { Text } = Typography
+type Props = {
+  transactions: UserTransactionType[]
+}
 
-type Props = { transactions: UserTransactionType[] }
 const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
+  const intl = useIntl()
+
   const address = 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y'
   const party = (tx: UserTransactionType) => {
     return transactionParty(address, tx)
   }
   return (
-    <Table size="small" dataSource={transactions} rowKey="_id" pagination={false}>
+    <StyledTable dataSource={transactions} rowKey="_id" pagination={false}>
       <Table.Column
-        title="Type"
+        title={intl.formatMessage({ id: 'wallet.transaction.table.type' })}
         dataIndex="txType"
-        width="1px"
-        render={(value, tx: UserTransactionType) => {
+        align="left"
+        render={(_, tx: UserTransactionType) => {
           const p = party(tx)
-          return <span style={{ textTransform: 'uppercase' }}>{p.msg}</span>
+          return <StyledText>{p.msg}</StyledText>
         }}
       />
       <Table.Column
-        title="Party"
-        dataIndex="Type"
-        render={(value, tx: UserTransactionType) => {
-          const p = party(tx)
-          return <Text strong>{p.label}:&nbsp;</Text>
-        }}
-      />
-      <Table.Column
-        title="Address"
+        title={intl.formatMessage({ id: 'wallet.transaction.table.address' })}
         dataIndex="txFrom"
-        render={(value, tx: UserTransactionType) => {
+        align="left"
+        render={(_, tx: UserTransactionType) => {
           const p = party(tx)
-          return (
-            <Text ellipsis style={{ fontFamily: 'monospace' }}>
-              {p.address}
-            </Text>
-          )
+          return <StyledText>{p.address}</StyledText>
         }}
       />
       <Table.Column
-        title="Amount"
+        title={intl.formatMessage({ id: 'wallet.transaction.table.to' })}
+        dataIndex="Type"
+        align="left"
+        render={(_, tx: UserTransactionType) => {
+          const p = party(tx)
+          return <StyledText>{p.label}:&nbsp;</StyledText>
+        }}
+      />
+      <Table.Column
+        title={intl.formatMessage({ id: 'wallet.transaction.table.amount' })}
         dataIndex="txValue"
-        align="right"
+        align="left"
         width="1px"
-        render={(value, tx: UserTransactionType) => {
+        render={(_, tx: UserTransactionType) => {
           const p = party(tx)
           return (
-            <Text>
+            <StyledText>
               {p.op}
               {tx.value}&nbsp;
-            </Text>
+            </StyledText>
           )
         }}
       />
       <Table.Column
-        title="Asset"
+        title={intl.formatMessage({ id: 'wallet.transaction.table.coin' })}
         dataIndex="txAsset"
+        align="left"
         render={(value: string) => {
-          return <Text type="secondary">{shortSymbol(value)}</Text>
+          return <StyledText>{shortSymbol(value)}</StyledText>
         }}
       />
       <Table.Column
-        title="Link"
+        title=""
         dataIndex="txHash"
+        align="left"
         render={() => {
-          return <div>LINK</div>
+          return <StyledLink>LINK</StyledLink>
         }}
       />
-    </Table>
+    </StyledTable>
   )
 }
 export default TransactionsTable

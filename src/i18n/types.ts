@@ -20,6 +20,13 @@ export type WalletMessages = {
   'wallet.column.ticker': string
   'wallet.column.balance': string
   'wallet.column.value': string
+  'wallet.action.send': string
+  'wallet.action.receive': string
+  'wallet.transaction.table.type': string
+  'wallet.transaction.table.address': string
+  'wallet.transaction.table.to': string
+  'wallet.transaction.table.amount': string
+  'wallet.transaction.table.coin': string
 }
 
 export type Messages = CommonMessages & PoolsMessages & WalletMessages
