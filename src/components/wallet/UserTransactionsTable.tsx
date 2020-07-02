@@ -22,7 +22,7 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
   return (
     <StyledTable dataSource={transactions} rowKey="_id" pagination={false}>
       <Table.Column
-        title={intl.formatMessage({ id: 'wallet.transaction.table.type' })}
+        title={intl.formatMessage({ id: 'common.type' })}
         dataIndex="txType"
         align="left"
         render={(_, tx: UserTransactionType) => {
@@ -31,7 +31,7 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
         }}
       />
       <Table.Column
-        title={intl.formatMessage({ id: 'wallet.transaction.table.address' })}
+        title={intl.formatMessage({ id: 'common.address' })}
         dataIndex="txFrom"
         align="left"
         render={(_, tx: UserTransactionType) => {
@@ -40,7 +40,7 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
         }}
       />
       <Table.Column
-        title={intl.formatMessage({ id: 'wallet.transaction.table.to' })}
+        title={intl.formatMessage({ id: 'common.to' })}
         dataIndex="Type"
         align="left"
         render={(_, tx: UserTransactionType) => {
@@ -49,10 +49,9 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
         }}
       />
       <Table.Column
-        title={intl.formatMessage({ id: 'wallet.transaction.table.amount' })}
+        title={intl.formatMessage({ id: 'common.amount' })}
         dataIndex="txValue"
         align="left"
-        width="1px"
         render={(_, tx: UserTransactionType) => {
           const p = party(tx)
           return (
@@ -64,7 +63,7 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
         }}
       />
       <Table.Column
-        title={intl.formatMessage({ id: 'wallet.transaction.table.coin' })}
+        title={intl.formatMessage({ id: 'common.coin' })}
         dataIndex="txAsset"
         align="left"
         render={(value: string) => {

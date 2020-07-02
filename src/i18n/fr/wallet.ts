@@ -10,12 +10,7 @@ const wallet: WalletMessages = {
   'wallet.column.balance': 'Balance - FR',
   'wallet.column.value': 'Value - FR',
   'wallet.action.send': 'Send - FR',
-  'wallet.action.receive': 'Receive - FR',
-  'wallet.transaction.table.type': 'Type - FR',
-  'wallet.transaction.table.address': 'Address - FR',
-  'wallet.transaction.table.to': 'To - FR',
-  'wallet.transaction.table.amount': 'Amount - FR',
-  'wallet.transaction.table.coin': 'Coin - FR'
+  'wallet.action.receive': 'Receive - FR'
 }
 
 export default wallet

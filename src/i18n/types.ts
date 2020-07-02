@@ -4,6 +4,11 @@ export type CommonMessages = {
   'common.stats': string
   'common.network': string
   'common.faqs': string
+  'common.type': string
+  'common.address': string
+  'common.to': string
+  'common.amount': string
+  'common.coin': string
 }
 
 export type PoolsMessages = {
@@ -22,11 +27,6 @@ export type WalletMessages = {
   'wallet.column.value': string
   'wallet.action.send': string
   'wallet.action.receive': string
-  'wallet.transaction.table.type': string
-  'wallet.transaction.table.address': string
-  'wallet.transaction.table.to': string
-  'wallet.transaction.table.amount': string
-  'wallet.transaction.table.coin': string
 }
 
 export type Messages = CommonMessages & PoolsMessages & WalletMessages
