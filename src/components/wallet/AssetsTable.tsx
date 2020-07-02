@@ -13,18 +13,21 @@ import { useHistory } from 'react-router-dom'
 import ErrorView from '../../components/shared/error/ErrorView'
 import Coin from '../../components/uielements/coins/coin'
 import Label from '../../components/uielements/label'
+import { RUNE_PRICE_POOL } from '../../const'
 import * as walletRoutes from '../../routes/wallet'
 import { BalancesRD } from '../../services/binance/types'
+import { PricePool } from '../../views/pools/types'
 import Button from '../uielements/button'
 import { TableWrapper } from './AssetsTable.style'
 
 type Props = {
   balances: BalancesRD
+  pricePool?: PricePool
   reloadBalancesHandler?: () => void
 }
 
 const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
-  const { balances: balancesRD, reloadBalancesHandler = () => {} } = props
+  const { balances: balancesRD, reloadBalancesHandler = () => {}, pricePool: _ = RUNE_PRICE_POOL } = props
   const history = useHistory()
   const intl = useIntl()
 

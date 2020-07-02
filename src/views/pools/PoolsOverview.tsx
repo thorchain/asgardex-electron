@@ -17,7 +17,6 @@ import Coin from '../../components/uielements/coins/coin'
 import Label from '../../components/uielements/label'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
-import { RUNE_PRICE_POOL } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getPoolTableRowsData, hasPendingPools } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
@@ -25,7 +24,7 @@ import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { PoolsState } from '../../services/midgard/types'
-import { selectedPricePoolSelector } from '../../services/midgard/utils'
+import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import View from '../View'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
@@ -75,11 +74,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
 
-  const pricePool = useMemo(() => {
-    const pools = RD.toNullable(poolsRD)
-    const pricePools = pools && O.toNullable(pools.pricePools)
-    return (pricePools && selectedPricePoolSelector(pricePools, selectedPricePoolAsset)) || RUNE_PRICE_POOL
-  }, [poolsRD, selectedPricePoolAsset])
+  const pricePool = useMemo(() => pricePoolSelectorFromRD(poolsRD, selectedPricePoolAsset), [
+    poolsRD,
+    selectedPricePoolAsset
+  ])
 
   const clickSwapHandler = (p: SwapRouteParams) => {
     history.push(swapRoutes.swap.path(p))

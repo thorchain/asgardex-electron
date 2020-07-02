@@ -1,12 +1,13 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { getAssetFromString } from '@thorchain/asgardex-util'
 import { head } from 'fp-ts/lib/NonEmptyArray'
-import { Option, toNullable, none, some, isNone } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
 
 import { RUNE_PRICE_POOL, CURRENCY_WHEIGHTS } from '../../const'
 import { toPoolData } from '../../helpers/poolHelper'
 import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool, PoolAsset } from '../../views/pools/types'
-import { AssetDetails, AssetDetailMap, PoolDetails } from './types'
+import { AssetDetails, AssetDetailMap, PoolDetails, PoolsStateRD, SelectedPricePoolAsset } from './types'
 
 export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} => {
   let assetDataIndex = {}
@@ -23,15 +24,15 @@ export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} =
   return assetDataIndex
 }
 
-export const getAssetDetail = (assets: AssetDetails, ticker: string): Option<AssetDetail> =>
-  assets.reduce((acc: Option<AssetDetail>, asset: AssetDetail) => {
-    if (isNone(acc)) {
+export const getAssetDetail = (assets: AssetDetails, ticker: string): O.Option<AssetDetail> =>
+  assets.reduce((acc: O.Option<AssetDetail>, asset: AssetDetail) => {
+    if (O.isNone(acc)) {
       const { asset: a = '' } = asset
       const { ticker: t } = getAssetFromString(a)
-      return ticker === t ? some(asset) : none
+      return ticker === t ? O.some(asset) : O.none
     }
     return acc
-  }, none)
+  }, O.none)
 
 export const getPricePools = (pools: PoolDetails, whitelist: PricePoolAssets): PricePools => {
   const poolDetails = pools.filter(
@@ -53,8 +54,11 @@ export const getPricePools = (pools: PoolDetails, whitelist: PricePoolAssets): P
   return [RUNE_PRICE_POOL, ...pricePools]
 }
 
-export const selectedPricePoolSelector = (pools: PricePools, oAsset: Option<PricePoolAsset>) => {
-  const asset = toNullable(oAsset)
+/**
+ * Returns price pool depending on selected `PricePoolAsset`
+ */
+export const pricePoolSelector = (pools: PricePools, selectedAsset: O.Option<PricePoolAsset>) => {
+  const asset = O.toNullable(selectedAsset)
   // Check if prev. selected pool is still available
   const prevPool = asset && pools.find((pool) => pool.asset === asset)
   if (prevPool) {
@@ -64,4 +68,13 @@ export const selectedPricePoolSelector = (pools: PricePools, oAsset: Option<Pric
   // Use TUSDB or use "RUNE" pool (which is always the first pool")
   const tusdbPool = pools.find((pool) => pool.asset === PoolAsset.TUSDB)
   return tusdbPool || head(pools)
+}
+
+/**
+ * Similar to `pricePoolSelector`, but taking `PoolsStateRD` instead of `PoolsState`
+ */
+export const pricePoolSelectorFromRD = (poolsRD: PoolsStateRD, selectedPricePoolAsset: SelectedPricePoolAsset) => {
+  const pools = RD.toNullable(poolsRD)
+  const pricePools = pools && O.toNullable(pools.pricePools)
+  return (pricePools && pricePoolSelector(pricePools, selectedPricePoolAsset)) || RUNE_PRICE_POOL
 }
