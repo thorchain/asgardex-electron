@@ -1,12 +1,20 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { AssetTicker } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { RUNE_TICKER, PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, RUNE_PRICE_POOL } from '../../const'
+import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, RUNE_PRICE_POOL } from '../../const'
 import { toPoolData } from '../../helpers/poolHelper'
 import { ThorchainEndpoint, AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PoolAsset, PricePool, PricePools } from '../../views/pools/types'
 import { PoolsState, PoolsStateRD } from './types'
-import { getAssetDetailIndex, getAssetDetail, getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
+import {
+  getAssetDetailIndex,
+  getAssetDetail,
+  getPricePools,
+  pricePoolSelector,
+  pricePoolSelectorFromRD,
+  getPoolDetail
+} from './utils'
 
 type PoolDataMock = { asset?: string }
 
@@ -34,12 +42,12 @@ describe('services/midgard/utils/', () => {
     })
   })
 
-  describe('getDetail', () => {
+  describe('getAssetDetail', () => {
     const runeDetail: AssetDetail = { asset: PoolAsset.RUNE }
     const bnbDetail: AssetDetail = { asset: PoolAsset.BNB }
 
     it('returns details of RUNE', () => {
-      const result = getAssetDetail([runeDetail, bnbDetail], RUNE_TICKER)
+      const result = getAssetDetail([runeDetail, bnbDetail], AssetTicker.RUNE)
       expect(result).toEqual(O.some(runeDetail))
     })
     it('returns None if no RUNE details available', () => {
@@ -172,6 +180,20 @@ describe('services/midgard/utils/', () => {
     it('selects RUNE pool by default if loading other price pools failed', () => {
       const pool = pricePoolSelectorFromRD(RD.failure(new Error('Could not load pools')), O.none)
       expect(pool.asset).toEqual(PoolAsset.RUNE)
+    })
+  })
+
+  describe('getPoolDetail', () => {
+    const runeDetail: PoolDetail = { asset: PoolAsset.RUNE }
+    const bnbDetail: PoolDetail = { asset: PoolAsset.BNB }
+
+    it('returns details of RUNE pool', () => {
+      const result = getPoolDetail([runeDetail, bnbDetail], AssetTicker.RUNE)
+      expect(result).toEqual(O.some(runeDetail))
+    })
+    it('returns None if no RUNE details available', () => {
+      const result = getPoolDetail([bnbDetail], 'TOMOB')
+      expect(result).toBeNone()
     })
   })
 })

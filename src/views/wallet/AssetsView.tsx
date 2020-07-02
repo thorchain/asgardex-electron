@@ -28,7 +28,16 @@ const AssetsView: React.FC = (): JSX.Element => {
     selectedPricePoolAsset
   ])
 
-  return <AssetsTable balances={balancesRD} reloadBalancesHandler={reloadBalances} pricePool={pricePool} />
+  const poolDetails = RD.toNullable(poolsRD)?.poolDetails ?? []
+
+  return (
+    <AssetsTable
+      balances={balancesRD}
+      reloadBalancesHandler={reloadBalances}
+      pricePool={pricePool}
+      poolDetails={poolDetails}
+    />
+  )
 }
 
 export default AssetsView

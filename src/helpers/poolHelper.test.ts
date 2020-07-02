@@ -2,8 +2,9 @@ import { PoolData, assetAmount, assetToBase } from '@thorchain/asgardex-util'
 import { some } from 'fp-ts/lib/Option'
 
 import { PoolDetails } from '../services/midgard/types'
+import { toPoolData } from '../services/midgard/utils'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
-import { filterPendingPools, getDeepestPool, getPoolTableRowsData, toPoolData } from './poolHelper'
+import { filterPendingPools, getDeepestPool, getPoolTableRowsData } from './poolHelper'
 
 describe('helpers/poolHelper/', () => {
   const pool1: PoolDetail = { status: PoolDetailStatusEnum.Bootstrapped, runeDepth: '1000' }

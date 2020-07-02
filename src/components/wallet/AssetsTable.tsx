@@ -2,9 +2,10 @@ import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Balances, Balance } from '@thorchain/asgardex-binance'
-import { getAssetFromString, assetAmount, bnOrZero, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { assetAmount, bnOrZero, formatAssetAmountCurrency, baseToAsset } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
+import * as FP from 'fp-ts/lib/function'
 import { Option, some, none } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -16,6 +17,8 @@ import Label from '../../components/uielements/label'
 import { RUNE_PRICE_POOL } from '../../const'
 import * as walletRoutes from '../../routes/wallet'
 import { BalancesRD } from '../../services/binance/types'
+import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue } from '../../services/binance/utils'
+import { PoolDetails } from '../../services/midgard/types'
 import { PricePool } from '../../views/pools/types'
 import Button from '../uielements/button'
 import { TableWrapper } from './AssetsTable.style'
@@ -23,11 +26,13 @@ import { TableWrapper } from './AssetsTable.style'
 type Props = {
   balances: BalancesRD
   pricePool?: PricePool
+  poolDetails: PoolDetails
   reloadBalancesHandler?: () => void
 }
 
 const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
-  const { balances: balancesRD, reloadBalancesHandler = () => {}, pricePool: _ = RUNE_PRICE_POOL } = props
+  const { balances: balancesRD, reloadBalancesHandler = () => {}, pricePool = RUNE_PRICE_POOL, poolDetails } = props
+
   const history = useHistory()
   const intl = useIntl()
 
@@ -53,17 +58,20 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     title: intl.formatMessage({ id: 'wallet.column.ticker' }),
     align: 'left',
     dataIndex: 'symbol',
-    render: (_, { symbol }) => <Label>{getAssetFromString(`.${symbol}`)?.ticker ?? ''}</Label>
+    render: (_, { symbol }) => {
+      const { ticker = '' } = bncSymbolToAsset(symbol)
+      return <Label>{ticker}</Label>
+    }
   }
 
   const balanceColumn: ColumnType<Balance> = {
     title: intl.formatMessage({ id: 'wallet.column.balance' }),
     align: 'left',
     dataIndex: 'free',
-    render: (_, { free }) => {
+    render: (_, { free, symbol }) => {
       const amount = assetAmount(bnOrZero(free))
-      // TODO (@Veado) Get currency from symbol
-      const label = formatAssetAmountCurrency(amount, '', 3)
+      const asset = bncSymbolToAssetString(symbol)
+      const label = formatAssetAmountCurrency(amount, asset, 3)
       return <Label>{label}</Label>
     }
   }
@@ -72,7 +80,21 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     title: intl.formatMessage({ id: 'wallet.column.value' }),
     align: 'left',
     dataIndex: 'free',
-    render: () => <Label>TODO</Label>
+    render: (_, balance) => {
+      const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
+      const label = FP.pipe(
+        oPrice,
+        O.map((price) => formatAssetAmountCurrency(baseToAsset(price), pricePool.asset, 3)),
+        O.getOrElse(() => '')
+      )
+      return <Label>{label}</Label>
+    },
+    sorter: (a: Balance, b: Balance) => {
+      const aAmount = bnOrZero(a.free)
+      const bAmount = bnOrZero(b.free)
+      return aAmount.minus(bAmount).toNumber()
+    },
+    sortDirections: ['descend', 'ascend']
   }
 
   const columns = [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn]

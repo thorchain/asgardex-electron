@@ -1,10 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { getAssetFromString } from '@thorchain/asgardex-util'
+import { getAssetFromString, bnOrZero, baseAmount, PoolData } from '@thorchain/asgardex-util'
 import { head } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
 import { RUNE_PRICE_POOL, CURRENCY_WHEIGHTS } from '../../const'
-import { toPoolData } from '../../helpers/poolHelper'
 import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool, PoolAsset } from '../../views/pools/types'
 import { AssetDetails, AssetDetailMap, PoolDetails, PoolsStateRD, SelectedPricePoolAsset } from './types'
@@ -77,4 +76,27 @@ export const pricePoolSelectorFromRD = (poolsRD: PoolsStateRD, selectedPricePool
   const pools = RD.toNullable(poolsRD)
   const pricePools = pools && O.toNullable(pools.pricePools)
   return (pricePools && pricePoolSelector(pricePools, selectedPricePoolAsset)) || RUNE_PRICE_POOL
+}
+
+export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<PoolDetail> =>
+  details.reduce((acc: O.Option<PoolDetail>, detail: PoolDetail) => {
+    if (O.isNone(acc)) {
+      const { asset: detailAsset = '' } = detail
+      const { ticker: detailTicker } = getAssetFromString(detailAsset)
+      return detailTicker === ticker ? O.some(detail) : O.none
+    }
+    return acc
+  }, O.none)
+
+/**
+ * Transforms `PoolDetail` into `PoolData`
+ * Needed for misc. pool calculations using `asgardex-util`
+ */
+export const toPoolData = (detail: PoolDetail) => {
+  const assetDepth = bnOrZero(detail.assetDepth)
+  const runeDepth = bnOrZero(detail.runeDepth)
+  return {
+    assetBalance: baseAmount(assetDepth),
+    runeBalance: baseAmount(runeDepth)
+  } as PoolData
 }

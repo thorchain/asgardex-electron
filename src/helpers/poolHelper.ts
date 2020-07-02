@@ -1,4 +1,4 @@
-import { bnOrZero, baseAmount, PoolData, getAssetFromString } from '@thorchain/asgardex-util'
+import { bnOrZero, PoolData, getAssetFromString } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
@@ -41,16 +41,3 @@ export const getDeepestPool = (pools: PoolDetails): Option<PoolDetail> =>
     const prev = O.toNullable(acc)
     return runeDepth.isGreaterThanOrEqualTo(bnOrZero(prev?.runeDepth)) ? some(pool) : acc
   }, none)
-
-/**
- * Transforms `PoolDetail` into `PoolData`
- * Needed for misc. pool calculations using `asgardex-util`
- */
-export const toPoolData = (detail: PoolDetail) => {
-  const assetDepth = bnOrZero(detail.assetDepth)
-  const runeDepth = bnOrZero(detail.runeDepth)
-  return {
-    assetBalance: baseAmount(assetDepth),
-    runeBalance: baseAmount(runeDepth)
-  } as PoolData
-}
