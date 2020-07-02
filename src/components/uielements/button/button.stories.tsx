@@ -144,6 +144,7 @@ storiesOf('Components/Button', module)
     const sizeOptions: SizeOption = {
       small: 'small',
       normal: 'normal',
+      xnormal: 'xnormal',
       big: 'big'
     }
 
