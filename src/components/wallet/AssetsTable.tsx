@@ -42,7 +42,6 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const iconColumn: ColumnType<Balance> = {
     key: 'icon',
     title: '',
-    width: 1,
     dataIndex: 'symbol',
     render: (_, { symbol }) => <Coin type={symbol} size="big" />
   }
@@ -58,10 +57,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     title: intl.formatMessage({ id: 'wallet.column.ticker' }),
     align: 'left',
     dataIndex: 'symbol',
-    render: (_, { symbol }) => {
-      const { ticker = '' } = bncSymbolToAsset(symbol)
-      return <Label>{ticker}</Label>
-    }
+    render: (_, { symbol }) => <Label>{bncSymbolToAsset(symbol)?.ticker ?? ''}</Label>
   }
 
   const balanceColumn: ColumnType<Balance> = {
@@ -85,7 +81,8 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       const label = FP.pipe(
         oPrice,
         O.map((price) => formatAssetAmountCurrency(baseToAsset(price), pricePool.asset, 3)),
-        O.getOrElse(() => '')
+        // "empty" label if we don't get a price value
+        O.getOrElse(() => '--')
       )
       return <Label>{label}</Label>
     },

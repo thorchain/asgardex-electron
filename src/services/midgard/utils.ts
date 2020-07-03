@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { getAssetFromString, bnOrZero, baseAmount, PoolData } from '@thorchain/asgardex-util'
+import * as FP from 'fp-ts/lib/function'
 import { head } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
@@ -54,20 +55,23 @@ export const getPricePools = (pools: PoolDetails, whitelist: PricePoolAssets): P
 }
 
 /**
- * Returns price pool depending on selected `PricePoolAsset`
+ * Selector to get a `PricePool` from a list of `PricePools` by a given `PricePoolAsset`
+ *
+ * It will always return a `PricePool`:
+ * - (1) `PricePool` from list of pools (if available)
+ * - (2) OR TUSDB (if available in list of pools)
+ * - (3) OR RUNE (if no other pool is available)
  */
-export const pricePoolSelector = (pools: PricePools, selectedAsset: O.Option<PricePoolAsset>) => {
-  const asset = O.toNullable(selectedAsset)
-  // Check if prev. selected pool is still available
-  const prevPool = asset && pools.find((pool) => pool.asset === asset)
-  if (prevPool) {
-    return prevPool
-  }
-
-  // Use TUSDB or use "RUNE" pool (which is always the first pool")
-  const tusdbPool = pools.find((pool) => pool.asset === PoolAsset.TUSDB)
-  return tusdbPool || head(pools)
-}
+export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolAsset>): PricePool =>
+  FP.pipe(
+    oAsset,
+    // (1) Check if `PricePool` is available in `PricePools`
+    O.mapNullable((asset) => pools.find((pool) => pool.asset === asset)),
+    // (2) If (1) fails, check if TUSDB pool is available in `PricePools`
+    O.fold(() => O.fromNullable(pools.find((pool) => pool.asset === PoolAsset.TUSDB)), O.some),
+    // (3) If (2) failes, return RUNE pool, which is always first entry in pools list
+    O.getOrElse(() => head(pools))
+  )
 
 /**
  * Similar to `pricePoolSelector`, but taking `PoolsStateRD` instead of `PoolsState`
@@ -78,6 +82,10 @@ export const pricePoolSelectorFromRD = (poolsRD: PoolsStateRD, selectedPricePool
   return (pricePools && pricePoolSelector(pricePools, selectedPricePoolAsset)) || RUNE_PRICE_POOL
 }
 
+/**
+ * Gets a `PoolDetail by given ticker
+ * It returns `None` if no `PoolDetail` has been found
+ */
 export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<PoolDetail> =>
   details.reduce((acc: O.Option<PoolDetail>, detail: PoolDetail) => {
     if (O.isNone(acc)) {
@@ -89,8 +97,7 @@ export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<Po
   }, O.none)
 
 /**
- * Transforms `PoolDetail` into `PoolData`
- * Needed for misc. pool calculations using `asgardex-util`
+ * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)
  */
 export const toPoolData = (detail: PoolDetail) => {
   const assetDepth = bnOrZero(detail.assetDepth)
