@@ -3,7 +3,6 @@ import { AssetTicker } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, RUNE_PRICE_POOL } from '../../const'
-import { toPoolData } from '../../helpers/poolHelper'
 import { ThorchainEndpoint, AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PoolAsset, PricePool, PricePools } from '../../views/pools/types'
 import { PoolsState, PoolsStateRD } from './types'
@@ -13,7 +12,8 @@ import {
   getPricePools,
   pricePoolSelector,
   pricePoolSelectorFromRD,
-  getPoolDetail
+  getPoolDetail,
+  toPoolData
 } from './utils'
 
 type PoolDataMock = { asset?: string }
