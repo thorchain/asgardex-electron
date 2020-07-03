@@ -8,7 +8,9 @@ const wallet: WalletMessages = {
   'wallet.column.name': 'Name - DE',
   'wallet.column.ticker': 'Ticker - DE',
   'wallet.column.balance': 'Balance - DE',
-  'wallet.column.value': 'Value - DE'
+  'wallet.column.value': 'Value - DE',
+  'wallet.action.send': 'Send - DE',
+  'wallet.action.receive': 'Receive - DE'
 }
 
 export default wallet

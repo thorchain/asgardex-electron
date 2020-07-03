@@ -1,16 +1,25 @@
 import React from 'react'
 
-import { Row, Col, Typography, Divider, Button, Card } from 'antd'
+import { Row, Col } from 'antd'
+import { useIntl } from 'react-intl'
 import { useParams, useHistory } from 'react-router-dom'
 
+import Button from '../../components/uielements/button'
 import { shortSymbol } from '../../helpers/tokenHelpers'
 import { AssetDetailsRouteParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { UserTransactionType, UserAssetType } from '../../types/wallet'
 import DynamicCoin from '../shared/icons/DynamicCoin'
+import {
+  StyledCard,
+  CoinInfoWrapper,
+  CoinTitle,
+  CoinSubtitle,
+  CoinPrice,
+  StyledDivider,
+  ActionWrapper
+} from './AssetDetails.style'
 import TransactionsTable from './UserTransactionsTable'
-
-const { Title } = Typography
 
 // Dummy data
 const txs: UserTransactionType[] = [
@@ -40,6 +49,7 @@ const txs: UserTransactionType[] = [
 const AssetDetails: React.FC = (): JSX.Element => {
   const { symbol } = useParams<AssetDetailsRouteParams>()
   const history = useHistory()
+  const intl = useIntl()
   // Dummy data
   const asset: UserAssetType = {
     _id: '2',
@@ -48,77 +58,51 @@ const AssetDetails: React.FC = (): JSX.Element => {
     locked: 101,
     symbol: symbol,
     name: shortSymbol(symbol),
-    full: 1173
+    full: 35.13
   }
   const sendable = () => asset.free > 0
 
   return (
     <Row>
-      <Col span={24} md={{ span: 16, offset: 4 }} lg={{ span: 12, offset: 6 }}>
-        <Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ margin: '24px' }}>
-            <DynamicCoin type={asset.symbol} size="big" />
+      <Col span={24}>
+        <StyledCard bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
+          <div>
+            <DynamicCoin type={asset.symbol} size="xbig" />
           </div>
-          <Title level={4}>NAME: {shortSymbol(asset.symbol)}</Title>
-          <div>{asset.symbol}</div>
-          <Title level={3}>
-            {asset.full?.toLocaleString()} <small>{shortSymbol(asset.symbol)}</small>
-          </Title>
-        </Card>
+          <CoinInfoWrapper>
+            <CoinTitle>{shortSymbol(asset.symbol)}</CoinTitle>
+            <CoinSubtitle>{asset.symbol}</CoinSubtitle>
+          </CoinInfoWrapper>
+          <CoinPrice>{asset.full?.toLocaleString()}</CoinPrice>
+        </StyledCard>
       </Col>
 
-      <Col span={24} md={{ span: 16, offset: 4 }} lg={{ span: 12, offset: 6 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-          <div>
-            <div>Free:</div>
-            <Title level={4}>{asset.free.toLocaleString()}</Title>
-          </div>
+      <StyledDivider />
 
-          <div>
-            <div>Frozen:</div>
-            <Title level={4}>{asset.frozen.toLocaleString()}</Title>
-          </div>
-
-          <div>
-            <div>Locked:</div>
-            <Title level={4}>{asset.locked.toLocaleString()}</Title>
-          </div>
-        </div>
-      </Col>
-
-      <Divider />
-
-      <Col span={24} md={{ span: 16, offset: 4 }} lg={{ span: 12, offset: 6 }}>
+      <Col span={24}>
         <Row>
-          <Col span={12}>
-            <Card bordered={false}>
+          <Col span={24}>
+            <ActionWrapper bordered={false}>
               <Button
                 type="primary"
-                shape="round"
-                size="large"
-                block
+                round="true"
+                sizevalue="xnormal"
                 disabled={!sendable()}
                 onClick={() => history.push(walletRoutes.fundsSend.path())}>
-                Send
+                {intl.formatMessage({ id: 'wallet.action.send' })}
               </Button>
-            </Card>
-          </Col>
-
-          <Col span={12}>
-            <Card bordered={false}>
               <Button
-                type="ghost"
-                shape="round"
-                size="large"
-                block
+                typevalue="outline"
+                round="true"
+                sizevalue="xnormal"
                 onClick={() => history.push(walletRoutes.fundsReceive.path())}>
-                Receive
+                {intl.formatMessage({ id: 'wallet.action.receive' })}
               </Button>
-            </Card>
+            </ActionWrapper>
           </Col>
         </Row>
       </Col>
-      <Divider />
+      <StyledDivider />
       <Col span={24}>
         <TransactionsTable transactions={txs} />
       </Col>

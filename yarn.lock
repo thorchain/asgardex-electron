@@ -2463,9 +2463,9 @@
   dependencies:
     "@babel/runtime" "^7.10.2"
 
-"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#issue-5/ready-4-asgardex":
+"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#529d099269da893f7ee1f3785d91f674684acbf2":
   version "1.0.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#141c44c26d617b7be25f35ccf76ea0a3c70981f2"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#529d099269da893f7ee1f3785d91f674684acbf2"
 
 "@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git":
   version "0.1.0"
