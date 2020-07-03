@@ -6,7 +6,6 @@ import { useIntl } from 'react-intl'
 import { useParams, useHistory } from 'react-router-dom'
 
 import Button from '../../components/uielements/button'
-import Label from '../../components/uielements/label'
 import { shortSymbol } from '../../helpers/tokenHelpers'
 import { AssetDetailsRouteParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
@@ -14,6 +13,7 @@ import { UserTransactionType, UserAssetType } from '../../types/wallet'
 import DynamicCoin from '../shared/icons/DynamicCoin'
 import {
   StyledCard,
+  StyledLabel,
   CoinInfoWrapper,
   CoinTitle,
   CoinSubtitle,
@@ -72,10 +72,10 @@ const AssetDetails: React.FC = (): JSX.Element => {
     <>
       <Row>
         <Col span={24}>
-          <Label size="large" color="primary" weight="bold" onClick={onBack}>
+          <StyledLabel size="large" color="primary" weight="bold" onClick={onBack}>
             <LeftOutlined />
             <span>Back</span>
-          </Label>
+          </StyledLabel>
         </Col>
       </Row>
       <Row>

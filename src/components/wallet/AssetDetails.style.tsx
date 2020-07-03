@@ -2,11 +2,17 @@ import { Card, Divider } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import Label from '../../components/uielements/label'
+
 export const StyledCard = styled(Card)`
   .ant-card-body {
     padding: 35px 50px 25px;
     background-color: ${palette('background', 1)};
   }
+`
+
+export const StyledLabel = styled(Label)`
+  margin-bottom: 18px;
 `
 
 export const CoinInfoWrapper = styled.div`
