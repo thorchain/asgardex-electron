@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 
-import { DownOutlined } from '@ant-design/icons'
-import { Menu, Dropdown, Button, Card, Typography } from 'antd'
+import { Menu, Dropdown } from 'antd'
 
+import Label from '../../components/uielements/label'
 import { shortSymbol } from '../../helpers/tokenHelpers'
 import { UserAssetType } from '../../types/wallet'
 import DynamicCoin from '../shared/icons/DynamicCoin'
+import { StyledCard, AssetWrapper, AssetInfoWrapper, AssetTitle } from './AccountSelector.style'
 
-const { Title } = Typography
 // Multi-use 'account selector' component will have a data context
 // Dummy data
 const UserAssets: UserAssetType[] = [
@@ -37,24 +37,22 @@ const AccountSelector: React.FC<Props> = ({ symbol, onChange, size }): JSX.Eleme
     </Menu>
   )
   return (
-    <Card bordered={false} bodyStyle={{ padding: '6px' }}>
-      <div style={{ display: 'flex' }}>
+    <StyledCard bordered={false}>
+      <AssetWrapper>
         <div>
-          <DynamicCoin type={symb} size={size || 'normal'} />
+          <DynamicCoin type={symb} size={size || 'xbig'} />
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <Title level={4} style={{ marginLeft: '18px', marginBottom: '0' }}>
-            {shortSymbol(symb)}
-          </Title>
+        <AssetInfoWrapper>
+          <AssetTitle>{shortSymbol(symb)}</AssetTitle>
 
           <Dropdown overlay={menu} trigger={['click']}>
-            <Button type="link">
-              Change <DownOutlined />
-            </Button>
+            <Label textTransform="uppercase" color="primary" size="big">
+              Change
+            </Label>
           </Dropdown>
-        </div>
-      </div>
-    </Card>
+        </AssetInfoWrapper>
+      </AssetWrapper>
+    </StyledCard>
   )
 }
 

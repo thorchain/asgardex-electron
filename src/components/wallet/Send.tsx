@@ -1,38 +1,57 @@
 import React from 'react'
 
-import { Row, Col, Form, Input, Button, Typography } from 'antd'
+import { Row, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
+import { useIntl } from 'react-intl'
 
+import Button from '../../components/uielements/button'
+import Input from '../../components/uielements/input'
+import Label from '../../components/uielements/label'
 import AccountSelector from './AccountSelector'
-
-const { Title } = Typography
+import { StyledCol, StyledForm, StyledSubForm, StyledFormItem, StyledSubmitItem, StyledLabel } from './Send.style'
 
 const Send: React.FC = (): JSX.Element => {
+  const intl = useIntl()
+
   const onSubmit = (data: Store) => {
     console.log(data)
   }
+
   return (
     <Row>
-      <Col sm={{ span: 24 }} md={{ span: 16, offset: 4 }} lg={{ span: 12, offset: 6 }}>
-        <Title level={4}>Send Funds</Title>
+      <StyledCol span={24}>
         <AccountSelector />
-        <Form onFinish={onSubmit} labelCol={{ span: 24 }}>
-          <Form.Item name="recipient" label="recipient">
-            <Input size="large" />
-          </Form.Item>
-          <Form.Item name="amount" label="amount">
-            <Input size="large" />
-          </Form.Item>
-          <Form.Item name="password" label="password">
-            <Input type="password" size="large" />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" size="large" block>
+        <StyledForm onFinish={onSubmit} labelCol={{ span: 24 }}>
+          <StyledSubForm>
+            <Label color="gray" size="big" textTransform="uppercase">
+              {intl.formatMessage({ id: 'common.address' })}
+            </Label>
+            <Form.Item name="recipient">
+              <Input sizevalue="big" />
+            </Form.Item>
+            <Label color="gray" size="big" textTransform="uppercase">
+              {intl.formatMessage({ id: 'common.amount' })}
+            </Label>
+            <StyledFormItem name="amount">
+              <Input sizevalue="big" />
+            </StyledFormItem>
+            <StyledLabel size="big" color="primary" textTransform="uppercase">
+              MAX 35.3 BNB
+            </StyledLabel>
+            <Label color="gray" size="big" textTransform="uppercase">
+              {intl.formatMessage({ id: 'common.memo' })}
+            </Label>
+            <Form.Item name="password">
+              <Input sizevalue="big" />
+            </Form.Item>
+          </StyledSubForm>
+          <StyledSubmitItem>
+            <Button type="primary" htmlType="submit" round="true" sizevalue="xnormal">
               Submit
             </Button>
-          </Form.Item>
-        </Form>
-      </Col>
+          </StyledSubmitItem>
+        </StyledForm>
+      </StyledCol>
     </Row>
   )
 }
