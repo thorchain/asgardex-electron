@@ -12,7 +12,7 @@ import { hasImportedKeystore } from './util'
 // key file path
 const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
 
-const initialKeystoreState = () => (fs.pathExistsSync(KEY_FILE) ? some(none) : none)
+const initialKeystoreState = (): KeystoreState => (fs.pathExistsSync(KEY_FILE) ? some(none) : none)
 
 const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(initialKeystoreState())
 
@@ -21,6 +21,8 @@ const { get$: getKeystoreState$, set: setKeystoreState } = observableState<Keyst
  */
 const addKeystore = async (phrase: Phrase, password: string) => {
   try {
+    // remove previous keystore before adding a new one to trigger changes of `KeystoreState
+    await removeKeystore()
     const keystore: CryptoKeystore = await encryptToKeyStore(phrase, password)
     await fs.ensureFile(KEY_FILE)
     await fs.writeJSON(KEY_FILE, keystore)
@@ -32,6 +34,8 @@ const addKeystore = async (phrase: Phrase, password: string) => {
 }
 
 export const removeKeystore = async () => {
+  // If `KEY_FILE' does not exist, `fs.remove` silently does nothing.
+  // ^ see https://github.com/jprichardson/node-fs-extra/blob/master/docs/remove.md
   await fs.remove(KEY_FILE)
   setKeystoreState(none)
 }
@@ -39,12 +43,14 @@ export const removeKeystore = async () => {
 const addPhrase = async (state: KeystoreState, password: string) => {
   // make sure
   if (!hasImportedKeystore(state)) {
+    // TODO(@Veado) i18m
     return Promise.reject('Keystore has to be imported first')
   }
 
   // make sure file still exists
   const exists = await fs.pathExists(KEY_FILE)
   if (!exists) {
+    // TODO(@Veado) i18m
     return Promise.reject('Keystore has to be imported first')
   }
 
@@ -55,6 +61,7 @@ const addPhrase = async (state: KeystoreState, password: string) => {
     setKeystoreState(some(some({ phrase })))
     return Promise.resolve()
   } catch (error) {
+    // TODO(@Veado) i18m
     return Promise.reject(`Could not decrypt phrase from keystore: ${error}`)
   }
 }

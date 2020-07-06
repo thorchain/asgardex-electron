@@ -1,11 +1,16 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
 import * as crypto from '@thorchain/asgardex-crypto'
-import { Form } from 'antd'
+import { Form, Spin } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
+import Paragraph from 'antd/lib/typography/Paragraph'
+import * as O from 'fp-ts/lib/Option'
+import { none, Option, some } from 'fp-ts/lib/Option'
+import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
+import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as walletRoutes from '../../routes/wallet'
 import Button from '../uielements/button'
@@ -17,76 +22,108 @@ const ImportPhrase: React.FC = (): JSX.Element => {
   const [form] = Form.useForm()
 
   const { keystoreService } = useWalletContext()
+  const keystore = useObservableState(keystoreService.keystore$, none)
+
+  const { clientViewState$ } = useBinanceContext()
+  const clientViewState = useObservableState(clientViewState$, 'notready')
+  const [importing, setImporting] = useState(false)
+  const [importError, setImportError] = useState<Option<Error>>(none)
+
+  useEffect(() => {
+    if (clientViewState === 'error') {
+      setImporting(false)
+      setImportError(some(new Error('Could not create instance of BinanceClient')))
+    }
+    if (clientViewState === 'ready') {
+      // reset states
+      setImporting(false)
+      setImportError(none)
+      // redirect to wallets assets view
+      history.push(walletRoutes.assets.template)
+    }
+  }, [clientViewState, history, keystore])
 
   const [validPhrase, setValidPhrase] = useState(false)
   const [validPassword, setValidPassword] = useState(false)
 
   const phraseValidator = async (_: Rule, value: string) => {
     if (!value) {
+      // TODO(@Veado): i18n
       return Promise.reject('Value for phrase required')
     }
     const valid = crypto.validatePhrase(value)
     setValidPhrase(valid)
+    // TODO(@Veado): i18n
     return valid ? Promise.resolve() : Promise.reject('Invalid mnemonic seed phrase')
   }
 
   const passwordValidator = async (_: Rule, value: string) => {
     if (!value) {
       setValidPassword(false)
+      // TODO(@Veado): i18n
       return Promise.reject('Value for password required')
-    }
-    if (value.length < 5) {
-      setValidPassword(false)
-      return Promise.reject('Password needs to have 5 character at least')
     }
     setValidPassword(true)
     return Promise.resolve()
   }
 
   const submitForm = useCallback(
-    async ({ phrase: newPhrase, password }: Store) => {
-      try {
-        await keystoreService.addKeystore(newPhrase, password)
-        // redirect to wallets assets view
-        history.push(walletRoutes.assets.template)
-      } catch (error) {
-        console.error('could not submit phrase', error)
-      }
+    ({ phrase: newPhrase, password }: Store) => {
+      setImportError(none)
+      setImporting(true)
+      keystoreService.addKeystore(newPhrase, password).catch((error) => {
+        setImporting(false)
+        // TODO(@Veado): i18n
+        setImportError(some(error))
+      })
     },
-    [keystoreService, history]
+    [keystoreService]
+  )
+
+  const renderError = useMemo(
+    () =>
+      O.fold(
+        () => <></>,
+        // TODO(@Veado): i18n
+        (error: Error) => <Paragraph>Error while importing passphrase: {error.toString()}</Paragraph>
+      )(importError),
+    [importError]
   )
 
   return (
-    <Form
-      form={form}
-      onFinish={submitForm}
-      labelCol={{ span: 24 }}
-      style={{ paddingLeft: 30, paddingRight: 30, paddingBottom: 30 }}>
-      <span>PHRASE</span>
-      <Form.Item
-        name="phrase"
-        rules={[{ required: true, validator: phraseValidator }]}
-        validateTrigger={['onSubmit', 'onChange']}>
-        <InputTextArea placeholder="ENTER PHRASE" rows={5} />
-      </Form.Item>
-      <Form.Item
-        name="password"
-        rules={[{ required: true, validator: passwordValidator }]}
-        validateTrigger={['onSubmit', 'onChange']}>
-        <Input placeholder="PASSWORD" security="password" size="small" style={{ width: 280 }} />
-      </Form.Item>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button
-          size="middle"
-          type="link"
-          htmlType="submit"
-          style={{ width: 150, alignSelf: 'flex-end' }}
-          block
-          disabled={!validPassword || !validPhrase}>
-          Import
-        </Button>
-      </div>
-    </Form>
+    <>
+      {renderError}
+      <Form form={form} onFinish={submitForm} labelCol={{ span: 24 }} style={{ padding: 30, paddingTop: 15 }}>
+        {/* TODO(@Veado): i18n */}
+        <Spin spinning={importing} tip="Loading...">
+          <Form.Item
+            name="phrase"
+            rules={[{ required: true, validator: phraseValidator }]}
+            validateTrigger={['onSubmit', 'onChange']}>
+            {/* TODO(@Veado): i18n */}
+            <InputTextArea placeholder="ENTER PHRASE" rows={5} />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            rules={[{ required: true, validator: passwordValidator }]}
+            validateTrigger={['onSubmit', 'onChange']}>
+            {/* TODO(@Veado): i18n */}
+            <Input placeholder="PASSWORD" security="password" style={{ width: 280 }} />
+          </Form.Item>
+        </Spin>
+        <Form.Item>
+          <Button
+            size="large"
+            type="primary"
+            htmlType="submit"
+            block
+            style={{ width: 150 }}
+            disabled={!validPassword || !validPhrase || importing}>
+            Import
+          </Button>
+        </Form.Item>
+      </Form>
+    </>
   )
 }
 export default ImportPhrase

@@ -3,6 +3,7 @@ import { palette } from 'styled-theme'
 
 type SizeType = { [key: string]: string }
 const sizes: SizeType = {
+  xbig: '66px',
   big: '58px',
   normal: '42px',
   small: '32px'

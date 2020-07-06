@@ -1,10 +1,12 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react'
 
 import { PlusCircleFilled, CloseCircleOutlined } from '@ant-design/icons'
-import { KeyStore } from '@binance-chain/javascript-sdk/typings/crypto'
+import { Address } from '@thorchain/asgardex-binance'
 import { Row, Col, Typography, Button, Card, List } from 'antd'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 
-import { useWalletContext } from '../../contexts/WalletContext'
+import { Network } from '../../services/app/types'
 import { UserAccountType } from '../../types/wallet'
 
 const { Title, Text, Paragraph } = Typography
@@ -39,40 +41,35 @@ const UserAccounts: UserAccountType[] = [
 ]
 // Dummy data... types not confirmed
 
-const WalletManage: React.FC = (): JSX.Element => {
-  const [keystore, setKeystore] = useState<KeyStore>()
-  const [network, setNetwork] = useState<string | null>()
-  const [chainId, setChainId] = useState<string | null>()
-  const [address, setAddress] = useState<string | null>('')
+type Props = {
+  network: Network
+  toggleNetwork?: () => void
+  address: O.Option<Address>
+  lockWallet?: () => void
+  removeKeystore?: () => void
+}
 
-  const { keystoreService } = useWalletContext()
+const Settings: React.FC<Props> = (props: Props): JSX.Element => {
+  const { network, toggleNetwork = () => {}, address, lockWallet = () => {}, removeKeystore = () => {} } = props
+
+  const [chainId, setChainId] = useState<string | null>()
 
   async function setData() {
-    const key: string | null = localStorage.getItem('keystore')
-    if (key) {
-      setKeystore(JSON.parse(key))
-    }
     // Temporary network client settings placeholders
-    setNetwork('testnet')
-    setChainId('Binance-Nile')
-    setAddress(localStorage.getItem('address'))
+    setChainId('unknown')
   }
   useEffect(() => {
     setData()
   }, [])
-  const fileName = (): string | undefined => address?.concat('-keystore.txt')
+
   const downloadLink: string = useMemo(() => {
     const keystring: string = localStorage.getItem('keystore') || ''
     return 'data:text/plain;charset=utf-8,' + encodeURIComponent(keystring)
   }, [])
 
-  const lockWallet = useCallback(() => {
-    keystoreService.lock()
-  }, [keystoreService])
-
   const removeWallet = useCallback(() => {
-    keystoreService.removeKeystore()
-  }, [keystoreService])
+    removeKeystore()
+  }, [removeKeystore])
 
   return (
     <Row gutter={[16, 16]}>
@@ -83,7 +80,7 @@ const WalletManage: React.FC = (): JSX.Element => {
           <Row>
             <Col span={12}>
               <Card bordered={false}>
-                <Button type="ghost" shape="round" block href={downloadLink} download={fileName()}>
+                <Button type="ghost" shape="round" block href={downloadLink} download={''}>
                   Export Keystore
                 </Button>
               </Card>
@@ -116,11 +113,16 @@ const WalletManage: React.FC = (): JSX.Element => {
           <Row>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Client Address:</Text>
-              <Paragraph ellipsis>{address}</Paragraph>
+              <Paragraph>
+                {FP.pipe(
+                  address,
+                  O.getOrElse(() => '')
+                )}
+              </Paragraph>
             </Col>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Keystore Version:</Text>
-              <Paragraph>{keystore?.version}</Paragraph>
+              <Paragraph></Paragraph>
             </Col>
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Type:</Text>
@@ -129,6 +131,9 @@ const WalletManage: React.FC = (): JSX.Element => {
             <Col md={{ span: 24 }} lg={{ span: 12 }}>
               <Text strong>Chain ID:</Text>
               <Paragraph>{chainId}</Paragraph>
+            </Col>
+            <Col md={{ span: 24 }} lg={{ span: 12 }}>
+              <Button onClick={toggleNetwork}>Change to {network === Network.MAIN ? 'testnet' : 'mainnet'}</Button>
             </Col>
           </Row>
         </Card>
@@ -168,4 +173,4 @@ const WalletManage: React.FC = (): JSX.Element => {
   )
 }
 
-export default WalletManage
+export default Settings

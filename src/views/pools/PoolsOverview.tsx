@@ -56,19 +56,6 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     }
   }, [thorchainConstantsRD, thorchainLastblockRD])
 
-  useEffect(
-    () => {
-      // Reload pools + lastblock data whenever PoolsOverview has been entered,
-      // but NOT if PoolsOverview is "visible" as a "home screen"
-      if (history.length > 1) {
-        midgardService.reloadPoolsState()
-        midgardService.reloadThorchainLastblock()
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
-
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   // store previous data of pools to render these while reloading

@@ -10,7 +10,7 @@ type WalletContextValue = {
 }
 
 const initialContext: WalletContextValue = {
-  keystoreService: keystoreService
+  keystoreService
 }
 const WalletContext = createContext<Option<WalletContextValue>>(none)
 

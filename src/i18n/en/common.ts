@@ -5,7 +5,12 @@ const common: CommonMessages = {
   'common.network': 'Network',
   'common.faqs': 'FAQs',
   'common.greeting': 'Hello {name}',
-  'common.copyright': '©'
+  'common.copyright': '©',
+  'common.type': 'Type',
+  'common.address': 'Address',
+  'common.to': 'To',
+  'common.amount': 'Amount',
+  'common.coin': 'Coin'
 }
 
 export default common

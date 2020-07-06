@@ -3,11 +3,11 @@ import React from 'react'
 import { Row, Col, Form, Input, Button, Typography } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 
-import AccountSelector from '../../components/wallet/AccountSelector'
+import AccountSelector from './AccountSelector'
 
 const { Title } = Typography
 
-const FundsSendScreen: React.FC = (): JSX.Element => {
+const Send: React.FC = (): JSX.Element => {
   const onSubmit = (data: Store) => {
     console.log(data)
   }
@@ -37,4 +37,4 @@ const FundsSendScreen: React.FC = (): JSX.Element => {
   )
 }
 
-export default FundsSendScreen
+export default Send

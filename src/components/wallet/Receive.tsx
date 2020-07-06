@@ -4,7 +4,7 @@ import { CopyOutlined } from '@ant-design/icons'
 import { Row, Col, Typography, Card, Button } from 'antd'
 import QRCode from 'qrcode'
 
-import AccountSelector from '../../components/wallet/AccountSelector'
+import AccountSelector from './AccountSelector'
 
 const { Title, Text } = Typography
 
@@ -16,7 +16,7 @@ const UserAccount = {
   _id: 'MTbyhYhWysp25TDBy'
 }
 
-const RecieveFundsView: React.FC = (): JSX.Element => {
+const Receive: React.FC = (): JSX.Element => {
   const [copyMsg, setCopyMsg] = useState<string>('')
   const [timer, setTimer] = useState<number | null>(null)
   const [account, setAccount] = useState<string>()
@@ -85,4 +85,4 @@ const RecieveFundsView: React.FC = (): JSX.Element => {
   )
 }
 
-export default RecieveFundsView
+export default Receive
