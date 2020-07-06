@@ -52,24 +52,22 @@ export const getPoolPriceValue = (
   selectedPricePoolData: PoolData
 ): O.Option<BaseAmount> => {
   const amount = assetToBase(assetAmount(bnOrZero(free)))
-  const oPoolDetail = getPoolDetail(poolDetails, symbol)
-  const poolDetail = O.toNullable(oPoolDetail)
 
-  // calculate value based on `pricePoolData`
-  if (poolDetail) {
-    const poolData = toPoolData(poolDetail)
-    return O.some(getValueOfAsset1InAsset2(amount, poolData, selectedPricePoolData))
-  }
-
-  const { ticker = '' } = bncSymbolToAsset(symbol)
-
-  // Calculate RUNE values based on `pricePoolData`
-  if (ticker === AssetTicker.RUNE) {
-    return O.some(getValueOfRuneInAsset(amount, selectedPricePoolData))
-  }
-
-  // In all other cases we don't have any price pool and no price
-  return O.none
+  return FP.pipe(
+    getPoolDetail(poolDetails, symbol),
+    O.map(toPoolData),
+    // calculate value based on `pricePoolData`
+    O.map((poolData) => getValueOfAsset1InAsset2(amount, poolData, selectedPricePoolData)),
+    O.alt(() => {
+      const { ticker = '' } = bncSymbolToAsset(symbol)
+      // Calculate RUNE values based on `pricePoolData`
+      if (ticker === AssetTicker.RUNE) {
+        return O.some(getValueOfRuneInAsset(amount, selectedPricePoolData))
+      }
+      // In all other cases we don't have any price pool and no price
+      return O.none
+    })
+  )
 }
 
 /**

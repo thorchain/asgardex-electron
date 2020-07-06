@@ -25,14 +25,14 @@ export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} =
 }
 
 export const getAssetDetail = (assets: AssetDetails, ticker: string): O.Option<AssetDetail> =>
-  assets.reduce((acc: O.Option<AssetDetail>, asset: AssetDetail) => {
-    if (O.isNone(acc)) {
+  FP.pipe(
+    assets.find((asset: AssetDetail) => {
       const { asset: a = '' } = asset
       const { ticker: t } = getAssetFromString(a)
-      return ticker === t ? O.some(asset) : O.none
-    }
-    return acc
-  }, O.none)
+      return ticker === t
+    }),
+    O.fromNullable
+  )
 
 export const getPricePools = (pools: PoolDetails, whitelist: PricePoolAssets): PricePools => {
   const poolDetails = pools.filter(
@@ -87,23 +87,19 @@ export const pricePoolSelectorFromRD = (poolsRD: PoolsStateRD, selectedPricePool
  * It returns `None` if no `PoolDetail` has been found
  */
 export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<PoolDetail> =>
-  details.reduce((acc: O.Option<PoolDetail>, detail: PoolDetail) => {
-    if (O.isNone(acc)) {
+  FP.pipe(
+    details.find((detail: PoolDetail) => {
       const { asset: detailAsset = '' } = detail
       const { ticker: detailTicker } = getAssetFromString(detailAsset)
-      return detailTicker === ticker ? O.some(detail) : O.none
-    }
-    return acc
-  }, O.none)
+      return detailTicker === ticker
+    }),
+    O.fromNullable
+  )
 
 /**
  * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)
  */
-export const toPoolData = (detail: PoolDetail) => {
-  const assetDepth = bnOrZero(detail.assetDepth)
-  const runeDepth = bnOrZero(detail.runeDepth)
-  return {
-    assetBalance: baseAmount(assetDepth),
-    runeBalance: baseAmount(runeDepth)
-  } as PoolData
-}
+export const toPoolData = (detail: PoolDetail): PoolData => ({
+  assetBalance: baseAmount(bnOrZero(detail.assetDepth)),
+  runeBalance: baseAmount(bnOrZero(detail.runeDepth))
+})
