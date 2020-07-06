@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import { LeftOutlined } from '@ant-design/icons'
 import { Row, Col } from 'antd'
@@ -53,20 +53,27 @@ const AssetDetails: React.FC = (): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
   // Dummy data
-  const asset: UserAssetType = {
-    _id: '2',
-    free: 1034,
-    frozen: 38,
-    locked: 101,
-    symbol: symbol,
-    name: shortSymbol(symbol),
-    full: 35.13
-  }
+  const asset: UserAssetType = useMemo(
+    () => ({
+      _id: '2',
+      free: 1034,
+      frozen: 38,
+      locked: 101,
+      symbol: symbol,
+      name: shortSymbol(symbol),
+      full: 35.13
+    }),
+    [symbol]
+  )
+
   const sendable = () => asset.free > 0
 
   const onBack = useCallback(() => {
     history.goBack()
   }, [history])
+
+  const walletActionSendClick = useCallback(() => history.push(walletRoutes.fundsSend.path()), [history])
+  const walletActionReceiveClick = useCallback(() => history.push(walletRoutes.fundsReceive.path()), [history])
 
   return (
     <>
@@ -103,14 +110,10 @@ const AssetDetails: React.FC = (): JSX.Element => {
                   round="true"
                   sizevalue="xnormal"
                   disabled={!sendable()}
-                  onClick={() => history.push(walletRoutes.fundsSend.path())}>
+                  onClick={walletActionSendClick}>
                   {intl.formatMessage({ id: 'wallet.action.send' })}
                 </Button>
-                <Button
-                  typevalue="outline"
-                  round="true"
-                  sizevalue="xnormal"
-                  onClick={() => history.push(walletRoutes.fundsReceive.path())}>
+                <Button typevalue="outline" round="true" sizevalue="xnormal" onClick={walletActionReceiveClick}>
                   {intl.formatMessage({ id: 'wallet.action.receive' })}
                 </Button>
               </ActionWrapper>

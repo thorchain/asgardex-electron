@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import BigNumber from 'bignumber.js'
 
@@ -58,10 +58,10 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
   const { slip: slipAmount } = calcResult
   const { status, value, startTime, hash } = txStatus
 
-  const onCloseModal = () => {
+  const onCloseModal = useCallback(() => {
     setOpenSwapModal(!openSwapModal)
     if (onClose) onClose()
-  }
+  }, [openSwapModal, onClose])
 
   return (
     <SwapModalWrapper title={swapTitle} visible={openSwapModal} footer={null} onCancel={onCloseModal}>

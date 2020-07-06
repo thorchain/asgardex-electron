@@ -93,39 +93,41 @@ const HeaderNetStatus: React.FC<Props> = (_: Props): JSX.Element => {
     )
   }, [menuItems, theme])
 
-  const menuMobile = menuItems.map((item, i) => {
-    const { label, key, url } = item
-    const color = palette('text', 0)({ theme })
-    return (
-      <HeaderDrawerItem key={key} className={i === menuItems.length - 1 ? 'last' : 'headerdraweritem'}>
-        <Row align="middle" style={{ marginLeft: '15px', marginRight: '15px' }}>
-          <ConnectionStatus color={url ? 'green' : 'yellow'} />
-        </Row>
-        <Row>
-          <Col>
-            <Paragraph
-              strong
-              style={{
-                textTransform: 'capitalize',
-                color,
-                marginBottom: 0
-              }}>
-              {label}
-            </Paragraph>
-            <Paragraph
-              style={{
-                paddingLeft: '10px',
-                textTransform: 'lowercase',
-                color,
-                marginBottom: 0
-              }}>
-              {url || 'unknown'}
-            </Paragraph>
-          </Col>
-        </Row>
-      </HeaderDrawerItem>
-    )
-  })
+  const menuMobile = useMemo(() => {
+    return menuItems.map((item, i) => {
+      const { label, key, url } = item
+      const color = palette('text', 0)({ theme })
+      return (
+        <HeaderDrawerItem key={key} className={i === menuItems.length - 1 ? 'last' : 'headerdraweritem'}>
+          <Row align="middle" style={{ marginLeft: '15px', marginRight: '15px' }}>
+            <ConnectionStatus color={url ? 'green' : 'yellow'} />
+          </Row>
+          <Row>
+            <Col>
+              <Paragraph
+                strong
+                style={{
+                  textTransform: 'capitalize',
+                  color,
+                  marginBottom: 0
+                }}>
+                {label}
+              </Paragraph>
+              <Paragraph
+                style={{
+                  paddingLeft: '10px',
+                  textTransform: 'lowercase',
+                  color,
+                  marginBottom: 0
+                }}>
+                {url || 'unknown'}
+              </Paragraph>
+            </Col>
+          </Row>
+        </HeaderDrawerItem>
+      )
+    })
+  }, [menuItems, theme])
 
   return (
     <HeaderNetStatusWrapper>
