@@ -1,34 +1,37 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { tokenAmount } from '@thorchain/asgardex-token'
-import { bn } from '@thorchain/asgardex-util'
+import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
 
+import { ASSETS_MAINNET } from '../../../../mock/assets'
 import CoinData from './CoinData'
+
+const assetValue = assetToBase(assetAmount(2.49274))
+const targetValue = assetToBase(assetAmount(0.49555))
+const price = assetToBase(assetAmount(217.92))
 
 storiesOf('Components/Coins/CoinData', module).add('default', () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '300px' }}>
-      <CoinData asset="bnb" price={bn(217.92)} />
-      <CoinData asset="bnb" assetValue={tokenAmount(2.49274)} price={bn(217.92)} />
-      <CoinData asset="ftm" assetValue={tokenAmount(2.49274)} price={bn(217.92)} />
-      <CoinData asset="rune" assetValue={tokenAmount(2.49274)} price={bn(217.92)} />
-      <CoinData asset="ankr" assetValue={tokenAmount(2.49274)} price={bn(217.92)} />
-      <CoinData asset="bolt" assetValue={tokenAmount(2.49274)} price={bn(217.92)} />
-      <CoinData asset="tomo" assetValue={tokenAmount(2.49274)} price={bn(217.92)} />
+      <CoinData asset={ASSETS_MAINNET.BNB} price={price} />
+      <CoinData asset={ASSETS_MAINNET.BNB} assetValue={assetValue} price={price} />
+      <CoinData asset={ASSETS_MAINNET.FTM} assetValue={assetValue} price={price} />
+      <CoinData asset={ASSETS_MAINNET.RUNE} assetValue={assetValue} price={price} />
+      <CoinData asset={ASSETS_MAINNET.BOLT} assetValue={assetValue} price={price} />
+      <CoinData asset={ASSETS_MAINNET.TOMO} assetValue={assetValue} price={price} />
       <CoinData
-        asset="bnb"
-        target="bolt"
-        assetValue={tokenAmount(2.49274)}
-        targetValue={tokenAmount(0.49555)}
-        price={bn(217.92)}
+        asset={ASSETS_MAINNET.BNB}
+        target={ASSETS_MAINNET.BOLT}
+        assetValue={assetValue}
+        targetValue={targetValue}
+        price={price}
       />
       <CoinData
-        asset="bnb"
-        target="bolt"
-        assetValue={tokenAmount(2.49274)}
-        targetValue={tokenAmount(0.49555)}
-        price={bn(217.92)}
+        asset={ASSETS_MAINNET.BNB}
+        target={ASSETS_MAINNET.BOLT}
+        assetValue={assetValue}
+        targetValue={targetValue}
+        price={price}
         size="big"
       />
     </div>

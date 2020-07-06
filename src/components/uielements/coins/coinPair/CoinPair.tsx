@@ -1,25 +1,25 @@
 import React from 'react'
 
 import { CaretRightOutlined } from '@ant-design/icons'
+import { Asset } from '@thorchain/asgardex-util'
 
 import CoinIcon from '../coinIcon'
 import { CoinPairWrapper } from './CoinPair.style'
 
 type Props = {
-  className?: string
-  from: string
-  to: string
+  from: Asset
+  to: Asset
 }
 
-const CoinPair: React.FC<Props> = ({ className = '', from, to }): JSX.Element => {
+const CoinPair: React.FC<Props> = ({ from, to }): JSX.Element => {
   return (
-    <CoinPairWrapper className={`coinPair-wrapper ${className}`}>
+    <CoinPairWrapper>
       <div className="coin-data">
-        <CoinIcon type={from} />
+        <CoinIcon asset={from} />
       </div>
       <CaretRightOutlined className="arrow-icon" />
       <div className="coin-data">
-        <CoinIcon type={to} />
+        <CoinIcon asset={to} />
       </div>
     </CoinPairWrapper>
   )

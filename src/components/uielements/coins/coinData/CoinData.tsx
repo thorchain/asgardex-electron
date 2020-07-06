@@ -1,23 +1,26 @@
 import React from 'react'
 
-import { TokenAmount, formatTokenAmount } from '@thorchain/asgardex-token'
-import { bn, formatBN } from '@thorchain/asgardex-util'
-import BigNumber from 'bignumber.js'
+import {
+  BaseAmount,
+  formatAssetAmountCurrency,
+  baseToAsset,
+  formatAssetAmount,
+  baseAmount,
+  Asset
+} from '@thorchain/asgardex-util'
 
 import Label from '../../label'
 import Coin from '../coin'
 import { CoinDataWrapper, CoinDataWrapperType, CoinDataWrapperSize } from './CoinData.style'
 
 type Props = {
-  asset?: string
-  assetValue?: TokenAmount
-  target?: string
-  targetValue?: TokenAmount
-  price?: BigNumber
-  priceUnit?: string
+  asset: Asset
+  assetValue?: BaseAmount
+  target?: Asset
+  targetValue?: BaseAmount
+  price?: BaseAmount
   priceValid?: boolean
   size?: CoinDataWrapperSize
-  className?: string
   type?: CoinDataWrapperType
 }
 
@@ -27,37 +30,38 @@ const CoinData: React.FC<Props> = (props: Props): JSX.Element => {
     assetValue,
     target,
     targetValue,
-    price = bn(0),
-    priceUnit = 'RUNE',
+    price = baseAmount(0),
     priceValid = true,
     size = 'small',
-    className = '',
     type = 'normal'
   } = props
 
-  const priceLabel = priceValid ? `${priceUnit.toUpperCase()} ${formatBN(price)}` : 'NOT LISTED'
+  const priceLabel = priceValid ? formatAssetAmountCurrency(baseToAsset(price)) : 'NOT LISTED'
+
+  const assetSymbol = asset.symbol ?? ''
+  const targetSymbol = target?.symbol ?? ''
 
   return (
-    <CoinDataWrapper size={size} target={target} type={type} className={`coinData-wrapper ${className}`}>
-      {asset && <Coin className="coinData-coin-avatar" type={asset} over={target} size={size} />}
+    <CoinDataWrapper size={size} type={type}>
+      {asset && <Coin className="coinData-coin-avatar" asset={asset} target={target} size={size} />}
       <div className="coinData-asset-info">
         <Label className="coinData-asset-label" weight="600">
-          {`${asset} ${target ? ':' : ''}`}
+          {`${assetSymbol} ${target ? ':' : ''}`}
         </Label>
         {assetValue && (
           <Label className="coinData-asset-value" weight="600">
-            {formatTokenAmount(assetValue)}
+            {formatAssetAmount(baseToAsset(assetValue))}
           </Label>
         )}
       </div>
       {target && (
         <div className="coinData-target-info">
           <Label className="coinData-target-label" weight="600">
-            {target}
+            {targetSymbol}
           </Label>
           {targetValue && (
             <Label className="coinData-target-value" weight="600">
-              {formatTokenAmount(targetValue)}
+              {formatAssetAmount(baseToAsset(targetValue))}
             </Label>
           )}
         </div>

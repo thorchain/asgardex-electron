@@ -3,7 +3,7 @@ import { palette, key } from 'styled-theme'
 
 import { Size, Sizes } from './types'
 
-type CoinIconWrapperProps = {
+type IconProps = {
   size: Size
 }
 
@@ -12,34 +12,40 @@ const sizes: Sizes = {
   small: key('sizes.coin.small', '30px')
 }
 
-export const CoinIconWrapper = styled.div`
-  width: ${(props: CoinIconWrapperProps) => sizes[props.size]};
-  height: ${(props: CoinIconWrapperProps) => sizes[props.size]};
+export const IconWrapper = styled.div<IconProps>`
+  width: ${({ size }) => sizes[size]};
+  height: ${({ size }) => sizes[size]};
+  position: relative;
+`
 
-  img {
-    width: ${(props: CoinIconWrapperProps) => sizes[props.size]};
-    height: ${(props: CoinIconWrapperProps) => sizes[props.size]};
-    border-radius: 50%;
-    box-shadow: 0px 2px 4px ${palette('secondary', 1)};
-    vertical-align: top; /* bug in coin alignment */
-  }
+export const IconBG = styled.div<IconProps>`
+  width: ${({ size }) => sizes[size]};
+  height: ${({ size }) => sizes[size]};
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: ${palette('gray', 1)};
+`
 
-  .blue-circle {
-    width: ${(props: CoinIconWrapperProps) => sizes[props.size]};
-    height: ${(props: CoinIconWrapperProps) => sizes[props.size]};
-    background-color: ${palette('secondary', 0)};
-    border-radius: 50%;
-  }
-  .confirm-circle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: ${(props: CoinIconWrapperProps) => sizes[props.size]};
-    height: ${(props: CoinIconWrapperProps) => sizes[props.size]};
-    background-color: ${palette('success', 0)};
-    border-radius: 50%;
-    svg {
-      color: ${palette('background', 1)};
-    }
-  }
+export const IconFallback = styled.div<IconProps>`
+  width: ${({ size }) => sizes[size]};
+  height: ${({ size }) => sizes[size]};
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: ${({ size }) => (size === 'big' ? '12px' : '10px')};
+  color: ${palette('text', 3)};
+`
+
+export const Icon = styled.img<IconProps>`
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: ${({ size }) => sizes[size]};
+  height: ${({ size }) => sizes[size]};
+  border-radius: 50%;
 `

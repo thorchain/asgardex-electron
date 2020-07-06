@@ -1,47 +1,42 @@
 import React from 'react'
 
+import { radios, withKnobs } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 
+import { ASSETS_MAINNET } from '../../../../mock/assets'
+import { Size } from '../coinIcon/types'
 import Coin from './Coin'
 
-storiesOf('Components/Coins/Coin', module).add('default', () => {
-  return (
-    <div>
-      <div style={{ display: 'flex' }}>
-        <Coin type="bnb" size="small" />
-        <Coin type="bolt" size="small" />
-        <Coin type="rune" size="small" />
-        <Coin type="ankr" size="small" />
-        <Coin type="ftm" size="small" />
-        <Coin type="tomo" size="small" />
-        <Coin type="loki" size="small" />
+type SizeOptions = {
+  [key in Size]: Size
+}
+
+const sizeOptions: SizeOptions = {
+  small: 'small',
+  big: 'big'
+}
+
+storiesOf('Components/Coins/Coin', module)
+  .addDecorator(withKnobs)
+  .add('default', () => {
+    const size = radios('size', sizeOptions, 'small')
+
+    return (
+      <div>
+        <div>size: {size}</div>
+        <div style={{ display: 'flex' }}>
+          <Coin asset={ASSETS_MAINNET.BNB} size={size} />
+          <Coin asset={ASSETS_MAINNET.BOLT} size={size} />
+          <Coin asset={ASSETS_MAINNET.RUNE} size={size} />
+          <Coin asset={ASSETS_MAINNET.FTM} size={size} />
+          <Coin asset={ASSETS_MAINNET.TOMO} size={size} />
+        </div>
+        <div style={{ display: 'flex' }}>
+          <Coin asset={ASSETS_MAINNET.BNB} target={ASSETS_MAINNET.BOLT} size={size} />
+          <Coin asset={ASSETS_MAINNET.BNB} target={ASSETS_MAINNET.RUNE} size={size} />
+          <Coin asset={ASSETS_MAINNET.BNB} target={ASSETS_MAINNET.FTM} size={size} />
+          <Coin asset={ASSETS_MAINNET.BNB} target={ASSETS_MAINNET.TOMO} size={size} />
+        </div>
       </div>
-      <div style={{ display: 'flex' }}>
-        <Coin type="bnb" size="big" />
-        <Coin type="bolt" size="big" />
-        <Coin type="rune" size="big" />
-        <Coin type="ankr" size="big" />
-        <Coin type="ftm" size="big" />
-        <Coin type="tomo" size="big" />
-        <Coin type="loki" size="big" />
-      </div>
-      <div style={{ display: 'flex' }}>
-        <Coin type="bnb" over="bolt" size="small" />
-        <Coin type="bnb" over="rune" size="small" />
-        <Coin type="bnb" over="ankr" size="small" />
-        <Coin type="bnb" over="ftm" size="small" />
-        <Coin type="bnb" over="tomo" size="small" />
-        <Coin type="bnb" over="loki" size="small" />
-        <Coin type="loki" over="bnb" size="small" />
-      </div>
-      <div style={{ display: 'flex' }}>
-        <Coin type="bnb" over="bolt" size="big" />
-        <Coin type="bnb" over="rune" size="big" />
-        <Coin type="bnb" over="ankr" size="big" />
-        <Coin type="bnb" over="ftm" size="big" />
-        <Coin type="bnb" over="tomo" size="big" />
-        <Coin type="bnb" over="loki" size="big" />
-      </div>
-    </div>
-  )
-})
+    )
+  })

@@ -1,43 +1,65 @@
-import React from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 
-import { CheckOutlined } from '@ant-design/icons'
+import { Asset } from '@thorchain/asgardex-util'
 
-import { coinIconGroup } from '../../../icons/coinIcons'
-import DynamicCoin from '../dynamicCoin'
-import { CoinIconWrapper } from './CoinIcon.style'
+import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
+import * as Styled from './CoinIcon.style'
 import { Size } from './types'
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string
   size?: Size
-  type?: string
+  asset: Asset
 }
 
-const CoinIcon: React.FC<Props> = ({ className = '', size = 'big', type = 'bnb', ...rest }: Props): JSX.Element => {
-  const renderCoinIcon = () => {
-    const coinIcon = coinIconGroup[type.toLowerCase()] || ''
+const CoinIcon: React.FC<Props> = (props: Props): JSX.Element => {
+  const { asset, size = 'big' } = props
+  const [error, setError] = useState(false)
 
-    if (coinIcon) {
-      return <img src={coinIcon} alt={type} />
-    }
-    if (type === 'blue') {
-      return <div className="blue-circle" />
-    }
-    if (type === 'confirm') {
-      return (
-        <div className="confirm-circle">
-          <CheckOutlined />
-        </div>
-      )
-    }
+  const imgUrl = useMemo(() => {
+    const { symbol, ticker } = asset
+    let assetId = symbol
 
-    return <DynamicCoin type={type} size={size} />
-  }
+    if (ticker === 'RUNE') {
+      assetId = 'RUNE-B1A'
+    }
+    // currently we do load assets for Binance chain only
+    const url = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${assetId}/logo.png`
+    console.log('url', url)
+    return url
+  }, [asset])
+
+  const renderIcon = useMemo(
+    () => (
+      <Styled.IconWrapper size={size}>
+        <Styled.Icon src={imgUrl} size={size} onError={() => setError(true)} />{' '}
+      </Styled.IconWrapper>
+    ),
+    [imgUrl, size]
+  )
+  useEffect(() => console.log('size', size), [size])
+
+  const renderFallbackIcon = useMemo(() => {
+    const { symbol = '' } = asset
+    const gradientColors = () => {
+      const numbers = getIntFromName(symbol)
+      const start = rainbowStop(numbers[0])
+      const stop = rainbowStop(numbers[1])
+      return `linear-gradient(45deg,${start},${stop})`
+    }
+    return (
+      <Styled.IconWrapper size={size}>
+        <Styled.IconFallback style={{ backgroundImage: gradientColors() }} size={size}>
+          {symbol}
+        </Styled.IconFallback>
+      </Styled.IconWrapper>
+    )
+  }, [asset, size])
 
   return (
-    <CoinIconWrapper size={size} className={`coinIcon-wrapper ${className}`} {...rest}>
-      {renderCoinIcon()}
-    </CoinIconWrapper>
+    <>
+      {!error && renderIcon}
+      {error && renderFallbackIcon}
+    </>
   )
 }
 

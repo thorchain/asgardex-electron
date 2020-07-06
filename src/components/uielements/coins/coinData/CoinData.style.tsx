@@ -22,17 +22,17 @@ export const CoinDataWrapper = styled.div<CoinDataWrapperProps>`
   }
 
   .coinData-coin-avatar {
-    margin-right: ${(props) => (props.target ? '0px' : '12px')};
+    margin-right: ${({ target }) => (target ? '0px' : '12px')};
   }
 
   .coinData-asset-info {
-    margin-left: ${(props) => (props.target ? '0px' : '4px')} !important;
+    margin-left: ${({ target }) => (target ? '0px' : '4px')} !important;
   }
 
   .coinData-asset-info,
   .coinData-target-info {
     display: flex;
-    flex-direction: ${(props) => (props.type === 'normal' ? 'column' : 'row')};
+    flex-direction: ${({ type }) => (type === 'normal' ? 'column' : 'row')};
     margin: 0 4px;
   }
 
@@ -41,7 +41,7 @@ export const CoinDataWrapper = styled.div<CoinDataWrapperProps>`
     flex-grow: 1;
     justify-content: flex-end;
 
-    ${(props) => props.size === 'big' && 'height: 32px;'}
+    ${({ size }) => size === 'big' && 'height: 32px;'}
     .label-wrapper {
       ${(props) =>
         props.size === 'big' &&
@@ -58,6 +58,6 @@ export const CoinDataWrapper = styled.div<CoinDataWrapperProps>`
   }
 
   .coinData-asset-label {
-    margin-right: ${(props) => (props.type !== 'normal' ? '4px' : 0)};
+    margin-right: ${({ type }) => (type !== 'normal' ? '4px' : 0)};
   }
 `
