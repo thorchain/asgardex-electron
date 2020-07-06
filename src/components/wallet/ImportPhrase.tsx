@@ -111,12 +111,11 @@ const ImportPhrase: React.FC = (): JSX.Element => {
             <Input placeholder="PASSWORD" security="password" style={{ width: 280 }} />
           </Form.Item>
         </Spin>
-        <Form.Item>
+        <Form.Item style={{ display: 'grid', justifyContent: 'flex-end' }}>
           <Button
             size="large"
             type="primary"
             htmlType="submit"
-            block
             style={{ width: 150 }}
             disabled={!validPassword || !validPhrase || importing}>
             Import
