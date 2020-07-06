@@ -27,6 +27,7 @@ export const StyledTable = styled(Table)`
 export const StyledText = styled(Text)`
   text-transform: uppercase;
   font-weight: 600;
+  color: ${palette('text', 1)};
 `
 
 export const StyledLink = styled(Text)`
