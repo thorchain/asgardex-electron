@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import Text from 'antd/lib/typography/Text'
 import { useObservableState } from 'observable-hooks'
@@ -26,7 +26,7 @@ const HeaderLock: React.FC<Props> = (props: Props): JSX.Element => {
 
   const iconStyle = { fontSize: '1.5em', cursor: disabled ? 'not-allowed' : 'pointer' }
 
-  const clickHandler = (_: React.MouseEvent) => onPress()
+  const clickHandler = useCallback((_: React.MouseEvent) => onPress(), [onPress])
 
   // Desktop view displays current lock status
   const desktopView = useMemo(

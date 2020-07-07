@@ -2497,10 +2497,10 @@
   resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.1.3.tgz#66e0e79dc45b0176ab7aad3b7f27453d1c13c684"
   integrity sha512-wTck5pfRNfPkVQ5CnssINSBG2/Mw4Q5fmGIlHhrRo+ycuSL5XjNDOt7bYJW6RBf/iEegtyi0qKPq1yuvI8ywmg==
 
-"@thorchain/asgardex-util@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.2.0.tgz#b45d43ead152a1f7e1c70a7eb81102c9bef96ca2"
-  integrity sha512-JRJnuWs7laXP7V1JzJ4O6TxU0mTcCHg/xu4TAHccFw0aLsTSsavJhGdwbmciMrZRoY+3j6+Hd6PSI3EznsdBaA==
+"@thorchain/asgardex-util@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.2.1.tgz#edad713a856987f99e97539d0f285be809f4984d"
+  integrity sha512-Cc1S9jvlxj2W83MkPC4V87Jv03zKZCzWVDi2oSAuYGOLJ6zkk0WpWtHf5PHiMbqSqUJwLKiDCh6+DJ6fSGlFmg==
 
 "@thorchain/byzantine-module@^0.1.1":
   version "0.1.1"

@@ -17,7 +17,6 @@ import Coin from '../../components/uielements/coins/coin'
 import Label from '../../components/uielements/label'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
-import { RUNE_PRICE_POOL } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getPoolTableRowsData, hasPendingPools } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
@@ -25,7 +24,7 @@ import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { PoolsState } from '../../services/midgard/types'
-import { selectedPricePoolSelector } from '../../services/midgard/utils'
+import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import View from '../View'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
@@ -75,39 +74,46 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
 
-  const pricePool = useMemo(() => {
-    const pools = RD.toNullable(poolsRD)
-    const pricePools = pools && O.toNullable(pools.pricePools)
-    return (pricePools && selectedPricePoolSelector(pricePools, selectedPricePoolAsset)) || RUNE_PRICE_POOL
-  }, [poolsRD, selectedPricePoolAsset])
-
-  const clickSwapHandler = (p: SwapRouteParams) => {
-    history.push(swapRoutes.swap.path(p))
-  }
-
-  const clickStakeHandler = (asset: string) => {
-    history.push(stakeRoutes.stake.path({ asset }))
-  }
-
-  const clickRefreshHandler = () => {
-    midgardService.reloadPoolsState()
-    midgardService.reloadNetworkInfo()
-  }
-
-  const renderBtnColTitle = () => (
-    <ActionColumn>
-      <Button onClick={clickRefreshHandler} typevalue="outline">
-        <SyncOutlined />
-        refresh
-      </Button>
-    </ActionColumn>
+  const pricePool = useMemo(() => pricePoolSelectorFromRD(poolsRD, selectedPricePoolAsset), [
+    poolsRD,
+    selectedPricePoolAsset
+  ])
+  const getSwapPath = swapRoutes.swap.path
+  const clickSwapHandler = useCallback(
+    (p: SwapRouteParams) => {
+      history.push(getSwapPath(p))
+    },
+    [getSwapPath, history]
   )
 
-  const btnPoolsColumn = {
-    key: 'btn',
-    title: renderBtnColTitle,
-    width: 280,
-    render: (_: string, record: PoolTableRowData) => {
+  const getStakePath = stakeRoutes.stake.path
+
+  const clickStakeHandler = useCallback(
+    (asset: string) => {
+      history.push(getStakePath({ asset }))
+    },
+    [history, getStakePath]
+  )
+
+  const clickRefreshHandler = useCallback(() => {
+    midgardService.reloadPoolsState()
+    midgardService.reloadNetworkInfo()
+  }, [midgardService])
+
+  const renderBtnColTitle = useCallback(
+    () => (
+      <ActionColumn>
+        <Button onClick={clickRefreshHandler} typevalue="outline">
+          <SyncOutlined />
+          refresh
+        </Button>
+      </ActionColumn>
+    ),
+    [clickRefreshHandler]
+  )
+
+  const renderBtnPoolsColumn = useCallback(
+    (_: string, record: PoolTableRowData) => {
       const {
         pool: { asset, target }
       } = record
@@ -124,96 +130,141 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           </Button>
         </TableAction>
       )
-    }
+    },
+    [clickStakeHandler, clickSwapHandler]
+  )
+
+  const btnPoolsColumn = {
+    key: 'btn',
+    title: renderBtnColTitle,
+    width: 280,
+    render: renderBtnPoolsColumn
   }
 
+  const renderPoolColumn = useCallback(
+    ({ target }: { asset: string; target: string }) => <Coin type="rune" over={target} />,
+    []
+  )
   const poolColumn: ColumnType<PoolTableRowData> = {
     key: 'pool',
     title: 'pool',
     dataIndex: 'pool',
     width: 100,
-    render: ({ target }: { asset: string; target: string }) => <Coin type="rune" over={target} />
+    render: renderPoolColumn
   }
 
+  const renderPoolColumnMobile = useCallback(
+    ({ target }: { asset: string; target: string }) => (
+      <Row justify="center" align="middle" style={{ width: '100%' }}>
+        <Coin type="rune" over={target} />
+      </Row>
+    ),
+    []
+  )
   const poolColumnMobile: ColumnType<PoolTableRowData> = {
     key: 'pool',
     title: 'pool',
     dataIndex: 'pool',
-    render: ({ target }: { asset: string; target: string }) => (
-      <Row justify="center" align="middle" style={{ width: '100%' }}>
-        <Coin type="rune" over={target} />
-      </Row>
-    )
+    render: renderPoolColumnMobile
   }
 
+  const renderAssetColumn = useCallback(({ target }: { target: string }) => <Label>{target}</Label>, [])
+  const sortAssetColumn = useCallback(
+    (a: PoolTableRowData, b: PoolTableRowData) => a.pool.target.localeCompare(b.pool.target),
+    []
+  )
   const assetColumn: ColumnType<PoolTableRowData> = {
     key: 'asset',
     title: 'asset',
     dataIndex: 'pool',
-    render: ({ target }: { target: string }) => <Label>{target}</Label>,
-    sorter: (a: PoolTableRowData, b: PoolTableRowData) => a.pool.target.localeCompare(b.pool.target),
+    render: renderAssetColumn,
+    sorter: sortAssetColumn,
     sortDirections: ['descend', 'ascend']
   }
+
+  const renderPriceColumn = useCallback(
+    (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset, 3)}</Label>,
+    [pricePool]
+  )
+  const sortPriceColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
+    const aAmount = a.poolPrice.amount()
+    const bAmount = b.poolPrice.amount()
+    return aAmount.minus(bAmount).toNumber()
+  }, [])
 
   const priceColumn: ColumnType<PoolTableRowData> = {
     key: 'poolprice',
     title: 'price',
     dataIndex: 'poolPrice',
-    render: (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset, 3)}</Label>,
-    sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
-      const aAmount = a.poolPrice.amount()
-      const bAmount = b.poolPrice.amount()
-      return aAmount.minus(bAmount).toNumber()
-    },
+    render: renderPriceColumn,
+    sorter: sortPriceColumn,
     sortDirections: ['descend', 'ascend'],
     defaultSortOrder: 'descend'
   }
 
+  const renderDepthColumn = useCallback(
+    (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
+    [pricePool]
+  )
+  const sortDepthColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
+    const aAmount = a.depthPrice.amount()
+    const bAmount = b.depthPrice.amount()
+    return aAmount.minus(bAmount).toNumber()
+  }, [])
   const depthColumn: ColumnType<PoolTableRowData> = {
     key: 'depth',
     title: 'depth',
     dataIndex: 'depthPrice',
-    render: (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
-    sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
-      const aAmount = a.depthPrice.amount()
-      const bAmount = b.depthPrice.amount()
-      return aAmount.minus(bAmount).toNumber()
-    },
+    render: renderDepthColumn,
+    sorter: sortDepthColumn,
     sortDirections: ['descend', 'ascend']
   }
 
+  const renderVolumeColumn = useCallback(
+    (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
+    [pricePool]
+  )
+  const sortVolumeColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
+    const aAmount = a.volumePrice.amount()
+    const bAmount = b.volumePrice.amount()
+    return aAmount.minus(bAmount).toNumber()
+  }, [])
   const volumeColumn: ColumnType<PoolTableRowData> = {
     key: 'vol',
     title: '24h vol',
     dataIndex: 'volumePrice',
-    render: (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
-    sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
-      const aAmount = a.volumePrice.amount()
-      const bAmount = b.volumePrice.amount()
-      return aAmount.minus(bAmount).toNumber()
-    },
+    render: renderVolumeColumn,
+    sorter: sortVolumeColumn,
     sortDirections: ['descend', 'ascend']
   }
 
+  const renderTransactionColumn = useCallback(
+    (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
+    [pricePool]
+  )
+  const sortTransactionColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
+    const aAmount = a.transactionPrice.amount()
+    const bAmount = b.transactionPrice.amount()
+    return aAmount.minus(bAmount).toNumber()
+  }, [])
   const transactionColumn: ColumnType<PoolTableRowData> = {
     key: 'transaction',
     title: 'avg. size',
     dataIndex: 'transactionPrice',
-    render: (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
-    sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
-      const aAmount = a.transactionPrice.amount()
-      const bAmount = b.transactionPrice.amount()
-      return aAmount.minus(bAmount).toNumber()
-    },
+    render: renderTransactionColumn,
+    sorter: sortTransactionColumn,
     sortDirections: ['descend', 'ascend']
   }
+
+  const renderSlipColumn = useCallback((slip: BigNumber) => <Trend amount={slip} />, [])
+  const sortSlipColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => a.slip.minus(b.slip).toNumber(), [])
 
   const slipColumn: ColumnType<PoolTableRowData> = {
     key: 'slip',
     title: 'avg. slip',
     dataIndex: 'slip',
-    render: (slip: BigNumber) => <Trend amount={slip} />,
-    sorter: (a: PoolTableRowData, b: PoolTableRowData) => a.slip.minus(b.slip).toNumber(),
+    render: renderSlipColumn,
+    sorter: sortSlipColumn,
     sortDirections: ['descend', 'ascend']
   }
 
@@ -284,11 +335,8 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     [poolsRD, pricePool, renderPoolsTable]
   )
 
-  const btnPendingPoolsColumn = {
-    key: 'btn',
-    title: '',
-    width: 200,
-    render: (_: string, record: PoolTableRowData) => {
+  const renderBtnPendingPoolsColumn = useCallback(
+    (_: string, record: PoolTableRowData) => {
       const {
         pool: { target }
       } = record
@@ -301,14 +349,19 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           </Button>
         </TableAction>
       )
-    }
+    },
+    [clickStakeHandler]
+  )
+
+  const btnPendingPoolsColumn = {
+    key: 'btn',
+    title: '',
+    width: 200,
+    render: renderBtnPendingPoolsColumn
   }
 
-  const blockLeftColumn = {
-    key: 'blocks',
-    title: 'blocks left',
-    width: 80,
-    render: (_: string, record: PoolTableRowData) => {
+  const renderBlockLeftColumn = useCallback(
+    (_: string, record: PoolTableRowData) => {
       const { deepest } = record
 
       return (
@@ -316,7 +369,15 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           <BlockLeftLabel>{deepest ? blocksLeft.toString() : ''}</BlockLeftLabel>
         </TableAction>
       )
-    }
+    },
+    [blocksLeft]
+  )
+
+  const blockLeftColumn = {
+    key: 'blocks',
+    title: 'blocks left',
+    width: 80,
+    render: renderBlockLeftColumn
   }
 
   const desktopPendingPoolsColumns: ColumnsType<PoolTableRowData> = [

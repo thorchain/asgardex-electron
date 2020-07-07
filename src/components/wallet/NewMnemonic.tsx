@@ -1,13 +1,13 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 
 import { Card, Tag, Typography } from 'antd'
 
 const { Paragraph, Text } = Typography
 
 const NewMnemonic: React.FC<{ mnemonic: string }> = ({ mnemonic }): JSX.Element => {
-  const wordsList = () => {
+  const wordsList = useCallback(() => {
     return mnemonic.split(' ')
-  }
+  }, [mnemonic])
   return (
     <>
       <label>Mnemonic HD wallet seed phrase</label>

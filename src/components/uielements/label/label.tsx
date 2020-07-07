@@ -22,6 +22,7 @@ const Label: React.FC<Props> = (props: Props): JSX.Element => {
     textTransform = 'none',
     children,
     className = '',
+    onClick = () => {},
     style
   } = props
 
@@ -33,7 +34,8 @@ const Label: React.FC<Props> = (props: Props): JSX.Element => {
       weight={weight}
       textTransform={textTransform}
       style={style}
-      align={align}>
+      align={align}
+      onClick={onClick}>
       {loading && '...'}
       {!loading && children}
     </LabelWrapper>

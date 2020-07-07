@@ -10,6 +10,7 @@ export type CommonMessages = {
   'common.amount': string
   'common.coin': string
   'common.password': string
+  'common.memo': string
 }
 
 export type PoolsMessages = {

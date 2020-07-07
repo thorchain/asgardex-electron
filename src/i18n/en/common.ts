@@ -11,7 +11,8 @@ const common: CommonMessages = {
   'common.to': 'To',
   'common.amount': 'Amount',
   'common.coin': 'Coin',
-  'common.password': 'Password'
+  'common.password': 'Password',
+  'common.memo': 'Memo'
 }
 
 export default common
