@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import { useObservableState } from 'observable-hooks'
 import { palette } from 'styled-theme'
@@ -19,10 +19,10 @@ const HeaderTheme: React.FC<Props> = (props: Props): JSX.Element => {
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
   const iconStyle = { fontSize: '1.5em' }
 
-  const clickSwitchThemeHandler = () => {
+  const clickSwitchThemeHandler = useCallback(() => {
     toggleTheme()
     onPress()
-  }
+  }, [toggleTheme, onPress])
 
   return (
     <HeaderThemeWrapper onClick={() => clickSwitchThemeHandler()}>

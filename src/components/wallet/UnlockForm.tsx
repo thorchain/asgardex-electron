@@ -57,9 +57,9 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
     [unlockHandler, keystore]
   )
 
-  const onReset = () => {
+  const onReset = useCallback(() => {
     form.resetFields()
-  }
+  }, [form])
 
   const renderError = useMemo(
     () =>

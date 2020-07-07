@@ -43,7 +43,7 @@ const ImportPhrase: React.FC = (): JSX.Element => {
   const [validPhrase, setValidPhrase] = useState(false)
   const [validPassword, setValidPassword] = useState(false)
 
-  const phraseValidator = async (_: Rule, value: string) => {
+  const phraseValidator = useCallback(async (_: Rule, value: string) => {
     if (!value) {
       // TODO(@Veado): i18n
       return Promise.reject('Value for phrase required')
@@ -52,9 +52,9 @@ const ImportPhrase: React.FC = (): JSX.Element => {
     setValidPhrase(valid)
     // TODO(@Veado): i18n
     return valid ? Promise.resolve() : Promise.reject('Invalid mnemonic seed phrase')
-  }
+  }, [])
 
-  const passwordValidator = async (_: Rule, value: string) => {
+  const passwordValidator = useCallback(async (_: Rule, value: string) => {
     if (!value) {
       setValidPassword(false)
       // TODO(@Veado): i18n
@@ -62,11 +62,11 @@ const ImportPhrase: React.FC = (): JSX.Element => {
     }
     setValidPassword(true)
     return Promise.resolve()
-  }
+  }, [])
 
-  const onReset = () => {
+  const onReset = useCallback(() => {
     form.resetFields()
-  }
+  }, [form])
 
   const submitForm = useCallback(
     ({ phrase: newPhrase, password }: Store) => {

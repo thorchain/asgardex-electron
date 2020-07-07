@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 import { Menu, Dropdown } from 'antd'
 
@@ -23,18 +23,22 @@ const AccountSelector: React.FC<Props> = ({ symbol, onChange, size }): JSX.Eleme
       onChange(symb)
     }
   }, [symb, onChange])
-  const menu = () => (
-    <Menu>
-      {UserAssets.map((asset: UserAssetType, i: number) => (
-        <Menu.Item key={i} onClick={() => setSymb(asset.symbol)}>
-          <div style={{ display: 'flex' }}>
-            <div>{shortSymbol(asset.symbol)}</div>&nbsp;
-            <div>NAME..</div>&nbsp;
-            <div style={{ marginLeft: 'auto' }}>({asset.free})</div>
-          </div>
-        </Menu.Item>
-      ))}
-    </Menu>
+
+  const menu = useCallback(
+    () => (
+      <Menu>
+        {UserAssets.map((asset: UserAssetType, i: number) => (
+          <Menu.Item key={i} onClick={() => setSymb(asset.symbol)}>
+            <div style={{ display: 'flex' }}>
+              <div>{shortSymbol(asset.symbol)}</div>&nbsp;
+              <div>NAME..</div>&nbsp;
+              <div style={{ marginLeft: 'auto' }}>({asset.free})</div>
+            </div>
+          </Menu.Item>
+        ))}
+      </Menu>
+    ),
+    []
   )
   return (
     <StyledCard bordered={false}>

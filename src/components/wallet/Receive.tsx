@@ -45,7 +45,7 @@ const Receive: React.FC = (): JSX.Element => {
     }
   }, [timer])
 
-  const handleCopyAddress = () => {
+  const handleCopyAddress = useCallback(() => {
     navigator.clipboard.writeText(userAccount().address)
     setCopyMsg('Address copied..')
     if (timer) {
@@ -55,7 +55,7 @@ const Receive: React.FC = (): JSX.Element => {
       setCopyMsg('')
     }, 3000)
     setTimer(tmr)
-  }
+  }, [timer])
 
   const onBack = useCallback(() => {
     history.goBack()

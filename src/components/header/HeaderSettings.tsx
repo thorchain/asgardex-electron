@@ -19,12 +19,10 @@ const HeaderSettings: React.FC<Props> = (props: Props): JSX.Element => {
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
-  const iconStyle = { fontSize: '1.5em', cursor: disabled ? 'not-allowed' : 'pointer' }
-
-  const clickHandler = (_: React.MouseEvent) => onPress()
+  const iconStyle = useMemo(() => ({ fontSize: '1.5em', cursor: disabled ? 'not-allowed' : 'pointer' }), [disabled])
 
   return (
-    <HeaderIconWrapper onClick={clickHandler} disabled={disabled}>
+    <HeaderIconWrapper onClick={onPress} disabled={disabled}>
       {!isDesktopView && <Text style={{ color }}>SETTINGS</Text>}
       <SettingsIcon style={{ color, ...iconStyle }} />
     </HeaderIconWrapper>

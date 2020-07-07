@@ -88,9 +88,9 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
-  const toggleMenu = () => {
+  const toggleMenu = useCallback(() => {
     setMenuVisible(!menuVisible)
-  }
+  }, [menuVisible])
 
   const closeMenu = useCallback(() => {
     if (!isDesktopView) {

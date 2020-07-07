@@ -39,63 +39,88 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
   // store previous data of balances to still render these while reloading new data
   const previousBalances = useRef<Option<Balances>>(none)
 
-  const iconColumn: ColumnType<Balance> = {
-    key: 'icon',
-    title: '',
-    dataIndex: 'symbol',
-    render: (_, { symbol }) => <Coin type={symbol} size="big" />
-  }
+  const iconColumn: ColumnType<Balance> = useMemo(
+    () => ({
+      key: 'icon',
+      title: '',
+      dataIndex: 'symbol',
+      render: (_, { symbol }) => <Coin type={symbol} size="big" />
+    }),
+    []
+  )
 
-  const nameColumn: ColumnType<Balance> = {
-    title: intl.formatMessage({ id: 'wallet.column.name' }),
-    align: 'left',
-    dataIndex: 'symbol',
-    render: (_, { symbol }) => <Label>{symbol}</Label>
-  }
+  const nameColumn: ColumnType<Balance> = useMemo(
+    () => ({
+      title: intl.formatMessage({ id: 'wallet.column.name' }),
+      align: 'left',
+      dataIndex: 'symbol',
+      render: (_, { symbol }) => <Label>{symbol}</Label>
+    }),
+    [intl]
+  )
 
-  const tickerColumn: ColumnType<Balance> = {
-    title: intl.formatMessage({ id: 'wallet.column.ticker' }),
-    align: 'left',
-    dataIndex: 'symbol',
-    render: (_, { symbol }) => <Label>{bncSymbolToAsset(symbol)?.ticker ?? ''}</Label>
-  }
+  const tickerColumn: ColumnType<Balance> = useMemo(
+    () => ({
+      title: intl.formatMessage({ id: 'wallet.column.ticker' }),
+      align: 'left',
+      dataIndex: 'symbol',
+      render: (_, { symbol }) => <Label>{bncSymbolToAsset(symbol)?.ticker ?? ''}</Label>
+    }),
+    [intl]
+  )
 
-  const balanceColumn: ColumnType<Balance> = {
-    title: intl.formatMessage({ id: 'wallet.column.balance' }),
-    align: 'left',
-    dataIndex: 'free',
-    render: (_, { free, symbol }) => {
-      const amount = assetAmount(bnOrZero(free))
-      const asset = bncSymbolToAssetString(symbol)
-      const label = formatAssetAmountCurrency(amount, asset, 3)
-      return <Label>{label}</Label>
-    }
-  }
+  const balanceColumn: ColumnType<Balance> = useMemo(
+    () => ({
+      title: intl.formatMessage({ id: 'wallet.column.balance' }),
+      align: 'left',
+      dataIndex: 'free',
+      render: (_, { free, symbol }) => {
+        const amount = assetAmount(bnOrZero(free))
+        const asset = bncSymbolToAssetString(symbol)
+        const label = formatAssetAmountCurrency(amount, asset, 3)
+        return <Label>{label}</Label>
+      }
+    }),
+    [intl]
+  )
 
-  const priceColumn: ColumnType<Balance> = {
-    title: intl.formatMessage({ id: 'wallet.column.value' }),
-    align: 'left',
-    dataIndex: 'free',
-    render: (_, balance) => {
-      const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
-      const label = FP.pipe(
-        oPrice,
-        O.map((price) => formatAssetAmountCurrency(baseToAsset(price), pricePool.asset, 3)),
-        // "empty" label if we don't get a price value
-        O.getOrElse(() => '--')
-      )
-      return <Label>{label}</Label>
-    },
-    sorter: (a: Balance, b: Balance) => {
-      const aAmount = bnOrZero(a.free)
-      const bAmount = bnOrZero(b.free)
-      return aAmount.minus(bAmount).toNumber()
-    },
-    sortDirections: ['descend', 'ascend']
-  }
+  const priceColumn: ColumnType<Balance> = useMemo(
+    () => ({
+      title: intl.formatMessage({ id: 'wallet.column.value' }),
+      align: 'left',
+      dataIndex: 'free',
+      render: (_, balance) => {
+        const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
+        const label = FP.pipe(
+          oPrice,
+          O.map((price) => formatAssetAmountCurrency(baseToAsset(price), pricePool.asset, 3)),
+          // "empty" label if we don't get a price value
+          O.getOrElse(() => '--')
+        )
+        return <Label>{label}</Label>
+      },
+      sorter: (a: Balance, b: Balance) => {
+        const aAmount = bnOrZero(a.free)
+        const bAmount = bnOrZero(b.free)
+        return aAmount.minus(bAmount).toNumber()
+      },
+      sortDirections: ['descend', 'ascend']
+    }),
+    [poolDetails, pricePool, intl]
+  )
 
   const columns = [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn]
 
+  const onRow = useCallback(
+    (record: Balance) => {
+      return {
+        onClick: () => {
+          history.push(walletRoutes.assetDetails.path({ symbol: record.symbol }))
+        }
+      }
+    },
+    [history]
+  )
   const renderAssetsTable = useCallback(
     (balances: Balances, loading = false) => {
       return (
@@ -103,18 +128,12 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
           dataSource={balances}
           loading={loading}
           rowKey={({ symbol }: Balance) => symbol}
-          onRow={(record: Balance) => {
-            return {
-              onClick: () => {
-                history.push(walletRoutes.assetDetails.path({ symbol: record.symbol }))
-              }
-            }
-          }}
+          onRow={onRow}
           columns={columns}
         />
       )
     },
-    [columns, history]
+    [columns, onRow]
   )
 
   const renderAssets = useMemo(
