@@ -1,10 +1,20 @@
-import { some } from 'fp-ts/lib/Option'
+import * as RD from '@devexperts/remote-data-ts'
+import { AssetTicker } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 
-import { RUNE_TICKER, PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, RUNE_PRICE_POOL } from '../../const'
-import { toPoolData } from '../../helpers/poolHelper'
+import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, RUNE_PRICE_POOL } from '../../const'
 import { ThorchainEndpoint, AssetDetail, PoolDetail } from '../../types/generated/midgard'
-import { PoolAsset, PricePool } from '../../views/pools/types'
-import { getAssetDetailIndex, getAssetDetail, getPricePools, selectedPricePoolSelector } from './utils'
+import { PoolAsset, PricePool, PricePools } from '../../views/pools/types'
+import { PoolsState, PoolsStateRD } from './types'
+import {
+  getAssetDetailIndex,
+  getAssetDetail,
+  getPricePools,
+  pricePoolSelector,
+  pricePoolSelectorFromRD,
+  getPoolDetail,
+  toPoolData
+} from './utils'
 
 type PoolDataMock = { asset?: string }
 
@@ -32,13 +42,13 @@ describe('services/midgard/utils/', () => {
     })
   })
 
-  describe('getDetail', () => {
+  describe('getAssetDetail', () => {
     const runeDetail: AssetDetail = { asset: PoolAsset.RUNE }
     const bnbDetail: AssetDetail = { asset: PoolAsset.BNB }
 
     it('returns details of RUNE', () => {
-      const result = getAssetDetail([runeDetail, bnbDetail], RUNE_TICKER)
-      expect(result).toEqual(some(runeDetail))
+      const result = getAssetDetail([runeDetail, bnbDetail], AssetTicker.RUNE)
+      expect(result).toEqual(O.some(runeDetail))
     })
     it('returns None if no RUNE details available', () => {
       const result = getAssetDetail([bnbDetail], 'TOMOB')
@@ -97,25 +107,93 @@ describe('services/midgard/utils/', () => {
     })
   })
 
-  describe('selectedPricePoolSelector', () => {
+  describe('pricePoolSelector', () => {
     const poolData = toPoolData({})
     const eth: PricePool = { asset: PoolAsset.ETH, poolData }
     const tusdb: PricePool = { asset: PoolAsset.TUSDB, poolData }
     const btc: PricePool = { asset: PoolAsset.BTC, poolData }
 
-    it('selects ETH asset', () => {
-      const pool = selectedPricePoolSelector([RUNE_PRICE_POOL, eth, tusdb, btc], some(PoolAsset.ETH))
+    it('selects ETH pool', () => {
+      const pool = pricePoolSelector([RUNE_PRICE_POOL, eth, tusdb, btc], O.some(PoolAsset.ETH))
       expect(pool.asset).toEqual(PoolAsset.ETH)
     })
 
     it('selects TUSDB pool if ETH pool is not available', () => {
-      const pool = selectedPricePoolSelector([RUNE_PRICE_POOL, tusdb, btc], some(PoolAsset.ETH))
+      const pool = pricePoolSelector([RUNE_PRICE_POOL, tusdb, btc], O.some(PoolAsset.ETH))
+      expect(pool.asset).toEqual(PoolAsset.TUSDB)
+    })
+
+    it('selects TUSDB by default if no selection has been done', () => {
+      const pool = pricePoolSelector([RUNE_PRICE_POOL, eth, tusdb, btc], O.none)
       expect(pool.asset).toEqual(PoolAsset.TUSDB)
     })
 
     it('selects RUNE if ETH + TUSDB pools are not available', () => {
-      const pool = selectedPricePoolSelector([RUNE_PRICE_POOL, btc], some(PoolAsset.ETH))
+      const pool = pricePoolSelector([RUNE_PRICE_POOL, btc], O.some(PoolAsset.ETH))
       expect(pool.asset).toEqual(PoolAsset.RUNE)
+    })
+  })
+
+  describe('pricePoolSelectorFromRD', () => {
+    const poolData = toPoolData({})
+    const eth: PricePool = { asset: PoolAsset.ETH, poolData }
+    const tusdb: PricePool = { asset: PoolAsset.TUSDB, poolData }
+    const btc: PricePool = { asset: PoolAsset.BTC, poolData }
+    const mockPoolsStateSuccess = (pricePools: PricePools): PoolsStateRD =>
+      RD.success({
+        assetDetails: [],
+        poolAssets: [],
+        poolDetails: [],
+        pricePools: O.some(pricePools)
+      } as PoolsState)
+
+    it('selects ETH pool', () => {
+      const poolsRD = mockPoolsStateSuccess([RUNE_PRICE_POOL, eth, tusdb, btc])
+      const pool = pricePoolSelectorFromRD(poolsRD, O.some(PoolAsset.ETH))
+      expect(pool.asset).toEqual(PoolAsset.ETH)
+    })
+
+    it('selects TUSDB pool if ETH pool is not available', () => {
+      const poolsRD = mockPoolsStateSuccess([RUNE_PRICE_POOL, tusdb, btc])
+      const pool = pricePoolSelectorFromRD(poolsRD, O.some(PoolAsset.ETH))
+      expect(pool.asset).toEqual(PoolAsset.TUSDB)
+    })
+
+    it('selects TUSDB by default if no selection has been done', () => {
+      const poolsRD = mockPoolsStateSuccess([RUNE_PRICE_POOL, eth, tusdb, btc])
+      const pool = pricePoolSelectorFromRD(poolsRD, O.none)
+      expect(pool.asset).toEqual(PoolAsset.TUSDB)
+    })
+
+    it('selects RUNE if ETH + TUSDB pools are not available', () => {
+      const poolsRD = mockPoolsStateSuccess([RUNE_PRICE_POOL, btc])
+      const pool = pricePoolSelectorFromRD(poolsRD, O.some(PoolAsset.ETH))
+      expect(pool.asset).toEqual(PoolAsset.RUNE)
+    })
+
+    it('selects RUNE if no other price pool is available', () => {
+      const poolsRD = mockPoolsStateSuccess([RUNE_PRICE_POOL])
+      const pool = pricePoolSelectorFromRD(poolsRD, O.some(PoolAsset.ETH))
+      expect(pool.asset).toEqual(PoolAsset.RUNE)
+    })
+
+    it('selects RUNE pool by default if loading other price pools failed', () => {
+      const pool = pricePoolSelectorFromRD(RD.failure(new Error('Could not load pools')), O.none)
+      expect(pool.asset).toEqual(PoolAsset.RUNE)
+    })
+  })
+
+  describe('getPoolDetail', () => {
+    const runeDetail: PoolDetail = { asset: PoolAsset.RUNE }
+    const bnbDetail: PoolDetail = { asset: PoolAsset.BNB }
+
+    it('returns details of RUNE pool', () => {
+      const result = getPoolDetail([runeDetail, bnbDetail], AssetTicker.RUNE)
+      expect(result).toEqual(O.some(runeDetail))
+    })
+    it('returns None if no RUNE details available', () => {
+      const result = getPoolDetail([bnbDetail], 'TOMOB')
+      expect(result).toBeNone()
     })
   })
 })
