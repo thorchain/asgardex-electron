@@ -23,11 +23,14 @@ export const StyledFormItem = styled(Form.Item)`
 
 export const CustomLabel = styled(Label)`
   font-family: 'MainFontRegular';
+  text-transform: uppercase;
+  color: ${palette('text', 2)};
 `
 
 export const StyledLabel = styled(Label)`
   margin-bottom: 14px;
   font-family: 'MainFontRegular';
+  color: ${palette('primary', 0)};
 `
 
 export const StyledSubmitItem = styled(Form.Item)`

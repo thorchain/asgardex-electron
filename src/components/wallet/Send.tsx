@@ -47,24 +47,16 @@ const Send: React.FC = (): JSX.Element => {
           <AccountSelector />
           <StyledForm onFinish={onSubmit} labelCol={{ span: 24 }}>
             <StyledSubForm>
-              <CustomLabel color="gray" size="big" textTransform="uppercase">
-                {intl.formatMessage({ id: 'common.address' })}
-              </CustomLabel>
+              <CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</CustomLabel>
               <Form.Item name="recipient">
                 <Input color="primary" sizevalue="big" />
               </Form.Item>
-              <CustomLabel color="gray" size="big" textTransform="uppercase">
-                {intl.formatMessage({ id: 'common.amount' })}
-              </CustomLabel>
+              <CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</CustomLabel>
               <StyledFormItem name="amount">
                 <Input sizevalue="big" />
               </StyledFormItem>
-              <StyledLabel size="big" color="primary" textTransform="uppercase">
-                MAX 35.3 BNB
-              </StyledLabel>
-              <CustomLabel color="gray" size="big" textTransform="uppercase">
-                {intl.formatMessage({ id: 'common.memo' })}
-              </CustomLabel>
+              <StyledLabel size="big">MAX 35.3 BNB</StyledLabel>
+              <CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</CustomLabel>
               <Form.Item name="password">
                 <Input sizevalue="big" />
               </Form.Item>
