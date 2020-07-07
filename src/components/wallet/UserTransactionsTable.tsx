@@ -14,6 +14,7 @@ type Props = {
 
 type Column = 'type' | 'address' | 'to' | 'amount' | 'coin'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getColumnsRenderers = (address: string): Record<Column, (value: any, tx: UserTransactionType) => JSX.Element> => {
   const party = (tx: UserTransactionType) => {
     return transactionParty(address, tx)
