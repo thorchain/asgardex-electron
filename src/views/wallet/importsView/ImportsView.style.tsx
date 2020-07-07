@@ -23,6 +23,10 @@ export const ImportsViewWrapper = styled.div`
 export const TabLabel = styled(Label)`
   color: ${palette('black', 1)};
   padding: 0;
-  paddingleft: 20;
-  paddingright: 20;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 19px;
+  text-transform: uppercase;
 `
