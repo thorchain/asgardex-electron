@@ -102,12 +102,11 @@ const ImportPhrase: React.FC = (): JSX.Element => {
             name="phrase"
             rules={[{ required: true, validator: phraseValidator }]}
             validateTrigger={['onSubmit', 'onChange']}>
-            {/* TODO(@Veado): i18n */}
             <InputTextArea
               color={'primary'}
               sizevalue={'normal'}
               typevalue={'normal'}
-              placeholder={intl.formatMessage({ id: 'wallet.imports.enter.phrase' }).toUpperCase()}
+              placeholder={intl.formatMessage({ id: 'wallet.imports.enterphrase' }).toUpperCase()}
               rows={5}
             />
           </Form.Item>
@@ -115,7 +114,6 @@ const ImportPhrase: React.FC = (): JSX.Element => {
             name="password"
             rules={[{ required: true, validator: passwordValidator }]}
             validateTrigger={['onSubmit', 'onChange']}>
-            {/* TODO(@Veado): i18n */}
             <InputPasswordWrapper
               color="primary"
               sizevalue="normal"

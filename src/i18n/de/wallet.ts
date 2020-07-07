@@ -12,7 +12,7 @@ const wallet: WalletMessages = {
   'wallet.action.send': 'Send - DE',
   'wallet.action.receive': 'Receive - DE',
   'wallet.imports.phrase': 'Phrase',
-  'wallet.imports.enter.phrase': 'Phrase eingeben'
+  'wallet.imports.enterphrase': 'Phrase eingeben'
 }
 
 export default wallet
