@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react'
 
 import { Tabs, Row } from 'antd'
+import { useIntl } from 'react-intl'
 
 import BackLink from '../../../components/uielements/backLink'
 import Label from '../../../components/uielements/label'
 import ImportPhrase from '../../../components/wallet/ImportPhrase'
-import { ImportsViewWrapper } from './ImportsView.style'
+import { ImportsViewWrapper, TabLabel } from './ImportsView.style'
 
 enum TabKey {
   PHRASE = 'phrase',
@@ -19,12 +20,18 @@ type Tab = {
 }
 
 const ImportsView: React.FC = (): JSX.Element => {
-  const items = useMemo(() => [{ key: TabKey.PHRASE, label: 'Phrase', content: <ImportPhrase /> }] as Tab[], [])
+  const intl = useIntl()
+  const items: Tab[] = useMemo(
+    () => [
+      { key: TabKey.PHRASE, label: intl.formatMessage({ id: 'wallet.imports.phrase' }), content: <ImportPhrase /> }
+    ],
+    [intl]
+  )
 
   const tabs = useMemo(
     () =>
       items.map(({ label, key, content }) => (
-        <Tabs.TabPane tab={<Label style={{ padding: 0, paddingLeft: 20, paddingRight: 20 }}>{label}</Label>} key={key}>
+        <Tabs.TabPane tab={<TabLabel>{label}</TabLabel>} key={key}>
           {content}
         </Tabs.TabPane>
       )),
@@ -41,7 +48,7 @@ const ImportsView: React.FC = (): JSX.Element => {
           IMPORT EXISTING WALLET
         </Label>
       </Row>
-      <div style={{ backgroundColor: 'white', height: '95%' }}>
+      <div style={{ height: '95%' }}>
         <Tabs activeKey={TabKey.PHRASE} size="large">
           {tabs}
         </Tabs>

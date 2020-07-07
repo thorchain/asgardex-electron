@@ -59,10 +59,12 @@ const inputStyle = css`
     &:hover,
     &:focus {
       border-color: ${(props: InputWrapperProps) => colors[props.color]};
-      --antd-wave-shadow-color: ${(props: InputWrapperProps) => colors[props.color]};
       box-shadow: ${(props: InputWrapperProps) =>
         props.typevalue === 'ghost' ? 'none' : '0 0 0 2px ' + colors[props.color]};
     }
+  }
+  & .ant-input-password-icon {
+    color: ${colors.primary};
   }
 `
 export const InputWrapper = styled(Input)`
@@ -73,6 +75,6 @@ export const InputPasswordWrapper = styled(Input.Password)`
   ${inputStyle}
 `
 
-export const InputTextAreaWrapper = styled(Input.TextArea)`
+export const InputTextArea = styled(Input.TextArea)`
   ${inputStyle}
 `

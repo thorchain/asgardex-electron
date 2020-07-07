@@ -8,18 +8,20 @@ import Paragraph from 'antd/lib/typography/Paragraph'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as walletRoutes from '../../routes/wallet'
 import Button from '../uielements/button'
-import Input from '../uielements/input'
-import InputTextArea from '../uielements/input/InputTextArea'
+import { InputPasswordWrapper, InputTextArea } from '../uielements/input/Input.style'
 
 const ImportPhrase: React.FC = (): JSX.Element => {
   const history = useHistory()
   const [form] = Form.useForm()
+
+  const intl = useIntl()
 
   const { keystoreService } = useWalletContext()
   const keystore = useObservableState(keystoreService.keystore$, none)
@@ -101,14 +103,27 @@ const ImportPhrase: React.FC = (): JSX.Element => {
             rules={[{ required: true, validator: phraseValidator }]}
             validateTrigger={['onSubmit', 'onChange']}>
             {/* TODO(@Veado): i18n */}
-            <InputTextArea placeholder="ENTER PHRASE" rows={5} />
+            <InputTextArea
+              color={'primary'}
+              sizevalue={'normal'}
+              typevalue={'normal'}
+              placeholder={intl.formatMessage({ id: 'wallet.imports.enter.phrase' }).toUpperCase()}
+              rows={5}
+            />
           </Form.Item>
           <Form.Item
             name="password"
             rules={[{ required: true, validator: passwordValidator }]}
             validateTrigger={['onSubmit', 'onChange']}>
             {/* TODO(@Veado): i18n */}
-            <Input placeholder="PASSWORD" security="password" style={{ width: 280 }} />
+            <InputPasswordWrapper
+              color="primary"
+              sizevalue="normal"
+              typevalue="normal"
+              security="password"
+              placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
+              style={{ width: 280 }}
+            />
           </Form.Item>
         </Spin>
         <Form.Item style={{ display: 'grid', justifyContent: 'flex-end' }}>

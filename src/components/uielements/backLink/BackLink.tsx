@@ -9,14 +9,14 @@ type Props = {
   title?: string
 }
 
-const BackLink: React.FC<Props> = ({ title = 'Back', ...otherProps }): JSX.Element => {
+const BackLink: React.FC<Props> = ({ title = 'Back' }): JSX.Element => {
   const history = useHistory()
 
   const clickHandler = () => {
     history.goBack()
   }
   return (
-    <BackLinkWrapper {...otherProps} onClick={clickHandler}>
+    <BackLinkWrapper onClick={clickHandler}>
       <LeftOutlined />
       <span>{title}</span>
     </BackLinkWrapper>

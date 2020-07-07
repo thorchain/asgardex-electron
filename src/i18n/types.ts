@@ -9,6 +9,7 @@ export type CommonMessages = {
   'common.to': string
   'common.amount': string
   'common.coin': string
+  'common.password': string
 }
 
 export type PoolsMessages = {
@@ -27,6 +28,8 @@ export type WalletMessages = {
   'wallet.column.value': string
   'wallet.action.send': string
   'wallet.action.receive': string
+  'wallet.imports.phrase': string
+  'wallet.imports.enter.phrase': string
 }
 
 export type Messages = CommonMessages & PoolsMessages & WalletMessages

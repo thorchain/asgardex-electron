@@ -1,6 +1,8 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import Label from '../../../components/uielements/label'
+
 export const ImportsViewWrapper = styled.div`
   flex: 1;
 
@@ -16,4 +18,11 @@ export const ImportsViewWrapper = styled.div`
     height: 5px;
     background: ${palette('gradient', 0)};
   }
+`
+
+export const TabLabel = styled(Label)`
+  color: ${palette('black', 1)};
+  padding: 0;
+  paddingleft: 20;
+  paddingright: 20;
 `
