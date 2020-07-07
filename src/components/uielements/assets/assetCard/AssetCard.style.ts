@@ -6,8 +6,8 @@ import { DividerProps } from 'antd/lib/divider'
 import styled, { css } from 'styled-components'
 import { palette } from 'styled-theme'
 
+import CoinIcon from '../../coins/coinIcon'
 import Label from '../../label'
-import AssetIcon from '../assetIcon'
 
 export const AssetCardWrapper = styled.div`
   .title-label {
@@ -74,7 +74,7 @@ export const AssetNameLabel = styled(Label).attrs({
   padding: 8px 16px 6px 16px;
 `
 
-export const AssetDropdownAsset = styled(AssetIcon)`
+export const AssetDropdownAsset = styled(CoinIcon)`
   width: 45px;
   height: 45px;
   transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;

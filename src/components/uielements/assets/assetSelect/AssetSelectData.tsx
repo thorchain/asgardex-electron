@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { TokenAmount } from '@thorchain/asgardex-token'
-import { bn, formatBN } from '@thorchain/asgardex-util'
+import { bn, formatBN, Asset } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
 import Coin from '../../coins/coin'
@@ -9,9 +9,9 @@ import Label from '../../label'
 import { AssetSelectDataWrapper, AssetSelectDataWrapperType, AssetSelectDataWrapperSize } from './AssetSelectData.style'
 
 type Props = {
-  asset?: string
+  asset: Asset
   assetValue?: TokenAmount
-  target?: string
+  target?: Asset
   targetValue?: TokenAmount
   price?: BigNumber
   priceUnit?: string
@@ -26,8 +26,12 @@ const AssetSelectData: React.FC<Props> = (props: Props): JSX.Element => {
   const priceLabel = priceValid ? `$ ${formatBN(price)}` : 'NOT LISTED'
 
   return (
-    <AssetSelectDataWrapper size={size} target={target} type={type} className={`coinData-wrapper ${className}`}>
-      {asset && <Coin className="assetSelectData-coin-avatar" type={asset} over={target} size={size} />}
+    <AssetSelectDataWrapper
+      size={size}
+      hasTarget={target !== undefined}
+      type={type}
+      className={`coinData-wrapper ${className}`}>
+      {asset && <Coin asset={asset} target={target} size={size} />}
       <div className="assetSelectData-asset-info">
         <Label className="assetSelectData-asset-label" weight="600">
           {`${asset}`}

@@ -3,30 +3,36 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { SearchOutlined } from '@ant-design/icons'
 import { ClickParam } from 'antd/lib/menu'
 
-import { AssetPair } from '../../../types/asgardex'
 import Input from '../input'
 import { Menu, MenuItem } from './FilterMenu.style'
 
-type Props = {
+type Props<T> = {
   asset?: string
-  data: AssetPair[]
+  data: T[]
   placeholder?: string
   searchEnabled?: boolean
-  cellRenderer: (data: AssetPair) => { key: string; node: JSX.Element }
-  disableItemFilter?: (item: AssetPair) => boolean
-  filterFunction: (item: AssetPair, searchTerm: string) => boolean
+  cellRenderer: (data: T) => { key: string; node: JSX.Element }
+  disableItemFilter?: (item: T) => boolean
+  filterFunction: (item: T, searchTerm: string) => boolean
   onSelect?: (value: string) => void
 }
 
-const FilterMenu: React.FC<Props> = ({
-  onSelect = (_) => {},
-  searchEnabled = false,
-  data,
-  filterFunction,
-  cellRenderer,
-  disableItemFilter = (_) => false,
-  placeholder = 'Search Token ...'
-}): JSX.Element => {
+// Note: To have fully support of generic types in props,
+// we define FilterMenu as an "old-school" a function here.
+// Arrow functions seems to have some issues with generic types for properties in React.FC.
+// Based on "How to use generics in props in React in a functional component?"" https://stackoverflow.com/a/59373728/2032698
+function FilterMenu<T>(props: Props<T>): JSX.Element {
+  // const FilterMenu = <T extends object>(props: Props<T>): JSX.Element => {
+  const {
+    onSelect = (_) => {},
+    searchEnabled = false,
+    data,
+    filterFunction,
+    cellRenderer,
+    disableItemFilter = (_) => false,
+    placeholder = 'Search Token ...'
+  } = props
+
   const [searchTerm, setSearchTerm] = useState('')
 
   const handleClick = useCallback(
@@ -45,7 +51,7 @@ const FilterMenu: React.FC<Props> = ({
     setSearchTerm(newSearchTerm)
   }, [])
 
-  const filteredData: AssetPair[] = useMemo(
+  const filteredData: T[] = useMemo(
     () => (searchTerm === '' ? data : data.filter((item) => filterFunction(item, searchTerm))),
     [data, filterFunction, searchTerm]
   )
@@ -64,7 +70,7 @@ const FilterMenu: React.FC<Props> = ({
           />
         </Menu.Item>
       )}
-      {filteredData.map((item: AssetPair) => {
+      {filteredData.map((item: T) => {
         const { key, node } = cellRenderer(item)
         const disableItem = disableItemFilter(item)
 

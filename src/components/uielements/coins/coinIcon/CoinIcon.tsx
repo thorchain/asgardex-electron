@@ -11,7 +11,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
   asset: Asset
 }
 
-const CoinIcon: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
   const { asset, size = 'big' } = props
   const [error, setError] = useState(false)
 
@@ -63,4 +63,4 @@ const CoinIcon: React.FC<Props> = (props: Props): JSX.Element => {
   )
 }
 
-export default CoinIcon
+export default AssetIcon

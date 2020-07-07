@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState, RefObject } from 'react'
 
 import { TokenAmount, tokenAmount } from '@thorchain/asgardex-token'
-import { bn, delay, formatBN } from '@thorchain/asgardex-util'
+import { bn, delay, formatBN, Asset, getAssetFromString } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import { sortBy as _sortBy } from 'lodash'
@@ -47,7 +47,7 @@ const DropdownCarret: React.FC<DropdownCarretProps> = ({ open, onClick = () => {
 }
 
 type Props = {
-  asset: string
+  asset: Asset
   assetData?: AssetPair[]
   amount: TokenAmount
   price: BigNumber
@@ -60,7 +60,7 @@ type Props = {
   withSearch?: boolean
   onSelect?: (value: number) => void
   onChange?: (value: BigNumber) => void
-  onChangeAsset?: (asset: string) => void
+  onChangeAsset?: (asset: Asset) => void
   className?: string
   dataTestWrapper?: string
   dataTestInput?: string
@@ -69,7 +69,7 @@ type Props = {
 
 const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
   const {
-    asset = 'bnb',
+    asset,
     assetData = [],
     amount = tokenAmount(0),
     price = bn(0),
@@ -83,7 +83,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     searchDisable = [],
     onSelect = (_: number) => {},
     onChange = (_: BigNumber) => {},
-    onChangeAsset = (_: string) => {},
+    onChangeAsset = (_: Asset) => {},
     children = null
   } = props
 
@@ -113,7 +113,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     // Wait for the dropdown to close
     await delay(500)
     handleResetPercentButtons()
-    onChangeAsset(asset)
+    onChangeAsset(getAssetFromString(asset))
   }
 
   function renderMenu() {
@@ -124,7 +124,6 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
         assetData={sortedAssetData}
         asset={asset}
         priceIndex={priceIndex}
-        unit={unit}
         withSearch={withSearch}
         searchDisable={searchDisable}
         onSelect={handleChangeAsset}
@@ -136,7 +135,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     const disabled = assetData.length === 0
     return (
       <AssetDropdownButton disabled={disabled} onClick={handleDropdownButtonClicked}>
-        <AssetDropdownAsset type={asset} size="big" />
+        <AssetDropdownAsset asset={asset} size="big" />
         {!disabled ? (
           <AssetDropdownVerticalColumn>
             <DropdownCarret className="caret-down" open={openDropdown} />

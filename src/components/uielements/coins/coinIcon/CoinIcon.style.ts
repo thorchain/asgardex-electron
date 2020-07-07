@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { palette, key } from 'styled-theme'
+import { palette } from 'styled-theme'
 
 import { Size, Sizes } from './types'
 
@@ -8,8 +8,10 @@ type IconProps = {
 }
 
 const sizes: Sizes = {
-  big: key('sizes.coin.big', '40px'),
-  small: key('sizes.coin.small', '30px')
+  large: '66px',
+  big: '58px',
+  normal: '42px',
+  small: '32px'
 }
 
 export const IconWrapper = styled.div<IconProps>`

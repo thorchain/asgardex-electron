@@ -13,7 +13,9 @@ type SizeOptions = {
 
 const sizeOptions: SizeOptions = {
   small: 'small',
-  big: 'big'
+  big: 'big',
+  normal: 'normal',
+  large: 'large'
 }
 
 storiesOf('Components/Coins/Coin', module)
@@ -23,7 +25,6 @@ storiesOf('Components/Coins/Coin', module)
 
     return (
       <div>
-        <div>size: {size}</div>
         <div style={{ display: 'flex' }}>
           <Coin asset={ASSETS_MAINNET.BNB} size={size} />
           <Coin asset={ASSETS_MAINNET.BOLT} size={size} />

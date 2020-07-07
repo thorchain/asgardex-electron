@@ -12,7 +12,6 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import ErrorView from '../../components/shared/error/ErrorView'
-import Coin from '../../components/uielements/coins/coin'
 import Label from '../../components/uielements/label'
 import { RUNE_PRICE_POOL } from '../../const'
 import * as walletRoutes from '../../routes/wallet'
@@ -21,6 +20,7 @@ import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue } from '../
 import { PoolDetails } from '../../services/midgard/types'
 import { PricePool } from '../../views/pools/types'
 import Button from '../uielements/button'
+import Coin from '../uielements/coins/coin'
 import { TableWrapper } from './AssetsTable.style'
 
 type Props = {

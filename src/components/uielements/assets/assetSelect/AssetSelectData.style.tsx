@@ -7,7 +7,7 @@ export type AssetSelectDataWrapperType = 'wallet' | 'normal'
 type AssetSelectDataWrapperProps = {
   size: AssetSelectDataWrapperSize
   type: AssetSelectDataWrapperType
-  target?: string
+  hasTarget?: boolean
 }
 
 export const AssetSelectDataWrapper = styled.div<AssetSelectDataWrapperProps>`
@@ -22,17 +22,17 @@ export const AssetSelectDataWrapper = styled.div<AssetSelectDataWrapperProps>`
   }
 
   .assetSelectData-asset-avatar {
-    margin-right: ${(props) => (props.target ? '0px' : '12px')};
+    margin-right: ${({ hasTarget }) => (hasTarget ? '0px' : '12px')};
   }
 
   .assetSelectData-asset-info {
-    margin-left: ${(props) => (props.target ? '0px' : '4px')} !important;
+    margin-left: ${({ hasTarget }) => (hasTarget ? '0px' : '4px')} !important;
   }
 
   .assetSelectData-asset-info,
   .assetSelectData-target-info {
     display: flex;
-    flex-direction: ${(props) => (props.type === 'normal' ? 'column' : 'row')};
+    flex-direction: ${({ type }) => (type === 'normal' ? 'column' : 'row')};
     margin: 0 4px;
   }
 

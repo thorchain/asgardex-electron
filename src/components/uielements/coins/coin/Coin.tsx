@@ -3,8 +3,8 @@ import React from 'react'
 import { Asset } from '@thorchain/asgardex-util'
 
 import CoinIcon from '../coinIcon'
+import { Size as CoinSize } from '../coinIcon/types'
 import { CoinWrapper, CoinsWrapper } from './Coin.style'
-import { CoinSize } from './types'
 
 type Props = {
   asset: Asset

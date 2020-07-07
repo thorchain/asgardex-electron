@@ -1,8 +1,10 @@
+import { Asset } from '@thorchain/asgardex-util'
+
 export type UserAssetType = {
   _id?: string
   name?: string
   value?: number
-  symbol: string
+  asset: Asset
   full?: number
   free: number
   frozen: number

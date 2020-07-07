@@ -1,10 +1,9 @@
 import React from 'react'
 
-import { CaretRightOutlined } from '@ant-design/icons'
 import { Asset } from '@thorchain/asgardex-util'
 
 import CoinIcon from '../coinIcon'
-import { CoinPairWrapper } from './CoinPair.style'
+import * as Styled from './CoinPair.style'
 
 type Props = {
   from: Asset
@@ -13,15 +12,15 @@ type Props = {
 
 const CoinPair: React.FC<Props> = ({ from, to }): JSX.Element => {
   return (
-    <CoinPairWrapper>
-      <div className="coin-data">
+    <Styled.CoinPairWrapper>
+      <Styled.CoinWrapper>
         <CoinIcon asset={from} />
-      </div>
-      <CaretRightOutlined className="arrow-icon" />
-      <div className="coin-data">
+      </Styled.CoinWrapper>
+      <Styled.PairIcon />
+      <Styled.CoinWrapper>
         <CoinIcon asset={to} />
-      </div>
-    </CoinPairWrapper>
+      </Styled.CoinWrapper>
+    </Styled.CoinPairWrapper>
   )
 }
 
