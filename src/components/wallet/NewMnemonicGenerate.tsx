@@ -1,7 +1,8 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 
 import { generatePhrase } from '@thorchain/asgardex-crypto'
 import { Form, Input, Button } from 'antd'
+import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 
 type Props = {}
@@ -23,6 +24,20 @@ const NewMnemonicGenerate: React.FC<Props> = (_: Props): JSX.Element => {
     }
   }, [])
 
+  const rules: Rule[] = useMemo(
+    () => [
+      { required: true },
+      ({ getFieldValue }) => ({
+        validator(_, value) {
+          if (!value || getFieldValue('password') === value) {
+            return Promise.resolve()
+          }
+          return Promise.reject('Password mismatch!')
+        }
+      })
+    ],
+    []
+  )
   return (
     <>
       <h1>Generate the new mnemonic wallet</h1>
@@ -32,17 +47,7 @@ const NewMnemonicGenerate: React.FC<Props> = (_: Props): JSX.Element => {
           label="Repeat Password"
           dependencies={['password']}
           validateTrigger={['onSubmit', 'onBlur']}
-          rules={[
-            { required: true },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                if (!value || getFieldValue('password') === value) {
-                  return Promise.resolve()
-                }
-                return Promise.reject('Password mismatch!')
-              }
-            })
-          ]}>
+          rules={rules}>
           <Input size="large" type="password" />
         </Form.Item>
         <Form.Item>

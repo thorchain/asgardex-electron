@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 
 import { Button } from 'antd'
 import { useHistory, useParams } from 'react-router-dom'
@@ -13,9 +13,10 @@ const StakeView: React.FC<Props> = (_): JSX.Element => {
 
   const { asset } = useParams<StakeRouteParams>()
 
-  const clickHandler = () => {
-    history.goBack()
-  }
+  const goBack = history.goBack
+  const clickHandler = useCallback(() => {
+    goBack()
+  }, [goBack])
 
   return (
     <View>

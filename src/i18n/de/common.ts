@@ -10,7 +10,8 @@ const common: CommonMessages = {
   'common.address': 'Address - DE',
   'common.to': 'To - DE',
   'common.amount': 'Amount - DE',
-  'common.coin': 'Coin - DE'
+  'common.coin': 'Coin - DE',
+  'common.memo': 'Memo - DE'
 }
 
 export default common

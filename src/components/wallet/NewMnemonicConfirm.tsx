@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import { RedoOutlined } from '@ant-design/icons'
 import { Card, Col, Row, Button, Form } from 'antd'
@@ -23,7 +23,19 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
   const [mnemonicError, setMnemonicError] = useState<string>('')
   const [initialized, setInitialized] = useState<boolean>(false)
 
-  function init() {
+  const shuffledWords = useCallback((words: WordType[]) => {
+    const shuffler = (arr: WordType[]) => {
+      const newArr = arr.slice()
+      for (let i = newArr.length - 1; i > 0; i--) {
+        const rand = Math.floor(Math.random() * (i + 1))
+        ;[newArr[i], newArr[rand]] = [newArr[rand], newArr[i]]
+      }
+      return newArr
+    }
+    return words.length > 0 ? shuffler(words) : []
+  }, [])
+
+  const init = useCallback(() => {
     const words = mnemonic.split(' ')
     if (words && !initialized) {
       const res = words.map((e: string) => {
@@ -34,21 +46,9 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
       setShuffledWordsList(shuffledWords(res))
       setInitialized(true)
     }
-  }
+  }, [mnemonic, initialized, shuffledWords])
 
-  function shuffledWords(words: WordType[]) {
-    const shuffler = (arr: WordType[]) => {
-      const newArr = arr.slice()
-      for (let i = newArr.length - 1; i > 0; i--) {
-        const rand = Math.floor(Math.random() * (i + 1))
-        ;[newArr[i], newArr[rand]] = [newArr[rand], newArr[i]]
-      }
-      return newArr
-    }
-    return words.length > 0 ? shuffler(words) : []
-  }
-
-  function sortedSelectedWords(): WordType[] {
+  const sortedSelectedWords = useCallback((): WordType[] => {
     function compare(a: WordType, b: WordType) {
       const num1 = a.sequence
       const num2 = b.sequence
@@ -61,16 +61,19 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
       return comparison
     }
     return wordsList.filter((e: WordType) => e.selected === true).sort(compare)
-  }
+  }, [wordsList])
 
   init()
 
-  const isSelected = (id: string) => {
-    const res: WordType | undefined = wordsList.find((e: WordType) => e._id === id)
-    return !!res?.selected
-  }
+  const isSelected = useCallback(
+    (id: string) => {
+      const res: WordType | undefined = wordsList.find((e: WordType) => e._id === id)
+      return !!res?.selected
+    },
+    [wordsList]
+  )
 
-  const checkPhraseConfirmWords = () => {
+  const checkPhraseConfirmWords = useCallback(() => {
     // check against original phrase order
     const words = wordsList
 
@@ -97,9 +100,9 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
       setMnemonicError('Complete confirmation')
       return false
     }
-  }
+  }, [wordsList, sortedSelectedWords])
 
-  const handleResetPhrase = () => {
+  const handleResetPhrase = useCallback(() => {
     const newWords = wordsList.map((e: WordType) => {
       e.selected = false
       e.error = false
@@ -108,51 +111,60 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
     })
     setWordsList(newWords)
     setMnemonicError('')
-  }
-  const handleAddWord = (id: string) => {
-    const selects: WordType[] = sortedSelectedWords()
-    const lastSequence = (selects[selects.length - 1] && selects[selects.length - 1].sequence) || 0
-    const newSequence = lastSequence >= 0 ? lastSequence + 1 : 0
-    const newWords = wordsList.map((e: WordType) => {
-      if (e._id === id) {
-        e.selected = true
-        e.sequence = newSequence
-      }
-      return e
-    })
-    setWordsList(newWords)
-    setMnemonicError('')
-  }
-  const handleRemoveWord = (id: string) => {
-    const newWords = wordsList.map((e: WordType) => {
-      if (e._id === id) {
-        e.selected = false
-        e.error = false
-        delete e.sequence
-      }
-      return e
-    })
-    setWordsList(newWords)
-    setMnemonicError('')
-  }
-  const handleFormSubmit = (formData: Store) => {
-    console.log('submitting form')
-    console.log(formData)
+  }, [wordsList])
+  const handleAddWord = useCallback(
+    (id: string) => {
+      const selects: WordType[] = sortedSelectedWords()
+      const lastSequence = (selects[selects.length - 1] && selects[selects.length - 1].sequence) || 0
+      const newSequence = lastSequence >= 0 ? lastSequence + 1 : 0
+      const newWords = wordsList.map((e: WordType) => {
+        if (e._id === id) {
+          e.selected = true
+          e.sequence = newSequence
+        }
+        return e
+      })
+      setWordsList(newWords)
+      setMnemonicError('')
+    },
+    [sortedSelectedWords, wordsList]
+  )
+  const handleRemoveWord = useCallback(
+    (id: string) => {
+      const newWords = wordsList.map((e: WordType) => {
+        if (e._id === id) {
+          e.selected = false
+          e.error = false
+          delete e.sequence
+        }
+        return e
+      })
+      setWordsList(newWords)
+      setMnemonicError('')
+    },
+    [wordsList]
+  )
+  const handleFormSubmit = useCallback(
+    (formData: Store) => {
+      console.log('submitting form')
+      console.log(formData)
 
-    const checkwords = checkPhraseConfirmWords()
+      const checkwords = checkPhraseConfirmWords()
 
-    if (checkwords) {
-      // The submitted phrase as a string for passing to wallet methods
-      onConfirm()
-      const repeatPhrase = wordsList
-        .filter((e: WordType) => e.selected === true)
-        .map((f: WordType) => {
-          return f.text
-        })
-        .join(' ')
-      console.log(repeatPhrase)
-    }
-  }
+      if (checkwords) {
+        // The submitted phrase as a string for passing to wallet methods
+        onConfirm()
+        const repeatPhrase = wordsList
+          .filter((e: WordType) => e.selected === true)
+          .map((f: WordType) => {
+            return f.text
+          })
+          .join(' ')
+        console.log(repeatPhrase)
+      }
+    },
+    [checkPhraseConfirmWords, onConfirm, wordsList]
+  )
   return (
     <>
       <Form labelCol={{ span: 24 }} onFinish={(e: Store) => handleFormSubmit(e)}>
