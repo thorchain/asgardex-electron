@@ -13,6 +13,7 @@ export const StyledCard = styled(Card)`
 
 export const StyledLabel = styled(Label)`
   margin-bottom: 18px;
+  font-family: 'MainFontRegular';
 `
 
 export const CoinInfoWrapper = styled.div`
