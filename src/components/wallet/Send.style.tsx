@@ -21,8 +21,13 @@ export const StyledFormItem = styled(Form.Item)`
   margin-bottom: 0;
 `
 
+export const CustomLabel = styled(Label)`
+  font-family: 'MainFontRegular';
+`
+
 export const StyledLabel = styled(Label)`
   margin-bottom: 14px;
+  font-family: 'MainFontRegular';
 `
 
 export const StyledSubmitItem = styled(Form.Item)`
@@ -30,4 +35,9 @@ export const StyledSubmitItem = styled(Form.Item)`
     display: flex;
     justify-content: flex-end;
   }
+`
+
+export const StyledBackLabel = styled(Label)`
+  margin-bottom: 18px;
+  font-family: 'MainFontRegular';
 `
