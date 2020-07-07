@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import { CopyOutlined } from '@ant-design/icons'
-import { Row, Col, Typography, Card, Button } from 'antd'
+import { LeftOutlined } from '@ant-design/icons'
+import { Row, Col } from 'antd'
 import QRCode from 'qrcode'
+import { useHistory } from 'react-router-dom'
 
 import AccountSelector from './AccountSelector'
-
-const { Title, Text } = Typography
+import { StyledBackLabel, StyledCol, StyledCard, StyledDiv, StyledAddress, StyledLabel } from './Receive.style'
 
 // Dummmy data
 const UserAccount = {
@@ -17,9 +17,10 @@ const UserAccount = {
 }
 
 const Receive: React.FC = (): JSX.Element => {
+  const history = useHistory()
   const [copyMsg, setCopyMsg] = useState<string>('')
   const [timer, setTimer] = useState<number | null>(null)
-  const [account, setAccount] = useState<string>()
+
   const userAccount = () => {
     // Placeholder
     return UserAccount
@@ -56,32 +57,38 @@ const Receive: React.FC = (): JSX.Element => {
     setTimer(tmr)
   }
 
+  const onBack = useCallback(() => {
+    history.goBack()
+  }, [history])
+
   return (
-    <Row>
-      <Col sm={{ span: 24 }} md={{ span: 16, offset: 4 }} lg={{ span: 14, offset: 5 }}>
-        <Title level={3} style={{ textAlign: 'center' }}>
-          Receive Funds To: {account}
-        </Title>
-        <AccountSelector onChange={(s: string) => setAccount(s)} />
-        <Card bordered={false}>
-          <div style={{ display: 'flex', justifyContent: 'center' }} id="qr-container"></div>
-        </Card>
-      </Col>
-      <Col sm={{ span: 24 }} md={{ span: 16, offset: 4 }} lg={{ span: 14, offset: 5 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <label htmlFor="clipboard-btn">
-            <Title level={4} ellipsis code>
-              {userAccount().address}
-            </Title>
-          </label>
-          <Button type="primary" size="large" onClick={handleCopyAddress}>
-            Copy&nbsp;
-            <CopyOutlined />
-          </Button>
-          <Text type="secondary">{copyMsg}</Text>
-        </div>
-      </Col>
-    </Row>
+    <>
+      <Row>
+        <Col span={24}>
+          <StyledBackLabel size="large" color="primary" weight="bold" onClick={onBack}>
+            <LeftOutlined />
+            <span>Back</span>
+          </StyledBackLabel>
+        </Col>
+      </Row>
+      <Row>
+        <StyledCol span={24}>
+          <AccountSelector />
+          <StyledCard bordered={false}>
+            <div id="qr-container" />
+          </StyledCard>
+          <StyledDiv>
+            <label htmlFor="clipboard-btn">
+              <StyledAddress size="large">{userAccount().address}</StyledAddress>
+            </label>
+            <StyledLabel size="big" onClick={handleCopyAddress}>
+              Copy
+            </StyledLabel>
+            <StyledAddress size="big">{copyMsg}</StyledAddress>
+          </StyledDiv>
+        </StyledCol>
+      </Row>
+    </>
   )
 }
 
