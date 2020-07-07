@@ -29,7 +29,7 @@ import {
   ThorchainConstantsRD,
   SelectedPricePoolAsset
 } from './types'
-import { getPricePools, selectedPricePoolSelector } from './utils'
+import { getPricePools, pricePoolSelector } from './utils'
 
 const MIDGARD_MAX_RETRY = 3
 const BYZANTINE_MAX_RETRY = 5
@@ -95,7 +95,7 @@ const loadPoolsStateData$ = () => {
       const prevAsset = selectedPricePoolAsset()
       const pricePools = O.toNullable(state.pricePools)
       if (pricePools) {
-        const selectedPricePool = selectedPricePoolSelector(pricePools, prevAsset)
+        const selectedPricePool = pricePoolSelector(pricePools, prevAsset)
         setSelectedPricePoolAsset(selectedPricePool.asset)
       }
     }),

@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 
+import { LeftOutlined } from '@ant-design/icons'
 import { Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 import { useParams, useHistory } from 'react-router-dom'
@@ -12,6 +13,7 @@ import { UserTransactionType, UserAssetType } from '../../types/wallet'
 import DynamicCoin from '../shared/icons/DynamicCoin'
 import {
   StyledCard,
+  StyledLabel,
   CoinInfoWrapper,
   CoinTitle,
   CoinSubtitle,
@@ -62,51 +64,65 @@ const AssetDetails: React.FC = (): JSX.Element => {
   }
   const sendable = () => asset.free > 0
 
+  const onBack = useCallback(() => {
+    history.goBack()
+  }, [history])
+
   return (
-    <Row>
-      <Col span={24}>
-        <StyledCard bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
-          <div>
-            <DynamicCoin type={asset.symbol} size="xbig" />
-          </div>
-          <CoinInfoWrapper>
-            <CoinTitle>{shortSymbol(asset.symbol)}</CoinTitle>
-            <CoinSubtitle>{asset.symbol}</CoinSubtitle>
-          </CoinInfoWrapper>
-          <CoinPrice>{asset.full?.toLocaleString()}</CoinPrice>
-        </StyledCard>
-      </Col>
+    <>
+      <Row>
+        <Col span={24}>
+          <StyledLabel size="large" color="primary" weight="bold" onClick={onBack}>
+            <LeftOutlined />
+            <span>Back</span>
+          </StyledLabel>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={24}>
+          <StyledCard bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
+            <div>
+              <DynamicCoin type={asset.symbol} size="xbig" />
+            </div>
+            <CoinInfoWrapper>
+              <CoinTitle>{shortSymbol(asset.symbol)}</CoinTitle>
+              <CoinSubtitle>{asset.symbol}</CoinSubtitle>
+            </CoinInfoWrapper>
+            <CoinPrice>{asset.full?.toLocaleString()}</CoinPrice>
+          </StyledCard>
+        </Col>
 
-      <StyledDivider />
+        <StyledDivider />
 
-      <Col span={24}>
-        <Row>
-          <Col span={24}>
-            <ActionWrapper bordered={false}>
-              <Button
-                type="primary"
-                round="true"
-                sizevalue="xnormal"
-                disabled={!sendable()}
-                onClick={() => history.push(walletRoutes.fundsSend.path())}>
-                {intl.formatMessage({ id: 'wallet.action.send' })}
-              </Button>
-              <Button
-                typevalue="outline"
-                round="true"
-                sizevalue="xnormal"
-                onClick={() => history.push(walletRoutes.fundsReceive.path())}>
-                {intl.formatMessage({ id: 'wallet.action.receive' })}
-              </Button>
-            </ActionWrapper>
-          </Col>
-        </Row>
-      </Col>
-      <StyledDivider />
-      <Col span={24}>
-        <TransactionsTable transactions={txs} />
-      </Col>
-    </Row>
+        <Col span={24}>
+          <Row>
+            <Col span={24}>
+              <ActionWrapper bordered={false}>
+                <Button
+                  type="primary"
+                  round="true"
+                  sizevalue="xnormal"
+                  disabled={!sendable()}
+                  onClick={() => history.push(walletRoutes.fundsSend.path())}>
+                  {intl.formatMessage({ id: 'wallet.action.send' })}
+                </Button>
+                <Button
+                  typevalue="outline"
+                  round="true"
+                  sizevalue="xnormal"
+                  onClick={() => history.push(walletRoutes.fundsReceive.path())}>
+                  {intl.formatMessage({ id: 'wallet.action.receive' })}
+                </Button>
+              </ActionWrapper>
+            </Col>
+          </Row>
+        </Col>
+        <StyledDivider />
+        <Col span={24}>
+          <TransactionsTable transactions={txs} />
+        </Col>
+      </Row>
+    </>
   )
 }
 export default AssetDetails

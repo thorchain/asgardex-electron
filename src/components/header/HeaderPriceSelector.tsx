@@ -10,9 +10,9 @@ import {
   HeaderDropdownMenuItem,
   HeaderDropdownContentWrapper,
   HeaderDropdownMenuItemText,
-  HeaderDropdownWrapper,
   HeaderDropdownTitle
 } from './HeaderMenu.style'
+import { HeaderPriceSelectorWrapper } from './HeaderPriceSelector.style'
 import { toHeaderCurrencyLabel } from './util'
 
 type Props = {
@@ -51,7 +51,7 @@ const HeaderPriceSelector: React.FC<Props> = (props: Props): JSX.Element => {
 
   const title = useMemo(() => (selectedAsset ? toHeaderCurrencyLabel(selectedAsset) : '--'), [selectedAsset])
   return (
-    <HeaderDropdownWrapper>
+    <HeaderPriceSelectorWrapper>
       <Dropdown disabled={disabled} overlay={menu} trigger={['click']} placement="bottomCenter">
         <HeaderDropdownContentWrapper>
           {!isDesktopView && <HeaderDropdownTitle>Currency</HeaderDropdownTitle>}
@@ -61,7 +61,7 @@ const HeaderPriceSelector: React.FC<Props> = (props: Props): JSX.Element => {
           </Row>
         </HeaderDropdownContentWrapper>
       </Dropdown>
-    </HeaderDropdownWrapper>
+    </HeaderPriceSelectorWrapper>
   )
 }
 

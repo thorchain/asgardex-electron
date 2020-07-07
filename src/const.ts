@@ -1,4 +1,4 @@
-import { getAssetFromString, assetToBase, assetAmount } from '@thorchain/asgardex-util'
+import { AssetSymbol, assetToBase, assetAmount } from '@thorchain/asgardex-util'
 
 import {
   PricePoolCurrencySymbols,
@@ -8,15 +8,12 @@ import {
   PricePoolAssets
 } from './views/pools/types'
 
-// Rune ticker as const - just because we use it almost everywhere ...
-export const RUNE_TICKER = getAssetFromString(PoolAsset.RUNE)?.ticker ?? 'RUNE'
-
 // Currency symbols used for pricing
 export const CURRENCY_SYMBOLS: PricePoolCurrencySymbols = {
-  [PoolAsset.RUNE]: 'ᚱ',
-  [PoolAsset.BTC]: '₿',
-  [PoolAsset.ETH]: 'Ξ',
-  [PoolAsset.TUSDB]: '$'
+  [PoolAsset.RUNE]: AssetSymbol.RUNE,
+  [PoolAsset.BTC]: AssetSymbol.BTC,
+  [PoolAsset.ETH]: AssetSymbol.ETH,
+  [PoolAsset.TUSDB]: AssetSymbol.USD
 }
 
 // Weight of currencies needed for pricing

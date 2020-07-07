@@ -14,14 +14,14 @@ const balances: Balances = [
 
 storiesOf('Wallet/AssetsTable', module)
   .add('initial', () => {
-    return <AssetsTable balances={RD.initial} />
+    return <AssetsTable balances={RD.initial} poolDetails={[]} />
   })
   .add('loading', () => {
-    return <AssetsTable balances={RD.pending} />
+    return <AssetsTable balances={RD.pending} poolDetails={[]} />
   })
   .add('data', () => {
-    return <AssetsTable balances={RD.success(balances)} />
+    return <AssetsTable balances={RD.success(balances)} poolDetails={[]} />
   })
   .add('error', () => {
-    return <AssetsTable balances={RD.failure(new Error('Could not load data'))} />
+    return <AssetsTable balances={RD.failure(new Error('Could not load data'))} poolDetails={[]} />
   })
