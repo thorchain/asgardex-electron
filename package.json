@@ -57,7 +57,6 @@
     "@thorchain/asgardex-binance": "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#529d099269da893f7ee1f3785d91f674684acbf2",
     "@thorchain/asgardex-crypto": "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git",
     "@thorchain/asgardex-theme": "^0.1.1",
-    "@thorchain/asgardex-token": "^0.1.1",
     "@thorchain/asgardex-util": "^0.2.1",
     "@thorchain/byzantine-module": "^0.1.1",
     "@types/qrcode": "^1.3.4",

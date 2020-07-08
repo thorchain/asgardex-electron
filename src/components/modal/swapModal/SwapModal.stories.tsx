@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { tokenAmount } from '@thorchain/asgardex-token'
 import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
@@ -22,9 +21,9 @@ storiesOf('Components/Swap Modal', module).add('default', () => {
   const calcResult: CalcResult = {
     Px: new BigNumber(1),
     slip: new BigNumber(0.01645550108862126),
-    outputAmount: tokenAmount(1),
+    outputAmount: assetAmount(1),
     outputPrice: new BigNumber(556327544945582288316300000000),
-    fee: tokenAmount(1)
+    fee: assetAmount(1)
   }
 
   return (

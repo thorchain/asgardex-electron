@@ -1,4 +1,3 @@
-// import { baseAmount } from '@thorchain/asgardex-token'
 import { bn, assetAmount, PoolData, assetToBase, getAssetFromString } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 

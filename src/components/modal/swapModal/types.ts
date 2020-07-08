@@ -1,4 +1,4 @@
-import { BaseAmount, TokenAmount } from '@thorchain/asgardex-token'
+import { BaseAmount, AssetAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
 export type CalcResult = {
@@ -8,8 +8,8 @@ export type CalcResult = {
   symbolTo?: string
   Px: BigNumber
   slip: BigNumber
-  outputAmount: TokenAmount
+  outputAmount: AssetAmount
   outputPrice: BigNumber
-  fee: TokenAmount
+  fee: AssetAmount
   lim?: BaseAmount
 }
