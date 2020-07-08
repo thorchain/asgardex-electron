@@ -11,7 +11,7 @@ import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PoolAsset, PricePoolAsset } from '../pools/types'
 
 const AssetsView: React.FC = (): JSX.Element => {
-  const { balancesState$, reloadBalances } = useBinanceContext()
+  const { balancesState$ } = useBinanceContext()
   const balancesRD = useObservableState(balancesState$, RD.initial)
 
   const {
@@ -30,14 +30,7 @@ const AssetsView: React.FC = (): JSX.Element => {
 
   const poolDetails = RD.toNullable(poolsRD)?.poolDetails ?? []
 
-  return (
-    <AssetsTable
-      balances={balancesRD}
-      reloadBalancesHandler={reloadBalances}
-      pricePool={pricePool}
-      poolDetails={poolDetails}
-    />
-  )
+  return <AssetsTable balances={balancesRD} pricePool={pricePool} poolDetails={poolDetails} />
 }
 
 export default AssetsView

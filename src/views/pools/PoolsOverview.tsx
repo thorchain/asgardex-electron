@@ -26,7 +26,6 @@ import { SwapRouteParams } from '../../routes/swap'
 import { PoolsState } from '../../services/midgard/types'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
-import View from '../View'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
 import { PoolTableRowData, PoolTableRowsData, PricePoolAsset, PoolAsset } from './types'
 import { getBlocksLeftForPendingPoolAsString } from './utils'
@@ -429,7 +428,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   )
 
   return (
-    <View>
+    <>
       <Label size="big" weight="bold" color="normal" textTransform="uppercase">
         Available Pools
       </Label>
@@ -438,7 +437,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         Pending Pools
       </Label>
       {renderPendingPools}
-    </View>
+    </>
   )
 }
 

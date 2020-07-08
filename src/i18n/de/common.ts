@@ -12,7 +12,8 @@ const common: CommonMessages = {
   'common.amount': 'Amount - DE',
   'common.coin': 'Coin - DE',
   'common.password': 'Passwort',
-  'common.memo': 'Memo - DE'
+  'common.memo': 'Memo - DE',
+  'common.refresh': 'aktualisierung'
 }
 
 export default common

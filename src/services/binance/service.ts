@@ -6,7 +6,7 @@ import { none, some } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, catchError, retry, shareReplay, startWith, switchMap } from 'rxjs/operators'
+import { map, mergeMap, catchError, retry, shareReplay, startWith, switchMap, debounceTime } from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
 import { envOrDefault } from '../../helpers/envHelper'
@@ -217,7 +217,10 @@ const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const balancesState$: Observable<BalancesRD> = Rx.combineLatest(reloadBalances$, clientState$).pipe(
+const balancesState$: Observable<BalancesRD> = Rx.combineLatest(
+  reloadBalances$.pipe(debounceTime(300)),
+  clientState$
+).pipe(
   mergeMap(([_, clientState]) => {
     const client = getBinanceClient(clientState)
     return FP.pipe(
