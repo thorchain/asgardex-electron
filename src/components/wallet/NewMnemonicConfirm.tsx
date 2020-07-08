@@ -5,6 +5,8 @@ import { Card, Col, Row, Button, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import { v4 as uuidv4 } from 'uuid'
 
+import { isSelectedFactory } from '../../helpers/isSelectedHelper'
+
 type WordType = {
   text: string
   _id: string
@@ -65,13 +67,8 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
 
   init()
 
-  const isSelected = useCallback(
-    (id: string) => {
-      const res: WordType | undefined = wordsList.find((e: WordType) => e._id === id)
-      return !!res?.selected
-    },
-    [wordsList]
-  )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const isSelected = useCallback(isSelectedFactory(wordsList, '_id'), [wordsList])
 
   const checkPhraseConfirmWords = useCallback(() => {
     // check against original phrase order
