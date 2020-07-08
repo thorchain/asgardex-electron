@@ -70,7 +70,7 @@ const WalletView: React.FC = (): JSX.Element => {
         </Switch>
       </>
     ),
-    []
+    [reloadBalances]
   )
 
   const renderWalletRoute = useCallback(
