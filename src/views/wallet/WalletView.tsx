@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
+import SyncIcon from '@ant-design/icons/SyncOutlined'
 import * as H from 'history'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -39,6 +40,7 @@ const WalletView: React.FC = (): JSX.Element => {
     () => (
       <>
         <Button style={{ marginBottom: 20 }} typevalue={'outline'} onClick={reloadBalances}>
+          <SyncIcon />
           {intl.formatMessage({ id: 'common.refresh' })}
         </Button>
         <Switch>
