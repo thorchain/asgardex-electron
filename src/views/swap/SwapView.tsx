@@ -4,7 +4,6 @@ import { Button } from 'antd'
 import { useHistory, useParams } from 'react-router-dom'
 
 import { SwapRouteParams } from '../../routes/swap'
-import View from '../View'
 
 type Props = {}
 
@@ -19,12 +18,12 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
   }, [goBack])
 
   return (
-    <View>
+    <>
       <Button onClick={clickHandler}>Back</Button>
       <h1>
         Swap {source.toUpperCase()} -&gt; {target.toUpperCase()}
       </h1>
-    </View>
+    </>
   )
 }
 

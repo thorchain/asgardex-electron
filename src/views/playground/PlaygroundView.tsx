@@ -9,7 +9,6 @@ import { useIntl } from 'react-intl'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { PoolsState } from '../../services/midgard/types'
-import View from '../View'
 
 type Props = {}
 
@@ -71,7 +70,7 @@ const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
   )
 
   return (
-    <View>
+    <>
       <h1>Playground</h1>
       <h1>i18n</h1>
       <h2>{intl.formatMessage({ id: 'common.greeting' }, { name: 'ASGARDEX' })}</h2>
@@ -83,7 +82,7 @@ const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
       <Button onClick={() => midgardService.reloadPoolsState()}>Reload pools</Button>
       <h1>Memo</h1>
       <h2>{memo}</h2>
-    </View>
+    </>
   )
 }
 

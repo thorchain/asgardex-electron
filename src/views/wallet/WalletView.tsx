@@ -9,7 +9,6 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import View from '../View'
 import AssetDetailsView from './AssetDetailsView'
 import AssetsView from './AssetsView'
 import BondsView from './BondsView'
@@ -103,19 +102,17 @@ const WalletView: React.FC = (): JSX.Element => {
   )
 
   return (
-    <View>
-      <Switch>
-        <Route path={walletRoutes.locked.template} exact>
-          <UnlockView />
-        </Route>
-        <Route path={walletRoutes.imports.template} exact>
-          <div style={{ display: 'flex' }}>
-            <ImportsView />
-          </div>
-        </Route>
-        <Route path={walletRoutes.base.template} render={renderWalletRoute} />
-      </Switch>
-    </View>
+    <Switch>
+      <Route path={walletRoutes.locked.template} exact>
+        <UnlockView />
+      </Route>
+      <Route path={walletRoutes.imports.template} exact>
+        <div style={{ display: 'flex' }}>
+          <ImportsView />
+        </div>
+      </Route>
+      <Route path={walletRoutes.base.template} render={renderWalletRoute} />
+    </Switch>
   )
 }
 
