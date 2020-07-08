@@ -1,3 +1,1 @@
-import Input from './Input'
-
-export default Input
+export { Input, InputPassword, InputTextArea } from './Input.style'

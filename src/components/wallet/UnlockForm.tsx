@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
-import { Form, Input, Button } from 'antd'
+import { Form, Button } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
@@ -9,6 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 import { useHistory, useLocation } from 'react-router-dom'
 
+import { InputPassword } from '../../components/uielements/input'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { KeystoreState } from '../../services/wallet/types'
@@ -81,7 +82,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
         name="password"
         rules={[{ required: true, validator: passwordValidator }]}
         validateTrigger={['onSubmit', 'onChange']}>
-        <Input.Password placeholder="Enter your password" size="large" />
+        <InputPassword placeholder="Enter your password" size="large" />
       </Form.Item>
       {renderError}
       <Form.Item>

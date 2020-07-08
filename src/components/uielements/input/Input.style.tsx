@@ -1,34 +1,30 @@
-import { Input } from 'antd'
-import styled from 'styled-components'
+import * as A from 'antd'
+import { SizeType } from 'antd/lib/config-provider/SizeContext'
+import * as AI from 'antd/lib/input'
+import styled, { css } from 'styled-components'
 import { palette, key } from 'styled-theme'
 
-import { Color, Colors, FontSettings, InputType, Size, Sizes } from './types'
-
-export type InputWrapperProps = {
-  sizevalue: Size
-  color: Color
-  typevalue: InputType
-}
+import { Color, Colors, FontSettings, InputType } from './types'
 
 const fontSettings: FontSettings = {
   small: {
     size: key('sizes.font.small', '10px'),
     spacing: '0.5px'
   },
-  normal: {
+  middle: {
     size: key('sizes.font.normal', '11px'),
     spacing: '0.5px'
   },
-  big: {
+  large: {
     size: key('sizes.font.normal', '12px'),
     spacing: '0.5px'
   }
 }
 
-const sizes: Sizes = {
+const sizes: Record<NonNullable<SizeType>, string> = {
   small: '20px',
-  normal: '25px',
-  big: '32px'
+  middle: '25px',
+  large: '32px'
 }
 
 const colors: Colors = {
@@ -38,14 +34,21 @@ const colors: Colors = {
   error: palette('error', 0)
 }
 
-export const InputWrapper = styled(Input)`
+type CustomInputProps = {
+  color?: Color
+  typevalue?: InputType
+}
+
+type InputProps = CustomInputProps & AI.InputProps
+
+const inputStyle = css<InputProps>`
   &.ant-input-affix-wrapper,
   &.ant-input {
-    height: ${(props: InputWrapperProps) => sizes[props.sizevalue]};
-    font-size: ${(props: InputWrapperProps) => fontSettings[props.sizevalue].size};
-    letter-spacing: ${(props: InputWrapperProps) => fontSettings[props.sizevalue].spacing};
-    ${(props: InputWrapperProps) => props.typevalue === 'ghost' && 'border: none;'};
-    ${(props: InputWrapperProps) => props.typevalue === 'ghost' && 'background: #F0F3F7;'};
+    height: ${({ size = 'middle' }) => sizes[size]};
+    font-size: ${({ size = 'middle' }) => fontSettings[size].size};
+    letter-spacing: ${({ size = 'middle' }) => fontSettings[size].spacing};
+    ${({ typevalue }) => typevalue === 'ghost' && 'border: none;'};
+    ${({ typevalue }) => typevalue === 'ghost' && 'background: #F0F3F7;'};
 
     border: 1px solid ${palette('gray', 0)};
     background: ${palette('background', 1)};
@@ -58,10 +61,24 @@ export const InputWrapper = styled(Input)`
 
     &:hover,
     &:focus {
-      border-color: ${(props: InputWrapperProps) => colors[props.color]};
-      --antd-wave-shadow-color: ${(props: InputWrapperProps) => colors[props.color]};
-      box-shadow: ${(props: InputWrapperProps) =>
-        props.typevalue === 'ghost' ? 'none' : '0 0 0 2px ' + colors[props.color]};
+      border-color: ${({ color = 'primary' }) => colors[color]};
+      box-shadow: ${({ typevalue = 'normal', color = 'primary' }) =>
+        typevalue === 'ghost' ? 'none' : '0 0 0 2px ' + colors[color]};
     }
   }
+`
+
+export const Input = styled(A.Input)<InputProps>`
+  ${inputStyle}
+`
+
+export const InputPassword = styled(A.Input.Password)<InputProps>`
+  ${inputStyle}
+  & .ant-input-password-icon {
+    color: ${colors.primary};
+  }
+`
+
+export const InputTextArea = styled(A.Input.TextArea)<InputProps>`
+  ${inputStyle}
 `

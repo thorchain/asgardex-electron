@@ -13,7 +13,7 @@ import View from '../View'
 import AssetDetailsView from './AssetDetailsView'
 import AssetsView from './AssetsView'
 import BondsView from './BondsView'
-import ImportsView from './ImportsView'
+import ImportsView from './importsView'
 import ReceiveView from './ReceiveView'
 import SendView from './SendView'
 import SettingsView from './SettingsView'
@@ -109,7 +109,9 @@ const WalletView: React.FC = (): JSX.Element => {
           <UnlockView />
         </Route>
         <Route path={walletRoutes.imports.template} exact>
-          <ImportsView />
+          <div style={{ display: 'flex' }}>
+            <ImportsView />
+          </div>
         </Route>
         <Route path={walletRoutes.base.template} render={renderWalletRoute} />
       </Switch>

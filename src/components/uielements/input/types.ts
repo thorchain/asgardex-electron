@@ -1,22 +1,18 @@
-export type Size = 'small' | 'normal' | 'big'
+import { SizeType } from 'antd/lib/config-provider/SizeContext'
 
 export type Color = 'primary' | 'success' | 'warning' | 'error'
 
 export type InputType = 'normal' | 'ghost'
+
+export type InputSecurity = 'normal' | 'password'
 
 type FontSetting = {
   size: string
   spacing: string
 }
 
-export type FontSettings = {
-  [key: string]: FontSetting
-}
+export type FontSettings = Record<NonNullable<SizeType>, FontSetting>
 
 export type Colors = {
   [key in Color]: string
-}
-
-export type Sizes = {
-  [key in Size]: string
 }
