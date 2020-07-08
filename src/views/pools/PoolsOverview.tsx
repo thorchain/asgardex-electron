@@ -143,10 +143,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     render: renderBtnPoolsColumn
   }
 
-  const renderPoolColumn = useCallback(({ target }: Pool) => {
-    console.log('xxx target:', target)
-    return <AssetPairOverlapped asset={getAssetFromString(PoolAsset.RUNE)} target={target} />
-  }, [])
+  const renderPoolColumn = useCallback(
+    ({ target }: Pool) => <AssetPairOverlapped asset={getAssetFromString(PoolAsset.RUNE)} target={target} />,
+    []
+  )
   const poolColumn: ColumnType<PoolTableRowData> = {
     key: 'pool',
     title: 'pool',
