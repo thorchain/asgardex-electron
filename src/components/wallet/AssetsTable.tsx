@@ -2,7 +2,13 @@ import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Balances, Balance } from '@thorchain/asgardex-binance'
-import { assetAmount, bnOrZero, formatAssetAmountCurrency, baseToAsset } from '@thorchain/asgardex-util'
+import {
+  assetAmount,
+  bnOrZero,
+  formatAssetAmountCurrency,
+  baseToAsset,
+  getAssetFromString
+} from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/lib/function'
@@ -19,8 +25,8 @@ import { BalancesRD } from '../../services/binance/types'
 import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
 import { PricePool } from '../../views/pools/types'
+import AssetIcon from '../uielements/assets/assetIcon'
 import Button from '../uielements/button'
-import Coin from '../uielements/coins/coin'
 import { TableWrapper } from './AssetsTable.style'
 
 type Props = {
@@ -44,7 +50,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       key: 'icon',
       title: '',
       dataIndex: 'symbol',
-      render: (_, { symbol }) => <Coin type={symbol} size="big" />
+      render: (_, { symbol }) => <AssetIcon asset={getAssetFromString(symbol)} size="big" />
     }),
     []
   )

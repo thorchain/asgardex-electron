@@ -6,7 +6,7 @@ import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import { ASSETS_MAINNET } from '../../../mock/assets'
 import { AssetPair } from '../../../types/asgardex'
-import CoinData from '../coins/coinData'
+import AssetData from '../assets/assetData'
 import FilterMenu from './FilterMenu'
 
 storiesOf('Components/FilterMenu', module).add('coins example', () => {
@@ -17,7 +17,7 @@ storiesOf('Components/FilterMenu', module).add('coins example', () => {
 
   const cellRenderer = (data: AssetPair) => {
     const { asset, price } = data
-    const node = <CoinData asset={asset} price={price} />
+    const node = <AssetData asset={asset} price={price} />
     return { key: asset?.symbol ?? '', node }
   }
 

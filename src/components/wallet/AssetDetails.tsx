@@ -11,7 +11,7 @@ import { AssetDetailsRouteParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { UserTransactionType } from '../../types/wallet'
 import { PoolAsset } from '../../views/pools/types'
-import Coin from '../uielements/coins/coin'
+import AssetIcon from '../uielements/assets/assetIcon'
 import {
   StyledCard,
   StyledLabel,
@@ -79,7 +79,7 @@ const AssetDetails: React.FC = (): JSX.Element => {
         <Col span={24}>
           <StyledCard bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
             <div>
-              <Coin asset={asset} size="large" />
+              <AssetIcon asset={asset} size="large" />
             </div>
             <CoinInfoWrapper>
               <CoinTitle>{asset?.ticker ?? 'unknown'}</CoinTitle>

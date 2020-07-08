@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Asset } from '@thorchain/asgardex-util'
 
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
-import * as Styled from './CoinIcon.style'
+import * as Styled from './AssetIcon.style'
 import { Size } from './types'
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {

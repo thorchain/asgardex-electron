@@ -4,8 +4,8 @@ import { Asset, baseAmount } from '@thorchain/asgardex-util'
 
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetPair } from '../../../../types/asgardex'
-import CoinData from '../../coins/coinData'
 import FilterMenu from '../../filterMenu'
+import AssetData from '../assetData'
 
 const filterFunction = (item: AssetPair, searchTerm: string) => {
   const { ticker } = item.asset
@@ -39,7 +39,7 @@ const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
       const { asset } = data
       const { ticker = '' } = asset
       const price = baseAmount(priceIndex[ticker])
-      const node = <CoinData asset={asset} price={price} />
+      const node = <AssetData asset={asset} price={price} />
       const key = asset?.symbol ?? ''
       return { key, node }
     },

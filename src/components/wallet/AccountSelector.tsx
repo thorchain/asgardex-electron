@@ -3,9 +3,9 @@ import React, { useCallback } from 'react'
 import { Asset } from '@thorchain/asgardex-util'
 import { Menu, Dropdown } from 'antd'
 
-import { Size as CoinSize } from '../../components/uielements/coins/coinIcon/types'
+import { Size as CoinSize } from '../../components/uielements/assets/assetIcon/types'
 import Label from '../../components/uielements/label'
-import CoinIcon from '../uielements/coins/coinIcon'
+import AssetIcon from '../uielements/assets/assetIcon'
 import { StyledCard, AssetWrapper, AssetInfoWrapper, AssetTitle } from './AccountSelector.style'
 
 // Multi-use 'account selector' component will have a data context
@@ -45,7 +45,7 @@ const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
     <StyledCard bordered={false}>
       <AssetWrapper>
         <div>
-          <CoinIcon asset={asset} size={size} />
+          <AssetIcon asset={asset} size={size} />
         </div>
         <AssetInfoWrapper>
           <AssetTitle>{asset?.symbol ?? 'unknown'}</AssetTitle>

@@ -3,8 +3,8 @@ import React from 'react'
 import { bn, formatBN, Asset } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
-import Coin from '../../coins/coin'
 import Label from '../../label'
+import AssetIcon from '../assetIcon'
 import { AssetSelectDataWrapper, AssetSelectDataWrapperType, AssetSelectDataWrapperSize } from './AssetSelectData.style'
 
 type Props = {
@@ -27,7 +27,7 @@ const AssetSelectData: React.FC<Props> = (props: Props): JSX.Element => {
       hasTarget={target !== undefined}
       type={type}
       className={`coinData-wrapper ${className}`}>
-      {asset && <Coin asset={asset} target={target} size={size} />}
+      {asset && <AssetIcon asset={asset} size={size} />}
       <div className="assetSelectData-asset-info">
         <Label className="assetSelectData-asset-label" weight="600">
           {asset?.ticker ?? 'unknown'}

@@ -4,14 +4,14 @@ import { radios } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 
 import { ASSETS_MAINNET } from '../../../../mock/assets'
-import AssetIcon from './CoinIcon'
+import AssetIcon from './AssetIcon'
 import { Size } from './types'
 
 type SizeOptions = {
   [key in Size]: Size
 }
 
-storiesOf('Components/assets/CoinIcon', module).add('default', () => {
+storiesOf('Components/assets/AssetIcon', module).add('default', () => {
   const sizeOptions: SizeOptions = {
     small: 'small',
     normal: 'normal',

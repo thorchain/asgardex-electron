@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { formatBN, formatBNCurrency } from '@thorchain/asgardex-util'
+import { formatBN, formatBNCurrency, Asset } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
-import CoinIcon from '../coins/coinIcon'
+import AssetIcon from '../assets/assetIcon'
 import Status from '../status'
 import {
   TokenDetailContainer,
@@ -15,16 +15,14 @@ import {
 
 export type Props = {
   title: string
-  target?: string
-  ticker: string
+  target: Asset
   marketPrice: BigNumber
   totalSupply: BigNumber
 }
 
 const TokenDetailCard: React.FC<Props> = ({
   title = 'TOKEN DETAILS',
-  target = 'RUNE',
-  ticker = '',
+  target,
   marketPrice,
   totalSupply
 }): JSX.Element => {
@@ -36,11 +34,11 @@ const TokenDetailCard: React.FC<Props> = ({
 
       <NewTokenDetailWrapper>
         <NewTokenCoin>
-          <CoinIcon type={target} />
+          <AssetIcon asset={target} />
         </NewTokenCoin>
 
-        <TokenName size="normal">{target.toUpperCase()}</TokenName>
-        <Status title="Ticker" value={ticker.toUpperCase()} direction="horizontal" />
+        <TokenName size="normal">{target?.symbol ?? 'unknown'}</TokenName>
+        <Status title="Ticker" value={target?.ticker ?? 'unknown'} direction="horizontal" />
         <Status title="Market Price" value={`${formatBNCurrency(marketPrice)}`} direction="horizontal" />
         <Status title="Total Supply" value={formatBN(totalSupply)} direction="horizontal" />
       </NewTokenDetailWrapper>

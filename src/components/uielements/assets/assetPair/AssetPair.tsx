@@ -2,8 +2,8 @@ import React from 'react'
 
 import { Asset } from '@thorchain/asgardex-util'
 
-import CoinIcon from '../../coins/coinIcon'
-import { Size as CoinSize } from '../../coins/coinIcon/types'
+import AssetIcon from '../assetIcon'
+import { Size as CoinSize } from '../assetIcon/types'
 import * as Styled from './AssetPair.style'
 
 type Props = {
@@ -17,11 +17,11 @@ const AssetPair: React.FC<Props> = (props): JSX.Element => {
   return (
     <Styled.AssetPairWrapper>
       <Styled.CoinWrapper>
-        <CoinIcon asset={from} size={size} />
+        <AssetIcon asset={from} size={size} />
       </Styled.CoinWrapper>
       <Styled.PairIcon />
       <Styled.CoinWrapper>
-        <CoinIcon asset={to} size={size} />
+        <AssetIcon asset={to} size={size} />
       </Styled.CoinWrapper>
     </Styled.AssetPairWrapper>
   )

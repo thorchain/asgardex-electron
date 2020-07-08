@@ -10,8 +10,8 @@ import {
 } from '@thorchain/asgardex-util'
 
 import Label from '../../label'
-import Coin from '../coin'
-import { CoinDataWrapper, CoinDataWrapperType, CoinDataWrapperSize } from './CoinData.style'
+import AssetIcon from '../assetIcon'
+import { CoinDataWrapper, CoinDataWrapperType, CoinDataWrapperSize } from './AssetData.style'
 
 type Props = {
   asset: Asset
@@ -24,7 +24,7 @@ type Props = {
   type?: CoinDataWrapperType
 }
 
-const CoinData: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetData: React.FC<Props> = (props: Props): JSX.Element => {
   const {
     asset,
     assetValue,
@@ -43,7 +43,7 @@ const CoinData: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <CoinDataWrapper size={size} type={type}>
-      {asset && <Coin className="coinData-coin-avatar" asset={asset} target={target} size={size} />}
+      {asset && <AssetIcon className="coinData-coin-avatar" asset={asset} size={size} />}
       <div className="coinData-asset-info">
         <Label className="coinData-asset-label" weight="600">
           {`${assetTicker} ${target ? ':' : ''}`}
@@ -75,4 +75,4 @@ const CoinData: React.FC<Props> = (props: Props): JSX.Element => {
   )
 }
 
-export default CoinData
+export default AssetData
