@@ -1,28 +1,35 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { Size, Sizes } from './types'
+import { Size, Sizes, FontSizes } from './types'
 
 type IconProps = {
   size: Size
 }
 
-const sizes: Sizes = {
-  large: '66px',
-  big: '58px',
-  normal: '42px',
-  small: '32px'
+const fontSizes: FontSizes = {
+  large: 18,
+  big: 11,
+  normal: 10,
+  small: 8
+}
+
+export const sizes: Sizes = {
+  large: 72,
+  big: 55,
+  normal: 40,
+  small: 32
 }
 
 export const IconWrapper = styled.div<IconProps>`
-  width: ${({ size }) => sizes[size]};
-  height: ${({ size }) => sizes[size]};
+  width: ${({ size }) => `${sizes[size]}px`};
+  height: ${({ size }) => `${sizes[size]}px`};
   position: relative;
 `
 
 export const IconBG = styled.div<IconProps>`
-  width: ${({ size }) => sizes[size]};
-  height: ${({ size }) => sizes[size]};
+  width: ${({ size }) => `${sizes[size]}px`};
+  height: ${({ size }) => `${sizes[size]}px`};
   position: absolute;
   left: 0;
   top: 0;
@@ -30,8 +37,8 @@ export const IconBG = styled.div<IconProps>`
 `
 
 export const IconFallback = styled.div<IconProps>`
-  width: ${({ size }) => sizes[size]};
-  height: ${({ size }) => sizes[size]};
+  width: ${({ size }) => `${sizes[size]}px`};
+  height: ${({ size }) => `${sizes[size]}px`};
   position: absolute;
   left: 0;
   top: 0;
@@ -39,7 +46,7 @@ export const IconFallback = styled.div<IconProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: ${({ size }) => (size === 'big' ? '12px' : '10px')};
+  font-size: ${({ size }) => `${fontSizes[size]}px`};
   color: ${palette('text', 3)};
 `
 
@@ -47,7 +54,7 @@ export const Icon = styled.img<IconProps>`
   position: absolute;
   left: 0;
   top: 0;
-  width: ${({ size }) => sizes[size]};
-  height: ${({ size }) => sizes[size]};
+  width: ${({ size }) => `${sizes[size]}px`};
+  height: ${({ size }) => `${sizes[size]}px`};
   border-radius: 50%;
 `

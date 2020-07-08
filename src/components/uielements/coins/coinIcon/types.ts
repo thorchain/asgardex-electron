@@ -1,5 +1,4 @@
 export type Size = 'small' | 'normal' | 'big' | 'large'
 
-export type Sizes = {
-  [key in Size]: string
-}
+export type Sizes = Record<Size, number>
+export type FontSizes = Record<Size, number>

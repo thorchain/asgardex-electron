@@ -11,7 +11,7 @@ type SizeOptions = {
   [key in Size]: Size
 }
 
-storiesOf('Components/assets/AssetIcon', module).add('default', () => {
+storiesOf('Components/assets/CoinIcon', module).add('default', () => {
   const sizeOptions: SizeOptions = {
     small: 'small',
     normal: 'normal',

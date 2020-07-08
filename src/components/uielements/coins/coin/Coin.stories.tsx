@@ -7,9 +7,7 @@ import { ASSETS_MAINNET } from '../../../../mock/assets'
 import { Size } from '../coinIcon/types'
 import Coin from './Coin'
 
-type SizeOptions = {
-  [key in Size]: Size
-}
+type SizeOptions = Record<Size, Size>
 
 const sizeOptions: SizeOptions = {
   small: 'small',
