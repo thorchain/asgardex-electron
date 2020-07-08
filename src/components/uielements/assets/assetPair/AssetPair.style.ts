@@ -12,13 +12,11 @@ export const CoinWrapper = styled.div`
   justify-content: center;
   align-items: center;
   padding-top: 3px;
-
-  &:last-child {
-    margin-left: -6px;
-  }
 `
 
 export const PairIcon = styled(CaretRightOutlined)`
-  margin: 15px 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: ${palette('text', 2)};
 `

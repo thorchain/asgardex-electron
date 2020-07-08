@@ -3,13 +3,13 @@ import React from 'react'
 import { Asset } from '@thorchain/asgardex-util'
 
 import CoinIcon from '../../coins/coinIcon'
+import { Size as CoinSize } from '../../coins/coinIcon/types'
 import * as Styled from './AssetPair.style'
-import { Size } from './types'
 
 type Props = {
   from: Asset
   to: Asset
-  size?: Size
+  size?: CoinSize
 }
 
 const AssetPair: React.FC<Props> = (props): JSX.Element => {
