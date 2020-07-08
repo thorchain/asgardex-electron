@@ -11,6 +11,7 @@ export type CommonMessages = {
   'common.coin': string
   'common.password': string
   'common.memo': string
+  'common.refresh': string
 }
 
 export type PoolsMessages = {

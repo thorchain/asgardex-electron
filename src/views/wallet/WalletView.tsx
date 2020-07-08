@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as H from 'history'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
 import Button from '../../components/uielements/button'
@@ -24,6 +25,7 @@ import UnlockView from './UnlockView'
 const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { reloadBalances } = useBinanceContext()
+  const intl = useIntl()
 
   // Important note:
   // Since `useObservableState` is set after first render
@@ -37,7 +39,7 @@ const WalletView: React.FC = (): JSX.Element => {
     () => (
       <>
         <Button style={{ marginBottom: 20 }} typevalue={'outline'} onClick={reloadBalances}>
-          Refresh
+          {intl.formatMessage({ id: 'common.refresh' })}
         </Button>
         <Switch>
           <Route path={walletRoutes.base.template} exact>
@@ -70,7 +72,7 @@ const WalletView: React.FC = (): JSX.Element => {
         </Switch>
       </>
     ),
-    [reloadBalances]
+    [reloadBalances, intl]
   )
 
   const renderWalletRoute = useCallback(
