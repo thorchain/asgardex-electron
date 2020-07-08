@@ -26,18 +26,16 @@ import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue } from '../
 import { PoolDetails } from '../../services/midgard/types'
 import { PricePool } from '../../views/pools/types'
 import AssetIcon from '../uielements/assets/assetIcon'
-import Button from '../uielements/button'
 import { TableWrapper } from './AssetsTable.style'
 
 type Props = {
   balances: BalancesRD
   pricePool?: PricePool
   poolDetails: PoolDetails
-  reloadBalancesHandler?: () => void
 }
 
 const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
-  const { balances: balancesRD, reloadBalancesHandler = () => {}, pricePool = RUNE_PRICE_POOL, poolDetails } = props
+  const { balances: balancesRD, pricePool = RUNE_PRICE_POOL, poolDetails } = props
 
   const history = useHistory()
   const intl = useIntl()
@@ -170,12 +168,9 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   return (
-    <>
-      <Button onClick={reloadBalancesHandler}>Refresh</Button>
-      <Row>
-        <Col span={24}>{renderAssets}</Col>
-      </Row>
-    </>
+    <Row>
+      <Col span={24}>{renderAssets}</Col>
+    </Row>
   )
 }
 
