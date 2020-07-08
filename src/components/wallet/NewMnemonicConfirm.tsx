@@ -5,6 +5,7 @@ import { Card, Col, Row, Button, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import { v4 as uuidv4 } from 'uuid'
 
+import { shuffleArray } from '../../helpers/shuffleArrayHelper'
 import { isSelectedFactory } from '../../helpers/isSelectedHelper'
 
 type WordType = {
@@ -25,17 +26,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
   const [mnemonicError, setMnemonicError] = useState<string>('')
   const [initialized, setInitialized] = useState<boolean>(false)
 
-  const shuffledWords = useCallback((words: WordType[]) => {
-    const shuffler = (arr: WordType[]) => {
-      const newArr = arr.slice()
-      for (let i = newArr.length - 1; i > 0; i--) {
-        const rand = Math.floor(Math.random() * (i + 1))
-        ;[newArr[i], newArr[rand]] = [newArr[rand], newArr[i]]
-      }
-      return newArr
-    }
-    return words.length > 0 ? shuffler(words) : []
-  }, [])
+  const shuffledWords = useCallback<(array: WordType[]) => WordType[]>(shuffleArray, [])
 
   const init = useCallback(() => {
     const words = mnemonic.split(' ')
