@@ -4,7 +4,9 @@ import * as H from 'history'
 import { useObservableState } from 'observable-hooks'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
+import Button from '../../components/uielements/button'
 import AssetsNav from '../../components/wallet/AssetsNav'
+import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
@@ -21,6 +23,7 @@ import UnlockView from './UnlockView'
 
 const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
+  const { reloadBalances } = useBinanceContext()
 
   // Important note:
   // Since `useObservableState` is set after first render
@@ -32,35 +35,40 @@ const WalletView: React.FC = (): JSX.Element => {
   // if an user has a phrase imported and wallet has not been locked
   const renderWalletRoutes = useMemo(
     () => (
-      <Switch>
-        <Route path={walletRoutes.base.template} exact>
-          <Redirect to={walletRoutes.assets.path()} />
-        </Route>
-        <Route path={walletRoutes.settings.template} exact>
-          <SettingsView />
-        </Route>
-        <Route path={walletRoutes.assets.template} exact>
-          <AssetsNav />
-          <AssetsView />
-        </Route>
-        <Route path={walletRoutes.stakes.template} exact>
-          <AssetsNav />
-          <StakesView />
-        </Route>
-        <Route path={walletRoutes.bonds.template} exact>
-          <AssetsNav />
-          <BondsView />
-        </Route>
-        <Route path={walletRoutes.fundsReceive.template} exact>
-          <ReceiveView />
-        </Route>
-        <Route path={walletRoutes.fundsSend.template} exact>
-          <SendView />
-        </Route>
-        <Route path={walletRoutes.assetDetails.template} exact>
-          <AssetDetailsView />
-        </Route>
-      </Switch>
+      <>
+        <Button style={{ marginBottom: 20 }} typevalue={'outline'} onClick={reloadBalances}>
+          Refresh
+        </Button>
+        <Switch>
+          <Route path={walletRoutes.base.template} exact>
+            <Redirect to={walletRoutes.assets.path()} />
+          </Route>
+          <Route path={walletRoutes.settings.template} exact>
+            <SettingsView />
+          </Route>
+          <Route path={walletRoutes.assets.template} exact>
+            <AssetsNav />
+            <AssetsView />
+          </Route>
+          <Route path={walletRoutes.stakes.template} exact>
+            <AssetsNav />
+            <StakesView />
+          </Route>
+          <Route path={walletRoutes.bonds.template} exact>
+            <AssetsNav />
+            <BondsView />
+          </Route>
+          <Route path={walletRoutes.fundsReceive.template} exact>
+            <ReceiveView />
+          </Route>
+          <Route path={walletRoutes.fundsSend.template} exact>
+            <SendView />
+          </Route>
+          <Route path={walletRoutes.assetDetails.template} exact>
+            <AssetDetailsView />
+          </Route>
+        </Switch>
+      </>
     ),
     []
   )
