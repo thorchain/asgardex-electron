@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
 
 import { SyncOutlined, SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { BaseAmount, baseToAsset, formatAssetAmountCurrency, getAssetFromString } from '@thorchain/asgardex-util'
+import { BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import BigNumber from 'bignumber.js'
@@ -12,7 +12,7 @@ import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
 import ErrorView from '../../components/shared/error/ErrorView'
-import { AssetPairOverlapped } from '../../components/uielements/assets/assetPair'
+import AssetIcon from '../../components/uielements/assets/assetIcon'
 import Button from '../../components/uielements/button'
 import Label from '../../components/uielements/label'
 import Table from '../../components/uielements/table'
@@ -144,7 +144,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderPoolColumn = useCallback(
-    ({ target }: Pool) => <AssetPairOverlapped asset={getAssetFromString(PoolAsset.RUNE)} target={target} />,
+    ({ target }: Pool) => (
+      <Row justify="center" align="middle">
+        <AssetIcon asset={target} />
+      </Row>
+    ),
     []
   )
   const poolColumn: ColumnType<PoolTableRowData> = {
@@ -156,9 +160,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderPoolColumnMobile = useCallback(
-    ({ target }: { asset: string; target: string }) => (
+    ({ target }: Pool) => (
       <Row justify="center" align="middle" style={{ width: '100%' }}>
-        <AssetPairOverlapped asset={getAssetFromString(PoolAsset.RUNE)} target={getAssetFromString(target)} />
+        <AssetIcon asset={target} />
       </Row>
     ),
     []

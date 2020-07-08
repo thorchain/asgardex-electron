@@ -38,6 +38,7 @@ export const getPoolTableRowData = (poolDetail: PoolDetail, pricePoolData: PoolD
   const status = poolDetail?.status ?? PoolDetailStatusEnum.Disabled
 
   const pool: Pool = {
+    // TODO(@Veado): Handle test/mainnet, since RUNE symbol is different
     asset: getAssetFromString(PoolAsset.RUNE),
     target: poolDetail.asset ? getAssetFromString(poolDetail.asset) : {}
   }

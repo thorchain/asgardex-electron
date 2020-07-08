@@ -14,7 +14,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
-  const { asset, size = 'big' } = props
+  const { asset, size = 'normal' } = props
   const [error, setError] = useState(false)
 
   const imgUrl = useMemo(() => {
