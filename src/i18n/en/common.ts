@@ -13,7 +13,7 @@ const common: CommonMessages = {
   'common.coin': 'Coin',
   'common.password': 'Password',
   'common.memo': 'Memo',
-  'common.refresh': 'REFRESH'
+  'common.refresh': 'refresh'
 }
 
 export default common
