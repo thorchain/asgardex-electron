@@ -1,9 +1,7 @@
 import React, { RefObject, useRef, useState } from 'react'
 
-import { tokenAmount } from '@thorchain/asgardex-token'
-import { bn, delay, Asset } from '@thorchain/asgardex-util'
+import { delay, Asset } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
-import BigNumber from 'bignumber.js'
 import { sortBy as _sortBy } from 'lodash'
 
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
@@ -36,9 +34,7 @@ const DropdownCarret: React.FC<DropdownCarretProps> = (props: DropdownCarretProp
 type Props = {
   assetData: AssetPair[]
   asset: Asset
-  price: BigNumber
   priceIndex: PriceDataIndex
-  priceUnit?: string
   withSearch?: boolean
   searchDisable?: string[]
   onSelect: (_: number) => void
@@ -49,9 +45,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
   const {
     asset,
     assetData = [],
-    price = bn(0),
     priceIndex,
-    priceUnit = '$',
     withSearch = false,
     searchDisable = [],
     onChangeAsset = (_: string) => {}
@@ -105,7 +99,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
     <AssetSelectWrapper ref={ref}>
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <>
-          <AssetSelectData asset={asset} assetValue={tokenAmount(price)} priceUnit={priceUnit} />
+          <AssetSelectData asset={asset} />
           {renderDropDownButton()}
         </>
       </Dropdown>

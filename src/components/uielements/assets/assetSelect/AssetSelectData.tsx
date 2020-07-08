@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { TokenAmount } from '@thorchain/asgardex-token'
 import { bn, formatBN, Asset } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
@@ -10,11 +9,8 @@ import { AssetSelectDataWrapper, AssetSelectDataWrapperType, AssetSelectDataWrap
 
 type Props = {
   asset: Asset
-  assetValue?: TokenAmount
   target?: Asset
-  targetValue?: TokenAmount
   price?: BigNumber
-  priceUnit?: string
   priceValid?: boolean
   size?: AssetSelectDataWrapperSize
   className?: string
@@ -34,7 +30,7 @@ const AssetSelectData: React.FC<Props> = (props: Props): JSX.Element => {
       {asset && <Coin asset={asset} target={target} size={size} />}
       <div className="assetSelectData-asset-info">
         <Label className="assetSelectData-asset-label" weight="600">
-          {`${asset}`}
+          {asset?.ticker ?? 'unknown'}
         </Label>
       </div>
       <div className="asset-price-info">

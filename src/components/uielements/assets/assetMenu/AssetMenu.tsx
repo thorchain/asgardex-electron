@@ -30,7 +30,8 @@ const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
         const { ticker = '' } = item.asset
         return ticker !== asset?.ticker
       }),
-    [asset?.ticker, assetData]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [asset, assetData]
   )
 
   const cellRenderer = useCallback(

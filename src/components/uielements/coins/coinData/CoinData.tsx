@@ -38,15 +38,15 @@ const CoinData: React.FC<Props> = (props: Props): JSX.Element => {
 
   const priceLabel = priceValid ? formatAssetAmountCurrency(baseToAsset(price)) : 'NOT LISTED'
 
-  const assetSymbol = asset.symbol ?? ''
-  const targetSymbol = target?.symbol ?? ''
+  const assetTicker = asset.ticker ?? 'unknown'
+  const targetTicker = target?.ticker ?? 'unknown'
 
   return (
     <CoinDataWrapper size={size} type={type}>
       {asset && <Coin className="coinData-coin-avatar" asset={asset} target={target} size={size} />}
       <div className="coinData-asset-info">
         <Label className="coinData-asset-label" weight="600">
-          {`${assetSymbol} ${target ? ':' : ''}`}
+          {`${assetTicker} ${target ? ':' : ''}`}
         </Label>
         {assetValue && (
           <Label className="coinData-asset-value" weight="600">
@@ -57,7 +57,7 @@ const CoinData: React.FC<Props> = (props: Props): JSX.Element => {
       {target && (
         <div className="coinData-target-info">
           <Label className="coinData-target-label" weight="600">
-            {targetSymbol}
+            {targetTicker}
           </Label>
           {targetValue && (
             <Label className="coinData-target-value" weight="600">

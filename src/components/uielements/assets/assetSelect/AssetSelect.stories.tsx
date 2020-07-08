@@ -22,7 +22,6 @@ storiesOf('Components/Assets/AssetSelect', module).add('default', () => {
             price: ONE_ASSET_BASE_AMOUNT
           }
         ]}
-        price={bn(600)}
         priceIndex={{
           RUNE: bn(1)
         }}
