@@ -1,7 +1,6 @@
 import React, { useCallback, useRef, useState, RefObject } from 'react'
 
-import { TokenAmount, tokenAmount } from '@thorchain/asgardex-token'
-import { bn, delay, formatBN, Asset, getAssetFromString } from '@thorchain/asgardex-util'
+import { bn, delay, formatBN, Asset, getAssetFromString, BaseAmount } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import { sortBy as _sortBy } from 'lodash'
@@ -49,7 +48,7 @@ const DropdownCarret: React.FC<DropdownCarretProps> = ({ open, onClick = () => {
 type Props = {
   asset: Asset
   assetData?: AssetPair[]
-  amount: TokenAmount
+  amount: BaseAmount
   price: BigNumber
   priceIndex?: PriceDataIndex
   unit?: string
@@ -70,8 +69,8 @@ type Props = {
 const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
   const {
     asset,
+    amount,
     assetData = [],
-    amount = tokenAmount(0),
     price = bn(0),
     priceIndex,
     slip,
@@ -150,7 +149,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
 
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <CardBorderWrapper>
-          <AssetNameLabel>{asset}</AssetNameLabel>
+          <AssetNameLabel>{asset?.ticker ?? 'unknown'}</AssetNameLabel>
           <HorizontalDivider />
           <CardTopRow>
             <AssetData>

@@ -1,9 +1,10 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { tokenAmount } from '@thorchain/asgardex-token'
-import { bn } from '@thorchain/asgardex-util'
+import { bn, assetAmount, assetToBase } from '@thorchain/asgardex-util'
 
+import { ONE_ASSET_BASE_AMOUNT } from '../../../../const'
+import { ASSETS_MAINNET } from '../../../../mock/assets'
 import AssetCard from './AssetCard'
 
 storiesOf('Components/Assets/AssetCard', module).add('default', () => {
@@ -11,25 +12,31 @@ storiesOf('Components/Assets/AssetCard', module).add('default', () => {
     <div style={{ display: 'flex', padding: '20px' }}>
       <AssetCard
         title="You are swapping"
-        asset="bnb"
+        asset={ASSETS_MAINNET.BNB}
         assetData={[
           {
-            asset: 'rune',
-            price: bn(1)
+            asset: ASSETS_MAINNET.BNB,
+            price: ONE_ASSET_BASE_AMOUNT
           },
           {
-            asset: 'tomo',
-            price: bn(1)
+            asset: ASSETS_MAINNET.TOMO,
+            price: ONE_ASSET_BASE_AMOUNT
           }
         ]}
-        amount={tokenAmount(1.354)}
+        amount={assetToBase(assetAmount(1.354))}
         price={bn(600)}
         priceIndex={{
           RUNE: bn(1)
         }}
         withSelection
       />
-      <AssetCard title="You will receive" asset="bolt" amount={tokenAmount(13549)} price={bn(596)} slip={2} />
+      <AssetCard
+        title="You will receive"
+        asset={ASSETS_MAINNET.BOLT}
+        amount={assetToBase(assetAmount(13.549))}
+        price={bn(596)}
+        slip={2}
+      />
     </div>
   )
 })
