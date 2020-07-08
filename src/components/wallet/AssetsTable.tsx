@@ -50,7 +50,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       key: 'icon',
       title: '',
       dataIndex: 'symbol',
-      render: (_, { symbol }) => <AssetIcon asset={getAssetFromString(symbol)} size="big" />
+      render: (_, { symbol }) => <AssetIcon asset={getAssetFromString(`BNB.${symbol}`)} size="normal" />
     }),
     []
   )
