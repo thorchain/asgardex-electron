@@ -1,4 +1,5 @@
 import { Observable, BehaviorSubject } from 'rxjs'
+import { debounceTime } from 'rxjs/operators'
 
 export type ObservableState<T> = {
   get$: Observable<T>
@@ -50,7 +51,7 @@ export type TriggerStream = {
 export const triggerStream = (): TriggerStream => {
   const subject$$ = new BehaviorSubject('')
   return {
-    stream$: subject$$.asObservable(),
+    stream$: subject$$.pipe(debounceTime(300)),
     trigger: () => subject$$.next('trigger')
   }
 }
