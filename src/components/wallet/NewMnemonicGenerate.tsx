@@ -1,9 +1,11 @@
 import React, { useState, useCallback, useMemo } from 'react'
 
 import { generatePhrase } from '@thorchain/asgardex-crypto'
-import { Form, Input, Button } from 'antd'
+import { Form, Button } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
+
+import { Input } from '../../components/uielements/input'
 
 type Props = {}
 const NewMnemonicGenerate: React.FC<Props> = (_: Props): JSX.Element => {

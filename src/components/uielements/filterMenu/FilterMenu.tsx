@@ -4,7 +4,7 @@ import { SearchOutlined } from '@ant-design/icons'
 import { ClickParam } from 'antd/lib/menu'
 
 import { AssetPair } from '../../../types/asgardex'
-import Input from '../input'
+import { Input } from '../input'
 import { Menu, MenuItem } from './FilterMenu.style'
 
 type Props = {
@@ -58,7 +58,7 @@ const FilterMenu: React.FC<Props> = ({
             value={searchTerm}
             onChange={handleSearchChanged}
             placeholder={placeholder}
-            sizevalue="big"
+            size="large"
             typevalue="ghost"
             suffix={<SearchOutlined />}
           />

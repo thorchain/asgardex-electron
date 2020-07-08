@@ -15,7 +15,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as walletRoutes from '../../routes/wallet'
 import Button from '../uielements/button'
-import { InputPasswordWrapper, InputTextArea } from '../uielements/input/Input.style'
+import { InputPassword, InputTextArea } from '../uielements/input/'
 
 const ImportPhrase: React.FC = (): JSX.Element => {
   const history = useHistory()
@@ -103,9 +103,9 @@ const ImportPhrase: React.FC = (): JSX.Element => {
             rules={[{ required: true, validator: phraseValidator }]}
             validateTrigger={['onSubmit', 'onChange']}>
             <InputTextArea
-              color={'primary'}
-              sizevalue={'normal'}
-              typevalue={'normal'}
+              color="primary"
+              size="middle"
+              typevalue="normal"
               placeholder={intl.formatMessage({ id: 'wallet.imports.enterphrase' }).toUpperCase()}
               rows={5}
             />
@@ -114,9 +114,9 @@ const ImportPhrase: React.FC = (): JSX.Element => {
             name="password"
             rules={[{ required: true, validator: passwordValidator }]}
             validateTrigger={['onSubmit', 'onChange']}>
-            <InputPasswordWrapper
+            <InputPassword
               color="primary"
-              sizevalue="normal"
+              size="middle"
               typevalue="normal"
               security="password"
               placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}

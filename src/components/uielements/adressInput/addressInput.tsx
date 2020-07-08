@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import { PlusOutlined, DeleteFilled } from '@ant-design/icons'
 
-import Input from '../input'
+import { Input } from '../input'
 import { AddressInputWrapper, PopoverContainer, PopoverContent } from './addressInput.style'
 
 type Props = {
@@ -67,7 +67,7 @@ const AddressInput: React.FC<Props> = (props: Props): JSX.Element => {
           <Input
             className="address-input"
             color="success"
-            sizevalue="normal"
+            size="middle"
             value={value}
             onChange={onChangeHandler}
             placeholder="Enter Recipient Address"

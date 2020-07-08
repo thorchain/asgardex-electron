@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import Button from '../../components/uielements/button'
-import Input from '../../components/uielements/input'
+import { Input } from '../../components/uielements/input'
 import AccountSelector from './AccountSelector'
 import {
   StyledCol,
@@ -49,16 +49,16 @@ const Send: React.FC = (): JSX.Element => {
             <StyledSubForm>
               <CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</CustomLabel>
               <Form.Item name="recipient">
-                <Input color="primary" sizevalue="big" />
+                <Input color="primary" size="large" />
               </Form.Item>
               <CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</CustomLabel>
               <StyledFormItem name="amount">
-                <Input sizevalue="big" />
+                <Input size="large" />
               </StyledFormItem>
               <StyledLabel size="big">MAX 35.3 BNB</StyledLabel>
               <CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</CustomLabel>
               <Form.Item name="password">
-                <Input sizevalue="big" />
+                <Input size="large" />
               </Form.Item>
             </StyledSubForm>
             <StyledSubmitItem>
