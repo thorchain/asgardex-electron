@@ -19,11 +19,11 @@ type Props = {
   asset: Asset
   assets: Asset[]
   onChange?: (asset: Asset) => {}
-  size: CoinSize
+  size?: CoinSize
 }
 
 const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
-  const { asset, assets, onChange = (_) => {}, size } = props
+  const { asset, assets, onChange = (_) => {}, size = 'normal' } = props
 
   const menu = useCallback(
     () => (

@@ -5,6 +5,7 @@ import { Row, Col } from 'antd'
 import QRCode from 'qrcode'
 import { useHistory } from 'react-router-dom'
 
+import { ASSETS_MAINNET } from '../../mock/assets'
 import AccountSelector from './AccountSelector'
 import { StyledBackLabel, StyledCol, StyledCard, StyledDiv, StyledAddress, StyledLabel } from './Receive.style'
 
@@ -73,7 +74,8 @@ const Receive: React.FC = (): JSX.Element => {
       </Row>
       <Row>
         <StyledCol span={24}>
-          <AccountSelector />
+          {/* AccountSelector needs data - we are using mock data for now */}
+          <AccountSelector asset={ASSETS_MAINNET.BOLT} assets={[ASSETS_MAINNET.BNB, ASSETS_MAINNET.TOMO]} />
           <StyledCard bordered={false}>
             <div id="qr-container" />
           </StyledCard>

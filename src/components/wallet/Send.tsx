@@ -8,6 +8,7 @@ import { useHistory } from 'react-router-dom'
 
 import Button from '../../components/uielements/button'
 import { Input } from '../../components/uielements/input'
+import { ASSETS_MAINNET } from '../../mock/assets'
 import AccountSelector from './AccountSelector'
 import {
   StyledCol,
@@ -44,7 +45,8 @@ const Send: React.FC = (): JSX.Element => {
       </Row>
       <Row>
         <StyledCol span={24}>
-          <AccountSelector />
+          {/* AccountSelector needs data - we are using mock data for now */}
+          <AccountSelector asset={ASSETS_MAINNET.BOLT} assets={[ASSETS_MAINNET.BNB, ASSETS_MAINNET.TOMO]} />
           <StyledForm onFinish={onSubmit} labelCol={{ span: 24 }}>
             <StyledSubForm>
               <CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</CustomLabel>

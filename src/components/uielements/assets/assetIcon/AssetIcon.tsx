@@ -39,9 +39,9 @@ const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
   useEffect(() => console.log('size', size), [size])
 
   const renderFallbackIcon = useMemo(() => {
-    const { symbol = '' } = asset
+    const { ticker = '' } = asset
     const gradientColors = () => {
-      const numbers = getIntFromName(symbol)
+      const numbers = getIntFromName(ticker)
       const start = rainbowStop(numbers[0])
       const stop = rainbowStop(numbers[1])
       return `linear-gradient(45deg,${start},${stop})`
@@ -49,7 +49,7 @@ const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
     return (
       <Styled.IconWrapper size={size}>
         <Styled.IconFallback style={{ backgroundImage: gradientColors() }} size={size}>
-          {symbol}
+          {ticker}
         </Styled.IconFallback>
       </Styled.IconWrapper>
     )
