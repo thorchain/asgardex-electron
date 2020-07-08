@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { SearchOutlined } from '@ant-design/icons'
 import { ClickParam } from 'antd/lib/menu'
 
-import Input from '../input'
+import { Input } from '../input'
 import { Menu, MenuItem } from './FilterMenu.style'
 
 type Props<T> = {
@@ -64,7 +64,7 @@ function FilterMenu<T>(props: Props<T>): JSX.Element {
             value={searchTerm}
             onChange={handleSearchChanged}
             placeholder={placeholder}
-            sizevalue="big"
+            size="large"
             typevalue="ghost"
             suffix={<SearchOutlined />}
           />

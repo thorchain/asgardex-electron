@@ -1,22 +1,27 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
 import * as crypto from '@thorchain/asgardex-crypto'
-import { Form, Button, Input, Spin } from 'antd'
+import { Form, Spin } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as walletRoutes from '../../routes/wallet'
+import Button from '../uielements/button'
+import { InputPassword, InputTextArea } from '../uielements/input/'
 
 const ImportPhrase: React.FC = (): JSX.Element => {
   const history = useHistory()
   const [form] = Form.useForm()
+
+  const intl = useIntl()
 
   const { keystoreService } = useWalletContext()
   const keystore = useObservableState(keystoreService.keystore$, none)
@@ -64,10 +69,6 @@ const ImportPhrase: React.FC = (): JSX.Element => {
     return Promise.resolve()
   }, [])
 
-  const onReset = useCallback(() => {
-    form.resetFields()
-  }, [form])
-
   const submitForm = useCallback(
     ({ phrase: newPhrase, password }: Store) => {
       setImportError(none)
@@ -94,35 +95,43 @@ const ImportPhrase: React.FC = (): JSX.Element => {
   return (
     <>
       {renderError}
-      <Form form={form} onFinish={submitForm} labelCol={{ span: 24 }}>
+      <Form form={form} onFinish={submitForm} labelCol={{ span: 24 }} style={{ padding: 30, paddingTop: 15 }}>
         {/* TODO(@Veado): i18n */}
         <Spin spinning={importing} tip="Loading...">
           <Form.Item
             name="phrase"
             rules={[{ required: true, validator: phraseValidator }]}
             validateTrigger={['onSubmit', 'onChange']}>
-            {/* TODO(@Veado): i18n */}
-            <Input.Password placeholder="Enter your phrase" size="large" />
+            <InputTextArea
+              color="primary"
+              size="middle"
+              typevalue="normal"
+              placeholder={intl.formatMessage({ id: 'wallet.imports.enterphrase' }).toUpperCase()}
+              rows={5}
+            />
           </Form.Item>
           <Form.Item
             name="password"
             rules={[{ required: true, validator: passwordValidator }]}
             validateTrigger={['onSubmit', 'onChange']}>
-            {/* TODO(@Veado): i18n */}
-            <Input.Password placeholder="Enter your password" size="large" />
+            <InputPassword
+              color="primary"
+              size="middle"
+              typevalue="normal"
+              security="password"
+              placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
+              style={{ width: 280 }}
+            />
           </Form.Item>
         </Spin>
-        <Form.Item>
+        <Form.Item style={{ display: 'grid', justifyContent: 'flex-end' }}>
           <Button
             size="large"
             type="primary"
             htmlType="submit"
-            block
+            style={{ width: 150 }}
             disabled={!validPassword || !validPhrase || importing}>
             Import
-          </Button>
-          <Button size="large" type="primary" block onClick={onReset} disabled={importing}>
-            Reset
           </Button>
         </Form.Item>
       </Form>

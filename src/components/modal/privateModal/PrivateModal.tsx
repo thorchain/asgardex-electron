@@ -3,7 +3,7 @@ import React, { useCallback } from 'react'
 import { LockOutlined } from '@ant-design/icons'
 import { Form } from 'antd'
 
-import Input from '../../uielements/input'
+import { Input } from '../../uielements/input'
 import { StyledModal } from './PrivateModal.style'
 
 type Props = {
@@ -45,7 +45,7 @@ const PrivateModal: React.FC<Props> = (props): JSX.Element => {
           <Input
             type="password"
             typevalue="ghost"
-            sizevalue="big"
+            size="large"
             value={password}
             onChange={onChangePasswordHandler}
             prefix={<LockOutlined />}
