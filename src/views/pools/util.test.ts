@@ -1,16 +1,16 @@
-import { bn, assetAmount, PoolData, assetToBase, getAssetFromString } from '@thorchain/asgardex-util'
+import { bn, assetAmount, PoolData, assetToBase } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { ASSETS_MAINNET } from '../../mock/assets'
+import { ASSETS_TESTNET } from '../../mock/assets'
 import { ThorchainConstants, ThorchainLastblock } from '../../types/generated/midgard'
 import { PoolDetail, PoolDetailStatusEnum } from '../../types/generated/midgard/models/PoolDetail'
-import { PoolTableRowData, PoolAsset } from './types'
+import { PoolTableRowData } from './types'
 import { getPoolTableRowData, getBlocksLeftForPendingPool, getBlocksLeftForPendingPoolAsString } from './utils'
 
 describe('poolUtil', () => {
   describe('getPoolTableRowData', () => {
     const lokPoolDetail: PoolDetail = {
-      asset: 'BNB.FTM-A64',
+      asset: 'BNB.FTM-585',
       assetDepth: '11000000000',
       runeDepth: '10000000000',
       poolVolume24hr: '10000000000',
@@ -28,8 +28,8 @@ describe('poolUtil', () => {
     it('transforms data for a FTM pool', () => {
       const expected: PoolTableRowData = {
         pool: {
-          asset: getAssetFromString(PoolAsset.RUNE),
-          target: ASSETS_MAINNET.FTM
+          asset: ASSETS_TESTNET.RUNE,
+          target: ASSETS_TESTNET.FTM
         },
         poolPrice: assetToBase(assetAmount(2)),
         depthPrice: assetToBase(assetAmount(1000)),

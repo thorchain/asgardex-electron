@@ -1,4 +1,5 @@
 import {
+  EMPTY_ASSET,
   bnOrZero,
   PoolData,
   assetAmount,
@@ -6,18 +7,20 @@ import {
   baseAmount,
   getValueOfRuneInAsset,
   assetToBase,
-  getAssetFromString
+  assetFromString
 } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
+import { ASSETS_TESTNET } from '../../mock/assets'
 import { toPoolData } from '../../services/midgard/utils'
 import { PoolDetail, PoolDetailStatusEnum, ThorchainLastblock, ThorchainConstants } from '../../types/generated/midgard'
-import { PoolTableRowData, Pool, PoolAsset } from './types'
+import { PoolTableRowData, Pool } from './types'
 
 export const getPoolTableRowData = (poolDetail: PoolDetail, pricePoolData: PoolData): PoolTableRowData => {
-  const { ticker = '' } = getAssetFromString(poolDetail?.asset)
+  const assetString = poolDetail?.asset ?? ''
+  const ticker = assetFromString(assetString)?.ticker ?? ''
 
   const poolData = toPoolData(poolDetail)
 
@@ -39,8 +42,8 @@ export const getPoolTableRowData = (poolDetail: PoolDetail, pricePoolData: PoolD
 
   const pool: Pool = {
     // TODO(@Veado): Handle test/mainnet, since RUNE symbol is different
-    asset: getAssetFromString(PoolAsset.RUNE),
-    target: poolDetail.asset ? getAssetFromString(poolDetail.asset) : {}
+    asset: ASSETS_TESTNET.RUNE,
+    target: assetFromString(poolDetail?.asset ?? '') || EMPTY_ASSET
   }
 
   return {

@@ -1,4 +1,4 @@
-import { bnOrZero, PoolData, getAssetFromString } from '@thorchain/asgardex-util'
+import { bnOrZero, PoolData, assetFromString } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
@@ -14,10 +14,10 @@ export const getPoolTableRowsData = (
 ): PoolTableRowsData => {
   const poolDetailsFiltered = poolDetails.filter((detail) => detail?.status === poolStatus)
   const deepestPool = O.toNullable(getDeepestPool(poolDetailsFiltered))
-  const { symbol: deepestPoolSymbol } = getAssetFromString(deepestPool?.asset)
+  const deepestPoolSymbol = assetFromString(deepestPool?.asset ?? '')?.symbol
   // Transform `PoolDetails` -> PoolRowType
   return poolDetailsFiltered.map((poolDetail, index) => {
-    const { symbol = '' } = getAssetFromString(poolDetail.asset)
+    const symbol = assetFromString(poolDetail.asset ?? '')?.symbol
     const deepest = symbol && deepestPoolSymbol && symbol === deepestPoolSymbol
     return {
       ...getPoolTableRowData(poolDetail, pricePool),

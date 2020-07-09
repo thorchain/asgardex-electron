@@ -1,16 +1,15 @@
 import React, { useCallback } from 'react'
 
 import { LeftOutlined } from '@ant-design/icons'
-import { getAssetFromString } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 import { useParams, useHistory } from 'react-router-dom'
 
 import Button from '../../components/uielements/button'
+import { ASSETS_TESTNET } from '../../mock/assets'
 import { AssetDetailsRouteParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { UserTransactionType } from '../../types/wallet'
-import { PoolAsset } from '../../views/pools/types'
 import AssetIcon from '../uielements/assets/assetIcon'
 import {
   StyledCard,
@@ -55,8 +54,8 @@ const AssetDetails: React.FC = (): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
-  // dummy data
-  const asset = getAssetFromString(PoolAsset.RUNE)
+  // dummy data - temporary workaround as long as we have not any logic for real data
+  const asset = ASSETS_TESTNET.RUNE
 
   const onBack = useCallback(() => {
     history.goBack()

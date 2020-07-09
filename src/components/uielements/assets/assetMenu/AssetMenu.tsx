@@ -25,11 +25,7 @@ const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
   const { assetData, asset, priceIndex = {}, withSearch, searchDisable = [], onSelect = () => {} } = props
 
   const filteredData = useMemo(
-    () =>
-      assetData.filter((item) => {
-        const { ticker = '' } = item.asset
-        return ticker !== asset?.ticker
-      }),
+    () => assetData.filter((item) => item.asset.ticker !== asset.ticker),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [asset, assetData]
   )
@@ -37,8 +33,7 @@ const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
   const cellRenderer = useCallback(
     (data: AssetPair) => {
       const { asset } = data
-      const { ticker = '' } = asset
-      const price = baseAmount(priceIndex[ticker])
+      const price = baseAmount(priceIndex[asset.ticker])
       const node = <AssetData asset={asset} price={price} />
       const key = asset?.symbol ?? ''
       return { key, node }
@@ -46,13 +41,9 @@ const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
     [priceIndex]
   )
 
-  const disableItemFilterHandler = useCallback(
-    (item: AssetPair) => {
-      const { ticker = '' } = item.asset
-      return searchDisable.indexOf(ticker) > -1
-    },
-    [searchDisable]
-  )
+  const disableItemFilterHandler = useCallback((item: AssetPair) => searchDisable.indexOf(item.asset.ticker) > -1, [
+    searchDisable
+  ])
 
   return (
     <FilterMenu
