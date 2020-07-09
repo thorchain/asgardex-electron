@@ -209,8 +209,8 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderHeaderSettings = useMemo(
-    () => <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} disabled={isLocked(keystore)} />,
-    [isDesktopView, clickSettingsHandler, keystore]
+    () => <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} />,
+    [isDesktopView, clickSettingsHandler]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
