@@ -11,18 +11,17 @@ import { HeaderIconWrapper } from './HeaderIcon.style'
 type Props = {
   onPress?: () => void
   isDesktopView: boolean
-  disabled?: boolean
 }
 
 const HeaderSettings: React.FC<Props> = (props: Props): JSX.Element => {
-  const { onPress = () => {}, isDesktopView, disabled = false } = props
+  const { onPress = () => {}, isDesktopView } = props
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
-  const iconStyle = useMemo(() => ({ fontSize: '1.5em', cursor: disabled ? 'not-allowed' : 'pointer' }), [disabled])
+  const iconStyle = useMemo(() => ({ fontSize: '1.5em' }), [])
 
   return (
-    <HeaderIconWrapper onClick={onPress} disabled={disabled}>
+    <HeaderIconWrapper onClick={onPress}>
       {!isDesktopView && <Text style={{ color }}>SETTINGS</Text>}
       <SettingsIcon style={{ color, ...iconStyle }} />
     </HeaderIconWrapper>
