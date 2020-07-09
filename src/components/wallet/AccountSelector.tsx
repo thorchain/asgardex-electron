@@ -8,13 +8,6 @@ import Label from '../../components/uielements/label'
 import AssetIcon from '../uielements/assets/assetIcon'
 import { StyledCard, AssetWrapper, AssetInfoWrapper, AssetTitle } from './AccountSelector.style'
 
-// Multi-use 'account selector' component will have a data context
-// Dummy data
-// const UserAssets: UserAssetType[] = [
-//   { _id: '1', free: 99, frozen: 11, locked: 21, asset: 'BNB-JST', name: 'Binance', value: 0.99 },
-//   { _id: '2', free: 1034, frozen: 38, locked: 101, asset: 'RUNE-1E0', name: 'Rune', value: 0.25 }
-// ]
-
 type Props = {
   asset: Asset
   assets: Asset[]

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 
 import { Asset, AssetTicker } from '@thorchain/asgardex-util'
 
@@ -48,7 +48,6 @@ const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
     ),
     [imgUrl, onErrorHandler, size]
   )
-  useEffect(() => console.log('size', size), [size])
 
   const renderFallbackIcon = useMemo(() => {
     const { ticker = '' } = asset
