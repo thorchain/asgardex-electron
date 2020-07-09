@@ -1,4 +1,4 @@
-import { Divider, Row, Card, List } from 'antd'
+import { Divider, Row, Col, Card, List } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -25,7 +25,7 @@ export const StyledTitle = styled(Label)`
 
 export const StyledDivider = styled(Divider)`
   margin: 0;
-  border-top: ${palette('dark', 1)};
+  border-top: 1px solid ${palette('gray', 0)};
 `
 
 export const StyledSubtitle = styled(Label)`
@@ -46,9 +46,14 @@ export const StyledRow = styled(Row)`
   }
 `
 
+export const StyledWalletCol = styled(Col)`
+  width: 100%;
+`
+
 export const StyledCard = styled(Card)`
   border-radius: 5px;
   background-color: ${palette('background', 1)};
+  border: 1px solid ${palette('gray', 0)};
 `
 
 export const StyledOptionCard = styled(Card)`
@@ -58,20 +63,28 @@ export const StyledOptionCard = styled(Card)`
     justify-content: center;
     align-items: center;
     background-color: ${palette('background', 1)};
+    width: 100%;
   }
 `
 
 export const StyledOptionLabel = styled(Label)`
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   text-transform: uppercase;
+  font-size: 14px;
   font-family: 'MainFontRegular';
-  min-height: 50px;
+  min-height: 38px;
 `
 
 export const StyledButton = styled(Button)`
+  font-family: 'MainFontRegular';
   text-transform: uppercase;
+
+  span {
+    font-size: 14px;
+  }
 `
 
 export const StyledPlaceholder = styled(Label)`
@@ -98,9 +111,15 @@ export const StyledClientButton = styled(Label)`
 `
 
 export const StyledAccountCard = styled(Card)`
+  border: 1px solid ${palette('gray', 0)};
+
   .ant-card-body {
     padding: 0;
     background-color: ${palette('background', 1)};
+
+    div > div > div > ul > li {
+      border-bottom: 1px solid ${palette('gray', 0)};
+    }
   }
 `
 
@@ -108,6 +127,12 @@ export const StyledListItem = styled(List.Item)`
   padding: 20px 20px 0;
   flex-direction: column;
   align-items: start;
+  border: none;
+  border-bottom: 1px solid ${palette('gray', 0)};
+
+  .ant-list-item {
+    border-bottom: 1px solid ${palette('gray', 0)};
+  }
 `
 
 export const StyledChainName = styled(Label)`
@@ -122,6 +147,7 @@ export const StyledChainName = styled(Label)`
 export const StyledChainContent = styled.div`
   margin-left: 30px;
   margin-top: 10px;
+  width: 100%;
 `
 
 export const StyledAccountPlaceholder = styled(Label)`
@@ -134,11 +160,20 @@ export const StyledAccountPlaceholder = styled(Label)`
 `
 
 export const StyledAccountContent = styled(Label)`
-  display: block;
+  display: flex;
+  align-items: center;
   padding: 0px;
   color: ${palette('text', 1)};
+`
+
+export const StyledAccountAddress = styled(Label)`
+  display: inline-block;
+  width: calc(70%);
+  white-space: nowrap;
+  overflow: hidden;
   font-family: 'MainFontRegular';
   font-size: 16px;
+  text-overflow: ellipsis;
   text-transform: uppercase;
 `
 

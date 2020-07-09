@@ -12,6 +12,7 @@ import { UserAccountType } from '../../types/wallet'
 import {
   StyledTitleWrapper,
   StyledRow,
+  StyledWalletCol,
   StyledTitle,
   StyledDivider,
   StyledSubtitle,
@@ -28,7 +29,8 @@ import {
   StyledChainContent,
   StyledAccountPlaceholder,
   StyledDeviceText,
-  StyledAccountContent
+  StyledAccountContent,
+  StyledAccountAddress
 } from './Settings.style'
 
 // Dummy Data
@@ -103,32 +105,32 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
         </Col>
       </Row>
       <StyledRow gutter={[16, 16]}>
-        <Col span={12}>
+        <Col sm={{ span: 24 }} md={{ span: 12 }}>
           <StyledSubtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</StyledSubtitle>
           <StyledCard>
             <Row>
-              <Col span={12}>
+              <StyledWalletCol sm={{ span: 24 }} md={{ span: 12 }}>
                 <StyledOptionCard bordered={false}>
                   <StyledOptionLabel color="primary" size="big">
                     {intl.formatMessage({ id: 'setting.export' })}
                   </StyledOptionLabel>
                 </StyledOptionCard>
-              </Col>
-              <Col span={12}>
+              </StyledWalletCol>
+              <StyledWalletCol sm={{ span: 24 }} md={{ span: 12 }}>
                 <StyledOptionCard bordered={false}>
                   <StyledOptionLabel color="warning" size="big" onClick={lockWallet}>
                     {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
                   </StyledOptionLabel>
                 </StyledOptionCard>
-              </Col>
-              <Col span={12}>
+              </StyledWalletCol>
+              <StyledWalletCol sm={{ span: 24 }} md={{ span: 12 }}>
                 <StyledOptionCard bordered={false}>
                   <StyledButton sizevalue="xnormal" color="primary" typevalue="outline" round="true" disabled>
                     {intl.formatMessage({ id: 'setting.view.phrase' })}
                   </StyledButton>
                 </StyledOptionCard>
-              </Col>
-              <Col span={12}>
+              </StyledWalletCol>
+              <StyledWalletCol sm={{ span: 24 }} md={{ span: 12 }}>
                 <StyledOptionCard bordered={false}>
                   <StyledButton
                     sizevalue="xnormal"
@@ -139,7 +141,7 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
                     {intl.formatMessage({ id: 'setting.remove.wallet' })}
                   </StyledButton>
                 </StyledOptionCard>
-              </Col>
+              </StyledWalletCol>
             </Row>
           </StyledCard>
           <StyledSubtitle>{intl.formatMessage({ id: 'setting.client' })}</StyledSubtitle>
@@ -170,7 +172,7 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
                     <StyledChainContent key={j}>
                       <StyledAccountPlaceholder>{acc.name}</StyledAccountPlaceholder>
                       <StyledAccountContent>
-                        {acc.address}
+                        <StyledAccountAddress>{acc.address}</StyledAccountAddress>
                         {acc.type === 'external' && (
                           <Button type="link" danger>
                             <StopOutlined />
