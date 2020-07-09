@@ -20,7 +20,8 @@ import {
   CoinSubtitle,
   CoinPrice,
   StyledDivider,
-  ActionWrapper
+  ActionWrapper,
+  StyledAssetName
 } from './AssetDetails.style'
 import TransactionsTable from './UserTransactionsTable'
 
@@ -66,7 +67,7 @@ const AssetDetails: React.FC = (): JSX.Element => {
 
   return (
     <>
-      <h1>{symbol}</h1>
+      <StyledAssetName>{symbol}</StyledAssetName>
       <Row>
         <Col span={24}>
           <StyledLabel size="large" color="primary" weight="bold" onClick={onBack}>
