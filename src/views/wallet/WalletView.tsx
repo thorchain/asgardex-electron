@@ -6,7 +6,6 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
-import Button from '../../components/uielements/button'
 import AssetsNav from '../../components/wallet/AssetsNav'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -22,6 +21,7 @@ import SendView from './SendView'
 import SettingsView from './SettingsView'
 import StakesView from './StakesView'
 import UnlockView from './UnlockView'
+import * as Styled from './WalletView.styles'
 
 const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
@@ -34,15 +34,23 @@ const WalletView: React.FC = (): JSX.Element => {
   // we have to add 'undefined'  as default value
   const keystore = useObservableState(keystoreService.keystore$, undefined)
 
+  const reloadButton = useMemo(
+    () => (
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Styled.RefreshButton typevalue={'outline'} onClick={reloadBalances}>
+          <SyncIcon />
+          {intl.formatMessage({ id: 'common.refresh' })}
+        </Styled.RefreshButton>
+      </div>
+    ),
+    [reloadBalances, intl]
+  )
+
   // Following routes are accessable only,
   // if an user has a phrase imported and wallet has not been locked
   const renderWalletRoutes = useMemo(
     () => (
       <>
-        <Button style={{ marginBottom: 20 }} typevalue={'outline'} onClick={reloadBalances}>
-          <SyncIcon />
-          {intl.formatMessage({ id: 'common.refresh' })}
-        </Button>
         <Switch>
           <Route path={walletRoutes.base.template} exact>
             <Redirect to={walletRoutes.assets.path()} />
@@ -51,14 +59,17 @@ const WalletView: React.FC = (): JSX.Element => {
             <SettingsView />
           </Route>
           <Route path={walletRoutes.assets.template} exact>
+            {reloadButton}
             <AssetsNav />
             <AssetsView />
           </Route>
           <Route path={walletRoutes.stakes.template} exact>
+            {reloadButton}
             <AssetsNav />
             <StakesView />
           </Route>
           <Route path={walletRoutes.bonds.template} exact>
+            {reloadButton}
             <AssetsNav />
             <BondsView />
           </Route>
@@ -74,7 +85,7 @@ const WalletView: React.FC = (): JSX.Element => {
         </Switch>
       </>
     ),
-    [reloadBalances, intl]
+    [reloadButton]
   )
 
   const renderWalletRoute = useCallback(
