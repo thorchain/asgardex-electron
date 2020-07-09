@@ -17,11 +17,7 @@ type Props<T> = {
   onSelect?: (value: string) => void
 }
 
-// Note: To have fully support of generic types in props,
-// we define FilterMenu as an "old-school" a function here.
-// Arrow functions seems to have some issues with generic types for properties in React.FC.
-// Based on "How to use generics in props in React in a functional component?"" https://stackoverflow.com/a/59373728/2032698
-function FilterMenu<T>(props: Props<T>): JSX.Element {
+const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
   const {
     onSelect = (_) => {},
     searchEnabled = false,
