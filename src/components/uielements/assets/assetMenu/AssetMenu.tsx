@@ -25,7 +25,7 @@ const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
   const { assetData, asset, priceIndex = {}, withSearch, searchDisable = [], onSelect = () => {} } = props
 
   const filteredData = useMemo(
-    () => assetData.filter((item) => item.asset.ticker !== asset?.ticker),
+    () => assetData.filter((item) => item.asset.ticker !== asset.ticker),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [asset, assetData]
   )
