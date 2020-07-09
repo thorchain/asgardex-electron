@@ -5,6 +5,7 @@ import antdData from 'antd/lib/locale-provider/en_GB'
 import { Messages } from '../types'
 import common from './common'
 import pools from './pools'
+import settings from './settings'
 import wallet from './wallet'
 
-export default { ...antdData, ...common, ...pools, ...wallet } as Messages
+export default { ...antdData, ...common, ...pools, ...wallet, ...settings } as Messages

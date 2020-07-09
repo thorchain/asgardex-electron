@@ -11,6 +11,14 @@ export const StyledCard = styled(Card)`
   }
 `
 
+export const StyledAssetName = styled.h1`
+  font-size: 32px;
+  font-family: 'MainFontRegular';
+  color: ${palette('text', 0)};
+  line-height: 1em;
+  text-transform: uppercase;
+`
+
 export const StyledLabel = styled(Label)`
   margin-bottom: 18px;
   font-family: 'MainFontRegular';

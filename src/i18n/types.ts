@@ -34,7 +34,20 @@ export type WalletMessages = {
   'wallet.imports.enterphrase': string
 }
 
-export type Messages = CommonMessages & PoolsMessages & WalletMessages
+export type SettingMessages = {
+  'setting.title': string
+  'setting.wallet.management': string
+  'setting.client': string
+  'setting.account.management': string
+  'setting.export': string
+  'setting.lock': string
+  'setting.view.phrase': string
+  'setting.remove.wallet': string
+  'setting.midgard': string
+  'setting.version': string
+}
+
+export type Messages = CommonMessages & PoolsMessages & WalletMessages & SettingMessages
 
 export enum Locale {
   EN = 'en',
