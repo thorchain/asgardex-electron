@@ -1,6 +1,7 @@
 import { PoolData, assetAmount, assetToBase } from '@thorchain/asgardex-util'
 import { some } from 'fp-ts/lib/Option'
 
+import { ASSETS_TESTNET } from '../mock/assets'
 import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
@@ -63,7 +64,7 @@ describe('helpers/poolHelper/', () => {
         status: PoolDetailStatusEnum.Enabled
       },
       {
-        asset: 'BNB.LOK-3C0',
+        asset: 'BNB.FTM-585',
         status: PoolDetailStatusEnum.Enabled
       },
       {
@@ -80,14 +81,14 @@ describe('helpers/poolHelper/', () => {
     it('returns data for pending pools', () => {
       const result = getPoolTableRowsData(poolDetails, pricePoolData, PoolDetailStatusEnum.Bootstrapped)
       expect(result.length).toEqual(1)
-      expect(result[0].pool.target).toEqual('BOLT')
+      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.BOLT)
     })
 
     it('returns data for available pools', () => {
       const result = getPoolTableRowsData(poolDetails, pricePoolData, PoolDetailStatusEnum.Enabled)
       expect(result.length).toEqual(2)
-      expect(result[0].pool.target).toEqual('TOMOB')
-      expect(result[1].pool.target).toEqual('LOK')
+      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.TOMO)
+      expect(result[1].pool.target).toEqual(ASSETS_TESTNET.FTM)
     })
   })
 

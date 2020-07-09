@@ -1,60 +1,55 @@
 import React, { useMemo, useCallback } from 'react'
 
-import { validBNOrZero } from '@thorchain/asgardex-util'
-import * as O from 'fp-ts/lib/Option'
+import { Asset, baseAmount } from '@thorchain/asgardex-util'
 
-import { getTickerFormat } from '../../../../helpers/stringHelper'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetPair } from '../../../../types/asgardex'
-import CoinData from '../../coins/coinData'
 import FilterMenu from '../../filterMenu'
+import AssetData from '../assetData'
 
 const filterFunction = (item: AssetPair, searchTerm: string) => {
-  const tokenName = O.toNullable(getTickerFormat(item.asset))
-  return tokenName?.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0
+  const { ticker } = item.asset
+  return ticker?.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0
 }
 
 type Props = {
-  asset: string
+  asset: Asset
   assetData: AssetPair[]
   priceIndex?: PriceDataIndex
-  unit: string
   searchDisable: string[]
   withSearch: boolean
   onSelect: (value: string) => void
 }
 
 const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
-  const { assetData, asset, priceIndex = {}, unit, withSearch, searchDisable = [], onSelect = () => {} } = props
+  const { assetData, asset, priceIndex = {}, withSearch, searchDisable = [], onSelect = () => {} } = props
 
   const filteredData = useMemo(
     () =>
       assetData.filter((item) => {
-        const tokenName = O.toNullable(getTickerFormat(item.asset))
-        return tokenName?.toLowerCase() !== asset.toLowerCase()
+        const { ticker = '' } = item.asset
+        return ticker !== asset?.ticker
       }),
-    [assetData, asset]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [asset, assetData]
   )
 
   const cellRenderer = useCallback(
     (data: AssetPair) => {
       const { asset } = data
-      const key = asset || 'unknown-key'
-      const tokenName = O.toUndefined(getTickerFormat(asset))
-
-      const ticker = O.toNullable(getTickerFormat(asset))?.toUpperCase() ?? ''
-      const price = validBNOrZero(priceIndex[ticker])
-
-      const node = <CoinData asset={tokenName} price={price} priceUnit={unit} />
+      const { ticker = '' } = asset
+      const price = baseAmount(priceIndex[ticker])
+      const node = <AssetData asset={asset} price={price} />
+      const key = asset?.symbol ?? ''
       return { key, node }
     },
-    [priceIndex, unit]
+    [priceIndex]
   )
 
   const disableItemFilterHandler = useCallback(
     (item: AssetPair) => {
-      const tokenName = O.toNullable(getTickerFormat(item.asset))?.toLowerCase()
-      return searchDisable.indexOf(tokenName ?? '') > -1
+      const { ticker = '' } = item.asset
+      return searchDisable.indexOf(ticker) > -1
     },
     [searchDisable]
   )

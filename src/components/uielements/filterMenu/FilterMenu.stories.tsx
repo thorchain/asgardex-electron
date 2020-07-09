@@ -1,58 +1,57 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn } from '@thorchain/asgardex-util'
-import * as O from 'fp-ts/lib/Option'
+import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
 
-import { getTickerFormat } from '../../../helpers/stringHelper'
+import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
+import { ASSETS_MAINNET } from '../../../mock/assets'
 import { AssetPair } from '../../../types/asgardex'
-import CoinData from '../coins/coinData'
+import AssetData from '../assets/assetData'
 import FilterMenu from './FilterMenu'
 
-const filterFunction = (item: AssetPair, searchTerm: string) =>
-  O.toNullable(getTickerFormat(item.asset))?.indexOf(searchTerm.toLowerCase()) === 0 ?? false
-
-const cellRenderer = (data: AssetPair) => {
-  const { asset: key, price } = data
-  const tokenName = O.toNullable(getTickerFormat(key)) || ''
-  const node = <CoinData asset={tokenName} price={price} />
-  return { key, node }
-}
-
 storiesOf('Components/FilterMenu', module).add('coins example', () => {
+  const filterFunction = (item: AssetPair, searchTerm: string) => {
+    const symbol = item.asset.symbol?.toLowerCase() ?? ''
+    return symbol.indexOf(searchTerm.toLowerCase()) === 0 ?? false
+  }
+
+  const cellRenderer = (data: AssetPair) => {
+    const { asset, price } = data
+    const node = <AssetData asset={asset} price={price} />
+    return { key: asset?.symbol ?? '', node }
+  }
+
   return (
     <FilterMenu
       searchEnabled
       filterFunction={filterFunction}
       cellRenderer={cellRenderer}
       asset="TOMOB-1E1"
-      data={[
-        { asset: 'FSN-F1B', price: bn(1) },
-        { asset: 'FTM-585', price: bn(1) },
-        { asset: 'LOK-3C0', price: bn(0) },
-        { asset: 'TCAN-014', price: bn(1) },
-        { asset: 'TOMOB-1E1', price: bn(1) },
-        { asset: 'BNB', price: bn(0.00387) }
-      ]}
+      data={
+        [
+          { asset: ASSETS_MAINNET.RUNE, price: ONE_ASSET_BASE_AMOUNT },
+          { asset: ASSETS_MAINNET.FTM, price: ONE_ASSET_BASE_AMOUNT },
+          { asset: ASSETS_MAINNET.TOMO, price: ONE_ASSET_BASE_AMOUNT },
+          { asset: ASSETS_MAINNET.BNB, price: assetToBase(assetAmount(0.00387)) }
+        ] as AssetPair[]
+      }
     />
   )
 })
 storiesOf('Components/FilterMenu', module).add('general use', () => {
+  const filterFunction = (name: string, searchTerm: string) =>
+    name.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0 ?? false
+
   return (
     <FilterMenu
       searchEnabled
       filterFunction={filterFunction}
-      cellRenderer={({ asset }) => ({
+      cellRenderer={(name) => ({
         key: `${Math.random()}-name`,
-        node: <div>{asset}</div>
+        node: <div>{name}</div>
       })}
       asset="paul"
-      data={[
-        { asset: 'John', price: bn(1) },
-        { asset: 'Paul', price: bn(2) },
-        { asset: 'George', price: bn(3) },
-        { asset: 'Ringo', price: bn(4) }
-      ]} // AssetPair[]
+      data={['John', 'Paul', 'George', 'Ringo']}
     />
   )
 })

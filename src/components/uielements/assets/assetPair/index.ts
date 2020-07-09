@@ -1,3 +1,4 @@
-import AssetPair from './assetPair'
+import AssetPair from './AssetPair'
+import AssetPairOverlapped from './AssetPairOverlapped'
 
-export default AssetPair
+export { AssetPair, AssetPairOverlapped }

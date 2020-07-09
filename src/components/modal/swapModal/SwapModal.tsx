@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react'
 
-import BigNumber from 'bignumber.js'
+import { Asset, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
 
 import { TxStatus } from '../../../types/asgardex'
-import CoinData from '../../uielements/coins/coinData'
+import AssetData from '../../uielements/assets/assetData'
 import StepBar from '../../uielements/stepBar'
 import Trend from '../../uielements/trend'
 import TxTimer from '../../uielements/txTimer'
@@ -25,10 +25,10 @@ import { CalcResult } from './types'
 type Props = {
   calcResult: CalcResult
   isCompleted?: boolean
-  priceFrom?: BigNumber
-  priceTo?: BigNumber
-  swapSource: string
-  swapTarget: string
+  priceFrom?: BaseAmount
+  priceTo?: BaseAmount
+  swapSource: Asset
+  swapTarget: Asset
   txStatus: TxStatus
   visible?: boolean
   onClose?: () => void
@@ -41,8 +41,8 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
   const {
     calcResult,
     isCompleted = false,
-    priceFrom = new BigNumber(0),
-    priceTo = new BigNumber(0),
+    priceFrom = baseAmount(0),
+    priceTo = baseAmount(0),
     swapSource,
     swapTarget,
     txStatus,
@@ -81,8 +81,8 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
           <CoinDataWrapper>
             <StepBar size={50} />
             <CoinDataContainer>
-              <CoinData asset={swapSource} price={priceFrom} priceUnit={swapSource} />
-              <CoinData asset={swapTarget} price={priceTo} priceUnit={swapTarget} />
+              <AssetData asset={swapSource} price={priceFrom} />
+              <AssetData asset={swapTarget} price={priceTo} />
             </CoinDataContainer>
           </CoinDataWrapper>
         </SwapModalContentRow>

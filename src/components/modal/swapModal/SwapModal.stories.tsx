@@ -1,9 +1,10 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { tokenAmount } from '@thorchain/asgardex-token'
+import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
+import { ASSETS_MAINNET } from '../../../mock/assets'
 import { TxStatus, TxTypes } from '../../../types/asgardex'
 import SwapModal from './SwapModal'
 import { CalcResult } from './types'
@@ -20,9 +21,9 @@ storiesOf('Components/Swap Modal', module).add('default', () => {
   const calcResult: CalcResult = {
     Px: new BigNumber(1),
     slip: new BigNumber(0.01645550108862126),
-    outputAmount: tokenAmount(1),
+    outputAmount: assetAmount(1),
     outputPrice: new BigNumber(556327544945582288316300000000),
-    fee: tokenAmount(1)
+    fee: assetAmount(1)
   }
 
   return (
@@ -35,10 +36,10 @@ storiesOf('Components/Swap Modal', module).add('default', () => {
       <SwapModal
         calcResult={calcResult}
         isCompleted
-        swapSource="RUNE"
-        priceFrom={new BigNumber(5)}
-        priceTo={new BigNumber(2)}
-        swapTarget="BNB"
+        swapSource={ASSETS_MAINNET.RUNE}
+        priceFrom={assetToBase(assetAmount(5))}
+        priceTo={assetToBase(assetAmount(5))}
+        swapTarget={ASSETS_MAINNET.BNB}
         txStatus={txStatus}
         visible
       />

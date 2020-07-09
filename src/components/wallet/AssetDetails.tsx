@@ -1,16 +1,17 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 
 import { LeftOutlined } from '@ant-design/icons'
+import { getAssetFromString } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 import { useParams, useHistory } from 'react-router-dom'
 
 import Button from '../../components/uielements/button'
-import { shortSymbol } from '../../helpers/tokenHelpers'
 import { AssetDetailsRouteParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
-import { UserTransactionType, UserAssetType } from '../../types/wallet'
-import DynamicCoin from '../shared/icons/DynamicCoin'
+import { UserTransactionType } from '../../types/wallet'
+import { PoolAsset } from '../../views/pools/types'
+import AssetIcon from '../uielements/assets/assetIcon'
 import {
   StyledCard,
   StyledLabel,
@@ -52,21 +53,9 @@ const AssetDetails: React.FC = (): JSX.Element => {
   const { symbol } = useParams<AssetDetailsRouteParams>()
   const history = useHistory()
   const intl = useIntl()
-  // Dummy data
-  const asset: UserAssetType = useMemo(
-    () => ({
-      _id: '2',
-      free: 1034,
-      frozen: 38,
-      locked: 101,
-      symbol: symbol,
-      name: shortSymbol(symbol),
-      full: 35.13
-    }),
-    [symbol]
-  )
 
-  const sendable = () => asset.free > 0
+  // dummy data
+  const asset = getAssetFromString(PoolAsset.RUNE)
 
   const onBack = useCallback(() => {
     history.goBack()
@@ -77,6 +66,7 @@ const AssetDetails: React.FC = (): JSX.Element => {
 
   return (
     <>
+      <h1>{symbol}</h1>
       <Row>
         <Col span={24}>
           <StyledLabel size="large" color="primary" weight="bold" onClick={onBack}>
@@ -89,13 +79,13 @@ const AssetDetails: React.FC = (): JSX.Element => {
         <Col span={24}>
           <StyledCard bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
             <div>
-              <DynamicCoin type={asset.symbol} size="xbig" />
+              <AssetIcon asset={asset} size="large" />
             </div>
             <CoinInfoWrapper>
-              <CoinTitle>{shortSymbol(asset.symbol)}</CoinTitle>
-              <CoinSubtitle>{asset.symbol}</CoinSubtitle>
+              <CoinTitle>{asset?.ticker ?? 'unknown'}</CoinTitle>
+              <CoinSubtitle>{asset?.symbol ?? 'unknown'}</CoinSubtitle>
             </CoinInfoWrapper>
-            <CoinPrice>{asset.full?.toLocaleString()}</CoinPrice>
+            <CoinPrice>$ 4.01</CoinPrice>
           </StyledCard>
         </Col>
 
@@ -105,12 +95,7 @@ const AssetDetails: React.FC = (): JSX.Element => {
           <Row>
             <Col span={24}>
               <ActionWrapper bordered={false}>
-                <Button
-                  type="primary"
-                  round="true"
-                  sizevalue="xnormal"
-                  disabled={!sendable()}
-                  onClick={walletActionSendClick}>
+                <Button type="primary" round="true" sizevalue="xnormal" onClick={walletActionSendClick}>
                   {intl.formatMessage({ id: 'wallet.action.send' })}
                 </Button>
                 <Button typevalue="outline" round="true" sizevalue="xnormal" onClick={walletActionReceiveClick}>

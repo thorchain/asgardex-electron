@@ -12,8 +12,8 @@ import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
 import ErrorView from '../../components/shared/error/ErrorView'
+import AssetIcon from '../../components/uielements/assets/assetIcon'
 import Button from '../../components/uielements/button'
-import Coin from '../../components/uielements/coins/coin'
 import Label from '../../components/uielements/label'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
@@ -27,7 +27,7 @@ import { PoolsState } from '../../services/midgard/types'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
-import { PoolTableRowData, PoolTableRowsData, PricePoolAsset, PoolAsset } from './types'
+import { PoolTableRowData, PoolTableRowsData, PricePoolAsset, PoolAsset, Pool } from './types'
 import { getBlocksLeftForPendingPoolAsString } from './utils'
 
 type Props = {}
@@ -117,13 +117,15 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         pool: { asset, target }
       } = record
 
+      const { symbol: assetSymbol = '' } = asset
+      const { symbol: targetSymbol = '' } = target
       return (
         <TableAction>
-          <Button round="true" onClick={() => clickStakeHandler(target)} typevalue="outline">
+          <Button round="true" onClick={() => clickStakeHandler(targetSymbol)} typevalue="outline">
             <PlusOutlined />
             liquidity
           </Button>
-          <Button round="true" onClick={() => clickSwapHandler({ source: asset, target })}>
+          <Button round="true" onClick={() => clickSwapHandler({ source: assetSymbol, target: targetSymbol })}>
             <SwapOutlined />
             swap
           </Button>
@@ -141,7 +143,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderPoolColumn = useCallback(
-    ({ target }: { asset: string; target: string }) => <Coin type="rune" over={target} />,
+    ({ target }: Pool) => (
+      <Row justify="center" align="middle">
+        <AssetIcon asset={target} />
+      </Row>
+    ),
     []
   )
   const poolColumn: ColumnType<PoolTableRowData> = {
@@ -153,9 +159,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderPoolColumnMobile = useCallback(
-    ({ target }: { asset: string; target: string }) => (
+    ({ target }: Pool) => (
       <Row justify="center" align="middle" style={{ width: '100%' }}>
-        <Coin type="rune" over={target} />
+        <AssetIcon asset={target} />
       </Row>
     ),
     []
@@ -167,11 +173,12 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     render: renderPoolColumnMobile
   }
 
-  const renderAssetColumn = useCallback(({ target }: { target: string }) => <Label>{target}</Label>, [])
-  const sortAssetColumn = useCallback(
-    (a: PoolTableRowData, b: PoolTableRowData) => a.pool.target.localeCompare(b.pool.target),
-    []
-  )
+  const renderAssetColumn = useCallback(({ target }: Pool) => <Label>{target?.ticker ?? 'unknown'}</Label>, [])
+  const sortAssetColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
+    const { symbol: aSymbol = '' } = a.pool.target
+    const { symbol: bSymbol = '' } = b.pool.target
+    return aSymbol.localeCompare(bSymbol)
+  }, [])
   const assetColumn: ColumnType<PoolTableRowData> = {
     key: 'asset',
     title: 'asset',
@@ -340,9 +347,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         pool: { target }
       } = record
 
+      const { symbol = '' } = target
+
       return (
         <TableAction>
-          <Button round="true" onClick={() => clickStakeHandler(target)} typevalue="outline">
+          <Button round="true" onClick={() => clickStakeHandler(symbol)} typevalue="outline">
             <PlusOutlined />
             liquidity
           </Button>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
+import { Asset } from '@thorchain/asgardex-util'
 import Draggable, {
   ControlPosition,
   DraggableBounds,
@@ -8,14 +9,14 @@ import Draggable, {
   DraggableEventHandler
 } from 'react-draggable'
 
-import CoinIcon from '../coins/coinIcon'
+import AssetIcon from '../assets/assetIcon'
 import { DragWrapper, TitleLabel } from './Drag.style'
 
 type Props = {
   className?: string
   reset?: boolean
-  source: string
-  target: string
+  source: Asset
+  target: Asset
   title?: string
   onConfirm?: () => void
   onDrag?: () => void
@@ -138,10 +139,16 @@ const Drag: React.FC<Props> = ({
     <div className={`drag-wrapper ${className}`}>
       <DragWrapper overlap={overlap} success={success} missed={missed} dragging={dragging} {...rest}>
         <Draggable position={pos} axis="x" bounds={dragBounds} {...dragHandlers}>
-          <CoinIcon onMouseEnter={handleFocus} onMouseLeave={handleBlur} className="source-asset" type={source} />
+          <AssetIcon
+            onMouseEnter={handleFocus}
+            onMouseLeave={handleBlur}
+            className="source-asset"
+            asset={source}
+            size="small"
+          />
         </Draggable>
         {title && <TitleLabel color="input">{title}</TitleLabel>}
-        <CoinIcon className="target-asset" type={target} />
+        <AssetIcon className="target-asset" asset={target} size="small" />
       </DragWrapper>
     </div>
   )

@@ -1,5 +1,4 @@
 import {
-  AssetTicker,
   bnOrZero,
   PoolData,
   assetAmount,
@@ -15,7 +14,7 @@ import { none, Option, some } from 'fp-ts/lib/Option'
 
 import { toPoolData } from '../../services/midgard/utils'
 import { PoolDetail, PoolDetailStatusEnum, ThorchainLastblock, ThorchainConstants } from '../../types/generated/midgard'
-import { PoolTableRowData, Pool } from './types'
+import { PoolTableRowData, Pool, PoolAsset } from './types'
 
 export const getPoolTableRowData = (poolDetail: PoolDetail, pricePoolData: PoolData): PoolTableRowData => {
   const { ticker = '' } = getAssetFromString(poolDetail?.asset)
@@ -39,8 +38,9 @@ export const getPoolTableRowData = (poolDetail: PoolDetail, pricePoolData: PoolD
   const status = poolDetail?.status ?? PoolDetailStatusEnum.Disabled
 
   const pool: Pool = {
-    asset: AssetTicker.RUNE,
-    target: ticker
+    // TODO(@Veado): Handle test/mainnet, since RUNE symbol is different
+    asset: getAssetFromString(PoolAsset.RUNE),
+    target: poolDetail.asset ? getAssetFromString(poolDetail.asset) : {}
   }
 
   return {

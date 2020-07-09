@@ -1,9 +1,7 @@
 import React, { RefObject, useRef, useState } from 'react'
 
-import { tokenAmount } from '@thorchain/asgardex-token'
-import { bn, delay } from '@thorchain/asgardex-util'
+import { delay, Asset } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
-import BigNumber from 'bignumber.js'
 import { sortBy as _sortBy } from 'lodash'
 
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
@@ -20,45 +18,37 @@ import {
 import AssetSelectData from './AssetSelectData'
 
 type DropdownCarretProps = {
-  className?: string
   open: boolean
   onClick?: () => void
 }
 
 const DropdownCarret: React.FC<DropdownCarretProps> = (props: DropdownCarretProps): JSX.Element => {
-  const { open, onClick = () => {}, className = '' } = props
+  const { open, onClick = () => {} } = props
   return (
     <DropdownIconHolder>
-      <DropdownIcon open={open} className={className} onClick={onClick} />
+      <DropdownIcon open={open} onClick={onClick} />
     </DropdownIconHolder>
   )
 }
 
 type Props = {
   assetData: AssetPair[]
-  asset: string
-  price: BigNumber
+  asset: Asset
   priceIndex: PriceDataIndex
-  priceUnit?: string
   withSearch?: boolean
   searchDisable?: string[]
   onSelect: (_: number) => void
   onChangeAsset?: (asset: string) => void
-  className?: string
 }
 
 const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
   const {
-    asset = 'bnb',
+    asset,
     assetData = [],
-    price = bn(0),
     priceIndex,
-    priceUnit = '$',
     withSearch = false,
     searchDisable = [],
-    // onSelect = (_: number) => {},
-    onChangeAsset = (_: string) => {},
-    className = ''
+    onChangeAsset = (_: string) => {}
   } = props
 
   const [openDropdown, setOpenDropdown] = useState<boolean>(false)
@@ -88,7 +78,6 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
           assetData={sortedAssetData}
           asset={asset}
           priceIndex={priceIndex}
-          unit={priceUnit}
           withSearch={withSearch}
           searchDisable={searchDisable}
           onSelect={handleChangeAsset}
@@ -101,16 +90,16 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
     const disabled = assetData.length === 0
     return (
       <AssetDropdownButton disabled={disabled} onClick={handleDropdownButtonClicked}>
-        {!disabled ? <DropdownCarret className="caret-down" open={openDropdown} /> : null}
+        {!disabled ? <DropdownCarret open={openDropdown} /> : null}
       </AssetDropdownButton>
     )
   }
 
   return (
-    <AssetSelectWrapper ref={ref} className={`assetSelect-wrapper ${className}`}>
+    <AssetSelectWrapper ref={ref}>
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <>
-          <AssetSelectData asset={asset} assetValue={tokenAmount(price)} priceUnit={priceUnit} />
+          <AssetSelectData asset={asset} />
           {renderDropDownButton()}
         </>
       </Dropdown>

@@ -1,16 +1,16 @@
-// import { baseAmount } from '@thorchain/asgardex-token'
-import { bn, assetAmount, PoolData, assetToBase } from '@thorchain/asgardex-util'
+import { bn, assetAmount, PoolData, assetToBase, getAssetFromString } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { ASSETS_MAINNET } from '../../mock/assets'
 import { ThorchainConstants, ThorchainLastblock } from '../../types/generated/midgard'
 import { PoolDetail, PoolDetailStatusEnum } from '../../types/generated/midgard/models/PoolDetail'
-import { PoolTableRowData } from './types'
+import { PoolTableRowData, PoolAsset } from './types'
 import { getPoolTableRowData, getBlocksLeftForPendingPool, getBlocksLeftForPendingPoolAsString } from './utils'
 
 describe('poolUtil', () => {
   describe('getPoolTableRowData', () => {
     const lokPoolDetail: PoolDetail = {
-      asset: 'BNB.LOK-3C0',
+      asset: 'BNB.FTM-A64',
       assetDepth: '11000000000',
       runeDepth: '10000000000',
       poolVolume24hr: '10000000000',
@@ -25,11 +25,11 @@ describe('poolUtil', () => {
       assetBalance: assetToBase(assetAmount(100))
     }
 
-    it('transforms data for a LOK pool', () => {
+    it('transforms data for a FTM pool', () => {
       const expected: PoolTableRowData = {
         pool: {
-          asset: 'RUNE',
-          target: 'LOK'
+          asset: getAssetFromString(PoolAsset.RUNE),
+          target: ASSETS_MAINNET.FTM
         },
         poolPrice: assetToBase(assetAmount(2)),
         depthPrice: assetToBase(assetAmount(1000)),

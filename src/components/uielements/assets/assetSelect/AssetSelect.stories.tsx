@@ -3,24 +3,25 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { bn } from '@thorchain/asgardex-util'
 
+import { ONE_ASSET_BASE_AMOUNT } from '../../../../const'
+import { ASSETS_MAINNET } from '../../../../mock/assets'
 import AssetSelect from './AssetSelect'
 
 storiesOf('Components/Assets/AssetSelect', module).add('default', () => {
   return (
     <div style={{ display: 'flex', padding: '20px' }}>
       <AssetSelect
-        asset="bnb"
+        asset={ASSETS_MAINNET.BNB}
         assetData={[
           {
-            asset: 'rune',
-            price: bn(1)
+            asset: ASSETS_MAINNET.RUNE,
+            price: ONE_ASSET_BASE_AMOUNT
           },
           {
-            asset: 'tomo',
-            price: bn(1)
+            asset: ASSETS_MAINNET.TOMO,
+            price: ONE_ASSET_BASE_AMOUNT
           }
         ]}
-        price={bn(600)}
         priceIndex={{
           RUNE: bn(1)
         }}
