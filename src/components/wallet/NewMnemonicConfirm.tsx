@@ -3,10 +3,10 @@ import React, { useCallback, useState } from 'react'
 import { RedoOutlined } from '@ant-design/icons'
 import { Card, Col, Row, Button, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
+import shuffleArray from 'lodash.shuffle'
 import { v4 as uuidv4 } from 'uuid'
 
-import { shuffleArray } from '../../helpers/shuffleArrayHelper'
-import { isSelectedFactory } from '../../helpers/isSelectedHelper'
+import { isSelectedFactory } from '../../helpers/array'
 
 type WordType = {
   text: string
