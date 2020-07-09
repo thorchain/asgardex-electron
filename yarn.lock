@@ -2485,10 +2485,10 @@
   dependencies:
     polished "^3.6.3"
 
-"@thorchain/asgardex-util@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.2.1.tgz#edad713a856987f99e97539d0f285be809f4984d"
-  integrity sha512-Cc1S9jvlxj2W83MkPC4V87Jv03zKZCzWVDi2oSAuYGOLJ6zkk0WpWtHf5PHiMbqSqUJwLKiDCh6+DJ6fSGlFmg==
+"@thorchain/asgardex-util@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.3.0.tgz#7a9b57ae1736f47cec125b29e423f9f0ded1a15f"
+  integrity sha512-2d72flkoMuxARDLY1JTAwnhUbPCz+6dbGoG2EO6FrpIWLeOXAoQHhZ5wB+q0zWb4w6dlg+kqkFMjvdm7sVBu4g==
 
 "@thorchain/byzantine-module@^0.1.1":
   version "0.1.1"
