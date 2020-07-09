@@ -3,11 +3,12 @@ import React, { useMemo, useCallback, useRef } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Balances, Balance } from '@thorchain/asgardex-binance'
 import {
+  EMPTY_ASSET,
   assetAmount,
   bnOrZero,
   formatAssetAmountCurrency,
   baseToAsset,
-  getAssetFromString
+  assetFromString
 } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
@@ -48,7 +49,10 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       key: 'icon',
       title: '',
       dataIndex: 'symbol',
-      render: (_, { symbol }) => <AssetIcon asset={getAssetFromString(`BNB.${symbol}`)} size="normal" />
+      render: (_, { symbol }) => {
+        const asset = assetFromString(`BNB.${symbol}`) || EMPTY_ASSET
+        return <AssetIcon asset={asset} size="normal" />
+      }
     }),
     []
   )

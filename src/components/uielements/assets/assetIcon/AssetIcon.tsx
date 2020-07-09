@@ -50,7 +50,7 @@ const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   const renderFallbackIcon = useMemo(() => {
-    const { ticker = '' } = asset
+    const { ticker } = asset
     const numbers = getIntFromName(ticker)
     const backgroundImage = `linear-gradient(45deg,${rainbowStop(numbers[0])},${rainbowStop(numbers[1])})`
 

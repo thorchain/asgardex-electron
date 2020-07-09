@@ -7,7 +7,7 @@ import {
   assetToBase,
   assetAmount,
   bnOrZero,
-  getAssetFromString,
+  assetFromString,
   AssetTicker,
   getValueOfRuneInAsset
 } from '@thorchain/asgardex-util'
@@ -59,7 +59,7 @@ export const getPoolPriceValue = (
     // calculate value based on `pricePoolData`
     O.map((poolData) => getValueOfAsset1InAsset2(amount, poolData, selectedPricePoolData)),
     O.alt(() => {
-      const { ticker = '' } = bncSymbolToAsset(symbol)
+      const ticker = bncSymbolToAsset(symbol)?.ticker ?? ''
       // Calculate RUNE values based on `pricePoolData`
       if (ticker === AssetTicker.RUNE) {
         return O.some(getValueOfRuneInAsset(amount, selectedPricePoolData))
@@ -73,7 +73,7 @@ export const getPoolPriceValue = (
 /**
  * Converts a BinanceChain symbol to an `Asset`
  **/
-export const bncSymbolToAsset = (symbol: string) => getAssetFromString(bncSymbolToAssetString(symbol))
+export const bncSymbolToAsset = (symbol: string) => assetFromString(bncSymbolToAssetString(symbol))
 
 /**
  * Converts a BinanceChain symbol to an `Asset` string

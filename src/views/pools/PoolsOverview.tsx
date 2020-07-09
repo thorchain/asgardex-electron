@@ -347,11 +347,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         pool: { target }
       } = record
 
-      const { symbol = '' } = target
-
       return (
         <TableAction>
-          <Button round="true" onClick={() => clickStakeHandler(symbol)} typevalue="outline">
+          <Button round="true" onClick={() => clickStakeHandler(target.symbol)} typevalue="outline">
             <PlusOutlined />
             liquidity
           </Button>

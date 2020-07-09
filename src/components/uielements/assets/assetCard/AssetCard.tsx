@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState, RefObject } from 'react'
 
-import { bn, delay, formatBN, Asset, getAssetFromString, BaseAmount } from '@thorchain/asgardex-util'
+import { bn, delay, formatBN, Asset, assetFromString, BaseAmount } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import { sortBy as _sortBy } from 'lodash'
@@ -106,13 +106,16 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     onSelect(percentButtonSelected)
   }
 
-  const handleChangeAsset = async (asset: string) => {
+  const handleChangeAsset = async (assetString: string) => {
     setOpenDropdown(false)
 
     // Wait for the dropdown to close
     await delay(500)
     handleResetPercentButtons()
-    onChangeAsset(getAssetFromString(asset))
+    const asset = assetFromString(assetString)
+    if (asset) {
+      onChangeAsset(asset)
+    }
   }
 
   function renderMenu() {

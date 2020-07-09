@@ -1,6 +1,4 @@
-import { getAssetFromString, Asset } from '@thorchain/asgardex-util'
-
-import { PoolAsset } from '../views/pools/types'
+import { Asset } from '@thorchain/asgardex-util'
 
 type Assets = 'RUNE' | 'BNB' | 'FTM' | 'TOMO' | 'BOLT'
 
@@ -8,17 +6,17 @@ type AssetsTestnet = Record<Assets, Asset>
 type AssetsMainnet = Record<Assets, Asset>
 
 export const ASSETS_TESTNET: AssetsTestnet = {
-  RUNE: getAssetFromString(PoolAsset.RUNE),
-  BNB: getAssetFromString(PoolAsset.BNB),
-  FTM: getAssetFromString('BNB.FTM-585'),
-  TOMO: getAssetFromString('BNB.TOMOB-1E1'),
-  BOLT: getAssetFromString('BNB.BOLT-E42')
+  RUNE: { chain: 'BNB', symbol: 'RUNE-A1A', ticker: 'RUNE' },
+  BNB: { chain: 'BNB', symbol: 'BNB', ticker: 'BNB' },
+  FTM: { chain: 'BNB', symbol: 'FTM-585', ticker: 'FTM' },
+  TOMO: { chain: 'BNB', symbol: 'TOMOB-1E1', ticker: 'TOMOB' },
+  BOLT: { chain: 'BNB', symbol: 'BOLT-E42', ticker: 'BOLT' }
 }
 
 export const ASSETS_MAINNET: AssetsMainnet = {
-  RUNE: getAssetFromString('BNB.RUNE-B1A'),
-  BNB: getAssetFromString(PoolAsset.BNB),
-  FTM: getAssetFromString('BNB.FTM-A64'),
-  TOMO: getAssetFromString('BNB.TOMOB-4BC'),
-  BOLT: getAssetFromString('BNB.BOLT-4C6')
+  RUNE: { chain: 'BNB', symbol: 'RUNE-B1A', ticker: 'RUNE' },
+  BNB: { chain: 'BNB', symbol: 'BNB', ticker: 'BNB' },
+  FTM: { chain: 'BNB', symbol: 'FTM-A64', ticker: 'FTM' },
+  TOMO: { chain: 'BNB', symbol: 'TOMOB-4BC', ticker: 'TOMOB' },
+  BOLT: { chain: 'BNB', symbol: 'BOLT-4C6', ticker: 'BOLT' }
 }

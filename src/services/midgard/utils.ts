@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { getAssetFromString, bnOrZero, baseAmount, PoolData } from '@thorchain/asgardex-util'
+import { assetFromString, bnOrZero, baseAmount, PoolData } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import { head } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -14,7 +14,7 @@ export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} =
 
   assets.forEach((assetInfo) => {
     const { asset = '' } = assetInfo
-    const { symbol = '' } = getAssetFromString(asset)
+    const symbol = assetFromString(asset)?.symbol
 
     if (symbol) {
       assetDataIndex = { ...assetDataIndex, [symbol]: assetInfo }
@@ -26,10 +26,10 @@ export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} =
 
 export const getAssetDetail = (assets: AssetDetails, ticker: string): O.Option<AssetDetail> =>
   FP.pipe(
-    assets.find((asset: AssetDetail) => {
-      const { asset: a = '' } = asset
-      const { ticker: t } = getAssetFromString(a)
-      return ticker === t
+    assets.find((detail: AssetDetail) => {
+      const { asset = '' } = detail
+      const detailTicker = assetFromString(asset)?.ticker
+      return detailTicker && detailTicker === ticker
     }),
     O.fromNullable
   )
@@ -90,8 +90,8 @@ export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<Po
   FP.pipe(
     details.find((detail: PoolDetail) => {
       const { asset: detailAsset = '' } = detail
-      const { ticker: detailTicker } = getAssetFromString(detailAsset)
-      return detailTicker === ticker
+      const detailTicker = assetFromString(detailAsset)?.ticker
+      return detailTicker && detailTicker === ticker
     }),
     O.fromNullable
   )
