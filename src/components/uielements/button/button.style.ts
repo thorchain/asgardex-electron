@@ -92,15 +92,15 @@ const colorGroups: ColorGroups = {
 
 type ButtonThemeValue = {
   text: string
-  border: string
-  background: string
-  action: {
-    text: string
-    border: string
-    background: string
+  border?: string
+  background?: string
+  action?: {
+    text?: string
+    border?: string
+    background?: string
   }
-  focus: {
-    border: string
+  focus?: {
+    border?: string
     borderBottom?: string
   }
 }
@@ -160,6 +160,7 @@ const getThemes = () => {
         border: main
       }
     }
+
     value.normal = {
       text: palette('text', 0),
       border: palette('gray', 0),
@@ -172,6 +173,13 @@ const getThemes = () => {
       focus: {
         border: palette('gray', 0),
         borderBottom
+      }
+    }
+
+    value.transparent = {
+      text: palette('success', 0),
+      action: {
+        text: palette('success', 1)
       }
     }
 
@@ -219,8 +227,8 @@ export const ButtonWrapper = styled(Button)<Props>`
     &:active,
     &:focus {
       color: ${(props) => getThemeValue(props.color, props.typevalue)?.text ?? ''};
-      border-color: ${(props) => getThemeValue(props.color, props.typevalue)?.border ?? ''};
-      background: ${(props) => getThemeValue(props.color, props.typevalue)?.background ?? ''};
+      border-color: ${(props) => getThemeValue(props.color, props.typevalue)?.border ?? 'transparent'};
+      background: ${(props) => getThemeValue(props.color, props.typevalue)?.background ?? 'transparent'};
       ${(props) =>
         props.typevalue === 'normal' &&
         `
@@ -236,8 +244,8 @@ export const ButtonWrapper = styled(Button)<Props>`
     &:focus,
     &:active {
       border-color: ${(props) =>
-        getThemeValue(props.color, props.typevalue)?.focus.border ??
-        ''} !important; /* (Rudi): HACK: Border is overridden in selection.style.js buttons we need to create a new style for these buttons remove this when ready */
+        getThemeValue(props.color, props.typevalue)?.focus?.border ??
+        'transparent'} !important; /* (Rudi): HACK: Border is overridden in selection.style.js buttons we need to create a new style for these buttons remove this when ready */
     }
 
     /* apply special override styles for .focused class */
@@ -246,12 +254,12 @@ export const ButtonWrapper = styled(Button)<Props>`
       &,
       &:focus,
       &:active {
-        color: ${(props) => getThemeValue(props.color, props.typevalue)?.action.text ?? ''};
-        border-color: ${(props) => getThemeValue(props.color, props.typevalue)?.action.border ?? ''};
+        color: ${(props) => getThemeValue(props.color, props.typevalue)?.action?.text ?? ''};
+        border-color: ${(props) => getThemeValue(props.color, props.typevalue)?.action?.border ?? 'transparent'};
         background: ${(props) =>
           props.typevalue === 'normal'
-            ? getThemeValue(props.color, props.typevalue)?.focus.borderBottom ?? ''
-            : getThemeValue(props.color, props.typevalue)?.action.background ?? ''};
+            ? getThemeValue(props.color, props.typevalue)?.focus?.borderBottom ?? 'transparent'
+            : getThemeValue(props.color, props.typevalue)?.action?.background ?? 'transparent'};
         ${(props) =>
           props.typevalue === 'normal' &&
           `

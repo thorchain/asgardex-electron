@@ -37,7 +37,7 @@ const WalletView: React.FC = (): JSX.Element => {
   const reloadButton = useMemo(
     () => (
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Styled.RefreshButton typevalue={'outline'} onClick={reloadBalances}>
+        <Styled.RefreshButton typevalue="transparent" type="text" onClick={reloadBalances}>
           <SyncIcon />
           {intl.formatMessage({ id: 'common.refresh' })}
         </Styled.RefreshButton>
