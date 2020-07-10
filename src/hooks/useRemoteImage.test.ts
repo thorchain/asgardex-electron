@@ -12,7 +12,7 @@ describe('hooks/useRemoteImage', () => {
   const LOAD_FAILURE_SRC = 'fail'
   const LOAD_SUCCESS_SRC = 'success'
 
-  beforeEach(() => {
+  beforeAll(() => {
     // Mocking Image.prototype.src to call the onload or onerror
     Object.defineProperty(global.Image.prototype, 'src', {
       set(src: string) {
@@ -23,6 +23,10 @@ describe('hooks/useRemoteImage', () => {
         }
       }
     })
+  })
+
+  afterAll(() => {
+    delete global.Image.prototype.src
   })
 
   it('should has initial pending state', () => {
