@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-import { Table } from 'antd'
+import { Grid, Table } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { shortSymbol } from '../../helpers/tokenHelpers'
@@ -50,6 +50,7 @@ const getColumnsRenderers = (address: string): Record<Column, (value: any, tx: U
 
 const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
   const intl = useIntl()
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   const address = 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y'
 
@@ -57,24 +58,31 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
 
   return (
     <StyledTable dataSource={transactions} rowKey="_id" pagination={false}>
-      <Table.Column
-        title={intl.formatMessage({ id: 'common.type' })}
-        dataIndex="txType"
-        align="left"
-        render={columnsRenderers.type}
-      />
-      <Table.Column
-        title={intl.formatMessage({ id: 'common.address' })}
-        dataIndex="txFrom"
-        align="left"
-        render={columnsRenderers.address}
-      />
-      <Table.Column
-        title={intl.formatMessage({ id: 'common.to' })}
-        dataIndex="Type"
-        align="left"
-        render={columnsRenderers.to}
-      />
+      {isDesktopView && (
+        <Table.Column
+          title={intl.formatMessage({ id: 'common.type' })}
+          dataIndex="txType"
+          align="left"
+          render={columnsRenderers.type}
+        />
+      )}
+      {isDesktopView && (
+        <Table.Column
+          title={intl.formatMessage({ id: 'common.address' })}
+          dataIndex="txFrom"
+          align="left"
+          render={columnsRenderers.address}
+        />
+      )}
+
+      {isDesktopView && (
+        <Table.Column
+          title={intl.formatMessage({ id: 'common.to' })}
+          dataIndex="Type"
+          align="left"
+          render={columnsRenderers.to}
+        />
+      )}
       <Table.Column
         title={intl.formatMessage({ id: 'common.amount' })}
         dataIndex="txValue"
