@@ -46,6 +46,14 @@ While environment variables are not required (defaults are set), you can configu
 yarn dev
 ```
 
+### How to auto-unlock a locked wallet while hot-reloading the app (for development only, disabled in production build)
+
+```bash
+REACT_APP_WALLET_PASSWORD=secret yarn dev
+```
+
+Or add to `REACT_APP_WALLET_PASSWORD=secret` to `.env` file and run `yarn dev`
+
 ## Test
 
 ```bash
