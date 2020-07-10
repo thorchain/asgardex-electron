@@ -49,8 +49,9 @@ const inputStyle = css<InputProps>`
     letter-spacing: ${({ size = 'middle' }) => fontSettings[size].spacing};
     ${({ typevalue }) => typevalue === 'ghost' && 'border: none;'};
     ${({ typevalue }) => typevalue === 'ghost' && 'background: #F0F3F7;'};
+    border-color: ${({ color = 'primary', typevalue = 'normal' }) =>
+      typevalue === 'ghost' ? 'transparent' : colors[color]};
 
-    border: 1px solid ${palette('gray', 0)};
     background: ${palette('background', 1)};
     color: ${palette('text', 0)};
     input,

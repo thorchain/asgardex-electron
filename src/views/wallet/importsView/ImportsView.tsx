@@ -4,9 +4,9 @@ import { Tabs, Row } from 'antd'
 import { useIntl } from 'react-intl'
 
 import BackLink from '../../../components/uielements/backLink'
-import Label from '../../../components/uielements/label'
+import Headline from '../../../components/uielements/headline'
 import ImportPhrase from '../../../components/wallet/ImportPhrase'
-import { ImportsViewWrapper, TabLabel } from './ImportsView.style'
+import * as Styled from './ImportsView.style'
 
 enum TabKey {
   PHRASE = 'phrase',
@@ -31,7 +31,7 @@ const ImportsView: React.FC = (): JSX.Element => {
   const tabs = useMemo(
     () =>
       items.map(({ label, key, content }) => (
-        <Tabs.TabPane tab={<TabLabel>{label}</TabLabel>} key={key}>
+        <Tabs.TabPane tab={<Styled.TabLabel>{label}</Styled.TabLabel>} key={key}>
           {content}
         </Tabs.TabPane>
       )),
@@ -39,21 +39,15 @@ const ImportsView: React.FC = (): JSX.Element => {
   )
 
   return (
-    <ImportsViewWrapper>
+    <Styled.ImportsViewWrapper>
       <div style={{ position: 'absolute' }}>
         <BackLink />
       </div>
       <Row style={{ justifyContent: 'center' }}>
-        <Label size="big" style={{ padding: 0 }}>
-          IMPORT EXISTING WALLET
-        </Label>
+        <Headline>{intl.formatMessage({ id: 'wallet.imports.wallet' })}</Headline>
       </Row>
-      <div style={{ height: '95%' }}>
-        <Tabs activeKey={TabKey.PHRASE} size="large">
-          {tabs}
-        </Tabs>
-      </div>
-    </ImportsViewWrapper>
+      <Styled.Tabs activeKey={TabKey.PHRASE}>{tabs}</Styled.Tabs>
+    </Styled.ImportsViewWrapper>
   )
 }
 export default ImportsView
