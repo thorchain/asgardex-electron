@@ -1,13 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
 import { LeftOutlined } from '@ant-design/icons'
-import { Row, Col } from 'antd'
+import { Grid, Row, Col } from 'antd'
 import QRCode from 'qrcode'
 import { useHistory } from 'react-router-dom'
 
 import { ASSETS_MAINNET } from '../../mock/assets'
 import AccountSelector from './AccountSelector'
-import { StyledBackLabel, StyledCol, StyledCard, StyledDiv, StyledAddress, StyledLabel } from './Receive.style'
+import {
+  StyledBackLabel,
+  StyledCol,
+  StyledCard,
+  StyledDiv,
+  StyledAddressWrapper,
+  StyledAddress,
+  StyledLabel
+} from './Receive.style'
 
 // Dummmy data
 const UserAccount = {
@@ -21,6 +29,7 @@ const Receive: React.FC = (): JSX.Element => {
   const history = useHistory()
   const [copyMsg, setCopyMsg] = useState<string>('')
   const [timer, setTimer] = useState<number | null>(null)
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   const userAccount = () => {
     // Placeholder
@@ -76,13 +85,19 @@ const Receive: React.FC = (): JSX.Element => {
         <StyledCol span={24}>
           {/* AccountSelector needs data - we are using mock data for now */}
           <AccountSelector asset={ASSETS_MAINNET.BOLT} assets={[ASSETS_MAINNET.BNB, ASSETS_MAINNET.TOMO]} />
-          <StyledCard bordered={false}>
+          <StyledCard isDesktopView={isDesktopView} bordered={false}>
             <div id="qr-container" />
           </StyledCard>
           <StyledDiv>
-            <label htmlFor="clipboard-btn">
-              <StyledAddress size="large">{userAccount().address}</StyledAddress>
-            </label>
+            {isDesktopView ? (
+              <label htmlFor="clipboard-btn">
+                <StyledAddress size="large">{userAccount().address}</StyledAddress>
+              </label>
+            ) : (
+              <StyledAddressWrapper htmlFor="clipboard-btn">
+                <StyledAddress size="large">{userAccount().address}</StyledAddress>
+              </StyledAddressWrapper>
+            )}
             <StyledLabel size="big" onClick={handleCopyAddress}>
               Copy
             </StyledLabel>
