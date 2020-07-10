@@ -5,7 +5,8 @@ import { useRemoteImage } from './useRemoteImage'
 const mockSetValue = jest.fn()
 
 jest.mock('react', () => ({
-  useState: (value: unknown) => [value, mockSetValue]
+  useState: (value: unknown) => [value, mockSetValue],
+  useEffect: (fn: () => void) => fn()
 }))
 
 describe('hooks/useRemoteImage', () => {
