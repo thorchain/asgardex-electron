@@ -10,10 +10,12 @@ import { none, Option, some } from 'fp-ts/lib/Option'
 import { useHistory, useLocation } from 'react-router-dom'
 
 import { InputPassword } from '../../components/uielements/input'
+import { IS_PRODUCTION } from '../../const'
+import { envOrDefault } from '../../helpers/envHelper'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { KeystoreState } from '../../services/wallet/types'
-import { isLocked } from '../../services/wallet/util'
+import { isLocked, hasImportedKeystore } from '../../services/wallet/util'
 
 type Props = {
   keystore: KeystoreState
@@ -30,6 +32,25 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
   const [validPassword, setValidPassword] = useState(false)
 
   const [unlockError, setUnlockError] = useState<Option<Error>>(none)
+
+  /**
+   * Helper to auto-unlock wallet in development mode while hot-relaoding the app
+   * Wallet has to be imported and `REACT_APP_WALLET_PASSWORD` has to be set as env before
+   */
+  useEffect(() => {
+    if (!IS_PRODUCTION) {
+      const checkPassword = async () => {
+        const password = envOrDefault(process.env.REACT_APP_WALLET_PASSWORD, '')
+        if (password && keystore && hasImportedKeystore(keystore) && isLocked(keystore)) {
+          await unlockHandler(keystore, password).catch((error) => {
+            setUnlockError(some(error))
+          })
+          setValidPassword(true)
+        }
+      }
+      checkPassword()
+    }
+  }, [keystore, unlockHandler])
 
   // Re-direct to previous view after unlocking the wallet
   useEffect(() => {
