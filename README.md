@@ -48,11 +48,13 @@ yarn dev
 
 ### How to auto-unlock a locked wallet while hot-reloading the app (for development only, disabled in production build)
 
+Use `REACT_APP_WALLET_PASSWORD` to run the app by replacing `password` with your own password
+
 ```bash
-REACT_APP_WALLET_PASSWORD=secret yarn dev
+REACT_APP_WALLET_PASSWORD=password yarn dev
 ```
 
-Or add to `REACT_APP_WALLET_PASSWORD=secret` to `.env` file and run `yarn dev`
+Or add to `REACT_APP_WALLET_PASSWORD=password` to `.env` file and run `yarn dev`
 
 ## Test
 
