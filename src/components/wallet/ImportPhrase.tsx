@@ -129,6 +129,7 @@ const ImportPhrase: React.FC = (): JSX.Element => {
             size="large"
             type="primary"
             htmlType="submit"
+            round="true"
             style={{ width: 150 }}
             disabled={!validPassword || !validPhrase || importing}>
             Import

@@ -31,6 +31,7 @@ export type WalletMessages = {
   'wallet.action.send': string
   'wallet.action.receive': string
   'wallet.imports.phrase': string
+  'wallet.imports.wallet': string
   'wallet.imports.enterphrase': string
 }
 

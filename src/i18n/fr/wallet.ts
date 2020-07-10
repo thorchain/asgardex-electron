@@ -12,6 +12,7 @@ const wallet: WalletMessages = {
   'wallet.action.send': 'Send - FR',
   'wallet.action.receive': 'Receive - FR',
   'wallet.imports.phrase': 'Phrase',
+  'wallet.imports.wallet': 'Import existing wallet - FR',
   'wallet.imports.enterphrase': 'Entrez une phrase'
 }
 
