@@ -32,6 +32,9 @@ export type WalletMessages = {
   'wallet.action.send': string
   'wallet.action.receive': string
   'wallet.action.remove': string
+  'wallet.action.unlock': string
+  'wallet.unlock.title': string
+  'wallet.unlock.phrase': string
   'wallet.imports.phrase': string
   'wallet.imports.wallet': string
   'wallet.imports.enterphrase': string

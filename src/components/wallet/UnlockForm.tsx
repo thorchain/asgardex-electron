@@ -115,16 +115,16 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
       </Modal>
       <Styled.Header>
         <BackLink style={{ position: 'absolute', top: 0, left: 0 }} />
-        <Styled.Text>Unlock your Wallet</Styled.Text>
+        <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.title' })}</Styled.Text>
       </Styled.Header>
       <Styled.Content>
         <div style={{ width: '100%' }}>
-          <Styled.Text>enter your password</Styled.Text>
+          <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.phrase' })}</Styled.Text>
           <Styled.PasswordInput
             name="password"
             rules={[{ required: true, validator: passwordValidator }]}
             validateTrigger={['onSubmit', 'onChange']}>
-            <InputPassword placeholder="password" size="large" />
+            <InputPassword placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()} size="large" />
           </Styled.PasswordInput>
         </div>
         {renderError}
@@ -134,7 +134,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
               {intl.formatMessage({ id: 'common.remove' })} {intl.formatMessage({ id: 'wallet.title' })}
             </Styled.Button>
             <Styled.Button round="true" size="large" type="primary" block htmlType="submit" disabled={!validPassword}>
-              Unlock
+              {intl.formatMessage({ id: 'wallet.action.unlock' })}
             </Styled.Button>
           </Styled.Actions>
         </Styled.Form.Item>
