@@ -29,6 +29,7 @@ export const checkPhraseConfirmWordsFactory = (
       const selectedWord = selectedWords[i]
 
       if (word._id !== selectedWord._id) {
+        // eslint-disable-next-line no-loop-func
         newWords = words.map((e: WordType) => {
           if (e._id === selectedWord._id) {
             e.error = true
@@ -80,6 +81,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const isSelected = useCallback(isSelectedFactory(wordsList, '_id'), [wordsList])
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const checkPhraseConfirmWords = useCallback(checkPhraseConfirmWordsFactory(setWordsList, setMnemonicError), [
     setWordsList,
     setMnemonicError
