@@ -1,10 +1,15 @@
 import { join } from 'path'
 
-import { BrowserWindow, app, remote } from 'electron'
+import { BrowserWindow, app, remote, Menu, MenuItemConstructorOptions, ipcMain } from 'electron'
 import electronDebug from 'electron-debug'
 import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
+import { createIntl, IntlShape } from 'react-intl'
+import { fromEvent } from 'rxjs'
+
+import { getLocaleFromString } from '../src/shared/i18n'
+import { getMessagesByLocale, cache } from './i18n'
 
 export const IS_DEV = isDev && process.env.NODE_ENV !== 'production'
 export const APP_ROOT = join(__dirname, '..', '..')
@@ -18,7 +23,9 @@ const initLogger = () => {
   log.transports.file.resolvePath = (variables: log.PathVariables) => {
     const ap = app || remote.app
     // Logs go into ~/.{appName}/logs/ dir
-    return join(ap.getPath('userData'), app.getName(), 'logs', variables.fileName as string)
+    const path = join(ap.getPath('userData'), 'logs', variables.fileName as string)
+    console.log('path', path)
+    return path
   }
 }
 
@@ -53,13 +60,34 @@ const closeHandler = () => {
 
 const setupDevEnv = async () => {
   // install react & redux chrome dev tools
-  const { default: install, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } = require('electron-devtools-installer') // eslint-disable-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { default: install, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer')
   try {
     await install(REACT_DEVELOPER_TOOLS)
-    await install(REDUX_DEVTOOLS)
   } catch (e) {
     warn('unable to install devtools', e)
   }
+}
+
+enum IPCMessages {
+  UPDATE_LANG = 'UPDATE_LANG'
+}
+
+const menu = (intl: IntlShape): MenuItemConstructorOptions[] => [
+  {
+    label: intl.formatMessage({ id: 'menu.edit.title' })
+  },
+  {
+    role: 'editMenu'
+  }
+]
+
+const setMenu = (localeStr: string) => {
+  console.log('electron change lang', localeStr)
+  const locale = getLocaleFromString(localeStr)
+  const intl = createIntl({ locale, messages: getMessagesByLocale(locale) }, cache)
+  const appMenu = Menu.buildFromTemplate(menu(intl))
+  Menu.setApplicationMenu(appMenu)
 }
 
 const initMainWindow = async () => {
@@ -71,7 +99,6 @@ const initMainWindow = async () => {
       nodeIntegration: true
     }
   })
-  mainWindow.setMenuBarVisibility(false)
 
   if (IS_DEV) {
     await setupDevEnv()
@@ -90,8 +117,14 @@ const init = async () => {
   app.on('activate', activateHandler)
 }
 
+const initIPC = () => {
+  const source$ = fromEvent<string>(ipcMain, IPCMessages.UPDATE_LANG, (_, locale) => locale)
+  source$.subscribe((locale: string) => setMenu(locale))
+}
+
 try {
   init()
+  initIPC()
 } catch (error) {
   log.error(`Unable to initial Electron app: ${error}`)
 }
