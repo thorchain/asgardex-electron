@@ -1,5 +1,6 @@
 import { AssetSymbol, assetToBase, assetAmount } from '@thorchain/asgardex-util'
 
+import { envOrDefault } from './helpers/envHelper'
 import {
   PricePoolCurrencySymbols,
   PricePoolCurrencyWeights,
@@ -7,6 +8,8 @@ import {
   PricePool,
   PricePoolAssets
 } from './views/pools/types'
+
+export const IS_PRODUCTION = envOrDefault(process.env.NODE_ENV, '') === 'production'
 
 // Currency symbols used for pricing
 export const CURRENCY_SYMBOLS: PricePoolCurrencySymbols = {

@@ -1,10 +1,13 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback } from 'react'
 
+import { LoadingOutlined } from '@ant-design/icons'
+import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetTicker } from '@thorchain/asgardex-util'
 
 import bnbIcon from '../../../../assets/svg/coin-bnb.svg'
 import runeIcon from '../../../../assets/svg/rune-flash-icon.svg'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
+import { useRemoteImage } from '../../../../hooks/useRemoteImage'
 import * as Styled from './AssetIcon.style'
 import { Size } from './types'
 
@@ -15,7 +18,6 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 
 const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
   const { asset, size = 'normal' } = props
-  const [error, setError] = useState(false)
 
   const imgUrl = useMemo(() => {
     const { symbol, ticker } = asset
@@ -36,20 +38,25 @@ const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
     return url
   }, [asset])
 
-  const onErrorHandler = useCallback(() => {
-    setError(true)
-  }, [])
+  const remoteIconImage = useRemoteImage(imgUrl)
 
-  const renderIcon = useMemo(
-    () => (
+  const renderIcon = useCallback(
+    (src: string) => (
       <Styled.IconWrapper size={size}>
-        <Styled.Icon src={imgUrl} size={size} onError={onErrorHandler} />{' '}
+        <Styled.Icon src={src} size={size} />{' '}
       </Styled.IconWrapper>
     ),
-    [imgUrl, onErrorHandler, size]
+    [size]
   )
 
-  const renderFallbackIcon = useMemo(() => {
+  const renderPendingIcon = useCallback(() => {
+    return (
+      <Styled.IconWrapper size={size}>
+        <LoadingOutlined />
+      </Styled.IconWrapper>
+    )
+  }, [size])
+  const renderFallbackIcon = useCallback(() => {
     const { ticker } = asset
     const numbers = getIntFromName(ticker)
     const backgroundImage = `linear-gradient(45deg,${rainbowStop(numbers[0])},${rainbowStop(numbers[1])})`
@@ -63,12 +70,7 @@ const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
     )
   }, [asset, size])
 
-  return (
-    <>
-      {!error && renderIcon}
-      {error && renderFallbackIcon}
-    </>
-  )
+  return RD.fold(() => <></>, renderPendingIcon, renderFallbackIcon, renderIcon)(remoteIconImage)
 }
 
 export default AssetIcon

@@ -13,6 +13,7 @@ export type CommonMessages = {
   'common.memo': string
   'common.refresh': string
   'common.date': string
+  'common.remove': string
 }
 
 export type PoolsMessages = {
@@ -31,7 +32,9 @@ export type WalletMessages = {
   'wallet.column.value': string
   'wallet.action.send': string
   'wallet.action.receive': string
+  'wallet.action.remove': string
   'wallet.imports.phrase': string
+  'wallet.imports.wallet': string
   'wallet.imports.enterphrase': string
 }
 

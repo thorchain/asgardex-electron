@@ -10,9 +10,9 @@ export type ComponentProps = {
   style?: React.CSSProperties
 }
 
-type Props = ComponentProps & StyledProps
+export type LabelProps = ComponentProps & StyledProps
 
-const Label: React.FC<Props> = (props: Props): JSX.Element => {
+const Label: React.FC<LabelProps> = (props: LabelProps): JSX.Element => {
   const {
     loading = false,
     align = 'left',
