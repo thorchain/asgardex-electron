@@ -4,23 +4,9 @@ import { useObservableState } from 'observable-hooks'
 import { IntlProvider } from 'react-intl'
 import * as Rx from 'rxjs'
 
-import { getLocaleFromString, getMessagesByLocale } from '../i18n'
+import { getMessagesByLocale } from '../i18n'
 import { Locale } from '../i18n/types'
-
-const LOCALE_KEY = 'asgdx-locale'
-
-const initialLocale = (): Locale => {
-  const lang = navigator.language.split(/[-_]/)[0]
-  return (localStorage.getItem(LOCALE_KEY) as Locale) || getLocaleFromString(lang)
-}
-
-const selectedLocale$$ = new Rx.BehaviorSubject(initialLocale())
-const locale$ = selectedLocale$$.asObservable()
-
-const changeLocale = (nextLocale: Locale) => {
-  localStorage.setItem(LOCALE_KEY, nextLocale)
-  selectedLocale$$.next(nextLocale)
-}
+import { locale$, changeLocale, initialLocale } from '../services/i18n/service'
 
 type I18nContextValue = {
   locale$: Rx.Observable<Locale>
