@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 
+import { LoadingOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetTicker } from '@thorchain/asgardex-util'
 
@@ -48,6 +49,13 @@ const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
     [size]
   )
 
+  const renderPendingIcon = useCallback(() => {
+    return (
+      <Styled.IconWrapper size={size}>
+        <LoadingOutlined />
+      </Styled.IconWrapper>
+    )
+  }, [size])
   const renderFallbackIcon = useCallback(() => {
     const { ticker } = asset
     const numbers = getIntFromName(ticker)
@@ -62,7 +70,7 @@ const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
     )
   }, [asset, size])
 
-  return RD.fold(() => <></>, renderFallbackIcon, renderFallbackIcon, renderIcon)(remoteIconImage)
+  return RD.fold(() => <></>, renderPendingIcon, renderFallbackIcon, renderIcon)(remoteIconImage)
 }
 
 export default AssetIcon
