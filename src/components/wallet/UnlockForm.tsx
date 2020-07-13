@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
-import { Form, Button } from 'antd'
+import { Form, Button, Modal } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
@@ -27,6 +27,7 @@ type Props = {
 const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
   const { keystore, unlockHandler = () => Promise.resolve() } = props
 
+  const [showRemoveModal, setShowRemoveModal] = useState(false)
   const history = useHistory()
   const location = useLocation<RedirectRouteState>()
   const intl = useIntl()
@@ -88,13 +89,18 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
     form.resetFields()
   }, [form])
 
-  const onRemove = useCallback(() => {
-    const isConfirmed = window.confirm('remove wallet?')
-    if (isConfirmed) {
-      removeKeystore().then(() => {
-        history.push(walletRoutes.imports.template)
-      })
-    }
+  const showRemoveConfirm = useCallback(() => {
+    setShowRemoveModal(true)
+  }, [])
+
+  const hideRemoveConfirm = useCallback(() => {
+    setShowRemoveModal(false)
+  }, [])
+
+  const onRemoveConfirm = useCallback(() => {
+    removeKeystore().then(() => {
+      history.push(walletRoutes.imports.template)
+    })
   }, [history, removeKeystore])
 
   const renderError = useMemo(
@@ -113,6 +119,9 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <Form form={form} onFinish={submitForm}>
+      <Modal visible={showRemoveModal} onCancel={hideRemoveConfirm} onOk={onRemoveConfirm}>
+        Remove wallet?
+      </Modal>
       <Form.Item
         name="password"
         rules={[{ required: true, validator: passwordValidator }]}
@@ -127,7 +136,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
         <Button size="large" type="primary" block onClick={onReset}>
           Reset
         </Button>
-        <Button size="large" type="primary" block onClick={onRemove}>
+        <Button size="large" type="primary" block onClick={showRemoveConfirm}>
           {intl.formatMessage({ id: 'common.remove' })}
         </Button>
       </Form.Item>
