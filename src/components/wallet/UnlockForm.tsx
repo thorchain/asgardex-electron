@@ -7,10 +7,12 @@ import Paragraph from 'antd/lib/typography/Paragraph'
 import Text from 'antd/lib/typography/Text'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
+import { useIntl } from 'react-intl'
 import { useHistory, useLocation } from 'react-router-dom'
 
 import { InputPassword } from '../../components/uielements/input'
 import { IS_PRODUCTION } from '../../const'
+import { useWalletContext } from '../../contexts/WalletContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
@@ -27,6 +29,9 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
 
   const history = useHistory()
   const location = useLocation<RedirectRouteState>()
+  const intl = useIntl()
+  const { keystoreService } = useWalletContext()
+  const { removeKeystore } = keystoreService
   const [form] = Form.useForm()
 
   const [validPassword, setValidPassword] = useState(false)
@@ -83,6 +88,15 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
     form.resetFields()
   }, [form])
 
+  const onRemove = useCallback(() => {
+    const isConfirmed = window.confirm('remove wallet?')
+    if (isConfirmed) {
+      removeKeystore().then(() => {
+        history.push(walletRoutes.imports.template)
+      })
+    }
+  }, [history, removeKeystore])
+
   const renderError = useMemo(
     () =>
       O.fold(
@@ -112,6 +126,9 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
         </Button>
         <Button size="large" type="primary" block onClick={onReset}>
           Reset
+        </Button>
+        <Button size="large" type="primary" block onClick={onRemove}>
+          {intl.formatMessage({ id: 'common.remove' })}
         </Button>
       </Form.Item>
       <Text>Unlock your Wallet</Text>

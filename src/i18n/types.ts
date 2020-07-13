@@ -12,6 +12,7 @@ export type CommonMessages = {
   'common.password': string
   'common.memo': string
   'common.refresh': string
+  'common.remove': string
 }
 
 export type PoolsMessages = {
