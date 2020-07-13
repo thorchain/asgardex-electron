@@ -88,6 +88,7 @@ export const CoinMobilePrice = styled.p`
 
 export const StyledDivider = styled(Divider)`
   margin: 0px;
+  border-top: 1px solid ${palette('gray', 0)};
 `
 
 export const StyledRow = styled(Row)`
