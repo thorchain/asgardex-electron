@@ -114,7 +114,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
   return (
     <Form form={form} onFinish={submitForm}>
       <Modal visible={showRemoveModal} onCancel={hideRemoveConfirm} onOk={removeKeystore}>
-        Remove wallet?
+        {intl.formatMessage({ id: 'wallet.action.remove' })}
       </Modal>
       <Form.Item
         name="password"
