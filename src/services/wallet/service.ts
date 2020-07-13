@@ -12,7 +12,7 @@ import { hasImportedKeystore } from './util'
 // key file path
 const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
 
-const initialKeystoreState = (): KeystoreState => (fs.pathExistsSync(KEY_FILE) ? some(none) : none)
+export const initialKeystoreState = (): KeystoreState => (fs.pathExistsSync(KEY_FILE) ? some(none) : none)
 
 const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(initialKeystoreState())
 
