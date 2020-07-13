@@ -13,7 +13,7 @@ const common: CommonMessages = {
   'common.coin': 'Coin - DE',
   'common.password': 'Passwort',
   'common.memo': 'Memo - DE',
-  'common.refresh': 'Aktualisierung',
+  'common.refresh': 'Aktualisieren',
   'common.remove': 'Entfernen'
 }
 

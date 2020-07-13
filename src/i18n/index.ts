@@ -5,19 +5,6 @@ import { Locale, Messages } from './types'
 
 export const LOCALES = [Locale.EN, Locale.DE, Locale.FR]
 
-export const getLocaleFromString = (s: string): Locale => {
-  switch (s) {
-    case 'en':
-      return Locale.EN
-    case 'fr':
-      return Locale.FR
-    case 'de':
-      return Locale.DE
-    default:
-      return Locale.EN
-  }
-}
-
 export const getMessagesByLocale = (l: Locale): Messages => {
   switch (l) {
     case Locale.EN:
