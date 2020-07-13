@@ -1,10 +1,7 @@
 import { Layout } from 'antd'
 import styled from 'styled-components'
-import { size } from 'styled-theme'
 
 export const ViewWrapper = styled(Layout.Content)`
+  overflow: auto;
   padding: 70px 50px;
-  margin-top: ${size('headerHeight')};
-  margin-bottom: ${size('footerHeight')};
-  min-height: calc(100vh - ${size('headerHeight')} - ${size('footerHeight')});
 `
