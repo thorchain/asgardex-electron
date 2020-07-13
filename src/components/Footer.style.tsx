@@ -3,12 +3,10 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { palette, key, size } from 'styled-theme'
 
-import { media, Z_INDEX_MAP } from '../helpers/styleHelper'
+import { media } from '../helpers/styleHelper'
 
 export const FooterContainer = styled(Layout.Footer)`
-  position: fixed;
   bottom: 0;
-  z-index: ${Z_INDEX_MAP.footer};
   width: 100vw;
   padding: 20px 20px;
 
