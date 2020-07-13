@@ -97,12 +97,6 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
     setShowRemoveModal(false)
   }, [])
 
-  const onRemoveConfirm = useCallback(() => {
-    removeKeystore().then(() => {
-      history.push(walletRoutes.imports.template)
-    })
-  }, [history, removeKeystore])
-
   const renderError = useMemo(
     () =>
       O.fold(
@@ -119,7 +113,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <Form form={form} onFinish={submitForm}>
-      <Modal visible={showRemoveModal} onCancel={hideRemoveConfirm} onOk={onRemoveConfirm}>
+      <Modal visible={showRemoveModal} onCancel={hideRemoveConfirm} onOk={removeKeystore}>
         Remove wallet?
       </Modal>
       <Form.Item
