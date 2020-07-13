@@ -10,7 +10,7 @@
     "dev:app": "cross-env BROWSER=none yarn start:web",
     "dev:electron": "wait-on http://localhost:3000 && nodemon -I --watch ./electron/ --exec electron ./public/dev.js",
     "build": "cross-env CI=false PUBLIC_URL=./ craco build",
-    "prebuild": "tsc -p ./electron/tsconfig.json",
+    "prebuild": "webpack --config webpack.electron.js --mode production",
     "test": "craco test",
     "package": "yarn build && yarn package:electron",
     "package:electron": "electron-builder build -c.extraMetadata.main=build/electron.js --config .electronbuildrc",
@@ -84,6 +84,8 @@
     "uuid": "^8.1.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.10.4",
+    "@babel/preset-typescript": "^7.10.4",
     "@hot-loader/react-dom": "^16.13.0",
     "@react-theming/storybook-addon": "^1.0.2",
     "@storybook/addon-actions": "^5.3.19",
@@ -109,6 +111,7 @@
     "@types/styled-components": "^5.1.0",
     "@typescript-eslint/eslint-plugin": "^3.3.0",
     "@typescript-eslint/parser": "^3.3.0",
+    "babel-loader": "^8.1.0",
     "concurrently": "^5.2.0",
     "cross-env": "^7.0.2",
     "electron": "^8.3.2",
@@ -130,6 +133,7 @@
     "testcafe-react-selectors": "^4.0.0",
     "ts-jest": "^26.1.0",
     "ts-node": "^8.10.2",
-    "wait-on": "^5.0.1"
+    "wait-on": "^5.0.1",
+    "webpack-cli": "^3.3.12"
   }
 }
