@@ -2,10 +2,8 @@ import React, { useMemo, useCallback } from 'react'
 
 import { Row, Dropdown } from 'antd'
 import { ClickParam } from 'antd/lib/menu'
-import { useObservableState } from 'observable-hooks'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
-import { useI18nContext } from '../../contexts/I18nContext'
 import { LOCALES } from '../../i18n'
 import { Locale } from '../../i18n/types'
 import Menu from '../shared/Menu'
@@ -19,13 +17,12 @@ import {
 
 type Props = {
   isDesktopView: boolean
+  locale: Locale
+  changeLocale?: (locale: Locale) => void
 }
 
 const HeaderLang: React.FC<Props> = (props: Props): JSX.Element => {
-  const { isDesktopView } = props
-
-  const { changeLocale, locale$ } = useI18nContext()
-  const currentLocale = useObservableState(locale$)
+  const { isDesktopView, changeLocale = () => {}, locale } = props
 
   const changeLang = useCallback(
     ({ key }: ClickParam) => {
@@ -55,7 +52,7 @@ const HeaderLang: React.FC<Props> = (props: Props): JSX.Element => {
         <HeaderDropdownContentWrapper>
           {!isDesktopView && <HeaderDropdownTitle>Language</HeaderDropdownTitle>}
           <Row style={{ alignItems: 'center' }}>
-            <HeaderDropdownMenuItemText strong>{currentLocale || ''}</HeaderDropdownMenuItemText>
+            <HeaderDropdownMenuItemText strong>{locale || ''}</HeaderDropdownMenuItemText>
             <DownIcon />
           </Row>
         </HeaderDropdownContentWrapper>

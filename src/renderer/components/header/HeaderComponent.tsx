@@ -11,6 +11,7 @@ import { useHistory } from 'react-router-dom'
 import { Observable } from 'rxjs'
 import { palette, size } from 'styled-theme'
 
+import { Locale } from '../../../shared/i18n/types'
 import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
 import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
@@ -50,10 +51,20 @@ type Props = {
   setSelectedPricePool: (asset: PricePoolAsset) => void
   poolsState$: Observable<PoolsStateRD>
   selectedPricePoolAsset$: Observable<SelectedPricePoolAsset>
+  locale: Locale
+  changeLocale?: (locale: Locale) => void
 }
 
 const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
-  const { keystore, poolsState$, selectedPricePoolAsset$, lockHandler, setSelectedPricePool } = props
+  const {
+    keystore,
+    poolsState$,
+    selectedPricePoolAsset$,
+    lockHandler,
+    setSelectedPricePool,
+    locale,
+    changeLocale
+  } = props
 
   const intl = useIntl()
 
@@ -213,6 +224,11 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     [isDesktopView, clickSettingsHandler]
   )
 
+  const renderHeaderLang = useMemo(
+    () => <HeaderLang isDesktopView={isDesktopView} locale={locale} changeLocale={changeLocale} />,
+    [changeLocale, isDesktopView, locale]
+  )
+
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
@@ -239,7 +255,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                   <HeaderTheme isDesktopView={isDesktopView} />
                   {renderHeaderLock}
                   {renderHeaderSettings}
-                  <HeaderLang isDesktopView={isDesktopView} />
+                  {renderHeaderLang}
                 </Row>
               </Col>
             </>
@@ -286,9 +302,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
             </HeaderDrawerItem>
             <HeaderDrawerItem>{renderHeaderLock}</HeaderDrawerItem>
             <HeaderDrawerItem>{renderHeaderSettings}</HeaderDrawerItem>
-            <HeaderDrawerItem>
-              <HeaderLang isDesktopView={isDesktopView} />
-            </HeaderDrawerItem>
+            <HeaderDrawerItem>{renderHeaderLang}</HeaderDrawerItem>
             <HeaderNetStatus />
           </HeaderDrawer>
         )}

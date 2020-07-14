@@ -9,17 +9,23 @@ import { AppProvider } from '../src/renderer/contexts/AppContext'
 import { ThemeProvider } from '../src/renderer/contexts/ThemeContext'
 import { I18nProvider } from '../src/renderer/contexts/I18nContext'
 import { AppWrapper } from '../src/renderer/App.style'
+import { Locale } from '../src/shared/i18n/types'
+import { IntlProvider } from 'react-intl'
+import { getMessagesByLocale } from '../src/renderer/i18n'
 
 const lightTheme = { name: 'Light', ...themes.light }
 const darkTheme = { name: 'Dark', ...themes.dark }
+const locale = Locale.EN
+const messages = getMessagesByLocale(locale)
 
 const providerFn = ({ theme, children }) => (
   <AppProvider>
-    <I18nProvider>
+    {/* We use IntlProvider instead of our our custom I18nProvider to provide messages, but w/o dependencies to Electron/Node source, which can't run in storybook */}
+    <IntlProvider locale={locale} messages={messages} defaultLocale={locale}>
       <ThemeProvider theme={theme}>
         <AppWrapper>{children}</AppWrapper>
       </ThemeProvider>
-    </I18nProvider>
+    </IntlProvider>
   </AppProvider>
 )
 

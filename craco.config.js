@@ -10,7 +10,6 @@ module.exports = {
       webpackConfig.target = 'electron-renderer'
       // support hot reload of hooks
       webpackConfig.resolve.alias['react-dom'] = '@hot-loader/react-dom'
-      console.log('webpackConfig 22', webpackConfig)
       return webpackConfig
     },
     plugins: [
