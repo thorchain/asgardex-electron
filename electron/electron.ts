@@ -9,6 +9,7 @@ import { createIntl, IntlShape } from 'react-intl'
 import { fromEvent } from 'rxjs'
 
 import { getLocaleFromString } from '../src/shared/i18n'
+import IPCMessages from '../src/shared/ipc/messages'
 import { getMessagesByLocale, cache } from './i18n'
 
 export const IS_DEV = isDev && process.env.NODE_ENV !== 'production'
@@ -67,10 +68,6 @@ const setupDevEnv = async () => {
   } catch (e) {
     warn('unable to install devtools', e)
   }
-}
-
-enum IPCMessages {
-  UPDATE_LANG = 'UPDATE_LANG'
 }
 
 const menu = (intl: IntlShape): MenuItemConstructorOptions[] => [
