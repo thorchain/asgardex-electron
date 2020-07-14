@@ -48,7 +48,6 @@ export type SettingMessages = {
   'setting.export': string
   'setting.lock': string
   'setting.view.phrase': string
-  'setting.remove.wallet': string
   'setting.midgard': string
   'setting.version': string
 }
