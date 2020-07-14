@@ -10,7 +10,7 @@
     "dev:app": "cross-env BROWSER=none yarn start:web",
     "dev:electron": "wait-on http://localhost:3000 && nodemon -I --watch ./electron/ --exec electron ./public/dev.js",
     "build": "cross-env CI=false PUBLIC_URL=./ craco build",
-    "prebuild": "tsc -p ./electron/tsconfig.json",
+    "prebuild": "webpack --config webpack.electron.js --mode production",
     "test": "craco test",
     "package": "yarn build && yarn package:electron",
     "package:electron": "electron-builder build -c.extraMetadata.main=build/electron.js --config .electronbuildrc",
@@ -80,7 +80,7 @@
     "rxjs": "^6.5.5",
     "styled-components": "^5.1.1",
     "styled-theme": "^0.3.3",
-    "typescript": "^3.9.5",
+    "typescript": "^3.9.6",
     "uuid": "^8.1.0"
   },
   "devDependencies": {
@@ -129,7 +129,9 @@
     "testcafe-browser-provider-electron": "^0.0.15-alpha.1",
     "testcafe-react-selectors": "^4.0.0",
     "ts-jest": "^26.1.0",
+    "ts-loader": "^8.0.0",
     "ts-node": "^8.10.2",
-    "wait-on": "^5.0.1"
+    "wait-on": "^5.0.1",
+    "webpack-cli": "^3.3.12"
   }
 }
