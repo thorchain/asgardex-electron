@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 
-import { Table } from 'antd'
+import { Grid } from 'antd'
+import { ColumnsType, ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
 
 import { shortSymbol } from '../../helpers/tokenHelpers'
@@ -12,7 +13,7 @@ type Props = {
   transactions: UserTransactionType[]
 }
 
-type Column = 'type' | 'address' | 'to' | 'amount' | 'coin'
+type Column = 'type' | 'address' | 'timeStamp' | 'to' | 'amount' | 'coin'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getColumnsRenderers = (address: string): Record<Column, (value: any, tx: UserTransactionType) => JSX.Element> => {
@@ -28,6 +29,10 @@ const getColumnsRenderers = (address: string): Record<Column, (value: any, tx: U
     address: (_, tx) => {
       const p = party(tx)
       return <StyledText>{p.address}</StyledText>
+    },
+    timeStamp: (_, tx) => {
+      const p = party(tx)
+      return <StyledText>{p.timeStamp ? new Date(p.timeStamp).toDateString() : ''}</StyledText>
     },
     to: (_, tx) => {
       const p = party(tx)
@@ -50,52 +55,87 @@ const getColumnsRenderers = (address: string): Record<Column, (value: any, tx: U
 
 const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
   const intl = useIntl()
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   const address = 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y'
 
   const columnsRenderers = useMemo(() => getColumnsRenderers(address), [address])
 
+  const typeColumn: ColumnType<UserTransactionType> = {
+    key: 'txType',
+    title: intl.formatMessage({ id: 'common.type' }),
+    dataIndex: 'txType',
+    align: 'left',
+    render: columnsRenderers.type
+  }
+
+  const fromColumn: ColumnType<UserTransactionType> = {
+    key: 'fromAddr',
+    title: intl.formatMessage({ id: 'common.address' }),
+    dataIndex: 'txFrom',
+    align: 'left',
+    render: columnsRenderers.address
+  }
+
+  const toColumn: ColumnType<UserTransactionType> = {
+    key: 'toAddr',
+    title: intl.formatMessage({ id: 'common.to' }),
+    dataIndex: 'toAddr',
+    align: 'left',
+    render: columnsRenderers.to
+  }
+
+  const dateColumn: ColumnType<UserTransactionType> = {
+    key: 'timeStamp',
+    title: intl.formatMessage({ id: 'common.date' }),
+    dataIndex: 'timeStamp',
+    align: 'left',
+    render: columnsRenderers.timeStamp
+  }
+
+  const amountColumn: ColumnType<UserTransactionType> = {
+    key: 'value',
+    title: intl.formatMessage({ id: 'common.amount' }),
+    dataIndex: 'txValue',
+    align: 'left',
+    render: columnsRenderers.amount
+  }
+
+  const coinColumn: ColumnType<UserTransactionType> = {
+    key: 'txAsset',
+    title: intl.formatMessage({ id: 'common.coin' }),
+    dataIndex: 'txAsset',
+    align: 'left',
+    render: columnsRenderers.coin
+  }
+
+  const linkColumn: ColumnType<UserTransactionType> = {
+    key: 'txHash',
+    title: '',
+    dataIndex: 'txHash',
+    align: 'left',
+    render: () => <StyledLink>LINK</StyledLink>
+  }
+
+  const desktopColumns: ColumnsType<UserTransactionType> = [
+    typeColumn,
+    fromColumn,
+    toColumn,
+    dateColumn,
+    amountColumn,
+    coinColumn,
+    linkColumn
+  ]
+
+  const mobileColumns: ColumnsType<UserTransactionType> = [amountColumn, coinColumn, linkColumn]
+
   return (
-    <StyledTable dataSource={transactions} rowKey="_id" pagination={false}>
-      <Table.Column
-        title={intl.formatMessage({ id: 'common.type' })}
-        dataIndex="txType"
-        align="left"
-        render={columnsRenderers.type}
-      />
-      <Table.Column
-        title={intl.formatMessage({ id: 'common.address' })}
-        dataIndex="txFrom"
-        align="left"
-        render={columnsRenderers.address}
-      />
-      <Table.Column
-        title={intl.formatMessage({ id: 'common.to' })}
-        dataIndex="Type"
-        align="left"
-        render={columnsRenderers.to}
-      />
-      <Table.Column
-        title={intl.formatMessage({ id: 'common.amount' })}
-        dataIndex="txValue"
-        align="left"
-        render={columnsRenderers.amount}
-      />
-      <Table.Column
-        title={intl.formatMessage({ id: 'common.coin' })}
-        dataIndex="txAsset"
-        align="left"
-        render={columnsRenderers.coin}
-      />
-      <Table.Column
-        title=""
-        dataIndex="txHash"
-        align="left"
-        render={() => {
-          return <StyledLink>LINK</StyledLink>
-        }}
-      />
-    </StyledTable>
+    <StyledTable
+      columns={isDesktopView ? desktopColumns : mobileColumns}
+      dataSource={transactions}
+      rowKey="_id"
+      pagination={false}
+    />
   )
 }
 export default TransactionsTable

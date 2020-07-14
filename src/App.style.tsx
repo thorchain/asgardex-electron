@@ -30,5 +30,9 @@ export const AppWrapper = styled.div<AppWrapperProps>`
 `
 
 export const AppLayout = styled(Layout)`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
   background: ${palette('background', 3)};
 `

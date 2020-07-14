@@ -48,6 +48,7 @@ export type TransactionPartyType = {
   msg: string
   label: string
   address?: string | null
+  timeStamp?: string | null
   color: string
   op: string
 }
