@@ -27,3 +27,11 @@ export const BackLinkWrapper = styled.div`
     color: ${palette('primary', 0)};
   }
 `
+
+export const ButtonText = styled('span')`
+  display: none;
+
+  ${media.sm`
+    display: initial;
+  `}
+`

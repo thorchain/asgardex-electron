@@ -11,7 +11,10 @@ const wallet: WalletMessages = {
   'wallet.column.value': 'Value',
   'wallet.action.send': 'Send',
   'wallet.action.receive': 'Receive',
-  'wallet.action.remove': 'Remove wallet?',
+  'wallet.action.remove': 'Remove wallet',
+  'wallet.action.unlock': 'Unlock',
+  'wallet.unlock.title': 'Unlock your wallet',
+  'wallet.unlock.phrase': 'Enter your your phrase',
   'wallet.imports.phrase': 'Phrase',
   'wallet.imports.wallet': 'Import existing wallet',
   'wallet.imports.enterphrase': 'Enter phrase'

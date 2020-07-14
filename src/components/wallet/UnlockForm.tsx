@@ -1,10 +1,9 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
-import { Form, Button, Modal } from 'antd'
+import { Modal } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
-import Text from 'antd/lib/typography/Text'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -18,6 +17,8 @@ import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked, hasImportedKeystore } from '../../services/wallet/util'
+import BackLink from '../uielements/backLink'
+import * as Styled from './UnlockForm.style'
 
 type Props = {
   keystore: KeystoreState
@@ -33,7 +34,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
   const intl = useIntl()
   const { keystoreService } = useWalletContext()
   const { removeKeystore } = keystoreService
-  const [form] = Form.useForm()
+  const [form] = Styled.Form.useForm()
 
   const [validPassword, setValidPassword] = useState(false)
 
@@ -85,10 +86,6 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
     [unlockHandler, keystore]
   )
 
-  const onReset = useCallback(() => {
-    form.resetFields()
-  }, [form])
-
   const showRemoveConfirm = useCallback(() => {
     setShowRemoveModal(true)
   }, [])
@@ -112,30 +109,44 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   return (
-    <Form form={form} onFinish={submitForm}>
+    <>
       <Modal visible={showRemoveModal} onCancel={hideRemoveConfirm} onOk={removeKeystore}>
         {intl.formatMessage({ id: 'wallet.action.remove' })}
       </Modal>
-      <Form.Item
-        name="password"
-        rules={[{ required: true, validator: passwordValidator }]}
-        validateTrigger={['onSubmit', 'onChange']}>
-        <InputPassword placeholder="Enter your password" size="large" />
-      </Form.Item>
-      {renderError}
-      <Form.Item>
-        <Button size="large" type="primary" block htmlType="submit" disabled={!validPassword}>
-          Unlock wallet
-        </Button>
-        <Button size="large" type="primary" block onClick={onReset}>
-          Reset
-        </Button>
-        <Button size="large" type="primary" block onClick={showRemoveConfirm}>
-          {intl.formatMessage({ id: 'common.remove' })}
-        </Button>
-      </Form.Item>
-      <Text>Unlock your Wallet</Text>
-    </Form>
+      <Styled.Header>
+        <BackLink style={{ position: 'absolute', top: 0, left: 0 }} />
+        <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.title' })}</Styled.Text>
+      </Styled.Header>
+      <Styled.Form form={form} onFinish={submitForm}>
+        <Styled.Content>
+          <div style={{ width: '100%' }}>
+            <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.phrase' })}</Styled.Text>
+            <Styled.PasswordInput
+              name="password"
+              rules={[{ required: true, validator: passwordValidator }]}
+              validateTrigger={['onSubmit', 'onChange']}>
+              <InputPassword placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()} size="large" />
+            </Styled.PasswordInput>
+          </div>
+          {renderError}
+          <Styled.FormItem>
+            <Styled.Actions>
+              <Styled.Button
+                sizevalue="normal"
+                color="error"
+                typevalue="outline"
+                round="true"
+                onClick={showRemoveConfirm}>
+                {intl.formatMessage({ id: 'wallet.action.remove' })}
+              </Styled.Button>
+              <Styled.Button round="true" size="large" type="primary" block htmlType="submit" disabled={!validPassword}>
+                {intl.formatMessage({ id: 'wallet.action.unlock' })}
+              </Styled.Button>
+            </Styled.Actions>
+          </Styled.FormItem>
+        </Styled.Content>
+      </Styled.Form>
+    </>
   )
 }
 export default UnlockForm

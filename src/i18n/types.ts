@@ -33,6 +33,9 @@ export type WalletMessages = {
   'wallet.action.send': string
   'wallet.action.receive': string
   'wallet.action.remove': string
+  'wallet.action.unlock': string
+  'wallet.unlock.title': string
+  'wallet.unlock.phrase': string
   'wallet.imports.phrase': string
   'wallet.imports.wallet': string
   'wallet.imports.enterphrase': string
@@ -46,7 +49,6 @@ export type SettingMessages = {
   'setting.export': string
   'setting.lock': string
   'setting.view.phrase': string
-  'setting.remove.wallet': string
   'setting.midgard': string
   'setting.version': string
 }
