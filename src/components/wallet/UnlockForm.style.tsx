@@ -9,25 +9,18 @@ import BaseButton from '../uielements/button'
 export const Form = styled(AF)`
   display: flex;
   flex-direction: column;
+  flex: 1;
+`
 
-  ${media.lg`
-    height: 100%;
-  `}
-
-  .ant-form-item {
-    width: 100%;
-    margin: 0;
-  }
+export const FormItem = styled(Form.Item)`
+  width: 100%;
+  margin: 0;
 `
 
 export const Header = styled('div')`
   display: flex;
   justify-content: center;
   position: relative;
-
-  .ant-typography {
-    font-weight: 600;
-  }
 `
 
 export const Text = styled(AT)`
@@ -37,11 +30,13 @@ export const Text = styled(AT)`
   margin-bottom: 30px;
   color: ${palette('text', 1)};
   text-transform: uppercase;
+  font-weight: 600;
 `
 
 export const PasswordInput = styled(AF.Item)`
   width: 100%;
   max-width: 400px;
+  margin: 0 auto;
   margin-bottom: 20px !important;
 `
 
@@ -57,10 +52,6 @@ export const Content = styled('div')`
   ${media.sm`
     padding: 90px 60px 70px 60px;
   `}
-
-  .ant-row {
-    margin: 0 auto;
-  }
 `
 
 export const Actions = styled('div')`

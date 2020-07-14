@@ -109,7 +109,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   return (
-    <Styled.Form form={form} onFinish={submitForm}>
+    <>
       <Modal visible={showRemoveModal} onCancel={hideRemoveConfirm} onOk={removeKeystore}>
         {intl.formatMessage({ id: 'wallet.action.remove' })}
       </Modal>
@@ -117,29 +117,36 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
         <BackLink style={{ position: 'absolute', top: 0, left: 0 }} />
         <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.title' })}</Styled.Text>
       </Styled.Header>
-      <Styled.Content>
-        <div style={{ width: '100%' }}>
-          <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.phrase' })}</Styled.Text>
-          <Styled.PasswordInput
-            name="password"
-            rules={[{ required: true, validator: passwordValidator }]}
-            validateTrigger={['onSubmit', 'onChange']}>
-            <InputPassword placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()} size="large" />
-          </Styled.PasswordInput>
-        </div>
-        {renderError}
-        <Styled.Form.Item>
-          <Styled.Actions>
-            <Styled.Button round="true" color="error" typevalue="ghost" size="large" block onClick={showRemoveConfirm}>
-              {intl.formatMessage({ id: 'common.remove' })} {intl.formatMessage({ id: 'wallet.title' })}
-            </Styled.Button>
-            <Styled.Button round="true" size="large" type="primary" block htmlType="submit" disabled={!validPassword}>
-              {intl.formatMessage({ id: 'wallet.action.unlock' })}
-            </Styled.Button>
-          </Styled.Actions>
-        </Styled.Form.Item>
-      </Styled.Content>
-    </Styled.Form>
+      <Styled.Form form={form} onFinish={submitForm}>
+        <Styled.Content>
+          <div style={{ width: '100%' }}>
+            <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.phrase' })}</Styled.Text>
+            <Styled.PasswordInput
+              name="password"
+              rules={[{ required: true, validator: passwordValidator }]}
+              validateTrigger={['onSubmit', 'onChange']}>
+              <InputPassword placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()} size="large" />
+            </Styled.PasswordInput>
+          </div>
+          {renderError}
+          <Styled.FormItem>
+            <Styled.Actions>
+              <Styled.Button
+                sizevalue="normal"
+                color="error"
+                typevalue="outline"
+                round="true"
+                onClick={showRemoveConfirm}>
+                {intl.formatMessage({ id: 'wallet.action.remove' })}
+              </Styled.Button>
+              <Styled.Button round="true" size="large" type="primary" block htmlType="submit" disabled={!validPassword}>
+                {intl.formatMessage({ id: 'wallet.action.unlock' })}
+              </Styled.Button>
+            </Styled.Actions>
+          </Styled.FormItem>
+        </Styled.Content>
+      </Styled.Form>
+    </>
   )
 }
 export default UnlockForm
