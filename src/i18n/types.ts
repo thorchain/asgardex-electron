@@ -12,6 +12,7 @@ export type CommonMessages = {
   'common.password': string
   'common.memo': string
   'common.refresh': string
+  'common.date': string
   'common.remove': string
 }
 

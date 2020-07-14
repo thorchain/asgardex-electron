@@ -13,6 +13,7 @@ export const StyledTable = styled(Table)`
     line-height: 19px;
     font-family: 'MainFontRegular';
     border: none;
+    color: ${palette('gray', 2)};
   }
 
   .ant-table-tbody > tr > td {
@@ -21,6 +22,14 @@ export const StyledTable = styled(Table)`
     line-height: 22px;
     font-family: 'MainFontRegular';
     border: none;
+
+    span {
+      display: inline-block;
+      text-overflow: ellipsis;
+      max-width: 200px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
   }
 `
 
