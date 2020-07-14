@@ -8,13 +8,14 @@ module.exports = (env, argv) => ({
   },
   devtool: argv.mode === 'production' ? false : 'source-map',
   resolve: {
-    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx']
+    extensions: ['.ts', '.js']
   },
   module: {
     rules: [
       {
-        test: [/\.jsx?$/, /\.tsx?$/],
-        use: 'babel-loader',
+        test: [/\.tsx?$/],
+        loader: 'ts-loader',
+        options: { configFile: path.resolve(__dirname, 'electron', 'tsconfig.json') },
         exclude: /node_modules/
       }
     ]
