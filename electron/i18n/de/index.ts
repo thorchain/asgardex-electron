@@ -1,4 +1,12 @@
-import { EditMenuMessages, HelpMenuMessages, ViewMenuMessages } from '../types'
+import { EditMenuMessages, HelpMenuMessages, ViewMenuMessages, AppMenuMessages } from '../types'
+
+const appMenu: AppMenuMessages = {
+  'menu.app.about': 'Über {name}',
+  'menu.app.hideApp': '{name} ausblenden',
+  'menu.app.hideOthers': 'Andere ausblenden',
+  'menu.app.unhide': 'Zeige alle',
+  'menu.app.quit': '{name} beenden'
+}
 
 const editMenu: EditMenuMessages = {
   'menu.edit.title': 'Bearbeiten',
@@ -25,4 +33,4 @@ const viewMenu: ViewMenuMessages = {
   'menu.view.toggleDevTools': 'Dev Tools ein/aus'
 }
 
-export default { ...editMenu, ...viewMenu, ...helpMenu }
+export default { ...appMenu, ...editMenu, ...viewMenu, ...helpMenu }

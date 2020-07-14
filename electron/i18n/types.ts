@@ -1,3 +1,11 @@
+export type AppMenuMessages = {
+  'menu.app.about': string
+  'menu.app.hideApp': string
+  'menu.app.hideOthers': string
+  'menu.app.unhide': string
+  'menu.app.quit': string
+}
+
 export type EditMenuMessages = {
   'menu.edit.title': string
   'menu.edit.undo': string
@@ -23,4 +31,4 @@ export type ViewMenuMessages = {
   'menu.view.toggleDevTools': string
 }
 
-export type Messages = HelpMenuMessages & HelpMenuMessages & ViewMenuMessages
+export type Messages = AppMenuMessages & HelpMenuMessages & HelpMenuMessages & ViewMenuMessages
