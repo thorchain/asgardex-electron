@@ -85,6 +85,21 @@ const initMainWindow = async () => {
 
   mainWindow.on('closed', closeHandler)
   mainWindow.loadURL(BASE_URL)
+  // hide menu at start, we need to wait for locale sent by `ipcRenderer`
+  mainWindow.setMenuBarVisibility(false)
+}
+
+const langChangeHandler = (locale: Locale) => {
+  setMenu(locale, IS_DEV)
+  // show menu, which is hided at start
+  if (mainWindow && !mainWindow.isMenuBarVisible()) {
+    mainWindow.setMenuBarVisibility(true)
+  }
+}
+
+const initIPC = () => {
+  const source$ = fromEvent<Locale>(ipcMain, IPCMessages.UPDATE_LANG, (_, locale) => locale)
+  source$.subscribe(langChangeHandler)
 }
 
 const init = async () => {
@@ -94,16 +109,12 @@ const init = async () => {
 
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
-}
 
-const initIPC = () => {
-  const source$ = fromEvent<Locale>(ipcMain, IPCMessages.UPDATE_LANG, (_, locale) => locale)
-  source$.subscribe((locale) => setMenu(locale, IS_DEV))
+  initIPC()
 }
 
 try {
   init()
-  initIPC()
 } catch (error) {
   log.error(`Unable to initial Electron app: ${error}`)
 }
