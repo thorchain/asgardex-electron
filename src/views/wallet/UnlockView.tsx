@@ -11,7 +11,8 @@ import { hasImportedKeystore } from '../../services/wallet/util'
 
 const UnlockView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
-  const keystore = useObservableState(keystoreService.keystore$, initialKeystoreState())
+  const { keystore$, removeKeystore } = keystoreService
+  const keystore = useObservableState(keystore$, initialKeystoreState())
   const history = useHistory()
 
   useEffect(() => {
@@ -20,7 +21,7 @@ const UnlockView: React.FC = (): JSX.Element => {
     }
   }, [keystore, history])
 
-  return <UnlockForm keystore={keystore} unlockHandler={keystoreService.unlock} />
+  return <UnlockForm keystore={keystore} unlock={keystoreService.unlock} removeKeystore={removeKeystore} />
 }
 
 export default UnlockView
