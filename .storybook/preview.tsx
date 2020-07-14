@@ -5,10 +5,10 @@ import { configure } from '@storybook/react'
 import { withThemes } from '@react-theming/storybook-addon'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 
-import { AppProvider } from '../src/contexts/AppContext'
-import { ThemeProvider } from '../src/contexts/ThemeContext'
-import { I18nProvider } from '../src/contexts/I18nContext'
-import { AppWrapper } from '../src/App.style'
+import { AppProvider } from '../src/renderer/contexts/AppContext'
+import { ThemeProvider } from '../src/renderer/contexts/ThemeContext'
+import { I18nProvider } from '../src/renderer/contexts/I18nContext'
+import { AppWrapper } from '../src/renderer/App.style'
 
 const lightTheme = { name: 'Light', ...themes.light }
 const darkTheme = { name: 'Dark', ...themes.dark }

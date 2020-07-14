@@ -15,6 +15,6 @@
     "jsx": "react",
     "isolatedModules": true
   },
-  "include": ["src"],
-  "exclude": ["electron/electron.ts"]
+  "include": ["src/shared", "src/renderer"],
+  "exclude": ["src/main/"]
 }
