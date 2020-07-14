@@ -10,7 +10,6 @@ import { useIntl } from 'react-intl'
 import { useHistory, useLocation } from 'react-router-dom'
 
 import { InputPassword } from '../../components/uielements/input'
-import { useWalletContext } from '../../contexts/WalletContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
@@ -22,18 +21,17 @@ import * as Styled from './UnlockForm.style'
 
 type Props = {
   keystore: KeystoreState
-  unlockHandler?: (state: KeystoreState, password: string) => Promise<void>
+  unlock?: (state: KeystoreState, password: string) => Promise<void>
+  removeKeystore?: () => Promise<void>
 }
 
 const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
-  const { keystore, unlockHandler = () => Promise.resolve() } = props
+  const { keystore, unlock: unlockHandler = () => Promise.resolve(), removeKeystore = () => Promise.resolve() } = props
 
   const [showRemoveModal, setShowRemoveModal] = useState(false)
   const history = useHistory()
   const location = useLocation<RedirectRouteState>()
   const intl = useIntl()
-  const { keystoreService } = useWalletContext()
-  const { removeKeystore } = keystoreService
   const [form] = Styled.Form.useForm()
 
   const [validPassword, setValidPassword] = useState(false)

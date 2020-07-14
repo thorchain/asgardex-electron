@@ -5,6 +5,7 @@ import { storiesOf } from '@storybook/react'
 import { none } from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
+import { Locale } from '../../shared/i18n/types'
 import HeaderComponent from './HeaderComponent'
 
 storiesOf('Components/Header', module).add('default', () => {
@@ -15,6 +16,7 @@ storiesOf('Components/Header', module).add('default', () => {
       poolsState$={Rx.of(RD.pending)}
       setSelectedPricePool={() => console.log('setSelectedPricePool')}
       selectedPricePoolAsset$={Rx.of(none)}
+      locale={Locale.EN}
     />
   )
 })
