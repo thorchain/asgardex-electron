@@ -3,11 +3,9 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { palette, size } from 'styled-theme'
 
-import { Z_INDEX_MAP, media } from '../../helpers/styleHelper'
+import { media } from '../../helpers/styleHelper'
 
 export const HeaderContainer = styled(Layout.Header)`
-  position: fixed;
-  z-index: ${Z_INDEX_MAP.header};
   height: ${size('headerHeight', '50px')};
   width: 100vw;
   background-color: ${palette('background', 0)};

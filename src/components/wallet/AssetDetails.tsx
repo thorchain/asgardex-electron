@@ -1,26 +1,29 @@
 import React, { useCallback } from 'react'
 
 import { LeftOutlined } from '@ant-design/icons'
-import { Row, Col } from 'antd'
+import { Row, Col, Grid } from 'antd'
 import { useIntl } from 'react-intl'
-import { useParams, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import Button from '../../components/uielements/button'
 import { ASSETS_TESTNET } from '../../mock/assets'
-import { AssetDetailsRouteParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { UserTransactionType } from '../../types/wallet'
 import AssetIcon from '../uielements/assets/assetIcon'
 import {
   StyledCard,
+  StyledMobileCard,
   StyledLabel,
   CoinInfoWrapper,
   CoinTitle,
   CoinSubtitle,
   CoinPrice,
+  CoinMobilePrice,
   StyledDivider,
   ActionWrapper,
-  StyledAssetName
+  ActionMobileWrapper,
+  StyledRow,
+  StyledCol
 } from './AssetDetails.style'
 import TransactionsTable from './UserTransactionsTable'
 
@@ -50,9 +53,10 @@ const txs: UserTransactionType[] = [
 ]
 
 const AssetDetails: React.FC = (): JSX.Element => {
-  const { symbol } = useParams<AssetDetailsRouteParams>()
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   const history = useHistory()
   const intl = useIntl()
+  const ActionComponent = isDesktopView ? ActionWrapper : ActionMobileWrapper
 
   // dummy data - temporary workaround as long as we have not any logic for real data
   const asset = ASSETS_TESTNET.RUNE
@@ -66,7 +70,6 @@ const AssetDetails: React.FC = (): JSX.Element => {
 
   return (
     <>
-      <StyledAssetName>{symbol}</StyledAssetName>
       <Row>
         <Col span={24}>
           <StyledLabel size="large" color="primary" weight="bold" onClick={onBack}>
@@ -77,34 +80,52 @@ const AssetDetails: React.FC = (): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          <StyledCard bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
-            <div>
-              <AssetIcon asset={asset} size="large" />
-            </div>
-            <CoinInfoWrapper>
-              <CoinTitle>{asset?.ticker ?? 'unknown'}</CoinTitle>
-              <CoinSubtitle>{asset?.symbol ?? 'unknown'}</CoinSubtitle>
-            </CoinInfoWrapper>
-            <CoinPrice>$ 4.01</CoinPrice>
-          </StyledCard>
+          {isDesktopView && (
+            <StyledCard bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
+              <div>
+                <AssetIcon asset={asset} size="large" />
+              </div>
+              <CoinInfoWrapper>
+                <CoinTitle>{asset?.ticker ?? 'unknown'}</CoinTitle>
+                <CoinSubtitle>{asset?.symbol ?? 'unknown'}</CoinSubtitle>
+              </CoinInfoWrapper>
+              <CoinPrice>$ 4.01</CoinPrice>
+            </StyledCard>
+          )}
+          {!isDesktopView && (
+            <>
+              <StyledMobileCard bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
+                <div>
+                  <AssetIcon asset={asset} size="large" />
+                </div>
+                <CoinInfoWrapper>
+                  <CoinTitle>{asset?.ticker ?? 'unknown'}</CoinTitle>
+                  <CoinSubtitle>{asset?.symbol ?? 'unknown'}</CoinSubtitle>
+                  <CoinMobilePrice>$ 4.01</CoinMobilePrice>
+                </CoinInfoWrapper>
+              </StyledMobileCard>
+            </>
+          )}
         </Col>
 
         <StyledDivider />
 
-        <Col span={24}>
-          <Row>
-            <Col span={24}>
-              <ActionWrapper bordered={false}>
-                <Button type="primary" round="true" sizevalue="xnormal" onClick={walletActionSendClick}>
-                  {intl.formatMessage({ id: 'wallet.action.send' })}
-                </Button>
-                <Button typevalue="outline" round="true" sizevalue="xnormal" onClick={walletActionReceiveClick}>
-                  {intl.formatMessage({ id: 'wallet.action.receive' })}
-                </Button>
-              </ActionWrapper>
-            </Col>
-          </Row>
-        </Col>
+        <StyledRow>
+          <StyledCol sm={{ span: 24 }} md={{ span: 12 }}>
+            <ActionComponent bordered={false}>
+              <Button type="primary" round="true" sizevalue="xnormal" onClick={walletActionSendClick}>
+                {intl.formatMessage({ id: 'wallet.action.send' })}
+              </Button>
+            </ActionComponent>
+          </StyledCol>
+          <StyledCol sm={{ span: 24 }} md={{ span: 12 }}>
+            <ActionComponent bordered={false}>
+              <Button typevalue="outline" round="true" sizevalue="xnormal" onClick={walletActionReceiveClick}>
+                {intl.formatMessage({ id: 'wallet.action.receive' })}
+              </Button>
+            </ActionComponent>
+          </StyledCol>
+        </StyledRow>
         <StyledDivider />
         <Col span={24}>
           <TransactionsTable transactions={txs} />

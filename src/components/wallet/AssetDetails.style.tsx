@@ -1,4 +1,4 @@
-import { Card, Divider } from 'antd'
+import { Card, Divider, Row, Col } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -9,6 +9,20 @@ export const StyledCard = styled(Card)`
     padding: 35px 50px 25px;
     background-color: ${palette('background', 1)};
   }
+`
+
+export const StyledMobileCard = styled(Card)`
+  .ant-card-body {
+    padding: 24px;
+    background-color: ${palette('background', 1)};
+  }
+`
+
+export const StyledPriceWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${palette('background', 1)};
 `
 
 export const StyledAssetName = styled.h1`
@@ -60,9 +74,31 @@ export const CoinPrice = styled.p`
   text-transform: uppercase;
 `
 
+export const CoinMobilePrice = styled.p`
+  display: flex;
+  align-items: flex-end;
+  margin: 10px 0px 0px;
+  font-size: 32px;
+  font-family: 'MainFontRegular';
+  font-weight: 300;
+  color: ${palette('text', 0)};
+  line-height: 38px;
+  text-transform: uppercase;
+`
+
 export const StyledDivider = styled(Divider)`
   margin: 0px;
+  border-top: 1px solid ${palette('gray', 0)};
 `
+
+export const StyledRow = styled(Row)`
+  width: 100%;
+`
+
+export const StyledCol = styled(Col)`
+  width: 100%;
+`
+
 export const ActionWrapper = styled(Card)`
   display: flex;
   justify-content: center;
@@ -70,6 +106,20 @@ export const ActionWrapper = styled(Card)`
 
   .ant-card-body {
     padding: 51px 0px 44px;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    background-color: ${palette('background', 1)};
+  }
+`
+
+export const ActionMobileWrapper = styled(Card)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .ant-card-body {
+    padding: 20px 0px;
     display: flex;
     width: 100%;
     justify-content: space-between;

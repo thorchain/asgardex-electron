@@ -14,6 +14,7 @@ const common: CommonMessages = {
   'common.password': 'Passwort',
   'common.memo': 'Memo - DE',
   'common.refresh': 'Aktualisieren',
+  'common.date': 'Date - DE',
   'common.remove': 'Entfernen'
 }
 
