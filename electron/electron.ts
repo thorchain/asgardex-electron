@@ -1,18 +1,19 @@
 import { join } from 'path'
 
-import { BrowserWindow, app, remote, Menu, MenuItemConstructorOptions, ipcMain } from 'electron'
+import { BrowserWindow, app, remote, ipcMain } from 'electron'
 import electronDebug from 'electron-debug'
 import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
-import { createIntl, IntlShape } from 'react-intl'
 import { fromEvent } from 'rxjs'
 
-import { getLocaleFromString } from '../src/shared/i18n'
+// import { IS_PRODUCTION } from '../src/shared/const'
 import IPCMessages from '../src/shared/ipc/messages'
-import { getMessagesByLocale, cache } from './i18n'
+import { setMenu } from './menu'
 
+// export const IS_DEV = isDev && IS_PRODUCTION
 export const IS_DEV = isDev && process.env.NODE_ENV !== 'production'
+
 export const APP_ROOT = join(__dirname, '..', '..')
 
 const BASE_URL_DEV = 'http://localhost:3000'
@@ -23,9 +24,8 @@ export const BASE_URL = IS_DEV ? BASE_URL_DEV : BASE_URL_PROD
 const initLogger = () => {
   log.transports.file.resolvePath = (variables: log.PathVariables) => {
     const ap = app || remote.app
-    // Logs go into ~/.{appName}/logs/ dir
+    // Logs go into ~/.config/{appName}/logs/ dir
     const path = join(ap.getPath('userData'), 'logs', variables.fileName as string)
-    console.log('path', path)
     return path
   }
 }
@@ -70,23 +70,6 @@ const setupDevEnv = async () => {
   }
 }
 
-const menu = (intl: IntlShape): MenuItemConstructorOptions[] => [
-  {
-    label: intl.formatMessage({ id: 'menu.edit.title' })
-  },
-  {
-    role: 'editMenu'
-  }
-]
-
-const setMenu = (localeStr: string) => {
-  console.log('electron change lang', localeStr)
-  const locale = getLocaleFromString(localeStr)
-  const intl = createIntl({ locale, messages: getMessagesByLocale(locale) }, cache)
-  const appMenu = Menu.buildFromTemplate(menu(intl))
-  Menu.setApplicationMenu(appMenu)
-}
-
 const initMainWindow = async () => {
   mainWindow = new BrowserWindow({
     width: IS_DEV ? 1600 : 1200,
@@ -116,7 +99,7 @@ const init = async () => {
 
 const initIPC = () => {
   const source$ = fromEvent<string>(ipcMain, IPCMessages.UPDATE_LANG, (_, locale) => locale)
-  source$.subscribe((locale: string) => setMenu(locale))
+  source$.subscribe((locale: string) => setMenu(locale, IS_DEV))
 }
 
 try {

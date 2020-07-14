@@ -8,6 +8,7 @@ import { useHistory } from 'react-router-dom'
 import { ReactComponent as TelegramIcon } from '../assets/svg/icon-telegram.svg'
 import { ReactComponent as ThorChainIcon } from '../assets/svg/logo-thorchain.svg'
 import * as playgroundRoutes from '../routes/playground'
+import { ExternalUrl } from '../shared/const'
 import { FooterContainer, FooterLink, FooterIconWrapper, FooterLinkWrapper } from './Footer.style'
 
 const { shell } = window.require('electron')
@@ -46,7 +47,7 @@ const Footer: React.FC<Props> = (props: Props): JSX.Element => {
       <Row justify="space-between" align="middle">
         <Col span={24} md={4}>
           <Row justify={screens.md ? 'start' : 'center'}>
-            <FooterIcon url="https://thorchain.org">
+            <FooterIcon url={ExternalUrl.WEBSITE}>
               <ThorChainIcon />
             </FooterIcon>
           </Row>
@@ -60,17 +61,17 @@ const Footer: React.FC<Props> = (props: Props): JSX.Element => {
         </Col>
         <Col span={24} md={6}>
           <Row justify={screens.md ? 'end' : 'center'}>
-            <FooterIcon url="https://twitter.com/thorchain_org">
+            <FooterIcon url={ExternalUrl.TWITTER}>
               <TwitterOutlined />
             </FooterIcon>
-            <FooterIcon url="https://t.me/thorchain_org">
+            <FooterIcon url={ExternalUrl.TELEGRAM}>
               <Icon component={TelegramIcon} />
             </FooterIcon>
-            <FooterIcon url="https://github.com/thorchain">
+            <FooterIcon url={ExternalUrl.GITHUB}>
               <GithubOutlined />
             </FooterIcon>
             {commitHash && (
-              <FooterIcon url={`https://github.com/thorchain/asgardex-electron/commit/${commitHash}`}>
+              <FooterIcon url={`${ExternalUrl.GITHUB}/commit/${commitHash}`}>
                 <BranchesOutlined />
               </FooterIcon>
             )}
