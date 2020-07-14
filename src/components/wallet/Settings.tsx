@@ -138,7 +138,7 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
                     typevalue="outline"
                     round="true"
                     onClick={removeWallet}>
-                    {intl.formatMessage({ id: 'setting.remove.wallet' })}
+                    {intl.formatMessage({ id: 'wallet.action.remove' })}
                   </StyledButton>
                 </StyledOptionCard>
               </StyledWalletCol>

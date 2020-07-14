@@ -7,11 +7,10 @@ import log from 'electron-log'
 import { warn } from 'electron-log'
 import { fromEvent } from 'rxjs'
 
-// import { IS_PRODUCTION } from '../src/shared/const'
+import { Locale } from '../src/shared/i18n/types'
 import IPCMessages from '../src/shared/ipc/messages'
 import { setMenu } from './menu'
 
-// export const IS_DEV = isDev && IS_PRODUCTION
 export const IS_DEV = isDev && process.env.NODE_ENV !== 'production'
 
 export const APP_ROOT = join(__dirname, '..', '..')
@@ -60,7 +59,7 @@ const closeHandler = () => {
 }
 
 const setupDevEnv = async () => {
-  // install react & redux chrome dev tools
+  // install react chrome dev tools
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { default: install, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer')
   try {
@@ -98,8 +97,8 @@ const init = async () => {
 }
 
 const initIPC = () => {
-  const source$ = fromEvent<string>(ipcMain, IPCMessages.UPDATE_LANG, (_, locale) => locale)
-  source$.subscribe((locale: string) => setMenu(locale, IS_DEV))
+  const source$ = fromEvent<Locale>(ipcMain, IPCMessages.UPDATE_LANG, (_, locale) => locale)
+  source$.subscribe((locale) => setMenu(locale, IS_DEV))
 }
 
 try {

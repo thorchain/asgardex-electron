@@ -8,7 +8,6 @@ const settings: SettingMessages = {
   'setting.export': 'Export Keystore',
   'setting.lock': 'Lock',
   'setting.view.phrase': 'View Phrase',
-  'setting.remove.wallet': 'Remove Wallet',
   'setting.midgard': 'Midgard',
   'setting.version': 'Version'
 }

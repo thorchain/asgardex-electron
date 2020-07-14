@@ -265,7 +265,12 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
         </Row>
         {!isDesktopView && (
           <HeaderDrawer
-            style={{ marginTop: headerHeight, backgroundColor: 'transparent' }}
+            style={{
+              marginTop: menuVisible ? headerHeight : 0,
+              backgroundColor: 'transparent',
+              maxHeight: `calc(100% - ${headerHeight})`,
+              overflow: 'auto'
+            }}
             bodyStyle={{ backgroundColor: 'transparent' }}
             drawerStyle={{ backgroundColor: 'transparent' }}
             maskStyle={{ backgroundColor: 'transparent' }}
