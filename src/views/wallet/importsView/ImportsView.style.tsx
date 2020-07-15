@@ -7,10 +7,6 @@ import Label from '../../../components/uielements/label'
 export const ImportsViewWrapper = styled.div`
   flex: 1;
 
-  .ant-tabs {
-    margin-top: 20px;
-  }
-
   .ant-tabs-nav {
     &::before {
       border-bottom-color: ${palette('background', 2)};
