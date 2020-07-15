@@ -181,11 +181,11 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const clickLockHandler = useCallback(() => {
     // lock if needed
     if (!isLocked(keystore)) {
+      closeMenu()
       lockHandler()
-      history.push(walletRoutes.locked.path())
     }
     closeMenu()
-  }, [closeMenu, history, keystore, lockHandler])
+  }, [closeMenu, keystore, lockHandler])
 
   const currencyChangeHandler = useCallback(
     (asset: PricePoolAsset) => {
