@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
+import { Txs } from '@thorchain/asgardex-binance'
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
 
 import { shortSymbol } from '../../helpers/tokenHelpers'
 import { transactionParty } from '../../helpers/transactionHelpers'
+import { TxsRD } from '../../services/binance/types'
 import { UserTransactionType } from '../../types/wallet'
+import ErrorView from '../shared/error/ErrorView'
 import { StyledTable, StyledText, StyledLink } from './UserTransactionTable.style'
-
-type Props = {
-  transactions: UserTransactionType[]
-}
 
 type Column = 'type' | 'address' | 'timeStamp' | 'to' | 'amount' | 'coin'
 
@@ -53,7 +53,11 @@ const getColumnsRenderers = (address: string): Record<Column, (value: any, tx: U
   }
 }
 
-const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
+type Props = {
+  txsRD: TxsRD
+}
+const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
+  const { txsRD } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -129,13 +133,32 @@ const TransactionsTable: React.FC<Props> = ({ transactions }): JSX.Element => {
 
   const mobileColumns: ColumnsType<UserTransactionType> = [amountColumn, coinColumn, linkColumn]
 
-  return (
-    <StyledTable
-      columns={isDesktopView ? desktopColumns : mobileColumns}
-      dataSource={transactions}
-      rowKey="_id"
-      pagination={false}
-    />
+  const renderTable = useCallback(
+    (data: Txs, loading = false) => {
+      const columns = isDesktopView ? desktopColumns : mobileColumns
+      return <StyledTable columns={columns} dataSource={data} loading={loading} rowKey="key" />
+    },
+    [desktopColumns, isDesktopView, mobileColumns]
   )
+
+  const renderContent = useMemo(
+    () => (
+      <>
+        {RD.fold(
+          () => renderTable([], true),
+          () => renderTable([], true),
+          (error: Error) => {
+            const msg = error?.toString() ?? ''
+            return <ErrorView message={msg} />
+          },
+          // success state
+          (txs: Txs): JSX.Element => renderTable(txs)
+        )(txsRD)}
+      </>
+    ),
+    [txsRD, renderTable]
+  )
+
+  return renderContent
 }
 export default TransactionsTable

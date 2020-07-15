@@ -7,7 +7,7 @@ import { useHistory } from 'react-router-dom'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import * as walletRoutes from '../../routes/wallet'
-import { UserTransactionType } from '../../types/wallet'
+import { TxsRD } from '../../services/binance/types'
 import AssetIcon from '../uielements/assets/assetIcon'
 import Button from '../uielements/button'
 import {
@@ -27,32 +27,12 @@ import {
 } from './AssetDetails.style'
 import TransactionsTable from './UserTransactionsTable'
 
-// Dummy data
-const txs: UserTransactionType[] = [
-  {
-    _id: 0,
-    blockHeight: 74645396,
-    code: 0,
-    confirmBlocks: 0,
-    data: null,
-    fromAddr: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
-    memo: '',
-    orderId: null,
-    proposalId: null,
-    sequence: 29,
-    source: 0,
-    timeStamp: '2020-04-01T03:46:55.786Z',
-    toAddr: null,
-    txAge: 1578666,
-    txAsset: 'RUNE-A1F',
-    txFee: '0.00500000',
-    txHash: '320C31E9B5E5D21B4912BBC09C4A6F04EC4666698D6EAEBBBA3DBFAA7B9D17B3',
-    txType: 'FREEZE_TOKEN',
-    value: '12.00000000'
-  }
-]
+type Props = {
+  txsRD: TxsRD
+}
 
-const AssetDetails: React.FC = (): JSX.Element => {
+const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
+  const { txsRD } = props
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   const history = useHistory()
   const intl = useIntl()
@@ -128,7 +108,7 @@ const AssetDetails: React.FC = (): JSX.Element => {
         </StyledRow>
         <StyledDivider />
         <Col span={24}>
-          <TransactionsTable transactions={txs} />
+          <TransactionsTable txsRD={txsRD} />
         </Col>
       </Row>
     </>

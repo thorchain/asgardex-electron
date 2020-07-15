@@ -1,10 +1,13 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balances, BinanceClient } from '@thorchain/asgardex-binance'
+import { Balances, BinanceClient, Txs } from '@thorchain/asgardex-binance'
 import { Either } from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
 import { Option, option } from 'fp-ts/lib/Option'
 
 export type BalancesRD = RD.RemoteData<Error, Balances>
+
+export type TxsRD = RD.RemoteData<Error, Txs>
+
 /**
  * Three States:
  * (1) None -> no client has been instantiated
