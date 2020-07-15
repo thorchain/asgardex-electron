@@ -17,7 +17,11 @@ const wallet: WalletMessages = {
   'wallet.unlock.phrase': 'Enter your your phrase - DE',
   'wallet.imports.phrase': 'Phrase',
   'wallet.imports.wallet': 'Import existing wallet - DE',
-  'wallet.imports.enterphrase': 'Phrase eingeben'
+  'wallet.imports.enterphrase': 'Phrase eingeben',
+  'wallet.empty.action.import': 'Import - DE',
+  'wallet.empty.action.create': 'Create - DE',
+  'wallet.empty.phrase.import': 'Import an existing wallet with funds on it - DE',
+  'wallet.empty.phrase.create': 'Create a new wallet, and funds on it - DE'
 }
 
 export default wallet

@@ -7,6 +7,13 @@ export const base: Route<void> = {
   }
 }
 
+export const noWallet: Route<void> = {
+  template: `${base.template}/noWallet`,
+  path() {
+    return this.template
+  }
+}
+
 export const imports: Route<void> = {
   template: `${base.template}/imports`,
   path() {
