@@ -185,7 +185,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
       lockHandler()
     }
     closeMenu()
-  }, [closeMenu, history, keystore, lockHandler])
+  }, [closeMenu, keystore, lockHandler])
 
   const currencyChangeHandler = useCallback(
     (asset: PricePoolAsset) => {
