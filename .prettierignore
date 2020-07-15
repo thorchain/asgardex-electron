@@ -2,5 +2,5 @@
 /node_modules
 .editorconfig
 README.md
-src/serviceWorker.ts
+src/renderer/serviceWorker.ts
 /public/

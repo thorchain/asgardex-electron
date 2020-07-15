@@ -62,6 +62,44 @@ Or add to `REACT_APP_WALLET_PASSWORD=password` to `.env` file and run `yarn dev`
 yarn test
 ```
 
+## Folder structure
+
+### `src`
+
+```bash
+src
+├── index.ts # entry point for CRA
+├── main # sources of Electron's main process
+├── renderer # sources of Electron's renderer process (aka webapp)
+└── shared # shared sources for Electron's main and renderer processes
+```
+
+### `src/main` (Electron's "main" app)
+
+```bash
+src/main
+├── electron.ts # entry point
+├── i18n # internationalization (needed for menus)
+└── menu # "native" menus
+```
+
+### `src/renderer` (Electron's "renderer" app aka ReactJS webapp)
+
+```bash
+src/renderer
+├── assets # static files (svg, fonts etc.)
+├── components # basic components
+├── contexts # React contexts to provide "global" accessible states (RxJS based)
+├── helpers # helper functions
+├── hooks # custom hooks
+├── i18n # internationalization (translations etc.)
+├── index.tsx # entry point
+├── routes # routing
+├── services # RxJS based IO handler and states (consumed by contexts)
+├── types # TypeScript types (e.g. generated types for Midgard API)
+└── views # "Container" components
+```
+
 ## Packaging
 
 **Important note** for `macOS` users: Please follow guide of ["How to package `ASGARDEX` on macOS"](./PACKAGE_MACOS.md) before running following command.
