@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { SliderProps } from 'antd/lib/slider'
+import { SliderSingleProps } from 'antd/lib/slider'
 import { TooltipPlacement } from 'antd/lib/tooltip'
 
 import { SliderWrapper, SliderLabel } from './Slider.style'
 
-interface Props extends SliderProps {
+interface Props extends SliderSingleProps {
   className?: string
   tooltipPlacement?: TooltipPlacement
   withLabel?: boolean

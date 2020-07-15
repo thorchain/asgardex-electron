@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react'
 
 import { Row, Dropdown } from 'antd'
-import { ClickParam } from 'antd/lib/menu'
+import { MenuProps } from 'antd/lib/menu'
 import { useObservableState } from 'observable-hooks'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
@@ -27,8 +27,8 @@ const HeaderLang: React.FC<Props> = (props: Props): JSX.Element => {
   const { changeLocale, locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$)
 
-  const changeLang = useCallback(
-    ({ key }: ClickParam) => {
+  const changeLang: MenuProps['onClick'] = useCallback(
+    ({ key }) => {
       changeLocale(key as Locale)
     },
     [changeLocale]
