@@ -12,5 +12,5 @@
     "pretty": true
   },
   "include": ["./src/main", "./src/shared"],
-  "exclude": ["src/remderer/"]
+  "exclude": ["src/renderer/"]
 }
