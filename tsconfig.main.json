@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2019",
+    "lib": ["esnext"],
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "./public/",
+    "pretty": true
+  },
+  "include": ["./src/main", "./src/shared"],
+  "exclude": ["src/renderer/"]
+}

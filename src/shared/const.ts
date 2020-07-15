@@ -1,4 +1,4 @@
-import { envOrDefault } from '../helpers/envHelper'
+import { envOrDefault } from '../renderer/helpers/envHelper'
 
 export const IS_PRODUCTION = envOrDefault(process.env.NODE_ENV, '') === 'production'
 
