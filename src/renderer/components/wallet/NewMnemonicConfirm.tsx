@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { RedoOutlined } from '@ant-design/icons'
 import { Col, Row, Button, Form } from 'antd'
 import shuffleArray from 'lodash.shuffle'
+import { useIntl } from 'react-intl'
 import { v4 as uuidv4 } from 'uuid'
 
 import { isSelectedFactory, sortedSelected } from '../../helpers/array'
@@ -56,6 +57,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
   const [loadingMsg] = useState<string>('')
   const [mnemonicError, setMnemonicError] = useState<string>('')
   const [initialized, setInitialized] = useState<boolean>(false)
+  const intl = useIntl()
 
   const shuffledWords = useCallback<(array: WordType[]) => WordType[]>(shuffleArray, [])
 
@@ -149,7 +151,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
       <Form labelCol={{ span: 24 }} onFinish={handleFormSubmit}>
         <Form.Item
           name="mnemonic"
-          label="Confirm Phrase"
+          label={intl.formatMessage({ id: 'wallet.create.enter.phrase' })}
           validateStatus={mnemonicError && 'error'}
           help={!!mnemonicError && mnemonicError}>
           <MnemonicPhrase words={sortedSelectedWords} onWordClick={handleRemoveWord} />
@@ -158,7 +160,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
         <Form.Item
           label={
             <>
-              Select in correct order
+              {intl.formatMessage({ id: 'wallet.create.words.click' })}
               <Button type="link" onClick={handleResetPhrase}>
                 <RedoOutlined />
               </Button>
