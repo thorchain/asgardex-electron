@@ -5,11 +5,11 @@ import { Txs, Tx, Address } from '@thorchain/asgardex-binance'
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as O from 'fp-ts/lib/Option'
-import { useIntl } from 'react-intl'
+import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 
 import { TxsRD } from '../../services/binance/types'
 import ErrorView from '../shared/error/ErrorView'
-import { StyledTable, StyledText, StyledLink } from './TransactionTable.style'
+import * as Styled from './TransactionTable.style'
 
 type Props = {
   txsRD: TxsRD
@@ -20,7 +20,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
-  const renderTypeColumn = useCallback(({ txType }: Tx) => <StyledText>{txType}</StyledText>, [])
+  const renderTypeColumn = useCallback(({ txType }: Tx) => <Styled.Text>{txType}</Styled.Text>, [])
   const typeColumn: ColumnType<Tx> = {
     key: 'txType',
     title: intl.formatMessage({ id: 'common.type' }),
@@ -29,7 +29,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     render: renderTypeColumn
   }
 
-  const renderFromColumn = useCallback(({ fromAddr }: Tx) => <StyledText>{fromAddr}</StyledText>, [])
+  const renderFromColumn = useCallback(({ fromAddr }: Tx) => <Styled.Text>{fromAddr}</Styled.Text>, [])
   const fromColumn: ColumnType<Tx> = {
     key: 'fromAddr',
     title: intl.formatMessage({ id: 'common.address' }),
@@ -38,7 +38,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     render: renderFromColumn
   }
 
-  const renderToColumn = useCallback(({ toAddr }: Tx) => <StyledText>{toAddr}</StyledText>, [])
+  const renderToColumn = useCallback(({ toAddr }: Tx) => <Styled.Text>{toAddr}</Styled.Text>, [])
   const toColumn: ColumnType<Tx> = {
     key: 'toAddr',
     title: intl.formatMessage({ id: 'common.to' }),
@@ -48,7 +48,16 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   }
 
   const renderDateColumn = useCallback(
-    ({ timeStamp }: Tx) => <StyledText>{timeStamp ? new Date(timeStamp).toDateString() : ''}</StyledText>,
+    // ({ timeStamp }: Tx) => <Styled.Text>{timeStamp ? new Date(timeStamp).toDateString() : ''}</Styled.Text>,
+    ({ timeStamp }: Tx) => {
+      const date = new Date(timeStamp)
+      return (
+        <>
+          <FormattedDate value={date} />
+          <FormattedTime value={date} />
+        </>
+      )
+    },
     []
   )
   const dateColumn: ColumnType<Tx> = {
@@ -59,7 +68,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     render: renderDateColumn
   }
 
-  const renderAmountColumn = useCallback(({ value }: Tx) => <StyledText>{value};</StyledText>, [])
+  const renderAmountColumn = useCallback(({ value }: Tx) => <Styled.Text>{value};</Styled.Text>, [])
   const amountColumn: ColumnType<Tx> = {
     key: 'value',
     title: intl.formatMessage({ id: 'common.amount' }),
@@ -68,7 +77,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     render: renderAmountColumn
   }
 
-  const renderCoinColumn = useCallback(({ txAsset }: Tx) => <StyledText>{txAsset};</StyledText>, [])
+  const renderCoinColumn = useCallback(({ txAsset }: Tx) => <Styled.Text>{txAsset};</Styled.Text>, [])
   const coinColumn: ColumnType<Tx> = {
     key: 'txAsset',
     title: intl.formatMessage({ id: 'common.coin' }),
@@ -77,7 +86,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     render: renderCoinColumn
   }
 
-  const renderLinkColumn = useCallback((_) => <StyledLink>LINK</StyledLink>, [])
+  const renderLinkColumn = useCallback((_) => <Styled.Link>LINK</Styled.Link>, [])
   const linkColumn: ColumnType<Tx> = {
     key: 'txHash',
     title: '',
@@ -101,7 +110,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const renderTable = useCallback(
     (txs: Txs, loading = false) => {
       const columns = isDesktopView ? desktopColumns : mobileColumns
-      return <StyledTable columns={columns} dataSource={txs} loading={loading} rowKey="key" />
+      return <Styled.Table columns={columns} dataSource={txs} loading={loading} rowKey="key" />
     },
     [desktopColumns, isDesktopView, mobileColumns]
   )

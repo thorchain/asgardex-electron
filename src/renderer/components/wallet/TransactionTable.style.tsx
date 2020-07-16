@@ -2,11 +2,9 @@ import { Typography } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import Table from '../uielements/table'
+import UITable from '../uielements/table'
 
-const { Text } = Typography
-
-export const StyledTable = styled(Table)`
+export const Table = styled(UITable)`
   .ant-table-thead > tr > th {
     font-size: 16px;
     font-weight: 600;
@@ -33,13 +31,13 @@ export const StyledTable = styled(Table)`
   }
 `
 
-export const StyledText = styled(Text)`
+export const Text = styled(Typography.Text)`
   text-transform: uppercase;
   font-weight: 600;
   color: ${palette('text', 1)};
 `
 
-export const StyledLink = styled(Text)`
+export const Link = styled(Typography.Text)`
   font-weight: 600;
   text-transform: uppercase;
   color: ${palette('primary', 0)};
