@@ -4,6 +4,7 @@ import { generatePhrase } from '@thorchain/asgardex-crypto'
 import { Form, Button } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
+import { useIntl } from 'react-intl'
 
 import { InputPassword as Input } from '../uielements/input'
 import Label from '../uielements/label'
@@ -14,6 +15,7 @@ type Props = {
 }
 const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element => {
   const [loadingMsg, setLoadingMsg] = useState<string>('')
+  const intl = useIntl()
 
   const phrase = useMemo(() => generatePhrase(), [])
 
@@ -57,7 +59,7 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
   }, [phrase])
   return (
     <>
-      <Label onClick={copyPhraseToClipborad}>copy phrase below</Label>
+      <Label onClick={copyPhraseToClipborad}>{intl.formatMessage({ id: 'wallet.create.copy.phrase' })}</Label>
       <MnemonicPhrase words={phraseWords} />
       <Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>
         <Form.Item name="password" label="Password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>

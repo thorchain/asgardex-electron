@@ -21,7 +21,9 @@ const wallet: WalletMessages = {
   'wallet.empty.action.import': 'Import - DE',
   'wallet.empty.action.create': 'Create - DE',
   'wallet.empty.phrase.import': 'Import an existing wallet with funds on it - DE',
-  'wallet.empty.phrase.create': 'Create a new wallet, and funds on it - DE'
+  'wallet.empty.phrase.create': 'Create a new wallet, and funds on it - DE',
+  'wallet.create.copy.phrase': 'Click here to copy phrase below - DE',
+  'wallet.create.title': 'Create new wallet - DE'
 }
 
 export default wallet

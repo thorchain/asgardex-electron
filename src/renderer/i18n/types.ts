@@ -43,6 +43,8 @@ export type WalletMessages = {
   'wallet.empty.action.create': string
   'wallet.empty.phrase.import': string
   'wallet.empty.phrase.create': string
+  'wallet.create.copy.phrase': string
+  'wallet.create.title': string
 }
 
 export type SettingMessages = {

@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react'
 
+import { useIntl } from 'react-intl'
+
 import PageTitle from '../../../components/PageTitle'
 import Tabs from '../../../components/Tabs'
 import { KeystoreView } from './KeystoreView'
@@ -11,6 +13,7 @@ enum TabKey {
 }
 
 export const CreateView = () => {
+  const intl = useIntl()
   const items = useMemo(
     () => [
       {
@@ -29,7 +32,7 @@ export const CreateView = () => {
 
   return (
     <>
-      <PageTitle>create new wallet</PageTitle>
+      <PageTitle>{intl.formatMessage({ id: 'wallet.create.title' })}</PageTitle>
       <Tabs tabs={items} defaultTabIndex={1} />
     </>
   )
