@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl'
 
 import { TxsRD } from '../../services/binance/types'
 import ErrorView from '../shared/error/ErrorView'
-import { StyledTable, StyledText, StyledLink } from './UserTransactionTable.style'
+import { StyledTable, StyledText, StyledLink } from './TransactionTable.style'
 
 type Props = {
   txsRD: TxsRD
@@ -99,9 +99,9 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const mobileColumns: ColumnsType<Tx> = [amountColumn, coinColumn, linkColumn]
 
   const renderTable = useCallback(
-    (data: Txs, loading = false) => {
+    (txs: Txs, loading = false) => {
       const columns = isDesktopView ? desktopColumns : mobileColumns
-      return <StyledTable columns={columns} dataSource={data} loading={loading} rowKey="key" />
+      return <StyledTable columns={columns} dataSource={txs} loading={loading} rowKey="key" />
     },
     [desktopColumns, isDesktopView, mobileColumns]
   )
@@ -116,7 +116,6 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
             const msg = error?.toString() ?? ''
             return <ErrorView message={msg} />
           },
-          // success state
           (txs: Txs): JSX.Element => renderTable(txs)
         )(txsRD)}
       </>

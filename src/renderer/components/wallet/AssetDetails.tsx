@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@thorchain/asgardex-binance'
@@ -16,21 +16,8 @@ import { TxsRD, BalancesRD } from '../../services/binance/types'
 import AssetIcon from '../uielements/assets/assetIcon'
 import BackLink from '../uielements/backLink'
 import Button, { RefreshButton } from '../uielements/button'
-import {
-  StyledCard,
-  StyledMobileCard,
-  CoinInfoWrapper,
-  CoinTitle,
-  CoinSubtitle,
-  CoinPrice,
-  CoinMobilePrice,
-  StyledDivider,
-  ActionWrapper,
-  ActionMobileWrapper,
-  StyledRow,
-  StyledCol
-} from './AssetDetails.style'
-import TransactionsTable from './UserTransactionsTable'
+import * as Styled from './AssetDetails.style'
+import TransactionsTable from './TransactionsTable'
 
 type Props = {
   txsRD: TxsRD
@@ -55,22 +42,27 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   const history = useHistory()
   const intl = useIntl()
-  const ActionComponent = isDesktopView ? ActionWrapper : ActionMobileWrapper
+  const ActionComponent = isDesktopView ? Styled.ActionWrapper : Styled.ActionMobileWrapper
 
   const walletActionSendClick = useCallback(() => history.push(walletRoutes.fundsSend.path()), [history])
   const walletActionReceiveClick = useCallback(() => history.push(walletRoutes.fundsReceive.path()), [history])
 
+  // store previous balance to re-render it while reloading
+  const previousBalance = useRef<string>('--')
+
   const renderAssetIcon = useMemo(() => asset && <AssetIcon asset={asset} size="large" />, [asset])
 
-  const renderPrice = useMemo(() => {
+  const renderBalance = useMemo(() => {
     const oBalances = RD.toOption(balancesRD)
     return FP.pipe(
       sequenceT(O.option)(oBalances, oAsset),
       O.fold(
-        () => '--',
+        () => previousBalance.current,
         ([balances, asset]) => {
           const amount = balanceByAsset(balances, asset)
-          return formatAssetAmountCurrency(amount, assetToString(asset), 3)
+          const balance = formatAssetAmountCurrency(amount, assetToString(asset), 3)
+          previousBalance.current = balance
+          return balance
         }
       )
     )
@@ -93,49 +85,36 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          {isDesktopView && (
-            <StyledCard bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
-              <div>{renderAssetIcon}</div>
-              <CoinInfoWrapper>
-                <CoinTitle>{asset?.ticker ?? '--'}</CoinTitle>
-                <CoinSubtitle>{asset?.symbol ?? '--'}</CoinSubtitle>
-              </CoinInfoWrapper>
-              <CoinPrice>{renderPrice}</CoinPrice>
-            </StyledCard>
-          )}
-          {!isDesktopView && (
-            <>
-              <StyledMobileCard bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
-                <div>{renderAssetIcon}</div>
-                <CoinInfoWrapper>
-                  <CoinTitle>{asset?.ticker ?? 'unknown'}</CoinTitle>
-                  <CoinSubtitle>{asset?.symbol ?? 'unknown'}</CoinSubtitle>
-                  <CoinMobilePrice>$ 4.01</CoinMobilePrice>
-                </CoinInfoWrapper>
-              </StyledMobileCard>
-            </>
-          )}
+          <Styled.Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
+            {renderAssetIcon}
+            <Styled.CoinInfoWrapper>
+              <Styled.CoinTitle>{asset?.ticker ?? '--'}</Styled.CoinTitle>
+              <Styled.CoinSubtitle>{asset ? assetToString(asset) : '--'}</Styled.CoinSubtitle>
+              {!isDesktopView && <Styled.CoinMobilePrice>{renderBalance}</Styled.CoinMobilePrice>}
+            </Styled.CoinInfoWrapper>
+            {isDesktopView && <Styled.CoinPrice>{renderBalance}</Styled.CoinPrice>}
+          </Styled.Card>
         </Col>
 
-        <StyledDivider />
+        <Styled.Divider />
 
-        <StyledRow>
-          <StyledCol sm={{ span: 24 }} md={{ span: 12 }}>
+        <Styled.Row>
+          <Styled.Col sm={{ span: 24 }} md={{ span: 12 }}>
             <ActionComponent bordered={false}>
               <Button type="primary" round="true" sizevalue="xnormal" onClick={walletActionSendClick}>
                 {intl.formatMessage({ id: 'wallet.action.send' })}
               </Button>
             </ActionComponent>
-          </StyledCol>
-          <StyledCol sm={{ span: 24 }} md={{ span: 12 }}>
+          </Styled.Col>
+          <Styled.Col sm={{ span: 24 }} md={{ span: 12 }}>
             <ActionComponent bordered={false}>
               <Button typevalue="outline" round="true" sizevalue="xnormal" onClick={walletActionReceiveClick}>
                 {intl.formatMessage({ id: 'wallet.action.receive' })}
               </Button>
             </ActionComponent>
-          </StyledCol>
-        </StyledRow>
-        <StyledDivider />
+          </Styled.Col>
+        </Styled.Row>
+        <Styled.Divider />
         <Col span={24}>
           <TransactionsTable txsRD={txsRD} address={address} />
         </Col>

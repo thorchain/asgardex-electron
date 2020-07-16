@@ -1,17 +1,17 @@
-import { Card, Divider, Row, Col } from 'antd'
+import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import Label from '../uielements/label'
 
-export const StyledCard = styled(Card)`
+export const Card = styled(A.Card)`
   .ant-card-body {
     padding: 35px 50px 25px;
     background-color: ${palette('background', 1)};
   }
 `
 
-export const StyledMobileCard = styled(Card)`
+export const MobileCard = styled(A.Card)`
   .ant-card-body {
     padding: 24px;
     background-color: ${palette('background', 1)};
@@ -86,16 +86,16 @@ export const CoinMobilePrice = styled.p`
   text-transform: uppercase;
 `
 
-export const StyledDivider = styled(Divider)`
+export const Divider = styled(A.Divider)`
   margin: 0px;
   border-top: 1px solid ${palette('gray', 0)};
 `
 
-export const StyledRow = styled(Row)`
+export const Row = styled(A.Row)`
   width: 100%;
 `
 
-export const StyledCol = styled(Col)`
+export const Col = styled(A.Col)`
   width: 100%;
 `
 
