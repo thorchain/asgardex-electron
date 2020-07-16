@@ -1,7 +1,5 @@
 import React, { useMemo } from 'react'
 
-// import { useIntl } from 'react-intl'
-
 import Tabs from '../../../components/Tabs'
 import { MainnetView } from './MainnetView'
 
@@ -17,7 +15,6 @@ type Tab = {
 }
 
 const NoWalletView = () => {
-  // const intl = useIntl()
   const items: Tab[] = useMemo(
     () => [
       { key: TabKey.TESTNET, label: 'testnet', content: <span>testnet</span> },

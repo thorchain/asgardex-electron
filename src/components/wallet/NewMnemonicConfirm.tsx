@@ -190,7 +190,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
           <Row>
             {shuffledWordsList.map((word: WordType) => (
               <Col sm={{ span: 12 }} md={{ span: 8 }} key={word._id} style={{ padding: '6px' }}>
-                <Button type="primary" disabled={isSelected(word._id)} block onClick={() => handleAddWord(word._id)}>
+                <Button type="ghost" disabled={isSelected(word._id)} block onClick={() => handleAddWord(word._id)}>
                   {word.text}
                 </Button>
               </Col>

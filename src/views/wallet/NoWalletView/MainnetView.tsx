@@ -10,8 +10,13 @@ import * as Styled from './Mainnet.styles'
 export const MainnetView = () => {
   const history = useHistory()
   const intl = useIntl()
+
   const importClick = useCallback(() => {
     history.push(walletRoutes.imports.path())
+  }, [history])
+
+  const createClick = useCallback(() => {
+    history.push(walletRoutes.create.path())
   }, [history])
 
   return (
@@ -26,7 +31,7 @@ export const MainnetView = () => {
       </Styled.ActionContainer>
 
       <Styled.ActionContainer>
-        <Styled.ActionButton typevalue={'outline'} round="true">
+        <Styled.ActionButton onClick={createClick} typevalue={'outline'} round="true">
           {intl.formatMessage({ id: 'wallet.empty.action.create' })}
         </Styled.ActionButton>
         <Label align="center" color="gray" size="big" textTransform="uppercase">
