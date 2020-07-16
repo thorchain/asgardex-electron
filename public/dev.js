@@ -9,8 +9,8 @@
  */
 
 // import tsconfig
-const config = require("../electron/tsconfig.json");
+const config = require("../tsconfig.main.json");
 // register the typescript compiler
 require("ts-node").register(config);
 // import the main process typescript code
-require("../electron/electron");
+require("../src/main/electron");

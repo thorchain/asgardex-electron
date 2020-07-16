@@ -5,21 +5,27 @@ import { configure } from '@storybook/react'
 import { withThemes } from '@react-theming/storybook-addon'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 
-import { AppProvider } from '../src/contexts/AppContext'
-import { ThemeProvider } from '../src/contexts/ThemeContext'
-import { I18nProvider } from '../src/contexts/I18nContext'
-import { AppWrapper } from '../src/App.style'
+import { AppProvider } from '../src/renderer/contexts/AppContext'
+import { ThemeProvider } from '../src/renderer/contexts/ThemeContext'
+import { I18nProvider } from '../src/renderer/contexts/I18nContext'
+import { AppWrapper } from '../src/renderer/App.style'
+import { Locale } from '../src/shared/i18n/types'
+import { IntlProvider } from 'react-intl'
+import { getMessagesByLocale } from '../src/renderer/i18n'
 
 const lightTheme = { name: 'Light', ...themes.light }
 const darkTheme = { name: 'Dark', ...themes.dark }
+const locale = Locale.EN
+const messages = getMessagesByLocale(locale)
 
 const providerFn = ({ theme, children }) => (
   <AppProvider>
-    <I18nProvider>
+    {/* We use IntlProvider instead of our our custom I18nProvider to provide messages, but w/o dependencies to Electron/Node source, which can't run in storybook */}
+    <IntlProvider locale={locale} messages={messages} defaultLocale={locale}>
       <ThemeProvider theme={theme}>
         <AppWrapper>{children}</AppWrapper>
       </ThemeProvider>
-    </I18nProvider>
+    </IntlProvider>
   </AppProvider>
 )
 
