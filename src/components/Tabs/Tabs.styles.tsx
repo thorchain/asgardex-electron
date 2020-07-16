@@ -38,6 +38,7 @@ export const TabLabel = styled(Label)`
 
 export const ContentWrapper = styled('div')<{ centerContent?: boolean }>`
   display: flex;
+  flex-direction: column;
   justify-content: ${(props) => (props.centerContent ? 'center' : '')};
   align-items: ${(props) => (props.centerContent ? 'center' : '')};
   padding: 40px;
