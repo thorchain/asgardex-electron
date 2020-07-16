@@ -44,6 +44,9 @@ const NewMnemonicGenerate: React.FC<Props> = (_: Props): JSX.Element => {
     <>
       <h1>Generate the new mnemonic wallet</h1>
       <Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>
+        <Form.Item name="password" label="Password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
+          <Input size="large" type="password" />
+        </Form.Item>
         <Form.Item
           name="repeatPassword"
           label="Repeat Password"
