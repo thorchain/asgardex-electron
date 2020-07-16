@@ -15,15 +15,9 @@ type Tab = {
 }
 
 const NoWalletView = () => {
-  const items: Tab[] = useMemo(
-    () => [
-      { key: TabKey.TESTNET, label: 'testnet', content: <span>testnet</span> },
-      { key: TabKey.MAINNET, label: 'mainnet', content: <MainnetView /> }
-    ],
-    []
-  )
+  const items: Tab[] = useMemo(() => [{ key: TabKey.MAINNET, label: 'mainnet', content: <MainnetView /> }], [])
 
-  return <Tabs centerContent={true} tabs={items} defaultTabIndex={1} />
+  return <Tabs centerContent={true} tabs={items} />
 }
 
 export default NoWalletView

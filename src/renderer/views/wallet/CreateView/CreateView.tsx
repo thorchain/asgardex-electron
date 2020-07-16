@@ -30,7 +30,7 @@ export const CreateView = () => {
   return (
     <>
       <PageTitle>create new wallet</PageTitle>
-      <Tabs tabs={items} />
+      <Tabs tabs={items} defaultTabIndex={1} />
     </>
   )
 }
