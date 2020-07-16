@@ -8,12 +8,28 @@ import AssetDetails from '../../components/wallet/AssetDetails'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 
 const AssetDetailsView: React.FC = (): JSX.Element => {
-  const { txsSelectedAsset$, address$, balancesState$, selectedAsset$ } = useBinanceContext()
+  const {
+    txsSelectedAsset$,
+    address$,
+    balancesState$,
+    selectedAsset$,
+    reloadBalances,
+    reloadTxssSelectedAsset
+  } = useBinanceContext()
   const txsRD = useObservableState(txsSelectedAsset$, RD.initial)
   const address = useObservableState(address$, O.none)
   const balancesRD = useObservableState(balancesState$, RD.initial)
   const selectedAsset = useObservableState(selectedAsset$, O.none)
 
-  return <AssetDetails txsRD={txsRD} address={address} balancesRD={balancesRD} asset={selectedAsset} />
+  return (
+    <AssetDetails
+      txsRD={txsRD}
+      address={address}
+      balancesRD={balancesRD}
+      asset={selectedAsset}
+      reloadSelectedAssetTxsHandler={reloadTxssSelectedAsset}
+      reloadBalancesHandler={reloadBalances}
+    />
+  )
 }
 export default AssetDetailsView

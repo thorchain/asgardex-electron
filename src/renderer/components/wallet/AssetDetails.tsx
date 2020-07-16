@@ -15,7 +15,7 @@ import * as walletRoutes from '../../routes/wallet'
 import { TxsRD, BalancesRD } from '../../services/binance/types'
 import AssetIcon from '../uielements/assets/assetIcon'
 import BackLink from '../uielements/backLink'
-import Button from '../uielements/button'
+import Button, { RefreshButton } from '../uielements/button'
 import {
   StyledCard,
   StyledMobileCard,
@@ -37,10 +37,19 @@ type Props = {
   balancesRD: BalancesRD
   asset: O.Option<Asset>
   address: O.Option<Address>
+  reloadBalancesHandler?: () => void
+  reloadSelectedAssetTxsHandler?: () => void
 }
 
 const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
-  const { txsRD, address, balancesRD, asset: oAsset } = props
+  const {
+    txsRD,
+    address,
+    balancesRD,
+    asset: oAsset,
+    reloadBalancesHandler = () => {},
+    reloadSelectedAssetTxsHandler = () => {}
+  } = props
 
   const asset = O.toNullable(oAsset)
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -67,11 +76,19 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
     )
   }, [balancesRD, oAsset])
 
+  const refreshHandler = useCallback(() => {
+    reloadSelectedAssetTxsHandler()
+    reloadBalancesHandler()
+  }, [reloadBalancesHandler, reloadSelectedAssetTxsHandler])
+
   return (
     <>
-      <Row>
-        <Col span={24}>
+      <Row justify="space-between">
+        <Col>
           <BackLink />
+        </Col>
+        <Col>
+          <RefreshButton clickHandler={refreshHandler} />
         </Col>
       </Row>
       <Row>

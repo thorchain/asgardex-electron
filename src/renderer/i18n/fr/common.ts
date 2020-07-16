@@ -15,6 +15,7 @@ const common: CommonMessages = {
   'common.memo': 'Memo - FR',
   'common.date': 'Date - FR',
   'common.refresh': 'Rafraîchir',
+  'common.back': 'Back - FR',
   'common.remove': 'Retirer'
 }
 
