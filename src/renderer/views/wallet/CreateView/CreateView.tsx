@@ -13,8 +13,16 @@ enum TabKey {
 export const CreateView = () => {
   const items = useMemo(
     () => [
-      { key: TabKey.KEYSTORE, label: 'keystore', content: <KeystoreView /> },
-      { key: TabKey.PHRASE, label: 'phrase', content: <PhraseView /> }
+      {
+        key: TabKey.KEYSTORE,
+        label: 'keystore',
+        content: <KeystoreView />
+      },
+      {
+        key: TabKey.PHRASE,
+        label: 'phrase',
+        content: <PhraseView />
+      }
     ],
     []
   )

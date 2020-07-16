@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { RedoOutlined } from '@ant-design/icons'
-import { Card, Col, Row, Button, Form } from 'antd'
-import { Store } from 'antd/lib/form/interface'
+import { Col, Row, Button, Form } from 'antd'
 import shuffleArray from 'lodash.shuffle'
 import { v4 as uuidv4 } from 'uuid'
 
 import { isSelectedFactory, sortedSelected } from '../../helpers/array'
+import { MnemonicPhrase } from './MnemonicPhrase'
 
 export type WordType = {
   text: string
@@ -129,27 +129,21 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
     },
     [wordsList]
   )
-  const handleFormSubmit = useCallback(
-    (formData: Store) => {
-      console.log('submitting form')
-      console.log(formData)
+  const handleFormSubmit = useCallback(() => {
+    const checkwords = checkPhraseConfirmWords(wordsList, sortedSelectedWords)
 
-      const checkwords = checkPhraseConfirmWords(wordsList, sortedSelectedWords)
-
-      if (checkwords) {
-        // The submitted phrase as a string for passing to wallet methods
-        onConfirm()
-        const repeatPhrase = wordsList
-          .filter((e: WordType) => e.selected === true)
-          .map((f: WordType) => {
-            return f.text
-          })
-          .join(' ')
-        console.log(repeatPhrase)
-      }
-    },
-    [checkPhraseConfirmWords, onConfirm, wordsList, sortedSelectedWords]
-  )
+    if (checkwords) {
+      // The submitted phrase as a string for passing to wallet methods
+      onConfirm()
+      const repeatPhrase = wordsList
+        .filter((e: WordType) => e.selected === true)
+        .map((f: WordType) => {
+          return f.text
+        })
+        .join(' ')
+      console.log(repeatPhrase)
+    }
+  }, [checkPhraseConfirmWords, onConfirm, wordsList, sortedSelectedWords])
   return (
     <>
       <Form labelCol={{ span: 24 }} onFinish={handleFormSubmit}>
@@ -158,24 +152,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
           label="Confirm Phrase"
           validateStatus={mnemonicError && 'error'}
           help={!!mnemonicError && mnemonicError}>
-          <Row>
-            <Col span={24}>
-              <Card bodyStyle={{ padding: '6px', minHeight: '100px' }}>
-                <div>
-                  {sortedSelectedWords.map((word) => (
-                    <Button
-                      key={word._id}
-                      disabled={!!loadingMsg}
-                      danger={word.error}
-                      onClick={() => word._id && handleRemoveWord(word._id)}
-                      style={{ margin: '6px' }}>
-                      {word.text}
-                    </Button>
-                  ))}
-                </div>
-              </Card>
-            </Col>
-          </Row>
+          <MnemonicPhrase words={sortedSelectedWords} onWordClick={handleRemoveWord} />
         </Form.Item>
 
         <Form.Item

@@ -5,26 +5,37 @@ import { Form, Button } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 
-import { Input } from '../uielements/input'
+import { InputPassword as Input } from '../uielements/input'
+import Label from '../uielements/label'
+import { MnemonicPhrase } from './MnemonicPhrase'
 
-type Props = {}
-const NewMnemonicGenerate: React.FC<Props> = (_: Props): JSX.Element => {
+type Props = {
+  onSubmit: (info: { phrase: string; password: string }) => void
+}
+const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element => {
   const [loadingMsg, setLoadingMsg] = useState<string>('')
 
-  const createMnemonicWallet = () => {
-    const phrase = generatePhrase()
+  const phrase = useMemo(() => generatePhrase(), [])
+
+  const phraseWords = useMemo(() => phrase.split(' ').map((word) => ({ text: word, _id: word })), [phrase])
+
+  const createMnemonicWallet = useCallback(() => {
     // TODO (@Veado) Extract this into helper
     localStorage.setItem('phrase', phrase)
-  }
+  }, [phrase])
 
-  const handleFormFinish = useCallback(async (_: Store) => {
-    try {
-      setLoadingMsg('Creating wallet...')
-      createMnemonicWallet()
-    } catch (err) {
-      setLoadingMsg('')
-    }
-  }, [])
+  const handleFormFinish = useCallback(
+    async (formData: Store) => {
+      try {
+        setLoadingMsg('Creating wallet...')
+        createMnemonicWallet()
+        onSubmit({ phrase, password: formData.password })
+      } catch (err) {
+        setLoadingMsg('')
+      }
+    },
+    [createMnemonicWallet, onSubmit, phrase]
+  )
 
   const rules: Rule[] = useMemo(
     () => [
@@ -40,9 +51,14 @@ const NewMnemonicGenerate: React.FC<Props> = (_: Props): JSX.Element => {
     ],
     []
   )
+
+  const copyPhraseToClipborad = useCallback(() => {
+    navigator.clipboard.writeText(phrase)
+  }, [phrase])
   return (
     <>
-      <h1>Generate the new mnemonic wallet</h1>
+      <Label onClick={copyPhraseToClipborad}>copy phrase below</Label>
+      <MnemonicPhrase words={phraseWords} />
       <Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>
         <Form.Item name="password" label="Password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
           <Input size="large" type="password" />
