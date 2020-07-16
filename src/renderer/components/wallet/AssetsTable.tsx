@@ -31,14 +31,14 @@ import Label from '../uielements/label'
 import { TableWrapper } from './AssetsTable.style'
 
 type Props = {
-  balances: BalancesRD
+  balancesRD: BalancesRD
   pricePool?: PricePool
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: O.Option<Asset>) => void
 }
 
 const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
-  const { balances: balancesRD, pricePool = RUNE_PRICE_POOL, poolDetails, selectAssetHandler = (_) => {} } = props
+  const { balancesRD, pricePool = RUNE_PRICE_POOL, poolDetails, selectAssetHandler = (_) => {} } = props
 
   const history = useHistory()
   const intl = useIntl()

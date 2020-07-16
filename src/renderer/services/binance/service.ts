@@ -239,7 +239,7 @@ const balancesState$: Observable<BalancesRD> = Rx.combineLatest(
   shareReplay()
 )
 
-const { get$: getSelectedAsset$, set: setSelectedAsset } = observableState<O.Option<Asset>>(O.none)
+const { get$: selectedAsset$, set: setSelectedAsset } = observableState<O.Option<Asset>>(O.none)
 
 /**
  * Observable to load txs from Binance API endpoint
@@ -274,7 +274,7 @@ const { stream$: reloadTxsSelectedAsset$, trigger: reloadTxssSelectedAsset } = t
 const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest(
   clientState$,
   reloadTxsSelectedAsset$.pipe(debounceTime(300)),
-  getSelectedAsset$
+  selectedAsset$
 ).pipe(
   mergeMap(([clientState, _, oAsset]) => {
     const client = getBinanceClient(clientState)
@@ -305,5 +305,6 @@ export {
   reloadBalances,
   txsSelectedAsset$,
   reloadTxssSelectedAsset,
-  address$
+  address$,
+  selectedAsset$
 }

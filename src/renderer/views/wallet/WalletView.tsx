@@ -25,7 +25,7 @@ import * as Styled from './WalletView.styles'
 
 const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
-  const { reloadBalances } = useBinanceContext()
+  const { reloadBalances, reloadTxssSelectedAsset } = useBinanceContext()
   const intl = useIntl()
 
   // Important note:
@@ -34,16 +34,16 @@ const WalletView: React.FC = (): JSX.Element => {
   // we have to add 'undefined'  as default value
   const keystore = useObservableState(keystoreService.keystore$, undefined)
 
-  const reloadButton = useMemo(
-    () => (
+  const reloadButton = useCallback(
+    (onClickHandler) => (
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Styled.RefreshButton typevalue="transparent" type="text" onClick={reloadBalances}>
+        <Styled.RefreshButton typevalue="transparent" type="text" onClick={onClickHandler}>
           <SyncIcon />
           {intl.formatMessage({ id: 'common.refresh' })}
         </Styled.RefreshButton>
       </div>
     ),
-    [reloadBalances, intl]
+    [intl]
   )
 
   // Following routes are accessable only,
@@ -59,17 +59,17 @@ const WalletView: React.FC = (): JSX.Element => {
             <SettingsView />
           </Route>
           <Route path={walletRoutes.assets.template} exact>
-            {reloadButton}
+            {reloadButton(reloadBalances)}
             <AssetsNav />
             <AssetsView />
           </Route>
           <Route path={walletRoutes.stakes.template} exact>
-            {reloadButton}
+            {reloadButton(reloadBalances)}
             <AssetsNav />
             <StakesView />
           </Route>
           <Route path={walletRoutes.bonds.template} exact>
-            {reloadButton}
+            {reloadButton(reloadBalances)}
             <AssetsNav />
             <BondsView />
           </Route>
@@ -80,12 +80,16 @@ const WalletView: React.FC = (): JSX.Element => {
             <SendView />
           </Route>
           <Route path={walletRoutes.assetDetails.template} exact>
+            {reloadButton(() => {
+              reloadBalances()
+              reloadTxssSelectedAsset()
+            })}
             <AssetDetailsView />
           </Route>
         </Switch>
       </>
     ),
-    [reloadButton]
+    [reloadBalances, reloadButton, reloadTxssSelectedAsset]
   )
 
   const renderWalletRoute = useCallback(

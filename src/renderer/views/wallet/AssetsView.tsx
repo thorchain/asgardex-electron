@@ -35,7 +35,7 @@ const AssetsView: React.FC = (): JSX.Element => {
 
   return (
     <AssetsTable
-      balances={balancesRD}
+      balancesRD={balancesRD}
       pricePool={pricePool}
       poolDetails={poolDetails}
       selectAssetHandler={setSelectedAsset}

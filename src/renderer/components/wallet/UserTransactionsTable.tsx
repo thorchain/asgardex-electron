@@ -1,9 +1,10 @@
 import React, { useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Txs, Tx } from '@thorchain/asgardex-binance'
+import { Txs, Tx, Address } from '@thorchain/asgardex-binance'
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { TxsRD } from '../../services/binance/types'
@@ -12,6 +13,7 @@ import { StyledTable, StyledText, StyledLink } from './UserTransactionTable.styl
 
 type Props = {
   txsRD: TxsRD
+  address: O.Option<Address>
 }
 const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const { txsRD } = props

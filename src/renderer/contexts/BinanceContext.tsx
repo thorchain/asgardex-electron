@@ -13,6 +13,7 @@ import {
   address$,
   setSelectedAsset,
   txsSelectedAsset$,
+  selectedAsset$,
   reloadTxssSelectedAsset
 } from '../services/binance/service'
 import { useAppContext } from './AppContext'
@@ -27,6 +28,7 @@ type BinanceContextValue = {
   setSelectedAsset: typeof setSelectedAsset
   txsSelectedAsset$: typeof txsSelectedAsset$
   reloadTxssSelectedAsset: typeof reloadTxssSelectedAsset
+  selectedAsset$: typeof selectedAsset$
   address$: typeof address$
 }
 
@@ -39,6 +41,7 @@ const initialContext = {
   setSelectedAsset,
   txsSelectedAsset$,
   reloadTxssSelectedAsset,
+  selectedAsset$,
   address$
 }
 
