@@ -1,57 +1,14 @@
 import React, { useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Txs } from '@thorchain/asgardex-binance'
+import { Txs, Tx } from '@thorchain/asgardex-binance'
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
 
-import { shortSymbol } from '../../helpers/tokenHelpers'
-import { transactionParty } from '../../helpers/transactionHelpers'
 import { TxsRD } from '../../services/binance/types'
-import { UserTransactionType } from '../../types/wallet'
 import ErrorView from '../shared/error/ErrorView'
 import { StyledTable, StyledText, StyledLink } from './UserTransactionTable.style'
-
-type Column = 'type' | 'address' | 'timeStamp' | 'to' | 'amount' | 'coin'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getColumnsRenderers = (address: string): Record<Column, (value: any, tx: UserTransactionType) => JSX.Element> => {
-  const party = (tx: UserTransactionType) => {
-    return transactionParty(address, tx)
-  }
-
-  return {
-    type: (_, tx) => {
-      const p = party(tx)
-      return <StyledText>{p.msg}</StyledText>
-    },
-    address: (_, tx) => {
-      const p = party(tx)
-      return <StyledText>{p.address}</StyledText>
-    },
-    timeStamp: (_, tx) => {
-      const p = party(tx)
-      return <StyledText>{p.timeStamp ? new Date(p.timeStamp).toDateString() : ''}</StyledText>
-    },
-    to: (_, tx) => {
-      const p = party(tx)
-      return <StyledText>{p.label}:&nbsp;</StyledText>
-    },
-    amount: (_, tx) => {
-      const p = party(tx)
-      return (
-        <StyledText>
-          {p.op}
-          {tx.value}&nbsp;
-        </StyledText>
-      )
-    },
-    coin: (value: string) => {
-      return <StyledText>{shortSymbol(value)}</StyledText>
-    }
-  }
-}
 
 type Props = {
   txsRD: TxsRD
@@ -61,67 +18,73 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
-  const address = 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y'
-
-  const columnsRenderers = useMemo(() => getColumnsRenderers(address), [address])
-
-  const typeColumn: ColumnType<UserTransactionType> = {
+  const renderTypeColumn = useCallback(({ txType }: Tx) => <StyledText>{txType}</StyledText>, [])
+  const typeColumn: ColumnType<Tx> = {
     key: 'txType',
     title: intl.formatMessage({ id: 'common.type' }),
     dataIndex: 'txType',
     align: 'left',
-    render: columnsRenderers.type
+    render: renderTypeColumn
   }
 
-  const fromColumn: ColumnType<UserTransactionType> = {
+  const renderFromColumn = useCallback(({ fromAddr }: Tx) => <StyledText>{fromAddr}</StyledText>, [])
+  const fromColumn: ColumnType<Tx> = {
     key: 'fromAddr',
     title: intl.formatMessage({ id: 'common.address' }),
     dataIndex: 'txFrom',
     align: 'left',
-    render: columnsRenderers.address
+    render: renderFromColumn
   }
 
-  const toColumn: ColumnType<UserTransactionType> = {
+  const renderToColumn = useCallback(({ toAddr }: Tx) => <StyledText>{toAddr}</StyledText>, [])
+  const toColumn: ColumnType<Tx> = {
     key: 'toAddr',
     title: intl.formatMessage({ id: 'common.to' }),
     dataIndex: 'toAddr',
     align: 'left',
-    render: columnsRenderers.to
+    render: renderToColumn
   }
 
-  const dateColumn: ColumnType<UserTransactionType> = {
+  const renderDateColumn = useCallback(
+    ({ timeStamp }: Tx) => <StyledText>{timeStamp ? new Date(timeStamp).toDateString() : ''}</StyledText>,
+    []
+  )
+  const dateColumn: ColumnType<Tx> = {
     key: 'timeStamp',
     title: intl.formatMessage({ id: 'common.date' }),
     dataIndex: 'timeStamp',
     align: 'left',
-    render: columnsRenderers.timeStamp
+    render: renderDateColumn
   }
 
-  const amountColumn: ColumnType<UserTransactionType> = {
+  const renderAmountColumn = useCallback(({ value }: Tx) => <StyledText>{value};</StyledText>, [])
+  const amountColumn: ColumnType<Tx> = {
     key: 'value',
     title: intl.formatMessage({ id: 'common.amount' }),
     dataIndex: 'txValue',
     align: 'left',
-    render: columnsRenderers.amount
+    render: renderAmountColumn
   }
 
-  const coinColumn: ColumnType<UserTransactionType> = {
+  const renderCoinColumn = useCallback(({ txAsset }: Tx) => <StyledText>{txAsset};</StyledText>, [])
+  const coinColumn: ColumnType<Tx> = {
     key: 'txAsset',
     title: intl.formatMessage({ id: 'common.coin' }),
     dataIndex: 'txAsset',
     align: 'left',
-    render: columnsRenderers.coin
+    render: renderCoinColumn
   }
 
-  const linkColumn: ColumnType<UserTransactionType> = {
+  const renderLinkColumn = useCallback((_) => <StyledLink>LINK</StyledLink>, [])
+  const linkColumn: ColumnType<Tx> = {
     key: 'txHash',
     title: '',
     dataIndex: 'txHash',
     align: 'left',
-    render: () => <StyledLink>LINK</StyledLink>
+    render: renderLinkColumn
   }
 
-  const desktopColumns: ColumnsType<UserTransactionType> = [
+  const desktopColumns: ColumnsType<Tx> = [
     typeColumn,
     fromColumn,
     toColumn,
@@ -131,7 +94,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     linkColumn
   ]
 
-  const mobileColumns: ColumnsType<UserTransactionType> = [amountColumn, coinColumn, linkColumn]
+  const mobileColumns: ColumnsType<Tx> = [amountColumn, coinColumn, linkColumn]
 
   const renderTable = useCallback(
     (data: Txs, loading = false) => {
