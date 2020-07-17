@@ -13,6 +13,7 @@ import { useHistory } from 'react-router-dom'
 import { balanceByAsset } from '../../helpers/binanceHelper'
 import * as walletRoutes from '../../routes/wallet'
 import { TxsRD, BalancesRD } from '../../services/binance/types'
+import { OpenExternalHandler } from '../../types/asgardex'
 import AssetIcon from '../uielements/assets/assetIcon'
 import BackLink from '../uielements/backLink'
 import Button, { RefreshButton } from '../uielements/button'
@@ -24,6 +25,8 @@ type Props = {
   balancesRD: BalancesRD
   asset: O.Option<Asset>
   address: O.Option<Address>
+  explorerUrl?: O.Option<string>
+  openExternal: OpenExternalHandler
   reloadBalancesHandler?: () => void
   reloadSelectedAssetTxsHandler?: () => void
 }
@@ -35,7 +38,9 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
     balancesRD,
     asset: oAsset,
     reloadBalancesHandler = () => {},
-    reloadSelectedAssetTxsHandler = () => {}
+    reloadSelectedAssetTxsHandler = () => {},
+    explorerUrl = O.none,
+    openExternal
   } = props
 
   const asset = O.toNullable(oAsset)
@@ -72,6 +77,16 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
     reloadSelectedAssetTxsHandler()
     reloadBalancesHandler()
   }, [reloadBalancesHandler, reloadSelectedAssetTxsHandler])
+
+  const clickTxLinkHandler = useCallback(
+    (txHash: string) => {
+      FP.pipe(
+        explorerUrl,
+        O.map((url) => openExternal(`${url}/tx/${txHash}`))
+      )
+    },
+    [explorerUrl, openExternal]
+  )
 
   return (
     <>
@@ -116,7 +131,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
         </Styled.Row>
         <Styled.Divider />
         <Col span={24}>
-          <TransactionsTable txsRD={txsRD} address={address} />
+          <TransactionsTable txsRD={txsRD} address={address} asset={oAsset} clickTxLinkHandler={clickTxLinkHandler} />
         </Col>
       </Row>
     </>

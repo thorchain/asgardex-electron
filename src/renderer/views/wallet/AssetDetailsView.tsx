@@ -1,6 +1,7 @@
 import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { shell } from 'electron'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
@@ -14,12 +15,14 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
     balancesState$,
     selectedAsset$,
     reloadBalances,
-    reloadTxssSelectedAsset
+    reloadTxssSelectedAsset,
+    explorerUrl$
   } = useBinanceContext()
   const txsRD = useObservableState(txsSelectedAsset$, RD.initial)
   const address = useObservableState(address$, O.none)
   const balancesRD = useObservableState(balancesState$, RD.initial)
   const selectedAsset = useObservableState(selectedAsset$, O.none)
+  const explorerUrl = useObservableState(explorerUrl$, O.none)
 
   return (
     <AssetDetails
@@ -29,6 +32,8 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
       asset={selectedAsset}
       reloadSelectedAssetTxsHandler={reloadTxssSelectedAsset}
       reloadBalancesHandler={reloadBalances}
+      explorerUrl={explorerUrl}
+      openExternal={shell.openExternal}
     />
   )
 }

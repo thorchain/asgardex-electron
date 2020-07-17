@@ -2,8 +2,10 @@ import React, { useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Txs, Tx, Address } from '@thorchain/asgardex-binance'
+import { Asset, assetAmount, assetToString, formatAssetAmountCurrency, bnOrZero } from '@thorchain/asgardex-util'
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 
@@ -14,9 +16,11 @@ import * as Styled from './TransactionTable.style'
 type Props = {
   txsRD: TxsRD
   address: O.Option<Address>
+  asset: O.Option<Asset>
+  clickTxLinkHandler: (txHash: string) => void
 }
 const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
-  const { txsRD } = props
+  const { txsRD, asset: oAsset, clickTxLinkHandler } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -24,7 +28,6 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const typeColumn: ColumnType<Tx> = {
     key: 'txType',
     title: intl.formatMessage({ id: 'common.type' }),
-    dataIndex: 'txType',
     align: 'left',
     render: renderTypeColumn
   }
@@ -32,8 +35,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const renderFromColumn = useCallback(({ fromAddr }: Tx) => <Styled.Text>{fromAddr}</Styled.Text>, [])
   const fromColumn: ColumnType<Tx> = {
     key: 'fromAddr',
-    title: intl.formatMessage({ id: 'common.address' }),
-    dataIndex: 'txFrom',
+    title: intl.formatMessage({ id: 'common.from' }),
     align: 'left',
     render: renderFromColumn
   }
@@ -42,70 +44,62 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const toColumn: ColumnType<Tx> = {
     key: 'toAddr',
     title: intl.formatMessage({ id: 'common.to' }),
-    dataIndex: 'toAddr',
     align: 'left',
     render: renderToColumn
   }
 
-  const renderDateColumn = useCallback(
-    // ({ timeStamp }: Tx) => <Styled.Text>{timeStamp ? new Date(timeStamp).toDateString() : ''}</Styled.Text>,
-    ({ timeStamp }: Tx) => {
-      const date = new Date(timeStamp)
-      return (
-        <>
-          <FormattedDate value={date} />
-          <FormattedTime value={date} />
-        </>
-      )
-    },
-    []
-  )
+  const renderDateColumn = useCallback(({ timeStamp }: Tx) => {
+    const date = new Date(timeStamp)
+    return (
+      <>
+        <FormattedDate value={date} />
+        <FormattedTime value={date} />
+      </>
+    )
+  }, [])
   const dateColumn: ColumnType<Tx> = {
     key: 'timeStamp',
     title: intl.formatMessage({ id: 'common.date' }),
-    dataIndex: 'timeStamp',
     align: 'left',
     render: renderDateColumn
   }
 
-  const renderAmountColumn = useCallback(({ value }: Tx) => <Styled.Text>{value};</Styled.Text>, [])
+  const renderAmountColumn = useCallback(
+    ({ value }: Tx) =>
+      FP.pipe(
+        oAsset,
+        O.fold(
+          () => <></>,
+          (asset) => {
+            const amount = assetAmount(bnOrZero(value))
+            const label = formatAssetAmountCurrency(amount, assetToString(asset), 3)
+            return <Styled.Text>{label}</Styled.Text>
+          }
+        )
+      ),
+    [oAsset]
+  )
   const amountColumn: ColumnType<Tx> = {
     key: 'value',
     title: intl.formatMessage({ id: 'common.amount' }),
-    dataIndex: 'txValue',
     align: 'left',
     render: renderAmountColumn
   }
 
-  const renderCoinColumn = useCallback(({ txAsset }: Tx) => <Styled.Text>{txAsset};</Styled.Text>, [])
-  const coinColumn: ColumnType<Tx> = {
-    key: 'txAsset',
-    title: intl.formatMessage({ id: 'common.coin' }),
-    dataIndex: 'txAsset',
-    align: 'left',
-    render: renderCoinColumn
-  }
-
-  const renderLinkColumn = useCallback((_) => <Styled.Link>LINK</Styled.Link>, [])
+  const renderLinkColumn = useCallback(
+    ({ txHash }: Tx) => <Styled.Link onClick={() => clickTxLinkHandler(txHash)}>LINK</Styled.Link>,
+    [clickTxLinkHandler]
+  )
   const linkColumn: ColumnType<Tx> = {
     key: 'txHash',
     title: '',
-    dataIndex: 'txHash',
     align: 'left',
     render: renderLinkColumn
   }
 
-  const desktopColumns: ColumnsType<Tx> = [
-    typeColumn,
-    fromColumn,
-    toColumn,
-    dateColumn,
-    amountColumn,
-    coinColumn,
-    linkColumn
-  ]
+  const desktopColumns: ColumnsType<Tx> = [typeColumn, fromColumn, toColumn, dateColumn, amountColumn, linkColumn]
 
-  const mobileColumns: ColumnsType<Tx> = [amountColumn, coinColumn, linkColumn]
+  const mobileColumns: ColumnsType<Tx> = [amountColumn, dateColumn, linkColumn]
 
   const renderTable = useCallback(
     (txs: Txs, loading = false) => {

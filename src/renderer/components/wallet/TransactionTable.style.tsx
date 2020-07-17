@@ -1,4 +1,4 @@
-import { Typography } from 'antd'
+import { Typography, Button } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -37,7 +37,7 @@ export const Text = styled(Typography.Text)`
   color: ${palette('text', 1)};
 `
 
-export const Link = styled(Typography.Text)`
+export const Link = styled(Button).attrs({ type: 'link' })`
   font-weight: 600;
   text-transform: uppercase;
   color: ${palette('primary', 0)};

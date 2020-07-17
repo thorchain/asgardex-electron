@@ -297,6 +297,23 @@ const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest(
 )
 
 /**
+ * Explorer url depending on selected network
+ *
+ * If a client is not available (e.g. by removing keystore), it returns `None`
+ *
+ */
+const explorerUrl$: Observable<O.Option<string>> = clientState$.pipe(
+  mergeMap((clientState) =>
+    Rx.of(
+      FP.pipe(
+        getBinanceClient(clientState),
+        O.chain((client) => some(client.getExplorerUrl()))
+      )
+    )
+  ),
+  shareReplay()
+)
+/**
  * Object with all "public" functions and observables
  */
 export {
@@ -311,5 +328,6 @@ export {
   txsSelectedAsset$,
   reloadTxssSelectedAsset,
   address$,
-  selectedAsset$
+  selectedAsset$,
+  explorerUrl$
 }
