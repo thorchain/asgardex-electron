@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@thorchain/asgardex-binance'
-import { Asset, formatAssetAmountCurrency, assetToString } from '@thorchain/asgardex-util'
+import { Asset, assetToString, formatAssetAmount } from '@thorchain/asgardex-util'
 import { Row, Col, Grid } from 'antd'
 import { sequenceT } from 'fp-ts/lib/Apply'
 import * as FP from 'fp-ts/lib/function'
@@ -65,7 +65,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
         () => previousBalance.current,
         ([balances, asset]) => {
           const amount = balanceByAsset(balances, asset)
-          const balance = formatAssetAmountCurrency(amount, assetToString(asset), 3)
+          const balance = formatAssetAmount(amount, 3)
           previousBalance.current = balance
           return balance
         }
