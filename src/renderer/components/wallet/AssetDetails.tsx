@@ -131,7 +131,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
         </Styled.Row>
         <Styled.Divider />
         <Col span={24}>
-          <TransactionsTable txsRD={txsRD} address={address} asset={oAsset} clickTxLinkHandler={clickTxLinkHandler} />
+          <TransactionsTable txsRD={txsRD} address={address} clickTxLinkHandler={clickTxLinkHandler} />
         </Col>
       </Row>
     </>

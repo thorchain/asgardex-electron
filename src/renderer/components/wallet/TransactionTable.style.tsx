@@ -1,4 +1,5 @@
-import { Typography, Button } from 'antd'
+import { SelectOutlined } from '@ant-design/icons'
+import { Typography } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -7,38 +8,24 @@ import UITable from '../uielements/table'
 export const Table = styled(UITable)`
   .ant-table-thead > tr > th {
     font-size: 16px;
-    font-weight: 600;
-    line-height: 19px;
     font-family: 'MainFontRegular';
     border: none;
     color: ${palette('gray', 2)};
   }
 
   .ant-table-tbody > tr > td {
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 22px;
-    font-family: 'MainFontRegular';
     border: none;
-
-    span {
-      display: inline-block;
-      text-overflow: ellipsis;
-      max-width: 200px;
-      overflow: hidden;
-      white-space: nowrap;
-    }
   }
 `
 
 export const Text = styled(Typography.Text)`
+  font-size: 16px;
   text-transform: uppercase;
-  font-weight: 600;
+  font-family: 'MainFontRegular';
   color: ${palette('text', 1)};
 `
 
-export const Link = styled(Button).attrs({ type: 'link' })`
-  font-weight: 600;
-  text-transform: uppercase;
-  color: ${palette('primary', 0)};
+export const LinkIcon = styled(SelectOutlined)`
+  transform: scale(-1, 1);
+  color: ${palette('text', 1)};
 `
