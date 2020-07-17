@@ -1,10 +1,11 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Txs, Tx, Address } from '@thorchain/asgardex-binance'
 import { assetAmount, bnOrZero, formatAssetAmount } from '@thorchain/asgardex-util'
 import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 
@@ -21,6 +22,9 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const { txsRD, clickTxLinkHandler } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+
+  // store previous data of Txs to render these while reloading
+  const previousTxs = useRef<O.Option<Txs>>(O.none)
 
   const renderTypeColumn = useCallback(({ txType }: Tx) => <Styled.Text>{txType}</Styled.Text>, [])
   const typeColumn: ColumnType<Tx> = {
@@ -55,20 +59,24 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
       return (
         <Row gutter={[8, 0]}>
           <Col>
-            <FormattedDate
-              year={isDesktopView ? 'numeric' : '2-digit'}
-              month={isDesktopView ? '2-digit' : 'numeric'}
-              day={isDesktopView ? '2-digit' : 'numeric'}
-              value={date}
-            />
+            <Styled.Text>
+              <FormattedDate
+                year={isDesktopView ? 'numeric' : '2-digit'}
+                month={isDesktopView ? '2-digit' : 'numeric'}
+                day={isDesktopView ? '2-digit' : 'numeric'}
+                value={date}
+              />
+            </Styled.Text>
           </Col>
           <Col>
-            <FormattedTime
-              hour={isDesktopView ? '2-digit' : 'numeric'}
-              minute={isDesktopView ? '2-digit' : 'numeric'}
-              hour12={isDesktopView}
-              value={date}
-            />
+            <Styled.Text>
+              <FormattedTime
+                hour={isDesktopView ? '2-digit' : 'numeric'}
+                minute={isDesktopView ? '2-digit' : 'numeric'}
+                hour12={false}
+                value={date}
+              />
+            </Styled.Text>
           </Col>
         </Row>
       )
@@ -116,7 +124,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const renderTable = useCallback(
     (txs: Txs, loading = false) => {
       const columns = isDesktopView ? desktopColumns : mobileColumns
-      return <Styled.Table columns={columns} dataSource={txs} loading={loading} rowKey="key" />
+      return <Styled.Table columns={columns} dataSource={txs} loading={loading} rowKey="txHash" />
     },
     [desktopColumns, isDesktopView, mobileColumns]
   )
@@ -126,12 +134,21 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
       <>
         {RD.fold(
           () => renderTable([], true),
-          () => renderTable([], true),
+          () => {
+            const txs = FP.pipe(
+              previousTxs.current,
+              O.getOrElse(() => [] as Txs)
+            )
+            return renderTable(txs, true)
+          },
           (error: Error) => {
             const msg = error?.toString() ?? ''
             return <ErrorView message={msg} />
           },
-          (txs: Txs): JSX.Element => renderTable(txs)
+          (txs: Txs): JSX.Element => {
+            previousTxs.current = O.some(txs)
+            return renderTable(txs)
+          }
         )(txsRD)}
       </>
     ),
