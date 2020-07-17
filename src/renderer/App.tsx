@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { shell } from 'electron'
 import { BrowserRouter as Router } from 'react-router-dom'
 
 import { AppWrapper, AppLayout } from './App.style'
@@ -26,7 +27,7 @@ const AppView: React.FC<Props> = (_): JSX.Element => {
           <View>
             <ViewRoutes />
           </View>
-          <Footer commitHash={envOrDefault($COMMIT_HASH, '')}></Footer>
+          <Footer commitHash={envOrDefault($COMMIT_HASH, '')} openExternal={shell.openExternal}></Footer>
         </AppLayout>
       </AppWrapper>
     </>
