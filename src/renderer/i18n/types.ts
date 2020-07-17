@@ -7,6 +7,7 @@ export type CommonMessages = {
   'common.type': string
   'common.address': string
   'common.to': string
+  'common.from': string
   'common.amount': string
   'common.coin': string
   'common.password': string

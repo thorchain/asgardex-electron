@@ -9,6 +9,7 @@ const common: CommonMessages = {
   'common.type': 'Type',
   'common.address': 'Address',
   'common.to': 'To',
+  'common.from': 'From',
   'common.amount': 'Amount',
   'common.coin': 'Coin',
   'common.password': 'Password',
