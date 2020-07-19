@@ -6,6 +6,7 @@ import { useHistory } from 'react-router'
 import PageTitle from '../../../components/PageTitle'
 import Tabs from '../../../components/Tabs'
 import * as walletRoutes from '../../../routes/wallet'
+import * as Styled from './CreateView.styles'
 import { KeystoreView } from './KeystoreView'
 import { PhraseView } from './PhraseView'
 
@@ -66,9 +67,9 @@ export const CreateView = () => {
   }, [history, activeTab])
 
   return (
-    <>
+    <Styled.Container>
       <PageTitle>{intl.formatMessage({ id: 'wallet.create.title' })}</PageTitle>
       <Tabs tabs={items} defaultTabIndex={1} activeTabKey={activeTab} />
-    </>
+    </Styled.Container>
   )
 }
