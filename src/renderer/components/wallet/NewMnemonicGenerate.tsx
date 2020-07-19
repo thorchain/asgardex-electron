@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react'
 
 import { generatePhrase } from '@thorchain/asgardex-crypto'
-import { Form, Button } from 'antd'
+import { Form, Button, Row } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import { useIntl } from 'react-intl'
@@ -9,6 +9,7 @@ import { useIntl } from 'react-intl'
 import { InputPassword as Input } from '../uielements/input'
 import Label from '../uielements/label'
 import { MnemonicPhrase } from './MnemonicPhrase'
+import RefreshButton from './RefreshButton'
 
 export type MnemonicInfo = { phrase: string; password: string }
 
@@ -19,7 +20,7 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
   const [loadingMsg, setLoadingMsg] = useState<string>('')
   const intl = useIntl()
 
-  const phrase = useMemo(() => generatePhrase(), [])
+  const [phrase, setPhrase] = useState(generatePhrase())
 
   const phraseWords = useMemo(() => phrase.split(' ').map((word) => ({ text: word, _id: word })), [phrase])
 
@@ -55,7 +56,10 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
   }, [phrase])
   return (
     <>
-      <Label onClick={copyPhraseToClipborad}>{intl.formatMessage({ id: 'wallet.create.copy.phrase' })}</Label>
+      <Row justify="space-between">
+        <Label onClick={copyPhraseToClipborad}>{intl.formatMessage({ id: 'wallet.create.copy.phrase' })}</Label>
+        <RefreshButton onRefresh={() => setPhrase(generatePhrase())} />
+      </Row>
       <MnemonicPhrase words={phraseWords} />
       <Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>
         <Form.Item name="password" label="Password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
