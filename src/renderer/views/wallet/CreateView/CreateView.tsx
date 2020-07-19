@@ -24,16 +24,24 @@ export const CreateView = () => {
     () => [
       {
         key: TabKey.KEYSTORE,
-        label: <span onClick={() => history.push(walletRoutes.create.keystore.template)}>keystore</span>,
+        label: (
+          <span onClick={() => history.push(walletRoutes.create.keystore.template)}>
+            {intl.formatMessage({ id: 'common.keystore' })}
+          </span>
+        ),
         content: <KeystoreView />
       },
       {
         key: TabKey.PHRASE,
-        label: <span onClick={() => history.push(walletRoutes.create.phrase.template)}>phrase</span>,
+        label: (
+          <span onClick={() => history.push(walletRoutes.create.phrase.template)}>
+            {intl.formatMessage({ id: 'common.phrase' })}
+          </span>
+        ),
         content: <PhraseView />
       }
     ],
-    [history]
+    [history, intl]
   )
 
   /**

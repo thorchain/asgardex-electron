@@ -14,6 +14,8 @@ export type CommonMessages = {
   'common.refresh': string
   'common.date': string
   'common.remove': string
+  'common.keystore': string
+  'common.phrase': string
 }
 
 export type PoolsMessages = {

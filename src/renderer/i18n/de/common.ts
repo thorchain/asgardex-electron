@@ -15,7 +15,9 @@ const common: CommonMessages = {
   'common.memo': 'Memo - DE',
   'common.refresh': 'Aktualisieren',
   'common.date': 'Date - DE',
-  'common.remove': 'Entfernen'
+  'common.remove': 'Entfernen',
+  'common.keystore': 'Keystore - DE',
+  'common.phrase': 'Phrase - DE'
 }
 
 export default common
