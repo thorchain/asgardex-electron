@@ -16,7 +16,7 @@ export const MainnetView = () => {
   }, [history])
 
   const createClick = useCallback(() => {
-    history.push(walletRoutes.create.path())
+    history.push(walletRoutes.create.base.path())
   }, [history])
 
   return (

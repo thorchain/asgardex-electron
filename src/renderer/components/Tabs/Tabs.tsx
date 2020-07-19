@@ -6,11 +6,12 @@ import * as Styled from './Tabs.styles'
 
 type Props = {
   defaultTabIndex?: number
-  tabs: { label: string; key: string; content: React.ReactNode }[]
+  tabs: { label: React.ReactNode; key: string; content: React.ReactNode }[]
   centerContent?: boolean
+  activeTabKey?: string
 }
 
-export const Tabs: React.FC<Props> = ({ tabs, defaultTabIndex, centerContent }): JSX.Element => {
+export const Tabs: React.FC<Props> = ({ tabs, defaultTabIndex, centerContent, ...props }): JSX.Element => {
   const [activeTabKey, setActiveTabKey] = useState(tabs[defaultTabIndex || 0].key)
   const content = useMemo(
     () =>
@@ -23,7 +24,7 @@ export const Tabs: React.FC<Props> = ({ tabs, defaultTabIndex, centerContent }):
   )
 
   return (
-    <Styled.Tabs centered={true} activeKey={activeTabKey}>
+    <Styled.Tabs centered={true} activeKey={props.activeTabKey || activeTabKey}>
       {content}
     </Styled.Tabs>
   )

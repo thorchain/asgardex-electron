@@ -1,5 +1,15 @@
 import React from 'react'
 
+import { Route, Switch } from 'react-router'
+
+import * as walletRoutes from '../../../routes/wallet'
+
 export const KeystoreView: React.FC = () => {
-  return <span>keystore</span>
+  return (
+    <Switch>
+      <Route path={walletRoutes.create.keystore.template} exact>
+        <span>keystore</span>
+      </Route>
+    </Switch>
+  )
 }

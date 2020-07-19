@@ -1,29 +1,48 @@
-import React, { useState } from 'react'
+import React from 'react'
 
-import { useHistory } from 'react-router'
+import { Redirect, Route, RouteComponentProps, Switch, useHistory } from 'react-router'
 
 import MnemonicConfirmScreen from '../../../components/wallet/NewMnemonicConfirm'
-import MnemonicGenerate from '../../../components/wallet/NewMnemonicGenerate'
+import MnemonicGenerate, { MnemonicInfo } from '../../../components/wallet/NewMnemonicGenerate'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import * as walletRoutes from '../../../routes/wallet'
 
 export const PhraseView: React.FC = () => {
-  const [mnemonicInfo, setMnemonicInfo] = useState<{ phrase: string; password: string } | undefined>()
   const history = useHistory()
   const { keystoreService } = useWalletContext()
 
-  if (!mnemonicInfo) {
-    return <MnemonicGenerate onSubmit={setMnemonicInfo} />
-  }
-
   return (
-    <MnemonicConfirmScreen
-      mnemonic={mnemonicInfo.phrase}
-      onConfirm={() => {
-        keystoreService.addKeystore(mnemonicInfo.phrase, mnemonicInfo.password).then(() => {
-          history.push(walletRoutes.assets.path())
-        })
-      }}
-    />
+    <Switch>
+      <Route path={walletRoutes.create.phrase.template} exact>
+        <MnemonicGenerate
+          onSubmit={({ phrase, password }) => {
+            history.push(walletRoutes.create.phraseConfirm.path(), { phrase, password })
+          }}
+        />
+      </Route>
+      <Route
+        path={walletRoutes.create.phraseConfirm.template}
+        exact
+        component={(props: RouteComponentProps<{}, {}, MnemonicInfo>) => {
+          const phrase = props.history.location.state?.phrase
+          const password = props.history.location.state?.password
+
+          if (!phrase || !password) {
+            return <Redirect to={walletRoutes.create.phrase.template} />
+          }
+
+          return (
+            <MnemonicConfirmScreen
+              mnemonic={phrase}
+              onConfirm={() => {
+                keystoreService.addKeystore(phrase, password).then(() => {
+                  history.push(walletRoutes.base.path())
+                })
+              }}
+            />
+          )
+        }}
+      />
+    </Switch>
   )
 }

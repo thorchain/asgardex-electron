@@ -10,8 +10,10 @@ import { InputPassword as Input } from '../uielements/input'
 import Label from '../uielements/label'
 import { MnemonicPhrase } from './MnemonicPhrase'
 
+export type MnemonicInfo = { phrase: string; password: string }
+
 type Props = {
-  onSubmit: (info: { phrase: string; password: string }) => void
+  onSubmit: (info: MnemonicInfo) => void
 }
 const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element => {
   const [loadingMsg, setLoadingMsg] = useState<string>('')

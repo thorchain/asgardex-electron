@@ -1,4 +1,5 @@
-import { Route } from './types'
+import { Route } from '../types'
+import * as createRoutes from './create'
 
 export const base: Route<void> = {
   template: '/wallet',
@@ -28,12 +29,7 @@ export const locked: Route<void> = {
   }
 }
 
-export const create: Route<void> = {
-  template: `${base.template}/create`,
-  path() {
-    return this.template
-  }
-}
+export const create = createRoutes
 
 export const settings: Route<void> = {
   template: `${base.template}/settings`,

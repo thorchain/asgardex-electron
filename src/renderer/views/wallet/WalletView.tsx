@@ -130,7 +130,7 @@ const WalletView: React.FC = (): JSX.Element => {
       <Route path={walletRoutes.noWallet.template} exact>
         <NoWalletView />
       </Route>
-      <Route path={walletRoutes.create.template} exact>
+      <Route path={walletRoutes.create.base.template}>
         <CreateView />
       </Route>
       <Route path={walletRoutes.locked.template} exact>
