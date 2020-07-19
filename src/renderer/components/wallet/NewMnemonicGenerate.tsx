@@ -23,22 +23,16 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
 
   const phraseWords = useMemo(() => phrase.split(' ').map((word) => ({ text: word, _id: word })), [phrase])
 
-  const createMnemonicWallet = useCallback(() => {
-    // TODO (@Veado) Extract this into helper
-    localStorage.setItem('phrase', phrase)
-  }, [phrase])
-
   const handleFormFinish = useCallback(
     async (formData: Store) => {
       try {
         setLoadingMsg('Creating wallet...')
-        createMnemonicWallet()
         onSubmit({ phrase, password: formData.password })
       } catch (err) {
         setLoadingMsg('')
       }
     },
-    [createMnemonicWallet, onSubmit, phrase]
+    [onSubmit, phrase]
   )
 
   const rules: Rule[] = useMemo(
