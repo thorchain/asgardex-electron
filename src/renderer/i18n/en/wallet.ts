@@ -28,7 +28,8 @@ const wallet: WalletMessages = {
   'wallet.create.words.click': 'Click the word in correct order',
   'wallet.create.creating': 'Creating wallet',
   'wallet.create.password.repeat': 'Repeat password',
-  'wallet.create.password.mismatch': 'Password mismatch'
+  'wallet.create.password.mismatch': 'Password mismatch',
+  'wallet.create.error': 'Error while saving a phrase'
 }
 
 export default wallet

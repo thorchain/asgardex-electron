@@ -32,14 +32,7 @@ export const PhraseView: React.FC = () => {
           }
 
           return (
-            <MnemonicConfirmScreen
-              mnemonic={phrase}
-              onConfirm={() => {
-                keystoreService.addKeystore(phrase, password).then(() => {
-                  history.push(walletRoutes.base.path())
-                })
-              }}
-            />
+            <MnemonicConfirmScreen mnemonic={phrase} onConfirm={() => keystoreService.addKeystore(phrase, password)} />
           )
         }}
       />

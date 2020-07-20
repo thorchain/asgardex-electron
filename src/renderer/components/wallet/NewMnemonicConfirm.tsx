@@ -4,9 +4,11 @@ import { RedoOutlined } from '@ant-design/icons'
 import { Col, Row, Button, Form } from 'antd'
 import shuffleArray from 'lodash.shuffle'
 import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router'
 import { v4 as uuidv4 } from 'uuid'
 
 import { isSelectedFactory, sortedSelected } from '../../helpers/array'
+import * as walletRoutes from '../../routes/wallet'
 import { MnemonicPhrase } from './MnemonicPhrase'
 
 export type WordType = {
@@ -48,7 +50,7 @@ export const checkPhraseConfirmWordsFactory = (
   }
 }
 
-const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }> = ({
+const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: () => Promise<void> }> = ({
   mnemonic,
   onConfirm
 }): JSX.Element => {
@@ -58,6 +60,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
   const [mnemonicError, setMnemonicError] = useState<string>('')
   const [initialized, setInitialized] = useState<boolean>(false)
   const intl = useIntl()
+  const history = useHistory()
 
   const shuffledWords = useCallback<(array: WordType[]) => WordType[]>(shuffleArray, [])
 
@@ -135,17 +138,15 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
     const checkwords = checkPhraseConfirmWords(wordsList, sortedSelectedWords)
 
     if (checkwords) {
-      // The submitted phrase as a string for passing to wallet methods
       onConfirm()
-      const repeatPhrase = wordsList
-        .filter((e: WordType) => e.selected === true)
-        .map((f: WordType) => {
-          return f.text
+        .then(() => {
+          history.push(walletRoutes.base.path())
         })
-        .join(' ')
-      console.log(repeatPhrase)
+        .catch(() => {
+          setMnemonicError(intl.formatMessage({ id: 'wallet.create.error' }))
+        })
     }
-  }, [checkPhraseConfirmWords, onConfirm, wordsList, sortedSelectedWords])
+  }, [checkPhraseConfirmWords, onConfirm, wordsList, sortedSelectedWords, history, intl])
   return (
     <>
       <Form labelCol={{ span: 24 }} onFinish={handleFormSubmit}>
@@ -178,7 +179,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
         </Form.Item>
         <Form.Item>
           <Button size="large" type="primary" htmlType="submit" block>
-            {loadingMsg || 'Confirm'}
+            {loadingMsg || intl.formatMessage({ id: 'common.confirm' })}
           </Button>
         </Form.Item>
       </Form>
