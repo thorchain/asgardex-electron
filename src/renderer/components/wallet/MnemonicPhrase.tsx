@@ -1,7 +1,8 @@
 import React from 'react'
 
-import { Button, Card, Col, Row } from 'antd'
+import { Col, Row } from 'antd'
 
+import * as Styled from './MnemonicPhrase.styles'
 import { WordType } from './NewMnemonicConfirm'
 
 type Props = {
@@ -15,20 +16,23 @@ export const MnemonicPhrase = React.forwardRef<any, Props>(({ words, onWordClick
   return (
     <Row ref={ref}>
       <Col span={24}>
-        <Card bodyStyle={{ padding: '6px', minHeight: '100px' }}>
+        <Styled.Card bodyStyle={{ padding: '6px', minHeight: '100px' }}>
           <div>
             {words.map((word) => (
-              <Button
+              <Styled.Button
+                type={'text'}
+                size={'large'}
                 key={word._id}
-                disabled={!!readOnly}
+                tabIndex={readOnly ? -1 : 0}
                 danger={word.error}
-                onClick={() => word._id && onWordClick && onWordClick(word._id)}
+                readOnly={readOnly}
+                onClick={readOnly ? undefined : () => word._id && onWordClick && onWordClick(word._id)}
                 style={{ margin: '6px' }}>
                 {word.text}
-              </Button>
+              </Styled.Button>
             ))}
           </div>
-        </Card>
+        </Styled.Card>
       </Col>
     </Row>
   )

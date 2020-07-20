@@ -60,7 +60,7 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
         <Label onClick={copyPhraseToClipborad}>{intl.formatMessage({ id: 'wallet.create.copy.phrase' })}</Label>
         <RefreshButton clickHandler={() => setPhrase(generatePhrase())} />
       </Row>
-      <MnemonicPhrase words={phraseWords} />
+      <MnemonicPhrase words={phraseWords} readOnly={true} />
       <Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>
         <Form.Item
           name="password"
