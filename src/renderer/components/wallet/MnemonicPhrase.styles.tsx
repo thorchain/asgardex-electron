@@ -19,6 +19,11 @@ export const Button = styled(A.Button)<{ readOnly?: boolean }>`
   }
 `
 
+export const EnterPhraseContainer = styled(A.Form.Item)`
+  flex: 1;
+  flex-direction: column;
+`
+
 export const Row = styled(A.Row)`
   margin-bottom: 32px;
 `

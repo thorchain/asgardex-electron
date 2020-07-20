@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl'
 import Button, { RefreshButton } from '../uielements/button/'
 import { InputPassword as Input } from '../uielements/input'
 import { MnemonicPhrase } from './MnemonicPhrase'
-import * as Styled from './NewMnemonicGenerate.styles'
+import * as Styled from './NewMnemonic.styles'
 
 export type MnemonicInfo = { phrase: string; password: string }
 
@@ -56,9 +56,9 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
   return (
     <>
       <Styled.TitleContainer justify="space-between">
-        <Styled.CopyText copyable={{ onCopy: copyPhraseToClipborad }}>
+        <Styled.SectionTitle copyable={{ onCopy: copyPhraseToClipborad }}>
           {intl.formatMessage({ id: 'wallet.create.copy.phrase' })}
-        </Styled.CopyText>
+        </Styled.SectionTitle>
         <RefreshButton clickHandler={() => setPhrase(generatePhrase())} />
       </Styled.TitleContainer>
       <MnemonicPhrase words={phraseWords} readOnly={true} />
