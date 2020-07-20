@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react'
 
 import { Row, Dropdown } from 'antd'
-import { ClickParam } from 'antd/lib/menu'
+import { MenuProps } from 'antd/lib/menu'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { PricePoolAsset, PricePoolAssets } from '../../views/pools/types'
@@ -26,8 +26,8 @@ type Props = {
 const HeaderPriceSelector: React.FC<Props> = (props: Props): JSX.Element => {
   const { assets, selectedAsset, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
 
-  const changeItem = useCallback(
-    (param: ClickParam) => {
+  const changeItem: MenuProps['onClick'] = useCallback(
+    (param) => {
       const asset = param.key as PricePoolAsset
       changeHandler(asset)
     },

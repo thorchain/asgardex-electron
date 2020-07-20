@@ -4,8 +4,9 @@ import Label from '../label'
 
 export const Headline = styled(Label).attrs({
   size: 'large',
-  textTransform: 'uppercase'
+  textTransform: 'uppercase',
+  align: 'center'
 })`
   padding: 0;
-  font-family: 'MainFontSemiBold';
+  font-family: 'MainFontBold';
 `

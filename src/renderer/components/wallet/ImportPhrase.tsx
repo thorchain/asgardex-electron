@@ -95,7 +95,11 @@ const ImportPhrase: React.FC = (): JSX.Element => {
   return (
     <>
       {renderError}
-      <Form form={form} onFinish={submitForm} labelCol={{ span: 24 }} style={{ padding: 30, paddingTop: 15 }}>
+      <Form
+        form={form}
+        onFinish={submitForm}
+        labelCol={{ span: 24 }}
+        style={{ width: '100%', padding: 30, paddingTop: 15 }}>
         {/* TODO(@Veado): i18n */}
         <Spin spinning={importing} tip="Loading...">
           <Form.Item
@@ -120,7 +124,7 @@ const ImportPhrase: React.FC = (): JSX.Element => {
               typevalue="normal"
               security="password"
               placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
-              style={{ width: 280 }}
+              style={{ maxWidth: 280 }}
             />
           </Form.Item>
         </Spin>

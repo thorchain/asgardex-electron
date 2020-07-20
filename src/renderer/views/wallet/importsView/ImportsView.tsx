@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react'
 
-import { Tabs, Row } from 'antd'
 import { useIntl } from 'react-intl'
 
-import BackLink from '../../../components/uielements/backLink'
-import Headline from '../../../components/uielements/headline'
+import { PageTitle } from '../../../components/PageTitle/PageTitle'
+import Tabs from '../../../components/Tabs'
 import ImportPhrase from '../../../components/wallet/ImportPhrase'
 import * as Styled from './ImportsView.style'
 
@@ -28,25 +27,10 @@ const ImportsView: React.FC = (): JSX.Element => {
     [intl]
   )
 
-  const tabs = useMemo(
-    () =>
-      items.map(({ label, key, content }) => (
-        <Tabs.TabPane tab={<Styled.TabLabel>{label}</Styled.TabLabel>} key={key}>
-          {content}
-        </Tabs.TabPane>
-      )),
-    [items]
-  )
-
   return (
     <Styled.ImportsViewWrapper>
-      <div style={{ position: 'absolute' }}>
-        <BackLink />
-      </div>
-      <Row style={{ justifyContent: 'center' }}>
-        <Headline>{intl.formatMessage({ id: 'wallet.imports.wallet' })}</Headline>
-      </Row>
-      <Styled.Tabs activeKey={TabKey.PHRASE}>{tabs}</Styled.Tabs>
+      <PageTitle>{intl.formatMessage({ id: 'wallet.imports.wallet' })}</PageTitle>
+      <Tabs tabs={items} />
     </Styled.ImportsViewWrapper>
   )
 }

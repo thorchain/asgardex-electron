@@ -16,6 +16,10 @@ export type CommonMessages = {
   'common.date': string
   'common.remove': string
   'common.back': string
+  'common.keystore': string
+  'common.phrase': string
+  'common.submit': string
+  'common.confirm': string
 }
 
 export type PoolsMessages = {
@@ -42,6 +46,18 @@ export type WalletMessages = {
   'wallet.imports.wallet': string
   'wallet.imports.enterphrase': string
   'wallet.txs.last90days': string
+  'wallet.empty.action.import': string
+  'wallet.empty.action.create': string
+  'wallet.empty.phrase.import': string
+  'wallet.empty.phrase.create': string
+  'wallet.create.title': string
+  'wallet.create.creating': string
+  'wallet.create.error': string
+  'wallet.create.password.repeat': string
+  'wallet.create.password.mismatch': string
+  'wallet.create.copy.phrase': string
+  'wallet.create.words.click': string
+  'wallet.create.enter.phrase': string
 }
 
 export type SettingMessages = {

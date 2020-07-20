@@ -1,12 +1,15 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { RedoOutlined } from '@ant-design/icons'
-import { Card, Col, Row, Button, Form } from 'antd'
-import { Store } from 'antd/lib/form/interface'
+import { Col, Row, Button, Form } from 'antd'
 import shuffleArray from 'lodash.shuffle'
+import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router'
 import { v4 as uuidv4 } from 'uuid'
 
 import { isSelectedFactory, sortedSelected } from '../../helpers/array'
+import * as walletRoutes from '../../routes/wallet'
+import { MnemonicPhrase } from './MnemonicPhrase'
 
 export type WordType = {
   text: string
@@ -47,15 +50,16 @@ export const checkPhraseConfirmWordsFactory = (
   }
 }
 
-const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }> = ({
+const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: () => Promise<void> }> = ({
   mnemonic,
   onConfirm
 }): JSX.Element => {
   const [wordsList, setWordsList] = useState<WordType[]>([])
   const [shuffledWordsList, setShuffledWordsList] = useState<WordType[]>([])
-  const [loadingMsg] = useState<string>('')
   const [mnemonicError, setMnemonicError] = useState<string>('')
   const [initialized, setInitialized] = useState<boolean>(false)
+  const intl = useIntl()
+  const history = useHistory()
 
   const shuffledWords = useCallback<(array: WordType[]) => WordType[]>(shuffleArray, [])
 
@@ -129,59 +133,34 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
     },
     [wordsList]
   )
-  const handleFormSubmit = useCallback(
-    (formData: Store) => {
-      console.log('submitting form')
-      console.log(formData)
+  const handleFormSubmit = useCallback(() => {
+    const checkwords = checkPhraseConfirmWords(wordsList, sortedSelectedWords)
 
-      const checkwords = checkPhraseConfirmWords(wordsList, sortedSelectedWords)
-
-      if (checkwords) {
-        // The submitted phrase as a string for passing to wallet methods
-        onConfirm()
-        const repeatPhrase = wordsList
-          .filter((e: WordType) => e.selected === true)
-          .map((f: WordType) => {
-            return f.text
-          })
-          .join(' ')
-        console.log(repeatPhrase)
-      }
-    },
-    [checkPhraseConfirmWords, onConfirm, wordsList, sortedSelectedWords]
-  )
+    if (checkwords) {
+      onConfirm()
+        .then(() => {
+          history.push(walletRoutes.base.path())
+        })
+        .catch(() => {
+          setMnemonicError(intl.formatMessage({ id: 'wallet.create.error' }))
+        })
+    }
+  }, [checkPhraseConfirmWords, onConfirm, wordsList, sortedSelectedWords, history, intl])
   return (
     <>
       <Form labelCol={{ span: 24 }} onFinish={handleFormSubmit}>
         <Form.Item
           name="mnemonic"
-          label="Confirm Phrase"
+          label={intl.formatMessage({ id: 'wallet.create.enter.phrase' })}
           validateStatus={mnemonicError && 'error'}
           help={!!mnemonicError && mnemonicError}>
-          <Row>
-            <Col span={24}>
-              <Card bodyStyle={{ padding: '6px', minHeight: '100px' }}>
-                <div>
-                  {sortedSelectedWords.map((word) => (
-                    <Button
-                      key={word._id}
-                      disabled={!!loadingMsg}
-                      danger={word.error}
-                      onClick={() => word._id && handleRemoveWord(word._id)}
-                      style={{ margin: '6px' }}>
-                      {word.text}
-                    </Button>
-                  ))}
-                </div>
-              </Card>
-            </Col>
-          </Row>
+          <MnemonicPhrase words={sortedSelectedWords} onWordClick={handleRemoveWord} />
         </Form.Item>
 
         <Form.Item
           label={
             <>
-              Select in correct order
+              {intl.formatMessage({ id: 'wallet.create.words.click' })}
               <Button type="link" onClick={handleResetPhrase}>
                 <RedoOutlined />
               </Button>
@@ -190,7 +169,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
           <Row>
             {shuffledWordsList.map((word: WordType) => (
               <Col sm={{ span: 12 }} md={{ span: 8 }} key={word._id} style={{ padding: '6px' }}>
-                <Button type="primary" disabled={isSelected(word._id)} block onClick={() => handleAddWord(word._id)}>
+                <Button type="ghost" disabled={isSelected(word._id)} block onClick={() => handleAddWord(word._id)}>
                   {word.text}
                 </Button>
               </Col>
@@ -199,7 +178,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: Function }>
         </Form.Item>
         <Form.Item>
           <Button size="large" type="primary" htmlType="submit" block>
-            {loadingMsg || 'Confirm'}
+            {intl.formatMessage({ id: 'common.confirm' })}
           </Button>
         </Form.Item>
       </Form>
