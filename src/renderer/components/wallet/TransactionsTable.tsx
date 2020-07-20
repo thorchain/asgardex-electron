@@ -32,7 +32,9 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     title: intl.formatMessage({ id: 'common.type' }),
     align: 'left',
     width: 120,
-    render: renderTypeColumn
+    sorter: (a: Tx, b: Tx) => a.txType.localeCompare(b.txType),
+    render: renderTypeColumn,
+    sortDirections: ['descend', 'ascend']
   }
 
   const renderFromColumn = useCallback(({ fromAddr }: Tx) => <Styled.Text>{fromAddr}</Styled.Text>, [])
@@ -41,7 +43,9 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     title: intl.formatMessage({ id: 'common.from' }),
     align: 'left',
     ellipsis: true,
-    render: renderFromColumn
+    render: renderFromColumn,
+    sorter: (a: Tx, b: Tx) => a.fromAddr.localeCompare(b.fromAddr),
+    sortDirections: ['descend', 'ascend']
   }
 
   const renderToColumn = useCallback(({ toAddr }: Tx) => <Styled.Text>{toAddr}</Styled.Text>, [])
@@ -50,7 +54,9 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     title: intl.formatMessage({ id: 'common.to' }),
     align: 'left',
     ellipsis: true,
-    render: renderToColumn
+    render: renderToColumn,
+    sorter: (a: Tx, b: Tx) => a.toAddr.localeCompare(b.toAddr),
+    sortDirections: ['descend', 'ascend']
   }
 
   const renderDateColumn = useCallback(
@@ -70,12 +76,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
           </Col>
           <Col>
             <Styled.Text>
-              <FormattedTime
-                hour={isDesktopView ? '2-digit' : 'numeric'}
-                minute={isDesktopView ? '2-digit' : 'numeric'}
-                hour12={false}
-                value={date}
-              />
+              <FormattedTime hour="2-digit" minute="2-digit" second="2-digit" hour12={false} value={date} />
             </Styled.Text>
           </Col>
         </Row>
@@ -88,8 +89,11 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     key: 'timeStamp',
     title: intl.formatMessage({ id: 'common.date' }),
     align: 'left',
-    width: isDesktopView ? 200 : 120,
-    render: renderDateColumn
+    width: isDesktopView ? 200 : 180,
+    render: renderDateColumn,
+    sorter: (a: Tx, b: Tx) => new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime(),
+    sortDirections: ['descend', 'ascend'],
+    defaultSortOrder: 'descend'
   }
 
   const renderAmountColumn = useCallback(({ value }: Tx) => {
@@ -102,7 +106,9 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     key: 'value',
     title: intl.formatMessage({ id: 'common.amount' }),
     align: 'left',
-    render: renderAmountColumn
+    render: renderAmountColumn,
+    sorter: (a: Tx, b: Tx) => bnOrZero(a.value).comparedTo(bnOrZero(b.value)),
+    sortDirections: ['descend', 'ascend']
   }
 
   const renderLinkColumn = useCallback(
