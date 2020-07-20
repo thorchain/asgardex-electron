@@ -17,7 +17,8 @@ const common: CommonMessages = {
   'common.refresh': 'Rafraîchir',
   'common.remove': 'Retirer',
   'common.keystore': 'Keystore - FR',
-  'common.phrase': 'Phrase - FR'
+  'common.phrase': 'Phrase - FR',
+  'common.submit': 'Submit - FR'
 }
 
 export default common

@@ -16,6 +16,7 @@ export type CommonMessages = {
   'common.remove': string
   'common.keystore': string
   'common.phrase': string
+  'common.submit': string
 }
 
 export type PoolsMessages = {
@@ -46,6 +47,9 @@ export type WalletMessages = {
   'wallet.empty.phrase.import': string
   'wallet.empty.phrase.create': string
   'wallet.create.title': string
+  'wallet.create.creating': string
+  'wallet.create.password.repeat': string
+  'wallet.create.password.mismatch': string
   'wallet.create.copy.phrase': string
   'wallet.create.words.click': string
   'wallet.create.enter.phrase': string

@@ -27,13 +27,13 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
   const handleFormFinish = useCallback(
     async (formData: Store) => {
       try {
-        setLoadingMsg('Creating wallet...')
+        setLoadingMsg(intl.formatMessage({ id: 'wallet.create.creating' }) + '...')
         onSubmit({ phrase, password: formData.password })
       } catch (err) {
         setLoadingMsg('')
       }
     },
-    [onSubmit, phrase]
+    [onSubmit, phrase, intl]
   )
 
   const rules: Rule[] = useMemo(
@@ -44,11 +44,11 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
           if (!value || getFieldValue('password') === value) {
             return Promise.resolve()
           }
-          return Promise.reject('Password mismatch!')
+          return Promise.reject(intl.formatMessage({ id: 'wallet.create.password.mismatch' }))
         }
       })
     ],
-    []
+    [intl]
   )
 
   const copyPhraseToClipborad = useCallback(() => {
@@ -62,12 +62,16 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
       </Row>
       <MnemonicPhrase words={phraseWords} />
       <Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>
-        <Form.Item name="password" label="Password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
+        <Form.Item
+          name="password"
+          label={intl.formatMessage({ id: 'common.password' })}
+          validateTrigger={['onSubmit', 'onBlur']}
+          rules={rules}>
           <Input size="large" type="password" />
         </Form.Item>
         <Form.Item
           name="repeatPassword"
-          label="Repeat Password"
+          label={intl.formatMessage({ id: 'wallet.create.password.repeat' })}
           dependencies={['password']}
           validateTrigger={['onSubmit', 'onBlur']}
           rules={rules}>
@@ -75,7 +79,7 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
         </Form.Item>
         <Form.Item>
           <Button size="large" type="primary" htmlType="submit" block>
-            {loadingMsg || 'Submit'}
+            {loadingMsg || intl.formatMessage({ id: 'common.submit' })}
           </Button>
         </Form.Item>
       </Form>
