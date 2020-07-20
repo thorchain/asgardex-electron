@@ -17,7 +17,8 @@ const wallet: WalletMessages = {
   'wallet.unlock.phrase': 'Enter your your phrase',
   'wallet.imports.phrase': 'Phrase',
   'wallet.imports.wallet': 'Import existing wallet',
-  'wallet.imports.enterphrase': 'Enter phrase'
+  'wallet.imports.enterphrase': 'Enter phrase',
+  'wallet.txs.last90days': 'Transactions for last 90 days'
 }
 
 export default wallet

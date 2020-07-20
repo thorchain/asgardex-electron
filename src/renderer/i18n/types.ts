@@ -41,6 +41,7 @@ export type WalletMessages = {
   'wallet.imports.phrase': string
   'wallet.imports.wallet': string
   'wallet.imports.enterphrase': string
+  'wallet.txs.last90days': string
 }
 
 export type SettingMessages = {

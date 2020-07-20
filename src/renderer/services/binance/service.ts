@@ -255,9 +255,9 @@ const loadTxsOfSelectedAsset$ = (client: BinanceClient, asset: O.Option<Asset>):
   )
 
   const endTime = Date.now()
-  // Offset is set to a 89 day window - similar to ASGARDEX wallet approach,
+  // Offset is set to a 90 day window - similar to ASGARDEX wallet approach,
   // see https://gitlab.com/thorchain/asgard-wallet/-/blob/develop/imports/api/wallet.js#L39-48
-  const offset = 89 * 24 * 60 * 60 * 1000
+  const offset = 90 * 24 * 60 * 60 * 1000
   const startTime = endTime - offset
   return Rx.from(client.getTransactions({ txAsset, endTime, startTime })).pipe(
     mergeMap(({ tx }: TxPage) => Rx.of(RD.success(tx))),

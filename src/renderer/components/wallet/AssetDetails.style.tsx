@@ -2,6 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import Headline from '../uielements/headline'
 import Label from '../uielements/label'
 
 export const Card = styled(A.Card)`
@@ -125,4 +126,13 @@ export const ActionMobileWrapper = styled(Card)`
     justify-content: space-between;
     background-color: ${palette('background', 1)};
   }
+`
+type TableHeadlineProps = {
+  isDesktop: boolean
+}
+
+export const TableHeadline = styled(Headline)`
+  padding: 40px 0 20px 0;
+  width: 100%;
+  text-align: ${({ isDesktop }: TableHeadlineProps) => (isDesktop ? 'left' : 'center')};
 `

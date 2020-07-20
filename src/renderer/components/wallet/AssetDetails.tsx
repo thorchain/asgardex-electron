@@ -130,6 +130,13 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
           </Styled.Col>
         </Styled.Row>
         <Styled.Divider />
+      </Row>
+      <Row>
+        <Col span={24}>
+          <Styled.TableHeadline isDesktop={isDesktopView}>
+            {intl.formatMessage({ id: 'wallet.txs.last90days' })}
+          </Styled.TableHeadline>
+        </Col>
         <Col span={24}>
           <TransactionsTable txsRD={txsRD} address={address} clickTxLinkHandler={clickTxLinkHandler} />
         </Col>
