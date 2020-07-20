@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Col, Row } from 'antd'
+import { Col } from 'antd'
 
 import * as Styled from './MnemonicPhrase.styles'
 import { WordType } from './NewMnemonicConfirm'
@@ -14,7 +14,7 @@ type Props = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MnemonicPhrase = React.forwardRef<any, Props>(({ words, onWordClick, readOnly }, ref) => {
   return (
-    <Row ref={ref}>
+    <Styled.Row ref={ref}>
       <Col span={24}>
         <Styled.Card bodyStyle={{ padding: '6px', minHeight: '100px' }}>
           <div>
@@ -34,6 +34,6 @@ export const MnemonicPhrase = React.forwardRef<any, Props>(({ words, onWordClick
           </div>
         </Styled.Card>
       </Col>
-    </Row>
+    </Styled.Row>
   )
 })

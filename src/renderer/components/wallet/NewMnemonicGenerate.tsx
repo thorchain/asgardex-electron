@@ -1,15 +1,16 @@
 import React, { useState, useCallback, useMemo } from 'react'
 
 import { generatePhrase } from '@thorchain/asgardex-crypto'
-import { Form, Button, Row } from 'antd'
+import { Row } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import { useIntl } from 'react-intl'
 
-import { RefreshButton } from '../uielements/button/'
+import Button, { RefreshButton } from '../uielements/button/'
 import { InputPassword as Input } from '../uielements/input'
 import Label from '../uielements/label'
 import { MnemonicPhrase } from './MnemonicPhrase'
+import * as Styled from './NewMnemonicGenerate.styles'
 
 export type MnemonicInfo = { phrase: string; password: string }
 
@@ -61,28 +62,33 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
         <RefreshButton clickHandler={() => setPhrase(generatePhrase())} />
       </Row>
       <MnemonicPhrase words={phraseWords} readOnly={true} />
-      <Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>
-        <Form.Item
-          name="password"
-          label={intl.formatMessage({ id: 'common.password' })}
-          validateTrigger={['onSubmit', 'onBlur']}
-          rules={rules}>
-          <Input size="large" type="password" />
-        </Form.Item>
-        <Form.Item
-          name="repeatPassword"
-          label={intl.formatMessage({ id: 'wallet.create.password.repeat' })}
-          dependencies={['password']}
-          validateTrigger={['onSubmit', 'onBlur']}
-          rules={rules}>
-          <Input size="large" type="password" />
-        </Form.Item>
-        <Form.Item>
-          <Button size="large" type="primary" htmlType="submit" block>
+      <Styled.Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>
+        <Styled.PasswordContainer>
+          <Styled.PasswordItem name="password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
+            <Input
+              size="large"
+              type="password"
+              placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
+            />
+          </Styled.PasswordItem>
+          <Styled.PasswordItem
+            name="repeatPassword"
+            dependencies={['password']}
+            validateTrigger={['onSubmit', 'onBlur']}
+            rules={rules}>
+            <Input
+              size="large"
+              type="password"
+              placeholder={intl.formatMessage({ id: 'wallet.create.password.repeat' }).toUpperCase()}
+            />
+          </Styled.PasswordItem>
+        </Styled.PasswordContainer>
+        <Styled.SubmitItem>
+          <Button size="large" type="primary" round="true" htmlType="submit">
             {loadingMsg || intl.formatMessage({ id: 'common.submit' })}
           </Button>
-        </Form.Item>
-      </Form>
+        </Styled.SubmitItem>
+      </Styled.Form>
     </>
   )
 }

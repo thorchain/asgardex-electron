@@ -16,3 +16,7 @@ export const Button = styled(A.Button)<{ readOnly?: boolean }>`
     background: ${(props) => (props?.readOnly ? 'none' : palette('gray', 0))};
   }
 `
+
+export const Row = styled(A.Row)`
+  margin-bottom: 32px;
+`
