@@ -56,7 +56,6 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: () => Promi
 }): JSX.Element => {
   const [wordsList, setWordsList] = useState<WordType[]>([])
   const [shuffledWordsList, setShuffledWordsList] = useState<WordType[]>([])
-  const [loadingMsg] = useState<string>('')
   const [mnemonicError, setMnemonicError] = useState<string>('')
   const [initialized, setInitialized] = useState<boolean>(false)
   const intl = useIntl()
@@ -179,7 +178,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: () => Promi
         </Form.Item>
         <Form.Item>
           <Button size="large" type="primary" htmlType="submit" block>
-            {loadingMsg || intl.formatMessage({ id: 'common.confirm' })}
+            {intl.formatMessage({ id: 'common.confirm' })}
           </Button>
         </Form.Item>
       </Form>
