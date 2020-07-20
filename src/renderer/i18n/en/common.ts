@@ -21,7 +21,9 @@ const common: CommonMessages = {
   'common.keystore': 'Keystore',
   'common.phrase': 'Phrase',
   'common.submit': 'Submit',
-  'common.confirm': 'Confirm'
+  'common.confirm': 'Confirm',
+  'common.next': 'Next',
+  'common.finish': 'Finish'
 }
 
 export default common

@@ -4,11 +4,13 @@ import { palette } from 'styled-theme'
 
 export const Card = styled(A.Card)`
   border-color: ${palette('primary', 0)};
+  background: transparent;
 `
 
 export const Button = styled(A.Button)<{ readOnly?: boolean }>`
   font-weight: bold;
   cursor: ${(props) => (props?.readOnly ? 'default' : 'pointer')};
+  color: ${palette('text', 0)};
 
   &:hover,
   &:active,

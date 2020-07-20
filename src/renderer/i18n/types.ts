@@ -20,6 +20,8 @@ export type CommonMessages = {
   'common.phrase': string
   'common.submit': string
   'common.confirm': string
+  'common.next': string
+  'common.finish': string
 }
 
 export type PoolsMessages = {

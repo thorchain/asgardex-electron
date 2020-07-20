@@ -1,14 +1,12 @@
 import React, { useState, useCallback, useMemo } from 'react'
 
 import { generatePhrase } from '@thorchain/asgardex-crypto'
-import { Row } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import { useIntl } from 'react-intl'
 
 import Button, { RefreshButton } from '../uielements/button/'
 import { InputPassword as Input } from '../uielements/input'
-import Label from '../uielements/label'
 import { MnemonicPhrase } from './MnemonicPhrase'
 import * as Styled from './NewMnemonicGenerate.styles'
 
@@ -57,10 +55,12 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
   }, [phrase])
   return (
     <>
-      <Row justify="space-between">
-        <Label onClick={copyPhraseToClipborad}>{intl.formatMessage({ id: 'wallet.create.copy.phrase' })}</Label>
+      <Styled.TitleContainer justify="space-between">
+        <Styled.CopyText copyable={{ onCopy: copyPhraseToClipborad }}>
+          {intl.formatMessage({ id: 'wallet.create.copy.phrase' })}
+        </Styled.CopyText>
         <RefreshButton clickHandler={() => setPhrase(generatePhrase())} />
-      </Row>
+      </Styled.TitleContainer>
       <MnemonicPhrase words={phraseWords} readOnly={true} />
       <Styled.Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>
         <Styled.PasswordContainer>
@@ -85,7 +85,7 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
         </Styled.PasswordContainer>
         <Styled.SubmitItem>
           <Button size="large" type="primary" round="true" htmlType="submit">
-            {loadingMsg || intl.formatMessage({ id: 'common.submit' })}
+            {loadingMsg || intl.formatMessage({ id: 'common.next' })}
           </Button>
         </Styled.SubmitItem>
       </Styled.Form>

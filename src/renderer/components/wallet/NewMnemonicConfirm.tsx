@@ -178,7 +178,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: () => Promi
         </Form.Item>
         <Form.Item>
           <Button size="large" type="primary" htmlType="submit" block>
-            {intl.formatMessage({ id: 'common.confirm' })}
+            {intl.formatMessage({ id: 'common.finish' })}
           </Button>
         </Form.Item>
       </Form>
