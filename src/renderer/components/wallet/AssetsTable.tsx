@@ -13,8 +13,8 @@ import {
 } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
+import { sequenceT } from 'fp-ts/lib/Apply'
 import * as FP from 'fp-ts/lib/function'
-import { Option, some, none } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
@@ -44,14 +44,13 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const intl = useIntl()
 
   // store previous data of balances to still render these while reloading new data
-  const previousBalances = useRef<Option<Balances>>(none)
+  const previousBalances = useRef<O.Option<Balances>>(O.none)
 
   const iconColumn: ColumnType<Balance> = useMemo(
     () => ({
-      key: 'icon',
+      key: 'symbol',
       title: '',
-      dataIndex: 'symbol',
-      render: (_, { symbol }) => {
+      render: ({ symbol }: Balance) => {
         const asset = assetFromString(`BNB.${symbol}`) || EMPTY_ASSET
         return <AssetIcon asset={asset} size="normal" />
       }
@@ -61,45 +60,56 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
 
   const nameColumn: ColumnType<Balance> = useMemo(
     () => ({
+      key: 'symbol',
       title: intl.formatMessage({ id: 'wallet.column.name' }),
       align: 'left',
-      dataIndex: 'symbol',
-      render: (_, { symbol }) => <Label>{symbol}</Label>
+      render: ({ symbol }: Balance) => <Label>{symbol}</Label>,
+      sorter: (a: Balance, b: Balance) => a.symbol.localeCompare(b.symbol),
+      sortDirections: ['descend', 'ascend'],
+      defaultSortOrder: 'ascend'
     }),
     [intl]
   )
 
   const tickerColumn: ColumnType<Balance> = useMemo(
     () => ({
+      key: 'symbol',
       title: intl.formatMessage({ id: 'wallet.column.ticker' }),
       align: 'left',
-      dataIndex: 'symbol',
-      render: (_, { symbol }) => <Label>{bncSymbolToAsset(symbol)?.ticker ?? ''}</Label>
+      render: ({ symbol }: Balance) => <Label>{bncSymbolToAsset(symbol)?.ticker ?? ''}</Label>,
+      sorter: (a: Balance, b: Balance) => {
+        const tickerA = bncSymbolToAsset(a.symbol)?.ticker ?? ''
+        const tickerB = bncSymbolToAsset(b.symbol)?.ticker ?? ''
+        return tickerA.localeCompare(tickerB)
+      },
+      sortDirections: ['descend', 'ascend']
     }),
     [intl]
   )
 
   const balanceColumn: ColumnType<Balance> = useMemo(
     () => ({
+      key: 'free',
       title: intl.formatMessage({ id: 'wallet.column.balance' }),
       align: 'left',
-      dataIndex: 'free',
-      render: (_, { free, symbol }) => {
+      render: ({ free, symbol }: Balance) => {
         const amount = assetAmount(bnOrZero(free))
         const asset = bncSymbolToAssetString(symbol)
         const label = formatAssetAmountCurrency(amount, asset, 3)
         return <Label>{label}</Label>
-      }
+      },
+      sorter: (a: Balance, b: Balance) => bnOrZero(a.free).comparedTo(bnOrZero(b.free)),
+      sortDirections: ['descend', 'ascend']
     }),
     [intl]
   )
 
   const priceColumn: ColumnType<Balance> = useMemo(
     () => ({
+      key: 'free',
       title: intl.formatMessage({ id: 'wallet.column.value' }),
       align: 'left',
-      dataIndex: 'free',
-      render: (_, balance) => {
+      render: (balance: Balance) => {
         const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
         const label = FP.pipe(
           oPrice,
@@ -110,9 +120,15 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
         return <Label>{label}</Label>
       },
       sorter: (a: Balance, b: Balance) => {
-        const aAmount = bnOrZero(a.free)
-        const bAmount = bnOrZero(b.free)
-        return aAmount.minus(bAmount).toNumber()
+        const oPriceA = getPoolPriceValue(a, poolDetails, pricePool.poolData)
+        const oPriceB = getPoolPriceValue(b, poolDetails, pricePool.poolData)
+        return FP.pipe(
+          sequenceT(O.option)(oPriceA, oPriceB),
+          O.fold(
+            () => 0,
+            ([priceA, priceB]) => priceA.amount().comparedTo(priceB.amount())
+          )
+        )
       },
       sortDirections: ['descend', 'ascend']
     }),
@@ -166,7 +182,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
           },
           // success state
           (balances: Balances): JSX.Element => {
-            previousBalances.current = some(balances)
+            previousBalances.current = O.some(balances)
             return renderAssetsTable(balances)
           }
         )(balancesRD)}
