@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react'
 
 import { Row, Dropdown } from 'antd'
-import { ClickParam } from 'antd/lib/menu'
+import { MenuProps } from 'antd/lib/menu'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { LOCALES } from '../../i18n'
@@ -24,8 +24,8 @@ type Props = {
 const HeaderLang: React.FC<Props> = (props: Props): JSX.Element => {
   const { isDesktopView, changeLocale = () => {}, locale } = props
 
-  const changeLang = useCallback(
-    ({ key }: ClickParam) => {
+  const changeLang: MenuProps['onClick'] = useCallback(
+    ({ key }) => {
       changeLocale(key as Locale)
     },
     [changeLocale]

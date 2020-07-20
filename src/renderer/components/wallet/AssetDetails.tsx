@@ -107,9 +107,8 @@ const AssetDetails: React.FC = (): JSX.Element => {
             </>
           )}
         </Col>
-
+        www
         <StyledDivider />
-
         <StyledRow>
           <StyledCol sm={{ span: 24 }} md={{ span: 12 }}>
             <ActionComponent bordered={false}>

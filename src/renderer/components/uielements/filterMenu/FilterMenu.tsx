@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { SearchOutlined } from '@ant-design/icons'
-import { ClickParam } from 'antd/lib/menu'
+import { MenuProps } from 'antd/lib/menu'
 
 import { Input } from '../input'
 import { Menu, MenuItem } from './FilterMenu.style'
@@ -30,8 +30,8 @@ const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
 
   const [searchTerm, setSearchTerm] = useState('')
 
-  const handleClick = useCallback(
-    (event: ClickParam) => {
+  const handleClick: MenuProps['onClick'] = useCallback(
+    (event) => {
       // (Rudi) bail if this is triggered by the search menu item
       if (!event || !event.key || event.key === '_search') return
 
