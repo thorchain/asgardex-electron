@@ -7,7 +7,7 @@ export const StyledMenu = styled(Menu)`
   display: flex;
   justify-content: center;
   align-items: center;
-  border-bottom: 0.5px solid #969dab;
+  border-bottom: 1px solid ${palette('gray', 1)};
 
   .ant-menu-item:hover,
   .ant-menu-submenu:hover,

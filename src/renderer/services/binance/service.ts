@@ -1,5 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { WS, Client, Network as BinanceNetwork, BinanceClient, Address } from '@thorchain/asgardex-binance'
+import { WS, Client, Network as BinanceNetwork, BinanceClient, Address, TxPage } from '@thorchain/asgardex-binance'
+import { Asset } from '@thorchain/asgardex-util'
+import { sequenceT } from 'fp-ts/lib/Apply'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import { none, some } from 'fp-ts/lib/Option'
@@ -14,7 +16,7 @@ import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
-import { BalancesRD, BinanceClientStateForViews, BinanceClientState } from './types'
+import { BalancesRD, BinanceClientStateForViews, BinanceClientState, TxsRD } from './types'
 import { getBinanceClientStateForViews, getBinanceClient } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
@@ -237,6 +239,80 @@ const balancesState$: Observable<BalancesRD> = Rx.combineLatest(
   shareReplay()
 )
 
+const { get$: selectedAsset$, set: setSelectedAsset } = observableState<O.Option<Asset>>(O.none)
+
+/**
+ * Observable to load txs from Binance API endpoint
+ * If client is not available, it returns an `initial` state
+ */
+const loadTxsOfSelectedAsset$ = (client: BinanceClient, asset: O.Option<Asset>): Observable<TxsRD> => {
+  const txAsset = FP.pipe(
+    asset,
+    O.fold(
+      () => undefined,
+      (asset) => asset.symbol
+    )
+  )
+
+  const endTime = Date.now()
+  // Offset is set to a 90 day window - similar to ASGARDEX wallet approach,
+  // see https://gitlab.com/thorchain/asgard-wallet/-/blob/develop/imports/api/wallet.js#L39-48
+  const offset = 90 * 24 * 60 * 60 * 1000
+  const startTime = endTime - offset
+  return Rx.from(client.getTransactions({ txAsset, endTime, startTime })).pipe(
+    mergeMap(({ tx }: TxPage) => Rx.of(RD.success(tx))),
+    catchError((error) => Rx.of(RD.failure(error))),
+    startWith(RD.pending),
+    retry(BINANCE_MAX_RETRY)
+  )
+}
+
+// `TriggerStream` to reload `Txs`
+const { stream$: reloadTxsSelectedAsset$, trigger: reloadTxssSelectedAsset } = triggerStream()
+
+/**
+ * State of `Txs`
+ *
+ * Data will be loaded by first subscription only
+ * If a client is not available (e.g. by removing keystore), it returns an `initial` state
+ */
+const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest(
+  clientState$,
+  reloadTxsSelectedAsset$.pipe(debounceTime(300)),
+  selectedAsset$
+).pipe(
+  mergeMap(([clientState, _, oAsset]) => {
+    const client = getBinanceClient(clientState)
+    return FP.pipe(
+      // client and asset has to be available
+      sequenceT(O.option)(client, oAsset),
+      O.fold(
+        () => Rx.of(RD.initial as TxsRD),
+        ([clientState, asset]) => loadTxsOfSelectedAsset$(clientState, O.some(asset))
+      )
+    )
+  }),
+  // cache it to avoid reloading data by every subscription
+  shareReplay()
+)
+
+/**
+ * Explorer url depending on selected network
+ *
+ * If a client is not available (e.g. by removing keystore), it returns `None`
+ *
+ */
+const explorerUrl$: Observable<O.Option<string>> = clientState$.pipe(
+  mergeMap((clientState) =>
+    Rx.of(
+      FP.pipe(
+        getBinanceClient(clientState),
+        O.chain((client) => some(client.getExplorerUrl()))
+      )
+    )
+  ),
+  shareReplay()
+)
 /**
  * Object with all "public" functions and observables
  */
@@ -247,6 +323,11 @@ export {
   setKeystoreState,
   clientViewState$,
   balancesState$,
+  setSelectedAsset,
   reloadBalances,
-  address$
+  txsSelectedAsset$,
+  reloadTxssSelectedAsset,
+  address$,
+  selectedAsset$,
+  explorerUrl$
 }

@@ -1,11 +1,12 @@
 import React, { useCallback, useMemo } from 'react'
 
+import { Row } from 'antd'
 import * as H from 'history'
 import { useObservableState } from 'observable-hooks'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
+import { RefreshButton } from '../../components/uielements/button/'
 import AssetsNav from '../../components/wallet/AssetsNav'
-import RefreshButton from '../../components/wallet/RefreshButton'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
@@ -33,13 +34,13 @@ const WalletView: React.FC = (): JSX.Element => {
   // we have to add 'undefined'  as default value
   const keystore = useObservableState(keystoreService.keystore$, undefined)
 
-  const reloadButton = useMemo(
-    () => (
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <RefreshButton onRefresh={reloadBalances} />
-      </div>
+  const reloadButton = useCallback(
+    (onClickHandler) => (
+      <Row justify="end" style={{ marginBottom: '20px' }}>
+        <RefreshButton clickHandler={onClickHandler} />
+      </Row>
     ),
-    [reloadBalances]
+    []
   )
 
   // Following routes are accessable only,
@@ -55,17 +56,17 @@ const WalletView: React.FC = (): JSX.Element => {
             <SettingsView />
           </Route>
           <Route path={walletRoutes.assets.template} exact>
-            {reloadButton}
+            {reloadButton(reloadBalances)}
             <AssetsNav />
             <AssetsView />
           </Route>
           <Route path={walletRoutes.stakes.template} exact>
-            {reloadButton}
+            {reloadButton(reloadBalances)}
             <AssetsNav />
             <StakesView />
           </Route>
           <Route path={walletRoutes.bonds.template} exact>
-            {reloadButton}
+            {reloadButton(reloadBalances)}
             <AssetsNav />
             <BondsView />
           </Route>
@@ -81,7 +82,7 @@ const WalletView: React.FC = (): JSX.Element => {
         </Switch>
       </>
     ),
-    [reloadButton]
+    [reloadBalances, reloadButton]
   )
 
   const renderWalletRoute = useCallback(

@@ -7,6 +7,7 @@ export type CommonMessages = {
   'common.type': string
   'common.address': string
   'common.to': string
+  'common.from': string
   'common.amount': string
   'common.coin': string
   'common.password': string
@@ -14,6 +15,7 @@ export type CommonMessages = {
   'common.refresh': string
   'common.date': string
   'common.remove': string
+  'common.back': string
   'common.keystore': string
   'common.phrase': string
   'common.submit': string
@@ -43,6 +45,7 @@ export type WalletMessages = {
   'wallet.imports.phrase': string
   'wallet.imports.wallet': string
   'wallet.imports.enterphrase': string
+  'wallet.txs.last90days': string
   'wallet.empty.action.import': string
   'wallet.empty.action.create': string
   'wallet.empty.phrase.import': string

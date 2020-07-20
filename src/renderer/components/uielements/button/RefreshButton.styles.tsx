@@ -1,8 +1,7 @@
 import styled from 'styled-components'
 
-import Button from '../uielements/button'
+import Button from './button'
 
 export const RefreshButton = styled(Button)`
-  margin-bottom: 20px;
   box-shadow: none;
 `

@@ -18,6 +18,7 @@ const wallet: WalletMessages = {
   'wallet.imports.phrase': 'Phrase',
   'wallet.imports.wallet': 'Import existing wallet - FR',
   'wallet.imports.enterphrase': 'Entrez une phrase',
+  'wallet.txs.last90days': 'Transactions for last 90 days - FR',
   'wallet.empty.action.import': 'Import - FR',
   'wallet.empty.action.create': 'Create - FR',
   'wallet.empty.phrase.import': 'Import an existing wallet with funds on it - FR',

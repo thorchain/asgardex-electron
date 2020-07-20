@@ -50,11 +50,11 @@
   "homepage": "https://thorchain.org",
   "dependencies": {
     "@ant-design/icons": "^4.2.1",
-    "@binance-chain/javascript-sdk": "3.0.2-alpha.11",
+    "@binance-chain/javascript-sdk": "^4.0.5",
     "@craco/craco": "^5.6.4",
     "@devexperts/remote-data-ts": "^2.0.3",
     "@openapitools/openapi-generator-cli": "^1.0.13-4.3.1",
-    "@thorchain/asgardex-binance": "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#529d099269da893f7ee1f3785d91f674684acbf2",
+    "@thorchain/asgardex-binance": "^2.0.0",
     "@thorchain/asgardex-crypto": "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git",
     "@thorchain/asgardex-theme": "^0.1.1",
     "@thorchain/asgardex-util": "^0.3.0",

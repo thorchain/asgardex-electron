@@ -1184,10 +1184,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@binance-chain/javascript-sdk@3.0.2-alpha.11":
-  version "3.0.2-alpha.11"
-  resolved "https://registry.yarnpkg.com/@binance-chain/javascript-sdk/-/javascript-sdk-3.0.2-alpha.11.tgz#c805bbb0d95f52487e6ce14b6a60b4d2788278b5"
-  integrity sha512-HYpkoo32c5Th9zud5S6OVYycGamqBPgDHO/fZQ8GZvnDGmwN1gW7eJgJ6citC65AblaEqjBwo5TCt5cx5qSx0g==
+"@binance-chain/javascript-sdk@^4.0.5":
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/@binance-chain/javascript-sdk/-/javascript-sdk-4.0.5.tgz#9225b81b45d6823784dc59fe73e223c651037ffa"
+  integrity sha512-vlIaY/Gc5rN1hBAEPvXr5LyHnXlA5/0NkdPSI5hRfiRcixhFj7/Iso5CTg4kI/xKr3JFtfyLFo6fWqyoP8IgYA==
   dependencies:
     "@babel/runtime" "^7.10.4"
     "@ledgerhq/hw-transport-u2f" "^5.9.0"
@@ -1210,6 +1210,7 @@
     bip32 "^2.0.5"
     bip39 "^3.0.2"
     bn.js "^4.11.8"
+    camelcase "^5.3.1"
     crypto-browserify "^3.12.0"
     crypto-js "^3.1.9-1"
     elliptic "^6.0.0"
@@ -1217,6 +1218,7 @@
     events "^3.0.0"
     is_js "^0.9.0"
     lodash "^4.17.15"
+    minimist "^1.2.5"
     ndjson "^1.5.0"
     protocol-buffers-encodings "^1.1.0"
     pumpify "^2.0.1"
@@ -2464,9 +2466,10 @@
   dependencies:
     "@babel/runtime" "^7.10.2"
 
-"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#529d099269da893f7ee1f3785d91f674684acbf2":
-  version "1.0.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#529d099269da893f7ee1f3785d91f674684acbf2"
+"@thorchain/asgardex-binance@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-binance/-/asgardex-binance-2.0.0.tgz#0a82c9db499bd7242841675839e89f773aad131c"
+  integrity sha512-BaOdsrOzEXaD98npbIyyVMtoA6JTc6BrC+HLQzg74GmKK8O2YOR8oa/l7rynArxMPVBaIZe6j18KfKfwO2fQzg==
 
 "@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git":
   version "0.1.0"

@@ -10,7 +10,12 @@ import {
   setKeystoreState,
   clientViewState$,
   setNetworkState,
-  address$
+  address$,
+  setSelectedAsset,
+  txsSelectedAsset$,
+  selectedAsset$,
+  reloadTxssSelectedAsset,
+  explorerUrl$
 } from '../services/binance/service'
 import { useAppContext } from './AppContext'
 import { useWalletContext } from './WalletContext'
@@ -21,7 +26,12 @@ type BinanceContextValue = {
   clientViewState$: typeof clientViewState$
   reloadBalances: typeof reloadBalances
   balancesState$: typeof balancesState$
+  setSelectedAsset: typeof setSelectedAsset
+  txsSelectedAsset$: typeof txsSelectedAsset$
+  reloadTxssSelectedAsset: typeof reloadTxssSelectedAsset
+  selectedAsset$: typeof selectedAsset$
   address$: typeof address$
+  explorerUrl$: typeof explorerUrl$
 }
 
 const initialContext = {
@@ -30,7 +40,12 @@ const initialContext = {
   clientViewState$,
   reloadBalances,
   balancesState$,
-  address$
+  setSelectedAsset,
+  txsSelectedAsset$,
+  reloadTxssSelectedAsset,
+  selectedAsset$,
+  address$,
+  explorerUrl$
 }
 
 const BinanceContext = createContext<BinanceContextValue | null>(null)

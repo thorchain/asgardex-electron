@@ -6,10 +6,10 @@ import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import { useIntl } from 'react-intl'
 
+import { RefreshButton } from '../uielements/button/'
 import { InputPassword as Input } from '../uielements/input'
 import Label from '../uielements/label'
 import { MnemonicPhrase } from './MnemonicPhrase'
-import RefreshButton from './RefreshButton'
 
 export type MnemonicInfo = { phrase: string; password: string }
 
@@ -58,7 +58,7 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
     <>
       <Row justify="space-between">
         <Label onClick={copyPhraseToClipborad}>{intl.formatMessage({ id: 'wallet.create.copy.phrase' })}</Label>
-        <RefreshButton onRefresh={() => setPhrase(generatePhrase())} />
+        <RefreshButton clickHandler={() => setPhrase(generatePhrase())} />
       </Row>
       <MnemonicPhrase words={phraseWords} />
       <Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>

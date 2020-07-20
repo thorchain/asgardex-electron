@@ -17,6 +17,7 @@ const AssetsView: React.FC = (): JSX.Element => {
   const {
     service: { poolsState$, selectedPricePoolAsset$ }
   } = useMidgardContext()
+
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<O.Option<PricePoolAsset>>(
     selectedPricePoolAsset$,
@@ -28,9 +29,18 @@ const AssetsView: React.FC = (): JSX.Element => {
     selectedPricePoolAsset
   ])
 
+  const { setSelectedAsset } = useBinanceContext()
+
   const poolDetails = RD.toNullable(poolsRD)?.poolDetails ?? []
 
-  return <AssetsTable balances={balancesRD} pricePool={pricePool} poolDetails={poolDetails} />
+  return (
+    <AssetsTable
+      balancesRD={balancesRD}
+      pricePool={pricePool}
+      poolDetails={poolDetails}
+      selectAssetHandler={setSelectedAsset}
+    />
+  )
 }
 
 export default AssetsView

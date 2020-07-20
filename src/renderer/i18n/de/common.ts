@@ -6,20 +6,22 @@ const common: CommonMessages = {
   'common.faqs': 'FAQs',
   'common.greeting': 'Hallo {name}',
   'common.copyright': '©',
-  'common.type': 'Type - DE',
-  'common.address': 'Address - DE',
-  'common.to': 'To - DE',
-  'common.amount': 'Amount - DE',
-  'common.coin': 'Coin - DE',
+  'common.type': 'Typ',
+  'common.address': 'Addresse',
+  'common.to': 'Zu',
+  'common.from': 'Von',
+  'common.amount': 'Wert',
+  'common.coin': 'Coin',
   'common.password': 'Passwort',
-  'common.memo': 'Memo - DE',
+  'common.memo': 'Memo',
   'common.refresh': 'Aktualisieren',
-  'common.date': 'Date - DE',
+  'common.back': 'Zurück',
+  'common.date': 'Datum',
   'common.remove': 'Entfernen',
-  'common.keystore': 'Keystore - DE',
-  'common.phrase': 'Phrase - DE',
-  'common.submit': 'Submit - DE',
-  'common.confirm': 'Confirm - DE'
+  'common.keystore': 'Keystore',
+  'common.phrase': 'Phrase',
+  'common.submit': 'Abschicken',
+  'common.confirm': 'Bestätigen'
 }
 
 export default common

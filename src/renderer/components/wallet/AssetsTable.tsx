@@ -8,7 +8,8 @@ import {
   bnOrZero,
   formatAssetAmountCurrency,
   baseToAsset,
-  assetFromString
+  assetFromString,
+  Asset
 } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
@@ -30,13 +31,14 @@ import Label from '../uielements/label'
 import { TableWrapper } from './AssetsTable.style'
 
 type Props = {
-  balances: BalancesRD
+  balancesRD: BalancesRD
   pricePool?: PricePool
   poolDetails: PoolDetails
+  selectAssetHandler?: (asset: O.Option<Asset>) => void
 }
 
 const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
-  const { balances: balancesRD, pricePool = RUNE_PRICE_POOL, poolDetails } = props
+  const { balancesRD, pricePool = RUNE_PRICE_POOL, poolDetails, selectAssetHandler = (_) => {} } = props
 
   const history = useHistory()
   const intl = useIntl()
@@ -120,14 +122,16 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const columns = [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn]
 
   const onRow = useCallback(
-    (record: Balance) => {
+    ({ symbol }: Balance) => {
       return {
         onClick: () => {
-          history.push(walletRoutes.assetDetails.path({ symbol: record.symbol }))
+          const asset = O.fromNullable(assetFromString(`BNB.${symbol}`))
+          selectAssetHandler(asset)
+          history.push(walletRoutes.assetDetails.path({ symbol }))
         }
       }
     },
-    [history]
+    [history, selectAssetHandler]
   )
   const renderAssetsTable = useCallback(
     (balances: Balances, loading = false) => {
