@@ -10,6 +10,13 @@ export const SectionTitle = styled(A.Typography.Text)`
   text-transform: uppercase;
   font-size: 16px;
   color: ${palette('gray', 2)};
+
+  // Copy to Clipboard and reset mnemonic phrase action icons
+  // Keep them here together to avoid inconsistency
+  > [role='button'],
+  button {
+    color: ${palette('primary', 0)};
+  }
 `
 
 export const Form = styled(A.Form)`

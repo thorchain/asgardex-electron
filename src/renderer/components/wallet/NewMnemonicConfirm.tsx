@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { RedoOutlined } from '@ant-design/icons'
+import { DeleteOutlined, RedoOutlined } from '@ant-design/icons'
 import { Col, Row, Button as AButton, Form } from 'antd'
 import shuffleArray from 'lodash.shuffle'
 import { useIntl } from 'react-intl'
@@ -158,7 +158,7 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: () => Promi
       </MnemonicStyled.TitleContainer>
       <MnemonicStyled.Form labelCol={{ span: 24 }} onFinish={handleFormSubmit}>
         <Form.Item name="mnemonic" validateStatus={mnemonicError && 'error'} help={!!mnemonicError && mnemonicError}>
-          <MnemonicPhrase words={sortedSelectedWords} onWordClick={handleRemoveWord} />
+          <MnemonicPhrase wordIcon={<DeleteOutlined />} words={sortedSelectedWords} onWordClick={handleRemoveWord} />
         </Form.Item>
 
         <MnemonicPhraseStyled.EnterPhraseContainer
