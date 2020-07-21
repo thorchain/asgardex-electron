@@ -10756,7 +10756,7 @@ jest-config@^24.9.0:
     pretty-format "^24.9.0"
     realpath-native "^1.1.0"
 
-jest-diff@^24.9.0:
+jest-diff@24.9.0, jest-diff@^24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/jest-diff/-/jest-diff-24.9.0.tgz#931b7d0d5778a1baf7452cb816e325e3724055da"
   integrity sha512-qMfrTs8AdJE2iqrTp0hzh7kTd2PQWrsFyj9tORoKmu32xjPjeE4NyjVRDz8ybYwqS2ik8N4hsIpiVTyFeo2lBQ==
@@ -10888,7 +10888,15 @@ jest-leak-detector@^24.9.0:
     jest-get-type "^24.9.0"
     pretty-format "^24.9.0"
 
-jest-matcher-utils@^24.9.0:
+jest-marbles@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/jest-marbles/-/jest-marbles-2.5.1.tgz#4a869fdea1b59d65f205a24bbfb3b7105f1b164b"
+  integrity sha512-BsHEqrHLMTsfqagWeWJ+vJrSPNcn7vIFpx+e4G/sKGnx8JLDniRBbiwtHfUP5yoQtXDi+56I6atr5WdgJUknmw==
+  dependencies:
+    jest-diff "24.9.0"
+    jest-matcher-utils "24.9.0"
+
+jest-matcher-utils@24.9.0, jest-matcher-utils@^24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/jest-matcher-utils/-/jest-matcher-utils-24.9.0.tgz#f5b3661d5e628dffe6dd65251dfdae0e87c3a073"
   integrity sha512-OZz2IXsu6eaiMAwe67c1T+5tUAtQyQx27/EMEkbFAGiw52tB9em+uGbzpcgYVpA8wl0hlxKPZxrly4CXU/GjHA==
