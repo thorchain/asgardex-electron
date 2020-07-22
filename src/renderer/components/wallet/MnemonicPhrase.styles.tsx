@@ -9,6 +9,12 @@ export const Card = styled(A.Card).attrs({
   background: transparent;
 `
 
+const iconClassName = 'mnemonic-word__icon'
+export const IconWrapper = styled('span').attrs({ className: iconClassName })`
+  margin-left: 8px;
+  opacity: 0;
+`
+
 export const Button = styled(A.Button)<{ readOnly?: boolean }>`
   font-weight: bold;
   cursor: ${(props) => (props?.readOnly ? 'default' : 'pointer')};
@@ -18,6 +24,10 @@ export const Button = styled(A.Button)<{ readOnly?: boolean }>`
   &:active,
   &:focus {
     background: ${(props) => (props?.readOnly ? 'none' : palette('gray', 0))};
+
+    .${iconClassName} {
+      opacity: 1;
+    }
   }
 `
 

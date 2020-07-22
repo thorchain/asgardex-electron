@@ -31,7 +31,7 @@ export const MnemonicPhrase = React.forwardRef<any, Props>(
                     onClick={readOnly ? undefined : () => onWordClick(word._id)}
                     style={{ margin: '6px' }}>
                     {word.text}
-                    {wordIcon}
+                    <Styled.IconWrapper>{wordIcon}</Styled.IconWrapper>
                   </Styled.Button>
                 </Col>
               ))}
