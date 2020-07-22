@@ -1,26 +1,25 @@
 import { tap, map, withLatestFrom } from 'rxjs/operators'
 
-import { createScheduler } from '../../tests/util'
 import { network$, toggleNetwork, onlineStatus$ } from './service'
 import { Network, OnlineStatus } from './types'
 
 describe('services/app/service/', () => {
   describe('network$', () => {
     it('returns testnet by default', () => {
-      createScheduler().run(({ expectObservable }) => {
+      runObservable(({ expectObservable }) => {
         expectObservable(network$).toBe('a', { a: Network.TEST })
       })
     })
 
     it('returns mainnet by toggleNetwork() before', () => {
-      createScheduler().run(({ expectObservable }) => {
+      runObservable(({ expectObservable }) => {
         toggleNetwork()
         expectObservable(network$).toBe('a', { a: Network.MAIN })
       })
     })
 
     it('calling toggleNetwork() four times changes network four times', () => {
-      createScheduler().run(({ cold, expectObservable }) => {
+      runObservable(({ cold, expectObservable }) => {
         const values = { a: 1, b: Network.TEST, c: Network.MAIN }
         const toggle = '--a----a--a--a'
         const result = '--b----c--b--c'
@@ -36,7 +35,7 @@ describe('services/app/service/', () => {
 
   describe('onlineStatus$', () => {
     it('changes status different times', () => {
-      createScheduler().run(({ cold, expectObservable }) => {
+      runObservable(({ cold, expectObservable }) => {
         const online = () => window.dispatchEvent(new Event('online'))
         const offline = () => window.dispatchEvent(new Event('offline'))
 
