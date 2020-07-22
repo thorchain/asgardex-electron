@@ -23,7 +23,7 @@ const wallet: WalletMessages = {
   'wallet.empty.action.create': 'Create',
   'wallet.empty.phrase.import': 'Import an existing wallet with funds on it',
   'wallet.empty.phrase.create': 'Create a new wallet, and funds on it',
-  'wallet.create.copy.phrase': 'Click here to copy phrase below',
+  'wallet.create.copy.phrase': 'Copy phrase below',
   'wallet.create.title': 'Create new wallet',
   'wallet.create.enter.phrase': 'Enter phrase correctly',
   'wallet.create.words.click': 'Click the word in correct order',

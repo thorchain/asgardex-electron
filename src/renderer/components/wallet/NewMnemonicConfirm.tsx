@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { RedoOutlined } from '@ant-design/icons'
-import { Col, Row, Button, Form } from 'antd'
+import { DeleteOutlined, RedoOutlined } from '@ant-design/icons'
+import { Col, Row, Button as AButton, Form } from 'antd'
 import shuffleArray from 'lodash.shuffle'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
@@ -9,7 +9,10 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { isSelectedFactory, sortedSelected } from '../../helpers/array'
 import * as walletRoutes from '../../routes/wallet'
+import Button from '../uielements/button'
 import { MnemonicPhrase } from './MnemonicPhrase'
+import * as MnemonicPhraseStyled from './MnemonicPhrase.styles'
+import * as MnemonicStyled from './NewMnemonic.styles'
 
 export type WordType = {
   text: string
@@ -148,40 +151,46 @@ const MnemonicConfirmScreen: React.FC<{ mnemonic: string; onConfirm: () => Promi
   }, [checkPhraseConfirmWords, onConfirm, wordsList, sortedSelectedWords, history, intl])
   return (
     <>
-      <Form labelCol={{ span: 24 }} onFinish={handleFormSubmit}>
-        <Form.Item
-          name="mnemonic"
-          label={intl.formatMessage({ id: 'wallet.create.enter.phrase' })}
-          validateStatus={mnemonicError && 'error'}
-          help={!!mnemonicError && mnemonicError}>
-          <MnemonicPhrase words={sortedSelectedWords} onWordClick={handleRemoveWord} />
+      <MnemonicStyled.TitleContainer>
+        <MnemonicStyled.SectionTitle>
+          {intl.formatMessage({ id: 'wallet.create.enter.phrase' })}
+        </MnemonicStyled.SectionTitle>
+      </MnemonicStyled.TitleContainer>
+      <MnemonicStyled.Form labelCol={{ span: 24 }} onFinish={handleFormSubmit}>
+        <Form.Item name="mnemonic" validateStatus={mnemonicError && 'error'} help={!!mnemonicError && mnemonicError}>
+          <MnemonicPhrase wordIcon={<DeleteOutlined />} words={sortedSelectedWords} onWordClick={handleRemoveWord} />
         </Form.Item>
 
-        <Form.Item
+        <MnemonicPhraseStyled.EnterPhraseContainer
           label={
-            <>
+            <MnemonicStyled.SectionTitle>
               {intl.formatMessage({ id: 'wallet.create.words.click' })}
-              <Button type="link" onClick={handleResetPhrase}>
+              <AButton type="link" onClick={handleResetPhrase}>
                 <RedoOutlined />
-              </Button>
-            </>
+              </AButton>
+            </MnemonicStyled.SectionTitle>
           }>
           <Row>
             {shuffledWordsList.map((word: WordType) => (
-              <Col sm={{ span: 12 }} md={{ span: 8 }} key={word._id} style={{ padding: '6px' }}>
-                <Button type="ghost" disabled={isSelected(word._id)} block onClick={() => handleAddWord(word._id)}>
+              <Col sm={{ span: 12 }} md={{ span: 4 }} key={word._id} style={{ padding: '6px' }}>
+                <MnemonicPhraseStyled.Button
+                  type={'text'}
+                  size={'large'}
+                  disabled={isSelected(word._id)}
+                  onClick={() => handleAddWord(word._id)}
+                  style={{ margin: '6px' }}>
                   {word.text}
-                </Button>
+                </MnemonicPhraseStyled.Button>
               </Col>
             ))}
           </Row>
-        </Form.Item>
-        <Form.Item>
-          <Button size="large" type="primary" htmlType="submit" block>
-            {intl.formatMessage({ id: 'common.confirm' })}
+        </MnemonicPhraseStyled.EnterPhraseContainer>
+        <MnemonicStyled.SubmitItem>
+          <Button size="large" type="primary" round="true" htmlType="submit">
+            {intl.formatMessage({ id: 'common.finish' })}
           </Button>
-        </Form.Item>
-      </Form>
+        </MnemonicStyled.SubmitItem>
+      </MnemonicStyled.Form>
     </>
   )
 }
