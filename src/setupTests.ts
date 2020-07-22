@@ -4,8 +4,17 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom/extend-expect'
 import { Option, isNone } from 'fp-ts/lib/Option'
+import { TestScheduler } from 'rxjs/testing'
 
 declare global {
+  const runObservable: typeof TestScheduler.prototype.run
+  // eslint-disable-next-line no-redeclare, @typescript-eslint/no-namespace
+  namespace NodeJS {
+    interface Global {
+      runObservable: () => typeof TestScheduler.prototype.run
+    }
+  }
+
   // eslint-disable-next-line no-redeclare, @typescript-eslint/no-namespace
   namespace jest {
     interface Matchers<R> {
@@ -13,6 +22,13 @@ declare global {
     }
   }
 }
+
+const createScheduler = () =>
+  new TestScheduler((actual, expected) => {
+    expect(expected).toEqual(actual)
+  })
+
+global.runObservable = () => createScheduler().run
 
 /**
  * Definition of custom matchers

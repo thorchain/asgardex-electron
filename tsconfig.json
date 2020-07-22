@@ -15,6 +15,6 @@
     "jsx": "react",
     "isolatedModules": true
   },
-  "include": ["src/shared", "src/renderer"],
+  "include": ["src/shared", "src/renderer", "src/setupTests.ts"],
   "exclude": ["src/main/"]
 }
