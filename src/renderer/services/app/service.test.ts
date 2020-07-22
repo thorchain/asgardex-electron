@@ -5,8 +5,6 @@ import { network$, toggleNetwork } from './service'
 import { Network } from './types'
 
 describe('services/app/service/', () => {
-  beforeEach(() => {})
-
   describe('network$', () => {
     it('returns testnet by default', () => {
       const expected = cold('a', { a: Network.TEST })
@@ -19,15 +17,17 @@ describe('services/app/service/', () => {
       expect(network$).toBeObservable(expected)
     })
 
-    it('toggleNetwork() changes network four times', () => {
+    it('calling toggleNetwork() four times changes network four times', () => {
+      const values = { a: 1, b: Network.TEST, c: Network.MAIN }
       const toggle = '--a----a--a--a'
-      const result = '--a----b--a--b'
-      const toggle$ = cold(toggle, { a: 1 }).pipe(tap(() => toggleNetwork()))
-      const result$ = toggle$.pipe(
+      const result = '--b----c--b--c'
+
+      const expected = cold(result, values)
+      const result$ = cold(toggle, values).pipe(
+        tap(() => toggleNetwork()),
         withLatestFrom(network$),
         map(([_, network]) => network)
       )
-      const expected = cold(result, { a: Network.TEST, b: Network.MAIN })
       expect(result$).toBeObservable(expected)
     })
   })
