@@ -7,6 +7,7 @@ import { Option, isNone } from 'fp-ts/lib/Option'
 import { TestScheduler } from 'rxjs/testing'
 
 declare global {
+  const runObservable: typeof TestScheduler.prototype.run
   // eslint-disable-next-line no-redeclare, @typescript-eslint/no-namespace
   namespace NodeJS {
     interface Global {
