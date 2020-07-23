@@ -1,5 +1,5 @@
 import { BinanceClient, Balance } from '@thorchain/asgardex-binance'
-import { assetToBase, assetAmount, PoolData } from '@thorchain/asgardex-util'
+import { assetToBase, assetAmount, PoolData, EMPTY_ASSET } from '@thorchain/asgardex-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -153,7 +153,10 @@ describe('services/binance/utils/', () => {
 
   describe('bncSymbolToAsset', () => {
     it('creates a RUNE `Asset`', () => {
-      const result = bncSymbolToAsset('RUNE-B1A')
+      const result = FP.pipe(
+        bncSymbolToAsset('RUNE-B1A'),
+        O.getOrElse(() => EMPTY_ASSET)
+      )
       expect(result).toEqual({
         chain: 'BNB',
         symbol: 'RUNE-B1A',
