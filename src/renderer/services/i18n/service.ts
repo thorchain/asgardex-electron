@@ -9,7 +9,7 @@ const LOCALE_KEY = 'asgdx-locale'
 
 const defaultLocale = () => {
   const lang = navigator.language.split(/[-_]/)[0]
-  getLocaleFromString(lang)
+  return getLocaleFromString(lang)
 }
 
 export const initialLocale = (): Locale => {
