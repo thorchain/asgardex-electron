@@ -23,7 +23,8 @@ const common: CommonMessages = {
   'common.submit': 'Submit - FR',
   'common.confirm': 'Confirm - FR',
   'common.next': 'Next - FR',
-  'common.finish': 'Finish - FR'
+  'common.finish': 'Finish - FR',
+  'common.copy': 'Copy - FR'
 }
 
 export default common
