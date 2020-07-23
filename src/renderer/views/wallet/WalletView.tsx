@@ -76,7 +76,7 @@ const WalletView: React.FC = (): JSX.Element => {
           <Route path={walletRoutes.fundsSend.template} exact>
             <SendView />
           </Route>
-          <Route path={walletRoutes.assetDetails.template} exact>
+          <Route path={walletRoutes.assetDetail.template} exact>
             <AssetDetailsView />
           </Route>
         </Switch>

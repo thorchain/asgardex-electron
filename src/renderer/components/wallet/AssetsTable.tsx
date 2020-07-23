@@ -143,7 +143,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
         onClick: () => {
           const asset = O.fromNullable(assetFromString(`BNB.${symbol}`))
           selectAssetHandler(asset)
-          history.push(walletRoutes.assetDetails.path({ symbol }))
+          history.push(walletRoutes.assetDetail.path({ symbol }))
         }
       }
     },
