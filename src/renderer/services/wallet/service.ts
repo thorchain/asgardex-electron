@@ -10,7 +10,7 @@ import { Phrase, KeystoreService, KeystoreState } from './types'
 import { hasImportedKeystore } from './util'
 
 // key file path
-const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
+export const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
 
 export const initialKeystoreState = (): KeystoreState => (fs.pathExistsSync(KEY_FILE) ? some(none) : none)
 
@@ -22,11 +22,11 @@ const { get$: getKeystoreState$, set: setKeystoreState } = observableState<Keyst
 const addKeystore = async (phrase: Phrase, password: string) => {
   try {
     // remove previous keystore before adding a new one to trigger changes of `KeystoreState
-    await removeKeystore()
+    await keystoreService.removeKeystore()
     const keystore: CryptoKeystore = await encryptToKeyStore(phrase, password)
     await fs.ensureFile(KEY_FILE)
     await fs.writeJSON(KEY_FILE, keystore)
-    setKeystoreState(some(some({ phrase })))
+    keystoreService._setKeystoreState(some(some({ phrase })))
     return Promise.resolve()
   } catch (error) {
     return Promise.reject(error)
@@ -37,7 +37,7 @@ export const removeKeystore = async () => {
   // If `KEY_FILE' does not exist, `fs.remove` silently does nothing.
   // ^ see https://github.com/jprichardson/node-fs-extra/blob/master/docs/remove.md
   await fs.remove(KEY_FILE)
-  setKeystoreState(none)
+  keystoreService._setKeystoreState(none)
 }
 
 const addPhrase = async (state: KeystoreState, password: string) => {
@@ -58,7 +58,7 @@ const addPhrase = async (state: KeystoreState, password: string) => {
   try {
     const keystore: CryptoKeystore = await fs.readJSON(KEY_FILE)
     const phrase = await decryptFromKeystore(keystore, password)
-    setKeystoreState(some(some({ phrase })))
+    keystoreService._setKeystoreState(some(some({ phrase })))
     return Promise.resolve()
   } catch (error) {
     // TODO(@Veado) i18m
@@ -76,5 +76,6 @@ export const keystoreService: KeystoreService = {
   addKeystore,
   removeKeystore,
   lock: removePhrase,
-  unlock: addPhrase
+  unlock: addPhrase,
+  _setKeystoreState: setKeystoreState
 }
