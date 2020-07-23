@@ -5,9 +5,9 @@ import { observableState } from '../../helpers/stateHelper'
 import { getLocaleFromString } from '../../i18n'
 import { Locale } from '../../i18n/types'
 
-export const LOCALE_KEY = 'asgdx-locale'
+const LOCALE_KEY = 'asgdx-locale'
 
-export const defaultLocale = () => {
+const defaultLocale = () => {
   const lang = navigator.language.split(/[-_]/)[0]
   return getLocaleFromString(lang)
 }
