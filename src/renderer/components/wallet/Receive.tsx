@@ -1,30 +1,32 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react'
+import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react'
 
 import { Address } from '@thorchain/asgardex-binance'
-import { delay } from '@thorchain/asgardex-util'
+import { delay, Asset, assetToString } from '@thorchain/asgardex-util'
 import { Grid, Row, Col } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import QRCode from 'qrcode'
 import { useIntl } from 'react-intl'
 
-import { ASSETS_MAINNET } from '../../../shared/mock/assets'
+import AssetIcon from '../uielements/assets/assetIcon'
 import BackLink from '../uielements/backLink'
-import AccountSelector from './AccountSelector'
 import * as Styled from './Receive.style'
 
 type Props = {
   address: O.Option<Address>
+  asset: O.Option<Asset>
 }
 
 const Receive: React.FC<Props> = (props: Props): JSX.Element => {
-  const { address: oAddress } = props
+  const { address: oAddress, asset: oAsset } = props
 
   const [copyMsg, setCopyMsg] = useState<string>('')
   const [errMsg, setErrorMsg] = useState<string>('')
   const intl = useIntl()
   const canvasContainer = useRef<HTMLDivElement>(null)
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+
+  const asset = O.toNullable(oAsset)
 
   useEffect(() => {
     setErrorMsg('')
@@ -64,6 +66,8 @@ const Receive: React.FC<Props> = (props: Props): JSX.Element => {
     O.getOrElse(() => '')
   )
 
+  const renderAssetIcon = useMemo(() => asset && <AssetIcon asset={asset} size="large" />, [asset])
+
   return (
     <>
       <Row>
@@ -73,7 +77,13 @@ const Receive: React.FC<Props> = (props: Props): JSX.Element => {
       </Row>
       <Row>
         <Styled.Col span={24}>
-          <AccountSelector asset={ASSETS_MAINNET.BOLT} assets={[ASSETS_MAINNET.BNB, ASSETS_MAINNET.TOMO]} />
+          <Styled.Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
+            {renderAssetIcon}
+            <Styled.CoinInfoWrapper>
+              <Styled.CoinTitle>{asset?.ticker ?? '--'}</Styled.CoinTitle>
+              <Styled.CoinSubtitle>{asset ? assetToString(asset) : '--'}</Styled.CoinSubtitle>
+            </Styled.CoinInfoWrapper>
+          </Styled.Card>
           <Styled.Card bordered={false}>
             <Styled.QRWrapper isDesktopView={isDesktopView} ref={canvasContainer}>
               {errMsg}

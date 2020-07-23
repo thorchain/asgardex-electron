@@ -9,6 +9,33 @@ export const Col = styled(A.Col)`
   background: ${palette('background', 1)};
 `
 
+export const CoinInfoWrapper = styled.div`
+  margin-left: 30px;
+  flex-direction: column;
+`
+
+export const CoinTitle = styled.p`
+  margin-bottom: 10px;
+  font-size: 32px;
+  font-family: 'MainFontRegular';
+  color: ${palette('text', 0)};
+  line-height: 38px;
+  text-transform: uppercase;
+`
+
+export const CoinSubtitle = styled.p`
+  margin-bottom: 0px;
+  font-size: 24px;
+  font-family: 'MainFontRegular';
+  color: ${palette('text', 0)};
+  line-height: 29px;
+  text-transform: uppercase;
+`
+export const Divider = styled(A.Divider)`
+  margin: 0px;
+  border-top: 1px solid ${palette('gray', 0)};
+`
+
 export const Card = styled(A.Card)`
   .ant-card-body {
     padding: 0;
