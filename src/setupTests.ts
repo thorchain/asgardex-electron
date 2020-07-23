@@ -7,12 +7,15 @@ import { Option, isNone } from 'fp-ts/lib/Option'
 import { RunHelpers } from 'rxjs/internal/testing/TestScheduler'
 import { TestScheduler } from 'rxjs/testing'
 
+type RunObservableCallback<T> = (helpers: RunHelpers) => T
+type RunObservable = <T>(callback: RunObservableCallback<T>) => T
+
 declare global {
-  const runObservable: <T>(callback: (helpers: RunHelpers) => T) => T
+  const runObservable: RunObservable
   // eslint-disable-next-line no-redeclare, @typescript-eslint/no-namespace
   namespace NodeJS {
     interface Global {
-      runObservable: <T>(callback: (helpers: RunHelpers) => T) => T
+      runObservable: RunObservable
     }
   }
 
@@ -25,7 +28,7 @@ declare global {
 }
 
 // Wrapper around `testScheduler.run` to provide it globally
-global.runObservable = <T>(callback: (helpers: RunHelpers) => T) => {
+global.runObservable = <T>(callback: RunObservableCallback<T>) => {
   const ts = new TestScheduler((actual, expected) => expect(expected).toStrictEqual(actual))
   return ts.run(callback)
 }
