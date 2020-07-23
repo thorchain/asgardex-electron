@@ -4,14 +4,15 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom/extend-expect'
 import { Option, isNone } from 'fp-ts/lib/Option'
+import { RunHelpers } from 'rxjs/internal/testing/TestScheduler'
 import { TestScheduler } from 'rxjs/testing'
 
 declare global {
-  const runObservable: typeof TestScheduler.prototype.run
+  const runObservable: <T>(callback: (helpers: RunHelpers) => T) => T
   // eslint-disable-next-line no-redeclare, @typescript-eslint/no-namespace
   namespace NodeJS {
     interface Global {
-      runObservable: () => typeof TestScheduler.prototype.run
+      runObservable: <T>(callback: (helpers: RunHelpers) => T) => T
     }
   }
 
@@ -23,12 +24,11 @@ declare global {
   }
 }
 
-const createScheduler = () =>
-  new TestScheduler((actual, expected) => {
-    expect(expected).toEqual(actual)
-  })
-
-global.runObservable = () => createScheduler().run
+// Wrapper around `testScheduler.run` to provide it globally
+global.runObservable = <T>(callback: (helpers: RunHelpers) => T) => {
+  const ts = new TestScheduler((actual, expected) => expect(expected).toStrictEqual(actual))
+  return ts.run(callback)
+}
 
 /**
  * Definition of custom matchers
