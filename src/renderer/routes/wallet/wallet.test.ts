@@ -64,10 +64,10 @@ describe('Wallet routes', () => {
 
   describe('asset detail route', () => {
     it('template', () => {
-      expect(assetDetail.template).toEqual('/wallet/assets/detail/:symbol')
+      expect(assetDetail.template).toEqual('/wallet/assets/detail/:asset')
     })
     it('returns path by given asset parameter', () => {
-      expect(assetDetail.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/bnb.bnb')
+      expect(assetDetail.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB')
     })
     it('redirects to base path if asset is empty', () => {
       expect(assetDetail.path({ asset: '' })).toEqual(assets.path())
@@ -76,19 +76,19 @@ describe('Wallet routes', () => {
 
   describe('funds receive route', () => {
     it('template', () => {
-      expect(fundsReceive.template).toEqual('/wallet/assets/detail/:symbol/receive')
+      expect(fundsReceive.template).toEqual('/wallet/assets/detail/:asset/receive')
     })
     it('path ', () => {
-      expect(fundsReceive.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/bnb.bnb/receive')
+      expect(fundsReceive.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB/receive')
     })
   })
 
   describe('funds send route', () => {
     it('template', () => {
-      expect(fundsSend.template).toEqual('/wallet/assets/detail/:symbol/send')
+      expect(fundsSend.template).toEqual('/wallet/assets/detail/:asset/send')
     })
     it('path ', () => {
-      expect(fundsSend.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/bnb.bnb/send')
+      expect(fundsSend.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB/send')
     })
   })
 })

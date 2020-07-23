@@ -61,10 +61,10 @@ export const bonds: Route<void> = {
 
 export type AssetDetailsRouteParams = { asset: string }
 export const assetDetail: Route<AssetDetailsRouteParams> = {
-  template: `${assets.template}/detail/:symbol`,
+  template: `${assets.template}/detail/:asset`,
   path: ({ asset }) => {
     if (asset) {
-      return `${assets.template}/detail/${asset.toLowerCase()}`
+      return `${assets.template}/detail/${asset}`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()
