@@ -51,33 +51,14 @@ describe('services/keystore/service/', () => {
 
   describe('addPhrase', () => {
     const password = 'password'
-    it('should reject if keystore is not imported', (done) => {
-      let failed = false
-      keystoreService
-        .unlock(none, password)
-        .catch(() => {
-          failed = true
-        })
-        .then(() => {
-          expect(failed).toBeTruthy()
-          done()
-        })
+    it('should reject if keystore is not imported', async () => {
+      await expect(keystoreService.unlock(some(none), password)).rejects.toBeTruthy()
     })
 
-    it('should reject if keystore file does not exist', (done) => {
-      let failed = false
-
+    it('should reject if keystore file does not exist', async () => {
       fsPathExistsSpy.mockImplementationOnce(() => Promise.resolve(false))
 
-      keystoreService
-        .unlock(some(none), password)
-        .catch(() => {
-          failed = true
-        })
-        .then(() => {
-          expect(failed).toBeTruthy()
-          done()
-        })
+      await expect(keystoreService.unlock(some(none), password)).rejects.toBeTruthy()
     })
 
     it('should call setKeystoreState', async (done) => {
