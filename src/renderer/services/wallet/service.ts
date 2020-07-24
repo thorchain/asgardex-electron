@@ -26,7 +26,7 @@ const addKeystore = async (phrase: Phrase, password: string) => {
     const keystore: CryptoKeystore = await encryptToKeyStore(phrase, password)
     await fs.ensureFile(KEY_FILE)
     await fs.writeJSON(KEY_FILE, keystore)
-    keystoreService._setKeystoreState(some(some({ phrase })))
+    setKeystoreState(some(some({ phrase })))
     return Promise.resolve()
   } catch (error) {
     return Promise.reject(error)
@@ -37,7 +37,7 @@ export const removeKeystore = async () => {
   // If `KEY_FILE' does not exist, `fs.remove` silently does nothing.
   // ^ see https://github.com/jprichardson/node-fs-extra/blob/master/docs/remove.md
   await fs.remove(KEY_FILE)
-  keystoreService._setKeystoreState(none)
+  setKeystoreState(none)
 }
 
 const addPhrase = async (state: KeystoreState, password: string) => {
@@ -58,7 +58,7 @@ const addPhrase = async (state: KeystoreState, password: string) => {
   try {
     const keystore: CryptoKeystore = await fs.readJSON(KEY_FILE)
     const phrase = await decryptFromKeystore(keystore, password)
-    keystoreService._setKeystoreState(some(some({ phrase })))
+    setKeystoreState(some(some({ phrase })))
     return Promise.resolve()
   } catch (error) {
     // TODO(@Veado) i18m
@@ -76,6 +76,5 @@ export const keystoreService: KeystoreService = {
   addKeystore,
   removeKeystore,
   lock: removePhrase,
-  unlock: addPhrase,
-  _setKeystoreState: setKeystoreState
+  unlock: addPhrase
 }

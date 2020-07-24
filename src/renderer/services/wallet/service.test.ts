@@ -1,5 +1,6 @@
 import { none, some } from 'fp-ts/lib/Option'
 import * as fs from 'fs-extra'
+import { tap } from 'rxjs/operators'
 
 import { removeKeystore, keystoreService, KEY_FILE } from './service'
 
@@ -14,7 +15,6 @@ jest.mock('@thorchain/asgardex-crypto', () => ({
 }))
 
 describe('services/keystore/service/', () => {
-  const _setKeystoreStateSpy = jest.spyOn(keystoreService, '_setKeystoreState')
   const fsRemoveSpy = jest.spyOn(fs, 'remove')
   const fsWriteJsonSpy = jest.spyOn(fs, 'writeJSON')
   const fsEnsureFileSpy = jest.spyOn(fs, 'ensureFile')
@@ -30,23 +30,14 @@ describe('services/keystore/service/', () => {
   it('removeKeystore', async (done) => {
     await removeKeystore()
     expect(fsRemoveSpy).toBeCalledWith(KEY_FILE)
-    expect(_setKeystoreStateSpy).toBeCalledWith(none)
-    done()
-  })
-
-  it('addKeystore', async (done) => {
-    const removeKeystoreSpy = jest.spyOn(keystoreService, 'removeKeystore')
-    const phrase = 'phrase'
-    const password = 'password'
-    removeKeystoreSpy.mockImplementationOnce(() => Promise.resolve())
-
-    await keystoreService.addKeystore(phrase, password)
-
-    expect(removeKeystoreSpy).toBeCalled()
-    expect(fsEnsureFileSpy).toBeCalledWith(KEY_FILE)
-    expect(fsWriteJsonSpy).toBeCalledWith(KEY_FILE, mockEncrypt)
-    expect(_setKeystoreStateSpy).toBeCalledWith(some(some({ phrase })))
-    done()
+    keystoreService.keystore$
+      .pipe(
+        tap((val) => {
+          expect(val).toEqual(none)
+          done()
+        })
+      )
+      .subscribe()
   })
 
   describe('addPhrase', () => {
@@ -67,8 +58,36 @@ describe('services/keystore/service/', () => {
 
       await keystoreService.unlock(some(some({ phrase: 'phrase' })), password)
 
-      expect(keystoreService._setKeystoreState).toBeCalledWith(some(some(mockDecrypt)))
-      done()
+      keystoreService.keystore$
+        .pipe(
+          tap((val) => {
+            expect(val).toEqual(some(some(mockDecrypt)))
+            done()
+          })
+        )
+        .subscribe()
     })
+  })
+
+  it('addKeystore', async (done) => {
+    const removeKeystoreSpy = jest.spyOn(keystoreService, 'removeKeystore')
+    const phrase = 'phrase'
+    const password = 'password'
+    removeKeystoreSpy.mockImplementationOnce(() => Promise.resolve())
+
+    await keystoreService.addKeystore(phrase, password)
+
+    expect(removeKeystoreSpy).toBeCalled()
+    expect(fsEnsureFileSpy).toBeCalledWith(KEY_FILE)
+    expect(fsWriteJsonSpy).toBeCalledWith(KEY_FILE, mockEncrypt)
+
+    keystoreService.keystore$
+      .pipe(
+        tap((val) => {
+          expect(val).toEqual(some(some({ phrase })))
+          done()
+        })
+      )
+      .subscribe()
   })
 })

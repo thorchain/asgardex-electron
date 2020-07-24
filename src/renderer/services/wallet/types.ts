@@ -20,5 +20,4 @@ export type KeystoreService = {
   removeKeystore: () => Promise<void>
   unlock: (state: KeystoreState, password: string) => Promise<void>
   lock: () => void
-  _setKeystoreState: (state: KeystoreState) => void
 }
