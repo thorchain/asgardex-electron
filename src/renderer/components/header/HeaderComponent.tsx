@@ -241,7 +241,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
               <Col>
                 <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
                   <AsgardexLogo />
-                  <HeaderNetStatus />
+                  <HeaderNetStatus isDesktopView={isDesktopView} />
                 </Row>
               </Col>
               <Col span="auto">
@@ -303,7 +303,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
             <HeaderDrawerItem>{renderHeaderLock}</HeaderDrawerItem>
             <HeaderDrawerItem>{renderHeaderSettings}</HeaderDrawerItem>
             <HeaderDrawerItem>{renderHeaderLang}</HeaderDrawerItem>
-            <HeaderNetStatus />
+            <HeaderNetStatus isDesktopView={isDesktopView} />
           </HeaderDrawer>
         )}
       </>
