@@ -31,7 +31,6 @@ const wallet: WalletMessages = {
   'wallet.create.password.repeat': 'Repeat password - FR',
   'wallet.create.password.mismatch': 'Password mismatch - FR',
   'wallet.create.error': 'Error while saving a phrase - FR',
-  'wallet.receive.address.copied': 'Address has been copied into clipboard. - FR',
   'wallet.receive.address.error': 'No address available to receive funds - FR',
   'wallet.receive.address.errorQR': 'Error while rendering QR code: {error} - FR'
 }

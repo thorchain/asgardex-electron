@@ -63,7 +63,6 @@ type WalletMessageKey =
   | 'wallet.create.copy.phrase'
   | 'wallet.create.words.click'
   | 'wallet.create.enter.phrase'
-  | 'wallet.receive.address.copied'
   | 'wallet.receive.address.error'
   | 'wallet.receive.address.errorQR'
 
