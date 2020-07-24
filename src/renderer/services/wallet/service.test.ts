@@ -33,7 +33,7 @@ describe('services/keystore/service/', () => {
     keystoreService.keystore$
       .pipe(
         tap((val) => {
-          expect(val).toEqual(none)
+          expect(val).toBeNone()
           done()
         })
       )
