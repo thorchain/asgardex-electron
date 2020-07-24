@@ -1,78 +1,85 @@
+type CommonMessageKey =
+  | 'common.greeting'
+  | 'common.copyright'
+  | 'common.stats'
+  | 'common.network'
+  | 'common.faqs'
+  | 'common.type'
+  | 'common.address'
+  | 'common.to'
+  | 'common.from'
+  | 'common.amount'
+  | 'common.coin'
+  | 'common.password'
+  | 'common.memo'
+  | 'common.refresh'
+  | 'common.date'
+  | 'common.remove'
+  | 'common.back'
+  | 'common.keystore'
+  | 'common.phrase'
+  | 'common.submit'
+  | 'common.confirm'
+  | 'common.next'
+  | 'common.finish'
+  | 'common.copy'
+  | 'common.loading'
+
 export type CommonMessages = {
-  'common.greeting': string
-  'common.copyright': string
-  'common.stats': string
-  'common.network': string
-  'common.faqs': string
-  'common.type': string
-  'common.address': string
-  'common.to': string
-  'common.from': string
-  'common.amount': string
-  'common.coin': string
-  'common.password': string
-  'common.memo': string
-  'common.refresh': string
-  'common.date': string
-  'common.remove': string
-  'common.back': string
-  'common.keystore': string
-  'common.phrase': string
-  'common.submit': string
-  'common.confirm': string
-  'common.next': string
-  'common.finish': string
+  [key in CommonMessageKey]: string
 }
 
-export type PoolsMessages = {
-  'pools.title': string
-  'pools.available': string
-}
+type PoolsMessageKey = 'pools.title' | 'pools.available'
+export type PoolsMessages = { [key in PoolsMessageKey]: string }
 
-export type WalletMessages = {
-  'wallet.title': string
-  'wallet.nav.assets': string
-  'wallet.nav.stakes': string
-  'wallet.nav.bonds': string
-  'wallet.column.name': string
-  'wallet.column.ticker': string
-  'wallet.column.balance': string
-  'wallet.column.value': string
-  'wallet.action.send': string
-  'wallet.action.receive': string
-  'wallet.action.remove': string
-  'wallet.action.unlock': string
-  'wallet.unlock.title': string
-  'wallet.unlock.phrase': string
-  'wallet.imports.phrase': string
-  'wallet.imports.wallet': string
-  'wallet.imports.enterphrase': string
-  'wallet.txs.last90days': string
-  'wallet.empty.action.import': string
-  'wallet.empty.action.create': string
-  'wallet.empty.phrase.import': string
-  'wallet.empty.phrase.create': string
-  'wallet.create.title': string
-  'wallet.create.creating': string
-  'wallet.create.error': string
-  'wallet.create.password.repeat': string
-  'wallet.create.password.mismatch': string
-  'wallet.create.copy.phrase': string
-  'wallet.create.words.click': string
-  'wallet.create.enter.phrase': string
-}
+type WalletMessageKey =
+  | 'wallet.title'
+  | 'wallet.nav.assets'
+  | 'wallet.nav.stakes'
+  | 'wallet.nav.bonds'
+  | 'wallet.column.name'
+  | 'wallet.column.ticker'
+  | 'wallet.column.balance'
+  | 'wallet.column.value'
+  | 'wallet.action.send'
+  | 'wallet.action.receive'
+  | 'wallet.action.remove'
+  | 'wallet.action.unlock'
+  | 'wallet.unlock.title'
+  | 'wallet.unlock.phrase'
+  | 'wallet.imports.phrase'
+  | 'wallet.imports.wallet'
+  | 'wallet.imports.enterphrase'
+  | 'wallet.txs.last90days'
+  | 'wallet.empty.action.import'
+  | 'wallet.empty.action.create'
+  | 'wallet.empty.phrase.import'
+  | 'wallet.empty.phrase.create'
+  | 'wallet.create.title'
+  | 'wallet.create.creating'
+  | 'wallet.create.error'
+  | 'wallet.create.password.repeat'
+  | 'wallet.create.password.mismatch'
+  | 'wallet.create.copy.phrase'
+  | 'wallet.create.words.click'
+  | 'wallet.create.enter.phrase'
+  | 'wallet.receive.address.error'
+  | 'wallet.receive.address.errorQR'
 
-export type SettingMessages = {
-  'setting.title': string
-  'setting.wallet.management': string
-  'setting.client': string
-  'setting.account.management': string
-  'setting.export': string
-  'setting.lock': string
-  'setting.view.phrase': string
-  'setting.midgard': string
-  'setting.version': string
-}
+export type WalletMessages = { [key in WalletMessageKey]: string }
+
+type SettingMessageKey =
+  | 'setting.title'
+  | 'setting.wallet.management'
+  | 'setting.client'
+  | 'setting.account.management'
+  | 'setting.export'
+  | 'setting.lock'
+  | 'setting.view.phrase'
+  | 'setting.midgard'
+  | 'setting.version'
+
+export type SettingMessages = { [key in SettingMessageKey]: string }
 
 export type Messages = CommonMessages & PoolsMessages & WalletMessages & SettingMessages
 

@@ -1,109 +1,100 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef, useMemo } from 'react'
 
-import { LeftOutlined } from '@ant-design/icons'
-import { Grid, Row, Col } from 'antd'
+import { Address } from '@thorchain/asgardex-binance'
+import { delay, Asset } from '@thorchain/asgardex-util'
+import { Grid, Row, Col, Spin } from 'antd'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import QRCode from 'qrcode'
-import { useHistory } from 'react-router-dom'
+import { useIntl } from 'react-intl'
 
-import { ASSETS_MAINNET } from '../../../shared/mock/assets'
-import AccountSelector from './AccountSelector'
-import {
-  StyledBackLabel,
-  StyledCol,
-  StyledCard,
-  StyledDiv,
-  StyledAddressWrapper,
-  StyledAddress,
-  StyledLabel
-} from './Receive.style'
+import AssetInfo from '../uielements/assets/AssetInfo'
+import BackLink from '../uielements/backLink'
+import * as Styled from './Receive.style'
 
-// Dummmy data
-const UserAccount = {
-  address: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
-  locked: false,
-  pwHash: '$2a$08$7p6Z3OwF7HuQdHoL3PnP8.0tgkkYZ5vl4XYv/ZkmhB9Jy7gT1GPuq',
-  _id: 'MTbyhYhWysp25TDBy'
+type Props = {
+  address: O.Option<Address>
+  asset: O.Option<Asset>
 }
 
-const Receive: React.FC = (): JSX.Element => {
-  const history = useHistory()
-  const [copyMsg, setCopyMsg] = useState<string>('')
-  const [timer, setTimer] = useState<number | null>(null)
-  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+const Receive: React.FC<Props> = (props: Props): JSX.Element => {
+  const { address: oAddress, asset: oAsset } = props
 
-  const userAccount = () => {
-    // Placeholder
-    return UserAccount
-  }
-  // This will be reactive when reactive datasource is added
-  /*eslint-disable */
+  const [errMsg, setErrorMsg] = useState('')
+  const [hasQR, setHasQR] = useState(false)
+  const intl = useIntl()
+  const canvasContainer = useRef<HTMLDivElement>(null)
+  const isDesktopView = Grid.useBreakpoint()?.md ?? false
+
   useEffect(() => {
-    const address = userAccount().address
-    QRCode.toCanvas(address, { errorCorrectionLevel: 'H', scale: 6 }, function (err, canvas) {
-      if (err) throw err
-      const container = document.getElementById('qr-container')
-      container?.appendChild(canvas)
-    })
-  }, [UserAccount])
-  /*eslint-enable */
-  useEffect(() => {
-    // Cleanup timer on 'unmount'
-    return function cleanup() {
-      if (timer) {
-        clearTimeout(timer)
-      }
-    }
-  }, [timer])
+    setErrorMsg('')
+    setHasQR(false)
+    FP.pipe(
+      oAddress,
+      O.fold(
+        () => setErrorMsg(intl.formatMessage({ id: 'wallet.receive.address.error' })),
+        async (address) => {
+          // Delay to render everything
+          await delay(500)
+          QRCode.toCanvas(address, { errorCorrectionLevel: 'H', scale: 6 }, (err, canvas) => {
+            if (err) {
+              setErrorMsg(intl.formatMessage({ id: 'wallet.receive.address.errorQR' }, { error: err.toString() }))
+            } else {
+              setHasQR(true)
+              canvasContainer.current?.appendChild(canvas)
+            }
+          })
+        }
+      )
+    )
+  }, [intl, oAddress])
 
-  const handleCopyAddress = useCallback(() => {
-    navigator.clipboard.writeText(userAccount().address)
-    setCopyMsg('Address copied..')
-    if (timer) {
-      clearTimeout(timer)
-    }
-    const tmr = setTimeout(() => {
-      setCopyMsg('')
-    }, 3000)
-    setTimer(tmr)
-  }, [timer])
+  const addressLabel = useMemo(
+    () =>
+      FP.pipe(
+        oAddress,
+        O.getOrElse(() => '')
+      ),
+    [oAddress]
+  )
 
-  const onBack = useCallback(() => {
-    history.goBack()
-  }, [history])
+  const hasAddress = O.isSome(oAddress)
 
   return (
     <>
       <Row>
         <Col span={24}>
-          <StyledBackLabel size="large" color="primary" weight="bold" onClick={onBack}>
-            <LeftOutlined />
-            <span>Back</span>
-          </StyledBackLabel>
+          <BackLink />
         </Col>
       </Row>
       <Row>
-        <StyledCol span={24}>
-          {/* AccountSelector needs data - we are using mock data for now */}
-          <AccountSelector asset={ASSETS_MAINNET.BOLT} assets={[ASSETS_MAINNET.BNB, ASSETS_MAINNET.TOMO]} />
-          <StyledCard isDesktopView={isDesktopView} bordered={false}>
-            <div id="qr-container" />
-          </StyledCard>
-          <StyledDiv>
+        <Col span={24}>
+          <AssetInfo asset={oAsset} />
+        </Col>
+        <Styled.Col span={24}>
+          <Styled.Card bordered={false}>
+            <Styled.QRWrapper smallView={!isDesktopView} ref={canvasContainer}>
+              {hasAddress && !hasQR && <Spin />}
+              {errMsg}
+            </Styled.QRWrapper>
+          </Styled.Card>
+          <Styled.Div>
             {isDesktopView ? (
               <label htmlFor="clipboard-btn">
-                <StyledAddress size="large">{userAccount().address}</StyledAddress>
+                <Styled.Address size="large">{addressLabel}</Styled.Address>
               </label>
             ) : (
-              <StyledAddressWrapper htmlFor="clipboard-btn">
-                <StyledAddress size="large">{userAccount().address}</StyledAddress>
-              </StyledAddressWrapper>
+              <Styled.AddressWrapper htmlFor="clipboard-btn">
+                <Styled.Address size="large">{addressLabel}</Styled.Address>
+              </Styled.AddressWrapper>
             )}
-            <StyledLabel size="big" onClick={handleCopyAddress}>
-              Copy
-            </StyledLabel>
-            <StyledAddress size="big">{copyMsg}</StyledAddress>
-          </StyledDiv>
-        </StyledCol>
+            {hasAddress && (
+              <Styled.CopyLabel copyable={{ text: addressLabel }}>
+                {intl.formatMessage({ id: 'common.copy' })}
+              </Styled.CopyLabel>
+            )}
+          </Styled.Div>
+        </Styled.Col>
       </Row>
     </>
   )

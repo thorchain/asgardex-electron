@@ -16,12 +16,12 @@ const wallet: WalletMessages = {
   'wallet.unlock.title': 'Wallet entsperren',
   'wallet.unlock.phrase': 'Geben Sie Ihre Phrase ein',
   'wallet.imports.phrase': 'Phrase',
-  'wallet.imports.wallet': 'Importiere bestehende Wallet',
+  'wallet.imports.wallet': 'Importiere eine bestehende Wallet',
   'wallet.imports.enterphrase': 'Phrase eingeben',
   'wallet.txs.last90days': 'Transaktionen der vergangenen 90 Tage',
   'wallet.empty.action.import': 'Importieren',
   'wallet.empty.action.create': 'Erstellen',
-  'wallet.empty.phrase.import': 'Importiere eine bestehende Wallet mit bestehendem Guthbaben',
+  'wallet.empty.phrase.import': 'Importiere eine bestehende Wallet mit Guthaben',
   'wallet.empty.phrase.create': 'Erstelle eine neue Wallet und füge ein Guthaben hinzu',
   'wallet.create.copy.phrase': 'Phrase kopieren',
   'wallet.create.title': 'Erstelle eine Wallet',
@@ -30,7 +30,9 @@ const wallet: WalletMessages = {
   'wallet.create.creating': 'Erstelle eine Wallet ...',
   'wallet.create.password.repeat': 'Passwort wiederholen',
   'wallet.create.password.mismatch': 'Passwort stimmit nicht überein',
-  'wallet.create.error': 'Fehler beim Abspeichern der Phrase'
+  'wallet.create.error': 'Fehler beim Abspeichern der Phrase',
+  'wallet.receive.address.error': 'Keine Addresse für den Empfang vorhanden',
+  'wallet.receive.address.errorQR': 'Error beim Rendern des QR Codes: {error}'
 }
 
 export default wallet
