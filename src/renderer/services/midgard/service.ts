@@ -8,6 +8,7 @@ import {
   catchError,
   concatMap,
   tap,
+  map,
   mergeMap,
   shareReplay,
   startWith,
@@ -269,6 +270,11 @@ const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
   shareReplay()
 )
 
+const apiEndpoint$: Rx.Observable<O.Option<string>> = byzantine$.pipe(
+  map((endpoint) => O.some(endpoint)),
+  catchError((_: Error) => Rx.of(O.none))
+)
+
 /**
  * Service object with all "public" functions and observables we want to provide
  */
@@ -282,5 +288,6 @@ export const service = {
   thorchainLastblockState$,
   reloadThorchainLastblock,
   setSelectedPricePool: setSelectedPricePoolAsset,
-  selectedPricePoolAsset$
+  selectedPricePoolAsset$,
+  apiEndpoint$
 }

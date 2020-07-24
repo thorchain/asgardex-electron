@@ -72,6 +72,7 @@ export type SettingMessages = {
   'setting.view.phrase': string
   'setting.midgard': string
   'setting.version': string
+  'setting.notconnected': string
 }
 
 export type Messages = CommonMessages & PoolsMessages & WalletMessages & SettingMessages
