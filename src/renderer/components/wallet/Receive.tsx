@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useMemo } from 'react'
 
-import { CheckCircleOutlined } from '@ant-design/icons'
 import { Address } from '@thorchain/asgardex-binance'
 import { delay, Asset } from '@thorchain/asgardex-util'
 import { Grid, Row, Col, Spin } from 'antd'
@@ -21,7 +20,6 @@ type Props = {
 const Receive: React.FC<Props> = (props: Props): JSX.Element => {
   const { address: oAddress, asset: oAsset } = props
 
-  const [copying, setCopying] = useState(false)
   const [errMsg, setErrorMsg] = useState('')
   const [hasQR, setHasQR] = useState(false)
   const intl = useIntl()
@@ -51,23 +49,16 @@ const Receive: React.FC<Props> = (props: Props): JSX.Element => {
     )
   }, [intl, oAddress])
 
-  const handleCopyAddress = useCallback(async () => {
-    FP.pipe(
-      oAddress,
-      O.map(async (address) => {
-        setCopying(true)
-        navigator.clipboard.writeText(address)
-        await delay(2000)
-        setCopying(false)
-        return address
-      })
-    )
-  }, [oAddress])
-
-  const addressLabel = FP.pipe(
-    oAddress,
-    O.getOrElse(() => '')
+  const addressLabel = useMemo(
+    () =>
+      FP.pipe(
+        oAddress,
+        O.getOrElse(() => '')
+      ),
+    [oAddress]
   )
+
+  const hasAddress = O.isSome(oAddress)
 
   return (
     <>
@@ -83,7 +74,7 @@ const Receive: React.FC<Props> = (props: Props): JSX.Element => {
         <Styled.Col span={24}>
           <Styled.Card bordered={false}>
             <Styled.QRWrapper smallView={!isDesktopView} ref={canvasContainer}>
-              {!hasQR && O.isSome(oAddress) && <Spin />}
+              {hasAddress && !hasQR && <Spin />}
               {errMsg}
             </Styled.QRWrapper>
           </Styled.Card>
@@ -97,10 +88,9 @@ const Receive: React.FC<Props> = (props: Props): JSX.Element => {
                 <Styled.Address size="large">{addressLabel}</Styled.Address>
               </Styled.AddressWrapper>
             )}
-            {O.isSome(oAddress) && (
-              <Styled.CopyLabel size="big" onClick={handleCopyAddress}>
+            {hasAddress && (
+              <Styled.CopyLabel copyable={{ text: addressLabel }}>
                 {intl.formatMessage({ id: 'common.copy' })}
-                <CheckCircleOutlined style={{ visibility: copying ? 'visible' : 'hidden' }} />
               </Styled.CopyLabel>
             )}
           </Styled.Div>

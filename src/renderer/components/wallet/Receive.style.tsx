@@ -84,15 +84,13 @@ export const Address = styled(UILabel)`
   font-family: 'MainFontRegular';
 `
 
-export const CopyLabel = styled(UILabel)`
+export const CopyLabel = styled(A.Typography.Text)`
   text-transform: uppercase;
   font-family: 'MainFontRegular';
-  font-weight: 600;
   color: ${palette('primary', 0)};
-  padding-left: 15px;
   /* icon */
   svg {
-    margin-left: 10px;
+    color: ${palette('primary', 0)};
   }
 `
 

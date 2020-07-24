@@ -7,7 +7,7 @@ describe('ThemeContext', () => {
   describe('ThemeContextValue', () => {
     beforeEach(() => {})
     describe('themeType$', () => {
-      it('  ', (done) => {
+      it('returns light theme as default', (done) => {
         themeType$.subscribe((type: ThemeType) => {
           expect(type).toBe(ThemeType.LIGHT)
           done()
