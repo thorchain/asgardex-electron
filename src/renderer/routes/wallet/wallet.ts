@@ -59,27 +59,38 @@ export const bonds: Route<void> = {
   }
 }
 
-export const fundsReceive: Route<void> = {
-  // TODO: Add support for asset/symbol
-  template: `${base.template}/funds-receive`,
-  path() {
-    return this.template
-  }
-}
-export const fundsSend: Route<void> = {
-  // TODO: Add support for asset/symbol
-  template: `${base.template}/funds-send`,
-  path() {
-    return this.template
+export type AssetDetailsRouteParams = { asset: string }
+export const assetDetail: Route<AssetDetailsRouteParams> = {
+  template: `${assets.template}/detail/:asset`,
+  path: ({ asset }) => {
+    if (asset) {
+      return `${assets.template}/detail/${asset}`
+    } else {
+      // Redirect to assets route if passed param is empty
+      return assets.path()
+    }
   }
 }
 
-export type AssetDetailsRouteParams = { symbol: string }
-export const assetDetails: Route<AssetDetailsRouteParams> = {
-  template: `${base.template}/asset-details/:symbol`,
-  path: ({ symbol }) => {
-    if (symbol) {
-      return `${base.template}/asset-details/${symbol.toLowerCase()}`
+export type FundsReceiveParams = { asset: string }
+export const fundsReceive: Route<FundsReceiveParams> = {
+  template: `${assetDetail.template}/receive`,
+  path: ({ asset }) => {
+    if (asset) {
+      return `${assetDetail.path({ asset })}/receive`
+    } else {
+      // Redirect to assets route if passed param is empty
+      return assets.path()
+    }
+  }
+}
+
+export type FundSendParams = { asset: string }
+export const fundsSend: Route<FundSendParams> = {
+  template: `${assetDetail.template}/send`,
+  path: ({ asset }) => {
+    if (asset) {
+      return `${assetDetail.path({ asset })}/send`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()

@@ -9,7 +9,8 @@ import {
   formatAssetAmountCurrency,
   baseToAsset,
   assetFromString,
-  Asset
+  Asset,
+  assetToString
 } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
@@ -76,10 +77,10 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       key: 'symbol',
       title: intl.formatMessage({ id: 'wallet.column.ticker' }),
       align: 'left',
-      render: ({ symbol }: Balance) => <Label>{bncSymbolToAsset(symbol)?.ticker ?? ''}</Label>,
+      render: ({ symbol }: Balance) => <Label>{O.toNullable(bncSymbolToAsset(symbol))?.ticker ?? ''}</Label>,
       sorter: (a: Balance, b: Balance) => {
-        const tickerA = bncSymbolToAsset(a.symbol)?.ticker ?? ''
-        const tickerB = bncSymbolToAsset(b.symbol)?.ticker ?? ''
+        const tickerA = O.toNullable(bncSymbolToAsset(a.symbol))?.ticker ?? ''
+        const tickerB = O.toNullable(bncSymbolToAsset(b.symbol))?.ticker ?? ''
         return tickerA.localeCompare(tickerB)
       },
       sortDirections: ['descend', 'ascend']
@@ -141,9 +142,12 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     ({ symbol }: Balance) => {
       return {
         onClick: () => {
-          const asset = O.fromNullable(assetFromString(`BNB.${symbol}`))
-          selectAssetHandler(asset)
-          history.push(walletRoutes.assetDetails.path({ symbol }))
+          const oAsset = bncSymbolToAsset(symbol)
+          selectAssetHandler(oAsset)
+          FP.pipe(
+            oAsset,
+            O.map((asset) => history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset) })))
+          )
         }
       }
     },

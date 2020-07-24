@@ -30,7 +30,9 @@ const wallet: WalletMessages = {
   'wallet.create.creating': 'Creating wallet',
   'wallet.create.password.repeat': 'Repeat password',
   'wallet.create.password.mismatch': 'Password mismatch',
-  'wallet.create.error': 'Error while saving a phrase'
+  'wallet.create.error': 'Error while saving a phrase',
+  'wallet.receive.address.error': 'No address available to receive funds',
+  'wallet.receive.address.errorQR': 'Error while rendering QR code: {error}'
 }
 
 export default wallet
