@@ -24,7 +24,8 @@ const common: CommonMessages = {
   'common.confirm': 'Bestätigen',
   'common.next': 'Next - DE',
   'common.finish': 'Finish - DE',
-  'common.copy': 'Kopieren'
+  'common.copy': 'Kopieren',
+  'common.loading': 'Lade...'
 }
 
 export default common

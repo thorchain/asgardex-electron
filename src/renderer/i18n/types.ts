@@ -23,6 +23,7 @@ type CommonMessageKey =
   | 'common.next'
   | 'common.finish'
   | 'common.copy'
+  | 'common.loading'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

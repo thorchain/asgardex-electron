@@ -100,8 +100,7 @@ const ImportPhrase: React.FC = (): JSX.Element => {
         onFinish={submitForm}
         labelCol={{ span: 24 }}
         style={{ width: '100%', padding: 30, paddingTop: 15 }}>
-        {/* TODO(@Veado): i18n */}
-        <Spin spinning={importing} tip="Loading...">
+        <Spin spinning={importing} tip={intl.formatMessage({ id: 'common.loading' })}>
           <Form.Item
             name="phrase"
             rules={[{ required: true, validator: phraseValidator }]}
