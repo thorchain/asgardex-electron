@@ -10,7 +10,7 @@ import { Phrase, KeystoreService, KeystoreState } from './types'
 import { hasImportedKeystore } from './util'
 
 // key file path
-const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
+export const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
 
 export const initialKeystoreState = (): KeystoreState => (fs.pathExistsSync(KEY_FILE) ? some(none) : none)
 
@@ -22,7 +22,7 @@ const { get$: getKeystoreState$, set: setKeystoreState } = observableState<Keyst
 const addKeystore = async (phrase: Phrase, password: string) => {
   try {
     // remove previous keystore before adding a new one to trigger changes of `KeystoreState
-    await removeKeystore()
+    await keystoreService.removeKeystore()
     const keystore: CryptoKeystore = await encryptToKeyStore(phrase, password)
     await fs.ensureFile(KEY_FILE)
     await fs.writeJSON(KEY_FILE, keystore)
