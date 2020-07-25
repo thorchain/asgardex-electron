@@ -1,25 +1,24 @@
 import React, { useMemo } from 'react'
 
 import { Dropdown, Row, Col } from 'antd'
-import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { useAppContext } from '../../contexts/AppContext'
-import * as API from '../../helpers/apiHelper'
 import { OnlineStatus } from '../../services/app/types'
 import ConnectionStatus from '../shared/icons/ConnectionStatus'
 import Menu from '../shared/Menu'
 import { HeaderDrawerItem } from './HeaderComponent.style'
 import * as Styled from './HeaderNetStatus.style'
+import { headerNetStatusSubheadline, headerNetStatusColor, HeaderNetStatusColor } from './util'
 
 type MenuItem = {
   key: string
   headline: string
   subheadline: string
-  color: 'green' | 'yellow'
+  color: HeaderNetStatusColor
 }
 
 type Props = {
@@ -31,35 +30,27 @@ type Props = {
 const HeaderNetStatus: React.FC<Props> = (props: Props): JSX.Element => {
   const { isDesktopView, midgardUrl, binanceUrl } = props
   const { onlineStatus$ } = useAppContext()
-  const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$)
+  const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
   const intl = useIntl()
   const onlineStatusColor = onlineStatus === OnlineStatus.ON ? 'green' : 'red'
 
   const menuItems = useMemo((): MenuItem[] => {
-    const getSubheadline = (url: O.Option<string>) =>
-      FP.pipe(
-        url,
-        O.map(API.getHostnameFromUrl),
-        O.flatten,
-        O.getOrElse(() => intl.formatMessage({ id: 'setting.notconnected' }))
-      )
-    const getColor = (url: O.Option<string>) => (O.isSome(url) ? 'green' : 'yellow')
-
+    const notConnectedTxt = intl.formatMessage({ id: 'setting.notconnected' })
     return [
       {
         key: 'midgard',
         headline: 'Midgard API',
-        subheadline: getSubheadline(midgardUrl),
-        color: getColor(midgardUrl)
+        subheadline: headerNetStatusSubheadline({ url: midgardUrl, onlineStatus, notConnectedTxt }),
+        color: headerNetStatusColor({ url: midgardUrl, onlineStatus })
       },
       {
         key: 'binance',
         headline: 'Binance Chain',
-        subheadline: getSubheadline(binanceUrl),
-        color: getColor(binanceUrl)
+        subheadline: headerNetStatusSubheadline({ url: binanceUrl, onlineStatus, notConnectedTxt }),
+        color: headerNetStatusColor({ url: binanceUrl, onlineStatus })
       }
     ]
-  }, [binanceUrl, intl, midgardUrl])
+  }, [binanceUrl, intl, midgardUrl, onlineStatus])
 
   const desktopMenu = useMemo(() => {
     return (
