@@ -1,8 +1,10 @@
 import React from 'react'
 
-import { none } from 'fp-ts/lib/Option'
+import * as E from 'fp-ts/lib/Either'
+import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
+import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -12,9 +14,13 @@ import HeaderComponent from './HeaderComponent'
 const Header: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { lock } = keystoreService
-  const keystore = useObservableState(keystoreService.keystore$, none)
+  const keystore = useObservableState(keystoreService.keystore$, O.none)
   const { service: midgardService } = useMidgardContext()
-  const { poolsState$, setSelectedPricePool, selectedPricePoolAsset$ } = midgardService
+  const { poolsState$, setSelectedPricePool, selectedPricePoolAsset$, apiEndpoint$ } = midgardService
+  const midgardUrl = useObservableState(apiEndpoint$, E.right(''))
+
+  const { explorerUrl$ } = useBinanceContext()
+  const explorerUrl = useObservableState(explorerUrl$, O.none)
 
   const { changeLocale, locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$, initialLocale)
@@ -28,6 +34,8 @@ const Header: React.FC = (): JSX.Element => {
       selectedPricePoolAsset$={selectedPricePoolAsset$}
       locale={currentLocale}
       changeLocale={changeLocale}
+      binanceUrl={explorerUrl}
+      midgardUrl={O.fromEither(midgardUrl)}
     />
   )
 }

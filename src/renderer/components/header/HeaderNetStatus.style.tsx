@@ -3,8 +3,10 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
+import Menu from '../shared/Menu'
+import Label from '../uielements/label'
 
-export const HeaderNetStatusWrapper = styled(Row)`
+export const Wrapper = styled(Row)`
   margin-bottom: 5px;
   /* id defined in svg */
   #down_icon {
@@ -15,7 +17,36 @@ export const HeaderNetStatusWrapper = styled(Row)`
   }
 
   width: 100%;
+
   ${media.lg`
-  width: auto;
-    `}
+    width: auto;
+  `}
+`
+
+export const MenuItem = styled(Menu.Item).attrs({
+  display: 'flex',
+  alignItems: 'center',
+  padding: '8px 10px'
+})``
+
+export const MenuItemHeadline = styled(Label).attrs({
+  size: 'normal',
+  weight: 'bold',
+  textTransform: 'uppercase',
+  color: 'normal'
+})`
+  padding: 0 20px 0 0;
+  font-size: 14px;
+`
+
+export const MenuItemSubHeadline = styled(Label).attrs({
+  size: 'small',
+  weight: 'normal',
+  textTransform: 'uppercase',
+  color: 'normal'
+})`
+  padding: 0 20px 0 0;
+  text-transform: lowercase;
+  margin-bottom: 0;
+  font-size: 14px;
 `

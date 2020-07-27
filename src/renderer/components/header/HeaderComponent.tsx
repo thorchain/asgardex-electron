@@ -53,6 +53,8 @@ type Props = {
   selectedPricePoolAsset$: Observable<SelectedPricePoolAsset>
   locale: Locale
   changeLocale?: (locale: Locale) => void
+  midgardUrl: O.Option<string>
+  binanceUrl: O.Option<string>
 }
 
 const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
@@ -63,7 +65,9 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     lockHandler,
     setSelectedPricePool,
     locale,
-    changeLocale
+    changeLocale,
+    midgardUrl,
+    binanceUrl
   } = props
 
   const intl = useIntl()
@@ -230,6 +234,11 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     [changeLocale, isDesktopView, locale]
   )
 
+  const renderHeaderNetStatus = useMemo(
+    () => <HeaderNetStatus isDesktopView={isDesktopView} midgardUrl={midgardUrl} binanceUrl={binanceUrl} />,
+    [binanceUrl, isDesktopView, midgardUrl]
+  )
+
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
@@ -242,7 +251,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
               <Col>
                 <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
                   <AsgardexLogo />
-                  <HeaderNetStatus />
+                  {renderHeaderNetStatus}
                 </Row>
               </Col>
               <Col span="auto">
@@ -303,7 +312,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
             <HeaderDrawerItem>{renderHeaderLock}</HeaderDrawerItem>
             <HeaderDrawerItem>{renderHeaderSettings}</HeaderDrawerItem>
             <HeaderDrawerItem>{renderHeaderLang}</HeaderDrawerItem>
-            <HeaderNetStatus />
+            {renderHeaderNetStatus}
           </HeaderDrawer>
         )}
       </>

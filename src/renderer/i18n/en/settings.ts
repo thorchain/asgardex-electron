@@ -9,7 +9,8 @@ const settings: SettingMessages = {
   'setting.lock': 'Lock',
   'setting.view.phrase': 'View Phrase',
   'setting.midgard': 'Midgard',
-  'setting.version': 'Version'
+  'setting.version': 'Version',
+  'setting.notconnected': 'Not connected'
 }
 
 export default settings

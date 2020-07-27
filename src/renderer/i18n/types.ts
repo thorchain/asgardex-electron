@@ -78,6 +78,7 @@ type SettingMessageKey =
   | 'setting.view.phrase'
   | 'setting.midgard'
   | 'setting.version'
+  | 'setting.notconnected'
 
 export type SettingMessages = { [key in SettingMessageKey]: string }
 
