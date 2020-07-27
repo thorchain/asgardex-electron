@@ -81,7 +81,6 @@
     "styled-components": "^5.1.1",
     "styled-theme": "^0.3.3",
     "typescript": "^3.9.6",
-    "url": "^0.11.0",
     "uuid": "^8.1.0"
   },
   "devDependencies": {

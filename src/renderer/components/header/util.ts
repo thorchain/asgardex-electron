@@ -26,8 +26,7 @@ export const headerNetStatusSubheadline = ({
   if (onlineStatus === OnlineStatus.OFF) return notConnectedTxt
   return FP.pipe(
     url,
-    O.map(API.getHostnameFromUrl),
-    O.flatten,
+    O.chain(API.getHostnameFromUrl),
     O.getOrElse(() => notConnectedTxt)
   )
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 
+import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
@@ -16,7 +17,7 @@ const Header: React.FC = (): JSX.Element => {
   const keystore = useObservableState(keystoreService.keystore$, O.none)
   const { service: midgardService } = useMidgardContext()
   const { poolsState$, setSelectedPricePool, selectedPricePoolAsset$, apiEndpoint$ } = midgardService
-  const midgardUrl = useObservableState(apiEndpoint$, O.none)
+  const midgardUrl = useObservableState(apiEndpoint$, E.right(''))
 
   const { explorerUrl$ } = useBinanceContext()
   const explorerUrl = useObservableState(explorerUrl$, O.none)
@@ -34,7 +35,7 @@ const Header: React.FC = (): JSX.Element => {
       locale={currentLocale}
       changeLocale={changeLocale}
       binanceUrl={explorerUrl}
-      midgardUrl={midgardUrl}
+      midgardUrl={O.fromEither(midgardUrl)}
     />
   )
 }

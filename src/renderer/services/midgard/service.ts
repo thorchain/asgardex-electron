@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import byzantine from '@thorchain/byzantine-module'
+import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 import { some } from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -270,9 +271,9 @@ const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
   shareReplay()
 )
 
-const apiEndpoint$: Rx.Observable<O.Option<string>> = byzantine$.pipe(
-  map((endpoint) => O.some(endpoint)),
-  catchError((_: Error) => Rx.of(O.none))
+const apiEndpoint$: Rx.Observable<E.Either<Error, string>> = byzantine$.pipe(
+  map((endpoint) => E.right(endpoint)),
+  catchError((error: Error) => Rx.of(E.left(error)))
 )
 
 /**
