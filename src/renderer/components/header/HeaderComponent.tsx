@@ -155,7 +155,8 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                 {label}
               </Row>
             </TabLink>
-          }></Tabs.TabPane>
+          }
+        />
       )),
     [items, activeKey, headerHeight]
   )
@@ -164,13 +165,13 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     () =>
       items.map(({ label, key, path, icon: Icon }) => (
         <Link key={key} to={path} onClick={closeMenu}>
-          <HeaderDrawerItem>
+          <HeaderDrawerItem active={activeKey === key}>
             <Icon style={{ marginLeft: '12px', marginRight: '12px' }} />
             {label}
           </HeaderDrawerItem>
         </Link>
       )),
-    [closeMenu, items]
+    [closeMenu, items, activeKey]
   )
 
   const clickSettingsHandler = useCallback(() => {
@@ -287,7 +288,6 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
               maxHeight: `calc(100% - ${headerHeight})`,
               overflow: 'auto'
             }}
-            bodyStyle={{ backgroundColor: 'transparent' }}
             drawerStyle={{ backgroundColor: 'transparent' }}
             maskStyle={{ backgroundColor: 'transparent' }}
             placement="top"

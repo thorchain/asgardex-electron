@@ -77,6 +77,7 @@ type TabLinkProps = {
 }
 
 export const TabLink = styled(Link)`
+  display: block;
   border-bottom-width: 3px;
   border-color: ${palette('primary', 0)};
   color: ${(props: TabLinkProps) => (props.selected ? palette('text', 1) : palette('text', 2))};
@@ -105,6 +106,7 @@ export const HeaderDrawer = styled(Drawer)`
     margin: 4px 4px 0px 4px;
     padding: 0;
     border-radius: 5px;
+    background-color: ${palette('background', 0)};
   }
 
   .ant-drawer-content {
@@ -116,16 +118,16 @@ export const HeaderDrawer = styled(Drawer)`
   #stake_icon,
   #wallet_icon {
     & > * {
-      fill: ${palette('text', 1)};
+      fill: currentColor;
     }
   }
 `
 
-export const HeaderDrawerItem = styled(Row)`
+export const HeaderDrawerItem = styled(Row)<{ active?: boolean }>`
   border-bottom-width: 1px;
   border-bottom-style: solid;
   border-color: ${palette('background', 2)};
-  background-color: ${palette('background', 0)};
+
   align-items: center;
   transition: none;
   height: 60px;
@@ -133,7 +135,7 @@ export const HeaderDrawerItem = styled(Row)`
   text-transform: uppercase;
   font-family: 'MainFontSemiBold';
   font-size: 18px;
-  color: ${palette('text', 1)};
+  color: ${(props) => (props.active ? palette('primary', 0) : palette('text', 1))};
   &.last {
     border: none;
   }
