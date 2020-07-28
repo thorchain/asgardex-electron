@@ -1,12 +1,15 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import { LeftOutlined } from '@ant-design/icons'
+import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { ASSETS_MAINNET } from '../../../shared/mock/assets'
+import { useBinanceContext } from '../../contexts/BinanceContext'
 import Button from '../uielements/button'
 import { Input } from '../uielements/input'
 import AccountSelector from './AccountSelector'
@@ -24,9 +27,16 @@ import {
 const Send: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const history = useHistory()
+  const { transaction: transactionService } = useBinanceContext()
+  const [activeAsset, setActiveAsset] = useState(ASSETS_MAINNET.BOLT)
+
+  const transaction = useObservableState(transactionService.normal.transaction$, RD.initial)
+
+  console.log('transaction --- ', transaction)
 
   const onSubmit = (data: Store) => {
     console.log(data)
+    transactionService.normal.pushTx(data.recipient, data.amount, ASSETS_MAINNET.BOLT.symbol)
   }
 
   const onBack = useCallback(() => {
@@ -46,7 +56,7 @@ const Send: React.FC = (): JSX.Element => {
       <Row>
         <StyledCol span={24}>
           {/* AccountSelector needs data - we are using mock data for now */}
-          <AccountSelector asset={ASSETS_MAINNET.BOLT} assets={[ASSETS_MAINNET.BNB, ASSETS_MAINNET.TOMO]} />
+          <AccountSelector onChange={setActiveAsset} asset={activeAsset} assets={Object.values(ASSETS_MAINNET)} />
           <StyledForm onFinish={onSubmit} labelCol={{ span: 24 }}>
             <StyledSubForm>
               <CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</CustomLabel>
