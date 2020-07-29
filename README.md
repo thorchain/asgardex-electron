@@ -143,7 +143,7 @@ By creating a new wallet or importing an existing one, ASGARDEX is saving wallet
 
 ## Releasing
 
-See [RELEASE.md](./REALEASE.md)
+See [RELEASE.md](./RELEASE.md)
 
 ## Docs
 
