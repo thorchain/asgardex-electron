@@ -43,7 +43,8 @@ type InputProps = CustomInputProps & AI.InputProps
 
 const inputStyle = css<InputProps>`
   &.ant-input-affix-wrapper,
-  &.ant-input {
+  &.ant-input,
+  &.ant-input-number {
     height: ${({ size = 'middle' }) => sizes[size]};
     font-size: ${({ size = 'middle' }) => fontSettings[size].size};
     letter-spacing: ${({ size = 'middle' }) => fontSettings[size].spacing};
@@ -71,6 +72,16 @@ const inputStyle = css<InputProps>`
 
 export const Input = styled(A.Input)<InputProps>`
   ${inputStyle}
+`
+
+export const InputNumber = styled(A.InputNumber)<InputProps>`
+  ${inputStyle}
+  width: 100%;
+
+  & .ant-input-number-input,
+  & .ant-input-number-input-wrap {
+    height: 100%;
+  }
 `
 
 export const InputPassword = styled(A.Input.Password)<InputProps>`
