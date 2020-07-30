@@ -11,7 +11,7 @@ import { StyledCard, AssetWrapper, AssetInfoWrapper, AssetTitle } from './Accoun
 type Props = {
   asset: Asset
   assets: Asset[]
-  onChange?: (asset: Asset) => {}
+  onChange?: (asset: Asset) => void
   size?: CoinSize
 }
 

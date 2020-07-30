@@ -16,6 +16,7 @@ import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
+import * as transactionServices from './transaction'
 import { BalancesRD, BinanceClientStateForViews, BinanceClientState, TxsRD } from './types'
 import { getBinanceClientStateForViews, getBinanceClient } from './utils'
 
@@ -160,8 +161,8 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
-              const client = new Client(phrase, binanceNetwork)
-              return some(right(client)) as BinanceClientState
+              const cleint = new Client(phrase, binanceNetwork)
+              return some(right(cleint)) as BinanceClientState
             } catch (error) {
               return some(left(error))
             }
@@ -171,6 +172,8 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
       }) as Observable<BinanceClientState>
   )
 )
+
+export type ClientState = typeof clientState$
 
 /**
  * Helper stream to provide "ready-to-go" state of latest `BinanceClient`, but w/o exposing the client
@@ -313,6 +316,8 @@ const explorerUrl$: Observable<O.Option<string>> = clientState$.pipe(
   ),
   shareReplay()
 )
+
+const transaction = transactionServices.createTransactionService(clientState$)
 /**
  * Object with all "public" functions and observables
  */
@@ -329,5 +334,6 @@ export {
   reloadTxssSelectedAsset,
   address$,
   selectedAsset$,
-  explorerUrl$
+  explorerUrl$,
+  transaction
 }

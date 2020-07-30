@@ -15,7 +15,8 @@ import {
   txsSelectedAsset$,
   selectedAsset$,
   reloadTxssSelectedAsset,
-  explorerUrl$
+  explorerUrl$,
+  transaction
 } from '../services/binance/service'
 import { useAppContext } from './AppContext'
 import { useWalletContext } from './WalletContext'
@@ -32,9 +33,10 @@ type BinanceContextValue = {
   selectedAsset$: typeof selectedAsset$
   address$: typeof address$
   explorerUrl$: typeof explorerUrl$
+  transaction: typeof transaction
 }
 
-const initialContext = {
+const initialContext: BinanceContextValue = {
   subscribeTransfers,
   miniTickers$,
   clientViewState$,
@@ -45,7 +47,8 @@ const initialContext = {
   reloadTxssSelectedAsset,
   selectedAsset$,
   address$,
-  explorerUrl$
+  explorerUrl$,
+  transaction
 }
 
 const BinanceContext = createContext<BinanceContextValue | null>(null)

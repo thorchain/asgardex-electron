@@ -25,7 +25,9 @@ const common: CommonMessages = {
   'common.next': 'Next - FR',
   'common.finish': 'Finish - FR',
   'common.copy': 'Copy - FR',
-  'common.loading': 'Loading... - FR'
+  'common.loading': 'Loading... - FR',
+  'common.error': 'Error - FR',
+  'common.success': 'Success - FR'
 }
 
 export default common
