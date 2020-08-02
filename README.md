@@ -31,7 +31,7 @@ _(in alphabetical order)_
 ## Install
 
 ```bash
-git clone https://github.com/thorchain/asgardex.git asgardex
+git clone https://github.com/thorchain/asgardex-electron.git asgardex
 cd asgardex
 yarn
 ```
