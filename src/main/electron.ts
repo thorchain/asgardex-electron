@@ -72,7 +72,7 @@ const initMainWindow = async () => {
   mainWindow = new BrowserWindow({
     width: IS_DEV ? 1600 : 1200,
     height: IS_DEV ? 1000 : 800,
-    icon: join(APP_ROOT, 'assets', 'icon.png'),
+    icon: join(APP_ROOT, 'resources', 'icon.png'),
     webPreferences: {
       nodeIntegration: true
     }
@@ -102,10 +102,8 @@ const initIPC = () => {
 }
 
 const init = async () => {
-  app.on('ready', async () => {
-    await initMainWindow()
-  })
-
+  await app.whenReady()
+  await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
 

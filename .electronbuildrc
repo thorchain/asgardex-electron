@@ -4,9 +4,9 @@
   "copyright": "Copyright © 2020 ${author}",
   "artifactName": "${productName}-${version}-${os}.${ext}",
   "afterSign": "./scripts/notarize.js",
-  "files": ["build/**/*", "assets/**/*"],
+  "files": ["resources/icon.png", "src/renderer/assets/svg/coin-*.svg"],
   "directories": {
-    "buildResources": "assets",
+    "buildResources": ".",
     "output": "release"
   },
   "mac": {
@@ -44,7 +44,7 @@
   "linux": {
     "category": "Finance",
     "packageCategory": "wallet",
-    "icon": "resources/icons",
+    "icon": "resources/icons/",
     "target": [
       {
         "target": "deb",
