@@ -7,7 +7,7 @@ jobs:
     name: Unit tests
     strategy:
       matrix:
-        node-version: [12.14.1]
+        node-version: [13]
 
     runs-on: ubuntu-latest
 

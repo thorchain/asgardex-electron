@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, macOS-latest, ubuntu-latest]
-        node_version: [12.14.1]
+        node_version: [13]
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v2
