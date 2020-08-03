@@ -1,5 +1,7 @@
+import { EMPTY_ASSET } from '@thorchain/asgardex-util'
+
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
-import { balanceByAsset } from './binanceHelper'
+import { balanceByAsset, isMiniToken } from './binanceHelper'
 
 describe('binanceHelper', () => {
   describe('amountByAsset', () => {
@@ -17,6 +19,21 @@ describe('binanceHelper', () => {
     it('returns 0 for an empty list of assets', () => {
       const result = balanceByAsset([], ASSETS_TESTNET.FTM)
       expect(result.amount().toNumber()).toEqual(0)
+    })
+  })
+
+  describe('isMiniToken', () => {
+    it('is true`', () => {
+      expect(isMiniToken({ symbol: 'MINIA-7A2M' })).toBeTruthy()
+    })
+    it('is false for RUNE asset', () => {
+      expect(isMiniToken({ symbol: 'RUNE-B1A' })).toBeFalsy()
+    })
+    it('is false for BNB asset', () => {
+      expect(isMiniToken({ symbol: 'BNB' })).toBeFalsy()
+    })
+    it('is false for EMTPY asset', () => {
+      expect(isMiniToken(EMPTY_ASSET)).toBeFalsy()
     })
   })
 })

@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { assetFromString, EMPTY_ASSET } from '@thorchain/asgardex-util'
 import byzantine from '@thorchain/byzantine-module'
 import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
@@ -22,6 +23,7 @@ import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
 import { Network } from '../app/types'
+import { isMiniToken } from '../binance/utils'
 import {
   PoolsStateRD,
   PoolsState,
@@ -73,13 +75,18 @@ const loadPoolsStateData$ = () => {
   setPoolState(RD.pending)
   // start queue of requests to get all pool data
   return apiGetPools$.pipe(
-    // set `PoolAssets` into state
-    tap((poolAssets) => (state = { ...state, poolAssets })),
+    map((poolAssets) => {
+      const filtered = poolAssets.filter((poolAsset) => {
+        const asset = assetFromString(poolAsset)
+        return !isMiniToken(asset || EMPTY_ASSET)
+      })
+      // set `PoolAssets` into state
+      state = { ...state, poolAssets: filtered }
+      return filtered
+    }),
     // load `AssetDetails`
     concatMap((poolAssets) => apiGetAssetInfo$(poolAssets)),
     // store `AssetDetails`
-    tap((assetDetails) => (state = { ...state, assetDetails })),
-    // Derive + store `assetDetailIndex`
     tap((assetDetails) => (state = { ...state, assetDetails })),
     // load `PoolDetails`
     concatMap((_) => apiGetPoolsData$(state.poolAssets)),
