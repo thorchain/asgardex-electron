@@ -169,7 +169,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     () =>
       items.map(({ label, key, path, icon: Icon }) => (
         <Link key={key} to={path} onClick={closeMenu}>
-          <HeaderDrawerItem active={activeKey === key}>
+          <HeaderDrawerItem selected={activeKey === key}>
             <Icon style={{ marginLeft: '12px', marginRight: '12px' }} />
             {label}
           </HeaderDrawerItem>

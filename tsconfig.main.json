@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2019",
-    "lib": ["esnext"],
+    "lib": ["ESNext"],
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

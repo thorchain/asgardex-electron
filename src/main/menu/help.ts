@@ -27,7 +27,7 @@ const menu = (intl: IntlShape): MenuItemConstructorOptions => ({
     {
       label: intl.formatMessage({ id: 'menu.help.issues' }),
       click() {
-        shell.openExternal(`${ExternalUrl.GITHUB}/issues`)
+        shell.openExternal(`${ExternalUrl.GITHUB_REPO}/issues`)
       }
     }
   ]

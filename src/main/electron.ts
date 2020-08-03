@@ -1,6 +1,6 @@
 import { join } from 'path'
 
-import { BrowserWindow, app, remote, ipcMain } from 'electron'
+import { BrowserWindow, app, ipcMain } from 'electron'
 import electronDebug from 'electron-debug'
 import isDev from 'electron-is-dev'
 import log from 'electron-log'
@@ -22,9 +22,8 @@ export const BASE_URL = IS_DEV ? BASE_URL_DEV : BASE_URL_PROD
 
 const initLogger = () => {
   log.transports.file.resolvePath = (variables: log.PathVariables) => {
-    const ap = app || remote.app
     // Logs go into ~/.config/{appName}/logs/ dir
-    const path = join(ap.getPath('userData'), 'logs', variables.fileName as string)
+    const path = join(app.getPath('userData'), 'logs', variables.fileName as string)
     return path
   }
 }
