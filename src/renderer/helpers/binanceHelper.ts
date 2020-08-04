@@ -9,7 +9,6 @@ export const balanceByAsset = (txs: PickBalanceAmount[], asset: Asset): AssetAmo
 }
 
 export const isMiniToken = ({ symbol }: Pick<Asset, 'symbol'>): boolean => {
-  const [one, two] = symbol.split('-')
-  if (!two) return false
-  return one.length === 4 && symbol.endsWith('M')
+  const [_, two] = symbol.split('-')
+  return two?.length === 4 && two?.endsWith('M')
 }
