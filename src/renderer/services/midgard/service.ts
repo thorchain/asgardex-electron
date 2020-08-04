@@ -14,7 +14,8 @@ import {
   shareReplay,
   startWith,
   switchMap,
-  distinctUntilChanged
+  distinctUntilChanged,
+  delay
 } from 'rxjs/operators'
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
@@ -74,24 +75,36 @@ const loadPoolsStateData$ = () => {
   // start queue of requests to get all pool data
   return apiGetPools$.pipe(
     map((poolAssets) => {
+      // Filter out mini token
+      // TODO(Veado): It can be removed as soon as midgard's endpoint has been fixed, see https://gitlab.com/thorchain/midgard/-/issues/215
       const filtered = filterPoolAssets(poolAssets)
       // set `PoolAssets` into state
       state = { ...state, poolAssets: filtered }
       return filtered
     }),
     // load `AssetDetails`
-    concatMap((poolAssets) => apiGetAssetInfo$(poolAssets)),
-    // store `AssetDetails`
-    tap((assetDetails) => (state = { ...state, assetDetails })),
+    // As long as Midgard has some issues to load all details at once at `v1/assets` endpoint we load details in sequence with some delay between
+    // TODO(@Veado) Load details at once if Midgard has been fixed
+    switchMap((poolAssets) =>
+      Rx.combineLatest(...poolAssets.map((pAsset, index) => apiGetAssetInfo$([pAsset], index * 50)))
+    ),
+    tap((assetDetails) => {
+      state = { ...state, assetDetails: assetDetails.map((d) => d[0]) }
+    }),
     // load `PoolDetails`
-    concatMap((_) => apiGetPoolsData$(state.poolAssets)),
+    // As long as Midgard has some issues to load all details at once at `v1/detail` endpoint we load details in sequence with some delay between
+    // TODO(@Veado) Load details at once if Midgard has been fixed
+    // switchMap((_) => apiGetPoolsData$(state.poolAssets)),
+    switchMap((_) =>
+      Rx.combineLatest(...state.poolAssets.map((pAsset, index) => apiGetPoolsData$([pAsset], index * 50)))
+    ),
     // Derive + store `poolDetails`
-    tap((poolDetails: PoolDetails) => {
-      state = { ...state, poolDetails }
+    tap((poolDetails: Array<PoolDetails>) => {
+      state = { ...state, poolDetails: poolDetails.map((d) => d[0]) }
     }),
     // Derive + store `pricePools`
-    tap((poolDetails: PoolDetails) => {
-      state = { ...state, pricePools: some(getPricePools(poolDetails, PRICE_POOLS_WHITELIST)) }
+    tap((_) => {
+      state = { ...state, pricePools: some(getPricePools(state.poolDetails, PRICE_POOLS_WHITELIST)) }
     }),
     // Update selected `PricePoolAsset`
     tap((_) => {
@@ -127,10 +140,13 @@ const apiGetPools$ = byzantine$.pipe(
 
 /**
  * Get data of `AssetDetails` from Midgard
+ * `delayTime` - Optional value in `ms` to delay request
  */
-const apiGetAssetInfo$ = (poolAssets: string[]) =>
-  byzantine$.pipe(
-    concatMap((endpoint) => {
+const apiGetAssetInfo$ = (poolAssets: string[], delayTime = 0) =>
+  Rx.of(null).pipe(
+    delay(delayTime),
+    switchMap(() => byzantine$),
+    switchMap((endpoint) => {
       const api = getMidgardDefaultApi(endpoint)
       return api.getAssetInfo({ asset: poolAssets.join() })
     })
@@ -138,9 +154,12 @@ const apiGetAssetInfo$ = (poolAssets: string[]) =>
 
 /**
  * Get `PoolDetails` data from Midgard
+ * `delayTime` - Optional value in `ms` to delay request
  */
-const apiGetPoolsData$ = (poolAssets: string[]) =>
-  byzantine$.pipe(
+const apiGetPoolsData$ = (poolAssets: string[], delayTime = 0) =>
+  Rx.of(null).pipe(
+    delay(delayTime),
+    switchMap(() => byzantine$),
     concatMap((endpoint) => {
       const api = getMidgardDefaultApi(endpoint)
       return api.getPoolsData({ asset: poolAssets.join() })
