@@ -7,3 +7,8 @@ export const balanceByAsset = (txs: PickBalanceAmount[], asset: Asset): AssetAmo
   const tx = txs.find(({ symbol }) => symbol === asset.symbol)
   return assetAmount(bnOrZero(tx?.free))
 }
+
+export const isMiniToken = ({ symbol }: Pick<Asset, 'symbol'>): boolean => {
+  const [_, two] = symbol.split('-')
+  return two?.length === 4 && two?.endsWith('M')
+}

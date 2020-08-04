@@ -1,10 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, bnOrZero, baseAmount, PoolData } from '@thorchain/asgardex-util'
+import { assetFromString, bnOrZero, baseAmount, PoolData, EMPTY_ASSET } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import { head } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
 import { RUNE_PRICE_POOL, CURRENCY_WHEIGHTS } from '../../const'
+import { isMiniToken } from '../../helpers/binanceHelper'
 import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool, PoolAsset } from '../../views/pools/types'
 import { AssetDetails, AssetDetailMap, PoolDetails, PoolsStateRD, SelectedPricePoolAsset } from './types'
@@ -103,3 +104,10 @@ export const toPoolData = (detail: PoolDetail): PoolData => ({
   assetBalance: baseAmount(bnOrZero(detail.assetDepth)),
   runeBalance: baseAmount(bnOrZero(detail.runeDepth))
 })
+
+/**
+ * Filter out mini tokens from pool assets
+ */
+export const filterPoolAssets = (poolAssets: string[]) => {
+  return poolAssets.filter((poolAsset) => !isMiniToken(assetFromString(poolAsset) || EMPTY_ASSET))
+}

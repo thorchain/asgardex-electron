@@ -13,7 +13,8 @@ import {
   pricePoolSelector,
   pricePoolSelectorFromRD,
   getPoolDetail,
-  toPoolData
+  toPoolData,
+  filterPoolAssets
 } from './utils'
 
 type PoolDataMock = { asset?: string }
@@ -194,6 +195,15 @@ describe('services/midgard/utils/', () => {
     it('returns None if no RUNE details available', () => {
       const result = getPoolDetail([bnbDetail], 'TOMOB')
       expect(result).toBeNone()
+    })
+  })
+
+  describe('filterPoolAssets', () => {
+    it('returns empty list', () => {
+      expect(filterPoolAssets([])).toEqual([])
+    })
+    it('filters out mini tokens', () => {
+      expect(filterPoolAssets(['BNB.BNB', 'BNB.MINIA-7A2M', 'BNB.RUNE-B1A'])).toEqual(['BNB.BNB', 'BNB.RUNE-B1A'])
     })
   })
 })
