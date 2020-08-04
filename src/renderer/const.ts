@@ -10,6 +10,7 @@ import {
 
 // Currency symbols used for pricing
 export const CURRENCY_SYMBOLS: PricePoolCurrencySymbols = {
+  [PoolAsset.RUNEB1A]: AssetSymbol.RUNE,
   [PoolAsset.RUNE67C]: AssetSymbol.RUNE,
   [PoolAsset.BTC]: AssetSymbol.BTC,
   [PoolAsset.ETH]: AssetSymbol.ETH,
@@ -22,7 +23,8 @@ export const CURRENCY_WHEIGHTS: PricePoolCurrencyWeights = {
   [PoolAsset.TUSDB]: 0,
   [PoolAsset.ETH]: 1,
   [PoolAsset.BTC]: 2,
-  [PoolAsset.RUNE67C]: 3
+  [PoolAsset.RUNEB1A]: 3,
+  [PoolAsset.RUNE67C]: 4
 }
 
 // One `AssetAmount` in `BaseAmount` as const, since we just need it at different places
