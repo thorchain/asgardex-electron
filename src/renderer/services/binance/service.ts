@@ -11,7 +11,6 @@ import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, catchError, retry, shareReplay, startWith, switchMap, debounceTime } from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
-import { isMiniToken } from '../../helpers/binanceHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
@@ -208,11 +207,7 @@ const address$: Observable<O.Option<Address>> = clientState$.pipe(
  */
 const loadBalances$ = (client: BinanceClient): Observable<BalancesRD> =>
   Rx.from(client.getBalance()).pipe(
-    mergeMap((balances) => {
-      // filter out mini tokens
-      const filtered = balances.filter((balance) => !isMiniToken({ symbol: balance.symbol }))
-      return Rx.of(RD.success(filtered))
-    }),
+    mergeMap((balances) => Rx.of(RD.success(balances))),
     catchError((error) => Rx.of(RD.failure(error))),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
