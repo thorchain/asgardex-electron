@@ -10,7 +10,6 @@ import {
   concatMap,
   tap,
   map,
-  mergeMap,
   shareReplay,
   startWith,
   switchMap,
@@ -60,51 +59,46 @@ const byzantine$ = getNetworkState$.pipe(
   retry(BYZANTINE_MAX_RETRY)
 )
 
-/**
- * State of pools data
- */
-const { get$: getPoolsState$, set: setPoolState } = observableState<PoolsStateRD>(RD.initial)
-
+const initialPoolsState: PoolsState = {
+  assetDetails: [],
+  poolAssets: [],
+  poolDetails: [],
+  pricePools: O.none
+}
 /**
  * Loading queue to get all needed data for `PoolsState`
  */
-const loadPoolsStateData$ = () => {
-  let state: PoolsState
-  // Update `PoolState` to `pending`
-  setPoolState(RD.pending)
+const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
+  // Local (mutable) state object to store all results of different api request we made here
+  let state = { ...initialPoolsState }
   // start queue of requests to get all pool data
   return apiGetPools$.pipe(
-    map((poolAssets) => {
-      // Filter out mini token
-      // TODO(Veado): It can be removed as soon as midgard's endpoint has been fixed, see https://gitlab.com/thorchain/midgard/-/issues/215
-      const filtered = filterPoolAssets(poolAssets)
-      // set `PoolAssets` into state
-      state = { ...state, poolAssets: filtered }
-      return filtered
+    // Store pool assets and filter out mini token
+    // TODO(Veado): It can be removed as soon as midgard's endpoint has been fixed - see https://gitlab.com/thorchain/midgard/-/issues/215
+    tap((poolAssets) => {
+      state = { ...state, poolAssets: filterPoolAssets(poolAssets) }
     }),
-    // load `AssetDetails`
+    // Load `AssetDetails`
     // As long as Midgard has some issues to load all details at once at `v1/assets` endpoint we load details in sequence with some delay between
     // TODO(@Veado) Load details at once if Midgard has been fixed
-    switchMap((poolAssets) =>
-      Rx.combineLatest(...poolAssets.map((pAsset, index) => apiGetAssetInfo$([pAsset], index * 50)))
-    ),
+    // switchMap((_) => apiGetAssetInfo$(state.poolAssets)),
+    switchMap((_) => Rx.combineLatest(...state.poolAssets.map((asset, index) => apiGetAssetInfo$(asset, index * 50)))),
+    // Store `AssetDetails` in `PoolsState`
     tap((assetDetails) => {
-      state = { ...state, assetDetails: assetDetails.map((d) => d[0]) }
+      state = { ...state, assetDetails }
     }),
-    // load `PoolDetails`
+    // Load `PoolDetails`
     // As long as Midgard has some issues to load all details at once at `v1/detail` endpoint we load details in sequence with some delay between
     // TODO(@Veado) Load details at once if Midgard has been fixed
     // switchMap((_) => apiGetPoolsData$(state.poolAssets)),
-    switchMap((_) =>
-      Rx.combineLatest(...state.poolAssets.map((pAsset, index) => apiGetPoolsData$([pAsset], index * 50)))
-    ),
-    // Derive + store `poolDetails`
-    tap((poolDetails: Array<PoolDetails>) => {
-      state = { ...state, poolDetails: poolDetails.map((d) => d[0]) }
-    }),
-    // Derive + store `pricePools`
-    tap((_) => {
-      state = { ...state, pricePools: some(getPricePools(state.poolDetails, PRICE_POOLS_WHITELIST)) }
+    switchMap((_) => Rx.combineLatest(...state.poolAssets.map((asset, index) => apiGetPoolsData$(asset, index * 50)))),
+    // Derive + store `poolDetails` + `pricePools`
+    tap((poolDetails: PoolDetails) => {
+      state = {
+        ...state,
+        poolDetails,
+        pricePools: some(getPricePools(poolDetails, PRICE_POOLS_WHITELIST))
+      }
     }),
     // Update selected `PricePoolAsset`
     tap((_) => {
@@ -116,14 +110,10 @@ const loadPoolsStateData$ = () => {
         setSelectedPricePoolAsset(selectedPricePool.asset)
       }
     }),
-    // set everything into a `success` state
-    tap((_) => setPoolState(RD.success(state))),
+    // return a `success` state
+    switchMap((_) => Rx.of(RD.success(state))),
     // catch any errors if there any
-    catchError((error: Error) => {
-      // set `error` state
-      setPoolState(RD.failure(error))
-      return Rx.of('Error while fetching data for pools')
-    }),
+    catchError((error: Error) => Rx.of(RD.failure(error))),
     retry(MIDGARD_MAX_RETRY)
   )
 }
@@ -142,28 +132,30 @@ const apiGetPools$ = byzantine$.pipe(
  * Get data of `AssetDetails` from Midgard
  * `delayTime` - Optional value in `ms` to delay request
  */
-const apiGetAssetInfo$ = (poolAssets: string[], delayTime = 0) =>
+const apiGetAssetInfo$ = (asset: string, delayTime = 0) =>
   Rx.of(null).pipe(
     delay(delayTime),
     switchMap(() => byzantine$),
     switchMap((endpoint) => {
       const api = getMidgardDefaultApi(endpoint)
-      return api.getAssetInfo({ asset: poolAssets.join() })
-    })
+      return api.getAssetInfo({ asset })
+    }),
+    map((details) => details[0])
   )
 
 /**
  * Get `PoolDetails` data from Midgard
  * `delayTime` - Optional value in `ms` to delay request
  */
-const apiGetPoolsData$ = (poolAssets: string[], delayTime = 0) =>
+const apiGetPoolsData$ = (asset: string, delayTime = 0) =>
   Rx.of(null).pipe(
     delay(delayTime),
     switchMap(() => byzantine$),
-    concatMap((endpoint) => {
+    switchMap((endpoint) => {
       const api = getMidgardDefaultApi(endpoint)
-      return api.getPoolsData({ asset: poolAssets.join() })
-    })
+      return api.getPoolsData({ asset })
+    }),
+    map((details) => details[0])
   )
 
 // `TriggerStream` to reload data of pools
@@ -174,9 +166,7 @@ const { stream$: reloadPoolsState$, trigger: reloadPoolsState } = triggerStream(
  */
 const poolsState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$.pipe(
   // start loading queue
-  switchMap((_) => loadPoolsStateData$()),
-  // return state of pool data
-  mergeMap((_) => getPoolsState$),
+  switchMap((_) => loadPoolsStateData$().pipe(startWith(RD.pending))),
   // cache it to avoid reloading data by every subscription
   shareReplay()
 )
