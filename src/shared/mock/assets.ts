@@ -6,7 +6,7 @@ type AssetsTestnet = Record<Assets, Asset>
 type AssetsMainnet = Record<Assets, Asset>
 
 export const ASSETS_TESTNET: AssetsTestnet = {
-  RUNE: { chain: 'BNB', symbol: 'RUNE-A1A', ticker: 'RUNE' },
+  RUNE: { chain: 'BNB', symbol: 'RUNE-67C', ticker: 'RUNE' },
   BNB: { chain: 'BNB', symbol: 'BNB', ticker: 'BNB' },
   FTM: { chain: 'BNB', symbol: 'FTM-585', ticker: 'FTM' },
   TOMO: { chain: 'BNB', symbol: 'TOMOB-1E1', ticker: 'TOMOB' },

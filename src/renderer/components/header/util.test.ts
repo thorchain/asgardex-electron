@@ -7,7 +7,7 @@ import { toHeaderCurrencyLabel, headerNetStatusSubheadline, headerNetStatusColor
 describe('header/util', () => {
   describe('toHeaderCurrencyItem', () => {
     it('returns label for RUNE', () => {
-      const result = toHeaderCurrencyLabel(PoolAsset.RUNE)
+      const result = toHeaderCurrencyLabel(PoolAsset.RUNE67C)
       expect(result).toEqual('ᚱ RUNE')
     })
 

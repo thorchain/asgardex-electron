@@ -21,7 +21,8 @@ const AssetsView: React.FC = (): JSX.Element => {
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<O.Option<PricePoolAsset>>(
     selectedPricePoolAsset$,
-    O.some(PoolAsset.RUNE)
+    // FIXME(@Veado) Depends on main/testnet - https://github.com/thorchain/asgardex-electron/issues/316
+    O.some(PoolAsset.RUNE67C)
   )
 
   const pricePool = useMemo(() => pricePoolSelectorFromRD(poolsRD, selectedPricePoolAsset), [
