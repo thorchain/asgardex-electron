@@ -56,10 +56,18 @@ REACT_APP_WALLET_PASSWORD=password yarn dev
 
 Or add to `REACT_APP_WALLET_PASSWORD=password` to `.env` file and run `yarn dev`
 
-## Test
+## Tests
+
+### `unit`
 
 ```bash
 yarn test
+```
+
+### `e2e`
+
+```bash
+yarn test:e2e
 ```
 
 ## Folder structure
