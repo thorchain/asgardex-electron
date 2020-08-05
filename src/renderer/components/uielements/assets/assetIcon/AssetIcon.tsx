@@ -16,9 +16,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
   asset: Asset
 }
 
-const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
-  const { asset, size = 'normal' } = props
-
+const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', ...rest }): JSX.Element => {
   const imgUrl = useMemo(() => {
     const { symbol, ticker } = asset
     const assetId = symbol
@@ -42,11 +40,11 @@ const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
 
   const renderIcon = useCallback(
     (src: string) => (
-      <Styled.IconWrapper size={size}>
+      <Styled.IconWrapper className={`coinIcon-wrapper ${rest.className}`} size={size}>
         <Styled.Icon src={src} size={size} />{' '}
       </Styled.IconWrapper>
     ),
-    [size]
+    [size, rest.className]
   )
 
   const renderPendingIcon = useCallback(() => {
@@ -62,13 +60,13 @@ const AssetIcon: React.FC<Props> = (props: Props): JSX.Element => {
     const backgroundImage = `linear-gradient(45deg,${rainbowStop(numbers[0])},${rainbowStop(numbers[1])})`
 
     return (
-      <Styled.IconWrapper size={size}>
+      <Styled.IconWrapper {...rest} size={size}>
         <Styled.IconFallback style={{ backgroundImage }} size={size}>
           {ticker}
         </Styled.IconFallback>
       </Styled.IconWrapper>
     )
-  }, [asset, size])
+  }, [asset, size, rest])
 
   return RD.fold(() => <></>, renderPendingIcon, renderFallbackIcon, renderIcon)(remoteIconImage)
 }

@@ -25,7 +25,7 @@ storiesOf('Components/Assets/AssetSelect', module).add('default', () => {
         priceIndex={{
           RUNE: bn(1)
         }}
-        onSelect={(_: number) => {}}
+        onSelect={() => {}}
       />
     </div>
   )

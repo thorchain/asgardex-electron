@@ -35,10 +35,10 @@ export const getAssetDetail = (assets: AssetDetails, ticker: string): O.Option<A
     O.fromNullable
   )
 
-export const getPricePools = (pools: PoolDetails, whitelist: PricePoolAssets): PricePools => {
-  const poolDetails = pools.filter(
-    (detail) => whitelist.find((asset) => detail.asset && detail.asset === asset) !== undefined
-  )
+export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): PricePools => {
+  const poolDetails = !whitelist
+    ? pools
+    : pools.filter((detail) => whitelist.find((asset) => detail.asset && detail.asset === asset) !== undefined)
 
   const pricePools = poolDetails
     .map((detail: PoolDetail) => {

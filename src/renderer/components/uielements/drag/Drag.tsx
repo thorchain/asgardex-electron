@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
 import { Asset } from '@thorchain/asgardex-util'
-import Draggable, {
-  ControlPosition,
-  DraggableBounds,
-  DraggableData,
-  DraggableEvent,
-  DraggableEventHandler
-} from 'react-draggable'
+import Draggable, { ControlPosition, DraggableBounds, DraggableEvent, DraggableEventHandler } from 'react-draggable'
 
 import AssetIcon from '../assets/assetIcon'
-import { DragWrapper, TitleLabel } from './Drag.style'
+import * as Styled from './Drag.style'
 
 type Props = {
   className?: string
@@ -32,7 +26,6 @@ const Drag: React.FC<Props> = ({
   onDrag = () => {},
   ...rest
 }: Props): JSX.Element => {
-  const [focused, setFocused] = useState<boolean>(true)
   const [overlap, setOverlap] = useState<boolean>(false)
   const [success, setSuccess] = useState<boolean>(false)
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -52,7 +45,6 @@ const Drag: React.FC<Props> = ({
   }, [reset])
 
   const handleReset = () => {
-    setFocused(false)
     setSuccess(false)
     setOverlap(false)
     setDisabled(false)
@@ -61,21 +53,9 @@ const Drag: React.FC<Props> = ({
     setPos({ x: 0, y: 0 })
   }
 
-  const handleFocus = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault()
-
-    setFocused(true)
-  }
-
-  const handleBlur = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault()
-  }
-
   const handleDragStart: DraggableEventHandler = (e: DraggableEvent) => {
     e.preventDefault()
-    e.stopPropagation()
-
-    if (!focused || disabled) {
+    if (disabled) {
       return false
     }
 
@@ -85,15 +65,12 @@ const Drag: React.FC<Props> = ({
     setDragging(true)
   }
 
-  const handleDragging: DraggableEventHandler = (e: DraggableEvent, pos: DraggableData) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    if (!focused || disabled) {
+  const handleDragging: DraggableEventHandler = (_, data) => {
+    if (disabled) {
       return false
     }
 
-    const { x } = pos
+    const { x } = data
 
     const overlapLimit = 164
     const successLimit = 190
@@ -107,15 +84,15 @@ const Drag: React.FC<Props> = ({
       setOverlap(false)
     }
 
-    setPos(pos)
+    setPos({ x: data.x, y: data.y })
   }
 
-  const handleDragStop: DraggableEventHandler = (e: DraggableEvent, pos: DraggableData) => {
-    if (!focused || disabled) {
+  const handleDragStop: DraggableEventHandler = (_, data) => {
+    if (disabled) {
       return false
     }
 
-    const { x } = pos
+    const { x } = data
 
     const successLimit = 190
 
@@ -124,9 +101,8 @@ const Drag: React.FC<Props> = ({
       setOverlap(false)
       setDisabled(true)
       onConfirm()
-    } else {
-      handleReset()
     }
+    handleReset()
   }
 
   const dragHandlers = {
@@ -134,22 +110,17 @@ const Drag: React.FC<Props> = ({
     onDrag: handleDragging,
     onStop: handleDragStop
   }
-
   return (
     <div className={`drag-wrapper ${className}`}>
-      <DragWrapper overlap={overlap} success={success} missed={missed} dragging={dragging} {...rest}>
+      <Styled.DragContainer overlap={overlap} success={success} missed={missed} dragging={dragging} {...rest}>
         <Draggable position={pos} axis="x" bounds={dragBounds} {...dragHandlers}>
-          <AssetIcon
-            onMouseEnter={handleFocus}
-            onMouseLeave={handleBlur}
-            className="source-asset"
-            asset={source}
-            size="small"
-          />
+          <div className="source-asset">
+            <Styled.AssetIcon asset={source} size="small" />
+          </div>
         </Draggable>
-        {title && <TitleLabel color="input">{title}</TitleLabel>}
+        {title && <Styled.TitleLabel color="input">{title}</Styled.TitleLabel>}
         <AssetIcon className="target-asset" asset={target} size="small" />
-      </DragWrapper>
+      </Styled.DragContainer>
     </div>
   )
 }
