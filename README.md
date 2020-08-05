@@ -30,6 +30,8 @@ _(in alphabetical order)_
 
 ## Install
 
+It's recommended to use a Node version as same as Electron is running with (currently: [`Electron v9.1.2` / Node `12.14.1`](https://github.com/electron/releases#releases))
+
 ```bash
 git clone https://github.com/thorchain/asgardex-electron.git asgardex
 cd asgardex
