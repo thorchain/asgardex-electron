@@ -1,10 +1,13 @@
 const path = require('path')
 
 module.exports = (env, argv) => ({
-  entry: './src/main/electron.ts',
+  entry: {
+    // preload: './src/main/preload.ts',
+    electron: './src/main/electron.ts'
+  },
   output: {
     path: path.resolve(__dirname, 'public'),
-    filename: 'electron.js'
+    filename: '[name].js'
   },
   devtool: argv.mode === 'production' ? false : 'source-map',
   resolve: {

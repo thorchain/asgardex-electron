@@ -123,7 +123,7 @@ export const HeaderDrawer = styled(Drawer)`
   }
 `
 
-export const HeaderDrawerItem = styled(Row)<{ active?: boolean }>`
+export const HeaderDrawerItem = styled(Row)<{ selected?: boolean }>`
   border-bottom-width: 1px;
   border-bottom-style: solid;
   border-color: ${palette('background', 2)};
@@ -135,7 +135,7 @@ export const HeaderDrawerItem = styled(Row)<{ active?: boolean }>`
   text-transform: uppercase;
   font-family: 'MainFontSemiBold';
   font-size: 18px;
-  color: ${(props) => (props.active ? palette('primary', 0) : palette('text', 1))};
+  color: ${({ selected }) => (selected ? palette('primary', 0) : palette('text', 1))};
   &.last {
     border: none;
   }
