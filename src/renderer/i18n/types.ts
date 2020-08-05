@@ -84,7 +84,11 @@ type SettingMessageKey =
 
 export type SettingMessages = { [key in SettingMessageKey]: string }
 
-export type Messages = CommonMessages & PoolsMessages & WalletMessages & SettingMessages
+type SwapMessageKey = 'swap.swapping' | 'swap.input' | 'swap.balance' | 'swap.output' | 'swap.drag'
+
+export type SwapMessages = { [key in SwapMessageKey]: string }
+
+export type Messages = CommonMessages & PoolsMessages & WalletMessages & SettingMessages & SwapMessages
 
 export enum Locale {
   EN = 'en',

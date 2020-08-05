@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import { Asset, assetToString, baseAmount, bn, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
+import { useIntl } from 'react-intl'
 
 import { PoolDetails } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
@@ -29,6 +30,7 @@ export const Swap = ({
   targetAsset: _targetAsset,
   poolDetails = []
 }: SwapProps) => {
+  const intl = useIntl()
   // convert to hash map here instead of using getPoolDetail
   const poolData: Record<string, PoolData> = useMemo(() => {
     return poolDetails.reduce((acc, cur) => {
@@ -97,7 +99,7 @@ export const Swap = ({
   return (
     <Styled.Container>
       <Styled.ContentContainer>
-        <Styled.Header>you are swapping</Styled.Header>
+        <Styled.Header>{intl.formatMessage({ id: 'swap.swapping' })}</Styled.Header>
 
         <Styled.FormContainer>
           <Styled.CurrencyInfoContainer>
@@ -106,8 +108,8 @@ export const Swap = ({
 
           <Styled.ValueItemContainer className={'valueItemContainer-out'}>
             <AssetInput
-              title={'input'}
-              label={balance ? `balance: ${balance}` : ''}
+              title={intl.formatMessage({ id: 'swap.input' })}
+              label={balance ? `${intl.formatMessage({ id: 'swap.balance' })}: ${balance}` : ''}
               onChange={setChangeAmount}
               amount={changeAmount}
             />
@@ -132,7 +134,7 @@ export const Swap = ({
 
           <Styled.ValueItemContainer className={'valueItemContainer-in'}>
             <Styled.InValue>
-              <Styled.InValueTitle>output:</Styled.InValueTitle>
+              <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}:</Styled.InValueTitle>
               <div>{targetResultValue}</div>
             </Styled.InValue>
             <AssetSelect
@@ -153,7 +155,7 @@ export const Swap = ({
       <Styled.SubmitContainer>
         <Drag
           onConfirm={() => onConfirmSwap(sourceAsset, targetAsset, changeAmount)}
-          title={'drag to swap'}
+          title={intl.formatMessage({ id: 'swap.drag' })}
           source={sourceAsset}
           target={targetAsset}
         />
