@@ -31,10 +31,11 @@ const FooterIcon: React.FC<IconProps> = (props: IconProps): JSX.Element => {
 type Props = {
   commitHash?: string
   openExternal: OpenExternalHandler
+  isDev: boolean
 }
 
 const Footer: React.FC<Props> = (props: Props): JSX.Element => {
-  const { commitHash, openExternal } = props
+  const { commitHash, openExternal, isDev } = props
 
   const intl = useIntl()
 
@@ -79,14 +80,16 @@ const Footer: React.FC<Props> = (props: Props): JSX.Element => {
               <GithubOutlined />
             </FooterIcon>
             {commitHash && (
-              <FooterIcon url={`${ExternalUrl.GITHUB}/commit/${commitHash}`} onClick={clickIconHandler}>
+              <FooterIcon url={`${ExternalUrl.GITHUB_REPO}/commit/${commitHash}`} onClick={clickIconHandler}>
                 <BranchesOutlined />
               </FooterIcon>
             )}
-            {/* TODO (@Veado) Just for debugging - Remove it if we don't need it anymore */}
-            <FooterIconWrapper onClick={gotoPlayground}>
-              <BugOutlined />
-            </FooterIconWrapper>
+            {/* Just for debugging - is hidden in production build */}
+            {isDev && (
+              <FooterIconWrapper onClick={gotoPlayground}>
+                <BugOutlined />
+              </FooterIconWrapper>
+            )}
           </Row>
         </Col>
       </Row>

@@ -18,7 +18,8 @@
     "prettier"
   ],
   "globals": {
-    "$COMMIT_HASH": true
+    "$COMMIT_HASH": true,
+    "$IS_DEV": true
   },
   "settings": {
     "react": {

@@ -12,7 +12,8 @@ module.exports = {
     },
     plugins: [
       new webpack.DefinePlugin({
-        $COMMIT_HASH: JSON.stringify(new GitRevisionPlugin().commithash())
+        $COMMIT_HASH: JSON.stringify(new GitRevisionPlugin().commithash()),
+        $IS_DEV: JSON.stringify(process.env.NODE_ENV !== 'production')
       })
     ]
   },
@@ -20,7 +21,8 @@ module.exports = {
     configure: {
       preset: 'ts-jest',
       globals: {
-        $COMMIT_HASH: true
+        $COMMIT_HASH: true,
+        $IS_DEV: true
       }
     }
   }
