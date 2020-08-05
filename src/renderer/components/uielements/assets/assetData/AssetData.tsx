@@ -36,7 +36,9 @@ const AssetData: React.FC<Props> = (props: Props): JSX.Element => {
     type = 'normal'
   } = props
 
-  const priceLabel = priceValid ? formatAssetAmountCurrency(baseToAsset(price)) : 'NOT LISTED'
+  const formattedPrice = formatAssetAmountCurrency(baseToAsset(price))
+  // @TODO add valid formatters
+  const priceLabel = priceValid && formattedPrice !== '$ 0.00' ? formattedPrice : ''
 
   const assetTicker = asset.ticker ?? 'unknown'
   const targetTicker = target?.ticker ?? 'unknown'
