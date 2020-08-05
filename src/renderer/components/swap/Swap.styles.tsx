@@ -15,7 +15,7 @@ export const Container = styled('div')`
   margin: auto;
   color: ${palette('text', 0)};
   text-transform: uppercase;
-  padding-bottom: 60px;
+  padding: 60px 0;
 `
 
 export const Header = styled('div')`
