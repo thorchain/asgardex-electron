@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { shell } from 'electron'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { HashRouter as Router } from 'react-router-dom'
 
 import { AppWrapper, AppLayout } from './App.style'
 import Footer from './components/Footer'
