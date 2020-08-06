@@ -21,7 +21,7 @@ import {
 import { useAppContext } from './AppContext'
 import { useWalletContext } from './WalletContext'
 
-type BinanceContextValue = {
+export type BinanceContextValue = {
   subscribeTransfers: typeof subscribeTransfers
   miniTickers$: typeof miniTickers$
   clientViewState$: typeof clientViewState$
