@@ -80,7 +80,8 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
     selectedPricePoolAsset$,
-    some(PoolAsset.RUNE)
+    // FIXME(@Veado) Depends on main/testnet - https://github.com/thorchain/asgardex-electron/issues/316
+    some(PoolAsset.RUNE67C)
   )
 
   // store previous data to render it while reloading new data
@@ -169,7 +170,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     () =>
       items.map(({ label, key, path, icon: Icon }) => (
         <Link key={key} to={path} onClick={closeMenu}>
-          <HeaderDrawerItem active={activeKey === key}>
+          <HeaderDrawerItem selected={activeKey === key}>
             <Icon style={{ marginLeft: '12px', marginRight: '12px' }} />
             {label}
           </HeaderDrawerItem>

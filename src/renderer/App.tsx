@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { shell } from 'electron'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { HashRouter as Router } from 'react-router-dom'
 
 import { AppWrapper, AppLayout } from './App.style'
 import Footer from './components/Footer'
@@ -27,7 +27,10 @@ const AppView: React.FC<Props> = (_): JSX.Element => {
           <View>
             <ViewRoutes />
           </View>
-          <Footer commitHash={envOrDefault($COMMIT_HASH, '')} openExternal={shell.openExternal}></Footer>
+          <Footer
+            commitHash={envOrDefault($COMMIT_HASH, '')}
+            openExternal={shell.openExternal}
+            isDev={$IS_DEV}></Footer>
         </AppLayout>
       </AppWrapper>
     </>

@@ -7,7 +7,7 @@ import { Balances } from '@thorchain/asgardex-binance'
 import AssetsTable from './AssetsTable'
 
 const balances: Balances = [
-  { free: '122', frozen: '0', locked: '0', symbol: 'RUNE-A1F' },
+  { free: '122', frozen: '0', locked: '0', symbol: 'RUNE-67C' },
   { free: '0.01000000', frozen: '0', locked: '0', symbol: 'BNB' },
   { free: '3.00000000', frozen: '0', locked: '0', symbol: 'FTM-585' }
 ]

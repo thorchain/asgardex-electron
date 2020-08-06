@@ -39,7 +39,8 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const poolsRD = useObservableState(midgardService.poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
     midgardService.selectedPricePoolAsset$,
-    some(PoolAsset.RUNE)
+    // FIXME(@Veado) Depends on main/testnet - https://github.com/thorchain/asgardex-electron/issues/316
+    some(PoolAsset.RUNE67C)
   )
   const thorchainLastblockRD = useObservableState(midgardService.thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(midgardService.thorchainConstantsState$, RD.pending)

@@ -11,7 +11,8 @@ export type Pool = {
 
 // Pool assets
 export enum PoolAsset {
-  RUNE = 'BNB.RUNE-A1A',
+  RUNE67C = 'BNB.RUNE-67C', // testnet
+  RUNEB1A = 'BNB.RUNE-B1A', // mainnet
   BNB = 'BNB.BNB',
   ETH = 'ETH.ETH',
   BTC = 'BTC.BTC',
@@ -19,7 +20,7 @@ export enum PoolAsset {
 }
 
 // List of assets used for pricing
-export type PricePoolAsset = PoolAsset.RUNE | PoolAsset.ETH | PoolAsset.BTC | PoolAsset.TUSDB
+export type PricePoolAsset = PoolAsset.RUNE67C | PoolAsset.RUNEB1A | PoolAsset.ETH | PoolAsset.BTC | PoolAsset.TUSDB
 export type PricePoolAssets = PricePoolAsset[]
 
 export type PricePoolCurrencySymbols = {

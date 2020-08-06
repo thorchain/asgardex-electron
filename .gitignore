@@ -16,6 +16,7 @@ yarn-error.log*
 .eslintcache
 
 /public/electron.js
+/public/preload.js
 
 # storybook static
 /storybook-static

@@ -44,7 +44,7 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('getAssetDetail', () => {
-    const runeDetail: AssetDetail = { asset: PoolAsset.RUNE }
+    const runeDetail: AssetDetail = { asset: PoolAsset.RUNE67C }
     const bnbDetail: AssetDetail = { asset: PoolAsset.BNB }
 
     it('returns details of RUNE', () => {
@@ -68,7 +68,7 @@ describe('services/midgard/utils/', () => {
       const result = getPricePools([tomob, eth, tusdb, btc, lok], PRICE_POOLS_WHITELIST)
       // RUNE pool
       const pool0 = result[0]
-      expect(pool0.asset).toEqual(PoolAsset.RUNE)
+      expect(pool0.asset).toEqual(PoolAsset.RUNE67C)
       expect(pool0.poolData.runeBalance.amount().toNumber()).toEqual(ONE_ASSET_BASE_AMOUNT.amount().toNumber())
       expect(pool0.poolData.assetBalance.amount().toNumber()).toEqual(ONE_ASSET_BASE_AMOUNT.amount().toNumber())
       // BTC pool
@@ -93,7 +93,7 @@ describe('services/midgard/utils/', () => {
       expect(result.length).toEqual(2)
       // RUNE pool
       const pool0 = result[0]
-      expect(pool0.asset).toEqual(PoolAsset.RUNE)
+      expect(pool0.asset).toEqual(PoolAsset.RUNE67C)
       // BTC pool
       const btcPool = result[1]
       expect(btcPool.asset).toEqual(PoolAsset.BTC)
@@ -104,7 +104,7 @@ describe('services/midgard/utils/', () => {
       expect(result.length).toEqual(1)
       // RUNE pool
       const pool0 = result[0]
-      expect(pool0.asset).toEqual(PoolAsset.RUNE)
+      expect(pool0.asset).toEqual(PoolAsset.RUNE67C)
     })
   })
 
@@ -131,7 +131,7 @@ describe('services/midgard/utils/', () => {
 
     it('selects RUNE if ETH + TUSDB pools are not available', () => {
       const pool = pricePoolSelector([RUNE_PRICE_POOL, btc], O.some(PoolAsset.ETH))
-      expect(pool.asset).toEqual(PoolAsset.RUNE)
+      expect(pool.asset).toEqual(PoolAsset.RUNE67C)
     })
   })
 
@@ -169,23 +169,23 @@ describe('services/midgard/utils/', () => {
     it('selects RUNE if ETH + TUSDB pools are not available', () => {
       const poolsRD = mockPoolsStateSuccess([RUNE_PRICE_POOL, btc])
       const pool = pricePoolSelectorFromRD(poolsRD, O.some(PoolAsset.ETH))
-      expect(pool.asset).toEqual(PoolAsset.RUNE)
+      expect(pool.asset).toEqual(PoolAsset.RUNE67C)
     })
 
     it('selects RUNE if no other price pool is available', () => {
       const poolsRD = mockPoolsStateSuccess([RUNE_PRICE_POOL])
       const pool = pricePoolSelectorFromRD(poolsRD, O.some(PoolAsset.ETH))
-      expect(pool.asset).toEqual(PoolAsset.RUNE)
+      expect(pool.asset).toEqual(PoolAsset.RUNE67C)
     })
 
     it('selects RUNE pool by default if loading other price pools failed', () => {
       const pool = pricePoolSelectorFromRD(RD.failure(new Error('Could not load pools')), O.none)
-      expect(pool.asset).toEqual(PoolAsset.RUNE)
+      expect(pool.asset).toEqual(PoolAsset.RUNE67C)
     })
   })
 
   describe('getPoolDetail', () => {
-    const runeDetail: PoolDetail = { asset: PoolAsset.RUNE }
+    const runeDetail: PoolDetail = { asset: PoolAsset.RUNE67C }
     const bnbDetail: PoolDetail = { asset: PoolAsset.BNB }
 
     it('returns details of RUNE pool', () => {
