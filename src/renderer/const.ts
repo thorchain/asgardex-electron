@@ -10,7 +10,8 @@ import {
 
 // Currency symbols used for pricing
 export const CURRENCY_SYMBOLS: PricePoolCurrencySymbols = {
-  [PoolAsset.RUNE]: AssetSymbol.RUNE,
+  [PoolAsset.RUNEB1A]: AssetSymbol.RUNE,
+  [PoolAsset.RUNE67C]: AssetSymbol.RUNE,
   [PoolAsset.BTC]: AssetSymbol.BTC,
   [PoolAsset.ETH]: AssetSymbol.ETH,
   [PoolAsset.TUSDB]: AssetSymbol.USD
@@ -22,7 +23,8 @@ export const CURRENCY_WHEIGHTS: PricePoolCurrencyWeights = {
   [PoolAsset.TUSDB]: 0,
   [PoolAsset.ETH]: 1,
   [PoolAsset.BTC]: 2,
-  [PoolAsset.RUNE]: 3
+  [PoolAsset.RUNEB1A]: 3,
+  [PoolAsset.RUNE67C]: 4
 }
 
 // One `AssetAmount` in `BaseAmount` as const, since we just need it at different places
@@ -30,7 +32,7 @@ export const ONE_ASSET_BASE_AMOUNT = assetToBase(assetAmount(1))
 
 // We will never have a "RUNE" pool, but we do need such thing for pricing
 export const RUNE_PRICE_POOL: PricePool = {
-  asset: PoolAsset.RUNE,
+  asset: PoolAsset.RUNE67C,
   poolData: { assetBalance: ONE_ASSET_BASE_AMOUNT, runeBalance: ONE_ASSET_BASE_AMOUNT }
 }
 

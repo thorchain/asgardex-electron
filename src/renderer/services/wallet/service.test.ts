@@ -43,7 +43,7 @@ describe('services/keystore/service/', () => {
   describe('addPhrase', () => {
     const password = 'password'
     it('should reject if keystore is not imported', async () => {
-      await expect(keystoreService.unlock(some(none), password)).rejects.toBeTruthy()
+      await expect(keystoreService.unlock(none, password)).rejects.toBeTruthy()
     })
 
     it('should reject if keystore file does not exist', async () => {

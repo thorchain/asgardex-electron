@@ -118,7 +118,7 @@ describe('services/binance/utils/', () => {
     it('returns a price for RUNE in USD', () => {
       const balance: Balance = {
         free: '1',
-        symbol: 'RUNE-A1A',
+        symbol: 'RUNE-67C',
         locked: '',
         frozen: ''
       }
