@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { PoolDetails } from '../../services/midgard/types'
-import { toPoolData } from '../../services/midgard/utils'
+import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import AssetInput from '../uielements/assets/assetInput'
 import AssetSelect from '../uielements/assets/assetSelect'
 import Drag from '../uielements/drag'
@@ -33,13 +33,7 @@ export const Swap = ({
   const intl = useIntl()
   // convert to hash map here instead of using getPoolDetail
   const poolData: Record<string, PoolData> = useMemo(() => {
-    return poolDetails.reduce((acc, cur) => {
-      if (!cur.asset) {
-        return acc
-      }
-
-      return { ...acc, [cur.asset]: toPoolData(cur) }
-    }, {} as Record<string, PoolData>)
+    return getPoolDetailsHashMap(poolDetails)
   }, [poolDetails])
 
   const initialSourceAsset = useMemo(() => {

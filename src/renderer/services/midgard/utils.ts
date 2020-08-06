@@ -98,6 +98,20 @@ export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<Po
   )
 
 /**
+ * Converts PoolDetails to the appropriate HashMap
+ * Keys of the end HasMap is PoolDetails[i].asset
+ */
+export const getPoolDetailsHashMap = (poolDetails: PoolDetails): Record<string, PoolData> => {
+  return poolDetails.reduce((acc, cur) => {
+    if (!cur.asset) {
+      return acc
+    }
+
+    return { ...acc, [cur.asset]: toPoolData(cur) }
+  }, {} as Record<string, PoolData>)
+}
+
+/**
  * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)
  */
 export const toPoolData = (detail: PoolDetail): PoolData => ({
