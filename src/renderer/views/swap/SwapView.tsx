@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { fold, initial } from '@devexperts/remote-data-ts'
-import { bn, assetFromString, Asset } from '@thorchain/asgardex-util'
+import { assetFromString, Asset, bnOrZero } from '@thorchain/asgardex-util'
 import { Spin } from 'antd'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
@@ -21,7 +21,6 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { service: midgardService } = useMidgardContext()
   const { poolsState$ } = midgardService
   const poolsState = useObservableState(poolsState$, initial)
-
   return (
     <>
       <BackLink />
@@ -35,7 +34,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
             (state) => {
               const availableAssets = state.assetDetails
                 .filter((a) => a.asset !== undefined && !!a.asset)
-                .map((a) => ({ asset: assetFromString(a.asset as string) as Asset, priceRune: bn(a.priceRune || 0) }))
+                .map((a) => ({ asset: assetFromString(a.asset as string) as Asset, priceRune: bnOrZero(a.priceRune) }))
 
               return (
                 <Swap
