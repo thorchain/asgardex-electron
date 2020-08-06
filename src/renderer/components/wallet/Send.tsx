@@ -32,17 +32,17 @@ const Send: React.FC<SendProps> = ({ transactionService }): JSX.Element => {
 
   const addressValidator = async (_: unknown, value: string) => {
     if (!value || value.length < 8) {
-      return Promise.reject('Address should be at least 8 symbols length')
+      return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.address.length' }))
     }
   }
   const amountValidator = async (_: unknown, stringValue: string) => {
     const value = Number(stringValue)
     if (Number.isNaN(value)) {
-      return Promise.reject('Amount should be a number')
+      return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBeNumber' }))
     }
 
     if (value <= 0) {
-      return Promise.reject('Amount should be positive')
+      return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBePositive' }))
     }
 
     // @TODO: Add check form Max available amount
