@@ -6,12 +6,11 @@
   "afterSign": "./scripts/notarize.js",
   "files": ["resources/icon.png", "src/renderer/assets/svg/coin-*.svg"],
   "directories": {
-    "buildResources": ".",
+    "buildResources": "resources",
     "output": "release"
   },
   "mac": {
     "target": ["dmg"],
-    "icon": "resources/icons/icon.icns",
     "category": "public.app-category.finance",
     "hardenedRuntime": true,
     "gatekeeperAssess": false,
@@ -33,7 +32,6 @@
     ]
   },
   "win": {
-    "icon": "resources/icon.ico",
     "target": [
       {
         "target": "nsis",
@@ -44,7 +42,6 @@
   "linux": {
     "category": "Finance",
     "packageCategory": "wallet",
-    "icon": "resources/icons/",
     "target": [
       {
         "target": "deb",

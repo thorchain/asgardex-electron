@@ -1,6 +1,6 @@
 import { join } from 'path'
 
-import { BrowserWindow, app, ipcMain } from 'electron'
+import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
 import isDev from 'electron-is-dev'
 import log from 'electron-log'
@@ -19,6 +19,8 @@ const BASE_URL_DEV = 'http://localhost:3000'
 const BASE_URL_PROD = `file://${join(__dirname, '../build/index.html')}`
 // use dev server for hot reload or file in production
 export const BASE_URL = IS_DEV ? BASE_URL_DEV : BASE_URL_PROD
+// Application icon
+const APP_ICON = join(APP_ROOT, 'resources', process.platform.match('win32') ? 'icon.ico' : 'icon.png')
 
 const initLogger = () => {
   log.transports.file.resolvePath = (variables: log.PathVariables) => {
@@ -72,7 +74,7 @@ const initMainWindow = async () => {
   mainWindow = new BrowserWindow({
     width: IS_DEV ? 1600 : 1200,
     height: IS_DEV ? 1000 : 800,
-    icon: join(APP_ROOT, 'resources', 'icon.png'),
+    icon: nativeImage.createFromPath(APP_ICON),
     webPreferences: {
       nodeIntegration: true
     }

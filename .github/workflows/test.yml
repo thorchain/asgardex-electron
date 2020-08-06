@@ -7,12 +7,16 @@ jobs:
     name: Unit tests
     strategy:
       matrix:
-        node-version: [13]
+        node-version: [12]
 
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v1
+
+      - name: Install missing dependencies on Linux
+        run: sudo apt-get update && sudo apt-get install libudev-dev libusb-1.0-0-dev
+        if: runner.os == 'Linux'
 
       - name: Get yarn cache
         id: yarn-cache
@@ -47,6 +51,10 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
+      - name: Install missing dependencies on Linux
+        run: sudo apt-get update && sudo apt-get install libudev-dev libusb-1.0-0-dev
+        if: runner.os == 'Linux'
+
       - name: Get yarn cache
         id: yarn-cache
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -78,6 +86,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
+
+      - name: Install missing dependencies on Linux
+        run: sudo apt-get update && sudo apt-get install libudev-dev libusb-1.0-0-dev
+        if: runner.os == 'Linux'
 
       - name: Get yarn cache
         id: yarn-cache
