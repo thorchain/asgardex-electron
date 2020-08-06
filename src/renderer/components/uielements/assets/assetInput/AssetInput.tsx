@@ -38,6 +38,7 @@ const AssetInput: React.FC<Props> = (props: Props): JSX.Element => {
       <div className="asset-input-header">
         <p className="asset-input-title">{title}</p>
         {status && <p className="asset-input-header-label">{status}</p>}
+        <p className="asset-amount-label">{label}</p>
       </div>
       <div className="asset-input-content" ref={inputRef}>
         <CoinInputAdvanced
@@ -46,7 +47,6 @@ const AssetInput: React.FC<Props> = (props: Props): JSX.Element => {
           onChangeValue={onChangeHandler}
           {...inputProps}
         />
-        <p className="asset-amount-label">{label}</p>
       </div>
     </AssetInputWrapper>
   )

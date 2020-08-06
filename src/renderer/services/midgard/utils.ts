@@ -35,10 +35,10 @@ export const getAssetDetail = (assets: AssetDetails, ticker: string): O.Option<A
     O.fromNullable
   )
 
-export const getPricePools = (pools: PoolDetails, whitelist: PricePoolAssets): PricePools => {
-  const poolDetails = pools.filter(
-    (detail) => whitelist.find((asset) => detail.asset && detail.asset === asset) !== undefined
-  )
+export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): PricePools => {
+  const poolDetails = !whitelist
+    ? pools
+    : pools.filter((detail) => whitelist.find((asset) => detail.asset && detail.asset === asset) !== undefined)
 
   const pricePools = poolDetails
     .map((detail: PoolDetail) => {
@@ -96,6 +96,20 @@ export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<Po
     }),
     O.fromNullable
   )
+
+/**
+ * Converts PoolDetails to the appropriate HashMap
+ * Keys of the end HasMap is PoolDetails[i].asset
+ */
+export const getPoolDetailsHashMap = (poolDetails: PoolDetails): Record<string, PoolData> => {
+  return poolDetails.reduce((acc, cur) => {
+    if (!cur.asset) {
+      return acc
+    }
+
+    return { ...acc, [cur.asset]: toPoolData(cur) }
+  }, {} as Record<string, PoolData>)
+}
 
 /**
  * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)

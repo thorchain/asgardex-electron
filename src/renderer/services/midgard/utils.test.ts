@@ -14,7 +14,8 @@ import {
   pricePoolSelectorFromRD,
   getPoolDetail,
   toPoolData,
-  filterPoolAssets
+  filterPoolAssets,
+  getPoolDetailsHashMap
 } from './utils'
 
 type PoolDataMock = { asset?: string }
@@ -195,6 +196,28 @@ describe('services/midgard/utils/', () => {
     it('returns None if no RUNE details available', () => {
       const result = getPoolDetail([bnbDetail], 'TOMOB')
       expect(result).toBeNone()
+    })
+  })
+
+  describe('getPoolDetailsHashMap', () => {
+    const runeDetail: PoolDetail = { asset: PoolAsset.RUNE67C }
+    const bnbDetail: PoolDetail = { asset: PoolAsset.BNB }
+
+    it('returns hashMap of pool details', () => {
+      const result = getPoolDetailsHashMap([runeDetail, bnbDetail])
+
+      /**
+       * Compare stringified structures 'cause
+       * Jest compares amount's getter functions by
+       * pointers and jest.mock does not work in terms
+       * of single describe (only as global mock for file)
+       */
+      expect(JSON.stringify(result)).toEqual(
+        JSON.stringify({
+          [PoolAsset.RUNE67C]: toPoolData(runeDetail),
+          [PoolAsset.BNB]: toPoolData(bnbDetail)
+        })
+      )
     })
   })
 

@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { palette } from 'styled-theme'
 
 export type AssetSelectDataWrapperSize = 'small' | 'big'
 export type AssetSelectDataWrapperType = 'wallet' | 'normal'
@@ -54,7 +53,7 @@ export const AssetSelectDataWrapper = styled.div<AssetSelectDataWrapperProps>`
   .assetSelectData-asset-value,
   .assetSelectData-target-label,
   .assetSelectData-target-value {
-    color: ${palette('text', 0)};
+    color: inherit;
     font-weight: bold;
   }
 

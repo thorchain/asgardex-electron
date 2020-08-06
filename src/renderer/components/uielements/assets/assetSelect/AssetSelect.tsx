@@ -34,11 +34,10 @@ const DropdownCarret: React.FC<DropdownCarretProps> = (props: DropdownCarretProp
 type Props = {
   assetData: AssetPair[]
   asset: Asset
-  priceIndex: PriceDataIndex
+  priceIndex?: PriceDataIndex
   withSearch?: boolean
   searchDisable?: string[]
-  onSelect: (_: number) => void
-  onChangeAsset?: (asset: string) => void
+  onSelect: (_: Asset) => void
 }
 
 const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
@@ -48,7 +47,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
     priceIndex,
     withSearch = false,
     searchDisable = [],
-    onChangeAsset = (_: string) => {}
+    onSelect = (_: Asset) => {}
   } = props
 
   const [openDropdown, setOpenDropdown] = useState<boolean>(false)
@@ -61,17 +60,19 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
     setOpenDropdown((value) => !value)
   }
 
-  const handleChangeAsset = async (asset: string) => {
+  const handleChangeAsset = async (assetId: string) => {
     setOpenDropdown(false)
 
     // Wait for the dropdown to close
     await delay(500)
-    onChangeAsset(asset)
+    const changedAsset = assetData.find((asset) => asset.asset.symbol === assetId)
+    if (changedAsset) {
+      onSelect(changedAsset.asset)
+    }
   }
 
   const renderMenu = () => {
     const sortedAssetData = _sortBy(assetData, ['asset'])
-
     return (
       <AssetSelectMenuWrapper>
         <AssetMenu

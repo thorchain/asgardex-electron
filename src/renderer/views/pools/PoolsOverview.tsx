@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
 
 import { SyncOutlined, SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { assetToString, BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import BigNumber from 'bignumber.js'
@@ -118,7 +118,6 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         pool: { asset, target }
       } = record
 
-      const { symbol: assetSymbol = '' } = asset
       const { symbol: targetSymbol = '' } = target
       return (
         <TableAction>
@@ -126,7 +125,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
             <PlusOutlined />
             liquidity
           </Button>
-          <Button round="true" onClick={() => clickSwapHandler({ source: assetSymbol, target: targetSymbol })}>
+          <Button
+            round="true"
+            onClick={() => clickSwapHandler({ source: assetToString(asset), target: assetToString(target) })}>
             <SwapOutlined />
             swap
           </Button>

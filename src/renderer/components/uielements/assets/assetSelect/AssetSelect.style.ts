@@ -11,14 +11,9 @@ export const AssetSelectWrapper = styled.div`
 
   width: 216px;
   height: 60px;
-  border: 1px solid ${palette('gray', 0)};
   border-radius: 2px;
   text-transform: uppercase;
   ${transition()};
-
-  &:hover {
-    border-color: ${palette('success', 0)};
-  }
 `
 
 export const AssetSelectMenuWrapper = styled.div`
@@ -33,7 +28,7 @@ export const DropdownIcon = styled(CaretDownOutlined)`
 
   svg {
     font-size: 22px;
-    color: ${palette('gray', 1)};
+    color: ${palette('primary', 0)};
   }
 `
 

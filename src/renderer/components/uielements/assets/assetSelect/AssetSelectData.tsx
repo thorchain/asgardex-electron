@@ -19,7 +19,9 @@ type Props = {
 
 const AssetSelectData: React.FC<Props> = (props: Props): JSX.Element => {
   const { asset, target, price = bn(0), priceValid = true, size = 'small', className = '', type = 'normal' } = props
-  const priceLabel = priceValid ? `$ ${formatBN(price)}` : 'NOT LISTED'
+  const formattedPrice = formatBN(price)
+  // @TODO add valid formatters
+  const priceLabel = priceValid && Number(formattedPrice) !== 0 ? `$ ${formattedPrice}` : ''
 
   return (
     <AssetSelectDataWrapper
