@@ -8,15 +8,18 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { ASSETS_MAINNET } from '../../../shared/mock/assets'
-import { useBinanceContext } from '../../contexts/BinanceContext'
+import { BinanceContextValue } from '../../contexts/BinanceContext'
 import BackLink from '../uielements/backLink'
 import { Input, InputNumber } from '../uielements/input'
 import AccountSelector from './AccountSelector'
 import * as Styled from './Send.style'
 
-const Send: React.FC = (): JSX.Element => {
+type SendProps = {
+  transactionService: BinanceContextValue['transaction']
+}
+
+const Send: React.FC<SendProps> = ({ transactionService }): JSX.Element => {
   const intl = useIntl()
-  const { transaction: transactionService } = useBinanceContext()
   const [activeAsset, setActiveAsset] = useState(ASSETS_MAINNET.BOLT)
 
   useEffect(() => {
@@ -72,7 +75,7 @@ const Send: React.FC = (): JSX.Element => {
                     </Styled.FormItem>
                     <Styled.StyledLabel size="big">MAX 35.3 BNB</Styled.StyledLabel>
                     <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
-                    <Form.Item name="password ">
+                    <Form.Item name="password">
                       <Input size="large" />
                     </Form.Item>
                   </Styled.SubForm>
