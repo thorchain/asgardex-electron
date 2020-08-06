@@ -32,7 +32,10 @@ const wallet: WalletMessages = {
   'wallet.create.password.mismatch': 'Password mismatch',
   'wallet.create.error': 'Error while saving a phrase',
   'wallet.receive.address.error': 'No address available to receive funds',
-  'wallet.receive.address.errorQR': 'Error while rendering QR code: {error}'
+  'wallet.receive.address.errorQR': 'Error while rendering QR code: {error}',
+  'wallet.send.errors.address.length': 'Address should be at least 8 symbols length',
+  'wallet.send.errors.amount.shouldBeNumber': 'Amount should be a number',
+  'wallet.send.errors.amount.shouldBePositive': 'Amount should be positive'
 }
 
 export default wallet
