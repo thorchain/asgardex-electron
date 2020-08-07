@@ -58,17 +58,16 @@ const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configurat
  * Endpoint provided by Byzantine
  */
 const byzantine$: Rx.Observable<E.Either<Error, string>> = getNetworkState$.pipe(
-  distinctUntilChanged(),
   // Since `getNetworkState` is created by `observableState` and it takes an initial value,
   // this stream might emit same values and we do need a "dirty check"
   // to avoid to create another instance of byzantine by having same `Network`
-  // distinctUntilChanged(),
+  distinctUntilChanged(),
   switchMap((network) => Rx.from(byzantine(network === Network.MAIN, true))),
   map((endpoint) => E.right(endpoint)),
   tap((network) => console.log('network:', network)),
   tap((endpoint) => console.log('byzantine :', endpoint)),
-  retry(BYZANTINE_MAX_RETRY),
   shareReplay(),
+  retry(BYZANTINE_MAX_RETRY),
   catchError((error) => Rx.of(E.left(error)))
 )
 
@@ -91,6 +90,7 @@ const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
       FP.pipe(
         ePoolAssets,
         E.fold(
+          // Returning empty array for debugging only - throwError to catch it and to map into RD.failure
           (_error) => Rx.of([]),
           (poolAssets) => {
             // Store pool assets and filter out mini token
