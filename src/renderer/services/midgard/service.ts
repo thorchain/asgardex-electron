@@ -20,13 +20,20 @@ import {
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
-import { Configuration, DefaultApi, AssetDetail } from '../../types/generated/midgard'
+import {
+  Configuration,
+  DefaultApi,
+  AssetDetail,
+  PoolDetail,
+  ThorchainLastblock,
+  ThorchainConstants,
+  NetworkInfo
+} from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
 import { Network } from '../app/types'
 import {
   PoolsStateRD,
   PoolsState,
-  PoolDetails,
   NetworkInfoRD,
   ThorchainLastblockRD,
   ThorchainConstantsRD,
@@ -35,7 +42,7 @@ import {
 import { getPricePools, pricePoolSelector, filterPoolAssets } from './utils'
 
 const MIDGARD_MAX_RETRY = 3
-// const BYZANTINE_MAX_RETRY = 5
+const BYZANTINE_MAX_RETRY = 5
 
 /**
  * Observable state of `Network`
@@ -52,25 +59,17 @@ const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configurat
  */
 const byzantine$: Rx.Observable<E.Either<Error, string>> = getNetworkState$.pipe(
   distinctUntilChanged(),
-  tap((network) => console.log('network:', network)),
   // Since `getNetworkState` is created by `observableState` and it takes an initial value,
   // this stream might emit same values and we do need a "dirty check"
   // to avoid to create another instance of byzantine by having same `Network`
   // distinctUntilChanged(),
   switchMap((network) => Rx.from(byzantine(network === Network.MAIN, true))),
   map((endpoint) => E.right(endpoint)),
+  tap((network) => console.log('network:', network)),
   tap((endpoint) => console.log('byzantine :', endpoint)),
+  retry(BYZANTINE_MAX_RETRY),
   shareReplay(),
   catchError((error) => Rx.of(E.left(error)))
-  // retry(BYZANTINE_MAX_RETRY),
-  // retryWhen((errors) => {
-  //   return errors.pipe(
-  //     delayWhen(() => Rx.timer(2000)),
-  //     tap(() => console.log('retrying...'))
-  //   )
-  // })
-  // retry()
-  // retryWhen(() => getNetworkState$) // --> using `retryWhen()` instead of `retry()`
 )
 
 const initialPoolsState: PoolsState = {
@@ -92,7 +91,7 @@ const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
       FP.pipe(
         ePoolAssets,
         E.fold(
-          (_error) => Rx.EMPTY,
+          (_error) => Rx.of([]),
           (poolAssets) => {
             // Store pool assets and filter out mini token
             // TODO(Veado): It can be removed as soon as midgard's endpoint has been fixed - see https://gitlab.com/thorchain/midgard/-/issues/215
@@ -115,7 +114,7 @@ const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
       // switchMap((_) => apiGetPoolsData$(state.poolAssets)),
       return Rx.combineLatest(...state.poolAssets.map((asset, index) => apiGetPoolsData$(asset, index * 50)))
     }),
-    switchMap((poolDetails: PoolDetails) => {
+    switchMap((poolDetails) => {
       // Store `poolDetails` + `pricePools`
       state = {
         ...state,
@@ -186,24 +185,31 @@ const apiGetAssetInfo$ = (asset: string, delayTime = 0): Rx.Observable<E.Either<
     )
   )
 
+const callGetPoolsData$ = (endpoint: string, asset: string): Rx.Observable<E.Either<Error, PoolDetail>> => {
+  const api = getMidgardDefaultApi(endpoint)
+  return api.getPoolsData({ asset }).pipe(
+    map((details) => E.right(details[0])),
+    catchError((error) => Rx.of(E.left(error)))
+  )
+}
+
 /**
  * Get `PoolDetails` data from Midgard
  * `delayTime` - Optional value in `ms` to delay request
  */
-const apiGetPoolsData$ = (asset: string, delayTime = 0) =>
+const apiGetPoolsData$ = (asset: string, delayTime = 0): Rx.Observable<E.Either<Error, PoolDetail>> =>
   Rx.of(null).pipe(
     delay(delayTime),
     switchMap(() => byzantine$),
     switchMap((eEndpoint) => {
       return FP.pipe(
         eEndpoint,
-        E.fold(Rx.throwError, (endpoint) => {
-          const api = getMidgardDefaultApi(endpoint)
-          return api.getPoolsData({ asset })
-        })
+        E.fold(
+          (error) => Rx.of(E.left(error)),
+          (endpoint) => callGetPoolsData$(endpoint, asset)
+        )
       )
-    }),
-    map((details) => details[0])
+    })
   )
 
 // `TriggerStream` to reload data of pools
@@ -219,17 +225,22 @@ const poolsState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$.pipe(
   shareReplay()
 )
 
+const callGetThorchainLastblock$ = (endpoint: string): Rx.Observable<E.Either<Error, ThorchainLastblock>> => {
+  const api = getMidgardDefaultApi(endpoint)
+  return api.getThorchainProxiedLastblock().pipe(
+    map(E.right),
+    catchError((error) => Rx.of(E.left(error)))
+  )
+}
+
 /**
  * Get `ThorchainLastblock` data from Midgard
  */
-const apiGetThorchainLastblock$ = byzantine$.pipe(
+const apiGetThorchainLastblock$: Rx.Observable<E.Either<Error, ThorchainLastblock>> = byzantine$.pipe(
   switchMap((eEndpoint) => {
     return FP.pipe(
       eEndpoint,
-      E.fold(Rx.throwError, (endpoint) => {
-        const api = getMidgardDefaultApi(endpoint)
-        return api.getThorchainProxiedLastblock()
-      })
+      E.fold((error) => Rx.of(E.left(error)), callGetThorchainLastblock$)
     )
   })
 )
@@ -243,7 +254,7 @@ const { stream$: reloadThorchainLastblock$, trigger: reloadThorchainLastblock } 
 const loadThorchainLastblock$ = () =>
   apiGetThorchainLastblock$.pipe(
     // store result
-    concatMap((result) => Rx.of(RD.success(result))),
+    concatMap((result) => Rx.of(RD.fromEither(result))),
     // catch any errors if there any
     catchError((error: Error) => Rx.of(RD.failure(error))),
     startWith(RD.pending),
@@ -260,6 +271,14 @@ const thorchainLastblockState$: Rx.Observable<ThorchainLastblockRD> = reloadThor
   shareReplay()
 )
 
+const callGetThorchainConstants$ = (endpoint: string): Rx.Observable<E.Either<Error, ThorchainConstants>> => {
+  const api = getMidgardDefaultApi(endpoint)
+  return api.getThorchainProxiedConstants().pipe(
+    map(E.right),
+    catchError((error) => Rx.of(E.left(error)))
+  )
+}
+
 /**
  * Get `ThorchainConstants` data from Midgard
  */
@@ -267,10 +286,7 @@ const apiGetThorchainConstants$ = byzantine$.pipe(
   switchMap((eEndpoint) => {
     return FP.pipe(
       eEndpoint,
-      E.fold(Rx.throwError, (endpoint) => {
-        const api = getMidgardDefaultApi(endpoint)
-        return api.getThorchainProxiedConstants()
-      })
+      E.fold((error) => Rx.of(E.left(error)), callGetThorchainConstants$)
     )
   })
 )
@@ -279,7 +295,7 @@ const apiGetThorchainConstants$ = byzantine$.pipe(
  * Provides data of `ThorchainConstants`
  */
 const thorchainConstantsState$: Rx.Observable<ThorchainConstantsRD> = apiGetThorchainConstants$.pipe(
-  concatMap((result) => Rx.of(RD.success(result))),
+  concatMap((result) => Rx.of(RD.fromEither(result))),
   catchError((error: Error) => Rx.of(RD.failure(error))),
   startWith(RD.pending),
   retry(MIDGARD_MAX_RETRY),
@@ -304,6 +320,14 @@ const setSelectedPricePoolAsset = (asset: PricePoolAsset) => {
   updateSelectedPricePoolAsset(some(asset))
 }
 
+const callGetNetworkData$ = (endpoint: string): Rx.Observable<E.Either<Error, NetworkInfo>> => {
+  const api = getMidgardDefaultApi(endpoint)
+  return api.getNetworkData().pipe(
+    map(E.right),
+    catchError((error) => Rx.of(E.left(error)))
+  )
+}
+
 /**
  * API request to get data of `NetworkInfo`
  */
@@ -311,10 +335,7 @@ const apiGetNetworkData$ = byzantine$.pipe(
   switchMap((eEndpoint) => {
     return FP.pipe(
       eEndpoint,
-      E.fold(Rx.throwError, (endpoint) => {
-        const api = getMidgardDefaultApi(endpoint)
-        return api.getNetworkData()
-      })
+      E.fold((error) => Rx.of(E.left(error)), callGetNetworkData$)
     )
   })
 )
@@ -325,7 +346,7 @@ const apiGetNetworkData$ = byzantine$.pipe(
 const loadNetworkInfo$ = (): Rx.Observable<NetworkInfoRD> =>
   apiGetNetworkData$.pipe(
     // store result
-    concatMap((info) => Rx.of(RD.success(info))),
+    concatMap((info) => Rx.of(RD.fromEither(info))),
     // catch any errors if there any
     catchError((error: Error) => Rx.of(RD.failure(error))),
     startWith(RD.pending),
