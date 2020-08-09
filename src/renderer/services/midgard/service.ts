@@ -40,6 +40,7 @@ import {
   SelectedPricePoolAsset
 } from './types'
 import { getPricePools, pricePoolSelector, filterPoolAssets } from './utils'
+import { sequenceT } from 'fp-ts/lib/Apply'
 
 const MIDGARD_MAX_RETRY = 3
 const BYZANTINE_MAX_RETRY = 5
@@ -72,9 +73,9 @@ const byzantine$: Rx.Observable<E.Either<Error, string>> = getNetworkState$.pipe
 )
 
 const initialPoolsState: PoolsState = {
-  assetDetails: [],
+  assetDetails: E.right([]),
   poolAssets: [],
-  poolDetails: [],
+  poolDetails: E.right([]),
   pricePools: O.none
 }
 /**
@@ -100,26 +101,34 @@ const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
             // As long as Midgard has some issues to load all details at once at `v1/assets` endpoint we load details in sequence with some delay between
             // TODO(@Veado) Load details at once if Midgard has been fixed
             // switchMap((_) => apiGetAssetInfo$(state.poolAssets)),
-            return Rx.combineLatest(...state.poolAssets.map((asset, index) => apiGetAssetInfo$(asset, index * 50)))
+            return Rx.combineLatest(state.poolAssets.map((asset, index) => apiGetAssetInfo$(asset, index * 50)))
           }
         )
       )
     ),
-    switchMap((assetDetails) => {
+    switchMap((_assetDetails) => {
+      const [first, ...rightValues] = _assetDetails.filter(E.isRight)
       // Store `AssetDetails` in `PoolsState`
-      state = { ...state, assetDetails }
+      state = { ...state, assetDetails: sequenceT(E.either)(first, ...rightValues) }
       // Load `PoolDetails`
       // As long as Midgard has some issues to load all details at once at `v1/detail` endpoint we load details in sequence with some delay between
       // TODO(@Veado) Load details at once if Midgard has been fixed
       // switchMap((_) => apiGetPoolsData$(state.poolAssets)),
-      return Rx.combineLatest(...state.poolAssets.map((asset, index) => apiGetPoolsData$(asset, index * 50)))
+      return Rx.combineLatest(state.poolAssets.map((asset, index) => apiGetPoolsData$(asset, index * 50)))
     }),
-    switchMap((poolDetails) => {
+    switchMap((_poolDetails) => {
+      const [first, ...rightValues] = _poolDetails.filter(E.isRight) as typeof _poolDetails
+      const poolDetails = sequenceT(E.either)(first, ...rightValues)
       // Store `poolDetails` + `pricePools`
       state = {
         ...state,
         poolDetails,
-        pricePools: some(getPricePools(poolDetails, PRICE_POOLS_WHITELIST))
+        pricePools: some(
+          getPricePools(
+            E.getOrElse<Error, PoolDetail[]>(() => [])(poolDetails),
+            PRICE_POOLS_WHITELIST
+          )
+        )
       }
       // Update selected `PricePoolAsset`
       // check storage

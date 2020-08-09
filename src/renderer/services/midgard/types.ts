@@ -10,6 +10,7 @@ import {
   ThorchainConstants
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset } from '../../views/pools/types'
+import { Either } from 'fp-ts/lib/Either'
 
 export type PoolAsset = string
 export type PoolAssets = string[]
@@ -27,9 +28,9 @@ export type PriceDataIndex = {
 }
 
 export type PoolsState = {
-  assetDetails: AssetDetails
+  assetDetails: Either<Error, AssetDetails>
   poolAssets: PoolAssets
-  poolDetails: PoolDetails
+  poolDetails: Either<Error, PoolDetails>
   pricePools: Option<PricePools>
 }
 
