@@ -1,8 +1,8 @@
 const path = require('path')
 
-module.exports = (env, argv) => ({
+module.exports = (_ /* env */, argv) => ({
   entry: {
-    // preload: './src/main/preload.ts',
+    preload: './src/main/preload.ts',
     electron: './src/main/electron.ts'
   },
   output: {

@@ -1,0 +1,13 @@
+import { contextBridge } from 'electron'
+
+import { apiKeystore } from './api/keystore'
+import { apiLang } from './api/lang'
+
+// ContextBridge is used here to expose custom api objects on `window`
+// to be accessable at `renderer` processes,
+// even if `contextIsolation` is enabled
+// https://www.electronjs.org/docs/api/context-bridge
+
+// `apiKeystore` object
+contextBridge.exposeInMainWorld('apiKeystore', apiKeystore)
+contextBridge.exposeInMainWorld('apiKeystore', apiLang)
