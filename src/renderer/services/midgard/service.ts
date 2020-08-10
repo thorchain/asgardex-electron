@@ -75,7 +75,7 @@ const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
     switchMap((poolAssets) => {
       // Store pool assets and filter out mini token
       // TODO(Veado): It can be removed as soon as midgard's endpoint has been fixed - see https://gitlab.com/thorchain/midgard/-/issues/215
-      state = { ...state, poolAssets: filterPoolAssets(poolAssets) }
+      state = { ...state, poolAssets: filterPoolAssets(poolAssets).slice(0, 2) }
       // Load `AssetDetails`
       // As long as Midgard has some issues to load all details at once at `v1/assets` endpoint we load details in sequence with some delay between
       // TODO(@Veado) Load details at once if Midgard has been fixed
