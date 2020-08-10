@@ -57,12 +57,15 @@ const addPhrase = async (state: KeystoreState, password: string) => {
 }
 
 // check keystore at start
-window.apiKeystore.exists().then((result) => setKeystoreState(result ? some(none) : none))
+window.apiKeystore.exists().then(
+  (result) => setKeystoreState(result ? some(none) /*imported, but locked*/ : none /*not imported*/),
+  (_) => setKeystoreState(none /*not imported*/)
+)
 
 export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystore,
   removeKeystore,
-  lock: () => setKeystoreState(some(none)), // Note: It does not remove keystore from filesystem!
+  lock: () => setKeystoreState(some(none)),
   unlock: addPhrase
 }

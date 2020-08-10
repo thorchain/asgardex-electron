@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { shell } from 'electron'
 import { HashRouter as Router } from 'react-router-dom'
 
 import { AppWrapper, AppLayout } from './App.style'
@@ -29,7 +28,7 @@ const AppView: React.FC<Props> = (_): JSX.Element => {
           </View>
           <Footer
             commitHash={envOrDefault($COMMIT_HASH, '')}
-            openExternal={shell.openExternal}
+            openExternal={() => Promise.resolve() /* shell.openExternal */}
             isDev={$IS_DEV}></Footer>
         </AppLayout>
       </AppWrapper>

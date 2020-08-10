@@ -10,4 +10,5 @@ import { apiLang } from './api/lang'
 
 // `apiKeystore` object
 contextBridge.exposeInMainWorld('apiKeystore', apiKeystore)
-contextBridge.exposeInMainWorld('apiKeystore', apiLang)
+// `apiLang` object
+contextBridge.exposeInMainWorld('apiLang', apiLang)

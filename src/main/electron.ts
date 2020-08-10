@@ -3,12 +3,13 @@ import { join } from 'path'
 import { Keystore } from '@thorchain/asgardex-crypto'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
 
 import { Locale } from '../shared/i18n/types'
-import { saveKeystore, removeKeystore, getKeystore } from './api/keystore'
+import { saveKeystore, removeKeystore, getKeystore, keystoreExist } from './api/keystore'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
@@ -61,11 +62,8 @@ const closeHandler = () => {
 }
 
 const setupDevEnv = async () => {
-  // install react chrome dev tools
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { default: install, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer')
   try {
-    await install(REACT_DEVELOPER_TOOLS)
+    await installExtension(REACT_DEVELOPER_TOOLS)
   } catch (e) {
     warn('unable to install devtools', e)
   }
@@ -89,7 +87,7 @@ const initMainWindow = async () => {
       // https://www.electronjs.org/docs/tutorial/security#15-disable-the-remote-module
       enableRemoteModule: false,
       // preload script
-      preload: join(__dirname, 'preload.js')
+      preload: join(__dirname, IS_DEV ? '../../public/' : '../build/', 'preload.js')
     }
   })
 
@@ -118,10 +116,12 @@ const initIPC = () => {
   ipcMain.handle(IPCMessages.SAVE_KEYSTORE, (_, keystore: Keystore) => saveKeystore(keystore))
   ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, () => removeKeystore())
   ipcMain.handle(IPCMessages.GET_KEYSTORE, () => getKeystore())
+  ipcMain.handle(IPCMessages.KEYSTORE_EXIST, () => keystoreExist())
 }
 
 const init = async () => {
   await app.whenReady()
+  console.log('__dirname:', __dirname)
   await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
