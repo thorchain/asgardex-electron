@@ -16,7 +16,10 @@ export const PhraseView: React.FC = () => {
       <Route path={walletRoutes.create.phrase.template} exact>
         <MnemonicGenerate
           onSubmit={({ phrase, password }) => {
-            history.push(walletRoutes.create.phraseConfirm.path(), { phrase, password })
+            history.push({
+              pathname: walletRoutes.create.phraseConfirm.path(),
+              state: { phrase, password }
+            })
           }}
         />
       </Route>
