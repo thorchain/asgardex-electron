@@ -1,9 +1,10 @@
+import Title from 'antd/lib/typography/Title'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
 
-export const ErrorWrapper = styled.div`
+export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,9 +14,6 @@ export const ErrorWrapper = styled.div`
   `}
   background-color: ${palette('background', 1)};
 
-  .message {
-    color: ${palette('text', 2)};
-  }
 
   .icon {
     display: flex;
@@ -33,4 +31,12 @@ export const ErrorWrapper = styled.div`
       fill: ${palette('error', 0)};
     }
   }
+`
+
+export const Message = styled(Title).attrs({ level: 4 })`
+  color: ${palette('text', 2)};
+`
+
+export const ActionButtonWrapper = styled.div`
+  margin-top: 10px;
 `

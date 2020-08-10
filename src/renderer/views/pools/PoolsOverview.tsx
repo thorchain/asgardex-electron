@@ -9,6 +9,7 @@ import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import { Option, none, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import ErrorView from '../../components/shared/error/ErrorView'
@@ -34,6 +35,7 @@ type Props = {}
 
 const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
+  const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
   const poolsRD = useObservableState(midgardService.poolsState$, RD.pending)
@@ -100,17 +102,17 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     midgardService.reloadNetworkInfo()
   }, [midgardService])
 
-  const renderBtnColTitle = useCallback(
+  const renderRefreshBtn = useMemo(
     () => (
-      <ActionColumn>
-        <Button onClick={clickRefreshHandler} typevalue="outline">
-          <SyncOutlined />
-          refresh
-        </Button>
-      </ActionColumn>
+      <Button onClick={clickRefreshHandler} typevalue="outline">
+        <SyncOutlined />
+        {intl.formatMessage({ id: 'common.refresh' })}
+      </Button>
     ),
-    [clickRefreshHandler]
+    [clickRefreshHandler, intl]
   )
+
+  const renderBtnColTitle = useMemo(() => <ActionColumn>{renderRefreshBtn}</ActionColumn>, [renderRefreshBtn])
 
   const renderBtnPoolsColumn = useCallback(
     (_: string, record: PoolTableRowData) => {
@@ -325,7 +327,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           // error state
           (error: Error) => {
             const msg = error?.toString() ?? ''
-            return <ErrorView message={msg} />
+            return <ErrorView message={msg} actionButton={renderRefreshBtn} />
           },
           // success state
           (pools: PoolsState): JSX.Element => {
@@ -340,7 +342,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         )(poolsRD)}
       </>
     ),
-    [poolsRD, pricePool, renderPoolsTable]
+    [poolsRD, pricePool.poolData, renderPoolsTable, renderRefreshBtn]
   )
 
   const renderBtnPendingPoolsColumn = useCallback(

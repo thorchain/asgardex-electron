@@ -22,12 +22,12 @@ const common: CommonMessages = {
   'common.phrase': 'Phrase',
   'common.submit': 'Abschicken',
   'common.confirm': 'Bestätigen',
-  'common.next': 'Next - DE',
-  'common.finish': 'Finish - DE',
+  'common.next': 'Weiter',
+  'common.finish': 'Beenden',
   'common.copy': 'Kopieren',
   'common.loading': 'Lade...',
-  'common.error': 'Error - DE',
-  'common.success': 'Success - DE'
+  'common.error': 'Fehler',
+  'common.success': 'Erfolgreich'
 }
 
 export default common
