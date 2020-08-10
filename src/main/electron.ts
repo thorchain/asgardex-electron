@@ -110,9 +110,7 @@ const langChangeHandler = (locale: Locale) => {
 }
 
 const initIPC = () => {
-  // const source$ = fromEvent<Locale>(ipcMain, IPCMessages.UPDATE_LANG, (_, locale) => locale)
-  // source$.subscribe(langChangeHandler)
-  ipcMain.handle(IPCMessages.UPDATE_LANG, (_, locale: Locale) => langChangeHandler(locale))
+  ipcMain.on(IPCMessages.UPDATE_LANG, (_, locale: Locale) => langChangeHandler(locale))
   ipcMain.handle(IPCMessages.SAVE_KEYSTORE, (_, keystore: Keystore) => saveKeystore(keystore))
   ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, () => removeKeystore())
   ipcMain.handle(IPCMessages.GET_KEYSTORE, () => getKeystore())
@@ -121,7 +119,6 @@ const initIPC = () => {
 
 const init = async () => {
   await app.whenReady()
-  console.log('__dirname:', __dirname)
   await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
