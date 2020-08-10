@@ -13,9 +13,14 @@ export type ApiLang = {
   update: (locale: Locale) => void
 }
 
+export type ApiUrl = {
+  openExternal: (url: string) => Promise<void>
+}
+
 declare global {
   interface Window {
     apiKeystore: ApiKeystore
     apiLang: ApiLang
+    apiUrl: ApiUrl
   }
 }

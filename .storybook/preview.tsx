@@ -7,11 +7,17 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 
 import { AppProvider } from '../src/renderer/contexts/AppContext'
 import { ThemeProvider } from '../src/renderer/contexts/ThemeContext'
-import { I18nProvider } from '../src/renderer/contexts/I18nContext'
 import { AppWrapper } from '../src/renderer/App.style'
 import { Locale } from '../src/shared/i18n/types'
 import { IntlProvider } from 'react-intl'
 import { getMessagesByLocale } from '../src/renderer/i18n'
+
+import * as mockApi from '../src/shared/mock/api'
+
+// Mock api provided by main renderer
+window.apiKeystore = { ...mockApi.apiKeystore }
+window.apiLang = {...mockApi.apiLang }
+window.apiUrl = {...mockApi.apiUrl }
 
 const lightTheme = { name: 'Light', ...themes.light }
 const darkTheme = { name: 'Dark', ...themes.dark }

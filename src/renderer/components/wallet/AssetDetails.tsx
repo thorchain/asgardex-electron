@@ -10,7 +10,6 @@ import { useHistory } from 'react-router-dom'
 
 import * as walletRoutes from '../../routes/wallet'
 import { TxsRD, BalancesRD } from '../../services/binance/types'
-import { OpenExternalHandler } from '../../types/asgardex'
 import AssetInfo from '../uielements/assets/AssetInfo'
 import BackLink from '../uielements/backLink'
 import Button, { RefreshButton } from '../uielements/button'
@@ -23,7 +22,6 @@ type Props = {
   asset: O.Option<Asset>
   address: O.Option<Address>
   explorerUrl?: O.Option<string>
-  openExternal: OpenExternalHandler
   reloadBalancesHandler?: () => void
   reloadSelectedAssetTxsHandler?: () => void
 }
@@ -36,8 +34,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
     asset,
     reloadBalancesHandler = () => {},
     reloadSelectedAssetTxsHandler = () => {},
-    explorerUrl = O.none,
-    openExternal
+    explorerUrl = O.none
   } = props
 
   const assetAsString = useMemo(
@@ -73,10 +70,10 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
     (txHash: string) => {
       FP.pipe(
         explorerUrl,
-        O.map((url) => openExternal(`${url}/tx/${txHash}`))
+        O.map((url) => window.apiUrl.openExternal(`${url}/tx/${txHash}`))
       )
     },
-    [explorerUrl, openExternal]
+    [explorerUrl]
   )
 
   return (

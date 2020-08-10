@@ -9,7 +9,6 @@ import { ExternalUrl } from '../../shared/const'
 import { ReactComponent as TelegramIcon } from '../assets/svg/icon-telegram.svg'
 import { ReactComponent as ThorChainIcon } from '../assets/svg/logo-thorchain.svg'
 import * as playgroundRoutes from '../routes/playground'
-import { OpenExternalHandler } from '../types/asgardex'
 import { FooterContainer, FooterLink, FooterIconWrapper, FooterLinkWrapper } from './Footer.style'
 
 type IconProps = {
@@ -30,12 +29,11 @@ const FooterIcon: React.FC<IconProps> = (props: IconProps): JSX.Element => {
 
 type Props = {
   commitHash?: string
-  openExternal: OpenExternalHandler
   isDev: boolean
 }
 
 const Footer: React.FC<Props> = (props: Props): JSX.Element => {
-  const { commitHash, openExternal, isDev } = props
+  const { commitHash, isDev } = props
 
   const intl = useIntl()
 
@@ -44,12 +42,9 @@ const Footer: React.FC<Props> = (props: Props): JSX.Element => {
 
   const gotoPlayground = useCallback(() => history.push(playgroundRoutes.base.path()), [history])
 
-  const clickIconHandler = useCallback(
-    (url: string) => {
-      openExternal(url)
-    },
-    [openExternal]
-  )
+  const clickIconHandler = useCallback((url: string) => {
+    window.apiUrl.openExternal(url)
+  }, [])
 
   return (
     <FooterContainer>

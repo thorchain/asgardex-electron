@@ -26,10 +26,7 @@ const AppView: React.FC<Props> = (_): JSX.Element => {
           <View>
             <ViewRoutes />
           </View>
-          <Footer
-            commitHash={envOrDefault($COMMIT_HASH, '')}
-            openExternal={() => Promise.resolve() /* shell.openExternal */}
-            isDev={$IS_DEV}></Footer>
+          <Footer commitHash={envOrDefault($COMMIT_HASH, '')} isDev={$IS_DEV} />
         </AppLayout>
       </AppWrapper>
     </>

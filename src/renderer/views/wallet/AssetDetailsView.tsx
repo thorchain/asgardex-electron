@@ -32,7 +32,6 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
       reloadSelectedAssetTxsHandler={reloadTxssSelectedAsset}
       reloadBalancesHandler={reloadBalances}
       explorerUrl={explorerUrl}
-      openExternal={() => Promise.resolve() /* shell.openExternal */}
     />
   )
 }

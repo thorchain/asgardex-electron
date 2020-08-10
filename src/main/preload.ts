@@ -2,6 +2,7 @@ import { contextBridge } from 'electron'
 
 import { apiKeystore } from './api/keystore'
 import { apiLang } from './api/lang'
+import { apiUrl } from './api/url'
 
 // ContextBridge is used here to expose custom api objects on `window`
 // to be accessable at `renderer` processes,
@@ -12,3 +13,5 @@ import { apiLang } from './api/lang'
 contextBridge.exposeInMainWorld('apiKeystore', apiKeystore)
 // `apiLang` object
 contextBridge.exposeInMainWorld('apiLang', apiLang)
+// `apiUrl` object
+contextBridge.exposeInMainWorld('apiUrl', apiUrl)

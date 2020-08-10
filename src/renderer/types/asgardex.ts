@@ -53,5 +53,3 @@ export type TxStatus = {
    */
   readonly hash?: string
 }
-
-export type OpenExternalHandler = (url: string) => Promise<void>
