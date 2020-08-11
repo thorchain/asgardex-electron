@@ -36,7 +36,7 @@ const SendView: React.FC = (): JSX.Element => {
             sequenceTOptionFromArray
           )
         ),
-        RD.chain((balances) => RD.fromOption(balances, () => Error('')))
+        RD.chain((balances) => RD.fromOption(balances, () => Error('Error while loading balances')))
       ),
     [balancesState]
   )

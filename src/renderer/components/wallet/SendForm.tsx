@@ -1,21 +1,21 @@
 import React, { useCallback, useState } from 'react'
 
-import { Asset, bn } from '@thorchain/asgardex-util'
+import { bn } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
-import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { useIntl } from 'react-intl'
 
 import { ASSETS_MAINNET } from '../../../shared/mock/assets'
+import { AssetWithBalance } from '../../types/asgardex'
 import { Input, InputNumber } from '../uielements/input'
 import AccountSelector from './AccountSelector'
 import * as Styled from './Send.style'
 
 type SendFormProps = {
-  balances?: (Asset & { balance?: BigNumber })[]
-  initialActiveAsset?: O.Option<Asset>
+  balances?: AssetWithBalance[]
+  initialActiveAsset?: O.Option<AssetWithBalance>
   onSubmit: (recipient: string, amount: number, symbol: string, password?: string) => void
 }
 
@@ -25,10 +25,10 @@ export const SendForm: React.FC<SendFormProps> = ({
   initialActiveAsset = O.none
 }): JSX.Element => {
   const intl = useIntl()
-  const [activeAsset, setActiveAsset] = useState<Asset & { balance?: BigNumber }>(
+  const [activeAsset, setActiveAsset] = useState<AssetWithBalance>(
     pipe(
       initialActiveAsset,
-      O.getOrElse(() => ASSETS_MAINNET.BOLT)
+      O.getOrElse(() => ({ ...ASSETS_MAINNET.BOLT, balance: bn(0) }))
     )
   )
 
@@ -54,7 +54,7 @@ export const SendForm: React.FC<SendFormProps> = ({
         return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBePositive' }))
       }
 
-      if (value.isGreaterThan(activeAsset.balance || 0)) {
+      if (value.isGreaterThan(activeAsset.balance)) {
         return Promise.reject('should be less then your balance')
       }
     },
@@ -82,7 +82,7 @@ export const SendForm: React.FC<SendFormProps> = ({
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
               <InputNumber min={0} size="large" />
             </Styled.FormItem>
-            <Styled.StyledLabel size="big">MAX: {activeAsset.balance?.toFormat()}</Styled.StyledLabel>
+            <Styled.StyledLabel size="big">MAX: {activeAsset.balance.toFormat()}</Styled.StyledLabel>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
             <Form.Item name="password">
               <Input size="large" />

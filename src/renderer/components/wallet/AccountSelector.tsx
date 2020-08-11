@@ -2,8 +2,8 @@ import React, { useCallback } from 'react'
 
 import { Asset, assetAmount, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Menu, Dropdown } from 'antd'
-import BigNumber from 'bignumber.js'
 
+import { AssetWithBalance } from '../../types/asgardex'
 import AssetIcon from '../uielements/assets/assetIcon'
 import { Size as CoinSize } from '../uielements/assets/assetIcon/types'
 import Label from '../uielements/label'
@@ -11,8 +11,8 @@ import { StyledCard, AssetWrapper, AssetInfoWrapper, AssetTitle } from './Accoun
 
 type Props = {
   asset: Asset
-  assets: (Asset & { balance?: BigNumber })[]
-  onChange?: (asset: Asset) => void
+  assets: AssetWithBalance[]
+  onChange?: (asset: AssetWithBalance) => void
   size?: CoinSize
 }
 

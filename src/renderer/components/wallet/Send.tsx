@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset } from '@thorchain/asgardex-util'
-import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { BinanceContextValue } from '../../contexts/BinanceContext'
+import { AssetWithBalance } from '../../types/asgardex'
 import ErrorView from '../shared/error/ErrorView'
 import { LoadingView } from '../shared/loading/LoadingView'
 import BackLink from '../uielements/backLink'
@@ -17,8 +16,8 @@ import { SendForm } from './SendForm'
 
 type SendProps = {
   transactionService: BinanceContextValue['transaction']
-  balances?: RD.RemoteData<Error, (Asset & { balance?: BigNumber })[]>
-  initialActiveAsset?: RD.RemoteData<Error, O.Option<Asset>>
+  balances?: RD.RemoteData<Error, AssetWithBalance[]>
+  initialActiveAsset?: RD.RemoteData<Error, O.Option<AssetWithBalance>>
 }
 
 const Send: React.FC<SendProps> = ({

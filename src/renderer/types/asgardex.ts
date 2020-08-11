@@ -1,4 +1,5 @@
 import { BaseAmount, Asset } from '@thorchain/asgardex-util'
+import BigNumber from 'bignumber.js'
 import { Option } from 'fp-ts/lib/Option'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,6 +13,10 @@ export type Pair = {
 export type AssetPair = {
   asset: Asset
   price: BaseAmount
+}
+
+export type AssetWithBalance = Asset & {
+  balance: BigNumber
 }
 
 export enum TxTypes {
