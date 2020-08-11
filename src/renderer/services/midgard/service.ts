@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import byzantine from '@thorchain/byzantine-module'
 import * as E from 'fp-ts/lib/Either'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { some } from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -20,6 +21,7 @@ import { PRICE_POOLS_WHITELIST } from '../../const'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
+import { isPricePoolAsset } from '../../views/pools/types'
 import { Network } from '../app/types'
 import {
   PoolsStateRD,
@@ -227,7 +229,8 @@ const thorchainConstantsState$: Rx.Observable<ThorchainConstantsRD> = apiGetThor
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
 
-export const getSelectedPricePool = () => O.fromNullable(localStorage.getItem(PRICE_POOL_KEY) as PricePoolAsset)
+export const getSelectedPricePool = () =>
+  FP.pipe(localStorage.getItem(PRICE_POOL_KEY), O.fromNullable, O.filter(isPricePoolAsset))
 
 const {
   get$: selectedPricePoolAsset$,
