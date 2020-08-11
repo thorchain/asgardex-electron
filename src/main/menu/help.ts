@@ -1,7 +1,8 @@
-import { MenuItemConstructorOptions, shell } from 'electron'
+import { MenuItemConstructorOptions } from 'electron'
 import { IntlShape } from 'react-intl'
 
 import { ExternalUrl } from '../../shared/const'
+import { apiUrl } from '../api/url'
 
 const menu = (intl: IntlShape): MenuItemConstructorOptions => ({
   label: intl.formatMessage({ id: 'menu.help.title' }),
@@ -9,25 +10,25 @@ const menu = (intl: IntlShape): MenuItemConstructorOptions => ({
     {
       label: intl.formatMessage({ id: 'menu.help.learn' }),
       click() {
-        shell.openExternal(ExternalUrl.WEBSITE)
+        apiUrl.openExternal(ExternalUrl.WEBSITE)
       }
     },
     {
       label: intl.formatMessage({ id: 'menu.help.docs' }),
       click() {
-        shell.openExternal(ExternalUrl.DOCS)
+        apiUrl.openExternal(ExternalUrl.DOCS)
       }
     },
     {
       label: intl.formatMessage({ id: 'menu.help.telegram' }),
       click() {
-        shell.openExternal(ExternalUrl.TELEGRAM)
+        apiUrl.openExternal(ExternalUrl.TELEGRAM)
       }
     },
     {
       label: intl.formatMessage({ id: 'menu.help.issues' }),
       click() {
-        shell.openExternal(`${ExternalUrl.GITHUB_REPO}/issues`)
+        apiUrl.openExternal(`${ExternalUrl.GITHUB_REPO}/issues`)
       }
     }
   ]
