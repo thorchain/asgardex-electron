@@ -3,14 +3,21 @@ import { sequenceT } from 'fp-ts/lib/Apply'
 import * as O from 'fp-ts/lib/Option'
 
 export const sequenceTOption = sequenceT(O.option)
+export const sequenceTOptionFromArray = <A>([first, ...rest]: O.Option<A>[]): O.Option<A[]> => {
+  if (!first) {
+    return O.none
+  }
 
-export const _sequenceTRD = sequenceT(RD.remoteData)
-export const sequenceTRD = <E, A>(onEmpty: () => E) => ([first, ...rest]: RD.RemoteData<E, A>[]): RD.RemoteData<
+  return sequenceTOption(first, ...rest)
+}
+
+export const sequenceTRD = sequenceT(RD.remoteData)
+export const sequenceTRDFromArray = <E, A>(onEmpty: () => E) => ([first, ...rest]: RD.RemoteData<
   E,
-  A[]
-> => {
+  A
+>[]): RD.RemoteData<E, A[]> => {
   if (!first) {
     return RD.failure(onEmpty())
   }
-  return _sequenceTRD(first, ...rest)
+  return sequenceTRD(first, ...rest)
 }

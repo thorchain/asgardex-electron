@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset } from '@thorchain/asgardex-util'
+import BigNumber from 'bignumber.js'
+import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { BinanceContextValue } from '../../contexts/BinanceContext'
-import { BalancesRD } from '../../services/binance/types'
+import ErrorView from '../shared/error/ErrorView'
 import { LoadingView } from '../shared/loading/LoadingView'
 import BackLink from '../uielements/backLink'
 import * as Styled from './Send.style'
@@ -15,11 +17,15 @@ import { SendForm } from './SendForm'
 
 type SendProps = {
   transactionService: BinanceContextValue['transaction']
-  balances?: BalancesRD
-  initialActiveAsset?: Asset | null
+  balances?: RD.RemoteData<Error, (Asset & { balance?: BigNumber })[]>
+  initialActiveAsset?: RD.RemoteData<Error, O.Option<Asset>>
 }
 
-const Send: React.FC<SendProps> = ({ transactionService, balances = RD.initial, initialActiveAsset }): JSX.Element => {
+const Send: React.FC<SendProps> = ({
+  transactionService,
+  balances = RD.initial,
+  initialActiveAsset = RD.initial
+}): JSX.Element => {
   const intl = useIntl()
 
   useEffect(() => {
@@ -28,19 +34,33 @@ const Send: React.FC<SendProps> = ({ transactionService, balances = RD.initial, 
 
   const transaction = useObservableState(transactionService.transaction$, RD.initial)
 
+  const sendForm = useMemo(
+    () =>
+      pipe(
+        RD.combine(balances, initialActiveAsset),
+        RD.fold(
+          () => <></>,
+          () => <LoadingView />,
+          () => <ErrorView message={intl.formatMessage({ id: 'wallet.send.errors.balancesFailed' })} />,
+          ([balances, initialActiveAsset]) => (
+            <SendForm
+              initialActiveAsset={initialActiveAsset}
+              onSubmit={transactionService.pushTx}
+              balances={balances}
+            />
+          )
+        )
+      ),
+    [intl, balances, initialActiveAsset, transactionService]
+  )
+
   return (
     <>
       <BackLink />
       {pipe(
         transaction,
         RD.fold(
-          () => (
-            <SendForm
-              initialActiveAsset={initialActiveAsset}
-              onSubmit={transactionService.pushTx}
-              balances={balances}
-            />
-          ),
+          () => sendForm,
           () => <LoadingView />,
           (e) => (
             <Styled.Result

@@ -1,55 +1,35 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Asset, bn } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import BigNumber from 'bignumber.js'
+import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { useIntl } from 'react-intl'
 
 import { ASSETS_MAINNET } from '../../../shared/mock/assets'
-import { sequenceTRD } from '../../helpers/fpHelpers'
-import { BalancesRD } from '../../services/binance/types'
-import { bncSymbolToAsset } from '../../services/binance/utils'
-import ErrorView from '../shared/error/ErrorView'
-import { LoadingView } from '../shared/loading/LoadingView'
 import { Input, InputNumber } from '../uielements/input'
 import AccountSelector from './AccountSelector'
 import * as Styled from './Send.style'
 
 type SendFormProps = {
-  balances?: BalancesRD
-  initialActiveAsset?: Asset | null
+  balances?: (Asset & { balance?: BigNumber })[]
+  initialActiveAsset?: O.Option<Asset>
   onSubmit: (recipient: string, amount: number, symbol: string, password?: string) => void
 }
 
 export const SendForm: React.FC<SendFormProps> = ({
   onSubmit: onSubmitProp,
-  balances = RD.initial,
-  initialActiveAsset
+  balances = [],
+  initialActiveAsset = O.none
 }): JSX.Element => {
   const intl = useIntl()
   const [activeAsset, setActiveAsset] = useState<Asset & { balance?: BigNumber }>(
-    initialActiveAsset || ASSETS_MAINNET.BOLT
-  )
-
-  const balancesValue = useMemo(
-    () =>
-      pipe(
-        balances,
-        RD.map((balances) =>
-          balances.map((balance) =>
-            pipe(
-              bncSymbolToAsset(balance.symbol),
-              (val) => RD.fromOption(val, () => Error('')),
-              RD.map((asset) => ({ ...asset, balance: bn(balance.free) }))
-            )
-          )
-        ),
-        RD.chain(sequenceTRD(() => Error('No Data')))
-      ),
-    [balances]
+    pipe(
+      initialActiveAsset,
+      O.getOrElse(() => ASSETS_MAINNET.BOLT)
+    )
   )
 
   const [form] = Styled.Form.useForm()
@@ -88,48 +68,31 @@ export const SendForm: React.FC<SendFormProps> = ({
     [onSubmitProp, activeAsset]
   )
 
-  const renderSuccess = useCallback(
-    (balances) => {
-      return (
-        <Row>
-          <Styled.Col span={24}>
-            <AccountSelector onChange={setActiveAsset} asset={activeAsset} assets={balances} />
-            <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
-              <Styled.SubForm>
-                <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
-                <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-                  <Input color="primary" size="large" />
-                </Form.Item>
-                <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
-                <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-                  <InputNumber min={0} size="large" />
-                </Styled.FormItem>
-                <Styled.StyledLabel size="big">MAX: {activeAsset.balance?.toFormat()}</Styled.StyledLabel>
-                <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
-                <Form.Item name="password">
-                  <Input size="large" />
-                </Form.Item>
-              </Styled.SubForm>
-              <Styled.SubmitItem>
-                <Styled.Button htmlType="submit">{intl.formatMessage({ id: 'wallet.action.send' })}</Styled.Button>
-              </Styled.SubmitItem>
-            </Styled.Form>
-          </Styled.Col>
-        </Row>
-      )
-    },
-    [intl, setActiveAsset, activeAsset, onSubmit, form, addressValidator, amountValidator]
+  return (
+    <Row>
+      <Styled.Col span={24}>
+        <AccountSelector onChange={setActiveAsset} asset={activeAsset} assets={balances} />
+        <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
+          <Styled.SubForm>
+            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
+            <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
+              <Input color="primary" size="large" />
+            </Form.Item>
+            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
+            <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
+              <InputNumber min={0} size="large" />
+            </Styled.FormItem>
+            <Styled.StyledLabel size="big">MAX: {activeAsset.balance?.toFormat()}</Styled.StyledLabel>
+            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
+            <Form.Item name="password">
+              <Input size="large" />
+            </Form.Item>
+          </Styled.SubForm>
+          <Styled.SubmitItem>
+            <Styled.Button htmlType="submit">{intl.formatMessage({ id: 'wallet.action.send' })}</Styled.Button>
+          </Styled.SubmitItem>
+        </Styled.Form>
+      </Styled.Col>
+    </Row>
   )
-
-  return useMemo(() => {
-    return pipe(
-      balancesValue,
-      RD.fold(
-        () => <></>,
-        () => <LoadingView />,
-        () => <ErrorView message={intl.formatMessage({ id: 'wallet.send.errors.balancesFailed' })} />,
-        renderSuccess
-      )
-    )
-  }, [balancesValue, intl, renderSuccess])
 }

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 
-import { Asset } from '@thorchain/asgardex-util'
+import { Asset, assetAmount, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Menu, Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 
@@ -22,14 +22,13 @@ const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
     () => (
       <Menu>
         {assets.map((asset, i: number) => {
-          // console.log('asset.balance?.toFormat(2).toString()', asset.balance?.toFormat(2).toString())
-          const res = asset.balance?.toFormat(2).toString() || '0.00'
-          console.log('res - ', res)
           return (
             <Menu.Item key={i} onClick={() => onChange(asset)}>
               <div style={{ display: 'flex' }}>
                 <div>{asset?.symbol ?? 'unknown'}</div>&nbsp;
-                <div style={{ marginLeft: 'auto' }}>({res})</div>
+                <div style={{ marginLeft: 'auto' }}>
+                  {formatAssetAmountCurrency(assetAmount(asset.balance), assetToString(asset))}
+                </div>
               </div>
             </Menu.Item>
           )
