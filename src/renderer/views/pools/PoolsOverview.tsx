@@ -156,7 +156,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   )
   const poolColumn: ColumnType<PoolTableRowData> = {
     key: 'pool',
-    title: 'pool',
+    title: intl.formatMessage({ id: 'common.pool' }),
     dataIndex: 'pool',
     width: 100,
     render: renderPoolColumn
@@ -172,7 +172,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   )
   const poolColumnMobile: ColumnType<PoolTableRowData> = {
     key: 'pool',
-    title: 'pool',
+    title: intl.formatMessage({ id: 'common.pool' }),
     dataIndex: 'pool',
     render: renderPoolColumnMobile
   }
@@ -185,7 +185,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }, [])
   const assetColumn: ColumnType<PoolTableRowData> = {
     key: 'asset',
-    title: 'asset',
+    title: intl.formatMessage({ id: 'common.asset' }),
     dataIndex: 'pool',
     render: renderAssetColumn,
     sorter: sortAssetColumn,
@@ -204,7 +204,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   const priceColumn: ColumnType<PoolTableRowData> = {
     key: 'poolprice',
-    title: 'price',
+    title: intl.formatMessage({ id: 'common.price' }),
     dataIndex: 'poolPrice',
     render: renderPriceColumn,
     sorter: sortPriceColumn,
@@ -223,7 +223,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }, [])
   const depthColumn: ColumnType<PoolTableRowData> = {
     key: 'depth',
-    title: 'depth',
+    title: intl.formatMessage({ id: 'pools.depth' }),
     dataIndex: 'depthPrice',
     render: renderDepthColumn,
     sorter: sortDepthColumn,
@@ -241,7 +241,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }, [])
   const volumeColumn: ColumnType<PoolTableRowData> = {
     key: 'vol',
-    title: '24h vol',
+    title: intl.formatMessage({ id: 'pools.24hvol' }),
     dataIndex: 'volumePrice',
     render: renderVolumeColumn,
     sorter: sortVolumeColumn,
@@ -259,7 +259,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }, [])
   const transactionColumn: ColumnType<PoolTableRowData> = {
     key: 'transaction',
-    title: 'avg. size',
+    title: intl.formatMessage({ id: 'pools.avgsize' }),
     dataIndex: 'transactionPrice',
     render: renderTransactionColumn,
     sorter: sortTransactionColumn,
@@ -271,7 +271,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   const slipColumn: ColumnType<PoolTableRowData> = {
     key: 'slip',
-    title: 'avg. slip',
+    title: intl.formatMessage({ id: 'pools.avgslip' }),
     dataIndex: 'slip',
     render: renderSlipColumn,
     sorter: sortSlipColumn,
@@ -280,7 +280,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   const tradeColumn: ColumnType<PoolTableRowData> = {
     key: 'trade',
-    title: 'trades',
+    title: intl.formatMessage({ id: 'pools.trades' }),
     dataIndex: 'trades',
     render: (trades: BigNumber) => <Label>{trades.toString()}</Label>,
     sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
@@ -385,7 +385,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   const blockLeftColumn = {
     key: 'blocks',
-    title: 'blocks left',
+    title: intl.formatMessage({ id: 'pools.blocksleft' }),
     width: 80,
     render: renderBlockLeftColumn
   }
@@ -441,11 +441,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   return (
     <>
       <Label size="big" weight="bold" color="normal" textTransform="uppercase">
-        Available Pools
+        {intl.formatMessage({ id: 'pools.available' })}
       </Label>
       {renderPools}
       <Label size="big" weight="bold" color="normal" textTransform="uppercase" style={{ marginTop: '40px' }}>
-        Pending Pools
+        {intl.formatMessage({ id: 'pools.pending' })}
       </Label>
       {renderPendingPools}
     </>

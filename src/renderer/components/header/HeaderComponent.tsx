@@ -132,13 +132,13 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
       [
         {
           key: TabKey.POOLS,
-          label: intl.formatMessage({ id: 'pools.title' }),
+          label: intl.formatMessage({ id: 'common.title' }),
           path: poolsRoutes.base.path(),
           icon: SwapIcon
         },
         {
           key: TabKey.WALLET,
-          label: intl.formatMessage({ id: 'wallet.title' }),
+          label: intl.formatMessage({ id: 'common.wallet' }),
           path: walletRoutes.base.path(),
           icon: WalletIcon
         }

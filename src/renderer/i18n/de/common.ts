@@ -27,7 +27,13 @@ const common: CommonMessages = {
   'common.copy': 'Kopieren',
   'common.loading': 'Lade...',
   'common.error': 'Fehler',
-  'common.success': 'Erfolgreich'
+  'common.success': 'Erfolgreich',
+  'common.wallet': 'Wallet',
+  'common.assets': 'Assets',
+  'common.asset': 'Asset',
+  'common.pools': 'Pools',
+  'common.pool': 'Pool',
+  'common.price': 'Preis'
 }
 
 export default common
