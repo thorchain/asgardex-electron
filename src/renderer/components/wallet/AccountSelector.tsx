@@ -21,21 +21,23 @@ const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
   const menu = useCallback(
     () => (
       <Menu>
-        {assets.map((asset, i: number) => {
-          return (
-            <Menu.Item key={i} onClick={() => onChange(asset)}>
-              <div style={{ display: 'flex' }}>
-                <div>{asset?.symbol ?? 'unknown'}</div>&nbsp;
-                <div style={{ marginLeft: 'auto' }}>
-                  {formatAssetAmountCurrency(assetAmount(asset.balance), assetToString(asset))}
+        {assets
+          .filter((cure) => cure.symbol !== asset.symbol)
+          .map((asset, i: number) => {
+            return (
+              <Menu.Item key={i} onClick={() => onChange(asset)}>
+                <div style={{ display: 'flex' }}>
+                  <div>{asset?.symbol ?? 'unknown'}</div>&nbsp;
+                  <div style={{ marginLeft: 'auto' }}>
+                    {formatAssetAmountCurrency(assetAmount(asset.balance), assetToString(asset))}
+                  </div>
                 </div>
-              </div>
-            </Menu.Item>
-          )
-        })}
+              </Menu.Item>
+            )
+          })}
       </Menu>
     ),
-    [assets, onChange]
+    [asset, assets, onChange]
   )
   return (
     <StyledCard bordered={false}>
