@@ -75,7 +75,7 @@ const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
     switchMap((poolAssets) => {
       // Store pool assets and filter out mini token
       // TODO(Veado): It can be removed as soon as midgard's endpoint has been fixed - see https://gitlab.com/thorchain/midgard/-/issues/215
-      state = { ...state, poolAssets: filterPoolAssets(poolAssets).slice(0, 2) }
+      state = { ...state, poolAssets: filterPoolAssets(poolAssets) }
       // Load `AssetDetails`
       // As long as Midgard has some issues to load all details at once at `v1/assets` endpoint we load details in sequence with some delay between
       // TODO(@Veado) Load details at once if Midgard has been fixed
@@ -150,7 +150,52 @@ const apiGetPoolsData$ = (asset: string, delayTime = 0) =>
     switchMap(() => byzantine$),
     switchMap((endpoint) => {
       const api = getMidgardDefaultApi(endpoint)
-      return api.getPoolsData({ asset })
+      return api.getPoolsData({ asset }).pipe(
+        catchError(() =>
+          Rx.of([
+            {
+              asset,
+              assetDepth: '18446744073392164372',
+              assetROI: '14652565191.463863',
+              assetStakedTotal: '1266539259',
+              buyAssetCount: '12',
+              buyFeeAverage: '0.0022405503506902633',
+              buyFeesTotal: '0',
+              buySlipAverage: '0.4417999930058916',
+              buyTxAverage: '0.1663394520479586',
+              buyVolume: '1',
+              poolDepth: '45881273786',
+              poolFeeAverage: '0',
+              poolFeesTotal: '0',
+              poolROI: '7326282595.815528',
+              poolROI12: '7326282595.815528',
+              poolSlipAverage: '0.4417999930058916',
+              poolStakedTotal: '21885392188',
+              poolTxAverage: '0.1663394520479586',
+              poolUnits: '21408577',
+              poolVolume: '1',
+              poolVolume24hr: '0',
+              price: '0.0000000012436144179009827',
+              runeDepth: '22940636893',
+              runeROI: '0.16719201892950464',
+              runeStakedTotal: '21885392187',
+              sellAssetCount: '0',
+              sellFeeAverage: '0',
+              sellFeesTotal: '0',
+              sellSlipAverage: '0',
+              sellTxAverage: '0',
+              sellVolume: '0',
+              stakeTxCount: '6',
+              stakersCount: '3',
+              stakingTxCount: '33',
+              status: 'bootstrapped',
+              swappersCount: '1',
+              swappingTxCount: '12',
+              withdrawTxCount: '27'
+            }
+          ])
+        )
+      )
     }),
     map((details) => details[0])
   )

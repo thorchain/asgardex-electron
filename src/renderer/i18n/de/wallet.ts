@@ -37,7 +37,8 @@ const wallet: WalletMessages = {
   'wallet.send.errors.balancesFailed': 'No balances loaded - DE',
   'wallet.send.errors.address.length': 'Address should be at least 8 symbols length - DE',
   'wallet.send.errors.amount.shouldBeNumber': 'Amount should be a number - DE',
-  'wallet.send.errors.amount.shouldBePositive': 'Amount should be positive - DE'
+  'wallet.send.errors.amount.shouldBePositive': 'Amount should be positive - DE',
+  'wallet.send.errors.amount.shouldBeLessThatBalance': 'Amount should be less than your balance - DE'
 }
 
 export default wallet

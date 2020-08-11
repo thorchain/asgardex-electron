@@ -40,7 +40,7 @@ const Send: React.FC<SendProps> = ({
         RD.fold(
           () => <></>,
           () => <LoadingView />,
-          () => <ErrorView message={intl.formatMessage({ id: 'wallet.send.errors.balancesFailed' })} />,
+          (e) => <ErrorView message={e.message} />,
           ([balances, initialActiveAsset]) => (
             <SendForm
               initialActiveAsset={initialActiveAsset}
@@ -50,7 +50,7 @@ const Send: React.FC<SendProps> = ({
           )
         )
       ),
-    [intl, balances, initialActiveAsset, transactionService]
+    [balances, initialActiveAsset, transactionService]
   )
 
   return (

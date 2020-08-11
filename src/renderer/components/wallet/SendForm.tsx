@@ -55,7 +55,7 @@ export const SendForm: React.FC<SendFormProps> = ({
       }
 
       if (value.isGreaterThan(activeAsset.balance)) {
-        return Promise.reject('should be less then your balance')
+        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBeLessThatBalance' }))
       }
     },
     [intl, activeAsset]
