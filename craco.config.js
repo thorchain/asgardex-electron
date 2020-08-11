@@ -4,8 +4,10 @@ const webpack = require('webpack')
 module.exports = {
   webpack: {
     configure: (webpackConfig) => {
-      // support electron
-      webpackConfig.target = 'electron-renderer'
+      // Use `web` instead of 'electron-renderer'
+      // to avoid "Uncaught ReferenceError: require is not defined"
+      // ^ https://gist.github.com/msafi/d1b8571aa921feaaa0f893ab24bb727b
+      webpackConfig.target = 'web'
       // support hot reload of hooks
       webpackConfig.resolve.alias['react-dom'] = '@hot-loader/react-dom'
       return webpackConfig

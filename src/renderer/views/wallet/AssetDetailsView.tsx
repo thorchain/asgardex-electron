@@ -1,7 +1,6 @@
 import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { shell } from 'electron'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
@@ -33,7 +32,6 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
       reloadSelectedAssetTxsHandler={reloadTxssSelectedAsset}
       reloadBalancesHandler={reloadBalances}
       explorerUrl={explorerUrl}
-      openExternal={shell.openExternal}
     />
   )
 }

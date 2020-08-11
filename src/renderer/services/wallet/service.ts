@@ -1,18 +1,11 @@
-import * as path from 'path'
-
 import { encryptToKeyStore, decryptFromKeystore, Keystore as CryptoKeystore } from '@thorchain/asgardex-crypto'
 import { none, some } from 'fp-ts/lib/Option'
-import * as fs from 'fs-extra'
 
 import { observableState } from '../../helpers/stateHelper'
-import { STORAGE_DIR } from '../const'
 import { Phrase, KeystoreService, KeystoreState } from './types'
 import { hasImportedKeystore } from './util'
 
-// key file path
-export const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
-
-export const initialKeystoreState = (): KeystoreState => (fs.pathExistsSync(KEY_FILE) ? some(none) : none)
+export const initialKeystoreState = (): KeystoreState => none
 
 const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(initialKeystoreState())
 
@@ -24,8 +17,7 @@ const addKeystore = async (phrase: Phrase, password: string) => {
     // remove previous keystore before adding a new one to trigger changes of `KeystoreState
     await keystoreService.removeKeystore()
     const keystore: CryptoKeystore = await encryptToKeyStore(phrase, password)
-    await fs.ensureFile(KEY_FILE)
-    await fs.writeJSON(KEY_FILE, keystore)
+    await window.apiKeystore.save(keystore)
     setKeystoreState(some(some({ phrase })))
     return Promise.resolve()
   } catch (error) {
@@ -34,9 +26,7 @@ const addKeystore = async (phrase: Phrase, password: string) => {
 }
 
 export const removeKeystore = async () => {
-  // If `KEY_FILE' does not exist, `fs.remove` silently does nothing.
-  // ^ see https://github.com/jprichardson/node-fs-extra/blob/master/docs/remove.md
-  await fs.remove(KEY_FILE)
+  await window.apiKeystore.remove()
   setKeystoreState(none)
 }
 
@@ -48,7 +38,7 @@ const addPhrase = async (state: KeystoreState, password: string) => {
   }
 
   // make sure file still exists
-  const exists = await fs.pathExists(KEY_FILE)
+  const exists = await window.apiKeystore.exists()
   if (!exists) {
     // TODO(@Veado) i18m
     return Promise.reject('Keystore has to be imported first')
@@ -56,7 +46,7 @@ const addPhrase = async (state: KeystoreState, password: string) => {
 
   // decrypt phrase from keystore
   try {
-    const keystore: CryptoKeystore = await fs.readJSON(KEY_FILE)
+    const keystore: CryptoKeystore = await window.apiKeystore.get()
     const phrase = await decryptFromKeystore(keystore, password)
     setKeystoreState(some(some({ phrase })))
     return Promise.resolve()
@@ -66,15 +56,16 @@ const addPhrase = async (state: KeystoreState, password: string) => {
   }
 }
 
-// * Note: It does not remove keystore from filesystem!
-const removePhrase = () => {
-  setKeystoreState(some(none))
-}
+// check keystore at start
+window.apiKeystore.exists().then(
+  (result) => setKeystoreState(result ? some(none) /*imported, but locked*/ : none /*not imported*/),
+  (_) => setKeystoreState(none /*not imported*/)
+)
 
 export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystore,
   removeKeystore,
-  lock: removePhrase,
+  lock: () => setKeystoreState(some(none)),
   unlock: addPhrase
 }

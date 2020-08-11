@@ -14,7 +14,6 @@ storiesOf('Wallet/AssetsDetails', module).add('default', () => {
       balancesRD={RD.initial}
       address={O.some('bnb1jxfh2g85q3v0tdq56fnevx6xcxtcnhtsmcu64m')}
       asset={O.some(ASSETS_TESTNET.RUNE)}
-      openExternal={(url: string) => Promise.resolve(console.log(`open external ${url}`))}
     />
   )
 })

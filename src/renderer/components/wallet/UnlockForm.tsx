@@ -11,6 +11,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 
 import { IS_PRODUCTION } from '../../../shared/const'
 import { envOrDefault } from '../../helpers/envHelper'
+import * as appRoutes from '../../routes/app'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { KeystoreState } from '../../services/wallet/types'
@@ -106,9 +107,14 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
     [unlockError]
   )
 
+  const onOkHandlder = useCallback(async () => {
+    await removeKeystore()
+    history.push(appRoutes.base.template)
+  }, [history, removeKeystore])
+
   return (
     <>
-      <Modal visible={showRemoveModal} onCancel={hideRemoveConfirm} onOk={removeKeystore}>
+      <Modal visible={showRemoveModal} onCancel={hideRemoveConfirm} onOk={onOkHandlder}>
         {intl.formatMessage({ id: 'wallet.action.remove' })}
       </Modal>
       <Styled.Header>

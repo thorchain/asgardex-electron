@@ -7,6 +7,9 @@ import { Option, isNone } from 'fp-ts/lib/Option'
 import { RunHelpers } from 'rxjs/internal/testing/TestScheduler'
 import { TestScheduler } from 'rxjs/testing'
 
+import { ApiKeystore, ApiLang, ApiUrl } from './shared/api/types'
+import * as mockApi from './shared/mock/api'
+
 type RunObservableCallback<T> = (helpers: RunHelpers) => T
 type RunObservable = <T>(callback: RunObservableCallback<T>) => T
 
@@ -17,6 +20,12 @@ declare global {
     interface Global {
       runObservable: RunObservable
     }
+  }
+
+  interface Window {
+    apiKeystore: ApiKeystore
+    apiLang: ApiLang
+    apiUrl: ApiUrl
   }
 
   // eslint-disable-next-line no-redeclare, @typescript-eslint/no-namespace
@@ -32,6 +41,12 @@ global.runObservable = <T>(callback: RunObservableCallback<T>) => {
   const ts = new TestScheduler((actual, expected) => expect(expected).toStrictEqual(actual))
   return ts.run(callback)
 }
+
+// Mock "api" objects on `window` provided by main renderer
+// all can be overridden in tests if needed
+global.window.apiKeystore = { ...mockApi.apiKeystore }
+global.window.apiLang = { ...mockApi.apiLang }
+global.window.apiUrl = { ...mockApi.apiUrl }
 
 /**
  * Definition of custom matchers

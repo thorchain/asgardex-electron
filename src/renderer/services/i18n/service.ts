@@ -1,6 +1,3 @@
-import { ipcRenderer } from 'electron'
-
-import IPCMessages from '../../../shared/ipc/messages'
 import { observableState } from '../../helpers/stateHelper'
 import { getLocaleFromString } from '../../i18n'
 import { Locale } from '../../i18n/types'
@@ -14,7 +11,7 @@ const defaultLocale = () => {
 
 export const initialLocale = (): Locale => {
   const locale = (localStorage?.getItem(LOCALE_KEY) as Locale) || defaultLocale()
-  ipcRenderer.send(IPCMessages.UPDATE_LANG, locale)
+  window.apiLang.update(locale)
   return locale
 }
 
@@ -26,7 +23,7 @@ const { get$: locale$, get: locale, set: setLocale } = observableState<Locale>(i
 const changeLocale = (next: Locale) => {
   if (next !== locale()) {
     localStorage.setItem(LOCALE_KEY, next)
-    ipcRenderer.send(IPCMessages.UPDATE_LANG, next)
+    window.apiLang.update(next)
     setLocale(next)
   }
 }
