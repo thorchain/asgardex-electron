@@ -15,6 +15,7 @@ const wallet: WalletMessages = {
   'wallet.action.unlock': 'Unlock',
   'wallet.unlock.title': 'Unlock your wallet',
   'wallet.unlock.phrase': 'Enter your your phrase',
+  'wallet.unlock.error': 'Could not unlock the wallet. Please check you password and try it again',
   'wallet.imports.phrase': 'Phrase',
   'wallet.imports.wallet': 'Import existing wallet',
   'wallet.imports.enterphrase': 'Enter phrase',

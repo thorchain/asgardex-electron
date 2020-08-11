@@ -49,6 +49,7 @@ type WalletMessageKey =
   | 'wallet.action.unlock'
   | 'wallet.unlock.title'
   | 'wallet.unlock.phrase'
+  | 'wallet.unlock.error'
   | 'wallet.imports.phrase'
   | 'wallet.imports.wallet'
   | 'wallet.imports.enterphrase'
