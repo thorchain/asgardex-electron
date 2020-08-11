@@ -34,6 +34,7 @@ const wallet: WalletMessages = {
   'wallet.create.error': 'Fehler beim Abspeichern der Phrase',
   'wallet.receive.address.error': 'Keine Addresse für den Empfang vorhanden',
   'wallet.receive.address.errorQR': 'Error beim Rendern des QR Codes: {error}',
+  'wallet.send.errors.balancesFailed': 'No balances loaded - DE',
   'wallet.send.errors.address.length': 'Address should be at least 8 symbols length - DE',
   'wallet.send.errors.amount.shouldBeNumber': 'Amount should be a number - DE',
   'wallet.send.errors.amount.shouldBePositive': 'Amount should be positive - DE'

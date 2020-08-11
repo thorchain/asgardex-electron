@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, bn } from '@thorchain/asgardex-util'
@@ -12,6 +12,8 @@ import { ASSETS_MAINNET } from '../../../shared/mock/assets'
 import { sequenceTRD } from '../../helpers/fpHelpers'
 import { BalancesRD } from '../../services/binance/types'
 import { bncSymbolToAsset } from '../../services/binance/utils'
+import ErrorView from '../shared/error/ErrorView'
+import { LoadingView } from '../shared/loading/LoadingView'
 import { Input, InputNumber } from '../uielements/input'
 import AccountSelector from './AccountSelector'
 import * as Styled from './Send.style'
@@ -52,73 +54,82 @@ export const SendForm: React.FC<SendFormProps> = ({
 
   const [form] = Styled.Form.useForm()
 
-  const addressValidator = async (_: unknown, value: string) => {
-    if (!value || value.length < 8) {
-      return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.address.length' }))
-    }
-  }
-  const amountValidator = async (_: unknown, stringValue: string) => {
-    const value = bn(stringValue)
-    if (Number.isNaN(value)) {
-      return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBeNumber' }))
-    }
+  const addressValidator = useCallback(
+    async (_: unknown, value: string) => {
+      if (!value || value.length < 8) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.address.length' }))
+      }
+    },
+    [intl]
+  )
 
-    if (!value.isGreaterThan(0)) {
-      return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBePositive' }))
-    }
+  const amountValidator = useCallback(
+    async (_: unknown, stringValue: string) => {
+      const value = bn(stringValue)
+      if (Number.isNaN(value)) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBeNumber' }))
+      }
 
-    if (value.isGreaterThan(activeAsset.balance || 0)) {
-      return Promise.reject('should be less then your balance')
-    }
+      if (!value.isGreaterThan(0)) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBePositive' }))
+      }
 
-    // @TODO: Add check form Max available amount
-  }
+      if (value.isGreaterThan(activeAsset.balance || 0)) {
+        return Promise.reject('should be less then your balance')
+      }
+    },
+    [intl, activeAsset]
+  )
 
-  const onSubmit = (data: Store) => {
-    onSubmitProp(data.recipient, data.amount, activeAsset.symbol, data.password)
-  }
+  const onSubmit = useCallback(
+    (data: Store) => {
+      onSubmitProp(data.recipient, data.amount, activeAsset.symbol, data.password)
+    },
+    [onSubmitProp, activeAsset]
+  )
 
-  const renderSelect = useMemo(() => {
+  const renderSuccess = useCallback(
+    (balances) => {
+      return (
+        <Row>
+          <Styled.Col span={24}>
+            <AccountSelector onChange={setActiveAsset} asset={activeAsset} assets={balances} />
+            <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
+              <Styled.SubForm>
+                <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
+                <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
+                  <Input color="primary" size="large" />
+                </Form.Item>
+                <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
+                <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
+                  <InputNumber min={0} size="large" />
+                </Styled.FormItem>
+                <Styled.StyledLabel size="big">MAX: {activeAsset.balance?.toFormat()}</Styled.StyledLabel>
+                <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
+                <Form.Item name="password">
+                  <Input size="large" />
+                </Form.Item>
+              </Styled.SubForm>
+              <Styled.SubmitItem>
+                <Styled.Button htmlType="submit">{intl.formatMessage({ id: 'wallet.action.send' })}</Styled.Button>
+              </Styled.SubmitItem>
+            </Styled.Form>
+          </Styled.Col>
+        </Row>
+      )
+    },
+    [intl, setActiveAsset, activeAsset, onSubmit, form, addressValidator, amountValidator]
+  )
+
+  return useMemo(() => {
     return pipe(
       balancesValue,
       RD.fold(
         () => <></>,
-        () => <></>,
-        () => <></>,
-        (balances) => {
-          return <AccountSelector onChange={setActiveAsset} asset={activeAsset} assets={balances} />
-        }
+        () => <LoadingView />,
+        () => <ErrorView message={intl.formatMessage({ id: 'wallet.send.errors.balancesFailed' })} />,
+        renderSuccess
       )
     )
-  }, [balancesValue, activeAsset])
-
-  return (
-    <Row>
-      <Styled.Col span={24}>
-        {/* AccountSelector needs data - we are using mock data for now */}
-        {/*<AccountSelector onChange={setActiveAsset} asset={activeAsset} assets={Object.values(ASSETS_MAINNET)} />*/}
-        {renderSelect}
-        <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
-          <Styled.SubForm>
-            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
-            <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-              <Input color="primary" size="large" />
-            </Form.Item>
-            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
-            <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              <InputNumber min={0} size="large" />
-            </Styled.FormItem>
-            <Styled.StyledLabel size="big">MAX: {activeAsset.balance?.toFormat()}</Styled.StyledLabel>
-            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
-            <Form.Item name="password">
-              <Input size="large" />
-            </Form.Item>
-          </Styled.SubForm>
-          <Styled.SubmitItem>
-            <Styled.Button htmlType="submit">{intl.formatMessage({ id: 'wallet.action.send' })}</Styled.Button>
-          </Styled.SubmitItem>
-        </Styled.Form>
-      </Styled.Col>
-    </Row>
-  )
+  }, [balancesValue, intl, renderSuccess])
 }

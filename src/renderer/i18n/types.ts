@@ -68,6 +68,7 @@ type WalletMessageKey =
   | 'wallet.create.enter.phrase'
   | 'wallet.receive.address.error'
   | 'wallet.receive.address.errorQR'
+  | 'wallet.send.errors.balancesFailed'
   | 'wallet.send.errors.address.length'
   | 'wallet.send.errors.amount.shouldBeNumber'
   | 'wallet.send.errors.amount.shouldBePositive'
