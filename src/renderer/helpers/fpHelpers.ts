@@ -5,10 +5,12 @@ import * as O from 'fp-ts/lib/Option'
 export const sequenceTOption = sequenceT(O.option)
 
 export const _sequenceTRD = sequenceT(RD.remoteData)
-export const sequenceTRD = <E, A>(onEmpty: () => E) => (rds: RD.RemoteData<E, A>[]): RD.RemoteData<E, A[]> => {
-  if (!rds[0]) {
+export const sequenceTRD = <E, A>(onEmpty: () => E) => ([first, ...rest]: RD.RemoteData<E, A>[]): RD.RemoteData<
+  E,
+  A[]
+> => {
+  if (!first) {
     return RD.failure(onEmpty())
   }
-  // @ts-ignore
-  return _sequenceTRD(...rds)
+  return _sequenceTRD(first, ...rest)
 }
