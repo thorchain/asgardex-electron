@@ -8,6 +8,7 @@ import { useIntl } from 'react-intl'
 
 import { BinanceContextValue } from '../../contexts/BinanceContext'
 import { BalancesRD } from '../../services/binance/types'
+import { LoadingView } from '../shared/loading/LoadingView'
 import BackLink from '../uielements/backLink'
 import * as Styled from './Send.style'
 import { SendForm } from './SendForm'
@@ -40,7 +41,7 @@ const Send: React.FC<SendProps> = ({ transactionService, balances = RD.initial, 
               balances={balances}
             />
           ),
-          () => <Styled.Result title={<Styled.Text>{intl.formatMessage({ id: 'common.loading' })}</Styled.Text>} />,
+          () => <LoadingView />,
           (e) => (
             <Styled.Result
               status="error"
