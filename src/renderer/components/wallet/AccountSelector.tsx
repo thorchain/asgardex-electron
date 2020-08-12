@@ -2,6 +2,7 @@ import React, { useCallback } from 'react'
 
 import { Asset, assetAmount, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Menu, Dropdown } from 'antd'
+import { useIntl } from 'react-intl'
 
 import { AssetWithBalance } from '../../types/asgardex'
 import AssetIcon from '../uielements/assets/assetIcon'
@@ -18,6 +19,9 @@ type Props = {
 
 const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
   const { asset, assets, onChange = (_) => {}, size = 'normal' } = props
+
+  const intl = useIntl()
+
   const menu = useCallback(
     () => (
       <Menu>
@@ -39,6 +43,7 @@ const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
     ),
     [asset, assets, onChange]
   )
+
   return (
     <StyledCard bordered={false}>
       <AssetWrapper>
@@ -50,7 +55,7 @@ const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
 
           <Dropdown overlay={menu} trigger={['click']}>
             <Label textTransform="uppercase" color="primary" size="big">
-              Change
+              {intl.formatMessage({ id: 'common.change' })}
             </Label>
           </Dropdown>
         </AssetInfoWrapper>

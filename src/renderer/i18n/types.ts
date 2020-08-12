@@ -26,6 +26,7 @@ type CommonMessageKey =
   | 'common.loading'
   | 'common.error'
   | 'common.success'
+  | 'common.change'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

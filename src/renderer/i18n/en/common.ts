@@ -27,7 +27,8 @@ const common: CommonMessages = {
   'common.copy': 'Copy',
   'common.loading': 'Loading...',
   'common.error': 'Error',
-  'common.success': 'Success'
+  'common.success': 'Success',
+  'common.change': 'Change'
 }
 
 export default common
