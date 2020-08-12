@@ -1,13 +1,13 @@
 import React, { useCallback, useState, useMemo } from 'react'
 
-import { bn } from '@thorchain/asgardex-util'
+import { bn, formatAssetAmount, assetAmount } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { useIntl } from 'react-intl'
 
-import { ASSETS_MAINNET } from '../../../shared/mock/assets'
+import { EMTPY_ASSET_WITH_BALANCE } from '../../helpers/assetHelper'
 import { AssetWithBalance } from '../../types/asgardex'
 import { Input, InputNumber } from '../uielements/input'
 import AccountSelector from './AccountSelector'
@@ -17,7 +17,7 @@ import { SendAction } from './types'
 type SendFormProps = {
   sendAction: SendAction
   balances?: AssetWithBalance[]
-  initialActiveAsset?: O.Option<AssetWithBalance>
+  initialActiveAsset: O.Option<AssetWithBalance>
   onSubmit: (recipient: string, amount: number, symbol: string, password?: string) => void
 }
 
@@ -31,7 +31,7 @@ export const SendForm: React.FC<SendFormProps> = ({
   const [activeAsset, setActiveAsset] = useState<AssetWithBalance>(
     pipe(
       initialActiveAsset,
-      O.getOrElse(() => ({ ...ASSETS_MAINNET.BOLT, balance: bn(0) }))
+      O.getOrElse(() => EMTPY_ASSET_WITH_BALANCE)
     )
   )
 
@@ -46,6 +46,13 @@ export const SendForm: React.FC<SendFormProps> = ({
     [intl]
   )
 
+  const maxAmount = useMemo(() => {
+    if (sendAction === 'unfreeze') {
+      return activeAsset.frozenBalance || assetAmount(0)
+    }
+    return activeAsset.balance
+  }, [activeAsset, sendAction])
+
   const amountValidator = useCallback(
     async (_: unknown, stringValue: string) => {
       const value = bn(stringValue)
@@ -57,16 +64,16 @@ export const SendForm: React.FC<SendFormProps> = ({
         return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBePositive' }))
       }
 
-      if (value.isGreaterThan(activeAsset.balance)) {
+      if (value.isGreaterThan(maxAmount.amount())) {
         return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBeLessThatBalance' }))
       }
     },
-    [intl, activeAsset]
+    [maxAmount, intl]
   )
 
   const onSubmit = useCallback(
     (data: Store) => {
-      onSubmitProp(data.recipient, data.amount, activeAsset.symbol, data.password)
+      onSubmitProp(data.recipient, data.amount, activeAsset.asset.symbol, data.password)
     },
     [onSubmitProp, activeAsset]
   )
@@ -87,7 +94,7 @@ export const SendForm: React.FC<SendFormProps> = ({
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={setActiveAsset} asset={activeAsset} assets={balances} />
+        <AccountSelector onChange={setActiveAsset} selectedAsset={activeAsset.asset} assets={balances} />
         <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
@@ -98,7 +105,7 @@ export const SendForm: React.FC<SendFormProps> = ({
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
               <InputNumber min={0} size="large" />
             </Styled.FormItem>
-            <Styled.StyledLabel size="big">MAX: {activeAsset.balance.toFormat()}</Styled.StyledLabel>
+            <Styled.StyledLabel size="big">MAX: {formatAssetAmount(maxAmount)}</Styled.StyledLabel>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
             <Form.Item name="password">
               <Input size="large" />

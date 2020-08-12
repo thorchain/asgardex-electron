@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 
-import { Asset, assetAmount, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { Asset, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Menu, Dropdown } from 'antd'
 import { useIntl } from 'react-intl'
 
@@ -11,14 +11,14 @@ import Label from '../uielements/label'
 import { StyledCard, AssetWrapper, AssetInfoWrapper, AssetTitle } from './AccountSelector.style'
 
 type Props = {
-  asset: Asset
+  selectedAsset: Asset
   assets: AssetWithBalance[]
   onChange?: (asset: AssetWithBalance) => void
   size?: CoinSize
 }
 
 const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
-  const { asset, assets, onChange = (_) => {}, size = 'normal' } = props
+  const { selectedAsset, assets, onChange = (_) => {}, size = 'normal' } = props
 
   const intl = useIntl()
 
@@ -26,32 +26,31 @@ const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
     () => (
       <Menu>
         {assets
-          .filter((cure) => cure.symbol !== asset.symbol)
-          .map((asset, i: number) => {
+          .filter(({ asset }) => asset.symbol !== selectedAsset.symbol)
+          .map((assetWB, i: number) => {
+            const { asset, balance } = assetWB
             return (
-              <Menu.Item key={i} onClick={() => onChange(asset)}>
+              <Menu.Item key={i} onClick={() => onChange(assetWB)}>
                 <div style={{ display: 'flex' }}>
-                  <div>{asset?.symbol ?? 'unknown'}</div>&nbsp;
-                  <div style={{ marginLeft: 'auto' }}>
-                    {formatAssetAmountCurrency(assetAmount(asset.balance), assetToString(asset))}
-                  </div>
+                  <div>{asset.symbol} </div>
+                  <div style={{ marginLeft: 'auto' }}>{formatAssetAmountCurrency(balance, assetToString(asset))}</div>
                 </div>
               </Menu.Item>
             )
           })}
       </Menu>
     ),
-    [asset, assets, onChange]
+    [selectedAsset, assets, onChange]
   )
 
   return (
     <StyledCard bordered={false}>
       <AssetWrapper>
         <div>
-          <AssetIcon asset={asset} size={size} />
+          <AssetIcon asset={selectedAsset} size={size} />
         </div>
         <AssetInfoWrapper>
-          <AssetTitle>{asset?.symbol ?? 'unknown'}</AssetTitle>
+          <AssetTitle>{selectedAsset.symbol}</AssetTitle>
 
           <Dropdown overlay={menu} trigger={['click']}>
             <Label textTransform="uppercase" color="primary" size="big">

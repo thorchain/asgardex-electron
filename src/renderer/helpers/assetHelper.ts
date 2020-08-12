@@ -1,4 +1,12 @@
-import { Asset } from '@thorchain/asgardex-util'
+import { Asset, EMPTY_ASSET, assetAmount } from '@thorchain/asgardex-util'
+
+import { AssetWithBalance } from '../types/asgardex'
+
+export const EMTPY_ASSET_WITH_BALANCE: AssetWithBalance = {
+  asset: EMPTY_ASSET,
+  balance: assetAmount(0),
+  frozenBalance: assetAmount(0)
+}
 
 // Note: All of following content will be go into `@thorchain/asgardex-util`
 

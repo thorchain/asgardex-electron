@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 
 import { initial } from '@devexperts/remote-data-ts'
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, bn } from '@thorchain/asgardex-util'
+import { assetFromString, Asset, assetAmount } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/Array'
 import * as O from 'fp-ts/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -16,6 +16,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { SendParams } from '../../routes/wallet'
 import { bncSymbolToAsset } from '../../services/binance/utils'
+import { AssetWithBalance } from '../../types/asgardex'
 
 type Props = {
   sendAction?: SendAction
@@ -28,6 +29,7 @@ const SendView: React.FC<Props> = ({ sendAction = 'send' }): JSX.Element => {
   const intl = useIntl()
 
   const asset = assetFromString(assetParam)
+
   const balances = useMemo(
     () =>
       pipe(
@@ -37,7 +39,11 @@ const SendView: React.FC<Props> = ({ sendAction = 'send' }): JSX.Element => {
             balances.map((balance) =>
               pipe(
                 bncSymbolToAsset(balance.symbol),
-                O.map((asset) => ({ ...asset, balance: bn(balance.free) }))
+                O.map<Asset, AssetWithBalance>((asset) => ({
+                  asset,
+                  balance: assetAmount(balance.free),
+                  frozenBalance: assetAmount(balance.frozen)
+                }))
               )
             ),
             sequenceTOptionFromArray
@@ -50,8 +56,8 @@ const SendView: React.FC<Props> = ({ sendAction = 'send' }): JSX.Element => {
     [balancesState, intl]
   )
   const initialActiveAsset = useMemo(
-    () => pipe(balances, RD.map(A.findFirst((balance) => balance.symbol === asset?.symbol))),
-    [balances, asset]
+    () => pipe(balances, RD.map(A.findFirst((assetWB) => assetWB.asset.symbol === asset?.symbol))),
+    [asset, balances]
   )
 
   return (

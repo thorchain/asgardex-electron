@@ -14,13 +14,13 @@ import {
 } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
-import { sequenceT } from 'fp-ts/lib/Apply'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { RUNE_PRICE_POOL } from '../../const'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import * as walletRoutes from '../../routes/wallet'
 import { BalancesRD } from '../../services/binance/types'
 import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue } from '../../services/binance/utils'
@@ -124,7 +124,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
         const oPriceA = getPoolPriceValue(a, poolDetails, pricePool.poolData)
         const oPriceB = getPoolPriceValue(b, poolDetails, pricePool.poolData)
         return FP.pipe(
-          sequenceT(O.option)(oPriceA, oPriceB),
+          sequenceTOption(oPriceA, oPriceB),
           O.fold(
             () => 0,
             ([priceA, priceB]) => priceA.amount().comparedTo(priceB.amount())

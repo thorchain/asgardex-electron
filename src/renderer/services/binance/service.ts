@@ -1,7 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { WS, Client, Network as BinanceNetwork, BinanceClient, Address, TxPage } from '@thorchain/asgardex-binance'
 import { Asset } from '@thorchain/asgardex-util'
-import { sequenceT } from 'fp-ts/lib/Apply'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import { none, some } from 'fp-ts/lib/Option'
@@ -12,6 +11,7 @@ import { map, mergeMap, catchError, retry, shareReplay, startWith, switchMap, de
 import { webSocket } from 'rxjs/webSocket'
 
 import { envOrDefault } from '../../helpers/envHelper'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
 import { KeystoreState } from '../wallet/types'
@@ -288,7 +288,7 @@ const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest(
     const client = getBinanceClient(clientState)
     return FP.pipe(
       // client and asset has to be available
-      sequenceT(O.option)(client, oAsset),
+      sequenceTOption(client, oAsset),
       O.fold(
         () => Rx.of(RD.initial as TxsRD),
         ([clientState, asset]) => loadTxsOfSelectedAsset$(clientState, O.some(asset))
