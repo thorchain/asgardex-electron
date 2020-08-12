@@ -49,7 +49,7 @@ describe('helpers/envHelper/', () => {
     })
 
     it('Lifts all `success` values', () => {
-      const result = FP.pipe([RD.success(1), RD.success(2)], sequenceTRDFromArray<>(onEmpty))
+      const result = FP.pipe([RD.success(1), RD.success(2)], sequenceTRDFromArray(onEmpty))
       expect(result).toEqual(RD.success([1, 2]))
     })
   })
