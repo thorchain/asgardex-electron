@@ -78,7 +78,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
   const walletActionSendClick = useCallback(() => {
     switch (sendAction) {
       case 'send':
-        history.push(walletRoutes.fundsSend.path({ asset: assetAsString }))
+        history.push(walletRoutes.send.path({ asset: assetAsString }))
         break
       case 'freeze':
         console.log('TODO Add freeze route')
@@ -92,7 +92,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
   }, [assetAsString, history, sendAction])
 
   const walletActionReceiveClick = useCallback(
-    () => history.push(walletRoutes.fundsReceive.path({ asset: assetAsString })),
+    () => history.push(walletRoutes.receive.path({ asset: assetAsString })),
     [assetAsString, history]
   )
 
