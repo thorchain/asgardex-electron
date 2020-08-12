@@ -68,10 +68,10 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
         history.push(walletRoutes.send.path({ asset: assetAsString }))
         break
       case 'freeze':
-        console.log('TODO Add freeze route')
+        history.push(walletRoutes.freeze.path({ asset: assetAsString }))
         break
       case 'unfreeze':
-        console.log('TODO Add unfreeze route')
+        history.push(walletRoutes.unfreeze.path({ asset: assetAsString }))
         break
       default:
       // nothing to do

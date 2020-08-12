@@ -74,13 +74,13 @@ const WalletView: React.FC = (): JSX.Element => {
             <ReceiveView />
           </Route>
           <Route path={walletRoutes.send.template} exact>
-            <SendView />
+            <SendView sendAction="send" />
           </Route>
           <Route path={walletRoutes.freeze.template} exact>
-            <SendView />
+            <SendView sendAction="freeze" />
           </Route>
-          <Route path={walletRoutes.freeze.template} exact>
-            <SendView />
+          <Route path={walletRoutes.unfreeze.template} exact>
+            <SendView sendAction="unfreeze" />
           </Route>
           <Route path={walletRoutes.assetDetail.template} exact>
             <AssetDetailsView />

@@ -13,8 +13,10 @@ import { LoadingView } from '../shared/loading/LoadingView'
 import BackLink from '../uielements/backLink'
 import * as Styled from './Send.style'
 import { SendForm } from './SendForm'
+import { SendAction } from './types'
 
 type SendProps = {
+  sendAction?: SendAction
   transactionService: BinanceContextValue['transaction']
   balances?: RD.RemoteData<Error, AssetWithBalance[]>
   initialActiveAsset?: RD.RemoteData<Error, O.Option<AssetWithBalance>>
@@ -23,7 +25,8 @@ type SendProps = {
 const Send: React.FC<SendProps> = ({
   transactionService,
   balances = RD.initial,
-  initialActiveAsset = RD.initial
+  initialActiveAsset = RD.initial,
+  sendAction = 'send'
 }): JSX.Element => {
   const intl = useIntl()
 
@@ -43,6 +46,7 @@ const Send: React.FC<SendProps> = ({
           (e) => <ErrorView message={e.message} />,
           ([balances, initialActiveAsset]) => (
             <SendForm
+              sendAction={sendAction}
               initialActiveAsset={initialActiveAsset}
               onSubmit={transactionService.pushTx}
               balances={balances}
@@ -50,7 +54,7 @@ const Send: React.FC<SendProps> = ({
           )
         )
       ),
-    [balances, initialActiveAsset, transactionService]
+    [balances, initialActiveAsset, sendAction, transactionService]
   )
 
   return (

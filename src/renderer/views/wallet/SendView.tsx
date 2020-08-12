@@ -11,12 +11,17 @@ import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 
 import Send from '../../components/wallet/Send'
+import { SendAction } from '../../components/wallet/types'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { SendParams } from '../../routes/wallet'
 import { bncSymbolToAsset } from '../../services/binance/utils'
 
-const SendView: React.FC = (): JSX.Element => {
+type Props = {
+  sendAction?: SendAction
+}
+
+const SendView: React.FC<Props> = ({ sendAction = 'send' }): JSX.Element => {
   const { transaction, balancesState$ } = useBinanceContext()
   const { asset: assetParam } = useParams<SendParams>()
   const balancesState = useObservableState(balancesState$, initial)
@@ -49,7 +54,14 @@ const SendView: React.FC = (): JSX.Element => {
     [balances, asset]
   )
 
-  return <Send transactionService={transaction} balances={balances} initialActiveAsset={initialActiveAsset} />
+  return (
+    <Send
+      sendAction={sendAction}
+      transactionService={transaction}
+      balances={balances}
+      initialActiveAsset={initialActiveAsset}
+    />
+  )
 }
 
 export default SendView

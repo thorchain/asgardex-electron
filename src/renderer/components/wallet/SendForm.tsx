@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 
 import { bn } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
@@ -12,14 +12,17 @@ import { AssetWithBalance } from '../../types/asgardex'
 import { Input, InputNumber } from '../uielements/input'
 import AccountSelector from './AccountSelector'
 import * as Styled from './Send.style'
+import { SendAction } from './types'
 
 type SendFormProps = {
+  sendAction: SendAction
   balances?: AssetWithBalance[]
   initialActiveAsset?: O.Option<AssetWithBalance>
   onSubmit: (recipient: string, amount: number, symbol: string, password?: string) => void
 }
 
 export const SendForm: React.FC<SendFormProps> = ({
+  sendAction,
   onSubmit: onSubmitProp,
   balances = [],
   initialActiveAsset = O.none
@@ -68,6 +71,19 @@ export const SendForm: React.FC<SendFormProps> = ({
     [onSubmitProp, activeAsset]
   )
 
+  const submitLabel = useMemo(() => {
+    switch (sendAction) {
+      case 'send':
+        return intl.formatMessage({ id: 'wallet.action.send' })
+      case 'freeze':
+        return intl.formatMessage({ id: 'wallet.action.freeze' })
+      case 'unfreeze':
+        return intl.formatMessage({ id: 'wallet.action.unfreeze' })
+      default:
+        return ''
+    }
+  }, [intl, sendAction])
+
   return (
     <Row>
       <Styled.Col span={24}>
@@ -89,7 +105,7 @@ export const SendForm: React.FC<SendFormProps> = ({
             </Form.Item>
           </Styled.SubForm>
           <Styled.SubmitItem>
-            <Styled.Button htmlType="submit">{intl.formatMessage({ id: 'wallet.action.send' })}</Styled.Button>
+            <Styled.Button htmlType="submit">{submitLabel}</Styled.Button>
           </Styled.SubmitItem>
         </Styled.Form>
       </Styled.Col>

@@ -13,31 +13,35 @@ const createServiceProp = (value: Observable<RemoteData<Error, any>>) => ({
   resetTx: () => null
 })
 
-storiesOf('Wallet/Send', module).add('default', () => {
-  return <Send transactionService={createServiceProp(EMPTY)} />
-})
-
-storiesOf('Wallet/Send', module).add('pending', () => {
-  return <Send transactionService={createServiceProp(of(pending))} />
-})
-
-storiesOf('Wallet/Send', module).add('error', () => {
-  return <Send transactionService={createServiceProp(of(failure(Error('error example'))))} />
-})
-
-storiesOf('Wallet/Send', module).add('success', () => {
-  return (
-    <Send
-      transactionService={createServiceProp(
-        of(
-          success({
-            code: 200,
-            hash: '',
-            log: '',
-            ok: true
-          })
-        )
-      )}
-    />
-  )
-})
+storiesOf('Wallet/Send', module)
+  .add('send', () => {
+    return <Send transactionService={createServiceProp(EMPTY)} />
+  })
+  .add('freeze', () => {
+    return <Send transactionService={createServiceProp(EMPTY)} sendAction="freeze" />
+  })
+  .add('unfreeze', () => {
+    return <Send transactionService={createServiceProp(EMPTY)} sendAction="unfreeze" />
+  })
+  .add('pending', () => {
+    return <Send transactionService={createServiceProp(of(pending))} />
+  })
+  .add('error', () => {
+    return <Send transactionService={createServiceProp(of(failure(Error('error example'))))} />
+  })
+  .add('success', () => {
+    return (
+      <Send
+        transactionService={createServiceProp(
+          of(
+            success({
+              code: 200,
+              hash: '',
+              log: '',
+              ok: true
+            })
+          )
+        )}
+      />
+    )
+  })
