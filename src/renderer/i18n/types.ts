@@ -49,6 +49,7 @@ type WalletMessageKey =
   | 'wallet.action.unlock'
   | 'wallet.unlock.title'
   | 'wallet.unlock.phrase'
+  | 'wallet.unlock.error'
   | 'wallet.imports.phrase'
   | 'wallet.imports.wallet'
   | 'wallet.imports.enterphrase'
@@ -67,9 +68,11 @@ type WalletMessageKey =
   | 'wallet.create.enter.phrase'
   | 'wallet.receive.address.error'
   | 'wallet.receive.address.errorQR'
+  | 'wallet.send.errors.balancesFailed'
   | 'wallet.send.errors.address.length'
   | 'wallet.send.errors.amount.shouldBeNumber'
   | 'wallet.send.errors.amount.shouldBePositive'
+  | 'wallet.send.errors.amount.shouldBeLessThatBalance'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 

@@ -1,26 +1,31 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Row, Form } from 'antd'
-import { Store } from 'antd/lib/form/interface'
+import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import { ASSETS_MAINNET } from '../../../shared/mock/assets'
 import { BinanceContextValue } from '../../contexts/BinanceContext'
+import { AssetWithBalance } from '../../types/asgardex'
+import ErrorView from '../shared/error/ErrorView'
+import { LoadingView } from '../shared/loading/LoadingView'
 import BackLink from '../uielements/backLink'
-import { Input, InputNumber } from '../uielements/input'
-import AccountSelector from './AccountSelector'
 import * as Styled from './Send.style'
+import { SendForm } from './SendForm'
 
 type SendProps = {
   transactionService: BinanceContextValue['transaction']
+  balances?: RD.RemoteData<Error, AssetWithBalance[]>
+  initialActiveAsset?: RD.RemoteData<Error, O.Option<AssetWithBalance>>
 }
 
-const Send: React.FC<SendProps> = ({ transactionService }): JSX.Element => {
+const Send: React.FC<SendProps> = ({
+  transactionService,
+  balances = RD.initial,
+  initialActiveAsset = RD.initial
+}): JSX.Element => {
   const intl = useIntl()
-  const [activeAsset, setActiveAsset] = useState(ASSETS_MAINNET.BOLT)
 
   useEffect(() => {
     transactionService.resetTx()
@@ -28,29 +33,25 @@ const Send: React.FC<SendProps> = ({ transactionService }): JSX.Element => {
 
   const transaction = useObservableState(transactionService.transaction$, RD.initial)
 
-  const [form] = Styled.Form.useForm()
-
-  const addressValidator = async (_: unknown, value: string) => {
-    if (!value || value.length < 8) {
-      return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.address.length' }))
-    }
-  }
-  const amountValidator = async (_: unknown, stringValue: string) => {
-    const value = Number(stringValue)
-    if (Number.isNaN(value)) {
-      return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBeNumber' }))
-    }
-
-    if (value <= 0) {
-      return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBePositive' }))
-    }
-
-    // @TODO: Add check form Max available amount
-  }
-
-  const onSubmit = (data: Store) => {
-    transactionService.pushTx(data.recipient, data.amount, activeAsset.symbol, data.password)
-  }
+  const sendForm = useMemo(
+    () =>
+      pipe(
+        RD.combine(balances, initialActiveAsset),
+        RD.fold(
+          () => <></>,
+          () => <LoadingView />,
+          (e) => <ErrorView message={e.message} />,
+          ([balances, initialActiveAsset]) => (
+            <SendForm
+              initialActiveAsset={initialActiveAsset}
+              onSubmit={transactionService.pushTx}
+              balances={balances}
+            />
+          )
+        )
+      ),
+    [balances, initialActiveAsset, transactionService]
+  )
 
   return (
     <>
@@ -58,35 +59,8 @@ const Send: React.FC<SendProps> = ({ transactionService }): JSX.Element => {
       {pipe(
         transaction,
         RD.fold(
-          () => (
-            <Row>
-              <Styled.Col span={24}>
-                {/* AccountSelector needs data - we are using mock data for now */}
-                <AccountSelector onChange={setActiveAsset} asset={activeAsset} assets={Object.values(ASSETS_MAINNET)} />
-                <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
-                  <Styled.SubForm>
-                    <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
-                    <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-                      <Input color="primary" size="large" />
-                    </Form.Item>
-                    <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
-                    <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-                      <InputNumber min={0} size="large" />
-                    </Styled.FormItem>
-                    <Styled.StyledLabel size="big">MAX 35.3 BNB</Styled.StyledLabel>
-                    <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
-                    <Form.Item name="password">
-                      <Input size="large" />
-                    </Form.Item>
-                  </Styled.SubForm>
-                  <Styled.SubmitItem>
-                    <Styled.Button htmlType="submit">{intl.formatMessage({ id: 'wallet.action.send' })}</Styled.Button>
-                  </Styled.SubmitItem>
-                </Styled.Form>
-              </Styled.Col>
-            </Row>
-          ),
-          () => <Styled.Result title={<Styled.Text>{intl.formatMessage({ id: 'common.loading' })}</Styled.Text>} />,
+          () => sendForm,
+          () => <LoadingView />,
           (e) => (
             <Styled.Result
               status="error"

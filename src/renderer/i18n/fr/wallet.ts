@@ -15,6 +15,7 @@ const wallet: WalletMessages = {
   'wallet.action.unlock': 'Ouvrir',
   'wallet.unlock.title': 'Unlock your wallet - FR',
   'wallet.unlock.phrase': 'Enter your your phrase - FR',
+  'wallet.unlock.error': 'Could not unlock the wallet. Please check you password and try it again - FR',
   'wallet.imports.phrase': 'Phrase',
   'wallet.imports.wallet': 'Import existing wallet - FR',
   'wallet.imports.enterphrase': 'Entrez une phrase',
@@ -33,9 +34,11 @@ const wallet: WalletMessages = {
   'wallet.create.error': 'Error while saving a phrase - FR',
   'wallet.receive.address.error': 'No address available to receive funds - FR',
   'wallet.receive.address.errorQR': 'Error while rendering QR code: {error} - FR',
+  'wallet.send.errors.balancesFailed': 'No balances loaded - FR',
   'wallet.send.errors.address.length': 'Address should be at least 8 symbols length - FR',
   'wallet.send.errors.amount.shouldBeNumber': 'Amount should be a number - FR',
-  'wallet.send.errors.amount.shouldBePositive': 'Amount should be positive - FR'
+  'wallet.send.errors.amount.shouldBePositive': 'Amount should be positive - FR',
+  'wallet.send.errors.amount.shouldBeLessThatBalance': 'Amount should be less than your balance - FR'
 }
 
 export default wallet

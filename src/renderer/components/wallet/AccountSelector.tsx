@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react'
 
-import { Asset } from '@thorchain/asgardex-util'
+import { Asset, assetAmount, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Menu, Dropdown } from 'antd'
 
+import { AssetWithBalance } from '../../types/asgardex'
 import AssetIcon from '../uielements/assets/assetIcon'
 import { Size as CoinSize } from '../uielements/assets/assetIcon/types'
 import Label from '../uielements/label'
@@ -10,29 +11,33 @@ import { StyledCard, AssetWrapper, AssetInfoWrapper, AssetTitle } from './Accoun
 
 type Props = {
   asset: Asset
-  assets: Asset[]
-  onChange?: (asset: Asset) => void
+  assets: AssetWithBalance[]
+  onChange?: (asset: AssetWithBalance) => void
   size?: CoinSize
 }
 
 const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
   const { asset, assets, onChange = (_) => {}, size = 'normal' } = props
-
   const menu = useCallback(
     () => (
       <Menu>
-        {assets.map((asset, i: number) => (
-          <Menu.Item key={i} onClick={() => onChange(asset)}>
-            <div style={{ display: 'flex' }}>
-              <div>{asset?.symbol ?? 'unknown'}</div>&nbsp;
-              <div>NAME..</div>&nbsp;
-              <div style={{ marginLeft: 'auto' }}>($ 8.50)</div>
-            </div>
-          </Menu.Item>
-        ))}
+        {assets
+          .filter((cure) => cure.symbol !== asset.symbol)
+          .map((asset, i: number) => {
+            return (
+              <Menu.Item key={i} onClick={() => onChange(asset)}>
+                <div style={{ display: 'flex' }}>
+                  <div>{asset?.symbol ?? 'unknown'}</div>&nbsp;
+                  <div style={{ marginLeft: 'auto' }}>
+                    {formatAssetAmountCurrency(assetAmount(asset.balance), assetToString(asset))}
+                  </div>
+                </div>
+              </Menu.Item>
+            )
+          })}
       </Menu>
     ),
-    [assets, onChange]
+    [asset, assets, onChange]
   )
   return (
     <StyledCard bordered={false}>

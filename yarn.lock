@@ -8962,15 +8962,10 @@ foundry-primitives@^0.2.1:
     rlp "^2.1.0"
     tweetnacl "^1.0.3"
 
-fp-ts@^2.0.0:
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.6.2.tgz#0115221e223e0e4a1d08d93c0ebaee9241688cd1"
-  integrity sha512-RUm0iNcD7eMFZo6W1K10kqi0DyYX06lbbjyNgKwEWg1kPZw91ZXlkEx/9cII1x/jY4fHzh14+Hquk5sJnXBzQA==
-
-fp-ts@^2.7.1:
-  version "2.7.1"
-  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.7.1.tgz#7bd754f3362f4b9bc4d272a97c0658e9a1bc16bc"
-  integrity sha512-rYy41jF1gVhBNYbPwup50dtyT686OKOoa86PXwh8aKpBRfmvPhnBh2zUkOYj84GIMSCsgY+oJ/RVhVKRvWNPTA==
+fp-ts@^2.0.0, fp-ts@^2.8.1:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.8.1.tgz#b1812171469a7c0fcbc0b770ac2568f8356d1993"
+  integrity sha512-HuA/6roEliHoBgEOLCKmGRcM90e2trW/ITZZ9d9P/ra7PreqQagC3Jg6OzqWkai13KUbG90b8QO9rHPBGK/ckw==
 
 fragment-cache@^0.2.1:
   version "0.2.1"
@@ -10180,14 +10175,14 @@ invert-kv@^2.0.0:
   integrity sha512-wPVv/y/QQ/Uiirj/vh3oP+1Ww+AWehmi1g5fFWGPF6IpCBCDVrhgHRMvrLfdYcwDh3QJbGXDW4JAuzxElLSqKA==
 
 io-ts-types@^0.5.0:
-  version "0.5.7"
-  resolved "https://registry.yarnpkg.com/io-ts-types/-/io-ts-types-0.5.7.tgz#adf5621f5c1dabfa99f7a52c6424ff4ae4faebd5"
-  integrity sha512-3AN63MewxiYhJeQ+/RirPMbAM3DBn2tv2VOCHG2dc1DZOzM2JmH87TxJukfIbWICcJ0aYvncz0nAV7jverCkcQ==
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/io-ts-types/-/io-ts-types-0.5.9.tgz#3efa7c123b102c7e9ebe5bccfc610071d7d6e008"
+  integrity sha512-wL+syEjQL4X9cXkAYxte4EJ+MCobjx7dKJb1Y/33UnRRvT1PjkXqB5Wz/LJtG/MEaMcC0euwsHM0ooRDJvrKug==
 
 io-ts@^2.0.0:
-  version "2.2.4"
-  resolved "https://registry.yarnpkg.com/io-ts/-/io-ts-2.2.4.tgz#c9b5390b8c60b9976ad03f670a6b976fe50d4083"
-  integrity sha512-a8A/3jekTgSPfQ+OG40sTiX2gohXZz89X1+TfKsWJ/vpA2dBilBkrGYPiDE8OaKMMG7xm5ma3SAZL5eNr4Bi2w==
+  version "2.2.9"
+  resolved "https://registry.yarnpkg.com/io-ts/-/io-ts-2.2.9.tgz#9a427512926462f20415099917a31dbf409ff2b0"
+  integrity sha512-Q9ob1VnpwyNoMam/BO6hm2dF4uu+to8NWSZNsRW6Q2Ni38PadgLZSQDo0hW7CJFgpJkQw4BXGwXzjr7c47c+fw==
 
 ip-regex@^2.1.0:
   version "2.1.0"

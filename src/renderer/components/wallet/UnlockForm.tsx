@@ -3,7 +3,6 @@ import React, { useCallback, useState, useEffect, useMemo } from 'react'
 import { Modal } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
-import Paragraph from 'antd/lib/typography/Paragraph'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -98,13 +97,9 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
       O.fold(
         () => <></>,
 
-        (_: Error) => (
-          <Paragraph>
-            {/* TODO(@Veado): i18n */}Could not unlock the wallet. Please check you password and try it again
-          </Paragraph>
-        )
+        (_: Error) => <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.error' })}</Styled.Text>
       )(unlockError),
-    [unlockError]
+    [unlockError, intl]
   )
 
   const onOkHandlder = useCallback(async () => {
