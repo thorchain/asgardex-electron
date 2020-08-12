@@ -28,7 +28,13 @@ const common: CommonMessages = {
   'common.loading': 'Loading...',
   'common.error': 'Error',
   'common.success': 'Success',
-  'common.change': 'Change'
+  'common.change': 'Change',
+  'common.wallet': 'Wallet',
+  'common.assets': 'Assets',
+  'common.asset': 'Asset',
+  'common.pools': 'Pools',
+  'common.pool': 'Pool',
+  'common.price': 'Price'
 }
 
 export default common
