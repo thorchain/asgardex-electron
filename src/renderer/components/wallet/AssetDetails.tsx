@@ -17,20 +17,7 @@ import Button, { RefreshButton } from '../uielements/button'
 import Label from '../uielements/label'
 import * as Styled from './AssetDetails.style'
 import TransactionsTable from './TransactionsTable'
-
-type SendAction = 'send' | 'freeze' | 'unfreeze'
-
-// type guard to check possible values of `SendAction`
-const isSendAction = (action: string): action is SendAction => {
-  switch (action) {
-    case 'send':
-    case 'freeze':
-    case 'unfreeze':
-      return true
-    default:
-      return false
-  }
-}
+import { SendAction, isSendAction } from './types'
 
 type SendActionMenuItem = {
   key: SendAction
