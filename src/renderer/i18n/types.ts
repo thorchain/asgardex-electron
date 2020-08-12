@@ -26,17 +26,30 @@ type CommonMessageKey =
   | 'common.loading'
   | 'common.error'
   | 'common.success'
+  | 'common.wallet'
+  | 'common.pool'
+  | 'common.pools'
+  | 'common.asset'
+  | 'common.assets'
+  | 'common.price'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
 }
 
-type PoolsMessageKey = 'pools.title' | 'pools.available'
+type PoolsMessageKey =
+  | 'pools.depth'
+  | 'pools.24hvol'
+  | 'pools.avgsize'
+  | 'pools.avgslip'
+  | 'pools.blocksleft'
+  | 'pools.trades'
+  | 'pools.pending'
+  | 'pools.available'
+
 export type PoolsMessages = { [key in PoolsMessageKey]: string }
 
 type WalletMessageKey =
-  | 'wallet.title'
-  | 'wallet.nav.assets'
   | 'wallet.nav.stakes'
   | 'wallet.nav.bonds'
   | 'wallet.column.name'

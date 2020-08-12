@@ -28,7 +28,7 @@ export const AssetsNav: React.FC = (): JSX.Element => {
       [
         {
           key: MenuKey.ASSETS,
-          label: intl.formatMessage({ id: 'wallet.nav.assets' }),
+          label: intl.formatMessage({ id: 'common.assets' }),
           path: walletRoutes.assets.path()
         },
         {

@@ -1,8 +1,14 @@
 import { PoolsMessages } from '../types'
 
 const pools: PoolsMessages = {
-  'pools.title': 'Pools',
-  'pools.available': 'Available Pools'
+  'pools.depth': 'Depth',
+  'pools.24hvol': '24h volume',
+  'pools.avgsize': 'avg size',
+  'pools.avgslip': 'avg slip',
+  'pools.blocksleft': 'blocks left',
+  'pools.trades': 'Trades',
+  'pools.pending': 'Pending pools',
+  'pools.available': 'Available pools'
 }
 
 export default pools
