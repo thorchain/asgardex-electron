@@ -11,6 +11,8 @@ const wallet: WalletMessages = {
   'wallet.column.value': 'Value - FR',
   'wallet.action.send': 'Send - FR',
   'wallet.action.receive': 'Receive - FR',
+  'wallet.action.freeze': 'Freeze - FR',
+  'wallet.action.unfreeze': 'Unfreeze - FR',
   'wallet.action.remove': 'Remove Wallet - FR',
   'wallet.action.unlock': 'Ouvrir',
   'wallet.unlock.title': 'Unlock your wallet - FR',
