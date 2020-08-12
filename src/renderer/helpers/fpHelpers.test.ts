@@ -31,7 +31,7 @@ describe('helpers/envHelper/', () => {
 
     it('returns `failure` for a RD list with failures inside', () => {
       const result = FP.pipe([RD.failure('another error'), RD.success(1)], sequenceTRDFromArray(onEmpty))
-      expect(result).toBeTruthy()
+      expect(result).toEqual(RD.failure('another error'))
     })
 
     it('returns `pending` for a RD list with `pending` inside', () => {
@@ -40,12 +40,9 @@ describe('helpers/envHelper/', () => {
     })
 
     it('returns `pending` for a RD list with `pending` inside', () => {
-      const result = FP.pipe(
-        [RD.success(1), RD.progress({ loaded: 100, total: O.none })],
-        sequenceTRDFromArray(onEmpty),
-        RD.isPending
-      )
-      expect(result).toBeTruthy()
+      const progress = { loaded: 100, total: O.none }
+      const result = FP.pipe([RD.success(1), RD.progress(progress)], sequenceTRDFromArray(onEmpty))
+      expect(result).toEqual(RD.progress(progress))
     })
 
     it('Lifts all `success` values', () => {
