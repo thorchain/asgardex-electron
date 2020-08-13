@@ -1,7 +1,7 @@
 import { PoolsMessages } from '../types'
 
 const pools: PoolsMessages = {
-  'pools.depth': ' ',
+  'pools.depth': 'Depth',
   'pools.24hvol': 'Значение за 24ч',
   'pools.avgsize': 'ср  size',
   'pools.avgslip': 'ср slip',

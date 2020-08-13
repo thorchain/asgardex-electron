@@ -12,7 +12,7 @@ const wallet: WalletMessages = {
   'wallet.action.remove': 'Удалить кошелек',
   'wallet.action.unlock': 'Разблокировать',
   'wallet.unlock.title': 'Разблокировать кошелек',
-  'wallet.unlock.phrase': 'Введите вашу секретную фразу',
+  'wallet.unlock.phrase': 'Введите ваш пароль',
   'wallet.unlock.error': 'Не получилось разблокировать кошелек. Пожалуйста, проверьте пароль и попробуйте еще раз',
   'wallet.imports.phrase': 'Фраза',
   'wallet.imports.wallet': 'Импортировать существующий кошелек',
@@ -35,7 +35,7 @@ const wallet: WalletMessages = {
   'wallet.send.errors.balancesFailed': 'Нет загруженных балансов',
   'wallet.send.errors.address.length': 'Адрес должен содержать минмум 8 символов',
   'wallet.send.errors.amount.shouldBeNumber': 'Количество должно быть числом',
-  'wallet.send.errors.amount.shouldBePositive': 'Количество должно быть положительным',
+  'wallet.send.errors.amount.shouldBePositive': 'Количество должно быть положительным числом',
   'wallet.send.errors.amount.shouldBeLessThatBalance': 'Количество должно быть меньше вашего баланса'
 }
 
