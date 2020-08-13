@@ -42,37 +42,12 @@ const UserAccounts: UserAccountType[] = [
         name: 'Main',
         address: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
         type: 'internal'
-      },
-      {
-        name: 'Ledger',
-        address: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
-        type: 'external'
       }
-    ]
-  },
-  {
-    chainName: 'Ethereum',
-    accounts: [
-      {
-        name: 'Main',
-        address: '0x910286F93b230E221384844C4ae18a14c474E74E',
-        type: 'internal'
-      }
-    ]
-  },
-  {
-    chainName: 'Bitcoin',
-    accounts: [
-      {
-        name: 'Main',
-        address: '0x910286F93b230E221384844C4ae18a14c474E74E',
-        type: 'internal'
-      },
-      {
-        name: 'Ledger',
-        address: '0x910286F93b230E221384844C4ae18a14c474E74E',
-        type: 'external'
-      }
+      // {
+      //   name: 'Ledger',
+      //   address: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
+      //   type: 'external'
+      // }
     ]
   }
 ]
