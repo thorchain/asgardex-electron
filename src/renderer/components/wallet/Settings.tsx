@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 
-import { PlusCircleFilled, StopOutlined } from '@ant-design/icons'
+import { StopOutlined } from '@ant-design/icons'
 import { Address } from '@thorchain/asgardex-binance'
 import { Row, Col, Button, List } from 'antd'
 import * as O from 'fp-ts/lib/Option'
@@ -28,7 +28,6 @@ import {
   StyledChainName,
   StyledChainContent,
   StyledAccountPlaceholder,
-  StyledDeviceText,
   StyledAccountContent,
   StyledAccountAddress
 } from './Settings.style'
@@ -156,12 +155,6 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
                       </StyledAccountContent>
                     </StyledChainContent>
                   ))}
-                  <StyledChainContent>
-                    <StyledDeviceText color="primary">
-                      <PlusCircleFilled />
-                      Add Device
-                    </StyledDeviceText>
-                  </StyledChainContent>
                 </StyledListItem>
               )}
             />
