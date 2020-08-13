@@ -111,8 +111,8 @@ export type Messages = CommonMessages & PoolsMessages & WalletMessages & Setting
 
 export enum Locale {
   EN = 'en',
-  FR = 'fr',
-  DE = 'de'
+  DE = 'de',
+  RU = 'ru'
 }
 
 export type Translation = {

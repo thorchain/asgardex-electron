@@ -1,6 +1,6 @@
-// French (France)
+// English (Global)
 // Antd Internationalization https://2x.ant.design/docs/react/i18n
-import antdData from 'antd/lib/locale-provider/fr_FR'
+import antdData from 'antd/lib/locale-provider/en_GB'
 
 import { Messages } from '../types'
 import common from './common'

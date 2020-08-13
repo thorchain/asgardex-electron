@@ -21,8 +21,8 @@ describe('services/i18n/service/', () => {
     })
 
     it('returns previous stored language', () => {
-      storageSpy.mockImplementationOnce((_: string) => 'fr')
-      expect(initialLocale()).toBe(Locale.FR)
+      storageSpy.mockImplementationOnce((_: string) => 'ru')
+      expect(initialLocale()).toBe(Locale.RU)
     })
 
     it('returns lang of navigator if no lang has not been stored before', () => {
@@ -49,7 +49,7 @@ describe('services/i18n/service/', () => {
   describe('locale$', () => {
     it('calling changeLocale() four times changes network four times', () => {
       runObservable(({ cold, expectObservable }) => {
-        const values = { a: Locale.EN, b: Locale.DE, c: Locale.FR }
+        const values = { a: Locale.EN, b: Locale.DE, c: Locale.RU }
         const change = '--a--b--c--b'
         const result = '--a--b--c--b'
         const result$ = cold(change, values).pipe(
