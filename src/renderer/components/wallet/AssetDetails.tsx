@@ -149,7 +149,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
     <>
       <Row justify="space-between">
         <Col>
-          <BackLink />
+          <BackLink path={walletRoutes.assets.path()} />
         </Col>
         <Col>
           <RefreshButton clickHandler={refreshHandler} />

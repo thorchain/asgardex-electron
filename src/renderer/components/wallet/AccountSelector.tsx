@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react'
 
 import { Asset, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
-import { Menu, Dropdown } from 'antd'
+import { Menu, Dropdown, Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 
-import { AssetWithBalance } from '../../types/asgardex'
+import { AssetsWithBalance } from '../../services/binance/types'
 import AssetIcon from '../uielements/assets/assetIcon'
 import { Size as CoinSize } from '../uielements/assets/assetIcon/types'
 import Label from '../uielements/label'
@@ -12,8 +12,8 @@ import { StyledCard, AssetWrapper, AssetInfoWrapper, AssetTitle } from './Accoun
 
 type Props = {
   selectedAsset: Asset
-  assets: AssetWithBalance[]
-  onChange?: (asset: AssetWithBalance) => void
+  assets: AssetsWithBalance
+  onChange?: (asset: Asset) => void
   size?: CoinSize
 }
 
@@ -30,11 +30,11 @@ const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
           .map((assetWB, i: number) => {
             const { asset, balance } = assetWB
             return (
-              <Menu.Item key={i} onClick={() => onChange(assetWB)}>
-                <div style={{ display: 'flex' }}>
-                  <div>{asset.symbol} </div>
-                  <div style={{ marginLeft: 'auto' }}>{formatAssetAmountCurrency(balance, assetToString(asset))}</div>
-                </div>
+              <Menu.Item key={i} onClick={() => onChange(asset)}>
+                <Row gutter={[8, 0]}>
+                  <Col>{asset.symbol} </Col>
+                  <Col>{formatAssetAmountCurrency(balance, assetToString(asset))}</Col>
+                </Row>
               </Menu.Item>
             )
           })}

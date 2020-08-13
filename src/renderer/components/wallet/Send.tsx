@@ -1,82 +1,52 @@
 import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import * as O from 'fp-ts/lib/Option'
-import { pipe } from 'fp-ts/lib/pipeable'
+import * as FP from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { BinanceContextValue } from '../../contexts/BinanceContext'
-import { AssetWithBalance } from '../../types/asgardex'
+import { AssetWithBalance, AssetsWithBalance } from '../../services/binance/types'
 import ErrorView from '../shared/error/ErrorView'
 import { LoadingView } from '../shared/loading/LoadingView'
-import BackLink from '../uielements/backLink'
 import * as Styled from './Send.style'
 import { SendForm } from './SendForm'
 import { SendAction } from './types'
 
 type SendProps = {
-  sendAction?: SendAction
+  sendAction: SendAction
   transactionService: BinanceContextValue['transaction']
-  balances?: RD.RemoteData<Error, AssetWithBalance[]>
-  initialActiveAsset?: RD.RemoteData<Error, O.Option<AssetWithBalance>>
+  balances: AssetsWithBalance
+  selectedAsset: AssetWithBalance
 }
 
-const Send: React.FC<SendProps> = ({
-  transactionService,
-  balances = RD.initial,
-  initialActiveAsset = RD.initial,
-  sendAction = 'send'
-}): JSX.Element => {
+const Send: React.FC<SendProps> = ({ transactionService, balances, selectedAsset, sendAction }): JSX.Element => {
   const intl = useIntl()
 
+  const { transaction$, resetTx, pushTx } = transactionService
+
   useEffect(() => {
-    transactionService.resetTx()
-  }, [transactionService])
+    resetTx()
+  }, [resetTx])
 
-  const transaction = useObservableState(transactionService.transaction$, RD.initial)
+  const transaction = useObservableState(transaction$, RD.initial)
 
-  const sendForm = useMemo(
-    () =>
-      pipe(
-        RD.combine(balances, initialActiveAsset),
-        RD.fold(
-          () => <></>,
-          () => <LoadingView />,
-          (e) => <ErrorView message={e.message} />,
-          ([balances, initialActiveAsset]) => (
-            <SendForm
-              sendAction={sendAction}
-              initialActiveAsset={initialActiveAsset}
-              onSubmit={transactionService.pushTx}
-              balances={balances}
-            />
-          )
-        )
-      ),
-    [balances, initialActiveAsset, sendAction, transactionService]
+  const renderErrorBtn = useMemo(
+    () => <Styled.Button onClick={resetTx}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,
+    [intl, resetTx]
   )
 
   return (
     <>
-      <BackLink />
-      {pipe(
+      {FP.pipe(
         transaction,
         RD.fold(
-          () => sendForm,
+          () => <SendForm sendAction={sendAction} asset={selectedAsset} onSubmit={pushTx} assets={balances} />,
           () => <LoadingView />,
-          (e) => (
-            <Styled.Result
-              status="error"
-              title={<Styled.Text>{intl.formatMessage({ id: 'common.error' })}</Styled.Text>}
-              subTitle={<Styled.Text>{e.message}</Styled.Text>}
-              extra={
-                <Styled.Button onClick={transactionService.resetTx}>
-                  {intl.formatMessage({ id: 'common.back' })}
-                </Styled.Button>
-              }
-            />
-          ),
+          (error) => {
+            const msg = error?.toString() ?? ''
+            return <ErrorView message={msg} actionButton={renderErrorBtn} />
+          },
           () => (
             <Styled.Result
               status="success"

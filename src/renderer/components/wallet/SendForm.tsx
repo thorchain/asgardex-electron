@@ -1,14 +1,13 @@
-import React, { useCallback, useState, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
-import { bn, formatAssetAmount, assetAmount } from '@thorchain/asgardex-util'
+import { bn, assetAmount, assetToString, Asset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
-import * as O from 'fp-ts/lib/Option'
-import { pipe } from 'fp-ts/lib/pipeable'
 import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router-dom'
 
-import { EMTPY_ASSET_WITH_BALANCE } from '../../helpers/assetHelper'
-import { AssetWithBalance } from '../../types/asgardex'
+import * as walletRoutes from '../../routes/wallet'
+import { AssetsWithBalance, AssetWithBalance } from '../../services/binance/types'
 import { Input, InputNumber } from '../uielements/input'
 import AccountSelector from './AccountSelector'
 import * as Styled from './Send.style'
@@ -16,24 +15,19 @@ import { SendAction } from './types'
 
 type SendFormProps = {
   sendAction: SendAction
-  balances?: AssetWithBalance[]
-  initialActiveAsset: O.Option<AssetWithBalance>
+  assets?: AssetsWithBalance
+  asset: AssetWithBalance
   onSubmit: (recipient: string, amount: number, symbol: string, password?: string) => void
 }
 
 export const SendForm: React.FC<SendFormProps> = ({
   sendAction,
   onSubmit: onSubmitProp,
-  balances = [],
-  initialActiveAsset = O.none
+  assets = [],
+  asset: assetWB
 }): JSX.Element => {
   const intl = useIntl()
-  const [activeAsset, setActiveAsset] = useState<AssetWithBalance>(
-    pipe(
-      initialActiveAsset,
-      O.getOrElse(() => EMTPY_ASSET_WITH_BALANCE)
-    )
-  )
+  const history = useHistory()
 
   const [form] = Styled.Form.useForm()
 
@@ -48,10 +42,10 @@ export const SendForm: React.FC<SendFormProps> = ({
 
   const maxAmount = useMemo(() => {
     if (sendAction === 'unfreeze') {
-      return activeAsset.frozenBalance || assetAmount(0)
+      return assetWB.frozenBalance || assetAmount(0)
     }
-    return activeAsset.balance
-  }, [activeAsset, sendAction])
+    return assetWB.balance
+  }, [assetWB, sendAction])
 
   const amountValidator = useCallback(
     async (_: unknown, stringValue: string) => {
@@ -73,9 +67,9 @@ export const SendForm: React.FC<SendFormProps> = ({
 
   const onSubmit = useCallback(
     (data: Store) => {
-      onSubmitProp(data.recipient, data.amount, activeAsset.asset.symbol, data.password)
+      onSubmitProp(data.recipient, data.amount, assetWB.asset.symbol, data.password)
     },
-    [onSubmitProp, activeAsset]
+    [onSubmitProp, assetWB]
   )
 
   const submitLabel = useMemo(() => {
@@ -91,10 +85,15 @@ export const SendForm: React.FC<SendFormProps> = ({
     }
   }, [intl, sendAction])
 
+  const changeSelectorHandler = (asset: Asset) => {
+    const path = walletRoutes.send.path({ asset: assetToString(asset) })
+    history.push(path)
+  }
+
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={setActiveAsset} selectedAsset={activeAsset.asset} assets={balances} />
+        <AccountSelector onChange={changeSelectorHandler} selectedAsset={assetWB.asset} assets={assets} />
         <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
@@ -105,7 +104,9 @@ export const SendForm: React.FC<SendFormProps> = ({
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
               <InputNumber min={0} size="large" />
             </Styled.FormItem>
-            <Styled.StyledLabel size="big">MAX: {formatAssetAmount(maxAmount)}</Styled.StyledLabel>
+            <Styled.StyledLabel size="big">
+              MAX: {formatAssetAmountCurrency(maxAmount, assetToString(assetWB.asset))}
+            </Styled.StyledLabel>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
             <Form.Item name="password">
               <Input size="large" />

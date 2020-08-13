@@ -9,19 +9,16 @@ import {
   formatAssetAmountCurrency,
   baseToAsset,
   assetFromString,
-  Asset,
-  assetToString
+  Asset
 } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
 
 import { RUNE_PRICE_POOL } from '../../const'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import * as walletRoutes from '../../routes/wallet'
 import { BalancesRD } from '../../services/binance/types'
 import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
@@ -41,7 +38,6 @@ type Props = {
 const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const { balancesRD, pricePool = RUNE_PRICE_POOL, poolDetails, selectAssetHandler = (_) => {} } = props
 
-  const history = useHistory()
   const intl = useIntl()
 
   // store previous data of balances to still render these while reloading new data
@@ -144,14 +140,10 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
         onClick: () => {
           const oAsset = bncSymbolToAsset(symbol)
           selectAssetHandler(oAsset)
-          FP.pipe(
-            oAsset,
-            O.map((asset) => history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset) })))
-          )
         }
       }
     },
-    [history, selectAssetHandler]
+    [selectAssetHandler]
   )
   const renderAssetsTable = useCallback(
     (balances: Balances, loading = false) => {

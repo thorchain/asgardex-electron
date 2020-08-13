@@ -59,8 +59,8 @@ export const bonds: Route<void> = {
   }
 }
 
-export type AssetDetailsRouteParams = { asset: string }
-export const assetDetail: Route<AssetDetailsRouteParams> = {
+export type AssetDetailsParams = { asset: string }
+export const assetDetail: Route<AssetDetailsParams> = {
   template: `${assets.template}/detail/:asset`,
   path: ({ asset }) => {
     if (asset) {

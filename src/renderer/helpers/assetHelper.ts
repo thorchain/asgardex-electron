@@ -1,6 +1,6 @@
 import { Asset, EMPTY_ASSET, assetAmount } from '@thorchain/asgardex-util'
 
-import { AssetWithBalance } from '../types/asgardex'
+import { AssetWithBalance } from '../services/binance/types'
 
 export const EMTPY_ASSET_WITH_BALANCE: AssetWithBalance = {
   asset: EMPTY_ASSET,
