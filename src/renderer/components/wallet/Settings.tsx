@@ -4,6 +4,7 @@ import { StopOutlined } from '@ant-design/icons'
 import { Address } from '@thorchain/asgardex-binance'
 import { Row, Col, Button, List } from 'antd'
 import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/pipeable'
 import { useIntl } from 'react-intl'
 
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
@@ -62,7 +63,7 @@ type Props = {
 
 const Settings: React.FC<Props> = (props: Props): JSX.Element => {
   const intl = useIntl()
-  const { network, toggleNetwork = () => {}, lockWallet = () => {}, removeKeystore = () => {} } = props
+  const { address, network, toggleNetwork = () => {}, lockWallet = () => {}, removeKeystore = () => {} } = props
 
   const removeWallet = useCallback(() => {
     removeKeystore()
@@ -122,8 +123,15 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
           <StyledCard>
             <Row>
               <Col span={24}>
-                <StyledPlaceholder>{intl.formatMessage({ id: 'setting.midgard' })}</StyledPlaceholder>
-                <StyledClientLabel>128.128.128.128:8080</StyledClientLabel>
+                <StyledPlaceholder>{network === Network.MAIN ? 'Binance chain' : 'Midgard API'}</StyledPlaceholder>
+
+                <StyledClientLabel>
+                  {pipe(
+                    address,
+                    O.getOrElse(() => intl.formatMessage({ id: 'setting.notconnected' }))
+                  )}
+                </StyledClientLabel>
+
                 <StyledPlaceholder>{intl.formatMessage({ id: 'setting.version' })}</StyledPlaceholder>
                 <StyledClientLabel>v1.2.3</StyledClientLabel>
                 <StyledClientButton color="warning" size="big" onClick={toggleNetwork}>
