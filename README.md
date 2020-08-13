@@ -44,6 +44,14 @@ While environment variables are not required (defaults are set), you can configu
 
 ## Development
 
+- Build sources needed by [`main` process](https://www.electronjs.org/docs/glossary#main-process) (only once or whenever you change something in [`preload.ts`](./src/main/preload.ts) or [`electron.ts`](./src/main/electron.ts))
+
+```bash
+yarn prebuild
+```
+
+- Build everything needed by [`renderer` process](https://www.electronjs.org/docs/glossary#renderer-process) and run application in `watch` mode
+
 ```bash
 yarn dev
 ```
