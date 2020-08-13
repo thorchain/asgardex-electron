@@ -1,6 +1,8 @@
 const GitRevisionPlugin = require('git-revision-webpack-plugin')
 const webpack = require('webpack')
 
+const { version } = require('./package')
+
 module.exports = {
   webpack: {
     configure: (webpackConfig) => {
@@ -15,6 +17,7 @@ module.exports = {
     plugins: [
       new webpack.DefinePlugin({
         $COMMIT_HASH: JSON.stringify(new GitRevisionPlugin().commithash()),
+        $VERSION: JSON.stringify(version),
         $IS_DEV: JSON.stringify(process.env.NODE_ENV !== 'production')
       })
     ]

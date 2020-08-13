@@ -55,6 +55,7 @@ const UserAccounts: UserAccountType[] = [
 
 type Props = {
   network: Network
+  apiVersion?: string
   toggleNetwork?: () => void
   address: O.Option<Address>
   lockWallet?: () => void
@@ -63,7 +64,14 @@ type Props = {
 
 const Settings: React.FC<Props> = (props: Props): JSX.Element => {
   const intl = useIntl()
-  const { address, network, toggleNetwork = () => {}, lockWallet = () => {}, removeKeystore = () => {} } = props
+  const {
+    apiVersion = '',
+    address,
+    network,
+    toggleNetwork = () => {},
+    lockWallet = () => {},
+    removeKeystore = () => {}
+  } = props
 
   const removeWallet = useCallback(() => {
     removeKeystore()
@@ -133,7 +141,7 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
                 </StyledClientLabel>
 
                 <StyledPlaceholder>{intl.formatMessage({ id: 'setting.version' })}</StyledPlaceholder>
-                <StyledClientLabel>v1.2.3</StyledClientLabel>
+                <StyledClientLabel>v{apiVersion}</StyledClientLabel>
                 <StyledClientButton color="warning" size="big" onClick={toggleNetwork}>
                   Change to {network === Network.MAIN ? 'testnet' : 'mainnet'}
                 </StyledClientButton>

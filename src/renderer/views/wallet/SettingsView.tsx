@@ -11,6 +11,7 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { envOrDefault } from '../../helpers/envHelper'
 import { Network, OnlineStatus } from '../../services/app/types'
 
 const SettingsView: React.FC = (): JSX.Element => {
@@ -38,10 +39,13 @@ const SettingsView: React.FC = (): JSX.Element => {
 
   const address = useMemo(() => (onlineStatus === OnlineStatus.OFF ? O.none : endpointUrl), [endpointUrl, onlineStatus])
 
+  const apiVersion = envOrDefault($VERSION, '-')
+
   return (
     <Row>
       <Col span={24}>
         <Settings
+          apiVersion={apiVersion}
           network={network}
           toggleNetwork={toggleNetwork}
           address={address}
