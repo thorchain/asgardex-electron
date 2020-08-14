@@ -27,7 +27,7 @@ const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
 
   const intl = useIntl()
 
-  const { transaction, balancesState$ } = useBinanceContext()
+  const { freeze: freezeService, balancesState$ } = useBinanceContext()
   const balancesState = useObservableState(balancesState$, initial)
   const balances = useMemo(() => toAssetWithBalances(balancesState, intl), [balancesState, intl])
   const oSelectedAssetWB = useMemo(() => getAssetWithBalance(balances, oSelectedAsset), [oSelectedAsset, balances])
@@ -46,7 +46,7 @@ const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
           (selectedAsset) => (
             <>
               <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(selectedAsset.asset) })} />
-              <Freeze freezeAction={freezeAction} selectedAsset={selectedAsset} transactionService={transaction} />
+              <Freeze freezeAction={freezeAction} selectedAsset={selectedAsset} freezeService={freezeService} />
             </>
           )
         )

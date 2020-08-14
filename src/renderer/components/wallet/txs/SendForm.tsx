@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 
-import { bn, assetToString, Asset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { Address } from '@thorchain/asgardex-binance'
+import { bn, assetToString, Asset, formatAssetAmountCurrency, AssetAmount, assetAmount } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import { useIntl } from 'react-intl'
@@ -15,7 +16,7 @@ import * as Styled from './Form.style'
 type Props = {
   assets?: AssetsWithBalance
   asset: AssetWithBalance
-  onSubmit: (recipient: string, amount: number, symbol: string, memo?: string) => void
+  onSubmit: ({ to, amount, asset, memo }: { to: Address; amount: AssetAmount; asset: Asset; memo?: string }) => void
 }
 
 export const SendForm: React.FC<Props> = ({ onSubmit: onSubmitProp, assets = [], asset: assetWB }): JSX.Element => {
@@ -53,7 +54,7 @@ export const SendForm: React.FC<Props> = ({ onSubmit: onSubmitProp, assets = [],
 
   const onSubmit = useCallback(
     (data: Store) => {
-      onSubmitProp(data.recipient, data.amount, assetWB.asset.symbol, data.memo)
+      onSubmitProp({ to: data.recipient, amount: assetAmount(data.amount), asset: assetWB.asset, memo: data.memo })
     },
     [onSubmitProp, assetWB]
   )

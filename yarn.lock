@@ -1199,10 +1199,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@binance-chain/javascript-sdk@^4.0.5":
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/@binance-chain/javascript-sdk/-/javascript-sdk-4.0.5.tgz#9225b81b45d6823784dc59fe73e223c651037ffa"
-  integrity sha512-vlIaY/Gc5rN1hBAEPvXr5LyHnXlA5/0NkdPSI5hRfiRcixhFj7/Iso5CTg4kI/xKr3JFtfyLFo6fWqyoP8IgYA==
+"@binance-chain/javascript-sdk@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@binance-chain/javascript-sdk/-/javascript-sdk-4.1.0.tgz#d59b8bd5b4ecb95fe4b95992bfc0a27f74775e94"
+  integrity sha512-hxjZsoeRLwTXZFpG2vDz9HQuc2NzaTRTz8H+scA34b6laXhlSDopPhGNFRHvTt2Hn86oT8MW6NY3kk62PwYh7w==
   dependencies:
     "@babel/runtime" "^7.10.4"
     "@ledgerhq/hw-transport-u2f" "^5.9.0"
@@ -1232,7 +1232,7 @@
     eslint-utils "^1.4.2"
     events "^3.0.0"
     is_js "^0.9.0"
-    lodash "^4.17.15"
+    lodash "^4.17.19"
     minimist "^1.2.5"
     ndjson "^1.5.0"
     protocol-buffers-encodings "^1.1.0"

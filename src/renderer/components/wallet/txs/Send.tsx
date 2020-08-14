@@ -21,7 +21,7 @@ type Props = {
 const Send: React.FC<Props> = ({ transactionService, balances, selectedAsset }): JSX.Element => {
   const intl = useIntl()
 
-  const { transaction$, resetTx, pushTx } = transactionService
+  const { tx$: transaction$, resetTx, pushTx } = transactionService
 
   useEffect(() => {
     resetTx()

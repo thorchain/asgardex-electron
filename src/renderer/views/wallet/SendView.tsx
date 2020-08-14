@@ -26,7 +26,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
 
   const intl = useIntl()
 
-  const { transaction, balancesState$ } = useBinanceContext()
+  const { transaction: transactionService, balancesState$ } = useBinanceContext()
   const balancesState = useObservableState(balancesState$, initial)
   const balances = useMemo(() => toAssetWithBalances(balancesState, intl), [balancesState, intl])
   const oSelectedAssetWB = useMemo(() => getAssetWithBalance(balances, oSelectedAsset), [oSelectedAsset, balances])
@@ -52,7 +52,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
                   () => <LoadingView />,
                   (e) => <ErrorView message={e.message} />,
                   (balances) => (
-                    <Send selectedAsset={selectedAsset} transactionService={transaction} balances={balances} />
+                    <Send selectedAsset={selectedAsset} transactionService={transactionService} balances={balances} />
                   )
                 )
               )}

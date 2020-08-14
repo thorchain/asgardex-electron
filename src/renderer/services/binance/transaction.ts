@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@thorchain/asgardex-binance'
+import { AssetAmount, Asset } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/lib/pipeable'
@@ -11,9 +12,19 @@ import { ClientState } from './service'
 import { TransferRD } from './types'
 import { getBinanceClient } from './utils'
 
-const { get$: transaction$, set: setTransaction } = observableState<TransferRD>(RD.initial)
+const { get$: tx$, set: setTransaction } = observableState<TransferRD>(RD.initial)
 
-const pushTx = (clientState: ClientState) => (addressTo: Address, amount: number, asset: string, memo?: string) => {
+const pushTx = (clientState: ClientState) => ({
+  to,
+  amount,
+  asset: { symbol },
+  memo
+}: {
+  to: Address
+  amount: AssetAmount
+  asset: Asset
+  memo?: string
+}) => {
   return clientState
     .pipe(
       map(getBinanceClient),
@@ -22,8 +33,8 @@ const pushTx = (clientState: ClientState) => (addressTo: Address, amount: number
     .pipe(
       switchMap((client) =>
         memo
-          ? Rx.from(client.vaultTx(addressTo, amount, asset, memo))
-          : Rx.from(client.normalTx(addressTo, amount, asset))
+          ? Rx.from(client.vaultTx(to, amount.amount().toNumber(), symbol, memo))
+          : Rx.from(client.normalTx(to, amount.amount().toNumber(), symbol))
       ),
       map((r) => O.fromNullable(r.result)),
       map((r) => RD.fromOption(r, () => Error('Transaction: empty response'))),
@@ -44,7 +55,7 @@ const pushTx = (clientState: ClientState) => (addressTo: Address, amount: number
 }
 
 export const createTransactionService = (client: ClientState) => ({
-  transaction$,
+  tx$,
   pushTx: pushTx(client),
   resetTx: () => setTransaction(RD.initial)
 })

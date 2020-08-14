@@ -1,18 +1,17 @@
 import React from 'react'
 
-import { failure, initial, pending, RemoteData, success } from '@devexperts/remote-data-ts'
+import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { Transfer } from '@thorchain/asgardex-binance'
 import { assetAmount } from '@thorchain/asgardex-util'
 import { EMPTY, Observable, of } from 'rxjs'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
-import { AssetWithBalance } from '../../../services/binance/types'
+import { AssetWithBalance, FreezeRD } from '../../../services/binance/types'
 import Freeze from './Freeze'
 
-const createServiceProp = (value: Observable<RemoteData<Error, Transfer>>) => ({
-  transaction$: value,
-  pushTx: () => of(initial).subscribe(),
+const createServiceProp = (value: Observable<FreezeRD>) => ({
+  txRD$: value,
+  pushTx: () => of(RD.initial).subscribe(),
   resetTx: () => null
 })
 
@@ -24,16 +23,14 @@ const selectedAsset: AssetWithBalance = {
 
 storiesOf('Wallet/Freeze', module)
   .add('freeze', () => {
-    return <Freeze freezeAction="freeze" selectedAsset={selectedAsset} transactionService={createServiceProp(EMPTY)} />
+    return <Freeze freezeAction="freeze" selectedAsset={selectedAsset} freezeService={createServiceProp(EMPTY)} />
   })
   .add('unfreeze', () => {
-    return (
-      <Freeze freezeAction="unfreeze" selectedAsset={selectedAsset} transactionService={createServiceProp(EMPTY)} />
-    )
+    return <Freeze freezeAction="unfreeze" selectedAsset={selectedAsset} freezeService={createServiceProp(EMPTY)} />
   })
   .add('pending', () => {
     return (
-      <Freeze freezeAction="freeze" selectedAsset={selectedAsset} transactionService={createServiceProp(of(pending))} />
+      <Freeze freezeAction="freeze" selectedAsset={selectedAsset} freezeService={createServiceProp(of(RD.pending))} />
     )
   })
   .add('error', () => {
@@ -41,7 +38,7 @@ storiesOf('Wallet/Freeze', module)
       <Freeze
         freezeAction="freeze"
         selectedAsset={selectedAsset}
-        transactionService={createServiceProp(of(failure(Error('error example'))))}
+        freezeService={createServiceProp(of(RD.failure(Error('error example'))))}
       />
     )
   })
@@ -50,9 +47,9 @@ storiesOf('Wallet/Freeze', module)
       <Freeze
         freezeAction="freeze"
         selectedAsset={selectedAsset}
-        transactionService={createServiceProp(
+        freezeService={createServiceProp(
           of(
-            success({
+            RD.success({
               code: 200,
               hash: '',
               log: '',

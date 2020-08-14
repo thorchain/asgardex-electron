@@ -5,6 +5,8 @@ import { Either } from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
 import { Option, option } from 'fp-ts/lib/Option'
 
+import { FixmeType } from '../../types/asgardex'
+
 export type BalancesRD = RD.RemoteData<Error, Balances>
 
 export type AssetWithBalance = {
@@ -33,3 +35,6 @@ export const BinanceClientStateM = getEitherM(option)
 export type BinanceClientStateForViews = 'notready' | 'ready' | 'error'
 
 export type TransferRD = RD.RemoteData<Error, Transfer>
+
+export type FreezeResult = { result: FixmeType; status: number }
+export type FreezeRD = RD.RemoteData<Error, FixmeType>

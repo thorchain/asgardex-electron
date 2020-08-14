@@ -16,7 +16,8 @@ import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
-import * as transactionServices from './transaction'
+import { createFreezeService } from './freeze'
+import { createTransactionService } from './transaction'
 import { BalancesRD, BinanceClientStateForViews, BinanceClientState, TxsRD } from './types'
 import { getBinanceClientStateForViews, getBinanceClient } from './utils'
 
@@ -131,7 +132,7 @@ const miniTickers$ = ws$.pipe(
 const BINANCE_MAX_RETRY = 3
 
 /**
- * Binannce network depending on `Network`
+ * Binance network depending on `Network`
  */
 const binanceNetwork$: Observable<BinanceNetwork> = getNetworkState$.pipe(
   mergeMap((network) => {
@@ -317,7 +318,8 @@ const explorerUrl$: Observable<O.Option<string>> = clientState$.pipe(
   shareReplay()
 )
 
-const transaction = transactionServices.createTransactionService(clientState$)
+const transaction = createTransactionService(clientState$)
+const freeze = createFreezeService(clientState$, address$)
 /**
  * Object with all "public" functions and observables
  */
@@ -335,5 +337,6 @@ export {
   address$,
   selectedAsset$,
   explorerUrl$,
-  transaction
+  transaction,
+  freeze
 }

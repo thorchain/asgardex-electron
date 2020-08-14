@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { bn, assetAmount, assetToString, Asset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { AssetAmount, bn, assetAmount, assetToString, Asset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Row } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import { useIntl } from 'react-intl'
@@ -16,7 +16,7 @@ import { FreezeAction } from './types'
 type Props = {
   freezeAction: FreezeAction
   asset: AssetWithBalance
-  onSubmit: (recipient: string, amount: number, symbol: string) => void
+  onSubmit: ({ amount, asset, action }: { amount: AssetAmount; asset: Asset; action: FreezeAction }) => void
 }
 
 export const FreezeForm: React.FC<Props> = ({ freezeAction, onSubmit: onSubmitProp, asset: assetWB }): JSX.Element => {
@@ -52,9 +52,9 @@ export const FreezeForm: React.FC<Props> = ({ freezeAction, onSubmit: onSubmitPr
 
   const onSubmit = useCallback(
     (data: Store) => {
-      onSubmitProp(data.recipient, data.amount, assetWB.asset.symbol)
+      onSubmitProp({ amount: assetAmount(data.amount), asset: assetWB.asset, action: freezeAction })
     },
-    [onSubmitProp, assetWB]
+    [onSubmitProp, assetWB, freezeAction]
   )
 
   const submitLabel = useMemo(() => {
