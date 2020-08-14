@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { assetFromString } from '@thorchain/asgardex-util'
@@ -17,7 +17,8 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
     balancesState$,
     reloadBalances,
     reloadTxssSelectedAsset,
-    explorerUrl$
+    explorerUrl$,
+    setSelectedAsset
   } = useBinanceContext()
 
   const { asset } = useParams<AssetDetailsParams>()
@@ -28,6 +29,10 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
   const balancesRD = useObservableState(balancesState$, RD.initial)
 
   const explorerUrl = useObservableState(explorerUrl$, O.none)
+
+  // Set selected asset to trigger dependent streams to get all needed data (such as its transactions)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => setSelectedAsset(selectedAsset), [])
 
   return (
     <AssetDetails
