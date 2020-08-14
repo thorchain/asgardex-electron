@@ -1,7 +1,6 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import { StopOutlined } from '@ant-design/icons'
-import { Address } from '@thorchain/asgardex-binance'
 import { Row, Col, Button, List } from 'antd'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -33,31 +32,12 @@ import {
   StyledAccountAddress
 } from './Settings.style'
 
-// Dummy Data
-const UserAccounts: UserAccountType[] = [
-  {
-    chainName: 'Binancechain',
-    accounts: [
-      {
-        name: 'Main',
-        address: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
-        type: 'internal'
-      }
-      // {
-      //   name: 'Ledger',
-      //   address: 'tbnb1vxutrxadm0utajduxfr6wd9kqfalv0dg2wnx5y',
-      //   type: 'external'
-      // }
-    ]
-  }
-]
-// Dummy data... types not confirmed
-
 type Props = {
   network: Network
   apiVersion?: string
   toggleNetwork?: () => void
-  address: O.Option<Address>
+  clientUrl: O.Option<string>
+  userAccounts?: O.Option<UserAccountType[]>
   lockWallet?: () => void
   removeKeystore?: () => void
 }
@@ -66,8 +46,9 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
   const intl = useIntl()
   const {
     apiVersion = '',
-    address,
+    clientUrl,
     network,
+    userAccounts = O.none,
     toggleNetwork = () => {},
     lockWallet = () => {},
     removeKeystore = () => {}
@@ -76,6 +57,43 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
   const removeWallet = useCallback(() => {
     removeKeystore()
   }, [removeKeystore])
+
+  const accounts = useMemo(
+    () =>
+      pipe(
+        userAccounts,
+        O.map((accounts) => (
+          <Col key={'accounts'} sm={{ span: 24 }} md={{ span: 12 }}>
+            <StyledSubtitle>{intl.formatMessage({ id: 'setting.account.management' })}</StyledSubtitle>
+            <StyledAccountCard>
+              <List
+                dataSource={accounts}
+                renderItem={(item, i: number) => (
+                  <StyledListItem key={i}>
+                    <StyledChainName>{item.chainName}</StyledChainName>
+                    {item.accounts.map((acc, j) => (
+                      <StyledChainContent key={j}>
+                        <StyledAccountPlaceholder>{acc.name}</StyledAccountPlaceholder>
+                        <StyledAccountContent>
+                          <StyledAccountAddress>{acc.address}</StyledAccountAddress>
+                          {acc.type === 'external' && (
+                            <Button type="link" danger>
+                              <StopOutlined />
+                            </Button>
+                          )}
+                        </StyledAccountContent>
+                      </StyledChainContent>
+                    ))}
+                  </StyledListItem>
+                )}
+              />
+            </StyledAccountCard>
+          </Col>
+        )),
+        O.getOrElse(() => <></>)
+      ),
+    [intl, userAccounts]
+  )
 
   return (
     <>
@@ -131,11 +149,11 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
           <StyledCard>
             <Row>
               <Col span={24}>
-                <StyledPlaceholder>{network === Network.MAIN ? 'Binance chain' : 'Midgard API'}</StyledPlaceholder>
+                <StyledPlaceholder>{intl.formatMessage({ id: 'setting.midgard' })}</StyledPlaceholder>
 
                 <StyledClientLabel>
                   {pipe(
-                    address,
+                    clientUrl,
                     O.getOrElse(() => intl.formatMessage({ id: 'setting.notconnected' }))
                   )}
                 </StyledClientLabel>
@@ -149,33 +167,7 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
             </Row>
           </StyledCard>
         </Col>
-
-        <Col sm={{ span: 24 }} md={{ span: 12 }}>
-          <StyledSubtitle>{intl.formatMessage({ id: 'setting.account.management' })}</StyledSubtitle>
-          <StyledAccountCard>
-            <List
-              dataSource={UserAccounts}
-              renderItem={(item, i: number) => (
-                <StyledListItem key={i}>
-                  <StyledChainName>{item.chainName}</StyledChainName>
-                  {item.accounts.map((acc, j) => (
-                    <StyledChainContent key={j}>
-                      <StyledAccountPlaceholder>{acc.name}</StyledAccountPlaceholder>
-                      <StyledAccountContent>
-                        <StyledAccountAddress>{acc.address}</StyledAccountAddress>
-                        {acc.type === 'external' && (
-                          <Button type="link" danger>
-                            <StopOutlined />
-                          </Button>
-                        )}
-                      </StyledAccountContent>
-                    </StyledChainContent>
-                  ))}
-                </StyledListItem>
-              )}
-            />
-          </StyledAccountCard>
-        </Col>
+        {accounts}
       </StyledRow>
     </>
   )

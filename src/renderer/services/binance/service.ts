@@ -8,10 +8,21 @@ import { none, some } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, catchError, retry, shareReplay, startWith, switchMap, debounceTime } from 'rxjs/operators'
+import {
+  map,
+  mergeMap,
+  catchError,
+  retry,
+  shareReplay,
+  startWith,
+  switchMap,
+  debounceTime,
+  distinctUntilChanged
+} from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
 import { envOrDefault } from '../../helpers/envHelper'
+import * as fpHelpers from '../../helpers/fpHelpers'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
 import { KeystoreState } from '../wallet/types'
@@ -198,6 +209,7 @@ const address$: Observable<O.Option<Address>> = clientState$.pipe(
       )
     )
   ),
+  distinctUntilChanged(fpHelpers.eqOString.equals),
   shareReplay()
 )
 
