@@ -2,8 +2,8 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import BaseButton from '../uielements/button'
-import Label from '../uielements/label'
+import BaseButton from '../../uielements/button'
+import Label from '../../uielements/label'
 
 export const Col = styled(A.Col)`
   padding: 20px 30px;

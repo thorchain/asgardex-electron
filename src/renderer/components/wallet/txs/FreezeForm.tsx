@@ -1,51 +1,36 @@
 import React, { useCallback, useMemo } from 'react'
 
 import { bn, assetAmount, assetToString, Asset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
-import { Row, Form } from 'antd'
+import { Row } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import * as walletRoutes from '../../routes/wallet'
-import { AssetsWithBalance, AssetWithBalance } from '../../services/binance/types'
-import { Input, InputNumber } from '../uielements/input'
-import AccountSelector from './AccountSelector'
-import * as Styled from './Send.style'
-import { SendAction } from './types'
+import * as walletRoutes from '../../../routes/wallet'
+import { AssetWithBalance } from '../../../services/binance/types'
+import { CoinInputAdvancedView } from '../../uielements/coins/coinInputAdvanced/CoinInputAdvanced.style'
+import AccountSelector from '../AccountSelector'
+import * as Styled from './Form.style'
+import { FreezeAction } from './types'
 
-type SendFormProps = {
-  sendAction: SendAction
-  assets?: AssetsWithBalance
+type Props = {
+  freezeAction: FreezeAction
   asset: AssetWithBalance
-  onSubmit: (recipient: string, amount: number, symbol: string, password?: string) => void
+  onSubmit: (recipient: string, amount: number, symbol: string) => void
 }
 
-export const SendForm: React.FC<SendFormProps> = ({
-  sendAction,
-  onSubmit: onSubmitProp,
-  assets = [],
-  asset: assetWB
-}): JSX.Element => {
+export const FreezeForm: React.FC<Props> = ({ freezeAction, onSubmit: onSubmitProp, asset: assetWB }): JSX.Element => {
   const intl = useIntl()
   const history = useHistory()
 
   const [form] = Styled.Form.useForm()
 
-  const addressValidator = useCallback(
-    async (_: unknown, value: string) => {
-      if (!value || value.length < 8) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.address.length' }))
-      }
-    },
-    [intl]
-  )
-
   const maxAmount = useMemo(() => {
-    if (sendAction === 'unfreeze') {
+    if (freezeAction === 'unfreeze') {
       return assetWB.frozenBalance || assetAmount(0)
     }
     return assetWB.balance
-  }, [assetWB, sendAction])
+  }, [assetWB, freezeAction])
 
   const amountValidator = useCallback(
     async (_: unknown, stringValue: string) => {
@@ -67,15 +52,13 @@ export const SendForm: React.FC<SendFormProps> = ({
 
   const onSubmit = useCallback(
     (data: Store) => {
-      onSubmitProp(data.recipient, data.amount, assetWB.asset.symbol, data.password)
+      onSubmitProp(data.recipient, data.amount, assetWB.asset.symbol)
     },
     [onSubmitProp, assetWB]
   )
 
   const submitLabel = useMemo(() => {
-    switch (sendAction) {
-      case 'send':
-        return intl.formatMessage({ id: 'wallet.action.send' })
+    switch (freezeAction) {
       case 'freeze':
         return intl.formatMessage({ id: 'wallet.action.freeze' })
       case 'unfreeze':
@@ -83,7 +66,7 @@ export const SendForm: React.FC<SendFormProps> = ({
       default:
         return ''
     }
-  }, [intl, sendAction])
+  }, [intl, freezeAction])
 
   const changeSelectorHandler = (asset: Asset) => {
     const path = walletRoutes.send.path({ asset: assetToString(asset) })
@@ -93,24 +76,16 @@ export const SendForm: React.FC<SendFormProps> = ({
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeSelectorHandler} selectedAsset={assetWB.asset} assets={assets} />
+        <AccountSelector onChange={changeSelectorHandler} selectedAsset={assetWB.asset} assets={[assetWB]} />
         <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
           <Styled.SubForm>
-            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
-            <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-              <Input color="primary" size="large" />
-            </Form.Item>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              <InputNumber min={0} size="large" />
+              <CoinInputAdvancedView color="primary" size="large" />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">
               MAX: {formatAssetAmountCurrency(maxAmount, assetToString(assetWB.asset))}
             </Styled.StyledLabel>
-            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
-            <Form.Item name="password">
-              <Input size="large" />
-            </Form.Item>
           </Styled.SubForm>
           <Styled.SubmitItem>
             <Styled.Button htmlType="submit">{submitLabel}</Styled.Button>

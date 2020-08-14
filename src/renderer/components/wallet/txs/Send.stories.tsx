@@ -5,8 +5,8 @@ import { storiesOf } from '@storybook/react'
 import { assetAmount } from '@thorchain/asgardex-util'
 import { EMPTY, Observable, of } from 'rxjs'
 
-import { ASSETS_MAINNET } from '../../../shared/mock/assets'
-import { AssetsWithBalance, AssetWithBalance } from '../../services/binance/types'
+import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
+import { AssetsWithBalance, AssetWithBalance } from '../../../services/binance/types'
 import Send from './Send'
 
 // eslint-disable-next-line
@@ -26,49 +26,16 @@ const balances: AssetsWithBalance = [selectedAsset]
 
 storiesOf('Wallet/Send', module)
   .add('send', () => {
-    return (
-      <Send
-        sendAction="send"
-        selectedAsset={selectedAsset}
-        balances={balances}
-        transactionService={createServiceProp(EMPTY)}
-      />
-    )
-  })
-  .add('freeze', () => {
-    return (
-      <Send
-        sendAction="freeze"
-        selectedAsset={selectedAsset}
-        balances={balances}
-        transactionService={createServiceProp(EMPTY)}
-      />
-    )
-  })
-  .add('unfreeze', () => {
-    return (
-      <Send
-        sendAction="unfreeze"
-        selectedAsset={selectedAsset}
-        balances={balances}
-        transactionService={createServiceProp(EMPTY)}
-      />
-    )
+    return <Send selectedAsset={selectedAsset} balances={balances} transactionService={createServiceProp(EMPTY)} />
   })
   .add('pending', () => {
     return (
-      <Send
-        sendAction="send"
-        selectedAsset={selectedAsset}
-        balances={balances}
-        transactionService={createServiceProp(of(pending))}
-      />
+      <Send selectedAsset={selectedAsset} balances={balances} transactionService={createServiceProp(of(pending))} />
     )
   })
   .add('error', () => {
     return (
       <Send
-        sendAction="send"
         selectedAsset={selectedAsset}
         balances={balances}
         transactionService={createServiceProp(of(failure(Error('error example'))))}
@@ -78,7 +45,6 @@ storiesOf('Wallet/Send', module)
   .add('success', () => {
     return (
       <Send
-        sendAction="send"
         selectedAsset={selectedAsset}
         balances={balances}
         transactionService={createServiceProp(

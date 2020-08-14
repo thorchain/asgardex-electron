@@ -8,20 +8,15 @@ import { catchError, map, startWith, switchMap, tap } from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
 import { ClientState } from './service'
+import { TransferRD } from './types'
+import { getBinanceClient } from './utils'
 
-type Transaction = {
-  code: number
-  hash: string
-  log: string
-  ok: boolean
-}
+const { get$: transaction$, set: setTransaction } = observableState<TransferRD>(RD.initial)
 
-const { get$: transaction$, set: setTransaction } = observableState<RD.RemoteData<Error, Transaction>>(RD.initial)
-
-const pushTx = (client: ClientState) => (addressTo: Address, amount: number, asset: string, memo?: string) => {
-  return client
+const pushTx = (clientState: ClientState) => (addressTo: Address, amount: number, asset: string, memo?: string) => {
+  return clientState
     .pipe(
-      map(O.chain(O.fromEither)),
+      map(getBinanceClient),
       switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY))
     )
     .pipe(
@@ -36,13 +31,7 @@ const pushTx = (client: ClientState) => (addressTo: Address, amount: number, ass
         FP.pipe(
           r,
           RD.map(A.head),
-          RD.chain((r) => RD.fromOption(r, () => Error('Transaction: no results received'))),
-          RD.map((r) => ({
-            code: r.code,
-            hash: r.hash,
-            log: r.log,
-            ok: r.ok
-          }))
+          RD.chain((r) => RD.fromOption(r, () => Error('Transaction: no results received')))
         )
       ),
       catchError((e) => {

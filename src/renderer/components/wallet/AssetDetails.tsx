@@ -17,7 +17,7 @@ import Button, { RefreshButton } from '../uielements/button'
 import Label from '../uielements/label'
 import * as Styled from './AssetDetails.style'
 import TransactionsTable from './TransactionsTable'
-import { SendAction, isSendAction } from './types'
+import { SendAction, isSendAction } from './txs/types'
 
 type SendActionMenuItem = {
   key: SendAction
@@ -130,20 +130,18 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
   const changeActionMenu = useMemo(() => {
     return (
       <Menu onClick={changeActionMenuClickHandler}>
-        {menuItems
-          .filter(({ key }) => key !== sendAction)
-          .map(({ key, label }) => (
-            <Menu.Item key={key}>
-              <Row align="middle">
-                <Label textTransform="uppercase" align="center">
-                  {label}
-                </Label>
-              </Row>
-            </Menu.Item>
-          ))}
+        {menuItems.map(({ key, label }) => (
+          <Menu.Item key={key}>
+            <Row align="middle">
+              <Label textTransform="uppercase" align="center">
+                {label}
+              </Label>
+            </Row>
+          </Menu.Item>
+        ))}
       </Menu>
     )
-  }, [menuItems, sendAction])
+  }, [menuItems])
 
   return (
     <>

@@ -5,22 +5,20 @@ import * as FP from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import { BinanceContextValue } from '../../contexts/BinanceContext'
-import { AssetWithBalance, AssetsWithBalance } from '../../services/binance/types'
-import ErrorView from '../shared/error/ErrorView'
-import { LoadingView } from '../shared/loading/LoadingView'
-import * as Styled from './Send.style'
+import { BinanceContextValue } from '../../../contexts/BinanceContext'
+import { AssetWithBalance, AssetsWithBalance, TransferRD } from '../../../services/binance/types'
+import ErrorView from '../../shared/error/ErrorView'
+import { LoadingView } from '../../shared/loading/LoadingView'
+import * as Styled from './Form.style'
 import { SendForm } from './SendForm'
-import { SendAction } from './types'
 
-type SendProps = {
-  sendAction: SendAction
+type Props = {
   transactionService: BinanceContextValue['transaction']
   balances: AssetsWithBalance
   selectedAsset: AssetWithBalance
 }
 
-const Send: React.FC<SendProps> = ({ transactionService, balances, selectedAsset, sendAction }): JSX.Element => {
+const Send: React.FC<Props> = ({ transactionService, balances, selectedAsset }): JSX.Element => {
   const intl = useIntl()
 
   const { transaction$, resetTx, pushTx } = transactionService
@@ -29,7 +27,7 @@ const Send: React.FC<SendProps> = ({ transactionService, balances, selectedAsset
     resetTx()
   }, [resetTx])
 
-  const transaction = useObservableState(transaction$, RD.initial)
+  const transaction = useObservableState<TransferRD>(transaction$, RD.initial)
 
   const renderErrorBtn = useMemo(
     () => <Styled.Button onClick={resetTx}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,
@@ -41,7 +39,7 @@ const Send: React.FC<SendProps> = ({ transactionService, balances, selectedAsset
       {FP.pipe(
         transaction,
         RD.fold(
-          () => <SendForm sendAction={sendAction} asset={selectedAsset} onSubmit={pushTx} assets={balances} />,
+          () => <SendForm asset={selectedAsset} onSubmit={pushTx} assets={balances} />,
           () => <LoadingView />,
           (error) => {
             const msg = error?.toString() ?? ''

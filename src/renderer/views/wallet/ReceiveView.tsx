@@ -5,7 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router-dom'
 
-import Receive from '../../components/wallet/Receive'
+import Receive from '../../components/wallet/txs/Receive'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { ReceiveParams } from '../../routes/wallet'
 
