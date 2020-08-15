@@ -21,12 +21,12 @@ const SettingsView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { lock, removeKeystore } = keystoreService
   const { network$, toggleNetwork } = useAppContext()
-  const { address$: _binanceAddress$ } = useBinanceContext()
+  const binanceContext = useBinanceContext()
 
   const binanceAddress$ = useMemo(
     () =>
       pipe(
-        _binanceAddress$,
+        binanceContext.address$,
         RxOperators.map(
           O.map((address) => ({
             chainName: 'Binancechain',
@@ -40,12 +40,10 @@ const SettingsView: React.FC = (): JSX.Element => {
           }))
         )
       ),
-    [_binanceAddress$]
+    [binanceContext.address$]
   )
 
-  const {
-    service: { apiEndpoint$: _midgardEndpoint$ }
-  } = useMidgardContext()
+  const { service: midgardService } = useMidgardContext()
 
   const { onlineStatus$ } = useAppContext()
 
@@ -53,7 +51,9 @@ const SettingsView: React.FC = (): JSX.Element => {
 
   const network = useObservableState(network$, Network.TEST)
 
-  const midgardEndpoint$ = useMemo(() => pipe(_midgardEndpoint$, RxOperators.map(O.fromEither)), [_midgardEndpoint$])
+  const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxOperators.map(O.fromEither)), [
+    midgardService.apiEndpoint$
+  ])
 
   const endpointUrl = useObservableState(midgardEndpoint$, O.none)
 
