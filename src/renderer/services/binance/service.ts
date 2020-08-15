@@ -319,7 +319,7 @@ const explorerUrl$: Observable<O.Option<string>> = clientState$.pipe(
 )
 
 const transaction = createTransactionService(clientState$)
-const freeze = createFreezeService(clientState$, address$)
+const freeze = createFreezeService(clientState$)
 /**
  * Object with all "public" functions and observables
  */
