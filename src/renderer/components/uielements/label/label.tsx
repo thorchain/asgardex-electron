@@ -22,7 +22,7 @@ const Label: React.FC<LabelProps> = (props: LabelProps): JSX.Element => {
     textTransform = 'none',
     children,
     className = '',
-    onClick = () => {},
+    onClick,
     style
   } = props
 

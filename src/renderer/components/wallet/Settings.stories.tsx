@@ -12,7 +12,7 @@ storiesOf('Wallet/Settings', module).add('default', () => {
     <Settings
       network={Network.TEST}
       toggleNetwork={() => console.log('toggle network')}
-      address={some(WALLET_ADDRESS_TESTNET)}
+      clientUrl={some(WALLET_ADDRESS_TESTNET)}
       lockWallet={() => console.log('lock')}
       removeKeystore={() => console.log('removeKeystore')}
     />
