@@ -76,22 +76,13 @@ const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
   return apiGetPools$.pipe(
     switchMap((poolAssets) => {
       // Store pool assets and filter out mini token
-      // TODO(Veado): It can be removed as soon as midgard's endpoint has been fixed - see https://gitlab.com/thorchain/midgard/-/issues/215
       state = { ...state, poolAssets: filterPoolAssets(poolAssets) }
-      // Load `AssetDetails`
-      // As long as Midgard has some issues to load all details at once at `v1/assets` endpoint we load details in sequence with some delay between
-      // TODO(@Veado) Load details at once if Midgard has been fixed
-      // switchMap((_) => apiGetAssetInfo$(state.poolAssets)),
-      return Rx.combineLatest(...state.poolAssets.map((asset, index) => apiGetAssetInfo$(asset, index * 50)))
+      return apiGetAssetInfo$(state.poolAssets.join(','))
     }),
     switchMap((assetDetails) => {
       // Store `AssetDetails` in `PoolsState`
       state = { ...state, assetDetails }
-      // Load `PoolDetails`
-      // As long as Midgard has some issues to load all details at once at `v1/detail` endpoint we load details in sequence with some delay between
-      // TODO(@Veado) Load details at once if Midgard has been fixed
-      // switchMap((_) => apiGetPoolsData$(state.poolAssets)),
-      return Rx.combineLatest(...state.poolAssets.map((asset, index) => apiGetPoolsData$(asset, index * 50)))
+      return apiGetPoolsData$(state.poolAssets.join(','))
     }),
     switchMap((poolDetails: PoolDetails) => {
       // Store `poolDetails` + `pricePools`
@@ -138,8 +129,7 @@ const apiGetAssetInfo$ = (asset: string, delayTime = 0) =>
     switchMap((endpoint) => {
       const api = getMidgardDefaultApi(endpoint)
       return api.getAssetInfo({ asset })
-    }),
-    map((details) => details[0])
+    })
   )
 
 /**
@@ -153,8 +143,7 @@ const apiGetPoolsData$ = (asset: string, delayTime = 0) =>
     switchMap((endpoint) => {
       const api = getMidgardDefaultApi(endpoint)
       return api.getPoolsData({ asset })
-    }),
-    map((details) => details[0])
+    })
   )
 
 // `TriggerStream` to reload data of pools
