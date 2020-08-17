@@ -1,5 +1,6 @@
 import { Input } from 'antd'
 import styled from 'styled-components'
+import { palette } from 'styled-theme'
 
 export const CoinInputAdvancedView = styled(Input)`
   width: 100%;
@@ -7,6 +8,7 @@ export const CoinInputAdvancedView = styled(Input)`
   &.ant-input {
     padding: 0;
     color: inherit;
+    border-color: ${palette('primary', 0)};
     &:focus {
       outline: none;
       box-shadow: none;

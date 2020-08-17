@@ -36,5 +36,25 @@ export type BinanceClientStateForViews = 'notready' | 'ready' | 'error'
 
 export type TransferRD = RD.RemoteData<Error, Transfer>
 
+export type FreezeAction = 'freeze' | 'unfreeze'
+export type SendAction = 'send' | FreezeAction
+
+// type guard to check possible values of `FreezeAction`
+export const isSendAction = (action: string): action is SendAction => {
+  switch (action) {
+    case 'send':
+    case 'freeze':
+    case 'unfreeze':
+      return true
+    default:
+      return false
+  }
+}
+
 export type FreezeResult = { result: FixmeType; status: number }
-export type FreezeRD = RD.RemoteData<Error, FixmeType>
+export type FreezeRD = RD.RemoteData<Error, Transfer>
+export type FreezeTxParams = {
+  amount: AssetAmount
+  asset: Asset
+  action: FreezeAction
+}

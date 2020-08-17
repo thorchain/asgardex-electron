@@ -1199,51 +1199,6 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@binance-chain/javascript-sdk@https://github.com/veado/javascript-sdk#fix/tokenmanager-instance":
-  version "0.0.0-development"
-  resolved "https://github.com/veado/javascript-sdk#eebad661a03f6377b44f643e2d26a89ecff29146"
-  dependencies:
-    "@babel/runtime" "^7.10.4"
-    "@ledgerhq/hw-transport-u2f" "^5.9.0"
-    "@ledgerhq/hw-transport-web-ble" "^5.9.0"
-    "@types/bech32" "^1.1.2"
-    "@types/big.js" "^4.0.5"
-    "@types/bn.js" "^4.11.6"
-    "@types/crypto-js" "^3.1.43"
-    "@types/elliptic" "^6.4.12"
-    "@types/jest" "^25.1.4"
-    "@types/ledgerhq__hw-transport" "^4.21.2"
-    "@types/lodash" "^4.14.149"
-    "@types/node" "^13.9.0"
-    "@types/pumpify" "^1.4.1"
-    "@types/tiny-secp256k1" "^1.0.0"
-    "@types/uuid" "^7.0.0"
-    axios "^0.19.0"
-    bech32 "^1.1.3"
-    big.js "^5.2.2"
-    bip32 "^2.0.5"
-    bip39 "^3.0.2"
-    bn.js "^4.11.8"
-    camelcase "^5.3.1"
-    crypto-browserify "^3.12.0"
-    crypto-js "^3.1.9-1"
-    elliptic "^6.0.0"
-    eslint-utils "^1.4.2"
-    events "^3.0.0"
-    is_js "^0.9.0"
-    lodash "^4.17.19"
-    minimist "^1.2.5"
-    ndjson "^1.5.0"
-    protocol-buffers-encodings "^1.1.0"
-    pumpify "^2.0.1"
-    secure-random "^1.1.2"
-    tiny-secp256k1 "^1.1.3"
-    url "^0.11.0"
-    uuid "^3.3.2"
-    websocket-stream "^5.5.0"
-  optionalDependencies:
-    "@ledgerhq/hw-transport-node-hid" "^5.10.0"
-
 "@binance-chain/javascript-sdk@https://github.com/veado/javascript-sdk#fix/tokenmanager-instance-lib":
   version "0.0.0-development"
   resolved "https://github.com/veado/javascript-sdk#06aac30e1274d24b39336fb822a93e2c8d5eb53f"
@@ -3045,11 +3000,6 @@
   version "7.0.4"
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-7.0.4.tgz#00a5749810b4ad80bff73a61f9cc9d0d521feb3c"
   integrity sha512-WGZCqBZZ0mXN2RxvLHL6/7RCu+OWs28jgQMP04LWfpyJlQUMTR6YU9CNJAKDgbw+EV/u687INXuLUc7FuML/4g==
-
-"@types/uuid@^8.3.0":
-  version "8.3.0"
-  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-8.3.0.tgz#215c231dff736d5ba92410e6d602050cce7e273f"
-  integrity sha512-eQ9qFW/fhfGJF8WKHGEHZEyVWfZxrT+6CLIJGBcZPfxUh/+BnEj+UCGYMlr9qZuX/2AltsvwrGqp0LhEW8D0zQ==
 
 "@types/webpack-env@^1.15.0":
   version "1.15.2"

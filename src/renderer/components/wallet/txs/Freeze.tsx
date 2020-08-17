@@ -1,25 +1,27 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { BinanceContextValue } from '../../../contexts/BinanceContext'
-import { AssetWithBalance, FreezeRD } from '../../../services/binance/types'
+import { AssetWithBalance, FreezeRD, FreezeAction } from '../../../services/binance/types'
 import ErrorView from '../../shared/error/ErrorView'
-import { LoadingView } from '../../shared/loading/LoadingView'
+import SuccessView from '../../shared/success/SuccessView'
 import * as Styled from './Form.style'
 import { FreezeForm } from './FreezeForm'
-import { FreezeAction } from './types'
 
 type Props = {
   freezeAction: FreezeAction
   freezeService: BinanceContextValue['freeze']
   selectedAsset: AssetWithBalance
+  explorerUrl: O.Option<string>
 }
 
-const Freeze: React.FC<Props> = ({ freezeService, selectedAsset, freezeAction: sendAction }): JSX.Element => {
+const Freeze: React.FC<Props> = (props: Props): JSX.Element => {
+  const { freezeService, selectedAsset, freezeAction: sendAction, explorerUrl = O.none } = props
   const intl = useIntl()
 
   const { txRD$, resetTx: resetFreeze, pushTx: pushFreeze } = freezeService
@@ -35,23 +37,48 @@ const Freeze: React.FC<Props> = ({ freezeService, selectedAsset, freezeAction: s
     [intl, resetFreeze]
   )
 
+  const renderSuccessBtn = useCallback(
+    (txHash: string) => {
+      const onClickHandler = () => {
+        FP.pipe(
+          explorerUrl,
+          O.map((url) => window.apiUrl.openExternal(`${url}/tx/${txHash}`))
+        )
+      }
+      return (
+        <Styled.Button onClick={onClickHandler}>
+          {intl.formatMessage({ id: 'wallet.send.success.opentx' })}
+        </Styled.Button>
+      )
+    },
+    [intl, explorerUrl]
+  )
+
+  const renderForm = useMemo(
+    () => (
+      <FreezeForm
+        freezeAction={sendAction}
+        asset={selectedAsset}
+        onSubmit={pushFreeze}
+        isLoading={RD.isPending(txRD)}
+      />
+    ),
+    [pushFreeze, selectedAsset, sendAction, txRD]
+  )
+
   return (
     <>
       {FP.pipe(
         txRD,
         RD.fold(
-          () => <FreezeForm freezeAction={sendAction} asset={selectedAsset} onSubmit={pushFreeze} />,
-          () => <LoadingView />,
+          () => renderForm,
+          () => renderForm,
           (error) => {
             const msg = error?.toString() ?? ''
             return <ErrorView message={msg} actionButton={renderErrorBtn} />
           },
-          (_) => (
-            <Styled.Result
-              status="success"
-              title={<Styled.Text>{intl.formatMessage({ id: 'common.success' })}</Styled.Text>}
-              extra={<Styled.Button onClick={freezeService.resetTx}>OK</Styled.Button>}
-            />
+          ({ hash }) => (
+            <SuccessView message={intl.formatMessage({ id: 'common.success' })} actionButton={renderSuccessBtn(hash)} />
           )
         )
       )}

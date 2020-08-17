@@ -89,6 +89,7 @@ type WalletMessageKey =
   | 'wallet.send.errors.amount.shouldBeNumber'
   | 'wallet.send.errors.amount.shouldBePositive'
   | 'wallet.send.errors.amount.shouldBeLessThatBalance'
+  | 'wallet.send.success.opentx'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 

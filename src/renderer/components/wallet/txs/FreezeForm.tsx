@@ -1,25 +1,26 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { AssetAmount, bn, assetAmount, assetToString, Asset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { bn, assetAmount, assetToString, Asset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Row } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import * as walletRoutes from '../../../routes/wallet'
-import { AssetWithBalance } from '../../../services/binance/types'
+import { AssetWithBalance, FreezeAction, FreezeTxParams } from '../../../services/binance/types'
 import { CoinInputAdvancedView } from '../../uielements/coins/coinInputAdvanced/CoinInputAdvanced.style'
 import AccountSelector from '../AccountSelector'
 import * as Styled from './Form.style'
-import { FreezeAction } from './types'
 
 type Props = {
   freezeAction: FreezeAction
   asset: AssetWithBalance
-  onSubmit: ({ amount, asset, action }: { amount: AssetAmount; asset: Asset; action: FreezeAction }) => void
+  onSubmit: ({ amount, asset, action }: FreezeTxParams) => void
+  isLoading: boolean
 }
 
-export const FreezeForm: React.FC<Props> = ({ freezeAction, onSubmit: onSubmitProp, asset: assetWB }): JSX.Element => {
+export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
+  const { freezeAction, onSubmit: onSubmitProp, asset: assetWB, isLoading = false } = props
   const intl = useIntl()
   const history = useHistory()
 
@@ -81,14 +82,16 @@ export const FreezeForm: React.FC<Props> = ({ freezeAction, onSubmit: onSubmitPr
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              <CoinInputAdvancedView color="primary" size="large" />
+              <CoinInputAdvancedView color="primary" size="large" disabled={isLoading} />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">
               MAX: {formatAssetAmountCurrency(maxAmount, assetToString(assetWB.asset))}
             </Styled.StyledLabel>
           </Styled.SubForm>
           <Styled.SubmitItem>
-            <Styled.Button htmlType="submit">{submitLabel}</Styled.Button>
+            <Styled.Button loading={isLoading} htmlType="submit">
+              {submitLabel}
+            </Styled.Button>
           </Styled.SubmitItem>
         </Styled.Form>
       </Styled.Col>

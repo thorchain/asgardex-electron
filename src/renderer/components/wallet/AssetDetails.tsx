@@ -10,14 +10,13 @@ import { useHistory } from 'react-router-dom'
 
 import * as AH from '../../helpers/assetHelper'
 import * as walletRoutes from '../../routes/wallet'
-import { TxsRD, BalancesRD } from '../../services/binance/types'
+import { TxsRD, BalancesRD, SendAction, isSendAction } from '../../services/binance/types'
 import AssetInfo from '../uielements/assets/AssetInfo'
 import BackLink from '../uielements/backLink'
 import Button, { RefreshButton } from '../uielements/button'
 import Label from '../uielements/label'
 import * as Styled from './AssetDetails.style'
 import TransactionsTable from './TransactionsTable'
-import { SendAction, isSendAction } from './txs/types'
 
 type SendActionMenuItem = {
   key: SendAction

@@ -1,4 +1,4 @@
-import { SelectOutlined } from '@ant-design/icons'
+import { SelectOutlined, SwapLeftOutlined, SwapRightOutlined, SwapOutlined } from '@ant-design/icons'
 import { Typography } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -26,6 +26,34 @@ export const Text = styled(Typography.Text)`
 `
 
 export const LinkIcon = styled(SelectOutlined)`
-  transform: scale(-1, 1);
-  color: ${palette('text', 1)};
+  svg {
+    height: 20px;
+    width: 20px;
+    transform: scale(-1, 1) translateX(5px);
+    color: ${palette('text', 1)};
+  }
+`
+
+export const FreezeIcon = styled(SwapRightOutlined)`
+  svg {
+    height: 20px;
+    width: 20px;
+    color: ${palette('text', 1)};
+  }
+`
+
+export const UnfreezeIcon = styled(SwapLeftOutlined)`
+  svg {
+    height: 20px;
+    width: 20px;
+    color: ${palette('text', 1)};
+  }
+`
+
+export const TransferIcon = styled(SwapOutlined)`
+  svg {
+    height: 20px;
+    width: 20px;
+    color: ${palette('text', 1)};
+  }
 `

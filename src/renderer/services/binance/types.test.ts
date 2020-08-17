@@ -1,6 +1,6 @@
 import { isSendAction } from './types'
 
-describe('components/wallet/txs/types', () => {
+describe('services/binance/types', () => {
   describe('isSendAction', () => {
     it('returns true for known actions', () => {
       expect(isSendAction('send')).toBeTruthy()
