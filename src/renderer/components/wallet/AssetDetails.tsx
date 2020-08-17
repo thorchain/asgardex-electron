@@ -131,7 +131,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
       <Menu onClick={changeActionMenuClickHandler}>
         {menuItems.map(({ key, label }) => (
           <Menu.Item key={key}>
-            <Row align="middle">
+            <Row justify="center">
               <Label textTransform="uppercase" align="center">
                 {label}
               </Label>
@@ -169,7 +169,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
               </Row>
               {isRuneAsset && (
                 <Row justify="center">
-                  <Dropdown overlay={changeActionMenu} trigger={['click']}>
+                  <Dropdown overlay={changeActionMenu} placement="bottomCenter" trigger={['click']}>
                     <Label textTransform="uppercase" align="center" color="primary" size="big">
                       {intl.formatMessage({ id: 'common.change' })}
                     </Label>

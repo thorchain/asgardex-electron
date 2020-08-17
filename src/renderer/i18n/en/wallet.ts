@@ -39,7 +39,7 @@ const wallet: WalletMessages = {
   'wallet.send.errors.amount.shouldBeNumber': 'Amount should be a number',
   'wallet.send.errors.amount.shouldBePositive': 'Amount should be positive',
   'wallet.send.errors.amount.shouldBeLessThatBalance': 'Amount should be less than your balance',
-  'wallet.send.success.opentx': 'Open transaction'
+  'wallet.send.success': 'Transaction succeeded.'
 }
 
 export default wallet

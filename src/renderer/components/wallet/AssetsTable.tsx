@@ -73,7 +73,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       key: 'symbol',
       title: intl.formatMessage({ id: 'wallet.column.ticker' }),
       align: 'left',
-      render: ({ symbol }: Balance) => <Label>{O.toNullable(bncSymbolToAsset(symbol))?.ticker ?? ''}</Label>,
+      render: ({ symbol }: Balance) => <Label nowrap>{O.toNullable(bncSymbolToAsset(symbol))?.ticker ?? ''}</Label>,
       sorter: (a: Balance, b: Balance) => {
         const tickerA = O.toNullable(bncSymbolToAsset(a.symbol))?.ticker ?? ''
         const tickerB = O.toNullable(bncSymbolToAsset(b.symbol))?.ticker ?? ''
@@ -93,7 +93,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
         const amount = assetAmount(bnOrZero(free))
         const asset = bncSymbolToAssetString(symbol)
         const label = formatAssetAmountCurrency(amount, asset, 3)
-        return <Label>{label}</Label>
+        return <Label nowrap>{label}</Label>
       },
       sorter: (a: Balance, b: Balance) => bnOrZero(a.free).comparedTo(bnOrZero(b.free)),
       sortDirections: ['descend', 'ascend']
@@ -114,7 +114,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
           // "empty" label if we don't get a price value
           O.getOrElse(() => '--')
         )
-        return <Label>{label}</Label>
+        return <Label nowrap>{label}</Label>
       },
       sorter: (a: Balance, b: Balance) => {
         const oPriceA = getPoolPriceValue(a, poolDetails, pricePool.poolData)

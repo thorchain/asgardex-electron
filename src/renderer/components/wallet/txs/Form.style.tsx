@@ -1,3 +1,4 @@
+import { SelectOutlined } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -59,6 +60,12 @@ export const Button = styled(BaseButton).attrs({
   round: 'true',
   sizevalue: 'xnormal'
 })``
+
+export const ButtonLinkIcon = styled(SelectOutlined)`
+  svg {
+    transform: scale(-1, 1);
+  }
+`
 
 export const Text = styled('span')`
   color: ${palette('text', 2)};

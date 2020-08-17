@@ -10,6 +10,7 @@ import { BinanceContextValue } from '../../../contexts/BinanceContext'
 import { AssetWithBalance, FreezeRD, FreezeAction } from '../../../services/binance/types'
 import ErrorView from '../../shared/error/ErrorView'
 import SuccessView from '../../shared/success/SuccessView'
+import Button from '../../uielements/button'
 import * as Styled from './Form.style'
 import { FreezeForm } from './FreezeForm'
 
@@ -46,9 +47,10 @@ const Freeze: React.FC<Props> = (props: Props): JSX.Element => {
         )
       }
       return (
-        <Styled.Button onClick={onClickHandler}>
-          {intl.formatMessage({ id: 'wallet.send.success.opentx' })}
-        </Styled.Button>
+        <Button round="true" onClick={onClickHandler}>
+          <Styled.ButtonLinkIcon />
+          {intl.formatMessage({ id: 'common.transaction' })}
+        </Button>
       )
     },
     [intl, explorerUrl]
@@ -78,7 +80,10 @@ const Freeze: React.FC<Props> = (props: Props): JSX.Element => {
             return <ErrorView message={msg} actionButton={renderErrorBtn} />
           },
           ({ hash }) => (
-            <SuccessView message={intl.formatMessage({ id: 'common.success' })} actionButton={renderSuccessBtn(hash)} />
+            <SuccessView
+              message={intl.formatMessage({ id: 'wallet.send.success' })}
+              actionButton={renderSuccessBtn(hash)}
+            />
           )
         )
       )}

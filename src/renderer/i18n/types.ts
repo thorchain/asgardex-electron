@@ -33,6 +33,7 @@ type CommonMessageKey =
   | 'common.asset'
   | 'common.assets'
   | 'common.price'
+  | 'common.transaction'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -89,7 +90,7 @@ type WalletMessageKey =
   | 'wallet.send.errors.amount.shouldBeNumber'
   | 'wallet.send.errors.amount.shouldBePositive'
   | 'wallet.send.errors.amount.shouldBeLessThatBalance'
-  | 'wallet.send.success.opentx'
+  | 'wallet.send.success'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 
