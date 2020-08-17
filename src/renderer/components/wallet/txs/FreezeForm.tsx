@@ -1,14 +1,12 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { bn, assetAmount, assetToString, Asset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { bn, assetAmount, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Row } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
 
-import * as walletRoutes from '../../../routes/wallet'
 import { AssetWithBalance, FreezeAction, FreezeTxParams } from '../../../services/binance/types'
-import { CoinInputAdvancedView } from '../../uielements/coins/coinInputAdvanced/CoinInputAdvanced.style'
+import { InputNumber } from '../../uielements/input'
 import AccountSelector from '../AccountSelector'
 import * as Styled from './Form.style'
 
@@ -21,8 +19,8 @@ type Props = {
 
 export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
   const { freezeAction, onSubmit: onSubmitProp, asset: assetWB, isLoading = false } = props
+
   const intl = useIntl()
-  const history = useHistory()
 
   const [form] = Styled.Form.useForm()
 
@@ -34,11 +32,8 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
   }, [assetWB, freezeAction])
 
   const amountValidator = useCallback(
-    async (_: unknown, stringValue: string) => {
+    async (a: unknown, stringValue: string) => {
       const value = bn(stringValue)
-      if (Number.isNaN(value)) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBeNumber' }))
-      }
 
       if (!value.isGreaterThan(0)) {
         return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBePositive' }))
@@ -69,20 +64,22 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
     }
   }, [intl, freezeAction])
 
-  const changeSelectorHandler = (asset: Asset) => {
-    const path = walletRoutes.send.path({ asset: assetToString(asset) })
-    history.push(path)
-  }
-
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeSelectorHandler} selectedAsset={assetWB.asset} assets={[assetWB]} />
+        <AccountSelector selectedAsset={assetWB.asset} assets={[assetWB]} />
         <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
-            <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              <CoinInputAdvancedView color="primary" size="large" disabled={isLoading} />
+            <Styled.FormItem
+              rules={[
+                {
+                  required: true,
+                  validator: amountValidator
+                }
+              ]}
+              name="amount">
+              <InputNumber min={0} size="large" />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">
               MAX: {formatAssetAmountCurrency(maxAmount, assetToString(assetWB.asset))}
