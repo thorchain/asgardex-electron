@@ -18,6 +18,7 @@ import {
 } from 'rxjs/operators'
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
+import { fromPromise$ } from '../../helpers/rx'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
@@ -47,6 +48,8 @@ const { get$: getNetworkState$, set: setNetworkState } = observableState<Network
  */
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
+const nextByzantine = fromPromise$((network: Network) => byzantine(network === Network.MAIN, true), '')
+
 /**
  * Endpoint provided by Byzantine
  */
@@ -55,7 +58,7 @@ const byzantine$ = getNetworkState$.pipe(
   // this stream might emit same values and we do need a "dirty check"
   // to avoid to create another instance of byzantine by having same `Network`
   distinctUntilChanged(),
-  switchMap((network) => Rx.from(byzantine(network === Network.MAIN, true))),
+  switchMap(nextByzantine),
   shareReplay(),
   retry(BYZANTINE_MAX_RETRY)
 )
@@ -283,8 +286,10 @@ const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
 )
 
 const apiEndpoint$: Rx.Observable<E.Either<Error, string>> = byzantine$.pipe(
-  map((endpoint) => E.right(endpoint)),
-  catchError((error: Error) => Rx.of(E.left(error)))
+  map((endpoint) => (endpoint ? E.right(endpoint) : E.left(Error('No endpoint provided')))),
+  catchError((error: Error) => {
+    return Rx.of(E.left(error))
+  })
 )
 
 /**
