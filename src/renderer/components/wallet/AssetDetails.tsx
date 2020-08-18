@@ -51,13 +51,13 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
   const intl = useIntl()
   const ActionComponent = isDesktopView ? Styled.ActionWrapper : Styled.ActionMobileWrapper
 
-  const walletActionSendClick = useCallback(() => history.push(walletRoutes.fundsSend.path({ asset: assetAsString })), [
+  const walletActionSendClick = useCallback(() => history.push(walletRoutes.send.path({ asset: assetAsString })), [
     assetAsString,
     history
   ])
 
   const walletActionReceiveClick = useCallback(
-    () => history.push(walletRoutes.fundsReceive.path({ asset: assetAsString })),
+    () => history.push(walletRoutes.receive.path({ asset: assetAsString })),
     [assetAsString, history]
   )
 
