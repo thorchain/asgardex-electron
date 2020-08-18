@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Col, Row } from 'antd'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -51,7 +52,7 @@ const SettingsView: React.FC = (): JSX.Element => {
 
   const network = useObservableState(network$, Network.TEST)
 
-  const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxOperators.map(O.fromEither)), [
+  const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxOperators.map(RD.toOption)), [
     midgardService.apiEndpoint$
   ])
 

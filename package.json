@@ -45,21 +45,15 @@
   "bugs": {
     "url": "https://github.com/thorchain/asgardex/issues"
   },
-  "keywords": [
-    "thorchain",
-    "asgardex",
-    "bepswap",
-    "thornode",
-    "bitcoin",
-    "ethereum",
-    "binance chain"
-  ],
+  "keywords": ["thorchain", "asgardex", "bepswap", "thornode", "bitcoin", "ethereum", "binance chain"],
   "homepage": "https://thorchain.org",
   "dependencies": {
     "@ant-design/icons": "^4.2.1",
     "@binance-chain/javascript-sdk": "^4.0.5",
     "@craco/craco": "^5.6.4",
     "@devexperts/remote-data-ts": "^2.0.3",
+    "@devexperts/rx-utils": "^1.0.0-alpha.14",
+    "@devexperts/utils": "^1.0.0-alpha.14",
     "@openapitools/openapi-generator-cli": "^1.0.15-4.3.1",
     "@thorchain/asgardex-binance": "^2.0.0",
     "@thorchain/asgardex-crypto": "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git",
@@ -72,6 +66,7 @@
     "electron-debug": "^3.1.0",
     "electron-log": "^4.2.2",
     "fp-ts": "^2.8.1",
+    "fp-ts-rxjs": "^0.6.9",
     "fs-extra": "^9.0.1",
     "lodash.shuffle": "^4.2.0",
     "observable-hooks": "^3.0.0",
