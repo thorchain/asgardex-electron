@@ -1,61 +1,68 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
-import { Asset, assetAmount, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
-import { Menu, Dropdown } from 'antd'
+import { Asset, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { Menu, Dropdown, Row, Col } from 'antd'
+import { useIntl } from 'react-intl'
 
-import { AssetWithBalance } from '../../types/asgardex'
+import { AssetsWithBalance } from '../../services/binance/types'
 import AssetIcon from '../uielements/assets/assetIcon'
 import { Size as CoinSize } from '../uielements/assets/assetIcon/types'
-import Label from '../uielements/label'
-import { StyledCard, AssetWrapper, AssetInfoWrapper, AssetTitle } from './AccountSelector.style'
+import * as Styled from './AccountSelector.style'
 
 type Props = {
-  asset: Asset
-  assets: AssetWithBalance[]
-  onChange?: (asset: AssetWithBalance) => void
+  selectedAsset: Asset
+  assets: AssetsWithBalance
+  onChange?: (asset: Asset) => void
   size?: CoinSize
 }
 
 const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
-  const { asset, assets, onChange = (_) => {}, size = 'normal' } = props
+  const { selectedAsset, assets, onChange = (_) => {}, size = 'normal' } = props
+
+  const intl = useIntl()
+
+  const filteredAssets = useMemo(() => assets.filter(({ asset }) => asset.symbol !== selectedAsset.symbol), [
+    assets,
+    selectedAsset
+  ])
+  const enableDropdown = filteredAssets.length > 0
+
   const menu = useCallback(
     () => (
       <Menu>
-        {assets
-          .filter((cure) => cure.symbol !== asset.symbol)
-          .map((asset, i: number) => {
-            return (
-              <Menu.Item key={i} onClick={() => onChange(asset)}>
-                <div style={{ display: 'flex' }}>
-                  <div>{asset?.symbol ?? 'unknown'}</div>&nbsp;
-                  <div style={{ marginLeft: 'auto' }}>
-                    {formatAssetAmountCurrency(assetAmount(asset.balance), assetToString(asset))}
-                  </div>
-                </div>
-              </Menu.Item>
-            )
-          })}
+        {filteredAssets.map((assetWB, i: number) => {
+          const { asset, balance } = assetWB
+          return (
+            <Menu.Item key={i} onClick={() => onChange(asset)}>
+              <Row gutter={[8, 0]}>
+                <Col>{asset.symbol} </Col>
+                <Col>{formatAssetAmountCurrency(balance, assetToString(asset))}</Col>
+              </Row>
+            </Menu.Item>
+          )
+        })}
       </Menu>
     ),
-    [asset, assets, onChange]
+    [filteredAssets, onChange]
   )
-  return (
-    <StyledCard bordered={false}>
-      <AssetWrapper>
-        <div>
-          <AssetIcon asset={asset} size={size} />
-        </div>
-        <AssetInfoWrapper>
-          <AssetTitle>{asset?.symbol ?? 'unknown'}</AssetTitle>
 
-          <Dropdown overlay={menu} trigger={['click']}>
-            <Label textTransform="uppercase" color="primary" size="big">
-              Change
-            </Label>
-          </Dropdown>
-        </AssetInfoWrapper>
-      </AssetWrapper>
-    </StyledCard>
+  return (
+    <Styled.Card bordered={false}>
+      <Styled.AssetWrapper>
+        <div>
+          <AssetIcon asset={selectedAsset} size={size} />
+        </div>
+        <Styled.AssetInfoWrapper>
+          <Styled.AssetTitle>{selectedAsset.symbol}</Styled.AssetTitle>
+
+          {enableDropdown && (
+            <Dropdown overlay={menu} trigger={['click']}>
+              <Styled.Label>{intl.formatMessage({ id: 'common.change' })}</Styled.Label>
+            </Dropdown>
+          )}
+        </Styled.AssetInfoWrapper>
+      </Styled.AssetWrapper>
+    </Styled.Card>
   )
 }
 

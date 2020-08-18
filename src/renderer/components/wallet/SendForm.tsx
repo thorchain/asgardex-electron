@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 
-import { bn } from '@thorchain/asgardex-util'
+import { bn, Asset } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import * as O from 'fp-ts/lib/Option'
@@ -8,13 +8,14 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import { useIntl } from 'react-intl'
 
 import { ASSETS_MAINNET } from '../../../shared/mock/assets'
+import { AssetsWithBalance } from '../../services/binance/types'
 import { AssetWithBalance } from '../../types/asgardex'
 import { Input, InputNumber } from '../uielements/input'
 import AccountSelector from './AccountSelector'
 import * as Styled from './Send.style'
 
 type SendFormProps = {
-  balances?: AssetWithBalance[]
+  balances?: AssetsWithBalance
   initialActiveAsset?: O.Option<AssetWithBalance>
   onSubmit: (recipient: string, amount: number, symbol: string, password?: string) => void
 }
@@ -25,7 +26,8 @@ export const SendForm: React.FC<SendFormProps> = ({
   initialActiveAsset = O.none
 }): JSX.Element => {
   const intl = useIntl()
-  const [activeAsset, setActiveAsset] = useState<AssetWithBalance>(
+  // `activeAsset` will be removed in https://github.com/thorchain/asgardex-electron/pull/340
+  const [activeAsset] = useState<AssetWithBalance>(
     pipe(
       initialActiveAsset,
       O.getOrElse(() => ({ ...ASSETS_MAINNET.BOLT, balance: bn(0) }))
@@ -68,10 +70,14 @@ export const SendForm: React.FC<SendFormProps> = ({
     [onSubmitProp, activeAsset]
   )
 
+  const changeSelectorHandler = (_asset: Asset) => {
+    // will be implemented by https://github.com/thorchain/asgardex-electron/pull/340
+  }
+
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={setActiveAsset} asset={activeAsset} assets={balances} />
+        <AccountSelector onChange={changeSelectorHandler} selectedAsset={activeAsset} assets={balances} />
         <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>

@@ -1,10 +1,21 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Balances, BinanceClient, Txs } from '@thorchain/asgardex-binance'
+import { Asset, AssetAmount } from '@thorchain/asgardex-util'
 import { Either } from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
 import { Option, option } from 'fp-ts/lib/Option'
 
 export type BalancesRD = RD.RemoteData<Error, Balances>
+
+export type AssetWithBalance = {
+  asset: Asset
+  balance: AssetAmount
+  frozenBalance?: AssetAmount
+}
+
+export type AssetsWithBalance = AssetWithBalance[]
+
+export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>
 
 export type TxsRD = RD.RemoteData<Error, Txs>
 
