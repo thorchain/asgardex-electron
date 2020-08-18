@@ -3,7 +3,11 @@ import { switchMap } from 'rxjs/operators'
 
 import { observableState } from '../stateHelper'
 
-export const fromPromise$ = <T, V>(factory: (next: V) => Promise<T>, defaultValue: T, onError = () => defaultValue) => {
+export const fromPromise$ = <T, V>(
+  factory: (next: V) => Promise<T>,
+  defaultValue: T,
+  onError = (_: Error) => defaultValue
+) => {
   const { get$, set } = observableState<T>(defaultValue)
 
   const res$ = get$.pipe(
