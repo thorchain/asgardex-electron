@@ -19,7 +19,7 @@ import { Observable } from 'rxjs'
  */
 export type LiveData<E, A> = Observable<RemoteData<E, A>>
 
-export const URI = '@devexperts/rx-utils//LiveData'
+export const URI = '//LiveData'
 export type URI = typeof URI
 declare module 'fp-ts/lib/HKT' {
   interface URItoKind2<E, A> {
@@ -33,11 +33,6 @@ const foldableValueRemoteData: FoldableValue2<typeof remoteData.URI> & MonadThro
   throwError: failure
 }
 
-/**
- * Breaking by fp-ts version 2.8.1
- */
-// eslint-disable-next-line  @typescript-eslint/ban-ts-comment
-// @ts-ignore
 export const instanceLiveData: MonadThrow2<URI> & CoproductLeft<URI> & Filterable2<URI> = {
   URI,
   ...getLiveDataM(instanceObservable, foldableValueRemoteData)
