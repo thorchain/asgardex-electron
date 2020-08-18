@@ -52,7 +52,9 @@ export const isSendAction = (action: string): action is SendAction => {
 }
 
 export type FreezeResult = { result: FixmeType; status: number }
+
 export type FreezeRD = RD.RemoteData<Error, Transfer>
+
 export type FreezeTxParams = {
   amount: AssetAmount
   asset: Asset

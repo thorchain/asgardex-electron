@@ -27,6 +27,7 @@ const tx$ = ({
       if (action === 'freeze') {
         return Rx.from(client.freeze(amount.amount().toNumber(), asset.symbol))
       }
+      // unffreeze
       if (action === 'unfreeze') {
         return Rx.from(client.unfreeze(amount.amount().toNumber(), asset.symbol))
       }
