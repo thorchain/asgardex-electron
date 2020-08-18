@@ -1,6 +1,5 @@
-import { Transfer } from '@binance-chain/javascript-sdk/lib/client'
 import * as RD from '@devexperts/remote-data-ts'
-import { Balances, BinanceClient, Txs } from '@thorchain/asgardex-binance'
+import { Balances, BinanceClient, Txs, Transfer } from '@thorchain/asgardex-binance'
 import { Asset, AssetAmount } from '@thorchain/asgardex-util'
 import { Either } from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'

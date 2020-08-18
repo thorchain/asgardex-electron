@@ -46,7 +46,7 @@ const tx$ = ({
       )
     ),
     catchError((error) => Rx.of(RD.failure(error))),
-    startWith(RD.pending as TransferRD)
+    startWith(RD.pending)
   )
 
 const pushTx = (clientState$: ClientState) => ({ to, amount, asset, memo }: SendTxParams) =>
