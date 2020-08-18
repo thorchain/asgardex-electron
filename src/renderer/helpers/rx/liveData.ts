@@ -13,10 +13,6 @@ import { MonadThrow2 } from 'fp-ts/lib/MonadThrow'
 import { pipeable } from 'fp-ts/lib/pipeable'
 import { Observable } from 'rxjs'
 
-/**
- * isomoprhic to `LiveData12<typeof instanceObservable.URI, typeof remoteData.URI, E, A>`
- * but left as an interface to not overload typechecker and IDE
- */
 export type LiveData<E, A> = Observable<RemoteData<E, A>>
 
 export const URI = '//LiveData'

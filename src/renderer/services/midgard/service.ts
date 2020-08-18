@@ -9,7 +9,8 @@ import { combineLatest } from 'rxjs'
 import { retry, catchError, map, shareReplay, startWith, switchMap, distinctUntilChanged, delay } from 'rxjs/operators'
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
-import { fromPromise$, liveData, LiveData } from '../../helpers/rx'
+import { fromPromise$ } from '../../helpers/rx/fromPromise'
+import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
@@ -52,7 +53,7 @@ const byzantine$ = getNetworkState$.pipe(
   // to avoid to create another instance of byzantine by having same `Network`
   distinctUntilChanged(),
   switchMap(nextByzantine),
-  shareReplay(),
+  shareReplay(1),
   retry(BYZANTINE_MAX_RETRY)
 )
 
@@ -202,7 +203,7 @@ const thorchainLastblockState$: Rx.Observable<ThorchainLastblockRD> = reloadThor
   // start request
   switchMap((_) => loadThorchainLastblock$()),
   // cache it to avoid reloading data by every subscription
-  shareReplay()
+  shareReplay(1)
 )
 
 /**
@@ -225,7 +226,7 @@ const apiGetThorchainConstants$ = pipe(
 const thorchainConstantsState$: Rx.Observable<ThorchainConstantsRD> = apiGetThorchainConstants$.pipe(
   startWith(RD.pending),
   retry(MIDGARD_MAX_RETRY),
-  shareReplay()
+  shareReplay(1)
 )
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
@@ -274,7 +275,7 @@ const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
   // start request
   switchMap(loadNetworkInfo$),
   // cache it to avoid reloading data by every subscription
-  shareReplay()
+  shareReplay(1)
 )
 
 /**
