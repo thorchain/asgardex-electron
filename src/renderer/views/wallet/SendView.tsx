@@ -49,7 +49,8 @@ const SendView: React.FC = (): JSX.Element => {
     [balances, asset]
   )
 
-  return <Send transactionService={transaction} balances={balances} initialActiveAsset={initialActiveAsset} />
+  // `balances` will be fixed in https://github.com/thorchain/asgardex-electron/pull/340
+  return <Send transactionService={transaction} balances={RD.initial} initialActiveAsset={initialActiveAsset} />
 }
 
 export default SendView

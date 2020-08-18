@@ -7,6 +7,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { BinanceContextValue } from '../../contexts/BinanceContext'
+import { AssetsWithBalanceRD } from '../../services/binance/types'
 import { AssetWithBalance } from '../../types/asgardex'
 import ErrorView from '../shared/error/ErrorView'
 import { LoadingView } from '../shared/loading/LoadingView'
@@ -16,7 +17,7 @@ import { SendForm } from './SendForm'
 
 type SendProps = {
   transactionService: BinanceContextValue['transaction']
-  balances?: RD.RemoteData<Error, AssetWithBalance[]>
+  balances?: AssetsWithBalanceRD
   initialActiveAsset?: RD.RemoteData<Error, O.Option<AssetWithBalance>>
 }
 

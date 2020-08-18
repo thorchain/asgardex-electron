@@ -28,6 +28,7 @@ const common: CommonMessages = {
   'common.loading': 'Lade...',
   'common.error': 'Fehler',
   'common.success': 'Erfolgreich',
+  'common.change': 'Ändern',
   'common.wallet': 'Wallet',
   'common.assets': 'Assets',
   'common.asset': 'Asset',
