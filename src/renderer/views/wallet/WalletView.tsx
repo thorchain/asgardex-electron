@@ -70,10 +70,10 @@ const WalletView: React.FC = (): JSX.Element => {
             <AssetsNav />
             <BondsView />
           </Route>
-          <Route path={walletRoutes.fundsReceive.template} exact>
+          <Route path={walletRoutes.receive.template} exact>
             <ReceiveView />
           </Route>
-          <Route path={walletRoutes.fundsSend.template} exact>
+          <Route path={walletRoutes.send.template} exact>
             <SendView />
           </Route>
           <Route path={walletRoutes.assetDetail.template} exact>
