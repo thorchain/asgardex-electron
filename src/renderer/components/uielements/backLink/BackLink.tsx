@@ -9,14 +9,19 @@ import { BackLinkWrapper, ButtonText } from './BackLink.style'
 type Props = {
   label?: string
   style?: React.CSSProperties
+  path?: string
 }
 
-const BackLink: React.FC<Props> = ({ label, style }): JSX.Element => {
+const BackLink: React.FC<Props> = ({ label, style, path }): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
   const clickHandler = () => {
-    history.goBack()
+    if (path) {
+      history.push(path)
+    } else {
+      history.goBack()
+    }
   }
   return (
     <BackLinkWrapper onClick={clickHandler} style={style}>
