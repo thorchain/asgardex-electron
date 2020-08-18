@@ -1,38 +1,27 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 
-import { bn, Asset } from '@thorchain/asgardex-util'
+import { Address } from '@thorchain/asgardex-binance'
+import { bn, assetToString, Asset, formatAssetAmountCurrency, AssetAmount, assetAmount } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
-import * as O from 'fp-ts/lib/Option'
-import { pipe } from 'fp-ts/lib/pipeable'
 import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router-dom'
 
-import { ASSETS_MAINNET } from '../../../shared/mock/assets'
-import { AssetsWithBalance } from '../../services/binance/types'
-import { AssetWithBalance } from '../../types/asgardex'
-import { Input, InputNumber } from '../uielements/input'
-import AccountSelector from './AccountSelector'
+import * as walletRoutes from '../../../routes/wallet'
+import { AssetsWithBalance, AssetWithBalance } from '../../../services/binance/types'
+import { Input, InputNumber } from '../../uielements/input'
+import AccountSelector from './../AccountSelector'
 import * as Styled from './Send.style'
 
-type SendFormProps = {
-  balances?: AssetsWithBalance
-  initialActiveAsset?: O.Option<AssetWithBalance>
-  onSubmit: (recipient: string, amount: number, symbol: string, password?: string) => void
+type Props = {
+  assets?: AssetsWithBalance
+  asset: AssetWithBalance
+  onSubmit: ({ to, amount, asset, memo }: { to: Address; amount: AssetAmount; asset: Asset; memo?: string }) => void
 }
 
-export const SendForm: React.FC<SendFormProps> = ({
-  onSubmit: onSubmitProp,
-  balances = [],
-  initialActiveAsset = O.none
-}): JSX.Element => {
+export const SendForm: React.FC<Props> = ({ onSubmit: onSubmitProp, assets = [], asset: assetWB }): JSX.Element => {
   const intl = useIntl()
-  // `activeAsset` will be removed in https://github.com/thorchain/asgardex-electron/pull/340
-  const [activeAsset] = useState<AssetWithBalance>(
-    pipe(
-      initialActiveAsset,
-      O.getOrElse(() => ({ ...ASSETS_MAINNET.BOLT, balance: bn(0) }))
-    )
-  )
+  const history = useHistory()
 
   const [form] = Styled.Form.useForm()
 
@@ -56,28 +45,30 @@ export const SendForm: React.FC<SendFormProps> = ({
         return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBePositive' }))
       }
 
-      if (value.isGreaterThan(activeAsset.balance)) {
+      if (value.isGreaterThan(assetWB.balance.amount())) {
         return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBeLessThatBalance' }))
       }
     },
-    [intl, activeAsset]
+    [assetWB, intl]
   )
 
   const onSubmit = useCallback(
     (data: Store) => {
-      onSubmitProp(data.recipient, data.amount, activeAsset.symbol, data.password)
+      onSubmitProp({ to: data.recipient, amount: assetAmount(data.amount), asset: assetWB.asset, memo: data.memo })
     },
-    [onSubmitProp, activeAsset]
+    [onSubmitProp, assetWB]
   )
 
-  const changeSelectorHandler = (_asset: Asset) => {
-    // will be implemented by https://github.com/thorchain/asgardex-electron/pull/340
+  const changeSelectorHandler = (asset: Asset) => {
+    const path = walletRoutes.send.path({ asset: assetToString(asset) })
+    history.push(path)
   }
 
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeSelectorHandler} selectedAsset={activeAsset} assets={balances} />
+        <AccountSelector onChange={changeSelectorHandler} selectedAsset={assetWB.asset} assets={assets} />
+
         <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
@@ -88,9 +79,11 @@ export const SendForm: React.FC<SendFormProps> = ({
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
               <InputNumber min={0} size="large" />
             </Styled.FormItem>
-            <Styled.StyledLabel size="big">MAX: {activeAsset.balance.toFormat()}</Styled.StyledLabel>
+            <Styled.StyledLabel size="big">
+              MAX: {formatAssetAmountCurrency(assetWB.balance, assetToString(assetWB.asset))}
+            </Styled.StyledLabel>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
-            <Form.Item name="password">
+            <Form.Item name="memo">
               <Input size="large" />
             </Form.Item>
           </Styled.SubForm>

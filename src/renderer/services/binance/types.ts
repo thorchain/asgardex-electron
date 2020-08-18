@@ -1,3 +1,4 @@
+import { Transfer } from '@binance-chain/javascript-sdk/lib/client'
 import * as RD from '@devexperts/remote-data-ts'
 import { Balances, BinanceClient, Txs } from '@thorchain/asgardex-binance'
 import { Asset, AssetAmount } from '@thorchain/asgardex-util'
@@ -31,6 +32,8 @@ export type BinanceClientState = Option<Either<Error, BinanceClient>>
 export const BinanceClientStateM = getEitherM(option)
 
 export type BinanceClientStateForViews = 'notready' | 'ready' | 'error'
+
+export type TransferRD = RD.RemoteData<Error, Transfer>
 
 export type FreezeAction = 'freeze' | 'unfreeze'
 export type SendAction = 'send' | FreezeAction
