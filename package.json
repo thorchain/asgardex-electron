@@ -60,6 +60,8 @@
     "@binance-chain/javascript-sdk": "^4.0.5",
     "@craco/craco": "^5.6.4",
     "@devexperts/remote-data-ts": "^2.0.3",
+    "@devexperts/rx-utils": "^1.0.0-alpha.14",
+    "@devexperts/utils": "^1.0.0-alpha.14",
     "@openapitools/openapi-generator-cli": "^1.0.15-4.3.1",
     "@thorchain/asgardex-binance": "^2.0.0",
     "@thorchain/asgardex-crypto": "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git",

@@ -21,7 +21,7 @@ import {
 } from 'rxjs/operators'
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
-import { fromPromise$ } from '../../helpers/rx'
+import { fromPromise$, LiveData } from '../../helpers/rx'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
@@ -34,7 +34,8 @@ import {
   ThorchainConstantsRD,
   SelectedPricePoolAsset
 } from './types'
-import { getPricePools, pricePoolSelector } from './utils'
+import { getPricePools, pricePoolSelector, filterPoolAssets } from './utils'
+import { Observable } from 'rxjs'
 
 const MIDGARD_MAX_RETRY = 3
 const BYZANTINE_MAX_RETRY = 5
@@ -49,7 +50,11 @@ const { get$: getNetworkState$, set: setNetworkState } = observableState<Network
  */
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
-const nextByzantine = fromPromise$((network: Network) => byzantine(network === Network.MAIN, true), '')
+const nextByzantine: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
+  (network: Network) => byzantine(network === Network.MAIN, true).then(RD.success),
+  RD.pending,
+  () => RD.failure(Error('rd error'))
+)
 
 /**
  * Endpoint provided by Byzantine
@@ -112,9 +117,22 @@ const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
  * Get data of `Pools` from Midgard
  */
 const apiGetPools$ = byzantine$.pipe(
+  map(RD.map(getMidgardDefaultApi)),
   concatMap((endpoint) => {
-    const api = getMidgardDefaultApi(endpoint)
-    return api.getPools()
+    type Type = Rx.Observable<RD.RemoteData<Error, string[]>>
+    const res: Type = pipe(
+      endpoint,
+      RD.fold(
+        () => Rx.of(RD.initial),
+        () => Rx.of(RD.pending),
+        (e) => Rx.of(RD.failure(e)),
+        // @ts-ignore
+        (api) => pipe(api.getPools(), map(RD.success))
+      )
+    )
+    return res
+    // const api = getMidgardDefaultApi(endpoint)
+    // return api.getPools()
   })
 )
 
