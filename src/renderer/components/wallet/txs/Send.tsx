@@ -43,7 +43,7 @@ const Send: React.FC<Props> = ({ transactionService, balances, selectedAsset }):
           () => <LoadingView />,
           (error) => {
             const msg = error?.toString() ?? ''
-            return <ErrorView message={msg} actionButton={renderErrorBtn} />
+            return <ErrorView title={msg} extra={renderErrorBtn} />
           },
           () => (
             <Styled.Result

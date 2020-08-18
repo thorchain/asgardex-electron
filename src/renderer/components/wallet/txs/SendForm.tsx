@@ -68,6 +68,7 @@ export const SendForm: React.FC<Props> = ({ onSubmit: onSubmitProp, assets = [],
     <Row>
       <Styled.Col span={24}>
         <AccountSelector onChange={changeSelectorHandler} selectedAsset={assetWB.asset} assets={assets} />
+
         <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>

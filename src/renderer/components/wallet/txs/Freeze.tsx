@@ -77,13 +77,10 @@ const Freeze: React.FC<Props> = (props: Props): JSX.Element => {
           () => renderForm,
           (error) => {
             const msg = error?.toString() ?? ''
-            return <ErrorView message={msg} actionButton={renderErrorBtn} />
+            return <ErrorView title={msg} extra={renderErrorBtn} />
           },
           ({ hash }) => (
-            <SuccessView
-              message={intl.formatMessage({ id: 'wallet.send.success' })}
-              actionButton={renderSuccessBtn(hash)}
-            />
+            <SuccessView title={intl.formatMessage({ id: 'wallet.send.success' })} extra={renderSuccessBtn(hash)} />
           )
         )
       )}

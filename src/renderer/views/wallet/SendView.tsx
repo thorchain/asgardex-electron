@@ -39,7 +39,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
           () => (
             <>
               <BackLink />
-              <ErrorView message={`Parsing asset ${asset} from route failed`} />
+              <ErrorView title={`Parsing asset ${asset} from route failed`} />
             </>
           ),
           (selectedAsset) => (
@@ -50,7 +50,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
                 RD.fold(
                   () => <></>,
                   () => <LoadingView />,
-                  (e) => <ErrorView message={e.message} />,
+                  (e) => <ErrorView title={e.message} />,
                   (balances) => (
                     <Send selectedAsset={selectedAsset} transactionService={transactionService} balances={balances} />
                   )

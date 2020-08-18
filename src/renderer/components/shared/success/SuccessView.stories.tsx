@@ -7,7 +7,7 @@ import SuccessView from './SuccessView'
 
 storiesOf('Components/SuccessView', module)
   .add('default', () => {
-    return <SuccessView message="Data loaded successfully!" />
+    return <SuccessView title="Data loaded successfully!" />
   })
   .add('action button', () => {
     const renderActionButton = () => (
@@ -15,5 +15,5 @@ storiesOf('Components/SuccessView', module)
         Click me
       </Button>
     )
-    return <SuccessView message="Data loaded successfully!" actionButton={renderActionButton()} />
+    return <SuccessView title="Data loaded successfully!" extra={renderActionButton()} />
   })

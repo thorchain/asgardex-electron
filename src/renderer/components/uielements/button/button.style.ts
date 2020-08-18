@@ -209,10 +209,6 @@ type Props = ButtonWrapperProps & ButtonProps
 
 export const ButtonWrapper = styled(Button)<Props>`
   &.ant-btn {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-
     border-radius: ${(props) => (props.round === 'true' ? sizes[props.sizevalue].height : '3px')};
     min-width: ${(props) => sizes[props.sizevalue].width};
     height: ${(props) => sizes[props.sizevalue].height};
@@ -226,9 +222,11 @@ export const ButtonWrapper = styled(Button)<Props>`
     &,
     &:active,
     &:focus {
-      color: ${(props) => getThemeValue(props.color, props.typevalue)?.text ?? ''};
-      border-color: ${(props) => getThemeValue(props.color, props.typevalue)?.border ?? 'transparent'};
-      background: ${(props) => getThemeValue(props.color, props.typevalue)?.background ?? 'transparent'};
+      color: ${(props) => (!props.disabled && getThemeValue(props.color, props.typevalue)?.text) ?? ''};
+      border-color: ${(props) =>
+        (!props.disabled && getThemeValue(props.color, props.typevalue)?.border) ?? 'transparent'};
+      background: ${(props) =>
+        (!props.disabled && getThemeValue(props.color, props.typevalue)?.background) ?? 'transparent'};
       ${(props) =>
         props.typevalue === 'normal' &&
         `
@@ -254,12 +252,13 @@ export const ButtonWrapper = styled(Button)<Props>`
       &,
       &:focus,
       &:active {
-        color: ${(props) => getThemeValue(props.color, props.typevalue)?.action?.text ?? ''};
-        border-color: ${(props) => getThemeValue(props.color, props.typevalue)?.action?.border ?? 'transparent'};
+        color: ${(props) => !props.disabled && (getThemeValue(props.color, props.typevalue)?.action?.text ?? '')};
+        border-color: ${(props) =>
+          !props.disabled && (getThemeValue(props.color, props.typevalue)?.action?.border ?? 'transparent')};
         background: ${(props) =>
           props.typevalue === 'normal'
-            ? getThemeValue(props.color, props.typevalue)?.focus?.borderBottom ?? 'transparent'
-            : getThemeValue(props.color, props.typevalue)?.action?.background ?? 'transparent'};
+            ? !props.disabled && (getThemeValue(props.color, props.typevalue)?.focus?.borderBottom ?? 'transparent')
+            : !props.disabled && (getThemeValue(props.color, props.typevalue)?.action?.background ?? 'transparent')};
         ${(props) =>
           props.typevalue === 'normal' &&
           `

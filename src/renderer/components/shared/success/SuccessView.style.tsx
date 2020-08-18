@@ -1,4 +1,4 @@
-import { InfoCircleOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -24,7 +24,7 @@ export const IconWrapper = styled.div`
   background: ${palette('background', 2)};
 `
 
-export const Icon = styled(InfoCircleOutlined)`
+export const Icon = styled(CheckCircleOutlined)`
   display: flex;
   width: 100%;
   height: 100%;
@@ -33,6 +33,6 @@ export const Icon = styled(InfoCircleOutlined)`
   svg {
     width: 60px;
     height: 60px;
-    fill: ${palette('error', 0)};
+    fill: ${palette('success', 0)};
   }
 `

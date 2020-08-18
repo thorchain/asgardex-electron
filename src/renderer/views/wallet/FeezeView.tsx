@@ -41,7 +41,7 @@ const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
           () => (
             <>
               <BackLink />
-              <ErrorView message={`Parsing asset ${asset} from route failed`} />
+              <ErrorView title={`Parsing asset ${asset} from route failed`} />
             </>
           ),
           (selectedAsset) => (

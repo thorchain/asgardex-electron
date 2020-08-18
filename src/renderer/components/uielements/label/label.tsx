@@ -24,7 +24,7 @@ const Label: React.FC<LabelProps> = (props: LabelProps): JSX.Element => {
     nowrap = false,
     children,
     className = '',
-    onClick = () => {},
+    onClick,
     style
   } = props
 

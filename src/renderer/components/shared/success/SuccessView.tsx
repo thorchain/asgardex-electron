@@ -1,22 +1,20 @@
 import React from 'react'
 
-import { CheckCircleOutlined } from '@ant-design/icons'
+import { ResultProps } from 'antd/lib/result'
 
 import * as Styled from './SuccessView.style'
 
-type Props = { message: string; actionButton?: React.ReactNode }
+type Props = Omit<ResultProps, 'icon'>
 
-const SuccessView: React.FC<Props> = (props: Props): JSX.Element => {
-  const { message, actionButton } = props
-  return (
-    <Styled.Wrapper>
-      <div className="icon">
-        <CheckCircleOutlined />
-      </div>
-      <Styled.Message level={4}>{message}</Styled.Message>
-      {actionButton && <Styled.ActionButtonWrapper>{actionButton}</Styled.ActionButtonWrapper>}
-    </Styled.Wrapper>
-  )
-}
+const SuccessView: React.FC<Props> = (props: Props): JSX.Element => (
+  <Styled.Result
+    icon={
+      <Styled.IconWrapper>
+        <Styled.Icon />
+      </Styled.IconWrapper>
+    }
+    {...props}
+  />
+)
 
 export default SuccessView
