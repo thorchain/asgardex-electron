@@ -6,6 +6,7 @@ export type ComponentProps = {
   className?: string
   children?: React.ReactNode
   loading?: boolean
+  nowrap?: boolean
   onClick?: () => void
   style?: React.CSSProperties
 }
@@ -20,6 +21,7 @@ const Label: React.FC<LabelProps> = (props: LabelProps): JSX.Element => {
     color = 'normal',
     weight = 'normal',
     textTransform = 'none',
+    nowrap = false,
     children,
     className = '',
     onClick,
@@ -35,6 +37,7 @@ const Label: React.FC<LabelProps> = (props: LabelProps): JSX.Element => {
       textTransform={textTransform}
       style={style}
       align={align}
+      nowrap={nowrap}
       onClick={onClick}>
       {loading && '...'}
       {!loading && children}

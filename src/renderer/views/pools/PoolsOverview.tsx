@@ -156,6 +156,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   )
   const poolColumn: ColumnType<PoolTableRowData> = {
     key: 'pool',
+    align: 'center',
     title: intl.formatMessage({ id: 'common.pool' }),
     dataIndex: 'pool',
     width: 100,
@@ -177,7 +178,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     render: renderPoolColumnMobile
   }
 
-  const renderAssetColumn = useCallback(({ target }: Pool) => <Label>{target?.ticker ?? 'unknown'}</Label>, [])
+  const renderAssetColumn = useCallback(
+    ({ target }: Pool) => <Label align="center">{target?.ticker ?? 'unknown'}</Label>,
+    []
+  )
   const sortAssetColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
     const { symbol: aSymbol = '' } = a.pool.target
     const { symbol: bSymbol = '' } = b.pool.target
@@ -193,7 +197,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderPriceColumn = useCallback(
-    (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset, 3)}</Label>,
+    (price: BaseAmount) => (
+      <Label align="right" nowrap>
+        {formatAssetAmountCurrency(baseToAsset(price), pricePool.asset, 3)}
+      </Label>
+    ),
     [pricePool]
   )
   const sortPriceColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
@@ -204,6 +212,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   const priceColumn: ColumnType<PoolTableRowData> = {
     key: 'poolprice',
+    align: 'right',
     title: intl.formatMessage({ id: 'common.price' }),
     dataIndex: 'poolPrice',
     render: renderPriceColumn,
@@ -213,7 +222,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderDepthColumn = useCallback(
-    (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
+    (price: BaseAmount) => (
+      <Label align="right" nowrap>
+        {formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}
+      </Label>
+    ),
     [pricePool]
   )
   const sortDepthColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
@@ -231,7 +244,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderVolumeColumn = useCallback(
-    (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
+    (price: BaseAmount) => (
+      <Label align="right" nowrap>
+        {formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}
+      </Label>
+    ),
     [pricePool]
   )
   const sortVolumeColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
@@ -241,6 +258,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }, [])
   const volumeColumn: ColumnType<PoolTableRowData> = {
     key: 'vol',
+    align: 'right',
     title: intl.formatMessage({ id: 'pools.24hvol' }),
     dataIndex: 'volumePrice',
     render: renderVolumeColumn,
@@ -249,7 +267,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderTransactionColumn = useCallback(
-    (price: BaseAmount) => <Label>{formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}</Label>,
+    (price: BaseAmount) => (
+      <Label align="right" nowrap>
+        {formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}
+      </Label>
+    ),
     [pricePool]
   )
   const sortTransactionColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
@@ -259,6 +281,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }, [])
   const transactionColumn: ColumnType<PoolTableRowData> = {
     key: 'transaction',
+    align: 'right',
     title: intl.formatMessage({ id: 'pools.avgsize' }),
     dataIndex: 'transactionPrice',
     render: renderTransactionColumn,
@@ -271,6 +294,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   const slipColumn: ColumnType<PoolTableRowData> = {
     key: 'slip',
+    align: 'center',
     title: intl.formatMessage({ id: 'pools.avgslip' }),
     dataIndex: 'slip',
     render: renderSlipColumn,
@@ -282,7 +306,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'trade',
     title: intl.formatMessage({ id: 'pools.trades' }),
     dataIndex: 'trades',
-    render: (trades: BigNumber) => <Label>{trades.toString()}</Label>,
+    render: (trades: BigNumber) => <Label align="center">{trades.toString()}</Label>,
     sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
       const aAmount = a.trades
       const bAmount = b.trades
