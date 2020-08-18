@@ -59,8 +59,8 @@ export const bonds: Route<void> = {
   }
 }
 
-export type AssetDetailsRouteParams = { asset: string }
-export const assetDetail: Route<AssetDetailsRouteParams> = {
+export type AssetDetailsParams = { asset: string }
+export const assetDetail: Route<AssetDetailsParams> = {
   template: `${assets.template}/detail/:asset`,
   path: ({ asset }) => {
     if (asset) {
@@ -72,8 +72,8 @@ export const assetDetail: Route<AssetDetailsRouteParams> = {
   }
 }
 
-export type FundsReceiveParams = { asset: string }
-export const fundsReceive: Route<FundsReceiveParams> = {
+export type ReceiveParams = { asset: string }
+export const receive: Route<ReceiveParams> = {
   template: `${assetDetail.template}/receive`,
   path: ({ asset }) => {
     if (asset) {
@@ -85,12 +85,38 @@ export const fundsReceive: Route<FundsReceiveParams> = {
   }
 }
 
-export type FundSendParams = { asset: string }
-export const fundsSend: Route<FundSendParams> = {
+export type SendParams = { asset: string }
+export const send: Route<SendParams> = {
   template: `${assetDetail.template}/send`,
   path: ({ asset }) => {
     if (asset) {
       return `${assetDetail.path({ asset })}/send`
+    } else {
+      // Redirect to assets route if passed param is empty
+      return assets.path()
+    }
+  }
+}
+
+export type FreezeParams = { asset: string }
+export const freeze: Route<FreezeParams> = {
+  template: `${assetDetail.template}/freeze`,
+  path: ({ asset }) => {
+    if (asset) {
+      return `${assetDetail.path({ asset })}/freeze`
+    } else {
+      // Redirect to assets route if passed param is empty
+      return assets.path()
+    }
+  }
+}
+
+export type UnfreezeParams = { asset: string }
+export const unfreeze: Route<UnfreezeParams> = {
+  template: `${assetDetail.template}/unfreeze`,
+  path: ({ asset }) => {
+    if (asset) {
+      return `${assetDetail.path({ asset })}/unfreeze`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()
