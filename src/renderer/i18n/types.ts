@@ -59,6 +59,8 @@ type WalletMessageKey =
   | 'wallet.column.value'
   | 'wallet.action.send'
   | 'wallet.action.receive'
+  | 'wallet.action.freeze'
+  | 'wallet.action.unfreeze'
   | 'wallet.action.remove'
   | 'wallet.action.unlock'
   | 'wallet.unlock.title'
