@@ -1,10 +1,11 @@
-import Title from 'antd/lib/typography/Title'
+import { InfoCircleOutlined } from '@ant-design/icons'
+import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
 
-export const Wrapper = styled.div`
+export const Result = styled(A.Result)`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,29 +15,24 @@ export const Wrapper = styled.div`
   `}
   background-color: ${palette('background', 1)};
 
+`
+export const IconWrapper = styled.div`
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: ${palette('background', 2)};
+`
 
-  .icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    width: 100px;
-    height: 100px;
-    margin-bottom: 20px;
-    border-radius: 50%;
-    background: ${palette('background', 2)};
-    svg {
-      width: 60px;
-      height: 60px;
-      fill: ${palette('error', 0)};
-    }
+export const Icon = styled(InfoCircleOutlined)`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  svg {
+    width: 60px;
+    height: 60px;
+    fill: ${palette('error', 0)};
   }
-`
-
-export const Message = styled(Title).attrs({ level: 4 })`
-  color: ${palette('text', 2)};
-`
-
-export const ActionButtonWrapper = styled.div`
-  margin-top: 10px;
 `

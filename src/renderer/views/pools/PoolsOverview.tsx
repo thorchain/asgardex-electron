@@ -351,7 +351,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           // error state
           (error: Error) => {
             const msg = error?.toString() ?? ''
-            return <ErrorView message={msg} actionButton={renderRefreshBtn} />
+            return <ErrorView title={msg} extra={renderRefreshBtn} />
           },
           // success state
           (pools: PoolsState): JSX.Element => {

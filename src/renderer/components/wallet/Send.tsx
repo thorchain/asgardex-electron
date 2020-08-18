@@ -41,7 +41,7 @@ const Send: React.FC<SendProps> = ({
         RD.fold(
           () => <></>,
           () => <LoadingView />,
-          (e) => <ErrorView message={e.message} />,
+          (e) => <ErrorView title={e.message} />,
           ([balances, initialActiveAsset]) => (
             <SendForm
               initialActiveAsset={initialActiveAsset}
