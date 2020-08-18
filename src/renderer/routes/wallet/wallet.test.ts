@@ -1,4 +1,17 @@
-import { base, imports, locked, settings, assets, stakes, bonds, assetDetail, fundsSend, fundsReceive } from './wallet'
+import {
+  base,
+  imports,
+  locked,
+  settings,
+  assets,
+  stakes,
+  bonds,
+  assetDetail,
+  send,
+  receive,
+  freeze,
+  unfreeze
+} from './wallet'
 
 describe('Wallet routes', () => {
   describe('base routes', () => {
@@ -74,21 +87,39 @@ describe('Wallet routes', () => {
     })
   })
 
-  describe('funds receive route', () => {
+  describe('receive route', () => {
     it('template', () => {
-      expect(fundsReceive.template).toEqual('/wallet/assets/detail/:asset/receive')
+      expect(receive.template).toEqual('/wallet/assets/detail/:asset/receive')
     })
     it('path ', () => {
-      expect(fundsReceive.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB/receive')
+      expect(receive.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB/receive')
     })
   })
 
-  describe('funds send route', () => {
+  describe('send route', () => {
     it('template', () => {
-      expect(fundsSend.template).toEqual('/wallet/assets/detail/:asset/send')
+      expect(send.template).toEqual('/wallet/assets/detail/:asset/send')
     })
     it('path ', () => {
-      expect(fundsSend.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB/send')
+      expect(send.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB/send')
+    })
+  })
+
+  describe('freeze route', () => {
+    it('template', () => {
+      expect(freeze.template).toEqual('/wallet/assets/detail/:asset/freeze')
+    })
+    it('path ', () => {
+      expect(freeze.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB/freeze')
+    })
+  })
+
+  describe('unfreeze route', () => {
+    it('template', () => {
+      expect(unfreeze.template).toEqual('/wallet/assets/detail/:asset/unfreeze')
+    })
+    it('path ', () => {
+      expect(unfreeze.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB/unfreeze')
     })
   })
 })

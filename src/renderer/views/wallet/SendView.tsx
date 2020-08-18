@@ -13,12 +13,12 @@ import { useParams } from 'react-router'
 import Send from '../../components/wallet/Send'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
-import { FundSendParams } from '../../routes/wallet'
+import { SendParams } from '../../routes/wallet'
 import { bncSymbolToAsset } from '../../services/binance/utils'
 
 const SendView: React.FC = (): JSX.Element => {
   const { transaction, balancesState$ } = useBinanceContext()
-  const { asset: assetParam } = useParams<FundSendParams>()
+  const { asset: assetParam } = useParams<SendParams>()
   const balancesState = useObservableState(balancesState$, initial)
   const intl = useIntl()
 
