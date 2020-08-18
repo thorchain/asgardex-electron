@@ -167,9 +167,10 @@ storiesOf('Components/Button', module)
     const color = radios('color', colorOptions, 'primary')
     const type = radios('type', typeOptions, 'default')
     const focused = boolean('focused', false)
+    const loading = boolean('loading', false)
 
     return (
-      <Button sizevalue={size} color={color} typevalue={type} focused={focused}>
+      <Button sizevalue={size} color={color} typevalue={type} focused={focused} loading={loading}>
         {buttonText}
       </Button>
     )
