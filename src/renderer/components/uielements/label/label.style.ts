@@ -9,6 +9,7 @@ export type Props = {
   color?: Color
   weight?: string
   textTransform?: TextTransform
+  nowrap?: boolean
   onClick?: () => void
 }
 
@@ -50,6 +51,7 @@ const colors: Colors = {
 
 export const LabelWrapper = styled.div<Props>`
   padding: 10px 0;
+  white-space: ${({ nowrap = false }) => (nowrap ? 'nowrap' : 'normal')};
   font-size: ${({ size = 'normal' }) => fontSettings[size].size};
   text-transform: ${({ textTransform = 'none' }) => textTransform};
   font-weight: ${({ weight }) => weight};
