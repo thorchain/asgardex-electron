@@ -182,7 +182,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
           // error state
           (error: Error) => {
             const msg = error?.toString() ?? ''
-            return <ErrorView message={msg} />
+            return <ErrorView title={msg} />
           },
           // success state
           (balances: Balances): JSX.Element => {

@@ -8,7 +8,7 @@ import ErrorView from './ErrorView'
 
 storiesOf('Components/ErrorView', module)
   .add('default', () => {
-    return <ErrorView message="Error while loading data!" />
+    return <ErrorView title="Error while loading data!" />
   })
   .add('action button', () => {
     const renderActionButton = () => (
@@ -17,5 +17,5 @@ storiesOf('Components/ErrorView', module)
         Action Button
       </Button>
     )
-    return <ErrorView message="Error while loading data!" actionButton={renderActionButton()} />
+    return <ErrorView title="Error while loading data!" extra={renderActionButton()} />
   })
