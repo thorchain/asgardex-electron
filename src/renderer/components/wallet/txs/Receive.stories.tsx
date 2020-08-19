@@ -3,8 +3,8 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import * as O from 'fp-ts/lib/Option'
 
-import { WALLET_ADDRESS_TESTNET } from '../../../shared/mock/address'
-import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { WALLET_ADDRESS_TESTNET } from '../../../../shared/mock/address'
+import { ASSETS_TESTNET } from '../../../../shared/mock/assets'
 import Receive from './Receive'
 
 storiesOf('Wallet/Receive', module)

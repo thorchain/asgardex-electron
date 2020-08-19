@@ -1,7 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { WS, Client, Network as BinanceNetwork, BinanceClient, Address, TxPage } from '@thorchain/asgardex-binance'
 import { Asset } from '@thorchain/asgardex-util'
-import { sequenceT } from 'fp-ts/lib/Apply'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import { none, some } from 'fp-ts/lib/Option'
@@ -22,12 +21,14 @@ import {
 import { webSocket } from 'rxjs/webSocket'
 
 import { envOrDefault } from '../../helpers/envHelper'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import * as fpHelpers from '../../helpers/fpHelpers'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
-import * as transactionServices from './transaction'
+import { createFreezeService } from './freeze'
+import { createTransactionService } from './transaction'
 import { BalancesRD, BinanceClientStateForViews, BinanceClientState, TxsRD } from './types'
 import { getBinanceClientStateForViews, getBinanceClient } from './utils'
 
@@ -142,7 +143,7 @@ const miniTickers$ = ws$.pipe(
 const BINANCE_MAX_RETRY = 3
 
 /**
- * Binannce network depending on `Network`
+ * Binance network depending on `Network`
  */
 const binanceNetwork$: Observable<BinanceNetwork> = getNetworkState$.pipe(
   mergeMap((network) => {
@@ -300,7 +301,7 @@ const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest(
     const client = getBinanceClient(clientState)
     return FP.pipe(
       // client and asset has to be available
-      sequenceT(O.option)(client, oAsset),
+      sequenceTOption(client, oAsset),
       O.fold(
         () => Rx.of(RD.initial as TxsRD),
         ([clientState, asset]) => loadTxsOfSelectedAsset$(clientState, O.some(asset))
@@ -329,12 +330,15 @@ const explorerUrl$: Observable<O.Option<string>> = clientState$.pipe(
   shareReplay()
 )
 
+const transaction = createTransactionService(clientState$)
+
+const freeze = createFreezeService(clientState$)
+
 const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(
   mergeMap((clientState) => Rx.of(getBinanceClient(clientState))),
   shareReplay(1)
 )
 
-const transaction = transactionServices.createTransactionService(clientState$)
 /**
  * Object with all "public" functions and observables
  */
@@ -353,5 +357,6 @@ export {
   selectedAsset$,
   explorerUrl$,
   transaction,
+  freeze,
   client$
 }

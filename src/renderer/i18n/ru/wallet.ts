@@ -34,6 +34,7 @@ const wallet: WalletMessages = {
   'wallet.create.error': 'Ошибка при сохранении фрразы',
   'wallet.receive.address.error': 'Нет доступных адресов для получения',
   'wallet.receive.address.errorQR': 'Ошибка при создании QR-кода: {error}',
+  'wallet.send.success': 'Transaction succeeded - RU.',
   'wallet.errors.balancesFailed': 'Нет загруженных балансов',
   'wallet.errors.address.empty': "Address can't be empty - RU",
   'wallet.errors.address.invalid': 'Address is invalid - RU',

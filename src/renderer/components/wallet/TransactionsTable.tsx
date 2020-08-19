@@ -26,13 +26,17 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   // store previous data of Txs to render these while reloading
   const previousTxs = useRef<O.Option<Txs>>(O.none)
 
-  const renderTypeColumn = useCallback(({ txType }: Tx) => <Styled.Text>{txType}</Styled.Text>, [])
+  const renderTypeColumn = useCallback(({ txType }: Tx) => {
+    if (txType === 'FREEZE_TOKEN') return <Styled.FreezeIcon />
+    if (txType === 'UN_FREEZE_TOKEN') return <Styled.UnfreezeIcon />
+    if (txType === 'TRANSFER') return <Styled.TransferIcon />
+    return <></>
+  }, [])
   const typeColumn: ColumnType<Tx> = {
     key: 'txType',
-    title: intl.formatMessage({ id: 'common.type' }),
-    align: 'left',
-    width: 120,
-    sorter: (a: Tx, b: Tx) => a.txType.localeCompare(b.txType),
+    title: '',
+    align: 'center',
+    width: 60,
     render: renderTypeColumn,
     sortDirections: ['descend', 'ascend']
   }
@@ -118,14 +122,14 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const linkColumn: ColumnType<Tx> = {
     key: 'txHash',
     title: '',
-    align: 'left',
-    width: 50,
+    align: 'center',
+    width: 60,
     render: renderLinkColumn
   }
 
   const desktopColumns: ColumnsType<Tx> = [typeColumn, fromColumn, toColumn, dateColumn, amountColumn, linkColumn]
 
-  const mobileColumns: ColumnsType<Tx> = [amountColumn, dateColumn, linkColumn]
+  const mobileColumns: ColumnsType<Tx> = [typeColumn, amountColumn, dateColumn, linkColumn]
 
   const renderTable = useCallback(
     (txs: Txs, loading = false) => {

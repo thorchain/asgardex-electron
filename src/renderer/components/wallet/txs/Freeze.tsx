@@ -7,36 +7,35 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { BinanceContextValue } from '../../../contexts/BinanceContext'
-import { AssetWithBalance, TransferRD, AssetsWithBalanceRD, AddressValidation } from '../../../services/binance/types'
+import { AssetWithBalance, FreezeRD, FreezeAction } from '../../../services/binance/types'
 import ErrorView from '../../shared/error/ErrorView'
 import SuccessView from '../../shared/success/SuccessView'
 import Button from '../../uielements/button'
 import * as Styled from './Form.style'
-import { SendForm } from './SendForm'
+import { FreezeForm } from './FreezeForm'
 
 type Props = {
-  transactionService: BinanceContextValue['transaction']
-  balances: AssetsWithBalanceRD
+  freezeAction: FreezeAction
+  freezeService: BinanceContextValue['freeze']
   selectedAsset: AssetWithBalance
   explorerUrl: O.Option<string>
-  addressValidation: AddressValidation
 }
 
-const Send: React.FC<Props> = (props): JSX.Element => {
-  const { transactionService, balances, selectedAsset, explorerUrl = O.none, addressValidation } = props
+const Freeze: React.FC<Props> = (props: Props): JSX.Element => {
+  const { freezeService, selectedAsset, freezeAction: sendAction, explorerUrl = O.none } = props
   const intl = useIntl()
 
-  const { txRD$, resetTx, pushTx } = transactionService
+  const { txRD$, resetTx: resetFreeze, pushTx: pushFreeze } = freezeService
 
   useEffect(() => {
-    resetTx()
-  }, [resetTx])
+    resetFreeze()
+  }, [resetFreeze])
 
-  const txRD = useObservableState<TransferRD>(txRD$, RD.initial)
+  const txRD = useObservableState<FreezeRD>(txRD$, RD.initial)
 
   const renderErrorBtn = useMemo(
-    () => <Styled.Button onClick={resetTx}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,
-    [intl, resetTx]
+    () => <Styled.Button onClick={resetFreeze}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,
+    [intl, resetFreeze]
   )
 
   const renderSuccessBtn = useCallback(
@@ -48,7 +47,7 @@ const Send: React.FC<Props> = (props): JSX.Element => {
         )
       }
       return (
-        <Button round="true" onClick={onClickHandler} sizevalue="normal">
+        <Button round="true" onClick={onClickHandler}>
           <Styled.ButtonLinkIcon />
           {intl.formatMessage({ id: 'common.transaction' })}
         </Button>
@@ -59,15 +58,14 @@ const Send: React.FC<Props> = (props): JSX.Element => {
 
   const renderForm = useMemo(
     () => (
-      <SendForm
-        assetWB={selectedAsset}
-        onSubmit={pushTx}
-        assetsWB={balances}
+      <FreezeForm
+        freezeAction={sendAction}
+        asset={selectedAsset}
+        onSubmit={pushFreeze}
         isLoading={RD.isPending(txRD)}
-        addressValidation={addressValidation}
       />
     ),
-    [selectedAsset, pushTx, balances, txRD, addressValidation]
+    [pushFreeze, selectedAsset, sendAction, txRD]
   )
 
   return (
@@ -82,7 +80,7 @@ const Send: React.FC<Props> = (props): JSX.Element => {
             return <ErrorView title={msg} extra={renderErrorBtn} />
           },
           ({ hash }) => (
-            <SuccessView title={intl.formatMessage({ id: 'common.success' })} extra={renderSuccessBtn(hash)} />
+            <SuccessView title={intl.formatMessage({ id: 'wallet.send.success' })} extra={renderSuccessBtn(hash)} />
           )
         )
       )}
@@ -90,4 +88,4 @@ const Send: React.FC<Props> = (props): JSX.Element => {
   )
 }
 
-export default Send
+export default Freeze

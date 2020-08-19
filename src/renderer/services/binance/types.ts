@@ -49,4 +49,11 @@ export const isSendAction = (action: string): action is SendAction => {
   }
 }
 
+export type FreezeRD = RD.RemoteData<Error, Transfer>
+
+export type FreezeTxParams = {
+  amount: AssetAmount
+  asset: Asset
+  action: FreezeAction
+}
 export type AddressValidation = BinanceClient['validateAddress']

@@ -9,19 +9,16 @@ import {
   formatAssetAmountCurrency,
   baseToAsset,
   assetFromString,
-  Asset,
-  assetToString
+  Asset
 } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
-import { sequenceT } from 'fp-ts/lib/Apply'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
 
 import { RUNE_PRICE_POOL } from '../../const'
-import * as walletRoutes from '../../routes/wallet'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { BalancesRD } from '../../services/binance/types'
 import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
@@ -41,7 +38,6 @@ type Props = {
 const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const { balancesRD, pricePool = RUNE_PRICE_POOL, poolDetails, selectAssetHandler = (_) => {} } = props
 
-  const history = useHistory()
   const intl = useIntl()
 
   // store previous data of balances to still render these while reloading new data
@@ -118,13 +114,13 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
           // "empty" label if we don't get a price value
           O.getOrElse(() => '--')
         )
-        return <Label>{label}</Label>
+        return <Label nowrap>{label}</Label>
       },
       sorter: (a: Balance, b: Balance) => {
         const oPriceA = getPoolPriceValue(a, poolDetails, pricePool.poolData)
         const oPriceB = getPoolPriceValue(b, poolDetails, pricePool.poolData)
         return FP.pipe(
-          sequenceT(O.option)(oPriceA, oPriceB),
+          sequenceTOption(oPriceA, oPriceB),
           O.fold(
             () => 0,
             ([priceA, priceB]) => priceA.amount().comparedTo(priceB.amount())
@@ -144,14 +140,10 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
         onClick: () => {
           const oAsset = bncSymbolToAsset(symbol)
           selectAssetHandler(oAsset)
-          FP.pipe(
-            oAsset,
-            O.map((asset) => history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset) })))
-          )
         }
       }
     },
-    [history, selectAssetHandler]
+    [selectAssetHandler]
   )
   const renderAssetsTable = useCallback(
     (balances: Balances, loading = false) => {

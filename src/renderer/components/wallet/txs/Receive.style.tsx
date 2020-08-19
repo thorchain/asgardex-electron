@@ -2,7 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import UILabel from '../uielements/label'
+import UILabel from '../../uielements/label'
 
 export const Col = styled(A.Col)`
   padding: 0 30px 20px 30px;

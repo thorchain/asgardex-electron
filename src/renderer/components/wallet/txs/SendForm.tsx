@@ -18,7 +18,7 @@ import {
 } from '../../../services/binance/types'
 import { Input, InputNumber } from '../../uielements/input'
 import AccountSelector from './../AccountSelector'
-import * as Styled from './Send.style'
+import * as Styled from './Form.style'
 
 type Props = {
   assetsWB: AssetsWithBalanceRD
@@ -49,7 +49,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
       if (!value) {
         return Promise.reject(intl.formatMessage({ id: 'wallet.errors.address.empty' }))
       }
-      if (!addressValidation(value)) {
+      if (!addressValidation(value.toLowerCase())) {
         return Promise.reject(intl.formatMessage({ id: 'wallet.errors.address.invalid' }))
       }
     },

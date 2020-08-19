@@ -105,7 +105,7 @@ export const toAssetWithBalances = (balancesRD: BalancesRD, intl?: IntlShape): A
     RD.map(sequenceTOptionFromArray),
     RD.chain((balances) =>
       RD.fromOption(balances, () =>
-        Error(intl?.formatMessage({ id: 'wallet.send.errors.balancesFailed' }) ?? 'Transform failed')
+        Error(intl?.formatMessage({ id: 'wallet.errors.balancesFailed' }) ?? 'Transform failed')
       )
     )
   )
