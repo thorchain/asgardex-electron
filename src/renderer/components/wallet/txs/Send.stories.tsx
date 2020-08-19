@@ -3,10 +3,11 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { assetAmount } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 import { EMPTY, Observable, of } from 'rxjs'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
-import { AssetsWithBalance, AssetWithBalance, TransferRD } from '../../../services/binance/types'
+import { AssetWithBalance, TransferRD, AssetsWithBalanceRD } from '../../../services/binance/types'
 import Send from './Send'
 
 // eslint-disable-next-line
@@ -22,15 +23,28 @@ const selectedAsset: AssetWithBalance = {
   frozenBalance: assetAmount(1)
 }
 
-const balances: AssetsWithBalance = [selectedAsset]
+const balances: AssetsWithBalanceRD = RD.success([selectedAsset])
+const explorerUrl = O.none
 
 storiesOf('Wallet/Send', module)
   .add('send', () => {
-    return <Send selectedAsset={selectedAsset} balances={balances} transactionService={createServiceProp(EMPTY)} />
+    return (
+      <Send
+        selectedAsset={selectedAsset}
+        balances={balances}
+        transactionService={createServiceProp(EMPTY)}
+        explorerUrl={explorerUrl}
+      />
+    )
   })
   .add('pending', () => {
     return (
-      <Send selectedAsset={selectedAsset} balances={balances} transactionService={createServiceProp(of(RD.pending))} />
+      <Send
+        selectedAsset={selectedAsset}
+        balances={balances}
+        transactionService={createServiceProp(of(RD.pending))}
+        explorerUrl={explorerUrl}
+      />
     )
   })
   .add('error', () => {
@@ -39,6 +53,7 @@ storiesOf('Wallet/Send', module)
         selectedAsset={selectedAsset}
         balances={balances}
         transactionService={createServiceProp(of(RD.failure(Error('error example'))))}
+        explorerUrl={explorerUrl}
       />
     )
   })
@@ -57,6 +72,7 @@ storiesOf('Wallet/Send', module)
             })
           )
         )}
+        explorerUrl={explorerUrl}
       />
     )
   })
