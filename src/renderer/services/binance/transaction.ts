@@ -3,10 +3,10 @@ import { Address } from '@thorchain/asgardex-binance'
 import { AssetAmount, Asset } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
-import * as FP from 'fp-ts/lib/pipeable'
 import * as Rx from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
+import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { ClientState } from './service'
 import { TransferRD } from './types'
@@ -38,13 +38,8 @@ const tx$ = ({
     ),
     map(({ result }) => O.fromNullable(result)),
     map((transfers) => RD.fromOption(transfers, () => Error('Transaction: empty response'))),
-    map((transfers) =>
-      FP.pipe(
-        transfers,
-        RD.map(A.head),
-        RD.chain((transfer) => RD.fromOption(transfer, () => Error('Transaction: no results received')))
-      )
-    ),
+    liveData.map(A.head),
+    liveData.chain(liveData.fromOption(() => Error('Transaction: no results received'))),
     catchError((error) => Rx.of(RD.failure(error))),
     startWith(RD.pending)
   )
