@@ -35,12 +35,13 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
     async (a: unknown, stringValue: string) => {
       const value = bn(stringValue)
 
+      // TODO(Veado): Consider fees (https://github.com/thorchain/asgardex-electron/issues/369)
       if (!value.isGreaterThan(0)) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBePositive' }))
+        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }))
       }
 
       if (value.isGreaterThan(maxAmount.amount())) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBeLessThatBalance' }))
+        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' }))
       }
     },
     [maxAmount, intl]
