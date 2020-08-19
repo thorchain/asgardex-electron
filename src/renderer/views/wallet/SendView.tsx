@@ -38,7 +38,6 @@ const SendView: React.FC<Props> = (): JSX.Element => {
     () =>
       FP.pipe(
         client,
-        O.map((c) => c),
         O.map((c) => c.validateAddress),
         O.getOrElse((): AddressValidation => (_: string) => true)
       ),

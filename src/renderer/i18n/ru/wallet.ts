@@ -38,7 +38,7 @@ const wallet: WalletMessages = {
   'wallet.errors.address.empty': "Address can't be empty - RU",
   'wallet.errors.address.invalid': 'Address is invalid - RU',
   'wallet.errors.amount.shouldBeNumber': 'Количество должно быть числом',
-  'wallet.errors.amount.shouldBeGreaterThan': 'Amount should be greater than {amount} - RU',
+  'wallet.errors.amount.shouldBeGreaterThan': 'Количество должно быть больше, чем {amount}',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Количество должно быть меньше вашего баланса'
 }
 

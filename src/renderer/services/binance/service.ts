@@ -331,7 +331,7 @@ const explorerUrl$: Observable<O.Option<string>> = clientState$.pipe(
 
 const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(
   mergeMap((clientState) => Rx.of(getBinanceClient(clientState))),
-  shareReplay()
+  shareReplay(1)
 )
 
 const transaction = transactionServices.createTransactionService(clientState$)
