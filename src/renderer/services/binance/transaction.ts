@@ -14,7 +14,7 @@ import { getBinanceClient } from './utils'
 
 const { get$: txRD$, set: setTxRD } = observableState<TransferRD>(RD.initial)
 
-type SendTxParams = {
+export type SendTxParams = {
   to: Address
   amount: AssetAmount
   asset: Asset

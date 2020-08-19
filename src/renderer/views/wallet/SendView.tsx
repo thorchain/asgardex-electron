@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
 
 import { initial } from '@devexperts/remote-data-ts'
-import * as RD from '@devexperts/remote-data-ts'
 import { assetFromString, assetToString } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -10,7 +9,6 @@ import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 
 import ErrorView from '../../components/shared/error/ErrorView'
-import { LoadingView } from '../../components/shared/loading/LoadingView'
 import BackLink from '../../components/uielements/backLink'
 import Send from '../../components/wallet/txs/Send'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -26,8 +24,9 @@ const SendView: React.FC<Props> = (): JSX.Element => {
 
   const intl = useIntl()
 
-  const { transaction: transactionService, balancesState$ } = useBinanceContext()
+  const { transaction: transactionService, balancesState$, explorerUrl$ } = useBinanceContext()
   const balancesState = useObservableState(balancesState$, initial)
+  const explorerUrl = useObservableState(explorerUrl$, O.none)
   const balances = useMemo(() => toAssetWithBalances(balancesState, intl), [balancesState, intl])
   const oSelectedAssetWB = useMemo(() => getAssetWithBalance(balances, oSelectedAsset), [oSelectedAsset, balances])
 
@@ -45,17 +44,13 @@ const SendView: React.FC<Props> = (): JSX.Element => {
           (selectedAsset) => (
             <>
               <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(selectedAsset.asset) })} />
-              {FP.pipe(
-                balances,
-                RD.fold(
-                  () => <></>,
-                  () => <LoadingView />,
-                  (e) => <ErrorView title={e.message} />,
-                  (balances) => (
-                    <Send selectedAsset={selectedAsset} transactionService={transactionService} balances={balances} />
-                  )
-                )
-              )}
+
+              <Send
+                selectedAsset={selectedAsset}
+                transactionService={transactionService}
+                balances={balances}
+                explorerUrl={explorerUrl}
+              />
             </>
           )
         )

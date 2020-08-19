@@ -1,30 +1,44 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
-import { Address } from '@thorchain/asgardex-binance'
-import { bn, assetToString, Asset, formatAssetAmountCurrency, AssetAmount, assetAmount } from '@thorchain/asgardex-util'
+import * as RD from '@devexperts/remote-data-ts'
+import { bn, assetToString, Asset, formatAssetAmountCurrency, assetAmount } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
+import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import * as walletRoutes from '../../../routes/wallet'
-import { AssetsWithBalance, AssetWithBalance } from '../../../services/binance/types'
+import { SendTxParams } from '../../../services/binance/transaction'
+import { AssetWithBalance, AssetsWithBalanceRD, AssetsWithBalance } from '../../../services/binance/types'
 import { Input, InputNumber } from '../../uielements/input'
 import AccountSelector from './../AccountSelector'
 import * as Styled from './Send.style'
 
 type Props = {
-  assets?: AssetsWithBalance
-  asset: AssetWithBalance
-  onSubmit: ({ to, amount, asset, memo }: { to: Address; amount: AssetAmount; asset: Asset; memo?: string }) => void
+  assetsWB: AssetsWithBalanceRD
+  assetWB: AssetWithBalance
+  onSubmit: ({ to, amount, asset, memo }: SendTxParams) => void
+  isLoading: boolean
 }
 
-export const SendForm: React.FC<Props> = ({ onSubmit: onSubmitProp, assets = [], asset: assetWB }): JSX.Element => {
+export const SendForm: React.FC<Props> = (props): JSX.Element => {
+  const { onSubmit: onSubmitProp, assetsWB, assetWB, isLoading = false } = props
   const intl = useIntl()
   const history = useHistory()
 
   const [form] = Styled.Form.useForm()
 
+  const assets = useMemo(
+    () =>
+      FP.pipe(
+        assetsWB,
+        RD.getOrElse(() => [] as AssetsWithBalance)
+      ),
+    [assetsWB]
+  )
+
+  // TODO (veado): Use BinanceClient.validateAddress()
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
       if (!value || value.length < 8) {
@@ -73,22 +87,24 @@ export const SendForm: React.FC<Props> = ({ onSubmit: onSubmitProp, assets = [],
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
             <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-              <Input color="primary" size="large" />
+              <Input color="primary" size="large" disabled={isLoading} />
             </Form.Item>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              <InputNumber min={0} size="large" />
+              <InputNumber min={0} size="large" disabled={isLoading} />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">
               MAX: {formatAssetAmountCurrency(assetWB.balance, assetToString(assetWB.asset))}
             </Styled.StyledLabel>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
             <Form.Item name="memo">
-              <Input size="large" />
+              <Input size="large" disabled={isLoading} />
             </Form.Item>
           </Styled.SubForm>
           <Styled.SubmitItem>
-            <Styled.Button htmlType="submit">{intl.formatMessage({ id: 'wallet.action.send' })}</Styled.Button>
+            <Styled.Button loading={isLoading} htmlType="submit">
+              {intl.formatMessage({ id: 'wallet.action.send' })}
+            </Styled.Button>
           </Styled.SubmitItem>
         </Styled.Form>
       </Styled.Col>
