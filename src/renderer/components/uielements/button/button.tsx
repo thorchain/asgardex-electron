@@ -27,7 +27,6 @@ const Button: React.FC<Props> = (props: Props): JSX.Element => {
     round = 'false',
     focused = false,
     className = '',
-    loading = false,
     ...otherProps
   } = props
 
@@ -42,7 +41,6 @@ const Button: React.FC<Props> = (props: Props): JSX.Element => {
       sizevalue={sizevalue}
       typevalue={typevalue}
       round={round}
-      loading={loading}
       {...otherProps}>
       {children}
       {props.typevalue === 'normal' && <div className="borderBottom" />}

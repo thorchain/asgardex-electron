@@ -5,8 +5,6 @@ import { Either } from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
 import { Option, option } from 'fp-ts/lib/Option'
 
-import { FixmeType } from '../../types/asgardex'
-
 export type BalancesRD = RD.RemoteData<Error, Balances>
 
 export type AssetWithBalance = {
@@ -50,8 +48,6 @@ export const isSendAction = (action: string): action is SendAction => {
       return false
   }
 }
-
-export type FreezeResult = { result: FixmeType; status: number }
 
 export type FreezeRD = RD.RemoteData<Error, Transfer>
 

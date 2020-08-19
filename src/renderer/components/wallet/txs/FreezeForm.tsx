@@ -79,7 +79,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
                 }
               ]}
               name="amount">
-              <InputNumber min={0} size="large" />
+              <InputNumber min={0} size="large" disabled={isLoading} />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">
               MAX: {formatAssetAmountCurrency(maxAmount, assetToString(assetWB.asset))}
