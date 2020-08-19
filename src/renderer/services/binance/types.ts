@@ -60,3 +60,4 @@ export type FreezeTxParams = {
   asset: Asset
   action: FreezeAction
 }
+export type AddressValidation = BinanceClient['validateAddress']

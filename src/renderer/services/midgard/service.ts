@@ -1,26 +1,16 @@
 import * as RD from '@devexperts/remote-data-ts'
 import byzantine from '@thorchain/byzantine-module'
-import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { some } from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
 import { combineLatest } from 'rxjs'
-import {
-  retry,
-  catchError,
-  concatMap,
-  map,
-  shareReplay,
-  startWith,
-  switchMap,
-  distinctUntilChanged,
-  delay,
-  tap
-} from 'rxjs/operators'
+import { retry, catchError, map, shareReplay, startWith, switchMap, distinctUntilChanged, delay } from 'rxjs/operators'
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
+import { fromPromise$ } from '../../helpers/rx/fromPromise'
+import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
@@ -48,6 +38,12 @@ const { get$: getNetworkState$, set: setNetworkState } = observableState<Network
  */
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
+const nextByzantine: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
+  (network: Network) => byzantine(network === Network.MAIN, true).then(RD.success),
+  RD.pending,
+  RD.failure
+)
+
 /**
  * Endpoint provided by Byzantine
  */
@@ -56,9 +52,23 @@ const byzantine$ = getNetworkState$.pipe(
   // this stream might emit same values and we do need a "dirty check"
   // to avoid to create another instance of byzantine by having same `Network`
   distinctUntilChanged(),
-  switchMap((network) => Rx.from(byzantine(network === Network.MAIN, true))),
-  shareReplay(),
+  switchMap(nextByzantine),
+  shareReplay(1),
   retry(BYZANTINE_MAX_RETRY)
+)
+
+/**
+ * Get data of `Pools` from Midgard
+ */
+const apiGetPools$ = byzantine$.pipe(
+  map(RD.map(getMidgardDefaultApi)),
+  liveData.chain((api) =>
+    pipe(
+      api.getPools(),
+      map(RD.success),
+      catchError((e: Error) => Rx.of(RD.failure(e)))
+    )
+  )
 )
 
 /**
@@ -69,51 +79,48 @@ const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
 
   const assetDetails$ = pipe(
     poolAssets$,
-    switchMap((assets) => apiGetAssetInfo$(assets.join(',')))
+    liveData.map((assets) => assets.join(',')),
+    liveData.chain(apiGetAssetInfo$),
+    shareReplay(1)
   )
 
   const poolDetails$ = pipe(
     poolAssets$,
-    switchMap((assets) => apiGetPoolsData$(assets.join(',')))
+    liveData.map((assets) => assets.join(',')),
+    liveData.chain(apiGetPoolsData$),
+    shareReplay(1)
   )
 
   const pricePools$ = pipe(
     poolDetails$,
-    map((poolDetails) => some(getPricePools(poolDetails, PRICE_POOLS_WHITELIST)))
+    liveData.map((poolDetails) => some(getPricePools(poolDetails, PRICE_POOLS_WHITELIST))),
+    shareReplay(1)
   )
 
   return pipe(
     combineLatest([poolAssets$, assetDetails$, poolDetails$, pricePools$]),
-    map(([poolAssets, assetDetails, poolDetails, pricePools]) => ({
-      poolAssets,
-      assetDetails,
-      poolDetails,
-      pricePools
-    })),
-    tap((state) => {
-      const prevAsset = selectedPricePoolAsset()
-      const pricePools = O.toNullable(state.pricePools)
-      if (pricePools) {
-        const selectedPricePool = pricePoolSelector(pricePools, prevAsset)
-        setSelectedPricePoolAsset(selectedPricePool.asset)
-      }
-    }),
-    map(RD.success),
+    map((state) => RD.combine(...state)),
+    map(
+      RD.map(([poolAssets, assetDetails, poolDetails, pricePools]) => {
+        const prevAsset = selectedPricePoolAsset()
+        const nullablePricePools = O.toNullable(pricePools)
+        if (nullablePricePools) {
+          const selectedPricePool = pricePoolSelector(nullablePricePools, prevAsset)
+          setSelectedPricePoolAsset(selectedPricePool.asset)
+        }
+        return {
+          poolAssets,
+          assetDetails,
+          poolDetails,
+          pricePools
+        }
+      })
+    ),
     startWith(RD.pending),
     catchError((error: Error) => Rx.of(RD.failure(error))),
     retry(MIDGARD_MAX_RETRY)
   )
 }
-
-/**
- * Get data of `Pools` from Midgard
- */
-const apiGetPools$ = byzantine$.pipe(
-  concatMap((endpoint) => {
-    const api = getMidgardDefaultApi(endpoint)
-    return api.getPools()
-  })
-)
 
 /**
  * Get data of `AssetDetails` from Midgard
@@ -123,10 +130,13 @@ const apiGetAssetInfo$ = (asset: string, delayTime = 0) =>
   Rx.of(null).pipe(
     delay(delayTime),
     switchMap(() => byzantine$),
-    switchMap((endpoint) => {
-      const api = getMidgardDefaultApi(endpoint)
-      return api.getAssetInfo({ asset })
-    })
+    liveData.chain((endpoint) =>
+      pipe(
+        getMidgardDefaultApi(endpoint).getAssetInfo({ asset }),
+        map(RD.success),
+        catchError((e: Error) => Rx.of(RD.failure(e)))
+      )
+    )
   )
 
 /**
@@ -137,10 +147,13 @@ const apiGetPoolsData$ = (asset: string, delayTime = 0) =>
   Rx.of(null).pipe(
     delay(delayTime),
     switchMap(() => byzantine$),
-    switchMap((endpoint) => {
-      const api = getMidgardDefaultApi(endpoint)
-      return api.getPoolsData({ asset })
-    })
+    liveData.chain((endpoint) =>
+      pipe(
+        getMidgardDefaultApi(endpoint).getPoolsData({ asset }),
+        map(RD.success),
+        catchError((e: Error) => Rx.of(RD.failure(e)))
+      )
+    )
   )
 
 // `TriggerStream` to reload data of pools
@@ -151,19 +164,22 @@ const { stream$: reloadPoolsState$, trigger: reloadPoolsState } = triggerStream(
  */
 const poolsState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$.pipe(
   // start loading queue
-  switchMap((_) => loadPoolsStateData$().pipe(startWith(RD.pending))),
+  switchMap(loadPoolsStateData$),
   // cache it to avoid reloading data by every subscription
-  shareReplay()
+  shareReplay(1)
 )
 
 /**
  * Get `ThorchainLastblock` data from Midgard
  */
 const apiGetThorchainLastblock$ = byzantine$.pipe(
-  concatMap((endpoint) => {
-    const api = getMidgardDefaultApi(endpoint)
-    return api.getThorchainProxiedLastblock()
-  })
+  liveData.chain((endpoint) =>
+    pipe(
+      getMidgardDefaultApi(endpoint).getThorchainProxiedLastblock(),
+      map(RD.success),
+      catchError((e: Error) => Rx.of(RD.failure(e)))
+    )
+  )
 )
 
 // `TriggerStream` to reload data of `ThorchainLastblock`
@@ -174,8 +190,6 @@ const { stream$: reloadThorchainLastblock$, trigger: reloadThorchainLastblock } 
  */
 const loadThorchainLastblock$ = () =>
   apiGetThorchainLastblock$.pipe(
-    // store result
-    concatMap((result) => Rx.of(RD.success(result))),
     // catch any errors if there any
     catchError((error: Error) => Rx.of(RD.failure(error))),
     startWith(RD.pending),
@@ -189,28 +203,30 @@ const thorchainLastblockState$: Rx.Observable<ThorchainLastblockRD> = reloadThor
   // start request
   switchMap((_) => loadThorchainLastblock$()),
   // cache it to avoid reloading data by every subscription
-  shareReplay()
+  shareReplay(1)
 )
 
 /**
  * Get `ThorchainConstants` data from Midgard
  */
-const apiGetThorchainConstants$ = byzantine$.pipe(
-  concatMap((endpoint) => {
-    const api = getMidgardDefaultApi(endpoint)
-    return api.getThorchainProxiedConstants()
-  })
+const apiGetThorchainConstants$ = pipe(
+  byzantine$,
+  liveData.chain((endpoint) =>
+    pipe(
+      getMidgardDefaultApi(endpoint).getThorchainProxiedConstants(),
+      map(RD.success),
+      catchError((e: Error) => Rx.of(RD.failure(e)))
+    )
+  )
 )
 
 /**
  * Provides data of `ThorchainConstants`
  */
 const thorchainConstantsState$: Rx.Observable<ThorchainConstantsRD> = apiGetThorchainConstants$.pipe(
-  concatMap((result) => Rx.of(RD.success(result))),
-  catchError((error: Error) => Rx.of(RD.failure(error))),
   startWith(RD.pending),
   retry(MIDGARD_MAX_RETRY),
-  shareReplay()
+  shareReplay(1)
 )
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
@@ -233,26 +249,20 @@ const setSelectedPricePoolAsset = (asset: PricePoolAsset) => {
 }
 
 /**
- * API request to get data of `NetworkInfo`
- */
-const apiGetNetworkData$ = byzantine$.pipe(
-  concatMap((endpoint) => {
-    const api = getMidgardDefaultApi(endpoint)
-    return api.getNetworkData()
-  })
-)
-
-/**
  * Loads data of `NetworkInfo`
  */
 const loadNetworkInfo$ = (): Rx.Observable<NetworkInfoRD> =>
-  apiGetNetworkData$.pipe(
-    // store result
-    concatMap((info) => Rx.of(RD.success(info))),
-    // catch any errors if there any
-    catchError((error: Error) => Rx.of(RD.failure(error))),
-    startWith(RD.pending),
-    retry(MIDGARD_MAX_RETRY)
+  pipe(
+    byzantine$,
+    liveData.chain((endpoint) =>
+      pipe(
+        getMidgardDefaultApi(endpoint).getNetworkData(),
+        map(RD.success),
+        startWith(RD.pending),
+        catchError((e: Error) => Rx.of(RD.failure(e))),
+        retry(MIDGARD_MAX_RETRY)
+      )
+    )
   )
 
 // `TriggerStream` to reload `NetworkInfo`
@@ -263,14 +273,9 @@ const { stream$: reloadNetworkInfo$, trigger: reloadNetworkInfo } = triggerStrea
  */
 const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
   // start request
-  switchMap((_) => loadNetworkInfo$()),
+  switchMap(loadNetworkInfo$),
   // cache it to avoid reloading data by every subscription
-  shareReplay()
-)
-
-const apiEndpoint$: Rx.Observable<E.Either<Error, string>> = byzantine$.pipe(
-  map((endpoint) => E.right(endpoint)),
-  catchError((error: Error) => Rx.of(E.left(error)))
+  shareReplay(1)
 )
 
 /**
@@ -287,5 +292,5 @@ export const service = {
   reloadThorchainLastblock,
   setSelectedPricePool: setSelectedPricePoolAsset,
   selectedPricePoolAsset$,
-  apiEndpoint$
+  apiEndpoint$: byzantine$
 }

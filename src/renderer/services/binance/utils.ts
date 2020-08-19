@@ -19,7 +19,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { IntlShape } from 'react-intl'
 
-import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
+import { sequenceTOptionFromArray, sequenceTOption } from '../../helpers/fpHelpers'
 import { BalancesRD, AssetWithBalance, AssetsWithBalanceRD } from '../../services/binance/types'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
@@ -90,36 +90,36 @@ export const bncSymbolToAssetString = (symbol: string) => `BNB.${symbol}`
 export const toAssetWithBalances = (balancesRD: BalancesRD, intl?: IntlShape): AssetsWithBalanceRD =>
   FP.pipe(
     balancesRD,
-    RD.map((balances) =>
-      FP.pipe(
-        balances.map((balance) =>
-          FP.pipe(
-            bncSymbolToAsset(balance.symbol),
-            O.map<Asset, AssetWithBalance>((asset) => ({
-              asset,
-              balance: assetAmount(balance.free),
-              frozenBalance: assetAmount(balance.frozen)
-            }))
-          )
-        ),
-        sequenceTOptionFromArray
+    RD.map(
+      A.map((balance) =>
+        FP.pipe(
+          bncSymbolToAsset(balance.symbol),
+          O.map<Asset, AssetWithBalance>((asset) => ({
+            asset,
+            balance: assetAmount(balance.free),
+            frozenBalance: assetAmount(balance.frozen)
+          }))
+        )
       )
     ),
+    RD.map(sequenceTOptionFromArray),
     RD.chain((balances) =>
       RD.fromOption(balances, () =>
-        Error(intl?.formatMessage({ id: 'wallet.send.errors.balancesFailed' }) ?? 'Transform failed')
+        Error(intl?.formatMessage({ id: 'wallet.errors.balancesFailed' }) ?? 'Transform failed')
       )
     )
   )
 
 export const getAssetWithBalance = (
   balancesRD: AssetsWithBalanceRD,
-  asset: O.Option<Asset>
+  oAsset: O.Option<Asset>
 ): O.Option<AssetWithBalance> =>
   FP.pipe(
-    asset,
-    O.chain((asset) =>
-      FP.pipe(balancesRD, RD.map(A.findFirst((assetWB) => assetWB.asset.symbol === asset.symbol)), RD.toOption)
-    ),
-    O.flatten
+    sequenceTOption(oAsset, RD.toOption(balancesRD)),
+    O.chain(([asset, balances]) =>
+      FP.pipe(
+        balances,
+        A.findFirst((assetWB) => assetWB.asset.symbol === asset.symbol)
+      )
+    )
   )

@@ -331,7 +331,14 @@ const explorerUrl$: Observable<O.Option<string>> = clientState$.pipe(
 )
 
 const transaction = createTransactionService(clientState$)
+
 const freeze = createFreezeService(clientState$)
+
+const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(
+  mergeMap((clientState) => Rx.of(getBinanceClient(clientState))),
+  shareReplay(1)
+)
+
 /**
  * Object with all "public" functions and observables
  */
@@ -350,5 +357,6 @@ export {
   selectedAsset$,
   explorerUrl$,
   transaction,
-  freeze
+  freeze,
+  client$
 }

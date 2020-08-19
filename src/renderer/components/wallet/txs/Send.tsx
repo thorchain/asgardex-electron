@@ -1,56 +1,88 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { BinanceContextValue } from '../../../contexts/BinanceContext'
-import { AssetWithBalance, AssetsWithBalance, TransferRD } from '../../../services/binance/types'
+import { AssetWithBalance, TransferRD, AssetsWithBalanceRD, AddressValidation } from '../../../services/binance/types'
 import ErrorView from '../../shared/error/ErrorView'
-import { LoadingView } from '../../shared/loading/LoadingView'
+import SuccessView from '../../shared/success/SuccessView'
+import Button from '../../uielements/button'
 import * as Styled from './Form.style'
 import { SendForm } from './SendForm'
 
 type Props = {
   transactionService: BinanceContextValue['transaction']
-  balances: AssetsWithBalance
+  balances: AssetsWithBalanceRD
   selectedAsset: AssetWithBalance
+  explorerUrl: O.Option<string>
+  addressValidation: AddressValidation
 }
 
-const Send: React.FC<Props> = ({ transactionService, balances, selectedAsset }): JSX.Element => {
+const Send: React.FC<Props> = (props): JSX.Element => {
+  const { transactionService, balances, selectedAsset, explorerUrl = O.none, addressValidation } = props
   const intl = useIntl()
 
-  const { tx$: transaction$, resetTx, pushTx } = transactionService
+  const { txRD$, resetTx, pushTx } = transactionService
 
   useEffect(() => {
     resetTx()
   }, [resetTx])
 
-  const transaction = useObservableState<TransferRD>(transaction$, RD.initial)
+  const txRD = useObservableState<TransferRD>(txRD$, RD.initial)
 
   const renderErrorBtn = useMemo(
     () => <Styled.Button onClick={resetTx}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,
     [intl, resetTx]
   )
 
+  const renderSuccessBtn = useCallback(
+    (txHash: string) => {
+      const onClickHandler = () => {
+        FP.pipe(
+          explorerUrl,
+          O.map((url) => window.apiUrl.openExternal(`${url}/tx/${txHash}`))
+        )
+      }
+      return (
+        <Button round="true" onClick={onClickHandler} sizevalue="normal">
+          <Styled.ButtonLinkIcon />
+          {intl.formatMessage({ id: 'common.transaction' })}
+        </Button>
+      )
+    },
+    [intl, explorerUrl]
+  )
+
+  const renderForm = useMemo(
+    () => (
+      <SendForm
+        assetWB={selectedAsset}
+        onSubmit={pushTx}
+        assetsWB={balances}
+        isLoading={RD.isPending(txRD)}
+        addressValidation={addressValidation}
+      />
+    ),
+    [selectedAsset, pushTx, balances, txRD, addressValidation]
+  )
+
   return (
     <>
       {FP.pipe(
-        transaction,
+        txRD,
         RD.fold(
-          () => <SendForm asset={selectedAsset} onSubmit={pushTx} assets={balances} />,
-          () => <LoadingView />,
+          () => renderForm,
+          () => renderForm,
           (error) => {
             const msg = error?.toString() ?? ''
             return <ErrorView title={msg} extra={renderErrorBtn} />
           },
-          () => (
-            <Styled.Result
-              status="success"
-              title={<Styled.Text>{intl.formatMessage({ id: 'common.success' })}</Styled.Text>}
-              extra={<Styled.Button onClick={transactionService.resetTx}>OK</Styled.Button>}
-            />
+          ({ hash }) => (
+            <SuccessView title={intl.formatMessage({ id: 'common.success' })} extra={renderSuccessBtn(hash)} />
           )
         )
       )}

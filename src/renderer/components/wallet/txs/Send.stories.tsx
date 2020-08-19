@@ -1,18 +1,19 @@
 import React from 'react'
 
-import { failure, initial, pending, success } from '@devexperts/remote-data-ts'
+import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { assetAmount } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 import { EMPTY, Observable, of } from 'rxjs'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
-import { AssetsWithBalance, AssetWithBalance, TransferRD } from '../../../services/binance/types'
+import { AssetWithBalance, TransferRD, AssetsWithBalanceRD, AddressValidation } from '../../../services/binance/types'
 import Send from './Send'
 
 // eslint-disable-next-line
 const createServiceProp = (value: Observable<TransferRD>) => ({
-  tx$: value,
-  pushTx: () => of(initial).subscribe(),
+  txRD$: value,
+  pushTx: () => of(RD.initial).subscribe(),
   resetTx: () => null
 })
 
@@ -22,15 +23,31 @@ const selectedAsset: AssetWithBalance = {
   frozenBalance: assetAmount(1)
 }
 
-const balances: AssetsWithBalance = [selectedAsset]
+const balances: AssetsWithBalanceRD = RD.success([selectedAsset])
+const explorerUrl = O.none
+const addressValidation: AddressValidation = (_) => true
 
 storiesOf('Wallet/Send', module)
   .add('send', () => {
-    return <Send selectedAsset={selectedAsset} balances={balances} transactionService={createServiceProp(EMPTY)} />
+    return (
+      <Send
+        selectedAsset={selectedAsset}
+        balances={balances}
+        transactionService={createServiceProp(EMPTY)}
+        explorerUrl={explorerUrl}
+        addressValidation={addressValidation}
+      />
+    )
   })
   .add('pending', () => {
     return (
-      <Send selectedAsset={selectedAsset} balances={balances} transactionService={createServiceProp(of(pending))} />
+      <Send
+        selectedAsset={selectedAsset}
+        balances={balances}
+        transactionService={createServiceProp(of(RD.pending))}
+        explorerUrl={explorerUrl}
+        addressValidation={addressValidation}
+      />
     )
   })
   .add('error', () => {
@@ -38,7 +55,9 @@ storiesOf('Wallet/Send', module)
       <Send
         selectedAsset={selectedAsset}
         balances={balances}
-        transactionService={createServiceProp(of(failure(Error('error example'))))}
+        transactionService={createServiceProp(of(RD.failure(Error('error example'))))}
+        explorerUrl={explorerUrl}
+        addressValidation={addressValidation}
       />
     )
   })
@@ -47,16 +66,18 @@ storiesOf('Wallet/Send', module)
       <Send
         selectedAsset={selectedAsset}
         balances={balances}
+        addressValidation={addressValidation}
         transactionService={createServiceProp(
           of(
-            success({
+            RD.success({
               code: 200,
-              hash: '',
+              hash: 'ABC123',
               log: '',
               ok: true
             })
           )
         )}
+        explorerUrl={explorerUrl}
       />
     )
   })
