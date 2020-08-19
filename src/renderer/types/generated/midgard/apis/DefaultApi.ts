@@ -26,14 +26,16 @@ import {
     ThorchainConstants,
     ThorchainEndpoints,
     ThorchainLastblock,
+    TotalVolChanges,
 } from '../models';
 
 export interface GetAssetInfoRequest {
     asset: string;
 }
 
-export interface GetPoolsDataRequest {
+export interface GetPoolsDetailsRequest {
     asset: string;
+    view?: GetPoolsDetailsViewEnum;
 }
 
 export interface GetStakersAddressAndAssetDataRequest {
@@ -43,6 +45,12 @@ export interface GetStakersAddressAndAssetDataRequest {
 
 export interface GetStakersAddressDataRequest {
     address: string;
+}
+
+export interface GetTotalVolChangesRequest {
+    interval: GetTotalVolChangesIntervalEnum;
+    from: number;
+    to: number;
 }
 
 export interface GetTxDetailsRequest {
@@ -122,15 +130,17 @@ export class DefaultApi extends BaseAPI {
     };
 
     /**
-     * Returns an object containing all the pool data for that asset. All assets on BEPSwap have associated pools.
-     * Get Pools Data
+     * Returns an object containing all the pool details for that asset.
+     * Get Pools Details
      */
-    getPoolsData = ({ asset }: GetPoolsDataRequest): Observable<Array<PoolDetail>> => {
-        throwIfNullOrUndefined(asset, 'getPoolsData');
+    getPoolsDetails = ({ asset, view }: GetPoolsDetailsRequest): Observable<Array<PoolDetail>> => {
+        throwIfNullOrUndefined(asset, 'getPoolsDetails');
 
         const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
             'asset': asset,
         };
+
+        if (view != null) { query['view'] = view; }
 
         return this.request<Array<PoolDetail>>({
             path: '/v1/pools/detail',
@@ -227,6 +237,28 @@ export class DefaultApi extends BaseAPI {
     };
 
     /**
+     * Returns total volume changes of all pools in specified interval
+     * Get Total Volume Changes
+     */
+    getTotalVolChanges = ({ interval, from, to }: GetTotalVolChangesRequest): Observable<Array<TotalVolChanges>> => {
+        throwIfNullOrUndefined(interval, 'getTotalVolChanges');
+        throwIfNullOrUndefined(from, 'getTotalVolChanges');
+        throwIfNullOrUndefined(to, 'getTotalVolChanges');
+
+        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
+            'interval': interval,
+            'from': from,
+            'to': to,
+        };
+
+        return this.request<Array<TotalVolChanges>>({
+            path: '/v1/history/total_volume',
+            method: 'GET',
+            query,
+        });
+    };
+
+    /**
      * Return an array containing the event details
      * Get details of a tx by address, asset or tx-id
      */
@@ -251,4 +283,26 @@ export class DefaultApi extends BaseAPI {
         });
     };
 
+}
+
+/**
+ * @export
+ * @enum {string}
+ */
+export enum GetPoolsDetailsViewEnum {
+    Balances = 'balances',
+    Simple = 'simple',
+    Full = 'full'
+}
+/**
+ * @export
+ * @enum {string}
+ */
+export enum GetTotalVolChangesIntervalEnum {
+    _5min = '5min',
+    Hour = 'hour',
+    Day = 'day',
+    Week = 'week',
+    Month = 'month',
+    Year = 'year'
 }

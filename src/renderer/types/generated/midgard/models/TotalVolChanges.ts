@@ -13,28 +13,27 @@
 
 /**
  * @export
- * @interface StakersAssetData
+ * @interface TotalVolChanges
  */
-export interface StakersAssetData {
+export interface TotalVolChanges {
     /**
      * @type {string}
-     * @memberof StakersAssetData
+     * @memberof TotalVolChanges
      */
-    asset?: string;
+    buyVolume?: string;
     /**
-     * @type {number}
-     * @memberof StakersAssetData
-     */
-    dateFirstStaked?: number;
-    /**
-     * @type {number}
-     * @memberof StakersAssetData
-     */
-    heightLastStaked?: number;
-    /**
-     * Represents ownership of a pool.
      * @type {string}
-     * @memberof StakersAssetData
+     * @memberof TotalVolChanges
      */
-    stakeUnits?: string;
+    sellVolume?: string;
+    /**
+     * @type {number}
+     * @memberof TotalVolChanges
+     */
+    time?: number;
+    /**
+     * @type {string}
+     * @memberof TotalVolChanges
+     */
+    totalVolume?: string;
 }
