@@ -21,5 +21,6 @@ export * from './ThorchainEndpoints';
 export * from './ThorchainInt64Constants';
 export * from './ThorchainLastblock';
 export * from './ThorchainStringConstants';
+export * from './TotalVolChanges';
 export * from './Tx';
 export * from './TxDetails';
