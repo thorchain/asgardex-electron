@@ -329,6 +329,11 @@ const explorerUrl$: Observable<O.Option<string>> = clientState$.pipe(
   shareReplay()
 )
 
+const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(
+  mergeMap((clientState) => Rx.of(getBinanceClient(clientState))),
+  shareReplay(1)
+)
+
 const transaction = transactionServices.createTransactionService(clientState$)
 /**
  * Object with all "public" functions and observables
@@ -347,5 +352,6 @@ export {
   address$,
   selectedAsset$,
   explorerUrl$,
-  transaction
+  transaction,
+  client$
 }

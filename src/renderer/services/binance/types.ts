@@ -48,3 +48,5 @@ export const isSendAction = (action: string): action is SendAction => {
       return false
   }
 }
+
+export type AddressValidation = BinanceClient['validateAddress']

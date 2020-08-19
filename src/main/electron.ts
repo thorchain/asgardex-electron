@@ -14,10 +14,11 @@ import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
 export const IS_DEV = isDev && process.env.NODE_ENV !== 'production'
+export const PORT = process.env.PORT || 3000
 
 export const APP_ROOT = join(__dirname, '..', '..')
 
-const BASE_URL_DEV = 'http://localhost:3000'
+const BASE_URL_DEV = `http://localhost:${PORT}`
 const BASE_URL_PROD = `file://${join(__dirname, '../build/index.html')}`
 // use dev server for hot reload or file in production
 export const BASE_URL = IS_DEV ? BASE_URL_DEV : BASE_URL_PROD

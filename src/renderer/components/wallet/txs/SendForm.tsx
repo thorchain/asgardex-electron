@@ -10,7 +10,12 @@ import { useHistory } from 'react-router-dom'
 
 import * as walletRoutes from '../../../routes/wallet'
 import { SendTxParams } from '../../../services/binance/transaction'
-import { AssetWithBalance, AssetsWithBalanceRD, AssetsWithBalance } from '../../../services/binance/types'
+import {
+  AssetWithBalance,
+  AssetsWithBalanceRD,
+  AssetsWithBalance,
+  AddressValidation
+} from '../../../services/binance/types'
 import { Input, InputNumber } from '../../uielements/input'
 import AccountSelector from './../AccountSelector'
 import * as Styled from './Send.style'
@@ -20,10 +25,11 @@ type Props = {
   assetWB: AssetWithBalance
   onSubmit: ({ to, amount, asset, memo }: SendTxParams) => void
   isLoading: boolean
+  addressValidation: AddressValidation
 }
 
 export const SendForm: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit: onSubmitProp, assetsWB, assetWB, isLoading = false } = props
+  const { onSubmit: onSubmitProp, assetsWB, assetWB, isLoading = false, addressValidation } = props
   const intl = useIntl()
   const history = useHistory()
 
@@ -38,29 +44,32 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     [assetsWB]
   )
 
-  // TODO (veado): Use BinanceClient.validateAddress()
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
-      if (!value || value.length < 8) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.address.length' }))
+      if (!value) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.address.empty' }))
+      }
+      if (!addressValidation(value)) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.address.invalid' }))
       }
     },
-    [intl]
+    [addressValidation, intl]
   )
 
   const amountValidator = useCallback(
     async (_: unknown, stringValue: string) => {
       const value = bn(stringValue)
       if (Number.isNaN(value)) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBeNumber' }))
+        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }))
       }
 
+      // TODO(Veado): Consider fees (https://github.com/thorchain/asgardex-electron/issues/369)
       if (!value.isGreaterThan(0)) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBePositive' }))
+        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }))
       }
 
       if (value.isGreaterThan(assetWB.balance.amount())) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.send.errors.amount.shouldBeLessThatBalance' }))
+        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' }))
       }
     },
     [assetWB, intl]

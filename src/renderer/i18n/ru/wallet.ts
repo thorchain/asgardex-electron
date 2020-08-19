@@ -34,11 +34,12 @@ const wallet: WalletMessages = {
   'wallet.create.error': 'Ошибка при сохранении фрразы',
   'wallet.receive.address.error': 'Нет доступных адресов для получения',
   'wallet.receive.address.errorQR': 'Ошибка при создании QR-кода: {error}',
-  'wallet.send.errors.balancesFailed': 'Нет загруженных балансов',
-  'wallet.send.errors.address.length': 'Адрес должен содержать минмум 8 символов',
-  'wallet.send.errors.amount.shouldBeNumber': 'Количество должно быть числом',
-  'wallet.send.errors.amount.shouldBePositive': 'Количество должно быть положительным числом',
-  'wallet.send.errors.amount.shouldBeLessThatBalance': 'Количество должно быть меньше вашего баланса'
+  'wallet.errors.balancesFailed': 'Нет загруженных балансов',
+  'wallet.errors.address.empty': "Address can't be empty - RU",
+  'wallet.errors.address.invalid': 'Address is invalid - RU',
+  'wallet.errors.amount.shouldBeNumber': 'Количество должно быть числом',
+  'wallet.errors.amount.shouldBeGreaterThan': 'Количество должно быть больше, чем {amount}',
+  'wallet.errors.amount.shouldBeLessThanBalance': 'Количество должно быть меньше вашего баланса'
 }
 
 export default wallet
