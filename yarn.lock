@@ -1199,10 +1199,9 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@binance-chain/javascript-sdk@^4.0.5":
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/@binance-chain/javascript-sdk/-/javascript-sdk-4.0.5.tgz#9225b81b45d6823784dc59fe73e223c651037ffa"
-  integrity sha512-vlIaY/Gc5rN1hBAEPvXr5LyHnXlA5/0NkdPSI5hRfiRcixhFj7/Iso5CTg4kI/xKr3JFtfyLFo6fWqyoP8IgYA==
+"@binance-chain/javascript-sdk@https://github.com/veado/javascript-sdk#fix/tokenmanager-instance-lib":
+  version "0.0.0-development"
+  resolved "https://github.com/veado/javascript-sdk#06aac30e1274d24b39336fb822a93e2c8d5eb53f"
   dependencies:
     "@babel/runtime" "^7.10.4"
     "@ledgerhq/hw-transport-u2f" "^5.9.0"
@@ -1232,7 +1231,7 @@
     eslint-utils "^1.4.2"
     events "^3.0.0"
     is_js "^0.9.0"
-    lodash "^4.17.15"
+    lodash "^4.17.19"
     minimist "^1.2.5"
     ndjson "^1.5.0"
     protocol-buffers-encodings "^1.1.0"
@@ -2534,10 +2533,9 @@
   dependencies:
     "@babel/runtime" "^7.10.2"
 
-"@thorchain/asgardex-binance@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-binance/-/asgardex-binance-2.0.0.tgz#0a82c9db499bd7242841675839e89f773aad131c"
-  integrity sha512-BaOdsrOzEXaD98npbIyyVMtoA6JTc6BrC+HLQzg74GmKK8O2YOR8oa/l7rynArxMPVBaIZe6j18KfKfwO2fQzg==
+"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#a5932e9046046ccfe07ef530caa1a2ffc3eee2e4":
+  version "2.1.1"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#a5932e9046046ccfe07ef530caa1a2ffc3eee2e4"
 
 "@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git":
   version "0.1.0"

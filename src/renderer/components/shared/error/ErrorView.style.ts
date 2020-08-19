@@ -5,6 +5,8 @@ import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
 
+// TODO(Veado): Extract common styles of `ErrorView.style` + `SuccessView.style` into on `*.style` file
+
 export const Result = styled(A.Result)`
   display: flex;
   flex-direction: column;
@@ -14,6 +16,13 @@ export const Result = styled(A.Result)`
     padding: 50px 10px;
   `}
   background-color: ${palette('background', 1)};
+
+  .ant-result-title{
+    color: ${palette('text', 0)};
+  }
+  .ant-result-subtitle{
+    color: ${palette('text', 1)};
+  }
 
 `
 export const IconWrapper = styled.div`

@@ -1,61 +1,54 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@thorchain/asgardex-binance'
+import { AssetAmount, Asset } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
-import * as FP from 'fp-ts/lib/pipeable'
 import * as Rx from 'rxjs'
-import { catchError, map, startWith, switchMap, tap } from 'rxjs/operators'
+import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
+import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { ClientState } from './service'
+import { TransferRD } from './types'
+import { getBinanceClient } from './utils'
 
-type Transaction = {
-  code: number
-  hash: string
-  log: string
-  ok: boolean
+const { get$: txRD$, set: setTxRD } = observableState<TransferRD>(RD.initial)
+
+export type SendTxParams = {
+  to: Address
+  amount: AssetAmount
+  asset: Asset
+  memo?: string
 }
 
-const { get$: transaction$, set: setTransaction } = observableState<RD.RemoteData<Error, Transaction>>(RD.initial)
+const tx$ = ({
+  clientState$,
+  to,
+  amount,
+  asset: { symbol },
+  memo
+}: { clientState$: ClientState } & SendTxParams): Rx.Observable<TransferRD> =>
+  clientState$.pipe(
+    map(getBinanceClient),
+    switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY)),
+    switchMap((client) =>
+      memo
+        ? Rx.from(client.vaultTx(to, amount.amount().toNumber(), symbol, memo))
+        : Rx.from(client.normalTx(to, amount.amount().toNumber(), symbol))
+    ),
+    map(({ result }) => O.fromNullable(result)),
+    map((transfers) => RD.fromOption(transfers, () => Error('Transaction: empty response'))),
+    liveData.map(A.head),
+    liveData.chain(liveData.fromOption(() => Error('Transaction: no results received'))),
+    catchError((error) => Rx.of(RD.failure(error))),
+    startWith(RD.pending)
+  )
 
-const pushTx = (client: ClientState) => (addressTo: Address, amount: number, asset: string, memo?: string) => {
-  return client
-    .pipe(
-      map(O.chain(O.fromEither)),
-      switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY))
-    )
-    .pipe(
-      switchMap((client) =>
-        memo
-          ? Rx.from(client.vaultTx(addressTo, amount, asset, memo))
-          : Rx.from(client.normalTx(addressTo, amount, asset))
-      ),
-      map((r) => O.fromNullable(r.result)),
-      map((r) => RD.fromOption(r, () => Error('Transaction: empty response'))),
-      map((r) =>
-        FP.pipe(
-          r,
-          RD.map(A.head),
-          RD.chain((r) => RD.fromOption(r, () => Error('Transaction: no results received'))),
-          RD.map((r) => ({
-            code: r.code,
-            hash: r.hash,
-            log: r.log,
-            ok: r.ok
-          }))
-        )
-      ),
-      catchError((e) => {
-        return Rx.of(RD.failure(e))
-      }),
-      startWith(RD.pending),
-      tap(setTransaction)
-    )
-    .subscribe()
-}
+const pushTx = (clientState$: ClientState) => ({ to, amount, asset, memo }: SendTxParams) =>
+  tx$({ clientState$, to, amount, asset, memo }).subscribe(setTxRD)
 
-export const createTransactionService = (client: ClientState) => ({
-  transaction$,
-  pushTx: pushTx(client),
-  resetTx: () => setTransaction(RD.initial)
+export const createTransactionService = (client$: ClientState) => ({
+  txRD$,
+  pushTx: pushTx(client$),
+  resetTx: () => setTxRD(RD.initial)
 })

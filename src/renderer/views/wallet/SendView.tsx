@@ -1,56 +1,62 @@
 import React, { useMemo } from 'react'
 
 import { initial } from '@devexperts/remote-data-ts'
-import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, bn } from '@thorchain/asgardex-util'
-import * as A from 'fp-ts/Array'
+import { assetFromString, assetToString } from '@thorchain/asgardex-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
-import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 
-import Send from '../../components/wallet/Send'
+import ErrorView from '../../components/shared/error/ErrorView'
+import BackLink from '../../components/uielements/backLink'
+import Send from '../../components/wallet/txs/Send'
 import { useBinanceContext } from '../../contexts/BinanceContext'
-import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { SendParams } from '../../routes/wallet'
-import { bncSymbolToAsset } from '../../services/binance/utils'
+import * as walletRoutes from '../../routes/wallet'
+import { toAssetWithBalances, getAssetWithBalance } from '../../services/binance/utils'
 
-const SendView: React.FC = (): JSX.Element => {
-  const { transaction, balancesState$ } = useBinanceContext()
-  const { asset: assetParam } = useParams<SendParams>()
-  const balancesState = useObservableState(balancesState$, initial)
+type Props = {}
+
+const SendView: React.FC<Props> = (): JSX.Element => {
+  const { asset } = useParams<SendParams>()
+  const oSelectedAsset = O.fromNullable(assetFromString(asset))
+
   const intl = useIntl()
 
-  const asset = assetFromString(assetParam)
-  const balances = useMemo(
-    () =>
-      pipe(
-        balancesState,
-        RD.map((balances) =>
-          pipe(
-            balances.map((balance) =>
-              pipe(
-                bncSymbolToAsset(balance.symbol),
-                O.map((asset) => ({ ...asset, balance: bn(balance.free) }))
-              )
-            ),
-            sequenceTOptionFromArray
-          )
-        ),
-        RD.chain((balances) =>
-          RD.fromOption(balances, () => Error(intl.formatMessage({ id: 'wallet.send.errors.balancesFailed' })))
-        )
-      ),
-    [balancesState, intl]
-  )
-  const initialActiveAsset = useMemo(
-    () => pipe(balances, RD.map(A.findFirst((balance) => balance.symbol === asset?.symbol))),
-    [balances, asset]
-  )
+  const { transaction: transactionService, balancesState$, explorerUrl$ } = useBinanceContext()
+  const balancesState = useObservableState(balancesState$, initial)
+  const explorerUrl = useObservableState(explorerUrl$, O.none)
+  const balances = useMemo(() => toAssetWithBalances(balancesState, intl), [balancesState, intl])
+  const oSelectedAssetWB = useMemo(() => getAssetWithBalance(balances, oSelectedAsset), [oSelectedAsset, balances])
 
-  // `balances` will be fixed in https://github.com/thorchain/asgardex-electron/pull/340
-  return <Send transactionService={transaction} balances={RD.initial} initialActiveAsset={initialActiveAsset} />
+  if (O.isNone(oSelectedAsset)) {
+    return (
+      <>
+        <BackLink />
+        <ErrorView title={`Parsing asset ${asset} from route failed`} />
+      </>
+    )
+  }
+
+  return FP.pipe(
+    oSelectedAssetWB,
+    O.fold(
+      () => <></>,
+      (selectedAsset) => (
+        <>
+          <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(selectedAsset.asset) })} />
+
+          <Send
+            selectedAsset={selectedAsset}
+            transactionService={transactionService}
+            balances={balances}
+            explorerUrl={explorerUrl}
+          />
+        </>
+      )
+    )
+  )
 }
 
 export default SendView

@@ -33,6 +33,7 @@ type CommonMessageKey =
   | 'common.asset'
   | 'common.assets'
   | 'common.price'
+  | 'common.transaction'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

@@ -1,3 +1,4 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { BinanceClient } from '@thorchain/asgardex-binance'
 import { Balance } from '@thorchain/asgardex-binance'
 import {
@@ -12,10 +13,14 @@ import {
   getValueOfRuneInAsset,
   Asset
 } from '@thorchain/asgardex-util'
+import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import { IntlShape } from 'react-intl'
 
+import { sequenceTOptionFromArray, sequenceTOption } from '../../helpers/fpHelpers'
+import { BalancesRD, AssetWithBalance, AssetsWithBalanceRD } from '../../services/binance/types'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
 import { BinanceClientState, BinanceClientStateM, BinanceClientStateForViews } from './types'
@@ -81,3 +86,40 @@ export const bncSymbolToAsset = (symbol: string): O.Option<Asset> =>
  * Converts a BinanceChain symbol to an `Asset` string
  **/
 export const bncSymbolToAssetString = (symbol: string) => `BNB.${symbol}`
+
+export const toAssetWithBalances = (balancesRD: BalancesRD, intl?: IntlShape): AssetsWithBalanceRD =>
+  FP.pipe(
+    balancesRD,
+    RD.map(
+      A.map((balance) =>
+        FP.pipe(
+          bncSymbolToAsset(balance.symbol),
+          O.map<Asset, AssetWithBalance>((asset) => ({
+            asset,
+            balance: assetAmount(balance.free),
+            frozenBalance: assetAmount(balance.frozen)
+          }))
+        )
+      )
+    ),
+    RD.map(sequenceTOptionFromArray),
+    RD.chain((balances) =>
+      RD.fromOption(balances, () =>
+        Error(intl?.formatMessage({ id: 'wallet.send.errors.balancesFailed' }) ?? 'Transform failed')
+      )
+    )
+  )
+
+export const getAssetWithBalance = (
+  balancesRD: AssetsWithBalanceRD,
+  oAsset: O.Option<Asset>
+): O.Option<AssetWithBalance> =>
+  FP.pipe(
+    sequenceTOption(oAsset, RD.toOption(balancesRD)),
+    O.chain(([asset, balances]) =>
+      FP.pipe(
+        balances,
+        A.findFirst((assetWB) => assetWB.asset.symbol === asset.symbol)
+      )
+    )
+  )
