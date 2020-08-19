@@ -30,32 +30,32 @@ const SendView: React.FC<Props> = (): JSX.Element => {
   const balances = useMemo(() => toAssetWithBalances(balancesState, intl), [balancesState, intl])
   const oSelectedAssetWB = useMemo(() => getAssetWithBalance(balances, oSelectedAsset), [oSelectedAsset, balances])
 
-  return (
-    <>
-      {FP.pipe(
-        oSelectedAssetWB,
-        O.fold(
-          () => (
-            <>
-              <BackLink />
-              <ErrorView title={`Parsing asset ${asset} from route failed`} />
-            </>
-          ),
-          (selectedAsset) => (
-            <>
-              <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(selectedAsset.asset) })} />
+  if (O.isNone(oSelectedAsset)) {
+    return (
+      <>
+        <BackLink />
+        <ErrorView title={`Parsing asset ${asset} from route failed`} />
+      </>
+    )
+  }
 
-              <Send
-                selectedAsset={selectedAsset}
-                transactionService={transactionService}
-                balances={balances}
-                explorerUrl={explorerUrl}
-              />
-            </>
-          )
-        )
-      )}
-    </>
+  return FP.pipe(
+    oSelectedAssetWB,
+    O.fold(
+      () => <></>,
+      (selectedAsset) => (
+        <>
+          <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(selectedAsset.asset) })} />
+
+          <Send
+            selectedAsset={selectedAsset}
+            transactionService={transactionService}
+            balances={balances}
+            explorerUrl={explorerUrl}
+          />
+        </>
+      )
+    )
   )
 }
 
