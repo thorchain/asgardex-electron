@@ -34,11 +34,12 @@ const wallet: WalletMessages = {
   'wallet.create.error': 'Fehler beim Abspeichern der Phrase',
   'wallet.receive.address.error': 'Keine Addresse für den Empfang vorhanden',
   'wallet.receive.address.errorQR': 'Error beim Rendern des QR Codes: {error}',
-  'wallet.send.errors.balancesFailed': 'No balances loaded - DE',
-  'wallet.send.errors.address.length': 'Address should be at least 8 symbols length - DE',
-  'wallet.send.errors.amount.shouldBeNumber': 'Amount should be a number - DE',
-  'wallet.send.errors.amount.shouldBePositive': 'Amount should be positive - DE',
-  'wallet.send.errors.amount.shouldBeLessThatBalance': 'Amount should be less than your balance - DE'
+  'wallet.errors.balancesFailed': 'No balances loaded - DE',
+  'wallet.errors.address.empty': 'Keine Addresse angegeben',
+  'wallet.errors.address.invalid': 'Addresse ist nicht valide',
+  'wallet.errors.amount.shouldBeNumber': 'Wert sollte eine Nummer sein',
+  'wallet.errors.amount.shouldBeGreaterThan': 'Wert sollte größer als {amount} betragen',
+  'wallet.errors.amount.shouldBeLessThanBalance': 'Wert sollte geringer als Ihr Guthaben sein'
 }
 
 export default wallet

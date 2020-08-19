@@ -7,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import { EMPTY, Observable, of } from 'rxjs'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
-import { AssetWithBalance, TransferRD, AssetsWithBalanceRD } from '../../../services/binance/types'
+import { AssetWithBalance, TransferRD, AssetsWithBalanceRD, AddressValidation } from '../../../services/binance/types'
 import Send from './Send'
 
 // eslint-disable-next-line
@@ -25,6 +25,7 @@ const selectedAsset: AssetWithBalance = {
 
 const balances: AssetsWithBalanceRD = RD.success([selectedAsset])
 const explorerUrl = O.none
+const addressValidation: AddressValidation = (_) => true
 
 storiesOf('Wallet/Send', module)
   .add('send', () => {
@@ -34,6 +35,7 @@ storiesOf('Wallet/Send', module)
         balances={balances}
         transactionService={createServiceProp(EMPTY)}
         explorerUrl={explorerUrl}
+        addressValidation={addressValidation}
       />
     )
   })
@@ -44,6 +46,7 @@ storiesOf('Wallet/Send', module)
         balances={balances}
         transactionService={createServiceProp(of(RD.pending))}
         explorerUrl={explorerUrl}
+        addressValidation={addressValidation}
       />
     )
   })
@@ -54,6 +57,7 @@ storiesOf('Wallet/Send', module)
         balances={balances}
         transactionService={createServiceProp(of(RD.failure(Error('error example'))))}
         explorerUrl={explorerUrl}
+        addressValidation={addressValidation}
       />
     )
   })
@@ -62,6 +66,7 @@ storiesOf('Wallet/Send', module)
       <Send
         selectedAsset={selectedAsset}
         balances={balances}
+        addressValidation={addressValidation}
         transactionService={createServiceProp(
           of(
             RD.success({

@@ -34,11 +34,12 @@ const wallet: WalletMessages = {
   'wallet.create.error': 'Error while saving a phrase',
   'wallet.receive.address.error': 'No address available to receive funds',
   'wallet.receive.address.errorQR': 'Error while rendering QR code: {error}',
-  'wallet.send.errors.balancesFailed': 'No balances loaded',
-  'wallet.send.errors.address.length': 'Address should be at least 8 symbols length',
-  'wallet.send.errors.amount.shouldBeNumber': 'Amount should be a number',
-  'wallet.send.errors.amount.shouldBePositive': 'Amount should be positive',
-  'wallet.send.errors.amount.shouldBeLessThatBalance': 'Amount should be less than your balance'
+  'wallet.errors.balancesFailed': 'No balances loaded',
+  'wallet.errors.address.empty': "Address can't be empty",
+  'wallet.errors.address.invalid': 'Address is invalid',
+  'wallet.errors.amount.shouldBeNumber': 'Amount should be a number',
+  'wallet.errors.amount.shouldBeGreaterThan': 'Amount should be greater than {amount}',
+  'wallet.errors.amount.shouldBeLessThanBalance': 'Amount should be less than your balance'
 }
 
 export default wallet
