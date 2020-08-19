@@ -209,6 +209,9 @@ type Props = ButtonWrapperProps & ButtonProps
 
 export const ButtonWrapper = styled(Button)<Props>`
   &.ant-btn {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
     border-radius: ${(props) => (props.round === 'true' ? sizes[props.sizevalue].height : '3px')};
     min-width: ${(props) => sizes[props.sizevalue].width};
     height: ${(props) => sizes[props.sizevalue].height};
@@ -272,7 +275,6 @@ export const ButtonWrapper = styled(Button)<Props>`
     }
 
     svg {
-      display: flex;
       font-size: 18px;
     }
   }
