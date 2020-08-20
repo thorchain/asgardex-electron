@@ -6,7 +6,7 @@ import { observableState } from '../stateHelper'
 export const fromPromise$ = <T, V>(
   factory: (next: V) => Promise<T>,
   defaultValue: T,
-  onError = (_: Error) => defaultValue
+  onError: (_: Error) => T = (_) => defaultValue
 ) => {
   const { get$, set } = observableState<T>(defaultValue)
 
