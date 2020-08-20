@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@thorchain/asgardex-binance'
 import { Asset, assetToString } from '@thorchain/asgardex-util'
 import { Row, Col, Grid, Menu, Dropdown } from 'antd'
@@ -43,8 +42,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
     asset,
     reloadBalancesHandler = () => {},
     reloadSelectedAssetTxsHandler = () => {},
-    explorerUrl = O.none,
-    transferFees = RD.initial
+    explorerUrl = O.none
   } = props
 
   const [sendAction, setSendAction] = useState<SendAction>('send')
@@ -58,10 +56,6 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
       ),
     [asset]
   )
-
-  useCallback(() => {
-    console.log('fees:', transferFees)
-  }, [transferFees])
 
   const isRuneAsset = useMemo(() => FP.pipe(asset, O.filter(AH.isRuneAsset), O.isSome), [asset])
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
