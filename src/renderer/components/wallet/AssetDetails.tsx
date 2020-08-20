@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@thorchain/asgardex-binance'
 import { Asset, assetToString } from '@thorchain/asgardex-util'
 import { Row, Col, Grid, Menu, Dropdown } from 'antd'
@@ -10,7 +11,7 @@ import { useHistory } from 'react-router-dom'
 
 import * as AH from '../../helpers/assetHelper'
 import * as walletRoutes from '../../routes/wallet'
-import { TxsRD, BalancesRD, SendAction, isSendAction } from '../../services/binance/types'
+import { TxsRD, BalancesRD, SendAction, isSendAction, TransferFeesRD } from '../../services/binance/types'
 import AssetInfo from '../uielements/assets/AssetInfo'
 import BackLink from '../uielements/backLink'
 import Button, { RefreshButton } from '../uielements/button'
@@ -29,6 +30,7 @@ type Props = {
   asset: O.Option<Asset>
   address: O.Option<Address>
   explorerUrl?: O.Option<string>
+  transferFees: TransferFeesRD
   reloadBalancesHandler?: () => void
   reloadSelectedAssetTxsHandler?: () => void
 }
@@ -41,7 +43,8 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
     asset,
     reloadBalancesHandler = () => {},
     reloadSelectedAssetTxsHandler = () => {},
-    explorerUrl = O.none
+    explorerUrl = O.none,
+    transferFees = RD.initial
   } = props
 
   const [sendAction, setSendAction] = useState<SendAction>('send')
@@ -55,6 +58,10 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
       ),
     [asset]
   )
+
+  useCallback(() => {
+    console.log('fees:', transferFees)
+  }, [transferFees])
 
   const isRuneAsset = useMemo(() => FP.pipe(asset, O.filter(AH.isRuneAsset), O.isSome), [asset])
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
