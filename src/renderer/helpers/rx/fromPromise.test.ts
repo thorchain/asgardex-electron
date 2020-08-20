@@ -4,7 +4,7 @@ import { fromPromise$ } from './fromPromise'
 
 describe('/helpers/rx/fromPromise', () => {
   it('should trigger next value in case Promise resolved', (done) => {
-    const targetStream$ = fromPromise$((val) => Promise.resolve(val), 0)
+    const targetStream$ = fromPromise$<number, number>((val) => Promise.resolve(val), 0)
 
     targetStream$(1)
     targetStream$(2)
@@ -15,7 +15,7 @@ describe('/helpers/rx/fromPromise', () => {
         scan((acc, cur) => {
           acc.push(cur)
           return acc
-        }, []),
+        }, [] as number[]),
         takeLast(1)
       )
       .subscribe((val) => {
@@ -26,7 +26,7 @@ describe('/helpers/rx/fromPromise', () => {
 
   describe('Promise rejected', () => {
     it('should trigger default onError cb if on error not provided', (done) => {
-      const targetStream$ = fromPromise$((val) => Promise.reject(val), 3)
+      const targetStream$ = fromPromise$<number, number>((val) => Promise.reject(val), 3)
 
       targetStream$(2)
         .pipe(take(1), takeLast(1))
@@ -37,10 +37,10 @@ describe('/helpers/rx/fromPromise', () => {
     })
 
     it('should trigger onError cb ', (done) => {
-      const targetStream$ = fromPromise$(
+      const targetStream$ = fromPromise$<number, number>(
         () => Promise.reject(3),
         1,
-        (e) => e * 2
+        (_) => 6
       )
 
       targetStream$(3)
@@ -49,7 +49,7 @@ describe('/helpers/rx/fromPromise', () => {
           scan((acc, cur) => {
             acc.push(cur)
             return acc
-          }, []),
+          }, [] as number[]),
           takeLast(1)
         )
         .subscribe((val) => {
