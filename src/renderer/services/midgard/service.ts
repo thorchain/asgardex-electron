@@ -38,7 +38,7 @@ const { get$: getNetworkState$, set: setNetworkState } = observableState<Network
  */
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
-const nextByzantine: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
+const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
   (network: Network) => byzantine(network === Network.MAIN, true).then(RD.success),
   RD.pending,
   RD.failure
@@ -52,7 +52,7 @@ const byzantine$ = getNetworkState$.pipe(
   // this stream might emit same values and we do need a "dirty check"
   // to avoid to create another instance of byzantine by having same `Network`
   distinctUntilChanged(),
-  switchMap(nextByzantine),
+  switchMap(nextByzantine$),
   shareReplay(1),
   retry(BYZANTINE_MAX_RETRY)
 )
