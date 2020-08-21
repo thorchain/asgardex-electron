@@ -1,4 +1,4 @@
-import { BaseAmount } from '@thorchain/asgardex-util'
+import { AssetAmount } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservable, useObservableState } from 'observable-hooks'
@@ -7,8 +7,8 @@ import * as Rx from 'rxjs/operators'
 
 import { TransferFees } from '../services/binance/types'
 
-const useSingleTxFee = (transferFees$: Observable<O.Option<TransferFees>>): O.Option<BaseAmount> =>
-  useObservableState<O.Option<BaseAmount>>(
+const useSingleTxFee = (transferFees$: Observable<O.Option<TransferFees>>): O.Option<AssetAmount> =>
+  useObservableState(
     useObservable(() =>
       transferFees$.pipe(
         Rx.map((fees) =>
