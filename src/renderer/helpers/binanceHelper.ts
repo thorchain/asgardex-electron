@@ -18,6 +18,8 @@ export const isMiniToken = ({ symbol }: Pick<Asset, 'symbol'>): boolean => {
   return two?.length === 4 && two?.endsWith('M')
 }
 
+export const isBinanceChain = ({ chain }: Pick<Asset, 'chain'>): boolean => chain === 'BNB'
+
 export const getTransferFees = (fees: Fees): O.Option<TransferFees> =>
   FP.pipe(
     fees,

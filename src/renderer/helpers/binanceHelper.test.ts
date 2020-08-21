@@ -4,7 +4,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
-import { balanceByAsset, isMiniToken, getTransferFees } from './binanceHelper'
+import { balanceByAsset, isMiniToken, getTransferFees, isBinanceChain } from './binanceHelper'
 
 describe('binanceHelper', () => {
   describe('amountByAsset', () => {
@@ -37,6 +37,18 @@ describe('binanceHelper', () => {
     })
     it('is false for EMTPY asset', () => {
       expect(isMiniToken(EMPTY_ASSET)).toBeFalsy()
+    })
+  })
+
+  describe('isBinanceChain', () => {
+    it('is true`', () => {
+      expect(isBinanceChain({ chain: 'BNB' })).toBeTruthy()
+    })
+    it('is false for others', () => {
+      expect(isBinanceChain({ chain: 'ETH' })).toBeFalsy()
+    })
+    it('is false for EMTPY asset', () => {
+      expect(isBinanceChain(EMPTY_ASSET)).toBeFalsy()
     })
   })
 
