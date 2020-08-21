@@ -17,6 +17,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import { isBnbAsset } from '../../../helpers/assetHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { SendTxParams } from '../../../services/binance/transaction'
 import {
@@ -55,16 +56,20 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     [assetsWB]
   )
 
-  const bnbAmount = useMemo(
-    () =>
-      FP.pipe(
-        assets,
-        A.findFirst(({ asset }) => asset.symbol === 'BNB'),
-        O.map(({ balance }) => balance),
-        O.getOrElse(() => assetAmount(0))
-      ),
-    [assets]
-  )
+  const bnbAmount = useMemo(() => {
+    // return balance of current asset (if BNB)
+    if (isBnbAsset(assetWB.asset)) {
+      return assetWB.balance
+    }
+    // or check list of other assets to get bnb balance
+    return FP.pipe(
+      assets,
+      A.findFirst(({ asset }) => asset.symbol === 'BNB'),
+      O.map(({ balance }) => balance),
+      // no bnb asset == zero amount
+      O.getOrElse(() => assetAmount(0))
+    )
+  }, [assetWB, assets])
 
   const feeLabel = useMemo(
     () =>
