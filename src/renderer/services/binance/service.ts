@@ -188,10 +188,7 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
 
 export type ClientState = typeof clientState$
 
-const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(
-  mergeMap((clientState) => Rx.of(getBinanceClient(clientState))),
-  shareReplay(1)
-)
+const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(map(getBinanceClient), shareReplay(1))
 
 /**
  * Helper stream to provide "ready-to-go" state of latest `BinanceClient`, but w/o exposing the client
@@ -208,7 +205,7 @@ const clientViewState$: Observable<BinanceClientStateForViews> = clientState$.pi
  *
  */
 const address$: Observable<O.Option<Address>> = client$.pipe(
-  map(FP.pipe(O.chain((client) => some(client.getAddress())))),
+  map(FP.pipe(O.map((client) => client.getAddress()))),
   distinctUntilChanged(fpHelpers.eqOString.equals),
   shareReplay(1)
 )
@@ -313,8 +310,8 @@ const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest(
  *
  */
 const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
-  map(FP.pipe(O.chain((client) => some(client.getExplorerUrl())))),
-  shareReplay()
+  map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
+  shareReplay(1)
 )
 
 /**
@@ -323,7 +320,7 @@ const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
  */
 const loadFees$ = (client: BinanceClient): Observable<FeesRD> =>
   Rx.from(client.getFees()).pipe(
-    mergeMap((fees) => Rx.of(RD.success(fees))),
+    map(RD.success),
     catchError((error) => Rx.of(RD.failure(error))),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
@@ -342,7 +339,7 @@ const fees$: Observable<FeesRD> = client$.pipe(
  * Filtered fees to return `TransferFees` only
  * If a client is not available, it returns `None`
  */
-const transferFees$: Observable<TransferFeesRD> = fees$.pipe(map(FP.pipe(RD.map(getTransferFees))), shareReplay())
+const transferFees$: Observable<TransferFeesRD> = fees$.pipe(map(RD.map(getTransferFees)), shareReplay(1))
 
 const transaction = createTransactionService(clientState$)
 
