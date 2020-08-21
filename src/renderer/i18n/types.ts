@@ -34,6 +34,9 @@ type CommonMessageKey =
   | 'common.assets'
   | 'common.price'
   | 'common.transaction'
+  | 'common.fee'
+  | 'common.fees'
+  | 'common.max'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -92,6 +95,8 @@ type WalletMessageKey =
   | 'wallet.errors.amount.shouldBeNumber'
   | 'wallet.errors.amount.shouldBeGreaterThan'
   | 'wallet.errors.amount.shouldBeLessThanBalance'
+  | 'wallet.errors.amount.shouldBeLessThanBalanceAndFee'
+  | 'wallet.errors.fee.notCovered'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 

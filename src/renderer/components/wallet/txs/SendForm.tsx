@@ -1,10 +1,19 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { bn, assetToString, Asset, formatAssetAmountCurrency, assetAmount } from '@thorchain/asgardex-util'
+import {
+  assetToString,
+  Asset,
+  formatAssetAmountCurrency,
+  assetAmount,
+  AssetAmount,
+  formatAssetAmount
+} from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
@@ -19,6 +28,7 @@ import {
 import { Input, InputNumber } from '../../uielements/input'
 import AccountSelector from './../AccountSelector'
 import * as Styled from './Form.style'
+import { sendAmountValidator } from './util'
 
 type Props = {
   assetsWB: AssetsWithBalanceRD
@@ -26,10 +36,11 @@ type Props = {
   onSubmit: ({ to, amount, asset, memo }: SendTxParams) => void
   isLoading: boolean
   addressValidation: AddressValidation
+  fee: O.Option<AssetAmount>
 }
 
 export const SendForm: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit: onSubmitProp, assetsWB, assetWB, isLoading = false, addressValidation } = props
+  const { onSubmit: onSubmitProp, assetsWB, assetWB, isLoading = false, addressValidation, fee } = props
   const intl = useIntl()
   const history = useHistory()
 
@@ -42,6 +53,29 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
         RD.getOrElse(() => [] as AssetsWithBalance)
       ),
     [assetsWB]
+  )
+
+  const bnbAmount = useMemo(
+    () =>
+      FP.pipe(
+        assets,
+        A.findFirst(({ asset }) => asset.symbol === 'BNB'),
+        O.map(({ balance }) => balance),
+        O.getOrElse(() => assetAmount(0))
+      ),
+    [assets]
+  )
+
+  const feeLabel = useMemo(
+    () =>
+      FP.pipe(
+        fee,
+        O.fold(
+          () => '--',
+          (f) => `${formatAssetAmount(f, 6)} BNB`
+        )
+      ),
+    [fee]
   )
 
   const addressValidator = useCallback(
@@ -57,22 +91,8 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
   )
 
   const amountValidator = useCallback(
-    async (_: unknown, stringValue: string) => {
-      const value = bn(stringValue)
-      if (Number.isNaN(value)) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }))
-      }
-
-      // TODO(Veado): Consider fees (https://github.com/thorchain/asgardex-electron/issues/369)
-      if (!value.isGreaterThan(0)) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }))
-      }
-
-      if (value.isGreaterThan(assetWB.balance.amount())) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' }))
-      }
-    },
-    [assetWB, intl]
+    async (_: unknown, value: string) => sendAmountValidator({ input: value, assetWB, fee, intl, bnbAmount }),
+    [assetWB, fee, intl, bnbAmount]
   )
 
   const onSubmit = useCallback(
@@ -103,7 +123,12 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
               <InputNumber min={0} size="large" disabled={isLoading} />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">
-              MAX: {formatAssetAmountCurrency(assetWB.balance, assetToString(assetWB.asset))}
+              <>
+                {intl.formatMessage({ id: 'common.max' })}:{' '}
+                {formatAssetAmountCurrency(assetWB.balance, assetToString(assetWB.asset))}
+                <br />
+                {intl.formatMessage({ id: 'common.fees' })}: {feeLabel}
+              </>
             </Styled.StyledLabel>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
             <Form.Item name="memo">

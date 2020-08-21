@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Balances, BinanceClient, Txs, Transfer, Fees } from '@thorchain/asgardex-binance'
-import { Asset, AssetAmount, BaseAmount } from '@thorchain/asgardex-util'
+import { Asset, AssetAmount } from '@thorchain/asgardex-util'
 import * as E from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
 import * as O from 'fp-ts/lib/Option'
@@ -67,14 +67,14 @@ export type TransferFees = {
   /**
    * Fee of a transfer to a single address
    */
-  single: BaseAmount
+  single: AssetAmount
   /**
    * Multi send fee to muliple addresses
    * If the count of output address is bigger than the threshold, currently it's 2,
    * then the total transaction fee is 0.0003 BNB per token per address.
    * https://docs.binance.org/trading-spec.html#multi-send-fees
    */
-  multi: BaseAmount
+  multi: AssetAmount
 }
 
 export type FeesRD = RD.RemoteData<Error, Fees>

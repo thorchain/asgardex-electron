@@ -38,9 +38,12 @@ const wallet: WalletMessages = {
   'wallet.errors.balancesFailed': 'Kein Saldo geladen',
   'wallet.errors.address.empty': 'Keine Addresse angegeben',
   'wallet.errors.address.invalid': 'Addresse ist nicht valide',
-  'wallet.errors.amount.shouldBeNumber': 'Wert sollte eine Nummer sein',
-  'wallet.errors.amount.shouldBeGreaterThan': 'Wert sollte größer als {amount} betragen',
-  'wallet.errors.amount.shouldBeLessThanBalance': 'Wert sollte geringer als Ihr Guthaben sein'
+  'wallet.errors.amount.shouldBeNumber': 'Der eingegebene Wert sollte eine Nummer sein',
+  'wallet.errors.amount.shouldBeGreaterThan': 'Der eingegebene Wert sollte höher als {amount} betragen',
+  'wallet.errors.amount.shouldBeLessThanBalance': 'Der eingegebene Wert sollte nicht höher als Ihr Guthaben sein',
+  'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
+    'Der eingegebene Wert sollte nicht höher als Ihr Guthaben abzgl. Gebühren sein',
+  'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Ihr Guthaben ({balance}) gedeckt'
 }
 
 export default wallet

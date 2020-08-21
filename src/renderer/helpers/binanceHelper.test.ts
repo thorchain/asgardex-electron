@@ -91,8 +91,8 @@ describe('binanceHelper', () => {
         O.fold(
           () => fail('result should be Some'),
           ({ single, multi }) => {
-            expect(single.amount()).toEqual(assetAmount(37500).amount())
-            return expect(multi.amount()).toEqual(assetAmount(30000).amount())
+            expect(single.amount()).toEqual(assetAmount(0.000375).amount())
+            return expect(multi.amount()).toEqual(assetAmount(0.0003).amount())
           }
         )
       )

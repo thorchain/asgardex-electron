@@ -1,5 +1,5 @@
 import { Balance, Fees, isTransferFee } from '@thorchain/asgardex-binance'
-import { Asset, bnOrZero, assetAmount, AssetAmount, baseAmount } from '@thorchain/asgardex-util'
+import { Asset, bnOrZero, assetAmount, AssetAmount, baseAmount, baseToAsset } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -27,6 +27,9 @@ export const getTransferFees = (fees: Fees): O.Option<TransferFees> =>
     O.filter((item) => item?.fixed_fee_params?.fee !== undefined && item?.multi_transfer_fee !== undefined),
     O.map(
       (item) =>
-        ({ single: baseAmount(item.fixed_fee_params.fee), multi: baseAmount(item.multi_transfer_fee) } as TransferFees)
+        ({
+          single: baseToAsset(baseAmount(item.fixed_fee_params.fee)),
+          multi: baseToAsset(baseAmount(item.multi_transfer_fee))
+        } as TransferFees)
     )
   )
