@@ -8,5 +8,5 @@ import * as Rx from 'rxjs/operators'
 import { getSingleTxFee } from '../helpers/binanceHelper'
 import { TransferFeesRD } from '../services/binance/types'
 
-export const useSingleFee = (transferFeesRD$: Observable<TransferFeesRD>): O.Option<AssetAmount> =>
+export const useSingleTxFee = (transferFeesRD$: Observable<TransferFeesRD>): O.Option<AssetAmount> =>
   useObservableState(() => transferFeesRD$.pipe(Rx.map(RD.toOption), Rx.map(getSingleTxFee)), O.none)[0]
