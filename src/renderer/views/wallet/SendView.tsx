@@ -13,7 +13,7 @@ import ErrorView from '../../components/shared/error/ErrorView'
 import BackLink from '../../components/uielements/backLink'
 import Send from '../../components/wallet/txs/Send'
 import { useBinanceContext } from '../../contexts/BinanceContext'
-import { useSingleFee } from '../../hooks/useSingleTxFee'
+import { useSingleTxFee } from '../../hooks/useSingleTxFee'
 import { SendParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { AddressValidation } from '../../services/binance/types'
@@ -32,7 +32,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
   const explorerUrl = useObservableState(explorerUrl$, O.none)
   const client = useObservableState<O.Option<BinanceClient>>(client$, O.none)
 
-  const fee = useSingleFee(transferFees$)
+  const fee = useSingleTxFee(transferFees$)
 
   const balances = useMemo(() => toAssetWithBalances(balancesState, intl), [balancesState, intl])
   const oSelectedAssetWB = useMemo(() => getAssetWithBalance(balances, oSelectedAsset), [oSelectedAsset, balances])
