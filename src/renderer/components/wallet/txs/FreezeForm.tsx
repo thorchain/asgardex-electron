@@ -1,15 +1,24 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { bn, assetAmount, assetToString, formatAssetAmountCurrency, AssetAmount } from '@thorchain/asgardex-util'
+import {
+  assetAmount,
+  assetToString,
+  formatAssetAmountCurrency,
+  AssetAmount,
+  formatAssetAmount
+} from '@thorchain/asgardex-util'
 import { Row } from 'antd'
 import { Store } from 'antd/lib/form/interface'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { BNB_SYMBOL } from '../../../helpers/assetHelper'
 import { AssetWithBalance, FreezeAction, FreezeTxParams } from '../../../services/binance/types'
 import { InputNumber } from '../../uielements/input'
 import AccountSelector from '../AccountSelector'
 import * as Styled from './Form.style'
+import { freezeAmountValidator } from './util'
 
 type Props = {
   freezeAction: FreezeAction
@@ -21,7 +30,7 @@ type Props = {
 }
 
 export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
-  const { freezeAction, onSubmit: onSubmitProp, asset: assetWB, isLoading = false } = props
+  const { freezeAction, onSubmit: onSubmitProp, asset: assetWB, isLoading = false, bnbAmount, fee } = props
 
   const intl = useIntl()
 
@@ -35,19 +44,31 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
   }, [assetWB, freezeAction])
 
   const amountValidator = useCallback(
-    async (a: unknown, stringValue: string) => {
-      const value = bn(stringValue)
+    async (a: unknown, value: string) =>
+      freezeAmountValidator({
+        input: value,
+        fee,
+        maxAmount,
+        bnbAmount: FP.pipe(
+          bnbAmount,
+          // no bnb asset == zero amount
+          O.getOrElse(() => assetAmount(0))
+        ),
+        intl
+      }),
+    [bnbAmount, fee, intl, maxAmount]
+  )
 
-      // TODO(Veado): Consider fees (https://github.com/thorchain/asgardex-electron/issues/369)
-      if (!value.isGreaterThan(0)) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }))
-      }
-
-      if (value.isGreaterThan(maxAmount.amount())) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' }))
-      }
-    },
-    [maxAmount, intl]
+  const feeLabel = useMemo(
+    () =>
+      FP.pipe(
+        fee,
+        O.fold(
+          () => '--',
+          (f) => `${formatAssetAmount(f, 6)} ${BNB_SYMBOL}`
+        )
+      ),
+    [fee]
   )
 
   const onSubmit = useCallback(
@@ -86,7 +107,12 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
               <InputNumber min={0} size="large" disabled={isLoading} />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">
-              MAX: {formatAssetAmountCurrency(maxAmount, assetToString(assetWB.asset))}
+              <>
+                {intl.formatMessage({ id: 'common.max' })}:{' '}
+                {formatAssetAmountCurrency(assetWB.balance, assetToString(assetWB.asset))}
+                <br />
+                {intl.formatMessage({ id: 'common.fees' })}: {feeLabel}
+              </>
             </Styled.StyledLabel>
           </Styled.SubForm>
           <Styled.SubmitItem>

@@ -2,7 +2,7 @@ import { bn, AssetAmount, isValidBN, formatAssetAmount } from '@thorchain/asgard
 import * as O from 'fp-ts/lib/Option'
 import { IntlShape } from 'react-intl'
 
-import { isBnbAsset } from '../../../helpers/assetHelper'
+import { isBnbAsset, BNB_SYMBOL } from '../../../helpers/assetHelper'
 import { AssetWithBalance } from '../../../services/binance/types'
 
 export type SendAmountValidatorProps = {
@@ -39,7 +39,7 @@ export const sendAmountValidator = async ({
     return Promise.reject(
       intl?.formatMessage(
         { id: 'wallet.errors.fee.notCovered' },
-        { fee: formatAssetAmount(bnbAmount, 6), balance: formatAssetAmount(bnbAmount, 8) }
+        { fee: formatAssetAmount(bnbAmount, 6), balance: `${formatAssetAmount(bnbAmount, 8)} ${BNB_SYMBOL}` }
       ) ?? 'fee > bnb balance'
     )
   }
@@ -59,6 +59,55 @@ export const sendAmountValidator = async ({
   if (value.isGreaterThan(assetWB.balance.amount())) {
     return Promise.reject(
       intl?.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' }) ?? 'input > balance'
+    )
+  }
+
+  return Promise.resolve()
+}
+
+export type FreezeAmountValidatorProps = {
+  input: string
+  fee: O.Option<AssetAmount>
+  maxAmount: AssetAmount
+  bnbAmount: AssetAmount
+  intl?: IntlShape
+}
+
+export const freezeAmountValidator = async ({
+  input,
+  fee,
+  maxAmount,
+  bnbAmount,
+  intl
+}: FreezeAmountValidatorProps): Promise<void> => {
+  const value = bn(input)
+
+  // input is number
+  if (!isValidBN(value)) {
+    return Promise.reject(intl?.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }) ?? 'Invalid input')
+  }
+
+  // input > 0
+  if (value.isLessThanOrEqualTo(0)) {
+    return Promise.reject(
+      intl?.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }) ?? 'input >= 0'
+    )
+  }
+
+  // bnb balance > fee (non BNB assets only)
+  if (O.isSome(fee) && bnbAmount.amount().isLessThan(fee.value.amount())) {
+    return Promise.reject(
+      intl?.formatMessage(
+        { id: 'wallet.errors.fee.notCovered' },
+        { fee: formatAssetAmount(bnbAmount, 6), balance: `${formatAssetAmount(bnbAmount, 8)} ${BNB_SYMBOL}` }
+      ) ?? 'fee > bnb balance'
+    )
+  }
+
+  // input > maxAmount
+  if (value.isGreaterThan(maxAmount.amount())) {
+    return Promise.reject(
+      intl?.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' }) ?? 'input > maxAmount'
     )
   }
 
