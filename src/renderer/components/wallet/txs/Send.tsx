@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { AssetAmount } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
@@ -20,10 +21,11 @@ type Props = {
   selectedAsset: AssetWithBalance
   explorerUrl: O.Option<string>
   addressValidation: AddressValidation
+  fee: O.Option<AssetAmount>
 }
 
 const Send: React.FC<Props> = (props): JSX.Element => {
-  const { transactionService, balances, selectedAsset, explorerUrl = O.none, addressValidation } = props
+  const { transactionService, balances, selectedAsset, explorerUrl = O.none, addressValidation, fee } = props
   const intl = useIntl()
 
   const { txRD$, resetTx, pushTx } = transactionService
@@ -65,9 +67,10 @@ const Send: React.FC<Props> = (props): JSX.Element => {
         assetsWB={balances}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
+        fee={fee}
       />
     ),
-    [selectedAsset, pushTx, balances, txRD, addressValidation]
+    [selectedAsset, pushTx, balances, txRD, addressValidation, fee]
   )
 
   return (

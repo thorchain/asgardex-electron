@@ -13,6 +13,7 @@ import ErrorView from '../../components/shared/error/ErrorView'
 import BackLink from '../../components/uielements/backLink'
 import Send from '../../components/wallet/txs/Send'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useSingleTxFee } from '../../hooks/useSingleTxFee'
 import { SendParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { AddressValidation } from '../../services/binance/types'
@@ -26,10 +27,12 @@ const SendView: React.FC<Props> = (): JSX.Element => {
 
   const intl = useIntl()
 
-  const { transaction: transactionService, balancesState$, explorerUrl$, client$ } = useBinanceContext()
+  const { transaction: transactionService, balancesState$, explorerUrl$, client$, transferFees$ } = useBinanceContext()
   const balancesState = useObservableState(balancesState$, initial)
   const explorerUrl = useObservableState(explorerUrl$, O.none)
   const client = useObservableState<O.Option<BinanceClient>>(client$, O.none)
+
+  const fee = useSingleTxFee(transferFees$)
 
   const balances = useMemo(() => toAssetWithBalances(balancesState, intl), [balancesState, intl])
   const oSelectedAssetWB = useMemo(() => getAssetWithBalance(balances, oSelectedAsset), [oSelectedAsset, balances])
@@ -67,6 +70,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
             balances={balances}
             explorerUrl={explorerUrl}
             addressValidation={addressValidation}
+            fee={fee}
           />
         </>
       )

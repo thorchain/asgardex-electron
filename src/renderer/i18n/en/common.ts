@@ -35,7 +35,10 @@ const common: CommonMessages = {
   'common.pools': 'Pools',
   'common.pool': 'Pool',
   'common.price': 'Price',
-  'common.transaction': 'Transaction'
+  'common.transaction': 'Transaction',
+  'common.fee': 'Fee',
+  'common.fees': 'Fees',
+  'common.max': 'Max'
 }
 
 export default common

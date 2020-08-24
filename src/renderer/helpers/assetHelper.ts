@@ -12,9 +12,12 @@ export const EMTPY_ASSET_WITH_BALANCE: AssetWithBalance = {
 
 export const RUNE_SYMBOL_MAINNET = 'RUNE-B1A'
 export const RUNE_SYMBOL_TESTNET = 'RUNE-67C'
+export const BNB_SYMBOL = 'BNB'
 
 /**
  * Check whether is RUNE asset or not
  */
 export const isRuneAsset = ({ symbol }: Asset): boolean =>
   symbol === RUNE_SYMBOL_MAINNET || symbol === RUNE_SYMBOL_TESTNET
+
+export const isBnbAsset = ({ symbol }: Asset): boolean => symbol === BNB_SYMBOL

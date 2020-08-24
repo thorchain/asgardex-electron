@@ -40,7 +40,10 @@ const wallet: WalletMessages = {
   'wallet.errors.address.invalid': 'Address is invalid - RU',
   'wallet.errors.amount.shouldBeNumber': 'Количество должно быть числом',
   'wallet.errors.amount.shouldBeGreaterThan': 'Количество должно быть больше, чем {amount}',
-  'wallet.errors.amount.shouldBeLessThanBalance': 'Количество должно быть меньше вашего баланса'
+  'wallet.errors.amount.shouldBeLessThanBalance': 'Количество должно быть меньше вашего баланса',
+  'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
+    'Количество должно быть меньше, чем ваш баланс после вычета комисси',
+  'wallet.errors.fee.notCovered': ' Комиссия не покрывается вашим банаслом ({balance})'
 }
 
 export default wallet

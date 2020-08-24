@@ -32,6 +32,7 @@ export const CustomLabel = styled(Label)`
 export const StyledLabel = styled(Label)`
   margin-bottom: 14px;
   font-family: 'MainFontRegular';
+  text-transform: uppercase;
   color: ${palette('primary', 0)};
 `
 

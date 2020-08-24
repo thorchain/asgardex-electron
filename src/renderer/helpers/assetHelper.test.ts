@@ -1,6 +1,6 @@
 import { assetFromString, EMPTY_ASSET } from '@thorchain/asgardex-util'
 
-import { isRuneAsset } from './assetHelper'
+import { isRuneAsset, isBnbAsset } from './assetHelper'
 
 describe('helpers/assetHelper', () => {
   describe('isRuneAsset', () => {
@@ -17,6 +17,17 @@ describe('helpers/assetHelper', () => {
     it('returns false for any other asset than RUNE', () => {
       const asset = assetFromString('BNB.BNB') || EMPTY_ASSET
       expect(isRuneAsset(asset)).toBeFalsy()
+    })
+  })
+  describe('isBnbAsset', () => {
+    it('checks BNB asset', () => {
+      const asset = assetFromString('BNB.BNB') || EMPTY_ASSET
+      expect(isBnbAsset(asset)).toBeTruthy()
+    })
+
+    it('returns false for any other asset than BNB', () => {
+      const asset = assetFromString('BNB.RUNE-B1A') || EMPTY_ASSET
+      expect(isBnbAsset(asset)).toBeFalsy()
     })
   })
 })

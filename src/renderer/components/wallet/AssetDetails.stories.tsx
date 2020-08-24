@@ -10,28 +10,14 @@ import AssetDetails from './AssetDetails'
 
 const address = O.some(WALLET_ADDRESS_TESTNET)
 
-const fees = RD.initial
-
 storiesOf('Wallet/AssetsDetails', module)
   .add('BNB', () => {
     return (
-      <AssetDetails
-        txsRD={RD.initial}
-        balancesRD={RD.initial}
-        address={address}
-        asset={O.some(ASSETS_TESTNET.BNB)}
-        transferFees={fees}
-      />
+      <AssetDetails txsRD={RD.initial} balancesRD={RD.initial} address={address} asset={O.some(ASSETS_TESTNET.BNB)} />
     )
   })
   .add('RUNE', () => {
     return (
-      <AssetDetails
-        txsRD={RD.initial}
-        balancesRD={RD.initial}
-        address={address}
-        asset={O.some(ASSETS_TESTNET.RUNE)}
-        transferFees={fees}
-      />
+      <AssetDetails txsRD={RD.initial} balancesRD={RD.initial} address={address} asset={O.some(ASSETS_TESTNET.RUNE)} />
     )
   })

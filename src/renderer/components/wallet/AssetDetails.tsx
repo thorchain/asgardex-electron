@@ -10,7 +10,7 @@ import { useHistory } from 'react-router-dom'
 
 import * as AH from '../../helpers/assetHelper'
 import * as walletRoutes from '../../routes/wallet'
-import { TxsRD, BalancesRD, SendAction, isSendAction, TransferFeesRD } from '../../services/binance/types'
+import { TxsRD, BalancesRD, SendAction, isSendAction } from '../../services/binance/types'
 import AssetInfo from '../uielements/assets/AssetInfo'
 import BackLink from '../uielements/backLink'
 import Button, { RefreshButton } from '../uielements/button'
@@ -29,7 +29,6 @@ type Props = {
   asset: O.Option<Asset>
   address: O.Option<Address>
   explorerUrl?: O.Option<string>
-  transferFees: TransferFeesRD
   reloadBalancesHandler?: () => void
   reloadSelectedAssetTxsHandler?: () => void
 }

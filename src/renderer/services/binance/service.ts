@@ -30,7 +30,7 @@ import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import { BalancesRD, BinanceClientStateForViews, BinanceClientState, TxsRD, TransferFeesRD, FeesRD } from './types'
+import { BalancesRD, BinanceClientStateForViews, BinanceClientState, TxsRD, FeesRD, TransferFeesRD } from './types'
 import { getBinanceClientStateForViews, getBinanceClient } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
@@ -337,9 +337,16 @@ const fees$: Observable<FeesRD> = client$.pipe(
 
 /**
  * Filtered fees to return `TransferFees` only
- * If a client is not available, it returns `None`
  */
-const transferFees$: Observable<TransferFeesRD> = fees$.pipe(map(RD.map(getTransferFees)), shareReplay(1))
+const transferFees$: Observable<TransferFeesRD> = fees$.pipe(
+  map((fees) =>
+    FP.pipe(
+      fees,
+      RD.chain((f) => RD.fromEither(getTransferFees(f)))
+    )
+  ),
+  shareReplay(1)
+)
 
 const transaction = createTransactionService(clientState$)
 
