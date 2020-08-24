@@ -1,7 +1,7 @@
 import { Fees, Fee, DexFees, TransferFee } from '@thorchain/asgardex-binance'
 import { EMPTY_ASSET, assetAmount } from '@thorchain/asgardex-util'
+import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { balanceByAsset, isMiniToken, getTransferFees, isBinanceChain } from './binanceHelper'
@@ -88,7 +88,7 @@ describe('binanceHelper', () => {
       const result = getTransferFees(fees)
       FP.pipe(
         result,
-        O.fold(
+        E.fold(
           () => fail('result should be Some'),
           ({ single, multi }) => {
             expect(single.amount()).toEqual(assetAmount(0.000375).amount())
@@ -97,13 +97,13 @@ describe('binanceHelper', () => {
         )
       )
     })
-    it('returns None for an empty list of fees', () => {
+    it('returns Left for an empty list of fees', () => {
       const result = getTransferFees([])
-      expect(result).toBeNone()
+      expect(result).toBeLeft()
     })
-    it('returns None if no fees for transfers are available', () => {
+    it('returns Left if no fees for transfers are available', () => {
       const result = getTransferFees([fee, dexFees])
-      expect(result).toBeNone()
+      expect(result).toBeLeft()
     })
   })
 })

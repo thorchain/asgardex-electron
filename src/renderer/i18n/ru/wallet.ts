@@ -41,8 +41,9 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeNumber': 'Количество должно быть числом',
   'wallet.errors.amount.shouldBeGreaterThan': 'Количество должно быть больше, чем {amount}',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Количество должно быть меньше вашего баланса',
-  'wallet.errors.amount.shouldBeLessThanBalanceAndFee': 'Amount should be less than your balance minus fee - RU',
-  'wallet.errors.fee.notCovered': 'Fees are not covered by your balance ({balance}) - RU'
+  'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
+    'Количество должно быть меньше, чем ваш баланс после вычетом комисси',
+  'wallet.errors.fee.notCovered': ' Комиссия не покрывается вашим банаслом ({balance})'
 }
 
 export default wallet

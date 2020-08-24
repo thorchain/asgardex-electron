@@ -17,7 +17,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { isBnbAsset } from '../../../helpers/assetHelper'
+import { isBnbAsset, BNB_SYMBOL } from '../../../helpers/assetHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { SendTxParams } from '../../../services/binance/transaction'
 import {
@@ -64,7 +64,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     // or check list of other assets to get bnb balance
     return FP.pipe(
       assets,
-      A.findFirst(({ asset }) => asset.symbol === 'BNB'),
+      A.findFirst(({ asset }) => isBnbAsset(asset)),
       O.map(({ balance }) => balance),
       // no bnb asset == zero amount
       O.getOrElse(() => assetAmount(0))
@@ -77,7 +77,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
         fee,
         O.fold(
           () => '--',
-          (f) => `${formatAssetAmount(f, 6)} BNB`
+          (f) => `${formatAssetAmount(f, 6)} ${BNB_SYMBOL}`
         )
       ),
     [fee]

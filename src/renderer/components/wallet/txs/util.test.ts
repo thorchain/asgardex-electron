@@ -18,7 +18,7 @@ describe('wallet/txs/utils/', () => {
 
     it('resolves if everything validates', async () => {
       const result = sendAmountValidator(validValues)
-      expect(result).resolves.toBeEmpty()
+      expect(result).resolves.toBeUndefined()
     })
 
     it('rejects for non number inputs', async () => {

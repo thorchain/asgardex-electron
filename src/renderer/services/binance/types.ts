@@ -3,7 +3,6 @@ import { Balances, BinanceClient, Txs, Transfer, Fees } from '@thorchain/asgarde
 import { Asset, AssetAmount } from '@thorchain/asgardex-util'
 import * as E from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
-import * as O from 'fp-ts/lib/Option'
 import { Option, option } from 'fp-ts/lib/Option'
 
 export type BalancesRD = RD.RemoteData<Error, Balances>
@@ -78,4 +77,4 @@ export type TransferFees = {
 }
 
 export type FeesRD = RD.RemoteData<Error, Fees>
-export type TransferFeesRD = RD.RemoteData<Error, O.Option<TransferFees>>
+export type TransferFeesRD = RD.RemoteData<Error, TransferFees>
