@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import { Asset } from '@thorchain/asgardex-util'
 import Draggable, { ControlPosition, DraggableBounds, DraggableEvent, DraggableEventHandler } from 'react-draggable'
@@ -14,6 +14,7 @@ type Props = {
   title?: string
   onConfirm?: () => void
   onDrag?: () => void
+  disabled?: boolean
 }
 
 const Drag: React.FC<Props> = ({
@@ -24,14 +25,17 @@ const Drag: React.FC<Props> = ({
   title = '',
   onConfirm = () => {},
   onDrag = () => {},
+  disabled: disabledProp = false,
   ...rest
 }: Props): JSX.Element => {
   const [overlap, setOverlap] = useState<boolean>(false)
   const [success, setSuccess] = useState<boolean>(false)
-  const [disabled, setDisabled] = useState<boolean>(false)
+  const [disabledState, setDisabled] = useState<boolean>(false)
   const [missed, setMissed] = useState<boolean>(false)
   const [dragging, setDragging] = useState<boolean>(false)
   const [pos, setPos] = useState<ControlPosition>({ x: 0, y: 0 })
+
+  const disabled = useMemo(() => disabledProp || disabledState, [disabledProp, disabledState])
 
   const dragBounds: DraggableBounds = {
     left: 0,
@@ -112,8 +116,14 @@ const Drag: React.FC<Props> = ({
   }
   return (
     <div className={`drag-wrapper ${className}`}>
-      <Styled.DragContainer overlap={overlap} success={success} missed={missed} dragging={dragging} {...rest}>
-        <Draggable position={pos} axis="x" bounds={dragBounds} {...dragHandlers}>
+      <Styled.DragContainer
+        disabled={disabled}
+        overlap={overlap}
+        success={success}
+        missed={missed}
+        dragging={dragging}
+        {...rest}>
+        <Draggable disabled={disabled} position={pos} axis="x" bounds={dragBounds} {...dragHandlers}>
           <div className="source-asset">
             <Styled.AssetIcon asset={source} size="small" />
           </div>

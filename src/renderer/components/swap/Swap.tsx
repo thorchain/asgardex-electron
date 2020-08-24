@@ -1,9 +1,25 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Asset, assetToString, baseAmount, bn, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
+import * as RD from '@devexperts/remote-data-ts'
+import { Balance, Balances } from '@thorchain/asgardex-binance'
+import {
+  Asset,
+  assetAmount,
+  AssetAmount,
+  assetToString,
+  baseAmount,
+  bn,
+  formatBN,
+  PoolData
+} from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
+import * as A from 'fp-ts/lib/Array'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/pipeable'
 import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router'
 
+import { swap } from '../../routes/swap'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import AssetInput from '../uielements/assets/assetInput'
@@ -12,25 +28,33 @@ import Drag from '../uielements/drag'
 import Slider from '../uielements/slider'
 import { CurrencyInfo } from './CurrencyInfo'
 import * as Styled from './Swap.styles'
+import { getSwapData, getSwapMemo } from './utils'
 
 type SwapProps = {
   balance?: number
   availableAssets: { asset: Asset; priceRune: BigNumber }[]
   sourceAsset: Asset
   targetAsset: Asset
-  onConfirmSwap: (source: Asset, target: Asset, amount: BigNumber) => void
+  onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
   poolDetails?: PoolDetails
+  isWalletEnabled?: boolean
+  assetsInWallet?: O.Option<string[]>
+  balances?: RD.RemoteData<Error, Balances>
 }
 
 export const Swap = ({
-  balance,
+  // balance,
   availableAssets,
+  assetsInWallet = O.none,
   onConfirmSwap,
   sourceAsset: _sourceAsset,
   targetAsset: _targetAsset,
-  poolDetails = []
+  poolDetails = [],
+  isWalletEnabled = false,
+  balances = RD.initial
 }: SwapProps) => {
   const intl = useIntl()
+  const history = useHistory()
   // convert to hash map here instead of using getPoolDetail
   const poolData: Record<string, PoolData> = useMemo(() => {
     return getPoolDetailsHashMap(poolDetails)
@@ -51,11 +75,18 @@ export const Swap = ({
 
   const [changeAmount, setChangeAmount] = useState(bn(0))
 
+  const balance = pipe(
+    balances,
+    RD.map(A.findFirst((balance) => balance.symbol === sourceAsset.symbol)),
+    RD.getOrElse((): O.Option<Balance> => O.none)
+  )
+
   const setChangeAmountFromPercentValue = useCallback(
-    (s) => {
-      if (balance) {
-        setChangeAmount(bn((s * balance) / 100))
-      }
+    (percents) => {
+      pipe(
+        balance,
+        O.map((balance) => setChangeAmount(bn(balance.free).multipliedBy(Number(percents) / 100)))
+      )
     },
     [setChangeAmount, balance]
   )
@@ -68,7 +99,7 @@ export const Swap = ({
     return availableAssets.find((asset) => asset.asset.symbol === targetAsset.symbol)
   }, [availableAssets, targetAsset])
 
-  const assets = useMemo(
+  const allAssets = useMemo(
     () =>
       availableAssets.map((asset) => ({
         asset: asset.asset,
@@ -77,64 +108,125 @@ export const Swap = ({
     [availableAssets]
   )
 
-  const targetResultValue = useMemo(
+  const assetsToSwapFrom = useMemo(() => {
+    return pipe(
+      allAssets,
+      A.filter((asset) =>
+        pipe(
+          assetsInWallet,
+          O.map((symbols) => symbols.includes(asset.asset.symbol)),
+          O.getOrElse((): boolean => false)
+        )
+      ),
+      (assets) => (assets.length ? assets : allAssets),
+      A.filter((asset) => asset.asset.symbol !== sourceAsset.symbol && asset.asset.symbol !== targetAsset.symbol)
+    )
+  }, [allAssets, assetsInWallet, sourceAsset, targetAsset])
+
+  const assetsToSwapTo = useMemo(() => {
+    return allAssets.filter(
+      (asset) => asset.asset.symbol !== sourceAsset.symbol && asset.asset.symbol !== targetAsset.symbol
+    )
+  }, [allAssets, sourceAsset, targetAsset])
+
+  const canSwitchAssets = useMemo(
     () =>
-      getValueOfAsset1InAsset2(
-        baseAmount(changeAmount),
-        poolData[assetToString(sourceAsset)],
-        poolData[assetToString(targetAsset)]
-      )
-        .amount()
-        .toFormat(2)
-        .toString(),
-    [changeAmount, sourceAsset, targetAsset, poolData]
+      pipe(
+        balances,
+        RD.map((balances) => !!balances.find((balance) => balance.symbol === targetAsset.symbol)),
+        RD.getOrElse(() => true)
+      ),
+    [balances, targetAsset]
   )
+
+  const onSwapChange = useCallback(() => {
+    if (!canSwitchAssets) {
+      return
+    }
+    const tmp = sourceAsset
+    setSourceAsset(targetAsset)
+    setTargetAsset(tmp)
+  }, [sourceAsset, targetAsset, canSwitchAssets])
+
+  const swapData = useMemo(() => getSwapData(changeAmount, sourceAsset, targetAsset, poolData), [
+    changeAmount,
+    sourceAsset,
+    targetAsset,
+    poolData
+  ])
+
+  useEffect(() => {
+    history.replace(
+      swap.path({
+        target: assetToString(sourceAsset),
+        source: assetToString(targetAsset)
+      })
+    )
+  }, [targetAsset, sourceAsset, history])
+
+  const onSwapConfirmed = useCallback(() => {
+    if (isWalletEnabled) {
+      const memo = getSwapMemo(assetToString(targetAsset), '')
+      onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
+    }
+  }, [onConfirmSwap, changeAmount, isWalletEnabled, sourceAsset, targetAsset])
 
   return (
     <Styled.Container>
       <Styled.ContentContainer>
-        <Styled.Header>{intl.formatMessage({ id: 'swap.swapping' })}</Styled.Header>
+        <Styled.Header>
+          {intl.formatMessage({ id: 'swap.swapping' })} {sourceAsset.ticker} {' >> '} {targetAsset.ticker}
+        </Styled.Header>
 
         <Styled.FormContainer>
           <Styled.CurrencyInfoContainer>
-            <CurrencyInfo from={sourceAssetPair} to={targetAssetPair} />
+            <CurrencyInfo slip={swapData.slip} from={sourceAssetPair} to={targetAssetPair} />
           </Styled.CurrencyInfoContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-out'}>
             <AssetInput
               title={intl.formatMessage({ id: 'swap.input' })}
-              label={balance ? `${intl.formatMessage({ id: 'swap.balance' })}: ${balance}` : ''}
+              label={pipe(
+                balance,
+                O.map((balance) => `${intl.formatMessage({ id: 'swap.balance' })}: ${bn(balance.free).toFormat(2)}`),
+                O.getOrElse(() => '')
+              )}
               onChange={setChangeAmount}
               amount={changeAmount}
             />
-            <AssetSelect onSelect={setSourceAsset} asset={sourceAsset} assetData={assets} />
+            <AssetSelect onSelect={setSourceAsset} asset={sourceAsset} assetData={assetsToSwapFrom} />
           </Styled.ValueItemContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-percent'}>
             <Styled.SliderContainer>
-              {balance && (
-                <Slider
-                  value={(changeAmount.toNumber() / (balance || 1)) * 100}
-                  onChange={setChangeAmountFromPercentValue}
-                  tooltipVisible={true}
-                  withLabel={true}
-                  tooltipPlacement={'top'}
-                />
+              {pipe(
+                balance,
+                O.map((balance) => (
+                  <Slider
+                    key={'swap percentage slider'}
+                    value={(changeAmount.toNumber() / bn(balance.free).toNumber()) * 100}
+                    onChange={setChangeAmountFromPercentValue}
+                    tooltipVisible={true}
+                    withLabel={true}
+                    tooltipPlacement={'top'}
+                  />
+                )),
+                O.toNullable
               )}
             </Styled.SliderContainer>
 
-            <Styled.SwapOutlined />
+            <Styled.SwapOutlined disabled={!canSwitchAssets} onClick={onSwapChange} />
           </Styled.ValueItemContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-in'}>
             <Styled.InValue>
               <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}:</Styled.InValueTitle>
-              <div>{targetResultValue}</div>
+              <div>{formatBN(swapData.swapResult)}</div>
             </Styled.InValue>
             <AssetSelect
               onSelect={setTargetAsset}
               asset={targetAsset}
-              assetData={assets}
+              assetData={assetsToSwapTo}
               priceIndex={availableAssets.reduce((acc, asset) => {
                 return {
                   ...acc,
@@ -148,11 +240,13 @@ export const Swap = ({
 
       <Styled.SubmitContainer>
         <Drag
-          onConfirm={() => onConfirmSwap(sourceAsset, targetAsset, changeAmount)}
+          disabled={!isWalletEnabled || changeAmount.eq(0)}
+          onConfirm={onSwapConfirmed}
           title={intl.formatMessage({ id: 'swap.drag' })}
           source={sourceAsset}
           target={targetAsset}
         />
+        <div>fee: {swapData.fee.toFormat(5)}</div>
       </Styled.SubmitContainer>
     </Styled.Container>
   )

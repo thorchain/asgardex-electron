@@ -36,7 +36,7 @@ export const Header = styled('div')`
 export const SwapOutlined = styled(ASwapOutlined).attrs({ rotate: 90 })`
   width: 100%;
   color: ${palette('success', 0)};
-
+  ${(props) => (props.disabled ? 'opacity: 0.5; cursor: not-allowed !important;' : '')}
   svg {
     height: 22px;
     width: 22px;

@@ -12,7 +12,7 @@ import { ClientState } from './service'
 import { TransferRD } from './types'
 import { getBinanceClient } from './utils'
 
-const { get$: txRD$, set: setTxRD } = observableState<TransferRD>(RD.initial)
+const { get$: swapRD$, set: setSwapRD } = observableState<TransferRD>(RD.initial)
 
 export type SendTxParams = {
   to: Address
@@ -44,12 +44,11 @@ const tx$ = ({
     startWith(RD.pending)
   )
 
-const pushTx = (clientState$: ClientState) => ({ to, amount, asset, memo }: SendTxParams) => {
-  return tx$({ clientState$, to, amount, asset, memo }).subscribe(setTxRD)
-}
+const pushTx = (clientState$: ClientState) => ({ to, amount, asset, memo }: SendTxParams) =>
+  tx$({ clientState$, to, amount, asset, memo }).subscribe(setSwapRD)
 
-export const createTransactionService = (client$: ClientState) => ({
-  txRD$,
+export const createSwapService = (client$: ClientState) => ({
+  txRD$: swapRD$,
   pushTx: pushTx(client$),
-  resetTx: () => setTxRD(RD.initial)
+  resetTx: () => setSwapRD(RD.initial)
 })
