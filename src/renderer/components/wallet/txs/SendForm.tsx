@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import {
   assetToString,
   Asset,
@@ -11,28 +10,23 @@ import {
 } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
-import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { isBnbAsset, BNB_SYMBOL } from '../../../helpers/assetHelper'
+import { getBnbAmount } from '../../../helpers/binanceHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { SendTxParams } from '../../../services/binance/transaction'
-import {
-  AssetWithBalance,
-  AssetsWithBalanceRD,
-  AssetsWithBalance,
-  AddressValidation
-} from '../../../services/binance/types'
+import { AssetWithBalance, AddressValidation, AssetsWithBalance } from '../../../services/binance/types'
 import { Input, InputNumber } from '../../uielements/input'
 import AccountSelector from './../AccountSelector'
 import * as Styled from './Form.style'
 import { sendAmountValidator } from './util'
 
 type Props = {
-  assetsWB: AssetsWithBalanceRD
+  assetsWB: AssetsWithBalance
   assetWB: AssetWithBalance
   onSubmit: ({ to, amount, asset, memo }: SendTxParams) => void
   isLoading: boolean
@@ -47,15 +41,6 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
 
   const [form] = Styled.Form.useForm()
 
-  const assets = useMemo(
-    () =>
-      FP.pipe(
-        assetsWB,
-        RD.getOrElse(() => [] as AssetsWithBalance)
-      ),
-    [assetsWB]
-  )
-
   const bnbAmount = useMemo(() => {
     // return balance of current asset (if BNB)
     if (isBnbAsset(assetWB.asset)) {
@@ -63,13 +48,12 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     }
     // or check list of other assets to get bnb balance
     return FP.pipe(
-      assets,
-      A.findFirst(({ asset }) => isBnbAsset(asset)),
-      O.map(({ balance }) => balance),
+      assetsWB,
+      getBnbAmount,
       // no bnb asset == zero amount
       O.getOrElse(() => assetAmount(0))
     )
-  }, [assetWB, assets])
+  }, [assetWB, assetsWB])
 
   const feeLabel = useMemo(
     () =>
@@ -115,7 +99,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeSelectorHandler} selectedAsset={assetWB.asset} assets={assets} />
+        <AccountSelector onChange={changeSelectorHandler} selectedAsset={assetWB.asset} assets={assetsWB} />
 
         <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
           <Styled.SubForm>

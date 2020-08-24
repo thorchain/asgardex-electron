@@ -5,7 +5,8 @@ import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { TransferFees } from '../services/binance/types'
+import { TransferFees, AssetsWithBalance } from '../services/binance/types'
+import { isBnbAsset } from './assetHelper'
 
 type PickBalanceAmount = Pick<Balance, 'symbol' | 'free'>
 
@@ -43,4 +44,11 @@ export const getSingleTxFee = (oTransferFees: O.Option<TransferFees>): O.Option<
   FP.pipe(
     oTransferFees,
     O.map((f) => f.single)
+  )
+
+export const getBnbAmount = (assets: AssetsWithBalance): O.Option<AssetAmount> =>
+  FP.pipe(
+    assets,
+    A.findFirst(({ asset }) => isBnbAsset(asset)),
+    O.map(({ balance }) => balance)
   )

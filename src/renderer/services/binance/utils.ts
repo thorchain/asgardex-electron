@@ -19,8 +19,8 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { IntlShape } from 'react-intl'
 
-import { sequenceTOptionFromArray, sequenceTOption } from '../../helpers/fpHelpers'
-import { BalancesRD, AssetWithBalance, AssetsWithBalanceRD } from '../../services/binance/types'
+import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
+import { BalancesRD, AssetWithBalance, AssetsWithBalanceRD, AssetsWithBalance } from '../../services/binance/types'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
 import { BinanceClientState, BinanceClientStateM, BinanceClientStateForViews } from './types'
@@ -110,15 +110,12 @@ export const toAssetWithBalances = (balancesRD: BalancesRD, intl?: IntlShape): A
     )
   )
 
-export const getAssetWithBalance = (
-  balancesRD: AssetsWithBalanceRD,
-  oAsset: O.Option<Asset>
-): O.Option<AssetWithBalance> =>
+export const getAssetWithBalance = (assetsWB: AssetsWithBalance, oAsset: O.Option<Asset>): O.Option<AssetWithBalance> =>
   FP.pipe(
-    sequenceTOption(oAsset, RD.toOption(balancesRD)),
-    O.chain(([asset, balances]) =>
+    oAsset,
+    O.chain((asset) =>
       FP.pipe(
-        balances,
+        assetsWB,
         A.findFirst((assetWB) => assetWB.asset.symbol === asset.symbol)
       )
     )

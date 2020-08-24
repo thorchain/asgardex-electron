@@ -1,8 +1,9 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { bn, assetAmount, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { bn, assetAmount, assetToString, formatAssetAmountCurrency, AssetAmount } from '@thorchain/asgardex-util'
 import { Row } from 'antd'
 import { Store } from 'antd/lib/form/interface'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { AssetWithBalance, FreezeAction, FreezeTxParams } from '../../../services/binance/types'
@@ -13,8 +14,10 @@ import * as Styled from './Form.style'
 type Props = {
   freezeAction: FreezeAction
   asset: AssetWithBalance
+  bnbAmount: O.Option<AssetAmount>
   onSubmit: ({ amount, asset, action }: FreezeTxParams) => void
   isLoading: boolean
+  fee: O.Option<AssetAmount>
 }
 
 export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
