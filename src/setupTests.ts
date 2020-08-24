@@ -3,6 +3,7 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom/extend-expect'
+import { isLeft, Either } from 'fp-ts/lib/Either'
 import { Option, isNone } from 'fp-ts/lib/Option'
 import { RunHelpers } from 'rxjs/internal/testing/TestScheduler'
 import { TestScheduler } from 'rxjs/testing'
@@ -32,6 +33,7 @@ declare global {
   namespace jest {
     interface Matchers<R> {
       toBeNone(): R
+      toBeLeft(): R
     }
   }
 }
@@ -57,18 +59,27 @@ global.window.apiUrl = { ...mockApi.apiUrl }
  * */
 expect.extend({
   toBeNone<T>(received: Option<T>) {
-    const pass = isNone(received)
-
-    if (pass) {
+    if (isNone(received)) {
       return {
         message: () => `Expected ${received} not to be None`,
         pass: true
       }
-    } else {
+    }
+    return {
+      message: () => `Expected ${received} to be None`,
+      pass: false
+    }
+  },
+  toBeLeft<E, A>(received: Either<E, A>) {
+    if (isLeft(received)) {
       return {
-        message: () => `Expected ${received} to be None`,
-        pass: false
+        message: () => `Expected ${received} not to be "Left"`,
+        pass: true
       }
+    }
+    return {
+      message: () => `Expected ${received} to be "Left"`,
+      pass: false
     }
   }
 })
