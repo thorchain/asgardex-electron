@@ -2,12 +2,7 @@ import { assetAmount } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../../shared/mock/assets'
-import {
-  SendAmountValidatorProps,
-  sendAmountValidator,
-  FreezeAmountValidatorProps,
-  freezeAmountValidator
-} from './util'
+import { SendAmountValidatorProps, sendAmountValidator, FreezeAmountValidatorProps, validateFreezeInput } from './util'
 
 describe('wallet/txs/utils/', () => {
   describe('sendAmountValidator', () => {
@@ -67,38 +62,30 @@ describe('wallet/txs/utils/', () => {
   describe('freezeAmountValidator', () => {
     const validValues: FreezeAmountValidatorProps = {
       input: '11',
-      fee: O.some(assetAmount(0.0035)),
-      maxAmount: assetAmount(11),
-      bnbAmount: assetAmount(1)
+      maxAmount: assetAmount(11)
     }
 
     it('resolves if everything validates', async () => {
-      const result = freezeAmountValidator(validValues)
+      const result = validateFreezeInput(validValues)
       expect(result).resolves.toBeUndefined()
     })
 
     it('rejects for non number inputs', async () => {
       const props = { ...validValues, input: 'hello' }
-      const result = freezeAmountValidator(props)
+      const result = validateFreezeInput(props)
       expect(result).rejects.toBe('Invalid input')
     })
 
     it('rejects for input <= 0', async () => {
       const props = { ...validValues, input: '0' }
-      const result = freezeAmountValidator(props)
-      expect(result).rejects.toBe('input >= 0')
+      const result = validateFreezeInput(props)
+      expect(result).rejects.toBe('input <= 0')
     })
 
     it('rejects for input > maxBalance', async () => {
       const props = { ...validValues, input: '1001' }
-      const result = freezeAmountValidator(props)
+      const result = validateFreezeInput(props)
       expect(result).rejects.toBe('input > maxAmount')
-    })
-
-    it('rejects for invalid bnb balance (non BNB assets only)', async () => {
-      const props = { ...validValues, bnbAmount: assetAmount(0.0001) }
-      const result = freezeAmountValidator(props)
-      expect(result).rejects.toBe('fee > bnb balance')
     })
   })
 })
