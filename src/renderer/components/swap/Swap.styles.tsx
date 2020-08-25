@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
+import AssetInputBase from '../uielements/assets/assetInput'
 
 export const Container = styled('div')`
   display: flex;
@@ -129,5 +130,11 @@ export const PendingContainer = styled('div')`
   &:not(:empty) {
     width: 100%;
     height: 100%;
+  }
+`
+
+export const AssetInput = styled(AssetInputBase)`
+  & .ant-input {
+    border: none;
   }
 `

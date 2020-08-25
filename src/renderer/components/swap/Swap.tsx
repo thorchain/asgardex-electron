@@ -27,7 +27,6 @@ import { AssetWithPrice, TransferRD } from '../../services/binance/types'
 import { getAssetBalance } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
-import AssetInput from '../uielements/assets/assetInput'
 import AssetSelect from '../uielements/assets/assetSelect'
 import Drag from '../uielements/drag'
 import Modal from '../uielements/modal'
@@ -314,7 +313,7 @@ export const Swap = ({
           </Styled.CurrencyInfoContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-out'}>
-            <AssetInput
+            <Styled.AssetInput
               title={intl.formatMessage({ id: 'swap.input' })}
               label={balanceLabel}
               onChange={setChangeAmount}

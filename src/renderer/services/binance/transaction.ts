@@ -44,9 +44,8 @@ const tx$ = ({
     startWith(RD.pending)
   )
 
-const pushTx = (clientState$: ClientState) => ({ to, amount, asset, memo }: SendTxParams) => {
-  return tx$({ clientState$, to, amount, asset, memo }).subscribe(setTxRD)
-}
+const pushTx = (clientState$: ClientState) => ({ to, amount, asset, memo }: SendTxParams) =>
+  tx$({ clientState$, to, amount, asset, memo }).subscribe(setTxRD)
 
 export const createTransactionService = (client$: ClientState) => ({
   txRD$,
