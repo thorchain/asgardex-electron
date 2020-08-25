@@ -13,6 +13,7 @@ import {
   formatBN,
   PoolData
 } from '@thorchain/asgardex-util'
+import { Spin } from 'antd'
 import { eqString } from 'fp-ts/Eq'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -22,13 +23,14 @@ import { useHistory } from 'react-router'
 
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { swap } from '../../routes/swap'
-import { AssetWithPrice } from '../../services/binance/types'
+import { AssetWithPrice, TransferRD } from '../../services/binance/types'
 import { getAssetBalance } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import AssetInput from '../uielements/assets/assetInput'
 import AssetSelect from '../uielements/assets/assetSelect'
 import Drag from '../uielements/drag'
+import Modal from '../uielements/modal'
 import Slider from '../uielements/slider'
 import { CurrencyInfo } from './CurrencyInfo'
 import * as Styled from './Swap.styles'
@@ -42,6 +44,9 @@ type SwapProps = {
   onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
   poolDetails?: PoolDetails
   balances?: RD.RemoteData<Error, Balances>
+  tx?: TransferRD
+  resetTx?: () => void
+  goToTransaction?: (txHash: string) => void
 }
 
 export const Swap = ({
@@ -50,7 +55,10 @@ export const Swap = ({
   sourceAsset: sourceAssetProp,
   targetAsset: targetAssetProp,
   poolDetails = [],
-  balances = RD.initial
+  balances = RD.initial,
+  tx = RD.initial,
+  goToTransaction,
+  resetTx
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
@@ -257,8 +265,37 @@ export const Swap = ({
     [balance, changeAmount, setChangeAmountFromPercentValue]
   )
 
+  const pending = useMemo(
+    () =>
+      pipe(
+        tx,
+        RD.fold(
+          () => null,
+          () => <Spin />,
+          (e) => (
+            <Modal closable visible title={'error'} onOk={onSwapConfirmed} okText={'Retry'} onCancel={resetTx}>
+              {e.message}
+            </Modal>
+          ),
+          (r) => (
+            <Modal
+              closable
+              visible
+              title={'success'}
+              okText={'Open transaction page'}
+              onOk={() => goToTransaction && goToTransaction(r.hash)}
+              onCancel={resetTx}>
+              {r.hash}
+            </Modal>
+          )
+        )
+      ),
+    [tx, goToTransaction, onSwapConfirmed, resetTx]
+  )
+
   return (
     <Styled.Container>
+      <Styled.PendingContainer>{pending}</Styled.PendingContainer>
       <Styled.ContentContainer>
         <Styled.Header>
           {pipe(

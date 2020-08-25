@@ -115,3 +115,19 @@ export const SubmitContainer = styled('div')`
   flex-direction: column;
   align-items: center;
 `
+
+export const PendingContainer = styled('div')`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 60px;
+  left: 0;
+  z-index: 9;
+  background-color: ${palette('gradient', 1)};
+
+  &:not(:empty) {
+    width: 100%;
+    height: 100%;
+  }
+`

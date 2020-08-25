@@ -19,6 +19,7 @@ export const ModalWrapper = styled(Modal)`
   }
   .ant-modal-body {
     padding: 46px 32px;
+    color: ${palette('text', 2)};
     background: ${palette('background', 1)};
     border-color: ${palette('gray', 0)};
 
