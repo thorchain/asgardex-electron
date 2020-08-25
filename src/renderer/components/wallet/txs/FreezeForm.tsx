@@ -89,7 +89,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
       sequenceTOption(oFee, oBnbAmount),
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
-        () => (O.isNone(oFee) ? false : true),
+        () => !O.isNone(oFee),
         ([fee, bnbAmount]) => bnbAmount.amount().isLessThan(fee.amount())
       )
     )
