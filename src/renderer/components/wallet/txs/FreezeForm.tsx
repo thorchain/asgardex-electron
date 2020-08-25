@@ -14,11 +14,12 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { BNB_SYMBOL } from '../../../helpers/assetHelper'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { AssetWithBalance, FreezeAction, FreezeTxParams } from '../../../services/binance/types'
 import { InputNumber } from '../../uielements/input'
 import AccountSelector from '../AccountSelector'
 import * as Styled from './Form.style'
-import { freezeAmountValidator } from './util'
+import { validateFreezeInput } from './util'
 
 type Props = {
   freezeAction: FreezeAction
@@ -30,7 +31,14 @@ type Props = {
 }
 
 export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
-  const { freezeAction, onSubmit: onSubmitProp, asset: assetWB, isLoading = false, bnbAmount, fee } = props
+  const {
+    freezeAction,
+    onSubmit: onSubmitProp,
+    asset: assetWB,
+    isLoading = false,
+    bnbAmount: oBnbAmount,
+    fee: oFee
+  } = props
 
   const intl = useIntl()
 
@@ -45,30 +53,24 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
 
   const amountValidator = useCallback(
     async (a: unknown, value: string) =>
-      freezeAmountValidator({
+      validateFreezeInput({
         input: value,
-        fee,
         maxAmount,
-        bnbAmount: FP.pipe(
-          bnbAmount,
-          // no bnb asset == zero amount
-          O.getOrElse(() => assetAmount(0))
-        ),
         intl
       }),
-    [bnbAmount, fee, intl, maxAmount]
+    [intl, maxAmount]
   )
 
   const feeLabel = useMemo(
     () =>
       FP.pipe(
-        fee,
+        oFee,
         O.fold(
           () => '--',
           (f) => `${formatAssetAmount(f, 6)} ${BNB_SYMBOL}`
         )
       ),
-    [fee]
+    [oFee]
   )
 
   const onSubmit = useCallback(
@@ -88,6 +90,38 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
         return ''
     }
   }, [intl, freezeAction])
+
+  const isFeeError = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(oFee, oBnbAmount),
+      O.fold(
+        // Missing (or loading) fees does not mean we can't sent something ...
+        () => (O.isNone(oFee) ? false : true),
+        ([fee, bnbAmount]) => bnbAmount.amount().isLessThan(fee.amount())
+      )
+    )
+  }, [oBnbAmount, oFee])
+
+  const renderFeeError = useMemo(() => {
+    if (!isFeeError) return <></>
+
+    const amount = FP.pipe(
+      oBnbAmount,
+      // no bnb asset == zero amount
+      O.getOrElse(() => assetAmount(0))
+    )
+
+    const msg = intl.formatMessage(
+      { id: 'wallet.errors.fee.notCovered' },
+      { fee: formatAssetAmount(amount, 6), balance: `${formatAssetAmount(amount, 8)} ${BNB_SYMBOL}` }
+    )
+
+    return (
+      <Styled.StyledLabel size="big" color="error">
+        {msg}
+      </Styled.StyledLabel>
+    )
+  }, [oBnbAmount, intl, isFeeError])
 
   return (
     <Row>
@@ -114,9 +148,10 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
                 {intl.formatMessage({ id: 'common.fees' })}: {feeLabel}
               </>
             </Styled.StyledLabel>
+            {renderFeeError}
           </Styled.SubForm>
           <Styled.SubmitItem>
-            <Styled.Button loading={isLoading} htmlType="submit">
+            <Styled.Button loading={isLoading} disabled={isFeeError} htmlType="submit">
               {submitLabel}
             </Styled.Button>
           </Styled.SubmitItem>

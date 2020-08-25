@@ -121,3 +121,15 @@ storiesOf('Wallet/Freeze', module)
       />
     )
   })
+  .add('bnb amount < fees', () => {
+    return (
+      <Freeze
+        freezeAction="freeze"
+        explorerUrl={explorerUrl}
+        selectedAsset={selectedAsset}
+        freezeService={createServiceProp(EMPTY)}
+        fee={fee}
+        bnbAmount={O.some(assetAmount(0.00000001))}
+      />
+    )
+  })
