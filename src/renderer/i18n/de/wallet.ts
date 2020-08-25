@@ -34,11 +34,16 @@ const wallet: WalletMessages = {
   'wallet.create.error': 'Fehler beim Abspeichern der Phrase',
   'wallet.receive.address.error': 'Keine Addresse für den Empfang vorhanden',
   'wallet.receive.address.errorQR': 'Error beim Rendern des QR Codes: {error}',
-  'wallet.send.errors.balancesFailed': 'No balances loaded - DE',
-  'wallet.send.errors.address.length': 'Address should be at least 8 symbols length - DE',
-  'wallet.send.errors.amount.shouldBeNumber': 'Amount should be a number - DE',
-  'wallet.send.errors.amount.shouldBePositive': 'Amount should be positive - DE',
-  'wallet.send.errors.amount.shouldBeLessThatBalance': 'Amount should be less than your balance - DE'
+  'wallet.send.success': 'Transaktion war erfolgreich.',
+  'wallet.errors.balancesFailed': 'Kein Saldo geladen',
+  'wallet.errors.address.empty': 'Keine Addresse angegeben',
+  'wallet.errors.address.invalid': 'Addresse ist nicht valide',
+  'wallet.errors.amount.shouldBeNumber': 'Der eingegebene Wert sollte eine Nummer sein',
+  'wallet.errors.amount.shouldBeGreaterThan': 'Der eingegebene Wert sollte höher als {amount} betragen',
+  'wallet.errors.amount.shouldBeLessThanBalance': 'Der eingegebene Wert sollte nicht höher als Ihr Guthaben sein',
+  'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
+    'Der eingegebene Wert sollte nicht höher als Ihr Guthaben abzgl. Gebühren sein',
+  'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Ihr Guthaben ({balance}) gedeckt'
 }
 
 export default wallet

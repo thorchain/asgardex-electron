@@ -1,8 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balances, BinanceClient, Txs, Transfer } from '@thorchain/asgardex-binance'
+import { Balances, BinanceClient, Txs, Transfer, Fees } from '@thorchain/asgardex-binance'
 import { Asset, AssetAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
-import { Either } from 'fp-ts/lib/Either'
+import * as E from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
 import { Option, option } from 'fp-ts/lib/Option'
 
@@ -31,7 +31,7 @@ export type TxsRD = RD.RemoteData<Error, Txs>
  * (2) Some(Right) -> A client has been instantiated
  * (3) Some(Left) -> An error while trying to instantiate a client
  */
-export type BinanceClientState = Option<Either<Error, BinanceClient>>
+export type BinanceClientState = Option<E.Either<Error, BinanceClient>>
 
 // Something like `EitherT<Option>` Monad
 export const BinanceClientStateM = getEitherM(option)
@@ -54,3 +54,33 @@ export const isSendAction = (action: string): action is SendAction => {
       return false
   }
 }
+
+export type FreezeRD = RD.RemoteData<Error, Transfer>
+
+export type FreezeTxParams = {
+  amount: AssetAmount
+  asset: Asset
+  action: FreezeAction
+}
+export type AddressValidation = BinanceClient['validateAddress']
+
+/**
+ * Fees of Transfers
+ * https://docs.binance.org/trading-spec.html#fees
+ */
+export type TransferFees = {
+  /**
+   * Fee of a transfer to a single address
+   */
+  single: AssetAmount
+  /**
+   * Multi send fee to muliple addresses
+   * If the count of output address is bigger than the threshold, currently it's 2,
+   * then the total transaction fee is 0.0003 BNB per token per address.
+   * https://docs.binance.org/trading-spec.html#multi-send-fees
+   */
+  multi: AssetAmount
+}
+
+export type FeesRD = RD.RemoteData<Error, Fees>
+export type TransferFeesRD = RD.RemoteData<Error, TransferFees>

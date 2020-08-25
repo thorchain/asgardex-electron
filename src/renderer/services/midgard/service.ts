@@ -6,13 +6,13 @@ import { some } from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
 import { combineLatest } from 'rxjs'
-import { retry, catchError, map, shareReplay, startWith, switchMap, distinctUntilChanged, delay } from 'rxjs/operators'
+import { retry, catchError, map, shareReplay, startWith, switchMap, distinctUntilChanged } from 'rxjs/operators'
 
 import { PRICE_POOLS_WHITELIST } from '../../const'
 import { fromPromise$ } from '../../helpers/rx/fromPromise'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
-import { Configuration, DefaultApi } from '../../types/generated/midgard'
+import { Configuration, DefaultApi, GetPoolsDetailsViewEnum } from '../../types/generated/midgard'
 import { PricePoolAsset } from '../../views/pools/types'
 import { isPricePoolAsset } from '../../views/pools/types'
 import { Network } from '../app/types'
@@ -38,7 +38,7 @@ const { get$: getNetworkState$, set: setNetworkState } = observableState<Network
  */
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
-const nextByzantine: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
+const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
   (network: Network) => byzantine(network === Network.MAIN, true).then(RD.success),
   RD.pending,
   RD.failure
@@ -52,7 +52,7 @@ const byzantine$ = getNetworkState$.pipe(
   // this stream might emit same values and we do need a "dirty check"
   // to avoid to create another instance of byzantine by having same `Network`
   distinctUntilChanged(),
-  switchMap(nextByzantine),
+  switchMap(nextByzantine$),
   shareReplay(1),
   retry(BYZANTINE_MAX_RETRY)
 )
@@ -124,12 +124,10 @@ const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
 
 /**
  * Get data of `AssetDetails` from Midgard
- * `delayTime` - Optional value in `ms` to delay request
  */
-const apiGetAssetInfo$ = (asset: string, delayTime = 0) =>
-  Rx.of(null).pipe(
-    delay(delayTime),
-    switchMap(() => byzantine$),
+const apiGetAssetInfo$ = (asset: string) =>
+  pipe(
+    byzantine$,
     liveData.chain((endpoint) =>
       pipe(
         getMidgardDefaultApi(endpoint).getAssetInfo({ asset }),
@@ -141,15 +139,12 @@ const apiGetAssetInfo$ = (asset: string, delayTime = 0) =>
 
 /**
  * Get `PoolDetails` data from Midgard
- * `delayTime` - Optional value in `ms` to delay request
  */
-const apiGetPoolsData$ = (asset: string, delayTime = 0) =>
-  Rx.of(null).pipe(
-    delay(delayTime),
-    switchMap(() => byzantine$),
+const apiGetPoolsData$ = (asset: string) =>
+  byzantine$.pipe(
     liveData.chain((endpoint) =>
       pipe(
-        getMidgardDefaultApi(endpoint).getPoolsData({ asset }),
+        getMidgardDefaultApi(endpoint).getPoolsDetails({ asset, view: GetPoolsDetailsViewEnum.Simple }),
         map(RD.success),
         catchError((e: Error) => Rx.of(RD.failure(e)))
       )

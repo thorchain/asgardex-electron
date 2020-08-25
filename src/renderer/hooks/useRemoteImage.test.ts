@@ -18,9 +18,9 @@ describe('hooks/useRemoteImage', () => {
     Object.defineProperty(global.Image.prototype, 'src', {
       set(src: string) {
         if (src === LOAD_FAILURE_SRC) {
-          this.onerror()
+          this.dispatchEvent(new Event('error'))
         } else if (src === LOAD_SUCCESS_SRC) {
-          this.onload()
+          this.dispatchEvent(new Event('load'))
         }
       }
     })

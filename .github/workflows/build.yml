@@ -57,13 +57,8 @@ jobs:
           SIGNING_APPLE_ID: ${{ secrets.SIGNING_APPLE_ID }}
           SIGNING_APP_PASSWORD: ${{ secrets.SIGNING_APP_PASSWORD }}
 
-      - name: Remove previous artifacts
-        run: rm -r -- ./*
-        shell: bash
-        working-directory: ./release
-
       - name: Upload artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.OS }}
           path: release

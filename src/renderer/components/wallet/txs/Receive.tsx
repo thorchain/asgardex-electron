@@ -8,8 +8,8 @@ import * as O from 'fp-ts/lib/Option'
 import QRCode from 'qrcode'
 import { useIntl } from 'react-intl'
 
-import AssetInfo from '../uielements/assets/AssetInfo'
-import BackLink from '../uielements/backLink'
+import AssetInfo from '../../uielements/assets/AssetInfo'
+import BackLink from '../../uielements/backLink'
 import * as Styled from './Receive.style'
 
 type Props = {

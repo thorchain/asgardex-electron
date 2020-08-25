@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 
 import { initial } from '@devexperts/remote-data-ts'
+import { BinanceClient } from '@thorchain/asgardex-binance'
 import { assetFromString, assetToString } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -12,8 +13,10 @@ import ErrorView from '../../components/shared/error/ErrorView'
 import BackLink from '../../components/uielements/backLink'
 import Send from '../../components/wallet/txs/Send'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useSingleTxFee } from '../../hooks/useSingleTxFee'
 import { SendParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
+import { AddressValidation } from '../../services/binance/types'
 import { toAssetWithBalances, getAssetWithBalance } from '../../services/binance/utils'
 
 type Props = {}
@@ -24,11 +27,25 @@ const SendView: React.FC<Props> = (): JSX.Element => {
 
   const intl = useIntl()
 
-  const { transaction: transactionService, balancesState$, explorerUrl$ } = useBinanceContext()
+  const { transaction: transactionService, balancesState$, explorerUrl$, client$, transferFees$ } = useBinanceContext()
   const balancesState = useObservableState(balancesState$, initial)
   const explorerUrl = useObservableState(explorerUrl$, O.none)
+  const client = useObservableState<O.Option<BinanceClient>>(client$, O.none)
+
+  const fee = useSingleTxFee(transferFees$)
+
   const balances = useMemo(() => toAssetWithBalances(balancesState, intl), [balancesState, intl])
   const oSelectedAssetWB = useMemo(() => getAssetWithBalance(balances, oSelectedAsset), [oSelectedAsset, balances])
+
+  const addressValidation = useMemo(
+    () =>
+      FP.pipe(
+        client,
+        O.map((c) => c.validateAddress),
+        O.getOrElse((): AddressValidation => (_: string) => true)
+      ),
+    [client]
+  )
 
   if (O.isNone(oSelectedAsset)) {
     return (
@@ -52,6 +69,8 @@ const SendView: React.FC<Props> = (): JSX.Element => {
             transactionService={transactionService}
             balances={balances}
             explorerUrl={explorerUrl}
+            addressValidation={addressValidation}
+            fee={fee}
           />
         </>
       )

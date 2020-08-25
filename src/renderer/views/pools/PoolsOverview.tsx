@@ -236,6 +236,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }, [])
   const depthColumn: ColumnType<PoolTableRowData> = {
     key: 'depth',
+    align: 'right',
     title: intl.formatMessage({ id: 'pools.depth' }),
     dataIndex: 'depthPrice',
     render: renderDepthColumn,
@@ -304,6 +305,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   const tradeColumn: ColumnType<PoolTableRowData> = {
     key: 'trade',
+    align: 'center',
     title: intl.formatMessage({ id: 'pools.trades' }),
     dataIndex: 'trades',
     render: (trades: BigNumber) => <Label align="center">{trades.toString()}</Label>,
