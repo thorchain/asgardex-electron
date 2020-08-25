@@ -63,7 +63,7 @@ const Freeze: React.FC<Props> = (props: Props): JSX.Element => {
     () => (
       <FreezeForm
         freezeAction={sendAction}
-        asset={selectedAsset}
+        assetWB={selectedAsset}
         onSubmit={pushFreeze}
         isLoading={RD.isPending(txRD)}
         fee={fee}

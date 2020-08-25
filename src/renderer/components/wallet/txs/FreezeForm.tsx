@@ -23,7 +23,7 @@ import { validateFreezeInput } from './util'
 
 type Props = {
   freezeAction: FreezeAction
-  asset: AssetWithBalance
+  assetWB: AssetWithBalance
   bnbAmount: O.Option<AssetAmount>
   onSubmit: ({ amount, asset, action }: FreezeTxParams) => void
   isLoading: boolean
@@ -31,14 +31,7 @@ type Props = {
 }
 
 export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
-  const {
-    freezeAction,
-    onSubmit: onSubmitProp,
-    asset: assetWB,
-    isLoading = false,
-    bnbAmount: oBnbAmount,
-    fee: oFee
-  } = props
+  const { freezeAction, onSubmit: onSubmitProp, assetWB, isLoading = false, bnbAmount: oBnbAmount, fee: oFee } = props
 
   const intl = useIntl()
 
@@ -95,7 +88,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
     return FP.pipe(
       sequenceTOption(oFee, oBnbAmount),
       O.fold(
-        // Missing (or loading) fees does not mean we can't sent something ...
+        // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => (O.isNone(oFee) ? false : true),
         ([fee, bnbAmount]) => bnbAmount.amount().isLessThan(fee.amount())
       )

@@ -88,7 +88,7 @@ export const validateFreezeInput = async ({ input, maxAmount, intl }: FreezeAmou
     input,
     // valid BigNumber
     validateBN(errorMsg1),
-    // input >= 0
+    // input > 0
     E.chain(greaterThan(min)(errorMsg2)),
     // input <= maxAmount
     E.chain(lessThanOrEqualTo(max)(errorMsg3)),

@@ -30,7 +30,7 @@ describe('wallet/txs/utils/', () => {
     it('rejects for input <= 0', async () => {
       const props = { ...validValues, input: '0' }
       const result = sendAmountValidator(props)
-      expect(result).rejects.toBe('input >= 0')
+      expect(result).rejects.toBe('input <= 0')
     })
 
     it('rejects for input > balance', async () => {
