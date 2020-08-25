@@ -6,10 +6,18 @@ export const useRemoteImage = (src: string) => {
   const [remoteImage, setRemoteImage] = useState<RD.RemoteData<string, string>>(RD.pending)
 
   useEffect(() => {
+    const onLoadHandler = () => setRemoteImage(RD.success(src))
+    const onErrorHandler = () => setRemoteImage(RD.failure(src))
+
     const image = new Image()
-    image.onload = () => setRemoteImage(RD.success(src))
-    image.onerror = () => setRemoteImage(RD.failure(src))
+    image.addEventListener('load', onLoadHandler)
+    image.addEventListener('error', onErrorHandler)
     image.src = src
+    // clean up
+    return () => {
+      image.removeEventListener('load', onLoadHandler)
+      image.removeEventListener('error', onErrorHandler)
+    }
   }, [src])
 
   return remoteImage
