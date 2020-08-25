@@ -10,8 +10,7 @@ import {
   getSwapSlip,
   PoolData,
   bn,
-  getSwapFee,
-  getDoubleSwapFee
+  BaseAmount
 } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
@@ -27,7 +26,7 @@ const getAssetFormat = (symbol: string) => {
 }
 
 export const getSwapMemo = (symbol: string, addr: string, sliplimit = '') =>
-  `SWAP:${getAssetFormat(symbol)}:${addr}:${sliplimit}`
+  `SWAP:${getAssetFormat(symbol)}${addr ? `:${addr}` : ''}${sliplimit ? `:${sliplimit}` : ''}`
 
 /**
  * @returns none - neither sourceAsset neither targetAsset is RUNE
@@ -49,7 +48,7 @@ const isRuneSwap = (sourceAsset: Asset, targetAsset: Asset) => {
 const getSlip = (
   sourceAsset: Asset,
   targetAsset: Asset,
-  changeAmount: BigNumber,
+  changeAmount: BaseAmount,
   pools: Record<string, PoolData>,
   runeSwap: O.Option<boolean> = O.none
 ) =>
@@ -57,7 +56,7 @@ const getSlip = (
     runeSwap,
     O.map((toRune) => {
       const targetPoolData = pools[assetToString(targetAsset)]
-      return getSwapSlip(assetToBase(assetAmount(changeAmount)), targetPoolData, toRune)
+      return getSwapSlip(changeAmount, targetPoolData, toRune)
     }),
     O.alt(() =>
       pipe(
@@ -65,7 +64,7 @@ const getSlip = (
           O.fromNullable(pools[assetToString(sourceAsset)]),
           O.fromNullable(pools[assetToString(targetAsset)])
         ),
-        O.map(([source, target]) => getDoubleSwapSlip(assetToBase(assetAmount(changeAmount)), source, target))
+        O.map(([source, target]) => getDoubleSwapSlip(changeAmount, source, target))
       )
     ),
     O.getOrElse(() => bn(0))
@@ -74,18 +73,17 @@ const getSlip = (
 const getSwapResult = (
   sourceAsset: Asset,
   targetAsset: Asset,
-  changeAmount: BigNumber,
+  changeAmount: BaseAmount,
   pools: Record<string, PoolData>,
-  slip: BigNumber,
   runeSwap: O.Option<boolean> = O.none
 ) =>
   pipe(
     runeSwap,
     O.chain((toRune) => {
-      const assetSymbol = assetToString(runeSwap ? sourceAsset : targetAsset)
+      const assetSymbol = assetToString(toRune ? sourceAsset : targetAsset)
       return pipe(
         O.fromNullable(pools[assetSymbol]),
-        O.map((poolData) => getSwapOutput(assetToBase(assetAmount(changeAmount)), poolData, toRune))
+        O.map((poolData) => getSwapOutput(changeAmount, poolData, toRune))
       )
     }),
     O.alt(() =>
@@ -94,43 +92,16 @@ const getSwapResult = (
           O.fromNullable(pools[assetToString(sourceAsset)]),
           O.fromNullable(pools[assetToString(targetAsset)])
         ),
-        O.map(([source, target]) => getDoubleSwapOutput(assetToBase(assetAmount(changeAmount)), source, target))
+        O.map(([source, target]) => getDoubleSwapOutput(changeAmount, source, target))
       )
     ),
-    O.map((swapResult) => swapResult.amount().multipliedBy(bn(1).minus(slip))),
-    O.getOrElse(() => bn(0))
-  )
-
-const getFee = (
-  sourceAsset: Asset,
-  targetAsset: Asset,
-  changeAmount: BigNumber,
-  pools: Record<string, PoolData>,
-  runeSwap: O.Option<boolean> = O.none
-) =>
-  pipe(
-    runeSwap,
-    O.map((toRune) => {
-      const targetPoolData = pools[assetToString(targetAsset)]
-      return getSwapFee(assetToBase(assetAmount(changeAmount)), targetPoolData, toRune)
-    }),
-    O.alt(() =>
-      pipe(
-        sequenceTOption(
-          O.fromNullable(pools[assetToString(sourceAsset)]),
-          O.fromNullable(pools[assetToString(targetAsset)])
-        ),
-        O.map(([source, target]) => getDoubleSwapFee(assetToBase(assetAmount(changeAmount)), source, target))
-      )
-    ),
-    O.map((fee) => baseToAsset(fee).amount()),
+    O.map((swapResult) => baseToAsset(swapResult).amount()),
     O.getOrElse(() => bn(0))
   )
 
 const defaultSwapData = {
   slip: bn(0),
-  swapResult: bn(0),
-  fee: bn(0)
+  swapResult: bn(0)
 }
 
 export const getSwapData = (
@@ -143,13 +114,12 @@ export const getSwapData = (
     sequenceTOption(sourceAsset, targetAsset),
     O.map(([sourceAsset, targetAsset]) => {
       const runeSwap = isRuneSwap(sourceAsset, targetAsset)
-      const slip = getSlip(sourceAsset, targetAsset, swapAmount, pools, runeSwap)
-      const swapResult = getSwapResult(sourceAsset, targetAsset, swapAmount, pools, slip, runeSwap)
-
+      const swapBaseAmount = assetToBase(assetAmount(swapAmount))
+      const slip = getSlip(sourceAsset, targetAsset, swapBaseAmount, pools, runeSwap)
+      const swapResult = getSwapResult(sourceAsset, targetAsset, swapBaseAmount, pools, runeSwap)
       return {
         slip,
-        swapResult,
-        fee: getFee(sourceAsset, targetAsset, swapAmount, pools, runeSwap)
+        swapResult
       }
     }),
     O.getOrElse(() => defaultSwapData)

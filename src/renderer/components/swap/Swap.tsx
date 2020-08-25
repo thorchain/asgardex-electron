@@ -240,7 +240,7 @@ export const Swap = ({
       // eslint-disable-next-line  array-callback-return
       O.map(([sourceAsset, targetAsset]) => {
         // @todo thatStrangeGuy is address empty ?
-        const memo = getSwapMemo(assetToString(targetAsset), '')
+        const memo = getSwapMemo(targetAsset.symbol, '')
         onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
       })
     )
@@ -338,7 +338,7 @@ export const Swap = ({
           <Styled.ValueItemContainer className={'valueItemContainer-in'}>
             <Styled.InValue>
               <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}:</Styled.InValueTitle>
-              <div>{formatBN(swapData.swapResult)}</div>
+              <div>{formatBN(swapData.swapResult, 7)}</div>
             </Styled.InValue>
             <AssetSelect
               onSelect={setTargetAsset}
