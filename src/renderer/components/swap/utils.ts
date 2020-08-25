@@ -18,6 +18,7 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 
 import { isRuneAsset } from '../../helpers/assetHelper'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 
 const getAssetFormat = (symbol: string) => {
   return `BNB.${symbol}`
@@ -115,19 +116,31 @@ const getFee = (
     )
   )
 
+const defaultSwapData = {
+  slip: bn(0),
+  swapResult: bn(0),
+  fee: bn(0)
+}
+
 export const getSwapData = (
   swapAmount: BigNumber,
-  sourceAsset: Asset,
-  targetAsset: Asset,
+  sourceAsset: O.Option<Asset>,
+  targetAsset: O.Option<Asset>,
   pools: Record<string, PoolData>
 ) => {
-  const runeSwap = isRuneSwap(sourceAsset, targetAsset)
-  const slip = getSlip(sourceAsset, targetAsset, swapAmount, pools, runeSwap)
-  const swapResult = getSwapResult(sourceAsset, targetAsset, swapAmount, pools, slip, runeSwap)
+  return pipe(
+    sequenceTOption(sourceAsset, targetAsset),
+    O.map(([sourceAsset, targetAsset]) => {
+      const runeSwap = isRuneSwap(sourceAsset, targetAsset)
+      const slip = getSlip(sourceAsset, targetAsset, swapAmount, pools, runeSwap)
+      const swapResult = getSwapResult(sourceAsset, targetAsset, swapAmount, pools, slip, runeSwap)
 
-  return {
-    slip,
-    swapResult,
-    fee: baseToAsset(getFee(sourceAsset, targetAsset, swapAmount, pools, runeSwap)).amount()
-  }
+      return {
+        slip,
+        swapResult,
+        fee: baseToAsset(getFee(sourceAsset, targetAsset, swapAmount, pools, runeSwap)).amount()
+      }
+    }),
+    O.getOrElse(() => defaultSwapData)
+  )
 }

@@ -5,6 +5,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { assetFromString, Asset, bnOrZero, AssetAmount } from '@thorchain/asgardex-util'
 import { Spin } from 'antd'
 import * as A from 'fp-ts/lib/Array'
+import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router-dom'
@@ -78,8 +79,8 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
 
               return (
                 <Swap
-                  sourceAsset={assetFromString(source.toUpperCase()) || availableAssets[0].asset}
-                  targetAsset={assetFromString(target.toUpperCase()) || availableAssets[0].asset}
+                  sourceAsset={O.fromNullable(assetFromString(source.toUpperCase()))}
+                  targetAsset={O.fromNullable(assetFromString(target.toUpperCase()))}
                   onConfirmSwap={onConfirmSwap}
                   availableAssets={availableAssets}
                   poolDetails={state.poolDetails}
