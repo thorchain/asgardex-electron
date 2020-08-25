@@ -13,7 +13,6 @@ import {
   formatBN,
   PoolData
 } from '@thorchain/asgardex-util'
-import BigNumber from 'bignumber.js'
 import { eqString } from 'fp-ts/Eq'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -23,6 +22,8 @@ import { useHistory } from 'react-router'
 
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { swap } from '../../routes/swap'
+import { AssetWithPrice } from '../../services/binance/types'
+import { getAssetBalance } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import AssetInput from '../uielements/assets/assetInput'
@@ -31,11 +32,11 @@ import Drag from '../uielements/drag'
 import Slider from '../uielements/slider'
 import { CurrencyInfo } from './CurrencyInfo'
 import * as Styled from './Swap.styles'
-import { getSwapData, getSwapMemo } from './utils'
+import { getSwapData, getSwapMemo, pairAssetToPlain, pickAssetPair } from './utils'
 
 type SwapProps = {
   balance?: number
-  availableAssets: { asset: Asset; priceRune: BigNumber }[]
+  availableAssets: AssetWithPrice[]
   sourceAsset: O.Option<Asset>
   targetAsset: O.Option<Asset>
   onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
@@ -46,46 +47,26 @@ type SwapProps = {
 export const Swap = ({
   availableAssets,
   onConfirmSwap,
-  sourceAsset: _sourceAsset,
-  targetAsset: _targetAsset,
+  sourceAsset: sourceAssetProp,
+  targetAsset: targetAssetProp,
   poolDetails = [],
   balances = RD.initial
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
   // convert to hash map here instead of using getPoolDetail
-  const poolData: Record<string, PoolData> = useMemo(() => {
-    return getPoolDetailsHashMap(poolDetails)
-  }, [poolDetails])
-
-  const sourceAsset = useMemo(() => {
-    return pipe(
-      _sourceAsset,
-      O.chain((sourceAsset) =>
-        pipe(
-          availableAssets,
-          A.findFirst((asset) => sourceAsset.symbol === asset.asset.symbol)
-        )
-      ),
-      O.alt(() => pipe(availableAssets, A.head)),
-      O.map((a) => a.asset)
-    )
-  }, [availableAssets, _sourceAsset])
-
-  const targetAsset = useMemo(() => {
-    return pipe(
-      _targetAsset,
-      O.chain((targetAsset) =>
-        pipe(
-          availableAssets,
-          A.findFirst((asset) => targetAsset.symbol === asset.asset.symbol)
-        )
-      ),
-      O.alt(() => pipe(availableAssets, A.head)),
-      O.map((a) => a.asset)
-      // O.getOrElse(() => availableAssets[0].asset)
-    )
-  }, [availableAssets, _targetAsset])
+  const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails), [poolDetails])
+  const sourceAssetPair = useMemo(() => pickAssetPair(availableAssets, sourceAssetProp), [
+    availableAssets,
+    sourceAssetProp
+  ])
+  const targetAssetPair = useMemo(() => pickAssetPair(availableAssets, targetAssetProp), [
+    availableAssets,
+    targetAssetProp
+  ])
+  const sourceAsset = useMemo(() => pairAssetToPlain(sourceAssetPair), [sourceAssetPair])
+  const targetAsset = useMemo(() => pairAssetToPlain(targetAssetPair), [targetAssetPair])
+  const assetsToSwap = useMemo(() => sequenceTOption(sourceAsset, targetAsset), [sourceAsset, targetAsset])
 
   const setSourceAsset = useCallback(
     (asset: Asset) => {
@@ -123,19 +104,7 @@ export const Swap = ({
 
   const [changeAmount, setChangeAmount] = useState(bn(0))
 
-  const balance = useMemo(
-    () =>
-      pipe(
-        sequenceTOption(pipe(balances, RD.toOption), sourceAsset),
-        O.chain(([balances, sourceAsset]) =>
-          pipe(
-            balances,
-            A.findFirst((balance) => balance.symbol === sourceAsset.symbol)
-          )
-        )
-      ),
-    [balances, sourceAsset]
-  )
+  const balance = useMemo(() => getAssetBalance(balances, sourceAsset), [balances, sourceAsset])
 
   const setChangeAmountFromPercentValue = useCallback(
     (percents) => {
@@ -146,32 +115,6 @@ export const Swap = ({
     },
     [setChangeAmount, balance]
   )
-
-  const sourceAssetPair = useMemo(
-    () =>
-      pipe(
-        sourceAsset,
-        O.chain((sourceAsset) =>
-          pipe(
-            availableAssets,
-            A.findFirst((asset) => asset.asset.symbol === sourceAsset.symbol)
-          )
-        )
-      ),
-    [availableAssets, sourceAsset]
-  )
-
-  const targetAssetPair = useMemo(() => {
-    return pipe(
-      targetAsset,
-      O.chain((targetAsset) =>
-        pipe(
-          availableAssets,
-          A.findFirst((asset) => asset.asset.symbol === targetAsset.symbol)
-        )
-      )
-    )
-  }, [availableAssets, targetAsset])
 
   const allAssets = useMemo(
     () =>
@@ -200,7 +143,7 @@ export const Swap = ({
     )
 
     return pipe(
-      sequenceTOption(sourceAsset, targetAsset),
+      assetsToSwap,
       O.map(([sourceAsset, targetAsset]) =>
         pipe(
           availableAssets,
@@ -209,11 +152,11 @@ export const Swap = ({
       ),
       O.getOrElse(() => allAssets)
     )
-  }, [allAssets, assetSymbolsInWallet, sourceAsset, targetAsset])
+  }, [assetsToSwap, allAssets, assetSymbolsInWallet])
 
   const assetsToSwapTo = useMemo(() => {
     return pipe(
-      sequenceTOption(sourceAsset, targetAsset),
+      assetsToSwap,
       O.map(([sourceAsset, targetAsset]) =>
         pipe(
           allAssets,
@@ -222,7 +165,7 @@ export const Swap = ({
       ),
       O.getOrElse(() => allAssets)
     )
-  }, [allAssets, sourceAsset, targetAsset])
+  }, [assetsToSwap, allAssets])
 
   const canSwitchAssets = useMemo(
     () =>
@@ -242,7 +185,7 @@ export const Swap = ({
       return
     }
     pipe(
-      sequenceTOption(sourceAsset, targetAsset),
+      assetsToSwap,
       // eslint-disable-next-line  array-callback-return
       O.map(([sourceAsset, targetAsset]) => {
         history.replace(
@@ -253,7 +196,7 @@ export const Swap = ({
         )
       })
     )
-  }, [history, sourceAsset, targetAsset, canSwitchAssets])
+  }, [assetsToSwap, history, canSwitchAssets])
 
   const swapData = useMemo(() => getSwapData(changeAmount, sourceAsset, targetAsset, poolData), [
     changeAmount,
@@ -278,15 +221,14 @@ export const Swap = ({
       pipe(
         balances,
         RD.map(A.isEmpty),
-        RD.getOrElse(() => false)
+        RD.getOrElse(() => true)
       ),
     [balances, changeAmount]
   )
 
   const onSwapConfirmed = useCallback(() => {
-    console.log('sourceAsset --- ', sourceAsset, 'targetAsset --- ', targetAsset)
     pipe(
-      sequenceTOption(sourceAsset, targetAsset),
+      assetsToSwap,
       // eslint-disable-next-line  array-callback-return
       O.map(([sourceAsset, targetAsset]) => {
         // @todo thatStrangeGuy is address empty ?
@@ -294,7 +236,7 @@ export const Swap = ({
         onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
       })
     )
-  }, [onConfirmSwap, changeAmount, sourceAsset, targetAsset])
+  }, [assetsToSwap, onConfirmSwap, changeAmount])
 
   const slider = useMemo(
     () =>
@@ -320,7 +262,7 @@ export const Swap = ({
       <Styled.ContentContainer>
         <Styled.Header>
           {pipe(
-            sequenceTOption(sourceAsset, targetAsset),
+            assetsToSwap,
             O.map(
               ([sourceAsset, targetAsset]) =>
                 `${intl.formatMessage({ id: 'swap.swapping' })} ${sourceAsset.ticker} >> ${targetAsset.ticker}`
@@ -393,7 +335,7 @@ export const Swap = ({
             O.getOrElse(() => EMPTY_ASSET)
           )}
         />
-        <div>fee: {formatBN(swapData.fee)}</div>
+        <div>fee: 0.000375 + 1 RUNE</div>
       </Styled.SubmitContainer>
     </Styled.Container>
   )

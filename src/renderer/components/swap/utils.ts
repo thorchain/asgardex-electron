@@ -14,11 +14,13 @@ import {
   getDoubleSwapFee
 } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
+import * as A from 'fp-ts/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 
 import { isRuneAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { AssetWithPrice } from '../../services/binance/types'
 
 const getAssetFormat = (symbol: string) => {
   return `BNB.${symbol}`
@@ -57,13 +59,16 @@ const getSlip = (
       const targetPoolData = pools[assetToString(targetAsset)]
       return getSwapSlip(assetToBase(assetAmount(changeAmount)), targetPoolData, toRune)
     }),
-    O.getOrElse(() =>
-      getDoubleSwapSlip(
-        assetToBase(assetAmount(changeAmount)),
-        pools[assetToString(sourceAsset)],
-        pools[assetToString(targetAsset)]
+    O.alt(() =>
+      pipe(
+        sequenceTOption(
+          O.fromNullable(pools[assetToString(sourceAsset)]),
+          O.fromNullable(pools[assetToString(targetAsset)])
+        ),
+        O.map(([source, target]) => getDoubleSwapSlip(assetToBase(assetAmount(changeAmount)), source, target))
       )
-    )
+    ),
+    O.getOrElse(() => bn(0))
   )
 
 const getSwapResult = (
@@ -76,22 +81,24 @@ const getSwapResult = (
 ) =>
   pipe(
     runeSwap,
-    O.map((toRune) => {
+    O.chain((toRune) => {
       const assetSymbol = assetToString(runeSwap ? sourceAsset : targetAsset)
-      const targetPoolData = pools[assetSymbol]
-      return baseToAsset(getSwapOutput(assetToBase(assetAmount(changeAmount)), targetPoolData, toRune))
-        .amount()
-        .multipliedBy(bn(1).minus(slip))
-    }),
-    O.getOrElse(() => {
-      const res = getDoubleSwapOutput(
-        assetToBase(assetAmount(changeAmount)),
-        pools[assetToString(sourceAsset)],
-        pools[assetToString(targetAsset)]
+      return pipe(
+        O.fromNullable(pools[assetSymbol]),
+        O.map((poolData) => getSwapOutput(assetToBase(assetAmount(changeAmount)), poolData, toRune))
       )
-
-      return baseToAsset(res).amount().multipliedBy(bn(1).minus(slip))
-    })
+    }),
+    O.alt(() =>
+      pipe(
+        sequenceTOption(
+          O.fromNullable(pools[assetToString(sourceAsset)]),
+          O.fromNullable(pools[assetToString(targetAsset)])
+        ),
+        O.map(([source, target]) => getDoubleSwapOutput(assetToBase(assetAmount(changeAmount)), source, target))
+      )
+    ),
+    O.map((swapResult) => swapResult.amount().multipliedBy(bn(1).minus(slip))),
+    O.getOrElse(() => bn(0))
   )
 
 const getFee = (
@@ -107,13 +114,17 @@ const getFee = (
       const targetPoolData = pools[assetToString(targetAsset)]
       return getSwapFee(assetToBase(assetAmount(changeAmount)), targetPoolData, toRune)
     }),
-    O.getOrElse(() =>
-      getDoubleSwapFee(
-        assetToBase(assetAmount(changeAmount)),
-        pools[assetToString(sourceAsset)],
-        pools[assetToString(targetAsset)]
+    O.alt(() =>
+      pipe(
+        sequenceTOption(
+          O.fromNullable(pools[assetToString(sourceAsset)]),
+          O.fromNullable(pools[assetToString(targetAsset)])
+        ),
+        O.map(([source, target]) => getDoubleSwapFee(assetToBase(assetAmount(changeAmount)), source, target))
       )
-    )
+    ),
+    O.map((fee) => baseToAsset(fee).amount()),
+    O.getOrElse(() => bn(0))
   )
 
 const defaultSwapData = {
@@ -138,9 +149,27 @@ export const getSwapData = (
       return {
         slip,
         swapResult,
-        fee: baseToAsset(getFee(sourceAsset, targetAsset, swapAmount, pools, runeSwap)).amount()
+        fee: getFee(sourceAsset, targetAsset, swapAmount, pools, runeSwap)
       }
     }),
     O.getOrElse(() => defaultSwapData)
   )
 }
+
+export const pickAssetPair = (availableAssets: AssetWithPrice[], asset: O.Option<Asset>) =>
+  pipe(
+    asset,
+    O.chain((sourceAsset) =>
+      pipe(
+        availableAssets,
+        A.findFirst((asset) => sourceAsset.symbol === asset.asset.symbol)
+      )
+    ),
+    O.alt(() => pipe(availableAssets, A.head))
+  )
+
+export const pairAssetToPlain = (pair: O.Option<AssetWithPrice>) =>
+  pipe(
+    pair,
+    O.map((pair) => pair.asset)
+  )
