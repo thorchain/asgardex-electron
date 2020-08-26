@@ -9,6 +9,7 @@ type DragWrapperProps = {
   missed: boolean
   overlap: boolean
   success: boolean
+  disabled: boolean
 }
 
 export const DragContainer = styled.div`
@@ -24,6 +25,8 @@ export const DragContainer = styled.div`
   border-radius: 20px;
   ${(props) => props.dragging && 'box-shadow: 0px 0px 4px 1px #50E3C2'};
   ${(props) => props.success && 'box-shadow: 0px 0px 4px 1px #50E3C2'};
+  ${(props) => props.disabled && 'opacity: .5'};
+  ${(props) => props.disabled && 'cursor: not-allowed'};
 
   overflow: hidden;
 

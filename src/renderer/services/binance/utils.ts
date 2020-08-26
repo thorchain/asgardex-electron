@@ -17,6 +17,7 @@ import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/pipeable'
 import { IntlShape } from 'react-intl'
 
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
@@ -117,6 +118,17 @@ export const getAssetWithBalance = (assetsWB: AssetsWithBalance, oAsset: O.Optio
       FP.pipe(
         assetsWB,
         A.findFirst((assetWB) => assetWB.asset.symbol === asset.symbol)
+      )
+    )
+  )
+
+export const getAssetBalance = (balances: BalancesRD, asset: O.Option<Asset>) =>
+  pipe(
+    sequenceTOption(pipe(balances, RD.toOption), asset),
+    O.chain(([balances, asset]) =>
+      pipe(
+        balances,
+        A.findFirst((balance) => balance.symbol === asset.symbol)
       )
     )
   )

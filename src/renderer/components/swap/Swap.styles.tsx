@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
+import AssetInputBase from '../uielements/assets/assetInput'
 
 export const Container = styled('div')`
   display: flex;
@@ -36,7 +37,7 @@ export const Header = styled('div')`
 export const SwapOutlined = styled(ASwapOutlined).attrs({ rotate: 90 })`
   width: 100%;
   color: ${palette('success', 0)};
-
+  ${(props) => (props.disabled ? 'opacity: 0.5; cursor: not-allowed !important;' : '')}
   svg {
     height: 22px;
     width: 22px;
@@ -114,4 +115,26 @@ export const SubmitContainer = styled('div')`
   display: flex;
   flex-direction: column;
   align-items: center;
+`
+
+export const PendingContainer = styled('div')`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 60px;
+  left: 0;
+  z-index: 9;
+  background-color: ${palette('gradient', 1)};
+
+  &:not(:empty) {
+    width: 100%;
+    height: 100%;
+  }
+`
+
+export const AssetInput = styled(AssetInputBase)`
+  & .ant-input {
+    border: none;
+  }
 `

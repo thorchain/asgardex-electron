@@ -1,25 +1,30 @@
 import React from 'react'
 
-import { Asset, formatBN } from '@thorchain/asgardex-util'
+import { Asset, formatBN, bn } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/pipeable'
 
+import { sequenceTOption } from '../../../helpers/fpHelpers'
 import * as Styled from './CurrencyInfo.styles'
 
 type CurrencyInfo = {
-  from?: { asset: Asset; priceRune: BigNumber }
-  to?: { asset: Asset; priceRune: BigNumber }
+  from?: O.Option<{ asset: Asset; priceRune: BigNumber }>
+  to?: O.Option<{ asset: Asset; priceRune: BigNumber }>
+  slip?: BigNumber
 }
 
-export const CurrencyInfo = ({ from, to }: CurrencyInfo) => {
-  if (!from || !to) {
-    return null
-  }
-  return (
-    <Styled.Container>
-      <div>
-        1 {from.asset.ticker} = {formatBN(from.priceRune.dividedBy(to.priceRune), 5)} {to.asset.ticker}
-      </div>
-      <div>slip: 1%</div>
-    </Styled.Container>
+export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: CurrencyInfo) => {
+  return pipe(
+    sequenceTOption(from, to),
+    O.map(([from, to]) => (
+      <Styled.Container key={'currency info'}>
+        <div>
+          1 {from.asset.ticker} = {formatBN(from.priceRune.dividedBy(to.priceRune), 5)} {to.asset.ticker}
+        </div>
+        <div>slip: {slip.multipliedBy(100).toFormat(2)}%</div>
+      </Styled.Container>
+    )),
+    O.toNullable
   )
 }

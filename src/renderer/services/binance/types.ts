@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Balances, BinanceClient, Txs, Transfer, Fees } from '@thorchain/asgardex-binance'
 import { Asset, AssetAmount } from '@thorchain/asgardex-util'
+import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
 import { Option, option } from 'fp-ts/lib/Option'
@@ -11,6 +12,11 @@ export type AssetWithBalance = {
   asset: Asset
   balance: AssetAmount
   frozenBalance?: AssetAmount
+}
+
+export type AssetWithPrice = {
+  asset: Asset
+  priceRune: BigNumber
 }
 
 export type AssetsWithBalance = AssetWithBalance[]

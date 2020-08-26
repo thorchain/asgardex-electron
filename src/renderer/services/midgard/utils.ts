@@ -102,13 +102,19 @@ export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<Po
  * Keys of the end HasMap is PoolDetails[i].asset
  */
 export const getPoolDetailsHashMap = (poolDetails: PoolDetails): Record<string, PoolData> => {
-  return poolDetails.reduce((acc, cur) => {
+  const res = poolDetails.reduce((acc, cur) => {
     if (!cur.asset) {
       return acc
     }
 
     return { ...acc, [cur.asset]: toPoolData(cur) }
   }, {} as Record<string, PoolData>)
+
+  res[PoolAsset.RUNE67C] = {
+    ...RUNE_PRICE_POOL.poolData
+  }
+
+  return res
 }
 
 /**

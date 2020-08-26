@@ -273,6 +273,19 @@ const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
   shareReplay(1)
 )
 
+const poolAddresses$ = pipe(
+  byzantine$,
+  liveData.chain((endpoint) =>
+    pipe(
+      getMidgardDefaultApi(endpoint).getThorchainProxiedEndpoints(),
+      map(RD.success),
+      startWith(RD.pending),
+      catchError((e: Error) => Rx.of(RD.failure(e)))
+    )
+  ),
+  liveData.map((s) => s.current || []),
+  retry(MIDGARD_MAX_RETRY)
+)
 /**
  * Service object with all "public" functions and observables we want to provide
  */
@@ -287,5 +300,6 @@ export const service = {
   reloadThorchainLastblock,
   setSelectedPricePool: setSelectedPricePoolAsset,
   selectedPricePoolAsset$,
-  apiEndpoint$: byzantine$
+  apiEndpoint$: byzantine$,
+  poolAddresses$
 }
