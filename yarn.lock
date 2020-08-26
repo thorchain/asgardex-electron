@@ -2534,10 +2534,10 @@
   dependencies:
     "@babel/runtime" "^7.10.2"
 
-"@thorchain/asgardex-binance@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-binance/-/asgardex-binance-3.0.0.tgz#12e1490832428a3238adcc68e1ff387f2e159f6f"
-  integrity sha512-5vaMHeIAt7V9FBdNU+O+eWFDuBLAtJjSn28Ap3qNqMNluaupDmNpN5ijWyQYZ+Go/dthKmYT+b/O4dws/I/sTw==
+"@thorchain/asgardex-binance@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-binance/-/asgardex-binance-3.0.1.tgz#ef516851b1f7d9fde28b43bb1bc0aab7bd1e1abc"
+  integrity sha512-Pg7jbDJlyvOe46QMFJKADwhe3xXkWQ0c754e6BulBJsXDLw8lzodOsP98hlJwukJXe7AE5jjyAiS/jfWA2WDiQ==
 
 "@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git":
   version "0.1.0"
