@@ -1,13 +1,24 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { bn, assetAmount, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import {
+  assetAmount,
+  assetToString,
+  formatAssetAmountCurrency,
+  AssetAmount,
+  formatAssetAmount
+} from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { BNB_SYMBOL } from '../../../helpers/assetHelper'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { AssetWithBalance, FreezeAction, FreezeTxParams } from '../../../services/binance/types'
 import { InputNumber } from '../../uielements/input'
 import AccountSelector from '../AccountSelector'
 import * as Styled from './Form.style'
+import { validateFreezeInput } from './util'
 
 export type FormValues = {
   amount: string
@@ -15,13 +26,15 @@ export type FormValues = {
 
 type Props = {
   freezeAction: FreezeAction
-  asset: AssetWithBalance
+  assetWB: AssetWithBalance
+  bnbAmount: O.Option<AssetAmount>
   onSubmit: ({ amount, asset, action }: FreezeTxParams) => void
   isLoading: boolean
+  fee: O.Option<AssetAmount>
 }
 
 export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
-  const { freezeAction, onSubmit: onSubmitProp, asset: assetWB, isLoading = false } = props
+  const { freezeAction, onSubmit: onSubmitProp, assetWB, isLoading = false, bnbAmount: oBnbAmount, fee: oFee } = props
 
   const intl = useIntl()
 
@@ -35,19 +48,25 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
   }, [assetWB, freezeAction])
 
   const amountValidator = useCallback(
-    async (a: unknown, stringValue: string) => {
-      const value = bn(stringValue)
+    async (a: unknown, value: string) =>
+      validateFreezeInput({
+        input: value,
+        maxAmount,
+        intl
+      }),
+    [intl, maxAmount]
+  )
 
-      // TODO(Veado): Consider fees (https://github.com/thorchain/asgardex-electron/issues/369)
-      if (!value.isGreaterThan(0)) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }))
-      }
-
-      if (value.isGreaterThan(maxAmount.amount())) {
-        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' }))
-      }
-    },
-    [maxAmount, intl]
+  const feeLabel = useMemo(
+    () =>
+      FP.pipe(
+        oFee,
+        O.fold(
+          () => '--',
+          (f) => `${formatAssetAmount(f, 6)} ${BNB_SYMBOL}`
+        )
+      ),
+    [oFee]
   )
 
   const onSubmit = useCallback(
@@ -68,6 +87,38 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
     }
   }, [intl, freezeAction])
 
+  const isFeeError = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(oFee, oBnbAmount),
+      O.fold(
+        // Missing (or loading) fees does not mean we can't sent something. No error then.
+        () => !O.isNone(oFee),
+        ([fee, bnbAmount]) => bnbAmount.amount().isLessThan(fee.amount())
+      )
+    )
+  }, [oBnbAmount, oFee])
+
+  const renderFeeError = useMemo(() => {
+    if (!isFeeError) return <></>
+
+    const amount = FP.pipe(
+      oBnbAmount,
+      // no bnb asset == zero amount
+      O.getOrElse(() => assetAmount(0))
+    )
+
+    const msg = intl.formatMessage(
+      { id: 'wallet.errors.fee.notCovered' },
+      { fee: formatAssetAmount(amount, 6), balance: `${formatAssetAmount(amount, 8)} ${BNB_SYMBOL}` }
+    )
+
+    return (
+      <Styled.StyledLabel size="big" color="error">
+        {msg}
+      </Styled.StyledLabel>
+    )
+  }, [oBnbAmount, intl, isFeeError])
+
   return (
     <Row>
       <Styled.Col span={24}>
@@ -87,11 +138,17 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
               <InputNumber min={0} size="large" disabled={isLoading} />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">
-              MAX: {formatAssetAmountCurrency(maxAmount, assetToString(assetWB.asset))}
+              <>
+                {intl.formatMessage({ id: 'common.max' })}:{' '}
+                {formatAssetAmountCurrency(assetWB.balance, assetToString(assetWB.asset))}
+                <br />
+                {intl.formatMessage({ id: 'common.fees' })}: {feeLabel}
+              </>
             </Styled.StyledLabel>
+            {renderFeeError}
           </Styled.SubForm>
           <Styled.SubmitItem>
-            <Styled.Button loading={isLoading} htmlType="submit">
+            <Styled.Button loading={isLoading} disabled={isFeeError} htmlType="submit">
               {submitLabel}
             </Styled.Button>
           </Styled.SubmitItem>

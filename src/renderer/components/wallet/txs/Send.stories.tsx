@@ -8,7 +8,7 @@ import { EMPTY, Observable, of } from 'rxjs'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { TRANSFER_FEES } from '../../../../shared/mock/fees'
-import { AssetWithBalance, TransferRD, AssetsWithBalanceRD, AddressValidation } from '../../../services/binance/types'
+import { AssetWithBalance, AssetsWithBalance, TransferRD, AddressValidation } from '../../../services/binance/types'
 import Send from './Send'
 
 // eslint-disable-next-line
@@ -23,7 +23,7 @@ const selectedAsset: AssetWithBalance = {
   balance: assetAmount(1)
 }
 
-const balances: AssetsWithBalanceRD = RD.success([selectedAsset])
+const balances: AssetsWithBalance = [selectedAsset]
 const explorerUrl = O.none
 const fee = O.some(TRANSFER_FEES.single)
 
@@ -34,7 +34,7 @@ storiesOf('Wallet/Send', module)
     return (
       <Send
         selectedAsset={selectedAsset}
-        balances={balances}
+        assetsWB={balances}
         transactionService={createServiceProp(EMPTY)}
         explorerUrl={explorerUrl}
         addressValidation={addressValidation}
@@ -46,7 +46,7 @@ storiesOf('Wallet/Send', module)
     return (
       <Send
         selectedAsset={selectedAsset}
-        balances={balances}
+        assetsWB={balances}
         transactionService={createServiceProp(of(RD.pending))}
         explorerUrl={explorerUrl}
         addressValidation={addressValidation}
@@ -58,7 +58,7 @@ storiesOf('Wallet/Send', module)
     return (
       <Send
         selectedAsset={selectedAsset}
-        balances={balances}
+        assetsWB={balances}
         transactionService={createServiceProp(of(RD.failure(Error('error example'))))}
         explorerUrl={explorerUrl}
         addressValidation={addressValidation}
@@ -70,7 +70,7 @@ storiesOf('Wallet/Send', module)
     return (
       <Send
         selectedAsset={selectedAsset}
-        balances={balances}
+        assetsWB={balances}
         addressValidation={addressValidation}
         transactionService={createServiceProp(
           of(
@@ -91,7 +91,7 @@ storiesOf('Wallet/Send', module)
     return (
       <Send
         selectedAsset={selectedAsset}
-        balances={balances}
+        assetsWB={balances}
         transactionService={createServiceProp(EMPTY)}
         explorerUrl={explorerUrl}
         addressValidation={addressValidation}

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-import { initial } from '@devexperts/remote-data-ts'
+import * as RD from '@devexperts/remote-data-ts'
 import { BinanceClient } from '@thorchain/asgardex-binance'
 import { assetFromString, assetToString } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
@@ -16,7 +16,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useSingleTxFee } from '../../hooks/useSingleTxFee'
 import { SendParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
-import { AddressValidation } from '../../services/binance/types'
+import { AddressValidation, AssetsWithBalance } from '../../services/binance/types'
 import { toAssetWithBalances, getAssetWithBalance } from '../../services/binance/utils'
 
 type Props = {}
@@ -28,14 +28,22 @@ const SendView: React.FC<Props> = (): JSX.Element => {
   const intl = useIntl()
 
   const { transaction: transactionService, balancesState$, explorerUrl$, client$, transferFees$ } = useBinanceContext()
-  const balancesState = useObservableState(balancesState$, initial)
+  const balancesState = useObservableState(balancesState$, RD.initial)
   const explorerUrl = useObservableState(explorerUrl$, O.none)
   const client = useObservableState<O.Option<BinanceClient>>(client$, O.none)
 
   const fee = useSingleTxFee(transferFees$)
 
-  const balances = useMemo(() => toAssetWithBalances(balancesState, intl), [balancesState, intl])
-  const oSelectedAssetWB = useMemo(() => getAssetWithBalance(balances, oSelectedAsset), [oSelectedAsset, balances])
+  const assetsWB = useMemo(
+    () =>
+      FP.pipe(
+        toAssetWithBalances(balancesState, intl),
+        RD.getOrElse(() => [] as AssetsWithBalance)
+      ),
+    [balancesState, intl]
+  )
+
+  const oSelectedAssetWB = useMemo(() => getAssetWithBalance(assetsWB, oSelectedAsset), [oSelectedAsset, assetsWB])
 
   const addressValidation = useMemo(
     () =>
@@ -67,7 +75,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
           <Send
             selectedAsset={selectedAsset}
             transactionService={transactionService}
-            balances={balances}
+            assetsWB={assetsWB}
             explorerUrl={explorerUrl}
             addressValidation={addressValidation}
             fee={fee}

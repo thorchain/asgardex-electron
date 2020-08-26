@@ -7,6 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import { EMPTY, Observable, of } from 'rxjs'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
+import { TRANSFER_FEES } from '../../../../shared/mock/fees'
 import { AssetWithBalance, FreezeRD } from '../../../services/binance/types'
 import Freeze from './Freeze'
 
@@ -23,6 +24,8 @@ const selectedAsset: AssetWithBalance = {
 }
 
 const explorerUrl = O.none
+const fee = O.some(TRANSFER_FEES.single)
+const bnbAmount = O.some(assetAmount(1))
 
 storiesOf('Wallet/Freeze', module)
   .add('freeze', () => {
@@ -32,6 +35,8 @@ storiesOf('Wallet/Freeze', module)
         explorerUrl={explorerUrl}
         selectedAsset={selectedAsset}
         freezeService={createServiceProp(EMPTY)}
+        fee={fee}
+        bnbAmount={bnbAmount}
       />
     )
   })
@@ -42,6 +47,8 @@ storiesOf('Wallet/Freeze', module)
         explorerUrl={explorerUrl}
         selectedAsset={selectedAsset}
         freezeService={createServiceProp(EMPTY)}
+        fee={fee}
+        bnbAmount={bnbAmount}
       />
     )
   })
@@ -52,6 +59,8 @@ storiesOf('Wallet/Freeze', module)
         explorerUrl={explorerUrl}
         selectedAsset={selectedAsset}
         freezeService={createServiceProp(of(RD.pending))}
+        fee={fee}
+        bnbAmount={bnbAmount}
       />
     )
   })
@@ -62,6 +71,8 @@ storiesOf('Wallet/Freeze', module)
         explorerUrl={explorerUrl}
         selectedAsset={selectedAsset}
         freezeService={createServiceProp(of(RD.failure(Error('error example'))))}
+        fee={fee}
+        bnbAmount={bnbAmount}
       />
     )
   })
@@ -81,6 +92,44 @@ storiesOf('Wallet/Freeze', module)
             })
           )
         )}
+        fee={fee}
+        bnbAmount={bnbAmount}
+      />
+    )
+  })
+  .add('no fees', () => {
+    return (
+      <Freeze
+        freezeAction="freeze"
+        explorerUrl={explorerUrl}
+        selectedAsset={selectedAsset}
+        freezeService={createServiceProp(EMPTY)}
+        fee={O.none}
+        bnbAmount={bnbAmount}
+      />
+    )
+  })
+  .add('no bnb amount', () => {
+    return (
+      <Freeze
+        freezeAction="freeze"
+        explorerUrl={explorerUrl}
+        selectedAsset={selectedAsset}
+        freezeService={createServiceProp(EMPTY)}
+        fee={fee}
+        bnbAmount={O.none}
+      />
+    )
+  })
+  .add('bnb amount < fees', () => {
+    return (
+      <Freeze
+        freezeAction="freeze"
+        explorerUrl={explorerUrl}
+        selectedAsset={selectedAsset}
+        freezeService={createServiceProp(EMPTY)}
+        fee={fee}
+        bnbAmount={O.some(assetAmount(0.00000001))}
       />
     )
   })

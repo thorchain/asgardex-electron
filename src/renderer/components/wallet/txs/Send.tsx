@@ -8,7 +8,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { BinanceContextValue } from '../../../contexts/BinanceContext'
-import { AssetWithBalance, TransferRD, AssetsWithBalanceRD, AddressValidation } from '../../../services/binance/types'
+import { AssetWithBalance, TransferRD, AddressValidation, AssetsWithBalance } from '../../../services/binance/types'
 import ErrorView from '../../shared/error/ErrorView'
 import SuccessView from '../../shared/success/SuccessView'
 import Button from '../../uielements/button'
@@ -17,7 +17,7 @@ import { SendForm } from './SendForm'
 
 type Props = {
   transactionService: BinanceContextValue['transaction']
-  balances: AssetsWithBalanceRD
+  assetsWB: AssetsWithBalance
   selectedAsset: AssetWithBalance
   explorerUrl: O.Option<string>
   addressValidation: AddressValidation
@@ -25,7 +25,7 @@ type Props = {
 }
 
 const Send: React.FC<Props> = (props): JSX.Element => {
-  const { transactionService, balances, selectedAsset, explorerUrl = O.none, addressValidation, fee } = props
+  const { transactionService, assetsWB, selectedAsset, explorerUrl = O.none, addressValidation, fee } = props
   const intl = useIntl()
 
   const { txRD$, resetTx, pushTx } = transactionService
@@ -64,13 +64,13 @@ const Send: React.FC<Props> = (props): JSX.Element => {
       <SendForm
         assetWB={selectedAsset}
         onSubmit={pushTx}
-        assetsWB={balances}
+        assetsWB={assetsWB}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
         fee={fee}
       />
     ),
-    [selectedAsset, pushTx, balances, txRD, addressValidation, fee]
+    [selectedAsset, pushTx, assetsWB, txRD, addressValidation, fee]
   )
 
   return (

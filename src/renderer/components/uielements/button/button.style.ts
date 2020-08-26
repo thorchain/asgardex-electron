@@ -225,11 +225,9 @@ export const ButtonWrapper = styled(Button)<Props>`
     &,
     &:active,
     &:focus {
-      color: ${(props) => (!props.disabled && getThemeValue(props.color, props.typevalue)?.text) ?? ''};
-      border-color: ${(props) =>
-        (!props.disabled && getThemeValue(props.color, props.typevalue)?.border) ?? 'transparent'};
-      background: ${(props) =>
-        (!props.disabled && getThemeValue(props.color, props.typevalue)?.background) ?? 'transparent'};
+      color: ${(props) => getThemeValue(props.color, props.typevalue)?.text ?? ''};
+      border-color: ${(props) => getThemeValue(props.color, props.typevalue)?.border ?? 'transparent'};
+      background: ${(props) => getThemeValue(props.color, props.typevalue)?.background ?? 'transparent'};
       ${(props) =>
         props.typevalue === 'normal' &&
         `
@@ -239,6 +237,11 @@ export const ButtonWrapper = styled(Button)<Props>`
           -moz-background-size: 100% 3px;
           background-size: 100% 3px;
         `}
+    }
+
+    &:disabled {
+      background: ${(props) => getThemeValue(props.color, props.typevalue)?.background ?? 'transparent'};
+      opacity: 0.5;
     }
 
     /* provide focus styles over the underlying styles */
@@ -255,9 +258,8 @@ export const ButtonWrapper = styled(Button)<Props>`
       &,
       &:focus,
       &:active {
-        color: ${(props) => !props.disabled && (getThemeValue(props.color, props.typevalue)?.action?.text ?? '')};
-        border-color: ${(props) =>
-          !props.disabled && (getThemeValue(props.color, props.typevalue)?.action?.border ?? 'transparent')};
+        color: ${(props) => getThemeValue(props.color, props.typevalue)?.action?.text ?? ''};
+        border-color: ${(props) => getThemeValue(props.color, props.typevalue)?.action?.border ?? 'transparent'};
         background: ${(props) =>
           props.typevalue === 'normal'
             ? !props.disabled && (getThemeValue(props.color, props.typevalue)?.focus?.borderBottom ?? 'transparent')

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { AssetAmount } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
@@ -19,10 +20,12 @@ type Props = {
   freezeService: BinanceContextValue['freeze']
   selectedAsset: AssetWithBalance
   explorerUrl: O.Option<string>
+  fee: O.Option<AssetAmount>
+  bnbAmount: O.Option<AssetAmount>
 }
 
 const Freeze: React.FC<Props> = (props: Props): JSX.Element => {
-  const { freezeService, selectedAsset, freezeAction: sendAction, explorerUrl = O.none } = props
+  const { freezeService, selectedAsset, freezeAction: sendAction, explorerUrl = O.none, fee, bnbAmount } = props
   const intl = useIntl()
 
   const { txRD$, resetTx: resetFreeze, pushTx: pushFreeze } = freezeService
@@ -60,12 +63,14 @@ const Freeze: React.FC<Props> = (props: Props): JSX.Element => {
     () => (
       <FreezeForm
         freezeAction={sendAction}
-        asset={selectedAsset}
+        assetWB={selectedAsset}
         onSubmit={pushFreeze}
         isLoading={RD.isPending(txRD)}
+        fee={fee}
+        bnbAmount={bnbAmount}
       />
     ),
-    [pushFreeze, selectedAsset, sendAction, txRD]
+    [bnbAmount, fee, pushFreeze, selectedAsset, sendAction, txRD]
   )
 
   return (

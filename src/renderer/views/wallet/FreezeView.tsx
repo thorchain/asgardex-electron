@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { initial } from '@devexperts/remote-data-ts'
 import { assetFromString, assetToString } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
@@ -8,13 +9,14 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 
-import ErrorView from '../../components/shared/error/ErrorView'
 import BackLink from '../../components/uielements/backLink'
 import Freeze from '../../components/wallet/txs/Freeze'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { getBnbAmount } from '../../helpers/binanceHelper'
+import { useSingleTxFee } from '../../hooks/useSingleTxFee'
 import { SendParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
-import { FreezeAction } from '../../services/binance/types'
+import { FreezeAction, AssetsWithBalance } from '../../services/binance/types'
 import { toAssetWithBalances, getAssetWithBalance } from '../../services/binance/utils'
 
 type Props = {
@@ -27,23 +29,26 @@ const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
 
   const intl = useIntl()
 
-  const { freeze: freezeService, balancesState$, explorerUrl$ } = useBinanceContext()
+  const { freeze: freezeService, balancesState$, explorerUrl$, transferFees$ } = useBinanceContext()
+  const fee = useSingleTxFee(transferFees$)
   const balancesState = useObservableState(balancesState$, initial)
   const explorerUrl = useObservableState(explorerUrl$, O.none)
-  const balances = useMemo(() => toAssetWithBalances(balancesState, intl), [balancesState, intl])
-  const oSelectedAssetWB = useMemo(() => getAssetWithBalance(balances, oSelectedAsset), [oSelectedAsset, balances])
-
+  const assetsWB = useMemo(
+    () =>
+      FP.pipe(
+        toAssetWithBalances(balancesState, intl),
+        RD.getOrElse(() => [] as AssetsWithBalance)
+      ),
+    [balancesState, intl]
+  )
+  const oSelectedAssetWB = useMemo(() => getAssetWithBalance(assetsWB, oSelectedAsset), [oSelectedAsset, assetsWB])
+  const bnbAmount = useMemo(() => FP.pipe(assetsWB, getBnbAmount), [assetsWB])
   return (
     <>
       {FP.pipe(
         oSelectedAssetWB,
         O.fold(
-          () => (
-            <>
-              <BackLink />
-              <ErrorView title={`Parsing asset ${asset} from route failed`} />
-            </>
-          ),
+          () => <></>,
           (selectedAsset) => (
             <>
               <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(selectedAsset.asset) })} />
@@ -52,6 +57,8 @@ const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
                 selectedAsset={selectedAsset}
                 freezeService={freezeService}
                 explorerUrl={explorerUrl}
+                fee={fee}
+                bnbAmount={bnbAmount}
               />
             </>
           )

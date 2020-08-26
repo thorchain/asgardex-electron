@@ -33,7 +33,7 @@ export const StyledLabel = styled(Label)`
   margin-bottom: 14px;
   font-family: 'MainFontRegular';
   text-transform: uppercase;
-  color: ${palette('primary', 0)};
+  color: ${({ color }) => (color === 'error' ? palette('error', 0) : palette('primary', 0))};
 `
 
 export const SubmitItem = styled(A.Form.Item)`
