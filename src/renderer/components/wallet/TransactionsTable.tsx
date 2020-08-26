@@ -102,7 +102,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
 
   const renderAmountColumn = useCallback(({ value }: Tx) => {
     const amount = assetAmount(bnOrZero(value))
-    const label = formatAssetAmount(amount, 3)
+    const label = formatAssetAmount(amount, 8)
     return <Styled.Text>{label}</Styled.Text>
   }, [])
 
