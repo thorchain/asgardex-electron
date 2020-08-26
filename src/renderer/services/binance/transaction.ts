@@ -33,8 +33,8 @@ const tx$ = ({
     switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY)),
     switchMap((client) =>
       memo
-        ? Rx.from(client.vaultTx(to, amount.amount().toNumber(), symbol, memo))
-        : Rx.from(client.normalTx(to, amount.amount().toNumber(), symbol))
+        ? Rx.from(client.vaultTx({ addressTo: to, amount: amount.amount().toString(), asset: symbol, memo }))
+        : Rx.from(client.normalTx({ addressTo: to, amount: amount.amount().toString(), asset: symbol }))
     ),
     map(({ result }) => O.fromNullable(result)),
     map((transfers) => RD.fromOption(transfers, () => Error('Transaction: empty response'))),

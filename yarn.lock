@@ -1225,9 +1225,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@binance-chain/javascript-sdk@https://github.com/veado/javascript-sdk#fix/tokenmanager-instance-lib":
-  version "0.0.0-development"
-  resolved "https://github.com/veado/javascript-sdk#06aac30e1274d24b39336fb822a93e2c8d5eb53f"
+"@binance-chain/javascript-sdk@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@binance-chain/javascript-sdk/-/javascript-sdk-4.1.1.tgz#383f02fec435929d21e9e22f9cfc6e9761a09d79"
+  integrity sha512-UeHRv1r7KiTZ3XnSrBLv5IxydDcZnEzykyQ9MJrxBXkUxApc4liZ4VW5g+32eOWfqFHNlyfb58f+MNhPntal2A==
   dependencies:
     "@babel/runtime" "^7.10.4"
     "@ledgerhq/hw-transport-u2f" "^5.9.0"
@@ -2559,9 +2560,10 @@
   dependencies:
     "@babel/runtime" "^7.10.2"
 
-"@thorchain/asgardex-binance@https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#64f85528de2564f74bf5ee61301e5c7f9622db4f":
-  version "2.1.1"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-binance.git#64f85528de2564f74bf5ee61301e5c7f9622db4f"
+"@thorchain/asgardex-binance@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-binance/-/asgardex-binance-3.0.1.tgz#ef516851b1f7d9fde28b43bb1bc0aab7bd1e1abc"
+  integrity sha512-Pg7jbDJlyvOe46QMFJKADwhe3xXkWQ0c754e6BulBJsXDLw8lzodOsP98hlJwukJXe7AE5jjyAiS/jfWA2WDiQ==
 
 "@thorchain/asgardex-crypto@https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git":
   version "0.1.0"

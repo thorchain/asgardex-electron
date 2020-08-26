@@ -25,11 +25,11 @@ const tx$ = ({
     switchMap((client) => {
       // freeze
       if (action === 'freeze') {
-        return Rx.from(client.freeze(amount.amount().toNumber(), asset.symbol))
+        return Rx.from(client.freeze({ amount: amount.amount().toString(), asset: asset.symbol }))
       }
       // unfreeze
       if (action === 'unfreeze') {
-        return Rx.from(client.unfreeze(amount.amount().toNumber(), asset.symbol))
+        return Rx.from(client.unfreeze({ amount: amount.amount().toString(), asset: asset.symbol }))
       }
       return Rx.EMPTY
     }),

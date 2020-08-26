@@ -174,8 +174,8 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
-              const cleint = new Client(phrase, binanceNetwork)
-              return some(right(cleint)) as BinanceClientState
+              const client = new Client({ phrase, network: binanceNetwork })
+              return some(right(client)) as BinanceClientState
             } catch (error) {
               return some(left(error))
             }
@@ -205,7 +205,7 @@ const clientViewState$: Observable<BinanceClientStateForViews> = clientState$.pi
  *
  */
 const address$: Observable<O.Option<Address>> = client$.pipe(
-  map(FP.pipe(O.map((client) => client.getAddress()))),
+  map(FP.pipe(O.chain((client) => FP.pipe(client.getAddress(), O.fromNullable)))),
   distinctUntilChanged(fpHelpers.eqOString.equals),
   shareReplay(1)
 )
