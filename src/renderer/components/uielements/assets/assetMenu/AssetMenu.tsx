@@ -19,10 +19,11 @@ type Props = {
   searchDisable: string[]
   withSearch: boolean
   onSelect: (value: string) => void
+  closeMenu?: () => void
 }
 
 const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
-  const { assetData, asset, priceIndex = {}, withSearch, searchDisable = [], onSelect = () => {} } = props
+  const { assetData, asset, priceIndex = {}, withSearch, searchDisable = [], onSelect = () => {}, closeMenu } = props
 
   const filteredData = useMemo(
     () => assetData.filter((item) => item.asset.ticker !== asset.ticker),
@@ -47,6 +48,7 @@ const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <FilterMenu
+      closeMenu={closeMenu}
       searchEnabled={withSearch}
       filterFunction={filterFunction}
       cellRenderer={cellRenderer}

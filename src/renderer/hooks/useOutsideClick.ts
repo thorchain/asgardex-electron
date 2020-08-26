@@ -2,7 +2,11 @@ import { useEffect, useRef, RefObject } from 'react'
 
 type Callback = (e: MouseEvent) => void
 
-export function useClickOutside<T extends Element>(ref: RefObject<T>, callback: Callback) {
+export function useClickOutside<T extends Element>(
+  ref: RefObject<T>,
+  callback: Callback,
+  options?: boolean | AddEventListenerOptions
+) {
   const callbackRef = useRef<Callback>()
   callbackRef.current = callback
 
@@ -12,7 +16,7 @@ export function useClickOutside<T extends Element>(ref: RefObject<T>, callback: 
         callbackRef?.current(e)
       }
     }
-    window.addEventListener('click', clickHandler)
-    return () => window.removeEventListener('click', clickHandler)
-  }, [ref, callbackRef])
+    window.addEventListener('click', clickHandler, options)
+    return () => window.removeEventListener('click', clickHandler, options)
+  }, [ref, callbackRef, options])
 }

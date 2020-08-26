@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { RefObject, useCallback, useMemo, useRef, useState } from 'react'
 
 import { SearchOutlined } from '@ant-design/icons'
 import { MenuProps } from 'antd/lib/menu'
 
+import { useClickOutside } from '../../../hooks/useOutsideClick'
 import { Input } from '../input'
 import { Menu, MenuItem } from './FilterMenu.style'
 
@@ -15,6 +16,7 @@ type Props<T> = {
   disableItemFilter?: (item: T) => boolean
   filterFunction: (item: T, searchTerm: string) => boolean
   onSelect?: (value: string) => void
+  closeMenu?: () => void
 }
 
 const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
@@ -25,7 +27,8 @@ const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
     filterFunction,
     cellRenderer,
     disableItemFilter = (_) => false,
-    placeholder = 'Search Token ...'
+    placeholder = 'Search Token ...',
+    closeMenu
   } = props
 
   const [searchTerm, setSearchTerm] = useState('')
@@ -46,36 +49,52 @@ const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
     setSearchTerm(newSearchTerm)
   }, [])
 
+  const ref: RefObject<HTMLDivElement> = useRef(null)
+  /**
+   * If we handle this callback on the bubbling phase there is next scenario
+   *  - user clicks to the 'open menu' button
+   *  - events are handled on the bubbling phase
+   *  - engine calls 'open' callback
+   *  - engine calls clickOutsideCallback
+   *  - filter menu closes right after  the click on the 'open' button
+   *
+   * To avoid this here is a need to call outside click event BEFORE
+   * calling 'open' callback and handle an event on the capturing phase
+   */
+  useClickOutside<HTMLDivElement>(ref, () => closeMenu && closeMenu(), true)
+
   const filteredData: T[] = useMemo(
     () => (searchTerm === '' ? data : data.filter((item) => filterFunction(item, searchTerm))),
     [data, filterFunction, searchTerm]
   )
 
   return (
-    <Menu onClick={handleClick}>
-      {searchEnabled && (
-        <Menu.Item disabled key="_search">
-          <Input
-            value={searchTerm}
-            onChange={handleSearchChanged}
-            placeholder={placeholder}
-            size="large"
-            typevalue="ghost"
-            suffix={<SearchOutlined />}
-          />
-        </Menu.Item>
-      )}
-      {filteredData.map((item: T) => {
-        const { key, node } = cellRenderer(item)
-        const disableItem = disableItemFilter(item)
+    <div ref={ref}>
+      <Menu onClick={handleClick}>
+        {searchEnabled && (
+          <Menu.Item disabled key="_search">
+            <Input
+              value={searchTerm}
+              onChange={handleSearchChanged}
+              placeholder={placeholder}
+              size="large"
+              typevalue="ghost"
+              suffix={<SearchOutlined />}
+            />
+          </Menu.Item>
+        )}
+        {filteredData.map((item: T) => {
+          const { key, node } = cellRenderer(item)
+          const disableItem = disableItemFilter(item)
 
-        return (
-          <MenuItem disabled={disableItem} key={key}>
-            {node}
-          </MenuItem>
-        )
-      })}
-    </Menu>
+          return (
+            <MenuItem disabled={disableItem} key={key}>
+              {node}
+            </MenuItem>
+          )
+        })}
+      </Menu>
+    </div>
   )
 }
 

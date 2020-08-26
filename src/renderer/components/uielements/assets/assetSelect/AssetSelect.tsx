@@ -1,10 +1,9 @@
-import React, { RefObject, useRef, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import { delay, Asset } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
 import { sortBy as _sortBy } from 'lodash'
 
-import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetPair } from '../../../../types/asgardex'
 import AssetMenu from '../assetMenu'
@@ -45,15 +44,16 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
     asset,
     assetData = [],
     priceIndex,
-    withSearch = false,
+    withSearch = true,
     searchDisable = [],
     onSelect = (_: Asset) => {}
   } = props
 
   const [openDropdown, setOpenDropdown] = useState<boolean>(false)
-  const ref: RefObject<HTMLDivElement> = useRef(null)
 
-  useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
+  const closeMenu = useCallback(() => {
+    setOpenDropdown(false)
+  }, [setOpenDropdown])
 
   const handleDropdownButtonClicked = () => {
     // toggle dropdown state
@@ -76,6 +76,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
     return (
       <AssetSelectMenuWrapper>
         <AssetMenu
+          closeMenu={closeMenu}
           assetData={sortedAssetData}
           asset={asset}
           priceIndex={priceIndex}
@@ -97,7 +98,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
   }
 
   return (
-    <AssetSelectWrapper ref={ref}>
+    <AssetSelectWrapper>
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <>
           <AssetSelectData asset={asset} />
