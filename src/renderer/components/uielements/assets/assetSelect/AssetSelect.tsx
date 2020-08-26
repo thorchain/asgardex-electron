@@ -3,6 +3,7 @@ import React, { useCallback, useState } from 'react'
 import { delay, Asset } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
 import { sortBy as _sortBy } from 'lodash'
+import { useIntl } from 'react-intl'
 
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetPair } from '../../../../types/asgardex'
@@ -50,6 +51,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
   } = props
 
   const [openDropdown, setOpenDropdown] = useState<boolean>(false)
+  const intl = useIntl()
 
   const closeMenu = useCallback(() => {
     setOpenDropdown(false)
@@ -60,22 +62,26 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
     setOpenDropdown((value) => !value)
   }
 
-  const handleChangeAsset = async (assetId: string) => {
-    setOpenDropdown(false)
+  const handleChangeAsset = useCallback(
+    async (assetId: string) => {
+      setOpenDropdown(false)
 
-    // Wait for the dropdown to close
-    await delay(500)
-    const changedAsset = assetData.find((asset) => asset.asset.symbol === assetId)
-    if (changedAsset) {
-      onSelect(changedAsset.asset)
-    }
-  }
+      // Wait for the dropdown to close
+      await delay(500)
+      const changedAsset = assetData.find((asset) => asset.asset.symbol === assetId)
+      if (changedAsset) {
+        onSelect(changedAsset.asset)
+      }
+    },
+    [assetData, onSelect]
+  )
 
-  const renderMenu = () => {
+  const renderMenu = useCallback(() => {
     const sortedAssetData = _sortBy(assetData, ['asset'])
     return (
       <AssetSelectMenuWrapper>
         <AssetMenu
+          searchPlaceholder={intl.formatMessage({ id: 'swap.searchToken' })}
           closeMenu={closeMenu}
           assetData={sortedAssetData}
           asset={asset}
@@ -86,7 +92,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
         />
       </AssetSelectMenuWrapper>
     )
-  }
+  }, [assetData, intl, asset, closeMenu, handleChangeAsset, priceIndex, searchDisable, withSearch])
 
   const renderDropDownButton = () => {
     const disabled = assetData.length === 0
