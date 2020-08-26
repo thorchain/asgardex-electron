@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react'
 
 import { generatePhrase } from '@thorchain/asgardex-crypto'
-import { Rule } from 'antd/lib/form'
-import { Store } from 'antd/lib/form/interface'
+import Form, { Rule } from 'antd/lib/form'
 import { useIntl } from 'react-intl'
 
 import Button, { RefreshButton } from '../uielements/button/'
@@ -15,6 +14,11 @@ export type MnemonicInfo = { phrase: string; password: string }
 type Props = {
   onSubmit: (info: MnemonicInfo) => void
 }
+
+export type FormValues = {
+  password: string
+}
+
 const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element => {
   const [loadingMsg, setLoadingMsg] = useState<string>('')
   const intl = useIntl()
@@ -23,11 +27,13 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
 
   const phraseWords = useMemo(() => phrase.split(' ').map((word) => ({ text: word, _id: word })), [phrase])
 
+  const [form] = Form.useForm<FormValues>()
+
   const handleFormFinish = useCallback(
-    async (formData: Store) => {
+    ({ password }: FormValues) => {
       try {
         setLoadingMsg(intl.formatMessage({ id: 'wallet.create.creating' }) + '...')
-        onSubmit({ phrase, password: formData.password })
+        onSubmit({ phrase, password: password })
       } catch (err) {
         setLoadingMsg('')
       }
@@ -62,7 +68,12 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
         <RefreshButton clickHandler={() => setPhrase(generatePhrase())} />
       </Styled.TitleContainer>
       <MnemonicPhrase words={phraseWords} readOnly={true} />
-      <Styled.Form onFinish={handleFormFinish} labelCol={{ span: 24 }}>
+      {/* `Form<FormValue>` does not work in `styled(Form)`, so we have to add styles here. All is just needed to have correct types in `onFinish` handler)  */}
+      <Form
+        form={form}
+        onFinish={handleFormFinish}
+        labelCol={{ span: 24 }}
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <Styled.PasswordContainer>
           <Styled.PasswordItem name="password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
             <Input
@@ -88,7 +99,7 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
             {loadingMsg || intl.formatMessage({ id: 'common.next' })}
           </Button>
         </Styled.SubmitItem>
-      </Styled.Form>
+      </Form>
     </>
   )
 }

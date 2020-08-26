@@ -57,7 +57,13 @@ const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
 
           {enableDropdown && (
             <Dropdown overlay={menu} trigger={['click']}>
-              <Styled.Label>{intl.formatMessage({ id: 'common.change' })}</Styled.Label>
+              {/* Important note:
+                  Label has to be wrapped into a `div` to avoid error render messages
+                  such as "Function components cannot be given refs"
+              */}
+              <div>
+                <Styled.Label>{intl.formatMessage({ id: 'common.change' })}</Styled.Label>
+              </div>
             </Dropdown>
           )}
         </Styled.AssetInfoWrapper>

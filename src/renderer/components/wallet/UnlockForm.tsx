@@ -1,8 +1,7 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
 import { Modal } from 'antd'
-import { Rule } from 'antd/lib/form'
-import { Store } from 'antd/lib/form/interface'
+import Form, { Rule } from 'antd/lib/form'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -19,6 +18,10 @@ import BackLink from '../uielements/backLink'
 import { InputPassword } from '../uielements/input'
 import * as Styled from './UnlockForm.style'
 
+type FormValues = {
+  password: string
+}
+
 type Props = {
   keystore: KeystoreState
   unlock?: (state: KeystoreState, password: string) => Promise<void>
@@ -32,7 +35,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
   const history = useHistory()
   const location = useLocation<RedirectRouteState>()
   const intl = useIntl()
-  const [form] = Styled.Form.useForm()
+  const [form] = Form.useForm<FormValues>()
 
   const [validPassword, setValidPassword] = useState(false)
 
@@ -75,7 +78,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
   }
 
   const submitForm = useCallback(
-    async ({ password }: Store) => {
+    async ({ password }: FormValues) => {
       setUnlockError(none)
       await unlockHandler(keystore, password).catch((error) => {
         setUnlockError(some(error))
@@ -116,7 +119,8 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
         <BackLink style={{ position: 'absolute', top: 0, left: 0 }} />
         <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.title' })}</Styled.Text>
       </Styled.Header>
-      <Styled.Form form={form} onFinish={submitForm}>
+      {/* `Form<FormValue>` does not work in `styled(Form)`, so we have to add styles here. All is just needed to have correct types in `onFinish` handler)  */}
+      <Form form={form} onFinish={submitForm} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
         <Styled.Content>
           <div style={{ width: '100%' }}>
             <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.phrase' })}</Styled.Text>
@@ -144,7 +148,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
             </Styled.Actions>
           </Styled.FormItem>
         </Styled.Content>
-      </Styled.Form>
+      </Form>
     </>
   )
 }
