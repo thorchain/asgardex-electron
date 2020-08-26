@@ -1,4 +1,4 @@
-import AF from 'antd/lib/form'
+import * as A from 'antd'
 import AT from 'antd/lib/typography/Text'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -6,13 +6,7 @@ import { palette } from 'styled-theme'
 import { media } from '../../helpers/styleHelper'
 import BaseButton from '../uielements/button'
 
-export const Form = styled(AF)`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-`
-
-export const FormItem = styled(Form.Item)`
+export const FormItem = styled(A.Form.Item)`
   width: 100%;
   margin: 0;
 `
@@ -33,7 +27,7 @@ export const Text = styled(AT)`
   font-weight: 600;
 `
 
-export const PasswordInput = styled(AF.Item)`
+export const PasswordInput = styled(A.Form.Item)`
   width: 100%;
   max-width: 400px;
   margin: 0 auto;

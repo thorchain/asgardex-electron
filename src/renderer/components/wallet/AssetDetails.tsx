@@ -170,9 +170,13 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
               {isRuneAsset && (
                 <Row justify="center">
                   <Dropdown overlay={changeActionMenu} placement="bottomCenter" trigger={['click']}>
-                    <Label textTransform="uppercase" align="center" color="primary" size="big">
-                      {intl.formatMessage({ id: 'common.change' })}
-                    </Label>
+                    {/* Important note:
+                        Label has to be wrapped into a `div` to avoid error render messages
+                        such as "Function components cannot be given refs"
+                     */}
+                    <div>
+                      <Styled.Label>{intl.formatMessage({ id: 'common.change' })}</Styled.Label>
+                    </div>
                   </Dropdown>
                 </Row>
               )}

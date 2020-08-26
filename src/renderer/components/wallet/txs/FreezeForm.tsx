@@ -7,8 +7,7 @@ import {
   AssetAmount,
   formatAssetAmount
 } from '@thorchain/asgardex-util'
-import { Row } from 'antd'
-import { Store } from 'antd/lib/form/interface'
+import { Row, Form } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -20,6 +19,10 @@ import { InputNumber } from '../../uielements/input'
 import AccountSelector from '../AccountSelector'
 import * as Styled from './Form.style'
 import { validateFreezeInput } from './util'
+
+export type FormValues = {
+  amount: string
+}
 
 type Props = {
   freezeAction: FreezeAction
@@ -35,7 +38,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
-  const [form] = Styled.Form.useForm()
+  const [form] = Form.useForm<FormValues>()
 
   const maxAmount = useMemo(() => {
     if (freezeAction === 'unfreeze') {
@@ -67,8 +70,8 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
   )
 
   const onSubmit = useCallback(
-    (data: Store) => {
-      onSubmitProp({ amount: assetAmount(data.amount), asset: assetWB.asset, action: freezeAction })
+    ({ amount }: FormValues) => {
+      onSubmitProp({ amount: assetAmount(amount), asset: assetWB.asset, action: freezeAction })
     },
     [onSubmitProp, assetWB, freezeAction]
   )
@@ -120,7 +123,8 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
     <Row>
       <Styled.Col span={24}>
         <AccountSelector selectedAsset={assetWB.asset} assets={[assetWB]} />
-        <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
+        {/* `Form<FormValue>` does not work in `styled(Form)`, so we have to add styles here. All is just needed to have correct types in `onFinish` handler)  */}
+        <Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }} style={{ padding: '30px' }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
             <Styled.FormItem
@@ -148,7 +152,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
               {submitLabel}
             </Styled.Button>
           </Styled.SubmitItem>
-        </Styled.Form>
+        </Form>
       </Styled.Col>
     </Row>
   )

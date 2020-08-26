@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
+import { Address } from '@thorchain/asgardex-binance'
 import {
   assetToString,
   Asset,
@@ -9,7 +10,6 @@ import {
   formatAssetAmount
 } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
-import { Store } from 'antd/lib/form/interface'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -25,6 +25,12 @@ import AccountSelector from './../AccountSelector'
 import * as Styled from './Form.style'
 import { sendAmountValidator } from './util'
 
+export type FormValues = {
+  recipient: Address
+  amount: string
+  memo?: string
+}
+
 type Props = {
   assetsWB: AssetsWithBalance
   assetWB: AssetWithBalance
@@ -39,7 +45,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
   const history = useHistory()
 
-  const [form] = Styled.Form.useForm()
+  const [form] = Form.useForm<FormValues>()
 
   const bnbAmount = useMemo(() => {
     // return balance of current asset (if BNB)
@@ -85,8 +91,8 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
   )
 
   const onSubmit = useCallback(
-    (data: Store) => {
-      onSubmitProp({ to: data.recipient, amount: assetAmount(data.amount), asset: assetWB.asset, memo: data.memo })
+    ({ amount, recipient, memo }: FormValues) => {
+      onSubmitProp({ to: recipient, amount: assetAmount(amount), asset: assetWB.asset, memo })
     },
     [onSubmitProp, assetWB]
   )
@@ -100,8 +106,8 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     <Row>
       <Styled.Col span={24}>
         <AccountSelector onChange={changeSelectorHandler} selectedAsset={assetWB.asset} assets={assetsWB} />
-
-        <Styled.Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }}>
+        {/* `Form<FormValue>` does not work in `styled(Form)`, so we have to add styles here. All is just needed to have correct types in `onFinish` handler)  */}
+        <Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }} style={{ padding: '30px' }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
             <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
@@ -129,7 +135,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
               {intl.formatMessage({ id: 'wallet.action.send' })}
             </Styled.Button>
           </Styled.SubmitItem>
-        </Styled.Form>
+        </Form>
       </Styled.Col>
     </Row>
   )
