@@ -20,7 +20,7 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import { IntlShape } from 'react-intl'
 
-import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
+import { sequenceTOptionFromArray, sequenceTOption } from '../../helpers/fpHelpers'
 import { BalancesRD, AssetWithBalance, AssetsWithBalanceRD, AssetsWithBalance } from '../../services/binance/types'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
