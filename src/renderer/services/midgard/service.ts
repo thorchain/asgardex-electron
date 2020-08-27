@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import byzantine from '@thorchain/byzantine-module'
+import midgard from '@thorchain/asgardex-midgard'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { some } from 'fp-ts/lib/Option'
@@ -39,7 +39,9 @@ const { get$: getNetworkState$, set: setNetworkState } = observableState<Network
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
 const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
-  (network: Network) => byzantine(network === Network.MAIN, true).then(RD.success),
+  // Important note: `Network.MAIN` is currently pointed to seed endpoint of `chaosnet`
+  // TODO (@Veado) Change it to mainnet before we are going live on mainnet
+  (network: Network) => midgard(network === Network.MAIN ? 'chaosnet' : 'testnet', true).then(RD.success),
   RD.pending,
   RD.failure
 )
