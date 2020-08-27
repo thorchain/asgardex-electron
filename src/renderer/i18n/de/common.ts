@@ -36,8 +36,8 @@ const common: CommonMessages = {
   'common.pool': 'Pool',
   'common.price': 'Preis',
   'common.transaction': 'Transaktion',
-  'common.fee': 'Geühr',
-  'common.fees': 'Geühren',
+  'common.fee': 'Gebühr',
+  'common.fees': 'Gebühren',
   'common.max': 'Max',
   'common.search': 'Suche'
 }
