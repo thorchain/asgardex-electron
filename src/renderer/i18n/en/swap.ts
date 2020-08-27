@@ -6,7 +6,7 @@ const swap: SwapMessages = {
   'swap.balance': 'Balance',
   'swap.output': 'Output',
   'swap.drag': 'Drag to swap',
-  'swap.searchToken': 'Search token'
+  'swap.searchAsset': 'Search Asset'
 }
 
 export default swap

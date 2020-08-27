@@ -2,6 +2,7 @@ import React, { RefObject, useCallback, useMemo, useRef, useState } from 'react'
 
 import { SearchOutlined } from '@ant-design/icons'
 import { MenuProps } from 'antd/lib/menu'
+import { useIntl } from 'react-intl'
 
 import { useClickOutside } from '../../../hooks/useOutsideClick'
 import { Input } from '../input'
@@ -27,9 +28,11 @@ const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
     filterFunction,
     cellRenderer,
     disableItemFilter = (_) => false,
-    placeholder = 'Search Token ...',
+    placeholder,
     closeMenu
   } = props
+
+  const intl = useIntl()
 
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -76,7 +79,7 @@ const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
             <Input
               value={searchTerm}
               onChange={handleSearchChanged}
-              placeholder={placeholder}
+              placeholder={placeholder || intl.formatMessage({ id: 'common.search' })}
               size="large"
               typevalue="ghost"
               suffix={<SearchOutlined />}

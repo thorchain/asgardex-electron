@@ -38,7 +38,8 @@ const common: CommonMessages = {
   'common.transaction': 'Транзакция',
   'common.fee': 'Комиссия',
   'common.fees': 'Комиссии',
-  'common.max': 'Макс.'
+  'common.max': 'Макс.',
+  'common.search': 'Поиск'
 }
 
 export default common

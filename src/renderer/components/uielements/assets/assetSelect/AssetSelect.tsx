@@ -81,7 +81,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
     return (
       <AssetSelectMenuWrapper>
         <AssetMenu
-          searchPlaceholder={intl.formatMessage({ id: 'swap.searchToken' })}
+          searchPlaceholder={intl.formatMessage({ id: 'swap.searchAsset' })}
           closeMenu={closeMenu}
           assetData={sortedAssetData}
           asset={asset}
