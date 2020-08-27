@@ -38,6 +38,7 @@ type CommonMessageKey =
   | 'common.fees'
   | 'common.max'
   | 'common.search'
+  | 'common.retry'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
