@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import byzantine from '@thorchain/byzantine-module'
+import midgard from '@thorchain/asgardex-midgard'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { some } from 'fp-ts/lib/Option'
@@ -31,7 +31,7 @@ const BYZANTINE_MAX_RETRY = 5
 /**
  * Observable state of `Network`
  */
-const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(Network.TEST)
+const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>('testnet')
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
@@ -39,7 +39,7 @@ const { get$: getNetworkState$, set: setNetworkState } = observableState<Network
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
 const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
-  (network: Network) => byzantine(network === Network.MAIN, true).then(RD.success),
+  (network: Network) => midgard(network, true).then(RD.success),
   RD.pending,
   RD.failure
 )

@@ -3,7 +3,4 @@ export enum OnlineStatus {
   OFF
 }
 
-export enum Network {
-  TEST = 'testnet',
-  MAIN = 'mainnet'
-}
+export type Network = 'testnet' | 'chaosnet' | 'mainnet'

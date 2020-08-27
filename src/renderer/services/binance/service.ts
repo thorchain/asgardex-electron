@@ -43,14 +43,14 @@ const BINANCE_MAINET_WS_URI = envOrDefault(process.env.REACT_APP_BINANCE_MAINNET
 /**
  * Observable state of `Network`
  */
-const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(Network.TEST)
+const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>('testnet')
 
 /**
  * Websocket endpoint depending on `Network`
  */
 const wsEndpoint$ = getNetworkState$.pipe(
   mergeMap((network) => {
-    if (network === Network.MAIN) return Rx.of(BINANCE_MAINET_WS_URI)
+    if (network === 'mainnet') return Rx.of(BINANCE_MAINET_WS_URI)
     // all other networks use testnet url for now
     return Rx.of(BINANCE_TESTNET_WS_URI)
   })
@@ -148,7 +148,7 @@ const BINANCE_MAX_RETRY = 3
  */
 const binanceNetwork$: Observable<BinanceNetwork> = getNetworkState$.pipe(
   mergeMap((network) => {
-    if (network === Network.MAIN) return Rx.of('mainnet' as BinanceNetwork)
+    if (network === 'mainnet') return Rx.of('mainnet' as BinanceNetwork)
     // all other networks use testnet url for now
     return Rx.of('testnet' as BinanceNetwork)
   })
