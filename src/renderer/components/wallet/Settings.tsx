@@ -161,7 +161,7 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
                 <StyledPlaceholder>{intl.formatMessage({ id: 'setting.version' })}</StyledPlaceholder>
                 <StyledClientLabel>v{apiVersion}</StyledClientLabel>
                 <StyledClientButton color="warning" size="big" onClick={toggleNetwork}>
-                  Change to {network === Network.MAIN ? 'testnet' : 'mainnet'}
+                  Change to {network === 'mainnet' ? 'testnet' : 'mainnet'}
                 </StyledClientButton>
               </Col>
             </Row>

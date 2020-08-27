@@ -16,7 +16,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
-import { Network, OnlineStatus } from '../../services/app/types'
+import { OnlineStatus, Network } from '../../services/app/types'
 
 const SettingsView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
@@ -50,7 +50,7 @@ const SettingsView: React.FC = (): JSX.Element => {
 
   const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
 
-  const network = useObservableState(network$, Network.TEST)
+  const network = useObservableState<Network>(network$, 'testnet')
 
   const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxOperators.map(RD.toOption)), [
     midgardService.apiEndpoint$

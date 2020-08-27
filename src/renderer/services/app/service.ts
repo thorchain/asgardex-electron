@@ -2,8 +2,7 @@ import * as Rx from 'rxjs'
 import { startWith, mapTo } from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
-import { OnlineStatus } from './types'
-import { Network } from './types'
+import { OnlineStatus, Network } from './types'
 
 // Check online status
 // https://www.electronjs.org/docs/tutorial/online-offline-events
@@ -15,10 +14,10 @@ const onlineStatus$ = Rx.merge(online$, offline$).pipe(startWith(navigator.onLin
 /**
  * State of `Network`
  */
-const { get$: network$, get: getNetwork, set: changeNetwork } = observableState(Network.TEST)
+const { get$: network$, get: getNetwork, set: changeNetwork } = observableState<Network>('testnet')
 
 const toggleNetwork = () => {
-  const next = getNetwork() === Network.MAIN ? Network.TEST : Network.MAIN
+  const next = getNetwork() === 'mainnet' ? 'testnet' : 'mainnet'
   changeNetwork(next)
 }
 

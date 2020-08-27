@@ -31,7 +31,7 @@ const BYZANTINE_MAX_RETRY = 5
 /**
  * Observable state of `Network`
  */
-const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(Network.TEST)
+const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>('testnet')
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
@@ -39,9 +39,7 @@ const { get$: getNetworkState$, set: setNetworkState } = observableState<Network
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
 const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
-  // Important note: `Network.MAIN` is currently pointed to seed endpoint of `chaosnet`
-  // TODO (@Veado) Change it to mainnet before we are going live on mainnet
-  (network: Network) => midgard(network === Network.MAIN ? 'chaosnet' : 'testnet', true).then(RD.success),
+  (network: Network) => midgard(network, true).then(RD.success),
   RD.pending,
   RD.failure
 )
