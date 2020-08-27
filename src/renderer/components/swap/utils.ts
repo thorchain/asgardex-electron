@@ -33,7 +33,7 @@ export const getSwapMemo = (symbol: string, addr: string, sliplimit = '') =>
  *          some(true) - targetAsset is RUNE
  *          some(false) - sourceAsset is RUNE
  */
-const isRuneSwap = (sourceAsset: Asset, targetAsset: Asset) => {
+export const isRuneSwap = (sourceAsset: Asset, targetAsset: Asset) => {
   if (isRuneAsset(targetAsset)) {
     return O.some(true)
   }
@@ -45,19 +45,20 @@ const isRuneSwap = (sourceAsset: Asset, targetAsset: Asset) => {
   return O.none
 }
 
-const getSlip = (
+export const getSlip = (
   sourceAsset: Asset,
   targetAsset: Asset,
   changeAmount: BaseAmount,
-  pools: Record<string, PoolData>,
-  runeSwap: O.Option<boolean> = O.none
+  pools: Record<string, PoolData>
 ) =>
   pipe(
-    runeSwap,
-    O.map((toRune) => {
-      const targetPoolData = pools[assetToString(targetAsset)]
-      return getSwapSlip(changeAmount, targetPoolData, toRune)
-    }),
+    isRuneSwap(sourceAsset, targetAsset),
+    O.chain((toRune) =>
+      pipe(
+        O.fromNullable(pools[assetToString(targetAsset)]),
+        O.map((targetPoolData) => getSwapSlip(changeAmount, targetPoolData, toRune))
+      )
+    ),
     O.alt(() =>
       pipe(
         sequenceTOption(
@@ -70,15 +71,14 @@ const getSlip = (
     O.getOrElse(() => bn(0))
   )
 
-const getSwapResult = (
+export const getSwapResult = (
   sourceAsset: Asset,
   targetAsset: Asset,
   changeAmount: BaseAmount,
-  pools: Record<string, PoolData>,
-  runeSwap: O.Option<boolean> = O.none
+  pools: Record<string, PoolData>
 ) =>
   pipe(
-    runeSwap,
+    isRuneSwap(sourceAsset, targetAsset),
     O.chain((toRune) => {
       const assetSymbol = assetToString(toRune ? sourceAsset : targetAsset)
       return pipe(
@@ -113,10 +113,9 @@ export const getSwapData = (
   return pipe(
     sequenceTOption(sourceAsset, targetAsset),
     O.map(([sourceAsset, targetAsset]) => {
-      const runeSwap = isRuneSwap(sourceAsset, targetAsset)
       const swapBaseAmount = assetToBase(assetAmount(swapAmount))
-      const slip = getSlip(sourceAsset, targetAsset, swapBaseAmount, pools, runeSwap)
-      const swapResult = getSwapResult(sourceAsset, targetAsset, swapBaseAmount, pools, runeSwap)
+      const slip = getSlip(sourceAsset, targetAsset, swapBaseAmount, pools)
+      const swapResult = getSwapResult(sourceAsset, targetAsset, swapBaseAmount, pools)
       return {
         slip,
         swapResult
