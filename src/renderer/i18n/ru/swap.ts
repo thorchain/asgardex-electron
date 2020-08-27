@@ -5,7 +5,8 @@ const swap: SwapMessages = {
   'swap.input': 'Отдаете',
   'swap.balance': 'Баланс',
   'swap.output': 'Получаете',
-  'swap.drag': 'Перетащите для обмена'
+  'swap.drag': 'Перетащите для обмена',
+  'swap.searchAsset': 'Поиск Ассета'
 }
 
 export default swap

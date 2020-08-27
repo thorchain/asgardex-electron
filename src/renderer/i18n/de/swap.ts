@@ -1,11 +1,12 @@
 import { SwapMessages } from '../types'
 
 const swap: SwapMessages = {
-  'swap.swapping': 'You are swapping - DE',
-  'swap.input': 'Input - DE',
-  'swap.balance': 'Balance - DE',
-  'swap.output': 'Output - DE',
-  'swap.drag': 'Drag to swap - DE'
+  'swap.swapping': 'Swap',
+  'swap.input': 'Eingabe',
+  'swap.balance': 'Guthaben',
+  'swap.output': 'Ausgabe',
+  'swap.drag': 'Ziehen um zu Swappen',
+  'swap.searchAsset': 'Suche Asset'
 }
 
 export default swap

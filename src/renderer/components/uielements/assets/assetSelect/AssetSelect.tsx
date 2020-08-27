@@ -1,10 +1,10 @@
-import React, { RefObject, useRef, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import { delay, Asset } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
 import { sortBy as _sortBy } from 'lodash'
+import { useIntl } from 'react-intl'
 
-import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetPair } from '../../../../types/asgardex'
 import AssetMenu from '../assetMenu'
@@ -45,37 +45,44 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
     asset,
     assetData = [],
     priceIndex,
-    withSearch = false,
+    withSearch = true,
     searchDisable = [],
     onSelect = (_: Asset) => {}
   } = props
 
   const [openDropdown, setOpenDropdown] = useState<boolean>(false)
-  const ref: RefObject<HTMLDivElement> = useRef(null)
+  const intl = useIntl()
 
-  useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
+  const closeMenu = useCallback(() => {
+    setOpenDropdown(false)
+  }, [setOpenDropdown])
 
   const handleDropdownButtonClicked = () => {
     // toggle dropdown state
     setOpenDropdown((value) => !value)
   }
 
-  const handleChangeAsset = async (assetId: string) => {
-    setOpenDropdown(false)
+  const handleChangeAsset = useCallback(
+    async (assetId: string) => {
+      setOpenDropdown(false)
 
-    // Wait for the dropdown to close
-    await delay(500)
-    const changedAsset = assetData.find((asset) => asset.asset.symbol === assetId)
-    if (changedAsset) {
-      onSelect(changedAsset.asset)
-    }
-  }
+      // Wait for the dropdown to close
+      await delay(500)
+      const changedAsset = assetData.find((asset) => asset.asset.symbol === assetId)
+      if (changedAsset) {
+        onSelect(changedAsset.asset)
+      }
+    },
+    [assetData, onSelect]
+  )
 
-  const renderMenu = () => {
+  const renderMenu = useCallback(() => {
     const sortedAssetData = _sortBy(assetData, ['asset'])
     return (
       <AssetSelectMenuWrapper>
         <AssetMenu
+          searchPlaceholder={intl.formatMessage({ id: 'swap.searchAsset' })}
+          closeMenu={closeMenu}
           assetData={sortedAssetData}
           asset={asset}
           priceIndex={priceIndex}
@@ -85,7 +92,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
         />
       </AssetSelectMenuWrapper>
     )
-  }
+  }, [assetData, intl, asset, closeMenu, handleChangeAsset, priceIndex, searchDisable, withSearch])
 
   const renderDropDownButton = () => {
     const disabled = assetData.length === 0
@@ -97,7 +104,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
   }
 
   return (
-    <AssetSelectWrapper ref={ref}>
+    <AssetSelectWrapper>
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <>
           <AssetSelectData asset={asset} />

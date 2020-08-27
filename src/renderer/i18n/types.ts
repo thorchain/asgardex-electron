@@ -37,6 +37,7 @@ type CommonMessageKey =
   | 'common.fee'
   | 'common.fees'
   | 'common.max'
+  | 'common.search'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -114,7 +115,7 @@ type SettingMessageKey =
 
 export type SettingMessages = { [key in SettingMessageKey]: string }
 
-type SwapMessageKey = 'swap.swapping' | 'swap.input' | 'swap.balance' | 'swap.output' | 'swap.drag'
+type SwapMessageKey = 'swap.swapping' | 'swap.input' | 'swap.balance' | 'swap.output' | 'swap.drag' | 'swap.searchAsset'
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
