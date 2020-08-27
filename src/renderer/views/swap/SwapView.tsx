@@ -9,10 +9,13 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
+import ErrorView from '../../components/shared/error/ErrorView'
 import { Swap } from '../../components/swap/Swap'
 import BackLink from '../../components/uielements/backLink'
+import Button from '../../components/uielements/button'
 import { RUNE_ASSET } from '../../const'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -25,11 +28,12 @@ type Props = {}
 
 const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { source, target } = useParams<SwapRouteParams>()
+  const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
   const { transaction } = useBinanceContext()
   const [tx] = useObservableState(() => transaction.txRD$, initial)
-  const { poolsState$, poolAddresses$ } = midgardService
+  const { poolsState$, poolAddresses$, reloadPoolsState } = midgardService
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
   const { balancesState$, explorerUrl$ } = useBinanceContext()
@@ -69,6 +73,18 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
     },
     [explorerUrl]
   )
+
+  const renderError = useCallback(
+    (e: Error) => (
+      <ErrorView
+        title={intl.formatMessage({ id: 'common.error' })}
+        subTitle={e.message}
+        extra={<Button onClick={reloadPoolsState}>{intl.formatMessage({ id: 'common.retry' })}</Button>}
+      />
+    ),
+    [reloadPoolsState, intl]
+  )
+
   return (
     <>
       <BackLink />
@@ -78,7 +94,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
           fold(
             () => <></>,
             () => <Spin size="large" />,
-            () => <span>error</span>,
+            renderError,
             (state) => {
               const availableAssets = state.assetDetails
                 .filter((a) => a.asset !== undefined && !!a.asset)
@@ -87,6 +103,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
               const hasRuneAsset = Boolean(availableAssets.find((asset) => asset.asset.symbol === PoolAsset.RUNE67C))
 
               if (!hasRuneAsset) {
+                // @todo thatStrangeGuy add logic for mainnet
                 availableAssets.unshift(RUNE_ASSET)
               }
 
