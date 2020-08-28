@@ -348,7 +348,7 @@ const transferFees$: Observable<TransferFeesRD> = fees$.pipe(
   shareReplay(1)
 )
 
-const transaction = createTransactionService(clientState$)
+const transaction = createTransactionService(clientState$, reloadBalances)
 
 const freeze = createFreezeService(clientState$)
 

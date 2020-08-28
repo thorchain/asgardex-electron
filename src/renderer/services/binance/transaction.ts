@@ -4,7 +4,7 @@ import { AssetAmount, Asset } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { catchError, map, startWith, switchMap } from 'rxjs/operators'
+import { catchError, map, startWith, switchMap, tap } from 'rxjs/operators'
 
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
@@ -47,8 +47,8 @@ const tx$ = ({
 const pushTx = (clientState$: ClientState) => ({ to, amount, asset, memo }: SendTxParams) =>
   tx$({ clientState$, to, amount, asset, memo }).subscribe(setTxRD)
 
-export const createTransactionService = (client$: ClientState) => ({
-  txRD$,
+export const createTransactionService = (client$: ClientState, updateAfterTransaction: () => void) => ({
+  txRD$: txRD$.pipe(tap((txResult) => RD.isSuccess(txResult) && updateAfterTransaction())),
   pushTx: pushTx(client$),
   resetTx: () => setTxRD(RD.initial)
 })
