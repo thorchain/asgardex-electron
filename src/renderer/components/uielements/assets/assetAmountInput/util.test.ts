@@ -1,20 +1,29 @@
-import { formatValue, validValue } from './util'
+import { formatValue, validInputValue } from './util'
 
 describe('components/AssetAmountInput/util', () => {
   describe('formatValue', () => {
     it('formats string numbers with thousend and decimal separator', () => {
-      expect(formatValue('1234567.89')).toEqual('1,234,567.89')
+      expect(formatValue('1234567.89', 8)).toEqual('1,234,567.89')
     })
-    it('formats empty string to 0', () => {
+    it('formats string numbers by given decimal', () => {
+      expect(formatValue('1.2345678', 2)).toEqual('1.23')
+    })
+    it('formats empty string to "0"', () => {
       expect(formatValue('')).toEqual('0')
     })
     it('formats "." to 0.', () => {
       expect(formatValue('.')).toEqual('0.')
     })
-    it('formats non numbers to 0', () => {
-      expect(formatValue('9llo0')).toEqual('90')
+    it('formats zeros to "0"', () => {
+      expect(formatValue('0000')).toEqual('0')
     })
-    it('formats non numbers to 0', () => {
+    it('formats decimal zeros to "0"', () => {
+      expect(formatValue('0.000')).toEqual('0')
+    })
+    it('ignores non numbers in string', () => {
+      expect(formatValue('a9ü&9%"+Ä')).toEqual('99')
+    })
+    it('formats string of non numbers to 0', () => {
       expect(formatValue('hello')).toEqual('0')
     })
     it('trims zeros', () => {
@@ -22,22 +31,22 @@ describe('components/AssetAmountInput/util', () => {
     })
   })
 
-  describe('validValue', () => {
+  describe('validInputValue', () => {
     it('returns true for strings of numbers ', () => {
-      expect(validValue('123')).toBeTruthy()
+      expect(validInputValue('123')).toBeTruthy()
     })
     it('returns true for strings of decimal numbers ', () => {
-      expect(validValue('123.45')).toBeTruthy()
+      expect(validInputValue('123.45')).toBeTruthy()
     })
-    it('returns true "0."', () => {
-      expect(validValue('0.')).toBeTruthy()
+    it('returns true for "0."', () => {
+      expect(validInputValue('0.')).toBeTruthy()
     })
     it('returns false for non numbers ', () => {
-      expect(validValue('hello')).toBeFalsy()
+      expect(validInputValue('hello')).toBeFalsy()
     })
 
     it('returns false for numbers including invalid characters ', () => {
-      expect(validValue('9hello')).toBeFalsy()
+      expect(validInputValue('9hello')).toBeFalsy()
     })
   })
 })

@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { trimZeros } from '../../../../helpers/stringHelper'
 import * as Styled from './AssetAmountInput.style'
-import { VALUE_ZERO, formatValue, validValue } from './util'
+import { VALUE_ZERO, formatValue, validInputValue } from './util'
 
 type Props = {
   amount?: AssetAmount
@@ -29,8 +29,8 @@ const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
       value,
       O.getOrElse(() => amountAsString)
     )
-    return focus ? altValue : formatValue(altValue)
-  }, [amountAsString, focus, value])
+    return focus ? altValue : formatValue(altValue, decimal)
+  }, [amountAsString, decimal, focus, value])
 
   useEffect(() => {
     const v = FP.pipe(
@@ -63,7 +63,7 @@ const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
         v,
         // remove uneeded zeros
         O.map(trimZeros),
-        // remove uneeded decimal
+        // remove not supported decimals
         O.map((v) => assetAmount(v, decimal).amount().toString()),
         // convert empty string to '0'
         O.map((v) => (v === '' ? VALUE_ZERO : v))
@@ -77,7 +77,7 @@ const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
 
   const onChangeHandler = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const { value: newValue } = target
-    if (validValue(newValue)) {
+    if (validInputValue(newValue)) {
       setValue(O.some(newValue))
     }
   }, [])
