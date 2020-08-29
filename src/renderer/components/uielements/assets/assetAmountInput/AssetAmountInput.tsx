@@ -9,32 +9,32 @@ import * as Styled from './AssetAmountInput.style'
 import { VALUE_ZERO, formatValue, validInputValue } from './util'
 
 type Props = {
-  amount?: AssetAmount
+  value?: AssetAmount
   onChange?: (value: AssetAmount) => void
   decimal?: number
 }
 
 const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
-  const { decimal = 8, amount = assetAmount(0, decimal), onChange = () => {} } = props
+  const { decimal = 8, value = assetAmount(0, decimal), onChange = () => {} } = props
 
-  const amountAsString = amount.amount().toString()
+  const amountAsString = value.amount().toString()
 
   // value as string (unformatted)
-  const [value, setValue] = useState<O.Option<string>>(O.none)
+  const [enteredValue, setEnteredValue] = useState<O.Option<string>>(O.none)
   const [focus, setFocus] = useState(false)
   const broadcastValue = useRef<string>(VALUE_ZERO)
 
   const inputValue = useMemo(() => {
     const altValue = FP.pipe(
-      value,
+      enteredValue,
       O.getOrElse(() => amountAsString)
     )
     return focus ? altValue : formatValue(altValue, decimal)
-  }, [amountAsString, decimal, focus, value])
+  }, [amountAsString, decimal, focus, enteredValue])
 
   useEffect(() => {
     const v = FP.pipe(
-      value,
+      enteredValue,
       O.getOrElse(() => '')
     )
     if (v !== '' && broadcastValue.current !== v) {
@@ -42,7 +42,7 @@ const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
       broadcastValue.current = v
       onChange(newAmount)
     }
-  }, [value, onChange, focus, decimal])
+  }, [enteredValue, onChange, focus, decimal])
 
   const onFocusHandler = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +58,7 @@ const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
   const onBlurHandler = useCallback(() => {
     setFocus(false)
     // Clean up value - it can't be done in onChangeHandler due race conditions!!
-    setValue((v) =>
+    setEnteredValue((v) =>
       FP.pipe(
         v,
         // remove uneeded zeros
@@ -78,22 +78,18 @@ const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
   const onChangeHandler = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const { value: newValue } = target
     if (validInputValue(newValue)) {
-      setValue(O.some(newValue))
+      setEnteredValue(O.some(newValue))
     }
   }, [])
 
   return (
-    <>
-      <Styled.Input
-        value={inputValue}
-        onChange={onChangeHandler}
-        onFocus={onFocusHandler}
-        onBlur={onBlurHandler}
-        onPressEnter={onPressEnterHandler}
-      />
-
-      <div>{JSON.stringify(value)}</div>
-    </>
+    <Styled.Input
+      value={inputValue}
+      onChange={onChangeHandler}
+      onFocus={onFocusHandler}
+      onBlur={onBlurHandler}
+      onPressEnter={onPressEnterHandler}
+    />
   )
 }
 
