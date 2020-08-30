@@ -14,6 +14,9 @@ describe('components/AssetAmountInput/util', () => {
     it('formats "." to 0.', () => {
       expect(formatValue('.')).toEqual('0.')
     })
+    it('formats "." to "0" for non (zero) decimal values', () => {
+      expect(formatValue('.', 0)).toEqual('0')
+    })
     it('formats zeros to "0"', () => {
       expect(formatValue('0000')).toEqual('0')
     })

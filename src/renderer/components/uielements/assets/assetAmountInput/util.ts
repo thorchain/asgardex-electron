@@ -20,14 +20,14 @@ export const VALUE_ZERO = '0'
  * formatValue('')            // output: '0'
  * ```
  **/
-export const formatValue = (value: string, maxDecimal = 8) => {
+export const formatValue = (value: string, maxDecimal = 2) => {
   // remove non number characters (excluding `.` and `,`)
   value = value.replace(/[^\d.,]/g, '')
 
   // '' -> '0'
   if (value === '') return VALUE_ZERO
   // '.'  -> '0.'
-  if (value === '.') return VALUE_ZERO_DECIMAL
+  if (maxDecimal > 0 && value === '.') return VALUE_ZERO_DECIMAL
 
   const valueBN = bn(value)
   // invalid BN  -> '0'

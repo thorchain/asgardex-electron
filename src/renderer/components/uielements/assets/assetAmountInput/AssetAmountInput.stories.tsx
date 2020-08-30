@@ -1,23 +1,24 @@
 import React, { useCallback } from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { assetAmount, AssetAmount, bn } from '@thorchain/asgardex-util'
+import { bn } from '@thorchain/asgardex-util'
 import { Form } from 'antd'
 import { Rule } from 'antd/lib/form'
+import BigNumber from 'bignumber.js'
 
 import Button from '../../button'
 import AssetAmountInput from './AssetAmountInput'
 
 type FormValues = {
-  amount: AssetAmount
+  amount: BigNumber
 }
 
 storiesOf('Components/Assets/AssetAmountInput', module)
   .add('default', () => {
-    const [value, setValue] = React.useState<AssetAmount>(assetAmount('1002.34'))
+    const [value, setValue] = React.useState<BigNumber>(bn('1002.34'))
 
     const handleChange = useCallback((v) => {
-      console.log('value ', v.amount().toString())
+      console.log('value ', v.toString())
       setValue(v)
     }, [])
 
@@ -32,7 +33,7 @@ storiesOf('Components/Assets/AssetAmountInput', module)
       <div style={{ padding: '20px' }}>
         <AssetAmountInput
           onChange={(value) => {
-            console.log('value ', value.amount().toString())
+            console.log('value ', value.toString())
           }}
         />
       </div>
@@ -41,12 +42,12 @@ storiesOf('Components/Assets/AssetAmountInput', module)
   .add('form validation', () => {
     const [form] = Form.useForm<FormValues>()
 
-    const checkAmount = (_: Rule, value: AssetAmount) => {
-      console.log('checkAmount ', value?.amount().toString() ?? 'undefined value')
-      if (value && value.amount().isGreaterThan(bn(10))) {
+    const checkValue = (_: Rule, value?: BigNumber) => {
+      console.log('checkValue ', value?.toString() ?? 'undefined value')
+      if (value && value.isGreaterThan(bn(10))) {
         return Promise.resolve()
       }
-      return Promise.reject('Asset amount must be greater than 10!')
+      return Promise.reject('Value must be greater than 10!')
     }
 
     const onFinish = (values: {}) => {
@@ -58,12 +59,12 @@ storiesOf('Components/Assets/AssetAmountInput', module)
         form={form}
         onFinish={onFinish}
         initialValues={{
-          amount: assetAmount('1')
+          amount: bn('1')
         }}>
-        <Form.Item name="amount" label="AssetAmount" rules={[{ validator: checkAmount }]}>
+        <Form.Item name="amount" label="Amount" rules={[{ validator: checkValue }]}>
           <AssetAmountInput
             onChange={(value) => {
-              console.log('onChange ', value?.amount().toString() ?? 'undefined value')
+              console.log('onChange ', value?.toString() ?? 'undefined value')
             }}
           />
         </Form.Item>

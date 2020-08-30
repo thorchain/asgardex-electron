@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback, useState, useRef, useEffect } from 'react'
 
-import { AssetAmount, delay, assetAmount } from '@thorchain/asgardex-util'
+import { delay, bn, fixedBN } from '@thorchain/asgardex-util'
+import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -9,37 +10,37 @@ import * as Styled from './AssetAmountInput.style'
 import { VALUE_ZERO, formatValue, validInputValue } from './util'
 
 type Props = {
-  value?: AssetAmount
-  onChange?: (value: AssetAmount) => void
+  value?: BigNumber
+  onChange?: (value: BigNumber) => void
   decimal?: number
 }
 
 const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
-  const { decimal = 8, value = assetAmount(0, decimal), onChange = () => {} } = props
+  const { decimal = 2, value = bn(0), onChange = () => {} } = props
 
-  const amountAsString = value.amount().toString()
+  const valueAsString = value.toString()
 
   // value as string (unformatted)
   const [enteredValue, setEnteredValue] = useState<O.Option<string>>(O.none)
   const [focus, setFocus] = useState(false)
-  const broadcastValue = useRef<string>(VALUE_ZERO)
+  const broadcastValue = useRef<BigNumber>(bn(0))
 
   const inputValue = useMemo(() => {
     const altValue = FP.pipe(
       enteredValue,
-      O.getOrElse(() => amountAsString)
+      O.getOrElse(() => valueAsString)
     )
     return focus ? altValue : formatValue(altValue, decimal)
-  }, [amountAsString, decimal, focus, enteredValue])
+  }, [valueAsString, decimal, focus, enteredValue])
 
   useEffect(() => {
     const v = FP.pipe(
       enteredValue,
       O.getOrElse(() => '')
     )
-    if (v !== '' && broadcastValue.current !== v) {
-      const newAmount = assetAmount(v, decimal)
-      broadcastValue.current = v
+    const newAmount = fixedBN(v, decimal)
+    if (v !== '' && !broadcastValue.current.isEqualTo(newAmount)) {
+      broadcastValue.current = newAmount
       onChange(newAmount)
     }
   }, [enteredValue, onChange, focus, decimal])
@@ -48,8 +49,9 @@ const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       const { target } = event
       setFocus(true)
-      // delay is needed before selecting
-      await delay(50)
+      // short delay is needed before selecting to keep its reference
+      // (it will be lost in other cases dure React rendering)
+      await delay(1)
       target.select()
     },
     [setFocus]
@@ -61,12 +63,16 @@ const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
     setEnteredValue((v) =>
       FP.pipe(
         v,
+        // convert empty string to '0'
+        O.map((v) => (v === '' ? VALUE_ZERO : v)),
         // remove uneeded zeros
         O.map(trimZeros),
-        // remove not supported decimals
-        O.map((v) => assetAmount(v, decimal).amount().toString()),
-        // convert empty string to '0'
-        O.map((v) => (v === '' ? VALUE_ZERO : v))
+        // format value based on supported decimals
+        O.map((v) => {
+          const n = fixedBN(v, decimal).toString()
+          console.log('n:', n)
+          return n
+        })
       )
     )
   }, [decimal])
