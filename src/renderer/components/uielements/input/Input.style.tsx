@@ -39,9 +39,9 @@ type CustomInputProps = {
   typevalue?: InputType
 }
 
-type InputProps = CustomInputProps & AI.InputProps
+export type InputProps = CustomInputProps & AI.InputProps
 
-const inputStyle = css<InputProps>`
+export const inputStyle = css<InputProps>`
   &.ant-input-affix-wrapper,
   &.ant-input,
   &.ant-input-number {
@@ -92,5 +92,9 @@ export const InputPassword = styled(A.Input.Password)<InputProps>`
 `
 
 export const InputTextArea = styled(A.Input.TextArea)<InputProps>`
+  ${inputStyle}
+`
+
+export const InputBigNumber = styled(A.Input)<InputProps>`
   ${inputStyle}
 `

@@ -1,23 +1,22 @@
 import React, { useMemo, useCallback, useState, useRef, useEffect } from 'react'
 
 import { delay, bn, fixedBN } from '@thorchain/asgardex-util'
-import { InputNumberProps } from 'antd/lib/input-number'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { trimZeros } from '../../../../helpers/stringHelper'
-import * as Styled from './InputBigNumber.style'
+import * as Styled from '../../input/Input.style'
 import { VALUE_ZERO, formatValue, validInputValue } from './util'
 
-type Props = Omit<InputNumberProps, 'value' | 'onChange'> & {
+type Props = Omit<Styled.InputProps, 'value' | 'onChange'> & {
   value?: BigNumber
   onChange?: (value: BigNumber) => void
   decimal?: number
 }
 
 const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
-  const { decimal = 2, value = bn(0), onChange = () => {}, disabled } = props
+  const { decimal = 2, value = bn(0), onChange = () => {}, ...otherProps /* any props of `InputNumberProps` */ } = props
 
   // value as string (unformatted) - it supports empty string for an empty input
   const [enteredValue, setEnteredValue] = useState<O.Option<string>>(O.none)
@@ -90,13 +89,13 @@ const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
   }, [])
 
   return (
-    <Styled.Input
+    <Styled.InputBigNumber
       value={inputValue}
       onChange={onChangeHandler}
       onFocus={onFocusHandler}
       onBlur={onBlurHandler}
       onPressEnter={onPressEnterHandler}
-      disabled={disabled}
+      {...otherProps}
     />
   )
 }
