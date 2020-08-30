@@ -1,6 +1,6 @@
 import { formatValue, validInputValue } from './util'
 
-describe('components/AssetAmountInput/util', () => {
+describe('components/BigNumberInput/util', () => {
   describe('formatValue', () => {
     it('formats string numbers with thousend and decimal separator', () => {
       expect(formatValue('1234567.89', 8)).toEqual('1,234,567.89')

@@ -2,18 +2,18 @@ import React, { useCallback } from 'react'
 
 import { storiesOf } from '@storybook/react'
 import { bn } from '@thorchain/asgardex-util'
-import { Form } from 'antd'
+import { Form, Row } from 'antd'
 import { Rule } from 'antd/lib/form'
 import BigNumber from 'bignumber.js'
 
 import Button from '../../button'
-import AssetAmountInput from './AssetAmountInput'
+import InputBigNumber from './InputBigNumber'
 
 type FormValues = {
   amount: BigNumber
 }
 
-storiesOf('Components/Assets/AssetAmountInput', module)
+storiesOf('Components/input/InputBigNumber', module)
   .add('default', () => {
     const [value, setValue] = React.useState<BigNumber>(bn('1002.34'))
 
@@ -24,14 +24,18 @@ storiesOf('Components/Assets/AssetAmountInput', module)
 
     return (
       <div style={{ padding: '20px' }}>
-        <AssetAmountInput value={value} onChange={handleChange} />
+        <InputBigNumber value={value} onChange={handleChange} />
+        <Row>
+          <Button onClick={() => setValue(bn(40000))}>Set 40k</Button>
+          <Button onClick={() => setValue(bn(2000))}>Set 2k</Button>
+        </Row>
       </div>
     )
   })
-  .add('no value', () => {
+  .add('no default value', () => {
     return (
       <div style={{ padding: '20px' }}>
-        <AssetAmountInput
+        <InputBigNumber
           onChange={(value) => {
             console.log('value ', value.toString())
           }}
@@ -62,7 +66,7 @@ storiesOf('Components/Assets/AssetAmountInput', module)
           amount: bn('1')
         }}>
         <Form.Item name="amount" label="Amount" rules={[{ validator: checkValue }]}>
-          <AssetAmountInput
+          <InputBigNumber
             onChange={(value) => {
               console.log('onChange ', value?.toString() ?? 'undefined value')
             }}

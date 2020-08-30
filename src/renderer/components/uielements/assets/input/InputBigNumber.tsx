@@ -6,7 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { trimZeros } from '../../../../helpers/stringHelper'
-import * as Styled from './AssetAmountInput.style'
+import * as Styled from './InputBigNumber.style'
 import { VALUE_ZERO, formatValue, validInputValue } from './util'
 
 type Props = {
@@ -15,31 +15,35 @@ type Props = {
   decimal?: number
 }
 
-const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
+const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
   const { decimal = 2, value = bn(0), onChange = () => {} } = props
 
-  const valueAsString = value.toString()
-
-  // value as string (unformatted)
+  // value as string (unformatted) - it supports empty string for an empty input
   const [enteredValue, setEnteredValue] = useState<O.Option<string>>(O.none)
   const [focus, setFocus] = useState(false)
   const broadcastValue = useRef<BigNumber>(bn(0))
 
-  const inputValue = useMemo(() => {
-    const altValue = FP.pipe(
-      enteredValue,
-      O.getOrElse(() => valueAsString)
-    )
-    return focus ? altValue : formatValue(altValue, decimal)
-  }, [valueAsString, decimal, focus, enteredValue])
+  const inputValue = useMemo(
+    () =>
+      FP.pipe(
+        enteredValue,
+        O.getOrElse(() => value.toString()),
+        (v) => (focus ? v : formatValue(v, decimal))
+      ),
+    [enteredValue, focus, decimal, value]
+  )
 
   useEffect(() => {
-    const v = FP.pipe(
+    const oValue = FP.pipe(
       enteredValue,
-      O.getOrElse(() => '')
+      // ignore empty input
+      O.filter((v) => v !== ''),
+      // format value
+      O.map((v) => fixedBN(v, decimal)),
+      O.filter((v) => !broadcastValue.current.isEqualTo(v))
     )
-    const newAmount = fixedBN(v, decimal)
-    if (v !== '' && !broadcastValue.current.isEqualTo(newAmount)) {
+    if (O.isSome(oValue)) {
+      const newAmount = oValue.value
       broadcastValue.current = newAmount
       onChange(newAmount)
     }
@@ -68,11 +72,7 @@ const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
         // remove uneeded zeros
         O.map(trimZeros),
         // format value based on supported decimals
-        O.map((v) => {
-          const n = fixedBN(v, decimal).toString()
-          console.log('n:', n)
-          return n
-        })
+        O.map((v) => fixedBN(v, decimal).toString())
       )
     )
   }, [decimal])
@@ -99,4 +99,4 @@ const AssetAmountInput: React.FC<Props> = (props: Props): JSX.Element => {
   )
 }
 
-export default AssetAmountInput
+export default InputBigNumber
