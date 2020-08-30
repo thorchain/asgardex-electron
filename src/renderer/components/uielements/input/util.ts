@@ -1,6 +1,6 @@
 import { bn, formatBN, isValidBN } from '@thorchain/asgardex-util'
 
-import { trimZeros } from '../../../../helpers/stringHelper'
+import { trimZeros } from '../../../helpers/stringHelper'
 
 const VALUE_ZERO_DECIMAL = '0.'
 export const VALUE_ZERO = '0'

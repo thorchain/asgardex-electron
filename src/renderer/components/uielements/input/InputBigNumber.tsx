@@ -5,8 +5,8 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { trimZeros } from '../../../../helpers/stringHelper'
-import * as Styled from '../../input/Input.style'
+import { trimZeros } from '../../../helpers/stringHelper'
+import * as Styled from './Input.style'
 import { VALUE_ZERO, formatValue, validInputValue } from './util'
 
 type Props = Omit<Styled.InputProps, 'value' | 'onChange'> & {
@@ -15,7 +15,7 @@ type Props = Omit<Styled.InputProps, 'value' | 'onChange'> & {
   decimal?: number
 }
 
-const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
+export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
   const { decimal = 2, value = bn(0), onChange = () => {}, ...otherProps /* any props of `InputNumberProps` */ } = props
 
   // value as string (unformatted) - it supports empty string for an empty input
@@ -99,5 +99,3 @@ const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
     />
   )
 }
-
-export default InputBigNumber
