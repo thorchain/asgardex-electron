@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback, useState, useRef, useEffect } from 'react'
 
 import { delay, bn, fixedBN } from '@thorchain/asgardex-util'
+import { InputNumberProps } from 'antd/lib/input-number'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -9,14 +10,14 @@ import { trimZeros } from '../../../../helpers/stringHelper'
 import * as Styled from './InputBigNumber.style'
 import { VALUE_ZERO, formatValue, validInputValue } from './util'
 
-type Props = {
+type Props = Omit<InputNumberProps, 'value' | 'onChange'> & {
   value?: BigNumber
   onChange?: (value: BigNumber) => void
   decimal?: number
 }
 
 const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
-  const { decimal = 2, value = bn(0), onChange = () => {} } = props
+  const { decimal = 2, value = bn(0), onChange = () => {}, disabled } = props
 
   // value as string (unformatted) - it supports empty string for an empty input
   const [enteredValue, setEnteredValue] = useState<O.Option<string>>(O.none)
@@ -69,10 +70,10 @@ const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
         v,
         // convert empty string to '0'
         O.map((v) => (v === '' ? VALUE_ZERO : v)),
-        // remove uneeded zeros
-        O.map(trimZeros),
         // format value based on supported decimals
-        O.map((v) => fixedBN(v, decimal).toString())
+        O.map((v) => fixedBN(v, decimal).toString()),
+        // remove uneeded zeros
+        O.map(trimZeros)
       )
     )
   }, [decimal])
@@ -95,6 +96,7 @@ const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
       onFocus={onFocusHandler}
       onBlur={onBlurHandler}
       onPressEnter={onPressEnterHandler}
+      disabled={disabled}
     />
   )
 }

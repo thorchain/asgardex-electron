@@ -40,8 +40,7 @@ export const formatValue = (value: string, maxDecimal = 2) => {
 }
 
 export const validInputValue = (value: string) => {
-  if (value === '') return true
-  if (value === VALUE_ZERO_DECIMAL) return true
+  if (value === '' || value === '.' || value === VALUE_ZERO_DECIMAL) return true
 
   return isValidBN(bn(value))
 }
