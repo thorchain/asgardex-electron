@@ -34,18 +34,20 @@ export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   useEffect(() => {
-    const oValue = FP.pipe(
+    const valueToBroadcast = FP.pipe(
       enteredValue,
       // ignore empty input
       O.filter((v) => v !== ''),
       // format value
       O.map((v) => fixedBN(v, decimal)),
+      // different value as before?
       O.filter((v) => !broadcastValue.current.isEqualTo(v))
     )
-    if (O.isSome(oValue)) {
-      const newAmount = oValue.value
-      broadcastValue.current = newAmount
-      onChange(newAmount)
+
+    if (O.isSome(valueToBroadcast)) {
+      const v = valueToBroadcast.value
+      broadcastValue.current = v
+      onChange(v)
     }
   }, [enteredValue, onChange, focus, decimal])
 

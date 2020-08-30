@@ -41,7 +41,7 @@ type CustomInputProps = {
 
 export type InputProps = CustomInputProps & AI.InputProps
 
-export const inputStyle = css<InputProps>`
+const inputStyle = css<InputProps>`
   height: ${({ size = 'middle' }) => sizes[size]};
   font-size: ${({ size = 'middle' }) => fontSettings[size].size};
   letter-spacing: ${({ size = 'middle' }) => fontSettings[size].spacing};
