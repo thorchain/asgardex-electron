@@ -3,7 +3,7 @@ import React, { useRef, useCallback } from 'react'
 import BigNumber from 'bignumber.js'
 
 import { FixmeType } from '../../../../types/asgardex'
-import CoinInputAdvanced from '../../coins/coinInputAdvanced'
+import { InputBigNumber } from '../../input'
 import { AssetInputWrapper } from './AssetInput.style'
 import { AssetInputProps } from './types'
 
@@ -41,12 +41,7 @@ const AssetInput: React.FC<Props> = (props: Props): JSX.Element => {
         <p className="asset-amount-label">{label}</p>
       </div>
       <div className="asset-input-content" ref={inputRef}>
-        <CoinInputAdvanced
-          className="asset-amount-input"
-          value={amount}
-          onChangeValue={onChangeHandler}
-          {...inputProps}
-        />
+        <InputBigNumber value={amount} onChange={onChangeHandler} {...inputProps} />
       </div>
     </AssetInputWrapper>
   )
