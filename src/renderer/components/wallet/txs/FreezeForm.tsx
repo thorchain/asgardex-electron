@@ -15,7 +15,7 @@ import { useIntl } from 'react-intl'
 import { BNB_SYMBOL } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { AssetWithBalance, FreezeAction, FreezeTxParams } from '../../../services/binance/types'
-import { InputNumber } from '../../uielements/input'
+import { InputBigNumber } from '../../uielements/input'
 import AccountSelector from '../AccountSelector'
 import * as Styled from './Form.style'
 import { validateFreezeInput } from './util'
@@ -135,7 +135,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
                 }
               ]}
               name="amount">
-              <InputNumber min={0} size="large" disabled={isLoading} />
+              <InputBigNumber min={0} size="large" disabled={isLoading} decimal={8} />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">
               <>

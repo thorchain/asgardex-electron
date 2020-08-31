@@ -20,7 +20,7 @@ import { getBnbAmount } from '../../../helpers/binanceHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { SendTxParams } from '../../../services/binance/transaction'
 import { AssetWithBalance, AddressValidation, AssetsWithBalance } from '../../../services/binance/types'
-import { Input, InputNumber } from '../../uielements/input'
+import { Input, InputBigNumber } from '../../uielements/input'
 import AccountSelector from './../AccountSelector'
 import * as Styled from './Form.style'
 import { sendAmountValidator } from './util'
@@ -115,7 +115,8 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
             </Form.Item>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              <InputNumber min={0} size="large" disabled={isLoading} />
+              {/* TODO(@Veado) In future decimal will be changed depending on selected asset, currently we have just BNB assets (decimal = 8) */}
+              <InputBigNumber min={0} size="large" disabled={isLoading} decimal={8} />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">
               <>
