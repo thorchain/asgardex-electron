@@ -1,4 +1,4 @@
-import { Balance, Fees, isTransferFee } from '@thorchain/asgardex-binance'
+import { Balance, Fees, isTransferFee, isFee, Fee } from '@thorchain/asgardex-binance'
 import { Asset, bnOrZero, assetAmount, AssetAmount, baseAmount, baseToAsset } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as E from 'fp-ts/lib/Either'
@@ -38,6 +38,16 @@ export const getTransferFees = (fees: Fees): E.Either<Error, TransferFees> =>
           multi: baseToAsset(baseAmount(item.multi_transfer_fee))
         } as TransferFees)
     )
+  )
+
+export const getFreezeFee = (fees: Fees): E.Either<Error, AssetAmount> =>
+  FP.pipe(
+    fees,
+    A.findFirst((fee) => {
+      return isFee(fee) && (fee as Fee).msg_type === 'tokensFreeze'
+    }),
+    E.fromOption(() => new Error('Could not find freeze fee')),
+    E.map((item) => baseToAsset(baseAmount((item as Fee).fee)))
   )
 
 export const getSingleTxFee = (oTransferFees: O.Option<TransferFees>): O.Option<AssetAmount> =>

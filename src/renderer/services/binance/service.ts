@@ -20,7 +20,7 @@ import {
 } from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
-import { getTransferFees } from '../../helpers/binanceHelper'
+import { getTransferFees, getFreezeFee } from '../../helpers/binanceHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import * as fpHelpers from '../../helpers/fpHelpers'
@@ -30,7 +30,15 @@ import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import { BalancesRD, BinanceClientStateForViews, BinanceClientState, TxsRD, FeesRD, TransferFeesRD } from './types'
+import {
+  BalancesRD,
+  BinanceClientStateForViews,
+  BinanceClientState,
+  TxsRD,
+  FeesRD,
+  TransferFeesRD,
+  FeeRD
+} from './types'
 import { getBinanceClientStateForViews, getBinanceClient } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
@@ -342,7 +350,20 @@ const transferFees$: Observable<TransferFeesRD> = fees$.pipe(
   map((fees) =>
     FP.pipe(
       fees,
-      RD.chain((f) => RD.fromEither(getTransferFees(f)))
+      RD.chain((fee) => RD.fromEither(getTransferFees(fee)))
+    )
+  ),
+  shareReplay(1)
+)
+
+/**
+ * Amount of feeze `Fee`
+ */
+const freezeFee$: Observable<FeeRD> = fees$.pipe(
+  map((fees) =>
+    FP.pipe(
+      fees,
+      RD.chain((fee) => RD.fromEither(getFreezeFee(fee)))
     )
   ),
   shareReplay(1)
@@ -372,5 +393,6 @@ export {
   explorerUrl$,
   transaction,
   freeze,
-  transferFees$
+  transferFees$,
+  freezeFee$
 }
