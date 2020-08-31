@@ -81,7 +81,7 @@ describe('helpers/stringHelper/', () => {
     it('trims zeros from "0.0"', () => {
       expect(trimZeros('0.0')).toEqual('0')
     })
-    it.only('trims zeros from "0.001"', () => {
+    it('trims zeros from "0.001"', () => {
       expect(trimZeros('0.001')).toEqual('0.001')
     })
     it('does not trim zeros', () => {

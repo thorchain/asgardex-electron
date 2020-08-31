@@ -18,22 +18,39 @@ const createServiceProp = (value: Observable<TransferRD>) => ({
   resetTx: () => null
 })
 
-const selectedAsset: AssetWithBalance = {
+const bnbAsset: AssetWithBalance = {
   asset: ASSETS_MAINNET.BNB,
   balance: assetAmount(1)
 }
 
-const balances: AssetsWithBalance = [selectedAsset]
+const runeAsset: AssetWithBalance = {
+  asset: ASSETS_MAINNET.RUNE,
+  balance: assetAmount(2)
+}
+
+const balances: AssetsWithBalance = [bnbAsset, runeAsset]
 const explorerUrl = O.none
 const fee = O.some(TRANSFER_FEES.single)
 
 const addressValidation: AddressValidation = (_) => true
 
 storiesOf('Wallet/Send', module)
-  .add('send', () => {
+  .add('send bnb', () => {
     return (
       <Send
-        selectedAsset={selectedAsset}
+        selectedAsset={bnbAsset}
+        assetsWB={balances}
+        transactionService={createServiceProp(EMPTY)}
+        explorerUrl={explorerUrl}
+        addressValidation={addressValidation}
+        fee={fee}
+      />
+    )
+  })
+  .add('send rune', () => {
+    return (
+      <Send
+        selectedAsset={runeAsset}
         assetsWB={balances}
         transactionService={createServiceProp(EMPTY)}
         explorerUrl={explorerUrl}
@@ -45,7 +62,7 @@ storiesOf('Wallet/Send', module)
   .add('pending', () => {
     return (
       <Send
-        selectedAsset={selectedAsset}
+        selectedAsset={bnbAsset}
         assetsWB={balances}
         transactionService={createServiceProp(of(RD.pending))}
         explorerUrl={explorerUrl}
@@ -57,7 +74,7 @@ storiesOf('Wallet/Send', module)
   .add('error', () => {
     return (
       <Send
-        selectedAsset={selectedAsset}
+        selectedAsset={bnbAsset}
         assetsWB={balances}
         transactionService={createServiceProp(of(RD.failure(Error('error example'))))}
         explorerUrl={explorerUrl}
@@ -69,7 +86,7 @@ storiesOf('Wallet/Send', module)
   .add('success', () => {
     return (
       <Send
-        selectedAsset={selectedAsset}
+        selectedAsset={bnbAsset}
         assetsWB={balances}
         addressValidation={addressValidation}
         transactionService={createServiceProp(
@@ -90,12 +107,24 @@ storiesOf('Wallet/Send', module)
   .add('no fees', () => {
     return (
       <Send
-        selectedAsset={selectedAsset}
+        selectedAsset={bnbAsset}
         assetsWB={balances}
         transactionService={createServiceProp(EMPTY)}
         explorerUrl={explorerUrl}
         addressValidation={addressValidation}
         fee={O.none}
+      />
+    )
+  })
+  .add('bnb amount < fees', () => {
+    return (
+      <Send
+        selectedAsset={bnbAsset}
+        assetsWB={balances}
+        transactionService={createServiceProp(EMPTY)}
+        explorerUrl={explorerUrl}
+        addressValidation={addressValidation}
+        fee={O.some(assetAmount(1.23))}
       />
     )
   })
