@@ -4,7 +4,7 @@ import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
-import { balanceByAsset, isMiniToken, getTransferFees, isBinanceChain } from './binanceHelper'
+import { balanceByAsset, isMiniToken, getTransferFees, isBinanceChain, getFreezeFee } from './binanceHelper'
 
 describe('binanceHelper', () => {
   describe('amountByAsset', () => {
@@ -52,7 +52,7 @@ describe('binanceHelper', () => {
     })
   })
 
-  describe('getTransferFeeds', () => {
+  describe('getTransferFees', () => {
     const fee: Fee = {
       msg_type: 'submit_proposal',
       fee: 500000000,
@@ -103,6 +103,39 @@ describe('binanceHelper', () => {
     })
     it('returns Left if no fees for transfers are available', () => {
       const result = getTransferFees([fee, dexFees])
+      expect(result).toBeLeft()
+    })
+  })
+  describe('getFreezeFee', () => {
+    const fee: Fee = {
+      msg_type: 'tokensFreeze',
+      fee: 50000,
+      fee_for: 1
+    }
+
+    const fee2: Fee = {
+      msg_type: 'timeLock',
+      fee: 1000000,
+      fee_for: 1
+    }
+
+    it('returns fee for "freeze"', () => {
+      const fees: Fees = [fee, fee2]
+      const result = getFreezeFee(fees)
+      FP.pipe(
+        result,
+        E.fold(
+          () => fail('result should be Some'),
+          (fee) => expect(fee.amount()).toEqual(assetAmount(0.0005).amount())
+        )
+      )
+    })
+    it('returns Left for an empty list of fees', () => {
+      const result = getFreezeFee([])
+      expect(result).toBeLeft()
+    })
+    it('returns Left if no fee for "freeze" is available', () => {
+      const result = getFreezeFee([fee2])
       expect(result).toBeLeft()
     })
   })

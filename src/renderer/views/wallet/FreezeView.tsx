@@ -2,18 +2,18 @@ import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { initial } from '@devexperts/remote-data-ts'
-import { assetFromString, assetToString } from '@thorchain/asgardex-util'
+import { assetFromString, assetToString, AssetAmount } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
+import * as Rx from 'rxjs/operators'
 
 import BackLink from '../../components/uielements/backLink'
 import Freeze from '../../components/wallet/txs/Freeze'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { getBnbAmount } from '../../helpers/binanceHelper'
-import { useSingleTxFee } from '../../hooks/useSingleTxFee'
 import { SendParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { FreezeAction, AssetsWithBalance } from '../../services/binance/types'
@@ -29,8 +29,8 @@ const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
 
   const intl = useIntl()
 
-  const { freeze: freezeService, balancesState$, explorerUrl$, transferFees$ } = useBinanceContext()
-  const fee = useSingleTxFee(transferFees$)
+  const { freeze: freezeService, balancesState$, explorerUrl$, freezeFee$ } = useBinanceContext()
+  const fee = useObservableState<O.Option<AssetAmount>>(() => freezeFee$.pipe(Rx.map(RD.toOption)), O.none)[0]
   const balancesState = useObservableState(balancesState$, initial)
   const explorerUrl = useObservableState(explorerUrl$, O.none)
   const assetsWB = useMemo(

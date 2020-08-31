@@ -82,5 +82,6 @@ export type TransferFees = {
   multi: AssetAmount
 }
 
+export type FeeRD = RD.RemoteData<Error, AssetAmount>
 export type FeesRD = RD.RemoteData<Error, Fees>
 export type TransferFeesRD = RD.RemoteData<Error, TransferFees>
