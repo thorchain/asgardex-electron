@@ -126,10 +126,6 @@ export const AssetData = styled.div.attrs({ className: 'asset-data' })`
   flex-direction: column;
   flex-grow: 1;
   padding: 12px 16px;
-
-  .asset-amount-label {
-    height: 24px;
-  }
 `
 
 export const VerticalDivider = styled(Divider).attrs({
