@@ -5,20 +5,23 @@ import {
   assetToString,
   formatAssetAmountCurrency,
   AssetAmount,
-  formatAssetAmount
+  formatAssetAmount,
+  bn
 } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
+import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { BNB_SYMBOL } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { trimZeros } from '../../../helpers/stringHelper'
 import { AssetWithBalance, FreezeAction, FreezeTxParams } from '../../../services/binance/types'
 import { InputBigNumber } from '../../uielements/input'
 import AccountSelector from '../AccountSelector'
 import * as Styled from './Form.style'
-import { validateFreezeInput } from './util'
+import { validateTxAmountInput } from './util'
 
 export type FormValues = {
   amount: string
@@ -48,11 +51,15 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
   }, [assetWB, freezeAction])
 
   const amountValidator = useCallback(
-    async (a: unknown, value: string) =>
-      validateFreezeInput({
+    async (_: unknown, value: BigNumber) =>
+      validateTxAmountInput({
         input: value,
         maxAmount,
-        intl
+        errors: {
+          msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
+          msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
+          msg3: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
+        }
       }),
     [intl, maxAmount]
   )
@@ -63,7 +70,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
         oFee,
         O.fold(
           () => '--',
-          (f) => `${formatAssetAmount(f, 6)} ${BNB_SYMBOL}`
+          (f) => `${trimZeros(formatAssetAmount(f, 8))} ${BNB_SYMBOL}`
         )
       ),
     [oFee]
@@ -124,7 +131,12 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
       <Styled.Col span={24}>
         <AccountSelector selectedAsset={assetWB.asset} assets={[assetWB]} />
         {/* `Form<FormValue>` does not work in `styled(Form)`, so we have to add styles here. All is just needed to have correct types in `onFinish` handler)  */}
-        <Form form={form} onFinish={onSubmit} labelCol={{ span: 24 }} style={{ padding: '30px' }}>
+        <Form
+          form={form}
+          initialValues={{ amount: bn(0) }}
+          onFinish={onSubmit}
+          labelCol={{ span: 24 }}
+          style={{ padding: '30px' }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
             <Styled.FormItem
