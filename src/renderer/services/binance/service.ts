@@ -24,6 +24,7 @@ import { getTransferFees, getFreezeFee } from '../../helpers/binanceHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import * as fpHelpers from '../../helpers/fpHelpers'
+import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
 import { KeystoreState } from '../wallet/types'
@@ -359,13 +360,10 @@ const transferFees$: Observable<TransferFeesRD> = fees$.pipe(
 /**
  * Amount of feeze `Fee`
  */
-const freezeFee$: Observable<FeeRD> = fees$.pipe(
-  map((fees) =>
-    FP.pipe(
-      fees,
-      RD.chain((fee) => RD.fromEither(getFreezeFee(fee)))
-    )
-  ),
+const freezeFee$: Observable<FeeRD> = FP.pipe(
+  fees$,
+  liveData.map(getFreezeFee),
+  liveData.chain(liveData.fromEither),
   shareReplay(1)
 )
 
