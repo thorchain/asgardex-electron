@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import { Address } from '@thorchain/asgardex-binance'
 import { Asset, assetToString } from '@thorchain/asgardex-util'
-import { Row, Col, Grid, Menu, Dropdown } from 'antd'
+import { Row, Col, Grid, Dropdown } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -14,7 +14,6 @@ import { TxsRD, BalancesRD, SendAction, isSendAction } from '../../services/bina
 import AssetInfo from '../uielements/assets/AssetInfo'
 import BackLink from '../uielements/backLink'
 import Button, { RefreshButton } from '../uielements/button'
-import Label from '../uielements/label'
 import * as Styled from './AssetDetails.style'
 import TransactionsTable from './TransactionsTable'
 
@@ -128,17 +127,15 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
 
   const changeActionMenu = useMemo(() => {
     return (
-      <Menu onClick={changeActionMenuClickHandler}>
+      <Styled.ActionMenu onClick={changeActionMenuClickHandler}>
         {menuItems.map(({ key, label }) => (
-          <Menu.Item key={key}>
+          <Styled.ActionMenuItem key={key}>
             <Row justify="center">
-              <Label textTransform="uppercase" align="center">
-                {label}
-              </Label>
+              <Styled.Label>{label}</Styled.Label>
             </Row>
-          </Menu.Item>
+          </Styled.ActionMenuItem>
         ))}
-      </Menu>
+      </Styled.ActionMenu>
     )
   }, [menuItems])
 
