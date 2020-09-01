@@ -165,7 +165,7 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
                 <Styled.ClientLabel>v{apiVersion}</Styled.ClientLabel>
                 <Styled.Placeholder>{intl.formatMessage({ id: 'common.network' })}</Styled.Placeholder>
                 <Dropdown overlay={networkMenu} trigger={['click']}>
-                  <Row align="middle" style={{ width: '130px' }} onClick={(e) => e.preventDefault()}>
+                  <Row align="middle" style={{ display: 'inline-flex' }} onClick={(e) => e.preventDefault()}>
                     <Styled.NetworkTitle>{selectedNetwork}</Styled.NetworkTitle>
                     <DownIcon />
                   </Row>
