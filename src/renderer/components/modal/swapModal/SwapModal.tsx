@@ -24,17 +24,18 @@ import { CalcResult } from './types'
 
 type Props = {
   calcResult: CalcResult
-  isCompleted?: boolean
-  priceFrom?: BaseAmount
-  priceTo?: BaseAmount
   swapSource: Asset
   swapTarget: Asset
   txStatus: TxStatus
+  isCompleted?: boolean
+  priceFrom?: BaseAmount
+  priceTo?: BaseAmount
   visible?: boolean
   onClose?: () => void
   onChangeTxTimer?: () => void
   onEndTxTimer?: () => void
   onClickFinish?: () => void
+  onViewTxClick?: (e: React.MouseEvent) => void
 }
 
 const SwapModal: React.FC<Props> = (props): JSX.Element => {
@@ -50,7 +51,8 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
     onClose = () => {},
     onChangeTxTimer = () => {},
     onClickFinish = () => {},
-    onEndTxTimer = () => {}
+    onEndTxTimer = () => {},
+    onViewTxClick = () => {}
   } = props
   const [openSwapModal, setOpenSwapModal] = useState<boolean>(visible)
 
@@ -96,7 +98,7 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
                     FINISH
                   </ViewButton>
                 )}
-                <ViewTransaction href="#" target="_blank" rel="noopener noreferrer">
+                <ViewTransaction onClick={onViewTxClick} href="#" target="_blank" rel="noopener noreferrer">
                   VIEW TRANSACTION
                 </ViewTransaction>
               </BtnCopyWrapper>

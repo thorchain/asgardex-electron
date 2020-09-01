@@ -6,7 +6,8 @@ import {
   baseToAsset,
   formatAssetAmount,
   baseAmount,
-  Asset
+  Asset,
+  assetToString
 } from '@thorchain/asgardex-util'
 
 import Label from '../../label'
@@ -36,7 +37,7 @@ const AssetData: React.FC<Props> = (props: Props): JSX.Element => {
     type = 'normal'
   } = props
 
-  const formattedPrice = formatAssetAmountCurrency(baseToAsset(price))
+  const formattedPrice = formatAssetAmountCurrency(baseToAsset(price), assetToString(asset))
   // @TODO add valid formatters
   const priceLabel = priceValid && formattedPrice !== '$ 0.00' ? formattedPrice : ''
 

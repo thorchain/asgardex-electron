@@ -11,6 +11,10 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
+import * as Rx from 'rxjs'
+import { EMPTY } from 'rxjs'
+import * as RxOperators from 'rxjs/operators'
+import { switchMap } from 'rxjs/operators'
 
 import ErrorView from '../../components/shared/error/ErrorView'
 import { Swap } from '../../components/swap/Swap'
@@ -31,14 +35,35 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
   const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
-  const { transaction } = useBinanceContext()
-  const [tx] = useObservableState(() => transaction.txRD$, initial)
+  const { transaction, address$, subscribeTransfers } = useBinanceContext()
   const { poolsState$, poolAddresses$, reloadPoolsState } = midgardService
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
-  const { balancesState$, explorerUrl$ } = useBinanceContext()
+  const { balancesState$, explorerUrl$, reloadBalances } = useBinanceContext()
 
   const balances = useObservableState(balancesState$)
+
+  const [txWithState] = useObservableState(() =>
+    pipe(
+      Rx.combineLatest([
+        transaction.txRD$,
+        pipe(
+          address$,
+          switchMap(O.fold(() => EMPTY, subscribeTransfers)),
+          RxOperators.map(RD.success),
+          RxOperators.tap((state) => RD.isSuccess(state) && reloadBalances()),
+          RxOperators.startWith(RD.pending)
+        )
+      ]),
+      RxOperators.map(([tx, state]) =>
+        pipe(
+          tx,
+          RD.map((tx) => ({ tx, state }))
+        )
+      ),
+      RxOperators.catchError((e) => Rx.of(RD.failure(e)))
+    )
+  )
 
   const onConfirmSwap = useCallback(
     (source: Asset, amount: AssetAmount, memo: string) => {
@@ -109,7 +134,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
 
               return (
                 <Swap
-                  tx={tx}
+                  txWithState={txWithState}
                   resetTx={transaction.resetTx}
                   goToTransaction={goToTransaction}
                   sourceAsset={O.fromNullable(assetFromString(source.toUpperCase()))}
