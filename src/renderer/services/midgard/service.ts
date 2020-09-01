@@ -16,6 +16,7 @@ import { Configuration, DefaultApi, GetPoolsDetailsViewEnum } from '../../types/
 import { PricePoolAsset } from '../../views/pools/types'
 import { isPricePoolAsset } from '../../views/pools/types'
 import { Network } from '../app/types'
+import { DEFAULT_NETWORK } from '../const'
 import {
   PoolsStateRD,
   NetworkInfoRD,
