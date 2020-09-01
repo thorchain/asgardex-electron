@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl'
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
 import { Network } from '../../services/app/types'
+import { AVAILABLE_NETWORKS } from '../../services/const'
 import { UserAccountType } from '../../types/wallet'
 import * as Styled from './Settings.style'
 
@@ -78,7 +79,6 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(
     (param) => {
-      console.log('changeNetworkHandler:', param)
       const asset = param.key as Network
       changeNetwork(asset)
     },
@@ -88,7 +88,7 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
   const networkMenu = useMemo(
     () => (
       <Styled.NetworkMenu onClick={changeNetworkHandler}>
-        {(['testnet', 'chaosnet', 'mainnet'] as Network[]).map((network) => (
+        {AVAILABLE_NETWORKS.map((network) => (
           <Styled.NetworkMenuItem key={network}>
             <Styled.NetworkLabel>{network}</Styled.NetworkLabel>
           </Styled.NetworkMenuItem>

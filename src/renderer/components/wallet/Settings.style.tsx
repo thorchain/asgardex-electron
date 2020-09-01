@@ -200,12 +200,6 @@ export const ActionMenuItem = styled(A.Menu.Item)`
   }
 `
 
-export const NetworkRow = styled(A.Row).attrs({
-  alignItems: 'center'
-})`
-  width: '150px';
-`
-
 export const NetworkMenuItem = styled(A.Menu.Item)`
   color: ${palette('text', 1)};
 
