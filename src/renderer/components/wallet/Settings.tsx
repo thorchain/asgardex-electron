@@ -1,41 +1,23 @@
 import React, { useCallback, useMemo } from 'react'
 
 import { StopOutlined } from '@ant-design/icons'
-import { Row, Col, Button, List } from 'antd'
+import { Row, Col, Button, List, Dropdown } from 'antd'
+import { MenuProps } from 'antd/lib/menu'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import { useIntl } from 'react-intl'
 
+import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
 import { Network } from '../../services/app/types'
+import { AVAILABLE_NETWORKS } from '../../services/const'
 import { UserAccountType } from '../../types/wallet'
-import {
-  StyledTitleWrapper,
-  StyledRow,
-  StyledWalletCol,
-  StyledTitle,
-  StyledDivider,
-  StyledSubtitle,
-  StyledCard,
-  StyledOptionCard,
-  StyledOptionLabel,
-  StyledButton,
-  StyledPlaceholder,
-  StyledClientLabel,
-  StyledClientButton,
-  StyledAccountCard,
-  StyledListItem,
-  StyledChainName,
-  StyledChainContent,
-  StyledAccountPlaceholder,
-  StyledAccountContent,
-  StyledAccountAddress
-} from './Settings.style'
+import * as Styled from './Settings.style'
 
 type Props = {
-  network: Network
+  selectedNetwork: Network
   apiVersion?: string
-  toggleNetwork?: () => void
+  changeNetwork: (network: Network) => void
   clientUrl: O.Option<string>
   userAccounts?: O.Option<UserAccountType[]>
   lockWallet?: () => void
@@ -47,11 +29,11 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
   const {
     apiVersion = '',
     clientUrl,
-    network,
+    selectedNetwork,
     userAccounts = O.none,
-    toggleNetwork = () => {},
     lockWallet = () => {},
-    removeKeystore = () => {}
+    removeKeystore = () => {},
+    changeNetwork
   } = props
 
   const removeWallet = useCallback(() => {
@@ -64,30 +46,30 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
         userAccounts,
         O.map((accounts) => (
           <Col key={'accounts'} sm={{ span: 24 }} md={{ span: 12 }}>
-            <StyledSubtitle>{intl.formatMessage({ id: 'setting.account.management' })}</StyledSubtitle>
-            <StyledAccountCard>
+            <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
+            <Styled.AccountCard>
               <List
                 dataSource={accounts}
                 renderItem={(item, i: number) => (
-                  <StyledListItem key={i}>
-                    <StyledChainName>{item.chainName}</StyledChainName>
+                  <Styled.ListItem key={i}>
+                    <Styled.ChainName>{item.chainName}</Styled.ChainName>
                     {item.accounts.map((acc, j) => (
-                      <StyledChainContent key={j}>
-                        <StyledAccountPlaceholder>{acc.name}</StyledAccountPlaceholder>
-                        <StyledAccountContent>
-                          <StyledAccountAddress>{acc.address}</StyledAccountAddress>
+                      <Styled.ChainContent key={j}>
+                        <Styled.AccountPlaceholder>{acc.name}</Styled.AccountPlaceholder>
+                        <Styled.AccountContent>
+                          <Styled.AccountAddress>{acc.address}</Styled.AccountAddress>
                           {acc.type === 'external' && (
                             <Button type="link" danger>
                               <StopOutlined />
                             </Button>
                           )}
-                        </StyledAccountContent>
-                      </StyledChainContent>
+                        </Styled.AccountContent>
+                      </Styled.ChainContent>
                     ))}
-                  </StyledListItem>
+                  </Styled.ListItem>
                 )}
               />
-            </StyledAccountCard>
+            </Styled.AccountCard>
           </Col>
         )),
         O.getOrElse(() => <></>)
@@ -95,80 +77,105 @@ const Settings: React.FC<Props> = (props: Props): JSX.Element => {
     [intl, userAccounts]
   )
 
+  const changeNetworkHandler: MenuProps['onClick'] = useCallback(
+    (param) => {
+      const asset = param.key as Network
+      changeNetwork(asset)
+    },
+    [changeNetwork]
+  )
+
+  const networkMenu = useMemo(
+    () => (
+      <Styled.NetworkMenu onClick={changeNetworkHandler}>
+        {AVAILABLE_NETWORKS.map((network) => (
+          <Styled.NetworkMenuItem key={network}>
+            <Styled.NetworkLabel>{network}</Styled.NetworkLabel>
+          </Styled.NetworkMenuItem>
+        ))}
+      </Styled.NetworkMenu>
+    ),
+    [changeNetworkHandler]
+  )
+
   return (
     <>
       <Row>
         <Col span={24}>
-          <StyledTitleWrapper>
-            <StyledTitle>{intl.formatMessage({ id: 'setting.title' })}</StyledTitle>
-          </StyledTitleWrapper>
-          <StyledDivider />
+          <Styled.TitleWrapper>
+            <Styled.Title>{intl.formatMessage({ id: 'setting.title' })}</Styled.Title>
+          </Styled.TitleWrapper>
+          <Styled.Divider />
         </Col>
       </Row>
-      <StyledRow gutter={[16, 16]}>
+      <Styled.Row gutter={[16, 16]}>
         <Col sm={{ span: 24 }} md={{ span: 12 }}>
-          <StyledSubtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</StyledSubtitle>
-          <StyledCard>
+          <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
+          <Styled.Card>
             <Row>
-              <StyledWalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                <StyledOptionCard bordered={false}>
-                  <StyledOptionLabel color="primary" size="big">
+              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                <Styled.OptionCard bordered={false}>
+                  <Styled.OptionLabel color="primary" size="big">
                     {intl.formatMessage({ id: 'setting.export' })}
-                  </StyledOptionLabel>
-                </StyledOptionCard>
-              </StyledWalletCol>
-              <StyledWalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                <StyledOptionCard bordered={false}>
-                  <StyledOptionLabel color="warning" size="big" onClick={lockWallet}>
+                  </Styled.OptionLabel>
+                </Styled.OptionCard>
+              </Styled.WalletCol>
+              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                <Styled.OptionCard bordered={false}>
+                  <Styled.OptionLabel color="warning" size="big" onClick={lockWallet}>
                     {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
-                  </StyledOptionLabel>
-                </StyledOptionCard>
-              </StyledWalletCol>
-              <StyledWalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                <StyledOptionCard bordered={false}>
-                  <StyledButton sizevalue="xnormal" color="primary" typevalue="outline" round="true" disabled>
+                  </Styled.OptionLabel>
+                </Styled.OptionCard>
+              </Styled.WalletCol>
+              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                <Styled.OptionCard bordered={false}>
+                  <Styled.Button sizevalue="xnormal" color="primary" typevalue="outline" round="true" disabled>
                     {intl.formatMessage({ id: 'setting.view.phrase' })}
-                  </StyledButton>
-                </StyledOptionCard>
-              </StyledWalletCol>
-              <StyledWalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                <StyledOptionCard bordered={false}>
-                  <StyledButton
+                  </Styled.Button>
+                </Styled.OptionCard>
+              </Styled.WalletCol>
+              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                <Styled.OptionCard bordered={false}>
+                  <Styled.Button
                     sizevalue="xnormal"
                     color="error"
                     typevalue="outline"
                     round="true"
                     onClick={removeWallet}>
                     {intl.formatMessage({ id: 'wallet.action.remove' })}
-                  </StyledButton>
-                </StyledOptionCard>
-              </StyledWalletCol>
+                  </Styled.Button>
+                </Styled.OptionCard>
+              </Styled.WalletCol>
             </Row>
-          </StyledCard>
-          <StyledSubtitle>{intl.formatMessage({ id: 'setting.client' })}</StyledSubtitle>
-          <StyledCard>
+          </Styled.Card>
+          <Styled.Subtitle>{intl.formatMessage({ id: 'setting.client' })}</Styled.Subtitle>
+          <Styled.Card>
             <Row>
               <Col span={24}>
-                <StyledPlaceholder>{intl.formatMessage({ id: 'setting.midgard' })}</StyledPlaceholder>
+                <Styled.Placeholder>{intl.formatMessage({ id: 'setting.midgard' })}</Styled.Placeholder>
 
-                <StyledClientLabel>
+                <Styled.ClientLabel>
                   {pipe(
                     clientUrl,
                     O.getOrElse(() => intl.formatMessage({ id: 'setting.notconnected' }))
                   )}
-                </StyledClientLabel>
+                </Styled.ClientLabel>
 
-                <StyledPlaceholder>{intl.formatMessage({ id: 'setting.version' })}</StyledPlaceholder>
-                <StyledClientLabel>v{apiVersion}</StyledClientLabel>
-                <StyledClientButton color="warning" size="big" onClick={toggleNetwork}>
-                  Change to {network === 'mainnet' ? 'testnet' : 'mainnet'}
-                </StyledClientButton>
+                <Styled.Placeholder>{intl.formatMessage({ id: 'setting.version' })}</Styled.Placeholder>
+                <Styled.ClientLabel>v{apiVersion}</Styled.ClientLabel>
+                <Styled.Placeholder>{intl.formatMessage({ id: 'common.network' })}</Styled.Placeholder>
+                <Dropdown overlay={networkMenu} trigger={['click']}>
+                  <Row align="middle" style={{ display: 'inline-flex' }} onClick={(e) => e.preventDefault()}>
+                    <Styled.NetworkTitle>{selectedNetwork}</Styled.NetworkTitle>
+                    <DownIcon />
+                  </Row>
+                </Dropdown>
               </Col>
             </Row>
-          </StyledCard>
+          </Styled.Card>
         </Col>
         {accounts}
-      </StyledRow>
+      </Styled.Row>
     </>
   )
 }

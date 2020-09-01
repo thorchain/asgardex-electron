@@ -17,11 +17,17 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { OnlineStatus, Network } from '../../services/app/types'
+import { DEFAULT_NETWORK } from '../../services/const'
+
+type NetworkMenuItem = {
+  key: string
+  label: string
+}
 
 const SettingsView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { lock, removeKeystore } = keystoreService
-  const { network$, toggleNetwork } = useAppContext()
+  const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
 
   const binanceAddress$ = useMemo(
@@ -50,7 +56,7 @@ const SettingsView: React.FC = (): JSX.Element => {
 
   const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
 
-  const network = useObservableState<Network>(network$, 'testnet')
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxOperators.map(RD.toOption)), [
     midgardService.apiEndpoint$
@@ -82,8 +88,8 @@ const SettingsView: React.FC = (): JSX.Element => {
       <Col span={24}>
         <Settings
           apiVersion={apiVersion}
-          network={network}
-          toggleNetwork={toggleNetwork}
+          selectedNetwork={network}
+          changeNetwork={changeNetwork}
           clientUrl={clientUrl}
           lockWallet={lock}
           removeKeystore={removeKeystore}

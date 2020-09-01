@@ -10,7 +10,7 @@ export type Props = {
   weight?: string
   textTransform?: TextTransform
   nowrap?: boolean
-  onClick?: () => void
+  onClick?: (_: React.MouseEvent<HTMLElement>) => void
 }
 
 const fontSettings: FontSettings = {
