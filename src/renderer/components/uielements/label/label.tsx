@@ -7,7 +7,7 @@ export type ComponentProps = {
   children?: React.ReactNode
   loading?: boolean
   nowrap?: boolean
-  onClick?: () => void
+  onClick?: (_: React.MouseEvent<HTMLElement>) => void
   style?: React.CSSProperties
 }
 

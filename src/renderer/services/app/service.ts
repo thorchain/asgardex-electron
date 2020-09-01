@@ -2,6 +2,7 @@ import * as Rx from 'rxjs'
 import { startWith, mapTo } from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
+import { DEFAULT_NETWORK } from '../const'
 import { OnlineStatus, Network } from './types'
 
 // Check online status
@@ -14,11 +15,6 @@ const onlineStatus$ = Rx.merge(online$, offline$).pipe(startWith(navigator.onLin
 /**
  * State of `Network`
  */
-const { get$: network$, get: getNetwork, set: changeNetwork } = observableState<Network>('testnet')
+const { get$: network$, set: changeNetwork } = observableState<Network>(DEFAULT_NETWORK)
 
-const toggleNetwork = () => {
-  const next = getNetwork() === 'mainnet' ? 'testnet' : 'mainnet'
-  changeNetwork(next)
-}
-
-export { onlineStatus$, network$, toggleNetwork }
+export { onlineStatus$, network$, changeNetwork }

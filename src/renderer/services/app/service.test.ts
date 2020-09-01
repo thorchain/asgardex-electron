@@ -1,6 +1,6 @@
-import { tap, map, withLatestFrom } from 'rxjs/operators'
+import { map, withLatestFrom } from 'rxjs/operators'
 
-import { network$, toggleNetwork, onlineStatus$ } from './service'
+import { network$, changeNetwork, onlineStatus$ } from './service'
 import { OnlineStatus } from './types'
 
 describe('services/app/service/', () => {
@@ -11,24 +11,17 @@ describe('services/app/service/', () => {
       })
     })
 
-    it('returns mainnet by toggleNetwork() before', () => {
+    it('returns mainnet ', () => {
       runObservable(({ expectObservable }) => {
-        toggleNetwork()
+        changeNetwork('mainnet')
         expectObservable(network$).toBe('a', { a: 'mainnet' })
       })
     })
 
-    it('calling toggleNetwork() four times changes network four times', () => {
-      runObservable(({ cold, expectObservable }) => {
-        const values = { a: 1, b: 'testnet', c: 'mainnet' }
-        const toggle = '--a----a--a--a'
-        const result = '--b----c--b--c'
-        const result$ = cold(toggle, values).pipe(
-          tap(() => toggleNetwork()),
-          withLatestFrom(network$),
-          map(([_, network]) => network)
-        )
-        expectObservable(result$).toBe(result, values)
+    it('returns chaosnet ', () => {
+      runObservable(({ expectObservable }) => {
+        changeNetwork('chaosnet')
+        expectObservable(network$).toBe('a', { a: 'chaosnet' })
       })
     })
   })
