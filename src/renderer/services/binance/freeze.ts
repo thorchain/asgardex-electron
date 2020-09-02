@@ -7,9 +7,9 @@ import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
+import { getClient } from '../utils'
 import { ClientState } from './service'
 import { FreezeRD, FreezeTxParams } from './types'
-import { getBinanceClient } from './utils'
 
 const { get$: txRD$, set: setTxRD } = observableState<FreezeRD>(RD.initial)
 
@@ -20,7 +20,7 @@ const tx$ = ({
   action
 }: { clientState$: ClientState } & FreezeTxParams): Rx.Observable<FreezeRD> =>
   clientState$.pipe(
-    map(getBinanceClient),
+    map(getClient),
     switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY)),
     switchMap((client) => {
       // freeze

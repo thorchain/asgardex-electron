@@ -11,10 +11,10 @@ import { observableState } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
 import { DEFAULT_NETWORK } from '../const'
 import { ClientStateForViews } from '../types'
+import { getClientStateForViews, getClient } from '../utils'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { BitcoinClientState } from './types'
-import { getBitcoinClientStateForViews, getBitcoinClient } from './utils'
 
 const BITCOIN_ELECTRS_API = envOrDefault(process.env.BITCOIN_ELECRTS_TESTNET_API, 'http://165.22.106.224')
 
@@ -68,14 +68,14 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, bitcoinNetwork$).pipe(
 
 export type ClientState = typeof clientState$
 
-const client$: Observable<O.Option<BitcoinClient>> = clientState$.pipe(map(getBitcoinClient), shareReplay(1))
+const client$: Observable<O.Option<BitcoinClient>> = clientState$.pipe(map(getClient), shareReplay(1))
 
 /**
  * Helper stream to provide "ready-to-go" state of latest `BitcoinClient`, but w/o exposing the client
  * It's needed by views only.
  */
 const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(
-  map((clientState) => getBitcoinClientStateForViews(clientState))
+  map((clientState) => getClientStateForViews(clientState))
 )
 
 /**
