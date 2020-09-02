@@ -1,0 +1,117 @@
+import { Client as BitcoinClient, Network as BitcoinNetwork } from '@thorchain/asgardex-bitcoin'
+import { right, left } from 'fp-ts/lib/Either'
+import * as FP from 'fp-ts/lib/function'
+import { none, some } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
+import { Observable, Observer } from 'rxjs'
+import {
+  map,
+  mergeMap,
+  shareReplay
+} from 'rxjs/operators'
+
+import { envOrDefault } from '../../helpers/envHelper'
+import { observableState } from '../../helpers/stateHelper'
+import { Network } from '../app/types'
+import { KeystoreState } from '../wallet/types'
+import { getPhrase } from '../wallet/util'
+import { BitcoinClientStateForViews, BitcoinClientState } from './types'
+import { getBitcoinClientStateForViews, getBitcoinClient } from './utils'
+
+const BITCOIN_ELECTRS_API = envOrDefault(process.env.BITCOIN_ELECRTS_TESTNET_API, 'http://165.22.106.224')
+
+/**
+ * Observable state of `Network`
+ */
+const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(BitcoinNetwork.TEST)
+
+/**
+ * Binance network depending on `Network`
+ */
+const bitcoinNetwork$: Observable<BitcoinNetwork> = getNetworkState$.pipe(
+  mergeMap((network) => {
+    if (network === 'mainnet') return Rx.of(BitcoinNetwork.MAIN)
+    // all other networks use testnet url for now
+    return Rx.of(BitcoinNetwork.TEST)
+  })
+)
+
+/**
+ * Observable state of `KeystoreState`
+ */
+const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(none)
+
+/**
+ * Stream to create an observable BitcoinClient depending on existing phrase in keystore
+ *
+ * Whenever a phrase has been added to keystore, a new BitcoinClient will be created.
+ * By the other hand: Whenever a phrase has been removed, the client is set to `None`
+ * A BitcoinClient will never be created as long as no phrase is available
+ */
+const clientState$ = Rx.combineLatest(getKeystoreState$, bitcoinNetwork$).pipe(
+  mergeMap(
+    ([keystore, bitcoinNetwork]) =>
+      Observable.create((observer: Observer<BitcoinClientState>) => {
+        const client = FP.pipe(
+          getPhrase(keystore),
+          O.chain((phrase) => {
+            try {
+              const client = new BitcoinClient(bitcoinNetwork, BITCOIN_ELECTRS_API, phrase)
+              return some(right(client)) as BitcoinClientState
+            } catch (error) {
+              return some(left(error))
+            }
+          })
+        )
+        observer.next(client)
+      }) as Observable<BitcoinClientState>
+  )
+)
+
+// export type ClientState = typeof clientState$
+
+const client$: Observable<O.Option<BitcoinClient>> = clientState$.pipe(map(getBitcoinClient), shareReplay(1))
+
+/**
+ * Helper stream to provide "ready-to-go" state of latest `BitcoinClient`, but w/o exposing the client
+ * It's needed by views only.
+ */
+const clientViewState$: Observable<BitcoinClientStateForViews> = clientState$.pipe(
+  map((clientState) => getBitcoinClientStateForViews(clientState))
+)
+
+/**
+ * Current `Address` depending on selected network
+ *
+ * If a client is not available (e.g. by removing keystore), it returns `None`
+ *
+ */
+// const address$: Observable<O.Option<Address>> = client$.pipe(
+//   map(FP.pipe(O.chain((client) => FP.pipe(client.getAddress(), O.fromNullable)))),
+//   distinctUntilChanged(fpHelpers.eqOString.equals),
+//   shareReplay(1)
+// )
+
+/**
+ * Object with all "public" functions and observables
+ */
+export {
+  // miniTickers$,
+  // subscribeTransfers,
+  setNetworkState,
+  client$,
+  setKeystoreState,
+  clientViewState$
+  // balancesState$,
+  // setSelectedAsset,
+  // reloadBalances,
+  // txsSelectedAsset$,
+  // reloadTxssSelectedAsset,
+  // address$
+  // selectedAsset$,
+  // explorerUrl$,
+  // transaction,
+  // freeze,
+  // transferFees$
+}
