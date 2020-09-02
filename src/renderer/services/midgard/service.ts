@@ -16,6 +16,7 @@ import { Configuration, DefaultApi, GetPoolsDetailsViewEnum } from '../../types/
 import { PricePoolAsset } from '../../views/pools/types'
 import { isPricePoolAsset } from '../../views/pools/types'
 import { Network } from '../app/types'
+import { DEFAULT_NETWORK } from '../const'
 import {
   PoolsStateRD,
   NetworkInfoRD,
@@ -31,7 +32,7 @@ const BYZANTINE_MAX_RETRY = 5
 /**
  * Observable state of `Network`
  */
-const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>('testnet')
+const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(DEFAULT_NETWORK)
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath

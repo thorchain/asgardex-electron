@@ -19,7 +19,8 @@ import {
   explorerUrl$,
   transaction,
   freeze,
-  transferFees$
+  transferFees$,
+  freezeFee$
 } from '../services/binance/service'
 import { useAppContext } from './AppContext'
 import { useWalletContext } from './WalletContext'
@@ -40,6 +41,7 @@ export type BinanceContextValue = {
   freeze: typeof freeze
   client$: typeof client$
   transferFees$: typeof transferFees$
+  freezeFee$: typeof freezeFee$
 }
 
 const initialContext: BinanceContextValue = {
@@ -57,7 +59,8 @@ const initialContext: BinanceContextValue = {
   explorerUrl$,
   transaction,
   freeze,
-  transferFees$
+  transferFees$,
+  freezeFee$
 }
 
 const BinanceContext = createContext<BinanceContextValue | null>(null)

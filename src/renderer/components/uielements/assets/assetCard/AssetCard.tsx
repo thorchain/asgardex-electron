@@ -8,7 +8,7 @@ import { sortBy as _sortBy } from 'lodash'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetPair } from '../../../../types/asgardex'
-import CoinInputAdvanced from '../../coins/coinInputAdvanced'
+import { InputBigNumber } from '../../input'
 import Label from '../../label'
 import Selection from '../../selection'
 import AssetMenu from '../assetMenu'
@@ -156,12 +156,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
           <HorizontalDivider />
           <CardTopRow>
             <AssetData>
-              <CoinInputAdvanced
-                className="asset-amount-label"
-                size="large"
-                value={amount.amount()}
-                onChangeValue={onChange}
-              />
+              <InputBigNumber size="large" value={amount.amount()} onChange={onChange} />
               <HorizontalDivider color="primary" />
               <AssetCardFooter>
                 <FooterLabel>{`${unit} ${formatBN(amount.amount().multipliedBy(price))}`}</FooterLabel>

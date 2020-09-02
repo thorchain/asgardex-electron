@@ -1,11 +1,11 @@
-import { Divider, Row, Col, Card, List } from 'antd'
+import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import Button from '../uielements/button'
-import Label from '../uielements/label'
+import UIButton from '../uielements/button'
+import UILabel from '../uielements/label'
 
-export const StyledTitleWrapper = styled.div`
+export const TitleWrapper = styled.div`
   margin: 0px -8px;
   display: flex;
   justify-content: center;
@@ -14,7 +14,7 @@ export const StyledTitleWrapper = styled.div`
   min-height: 70px;
 `
 
-export const StyledTitle = styled(Label)`
+export const Title = styled(UILabel)`
   color: ${palette('text', 1)};
   text-transform: uppercase;
   font-family: 'MainFontRegular';
@@ -23,12 +23,12 @@ export const StyledTitle = styled(Label)`
   line-height: 22px;
 `
 
-export const StyledDivider = styled(Divider)`
+export const Divider = styled(A.Divider)`
   margin: 0;
   border-top: 1px solid ${palette('gray', 0)};
 `
 
-export const StyledSubtitle = styled(Label)`
+export const Subtitle = styled(UILabel)`
   margin: 10px 0px;
   color: ${palette('text', 0)};
   text-transform: uppercase;
@@ -37,7 +37,7 @@ export const StyledSubtitle = styled(Label)`
   font-size: 18px;
 `
 
-export const StyledRow = styled(Row)`
+export const Row = styled(A.Row)`
   padding: 10px 30px;
   background-color: ${palette('background', 1)};
 
@@ -46,17 +46,17 @@ export const StyledRow = styled(Row)`
   }
 `
 
-export const StyledWalletCol = styled(Col)`
+export const WalletCol = styled(A.Col)`
   width: 100%;
 `
 
-export const StyledCard = styled(Card)`
+export const Card = styled(A.Card)`
   border-radius: 5px;
   background-color: ${palette('background', 1)};
   border: 1px solid ${palette('gray', 0)};
 `
 
-export const StyledOptionCard = styled(Card)`
+export const OptionCard = styled(A.Card)`
   .ant-card-body {
     padding: 12px;
     display: flex;
@@ -67,7 +67,7 @@ export const StyledOptionCard = styled(Card)`
   }
 `
 
-export const StyledOptionLabel = styled(Label)`
+export const OptionLabel = styled(UILabel)`
   padding: 0;
   display: flex;
   align-items: center;
@@ -78,7 +78,7 @@ export const StyledOptionLabel = styled(Label)`
   min-height: 38px;
 `
 
-export const StyledButton = styled(Button)`
+export const Button = styled(UIButton)`
   font-family: 'MainFontRegular';
   text-transform: uppercase;
 
@@ -87,7 +87,7 @@ export const StyledButton = styled(Button)`
   }
 `
 
-export const StyledPlaceholder = styled(Label)`
+export const Placeholder = styled(UILabel)`
   display: block;
   padding: 0px;
   color: ${palette('text', 2)};
@@ -96,7 +96,7 @@ export const StyledPlaceholder = styled(Label)`
   text-transform: uppercase;
 `
 
-export const StyledClientLabel = styled(Label)`
+export const ClientLabel = styled(UILabel)`
   display: block;
   padding-top: 0px;
   color: ${palette('text', 1)};
@@ -105,12 +105,12 @@ export const StyledClientLabel = styled(Label)`
   text-transform: uppercase;
 `
 
-export const StyledClientButton = styled(Label)`
+export const ClientButton = styled(UILabel)`
   font-family: 'MainFontRegular';
   text-transform: uppercase;
 `
 
-export const StyledAccountCard = styled(Card)`
+export const AccountCard = styled(A.Card)`
   border: 1px solid ${palette('gray', 0)};
 
   .ant-card-body {
@@ -123,7 +123,7 @@ export const StyledAccountCard = styled(Card)`
   }
 `
 
-export const StyledListItem = styled(List.Item)`
+export const ListItem = styled(A.List.Item)`
   padding: 20px 20px 0;
   flex-direction: column;
   align-items: start;
@@ -135,7 +135,7 @@ export const StyledListItem = styled(List.Item)`
   }
 `
 
-export const StyledChainName = styled(Label)`
+export const ChainName = styled(UILabel)`
   padding: 0px;
   text-transform: uppercase;
   font-weight: normal;
@@ -144,13 +144,13 @@ export const StyledChainName = styled(Label)`
   letter-spacing: 2px;
 `
 
-export const StyledChainContent = styled.div`
+export const ChainContent = styled.div`
   margin-left: 30px;
   margin-top: 10px;
   width: 100%;
 `
 
-export const StyledAccountPlaceholder = styled(Label)`
+export const AccountPlaceholder = styled(UILabel)`
   display: block;
   padding: 0px;
   color: ${palette('text', 2)};
@@ -159,14 +159,14 @@ export const StyledAccountPlaceholder = styled(Label)`
   text-transform: uppercase;
 `
 
-export const StyledAccountContent = styled(Label)`
+export const AccountContent = styled(UILabel)`
   display: flex;
   align-items: center;
   padding: 0px;
   color: ${palette('text', 1)};
 `
 
-export const StyledAccountAddress = styled(Label)`
+export const AccountAddress = styled(UILabel)`
   display: inline-block;
   width: calc(70%);
   white-space: nowrap;
@@ -177,7 +177,7 @@ export const StyledAccountAddress = styled(Label)`
   text-transform: uppercase;
 `
 
-export const StyledDeviceText = styled(Label)`
+export const DeviceText = styled(UILabel)`
   padding: 0 0 10px;
   text-transform: uppercase;
   font-weight: 600;
@@ -187,4 +187,34 @@ export const StyledDeviceText = styled(Label)`
   span {
     margin-right: 10px;
   }
+`
+
+export const NetworkMenu = styled(A.Menu)`
+  background-color: ${palette('background', 1)};
+`
+
+export const ActionMenuItem = styled(A.Menu.Item)`
+  background-color: ${palette('background', 1)};
+  &:hover {
+    background-color: ${palette('background', 2)};
+  }
+`
+
+export const NetworkMenuItem = styled(A.Menu.Item)`
+  color: ${palette('text', 1)};
+
+  &:hover {
+    background-color: ${palette('background', 2)};
+  }
+`
+
+export const NetworkLabel = styled(UILabel).attrs({
+  textTransform: 'uppercase',
+  size: 'big'
+})`
+  cursor: pointer;
+`
+
+export const NetworkTitle = styled(NetworkLabel)`
+  padding-right: 10px;
 `

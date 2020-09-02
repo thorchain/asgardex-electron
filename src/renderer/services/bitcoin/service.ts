@@ -9,6 +9,7 @@ import { map, mergeMap, shareReplay } from 'rxjs/operators'
 import { envOrDefault } from '../../helpers/envHelper'
 import { observableState } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
+import { DEFAULT_NETWORK } from '../const'
 import { ClientStateForViews } from '../types'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
@@ -20,7 +21,7 @@ const BITCOIN_ELECTRS_API = envOrDefault(process.env.BITCOIN_ELECRTS_TESTNET_API
 /**
  * Observable state of `Network`
  */
-const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>('testnet')
+const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(DEFAULT_NETWORK)
 
 /**
  * Binance network depending on `Network`

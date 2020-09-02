@@ -19,19 +19,21 @@ import {
 } from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
-import { getTransferFees } from '../../helpers/binanceHelper'
+import { getTransferFees, getFreezeFee } from '../../helpers/binanceHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import * as fpHelpers from '../../helpers/fpHelpers'
+import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
+import { DEFAULT_NETWORK } from '../const'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import { BalancesRD, BinanceClientState, TxsRD, FeesRD, TransferFeesRD } from './types'
+import { BalancesRD, TxsRD, FeesRD, TransferFeesRD, FeeRD, BinanceClientState } from './types'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -43,16 +45,16 @@ const BINANCE_MAINET_WS_URI = envOrDefault(process.env.REACT_APP_BINANCE_MAINNET
 /**
  * Observable state of `Network`
  */
-const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>('testnet')
+const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(DEFAULT_NETWORK)
 
 /**
  * Websocket endpoint depending on `Network`
  */
 const wsEndpoint$ = getNetworkState$.pipe(
   mergeMap((network) => {
-    if (network === 'mainnet') return Rx.of(BINANCE_MAINET_WS_URI)
-    // all other networks use testnet url for now
-    return Rx.of(BINANCE_TESTNET_WS_URI)
+    if (network === 'testnet') return Rx.of(BINANCE_TESTNET_WS_URI)
+    // chaosnet + mainnet will use Binance mainet url
+    return Rx.of(BINANCE_MAINET_WS_URI)
   })
 )
 
@@ -148,9 +150,9 @@ const BINANCE_MAX_RETRY = 3
  */
 const binanceNetwork$: Observable<BinanceNetwork> = getNetworkState$.pipe(
   mergeMap((network) => {
-    if (network === 'mainnet') return Rx.of('mainnet' as BinanceNetwork)
-    // all other networks use testnet url for now
-    return Rx.of('testnet' as BinanceNetwork)
+    if (network === 'testnet') return Rx.of('testnet' as BinanceNetwork)
+    // chaosnet + mainnet are using Binance mainnet url
+    return Rx.of('mainnet' as BinanceNetwork)
   })
 )
 
@@ -342,9 +344,19 @@ const transferFees$: Observable<TransferFeesRD> = fees$.pipe(
   map((fees) =>
     FP.pipe(
       fees,
-      RD.chain((f) => RD.fromEither(getTransferFees(f)))
+      RD.chain((fee) => RD.fromEither(getTransferFees(fee)))
     )
   ),
+  shareReplay(1)
+)
+
+/**
+ * Amount of feeze `Fee`
+ */
+const freezeFee$: Observable<FeeRD> = FP.pipe(
+  fees$,
+  liveData.map(getFreezeFee),
+  liveData.chain(liveData.fromEither),
   shareReplay(1)
 )
 
@@ -372,5 +384,6 @@ export {
   explorerUrl$,
   transaction,
   freeze,
-  transferFees$
+  transferFees$,
+  freezeFee$
 }
