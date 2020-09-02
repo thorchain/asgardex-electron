@@ -1,22 +1,18 @@
 import { Client as BitcoinClient, Network as BitcoinNetwork } from '@thorchain/asgardex-bitcoin'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
-import { none, some } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import {
-  map,
-  mergeMap,
-  shareReplay
-} from 'rxjs/operators'
+import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
 import { envOrDefault } from '../../helpers/envHelper'
 import { observableState } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
+import { ClientStateForViews } from '../types'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
-import { BitcoinClientStateForViews, BitcoinClientState } from './types'
+import { BitcoinClientState } from './types'
 import { getBitcoinClientStateForViews, getBitcoinClient } from './utils'
 
 const BITCOIN_ELECTRS_API = envOrDefault(process.env.BITCOIN_ELECRTS_TESTNET_API, 'http://165.22.106.224')
@@ -24,23 +20,23 @@ const BITCOIN_ELECTRS_API = envOrDefault(process.env.BITCOIN_ELECRTS_TESTNET_API
 /**
  * Observable state of `Network`
  */
-const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(BitcoinNetwork.TEST)
+const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>('testnet')
 
 /**
  * Binance network depending on `Network`
  */
 const bitcoinNetwork$: Observable<BitcoinNetwork> = getNetworkState$.pipe(
   mergeMap((network) => {
-    if (network === 'mainnet') return Rx.of(BitcoinNetwork.MAIN)
-    // all other networks use testnet url for now
-    return Rx.of(BitcoinNetwork.TEST)
+    if (network === 'testnet') return Rx.of(BitcoinNetwork.TEST)
+    // In case of 'chaosnet' + 'mainnet` use BitcoinNetwork.MAIN
+    return Rx.of(BitcoinNetwork.MAIN)
   })
 )
 
 /**
  * Observable state of `KeystoreState`
  */
-const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(none)
+const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(O.none)
 
 /**
  * Stream to create an observable BitcoinClient depending on existing phrase in keystore
@@ -53,14 +49,14 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, bitcoinNetwork$).pipe(
   mergeMap(
     ([keystore, bitcoinNetwork]) =>
       Observable.create((observer: Observer<BitcoinClientState>) => {
-        const client = FP.pipe(
+        const client: BitcoinClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
               const client = new BitcoinClient(bitcoinNetwork, BITCOIN_ELECTRS_API, phrase)
-              return some(right(client)) as BitcoinClientState
+              return O.some(right(client)) as BitcoinClientState
             } catch (error) {
-              return some(left(error))
+              return O.some(left(error))
             }
           })
         )
@@ -69,7 +65,7 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, bitcoinNetwork$).pipe(
   )
 )
 
-// export type ClientState = typeof clientState$
+export type ClientState = typeof clientState$
 
 const client$: Observable<O.Option<BitcoinClient>> = clientState$.pipe(map(getBitcoinClient), shareReplay(1))
 
@@ -77,7 +73,7 @@ const client$: Observable<O.Option<BitcoinClient>> = clientState$.pipe(map(getBi
  * Helper stream to provide "ready-to-go" state of latest `BitcoinClient`, but w/o exposing the client
  * It's needed by views only.
  */
-const clientViewState$: Observable<BitcoinClientStateForViews> = clientState$.pipe(
+const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(
   map((clientState) => getBitcoinClientStateForViews(clientState))
 )
 
@@ -96,22 +92,4 @@ const clientViewState$: Observable<BitcoinClientStateForViews> = clientState$.pi
 /**
  * Object with all "public" functions and observables
  */
-export {
-  // miniTickers$,
-  // subscribeTransfers,
-  setNetworkState,
-  client$,
-  setKeystoreState,
-  clientViewState$
-  // balancesState$,
-  // setSelectedAsset,
-  // reloadBalances,
-  // txsSelectedAsset$,
-  // reloadTxssSelectedAsset,
-  // address$
-  // selectedAsset$,
-  // explorerUrl$,
-  // transaction,
-  // freeze,
-  // transferFees$
-}
+export { setNetworkState, client$, setKeystoreState, clientViewState$ }
