@@ -27,7 +27,7 @@ import * as fpHelpers from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
-import { DEFAULT_NETWORK } from '../const'
+import { DEFAULT_NETWORK, MAX_PAGES } from '../const'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
@@ -39,7 +39,8 @@ import {
   TxsRD,
   FeesRD,
   TransferFeesRD,
-  FeeRD
+  FeeRD,
+  LoadTxsProps
 } from './types'
 import { getBinanceClientStateForViews, getBinanceClient } from './utils'
 
@@ -246,7 +247,7 @@ const balancesState$: Observable<BalancesRD> = Rx.combineLatest(reloadBalances$.
     return FP.pipe(
       client,
       O.fold(
-        // if a client is available, "reset" state to "initial"
+        // if a client is not available, "reset" state to "initial"
         () => Rx.of(RD.initial),
         // or start request and return state
         loadBalances$
@@ -263,9 +264,19 @@ const { get$: selectedAsset$, set: setSelectedAsset } = observableState<O.Option
  * Observable to load txs from Binance API endpoint
  * If client is not available, it returns an `initial` state
  */
-const loadTxsOfSelectedAsset$ = (client: BinanceClient, asset: O.Option<Asset>): Observable<TxsRD> => {
+const loadTxsOfSelectedAsset$ = ({
+  client,
+  oAsset,
+  limit,
+  offset
+}: {
+  client: BinanceClient
+  oAsset: O.Option<Asset>
+  limit: number
+  offset: number
+}): Observable<TxsRD> => {
   const txAsset = FP.pipe(
-    asset,
+    oAsset,
     O.fold(
       () => undefined,
       (asset) => asset.symbol
@@ -273,20 +284,25 @@ const loadTxsOfSelectedAsset$ = (client: BinanceClient, asset: O.Option<Asset>):
   )
 
   const endTime = Date.now()
-  // Offset is set to a 90 day window - similar to ASGARDEX wallet approach,
+  // 90 day window - similar to ASGARDEX wallet approach,
   // see https://gitlab.com/thorchain/asgard-wallet/-/blob/develop/imports/api/wallet.js#L39-48
-  const offset = 90 * 24 * 60 * 60 * 1000
-  const startTime = endTime - offset
-  return Rx.from(client.getTransactions({ txAsset, endTime, startTime })).pipe(
-    mergeMap(({ tx }: TxPage) => Rx.of(RD.success(tx))),
+  const diffTime = 90 * 24 * 60 * 60 * 1000
+  const startTime = endTime - diffTime
+  return Rx.from(client.getTransactions({ txAsset, endTime, startTime, limit, offset })).pipe(
+    mergeMap((page: TxPage) => Rx.of(RD.success(page))),
     catchError((error) => Rx.of(RD.failure(error))),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
   )
 }
 
+const initialLoadTxsProps: LoadTxsProps = {
+  limit: MAX_PAGES,
+  offset: 0
+}
+
 // `TriggerStream` to reload `Txs`
-const { stream$: reloadTxsSelectedAsset$, trigger: reloadTxssSelectedAsset } = triggerStream()
+const { get$: loadSelectedAssetTxs$, set: loadTxsSelectedAsset } = observableState<LoadTxsProps>(initialLoadTxsProps)
 
 /**
  * State of `Txs`
@@ -296,16 +312,16 @@ const { stream$: reloadTxsSelectedAsset$, trigger: reloadTxssSelectedAsset } = t
  */
 const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest(
   client$,
-  reloadTxsSelectedAsset$.pipe(debounceTime(300)),
+  loadSelectedAssetTxs$.pipe(debounceTime(300)),
   selectedAsset$
 ).pipe(
-  mergeMap(([client, _, oAsset]) => {
+  mergeMap(([client, { limit, offset }, oAsset]) => {
     return FP.pipe(
       // client and asset has to be available
       sequenceTOption(client, oAsset),
       O.fold(
         () => Rx.of(RD.initial as TxsRD),
-        ([clientState, asset]) => loadTxsOfSelectedAsset$(clientState, O.some(asset))
+        ([clientState, asset]) => loadTxsOfSelectedAsset$({ client: clientState, oAsset: O.some(asset), limit, offset })
       )
     )
   }),
@@ -386,7 +402,7 @@ export {
   setSelectedAsset,
   reloadBalances,
   txsSelectedAsset$,
-  reloadTxssSelectedAsset,
+  loadTxsSelectedAsset,
   address$,
   selectedAsset$,
   explorerUrl$,

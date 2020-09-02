@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balances, BinanceClient, Txs, Transfer, Fees } from '@thorchain/asgardex-binance'
+import { Balances, BinanceClient, Transfer, Fees, TxPage } from '@thorchain/asgardex-binance'
 import { Asset, AssetAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/lib/Either'
@@ -23,7 +23,7 @@ export type AssetsWithBalance = AssetWithBalance[]
 
 export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>
 
-export type TxsRD = RD.RemoteData<Error, Txs>
+export type TxsRD = RD.RemoteData<Error, TxPage>
 
 /**
  * Three States:
@@ -85,3 +85,8 @@ export type TransferFees = {
 export type FeeRD = RD.RemoteData<Error, AssetAmount>
 export type FeesRD = RD.RemoteData<Error, Fees>
 export type TransferFeesRD = RD.RemoteData<Error, TransferFees>
+
+export type LoadTxsProps = {
+  limit: number
+  offset: number
+}

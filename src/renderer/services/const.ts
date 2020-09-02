@@ -6,3 +6,6 @@ export const PRICE_POOLS_WHITELIST: PricePoolAssets = [PoolAsset.BTC, PoolAsset.
 
 export const DEFAULT_NETWORK: Network = 'testnet'
 export const AVAILABLE_NETWORKS: Network[] = ['testnet', 'chaosnet', 'mainnet']
+
+// Pagination: max. number of pages
+export const MAX_PAGES = 10
