@@ -53,6 +53,7 @@ const byzantine$ = getNetworkState$.pipe(
   // to avoid to create another instance of byzantine by having same `Network`
   distinctUntilChanged(),
   switchMap(nextByzantine$),
+  // map(() => RD.success('http://18.159.145.64:8080') as RD.RemoteData<Error, string>),
   shareReplay(1),
   retry(BYZANTINE_MAX_RETRY)
 )

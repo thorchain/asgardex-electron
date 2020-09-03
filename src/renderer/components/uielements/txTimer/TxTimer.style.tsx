@@ -25,6 +25,10 @@ export const TxTimerWrapper = styled.div`
     .confirm-icon {
       line-height: 1em;
     }
+
+    &:empty {
+      display: none;
+    }
   }
 
   .timerchart-circular-progressbar {

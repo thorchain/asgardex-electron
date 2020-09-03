@@ -7,19 +7,7 @@ import AssetData from '../../uielements/assets/assetData'
 import StepBar from '../../uielements/stepBar'
 import Trend from '../../uielements/trend'
 import TxTimer from '../../uielements/txTimer'
-import {
-  SwapModalWrapper,
-  SwapModalContent,
-  SwapModalContentRow,
-  TimerContainer,
-  CoinDataWrapper,
-  CoinDataContainer,
-  SwapInfoWrapper,
-  HashWrapper,
-  BtnCopyWrapper,
-  ViewButton,
-  ViewTransaction
-} from './SwapModal.style'
+import * as Styled from './SwapModal.style'
 import { CalcResult } from './types'
 
 type Props = {
@@ -66,47 +54,48 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
   }, [openSwapModal, onClose])
 
   return (
-    <SwapModalWrapper title={swapTitle} visible={openSwapModal} footer={null} onCancel={onCloseModal}>
-      <SwapModalContent>
-        <SwapModalContentRow>
-          <TimerContainer>
+    <Styled.SwapModalWrapper title={swapTitle} visible={openSwapModal} footer={null} onCancel={onCloseModal}>
+      <Styled.SwapModalContent>
+        <Styled.SwapModalContentRow>
+          <Styled.TimerContainer>
             <TxTimer
               status={status}
               value={value}
               maxValue={100}
               maxSec={45}
+              maxDuration={999999999999}
               startTime={startTime}
               onChange={onChangeTxTimer}
               onEnd={onEndTxTimer}
             />
-          </TimerContainer>
-          <CoinDataWrapper>
+          </Styled.TimerContainer>
+          <Styled.CoinDataWrapper>
             <StepBar size={50} />
-            <CoinDataContainer>
+            <Styled.CoinDataContainer>
               <AssetData asset={swapSource} price={priceFrom} />
               <AssetData asset={swapTarget} price={priceTo} />
-            </CoinDataContainer>
-          </CoinDataWrapper>
-        </SwapModalContentRow>
-        <SwapInfoWrapper>
+            </Styled.CoinDataContainer>
+          </Styled.CoinDataWrapper>
+        </Styled.SwapModalContentRow>
+        <Styled.SwapInfoWrapper>
           <Trend amount={slipAmount} />
           {hash && (
-            <HashWrapper>
-              <BtnCopyWrapper>
+            <Styled.HashWrapper>
+              <Styled.BtnCopyWrapper>
                 {isCompleted && (
-                  <ViewButton color="success" onClick={onClickFinish}>
+                  <Styled.ViewButton color="success" onClick={onClickFinish}>
                     FINISH
-                  </ViewButton>
+                  </Styled.ViewButton>
                 )}
-                <ViewTransaction onClick={onViewTxClick} href="#" target="_blank" rel="noopener noreferrer">
+                <Styled.ViewTransaction onClick={onViewTxClick} href="#" target="_blank" rel="noopener noreferrer">
                   VIEW TRANSACTION
-                </ViewTransaction>
-              </BtnCopyWrapper>
-            </HashWrapper>
+                </Styled.ViewTransaction>
+              </Styled.BtnCopyWrapper>
+            </Styled.HashWrapper>
           )}
-        </SwapInfoWrapper>
-      </SwapModalContent>
-    </SwapModalWrapper>
+        </Styled.SwapInfoWrapper>
+      </Styled.SwapModalContent>
+    </Styled.SwapModalWrapper>
   )
 }
 
