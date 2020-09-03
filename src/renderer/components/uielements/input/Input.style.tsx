@@ -39,34 +39,34 @@ type CustomInputProps = {
   typevalue?: InputType
 }
 
-type InputProps = CustomInputProps & AI.InputProps
+export type InputProps = CustomInputProps & AI.InputProps
 
 const inputStyle = css<InputProps>`
-  &.ant-input-affix-wrapper,
-  &.ant-input,
-  &.ant-input-number {
-    height: ${({ size = 'middle' }) => sizes[size]};
-    font-size: ${({ size = 'middle' }) => fontSettings[size].size};
-    letter-spacing: ${({ size = 'middle' }) => fontSettings[size].spacing};
-    ${({ typevalue }) => typevalue === 'ghost' && 'border: none;'};
-    ${({ typevalue }) => typevalue === 'ghost' && 'background: #F0F3F7;'};
-    border-color: ${({ color = 'primary', typevalue = 'normal' }) =>
-      typevalue === 'ghost' ? 'transparent' : colors[color]};
+  height: ${({ size = 'middle' }) => sizes[size]};
+  font-size: ${({ size = 'middle' }) => fontSettings[size].size};
+  letter-spacing: ${({ size = 'middle' }) => fontSettings[size].spacing};
+  ${({ typevalue }) => typevalue === 'ghost' && 'border: none;'};
+  ${({ typevalue }) => typevalue === 'ghost' && 'background: #F0F3F7;'};
+  border-color: ${({ color = 'primary', typevalue = 'normal' }) =>
+    typevalue === 'ghost' ? 'transparent' : colors[color]};
 
-    background: ${palette('background', 1)};
+  background: ${palette('background', 1)};
+  color: ${palette('text', 0)};
+  input,
+  input:-internal-autofill-selected {
     color: ${palette('text', 0)};
-    input,
-    input:-internal-autofill-selected {
-      color: ${palette('text', 0)};
-      background: ${palette('background', 1)};
-    }
+    background: ${palette('background', 1)};
+  }
 
-    &:hover,
-    &:focus {
-      border-color: ${({ color = 'primary' }) => colors[color]};
-      box-shadow: ${({ typevalue = 'normal', color = 'primary' }) =>
-        typevalue === 'ghost' ? 'none' : '0 0 0 2px ' + colors[color]};
-    }
+  &:hover,
+  &:focus {
+    border-color: ${({ color = 'primary' }) => colors[color]};
+    box-shadow: ${({ typevalue = 'normal', color = 'primary' }) =>
+      typevalue === 'ghost' ? 'none' : '0 0 0 2px ' + colors[color]};
+  }
+
+  .ant-form-item-has-error {
+    border-color: ${({ typevalue = 'normal' }) => (typevalue === 'ghost' ? 'transparent' : colors['error'])} !important;
   }
 `
 
@@ -92,5 +92,9 @@ export const InputPassword = styled(A.Input.Password)<InputProps>`
 `
 
 export const InputTextArea = styled(A.Input.TextArea)<InputProps>`
+  ${inputStyle}
+`
+
+export const InputBigNumber = styled(A.Input)<InputProps>`
   ${inputStyle}
 `

@@ -67,7 +67,7 @@ const Send: React.FC<Props> = (props): JSX.Element => {
         assetsWB={assetsWB}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
-        fee={fee}
+        oFee={fee}
       />
     ),
     [selectedAsset, pushTx, assetsWB, txRD, addressValidation, fee]
