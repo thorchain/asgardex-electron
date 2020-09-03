@@ -8,7 +8,6 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { EMPTY } from 'rxjs'
 import {
   map,
   mergeMap,
@@ -373,7 +372,7 @@ const freezeFee$: Observable<FeeRD> = FP.pipe(
 
 const wsTransfer$ = pipe(
   address$,
-  switchMap(O.fold(() => EMPTY, subscribeTransfers)),
+  switchMap(O.fold(() => Rx.EMPTY, subscribeTransfers)),
   RxOperators.map(RD.success),
   RxOperators.tap((state) => RD.isSuccess(state) && reloadBalances()),
   RxOperators.startWith(RD.pending)

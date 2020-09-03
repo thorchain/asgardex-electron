@@ -92,7 +92,6 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     if (!pools) {
       return prevPricePoolAssets?.current ?? []
     }
-    console.log('pools --- ', pools)
     const pricePools = O.toNullable(pools.pricePools)
     const assets = (pricePools && pricePools.map((pool) => pool.asset)) || []
     prevPricePoolAssets.current = assets

@@ -13,7 +13,6 @@ storiesOf('Components/TxTimer', module)
         status={boolean('status', false)}
         value={number('value', 0)}
         maxValue={number('max value', 100)}
-        maxDuration={9092909920}
         startTime={Date.now()}
       />
     )
