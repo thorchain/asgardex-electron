@@ -4,7 +4,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, shareReplay, distinctUntilChanged, tap } from 'rxjs/operators'
+import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators'
 
 import * as fpHelpers from '../../helpers/fpHelpers'
 import { observableState } from '../../helpers/stateHelper'
@@ -25,7 +25,6 @@ const { get$: getNetworkState$, set: setNetworkState } = observableState<Network
  */
 const ethereumNetwork$: Observable<EthereumNetwork> = getNetworkState$.pipe(
   map((network) => {
-    console.log('network', network)
     if (network === 'testnet') return EthereumNetwork.TEST
     // In case of 'chaosnet' + 'mainnet` use EthereumNetwork.MAIN
     return EthereumNetwork.MAIN
@@ -59,8 +58,6 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, ethereumNetwork$).pipe(
             }
           })
         )
-        console.log('clientState client:', client)
-
         observer.next(client)
       }) as Observable<EthereumClientState>
   )
@@ -68,12 +65,7 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, ethereumNetwork$).pipe(
 
 export type ClientState = typeof clientState$
 
-const client$: Observable<O.Option<EthereumClient>> = clientState$.pipe(
-  map(getClient),
-  tap((value) => console.log('client:', value)),
-
-  shareReplay(1)
-)
+const client$: Observable<O.Option<EthereumClient>> = clientState$.pipe(map(getClient), shareReplay(1))
 
 /**
  * Current `Address` depending on selected network
@@ -83,7 +75,6 @@ const client$: Observable<O.Option<EthereumClient>> = clientState$.pipe(
  */
 const address$: Observable<O.Option<Address>> = client$.pipe(
   map(FP.pipe(O.chain((client) => O.some(client.getAddress())))),
-  tap((value) => console.log('address', value)),
   distinctUntilChanged(fpHelpers.eqOString.equals),
   shareReplay(1)
 )
