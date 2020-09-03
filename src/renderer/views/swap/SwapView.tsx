@@ -12,19 +12,18 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
-import { EMPTY } from 'rxjs'
 import * as RxOperators from 'rxjs/operators'
-import { switchMap } from 'rxjs/operators'
 
 import ErrorView from '../../components/shared/error/ErrorView'
 import { Swap } from '../../components/swap/Swap'
 import BackLink from '../../components/uielements/backLink'
 import Button from '../../components/uielements/button'
-import { RUNE_ASSET } from '../../const'
+import { RUNE_ASSET, RUNE_PRICE_POOL } from '../../const'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { rdFromOption } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
+import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PoolAsset } from '../pools/types'
 import * as Styled from './SwapView.styles'
 
@@ -35,35 +34,25 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
   const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
-  const { transaction, address$, subscribeTransfers } = useBinanceContext()
-  const { poolsState$, poolAddresses$, reloadPoolsState } = midgardService
+  const { transaction, balancesState$, explorerUrl$ } = useBinanceContext()
+  const { poolsState$, poolAddresses$, reloadPoolsState, selectedPricePoolAsset$ } = midgardService
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
-  const { balancesState$, explorerUrl$, reloadBalances } = useBinanceContext()
+
+  const [selectedPool] = useObservableState(
+    () =>
+      pipe(
+        Rx.combineLatest([poolsState$, selectedPricePoolAsset$]),
+        RxOperators.map(([poolsState, selectedPricePoolAsset]) =>
+          pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset)
+        )
+      ),
+    RUNE_PRICE_POOL
+  )
 
   const balances = useObservableState(balancesState$)
 
-  const [txWithState] = useObservableState(() =>
-    pipe(
-      Rx.combineLatest([
-        transaction.txRD$,
-        pipe(
-          address$,
-          switchMap(O.fold(() => EMPTY, subscribeTransfers)),
-          RxOperators.map(RD.success),
-          RxOperators.tap((state) => RD.isSuccess(state) && reloadBalances()),
-          RxOperators.startWith(RD.pending)
-        )
-      ]),
-      RxOperators.map(([tx, state]) =>
-        pipe(
-          tx,
-          RD.map((tx) => ({ tx, state }))
-        )
-      ),
-      RxOperators.catchError((e) => Rx.of(RD.failure(e)))
-    )
-  )
+  const [txWithState] = useObservableState(() => transaction.txWithState$, RD.initial)
 
   const onConfirmSwap = useCallback(
     (source: Asset, amount: AssetAmount, memo: string) => {
@@ -134,6 +123,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
 
               return (
                 <Swap
+                  activePricePool={selectedPool}
                   txWithState={txWithState}
                   resetTx={transaction.resetTx}
                   goToTransaction={goToTransaction}

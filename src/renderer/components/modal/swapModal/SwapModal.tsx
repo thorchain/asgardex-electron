@@ -1,8 +1,10 @@
 import React, { useCallback, useState } from 'react'
 
 import { Asset, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
+import { useIntl } from 'react-intl'
 
 import { TxStatus } from '../../../types/asgardex'
+import { PricePoolAsset } from '../../../views/pools/types'
 import AssetData from '../../uielements/assets/assetData'
 import StepBar from '../../uielements/stepBar'
 import Trend from '../../uielements/trend'
@@ -11,6 +13,7 @@ import * as Styled from './SwapModal.style'
 import { CalcResult } from './types'
 
 type Props = {
+  baseAsset?: PricePoolAsset
   calcResult: CalcResult
   swapSource: Asset
   swapTarget: Asset
@@ -28,6 +31,7 @@ type Props = {
 
 const SwapModal: React.FC<Props> = (props): JSX.Element => {
   const {
+    baseAsset,
     calcResult,
     isCompleted = false,
     priceFrom = baseAmount(0),
@@ -43,8 +47,9 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
     onViewTxClick = () => {}
   } = props
   const [openSwapModal, setOpenSwapModal] = useState<boolean>(visible)
+  const intl = useIntl()
 
-  const swapTitle = isCompleted ? 'YOU SWAPPED' : 'YOU ARE SWAPPING'
+  const swapTitleKey = isCompleted ? 'swap.state.success' : 'swap.state.pending'
   const { slip: slipAmount } = calcResult
   const { status, value, startTime, hash } = txStatus
 
@@ -54,7 +59,11 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
   }, [openSwapModal, onClose])
 
   return (
-    <Styled.SwapModalWrapper title={swapTitle} visible={openSwapModal} footer={null} onCancel={onCloseModal}>
+    <Styled.SwapModalWrapper
+      title={intl.formatMessage({ id: swapTitleKey })}
+      visible={openSwapModal}
+      footer={null}
+      onCancel={onCloseModal}>
       <Styled.SwapModalContent>
         <Styled.SwapModalContentRow>
           <Styled.TimerContainer>
@@ -63,7 +72,7 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
               value={value}
               maxValue={100}
               maxSec={45}
-              maxDuration={999999999999}
+              maxDuration={Number.MAX_SAFE_INTEGER}
               startTime={startTime}
               onChange={onChangeTxTimer}
               onEnd={onEndTxTimer}
@@ -72,8 +81,8 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
           <Styled.CoinDataWrapper>
             <StepBar size={50} />
             <Styled.CoinDataContainer>
-              <AssetData asset={swapSource} price={priceFrom} />
-              <AssetData asset={swapTarget} price={priceTo} />
+              <AssetData priceBaseAsset={baseAsset} asset={swapSource} price={priceFrom} />
+              <AssetData priceBaseAsset={baseAsset} asset={swapTarget} price={priceTo} />
             </Styled.CoinDataContainer>
           </Styled.CoinDataWrapper>
         </Styled.SwapModalContentRow>
@@ -84,11 +93,11 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
               <Styled.BtnCopyWrapper>
                 {isCompleted && (
                   <Styled.ViewButton color="success" onClick={onClickFinish}>
-                    FINISH
+                    {intl.formatMessage({ id: 'common.finish' })}
                   </Styled.ViewButton>
                 )}
                 <Styled.ViewTransaction onClick={onViewTxClick} href="#" target="_blank" rel="noopener noreferrer">
-                  VIEW TRANSACTION
+                  {intl.formatMessage({ id: 'swap.viewTransaction' })}
                 </Styled.ViewTransaction>
               </Styled.BtnCopyWrapper>
             </Styled.HashWrapper>

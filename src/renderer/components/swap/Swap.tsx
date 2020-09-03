@@ -14,6 +14,7 @@ import {
   bn,
   EMPTY_ASSET,
   formatBN,
+  getValueOfAsset1InAsset2,
   PoolData
 } from '@thorchain/asgardex-util'
 import { Spin } from 'antd'
@@ -31,6 +32,7 @@ import { getAssetBalance } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { TxStatus, TxTypes } from '../../types/asgardex'
+import { PricePool } from '../../views/pools/types'
 import SwapModal from '../modal/swapModal'
 import { CalcResult } from '../modal/swapModal/types'
 import AssetSelect from '../uielements/assets/assetSelect'
@@ -52,6 +54,7 @@ type SwapProps = {
   txWithState?: RD.RemoteData<Error, { tx: Transfer; state: RD.RemoteData<Error, TransferWs> }>
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
+  activePricePool: PricePool
 }
 
 export const Swap = ({
@@ -63,7 +66,8 @@ export const Swap = ({
   balances = RD.initial,
   txWithState = RD.initial,
   goToTransaction,
-  resetTx
+  resetTx,
+  activePricePool
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
@@ -278,7 +282,13 @@ export const Swap = ({
           () => null,
           () => <Spin />,
           (e) => (
-            <Modal closable visible title={'error'} onOk={onSwapConfirmed} okText={'Retry'} onCancel={resetTx}>
+            <Modal
+              closable
+              visible
+              title={intl.formatMessage({ id: 'common.error' })}
+              onOk={onSwapConfirmed}
+              okText={intl.formatMessage({ id: 'common.retry' })}
+              onCancel={resetTx}>
               {e.message}
             </Modal>
           ),
@@ -289,7 +299,7 @@ export const Swap = ({
                 (): TxStatus => ({
                   modal: true,
                   value: 100,
-                  status: true,
+                  status: false,
                   type: TxTypes.SWAP
                 })
               ),
@@ -297,8 +307,9 @@ export const Swap = ({
                 (): RD.RemoteData<Error, TxStatus> =>
                   RD.success({
                     modal: true,
-                    value: 75,
-                    status: false,
+                    value: 50,
+                    status: true,
+                    startTime: Date.now(),
                     type: TxTypes.SWAP
                   })
               ),
@@ -307,14 +318,29 @@ export const Swap = ({
               RD.map(([sourceAssetPair, targetAssetPair, txStatus]) => (
                 <SwapModal
                   key={'swap modal result'}
+                  baseAsset={activePricePool.asset}
                   calcResult={{ slip: swapData.slip } as CalcResult}
                   swapSource={sourceAssetPair.asset}
                   swapTarget={targetAssetPair.asset}
-                  priceFrom={assetToBase(assetAmount(sourceAssetPair.priceRune))}
-                  priceTo={assetToBase(assetAmount(targetAssetPair.priceRune))}
+                  priceFrom={
+                    poolData[assetToString(sourceAssetPair.asset)] &&
+                    getValueOfAsset1InAsset2(
+                      assetToBase(assetAmount(1)),
+                      poolData[assetToString(sourceAssetPair.asset)],
+                      activePricePool.poolData
+                    )
+                  }
+                  priceTo={
+                    poolData[assetToString(targetAssetPair.asset)] &&
+                    getValueOfAsset1InAsset2(
+                      assetToBase(assetAmount(1)),
+                      poolData[assetToString(targetAssetPair.asset)],
+                      activePricePool.poolData
+                    )
+                  }
                   onClose={resetTx}
                   onClickFinish={resetTx}
-                  isCompleted={txStatus.status}
+                  isCompleted={!txStatus.status}
                   visible
                   onViewTxClick={(e) => {
                     e.preventDefault()
@@ -330,7 +356,18 @@ export const Swap = ({
             )
         )
       ),
-    [txWithState, goToTransaction, onSwapConfirmed, resetTx, sourceAssetPair, targetAssetPair, swapData]
+    [
+      intl,
+      txWithState,
+      goToTransaction,
+      onSwapConfirmed,
+      resetTx,
+      sourceAssetPair,
+      targetAssetPair,
+      swapData,
+      activePricePool,
+      poolData
+    ]
   )
 
   return (

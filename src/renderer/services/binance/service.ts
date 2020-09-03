@@ -5,8 +5,10 @@ import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import { none, some } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
+import { EMPTY } from 'rxjs'
 import {
   map,
   mergeMap,
@@ -18,6 +20,7 @@ import {
   debounceTime,
   distinctUntilChanged
 } from 'rxjs/operators'
+import * as RxOperators from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
 import { getTransferFees, getFreezeFee } from '../../helpers/binanceHelper'
@@ -368,7 +371,15 @@ const freezeFee$: Observable<FeeRD> = FP.pipe(
   shareReplay(1)
 )
 
-const transaction = createTransactionService(clientState$)
+const wsTransfer$ = pipe(
+  address$,
+  switchMap(O.fold(() => EMPTY, subscribeTransfers)),
+  RxOperators.map(RD.success),
+  RxOperators.tap((state) => RD.isSuccess(state) && reloadBalances()),
+  RxOperators.startWith(RD.pending)
+)
+
+const transaction = createTransactionService(clientState$, wsTransfer$)
 
 const freeze = createFreezeService(clientState$)
 
