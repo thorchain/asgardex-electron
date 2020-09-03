@@ -56,6 +56,7 @@
     "@devexperts/utils": "^1.0.0-alpha.14",
     "@openapitools/openapi-generator-cli": "^1.0.15-4.3.1",
     "@thorchain/asgardex-binance": "^3.0.1",
+    "@thorchain/asgardex-bitcoin": "^0.3.0",
     "@thorchain/asgardex-crypto": "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git",
     "@thorchain/asgardex-midgard": "^1.0.0",
     "@thorchain/asgardex-theme": "^0.1.1",

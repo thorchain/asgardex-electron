@@ -8,9 +8,9 @@ import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
+import { getClient } from '../utils'
 import { ClientState } from './service'
 import { TransferRD } from './types'
-import { getBinanceClient } from './utils'
 
 const { get$: txRD$, set: setTxRD } = observableState<TransferRD>(RD.initial)
 
@@ -29,7 +29,7 @@ const tx$ = ({
   memo
 }: { clientState$: ClientState } & SendTxParams): Rx.Observable<TransferRD> =>
   clientState$.pipe(
-    map(getBinanceClient),
+    map(getClient),
     switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY)),
     switchMap((client) =>
       memo

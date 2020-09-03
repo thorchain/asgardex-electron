@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { BinanceClient } from '@thorchain/asgardex-binance'
 import { Balance } from '@thorchain/asgardex-binance'
 import {
   getValueOfAsset1InAsset2,
@@ -14,7 +13,6 @@ import {
   Asset
 } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/Array'
-import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -24,31 +22,6 @@ import { sequenceTOptionFromArray, sequenceTOption } from '../../helpers/fpHelpe
 import { BalancesRD, AssetWithBalance, AssetsWithBalanceRD, AssetsWithBalance } from '../../services/binance/types'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
-import { BinanceClientState, BinanceClientStateM, BinanceClientStateForViews } from './types'
-
-export const getBinanceClient = (clientState: BinanceClientState): O.Option<BinanceClient> =>
-  BinanceClientStateM.getOrElse(clientState, () => O.none)
-
-export const hasBinanceClient = (clientState: BinanceClientState): boolean =>
-  FP.pipe(clientState, getBinanceClient, O.isSome)
-
-export const getBinanceClientStateForViews = (clientState: BinanceClientState): BinanceClientStateForViews =>
-  FP.pipe(
-    clientState,
-    O.fold(
-      // None -> 'notready'
-      () => 'notready',
-      // Check inner values of Some<Either>
-      // Some<Left<Error>> -> 'error
-      // Some<Right<BinanceClient>> -> 'ready
-      FP.flow(
-        E.fold(
-          (_) => 'error',
-          (_) => 'ready'
-        )
-      )
-    )
-  )
 
 /**
  * Helper to get a pool price value for a given `Balance`

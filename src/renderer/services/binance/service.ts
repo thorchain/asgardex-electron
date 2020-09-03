@@ -3,7 +3,6 @@ import { WS, Client, Network as BinanceNetwork, BinanceClient, Address, TxPage }
 import { Asset } from '@thorchain/asgardex-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
-import { none, some } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
@@ -28,20 +27,13 @@ import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
 import { DEFAULT_NETWORK } from '../const'
+import { ClientStateForViews } from '../types'
+import { getClient, getClientStateForViews } from '../utils'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import {
-  BalancesRD,
-  BinanceClientStateForViews,
-  BinanceClientState,
-  TxsRD,
-  FeesRD,
-  TransferFeesRD,
-  FeeRD
-} from './types'
-import { getBinanceClientStateForViews, getBinanceClient } from './utils'
+import { BalancesRD, TxsRD, FeesRD, TransferFeesRD, FeeRD, BinanceClientState } from './types'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -167,7 +159,7 @@ const binanceNetwork$: Observable<BinanceNetwork> = getNetworkState$.pipe(
 /**
  * Observable state of `KeystoreState`
  */
-const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(none)
+const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(O.none)
 
 /**
  * Stream to create an observable BinanceClient depending on existing phrase in keystore
@@ -180,14 +172,14 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
   mergeMap(
     ([keystore, binanceNetwork]) =>
       Observable.create((observer: Observer<BinanceClientState>) => {
-        const client = FP.pipe(
+        const client: BinanceClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
               const client = new Client({ phrase, network: binanceNetwork })
-              return some(right(client)) as BinanceClientState
+              return O.some(right(client)) as BinanceClientState
             } catch (error) {
-              return some(left(error))
+              return O.some(left(error))
             }
           })
         )
@@ -198,14 +190,14 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
 
 export type ClientState = typeof clientState$
 
-const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(map(getBinanceClient), shareReplay(1))
+const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(map(getClient), shareReplay(1))
 
 /**
  * Helper stream to provide "ready-to-go" state of latest `BinanceClient`, but w/o exposing the client
  * It's needed by views only.
  */
-const clientViewState$: Observable<BinanceClientStateForViews> = clientState$.pipe(
-  map((clientState) => getBinanceClientStateForViews(clientState))
+const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(
+  map((clientState) => getClientStateForViews(clientState))
 )
 
 /**
