@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Txs, Tx, Address } from '@thorchain/asgardex-binance'
+import { Txs, Tx, Address, TxPage } from '@thorchain/asgardex-binance'
 import { assetAmount, bnOrZero, formatAssetAmount } from '@thorchain/asgardex-util'
 import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
@@ -10,21 +10,24 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 
 import { TxsRD } from '../../services/binance/types'
+import { MAX_PAGINATION_ITEMS } from '../../services/const'
 import ErrorView from '../shared/error/ErrorView'
+import Pagination from '../uielements/Pagination'
 import * as Styled from './TransactionTable.style'
 
 type Props = {
   txsRD: TxsRD
   address: O.Option<Address>
   clickTxLinkHandler: (txHash: string) => void
+  changePaginationHandler: (page: number) => void
 }
 const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
-  const { txsRD, clickTxLinkHandler } = props
+  const { txsRD, clickTxLinkHandler, changePaginationHandler } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   // store previous data of Txs to render these while reloading
-  const previousTxs = useRef<O.Option<Txs>>(O.none)
+  const previousTxs = useRef<O.Option<TxPage>>(O.none)
 
   const renderTypeColumn = useCallback(({ txType }: Tx) => {
     if (txType === 'FREEZE_TOKEN') return <Styled.FreezeIcon />
@@ -132,37 +135,52 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const mobileColumns: ColumnsType<Tx> = [typeColumn, amountColumn, dateColumn, linkColumn]
 
   const renderTable = useCallback(
-    (txs: Txs, loading = false) => {
+    ({ total, tx }: TxPage, loading = false) => {
       const columns = isDesktopView ? desktopColumns : mobileColumns
-      return <Styled.Table columns={columns} dataSource={txs} loading={loading} rowKey="txHash" />
+      return (
+        <>
+          <Styled.Table columns={columns} dataSource={tx} loading={loading} rowKey="txHash" />
+          {total > 0 && (
+            <Pagination
+              defaultCurrent={1}
+              total={total}
+              defaultPageSize={MAX_PAGINATION_ITEMS}
+              showSizeChanger={false}
+              onChange={changePaginationHandler}
+            />
+          )}
+        </>
+      )
     },
-    [desktopColumns, isDesktopView, mobileColumns]
+    [desktopColumns, isDesktopView, mobileColumns, changePaginationHandler]
   )
+
+  const emptyTableData = useMemo((): TxPage => ({ total: 0, tx: [] as Txs }), [])
 
   const renderContent = useMemo(
     () => (
       <>
         {RD.fold(
-          () => renderTable([], true),
+          () => renderTable(emptyTableData, true),
           () => {
-            const txs = FP.pipe(
+            const data = FP.pipe(
               previousTxs.current,
-              O.getOrElse(() => [] as Txs)
+              O.getOrElse(() => emptyTableData)
             )
-            return renderTable(txs, true)
+            return renderTable(data, true)
           },
           (error: Error) => {
             const msg = error?.toString() ?? ''
             return <ErrorView title={msg} />
           },
-          (txs: Txs): JSX.Element => {
-            previousTxs.current = O.some(txs)
-            return renderTable(txs)
+          (data: TxPage): JSX.Element => {
+            previousTxs.current = O.some(data)
+            return renderTable(data)
           }
         )(txsRD)}
       </>
     ),
-    [txsRD, renderTable]
+    [txsRD, renderTable, emptyTableData]
   )
 
   return renderContent

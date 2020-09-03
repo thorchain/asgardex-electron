@@ -2916,12 +2916,6 @@
     hdkey "^2.0.1"
     uuid "^8.1.0"
 
-"@thorchain/asgardex-ethereum@https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#42bada004a43bf6c4b8be60ec33e330e47e84158":
-  version "0.1.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#42bada004a43bf6c4b8be60ec33e330e47e84158"
-  dependencies:
-    bip39 "^3.0.2"
-
 "@thorchain/asgardex-ethereum@https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#672ee67d71eaebd95d9580ca753e2cc8c45a5e12":
   version "0.1.0"
   resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#672ee67d71eaebd95d9580ca753e2cc8c45a5e12"
