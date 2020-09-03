@@ -2,24 +2,20 @@ import React, { createContext, useContext } from 'react'
 
 import { useSubscription } from 'observable-hooks'
 
-import {
-  setKeystoreState,
-  client$,
-  clientViewState$,
-  setNetworkState
-  // address$,
-} from '../services/bitcoin/service'
+import { setKeystoreState, client$, clientViewState$, setNetworkState, address$ } from '../services/bitcoin/service'
 import { useAppContext } from './AppContext'
 import { useWalletContext } from './WalletContext'
 
 export type BitcoinContextValue = {
   clientViewState$: typeof clientViewState$
   client$: typeof client$
+  address$: typeof address$
 }
 
 const initialContext: BitcoinContextValue = {
   client$,
-  clientViewState$
+  clientViewState$,
+  address$
 }
 
 const BitcoinContext = createContext<BitcoinContextValue | null>(null)
