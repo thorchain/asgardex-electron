@@ -10,7 +10,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 
 import { TxsRD } from '../../services/binance/types'
-import { MAX_PAGES } from '../../services/const'
+import { MAX_PAGINATION_ITEMS } from '../../services/const'
 import ErrorView from '../shared/error/ErrorView'
 import Pagination from '../uielements/Pagination'
 import * as Styled from './TransactionTable.style'
@@ -144,7 +144,7 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
             <Pagination
               defaultCurrent={1}
               total={total}
-              defaultPageSize={MAX_PAGES}
+              defaultPageSize={MAX_PAGINATION_ITEMS}
               showSizeChanger={false}
               onChange={changePaginationHandler}
             />

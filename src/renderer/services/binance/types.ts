@@ -2,9 +2,9 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Balances, BinanceClient, Transfer, Fees, TxPage } from '@thorchain/asgardex-binance'
 import { Asset, AssetAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
-import * as E from 'fp-ts/lib/Either'
-import { getEitherM } from 'fp-ts/lib/EitherT'
-import { Option, option } from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
+
+import { ClientState } from '../types'
 
 export type BalancesRD = RD.RemoteData<Error, Balances>
 
@@ -25,18 +25,8 @@ export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>
 
 export type TxsRD = RD.RemoteData<Error, TxPage>
 
-/**
- * Three States:
- * (1) None -> no client has been instantiated
- * (2) Some(Right) -> A client has been instantiated
- * (3) Some(Left) -> An error while trying to instantiate a client
- */
-export type BinanceClientState = Option<E.Either<Error, BinanceClient>>
-
-// Something like `EitherT<Option>` Monad
-export const BinanceClientStateM = getEitherM(option)
-
-export type BinanceClientStateForViews = 'notready' | 'ready' | 'error'
+export type BinanceClientState = ClientState<BinanceClient>
+export type BinanceClientState$ = Rx.Observable<ClientState<BinanceClient>>
 
 export type TransferRD = RD.RemoteData<Error, Transfer>
 

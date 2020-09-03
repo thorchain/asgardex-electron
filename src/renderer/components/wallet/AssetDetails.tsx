@@ -11,7 +11,7 @@ import { useHistory } from 'react-router-dom'
 import * as AH from '../../helpers/assetHelper'
 import * as walletRoutes from '../../routes/wallet'
 import { TxsRD, LoadTxsProps, BalancesRD, SendAction, isSendAction } from '../../services/binance/types'
-import { MAX_PAGES } from '../../services/const'
+import { MAX_PAGINATION_ITEMS } from '../../services/const'
 import AssetInfo from '../uielements/assets/AssetInfo'
 import BackLink from '../uielements/backLink'
 import Button, { RefreshButton } from '../uielements/button'
@@ -84,7 +84,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   const refreshHandler = useCallback(() => {
-    loadSelectedAssetTxsHandler({ limit: MAX_PAGES, offset: (currentPage - 1) * MAX_PAGES })
+    loadSelectedAssetTxsHandler({ limit: MAX_PAGINATION_ITEMS, offset: (currentPage - 1) * MAX_PAGINATION_ITEMS })
     reloadBalancesHandler()
   }, [loadSelectedAssetTxsHandler, currentPage, reloadBalancesHandler])
 
@@ -143,7 +143,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
 
   const onChangePagination = useCallback(
     (pageNo) => {
-      loadSelectedAssetTxsHandler({ limit: MAX_PAGES, offset: (pageNo - 1) * MAX_PAGES })
+      loadSelectedAssetTxsHandler({ limit: MAX_PAGINATION_ITEMS, offset: (pageNo - 1) * MAX_PAGINATION_ITEMS })
       setCurrentPage(pageNo)
     },
     [loadSelectedAssetTxsHandler]

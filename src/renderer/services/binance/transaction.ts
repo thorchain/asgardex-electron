@@ -8,9 +8,8 @@ import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
-import { ClientState } from './service'
-import { TransferRD } from './types'
-import { getBinanceClient } from './utils'
+import { getClient } from '../utils'
+import { TransferRD, BinanceClientState$ } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TransferRD>(RD.initial)
 
@@ -27,9 +26,9 @@ const tx$ = ({
   amount,
   asset: { symbol },
   memo
-}: { clientState$: ClientState } & SendTxParams): Rx.Observable<TransferRD> =>
+}: { clientState$: BinanceClientState$ } & SendTxParams): Rx.Observable<TransferRD> =>
   clientState$.pipe(
-    map(getBinanceClient),
+    map(getClient),
     switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY)),
     switchMap((client) =>
       memo
@@ -44,10 +43,10 @@ const tx$ = ({
     startWith(RD.pending)
   )
 
-const pushTx = (clientState$: ClientState) => ({ to, amount, asset, memo }: SendTxParams) =>
+const pushTx = (clientState$: BinanceClientState$) => ({ to, amount, asset, memo }: SendTxParams) =>
   tx$({ clientState$, to, amount, asset, memo }).subscribe(setTxRD)
 
-export const createTransactionService = (client$: ClientState) => ({
+export const createTransactionService = (client$: BinanceClientState$) => ({
   txRD$,
   pushTx: pushTx(client$),
   resetTx: () => setTxRD(RD.initial)

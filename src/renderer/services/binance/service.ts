@@ -1,9 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { WS, Client, Network as BinanceNetwork, BinanceClient, Address, TxPage } from '@thorchain/asgardex-binance'
+import { WS, Client, Network as BinanceNetwork, BinanceClient, Address } from '@thorchain/asgardex-binance'
 import { Asset } from '@thorchain/asgardex-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
-import { none, some } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
@@ -27,22 +26,23 @@ import * as fpHelpers from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
-import { DEFAULT_NETWORK, MAX_PAGES } from '../const'
+import { DEFAULT_NETWORK, MAX_PAGINATION_ITEMS } from '../const'
+import { ClientStateForViews } from '../types'
+import { getClient, getClientStateForViews } from '../utils'
 import { KeystoreState } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
 import {
-  BalancesRD,
-  BinanceClientStateForViews,
   BinanceClientState,
-  TxsRD,
+  BalancesRD,
+  FeeRD,
   FeesRD,
   TransferFeesRD,
-  FeeRD,
-  LoadTxsProps
+  TxsRD,
+  LoadTxsProps,
+  BinanceClientState$
 } from './types'
-import { getBinanceClientStateForViews, getBinanceClient } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -168,7 +168,7 @@ const binanceNetwork$: Observable<BinanceNetwork> = getNetworkState$.pipe(
 /**
  * Observable state of `KeystoreState`
  */
-const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(none)
+const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(O.none)
 
 /**
  * Stream to create an observable BinanceClient depending on existing phrase in keystore
@@ -177,18 +177,18 @@ const { get$: getKeystoreState$, set: setKeystoreState } = observableState<Keyst
  * By the other hand: Whenever a phrase has been removed, the client is set to `None`
  * A BinanceClient will never be created as long as no phrase is available
  */
-const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
+const clientState$: BinanceClientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
   mergeMap(
     ([keystore, binanceNetwork]) =>
       Observable.create((observer: Observer<BinanceClientState>) => {
-        const client = FP.pipe(
+        const client: BinanceClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
               const client = new Client({ phrase, network: binanceNetwork })
-              return some(right(client)) as BinanceClientState
+              return O.some(right(client)) as BinanceClientState
             } catch (error) {
-              return some(left(error))
+              return O.some(left(error))
             }
           })
         )
@@ -197,16 +197,14 @@ const clientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
   )
 )
 
-export type ClientState = typeof clientState$
-
-const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(map(getBinanceClient), shareReplay(1))
+const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(map(getClient), shareReplay(1))
 
 /**
  * Helper stream to provide "ready-to-go" state of latest `BinanceClient`, but w/o exposing the client
  * It's needed by views only.
  */
-const clientViewState$: Observable<BinanceClientStateForViews> = clientState$.pipe(
-  map((clientState) => getBinanceClientStateForViews(clientState))
+const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(
+  map((clientState) => getClientStateForViews(clientState))
 )
 
 /**
@@ -289,7 +287,7 @@ const loadTxsOfSelectedAsset$ = ({
   const diffTime = 90 * 24 * 60 * 60 * 1000
   const startTime = endTime - diffTime
   return Rx.from(client.getTransactions({ txAsset, endTime, startTime, limit, offset })).pipe(
-    mergeMap((page: TxPage) => Rx.of(RD.success(page))),
+    map(RD.success),
     catchError((error) => Rx.of(RD.failure(error))),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
@@ -297,7 +295,7 @@ const loadTxsOfSelectedAsset$ = ({
 }
 
 const initialLoadTxsProps: LoadTxsProps = {
-  limit: MAX_PAGES,
+  limit: MAX_PAGINATION_ITEMS,
   offset: 0
 }
 
@@ -315,7 +313,7 @@ const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest(
   loadSelectedAssetTxs$.pipe(debounceTime(300)),
   selectedAsset$
 ).pipe(
-  mergeMap(([client, { limit, offset }, oAsset]) => {
+  switchMap(([client, { limit, offset }, oAsset]) => {
     return FP.pipe(
       // client and asset has to be available
       sequenceTOption(client, oAsset),
