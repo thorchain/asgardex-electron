@@ -12,10 +12,10 @@ import { CalcResult } from './types'
 storiesOf('Components/Swap Modal', module).add('default', () => {
   const txStatus: TxStatus = {
     modal: true,
-    value: 100,
+    value: 75,
     status: true,
     type: TxTypes.SWAP,
-    startTime: 1592795475703,
+    startTime: Date.now(),
     hash: 'FCA7F45C74278F819757DC00AB5289E1192F9EA31A6C31B0B300CFCDC7C70B64'
   }
   const calcResult: CalcResult = {
@@ -35,7 +35,7 @@ storiesOf('Components/Swap Modal', module).add('default', () => {
       }}>
       <SwapModal
         calcResult={calcResult}
-        isCompleted
+        isCompleted={false}
         swapSource={ASSETS_MAINNET.RUNE}
         priceFrom={assetToBase(assetAmount(5))}
         priceTo={assetToBase(assetAmount(5))}

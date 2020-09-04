@@ -4,6 +4,7 @@ import { Asset } from '@thorchain/asgardex-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import {
@@ -17,6 +18,7 @@ import {
   debounceTime,
   distinctUntilChanged
 } from 'rxjs/operators'
+import * as RxOperators from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
 import { getTransferFees, getFreezeFee } from '../../helpers/binanceHelper'
@@ -382,7 +384,15 @@ const freezeFee$: Observable<FeeRD> = FP.pipe(
   shareReplay(1)
 )
 
-const transaction = createTransactionService(clientState$)
+const wsTransfer$ = pipe(
+  address$,
+  switchMap(O.fold(() => Rx.EMPTY, subscribeTransfers)),
+  RxOperators.map(O.some),
+  RxOperators.tap(O.map(reloadBalances)),
+  RxOperators.startWith(O.none)
+)
+
+const transaction = createTransactionService(clientState$, wsTransfer$)
 
 const freeze = createFreezeService(clientState$)
 

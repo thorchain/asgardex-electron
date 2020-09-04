@@ -9,6 +9,7 @@ import {
   Asset
 } from '@thorchain/asgardex-util'
 
+import { PricePoolAsset } from '../../../../views/pools/types'
 import Label from '../../label'
 import AssetIcon from '../assetIcon'
 import { CoinDataWrapper, CoinDataWrapperType, CoinDataWrapperSize } from './AssetData.style'
@@ -19,6 +20,9 @@ type Props = {
   target?: Asset
   targetValue?: BaseAmount
   price?: BaseAmount
+  // Asset which was used for calculating price
+  // Usually it's an asset from PriceSelector
+  priceBaseAsset?: PricePoolAsset
   priceValid?: boolean
   size?: CoinDataWrapperSize
   type?: CoinDataWrapperType
@@ -31,12 +35,13 @@ const AssetData: React.FC<Props> = (props: Props): JSX.Element => {
     target,
     targetValue,
     price = baseAmount(0),
+    priceBaseAsset,
     priceValid = true,
     size = 'small',
     type = 'normal'
   } = props
 
-  const formattedPrice = formatAssetAmountCurrency(baseToAsset(price))
+  const formattedPrice = formatAssetAmountCurrency(baseToAsset(price), priceBaseAsset)
   // @TODO add valid formatters
   const priceLabel = priceValid && formattedPrice !== '$ 0.00' ? formattedPrice : ''
 

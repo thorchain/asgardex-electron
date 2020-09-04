@@ -2,15 +2,19 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Balances } from '@thorchain/asgardex-binance'
+import { Transfer } from '@thorchain/asgardex-binance'
+import { Transfer as TransferWs } from '@thorchain/asgardex-binance/lib/types/binance-ws'
 import {
   Asset,
   assetAmount,
   AssetAmount,
+  assetToBase,
   assetToString,
   baseAmount,
   bn,
   EMPTY_ASSET,
   formatBN,
+  getValueOfAsset1InAsset2,
   PoolData
 } from '@thorchain/asgardex-util'
 import { Spin } from 'antd'
@@ -23,10 +27,14 @@ import { useHistory } from 'react-router'
 
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { swap } from '../../routes/swap'
-import { AssetWithPrice, TransferRD } from '../../services/binance/types'
+import { AssetWithPrice } from '../../services/binance/types'
 import { getAssetBalance } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
+import { TxStatus, TxTypes } from '../../types/asgardex'
+import { PricePool } from '../../views/pools/types'
+import SwapModal from '../modal/swapModal'
+import { CalcResult } from '../modal/swapModal/types'
 import AssetSelect from '../uielements/assets/assetSelect'
 import Drag from '../uielements/drag'
 import Modal from '../uielements/modal'
@@ -43,9 +51,10 @@ type SwapProps = {
   onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
   poolDetails?: PoolDetails
   balances?: RD.RemoteData<Error, Balances>
-  tx?: TransferRD
+  txWithState?: RD.RemoteData<Error, { tx: Transfer; state: O.Option<TransferWs> }>
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
+  activePricePool: PricePool
 }
 
 export const Swap = ({
@@ -55,9 +64,10 @@ export const Swap = ({
   targetAsset: targetAssetProp,
   poolDetails = [],
   balances = RD.initial,
-  tx = RD.initial,
+  txWithState = RD.initial,
   goToTransaction,
-  resetTx
+  resetTx,
+  activePricePool
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
@@ -264,37 +274,104 @@ export const Swap = ({
     [balance, changeAmount, setChangeAmountFromPercentValue]
   )
 
-  const pending = useMemo(
+  const pendingState = useMemo(
     () =>
       pipe(
-        tx,
+        txWithState,
         RD.fold(
           () => null,
           () => <Spin />,
           (e) => (
-            <Modal closable visible title={'error'} onOk={onSwapConfirmed} okText={'Retry'} onCancel={resetTx}>
-              {e.message}
-            </Modal>
-          ),
-          (r) => (
             <Modal
               closable
               visible
-              title={'success'}
-              okText={'Open transaction page'}
-              onOk={() => goToTransaction && goToTransaction(r.hash)}
+              title={intl.formatMessage({ id: 'common.error' })}
+              onOk={onSwapConfirmed}
+              okText={intl.formatMessage({ id: 'common.retry' })}
               onCancel={resetTx}>
-              {r.hash}
+              {e.message}
             </Modal>
-          )
+          ),
+          (r) =>
+            pipe(
+              r.state,
+              O.map(
+                (): TxStatus => ({
+                  modal: true,
+                  value: 100,
+                  status: false,
+                  type: TxTypes.SWAP
+                })
+              ),
+              O.alt(
+                (): O.Option<TxStatus> =>
+                  O.some({
+                    modal: true,
+                    value: 50,
+                    status: true,
+                    startTime: Date.now(),
+                    type: TxTypes.SWAP
+                  })
+              ),
+              O.chain((txStatus) => sequenceTOption(sourceAssetPair, targetAssetPair, O.some(txStatus))),
+              O.map(([sourceAssetPair, targetAssetPair, txStatus]) => (
+                <SwapModal
+                  key={'swap modal result'}
+                  baseAsset={activePricePool.asset}
+                  calcResult={{ slip: swapData.slip } as CalcResult}
+                  swapSource={sourceAssetPair.asset}
+                  swapTarget={targetAssetPair.asset}
+                  priceFrom={
+                    poolData[assetToString(sourceAssetPair.asset)] &&
+                    getValueOfAsset1InAsset2(
+                      assetToBase(assetAmount(1)),
+                      poolData[assetToString(sourceAssetPair.asset)],
+                      activePricePool.poolData
+                    )
+                  }
+                  priceTo={
+                    poolData[assetToString(targetAssetPair.asset)] &&
+                    getValueOfAsset1InAsset2(
+                      assetToBase(assetAmount(1)),
+                      poolData[assetToString(targetAssetPair.asset)],
+                      activePricePool.poolData
+                    )
+                  }
+                  onClose={resetTx}
+                  onClickFinish={resetTx}
+                  isCompleted={!txStatus.status}
+                  visible
+                  onViewTxClick={(e) => {
+                    e.preventDefault()
+                    goToTransaction && goToTransaction(r.tx.hash)
+                  }}
+                  txStatus={{
+                    ...txStatus,
+                    hash: r.tx.hash
+                  }}
+                />
+              )),
+              O.toNullable
+            )
         )
       ),
-    [tx, goToTransaction, onSwapConfirmed, resetTx]
+    [
+      intl,
+      txWithState,
+      goToTransaction,
+      onSwapConfirmed,
+      resetTx,
+      sourceAssetPair,
+      targetAssetPair,
+      swapData,
+      activePricePool,
+      poolData
+    ]
   )
 
   return (
     <Styled.Container>
-      <Styled.PendingContainer>{pending}</Styled.PendingContainer>
+      <Styled.PendingContainer>{pendingState}</Styled.PendingContainer>
       <Styled.ContentContainer>
         <Styled.Header>
           {pipe(

@@ -4,8 +4,8 @@ import theme from '@thorchain/asgardex-theme'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 
 import useInterval, { INACTIVE_INTERVAL } from '../../../hooks/useInterval'
-import { ConfirmIcon, RefundIcon } from '../../icons/timerIcons'
-import { TxTimerWrapper } from './TxTimer.style'
+import { RefundIcon } from '../../icons/timerIcons'
+import * as Styled from './TxTimer.style'
 
 import 'react-circular-progressbar/dist/styles.css'
 
@@ -14,6 +14,7 @@ type Props = {
   interval?: number
   maxSec?: number
   maxValue: number
+  maxDuration?: number
   refunded?: boolean
   startTime?: number
   status: boolean
@@ -31,6 +32,7 @@ const TxTimer: React.FC<Props> = (props): JSX.Element => {
     startTime = Date.now(),
     onChange = () => {},
     interval = 1000,
+    maxDuration,
     refunded = false,
     onEnd = () => {},
     className = ''
@@ -78,10 +80,10 @@ const TxTimer: React.FC<Props> = (props): JSX.Element => {
   // Delay the end of counting - for UX purposes only
   useEffect(() => {
     if (isEnd() && status) {
-      const id = setTimeout(handleEndTimer, 1000)
+      const id = setTimeout(handleEndTimer, maxDuration)
       return () => clearTimeout(id)
     }
-  }, [handleEndTimer, isEnd, status])
+  }, [handleEndTimer, isEnd, status, maxDuration])
 
   // Internal `active` state depends on `status`
   useEffect(() => {
@@ -95,9 +97,9 @@ const TxTimer: React.FC<Props> = (props): JSX.Element => {
     totalDuration < 10 ? Number(totalDuration).toFixed(1) : Math.round(totalDuration).toString()
 
   return (
-    <TxTimerWrapper className={`txTimer-wrapper ${className}`}>
+    <Styled.TxTimerWrapper className={`txTimer-wrapper ${className}`}>
       <div className="timerchart-icon">
-        {!active && <div className="confirm-icon">{!refunded ? <ConfirmIcon /> : <RefundIcon />}</div>}
+        {!active && <div className="confirm-icon">{!refunded ? <Styled.SuccessIcon /> : <RefundIcon />}</div>}
       </div>
       {active && (
         <CircularProgressbar
@@ -115,7 +117,7 @@ const TxTimer: React.FC<Props> = (props): JSX.Element => {
           })}
         />
       )}
-    </TxTimerWrapper>
+    </Styled.TxTimerWrapper>
   )
 }
 
