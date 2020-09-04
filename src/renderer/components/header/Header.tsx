@@ -16,7 +16,10 @@ const Header: React.FC = (): JSX.Element => {
   const { lock } = keystoreService
   const keystore = useObservableState(keystoreService.keystore$, O.none)
   const { service: midgardService } = useMidgardContext()
-  const { poolsState$, setSelectedPricePool, selectedPricePoolAsset$, apiEndpoint$ } = midgardService
+  const {
+    pools: { poolsState$, setSelectedPricePool, selectedPricePoolAsset$ },
+    apiEndpoint$
+  } = midgardService
   const midgardUrl = useObservableState(apiEndpoint$, RD.initial)
 
   const { explorerUrl$ } = useBinanceContext()

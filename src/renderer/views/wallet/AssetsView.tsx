@@ -20,7 +20,9 @@ const AssetsView: React.FC = (): JSX.Element => {
   const balancesRD = useObservableState(balancesState$, RD.initial)
 
   const {
-    service: { poolsState$, selectedPricePoolAsset$ }
+    service: {
+      pools: { poolsState$, selectedPricePoolAsset$ }
+    }
   } = useMidgardContext()
 
   const poolsRD = useObservableState(poolsState$, RD.pending)

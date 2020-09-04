@@ -14,13 +14,13 @@ export const CURRENCY_SYMBOLS: PricePoolCurrencySymbols = {
   [PoolAsset.RUNE67C]: AssetSymbol.RUNE,
   [PoolAsset.BTC]: AssetSymbol.BTC,
   [PoolAsset.ETH]: AssetSymbol.ETH,
-  [PoolAsset.TUSDB]: AssetSymbol.USD
+  [PoolAsset.BUSDB]: AssetSymbol.USD
 }
 
 // Weight of currencies needed for pricing
 // The higher the value the higher the weight
 export const CURRENCY_WHEIGHTS: PricePoolCurrencyWeights = {
-  [PoolAsset.TUSDB]: 0,
+  [PoolAsset.BUSDB]: 0,
   [PoolAsset.ETH]: 1,
   [PoolAsset.BTC]: 2,
   [PoolAsset.RUNEB1A]: 3,
@@ -39,4 +39,4 @@ export const RUNE_PRICE_POOL: PricePool = {
 export const RUNE_ASSET = { asset: assetFromString(PoolAsset.RUNE67C) as Asset, priceRune: bnOrZero(1) }
 
 // Whitelist of pools for pricing things
-export const PRICE_POOLS_WHITELIST: PricePoolAssets = [PoolAsset.BTC, PoolAsset.ETH, PoolAsset.TUSDB]
+export const PRICE_POOLS_WHITELIST: PricePoolAssets = [PoolAsset.BTC, PoolAsset.ETH, PoolAsset.BUSDB]

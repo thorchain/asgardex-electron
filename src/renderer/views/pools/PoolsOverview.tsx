@@ -38,9 +38,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
-  const poolsRD = useObservableState(midgardService.poolsState$, RD.pending)
+  const poolsRD = useObservableState(midgardService.pools.poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
-    midgardService.selectedPricePoolAsset$,
+    midgardService.pools.selectedPricePoolAsset$,
     // FIXME(@Veado) Depends on main/testnet - https://github.com/thorchain/asgardex-electron/issues/316
     some(PoolAsset.RUNE67C)
   )
@@ -98,7 +98,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   )
 
   const clickRefreshHandler = useCallback(() => {
-    midgardService.reloadPoolsState()
+    midgardService.pools.reloadPoolsState()
     midgardService.reloadNetworkInfo()
   }, [midgardService])
 

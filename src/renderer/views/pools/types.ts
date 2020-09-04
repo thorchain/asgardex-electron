@@ -16,7 +16,7 @@ export enum PoolAsset {
   BNB = 'BNB.BNB',
   ETH = 'ETH.ETH',
   BTC = 'BTC.BTC',
-  TUSDB = 'BNB.TUSDB-000'
+  BUSDB = 'BNB.BUSDB-000'
 }
 
 // Type guard for `PoolAsset`
@@ -24,7 +24,7 @@ export const isPoolAsset = (value: string): value is PoolAsset =>
   Object.values(PoolAsset).find((asset: string) => asset === value) !== undefined
 
 // List of assets used for pricing
-export type PricePoolAsset = PoolAsset.RUNE67C | PoolAsset.RUNEB1A | PoolAsset.ETH | PoolAsset.BTC | PoolAsset.TUSDB
+export type PricePoolAsset = PoolAsset.RUNE67C | PoolAsset.RUNEB1A | PoolAsset.ETH | PoolAsset.BTC | PoolAsset.BUSDB
 
 // Type guard for `PricePoolAsset`
 export const isPricePoolAsset = (value: string): value is PricePoolAsset =>

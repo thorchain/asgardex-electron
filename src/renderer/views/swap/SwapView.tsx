@@ -33,7 +33,9 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { service: midgardService } = useMidgardContext()
   const { transaction } = useBinanceContext()
   const [tx] = useObservableState(() => transaction.txRD$, initial)
-  const { poolsState$, poolAddresses$, reloadPoolsState } = midgardService
+  const {
+    pools: { poolsState$, poolAddresses$, reloadPoolsState }
+  } = midgardService
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
   const { balancesState$, explorerUrl$ } = useBinanceContext()
