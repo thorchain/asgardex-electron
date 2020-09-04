@@ -12,6 +12,7 @@ import * as RxO from 'rxjs/operators'
 import Settings from '../../components/wallet/Settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useBitcoinContext } from '../../contexts/BitcoinContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -27,6 +28,7 @@ const SettingsView: React.FC = (): JSX.Element => {
   const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
   const ethContext = useEthereumContext()
+  const bitcoinContext = useBitcoinContext()
 
   const binanceAddress$ = useMemo(
     () =>
@@ -74,6 +76,29 @@ const SettingsView: React.FC = (): JSX.Element => {
     [ethContext.address$]
   )
 
+  const bitcoinAddress$ = useMemo(
+    () =>
+      pipe(
+        bitcoinContext.address$,
+        RxO.map(
+          O.map(
+            (address) =>
+              ({
+                chainName: 'Bitcoin chain',
+                accounts: [
+                  {
+                    name: 'Main',
+                    address,
+                    type: 'internal'
+                  }
+                ]
+              } as UserAccountType)
+          )
+        )
+      ),
+    [bitcoinContext.address$]
+  )
+
   const { service: midgardService } = useMidgardContext()
 
   const { onlineStatus$ } = useAppContext()
@@ -97,11 +122,11 @@ const SettingsView: React.FC = (): JSX.Element => {
     () =>
       pipe(
         // combineLatest is for the future additional accounts
-        Rx.combineLatest([binanceAddress$, ethAddress$]),
+        Rx.combineLatest([binanceAddress$, ethAddress$, bitcoinAddress$]),
         RxO.map(A.filter(O.isSome)),
         RxO.map(sequenceTOptionFromArray)
       ),
-    [binanceAddress$, ethAddress$]
+    [binanceAddress$, ethAddress$, bitcoinAddress$]
   )
   const userAccounts = useObservableState(userAccounts$, O.none)
 
