@@ -387,9 +387,9 @@ const freezeFee$: Observable<FeeRD> = FP.pipe(
 const wsTransfer$ = pipe(
   address$,
   switchMap(O.fold(() => Rx.EMPTY, subscribeTransfers)),
-  RxOperators.map(RD.success),
-  RxOperators.tap((state) => RD.isSuccess(state) && reloadBalances()),
-  RxOperators.startWith(RD.pending)
+  RxOperators.map(O.some),
+  RxOperators.tap(O.map(reloadBalances)),
+  RxOperators.startWith(O.none)
 )
 
 const transaction = createTransactionService(clientState$, wsTransfer$)

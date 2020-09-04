@@ -25,7 +25,7 @@ import { pipe } from 'fp-ts/pipeable'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 
-import { rdFromOption, sequenceTOption } from '../../helpers/fpHelpers'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { swap } from '../../routes/swap'
 import { AssetWithPrice } from '../../services/binance/types'
 import { getAssetBalance } from '../../services/binance/utils'
@@ -51,7 +51,7 @@ type SwapProps = {
   onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
   poolDetails?: PoolDetails
   balances?: RD.RemoteData<Error, Balances>
-  txWithState?: RD.RemoteData<Error, { tx: Transfer; state: RD.RemoteData<Error, TransferWs> }>
+  txWithState?: RD.RemoteData<Error, { tx: Transfer; state: O.Option<TransferWs> }>
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
   activePricePool: PricePool
@@ -295,7 +295,7 @@ export const Swap = ({
           (r) =>
             pipe(
               r.state,
-              RD.map(
+              O.map(
                 (): TxStatus => ({
                   modal: true,
                   value: 100,
@@ -303,9 +303,9 @@ export const Swap = ({
                   type: TxTypes.SWAP
                 })
               ),
-              RD.alt(
-                (): RD.RemoteData<Error, TxStatus> =>
-                  RD.success({
+              O.alt(
+                (): O.Option<TxStatus> =>
+                  O.some({
                     modal: true,
                     value: 50,
                     status: true,
@@ -313,9 +313,8 @@ export const Swap = ({
                     type: TxTypes.SWAP
                   })
               ),
-              RD.map((txStatus) => sequenceTOption(sourceAssetPair, targetAssetPair, O.some(txStatus))),
-              RD.chain(rdFromOption(() => Error('Something went wrong'))),
-              RD.map(([sourceAssetPair, targetAssetPair, txStatus]) => (
+              O.chain((txStatus) => sequenceTOption(sourceAssetPair, targetAssetPair, O.some(txStatus))),
+              O.map(([sourceAssetPair, targetAssetPair, txStatus]) => (
                 <SwapModal
                   key={'swap modal result'}
                   baseAsset={activePricePool.asset}
@@ -352,7 +351,7 @@ export const Swap = ({
                   }}
                 />
               )),
-              RD.toNullable
+              O.toNullable
             )
         )
       ),
