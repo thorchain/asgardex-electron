@@ -32,13 +32,17 @@ storiesOf('Wallet/TransactionsTable', module).add('default', () => {
     value: '200.00000000'
   }
 
-  const txsRD = RD.success([tx])
+  const txsRD = RD.success({
+    total: 1,
+    tx: [tx]
+  })
 
   return (
     <TransactionsTable
       txsRD={txsRD}
       address={oAddress}
       clickTxLinkHandler={(txHash: string) => console.log('txHash ', txHash)}
+      changePaginationHandler={(page: number) => console.log('page:', page)}
     />
   )
 })

@@ -7,47 +7,71 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
-import * as RxOperators from 'rxjs/operators'
+import * as RxO from 'rxjs/operators'
 
 import Settings from '../../components/wallet/Settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { OnlineStatus, Network } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
-
-type NetworkMenuItem = {
-  key: string
-  label: string
-}
+import { UserAccountType } from '../../types/wallet'
 
 const SettingsView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { lock, removeKeystore } = keystoreService
   const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
+  const ethContext = useEthereumContext()
 
   const binanceAddress$ = useMemo(
     () =>
       pipe(
         binanceContext.address$,
-        RxOperators.map(
-          O.map((address) => ({
-            chainName: 'Binancechain',
-            accounts: [
-              {
-                name: 'Main',
-                address,
-                type: 'internal'
-              }
-            ]
-          }))
+        RxO.map(
+          O.map(
+            (address) =>
+              ({
+                chainName: 'Binancechain',
+                accounts: [
+                  {
+                    name: 'Main',
+                    address,
+                    type: 'internal'
+                  }
+                ]
+              } as UserAccountType)
+          )
         )
       ),
     [binanceContext.address$]
+  )
+
+  const ethAddress$ = useMemo(
+    () =>
+      pipe(
+        ethContext.address$,
+        RxO.map(
+          O.map(
+            (address) =>
+              ({
+                chainName: 'Ethereum chain',
+                accounts: [
+                  {
+                    name: 'Main',
+                    address,
+                    type: 'internal'
+                  }
+                ]
+              } as UserAccountType)
+          )
+        )
+      ),
+    [ethContext.address$]
   )
 
   const { service: midgardService } = useMidgardContext()
@@ -58,7 +82,7 @@ const SettingsView: React.FC = (): JSX.Element => {
 
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxOperators.map(RD.toOption)), [
+  const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxO.map(RD.toOption)), [
     midgardService.apiEndpoint$
   ])
 
@@ -73,11 +97,11 @@ const SettingsView: React.FC = (): JSX.Element => {
     () =>
       pipe(
         // combineLatest is for the future additional accounts
-        Rx.combineLatest([binanceAddress$]),
-        RxOperators.map(A.filter(O.isSome)),
-        RxOperators.map(sequenceTOptionFromArray)
+        Rx.combineLatest([binanceAddress$, ethAddress$]),
+        RxO.map(A.filter(O.isSome)),
+        RxO.map(sequenceTOptionFromArray)
       ),
-    [binanceAddress$]
+    [binanceAddress$, ethAddress$]
   )
   const userAccounts = useObservableState(userAccounts$, O.none)
 

@@ -16,7 +16,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
     address$,
     balancesState$,
     reloadBalances,
-    reloadTxssSelectedAsset,
+    loadTxsSelectedAsset,
     explorerUrl$,
     setSelectedAsset
   } = useBinanceContext()
@@ -41,7 +41,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
         address={address}
         balancesRD={balancesRD}
         asset={selectedAsset}
-        reloadSelectedAssetTxsHandler={reloadTxssSelectedAsset}
+        loadSelectedAssetTxsHandler={loadTxsSelectedAsset}
         reloadBalancesHandler={reloadBalances}
         explorerUrl={explorerUrl}
       />
