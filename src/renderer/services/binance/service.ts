@@ -25,8 +25,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import * as fpHelpers from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
-import { Network } from '../app/types'
-import { DEFAULT_NETWORK } from '../const'
+import { network$ } from '../app/service'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
 import { KeystoreState } from '../wallet/types'
@@ -45,12 +44,12 @@ const BINANCE_MAINET_WS_URI = envOrDefault(process.env.REACT_APP_BINANCE_MAINNET
 /**
  * Observable state of `Network`
  */
-const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(DEFAULT_NETWORK)
+// const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(DEFAULT_NETWORK)
 
 /**
  * Websocket endpoint depending on `Network`
  */
-const wsEndpoint$ = getNetworkState$.pipe(
+const wsEndpoint$ = network$.pipe(
   mergeMap((network) => {
     if (network === 'testnet') return Rx.of(BINANCE_TESTNET_WS_URI)
     // chaosnet + mainnet will use Binance mainet url
@@ -148,7 +147,7 @@ const BINANCE_MAX_RETRY = 3
 /**
  * Binance network depending on `Network`
  */
-const binanceNetwork$: Observable<BinanceNetwork> = getNetworkState$.pipe(
+const binanceNetwork$: Observable<BinanceNetwork> = network$.pipe(
   mergeMap((network) => {
     if (network === 'testnet') return Rx.of('testnet' as BinanceNetwork)
     // chaosnet + mainnet are using Binance mainnet url
@@ -370,7 +369,6 @@ const freeze = createFreezeService(clientState$)
 export {
   miniTickers$,
   subscribeTransfers,
-  setNetworkState,
   client$,
   setKeystoreState,
   clientViewState$,

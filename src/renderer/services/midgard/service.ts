@@ -6,20 +6,15 @@ import { retry, catchError, map, shareReplay, startWith, switchMap, distinctUnti
 
 import { fromPromise$ } from '../../helpers/rx/fromPromise'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
-import { observableState, triggerStream } from '../../helpers/stateHelper'
+import { triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
+import { network$ } from '../app/service'
 import { Network } from '../app/types'
-import { DEFAULT_NETWORK } from '../const'
 import { createPoolsService } from './pools'
 import { NetworkInfoRD, ThorchainLastblockRD, ThorchainConstantsRD } from './types'
 
 export const MIDGARD_MAX_RETRY = 3
 const BYZANTINE_MAX_RETRY = 5
-
-/**
- * Observable state of `Network`
- */
-const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(DEFAULT_NETWORK)
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
@@ -35,7 +30,7 @@ const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.
 /**
  * Endpoint provided by Byzantine
  */
-const byzantine$ = getNetworkState$.pipe(
+const byzantine$ = network$.pipe(
   // Since `getNetworkState` is created by `observableState` and it takes an initial value,
   // this stream might emit same values and we do need a "dirty check"
   // to avoid to create another instance of byzantine by having same `Network`
@@ -139,7 +134,6 @@ const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
  * Service object with all "public" functions and observables we want to provide
  */
 export const service = {
-  setNetworkState,
   networkInfo$,
   reloadNetworkInfo,
   thorchainConstantsState$,
