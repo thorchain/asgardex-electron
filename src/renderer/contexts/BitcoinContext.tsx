@@ -2,9 +2,8 @@ import React, { createContext, useContext } from 'react'
 
 import { useSubscription } from 'observable-hooks'
 
-import { setKeystoreState, client$, clientViewState$, setNetworkState, address$ } from '../services/bitcoin/service'
+import { client$, clientViewState$, setNetworkState, address$ } from '../services/bitcoin/service'
 import { useAppContext } from './AppContext'
-import { useWalletContext } from './WalletContext'
 
 export type BitcoinContextValue = {
   clientViewState$: typeof clientViewState$
@@ -25,12 +24,8 @@ type Props = {
 }
 
 export const BitcoinProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
-  const { keystoreService } = useWalletContext()
   const { network$ } = useAppContext()
-  // Note: Service does need to subscribe to latest state of keystore and network!
   useSubscription(network$, (network) => setNetworkState(network))
-  useSubscription(keystoreService.keystore$, (keystore) => setKeystoreState(keystore))
-
   return <BitcoinContext.Provider value={initialContext}>{children}</BitcoinContext.Provider>
 }
 

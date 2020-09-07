@@ -31,7 +31,7 @@ import { Network } from '../app/types'
 import { DEFAULT_NETWORK, MAX_PAGINATION_ITEMS } from '../const'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
-import { KeystoreState } from '../wallet/types'
+import { keystoreService } from '../wallet/service'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
@@ -168,18 +168,13 @@ const binanceNetwork$: Observable<BinanceNetwork> = getNetworkState$.pipe(
 )
 
 /**
- * Observable state of `KeystoreState`
- */
-const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(O.none)
-
-/**
  * Stream to create an observable BinanceClient depending on existing phrase in keystore
  *
  * Whenever a phrase has been added to keystore, a new BinanceClient will be created.
- * By the other hand: Whenever a phrase has been removed, the client is set to `None`
+ * By the other hand: Whenever a phrase has been removed, the client is set to `none`
  * A BinanceClient will never be created as long as no phrase is available
  */
-const clientState$: BinanceClientState$ = Rx.combineLatest(getKeystoreState$, binanceNetwork$).pipe(
+const clientState$: BinanceClientState$ = Rx.combineLatest([keystoreService.keystore$, binanceNetwork$]).pipe(
   mergeMap(
     ([keystore, binanceNetwork]) =>
       Observable.create((observer: Observer<BinanceClientState>) => {
@@ -404,7 +399,6 @@ export {
   subscribeTransfers,
   setNetworkState,
   client$,
-  setKeystoreState,
   clientViewState$,
   balancesState$,
   setSelectedAsset,
