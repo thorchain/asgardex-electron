@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react'
 
-import { fold, initial } from '@devexperts/remote-data-ts'
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, Asset, bnOrZero, AssetAmount } from '@thorchain/asgardex-util'
+import { fold, initial } from '@devexperts/remote-data-ts'
+import { Asset, AssetAmount, assetFromString, bnOrZero } from '@thorchain/asgardex-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -21,7 +21,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { rdFromOption } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
-import { PoolAsset } from '../pools/types'
+import { runeAsset$ } from '../../services/midgard/pools'
 import * as Styled from './SwapView.styles'
 
 type Props = {}
@@ -39,6 +39,8 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
   const { balancesState$, explorerUrl$ } = useBinanceContext()
+
+  const runeAsset = useObservableState(runeAsset$)
 
   const balances = useObservableState(balancesState$)
 
@@ -102,7 +104,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
                 .filter((a) => a.asset !== undefined && !!a.asset)
                 .map((a) => ({ asset: assetFromString(a.asset as string) as Asset, priceRune: bnOrZero(a.priceRune) }))
 
-              const hasRuneAsset = Boolean(availableAssets.find((asset) => asset.asset.symbol === PoolAsset.RUNE67C))
+              const hasRuneAsset = Boolean(availableAssets.find((asset) => asset.asset.symbol === runeAsset))
 
               if (!hasRuneAsset) {
                 // @todo thatStrangeGuy add logic for mainnet
@@ -111,6 +113,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
 
               return (
                 <Swap
+                  runeAsset={runeAsset}
                   tx={tx}
                   resetTx={transaction.resetTx}
                   goToTransaction={goToTransaction}

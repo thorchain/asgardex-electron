@@ -27,6 +27,7 @@ import { AssetWithPrice, TransferRD } from '../../services/binance/types'
 import { getAssetBalance } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
+import { PoolAsset } from '../../views/pools/types'
 import AssetSelect from '../uielements/assets/assetSelect'
 import Drag from '../uielements/drag'
 import Modal from '../uielements/modal'
@@ -46,6 +47,7 @@ type SwapProps = {
   tx?: TransferRD
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
+  runeAsset?: PoolAsset
 }
 
 export const Swap = ({
@@ -57,12 +59,16 @@ export const Swap = ({
   balances = RD.initial,
   tx = RD.initial,
   goToTransaction,
-  resetTx
+  resetTx,
+  runeAsset
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
   // convert to hash map here instead of using getPoolDetail
-  const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails), [poolDetails])
+  const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, runeAsset), [
+    poolDetails,
+    runeAsset
+  ])
   const sourceAssetPair = useMemo(() => pickAssetPair(availableAssets, sourceAssetProp), [
     availableAssets,
     sourceAssetProp

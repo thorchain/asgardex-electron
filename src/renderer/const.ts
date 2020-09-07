@@ -36,6 +36,11 @@ export const RUNE_PRICE_POOL: PricePool = {
   poolData: { assetBalance: ONE_ASSET_BASE_AMOUNT, runeBalance: ONE_ASSET_BASE_AMOUNT }
 }
 
+export const getRunePricePool = (runeSymbol: PoolAsset) => ({
+  asset: runeSymbol,
+  poolData: { assetBalance: ONE_ASSET_BASE_AMOUNT, runeBalance: ONE_ASSET_BASE_AMOUNT }
+})
+
 export const RUNE_ASSET = { asset: assetFromString(PoolAsset.RUNE67C) as Asset, priceRune: bnOrZero(1) }
 
 // Whitelist of pools for pricing things

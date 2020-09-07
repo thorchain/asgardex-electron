@@ -12,6 +12,8 @@ import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { DefaultApi, GetPoolsDetailsViewEnum } from '../../types/generated/midgard/apis'
 import { isPricePoolAsset, PricePoolAsset } from '../../views/pools/types'
+import { getCurrentNetworkState, network$ } from '../app/service'
+import { mapNetworkToPoolAssets } from '../const'
 import { MIDGARD_MAX_RETRY } from './service'
 import { PoolsStateRD, SelectedPricePoolAsset } from './types'
 import { getPricePools, pricePoolSelector } from './utils'
@@ -168,3 +170,12 @@ export const createPoolsService = (
     poolAddresses$
   }
 }
+
+export const networkPools$ = pipe(network$, map(mapNetworkToPoolAssets))
+
+export const getDefaultRuneAsset = () => mapNetworkToPoolAssets(getCurrentNetworkState()).RUNE
+
+export const runeAsset$ = pipe(
+  networkPools$,
+  map((pool) => pool.RUNE)
+)
