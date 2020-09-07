@@ -8,9 +8,7 @@ import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators
 
 import { envOrDefault } from '../../helpers/envHelper'
 import * as fpHelpers from '../../helpers/fpHelpers'
-import { observableState } from '../../helpers/stateHelper'
-import { Network } from '../app/types'
-import { DEFAULT_NETWORK } from '../const'
+import { network$ } from '../app/service'
 import { ClientStateForViews } from '../types'
 import { getClientStateForViews, getClient } from '../utils'
 import { keystoreService } from '../wallet/service'
@@ -20,14 +18,9 @@ import { BitcoinClientState } from './types'
 const BITCOIN_ELECTRS_API = envOrDefault(process.env.BITCOIN_ELECRTS_TESTNET_API, 'http://165.22.106.224')
 
 /**
- * Observable state of `Network`
- */
-const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(DEFAULT_NETWORK)
-
-/**
  * Binance network depending on `Network`
  */
-const bitcoinNetwork$: Observable<BitcoinNetwork> = getNetworkState$.pipe(
+const bitcoinNetwork$: Observable<BitcoinNetwork> = network$.pipe(
   mergeMap((network) => {
     if (network === 'testnet') return Rx.of(BitcoinNetwork.TEST)
     // In case of 'chaosnet' + 'mainnet` use BitcoinNetwork.MAIN
@@ -89,4 +82,4 @@ const address$: Observable<O.Option<string>> = client$.pipe(
 /**
  * Object with all "public" functions and observables
  */
-export { setNetworkState, client$, clientViewState$, address$ }
+export { client$, clientViewState$, address$ }

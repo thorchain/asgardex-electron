@@ -22,8 +22,8 @@ describe('header/util', () => {
     })
 
     it('returns label for TUSDB', () => {
-      const result = toHeaderCurrencyLabel(PoolAsset.TUSDB)
-      expect(result).toEqual('$ USD')
+      expect(toHeaderCurrencyLabel(PoolAsset.BUSDBD1)).toEqual('$ USD')
+      expect(toHeaderCurrencyLabel(PoolAsset.BUSDBAF)).toEqual('$ USD')
     })
   })
 
@@ -64,8 +64,8 @@ describe('header/util', () => {
     })
 
     it('returns label for TUSDB', () => {
-      const result = toHeaderCurrencyLabel(PoolAsset.TUSDB)
-      expect(result).toEqual('$ USD')
+      expect(toHeaderCurrencyLabel(PoolAsset.BUSDBAF)).toEqual('$ USD')
+      expect(toHeaderCurrencyLabel(PoolAsset.BUSDBD1)).toEqual('$ USD')
     })
   })
 

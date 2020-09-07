@@ -4,10 +4,11 @@ import * as FP from 'fp-ts/lib/function'
 import { head } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
-import { RUNE_PRICE_POOL, CURRENCY_WHEIGHTS } from '../../const'
+import { RUNE_PRICE_POOL, CURRENCY_WHEIGHTS, getRunePricePool } from '../../const'
 import { isMiniToken } from '../../helpers/binanceHelper'
 import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
-import { PricePoolAssets, PricePools, PricePoolAsset, PricePool, PoolAsset } from '../../views/pools/types'
+import { PricePoolAssets, PricePools, PricePoolAsset, PricePool, isBUSDAsset, RUNEAsset } from '../../views/pools/types'
+import { getDefaultRuneAsset } from './pools'
 import { AssetDetails, AssetDetailMap, PoolDetails, PoolsStateRD, SelectedPricePoolAsset } from './types'
 
 export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} => {
@@ -60,7 +61,7 @@ export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): 
  *
  * It will always return a `PricePool`:
  * - (1) `PricePool` from list of pools (if available)
- * - (2) OR TUSDB (if available in list of pools)
+ * - (2) OR BUSDB (if available in list of pools)
  * - (3) OR RUNE (if no other pool is available)
  */
 export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolAsset>): PricePool =>
@@ -68,8 +69,8 @@ export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolA
     oAsset,
     // (1) Check if `PricePool` is available in `PricePools`
     O.mapNullable((asset) => pools.find((pool) => pool.asset === asset)),
-    // (2) If (1) fails, check if TUSDB pool is available in `PricePools`
-    O.fold(() => O.fromNullable(pools.find((pool) => pool.asset === PoolAsset.TUSDB)), O.some),
+    // (2) If (1) fails, check if BUSDB pool is available in `PricePools`
+    O.fold(() => O.fromNullable(pools.find((pool) => isBUSDAsset(pool.asset))), O.some),
     // (3) If (2) failes, return RUNE pool, which is always first entry in pools list
     O.getOrElse(() => head(pools))
   )
@@ -101,7 +102,10 @@ export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<Po
  * Converts PoolDetails to the appropriate HashMap
  * Keys of the end HasMap is PoolDetails[i].asset
  */
-export const getPoolDetailsHashMap = (poolDetails: PoolDetails): Record<string, PoolData> => {
+export const getPoolDetailsHashMap = (
+  poolDetails: PoolDetails,
+  runeAsset: RUNEAsset = getDefaultRuneAsset()
+): Record<string, PoolData> => {
   const res = poolDetails.reduce((acc, cur) => {
     if (!cur.asset) {
       return acc
@@ -110,8 +114,10 @@ export const getPoolDetailsHashMap = (poolDetails: PoolDetails): Record<string, 
     return { ...acc, [cur.asset]: toPoolData(cur) }
   }, {} as Record<string, PoolData>)
 
-  res[PoolAsset.RUNE67C] = {
-    ...RUNE_PRICE_POOL.poolData
+  const runePricePool = getRunePricePool(runeAsset)
+
+  res[runeAsset] = {
+    ...runePricePool.poolData
   }
 
   return res

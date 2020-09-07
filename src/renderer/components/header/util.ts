@@ -5,12 +5,12 @@ import * as O from 'fp-ts/lib/Option'
 import { CURRENCY_SYMBOLS } from '../../const'
 import * as API from '../../helpers/apiHelper'
 import { OnlineStatus } from '../../services/app/types'
-import { PoolAsset, PricePoolAsset } from '../../views/pools/types'
+import { isBUSDAsset, PricePoolAsset } from '../../views/pools/types'
 
 export const toHeaderCurrencyLabel = (asset: PricePoolAsset): string => {
   let ticker = assetFromString(asset)?.ticker ?? 'unknown'
-  // special case TUSDB
-  if (asset === PoolAsset.TUSDB) ticker = 'USD'
+  // special case BUSDB
+  if (isBUSDAsset(asset)) ticker = 'USD'
   return `${CURRENCY_SYMBOLS[asset]} ${ticker}`
 }
 

@@ -1,38 +1,20 @@
 import * as RD from '@devexperts/remote-data-ts'
 import midgard from '@thorchain/asgardex-midgard'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
-import { some } from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
-import { combineLatest } from 'rxjs'
 import { retry, catchError, map, shareReplay, startWith, switchMap, distinctUntilChanged } from 'rxjs/operators'
 
-import { PRICE_POOLS_WHITELIST } from '../../const'
 import { fromPromise$ } from '../../helpers/rx/fromPromise'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
-import { observableState, triggerStream } from '../../helpers/stateHelper'
-import { Configuration, DefaultApi, GetPoolsDetailsViewEnum } from '../../types/generated/midgard'
-import { PricePoolAsset } from '../../views/pools/types'
-import { isPricePoolAsset } from '../../views/pools/types'
+import { triggerStream } from '../../helpers/stateHelper'
+import { Configuration, DefaultApi } from '../../types/generated/midgard'
+import { network$ } from '../app/service'
 import { Network } from '../app/types'
-import { DEFAULT_NETWORK } from '../const'
-import {
-  PoolsStateRD,
-  NetworkInfoRD,
-  ThorchainLastblockRD,
-  ThorchainConstantsRD,
-  SelectedPricePoolAsset
-} from './types'
-import { getPricePools, pricePoolSelector } from './utils'
+import { MIDGARD_MAX_RETRY } from '../const'
+import { createPoolsService } from './pools'
+import { NetworkInfoRD, ThorchainLastblockRD, ThorchainConstantsRD } from './types'
 
-const MIDGARD_MAX_RETRY = 3
 const BYZANTINE_MAX_RETRY = 5
-
-/**
- * Observable state of `Network`
- */
-const { get$: getNetworkState$, set: setNetworkState } = observableState<Network>(DEFAULT_NETWORK)
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
@@ -48,7 +30,7 @@ const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.
 /**
  * Endpoint provided by Byzantine
  */
-const byzantine$ = getNetworkState$.pipe(
+const byzantine$ = network$.pipe(
   // Since `getNetworkState` is created by `observableState` and it takes an initial value,
   // this stream might emit same values and we do need a "dirty check"
   // to avoid to create another instance of byzantine by having same `Network`
@@ -56,113 +38,6 @@ const byzantine$ = getNetworkState$.pipe(
   switchMap(nextByzantine$),
   shareReplay(1),
   retry(BYZANTINE_MAX_RETRY)
-)
-
-/**
- * Get data of `Pools` from Midgard
- */
-const apiGetPools$ = byzantine$.pipe(
-  map(RD.map(getMidgardDefaultApi)),
-  liveData.chain((api) =>
-    pipe(
-      api.getPools(),
-      map(RD.success),
-      catchError((e: Error) => Rx.of(RD.failure(e)))
-    )
-  )
-)
-
-/**
- * Loading queue to get all needed data for `PoolsState`
- */
-const loadPoolsStateData$ = (): Rx.Observable<PoolsStateRD> => {
-  const poolAssets$ = pipe(apiGetPools$, shareReplay(1))
-
-  const assetDetails$ = pipe(
-    poolAssets$,
-    liveData.map((assets) => assets.join(',')),
-    liveData.chain(apiGetAssetInfo$),
-    shareReplay(1)
-  )
-
-  const poolDetails$ = pipe(
-    poolAssets$,
-    liveData.map((assets) => assets.join(',')),
-    liveData.chain(apiGetPoolsData$),
-    shareReplay(1)
-  )
-
-  const pricePools$ = pipe(
-    poolDetails$,
-    liveData.map((poolDetails) => some(getPricePools(poolDetails, PRICE_POOLS_WHITELIST))),
-    shareReplay(1)
-  )
-
-  return pipe(
-    combineLatest([poolAssets$, assetDetails$, poolDetails$, pricePools$]),
-    map((state) => RD.combine(...state)),
-    map(
-      RD.map(([poolAssets, assetDetails, poolDetails, pricePools]) => {
-        const prevAsset = selectedPricePoolAsset()
-        const nullablePricePools = O.toNullable(pricePools)
-        if (nullablePricePools) {
-          const selectedPricePool = pricePoolSelector(nullablePricePools, prevAsset)
-          setSelectedPricePoolAsset(selectedPricePool.asset)
-        }
-        return {
-          poolAssets,
-          assetDetails,
-          poolDetails,
-          pricePools
-        }
-      })
-    ),
-    startWith(RD.pending),
-    catchError((error: Error) => Rx.of(RD.failure(error))),
-    retry(MIDGARD_MAX_RETRY)
-  )
-}
-
-/**
- * Get data of `AssetDetails` from Midgard
- */
-const apiGetAssetInfo$ = (asset: string) =>
-  pipe(
-    byzantine$,
-    liveData.chain((endpoint) =>
-      pipe(
-        getMidgardDefaultApi(endpoint).getAssetInfo({ asset }),
-        map(RD.success),
-        catchError((e: Error) => Rx.of(RD.failure(e)))
-      )
-    )
-  )
-
-/**
- * Get `PoolDetails` data from Midgard
- */
-const apiGetPoolsData$ = (asset: string) =>
-  byzantine$.pipe(
-    liveData.chain((endpoint) =>
-      pipe(
-        getMidgardDefaultApi(endpoint).getPoolsDetails({ asset, view: GetPoolsDetailsViewEnum.Simple }),
-        map(RD.success),
-        catchError((e: Error) => Rx.of(RD.failure(e)))
-      )
-    )
-  )
-
-// `TriggerStream` to reload data of pools
-const { stream$: reloadPoolsState$, trigger: reloadPoolsState } = triggerStream()
-
-/**
- * State of all pool data
- */
-const poolsState$: Rx.Observable<PoolsStateRD> = reloadPoolsState$.pipe(
-  // start loading queue
-  switchMap(loadPoolsStateData$),
-  // cache it to avoid reloading data by every subscription
-  shareReplay(1)
 )
 
 /**
@@ -225,25 +100,6 @@ const thorchainConstantsState$: Rx.Observable<ThorchainConstantsRD> = apiGetThor
   shareReplay(1)
 )
 
-const PRICE_POOL_KEY = 'asgdx-price-pool'
-
-export const getSelectedPricePool = () =>
-  FP.pipe(localStorage.getItem(PRICE_POOL_KEY), O.fromNullable, O.filter(isPricePoolAsset))
-
-const {
-  get$: selectedPricePoolAsset$,
-  get: selectedPricePoolAsset,
-  set: updateSelectedPricePoolAsset
-} = observableState<SelectedPricePoolAsset>(getSelectedPricePool())
-
-/**
- * Update selected `PricePoolAsset`
- */
-const setSelectedPricePoolAsset = (asset: PricePoolAsset) => {
-  localStorage.setItem(PRICE_POOL_KEY, asset)
-  updateSelectedPricePoolAsset(some(asset))
-}
-
 /**
  * Loads data of `NetworkInfo`
  */
@@ -274,33 +130,15 @@ const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
   shareReplay(1)
 )
 
-const poolAddresses$ = pipe(
-  byzantine$,
-  liveData.chain((endpoint) =>
-    pipe(
-      getMidgardDefaultApi(endpoint).getThorchainProxiedEndpoints(),
-      map(RD.success),
-      startWith(RD.pending),
-      catchError((e: Error) => Rx.of(RD.failure(e)))
-    )
-  ),
-  liveData.map((s) => s.current || []),
-  retry(MIDGARD_MAX_RETRY)
-)
 /**
  * Service object with all "public" functions and observables we want to provide
  */
 export const service = {
-  setNetworkState,
-  poolsState$,
-  reloadPoolsState,
   networkInfo$,
   reloadNetworkInfo,
   thorchainConstantsState$,
   thorchainLastblockState$,
   reloadThorchainLastblock,
-  setSelectedPricePool: setSelectedPricePoolAsset,
-  selectedPricePoolAsset$,
   apiEndpoint$: byzantine$,
-  poolAddresses$
+  pools: createPoolsService(byzantine$, getMidgardDefaultApi)
 }

@@ -12,7 +12,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import * as walletRoutes from '../../routes/wallet'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
-import { PoolAsset, PricePoolAsset } from '../pools/types'
+import { PricePoolAsset } from '../pools/types'
 
 const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
@@ -20,14 +20,15 @@ const AssetsView: React.FC = (): JSX.Element => {
   const balancesRD = useObservableState(balancesState$, RD.initial)
 
   const {
-    service: { poolsState$, selectedPricePoolAsset$ }
+    service: {
+      pools: { getDefaultRuneAsset, poolsState$, selectedPricePoolAsset$ }
+    }
   } = useMidgardContext()
 
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<O.Option<PricePoolAsset>>(
     selectedPricePoolAsset$,
-    // FIXME(@Veado) Depends on main/testnet - https://github.com/thorchain/asgardex-electron/issues/316
-    O.some(PoolAsset.RUNE67C)
+    O.some(getDefaultRuneAsset() as PricePoolAsset)
   )
 
   const pricePool = useMemo(() => pricePoolSelectorFromRD(poolsRD, selectedPricePoolAsset), [

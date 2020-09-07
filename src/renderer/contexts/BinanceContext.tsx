@@ -1,7 +1,5 @@
 import React, { createContext, useContext } from 'react'
 
-import { useSubscription } from 'observable-hooks'
-
 import {
   subscribeTransfers,
   miniTickers$,
@@ -9,7 +7,6 @@ import {
   balancesState$,
   client$,
   clientViewState$,
-  setNetworkState,
   address$,
   setSelectedAsset,
   txsSelectedAsset$,
@@ -21,7 +18,6 @@ import {
   transferFees$,
   freezeFee$
 } from '../services/binance/service'
-import { useAppContext } from './AppContext'
 
 export type BinanceContextValue = {
   subscribeTransfers: typeof subscribeTransfers
@@ -68,8 +64,6 @@ type Props = {
 }
 
 export const BinanceProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
-  const { network$ } = useAppContext()
-  useSubscription(network$, (network) => setNetworkState(network))
   return <BinanceContext.Provider value={initialContext}>{children}</BinanceContext.Provider>
 }
 

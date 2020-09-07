@@ -28,7 +28,7 @@ import { PoolsState } from '../../services/midgard/types'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
-import { PoolTableRowData, PoolTableRowsData, PricePoolAsset, PoolAsset, Pool } from './types'
+import { PoolTableRowData, PoolTableRowsData, PricePoolAsset, Pool } from './types'
 import { getBlocksLeftForPendingPoolAsString } from './utils'
 
 type Props = {}
@@ -38,11 +38,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
-  const poolsRD = useObservableState(midgardService.poolsState$, RD.pending)
+  const poolsRD = useObservableState(midgardService.pools.poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
-    midgardService.selectedPricePoolAsset$,
-    // FIXME(@Veado) Depends on main/testnet - https://github.com/thorchain/asgardex-electron/issues/316
-    some(PoolAsset.RUNE67C)
+    midgardService.pools.selectedPricePoolAsset$,
+    some(midgardService.pools.getDefaultRuneAsset() as PricePoolAsset)
   )
   const thorchainLastblockRD = useObservableState(midgardService.thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(midgardService.thorchainConstantsState$, RD.pending)
@@ -98,7 +97,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   )
 
   const clickRefreshHandler = useCallback(() => {
-    midgardService.reloadPoolsState()
+    midgardService.pools.reloadPoolsState()
     midgardService.reloadNetworkInfo()
   }, [midgardService])
 

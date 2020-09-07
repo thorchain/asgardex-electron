@@ -1,9 +1,6 @@
 import React, { createContext, useContext } from 'react'
 
-import { useSubscription } from 'observable-hooks'
-
-import { client$, clientViewState$, setNetworkState, address$ } from '../services/bitcoin/service'
-import { useAppContext } from './AppContext'
+import { client$, clientViewState$, address$ } from '../services/bitcoin/service'
 
 export type BitcoinContextValue = {
   clientViewState$: typeof clientViewState$
@@ -24,8 +21,6 @@ type Props = {
 }
 
 export const BitcoinProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
-  const { network$ } = useAppContext()
-  useSubscription(network$, (network) => setNetworkState(network))
   return <BitcoinContext.Provider value={initialContext}>{children}</BitcoinContext.Provider>
 }
 
