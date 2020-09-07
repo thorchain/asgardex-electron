@@ -8,11 +8,10 @@ import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators
 
 import { envOrDefault } from '../../helpers/envHelper'
 import * as fpHelpers from '../../helpers/fpHelpers'
-import { observableState } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import { ClientStateForViews } from '../types'
 import { getClientStateForViews, getClient } from '../utils'
-import { KeystoreState } from '../wallet/types'
+import { keystoreService } from '../wallet/service'
 import { getPhrase } from '../wallet/util'
 import { BitcoinClientState } from './types'
 
@@ -30,18 +29,13 @@ const bitcoinNetwork$: Observable<BitcoinNetwork> = network$.pipe(
 )
 
 /**
- * Observable state of `KeystoreState`
- */
-const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(O.none)
-
-/**
  * Stream to create an observable BitcoinClient depending on existing phrase in keystore
  *
  * Whenever a phrase has been added to keystore, a new BitcoinClient will be created.
- * By the other hand: Whenever a phrase has been removed, the client is set to `None`
+ * By the other hand: Whenever a phrase has been removed, the client is set to `none`
  * A BitcoinClient will never be created as long as no phrase is available
  */
-const clientState$ = Rx.combineLatest(getKeystoreState$, bitcoinNetwork$).pipe(
+const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork$]).pipe(
   mergeMap(
     ([keystore, bitcoinNetwork]) =>
       Observable.create((observer: Observer<BitcoinClientState>) => {
@@ -88,4 +82,4 @@ const address$: Observable<O.Option<string>> = client$.pipe(
 /**
  * Object with all "public" functions and observables
  */
-export { client$, setKeystoreState, clientViewState$, address$ }
+export { client$, clientViewState$, address$ }

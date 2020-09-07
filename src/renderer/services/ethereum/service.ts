@@ -11,7 +11,7 @@ import { observableState } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
 import { DEFAULT_NETWORK } from '../const'
 import { getClient } from '../utils'
-import { KeystoreState } from '../wallet/types'
+import { keystoreService } from '../wallet/service'
 import { getPhrase } from '../wallet/util'
 import { EthereumClientState } from './types'
 
@@ -32,18 +32,13 @@ const ethereumNetwork$: Observable<EthereumNetwork> = getNetworkState$.pipe(
 )
 
 /**
- * Observable state of `KeystoreState`
- */
-const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(O.none)
-
-/**
  * Stream to create an observable EthereumClient depending on existing phrase in keystore
  *
  * Whenever a phrase has been added to keystore, a new EthereumClient will be created.
- * By the other hand: Whenever a phrase has been removed, the client is set to `None`
+ * By the other hand: Whenever a phrase has been removed, the client is set to `none`
  * A EthereumClient will never be created as long as no phrase is available
  */
-const clientState$ = Rx.combineLatest(getKeystoreState$, ethereumNetwork$).pipe(
+const clientState$ = Rx.combineLatest([keystoreService.keystore$, ethereumNetwork$]).pipe(
   mergeMap(
     ([keystore, network]) =>
       Observable.create((observer: Observer<EthereumClientState>) => {
@@ -82,4 +77,4 @@ const address$: Observable<O.Option<Address>> = client$.pipe(
 /**
  * Object with all "public" functions and observables
  */
-export { setNetworkState, client$, setKeystoreState, address$ }
+export { setNetworkState, client$, address$ }
