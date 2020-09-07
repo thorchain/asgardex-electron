@@ -1,3 +1,5 @@
+import * as RD from '@devexperts/remote-data-ts'
+import { BaseAmount, Asset } from '@thorchain/asgardex-util'
 import { Option } from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
@@ -20,4 +22,13 @@ export type KeystoreService = {
   removeKeystore: () => Promise<void>
   unlock: (state: KeystoreState, password: string) => Promise<void>
   lock: () => void
+}
+
+export type WalletBalancesRD = RD.RemoteData<Error, WalletBalances>
+
+export type WalletBalances = WalletBalance[]
+
+export type WalletBalance = {
+  asset: Option<Asset>
+  amount: BaseAmount
 }

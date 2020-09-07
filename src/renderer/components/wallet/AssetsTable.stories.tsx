@@ -2,14 +2,25 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { Balances } from '@thorchain/asgardex-binance'
+import { assetFromString, baseAmount } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 
+import { WalletBalances } from '../../services/wallet/types'
 import AssetsTable from './AssetsTable'
 
-const balances: Balances = [
-  { free: '122', frozen: '0', locked: '0', symbol: 'RUNE-67C' },
-  { free: '0.01000000', frozen: '0', locked: '0', symbol: 'BNB' },
-  { free: '3.00000000', frozen: '0', locked: '0', symbol: 'FTM-585' }
+const balances: WalletBalances = [
+  {
+    amount: baseAmount('12200000000'),
+    asset: O.fromNullable(assetFromString('BNB.RUNE-67C'))
+  },
+  {
+    amount: baseAmount('1000000'),
+    asset: O.fromNullable(assetFromString('BNB'))
+  },
+  {
+    amount: baseAmount('300000000'),
+    asset: O.fromNullable(assetFromString('FTM-585'))
+  }
 ]
 
 storiesOf('Wallet/AssetsTable', module)

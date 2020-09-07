@@ -10,8 +10,9 @@ import { useHistory } from 'react-router-dom'
 
 import * as AH from '../../helpers/assetHelper'
 import * as walletRoutes from '../../routes/wallet'
-import { TxsRD, LoadTxsProps, BalancesRD, SendAction, isSendAction } from '../../services/binance/types'
+import { TxsRD, LoadTxsProps, SendAction, isSendAction } from '../../services/binance/types'
 import { MAX_PAGINATION_ITEMS } from '../../services/const'
+import { WalletBalancesRD } from '../../services/wallet/types'
 import AssetInfo from '../uielements/assets/AssetInfo'
 import BackLink from '../uielements/backLink'
 import Button, { RefreshButton } from '../uielements/button'
@@ -25,7 +26,7 @@ type SendActionMenuItem = {
 
 type Props = {
   txsRD: TxsRD
-  balancesRD: BalancesRD
+  balancesRD: WalletBalancesRD
   asset: O.Option<Asset>
   address: O.Option<Address>
   explorerUrl?: O.Option<string>
