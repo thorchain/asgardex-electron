@@ -10,10 +10,10 @@ import { triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { Network } from '../app/types'
+import { MIDGARD_MAX_RETRY } from '../const'
 import { createPoolsService } from './pools'
 import { NetworkInfoRD, ThorchainLastblockRD, ThorchainConstantsRD } from './types'
 
-export const MIDGARD_MAX_RETRY = 3
 const BYZANTINE_MAX_RETRY = 5
 
 /**

@@ -22,7 +22,7 @@ describe('header/util', () => {
     })
 
     it('returns label for TUSDB', () => {
-      const result = toHeaderCurrencyLabel(PoolAsset.TUSDB)
+      const result = toHeaderCurrencyLabel(PoolAsset.BUSDB)
       expect(result).toEqual('$ USD')
     })
   })
@@ -64,7 +64,7 @@ describe('header/util', () => {
     })
 
     it('returns label for TUSDB', () => {
-      const result = toHeaderCurrencyLabel(PoolAsset.TUSDB)
+      const result = toHeaderCurrencyLabel(PoolAsset.BUSDB)
       expect(result).toEqual('$ USD')
     })
   })

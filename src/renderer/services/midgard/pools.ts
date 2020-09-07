@@ -13,17 +13,16 @@ import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { DefaultApi, GetPoolsDetailsViewEnum } from '../../types/generated/midgard/apis'
 import { isPricePoolAsset, PricePoolAsset } from '../../views/pools/types'
 import { getCurrentNetworkState, network$ } from '../app/service'
-import { mapNetworkToPoolAssets } from '../const'
-import { MIDGARD_MAX_RETRY } from './service'
+import { mapNetworkToPoolAssets, MIDGARD_MAX_RETRY } from '../const'
 import { PoolsStateRD, SelectedPricePoolAsset } from './types'
 import { getPricePools, pricePoolSelector } from './utils'
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
 
-export const getSelectedPricePool = () =>
+const getSelectedPricePool = () =>
   FP.pipe(localStorage.getItem(PRICE_POOL_KEY), O.fromNullable, O.filter(isPricePoolAsset))
 
-export const createPoolsService = (
+const createPoolsService = (
   byzantine$: LiveData<Error, string>,
   getMidgardDefaultApi: (basePath: string) => DefaultApi
 ) => {
@@ -171,11 +170,13 @@ export const createPoolsService = (
   }
 }
 
-export const networkPools$ = pipe(network$, map(mapNetworkToPoolAssets))
+const networkPools$ = pipe(network$, map(mapNetworkToPoolAssets))
 
-export const getDefaultRuneAsset = () => mapNetworkToPoolAssets(getCurrentNetworkState()).RUNE
+const getDefaultRuneAsset = () => mapNetworkToPoolAssets(getCurrentNetworkState()).RUNE
 
-export const runeAsset$ = pipe(
+const runeAsset$ = pipe(
   networkPools$,
   map((pool) => pool.RUNE)
 )
+
+export { networkPools$, getDefaultRuneAsset, runeAsset$, createPoolsService, getSelectedPricePool }
