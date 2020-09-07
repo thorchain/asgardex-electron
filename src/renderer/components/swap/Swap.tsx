@@ -32,7 +32,7 @@ import { getAssetBalance } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { TxStatus, TxTypes } from '../../types/asgardex'
-import { PoolAsset } from '../../views/pools/types'
+import { RUNEAsset } from '../../views/pools/types'
 import { PricePool } from '../../views/pools/types'
 import SwapModal from '../modal/swapModal'
 import { CalcResult } from '../modal/swapModal/types'
@@ -55,7 +55,7 @@ type SwapProps = {
   txWithState?: RD.RemoteData<Error, { tx: Transfer; state: O.Option<TransferWs> }>
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
-  runeAsset?: PoolAsset
+  runeAsset?: RUNEAsset
   activePricePool: PricePool
 }
 

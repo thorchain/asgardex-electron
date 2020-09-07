@@ -11,7 +11,7 @@ import { PRICE_POOLS_WHITELIST } from '../../const'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { DefaultApi, GetPoolsDetailsViewEnum } from '../../types/generated/midgard/apis'
-import { isPricePoolAsset, PricePoolAsset } from '../../views/pools/types'
+import { isPricePoolAsset, PricePoolAsset, RUNEAsset } from '../../views/pools/types'
 import { getCurrentNetworkState, network$ } from '../app/service'
 import { mapNetworkToPoolAssets, MIDGARD_MAX_RETRY } from '../const'
 import { PoolsStateRD, SelectedPricePoolAsset } from './types'
@@ -24,7 +24,7 @@ const getSelectedPricePool = () =>
 
 const networkPools$ = pipe(network$, map(mapNetworkToPoolAssets))
 
-const getDefaultRuneAsset = () => mapNetworkToPoolAssets(getCurrentNetworkState()).RUNE
+const getDefaultRuneAsset = (): RUNEAsset => mapNetworkToPoolAssets(getCurrentNetworkState()).RUNE
 
 const runeAsset$ = pipe(
   networkPools$,

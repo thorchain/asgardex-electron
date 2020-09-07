@@ -1,28 +1,34 @@
-import { PoolAsset } from '../views/pools/types'
+import { BUSDAsset, PoolAsset, RUNEAsset } from '../views/pools/types'
 import { Network } from './app/types'
 
 export const DEFAULT_NETWORK: Network = 'testnet'
 export const AVAILABLE_NETWORKS: Network[] = ['testnet', 'chaosnet', 'mainnet']
 
-const commonAssets = {
-  BNB: 'BNB.BNB',
-  ETH: 'ETH.ETH',
-  BTC: 'BTC.BTC',
-  BUSDB: 'BNB.BUSDB-000'
+type CommonAssets = 'BNB' | 'ETH' | 'BTC'
+
+const commonAssets: Record<CommonAssets, PoolAsset> = {
+  BNB: PoolAsset.BNB,
+  ETH: PoolAsset.ETH,
+  BTC: PoolAsset.BTC
 }
 
-const networkPools = {
+type Pools = Record<CommonAssets, PoolAsset> & { RUNE: RUNEAsset } & { BUSD: BUSDAsset }
+
+const networkPools: Record<Network, Pools> = {
   testnet: {
     ...commonAssets,
-    RUNE: PoolAsset.RUNE67C
+    RUNE: PoolAsset.RUNE67C,
+    BUSD: PoolAsset.BUSDBAF
   },
   mainnet: {
     ...commonAssets,
-    RUNE: PoolAsset.RUNEB1A
+    RUNE: PoolAsset.RUNEB1A,
+    BUSD: PoolAsset.BUSDBD1
   },
   chaosnet: {
     ...commonAssets,
-    RUNE: PoolAsset.RUNEB1A
+    RUNE: PoolAsset.RUNEB1A,
+    BUSD: PoolAsset.BUSDBD1
   }
 }
 

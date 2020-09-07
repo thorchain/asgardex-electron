@@ -7,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import { RUNE_PRICE_POOL, CURRENCY_WHEIGHTS, getRunePricePool } from '../../const'
 import { isMiniToken } from '../../helpers/binanceHelper'
 import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
-import { PricePoolAssets, PricePools, PricePoolAsset, PricePool, PoolAsset } from '../../views/pools/types'
+import { PricePoolAssets, PricePools, PricePoolAsset, PricePool, isBUSDAsset, RUNEAsset } from '../../views/pools/types'
 import { getDefaultRuneAsset } from './pools'
 import { AssetDetails, AssetDetailMap, PoolDetails, PoolsStateRD, SelectedPricePoolAsset } from './types'
 
@@ -70,7 +70,7 @@ export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolA
     // (1) Check if `PricePool` is available in `PricePools`
     O.mapNullable((asset) => pools.find((pool) => pool.asset === asset)),
     // (2) If (1) fails, check if BUSDB pool is available in `PricePools`
-    O.fold(() => O.fromNullable(pools.find((pool) => pool.asset === PoolAsset.BUSDB)), O.some),
+    O.fold(() => O.fromNullable(pools.find((pool) => isBUSDAsset(pool.asset))), O.some),
     // (3) If (2) failes, return RUNE pool, which is always first entry in pools list
     O.getOrElse(() => head(pools))
   )
@@ -104,7 +104,7 @@ export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<Po
  */
 export const getPoolDetailsHashMap = (
   poolDetails: PoolDetails,
-  runeAsset: PoolAsset = getDefaultRuneAsset()
+  runeAsset: RUNEAsset = getDefaultRuneAsset()
 ): Record<string, PoolData> => {
   const res = poolDetails.reduce((acc, cur) => {
     if (!cur.asset) {
