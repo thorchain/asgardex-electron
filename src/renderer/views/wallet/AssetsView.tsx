@@ -11,7 +11,6 @@ import AssetsTable from '../../components/wallet/AssetsTable'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import * as walletRoutes from '../../routes/wallet'
-import { getDefaultRuneAsset } from '../../services/midgard/pools'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PricePoolAsset } from '../pools/types'
 
@@ -22,14 +21,13 @@ const AssetsView: React.FC = (): JSX.Element => {
 
   const {
     service: {
-      pools: { poolsState$, selectedPricePoolAsset$ }
+      pools: { getDefaultRuneAsset, poolsState$, selectedPricePoolAsset$ }
     }
   } = useMidgardContext()
 
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<O.Option<PricePoolAsset>>(
     selectedPricePoolAsset$,
-    // FIXME(@Veado) Depends on main/testnet - https://github.com/thorchain/asgardex-electron/issues/316
     O.some(getDefaultRuneAsset() as PricePoolAsset)
   )
 

@@ -22,6 +22,15 @@ const PRICE_POOL_KEY = 'asgdx-price-pool'
 const getSelectedPricePool = () =>
   FP.pipe(localStorage.getItem(PRICE_POOL_KEY), O.fromNullable, O.filter(isPricePoolAsset))
 
+const networkPools$ = pipe(network$, map(mapNetworkToPoolAssets))
+
+const getDefaultRuneAsset = () => mapNetworkToPoolAssets(getCurrentNetworkState()).RUNE
+
+const runeAsset$ = pipe(
+  networkPools$,
+  map((pool) => pool.RUNE)
+)
+
 const createPoolsService = (
   byzantine$: LiveData<Error, string>,
   getMidgardDefaultApi: (basePath: string) => DefaultApi
@@ -166,17 +175,10 @@ const createPoolsService = (
     setSelectedPricePool: setSelectedPricePoolAsset,
     selectedPricePoolAsset$,
     reloadPoolsState,
-    poolAddresses$
+    poolAddresses$,
+    runeAsset$,
+    getDefaultRuneAsset
   }
 }
 
-const networkPools$ = pipe(network$, map(mapNetworkToPoolAssets))
-
-const getDefaultRuneAsset = () => mapNetworkToPoolAssets(getCurrentNetworkState()).RUNE
-
-const runeAsset$ = pipe(
-  networkPools$,
-  map((pool) => pool.RUNE)
-)
-
-export { networkPools$, getDefaultRuneAsset, runeAsset$, createPoolsService, getSelectedPricePool }
+export { runeAsset$, createPoolsService, getDefaultRuneAsset, getSelectedPricePool }

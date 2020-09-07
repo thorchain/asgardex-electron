@@ -1,4 +1,4 @@
-import { AssetSymbol, assetToBase, assetAmount, assetFromString, Asset, bnOrZero } from '@thorchain/asgardex-util'
+import { AssetSymbol, assetToBase, assetAmount } from '@thorchain/asgardex-util'
 
 import {
   PricePoolCurrencySymbols,
@@ -36,12 +36,11 @@ export const RUNE_PRICE_POOL: PricePool = {
   poolData: { assetBalance: ONE_ASSET_BASE_AMOUNT, runeBalance: ONE_ASSET_BASE_AMOUNT }
 }
 
-export const getRunePricePool = (runeSymbol: PoolAsset) => ({
-  asset: runeSymbol,
-  poolData: { assetBalance: ONE_ASSET_BASE_AMOUNT, runeBalance: ONE_ASSET_BASE_AMOUNT }
-})
-
-export const RUNE_ASSET = { asset: assetFromString(PoolAsset.RUNE67C) as Asset, priceRune: bnOrZero(1) }
+export const getRunePricePool = (runeSymbol?: PoolAsset) =>
+  ({
+    asset: runeSymbol || PoolAsset.RUNE67C,
+    poolData: { assetBalance: ONE_ASSET_BASE_AMOUNT, runeBalance: ONE_ASSET_BASE_AMOUNT }
+  } as PricePool)
 
 // Whitelist of pools for pricing things
 export const PRICE_POOLS_WHITELIST: PricePoolAssets = [PoolAsset.BTC, PoolAsset.ETH, PoolAsset.BUSDB]

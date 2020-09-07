@@ -24,7 +24,6 @@ import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
-import { getDefaultRuneAsset } from '../../services/midgard/pools'
 import { PoolsState } from '../../services/midgard/types'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
@@ -42,7 +41,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const poolsRD = useObservableState(midgardService.pools.poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
     midgardService.pools.selectedPricePoolAsset$,
-    some(getDefaultRuneAsset() as PricePoolAsset)
+    some(midgardService.pools.getDefaultRuneAsset() as PricePoolAsset)
   )
   const thorchainLastblockRD = useObservableState(midgardService.thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(midgardService.thorchainConstantsState$, RD.pending)

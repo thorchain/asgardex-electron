@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
@@ -18,12 +18,11 @@ import ErrorView from '../../components/shared/error/ErrorView'
 import { Swap } from '../../components/swap/Swap'
 import BackLink from '../../components/uielements/backLink'
 import Button from '../../components/uielements/button'
-import { RUNE_ASSET, RUNE_PRICE_POOL } from '../../const'
+import { getRunePricePool } from '../../const'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { rdFromOption } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
-import { runeAsset$ } from '../../services/midgard/pools'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import * as Styled from './SwapView.styles'
 
@@ -34,13 +33,16 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
   const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
-  // const [tx] = useObservableState(() => transaction.txRD$, initial)
   const {
-    pools: { poolsState$, poolAddresses$, reloadPoolsState, selectedPricePoolAsset$ }
+    pools: { poolsState$, poolAddresses$, reloadPoolsState, selectedPricePoolAsset$, runeAsset$ }
   } = midgardService
   const { transaction, balancesState$, explorerUrl$ } = useBinanceContext()
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
+
+  const runeAsset = useObservableState(runeAsset$)
+
+  const runePricePool = useMemo(() => getRunePricePool(runeAsset), [runeAsset])
 
   const [selectedPool] = useObservableState(
     () =>
@@ -50,10 +52,8 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
           pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset)
         )
       ),
-    RUNE_PRICE_POOL
+    runePricePool
   )
-
-  const runeAsset = useObservableState(runeAsset$)
 
   const balances = useObservableState(balancesState$)
 
@@ -121,9 +121,8 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
 
               const hasRuneAsset = Boolean(availableAssets.find((asset) => asset.asset.symbol === runeAsset))
 
-              if (!hasRuneAsset) {
-                // @todo thatStrangeGuy add logic for mainnet
-                availableAssets.unshift(RUNE_ASSET)
+              if (!hasRuneAsset && runeAsset) {
+                availableAssets.unshift({ asset: assetFromString(runeAsset) as Asset, priceRune: bnOrZero(1) })
               }
 
               return (
