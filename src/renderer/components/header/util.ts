@@ -9,7 +9,7 @@ import { PoolAsset, PricePoolAsset } from '../../views/pools/types'
 
 export const toHeaderCurrencyLabel = (asset: PricePoolAsset): string => {
   let ticker = assetFromString(asset)?.ticker ?? 'unknown'
-  // special case TUSDB
+  // special case BUSDB
   if (asset === PoolAsset.BUSDB) ticker = 'USD'
   return `${CURRENCY_SYMBOLS[asset]} ${ticker}`
 }

@@ -69,7 +69,7 @@ export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolA
     oAsset,
     // (1) Check if `PricePool` is available in `PricePools`
     O.mapNullable((asset) => pools.find((pool) => pool.asset === asset)),
-    // (2) If (1) fails, check if TUSDB pool is available in `PricePools`
+    // (2) If (1) fails, check if BUSDB pool is available in `PricePools`
     O.fold(() => O.fromNullable(pools.find((pool) => pool.asset === PoolAsset.BUSDB)), O.some),
     // (3) If (2) failes, return RUNE pool, which is always first entry in pools list
     O.getOrElse(() => head(pools))

@@ -12,7 +12,7 @@ describe('view/pools/types', () => {
   })
 
   describe('isPricePoolAsset', () => {
-    it('returns true for TUSDB', () => {
+    it('returns true for BUSDB', () => {
       expect(isPricePoolAsset(PoolAsset.BUSDB)).toBeTruthy()
     })
     it('returns false for BNB', () => {
