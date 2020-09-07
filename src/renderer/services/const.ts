@@ -30,3 +30,6 @@ const networkPools = {
 }
 
 export const mapNetworkToPoolAssets = (network: Network) => networkPools[network]
+
+// Pagination: max. number of items
+export const MAX_PAGINATION_ITEMS = 10

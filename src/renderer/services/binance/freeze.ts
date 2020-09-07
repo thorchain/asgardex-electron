@@ -8,8 +8,7 @@ import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { getClient } from '../utils'
-import { ClientState } from './service'
-import { FreezeRD, FreezeTxParams } from './types'
+import { BinanceClientState$, FreezeRD, FreezeTxParams } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<FreezeRD>(RD.initial)
 
@@ -18,7 +17,7 @@ const tx$ = ({
   amount,
   asset,
   action
-}: { clientState$: ClientState } & FreezeTxParams): Rx.Observable<FreezeRD> =>
+}: { clientState$: BinanceClientState$ } & FreezeTxParams): Rx.Observable<FreezeRD> =>
   clientState$.pipe(
     map(getClient),
     switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY)),
@@ -43,10 +42,10 @@ const tx$ = ({
     startWith(RD.pending)
   )
 
-const pushTx = (clientState$: ClientState) => ({ amount, asset, action }: FreezeTxParams) =>
+const pushTx = (clientState$: BinanceClientState$) => ({ amount, asset, action }: FreezeTxParams) =>
   tx$({ clientState$, amount, asset, action }).subscribe(setTxRD)
 
-export const createFreezeService = (client$: ClientState) => ({
+export const createFreezeService = (client$: BinanceClientState$) => ({
   pushTx: pushTx(client$),
   resetTx: () => setTxRD(RD.initial),
   txRD$

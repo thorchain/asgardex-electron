@@ -1,7 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balances, BinanceClient, Txs, Transfer, Fees } from '@thorchain/asgardex-binance'
+import { Balances, BinanceClient, Transfer, Fees, TxPage } from '@thorchain/asgardex-binance'
 import { Asset, AssetAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
+import * as Rx from 'rxjs'
 
 import { ClientState } from '../types'
 
@@ -22,9 +23,10 @@ export type AssetsWithBalance = AssetWithBalance[]
 
 export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>
 
-export type TxsRD = RD.RemoteData<Error, Txs>
+export type TxsRD = RD.RemoteData<Error, TxPage>
 
 export type BinanceClientState = ClientState<BinanceClient>
+export type BinanceClientState$ = Rx.Observable<ClientState<BinanceClient>>
 
 export type TransferRD = RD.RemoteData<Error, Transfer>
 
@@ -73,3 +75,8 @@ export type TransferFees = {
 export type FeeRD = RD.RemoteData<Error, AssetAmount>
 export type FeesRD = RD.RemoteData<Error, Fees>
 export type TransferFeesRD = RD.RemoteData<Error, TransferFees>
+
+export type LoadTxsProps = {
+  limit: number
+  offset: number
+}

@@ -14,6 +14,7 @@ import Send from './Send'
 // eslint-disable-next-line
 const createServiceProp = (value: Observable<TransferRD>) => ({
   txRD$: value,
+  txWithState$: EMPTY,
   pushTx: () => of(RD.initial).subscribe(),
   resetTx: () => null
 })

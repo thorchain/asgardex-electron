@@ -1,3 +1,4 @@
+import { CheckOutlined } from '@ant-design/icons/lib'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -5,6 +6,8 @@ export const TxTimerWrapper = styled.div`
   position: relative;
   width: 100px;
   height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
 
   .timerchart-icon {
     position: absolute;
@@ -14,12 +17,17 @@ export const TxTimerWrapper = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: ${palette('background', 1)};
+    background: ${palette('gradient', 0)};
 
     width: 100%;
     height: 100%;
 
     .confirm-icon {
+      line-height: 1em;
+    }
+
+    &:empty {
+      display: none;
     }
   }
 
@@ -33,5 +41,12 @@ export const TxTimerWrapper = styled.div`
     &.hide {
       visibility: hidden;
     }
+  }
+`
+
+export const SuccessIcon = styled(CheckOutlined)`
+  svg {
+    width: 35px;
+    height: 35px;
   }
 `

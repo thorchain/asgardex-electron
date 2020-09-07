@@ -1,44 +1,37 @@
 import React, { useCallback, useState } from 'react'
 
 import { Asset, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
+import { useIntl } from 'react-intl'
 
 import { TxStatus } from '../../../types/asgardex'
+import { PricePoolAsset } from '../../../views/pools/types'
 import AssetData from '../../uielements/assets/assetData'
 import StepBar from '../../uielements/stepBar'
 import Trend from '../../uielements/trend'
 import TxTimer from '../../uielements/txTimer'
-import {
-  SwapModalWrapper,
-  SwapModalContent,
-  SwapModalContentRow,
-  TimerContainer,
-  CoinDataWrapper,
-  CoinDataContainer,
-  SwapInfoWrapper,
-  HashWrapper,
-  BtnCopyWrapper,
-  ViewButton,
-  ViewTransaction
-} from './SwapModal.style'
+import * as Styled from './SwapModal.style'
 import { CalcResult } from './types'
 
 type Props = {
+  baseAsset?: PricePoolAsset
   calcResult: CalcResult
-  isCompleted?: boolean
-  priceFrom?: BaseAmount
-  priceTo?: BaseAmount
   swapSource: Asset
   swapTarget: Asset
   txStatus: TxStatus
+  isCompleted?: boolean
+  priceFrom?: BaseAmount
+  priceTo?: BaseAmount
   visible?: boolean
   onClose?: () => void
   onChangeTxTimer?: () => void
   onEndTxTimer?: () => void
   onClickFinish?: () => void
+  onViewTxClick?: (e: React.MouseEvent) => void
 }
 
 const SwapModal: React.FC<Props> = (props): JSX.Element => {
   const {
+    baseAsset,
     calcResult,
     isCompleted = false,
     priceFrom = baseAmount(0),
@@ -50,11 +43,13 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
     onClose = () => {},
     onChangeTxTimer = () => {},
     onClickFinish = () => {},
-    onEndTxTimer = () => {}
+    onEndTxTimer = () => {},
+    onViewTxClick = () => {}
   } = props
   const [openSwapModal, setOpenSwapModal] = useState<boolean>(visible)
+  const intl = useIntl()
 
-  const swapTitle = isCompleted ? 'YOU SWAPPED' : 'YOU ARE SWAPPING'
+  const swapTitleKey = isCompleted ? 'swap.state.success' : 'swap.state.pending'
   const { slip: slipAmount } = calcResult
   const { status, value, startTime, hash } = txStatus
 
@@ -64,47 +59,52 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
   }, [openSwapModal, onClose])
 
   return (
-    <SwapModalWrapper title={swapTitle} visible={openSwapModal} footer={null} onCancel={onCloseModal}>
-      <SwapModalContent>
-        <SwapModalContentRow>
-          <TimerContainer>
+    <Styled.SwapModalWrapper
+      title={intl.formatMessage({ id: swapTitleKey })}
+      visible={openSwapModal}
+      footer={null}
+      onCancel={onCloseModal}>
+      <Styled.SwapModalContent>
+        <Styled.SwapModalContentRow>
+          <Styled.TimerContainer>
             <TxTimer
               status={status}
               value={value}
               maxValue={100}
               maxSec={45}
+              maxDuration={Number.MAX_SAFE_INTEGER}
               startTime={startTime}
               onChange={onChangeTxTimer}
               onEnd={onEndTxTimer}
             />
-          </TimerContainer>
-          <CoinDataWrapper>
+          </Styled.TimerContainer>
+          <Styled.CoinDataWrapper>
             <StepBar size={50} />
-            <CoinDataContainer>
-              <AssetData asset={swapSource} price={priceFrom} />
-              <AssetData asset={swapTarget} price={priceTo} />
-            </CoinDataContainer>
-          </CoinDataWrapper>
-        </SwapModalContentRow>
-        <SwapInfoWrapper>
+            <Styled.CoinDataContainer>
+              <AssetData priceBaseAsset={baseAsset} asset={swapSource} price={priceFrom} />
+              <AssetData priceBaseAsset={baseAsset} asset={swapTarget} price={priceTo} />
+            </Styled.CoinDataContainer>
+          </Styled.CoinDataWrapper>
+        </Styled.SwapModalContentRow>
+        <Styled.SwapInfoWrapper>
           <Trend amount={slipAmount} />
           {hash && (
-            <HashWrapper>
-              <BtnCopyWrapper>
+            <Styled.HashWrapper>
+              <Styled.BtnCopyWrapper>
                 {isCompleted && (
-                  <ViewButton color="success" onClick={onClickFinish}>
-                    FINISH
-                  </ViewButton>
+                  <Styled.ViewButton color="success" onClick={onClickFinish}>
+                    {intl.formatMessage({ id: 'common.finish' })}
+                  </Styled.ViewButton>
                 )}
-                <ViewTransaction href="#" target="_blank" rel="noopener noreferrer">
-                  VIEW TRANSACTION
-                </ViewTransaction>
-              </BtnCopyWrapper>
-            </HashWrapper>
+                <Styled.ViewTransaction onClick={onViewTxClick} href="#" target="_blank" rel="noopener noreferrer">
+                  {intl.formatMessage({ id: 'swap.viewTransaction' })}
+                </Styled.ViewTransaction>
+              </Styled.BtnCopyWrapper>
+            </Styled.HashWrapper>
           )}
-        </SwapInfoWrapper>
-      </SwapModalContent>
-    </SwapModalWrapper>
+        </Styled.SwapInfoWrapper>
+      </Styled.SwapModalContent>
+    </Styled.SwapModalWrapper>
   )
 }
 

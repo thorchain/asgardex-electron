@@ -7,6 +7,8 @@ import Footer from './components/Footer'
 import Header from './components/header/Header'
 import { AppProvider } from './contexts/AppContext'
 import { BinanceProvider } from './contexts/BinanceContext'
+import { BitcoinProvider } from './contexts/BitcoinContext'
+import { EthereumProvider } from './contexts/EthereumContext'
 import { I18nProvider } from './contexts/I18nContext'
 import { MidgardProvider } from './contexts/MidgardContext'
 import { ThemeProvider } from './contexts/ThemeContext'
@@ -38,15 +40,19 @@ const App: React.FC<Props> = (_): JSX.Element => {
     <AppProvider>
       <WalletProvider>
         <BinanceProvider>
-          <MidgardProvider>
-            <I18nProvider>
-              <Router>
-                <ThemeProvider>
-                  <AppView />
-                </ThemeProvider>
-              </Router>
-            </I18nProvider>
-          </MidgardProvider>
+          <BitcoinProvider>
+            <EthereumProvider>
+              <MidgardProvider>
+                <I18nProvider>
+                  <Router>
+                    <ThemeProvider>
+                      <AppView />
+                    </ThemeProvider>
+                  </Router>
+                </I18nProvider>
+              </MidgardProvider>
+            </EthereumProvider>
+          </BitcoinProvider>
         </BinanceProvider>
       </WalletProvider>
     </AppProvider>

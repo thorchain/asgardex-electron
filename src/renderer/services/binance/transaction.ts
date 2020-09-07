@@ -1,16 +1,18 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@thorchain/asgardex-binance'
+import { WS } from '@thorchain/asgardex-binance'
 import { AssetAmount, Asset } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
+import * as RxOperators from 'rxjs/operators'
 
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { getClient } from '../utils'
-import { ClientState } from './service'
-import { TransferRD } from './types'
+import { TransferRD, BinanceClientState$ } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TransferRD>(RD.initial)
 
@@ -27,7 +29,7 @@ const tx$ = ({
   amount,
   asset: { symbol },
   memo
-}: { clientState$: ClientState } & SendTxParams): Rx.Observable<TransferRD> =>
+}: { clientState$: BinanceClientState$ } & SendTxParams): Rx.Observable<TransferRD> =>
   clientState$.pipe(
     map(getClient),
     switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY)),
@@ -44,11 +46,25 @@ const tx$ = ({
     startWith(RD.pending)
   )
 
-const pushTx = (clientState$: ClientState) => ({ to, amount, asset, memo }: SendTxParams) =>
+const pushTx = (clientState$: BinanceClientState$) => ({ to, amount, asset, memo }: SendTxParams) =>
   tx$({ clientState$, to, amount, asset, memo }).subscribe(setTxRD)
 
-export const createTransactionService = (client$: ClientState) => ({
+export const createTransactionService = (
+  client$: BinanceClientState$,
+  wsTransfer$: Rx.Observable<O.Option<WS.Transfer>>
+) => ({
   txRD$,
+  txWithState$: pipe(
+    Rx.combineLatest([txRD$, wsTransfer$]),
+
+    RxOperators.map(([tx, state]) =>
+      pipe(
+        tx,
+        RD.map((tx) => ({ tx, state }))
+      )
+    ),
+    RxOperators.catchError((e) => Rx.of(RD.failure(e)))
+  ),
   pushTx: pushTx(client$),
   resetTx: () => setTxRD(RD.initial)
 })

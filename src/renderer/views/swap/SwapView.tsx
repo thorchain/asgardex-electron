@@ -11,17 +11,20 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
+import * as Rx from 'rxjs'
+import * as RxOperators from 'rxjs/operators'
 
 import ErrorView from '../../components/shared/error/ErrorView'
 import { Swap } from '../../components/swap/Swap'
 import BackLink from '../../components/uielements/backLink'
 import Button from '../../components/uielements/button'
-import { RUNE_ASSET } from '../../const'
+import { RUNE_ASSET, RUNE_PRICE_POOL } from '../../const'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { rdFromOption } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
 import { runeAsset$ } from '../../services/midgard/pools'
+import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import * as Styled from './SwapView.styles'
 
 type Props = {}
@@ -31,18 +34,30 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
   const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
-  const { transaction } = useBinanceContext()
-  const [tx] = useObservableState(() => transaction.txRD$, initial)
+  // const [tx] = useObservableState(() => transaction.txRD$, initial)
   const {
-    pools: { poolsState$, poolAddresses$, reloadPoolsState }
+    pools: { poolsState$, poolAddresses$, reloadPoolsState, selectedPricePoolAsset$ }
   } = midgardService
+  const { transaction, balancesState$, explorerUrl$ } = useBinanceContext()
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
-  const { balancesState$, explorerUrl$ } = useBinanceContext()
+
+  const [selectedPool] = useObservableState(
+    () =>
+      pipe(
+        Rx.combineLatest([poolsState$, selectedPricePoolAsset$]),
+        RxOperators.map(([poolsState, selectedPricePoolAsset]) =>
+          pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset)
+        )
+      ),
+    RUNE_PRICE_POOL
+  )
 
   const runeAsset = useObservableState(runeAsset$)
 
   const balances = useObservableState(balancesState$)
+
+  const [txWithState] = useObservableState(() => transaction.txWithState$, RD.initial)
 
   const onConfirmSwap = useCallback(
     (source: Asset, amount: AssetAmount, memo: string) => {
@@ -114,7 +129,8 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
               return (
                 <Swap
                   runeAsset={runeAsset}
-                  tx={tx}
+                  activePricePool={selectedPool}
+                  txWithState={txWithState}
                   resetTx={transaction.resetTx}
                   goToTransaction={goToTransaction}
                   sourceAsset={O.fromNullable(assetFromString(source.toUpperCase()))}

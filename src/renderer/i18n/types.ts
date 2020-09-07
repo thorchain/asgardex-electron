@@ -116,7 +116,16 @@ type SettingMessageKey =
 
 export type SettingMessages = { [key in SettingMessageKey]: string }
 
-type SwapMessageKey = 'swap.swapping' | 'swap.input' | 'swap.balance' | 'swap.output' | 'swap.drag' | 'swap.searchAsset'
+type SwapMessageKey =
+  | 'swap.input'
+  | 'swap.balance'
+  | 'swap.output'
+  | 'swap.drag'
+  | 'swap.searchAsset'
+  | 'swap.state.pending'
+  | 'swap.state.success'
+  | 'swap.viewTransaction'
+  | 'swap.swapping'
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 

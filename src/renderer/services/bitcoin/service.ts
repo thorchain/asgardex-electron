@@ -4,9 +4,10 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, shareReplay } from 'rxjs/operators'
+import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators'
 
 import { envOrDefault } from '../../helpers/envHelper'
+import * as fpHelpers from '../../helpers/fpHelpers'
 import { observableState } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import { ClientStateForViews } from '../types'
@@ -78,13 +79,13 @@ const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(
  * If a client is not available (e.g. by removing keystore), it returns `None`
  *
  */
-// const address$: Observable<O.Option<Address>> = client$.pipe(
-//   map(FP.pipe(O.chain((client) => FP.pipe(client.getAddress(), O.fromNullable)))),
-//   distinctUntilChanged(fpHelpers.eqOString.equals),
-//   shareReplay(1)
-// )
+const address$: Observable<O.Option<string>> = client$.pipe(
+  map(FP.pipe(O.chain((client) => O.some(client.getAddress())))),
+  distinctUntilChanged(fpHelpers.eqOString.equals),
+  shareReplay(1)
+)
 
 /**
  * Object with all "public" functions and observables
  */
-export { client$, setKeystoreState, clientViewState$ }
+export { client$, setKeystoreState, clientViewState$, address$ }
