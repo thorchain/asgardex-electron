@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { Asset, assetToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { Asset, assetToString, formatAssetAmountCurrency, baseToAsset } from '@thorchain/asgardex-util'
 import { Menu, Dropdown, Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 
-import { AssetsWithBalance } from '../../services/binance/types'
+import { AssetsWithBalance } from '../../services/wallet/types'
 import AssetIcon from '../uielements/assets/assetIcon'
 import { Size as CoinSize } from '../uielements/assets/assetIcon/types'
 import * as Styled from './AccountSelector.style'
@@ -31,12 +31,12 @@ const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
     () => (
       <Menu>
         {filteredAssets.map((assetWB, i: number) => {
-          const { asset, balance } = assetWB
+          const { asset, amount } = assetWB
           return (
             <Menu.Item key={i} onClick={() => onChange(asset)}>
               <Row gutter={[8, 0]}>
                 <Col>{asset.symbol} </Col>
-                <Col>{formatAssetAmountCurrency(balance, assetToString(asset))}</Col>
+                <Col>{formatAssetAmountCurrency(baseToAsset(amount), assetToString(asset))}</Col>
               </Row>
             </Menu.Item>
           )

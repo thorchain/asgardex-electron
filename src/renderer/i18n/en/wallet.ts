@@ -41,6 +41,7 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeNumber': 'Amount should be a number',
   'wallet.errors.amount.shouldBeGreaterThan': 'Amount should be greater than {amount}',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Amount should be less than your balance',
+  'wallet.errors.amount.shouldBeLessThanFrozenBalance': 'Amount should be less than your frozen value',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee': 'Amount should be less than your balance minus fee',
   'wallet.errors.fee.notCovered': 'Fees are not covered by your balance ({balance})'
 }

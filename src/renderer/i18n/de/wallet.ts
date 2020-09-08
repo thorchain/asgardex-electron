@@ -41,6 +41,8 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeNumber': 'Der eingegebene Wert sollte eine Nummer sein',
   'wallet.errors.amount.shouldBeGreaterThan': 'Der eingegebene Wert sollte höher als {amount} betragen',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Der eingegebene Wert sollte nicht höher als Ihr Guthaben sein',
+  'wallet.errors.amount.shouldBeLessThanFrozenBalance':
+    'Der eingegebene Wert sollte nicht höher als Ihr eingefrorenes Guthaben sein',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Der eingegebene Wert sollte nicht höher als Ihr Guthaben abzgl. Gebühren sein',
   'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Ihr Guthaben ({balance}) gedeckt'

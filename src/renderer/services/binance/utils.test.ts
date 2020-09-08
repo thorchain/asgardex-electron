@@ -5,7 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { PoolAsset } from '../../views/pools/types'
 import { PoolDetails } from '../midgard/types'
-import { WalletBalance } from '../wallet/types'
+import { AssetWithBalance } from '../wallet/types'
 import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue, getWalletBalances } from './utils'
 
 describe('services/binance/utils/', () => {
@@ -23,9 +23,10 @@ describe('services/binance/utils/', () => {
     }
 
     it('returns a price for BNB in USD', () => {
-      const balance: WalletBalance = {
+      const balance: AssetWithBalance = {
         amount: baseAmount('1'),
-        asset: O.fromNullable(assetFromString('BNB.BNB'))
+        frozenAmount: O.none,
+        asset: assetFromString('BNB.BNB') || EMPTY_ASSET
       }
       const result = FP.pipe(
         getPoolPriceValue(balance, poolDetails, usdPool),
@@ -38,9 +39,10 @@ describe('services/binance/utils/', () => {
     })
 
     it('returns a price for RUNE in USD', () => {
-      const balance: WalletBalance = {
+      const balance: AssetWithBalance = {
         amount: baseAmount('1'),
-        asset: O.fromNullable(assetFromString('BNB.RUNE-67C'))
+        frozenAmount: O.none,
+        asset: assetFromString('BNB.RUNE-67C') || EMPTY_ASSET
       }
       const result = FP.pipe(
         getPoolPriceValue(balance, [], usdPool),
@@ -53,9 +55,10 @@ describe('services/binance/utils/', () => {
     })
 
     it('returns a no price if no pools are available', () => {
-      const balance: WalletBalance = {
+      const balance: AssetWithBalance = {
         amount: baseAmount('1'),
-        asset: O.fromNullable(assetFromString('BNB.BNB'))
+        frozenAmount: O.none,
+        asset: assetFromString('BNB.BNB') || EMPTY_ASSET
       }
       const result = getPoolPriceValue(balance, [], usdPool)
       expect(result).toBeNone()
@@ -84,40 +87,56 @@ describe('services/binance/utils/', () => {
   })
 
   describe('getWalletBalances', () => {
-    it('maps `Balances` -> `WalletBalances`', () => {
+    it('maps `Balances` -> `AssetWithBalances`', () => {
       const balances: Balances = [
         {
           free: '1',
           symbol: 'BNB',
           locked: '',
-          frozen: ''
+          frozen: '11'
         },
         {
           free: '2',
           symbol: 'RUNE-B1A',
           locked: '',
           frozen: ''
+        },
+        // invalid data (invalid symbol)
+        {
+          free: '3',
+          symbol: '',
+          locked: '',
+          frozen: ''
         }
       ]
-
       const result = getWalletBalances(balances)
-      expect(result[0].asset).toEqual(
-        O.some({
-          chain: 'BNB',
-          symbol: 'BNB',
-          ticker: 'BNB'
-        })
-      )
+      // ignore invalid data, that's 2 balances only
+      expect(result.length).toEqual(2)
 
+      // check BNB balance
+      expect(result[0].asset).toEqual({
+        chain: 'BNB',
+        symbol: 'BNB',
+        ticker: 'BNB'
+      })
       expect(result[0].amount.amount()).toEqual(assetToBase(assetAmount(1)).amount())
-      expect(result[1].asset).toEqual(
-        O.some({
-          chain: 'BNB',
-          symbol: 'RUNE-B1A',
-          ticker: 'RUNE'
-        })
-      )
+      expect(
+        FP.pipe(
+          result[0].frozenAmount,
+          // Check transformation of `AssetAmount` to `BaseAmount`
+          O.map((a) => a.amount().isEqualTo(1100000000)),
+          O.getOrElse(() => false)
+        )
+      ).toBeTruthy()
+
+      // Check RUNE balance
+      expect(result[1].asset).toEqual({
+        chain: 'BNB',
+        symbol: 'RUNE-B1A',
+        ticker: 'RUNE'
+      })
       expect(result[1].amount.amount()).toEqual(assetToBase(assetAmount(2)).amount())
+      expect(result[1].frozenAmount).toBeNone()
     })
   })
 })

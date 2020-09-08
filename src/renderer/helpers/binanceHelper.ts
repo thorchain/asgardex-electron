@@ -1,19 +1,11 @@
-import { Balance, Fees, isTransferFee, isFee, Fee } from '@thorchain/asgardex-binance'
-import { Asset, bnOrZero, assetAmount, AssetAmount, baseAmount, baseToAsset } from '@thorchain/asgardex-util'
+import { Fees, isTransferFee, isFee, Fee } from '@thorchain/asgardex-binance'
+import { Asset, AssetAmount, baseAmount, baseToAsset } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { TransferFees, AssetsWithBalance } from '../services/binance/types'
-import { isBnbAsset } from './assetHelper'
-
-type PickBalanceAmount = Pick<Balance, 'symbol' | 'free'>
-
-export const balanceByAsset = (txs: PickBalanceAmount[], asset: Asset): AssetAmount => {
-  const tx = txs.find(({ symbol }) => symbol === asset.symbol)
-  return assetAmount(bnOrZero(tx?.free))
-}
+import { TransferFees } from '../services/binance/types'
 
 export const isMiniToken = ({ symbol }: Pick<Asset, 'symbol'>): boolean => {
   const [, two] = symbol.split('-')
@@ -54,11 +46,4 @@ export const getSingleTxFee = (oTransferFees: O.Option<TransferFees>): O.Option<
   FP.pipe(
     oTransferFees,
     O.map((f) => f.single)
-  )
-
-export const getBnbAmount = (assets: AssetsWithBalance): O.Option<AssetAmount> =>
-  FP.pipe(
-    assets,
-    A.findFirst(({ asset }) => isBnbAsset(asset)),
-    O.map(({ balance }) => balance)
   )

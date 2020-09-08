@@ -8,20 +8,10 @@ import { ClientState } from '../types'
 
 export type BalancesRD = RD.RemoteData<Error, Balances>
 
-export type AssetWithBalance = {
-  asset: Asset
-  balance: AssetAmount
-  frozenBalance?: AssetAmount
-}
-
 export type AssetWithPrice = {
   asset: Asset
   priceRune: BigNumber
 }
-
-export type AssetsWithBalance = AssetWithBalance[]
-
-export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>
 
 export type TxsRD = RD.RemoteData<Error, TxPage>
 

@@ -13,11 +13,11 @@ const address = O.some(WALLET_ADDRESS_TESTNET)
 storiesOf('Wallet/AssetsDetails', module)
   .add('BNB', () => {
     return (
-      <AssetDetails txsRD={RD.initial} balancesRD={RD.initial} address={address} asset={O.some(ASSETS_TESTNET.BNB)} />
+      <AssetDetails txsRD={RD.initial} assetsRD={RD.initial} address={address} asset={O.some(ASSETS_TESTNET.BNB)} />
     )
   })
   .add('RUNE', () => {
     return (
-      <AssetDetails txsRD={RD.initial} balancesRD={RD.initial} address={address} asset={O.some(ASSETS_TESTNET.RUNE)} />
+      <AssetDetails txsRD={RD.initial} assetsRD={RD.initial} address={address} asset={O.some(ASSETS_TESTNET.RUNE)} />
     )
   })

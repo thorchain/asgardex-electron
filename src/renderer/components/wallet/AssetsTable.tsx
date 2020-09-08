@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { EMPTY_ASSET, formatAssetAmountCurrency, baseToAsset, Asset, assetToString } from '@thorchain/asgardex-util'
+import { formatAssetAmountCurrency, baseToAsset, Asset, assetToString } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/lib/function'
@@ -12,7 +12,7 @@ import { RUNE_PRICE_POOL } from '../../const'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getPoolPriceValue } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
-import { WalletBalancesRD, WalletBalances, WalletBalance } from '../../services/wallet/types'
+import { AssetsWithBalanceRD, AssetsWithBalance, AssetWithBalance } from '../../services/wallet/types'
 import { PricePool } from '../../views/pools/types'
 import ErrorView from '../shared/error/ErrorView'
 import AssetIcon from '../uielements/assets/assetIcon'
@@ -20,51 +20,33 @@ import Label from '../uielements/label'
 import { TableWrapper } from './AssetsTable.style'
 
 type Props = {
-  balancesRD: WalletBalancesRD
+  assetsRD: AssetsWithBalanceRD
   pricePool?: PricePool
   poolDetails: PoolDetails
-  selectAssetHandler?: (asset: O.Option<Asset>) => void
+  selectAssetHandler?: (asset: Asset) => void
 }
 
 const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
-  const { balancesRD, pricePool = RUNE_PRICE_POOL, poolDetails, selectAssetHandler = (_) => {} } = props
+  const { assetsRD, pricePool = RUNE_PRICE_POOL, poolDetails, selectAssetHandler = (_) => {} } = props
 
   const intl = useIntl()
 
   // store previous data of balances to still render these while reloading new data
-  const previousBalances = useRef<O.Option<WalletBalances>>(O.none)
+  const previousBalances = useRef<O.Option<AssetsWithBalance>>(O.none)
 
-  const iconColumn: ColumnType<WalletBalance> = useMemo(
+  const iconColumn: ColumnType<AssetWithBalance> = useMemo(
     () => ({
       title: '',
-      render: ({ asset: oAsset }: WalletBalance) => {
-        const asset = FP.pipe(
-          oAsset,
-          O.getOrElse(() => EMPTY_ASSET)
-        )
-        return <AssetIcon asset={asset} size="normal" />
-      }
+      render: ({ asset }: AssetWithBalance) => <AssetIcon asset={asset} size="normal" />
     }),
     []
   )
 
-  const renderNameColumn = ({ asset: oAsset }: WalletBalance) => {
-    const name = FP.pipe(
-      oAsset,
-      O.map((a) => a.symbol),
-      O.getOrElse(() => '--')
-    )
-    return <Label>{name}</Label>
-  }
+  const renderNameColumn = ({ asset }: AssetWithBalance) => <Label>{asset.symbol}</Label>
+  const sortNameColumn = ({ asset: a }: AssetWithBalance, { asset: b }: AssetWithBalance) =>
+    a.symbol.localeCompare(b.symbol)
 
-  const sortNameColumn = ({ asset: oAssetA }: WalletBalance, { asset: oAssetB }: WalletBalance) =>
-    FP.pipe(
-      sequenceTOption(oAssetA, oAssetB),
-      O.map(([a, b]) => a.symbol.localeCompare(b.symbol)),
-      O.getOrElse(() => 0)
-    )
-
-  const nameColumn: ColumnType<WalletBalance> = useMemo(
+  const nameColumn: ColumnType<AssetWithBalance> = useMemo(
     () => ({
       title: intl.formatMessage({ id: 'wallet.column.name' }),
       align: 'left',
@@ -76,24 +58,11 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     [intl]
   )
 
-  const renderTickerColumn = ({ asset: oAsset }: WalletBalance) => {
-    const ticker = FP.pipe(
-      oAsset,
-      O.map((a) => a.ticker),
-      // "empty" label if we don't get a ticker
-      O.getOrElse(() => '--')
-    )
-    return <Label nowrap>{ticker}</Label>
-  }
+  const renderTickerColumn = ({ asset }: AssetWithBalance) => <Label nowrap>{asset.ticker}</Label>
+  const sortTickerColumn = ({ asset: a }: AssetWithBalance, { asset: b }: AssetWithBalance) =>
+    a.ticker.localeCompare(b.ticker)
 
-  const sortTickerColumn = ({ asset: oAssetA }: WalletBalance, { asset: oAssetB }: WalletBalance) =>
-    FP.pipe(
-      sequenceTOption(oAssetA, oAssetB),
-      O.map(([a, b]) => a.ticker.localeCompare(b.ticker)),
-      O.getOrElse(() => 0)
-    )
-
-  const tickerColumn: ColumnType<WalletBalance> = useMemo(
+  const tickerColumn: ColumnType<AssetWithBalance> = useMemo(
     () => ({
       title: intl.formatMessage({ id: 'wallet.column.ticker' }),
       align: 'left',
@@ -104,29 +73,25 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     [intl]
   )
 
-  const renderBalanceColumn = ({ asset: oAsset, amount }: WalletBalance) => {
-    const balance = FP.pipe(
-      oAsset,
-      O.map(assetToString),
-      O.map((assetString) => formatAssetAmountCurrency(baseToAsset(amount), assetString, 3)),
-      O.toUndefined
-    )
+  const renderBalanceColumn = ({ asset, amount }: AssetWithBalance) => {
+    const assetString = assetToString(asset)
+    const balance = formatAssetAmountCurrency(baseToAsset(amount), assetString, 3)
     return <Label nowrap>{balance}</Label>
   }
 
-  const balanceColumn: ColumnType<WalletBalance> = useMemo(
+  const balanceColumn: ColumnType<AssetWithBalance> = useMemo(
     () => ({
       title: intl.formatMessage({ id: 'wallet.column.balance' }),
       align: 'left',
       render: renderBalanceColumn,
-      sorter: (a: WalletBalance, b: WalletBalance) => a.amount.amount().comparedTo(b.amount.amount()),
+      sorter: (a: AssetWithBalance, b: AssetWithBalance) => a.amount.amount().comparedTo(b.amount.amount()),
       sortDirections: ['descend', 'ascend']
     }),
     [intl]
   )
 
   const renderPriceColumn = useCallback(
-    (balance: WalletBalance) => {
+    (balance: AssetWithBalance) => {
       const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
       const label = FP.pipe(
         oPrice,
@@ -139,12 +104,12 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     [poolDetails, pricePool]
   )
 
-  const priceColumn: ColumnType<WalletBalance> = useMemo(
+  const priceColumn: ColumnType<AssetWithBalance> = useMemo(
     () => ({
       title: intl.formatMessage({ id: 'wallet.column.value' }),
       align: 'left',
       render: renderPriceColumn,
-      sorter: (a: WalletBalance, b: WalletBalance) => {
+      sorter: (a: AssetWithBalance, b: AssetWithBalance) => {
         const oPriceA = getPoolPriceValue(a, poolDetails, pricePool.poolData)
         const oPriceB = getPoolPriceValue(b, poolDetails, pricePool.poolData)
         return FP.pipe(
@@ -163,7 +128,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const columns = [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn]
 
   const onRow = useCallback(
-    ({ asset }: WalletBalance) => {
+    ({ asset }: AssetWithBalance) => {
       return {
         onClick: () => selectAssetHandler(asset)
       }
@@ -171,7 +136,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     [selectAssetHandler]
   )
   const renderAssetsTable = useCallback(
-    (balances: WalletBalances, loading = false) => {
+    (balances: AssetsWithBalance, loading = false) => {
       return <TableWrapper dataSource={balances} loading={loading} rowKey={'tx'} onRow={onRow} columns={columns} />
     },
     [columns, onRow]
@@ -185,7 +150,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
           () => renderAssetsTable([], true),
           // loading state
           () => {
-            const pools = O.getOrElse(() => [] as WalletBalances)(previousBalances.current)
+            const pools = O.getOrElse(() => [] as AssetsWithBalance)(previousBalances.current)
             return renderAssetsTable(pools, true)
           },
           // error state
@@ -194,14 +159,14 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
             return <ErrorView title={msg} />
           },
           // success state
-          (balances: WalletBalances): JSX.Element => {
+          (balances: AssetsWithBalance): JSX.Element => {
             previousBalances.current = O.some(balances)
             return renderAssetsTable(balances)
           }
-        )(balancesRD)}
+        )(assetsRD)}
       </>
     ),
-    [balancesRD, renderAssetsTable]
+    [assetsRD, renderAssetsTable]
   )
 
   return (

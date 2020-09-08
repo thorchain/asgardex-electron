@@ -3,7 +3,6 @@ import React, { useMemo, useCallback } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetToString } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
-import * as FP from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
@@ -16,8 +15,8 @@ import { PricePoolAsset } from '../pools/types'
 
 const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const { balancesState$ } = useBinanceContext()
-  const balancesRD = useObservableState(balancesState$, RD.initial)
+  const { assetsWB$ } = useBinanceContext()
+  const balancesRD = useObservableState(assetsWB$, RD.initial)
 
   const {
     service: {
@@ -37,11 +36,7 @@ const AssetsView: React.FC = (): JSX.Element => {
   ])
 
   const selectAssetHandler = useCallback(
-    (oAsset: O.Option<Asset>) =>
-      FP.pipe(
-        oAsset,
-        O.map((asset) => history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset) })))
-      ),
+    (asset: Asset) => history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset) })),
     [history]
   )
 
@@ -49,7 +44,7 @@ const AssetsView: React.FC = (): JSX.Element => {
 
   return (
     <AssetsTable
-      balancesRD={balancesRD}
+      assetsRD={balancesRD}
       pricePool={pricePool}
       poolDetails={poolDetails}
       selectAssetHandler={selectAssetHandler}
