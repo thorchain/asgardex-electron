@@ -53,18 +53,8 @@ const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
   }, [])
 
   const ref: RefObject<HTMLDivElement> = useRef(null)
-  /**
-   * If we handle this callback on the bubbling phase there is next scenario
-   *  - user clicks to the 'open menu' button
-   *  - events are handled on the bubbling phase
-   *  - engine calls 'open' callback
-   *  - engine calls clickOutsideCallback
-   *  - filter menu closes right after  the click on the 'open' button
-   *
-   * To avoid this here is a need to call outside click event BEFORE
-   * calling 'open' callback and handle an event on the capturing phase
-   */
-  useClickOutside<HTMLDivElement>(ref, () => closeMenu && closeMenu(), true)
+
+  useClickOutside<HTMLDivElement>(ref, () => closeMenu && closeMenu())
 
   const filteredData: T[] = useMemo(
     () => (searchTerm === '' ? data : data.filter((item) => filterFunction(item, searchTerm))),
