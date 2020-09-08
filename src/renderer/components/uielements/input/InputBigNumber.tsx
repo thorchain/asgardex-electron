@@ -51,6 +51,10 @@ export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
     }
   }, [enteredValue, onChange, focus, decimal])
 
+  useEffect(() => {
+    setEnteredValue(O.some(value.toString()))
+  }, [value])
+
   const onFocusHandler = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       const { target } = event
