@@ -8,7 +8,8 @@ import {
   assetAmount,
   AssetAmount,
   formatAssetAmount,
-  bn
+  bn,
+  baseToAsset
 } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -18,12 +19,13 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { isBnbAsset, BNB_SYMBOL } from '../../../helpers/assetHelper'
-import { getBnbAmount } from '../../../helpers/binanceHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { trimZeros } from '../../../helpers/stringHelper'
+import { getBnbAmountFromBalances } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { SendTxParams } from '../../../services/binance/transaction'
-import { AssetWithBalance, AddressValidation, AssetsWithBalance } from '../../../services/binance/types'
+import { AddressValidation } from '../../../services/binance/types'
+import { AssetsWithBalance, AssetWithBalance } from '../../../services/wallet/types'
 import { Input, InputBigNumber } from '../../uielements/input'
 import AccountSelector from './../AccountSelector'
 import * as Styled from './Form.style'
@@ -51,13 +53,13 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
 
   const [form] = Form.useForm<FormValues>()
 
-  const oBnbAmount = useMemo(() => {
+  const oBnbAmount: O.Option<AssetAmount> = useMemo(() => {
     // return balance of current asset (if BNB)
     if (isBnbAsset(assetWB.asset)) {
-      return O.some(assetWB.balance)
+      return O.some(baseToAsset(assetWB.amount))
     }
     // or check list of other assets to get bnb balance
-    return FP.pipe(assetsWB, getBnbAmount)
+    return FP.pipe(assetsWB, getBnbAmountFromBalances)
   }, [assetWB, assetsWB])
 
   const feeLabel = useMemo(
@@ -94,7 +96,10 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
 
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
-      { fee: formatAssetAmount(amount, 6), balance: `${formatAssetAmount(amount, 8)} ${BNB_SYMBOL}` }
+      {
+        fee: formatAssetAmount(amount, 6),
+        balance: `${formatAssetAmount(amount, 8)} ${BNB_SYMBOL}`
+      }
     )
 
     return (
@@ -128,7 +133,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
         ),
         assetAmount
       )
-      const maxAmount = isBnbAsset(assetWB.asset) ? maxBnbAmount : assetWB.balance
+      const maxAmount = isBnbAsset(assetWB.asset) ? maxBnbAmount : baseToAsset(assetWB.amount)
       // error messages
       const errors = {
         msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
@@ -178,7 +183,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
             <Styled.StyledLabel size="big">
               <>
                 {intl.formatMessage({ id: 'common.max' })}:{' '}
-                {formatAssetAmountCurrency(assetWB.balance, assetToString(assetWB.asset), 8)}
+                {formatAssetAmountCurrency(baseToAsset(assetWB.amount), assetToString(assetWB.asset), 8)}
                 <br />
                 {intl.formatMessage({ id: 'common.fees' })}: {feeLabel}
               </>

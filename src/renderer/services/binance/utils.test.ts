@@ -1,11 +1,12 @@
-import { Balance } from '@thorchain/asgardex-binance'
-import { assetToBase, assetAmount, PoolData, EMPTY_ASSET } from '@thorchain/asgardex-util'
+import { Balances } from '@thorchain/asgardex-binance'
+import { assetToBase, assetAmount, PoolData, EMPTY_ASSET, baseAmount, assetFromString } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { PoolAsset } from '../../views/pools/types'
 import { PoolDetails } from '../midgard/types'
-import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue } from './utils'
+import { AssetWithBalance } from '../wallet/types'
+import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue, getWalletBalances } from './utils'
 
 describe('services/binance/utils/', () => {
   describe('getPoolPriceValue', () => {
@@ -22,11 +23,10 @@ describe('services/binance/utils/', () => {
     }
 
     it('returns a price for BNB in USD', () => {
-      const balance: Balance = {
-        free: '1',
-        symbol: 'BNB',
-        locked: '',
-        frozen: ''
+      const balance: AssetWithBalance = {
+        amount: baseAmount('1'),
+        frozenAmount: O.none,
+        asset: assetFromString('BNB.BNB') || EMPTY_ASSET
       }
       const result = FP.pipe(
         getPoolPriceValue(balance, poolDetails, usdPool),
@@ -35,15 +35,14 @@ describe('services/binance/utils/', () => {
           (price) => price.amount().toString()
         )
       )
-      expect(result).toEqual('1100000000')
+      expect(result).toEqual('11')
     })
 
     it('returns a price for RUNE in USD', () => {
-      const balance: Balance = {
-        free: '1',
-        symbol: 'RUNE-67C',
-        locked: '',
-        frozen: ''
+      const balance: AssetWithBalance = {
+        amount: baseAmount('1'),
+        frozenAmount: O.none,
+        asset: assetFromString('BNB.RUNE-67C') || EMPTY_ASSET
       }
       const result = FP.pipe(
         getPoolPriceValue(balance, [], usdPool),
@@ -52,15 +51,14 @@ describe('services/binance/utils/', () => {
           (price) => price.amount().toString()
         )
       )
-      expect(result).toEqual('110000000')
+      expect(result).toEqual('1')
     })
 
     it('returns a no price if no pools are available', () => {
-      const balance: Balance = {
-        free: '1',
-        symbol: 'BNB',
-        locked: '',
-        frozen: ''
+      const balance: AssetWithBalance = {
+        amount: baseAmount('1'),
+        frozenAmount: O.none,
+        asset: assetFromString('BNB.BNB') || EMPTY_ASSET
       }
       const result = getPoolPriceValue(balance, [], usdPool)
       expect(result).toBeNone()
@@ -85,6 +83,60 @@ describe('services/binance/utils/', () => {
         symbol: 'RUNE-B1A',
         ticker: 'RUNE'
       })
+    })
+  })
+
+  describe('getWalletBalances', () => {
+    it('maps `Balances` -> `AssetWithBalances`', () => {
+      const balances: Balances = [
+        {
+          free: '1',
+          symbol: 'BNB',
+          locked: '',
+          frozen: '11'
+        },
+        {
+          free: '2',
+          symbol: 'RUNE-B1A',
+          locked: '',
+          frozen: ''
+        },
+        // invalid data (invalid symbol)
+        {
+          free: '3',
+          symbol: '',
+          locked: '',
+          frozen: ''
+        }
+      ]
+      const result = getWalletBalances(balances)
+      // ignore invalid data, that's 2 balances only
+      expect(result.length).toEqual(2)
+
+      // check BNB balance
+      expect(result[0].asset).toEqual({
+        chain: 'BNB',
+        symbol: 'BNB',
+        ticker: 'BNB'
+      })
+      expect(result[0].amount.amount()).toEqual(assetToBase(assetAmount(1)).amount())
+      expect(
+        FP.pipe(
+          result[0].frozenAmount,
+          // Check transformation of `AssetAmount` to `BaseAmount`
+          O.map((a) => a.amount().isEqualTo(1100000000)),
+          O.getOrElse(() => false)
+        )
+      ).toBeTruthy()
+
+      // Check RUNE balance
+      expect(result[1].asset).toEqual({
+        chain: 'BNB',
+        symbol: 'RUNE-B1A',
+        ticker: 'RUNE'
+      })
+      expect(result[1].amount.amount()).toEqual(assetToBase(assetAmount(2)).amount())
+      expect(result[1].frozenAmount).toBeNone()
     })
   })
 })

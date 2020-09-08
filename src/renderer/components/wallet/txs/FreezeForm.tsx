@@ -6,7 +6,8 @@ import {
   formatAssetAmountCurrency,
   AssetAmount,
   formatAssetAmount,
-  bn
+  bn,
+  baseToAsset
 } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -17,7 +18,8 @@ import { useIntl } from 'react-intl'
 import { BNB_SYMBOL } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { trimZeros } from '../../../helpers/stringHelper'
-import { AssetWithBalance, FreezeAction, FreezeTxParams } from '../../../services/binance/types'
+import { FreezeAction, FreezeTxParams } from '../../../services/binance/types'
+import { AssetWithBalance } from '../../../services/wallet/types'
 import { InputBigNumber } from '../../uielements/input'
 import AccountSelector from '../AccountSelector'
 import * as Styled from './Form.style'
@@ -45,23 +47,32 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
 
   const maxAmount = useMemo(() => {
     if (freezeAction === 'unfreeze') {
-      return assetWB.frozenBalance || assetAmount(0)
+      return FP.pipe(
+        assetWB.frozenAmount,
+        O.map(baseToAsset),
+        O.getOrElse(() => assetAmount(0))
+      )
     }
-    return assetWB.balance
+    return baseToAsset(assetWB.amount)
   }, [assetWB, freezeAction])
 
   const amountValidator = useCallback(
-    async (_: unknown, value: BigNumber) =>
-      validateTxAmountInput({
+    async (_: unknown, value: BigNumber) => {
+      const msg3Id =
+        freezeAction === 'freeze'
+          ? 'wallet.errors.amount.shouldBeLessThanBalance'
+          : 'wallet.errors.amount.shouldBeLessThanFrozenBalance'
+      return validateTxAmountInput({
         input: value,
         maxAmount,
         errors: {
           msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
           msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
-          msg3: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
+          msg3: intl.formatMessage({ id: msg3Id })
         }
-      }),
-    [intl, maxAmount]
+      })
+    },
+    [freezeAction, intl, maxAmount]
   )
 
   const feeLabel = useMemo(
@@ -152,7 +163,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
             <Styled.StyledLabel size="big">
               <>
                 {intl.formatMessage({ id: 'common.max' })}:{' '}
-                {formatAssetAmountCurrency(assetWB.balance, assetToString(assetWB.asset))}
+                {formatAssetAmountCurrency(baseToAsset(assetWB.amount), assetToString(assetWB.asset))}
                 <br />
                 {intl.formatMessage({ id: 'common.fees' })}: {feeLabel}
               </>

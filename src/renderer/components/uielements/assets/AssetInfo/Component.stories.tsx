@@ -9,7 +9,7 @@ import AssetInfo from './Component'
 
 storiesOf('Wallet/AssetInfo', module)
   .add('default', () => {
-    return <AssetInfo balancesRD={RD.initial} asset={O.some(ASSETS_TESTNET.RUNE)} />
+    return <AssetInfo assetsRD={RD.initial} asset={O.some(ASSETS_TESTNET.RUNE)} />
   })
   .add('w/o price', () => {
     return <AssetInfo asset={O.some(ASSETS_TESTNET.RUNE)} />

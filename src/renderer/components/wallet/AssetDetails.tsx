@@ -10,8 +10,9 @@ import { useHistory } from 'react-router-dom'
 
 import * as AH from '../../helpers/assetHelper'
 import * as walletRoutes from '../../routes/wallet'
-import { TxsRD, LoadTxsProps, BalancesRD, SendAction, isSendAction } from '../../services/binance/types'
+import { TxsRD, LoadTxsProps, SendAction, isSendAction } from '../../services/binance/types'
 import { MAX_PAGINATION_ITEMS } from '../../services/const'
+import { AssetsWithBalanceRD } from '../../services/wallet/types'
 import AssetInfo from '../uielements/assets/AssetInfo'
 import BackLink from '../uielements/backLink'
 import Button, { RefreshButton } from '../uielements/button'
@@ -25,7 +26,7 @@ type SendActionMenuItem = {
 
 type Props = {
   txsRD: TxsRD
-  balancesRD: BalancesRD
+  assetsRD: AssetsWithBalanceRD
   asset: O.Option<Asset>
   address: O.Option<Address>
   explorerUrl?: O.Option<string>
@@ -37,7 +38,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
   const {
     txsRD,
     address,
-    balancesRD,
+    assetsRD,
     asset,
     reloadBalancesHandler = () => {},
     loadSelectedAssetTxsHandler = (_: LoadTxsProps) => {},
@@ -161,7 +162,7 @@ const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          <AssetInfo asset={asset} balancesRD={balancesRD} />
+          <AssetInfo asset={asset} assetsRD={assetsRD} />
         </Col>
 
         <Styled.Divider />

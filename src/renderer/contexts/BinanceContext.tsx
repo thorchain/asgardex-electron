@@ -4,7 +4,7 @@ import {
   subscribeTransfers,
   miniTickers$,
   reloadBalances,
-  balancesState$,
+  assetsWB$,
   client$,
   clientViewState$,
   address$,
@@ -24,7 +24,7 @@ export type BinanceContextValue = {
   miniTickers$: typeof miniTickers$
   clientViewState$: typeof clientViewState$
   reloadBalances: typeof reloadBalances
-  balancesState$: typeof balancesState$
+  assetsWB$: typeof assetsWB$
   setSelectedAsset: typeof setSelectedAsset
   txsSelectedAsset$: typeof txsSelectedAsset$
   loadTxsSelectedAsset: typeof loadTxsSelectedAsset
@@ -44,7 +44,7 @@ const initialContext: BinanceContextValue = {
   client$,
   clientViewState$,
   reloadBalances,
-  balancesState$,
+  assetsWB$,
   setSelectedAsset,
   txsSelectedAsset$,
   loadTxsSelectedAsset,

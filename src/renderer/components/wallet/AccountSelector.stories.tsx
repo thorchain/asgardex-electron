@@ -1,7 +1,8 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { assetAmount } from '@thorchain/asgardex-util'
+import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_MAINNET } from '../../../shared/mock/assets'
 import AccountSelector from './AccountSelector'
@@ -11,7 +12,11 @@ storiesOf('Wallet/AccountSelector', module)
     return (
       <AccountSelector
         selectedAsset={ASSETS_MAINNET.BOLT}
-        assets={[ASSETS_MAINNET.BNB, ASSETS_MAINNET.TOMO].map((asset) => ({ asset, balance: assetAmount(1) }))}
+        assets={[ASSETS_MAINNET.BNB, ASSETS_MAINNET.TOMO].map((asset) => ({
+          asset,
+          amount: assetToBase(assetAmount(1)),
+          frozenAmount: O.none
+        }))}
       />
     )
   })

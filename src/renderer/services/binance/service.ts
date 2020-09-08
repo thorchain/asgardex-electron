@@ -32,19 +32,12 @@ import { MAX_PAGINATION_ITEMS } from '../const'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
 import { keystoreService } from '../wallet/service'
+import { AssetsWithBalanceRD } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import {
-  BinanceClientState,
-  BalancesRD,
-  FeeRD,
-  FeesRD,
-  TransferFeesRD,
-  TxsRD,
-  LoadTxsProps,
-  BinanceClientState$
-} from './types'
+import { BinanceClientState, FeeRD, FeesRD, TransferFeesRD, TxsRD, LoadTxsProps, BinanceClientState$ } from './types'
+import { getWalletBalances } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -215,9 +208,9 @@ const address$: Observable<O.Option<Address>> = client$.pipe(
  * Observable to load balances from Binance API endpoint
  * If client is not available, it returns an `initial` state
  */
-const loadBalances$ = (client: BinanceClient): Observable<BalancesRD> =>
+const loadBalances$ = (client: BinanceClient): Observable<AssetsWithBalanceRD> =>
   Rx.from(client.getBalance()).pipe(
-    mergeMap((balances) => Rx.of(RD.success(balances))),
+    mergeMap((balances) => Rx.of(RD.success(getWalletBalances(balances)))),
     catchError((error) => Rx.of(RD.failure(error))),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
@@ -227,12 +220,15 @@ const loadBalances$ = (client: BinanceClient): Observable<BalancesRD> =>
 const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
 
 /**
- * State of `Balances`
+ * State of `Balance`s provided as `AssetsWithBalanceRD`
  *
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const balancesState$: Observable<BalancesRD> = Rx.combineLatest(reloadBalances$.pipe(debounceTime(300)), client$).pipe(
+const assetsWB$: Observable<AssetsWithBalanceRD> = Rx.combineLatest(
+  reloadBalances$.pipe(debounceTime(300)),
+  client$
+).pipe(
   mergeMap(([_, client]) => {
     return FP.pipe(
       client,
@@ -394,7 +390,7 @@ export {
   subscribeTransfers,
   client$,
   clientViewState$,
-  balancesState$,
+  assetsWB$,
   setSelectedAsset,
   reloadBalances,
   txsSelectedAsset$,

@@ -14,7 +14,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
   const {
     txsSelectedAsset$,
     address$,
-    balancesState$,
+    assetsWB$,
     reloadBalances,
     loadTxsSelectedAsset,
     explorerUrl$,
@@ -26,7 +26,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
 
   const txsRD = useObservableState(txsSelectedAsset$, RD.initial)
   const address = useObservableState(address$, O.none)
-  const balancesRD = useObservableState(balancesState$, RD.initial)
+  const balancesRD = useObservableState(assetsWB$, RD.initial)
 
   const explorerUrl = useObservableState(explorerUrl$, O.none)
 
@@ -39,7 +39,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
       <AssetDetails
         txsRD={txsRD}
         address={address}
-        balancesRD={balancesRD}
+        assetsRD={balancesRD}
         asset={selectedAsset}
         loadSelectedAssetTxsHandler={loadTxsSelectedAsset}
         reloadBalancesHandler={reloadBalances}

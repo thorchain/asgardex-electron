@@ -1,4 +1,6 @@
-import { Option } from 'fp-ts/lib/Option'
+import * as RD from '@devexperts/remote-data-ts'
+import { BaseAmount, Asset } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
 export type Phrase = string
@@ -12,7 +14,7 @@ export type Phrase = string
  */
 
 export type KeystoreContent = { phrase: Phrase }
-export type KeystoreState = Option<Option<KeystoreContent>>
+export type KeystoreState = O.Option<O.Option<KeystoreContent>>
 
 export type KeystoreService = {
   keystore$: Observable<KeystoreState>
@@ -21,3 +23,13 @@ export type KeystoreService = {
   unlock: (state: KeystoreState, password: string) => Promise<void>
   lock: () => void
 }
+
+export type AssetWithBalance = {
+  asset: Asset
+  amount: BaseAmount
+  frozenAmount: O.Option<BaseAmount>
+}
+
+export type AssetsWithBalance = AssetWithBalance[]
+
+export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>

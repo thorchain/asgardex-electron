@@ -36,7 +36,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
   const {
     pools: { poolsState$, poolAddresses$, reloadPoolsState, selectedPricePoolAsset$, runeAsset$ }
   } = midgardService
-  const { transaction, balancesState$, explorerUrl$ } = useBinanceContext()
+  const { transaction, assetsWB$, explorerUrl$ } = useBinanceContext()
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
 
@@ -55,7 +55,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
     runePricePool
   )
 
-  const balances = useObservableState(balancesState$)
+  const balances = useObservableState(assetsWB$)
 
   const [txWithState] = useObservableState(() => transaction.txWithState$, RD.initial)
 
@@ -137,7 +137,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
                   onConfirmSwap={onConfirmSwap}
                   availableAssets={availableAssets}
                   poolDetails={state.poolDetails}
-                  balances={balances}
+                  assetsRD={balances}
                 />
               )
             }

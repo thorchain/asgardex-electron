@@ -6,9 +6,9 @@ import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { balanceByAsset } from '../../../../helpers/binanceHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
-import { BalancesRD } from '../../../../services/binance/types'
+import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
+import { AssetsWithBalanceRD } from '../../../../services/wallet/types'
 import AssetIcon from '../assetIcon'
 import * as Styled from './Component.style'
 
@@ -17,11 +17,11 @@ type Props = {
   // balances are optional:
   // No balances == don't render price
   // balances == render price
-  balancesRD?: BalancesRD
+  assetsRD?: AssetsWithBalanceRD
 }
 
 const Component: React.FC<Props> = (props: Props): JSX.Element => {
-  const { balancesRD, asset: oAsset } = props
+  const { assetsRD, asset: oAsset } = props
 
   const asset = O.toNullable(oAsset)
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -33,23 +33,23 @@ const Component: React.FC<Props> = (props: Props): JSX.Element => {
   const renderAssetIcon = useMemo(() => asset && <AssetIcon asset={asset} size="large" />, [asset])
 
   const renderBalance = useMemo(() => {
-    if (!balancesRD) return React.Fragment
+    if (!assetsRD) return React.Fragment
 
     return FP.pipe(
-      balancesRD,
+      assetsRD,
       RD.toOption,
-      (oBalance) => sequenceTOption(oBalance, oAsset),
+      (oAssetsWB) => sequenceTOption(oAssetsWB, oAsset),
       O.fold(
         () => previousBalance.current,
-        ([balances, asset]) => {
-          const amount = balanceByAsset(balances, asset)
+        ([assetsWB, asset]) => {
+          const amount = getAssetAmountByAsset(assetsWB, asset)
           const balance = formatAssetAmount(amount, 3)
           previousBalance.current = balance
           return balance
         }
       )
     )
-  }, [oAsset, balancesRD])
+  }, [oAsset, assetsRD])
 
   return (
     <Styled.Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
