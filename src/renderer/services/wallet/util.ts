@@ -1,8 +1,12 @@
+import { getMonoid } from 'fp-ts/Array'
+import * as A from 'fp-ts/Array'
+import * as FP from 'fp-ts/function'
 import { pipe, identity } from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { isSome, Option } from 'fp-ts/lib/Option'
+import { Ord } from 'fp-ts/Ord'
 
-import { KeystoreState, KeystoreContent, Phrase } from './types'
+import { KeystoreState, KeystoreContent, Phrase, AssetWithBalance, AssetsWithBalance } from './types'
 
 export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> => pipe(state, O.chain(identity))
 
@@ -17,3 +21,43 @@ export const hasKeystoreContent = (state: KeystoreState): boolean => isSome(getK
 export const hasImportedKeystore = (state: KeystoreState): boolean => isSome(state)
 
 export const isLocked = (state: KeystoreState): boolean => !hasImportedKeystore(state) || !hasKeystoreContent(state)
+
+export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
+
+const TICKERS_ORDER = ['BTC', 'RUNE', 'BNB']
+
+const assetWithBalanceByTickersOrd: Ord<AssetWithBalance> = {
+  compare: (a, b) =>
+    TICKERS_ORDER.findIndex((ticker) => ticker === a.asset.ticker) >
+    TICKERS_ORDER.findIndex((ticker) => ticker === b.asset.ticker)
+      ? 1
+      : -1,
+  equals: (a, b) =>
+    TICKERS_ORDER.findIndex((ticker) => ticker === a.asset.ticker) ===
+    TICKERS_ORDER.findIndex((ticker) => ticker === b.asset.ticker)
+}
+
+const assetWithBalanceOrd: Ord<AssetWithBalance> = {
+  compare: (a, b) => (a.asset.ticker > b.asset.ticker ? 1 : -1),
+  equals: (a, b) => a.asset.ticker === b.asset.ticker
+}
+
+export const sortBalances = (balances: AssetsWithBalance) => {
+  return FP.pipe(
+    balances,
+    // split array for 2 parts: sortable assets and the rest
+    A.reduce([[], []] as [AssetsWithBalance, AssetsWithBalance], (acc, cur) => {
+      if (TICKERS_ORDER.includes(cur.asset.ticker)) {
+        acc[0].push(cur)
+      } else {
+        acc[1].push(cur)
+      }
+      return acc
+    }),
+    ([left, right]) =>
+      assetWithBalanceMonoid.concat(
+        FP.pipe(left, A.sort(assetWithBalanceByTickersOrd)),
+        FP.pipe(right, A.sort(assetWithBalanceOrd))
+      )
+  )
+}
