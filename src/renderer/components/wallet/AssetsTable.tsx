@@ -13,7 +13,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getPoolPriceValue } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
 import { AssetsWithBalanceRD, AssetsWithBalance, AssetWithBalance } from '../../services/wallet/types'
-import { sortBalances } from '../../services/wallet/util'
+import { filterNullableBalances, sortBalances } from '../../services/wallet/util'
 import { PricePool } from '../../views/pools/types'
 import ErrorView from '../shared/error/ErrorView'
 import AssetIcon from '../uielements/assets/assetIcon'
@@ -147,7 +147,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       <>
         {FP.pipe(
           assetsRD,
-          RD.map(sortBalances),
+          RD.map(FP.flow(filterNullableBalances, sortBalances)),
           RD.fold(
             // initial state
             () => renderAssetsTable([], true),

@@ -24,17 +24,21 @@ export const isLocked = (state: KeystoreState): boolean => !hasImportedKeystore(
 
 export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
 
+export const filterNullableBalances = (balances: AssetsWithBalance) => {
+  return FP.pipe(
+    balances,
+    A.filter((balance) => balance.amount.amount().isPositive())
+  )
+}
+
 const TICKERS_ORDER = ['BTC', 'RUNE', 'BNB']
 
+const getBalanceIndex = (balance: AssetWithBalance) =>
+  TICKERS_ORDER.findIndex((ticker) => ticker === balance.asset.ticker)
+
 const assetWithBalanceByTickersOrd: Ord<AssetWithBalance> = {
-  compare: (a, b) =>
-    TICKERS_ORDER.findIndex((ticker) => ticker === a.asset.ticker) >
-    TICKERS_ORDER.findIndex((ticker) => ticker === b.asset.ticker)
-      ? 1
-      : -1,
-  equals: (a, b) =>
-    TICKERS_ORDER.findIndex((ticker) => ticker === a.asset.ticker) ===
-    TICKERS_ORDER.findIndex((ticker) => ticker === b.asset.ticker)
+  compare: (a, b) => (getBalanceIndex(a) > getBalanceIndex(b) ? 1 : -1),
+  equals: (a, b) => getBalanceIndex(a) === getBalanceIndex(b)
 }
 
 const assetWithBalanceOrd: Ord<AssetWithBalance> = {
