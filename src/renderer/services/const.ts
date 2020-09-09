@@ -1,3 +1,5 @@
+import { bn } from '@thorchain/asgardex-util'
+
 import { BUSDAsset, PoolAsset, RUNEAsset } from '../views/pools/types'
 import { Network } from './app/types'
 
@@ -38,3 +40,5 @@ export const mapNetworkToPoolAssets = (network: Network) => networkPools[network
 export const MAX_PAGINATION_ITEMS = 10
 
 export const MIDGARD_MAX_RETRY = 3
+
+export const ZERO_BN = bn(0)

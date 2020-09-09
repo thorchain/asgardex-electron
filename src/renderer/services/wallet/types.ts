@@ -1,10 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BaseAmount, Asset } from '@thorchain/asgardex-util'
+import { getMonoid } from 'fp-ts/Array'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
 export type Phrase = string
 
+export type KeystoreContent = { phrase: Phrase }
 /**
  * Type for providing 3 states of keystore
  *
@@ -12,8 +14,6 @@ export type Phrase = string
  * (2) `Some<None>` -> LOCKED STATUS (keystore file, but no phrase)
  * (3) `Some<Some<KeystoreContent>>` -> UNLOCKED + IMPORTED STATUS (keystore file + phrase)
  */
-
-export type KeystoreContent = { phrase: Phrase }
 export type KeystoreState = O.Option<O.Option<KeystoreContent>>
 
 export type KeystoreService = {
@@ -34,3 +34,5 @@ export type AssetsWithBalance = AssetWithBalance[]
 
 export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>
 export type AssetWithBalanceRD = RD.RemoteData<Error, AssetWithBalance>
+
+export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
