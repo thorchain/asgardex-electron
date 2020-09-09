@@ -1,3 +1,4 @@
+import { assetToString } from '@thorchain/asgardex-util'
 import { getMonoid } from 'fp-ts/Array'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -6,7 +7,6 @@ import * as O from 'fp-ts/lib/Option'
 import { isSome, Option } from 'fp-ts/lib/Option'
 import { Ord } from 'fp-ts/Ord'
 
-import { groupFactory } from '../../helpers/array/group'
 import { KeystoreState, KeystoreContent, Phrase, AssetWithBalance, AssetsWithBalance } from './types'
 
 export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> => pipe(state, O.chain(identity))
@@ -42,12 +42,12 @@ const assetWithBalanceByTickersOrd: Ord<AssetWithBalance> = {
   equals: (a, b) => getBalanceIndex(a) === getBalanceIndex(b)
 }
 
+// We will compare asset strings and they automatically
+// be grouped by their chains in alphabetic order
 const assetWithBalanceOrd: Ord<AssetWithBalance> = {
-  compare: (a, b) => (a.asset.ticker > b.asset.ticker ? 1 : -1),
-  equals: (a, b) => a.asset.ticker === b.asset.ticker
+  compare: (a, b) => (assetToString(a.asset) > assetToString(b.asset) ? 1 : -1),
+  equals: (a, b) => assetToString(a.asset) === assetToString(b.asset)
 }
-
-const groupBalances = groupFactory<AssetWithBalance>({ equals: (a, b) => a.asset.chain === b.asset.chain })
 
 export const sortBalances = (balances: AssetsWithBalance) => {
   return FP.pipe(
@@ -64,9 +64,7 @@ export const sortBalances = (balances: AssetsWithBalance) => {
     ([left, right]) =>
       assetWithBalanceMonoid.concat(
         FP.pipe(left, A.sort(assetWithBalanceByTickersOrd)),
-        // Firstly we sort by asset's ticker and sorted array will be grouped with
-        // saving of ordering. In this case groups will be sorted inside of each other
-        FP.pipe(right, A.sort(assetWithBalanceOrd), groupBalances, A.flatten)
+        FP.pipe(right, A.sort(assetWithBalanceOrd))
       )
   )
 }
