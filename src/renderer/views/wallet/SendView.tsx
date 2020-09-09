@@ -12,6 +12,7 @@ import ErrorView from '../../components/shared/error/ErrorView'
 import BackLink from '../../components/uielements/backLink'
 import Send from '../../components/wallet/txs/Send'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useWalletContext } from '../../contexts/WalletContext'
 import { getAssetWBByAsset } from '../../helpers/walletHelper'
 import { useSingleTxFee } from '../../hooks/useSingleTxFee'
 import { SendParams } from '../../routes/wallet'
@@ -25,7 +26,9 @@ const SendView: React.FC<Props> = (): JSX.Element => {
   const { asset } = useParams<SendParams>()
   const oSelectedAsset = O.fromNullable(assetFromString(asset))
 
-  const { transaction: transactionService, assetsWB$, explorerUrl$, client$, transferFees$ } = useBinanceContext()
+  const { transaction: transactionService, explorerUrl$, client$, transferFees$ } = useBinanceContext()
+  const { assetsWB$ } = useWalletContext()
+
   const balancesState = useObservableState(assetsWB$, RD.initial)
   const explorerUrl = useObservableState(explorerUrl$, O.none)
   const client = useObservableState<O.Option<BinanceClient>>(client$, O.none)

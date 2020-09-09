@@ -3,8 +3,6 @@ import React, { createContext, useContext } from 'react'
 import {
   subscribeTransfers,
   miniTickers$,
-  reloadBalances,
-  assetsWB$,
   client$,
   clientViewState$,
   address$,
@@ -23,8 +21,6 @@ export type BinanceContextValue = {
   subscribeTransfers: typeof subscribeTransfers
   miniTickers$: typeof miniTickers$
   clientViewState$: typeof clientViewState$
-  reloadBalances: typeof reloadBalances
-  assetsWB$: typeof assetsWB$
   setSelectedAsset: typeof setSelectedAsset
   txsSelectedAsset$: typeof txsSelectedAsset$
   loadTxsSelectedAsset: typeof loadTxsSelectedAsset
@@ -43,8 +39,6 @@ const initialContext: BinanceContextValue = {
   miniTickers$,
   client$,
   clientViewState$,
-  reloadBalances,
-  assetsWB$,
   setSelectedAsset,
   txsSelectedAsset$,
   loadTxsSelectedAsset,

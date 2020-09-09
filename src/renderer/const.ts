@@ -1,4 +1,4 @@
-import { AssetSymbol, assetToBase, assetAmount } from '@thorchain/asgardex-util'
+import { AssetSymbol, assetToBase, assetAmount, Asset } from '@thorchain/asgardex-util'
 
 import {
   PricePoolCurrencySymbols,
@@ -7,6 +7,8 @@ import {
   PricePool,
   PricePoolAssets
 } from './views/pools/types'
+
+export const AssetBTC: Asset = { chain: 'BTC', symbol: 'BTC', ticker: 'BTC' }
 
 // Currency symbols used for pricing
 export const CURRENCY_SYMBOLS: PricePoolCurrencySymbols = {

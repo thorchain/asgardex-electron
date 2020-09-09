@@ -33,3 +33,4 @@ export type AssetWithBalance = {
 export type AssetsWithBalance = AssetWithBalance[]
 
 export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>
+export type AssetWithBalanceRD = RD.RemoteData<Error, AssetWithBalance>

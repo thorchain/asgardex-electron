@@ -21,6 +21,7 @@ import Button from '../../components/uielements/button'
 import { getRunePricePool } from '../../const'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useWalletContext } from '../../contexts/WalletContext'
 import { rdFromOption } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
@@ -36,7 +37,8 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
   const {
     pools: { poolsState$, poolAddresses$, reloadPoolsState, selectedPricePoolAsset$, runeAsset$ }
   } = midgardService
-  const { transaction, assetsWB$, explorerUrl$ } = useBinanceContext()
+  const { transaction, explorerUrl$ } = useBinanceContext()
+  const { assetsWB$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
 
