@@ -1,6 +1,14 @@
-import { envOrDefault } from './envHelper'
+import { envOrDefault, isEnv } from './envHelper'
 
 describe('helpers/envHelper/', () => {
+  describe('isEnv', () => {
+    it('returns true if valid', () => {
+      expect(isEnv('ANY_ENV')).toBeTruthy()
+    })
+    it('returns false if empty (invalid)', () => {
+      expect(isEnv('')).toBeFalsy()
+    })
+  })
   describe('envOrDefault', () => {
     it('returns ENV value if valid', () => {
       const env = 'valid-env-value'
