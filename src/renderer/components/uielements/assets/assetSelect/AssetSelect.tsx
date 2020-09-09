@@ -54,12 +54,13 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
   const intl = useIntl()
 
   const closeMenu = useCallback(() => {
-    setOpenDropdown(false)
-  }, [setOpenDropdown])
+    openDropdown && setOpenDropdown(false)
+  }, [setOpenDropdown, openDropdown])
 
-  const handleDropdownButtonClicked = () => {
+  const handleDropdownButtonClicked = (e: React.MouseEvent) => {
+    e.stopPropagation()
     // toggle dropdown state
-    setOpenDropdown((value) => !value)
+    setOpenDropdown(!openDropdown)
   }
 
   const handleChangeAsset = useCallback(
