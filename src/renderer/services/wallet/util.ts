@@ -7,6 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import { isSome, Option } from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/Ord'
 
+import { ZERO_BN } from '../const'
 import { KeystoreState, KeystoreContent, Phrase, AssetWithBalance, AssetsWithBalance } from './types'
 
 export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> => pipe(state, O.chain(identity))
@@ -28,7 +29,7 @@ export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
 export const filterNullableBalances = (balances: AssetsWithBalance) => {
   return FP.pipe(
     balances,
-    A.filter((balance) => balance.amount.amount().isPositive())
+    A.filter((balance) => balance.amount.amount().isGreaterThan(ZERO_BN))
   )
 }
 

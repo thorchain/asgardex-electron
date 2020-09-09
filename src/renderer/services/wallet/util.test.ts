@@ -1,8 +1,17 @@
+import { baseAmount } from '@thorchain/asgardex-util'
 import { some, none } from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { KeystoreState, KeystoreContent, AssetsWithBalance } from './types'
-import { getKeystoreContent, hasKeystoreContent, hasImportedKeystore, isLocked, getPhrase, sortBalances } from './util'
+import {
+  getKeystoreContent,
+  hasKeystoreContent,
+  hasImportedKeystore,
+  isLocked,
+  getPhrase,
+  sortBalances,
+  filterNullableBalances
+} from './util'
 
 describe('services/wallet/util/', () => {
   describe('getKeystoreContent', () => {
@@ -90,6 +99,34 @@ describe('services/wallet/util/', () => {
     it('returns true if keystore is not available', () => {
       const result = isLocked(none)
       expect(result).toBeTruthy()
+    })
+  })
+
+  describe('filterNullableBalances', () => {
+    it('should filter nullable balances', () => {
+      const target = [
+        {
+          asset: ASSETS_TESTNET.TOMO,
+          amount: baseAmount(0)
+        },
+        {
+          asset: ASSETS_TESTNET.BOLT,
+          amount: baseAmount(1)
+        },
+        {
+          asset: ASSETS_TESTNET.FTM,
+          amount: baseAmount(0)
+        },
+        {
+          asset: ASSETS_TESTNET.BNB,
+          amount: baseAmount(2)
+        },
+        {
+          asset: ASSETS_TESTNET.RUNE,
+          amount: baseAmount(0)
+        }
+      ] as AssetsWithBalance
+      expect(filterNullableBalances(target)).toEqual([target[1], target[3]])
     })
   })
 
