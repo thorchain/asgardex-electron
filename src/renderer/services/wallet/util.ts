@@ -5,7 +5,7 @@ import * as FP from 'fp-ts/function'
 import { pipe, identity } from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { isSome, Option } from 'fp-ts/lib/Option'
-import { Ord } from 'fp-ts/Ord'
+import * as Ord from 'fp-ts/Ord'
 
 import { KeystoreState, KeystoreContent, Phrase, AssetWithBalance, AssetsWithBalance } from './types'
 
@@ -37,17 +37,11 @@ const TICKERS_ORDER = ['BTC', 'RUNE', 'BNB']
 const getBalanceIndex = (balance: AssetWithBalance) =>
   TICKERS_ORDER.findIndex((ticker) => ticker === balance.asset.ticker)
 
-const assetWithBalanceByTickersOrd: Ord<AssetWithBalance> = {
-  compare: (a, b) => (getBalanceIndex(a) > getBalanceIndex(b) ? 1 : -1),
-  equals: (a, b) => getBalanceIndex(a) === getBalanceIndex(b)
-}
+const byTickersOrder = Ord.ord.contramap(Ord.ordNumber, getBalanceIndex)
 
 // We will compare asset strings and they automatically
 // be grouped by their chains in alphabetic order
-const assetWithBalanceOrd: Ord<AssetWithBalance> = {
-  compare: (a, b) => (assetToString(a.asset) > assetToString(b.asset) ? 1 : -1),
-  equals: (a, b) => assetToString(a.asset) === assetToString(b.asset)
-}
+const byAsset = Ord.ord.contramap(Ord.ordString, (balance: AssetWithBalance) => assetToString(balance.asset))
 
 export const sortBalances = (balances: AssetsWithBalance) => {
   return FP.pipe(
@@ -62,9 +56,6 @@ export const sortBalances = (balances: AssetsWithBalance) => {
       return acc
     }),
     ([left, right]) =>
-      assetWithBalanceMonoid.concat(
-        FP.pipe(left, A.sort(assetWithBalanceByTickersOrd)),
-        FP.pipe(right, A.sort(assetWithBalanceOrd))
-      )
+      assetWithBalanceMonoid.concat(FP.pipe(left, A.sort(byTickersOrder)), FP.pipe(right, A.sort(byAsset)))
   )
 }
