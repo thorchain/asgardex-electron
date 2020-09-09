@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BaseAmount, Asset } from '@thorchain/asgardex-util'
+import { getMonoid } from 'fp-ts/Array'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
@@ -33,3 +34,5 @@ export type AssetWithBalance = {
 export type AssetsWithBalance = AssetWithBalance[]
 
 export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>
+
+export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()

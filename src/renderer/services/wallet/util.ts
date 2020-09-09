@@ -1,5 +1,4 @@
 import { assetToString } from '@thorchain/asgardex-util'
-import { getMonoid } from 'fp-ts/Array'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import { pipe, identity } from 'fp-ts/lib/function'
@@ -8,7 +7,14 @@ import { isSome, Option } from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/Ord'
 
 import { ZERO_BN } from '../const'
-import { KeystoreState, KeystoreContent, Phrase, AssetWithBalance, AssetsWithBalance } from './types'
+import {
+  KeystoreState,
+  KeystoreContent,
+  Phrase,
+  AssetWithBalance,
+  AssetsWithBalance,
+  assetWithBalanceMonoid
+} from './types'
 
 export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> => pipe(state, O.chain(identity))
 
@@ -23,8 +29,6 @@ export const hasKeystoreContent = (state: KeystoreState): boolean => isSome(getK
 export const hasImportedKeystore = (state: KeystoreState): boolean => isSome(state)
 
 export const isLocked = (state: KeystoreState): boolean => !hasImportedKeystore(state) || !hasKeystoreContent(state)
-
-export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
 
 export const filterNullableBalances = (balances: AssetsWithBalance) => {
   return FP.pipe(
