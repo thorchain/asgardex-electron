@@ -13,6 +13,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getPoolPriceValue } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
 import { AssetsWithBalanceRD, AssetsWithBalance, AssetWithBalance } from '../../services/wallet/types'
+import { filterNullableBalances, sortBalances } from '../../services/wallet/util'
 import { PricePool } from '../../views/pools/types'
 import ErrorView from '../shared/error/ErrorView'
 import AssetIcon from '../uielements/assets/assetIcon'
@@ -52,8 +53,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       align: 'left',
       render: renderNameColumn,
       sorter: sortNameColumn,
-      sortDirections: ['descend', 'ascend'],
-      defaultSortOrder: 'ascend'
+      sortDirections: ['descend', 'ascend']
     }),
     [intl]
   )
@@ -145,25 +145,29 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
   const renderAssets = useMemo(
     () => (
       <>
-        {RD.fold(
-          // initial state
-          () => renderAssetsTable([], true),
-          // loading state
-          () => {
-            const pools = O.getOrElse(() => [] as AssetsWithBalance)(previousBalances.current)
-            return renderAssetsTable(pools, true)
-          },
-          // error state
-          (error: Error) => {
-            const msg = error?.toString() ?? ''
-            return <ErrorView title={msg} />
-          },
-          // success state
-          (balances: AssetsWithBalance): JSX.Element => {
-            previousBalances.current = O.some(balances)
-            return renderAssetsTable(balances)
-          }
-        )(assetsRD)}
+        {FP.pipe(
+          assetsRD,
+          RD.map(FP.flow(filterNullableBalances, sortBalances)),
+          RD.fold(
+            // initial state
+            () => renderAssetsTable([], true),
+            // loading state
+            () => {
+              const pools = O.getOrElse(() => [] as AssetsWithBalance)(previousBalances.current)
+              return renderAssetsTable(pools, true)
+            },
+            // error state
+            (error: Error) => {
+              const msg = error?.toString() ?? ''
+              return <ErrorView title={msg} />
+            },
+            // success state
+            (balances: AssetsWithBalance): JSX.Element => {
+              previousBalances.current = O.some(balances)
+              return renderAssetsTable(balances)
+            }
+          )
+        )}
       </>
     ),
     [assetsRD, renderAssetsTable]

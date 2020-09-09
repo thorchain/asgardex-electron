@@ -1,7 +1,17 @@
+import { baseAmount } from '@thorchain/asgardex-util'
 import { some, none } from 'fp-ts/lib/Option'
 
-import { KeystoreState, KeystoreContent } from './types'
-import { getKeystoreContent, hasKeystoreContent, hasImportedKeystore, isLocked, getPhrase } from './util'
+import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { KeystoreState, KeystoreContent, AssetsWithBalance } from './types'
+import {
+  getKeystoreContent,
+  hasKeystoreContent,
+  hasImportedKeystore,
+  isLocked,
+  getPhrase,
+  sortBalances,
+  filterNullableBalances
+} from './util'
 
 describe('services/wallet/util/', () => {
   describe('getKeystoreContent', () => {
@@ -89,6 +99,74 @@ describe('services/wallet/util/', () => {
     it('returns true if keystore is not available', () => {
       const result = isLocked(none)
       expect(result).toBeTruthy()
+    })
+  })
+
+  describe('filterNullableBalances', () => {
+    it('should filter nullable balances', () => {
+      const target = [
+        {
+          asset: ASSETS_TESTNET.TOMO,
+          amount: baseAmount(0)
+        },
+        {
+          asset: ASSETS_TESTNET.BOLT,
+          amount: baseAmount(1)
+        },
+        {
+          asset: ASSETS_TESTNET.FTM,
+          amount: baseAmount(0)
+        },
+        {
+          asset: ASSETS_TESTNET.BNB,
+          amount: baseAmount(2)
+        },
+        {
+          asset: ASSETS_TESTNET.RUNE,
+          amount: baseAmount(0)
+        }
+      ] as AssetsWithBalance
+      expect(filterNullableBalances(target)).toEqual([target[1], target[3]])
+    })
+  })
+
+  describe('sortBalances', () => {
+    it('should sort balances based on TICKERS_ORDER constant', () => {
+      expect(
+        sortBalances([
+          {
+            asset: ASSETS_TESTNET.TOMO
+          },
+          {
+            asset: ASSETS_TESTNET.BOLT
+          },
+          {
+            asset: ASSETS_TESTNET.FTM
+          },
+          {
+            asset: ASSETS_TESTNET.BNB
+          },
+          {
+            asset: ASSETS_TESTNET.RUNE
+          }
+        ] as AssetsWithBalance)
+      ).toEqual([
+        {
+          asset: ASSETS_TESTNET.RUNE
+        },
+        {
+          asset: ASSETS_TESTNET.BNB
+        },
+        {
+          asset: ASSETS_TESTNET.BOLT
+        },
+        {
+          asset: ASSETS_TESTNET.FTM
+        },
+        {
+          asset: ASSETS_TESTNET.TOMO
+        }
+      ])
     })
   })
 })
