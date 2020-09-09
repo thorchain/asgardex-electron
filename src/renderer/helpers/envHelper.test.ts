@@ -8,6 +8,9 @@ describe('helpers/envHelper/', () => {
     it('returns false if empty (invalid)', () => {
       expect(isEnv('')).toBeFalsy()
     })
+    it('returns false for undefined', () => {
+      expect(isEnv(undefined)).toBeFalsy()
+    })
   })
   describe('envOrDefault', () => {
     it('returns ENV value if valid', () => {
