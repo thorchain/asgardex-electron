@@ -6,6 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import { isSome, Option } from 'fp-ts/lib/Option'
 import { Ord } from 'fp-ts/Ord'
 
+import { groupFactory } from '../../helpers/array/group'
 import { KeystoreState, KeystoreContent, Phrase, AssetWithBalance, AssetsWithBalance } from './types'
 
 export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> => pipe(state, O.chain(identity))
@@ -46,6 +47,8 @@ const assetWithBalanceOrd: Ord<AssetWithBalance> = {
   equals: (a, b) => a.asset.ticker === b.asset.ticker
 }
 
+const groupBalances = groupFactory<AssetWithBalance>({ equals: (a, b) => a.asset.chain === b.asset.chain })
+
 export const sortBalances = (balances: AssetsWithBalance) => {
   return FP.pipe(
     balances,
@@ -61,7 +64,9 @@ export const sortBalances = (balances: AssetsWithBalance) => {
     ([left, right]) =>
       assetWithBalanceMonoid.concat(
         FP.pipe(left, A.sort(assetWithBalanceByTickersOrd)),
-        FP.pipe(right, A.sort(assetWithBalanceOrd))
+        // Firstly we sort by asset's ticker and sorted array will be grouped with
+        // saving of ordering. In this case groups will be sorted inside of each other
+        FP.pipe(right, A.sort(assetWithBalanceOrd), groupBalances, A.flatten)
       )
   )
 }
