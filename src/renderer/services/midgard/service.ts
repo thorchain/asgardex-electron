@@ -4,6 +4,7 @@ import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
 import { retry, catchError, map, shareReplay, startWith, switchMap, distinctUntilChanged } from 'rxjs/operators'
 
+import { isEnv } from '../../helpers/envHelper'
 import { fromPromise$ } from '../../helpers/rx/fromPromise'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
@@ -16,13 +17,19 @@ import { NetworkInfoRD, ThorchainLastblockRD, ThorchainConstantsRD } from './typ
 
 const BYZANTINE_MAX_RETRY = 5
 
+const MIDGARD_TESTNET_URL = process.env.REACT_APP_MIDGARD_TESTNET_URL
+
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
  */
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
 const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
-  (network: Network) => midgard(network, true).then(RD.success),
+  (network: Network) => {
+    // option to set Midgard url (for development only)
+    if (network === 'testnet' && isEnv(MIDGARD_TESTNET_URL)) return Promise.resolve(RD.success(MIDGARD_TESTNET_URL))
+    else return midgard(network, true).then(RD.success)
+  },
   RD.pending,
   RD.failure
 )

@@ -60,7 +60,7 @@ export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
       const { target } = event
       setFocus(true)
       // short delay is needed before selecting to keep its reference
-      // (it will be lost in other cases dure React rendering)
+      // (it will be lost in other cases due React rendering)
       await delay(1)
       target.select()
     },
