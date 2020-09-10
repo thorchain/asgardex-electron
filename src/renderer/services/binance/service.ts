@@ -31,7 +31,7 @@ import { MAX_PAGINATION_ITEMS } from '../const'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
 import { keystoreService } from '../wallet/service'
-import { AssetsWithBalanceRD } from '../wallet/types'
+import { AssetsWithBalanceRD, ApiError, ErrorId } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
@@ -210,7 +210,9 @@ const address$: Observable<O.Option<Address>> = client$.pipe(
 const loadBalances$ = (client: BinanceClient): Observable<AssetsWithBalanceRD> =>
   Rx.from(client.getBalance()).pipe(
     mergeMap((balances) => Rx.of(RD.success(getWalletBalances(balances)))),
-    catchError((error) => Rx.of(RD.failure(error))),
+    catchError((error: Error) =>
+      Rx.of(RD.failure({ apiId: 'BNB', errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
+    ),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
   )

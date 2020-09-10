@@ -3,19 +3,21 @@ import React, { createContext, useContext } from 'react'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
-import { reloadBalances, assetsWB$ } from '../services/wallet/balances'
+import { reloadBalances, assetsWB$, assetsWBState$ } from '../services/wallet/balances'
 import { keystoreService } from '../services/wallet/service'
 
 type WalletContextValue = {
   keystoreService: typeof keystoreService
   reloadBalances: typeof reloadBalances
   assetsWB$: typeof assetsWB$
+  assetsWBState$: typeof assetsWBState$
 }
 
 const initialContext: WalletContextValue = {
   keystoreService,
   reloadBalances,
-  assetsWB$
+  assetsWB$,
+  assetsWBState$
 }
 const WalletContext = createContext<Option<WalletContextValue>>(none)
 

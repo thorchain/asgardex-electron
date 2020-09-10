@@ -4,6 +4,9 @@ import { getMonoid } from 'fp-ts/Array'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
+import * as BNBTypes from '../binance/types'
+import * as BTCTypes from '../bitcoin/types'
+
 export type Phrase = string
 
 export type KeystoreContent = { phrase: Phrase }
@@ -32,7 +35,25 @@ export type AssetWithBalance = {
 
 export type AssetsWithBalance = AssetWithBalance[]
 
-export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>
-export type AssetWithBalanceRD = RD.RemoteData<Error, AssetWithBalance>
+export type AssetsWithBalanceRD = RD.RemoteData<ApiError, AssetsWithBalance>
+export type AssetWithBalanceRD = RD.RemoteData<ApiError, AssetWithBalance>
 
 export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
+
+export type AssetsWithBalanceState = {
+  assetsWB: AssetsWithBalance
+  errors: O.Option<ApiError[]>
+  loading: boolean
+}
+
+export type ApiId = BNBTypes.ApiId | BTCTypes.ApiId
+
+export enum ErrorId {
+  GET_BALANCES
+}
+
+export type ApiError = {
+  apiId: ApiId
+  errorId: ErrorId
+  msg: string
+}
