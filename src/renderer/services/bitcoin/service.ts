@@ -9,6 +9,7 @@ import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, catchError, shareReplay, startWith, distinctUntilChanged, debounceTime } from 'rxjs/operators'
 
 import { AssetBTC } from '../../const'
+import { BTC_DECIMAL } from '../../helpers/assetHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import * as fpHelpers from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
@@ -95,7 +96,7 @@ const loadBalances$ = (client: BitcoinClient): Observable<AssetWithBalanceRD> =>
       Rx.of(
         RD.success({
           asset: AssetBTC,
-          amount: baseAmount(balance),
+          amount: baseAmount(balance, BTC_DECIMAL),
           frozenAmount: O.none
         } as AssetWithBalance)
       )

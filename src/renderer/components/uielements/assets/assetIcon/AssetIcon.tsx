@@ -5,6 +5,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetTicker } from '@thorchain/asgardex-util'
 
 import bnbIcon from '../../../../assets/svg/coin-bnb.svg'
+import btcIcon from '../../../../assets/svg/coin-btc.svg'
 import runeIcon from '../../../../assets/svg/rune-flash-icon.svg'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
@@ -19,21 +20,26 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', ...rest }): JSX.Element => {
   const imgUrl = useMemo(() => {
     const { symbol, ticker } = asset
+    // BTC
+    if (ticker === AssetTicker.BTC) {
+      return btcIcon
+    }
+    // RUNE
+    if (ticker === AssetTicker.RUNE) {
+      // Always use "our" Rune asset
+      return runeIcon
+    }
+    // BNB
+    if (ticker === AssetTicker.BNB) {
+      // Since BNB is blacklisted at TrustWallet's asset, we have to use "our" own BNB icon
+      // (see https://github.com/trustwallet/assets/blob/master/blockchains/binance/blacklist.json)
+      return bnbIcon
+    }
+
     const assetId = symbol
     // currently we do load assets for Binance chain only
     // Note: Trustwallet supports asset names for mainnet only. For testnet we will use the `IconFallback` component
-    let url = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${assetId}/logo.png`
-
-    if (ticker === AssetTicker.RUNE) {
-      // Always use "our" Rune asset
-      url = runeIcon
-    }
-    if (ticker === 'BNB') {
-      // Since BNB is blacklisted at TrustWallet's asset, we have to use "our" own BNB icon
-      // (see https://github.com/trustwallet/assets/blob/master/blockchains/binance/blacklist.json)
-      url = bnbIcon
-    }
-    return url
+    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${assetId}/logo.png`
   }, [asset])
 
   const remoteIconImage = useRemoteImage(imgUrl)

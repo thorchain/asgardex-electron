@@ -1,4 +1,4 @@
-import { assetToString } from '@thorchain/asgardex-util'
+import { assetToString, AssetTicker } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import { pipe, identity } from 'fp-ts/lib/function'
@@ -37,7 +37,7 @@ export const filterNullableBalances = (balances: AssetsWithBalance) => {
   )
 }
 
-const TICKERS_ORDER = ['BTC', 'RUNE', 'BNB']
+const TICKERS_ORDER: string[] = [AssetTicker.BTC, AssetTicker.RUNE, AssetTicker.BNB]
 
 const getBalanceIndex = (balance: AssetWithBalance) =>
   TICKERS_ORDER.findIndex((ticker) => ticker === balance.asset.ticker)
