@@ -21,6 +21,4 @@ const assetsWB$: Observable<AssetsWithBalanceRD> = Rx.combineLatest([BNB.assetsW
   })
 )
 
-assetsWB$.subscribe(console.log)
-
 export { reloadBalances, assetsWB$ }

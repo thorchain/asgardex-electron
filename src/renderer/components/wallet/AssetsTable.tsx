@@ -137,7 +137,15 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
   )
   const renderAssetsTable = useCallback(
     (balances: AssetsWithBalance, loading = false) => {
-      return <TableWrapper dataSource={balances} loading={loading} rowKey={'tx'} onRow={onRow} columns={columns} />
+      return (
+        <TableWrapper
+          dataSource={balances}
+          loading={loading}
+          rowKey={({ asset }) => asset.symbol}
+          onRow={onRow}
+          columns={columns}
+        />
+      )
     },
     [columns, onRow]
   )
