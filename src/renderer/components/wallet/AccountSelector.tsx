@@ -34,7 +34,10 @@ const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
           const { asset, amount } = assetWB
           return (
             <Menu.Item key={i} onClick={() => onChange(asset)}>
-              <Row gutter={[8, 0]}>
+              <Row align={'middle'} gutter={[8, 0]}>
+                <Col>
+                  <AssetIcon asset={asset} size={'small'} />
+                </Col>
                 <Col>{asset.symbol} </Col>
                 <Col>{formatAssetAmountCurrency(baseToAsset(amount), assetToString(asset))}</Col>
               </Row>
