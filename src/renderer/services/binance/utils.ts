@@ -16,6 +16,7 @@ import {
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
+import { BNB_DECIMAL } from '../../helpers/assetHelper'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
 import { AssetWithBalance, AssetsWithBalance } from '../wallet/types'
@@ -63,7 +64,7 @@ export const getWalletBalances = (balances: Balances): AssetsWithBalance =>
       oAsset,
       O.map((asset) => {
         const amountBN = bnOrZero(free)
-        const amount = assetToBase(assetAmount(amountBN))
+        const amount = assetToBase(assetAmount(amountBN, BNB_DECIMAL))
         const frozenAmountBN = bn(frozen)
         const frozenAmount = isValidBN(frozenAmountBN) ? O.some(assetToBase(assetAmount(frozenAmountBN))) : O.none
 

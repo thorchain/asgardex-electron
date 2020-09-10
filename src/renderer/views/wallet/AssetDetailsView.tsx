@@ -8,18 +8,12 @@ import { useParams } from 'react-router-dom'
 
 import AssetDetails from '../../components/wallet/AssetDetails'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useWalletContext } from '../../contexts/WalletContext'
 import { AssetDetailsParams } from '../../routes/wallet'
 
 const AssetDetailsView: React.FC = (): JSX.Element => {
-  const {
-    txsSelectedAsset$,
-    address$,
-    assetsWB$,
-    reloadBalances,
-    loadTxsSelectedAsset,
-    explorerUrl$,
-    setSelectedAsset
-  } = useBinanceContext()
+  const { txsSelectedAsset$, address$, loadTxsSelectedAsset, explorerUrl$, setSelectedAsset } = useBinanceContext()
+  const { assetsWB$, reloadBalances } = useWalletContext()
 
   const { asset } = useParams<AssetDetailsParams>()
   const selectedAsset = O.fromNullable(assetFromString(asset))

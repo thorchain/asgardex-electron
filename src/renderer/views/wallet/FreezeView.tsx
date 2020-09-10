@@ -12,6 +12,7 @@ import * as Rx from 'rxjs/operators'
 import BackLink from '../../components/uielements/backLink'
 import Freeze from '../../components/wallet/txs/Freeze'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useWalletContext } from '../../contexts/WalletContext'
 import { getBnbAmountFromBalances, getAssetWBByAsset } from '../../helpers/walletHelper'
 import { SendParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
@@ -26,7 +27,8 @@ const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
   const { asset } = useParams<SendParams>()
   const oSelectedAsset = O.fromNullable(assetFromString(asset))
 
-  const { freeze: freezeService, assetsWB$, explorerUrl$, freezeFee$ } = useBinanceContext()
+  const { freeze: freezeService, explorerUrl$, freezeFee$ } = useBinanceContext()
+  const { assetsWB$ } = useWalletContext()
   const fee = useObservableState<O.Option<AssetAmount>>(() => freezeFee$.pipe(Rx.map(RD.toOption)), O.none)[0]
   const balancesState = useObservableState(assetsWB$, initial)
   const explorerUrl = useObservableState(explorerUrl$, O.none)

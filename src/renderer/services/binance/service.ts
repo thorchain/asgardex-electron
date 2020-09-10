@@ -4,7 +4,6 @@ import { Asset } from '@thorchain/asgardex-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import {
@@ -225,10 +224,10 @@ const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const assetsWB$: Observable<AssetsWithBalanceRD> = Rx.combineLatest(
+const assetsWB$: Observable<AssetsWithBalanceRD> = Rx.combineLatest([
   reloadBalances$.pipe(debounceTime(300)),
   client$
-).pipe(
+]).pipe(
   mergeMap(([_, client]) => {
     return FP.pipe(
       client,
@@ -370,7 +369,7 @@ const freezeFee$: Observable<FeeRD> = FP.pipe(
   shareReplay(1)
 )
 
-const wsTransfer$ = pipe(
+const wsTransfer$ = FP.pipe(
   address$,
   switchMap(O.fold(() => Rx.EMPTY, subscribeTransfers)),
   RxOperators.map(O.some),

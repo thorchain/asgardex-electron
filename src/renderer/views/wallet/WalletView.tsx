@@ -7,7 +7,6 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 
 import { RefreshButton } from '../../components/uielements/button/'
 import AssetsNav from '../../components/wallet/AssetsNav'
-import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
@@ -26,8 +25,7 @@ import StakesView from './StakesView'
 import UnlockView from './UnlockView'
 
 const WalletView: React.FC = (): JSX.Element => {
-  const { keystoreService } = useWalletContext()
-  const { reloadBalances } = useBinanceContext()
+  const { keystoreService, reloadBalances } = useWalletContext()
 
   // Important note:
   // Since `useObservableState` is set after first render

@@ -1,17 +1,24 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient, Network as BitcoinNetwork } from '@thorchain/asgardex-bitcoin'
+import { baseAmount } from '@thorchain/asgardex-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators'
+import { map, mergeMap, catchError, shareReplay, startWith, distinctUntilChanged, debounceTime } from 'rxjs/operators'
 
+import { AssetBTC } from '../../const'
+import { BTC_DECIMAL } from '../../helpers/assetHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import * as fpHelpers from '../../helpers/fpHelpers'
+import { liveData } from '../../helpers/rx/liveData'
+import { triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import { ClientStateForViews } from '../types'
 import { getClientStateForViews, getClient } from '../utils'
 import { keystoreService } from '../wallet/service'
+import { AssetWithBalanceRD, AssetWithBalance, AssetsWithBalanceRD } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { BitcoinClientState } from './types'
 
@@ -80,6 +87,56 @@ const address$: Observable<O.Option<string>> = client$.pipe(
 )
 
 /**
+ * Observable to load balances from Binance API endpoint
+ * If client is not available, it returns an `initial` state
+ */
+const loadBalances$ = (client: BitcoinClient): Observable<AssetWithBalanceRD> =>
+  Rx.from(client.getBalance()).pipe(
+    mergeMap((balance) =>
+      Rx.of(
+        RD.success({
+          asset: AssetBTC,
+          amount: baseAmount(balance, BTC_DECIMAL),
+          frozenAmount: O.none
+        } as AssetWithBalance)
+      )
+    ),
+    catchError((error) => Rx.of(RD.failure(error))),
+    startWith(RD.pending)
+  )
+
+// `TriggerStream` to reload `Balances`
+const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
+
+/**
+ * State of `Balance`s provided as `AssetsWithBalanceRD`
+ *
+ * Data will be loaded by first subscription only
+ * If a client is not available (e.g. by removing keystore), it returns an `initial` state
+ */
+const assetWB$: Observable<AssetWithBalanceRD> = Rx.combineLatest(
+  reloadBalances$.pipe(debounceTime(300)),
+  client$
+).pipe(
+  mergeMap(([_, client]) => {
+    return FP.pipe(
+      client,
+      O.fold(
+        // if a client is not available, "reset" state to "initial"
+        () => Rx.of(RD.initial),
+        // or start request and return state
+        loadBalances$
+      )
+    )
+  }),
+  // cache it to avoid reloading data by every subscription
+  shareReplay(1)
+)
+
+// Map `AssetWB` into `[AssetsWB]` - needed
+const assetsWB$: Observable<AssetsWithBalanceRD> = assetWB$.pipe(liveData.map((asset) => [asset]))
+
+/**
  * Object with all "public" functions and observables
  */
-export { client$, clientViewState$, address$ }
+export { client$, clientViewState$, address$, reloadBalances, assetsWB$ }
