@@ -1,7 +1,5 @@
 import { Asset } from '@thorchain/asgardex-util'
 
-// Note: All of following content will be go into `@thorchain/asgardex-util`
-
 export const RUNE_SYMBOL_MAINNET = 'RUNE-B1A'
 export const RUNE_SYMBOL_TESTNET = 'RUNE-67C'
 export const BNB_SYMBOL = 'BNB'
