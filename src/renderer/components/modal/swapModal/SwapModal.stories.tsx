@@ -42,6 +42,7 @@ storiesOf('Components/Swap Modal', module).add('default', () => {
         swapTarget={ASSETS_MAINNET.BNB}
         txStatus={txStatus}
         visible
+        maxSec={1}
       />
     </div>
   )

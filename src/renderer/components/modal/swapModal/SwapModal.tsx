@@ -27,6 +27,7 @@ type Props = {
   onEndTxTimer?: () => void
   onClickFinish?: () => void
   onViewTxClick?: (e: React.MouseEvent) => void
+  maxSec?: number
 }
 
 const SwapModal: React.FC<Props> = (props): JSX.Element => {
@@ -44,7 +45,8 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
     onChangeTxTimer = () => {},
     onClickFinish = () => {},
     onEndTxTimer = () => {},
-    onViewTxClick = () => {}
+    onViewTxClick = () => {},
+    maxSec = Number.MAX_SAFE_INTEGER
   } = props
   const [openSwapModal, setOpenSwapModal] = useState<boolean>(visible)
   const intl = useIntl()
@@ -71,7 +73,7 @@ const SwapModal: React.FC<Props> = (props): JSX.Element => {
               status={status}
               value={value}
               maxValue={100}
-              maxSec={45}
+              maxSec={maxSec}
               maxDuration={Number.MAX_SAFE_INTEGER}
               startTime={startTime}
               onChange={onChangeTxTimer}

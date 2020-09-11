@@ -16,6 +16,12 @@ export const CoinDataWrapper = styled.div<CoinDataWrapperProps>`
   width: 100%;
   padding: 0 8px;
 
+  margin-bottom: 30px;
+
+  &:last-child {
+    margin: 0;
+  }
+
   .label-wrapper {
     padding: 0;
     text-transform: uppercase;
