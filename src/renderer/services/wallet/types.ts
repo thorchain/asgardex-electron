@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BaseAmount, Asset } from '@thorchain/asgardex-util'
 import { getMonoid } from 'fp-ts/Array'
+import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
@@ -34,6 +35,7 @@ export type AssetWithBalance = {
 }
 
 export type AssetsWithBalance = AssetWithBalance[]
+export type NonEmptyAssetsWithBalance = NonEmptyArray<AssetWithBalance>
 
 export type AssetsWithBalanceRD = RD.RemoteData<ApiError, AssetsWithBalance>
 export type AssetWithBalanceRD = RD.RemoteData<ApiError, AssetWithBalance>
@@ -41,7 +43,7 @@ export type AssetWithBalanceRD = RD.RemoteData<ApiError, AssetWithBalance>
 export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
 
 export type AssetsWithBalanceState = {
-  assetsWB: AssetsWithBalance
+  assetsWB: O.Option<NonEmptyArray<AssetWithBalance>>
   errors: O.Option<ApiError[]>
   loading: boolean
 }
@@ -58,3 +60,5 @@ export type ApiError = {
   errorId: ErrorId
   msg: string
 }
+
+export type ApiErrors = ApiError[]

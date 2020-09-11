@@ -28,10 +28,10 @@ import { useHistory } from 'react-router'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getAssetWBByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
-import { AssetWithPrice } from '../../services/binance/types'
+import { AssetsWithPrice } from '../../services/binance/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
-import { AssetsWithBalanceRD, AssetWithBalance } from '../../services/wallet/types'
+import { AssetWithBalance, NonEmptyAssetsWithBalance } from '../../services/wallet/types'
 import { TxStatus, TxTypes } from '../../types/asgardex'
 import { RUNEAsset } from '../../views/pools/types'
 import { PricePool } from '../../views/pools/types'
@@ -47,12 +47,12 @@ import { getSwapData, getSwapMemo, pairAssetToPlain, pickAssetPair } from './uti
 
 type SwapProps = {
   balance?: number
-  availableAssets: AssetWithPrice[]
+  availableAssets: AssetsWithPrice
   sourceAsset: O.Option<Asset>
   targetAsset: O.Option<Asset>
   onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
   poolDetails?: PoolDetails
-  assetsRD?: AssetsWithBalanceRD
+  assetsWB?: O.Option<NonEmptyAssetsWithBalance>
   txWithState?: RD.RemoteData<Error, { tx: Transfer; state: O.Option<TransferWs> }>
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
@@ -66,7 +66,7 @@ export const Swap = ({
   sourceAsset: sourceAssetProp,
   targetAsset: targetAssetProp,
   poolDetails = [],
-  assetsRD = RD.initial,
+  assetsWB = O.none,
   txWithState = RD.initial,
   goToTransaction,
   resetTx,
@@ -88,9 +88,12 @@ export const Swap = ({
     availableAssets,
     targetAssetProp
   ])
-  const sourceAsset = useMemo(() => pairAssetToPlain(sourceAssetPair), [sourceAssetPair])
-  const targetAsset = useMemo(() => pairAssetToPlain(targetAssetPair), [targetAssetPair])
-  const assetsToSwap = useMemo(() => sequenceTOption(sourceAsset, targetAsset), [sourceAsset, targetAsset])
+  const sourceAsset: O.Option<Asset> = useMemo(() => pairAssetToPlain(sourceAssetPair), [sourceAssetPair])
+  const targetAsset: O.Option<Asset> = useMemo(() => pairAssetToPlain(targetAssetPair), [targetAssetPair])
+  const assetsToSwap: O.Option<[Asset, Asset]> = useMemo(() => sequenceTOption(sourceAsset, targetAsset), [
+    sourceAsset,
+    targetAsset
+  ])
 
   const setSourceAsset = useCallback(
     (asset: Asset) => {
@@ -128,8 +131,8 @@ export const Swap = ({
 
   const [changeAmount, setChangeAmount] = useState(bn(0))
 
-  const oAssetWB: O.Option<AssetWithBalance> = useMemo(() => getAssetWBByAsset(assetsRD, sourceAsset), [
-    assetsRD,
+  const oAssetWB: O.Option<AssetWithBalance> = useMemo(() => getAssetWBByAsset(assetsWB, sourceAsset), [
+    assetsWB,
     sourceAsset
   ])
 
@@ -155,9 +158,9 @@ export const Swap = ({
     [availableAssets]
   )
 
-  const assetSymbolsInWallet = useMemo(
-    () => FP.pipe(assetsRD, RD.map(A.map(({ asset }) => asset.symbol)), RD.toOption),
-    [assetsRD]
+  const assetSymbolsInWallet: O.Option<string[]> = useMemo(
+    () => FP.pipe(assetsWB, O.map(A.map(({ asset }) => asset.symbol))),
+    [assetsWB]
   )
 
   const assetsToSwapFrom = useMemo(() => {
@@ -201,14 +204,13 @@ export const Swap = ({
   const canSwitchAssets = useMemo(
     () =>
       FP.pipe(
-        assetsRD,
-        RD.map(A.map(({ asset }) => asset.symbol)),
-        RD.toOption,
-        (balances) => sequenceTOption(balances, targetAsset),
+        assetsWB,
+        O.map(A.map(({ asset }) => asset.symbol)),
+        (oAssetSymbols) => sequenceTOption(oAssetSymbols, targetAsset),
         O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqString)(targetAsset.symbol))),
         O.getOrElse(() => true)
       ),
-    [assetsRD, targetAsset]
+    [assetsWB, targetAsset]
   )
 
   const onSwitchAssets = useCallback(() => {
@@ -249,16 +251,7 @@ export const Swap = ({
     [oAssetWB, intl]
   )
 
-  const isSwapDisabled = useMemo(
-    () =>
-      changeAmount.eq(0) ||
-      FP.pipe(
-        assetsRD,
-        RD.map(A.isEmpty),
-        RD.getOrElse(() => true)
-      ),
-    [assetsRD, changeAmount]
-  )
+  const isSwapDisabled = useMemo(() => changeAmount.eq(0) || FP.pipe(assetsWB, O.isNone), [assetsWB, changeAmount])
 
   const onSwapConfirmed = useCallback(() => {
     FP.pipe(

@@ -1,10 +1,9 @@
-import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetAmount, AssetAmount, baseToAsset } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { AssetsWithBalance, AssetsWithBalanceRD, AssetWithBalance } from '../services/wallet/types'
+import { NonEmptyAssetsWithBalance, AssetWithBalance, AssetsWithBalance } from '../services/wallet/types'
 import { isBnbAsset } from './assetHelper'
 import { sequenceTOption } from './fpHelpers'
 
@@ -17,14 +16,14 @@ export const getAssetAmountByAsset = (balances: AssetsWithBalance, assetToFind: 
   )
 
 export const getAssetWBByAsset = (
-  balancesRD: AssetsWithBalanceRD,
+  oAssetsWB: O.Option<NonEmptyAssetsWithBalance>,
   oAsset: O.Option<Asset>
 ): O.Option<AssetWithBalance> =>
   FP.pipe(
-    sequenceTOption(FP.pipe(balancesRD, RD.toOption), oAsset),
-    O.chain(([balances, asset]) =>
+    sequenceTOption(oAssetsWB, oAsset),
+    O.chain(([assetsWB, asset]) =>
       FP.pipe(
-        balances,
+        assetsWB,
         A.findFirst(({ asset: assetInList }) => assetInList.symbol === asset.symbol)
       )
     )

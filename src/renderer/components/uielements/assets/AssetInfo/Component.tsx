@@ -1,6 +1,5 @@
 import React, { useMemo, useRef } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Asset, formatAssetAmount, assetToString } from '@thorchain/asgardex-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
@@ -8,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
-import { AssetsWithBalanceRD } from '../../../../services/wallet/types'
+import { NonEmptyAssetsWithBalance } from '../../../../services/wallet/types'
 import AssetIcon from '../assetIcon'
 import * as Styled from './Component.style'
 
@@ -17,11 +16,11 @@ type Props = {
   // balances are optional:
   // No balances == don't render price
   // balances == render price
-  assetsRD?: AssetsWithBalanceRD
+  assetsWB?: O.Option<NonEmptyAssetsWithBalance>
 }
 
 const Component: React.FC<Props> = (props: Props): JSX.Element => {
-  const { assetsRD, asset: oAsset } = props
+  const { assetsWB = O.none, asset: oAsset } = props
 
   const asset = O.toNullable(oAsset)
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -33,12 +32,10 @@ const Component: React.FC<Props> = (props: Props): JSX.Element => {
   const renderAssetIcon = useMemo(() => asset && <AssetIcon asset={asset} size="large" />, [asset])
 
   const renderBalance = useMemo(() => {
-    if (!assetsRD) return React.Fragment
+    if (O.isNone(assetsWB)) return React.Fragment
 
     return FP.pipe(
-      assetsRD,
-      RD.toOption,
-      (oAssetsWB) => sequenceTOption(oAssetsWB, oAsset),
+      sequenceTOption(assetsWB, oAsset),
       O.fold(
         () => previousBalance.current,
         ([assetsWB, asset]) => {
@@ -49,7 +46,7 @@ const Component: React.FC<Props> = (props: Props): JSX.Element => {
         }
       )
     )
-  }, [oAsset, assetsRD])
+  }, [oAsset, assetsWB])
 
   return (
     <Styled.Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>

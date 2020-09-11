@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { initial } from '@devexperts/remote-data-ts'
 import { assetFromString, assetToString, AssetAmount } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -17,6 +16,7 @@ import { getBnbAmountFromBalances, getAssetWBByAsset } from '../../helpers/walle
 import { SendParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { FreezeAction } from '../../services/binance/types'
+import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
 import { AssetWithBalance } from '../../services/wallet/types'
 
 type Props = {
@@ -28,18 +28,16 @@ const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
   const oSelectedAsset = O.fromNullable(assetFromString(asset))
 
   const { freeze: freezeService, explorerUrl$, freezeFee$ } = useBinanceContext()
-  const { assetsWB$ } = useWalletContext()
+  const { assetsWBState$ } = useWalletContext()
   const fee = useObservableState<O.Option<AssetAmount>>(() => freezeFee$.pipe(Rx.map(RD.toOption)), O.none)[0]
-  const balancesState = useObservableState(assetsWB$, initial)
+  const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
   const explorerUrl = useObservableState(explorerUrl$, O.none)
 
-  const oWalletBalance: O.Option<AssetWithBalance> = useMemo(() => getAssetWBByAsset(balancesState, oSelectedAsset), [
-    balancesState,
+  const oWalletBalance: O.Option<AssetWithBalance> = useMemo(() => getAssetWBByAsset(assetsWB, oSelectedAsset), [
+    assetsWB,
     oSelectedAsset
   ])
-  const bnbAmount = useMemo(() => FP.pipe(balancesState, RD.map(getBnbAmountFromBalances), RD.toOption, O.flatten), [
-    balancesState
-  ])
+  const bnbAmount = useMemo(() => FP.pipe(assetsWB, O.chain(getBnbAmountFromBalances)), [assetsWB])
   return (
     <>
       {FP.pipe(

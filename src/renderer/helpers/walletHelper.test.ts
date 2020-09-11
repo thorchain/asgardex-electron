@@ -1,10 +1,10 @@
-import * as RD from '@devexperts/remote-data-ts'
 import { baseAmount, assetFromString } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
-import { AssetsWithBalanceRD } from '../services/wallet/types'
+import { NonEmptyAssetsWithBalance } from '../services/wallet/types'
 import { getAssetAmountByAsset, getBnbAmountFromBalances, getAssetWBByAsset } from './walletHelper'
 
 describe('walletHelper', () => {
@@ -30,14 +30,19 @@ describe('walletHelper', () => {
 
   describe('getAssetWBByAsset', () => {
     it('returns amount of BNB', () => {
-      const assetsRD: AssetsWithBalanceRD = RD.success([RUNE_WB, BOLT_WB, BNB_WB])
-      const result = O.toNullable(getAssetWBByAsset(assetsRD, BNB))
+      const assetsWB: O.Option<NonEmptyAssetsWithBalance> = NEA.fromArray([RUNE_WB, BOLT_WB, BNB_WB])
+      const result = O.toNullable(getAssetWBByAsset(assetsWB, BNB))
       expect(result?.asset.symbol).toEqual('BNB')
       expect(result?.amount.amount().toString()).toEqual('45600000000')
     })
     it('returns none if BNB is not available', () => {
-      const assetsRD: AssetsWithBalanceRD = RD.success([RUNE_WB, BOLT_WB])
-      const result = getAssetWBByAsset(assetsRD, BNB)
+      const assetsWB: O.Option<NonEmptyAssetsWithBalance> = NEA.fromArray([RUNE_WB, BOLT_WB])
+      const result = getAssetWBByAsset(assetsWB, BNB)
+      expect(result).toBeNone()
+    })
+    it('returns none for empty lists of `AssetWB`', () => {
+      const assetsWB: O.Option<NonEmptyAssetsWithBalance> = NEA.fromArray([])
+      const result = getAssetWBByAsset(assetsWB, BNB)
       expect(result).toBeNone()
     })
   })

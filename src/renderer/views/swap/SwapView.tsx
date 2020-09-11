@@ -25,6 +25,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { rdFromOption } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
+import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
 import * as Styled from './SwapView.styles'
 
 type Props = {}
@@ -38,7 +39,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
     pools: { poolsState$, poolAddresses$, reloadPoolsState, selectedPricePoolAsset$, runeAsset$ }
   } = midgardService
   const { transaction, explorerUrl$ } = useBinanceContext()
-  const { assetsWB$ } = useWalletContext()
+  const { assetsWBState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
 
@@ -57,7 +58,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
     runePricePool
   )
 
-  const balances = useObservableState(assetsWB$)
+  const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
 
   const [txWithState] = useObservableState(() => transaction.txWithState$, RD.initial)
 
@@ -139,7 +140,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
                   onConfirmSwap={onConfirmSwap}
                   availableAssets={availableAssets}
                   poolDetails={state.poolDetails}
-                  assetsRD={balances}
+                  assetsWB={assetsWB}
                 />
               )
             }
