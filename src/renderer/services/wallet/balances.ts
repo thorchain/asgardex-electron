@@ -6,6 +6,7 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 
+import { eqAssetsWithBalanceRD } from '../../helpers/fp/eq'
 import { sequenceTRD, sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/service'
@@ -31,7 +32,7 @@ const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLatest([BNB
       A.filterMap(RD.toOption),
       A.flatten
     ),
-    loading: FP.pipe(rdList, A.findFirst(RD.isPending), O.isSome),
+    loading: FP.pipe(rdList, A.elem(eqAssetsWithBalanceRD)(RD.pending)),
     errors: FP.pipe(
       rdList,
       // filter errors out
