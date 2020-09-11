@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, BaseAmount } from '@thorchain/asgardex-util'
+import { Asset, BaseAmount, assetToString } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
 import * as O from 'fp-ts/lib/Option'
@@ -9,7 +9,7 @@ import { AssetWithBalance, ApiError, AssetsWithBalance } from '../../services/wa
 export const eqOString = O.getEq(Eq.eqString)
 
 export const eqAsset: Eq.Eq<Asset> = {
-  equals: (x, y) => x.symbol === y.symbol
+  equals: (x, y) => assetToString(x) === assetToString(y)
 }
 
 export const eqBaseAmount: Eq.Eq<BaseAmount> = {
