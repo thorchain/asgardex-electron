@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import * as Eq from 'fp-ts/Eq'
 import { Lazy } from 'fp-ts/function'
 import { sequenceT } from 'fp-ts/lib/Apply'
 import * as O from 'fp-ts/lib/Option'
@@ -26,11 +25,6 @@ export const sequenceTRDFromArray = <E, A>(onEmpty: () => E) => ([first, ...rest
   }
   return sequenceTRD(first, ...rest)
 }
-
-/**
- * Equality
- */
-export const eqOString = O.getEq(Eq.eqString)
 
 /**
  * Creation
