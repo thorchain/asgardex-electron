@@ -38,7 +38,8 @@ const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLatest([BNB
       // `RemoteData<Error, never>[]` -> `RemoteData<never, Error>[]` -> `O.some(Error)[]`
       A.map(FP.flow(RD.recover(O.some), RD.toOption)),
       // Transformation: `O.some(Error)[]` -> `O.some(Error[])`
-      sequenceTOptionFromArray
+      sequenceTOptionFromArray,
+      O.chain(NEA.fromArray)
     )
   })),
   startWith(INITIAL_ASSETS_WB_STATE)

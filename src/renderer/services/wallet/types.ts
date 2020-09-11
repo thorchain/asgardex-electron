@@ -44,7 +44,7 @@ export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
 
 export type AssetsWithBalanceState = {
   assetsWB: O.Option<NonEmptyArray<AssetWithBalance>>
-  errors: O.Option<ApiError[]>
+  errors: O.Option<NonEmptyArray<ApiError>>
   loading: boolean
 }
 
