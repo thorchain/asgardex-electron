@@ -6,6 +6,8 @@ import * as O from 'fp-ts/lib/Option'
 
 import { AssetWithBalance, ApiError, AssetsWithBalance } from '../../services/wallet/types'
 
+export const eqOString = O.getEq(Eq.eqString)
+
 export const eqAsset: Eq.Eq<Asset> = {
   equals: (x, y) => x.symbol === y.symbol
 }
@@ -23,7 +25,15 @@ export const eqAssetWithBalance: Eq.Eq<AssetWithBalance> = {
     eqOptionBaseAmount.equals(x.frozenAmount, y.frozenAmount)
 }
 
+export const eqErrorId = Eq.eqNumber
+
+export const eqApiError = Eq.getStructEq<ApiError>({
+  apiId: Eq.eqString,
+  errorId: eqErrorId,
+  msg: Eq.eqString
+})
+
 export const eqAssetsWithBalance = A.getEq(eqAssetWithBalance)
 
-export const eqAssetWithBalanceRD = RD.getEq<ApiError, AssetWithBalance>(Eq.eqStrict, eqAssetWithBalance)
-export const eqAssetsWithBalanceRD = RD.getEq<ApiError, AssetsWithBalance>(Eq.eqStrict, eqAssetsWithBalance)
+export const eqAssetWithBalanceRD = RD.getEq<ApiError, AssetWithBalance>(eqApiError, eqAssetWithBalance)
+export const eqAssetsWithBalanceRD = RD.getEq<ApiError, AssetsWithBalance>(eqApiError, eqAssetsWithBalance)

@@ -36,3 +36,14 @@ export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>
 export type AssetWithBalanceRD = RD.RemoteData<Error, AssetWithBalance>
 
 export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
+
+export enum ErrorId {
+  GET_BALANCES,
+  GET_ADDRESS
+}
+
+export type ApiError = {
+  apiId: string // ApiId (Will be add by https://github.com/thorchain/asgardex-electron/pull/449/)
+  errorId: ErrorId
+  msg: string
+}

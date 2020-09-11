@@ -2,8 +2,8 @@ import { baseAmount } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
-import { AssetWithBalance } from '../../services/wallet/types'
-import { eqAsset, eqBaseAmount, eqAssetWithBalance, eqAssetsWithBalance } from './eq'
+import { AssetWithBalance, ApiError, ErrorId } from '../../services/wallet/types'
+import { eqAsset, eqBaseAmount, eqAssetWithBalance, eqAssetsWithBalance, eqApiError } from './eq'
 
 describe('helpers/fp/eq', () => {
   describe('eqAsset', () => {
@@ -17,6 +17,7 @@ describe('helpers/fp/eq', () => {
       expect(eqAsset.equals(a, b)).toBeFalsy()
     })
   })
+
   describe('eqBaseAmount', () => {
     it('is equal', () => {
       const a = baseAmount(100, 18)
@@ -28,6 +29,39 @@ describe('helpers/fp/eq', () => {
       expect(eqBaseAmount.equals(a, b)).toBeFalsy()
     })
   })
+
+  describe('eqApiError', () => {
+    const a: ApiError = {
+      apiId: 'apiId',
+      errorId: ErrorId.GET_BALANCES,
+      msg: 'msg'
+    }
+    it('is equal', () => {
+      expect(eqApiError.equals(a, a)).toBeTruthy()
+    })
+    it('is not equal with different apiId', () => {
+      const b: ApiError = {
+        ...a,
+        apiId: 'anotherId'
+      }
+      expect(eqApiError.equals(a, b)).toBeFalsy()
+    })
+    it('is not equal with different msg', () => {
+      const b: ApiError = {
+        ...a,
+        msg: 'anotherMsg'
+      }
+      expect(eqApiError.equals(a, b)).toBeFalsy()
+    })
+    it('is not equal with different msg', () => {
+      const b: ApiError = {
+        ...a,
+        errorId: ErrorId.GET_ADDRESS
+      }
+      expect(eqApiError.equals(a, b)).toBeFalsy()
+    })
+  })
+
   describe('eqAssetWithBalance', () => {
     it('is equal', () => {
       const a: AssetWithBalance = {
