@@ -8,6 +8,7 @@ export const TxTimerWrapper = styled.div`
   height: 100px;
   border-radius: 50%;
   overflow: hidden;
+  color: ${palette('gray', 0)};
 
   .timerchart-icon {
     position: absolute;

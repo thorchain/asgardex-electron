@@ -11,7 +11,7 @@ import { map, mergeMap, catchError, shareReplay, startWith, distinctUntilChanged
 import { AssetBTC } from '../../const'
 import { BTC_DECIMAL } from '../../helpers/assetHelper'
 import { envOrDefault } from '../../helpers/envHelper'
-import * as fpHelpers from '../../helpers/fpHelpers'
+import { eqOString } from '../../helpers/fp/eq'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
@@ -82,7 +82,7 @@ const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(
  */
 const address$: Observable<O.Option<string>> = client$.pipe(
   map(FP.pipe(O.chain((client) => O.some(client.getAddress())))),
-  distinctUntilChanged(fpHelpers.eqOString.equals),
+  distinctUntilChanged(eqOString.equals),
   shareReplay(1)
 )
 

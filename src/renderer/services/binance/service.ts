@@ -22,8 +22,8 @@ import { webSocket } from 'rxjs/webSocket'
 
 import { getTransferFees, getFreezeFee } from '../../helpers/binanceHelper'
 import { envOrDefault } from '../../helpers/envHelper'
+import { eqOString } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import * as fpHelpers from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
@@ -199,7 +199,7 @@ const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(
  */
 const address$: Observable<O.Option<Address>> = client$.pipe(
   map(FP.pipe(O.chain((client) => FP.pipe(client.getAddress(), O.fromNullable)))),
-  distinctUntilChanged(fpHelpers.eqOString.equals),
+  distinctUntilChanged(eqOString.equals),
   shareReplay(1)
 )
 

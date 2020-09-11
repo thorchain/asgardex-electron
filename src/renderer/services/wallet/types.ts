@@ -49,7 +49,8 @@ export type AssetsWithBalanceState = {
 export type ApiId = BNBTypes.ApiId | BTCTypes.ApiId
 
 export enum ErrorId {
-  GET_BALANCES
+  GET_BALANCES,
+  GET_ADDRESS
 }
 
 export type ApiError = {
