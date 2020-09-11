@@ -43,8 +43,8 @@ export type AssetWithBalanceRD = RD.RemoteData<ApiError, AssetWithBalance>
 export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
 
 export type AssetsWithBalanceState = {
-  assetsWB: O.Option<NonEmptyArray<AssetWithBalance>>
-  errors: O.Option<NonEmptyArray<ApiError>>
+  assetsWB: O.Option<NonEmptyAssetsWithBalance>
+  errors: O.Option<NonEmptyApiErrors>
   loading: boolean
 }
 
@@ -61,4 +61,4 @@ export type ApiError = {
   msg: string
 }
 
-export type ApiErrors = ApiError[]
+export type NonEmptyApiErrors = NonEmptyArray<ApiError>

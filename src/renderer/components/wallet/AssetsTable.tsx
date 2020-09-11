@@ -11,7 +11,7 @@ import { RUNE_PRICE_POOL } from '../../const'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getPoolPriceValue } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
-import { AssetWithBalance, NonEmptyAssetsWithBalance, ApiErrors } from '../../services/wallet/types'
+import { AssetWithBalance, NonEmptyAssetsWithBalance, NonEmptyApiErrors } from '../../services/wallet/types'
 import { PricePool } from '../../views/pools/types'
 import AssetIcon from '../uielements/assets/assetIcon'
 import Label from '../uielements/label'
@@ -20,7 +20,7 @@ import { TableWrapper } from './AssetsTable.style'
 type Props = {
   assetsWB?: O.Option<NonEmptyAssetsWithBalance>
   assetsLoading?: boolean
-  assetsErrors?: O.Option<ApiErrors>
+  assetsErrors?: O.Option<NonEmptyApiErrors>
   pricePool?: PricePool
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: Asset) => void
