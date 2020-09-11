@@ -6,7 +6,7 @@ import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators'
 
-import * as fpHelpers from '../../helpers/fpHelpers'
+import { eqOString } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
 import { Network } from '../app/types'
 import { DEFAULT_NETWORK } from '../const'
@@ -70,7 +70,7 @@ const client$: Observable<O.Option<EthereumClient>> = clientState$.pipe(map(getC
  */
 const address$: Observable<O.Option<Address>> = client$.pipe(
   map(FP.pipe(O.chain((client) => O.some(client.getAddress())))),
-  distinctUntilChanged(fpHelpers.eqOString.equals),
+  distinctUntilChanged(eqOString.equals),
   shareReplay(1)
 )
 
