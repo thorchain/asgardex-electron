@@ -1,6 +1,5 @@
-import React, { useMemo, useCallback, useRef } from 'react'
+import React, { useMemo, useCallback } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { formatAssetAmountCurrency, baseToAsset, Asset, assetToString } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
@@ -12,28 +11,32 @@ import { RUNE_PRICE_POOL } from '../../const'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getPoolPriceValue } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
-import { AssetsWithBalanceRD, AssetsWithBalance, AssetWithBalance } from '../../services/wallet/types'
-import { filterNullableBalances, sortBalances } from '../../services/wallet/util'
+import { AssetWithBalance, NonEmptyAssetsWithBalance, NonEmptyApiErrors } from '../../services/wallet/types'
 import { PricePool } from '../../views/pools/types'
-import ErrorView from '../shared/error/ErrorView'
 import AssetIcon from '../uielements/assets/assetIcon'
 import Label from '../uielements/label'
 import { TableWrapper } from './AssetsTable.style'
 
 type Props = {
-  assetsRD: AssetsWithBalanceRD
+  assetsWB?: O.Option<NonEmptyAssetsWithBalance>
+  assetsLoading?: boolean
+  assetsErrors?: O.Option<NonEmptyApiErrors>
   pricePool?: PricePool
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: Asset) => void
 }
 
 const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
-  const { assetsRD, pricePool = RUNE_PRICE_POOL, poolDetails, selectAssetHandler = (_) => {} } = props
+  const {
+    assetsWB = O.none,
+    assetsLoading = false,
+    assetsErrors = O.none,
+    pricePool = RUNE_PRICE_POOL,
+    poolDetails,
+    selectAssetHandler = (_) => {}
+  } = props
 
   const intl = useIntl()
-
-  // store previous data of balances to still render these while reloading new data
-  const previousBalances = useRef<O.Option<AssetsWithBalance>>(O.none)
 
   const iconColumn: ColumnType<AssetWithBalance> = useMemo(
     () => ({
@@ -135,55 +138,43 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     },
     [selectAssetHandler]
   )
-  const renderAssetsTable = useCallback(
-    (balances: AssetsWithBalance, loading = false) => {
-      return (
-        <TableWrapper
-          dataSource={balances}
-          loading={loading}
-          rowKey={({ asset }) => asset.symbol}
-          onRow={onRow}
-          columns={columns}
-        />
-      )
-    },
-    [columns, onRow]
+
+  const renderApiErrors = useMemo(
+    () =>
+      FP.pipe(
+        assetsErrors,
+        O.fold(
+          () => <></>,
+          (errors) => (
+            <Row>
+              {errors.map(({ apiId, errorId, msg }) => (
+                <Col span={24} key={`${apiId}-${errorId}`}>
+                  {apiId} API: {msg}
+                </Col>
+              ))}
+            </Row>
+          )
+        )
+      ),
+    [assetsErrors]
   )
 
-  const renderAssets = useMemo(
-    () => (
-      <>
-        {FP.pipe(
-          assetsRD,
-          RD.map(FP.flow(filterNullableBalances, sortBalances)),
-          RD.fold(
-            // initial state
-            () => renderAssetsTable([], true),
-            // loading state
-            () => {
-              const pools = O.getOrElse(() => [] as AssetsWithBalance)(previousBalances.current)
-              return renderAssetsTable(pools, true)
-            },
-            // error state
-            (error: Error) => {
-              const msg = error?.toString() ?? ''
-              return <ErrorView title={msg} />
-            },
-            // success state
-            (balances: AssetsWithBalance): JSX.Element => {
-              previousBalances.current = O.some(balances)
-              return renderAssetsTable(balances)
-            }
-          )
-        )}
-      </>
-    ),
-    [assetsRD, renderAssetsTable]
-  )
+  const renderAssetsTable = useMemo(() => {
+    return (
+      <TableWrapper
+        dataSource={FP.pipe(assetsWB, O.toUndefined)}
+        loading={assetsLoading}
+        rowKey={({ asset }) => asset.symbol}
+        onRow={onRow}
+        columns={columns}
+      />
+    )
+  }, [assetsWB, assetsLoading, onRow, columns])
 
   return (
     <Row>
-      <Col span={24}>{renderAssets}</Col>
+      <Col span={24}>{renderApiErrors}</Col>
+      <Col span={24}>{renderAssetsTable}</Col>
     </Row>
   )
 }

@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { BinanceClient } from '@thorchain/asgardex-binance'
 import { assetFromString, assetToString } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
@@ -18,6 +17,7 @@ import { useSingleTxFee } from '../../hooks/useSingleTxFee'
 import { SendParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { AddressValidation } from '../../services/binance/types'
+import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
 import { AssetsWithBalance } from '../../services/wallet/types'
 
 type Props = {}
@@ -27,26 +27,15 @@ const SendView: React.FC<Props> = (): JSX.Element => {
   const oSelectedAsset = O.fromNullable(assetFromString(asset))
 
   const { transaction: transactionService, explorerUrl$, client$, transferFees$ } = useBinanceContext()
-  const { assetsWB$ } = useWalletContext()
+  const { assetsWBState$ } = useWalletContext()
 
-  const balancesState = useObservableState(assetsWB$, RD.initial)
+  const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
   const explorerUrl = useObservableState(explorerUrl$, O.none)
   const client = useObservableState<O.Option<BinanceClient>>(client$, O.none)
 
   const fee = useSingleTxFee(transferFees$)
 
-  const balances = useMemo(
-    () =>
-      FP.pipe(
-        balancesState,
-        RD.getOrElse(() => [] as AssetsWithBalance)
-      ),
-    [balancesState]
-  )
-  const oSelectedAssetWB = useMemo(() => getAssetWBByAsset(balancesState, oSelectedAsset), [
-    balancesState,
-    oSelectedAsset
-  ])
+  const oSelectedAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, oSelectedAsset), [assetsWB, oSelectedAsset])
 
   const addressValidation = useMemo(
     () =>
@@ -78,7 +67,10 @@ const SendView: React.FC<Props> = (): JSX.Element => {
           <Send
             selectedAsset={wb}
             transactionService={transactionService}
-            assetsWB={balances}
+            assetsWB={FP.pipe(
+              assetsWB,
+              O.getOrElse(() => [] as AssetsWithBalance)
+            )}
             explorerUrl={explorerUrl}
             addressValidation={addressValidation}
             fee={fee}

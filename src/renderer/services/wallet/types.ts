@@ -1,8 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BaseAmount, Asset } from '@thorchain/asgardex-util'
 import { getMonoid } from 'fp-ts/Array'
+import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
+
+import * as BNBTypes from '../binance/types'
+import * as BTCTypes from '../bitcoin/types'
 
 export type Phrase = string
 
@@ -31,11 +35,20 @@ export type AssetWithBalance = {
 }
 
 export type AssetsWithBalance = AssetWithBalance[]
+export type NonEmptyAssetsWithBalance = NonEmptyArray<AssetWithBalance>
 
-export type AssetsWithBalanceRD = RD.RemoteData<Error, AssetsWithBalance>
-export type AssetWithBalanceRD = RD.RemoteData<Error, AssetWithBalance>
+export type AssetsWithBalanceRD = RD.RemoteData<ApiError, AssetsWithBalance>
+export type AssetWithBalanceRD = RD.RemoteData<ApiError, AssetWithBalance>
 
 export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
+
+export type AssetsWithBalanceState = {
+  assetsWB: O.Option<NonEmptyAssetsWithBalance>
+  errors: O.Option<NonEmptyApiErrors>
+  loading: boolean
+}
+
+export type ApiId = BNBTypes.ApiId | BTCTypes.ApiId
 
 export enum ErrorId {
   GET_BALANCES,
@@ -43,7 +56,9 @@ export enum ErrorId {
 }
 
 export type ApiError = {
-  apiId: string // ApiId (Will be add by https://github.com/thorchain/asgardex-electron/pull/449/)
+  apiId: ApiId
   errorId: ErrorId
   msg: string
 }
+
+export type NonEmptyApiErrors = NonEmptyArray<ApiError>

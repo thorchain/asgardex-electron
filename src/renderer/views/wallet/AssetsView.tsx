@@ -11,12 +11,16 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as walletRoutes from '../../routes/wallet'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
+import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
 import { PricePoolAsset } from '../pools/types'
 
 const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const { assetsWB$ } = useWalletContext()
-  const balancesRD = useObservableState(assetsWB$, RD.initial)
+  const { assetsWBState$ } = useWalletContext()
+  const { assetsWB, loading: assetsLoading, errors: assetsErrors } = useObservableState(
+    assetsWBState$,
+    INITIAL_ASSETS_WB_STATE
+  )
 
   const {
     service: {
@@ -44,7 +48,9 @@ const AssetsView: React.FC = (): JSX.Element => {
 
   return (
     <AssetsTable
-      assetsRD={balancesRD}
+      assetsWB={assetsWB}
+      assetsLoading={assetsLoading}
+      assetsErrors={assetsErrors}
       pricePool={pricePool}
       poolDetails={poolDetails}
       selectAssetHandler={selectAssetHandler}

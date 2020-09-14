@@ -13,6 +13,8 @@ export type AssetWithPrice = {
   priceRune: BigNumber
 }
 
+export type AssetsWithPrice = AssetWithPrice[]
+
 export type TxsRD = RD.RemoteData<Error, TxPage>
 
 export type BinanceClientState = ClientState<BinanceClient>
@@ -70,3 +72,5 @@ export type LoadTxsProps = {
   limit: number
   offset: number
 }
+
+export type ApiId = 'BNB'

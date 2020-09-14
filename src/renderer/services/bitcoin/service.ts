@@ -18,7 +18,7 @@ import { network$ } from '../app/service'
 import { ClientStateForViews } from '../types'
 import { getClientStateForViews, getClient } from '../utils'
 import { keystoreService } from '../wallet/service'
-import { AssetWithBalanceRD, AssetWithBalance, AssetsWithBalanceRD } from '../wallet/types'
+import { AssetWithBalanceRD, AssetWithBalance, AssetsWithBalanceRD, ApiError, ErrorId } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { BitcoinClientState } from './types'
 
@@ -101,7 +101,9 @@ const loadBalances$ = (client: BitcoinClient): Observable<AssetWithBalanceRD> =>
         } as AssetWithBalance)
       )
     ),
-    catchError((error) => Rx.of(RD.failure(error))),
+    catchError((error: Error) =>
+      Rx.of(RD.failure({ apiId: 'BTC', errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
+    ),
     startWith(RD.pending)
   )
 

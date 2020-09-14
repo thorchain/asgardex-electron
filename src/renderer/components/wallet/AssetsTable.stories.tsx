@@ -1,14 +1,14 @@
 import React from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { assetFromString, baseAmount, EMPTY_ASSET } from '@thorchain/asgardex-util'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
-import { AssetsWithBalance } from '../../services/wallet/types'
+import { NonEmptyAssetsWithBalance } from '../../services/wallet/types'
 import AssetsTable from './AssetsTable'
 
-const balances: AssetsWithBalance = [
+const balances: O.Option<NonEmptyAssetsWithBalance> = NEA.fromArray([
   {
     amount: baseAmount('12200000000'),
     frozenAmount: O.none,
@@ -17,25 +17,22 @@ const balances: AssetsWithBalance = [
   {
     amount: baseAmount('1000000'),
     frozenAmount: O.none,
-    asset: assetFromString('BNB') || EMPTY_ASSET
+    asset: assetFromString('BNB.BNB') || EMPTY_ASSET
   },
   {
     amount: baseAmount('300000000'),
     frozenAmount: O.none,
-    asset: assetFromString('FTM-585') || EMPTY_ASSET
+    asset: assetFromString('BNB.FTM-585') || EMPTY_ASSET
   }
-]
+])
 
 storiesOf('Wallet/AssetsTable', module)
   .add('initial', () => {
-    return <AssetsTable assetsRD={RD.initial} poolDetails={[]} />
+    return <AssetsTable poolDetails={[]} />
   })
   .add('loading', () => {
-    return <AssetsTable assetsRD={RD.pending} poolDetails={[]} />
+    return <AssetsTable assetsLoading={true} poolDetails={[]} />
   })
   .add('data', () => {
-    return <AssetsTable assetsRD={RD.success(balances)} poolDetails={[]} />
-  })
-  .add('error', () => {
-    return <AssetsTable assetsRD={RD.failure(new Error('Could not load data'))} poolDetails={[]} />
+    return <AssetsTable assetsWB={balances} poolDetails={[]} />
   })

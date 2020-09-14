@@ -10,17 +10,18 @@ import AssetDetails from '../../components/wallet/AssetDetails'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { AssetDetailsParams } from '../../routes/wallet'
+import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
 
 const AssetDetailsView: React.FC = (): JSX.Element => {
   const { txsSelectedAsset$, address$, loadTxsSelectedAsset, explorerUrl$, setSelectedAsset } = useBinanceContext()
-  const { assetsWB$, reloadBalances } = useWalletContext()
+  const { assetsWBState$, reloadBalances } = useWalletContext()
 
   const { asset } = useParams<AssetDetailsParams>()
   const selectedAsset = O.fromNullable(assetFromString(asset))
 
   const txsRD = useObservableState(txsSelectedAsset$, RD.initial)
   const address = useObservableState(address$, O.none)
-  const balancesRD = useObservableState(assetsWB$, RD.initial)
+  const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
 
   const explorerUrl = useObservableState(explorerUrl$, O.none)
 
@@ -33,7 +34,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
       <AssetDetails
         txsRD={txsRD}
         address={address}
-        assetsRD={balancesRD}
+        assetsWB={assetsWB}
         asset={selectedAsset}
         loadSelectedAssetTxsHandler={loadTxsSelectedAsset}
         reloadBalancesHandler={reloadBalances}
