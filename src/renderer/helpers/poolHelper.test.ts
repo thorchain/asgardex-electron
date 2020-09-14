@@ -57,7 +57,7 @@ describe('helpers/poolHelper/', () => {
     })
   })
 
-  describe('getPoolViewData', () => {
+  describe('getPoolTableRowsData', () => {
     const poolDetails: PoolDetails = [
       {
         asset: 'BNB.TOMOB-1E1',
@@ -87,12 +87,12 @@ describe('helpers/poolHelper/', () => {
     it('returns data for available pools', () => {
       const result = getPoolTableRowsData(poolDetails, pricePoolData, PoolDetailStatusEnum.Enabled)
       expect(result.length).toEqual(2)
-      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.TOMO)
-      expect(result[1].pool.target).toEqual(ASSETS_TESTNET.FTM)
+      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.FTM)
+      expect(result[1].pool.target).toEqual(ASSETS_TESTNET.TOMO)
     })
   })
 
-  describe('getPoolViewData', () => {
+  describe('toPoolData', () => {
     const poolDetail: PoolDetail = {
       assetDepth: '11000000000',
       runeDepth: '10000000000'
