@@ -6,7 +6,8 @@ import { Messages } from '../types'
 import common from './common'
 import pools from './pools'
 import settings from './settings'
+import stake from './stake'
 import swap from './swap'
 import wallet from './wallet'
 
-export default { ...antdData, ...common, ...pools, ...wallet, ...settings, ...swap } as Messages
+export default { ...antdData, ...common, ...pools, ...wallet, ...settings, ...swap, ...stake } as Messages

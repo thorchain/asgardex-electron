@@ -130,7 +130,11 @@ type SwapMessageKey =
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
-export type Messages = CommonMessages & PoolsMessages & WalletMessages & SettingMessages & SwapMessages
+type StakeMessageKey = 'stake.totalShare' | 'stake.totalEarnings' | 'stake.poolShare'
+
+export type StakeMessages = { [key in StakeMessageKey]: string }
+
+export type Messages = CommonMessages & PoolsMessages & WalletMessages & SettingMessages & SwapMessages & StakeMessages
 
 export enum Locale {
   EN = 'en',
