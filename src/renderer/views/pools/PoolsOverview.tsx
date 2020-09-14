@@ -19,7 +19,8 @@ import Label from '../../components/uielements/label'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { getPoolTableRowsData, hasPendingPools } from '../../helpers/poolHelper'
+import { ordBaseAmount } from '../../helpers/fp/ord'
+import { getPoolTableRowsData, hasPendingPools, sortByDepth } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
@@ -192,7 +193,8 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     dataIndex: 'pool',
     render: renderAssetColumn,
     sorter: sortAssetColumn,
-    sortDirections: ['descend', 'ascend']
+    sortDirections: ['descend', 'ascend'],
+    defaultSortOrder: 'descend'
   }
 
   const renderPriceColumn = useCallback(
@@ -216,8 +218,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     dataIndex: 'poolPrice',
     render: renderPriceColumn,
     sorter: sortPriceColumn,
-    sortDirections: ['descend', 'ascend'],
-    defaultSortOrder: 'descend'
+    sortDirections: ['descend', 'ascend']
   }
 
   const renderDepthColumn = useCallback(
@@ -228,19 +229,17 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     ),
     [pricePool]
   )
-  const sortDepthColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
-    const aAmount = a.depthPrice.amount()
-    const bAmount = b.depthPrice.amount()
-    return aAmount.minus(bAmount).toNumber()
-  }, [])
+
   const depthColumn: ColumnType<PoolTableRowData> = {
     key: 'depth',
     align: 'right',
     title: intl.formatMessage({ id: 'pools.depth' }),
     dataIndex: 'depthPrice',
     render: renderDepthColumn,
-    sorter: sortDepthColumn,
-    sortDirections: ['descend', 'ascend']
+    sorter: sortByDepth,
+    sortDirections: ['descend', 'ascend'],
+    // Note: `defaultSortOrder` has no effect here, that's we do a default sort in `getPoolTableRowsData`
+    defaultSortOrder: 'descend'
   }
 
   const renderVolumeColumn = useCallback(
@@ -251,11 +250,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     ),
     [pricePool]
   )
-  const sortVolumeColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
-    const aAmount = a.volumePrice.amount()
-    const bAmount = b.volumePrice.amount()
-    return aAmount.minus(bAmount).toNumber()
-  }, [])
+  const sortVolumeColumn = useCallback(
+    (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.volumePrice, b.volumePrice),
+    []
+  )
   const volumeColumn: ColumnType<PoolTableRowData> = {
     key: 'vol',
     align: 'right',
@@ -324,8 +322,8 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     volumeColumn,
     transactionColumn,
     slipColumn,
-    tradeColumn,
-    btnPoolsColumn
+    tradeColumn
+    // btnPoolsColumn
   ]
 
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = [poolColumnMobile, btnPoolsColumn]
@@ -454,13 +452,15 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
               pricePool.poolData,
               PoolDetailStatusEnum.Bootstrapped
             )
+
+            console.log('poolViewData:', poolViewData)
             previousPendingPools.current = some(poolViewData)
             return renderPendingPoolsTable(poolViewData)
           }
         )(poolsRD)}
       </>
     ),
-    [poolsRD, renderPendingPoolsTable, pricePool]
+    [poolsRD, renderPendingPoolsTable, pricePool.poolData]
   )
 
   return (

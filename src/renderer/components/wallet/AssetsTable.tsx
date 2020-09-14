@@ -56,6 +56,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       align: 'left',
       render: renderNameColumn,
       sorter: sortNameColumn,
+      defaultSortOrder: 'ascend',
       sortDirections: ['descend', 'ascend']
     }),
     [intl]

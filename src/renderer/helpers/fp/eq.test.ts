@@ -1,11 +1,19 @@
-import { baseAmount } from '@thorchain/asgardex-util'
+import { baseAmount, bn } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { AssetWithBalance, ApiError, ErrorId } from '../../services/wallet/types'
-import { eqAsset, eqBaseAmount, eqAssetWithBalance, eqAssetsWithBalance, eqApiError } from './eq'
+import { eqAsset, eqBaseAmount, eqAssetWithBalance, eqAssetsWithBalance, eqApiError, egBigNumber } from './eq'
 
 describe('helpers/fp/eq', () => {
+  describe('egBigNumber', () => {
+    it('is equal', () => {
+      expect(egBigNumber.equals(bn(1.01), bn(1.01))).toBeTruthy()
+    })
+    it('is not equal', () => {
+      expect(egBigNumber.equals(bn(1), bn(1.01))).toBeFalsy()
+    })
+  })
   describe('eqAsset', () => {
     it('is equal', () => {
       const a = ASSETS_TESTNET.RUNE

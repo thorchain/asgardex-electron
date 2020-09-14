@@ -6,6 +6,10 @@ import { PoolDetails } from '../services/midgard/types'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData } from '../views/pools/types'
 import { getPoolTableRowData } from '../views/pools/utils'
+import { ordBaseAmount } from './fp/ord'
+
+export const sortByDepth = (a: PoolTableRowData, b: PoolTableRowData) =>
+  ordBaseAmount.compare(a.depthPrice, b.depthPrice)
 
 export const getPoolTableRowsData = (
   poolDetails: PoolDetails,
@@ -16,15 +20,23 @@ export const getPoolTableRowsData = (
   const deepestPool = O.toNullable(getDeepestPool(poolDetailsFiltered))
   const deepestPoolSymbol = assetFromString(deepestPool?.asset ?? '')?.symbol
   // Transform `PoolDetails` -> PoolRowType
-  return poolDetailsFiltered.map((poolDetail, index) => {
-    const symbol = assetFromString(poolDetail.asset ?? '')?.symbol
-    const deepest = symbol && deepestPoolSymbol && symbol === deepestPoolSymbol
-    return {
-      ...getPoolTableRowData(poolDetail, pricePool),
-      deepest,
-      key: poolDetail?.asset || index
-    } as PoolTableRowData
-  })
+  return (
+    poolDetailsFiltered
+      .map((poolDetail, index) => {
+        const symbol = assetFromString(poolDetail.asset ?? '')?.symbol
+        const deepest = symbol && deepestPoolSymbol && symbol === deepestPoolSymbol
+        return {
+          ...getPoolTableRowData(poolDetail, pricePool),
+          deepest,
+          key: poolDetail?.asset || index
+        } as PoolTableRowData
+      })
+      // Table does not accept `defaultSortOrder` for depth  for any reason,
+      // that's why we sort depth here
+      .sort(sortByDepth)
+      // descending sort
+      .reverse()
+  )
 }
 
 export const filterPendingPools = (pools: PoolDetails) =>
