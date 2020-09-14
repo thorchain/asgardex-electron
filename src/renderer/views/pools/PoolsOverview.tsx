@@ -19,7 +19,7 @@ import Label from '../../components/uielements/label'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { ordBaseAmount } from '../../helpers/fp/ord'
+import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
 import { getPoolTableRowsData, hasPendingPools, sortByDepth } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as stakeRoutes from '../../routes/stake'
@@ -205,11 +205,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     ),
     [pricePool]
   )
-  const sortPriceColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
-    const aAmount = a.poolPrice.amount()
-    const bAmount = b.poolPrice.amount()
-    return aAmount.minus(bAmount).toNumber()
-  }, [])
+  const sortPriceColumn = useCallback(
+    (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.poolPrice, b.poolPrice),
+    []
+  )
 
   const priceColumn: ColumnType<PoolTableRowData> = {
     key: 'poolprice',
@@ -272,11 +271,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     ),
     [pricePool]
   )
-  const sortTransactionColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
-    const aAmount = a.transactionPrice.amount()
-    const bAmount = b.transactionPrice.amount()
-    return aAmount.minus(bAmount).toNumber()
-  }, [])
+  const sortTransactionColumn = useCallback(
+    (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.transactionPrice, b.transactionPrice),
+    []
+  )
   const transactionColumn: ColumnType<PoolTableRowData> = {
     key: 'transaction',
     align: 'right',
@@ -288,7 +286,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderSlipColumn = useCallback((slip: BigNumber) => <Trend amount={slip} />, [])
-  const sortSlipColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => a.slip.minus(b.slip).toNumber(), [])
+  const sortSlipColumn = useCallback(
+    (a: PoolTableRowData, b: PoolTableRowData) => ordBigNumber.compare(a.slip, b.slip),
+    []
+  )
 
   const slipColumn: ColumnType<PoolTableRowData> = {
     key: 'slip',
@@ -306,11 +307,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     title: intl.formatMessage({ id: 'pools.trades' }),
     dataIndex: 'trades',
     render: (trades: BigNumber) => <Label align="center">{trades.toString()}</Label>,
-    sorter: (a: PoolTableRowData, b: PoolTableRowData) => {
-      const aAmount = a.trades
-      const bAmount = b.trades
-      return aAmount.minus(bAmount).toNumber()
-    },
+    sorter: (a: PoolTableRowData, b: PoolTableRowData) => ordBigNumber.compare(a.trades, b.trades),
     sortDirections: ['descend', 'ascend']
   }
 
