@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useRef, useEffect } from 'react'
 
 import { formatAssetAmountCurrency, baseToAsset, Asset, assetToString } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
@@ -13,7 +13,12 @@ import { ordBaseAmount } from '../../helpers/fp/ord'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getPoolPriceValue } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
-import { AssetWithBalance, NonEmptyAssetsWithBalance, NonEmptyApiErrors } from '../../services/wallet/types'
+import {
+  AssetWithBalance,
+  NonEmptyAssetsWithBalance,
+  NonEmptyApiErrors,
+  AssetsWithBalance
+} from '../../services/wallet/types'
 import { filterNullableBalances, sortBalances } from '../../services/wallet/util'
 import { PricePool } from '../../views/pools/types'
 import ErrorAlert from '../uielements/alert/ErrorAlert'
@@ -41,6 +46,9 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
   } = props
 
   const intl = useIntl()
+
+  // store previous data of balances to render these while reloading
+  const previousBalances = useRef<AssetsWithBalance>()
 
   const iconColumn: ColumnType<AssetWithBalance> = useMemo(
     () => ({
@@ -169,10 +177,14 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     [assetsWB]
   )
 
+  useEffect(() => {
+    if (tableData) previousBalances.current = tableData
+  }, [tableData])
+
   const renderAssetsTable = useMemo(() => {
     return (
       <TableWrapper
-        dataSource={tableData}
+        dataSource={assetsLoading && previousBalances.current ? previousBalances.current : tableData}
         loading={assetsLoading}
         rowKey={({ asset }) => asset.symbol}
         onRow={onRow}
