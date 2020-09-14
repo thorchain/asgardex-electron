@@ -8,6 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { RUNE_PRICE_POOL } from '../../const'
+import { ordBaseAmount } from '../../helpers/fp/ord'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getPoolPriceValue } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
@@ -88,7 +89,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       title: intl.formatMessage({ id: 'wallet.column.balance' }),
       align: 'left',
       render: renderBalanceColumn,
-      sorter: (a: AssetWithBalance, b: AssetWithBalance) => a.amount.amount().comparedTo(b.amount.amount()),
+      sorter: (a: AssetWithBalance, b: AssetWithBalance) => ordBaseAmount.compare(a.amount, b.amount),
       sortDirections: ['descend', 'ascend']
     }),
     [intl]
@@ -120,7 +121,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
           sequenceTOption(oPriceA, oPriceB),
           O.fold(
             () => 0,
-            ([priceA, priceB]) => priceA.amount().comparedTo(priceB.amount())
+            ([priceA, priceB]) => ordBaseAmount.compare(priceA, priceB)
           )
         )
       },
