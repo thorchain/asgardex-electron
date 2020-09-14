@@ -28,7 +28,7 @@ export const getPoolTableRowsData = (
     A.filter((poolDetail) => poolDetail.status === poolStatus)
   )
   // get symbol of deepest pool
-  const deepestPoolSymbol: O.Option<string> = FP.pipe(
+  const oDeepestPoolSymbol: O.Option<string> = FP.pipe(
     filteredPoolDetails,
     getDeepestPool,
     O.chain((poolDetail) => O.fromNullable(poolDetail.asset)),
@@ -41,16 +41,16 @@ export const getPoolTableRowsData = (
     filteredPoolDetails,
     A.mapWithIndex<PoolDetail, PoolTableRowData>((index, poolDetail) => {
       // get symbol of PoolDetail
-      const poolDetailSymbol: O.Option<string> = FP.pipe(
+      const oPoolDetailSymbol: O.Option<string> = FP.pipe(
         O.fromNullable(assetFromString(poolDetail.asset ?? '')),
         O.map(({ symbol }) => symbol)
       )
-      // check deepest pool
+      // compare symbols to set deepest pool
       const deepest = FP.pipe(
-        sequenceTOption(deepestPoolSymbol, poolDetailSymbol),
+        sequenceTOption(oDeepestPoolSymbol, oPoolDetailSymbol),
         O.fold(
           () => false,
-          ([a, b]) => Eq.eqString.equals(a, b)
+          ([deepestPoolSymbol, poolDetailSymbol]) => Eq.eqString.equals(deepestPoolSymbol, poolDetailSymbol)
         )
       )
       return {
