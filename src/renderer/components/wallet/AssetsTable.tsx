@@ -12,6 +12,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getPoolPriceValue } from '../../services/binance/utils'
 import { PoolDetails } from '../../services/midgard/types'
 import { AssetWithBalance, NonEmptyAssetsWithBalance, NonEmptyApiErrors } from '../../services/wallet/types'
+import { filterNullableBalances, sortBalances } from '../../services/wallet/util'
 import { PricePool } from '../../views/pools/types'
 import AssetIcon from '../uielements/assets/assetIcon'
 import Label from '../uielements/label'
@@ -56,7 +57,6 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       align: 'left',
       render: renderNameColumn,
       sorter: sortNameColumn,
-      defaultSortOrder: 'ascend',
       sortDirections: ['descend', 'ascend']
     }),
     [intl]
@@ -160,17 +160,24 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     [assetsErrors]
   )
 
+  const tableData = useMemo(
+    // filter out assets with zero balances
+    // and order assets to BTC -> RUNE -> BNB -> others
+    () => FP.pipe(assetsWB, O.map(FP.flow(filterNullableBalances, sortBalances)), O.toUndefined),
+    [assetsWB]
+  )
+
   const renderAssetsTable = useMemo(() => {
     return (
       <TableWrapper
-        dataSource={FP.pipe(assetsWB, O.toUndefined)}
+        dataSource={tableData}
         loading={assetsLoading}
         rowKey={({ asset }) => asset.symbol}
         onRow={onRow}
         columns={columns}
       />
     )
-  }, [assetsWB, assetsLoading, onRow, columns])
+  }, [tableData, assetsLoading, onRow, columns])
 
   return (
     <Row>

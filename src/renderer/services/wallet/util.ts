@@ -1,4 +1,4 @@
-import { assetToString, AssetTicker } from '@thorchain/asgardex-util'
+import { assetToString, AssetTicker, baseAmount } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import { pipe, identity } from 'fp-ts/lib/function'
@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import { isSome, Option } from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/Ord'
 
-import { ZERO_BN } from '../const'
+import { ordBaseAmount } from '../../helpers/fp/ord'
 import {
   KeystoreState,
   KeystoreContent,
@@ -33,7 +33,7 @@ export const isLocked = (state: KeystoreState): boolean => !hasImportedKeystore(
 export const filterNullableBalances = (balances: AssetsWithBalance) => {
   return FP.pipe(
     balances,
-    A.filter((balance) => balance.amount.amount().isGreaterThan(ZERO_BN))
+    A.filter(({ amount }) => Ord.gt(ordBaseAmount)(amount, baseAmount(0)))
   )
 }
 
