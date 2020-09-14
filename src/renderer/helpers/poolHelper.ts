@@ -1,41 +1,69 @@
 import { bnOrZero, PoolData, assetFromString } from '@thorchain/asgardex-util'
+import * as A from 'fp-ts/lib/Array'
+import * as Eq from 'fp-ts/lib/Eq'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { none, Option, some } from 'fp-ts/lib/Option'
+import * as Ord from 'fp-ts/lib/Ord'
 
 import { PoolDetails } from '../services/midgard/types'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData } from '../views/pools/types'
 import { getPoolTableRowData } from '../views/pools/utils'
 import { ordBaseAmount } from './fp/ord'
+import { sequenceTOption } from './fpHelpers'
 
 export const sortByDepth = (a: PoolTableRowData, b: PoolTableRowData) =>
   ordBaseAmount.compare(a.depthPrice, b.depthPrice)
+
+const ordByDepth = Ord.ord.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRowData) => depthPrice)
 
 export const getPoolTableRowsData = (
   poolDetails: PoolDetails,
   pricePool: PoolData,
   poolStatus: PoolDetailStatusEnum
 ): PoolTableRowsData => {
-  const poolDetailsFiltered = poolDetails.filter((detail) => detail?.status === poolStatus)
-  const deepestPool = O.toNullable(getDeepestPool(poolDetailsFiltered))
-  const deepestPoolSymbol = assetFromString(deepestPool?.asset ?? '')?.symbol
+  // filter pool details
+  const filteredPoolDetails: PoolDetails = FP.pipe(
+    poolDetails,
+    A.filter((poolDetail) => poolDetail.status === poolStatus)
+  )
+  // get symbol of deepest pool
+  const deepestPoolSymbol: O.Option<string> = FP.pipe(
+    filteredPoolDetails,
+    getDeepestPool,
+    O.chain((poolDetail) => O.fromNullable(poolDetail.asset)),
+    O.chain((assetString) => O.fromNullable(assetFromString(assetString))),
+    O.map(({ symbol }) => symbol)
+  )
+
   // Transform `PoolDetails` -> PoolRowType
-  return (
-    poolDetailsFiltered
-      .map((poolDetail, index) => {
-        const symbol = assetFromString(poolDetail.asset ?? '')?.symbol
-        const deepest = symbol && deepestPoolSymbol && symbol === deepestPoolSymbol
-        return {
-          ...getPoolTableRowData(poolDetail, pricePool),
-          deepest,
-          key: poolDetail?.asset || index
-        } as PoolTableRowData
-      })
-      // Table does not accept `defaultSortOrder` for depth  for any reason,
-      // that's why we sort depth here
-      .sort(sortByDepth)
-      // descending sort
-      .reverse()
+  return FP.pipe(
+    filteredPoolDetails,
+    A.mapWithIndex<PoolDetail, PoolTableRowData>((index, poolDetail) => {
+      // get symbol of PoolDetail
+      const poolDetailSymbol: O.Option<string> = FP.pipe(
+        O.fromNullable(assetFromString(poolDetail.asset ?? '')),
+        O.map(({ symbol }) => symbol)
+      )
+      // check deepest pool
+      const deepest = FP.pipe(
+        sequenceTOption(deepestPoolSymbol, poolDetailSymbol),
+        O.fold(
+          () => false,
+          ([a, b]) => Eq.eqString.equals(a, b)
+        )
+      )
+      return {
+        ...getPoolTableRowData(poolDetail, pricePool),
+        key: poolDetail?.asset || index.toString(),
+        deepest
+      }
+    }),
+    // Table does not accept `defaultSortOrder` for depth  for any reason,
+    // that's why we sort depth here
+    A.sortBy([ordByDepth]),
+    // descending sort
+    A.reverse
   )
 }
 
@@ -47,9 +75,9 @@ export const hasPendingPools = (pools: PoolDetails) => filterPendingPools(pools)
 /**
  * Filters a pool out with hightest value of run
  */
-export const getDeepestPool = (pools: PoolDetails): Option<PoolDetail> =>
-  pools.reduce((acc: Option<PoolDetail>, pool: PoolDetail) => {
+export const getDeepestPool = (pools: PoolDetails): O.Option<PoolDetail> =>
+  pools.reduce((acc: O.Option<PoolDetail>, pool: PoolDetail) => {
     const runeDepth = bnOrZero(pool.runeDepth)
     const prev = O.toNullable(acc)
-    return runeDepth.isGreaterThanOrEqualTo(bnOrZero(prev?.runeDepth)) ? some(pool) : acc
-  }, none)
+    return runeDepth.isGreaterThanOrEqualTo(bnOrZero(prev?.runeDepth)) ? O.some(pool) : acc
+  }, O.none)
