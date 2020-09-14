@@ -3,6 +3,7 @@ import React, { useMemo, useCallback } from 'react'
 import { formatAssetAmountCurrency, baseToAsset, Asset, assetToString } from '@thorchain/asgardex-util'
 import { Row, Col } from 'antd'
 import { ColumnType } from 'antd/lib/table'
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -15,6 +16,7 @@ import { PoolDetails } from '../../services/midgard/types'
 import { AssetWithBalance, NonEmptyAssetsWithBalance, NonEmptyApiErrors } from '../../services/wallet/types'
 import { filterNullableBalances, sortBalances } from '../../services/wallet/util'
 import { PricePool } from '../../views/pools/types'
+import ErrorAlert from '../uielements/alert/ErrorAlert'
 import AssetIcon from '../uielements/assets/assetIcon'
 import Label from '../uielements/label'
 import { TableWrapper } from './AssetsTable.style'
@@ -145,20 +147,19 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     () =>
       FP.pipe(
         assetsErrors,
+        O.map(
+          A.map(({ apiId, msg }) =>
+            intl.formatMessage({ id: 'wallet.errors.balancesFailed' }, { apiId, errorMsg: msg })
+          )
+        ),
         O.fold(
           () => <></>,
-          (errors) => (
-            <Row>
-              {errors.map(({ apiId, errorId, msg }) => (
-                <Col span={24} key={`${apiId}-${errorId}`}>
-                  {apiId} API: {msg}
-                </Col>
-              ))}
-            </Row>
+          (descriptions) => (
+            <ErrorAlert message={intl.formatMessage({ id: 'common.error' })} descriptions={descriptions} />
           )
         )
       ),
-    [assetsErrors]
+    [assetsErrors, intl]
   )
 
   const tableData = useMemo(

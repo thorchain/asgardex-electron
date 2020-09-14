@@ -35,7 +35,7 @@ const wallet: WalletMessages = {
   'wallet.receive.address.error': 'No address available to receive funds',
   'wallet.receive.address.errorQR': 'Error while rendering QR code: {error}',
   'wallet.send.success': 'Transaction succeeded.',
-  'wallet.errors.balancesFailed': 'No balances loaded',
+  'wallet.errors.balancesFailed': 'Loading balances failed. {errorMsg} (API Id: {apiId})',
   'wallet.errors.address.empty': "Address can't be empty",
   'wallet.errors.address.invalid': 'Address is invalid',
   'wallet.errors.amount.shouldBeNumber': 'Amount should be a number',
