@@ -322,8 +322,8 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     volumeColumn,
     transactionColumn,
     slipColumn,
-    tradeColumn
-    // btnPoolsColumn
+    tradeColumn,
+    btnPoolsColumn
   ]
 
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = [poolColumnMobile, btnPoolsColumn]
@@ -452,8 +452,6 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
               pricePool.poolData,
               PoolDetailStatusEnum.Bootstrapped
             )
-
-            console.log('poolViewData:', poolViewData)
             previousPendingPools.current = some(poolViewData)
             return renderPendingPoolsTable(poolViewData)
           }
