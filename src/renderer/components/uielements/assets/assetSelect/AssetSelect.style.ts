@@ -16,9 +16,9 @@ export const AssetSelectWrapper = styled.div`
   ${transition()};
 `
 
-export const AssetSelectMenuWrapper = styled.div`
+export const AssetSelectMenuWrapper = styled.div<{ minWidth?: number }>`
   margin-top: 10px;
-  width: 216px;
+  min-width: ${({ minWidth }) => minWidth || 216}px;
 `
 
 export const DropdownIcon = styled(CaretDownOutlined)`
@@ -45,11 +45,16 @@ export const AssetDropdownButton = styled.button`
     background: transparent;
     border: none;
     cursor: pointer;
+    padding: 0;
     &:focus {
       outline: none;
     }
     > * {
       margin-right: 10px;
+
+      &:last-child {
+        margin: 0;
+      }
     }
 
     ${!disabled

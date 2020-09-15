@@ -15,10 +15,20 @@ type Props = {
   size?: AssetSelectDataWrapperSize
   className?: string
   type?: AssetSelectDataWrapperType
+  showAssetName?: boolean
 }
 
 const AssetSelectData: React.FC<Props> = (props: Props): JSX.Element => {
-  const { asset, target, price = bn(0), priceValid = true, size = 'small', className = '', type = 'normal' } = props
+  const {
+    asset,
+    target,
+    price = bn(0),
+    priceValid = true,
+    size = 'small',
+    className = '',
+    type = 'normal',
+    showAssetName = true
+  } = props
   const formattedPrice = formatBN(price)
   // @TODO add valid formatters
   const priceLabel = priceValid && Number(formattedPrice) !== 0 ? `$ ${formattedPrice}` : ''
@@ -30,11 +40,13 @@ const AssetSelectData: React.FC<Props> = (props: Props): JSX.Element => {
       type={type}
       className={`coinData-wrapper ${className}`}>
       {asset && <AssetIcon asset={asset} size={size} />}
-      <div className="assetSelectData-asset-info">
-        <Label className="assetSelectData-asset-label" weight="600">
-          {asset?.ticker ?? 'unknown'}
-        </Label>
-      </div>
+      {showAssetName && (
+        <div className="assetSelectData-asset-info">
+          <Label className="assetSelectData-asset-label" weight="600">
+            {asset?.ticker ?? 'unknown'}
+          </Label>
+        </div>
+      )}
       <div className="asset-price-info">
         <Label size="small" color="gray" weight="bold">
           {priceLabel}

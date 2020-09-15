@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState, RefObject } from 'react'
+import React, { useRef, useState, RefObject } from 'react'
 
 import { bn, delay, formatBN, Asset, assetFromString, BaseAmount } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
@@ -8,42 +8,10 @@ import { sortBy as _sortBy } from 'lodash'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetPair } from '../../../../types/asgardex'
-import { InputBigNumber } from '../../input'
 import Label from '../../label'
 import Selection from '../../selection'
 import AssetMenu from '../assetMenu'
-import {
-  AssetCardFooter,
-  AssetData,
-  AssetNameLabel,
-  CardBorderWrapper,
-  CardTopRow,
-  AssetCardWrapper,
-  AssetDropdownButton,
-  AssetDropdownAsset,
-  AssetDropdownVerticalColumn,
-  DropdownIcon,
-  DropdownIconHolder,
-  FooterLabel,
-  HorizontalDivider
-} from './AssetCard.style'
-
-type DropdownCarretProps = {
-  open: boolean
-  onClick?: () => void
-  className?: string
-}
-const DropdownCarret: React.FC<DropdownCarretProps> = ({ open, onClick = () => {}, className = '' }): JSX.Element => {
-  const onClickHandler = useCallback(() => {
-    onClick()
-  }, [onClick])
-
-  return (
-    <DropdownIconHolder>
-      <DropdownIcon open={open} className={className} type="caret-down" onClick={onClickHandler} />
-    </DropdownIconHolder>
-  )
-}
+import * as Styled from './AssetCard.style'
 
 type Props = {
   asset: Asset
@@ -133,45 +101,35 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     )
   }
 
-  function renderDropDownButton() {
-    const disabled = assetData.length === 0
-    return (
-      <AssetDropdownButton disabled={disabled} onClick={handleDropdownButtonClicked}>
-        <AssetDropdownAsset asset={asset} size="big" />
-        {!disabled ? (
-          <AssetDropdownVerticalColumn>
-            <DropdownCarret className="caret-down" open={openDropdown} />
-          </AssetDropdownVerticalColumn>
-        ) : null}
-      </AssetDropdownButton>
-    )
-  }
   return (
-    <AssetCardWrapper ref={ref} className={`AssetCard-wrapper ${className}`}>
+    <Styled.AssetCardWrapper ref={ref} className={`AssetCard-wrapper ${className}`}>
       {title && <Label className="title-label">{title}</Label>}
 
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
-        <CardBorderWrapper>
-          <AssetNameLabel>{asset?.ticker ?? 'unknown'}</AssetNameLabel>
-          <HorizontalDivider />
-          <CardTopRow>
-            <AssetData>
-              <InputBigNumber size="large" value={amount.amount()} onChange={onChange} />
-              <HorizontalDivider color="primary" />
-              <AssetCardFooter>
-                <FooterLabel>{`${unit} ${formatBN(amount.amount().multipliedBy(price))}`}</FooterLabel>
-                {slip !== undefined && (
-                  <FooterLabel className="asset-slip-label">SLIP: {slip.toFixed(0)} %</FooterLabel>
-                )}
-              </AssetCardFooter>
-            </AssetData>
-            {renderDropDownButton()}
-          </CardTopRow>
-        </CardBorderWrapper>
+        <Styled.CardBorderWrapper>
+          <Styled.AssetNameLabel>{asset?.ticker ?? 'unknown'}</Styled.AssetNameLabel>
+          <Styled.CardTopRow>
+            <Styled.AssetSelect
+              showAssetName={false}
+              assetData={assetData}
+              asset={asset}
+              onSelect={handleDropdownButtonClicked}>
+              <Styled.AssetData>
+                <Styled.InputBigNumber size="middle" value={amount.amount()} onChange={onChange} />
+                <Styled.AssetCardFooter>
+                  <Styled.FooterLabel>{`${unit} ${formatBN(amount.amount().multipliedBy(price))}`}</Styled.FooterLabel>
+                  {slip !== undefined && (
+                    <Styled.FooterLabel className="asset-slip-label">SLIP: {slip.toFixed(0)} %</Styled.FooterLabel>
+                  )}
+                </Styled.AssetCardFooter>
+              </Styled.AssetData>
+            </Styled.AssetSelect>
+          </Styled.CardTopRow>
+        </Styled.CardBorderWrapper>
       </Dropdown>
       {withSelection && <Selection selected={percentButtonSelected} onSelect={handlePercentSelected} />}
       {children}
-    </AssetCardWrapper>
+    </Styled.AssetCardWrapper>
   )
 }
 
