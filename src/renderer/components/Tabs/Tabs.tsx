@@ -9,9 +9,18 @@ type Props = {
   tabs: { label: React.ReactNode; key: string; content: React.ReactNode }[]
   centerContent?: boolean
   activeTabKey?: string
+  centered?: boolean
+  className?: string
 }
 
-export const Tabs: React.FC<Props> = ({ tabs, defaultTabIndex, centerContent, ...props }): JSX.Element => {
+export const Tabs: React.FC<Props> = ({
+  tabs,
+  defaultTabIndex,
+  centerContent,
+  activeTabKey: activeTabKeyProp,
+  centered = true,
+  className
+}): JSX.Element => {
   const [activeTabKey, setActiveTabKey] = useState(tabs[defaultTabIndex || 0].key)
   const content = useMemo(
     () =>
@@ -24,7 +33,7 @@ export const Tabs: React.FC<Props> = ({ tabs, defaultTabIndex, centerContent, ..
   )
 
   return (
-    <Styled.Tabs centered={true} activeKey={props.activeTabKey || activeTabKey}>
+    <Styled.Tabs className={className} centered={centered} activeKey={activeTabKeyProp || activeTabKey}>
       {content}
     </Styled.Tabs>
   )

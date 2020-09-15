@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
+import { Tabs as TabsBase } from '../Tabs/Tabs'
 
 export const Container = styled('div')`
   min-height: 100%;
@@ -41,4 +42,12 @@ export const TotalContainer = styled('div')`
 export const StakeContentContainer = styled('div')`
   width: 100%;
   background: ${palette('background', 0)};
+`
+
+export const Tabs = styled(TabsBase)`
+  .ant-tabs {
+    &-nav-wrap {
+      padding: 0 50px;
+    }
+  }
 `
