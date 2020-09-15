@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useMemo } from 'react'
+
+import { useIntl } from 'react-intl'
 
 import * as Styled from './Stake.styles'
 
@@ -8,15 +10,23 @@ type Props = {
 }
 
 export const Stake: React.FC<Props> = ({ shareContent, topContent }) => {
-  const tabs = [
-    { label: 'add', key: 'add', content: 'add' },
-    { label: 'withdraw', key: 'withdraw', content: 'withdraw' }
-  ]
+  const intl = useIntl()
 
-  const extra = (
-    <Styled.AdvancedButton color="primary" typevalue="outline">
-      advanced mode
-    </Styled.AdvancedButton>
+  const tabs = useMemo(
+    () => [
+      { label: intl.formatMessage({ id: 'common.add' }), key: 'add', content: 'add' },
+      { label: intl.formatMessage({ id: 'stake.withdraw' }), key: 'withdraw', content: 'withdraw' }
+    ],
+    [intl]
+  )
+
+  const extra = useMemo(
+    () => (
+      <Styled.AdvancedButton color="primary" typevalue="outline">
+        {intl.formatMessage({ id: 'stake.advancedMode' })}
+      </Styled.AdvancedButton>
+    ),
+    [intl]
   )
 
   return (
