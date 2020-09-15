@@ -57,7 +57,7 @@ const PoolShare: React.FC<Props> = (props: Props): JSX.Element => {
         gradient={2}
         basePriceAsset={basePriceAsset}>
         <div>
-          <Label textTransform={'uppercase'} size={'big'} align="center" loading={loading}>
+          <Label textTransform="uppercase" size="big" align="center" loading={loading}>
             {intl.formatMessage({ id: 'stake.poolShare' })}
           </Label>
           <Styled.SharePercent loading={loading}>{poolShare ? `${formatBN(poolShare)}%` : '...'}</Styled.SharePercent>
