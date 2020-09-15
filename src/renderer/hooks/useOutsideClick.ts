@@ -13,7 +13,7 @@ export function useClickOutside<T extends Element>(
   useEffect(() => {
     const clickHandler = (e: MouseEvent) => {
       if (!ref?.current?.contains(e.target as Element) && callbackRef.current) {
-        callbackRef?.current(e)
+        callbackRef.current(e)
       }
     }
     window.addEventListener('click', clickHandler, options)

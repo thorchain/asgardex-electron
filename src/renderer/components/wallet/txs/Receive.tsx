@@ -41,7 +41,7 @@ const Receive: React.FC<Props> = (props: Props): JSX.Element => {
               setErrorMsg(intl.formatMessage({ id: 'wallet.receive.address.errorQR' }, { error: err.toString() }))
             } else {
               setHasQR(true)
-              canvasContainer.current?.appendChild(canvas)
+              if (canvasContainer.current) canvasContainer.current.appendChild(canvas)
             }
           })
         }

@@ -30,7 +30,8 @@ const AssetInput: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   const handleClickWrapper = useCallback(() => {
-    inputRef.current?.firstChild?.focus()
+    const target = inputRef.current?.firstChild
+    if (target) target.focus()
   }, [])
 
   return (
