@@ -24,6 +24,7 @@ const HeaderLock: React.FC<Props> = (props: Props): JSX.Element => {
 
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const iconStyle = { fontSize: '1.5em', cursor: disabled ? 'not-allowed' : 'pointer' }
 
   const clickHandler = useCallback((_: React.MouseEvent) => onPress(), [onPress])

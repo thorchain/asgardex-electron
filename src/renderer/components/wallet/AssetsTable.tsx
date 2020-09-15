@@ -140,6 +140,7 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
     [intl, renderPriceColumn, poolDetails, pricePool.poolData]
   )
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const columns = [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn]
 
   const onRow = useCallback(

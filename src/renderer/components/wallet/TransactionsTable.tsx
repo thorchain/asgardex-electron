@@ -130,8 +130,10 @@ const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
     render: renderLinkColumn
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const desktopColumns: ColumnsType<Tx> = [typeColumn, fromColumn, toColumn, dateColumn, amountColumn, linkColumn]
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const mobileColumns: ColumnsType<Tx> = [typeColumn, amountColumn, dateColumn, linkColumn]
 
   const renderTable = useCallback(

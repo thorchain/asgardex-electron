@@ -8,13 +8,13 @@ import { pipe } from 'fp-ts/pipeable'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import * as Styled from './CurrencyInfo.styles'
 
-type CurrencyInfo = {
+type Props = {
   from?: O.Option<{ asset: Asset; priceRune: BigNumber }>
   to?: O.Option<{ asset: Asset; priceRune: BigNumber }>
   slip?: BigNumber
 }
 
-export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: CurrencyInfo) => {
+export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: Props) => {
   return pipe(
     sequenceTOption(from, to),
     O.map(([from, to]) => (

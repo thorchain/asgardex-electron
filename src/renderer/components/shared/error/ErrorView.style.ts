@@ -17,13 +17,12 @@ export const Result = styled(A.Result)`
   `}
   background-color: ${palette('background', 1)};
 
-  .ant-result-title{
+  .ant-result-title {
     color: ${palette('text', 0)};
   }
-  .ant-result-subtitle{
+  .ant-result-subtitle {
     color: ${palette('text', 1)};
   }
-
 `
 export const IconWrapper = styled.div`
   display: inline-block;

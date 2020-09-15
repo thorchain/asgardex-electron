@@ -311,6 +311,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     sortDirections: ['descend', 'ascend']
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const desktopPoolsColumns: ColumnsType<PoolTableRowData> = [
     poolColumn,
     assetColumn,
@@ -323,6 +324,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     btnPoolsColumn
   ]
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = [poolColumnMobile, btnPoolsColumn]
 
   const renderPoolsTable = useCallback(
@@ -410,6 +412,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     render: renderBlockLeftColumn
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const desktopPendingPoolsColumns: ColumnsType<PoolTableRowData> = [
     poolColumn,
     assetColumn,
@@ -419,6 +422,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     btnPendingPoolsColumn
   ]
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const mobilePendingPoolsColumns: ColumnsType<PoolTableRowData> = [poolColumnMobile, btnPendingPoolsColumn]
 
   const renderPendingPoolsTable = useCallback(

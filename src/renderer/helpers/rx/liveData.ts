@@ -16,6 +16,7 @@ import { Observable } from 'rxjs'
 export type LiveData<E, A> = Observable<RemoteData<E, A>>
 
 export const URI = '//LiveData'
+// eslint-disable-next-line no-redeclare
 export type URI = typeof URI
 declare module 'fp-ts/lib/HKT' {
   interface URItoKind2<E, A> {

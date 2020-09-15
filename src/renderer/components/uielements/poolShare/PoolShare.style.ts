@@ -4,7 +4,6 @@ import { palette } from 'styled-theme'
 
 type PoolShareAccent = 'primary' | 'secondary'
 type DetailsWrapperProps = { accent: PoolShareAccent }
-type BorderWrapperProps = { showTopBorder?: boolean }
 
 export const PoolShareWrapper = styled.div`
   padding: 0px 12px 12px 16px;
