@@ -39,6 +39,7 @@ type CommonMessageKey =
   | 'common.max'
   | 'common.search'
   | 'common.retry'
+  | 'common.add'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -130,7 +131,12 @@ type SwapMessageKey =
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
-type StakeMessageKey = 'stake.totalShare' | 'stake.totalEarnings' | 'stake.poolShare'
+type StakeMessageKey =
+  | 'stake.totalShare'
+  | 'stake.totalEarnings'
+  | 'stake.poolShare'
+  | 'stake.withdraw'
+  | 'stake.advancedMode'
 
 export type StakeMessages = { [key in StakeMessageKey]: string }
 

@@ -1,17 +1,26 @@
 import React, { useMemo, useState } from 'react'
 
 import { Tabs as ATabs } from 'antd'
+import { TabsProps } from 'antd/lib/tabs'
 
 import * as Styled from './Tabs.styles'
 
-type Props = {
+type Props = TabsProps & {
   defaultTabIndex?: number
   tabs: { label: React.ReactNode; key: string; content: React.ReactNode }[]
   centerContent?: boolean
   activeTabKey?: string
 }
 
-export const Tabs: React.FC<Props> = ({ tabs, defaultTabIndex, centerContent, ...props }): JSX.Element => {
+export const Tabs: React.FC<Props> = ({
+  tabs,
+  defaultTabIndex,
+  centerContent,
+  activeTabKey: activeTabKeyProp,
+  centered = true,
+  className,
+  tabBarExtraContent
+}): JSX.Element => {
   const [activeTabKey, setActiveTabKey] = useState(tabs[defaultTabIndex || 0].key)
   const content = useMemo(
     () =>
@@ -24,7 +33,11 @@ export const Tabs: React.FC<Props> = ({ tabs, defaultTabIndex, centerContent, ..
   )
 
   return (
-    <Styled.Tabs centered={true} activeKey={props.activeTabKey || activeTabKey}>
+    <Styled.Tabs
+      tabBarExtraContent={tabBarExtraContent}
+      className={className}
+      centered={centered}
+      activeKey={activeTabKeyProp || activeTabKey}>
       {content}
     </Styled.Tabs>
   )

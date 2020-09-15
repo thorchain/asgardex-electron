@@ -40,7 +40,8 @@ const common: CommonMessages = {
   'common.fees': 'Fees',
   'common.max': 'Max',
   'common.search': 'Search',
-  'common.retry': 'Retry'
+  'common.retry': 'Retry',
+  'common.add': 'Add'
 }
 
 export default common
