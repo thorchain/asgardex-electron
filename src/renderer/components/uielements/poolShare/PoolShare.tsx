@@ -1,11 +1,12 @@
 import React from 'react'
 
-import { formatBN, BaseAmount, baseToAsset, formatAssetAmount } from '@thorchain/asgardex-util'
-import { Row, Col } from 'antd'
+import { formatBN, BaseAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
+import { useIntl } from 'react-intl'
 
 import Label from '../label'
-import { PoolShareWrapper, BorderWrapper, BorderShareWrapper, DetailsWrapper, ValuesWrapper } from './PoolShare.style'
+import { PoolCard } from './PoolCard'
+import * as Styled from './PoolShare.style'
 
 type Props = {
   source: string
@@ -40,85 +41,42 @@ const PoolShare: React.FC<Props> = (props: Props): JSX.Element => {
     poolShare
   } = props
 
+  const intl = useIntl()
+
   return (
-    <PoolShareWrapper>
-      <Label align="center">YOUR TOTAL SHARE OF THE POOL</Label>
-      <BorderWrapper>
-        <DetailsWrapper accent="primary">
-          <Col span={6}>
-            <Label align="center" loading={loading}>
-              {source.toUpperCase()}
-            </Label>
-          </Col>
-          <Col span={6}>
-            <Label align="center" loading={loading}>
-              {target.toUpperCase()}
-            </Label>
-          </Col>
-        </DetailsWrapper>
-        <Row justify="space-around">
-          <ValuesWrapper span={6}>
-            <Label align="center" loading={loading} color="dark">
-              {formatAssetAmount(baseToAsset(runeStakedShare))}
-            </Label>
-            <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceAsset} ${formatAssetAmount(baseToAsset(runeStakedPrice))}`}
-            </Label>
-          </ValuesWrapper>
-          <ValuesWrapper span={6}>
-            <Label align="center" loading={loading} color="dark">
-              {formatAssetAmount(baseToAsset(assetStakedShare))}
-            </Label>
-            <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceAsset} ${formatAssetAmount(baseToAsset(assetStakedPrice))}`}
-            </Label>
-          </ValuesWrapper>
-        </Row>
-      </BorderWrapper>
-      <BorderShareWrapper>
-        <Label align="center" loading={loading}>
-          POOL SHARE
-        </Label>
-        <Label align="center" size="normal" color="dark" loading={loading}>
-          {poolShare ? `${formatBN(poolShare)}%` : '...'}
-        </Label>
-      </BorderShareWrapper>
-      <Label align="center" color="dark">
-        YOUR TOTAL EARNINGS FROM THE POOL
-      </Label>
-      <BorderWrapper>
-        <DetailsWrapper accent="secondary">
-          <Col span={6}>
-            <Label align="center" loading={loading}>
-              {source.toUpperCase()}
-            </Label>
-          </Col>
-          <Col span={6}>
-            <Label align="center" loading={loading}>
-              {target.toUpperCase()}
-            </Label>
-          </Col>
-        </DetailsWrapper>
-        <Row justify="space-around">
-          <ValuesWrapper span={6}>
-            <Label align="center" loading={loading} color="dark">
-              {formatAssetAmount(baseToAsset(runeEarnedAmount))}
-            </Label>
-            <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceAsset} ${formatAssetAmount(baseToAsset(runeEarnedPrice))}`}
-            </Label>
-          </ValuesWrapper>
-          <ValuesWrapper span={6}>
-            <Label align="center" loading={loading} color="dark">
-              {formatAssetAmount(baseToAsset(assetEarnedAmount))}
-            </Label>
-            <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceAsset} ${formatAssetAmount(baseToAsset(assetEarnedPrice))}`}
-            </Label>
-          </ValuesWrapper>
-        </Row>
-      </BorderWrapper>
-    </PoolShareWrapper>
+    <Styled.PoolShareWrapper>
+      <PoolCard
+        title={intl.formatMessage({ id: 'stake.totalShare' })}
+        loading={loading}
+        source={source}
+        target={target}
+        runeAmount={runeStakedShare}
+        runePrice={runeStakedPrice}
+        assetAmount={assetStakedShare}
+        assetPrice={assetStakedPrice}
+        gradient={2}
+        basePriceAsset={basePriceAsset}>
+        <div>
+          <Label textTransform="uppercase" size="big" align="center" loading={loading}>
+            {intl.formatMessage({ id: 'stake.poolShare' })}
+          </Label>
+          <Styled.SharePercent loading={loading}>{poolShare ? `${formatBN(poolShare)}%` : '...'}</Styled.SharePercent>
+        </div>
+      </PoolCard>
+
+      <PoolCard
+        title={intl.formatMessage({ id: 'stake.totalEarnings' })}
+        loading={loading}
+        source={source}
+        target={target}
+        runeAmount={runeEarnedAmount}
+        runePrice={runeEarnedPrice}
+        assetAmount={assetEarnedAmount}
+        assetPrice={assetEarnedPrice}
+        basePriceAsset={basePriceAsset}
+        gradient={0}
+      />
+    </Styled.PoolShareWrapper>
   )
 }
 
