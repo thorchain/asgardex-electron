@@ -58,7 +58,6 @@ export const Tabs = styled(TabsBase)`
 
 export const AdvancedButton = styled(Button)`
   position: relative;
-  animation-duration: 0s !important;
 
   &.ant-btn {
     padding: 0 9px;
