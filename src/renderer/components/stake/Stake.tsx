@@ -13,13 +13,19 @@ export const Stake: React.FC<Props> = ({ shareContent, topContent }) => {
     { label: 'withdraw', key: 'withdraw', content: 'withdraw' }
   ]
 
+  const extra = (
+    <Styled.AdvancedButton color="primary" typevalue="outline">
+      advanced mode
+    </Styled.AdvancedButton>
+  )
+
   return (
     <Styled.Container>
       <Styled.TopContainer>{topContent}</Styled.TopContainer>
       <Styled.ContentContainer>
         <Styled.TotalContainer>{shareContent}</Styled.TotalContainer>
         <Styled.StakeContentContainer>
-          <Styled.Tabs tabs={tabs} centered={false} />
+          <Styled.Tabs tabs={tabs} centered={false} tabBarExtraContent={extra} />
         </Styled.StakeContentContainer>
       </Styled.ContentContainer>
     </Styled.Container>

@@ -3,6 +3,7 @@ import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
 import { Tabs as TabsBase } from '../Tabs/Tabs'
+import Button from '../uielements/button'
 
 export const Container = styled('div')`
   min-height: 100%;
@@ -46,8 +47,48 @@ export const StakeContentContainer = styled('div')`
 
 export const Tabs = styled(TabsBase)`
   .ant-tabs {
-    &-nav-wrap {
-      padding: 0 50px;
+    &-nav {
+      padding: 0 10px;
+      ${media.sm`
+        padding: 0 50px;
+    `}
     }
+  }
+`
+
+export const AdvancedButton = styled(Button)`
+  position: relative;
+  animation-duration: 0s !important;
+
+  &.ant-btn {
+    padding: 0 9px;
+    min-width: auto;
+  }
+
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 5px;
+    width: 5px;
+    background: currentColor;
+    border-radius: 50%;
+  }
+
+  ${media.sm`
+    &:after {
+      display: none;
+    }
+  `}
+
+  span {
+    display: none;
+
+    ${media.sm`
+      display: inline-block;
+    `}
   }
 `
