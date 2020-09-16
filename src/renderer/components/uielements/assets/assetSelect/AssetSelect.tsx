@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 
-import { delay, Asset } from '@thorchain/asgardex-util'
+import { delay, Asset, assetToString } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
 import { sortBy as _sortBy } from 'lodash'
 import { useIntl } from 'react-intl'
@@ -76,7 +76,7 @@ const AssetSelect: React.FC<Props> = (props): JSX.Element => {
 
       // Wait for the dropdown to close
       await delay(500)
-      const changedAsset = assetData.find((asset) => asset.asset.symbol === assetId)
+      const changedAsset = assetData.find((asset) => assetToString(asset.asset) === assetId)
       if (changedAsset) {
         onSelect(changedAsset.asset)
       }

@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 
-import { Asset, baseAmount } from '@thorchain/asgardex-util'
+import { Asset, assetToString, baseAmount } from '@thorchain/asgardex-util'
 
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetPair } from '../../../../types/asgardex'
@@ -46,7 +46,7 @@ const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
       const { asset } = data
       const price = baseAmount(priceIndex[asset.ticker])
       const node = <AssetData asset={asset} price={price} />
-      const key = asset?.symbol ?? ''
+      const key = assetToString(asset)
       return { key, node }
     },
     [priceIndex]

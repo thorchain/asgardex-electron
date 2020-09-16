@@ -16,6 +16,7 @@ const Slider: React.FC<Props> = ({
   tooltipPlacement = 'bottom',
   withLabel = false,
   tipFormatter = (value) => `${value}%`,
+  tooltipVisible,
   ...rest
 }): JSX.Element => {
   const ref = useRef()
@@ -26,7 +27,7 @@ const Slider: React.FC<Props> = ({
         ref={ref}
         className={`slider-wrapper ${className}`}
         tooltipPlacement={tooltipPlacement}
-        getTooltipPopupContainer={getTooltipPopupContainer}
+        getTooltipPopupContainer={tooltipVisible ? getTooltipPopupContainer : undefined}
         tipFormatter={tipFormatter}
         {...rest}
       />
