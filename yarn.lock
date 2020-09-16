@@ -2915,9 +2915,9 @@
     hdkey "^2.0.1"
     uuid "^8.1.0"
 
-"@thorchain/asgardex-ethereum@https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#672ee67d71eaebd95d9580ca753e2cc8c45a5e12":
+"@thorchain/asgardex-ethereum@https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#feature/getbalance-for-asgardex":
   version "0.1.0"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#672ee67d71eaebd95d9580ca753e2cc8c45a5e12"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#970582404ce6522f2af5589ea3ba01f788eac107"
   dependencies:
     bip39 "^3.0.2"
 
