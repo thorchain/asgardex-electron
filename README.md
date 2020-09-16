@@ -80,6 +80,14 @@ yarn test
 yarn test:e2e
 ```
 
+### `lint`
+
+```bash
+yarn lint
+```
+
+Note: `eslint` is provided by `react-scripts` located in `./node_modules/react-scripts/node_modules/` and don't need to be extra installed. If your editor has some issues to find `eslint`, you might point it to this location (see [VSCode settings file](.vscode/settings.json) as an example).
+
 ## Folder structure
 
 ### `src`
