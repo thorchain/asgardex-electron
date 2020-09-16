@@ -172,14 +172,16 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
 
   const tableData = useMemo(
     // filter out assets with zero balances
-    // and order assets to BTC -> RUNE -> BNB -> others
+    // and order assets to BTC -> ETH -> RUNE -> BNB -> others
     () => FP.pipe(assetsWB, O.map(FP.flow(filterNullableBalances, sortBalances)), O.toUndefined),
     [assetsWB]
   )
 
   useEffect(() => {
-    if (tableData) previousBalances.current = tableData
-  }, [tableData])
+    if (tableData && !assetsLoading) {
+      previousBalances.current = tableData
+    }
+  }, [tableData, assetsLoading])
 
   const renderAssetsTable = useMemo(() => {
     return (

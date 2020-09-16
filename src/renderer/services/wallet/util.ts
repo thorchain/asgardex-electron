@@ -37,7 +37,7 @@ export const filterNullableBalances = (balances: AssetsWithBalance) => {
   )
 }
 
-const TICKERS_ORDER: string[] = [AssetTicker.BTC, AssetTicker.RUNE, AssetTicker.BNB]
+const TICKERS_ORDER: string[] = [AssetTicker.BTC, AssetTicker.ETH, AssetTicker.RUNE, AssetTicker.BNB]
 
 const getBalanceIndex = (balance: AssetWithBalance) =>
   TICKERS_ORDER.findIndex((ticker) => ticker === balance.asset.ticker)

@@ -12,13 +12,12 @@ import { AssetBTC } from '../../const'
 import { BTC_DECIMAL } from '../../helpers/assetHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { eqOString } from '../../helpers/fp/eq'
-import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import { ClientStateForViews } from '../types'
 import { getClientStateForViews, getClient } from '../utils'
 import { keystoreService } from '../wallet/service'
-import { AssetWithBalanceRD, AssetWithBalance, AssetsWithBalanceRD, ApiError, ErrorId } from '../wallet/types'
+import { AssetWithBalanceRD, AssetWithBalance, ApiError, ErrorId } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { BitcoinClientState } from './types'
 
@@ -116,10 +115,10 @@ const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const assetWB$: Observable<AssetWithBalanceRD> = Rx.combineLatest(
+const assetWB$: Observable<AssetWithBalanceRD> = Rx.combineLatest([
   reloadBalances$.pipe(debounceTime(300)),
   client$
-).pipe(
+]).pipe(
   mergeMap(([_, client]) => {
     return FP.pipe(
       client,
@@ -135,10 +134,7 @@ const assetWB$: Observable<AssetWithBalanceRD> = Rx.combineLatest(
   shareReplay(1)
 )
 
-// Map `AssetWB` into `[AssetsWB]` - needed
-const assetsWB$: Observable<AssetsWithBalanceRD> = assetWB$.pipe(liveData.map((asset) => [asset]))
-
 /**
  * Object with all "public" functions and observables
  */
-export { client$, clientViewState$, address$, reloadBalances, assetsWB$ }
+export { client$, clientViewState$, address$, reloadBalances, assetWB$ }

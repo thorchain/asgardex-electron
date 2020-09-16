@@ -4,11 +4,9 @@ import { LoadingOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetTicker } from '@thorchain/asgardex-util'
 
-import bnbIcon from '../../../../assets/svg/coin-bnb.svg'
-import btcIcon from '../../../../assets/svg/coin-btc.svg'
-import runeIcon from '../../../../assets/svg/rune-flash-icon.svg'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
+import { bnbIcon, btcIcon, ethIcon, runeIcon } from '../../../icons'
 import * as Styled from './AssetIcon.style'
 import { Size } from './types'
 
@@ -24,6 +22,10 @@ const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', ...rest }): JSX.El
     if (ticker === AssetTicker.BTC) {
       return btcIcon
     }
+    // ETH
+    if (ticker === AssetTicker.ETH) {
+      return ethIcon
+    }
     // RUNE
     if (ticker === AssetTicker.RUNE) {
       // Always use "our" Rune asset
@@ -36,8 +38,9 @@ const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', ...rest }): JSX.El
       return bnbIcon
     }
 
+    // Currently all other assets are based on Binance chain
+    // TODO (@veado) Change it by introducing ERC20 tokens
     const assetId = symbol
-    // currently we do load assets for Binance chain only
     // Note: Trustwallet supports asset names for mainnet only. For testnet we will use the `IconFallback` component
     return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${assetId}/logo.png`
   }, [asset])
