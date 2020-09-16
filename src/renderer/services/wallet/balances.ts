@@ -22,7 +22,7 @@ const reloadBalances = () => {
   ETH.reloadBalances()
 }
 
-// Map assets into `AssetWB` into `[AssetsWB]`
+// Map single `AssetWB` into `[AssetsWB]`
 const btcAssetsWB$: Observable<AssetsWithBalanceRD> = BTC.assetWB$.pipe(liveData.map((asset) => [asset]))
 const ethAssetsWB$: Observable<AssetsWithBalanceRD> = ETH.assetWB$.pipe(liveData.map((asset) => [asset]))
 
