@@ -79,9 +79,8 @@ export const FooterLabel = styled(Label).attrs({
   padding: 0;
 `
 
-const selectMinWidth = 365
-export const AssetSelect = styled(BaseAssetSelect).attrs({ minWidth: selectMinWidth })`
-  width: ${selectMinWidth}px;
+export const AssetSelect = styled(BaseAssetSelect)`
+  width: 365px;
 
   // we have to set padding to the children 'cause of ant
   // calculates position based on parent's box-model

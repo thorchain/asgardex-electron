@@ -1,4 +1,4 @@
-import React, { useRef, useState, RefObject, useCallback, useMemo } from 'react'
+import React, { useRef, useState, RefObject, useCallback, useMemo, useEffect } from 'react'
 
 import { bn, formatBN, Asset, assetFromString, BaseAmount } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
@@ -27,12 +27,10 @@ type Props = {
   searchDisable?: string[]
   withPercentSlider?: boolean
   withSearch?: boolean
+  // Base amount as BigNumber
   onChange?: (value: BigNumber) => void
   onChangeAsset?: (asset: Asset) => void
   className?: string
-  dataTestWrapper?: string
-  dataTestInput?: string
-  children?: React.ReactNode
 }
 
 const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
@@ -56,6 +54,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
   } = props
 
   const [openDropdown, setOpenDropdown] = useState(false)
+  const [wrapperWidth, setWrapperWidth] = useState(0)
   const ref: RefObject<HTMLDivElement> = useRef(null)
 
   const selectedAmountBn = selectedAmount.amount()
@@ -98,6 +97,19 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     amountBn
   ])
 
+  // Needed to have appropriate width of a dropdown
+  useEffect(() => {
+    // it will be executed only once after componentDidMount
+    setWrapperWidth(!ref.current ? 0 : ref.current.clientWidth)
+    const listener = window.addEventListener('resize', () => {
+      setWrapperWidth(!ref.current ? 0 : ref.current.clientWidth)
+    })
+
+    return () => {
+      window.removeEventListener('resize', listener)
+    }
+  })
+
   return (
     <Styled.AssetCardWrapper ref={ref} className={`AssetCard-wrapper ${className}`}>
       {title && <Label className="title-label">{title}</Label>}
@@ -106,7 +118,12 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
         <Styled.CardBorderWrapper>
           <Styled.AssetNameLabel>{asset?.ticker ?? 'unknown'}</Styled.AssetNameLabel>
           <Styled.CardTopRow>
-            <Styled.AssetSelect showAssetName={false} assetData={assetData} asset={asset} onSelect={handleChangeAsset}>
+            <Styled.AssetSelect
+              minWidth={wrapperWidth}
+              showAssetName={false}
+              assetData={assetData}
+              asset={asset}
+              onSelect={handleChangeAsset}>
               <Styled.AssetData>
                 <Styled.InputBigNumber size="middle" value={selectedAmountBn} onChange={onChange} />
                 <Styled.AssetCardFooter>
