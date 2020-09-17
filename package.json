@@ -58,7 +58,7 @@
     "@thorchain/asgardex-binance": "^3.0.1",
     "@thorchain/asgardex-bitcoin": "https://gitlab.com/thorchain/asgardex-common/asgardex-bitcoin.git#1356f4512d8e1be28103c294bfca6d62730b008c",
     "@thorchain/asgardex-crypto": "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git",
-    "@thorchain/asgardex-ethereum": "https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#feature/getbalance-for-asgardex",
+    "@thorchain/asgardex-ethereum": "https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#4e05ab6ff0e9e9f80268f0916dce46270721c2d4",
     "@thorchain/asgardex-midgard": "^1.0.0",
     "@thorchain/asgardex-theme": "^0.1.1",
     "@thorchain/asgardex-util": "^0.4.0",
