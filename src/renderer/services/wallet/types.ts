@@ -41,6 +41,13 @@ export type NonEmptyAssetsWithBalance = NonEmptyArray<AssetWithBalance>
 export type AssetsWithBalanceRD = RD.RemoteData<ApiError, AssetsWithBalance>
 export type AssetWithBalanceRD = RD.RemoteData<ApiError, AssetWithBalance>
 
+export type AssetsWBChain = {
+  chainName: string
+  assetsWB: AssetsWithBalanceRD
+}
+
+export type AssetsWBChains = AssetsWBChain[]
+
 export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
 
 export type AssetsWithBalanceState = {
