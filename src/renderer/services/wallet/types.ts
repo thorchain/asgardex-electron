@@ -7,6 +7,7 @@ import { Observable } from 'rxjs'
 
 import * as BNBTypes from '../binance/types'
 import * as BTCTypes from '../bitcoin/types'
+import * as ETHTypes from '../ethereum/types'
 
 export type Phrase = string
 
@@ -48,7 +49,7 @@ export type AssetsWithBalanceState = {
   loading: boolean
 }
 
-export type ApiId = BNBTypes.ApiId | BTCTypes.ApiId
+export type ApiId = BNBTypes.ApiId | BTCTypes.ApiId | ETHTypes.ApiId
 
 export enum ErrorId {
   GET_BALANCES,

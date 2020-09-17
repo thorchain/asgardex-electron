@@ -174,7 +174,6 @@ export const AccountAddress = styled(UILabel)`
   font-family: 'MainFontRegular';
   font-size: 16px;
   text-overflow: ellipsis;
-  text-transform: uppercase;
 `
 
 export const DeviceText = styled(UILabel)`

@@ -9,17 +9,28 @@ import { map, startWith } from 'rxjs/operators'
 
 import { eqAssetsWithBalanceRD } from '../../helpers/fp/eq'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
+import { liveData } from '../../helpers/rx/liveData'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/service'
+import * as ETH from '../ethereum/service'
 import { INITIAL_ASSETS_WB_STATE } from './const'
-import { AssetsWithBalanceState } from './types'
+import { AssetsWithBalanceRD, AssetsWithBalanceState } from './types'
 
 const reloadBalances = () => {
   BTC.reloadBalances()
   BNB.reloadBalances()
+  ETH.reloadBalances()
 }
 
-const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLatest([BNB.assetsWB$, BTC.assetsWB$]).pipe(
+// Map single `AssetWB` into `[AssetsWB]`
+const btcAssetsWB$: Observable<AssetsWithBalanceRD> = BTC.assetWB$.pipe(liveData.map((asset) => [asset]))
+const ethAssetsWB$: Observable<AssetsWithBalanceRD> = ETH.assetWB$.pipe(liveData.map((asset) => [asset]))
+
+const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLatest([
+  BNB.assetsWB$,
+  btcAssetsWB$,
+  ethAssetsWB$
+]).pipe(
   map((rdList) => ({
     assetsWB: FP.pipe(
       rdList,

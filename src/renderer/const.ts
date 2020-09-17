@@ -9,6 +9,7 @@ import {
 } from './views/pools/types'
 
 export const AssetBTC: Asset = { chain: 'BTC', symbol: 'BTC', ticker: 'BTC' }
+export const AssetETH: Asset = { chain: 'ETH', symbol: 'ETH', ticker: 'ETH' }
 
 // Currency symbols used for pricing
 export const CURRENCY_SYMBOLS: PricePoolCurrencySymbols = {
