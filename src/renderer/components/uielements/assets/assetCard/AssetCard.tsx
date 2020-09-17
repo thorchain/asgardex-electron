@@ -93,7 +93,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   const percentValue = useMemo(() => selectedAmountBn.dividedBy(amountBn).multipliedBy(100).toNumber(), [
-    selectedAmount,
+    selectedAmountBn,
     amountBn
   ])
 
@@ -108,7 +108,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
     return () => {
       window.removeEventListener('resize', listener)
     }
-  })
+  }, [setWrapperWidth])
 
   return (
     <Styled.AssetCardWrapper ref={ref} className={`AssetCard-wrapper ${className}`}>
