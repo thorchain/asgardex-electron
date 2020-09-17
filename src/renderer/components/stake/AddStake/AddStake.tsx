@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { Asset, baseAmount, BaseAmount } from '@thorchain/asgardex-util'
 
@@ -33,15 +33,31 @@ export const AddStake: React.FC<Props> = ({
   // priceIndex,
   // unit,
 }) => {
-  const [selectedRuneAmount, setSelectedRuneAmount] = useState(baseAmount(0))
-  const [selectedAssetAmount, setSelectedAssetAmount] = useState(baseAmount(0))
+  const [stakeAmount, setStakeAmount] = useState(baseAmount(0))
 
-  const onRuneAmountChange = useCallback((value: BigNumber) => setSelectedRuneAmount(baseAmount(value)), [
-    setSelectedRuneAmount
-  ])
-  const onAssetAmountChange = useCallback((value: BigNumber) => setSelectedAssetAmount(baseAmount(value)), [
-    setSelectedAssetAmount
-  ])
+  const assetSelect = useMemo(() => {
+    const res = stakeAmount
+      .amount()
+      .multipliedBy(assetAmount.amount())
+      .dividedBy(stakeAmount.amount().plus(runeAmount.amount()))
+
+    return baseAmount(res)
+  }, [stakeAmount, assetAmount, runeAmount])
+
+  const onRuneChange = useCallback(
+    (val: BigNumber) => {
+      setStakeAmount(baseAmount(val))
+    },
+    [setStakeAmount]
+  )
+
+  const onAssetChange = useCallback(
+    (val: BigNumber) => {
+      const targetAssetAmount = val.multipliedBy(runeAmount.amount()).dividedBy(assetAmount.amount().minus(val))
+      setStakeAmount(baseAmount(targetAssetAmount))
+    },
+    [runeAmount, assetAmount]
+  )
 
   return (
     <Styled.Container className={className}>
@@ -59,8 +75,8 @@ export const AddStake: React.FC<Props> = ({
               price: ONE_ASSET_BASE_AMOUNT
             }
           ]}
-          selectedAmount={selectedRuneAmount}
-          onChange={onRuneAmountChange}
+          selectedAmount={stakeAmount}
+          onChange={onRuneChange}
           price={runePrice}
           withPercentSlider
         />
@@ -68,8 +84,8 @@ export const AddStake: React.FC<Props> = ({
         <Styled.AssetCard
           asset={asset}
           amount={assetAmount}
-          selectedAmount={selectedAssetAmount}
-          onChange={onAssetAmountChange}
+          selectedAmount={assetSelect}
+          onChange={onAssetChange}
           price={assetPrice}
         />
       </Styled.InputsWrapper>

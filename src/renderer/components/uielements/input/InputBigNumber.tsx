@@ -44,7 +44,7 @@ export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
       O.filter((v) => !broadcastValue.current.isEqualTo(v))
     )
 
-    if (O.isSome(valueToBroadcast)) {
+    if (focus && O.isSome(valueToBroadcast)) {
       const v = valueToBroadcast.value
       broadcastValue.current = v
       onChange(v)
