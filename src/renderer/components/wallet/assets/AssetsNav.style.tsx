@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import Menu from '../shared/Menu'
+import Menu from '../../shared/Menu'
 
 export const StyledMenu = styled(Menu)`
   display: flex;

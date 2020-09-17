@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import Table from '../uielements/table'
+import Table from '../../uielements/table'
 
 export const TableWrapper = styled(Table)`
   .ant-table-thead > tr > th {

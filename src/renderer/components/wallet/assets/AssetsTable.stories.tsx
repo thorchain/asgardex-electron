@@ -5,7 +5,7 @@ import { assetFromString, baseAmount, EMPTY_ASSET } from '@thorchain/asgardex-ut
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
-import { NonEmptyAssetsWithBalance } from '../../services/wallet/types'
+import { NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
 import AssetsTable from './AssetsTable'
 
 const balances: O.Option<NonEmptyAssetsWithBalance> = NEA.fromArray([
