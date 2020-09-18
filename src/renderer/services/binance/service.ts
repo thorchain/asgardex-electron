@@ -211,7 +211,7 @@ const loadBalances$ = (client: BinanceClient): Observable<AssetsWithBalanceRD> =
   Rx.from(client.getBalance()).pipe(
     mergeMap((balances) => Rx.of(RD.success(getWalletBalances(balances)))),
     catchError((error: Error) =>
-      Rx.of(RD.failure({ apiId: 'BNB', errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
+      Rx.of(RD.failure({ chainId: 'BNB', errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
     ),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)

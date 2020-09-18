@@ -15,7 +15,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
   asset: Asset
 }
 
-const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', ...rest }): JSX.Element => {
+const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className = '', ...rest }): JSX.Element => {
   const imgUrl = useMemo(() => {
     const { symbol, ticker } = asset
     // BTC
@@ -49,11 +49,11 @@ const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', ...rest }): JSX.El
 
   const renderIcon = useCallback(
     (src: string) => (
-      <Styled.IconWrapper className={`coinIcon-wrapper ${rest.className}`} size={size}>
+      <Styled.IconWrapper className={`coinIcon-wrapper ${className}`} size={size}>
         <Styled.Icon src={src} size={size} />{' '}
       </Styled.IconWrapper>
     ),
-    [size, rest.className]
+    [className, size]
   )
 
   const renderPendingIcon = useCallback(() => {

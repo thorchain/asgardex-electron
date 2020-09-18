@@ -156,8 +156,8 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       FP.pipe(
         assetsErrors,
         O.map(
-          A.map(({ apiId, msg }) =>
-            intl.formatMessage({ id: 'wallet.errors.balancesFailed' }, { apiId, errorMsg: msg })
+          A.map(({ msg }) =>
+            intl.formatMessage({ id: 'wallet.errors.balancesFailed' }, { apiId: 'unknown', errorMsg: msg })
           )
         ),
         O.fold(

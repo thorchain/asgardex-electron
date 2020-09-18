@@ -40,19 +40,11 @@ describe('helpers/fp/eq', () => {
 
   describe('eqApiError', () => {
     const a: ApiError = {
-      apiId: 'BNB',
       errorId: ErrorId.GET_BALANCES,
       msg: 'msg'
     }
     it('is equal', () => {
       expect(eqApiError.equals(a, a)).toBeTruthy()
-    })
-    it('is not equal with different apiId', () => {
-      const b: ApiError = {
-        ...a,
-        apiId: 'BTC'
-      }
-      expect(eqApiError.equals(a, b)).toBeFalsy()
     })
     it('is not equal with different msg', () => {
       const b: ApiError = {

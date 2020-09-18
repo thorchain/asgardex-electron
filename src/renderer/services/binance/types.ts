@@ -72,5 +72,3 @@ export type LoadTxsProps = {
   limit: number
   offset: number
 }
-
-export type ApiId = 'BNB'
