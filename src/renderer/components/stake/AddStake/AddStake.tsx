@@ -5,14 +5,13 @@ import { useIntl } from 'react-intl'
 
 import { PriceDataIndex } from '../../../services/midgard/types'
 import { AssetPair } from '../../../types/asgardex'
-import { RUNEAsset } from '../../../views/pools/types'
 import BigNumber from '../../uielements/assets/assetCard/AssetCard'
 import Drag from '../../uielements/drag'
 import * as Styled from './AddStake.style'
 
 type Props = {
   asset: Asset
-  runeAsset: RUNEAsset
+  runeAsset: Asset
   assetPrice: BigNumber
   runePrice: BigNumber
   assetAmount: BaseAmount
