@@ -48,7 +48,7 @@ export const AddStake: React.FC<Props> = ({
      * formula z = (x * Y) / (x + X)
      * z = value of Asset
      * x = input value of RUNE
-     * Y = amount of BOLT in the pool
+     * Y = amount of Asset in the pool
      * X = amount of RUNE in the pool
      */
     const res = stakeAmountValue
@@ -85,7 +85,7 @@ export const AddStake: React.FC<Props> = ({
        * formula x = (z * X) / (Y - z)
        * z = input value of Asset
        * x = value of RUNE
-       * Y = amount of BOLT in the pool
+       * Y = amount of Asset in the pool
        * X = amount of RUNE in the pool
        */
       const x = baseAmount(
@@ -93,7 +93,7 @@ export const AddStake: React.FC<Props> = ({
       )
       setStakeAmount(x)
     },
-    [assetPrice, runePrice, setStakeAmount]
+    [assetPrice, runePrice, setStakeAmount, runeAmount, assetAmountProp]
   )
 
   const onStakeConfirmed = useCallback(() => {
