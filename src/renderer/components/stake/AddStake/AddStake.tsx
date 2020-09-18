@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { Asset, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
+import { useIntl } from 'react-intl'
 
 import { PriceDataIndex } from '../../../services/midgard/types'
 import { AssetPair } from '../../../types/asgardex'
@@ -20,6 +21,7 @@ type Props = {
   unit?: string
   assetData?: AssetPair[]
   className?: string
+  onStake: (stakeAmount: BigNumber, asset: Asset) => void
 }
 
 export const AddStake: React.FC<Props> = ({
@@ -27,13 +29,15 @@ export const AddStake: React.FC<Props> = ({
   runeAsset,
   assetPrice,
   runePrice,
-  assetAmount: assetAmountProp,
+  assetAmount,
   runeAmount,
   className,
-  assetData
+  assetData,
+  onStake
   // priceIndex,
   // unit,
 }) => {
+  const intl = useIntl()
   /**
    * Hold stakeAmount as amount of runes to stake
    */
@@ -46,14 +50,17 @@ export const AddStake: React.FC<Props> = ({
      * r = stakeAmount * assetAmount / (stakeAmount + runeAmount)
      */
     const res = stakeAmountValue
-      .times(assetAmountProp.amount())
+      .times(assetAmount.amount())
       .div(stakeAmountValue.plus(runeAmount.amount()))
-      //
+      /**
+       * convert with a ration assetPrice / runePrice
+       * to get value from RUNE to asset
+       */
       .div(assetPrice)
       .times(runePrice)
 
     return baseAmount(res)
-  }, [stakeAmount, assetAmountProp, runeAmount, assetPrice, runePrice])
+  }, [stakeAmount, assetAmount, runeAmount, assetPrice, runePrice])
 
   const onRuneChange = useCallback(
     (runeInput: BigNumber) => {
@@ -74,6 +81,10 @@ export const AddStake: React.FC<Props> = ({
     [assetPrice, runePrice, setStakeAmount]
   )
 
+  const onStakeConfirmed = useCallback(() => {
+    onStake(stakeAmount.amount(), asset)
+  }, [stakeAmount, asset, onStake])
+
   return (
     <Styled.Container className={className}>
       <Styled.InputsWrapper>
@@ -88,7 +99,7 @@ export const AddStake: React.FC<Props> = ({
 
         <Styled.AssetCard
           asset={asset}
-          amount={assetAmountProp}
+          amount={assetAmount}
           selectedAmount={assetSelect}
           onChange={onAssetChange}
           price={assetPrice}
@@ -96,7 +107,12 @@ export const AddStake: React.FC<Props> = ({
         />
       </Styled.InputsWrapper>
 
-      <Drag title={'drag'} source={runeAsset} target={asset} />
+      <Drag
+        title={intl.formatMessage({ id: 'stake.drag' })}
+        source={runeAsset}
+        target={asset}
+        onConfirm={onStakeConfirmed}
+      />
     </Styled.Container>
   )
 }

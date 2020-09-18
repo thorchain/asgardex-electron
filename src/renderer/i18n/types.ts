@@ -137,6 +137,7 @@ type StakeMessageKey =
   | 'stake.poolShare'
   | 'stake.withdraw'
   | 'stake.advancedMode'
+  | 'stake.drag'
 
 export type StakeMessages = { [key in StakeMessageKey]: string }
 

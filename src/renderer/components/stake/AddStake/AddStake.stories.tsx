@@ -16,6 +16,7 @@ export const AddStakeStory = () => {
       runePrice={bn(2)}
       assetAmount={assetToBase(assetAmount(1.354))}
       runeAmount={assetToBase(assetAmount(1.354))}
+      onStake={console.log}
       assetData={[
         {
           asset: ASSETS_MAINNET.BNB,

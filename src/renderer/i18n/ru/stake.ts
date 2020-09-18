@@ -5,7 +5,8 @@ const stake: StakeMessages = {
   'stake.totalEarnings': 'Ваш общий доход от пула',
   'stake.poolShare': 'Доля  в пуле',
   'stake.withdraw': 'Убрать',
-  'stake.advancedMode': 'Расширенный режим'
+  'stake.advancedMode': 'Расширенный режим',
+  'stake.drag': 'Потяните'
 }
 
 export default stake
