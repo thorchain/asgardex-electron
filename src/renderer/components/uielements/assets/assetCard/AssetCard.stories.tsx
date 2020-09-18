@@ -1,17 +1,20 @@
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn, assetAmount, assetToBase } from '@thorchain/asgardex-util'
+import { bn, assetAmount, assetToBase, baseAmount } from '@thorchain/asgardex-util'
 
 import { ASSETS_MAINNET } from '../../../../../shared/mock/assets'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../../const'
 import AssetCard from './AssetCard'
 
 storiesOf('Components/Assets/AssetCard', module).add('default', () => {
+  const [selectedAmount, setSelectedAmount] = useState(baseAmount(0))
+
+  const onChange = useCallback((value) => setSelectedAmount(baseAmount(value)), [])
   return (
     <div style={{ display: 'flex', padding: '20px' }}>
       <AssetCard
-        title="You are swapping"
+        title="Title here"
         asset={ASSETS_MAINNET.BNB}
         assetData={[
           {
@@ -24,18 +27,13 @@ storiesOf('Components/Assets/AssetCard', module).add('default', () => {
           }
         ]}
         amount={assetToBase(assetAmount(1.354))}
+        selectedAmount={selectedAmount}
+        onChange={onChange}
         price={bn(600)}
         priceIndex={{
           RUNE: bn(1)
         }}
-        withSelection
-      />
-      <AssetCard
-        title="You will receive"
-        asset={ASSETS_MAINNET.BOLT}
-        amount={assetToBase(assetAmount(13.549))}
-        price={bn(596)}
-        slip={2}
+        withPercentSlider
       />
     </div>
   )

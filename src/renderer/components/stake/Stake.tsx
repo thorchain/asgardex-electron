@@ -7,14 +7,15 @@ import * as Styled from './Stake.styles'
 type Props = {
   shareContent: React.ReactNode
   topContent: React.ReactNode
+  AddStake: React.ComponentType
 }
 
-export const Stake: React.FC<Props> = ({ shareContent, topContent }) => {
+export const Stake: React.FC<Props> = ({ shareContent, topContent, AddStake }) => {
   const intl = useIntl()
 
   const tabs = useMemo(
     () => [
-      { label: intl.formatMessage({ id: 'common.add' }), key: 'add', content: 'add' },
+      { label: intl.formatMessage({ id: 'common.add' }), key: 'add', content: <AddStake /> },
       { label: intl.formatMessage({ id: 'stake.withdraw' }), key: 'withdraw', content: 'withdraw' }
     ],
     [intl]

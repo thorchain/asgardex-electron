@@ -34,24 +34,6 @@ export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   useEffect(() => {
-    const valueToBroadcast = FP.pipe(
-      enteredValue,
-      // ignore empty input
-      O.filter((v) => v !== ''),
-      // format value
-      O.map((v) => fixedBN(v, decimal)),
-      // different value as before?
-      O.filter((v) => !broadcastValue.current.isEqualTo(v))
-    )
-
-    if (O.isSome(valueToBroadcast)) {
-      const v = valueToBroadcast.value
-      broadcastValue.current = v
-      onChange(v)
-    }
-  }, [enteredValue, onChange, focus, decimal])
-
-  useEffect(() => {
     setEnteredValue(O.some(value.toString()))
   }, [value])
 
@@ -87,12 +69,32 @@ export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
     onBlurHandler()
   }, [onBlurHandler])
 
-  const onChangeHandler = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    const { value: newValue } = target
-    if (validInputValue(newValue)) {
-      setEnteredValue(O.some(newValue))
-    }
-  }, [])
+  const onChangeHandler = useCallback(
+    ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+      const { value: newValue } = target
+      if (validInputValue(newValue)) {
+        const valueToBroadcast = FP.pipe(
+          O.some(newValue),
+          // ignore empty input
+          O.filter((v) => v !== ''),
+          O.alt(() => O.some('0')),
+          // format value
+          O.map((v) => fixedBN(v, decimal)),
+          // different value as before?
+          O.filter((v) => !broadcastValue.current.isEqualTo(v))
+        )
+
+        if (O.isSome(valueToBroadcast)) {
+          const v = valueToBroadcast.value
+          broadcastValue.current = v
+          setEnteredValue(O.some(newValue))
+
+          onChange(bn(v))
+        }
+      }
+    },
+    [broadcastValue, decimal, onChange]
+  )
 
   return (
     <Styled.InputBigNumber
