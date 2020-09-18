@@ -79,7 +79,7 @@ export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
           O.filter((v) => v !== ''),
           O.alt(() => '0'),
           // format value
-          O.map((v) => fixedBN(v, decimal || 5)),
+          O.map((v) => fixedBN(v, decimal)),
           // different value as before?
           O.filter((v) => !broadcastValue.current.isEqualTo(v))
         )

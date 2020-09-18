@@ -32,9 +32,8 @@ export const AddStake: React.FC<Props> = ({
   runeAmount,
   className,
   assetData,
+  unit,
   onStake
-  // priceIndex,
-  // unit,
 }) => {
   const intl = useIntl()
   /**
@@ -111,6 +110,7 @@ export const AddStake: React.FC<Props> = ({
           onChange={onRuneChange}
           price={runePrice}
           withPercentSlider
+          unit={unit}
         />
 
         <Styled.AssetCard
@@ -120,6 +120,7 @@ export const AddStake: React.FC<Props> = ({
           onChange={onAssetChange}
           price={assetPrice}
           assetData={assetData}
+          unit={unit}
         />
       </Styled.InputsWrapper>
 

@@ -6,7 +6,7 @@ const stake: StakeMessages = {
   'stake.poolShare': ' Poolanteil',
   'stake.withdraw': 'Abheben',
   'stake.advancedMode': 'Experten modus',
-  'stake.drag': 'Drag to stake - DE'
+  'stake.drag': 'Ziehen um zu Staken'
 }
 
 export default stake
