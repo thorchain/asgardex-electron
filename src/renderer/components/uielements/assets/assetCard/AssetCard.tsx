@@ -1,6 +1,6 @@
 import React, { useRef, useState, RefObject, useCallback, useMemo, useEffect } from 'react'
 
-import { bn, formatBN, Asset, assetFromString, BaseAmount } from '@thorchain/asgardex-util'
+import { bn, formatBN, Asset, assetFromString, BaseAmount, baseToAsset } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import { sortBy as _sortBy } from 'lodash'
@@ -57,8 +57,8 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
   const [wrapperWidth, setWrapperWidth] = useState(0)
   const ref: RefObject<HTMLDivElement> = useRef(null)
 
-  const selectedAmountBn = useMemo(() => selectedAmount.amount(), [selectedAmount])
-  const amountBn = useMemo(() => amount.amount(), [amount])
+  const selectedAmountBn = useMemo(() => baseToAsset(selectedAmount).amount(), [selectedAmount])
+  const amountBn = useMemo(() => baseToAsset(amount).amount(), [amount])
 
   useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { Asset, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
+import { Asset, assetAmount, assetToBase, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
 import { useIntl } from 'react-intl'
 
 import { PriceDataIndex } from '../../../services/midgard/types'
@@ -28,7 +28,7 @@ export const AddStake: React.FC<Props> = ({
   runeAsset,
   assetPrice,
   runePrice,
-  assetAmount,
+  assetAmount: assetAmountProp,
   runeAmount,
   className,
   assetData,
@@ -46,10 +46,14 @@ export const AddStake: React.FC<Props> = ({
     const stakeAmountValue = stakeAmount.amount()
 
     /**
-     * r = stakeAmount * assetAmount / (stakeAmount + runeAmount)
+     * formula z = (x * Y) / (x + X)
+     * z = value of Asset
+     * x = input value of RUNE
+     * Y = amount of BOLT in the pool
+     * X = amount of RUNE in the pool
      */
     const res = stakeAmountValue
-      .times(assetAmount.amount())
+      .times(assetAmountProp.amount())
       .div(stakeAmountValue.plus(runeAmount.amount()))
       /**
        * convert with a ration assetPrice / runePrice
@@ -59,11 +63,11 @@ export const AddStake: React.FC<Props> = ({
       .times(runePrice)
 
     return baseAmount(res)
-  }, [stakeAmount, assetAmount, runeAmount, assetPrice, runePrice])
+  }, [stakeAmount, assetAmountProp, runeAmount, assetPrice, runePrice])
 
   const onRuneChange = useCallback(
     (runeInput: BigNumber) => {
-      setStakeAmount(baseAmount(runeInput))
+      setStakeAmount(assetToBase(assetAmount(runeInput)))
     },
     [setStakeAmount]
   )
@@ -71,11 +75,24 @@ export const AddStake: React.FC<Props> = ({
   const onAssetChange = useCallback(
     (assetInput: BigNumber) => {
       /**
-       * Convert Asset value to the RUNEs with
+       * Convert Asset value to the RUNE based BaseAmount with
        * assetPrice / runePrice - ratio to convert from asset to RUNE
        */
-      const targetRes = baseAmount(assetInput.times(assetPrice.div(runePrice)))
-      setStakeAmount(targetRes)
+      const z = assetToBase(assetAmount(assetInput.div(runePrice).times(assetPrice)))
+
+      /**
+       * @note this formula is a result of formula for the assetSelect
+       *       and this is just a `reversed` value
+       * formula x = (z * X) / (Y - z)
+       * z = input value of Asset
+       * x = value of RUNE
+       * Y = amount of BOLT in the pool
+       * X = amount of RUNE in the pool
+       */
+      const x = baseAmount(
+        z.amount().multipliedBy(runeAmount.amount()).dividedBy(assetAmountProp.amount().minus(z.amount()))
+      )
+      setStakeAmount(x)
     },
     [assetPrice, runePrice, setStakeAmount]
   )
@@ -98,7 +115,7 @@ export const AddStake: React.FC<Props> = ({
 
         <Styled.AssetCard
           asset={asset}
-          amount={assetAmount}
+          amount={assetAmountProp}
           selectedAmount={assetSelect}
           onChange={onAssetChange}
           price={assetPrice}
