@@ -57,20 +57,23 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
   const [wrapperWidth, setWrapperWidth] = useState(0)
   const ref: RefObject<HTMLDivElement> = useRef(null)
 
-  const selectedAmountBn = selectedAmount.amount()
-  const amountBn = amount.amount()
+  const selectedAmountBn = useMemo(() => selectedAmount.amount(), [selectedAmount])
+  const amountBn = useMemo(() => amount.amount(), [amount])
 
   useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
 
-  const handleChangeAsset = (asset: string | Asset) => {
-    const targetAsset = typeof asset === 'string' ? assetFromString(asset) : asset
-    if (targetAsset) {
-      onChangeAsset(targetAsset)
-      onChange(ZERO_BN)
-    }
-  }
+  const handleChangeAsset = useCallback(
+    (asset: string | Asset) => {
+      const targetAsset = typeof asset === 'string' ? assetFromString(asset) : asset
+      if (targetAsset) {
+        onChangeAsset(targetAsset)
+        onChange(ZERO_BN)
+      }
+    },
+    [onChangeAsset, onChange]
+  )
 
-  function renderMenu() {
+  const renderMenu = useCallback(() => {
     const sortedAssetData = _sortBy(assetData, ['asset'])
 
     return (
@@ -83,7 +86,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
         onSelect={handleChangeAsset}
       />
     )
-  }
+  }, [assetData, asset, priceIndex, withSearch, searchDisable, handleChangeAsset])
 
   const onPercentChange = useCallback(
     (percent: number) => {

@@ -1,10 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { Asset, baseAmount, BaseAmount } from '@thorchain/asgardex-util'
+import { Asset, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
 
-import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
-import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import { PriceDataIndex } from '../../../services/midgard/types'
+import { AssetPair } from '../../../types/asgardex'
 import { RUNEAsset } from '../../../views/pools/types'
 import BigNumber from '../../uielements/assets/assetCard/AssetCard'
 import Drag from '../../uielements/drag'
@@ -19,6 +18,7 @@ type Props = {
   runeAmount: BaseAmount
   priceIndex?: PriceDataIndex
   unit?: string
+  assetData?: AssetPair[]
   className?: string
 }
 
@@ -27,36 +27,51 @@ export const AddStake: React.FC<Props> = ({
   runeAsset,
   assetPrice,
   runePrice,
-  assetAmount,
+  assetAmount: assetAmountProp,
   runeAmount,
-  className
+  className,
+  assetData
   // priceIndex,
   // unit,
 }) => {
+  /**
+   * Hold stakeAmount as amount of runes to stake
+   */
   const [stakeAmount, setStakeAmount] = useState(baseAmount(0))
 
   const assetSelect = useMemo(() => {
-    const res = stakeAmount
-      .amount()
-      .multipliedBy(assetAmount.amount())
-      .dividedBy(stakeAmount.amount().plus(runeAmount.amount()))
+    const stakeAmountValue = stakeAmount.amount()
+
+    /**
+     * r = stakeAmount * assetAmount / (stakeAmount + runeAmount)
+     */
+    const res = stakeAmountValue
+      .times(assetAmountProp.amount())
+      .div(stakeAmountValue.plus(runeAmount.amount()))
+      //
+      .div(assetPrice)
+      .times(runePrice)
 
     return baseAmount(res)
-  }, [stakeAmount, assetAmount, runeAmount])
+  }, [stakeAmount, assetAmountProp, runeAmount, assetPrice, runePrice])
 
   const onRuneChange = useCallback(
-    (val: BigNumber) => {
-      setStakeAmount(baseAmount(val))
+    (runeInput: BigNumber) => {
+      setStakeAmount(baseAmount(runeInput))
     },
     [setStakeAmount]
   )
 
   const onAssetChange = useCallback(
-    (val: BigNumber) => {
-      const targetAssetAmount = val.multipliedBy(runeAmount.amount()).dividedBy(assetAmount.amount().minus(val))
-      setStakeAmount(baseAmount(targetAssetAmount))
+    (assetInput: BigNumber) => {
+      /**
+       * Convert Asset value to the RUNEs with
+       * assetPrice / runePrice - ratio to convert from asset to RUNE
+       */
+      const targetRes = baseAmount(assetInput.times(assetPrice.div(runePrice)))
+      setStakeAmount(targetRes)
     },
-    [runeAmount, assetAmount]
+    [assetPrice, runePrice, setStakeAmount]
   )
 
   return (
@@ -65,16 +80,6 @@ export const AddStake: React.FC<Props> = ({
         <Styled.AssetCard
           asset={runeAsset}
           amount={runeAmount}
-          assetData={[
-            {
-              asset: ASSETS_MAINNET.BNB,
-              price: ONE_ASSET_BASE_AMOUNT
-            },
-            {
-              asset: ASSETS_MAINNET.TOMO,
-              price: ONE_ASSET_BASE_AMOUNT
-            }
-          ]}
           selectedAmount={stakeAmount}
           onChange={onRuneChange}
           price={runePrice}
@@ -83,10 +88,11 @@ export const AddStake: React.FC<Props> = ({
 
         <Styled.AssetCard
           asset={asset}
-          amount={assetAmount}
+          amount={assetAmountProp}
           selectedAmount={assetSelect}
           onChange={onAssetChange}
           price={assetPrice}
+          assetData={assetData}
         />
       </Styled.InputsWrapper>
 
