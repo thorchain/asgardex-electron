@@ -77,7 +77,7 @@ export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
           O.some(newValue),
           // ignore empty input
           O.filter((v) => v !== ''),
-          O.alt(() => '0'),
+          O.alt(() => O.some('0')),
           // format value
           O.map((v) => fixedBN(v, decimal)),
           // different value as before?

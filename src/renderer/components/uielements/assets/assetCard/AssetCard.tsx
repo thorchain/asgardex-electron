@@ -23,7 +23,7 @@ type Props = {
   priceIndex?: PriceDataIndex
   unit?: string
   slip?: number
-  title: string
+  title?: string
   searchDisable?: string[]
   withPercentSlider?: boolean
   withSearch?: boolean
@@ -33,7 +33,7 @@ type Props = {
   className?: string
 }
 
-const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
     amount,
@@ -104,9 +104,10 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
   useEffect(() => {
     // it will be executed only once after componentDidMount
     setWrapperWidth(!ref.current ? 0 : ref.current.clientWidth)
-    const listener = window.addEventListener('resize', () => {
+    const listener = () => {
       setWrapperWidth(!ref.current ? 0 : ref.current.clientWidth)
-    })
+    }
+    window.addEventListener('resize', listener)
 
     return () => {
       window.removeEventListener('resize', listener)
@@ -115,7 +116,7 @@ const AssetCard: React.FC<Props> = (props: Props): JSX.Element => {
 
   return (
     <Styled.AssetCardWrapper ref={ref} className={`AssetCard-wrapper ${className}`}>
-      {title && <Label className="title-label">{title}</Label>}
+      {!!title && <Label className="title-label">{title}</Label>}
 
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <Styled.CardBorderWrapper>

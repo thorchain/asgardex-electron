@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { Asset, assetAmount, assetToBase, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
+import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { PriceDataIndex } from '../../../services/midgard/types'
 import { AssetPair } from '../../../types/asgardex'
-import BigNumber from '../../uielements/assets/assetCard/AssetCard'
 import Drag from '../../uielements/drag'
 import * as Styled from './AddStake.style'
 
