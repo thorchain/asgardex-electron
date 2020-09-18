@@ -21,18 +21,19 @@ import { AssetWithBalanceRD, AssetWithBalance, ApiError, ErrorId } from '../wall
 import { getPhrase } from '../wallet/util'
 import { BitcoinClientState } from './types'
 
-const BITCOIN_ELECTRS_API = envOrDefault(process.env.BITCOIN_ELECRTS_TESTNET_API, 'http://165.22.106.224')
-
 /**
- * Binance network depending on `Network`
+ * Binance network depending on selected `Network`
  */
 const bitcoinNetwork$: Observable<BitcoinNetwork> = network$.pipe(
-  mergeMap((network) => {
-    if (network === 'testnet') return Rx.of(BitcoinNetwork.TEST)
-    // In case of 'chaosnet' + 'mainnet` use BitcoinNetwork.MAIN
-    return Rx.of(BitcoinNetwork.MAIN)
+  map((network) => {
+    if (network === 'testnet') return BitcoinNetwork.TEST
+    // In case of 'chaosnet' + 'mainnet` we use `BitcoinNetwork.MAIN`
+    return BitcoinNetwork.MAIN
   })
 )
+
+const ELECTRS_TESTNET = envOrDefault(process.env.REACT_APP_BITCOIN_ELECRTS_TESTNET_API, 'http://165.22.106.224')
+const ELECTRS_MAINNET = envOrDefault(process.env.REACT_APP_BITCOIN_ELECRTS_MAINNET_API, 'http://188.166.254.248')
 
 /**
  * Stream to create an observable BitcoinClient depending on existing phrase in keystore
@@ -44,12 +45,14 @@ const bitcoinNetwork$: Observable<BitcoinNetwork> = network$.pipe(
 const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork$]).pipe(
   mergeMap(
     ([keystore, bitcoinNetwork]) =>
-      Observable.create((observer: Observer<BitcoinClientState>) => {
+      new Observable((observer: Observer<BitcoinClientState>) => {
         const client: BitcoinClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
-              const client = new BitcoinClient(bitcoinNetwork, BITCOIN_ELECTRS_API, phrase)
+              // Url of electrs
+              const electrsUrl = bitcoinNetwork === BitcoinNetwork.TEST ? ELECTRS_TESTNET : ELECTRS_MAINNET
+              const client = new BitcoinClient(bitcoinNetwork, electrsUrl, phrase)
               return O.some(right(client)) as BitcoinClientState
             } catch (error) {
               return O.some(left(error))
