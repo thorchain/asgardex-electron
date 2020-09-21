@@ -8,7 +8,6 @@ import Trend from '../trend'
 import * as Styled from './PoolStatus.style'
 
 type Props = {
-  // amount: AssetAmount
   asset: string
   label: string
   target: string
@@ -26,12 +25,7 @@ const PoolStatus: React.FC<Props> = (props): JSX.Element => {
         </Label>
         {trend && <Trend amount={trend} />}
       </Row>
-      <Styled.Value className="amount">
-        {
-          // formatAssetAmountCurrency(amount)
-          children
-        }
-      </Styled.Value>
+      <Styled.Value className="amount">{children}</Styled.Value>
       <Label textTransform="uppercase" color="light">
         {label}
       </Label>
