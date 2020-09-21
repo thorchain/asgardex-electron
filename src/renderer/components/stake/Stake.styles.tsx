@@ -35,7 +35,7 @@ export const TotalContainer = styled('div')`
   background: ${palette('background', 0)};
 
   ${media.lg`
-    max-width: 430px;
+    width: 50%;
     margin: 0 10px 0 0;
   `};
 `

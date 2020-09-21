@@ -1,35 +1,41 @@
 import React from 'react'
 
-import { AssetAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 
 import Label from '../label'
 import Trend from '../trend'
-import { PoolStatusWrapper } from './PoolStatus.style'
+import * as Styled from './PoolStatus.style'
 
 type Props = {
-  amount: AssetAmount
+  // amount: AssetAmount
   asset: string
   label: string
   target: string
-  trend: BigNumber
+  trend?: BigNumber
 }
 
-const PoolStatus: React.FC<Props> = (props: Props): JSX.Element => {
-  const { amount, asset, label, target, trend } = props
+const PoolStatus: React.FC<Props> = (props): JSX.Element => {
+  const { children, asset, label, target, trend } = props
 
   return (
-    <PoolStatusWrapper {...props}>
+    <Styled.PoolStatusWrapper {...props}>
       <Row style={{ justifyContent: 'space-between' }}>
-        <Label color="light">{asset + ' / ' + target}</Label>
-        <Trend amount={trend} />
+        <Label textTransform="uppercase" color="light">
+          {asset + ' / ' + target}
+        </Label>
+        {trend && <Trend amount={trend} />}
       </Row>
-      <Label size="big" className="amount">
-        {formatAssetAmountCurrency(amount)}
+      <Styled.Value className="amount">
+        {
+          // formatAssetAmountCurrency(amount)
+          children
+        }
+      </Styled.Value>
+      <Label textTransform="uppercase" color="light">
+        {label}
       </Label>
-      <Label color="light">{label}</Label>
-    </PoolStatusWrapper>
+    </Styled.PoolStatusWrapper>
   )
 }
 
