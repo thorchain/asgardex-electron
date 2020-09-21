@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 
-import { delay, Asset } from '@thorchain/asgardex-util'
+import { delay, Asset, assetToString } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
 import { sortBy as _sortBy } from 'lodash'
 import { useIntl } from 'react-intl'
@@ -38,16 +38,23 @@ type Props = {
   withSearch?: boolean
   searchDisable?: string[]
   onSelect: (_: Asset) => void
+  className?: string
+  minWidth?: number
+  showAssetName?: boolean
 }
 
-const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
     assetData = [],
     priceIndex,
     withSearch = true,
     searchDisable = [],
-    onSelect = (_: Asset) => {}
+    onSelect = (_: Asset) => {},
+    children,
+    className,
+    minWidth,
+    showAssetName
   } = props
 
   const [openDropdown, setOpenDropdown] = useState<boolean>(false)
@@ -69,7 +76,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
 
       // Wait for the dropdown to close
       await delay(500)
-      const changedAsset = assetData.find((asset) => asset.asset.symbol === assetId)
+      const changedAsset = assetData.find((asset) => assetToString(asset.asset) === assetId)
       if (changedAsset) {
         onSelect(changedAsset.asset)
       }
@@ -80,7 +87,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
   const renderMenu = useCallback(() => {
     const sortedAssetData = _sortBy(assetData, ['asset'])
     return (
-      <AssetSelectMenuWrapper>
+      <AssetSelectMenuWrapper minWidth={minWidth}>
         <AssetMenu
           searchPlaceholder={intl.formatMessage({ id: 'swap.searchAsset' })}
           closeMenu={closeMenu}
@@ -93,7 +100,7 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
         />
       </AssetSelectMenuWrapper>
     )
-  }, [assetData, intl, asset, closeMenu, handleChangeAsset, priceIndex, searchDisable, withSearch])
+  }, [assetData, intl, asset, closeMenu, handleChangeAsset, priceIndex, searchDisable, withSearch, minWidth])
 
   const renderDropDownButton = () => {
     const disabled = assetData.length === 0
@@ -105,10 +112,11 @@ const AssetSelect: React.FC<Props> = (props: Props): JSX.Element => {
   }
 
   return (
-    <AssetSelectWrapper>
+    <AssetSelectWrapper className={className}>
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <>
-          <AssetSelectData asset={asset} />
+          {children && children}
+          <AssetSelectData showAssetName={showAssetName} asset={asset} />
           {renderDropDownButton()}
         </>
       </Dropdown>

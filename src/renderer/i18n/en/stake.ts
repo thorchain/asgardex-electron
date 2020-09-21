@@ -5,7 +5,8 @@ const stake: StakeMessages = {
   'stake.totalEarnings': 'Your total earnings from the pool',
   'stake.poolShare': ' Pool share',
   'stake.withdraw': 'Withdraw',
-  'stake.advancedMode': 'Advanced mode'
+  'stake.advancedMode': 'Advanced mode',
+  'stake.drag': 'Drag to stake'
 }
 
 export default stake

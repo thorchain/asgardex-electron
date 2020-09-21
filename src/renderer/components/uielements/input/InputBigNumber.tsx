@@ -6,6 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { trimZeros } from '../../../helpers/stringHelper'
+import { ZERO_BN } from '../../../services/const'
 import * as Styled from './Input.style'
 import { VALUE_ZERO, formatValue, validInputValue } from './util'
 
@@ -16,7 +17,12 @@ type Props = Omit<Styled.InputProps, 'value' | 'onChange'> & {
 }
 
 export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
-  const { decimal = 2, value = bn(0), onChange = () => {}, ...otherProps /* any props of `InputNumberProps` */ } = props
+  const {
+    decimal = 2,
+    value = ZERO_BN,
+    onChange = () => {},
+    ...otherProps /* any props of `InputNumberProps` */
+  } = props
 
   // value as string (unformatted) - it supports empty string for an empty input
   const [enteredValue, setEnteredValue] = useState<O.Option<string>>(O.none)
@@ -32,24 +38,6 @@ export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
       ),
     [enteredValue, focus, decimal, value]
   )
-
-  useEffect(() => {
-    const valueToBroadcast = FP.pipe(
-      enteredValue,
-      // ignore empty input
-      O.filter((v) => v !== ''),
-      // format value
-      O.map((v) => fixedBN(v, decimal)),
-      // different value as before?
-      O.filter((v) => !broadcastValue.current.isEqualTo(v))
-    )
-
-    if (O.isSome(valueToBroadcast)) {
-      const v = valueToBroadcast.value
-      broadcastValue.current = v
-      onChange(v)
-    }
-  }, [enteredValue, onChange, focus, decimal])
 
   useEffect(() => {
     setEnteredValue(O.some(value.toString()))
@@ -87,12 +75,33 @@ export const InputBigNumber: React.FC<Props> = (props: Props): JSX.Element => {
     onBlurHandler()
   }, [onBlurHandler])
 
-  const onChangeHandler = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    const { value: newValue } = target
-    if (validInputValue(newValue)) {
-      setEnteredValue(O.some(newValue))
-    }
-  }, [])
+  const onChangeHandler = useCallback(
+    ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+      const { value: newValue } = target
+      if (validInputValue(newValue)) {
+        const valueToBroadcast = FP.pipe(
+          O.some(newValue),
+          // ignore empty input
+          O.filter((v) => v !== ''),
+          O.alt(() => O.some('0')),
+          // format value
+          O.map((v) => fixedBN(v, decimal)),
+          // different value as before?
+          O.filter((v) => !broadcastValue.current.isEqualTo(v))
+        )
+
+        setEnteredValue(O.some(newValue))
+
+        if (O.isSome(valueToBroadcast)) {
+          const v = valueToBroadcast.value
+          broadcastValue.current = v
+
+          onChange(bn(v))
+        }
+      }
+    },
+    [broadcastValue, decimal, onChange]
+  )
 
   return (
     <Styled.InputBigNumber

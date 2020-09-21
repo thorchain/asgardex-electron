@@ -1,7 +1,8 @@
 import * as A from 'antd'
 import styled from 'styled-components'
-import { palette } from 'styled-theme'
+import { palette, key } from 'styled-theme'
 
+import { media } from '../../helpers/styleHelper'
 import Label from '../uielements/label'
 
 export const Tabs = styled(A.Tabs).attrs({
@@ -41,6 +42,10 @@ export const ContentWrapper = styled('div')<{ centerContent?: boolean }>`
   flex-direction: column;
   justify-content: ${(props) => (props.centerContent ? 'center' : '')};
   align-items: ${(props) => (props.centerContent ? 'center' : '')};
-  padding: 40px;
   min-height: 100%;
+  padding: ${key('sizes.gutter.vertical', '0px')};
+
+  ${media.md`
+    padding: 40px;
+  `}
 `
