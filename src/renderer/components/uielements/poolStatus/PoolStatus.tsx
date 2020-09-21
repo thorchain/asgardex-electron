@@ -16,8 +16,8 @@ type Props = {
 const PoolStatus: React.FC<Props> = (props): JSX.Element => {
   const { children, label, trend } = props
   const [showTooltip, setShowTooltip] = useState(false)
-  const amountRef = useRef()
-  const containerRef = useRef()
+  const amountRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const onResizeCb = useCallback(() => {
     if (!amountRef.current) {
@@ -31,11 +31,17 @@ const PoolStatus: React.FC<Props> = (props): JSX.Element => {
     }
   }, [amountRef])
 
-  useCbOnResize(onResizeCb, [onResizeCb])
+  useCbOnResize(onResizeCb)
 
   const TooltipContainer: React.FC = useCallback(
     (props) =>
-      showTooltip ? <Styled.Tooltip title={children}>{props.children}</Styled.Tooltip> : <>{props.children}</>,
+      showTooltip ? (
+        <Styled.Tooltip title={children}>
+          <>{props.children}</>
+        </Styled.Tooltip>
+      ) : (
+        <>{props.children}</>
+      ),
     [showTooltip, children]
   )
 

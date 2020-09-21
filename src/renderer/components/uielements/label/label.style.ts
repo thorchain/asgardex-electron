@@ -11,6 +11,7 @@ export type Props = {
   textTransform?: TextTransform
   nowrap?: boolean
   onClick?: (_: React.MouseEvent<HTMLElement>) => void
+  ref?: unknown
 }
 
 const fontSettings: FontSettings = {

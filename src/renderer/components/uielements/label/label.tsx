@@ -13,7 +13,7 @@ export type ComponentProps = {
 
 export type LabelProps = ComponentProps & StyledProps
 
-const Label: React.FC<LabelProps> = React.forwardRef(
+const Label = React.forwardRef<HTMLDivElement, LabelProps>(
   (props, ref): JSX.Element => {
     const {
       loading = false,
