@@ -1,4 +1,4 @@
-import { assetToString, AssetTicker, baseAmount } from '@thorchain/asgardex-util'
+import { assetToString, baseAmount } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import { pipe, identity } from 'fp-ts/lib/function'
@@ -37,23 +37,18 @@ export const filterNullableBalances = (balances: AssetsWithBalance) => {
   )
 }
 
-const TICKERS_ORDER: string[] = [AssetTicker.BTC, AssetTicker.ETH, AssetTicker.RUNE, AssetTicker.BNB]
-
-const getBalanceIndex = (balance: AssetWithBalance) =>
-  TICKERS_ORDER.findIndex((ticker) => ticker === balance.asset.ticker)
-
-const byTickersOrder = Ord.ord.contramap(Ord.ordNumber, getBalanceIndex)
-
 // We will compare asset strings and they automatically
 // be grouped by their chains in alphabetic order
 const byAsset = Ord.ord.contramap(Ord.ordString, (balance: AssetWithBalance) => assetToString(balance.asset))
 
-export const sortBalances = (balances: AssetsWithBalance) => {
+export const sortBalances = (balances: AssetsWithBalance, orders: string[]) => {
+  const getBalanceIndex = (balance: AssetWithBalance) => orders.findIndex((ticker) => ticker === balance.asset.ticker)
+  const byTickersOrder = Ord.ord.contramap(Ord.ordNumber, getBalanceIndex)
   return FP.pipe(
     balances,
     // split array for 2 parts: sortable assets and the rest
     A.reduce([[], []] as [AssetsWithBalance, AssetsWithBalance], (acc, cur) => {
-      if (TICKERS_ORDER.includes(cur.asset.ticker)) {
+      if (orders.includes(cur.asset.ticker)) {
         acc[0].push(cur)
       } else {
         acc[1].push(cur)
