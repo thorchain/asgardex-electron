@@ -6,7 +6,7 @@ import { useObservableState } from 'observable-hooks'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
 import { RefreshButton } from '../../components/uielements/button/'
-import AssetsNav from '../../components/wallet/AssetsNav'
+import AssetsNav from '../../components/wallet/assets/AssetsNav'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'

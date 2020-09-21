@@ -31,10 +31,8 @@ export const eqAssetWithBalance: Eq.Eq<AssetWithBalance> = {
 }
 
 export const eqErrorId = Eq.eqNumber
-export const eqApiId = Eq.eqString
 
 export const eqApiError = Eq.getStructEq<ApiError>({
-  apiId: eqApiId,
   errorId: eqErrorId,
   msg: Eq.eqString
 })

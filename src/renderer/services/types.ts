@@ -2,6 +2,9 @@ import * as E from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
 import { Option, option } from 'fp-ts/lib/Option'
 
+// All possible chains we currently support or plan to support in near future
+export type ChainId = 'Thorchain' | 'Binance' | 'ETH' | 'BTC'
+
 /**
  * Three States:
  * (1) None -> no client has been instantiated

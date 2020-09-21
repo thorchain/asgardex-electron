@@ -8,22 +8,22 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { RUNE_PRICE_POOL } from '../../const'
-import { ordBaseAmount } from '../../helpers/fp/ord'
-import { sequenceTOption } from '../../helpers/fpHelpers'
-import { getPoolPriceValue } from '../../services/binance/utils'
-import { PoolDetails } from '../../services/midgard/types'
+import { RUNE_PRICE_POOL } from '../../../const'
+import { ordBaseAmount } from '../../../helpers/fp/ord'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { getPoolPriceValue } from '../../../services/binance/utils'
+import { PoolDetails } from '../../../services/midgard/types'
 import {
   AssetWithBalance,
   NonEmptyAssetsWithBalance,
   NonEmptyApiErrors,
   AssetsWithBalance
-} from '../../services/wallet/types'
-import { filterNullableBalances, sortBalances } from '../../services/wallet/util'
-import { PricePool } from '../../views/pools/types'
-import ErrorAlert from '../uielements/alert/ErrorAlert'
-import AssetIcon from '../uielements/assets/assetIcon'
-import Label from '../uielements/label'
+} from '../../../services/wallet/types'
+import { filterNullableBalances, sortBalances } from '../../../services/wallet/util'
+import { PricePool } from '../../../views/pools/types'
+import ErrorAlert from '../../uielements/alert/ErrorAlert'
+import AssetIcon from '../../uielements/assets/assetIcon'
+import Label from '../../uielements/label'
 import { TableWrapper } from './AssetsTable.style'
 
 type Props = {
@@ -156,8 +156,8 @@ const AssetsTable: React.FC<Props> = (props: Props): JSX.Element => {
       FP.pipe(
         assetsErrors,
         O.map(
-          A.map(({ apiId, msg }) =>
-            intl.formatMessage({ id: 'wallet.errors.balancesFailed' }, { apiId, errorMsg: msg })
+          A.map(({ msg }) =>
+            intl.formatMessage({ id: 'wallet.errors.balancesFailed' }, { apiId: 'unknown', errorMsg: msg })
           )
         ),
         O.fold(

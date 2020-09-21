@@ -95,7 +95,7 @@ const loadBalances$ = (client: EthereumClient): Observable<AssetWithBalanceRD> =
       )
     ),
     catchError((error: Error) =>
-      Rx.of(RD.failure({ apiId: 'ETH', errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
+      Rx.of(RD.failure({ chainId: 'ETH', errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
     ),
     startWith(RD.pending)
   )

@@ -4,7 +4,7 @@ import { Menu } from 'antd'
 import { useIntl } from 'react-intl'
 import { useRouteMatch, Link } from 'react-router-dom'
 
-import * as walletRoutes from '../../routes/wallet'
+import * as walletRoutes from '../../../routes/wallet'
 import { StyledMenu } from './AssetsNav.style'
 
 enum MenuKey {

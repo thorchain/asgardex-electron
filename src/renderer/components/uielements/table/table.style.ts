@@ -3,6 +3,10 @@ import styled from 'styled-components'
 import { key, palette } from 'styled-theme'
 
 export const TableWrapper = styled(Table)`
+  tr:hover {
+    cursor: ${(props) => (props.onRow ? 'pointer' : 'default')};
+  }
+
   .ant-table-thead > tr > th {
     height: 70px;
     border-top: none;

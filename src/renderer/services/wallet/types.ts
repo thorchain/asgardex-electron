@@ -5,9 +5,7 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
-import * as BNBTypes from '../binance/types'
-import * as BTCTypes from '../bitcoin/types'
-import * as ETHTypes from '../ethereum/types'
+import { ChainId } from '../types'
 
 export type Phrase = string
 
@@ -41,6 +39,14 @@ export type NonEmptyAssetsWithBalance = NonEmptyArray<AssetWithBalance>
 export type AssetsWithBalanceRD = RD.RemoteData<ApiError, AssetsWithBalance>
 export type AssetWithBalanceRD = RD.RemoteData<ApiError, AssetWithBalance>
 
+export type AssetsWBChain = {
+  address: string
+  chainId: ChainId
+  assetsWB: AssetsWithBalanceRD
+}
+
+export type AssetsWBChains = AssetsWBChain[]
+
 export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
 
 export type AssetsWithBalanceState = {
@@ -49,15 +55,12 @@ export type AssetsWithBalanceState = {
   loading: boolean
 }
 
-export type ApiId = BNBTypes.ApiId | BTCTypes.ApiId | ETHTypes.ApiId
-
 export enum ErrorId {
   GET_BALANCES,
   GET_ADDRESS
 }
 
 export type ApiError = {
-  apiId: ApiId
   errorId: ErrorId
   msg: string
 }
