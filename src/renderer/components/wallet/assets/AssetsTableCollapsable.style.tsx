@@ -4,19 +4,11 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import UILabel from '../../../components/uielements/label'
-import Table from '../../uielements/table'
+import UITable from '../../uielements/table'
 
-export const TableWrapper = styled(Table)`
-  .ant-table-thead > tr > th {
-    font-size: 16px;
-    font-weight: 600;
-    text-transform: uppercase;
-    height: 64px;
-  }
-
+export const Table = styled(UITable)`
   .ant-table-tbody > tr > td {
     padding: 0px 16px;
-    height: 64px;
   }
 
   .ant-table-tbody > tr > td > div {
@@ -56,6 +48,10 @@ export const Collapse = styled(A.Collapse)`
   &.ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
     padding: 0;
   }
+
+  &.ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header {
+    border-bottom: 1px solid ${palette('gray', 1)};
+  }
 `
 
 export const ExpandIcon = styled(CaretRightOutlined)`
@@ -68,5 +64,9 @@ export const HideIcon = styled(EyeInvisibleOutlined)`
   svg {
     color: ${palette('gray', 2)};
   }
+  /* TODO (@Veado)
+    Change to pointer if hide asset feature is implemented
+    see https://github.com/thorchain/asgardex-electron/issues/476
+  */
   cursor: pointer;
 `

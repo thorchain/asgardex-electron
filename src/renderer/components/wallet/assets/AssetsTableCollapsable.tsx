@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetToString, baseToAsset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
@@ -42,6 +42,14 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
   const intl = useIntl()
   const screenMap: ScreenMap = Grid.useBreakpoint()
 
+  // State to store open panel keys
+  const [openPanelKeys, setOpenPanelKeys] = useState<string[]>()
+  // State track that user has changed collpase state
+  const [collapseChangedByUser, setCollapseChangedByUser] = useState(false)
+
+  // store previous data of asset data to render these while reloading
+  const previousAssetsTableData = useRef<AssetsWithBalance[]>([])
+
   const onRow = useCallback(
     ({ asset }: AssetWithBalance) => {
       return {
@@ -51,8 +59,9 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
     [selectAssetHandler]
   )
 
-  const hideAssetHandler = useCallback((asset: Asset) => {
-    console.log('hideAssetHandler', assetToString(asset))
+  const hideAssetHandler = useCallback((_asset: Asset) => {
+    // TODO (@Veado) Add logic as part of
+    // https://github.com/thorchain/asgardex-electron/issues/476
   }, [])
 
   const iconColumn: ColumnType<AssetWithBalance> = useMemo(
@@ -166,7 +175,7 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
   const renderAssetsTable = useCallback(
     (tableData: AssetsWithBalance, loading = false) => {
       return (
-        <Styled.TableWrapper
+        <Styled.Table
           showHeader={false}
           dataSource={tableData}
           loading={loading}
@@ -180,20 +189,27 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   const renderAssetsWBState = useCallback(
-    (assetsWB: AssetsWithBalanceRD) =>
+    (assetsWB: AssetsWithBalanceRD, index: number) =>
       FP.pipe(
         assetsWB,
         RD.fold(
           // initial state
           () => renderAssetsTable([]),
           // loading state
-          () => renderAssetsTable([], true),
+          () => {
+            const data = previousAssetsTableData.current[index] ?? []
+            return renderAssetsTable(data, true)
+          },
           // error state
           ({ msg }: ApiError) => {
             return <ErrorView title={msg} />
           },
           // success state
-          (assetsWB) => renderAssetsTable(assetsWB)
+          (assetsWB) => {
+            const prev = previousAssetsTableData.current
+            prev[index] = assetsWB
+            return renderAssetsTable(assetsWB)
+          }
         )
       ),
     [renderAssetsTable]
@@ -230,7 +246,7 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
       )
       return (
         <Panel header={header} key={key}>
-          {renderAssetsWBState(assetsWB)}
+          {renderAssetsWBState(assetsWB, key)}
         </Panel>
       )
     },
@@ -238,13 +254,31 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   // open all panels by default
-  const openPanelKeys = useMemo(() => assetsWBChains.map((_, i) => i.toString()), [assetsWBChains])
+  useEffect(() => {
+    // don't change openPanelKeys if user has already changed panel state
+    if (!collapseChangedByUser) {
+      const keys = assetsWBChains.map((_, i) => i.toString())
+      setOpenPanelKeys(keys)
+    }
+  }, [assetsWBChains, collapseChangedByUser])
+
+  const onChangeCollpaseHandler = useCallback((key: string | string[]) => {
+    if (Array.isArray(key)) {
+      setOpenPanelKeys(key)
+    } else {
+      setOpenPanelKeys([key])
+    }
+    // user has changed collpase state
+    setCollapseChangedByUser(true)
+  }, [])
 
   return (
     <Styled.Collapse
       expandIcon={({ isActive }) => <Styled.ExpandIcon rotate={isActive ? 90 : 0} />}
       defaultActiveKey={openPanelKeys}
+      activeKey={openPanelKeys}
       expandIconPosition="right"
+      onChange={onChangeCollpaseHandler}
       ghost>
       {assetsWBChains.map(renderPanel)}
     </Styled.Collapse>

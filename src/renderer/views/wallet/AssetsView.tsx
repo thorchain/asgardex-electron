@@ -6,21 +6,18 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
-import AssetsTable from '../../components/wallet/assets/AssetsTable'
+import AssetsTableCollapsable from '../../components/wallet/assets/AssetsTableCollapsable'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as walletRoutes from '../../routes/wallet'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
-import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
+import { AssetsWBChains } from '../../services/wallet/types'
 import { PricePoolAsset } from '../pools/types'
 
 const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const { assetsWBState$ } = useWalletContext()
-  const { assetsWB, loading: assetsLoading, errors: assetsErrors } = useObservableState(
-    assetsWBState$,
-    INITIAL_ASSETS_WB_STATE
-  )
+  const { assetsWBChains$ } = useWalletContext()
+  const assetsWBChains = useObservableState(assetsWBChains$, [] as AssetsWBChains)
 
   const {
     service: {
@@ -47,10 +44,8 @@ const AssetsView: React.FC = (): JSX.Element => {
   const poolDetails = RD.toNullable(poolsRD)?.poolDetails ?? []
 
   return (
-    <AssetsTable
-      assetsWB={assetsWB}
-      assetsLoading={assetsLoading}
-      assetsErrors={assetsErrors}
+    <AssetsTableCollapsable
+      assetsWBChains={assetsWBChains}
       pricePool={pricePool}
       poolDetails={poolDetails}
       selectAssetHandler={selectAssetHandler}
