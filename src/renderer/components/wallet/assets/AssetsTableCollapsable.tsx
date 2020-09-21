@@ -2,7 +2,8 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetToString, baseToAsset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
-import { Col, Collapse, Row } from 'antd'
+import { Col, Collapse, Grid, Row } from 'antd'
+import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
 import { ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -38,7 +39,8 @@ type Props = {
 const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
   const { assetsWBChains = [], pricePool = RUNE_PRICE_POOL, poolDetails, selectAssetHandler = (_) => {} } = props
 
-  const _intl = useIntl()
+  const intl = useIntl()
+  const screenMap: ScreenMap = Grid.useBreakpoint()
 
   const onRow = useCallback(
     ({ asset }: AssetWithBalance) => {
@@ -134,6 +136,7 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
           align="middle"
           onClick={(event) => {
             event.preventDefault()
+            event.stopPropagation()
             hideAssetHandler(asset)
           }}>
           <Styled.HideIcon />
@@ -143,7 +146,22 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
     [hideAssetHandler]
   )
 
-  const columns = [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn, hideColumn]
+  const columns = useMemo(() => {
+    // desktop
+    if (screenMap?.lg) {
+      return [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn, hideColumn]
+    }
+    // tablet
+    if (screenMap?.md) {
+      return [iconColumn, tickerColumn, balanceColumn, hideColumn]
+    }
+    // mobile
+    if (screenMap?.xs) {
+      return [iconColumn, balanceColumn, hideColumn]
+    }
+
+    return []
+  }, [balanceColumn, hideColumn, iconColumn, nameColumn, priceColumn, screenMap, tickerColumn])
 
   const renderAssetsTable = useCallback(
     (tableData: AssetsWithBalance, loading = false) => {
@@ -188,21 +206,25 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
         assetsWB,
         RD.fold(
           () => '',
-          () => 'loading',
-          (_: ApiError) => 'error',
-          (assetsWB) => `${assetsWB.length} assets`
+          () => intl.formatMessage({ id: 'common.loading' }),
+          (_: ApiError) => intl.formatMessage({ id: 'common.error' }),
+          (assetsWB) => {
+            const length = assetsWB.length
+            const i18nKey = length === 1 ? 'common.asset' : 'common.assets'
+            return `(${length} ${intl.formatMessage({ id: i18nKey })})`
+          }
         )
       )
       const header = (
         <Styled.HeaderRow>
-          <Col xs={6} md={4}>
+          <Col xs={14} md={6} lg={4}>
             <Styled.HeaderLabel>{chainIdToString(chainId)}</Styled.HeaderLabel>
           </Col>
-          <Col xs={18} md={8}>
+          <Col xs={0} md={12} lg={10}>
             <Styled.HeaderAddress>{address}</Styled.HeaderAddress>
           </Col>
-          <Col xs={0} md={12}>
-            <Styled.HeaderLabel>{`(${assetsTxt})`}</Styled.HeaderLabel>
+          <Col xs={10} md={6} lg={10}>
+            <Styled.HeaderLabel color={RD.isFailure(assetsWB) ? 'error' : 'gray'}>{`${assetsTxt}`}</Styled.HeaderLabel>
           </Col>
         </Styled.HeaderRow>
       )
@@ -212,16 +234,16 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
         </Panel>
       )
     },
-    [renderAssetsWBState]
+    [intl, renderAssetsWBState]
   )
 
-  // open all panels
-  const collapseActiveKeys = useMemo(() => assetsWBChains.map((_, i) => i.toString()), [assetsWBChains])
+  // open all panels by default
+  const openPanelKeys = useMemo(() => assetsWBChains.map((_, i) => i.toString()), [assetsWBChains])
 
   return (
     <Styled.Collapse
       expandIcon={({ isActive }) => <Styled.ExpandIcon rotate={isActive ? 90 : 0} />}
-      defaultActiveKey={collapseActiveKeys}
+      defaultActiveKey={openPanelKeys}
       expandIconPosition="right"
       ghost>
       {assetsWBChains.map(renderPanel)}

@@ -34,7 +34,6 @@ export const HeaderRow = styled(A.Row)`
 
 export const HeaderLabel = styled(UILabel).attrs({
   textTransform: 'uppercase',
-  color: 'gray',
   size: 'normal'
 })`
   padding: 0;

@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router-dom'
 
-import AssetDetails from '../../components/wallet/AssetDetails'
+import AssetDetails from '../../components/wallet/assets/AssetDetails'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { AssetDetailsParams } from '../../routes/wallet'
