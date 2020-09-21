@@ -1,3 +1,4 @@
+import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -39,5 +40,15 @@ export const Value = styled(Label).attrs({
   weight: 'bold',
   size: 'big'
 })`
-  word-break: break-all;
+  text-transform: uppercase;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `
+export const Tooltip = styled(A.Tooltip).attrs({
+  placement: 'bottom',
+  overlayStyle: {
+    wordBreak: 'break-all',
+    textTransform: 'uppercase'
+  }
+})``
