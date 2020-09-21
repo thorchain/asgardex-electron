@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
-import AssetsTable from '../../components/wallet/AssetsTable'
+import AssetsTable from '../../components/wallet/assets/AssetsTable'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import * as walletRoutes from '../../routes/wallet'
