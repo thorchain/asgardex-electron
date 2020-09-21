@@ -1,4 +1,4 @@
-import { baseAmount } from '@thorchain/asgardex-util'
+import { AssetTicker, baseAmount } from '@thorchain/asgardex-util'
 import { some, none } from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -131,25 +131,28 @@ describe('services/wallet/util/', () => {
   })
 
   describe('sortBalances', () => {
-    it('should sort balances based on TICKERS_ORDER constant', () => {
+    it('sorts balances based on orders', () => {
       expect(
-        sortBalances([
-          {
-            asset: ASSETS_TESTNET.TOMO
-          },
-          {
-            asset: ASSETS_TESTNET.BOLT
-          },
-          {
-            asset: ASSETS_TESTNET.FTM
-          },
-          {
-            asset: ASSETS_TESTNET.BNB
-          },
-          {
-            asset: ASSETS_TESTNET.RUNE
-          }
-        ] as AssetsWithBalance)
+        sortBalances(
+          [
+            {
+              asset: ASSETS_TESTNET.TOMO
+            },
+            {
+              asset: ASSETS_TESTNET.BOLT
+            },
+            {
+              asset: ASSETS_TESTNET.FTM
+            },
+            {
+              asset: ASSETS_TESTNET.BNB
+            },
+            {
+              asset: ASSETS_TESTNET.RUNE
+            }
+          ] as AssetsWithBalance,
+          [AssetTicker.BTC, AssetTicker.ETH, AssetTicker.RUNE, AssetTicker.BNB]
+        )
       ).toEqual([
         {
           asset: ASSETS_TESTNET.RUNE

@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { AssetTicker } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -14,7 +15,8 @@ import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/service'
 import * as ETH from '../ethereum/service'
 import { INITIAL_ASSETS_WB_STATE } from './const'
-import { AssetsWithBalanceRD, AssetsWithBalanceState } from './types'
+import { AssetsWBChain, AssetsWithBalanceRD, AssetsWithBalanceState } from './types'
+import { sortBalances } from './util'
 
 const reloadBalances = () => {
   BTC.reloadBalances()
@@ -22,27 +24,79 @@ const reloadBalances = () => {
   ETH.reloadBalances()
 }
 
+/**
+ * Transforms BNB data (address + `AssetsWB`) into `AssetsWBChain`
+ */
+const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.address$, BNB.assetsWB$]).pipe(
+  map(([_address, assetsWB]) => ({
+    chainId: 'Binance',
+    address: '',
+    assetsWB: FP.pipe(
+      assetsWB,
+      RD.map((assets) => sortBalances(assets, [AssetTicker.BNB, AssetTicker.RUNE]))
+    )
+  }))
+)
+
+/**
+ * Transforms BTC data (address + `AssetWB`) into `AssetsWBChain`
+ */
+const btcAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BTC.address$, BTC.assetWB$]).pipe(
+  map(([_address, assetWB]) => ({
+    chainId: 'BTC',
+    address: '',
+    assetsWB: FP.pipe(
+      assetWB,
+      RD.map((assets) => [assets])
+    )
+  }))
+)
+
+/**
+ * Transforms ETH data (address + `AssetsWBChain`) into `AssetsWBChain`
+ */
+const ethAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([ETH.address$, ETH.assetWB$]).pipe(
+  map(([_address, assetWBRD]) => ({
+    chainId: 'ETH',
+    address: '',
+    assetsWB: FP.pipe(
+      assetWBRD,
+      RD.map((assetWB) => [assetWB])
+    )
+  }))
+)
+
+/**
+ * List of `AssetsWBChain` for all available chains (order is important)
+ */
+const assetsWBChains$ = Rx.combineLatest([btcAssetsWBChain$, ethAssetsWBChain$, bnbAssetsWBChain$])
+
 // Map single `AssetWB` into `[AssetsWB]`
 const btcAssetsWB$: Observable<AssetsWithBalanceRD> = BTC.assetWB$.pipe(liveData.map((asset) => [asset]))
 const ethAssetsWB$: Observable<AssetsWithBalanceRD> = ETH.assetWB$.pipe(liveData.map((asset) => [asset]))
 
+/**
+ * Transform a list of AssetsWithBalanceRD
+ * into a "single" state of `AssetsWithBalanceState`
+ * Because we need to have loading / error / data combined in one "state" object in some cases
+ */
 const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLatest([
   BNB.assetsWB$,
   btcAssetsWB$,
   ethAssetsWB$
 ]).pipe(
-  map((rdList) => ({
+  map((assetsWBList) => ({
     assetsWB: FP.pipe(
-      rdList,
+      assetsWBList,
       // filter results out
       // Transformation: RD<Error, AssetsWithBalance>`-> `AssetsWithBalance)[]`
       A.filterMap(RD.toOption),
       A.flatten,
       NEA.fromArray
     ),
-    loading: FP.pipe(rdList, A.elem(eqAssetsWithBalanceRD)(RD.pending)),
+    loading: FP.pipe(assetsWBList, A.elem(eqAssetsWithBalanceRD)(RD.pending)),
     errors: FP.pipe(
-      rdList,
+      assetsWBList,
       // filter errors out
       A.filter(RD.isFailure),
       // Transformation to get Errors out of RD:
@@ -56,4 +110,4 @@ const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLatest([
   startWith(INITIAL_ASSETS_WB_STATE)
 )
 
-export { reloadBalances, assetsWBState$ }
+export { reloadBalances, assetsWBState$, assetsWBChains$ }

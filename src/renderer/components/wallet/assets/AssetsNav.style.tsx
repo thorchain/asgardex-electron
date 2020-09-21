@@ -9,14 +9,9 @@ export const StyledMenu = styled(Menu)`
   align-items: center;
   border-bottom: 1px solid ${palette('gray', 1)};
 
-  .ant-menu-item:hover,
-  .ant-menu-submenu:hover,
-  .ant-menu-item-active,
-  .ant-menu-submenu-active,
-  .ant-menu-item-open,
-  .ant-menu-submenu-open,
-  .ant-menu-item-selected,
-  .ant-menu-submenu-selected {
+  &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:active,
+  &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover,
+  &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected {
     border-bottom: 2px solid ${palette('primary', 0)};
   }
 
