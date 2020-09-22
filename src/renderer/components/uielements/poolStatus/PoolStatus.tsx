@@ -1,35 +1,67 @@
-import React from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 
-import { AssetAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 
+import { useCbOnResize } from '../../../hooks/useCbOnResize'
 import Label from '../label'
 import Trend from '../trend'
-import { PoolStatusWrapper } from './PoolStatus.style'
+import * as Styled from './PoolStatus.style'
 
 type Props = {
-  amount: AssetAmount
-  asset: string
   label: string
-  target: string
-  trend: BigNumber
+  displayValue: string
+  fullValue?: string
+  trend?: BigNumber
 }
 
-const PoolStatus: React.FC<Props> = (props: Props): JSX.Element => {
-  const { amount, asset, label, target, trend } = props
+const PoolStatus: React.FC<Props> = (props): JSX.Element => {
+  const { label, trend, displayValue, fullValue } = props
+  const [showTooltip, setShowTooltip] = useState(false)
+  const amountRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const onResizeCb = useCallback(() => {
+    if (!amountRef.current) {
+      return
+    }
+
+    if (amountRef.current.offsetWidth < amountRef.current.scrollWidth) {
+      setShowTooltip(true)
+    } else {
+      setShowTooltip(false)
+    }
+  }, [amountRef])
+
+  useCbOnResize(onResizeCb)
+
+  const TooltipContainer: React.FC = useCallback(
+    (props) => {
+      return showTooltip || fullValue !== displayValue ? (
+        <Styled.Tooltip title={fullValue}>
+          <span>{props.children}</span>
+        </Styled.Tooltip>
+      ) : (
+        <>{props.children}</>
+      )
+    },
+    [fullValue, showTooltip, displayValue]
+  )
 
   return (
-    <PoolStatusWrapper {...props}>
-      <Row style={{ justifyContent: 'space-between' }}>
-        <Label color="light">{asset + ' / ' + target}</Label>
-        <Trend amount={trend} />
-      </Row>
-      <Label size="big" className="amount">
-        {formatAssetAmountCurrency(amount)}
-      </Label>
-      <Label color="light">{label}</Label>
-    </PoolStatusWrapper>
+    <Styled.PoolStatusWrapper ref={containerRef} {...props}>
+      <TooltipContainer>
+        <Row style={{ justifyContent: 'space-between', flexFlow: 'row' }}>
+          <Styled.Value ref={amountRef} className="amount">
+            {displayValue}
+          </Styled.Value>
+          {trend && <Trend amount={trend} />}
+        </Row>
+        <Label textTransform="uppercase" color="light">
+          {label}
+        </Label>
+      </TooltipContainer>
+    </Styled.PoolStatusWrapper>
   )
 }
 

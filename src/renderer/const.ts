@@ -1,4 +1,4 @@
-import { AssetSymbol, assetToBase, assetAmount, Asset } from '@thorchain/asgardex-util'
+import { AssetSymbol, assetToBase, assetAmount, Asset, assetFromString } from '@thorchain/asgardex-util'
 
 import {
   PricePoolCurrencySymbols,
@@ -19,6 +19,13 @@ export const CURRENCY_SYMBOLS: PricePoolCurrencySymbols = {
   [PoolAsset.ETH]: AssetSymbol.ETH,
   [PoolAsset.BUSDBAF]: AssetSymbol.USD,
   [PoolAsset.BUSDBD1]: AssetSymbol.USD
+}
+
+export const getCyrrencySymbolByAssetString = (asset: string) => {
+  if (asset in CURRENCY_SYMBOLS) {
+    return CURRENCY_SYMBOLS[asset as keyof typeof CURRENCY_SYMBOLS]
+  }
+  return assetFromString(asset)?.ticker || ''
 }
 
 // Weight of currencies needed for pricing

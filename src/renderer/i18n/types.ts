@@ -138,6 +138,12 @@ type StakeMessageKey =
   | 'stake.withdraw'
   | 'stake.advancedMode'
   | 'stake.drag'
+  | 'stake.poolDetails.depth'
+  | 'stake.poolDetails.24hvol'
+  | 'stake.poolDetails.allTimeVal'
+  | 'stake.poolDetails.totalSwaps'
+  | 'stake.poolDetails.totalStakers'
+  | 'stake.poolDetails.returnToDate'
 
 export type StakeMessages = { [key in StakeMessageKey]: string }
 

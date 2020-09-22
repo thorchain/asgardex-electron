@@ -1,5 +1,8 @@
+import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
+
+import Label from '../label'
 
 export const PoolStatusWrapper = styled.div`
   position: relative;
@@ -20,7 +23,7 @@ export const PoolStatusWrapper = styled.div`
     top: 0px;
     border-bottom-left-radius: 3px;
     border-top-left-radius: 3px;
-    background: ${palette('gradient', 0)};
+    background: ${palette('gradient', 2)};
   }
 
   .amount {
@@ -32,3 +35,20 @@ export const PoolStatusWrapper = styled.div`
     padding: 0;
   }
 `
+
+export const Value = styled(Label).attrs({
+  weight: 'bold',
+  size: 'big'
+})`
+  text-transform: uppercase;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`
+export const Tooltip = styled(A.Tooltip).attrs({
+  placement: 'bottom',
+  overlayStyle: {
+    wordBreak: 'break-all',
+    textTransform: 'uppercase'
+  }
+})``
