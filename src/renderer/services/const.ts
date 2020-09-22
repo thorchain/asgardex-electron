@@ -42,3 +42,5 @@ export const MAX_PAGINATION_ITEMS = 10
 export const MIDGARD_MAX_RETRY = 3
 
 export const ZERO_BN = bn(0)
+
+export const ONE_BN = bn(1)
