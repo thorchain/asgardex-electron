@@ -1,52 +1,51 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 
 import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 
-// import { useCbOnResize } from '../../../hooks/useCbOnResize'
+import { useCbOnResize } from '../../../hooks/useCbOnResize'
 import Label from '../label'
 import Trend from '../trend'
 import * as Styled from './PoolStatus.style'
 
 type Props = {
   label: string
+  displayValue: string
   fullValue?: string
   trend?: BigNumber
 }
 
 const PoolStatus: React.FC<Props> = (props): JSX.Element => {
-  const { children, label, trend, fullValue } = props
-  // const [showTooltip, setShowTooltip] = useState(false)
+  const { label, trend, displayValue, fullValue } = props
+  const [showTooltip, setShowTooltip] = useState(false)
   const amountRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // const onResizeCb = useCallback(() => {
-  //   if (!amountRef.current) {
-  //     return
-  //   }
-  //
-  //   if (amountRef.current.offsetWidth < amountRef.current.scrollWidth) {
-  //     setShowTooltip(true)
-  //   } else {
-  //     setShowTooltip(false)
-  //   }
-  // }, [amountRef])
-  //
-  // useCbOnResize(onResizeCb)
+  const onResizeCb = useCallback(() => {
+    if (!amountRef.current) {
+      return
+    }
+
+    if (amountRef.current.offsetWidth < amountRef.current.scrollWidth) {
+      setShowTooltip(true)
+    } else {
+      setShowTooltip(false)
+    }
+  }, [amountRef])
+
+  useCbOnResize(onResizeCb)
 
   const TooltipContainer: React.FC = useCallback(
     (props) => {
-      fullValue && console.log(fullValue)
-      return fullValue ? (
-        // @ts-ignore
+      return showTooltip || fullValue !== displayValue ? (
         <Styled.Tooltip title={fullValue}>
-          <>{props.children}</>
+          <span>{props.children}</span>
         </Styled.Tooltip>
       ) : (
         <>{props.children}</>
       )
     },
-    [fullValue]
+    [fullValue, showTooltip, displayValue]
   )
 
   return (
@@ -54,7 +53,7 @@ const PoolStatus: React.FC<Props> = (props): JSX.Element => {
       <TooltipContainer>
         <Row style={{ justifyContent: 'space-between', flexFlow: 'row' }}>
           <Styled.Value ref={amountRef} className="amount">
-            {children}
+            {displayValue}
           </Styled.Value>
           {trend && <Trend amount={trend} />}
         </Row>

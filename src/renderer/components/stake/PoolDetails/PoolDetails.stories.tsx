@@ -9,9 +9,10 @@ import { PoolDetails } from './PoolDetails'
 export const PoolDetailsStory = () => {
   return (
     <PoolDetails
-      depth={assetAmount(12000000000.12314)}
+      depth={assetAmount(1)}
       depthTrend={bn(12)}
-      volume24hr={assetAmount(12000)}
+      volume24hr={assetAmount(123)}
+      volume24hrTrend={bn(11)}
       allTimeVolume={assetAmount(12000)}
       totalSwaps={7042}
       totalStakers={307}
