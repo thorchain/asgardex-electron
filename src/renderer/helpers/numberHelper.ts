@@ -11,8 +11,3 @@ export const abbreviateNumber = (value: number, decimal = 0): string => {
 
   return `${newValue.toFixed(decimal)}${suffixNum > 0 ? ` ${suffixes[suffixNum]}` : ''}`
 }
-
-export const abbreviateNumberFromString = (value: string, decimal = 2): string => {
-  const num = parseFloat(value.replace(/,/g, ''))
-  return abbreviateNumber(num, decimal)
-}
