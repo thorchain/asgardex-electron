@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react'
 
-import { client$, clientViewState$, address$ } from '../services/bitcoin/service'
+import { client$, clientViewState$, address$ } from '../services/bitcoin'
 
 export type BitcoinContextValue = {
   clientViewState$: typeof clientViewState$
