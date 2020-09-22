@@ -9,7 +9,7 @@ const stake: StakeMessages = {
   'stake.drag': 'Drag to stake',
   'stake.poolDetails.depth': 'Depth',
   'stake.poolDetails.24hvol': '24hr volume',
-  'stake.poolDetails.allTimeVal': 'All time value',
+  'stake.poolDetails.allTimeVal': 'All time volume',
   'stake.poolDetails.totalSwaps': 'Total swaps',
   'stake.poolDetails.totalStakers': 'Total stakers',
   'stake.poolDetails.returnToDate': 'Return to date'

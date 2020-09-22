@@ -12,7 +12,7 @@ const stake: StakeMessages = {
   'stake.poolDetails.allTimeVal': 'Количество за все время',
   'stake.poolDetails.totalSwaps': 'Всего свапов',
   'stake.poolDetails.totalStakers': 'Всего держателей',
-  'stake.poolDetails.returnToDate': 'Возврат к дате'
+  'stake.poolDetails.returnToDate': 'Доходность'
 }
 
 export default stake
