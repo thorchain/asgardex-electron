@@ -28,9 +28,12 @@ const reloadBalances = () => {
  * Transforms BNB data (address + `AssetsWB`) into `AssetsWBChain`
  */
 const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.address$, BNB.assetsWB$]).pipe(
-  map(([_address, assetsWB]) => ({
+  map(([address, assetsWB]) => ({
     chainId: 'Binance',
-    address: '',
+    address: FP.pipe(
+      address,
+      O.getOrElse(() => '')
+    ),
     assetsWB: FP.pipe(
       assetsWB,
       RD.map((assets) => sortBalances(assets, [AssetTicker.BNB, AssetTicker.RUNE]))
@@ -42,9 +45,12 @@ const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.addre
  * Transforms BTC data (address + `AssetWB`) into `AssetsWBChain`
  */
 const btcAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BTC.address$, BTC.assetWB$]).pipe(
-  map(([_address, assetWB]) => ({
+  map(([address, assetWB]) => ({
     chainId: 'BTC',
-    address: '',
+    address: FP.pipe(
+      address,
+      O.getOrElse(() => '')
+    ),
     assetsWB: FP.pipe(
       assetWB,
       RD.map((assets) => [assets])
@@ -56,9 +62,12 @@ const btcAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BTC.addre
  * Transforms ETH data (address + `AssetsWBChain`) into `AssetsWBChain`
  */
 const ethAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([ETH.address$, ETH.assetWB$]).pipe(
-  map(([_address, assetWBRD]) => ({
+  map(([address, assetWBRD]) => ({
     chainId: 'ETH',
-    address: '',
+    address: FP.pipe(
+      address,
+      O.getOrElse(() => '')
+    ),
     assetsWB: FP.pipe(
       assetWBRD,
       RD.map((assetWB) => [assetWB])
