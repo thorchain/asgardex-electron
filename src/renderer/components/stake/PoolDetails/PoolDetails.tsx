@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react'
 
-import { Asset, AssetAmount, assetToString, formatAssetAmount } from '@thorchain/asgardex-util'
+import { AssetAmount, formatAssetAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
-import { getCyrrencySymbolByAssetString } from '../../../const'
+import { getCurrencySymbolByAssetString } from '../../../helpers/assetHelper'
 import { abbreviateNumber } from '../../../helpers/numberHelper'
+import { PricePoolAsset } from '../../../views/pools/types'
 import PoolStatus from '../../uielements/poolStatus'
 import * as Styled from './PoolDetails.style'
 
@@ -21,8 +22,8 @@ type Props = {
   totalStakers: number
   totalStakersTrend?: BigNumber
   // decimal value in percents
-  returnToDate: number
-  basePriceAsset: Asset
+  returnToDate: string
+  basePriceAsset: PricePoolAsset
 }
 
 export const PoolDetails: React.FC<Props> = ({
@@ -41,7 +42,7 @@ export const PoolDetails: React.FC<Props> = ({
 }) => {
   const intl = useIntl()
 
-  const priceSymbol = useMemo(() => getCyrrencySymbolByAssetString(assetToString(basePriceAsset)), [basePriceAsset])
+  const priceSymbol = useMemo(() => getCurrencySymbolByAssetString(basePriceAsset), [basePriceAsset])
 
   return (
     <Styled.Container>
@@ -77,7 +78,7 @@ export const PoolDetails: React.FC<Props> = ({
           fullValue={`${totalSwaps}`}
           trend={totalSwapsTrend}
           label={intl.formatMessage({ id: 'stake.poolDetails.totalSwaps' })}
-          displayValue={abbreviateNumber(totalSwaps, 2)}
+          displayValue={abbreviateNumber(totalSwaps)}
         />
       </Styled.Col>
 
@@ -85,7 +86,7 @@ export const PoolDetails: React.FC<Props> = ({
         <PoolStatus
           trend={totalStakersTrend}
           label={intl.formatMessage({ id: 'stake.poolDetails.totalStakers' })}
-          displayValue={abbreviateNumber(totalStakers, 2)}
+          displayValue={abbreviateNumber(totalStakers)}
         />
       </Styled.Col>
 

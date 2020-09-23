@@ -1,4 +1,6 @@
-import { Asset } from '@thorchain/asgardex-util'
+import { Asset, assetFromString } from '@thorchain/asgardex-util'
+
+import { CURRENCY_SYMBOLS } from '../const'
 
 export const RUNE_SYMBOL_MAINNET = 'RUNE-B1A'
 export const RUNE_SYMBOL_TESTNET = 'RUNE-67C'
@@ -31,3 +33,10 @@ export const isRuneAsset = ({ symbol }: Asset): boolean =>
   symbol === RUNE_SYMBOL_MAINNET || symbol === RUNE_SYMBOL_TESTNET
 
 export const isBnbAsset = ({ symbol }: Asset): boolean => symbol === BNB_SYMBOL
+
+export const getCurrencySymbolByAssetString = (asset: string) => {
+  if (asset in CURRENCY_SYMBOLS) {
+    return CURRENCY_SYMBOLS[asset as keyof typeof CURRENCY_SYMBOLS]
+  }
+  return assetFromString(asset)?.ticker || ''
+}
