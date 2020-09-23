@@ -17,6 +17,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../const'
 import { isBnbAsset, BNB_SYMBOL } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { trimZeros } from '../../../helpers/stringHelper'
@@ -97,7 +98,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     const amount = FP.pipe(
       oBnbAmount,
       // no bnb asset == zero amount
-      O.getOrElse(() => assetAmount(0))
+      O.getOrElse(() => ZERO_ASSET_AMOUNT)
     )
 
     const msg = intl.formatMessage(
@@ -134,7 +135,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
         sequenceTOption(oFee, oBnbAmount),
         O.fold(
           // Set maxAmount to zero if we dont know anything about bnb and fee amounts
-          () => bn(0),
+          () => ZERO_BN,
           ([fee, bnbAmount]) => bnbAmount.amount().minus(fee.amount())
         ),
         assetAmount

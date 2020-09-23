@@ -15,6 +15,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { ZERO_ASSET_AMOUNT } from '../../../const'
 import { BNB_SYMBOL } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { trimZeros } from '../../../helpers/stringHelper'
@@ -50,7 +51,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
       return FP.pipe(
         assetWB.frozenAmount,
         O.map(baseToAsset),
-        O.getOrElse(() => assetAmount(0))
+        O.getOrElse(() => ZERO_ASSET_AMOUNT)
       )
     }
     return baseToAsset(assetWB.amount)
@@ -122,7 +123,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
     const amount = FP.pipe(
       oBnbAmount,
       // no bnb asset == zero amount
-      O.getOrElse(() => assetAmount(0))
+      O.getOrElse(() => ZERO_ASSET_AMOUNT)
     )
 
     const msg = intl.formatMessage(
