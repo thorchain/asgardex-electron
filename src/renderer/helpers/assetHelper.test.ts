@@ -39,7 +39,7 @@ describe('helpers/assetHelper', () => {
     })
 
     it('should return ticker for unknown asset', () => {
-      expect(getCurrencySymbolByAssetString('chain.ticker-symbol')).toEqual('ticker')
+      expect(getCurrencySymbolByAssetString('BNB.ticker-symbol')).toEqual('ticker')
     })
 
     it('should return empty string for invalid asset', () => {
