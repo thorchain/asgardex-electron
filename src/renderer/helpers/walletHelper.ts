@@ -1,8 +1,9 @@
-import { Asset, assetAmount, AssetAmount, baseToAsset } from '@thorchain/asgardex-util'
+import { Asset, AssetAmount, baseToAsset } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
+import { ZERO_ASSET_AMOUNT } from '../const'
 import { NonEmptyAssetsWithBalance, AssetWithBalance, AssetsWithBalance } from '../services/wallet/types'
 import { isBnbAsset } from './assetHelper'
 import { sequenceTOption } from './fpHelpers'
@@ -12,7 +13,7 @@ export const getAssetAmountByAsset = (balances: AssetsWithBalance, assetToFind: 
     balances,
     A.findFirst(({ asset }) => asset.symbol === assetToFind.symbol),
     O.map((b) => baseToAsset(b.amount)),
-    O.getOrElse(() => assetAmount(0))
+    O.getOrElse(() => ZERO_ASSET_AMOUNT)
   )
 
 export const getAssetWBByAsset = (

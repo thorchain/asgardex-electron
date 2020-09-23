@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
-import { AssetAmount } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -8,16 +7,9 @@ import { catchError, map, mergeMap, shareReplay, startWith, switchMap } from 'rx
 
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Client$ } from './common'
-import { FeesRD, TxRD } from './types'
+import { FeesRD, SendTxParams, TxRD } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
-
-type SendTxParams = {
-  to: string // to address
-  amount: AssetAmount
-  feeRate: number
-  memo?: string
-}
 
 const tx$ = ({ client$, to, amount, feeRate, memo }: { client$: Client$ } & SendTxParams): Rx.Observable<TxRD> =>
   client$.pipe(

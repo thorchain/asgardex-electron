@@ -1,15 +1,15 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { Address } from '@thorchain/asgardex-binance'
+import { FeeOptions } from '@thorchain/asgardex-bitcoin/lib/types/client-types'
 import {
   assetToString,
   Asset,
   formatAssetAmountCurrency,
   assetAmount,
-  AssetAmount,
   formatAssetAmount,
   bn,
-  baseToAsset
+  baseToAsset,
+  AssetSymbol
 } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -17,33 +17,29 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../const'
-import { isBnbAsset, BNB_SYMBOL } from '../../../helpers/assetHelper'
+import { isBnbAsset, BNB_SYMBOL, BTC_DECIMAL } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { trimZeros } from '../../../helpers/stringHelper'
-import { getBnbAmountFromBalances } from '../../../helpers/walletHelper'
-import { SendTxParams } from '../../../services/binance/transaction'
-import { AddressValidation } from '../../../services/binance/types'
+import { SendTxParams, AddressValidation } from '../../../services/bitcoin/types'
 import { AssetsWithBalance, AssetWithBalance } from '../../../services/wallet/types'
 import { Input, InputBigNumber } from '../../uielements/input'
-import AccountSelector from './../AccountSelector'
+import AccountSelector from '../AccountSelector'
 import * as Styled from './Form.style'
 import { validateTxAmountInput } from './util'
 
-export type FormValues = {
-  recipient: Address
+type FormValues = {
+  recipient: string
   amount: string
-  memo?: string
 }
 
 type Props = {
   assetsWB: AssetsWithBalance
   assetWB: AssetWithBalance
-  onSubmit: ({ to, amount, asset, memo }: SendTxParams) => void
+  onSubmit: ({ to, amount, memo }: SendTxParams) => void
   changeAssetHandler: (asset: Asset) => void
   isLoading: boolean
   addressValidation: AddressValidation
-  oFee: O.Option<AssetAmount>
+  feeOptions: O.Option<FeeOptions>
 }
 
 export const SendForm: React.FC<Props> = (props): JSX.Element => {
@@ -54,43 +50,35 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     assetWB,
     isLoading = false,
     addressValidation,
-    oFee
+    feeOptions: oFeeOptions
   } = props
   const intl = useIntl()
 
   const [form] = Form.useForm<FormValues>()
 
-  const oBnbAmount: O.Option<AssetAmount> = useMemo(() => {
-    // return balance of current asset (if BNB)
-    if (isBnbAsset(assetWB.asset)) {
-      return O.some(baseToAsset(assetWB.amount))
-    }
-    // or check list of other assets to get bnb balance
-    return FP.pipe(assetsWB, getBnbAmountFromBalances)
-  }, [assetWB, assetsWB])
-
   const feeLabel = useMemo(
     () =>
       FP.pipe(
-        oFee,
+        oFeeOptions,
         O.fold(
           () => '--',
-          (f) => `${trimZeros(formatAssetAmount(f, 6))} ${BNB_SYMBOL}`
+          // TODO (@Veado) Which
+          ({ regular }) => `${AssetSymbol.BTC} ${trimZeros(regular.feeRate.toString())} `
         )
       ),
-    [oFee]
+    [oFeeOptions]
   )
 
   const isFeeError = useMemo(() => {
     return FP.pipe(
-      sequenceTOption(oFee, oBnbAmount),
+      oFeeOptions,
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oFee),
         ([fee, bnbAmount]) => bnbAmount.amount().isLessThan(fee.amount())
       )
     )
-  }, [oBnbAmount, oFee])
+  }, [oFeeOptions])
 
   const renderFeeError = useMemo(() => {
     if (!isFeeError) return <></>
@@ -98,7 +86,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     const amount = FP.pipe(
       oBnbAmount,
       // no bnb asset == zero amount
-      O.getOrElse(() => ZERO_ASSET_AMOUNT)
+      O.getOrElse(() => assetAmount(0))
     )
 
     const msg = intl.formatMessage(
@@ -114,7 +102,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
         {msg}
       </Styled.StyledLabel>
     )
-  }, [oBnbAmount, intl, isFeeError])
+  }, [intl, isFeeError])
 
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
@@ -135,7 +123,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
         sequenceTOption(oFee, oBnbAmount),
         O.fold(
           // Set maxAmount to zero if we dont know anything about bnb and fee amounts
-          () => ZERO_BN,
+          () => bn(0),
           ([fee, bnbAmount]) => bnbAmount.amount().minus(fee.amount())
         ),
         assetAmount
@@ -151,7 +139,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
       }
       return validateTxAmountInput({ input: value, maxAmount, errors })
     },
-    [assetWB, oFee, intl, oBnbAmount]
+    [assetWB, intl]
   )
 
   const onSubmit = useCallback(
@@ -160,12 +148,15 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     },
     [onSubmitProp, assetWB]
   )
-
   return (
     <Row>
       <Styled.Col span={24}>
         <AccountSelector onChange={changeAssetHandler} selectedAsset={assetWB.asset} assets={assetsWB} />
-        {/* `Form<FormValue>` does not work in `styled(Form)`, so we have to add styles here. All is just needed to have correct types in `onFinish` handler)  */}
+        {/*
+          Important note:
+          `Form<FormValue>` does not work in `styled(Form)`,
+          so we have to add styles here. All is just needed to have correct types in `onFinish` handler)
+         */}
         <Form
           form={form}
           initialValues={{ amount: bn(0) }}
@@ -179,8 +170,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
             </Form.Item>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              {/* TODO(@Veado) In future decimal will be changed depending on selected asset, currently we have just BNB assets (decimal = 8) */}
-              <InputBigNumber min={0} size="large" disabled={isLoading} decimal={8} />
+              <InputBigNumber min={0} size="large" disabled={isLoading} decimal={BTC_DECIMAL} />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">
               <>

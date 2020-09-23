@@ -1,11 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { BaseAmount, Asset } from '@thorchain/asgardex-util'
+import { BaseAmount, Asset, Chain } from '@thorchain/asgardex-util'
 import { getMonoid } from 'fp-ts/Array'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
-
-import { ChainId } from '../types'
 
 export type Phrase = string
 
@@ -41,7 +39,7 @@ export type AssetWithBalanceRD = RD.RemoteData<ApiError, AssetWithBalance>
 
 export type AssetsWBChain = {
   address: string
-  chainId: ChainId
+  chain: Chain
   assetsWB: AssetsWithBalanceRD
 }
 

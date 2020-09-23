@@ -1,13 +1,15 @@
 import React, { useEffect, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetAmount } from '@thorchain/asgardex-util'
+import { Asset, AssetAmount, assetToString } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router-dom'
 
 import { BinanceContextValue } from '../../../contexts/BinanceContext'
+import * as walletRoutes from '../../../routes/wallet'
 import { TransferRD, AddressValidation } from '../../../services/binance/types'
 import { AssetWithBalance, AssetsWithBalance } from '../../../services/wallet/types'
 import ErrorView from '../../shared/error/ErrorView'
@@ -28,6 +30,7 @@ type Props = {
 const Send: React.FC<Props> = (props): JSX.Element => {
   const { transactionService, assetsWB, selectedAsset, explorerUrl = O.none, addressValidation, fee } = props
   const intl = useIntl()
+  const history = useHistory()
 
   const { txRD$, resetTx, pushTx } = transactionService
 
@@ -60,6 +63,14 @@ const Send: React.FC<Props> = (props): JSX.Element => {
     [intl, explorerUrl]
   )
 
+  const changeAssetHandler = useCallback(
+    (asset: Asset) => {
+      const path = walletRoutes.send.path({ asset: assetToString(asset) })
+      history.push(path)
+    },
+    [history]
+  )
+
   const renderForm = useMemo(
     () => (
       <SendForm
@@ -68,10 +79,11 @@ const Send: React.FC<Props> = (props): JSX.Element => {
         assetsWB={assetsWB}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
+        changeAssetHandler={changeAssetHandler}
         oFee={fee}
       />
     ),
-    [selectedAsset, pushTx, assetsWB, txRD, addressValidation, fee]
+    [selectedAsset, pushTx, assetsWB, txRD, addressValidation, changeAssetHandler, fee]
   )
 
   return (

@@ -45,7 +45,9 @@ const wallet: WalletMessages = {
     'Der eingegebene Wert sollte nicht höher als Ihr eingefrorenes Guthaben sein',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Der eingegebene Wert sollte nicht höher als Ihr Guthaben abzgl. Gebühren sein',
-  'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Ihr Guthaben ({balance}) gedeckt'
+  'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Ihr Guthaben ({balance}) gedeckt',
+  'wallet.errors.route.invalidAsset': 'Invalides Asset in der Route: {asset}',
+  'wallet.errors.invalidChain': 'Invalide Chain: {chain}'
 }
 
 export default wallet

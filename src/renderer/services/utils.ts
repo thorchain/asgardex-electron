@@ -2,7 +2,7 @@ import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { ClientStateM, ClientStateForViews, ClientState, ChainId } from './types'
+import { ClientStateM, ClientStateForViews, ClientState } from './types'
 
 export const getClient = <C>(clientState: ClientState<C>): O.Option<C> =>
   ClientStateM.getOrElse(clientState, () => O.none)
@@ -26,18 +26,3 @@ export const getClientStateForViews = <C>(clientState: ClientState<C>): ClientSt
       )
     )
   )
-
-export const chainIdToString = (chainId: ChainId) => {
-  switch (chainId) {
-    case 'Thorchain':
-      return 'Thorchain'
-    case 'BTC':
-      return 'Bitcoin'
-    case 'ETH':
-      return 'Ethereum'
-    case 'Binance':
-      return 'Binance Chain'
-    default:
-      return 'unknown chain'
-  }
-}

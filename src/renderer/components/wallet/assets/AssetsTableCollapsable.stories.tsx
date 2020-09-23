@@ -10,19 +10,19 @@ import AssetsTableCollapsable from './AssetsTableCollapsable'
 
 const assetsWBChainRUNE: AssetsWBChain = {
   address: 'thor1766mazrxs5asuscepa227r6ekr657234f8p7nf',
-  chainId: 'Thorchain',
+  chain: 'THOR',
   assetsWB: RD.initial
 }
 
 const assetsWBChainBNB: AssetsWBChain = {
   address: 'bnb1zzapwywxrxa2wyyrp93ls5l0a6ftxju5phmhu9',
-  chainId: 'Binance',
+  chain: 'BNB',
   assetsWB: RD.initial
 }
 
 const assetsWBChainBTC: AssetsWBChain = {
   address: 'bc11766mazrxs5asuscepa227r6ekr657234f8p7nf',
-  chainId: 'BTC',
+  chain: 'BTC',
   assetsWB: RD.initial
 }
 
