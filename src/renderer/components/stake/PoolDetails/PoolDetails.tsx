@@ -24,6 +24,7 @@ type Props = {
   // decimal value in percents
   returnToDate: string
   basePriceAsset: PricePoolAsset
+  isLoading?: boolean
 }
 
 export const PoolDetails: React.FC<Props> = ({
@@ -38,7 +39,8 @@ export const PoolDetails: React.FC<Props> = ({
   volume24hrTrend,
   allTimeVolumeTrend,
   totalSwapsTrend,
-  totalStakersTrend
+  totalStakersTrend,
+  isLoading
 }) => {
   const intl = useIntl()
 
@@ -48,6 +50,7 @@ export const PoolDetails: React.FC<Props> = ({
     <Styled.Container>
       <Styled.Col>
         <PoolStatus
+          isLoading={isLoading}
           fullValue={`${priceSymbol} ${formatAssetAmount(depth)}`}
           trend={depthTrend}
           label={intl.formatMessage({ id: 'stake.poolDetails.depth' })}
@@ -57,6 +60,7 @@ export const PoolDetails: React.FC<Props> = ({
 
       <Styled.Col>
         <PoolStatus
+          isLoading={isLoading}
           fullValue={`${priceSymbol} ${formatAssetAmount(volume24hr)}`}
           trend={volume24hrTrend}
           label={intl.formatMessage({ id: 'stake.poolDetails.24hvol' })}
@@ -66,6 +70,7 @@ export const PoolDetails: React.FC<Props> = ({
 
       <Styled.Col>
         <PoolStatus
+          isLoading={isLoading}
           fullValue={`${priceSymbol} ${formatAssetAmount(allTimeVolume)}`}
           trend={allTimeVolumeTrend}
           label={intl.formatMessage({ id: 'stake.poolDetails.allTimeVal' })}
@@ -75,6 +80,7 @@ export const PoolDetails: React.FC<Props> = ({
 
       <Styled.Col>
         <PoolStatus
+          isLoading={isLoading}
           fullValue={`${totalSwaps}`}
           trend={totalSwapsTrend}
           label={intl.formatMessage({ id: 'stake.poolDetails.totalSwaps' })}
@@ -84,6 +90,7 @@ export const PoolDetails: React.FC<Props> = ({
 
       <Styled.Col>
         <PoolStatus
+          isLoading={isLoading}
           trend={totalStakersTrend}
           label={intl.formatMessage({ id: 'stake.poolDetails.totalStakers' })}
           displayValue={abbreviateNumber(totalStakers)}
@@ -92,6 +99,7 @@ export const PoolDetails: React.FC<Props> = ({
 
       <Styled.Col>
         <PoolStatus
+          isLoading={isLoading}
           label={intl.formatMessage({ id: 'stake.poolDetails.returnToDate' })}
           displayValue={returnToDate + '%'}
         />

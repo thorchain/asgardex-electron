@@ -9,10 +9,10 @@ import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 
 import { PoolDetails } from '../../../components/stake/PoolDetails/PoolDetails'
-import { ONE_BN } from '../../../const'
+import { ONE_ASSET_AMOUNT, ONE_BN } from '../../../const'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { PoolDetail } from '../../../types/generated/midgard/models'
-import { PricePoolAsset } from '../../pools/types'
+import { PoolAsset, PricePoolAsset } from '../../pools/types'
 
 const getDepth = (data: PoolDetail, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(priceRatio)))
@@ -31,6 +31,19 @@ const getReturnToDate = (data: PoolDetail) => (parseFloat(data.poolROI || '0') *
 
 type Props = {}
 
+const renderPendingView = () => (
+  <PoolDetails
+    depth={ONE_ASSET_AMOUNT}
+    volume24hr={ONE_ASSET_AMOUNT}
+    allTimeVolume={ONE_ASSET_AMOUNT}
+    totalSwaps={0}
+    totalStakers={0}
+    returnToDate={''}
+    basePriceAsset={PoolAsset.RUNE67C}
+    isLoading={true}
+  />
+)
+
 export const PoolDetailsView: React.FC<Props> = () => {
   const { service: midgardService } = useMidgardContext()
 
@@ -47,7 +60,7 @@ export const PoolDetailsView: React.FC<Props> = () => {
     detailedPoolData,
     RD.fold(
       () => null,
-      () => null,
+      renderPendingView,
       () => null,
       (data) => {
         return (

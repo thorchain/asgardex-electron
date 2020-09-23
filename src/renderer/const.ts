@@ -58,3 +58,5 @@ export const PRICE_POOLS_WHITELIST: PricePoolAssets = [
 export const ZERO_BN = bn(0)
 
 export const ONE_BN = bn(1)
+
+export const ONE_ASSET_AMOUNT = assetAmount(ONE_BN)
