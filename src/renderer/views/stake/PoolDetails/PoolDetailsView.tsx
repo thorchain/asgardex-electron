@@ -7,12 +7,14 @@ import * as O from 'fp-ts/lib/Option'
 import { Option, some } from 'fp-ts/Option'
 import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 
 import { PoolDetails } from '../../../components/stake/PoolDetails/PoolDetails'
-import { ONE_BN } from '../../../const'
+import PoolStatus from '../../../components/uielements/poolStatus'
+import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../../const'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { PoolDetail } from '../../../types/generated/midgard/models'
-import { PricePoolAsset } from '../../pools/types'
+import { PoolAsset, PricePoolAsset } from '../../pools/types'
 
 const getDepth = (data: PoolDetail, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(priceRatio)))
@@ -29,10 +31,23 @@ const getTotalStakers = (data: PoolDetail) => Number(data.stakersCount || 0)
 
 const getReturnToDate = (data: PoolDetail) => (parseFloat(data.poolROI || '0') * 100).toFixed(2)
 
-type Props = {}
+const defaultDetailsProps = {
+  depth: ZERO_ASSET_AMOUNT,
+  volume24hr: ZERO_ASSET_AMOUNT,
+  allTimeVolume: ZERO_ASSET_AMOUNT,
+  totalSwaps: 0,
+  totalStakers: 0,
+  returnToDate: '',
+  basePriceAsset: PoolAsset.RUNE67C as PricePoolAsset
+}
 
+const renderPendingView = () => <PoolDetails {...defaultDetailsProps} isLoading={true} />
+const renderInitialView = () => <PoolDetails {...defaultDetailsProps} />
+
+type Props = {}
 export const PoolDetailsView: React.FC<Props> = () => {
   const { service: midgardService } = useMidgardContext()
+  const intl = useIntl()
 
   const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
     midgardService.pools.selectedPricePoolAsset$,
@@ -46,9 +61,11 @@ export const PoolDetailsView: React.FC<Props> = () => {
   return pipe(
     detailedPoolData,
     RD.fold(
-      () => null,
-      () => null,
-      () => null,
+      renderInitialView,
+      renderPendingView,
+      (e: Error) => {
+        return <PoolStatus label={intl.formatMessage({ id: 'common.error' })} displayValue={e.message} />
+      },
       (data) => {
         return (
           <PoolDetails

@@ -1,3 +1,6 @@
+import React from 'react'
+
+import * as A from 'antd'
 import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
@@ -52,6 +55,7 @@ const colors: Colors = {
 
 export const LabelWrapper = styled.div<Props>`
   padding: 10px 0;
+  width: 100%;
   white-space: ${({ nowrap = false }) => (nowrap ? 'nowrap' : 'normal')};
   font-size: ${({ size = 'normal' }) => fontSettings[size].size};
   text-transform: ${({ textTransform = 'none' }) => textTransform};
@@ -60,4 +64,16 @@ export const LabelWrapper = styled.div<Props>`
   color: ${({ color }) => colors[color || 'normal']};
   cursor: ${({ onClick }) => onClick && 'pointer'};
   text-align: ${({ align = 'left' }) => align};
+`
+
+export const Skeleton = styled(A.Skeleton).attrs({
+  title: false,
+  paragraph: { rows: 1 },
+  active: true
+})`
+  .ant-skeleton {
+    &-paragraph {
+      margin: 0;
+    }
+  }
 `
