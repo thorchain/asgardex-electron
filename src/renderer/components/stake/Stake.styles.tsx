@@ -13,8 +13,6 @@ export const Container = styled('div')`
 
 export const TopContainer = styled('div')`
   max-width: 100%;
-  overflow: auto;
-  min-height: 100px;
   margin-bottom: 30px;
 `
 

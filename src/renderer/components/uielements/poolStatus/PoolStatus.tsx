@@ -13,10 +13,11 @@ type Props = {
   displayValue: string
   fullValue?: string
   trend?: BigNumber
+  isLoading?: boolean
 }
 
 const PoolStatus: React.FC<Props> = (props): JSX.Element => {
-  const { label, trend, displayValue, fullValue } = props
+  const { label, trend, displayValue, fullValue, isLoading } = props
   const [showTooltip, setShowTooltip] = useState(false)
   const amountRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -37,7 +38,7 @@ const PoolStatus: React.FC<Props> = (props): JSX.Element => {
 
   const TooltipContainer: React.FC = useCallback(
     (props) => {
-      return showTooltip || fullValue !== displayValue ? (
+      return !isLoading && (showTooltip || fullValue !== displayValue) ? (
         <Styled.Tooltip title={fullValue}>
           <span>{props.children}</span>
         </Styled.Tooltip>
@@ -45,14 +46,14 @@ const PoolStatus: React.FC<Props> = (props): JSX.Element => {
         <>{props.children}</>
       )
     },
-    [fullValue, showTooltip, displayValue]
+    [fullValue, showTooltip, displayValue, isLoading]
   )
 
   return (
     <Styled.PoolStatusWrapper ref={containerRef} {...props}>
       <TooltipContainer>
         <Row style={{ justifyContent: 'space-between', flexFlow: 'row' }}>
-          <Styled.Value ref={amountRef} className="amount">
+          <Styled.Value loading={isLoading} ref={amountRef} className="amount">
             {displayValue}
           </Styled.Value>
           {trend && <Trend amount={trend} />}

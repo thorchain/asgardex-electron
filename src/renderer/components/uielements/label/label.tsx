@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { LabelWrapper, Props as StyledProps } from './label.style'
+import * as Styled from './label.style'
 
 export type ComponentProps = {
   className?: string
@@ -11,7 +11,7 @@ export type ComponentProps = {
   style?: React.CSSProperties
 }
 
-export type LabelProps = ComponentProps & StyledProps
+export type LabelProps = ComponentProps & Styled.Props
 
 const Label = React.forwardRef<HTMLDivElement, LabelProps>(
   (props, ref): JSX.Element => {
@@ -30,7 +30,7 @@ const Label = React.forwardRef<HTMLDivElement, LabelProps>(
     } = props
 
     return (
-      <LabelWrapper
+      <Styled.LabelWrapper
         ref={ref}
         className={`label-wrapper ${className}`}
         size={size}
@@ -41,9 +41,9 @@ const Label = React.forwardRef<HTMLDivElement, LabelProps>(
         align={align}
         nowrap={nowrap}
         onClick={onClick}>
-        {loading && '...'}
+        {loading && <Styled.Skeleton />}
         {!loading && children}
-      </LabelWrapper>
+      </Styled.LabelWrapper>
     )
   }
 )

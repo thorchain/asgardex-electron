@@ -1,8 +1,9 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { assetAmount, AssetBTC, bn } from '@thorchain/asgardex-util'
+import { assetAmount, bn } from '@thorchain/asgardex-util'
 
+import { PoolAsset } from '../../../views/pools/types'
 import { PoolDetails } from './PoolDetails'
 
 export const PoolDetailsStory = () => {
@@ -15,8 +16,8 @@ export const PoolDetailsStory = () => {
       allTimeVolume={assetAmount(12000)}
       totalSwaps={7042}
       totalStakers={307}
-      returnToDate={44.64}
-      basePriceAsset={AssetBTC}
+      returnToDate={'44.64'}
+      basePriceAsset={PoolAsset.RUNE67C}
     />
   )
 }
