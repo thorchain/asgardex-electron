@@ -44,7 +44,9 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeLessThanFrozenBalance': 'Amount should be less than your frozen value - RU',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Количество должно быть меньше, чем ваш баланс после вычета комисси',
-  'wallet.errors.fee.notCovered': ' Комиссия не покрывается вашим банаслом ({balance})'
+  'wallet.errors.fee.notCovered': ' Комиссия не покрывается вашим банаслом ({balance})',
+  'wallet.errors.route.invalidAsset': 'Invalid asset in route: {asset} - RU',
+  'wallet.errors.invalidChain': 'Invalid chain: {chain} - RU'
 }
 
 export default wallet

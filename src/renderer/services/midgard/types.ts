@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Chain } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { Option } from 'fp-ts/lib/Option'
 
@@ -17,7 +18,7 @@ export type PoolAssets = string[]
 export type AssetDetails = AssetDetail[]
 
 export type AssetDetailMap = {
-  [asset: string]: AssetDetail
+  [key in Chain]: AssetDetail
 }
 
 export type PoolDetails = PoolDetail[]

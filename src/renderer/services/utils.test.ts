@@ -3,7 +3,7 @@ import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 
 import { ClientState } from './types'
-import { getClient, hasClient, getClientStateForViews, chainIdToString } from './utils'
+import { getClient, hasClient, getClientStateForViews } from './utils'
 
 // Mocking non default class exports
 // https://jestjs.io/docs/en/es6-class-mocks#mocking-non-default-class-exports
@@ -71,21 +71,6 @@ describe('services/utils/', () => {
       const state: ClientState<BinanceClient> = O.some(E.left(new Error('any error')))
       const result = getClientStateForViews(state)
       expect(result).toEqual('error')
-    })
-  })
-
-  describe('chainIdToString', () => {
-    it('returns string for Thorchain', () => {
-      expect(chainIdToString('Thorchain')).toEqual('Thorchain')
-    })
-    it('returns string for BTC', () => {
-      expect(chainIdToString('BTC')).toEqual('Bitcoin')
-    })
-    it('returns string for ETH', () => {
-      expect(chainIdToString('ETH')).toEqual('Ethereum')
-    })
-    it('returns string for BNB', () => {
-      expect(chainIdToString('Binance')).toEqual('Binance Chain')
     })
   })
 })

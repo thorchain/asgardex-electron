@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetTicker } from '@thorchain/asgardex-util'
+import { AssetBNB, AssetBTC, AssetTicker, assetToString } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, RUNE_PRICE_POOL } from '../../const'
@@ -27,13 +27,13 @@ describe('services/midgard/utils/', () => {
 
     it('should return non empty assetDataIndex ', () => {
       const bnbData: ThorchainEndpoint = { chain: 'BNB', address: '0xbnb' }
-      const asset1: PoolDataMock = { asset: 'A.B-C' }
-      const asset2: PoolDataMock = { asset: 'AA.BB-CC' }
+      const asset1: PoolDataMock = { asset: assetToString(AssetBNB) }
+      const asset2: PoolDataMock = { asset: assetToString(AssetBTC) }
       const data = [bnbData, asset1, asset2, emptyAsset, emptyAssetSymbol] as Array<PoolDataMock>
       const result = getAssetDetailIndex(data)
       const expected = {
-        'B-C': asset1,
-        'BB-CC': asset2
+        BNB: asset1,
+        BTC: asset2
       }
       expect(result).toEqual(expected)
     })

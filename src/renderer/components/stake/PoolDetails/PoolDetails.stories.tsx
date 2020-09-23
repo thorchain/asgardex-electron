@@ -1,9 +1,8 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { assetAmount, bn } from '@thorchain/asgardex-util'
+import { assetAmount, AssetBTC, bn } from '@thorchain/asgardex-util'
 
-import { AssetBTC } from '../../../const'
 import { PoolDetails } from './PoolDetails'
 
 export const PoolDetailsStory = () => {

@@ -28,51 +28,60 @@ const reloadBalances = () => {
  * Transforms BNB data (address + `AssetsWB`) into `AssetsWBChain`
  */
 const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.address$, BNB.assetsWB$]).pipe(
-  map(([address, assetsWB]) => ({
-    chainId: 'Binance',
-    address: FP.pipe(
-      address,
-      O.getOrElse(() => '')
-    ),
-    assetsWB: FP.pipe(
-      assetsWB,
-      RD.map((assets) => sortBalances(assets, [AssetTicker.BNB, AssetTicker.RUNE]))
-    )
-  }))
+  map(
+    ([address, assetsWB]) =>
+      ({
+        chain: 'BNB',
+        address: FP.pipe(
+          address,
+          O.getOrElse(() => '')
+        ),
+        assetsWB: FP.pipe(
+          assetsWB,
+          RD.map((assets) => sortBalances(assets, [AssetTicker.BNB, AssetTicker.RUNE]))
+        )
+      } as AssetsWBChain)
+  )
 )
 
 /**
  * Transforms BTC data (address + `AssetWB`) into `AssetsWBChain`
  */
 const btcAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BTC.address$, BTC.assetWB$]).pipe(
-  map(([address, assetWB]) => ({
-    chainId: 'BTC',
-    address: FP.pipe(
-      address,
-      O.getOrElse(() => '')
-    ),
-    assetsWB: FP.pipe(
-      assetWB,
-      RD.map((assets) => [assets])
-    )
-  }))
+  map(
+    ([address, assetWB]) =>
+      ({
+        chain: 'BTC',
+        address: FP.pipe(
+          address,
+          O.getOrElse(() => '')
+        ),
+        assetsWB: FP.pipe(
+          assetWB,
+          RD.map((assets) => [assets])
+        )
+      } as AssetsWBChain)
+  )
 )
 
 /**
  * Transforms ETH data (address + `AssetsWBChain`) into `AssetsWBChain`
  */
 const ethAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([ETH.address$, ETH.assetWB$]).pipe(
-  map(([address, assetWBRD]) => ({
-    chainId: 'ETH',
-    address: FP.pipe(
-      address,
-      O.getOrElse(() => '')
-    ),
-    assetsWB: FP.pipe(
-      assetWBRD,
-      RD.map((assetWB) => [assetWB])
-    )
-  }))
+  map(
+    ([address, assetWBRD]) =>
+      ({
+        chain: 'ETH',
+        address: FP.pipe(
+          address,
+          O.getOrElse(() => '')
+        ),
+        assetsWB: FP.pipe(
+          assetWBRD,
+          RD.map((assetWB) => [assetWB])
+        )
+      } as AssetsWBChain)
+  )
 )
 
 /**

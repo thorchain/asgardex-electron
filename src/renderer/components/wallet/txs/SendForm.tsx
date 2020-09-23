@@ -16,13 +16,11 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
 
 import { isBnbAsset, BNB_SYMBOL } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { trimZeros } from '../../../helpers/stringHelper'
 import { getBnbAmountFromBalances } from '../../../helpers/walletHelper'
-import * as walletRoutes from '../../../routes/wallet'
 import { SendTxParams } from '../../../services/binance/transaction'
 import { AddressValidation } from '../../../services/binance/types'
 import { AssetsWithBalance, AssetWithBalance } from '../../../services/wallet/types'
@@ -41,15 +39,23 @@ type Props = {
   assetsWB: AssetsWithBalance
   assetWB: AssetWithBalance
   onSubmit: ({ to, amount, asset, memo }: SendTxParams) => void
+  changeAssetHandler: (asset: Asset) => void
   isLoading: boolean
   addressValidation: AddressValidation
   oFee: O.Option<AssetAmount>
 }
 
 export const SendForm: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit: onSubmitProp, assetsWB, assetWB, isLoading = false, addressValidation, oFee } = props
+  const {
+    onSubmit: onSubmitProp,
+    changeAssetHandler,
+    assetsWB,
+    assetWB,
+    isLoading = false,
+    addressValidation,
+    oFee
+  } = props
   const intl = useIntl()
-  const history = useHistory()
 
   const [form] = Form.useForm<FormValues>()
 
@@ -154,15 +160,10 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     [onSubmitProp, assetWB]
   )
 
-  const changeSelectorHandler = (asset: Asset) => {
-    const path = walletRoutes.send.path({ asset: assetToString(asset) })
-    history.push(path)
-  }
-
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeSelectorHandler} selectedAsset={assetWB.asset} assets={assetsWB} />
+        <AccountSelector onChange={changeAssetHandler} selectedAsset={assetWB.asset} assets={assetsWB} />
         {/* `Form<FormValue>` does not work in `styled(Form)`, so we have to add styles here. All is just needed to have correct types in `onFinish` handler)  */}
         <Form
           form={form}

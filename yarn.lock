@@ -2937,10 +2937,9 @@
   dependencies:
     polished "^3.6.3"
 
-"@thorchain/asgardex-util@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.4.0.tgz#8ccc71a26ae566772f94d14ee137cec703b5cbe4"
-  integrity sha512-FY8uq+o2mgT3jQjVGMme1zAUzqrnuhrxIFukpLLHFxMLAvNct2Sv0661oc/st9f0VhwxAHP0cNwE0IW9L9z9Kg==
+"@thorchain/asgardex-util@https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#issue-11/add-chains":
+  version "0.4.1"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#24b0c156dbe76af23b1fa5693108c90a8bdf5ee6"
 
 "@types/anymatch@*":
   version "1.3.1"

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetToString, baseToAsset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { Asset, assetToString, baseToAsset, chainToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
 import { ColumnType } from 'antd/lib/table'
@@ -12,7 +12,6 @@ import { useIntl } from 'react-intl'
 import { RUNE_PRICE_POOL } from '../../../const'
 import { getPoolPriceValue } from '../../../services/binance/utils'
 import { PoolDetails } from '../../../services/midgard/types'
-import { chainIdToString } from '../../../services/utils'
 import {
   AssetWithBalance,
   AssetsWBChains,
@@ -217,7 +216,7 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
 
   // Panel
   const renderPanel = useCallback(
-    ({ chainId, address, assetsWB }: AssetsWBChain, key: number) => {
+    ({ chain, address, assetsWB }: AssetsWBChain, key: number) => {
       const assetsTxt = FP.pipe(
         assetsWB,
         RD.fold(
@@ -234,7 +233,7 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
       const header = (
         <Styled.HeaderRow>
           <Col xs={14} md={6} lg={4}>
-            <Styled.HeaderLabel>{chainIdToString(chainId)}</Styled.HeaderLabel>
+            <Styled.HeaderLabel>{chainToString(chain)}</Styled.HeaderLabel>
           </Col>
           <Col xs={0} md={12} lg={10}>
             <Styled.HeaderAddress>{address}</Styled.HeaderAddress>
