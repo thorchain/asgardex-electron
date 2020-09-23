@@ -4,7 +4,7 @@ import { AssetAmount, formatAssetAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
-import { getCyrrencySymbolByAssetString } from '../../../const'
+import { getCurrencySymbolByAssetString } from '../../../helpers/assetHelper'
 import { abbreviateNumber } from '../../../helpers/numberHelper'
 import { PricePoolAsset } from '../../../views/pools/types'
 import PoolStatus from '../../uielements/poolStatus'
@@ -42,7 +42,7 @@ export const PoolDetails: React.FC<Props> = ({
 }) => {
   const intl = useIntl()
 
-  const priceSymbol = useMemo(() => getCyrrencySymbolByAssetString(basePriceAsset), [basePriceAsset])
+  const priceSymbol = useMemo(() => getCurrencySymbolByAssetString(basePriceAsset), [basePriceAsset])
 
   return (
     <Styled.Container>

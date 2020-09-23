@@ -9,8 +9,8 @@ import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 
 import { PoolDetails } from '../../../components/stake/PoolDetails/PoolDetails'
+import { ONE_BN } from '../../../const'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
-import { ONE_BN } from '../../../services/const'
 import { PoolDetail } from '../../../types/generated/midgard/models'
 import { PricePoolAsset } from '../../pools/types'
 
