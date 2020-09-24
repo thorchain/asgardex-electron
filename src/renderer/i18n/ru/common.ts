@@ -42,8 +42,8 @@ const common: CommonMessages = {
   'common.search': 'Поиск',
   'common.retry': 'Повторить',
   'common.add': 'Добавить',
-  'common.swap': 'Swap - RU',
-  'common.liquidity': 'Liquidity - RU'
+  'common.swap': 'Обмен',
+  'common.liquidity': 'Ликвиидиность'
 }
 
 export default common
