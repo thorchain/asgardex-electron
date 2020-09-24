@@ -1,7 +1,18 @@
-import { Asset, AssetBNB, assetFromString, AssetRune67C, AssetRuneB1A } from '@thorchain/asgardex-util'
+import {
+  Asset,
+  AssetBNB,
+  AssetBTC,
+  AssetETH,
+  assetFromString,
+  AssetRune67C,
+  AssetRuneB1A,
+  AssetRuneNative,
+  Chain
+} from '@thorchain/asgardex-util'
 
 import { CURRENCY_SYMBOLS } from '../const'
 import { Network } from '../services/app/types'
+import { eqAsset } from './fp/eq'
 
 /**
  * Number of decimals for Binance chain assets
@@ -24,18 +35,35 @@ export const BTC_DECIMAL = 8
 export const ETH_DECIMAL = 18
 
 /**
- * Returns RUNE asset depending on network
+ * Returns RUNE asset depending on network and chain
  */
-// TODO (@Veado) Add test
-export const getRuneAsset = (net: Network) => (net === 'testnet' ? AssetRune67C : AssetRuneB1A)
+export const getRuneAsset = ({ network = 'testnet', chain = 'BNB' }: { network?: Network; chain: Chain }): Asset => {
+  // For future implementation only - we don't support Native Rune yet...
+  if (chain === 'THOR') return AssetRuneNative
+  // in other cases RUNE is running on Binance chain
+  return network === 'testnet' ? AssetRune67C : AssetRuneB1A
+}
 
 /**
- * Check whether is RUNE asset or not
+ * Check whether an asset is a RUNE asset
  */
-export const isRuneAsset = ({ symbol }: Asset): boolean =>
-  symbol === AssetRune67C.symbol || symbol === AssetRuneB1A.symbol
+export const isRuneAsset = (asset: Asset): boolean =>
+  eqAsset.equals(asset, AssetRune67C) || eqAsset.equals(asset, AssetRuneB1A) || eqAsset.equals(asset, AssetRuneNative)
 
-export const isBnbAsset = ({ symbol }: Asset): boolean => symbol === AssetBNB.symbol
+/**
+ * Check whether an asset is a BNB asset
+ */
+export const isBnbAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBNB)
+
+/**
+ * Check whether an asset is a BTC asset
+ */
+export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBTC)
+
+/**
+ * Check whether an asset is an ETH asset
+ */
+export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
 
 export const getCurrencySymbolByAssetString = (asset: string) => {
   if (asset in CURRENCY_SYMBOLS) {

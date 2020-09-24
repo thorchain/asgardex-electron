@@ -54,7 +54,8 @@ export const getPoolTableRowData = ({
       const status = poolDetail?.status ?? PoolDetailStatusEnum.Disabled
 
       const pool: Pool = {
-        asset: getRuneAsset(network),
+        // As long as we don't have Native RUNE, its an RUNE asset of BNB chain
+        asset: getRuneAsset({ network, chain: 'BNB' }),
         target: poolDetailAsset
       }
 

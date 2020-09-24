@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetTicker } from '@thorchain/asgardex-util'
+import { AssetBNB } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -8,9 +8,11 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import { map, startWith } from 'rxjs/operators'
 
+import { getRuneAsset } from '../../helpers/assetHelper'
 import { eqAssetsWithBalanceRD } from '../../helpers/fp/eq'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
+import { network$ } from '../app/service'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin'
 import * as ETH from '../ethereum/service'
@@ -27,9 +29,9 @@ const reloadBalances = () => {
 /**
  * Transforms BNB data (address + `AssetsWB`) into `AssetsWBChain`
  */
-const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.address$, BNB.assetsWB$]).pipe(
+const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.address$, BNB.assetsWB$, network$]).pipe(
   map(
-    ([address, assetsWB]) =>
+    ([address, assetsWB, network]) =>
       ({
         chain: 'BNB',
         address: FP.pipe(
@@ -38,7 +40,7 @@ const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.addre
         ),
         assetsWB: FP.pipe(
           assetsWB,
-          RD.map((assets) => sortBalances(assets, [AssetTicker.BNB, AssetTicker.RUNE]))
+          RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getRuneAsset({ network, chain: 'BNB' }).ticker]))
         )
       } as AssetsWBChain)
   )

@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetBNB, AssetBTC, AssetTicker, assetToString } from '@thorchain/asgardex-util'
+import { AssetBNB, AssetBTC, AssetRune67C, assetToString } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, RUNE_PRICE_POOL } from '../../const'
@@ -49,7 +49,7 @@ describe('services/midgard/utils/', () => {
     const bnbDetail: AssetDetail = { asset: PoolAsset.BNB }
 
     it('returns details of RUNE', () => {
-      const result = getAssetDetail([runeDetail, bnbDetail], AssetTicker.RUNE)
+      const result = getAssetDetail([runeDetail, bnbDetail], AssetRune67C.ticker)
       expect(result).toEqual(O.some(runeDetail))
     })
     it('returns None if no RUNE details available', () => {
@@ -190,7 +190,7 @@ describe('services/midgard/utils/', () => {
     const bnbDetail: PoolDetail = { asset: PoolAsset.BNB }
 
     it('returns details of RUNE pool', () => {
-      const result = getPoolDetail([runeDetail, bnbDetail], AssetTicker.RUNE)
+      const result = getPoolDetail([runeDetail, bnbDetail], AssetRune67C.ticker)
       expect(result).toEqual(O.some(runeDetail))
     })
     it('returns None if no RUNE details available', () => {
