@@ -5,6 +5,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/lib/Ord'
 
+import { Network } from '../services/app/types'
 import { PoolDetails } from '../services/midgard/types'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData } from '../views/pools/types'
@@ -17,11 +18,17 @@ export const sortByDepth = (a: PoolTableRowData, b: PoolTableRowData) =>
 
 const ordByDepth = Ord.ord.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRowData) => depthPrice)
 
-export const getPoolTableRowsData = (
-  poolDetails: PoolDetails,
-  pricePool: PoolData,
+export const getPoolTableRowsData = ({
+  poolDetails,
+  pricePoolData,
+  poolStatus,
+  network
+}: {
+  poolDetails: PoolDetails
+  pricePoolData: PoolData
   poolStatus: PoolDetailStatusEnum
-): PoolTableRowsData => {
+  network: Network
+}): PoolTableRowsData => {
   // filter pool details
   const filteredPoolDetails: PoolDetails = FP.pipe(
     poolDetails,
@@ -54,7 +61,7 @@ export const getPoolTableRowsData = (
         )
       )
       return {
-        ...getPoolTableRowData(poolDetail, pricePool),
+        ...getPoolTableRowData({ poolDetail, pricePoolData, network }),
         key: poolDetail?.asset || index.toString(),
         deepest
       }

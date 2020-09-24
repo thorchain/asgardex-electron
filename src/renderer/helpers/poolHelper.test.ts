@@ -1,10 +1,12 @@
-import { PoolData, assetAmount, assetToBase } from '@thorchain/asgardex-util'
-import { some } from 'fp-ts/lib/Option'
+import { PoolData, assetAmount, assetToBase, assetToString } from '@thorchain/asgardex-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
+import { Pool } from '../views/pools/types'
 import { filterPendingPools, getDeepestPool, getPoolTableRowsData } from './poolHelper'
 
 describe('helpers/poolHelper/', () => {
@@ -47,7 +49,7 @@ describe('helpers/poolHelper/', () => {
     it('returns deepest pool', () => {
       const pools = [pool1, pool2, pool4, pool3]
       const result = getDeepestPool(pools)
-      expect(result).toEqual(some(pool4))
+      expect(result).toEqual(O.some(pool4))
     })
 
     it('does not return a deepest pool by given an empty list of pools', () => {
@@ -78,17 +80,36 @@ describe('helpers/poolHelper/', () => {
       assetBalance: assetToBase(assetAmount(100))
     }
 
+    const poolTargetAsString = (oPool: O.Option<Pool>) =>
+      FP.pipe(
+        oPool,
+        O.map((pool) => assetToString(pool.target)),
+        O.getOrElse(() => 'unknown')
+      )
+
     it('returns data for pending pools', () => {
-      const result = getPoolTableRowsData(poolDetails, pricePoolData, PoolDetailStatusEnum.Bootstrapped)
+      const result = getPoolTableRowsData({
+        poolDetails,
+        pricePoolData,
+        poolStatus: PoolDetailStatusEnum.Bootstrapped,
+        network: 'testnet'
+      })
       expect(result.length).toEqual(1)
-      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.BOLT)
+      expect(poolTargetAsString(result[0].pool)).toEqual(assetToString(ASSETS_TESTNET.BOLT))
     })
 
     it('returns data for available pools', () => {
-      const result = getPoolTableRowsData(poolDetails, pricePoolData, PoolDetailStatusEnum.Enabled)
+      const result = getPoolTableRowsData({
+        poolDetails,
+        pricePoolData,
+        poolStatus: PoolDetailStatusEnum.Enabled,
+        network: 'testnet'
+      })
       expect(result.length).toEqual(2)
-      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.FTM)
-      expect(result[1].pool.target).toEqual(ASSETS_TESTNET.TOMO)
+
+      expect(O.isSome(result[0].pool)).toBeTruthy()
+      expect(poolTargetAsString(result[0].pool)).toEqual(assetToString(ASSETS_TESTNET.FTM))
+      expect(poolTargetAsString(result[1].pool)).toEqual(assetToString(ASSETS_TESTNET.TOMO))
     })
   })
 

@@ -1,6 +1,7 @@
 import { BaseAmount, PoolData, Asset } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
+import * as O from 'fp-ts/lib/Option'
 
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 
@@ -65,7 +66,7 @@ export type PricePool = {
 export type PricePools = NonEmptyArray<PricePool>
 
 export type PoolTableRowData = {
-  pool: Pool
+  pool: O.Option<Pool>
   depthPrice: BaseAmount
   volumePrice: BaseAmount
   transactionPrice: BaseAmount

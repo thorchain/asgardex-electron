@@ -1,10 +1,11 @@
-import { bn, assetAmount, PoolData, assetToBase } from '@thorchain/asgardex-util'
+import { bn, assetAmount, PoolData, assetToBase, AssetRune67C, assetToString } from '@thorchain/asgardex-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { ThorchainConstants, ThorchainLastblock } from '../../types/generated/midgard'
 import { PoolDetail, PoolDetailStatusEnum } from '../../types/generated/midgard/models/PoolDetail'
-import { PoolTableRowData } from './types'
+import { Pool, PoolTableRowData } from './types'
 import { getPoolTableRowData, getBlocksLeftForPendingPool, getBlocksLeftForPendingPoolAsString } from './utils'
 
 describe('poolUtil', () => {
@@ -27,10 +28,10 @@ describe('poolUtil', () => {
 
     it('transforms data for a FTM pool', () => {
       const expected: PoolTableRowData = {
-        pool: {
-          asset: ASSETS_TESTNET.RUNE,
+        pool: O.some({
+          asset: AssetRune67C,
           target: ASSETS_TESTNET.FTM
-        },
+        }),
         poolPrice: assetToBase(assetAmount(2)),
         depthPrice: assetToBase(assetAmount(1000)),
         volumePrice: assetToBase(assetAmount(1000)),
@@ -42,10 +43,28 @@ describe('poolUtil', () => {
         key: 'hi'
       }
 
-      const result = getPoolTableRowData(lokPoolDetail, pricePoolData)
+      const poolAssetString = (oPool: O.Option<Pool>) =>
+        FP.pipe(
+          oPool,
+          O.map((pool) => assetToString(pool.asset)),
+          O.getOrElse(() => 'unknown')
+        )
+      const poolTargetString = (oPool: O.Option<Pool>) =>
+        FP.pipe(
+          oPool,
+          O.map((pool) => assetToString(pool.target)),
+          O.getOrElse(() => 'unknown')
+        )
 
-      expect(result.pool.asset).toEqual(expected.pool.asset)
-      expect(result.pool.target).toEqual(expected.pool.target)
+      const result = getPoolTableRowData({
+        poolDetail: lokPoolDetail,
+        pricePoolData: pricePoolData,
+        network: 'testnet'
+      })
+
+      expect(O.isSome(result.pool)).toBeTruthy()
+      expect(poolAssetString(result.pool)).toEqual(poolAssetString(expected.pool))
+      expect(poolTargetString(result.pool)).toEqual(poolTargetString(expected.pool))
       expect(result.depthPrice.amount().toNumber()).toEqual(expected.depthPrice.amount().toNumber())
       expect(result.volumePrice.amount().toNumber()).toEqual(expected.volumePrice.amount().toNumber())
       expect(result.transactionPrice.amount().toNumber()).toEqual(expected.transactionPrice.amount().toNumber())

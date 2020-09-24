@@ -9,7 +9,8 @@ import {
   AssetAmount,
   formatAssetAmount,
   bn,
-  baseToAsset
+  baseToAsset,
+  AssetBNB
 } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -18,7 +19,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../const'
-import { isBnbAsset, BNB_SYMBOL } from '../../../helpers/assetHelper'
+import { isBnbAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { trimZeros } from '../../../helpers/stringHelper'
 import { getBnbAmountFromBalances } from '../../../helpers/walletHelper'
@@ -75,7 +76,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
         oFee,
         O.fold(
           () => '--',
-          (f) => `${trimZeros(formatAssetAmount(f, 6))} ${BNB_SYMBOL}`
+          (f) => `${trimZeros(formatAssetAmount(f, 6))} ${AssetBNB.symbol}`
         )
       ),
     [oFee]
@@ -105,7 +106,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
       { id: 'wallet.errors.fee.notCovered' },
       {
         fee: formatAssetAmount(amount, 6),
-        balance: `${formatAssetAmount(amount, 8)} ${BNB_SYMBOL}`
+        balance: `${formatAssetAmount(amount, 8)} ${AssetBNB.symbol}`
       }
     )
 

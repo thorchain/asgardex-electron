@@ -1,10 +1,7 @@
-import { Asset, assetFromString } from '@thorchain/asgardex-util'
+import { Asset, AssetBNB, assetFromString, AssetRune67C, AssetRuneB1A } from '@thorchain/asgardex-util'
 
 import { CURRENCY_SYMBOLS } from '../const'
-
-export const RUNE_SYMBOL_MAINNET = 'RUNE-B1A'
-export const RUNE_SYMBOL_TESTNET = 'RUNE-67C'
-export const BNB_SYMBOL = 'BNB'
+import { Network } from '../services/app/types'
 
 /**
  * Number of decimals for Binance chain assets
@@ -27,12 +24,18 @@ export const BTC_DECIMAL = 8
 export const ETH_DECIMAL = 18
 
 /**
+ * Returns RUNE asset depending on network
+ */
+// TODO (@Veado) Add test
+export const getRuneAsset = (net: Network) => (net === 'testnet' ? AssetRune67C : AssetRuneB1A)
+
+/**
  * Check whether is RUNE asset or not
  */
 export const isRuneAsset = ({ symbol }: Asset): boolean =>
-  symbol === RUNE_SYMBOL_MAINNET || symbol === RUNE_SYMBOL_TESTNET
+  symbol === AssetRune67C.symbol || symbol === AssetRuneB1A.symbol
 
-export const isBnbAsset = ({ symbol }: Asset): boolean => symbol === BNB_SYMBOL
+export const isBnbAsset = ({ symbol }: Asset): boolean => symbol === AssetBNB.symbol
 
 export const getCurrencySymbolByAssetString = (asset: string) => {
   if (asset in CURRENCY_SYMBOLS) {

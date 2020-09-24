@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { Asset, assetFromString, assetToString, baseAmount, EMPTY_ASSET } from '@thorchain/asgardex-util'
+import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, assetToString, baseAmount } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ApiError, AssetsWBChain, AssetsWBChains, ErrorId } from '../../../services/wallet/types'
@@ -33,7 +33,7 @@ const assetsWBChains: AssetsWBChains = [
       {
         amount: baseAmount('12200000000'),
         frozenAmount: O.none,
-        asset: assetFromString('BNB.RUNE-67C') || EMPTY_ASSET
+        asset: AssetRune67C
       }
     ])
   },
@@ -43,7 +43,7 @@ const assetsWBChains: AssetsWBChains = [
       {
         amount: baseAmount('1230000'),
         frozenAmount: O.none,
-        asset: assetFromString('BTC.BTC') || EMPTY_ASSET
+        asset: AssetBTC
       }
     ])
   },
@@ -53,12 +53,12 @@ const assetsWBChains: AssetsWBChains = [
       {
         amount: baseAmount('1000000'),
         frozenAmount: O.none,
-        asset: assetFromString('BNB.BNB') || EMPTY_ASSET
+        asset: AssetBNB
       },
       {
         amount: baseAmount('300000000'),
         frozenAmount: O.none,
-        asset: assetFromString('BNB.FTM-585') || EMPTY_ASSET
+        asset: AssetETH
       }
     ])
   }

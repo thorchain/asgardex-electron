@@ -6,6 +6,7 @@ import { assetToString, BaseAmount, baseToAsset, formatAssetAmountCurrency } fro
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { Option, none, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
@@ -18,13 +19,17 @@ import Button from '../../components/uielements/button'
 import Label from '../../components/uielements/label'
 import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
+import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getPoolTableRowsData, hasPendingPools, sortByDepth } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
+import { Network } from '../../services/app/types'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState } from '../../services/midgard/types'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
@@ -38,6 +43,8 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
   const { service: midgardService } = useMidgardContext()
   const poolsRD = useObservableState(midgardService.pools.poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
@@ -115,26 +122,27 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const renderBtnColTitle = useMemo(() => <ActionColumn>{renderRefreshBtn}</ActionColumn>, [renderRefreshBtn])
 
   const renderBtnPoolsColumn = useCallback(
-    (_: string, record: PoolTableRowData) => {
-      const {
-        pool: { asset, target }
-      } = record
-
-      return (
-        <TableAction>
-          <Button round="true" onClick={() => clickStakeHandler(assetToString(target))} typevalue="outline">
-            <PlusOutlined />
-            liquidity
-          </Button>
-          <Button
-            round="true"
-            onClick={() => clickSwapHandler({ source: assetToString(asset), target: assetToString(target) })}>
-            <SwapOutlined />
-            swap
-          </Button>
-        </TableAction>
-      )
-    },
+    (_: string, { pool: oPool }: PoolTableRowData) =>
+      FP.pipe(
+        oPool,
+        O.fold(
+          () => <></>,
+          ({ asset, target }) => (
+            <TableAction>
+              <Button round="true" onClick={() => clickStakeHandler(assetToString(target))} typevalue="outline">
+                <PlusOutlined />
+                liquidity
+              </Button>
+              <Button
+                round="true"
+                onClick={() => clickSwapHandler({ source: assetToString(asset), target: assetToString(target) })}>
+                <SwapOutlined />
+                swap
+              </Button>
+            </TableAction>
+          )
+        )
+      ),
     [clickStakeHandler, clickSwapHandler]
   )
 
@@ -181,11 +189,17 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     ({ target }: Pool) => <Label align="center">{target?.ticker ?? 'unknown'}</Label>,
     []
   )
-  const sortAssetColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => {
-    const { symbol: aSymbol = '' } = a.pool.target
-    const { symbol: bSymbol = '' } = b.pool.target
-    return aSymbol.localeCompare(bSymbol)
-  }, [])
+  const sortAssetColumn = useCallback(
+    ({ pool: oPoolA }: PoolTableRowData, { pool: oPoolB }: PoolTableRowData) =>
+      FP.pipe(
+        sequenceTOption(oPoolA, oPoolB),
+        O.fold(
+          () => 0,
+          ([{ target: targetA }, { target: targetB }]) => targetA.symbol.localeCompare(targetB.symbol)
+        )
+      ),
+    []
+  )
   const assetColumn: ColumnType<PoolTableRowData> = {
     key: 'asset',
     title: intl.formatMessage({ id: 'common.asset' }),
@@ -350,35 +364,37 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           },
           // success state
           (pools: PoolsState): JSX.Element => {
-            const poolViewData = getPoolTableRowsData(
-              pools.poolDetails,
-              pricePool.poolData,
-              PoolDetailStatusEnum.Enabled
-            )
+            const poolViewData = getPoolTableRowsData({
+              poolDetails: pools.poolDetails,
+              pricePoolData: pricePool.poolData,
+              poolStatus: PoolDetailStatusEnum.Enabled,
+              network
+            })
             previousPools.current = some(poolViewData)
             return renderPoolsTable(poolViewData)
           }
         )(poolsRD)}
       </>
     ),
-    [poolsRD, pricePool.poolData, renderPoolsTable, renderRefreshBtn]
+    [network, poolsRD, pricePool.poolData, renderPoolsTable, renderRefreshBtn]
   )
 
   const renderBtnPendingPoolsColumn = useCallback(
-    (_: string, record: PoolTableRowData) => {
-      const {
-        pool: { target }
-      } = record
-
-      return (
-        <TableAction>
-          <Button round="true" onClick={() => clickStakeHandler(target.symbol)} typevalue="outline">
-            <PlusOutlined />
-            liquidity
-          </Button>
-        </TableAction>
-      )
-    },
+    (_: string, { pool: oPool }: PoolTableRowData) =>
+      FP.pipe(
+        oPool,
+        O.fold(
+          () => <></>,
+          ({ target }) => (
+            <TableAction>
+              <Button round="true" onClick={() => clickStakeHandler(target.symbol)} typevalue="outline">
+                <PlusOutlined />
+                liquidity
+              </Button>
+            </TableAction>
+          )
+        )
+      ),
     [clickStakeHandler]
   )
 
@@ -443,18 +459,19 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           (_: Error) => renderPendingPoolsTable([]),
           // success state
           (state: PoolsState): JSX.Element => {
-            const poolViewData = getPoolTableRowsData(
-              state.poolDetails,
-              pricePool.poolData,
-              PoolDetailStatusEnum.Bootstrapped
-            )
+            const poolViewData = getPoolTableRowsData({
+              poolDetails: state.poolDetails,
+              pricePoolData: pricePool.poolData,
+              poolStatus: PoolDetailStatusEnum.Bootstrapped,
+              network
+            })
             previousPendingPools.current = some(poolViewData)
             return renderPendingPoolsTable(poolViewData)
           }
         )(poolsRD)}
       </>
     ),
-    [poolsRD, renderPendingPoolsTable, pricePool.poolData]
+    [poolsRD, renderPendingPoolsTable, pricePool.poolData, network]
   )
 
   return (

@@ -1,5 +1,4 @@
 import {
-  EMPTY_ASSET,
   bnOrZero,
   PoolData,
   assetAmount,
@@ -13,12 +12,21 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
-import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { getRuneAsset } from '../../helpers/assetHelper'
+import { Network } from '../../services/app/types'
 import { toPoolData } from '../../services/midgard/utils'
 import { PoolDetail, PoolDetailStatusEnum, ThorchainLastblock, ThorchainConstants } from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './types'
 
-export const getPoolTableRowData = (poolDetail: PoolDetail, pricePoolData: PoolData): PoolTableRowData => {
+export const getPoolTableRowData = ({
+  poolDetail,
+  pricePoolData,
+  network
+}: {
+  poolDetail: PoolDetail
+  pricePoolData: PoolData
+  network: Network
+}): PoolTableRowData => {
   const assetString = poolDetail?.asset ?? ''
   const ticker = assetFromString(assetString)?.ticker ?? ''
 
@@ -40,11 +48,14 @@ export const getPoolTableRowData = (poolDetail: PoolDetail, pricePoolData: PoolD
   const trades = bnOrZero(poolDetail?.swappingTxCount)
   const status = poolDetail?.status ?? PoolDetailStatusEnum.Disabled
 
-  const pool: Pool = {
-    // TODO(@Veado): Handle test/mainnet, since RUNE symbol is different
-    asset: ASSETS_TESTNET.RUNE,
-    target: assetFromString(poolDetail?.asset ?? '') || EMPTY_ASSET
-  }
+  const pool: O.Option<Pool> = FP.pipe(
+    assetFromString(poolDetail?.asset ?? ''),
+    O.fromNullable,
+    O.map((target) => ({
+      asset: getRuneAsset(network),
+      target
+    }))
+  )
 
   return {
     pool,
