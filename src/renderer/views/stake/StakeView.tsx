@@ -18,6 +18,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { StakeRouteParams } from '../../routes/stake'
+import { isLocked } from '../../services/wallet/util'
 import { PoolDetailsView } from './PoolDetails/PoolDetailsView'
 import { ShareView } from './Share/ShareView'
 
@@ -31,16 +32,7 @@ const StakeView: React.FC<Props> = (_) => {
 
   const keystore = useObservableState(keystoreService.keystore$, O.none)
 
-  const hasWallet = useMemo(
-    () =>
-      pipe(
-        keystore,
-        O.flatten,
-        O.map(Boolean),
-        O.getOrElse(() => false)
-      ),
-    [keystore]
-  )
+  const hasWallet = useMemo(() => pipe(keystore, isLocked), [keystore])
 
   const asset = assetFromString(assetParam.toUpperCase())
 

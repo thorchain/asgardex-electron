@@ -26,8 +26,8 @@ export const renderPending = () => (
 )
 
 export const getRuneShare = (stake: StakersAssetData, pool: PoolDetail) => {
-  const runeDepth = bn(pool.runeDepth || 0)
-  const stakeUnits = bn(stake.stakeUnits || 0)
+  const runeDepth = bnOrZero(pool.runeDepth)
+  const stakeUnits = bnOrZero(stake.stakeUnits)
   /**
    * Default is 1 as neutral element for division
    */
@@ -37,8 +37,8 @@ export const getRuneShare = (stake: StakersAssetData, pool: PoolDetail) => {
 }
 
 export const getAssetShare = (stake: StakersAssetData, pool: PoolDetail) => {
-  const assetDepth = bn(pool.assetDepth || 0)
-  const stakeUnits = bn(stake.stakeUnits || 0)
+  const assetDepth = bnOrZero(pool.assetDepth)
+  const stakeUnits = bnOrZero(stake.stakeUnits)
   const poolUnits = bn(pool.poolUnits || 1)
 
   return assetDepth.multipliedBy(stakeUnits).div(poolUnits)
