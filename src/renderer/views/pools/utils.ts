@@ -26,48 +26,51 @@ export const getPoolTableRowData = ({
   poolDetail: PoolDetail
   pricePoolData: PoolData
   network: Network
-}): PoolTableRowData => {
+}): O.Option<PoolTableRowData> => {
   const assetString = poolDetail?.asset ?? ''
-  const ticker = assetFromString(assetString)?.ticker ?? ''
+  const oPoolDetailAsset = O.fromNullable(assetFromString(assetString))
 
-  const poolData = toPoolData(poolDetail)
+  return FP.pipe(
+    oPoolDetailAsset,
+    O.map((poolDetailAsset) => {
+      const ticker = poolDetailAsset.ticker
 
-  const oneAsset = assetToBase(assetAmount(1))
-  const poolPrice = getValueOfAsset1InAsset2(oneAsset, poolData, pricePoolData)
+      const poolData = toPoolData(poolDetail)
 
-  const depthAmount = baseAmount(bnOrZero(poolDetail?.runeDepth))
-  const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
+      const oneAsset = assetToBase(assetAmount(1))
+      const poolPrice = getValueOfAsset1InAsset2(oneAsset, poolData, pricePoolData)
 
-  const volumeAmount = baseAmount(bnOrZero(poolDetail?.poolVolume24hr))
-  const volumePrice = getValueOfRuneInAsset(volumeAmount, pricePoolData)
+      const depthAmount = baseAmount(bnOrZero(poolDetail?.runeDepth))
+      const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
 
-  const transaction = baseAmount(bnOrZero(poolDetail?.poolTxAverage))
-  const transactionPrice = getValueOfRuneInAsset(transaction, pricePoolData)
+      const volumeAmount = baseAmount(bnOrZero(poolDetail?.poolVolume24hr))
+      const volumePrice = getValueOfRuneInAsset(volumeAmount, pricePoolData)
 
-  const slip = bnOrZero(poolDetail?.poolSlipAverage).multipliedBy(100)
-  const trades = bnOrZero(poolDetail?.swappingTxCount)
-  const status = poolDetail?.status ?? PoolDetailStatusEnum.Disabled
+      const transaction = baseAmount(bnOrZero(poolDetail?.poolTxAverage))
+      const transactionPrice = getValueOfRuneInAsset(transaction, pricePoolData)
 
-  const pool: O.Option<Pool> = FP.pipe(
-    assetFromString(poolDetail?.asset ?? ''),
-    O.fromNullable,
-    O.map((target) => ({
-      asset: getRuneAsset(network),
-      target
-    }))
+      const slip = bnOrZero(poolDetail?.poolSlipAverage).multipliedBy(100)
+      const trades = bnOrZero(poolDetail?.swappingTxCount)
+      const status = poolDetail?.status ?? PoolDetailStatusEnum.Disabled
+
+      const pool: Pool = {
+        asset: getRuneAsset(network),
+        target: poolDetailAsset
+      }
+
+      return {
+        pool,
+        poolPrice,
+        depthPrice,
+        volumePrice,
+        transactionPrice,
+        slip,
+        trades,
+        status,
+        key: ticker
+      }
+    })
   )
-
-  return {
-    pool,
-    poolPrice,
-    depthPrice,
-    volumePrice,
-    transactionPrice,
-    slip,
-    trades,
-    status,
-    key: ticker
-  }
 }
 
 export const getBlocksLeftForPendingPool = (

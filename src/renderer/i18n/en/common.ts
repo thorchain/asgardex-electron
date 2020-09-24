@@ -41,7 +41,9 @@ const common: CommonMessages = {
   'common.max': 'Max',
   'common.search': 'Search',
   'common.retry': 'Retry',
-  'common.add': 'Add'
+  'common.add': 'Add',
+  'common.swap': 'Swap',
+  'common.liquidity': 'Liquidity'
 }
 
 export default common

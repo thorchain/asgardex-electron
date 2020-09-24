@@ -2,11 +2,9 @@ import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
 
 import { SyncOutlined, SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { assetToString, BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { assetToString, baseToAsset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
-import BigNumber from 'bignumber.js'
-import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { Option, none, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
@@ -22,7 +20,6 @@ import Trend from '../../components/uielements/trend'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
-import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getPoolTableRowsData, hasPendingPools, sortByDepth } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as stakeRoutes from '../../routes/stake'
@@ -34,7 +31,7 @@ import { PoolsState } from '../../services/midgard/types'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
-import { PoolTableRowData, PoolTableRowsData, PricePoolAsset, Pool } from './types'
+import { PoolTableRowData, PoolTableRowsData, PricePoolAsset } from './types'
 import { getBlocksLeftForPendingPoolAsString } from './utils'
 
 type Props = {}
@@ -122,28 +119,22 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const renderBtnColTitle = useMemo(() => <ActionColumn>{renderRefreshBtn}</ActionColumn>, [renderRefreshBtn])
 
   const renderBtnPoolsColumn = useCallback(
-    (_: string, { pool: oPool }: PoolTableRowData) =>
-      FP.pipe(
-        oPool,
-        O.fold(
-          () => <></>,
-          ({ asset, target }) => (
-            <TableAction>
-              <Button round="true" onClick={() => clickStakeHandler(assetToString(target))} typevalue="outline">
-                <PlusOutlined />
-                liquidity
-              </Button>
-              <Button
-                round="true"
-                onClick={() => clickSwapHandler({ source: assetToString(asset), target: assetToString(target) })}>
-                <SwapOutlined />
-                swap
-              </Button>
-            </TableAction>
-          )
-        )
-      ),
-    [clickStakeHandler, clickSwapHandler]
+    (_: string, { pool }: PoolTableRowData) => (
+      <TableAction>
+        <Button round="true" onClick={() => clickStakeHandler(assetToString(pool.target))} typevalue="outline">
+          <PlusOutlined />
+          {intl.formatMessage({ id: 'common.liquidity' })}
+        </Button>
+        <Button
+          round="true"
+          onClick={() => clickSwapHandler({ source: assetToString(pool.asset), target: assetToString(pool.target) })}>
+          <SwapOutlined />
+          {intl.formatMessage({ id: 'common.swap' })}
+        </Button>
+      </TableAction>
+    ),
+
+    [clickStakeHandler, clickSwapHandler, intl]
   )
 
   const btnPoolsColumn = {
@@ -154,9 +145,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderPoolColumn = useCallback(
-    ({ target }: Pool) => (
+    ({ pool }: PoolTableRowData) => (
       <Row justify="center" align="middle">
-        <AssetIcon asset={target} />
+        <AssetIcon asset={pool.target} />
       </Row>
     ),
     []
@@ -165,15 +156,14 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'pool',
     align: 'center',
     title: intl.formatMessage({ id: 'common.pool' }),
-    dataIndex: 'pool',
     width: 100,
     render: renderPoolColumn
   }
 
   const renderPoolColumnMobile = useCallback(
-    ({ target }: Pool) => (
+    ({ pool }: PoolTableRowData) => (
       <Row justify="center" align="middle" style={{ width: '100%' }}>
-        <AssetIcon asset={target} />
+        <AssetIcon asset={pool.target} />
       </Row>
     ),
     []
@@ -181,29 +171,21 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const poolColumnMobile: ColumnType<PoolTableRowData> = {
     key: 'pool',
     title: intl.formatMessage({ id: 'common.pool' }),
-    dataIndex: 'pool',
     render: renderPoolColumnMobile
   }
 
   const renderAssetColumn = useCallback(
-    ({ target }: Pool) => <Label align="center">{target?.ticker ?? 'unknown'}</Label>,
+    ({ pool }: PoolTableRowData) => <Label align="center">{pool.target.ticker}</Label>,
     []
   )
   const sortAssetColumn = useCallback(
-    ({ pool: oPoolA }: PoolTableRowData, { pool: oPoolB }: PoolTableRowData) =>
-      FP.pipe(
-        sequenceTOption(oPoolA, oPoolB),
-        O.fold(
-          () => 0,
-          ([{ target: targetA }, { target: targetB }]) => targetA.symbol.localeCompare(targetB.symbol)
-        )
-      ),
+    ({ pool: poolA }: PoolTableRowData, { pool: poolB }: PoolTableRowData) =>
+      poolA.target.symbol.localeCompare(poolB.target.symbol),
     []
   )
   const assetColumn: ColumnType<PoolTableRowData> = {
     key: 'asset',
     title: intl.formatMessage({ id: 'common.asset' }),
-    dataIndex: 'pool',
     render: renderAssetColumn,
     sorter: sortAssetColumn,
     sortDirections: ['descend', 'ascend'],
@@ -211,9 +193,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderPriceColumn = useCallback(
-    (price: BaseAmount) => (
+    ({ poolPrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(price), pricePool.asset, 3)}
+        {formatAssetAmountCurrency(baseToAsset(poolPrice), pricePool.asset, 3)}
       </Label>
     ),
     [pricePool]
@@ -227,16 +209,15 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'poolprice',
     align: 'right',
     title: intl.formatMessage({ id: 'common.price' }),
-    dataIndex: 'poolPrice',
     render: renderPriceColumn,
     sorter: sortPriceColumn,
     sortDirections: ['descend', 'ascend']
   }
 
   const renderDepthColumn = useCallback(
-    (price: BaseAmount) => (
+    ({ depthPrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}
+        {formatAssetAmountCurrency(baseToAsset(depthPrice), pricePool.asset)}
       </Label>
     ),
     [pricePool]
@@ -246,7 +227,6 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'depth',
     align: 'right',
     title: intl.formatMessage({ id: 'pools.depth' }),
-    dataIndex: 'depthPrice',
     render: renderDepthColumn,
     sorter: sortByDepth,
     sortDirections: ['descend', 'ascend'],
@@ -255,9 +235,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   }
 
   const renderVolumeColumn = useCallback(
-    (price: BaseAmount) => (
+    ({ volumePrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}
+        {formatAssetAmountCurrency(baseToAsset(volumePrice), pricePool.asset)}
       </Label>
     ),
     [pricePool]
@@ -270,16 +250,15 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'vol',
     align: 'right',
     title: intl.formatMessage({ id: 'pools.24hvol' }),
-    dataIndex: 'volumePrice',
     render: renderVolumeColumn,
     sorter: sortVolumeColumn,
     sortDirections: ['descend', 'ascend']
   }
 
   const renderTransactionColumn = useCallback(
-    (price: BaseAmount) => (
+    ({ transactionPrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(price), pricePool.asset)}
+        {formatAssetAmountCurrency(baseToAsset(transactionPrice), pricePool.asset)}
       </Label>
     ),
     [pricePool]
@@ -292,13 +271,12 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'transaction',
     align: 'right',
     title: intl.formatMessage({ id: 'pools.avgsize' }),
-    dataIndex: 'transactionPrice',
     render: renderTransactionColumn,
     sorter: sortTransactionColumn,
     sortDirections: ['descend', 'ascend']
   }
 
-  const renderSlipColumn = useCallback((slip: BigNumber) => <Trend amount={slip} />, [])
+  const renderSlipColumn = useCallback(({ slip }: PoolTableRowData) => <Trend amount={slip} />, [])
   const sortSlipColumn = useCallback(
     (a: PoolTableRowData, b: PoolTableRowData) => ordBigNumber.compare(a.slip, b.slip),
     []
@@ -308,7 +286,6 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'slip',
     align: 'center',
     title: intl.formatMessage({ id: 'pools.avgslip' }),
-    dataIndex: 'slip',
     render: renderSlipColumn,
     sorter: sortSlipColumn,
     sortDirections: ['descend', 'ascend']
@@ -318,8 +295,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     key: 'trade',
     align: 'center',
     title: intl.formatMessage({ id: 'pools.trades' }),
-    dataIndex: 'trades',
-    render: (trades: BigNumber) => <Label align="center">{trades.toString()}</Label>,
+    render: ({ trades }: PoolTableRowData) => <Label align="center">{trades.toString()}</Label>,
     sorter: (a: PoolTableRowData, b: PoolTableRowData) => ordBigNumber.compare(a.trades, b.trades),
     sortDirections: ['descend', 'ascend']
   }
@@ -380,21 +356,14 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   )
 
   const renderBtnPendingPoolsColumn = useCallback(
-    (_: string, { pool: oPool }: PoolTableRowData) =>
-      FP.pipe(
-        oPool,
-        O.fold(
-          () => <></>,
-          ({ target }) => (
-            <TableAction>
-              <Button round="true" onClick={() => clickStakeHandler(target.symbol)} typevalue="outline">
-                <PlusOutlined />
-                liquidity
-              </Button>
-            </TableAction>
-          )
-        )
-      ),
+    (_: string, { pool }: PoolTableRowData) => (
+      <TableAction>
+        <Button round="true" onClick={() => clickStakeHandler(pool.target.symbol)} typevalue="outline">
+          <PlusOutlined />
+          liquidity
+        </Button>
+      </TableAction>
+    ),
     [clickStakeHandler]
   )
 
