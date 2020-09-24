@@ -13,9 +13,9 @@ const stake: StakeMessages = {
   'stake.poolDetails.totalSwaps': 'Gesamtanzahl Swaps',
   'stake.poolDetails.totalStakers': 'Gesamtanzahl Stakers',
   'stake.poolDetails.returnToDate': 'Ertrag bis heute',
-  'stake.wallet.add': 'Add wallet - DE',
-  'stake.wallet.connect': 'Please connect your wallet - DE',
-  'stake.pool.noStakes': "You don't have any shares in this pool - DE"
+  'stake.wallet.add': 'Wallet hinzufügen',
+  'stake.wallet.connect': 'Bitte verbinde Deine Wallet',
+  'stake.pool.noStakes': 'Du hast keine Anteile in diesem Pool'
 }
 
 export default stake
