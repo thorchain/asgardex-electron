@@ -61,7 +61,7 @@
     "@thorchain/asgardex-ethereum": "https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#4e05ab6ff0e9e9f80268f0916dce46270721c2d4",
     "@thorchain/asgardex-midgard": "^1.0.0",
     "@thorchain/asgardex-theme": "^0.1.1",
-    "@thorchain/asgardex-util": "https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#c4411d2c5062367dab50e8235390391a37de8e63",
+    "@thorchain/asgardex-util": "https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#cca05f377138c0f9329b573432098adeecaec036",
     "@types/electron-devtools-installer": "^2.2.0",
     "antd": "^4.6.1",
     "bignumber.js": "^9.0.0",

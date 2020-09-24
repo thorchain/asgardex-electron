@@ -1,4 +1,4 @@
-import { AssetSymbol, assetToBase, assetAmount, bn } from '@thorchain/asgardex-util'
+import { AssetCurrencySymbol, assetToBase, assetAmount, bn } from '@thorchain/asgardex-util'
 
 import {
   PricePoolCurrencySymbols,
@@ -10,12 +10,12 @@ import {
 
 // Currency symbols used for pricing
 export const CURRENCY_SYMBOLS: PricePoolCurrencySymbols = {
-  [PoolAsset.RUNEB1A]: AssetSymbol.RUNE,
-  [PoolAsset.RUNE67C]: AssetSymbol.RUNE,
-  [PoolAsset.BTC]: AssetSymbol.BTC,
-  [PoolAsset.ETH]: AssetSymbol.ETH,
-  [PoolAsset.BUSDBAF]: AssetSymbol.USD,
-  [PoolAsset.BUSDBD1]: AssetSymbol.USD
+  [PoolAsset.RUNEB1A]: AssetCurrencySymbol.RUNE,
+  [PoolAsset.RUNE67C]: AssetCurrencySymbol.RUNE,
+  [PoolAsset.BTC]: AssetCurrencySymbol.BTC,
+  [PoolAsset.ETH]: AssetCurrencySymbol.ETH,
+  [PoolAsset.BUSDBAF]: AssetCurrencySymbol.USD,
+  [PoolAsset.BUSDBD1]: AssetCurrencySymbol.USD
 }
 
 // Weight of currencies needed for pricing

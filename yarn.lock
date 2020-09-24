@@ -2937,9 +2937,9 @@
   dependencies:
     polished "^3.6.3"
 
-"@thorchain/asgardex-util@https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#c4411d2c5062367dab50e8235390391a37de8e63":
-  version "0.4.1"
-  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#c4411d2c5062367dab50e8235390391a37de8e63"
+"@thorchain/asgardex-util@https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#cca05f377138c0f9329b573432098adeecaec036":
+  version "0.4.2"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#cca05f377138c0f9329b573432098adeecaec036"
 
 "@types/anymatch@*":
   version "1.3.1"

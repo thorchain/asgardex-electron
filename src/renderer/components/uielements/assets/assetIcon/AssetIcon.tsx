@@ -2,8 +2,9 @@ import React, { useMemo, useCallback } from 'react'
 
 import { LoadingOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetTicker } from '@thorchain/asgardex-util'
+import { Asset } from '@thorchain/asgardex-util'
 
+import { isBnbAsset, isBtcAsset, isEthAsset, isRuneAsset } from '../../../../helpers/assetHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
 import { bnbIcon, btcIcon, ethIcon, runeIcon } from '../../../icons'
@@ -17,22 +18,21 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 
 const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className = '', ...rest }): JSX.Element => {
   const imgUrl = useMemo(() => {
-    const { symbol, ticker } = asset
     // BTC
-    if (ticker === AssetTicker.BTC) {
+    if (isBtcAsset(asset)) {
       return btcIcon
     }
     // ETH
-    if (ticker === AssetTicker.ETH) {
+    if (isEthAsset(asset)) {
       return ethIcon
     }
     // RUNE
-    if (ticker === AssetTicker.RUNE) {
+    if (isRuneAsset(asset)) {
       // Always use "our" Rune asset
       return runeIcon
     }
     // BNB
-    if (ticker === AssetTicker.BNB) {
+    if (isBnbAsset(asset)) {
       // Since BNB is blacklisted at TrustWallet's asset, we have to use "our" own BNB icon
       // (see https://github.com/trustwallet/assets/blob/master/blockchains/binance/blacklist.json)
       return bnbIcon
@@ -40,9 +40,8 @@ const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className = '', ..
 
     // Currently all other assets are based on Binance chain
     // TODO (@veado) Change it by introducing ERC20 tokens
-    const assetId = symbol
     // Note: Trustwallet supports asset names for mainnet only. For testnet we will use the `IconFallback` component
-    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${assetId}/logo.png`
+    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${asset.symbol}/logo.png`
   }, [asset])
 
   const remoteIconImage = useRemoteImage(imgUrl)
