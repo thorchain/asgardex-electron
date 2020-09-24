@@ -7,7 +7,8 @@ import {
   AssetAmount,
   formatAssetAmount,
   bn,
-  baseToAsset
+  baseToAsset,
+  AssetBNB
 } from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -16,7 +17,6 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { ZERO_ASSET_AMOUNT } from '../../../const'
-import { BNB_SYMBOL } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { trimZeros } from '../../../helpers/stringHelper'
 import { FreezeAction, FreezeTxParams } from '../../../services/binance/types'
@@ -82,7 +82,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
         oFee,
         O.fold(
           () => '--',
-          (f) => `${trimZeros(formatAssetAmount(f, 8))} ${BNB_SYMBOL}`
+          (f) => `${trimZeros(formatAssetAmount(f, 8))} ${AssetBNB.symbol}`
         )
       ),
     [oFee]
@@ -128,7 +128,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
 
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
-      { fee: formatAssetAmount(amount, 6), balance: `${formatAssetAmount(amount, 8)} ${BNB_SYMBOL}` }
+      { fee: formatAssetAmount(amount, 6), balance: `${formatAssetAmount(amount, 8)} ${AssetBNB.symbol}` }
     )
 
     return (

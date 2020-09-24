@@ -40,6 +40,8 @@ type CommonMessageKey =
   | 'common.search'
   | 'common.retry'
   | 'common.add'
+  | 'common.swap'
+  | 'common.liquidity'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

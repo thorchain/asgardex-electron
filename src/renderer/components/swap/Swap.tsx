@@ -11,7 +11,6 @@ import {
   assetToString,
   baseAmount,
   bn,
-  EMPTY_ASSET,
   formatBN,
   getValueOfAsset1InAsset2,
   PoolData,
@@ -406,14 +405,13 @@ export const Swap = ({
               onChange={setChangeAmount}
               amount={changeAmount}
             />
-            <AssetSelect
-              onSelect={setSourceAsset}
-              asset={FP.pipe(
-                sourceAsset,
-                O.getOrElse(() => EMPTY_ASSET)
-              )}
-              assetData={assetsToSwapFrom}
-            />
+            {FP.pipe(
+              sourceAsset,
+              O.fold(
+                () => <></>,
+                (asset) => <AssetSelect onSelect={setSourceAsset} asset={asset} assetData={assetsToSwapFrom} />
+              )
+            )}
           </Styled.ValueItemContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-percent'}>
@@ -426,38 +424,46 @@ export const Swap = ({
               <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}:</Styled.InValueTitle>
               <div>{formatBN(swapData.swapResult, 7)}</div>
             </Styled.InValue>
-            <AssetSelect
-              onSelect={setTargetAsset}
-              asset={FP.pipe(
-                targetAsset,
-                O.getOrElse(() => EMPTY_ASSET)
-              )}
-              assetData={assetsToSwapTo}
-              priceIndex={availableAssets.reduce((acc, asset) => {
-                return {
-                  ...acc,
-                  [asset.asset.ticker]: baseAmount(asset.priceRune).amount()
-                }
-              }, {})}
-            />
+            {FP.pipe(
+              targetAsset,
+              O.fold(
+                () => <></>,
+                (asset) => (
+                  <AssetSelect
+                    onSelect={setTargetAsset}
+                    asset={asset}
+                    assetData={assetsToSwapTo}
+                    priceIndex={availableAssets.reduce((acc, asset) => {
+                      return {
+                        ...acc,
+                        [asset.asset.ticker]: baseAmount(asset.priceRune).amount()
+                      }
+                    }, {})}
+                  />
+                )
+              )
+            )}
           </Styled.ValueItemContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
 
       <Styled.SubmitContainer>
-        <Drag
-          disabled={isSwapDisabled}
-          onConfirm={onSwapConfirmed}
-          title={intl.formatMessage({ id: 'swap.drag' })}
-          source={FP.pipe(
-            sourceAsset,
-            O.getOrElse(() => EMPTY_ASSET)
-          )}
-          target={FP.pipe(
-            targetAsset,
-            O.getOrElse(() => EMPTY_ASSET)
-          )}
-        />
+        {FP.pipe(
+          sequenceTOption(sourceAsset, targetAsset),
+          O.fold(
+            () => <></>,
+            ([source, target]) => (
+              <Drag
+                disabled={isSwapDisabled}
+                onConfirm={onSwapConfirmed}
+                title={intl.formatMessage({ id: 'swap.drag' })}
+                source={source}
+                target={target}
+              />
+            )
+          )
+        )}
+        {/* TODO (@thatThorchainGuy): Get 'BNB' fee from service  */}
         <div>fee: 0.000375 + 1 RUNE</div>
       </Styled.SubmitContainer>
     </Styled.Container>

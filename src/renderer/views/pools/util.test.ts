@@ -1,4 +1,5 @@
-import { bn, assetAmount, PoolData, assetToBase } from '@thorchain/asgardex-util'
+import { bn, assetAmount, PoolData, assetToBase, AssetRune67C } from '@thorchain/asgardex-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -28,7 +29,7 @@ describe('poolUtil', () => {
     it('transforms data for a FTM pool', () => {
       const expected: PoolTableRowData = {
         pool: {
-          asset: ASSETS_TESTNET.RUNE,
+          asset: AssetRune67C,
           target: ASSETS_TESTNET.FTM
         },
         poolPrice: assetToBase(assetAmount(2)),
@@ -42,15 +43,26 @@ describe('poolUtil', () => {
         key: 'hi'
       }
 
-      const result = getPoolTableRowData(lokPoolDetail, pricePoolData)
+      const result = getPoolTableRowData({
+        poolDetail: lokPoolDetail,
+        pricePoolData: pricePoolData,
+        network: 'testnet'
+      })
 
-      expect(result.pool.asset).toEqual(expected.pool.asset)
-      expect(result.pool.target).toEqual(expected.pool.target)
-      expect(result.depthPrice.amount().toNumber()).toEqual(expected.depthPrice.amount().toNumber())
-      expect(result.volumePrice.amount().toNumber()).toEqual(expected.volumePrice.amount().toNumber())
-      expect(result.transactionPrice.amount().toNumber()).toEqual(expected.transactionPrice.amount().toNumber())
-      expect(result.slip.toNumber()).toEqual(expected.slip.toNumber())
-      expect(result.trades.toNumber()).toEqual(expected.trades.toNumber())
+      expect(O.isSome(result)).toBeTruthy()
+      FP.pipe(
+        result,
+        O.map((data) => {
+          expect(data.pool).toEqual(expected.pool)
+          expect(data.pool).toEqual(expected.pool)
+          expect(data.depthPrice.amount().toNumber()).toEqual(expected.depthPrice.amount().toNumber())
+          expect(data.volumePrice.amount().toNumber()).toEqual(expected.volumePrice.amount().toNumber())
+          expect(data.transactionPrice.amount().toNumber()).toEqual(expected.transactionPrice.amount().toNumber())
+          expect(data.slip.toNumber()).toEqual(expected.slip.toNumber())
+          expect(data.trades.toNumber()).toEqual(expected.trades.toNumber())
+          return true
+        })
+      )
     })
   })
 

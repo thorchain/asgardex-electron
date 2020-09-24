@@ -1,5 +1,5 @@
 import { Fees, Fee, DexFees, TransferFee } from '@thorchain/asgardex-binance'
-import { EMPTY_ASSET, assetAmount } from '@thorchain/asgardex-util'
+import { assetAmount } from '@thorchain/asgardex-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
@@ -16,8 +16,8 @@ describe('binanceHelper', () => {
     it('is false for BNB asset', () => {
       expect(isMiniToken({ symbol: 'BNB' })).toBeFalsy()
     })
-    it('is false for EMTPY asset', () => {
-      expect(isMiniToken(EMPTY_ASSET)).toBeFalsy()
+    it('is false for empty symbol', () => {
+      expect(isMiniToken({ symbol: '' })).toBeFalsy()
     })
   })
 
@@ -28,8 +28,8 @@ describe('binanceHelper', () => {
     it('is false for others', () => {
       expect(isBinanceChain({ chain: 'ETH' })).toBeFalsy()
     })
-    it('is false for EMTPY asset', () => {
-      expect(isBinanceChain(EMPTY_ASSET)).toBeFalsy()
+    it('is false for empty chain', () => {
+      expect(isBinanceChain({ chain: '' })).toBeFalsy()
     })
   })
 

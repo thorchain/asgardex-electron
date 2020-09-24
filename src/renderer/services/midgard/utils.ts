@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, bnOrZero, baseAmount, PoolData, EMPTY_ASSET } from '@thorchain/asgardex-util'
+import { assetFromString, bnOrZero, baseAmount, PoolData } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import { head } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -135,5 +135,5 @@ export const toPoolData = (detail: PoolDetail): PoolData => ({
  * Filter out mini tokens from pool assets
  */
 export const filterPoolAssets = (poolAssets: string[]) => {
-  return poolAssets.filter((poolAsset) => !isMiniToken(assetFromString(poolAsset) || EMPTY_ASSET))
+  return poolAssets.filter((poolAsset) => !isMiniToken(assetFromString(poolAsset) || { symbol: '' }))
 }

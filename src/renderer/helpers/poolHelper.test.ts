@@ -1,5 +1,5 @@
-import { PoolData, assetAmount, assetToBase } from '@thorchain/asgardex-util'
-import { some } from 'fp-ts/lib/Option'
+import { PoolData, assetAmount, assetToBase, AssetRune67C } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { PoolDetails } from '../services/midgard/types'
@@ -47,7 +47,7 @@ describe('helpers/poolHelper/', () => {
     it('returns deepest pool', () => {
       const pools = [pool1, pool2, pool4, pool3]
       const result = getDeepestPool(pools)
-      expect(result).toEqual(some(pool4))
+      expect(result).toEqual(O.some(pool4))
     })
 
     it('does not return a deepest pool by given an empty list of pools', () => {
@@ -79,15 +79,29 @@ describe('helpers/poolHelper/', () => {
     }
 
     it('returns data for pending pools', () => {
-      const result = getPoolTableRowsData(poolDetails, pricePoolData, PoolDetailStatusEnum.Bootstrapped)
+      const result = getPoolTableRowsData({
+        poolDetails,
+        pricePoolData,
+        poolStatus: PoolDetailStatusEnum.Bootstrapped,
+        network: 'testnet'
+      })
       expect(result.length).toEqual(1)
+      expect(result[0].pool.asset).toEqual(AssetRune67C)
       expect(result[0].pool.target).toEqual(ASSETS_TESTNET.BOLT)
     })
 
     it('returns data for available pools', () => {
-      const result = getPoolTableRowsData(poolDetails, pricePoolData, PoolDetailStatusEnum.Enabled)
+      const result = getPoolTableRowsData({
+        poolDetails,
+        pricePoolData,
+        poolStatus: PoolDetailStatusEnum.Enabled,
+        network: 'testnet'
+      })
       expect(result.length).toEqual(2)
+
+      expect(result[0].pool.asset).toEqual(AssetRune67C)
       expect(result[0].pool.target).toEqual(ASSETS_TESTNET.FTM)
+      expect(result[1].pool.asset).toEqual(AssetRune67C)
       expect(result[1].pool.target).toEqual(ASSETS_TESTNET.TOMO)
     })
   })

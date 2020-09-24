@@ -5,23 +5,30 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/lib/Ord'
 
+import { Network } from '../services/app/types'
 import { PoolDetails } from '../services/midgard/types'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData } from '../views/pools/types'
 import { getPoolTableRowData } from '../views/pools/utils'
 import { ordBaseAmount } from './fp/ord'
-import { sequenceTOption } from './fpHelpers'
+import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
 
 export const sortByDepth = (a: PoolTableRowData, b: PoolTableRowData) =>
   ordBaseAmount.compare(a.depthPrice, b.depthPrice)
 
 const ordByDepth = Ord.ord.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRowData) => depthPrice)
 
-export const getPoolTableRowsData = (
-  poolDetails: PoolDetails,
-  pricePool: PoolData,
+export const getPoolTableRowsData = ({
+  poolDetails,
+  pricePoolData,
+  poolStatus,
+  network
+}: {
+  poolDetails: PoolDetails
+  pricePoolData: PoolData
   poolStatus: PoolDetailStatusEnum
-): PoolTableRowsData => {
+  network: Network
+}): PoolTableRowsData => {
   // filter pool details
   const filteredPoolDetails: PoolDetails = FP.pipe(
     poolDetails,
@@ -39,7 +46,7 @@ export const getPoolTableRowsData = (
   // Transform `PoolDetails` -> PoolRowType
   return FP.pipe(
     filteredPoolDetails,
-    A.mapWithIndex<PoolDetail, PoolTableRowData>((index, poolDetail) => {
+    A.mapWithIndex<PoolDetail, O.Option<PoolTableRowData>>((index, poolDetail) => {
       // get symbol of PoolDetail
       const oPoolDetailSymbol: O.Option<string> = FP.pipe(
         O.fromNullable(assetFromString(poolDetail.asset ?? '')),
@@ -53,12 +60,21 @@ export const getPoolTableRowsData = (
           ([deepestPoolSymbol, poolDetailSymbol]) => Eq.eqString.equals(deepestPoolSymbol, poolDetailSymbol)
         )
       )
-      return {
-        ...getPoolTableRowData(poolDetail, pricePool),
-        key: poolDetail?.asset || index.toString(),
-        deepest
-      }
+
+      return FP.pipe(
+        getPoolTableRowData({ poolDetail, pricePoolData, network }),
+        O.map(
+          (poolTableRowData) =>
+            ({
+              ...poolTableRowData,
+              key: poolDetail?.asset || index.toString(),
+              deepest
+            } as PoolTableRowData)
+        )
+      )
     }),
+    sequenceTOptionFromArray,
+    O.getOrElse(() => [] as PoolTableRowsData),
     // Table does not accept `defaultSortOrder` for depth  for any reason,
     // that's why we sort depth here
     A.sortBy([ordByDepth]),

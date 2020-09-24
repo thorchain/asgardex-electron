@@ -1,5 +1,5 @@
 import { Balances } from '@thorchain/asgardex-binance'
-import { assetToBase, assetAmount, PoolData, EMPTY_ASSET, baseAmount, assetFromString } from '@thorchain/asgardex-util'
+import { Asset, assetToBase, assetAmount, PoolData, baseAmount, AssetBNB, AssetRune67C } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -26,7 +26,7 @@ describe('services/binance/utils/', () => {
       const balance: AssetWithBalance = {
         amount: baseAmount('1'),
         frozenAmount: O.none,
-        asset: assetFromString('BNB.BNB') || EMPTY_ASSET
+        asset: AssetBNB
       }
       const result = FP.pipe(
         getPoolPriceValue(balance, poolDetails, usdPool),
@@ -42,7 +42,7 @@ describe('services/binance/utils/', () => {
       const balance: AssetWithBalance = {
         amount: baseAmount('1'),
         frozenAmount: O.none,
-        asset: assetFromString('BNB.RUNE-67C') || EMPTY_ASSET
+        asset: AssetRune67C
       }
       const result = FP.pipe(
         getPoolPriceValue(balance, [], usdPool),
@@ -58,7 +58,7 @@ describe('services/binance/utils/', () => {
       const balance: AssetWithBalance = {
         amount: baseAmount('1'),
         frozenAmount: O.none,
-        asset: assetFromString('BNB.BNB') || EMPTY_ASSET
+        asset: AssetBNB
       }
       const result = getPoolPriceValue(balance, [], usdPool)
       expect(result).toBeNone()
@@ -76,7 +76,7 @@ describe('services/binance/utils/', () => {
     it('creates a RUNE `Asset`', () => {
       const result = FP.pipe(
         bncSymbolToAsset('RUNE-B1A'),
-        O.getOrElse(() => EMPTY_ASSET)
+        O.getOrElse(() => ({ chain: 'BNB', symbol: 'invalid', ticker: 'invalid' } as Asset))
       )
       expect(result).toEqual({
         chain: 'BNB',
