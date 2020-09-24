@@ -63,6 +63,7 @@ storiesOf('Components/input/InputBigNumber', module)
         form={form}
         onFinish={onFinish}
         initialValues={{
+          // initial value for amount
           amount: bn('1')
         }}>
         <Form.Item name="amount" label="Amount" rules={[{ validator: checkValue }]}>
