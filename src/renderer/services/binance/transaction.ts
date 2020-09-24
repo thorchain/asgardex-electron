@@ -6,15 +6,16 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
-import { catchError, map, startWith, switchMap } from 'rxjs/operators'
+import { map, startWith, switchMap } from 'rxjs/operators'
 import * as RxOperators from 'rxjs/operators'
 
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { getClient } from '../utils'
-import { TransferRD, BinanceClientState$ } from './types'
+import { ApiError, ErrorId, TxRD } from '../wallet/types'
+import { BinanceClientState$ } from './types'
 
-const { get$: txRD$, set: setTxRD } = observableState<TransferRD>(RD.initial)
+const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
 export type SendTxParams = {
   to: Address
@@ -29,7 +30,7 @@ const tx$ = ({
   amount,
   asset: { symbol },
   memo
-}: { clientState$: BinanceClientState$ } & SendTxParams): Rx.Observable<TransferRD> =>
+}: { clientState$: BinanceClientState$ } & SendTxParams): Rx.Observable<TxRD> =>
   clientState$.pipe(
     map(getClient),
     switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY)),
@@ -39,10 +40,14 @@ const tx$ = ({
         : Rx.from(client.normalTx({ addressTo: to, amount: amount.amount().toString(), asset: symbol }))
     ),
     map(({ result }) => O.fromNullable(result)),
-    map((transfers) => RD.fromOption(transfers, () => Error('Transaction: empty response'))),
+    map((transfers) =>
+      RD.fromOption(transfers, () => ({ errorId: ErrorId.SEND_TX, msg: 'Transaction: empty response' } as ApiError))
+    ),
     liveData.map(A.head),
-    liveData.chain(liveData.fromOption(() => Error('Transaction: no results received'))),
-    catchError((error) => Rx.of(RD.failure(error))),
+    liveData.chain(
+      liveData.fromOption(() => ({ errorId: ErrorId.SEND_TX, msg: 'Transaction: no results received' } as ApiError))
+    ),
+    liveData.map(({ hash }) => hash),
     startWith(RD.pending)
   )
 

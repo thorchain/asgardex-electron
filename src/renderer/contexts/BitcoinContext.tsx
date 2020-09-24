@@ -1,17 +1,27 @@
 import React, { createContext, useContext } from 'react'
 
-import { client$, clientViewState$, address$ } from '../services/bitcoin'
+import { client$, address$, reloadBalances, reloadFees, assetWB$, txRD$, fees$, pushTx } from '../services/bitcoin'
 
 export type BitcoinContextValue = {
-  clientViewState$: typeof clientViewState$
   client$: typeof client$
   address$: typeof address$
+  reloadBalances: typeof reloadBalances
+  assetWB$: typeof assetWB$
+  fees$: typeof fees$
+  txRD$: typeof txRD$
+  pushTx: typeof pushTx
+  reloadFees: typeof reloadFees
 }
 
 const initialContext: BitcoinContextValue = {
   client$,
-  clientViewState$,
-  address$
+  address$,
+  reloadBalances,
+  assetWB$,
+  fees$,
+  txRD$,
+  pushTx,
+  reloadFees
 }
 
 const BitcoinContext = createContext<BitcoinContextValue | null>(null)

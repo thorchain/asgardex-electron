@@ -1,36 +1,38 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { BinanceClient } from '@thorchain/asgardex-binance'
 import { Asset } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 
-import Send from '../../../components/wallet/txs/Send'
+import Send from '../../../components/wallet/txs/send/Send'
+import { SendFormBNB } from '../../../components/wallet/txs/send/SendFormBNB'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
-import { useWalletContext } from '../../../contexts/WalletContext'
 import { getAssetWBByAsset } from '../../../helpers/walletHelper'
 import { useSingleTxFee } from '../../../hooks/useSingleTxFee'
 import { AddressValidation } from '../../../services/binance/types'
-import { INITIAL_ASSETS_WB_STATE } from '../../../services/wallet/const'
-import { AssetsWithBalance } from '../../../services/wallet/types'
+import { AssetsWithBalance, AssetWithBalance, NonEmptyAssetsWithBalance, TxRD } from '../../../services/wallet/types'
 
 type Props = {
   selectedAsset: Asset
+  assetsWB: O.Option<NonEmptyAssetsWithBalance>
 }
 
 const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset } = props
-  const { transaction: transactionService, explorerUrl$, client$, transferFees$ } = useBinanceContext()
-  const { assetsWBState$ } = useWalletContext()
+  const { selectedAsset, assetsWB } = props
 
-  const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
+  const oSelectedAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
+
+  const { transaction: transactionService, explorerUrl$, client$, transferFees$ } = useBinanceContext()
+
+  const { txRD$, resetTx, pushTx } = transactionService
+  const txRD = useObservableState<TxRD>(txRD$, RD.initial)
   const explorerUrl = useObservableState(explorerUrl$, O.none)
   const client = useObservableState<O.Option<BinanceClient>>(client$, O.none)
 
   const fee = useSingleTxFee(transferFees$)
-
-  const oSelectedAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
 
   const addressValidation = useMemo(
     () =>
@@ -42,21 +44,33 @@ const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     [client]
   )
 
+  const sendForm = useCallback(
+    (selectedAsset: AssetWithBalance) => (
+      <SendFormBNB
+        assetWB={selectedAsset}
+        onSubmit={pushTx}
+        assetsWB={FP.pipe(
+          assetsWB,
+          O.getOrElse(() => [] as AssetsWithBalance)
+        )}
+        isLoading={RD.isPending(txRD)}
+        addressValidation={addressValidation}
+        oFee={fee}
+      />
+    ),
+    [pushTx, assetsWB, txRD, addressValidation, fee]
+  )
+
   return FP.pipe(
     oSelectedAssetWB,
     O.fold(
       () => <></>,
       (selectedAssetWB) => (
         <Send
-          selectedAsset={selectedAssetWB}
           transactionService={transactionService}
-          assetsWB={FP.pipe(
-            assetsWB,
-            O.getOrElse(() => [] as AssetsWithBalance)
-          )}
           explorerUrl={explorerUrl}
-          addressValidation={addressValidation}
-          fee={fee}
+          resetTx={resetTx}
+          form={sendForm(selectedAssetWB)}
         />
       )
     )

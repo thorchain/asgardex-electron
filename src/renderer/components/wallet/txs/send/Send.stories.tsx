@@ -6,14 +6,14 @@ import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 import { EMPTY, Observable, of } from 'rxjs'
 
-import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
-import { TRANSFER_FEES } from '../../../../shared/mock/fees'
-import { TransferRD, AddressValidation } from '../../../services/binance/types'
-import { AssetWithBalance, AssetsWithBalance } from '../../../services/wallet/types'
-import Send from './Send'
+import { ASSETS_MAINNET } from '../../../../../../shared/mock/assets'
+import { TRANSFER_FEES } from '../../../../../../shared/mock/fees'
+import { AddressValidation } from '../../../../../services/binance/types'
+import { AssetWithBalance, AssetsWithBalance, TxRD } from '../../../../../services/wallet/types'
+import Send from './SendBNB'
 
 // eslint-disable-next-line
-const createServiceProp = (value: Observable<TransferRD>) => ({
+const createServiceProp = (value: Observable<TxRD>) => ({
   txRD$: value,
   txWithState$: EMPTY,
   pushTx: () => of(RD.initial).subscribe(),
@@ -93,16 +93,7 @@ storiesOf('Wallet/Send', module)
         selectedAsset={bnbAsset}
         assetsWB={balances}
         addressValidation={addressValidation}
-        transactionService={createServiceProp(
-          of(
-            RD.success({
-              code: 200,
-              hash: 'ABC123',
-              log: '',
-              ok: true
-            })
-          )
-        )}
+        transactionService={createServiceProp(of(RD.success('ABC123')))}
         explorerUrl={explorerUrl}
         fee={fee}
       />

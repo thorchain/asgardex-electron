@@ -6,8 +6,9 @@ import * as Rx from 'rxjs'
 import { catchError, map, mergeMap, shareReplay, startWith, switchMap } from 'rxjs/operators'
 
 import { observableState, triggerStream } from '../../helpers/stateHelper'
+import { ApiError, ErrorId, TxRD } from '../wallet/types'
 import { Client$ } from './common'
-import { FeesRD, SendTxParams, TxRD } from './types'
+import { FeesRD, SendTxParams } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
@@ -20,7 +21,7 @@ const tx$ = ({ client$, to, amount, feeRate, memo }: { client$: Client$ } & Send
         : Rx.from(client.normalTx({ addressTo: to, amount: amount.amount().toNumber(), feeRate }))
     ),
     map(RD.success),
-    catchError((error) => Rx.of(RD.failure(error))),
+    catchError((error) => Rx.of(RD.failure({ errorId: ErrorId.SEND_TX, msg: error?.msg ?? '' } as ApiError))),
     startWith(RD.pending)
   )
 

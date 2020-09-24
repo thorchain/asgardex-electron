@@ -55,7 +55,7 @@ export type AssetsWithBalanceState = {
 
 export enum ErrorId {
   GET_BALANCES,
-  GET_ADDRESS
+  SEND_TX
 }
 
 export type ApiError = {
@@ -64,3 +64,6 @@ export type ApiError = {
 }
 
 export type NonEmptyApiErrors = NonEmptyArray<ApiError>
+
+/* RD for sending transactions on different chains */
+export type TxRD = RD.RemoteData<ApiError, string>
