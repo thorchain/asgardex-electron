@@ -10,4 +10,5 @@ export const EmptyData = styled(A.Empty).attrs({
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  text-transform: uppercase;
 `

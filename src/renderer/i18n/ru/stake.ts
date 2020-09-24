@@ -14,7 +14,8 @@ const stake: StakeMessages = {
   'stake.poolDetails.totalStakers': 'Всего держателей',
   'stake.poolDetails.returnToDate': 'Доходность',
   'stake.wallet.add': 'Добавить',
-  'stake.wallet.connect': 'Пожалуйсста добавьте свой кошелек'
+  'stake.wallet.connect': 'Пожалуйсста добавьте свой кошелек',
+  'stake.pool.noStakes': 'У вас нет доли в этом пуле'
 }
 
 export default stake

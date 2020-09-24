@@ -148,6 +148,7 @@ type StakeMessageKey =
   | 'stake.poolDetails.totalSwaps'
   | 'stake.poolDetails.totalStakers'
   | 'stake.poolDetails.returnToDate'
+  | 'stake.pool.noStakes'
   | 'stake.wallet.add'
   | 'stake.wallet.connect'
 

@@ -4,6 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { assetAmount, assetFromString, assetToBase, baseAmount, bnOrZero } from '@thorchain/asgardex-util'
 import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 
 import PoolShare from '../../../components/uielements/poolShare'
@@ -16,6 +17,9 @@ import * as Styled from './ShareView.styles'
 export const ShareView: React.FC = () => {
   const { asset: assetParam } = useParams<StakeRouteParams>()
   const { service: midgardService } = useMidgardContext()
+
+  const intl = useIntl()
+
   const stakeData = useObservableState(midgardService.stake.stakes$, RD.initial)
   const poolDetailedInfo = useObservableState(midgardService.pools.poolDetailedState$, RD.initial)
   const runePriceRatio = useObservableState(midgardService.pools.priceRatio$, ONE_BN)
@@ -25,7 +29,7 @@ export const ShareView: React.FC = () => {
   return pipe(
     RD.combine(stakeData, poolDetailedInfo),
     RD.fold(
-      () => <Styled.EmptyData description={"YOU DON'T HAVE ANY SHARES IN THIS POOL."} />,
+      () => <Styled.EmptyData description={intl.formatMessage({ id: 'stake.pool.noStakes' })} />,
       helpers.renderPending,
       (e) => <Styled.EmptyData description={e.message} />,
       ([stake, pool]) => {
