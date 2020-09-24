@@ -1,4 +1,4 @@
-import { AssetTicker, baseAmount } from '@thorchain/asgardex-util'
+import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, baseAmount } from '@thorchain/asgardex-util'
 import { some, none } from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -151,7 +151,7 @@ describe('services/wallet/util/', () => {
               asset: ASSETS_TESTNET.RUNE
             }
           ] as AssetsWithBalance,
-          [AssetTicker.BTC, AssetTicker.ETH, AssetTicker.RUNE, AssetTicker.BNB]
+          [AssetBTC.ticker, AssetETH.ticker, AssetRune67C.ticker, AssetBNB.ticker]
         )
       ).toEqual([
         {
