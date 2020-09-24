@@ -1,12 +1,10 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 
 import { AssetAmount, formatAssetAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
-import { getCurrencySymbolByAssetString } from '../../../helpers/assetHelper'
 import { abbreviateNumber } from '../../../helpers/numberHelper'
-import { PricePoolAsset } from '../../../views/pools/types'
 import PoolStatus from '../../uielements/poolStatus'
 import * as Styled from './PoolDetails.style'
 
@@ -23,7 +21,7 @@ type Props = {
   totalStakersTrend?: BigNumber
   // decimal value in percents
   returnToDate: string
-  basePriceAsset: PricePoolAsset
+  priceSymbol?: string
   isLoading?: boolean
 }
 
@@ -34,7 +32,7 @@ export const PoolDetails: React.FC<Props> = ({
   totalStakers,
   totalSwaps,
   returnToDate,
-  basePriceAsset,
+  priceSymbol = '',
   depthTrend,
   volume24hrTrend,
   allTimeVolumeTrend,
@@ -43,8 +41,6 @@ export const PoolDetails: React.FC<Props> = ({
   isLoading
 }) => {
   const intl = useIntl()
-
-  const priceSymbol = useMemo(() => getCurrencySymbolByAssetString(basePriceAsset), [basePriceAsset])
 
   return (
     <Styled.Container>

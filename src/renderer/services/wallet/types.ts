@@ -7,7 +7,7 @@ import { Observable } from 'rxjs'
 
 export type Phrase = string
 
-export type KeystoreContent = { phrase: Phrase }
+export type KeystoreContent = { phrase: Phrase; address: string }
 /**
  * Type for providing 3 states of keystore
  *

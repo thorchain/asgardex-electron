@@ -148,6 +148,8 @@ type StakeMessageKey =
   | 'stake.poolDetails.totalSwaps'
   | 'stake.poolDetails.totalStakers'
   | 'stake.poolDetails.returnToDate'
+  | 'stake.wallet.add'
+  | 'stake.wallet.connect'
 
 export type StakeMessages = { [key in StakeMessageKey]: string }
 

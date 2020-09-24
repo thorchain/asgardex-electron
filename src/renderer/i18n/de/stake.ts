@@ -12,7 +12,9 @@ const stake: StakeMessages = {
   'stake.poolDetails.allTimeVal': 'Gesamtzeit Volumen',
   'stake.poolDetails.totalSwaps': 'Gesamtanzahl Swaps',
   'stake.poolDetails.totalStakers': 'Gesamtanzahl Stakers',
-  'stake.poolDetails.returnToDate': 'Ertrag bis heute'
+  'stake.poolDetails.returnToDate': 'Ertrag bis heute',
+  'stake.wallet.add': 'Add wallet - DE',
+  'stake.wallet.connect': 'Please connect your wallet - DE'
 }
 
 export default stake

@@ -2,15 +2,17 @@ import React, { useMemo } from 'react'
 
 import { useIntl } from 'react-intl'
 
+import { AddWallet } from './AddWallet'
 import * as Styled from './Stake.styles'
 
 type Props = {
-  shareContent: React.ReactNode
-  topContent: React.ReactNode
+  ShareContent: React.ComponentType
+  TopContent: React.ComponentType
   AddStake: React.ComponentType
+  hasWallet?: boolean
 }
 
-export const Stake: React.FC<Props> = ({ shareContent, topContent, AddStake }) => {
+export const Stake: React.FC<Props> = ({ ShareContent, TopContent, AddStake, hasWallet }) => {
   const intl = useIntl()
 
   const tabs = useMemo(
@@ -32,12 +34,22 @@ export const Stake: React.FC<Props> = ({ shareContent, topContent, AddStake }) =
 
   return (
     <Styled.Container>
-      <Styled.TopContainer>{topContent}</Styled.TopContainer>
+      <Styled.TopContainer>
+        <TopContent />{' '}
+      </Styled.TopContainer>
       <Styled.ContentContainer>
-        <Styled.TotalContainer>{shareContent}</Styled.TotalContainer>
-        <Styled.StakeContentContainer>
-          <Styled.Tabs tabs={tabs} centered={false} tabBarExtraContent={extra} />
-        </Styled.StakeContentContainer>
+        {hasWallet ? (
+          <>
+            <Styled.TotalContainer>
+              <ShareContent />
+            </Styled.TotalContainer>
+            <Styled.StakeContentContainer>
+              <Styled.Tabs tabs={tabs} centered={false} tabBarExtraContent={extra} />
+            </Styled.StakeContentContainer>
+          </>
+        ) : (
+          <AddWallet />
+        )}
       </Styled.ContentContainer>
     </Styled.Container>
   )

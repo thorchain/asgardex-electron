@@ -3,8 +3,6 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { baseAmount, baseToAsset, bn, bnOrZero } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
-import * as O from 'fp-ts/lib/Option'
-import { Option, some } from 'fp-ts/Option'
 import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -49,10 +47,7 @@ export const PoolDetailsView: React.FC<Props> = () => {
   const { service: midgardService } = useMidgardContext()
   const intl = useIntl()
 
-  const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
-    midgardService.pools.selectedPricePoolAsset$,
-    some(midgardService.pools.getDefaultRuneAsset())
-  )
+  const priceSymbol = useObservableState(midgardService.pools.selectedPricePoolAssetSymbol$)
 
   const priceRatio = useObservableState(midgardService.pools.priceRatio$, ONE_BN)
 
@@ -75,10 +70,7 @@ export const PoolDetailsView: React.FC<Props> = () => {
             totalSwaps={getTotalSwaps(data)}
             totalStakers={getTotalStakers(data)}
             returnToDate={getReturnToDate(data)}
-            basePriceAsset={pipe(
-              selectedPricePoolAsset,
-              O.getOrElse(() => midgardService.pools.getDefaultRuneAsset() as PricePoolAsset)
-            )}
+            priceSymbol={priceSymbol}
           />
         )
       }
