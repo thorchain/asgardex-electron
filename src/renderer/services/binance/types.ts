@@ -1,10 +1,14 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balances, BinanceClient, Transfer, Fees, TxPage } from '@thorchain/asgardex-binance'
+import { Balances, BinanceClient, Transfer, Fees, TxPage, WS } from '@thorchain/asgardex-binance'
 import { Asset, AssetAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
+import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
+import { LiveData } from '../../helpers/rx/liveData'
 import { ClientState } from '../types'
+import { ApiError } from '../wallet/types'
+import { SendTxParams } from './transaction'
 
 export type BalancesRD = RD.RemoteData<Error, Balances>
 
@@ -71,4 +75,14 @@ export type TransferFeesRD = RD.RemoteData<Error, TransferFees>
 export type LoadTxsProps = {
   limit: number
   offset: number
+}
+
+export type TxWithState = { txHash: string; state: O.Option<WS.Transfer> }
+export type TxWithStateRD = RD.RemoteData<ApiError, TxWithState>
+
+export type TransactionService = {
+  txRD$: LiveData<ApiError, string>
+  txWithState$: LiveData<ApiError, TxWithState>
+  pushTx: (p: SendTxParams) => Rx.Subscription
+  resetTx: () => void
 }

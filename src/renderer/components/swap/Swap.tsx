@@ -1,8 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Transfer } from '@thorchain/asgardex-binance'
-import { Transfer as TransferWs } from '@thorchain/asgardex-binance/lib/types/binance-ws'
 import {
   Asset,
   assetAmount,
@@ -27,10 +25,10 @@ import { useHistory } from 'react-router'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getAssetWBByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
-import { AssetsWithPrice } from '../../services/binance/types'
+import { AssetsWithPrice, TxWithStateRD } from '../../services/binance/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
-import { AssetWithBalance, NonEmptyAssetsWithBalance } from '../../services/wallet/types'
+import { ApiError, AssetWithBalance, NonEmptyAssetsWithBalance } from '../../services/wallet/types'
 import { TxStatus, TxTypes } from '../../types/asgardex'
 import { RUNEAsset } from '../../views/pools/types'
 import { PricePool } from '../../views/pools/types'
@@ -52,7 +50,7 @@ type SwapProps = {
   onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
   poolDetails?: PoolDetails
   assetsWB?: O.Option<NonEmptyAssetsWithBalance>
-  txWithState?: RD.RemoteData<Error, { tx: Transfer; state: O.Option<TransferWs> }>
+  txWithState?: TxWithStateRD
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
   runeAsset?: RUNEAsset
@@ -290,7 +288,7 @@ export const Swap = ({
         RD.fold(
           () => null,
           () => <Spin />,
-          (e) => (
+          (error: ApiError) => (
             <Modal
               closable
               visible
@@ -298,7 +296,7 @@ export const Swap = ({
               onOk={onSwapConfirmed}
               okText={intl.formatMessage({ id: 'common.retry' })}
               onCancel={resetTx}>
-              {e.message}
+              {error.msg}
             </Modal>
           ),
           (r) =>
@@ -352,11 +350,11 @@ export const Swap = ({
                   visible
                   onViewTxClick={(e) => {
                     e.preventDefault()
-                    goToTransaction && goToTransaction(r.tx.hash)
+                    goToTransaction && goToTransaction(r.txHash)
                   }}
                   txStatus={{
                     ...txStatus,
-                    hash: r.tx.hash
+                    hash: r.txHash
                   }}
                 />
               )),

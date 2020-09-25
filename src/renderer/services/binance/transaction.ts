@@ -4,16 +4,16 @@ import { WS } from '@thorchain/asgardex-binance'
 import { AssetAmount, Asset } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
-import { pipe } from 'fp-ts/pipeable'
+import * as FP from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
 import { map, startWith, switchMap } from 'rxjs/operators'
-import * as RxOperators from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
-import { liveData } from '../../helpers/rx/liveData'
+import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { getClient } from '../utils'
 import { ApiError, ErrorId, TxRD } from '../wallet/types'
-import { BinanceClientState$ } from './types'
+import { BinanceClientState$, TransactionService, TxWithState } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
@@ -54,22 +54,23 @@ const tx$ = ({
 const pushTx = (clientState$: BinanceClientState$) => ({ to, amount, asset, memo }: SendTxParams) =>
   tx$({ clientState$, to, amount, asset, memo }).subscribe(setTxRD)
 
+const txWithState$ = (wsTransfer$: Rx.Observable<O.Option<WS.Transfer>>): LiveData<ApiError, TxWithState> =>
+  FP.pipe(
+    Rx.combineLatest([txRD$, wsTransfer$]),
+    RxOp.map(([tx, state]) =>
+      FP.pipe(
+        tx,
+        RD.map((txHash) => ({ txHash, state }))
+      )
+    )
+  )
+
 export const createTransactionService = (
   client$: BinanceClientState$,
   wsTransfer$: Rx.Observable<O.Option<WS.Transfer>>
-) => ({
+): TransactionService => ({
   txRD$,
-  txWithState$: pipe(
-    Rx.combineLatest([txRD$, wsTransfer$]),
-
-    RxOperators.map(([tx, state]) =>
-      pipe(
-        tx,
-        RD.map((tx) => ({ tx, state }))
-      )
-    ),
-    RxOperators.catchError((e) => Rx.of(RD.failure(e)))
-  ),
+  txWithState$: txWithState$(wsTransfer$),
   pushTx: pushTx(client$),
   resetTx: () => setTxRD(RD.initial)
 })
