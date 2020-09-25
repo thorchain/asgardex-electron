@@ -3,13 +3,16 @@ import React, { useCallback, useMemo } from 'react'
 import { Asset, assetFromString, assetToString } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 
 import ErrorView from '../../../components/shared/error/ErrorView'
 import BackLink from '../../../components/uielements/backLink'
+import { useWalletContext } from '../../../contexts/WalletContext'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
+import { INITIAL_ASSETS_WB_STATE } from '../../../services/wallet/const'
 import SendViewBNB from './SendViewBNB'
 import SendViewBTC from './SendViewBTC'
 import SendViewETH from './SendViewETH'
@@ -20,6 +23,9 @@ const SendView: React.FC<Props> = (): JSX.Element => {
   const { asset } = useParams<SendParams>()
   const intl = useIntl()
   const oSelectedAsset = O.fromNullable(assetFromString(asset))
+
+  const { assetsWBState$ } = useWalletContext()
+  const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
 
   const renderAssetError = useMemo(
     () => (
@@ -42,9 +48,9 @@ const SendView: React.FC<Props> = (): JSX.Element => {
     (asset: Asset) => {
       switch (asset.chain) {
         case 'BNB':
-          return <SendViewBNB selectedAsset={asset} />
+          return <SendViewBNB selectedAsset={asset} assetsWB={assetsWB} />
         case 'BTC':
-          return <SendViewBTC />
+          return <SendViewBTC btcAsset={asset} assetsWB={assetsWB} />
         case 'ETH':
           return <SendViewETH />
         default:
@@ -60,7 +66,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [intl]
+    [assetsWB, intl]
   )
 
   return FP.pipe(

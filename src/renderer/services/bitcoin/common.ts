@@ -84,4 +84,16 @@ const address$: Observable<O.Option<string>> = client$.pipe(
   shareReplay(1)
 )
 
-export { client$, clientViewState$, address$ }
+/**
+ * Explorer url depending on selected network
+ *
+ * If a client is not available (e.g. by removing keystore), it returns `None`
+ *
+ */
+const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
+  map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
+  distinctUntilChanged(eqOString.equals),
+  shareReplay(1)
+)
+
+export { client$, clientViewState$, address$, explorerUrl$ }

@@ -3,7 +3,6 @@ import React, { useCallback, useMemo } from 'react'
 import { Address } from '@thorchain/asgardex-binance'
 import {
   assetToString,
-  Asset,
   formatAssetAmountCurrency,
   assetAmount,
   AssetAmount,
@@ -18,18 +17,19 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../const'
-import { isBnbAsset } from '../../../helpers/assetHelper'
-import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { trimZeros } from '../../../helpers/stringHelper'
-import { getBnbAmountFromBalances } from '../../../helpers/walletHelper'
-import { SendTxParams } from '../../../services/binance/transaction'
-import { AddressValidation } from '../../../services/binance/types'
-import { AssetsWithBalance, AssetWithBalance } from '../../../services/wallet/types'
-import { Input, InputBigNumber } from '../../uielements/input'
-import AccountSelector from './../AccountSelector'
-import * as Styled from './Form.style'
-import { validateTxAmountInput } from './util'
+import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
+import { isBnbAsset } from '../../../../helpers/assetHelper'
+import { sequenceTOption } from '../../../../helpers/fpHelpers'
+import { trimZeros } from '../../../../helpers/stringHelper'
+import { getBnbAmountFromBalances } from '../../../../helpers/walletHelper'
+import { SendTxParams } from '../../../../services/binance/transaction'
+import { AddressValidation } from '../../../../services/binance/types'
+import { AssetsWithBalance, AssetWithBalance } from '../../../../services/wallet/types'
+import { Input, InputBigNumber } from '../../../uielements/input'
+import AccountSelector from '../../AccountSelector'
+import * as Styled from '../Form.style'
+import { validateTxAmountInput } from '../util'
+import useChangeAssetHandler from './useChangeAssetHandler'
 
 export type FormValues = {
   recipient: Address
@@ -41,23 +41,16 @@ type Props = {
   assetsWB: AssetsWithBalance
   assetWB: AssetWithBalance
   onSubmit: ({ to, amount, asset, memo }: SendTxParams) => void
-  changeAssetHandler: (asset: Asset) => void
-  isLoading: boolean
+  isLoading?: boolean
   addressValidation: AddressValidation
-  oFee: O.Option<AssetAmount>
+  fee: O.Option<AssetAmount>
 }
 
-export const SendForm: React.FC<Props> = (props): JSX.Element => {
-  const {
-    onSubmit: onSubmitProp,
-    changeAssetHandler,
-    assetsWB,
-    assetWB,
-    isLoading = false,
-    addressValidation,
-    oFee
-  } = props
+const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
+  const { onSubmit, assetsWB, assetWB, isLoading = false, addressValidation, fee: oFee } = props
   const intl = useIntl()
+
+  const changeAssetHandler = useChangeAssetHandler()
 
   const [form] = Form.useForm<FormValues>()
 
@@ -155,11 +148,11 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     [assetWB, oFee, intl, oBnbAmount]
   )
 
-  const onSubmit = useCallback(
+  const onFinishHandler = useCallback(
     ({ amount, recipient, memo }: FormValues) => {
-      onSubmitProp({ to: recipient, amount: assetAmount(amount), asset: assetWB.asset, memo })
+      onSubmit({ to: recipient, amount: assetAmount(amount), asset: assetWB.asset, memo })
     },
-    [onSubmitProp, assetWB]
+    [onSubmit, assetWB]
   )
 
   return (
@@ -170,7 +163,7 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
         <Form
           form={form}
           initialValues={{ amount: bn(0) }}
-          onFinish={onSubmit}
+          onFinish={onFinishHandler}
           labelCol={{ span: 24 }}
           style={{ padding: '30px' }}>
           <Styled.SubForm>
@@ -207,3 +200,5 @@ export const SendForm: React.FC<Props> = (props): JSX.Element => {
     </Row>
   )
 }
+
+export default SendFormBNB

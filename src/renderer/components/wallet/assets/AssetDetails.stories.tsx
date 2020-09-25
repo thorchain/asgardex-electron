@@ -4,11 +4,11 @@ import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import * as O from 'fp-ts/lib/Option'
 
-import { WALLET_ADDRESS_TESTNET } from '../../../../shared/mock/address'
+import { BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
 import { ASSETS_TESTNET } from '../../../../shared/mock/assets'
 import AssetDetails from './AssetDetails'
 
-const address = O.some(WALLET_ADDRESS_TESTNET)
+const address = O.some(BNB_ADDRESS_TESTNET)
 
 storiesOf('Wallet/AssetsDetails', module)
   .add('BNB', () => {

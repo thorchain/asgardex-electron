@@ -56,7 +56,7 @@ describe('helpers/fp/eq', () => {
     it('is not equal with different msg', () => {
       const b: ApiError = {
         ...a,
-        errorId: ErrorId.GET_ADDRESS
+        errorId: ErrorId.SEND_TX
       }
       expect(eqApiError.equals(a, b)).toBeFalsy()
     })

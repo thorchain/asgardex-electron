@@ -183,6 +183,8 @@ const clientState$: BinanceClientState$ = Rx.combineLatest([keystoreService.keys
 
 const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(map(getClient), shareReplay(1))
 
+export type Client$ = typeof client$
+
 /**
  * Helper stream to provide "ready-to-go" state of latest `BinanceClient`, but w/o exposing the client
  * It's needed by views only.
@@ -211,7 +213,7 @@ const loadBalances$ = (client: BinanceClient): Observable<AssetsWithBalanceRD> =
   Rx.from(client.getBalance()).pipe(
     mergeMap((balances) => Rx.of(RD.success(getWalletBalances(balances)))),
     catchError((error: Error) =>
-      Rx.of(RD.failure({ chainId: 'BNB', errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
+      Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
     ),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
@@ -297,11 +299,11 @@ const { get$: loadSelectedAssetTxs$, set: loadTxsSelectedAsset } = observableSta
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest(
+const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest([
   client$,
   loadSelectedAssetTxs$.pipe(debounceTime(300)),
   selectedAsset$
-).pipe(
+]).pipe(
   switchMap(([client, { limit, offset }, oAsset]) => {
     return FP.pipe(
       // client and asset has to be available

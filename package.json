@@ -56,7 +56,7 @@
     "@devexperts/utils": "^1.0.0-alpha.14",
     "@openapitools/openapi-generator-cli": "^1.0.15-4.3.1",
     "@thorchain/asgardex-binance": "^3.0.1",
-    "@thorchain/asgardex-bitcoin": "https://gitlab.com/thorchain/asgardex-common/asgardex-bitcoin.git#64668af0d5fbe4881a8357f5861fc5d0cb13379f",
+    "@thorchain/asgardex-bitcoin": "https://gitlab.com/thorchain/asgardex-common/asgardex-bitcoin.git#f7b986922d69f241aba07f6db85942410a22a678",
     "@thorchain/asgardex-crypto": "https://gitlab.com/thorchain/asgardex-common/asgardex-crypto.git",
     "@thorchain/asgardex-ethereum": "https://gitlab.com/thorchain/asgardex-common/asgardex-ethereum.git#4e05ab6ff0e9e9f80268f0916dce46270721c2d4",
     "@thorchain/asgardex-midgard": "^1.0.0",

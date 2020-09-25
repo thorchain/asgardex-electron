@@ -5,6 +5,8 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
+import { LiveData } from '../../helpers/rx/liveData'
+
 export type Phrase = string
 
 export type KeystoreContent = { phrase: Phrase }
@@ -55,7 +57,7 @@ export type AssetsWithBalanceState = {
 
 export enum ErrorId {
   GET_BALANCES,
-  GET_ADDRESS
+  SEND_TX
 }
 
 export type ApiError = {
@@ -64,3 +66,7 @@ export type ApiError = {
 }
 
 export type NonEmptyApiErrors = NonEmptyArray<ApiError>
+
+/* RD/LD for sending transactions on different chains */
+export type TxRD = RD.RemoteData<ApiError, string>
+export type TxLD = LiveData<ApiError, string>
