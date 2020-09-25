@@ -8,8 +8,9 @@ import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 
 import Send from '../../../components/wallet/txs/send/Send'
-import { SendFormBNB } from '../../../components/wallet/txs/send/SendFormBNB'
+import SendFormBNB from '../../../components/wallet/txs/send/SendFormBNB'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getAssetWBByAsset } from '../../../helpers/walletHelper'
 import { useSingleTxFee } from '../../../hooks/useSingleTxFee'
 import { AddressValidation } from '../../../services/binance/types'
@@ -29,21 +30,27 @@ const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
 
   const { txRD$, resetTx, pushTx } = transactionService
   const txRD = useObservableState<TxRD>(txRD$, RD.initial)
-  const explorerUrl = useObservableState(explorerUrl$, O.none)
-  const client = useObservableState<O.Option<BinanceClient>>(client$, O.none)
+  const oExplorerUrl = useObservableState(explorerUrl$, O.none)
+  const oClient = useObservableState<O.Option<BinanceClient>>(client$, O.none)
 
   const fee = useSingleTxFee(transferFees$)
 
+  /**
+   * Address validation provided by BinanceClient
+   */
   const addressValidation = useMemo(
     () =>
       FP.pipe(
-        client,
-        O.map((c) => c.validateAddress),
+        oClient,
+        O.map((client) => client.validateAddress),
         O.getOrElse((): AddressValidation => (_: string) => true)
       ),
-    [client]
+    [oClient]
   )
 
+  /**
+   * Custom send form used by BNB chain only
+   */
   const sendForm = useCallback(
     (selectedAsset: AssetWithBalance) => (
       <SendFormBNB
@@ -62,17 +69,21 @@ const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
   )
 
   return FP.pipe(
-    oSelectedAssetWB,
+    sequenceTOption(oSelectedAssetWB, oExplorerUrl),
     O.fold(
       () => <></>,
-      (selectedAssetWB) => (
-        <Send
-          transactionService={transactionService}
-          explorerUrl={explorerUrl}
-          resetTx={resetTx}
-          form={sendForm(selectedAssetWB)}
-        />
-      )
+      ([selectedAssetWB, explorerUrl]) => {
+        const successActionHandler = (txHash: string) => window.apiUrl.openExternal(`${explorerUrl}/${txHash}`)
+        return (
+          <Send
+            txRD={txRD}
+            successActionHandler={successActionHandler}
+            inititalActionHandler={resetTx}
+            errorActionHandler={resetTx}
+            sendForm={sendForm(selectedAssetWB)}
+          />
+        )
+      }
     )
   )
 }

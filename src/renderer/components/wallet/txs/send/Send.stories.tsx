@@ -2,124 +2,36 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
-import * as O from 'fp-ts/lib/Option'
-import { EMPTY, Observable, of } from 'rxjs'
 
-import { ASSETS_MAINNET } from '../../../../../../shared/mock/assets'
-import { TRANSFER_FEES } from '../../../../../../shared/mock/fees'
-import { AddressValidation } from '../../../../../services/binance/types'
-import { AssetWithBalance, AssetsWithBalance, TxRD } from '../../../../../services/wallet/types'
-import Send from './SendBNB'
+import { ApiError, ErrorId } from '../../../../services/wallet/types'
+import Send from './Send'
 
-// eslint-disable-next-line
-const createServiceProp = (value: Observable<TxRD>) => ({
-  txRD$: value,
-  txWithState$: EMPTY,
-  pushTx: () => of(RD.initial).subscribe(),
-  resetTx: () => null
-})
-
-const bnbAsset: AssetWithBalance = {
-  asset: ASSETS_MAINNET.BNB,
-  amount: assetToBase(assetAmount(1)),
-  frozenAmount: O.none
-}
-
-const runeAsset: AssetWithBalance = {
-  asset: ASSETS_MAINNET.RUNE,
-  amount: assetToBase(assetAmount(2)),
-  frozenAmount: O.none
-}
-
-const balances: AssetsWithBalance = [bnbAsset, runeAsset]
-const explorerUrl = O.none
-const fee = O.some(TRANSFER_FEES.single)
-
-const addressValidation: AddressValidation = (_) => true
+const sendForm: JSX.Element = <h1>Send Form</h1>
 
 storiesOf('Wallet/Send', module)
-  .add('send bnb', () => {
+  .add('initial', () => {
     return (
-      <Send
-        selectedAsset={bnbAsset}
-        assetsWB={balances}
-        transactionService={createServiceProp(EMPTY)}
-        explorerUrl={explorerUrl}
-        addressValidation={addressValidation}
-        fee={fee}
-      />
+      <Send txRD={RD.initial} sendForm={sendForm} inititalActionHandler={() => console.log('initial action handler')} />
     )
   })
-  .add('send rune', () => {
-    return (
-      <Send
-        selectedAsset={runeAsset}
-        assetsWB={balances}
-        transactionService={createServiceProp(EMPTY)}
-        explorerUrl={explorerUrl}
-        addressValidation={addressValidation}
-        fee={fee}
-      />
-    )
+  .add('progress', () => {
+    return <Send txRD={RD.pending} sendForm={<h1>Send Form pending</h1>} />
   })
-  .add('pending', () => {
+  .add('send error', () => {
     return (
       <Send
-        selectedAsset={bnbAsset}
-        assetsWB={balances}
-        transactionService={createServiceProp(of(RD.pending))}
-        explorerUrl={explorerUrl}
-        addressValidation={addressValidation}
-        fee={fee}
-      />
-    )
-  })
-  .add('error', () => {
-    return (
-      <Send
-        selectedAsset={bnbAsset}
-        assetsWB={balances}
-        transactionService={createServiceProp(of(RD.failure(Error('error example'))))}
-        explorerUrl={explorerUrl}
-        addressValidation={addressValidation}
-        fee={fee}
+        txRD={RD.failure({ errorId: ErrorId.SEND_TX, msg: 'Sending tx failed' } as ApiError)}
+        sendForm={sendForm}
+        errorActionHandler={() => console.log('error action handler')}
       />
     )
   })
   .add('success', () => {
     return (
       <Send
-        selectedAsset={bnbAsset}
-        assetsWB={balances}
-        addressValidation={addressValidation}
-        transactionService={createServiceProp(of(RD.success('ABC123')))}
-        explorerUrl={explorerUrl}
-        fee={fee}
-      />
-    )
-  })
-  .add('no fees', () => {
-    return (
-      <Send
-        selectedAsset={bnbAsset}
-        assetsWB={balances}
-        transactionService={createServiceProp(EMPTY)}
-        explorerUrl={explorerUrl}
-        addressValidation={addressValidation}
-        fee={O.none}
-      />
-    )
-  })
-  .add('bnb amount < fees', () => {
-    return (
-      <Send
-        selectedAsset={bnbAsset}
-        assetsWB={balances}
-        transactionService={createServiceProp(EMPTY)}
-        explorerUrl={explorerUrl}
-        addressValidation={addressValidation}
-        fee={O.some(assetAmount(1.23))}
+        txRD={RD.success('0xabc123')}
+        sendForm={sendForm}
+        successActionHandler={(hash: string) => console.log(`success action handler: ${hash}`)}
       />
     )
   })

@@ -41,13 +41,13 @@ type Props = {
   assetsWB: AssetsWithBalance
   assetWB: AssetWithBalance
   onSubmit: ({ to, amount, asset, memo }: SendTxParams) => void
-  isLoading: boolean
+  isLoading?: boolean
   addressValidation: AddressValidation
-  oFee: O.Option<AssetAmount>
+  fee: O.Option<AssetAmount>
 }
 
-export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit: onSubmitProp, assetsWB, assetWB, isLoading = false, addressValidation, oFee } = props
+const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
+  const { onSubmit, assetsWB, assetWB, isLoading = false, addressValidation, fee: oFee } = props
   const intl = useIntl()
 
   const changeAssetHandler = useChangeAssetHandler()
@@ -148,11 +148,11 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     [assetWB, oFee, intl, oBnbAmount]
   )
 
-  const onSubmit = useCallback(
+  const onFinishHandler = useCallback(
     ({ amount, recipient, memo }: FormValues) => {
-      onSubmitProp({ to: recipient, amount: assetAmount(amount), asset: assetWB.asset, memo })
+      onSubmit({ to: recipient, amount: assetAmount(amount), asset: assetWB.asset, memo })
     },
-    [onSubmitProp, assetWB]
+    [onSubmit, assetWB]
   )
 
   return (
@@ -163,7 +163,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
         <Form
           form={form}
           initialValues={{ amount: bn(0) }}
-          onFinish={onSubmit}
+          onFinish={onFinishHandler}
           labelCol={{ span: 24 }}
           style={{ padding: '30px' }}>
           <Styled.SubForm>
@@ -200,3 +200,5 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     </Row>
   )
 }
+
+export default SendFormBNB
