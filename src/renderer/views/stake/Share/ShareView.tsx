@@ -1,7 +1,7 @@
 import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetAmount, assetFromString, assetToBase, baseAmount, bnOrZero } from '@thorchain/asgardex-util'
+import { assetFromString, baseAmount, bnOrZero } from '@thorchain/asgardex-util'
 import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -43,14 +43,10 @@ export const ShareView: React.FC = () => {
             source="RUNE"
             target={asset?.chain || ''}
             poolShare={helpers.getPoolShare(stake, pool)}
-            assetEarnedAmount={assetToBase(assetAmount(200))}
-            assetEarnedPrice={assetToBase(assetAmount(300))}
             assetStakedShare={assetStakedShare}
             basePriceAsset={priceSymbol}
             loading={false}
             assetStakedPrice={helpers.getAssetSharePrice(assetShare, bnOrZero(pool.price), runePriceRatio)}
-            runeEarnedAmount={assetToBase(assetAmount(200))}
-            runeEarnedPrice={assetToBase(assetAmount(300))}
             runeStakedPrice={runeStakedPrice}
             runeStakedShare={runeStakedShare}
           />

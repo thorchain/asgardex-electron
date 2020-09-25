@@ -12,14 +12,10 @@ export const renderPending = () => (
     source=""
     target=""
     poolShare={bn(0)}
-    assetEarnedAmount={assetToBase(assetAmount(0))}
-    assetEarnedPrice={assetToBase(assetAmount(0))}
     assetStakedPrice={assetToBase(assetAmount(0))}
     assetStakedShare={assetToBase(assetAmount(0))}
     basePriceAsset=""
     loading={true}
-    runeEarnedAmount={assetToBase(assetAmount(0))}
-    runeEarnedPrice={assetToBase(assetAmount(0))}
     runeStakedPrice={assetToBase(assetAmount(0))}
     runeStakedShare={assetToBase(assetAmount(0))}
   />
