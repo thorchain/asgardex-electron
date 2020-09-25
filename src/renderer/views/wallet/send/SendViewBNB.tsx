@@ -62,7 +62,7 @@ const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
-        oFee={fee}
+        fee={fee}
       />
     ),
     [pushTx, assetsWB, txRD, addressValidation, fee]
