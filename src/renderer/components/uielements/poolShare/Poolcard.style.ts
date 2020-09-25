@@ -1,4 +1,5 @@
 import { Col, Row } from 'antd'
+import { ColProps } from 'antd/lib/grid'
 import styled from 'styled-components'
 import { font, key, palette } from 'styled-theme'
 
@@ -41,7 +42,17 @@ export const DetailsWrapper = styled('div')<DetailsWrapperProps>`
   }
 `
 
-export const ValuesWrapper = styled(Col)`
+export const ValuesWrapper = styled(Col)<
+  ColProps & {
+    /**
+     * Store value as string as A.Col passes ...rest props as is.
+     * In this case there is a DOM validation errors in a console
+     */
+    loading?: string
+  }
+>`
+  width: ${({ loading }) => (loading === 'true' ? '100%' : 'auto')};
+  display: ${({ loading }) => (loading === 'true' ? 'flex' : 'initial')};
   padding-top: 20px;
   padding-bottom: 20px;
   .label-wrapper {

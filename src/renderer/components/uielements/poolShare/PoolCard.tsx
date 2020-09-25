@@ -49,7 +49,7 @@ export const PoolCard: React.FC<PoolCardProps> = ({
           </Styled.PoolCardRow>
         </Styled.DetailsWrapper>
         <Styled.PoolCardRow justify="space-around">
-          <Styled.ValuesWrapper>
+          <Styled.ValuesWrapper loading={`${loading}`}>
             <Label align="center" loading={loading} color="dark">
               {formatAssetAmount(baseToAsset(runeAmount))}
             </Label>
@@ -57,7 +57,7 @@ export const PoolCard: React.FC<PoolCardProps> = ({
               {`${basePriceAsset} ${formatAssetAmount(baseToAsset(runePrice))}`}
             </Label>
           </Styled.ValuesWrapper>
-          <Styled.ValuesWrapper>
+          <Styled.ValuesWrapper loading={`${loading}`}>
             <Label align="center" loading={loading} color="dark">
               {formatAssetAmount(baseToAsset(assetAmount))}
             </Label>

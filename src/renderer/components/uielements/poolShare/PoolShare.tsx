@@ -17,10 +17,6 @@ type Props = {
   basePriceAsset: string
   assetStakedShare: BaseAmount
   assetStakedPrice: BaseAmount
-  assetEarnedAmount: BaseAmount
-  assetEarnedPrice: BaseAmount
-  runeEarnedAmount: BaseAmount
-  runeEarnedPrice: BaseAmount
   poolShare: BigNumber
 }
 
@@ -34,10 +30,6 @@ const PoolShare: React.FC<Props> = (props: Props): JSX.Element => {
     target,
     assetStakedShare,
     assetStakedPrice,
-    assetEarnedAmount,
-    assetEarnedPrice,
-    runeEarnedAmount,
-    runeEarnedPrice,
     poolShare
   } = props
 
@@ -63,19 +55,6 @@ const PoolShare: React.FC<Props> = (props: Props): JSX.Element => {
           <Styled.SharePercent loading={loading}>{poolShare ? `${formatBN(poolShare)}%` : '...'}</Styled.SharePercent>
         </div>
       </PoolCard>
-
-      <PoolCard
-        title={intl.formatMessage({ id: 'stake.totalEarnings' })}
-        loading={loading}
-        source={source}
-        target={target}
-        runeAmount={runeEarnedAmount}
-        runePrice={runeEarnedPrice}
-        assetAmount={assetEarnedAmount}
-        assetPrice={assetEarnedPrice}
-        basePriceAsset={basePriceAsset}
-        gradient={0}
-      />
     </Styled.PoolShareWrapper>
   )
 }

@@ -11,6 +11,7 @@ import { combineLatest } from 'rxjs'
 import { catchError, map, retry, shareReplay, startWith, switchMap, filter } from 'rxjs/operators'
 
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
+import { getCurrencySymbolByAssetString } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
@@ -161,7 +162,9 @@ const createPoolsService = (
         A.head,
         liveData.fromOption(() => Error('Empty response'))
       )
-    )
+    ),
+    startWith(RD.pending),
+    shareReplay(1)
   )
 
   const {
@@ -177,6 +180,19 @@ const createPoolsService = (
     localStorage.setItem(PRICE_POOL_KEY, asset)
     updateSelectedPricePoolAsset(some(asset))
   }
+
+  /**
+   * Selected currency symbol
+   */
+  const selectedPricePoolAssetSymbol$ = FP.pipe(
+    selectedPricePoolAsset$,
+    map(
+      FP.flow(
+        O.map(getCurrencySymbolByAssetString),
+        O.getOrElse(() => '')
+      )
+    )
+  )
 
   const poolAddresses$ = pipe(
     byzantine$,
@@ -214,6 +230,7 @@ const createPoolsService = (
     poolsState$,
     setSelectedPricePool: setSelectedPricePoolAsset,
     selectedPricePoolAsset$,
+    selectedPricePoolAssetSymbol$,
     reloadPoolsState,
     poolAddresses$,
     runeAsset$,

@@ -13,6 +13,7 @@ import { network$ } from '../app/service'
 import { Network } from '../app/types'
 import { MIDGARD_MAX_RETRY } from '../const'
 import { createPoolsService } from './pools'
+import { createStakeService } from './stake'
 import { NetworkInfoRD, ThorchainLastblockRD, ThorchainConstantsRD } from './types'
 
 const BYZANTINE_MAX_RETRY = 5
@@ -147,5 +148,6 @@ export const service = {
   thorchainLastblockState$,
   reloadThorchainLastblock,
   apiEndpoint$: byzantine$,
-  pools: createPoolsService(byzantine$, getMidgardDefaultApi)
+  pools: createPoolsService(byzantine$, getMidgardDefaultApi),
+  stake: createStakeService(byzantine$, getMidgardDefaultApi)
 }
