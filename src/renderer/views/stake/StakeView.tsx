@@ -55,7 +55,13 @@ const StakeView: React.FC<Props> = (_) => {
   return (
     <>
       <BackLink />
-      <Stake hasWallet={hasWallet} TopContent={PoolDetailsView} ShareContent={ShareView} AddStake={AddStakeStory} />
+      <Stake
+        asset={asset}
+        hasWallet={hasWallet}
+        TopContent={PoolDetailsView}
+        ShareContent={ShareView}
+        AddStake={AddStakeStory}
+      />
     </>
   )
 }

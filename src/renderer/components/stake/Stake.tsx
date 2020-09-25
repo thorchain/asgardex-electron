@@ -1,18 +1,20 @@
 import React, { useMemo } from 'react'
 
+import { Asset } from '@thorchain/asgardex-util'
 import { useIntl } from 'react-intl'
 
 import { AddWallet } from './AddWallet'
 import * as Styled from './Stake.styles'
 
 type Props = {
-  ShareContent: React.ComponentType
+  asset: Asset
+  ShareContent: React.ComponentType<{ asset: Asset }>
   TopContent: React.ComponentType
   AddStake: React.ComponentType
   hasWallet?: boolean
 }
 
-export const Stake: React.FC<Props> = ({ ShareContent, TopContent, AddStake, hasWallet }) => {
+export const Stake: React.FC<Props> = ({ ShareContent, TopContent, AddStake, hasWallet, asset }) => {
   const intl = useIntl()
 
   const tabs = useMemo(
@@ -41,7 +43,7 @@ export const Stake: React.FC<Props> = ({ ShareContent, TopContent, AddStake, has
         {hasWallet ? (
           <>
             <Styled.TotalContainer>
-              <ShareContent />
+              <ShareContent asset={asset} />
             </Styled.TotalContainer>
             <Styled.StakeContentContainer>
               <Styled.Tabs tabs={tabs} centered={false} tabBarExtraContent={extra} />
