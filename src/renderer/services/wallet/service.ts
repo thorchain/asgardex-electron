@@ -18,7 +18,7 @@ const addKeystore = async (phrase: Phrase, password: string) => {
     await keystoreService.removeKeystore()
     const keystore: CryptoKeystore = await encryptToKeyStore(phrase, password)
     await window.apiKeystore.save(keystore)
-    setKeystoreState(some(some({ phrase, address: keystore.address })))
+    setKeystoreState(some(some({ phrase })))
     return Promise.resolve()
   } catch (error) {
     return Promise.reject(error)
@@ -48,7 +48,7 @@ const addPhrase = async (state: KeystoreState, password: string) => {
   try {
     const keystore: CryptoKeystore = await window.apiKeystore.get()
     const phrase = await decryptFromKeystore(keystore, password)
-    setKeystoreState(some(some({ phrase, address: keystore.address })))
+    setKeystoreState(some(some({ phrase })))
     return Promise.resolve()
   } catch (error) {
     // TODO(@Veado) i18m

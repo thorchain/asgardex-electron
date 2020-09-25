@@ -32,7 +32,7 @@ const StakeView: React.FC<Props> = (_) => {
 
   const keystore = useObservableState(keystoreService.keystore$, O.none)
 
-  const hasWallet = useMemo(() => pipe(keystore, isLocked), [keystore])
+  const hasWallet = useMemo(() => !pipe(keystore, isLocked), [keystore])
 
   const asset = assetFromString(assetParam.toUpperCase())
 
