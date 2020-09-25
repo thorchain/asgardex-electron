@@ -9,11 +9,11 @@ import * as Rx from 'rxjs'
 import { map, startWith, switchMap } from 'rxjs/operators'
 import * as RxOp from 'rxjs/operators'
 
-import { LiveData, liveData } from '../../helpers/rx/liveData'
+import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { getClient } from '../utils'
 import { ApiError, ErrorId, TxRD } from '../wallet/types'
-import { BinanceClientState$, TransactionService, TxWithState } from './types'
+import { BinanceClientState$, TransactionService, TxWithStateLD } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
@@ -54,7 +54,7 @@ const tx$ = ({
 const pushTx = (clientState$: BinanceClientState$) => ({ to, amount, asset, memo }: SendTxParams) =>
   tx$({ clientState$, to, amount, asset, memo }).subscribe(setTxRD)
 
-const txWithState$ = (wsTransfer$: Rx.Observable<O.Option<WS.Transfer>>): LiveData<ApiError, TxWithState> =>
+const txWithState$ = (wsTransfer$: Rx.Observable<O.Option<WS.Transfer>>): TxWithStateLD =>
   FP.pipe(
     Rx.combineLatest([txRD$, wsTransfer$]),
     RxOp.map(([tx, state]) =>

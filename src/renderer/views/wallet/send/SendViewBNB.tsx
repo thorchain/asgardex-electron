@@ -73,7 +73,7 @@ const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     O.fold(
       () => <></>,
       ([selectedAssetWB, explorerUrl]) => {
-        const successActionHandler = (txHash: string) => window.apiUrl.openExternal(`${explorerUrl}/${txHash}`)
+        const successActionHandler = (txHash: string) => window.apiUrl.openExternal(`${explorerUrl}/tx/${txHash}`)
         return (
           <Send
             txRD={txRD}

@@ -50,7 +50,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
         case 'BNB':
           return <SendViewBNB selectedAsset={asset} assetsWB={assetsWB} />
         case 'BTC':
-          return <SendViewBTC selectedAsset={asset} assetsWB={assetsWB} />
+          return <SendViewBTC btcAsset={asset} assetsWB={assetsWB} />
         case 'ETH':
           return <SendViewETH />
         default:

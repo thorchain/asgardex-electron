@@ -5,6 +5,8 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
+import { LiveData } from '../../helpers/rx/liveData'
+
 export type Phrase = string
 
 export type KeystoreContent = { phrase: Phrase }
@@ -65,5 +67,6 @@ export type ApiError = {
 
 export type NonEmptyApiErrors = NonEmptyArray<ApiError>
 
-/* RD for sending transactions on different chains */
+/* RD/LD for sending transactions on different chains */
 export type TxRD = RD.RemoteData<ApiError, string>
+export type TxLD = LiveData<ApiError, string>

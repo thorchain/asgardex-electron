@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import { ClientState } from '../types'
-import { ApiError } from '../wallet/types'
+import { ApiError, TxLD } from '../wallet/types'
 import { SendTxParams } from './transaction'
 
 export type BalancesRD = RD.RemoteData<Error, Balances>
@@ -79,10 +79,11 @@ export type LoadTxsProps = {
 
 export type TxWithState = { txHash: string; state: O.Option<WS.Transfer> }
 export type TxWithStateRD = RD.RemoteData<ApiError, TxWithState>
+export type TxWithStateLD = LiveData<ApiError, TxWithState>
 
 export type TransactionService = {
-  txRD$: LiveData<ApiError, string>
-  txWithState$: LiveData<ApiError, TxWithState>
+  txRD$: TxLD
+  txWithState$: TxWithStateLD
   pushTx: (p: SendTxParams) => Rx.Subscription
   resetTx: () => void
 }

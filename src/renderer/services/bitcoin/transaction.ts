@@ -8,7 +8,7 @@ import { catchError, map, mergeMap, shareReplay, startWith, switchMap } from 'rx
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { ApiError, ErrorId, TxRD } from '../wallet/types'
 import { Client$ } from './common'
-import { FeesRD, SendTxParams } from './types'
+import { FeesLD, FeesRD, SendTxParams, TransactionService } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
@@ -46,7 +46,7 @@ const loadFees$ = (client: BitcoinClient, memo?: string): Rx.Observable<FeesRD> 
  * Transaction fees
  * If a client is not available, it returns `None`
  */
-const fees$ = (client$: Client$): Rx.Observable<FeesRD> =>
+const fees$ = (client$: Client$): FeesLD =>
   Rx.combineLatest([client$, reloadFees$]).pipe(
     mergeMap(([oClient, _]) =>
       FP.pipe(
@@ -57,11 +57,12 @@ const fees$ = (client$: Client$): Rx.Observable<FeesRD> =>
     shareReplay(1)
   )
 
-const createTransactionService = (client$: Client$) => ({
+const createTransactionService = (client$: Client$): TransactionService => ({
   txRD$,
   pushTx: pushTx(client$),
   fees$: fees$(client$),
-  reloadFees
+  reloadFees,
+  resetTx: () => setTxRD(RD.initial)
 })
 
 export { createTransactionService }
