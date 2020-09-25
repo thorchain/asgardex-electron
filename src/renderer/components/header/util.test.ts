@@ -1,29 +1,30 @@
+import { AssetBTC, AssetETH, AssetRune67C } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { AssetBUSDBAF, AssetBUSDBD1 } from '../../const'
 import { OnlineStatus } from '../../services/app/types'
-import { PoolAsset } from '../../views/pools/types'
 import { toHeaderCurrencyLabel, headerNetStatusSubheadline, headerNetStatusColor } from './util'
 
 describe('header/util', () => {
   describe('toHeaderCurrencyItem', () => {
     it('returns label for RUNE', () => {
-      const result = toHeaderCurrencyLabel(PoolAsset.RUNE67C)
+      const result = toHeaderCurrencyLabel(AssetRune67C)
       expect(result).toEqual('ᚱ RUNE')
     })
 
     it('returns label for BTC', () => {
-      const result = toHeaderCurrencyLabel(PoolAsset.BTC)
+      const result = toHeaderCurrencyLabel(AssetBTC)
       expect(result).toEqual('₿ BTC')
     })
 
     it('returns label for ETH', () => {
-      const result = toHeaderCurrencyLabel(PoolAsset.ETH)
+      const result = toHeaderCurrencyLabel(AssetETH)
       expect(result).toEqual('Ξ ETH')
     })
 
     it('returns label for TUSDB', () => {
-      expect(toHeaderCurrencyLabel(PoolAsset.BUSDBD1)).toEqual('$ USD')
-      expect(toHeaderCurrencyLabel(PoolAsset.BUSDBAF)).toEqual('$ USD')
+      expect(toHeaderCurrencyLabel(AssetBUSDBD1)).toEqual('$ USD')
+      expect(toHeaderCurrencyLabel(AssetBUSDBAF)).toEqual('$ USD')
     })
   })
 
@@ -54,18 +55,18 @@ describe('header/util', () => {
     })
 
     it('returns label for BTC', () => {
-      const result = toHeaderCurrencyLabel(PoolAsset.BTC)
+      const result = toHeaderCurrencyLabel(AssetBTC)
       expect(result).toEqual('₿ BTC')
     })
 
     it('returns label for ETH', () => {
-      const result = toHeaderCurrencyLabel(PoolAsset.ETH)
+      const result = toHeaderCurrencyLabel(AssetETH)
       expect(result).toEqual('Ξ ETH')
     })
 
     it('returns label for TUSDB', () => {
-      expect(toHeaderCurrencyLabel(PoolAsset.BUSDBAF)).toEqual('$ USD')
-      expect(toHeaderCurrencyLabel(PoolAsset.BUSDBD1)).toEqual('$ USD')
+      expect(toHeaderCurrencyLabel(AssetBUSDBAF)).toEqual('$ USD')
+      expect(toHeaderCurrencyLabel(AssetBUSDBD1)).toEqual('$ USD')
     })
   })
 

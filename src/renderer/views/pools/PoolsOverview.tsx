@@ -44,10 +44,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
   const { service: midgardService } = useMidgardContext()
   const poolsRD = useObservableState(midgardService.pools.poolsState$, RD.pending)
-  const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
-    midgardService.pools.selectedPricePoolAsset$,
-    some(midgardService.pools.getDefaultRuneAsset() as PricePoolAsset)
-  )
+  const selectedPricePoolAsset = useObservableState<PricePoolAsset>(midgardService.pools.selectedPricePoolAsset$)
   const thorchainLastblockRD = useObservableState(midgardService.thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(midgardService.thorchainConstantsState$, RD.pending)
 

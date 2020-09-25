@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
-import { Asset, AssetAmount, assetFromString, bnOrZero } from '@thorchain/asgardex-util'
+import { Asset, AssetAmount, assetFromString, AssetRune67C, bnOrZero } from '@thorchain/asgardex-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -22,6 +22,7 @@ import { getRunePricePool } from '../../const'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { eqAsset } from '../../helpers/fp/eq'
 import { rdFromOption } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
@@ -43,7 +44,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
 
-  const runeAsset = useObservableState(runeAsset$)
+  const runeAsset = useObservableState(runeAsset$, AssetRune67C)
 
   const runePricePool = useMemo(() => getRunePricePool(runeAsset), [runeAsset])
 
@@ -52,7 +53,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
       pipe(
         Rx.combineLatest([poolsState$, selectedPricePoolAsset$]),
         RxOperators.map(([poolsState, selectedPricePoolAsset]) =>
-          pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset)
+          pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset, runeAsset)
         )
       ),
     runePricePool
@@ -122,10 +123,10 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
                 .filter((a) => a.asset !== undefined && !!a.asset)
                 .map((a) => ({ asset: assetFromString(a.asset as string) as Asset, priceRune: bnOrZero(a.priceRune) }))
 
-              const hasRuneAsset = Boolean(availableAssets.find((asset) => asset.asset.symbol === runeAsset))
+              const hasRuneAsset = Boolean(availableAssets.find(({ asset }) => eqAsset.equals(asset, runeAsset)))
 
               if (!hasRuneAsset && runeAsset) {
-                availableAssets.unshift({ asset: assetFromString(runeAsset) as Asset, priceRune: bnOrZero(1) })
+                availableAssets.unshift({ asset: runeAsset, priceRune: bnOrZero(1) })
               }
 
               return (

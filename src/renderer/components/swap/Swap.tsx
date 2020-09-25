@@ -30,7 +30,6 @@ import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { ApiError, AssetWithBalance, NonEmptyAssetsWithBalance } from '../../services/wallet/types'
 import { TxStatus, TxTypes } from '../../types/asgardex'
-import { RUNEAsset } from '../../views/pools/types'
 import { PricePool } from '../../views/pools/types'
 import SwapModal from '../modal/swapModal'
 import { CalcResult } from '../modal/swapModal/types'
@@ -53,7 +52,7 @@ type SwapProps = {
   txWithState?: TxWithStateRD
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
-  runeAsset?: RUNEAsset
+  runeAsset: Asset
   activePricePool: PricePool
 }
 

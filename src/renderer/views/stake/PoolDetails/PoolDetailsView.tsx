@@ -7,12 +7,11 @@ import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import { PoolDetails } from '../../../components/stake/PoolDetails/PoolDetails'
+import { PoolDetails, Props as PoolDetailProps } from '../../../components/stake/PoolDetails/PoolDetails'
 import PoolStatus from '../../../components/uielements/poolStatus'
 import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../../const'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { PoolDetail } from '../../../types/generated/midgard/models'
-import { PoolAsset, PricePoolAsset } from '../../pools/types'
 
 const getDepth = (data: PoolDetail, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(priceRatio)))
@@ -29,14 +28,13 @@ const getTotalStakers = (data: PoolDetail) => Number(data.stakersCount || 0)
 
 const getReturnToDate = (data: PoolDetail) => (parseFloat(data.poolROI || '0') * 100).toFixed(2)
 
-const defaultDetailsProps = {
+const defaultDetailsProps: PoolDetailProps = {
   depth: ZERO_ASSET_AMOUNT,
   volume24hr: ZERO_ASSET_AMOUNT,
   allTimeVolume: ZERO_ASSET_AMOUNT,
   totalSwaps: 0,
   totalStakers: 0,
-  returnToDate: '',
-  basePriceAsset: PoolAsset.RUNE67C as PricePoolAsset
+  returnToDate: ''
 }
 
 const renderPendingView = () => <PoolDetails {...defaultDetailsProps} isLoading={true} />

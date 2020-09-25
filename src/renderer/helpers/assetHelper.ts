@@ -3,14 +3,13 @@ import {
   AssetBNB,
   AssetBTC,
   AssetETH,
-  assetFromString,
   AssetRune67C,
   AssetRuneB1A,
   AssetRuneNative,
   Chain
 } from '@thorchain/asgardex-util'
 
-import { CURRENCY_SYMBOLS } from '../const'
+import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
 import { Network } from '../services/app/types'
 import { eqAsset } from './fp/eq'
 
@@ -48,7 +47,7 @@ export const getRuneAsset = ({ network = 'testnet', chain = 'BNB' }: { network?:
  * Check whether an asset is a RUNE asset
  */
 export const isRuneAsset = (asset: Asset): boolean =>
-  eqAsset.equals(asset, AssetRune67C) || eqAsset.equals(asset, AssetRuneB1A) || eqAsset.equals(asset, AssetRuneNative)
+  eqAsset.equals(asset, AssetRune67C) || eqAsset.equals(asset, AssetRuneB1A)
 
 /**
  * Check whether an asset is a BNB asset
@@ -65,9 +64,8 @@ export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
  */
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
 
-export const getCurrencySymbolByAssetString = (asset: string) => {
-  if (asset in CURRENCY_SYMBOLS) {
-    return CURRENCY_SYMBOLS[asset as keyof typeof CURRENCY_SYMBOLS]
-  }
-  return assetFromString(asset)?.ticker || ''
-}
+/**
+ * Check whether an asset is a RUNE asset
+ */
+export const isBUSDAsset = (asset: Asset): boolean =>
+  eqAsset.equals(asset, AssetBUSDBAF) || eqAsset.equals(asset, AssetBUSDBD1)

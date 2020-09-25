@@ -1,14 +1,14 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, bnOrZero, baseAmount, PoolData } from '@thorchain/asgardex-util'
+import { assetFromString, bnOrZero, baseAmount, PoolData, Asset, assetToString } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import { head } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
-import { RUNE_PRICE_POOL, CURRENCY_WHEIGHTS, getRunePricePool } from '../../const'
+import { CURRENCY_WHEIGHTS, getRunePricePool } from '../../const'
+import { isBUSDAsset } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
 import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
-import { PricePoolAssets, PricePools, PricePoolAsset, PricePool, isBUSDAsset, RUNEAsset } from '../../views/pools/types'
-import { getDefaultRuneAsset } from './pools'
+import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/types'
 import { AssetDetails, AssetDetailMap, PoolDetails, PoolsStateRD, SelectedPricePoolAsset } from './types'
 
 export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} => {
@@ -36,24 +36,24 @@ export const getAssetDetail = (assets: AssetDetails, ticker: string): O.Option<A
     O.fromNullable
   )
 
-export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): PricePools => {
+export const getPricePools = (pools: PoolDetails, runeAsset: Asset, whitelist?: PricePoolAssets): PricePools => {
   const poolDetails = !whitelist
     ? pools
-    : pools.filter((detail) => whitelist.find((asset) => detail.asset && detail.asset === asset) !== undefined)
+    : pools.filter((detail) => whitelist.find((asset) => detail?.asset === assetToString(asset)))
 
   const pricePools = poolDetails
     .map((detail: PoolDetail) => {
       // Since we have filtered pools based on whitelist before ^,
       // we can type asset as `PricePoolAsset` now
-      const asset = (detail?.asset ?? '') as PricePoolAsset
+      const asset = assetFromString(detail?.asset ?? '') as PricePoolAsset
       return {
         asset,
         poolData: toPoolData(detail)
       } as PricePool
     })
     // sort by weights (high weight wins)
-    .sort((a, b) => CURRENCY_WHEIGHTS[b.asset] - CURRENCY_WHEIGHTS[a.asset])
-  return [RUNE_PRICE_POOL, ...pricePools]
+    .sort((a, b) => (CURRENCY_WHEIGHTS[assetToString(b.asset)] || 0) - (CURRENCY_WHEIGHTS[assetToString(a.asset)] || 0))
+  return [getRunePricePool(runeAsset), ...pricePools]
 }
 
 /**
@@ -78,10 +78,14 @@ export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolA
 /**
  * Similar to `pricePoolSelector`, but taking `PoolsStateRD` instead of `PoolsState`
  */
-export const pricePoolSelectorFromRD = (poolsRD: PoolsStateRD, selectedPricePoolAsset: SelectedPricePoolAsset) => {
+export const pricePoolSelectorFromRD = (
+  poolsRD: PoolsStateRD,
+  selectedPricePoolAsset: SelectedPricePoolAsset,
+  runeAsset: Asset
+) => {
   const pools = RD.toNullable(poolsRD)
   const pricePools = pools && O.toNullable(pools.pricePools)
-  return (pricePools && pricePoolSelector(pricePools, selectedPricePoolAsset)) || RUNE_PRICE_POOL
+  return (pricePools && pricePoolSelector(pricePools, selectedPricePoolAsset)) || getRunePricePool(runeAsset)
 }
 
 /**
@@ -102,10 +106,7 @@ export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<Po
  * Converts PoolDetails to the appropriate HashMap
  * Keys of the end HasMap is PoolDetails[i].asset
  */
-export const getPoolDetailsHashMap = (
-  poolDetails: PoolDetails,
-  runeAsset: RUNEAsset = getDefaultRuneAsset()
-): Record<string, PoolData> => {
+export const getPoolDetailsHashMap = (poolDetails: PoolDetails, runeAsset: Asset): Record<string, PoolData> => {
   const res = poolDetails.reduce((acc, cur) => {
     if (!cur.asset) {
       return acc
@@ -116,7 +117,7 @@ export const getPoolDetailsHashMap = (
 
   const runePricePool = getRunePricePool(runeAsset)
 
-  res[runeAsset] = {
+  res[assetToString(runeAsset)] = {
     ...runePricePool.poolData
   }
 

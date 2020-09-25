@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 
+import { assetToString } from '@thorchain/asgardex-util'
 import { Row, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 
@@ -39,7 +40,7 @@ const HeaderPriceSelector: React.FC<Props> = (props: Props): JSX.Element => {
       <Menu onClick={changeItem}>
         {assets.map((asset) => {
           return (
-            <HeaderDropdownMenuItem key={asset}>
+            <HeaderDropdownMenuItem key={assetToString(asset)}>
               <HeaderDropdownMenuItemText strong>{toHeaderCurrencyLabel(asset)}</HeaderDropdownMenuItemText>
             </HeaderDropdownMenuItem>
           )

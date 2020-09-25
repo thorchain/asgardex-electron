@@ -1,9 +1,17 @@
 import { Balances } from '@thorchain/asgardex-binance'
-import { Asset, assetToBase, assetAmount, PoolData, baseAmount, AssetBNB, AssetRune67C } from '@thorchain/asgardex-util'
+import {
+  Asset,
+  assetToBase,
+  assetAmount,
+  PoolData,
+  baseAmount,
+  AssetBNB,
+  AssetRune67C,
+  assetToString
+} from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { PoolAsset } from '../../views/pools/types'
 import { PoolDetails } from '../midgard/types'
 import { AssetWithBalance } from '../wallet/types'
 import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue, getWalletBalances } from './utils'
@@ -12,7 +20,7 @@ describe('services/binance/utils/', () => {
   describe('getPoolPriceValue', () => {
     const poolDetails: PoolDetails = [
       {
-        asset: PoolAsset.BNB,
+        asset: assetToString(AssetBNB),
         assetDepth: '1000000000',
         runeDepth: '10000000000'
       }

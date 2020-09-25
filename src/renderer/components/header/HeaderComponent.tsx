@@ -3,7 +3,6 @@ import React, { useMemo, useState, useCallback, useRef } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid } from 'antd'
 import * as O from 'fp-ts/lib/Option'
-import { Option, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useRouteMatch, Link } from 'react-router-dom'
@@ -20,10 +19,10 @@ import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.s
 import { useThemeContext } from '../../contexts/ThemeContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { PoolsStateRD, SelectedPricePoolAsset } from '../../services/midgard/types'
+import { PoolsStateRD } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked, hasImportedKeystore } from '../../services/wallet/util'
-import { PricePoolAsset, PricePoolAssets, PoolAsset } from '../../views/pools/types'
+import { PricePoolAsset, PricePoolAssets } from '../../views/pools/types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './HeaderComponent.style'
 import HeaderLang from './HeaderLang'
 import HeaderLock from './HeaderLock'
@@ -50,7 +49,7 @@ type Props = {
   lockHandler: () => void
   setSelectedPricePool: (asset: PricePoolAsset) => void
   poolsState$: Observable<PoolsStateRD>
-  selectedPricePoolAsset$: Observable<SelectedPricePoolAsset>
+  selectedPricePoolAsset$: Observable<PricePoolAsset>
   locale: Locale
   changeLocale?: (locale: Locale) => void
   midgardUrl: O.Option<string>
@@ -78,11 +77,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const theme = useObservableState(theme$)
 
   const poolsRD = useObservableState(poolsState$, RD.pending)
-  const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
-    selectedPricePoolAsset$,
-    // FIXME(@Veado) Depends on main/testnet - https://github.com/thorchain/asgardex-electron/issues/316
-    some(PoolAsset.RUNE67C)
-  )
+  const selectedPricePoolAsset = useObservableState<PricePoolAsset>(selectedPricePoolAsset$)
 
   // store previous data to render it while reloading new data
   const prevPricePoolAssets = useRef<PricePoolAssets>()
@@ -205,7 +200,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
       <HeaderPriceSelector
         disabled={!hasPricePools}
         isDesktopView={isDesktopView}
-        selectedAsset={O.toUndefined(selectedPricePoolAsset)}
+        selectedAsset={selectedPricePoolAsset}
         assets={pricePoolAssets}
         changeHandler={currencyChangeHandler}
       />
