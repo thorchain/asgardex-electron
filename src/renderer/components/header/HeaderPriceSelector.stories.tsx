@@ -3,6 +3,7 @@ import React from 'react'
 import { boolean } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import { AssetBTC, AssetETH, AssetRune67C } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { AssetBUSDBAF } from '../../const'
 import { PricePoolAssets, PricePoolAsset } from '../../views/pools/types'
@@ -18,7 +19,7 @@ storiesOf('Components/HeaderPriceSelector', module).add('desktop / mobile', () =
       assets={assets}
       isDesktopView={isDesktopView}
       changeHandler={changeHandler}
-      selectedAsset={AssetBUSDBAF}
+      selectedAsset={O.some(AssetBUSDBAF)}
     />
   )
 })

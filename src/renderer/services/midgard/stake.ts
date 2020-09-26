@@ -12,7 +12,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { DefaultApi } from '../../types/generated/midgard/apis'
-import { StakersAssetData } from '../../types/generated/midgard/models'
+import { StakersAssetDataLD } from './types'
 
 const createStakeService = (
   byzantine$: LiveData<Error, string>,
@@ -24,7 +24,7 @@ const createStakeService = (
 
   const { get$: poolAsset$, set: setPoolAsset } = observableState<O.Option<Asset>>(O.none)
 
-  const stakes$: LiveData<Error, StakersAssetData> = pipe(
+  const stakes$: StakersAssetDataLD = pipe(
     combineLatest([api$.pipe(map(RD.toOption)), address$, poolAsset$]),
     map(([api, address, asset]) => sequenceTOption(api, address, asset)),
     switchMap(

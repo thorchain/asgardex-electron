@@ -11,6 +11,7 @@ import {
 
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
 import { Network } from '../services/app/types'
+import { DEFAULT_NETWORK } from '../services/const'
 import { eqAsset } from './fp/eq'
 
 /**
@@ -43,6 +44,10 @@ export const getRuneAsset = ({ network = 'testnet', chain = 'BNB' }: { network?:
   return network === 'testnet' ? AssetRune67C : AssetRuneB1A
 }
 
+/**
+ * Returns RUNE asset depending on DEFAULT_NETWORK
+ */
+export const getDefaultRuneAsset = (chain: Chain = 'BNB') => getRuneAsset({ network: DEFAULT_NETWORK, chain })
 /**
  * Check whether an asset is a RUNE asset
  */

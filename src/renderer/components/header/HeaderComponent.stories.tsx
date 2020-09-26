@@ -20,7 +20,7 @@ storiesOf('Components/Header', module).add('default', () => {
       lockHandler={() => console.log('lockHandler')}
       poolsState$={Rx.of(RD.pending)}
       setSelectedPricePool={() => console.log('setSelectedPricePool')}
-      selectedPricePoolAsset$={Rx.of(AssetRune67C)}
+      selectedPricePoolAsset$={Rx.of(O.some(AssetRune67C))}
       locale={Locale.EN}
       binanceUrl={binanceUrl}
       midgardUrl={midgardUrl}

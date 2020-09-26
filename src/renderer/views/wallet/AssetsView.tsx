@@ -9,6 +9,7 @@ import { useHistory } from 'react-router-dom'
 import AssetsTableCollapsable from '../../components/wallet/assets/AssetsTableCollapsable'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { getDefaultRuneAsset } from '../../helpers/assetHelper'
 import * as walletRoutes from '../../routes/wallet'
 import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { AssetsWBChains } from '../../services/wallet/types'
@@ -17,22 +18,25 @@ import { PricePoolAsset } from '../pools/types'
 const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
   const { assetsWBChains$ } = useWalletContext()
+
   const assetsWBChains = useObservableState(assetsWBChains$, [] as AssetsWBChains)
 
   const {
     service: {
-      pools: { getDefaultRuneAsset, poolsState$, selectedPricePoolAsset$ }
+      pools: { runeAsset$, poolsState$, selectedPricePoolAsset$ }
     }
   } = useMidgardContext()
 
+  const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<O.Option<PricePoolAsset>>(
     selectedPricePoolAsset$,
     O.some(getDefaultRuneAsset() as PricePoolAsset)
   )
 
-  const pricePool = useMemo(() => pricePoolSelectorFromRD(poolsRD, selectedPricePoolAsset), [
+  const pricePool = useMemo(() => pricePoolSelectorFromRD(poolsRD, selectedPricePoolAsset, runeAsset), [
     poolsRD,
+    runeAsset,
     selectedPricePoolAsset
   ])
 

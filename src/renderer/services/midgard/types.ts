@@ -12,20 +12,27 @@ import {
   NetworkInfo,
   ThorchainLastblock,
   ThorchainConstants,
-  ThorchainEndpoint
+  ThorchainEndpoint,
+  StakersAssetData
 } from '../../types/generated/midgard'
-import { PricePools, PricePoolAsset } from '../../views/pools/types'
+import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/types'
 
 export type PoolAsset = string
 export type PoolAssets = string[]
+export type PoolAssetsLD = LiveData<Error, PoolAssets>
 
 export type AssetDetails = AssetDetail[]
+export type AssetDetailsLD = LiveData<Error, AssetDetails>
 
 export type AssetDetailMap = {
   [key in Chain]: AssetDetail
 }
 
+export type PoolDetailRD = RD.RemoteData<Error, PoolDetail>
+export type PoolDetailLD = LiveData<Error, PoolDetail>
+
 export type PoolDetails = PoolDetail[]
+export type PoolDetailsLD = LiveData<Error, PoolDetails>
 
 export type PriceDataIndex = {
   [symbol: string]: BigNumber
@@ -37,10 +44,12 @@ export type PoolsState = {
   poolDetails: PoolDetails
   pricePools: Option<PricePools>
 }
-
-export type SelectedPricePoolAsset = Option<PricePoolAsset>
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
 export type PoolsStateLD = LiveData<Error, PoolsState>
+
+export type SelectedPricePoolAsset = Option<PricePoolAsset>
+
+export type SelectedPricePool = PricePool
 
 export type ThorchainLastblockRD = RD.RemoteData<Error, ThorchainLastblock>
 export type ThorchainLastblockLD = LiveData<Error, ThorchainLastblock>
@@ -55,13 +64,12 @@ export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 
 export type ByzantineLD = LiveData<Error, string>
 
-export type PoolDetailLD = LiveData<Error, PoolDetail>
-
 export type PoolsService = {
   poolsState$: LiveData<Error, PoolsState>
-  setSelectedPricePool: (asset: PricePoolAsset) => void
-  selectedPricePoolAsset$: Rx.Observable<PricePoolAsset>
-  selectedPricePoolAssetSymbol$: Rx.Observable<string>
+  setSelectedPricePoolAsset: (asset: PricePoolAsset) => void
+  selectedPricePoolAsset$: Rx.Observable<SelectedPricePoolAsset>
+  selectedPricePool$: Rx.Observable<SelectedPricePool>
+  selectedPricePoolAssetSymbol$: Rx.Observable<Option<string>>
   reloadPoolsState: () => void
   poolAddresses$: ThorchainEndpointsLD
   runeAsset$: Rx.Observable<Asset>
@@ -69,3 +77,6 @@ export type PoolsService = {
   reloadPoolDetailedState: (value: O.Option<Asset>) => void
   priceRatio$: Rx.Observable<BigNumber>
 }
+
+export type StakersAssetDataRD = RD.RemoteData<Error, StakersAssetData>
+export type StakersAssetDataLD = LiveData<Error, StakersAssetData>

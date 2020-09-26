@@ -11,20 +11,36 @@ import { catchError, map, retry, shareReplay, startWith, switchMap, filter } fro
 
 import { isPricePoolAsset, ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { getRuneAsset } from '../../helpers/assetHelper'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { DefaultApi, GetPoolsDetailsViewEnum } from '../../types/generated/midgard/apis'
 import { PoolDetail } from '../../types/generated/midgard/models'
-import { PricePoolAsset } from '../../views/pools/types'
+import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/types'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
-import { PoolDetailLD, PoolsService, PoolsStateLD, SelectedPricePoolAsset, ThorchainEndpointsLD } from './types'
-import { getPricePools, pricePoolSelector } from './utils'
+import {
+  AssetDetailsLD,
+  PoolAssetsLD,
+  PoolDetailLD,
+  PoolDetailsLD,
+  PoolsService,
+  PoolsStateLD,
+  SelectedPricePoolAsset,
+  ThorchainEndpointsLD
+} from './types'
+import { getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
 
-const getSelectedPricePool = (): O.Option<Asset> =>
-  FP.pipe(localStorage.getItem(PRICE_POOL_KEY) as string, assetFromString, O.fromNullable, O.filter(isPricePoolAsset))
+const getStoredSelectedPricePoolAsset = (): SelectedPricePoolAsset =>
+  FP.pipe(
+    localStorage.getItem(PRICE_POOL_KEY) as string,
+    O.fromNullable,
+    O.map(assetFromString),
+    O.chain(O.fromNullable),
+    O.filter(isPricePoolAsset)
+  )
 
 const runeAsset$: Rx.Observable<Asset> = network$.pipe(map((network) => getRuneAsset({ network, chain: 'BNB' })))
 
@@ -82,23 +98,23 @@ const createPoolsService = (
    * Loading queue to get all needed data for `PoolsState`
    */
   const loadPoolsStateData$ = (): PoolsStateLD => {
-    const poolAssets$ = FP.pipe(apiGetPools$, shareReplay(1))
+    const poolAssets$: PoolAssetsLD = FP.pipe(apiGetPools$, shareReplay(1))
 
-    const assetDetails$ = FP.pipe(
+    const assetDetails$: AssetDetailsLD = FP.pipe(
       poolAssets$,
       liveData.map((assets) => assets.join(',')),
       liveData.chain(apiGetAssetInfo$),
       shareReplay(1)
     )
 
-    const poolDetails$ = FP.pipe(
+    const poolDetails$: PoolDetailsLD = FP.pipe(
       poolAssets$,
       liveData.map((assets) => assets.join(',')),
       liveData.chain(apiGetPoolsData$),
       shareReplay(1)
     )
 
-    const pricePools$ = combineLatest([poolDetails$, runeAsset$]).pipe(
+    const pricePools$: LiveData<Error, O.Option<PricePools>> = combineLatest([poolDetails$, runeAsset$]).pipe(
       map(([poolDetailsRD, runeAsset]) =>
         FP.pipe(
           poolDetailsRD,
@@ -164,22 +180,9 @@ const createPoolsService = (
 
   const {
     get: getSelectedPricePoolAsset,
-    get$: getSelectedPricePoolAsset$,
+    get$: selectedPricePoolAsset$,
     set: updateSelectedPricePoolAsset
-  } = observableState<SelectedPricePoolAsset>(getSelectedPricePool())
-
-  /**
-   * Selected PricePoolAsset
-   * which is RUNE asset by default
-   */
-  const selectedPricePoolAsset$ = combineLatest([getSelectedPricePoolAsset$, runeAsset$]).pipe(
-    map(([oPricePoolAsset, runeAsset]) =>
-      FP.pipe(
-        oPricePoolAsset,
-        O.getOrElse(() => runeAsset)
-      )
-    )
-  )
+  } = observableState<SelectedPricePoolAsset>(getStoredSelectedPricePoolAsset())
 
   /**
    * Update selected `PricePoolAsset`
@@ -192,9 +195,21 @@ const createPoolsService = (
   /**
    * Selected currency symbol
    */
-  const selectedPricePoolAssetSymbol$: Rx.Observable<string> = FP.pipe(
-    selectedPricePoolAsset$,
-    map(currencySymbolByAsset)
+  const selectedPricePoolAssetSymbol$: Rx.Observable<O.Option<string>> = selectedPricePoolAsset$.pipe(
+    map(FP.flow(O.map(currencySymbolByAsset)))
+  )
+
+  /**
+   * Selected price pool
+   */
+  const selectedPricePool$: Rx.Observable<PricePool> = combineLatest([
+    runeAsset$,
+    poolsState$,
+    selectedPricePoolAsset$
+  ]).pipe(
+    map(([runeAsset, poolsState, selectedPricePoolAsset]) =>
+      pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset, runeAsset)
+    )
   )
 
   const poolAddresses$: ThorchainEndpointsLD = FP.pipe(
@@ -216,14 +231,12 @@ const createPoolsService = (
    */
   const priceRatio$: Rx.Observable<BigNumber> = FP.pipe(
     combineLatest([FP.pipe(poolsState$, map(RD.toOption)), selectedPricePoolAsset$]),
-    map(([oPools, selectedAsset]) =>
-      FP.pipe(
-        oPools,
-        O.chain((pools) =>
-          FP.pipe(
-            pools.assetDetails,
-            A.findFirst((assetDetail) => assetFromString(assetDetail?.asset ?? '') === selectedAsset)
-          )
+    map(([pools, selectedAsset]) => sequenceTOption(pools, selectedAsset)),
+    map(
+      O.chain(([pools, selectedAsset]) =>
+        FP.pipe(
+          pools.assetDetails,
+          A.findFirst((assetDetail) => assetFromString(assetDetail?.asset ?? '') === selectedAsset)
         )
       )
     ),
@@ -233,8 +246,9 @@ const createPoolsService = (
 
   return {
     poolsState$,
-    setSelectedPricePool: setSelectedPricePoolAsset,
+    setSelectedPricePoolAsset,
     selectedPricePoolAsset$,
+    selectedPricePool$,
     selectedPricePoolAssetSymbol$,
     reloadPoolsState,
     poolAddresses$,
@@ -245,4 +259,4 @@ const createPoolsService = (
   }
 }
 
-export { runeAsset$, createPoolsService, getSelectedPricePool }
+export { runeAsset$, createPoolsService, getStoredSelectedPricePoolAsset as getSelectedPricePool }

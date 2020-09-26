@@ -19,7 +19,7 @@ import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.s
 import { useThemeContext } from '../../contexts/ThemeContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { PoolsStateRD } from '../../services/midgard/types'
+import { PoolsStateRD, SelectedPricePoolAsset } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked, hasImportedKeystore } from '../../services/wallet/util'
 import { PricePoolAsset, PricePoolAssets } from '../../views/pools/types'
@@ -49,7 +49,7 @@ type Props = {
   lockHandler: () => void
   setSelectedPricePool: (asset: PricePoolAsset) => void
   poolsState$: Observable<PoolsStateRD>
-  selectedPricePoolAsset$: Observable<PricePoolAsset>
+  selectedPricePoolAsset$: Observable<SelectedPricePoolAsset>
   locale: Locale
   changeLocale?: (locale: Locale) => void
   midgardUrl: O.Option<string>
@@ -77,7 +77,7 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const theme = useObservableState(theme$)
 
   const poolsRD = useObservableState(poolsState$, RD.pending)
-  const selectedPricePoolAsset = useObservableState<PricePoolAsset>(selectedPricePoolAsset$)
+  const selectedPricePoolAsset = useObservableState<SelectedPricePoolAsset>(selectedPricePoolAsset$, O.none)
 
   // store previous data to render it while reloading new data
   const prevPricePoolAssets = useRef<PricePoolAssets>()

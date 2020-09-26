@@ -5,7 +5,7 @@ import { storiesOf } from '@storybook/react'
 import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, assetToString, baseAmount } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { getRunePricePool } from '../../../const'
+import { getRunePricePool } from '../../../helpers/poolHelper'
 import { ApiError, AssetsWBChain, AssetsWBChains, ErrorId } from '../../../services/wallet/types'
 import AssetsTableCollapsable from './AssetsTableCollapsable'
 

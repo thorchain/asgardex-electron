@@ -4,9 +4,11 @@ import * as FP from 'fp-ts/lib/function'
 import { head } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
-import { CURRENCY_WHEIGHTS, getRunePricePool } from '../../const'
+import { CURRENCY_WHEIGHTS } from '../../const'
 import { isBUSDAsset } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
+import { eqAsset } from '../../helpers/fp/eq'
+import { getRunePricePool } from '../../helpers/poolHelper'
 import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/types'
 import { AssetDetails, AssetDetailMap, PoolDetails, PoolsStateRD, SelectedPricePoolAsset } from './types'
@@ -68,7 +70,7 @@ export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolA
   FP.pipe(
     oAsset,
     // (1) Check if `PricePool` is available in `PricePools`
-    O.mapNullable((asset) => pools.find((pool) => pool.asset === asset)),
+    O.mapNullable((asset) => pools.find((pool) => eqAsset.equals(pool.asset, asset))),
     // (2) If (1) fails, check if BUSDB pool is available in `PricePools`
     O.fold(() => O.fromNullable(pools.find((pool) => isBUSDAsset(pool.asset))), O.some),
     // (3) If (2) failes, return RUNE pool, which is always first entry in pools list
@@ -82,11 +84,13 @@ export const pricePoolSelectorFromRD = (
   poolsRD: PoolsStateRD,
   selectedPricePoolAsset: SelectedPricePoolAsset,
   runeAsset: Asset
-) => {
-  const pools = RD.toNullable(poolsRD)
-  const pricePools = pools && O.toNullable(pools.pricePools)
-  return (pricePools && pricePoolSelector(pricePools, selectedPricePoolAsset)) || getRunePricePool(runeAsset)
-}
+): PricePool =>
+  FP.pipe(
+    RD.toOption(poolsRD),
+    O.chain((pools) => pools.pricePools),
+    O.map((pricePools) => pricePoolSelector(pricePools, selectedPricePoolAsset)),
+    O.getOrElse(() => getRunePricePool(runeAsset))
+  )
 
 /**
  * Gets a `PoolDetail by given ticker

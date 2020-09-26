@@ -2,7 +2,8 @@ import * as RD from '@devexperts/remote-data-ts'
 import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, assetToString } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, AssetBUSDBAF, getRunePricePool } from '../../const'
+import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, AssetBUSDBAF } from '../../const'
+import { getRunePricePool } from '../../helpers/poolHelper'
 import { ThorchainEndpoint, AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PricePool, PricePools } from '../../views/pools/types'
 import { PoolsState, PoolsStateRD } from './types'
@@ -168,7 +169,6 @@ describe('services/midgard/utils/', () => {
       const pool = pricePoolSelectorFromRD(poolsRD, O.none, AssetRuneB1A)
       expect(pool.asset).toEqual(AssetBUSDBAF)
     })
-
     it('selects RUNE if ETH + BUSDBAF pools are not available', () => {
       const poolsRD = mockPoolsStateSuccess([rune, btc])
       const pool = pricePoolSelectorFromRD(poolsRD, O.some(AssetETH), AssetRuneB1A)
