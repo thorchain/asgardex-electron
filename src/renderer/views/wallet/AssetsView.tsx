@@ -1,8 +1,7 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetToString } from '@thorchain/asgardex-util'
-import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
@@ -10,10 +9,9 @@ import AssetsTableCollapsable from '../../components/wallet/assets/AssetsTableCo
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { getDefaultRuneAsset } from '../../helpers/assetHelper'
+import { getRunePricePool } from '../../helpers/poolHelper'
 import * as walletRoutes from '../../routes/wallet'
-import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { AssetsWBChains } from '../../services/wallet/types'
-import { PricePoolAsset } from '../pools/types'
 
 const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
@@ -23,22 +21,14 @@ const AssetsView: React.FC = (): JSX.Element => {
 
   const {
     service: {
-      pools: { runeAsset$, poolsState$, selectedPricePoolAsset$ }
+      pools: { runeAsset$, poolsState$, selectedPricePool$ }
     }
   } = useMidgardContext()
 
   const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
   const poolsRD = useObservableState(poolsState$, RD.pending)
-  const selectedPricePoolAsset = useObservableState<O.Option<PricePoolAsset>>(
-    selectedPricePoolAsset$,
-    O.some(getDefaultRuneAsset() as PricePoolAsset)
-  )
 
-  const pricePool = useMemo(() => pricePoolSelectorFromRD(poolsRD, selectedPricePoolAsset, runeAsset), [
-    poolsRD,
-    runeAsset,
-    selectedPricePoolAsset
-  ])
+  const selectedPricePool = useObservableState(selectedPricePool$, getRunePricePool(runeAsset))
 
   const selectAssetHandler = useCallback(
     (asset: Asset) => history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset) })),
@@ -50,7 +40,7 @@ const AssetsView: React.FC = (): JSX.Element => {
   return (
     <AssetsTableCollapsable
       assetsWBChains={assetsWBChains}
-      pricePool={pricePool}
+      pricePool={selectedPricePool}
       poolDetails={poolDetails}
       selectAssetHandler={selectAssetHandler}
     />
