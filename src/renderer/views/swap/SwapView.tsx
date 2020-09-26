@@ -19,10 +19,9 @@ import Button from '../../components/uielements/button'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { getDefaultRuneAsset } from '../../helpers/assetHelper'
-import { eqAsset } from '../../helpers/fp/eq'
+import { getDefaultRuneAsset, isRuneAsset } from '../../helpers/assetHelper'
 import { rdFromOption } from '../../helpers/fpHelpers'
-import { getRunePricePool } from '../../helpers/poolHelper'
+import { getDefaultRunePricePool } from '../../helpers/poolHelper'
 import { SwapRouteParams } from '../../routes/swap'
 import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
 import * as Styled from './SwapView.styles'
@@ -44,7 +43,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
 
-  const selectedPricePool = useObservableState(selectedPricePool$, getRunePricePool(runeAsset))
+  const selectedPricePool = useObservableState(selectedPricePool$, getDefaultRunePricePool())
 
   const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
 
@@ -110,7 +109,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
                 .filter((a) => a.asset !== undefined && !!a.asset)
                 .map((a) => ({ asset: assetFromString(a.asset as string) as Asset, priceRune: bnOrZero(a.priceRune) }))
 
-              const hasRuneAsset = Boolean(availableAssets.find(({ asset }) => eqAsset.equals(asset, runeAsset)))
+              const hasRuneAsset = Boolean(availableAssets.find(({ asset }) => isRuneAsset(asset)))
 
               if (!hasRuneAsset && runeAsset) {
                 availableAssets.unshift({ asset: runeAsset, priceRune: bnOrZero(1) })

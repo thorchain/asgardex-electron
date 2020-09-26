@@ -1,6 +1,7 @@
 import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@thorchain/asgardex-util'
 
-import { isRuneAsset, isBnbAsset, getRuneAsset, isBtcAsset, isEthAsset } from './assetHelper'
+import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
+import { isRuneAsset, isBnbAsset, getRuneAsset, isBtcAsset, isEthAsset, isPricePoolAsset } from './assetHelper'
 
 describe('helpers/assetHelper', () => {
   describe('getRuneAsset', () => {
@@ -56,6 +57,19 @@ describe('helpers/assetHelper', () => {
 
     it('returns false for any other asset than ETH', () => {
       expect(isBnbAsset(AssetRuneB1A)).toBeFalsy()
+    })
+  })
+
+  describe('isPricePoolAsset', () => {
+    it('returns true for BUSDB', () => {
+      expect(isPricePoolAsset(AssetBUSDBAF)).toBeTruthy()
+      expect(isPricePoolAsset(AssetBUSDBD1)).toBeTruthy()
+    })
+    it('returns false for BNB', () => {
+      expect(isPricePoolAsset(AssetBNB)).toBeFalsy()
+    })
+    it('returns false for deprecated asset ', () => {
+      expect(isPricePoolAsset({ chain: 'BNB', symbol: 'RUNE-1AF', ticker: 'RUNE' })).toBeFalsy()
     })
   })
 })

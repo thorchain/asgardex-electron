@@ -8,8 +8,8 @@ import { useHistory } from 'react-router-dom'
 import AssetsTableCollapsable from '../../components/wallet/assets/AssetsTableCollapsable'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { getDefaultRuneAsset } from '../../helpers/assetHelper'
-import { getRunePricePool } from '../../helpers/poolHelper'
+import {} from '../../helpers/assetHelper'
+import { getDefaultRunePricePool } from '../../helpers/poolHelper'
 import * as walletRoutes from '../../routes/wallet'
 import { AssetsWBChains } from '../../services/wallet/types'
 
@@ -21,14 +21,13 @@ const AssetsView: React.FC = (): JSX.Element => {
 
   const {
     service: {
-      pools: { runeAsset$, poolsState$, selectedPricePool$ }
+      pools: { poolsState$, selectedPricePool$ }
     }
   } = useMidgardContext()
 
-  const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
   const poolsRD = useObservableState(poolsState$, RD.pending)
 
-  const selectedPricePool = useObservableState(selectedPricePool$, getRunePricePool(runeAsset))
+  const selectedPricePool = useObservableState(selectedPricePool$, getDefaultRunePricePool())
 
   const selectAssetHandler = useCallback(
     (asset: Asset) => history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset) })),

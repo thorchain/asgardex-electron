@@ -19,9 +19,8 @@ import Table from '../../components/uielements/table'
 import Trend from '../../components/uielements/trend'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { getDefaultRuneAsset } from '../../helpers/assetHelper'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
-import { getPoolTableRowsData, getRunePricePool, hasPendingPools, sortByDepth } from '../../helpers/poolHelper'
+import { getDefaultRunePricePool, getPoolTableRowsData, hasPendingPools, sortByDepth } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
@@ -46,15 +45,13 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const {
     thorchainLastblockState$,
     thorchainConstantsState$,
-    pools: { runeAsset$, poolsState$, selectedPricePool$, reloadPoolsState },
+    pools: { poolsState$, selectedPricePool$, reloadPoolsState },
     reloadThorchainLastblock,
     reloadNetworkInfo
   } = midgardService
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const thorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(thorchainConstantsState$, RD.pending)
-
-  const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
 
   const [blocksLeft, setBlocksLeft] = useState('')
 
@@ -85,7 +82,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
 
-  const selectedPricePool = useObservableState(selectedPricePool$, getRunePricePool(runeAsset))
+  const selectedPricePool = useObservableState(selectedPricePool$, getDefaultRunePricePool())
 
   const getSwapPath = swapRoutes.swap.path
   const clickSwapHandler = useCallback(

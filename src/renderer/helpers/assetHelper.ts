@@ -9,9 +9,10 @@ import {
   Chain
 } from '@thorchain/asgardex-util'
 
-import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
+import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
 import { Network } from '../services/app/types'
 import { DEFAULT_NETWORK } from '../services/const'
+import { PricePoolAsset } from '../views/pools/types'
 import { eqAsset } from './fp/eq'
 
 /**
@@ -74,3 +75,8 @@ export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
  */
 export const isBUSDAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetBUSDBAF) || eqAsset.equals(asset, AssetBUSDBD1)
+
+// Type guard for `PricePoolAsset`
+export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
+  // all of PoolAsset except BNB -> see `PricePoolAsset`
+  PRICE_ASSETS.includes(asset)

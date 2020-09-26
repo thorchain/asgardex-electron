@@ -10,7 +10,7 @@ import {
   assetToString
 } from '@thorchain/asgardex-util'
 
-import { PricePoolCurrencyWeights, PricePoolAssets, PricePoolAsset } from './views/pools/types'
+import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/types'
 
 // BUSD testnet
 export const AssetBUSDBAF: Asset = { chain: 'BNB', symbol: 'BUSD-BAF', ticker: 'BUSD' }
@@ -18,20 +18,13 @@ export const AssetBUSDBAF: Asset = { chain: 'BNB', symbol: 'BUSD-BAF', ticker: '
 export const AssetBUSDBD1: Asset = { chain: 'BNB', symbol: 'BUSD-BD1', ticker: 'BUSD' }
 
 export const PRICE_ASSETS: PricePoolAssets = [
-  AssetRune67C as PricePoolAsset,
-  AssetRuneB1A as PricePoolAsset,
-  AssetETH as PricePoolAsset,
-  AssetBTC as PricePoolAsset,
-  AssetBUSDBAF as PricePoolAsset,
-  AssetBUSDBD1 as PricePoolAsset
+  AssetRune67C,
+  AssetRuneB1A,
+  AssetETH,
+  AssetBTC,
+  AssetBUSDBAF,
+  AssetBUSDBD1
 ]
-
-export const PRICE_POOL_ASSETS_AS_STRING = PRICE_ASSETS.map((a) => assetToString(a))
-
-// Type guard for `PricePoolAsset`
-export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
-  // all of PoolAsset except BNB -> see `PricePoolAsset`
-  PRICE_ASSETS.includes(asset)
 
 // Weight of currencies needed for pricing
 // The higher the value the higher the weight
