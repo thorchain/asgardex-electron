@@ -192,11 +192,11 @@ describe('services/midgard/utils/', () => {
     const bnbDetail: PoolDetail = { asset: assetToString(AssetBNB) }
 
     it('returns details of RUNE pool', () => {
-      const result = getPoolDetail([runeDetail, bnbDetail], AssetRune67C.ticker)
+      const result = getPoolDetail([runeDetail, bnbDetail], AssetRune67C)
       expect(result).toEqual(O.some(runeDetail))
     })
     it('returns None if no RUNE details available', () => {
-      const result = getPoolDetail([bnbDetail], 'TOMOB')
+      const result = getPoolDetail([bnbDetail], AssetBTC)
       expect(result).toBeNone()
     })
   })

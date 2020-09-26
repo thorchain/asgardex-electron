@@ -93,15 +93,15 @@ export const pricePoolSelectorFromRD = (
   )
 
 /**
- * Gets a `PoolDetail by given ticker
+ * Gets a `PoolDetail by given Asset
  * It returns `None` if no `PoolDetail` has been found
  */
-export const getPoolDetail = (details: PoolDetails, ticker: string): O.Option<PoolDetail> =>
+export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<PoolDetail> =>
   FP.pipe(
     details.find((detail: PoolDetail) => {
       const { asset: detailAsset = '' } = detail
-      const detailTicker = assetFromString(detailAsset)?.ticker
-      return detailTicker && detailTicker === ticker
+      const detailTicker = assetFromString(detailAsset)
+      return detailTicker && eqAsset.equals(detailTicker, asset)
     }),
     O.fromNullable
   )
