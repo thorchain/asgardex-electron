@@ -2,6 +2,8 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { InnerForm } from '../shared/form/Form.style'
+
 export const TitleContainer = styled(A.Row).attrs({ justify: 'space-between' })`
   margin-bottom: 16px;
 `
@@ -19,7 +21,7 @@ export const SectionTitle = styled(A.Typography.Text)`
   }
 `
 
-export const Form = styled(A.Form)`
+export const Form = styled(InnerForm)`
   flex: 1;
   display: flex;
   flex-direction: column;

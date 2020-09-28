@@ -142,8 +142,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
     <Row>
       <Styled.Col span={24}>
         <AccountSelector selectedAsset={assetWB.asset} assets={[assetWB]} />
-        {/* `Form<FormValue>` does not work in `styled(Form)`, so we have to add styles here. All is just needed to have correct types in `onFinish` handler)  */}
-        <Form
+        <Styled.Form
           form={form}
           initialValues={{ amount: bn(0) }}
           onFinish={onSubmit}
@@ -176,7 +175,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
               {submitLabel}
             </Styled.Button>
           </Styled.SubmitItem>
-        </Form>
+        </Styled.Form>
       </Styled.Col>
     </Row>
   )
