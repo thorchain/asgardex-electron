@@ -2937,6 +2937,10 @@
   dependencies:
     polished "^3.6.3"
 
+"@thorchain/asgardex-util@https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#314da5b71f7c76b403c1e74f9256dcfea1e213f4":
+  version "0.4.2"
+  resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#314da5b71f7c76b403c1e74f9256dcfea1e213f4"
+
 "@thorchain/asgardex-util@https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#feature/currency-symbol-asset":
   version "0.4.2"
   resolved "https://gitlab.com/thorchain/asgardex-common/asgardex-util.git#dc18b4454bc9be84c26f6981852b0c09fe83fdc5"
