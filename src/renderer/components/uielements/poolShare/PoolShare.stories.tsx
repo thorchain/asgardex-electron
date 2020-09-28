@@ -12,7 +12,7 @@ export const DefaultPoolShare = () => (
     poolShare={bn(100)}
     assetStakedPrice={assetToBase(assetAmount(120.1))}
     assetStakedShare={assetToBase(assetAmount(500))}
-    basePriceAsset="$USD"
+    basePriceSymbol="USD"
     loading={false}
     runeStakedPrice={assetToBase(assetAmount(400))}
     runeStakedShare={assetToBase(assetAmount(500))}

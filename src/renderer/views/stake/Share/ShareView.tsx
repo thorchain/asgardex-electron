@@ -46,8 +46,7 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
             target={asset.chain}
             poolShare={helpers.getPoolShare(stake, pool)}
             assetStakedShare={assetStakedShare}
-            // TODO (@thatThorchainGuy) price symobl as `basePriceAsset` - is that correct?
-            basePriceAsset={FP.pipe(
+            basePriceSymbol={FP.pipe(
               priceSymbol,
               O.getOrElse(() => '')
             )}

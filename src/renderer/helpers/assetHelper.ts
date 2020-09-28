@@ -71,7 +71,7 @@ export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
 
 /**
- * Check whether an asset is a RUNE asset
+ * Check whether an asset is a BUSD asset
  */
 export const isBUSDAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetBUSDBAF) || eqAsset.equals(asset, AssetBUSDBD1)

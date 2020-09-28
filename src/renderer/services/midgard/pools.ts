@@ -196,7 +196,7 @@ const createPoolsService = (
    * Selected currency symbol
    */
   const selectedPricePoolAssetSymbol$: Rx.Observable<O.Option<string>> = selectedPricePoolAsset$.pipe(
-    map(FP.flow(O.map(currencySymbolByAsset)))
+    map(O.map(currencySymbolByAsset))
   )
 
   /**
