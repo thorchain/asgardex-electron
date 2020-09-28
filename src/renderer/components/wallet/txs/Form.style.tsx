@@ -3,6 +3,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { InnerForm } from '../../shared/form/Form.style'
 import BaseButton from '../../uielements/button'
 import Label from '../../uielements/label'
 
@@ -11,7 +12,7 @@ export const Col = styled(A.Col)`
   background: ${palette('background', 1)};
 `
 
-export const Form = styled(A.Form)`
+export const Form = styled(InnerForm)`
   padding: 30px;
 `
 

@@ -159,13 +159,7 @@ const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     <Row>
       <Styled.Col span={24}>
         <AccountSelector onChange={changeAssetHandler} selectedAsset={assetWB.asset} assets={assetsWB} />
-        {/* `Form<FormValue>` does not work in `styled(Form)`, so we have to add styles here. All is just needed to have correct types in `onFinish` handler)  */}
-        <Form
-          form={form}
-          initialValues={{ amount: bn(0) }}
-          onFinish={onFinishHandler}
-          labelCol={{ span: 24 }}
-          style={{ padding: '30px' }}>
+        <Styled.Form form={form} initialValues={{ amount: bn(0) }} onFinish={onFinishHandler} labelCol={{ span: 24 }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
             <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
@@ -195,7 +189,7 @@ const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
               {intl.formatMessage({ id: 'wallet.action.send' })}
             </Styled.Button>
           </Styled.SubmitItem>
-        </Form>
+        </Styled.Form>
       </Styled.Col>
     </Row>
   )

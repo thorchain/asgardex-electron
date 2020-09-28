@@ -4,7 +4,14 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
+import { InnerForm } from '../shared/form/Form.style'
 import BaseButton from '../uielements/button'
+
+export const Form = styled(InnerForm)`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`
 
 export const FormItem = styled(A.Form.Item)`
   width: 100%;
