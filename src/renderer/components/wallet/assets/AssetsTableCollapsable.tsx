@@ -9,7 +9,6 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { RUNE_PRICE_POOL } from '../../../const'
 import { getPoolPriceValue } from '../../../services/binance/utils'
 import { PoolDetails } from '../../../services/midgard/types'
 import {
@@ -30,13 +29,13 @@ const { Panel } = Collapse
 
 type Props = {
   assetsWBChains: AssetsWBChains
-  pricePool?: PricePool
+  pricePool: PricePool
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: Asset) => void
 }
 
 const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
-  const { assetsWBChains = [], pricePool = RUNE_PRICE_POOL, poolDetails, selectAssetHandler = (_) => {} } = props
+  const { assetsWBChains = [], pricePool, poolDetails, selectAssetHandler = (_) => {} } = props
 
   const intl = useIntl()
   const screenMap: ScreenMap = Grid.useBreakpoint()
@@ -110,11 +109,11 @@ const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
   )
 
   const renderPriceColumn = useCallback(
-    (balance: AssetWithBalance) => {
-      const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
+    (assetWB: AssetWithBalance) => {
+      const oPrice = getPoolPriceValue(assetWB, poolDetails, pricePool.poolData)
       const label = FP.pipe(
         oPrice,
-        O.map((price) => formatAssetAmountCurrency(baseToAsset(price), pricePool.asset, 3)),
+        O.map((price) => formatAssetAmountCurrency(baseToAsset(price), pricePool.asset.ticker, 3)),
         // "empty" label if we don't get a price value
         O.getOrElse(() => '--')
       )

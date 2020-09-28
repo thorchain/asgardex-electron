@@ -29,7 +29,7 @@ export const getPoolPriceValue = (
   selectedPricePoolData: PoolData
 ): O.Option<BaseAmount> => {
   return FP.pipe(
-    getPoolDetail(poolDetails, asset.ticker),
+    getPoolDetail(poolDetails, asset),
     O.map(toPoolData),
     // calculate value based on `pricePoolData`
     O.map((poolData) => getValueOfAsset1InAsset2(amount, poolData, selectedPricePoolData)),

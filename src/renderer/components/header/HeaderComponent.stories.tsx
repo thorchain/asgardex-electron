@@ -2,6 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
+import { AssetRune67C } from '@thorchain/asgardex-util'
 import { none } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -19,7 +20,7 @@ storiesOf('Components/Header', module).add('default', () => {
       lockHandler={() => console.log('lockHandler')}
       poolsState$={Rx.of(RD.pending)}
       setSelectedPricePool={() => console.log('setSelectedPricePool')}
-      selectedPricePoolAsset$={Rx.of(none)}
+      selectedPricePoolAsset$={Rx.of(O.some(AssetRune67C))}
       locale={Locale.EN}
       binanceUrl={binanceUrl}
       midgardUrl={midgardUrl}

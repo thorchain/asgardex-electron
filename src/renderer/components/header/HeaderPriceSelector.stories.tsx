@@ -2,11 +2,14 @@ import React from 'react'
 
 import { boolean } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
+import { AssetBTC, AssetETH, AssetRune67C } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 
-import { PoolAsset, PricePoolAssets, PricePoolAsset } from '../../views/pools/types'
+import { AssetBUSDBAF } from '../../const'
+import { PricePoolAssets, PricePoolAsset } from '../../views/pools/types'
 import HeaderPriceSelector from './HeaderPriceSelector'
 
-const assets: PricePoolAssets = [PoolAsset.RUNE67C, PoolAsset.BTC, PoolAsset.ETH, PoolAsset.BUSDBAF]
+const assets: PricePoolAssets = [AssetRune67C, AssetBTC, AssetETH, AssetBUSDBAF]
 
 storiesOf('Components/HeaderPriceSelector', module).add('desktop / mobile', () => {
   const changeHandler = (asset: PricePoolAsset) => console.log(`changed: ${asset}`)
@@ -16,7 +19,7 @@ storiesOf('Components/HeaderPriceSelector', module).add('desktop / mobile', () =
       assets={assets}
       isDesktopView={isDesktopView}
       changeHandler={changeHandler}
-      selectedAsset={PoolAsset.BUSDBAF}
+      selectedAsset={O.some(AssetBUSDBAF)}
     />
   )
 })

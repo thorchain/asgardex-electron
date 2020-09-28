@@ -5,6 +5,7 @@ import { storiesOf } from '@storybook/react'
 import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, assetToString, baseAmount } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { getRunePricePool } from '../../../helpers/poolHelper'
 import { ApiError, AssetsWBChain, AssetsWBChains, ErrorId } from '../../../services/wallet/types'
 import AssetsTableCollapsable from './AssetsTableCollapsable'
 
@@ -87,15 +88,21 @@ const assetsWBChainsError: AssetsWBChains = [
 ]
 
 const selectAssetHandler = (asset: Asset) => console.log('asset selected ', assetToString(asset))
+const pricePool = getRunePricePool(AssetRune67C)
 
 storiesOf('Wallet/AssetsTableCollapsable', module).add('initial', () => {
   return (
-    <AssetsTableCollapsable assetsWBChains={assetsWBChains} poolDetails={[]} selectAssetHandler={selectAssetHandler} />
+    <AssetsTableCollapsable
+      assetsWBChains={assetsWBChains}
+      poolDetails={[]}
+      selectAssetHandler={selectAssetHandler}
+      pricePool={pricePool}
+    />
   )
 })
 storiesOf('Wallet/AssetsTableCollapsable', module).add('loading', () => {
-  return <AssetsTableCollapsable assetsWBChains={assetsWBChainsLoading} poolDetails={[]} />
+  return <AssetsTableCollapsable assetsWBChains={assetsWBChainsLoading} poolDetails={[]} pricePool={pricePool} />
 })
 storiesOf('Wallet/AssetsTableCollapsable', module).add('error', () => {
-  return <AssetsTableCollapsable assetsWBChains={assetsWBChainsError} poolDetails={[]} />
+  return <AssetsTableCollapsable assetsWBChains={assetsWBChainsError} poolDetails={[]} pricePool={pricePool} />
 })

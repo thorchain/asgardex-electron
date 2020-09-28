@@ -14,7 +14,7 @@ import { Network } from '../app/types'
 import { MIDGARD_MAX_RETRY } from '../const'
 import { createPoolsService } from './pools'
 import { createStakeService } from './stake'
-import { NetworkInfoRD, ThorchainLastblockRD, ThorchainConstantsRD } from './types'
+import { NetworkInfoRD, NetworkInfoLD, ThorchainConstantsLD, ByzantineLD, ThorchainLastblockLD } from './types'
 
 const BYZANTINE_MAX_RETRY = 5
 
@@ -38,7 +38,7 @@ const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.
 /**
  * Endpoint provided by Byzantine
  */
-const byzantine$ = network$.pipe(
+const byzantine$: ByzantineLD = network$.pipe(
   // Since `getNetworkState` is created by `observableState` and it takes an initial value,
   // this stream might emit same values and we do need a "dirty check"
   // to avoid to create another instance of byzantine by having same `Network`
@@ -78,7 +78,7 @@ const loadThorchainLastblock$ = () =>
 /**
  * State of `ThorchainLastblock`, it will be loaded data by first subscription only
  */
-const thorchainLastblockState$: Rx.Observable<ThorchainLastblockRD> = reloadThorchainLastblock$.pipe(
+const thorchainLastblockState$: ThorchainLastblockLD = reloadThorchainLastblock$.pipe(
   // start request
   switchMap((_) => loadThorchainLastblock$()),
   // cache it to avoid reloading data by every subscription
@@ -102,7 +102,7 @@ const apiGetThorchainConstants$ = pipe(
 /**
  * Provides data of `ThorchainConstants`
  */
-const thorchainConstantsState$: Rx.Observable<ThorchainConstantsRD> = apiGetThorchainConstants$.pipe(
+const thorchainConstantsState$: ThorchainConstantsLD = apiGetThorchainConstants$.pipe(
   startWith(RD.pending),
   retry(MIDGARD_MAX_RETRY),
   shareReplay(1)
@@ -131,13 +131,21 @@ const { stream$: reloadNetworkInfo$, trigger: reloadNetworkInfo } = triggerStrea
 /**
  * State of `NetworkInfo`, it will be loaded data by first subscription only
  */
-const networkInfo$: Rx.Observable<NetworkInfoRD> = reloadNetworkInfo$.pipe(
+const networkInfo$: NetworkInfoLD = reloadNetworkInfo$.pipe(
   // start request
   switchMap(loadNetworkInfo$),
   // cache it to avoid reloading data by every subscription
   shareReplay(1)
 )
 
+export type MidgardService = {
+  networkInfo$: NetworkInfoLD
+  reloadNetworkInfo: () => void
+  thorchainConstantsState$: ThorchainConstantsLD
+  thorchainLastblockState$: ThorchainLastblockLD
+  reloadThorchainLastblock: () => void
+  apiEndpoint$: ByzantineLD
+}
 /**
  * Service object with all "public" functions and observables we want to provide
  */

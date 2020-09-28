@@ -3,16 +3,16 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { baseAmount, baseToAsset, bn, bnOrZero } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
-import { pipe } from 'fp-ts/pipeable'
+import * as O from 'fp-ts/lib/Option'
+import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import { PoolDetails } from '../../../components/stake/PoolDetails/PoolDetails'
+import { PoolDetails, Props as PoolDetailProps } from '../../../components/stake/PoolDetails/PoolDetails'
 import PoolStatus from '../../../components/uielements/poolStatus'
 import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../../const'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { PoolDetail } from '../../../types/generated/midgard/models'
-import { PoolAsset, PricePoolAsset } from '../../pools/types'
 
 const getDepth = (data: PoolDetail, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(priceRatio)))
@@ -29,14 +29,13 @@ const getTotalStakers = (data: PoolDetail) => Number(data.stakersCount || 0)
 
 const getReturnToDate = (data: PoolDetail) => (parseFloat(data.poolROI || '0') * 100).toFixed(2)
 
-const defaultDetailsProps = {
+const defaultDetailsProps: PoolDetailProps = {
   depth: ZERO_ASSET_AMOUNT,
   volume24hr: ZERO_ASSET_AMOUNT,
   allTimeVolume: ZERO_ASSET_AMOUNT,
   totalSwaps: 0,
   totalStakers: 0,
-  returnToDate: '',
-  basePriceAsset: PoolAsset.RUNE67C as PricePoolAsset
+  returnToDate: ''
 }
 
 const renderPendingView = () => <PoolDetails {...defaultDetailsProps} isLoading={true} />
@@ -47,13 +46,13 @@ export const PoolDetailsView: React.FC<Props> = () => {
   const { service: midgardService } = useMidgardContext()
   const intl = useIntl()
 
-  const priceSymbol = useObservableState(midgardService.pools.selectedPricePoolAssetSymbol$)
+  const priceSymbol = useObservableState(midgardService.pools.selectedPricePoolAssetSymbol$, O.none)
 
   const priceRatio = useObservableState(midgardService.pools.priceRatio$, ONE_BN)
 
   const detailedPoolData = useObservableState(midgardService.pools.poolDetailedState$, RD.initial)
 
-  return pipe(
+  return FP.pipe(
     detailedPoolData,
     RD.fold(
       renderInitialView,
@@ -70,7 +69,7 @@ export const PoolDetailsView: React.FC<Props> = () => {
             totalSwaps={getTotalSwaps(data)}
             totalStakers={getTotalStakers(data)}
             returnToDate={getReturnToDate(data)}
-            priceSymbol={priceSymbol}
+            priceSymbol={O.toUndefined(priceSymbol)}
           />
         )
       }
