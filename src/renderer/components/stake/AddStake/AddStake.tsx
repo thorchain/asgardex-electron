@@ -1,17 +1,18 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { Asset, assetAmount, assetToBase, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
+import { Asset, assetAmount, assetFromString, assetToBase, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { PriceDataIndex } from '../../../services/midgard/types'
 import { AssetPair } from '../../../types/asgardex'
+import { RUNEAsset } from '../../../views/pools/types'
 import Drag from '../../uielements/drag'
 import * as Styled from './AddStake.style'
 
 type Props = {
   asset: Asset
-  runeAsset: Asset
+  runeAsset: RUNEAsset
   assetPrice: BigNumber
   runePrice: BigNumber
   assetAmount: BaseAmount
@@ -21,11 +22,12 @@ type Props = {
   assetData?: AssetPair[]
   className?: string
   onStake: (stakeAmount: BigNumber, asset: Asset) => void
+  onChangeAsset: (asset: Asset) => void
 }
 
 export const AddStake: React.FC<Props> = ({
   asset,
-  runeAsset,
+  runeAsset: runeAssetProp,
   assetPrice,
   runePrice,
   assetAmount: assetAmountProp,
@@ -33,13 +35,16 @@ export const AddStake: React.FC<Props> = ({
   className,
   assetData,
   unit,
-  onStake
+  onStake,
+  onChangeAsset
 }) => {
   const intl = useIntl()
   /**
    * Hold stakeAmount as amount of runes to stake
    */
   const [stakeAmount, setStakeAmount] = useState(baseAmount(0))
+
+  const runeAsset = useMemo(() => assetFromString(runeAssetProp) as Asset, [runeAssetProp])
 
   const assetSelect = useMemo(() => {
     const stakeAmountValue = stakeAmount.amount()
@@ -121,6 +126,7 @@ export const AddStake: React.FC<Props> = ({
           price={assetPrice}
           assetData={assetData}
           unit={unit}
+          onChangeAsset={onChangeAsset}
         />
       </Styled.InputsWrapper>
 

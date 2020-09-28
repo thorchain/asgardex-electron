@@ -163,8 +163,7 @@ const createPoolsService = (
         liveData.fromOption(() => Error('Empty response'))
       )
     ),
-    startWith(RD.pending),
-    shareReplay(1)
+    startWith(RD.pending)
   )
 
   const {

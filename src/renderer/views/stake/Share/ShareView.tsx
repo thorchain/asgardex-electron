@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, baseAmount, bnOrZero } from '@thorchain/asgardex-util'
@@ -17,7 +17,12 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
 
   const intl = useIntl()
 
-  const stakeData = useObservableState(midgardService.stake.stakes$, RD.initial)
+  /**
+   * We have to get a new stake-stream for every new asset
+   * @description /src/renderer/services/midgard/stake.ts
+   */
+  const stakeData$ = useMemo(() => midgardService.stake.getStakes$(asset), [asset, midgardService.stake])
+  const stakeData = useObservableState(stakeData$, RD.initial)
   const poolDetailedInfo = useObservableState(midgardService.pools.poolDetailedState$, RD.initial)
   const runePriceRatio = useObservableState(midgardService.pools.priceRatio$, ONE_BN)
   const priceSymbol = useObservableState(midgardService.pools.selectedPricePoolAssetSymbol$, '')
@@ -25,7 +30,13 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
   return pipe(
     RD.combine(stakeData, poolDetailedInfo),
     RD.fold(
-      () => <Styled.EmptyData description={intl.formatMessage({ id: 'stake.pool.noStakes' })} />,
+      () => (
+        <Styled.EmptyData
+          description={intl.formatMessage({
+            id: 'stake.pool.noStakes'
+          })}
+        />
+      ),
       helpers.renderPending,
       (e) => <Styled.EmptyData description={e.message} />,
       ([stake, pool]) => {
