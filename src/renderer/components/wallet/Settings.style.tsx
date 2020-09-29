@@ -216,4 +216,5 @@ export const NetworkLabel = styled(UILabel).attrs({
 
 export const NetworkTitle = styled(NetworkLabel)`
   padding-right: 10px;
+  width: auto;
 `

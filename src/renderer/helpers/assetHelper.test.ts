@@ -1,8 +1,7 @@
-import { AssetBNB, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@thorchain/asgardex-util'
+import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@thorchain/asgardex-util'
 
-import { CURRENCY_SYMBOLS } from '../const'
-import { PoolAsset } from '../views/pools/types'
-import { isRuneAsset, isBnbAsset, getCurrencySymbolByAssetString, getRuneAsset } from './assetHelper'
+import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
+import { isRuneAsset, isBnbAsset, getRuneAsset, isBtcAsset, isEthAsset, isPricePoolAsset } from './assetHelper'
 
 describe('helpers/assetHelper', () => {
   describe('getRuneAsset', () => {
@@ -16,6 +15,7 @@ describe('helpers/assetHelper', () => {
       expect(getRuneAsset({ chain: 'THOR' })).toEqual(AssetRuneNative)
     })
   })
+
   describe('isRuneAsset', () => {
     it('checks rune asset for testnet', () => {
       expect(isRuneAsset(AssetRuneB1A)).toBeTruthy()
@@ -29,6 +29,7 @@ describe('helpers/assetHelper', () => {
       expect(isRuneAsset(AssetBNB)).toBeFalsy()
     })
   })
+
   describe('isBnbAsset', () => {
     it('checks BNB asset', () => {
       expect(isBnbAsset(AssetBNB)).toBeTruthy()
@@ -39,17 +40,36 @@ describe('helpers/assetHelper', () => {
     })
   })
 
-  describe('getCurrencySymbolByAssetString', () => {
-    it('should return rune symbol', () => {
-      expect(getCurrencySymbolByAssetString(PoolAsset.RUNEB1A)).toEqual(CURRENCY_SYMBOLS['BNB.RUNE-67C'])
+  describe('isBtcAsset', () => {
+    it('checks BTC asset', () => {
+      expect(isBtcAsset(AssetBTC)).toBeTruthy()
     })
 
-    it('should return ticker for unknown asset', () => {
-      expect(getCurrencySymbolByAssetString('BNB.ticker-symbol')).toEqual('ticker')
+    it('returns false for any other asset than BTC', () => {
+      expect(isBnbAsset(AssetRuneB1A)).toBeFalsy()
+    })
+  })
+
+  describe('isEthAsset', () => {
+    it('checks ETH asset', () => {
+      expect(isEthAsset(AssetETH)).toBeTruthy()
     })
 
-    it('should return empty string for invalid asset', () => {
-      expect(getCurrencySymbolByAssetString('invalid asset')).toEqual('')
+    it('returns false for any other asset than ETH', () => {
+      expect(isBnbAsset(AssetRuneB1A)).toBeFalsy()
+    })
+  })
+
+  describe('isPricePoolAsset', () => {
+    it('returns true for BUSDB', () => {
+      expect(isPricePoolAsset(AssetBUSDBAF)).toBeTruthy()
+      expect(isPricePoolAsset(AssetBUSDBD1)).toBeTruthy()
+    })
+    it('returns false for BNB', () => {
+      expect(isPricePoolAsset(AssetBNB)).toBeFalsy()
+    })
+    it('returns false for deprecated asset ', () => {
+      expect(isPricePoolAsset({ chain: 'BNB', symbol: 'RUNE-1AF', ticker: 'RUNE' })).toBeFalsy()
     })
   })
 })

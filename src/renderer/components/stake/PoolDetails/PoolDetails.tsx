@@ -8,7 +8,7 @@ import { abbreviateNumber } from '../../../helpers/numberHelper'
 import PoolStatus from '../../uielements/poolStatus'
 import * as Styled from './PoolDetails.style'
 
-type Props = {
+export type Props = {
   depth: AssetAmount
   depthTrend?: BigNumber
   volume24hr: AssetAmount

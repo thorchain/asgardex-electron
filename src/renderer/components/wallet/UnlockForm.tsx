@@ -119,8 +119,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
         <BackLink style={{ position: 'absolute', top: 0, left: 0 }} />
         <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.title' })}</Styled.Text>
       </Styled.Header>
-      {/* `Form<FormValue>` does not work in `styled(Form)`, so we have to add styles here. All is just needed to have correct types in `onFinish` handler)  */}
-      <Form form={form} onFinish={submitForm} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <Styled.Form form={form} onFinish={submitForm}>
         <Styled.Content>
           <div style={{ width: '100%' }}>
             <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.phrase' })}</Styled.Text>
@@ -148,7 +147,7 @@ const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
             </Styled.Actions>
           </Styled.FormItem>
         </Styled.Content>
-      </Form>
+      </Styled.Form>
     </>
   )
 }

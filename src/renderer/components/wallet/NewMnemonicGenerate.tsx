@@ -68,12 +68,7 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
         <RefreshButton clickHandler={() => setPhrase(generatePhrase())} />
       </Styled.TitleContainer>
       <MnemonicPhrase words={phraseWords} readOnly={true} />
-      {/* `Form<FormValue>` does not work in `styled(Form)`, so we have to add styles here. All is just needed to have correct types in `onFinish` handler)  */}
-      <Form
-        form={form}
-        onFinish={handleFormFinish}
-        labelCol={{ span: 24 }}
-        style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <Styled.Form form={form} onFinish={handleFormFinish} labelCol={{ span: 24 }}>
         <Styled.PasswordContainer>
           <Styled.PasswordItem name="password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
             <Input
@@ -99,7 +94,7 @@ const NewMnemonicGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Element 
             {loadingMsg || intl.formatMessage({ id: 'common.next' })}
           </Button>
         </Styled.SubmitItem>
-      </Form>
+      </Styled.Form>
     </>
   )
 }

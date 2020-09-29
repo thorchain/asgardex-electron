@@ -20,7 +20,7 @@ import Trend from '../../components/uielements/trend'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
-import { getPoolTableRowsData, hasPendingPools, sortByDepth } from '../../helpers/poolHelper'
+import { getDefaultRunePricePool, getPoolTableRowsData, hasPendingPools, sortByDepth } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
@@ -28,10 +28,9 @@ import { SwapRouteParams } from '../../routes/swap'
 import { Network } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState } from '../../services/midgard/types'
-import { pricePoolSelectorFromRD } from '../../services/midgard/utils'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
-import { PoolTableRowData, PoolTableRowsData, PricePoolAsset } from './types'
+import { PoolTableRowData, PoolTableRowsData } from './types'
 import { getBlocksLeftForPendingPoolAsString } from './utils'
 
 type Props = {}
@@ -43,13 +42,16 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
   const { service: midgardService } = useMidgardContext()
-  const poolsRD = useObservableState(midgardService.pools.poolsState$, RD.pending)
-  const selectedPricePoolAsset = useObservableState<Option<PricePoolAsset>>(
-    midgardService.pools.selectedPricePoolAsset$,
-    some(midgardService.pools.getDefaultRuneAsset() as PricePoolAsset)
-  )
-  const thorchainLastblockRD = useObservableState(midgardService.thorchainLastblockState$, RD.pending)
-  const thorchainConstantsRD = useObservableState(midgardService.thorchainConstantsState$, RD.pending)
+  const {
+    thorchainLastblockState$,
+    thorchainConstantsState$,
+    pools: { poolsState$, selectedPricePool$, reloadPoolsState },
+    reloadThorchainLastblock,
+    reloadNetworkInfo
+  } = midgardService
+  const poolsRD = useObservableState(poolsState$, RD.pending)
+  const thorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
+  const thorchainConstantsRD = useObservableState(thorchainConstantsState$, RD.pending)
 
   const [blocksLeft, setBlocksLeft] = useState('')
 
@@ -69,8 +71,8 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const previousPendingPools = useRef<Option<PoolTableRowsData>>(none)
 
   const pendingCountdownHandler = useCallback(() => {
-    midgardService.reloadThorchainLastblock()
-  }, [midgardService])
+    reloadThorchainLastblock()
+  }, [reloadThorchainLastblock])
 
   const pendingCountdownInterval = useMemo(() => {
     const pools = RD.toNullable(poolsRD)
@@ -80,10 +82,8 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
 
-  const pricePool = useMemo(() => pricePoolSelectorFromRD(poolsRD, selectedPricePoolAsset), [
-    poolsRD,
-    selectedPricePoolAsset
-  ])
+  const selectedPricePool = useObservableState(selectedPricePool$, getDefaultRunePricePool())
+
   const getSwapPath = swapRoutes.swap.path
   const clickSwapHandler = useCallback(
     (p: SwapRouteParams) => {
@@ -102,9 +102,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   )
 
   const clickRefreshHandler = useCallback(() => {
-    midgardService.pools.reloadPoolsState()
-    midgardService.reloadNetworkInfo()
-  }, [midgardService])
+    reloadPoolsState()
+    reloadNetworkInfo()
+  }, [reloadNetworkInfo, reloadPoolsState])
 
   const renderRefreshBtn = useMemo(
     () => (
@@ -195,10 +195,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const renderPriceColumn = useCallback(
     ({ poolPrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(poolPrice), pricePool.asset, 3)}
+        {formatAssetAmountCurrency(baseToAsset(poolPrice), assetToString(selectedPricePool.asset), 3)}
       </Label>
     ),
-    [pricePool]
+    [selectedPricePool.asset]
   )
   const sortPriceColumn = useCallback(
     (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.poolPrice, b.poolPrice),
@@ -217,10 +217,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const renderDepthColumn = useCallback(
     ({ depthPrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(depthPrice), pricePool.asset)}
+        {formatAssetAmountCurrency(baseToAsset(depthPrice), assetToString(selectedPricePool.asset))}
       </Label>
     ),
-    [pricePool]
+    [selectedPricePool.asset]
   )
 
   const depthColumn: ColumnType<PoolTableRowData> = {
@@ -237,10 +237,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const renderVolumeColumn = useCallback(
     ({ volumePrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(volumePrice), pricePool.asset)}
+        {formatAssetAmountCurrency(baseToAsset(volumePrice), assetToString(selectedPricePool.asset))}
       </Label>
     ),
-    [pricePool]
+    [selectedPricePool.asset]
   )
   const sortVolumeColumn = useCallback(
     (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.volumePrice, b.volumePrice),
@@ -258,10 +258,10 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const renderTransactionColumn = useCallback(
     ({ transactionPrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(transactionPrice), pricePool.asset)}
+        {formatAssetAmountCurrency(baseToAsset(transactionPrice), assetToString(selectedPricePool.asset))}
       </Label>
     ),
-    [pricePool]
+    [selectedPricePool.asset]
   )
   const sortTransactionColumn = useCallback(
     (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.transactionPrice, b.transactionPrice),
@@ -342,7 +342,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           (pools: PoolsState): JSX.Element => {
             const poolViewData = getPoolTableRowsData({
               poolDetails: pools.poolDetails,
-              pricePoolData: pricePool.poolData,
+              pricePoolData: selectedPricePool.poolData,
               poolStatus: PoolDetailStatusEnum.Enabled,
               network
             })
@@ -352,7 +352,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         )(poolsRD)}
       </>
     ),
-    [network, poolsRD, pricePool.poolData, renderPoolsTable, renderRefreshBtn]
+    [network, poolsRD, renderPoolsTable, renderRefreshBtn, selectedPricePool.poolData]
   )
 
   const renderBtnPendingPoolsColumn = useCallback(
@@ -430,7 +430,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
           (state: PoolsState): JSX.Element => {
             const poolViewData = getPoolTableRowsData({
               poolDetails: state.poolDetails,
-              pricePoolData: pricePool.poolData,
+              pricePoolData: selectedPricePool.poolData,
               poolStatus: PoolDetailStatusEnum.Bootstrapped,
               network
             })
@@ -440,7 +440,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         )(poolsRD)}
       </>
     ),
-    [poolsRD, renderPendingPoolsTable, pricePool.poolData, network]
+    [poolsRD, renderPendingPoolsTable, selectedPricePool.poolData, network]
   )
 
   return (

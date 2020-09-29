@@ -14,7 +14,7 @@ type Props = {
   runeStakedShare: BaseAmount
   runeStakedPrice: BaseAmount
   loading?: boolean
-  basePriceAsset: string
+  basePriceSymbol: string
   assetStakedShare: BaseAmount
   assetStakedPrice: BaseAmount
   poolShare: BigNumber
@@ -26,7 +26,7 @@ const PoolShare: React.FC<Props> = (props: Props): JSX.Element => {
     runeStakedShare,
     runeStakedPrice,
     loading,
-    basePriceAsset,
+    basePriceSymbol,
     target,
     assetStakedShare,
     assetStakedPrice,
@@ -47,7 +47,7 @@ const PoolShare: React.FC<Props> = (props: Props): JSX.Element => {
         assetAmount={assetStakedShare}
         assetPrice={assetStakedPrice}
         gradient={2}
-        basePriceAsset={basePriceAsset}>
+        basePriceSymbol={basePriceSymbol}>
         <div>
           <Label textTransform="uppercase" size="big" align="center" loading={loading}>
             {intl.formatMessage({ id: 'stake.poolShare' })}

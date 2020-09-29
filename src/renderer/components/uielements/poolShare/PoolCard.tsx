@@ -14,7 +14,7 @@ type PoolCardProps = {
   runePrice: BaseAmount
   assetAmount: BaseAmount
   assetPrice: BaseAmount
-  basePriceAsset: string
+  basePriceSymbol: string
   loading?: boolean
   gradient?: number
   className?: string
@@ -29,7 +29,7 @@ export const PoolCard: React.FC<PoolCardProps> = ({
   runePrice,
   assetAmount,
   assetPrice,
-  basePriceAsset,
+  basePriceSymbol,
   children,
   className,
   gradient = 0
@@ -54,7 +54,7 @@ export const PoolCard: React.FC<PoolCardProps> = ({
               {formatAssetAmount(baseToAsset(runeAmount))}
             </Label>
             <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceAsset} ${formatAssetAmount(baseToAsset(runePrice))}`}
+              {`${basePriceSymbol} ${formatAssetAmount(baseToAsset(runePrice))}`}
             </Label>
           </Styled.ValuesWrapper>
           <Styled.ValuesWrapper loading={`${loading}`}>
@@ -62,7 +62,7 @@ export const PoolCard: React.FC<PoolCardProps> = ({
               {formatAssetAmount(baseToAsset(assetAmount))}
             </Label>
             <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceAsset} ${formatAssetAmount(baseToAsset(assetPrice))}`}
+              {`${basePriceSymbol} ${formatAssetAmount(baseToAsset(assetPrice))}`}
             </Label>
           </Styled.ValuesWrapper>
         </Styled.PoolCardRow>

@@ -9,8 +9,8 @@ import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { AddStake } from '../../../components/stake/AddStake/AddStake'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
+import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
 import * as stakeRoutes from '../../../routes/stake'
-import { getDefaultRuneAsset } from '../../../services/midgard/pools'
 
 export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const history = useHistory()
