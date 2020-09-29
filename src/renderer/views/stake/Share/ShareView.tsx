@@ -38,7 +38,13 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
         />
       ),
       helpers.renderPending,
-      (e) => <Styled.EmptyData description={e.message} />,
+      () => (
+        <Styled.EmptyData
+          description={intl.formatMessage({
+            id: 'stake.pool.noStakes'
+          })}
+        />
+      ),
       ([stake, pool]) => {
         const runeShare = helpers.getRuneShare(stake, pool)
         const assetShare = helpers.getAssetShare(stake, pool)
