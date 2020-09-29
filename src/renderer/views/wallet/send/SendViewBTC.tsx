@@ -68,7 +68,8 @@ const SendViewBTC: React.FC<Props> = (props: Props): JSX.Element => {
     O.fold(
       () => <></>,
       ([btcAssetWB, explorerUrl]) => {
-        const successActionHandler = (txHash: string) => window.apiUrl.openExternal(`${explorerUrl}/${txHash}`)
+        const successActionHandler = (txHash: string) => window.apiUrl.openExternal(`${explorerUrl}tx/${txHash}`)
+
         return (
           <Send
             txRD={txRD}

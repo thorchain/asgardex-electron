@@ -6,6 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
+import { trimZeros } from '../../../../helpers/stringHelper'
 import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
 import { NonEmptyAssetsWithBalance } from '../../../../services/wallet/types'
 import AssetIcon from '../assetIcon'
@@ -40,7 +41,7 @@ const Component: React.FC<Props> = (props: Props): JSX.Element => {
         () => previousBalance.current,
         ([assetsWB, asset]) => {
           const amount = getAssetAmountByAsset(assetsWB, asset)
-          const balance = formatAssetAmount(amount, 3)
+          const balance = trimZeros(formatAssetAmount(amount, amount.decimal))
           previousBalance.current = balance
           return balance
         }

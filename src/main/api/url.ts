@@ -12,6 +12,7 @@ const EXTERNALS_WHITELIST = [
   'github.com',
   'explorer.binance.org',
   'testnet-explorer.binance.org',
+  'blockstream.info',
   'dex.binance.org',
   'testnet-dex.binance.org'
 ]
@@ -22,9 +23,9 @@ const openExternal = (target: string) => {
     if (EXTERNALS_WHITELIST.includes(hostname)) {
       return shell.openExternal(target)
     }
-    return Promise.reject(`URL ${url} has been blocked by ASGARDEX`)
+    return Promise.reject(`URL ${target} has been blocked by ASGARDEX`)
   } catch (e) {
-    return Promise.reject(`URL ${url} could not be parsed`)
+    return Promise.reject(`URL ${target} could not be parsed`)
   }
 }
 
