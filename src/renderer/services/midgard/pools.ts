@@ -1,5 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, assetToString, bn, currencySymbolByAsset } from '@thorchain/asgardex-util'
+import {
+  Asset,
+  assetFromString,
+  assetToString,
+  bn,
+  currencySymbolByAsset,
+  isValidAsset
+} from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -11,6 +18,7 @@ import { catchError, map, retry, shareReplay, startWith, switchMap, filter } fro
 
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { getRuneAsset, isPricePoolAsset } from '../../helpers/assetHelper'
+import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
@@ -236,7 +244,13 @@ const createPoolsService = (
       O.chain(([pools, selectedAsset]) =>
         FP.pipe(
           pools.assetDetails,
-          A.findFirst((assetDetail) => assetFromString(assetDetail?.asset ?? '') === selectedAsset)
+          A.findFirst((assetDetail) => {
+            const asset = assetFromString(assetDetail?.asset || '')
+            if (!asset || !isValidAsset(asset)) {
+              return false
+            }
+            return eqAsset.equals(asset, selectedAsset)
+          })
         )
       )
     ),
