@@ -29,13 +29,14 @@ import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import {
   AssetDetailsLD,
-  PoolAssetsLD,
+  PoolStringAssetsLD,
   PoolDetailLD,
   PoolDetailsLD,
   PoolsService,
   PoolsStateLD,
   SelectedPricePoolAsset,
-  ThorchainEndpointsLD
+  ThorchainEndpointsLD,
+  PoolAssetsLD
 } from './types'
 import { getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
 
@@ -106,7 +107,7 @@ const createPoolsService = (
    * Loading queue to get all needed data for `PoolsState`
    */
   const loadPoolsStateData$ = (): PoolsStateLD => {
-    const poolAssets$: PoolAssetsLD = FP.pipe(apiGetPools$, shareReplay(1))
+    const poolAssets$: PoolStringAssetsLD = FP.pipe(apiGetPools$, shareReplay(1))
 
     const assetDetails$: AssetDetailsLD = FP.pipe(
       poolAssets$,
@@ -184,6 +185,12 @@ const createPoolsService = (
     ),
     startWith(RD.pending),
     shareReplay(1)
+  )
+
+  const availableAssets$: PoolAssetsLD = FP.pipe(
+    poolsState$,
+    liveData.map((poolsState) => poolsState.poolAssets),
+    liveData.map(A.filterMap((asset) => O.fromNullable(assetFromString(asset))))
   )
 
   const {
@@ -269,7 +276,8 @@ const createPoolsService = (
     runeAsset$,
     poolDetailedState$,
     reloadPoolDetailedState,
-    priceRatio$
+    priceRatio$,
+    availableAssets$
   }
 }
 

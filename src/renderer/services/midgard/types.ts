@@ -18,7 +18,10 @@ import {
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/types'
 
 export type PoolAsset = string
-export type PoolAssets = string[]
+export type PoolStringAssets = string[]
+export type PoolStringAssetsLD = LiveData<Error, PoolStringAssets>
+
+export type PoolAssets = Asset[]
 export type PoolAssetsLD = LiveData<Error, PoolAssets>
 
 export type AssetDetails = AssetDetail[]
@@ -40,7 +43,7 @@ export type PriceDataIndex = {
 
 export type PoolsState = {
   assetDetails: AssetDetails
-  poolAssets: PoolAssets
+  poolAssets: PoolStringAssets
   poolDetails: PoolDetails
   pricePools: Option<PricePools>
 }
@@ -76,6 +79,7 @@ export type PoolsService = {
   poolDetailedState$: PoolDetailLD
   reloadPoolDetailedState: (value: O.Option<Asset>) => void
   priceRatio$: Rx.Observable<BigNumber>
+  availableAssets$: PoolAssetsLD
 }
 
 export type StakersAssetDataRD = RD.RemoteData<Error, StakersAssetData>
