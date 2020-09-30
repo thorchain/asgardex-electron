@@ -25,6 +25,7 @@ const Label = React.forwardRef<HTMLDivElement, LabelProps>(
       nowrap = false,
       children,
       className = '',
+      disabled = false,
       onClick,
       style
     } = props
@@ -40,6 +41,7 @@ const Label = React.forwardRef<HTMLDivElement, LabelProps>(
         style={style}
         align={align}
         nowrap={nowrap}
+        disabled={disabled}
         onClick={onClick}>
         {loading && <Styled.Skeleton />}
         {!loading && children}

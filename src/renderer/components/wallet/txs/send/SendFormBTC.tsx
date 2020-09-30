@@ -11,7 +11,7 @@ import {
   bn,
   formatAssetAmountCurrency
 } from '@thorchain/asgardex-util'
-import { Row, Form, Radio } from 'antd'
+import { Row, Form } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
@@ -22,6 +22,7 @@ import { ZERO_BN } from '../../../../const'
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation, FeesRD, SendTxParams } from '../../../../services/bitcoin/types'
 import { AssetsWithBalance, AssetWithBalance } from '../../../../services/wallet/types'
+import * as StyledR from '../../../shared/form/Radio.style'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import AccountSelector from '../../AccountSelector'
 import * as Styled from '../Form.style'
@@ -125,6 +126,15 @@ const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     )
   }, [assetWB.amount, intl, isFeeError])
 
+  const feeOptionsLabel: Record<FeeOptionsKey, string> = useMemo(
+    () => ({
+      fast: intl.formatMessage({ id: 'wallet.send.fast' }),
+      regular: intl.formatMessage({ id: 'wallet.send.regular' }),
+      slow: intl.formatMessage({ id: 'wallet.send.slow' })
+    }),
+    [intl]
+  )
+
   const renderFeeOptions = useMemo(
     () =>
       FP.pipe(
@@ -135,18 +145,18 @@ const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
           (fees) => {
             const onChangeHandler = (e: RadioChangeEvent) => setSelectedFeeKey(e.target.value)
             return (
-              <Radio.Group onChange={onChangeHandler} value={selectedFeeKey} disabled={isLoading}>
+              <StyledR.Radio.Group onChange={onChangeHandler} value={selectedFeeKey} disabled={isLoading}>
                 {Object.keys(fees).map((key) => (
-                  <Radio value={key as FeeOptionsKey} key={key}>
-                    {key}
-                  </Radio>
+                  <StyledR.Radio value={key as FeeOptionsKey} key={key}>
+                    <StyledR.RadioLabel>{feeOptionsLabel[key as FeeOptionsKey]}</StyledR.RadioLabel>
+                  </StyledR.Radio>
                 ))}
-              </Radio.Group>
+              </StyledR.Radio.Group>
             )
           }
         )
       ),
-    [feesRD, isLoading, selectedFeeKey]
+    [feeOptionsLabel, feesRD, isLoading, selectedFeeKey]
   )
 
   const addressValidator = useCallback(

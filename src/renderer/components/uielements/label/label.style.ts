@@ -10,6 +10,7 @@ export type Props = {
   align?: TextAlignment
   size?: Size
   color?: Color
+  disabled?: boolean
   weight?: string
   textTransform?: TextTransform
   nowrap?: boolean
@@ -62,6 +63,7 @@ export const LabelWrapper = styled.div<Props>`
   font-weight: ${({ weight }) => weight};
   letter-spacing: ${({ size = 'normal' }) => fontSettings[size].spacing};
   color: ${({ color }) => colors[color || 'normal']};
+  opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
   cursor: ${({ onClick }) => onClick && 'pointer'};
   text-align: ${({ align = 'left' }) => align};
 `
