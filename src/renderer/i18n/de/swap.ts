@@ -1,10 +1,10 @@
 import { SwapMessages } from '../types'
 
 const swap: SwapMessages = {
-  'swap.swapping': 'You are swapping - DE',
-  'swap.state.pending': 'You are swapping - DE',
-  'swap.state.success': 'You are swapped - DE',
-  'swap.viewTransaction': 'View transaction - DE',
+  'swap.swapping': 'Tauschen',
+  'swap.state.pending': 'Tauschvorgang läuft',
+  'swap.state.success': 'Erfolgreich getauscht',
+  'swap.viewTransaction': 'Transaktion ansehen',
   'swap.input': 'Eingabe',
   'swap.balance': 'Guthaben',
   'swap.output': 'Ausgabe',
