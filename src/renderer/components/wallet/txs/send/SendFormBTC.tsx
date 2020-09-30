@@ -45,7 +45,7 @@ type Props = {
   fees: FeesRD
 }
 
-const SendFormBTC: React.FC<Props> = (props: Props): JSX.Element => {
+const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   const { onSubmit, assetsWB, assetWB, addressValidation, isLoading, fees: feesRD } = props
 
   const changeAssetHandler = useChangeAssetHandler()

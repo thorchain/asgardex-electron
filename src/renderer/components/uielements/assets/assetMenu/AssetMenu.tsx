@@ -23,7 +23,7 @@ type Props = {
   searchPlaceholder?: string
 }
 
-const AssetMenu: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetMenu: React.FC<Props> = (props): JSX.Element => {
   const {
     searchPlaceholder,
     assetData,

@@ -17,7 +17,7 @@ type Props = {
   asset: O.Option<Asset>
 }
 
-const Receive: React.FC<Props> = (props: Props): JSX.Element => {
+const Receive: React.FC<Props> = (props): JSX.Element => {
   const { address: oAddress, asset: oAsset } = props
 
   const [errMsg, setErrorMsg] = useState('')

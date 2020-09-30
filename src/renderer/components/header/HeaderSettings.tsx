@@ -13,7 +13,7 @@ type Props = {
   isDesktopView: boolean
 }
 
-const HeaderSettings: React.FC<Props> = (props: Props): JSX.Element => {
+const HeaderSettings: React.FC<Props> = (props): JSX.Element => {
   const { onPress = () => {}, isDesktopView } = props
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)

@@ -17,7 +17,7 @@ type ComponentProps = {
 
 export type Props = ComponentProps & ButtonProps
 
-const Button: React.FC<Props> = (props: Props): JSX.Element => {
+const Button: React.FC<Props> = (props): JSX.Element => {
   const {
     children,
     sizevalue = 'normal',

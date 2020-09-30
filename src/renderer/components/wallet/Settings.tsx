@@ -24,7 +24,7 @@ type Props = {
   removeKeystore?: () => void
 }
 
-const Settings: React.FC<Props> = (props: Props): JSX.Element => {
+const Settings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
   const {
     apiVersion = '',

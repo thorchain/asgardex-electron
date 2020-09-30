@@ -13,7 +13,7 @@ type Props = {
   className?: string
 }
 
-const AssetPairOverlapped: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetPairOverlapped: React.FC<Props> = (props): JSX.Element => {
   const { asset, target, size = 'normal' } = props
 
   return (

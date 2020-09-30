@@ -27,7 +27,7 @@ type Props = {
   binanceUrl: O.Option<string>
 }
 
-const HeaderNetStatus: React.FC<Props> = (props: Props): JSX.Element => {
+const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
   const { isDesktopView, midgardUrl, binanceUrl } = props
   const { onlineStatus$ } = useAppContext()
   const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)

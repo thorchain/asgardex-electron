@@ -29,7 +29,7 @@ type Props = {
   type?: CoinDataWrapperType
 }
 
-const AssetData: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetData: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
     assetValue,

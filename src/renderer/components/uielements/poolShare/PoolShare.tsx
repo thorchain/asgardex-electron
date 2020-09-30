@@ -20,7 +20,7 @@ type Props = {
   poolShare: BigNumber
 }
 
-const PoolShare: React.FC<Props> = (props: Props): JSX.Element => {
+const PoolShare: React.FC<Props> = (props): JSX.Element => {
   const {
     source,
     runeStakedShare,

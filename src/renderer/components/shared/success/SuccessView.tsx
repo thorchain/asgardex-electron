@@ -6,7 +6,7 @@ import * as Styled from './SuccessView.style'
 
 type Props = Omit<ResultProps, 'icon'>
 
-const SuccessView: React.FC<Props> = (props: Props): JSX.Element => (
+const SuccessView: React.FC<Props> = (props): JSX.Element => (
   <Styled.Result
     icon={
       <Styled.IconWrapper>

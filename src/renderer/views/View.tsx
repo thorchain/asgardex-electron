@@ -6,7 +6,7 @@ type Props = {
   children?: React.ReactNode
 }
 
-const View: React.FC<Props> = (props: Props): JSX.Element => {
+const View: React.FC<Props> = (props): JSX.Element => {
   const { children } = props
   return <ViewWrapper>{children}</ViewWrapper>
 }

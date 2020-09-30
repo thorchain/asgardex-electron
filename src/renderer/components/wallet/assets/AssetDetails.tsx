@@ -34,7 +34,7 @@ type Props = {
   loadSelectedAssetTxsHandler?: (_: LoadTxsProps) => void
 }
 
-const AssetDetails: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
     txsRD,
     address,

@@ -16,7 +16,7 @@ type Props = {
   size?: CoinSize
 }
 
-const AccountSelector: React.FC<Props> = (props: Props): JSX.Element => {
+const AccountSelector: React.FC<Props> = (props): JSX.Element => {
   const { selectedAsset, assets, onChange = (_) => {}, size = 'normal' } = props
 
   const intl = useIntl()

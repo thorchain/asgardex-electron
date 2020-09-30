@@ -20,7 +20,7 @@ type Props = {
   assetsWB?: O.Option<NonEmptyAssetsWithBalance>
 }
 
-const Component: React.FC<Props> = (props: Props): JSX.Element => {
+const Component: React.FC<Props> = (props): JSX.Element => {
   const { assetsWB = O.none, asset: oAsset } = props
 
   const asset = O.toNullable(oAsset)

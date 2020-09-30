@@ -21,7 +21,7 @@ type Props = {
   clickTxLinkHandler: (txHash: string) => void
   changePaginationHandler: (page: number) => void
 }
-const TransactionsTable: React.FC<Props> = (props: Props): JSX.Element => {
+const TransactionsTable: React.FC<Props> = (props): JSX.Element => {
   const { txsRD, clickTxLinkHandler, changePaginationHandler } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
