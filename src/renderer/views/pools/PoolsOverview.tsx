@@ -195,7 +195,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const renderPriceColumn = useCallback(
     ({ poolPrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(poolPrice), assetToString(selectedPricePool.asset), 3)}
+        {formatAssetAmountCurrency({
+          amount: baseToAsset(poolPrice),
+          asset: selectedPricePool.asset,
+          decimal: 3
+        })}
       </Label>
     ),
     [selectedPricePool.asset]
@@ -217,7 +221,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const renderDepthColumn = useCallback(
     ({ depthPrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(depthPrice), assetToString(selectedPricePool.asset))}
+        {formatAssetAmountCurrency({
+          amount: baseToAsset(depthPrice),
+          asset: selectedPricePool.asset,
+          decimal: 2
+        })}
       </Label>
     ),
     [selectedPricePool.asset]
@@ -237,7 +245,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const renderVolumeColumn = useCallback(
     ({ volumePrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(volumePrice), assetToString(selectedPricePool.asset))}
+        {formatAssetAmountCurrency({
+          amount: baseToAsset(volumePrice),
+          asset: selectedPricePool.asset,
+          decimal: 2
+        })}
       </Label>
     ),
     [selectedPricePool.asset]
@@ -258,7 +270,11 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const renderTransactionColumn = useCallback(
     ({ transactionPrice }: PoolTableRowData) => (
       <Label align="right" nowrap>
-        {formatAssetAmountCurrency(baseToAsset(transactionPrice), assetToString(selectedPricePool.asset))}
+        {formatAssetAmountCurrency({
+          amount: baseToAsset(transactionPrice),
+          asset: selectedPricePool.asset,
+          decimal: 2
+        })}
       </Label>
     ),
     [selectedPricePool.asset]

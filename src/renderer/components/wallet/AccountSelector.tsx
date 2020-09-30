@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { Asset, assetToString, formatAssetAmountCurrency, baseToAsset } from '@thorchain/asgardex-util'
+import { Asset, formatAssetAmountCurrency, baseToAsset } from '@thorchain/asgardex-util'
 import { Menu, Dropdown, Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 
@@ -39,7 +39,7 @@ const AccountSelector: React.FC<Props> = (props): JSX.Element => {
                   <AssetIcon asset={asset} size={'small'} />
                 </Col>
                 <Col>{asset.symbol} </Col>
-                <Col>{formatAssetAmountCurrency(baseToAsset(amount), assetToString(asset))}</Col>
+                <Col>{formatAssetAmountCurrency({ amount: baseToAsset(amount), asset })}</Col>
               </Row>
             </Menu.Item>
           )

@@ -47,7 +47,7 @@ export const PoolDetails: React.FC<Props> = ({
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount(depth)}`}
+          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: depth, trimZeros: true })}`}
           trend={depthTrend}
           label={intl.formatMessage({ id: 'stake.poolDetails.depth' })}
           displayValue={`${priceSymbol} ${abbreviateNumber(depth.amount().toNumber(), 2)}`}
@@ -57,7 +57,7 @@ export const PoolDetails: React.FC<Props> = ({
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount(volume24hr)}`}
+          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: volume24hr, trimZeros: true })}`}
           trend={volume24hrTrend}
           label={intl.formatMessage({ id: 'stake.poolDetails.24hvol' })}
           displayValue={`${priceSymbol} ${abbreviateNumber(volume24hr.amount().toNumber(), 2)}`}
@@ -67,7 +67,7 @@ export const PoolDetails: React.FC<Props> = ({
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount(allTimeVolume)}`}
+          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: allTimeVolume, trimZeros: true })}`}
           trend={allTimeVolumeTrend}
           label={intl.formatMessage({ id: 'stake.poolDetails.allTimeVal' })}
           displayValue={`${priceSymbol} ${abbreviateNumber(allTimeVolume.amount().toNumber(), 2)}`}

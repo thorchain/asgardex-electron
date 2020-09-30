@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetToString, baseToAsset, chainToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { Asset, baseToAsset, chainToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
 import { ColumnType } from 'antd/lib/table'
@@ -92,8 +92,7 @@ const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderBalanceColumn = ({ asset, amount }: AssetWithBalance) => {
-    const assetString = assetToString(asset)
-    const balance = formatAssetAmountCurrency(baseToAsset(amount), assetString, 3)
+    const balance = formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 3 })
     return (
       <Label nowrap align="right">
         {balance}
@@ -113,7 +112,7 @@ const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       const oPrice = getPoolPriceValue(assetWB, poolDetails, pricePool.poolData)
       const label = FP.pipe(
         oPrice,
-        O.map((price) => formatAssetAmountCurrency(baseToAsset(price), pricePool.asset.ticker, 3)),
+        O.map((price) => formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })),
         // "empty" label if we don't get a price value
         O.getOrElse(() => '--')
       )

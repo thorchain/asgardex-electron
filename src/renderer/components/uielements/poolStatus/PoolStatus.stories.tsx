@@ -11,8 +11,8 @@ storiesOf('Components/PoolStatus', module).add('default', () => {
       <PoolStatus
         trend={bn(2.66)}
         label="DEPTH"
-        displayValue={formatAssetAmountCurrency(assetAmount(12000))}
-        fullValue={formatAssetAmountCurrency(assetAmount(12000))}
+        displayValue={formatAssetAmountCurrency({ amount: assetAmount(12000) })}
+        fullValue={formatAssetAmountCurrency({ amount: assetAmount(12000) })}
       />
     </div>
   )

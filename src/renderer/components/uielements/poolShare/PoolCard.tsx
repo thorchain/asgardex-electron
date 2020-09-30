@@ -51,18 +51,18 @@ export const PoolCard: React.FC<PoolCardProps> = ({
         <Styled.PoolCardRow justify="space-around">
           <Styled.ValuesWrapper loading={`${loading}`}>
             <Label align="center" loading={loading} color="dark">
-              {formatAssetAmount(baseToAsset(runeAmount))}
+              {formatAssetAmount({ amount: baseToAsset(runeAmount), trimZeros: true })}
             </Label>
             <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceSymbol} ${formatAssetAmount(baseToAsset(runePrice))}`}
+              {`${basePriceSymbol} ${formatAssetAmount({ amount: baseToAsset(runePrice), trimZeros: true })}`}
             </Label>
           </Styled.ValuesWrapper>
           <Styled.ValuesWrapper loading={`${loading}`}>
             <Label align="center" loading={loading} color="dark">
-              {formatAssetAmount(baseToAsset(assetAmount))}
+              {formatAssetAmount({ amount: baseToAsset(assetAmount), trimZeros: true })}
             </Label>
             <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceSymbol} ${formatAssetAmount(baseToAsset(assetPrice))}`}
+              {`${basePriceSymbol} ${formatAssetAmount({ amount: baseToAsset(assetPrice), trimZeros: true })}`}
             </Label>
           </Styled.ValuesWrapper>
         </Styled.PoolCardRow>
