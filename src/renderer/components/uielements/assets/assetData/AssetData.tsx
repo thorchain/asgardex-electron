@@ -6,8 +6,7 @@ import {
   baseToAsset,
   formatAssetAmount,
   baseAmount,
-  Asset,
-  assetToString
+  Asset
 } from '@thorchain/asgardex-util'
 
 import { PricePoolAsset } from '../../../../views/pools/types'
@@ -43,7 +42,7 @@ const AssetData: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const formattedPrice = priceBaseAsset
-    ? formatAssetAmountCurrency(baseToAsset(price), assetToString(priceBaseAsset))
+    ? formatAssetAmountCurrency({ amount: baseToAsset(price), asset: priceBaseAsset, trimZeros: true })
     : ''
   // @TODO (@thatStrangeGuy) add valid formatters
   const priceLabel = priceValid && formattedPrice !== '$ 0.00' ? formattedPrice : ''
@@ -60,7 +59,7 @@ const AssetData: React.FC<Props> = (props): JSX.Element => {
         </Label>
         {assetValue && (
           <Label className="coinData-asset-value" weight="600">
-            {formatAssetAmount(baseToAsset(assetValue))}
+            {formatAssetAmount({ amount: baseToAsset(assetValue), trimZeros: true })}
           </Label>
         )}
       </div>
@@ -71,7 +70,7 @@ const AssetData: React.FC<Props> = (props): JSX.Element => {
           </Label>
           {targetValue && (
             <Label className="coinData-target-value" weight="600">
-              {formatAssetAmount(baseToAsset(targetValue))}
+              {formatAssetAmount({ amount: baseToAsset(targetValue), trimZeros: true })}
             </Label>
           )}
         </div>

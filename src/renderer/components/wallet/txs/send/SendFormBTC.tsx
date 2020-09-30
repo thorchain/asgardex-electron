@@ -6,7 +6,6 @@ import {
   assetAmount,
   AssetBTC,
   assetToBase,
-  assetToString,
   baseAmount,
   baseToAsset,
   bn,
@@ -99,11 +98,11 @@ const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
           () => '...',
           (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
           (fees) =>
-            formatAssetAmountCurrency(
-              baseToAsset(baseAmount(fees[selectedFeeKey].feeTotal, BTC_DECIMAL)),
-              assetToString(AssetBTC),
-              BTC_DECIMAL
-            )
+            formatAssetAmountCurrency({
+              amount: baseToAsset(baseAmount(fees[selectedFeeKey].feeTotal, BTC_DECIMAL)),
+              asset: AssetBTC,
+              trimZeros: true
+            })
         )
       ),
     [feesRD, intl, selectedFeeKey]
@@ -115,7 +114,7 @@ const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
       {
-        balance: formatAssetAmountCurrency(baseToAsset(assetWB.amount), assetToString(AssetBTC), BTC_DECIMAL)
+        balance: formatAssetAmountCurrency({ amount: baseToAsset(assetWB.amount), asset: AssetBTC, trimZeros: true })
       }
     )
 
@@ -226,7 +225,11 @@ const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
             </Styled.FormItem>
             <Styled.StyledLabel size="big" style={{ marginBottom: 0, paddingBottom: 0 }}>
               {intl.formatMessage({ id: 'common.max' })}:{' '}
-              {formatAssetAmountCurrency(baseToAsset(assetWB.amount), assetToString(assetWB.asset), BTC_DECIMAL)}
+              {formatAssetAmountCurrency({
+                amount: baseToAsset(assetWB.amount),
+                asset: assetWB.asset,
+                trimZeros: true
+              })}
             </Styled.StyledLabel>
             <Styled.StyledLabel size="big" color={RD.isFailure(feesRD) ? 'error' : 'primary'} style={{ paddingTop: 0 }}>
               {intl.formatMessage({ id: 'common.fees' })}: {selectedFeeLabel}
