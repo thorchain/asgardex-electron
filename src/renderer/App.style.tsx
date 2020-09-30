@@ -27,6 +27,12 @@ export const AppWrapper = styled.div<AppWrapperProps>`
       transition: none;
     }
   }
+
+  .ant-radio-input {
+    &::selection {
+      background-color: ${palette('primary', 1)};
+    }
+  }
 `
 
 export const AppLayout = styled(Layout)`

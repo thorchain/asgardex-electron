@@ -25,7 +25,7 @@ type Props = {
   bnbAmount: O.Option<AssetAmount>
 }
 
-const Freeze: React.FC<Props> = (props: Props): JSX.Element => {
+const Freeze: React.FC<Props> = (props): JSX.Element => {
   const { freezeService, selectedAsset, freezeAction: sendAction, explorerUrl = O.none, fee, bnbAmount } = props
   const intl = useIntl()
 

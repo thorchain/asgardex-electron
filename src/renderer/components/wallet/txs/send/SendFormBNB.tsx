@@ -98,7 +98,6 @@ const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
       {
-        fee: formatAssetAmount(amount, 6),
         balance: `${formatAssetAmount(amount, 8)} ${AssetBNB.symbol}`
       }
     )
@@ -167,7 +166,6 @@ const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
             </Form.Item>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              {/* TODO(@Veado) In future decimal will be changed depending on selected asset, currently we have just BNB assets (decimal = 8) */}
               <InputBigNumber min={0} size="large" disabled={isLoading} decimal={8} />
             </Styled.FormItem>
             <Styled.StyledLabel size="big">

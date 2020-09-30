@@ -18,7 +18,7 @@ type Props = {
   showAssetName?: boolean
 }
 
-const AssetSelectData: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetSelectData: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
     target,

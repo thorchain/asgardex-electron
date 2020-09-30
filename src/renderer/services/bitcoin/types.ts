@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
 import { FeeOptions } from '@thorchain/asgardex-bitcoin/lib/types/client-types'
-import { AssetAmount } from '@thorchain/asgardex-util'
+import { BaseAmount } from '@thorchain/asgardex-util'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
@@ -18,7 +18,7 @@ export type AddressValidation = BitcoinClient['validateAddress']
 
 export type SendTxParams = {
   to: string // to address
-  amount: AssetAmount
+  amount: BaseAmount
   feeRate: number
   memo?: string
 }

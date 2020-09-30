@@ -32,7 +32,7 @@ type Props = {
   isDev: boolean
 }
 
-const Footer: React.FC<Props> = (props: Props): JSX.Element => {
+const Footer: React.FC<Props> = (props): JSX.Element => {
   const { commitHash, isDev } = props
 
   const intl = useIntl()

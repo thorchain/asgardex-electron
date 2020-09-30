@@ -13,7 +13,7 @@ type Props = {
   className?: string
 }
 
-const AddressInput: React.FC<Props> = (props: Props): JSX.Element => {
+const AddressInput: React.FC<Props> = (props): JSX.Element => {
   const { value = '', status: initialStatus = false, onStatusChange, onChange, className = '' } = props
 
   const [status, setStatus] = useState(initialStatus)

@@ -17,7 +17,7 @@ type Props = {
   className?: string
 }
 
-const AssetInput: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetInput: React.FC<Props> = (props): JSX.Element => {
   const { title, amount, status, label, inputProps = {}, className = '', onChange, ...otherProps } = props
 
   const inputRef = useRef<FixmeType>()

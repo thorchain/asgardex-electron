@@ -34,7 +34,7 @@ type Props = {
   selectAssetHandler?: (asset: Asset) => void
 }
 
-const AssetsTableCollapsable: React.FC<Props> = (props: Props): JSX.Element => {
+const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const { assetsWBChains = [], pricePool, poolDetails, selectAssetHandler = (_) => {} } = props
 
   const intl = useIntl()

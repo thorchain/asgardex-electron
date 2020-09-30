@@ -21,7 +21,7 @@ type Props = {
   changeLocale?: (locale: Locale) => void
 }
 
-const HeaderLang: React.FC<Props> = (props: Props): JSX.Element => {
+const HeaderLang: React.FC<Props> = (props): JSX.Element => {
   const { isDesktopView, changeLocale = () => {}, locale } = props
 
   const changeLang: MenuProps['onClick'] = useCallback(

@@ -21,7 +21,14 @@ const tx$ = ({ client$, to, amount, feeRate, memo }: { client$: Client$ } & Send
         : Rx.from(client.normalTx({ addressTo: to, amount: amount.amount().toNumber(), feeRate }))
     ),
     map(RD.success),
-    catchError((error) => Rx.of(RD.failure({ errorId: ErrorId.SEND_TX, msg: error?.msg ?? '' } as ApiError))),
+    catchError((error) =>
+      Rx.of(
+        RD.failure({
+          errorId: ErrorId.SEND_TX,
+          msg: error?.msg ?? error?.toString() ?? `Sending tx to ${to} failed`
+        } as ApiError)
+      )
+    ),
     startWith(RD.pending)
   )
 

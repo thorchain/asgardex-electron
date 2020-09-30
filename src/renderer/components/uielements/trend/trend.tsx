@@ -10,7 +10,7 @@ import { TrendWrapper } from './trend.style'
 type Props = {
   amount?: BigNumber
 }
-const Trend: React.FC<Props> = (props: Props): JSX.Element => {
+const Trend: React.FC<Props> = (props): JSX.Element => {
   const { amount = bn(0), ...otherProps } = props
   const trend = isValidBN(amount) && amount.isGreaterThanOrEqualTo(0)
   const trendIcon = trend ? <ArrowUpOutlined /> : <ArrowDownOutlined />

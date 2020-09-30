@@ -28,7 +28,7 @@ type Props = {
   removeKeystore?: () => Promise<void>
 }
 
-const UnlockForm: React.FC<Props> = (props: Props): JSX.Element => {
+const UnlockForm: React.FC<Props> = (props): JSX.Element => {
   const { keystore, unlock: unlockHandler = () => Promise.resolve(), removeKeystore = () => Promise.resolve() } = props
 
   const [showRemoveModal, setShowRemoveModal] = useState(false)

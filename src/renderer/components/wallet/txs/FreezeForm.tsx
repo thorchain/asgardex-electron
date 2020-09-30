@@ -128,7 +128,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
 
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
-      { fee: formatAssetAmount(amount, 6), balance: `${formatAssetAmount(amount, 8)} ${AssetBNB.symbol}` }
+      { balance: `${formatAssetAmount(amount, 8)} ${AssetBNB.symbol}` }
     )
 
     return (
