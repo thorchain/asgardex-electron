@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react'
+import React, { PropsWithChildren } from 'react'
 
 import { TableProps } from 'antd/lib/table'
 
 import { TableWrapper } from './table.style'
 
-export type Props = {
+type ComponentProps<T> = {
   className?: string
-}
+} & TableProps<T>
 
-const Table: React.FC<Props & TableProps<any>> = (props): JSX.Element => {
+export type Props<T> = PropsWithChildren<ComponentProps<T>>
+
+const Table = <T extends {}>(props: Props<T>): JSX.Element => {
   const { className = '', ...otherProps } = props
 
   return <TableWrapper className={`table-wrapper ${className}`} pagination={false} {...otherProps} />
