@@ -60,6 +60,8 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const selectedAmountBn = useMemo(() => baseToAsset(selectedAmount).amount(), [selectedAmount])
   const amountBn = useMemo(() => baseToAsset(amount).amount(), [amount])
 
+  console.log('amountBn --- ', asset.ticker, amountBn.toFormat(5))
+
   useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
 
   const handleChangeAsset = useCallback(
@@ -90,6 +92,7 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
 
   const onPercentChange = useCallback(
     (percent: number) => {
+      // console.log(amountBn.multipliedBy(percent / 100).toFormat(5))
       onChange(amountBn.multipliedBy(percent / 100))
     },
     [amountBn, onChange]

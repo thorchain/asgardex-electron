@@ -1,10 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { Asset, assetAmount, assetToBase, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
+import { Asset, assetAmount, assetToBase, BaseAmount, baseAmount, baseToAsset } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
-import { PriceDataIndex } from '../../../services/midgard/types'
 import { AssetPair } from '../../../types/asgardex'
 import Drag from '../../uielements/drag'
 import * as Styled from './AddStake.style'
@@ -16,7 +15,6 @@ type Props = {
   runePrice: BigNumber
   assetAmount: BaseAmount
   runeAmount: BaseAmount
-  priceIndex?: PriceDataIndex
   unit?: string
   assetData?: AssetPair[]
   className?: string
@@ -79,6 +77,7 @@ export const AddStake: React.FC<Props> = ({
        * Convert Asset value to the RUNE based BaseAmount with
        * assetPrice / runePrice - ratio to convert from asset to RUNE
        */
+      // todo question about division
       const z = assetToBase(assetAmount(assetInput.div(runePrice).times(assetPrice)))
 
       /**

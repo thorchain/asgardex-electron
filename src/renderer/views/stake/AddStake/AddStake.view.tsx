@@ -1,7 +1,13 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetToString, bn, bnOrZero } from '@thorchain/asgardex-util'
+import {
+  Asset,
+  assetToString,
+  baseAmount,
+  bn,
+  bnOrZero
+} from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -19,6 +25,7 @@ import { liveData } from '../../../helpers/rx/liveData'
 import * as stakeRoutes from '../../../routes/stake'
 import { getPoolDetail } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
+import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
 
 export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const history = useHistory()
@@ -36,6 +43,15 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const runeAsset = useObservableState(service.pools.runeAsset$, getDefaultRuneAsset(asset.chain))
   const runPrice = useObservableState(service.pools.priceRatio$, bn(1))
   const selectedPricePoolAssetSymbol = useObservableState(service.pools.selectedPricePoolAssetSymbol$, O.none)
+  /* We have to get a new stake-stream for every new asset
+   * @description /src/renderer/services/midgard/stake.ts
+   */
+  const stakeData$ = useMemo(() => service.stake.getStakes$(asset), [asset, service.stake])
+  const stakeData = useObservableState<StakersAssetDataRD>(stakeData$, RD.initial)
+
+  const {
+    pools: { poolDetailedState$, selectedPricePoolAssetSymbol$, priceRatio$ }
+  } = service
 
   const [assetsWB] = useObservableState(
     () =>
@@ -45,6 +61,8 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
       ),
     O.none
   )
+
+  const poolDetailedInfo = useObservableState<PoolDetailRD>(poolDetailedState$, RD.initial)
 
   const assetBalance = FP.pipe(
     assetsWB,
@@ -90,25 +108,27 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
   )
 
   return FP.pipe(
-    sequenceTRD(assetPrice, poolAssets),
+    sequenceTRD(assetPrice, poolAssets, stakeData, poolDetailedInfo),
     RD.fold(
       () => <span>initial</span>,
       () => <span>pending</span>,
       () => <span>error</span>,
-      ([assetPrice, poolAssets]) => (
-        <AddStake
-          onChangeAsset={onChangeAsset}
-          asset={asset}
-          runeAsset={runeAsset}
-          assetPrice={assetPrice}
-          runePrice={runPrice}
-          assetAmount={assetBalance}
-          runeAmount={runeBalance}
-          onStake={console.log}
-          unit={O.toUndefined(selectedPricePoolAssetSymbol)}
-          assetData={poolAssets}
-        />
-      )
+      ([assetPrice, poolAssets, stake, pool]) => {
+        return (
+          <AddStake
+            onChangeAsset={onChangeAsset}
+            asset={asset}
+            runeAsset={runeAsset}
+            assetPrice={assetPrice}
+            runePrice={runPrice}
+            assetAmount={baseAmount(bnOrZero(pool.assetDepth))}
+            runeAmount={baseAmount(bnOrZero(pool.runeDepth))}
+            onStake={console.log}
+            unit={O.toUndefined(selectedPricePoolAssetSymbol)}
+            assetData={poolAssets}
+          />
+        )
+      }
     )
   )
 }

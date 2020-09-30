@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn, assetAmount, assetToBase, AssetRune67C } from '@thorchain/asgardex-util'
+import { bn, assetAmount, assetToBase, AssetRune67C, baseAmount } from '@thorchain/asgardex-util'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
@@ -10,12 +10,12 @@ import { AddStake } from './AddStake'
 export const AddStakeStory = () => {
   return (
     <AddStake
-      asset={ASSETS_MAINNET.BOLT}
+      asset={ASSETS_MAINNET.BNB}
       runeAsset={AssetRune67C}
-      assetPrice={bn(56)}
+      assetPrice={bn(59.6)}
       runePrice={bn(1)}
-      assetAmount={assetToBase(assetAmount(200))}
-      runeAmount={assetToBase(assetAmount(200))}
+      assetAmount={baseAmount(bn('5787505638239'))}
+      runeAmount={baseAmount(bn('342861416698484'))}
       onStake={console.log}
       onChangeAsset={console.log}
       assetData={[
