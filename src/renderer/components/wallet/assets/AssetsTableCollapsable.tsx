@@ -92,7 +92,7 @@ const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderBalanceColumn = ({ asset, amount }: AssetWithBalance) => {
-    const balance = formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, trimZeros: true })
+    const balance = formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 3 })
     return (
       <Label nowrap align="right">
         {balance}
@@ -112,9 +112,7 @@ const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       const oPrice = getPoolPriceValue(assetWB, poolDetails, pricePool.poolData)
       const label = FP.pipe(
         oPrice,
-        O.map((price) =>
-          formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, trimZeros: true })
-        ),
+        O.map((price) => formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })),
         // "empty" label if we don't get a price value
         O.getOrElse(() => '--')
       )

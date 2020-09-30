@@ -198,7 +198,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         {formatAssetAmountCurrency({
           amount: baseToAsset(poolPrice),
           asset: selectedPricePool.asset,
-          trimZeros: true
+          decimal: 3
         })}
       </Label>
     ),
@@ -224,7 +224,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         {formatAssetAmountCurrency({
           amount: baseToAsset(depthPrice),
           asset: selectedPricePool.asset,
-          trimZeros: true
+          decimal: 2
         })}
       </Label>
     ),
@@ -248,7 +248,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         {formatAssetAmountCurrency({
           amount: baseToAsset(volumePrice),
           asset: selectedPricePool.asset,
-          trimZeros: true
+          decimal: 2
         })}
       </Label>
     ),
@@ -273,7 +273,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
         {formatAssetAmountCurrency({
           amount: baseToAsset(transactionPrice),
           asset: selectedPricePool.asset,
-          trimZeros: true
+          decimal: 2
         })}
       </Label>
     ),

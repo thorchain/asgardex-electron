@@ -1,6 +1,13 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { assetAmount, formatAssetAmountCurrency, AssetAmount, bn, baseToAsset } from '@thorchain/asgardex-util'
+import {
+  assetAmount,
+  formatAssetAmountCurrency,
+  AssetAmount,
+  bn,
+  baseToAsset,
+  AssetBNB
+} from '@thorchain/asgardex-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
@@ -72,17 +79,17 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
         oFee,
         O.fold(
           () => '--',
-          (fee) => formatAssetAmountCurrency({ amount: fee, asset: assetWB.asset, trimZeros: true })
+          (fee) => formatAssetAmountCurrency({ amount: fee, asset: AssetBNB, trimZeros: true })
         )
       ),
-    [assetWB.asset, oFee]
+    [oFee]
   )
 
   const onSubmit = useCallback(
     ({ amount }: FormValues) => {
-      onSubmitProp({ amount: assetAmount(amount), asset: assetWB.asset, action: freezeAction })
+      onSubmitProp({ amount: assetAmount(amount), asset: AssetBNB, action: freezeAction })
     },
-    [onSubmitProp, assetWB, freezeAction]
+    [onSubmitProp, freezeAction]
   )
 
   const submitLabel = useMemo(() => {
