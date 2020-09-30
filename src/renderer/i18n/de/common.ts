@@ -10,7 +10,7 @@ const common: CommonMessages = {
   'common.address': 'Addresse',
   'common.to': 'Zu',
   'common.from': 'Von',
-  'common.amount': 'Wert',
+  'common.amount': 'Betrag',
   'common.coin': 'Coin',
   'common.password': 'Passwort',
   'common.memo': 'Memo',
