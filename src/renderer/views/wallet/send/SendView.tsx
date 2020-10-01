@@ -9,6 +9,7 @@ import { useParams } from 'react-router'
 
 import ErrorView from '../../../components/shared/error/ErrorView'
 import BackLink from '../../../components/uielements/backLink'
+import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
@@ -26,6 +27,8 @@ const SendView: React.FC<Props> = (): JSX.Element => {
 
   const { assetsWBState$ } = useWalletContext()
   const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
+
+  const { reloadFees } = useBitcoinContext()
 
   const renderAssetError = useMemo(
     () => (
@@ -50,7 +53,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
         case 'BNB':
           return <SendViewBNB selectedAsset={asset} assetsWB={assetsWB} />
         case 'BTC':
-          return <SendViewBTC btcAsset={asset} assetsWB={assetsWB} />
+          return <SendViewBTC btcAsset={asset} assetsWB={assetsWB} reloadFeesHandler={reloadFees} />
         case 'ETH':
           return <SendViewETH />
         default:
@@ -66,7 +69,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [assetsWB, intl]
+    [assetsWB, intl, reloadFees]
   )
 
   return FP.pipe(

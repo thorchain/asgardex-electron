@@ -5,7 +5,7 @@ import { palette } from 'styled-theme'
 
 import { InnerForm } from '../../shared/form/Form.style'
 import BaseButton from '../../uielements/button'
-import Label from '../../uielements/label'
+import UILabel from '../../uielements/label'
 
 export const Col = styled(A.Col)`
   padding: 20px 30px;
@@ -24,13 +24,13 @@ export const FormItem = styled(A.Form.Item)`
   margin-bottom: 0;
 `
 
-export const CustomLabel = styled(Label)`
+export const CustomLabel = styled(UILabel)`
   font-family: 'MainFontRegular';
   text-transform: uppercase;
   color: ${palette('text', 2)};
 `
 
-export const StyledLabel = styled(Label)`
+export const Label = styled(UILabel)`
   margin-bottom: 14px;
   font-family: 'MainFontRegular';
   text-transform: uppercase;
@@ -44,7 +44,7 @@ export const SubmitItem = styled(A.Form.Item)`
   }
 `
 
-export const BackLabel = styled(Label)`
+export const BackLabel = styled(UILabel)`
   margin-bottom: 18px;
   font-family: 'MainFontRegular';
 `

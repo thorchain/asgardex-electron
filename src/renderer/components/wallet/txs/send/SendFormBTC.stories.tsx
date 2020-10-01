@@ -39,6 +39,8 @@ const addressValidation: AddressValidation = (_) => true
 const onSubmitHandler = ({ to, amount, feeRate, memo }: SendTxParams) =>
   console.log(`to: ${to}, amount ${formatBaseAmount(amount)}, feeRate: ${JSON.stringify(feeRate)}, memo: ${memo}`)
 
+const reloadFeesHandler = () => console.log('reload fees')
+
 storiesOf('Wallet/SendFormBTC', module)
   .add('send', () => (
     <SendFormBTC
@@ -46,6 +48,7 @@ storiesOf('Wallet/SendFormBTC', module)
       assetsWB={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
+      reloadFeesHandler={reloadFeesHandler}
       fees={feesRD}
     />
   ))
@@ -56,6 +59,7 @@ storiesOf('Wallet/SendFormBTC', module)
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       fees={feesRD}
+      reloadFeesHandler={reloadFeesHandler}
       isLoading={true}
     />
   ))
@@ -65,6 +69,7 @@ storiesOf('Wallet/SendFormBTC', module)
       assetsWB={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
+      reloadFeesHandler={reloadFeesHandler}
       fees={RD.pending}
     />
   ))
@@ -74,6 +79,7 @@ storiesOf('Wallet/SendFormBTC', module)
       assetsWB={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
+      reloadFeesHandler={reloadFeesHandler}
       fees={RD.failure(Error('Could not load fee for any reason'))}
     />
   ))
@@ -82,6 +88,7 @@ storiesOf('Wallet/SendFormBTC', module)
       assetWB={bnbAsset}
       assetsWB={balances}
       onSubmit={onSubmitHandler}
+      reloadFeesHandler={reloadFeesHandler}
       addressValidation={addressValidation}
       fees={feesRD}
     />
