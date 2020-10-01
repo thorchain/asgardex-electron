@@ -129,9 +129,9 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
     )
 
     return (
-      <Styled.StyledLabel size="big" color="error">
+      <Styled.Label size="big" color="error">
         {msg}
-      </Styled.StyledLabel>
+      </Styled.Label>
     )
   }, [isFeeError, oBnbAmount, intl, assetWB.asset])
 
@@ -157,7 +157,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
               name="amount">
               <InputBigNumber min={0} size="large" disabled={isLoading} decimal={8} />
             </Styled.FormItem>
-            <Styled.StyledLabel size="big">
+            <Styled.Label size="big">
               <>
                 {intl.formatMessage({ id: 'common.max' })}:{' '}
                 {formatAssetAmountCurrency({
@@ -168,7 +168,7 @@ export const FreezeForm: React.FC<Props> = (props): JSX.Element => {
                 <br />
                 {intl.formatMessage({ id: 'common.fees' })}: {feeLabel}
               </>
-            </Styled.StyledLabel>
+            </Styled.Label>
             {renderFeeError}
           </Styled.SubForm>
           <Styled.SubmitItem>
