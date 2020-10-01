@@ -3,14 +3,10 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { Tx } from '@thorchain/asgardex-binance'
-import * as O from 'fp-ts/lib/Option'
 
-import TransactionsTable from './TransactionsTable'
+import TxsHistoryTableBNB from './txs/history/TxsHistoryTableBNB'
 
 storiesOf('Wallet/TransactionsTable', module).add('default', () => {
-  const address = 'tbnb13egw96d95lldrhwu56dttrpn2fth6cs0axzaad'
-  const oAddress = O.some(address)
-
   const tx: Tx = {
     blockHeight: 91158744,
     code: 0,
@@ -38,9 +34,8 @@ storiesOf('Wallet/TransactionsTable', module).add('default', () => {
   })
 
   return (
-    <TransactionsTable
+    <TxsHistoryTableBNB
       txsRD={txsRD}
-      address={oAddress}
       clickTxLinkHandler={(txHash: string) => console.log('txHash ', txHash)}
       changePaginationHandler={(page: number) => console.log('page:', page)}
     />

@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Txs, Tx, Address, TxPage } from '@thorchain/asgardex-binance'
+import { Txs, Tx, TxPage } from '@thorchain/asgardex-binance'
 import { assetAmount, bnOrZero, formatAssetAmount } from '@thorchain/asgardex-util'
 import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
@@ -9,19 +9,18 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 
-import { TxsRD } from '../../services/binance/types'
-import { MAX_PAGINATION_ITEMS } from '../../services/const'
-import ErrorView from '../shared/error/ErrorView'
-import Pagination from '../uielements/Pagination'
-import * as Styled from './TransactionTable.style'
+import { TxsRD } from '../../../../services/binance/types'
+import { MAX_PAGINATION_ITEMS } from '../../../../services/const'
+import ErrorView from '../../../shared/error/ErrorView'
+import Pagination from '../../../uielements/Pagination'
+import * as Styled from '../../TransactionTable.style'
 
 type Props = {
   txsRD: TxsRD
-  address: O.Option<Address>
   clickTxLinkHandler: (txHash: string) => void
   changePaginationHandler: (page: number) => void
 }
-const TransactionsTable: React.FC<Props> = (props): JSX.Element => {
+const TxsHistoryTableBNB: React.FC<Props> = (props): JSX.Element => {
   const { txsRD, clickTxLinkHandler, changePaginationHandler } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -185,4 +184,4 @@ const TransactionsTable: React.FC<Props> = (props): JSX.Element => {
 
   return renderContent
 }
-export default TransactionsTable
+export default TxsHistoryTableBNB

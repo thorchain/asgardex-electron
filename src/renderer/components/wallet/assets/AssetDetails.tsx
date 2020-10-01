@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { Address } from '@thorchain/asgardex-binance'
 import { Asset, assetToString } from '@thorchain/asgardex-util'
-import { Row, Col, Grid, Dropdown } from 'antd'
+import { Row, Col, Dropdown } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -10,13 +9,11 @@ import { useHistory } from 'react-router-dom'
 
 import * as AH from '../../../helpers/assetHelper'
 import * as walletRoutes from '../../../routes/wallet'
-import { TxsRD, LoadTxsProps, SendAction, isSendAction } from '../../../services/binance/types'
-import { MAX_PAGINATION_ITEMS } from '../../../services/const'
+import { SendAction, isSendAction } from '../../../services/binance/types'
 import { NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
 import AssetInfo from '../../uielements/assets/AssetInfo'
 import BackLink from '../../uielements/backLink'
 import Button, { RefreshButton } from '../../uielements/button'
-import TransactionsTable from '../TransactionsTable'
 import * as Styled from './AssetDetails.style'
 
 type SendActionMenuItem = {
@@ -25,28 +22,15 @@ type SendActionMenuItem = {
 }
 
 type Props = {
-  txsRD: TxsRD
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
   asset: O.Option<Asset>
-  address: O.Option<Address>
-  explorerUrl?: O.Option<string>
   reloadBalancesHandler?: () => void
-  loadSelectedAssetTxsHandler?: (_: LoadTxsProps) => void
 }
 
 const AssetDetails: React.FC<Props> = (props): JSX.Element => {
-  const {
-    txsRD,
-    address,
-    assetsWB: oAssetsWB,
-    asset: oAsset,
-    reloadBalancesHandler = () => {},
-    loadSelectedAssetTxsHandler = (_: LoadTxsProps) => {},
-    explorerUrl = O.none
-  } = props
+  const { assetsWB: oAssetsWB, asset: oAsset, reloadBalancesHandler = () => {} } = props
 
   const [sendAction, setSendAction] = useState<SendAction>('send')
-  const [currentPage, setCurrentPage] = useState(1)
 
   const assetAsString = useMemo(
     () =>
@@ -59,7 +43,6 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   )
 
   const isRuneAsset = useMemo(() => FP.pipe(oAsset, O.filter(AH.isRuneAsset), O.isSome), [oAsset])
-  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   const history = useHistory()
   const intl = useIntl()
 
@@ -85,19 +68,8 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   )
 
   const refreshHandler = useCallback(() => {
-    loadSelectedAssetTxsHandler({ limit: MAX_PAGINATION_ITEMS, offset: (currentPage - 1) * MAX_PAGINATION_ITEMS })
     reloadBalancesHandler()
-  }, [loadSelectedAssetTxsHandler, currentPage, reloadBalancesHandler])
-
-  const clickTxLinkHandler = useCallback(
-    (txHash: string) => {
-      FP.pipe(
-        explorerUrl,
-        O.map((url) => window.apiUrl.openExternal(`${url}/tx/${txHash}`))
-      )
-    },
-    [explorerUrl]
-  )
+  }, [reloadBalancesHandler])
 
   const changeActionMenuClickHandler = ({ key }: { key: React.Key }) => {
     if (isSendAction(key.toString())) {
@@ -141,14 +113,6 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       </Styled.ActionMenu>
     )
   }, [menuItems])
-
-  const onChangePagination = useCallback(
-    (pageNo) => {
-      loadSelectedAssetTxsHandler({ limit: MAX_PAGINATION_ITEMS, offset: (pageNo - 1) * MAX_PAGINATION_ITEMS })
-      setCurrentPage(pageNo)
-    },
-    [loadSelectedAssetTxsHandler]
-  )
 
   return (
     <>
@@ -201,21 +165,6 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           </Styled.ActionCol>
         </Styled.ActionRow>
         <Styled.Divider />
-      </Row>
-      <Row>
-        <Col span={24}>
-          <Styled.TableHeadline isDesktop={isDesktopView}>
-            {intl.formatMessage({ id: 'wallet.txs.last90days' })}
-          </Styled.TableHeadline>
-        </Col>
-        <Col span={24}>
-          <TransactionsTable
-            txsRD={txsRD}
-            address={address}
-            clickTxLinkHandler={clickTxLinkHandler}
-            changePaginationHandler={onChangePagination}
-          />
-        </Col>
       </Row>
     </>
   )

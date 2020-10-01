@@ -13,8 +13,7 @@ import { AssetWithBalanceRD, AssetWithBalance, ApiError, ErrorId } from '../wall
 import { client$ } from './common'
 
 /**
- * Observable to load balances from Binance API endpoint
- * If client is not available, it returns an `initial` state
+ * Observable to load BTC balances
  */
 const loadBalances$ = (client: BitcoinClient): Observable<AssetWithBalanceRD> =>
   Rx.from(client.getBalance()).pipe(
