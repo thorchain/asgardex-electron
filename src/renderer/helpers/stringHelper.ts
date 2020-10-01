@@ -25,3 +25,4 @@ export const compareShallowStr = (str1: string, str2: string): boolean => {
 }
 
 export const emptyString = ''
+export const loadingString = '...'
