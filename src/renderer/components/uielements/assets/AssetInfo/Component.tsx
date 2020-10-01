@@ -51,8 +51,8 @@ const Component: React.FC<Props> = (props): JSX.Element => {
           ([assetsWB, asset]) =>
             FP.pipe(
               getAssetAmountByAsset(assetsWB, asset),
+              // save latest amount (if available only)
               O.map((amount) => {
-                // save latest amount
                 previousBalance.current = O.some(amount)
                 return amount
               }),
@@ -60,7 +60,7 @@ const Component: React.FC<Props> = (props): JSX.Element => {
               // because `assetsWB` is loaded in parallel for all assets of different chains
               O.alt(() => previousBalance.current),
               O.map((amount) => formatAssetAmount({ amount, trimZeros: true })),
-              O.getOrElse(() => '')
+              O.getOrElse(() => loadingString)
             )
         )
       ),
