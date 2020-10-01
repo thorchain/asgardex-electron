@@ -16,15 +16,21 @@ describe('walletHelper', () => {
   describe('amountByAsset', () => {
     it('returns amount of RUNE', () => {
       const result = getAssetAmountByAsset([RUNE_WB, BOLT_WB, BNB_WB], ASSETS_TESTNET.RUNE)
-      expect(result.amount().toNumber()).toEqual(123)
+      expect(
+        FP.pipe(
+          result,
+          O.map((a) => a.amount().toNumber()),
+          O.getOrElse(() => NaN)
+        )
+      ).toEqual(123)
     })
-    it('returns 0 for an unknown asset', () => {
+    it('returns None for an unknown asset', () => {
       const result = getAssetAmountByAsset([RUNE_WB, BNB_WB], ASSETS_TESTNET.FTM)
-      expect(result.amount().toNumber()).toEqual(0)
+      expect(result).toBeNone()
     })
-    it('returns 0 for an empty list of assets', () => {
+    it('returns None for an empty list of assets', () => {
       const result = getAssetAmountByAsset([], ASSETS_TESTNET.FTM)
-      expect(result.amount().toNumber()).toEqual(0)
+      expect(result).toBeNone()
     })
   })
 

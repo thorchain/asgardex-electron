@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetBNB } from '@thorchain/asgardex-util'
+import { AssetBNB, Chain } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -24,6 +24,25 @@ const reloadBalances = () => {
   BTC.reloadBalances()
   BNB.reloadBalances()
   ETH.reloadBalances()
+}
+
+const reloadBalancesByChain = (chain: Chain) => {
+  switch (chain) {
+    case 'BNB':
+      BNB.reloadBalances()
+      break
+    case 'BTC':
+      BTC.reloadBalances()
+      break
+    case 'ETH':
+      ETH.reloadBalances()
+      break
+    case 'THOR':
+      // reload THOR balances - not available yet
+      break
+    default:
+    // nothing to do
+  }
 }
 
 /**
@@ -130,4 +149,4 @@ const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLatest([
   startWith(INITIAL_ASSETS_WB_STATE)
 )
 
-export { reloadBalances, assetsWBState$, assetsWBChains$ }
+export { reloadBalances, reloadBalancesByChain, assetsWBState$, assetsWBChains$ }

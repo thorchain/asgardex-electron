@@ -38,8 +38,8 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
     txsRD,
     address,
-    assetsWB,
-    asset,
+    assetsWB: oAssetsWB,
+    asset: oAsset,
     reloadBalancesHandler = () => {},
     loadSelectedAssetTxsHandler = (_: LoadTxsProps) => {},
     explorerUrl = O.none
@@ -51,14 +51,14 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const assetAsString = useMemo(
     () =>
       FP.pipe(
-        asset,
+        oAsset,
         O.map((a) => assetToString(a)),
         O.getOrElse(() => '')
       ),
-    [asset]
+    [oAsset]
   )
 
-  const isRuneAsset = useMemo(() => FP.pipe(asset, O.filter(AH.isRuneAsset), O.isSome), [asset])
+  const isRuneAsset = useMemo(() => FP.pipe(oAsset, O.filter(AH.isRuneAsset), O.isSome), [oAsset])
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   const history = useHistory()
   const intl = useIntl()
@@ -162,7 +162,7 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          <AssetInfo asset={asset} assetsWB={assetsWB} />
+          <AssetInfo asset={oAsset} assetsWB={oAssetsWB} />
         </Col>
 
         <Styled.Divider />
