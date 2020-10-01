@@ -31,6 +31,7 @@ type Props = {
   onChange?: (value: BigNumber) => void
   onChangeAsset?: (asset: Asset) => void
   className?: string
+  disabled?: boolean
 }
 
 const AssetCard: React.FC<Props> = (props): JSX.Element => {
@@ -50,7 +51,8 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
     onChange = (_: BigNumber) => {},
     onChangeAsset = (_: Asset) => {},
     children = null,
-    selectedAmount
+    selectedAmount,
+    disabled
   } = props
 
   const [openDropdown, setOpenDropdown] = useState(false)
@@ -60,7 +62,7 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const selectedAmountBn = useMemo(() => baseToAsset(selectedAmount).amount(), [selectedAmount])
   const amountBn = useMemo(() => baseToAsset(amount).amount(), [amount])
 
-  console.log('amountBn --- ', asset.ticker, amountBn.toFormat(5))
+  // console.log(asset.ticker, selectedAmount.amount().toFormat(5))
 
   useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
 
@@ -132,7 +134,7 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
               asset={asset}
               onSelect={handleChangeAsset}>
               <Styled.AssetData>
-                <Styled.InputBigNumber size="middle" value={selectedAmountBn} onChange={onChange} />
+                <Styled.InputBigNumber disabled={disabled} size="middle" value={selectedAmountBn} onChange={onChange} />
                 <Styled.AssetCardFooter>
                   <Styled.FooterLabel>{`${unit} ${formatBN(selectedAmountBn.multipliedBy(price))}`}</Styled.FooterLabel>
                   {slip !== undefined && (
@@ -146,6 +148,7 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
       </Dropdown>
       {withPercentSlider && (
         <Slider
+          disabled={disabled}
           key={'asset amount slider'}
           value={percentValue}
           onChange={onPercentChange}

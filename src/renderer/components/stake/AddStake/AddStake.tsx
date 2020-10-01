@@ -20,6 +20,7 @@ type Props = {
   className?: string
   onStake: (stakeAmount: BigNumber, asset: Asset) => void
   onChangeAsset: (asset: Asset) => void
+  disabled?: boolean
 }
 
 export const AddStake: React.FC<Props> = ({
@@ -33,7 +34,8 @@ export const AddStake: React.FC<Props> = ({
   assetData,
   unit,
   onStake,
-  onChangeAsset
+  onChangeAsset,
+  disabled
 }) => {
   const intl = useIntl()
   /**
@@ -105,6 +107,7 @@ export const AddStake: React.FC<Props> = ({
     <Styled.Container className={className}>
       <Styled.InputsWrapper>
         <Styled.AssetCard
+          disabled={disabled}
           asset={runeAsset}
           amount={runeAmount}
           selectedAmount={stakeAmount}
@@ -115,6 +118,7 @@ export const AddStake: React.FC<Props> = ({
         />
 
         <Styled.AssetCard
+          disabled={disabled}
           asset={asset}
           amount={assetAmountProp}
           selectedAmount={assetSelect}
@@ -131,6 +135,7 @@ export const AddStake: React.FC<Props> = ({
         source={runeAsset}
         target={asset}
         onConfirm={onStakeConfirmed}
+        disabled={disabled}
       />
     </Styled.Container>
   )

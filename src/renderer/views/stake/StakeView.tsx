@@ -13,7 +13,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { StakeRouteParams } from '../../routes/stake'
 import { isLocked } from '../../services/wallet/util'
-import { AddStakeView } from './AddStake/AddStake.view'
+import { AddStakeView } from './AddStake/AddStakeView'
 import { PoolDetailsView } from './PoolDetails/PoolDetailsView'
 import { ShareView } from './Share/ShareView'
 

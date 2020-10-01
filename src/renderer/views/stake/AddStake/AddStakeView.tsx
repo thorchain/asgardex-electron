@@ -1,13 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import {
-  Asset,
-  assetToString,
-  baseAmount,
-  bn,
-  bnOrZero
-} from '@thorchain/asgardex-util'
+import { Asset, assetToString, baseAmount, bn, bnOrZero } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -16,16 +10,16 @@ import { useHistory } from 'react-router'
 import { map } from 'rxjs/operators'
 
 import { AddStake } from '../../../components/stake/AddStake/AddStake'
-import { ONE_ASSET_BASE_AMOUNT, ZERO_BASE_AMOUNT } from '../../../const'
+import { ONE_ASSET_BASE_AMOUNT, ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import * as stakeRoutes from '../../../routes/stake'
+import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
 import { getPoolDetail } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
-import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
 
 export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const history = useHistory()
@@ -107,12 +101,30 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
     RD.map((state) => bnOrZero(state.price).multipliedBy(runPrice))
   )
 
+  const renderDisabledAddStake = useCallback(
+    () => (
+      <AddStake
+        onChangeAsset={() => {}}
+        asset={asset}
+        runeAsset={runeAsset}
+        assetPrice={ZERO_BN}
+        runePrice={ZERO_BN}
+        assetAmount={ZERO_BASE_AMOUNT}
+        runeAmount={ZERO_BASE_AMOUNT}
+        onStake={() => {}}
+        unit={O.toUndefined(selectedPricePoolAssetSymbol)}
+        disabled={true}
+      />
+    ),
+    [asset, runeAsset, selectedPricePoolAssetSymbol]
+  )
+
   return FP.pipe(
     sequenceTRD(assetPrice, poolAssets, stakeData, poolDetailedInfo),
     RD.fold(
-      () => <span>initial</span>,
-      () => <span>pending</span>,
-      () => <span>error</span>,
+      renderDisabledAddStake,
+      renderDisabledAddStake,
+      renderDisabledAddStake,
       ([assetPrice, poolAssets, stake, pool]) => {
         return (
           <AddStake
