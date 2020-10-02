@@ -9,9 +9,9 @@ import { useHistory } from 'react-router-dom'
 
 import * as AH from '../../../helpers/assetHelper'
 import * as walletRoutes from '../../../routes/wallet'
-import { SendAction, isSendAction } from '../../../services/binance/types'
+import { LoadTxsProps, SendAction, isSendAction } from '../../../services/binance/types'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
-import { AssetTxsPageRD, LoadAssetTxsProps, NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
+import { AssetTxsPageRD, NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
 import AssetInfo from '../../uielements/assets/AssetInfo'
 import BackLink from '../../uielements/backLink'
 import Button, { RefreshButton } from '../../uielements/button'
@@ -26,32 +26,43 @@ type SendActionMenuItem = {
 type Props = {
   txsPageRD: AssetTxsPageRD
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
-  asset: Asset
+  asset: O.Option<Asset>
   explorerTxUrl?: O.Option<string>
   reloadBalancesHandler?: () => void
-  reloadAssetTxsHandler?: (_: LoadAssetTxsProps) => void
+  loadSelectedAssetTxsHandler?: (_: LoadTxsProps) => void
 }
 
 const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
     txsPageRD,
-    asset,
     assetsWB: oAssetsWB,
-    reloadAssetTxsHandler = (_) => {},
+    asset: oAsset,
     reloadBalancesHandler = () => {},
+    loadSelectedAssetTxsHandler = (p) => {
+      console.log('p:', p)
+    },
     explorerTxUrl = O.none
   } = props
 
   const [sendAction, setSendAction] = useState<SendAction>('send')
   const [currentPage, setCurrentPage] = useState(1)
 
-  const isRuneAsset = useMemo(() => AH.isRuneAsset(asset), [asset])
+  const assetAsString = useMemo(
+    () =>
+      FP.pipe(
+        oAsset,
+        O.map((a) => assetToString(a)),
+        O.getOrElse(() => '')
+      ),
+    [oAsset]
+  )
+
+  const isRuneAsset = useMemo(() => FP.pipe(oAsset, O.filter(AH.isRuneAsset), O.isSome), [oAsset])
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   const history = useHistory()
   const intl = useIntl()
 
   const walletActionSendClick = useCallback(() => {
-    const assetAsString = assetToString(asset)
     switch (sendAction) {
       case 'send':
         history.push(walletRoutes.send.path({ asset: assetAsString }))
@@ -65,23 +76,24 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       default:
       // nothing to do
     }
-  }, [asset, history, sendAction])
+  }, [assetAsString, history, sendAction])
 
   const walletActionReceiveClick = useCallback(
-    () => history.push(walletRoutes.receive.path({ asset: assetToString(asset) })),
-    [asset, history]
+    () => history.push(walletRoutes.receive.path({ asset: assetAsString })),
+    [assetAsString, history]
   )
 
   const refreshHandler = useCallback(() => {
-    reloadAssetTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
+    // loadSelectedAssetTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
+    console.log('refresh:')
     reloadBalancesHandler()
-  }, [currentPage, reloadAssetTxsHandler, reloadBalancesHandler])
+  }, [reloadBalancesHandler])
 
   const clickTxLinkHandler = useCallback(
     (txHash: string) => {
       FP.pipe(
         explorerTxUrl,
-        O.map((url) => window.apiUrl.openExternal(`${url}/${txHash}`))
+        O.map((url) => window.apiUrl.openExternal(`${url}${txHash}`))
       )
     },
     [explorerTxUrl]
@@ -132,10 +144,10 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const onChangePagination = useCallback(
     (pageNo) => {
-      reloadAssetTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (pageNo - 1) * MAX_ITEMS_PER_PAGE })
+      loadSelectedAssetTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (pageNo - 1) * MAX_ITEMS_PER_PAGE })
       setCurrentPage(pageNo)
     },
-    [reloadAssetTxsHandler]
+    [loadSelectedAssetTxsHandler]
   )
 
   return (
@@ -150,7 +162,7 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          <AssetInfo asset={O.some(asset)} assetsWB={oAssetsWB} />
+          <AssetInfo asset={oAsset} assetsWB={oAssetsWB} />
         </Col>
 
         <Styled.Divider />
@@ -197,6 +209,8 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           </Styled.TableHeadline>
         </Col>
         <Col span={24}>
+          <Col span={24}>{currentPage}</Col>
+
           <TransactionsTable
             txsPageRD={txsPageRD}
             clickTxLinkHandler={clickTxLinkHandler}

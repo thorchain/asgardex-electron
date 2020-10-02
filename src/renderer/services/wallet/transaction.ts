@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Chain } from '@thorchain/asgardex-util'
-import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -11,7 +10,7 @@ import { ApiError, ErrorId } from './types'
 const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> => {
   switch (chain) {
     case 'BNB':
-      return BNB.explorerUrl$.pipe(RxOp.map(FP.flow(O.map((url) => `${url}/tx/`))))
+      return BNB.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}/tx/`)))
     case 'BTC':
       // not implemented yet
       return Rx.of(O.none)

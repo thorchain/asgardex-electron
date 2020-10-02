@@ -27,15 +27,22 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
-import { MAX_ITEMS_PER_PAGE } from '../const'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
+import { INITIAL_LOAD_TXS_PROPS } from '../wallet/const'
 import { keystoreService } from '../wallet/service'
-import { AssetsWithBalanceRD, ApiError, ErrorId, AssetsWithBalanceLD, AssetTxsPageLD } from '../wallet/types'
+import {
+  AssetsWithBalanceRD,
+  ApiError,
+  ErrorId,
+  AssetsWithBalanceLD,
+  AssetTxsPageLD,
+  LoadAssetTxsProps
+} from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import { BinanceClientState, FeeRD, FeesRD, TransferFeesRD, LoadTxsProps, BinanceClientState$ } from './types'
+import { BinanceClientState, FeeRD, FeesRD, TransferFeesRD, BinanceClientState$ } from './types'
 import { getWalletBalances, toTxsHistoryPage } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
@@ -287,14 +294,9 @@ const loadTxsOfSelectedAsset$ = ({
   )
 }
 
-const initialLoadTxsProps: LoadTxsProps = {
-  limit: MAX_ITEMS_PER_PAGE,
-  offset: 0
-}
-
 // `TriggerStream` to reload `Txs`
-const { get$: reloadSelectedAssetTxs$, set: reloadTxsSelectedAsset } = observableState<LoadTxsProps>(
-  initialLoadTxsProps
+const { get$: reloadSelectedAssetTxs$, set: reloadTxsSelectedAsset } = observableState<LoadAssetTxsProps>(
+  INITIAL_LOAD_TXS_PROPS
 )
 
 /**

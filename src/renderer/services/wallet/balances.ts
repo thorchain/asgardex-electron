@@ -27,6 +27,7 @@ const reloadBalances = () => {
 }
 
 const reloadBalancesByChain = (chain: Chain) => {
+  console.log('reloadBalancesByChain:', chain)
   switch (chain) {
     case 'BNB':
       return BNB.reloadBalances

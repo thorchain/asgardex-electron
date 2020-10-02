@@ -144,7 +144,7 @@ const TransactionsTable: React.FC<Props> = (props): JSX.Element => {
   }
 
   const renderLinkColumn = useCallback(
-    (_, { hash }: AssetTx) => <Styled.LinkIcon onClick={() => clickTxLinkHandler(hash)} />,
+    ({ hash }: AssetTx) => <Styled.LinkIcon onClick={() => clickTxLinkHandler(hash)} />,
     [clickTxLinkHandler]
   )
   const linkColumn: ColumnType<AssetTx> = {
