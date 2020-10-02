@@ -1,7 +1,6 @@
 import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@thorchain/asgardex-binance'
 import { baseToAsset, formatAssetAmount } from '@thorchain/asgardex-util'
 import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
@@ -11,7 +10,7 @@ import { ordString } from 'fp-ts/lib/Ord'
 import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 
 import { ZERO_BN } from '../../const'
-import { MAX_PAGINATION_ITEMS } from '../../services/const'
+import { MAX_ITEMS_PER_PAGE } from '../../services/const'
 import { ApiError, AssetTx, AssetTxs, AssetTxsPage, AssetTxsPageRD } from '../../services/wallet/types'
 import ErrorView from '../shared/error/ErrorView'
 import Pagination from '../uielements/Pagination'
@@ -19,7 +18,6 @@ import * as Styled from './TransactionTable.style'
 
 type Props = {
   txsPageRD: AssetTxsPageRD
-  address: O.Option<Address>
   clickTxLinkHandler: (txHash: string) => void
   changePaginationHandler: (page: number) => void
 }
@@ -171,7 +169,7 @@ const TransactionsTable: React.FC<Props> = (props): JSX.Element => {
             <Pagination
               defaultCurrent={1}
               total={total}
-              defaultPageSize={MAX_PAGINATION_ITEMS}
+              defaultPageSize={MAX_ITEMS_PER_PAGE}
               showSizeChanger={false}
               onChange={changePaginationHandler}
             />

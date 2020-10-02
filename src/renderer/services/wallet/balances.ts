@@ -29,19 +29,16 @@ const reloadBalances = () => {
 const reloadBalancesByChain = (chain: Chain) => {
   switch (chain) {
     case 'BNB':
-      BNB.reloadBalances()
-      break
+      return BNB.reloadBalances
     case 'BTC':
-      BTC.reloadBalances()
-      break
+      return BTC.reloadBalances
     case 'ETH':
-      ETH.reloadBalances()
-      break
+      return ETH.reloadBalances
     case 'THOR':
       // reload THOR balances - not available yet
-      break
+      return () => {}
     default:
-    // nothing to do
+      return () => {}
   }
 }
 

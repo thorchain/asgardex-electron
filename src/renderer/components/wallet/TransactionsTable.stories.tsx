@@ -9,9 +9,6 @@ import { AssetTx } from '../../services/wallet/types'
 import TransactionsTable from './TransactionsTable'
 
 storiesOf('Wallet/TransactionsTable', module).add('default', () => {
-  const address = 'tbnb13egw96d95lldrhwu56dttrpn2fth6cs0axzaad'
-  const oAddress = O.some(address)
-
   const tx: AssetTx = {
     asset: O.some(AssetBNB),
     from: 'tbnb138u9djee6fwphhd2a3628q2h0j5w97yx48zqex',
@@ -30,7 +27,6 @@ storiesOf('Wallet/TransactionsTable', module).add('default', () => {
   return (
     <TransactionsTable
       txsPageRD={txsRD}
-      address={oAddress}
       clickTxLinkHandler={(txHash: string) => console.log('txHash ', txHash)}
       changePaginationHandler={(page: number) => console.log('page:', page)}
     />

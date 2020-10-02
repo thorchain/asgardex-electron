@@ -27,7 +27,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
-import { MAX_PAGINATION_ITEMS } from '../const'
+import { MAX_ITEMS_PER_PAGE } from '../const'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
 import { keystoreService } from '../wallet/service'
@@ -280,7 +280,7 @@ const loadTxsOfSelectedAsset$ = ({
     map(toTxsHistoryPage),
     map(RD.success),
     catchError((error) =>
-      Rx.of(RD.failure({ errorId: ErrorId.GET_TXS_HISTORY, msg: error?.message ?? error.toString() } as ApiError))
+      Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
     ),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
@@ -288,12 +288,14 @@ const loadTxsOfSelectedAsset$ = ({
 }
 
 const initialLoadTxsProps: LoadTxsProps = {
-  limit: MAX_PAGINATION_ITEMS,
+  limit: MAX_ITEMS_PER_PAGE,
   offset: 0
 }
 
 // `TriggerStream` to reload `Txs`
-const { get$: loadSelectedAssetTxs$, set: loadTxsSelectedAsset } = observableState<LoadTxsProps>(initialLoadTxsProps)
+const { get$: reloadSelectedAssetTxs$, set: reloadTxsSelectedAsset } = observableState<LoadTxsProps>(
+  initialLoadTxsProps
+)
 
 /**
  * State of `Txs`
@@ -303,7 +305,7 @@ const { get$: loadSelectedAssetTxs$, set: loadTxsSelectedAsset } = observableSta
  */
 const txsSelectedAsset$: AssetTxsPageLD = Rx.combineLatest([
   client$,
-  loadSelectedAssetTxs$.pipe(debounceTime(300)),
+  reloadSelectedAssetTxs$.pipe(debounceTime(300)),
   selectedAsset$
 ]).pipe(
   switchMap(([client, { limit, offset }, oAsset]) => {
@@ -399,7 +401,7 @@ export {
   setSelectedAsset,
   reloadBalances,
   txsSelectedAsset$,
-  loadTxsSelectedAsset,
+  reloadTxsSelectedAsset,
   address$,
   selectedAsset$,
   explorerUrl$,

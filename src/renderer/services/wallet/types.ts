@@ -81,9 +81,14 @@ export type AssetTxsPage = {
 export type AssetTxsPageRD = RD.RemoteData<ApiError, AssetTxsPage>
 export type AssetTxsPageLD = LiveData<ApiError, AssetTxsPage>
 
+export type LoadAssetTxsProps = {
+  limit: number
+  offset: number
+}
+
 export enum ErrorId {
   GET_BALANCES,
-  GET_TXS_HISTORY,
+  GET_ASSET_TXS,
   SEND_TX
 }
 

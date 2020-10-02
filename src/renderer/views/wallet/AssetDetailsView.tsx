@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react'
+import React, { useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString } from '@thorchain/asgardex-util'
+import { assetFromString, assetToString } from '@thorchain/asgardex-util'
+import { eqString } from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router-dom'
+import * as Rx from 'rxjs'
 
 import AssetDetails from '../../components/wallet/assets/AssetDetails'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -14,40 +16,63 @@ import { AssetDetailsParams } from '../../routes/wallet'
 import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
 
 const AssetDetailsView: React.FC = (): JSX.Element => {
-  const { txsSelectedAsset$, address$, loadTxsSelectedAsset, explorerUrl$, setSelectedAsset } = useBinanceContext()
-  const { assetsWBState$, reloadBalancesByChain } = useWalletContext()
+  const { txsSelectedAsset$, address$, setSelectedAsset } = useBinanceContext()
+  const { assetsWBState$, reloadBalancesByChain, explorerTxUrlByChain$, reloadAssetTxsByChain } = useWalletContext()
 
   const { asset } = useParams<AssetDetailsParams>()
-  const selectedAsset = O.fromNullable(assetFromString(asset))
+  const oSelectedAsset = O.fromNullable(assetFromString(asset))
 
-  const txsRD = useObservableState(txsSelectedAsset$, RD.initial)
+  const assetTxsRD = useObservableState(txsSelectedAsset$, RD.initial)
   const address = useObservableState(address$, O.none)
   const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
 
-  const explorerUrl = useObservableState(explorerUrl$, O.none)
+  const prevAssetString = useRef('')
 
-  const reloadBalancesHandler = FP.pipe(
-    selectedAsset,
-    O.map(({ chain }) => () => reloadBalancesByChain(chain)),
-    O.toUndefined
+  const explorerTxUrl$ = FP.pipe(
+    oSelectedAsset,
+    O.fold(
+      () => Rx.of(O.none),
+      ({ chain }) => explorerTxUrlByChain$(chain)
+    )
   )
+  const explorerTxUrl = useObservableState(explorerTxUrl$, O.none)
 
   // Set selected asset to trigger dependent streams to get all needed data (such as its transactions)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setSelectedAsset(selectedAsset), [])
+  // useEffect(() => setSelectedAsset(oSelectedAsset), [])
 
-  return (
-    <>
-      <AssetDetails
-        txsPageRD={txsRD}
-        address={address}
-        assetsWB={assetsWB}
-        asset={selectedAsset}
-        loadSelectedAssetTxsHandler={loadTxsSelectedAsset}
-        reloadBalancesHandler={reloadBalancesHandler}
-        explorerUrl={explorerUrl}
-      />
-    </>
+  const renderContent = useMemo(
+    () =>
+      FP.pipe(
+        oSelectedAsset,
+        O.filter((asset) => !eqString.equals(assetToString(asset), prevAssetString.current)),
+        O.fold(
+          () => <></>,
+          (asset) => {
+            const { chain } = asset
+            console.log('render table 22:', chain)
+            prevAssetString.current = assetToString(asset)
+            return (
+              <h1>render {chain} </h1>
+              // <AssetDetails
+              //   txsPageRD={RD.initial}
+              //   // txsPageRD={assetTxsRD}
+              //   address={address}
+              //   assetsWB={assetsWB}
+              //   asset={O.some(asset)}
+              //   reloadAssetTxsHandler={undefined}
+              //   reloadBalancesHandler={undefined}
+              //   // reloadAssetTxsHandler={reloadAssetTxsByChain(chain)}
+              //   // reloadBalancesHandler={reloadBalancesByChain(chain)}
+              //   explorerTxUrl={explorerTxUrl}
+              // />
+            )
+          }
+        )
+      ),
+    [oSelectedAsset]
   )
+
+  return renderContent
 }
 export default AssetDetailsView
