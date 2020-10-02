@@ -4,6 +4,7 @@ import { SliderSingleProps } from 'antd/lib/slider'
 import { TooltipPlacement } from 'antd/lib/tooltip'
 
 import { SliderWrapper, SliderLabel } from './Slider.style'
+import { toPoolData } from '../../../services/midgard/utils'
 
 interface Props extends SliderSingleProps {
   className?: string

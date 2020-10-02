@@ -154,6 +154,11 @@ type StakeMessageKey =
   | 'stake.pool.noStakes'
   | 'stake.wallet.add'
   | 'stake.wallet.connect'
+  | 'stake.withdraw.title'
+  | 'stake.withdraw.choseText'
+  | 'stake.withdraw.receiveText'
+  | 'stake.withdraw.fee'
+  | 'stake.withdraw.feeNote'
 
 export type StakeMessages = { [key in StakeMessageKey]: string }
 

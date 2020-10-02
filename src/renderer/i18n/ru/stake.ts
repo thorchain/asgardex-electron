@@ -15,7 +15,12 @@ const stake: StakeMessages = {
   'stake.poolDetails.returnToDate': 'Доходность',
   'stake.wallet.add': 'Добавить',
   'stake.wallet.connect': 'Пожалуйсста добавьте свой кошелек',
-  'stake.pool.noStakes': 'У вас нет доли в этом пуле'
+  'stake.pool.noStakes': 'У вас нет доли в этом пуле',
+  'stake.withdraw.title': 'Установить вывод',
+  'stake.withdraw.choseText': 'Выберите сколько вы хотите изять от 0% до 100%',
+  'stake.withdraw.receiveText': 'Вы полчучите',
+  'stake.withdraw.fee': 'Комиссия',
+  'stake.withdraw.feeNote': 'Важно: {fee} BNB останется на вашем кошельке для покрытия комисий.'
 }
 
 export default stake
