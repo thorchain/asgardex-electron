@@ -14,10 +14,14 @@ export const AddStakeStory = () => {
       runeAsset={AssetRune67C}
       assetPrice={bn(59.6)}
       runePrice={bn(1)}
-      assetAmount={baseAmount(bn('5787505638239'))}
-      runeAmount={baseAmount(bn('342861416698484'))}
+      assetBalance={assetToBase(assetAmount('1.45746'))}
+      runeBalance={assetToBase(assetAmount('8528.00000'))}
       onStake={console.log}
       onChangeAsset={console.log}
+      poolData={{
+        assetBalance: baseAmount('55986.99147'),
+        runeBalance: baseAmount('3254937.05597')
+      }}
       assetData={[
         {
           asset: ASSETS_MAINNET.BNB,

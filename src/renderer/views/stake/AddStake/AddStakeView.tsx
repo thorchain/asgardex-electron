@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetToString, baseAmount, bn, bnOrZero } from '@thorchain/asgardex-util'
+import { Asset, assetToString, bn, bnOrZero } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -17,8 +17,8 @@ import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import * as stakeRoutes from '../../../routes/stake'
-import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
-import { getPoolDetail } from '../../../services/midgard/utils'
+import { PoolDetailRD } from '../../../services/midgard/types'
+import { getPoolDetail, toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 
 export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
@@ -37,14 +37,9 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const runeAsset = useObservableState(service.pools.runeAsset$, getDefaultRuneAsset(asset.chain))
   const runPrice = useObservableState(service.pools.priceRatio$, bn(1))
   const selectedPricePoolAssetSymbol = useObservableState(service.pools.selectedPricePoolAssetSymbol$, O.none)
-  /* We have to get a new stake-stream for every new asset
-   * @description /src/renderer/services/midgard/stake.ts
-   */
-  const stakeData$ = useMemo(() => service.stake.getStakes$(asset), [asset, service.stake])
-  const stakeData = useObservableState<StakersAssetDataRD>(stakeData$, RD.initial)
 
   const {
-    pools: { poolDetailedState$, selectedPricePoolAssetSymbol$, priceRatio$ }
+    pools: { poolDetailedState$ }
   } = service
 
   const [assetsWB] = useObservableState(
@@ -109,32 +104,34 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
         runeAsset={runeAsset}
         assetPrice={ZERO_BN}
         runePrice={ZERO_BN}
-        assetAmount={ZERO_BASE_AMOUNT}
-        runeAmount={ZERO_BASE_AMOUNT}
+        assetBalance={ZERO_BASE_AMOUNT}
+        runeBalance={ZERO_BASE_AMOUNT}
         onStake={() => {}}
         unit={O.toUndefined(selectedPricePoolAssetSymbol)}
         disabled={true}
+        poolData={{ runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }}
       />
     ),
     [asset, runeAsset, selectedPricePoolAssetSymbol]
   )
 
   return FP.pipe(
-    sequenceTRD(assetPrice, poolAssets, stakeData, poolDetailedInfo),
+    sequenceTRD(assetPrice, poolAssets, poolDetailedInfo),
     RD.fold(
       renderDisabledAddStake,
       renderDisabledAddStake,
       renderDisabledAddStake,
-      ([assetPrice, poolAssets, stake, pool]) => {
+      ([assetPrice, poolAssets, pool]) => {
         return (
           <AddStake
+            poolData={toPoolData(pool)}
             onChangeAsset={onChangeAsset}
             asset={asset}
             runeAsset={runeAsset}
             assetPrice={assetPrice}
             runePrice={runPrice}
-            assetAmount={baseAmount(bnOrZero(pool.assetDepth))}
-            runeAmount={baseAmount(bnOrZero(pool.runeDepth))}
+            assetBalance={assetBalance}
+            runeBalance={runeBalance}
             onStake={console.log}
             unit={O.toUndefined(selectedPricePoolAssetSymbol)}
             assetData={poolAssets}
