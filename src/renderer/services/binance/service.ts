@@ -31,12 +31,12 @@ import { MAX_PAGINATION_ITEMS } from '../const'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
 import { keystoreService } from '../wallet/service'
-import { AssetsWithBalanceRD, ApiError, ErrorId } from '../wallet/types'
+import { AssetsWithBalanceRD, ApiError, ErrorId, AssetsWithBalanceLD, AssetTxsPageLD } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import { BinanceClientState, FeeRD, FeesRD, TransferFeesRD, TxsRD, LoadTxsProps, BinanceClientState$ } from './types'
-import { getWalletBalances } from './utils'
+import { BinanceClientState, FeeRD, FeesRD, TransferFeesRD, LoadTxsProps, BinanceClientState$ } from './types'
+import { getWalletBalances, toTxsHistoryPage } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -207,9 +207,8 @@ const address$: Observable<O.Option<Address>> = client$.pipe(
 
 /**
  * Observable to load balances from Binance API endpoint
- * If client is not available, it returns an `initial` state
  */
-const loadBalances$ = (client: BinanceClient): Observable<AssetsWithBalanceRD> =>
+const loadBalances$ = (client: BinanceClient): AssetsWithBalanceLD =>
   Rx.from(client.getBalance()).pipe(
     mergeMap((balances) => Rx.of(RD.success(getWalletBalances(balances)))),
     catchError((error: Error) =>
@@ -263,7 +262,7 @@ const loadTxsOfSelectedAsset$ = ({
   oAsset: O.Option<Asset>
   limit: number
   offset: number
-}): Observable<TxsRD> => {
+}): AssetTxsPageLD => {
   const txAsset = FP.pipe(
     oAsset,
     O.fold(
@@ -278,8 +277,11 @@ const loadTxsOfSelectedAsset$ = ({
   const diffTime = 90 * 24 * 60 * 60 * 1000
   const startTime = endTime - diffTime
   return Rx.from(client.getTransactions({ txAsset, endTime, startTime, limit, offset })).pipe(
+    map(toTxsHistoryPage),
     map(RD.success),
-    catchError((error) => Rx.of(RD.failure(error))),
+    catchError((error) =>
+      Rx.of(RD.failure({ errorId: ErrorId.GET_TXS_HISTORY, msg: error?.message ?? error.toString() } as ApiError))
+    ),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
   )
@@ -299,7 +301,7 @@ const { get$: loadSelectedAssetTxs$, set: loadTxsSelectedAsset } = observableSta
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest([
+const txsSelectedAsset$: AssetTxsPageLD = Rx.combineLatest([
   client$,
   loadSelectedAssetTxs$.pipe(debounceTime(300)),
   selectedAsset$
@@ -309,7 +311,7 @@ const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest([
       // client and asset has to be available
       sequenceTOption(client, oAsset),
       O.fold(
-        () => Rx.of(RD.initial as TxsRD),
+        () => Rx.of(RD.initial),
         ([clientState, asset]) => loadTxsOfSelectedAsset$({ client: clientState, oAsset: O.some(asset), limit, offset })
       )
     )

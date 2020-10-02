@@ -10,9 +10,9 @@ import { useHistory } from 'react-router-dom'
 
 import * as AH from '../../../helpers/assetHelper'
 import * as walletRoutes from '../../../routes/wallet'
-import { TxsRD, LoadTxsProps, SendAction, isSendAction } from '../../../services/binance/types'
+import { LoadTxsProps, SendAction, isSendAction } from '../../../services/binance/types'
 import { MAX_PAGINATION_ITEMS } from '../../../services/const'
-import { NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
+import { AssetTxsPageRD, NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
 import AssetInfo from '../../uielements/assets/AssetInfo'
 import BackLink from '../../uielements/backLink'
 import Button, { RefreshButton } from '../../uielements/button'
@@ -25,7 +25,7 @@ type SendActionMenuItem = {
 }
 
 type Props = {
-  txsRD: TxsRD
+  txsPageRD: AssetTxsPageRD
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
   asset: O.Option<Asset>
   address: O.Option<Address>
@@ -36,7 +36,7 @@ type Props = {
 
 const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
-    txsRD,
+    txsPageRD,
     address,
     assetsWB: oAssetsWB,
     asset: oAsset,
@@ -210,7 +210,7 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         </Col>
         <Col span={24}>
           <TransactionsTable
-            txsRD={txsRD}
+            txsPageRD={txsPageRD}
             address={address}
             clickTxLinkHandler={clickTxLinkHandler}
             changePaginationHandler={onChangePagination}

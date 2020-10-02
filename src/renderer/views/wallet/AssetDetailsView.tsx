@@ -39,7 +39,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
   return (
     <>
       <AssetDetails
-        txsRD={txsRD}
+        txsPageRD={txsRD}
         address={address}
         assetsWB={assetsWB}
         asset={selectedAsset}
