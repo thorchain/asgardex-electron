@@ -75,7 +75,7 @@ export const keystoreService: KeystoreService = {
 
 const { get$: getSelectedAsset$, set: setSelectedAsset } = observableState<O.Option<Asset>>(O.none)
 
-// always do a "dirty check" of selected asset
+// "dirty check" to trigger "real" changes of an asset only
 const selectedAsset$ = getSelectedAsset$.pipe(distinctUntilChanged(eqOAsset.equals))
 
 export { selectedAsset$, setSelectedAsset }

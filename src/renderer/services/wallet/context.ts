@@ -3,7 +3,7 @@ import { initialKeystoreState, keystoreService, removeKeystore, setSelectedAsset
 import { assetTxs$, loadAssetTxs$, assetTxsByChain$, explorerTxUrl$ } from './transaction'
 
 /**
- * Exports of functions and observables needed at UI level (provided by `WalletContext`)
+ * Exports all functions and observables needed at UI level (provided by `WalletContext`)
  */
 export {
   initialKeystoreState,

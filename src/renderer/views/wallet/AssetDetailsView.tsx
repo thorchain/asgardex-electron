@@ -25,8 +25,8 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
   const { asset } = useParams<AssetDetailsParams>()
   const selectedAsset = O.fromNullable(assetFromString(asset))
 
-  // Set selected asset to trigger dependent streams
-  // Needed to get all needed data (transactions etc.)
+  // Set selected asset once
+  // Needed to get all data for this asset (transactions etc.)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setSelectedAsset(selectedAsset), [])
 
