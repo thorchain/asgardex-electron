@@ -5,7 +5,8 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import * as BNB from '../binance/service'
-import { ApiError, ErrorId } from './types'
+import { selectedAsset$ } from './common'
+import { ApiError, AssetTxsPageLD, ErrorId, LoadAssetTxsHandler } from './types'
 
 const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> => {
   switch (chain) {
@@ -25,25 +26,43 @@ const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> =>
   }
 }
 
-const reloadAssetTxsByChain = (chain: Chain) => {
+export const explorerTxUrl$: Rx.Observable<O.Option<string>> = selectedAsset$.pipe(
+  RxOp.switchMap(
+    O.fold(
+      () => Rx.EMPTY,
+      ({ chain }) => explorerTxUrlByChain$(chain)
+    )
+  )
+)
+
+const loadAssetTxsHandlerByChain = (chain: Chain): O.Option<LoadAssetTxsHandler> => {
   switch (chain) {
     case 'BNB':
-      return BNB.reloadTxsSelectedAsset
+      return O.some(() => BNB.reloadTxsSelectedAsset)
     case 'BTC':
       // not implemented yet
-      return () => {}
+      return O.none
     case 'ETH':
       // not implemented yet
-      return () => {}
+      return O.none
     case 'THOR':
       // reload THOR balances - not available yet
-      return () => {}
+      return O.none
     default:
-      return () => {}
+      return O.none
   }
 }
 
-const assetTxsByChain$ = (chain: Chain) => {
+export const loadAssetTxs$: Rx.Observable<O.Option<LoadAssetTxsHandler>> = selectedAsset$.pipe(
+  RxOp.switchMap(
+    O.fold(
+      () => Rx.EMPTY,
+      ({ chain }) => Rx.of(loadAssetTxsHandlerByChain(chain))
+    )
+  )
+)
+
+export const assetTxsByChain$ = (chain: Chain): AssetTxsPageLD => {
   switch (chain) {
     case 'BNB':
       return BNB.txsSelectedAsset$
@@ -54,8 +73,15 @@ const assetTxsByChain$ = (chain: Chain) => {
     case 'THOR':
       return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
     default:
-    // nothing to do
+      return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${chain}` } as ApiError))
   }
 }
 
-export { reloadAssetTxsByChain, assetTxsByChain$, explorerTxUrlByChain$ }
+export const assetTxs$: AssetTxsPageLD = selectedAsset$.pipe(
+  RxOp.switchMap(
+    O.fold(
+      () => Rx.EMPTY,
+      ({ chain }) => assetTxsByChain$(chain)
+    )
+  )
+)

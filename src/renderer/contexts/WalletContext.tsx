@@ -3,30 +3,46 @@ import React, { createContext, useContext } from 'react'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
-import { reloadBalances, assetsWBState$, assetsWBChains$, reloadBalancesByChain } from '../services/wallet/balances'
-import { keystoreService } from '../services/wallet/service'
-import { reloadAssetTxsByChain, assetTxsByChain$, explorerTxUrlByChain$ } from '../services/wallet/transaction'
+import {
+  reloadBalances,
+  assetsWBState$,
+  assetsWBChains$,
+  reloadBalances$,
+  keystoreService,
+  selectedAsset$,
+  setSelectedAsset,
+  loadAssetTxs$,
+  assetTxsByChain$,
+  explorerTxUrl$,
+  assetTxs$
+} from '../services/wallet/context'
 
 type WalletContextValue = {
   keystoreService: typeof keystoreService
   reloadBalances: typeof reloadBalances
-  reloadBalancesByChain: typeof reloadBalancesByChain
   assetsWBState$: typeof assetsWBState$
   assetsWBChains$: typeof assetsWBChains$
   assetTxsByChain$: typeof assetTxsByChain$
-  reloadAssetTxsByChain: typeof reloadAssetTxsByChain
-  explorerTxUrlByChain$: typeof explorerTxUrlByChain$
+  loadAssetTxs$: typeof loadAssetTxs$
+  reloadBalances$: typeof reloadBalances$
+  explorerTxUrl$: typeof explorerTxUrl$
+  setSelectedAsset: typeof setSelectedAsset
+  selectedAsset$: typeof selectedAsset$
+  assetTxs$: typeof assetTxs$
 }
 
 const initialContext: WalletContextValue = {
   keystoreService,
   reloadBalances,
-  reloadBalancesByChain,
-  reloadAssetTxsByChain,
+  reloadBalances$,
+  loadAssetTxs$,
   assetsWBState$,
   assetsWBChains$,
   assetTxsByChain$,
-  explorerTxUrlByChain$
+  explorerTxUrl$,
+  setSelectedAsset,
+  selectedAsset$,
+  assetTxs$
 }
 const WalletContext = createContext<Option<WalletContextValue>>(none)
 

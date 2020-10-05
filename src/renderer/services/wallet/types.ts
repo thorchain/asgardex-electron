@@ -86,6 +86,10 @@ export type LoadAssetTxsProps = {
   offset: number
 }
 
+export type LoadAssetTxsHandler = (props: LoadAssetTxsProps) => void
+
+export type LoadBalancesHandler = () => void
+
 export enum ErrorId {
   GET_BALANCES,
   GET_ASSET_TXS,

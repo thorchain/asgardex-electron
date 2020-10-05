@@ -29,8 +29,8 @@ import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
+import { keystoreService, selectedAsset$ } from '../wallet/common'
 import { INITIAL_LOAD_TXS_PROPS } from '../wallet/const'
-import { keystoreService } from '../wallet/service'
 import {
   AssetsWithBalanceRD,
   ApiError,
@@ -253,8 +253,6 @@ const assetsWB$: Observable<AssetsWithBalanceRD> = Rx.combineLatest([
   shareReplay(1)
 )
 
-const { get$: selectedAsset$, set: setSelectedAsset } = observableState<O.Option<Asset>>(O.none)
-
 /**
  * Observable to load txs from Binance API endpoint
  * If client is not available, it returns an `initial` state
@@ -307,7 +305,7 @@ const { get$: reloadSelectedAssetTxs$, set: reloadTxsSelectedAsset } = observabl
  */
 const txsSelectedAsset$: AssetTxsPageLD = Rx.combineLatest([
   client$,
-  reloadSelectedAssetTxs$.pipe(debounceTime(300)),
+  reloadSelectedAssetTxs$.pipe(debounceTime(300), startWith(INITIAL_LOAD_TXS_PROPS)),
   selectedAsset$
 ]).pipe(
   switchMap(([client, { limit, offset }, oAsset]) => {
@@ -316,7 +314,13 @@ const txsSelectedAsset$: AssetTxsPageLD = Rx.combineLatest([
       sequenceTOption(client, oAsset),
       O.fold(
         () => Rx.of(RD.initial),
-        ([clientState, asset]) => loadTxsOfSelectedAsset$({ client: clientState, oAsset: O.some(asset), limit, offset })
+        ([clientState, asset]) =>
+          loadTxsOfSelectedAsset$({
+            client: clientState,
+            oAsset: O.some(asset),
+            limit,
+            offset
+          })
       )
     )
   }),
@@ -400,12 +404,10 @@ export {
   client$,
   clientViewState$,
   assetsWB$,
-  setSelectedAsset,
   reloadBalances,
   txsSelectedAsset$,
   reloadTxsSelectedAsset,
   address$,
-  selectedAsset$,
   explorerUrl$,
   transaction,
   freeze,

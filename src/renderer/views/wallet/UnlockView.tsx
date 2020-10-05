@@ -4,7 +4,7 @@ import { useObservableState } from 'observable-hooks'
 
 import UnlockForm from '../../components/wallet/UnlockForm'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { initialKeystoreState } from '../../services/wallet/service'
+import { initialKeystoreState } from '../../services/wallet/context'
 
 const UnlockView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()

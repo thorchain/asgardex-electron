@@ -5,7 +5,7 @@ import { createTransactionService } from './transaction'
 const { fees$, pushTx, reloadFees, txRD$, resetTx } = createTransactionService(client$)
 
 /**
- * Re-export "public" functions and observables
+ * Exports of functions and observables needed at UI level (provided by `BitcoinContext`)
  */
 export {
   client$,
