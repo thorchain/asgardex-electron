@@ -38,7 +38,7 @@ export const explorerTxUrl$: Rx.Observable<O.Option<string>> = selectedAsset$.pi
 const loadAssetTxsHandlerByChain = (chain: Chain): O.Option<LoadAssetTxsHandler> => {
   switch (chain) {
     case 'BNB':
-      return O.some(() => BNB.reloadTxsSelectedAsset)
+      return O.some(() => BNB.loadAssetTxs)
     case 'BTC':
       // not implemented yet
       return O.none
@@ -53,7 +53,7 @@ const loadAssetTxsHandlerByChain = (chain: Chain): O.Option<LoadAssetTxsHandler>
   }
 }
 
-export const loadAssetTxs$: Rx.Observable<O.Option<LoadAssetTxsHandler>> = selectedAsset$.pipe(
+export const loadAssetTxsHandler$: Rx.Observable<O.Option<LoadAssetTxsHandler>> = selectedAsset$.pipe(
   RxOp.switchMap(
     O.fold(
       () => Rx.EMPTY,
@@ -65,7 +65,7 @@ export const loadAssetTxs$: Rx.Observable<O.Option<LoadAssetTxsHandler>> = selec
 export const assetTxsByChain$ = (chain: Chain): AssetTxsPageLD => {
   switch (chain) {
     case 'BNB':
-      return BNB.txsSelectedAsset$
+      return BNB.assetTxs$
     case 'BTC':
       return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
     case 'ETH':

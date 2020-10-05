@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { WS, Client, Network as BinanceNetwork, BinanceClient, Address } from '@thorchain/asgardex-binance'
-import { Asset } from '@thorchain/asgardex-util'
+import { Asset, BNBChain } from '@thorchain/asgardex-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -293,25 +293,25 @@ const loadTxsOfSelectedAsset$ = ({
 }
 
 // `TriggerStream` to reload `Txs`
-const { get$: reloadSelectedAssetTxs$, set: reloadTxsSelectedAsset } = observableState<LoadAssetTxsProps>(
-  INITIAL_LOAD_TXS_PROPS
-)
+const { get$: loadAssetTxs$, set: loadAssetTxs } = observableState<LoadAssetTxsProps>(INITIAL_LOAD_TXS_PROPS)
 
 /**
- * State of `Txs`
+ * `Txs` of selected asset
  *
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const txsSelectedAsset$: AssetTxsPageLD = Rx.combineLatest([
+const assetTxs$: AssetTxsPageLD = Rx.combineLatest([
   client$,
-  reloadSelectedAssetTxs$.pipe(debounceTime(300), startWith(INITIAL_LOAD_TXS_PROPS)),
+  loadAssetTxs$.pipe(debounceTime(300), startWith(INITIAL_LOAD_TXS_PROPS)),
   selectedAsset$
 ]).pipe(
   switchMap(([client, { limit, offset }, oAsset]) => {
     return FP.pipe(
       // client and asset has to be available
       sequenceTOption(client, oAsset),
+      // ignore all assets from other chains than BNB
+      O.filter(([_, { chain }]) => chain === BNBChain),
       O.fold(
         () => Rx.of(RD.initial),
         ([clientState, asset]) =>
@@ -405,8 +405,8 @@ export {
   clientViewState$,
   assetsWB$,
   reloadBalances,
-  txsSelectedAsset$,
-  reloadTxsSelectedAsset,
+  assetTxs$,
+  loadAssetTxs,
   address$,
   explorerUrl$,
   transaction,

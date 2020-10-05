@@ -16,7 +16,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
   const {
     assetTxs$,
     assetsWBState$,
-    loadAssetTxs$,
+    loadAssetTxsHandler$,
     reloadBalances$,
     explorerTxUrl$,
     setSelectedAsset
@@ -34,7 +34,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
   const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
 
   const [reloadBalances] = useObservableState(() => reloadBalances$.pipe(RxOp.map(O.toUndefined)))
-  const [loadAssetTxs] = useObservableState(() => loadAssetTxs$.pipe(RxOp.map(O.toUndefined)))
+  const [loadAssetTxsHandler] = useObservableState(() => loadAssetTxsHandler$.pipe(RxOp.map(O.toUndefined)))
 
   const explorerTxUrl = useObservableState(explorerTxUrl$, O.none)
 
@@ -44,7 +44,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
         txsPageRD={txsRD}
         assetsWB={assetsWB}
         asset={selectedAsset}
-        loadAssetTxsHandler={loadAssetTxs}
+        loadAssetTxsHandler={loadAssetTxsHandler}
         reloadBalancesHandler={reloadBalances}
         explorerTxUrl={explorerTxUrl}
       />
