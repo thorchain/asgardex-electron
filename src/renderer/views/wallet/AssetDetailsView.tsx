@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { assetFromString } from '@thorchain/asgardex-util'
@@ -36,7 +36,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
     O.toUndefined
   )
 
-  const explorerTxUrl$ = useMemo(
+  const [explorerTxUrl] = useObservableState(
     () =>
       FP.pipe(
         selectedAsset,
@@ -45,10 +45,8 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
           ({ chain }) => explorerTxUrlByChain$(chain)
         )
       ),
-    [explorerTxUrlByChain$, selectedAsset]
+    O.none
   )
-
-  const explorerTxUrl = useObservableState(explorerTxUrl$, O.none)
 
   // Set selected asset to trigger dependent streams to get all needed data (such as its transactions)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,14 +54,13 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
 
   return (
     <>
-      <h1>{JSON.stringify(explorerTxUrl)}</h1>
       <AssetDetails
         txsPageRD={txsRD}
         assetsWB={assetsWB}
         asset={selectedAsset}
         loadSelectedAssetTxsHandler={reloadAssetTxs}
         reloadBalancesHandler={reloadBalances}
-        explorerTxUrl={O.none}
+        explorerTxUrl={explorerTxUrl}
       />
     </>
   )
