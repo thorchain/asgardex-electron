@@ -11,7 +11,7 @@ import {
   pushTx,
   explorerUrl$,
   resetTx
-} from '../services/bitcoin'
+} from '../services/bitcoin/context'
 
 export type BitcoinContextValue = {
   client$: typeof client$

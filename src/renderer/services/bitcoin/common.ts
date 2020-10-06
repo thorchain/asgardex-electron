@@ -11,7 +11,7 @@ import { eqOString } from '../../helpers/fp/eq'
 import { network$ } from '../app/service'
 import { ClientStateForViews } from '../types'
 import { getClientStateForViews, getClient } from '../utils'
-import { keystoreService } from '../wallet/service'
+import { keystoreService } from '../wallet/common'
 import { getPhrase } from '../wallet/util'
 import { BitcoinClientState } from './types'
 

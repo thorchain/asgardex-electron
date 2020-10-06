@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { Address } from '@thorchain/asgardex-binance'
 import { Asset, assetToString } from '@thorchain/asgardex-util'
 import { Row, Col, Grid, Dropdown } from 'antd'
 import * as FP from 'fp-ts/lib/function'
@@ -10,9 +9,10 @@ import { useHistory } from 'react-router-dom'
 
 import * as AH from '../../../helpers/assetHelper'
 import * as walletRoutes from '../../../routes/wallet'
-import { TxsRD, LoadTxsProps, SendAction, isSendAction } from '../../../services/binance/types'
-import { MAX_PAGINATION_ITEMS } from '../../../services/const'
-import { NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
+import { SendAction, isSendAction } from '../../../services/binance/types'
+import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
+import { EMPTY_ASSET_TX_HANDLER } from '../../../services/wallet/const'
+import { AssetTxsPageRD, LoadAssetTxsHandler, NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
 import AssetInfo from '../../uielements/assets/AssetInfo'
 import BackLink from '../../uielements/backLink'
 import Button, { RefreshButton } from '../../uielements/button'
@@ -25,24 +25,22 @@ type SendActionMenuItem = {
 }
 
 type Props = {
-  txsRD: TxsRD
+  txsPageRD: AssetTxsPageRD
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
   asset: O.Option<Asset>
-  address: O.Option<Address>
-  explorerUrl?: O.Option<string>
+  explorerTxUrl?: O.Option<string>
   reloadBalancesHandler?: () => void
-  loadSelectedAssetTxsHandler?: (_: LoadTxsProps) => void
+  loadAssetTxsHandler?: LoadAssetTxsHandler
 }
 
 const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
-    txsRD,
-    address,
+    txsPageRD,
     assetsWB: oAssetsWB,
     asset: oAsset,
     reloadBalancesHandler = () => {},
-    loadSelectedAssetTxsHandler = (_: LoadTxsProps) => {},
-    explorerUrl = O.none
+    loadAssetTxsHandler = EMPTY_ASSET_TX_HANDLER,
+    explorerTxUrl = O.none
   } = props
 
   const [sendAction, setSendAction] = useState<SendAction>('send')
@@ -85,18 +83,18 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   )
 
   const refreshHandler = useCallback(() => {
-    loadSelectedAssetTxsHandler({ limit: MAX_PAGINATION_ITEMS, offset: (currentPage - 1) * MAX_PAGINATION_ITEMS })
+    loadAssetTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
     reloadBalancesHandler()
-  }, [loadSelectedAssetTxsHandler, currentPage, reloadBalancesHandler])
+  }, [currentPage, loadAssetTxsHandler, reloadBalancesHandler])
 
   const clickTxLinkHandler = useCallback(
     (txHash: string) => {
       FP.pipe(
-        explorerUrl,
-        O.map((url) => window.apiUrl.openExternal(`${url}/tx/${txHash}`))
+        explorerTxUrl,
+        O.map((url) => window.apiUrl.openExternal(`${url}${txHash}`))
       )
     },
-    [explorerUrl]
+    [explorerTxUrl]
   )
 
   const changeActionMenuClickHandler = ({ key }: { key: React.Key }) => {
@@ -144,10 +142,10 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const onChangePagination = useCallback(
     (pageNo) => {
-      loadSelectedAssetTxsHandler({ limit: MAX_PAGINATION_ITEMS, offset: (pageNo - 1) * MAX_PAGINATION_ITEMS })
+      loadAssetTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (pageNo - 1) * MAX_ITEMS_PER_PAGE })
       setCurrentPage(pageNo)
     },
-    [loadSelectedAssetTxsHandler]
+    [loadAssetTxsHandler]
   )
 
   return (
@@ -210,8 +208,7 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         </Col>
         <Col span={24}>
           <TransactionsTable
-            txsRD={txsRD}
-            address={address}
+            txsPageRD={txsPageRD}
             clickTxLinkHandler={clickTxLinkHandler}
             changePaginationHandler={onChangePagination}
           />

@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { WS, Client, Network as BinanceNetwork, BinanceClient, Address } from '@thorchain/asgardex-binance'
-import { Asset } from '@thorchain/asgardex-util'
+import { Asset, BNBChain } from '@thorchain/asgardex-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -27,16 +27,23 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
-import { MAX_PAGINATION_ITEMS } from '../const'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
-import { keystoreService } from '../wallet/service'
-import { AssetsWithBalanceRD, ApiError, ErrorId } from '../wallet/types'
+import { keystoreService, selectedAsset$ } from '../wallet/common'
+import { INITIAL_LOAD_TXS_PROPS } from '../wallet/const'
+import {
+  AssetsWithBalanceRD,
+  ApiError,
+  ErrorId,
+  AssetsWithBalanceLD,
+  AssetTxsPageLD,
+  LoadAssetTxsProps
+} from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import { BinanceClientState, FeeRD, FeesRD, TransferFeesRD, TxsRD, LoadTxsProps, BinanceClientState$ } from './types'
-import { getWalletBalances } from './utils'
+import { BinanceClientState, FeeRD, FeesRD, TransferFeesRD, BinanceClientState$ } from './types'
+import { getWalletBalances, toTxsHistoryPage } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -207,9 +214,8 @@ const address$: Observable<O.Option<Address>> = client$.pipe(
 
 /**
  * Observable to load balances from Binance API endpoint
- * If client is not available, it returns an `initial` state
  */
-const loadBalances$ = (client: BinanceClient): Observable<AssetsWithBalanceRD> =>
+const loadBalances$ = (client: BinanceClient): AssetsWithBalanceLD =>
   Rx.from(client.getBalance()).pipe(
     mergeMap((balances) => Rx.of(RD.success(getWalletBalances(balances)))),
     catchError((error: Error) =>
@@ -247,8 +253,6 @@ const assetsWB$: Observable<AssetsWithBalanceRD> = Rx.combineLatest([
   shareReplay(1)
 )
 
-const { get$: selectedAsset$, set: setSelectedAsset } = observableState<O.Option<Asset>>(O.none)
-
 /**
  * Observable to load txs from Binance API endpoint
  * If client is not available, it returns an `initial` state
@@ -263,7 +267,7 @@ const loadTxsOfSelectedAsset$ = ({
   oAsset: O.Option<Asset>
   limit: number
   offset: number
-}): Observable<TxsRD> => {
+}): AssetTxsPageLD => {
   const txAsset = FP.pipe(
     oAsset,
     O.fold(
@@ -278,39 +282,45 @@ const loadTxsOfSelectedAsset$ = ({
   const diffTime = 90 * 24 * 60 * 60 * 1000
   const startTime = endTime - diffTime
   return Rx.from(client.getTransactions({ txAsset, endTime, startTime, limit, offset })).pipe(
+    map(toTxsHistoryPage),
     map(RD.success),
-    catchError((error) => Rx.of(RD.failure(error))),
+    catchError((error) =>
+      Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
+    ),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
   )
 }
 
-const initialLoadTxsProps: LoadTxsProps = {
-  limit: MAX_PAGINATION_ITEMS,
-  offset: 0
-}
-
 // `TriggerStream` to reload `Txs`
-const { get$: loadSelectedAssetTxs$, set: loadTxsSelectedAsset } = observableState<LoadTxsProps>(initialLoadTxsProps)
+const { get$: loadAssetTxs$, set: loadAssetTxs } = observableState<LoadAssetTxsProps>(INITIAL_LOAD_TXS_PROPS)
 
 /**
- * State of `Txs`
+ * `Txs` of selected asset
  *
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest([
+const assetTxs$: AssetTxsPageLD = Rx.combineLatest([
   client$,
-  loadSelectedAssetTxs$.pipe(debounceTime(300)),
+  loadAssetTxs$.pipe(debounceTime(300), startWith(INITIAL_LOAD_TXS_PROPS)),
   selectedAsset$
 ]).pipe(
   switchMap(([client, { limit, offset }, oAsset]) => {
     return FP.pipe(
       // client and asset has to be available
       sequenceTOption(client, oAsset),
+      // ignore all assets from other chains than BNB
+      O.filter(([_, { chain }]) => chain === BNBChain),
       O.fold(
-        () => Rx.of(RD.initial as TxsRD),
-        ([clientState, asset]) => loadTxsOfSelectedAsset$({ client: clientState, oAsset: O.some(asset), limit, offset })
+        () => Rx.of(RD.initial),
+        ([clientState, asset]) =>
+          loadTxsOfSelectedAsset$({
+            client: clientState,
+            oAsset: O.some(asset),
+            limit,
+            offset
+          })
       )
     )
   }),
@@ -394,12 +404,10 @@ export {
   client$,
   clientViewState$,
   assetsWB$,
-  setSelectedAsset,
   reloadBalances,
-  txsSelectedAsset$,
-  loadTxsSelectedAsset,
+  assetTxs$,
+  loadAssetTxs,
   address$,
-  selectedAsset$,
   explorerUrl$,
   transaction,
   freeze,

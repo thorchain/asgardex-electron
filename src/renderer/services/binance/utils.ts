@@ -1,4 +1,4 @@
-import { Balance, Balances } from '@thorchain/asgardex-binance'
+import { Balance, Balances, Tx, TxPage, TxType } from '@thorchain/asgardex-binance'
 import {
   getValueOfAsset1InAsset2,
   PoolData,
@@ -10,7 +10,8 @@ import {
   Asset,
   assetToBase,
   bn,
-  isValidBN
+  isValidBN,
+  AssetBNB
 } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -18,7 +19,7 @@ import * as O from 'fp-ts/lib/Option'
 import { BNB_DECIMAL, isRuneAsset } from '../../helpers/assetHelper'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
-import { AssetWithBalance, AssetsWithBalance } from '../wallet/types'
+import { AssetWithBalance, AssetsWithBalance, AssetTxsPage, AssetTx, AssetTxType } from '../wallet/types'
 
 /**
  * Helper to get a pool price value for a given `Balance`
@@ -53,7 +54,7 @@ export const bncSymbolToAsset = (symbol: string): O.Option<Asset> =>
 /**
  * Converts a BinanceChain symbol to an `Asset` string
  **/
-export const bncSymbolToAssetString = (symbol: string) => `BNB.${symbol}`
+export const bncSymbolToAssetString = (symbol: string) => `${AssetBNB.chain}.${symbol}`
 
 export const getWalletBalances = (balances: Balances): AssetsWithBalance =>
   balances.reduce((acc, { symbol, free, frozen }: Balance) => {
@@ -72,3 +73,31 @@ export const getWalletBalances = (balances: Balances): AssetsWithBalance =>
       O.getOrElse(() => acc)
     )
   }, [] as AssetsWithBalance)
+
+export const toAssetTxType = (txType: TxType): AssetTxType => {
+  switch (txType) {
+    case 'FREEZE_TOKEN':
+      return 'freeze'
+    case 'UN_FREEZE_TOKEN':
+      return 'unfreeze'
+    case 'TRANSFER':
+      return 'transfer'
+    default:
+      return 'unkown'
+  }
+}
+
+export const toTxHistory = (tx: Tx): AssetTx => ({
+  asset: bncSymbolToAsset(tx.txAsset),
+  from: tx.fromAddr,
+  // always a single amount to a single address only
+  to: [{ address: tx.toAddr, amount: assetToBase(assetAmount(bnOrZero(tx.value))) }],
+  date: new Date(tx.timeStamp),
+  type: toAssetTxType(tx.txType),
+  hash: tx.txHash
+})
+
+export const toTxsHistoryPage = ({ total, tx }: TxPage): AssetTxsPage => ({
+  total,
+  txs: tx.map(toTxHistory)
+})
