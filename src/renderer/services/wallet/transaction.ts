@@ -5,6 +5,8 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import * as BNB from '../binance/service'
+import * as BTC from '../bitcoin/common'
+import { loadAssetTxs as loadBtcTxs, assetTxs$ as btcTxs$ } from '../bitcoin/context'
 import { selectedAsset$ } from './common'
 import { ApiError, AssetTxsPageLD, ErrorId, LoadAssetTxsHandler } from './types'
 
@@ -13,8 +15,7 @@ const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> =>
     case 'BNB':
       return BNB.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}/tx/`)))
     case 'BTC':
-      // not implemented yet
-      return Rx.of(O.none)
+      return BTC.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}tx/`)))
     case 'ETH':
       // not implemented yet
       return Rx.of(O.none)
@@ -40,8 +41,7 @@ const loadAssetTxsHandlerByChain = (chain: Chain): O.Option<LoadAssetTxsHandler>
     case 'BNB':
       return O.some(() => BNB.loadAssetTxs)
     case 'BTC':
-      // not implemented yet
-      return O.none
+      return O.some(() => loadBtcTxs)
     case 'ETH':
       // not implemented yet
       return O.none
@@ -67,7 +67,7 @@ export const assetTxsByChain$ = (chain: Chain): AssetTxsPageLD => {
     case 'BNB':
       return BNB.assetTxs$
     case 'BTC':
-      return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
+      return btcTxs$
     case 'ETH':
       return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
     case 'THOR':

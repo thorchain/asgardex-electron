@@ -6,7 +6,7 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import { ClientState } from '../types'
-import { ApiError } from '../wallet/types'
+import { ApiError, AssetTxsPageLD } from '../wallet/types'
 
 export type BitcoinClientState = ClientState<BitcoinClient>
 export type BitcoinClientState$ = Rx.Observable<ClientState<BitcoinClient>>
@@ -29,4 +29,6 @@ export type TransactionService = {
   fees$: FeesLD
   reloadFees: () => void
   resetTx: () => void
+  assetTxs$: AssetTxsPageLD
+  loadAssetTxs: () => void
 }
