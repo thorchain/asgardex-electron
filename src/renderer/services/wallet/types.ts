@@ -57,14 +57,20 @@ export type AssetsWithBalanceState = {
 }
 
 export type AssetTxType = 'transfer' | 'freeze' | 'unfreeze' | 'unkown'
+
+export type AssetTxFrom = {
+  from: string // address or tx id
+  amount?: BaseAmount // amount sent from
+}
+
 export type AssetTxTo = {
-  address: string // to address
-  amount: BaseAmount // amount sent to
+  to: string // to address
+  amount: BaseAmount // amount to send
 }
 
 export type AssetTx = {
   asset: O.Option<Asset> // asset
-  from: string // from address
+  from: AssetTxFrom[] // from address
   to: AssetTxTo[] // to addresses
   date: Date // timestamp of tx
   type: AssetTxType // type

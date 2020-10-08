@@ -29,6 +29,19 @@ const TransactionsTable: React.FC<Props> = (props): JSX.Element => {
   // store previous data of Txs to render these while reloading
   const previousTxs = useRef<O.Option<AssetTxsPage>>(O.none)
 
+  // Helper to render a text with a line break
+  // That's needed to have multline texts in ant's table cell
+  // and still an option to render ellipsis if a text do not fit in a cell
+  const renderTextWithBreak = useCallback(
+    (text: string, key: string) => (
+      <Styled.Text key={key}>
+        {text}
+        <br key={`${key}-br`} />
+      </Styled.Text>
+    ),
+    []
+  )
+
   const renderTypeColumn = useCallback((_, { type }: AssetTx) => {
     switch (type) {
       case 'freeze':
@@ -51,26 +64,35 @@ const TransactionsTable: React.FC<Props> = (props): JSX.Element => {
     sortDirections: ['descend', 'ascend']
   }
 
-  const renderFromColumn = useCallback((_, { from }: AssetTx) => <Styled.Text>{from}</Styled.Text>, [])
+  const renderFromColumn = useCallback(
+    (_, { from }: AssetTx) =>
+      from.map(({ from }, index) => {
+        const key = `${from}-${index}`
+        return renderTextWithBreak(from, key)
+      }),
+    [renderTextWithBreak]
+  )
+
   const fromColumn: ColumnType<AssetTx> = {
     key: 'fromAddr',
     title: intl.formatMessage({ id: 'common.from' }),
     align: 'left',
     ellipsis: true,
     render: renderFromColumn,
-    sorter: (a: AssetTx, b: AssetTx) => ordString.compare(a.from, b.from),
+    sorter: ({ from: fromA }: AssetTx, { from: fromB }: AssetTx) =>
+      // For simplicity we sort first item only
+      // TODO (@Veado) Play around to get a user-friendly sort option
+      ordString.compare(fromA[0]?.from ?? '', fromB[0]?.from ?? ''),
     sortDirections: ['descend', 'ascend']
   }
 
   const renderToColumn = useCallback(
-    (_, { to }: AssetTx) => (
-      <>
-        {to.map(({ address }) => (
-          <Styled.Text key={address}>{address}</Styled.Text>
-        ))}
-      </>
-    ),
-    []
+    (_, { to }: AssetTx) =>
+      to.map(({ to }, index) => {
+        const key = `${to}-${index}`
+        return renderTextWithBreak(to, key)
+      }),
+    [renderTextWithBreak]
   )
 
   const toColumn: ColumnType<AssetTx> = {
@@ -82,7 +104,7 @@ const TransactionsTable: React.FC<Props> = (props): JSX.Element => {
     sorter: ({ to: toA }: AssetTx, { to: toB }: AssetTx) =>
       // For simplicity we sort first item only
       // TODO (@Veado) Play around to get a user-friendly sort option
-      ordString.compare(toA[0]?.address ?? '', toB[0]?.address ?? ''),
+      ordString.compare(toA[0]?.to ?? '', toB[0]?.to ?? ''),
     sortDirections: ['descend', 'ascend']
   }
 
@@ -121,20 +143,20 @@ const TransactionsTable: React.FC<Props> = (props): JSX.Element => {
   }
 
   const renderAmountColumn = useCallback(
-    (_, { to }: AssetTx) => (
-      <>
-        {to.map(({ amount, address }) => (
-          <Styled.Text key={address}>{formatAssetAmount({ amount: baseToAsset(amount), trimZeros: true })}</Styled.Text>
-        ))}
-      </>
-    ),
-    []
+    (_, { to }: AssetTx) =>
+      to.map(({ amount, to }, index) => {
+        const key = `${to}-${index}`
+        const text = formatAssetAmount({ amount: baseToAsset(amount), trimZeros: true })
+        return renderTextWithBreak(text, key)
+      }),
+    [renderTextWithBreak]
   )
 
   const amountColumn: ColumnType<AssetTx> = {
     key: 'value',
     title: intl.formatMessage({ id: 'common.amount' }),
     align: 'left',
+    width: 200,
     render: renderAmountColumn,
     sorter: ({ to: toA }: AssetTx, { to: toB }: AssetTx) =>
       // For simplicity we sort first item only
@@ -155,7 +177,7 @@ const TransactionsTable: React.FC<Props> = (props): JSX.Element => {
     render: renderLinkColumn
   }
 
-  const desktopColumns: ColumnsType<AssetTx> = [typeColumn, fromColumn, toColumn, dateColumn, amountColumn, linkColumn]
+  const desktopColumns: ColumnsType<AssetTx> = [typeColumn, fromColumn, toColumn, amountColumn, dateColumn, linkColumn]
 
   const mobileColumns: ColumnsType<AssetTx> = [typeColumn, amountColumn, dateColumn, linkColumn]
 

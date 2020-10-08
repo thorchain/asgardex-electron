@@ -87,17 +87,19 @@ export const toAssetTxType = (txType: TxType): AssetTxType => {
   }
 }
 
-export const toTxHistory = (tx: Tx): AssetTx => ({
-  asset: bncSymbolToAsset(tx.txAsset),
-  from: tx.fromAddr,
-  // always a single amount to a single address only
-  to: [{ address: tx.toAddr, amount: assetToBase(assetAmount(bnOrZero(tx.value))) }],
-  date: new Date(tx.timeStamp),
-  type: toAssetTxType(tx.txType),
-  hash: tx.txHash
-})
+export const toAssetTx = (tx: Tx): AssetTx => {
+  const amount = assetToBase(assetAmount(bnOrZero(tx.value)))
+  return {
+    asset: bncSymbolToAsset(tx.txAsset),
+    from: [{ from: tx.fromAddr, amount }],
+    to: [{ to: tx.toAddr, amount }],
+    date: new Date(tx.timeStamp),
+    type: toAssetTxType(tx.txType),
+    hash: tx.txHash
+  }
+}
 
-export const toTxsHistoryPage = ({ total, tx }: TxPage): AssetTxsPage => ({
+export const toTxsPage = ({ total, tx }: TxPage): AssetTxsPage => ({
   total,
-  txs: tx.map(toTxHistory)
+  txs: tx.map(toAssetTx)
 })

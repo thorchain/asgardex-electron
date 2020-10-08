@@ -43,7 +43,7 @@ import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
 import { BinanceClientState, FeeRD, FeesRD, TransferFeesRD, BinanceClientState$ } from './types'
-import { getWalletBalances, toTxsHistoryPage } from './utils'
+import { getWalletBalances, toTxsPage } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -257,7 +257,7 @@ const assetsWB$: Observable<AssetsWithBalanceRD> = Rx.combineLatest([
  * Observable to load txs from Binance API endpoint
  * If client is not available, it returns an `initial` state
  */
-const loadTxsOfSelectedAsset$ = ({
+const loadAssetTxs$ = ({
   client,
   oAsset,
   limit,
@@ -282,7 +282,7 @@ const loadTxsOfSelectedAsset$ = ({
   const diffTime = 90 * 24 * 60 * 60 * 1000
   const startTime = endTime - diffTime
   return Rx.from(client.getTransactions({ txAsset, endTime, startTime, limit, offset })).pipe(
-    map(toTxsHistoryPage),
+    map(toTxsPage),
     map(RD.success),
     catchError((error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
@@ -292,8 +292,8 @@ const loadTxsOfSelectedAsset$ = ({
   )
 }
 
-// `TriggerStream` to reload `Txs`
-const { get$: loadAssetTxs$, set: loadAssetTxs } = observableState<LoadAssetTxsProps>(INITIAL_LOAD_TXS_PROPS)
+// Observable State to reload `Txs` based on `LoadAssetTxsProps`
+const { get$: reloadAssetTxs$, set: reloadAssetTxs } = observableState<LoadAssetTxsProps>(INITIAL_LOAD_TXS_PROPS)
 
 /**
  * `Txs` of selected asset
@@ -303,7 +303,7 @@ const { get$: loadAssetTxs$, set: loadAssetTxs } = observableState<LoadAssetTxsP
  */
 const assetTxs$: AssetTxsPageLD = Rx.combineLatest([
   client$,
-  loadAssetTxs$.pipe(debounceTime(300), startWith(INITIAL_LOAD_TXS_PROPS)),
+  reloadAssetTxs$.pipe(debounceTime(300), startWith(INITIAL_LOAD_TXS_PROPS)),
   selectedAsset$
 ]).pipe(
   switchMap(([client, { limit, offset }, oAsset]) => {
@@ -315,7 +315,7 @@ const assetTxs$: AssetTxsPageLD = Rx.combineLatest([
       O.fold(
         () => Rx.of(RD.initial),
         ([clientState, asset]) =>
-          loadTxsOfSelectedAsset$({
+          loadAssetTxs$({
             client: clientState,
             oAsset: O.some(asset),
             limit,
@@ -406,7 +406,7 @@ export {
   assetsWB$,
   reloadBalances,
   assetTxs$,
-  loadAssetTxs,
+  reloadAssetTxs as loadAssetTxs,
   address$,
   explorerUrl$,
   transaction,
