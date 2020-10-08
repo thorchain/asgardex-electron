@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, baseAmount, bnOrZero } from '@thorchain/asgardex-util'
+import { Asset, baseAmount, bnOrZero, RUNE_TICKER } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
@@ -28,35 +28,43 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const runePriceRatio = useObservableState(priceRatio$, ONE_BN)
   const priceSymbol = useObservableState<O.Option<string>>(selectedPricePoolAssetSymbol$, O.none)
 
-  return FP.pipe(
-    RD.combine(stakeData, poolDetailedInfo),
-    RD.fold(
-      () => <Styled.EmptyData description={intl.formatMessage({ id: 'stake.pool.noStakes' })} />,
-      helpers.renderPending,
-      (e) => <Styled.EmptyData description={e.message} />,
-      ([stake, pool]) => {
-        const runeShare = helpers.getRuneShare(stake, pool)
-        const assetShare = helpers.getAssetShare(stake, pool)
-        const runeStakedShare = baseAmount(runeShare)
-        const runeStakedPrice = baseAmount(runePriceRatio.multipliedBy(runeShare))
-        const assetStakedShare = baseAmount(assetShare)
-        return (
-          <PoolShare
-            source="RUNE"
-            target={asset.chain}
-            poolShare={helpers.getPoolShare(stake, pool)}
-            assetStakedShare={assetStakedShare}
-            basePriceSymbol={FP.pipe(
-              priceSymbol,
-              O.getOrElse(() => '')
-            )}
-            loading={false}
-            assetStakedPrice={helpers.getAssetSharePrice(assetShare, bnOrZero(pool.price), runePriceRatio)}
-            runeStakedPrice={runeStakedPrice}
-            runeStakedShare={runeStakedShare}
-          />
+  const renderPoolShare = useMemo(
+    () =>
+      FP.pipe(
+        RD.combine(stakeData, poolDetailedInfo),
+        RD.fold(
+          () => <Styled.EmptyData description={intl.formatMessage({ id: 'stake.pool.noStakes' })} />,
+          helpers.renderPending,
+          (e) => <Styled.EmptyData description={e.message} />,
+          ([stake, pool]) => {
+            const runeShare = helpers.getRuneShare(stake, pool)
+            const assetShare = helpers.getAssetShare(stake, pool)
+            const runeStakedShare = baseAmount(runeShare)
+            const runeStakedPrice = baseAmount(runePriceRatio.multipliedBy(runeShare))
+            const assetStakedShare = baseAmount(assetShare)
+            const poolShare = helpers.getPoolShare(stake, pool)
+            return (
+              <PoolShare
+                source={RUNE_TICKER}
+                target={asset.chain}
+                poolShare={poolShare}
+                assetStakedShare={assetStakedShare}
+                basePriceSymbol={FP.pipe(
+                  priceSymbol,
+                  O.getOrElse(() => '')
+                )}
+                loading={false}
+                assetStakedPrice={helpers.getAssetSharePrice(assetShare, bnOrZero(pool.price), runePriceRatio)}
+                runeStakedPrice={runeStakedPrice}
+                runeStakedShare={runeStakedShare}
+              />
+            )
+          }
         )
-      }
-    )
+      ),
+
+    [asset.chain, intl, poolDetailedInfo, priceSymbol, runePriceRatio, stakeData]
   )
+
+  return renderPoolShare
 }
