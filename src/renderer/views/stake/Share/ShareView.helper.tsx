@@ -21,29 +21,31 @@ export const renderPending = () => (
   />
 )
 
-export const getRuneShare = (stake: StakersAssetData, pool: PoolDetail) => {
+export const getRuneShare = ({ units }: Pick<StakersAssetData, 'units'>, pool: PoolDetail) => {
   const runeDepth = bnOrZero(pool.runeDepth)
-  const stakeUnits = bnOrZero(stake.stakeUnits)
-  /**
-   * Default is 1 as neutral element for division
-   */
+  const stakeUnits = bnOrZero(units)
+  // Default is 1 as neutral element for division
   const poolUnits = bn(pool.poolUnits || 1)
 
   return runeDepth.multipliedBy(stakeUnits).div(poolUnits)
 }
 
-export const getAssetShare = (stake: StakersAssetData, pool: PoolDetail) => {
-  const assetDepth = bnOrZero(pool.assetDepth)
-  const stakeUnits = bnOrZero(stake.stakeUnits)
-  const poolUnits = bn(pool.poolUnits || 1)
+export const getAssetShare = (
+  { units }: Pick<StakersAssetData, 'units'>,
+  { assetDepth, poolUnits }: Pick<PoolDetail, 'assetDepth' | 'poolUnits'>
+) => {
+  const assetDepthBN = bnOrZero(assetDepth)
+  const stakeUnitsBN = bnOrZero(units)
+  // Default is 1 as neutral element for division
+  const poolUnitsBN = bn(poolUnits || 1)
 
-  return assetDepth.multipliedBy(stakeUnits).div(poolUnits)
+  return assetDepthBN.multipliedBy(stakeUnitsBN).div(poolUnitsBN)
 }
 
-export const getAssetSharePrice = (assetShare: BigNumber, price: BigNumber, priceRatio: BigNumber): BaseAmount => {
-  return baseAmount(assetShare.multipliedBy(price).multipliedBy(priceRatio))
-}
+export const getAssetSharePrice = (assetShare: BigNumber, price: BigNumber, priceRatio: BigNumber): BaseAmount =>
+  baseAmount(assetShare.multipliedBy(price).multipliedBy(priceRatio))
 
-export const getPoolShare = ({ stakeUnits }: StakersAssetData, { poolUnits }: PoolDetail) => {
-  return poolUnits ? bnOrZero(stakeUnits).div(poolUnits).multipliedBy(100) : ZERO_BN
-}
+export const getPoolShare = (
+  { units }: Pick<StakersAssetData, 'units'>,
+  { poolUnits }: Pick<PoolDetail, 'poolUnits'>
+) => (poolUnits ? bnOrZero(units).div(poolUnits).multipliedBy(100) : ZERO_BN)
