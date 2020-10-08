@@ -142,6 +142,7 @@ type StakeMessageKey =
   | 'stake.totalShare'
   | 'stake.totalEarnings'
   | 'stake.poolShare'
+  | 'stake.units'
   | 'stake.withdraw'
   | 'stake.advancedMode'
   | 'stake.drag'

@@ -1,25 +1,8 @@
-import React from 'react'
-
-import { assetAmount, assetToBase, baseAmount, BaseAmount, bn, bnOrZero } from '@thorchain/asgardex-util'
+import { baseAmount, BaseAmount, bn, bnOrZero } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
-import PoolShare from '../../../components/uielements/poolShare'
 import { ZERO_BN } from '../../../const'
 import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/models'
-
-export const renderPending = () => (
-  <PoolShare
-    source=""
-    target=""
-    poolShare={bn(0)}
-    assetStakedPrice={assetToBase(assetAmount(0))}
-    assetStakedShare={assetToBase(assetAmount(0))}
-    basePriceSymbol=""
-    loading={true}
-    runeStakedPrice={assetToBase(assetAmount(0))}
-    runeStakedShare={assetToBase(assetAmount(0))}
-  />
-)
 
 export const getRuneShare = ({ units }: Pick<StakersAssetData, 'units'>, pool: PoolDetail) => {
   const runeDepth = bnOrZero(pool.runeDepth)

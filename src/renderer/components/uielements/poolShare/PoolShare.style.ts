@@ -9,10 +9,18 @@ export const PoolShareWrapper = styled.div`
   font-size: 16px;
 `
 
-export const SharePercent = styled(Label).attrs({
+export const ShareLabel = styled(Label).attrs({
   align: 'center',
   size: 'normal',
   colo: 'dark'
+})`
+  font-weight: bold;
+`
+
+export const ShareHeadline = styled(Label).attrs({
+  align: 'center',
+  size: 'big',
+  textTransform: 'uppercase'
 })`
   font-weight: bold;
 `

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { BaseAmount, baseToAsset, formatAssetAmount } from '@thorchain/asgardex-util'
+import { Asset, BaseAmount, baseToAsset, formatAssetAmount } from '@thorchain/asgardex-util'
 import { Col } from 'antd'
 
 import Label from '../label'
@@ -8,8 +8,8 @@ import * as Styled from './Poolcard.style'
 
 type PoolCardProps = {
   title: string
-  source: string
-  target: string
+  sourceAsset: Asset
+  targetAsset: Asset
   runeAmount: BaseAmount
   runePrice: BaseAmount
   assetAmount: BaseAmount
@@ -23,8 +23,8 @@ type PoolCardProps = {
 export const PoolCard: React.FC<PoolCardProps> = ({
   title,
   loading,
-  source,
-  target,
+  sourceAsset,
+  targetAsset,
   runeAmount,
   runePrice,
   assetAmount,
@@ -41,10 +41,10 @@ export const PoolCard: React.FC<PoolCardProps> = ({
         <Styled.DetailsWrapper gradient={gradient} accent="primary">
           <Styled.PoolCardRow>
             <Col>
-              <Styled.AssetName loading={loading}>{source}</Styled.AssetName>
+              <Styled.AssetName loading={loading}>{sourceAsset.ticker}</Styled.AssetName>
             </Col>
             <Col>
-              <Styled.AssetName loading={loading}>{target}</Styled.AssetName>
+              <Styled.AssetName loading={loading}>{targetAsset.ticker}</Styled.AssetName>
             </Col>
           </Styled.PoolCardRow>
         </Styled.DetailsWrapper>

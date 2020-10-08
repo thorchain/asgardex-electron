@@ -3,7 +3,8 @@ import { StakeMessages } from '../types'
 const stake: StakeMessages = {
   'stake.totalShare': 'Dein Poolanteil',
   'stake.totalEarnings': 'Deine Gesamteinkommen vom Pool',
-  'stake.poolShare': ' Poolanteil',
+  'stake.poolShare': 'Poolanteil',
+  'stake.units': 'Liquidität Einheiten',
   'stake.withdraw': 'Abheben',
   'stake.advancedMode': 'Experten modus',
   'stake.drag': 'Ziehen um zu Staken',
