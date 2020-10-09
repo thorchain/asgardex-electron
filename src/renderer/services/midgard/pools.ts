@@ -1,5 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, assetToString, bn, currencySymbolByAsset } from '@thorchain/asgardex-util'
+import {
+  Asset,
+  assetFromString,
+  assetToString,
+  bn,
+  currencySymbolByAsset,
+  isValidAsset
+} from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -11,6 +18,7 @@ import { catchError, map, retry, shareReplay, startWith, switchMap, filter } fro
 
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { getRuneAsset, isPricePoolAsset } from '../../helpers/assetHelper'
+import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
@@ -21,13 +29,14 @@ import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import {
   AssetDetailsLD,
-  PoolAssetsLD,
+  PoolStringAssetsLD,
   PoolDetailLD,
   PoolDetailsLD,
   PoolsService,
   PoolsStateLD,
   SelectedPricePoolAsset,
-  ThorchainEndpointsLD
+  ThorchainEndpointsLD,
+  PoolAssetsLD
 } from './types'
 import { getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
 
@@ -99,7 +108,7 @@ const createPoolsService = (
    * Loading queue to get all needed data for `PoolsState`
    */
   const loadPoolsStateData$ = (): PoolsStateLD => {
-    const poolAssets$: PoolAssetsLD = FP.pipe(apiGetPools$, shareReplay(1))
+    const poolAssets$: PoolStringAssetsLD = FP.pipe(apiGetPools$, shareReplay(1))
 
     const assetDetails$: AssetDetailsLD = FP.pipe(
       poolAssets$,
@@ -179,6 +188,12 @@ const createPoolsService = (
     shareReplay(1)
   )
 
+  const availableAssets$: PoolAssetsLD = FP.pipe(
+    poolsState$,
+    liveData.map((poolsState) => poolsState.poolAssets),
+    liveData.map(A.filterMap((asset) => O.fromNullable(assetFromString(asset))))
+  )
+
   const {
     get: getSelectedPricePoolAsset,
     get$: selectedPricePoolAsset$,
@@ -237,7 +252,13 @@ const createPoolsService = (
       O.chain(([pools, selectedAsset]) =>
         FP.pipe(
           pools.assetDetails,
-          A.findFirst((assetDetail) => assetFromString(assetDetail?.asset ?? '') === selectedAsset)
+          A.findFirst((assetDetail) => {
+            const asset = assetFromString(assetDetail?.asset || '')
+            if (!asset || !isValidAsset(asset)) {
+              return false
+            }
+            return eqAsset.equals(asset, selectedAsset)
+          })
         )
       )
     ),
@@ -256,7 +277,8 @@ const createPoolsService = (
     runeAsset$,
     poolDetailedState$,
     reloadPoolDetailedState,
-    priceRatio$
+    priceRatio$,
+    availableAssets$
   }
 }
 

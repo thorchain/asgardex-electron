@@ -19,13 +19,18 @@ import * as Styled from './ShareView.styles'
 export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolDetailedState$, selectedPricePoolAssetSymbol$, priceRatio$, runeAsset$ },
-    stake: { stakes$ }
+    pools: { poolDetailedState$, selectedPricePoolAssetSymbol$, priceRatio$, runeAsset$ }
   } = midgardService
 
   const intl = useIntl()
 
-  const stakeData = useObservableState<StakersAssetDataRD>(stakes$, RD.initial)
+  /**
+   * We have to get a new stake-stream for every new asset
+   * @description /src/renderer/services/midgard/stake.ts
+   */
+  const stakeData$ = useMemo(() => midgardService.stake.getStakes$(asset), [asset, midgardService.stake])
+  const stakeData = useObservableState<StakersAssetDataRD>(stakeData$, RD.initial)
+
   const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
   const poolDetailedInfo = useObservableState<PoolDetailRD>(poolDetailedState$, RD.initial)
   const runePriceRatio = useObservableState(priceRatio$, ONE_BN)
@@ -86,7 +91,7 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
         RD.fold(
           () => <Styled.EmptyData description={intl.formatMessage({ id: 'stake.pool.noStakes' })} />,
           () => renderPoolSharePending,
-          (e) => <Styled.EmptyData description={e.message} />,
+          () => <Styled.EmptyData description={intl.formatMessage({ id: 'stake.pool.noStakes' })} />,
           ([stake, pool]) => renderPoolShareReady(stake, pool)
         )
       ),

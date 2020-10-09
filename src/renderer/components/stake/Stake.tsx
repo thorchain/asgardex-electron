@@ -10,7 +10,7 @@ type Props = {
   asset: Asset
   ShareContent: React.ComponentType<{ asset: Asset }>
   TopContent: React.ComponentType
-  AddStake: React.ComponentType
+  AddStake: React.ComponentType<{ asset: Asset }>
   hasWallet?: boolean
 }
 
@@ -19,10 +19,10 @@ export const Stake: React.FC<Props> = ({ ShareContent, TopContent, AddStake, has
 
   const tabs = useMemo(
     () => [
-      { label: intl.formatMessage({ id: 'common.add' }), key: 'add', content: <AddStake /> },
+      { label: intl.formatMessage({ id: 'common.add' }), key: 'add', content: <AddStake asset={asset} /> },
       { label: intl.formatMessage({ id: 'stake.withdraw' }), key: 'withdraw', content: 'withdraw' }
     ],
-    [intl]
+    [intl, asset]
   )
 
   const extra = useMemo(
@@ -37,7 +37,7 @@ export const Stake: React.FC<Props> = ({ ShareContent, TopContent, AddStake, has
   return (
     <Styled.Container>
       <Styled.TopContainer>
-        <TopContent />{' '}
+        <TopContent />
       </Styled.TopContainer>
       <Styled.ContentContainer>
         {hasWallet ? (
