@@ -16,6 +16,17 @@ import { PricePoolAsset } from '../views/pools/types'
 import { eqAsset } from './fp/eq'
 
 /**
+ * Decimal for any asset handled by THORChain and provided by Midgard
+ *
+ * Note 1: THORChain will only ever treat assets to be `1e8`
+ * Note 2: `THORCHAIN_DECIMAL` has to be used for pools/swap/liquidity only,
+ * at wallet parts we will get information about decimal from agardex client libs
+ * (eg. `asgardex-binance|bitcoin|ethereum` and others)
+ *
+ * */
+export const THORCHAIN_DECIMAL = 8
+
+/**
  * Number of decimals for Binance chain assets
  * Example:
  * 1 RUNE == 100,000,000 ð (tor)

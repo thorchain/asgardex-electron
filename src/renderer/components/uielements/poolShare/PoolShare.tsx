@@ -1,16 +1,16 @@
 import React from 'react'
 
-import { formatBN, BaseAmount } from '@thorchain/asgardex-util'
+import { formatBN, BaseAmount, Asset, formatBaseAsAssetAmount } from '@thorchain/asgardex-util'
+import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
-import Label from '../label'
 import { PoolCard } from './PoolCard'
 import * as Styled from './PoolShare.style'
 
 type Props = {
-  source: string
-  target: string
+  sourceAsset: Asset
+  targetAsset: Asset
   runeStakedShare: BaseAmount
   runeStakedPrice: BaseAmount
   loading?: boolean
@@ -18,19 +18,21 @@ type Props = {
   assetStakedShare: BaseAmount
   assetStakedPrice: BaseAmount
   poolShare: BigNumber
+  stakeUnits: BaseAmount
 }
 
 const PoolShare: React.FC<Props> = (props): JSX.Element => {
   const {
-    source,
+    sourceAsset,
     runeStakedShare,
     runeStakedPrice,
     loading,
     basePriceSymbol,
-    target,
+    targetAsset,
     assetStakedShare,
     assetStakedPrice,
-    poolShare
+    poolShare,
+    stakeUnits
   } = props
 
   const intl = useIntl()
@@ -40,20 +42,29 @@ const PoolShare: React.FC<Props> = (props): JSX.Element => {
       <PoolCard
         title={intl.formatMessage({ id: 'stake.totalShare' })}
         loading={loading}
-        source={source}
-        target={target}
+        sourceAsset={sourceAsset}
+        targetAsset={targetAsset}
         runeAmount={runeStakedShare}
         runePrice={runeStakedPrice}
         assetAmount={assetStakedShare}
         assetPrice={assetStakedPrice}
         gradient={2}
         basePriceSymbol={basePriceSymbol}>
-        <div>
-          <Label textTransform="uppercase" size="big" align="center" loading={loading}>
-            {intl.formatMessage({ id: 'stake.poolShare' })}
-          </Label>
-          <Styled.SharePercent loading={loading}>{poolShare ? `${formatBN(poolShare)}%` : '...'}</Styled.SharePercent>
-        </div>
+        <>
+          <Col span={24} sm={12}>
+            <Styled.ShareHeadline loading={loading}>{intl.formatMessage({ id: 'stake.units' })}</Styled.ShareHeadline>
+            <Styled.ShareLabel loading={loading}>{`${formatBaseAsAssetAmount({
+              amount: stakeUnits,
+              decimal: 2
+            })}`}</Styled.ShareLabel>
+          </Col>
+          <Col span={24} sm={12}>
+            <Styled.ShareHeadline loading={loading}>
+              {intl.formatMessage({ id: 'stake.poolShare' })}
+            </Styled.ShareHeadline>
+            <Styled.ShareLabel loading={loading}>{`${formatBN(poolShare)}%`}</Styled.ShareLabel>
+          </Col>
+        </>
       </PoolCard>
     </Styled.PoolShareWrapper>
   )
