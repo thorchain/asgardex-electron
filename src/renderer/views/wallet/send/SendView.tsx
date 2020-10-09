@@ -36,7 +36,7 @@ const SendView: React.FC<Props> = (): JSX.Element => {
         <BackLink />
         <ErrorView
           title={intl.formatMessage(
-            { id: 'wallet.errors.route.invalidAsset' },
+            { id: 'routes.invalid.asset' },
             {
               asset
             }

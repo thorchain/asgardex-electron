@@ -28,7 +28,8 @@ const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService, reloadBalances } = useWalletContext()
 
   // Important note:
-  // Since `useObservableState` is set after first render
+  // DON'T set `INITIAL_KEYSTORE_STATE` as default value
+  // Since `useObservableState` is set after first render (but not before)
   // and Route.render is called before first render,
   // we have to add 'undefined'  as default value
   const keystore = useObservableState(keystoreService.keystore$, undefined)
