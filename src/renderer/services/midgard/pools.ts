@@ -88,7 +88,8 @@ const createPoolsService = (
             asset,
             view: isDetailed ? GetPoolsDetailsViewEnum.Full : GetPoolsDetailsViewEnum.Simple
           }),
-          map(RD.success),
+          // error if no pools are available
+          map((assets) => (assets.length > 0 ? RD.success(assets) : RD.failure(new Error('No pools available')))),
           catchError((e: Error) => Rx.of(RD.failure(e)))
         )
       )
