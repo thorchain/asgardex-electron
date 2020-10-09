@@ -3,7 +3,9 @@ import React, { useMemo } from 'react'
 import { Asset } from '@thorchain/asgardex-util'
 import { useIntl } from 'react-intl'
 
-import { AddWallet } from './AddWallet'
+import { KeystoreState } from '../../services/wallet/types'
+import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
+import { AddWallet } from '../wallet/AddWallet'
 import * as Styled from './Stake.styles'
 
 type Props = {
@@ -11,11 +13,15 @@ type Props = {
   ShareContent: React.ComponentType<{ asset: Asset }>
   TopContent: React.ComponentType
   AddStake: React.ComponentType<{ asset: Asset }>
-  hasWallet?: boolean
+  keystoreState: KeystoreState
 }
 
-export const Stake: React.FC<Props> = ({ ShareContent, TopContent, AddStake, hasWallet, asset }) => {
+export const Stake: React.FC<Props> = (props) => {
+  const { ShareContent, TopContent, AddStake, asset, keystoreState } = props
   const intl = useIntl()
+
+  const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
+  const walletIsLocked = useMemo(() => isLocked(keystoreState), [keystoreState])
 
   const tabs = useMemo(
     () => [
@@ -40,7 +46,7 @@ export const Stake: React.FC<Props> = ({ ShareContent, TopContent, AddStake, has
         <TopContent />
       </Styled.TopContainer>
       <Styled.ContentContainer>
-        {hasWallet ? (
+        {walletIsImported && !walletIsLocked ? (
           <>
             <Styled.TotalContainer>
               <ShareContent asset={asset} />
@@ -50,7 +56,7 @@ export const Stake: React.FC<Props> = ({ ShareContent, TopContent, AddStake, has
             </Styled.StakeContentContainer>
           </>
         ) : (
-          <AddWallet />
+          <AddWallet isLocked={walletIsImported && walletIsLocked} />
         )}
       </Styled.ContentContainer>
     </Styled.Container>

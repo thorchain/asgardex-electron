@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect } from 'react'
 
 import { assetFromString } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/Option'
-import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router-dom'
 
@@ -12,7 +11,6 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { StakeRouteParams } from '../../routes/stake'
-import { isLocked } from '../../services/wallet/util'
 import { AddStakeView } from './AddStake/AddStakeView'
 import { PoolDetailsView } from './PoolDetails/PoolDetailsView'
 import { ShareView } from './Share/ShareView'
@@ -26,8 +24,6 @@ const StakeView: React.FC<Props> = (_) => {
   const { address$ } = useBinanceContext()
 
   const keystore = useObservableState(keystoreService.keystore$, O.none)
-
-  const hasWallet = useMemo(() => !pipe(keystore, isLocked), [keystore])
 
   const asset = assetFromString(assetParam.toUpperCase())
 
@@ -51,7 +47,7 @@ const StakeView: React.FC<Props> = (_) => {
       <BackLink />
       <Stake
         asset={asset}
-        hasWallet={hasWallet}
+        keystoreState={keystore}
         TopContent={PoolDetailsView}
         ShareContent={ShareView}
         AddStake={AddStakeView}
