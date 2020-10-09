@@ -43,7 +43,7 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
         loading={true}
         runeStakedPrice={baseAmount(0)}
         runeStakedShare={baseAmount(0)}
-        units={baseAmount(0)}
+        stakeUnits={baseAmount(0)}
       />
     ),
     [asset, runeAsset]
@@ -53,26 +53,26 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
     (stake: StakersAssetData, pool: PoolDetail) => {
       const runeShare = helpers.getRuneShare(stake, pool)
       const assetShare = helpers.getAssetShare(stake, pool)
-      const runeStakedShare = baseAmount(runeShare)
-      const runeStakedPrice = baseAmount(runePriceRatio.multipliedBy(runeShare))
-      const assetStakedShare = baseAmount(assetShare)
+      const runeStakedPrice = baseAmount(runePriceRatio.multipliedBy(runeShare.amount()))
       const poolShare = helpers.getPoolShare(stake, pool)
-      const units = baseAmount(bnOrZero(stake.units))
+      const assetStakedPrice = helpers.getAssetSharePrice(assetShare.amount(), bnOrZero(pool.price), runePriceRatio)
+      // stake units are RUNE based, provided as `BaseAmount`
+      const stakeUnits = baseAmount(bnOrZero(stake.units))
       return (
         <PoolShare
           sourceAsset={runeAsset}
           targetAsset={asset}
           poolShare={poolShare}
-          units={units}
-          assetStakedShare={assetStakedShare}
+          stakeUnits={stakeUnits}
+          assetStakedShare={assetShare}
           basePriceSymbol={FP.pipe(
             priceSymbol,
             O.getOrElse(() => '')
           )}
           loading={false}
-          assetStakedPrice={helpers.getAssetSharePrice(assetShare, bnOrZero(pool.price), runePriceRatio)}
+          assetStakedPrice={assetStakedPrice}
           runeStakedPrice={runeStakedPrice}
-          runeStakedShare={runeStakedShare}
+          runeStakedShare={runeShare}
         />
       )
     },

@@ -18,7 +18,7 @@ type Props = {
   assetStakedShare: BaseAmount
   assetStakedPrice: BaseAmount
   poolShare: BigNumber
-  units: BaseAmount
+  stakeUnits: BaseAmount
 }
 
 const PoolShare: React.FC<Props> = (props): JSX.Element => {
@@ -32,7 +32,7 @@ const PoolShare: React.FC<Props> = (props): JSX.Element => {
     assetStakedShare,
     assetStakedPrice,
     poolShare,
-    units
+    stakeUnits
   } = props
 
   const intl = useIntl()
@@ -51,11 +51,14 @@ const PoolShare: React.FC<Props> = (props): JSX.Element => {
         gradient={2}
         basePriceSymbol={basePriceSymbol}>
         <>
-          <Col span={12} sm={24}>
+          <Col span={24} sm={12}>
             <Styled.ShareHeadline loading={loading}>{intl.formatMessage({ id: 'stake.units' })}</Styled.ShareHeadline>
-            <Styled.ShareLabel loading={loading}>{`${formatBaseAsAssetAmount({ amount: units })}`}</Styled.ShareLabel>
+            <Styled.ShareLabel loading={loading}>{`${formatBaseAsAssetAmount({
+              amount: stakeUnits,
+              decimal: 2
+            })}`}</Styled.ShareLabel>
           </Col>
-          <Col span={12} sm={24}>
+          <Col span={24} sm={12}>
             <Styled.ShareHeadline loading={loading}>
               {intl.formatMessage({ id: 'stake.poolShare' })}
             </Styled.ShareHeadline>

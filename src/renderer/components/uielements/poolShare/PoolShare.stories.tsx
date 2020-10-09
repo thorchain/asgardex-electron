@@ -17,7 +17,7 @@ export const DefaultPoolShare = () => (
     runeStakedPrice={assetToBase(assetAmount(400))}
     runeStakedShare={assetToBase(assetAmount(500))}
     poolShare={bn(100)}
-    units={assetToBase(assetAmount(2.01))}
+    stakeUnits={assetToBase(assetAmount(2.01))}
   />
 )
 
@@ -42,7 +42,7 @@ storiesOf('Components/PoolShare', module)
           runeStakedPrice={baseAmount(0)}
           runeStakedShare={baseAmount(0)}
           poolShare={ZERO_BN}
-          units={baseAmount(0)}
+          stakeUnits={baseAmount(0)}
         />
       </div>
     )
