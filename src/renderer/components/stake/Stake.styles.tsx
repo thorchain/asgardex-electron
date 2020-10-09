@@ -11,11 +11,6 @@ export const Container = styled('div')`
   flex-direction: column;
 `
 
-export const TopContainer = styled('div')`
-  max-width: 100%;
-  margin-bottom: 30px;
-`
-
 export const ContentContainer = styled('div')`
   display: flex;
   flex-direction: column;

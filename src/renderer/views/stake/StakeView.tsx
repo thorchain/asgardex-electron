@@ -12,7 +12,6 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { StakeRouteParams } from '../../routes/stake'
 import { AddStakeView } from './AddStake/AddStakeView'
-import { PoolDetailsView } from './PoolDetails/PoolDetailsView'
 import { ShareView } from './Share/ShareView'
 
 type Props = {}
@@ -45,13 +44,7 @@ const StakeView: React.FC<Props> = (_) => {
   return (
     <>
       <BackLink />
-      <Stake
-        asset={asset}
-        keystoreState={keystore}
-        TopContent={PoolDetailsView}
-        ShareContent={ShareView}
-        AddStake={AddStakeView}
-      />
+      <Stake asset={asset} keystoreState={keystore} ShareContent={ShareView} AddStake={AddStakeView} />
     </>
   )
 }
