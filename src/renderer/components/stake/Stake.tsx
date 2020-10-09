@@ -37,7 +37,7 @@ export const Stake: React.FC<Props> = ({ ShareContent, TopContent, AddStake, has
   return (
     <Styled.Container>
       <Styled.TopContainer>
-        <TopContent />{' '}
+        <TopContent />
       </Styled.TopContainer>
       <Styled.ContentContainer>
         {hasWallet ? (

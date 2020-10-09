@@ -94,7 +94,6 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
 
   const onPercentChange = useCallback(
     (percent: number) => {
-      // console.log(amountBn.multipliedBy(percent / 100).toFormat(5))
       onChange(amountBn.multipliedBy(percent / 100))
     },
     [amountBn, onChange]
@@ -134,7 +133,13 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
               asset={asset}
               onSelect={handleChangeAsset}>
               <Styled.AssetData>
-                <Styled.InputBigNumber disabled={disabled} size="middle" value={selectedAmountBn} onChange={onChange} />
+                <Styled.InputBigNumber
+                  disabled={disabled}
+                  size="middle"
+                  value={selectedAmountBn}
+                  onChange={onChange}
+                  decimal={selectedAmount.decimal}
+                />
                 <Styled.AssetCardFooter>
                   <Styled.FooterLabel>{`${unit} ${formatBN(selectedAmountBn.multipliedBy(price))}`}</Styled.FooterLabel>
                   {slip !== undefined && (
@@ -149,7 +154,6 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
       {withPercentSlider && (
         <Slider
           disabled={disabled}
-          key={'asset amount slider'}
           value={percentValue}
           onChange={onPercentChange}
           tooltipPlacement="top"

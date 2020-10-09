@@ -31,16 +31,24 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
     [history]
   )
 
-  const { service } = useMidgardContext()
+  const {
+    service: {
+      pools: {
+        availableAssets$,
+        priceRatio$,
+        runeAsset$,
+        selectedPricePoolAssetSymbol$,
+        poolDetailedState$,
+        poolsState$
+      }
+    }
+  } = useMidgardContext()
+
   const { assetsWBState$ } = useWalletContext()
 
-  const runeAsset = useObservableState(service.pools.runeAsset$, getDefaultRuneAsset(asset.chain))
-  const runPrice = useObservableState(service.pools.priceRatio$, bn(1))
-  const selectedPricePoolAssetSymbol = useObservableState(service.pools.selectedPricePoolAssetSymbol$, O.none)
-
-  const {
-    pools: { poolDetailedState$ }
-  } = service
+  const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset(asset.chain))
+  const runPrice = useObservableState(priceRatio$, bn(1))
+  const selectedPricePoolAssetSymbol = useObservableState(selectedPricePoolAssetSymbol$, O.none)
 
   const [assetsWB] = useObservableState(
     () =>
@@ -69,7 +77,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
     O.getOrElse(() => ZERO_BASE_AMOUNT)
   )
 
-  const poolsStateRD = useObservableState(service.pools.poolsState$, RD.initial)
+  const poolsStateRD = useObservableState(poolsState$, RD.initial)
 
   const poolsState = FP.pipe(
     poolsStateRD,
@@ -79,7 +87,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const [poolAssets] = useObservableState(
     () =>
       FP.pipe(
-        service.pools.availableAssets$,
+        availableAssets$,
         liveData.map(
           A.map((asset) => ({
             asset,
