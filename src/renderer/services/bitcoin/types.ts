@@ -1,12 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
 import { FeeOptions } from '@thorchain/asgardex-bitcoin/lib/types/client-types'
-import { AssetAmount } from '@thorchain/asgardex-util'
+import { BaseAmount } from '@thorchain/asgardex-util'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import { ClientState } from '../types'
-import { ApiError } from '../wallet/types'
+import { ApiError, AssetTxsPageLD } from '../wallet/types'
 
 export type BitcoinClientState = ClientState<BitcoinClient>
 export type BitcoinClientState$ = Rx.Observable<ClientState<BitcoinClient>>
@@ -18,7 +18,7 @@ export type AddressValidation = BitcoinClient['validateAddress']
 
 export type SendTxParams = {
   to: string // to address
-  amount: AssetAmount
+  amount: BaseAmount
   feeRate: number
   memo?: string
 }
@@ -29,4 +29,6 @@ export type TransactionService = {
   fees$: FeesLD
   reloadFees: () => void
   resetTx: () => void
+  assetTxs$: AssetTxsPageLD
+  loadAssetTxs: () => void
 }

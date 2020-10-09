@@ -36,7 +36,7 @@ const fee = O.some(TRANSFER_FEES.single)
 const addressValidation: AddressValidation = (_) => true
 
 const onSubmitHandler = ({ to, amount, asset, memo }: SendTxParams) =>
-  console.log(`to: ${to}, amount ${formatAssetAmount(amount, 8)}, asset: ${assetToString(asset)}, memo: ${memo}`)
+  console.log(`to: ${to}, amount ${formatAssetAmount({ amount })}, asset: ${assetToString(asset)}, memo: ${memo}`)
 
 storiesOf('Wallet/SendFormBNB', module)
   .add('send bnb', () => (

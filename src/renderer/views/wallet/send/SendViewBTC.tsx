@@ -18,10 +18,11 @@ import { AssetsWithBalance, AssetWithBalance, NonEmptyAssetsWithBalance, TxRD } 
 type Props = {
   btcAsset: Asset
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
+  reloadFeesHandler: () => void
 }
 
-const SendViewBTC: React.FC<Props> = (props: Props): JSX.Element => {
-  const { btcAsset: selectedAsset, assetsWB } = props
+const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
+  const { btcAsset: selectedAsset, assetsWB, reloadFeesHandler } = props
 
   const oBtcAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
 
@@ -57,10 +58,11 @@ const SendViewBTC: React.FC<Props> = (props: Props): JSX.Element => {
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
+        reloadFeesHandler={reloadFeesHandler}
         fees={fees}
       />
     ),
-    [pushTx, assetsWB, txRD, addressValidation, fees]
+    [pushTx, assetsWB, txRD, addressValidation, reloadFeesHandler, fees]
   )
 
   return FP.pipe(
@@ -68,7 +70,8 @@ const SendViewBTC: React.FC<Props> = (props: Props): JSX.Element => {
     O.fold(
       () => <></>,
       ([btcAssetWB, explorerUrl]) => {
-        const successActionHandler = (txHash: string) => window.apiUrl.openExternal(`${explorerUrl}/${txHash}`)
+        const successActionHandler = (txHash: string) => window.apiUrl.openExternal(`${explorerUrl}tx/${txHash}`)
+
         return (
           <Send
             txRD={txRD}

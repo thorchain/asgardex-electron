@@ -27,7 +27,7 @@ type Props = {
   changeHandler?: (asset: PricePoolAsset) => void
 }
 
-const HeaderPriceSelector: React.FC<Props> = (props: Props): JSX.Element => {
+const HeaderPriceSelector: React.FC<Props> = (props): JSX.Element => {
   const { assets, selectedAsset, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
 
   const changeItem: MenuProps['onClick'] = useCallback(

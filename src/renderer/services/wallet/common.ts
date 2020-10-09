@@ -1,11 +1,14 @@
 import { encryptToKeyStore, decryptFromKeystore, Keystore as CryptoKeystore } from '@thorchain/asgardex-crypto'
-import { none, some } from 'fp-ts/lib/Option'
+import { Asset } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
+import { distinctUntilChanged } from 'rxjs/operators'
 
+import { eqOAsset } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
 import { Phrase, KeystoreService, KeystoreState } from './types'
 import { hasImportedKeystore } from './util'
 
-export const initialKeystoreState = (): KeystoreState => none
+export const initialKeystoreState = (): KeystoreState => O.none
 
 const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(initialKeystoreState())
 
@@ -18,7 +21,7 @@ const addKeystore = async (phrase: Phrase, password: string) => {
     await keystoreService.removeKeystore()
     const keystore: CryptoKeystore = await encryptToKeyStore(phrase, password)
     await window.apiKeystore.save(keystore)
-    setKeystoreState(some(some({ phrase })))
+    setKeystoreState(O.some(O.some({ phrase })))
     return Promise.resolve()
   } catch (error) {
     return Promise.reject(error)
@@ -27,7 +30,7 @@ const addKeystore = async (phrase: Phrase, password: string) => {
 
 export const removeKeystore = async () => {
   await window.apiKeystore.remove()
-  setKeystoreState(none)
+  setKeystoreState(O.none)
 }
 
 const addPhrase = async (state: KeystoreState, password: string) => {
@@ -48,7 +51,7 @@ const addPhrase = async (state: KeystoreState, password: string) => {
   try {
     const keystore: CryptoKeystore = await window.apiKeystore.get()
     const phrase = await decryptFromKeystore(keystore, password)
-    setKeystoreState(some(some({ phrase })))
+    setKeystoreState(O.some(O.some({ phrase })))
     return Promise.resolve()
   } catch (error) {
     // TODO(@Veado) i18m
@@ -58,14 +61,21 @@ const addPhrase = async (state: KeystoreState, password: string) => {
 
 // check keystore at start
 window.apiKeystore.exists().then(
-  (result) => setKeystoreState(result ? some(none) /*imported, but locked*/ : none /*not imported*/),
-  (_) => setKeystoreState(none /*not imported*/)
+  (result) => setKeystoreState(result ? O.some(O.none) /*imported, but locked*/ : O.none /*not imported*/),
+  (_) => setKeystoreState(O.none /*not imported*/)
 )
 
 export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystore,
   removeKeystore,
-  lock: () => setKeystoreState(some(none)),
+  lock: () => setKeystoreState(O.some(O.none)),
   unlock: addPhrase
 }
+
+const { get$: getSelectedAsset$, set: setSelectedAsset } = observableState<O.Option<Asset>>(O.none)
+
+// "dirty check" to trigger "real" changes of an asset only
+const selectedAsset$ = getSelectedAsset$.pipe(distinctUntilChanged(eqOAsset.equals))
+
+export { selectedAsset$, setSelectedAsset }

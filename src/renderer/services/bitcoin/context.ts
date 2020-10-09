@@ -2,10 +2,10 @@ import { assetWB$, reloadBalances } from './balances'
 import { client$, clientViewState$, address$, explorerUrl$ } from './common'
 import { createTransactionService } from './transaction'
 
-const { fees$, pushTx, reloadFees, txRD$, resetTx } = createTransactionService(client$)
+const { fees$, pushTx, reloadFees, txRD$, resetTx, loadAssetTxs, assetTxs$ } = createTransactionService(client$)
 
 /**
- * Re-export "public" functions and observables
+ * Exports all functions and observables needed at UI level (provided by `BitcoinContext`)
  */
 export {
   client$,
@@ -18,5 +18,7 @@ export {
   pushTx,
   reloadFees,
   txRD$,
-  resetTx
+  resetTx,
+  loadAssetTxs,
+  assetTxs$
 }

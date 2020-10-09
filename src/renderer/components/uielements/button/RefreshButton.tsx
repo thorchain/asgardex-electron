@@ -10,7 +10,7 @@ type Props = {
   clickHandler?: () => void
 }
 
-const RefreshButton: React.FC<Props> = (props: Props): JSX.Element => {
+const RefreshButton: React.FC<Props> = (props): JSX.Element => {
   const { label, clickHandler = () => {} } = props
   const intl = useIntl()
 

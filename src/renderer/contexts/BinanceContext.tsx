@@ -6,10 +6,7 @@ import {
   client$,
   clientViewState$,
   address$,
-  setSelectedAsset,
-  txsSelectedAsset$,
-  selectedAsset$,
-  loadTxsSelectedAsset,
+  assetTxs$,
   explorerUrl$,
   transaction,
   freeze,
@@ -21,10 +18,7 @@ export type BinanceContextValue = {
   subscribeTransfers: typeof subscribeTransfers
   miniTickers$: typeof miniTickers$
   clientViewState$: typeof clientViewState$
-  setSelectedAsset: typeof setSelectedAsset
-  txsSelectedAsset$: typeof txsSelectedAsset$
-  loadTxsSelectedAsset: typeof loadTxsSelectedAsset
-  selectedAsset$: typeof selectedAsset$
+  assetTxs$: typeof assetTxs$
   address$: typeof address$
   explorerUrl$: typeof explorerUrl$
   transaction: typeof transaction
@@ -39,10 +33,7 @@ const initialContext: BinanceContextValue = {
   miniTickers$,
   client$,
   clientViewState$,
-  setSelectedAsset,
-  txsSelectedAsset$,
-  loadTxsSelectedAsset,
-  selectedAsset$,
+  assetTxs$,
   address$,
   explorerUrl$,
   transaction,

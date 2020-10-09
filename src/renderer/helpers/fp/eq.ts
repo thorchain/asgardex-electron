@@ -17,6 +17,8 @@ export const eqAsset: Eq.Eq<Asset> = {
   equals: (x, y) => assetToString(x) === assetToString(y)
 }
 
+export const eqOAsset = O.getEq(eqAsset)
+
 export const eqBaseAmount: Eq.Eq<BaseAmount> = {
   equals: (x, y) => egBigNumber.equals(x.amount(), y.amount()) && x.decimal === y.decimal
 }

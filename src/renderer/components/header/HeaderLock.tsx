@@ -16,7 +16,7 @@ type Props = {
   disabled?: boolean
 }
 
-const HeaderLock: React.FC<Props> = (props: Props): JSX.Element => {
+const HeaderLock: React.FC<Props> = (props): JSX.Element => {
   const { isLocked, onPress = () => {}, isDesktopView, disabled = false } = props
 
   const { theme$ } = useThemeContext()

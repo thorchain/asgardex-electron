@@ -10,7 +10,7 @@ type Props = {
   className?: string
 }
 
-const Status: React.FC<Props> = (props: Props): JSX.Element => {
+const Status: React.FC<Props> = (props): JSX.Element => {
   const { title = '', value = '', direction = 'vertical', loading = false, className = '', ...otherProps } = props
 
   return (

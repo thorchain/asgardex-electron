@@ -14,8 +14,9 @@ const wallet: WalletMessages = {
   'wallet.action.remove': 'Wallet entfernen',
   'wallet.action.unlock': 'Entsperren',
   'wallet.unlock.title': 'Wallet entsperren',
-  'wallet.unlock.phrase': 'Geben Sie Ihre Phrase ein',
-  'wallet.unlock.error': 'Could not unlock the wallet. Please check you password and try it again - DE',
+  'wallet.unlock.phrase': 'Bitte gebe Deine Phrase ein',
+  'wallet.unlock.error':
+    'Die Wallet konnte nicht entsperrt werden. Bitte überprüfe Dein Passwort und versuche es noch einmal',
   'wallet.imports.phrase': 'Phrase',
   'wallet.imports.wallet': 'Importiere eine bestehende Wallet',
   'wallet.imports.enterphrase': 'Phrase eingeben',
@@ -35,17 +36,20 @@ const wallet: WalletMessages = {
   'wallet.receive.address.error': 'Keine Addresse für den Empfang vorhanden',
   'wallet.receive.address.errorQR': 'Error beim Rendern des QR Codes: {error}',
   'wallet.send.success': 'Transaktion war erfolgreich.',
+  'wallet.send.fast': 'Schnell',
+  'wallet.send.regular': 'Normal',
+  'wallet.send.slow': 'Langsam',
   'wallet.errors.balancesFailed': 'Fehler beim Laden der Guthaben. {errorMsg} (API Id: {apiId})',
   'wallet.errors.address.empty': 'Keine Addresse angegeben',
   'wallet.errors.address.invalid': 'Addresse ist nicht valide',
   'wallet.errors.amount.shouldBeNumber': 'Der eingegebene Wert sollte eine Nummer sein',
-  'wallet.errors.amount.shouldBeGreaterThan': 'Der eingegebene Wert sollte höher als {amount} betragen',
-  'wallet.errors.amount.shouldBeLessThanBalance': 'Der eingegebene Wert sollte nicht höher als Ihr Guthaben sein',
+  'wallet.errors.amount.shouldBeGreaterThan': 'Der eingegebene Betrag sollte höher als {amount} betragen',
+  'wallet.errors.amount.shouldBeLessThanBalance': 'Der eingegebene Betrag sollte nicht höher als Dein Guthaben sein',
   'wallet.errors.amount.shouldBeLessThanFrozenBalance':
-    'Der eingegebene Wert sollte nicht höher als Ihr eingefrorenes Guthaben sein',
+    'Der eingegebene Wert sollte nicht höher als Dein eingefrorenes Guthaben sein',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
-    'Der eingegebene Wert sollte nicht höher als Ihr Guthaben abzgl. Gebühren sein',
-  'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Ihr Guthaben ({balance}) gedeckt',
+    'Der eingegebene Wert sollte nicht höher als Dein Guthaben abzgl. Gebühren sein',
+  'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Dein Guthaben ({balance}) gedeckt',
   'wallet.errors.route.invalidAsset': 'Invalides Asset in der Route: {asset}',
   'wallet.errors.invalidChain': 'Invalide Chain: {chain}'
 }

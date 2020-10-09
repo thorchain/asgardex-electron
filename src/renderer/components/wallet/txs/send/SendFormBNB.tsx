@@ -2,11 +2,9 @@ import React, { useCallback, useMemo } from 'react'
 
 import { Address } from '@thorchain/asgardex-binance'
 import {
-  assetToString,
   formatAssetAmountCurrency,
   assetAmount,
   AssetAmount,
-  formatAssetAmount,
   bn,
   baseToAsset,
   AssetBNB
@@ -20,7 +18,6 @@ import { useIntl } from 'react-intl'
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
 import { isBnbAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
-import { trimZeros } from '../../../../helpers/stringHelper'
 import { getBnbAmountFromBalances } from '../../../../helpers/walletHelper'
 import { SendTxParams } from '../../../../services/binance/transaction'
 import { AddressValidation } from '../../../../services/binance/types'
@@ -69,7 +66,7 @@ const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
         oFee,
         O.fold(
           () => '--',
-          (f) => `${trimZeros(formatAssetAmount(f, 6))} ${AssetBNB.symbol}`
+          (fee) => formatAssetAmountCurrency({ amount: fee, asset: AssetBNB, trimZeros: true })
         )
       ),
     [oFee]
@@ -98,15 +95,14 @@ const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
       {
-        fee: formatAssetAmount(amount, 6),
-        balance: `${formatAssetAmount(amount, 8)} ${AssetBNB.symbol}`
+        balance: formatAssetAmountCurrency({ amount, asset: AssetBNB, trimZeros: true })
       }
     )
 
     return (
-      <Styled.StyledLabel size="big" color="error">
+      <Styled.Label size="big" color="error">
         {msg}
-      </Styled.StyledLabel>
+      </Styled.Label>
     )
   }, [oBnbAmount, intl, isFeeError])
 
@@ -167,17 +163,20 @@ const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
             </Form.Item>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              {/* TODO(@Veado) In future decimal will be changed depending on selected asset, currently we have just BNB assets (decimal = 8) */}
               <InputBigNumber min={0} size="large" disabled={isLoading} decimal={8} />
             </Styled.FormItem>
-            <Styled.StyledLabel size="big">
+            <Styled.Label size="big">
               <>
                 {intl.formatMessage({ id: 'common.max' })}:{' '}
-                {formatAssetAmountCurrency(baseToAsset(assetWB.amount), assetToString(assetWB.asset), 8)}
+                {formatAssetAmountCurrency({
+                  amount: baseToAsset(assetWB.amount),
+                  asset: assetWB.asset,
+                  trimZeros: true
+                })}
                 <br />
                 {intl.formatMessage({ id: 'common.fees' })}: {feeLabel}
               </>
-            </Styled.StyledLabel>
+            </Styled.Label>
             {renderFeeError}
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
             <Form.Item name="memo">

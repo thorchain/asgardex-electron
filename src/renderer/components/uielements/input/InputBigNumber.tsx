@@ -1,13 +1,12 @@
 import React, { useMemo, useCallback, useState, useRef, useEffect, forwardRef } from 'react'
 
-import { delay, bn, fixedBN } from '@thorchain/asgardex-util'
+import { delay, bn, fixedBN, trimZeros } from '@thorchain/asgardex-util'
 import { Input } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_BN } from '../../../const'
-import { trimZeros } from '../../../helpers/stringHelper'
 import * as Styled from './Input.style'
 import { VALUE_ZERO, formatValue, validInputValue } from './util'
 
