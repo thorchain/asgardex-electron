@@ -53,7 +53,6 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Der eingegebene Wert sollte nicht höher als Dein Guthaben abzgl. Gebühren sein',
   'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Dein Guthaben ({balance}) gedeckt',
-  'wallet.errors.route.invalidAsset': 'Invalides Asset in der Route: {asset}',
   'wallet.errors.invalidChain': 'Invalide Chain: {chain}'
 }
 

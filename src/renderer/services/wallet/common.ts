@@ -5,12 +5,11 @@ import { distinctUntilChanged } from 'rxjs/operators'
 
 import { eqOAsset } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
+import { INITIAL_KEYSTORE_STATE } from './const'
 import { Phrase, KeystoreService, KeystoreState } from './types'
 import { hasImportedKeystore } from './util'
 
-export const initialKeystoreState = (): KeystoreState => O.none
-
-const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(initialKeystoreState())
+const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(INITIAL_KEYSTORE_STATE)
 
 /**
  * Creates a keystore and saves it to disk
