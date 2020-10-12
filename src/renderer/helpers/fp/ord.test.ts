@@ -1,6 +1,6 @@
-import { bn, baseAmount } from '@thorchain/asgardex-util'
+import { bn, baseAmount, AssetRuneB1A, AssetBTC } from '@thorchain/asgardex-util'
 
-import { ordBigNumber, ordBaseAmount } from './ord'
+import { ordBigNumber, ordBaseAmount, ordAsset } from './ord'
 
 describe('helpers/fp/ord', () => {
   describe('ordBigNumber', () => {
@@ -17,6 +17,20 @@ describe('helpers/fp/ord', () => {
     })
     it('is less', () => {
       expect(ordBaseAmount.compare(baseAmount(1), baseAmount(101))).toEqual(-1)
+    })
+    it('is equal', () => {
+      expect(ordBaseAmount.compare(baseAmount(1), baseAmount(1))).toEqual(0)
+    })
+  })
+  describe('ordAsset', () => {
+    it('is less', () => {
+      expect(ordAsset.compare(AssetRuneB1A, AssetBTC)).toEqual(-1)
+    })
+    it('is grreater', () => {
+      expect(ordAsset.compare(AssetBTC, AssetRuneB1A)).toEqual(1)
+    })
+    it('is equal', () => {
+      expect(ordAsset.compare(AssetBTC, AssetBTC)).toEqual(0)
     })
   })
 })
