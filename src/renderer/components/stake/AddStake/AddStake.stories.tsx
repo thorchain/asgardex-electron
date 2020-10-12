@@ -18,9 +18,10 @@ export const AddStakeStory = () => {
       onStake={console.log}
       onChangeAsset={console.log}
       poolData={{
-        assetBalance: baseAmount('55986.99147'),
-        runeBalance: baseAmount('3254937.05597')
+        assetBalance: baseAmount('1000'),
+        runeBalance: baseAmount('2000')
       }}
+      priceAsset={AssetRune67C}
       assets={[AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO]}
     />
   )

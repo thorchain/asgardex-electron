@@ -6,7 +6,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router'
-import { map } from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
 import { AddStake } from '../../../components/stake/AddStake/AddStake'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
@@ -31,7 +31,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
 
   const {
     service: {
-      pools: { availableAssets$, priceRatio$, runeAsset$, selectedPricePoolAssetSymbol$, poolDetail$, poolsState$ }
+      pools: { availableAssets$, priceRatio$, runeAsset$, selectedPricePoolAsset$, poolDetail$, poolsState$ }
     }
   } = useMidgardContext()
 
@@ -39,13 +39,13 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
 
   const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset(asset.chain))
   const runPrice = useObservableState(priceRatio$, bn(1))
-  const selectedPricePoolAssetSymbol = useObservableState(selectedPricePoolAssetSymbol$, O.none)
+  const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
 
   const [assetsWB] = useObservableState(
     () =>
       FP.pipe(
         assetsWBState$,
-        map((assetsWBState) => assetsWBState.assetsWB)
+        RxOp.map((assetsWBState) => assetsWBState.assetsWB)
       ),
     O.none
   )
@@ -94,12 +94,12 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
         assetBalance={ZERO_BASE_AMOUNT}
         runeBalance={ZERO_BASE_AMOUNT}
         onStake={() => {}}
-        unit={O.toUndefined(selectedPricePoolAssetSymbol)}
+        priceAsset={selectedPricePoolAsset}
         disabled={true}
         poolData={{ runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }}
       />
     ),
-    [asset, runeAsset, selectedPricePoolAssetSymbol]
+    [asset, runeAsset, selectedPricePoolAsset]
   )
 
   return FP.pipe(
@@ -120,7 +120,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
             assetBalance={assetBalance}
             runeBalance={runeBalance}
             onStake={console.log}
-            unit={O.toUndefined(selectedPricePoolAssetSymbol)}
+            priceAsset={selectedPricePoolAsset}
             assets={poolAssets}
           />
         )

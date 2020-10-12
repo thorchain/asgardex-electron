@@ -1,11 +1,21 @@
 import React, { useRef, useState, RefObject, useCallback, useMemo, useEffect } from 'react'
 
-import { bn, formatBN, Asset, assetFromString, BaseAmount, baseToAsset, assetToBase } from '@thorchain/asgardex-util'
+import {
+  bn,
+  Asset,
+  assetFromString,
+  BaseAmount,
+  baseToAsset,
+  assetToBase,
+  formatAssetAmountCurrency,
+  assetAmount
+} from '@thorchain/asgardex-util'
 import * as AU from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
+import { BTC_DECIMAL, isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
@@ -18,9 +28,10 @@ type Props = {
   asset: Asset
   assets?: Asset[]
   selectedAmount: BaseAmount
+  maxAmount: BaseAmount
   price: BigNumber
   priceIndex?: PriceDataIndex
-  unit?: string
+  priceAsset?: Asset
   slip?: number
   title?: string
   searchDisable?: string[]
@@ -39,7 +50,7 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
     price = bn(0),
     priceIndex,
     slip,
-    unit = 'RUNE',
+    priceAsset,
     title = '',
     percentValue = NaN,
     withSearch = false,
@@ -49,6 +60,7 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
     onChangePercent = (_: number) => {},
     children = null,
     selectedAmount,
+    maxAmount,
     disabled
   } = props
 
@@ -57,6 +69,7 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const ref: RefObject<HTMLDivElement> = useRef(null)
 
   const selectedAmountBn = useMemo(() => baseToAsset(selectedAmount).amount(), [selectedAmount])
+  const maxAmountBn = useMemo(() => baseToAsset(maxAmount).amount(), [maxAmount])
 
   useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
 
@@ -114,6 +127,16 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
     [onChangeAssetAmount]
   )
 
+  const priceLabel = useMemo(() => {
+    const amount = assetAmount(selectedAmountBn.multipliedBy(price))
+    return formatAssetAmountCurrency({
+      amount,
+      asset: priceAsset,
+      // special case for BTC
+      decimal: priceAsset && isBtcAsset(priceAsset) ? BTC_DECIMAL : 2
+    })
+  }, [price, priceAsset, selectedAmountBn])
+
   return (
     <Styled.AssetCardWrapper ref={ref}>
       {!!title && <Label className="title-label">{title}</Label>}
@@ -135,9 +158,10 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
                   value={selectedAmountBn}
                   onChange={changeAssetAmountHandler}
                   decimal={selectedAmount.decimal}
+                  max={maxAmountBn.toString()}
                 />
                 <Styled.AssetCardFooter>
-                  <Styled.FooterLabel>{`${unit} ${formatBN(selectedAmountBn.multipliedBy(price))}`}</Styled.FooterLabel>
+                  <Styled.FooterLabel>{priceLabel}</Styled.FooterLabel>
                   {slip !== undefined && (
                     <Styled.FooterLabel className="asset-slip-label">SLIP: {slip.toFixed(0)} %</Styled.FooterLabel>
                   )}

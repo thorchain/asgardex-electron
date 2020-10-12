@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn, BaseAmount, AssetBNB, AssetBTC, AssetRuneB1A } from '@thorchain/asgardex-util'
+import { bn, BaseAmount, AssetBNB, AssetBTC, AssetRuneB1A, assetAmount, assetToBase } from '@thorchain/asgardex-util'
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import AssetCard from './AssetCard'
@@ -30,6 +30,7 @@ storiesOf('Components/Assets/AssetCard', module).add('default', () => {
           RUNE: bn(1)
         }}
         percentValue={percent}
+        maxAmount={assetToBase(assetAmount(10))}
       />
     </div>
   )
