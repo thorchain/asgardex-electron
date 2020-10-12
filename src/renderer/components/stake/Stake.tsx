@@ -11,13 +11,12 @@ import * as Styled from './Stake.styles'
 type Props = {
   asset: Asset
   ShareContent: React.ComponentType<{ asset: Asset }>
-  TopContent: React.ComponentType
   AddStake: React.ComponentType<{ asset: Asset }>
   keystoreState: KeystoreState
 }
 
 export const Stake: React.FC<Props> = (props) => {
-  const { ShareContent, TopContent, AddStake, asset, keystoreState } = props
+  const { ShareContent, AddStake, asset, keystoreState } = props
   const intl = useIntl()
 
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
@@ -42,9 +41,6 @@ export const Stake: React.FC<Props> = (props) => {
 
   return (
     <Styled.Container>
-      <Styled.TopContainer>
-        <TopContent />
-      </Styled.TopContainer>
       <Styled.ContentContainer>
         {walletIsImported && !walletIsLocked ? (
           <>

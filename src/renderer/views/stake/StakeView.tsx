@@ -14,7 +14,6 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { StakeRouteParams } from '../../routes/stake'
 import { AddStakeView } from './AddStake/AddStakeView'
-import { PoolDetailsView } from './PoolDetails/PoolDetailsView'
 import { ShareView } from './Share/ShareView'
 
 type Props = {}
@@ -67,15 +66,7 @@ const StakeView: React.FC<Props> = (_) => {
           )}
         />
       )}
-      {asset && (
-        <Stake
-          asset={asset}
-          keystoreState={keystoreState}
-          TopContent={PoolDetailsView}
-          ShareContent={ShareView}
-          AddStake={AddStakeView}
-        />
-      )}
+      {asset && <Stake asset={asset} keystoreState={keystoreState} ShareContent={ShareView} AddStake={AddStakeView} />}
     </>
   )
 }
