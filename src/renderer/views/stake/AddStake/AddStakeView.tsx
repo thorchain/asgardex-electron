@@ -33,14 +33,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
 
   const {
     service: {
-      pools: {
-        availableAssets$,
-        priceRatio$,
-        runeAsset$,
-        selectedPricePoolAssetSymbol$,
-        poolDetailedState$,
-        poolsState$
-      }
+      pools: { availableAssets$, priceRatio$, runeAsset$, selectedPricePoolAssetSymbol$, poolDetail$, poolsState$ }
     }
   } = useMidgardContext()
 
@@ -59,7 +52,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
     O.none
   )
 
-  const poolDetailedInfo = useObservableState<PoolDetailRD>(poolDetailedState$, RD.initial)
+  const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
 
   const assetBalance = FP.pipe(
     assetsWB,
@@ -84,7 +77,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
     RD.chain((poolsState) => RD.fromOption(getPoolDetail(poolsState.poolDetails, asset), () => Error('no data')))
   )
 
-  const [poolAssets] = useObservableState(
+  const [poolAssetsRD] = useObservableState(
     () =>
       FP.pipe(
         availableAssets$,
@@ -98,7 +91,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
     RD.initial
   )
 
-  const assetPrice = FP.pipe(
+  const assetPriceRD = FP.pipe(
     poolsState,
     // convert from RUNE price to selected pool asset price
     RD.map((state) => bnOrZero(state.price).multipliedBy(runPrice))
@@ -124,7 +117,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
   )
 
   return FP.pipe(
-    sequenceTRD(assetPrice, poolAssets, poolDetailedInfo),
+    sequenceTRD(assetPriceRD, poolAssetsRD, poolDetailRD),
     RD.fold(
       renderDisabledAddStake,
       renderDisabledAddStake,

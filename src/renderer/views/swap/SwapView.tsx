@@ -34,7 +34,7 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, poolAddresses$, reloadPoolsState, runeAsset$, selectedPricePool$ }
+    pools: { poolsState$, poolAddresses$, reloadPools, runeAsset$, selectedPricePool$ }
   } = midgardService
   const { transaction, explorerUrl$ } = useBinanceContext()
   const { assetsWBState$ } = useWalletContext()
@@ -88,10 +88,10 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
       <ErrorView
         title={intl.formatMessage({ id: 'common.error' })}
         subTitle={e.message}
-        extra={<Button onClick={reloadPoolsState}>{intl.formatMessage({ id: 'common.retry' })}</Button>}
+        extra={<Button onClick={reloadPools}>{intl.formatMessage({ id: 'common.retry' })}</Button>}
       />
     ),
-    [reloadPoolsState, intl]
+    [intl, reloadPools]
   )
 
   return (

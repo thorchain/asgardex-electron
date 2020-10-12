@@ -79,7 +79,7 @@ const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
       {renderPools}
       <h1>Ticker</h1>
       <h2>{tickers[0]?.s}</h2>
-      <Button onClick={() => midgardService.pools.reloadPoolsState()}>Reload pools</Button>
+      <Button onClick={() => midgardService.pools.reloadPools()}>Reload pools</Button>
       <h1>Memo</h1>
       <h2>{memo}</h2>
     </>

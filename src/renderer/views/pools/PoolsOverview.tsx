@@ -45,7 +45,7 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   const {
     thorchainLastblockState$,
     thorchainConstantsState$,
-    pools: { poolsState$, selectedPricePool$, reloadPoolsState },
+    pools: { poolsState$, selectedPricePool$, reloadPools },
     reloadThorchainLastblock,
     reloadNetworkInfo
   } = midgardService
@@ -102,9 +102,9 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
   )
 
   const clickRefreshHandler = useCallback(() => {
-    reloadPoolsState()
+    reloadPools()
     reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPoolsState])
+  }, [reloadNetworkInfo, reloadPools])
 
   const renderRefreshBtn = useMemo(
     () => (
