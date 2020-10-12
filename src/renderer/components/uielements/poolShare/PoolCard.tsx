@@ -3,6 +3,7 @@ import React from 'react'
 import { Asset, BaseAmount, baseToAsset, formatAssetAmount } from '@thorchain/asgardex-util'
 import { Col } from 'antd'
 
+import { isBtcAsset } from '../../../helpers/assetHelper'
 import Label from '../label'
 import * as Styled from './Poolcard.style'
 
@@ -51,10 +52,10 @@ export const PoolCard: React.FC<PoolCardProps> = ({
         <Styled.PoolCardRow justify="space-around">
           <Styled.ValuesWrapper loading={`${loading}`}>
             <Label align="center" loading={loading} color="dark">
-              {formatAssetAmount({ amount: baseToAsset(runeAmount), trimZeros: true })}
+              {formatAssetAmount({ amount: baseToAsset(runeAmount), decimal: 2 })}
             </Label>
             <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceSymbol} ${formatAssetAmount({ amount: baseToAsset(runePrice), trimZeros: true })}`}
+              {`${basePriceSymbol} ${formatAssetAmount({ amount: baseToAsset(runePrice), decimal: 2 })}`}
             </Label>
           </Styled.ValuesWrapper>
           <Styled.ValuesWrapper loading={`${loading}`}>
@@ -62,7 +63,11 @@ export const PoolCard: React.FC<PoolCardProps> = ({
               {formatAssetAmount({ amount: baseToAsset(assetAmount), trimZeros: true })}
             </Label>
             <Label align="center" size="normal" color="light" loading={loading}>
-              {`${basePriceSymbol} ${formatAssetAmount({ amount: baseToAsset(assetPrice), trimZeros: true })}`}
+              {`${basePriceSymbol} ${formatAssetAmount({
+                amount: baseToAsset(assetPrice),
+                // special case for BTC
+                decimal: isBtcAsset(sourceAsset) ? 8 : 2
+              })}`}
             </Label>
           </Styled.ValuesWrapper>
         </Styled.PoolCardRow>
