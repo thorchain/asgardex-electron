@@ -1,7 +1,9 @@
 import * as O from 'fp-ts/lib/Option'
 
 import { MAX_ITEMS_PER_PAGE } from '../const'
-import { AssetsWithBalanceState, LoadAssetTxsHandler, LoadAssetTxsProps } from './types'
+import { AssetsWithBalanceState, KeystoreState, LoadAssetTxsHandler, LoadAssetTxsProps } from './types'
+
+export const INITIAL_KEYSTORE_STATE: KeystoreState = O.none
 
 export const INITIAL_ASSETS_WB_STATE: AssetsWithBalanceState = {
   assetsWB: O.none,

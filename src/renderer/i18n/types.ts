@@ -47,6 +47,10 @@ export type CommonMessages = {
   [key in CommonMessageKey]: string
 }
 
+type RoutesMessageKey = 'routes.invalid.asset'
+
+export type RoutesMessages = { [key in RoutesMessageKey]: string }
+
 type PoolsMessageKey =
   | 'pools.depth'
   | 'pools.24hvol'
@@ -109,7 +113,6 @@ type WalletMessageKey =
   | 'wallet.errors.amount.shouldBeLessThanFrozenBalance'
   | 'wallet.errors.amount.shouldBeLessThanBalanceAndFee'
   | 'wallet.errors.fee.notCovered'
-  | 'wallet.errors.route.invalidAsset'
   | 'wallet.errors.invalidChain'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
@@ -161,7 +164,13 @@ type StakeMessageKey =
 
 export type StakeMessages = { [key in StakeMessageKey]: string }
 
-export type Messages = CommonMessages & PoolsMessages & WalletMessages & SettingMessages & SwapMessages & StakeMessages
+export type Messages = CommonMessages &
+  RoutesMessages &
+  PoolsMessages &
+  WalletMessages &
+  SettingMessages &
+  SwapMessages &
+  StakeMessages
 
 export enum Locale {
   EN = 'en',
