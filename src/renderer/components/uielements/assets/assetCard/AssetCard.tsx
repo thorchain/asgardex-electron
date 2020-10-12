@@ -1,14 +1,14 @@
 import React, { useRef, useState, RefObject, useCallback, useMemo, useEffect } from 'react'
 
-import { bn, formatBN, Asset, assetFromString, BaseAmount, baseToAsset } from '@thorchain/asgardex-util'
+import { bn, formatBN, Asset, assetFromString, BaseAmount, baseToAsset, assetToBase } from '@thorchain/asgardex-util'
+import * as AU from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
-import { sortBy as _sortBy } from 'lodash'
 
-import { ZERO_BN } from '../../../../const'
+import { ZERO_BASE_AMOUNT } from '../../../../const'
+import { ordAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
-import { AssetPair } from '../../../../types/asgardex'
 import Label from '../../label'
 import Slider from '../../slider'
 import AssetMenu from '../assetMenu'
@@ -16,8 +16,7 @@ import * as Styled from './AssetCard.style'
 
 type Props = {
   asset: Asset
-  assetData?: AssetPair[]
-  amount: BaseAmount
+  assets?: Asset[]
   selectedAmount: BaseAmount
   price: BigNumber
   priceIndex?: PriceDataIndex
@@ -25,31 +24,29 @@ type Props = {
   slip?: number
   title?: string
   searchDisable?: string[]
-  withPercentSlider?: boolean
+  percentValue?: number
   withSearch?: boolean
-  // Base amount as BigNumber
-  onChange?: (value: BigNumber) => void
+  onChangeAssetAmount?: (value: BaseAmount) => void
   onChangeAsset?: (asset: Asset) => void
-  className?: string
+  onChangePercent?: (percent: number) => void
   disabled?: boolean
 }
 
 const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
-    amount,
-    assetData = [],
+    assets = [],
     price = bn(0),
     priceIndex,
     slip,
     unit = 'RUNE',
-    className = '',
     title = '',
-    withPercentSlider = false,
+    percentValue = NaN,
     withSearch = false,
     searchDisable = [],
-    onChange = (_: BigNumber) => {},
+    onChangeAssetAmount = (_: BaseAmount) => {},
     onChangeAsset = (_: Asset) => {},
+    onChangePercent = (_: number) => {},
     children = null,
     selectedAmount,
     disabled
@@ -60,9 +57,6 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const ref: RefObject<HTMLDivElement> = useRef(null)
 
   const selectedAmountBn = useMemo(() => baseToAsset(selectedAmount).amount(), [selectedAmount])
-  const amountBn = useMemo(() => baseToAsset(amount).amount(), [amount])
-
-  // console.log(asset.ticker, selectedAmount.amount().toFormat(5))
 
   useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
 
@@ -71,18 +65,18 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
       const targetAsset = typeof asset === 'string' ? assetFromString(asset) : asset
       if (targetAsset) {
         onChangeAsset(targetAsset)
-        onChange(ZERO_BN)
+        onChangeAssetAmount(ZERO_BASE_AMOUNT)
       }
     },
-    [onChangeAsset, onChange]
+    [onChangeAsset, onChangeAssetAmount]
   )
 
   const renderMenu = useCallback(() => {
-    const sortedAssetData = _sortBy(assetData, ['asset'])
+    const sortedAssetData = assets.sort(ordAsset.compare)
 
     return (
       <AssetMenu
-        assetData={sortedAssetData}
+        assets={sortedAssetData}
         asset={asset}
         priceIndex={priceIndex}
         withSearch={withSearch}
@@ -90,19 +84,16 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
         onSelect={handleChangeAsset}
       />
     )
-  }, [assetData, asset, priceIndex, withSearch, searchDisable, handleChangeAsset])
+  }, [assets, asset, priceIndex, withSearch, searchDisable, handleChangeAsset])
 
   const onPercentChange = useCallback(
     (percent: number) => {
-      onChange(amountBn.multipliedBy(percent / 100))
+      onChangePercent(percent)
     },
-    [amountBn, onChange]
+    [onChangePercent]
   )
 
-  const percentValue = useMemo(() => selectedAmountBn.dividedBy(amountBn).multipliedBy(100).toNumber(), [
-    selectedAmountBn,
-    amountBn
-  ])
+  const withPercentSlider = useMemo(() => !isNaN(percentValue), [percentValue])
 
   // Needed to have appropriate width of a dropdown
   useEffect(() => {
@@ -118,8 +109,13 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
     }
   }, [setWrapperWidth])
 
+  const changeAssetAmountHandler = useCallback(
+    (value: BigNumber) => onChangeAssetAmount(assetToBase(AU.assetAmount(value))),
+    [onChangeAssetAmount]
+  )
+
   return (
-    <Styled.AssetCardWrapper ref={ref} className={`AssetCard-wrapper ${className}`}>
+    <Styled.AssetCardWrapper ref={ref}>
       {!!title && <Label className="title-label">{title}</Label>}
 
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
@@ -129,7 +125,7 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
             <Styled.AssetSelect
               minWidth={wrapperWidth}
               showAssetName={false}
-              assetData={assetData}
+              assets={assets}
               asset={asset}
               onSelect={handleChangeAsset}>
               <Styled.AssetData>
@@ -137,7 +133,7 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
                   disabled={disabled}
                   size="middle"
                   value={selectedAmountBn}
-                  onChange={onChange}
+                  onChange={changeAssetAmountHandler}
                   decimal={selectedAmount.decimal}
                 />
                 <Styled.AssetCardFooter>
