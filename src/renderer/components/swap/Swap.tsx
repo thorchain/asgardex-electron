@@ -7,7 +7,6 @@ import {
   AssetAmount,
   assetToBase,
   assetToString,
-  baseAmount,
   bn,
   formatBN,
   getValueOfAsset1InAsset2,
@@ -145,27 +144,20 @@ export const Swap = ({
     [setChangeAmount, oAssetWB]
   )
 
-  const allAssets = useMemo(
-    () =>
-      availableAssets.map((asset) => ({
-        asset: asset.asset,
-        price: baseAmount(asset.priceRune)
-      })),
-    [availableAssets]
-  )
+  const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
 
   const assetSymbolsInWallet: O.Option<string[]> = useMemo(
     () => FP.pipe(assetsWB, O.map(A.map(({ asset }) => asset.symbol))),
     [assetsWB]
   )
 
-  const assetsToSwapFrom = useMemo(() => {
-    const availableAssets = FP.pipe(
+  const assetsToSwapFrom = useMemo((): Asset[] => {
+    const filteredAssets: Asset[] = FP.pipe(
       allAssets,
       A.filter((asset) =>
         FP.pipe(
           assetSymbolsInWallet,
-          O.map((symbols) => symbols.includes(asset.asset.symbol)),
+          O.map((symbols) => symbols.includes(asset.symbol)),
           O.getOrElse((): boolean => false)
         )
       ),
@@ -176,26 +168,26 @@ export const Swap = ({
       assetsToSwap,
       O.map(([sourceAsset, targetAsset]) =>
         FP.pipe(
-          availableAssets,
-          A.filter((asset) => asset.asset.symbol !== sourceAsset.symbol && asset.asset.symbol !== targetAsset.symbol)
+          filteredAssets,
+          A.filter((asset) => asset.symbol !== sourceAsset.symbol && asset.symbol !== targetAsset.symbol)
         )
       ),
       O.getOrElse(() => allAssets)
     )
-  }, [assetsToSwap, allAssets, assetSymbolsInWallet])
+  }, [allAssets, assetsToSwap, assetSymbolsInWallet])
 
-  const assetsToSwapTo = useMemo(() => {
+  const assetsToSwapTo = useMemo((): Asset[] => {
     return FP.pipe(
       assetsToSwap,
       O.map(([sourceAsset, targetAsset]) =>
         FP.pipe(
           allAssets,
-          A.filter((asset) => asset.asset.symbol !== sourceAsset.symbol && asset.asset.symbol !== targetAsset.symbol)
+          A.filter((asset) => asset.symbol !== sourceAsset.symbol && asset.symbol !== targetAsset.symbol)
         )
       ),
       O.getOrElse(() => allAssets)
     )
-  }, [assetsToSwap, allAssets])
+  }, [allAssets, assetsToSwap])
 
   const canSwitchAssets = useMemo(
     () =>
@@ -406,7 +398,7 @@ export const Swap = ({
               sourceAsset,
               O.fold(
                 () => <></>,
-                (asset) => <AssetSelect onSelect={setSourceAsset} asset={asset} assetData={assetsToSwapFrom} />
+                (asset) => <AssetSelect onSelect={setSourceAsset} asset={asset} assets={assetsToSwapFrom} />
               )
             )}
           </Styled.ValueItemContainer>
@@ -425,19 +417,7 @@ export const Swap = ({
               targetAsset,
               O.fold(
                 () => <></>,
-                (asset) => (
-                  <AssetSelect
-                    onSelect={setTargetAsset}
-                    asset={asset}
-                    assetData={assetsToSwapTo}
-                    priceIndex={availableAssets.reduce((acc, asset) => {
-                      return {
-                        ...acc,
-                        [asset.asset.ticker]: baseAmount(asset.priceRune).amount()
-                      }
-                    }, {})}
-                  />
-                )
+                (asset) => <AssetSelect onSelect={setTargetAsset} asset={asset} assets={assetsToSwapTo} />
               )
             )}
           </Styled.ValueItemContainer>

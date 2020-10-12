@@ -3,19 +3,17 @@ import React, { useCallback } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetToString, bn, bnOrZero } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/function'
-import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router'
 import { map } from 'rxjs/operators'
 
 import { AddStake } from '../../../components/stake/AddStake/AddStake'
-import { ONE_ASSET_BASE_AMOUNT, ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
-import { liveData } from '../../../helpers/rx/liveData'
 import * as stakeRoutes from '../../../routes/stake'
 import { PoolDetailRD } from '../../../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../../../services/midgard/utils'
@@ -77,19 +75,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
     RD.chain((poolsState) => RD.fromOption(getPoolDetail(poolsState.poolDetails, asset), () => Error('no data')))
   )
 
-  const [poolAssetsRD] = useObservableState(
-    () =>
-      FP.pipe(
-        availableAssets$,
-        liveData.map(
-          A.map((asset) => ({
-            asset,
-            price: ONE_ASSET_BASE_AMOUNT
-          }))
-        )
-      ),
-    RD.initial
-  )
+  const poolAssetsRD = useObservableState(availableAssets$, RD.initial)
 
   const assetPriceRD = FP.pipe(
     poolsState,
@@ -135,7 +121,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
             runeBalance={runeBalance}
             onStake={console.log}
             unit={O.toUndefined(selectedPricePoolAssetSymbol)}
-            assetData={poolAssets}
+            assets={poolAssets}
           />
         )
       }
