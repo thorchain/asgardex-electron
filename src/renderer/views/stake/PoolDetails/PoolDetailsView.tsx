@@ -43,17 +43,22 @@ const renderInitialView = () => <PoolDetails {...defaultDetailsProps} />
 
 type Props = {}
 export const PoolDetailsView: React.FC<Props> = () => {
-  const { service: midgardService } = useMidgardContext()
+  const {
+    service: {
+      pools: { poolDetail$, priceRatio$, selectedPricePoolAssetSymbol$ }
+    }
+  } = useMidgardContext()
+
   const intl = useIntl()
 
-  const priceSymbol = useObservableState(midgardService.pools.selectedPricePoolAssetSymbol$, O.none)
+  const priceSymbol = useObservableState(selectedPricePoolAssetSymbol$, O.none)
 
-  const priceRatio = useObservableState(midgardService.pools.priceRatio$, ONE_BN)
+  const priceRatio = useObservableState(priceRatio$, ONE_BN)
 
-  const detailedPoolData = useObservableState(midgardService.pools.poolDetailedState$, RD.initial)
+  const poolDetailRD = useObservableState(poolDetail$, RD.initial)
 
   return FP.pipe(
-    detailedPoolData,
+    poolDetailRD,
     RD.fold(
       renderInitialView,
       renderPendingView,

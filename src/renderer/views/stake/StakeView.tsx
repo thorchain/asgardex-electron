@@ -22,11 +22,12 @@ const StakeView: React.FC<Props> = (_) => {
   const intl = useIntl()
 
   const { asset: assetParam } = useParams<StakeRouteParams>()
-  const { service: midgardService } = useMidgardContext()
   const {
-    pools: { reloadPoolDetailedState },
-    stake: { setAddress }
-  } = midgardService
+    service: {
+      pools: { reloadPoolDetail },
+      stake: { setAddress }
+    }
+  } = useMidgardContext()
   const { keystoreService } = useWalletContext()
   const { address$ } = useBinanceContext()
 
@@ -43,9 +44,9 @@ const StakeView: React.FC<Props> = (_) => {
 
   useEffect(() => {
     const oAsset = O.fromNullable(asset)
-    reloadPoolDetailedState(oAsset)
+    reloadPoolDetail(oAsset)
     setAddress(walletAddress)
-  }, [asset, reloadPoolDetailedState, setAddress, walletAddress])
+  }, [asset, reloadPoolDetail, setAddress, walletAddress])
 
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)

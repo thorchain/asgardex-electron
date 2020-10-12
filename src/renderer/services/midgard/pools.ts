@@ -160,12 +160,12 @@ const createPoolsService = (
   }
 
   // `TriggerStream` to reload data of pools
-  const { stream$: reloadPoolsState$, trigger: reloadPoolsState } = triggerStream()
+  const { stream$: reloadPools$, trigger: reloadPools } = triggerStream()
 
   /**
    * State of all pool data
    */
-  const poolsState$: PoolsStateLD = reloadPoolsState$.pipe(
+  const poolsState$: PoolsStateLD = reloadPools$.pipe(
     // start loading queue
     switchMap(loadPoolsStateData$),
     // cache it to avoid reloading data by every subscription
@@ -173,9 +173,9 @@ const createPoolsService = (
   )
 
   // `TriggerStream` to reload detailed data of pool
-  const { get$: reloadPoolDetailedState$, set: reloadPoolDetailedState } = observableState<O.Option<Asset>>(O.none)
+  const { get$: reloadPoolDetail$, set: reloadPoolDetail } = observableState<O.Option<Asset>>(O.none)
 
-  const poolDetailedState$: PoolDetailLD = reloadPoolDetailedState$.pipe(
+  const poolDetail$: PoolDetailLD = reloadPoolDetail$.pipe(
     filter(O.isSome),
     switchMap((asset) => apiGetPoolsData$(assetToString(asset.value), true)),
     liveData.chain(
@@ -272,11 +272,11 @@ const createPoolsService = (
     selectedPricePoolAsset$,
     selectedPricePool$,
     selectedPricePoolAssetSymbol$,
-    reloadPoolsState,
+    reloadPools,
     poolAddresses$,
     runeAsset$,
-    poolDetailedState$,
-    reloadPoolDetailedState,
+    poolDetail$,
+    reloadPoolDetail,
     priceRatio$,
     availableAssets$
   }

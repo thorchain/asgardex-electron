@@ -1,17 +1,16 @@
 import {
   bnOrZero,
   PoolData,
-  assetAmount,
   getValueOfAsset1InAsset2,
   baseAmount,
   getValueOfRuneInAsset,
-  assetToBase,
   assetFromString
 } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
+import { ONE_ASSET_BASE_AMOUNT } from '../../const'
 import { getRuneAsset } from '../../helpers/assetHelper'
 import { Network } from '../../services/app/types'
 import { toPoolData } from '../../services/midgard/utils'
@@ -37,8 +36,7 @@ export const getPoolTableRowData = ({
 
       const poolData = toPoolData(poolDetail)
 
-      const oneAsset = assetToBase(assetAmount(1))
-      const poolPrice = getValueOfAsset1InAsset2(oneAsset, poolData, pricePoolData)
+      const poolPrice = getValueOfAsset1InAsset2(ONE_ASSET_BASE_AMOUNT, poolData, pricePoolData)
 
       const depthAmount = baseAmount(bnOrZero(poolDetail?.runeDepth))
       const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
