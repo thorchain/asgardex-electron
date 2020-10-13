@@ -15,24 +15,14 @@ const style: React.CSSProperties = {
   width: '300px'
 }
 
-storiesOf('Components/Slider', module)
-  .add('default', () => {
-    const [currentValue, setCurrentValue] = useState(50)
-    return (
-      <div style={style}>
-        <p>currentValue {currentValue}</p>
-        <Slider defaultValue={currentValue} onChange={setCurrentValue} />
-        <Slider value={currentValue} withLabel />
-        <Slider value={currentValue} marks={marks} />
-      </div>
-    )
-  })
-  .add('delay 200ms', () => {
-    const [currentValue, setCurrentValue] = useState(30)
-    return (
-      <div style={style}>
-        <p>currentValue {currentValue}</p>
-        <Slider value={currentValue} debounceTime={200} onChange={setCurrentValue} />
-      </div>
-    )
-  })
+storiesOf('Components/Slider', module).add('default', () => {
+  const [currentValue, setCurrentValue] = useState(50)
+  return (
+    <div style={style}>
+      <p>currentValue {currentValue}</p>
+      <Slider defaultValue={currentValue} onChange={setCurrentValue} />
+      <Slider value={currentValue} withLabel />
+      <Slider value={currentValue} marks={marks} />
+    </div>
+  )
+})

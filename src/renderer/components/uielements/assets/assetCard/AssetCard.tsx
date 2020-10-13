@@ -99,13 +99,6 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
     )
   }, [assets, asset, priceIndex, withSearch, searchDisable, handleChangeAsset])
 
-  const onPercentChange = useCallback(
-    (percent: number) => {
-      onChangePercent(percent)
-    },
-    [onChangePercent]
-  )
-
   const withPercentSlider = useMemo(() => !isNaN(percentValue), [percentValue])
 
   // Needed to have appropriate width of a dropdown
@@ -175,8 +168,7 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
         <Slider
           disabled={disabled}
           value={percentValue}
-          debounceTime={100}
-          onChange={onPercentChange}
+          onChange={onChangePercent}
           tooltipPlacement="top"
           withLabel={true}
         />
