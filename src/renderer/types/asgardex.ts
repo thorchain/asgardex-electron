@@ -9,9 +9,9 @@ export type Pair = {
   target: Option<string>
 }
 
-export type AssetPair = {
+export type AssetWithAmount = {
   asset: Asset
-  price: BaseAmount
+  amount: BaseAmount
 }
 
 export enum TxTypes {

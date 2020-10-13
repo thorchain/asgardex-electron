@@ -2,19 +2,19 @@ import React, { useMemo, useCallback } from 'react'
 
 import { Asset, assetToString, baseAmount } from '@thorchain/asgardex-util'
 
+import { eqAsset } from '../../../../helpers/fp/eq'
 import { PriceDataIndex } from '../../../../services/midgard/types'
-import { AssetPair } from '../../../../types/asgardex'
 import FilterMenu from '../../filterMenu'
 import AssetData from '../assetData'
 
-const filterFunction = (item: AssetPair, searchTerm: string) => {
-  const { ticker } = item.asset
+const filterFunction = (asset: Asset, searchTerm: string) => {
+  const { ticker } = asset
   return ticker?.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0
 }
 
 type Props = {
   asset: Asset
-  assetData: AssetPair[]
+  assets: Asset[]
   priceIndex?: PriceDataIndex
   searchDisable: string[]
   withSearch: boolean
@@ -26,7 +26,7 @@ type Props = {
 const AssetMenu: React.FC<Props> = (props): JSX.Element => {
   const {
     searchPlaceholder,
-    assetData,
+    assets,
     asset,
     priceIndex = {},
     withSearch,
@@ -35,15 +35,10 @@ const AssetMenu: React.FC<Props> = (props): JSX.Element => {
     closeMenu
   } = props
 
-  const filteredData = useMemo(
-    () => assetData.filter((item) => item.asset.ticker !== asset.ticker),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [asset, assetData]
-  )
+  const filteredData = useMemo((): Asset[] => assets.filter((a: Asset) => !eqAsset.equals(a, asset)), [asset, assets])
 
   const cellRenderer = useCallback(
-    (data: AssetPair) => {
-      const { asset } = data
+    (asset: Asset) => {
       const price = baseAmount(priceIndex[asset.ticker])
       const node = <AssetData asset={asset} price={price} />
       const key = assetToString(asset)
@@ -52,7 +47,7 @@ const AssetMenu: React.FC<Props> = (props): JSX.Element => {
     [priceIndex]
   )
 
-  const disableItemFilterHandler = useCallback((item: AssetPair) => searchDisable.indexOf(item.asset.ticker) > -1, [
+  const disableItemFilterHandler = useCallback((asset: Asset) => searchDisable.indexOf(asset.ticker) > -1, [
     searchDisable
   ])
 
@@ -63,7 +58,7 @@ const AssetMenu: React.FC<Props> = (props): JSX.Element => {
       searchEnabled={withSearch}
       filterFunction={filterFunction}
       cellRenderer={cellRenderer}
-      disableItemFilter={(a: AssetPair) => disableItemFilterHandler(a)}
+      disableItemFilter={(a: Asset) => disableItemFilterHandler(a)}
       onSelect={onSelect}
       data={filteredData}
     />

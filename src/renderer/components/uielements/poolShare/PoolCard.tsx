@@ -3,7 +3,7 @@ import React from 'react'
 import { Asset, BaseAmount, baseToAsset, formatAssetAmount } from '@thorchain/asgardex-util'
 import { Col } from 'antd'
 
-import { isBtcAsset } from '../../../helpers/assetHelper'
+import { BTC_DECIMAL, isBtcAsset } from '../../../helpers/assetHelper'
 import Label from '../label'
 import * as Styled from './Poolcard.style'
 
@@ -66,7 +66,7 @@ export const PoolCard: React.FC<PoolCardProps> = ({
               {`${basePriceSymbol} ${formatAssetAmount({
                 amount: baseToAsset(assetPrice),
                 // special case for BTC
-                decimal: isBtcAsset(sourceAsset) ? 8 : 2
+                decimal: isBtcAsset(sourceAsset) ? BTC_DECIMAL : 2
               })}`}
             </Label>
           </Styled.ValuesWrapper>

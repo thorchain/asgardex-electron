@@ -5,14 +5,14 @@ import { TooltipPlacement } from 'antd/lib/tooltip'
 
 import { SliderWrapper, SliderLabel } from './Slider.style'
 
-interface Props extends SliderSingleProps {
-  className?: string
+type CustomProps = {
   tooltipPlacement?: TooltipPlacement
   withLabel?: boolean
 }
 
+type Props = CustomProps & SliderSingleProps
+
 const Slider: React.FC<Props> = ({
-  className = '',
   tooltipPlacement = 'bottom',
   withLabel = false,
   tipFormatter = (value) => `${value}%`,
@@ -21,11 +21,11 @@ const Slider: React.FC<Props> = ({
 }): JSX.Element => {
   const ref = useRef()
   const getTooltipPopupContainer = useCallback((container: HTMLElement) => ref.current || container, [ref])
+
   return (
     <>
       <SliderWrapper
         ref={ref}
-        className={`slider-wrapper ${className}`}
         tooltipPlacement={tooltipPlacement}
         getTooltipPopupContainer={tooltipVisible ? getTooltipPopupContainer : undefined}
         tipFormatter={tipFormatter}

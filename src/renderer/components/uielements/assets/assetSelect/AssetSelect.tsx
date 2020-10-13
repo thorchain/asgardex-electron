@@ -2,11 +2,10 @@ import React, { useCallback, useState } from 'react'
 
 import { delay, Asset, assetToString } from '@thorchain/asgardex-util'
 import { Dropdown } from 'antd'
-import { sortBy as _sortBy } from 'lodash'
 import { useIntl } from 'react-intl'
 
+import { ordAsset } from '../../../../helpers/fp/ord'
 import { PriceDataIndex } from '../../../../services/midgard/types'
-import { AssetPair } from '../../../../types/asgardex'
 import AssetMenu from '../assetMenu'
 import {
   AssetSelectWrapper,
@@ -32,7 +31,7 @@ const DropdownCarret: React.FC<DropdownCarretProps> = (props: DropdownCarretProp
 }
 
 type Props = {
-  assetData: AssetPair[]
+  assets: Asset[]
   asset: Asset
   priceIndex?: PriceDataIndex
   withSearch?: boolean
@@ -46,7 +45,7 @@ type Props = {
 const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
-    assetData = [],
+    assets = [],
     priceIndex,
     withSearch = true,
     searchDisable = [],
@@ -76,22 +75,22 @@ const AssetSelect: React.FC<Props> = (props): JSX.Element => {
 
       // Wait for the dropdown to close
       await delay(500)
-      const changedAsset = assetData.find((asset) => assetToString(asset.asset) === assetId)
+      const changedAsset = assets.find((asset) => assetToString(asset) === assetId)
       if (changedAsset) {
-        onSelect(changedAsset.asset)
+        onSelect(changedAsset)
       }
     },
-    [assetData, onSelect]
+    [assets, onSelect]
   )
 
   const renderMenu = useCallback(() => {
-    const sortedAssetData = _sortBy(assetData, ['asset'])
+    const sortedAssetData = assets.sort(ordAsset.compare)
     return (
       <AssetSelectMenuWrapper minWidth={minWidth}>
         <AssetMenu
           searchPlaceholder={intl.formatMessage({ id: 'swap.searchAsset' })}
           closeMenu={closeMenu}
-          assetData={sortedAssetData}
+          assets={sortedAssetData}
           asset={asset}
           priceIndex={priceIndex}
           withSearch={withSearch}
@@ -100,10 +99,10 @@ const AssetSelect: React.FC<Props> = (props): JSX.Element => {
         />
       </AssetSelectMenuWrapper>
     )
-  }, [assetData, intl, asset, closeMenu, handleChangeAsset, priceIndex, searchDisable, withSearch, minWidth])
+  }, [assets, intl, asset, closeMenu, handleChangeAsset, priceIndex, searchDisable, withSearch, minWidth])
 
   const renderDropDownButton = () => {
-    const disabled = assetData.length === 0
+    const disabled = assets.length === 0
     return (
       <AssetDropdownButton disabled={disabled} onClick={handleDropdownButtonClicked}>
         {!disabled ? <DropdownCarret open={openDropdown} /> : null}

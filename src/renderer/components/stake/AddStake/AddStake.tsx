@@ -1,22 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import {
-  Asset,
-  assetAmount,
-  AssetAmount,
-  assetToBase,
-  BaseAmount,
-  baseToAsset,
-  PoolData
-} from '@thorchain/asgardex-util'
-// import * as AH from '@thorchain/asgardex-util'
+import { Asset, baseAmount, BaseAmount, PoolData } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
-import { ZERO_ASSET_AMOUNT } from '../../../const'
-import { isRuneAsset } from '../../../helpers/assetHelper'
-import { AssetPair } from '../../../types/asgardex'
+import { ZERO_BASE_AMOUNT } from '../../../const'
 import Drag from '../../uielements/drag'
+import * as Helper from './AddStake.helper'
 import * as Styled from './AddStake.style'
 
 type Props = {
@@ -26,9 +16,8 @@ type Props = {
   runePrice: BigNumber
   assetBalance: BaseAmount
   runeBalance: BaseAmount
-  unit?: string
-  assetData?: AssetPair[]
-  className?: string
+  priceAsset?: Asset
+  assets?: Asset[]
   onStake: (stakeData: { asset: Asset; runeAsset: Asset; assetStake: BaseAmount; runeStake: BaseAmount }) => void
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
@@ -42,107 +31,122 @@ export const AddStake: React.FC<Props> = ({
   runePrice,
   assetBalance,
   runeBalance,
-  className,
-  assetData,
-  unit,
+  assets,
+  priceAsset,
   onStake,
   onChangeAsset,
   disabled = false,
   poolData
 }) => {
   const intl = useIntl()
-  const [runeAmountToStake, setRuneAmountToStake] = useState<AssetAmount>(ZERO_ASSET_AMOUNT)
-  const [assetAmountToStake, setAssetAmountToStake] = useState<AssetAmount>(ZERO_ASSET_AMOUNT)
+  const [runeAmountToStake, setRuneAmountToStake] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+  const [assetAmountToStake, setAssetAmountToStake] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+  const [percentValueToStake, setPercentValueToStake] = useState(0)
 
-  const runeBaseAmountToStake = useMemo(() => {
-    return assetToBase(runeAmountToStake)
-  }, [runeAmountToStake])
-
-  const assetSelect = useMemo(() => {
-    return assetToBase(assetAmountToStake)
-  }, [assetAmountToStake])
-
-  const getStakeValue = useCallback((amount: BigNumber, asset: Asset, poolData: PoolData) => {
-    if (isRuneAsset(asset)) {
-      return amount.times(poolData.assetBalance.amount().dividedBy(poolData.runeBalance.amount()))
-    }
-    return amount.times(poolData.runeBalance.amount().dividedBy(poolData.assetBalance.amount()))
-  }, [])
-
-  const onRuneChange = useCallback(
-    (runeInput: BigNumber) => {
-      const runeMax = baseToAsset(runeBalance).amount()
-      const assetMax = baseToAsset(assetBalance).amount()
-
-      const runeQuantity = runeInput.isGreaterThan(runeMax) ? runeMax : runeInput
-
-      const assetQuantity = getStakeValue(runeQuantity, runeAsset, poolData)
-
-      if (assetQuantity.isGreaterThan(assetMax)) {
-        const runeInputQuantity = getStakeValue(assetMax, asset, poolData)
-        setRuneAmountToStake(assetAmount(runeInputQuantity))
-        setAssetAmountToStake(assetAmount(assetMax))
-      } else {
-        setRuneAmountToStake(assetAmount(runeInput))
-        setAssetAmountToStake(assetAmount(assetQuantity))
-      }
-    },
-    [runeBalance, assetBalance, getStakeValue, runeAsset, poolData, asset]
+  const maxRuneAmountToStake = useMemo(
+    (): BaseAmount => Helper.maxRuneAmountToStake({ poolData, runeBalance, assetBalance }),
+    [assetBalance, poolData, runeBalance]
   )
 
-  const onAssetChange = useCallback(
-    (assetInput: BigNumber) => {
-      const runeMax = baseToAsset(runeBalance).amount()
-      const assetMax = baseToAsset(assetBalance).amount()
+  const maxAssetAmountToStake = useMemo(
+    (): BaseAmount => Helper.maxAssetAmountToStake({ poolData, runeBalance, assetBalance }),
+    [assetBalance, poolData, runeBalance]
+  )
 
-      const assetQuantity = assetInput.isGreaterThan(assetMax) ? assetMax : assetInput
+  const runeAmountChangeHandler = useCallback(
+    (runeInput: BaseAmount) => {
+      let runeQuantity = runeInput.amount().isGreaterThan(maxRuneAmountToStake.amount())
+        ? maxRuneAmountToStake
+        : runeInput
+      const assetQuantity = Helper.getAssetAmountToStake(runeQuantity, poolData)
 
-      const runeQuantity = getStakeValue(assetQuantity, asset, poolData)
-
-      if (runeQuantity.isGreaterThan(runeMax)) {
-        const assetInputQuantity = getStakeValue(runeMax, runeAsset, poolData)
-        setRuneAmountToStake(assetAmount(runeMax))
-        setAssetAmountToStake(assetAmount(assetInputQuantity))
+      if (assetQuantity.amount().isGreaterThan(maxRuneAmountToStake.amount())) {
+        runeQuantity = Helper.getRuneAmountToStake(maxRuneAmountToStake, poolData)
+        setRuneAmountToStake(runeQuantity)
+        setAssetAmountToStake(maxRuneAmountToStake)
+        setPercentValueToStake(100)
       } else {
-        setRuneAmountToStake(assetAmount(runeQuantity))
-        setAssetAmountToStake(assetAmount(assetQuantity))
+        setRuneAmountToStake(runeQuantity)
+        setAssetAmountToStake(assetQuantity)
+        // formula: runeQuantity * 100 / maxRuneAmountToStake
+        const percentToStake = maxRuneAmountToStake.amount().isGreaterThan(0)
+          ? runeQuantity.amount().multipliedBy(100).dividedBy(maxRuneAmountToStake.amount()).toNumber()
+          : 0
+        setPercentValueToStake(percentToStake)
       }
     },
-    [runeBalance, assetBalance, getStakeValue, asset, poolData, runeAsset]
+    [maxRuneAmountToStake, poolData]
+  )
+
+  const assetAmountChangeHandler = useCallback(
+    (assetInput: BaseAmount) => {
+      let assetQuantity = assetInput.amount().isGreaterThan(maxRuneAmountToStake.amount())
+        ? maxRuneAmountToStake
+        : assetInput
+      const runeQuantity = Helper.getRuneAmountToStake(assetQuantity, poolData)
+
+      if (runeQuantity.amount().isGreaterThan(maxRuneAmountToStake.amount())) {
+        assetQuantity = Helper.getAssetAmountToStake(runeQuantity, poolData)
+        setRuneAmountToStake(maxRuneAmountToStake)
+        setAssetAmountToStake(assetQuantity)
+        setPercentValueToStake(100)
+      } else {
+        setRuneAmountToStake(runeQuantity)
+        setAssetAmountToStake(assetQuantity)
+        // assetQuantity * 100 / maxAssetAmountToStake
+        const percentToStake = maxRuneAmountToStake.amount().isGreaterThan(0)
+          ? assetQuantity.amount().multipliedBy(100).dividedBy(maxRuneAmountToStake.amount()).toNumber()
+          : 0
+        setPercentValueToStake(percentToStake)
+      }
+    },
+    [maxRuneAmountToStake, poolData]
+  )
+
+  const changePercentHandler = useCallback(
+    (percent: number) => {
+      const runeAmountBN = maxRuneAmountToStake.amount().dividedBy(100).multipliedBy(percent)
+      const assetAmountBN = maxAssetAmountToStake.amount().dividedBy(100).multipliedBy(percent)
+      setRuneAmountToStake(baseAmount(runeAmountBN))
+      setAssetAmountToStake(baseAmount(assetAmountBN))
+      setPercentValueToStake(percent)
+    },
+    [maxAssetAmountToStake, maxRuneAmountToStake]
   )
 
   const onStakeConfirmed = useCallback(() => {
     onStake({
       asset,
       runeAsset,
-      assetStake: assetSelect,
-      runeStake: runeBaseAmountToStake
+      assetStake: assetAmountToStake,
+      runeStake: runeAmountToStake
     })
-  }, [onStake, asset, runeAsset, assetSelect, runeBaseAmountToStake])
+  }, [onStake, asset, runeAsset, assetAmountToStake, runeAmountToStake])
 
   return (
-    <Styled.Container className={className}>
+    <Styled.Container>
       <Styled.InputsWrapper>
         <Styled.AssetCard
           disabled={disabled}
           asset={runeAsset}
-          amount={runeBalance}
-          selectedAmount={runeBaseAmountToStake}
-          onChange={onRuneChange}
+          selectedAmount={runeAmountToStake}
+          maxAmount={maxRuneAmountToStake}
+          onChangeAssetAmount={runeAmountChangeHandler}
           price={runePrice}
-          withPercentSlider
-          unit={unit}
+          percentValue={percentValueToStake}
+          onChangePercent={changePercentHandler}
+          priceAsset={priceAsset}
         />
 
         <Styled.AssetCard
           disabled={disabled}
           asset={asset}
-          amount={assetBalance}
-          selectedAmount={assetSelect}
-          onChange={onAssetChange}
+          selectedAmount={assetAmountToStake}
+          maxAmount={maxAssetAmountToStake}
+          onChangeAssetAmount={assetAmountChangeHandler}
           price={assetPrice}
-          assetData={assetData}
-          unit={unit}
+          assets={assets}
+          priceAsset={priceAsset}
           onChangeAsset={onChangeAsset}
         />
       </Styled.InputsWrapper>
@@ -152,7 +156,7 @@ export const AddStake: React.FC<Props> = ({
         source={runeAsset}
         target={asset}
         onConfirm={onStakeConfirmed}
-        disabled={disabled || runeBaseAmountToStake.amount().isZero()}
+        disabled={disabled || runeAmountToStake.amount().isZero()}
       />
     </Styled.Container>
   )

@@ -5,19 +5,19 @@ import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
-import { AssetPair } from '../../../types/asgardex'
+import { AssetWithAmount } from '../../../types/asgardex'
 import AssetData from '../assets/assetData'
 import FilterMenu from './FilterMenu'
 
 storiesOf('Components/FilterMenu', module).add('coins example', () => {
-  const filterFunction = (item: AssetPair, searchTerm: string) => {
+  const filterFunction = (item: AssetWithAmount, searchTerm: string) => {
     const symbol = item.asset.symbol?.toLowerCase() ?? ''
     return symbol.indexOf(searchTerm.toLowerCase()) === 0 ?? false
   }
 
-  const cellRenderer = (data: AssetPair) => {
-    const { asset, price } = data
-    const node = <AssetData asset={asset} price={price} />
+  const cellRenderer = (data: AssetWithAmount) => {
+    const { asset, amount } = data
+    const node = <AssetData asset={asset} price={amount} />
     return { key: asset?.symbol ?? '', node }
   }
 
@@ -29,11 +29,11 @@ storiesOf('Components/FilterMenu', module).add('coins example', () => {
       asset="TOMOB-1E1"
       data={
         [
-          { asset: ASSETS_MAINNET.RUNE, price: ONE_ASSET_BASE_AMOUNT },
-          { asset: ASSETS_MAINNET.FTM, price: ONE_ASSET_BASE_AMOUNT },
-          { asset: ASSETS_MAINNET.TOMO, price: ONE_ASSET_BASE_AMOUNT },
-          { asset: ASSETS_MAINNET.BNB, price: assetToBase(assetAmount(0.00387)) }
-        ] as AssetPair[]
+          { asset: ASSETS_MAINNET.RUNE, amount: ONE_ASSET_BASE_AMOUNT },
+          { asset: ASSETS_MAINNET.FTM, amount: ONE_ASSET_BASE_AMOUNT },
+          { asset: ASSETS_MAINNET.TOMO, amount: ONE_ASSET_BASE_AMOUNT },
+          { asset: ASSETS_MAINNET.BNB, amount: assetToBase(assetAmount(0.00387)) }
+        ] as AssetWithAmount[]
       }
     />
   )

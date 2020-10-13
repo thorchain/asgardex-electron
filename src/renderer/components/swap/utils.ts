@@ -125,7 +125,7 @@ export const getSwapData = (
   )
 }
 
-export const pickAssetPair = (availableAssets: AssetWithPrice[], asset: O.Option<Asset>) =>
+export const pickAssetWithPrice = (availableAssets: AssetWithPrice[], asset: O.Option<Asset>) =>
   pipe(
     asset,
     O.chain((sourceAsset) =>
@@ -137,8 +137,8 @@ export const pickAssetPair = (availableAssets: AssetWithPrice[], asset: O.Option
     O.alt(() => pipe(availableAssets, A.head))
   )
 
-export const pairAssetToPlain = (pair: O.Option<AssetWithPrice>) =>
+export const assetWithPriceToAsset = (oAssetWP: O.Option<AssetWithPrice>) =>
   pipe(
-    pair,
-    O.map((pair) => pair.asset)
+    oAssetWP,
+    O.map((assetWP) => assetWP.asset)
   )
