@@ -175,6 +175,7 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
         <Slider
           disabled={disabled}
           value={percentValue}
+          debounceTime={100}
           onChange={onPercentChange}
           tooltipPlacement="top"
           withLabel={true}
