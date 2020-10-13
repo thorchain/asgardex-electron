@@ -2,7 +2,7 @@ import { assetToString, baseAmount, bn, PoolData } from '@thorchain/asgardex-uti
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
-import { getSwapMemo, isRuneSwap, getSlip, getSwapResult, getSwapData, pickAssetPair } from './utils'
+import { getSwapMemo, isRuneSwap, getSlip, getSwapResult, getSwapData, pickAssetWithPrice } from './utils'
 
 describe('components/swap/utils', () => {
   it('getSwapMemo', () => {
@@ -129,14 +129,14 @@ describe('components/swap/utils', () => {
     })
   })
 
-  describe('pickAssetPair', () => {
+  describe('pickAssetWithPrice', () => {
     it('should be none', () => {
-      expect(pickAssetPair([], O.none)).toBeNone()
-      expect(pickAssetPair([], O.some(ASSETS_TESTNET.FTM))).toBeNone()
+      expect(pickAssetWithPrice([], O.none)).toBeNone()
+      expect(pickAssetWithPrice([], O.some(ASSETS_TESTNET.FTM))).toBeNone()
     })
     it('should return first element if nothing found', () => {
       expect(
-        pickAssetPair(
+        pickAssetWithPrice(
           [
             { asset: ASSETS_TESTNET.RUNE, priceRune: bn(0) },
             { asset: ASSETS_TESTNET.BOLT, priceRune: bn(0) }
@@ -148,7 +148,7 @@ describe('components/swap/utils', () => {
 
     it('should pick asset', () => {
       expect(
-        pickAssetPair(
+        pickAssetWithPrice(
           [
             { asset: ASSETS_TESTNET.RUNE, priceRune: bn(0) },
             { asset: ASSETS_TESTNET.BOLT, priceRune: bn(0) },

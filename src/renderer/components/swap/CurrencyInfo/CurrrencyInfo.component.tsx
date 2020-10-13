@@ -1,16 +1,17 @@
 import React from 'react'
 
-import { Asset, formatBN, bn } from '@thorchain/asgardex-util'
+import { formatBN, bn } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 
 import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { AssetWithPrice } from '../../../services/binance/types'
 import * as Styled from './CurrencyInfo.styles'
 
 type CurrencyInfo = {
-  from?: O.Option<{ asset: Asset; priceRune: BigNumber }>
-  to?: O.Option<{ asset: Asset; priceRune: BigNumber }>
+  from?: O.Option<AssetWithPrice>
+  to?: O.Option<AssetWithPrice>
   slip?: BigNumber
 }
 

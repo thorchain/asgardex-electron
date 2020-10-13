@@ -24,7 +24,7 @@ import { useHistory } from 'react-router'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getAssetWBByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
-import { AssetsWithPrice, TxWithStateRD } from '../../services/binance/types'
+import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/binance/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { ApiError, AssetWithBalance, NonEmptyAssetsWithBalance } from '../../services/wallet/types'
@@ -38,7 +38,7 @@ import Modal from '../uielements/modal'
 import Slider from '../uielements/slider'
 import { CurrencyInfo } from './CurrencyInfo'
 import * as Styled from './Swap.styles'
-import { getSwapData, getSwapMemo, pairAssetToPlain, pickAssetPair } from './utils'
+import { getSwapData, getSwapMemo, assetWithPriceToAsset, pickAssetWithPrice } from './utils'
 
 type SwapProps = {
   balance?: number
@@ -75,16 +75,16 @@ export const Swap = ({
     poolDetails,
     runeAsset
   ])
-  const sourceAssetPair = useMemo(() => pickAssetPair(availableAssets, sourceAssetProp), [
+  const oSourceAssetWP: O.Option<AssetWithPrice> = useMemo(() => pickAssetWithPrice(availableAssets, sourceAssetProp), [
     availableAssets,
     sourceAssetProp
   ])
-  const targetAssetPair = useMemo(() => pickAssetPair(availableAssets, targetAssetProp), [
+  const oTargetAssetWP: O.Option<AssetWithPrice> = useMemo(() => pickAssetWithPrice(availableAssets, targetAssetProp), [
     availableAssets,
     targetAssetProp
   ])
-  const sourceAsset: O.Option<Asset> = useMemo(() => pairAssetToPlain(sourceAssetPair), [sourceAssetPair])
-  const targetAsset: O.Option<Asset> = useMemo(() => pairAssetToPlain(targetAssetPair), [targetAssetPair])
+  const sourceAsset: O.Option<Asset> = useMemo(() => assetWithPriceToAsset(oSourceAssetWP), [oSourceAssetWP])
+  const targetAsset: O.Option<Asset> = useMemo(() => assetWithPriceToAsset(oTargetAssetWP), [oTargetAssetWP])
   const assetsToSwap: O.Option<[Asset, Asset]> = useMemo(() => sequenceTOption(sourceAsset, targetAsset), [
     sourceAsset,
     targetAsset
@@ -311,27 +311,27 @@ export const Swap = ({
                     type: TxTypes.SWAP
                   })
               ),
-              O.chain((txStatus) => sequenceTOption(sourceAssetPair, targetAssetPair, O.some(txStatus))),
-              O.map(([sourceAssetPair, targetAssetPair, txStatus]) => (
+              O.chain((txStatus) => sequenceTOption(oSourceAssetWP, oTargetAssetWP, O.some(txStatus))),
+              O.map(([sourceAssetWP, targetAssetWP, txStatus]) => (
                 <SwapModal
                   key={'swap modal result'}
                   baseAsset={activePricePool.asset}
                   calcResult={{ slip: swapData.slip } as CalcResult}
-                  swapSource={sourceAssetPair.asset}
-                  swapTarget={targetAssetPair.asset}
+                  swapSource={sourceAssetWP.asset}
+                  swapTarget={targetAssetWP.asset}
                   priceFrom={
-                    poolData[assetToString(sourceAssetPair.asset)] &&
+                    poolData[assetToString(sourceAssetWP.asset)] &&
                     getValueOfAsset1InAsset2(
                       assetToBase(assetAmount(1)),
-                      poolData[assetToString(sourceAssetPair.asset)],
+                      poolData[assetToString(sourceAssetWP.asset)],
                       activePricePool.poolData
                     )
                   }
                   priceTo={
-                    poolData[assetToString(targetAssetPair.asset)] &&
+                    poolData[assetToString(targetAssetWP.asset)] &&
                     getValueOfAsset1InAsset2(
                       assetToBase(assetAmount(1)),
-                      poolData[assetToString(targetAssetPair.asset)],
+                      poolData[assetToString(targetAssetWP.asset)],
                       activePricePool.poolData
                     )
                   }
@@ -359,8 +359,8 @@ export const Swap = ({
       goToTransaction,
       onSwapConfirmed,
       resetTx,
-      sourceAssetPair,
-      targetAssetPair,
+      oSourceAssetWP,
+      oTargetAssetWP,
       swapData,
       activePricePool,
       poolData
@@ -384,7 +384,7 @@ export const Swap = ({
 
         <Styled.FormContainer>
           <Styled.CurrencyInfoContainer>
-            <CurrencyInfo slip={swapData.slip} from={sourceAssetPair} to={targetAssetPair} />
+            <CurrencyInfo slip={swapData.slip} from={oSourceAssetWP} to={oTargetAssetWP} />
           </Styled.CurrencyInfoContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-out'}>
