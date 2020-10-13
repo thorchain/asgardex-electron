@@ -4,9 +4,9 @@ import { Asset, baseAmount, BaseAmount, PoolData } from '@thorchain/asgardex-uti
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
-import { isRuneAsset, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
+import { ZERO_BASE_AMOUNT } from '../../../const'
 import Drag from '../../uielements/drag'
+import * as Helper from './AddStake.helper'
 import * as Styled from './AddStake.style'
 
 type Props = {
@@ -43,98 +43,73 @@ export const AddStake: React.FC<Props> = ({
   const [assetAmountToStake, setAssetAmountToStake] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [percentValueToStake, setPercentValueToStake] = useState(0)
 
-  const maxRuneAmountToStake = useMemo((): BaseAmount => {
-    const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
-    const maxRuneAmount = poolRuneBalance
-      .amount()
-      .dividedBy(poolAssetBalance.amount())
-      .multipliedBy(assetBalance.amount())
-    return maxRuneAmount.isGreaterThan(runeBalance.amount()) ? runeBalance : baseAmount(maxRuneAmount)
-  }, [assetBalance, poolData, runeBalance])
+  const maxRuneAmountToStake = useMemo(
+    (): BaseAmount => Helper.maxRuneAmountToStake({ poolData, runeBalance, assetBalance }),
+    [assetBalance, poolData, runeBalance]
+  )
 
-  const maxAssetAmountToStake = useMemo((): BaseAmount => {
-    const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
-    const maxAssetAmount = poolAssetBalance
-      .amount()
-      .dividedBy(poolRuneBalance.amount())
-      .multipliedBy(runeBalance.amount())
-    return maxAssetAmount.isGreaterThan(assetBalance.amount()) ? assetBalance : baseAmount(maxAssetAmount)
-  }, [assetBalance, poolData, runeBalance])
-
-  const getStakeValue = useCallback(
-    (
-      input: BaseAmount,
-      asset: Asset,
-      { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance }: PoolData
-    ): BaseAmount => {
-      let stakeValue = ZERO_BN
-      if (isRuneAsset(asset)) {
-        stakeValue = input.amount().times(poolAssetBalance.amount().dividedBy(poolRuneBalance.amount()))
-      } else {
-        stakeValue = input.amount().times(poolRuneBalance.amount().dividedBy(poolAssetBalance.amount()))
-      }
-      return baseAmount(stakeValue, THORCHAIN_DECIMAL)
-    },
-    []
+  const maxAssetAmountToStake = useMemo(
+    (): BaseAmount => Helper.maxAssetAmountToStake({ poolData, runeBalance, assetBalance }),
+    [assetBalance, poolData, runeBalance]
   )
 
   const runeAmountChangeHandler = useCallback(
     (runeInput: BaseAmount) => {
-      const runeQuantity = runeInput.amount().isGreaterThan(maxRuneAmountToStake.amount())
+      let runeQuantity = runeInput.amount().isGreaterThan(maxRuneAmountToStake.amount())
         ? maxRuneAmountToStake
         : runeInput
-      const assetQuantity = getStakeValue(runeQuantity, runeAsset, poolData)
+      const assetQuantity = Helper.getAssetAmountToStake(runeQuantity, poolData)
 
-      if (assetQuantity.amount().isGreaterThan(maxAssetAmountToStake.amount())) {
-        const runeInputQuantity = getStakeValue(assetBalance, asset, poolData)
-        setRuneAmountToStake(runeInputQuantity)
-        setAssetAmountToStake(maxAssetAmountToStake)
+      if (assetQuantity.amount().isGreaterThan(maxRuneAmountToStake.amount())) {
+        runeQuantity = Helper.getRuneAmountToStake(maxRuneAmountToStake, poolData)
+        setRuneAmountToStake(runeQuantity)
+        setAssetAmountToStake(maxRuneAmountToStake)
         setPercentValueToStake(100)
       } else {
-        setRuneAmountToStake(runeInput)
+        setRuneAmountToStake(runeQuantity)
         setAssetAmountToStake(assetQuantity)
-        // runeQuantity * 100 / maxRuneAmountToStake
+        // formula: runeQuantity * 100 / maxRuneAmountToStake
         const percentToStake = maxRuneAmountToStake.amount().isGreaterThan(0)
           ? runeQuantity.amount().multipliedBy(100).dividedBy(maxRuneAmountToStake.amount()).toNumber()
           : 0
         setPercentValueToStake(percentToStake)
       }
     },
-    [maxRuneAmountToStake, getStakeValue, runeAsset, poolData, maxAssetAmountToStake, assetBalance, asset]
+    [maxRuneAmountToStake, poolData]
   )
 
   const assetAmountChangeHandler = useCallback(
     (assetInput: BaseAmount) => {
-      const assetMax = assetBalance.amount()
-
-      const assetQuantity = assetInput.amount().isGreaterThan(assetMax) ? assetBalance : assetInput
-      const runeQuantity = getStakeValue(assetQuantity, asset, poolData)
+      let assetQuantity = assetInput.amount().isGreaterThan(maxRuneAmountToStake.amount())
+        ? maxRuneAmountToStake
+        : assetInput
+      const runeQuantity = Helper.getRuneAmountToStake(assetQuantity, poolData)
 
       if (runeQuantity.amount().isGreaterThan(maxRuneAmountToStake.amount())) {
-        const assetInputQuantity = getStakeValue(runeBalance, runeAsset, poolData)
+        assetQuantity = Helper.getAssetAmountToStake(runeQuantity, poolData)
         setRuneAmountToStake(maxRuneAmountToStake)
-        setAssetAmountToStake(assetInputQuantity)
+        setAssetAmountToStake(assetQuantity)
         setPercentValueToStake(100)
       } else {
         setRuneAmountToStake(runeQuantity)
         setAssetAmountToStake(assetQuantity)
         // assetQuantity * 100 / maxAssetAmountToStake
-        const percentToStake = maxAssetAmountToStake.amount().isGreaterThan(0)
-          ? assetQuantity.amount().multipliedBy(100).dividedBy(maxAssetAmountToStake.amount()).toNumber()
+        const percentToStake = maxRuneAmountToStake.amount().isGreaterThan(0)
+          ? assetQuantity.amount().multipliedBy(100).dividedBy(maxRuneAmountToStake.amount()).toNumber()
           : 0
         setPercentValueToStake(percentToStake)
       }
     },
-    [assetBalance, getStakeValue, asset, poolData, maxRuneAmountToStake, runeBalance, runeAsset, maxAssetAmountToStake]
+    [maxRuneAmountToStake, poolData]
   )
 
   const changePercentHandler = useCallback(
     (percent: number) => {
-      console.log('percent', percent)
       const runeAmountBN = maxRuneAmountToStake.amount().dividedBy(100).multipliedBy(percent)
       const assetAmountBN = maxAssetAmountToStake.amount().dividedBy(100).multipliedBy(percent)
       setRuneAmountToStake(baseAmount(runeAmountBN))
       setAssetAmountToStake(baseAmount(assetAmountBN))
+      setPercentValueToStake(percent)
     },
     [maxAssetAmountToStake, maxRuneAmountToStake]
   )
