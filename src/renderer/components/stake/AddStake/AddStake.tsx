@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { Asset, baseAmount, BaseAmount, PoolData } from '@thorchain/asgardex-util'
+import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
@@ -125,39 +126,44 @@ export const AddStake: React.FC<Props> = ({
 
   return (
     <Styled.Container>
-      <Styled.InputsWrapper>
-        <Styled.AssetCard
-          disabled={disabled}
-          asset={runeAsset}
-          selectedAmount={runeAmountToStake}
-          maxAmount={maxRuneAmountToStake}
-          onChangeAssetAmount={runeAmountChangeHandler}
-          price={runePrice}
-          percentValue={percentValueToStake}
-          onChangePercent={changePercentHandler}
-          priceAsset={priceAsset}
-        />
+      <Styled.CardsRow gutter={{ lg: 32 }}>
+        <Col xs={24} xl={12}>
+          <Styled.AssetCard
+            disabled={disabled}
+            asset={runeAsset}
+            selectedAmount={runeAmountToStake}
+            maxAmount={maxRuneAmountToStake}
+            onChangeAssetAmount={runeAmountChangeHandler}
+            price={runePrice}
+            percentValue={percentValueToStake}
+            onChangePercent={changePercentHandler}
+            priceAsset={priceAsset}
+          />
+        </Col>
+        <Col xs={24} xl={12}>
+          <Styled.AssetCard
+            disabled={disabled}
+            asset={asset}
+            selectedAmount={assetAmountToStake}
+            maxAmount={maxAssetAmountToStake}
+            onChangeAssetAmount={assetAmountChangeHandler}
+            price={assetPrice}
+            assets={assets}
+            priceAsset={priceAsset}
+            onChangeAsset={onChangeAsset}
+          />
+        </Col>
+      </Styled.CardsRow>
 
-        <Styled.AssetCard
-          disabled={disabled}
-          asset={asset}
-          selectedAmount={assetAmountToStake}
-          maxAmount={maxAssetAmountToStake}
-          onChangeAssetAmount={assetAmountChangeHandler}
-          price={assetPrice}
-          assets={assets}
-          priceAsset={priceAsset}
-          onChangeAsset={onChangeAsset}
+      <Styled.DragWrapper>
+        <Drag
+          title={intl.formatMessage({ id: 'stake.drag' })}
+          source={runeAsset}
+          target={asset}
+          onConfirm={onStakeConfirmed}
+          disabled={disabled || runeAmountToStake.amount().isZero()}
         />
-      </Styled.InputsWrapper>
-
-      <Drag
-        title={intl.formatMessage({ id: 'stake.drag' })}
-        source={runeAsset}
-        target={asset}
-        onConfirm={onStakeConfirmed}
-        disabled={disabled || runeAmountToStake.amount().isZero()}
-      />
+      </Styled.DragWrapper>
     </Styled.Container>
   )
 }

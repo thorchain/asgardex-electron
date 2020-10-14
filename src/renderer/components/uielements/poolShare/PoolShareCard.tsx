@@ -8,12 +8,10 @@ type Props = {
 
 const PoolShareCard: React.FC<Props> = ({ title, children }) => {
   return (
-    <Styled.ComponentWrapper>
-      <Styled.TitleWrapper>
-        <Styled.Title>{title}</Styled.Title>
-      </Styled.TitleWrapper>
-      <Styled.ContentWrapper>{children}</Styled.ContentWrapper>
-    </Styled.ComponentWrapper>
+    <Styled.Wrapper>
+      <Styled.Title>{title}</Styled.Title>
+      <Styled.Content>{children}</Styled.Content>
+    </Styled.Wrapper>
   )
 }
 

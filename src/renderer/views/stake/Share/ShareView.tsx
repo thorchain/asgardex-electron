@@ -21,7 +21,7 @@ import * as Styled from './ShareView.styles'
 export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolDetail$, selectedPricePoolAssetSymbol$, selectedPricePool$, runeAsset$ }
+    pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$, runeAsset$ }
   } = midgardService
 
   const intl = useIntl()
@@ -35,7 +35,7 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
 
   const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
-  const priceSymbol = useObservableState<O.Option<string>>(selectedPricePoolAssetSymbol$, O.none)
+  const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
 
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, getDefaultRunePricePool())
 
@@ -59,10 +59,7 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
           poolShare={poolShare}
           stakeUnits={stakeUnits}
           assetStakedShare={assetShare}
-          basePriceSymbol={FP.pipe(
-            priceSymbol,
-            O.getOrElse(() => '')
-          )}
+          priceAsset={FP.pipe(oPriceAsset, O.toUndefined)}
           loading={false}
           assetStakedPrice={assetStakedPrice}
           runeStakedPrice={runeStakedPrice}
@@ -70,7 +67,7 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
         />
       )
     },
-    [asset, pricePoolData, priceSymbol, runeAsset]
+    [asset, oPriceAsset, pricePoolData, runeAsset]
   )
 
   const renderPoolShare = useMemo(

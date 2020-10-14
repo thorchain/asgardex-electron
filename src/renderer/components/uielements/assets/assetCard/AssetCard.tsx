@@ -165,13 +165,15 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
         </Styled.CardBorderWrapper>
       </Dropdown>
       {withPercentSlider && (
-        <Slider
-          disabled={disabled}
-          value={percentValue}
-          onChange={onChangePercent}
-          tooltipPlacement="top"
-          withLabel={true}
-        />
+        <Styled.SliderWrapper>
+          <Slider
+            disabled={disabled}
+            value={percentValue}
+            onChange={onChangePercent}
+            tooltipPlacement="top"
+            withLabel={true}
+          />
+        </Styled.SliderWrapper>
       )}
       {children}
     </Styled.AssetCardWrapper>

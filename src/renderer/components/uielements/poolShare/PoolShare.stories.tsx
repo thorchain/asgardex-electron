@@ -12,7 +12,7 @@ export const DefaultPoolShare = () => (
     targetAsset={AssetBNB}
     assetStakedPrice={assetToBase(assetAmount(120.1))}
     assetStakedShare={assetToBase(assetAmount(500))}
-    basePriceSymbol="USD"
+    priceAsset={AssetRune67C}
     loading={false}
     runeStakedPrice={assetToBase(assetAmount(400))}
     runeStakedShare={assetToBase(assetAmount(500))}
@@ -37,7 +37,7 @@ storiesOf('Components/PoolShare', module)
           targetAsset={AssetBNB}
           assetStakedPrice={baseAmount(0)}
           assetStakedShare={baseAmount(0)}
-          basePriceSymbol=""
+          priceAsset={AssetRune67C}
           loading={true}
           runeStakedPrice={baseAmount(0)}
           runeStakedShare={baseAmount(0)}
