@@ -8,6 +8,22 @@ import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
 import { AddStakeStory } from './AddStake/AddStake.stories'
 import { Stake } from './Stake'
 
-storiesOf('Stake', module).add('default', () => {
-  return <Stake asset={AssetBNB} ShareContent={DefaultPoolShare} AddStake={AddStakeStory} keystoreState={O.none} />
-})
+storiesOf('Stake', module)
+  .add('default', () => {
+    return (
+      <Stake
+        asset={AssetBNB}
+        ShareContent={DefaultPoolShare}
+        AddStake={AddStakeStory}
+        keystoreState={O.some(O.some({ phrase: 'phrase' }))}
+      />
+    )
+  })
+  .add('no wallet', () => {
+    return <Stake asset={AssetBNB} ShareContent={DefaultPoolShare} AddStake={AddStakeStory} keystoreState={O.none} />
+  })
+  .add('locked', () => {
+    return (
+      <Stake asset={AssetBNB} ShareContent={DefaultPoolShare} AddStake={AddStakeStory} keystoreState={O.some(O.none)} />
+    )
+  })

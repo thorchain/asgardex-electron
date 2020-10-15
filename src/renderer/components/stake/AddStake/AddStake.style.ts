@@ -1,7 +1,6 @@
+import { Col, Row } from 'antd'
 import styled from 'styled-components'
-import { key } from 'styled-theme'
 
-import { media } from '../../../helpers/styleHelper'
 import BaseAssetCard from '../../uielements/assets/assetCard'
 
 export const Container = styled('div')`
@@ -13,29 +12,23 @@ export const Container = styled('div')`
   min-height: 100%;
 `
 
-export const InputsWrapper = styled('div')`
-  display: flex;
-  flex-direction: column;
+export const CardsRow = styled(Row).attrs({
+  justify: 'center',
+  align: 'top'
+})`
   width: 100%;
-  margin-bottom: ${key('sizes.gutter.vertical', 0)};
-
-  ${media.md`
-    flex-direction: row;
-    justify-content: center;
-    margin-bottom: calc(2 * ${key('sizes.gutter.vertical', '0px')});
-  `}
 `
 
+export const CardCol = styled(Col)`
+  padding-bottom: 20px;
+  &:last-child {
+    padding-bottom: 0;
+  }
+`
 export const AssetCard = styled(BaseAssetCard)`
   width: 100%;
-  margin: 0 0 ${key('sizes.gutter.vertical', 0)} 0;
+`
 
-  ${media.md`
-    margin: 0 ${key('sizes.gutter.vertical', 0)} 0 0;
-    width: 365px;
-  `}
-
-  &:last-child {
-    margin: 0;
-  }
+export const DragWrapper = styled('div')`
+  padding: 20px;
 `

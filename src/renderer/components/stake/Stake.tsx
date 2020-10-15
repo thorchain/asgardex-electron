@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 
 import { Asset } from '@thorchain/asgardex-util'
+// import { Col } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { KeystoreState } from '../../services/wallet/types'
@@ -44,12 +45,14 @@ export const Stake: React.FC<Props> = (props) => {
       <Styled.ContentContainer>
         {walletIsImported && !walletIsLocked ? (
           <>
-            <Styled.TotalContainer>
-              <ShareContent asset={asset} />
-            </Styled.TotalContainer>
-            <Styled.StakeContentContainer>
+            <Styled.StakeContentCol xs={24} xl={15}>
               <Styled.Tabs tabs={tabs} centered={false} tabBarExtraContent={extra} />
-            </Styled.StakeContentContainer>
+            </Styled.StakeContentCol>
+            <Styled.ShareContentCol xs={24} xl={9}>
+              <Styled.ShareContentWrapper>
+                <ShareContent asset={asset} />
+              </Styled.ShareContentWrapper>
+            </Styled.ShareContentCol>
           </>
         ) : (
           <AddWallet isLocked={walletIsImported && walletIsLocked} />

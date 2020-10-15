@@ -1,10 +1,12 @@
 import { StakeMessages } from '../types'
 
 const stake: StakeMessages = {
-  'stake.totalShare': 'Your total share of the pool',
+  'stake.share.title': 'Your pool share',
+  'stake.share.units': 'Liquidity units',
+  'stake.share.total': 'Total value',
+  'stake.share.poolshare': 'Pool share',
+  'stake.redemption.title': 'Current redemption value',
   'stake.totalEarnings': 'Your total earnings from the pool',
-  'stake.poolShare': ' Pool share',
-  'stake.units': 'Liquidity units',
   'stake.withdraw': 'Withdraw',
   'stake.advancedMode': 'Advanced mode',
   'stake.drag': 'Drag to stake',

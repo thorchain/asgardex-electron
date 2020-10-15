@@ -8,7 +8,7 @@ import BaseAssetSelect from '../assetSelect'
 const CONTAINER_SIDE_PADDING = 16
 
 export const AssetCardWrapper = styled.div`
-  width: 365px;
+  width: 100%;
   .title-label {
     font-style: italic;
   }
@@ -26,6 +26,7 @@ export const AssetCardWrapper = styled.div`
 export const CardBorderWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  margin-bottom: 20px;
 
   border: 1px solid ${palette('gray', 0)};
   border-radius: 3px;
@@ -103,4 +104,8 @@ export const InputBigNumber = styled(BaseInputBigNumber)`
   border-top: none;
   border-left: none;
   border-right: none;
+`
+
+export const SliderWrapper = styled.div`
+  padding: 0 5px 20px 10px;
 `

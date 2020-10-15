@@ -145,10 +145,12 @@ type SwapMessageKey =
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
 type StakeMessageKey =
-  | 'stake.totalShare'
+  | 'stake.share.title'
+  | 'stake.share.units'
+  | 'stake.share.poolshare'
+  | 'stake.share.total'
+  | 'stake.redemption.title'
   | 'stake.totalEarnings'
-  | 'stake.poolShare'
-  | 'stake.units'
   | 'stake.withdraw'
   | 'stake.advancedMode'
   | 'stake.drag'
