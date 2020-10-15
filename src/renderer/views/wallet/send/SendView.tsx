@@ -23,7 +23,7 @@ type Props = {}
 const SendView: React.FC<Props> = (): JSX.Element => {
   const { asset } = useParams<SendParams>()
   const intl = useIntl()
-  const oSelectedAsset = O.fromNullable(assetFromString(asset))
+  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
   const { assetsWBState$ } = useWalletContext()
   const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)

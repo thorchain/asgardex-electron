@@ -12,6 +12,7 @@ import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { Network } from '../app/types'
 import { MIDGARD_MAX_RETRY } from '../const'
+import { selectedPoolAsset$, setSelectedPoolAsset } from './common'
 import { createPoolsService } from './pools'
 import { createStakeService } from './stake'
 import { NetworkInfoRD, NetworkInfoLD, ThorchainConstantsLD, ByzantineLD, ThorchainLastblockLD } from './types'
@@ -144,6 +145,7 @@ export type MidgardService = {
   thorchainConstantsState$: ThorchainConstantsLD
   thorchainLastblockState$: ThorchainLastblockLD
   reloadThorchainLastblock: () => void
+  setSelectedPoolAsset: () => void
   apiEndpoint$: ByzantineLD
 }
 /**
@@ -155,7 +157,8 @@ export const service = {
   thorchainConstantsState$,
   thorchainLastblockState$,
   reloadThorchainLastblock,
+  setSelectedPoolAsset,
   apiEndpoint$: byzantine$,
-  pools: createPoolsService(byzantine$, getMidgardDefaultApi),
-  stake: createStakeService(byzantine$, getMidgardDefaultApi)
+  pools: createPoolsService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
+  stake: createStakeService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$)
 }
