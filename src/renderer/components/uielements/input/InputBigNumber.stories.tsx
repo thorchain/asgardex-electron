@@ -15,13 +15,10 @@ type FormValues = {
 
 storiesOf('Components/input/InputBigNumber', module)
   .add('default', () => {
-    const [value, setValue] = React.useState<BigNumber>(bn('1002.34'))
-
+    const [value, setValue] = React.useState<BigNumber>(bn('0.000001'))
     const handleChange = useCallback((v) => {
-      console.log('value ', v.toString())
       setValue(v)
     }, [])
-
     return (
       <div style={{ padding: '20px' }}>
         <InputBigNumber value={value} onChange={handleChange} />
@@ -29,6 +26,28 @@ storiesOf('Components/input/InputBigNumber', module)
           <Button onClick={() => setValue(bn(40000))}>Set 40k</Button>
           <Button onClick={() => setValue(bn(2000))}>Set 2k</Button>
         </Row>
+      </div>
+    )
+  })
+  .add('1e8', () => {
+    const [value, setValue] = React.useState<BigNumber>(bn('0.00000001'))
+    const handleChange = useCallback((v) => {
+      setValue(v)
+    }, [])
+    return (
+      <div style={{ padding: '20px' }}>
+        <InputBigNumber value={value} onChange={handleChange} decimal={8} />
+      </div>
+    )
+  })
+  .add('1e18', () => {
+    const [value, setValue] = React.useState<BigNumber>(bn('0.000000000000000001'))
+    const handleChange = useCallback((v) => {
+      setValue(v)
+    }, [])
+    return (
+      <div style={{ padding: '20px' }}>
+        <InputBigNumber value={value} onChange={handleChange} decimal={18} />
       </div>
     )
   })
@@ -45,7 +64,6 @@ storiesOf('Components/input/InputBigNumber', module)
   })
   .add('form validation', () => {
     const [form] = Form.useForm<FormValues>()
-
     const checkValue = (_: Rule, value?: BigNumber) => {
       console.log('checkValue ', value?.toString() ?? 'undefined value')
       if (value && value.isGreaterThan(bn(10))) {
@@ -53,7 +71,6 @@ storiesOf('Components/input/InputBigNumber', module)
       }
       return Promise.reject('Value must be greater than 10!')
     }
-
     const onFinish = (values: {}) => {
       console.log('onFinish: ', values)
     }

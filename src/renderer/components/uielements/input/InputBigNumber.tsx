@@ -34,15 +34,23 @@ export const InputBigNumber = forwardRef<Input, Props>(
       () =>
         FP.pipe(
           enteredValue,
-          O.getOrElse(() => value.toString()),
+          O.getOrElse(() => value.toFixed(decimal)),
           (v) => (focus ? v : formatValue(v, decimal))
         ),
       [enteredValue, focus, decimal, value]
     )
 
     useEffect(() => {
-      setEnteredValue(O.some(value.toString()))
-    }, [value])
+      FP.pipe(
+        // fix to decimal
+        value.toFixed(decimal),
+        // trim zeros
+        trimZeros,
+        O.some,
+        // save value into state
+        setEnteredValue
+      )
+    }, [decimal, value])
 
     const onFocusHandler = useCallback(
       async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,7 +73,7 @@ export const InputBigNumber = forwardRef<Input, Props>(
           // convert empty string to '0'
           O.map((v) => (v === '' ? VALUE_ZERO : v)),
           // format value based on supported decimals
-          O.map((v) => fixedBN(v, decimal).toString()),
+          O.map((v) => bn(v).toFixed(decimal)),
           // remove uneeded zeros
           O.map(trimZeros)
         )
@@ -80,7 +88,8 @@ export const InputBigNumber = forwardRef<Input, Props>(
       ({ target }: React.ChangeEvent<HTMLInputElement>) => {
         const { value: newValue } = target
         if (validInputValue(newValue)) {
-          const valueToBroadcast = FP.pipe(
+          // some checks needed whether to broadcast changes or not
+          FP.pipe(
             O.some(newValue),
             // ignore empty input
             O.filter((v) => v !== ''),
@@ -88,17 +97,17 @@ export const InputBigNumber = forwardRef<Input, Props>(
             // format value
             O.map((v) => fixedBN(v, decimal)),
             // different value as before?
-            O.filter((v) => !broadcastValue.current.isEqualTo(v))
+            O.filter((v) => !broadcastValue.current.isEqualTo(v)),
+            O.map((v) => {
+              // store broadcast value
+              broadcastValue.current = v
+              // trigger `onChange` handler
+              onChange(v)
+              return v
+            })
           )
-
+          // store entered value in state
           setEnteredValue(O.some(newValue))
-
-          if (O.isSome(valueToBroadcast)) {
-            const v = valueToBroadcast.value
-            broadcastValue.current = v
-
-            onChange(bn(v))
-          }
         }
       },
       [broadcastValue, decimal, onChange]
