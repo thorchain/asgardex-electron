@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { assetFromString } from '@thorchain/asgardex-util'
@@ -23,12 +23,12 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
   } = useWalletContext()
 
   const { asset } = useParams<AssetDetailsParams>()
-  const selectedAsset = O.fromNullable(assetFromString(asset))
+  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
   // Set selected asset once
   // Needed to get all data for this asset (transactions etc.)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setSelectedAsset(selectedAsset), [])
+  useEffect(() => setSelectedAsset(oSelectedAsset), [])
 
   const txsRD = useObservableState(assetTxs$, RD.initial)
   const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
@@ -43,7 +43,7 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
       <AssetDetails
         txsPageRD={txsRD}
         assetsWB={assetsWB}
-        asset={selectedAsset}
+        asset={oSelectedAsset}
         loadAssetTxsHandler={loadAssetTxsHandler}
         reloadBalancesHandler={reloadBalances}
         explorerTxUrl={explorerTxUrl}

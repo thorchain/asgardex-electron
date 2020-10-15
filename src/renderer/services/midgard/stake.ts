@@ -2,8 +2,8 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetToString } from '@thorchain/asgardex-util'
 import * as F from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
 import { combineLatest } from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
@@ -16,14 +16,15 @@ import { StakersAssetDataLD } from './types'
 
 const createStakeService = (
   byzantine$: LiveData<Error, string>,
-  getMidgardDefaultApi: (basePath: string) => DefaultApi
+  getMidgardDefaultApi: (basePath: string) => DefaultApi,
+  selectedPoolAsset$: Rx.Observable<O.Option<Asset>>
 ) => {
   const api$ = byzantine$.pipe(map(RD.map(getMidgardDefaultApi)))
 
   const { get$: address$, set: setAddress } = observableState<O.Option<string>>(O.none)
 
   /**
-   * getStakersAddressAndAssetData will return a new stream
+   * `api.getStakersAddressAndAssetData` will return a new stream
    * and once http request is completed (resolved/failed) end
    * stream will be completed too and there will not be any
    * effects at the subscription callback as stream is completed.
@@ -31,14 +32,15 @@ const createStakeService = (
    * a single stream per http request
    * @example /src/renderer/views/stake/StakeView.tsx
    */
-  const getStakes$ = (asset: Asset): StakersAssetDataLD =>
-    pipe(
-      combineLatest([api$.pipe(map(RD.toOption)), address$]),
-      map(([api, address]) => sequenceTOption(api, address)),
+  const getStakes$ = (): StakersAssetDataLD =>
+    FP.pipe(
+      combineLatest([api$.pipe(map(RD.toOption)), address$, selectedPoolAsset$]),
+      map(([oApi, oAddress, oSelectedAsset]) => sequenceTOption(oApi, oAddress, oSelectedAsset)),
       switchMap(
         O.fold(
           () => Rx.EMPTY,
-          ([api, address]) => api.getStakersAddressAndAssetData({ address, asset: assetToString(asset) })
+          ([api, address, selectedAsset]) =>
+            api.getStakersAddressAndAssetData({ address, asset: assetToString(selectedAsset) })
         )
       ),
       map(

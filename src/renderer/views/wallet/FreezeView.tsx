@@ -25,7 +25,7 @@ type Props = {
 
 const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
   const { asset } = useParams<SendParams>()
-  const oSelectedAsset = O.fromNullable(assetFromString(asset))
+  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
   const { freeze: freezeService, explorerUrl$, freezeFee$ } = useBinanceContext()
   const { assetsWBState$ } = useWalletContext()

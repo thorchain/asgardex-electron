@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import { assetFromString } from '@thorchain/asgardex-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -21,15 +22,23 @@ type Props = {}
 const StakeView: React.FC<Props> = (_) => {
   const intl = useIntl()
 
-  const { asset: assetParam } = useParams<StakeRouteParams>()
+  const { asset } = useParams<StakeRouteParams>()
   const {
     service: {
-      pools: { reloadPoolDetail },
+      setSelectedPoolAsset,
       stake: { setAddress }
     }
   } = useMidgardContext()
   const { keystoreService } = useWalletContext()
   const { address$ } = useBinanceContext()
+
+  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
+
+  // Set selected pool asset whenever an asset in route has been changed
+  // Needed to get all data for this pool (pool details etc.)
+  useEffect(() => {
+    setSelectedPoolAsset(oSelectedAsset)
+  }, [oSelectedAsset, setSelectedPoolAsset])
 
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`
@@ -38,15 +47,11 @@ const StakeView: React.FC<Props> = (_) => {
   // before a check of `keystoreState` can be done
   const keystoreState = useObservableState(keystoreService.keystore$, undefined)
 
-  const asset = assetFromString(assetParam.toUpperCase())
-
   const walletAddress = useObservableState(address$, O.none)
 
   useEffect(() => {
-    const oAsset = O.fromNullable(asset)
-    reloadPoolDetail(oAsset)
     setAddress(walletAddress)
-  }, [asset, reloadPoolDetail, setAddress, walletAddress])
+  }, [setAddress, walletAddress])
 
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)
@@ -57,17 +62,29 @@ const StakeView: React.FC<Props> = (_) => {
   return (
     <>
       <BackLink />
-      {!asset && (
-        <ErrorView
-          title={intl.formatMessage(
-            { id: 'routes.invalid.asset' },
-            {
-              asset
-            }
-          )}
-        />
+      {FP.pipe(
+        oSelectedAsset,
+        O.fold(
+          () => (
+            <ErrorView
+              title={intl.formatMessage(
+                { id: 'routes.invalid.asset' },
+                {
+                  asset
+                }
+              )}
+            />
+          ),
+          (selectedAsset) => (
+            <Stake
+              asset={selectedAsset}
+              keystoreState={keystoreState}
+              ShareContent={ShareView}
+              AddStake={AddStakeView}
+            />
+          )
+        )
       )}
-      {asset && <Stake asset={asset} keystoreState={keystoreState} ShareContent={ShareView} AddStake={AddStakeView} />}
     </>
   )
 }

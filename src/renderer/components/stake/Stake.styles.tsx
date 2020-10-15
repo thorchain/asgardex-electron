@@ -32,7 +32,11 @@ export const ShareContentCol = styled(Col).attrs({})`
 
 export const ShareContentWrapper = styled.div`
   background: ${palette('background', 0)};
-  min-height: auto;
+  /* min-height for spin loader + empty data icons  */
+  min-height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   ${media.xl`
       min-height: 100%;
   `};

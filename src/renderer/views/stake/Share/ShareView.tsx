@@ -21,16 +21,19 @@ import * as Styled from './ShareView.styles'
 export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$, runeAsset$ }
+    pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$, runeAsset$ },
+    stake: { getStakes$ }
   } = midgardService
 
   const intl = useIntl()
 
   /**
    * We have to get a new stake-stream for every new asset
+   * DON'T remove `slint-disable-next-line ...` ;)
    * @description /src/renderer/services/midgard/stake.ts
    */
-  const stakeData$ = useMemo(() => midgardService.stake.getStakes$(asset), [asset, midgardService.stake])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const stakeData$ = useMemo(() => getStakes$(), [asset])
   const stakeData = useObservableState<StakersAssetDataRD>(stakeData$, RD.initial)
 
   const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
@@ -76,11 +79,7 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
         RD.combine(stakeData, poolDetailRD),
         RD.fold(
           () => <Styled.EmptyData description={intl.formatMessage({ id: 'stake.pool.noStakes' })} />,
-          () => (
-            <Styled.EmptyContainer>
-              <Spin />
-            </Styled.EmptyContainer>
-          ),
+          () => <Spin />,
           () => <Styled.EmptyData description={intl.formatMessage({ id: 'stake.pool.noStakes' })} />,
           ([stake, pool]) => renderPoolShareReady(stake, pool)
         )

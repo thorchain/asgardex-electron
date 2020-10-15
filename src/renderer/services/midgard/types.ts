@@ -2,7 +2,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Asset, Chain } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { Option } from 'fp-ts/lib/Option'
-import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
@@ -77,7 +76,7 @@ export type PoolsService = {
   poolAddresses$: ThorchainEndpointsLD
   runeAsset$: Rx.Observable<Asset>
   poolDetail$: PoolDetailLD
-  reloadPoolDetail: (value: O.Option<Asset>) => void
+  reloadPoolDetail: () => void
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
 }
