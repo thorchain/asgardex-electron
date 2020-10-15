@@ -10,6 +10,7 @@ export * from './ModelError';
 export * from './NetworkInfo';
 export * from './NodeKey';
 export * from './Option';
+export * from './PoolAggChanges';
 export * from './PoolDetail';
 export * from './StakersAddressData';
 export * from './StakersAssetData';
