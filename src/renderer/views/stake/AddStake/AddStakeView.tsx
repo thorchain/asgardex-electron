@@ -12,14 +12,14 @@ import { AddStake } from '../../../components/stake/AddStake/AddStake'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
-import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import * as stakeRoutes from '../../../routes/stake'
 import { PoolDetailRD } from '../../../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
+import { Props } from './AddStakeView.types'
 
-export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
+export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' }) => {
   const history = useHistory()
 
   const onChangeAsset = useCallback(
@@ -31,13 +31,12 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
 
   const {
     service: {
-      pools: { availableAssets$, priceRatio$, runeAsset$, selectedPricePoolAsset$, poolDetail$, poolsState$ }
+      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, poolsState$ }
     }
   } = useMidgardContext()
 
   const { assetsWBState$ } = useWalletContext()
 
-  const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset(asset.chain))
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
 
@@ -86,6 +85,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const renderDisabledAddStake = useCallback(
     () => (
       <AddStake
+        type={type}
         onChangeAsset={() => {}}
         asset={asset}
         runeAsset={runeAsset}
@@ -99,7 +99,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
         poolData={{ runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }}
       />
     ),
-    [asset, runeAsset, selectedPricePoolAsset]
+    [asset, runeAsset, selectedPricePoolAsset, type]
   )
 
   return FP.pipe(
@@ -111,6 +111,7 @@ export const AddStakeView: React.FC<{ asset: Asset }> = ({ asset }) => {
       ([assetPrice, poolAssets, pool]) => {
         return (
           <AddStake
+            type={type}
             poolData={toPoolData(pool)}
             onChangeAsset={onChangeAsset}
             asset={asset}
