@@ -4,8 +4,8 @@ import { AssetAmount, formatAssetAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
-import { abbreviateNumber } from '../../../helpers/numberHelper'
-import PoolStatus from '../../uielements/poolStatus'
+import { abbreviateNumber } from '../../helpers/numberHelper'
+import PoolStatus from '../uielements/poolStatus'
 import * as Styled from './PoolDetails.style'
 
 export type Props = {
@@ -25,7 +25,7 @@ export type Props = {
   isLoading?: boolean
 }
 
-export const PoolDetails: React.FC<Props> = ({
+const PoolDetails: React.FC<Props> = ({
   depth,
   volume24hr,
   allTimeVolume,
@@ -103,3 +103,5 @@ export const PoolDetails: React.FC<Props> = ({
     </Styled.Container>
   )
 }
+
+export default PoolDetails

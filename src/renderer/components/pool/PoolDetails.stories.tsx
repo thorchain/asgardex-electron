@@ -3,7 +3,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { assetAmount, bn } from '@thorchain/asgardex-util'
 
-import { PoolDetails } from './PoolDetails'
+import PoolDetails from './PoolDetails'
 
 export const PoolDetailsStory = () => {
   return (
@@ -21,4 +21,4 @@ export const PoolDetailsStory = () => {
   )
 }
 
-storiesOf('Components/Stake/PoolDetails', module).add('default', PoolDetailsStory)
+storiesOf('Components/pool/PoolDetails', module).add('default', PoolDetailsStory)

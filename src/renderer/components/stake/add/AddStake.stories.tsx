@@ -4,7 +4,7 @@ import { storiesOf } from '@storybook/react'
 import { bn, assetAmount, assetToBase, AssetRune67C, AssetBNB, baseAmount, AssetBTC } from '@thorchain/asgardex-util'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
-import { AddStake } from './AddStake'
+import AddStake from './AddStake'
 
 const assetBalance = assetToBase(assetAmount(200))
 const runeBalance = assetToBase(assetAmount(100))

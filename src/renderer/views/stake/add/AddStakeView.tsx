@@ -8,7 +8,7 @@ import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
-import { AddStake } from '../../../components/stake/AddStake/AddStake'
+import AddStake from '../../../components/stake/add/AddStake'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
@@ -17,7 +17,13 @@ import * as stakeRoutes from '../../../routes/stake'
 import { PoolDetailRD } from '../../../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
-import { Props } from './AddStakeView.types'
+import { StakeType } from '../../../types/asgardex'
+
+type Props = {
+  asset: Asset
+  runeAsset: Asset
+  type: StakeType
+}
 
 export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' }) => {
   const history = useHistory()

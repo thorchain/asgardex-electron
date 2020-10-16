@@ -8,11 +8,11 @@ import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import { PoolDetails, Props as PoolDetailProps } from '../../../components/stake/PoolDetails/PoolDetails'
-import PoolStatus from '../../../components/uielements/poolStatus'
-import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../../const'
-import { useMidgardContext } from '../../../contexts/MidgardContext'
-import { PoolDetail } from '../../../types/generated/midgard/models'
+import PoolDetails, { Props as PoolDetailProps } from '../../components/pool/PoolDetails'
+import PoolStatus from '../../components/uielements/poolStatus'
+import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../const'
+import { useMidgardContext } from '../../contexts/MidgardContext'
+import { PoolDetail } from '../../types/generated/midgard/models'
 
 const getDepth = (data: PoolDetail, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(priceRatio)))
@@ -41,8 +41,7 @@ const defaultDetailsProps: PoolDetailProps = {
 const renderPendingView = () => <PoolDetails {...defaultDetailsProps} isLoading={true} />
 const renderInitialView = () => <PoolDetails {...defaultDetailsProps} />
 
-type Props = {}
-export const PoolDetailsView: React.FC<Props> = () => {
+const PoolDetailsView: React.FC = () => {
   const {
     service: {
       pools: { poolDetail$, priceRatio$, selectedPricePoolAssetSymbol$ }
@@ -81,3 +80,5 @@ export const PoolDetailsView: React.FC<Props> = () => {
     )
   )
 }
+
+export default PoolDetailsView

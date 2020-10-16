@@ -1,7 +1,7 @@
 import * as A from 'antd'
 import styled from 'styled-components'
 
-import { media } from '../../../helpers/styleHelper'
+import { media } from '../../helpers/styleHelper'
 
 const ITEM_GAP = '8px'
 

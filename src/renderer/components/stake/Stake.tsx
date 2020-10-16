@@ -8,7 +8,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getDefaultRuneAsset } from '../../helpers/assetHelper'
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import { Props as AddStakeViewProps } from '../../views/stake/AddStake/AddStakeView.types'
+import { StakeType } from '../../types/asgardex'
 import { AddWallet } from '../wallet/AddWallet'
 import * as Styled from './Stake.styles'
 
@@ -23,12 +23,13 @@ type Tab = {
 type Props = {
   asset: Asset
   ShareContent: React.ComponentType<{ asset: Asset }>
-  AddStake: React.ComponentType<AddStakeViewProps>
+  StakeContent: React.ComponentType<{ asset: Asset; runeAsset: Asset; type: StakeType }>
+  WidthdrawContent: React.ComponentType<{ asset: Asset; runeAsset: Asset }>
   keystoreState: KeystoreState
 }
 
 export const Stake: React.FC<Props> = (props) => {
-  const { ShareContent, AddStake, asset, keystoreState } = props
+  const { ShareContent, StakeContent, WidthdrawContent, asset, keystoreState } = props
   const intl = useIntl()
 
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
@@ -47,14 +48,18 @@ export const Stake: React.FC<Props> = (props) => {
       {
         key: 'stake-sym',
         label: intl.formatMessage({ id: 'stake.add.sym' }, { asset: asset.ticker }),
-        content: <AddStake asset={asset} runeAsset={runeAsset} type="sym" />
+        content: <StakeContent asset={asset} runeAsset={runeAsset} type="sym" />
       },
       {
         key: 'stake-asym',
         label: intl.formatMessage({ id: 'stake.add.asym' }, { assetA: asset.ticker, assetB: runeAsset.ticker }),
-        content: <AddStake asset={asset} runeAsset={runeAsset} type="asym" />
+        content: <StakeContent asset={asset} runeAsset={runeAsset} type="asym" />
       },
-      { key: 'withdraw', label: intl.formatMessage({ id: 'stake.withdraw' }), content: <h1>withdraw</h1> }
+      {
+        key: 'withdraw',
+        label: intl.formatMessage({ id: 'stake.withdraw' }),
+        content: <WidthdrawContent asset={asset} runeAsset={runeAsset} />
+      }
     ],
     [intl, asset, runeAsset]
   )
