@@ -23,10 +23,10 @@ import { SendTxParams } from '../../../../services/binance/transaction'
 import { AddressValidation } from '../../../../services/binance/types'
 import { AssetsWithBalance, AssetWithBalance } from '../../../../services/wallet/types'
 import { Input, InputBigNumber } from '../../../uielements/input'
-import AccountSelector from '../../AccountSelector'
-import * as Styled from '../Form.style'
-import { validateTxAmountInput } from '../util'
-import useChangeAssetHandler from './useChangeAssetHandler'
+import { AccountSelector } from '../../account'
+import * as Styled from '../TxForm.style'
+import { validateTxAmountInput } from '../TxForm.util'
+import { useChangeAssetHandler } from './Send.hooks'
 
 export type FormValues = {
   recipient: Address
@@ -43,7 +43,7 @@ type Props = {
   fee: O.Option<AssetAmount>
 }
 
-const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
+export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
   const { onSubmit, assetsWB, assetWB, isLoading = false, addressValidation, fee: oFee } = props
   const intl = useIntl()
 
@@ -193,5 +193,3 @@ const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     </Row>
   )
 }
-
-export default SendFormBNB

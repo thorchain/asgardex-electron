@@ -6,7 +6,7 @@ import { Form, Row } from 'antd'
 import { Rule } from 'antd/lib/form'
 import BigNumber from 'bignumber.js'
 
-import Button from '../button'
+import { Button } from '../button'
 import { InputBigNumber } from './InputBigNumber'
 
 type FormValues = {

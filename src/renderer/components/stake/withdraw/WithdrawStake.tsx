@@ -7,7 +7,7 @@ type Props = {
   runeAsset: Asset
 }
 
-const WithdrawStake: React.FC<Props> = (props): JSX.Element => {
+export const WithdrawStake: React.FC<Props> = (props): JSX.Element => {
   const { asset, runeAsset } = props
 
   return (
@@ -16,5 +16,3 @@ const WithdrawStake: React.FC<Props> = (props): JSX.Element => {
     </h1>
   )
 }
-
-export default WithdrawStake

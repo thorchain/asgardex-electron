@@ -9,14 +9,16 @@ import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
 import { bnbIcon, btcIcon, ethIcon, runeIcon } from '../../../icons'
 import * as Styled from './AssetIcon.style'
-import { Size } from './types'
+import { Size } from './AssetIcon.types'
 
-interface Props extends React.HTMLAttributes<HTMLDivElement> {
+type ComponentProps = {
   size?: Size
   asset: Asset
 }
 
-const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className = '', ...rest }): JSX.Element => {
+type Props = ComponentProps & React.HTMLAttributes<HTMLDivElement>
+
+export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className = '', ...rest }): JSX.Element => {
   const imgUrl = useMemo(() => {
     // BTC
     if (isBtcAsset(asset)) {
@@ -78,5 +80,3 @@ const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className = '', ..
 
   return RD.fold(() => <></>, renderPendingIcon, renderFallbackIcon, renderIcon)(remoteIconImage)
 }
-
-export default AssetIcon

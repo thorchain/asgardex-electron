@@ -6,25 +6,25 @@ import { useObservableState } from 'observable-hooks'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
 import { RefreshButton } from '../../components/uielements/button/'
-import AssetsNav from '../../components/wallet/assets/AssetsNav'
+import { AssetsNav } from '../../components/wallet/assets/AssetsNav'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import AssetDetailsView from './AssetDetailsView'
-import AssetsView from './AssetsView'
-import BondsView from './BondsView'
-import CreateView from './CreateView'
-import FreezeView from './FreezeView'
-import ImportsView from './importsView'
-import NoWalletView from './NoWalletView'
-import ReceiveView from './ReceiveView'
-import SendView from './send/SendView'
-import SettingsView from './SettingsView'
-import StakesView from './StakesView'
-import UnlockView from './UnlockView'
+import { AssetDetailsView } from './AssetDetailsView'
+import { AssetsView } from './AssetsView'
+import { BondsView } from './BondsView'
+import { CreateView } from './CreateView/CreateView'
+import { FreezeView } from './FreezeView'
+import { ImportsView } from './importsView/ImportsView'
+import { NoWalletView } from './NoWalletView/NoWalletView'
+import { ReceiveView } from './ReceiveView'
+import { SendView } from './send/SendView'
+import { SettingsView } from './SettingsView'
+import { StakesView } from './StakesView'
+import { UnlockView } from './UnlockView'
 
-const WalletView: React.FC = (): JSX.Element => {
+export const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService, reloadBalances } = useWalletContext()
 
   // Important note:
@@ -144,5 +144,3 @@ const WalletView: React.FC = (): JSX.Element => {
     </Switch>
   )
 }
-
-export default WalletView

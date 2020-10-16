@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Asset } from '@thorchain/asgardex-util'
 import Draggable, { ControlPosition, DraggableBounds, DraggableEvent, DraggableEventHandler } from 'react-draggable'
 
-import AssetIcon from '../assets/assetIcon'
+import { AssetIcon } from '../assets/assetIcon'
 import * as Styled from './Drag.style'
 
 type Props = {
@@ -17,7 +17,7 @@ type Props = {
   disabled?: boolean
 }
 
-const Drag: React.FC<Props> = ({
+export const Drag: React.FC<Props> = ({
   className = '',
   reset = true,
   source,
@@ -134,5 +134,3 @@ const Drag: React.FC<Props> = ({
     </div>
   )
 }
-
-export default Drag

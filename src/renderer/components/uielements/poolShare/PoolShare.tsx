@@ -16,7 +16,7 @@ import { useIntl } from 'react-intl'
 
 import { useElementWidth } from '../../../hooks/useContainerWidth'
 import * as Styled from './PoolShare.style'
-import PoolShareCard from './PoolShareCard'
+import { PoolShareCard } from './PoolShareCard'
 
 type Props = {
   sourceAsset: Asset
@@ -31,7 +31,7 @@ type Props = {
   stakeUnits: BaseAmount
 }
 
-const PoolShare: React.FC<Props> = (props): JSX.Element => {
+export const PoolShare: React.FC<Props> = (props): JSX.Element => {
   const {
     sourceAsset,
     runeStakedShare,
@@ -176,5 +176,3 @@ const PoolShare: React.FC<Props> = (props): JSX.Element => {
     </Styled.PoolShareWrapper>
   )
 }
-
-export default PoolShare

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import Label from '../label'
+import { Label } from '../label'
 
 export const Headline = styled(Label).attrs({
   size: 'large',

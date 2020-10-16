@@ -6,7 +6,7 @@ type Props = {
   title: string
 }
 
-const PoolShareCard: React.FC<Props> = ({ title, children }) => {
+export const PoolShareCard: React.FC<Props> = ({ title, children }) => {
   return (
     <Styled.Wrapper>
       <Styled.Title>{title}</Styled.Title>
@@ -14,5 +14,3 @@ const PoolShareCard: React.FC<Props> = ({ title, children }) => {
     </Styled.Wrapper>
   )
 }
-
-export default PoolShareCard

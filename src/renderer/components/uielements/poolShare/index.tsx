@@ -1,3 +1,2 @@
-import PoolShare from './PoolShare'
-
-export default PoolShare
+export { PoolShare } from './PoolShare'
+export { PoolShareCard } from './PoolShareCard'

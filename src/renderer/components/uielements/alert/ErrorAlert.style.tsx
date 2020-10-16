@@ -2,7 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import Label from '../label'
+import { Label } from '../label'
 
 export const Alert = styled(A.Alert)`
   /* container */

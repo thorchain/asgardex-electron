@@ -1,3 +1,1 @@
-import { Headline } from './Headline.style'
-
-export default Headline
+export { Headline } from './Headline.style'

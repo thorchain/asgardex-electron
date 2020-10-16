@@ -1,3 +1,3 @@
-import AssetData from './AssetData'
+import { AssetData } from './AssetData'
 
-export default AssetData
+export { AssetData }

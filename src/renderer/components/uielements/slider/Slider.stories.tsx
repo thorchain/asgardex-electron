@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import { storiesOf } from '@storybook/react'
 
-import Slider from './Slider'
+import { Slider } from './index'
 
 const marks = {
   0: '0%',

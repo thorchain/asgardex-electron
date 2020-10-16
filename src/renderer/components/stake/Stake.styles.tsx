@@ -3,8 +3,8 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
-import { Tabs as TabsBase } from '../Tabs/Tabs'
-import Button from '../uielements/button'
+import { Tabs as TabsBase } from '../tabs/Tabs'
+import { Button } from '../uielements/button'
 
 export const Container = styled('div')`
   min-height: 100%;

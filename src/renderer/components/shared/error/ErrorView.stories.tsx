@@ -3,8 +3,8 @@ import React from 'react'
 import { SyncOutlined } from '@ant-design/icons'
 import { storiesOf } from '@storybook/react'
 
-import Button from '../../uielements/button'
-import ErrorView from './ErrorView'
+import { Button } from '../../uielements/button'
+import { ErrorView } from './index'
 
 storiesOf('Components/ErrorView', module)
   .add('default', () => {

@@ -1,7 +1,7 @@
 import { Col, Row } from 'antd'
 import styled from 'styled-components'
 
-import BaseAssetCard from '../../uielements/assets/assetCard'
+import { AssetCard as BaseAssetCard } from '../../uielements/assets/assetCard'
 
 export const Container = styled('div')`
   display: flex;

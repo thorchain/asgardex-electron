@@ -2,7 +2,7 @@ import React from 'react'
 
 import { storiesOf } from '@storybook/react'
 
-import Modal from './Modal'
+import { Modal } from './Modal'
 
 storiesOf('Components/Modal', module).add('default', () => {
   return (

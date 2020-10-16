@@ -4,8 +4,8 @@ import { withKnobs, radios } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 
 import { ASSETS_MAINNET } from '../../../../../shared/mock/assets'
-import { Size as CoinSize } from '../assetIcon/types'
-import AssetPair from './AssetPair'
+import { Size as CoinSize } from '../assetIcon/AssetIcon.types'
+import { AssetPair } from './AssetPair'
 
 const sizeOptions: Record<CoinSize, CoinSize> = {
   small: 'small',

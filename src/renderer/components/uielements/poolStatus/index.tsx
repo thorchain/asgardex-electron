@@ -1,3 +1,1 @@
-import PoolStatus from './PoolStatus'
-
-export default PoolStatus
+export { PoolStatus } from './PoolStatus'

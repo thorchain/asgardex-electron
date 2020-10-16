@@ -2,9 +2,9 @@ import React, { useMemo } from 'react'
 
 import { useIntl } from 'react-intl'
 
-import { PageTitle } from '../../../components/PageTitle/PageTitle'
-import Tabs from '../../../components/Tabs'
-import ImportPhrase from '../../../components/wallet/ImportPhrase'
+import { PageTitle } from '../../../components/page/PageTitle'
+import { Tabs } from '../../../components/tabs'
+import { ImportPhrase } from '../../../components/wallet/phrase/'
 import * as Styled from './ImportsView.style'
 
 enum TabKey {
@@ -18,7 +18,7 @@ type Tab = {
   content: React.ReactNode
 }
 
-const ImportsView: React.FC = (): JSX.Element => {
+export const ImportsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const items: Tab[] = useMemo(
     () => [
@@ -34,4 +34,3 @@ const ImportsView: React.FC = (): JSX.Element => {
     </Styled.ImportsViewWrapper>
   )
 }
-export default ImportsView

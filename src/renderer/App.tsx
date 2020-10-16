@@ -3,8 +3,8 @@ import React from 'react'
 import { HashRouter as Router } from 'react-router-dom'
 
 import { AppWrapper, AppLayout } from './App.style'
-import Footer from './components/Footer'
-import Header from './components/header/Header'
+import { Footer } from './components/footer'
+import { Header } from './components/header/Header'
 import { AppProvider } from './contexts/AppContext'
 import { BinanceProvider } from './contexts/BinanceContext'
 import { BitcoinProvider } from './contexts/BitcoinContext'
@@ -14,12 +14,10 @@ import { MidgardProvider } from './contexts/MidgardContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { WalletProvider } from './contexts/WalletContext'
 import { envOrDefault } from './helpers/envHelper'
-import View from './views/View'
-import ViewRoutes from './views/ViewRoutes'
+import { View } from './views/View'
+import { ViewRoutes } from './views/ViewRoutes'
 
-type Props = {}
-
-const AppView: React.FC<Props> = (_): JSX.Element => {
+export const AppView: React.FC = (): JSX.Element => {
   return (
     <>
       <AppWrapper>
@@ -35,7 +33,7 @@ const AppView: React.FC<Props> = (_): JSX.Element => {
   )
 }
 
-const App: React.FC<Props> = (_): JSX.Element => {
+export const App: React.FC = (): JSX.Element => {
   return (
     <AppProvider>
       <WalletProvider>
@@ -58,5 +56,3 @@ const App: React.FC<Props> = (_): JSX.Element => {
     </AppProvider>
   )
 }
-
-export default App

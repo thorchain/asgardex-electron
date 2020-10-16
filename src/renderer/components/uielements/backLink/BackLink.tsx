@@ -12,7 +12,7 @@ type Props = {
   path?: string
 }
 
-const BackLink: React.FC<Props> = ({ label, style, path }): JSX.Element => {
+export const BackLink: React.FC<Props> = ({ label, style, path }): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -30,5 +30,3 @@ const BackLink: React.FC<Props> = ({ label, style, path }): JSX.Element => {
     </BackLinkWrapper>
   )
 }
-
-export default BackLink

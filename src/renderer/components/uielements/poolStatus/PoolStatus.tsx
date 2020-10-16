@@ -4,8 +4,8 @@ import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 
 import { useCbOnResize } from '../../../hooks/useCbOnResize'
-import Label from '../label'
-import Trend from '../trend'
+import { Label } from '../label'
+import { Trend } from '../trend'
 import * as Styled from './PoolStatus.style'
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
   isLoading?: boolean
 }
 
-const PoolStatus: React.FC<Props> = (props): JSX.Element => {
+export const PoolStatus: React.FC<Props> = (props): JSX.Element => {
   const { label, trend, displayValue, fullValue, isLoading } = props
   const [showTooltip, setShowTooltip] = useState(false)
   const amountRef = useRef<HTMLDivElement>(null)
@@ -65,5 +65,3 @@ const PoolStatus: React.FC<Props> = (props): JSX.Element => {
     </Styled.PoolStatusWrapper>
   )
 }
-
-export default PoolStatus

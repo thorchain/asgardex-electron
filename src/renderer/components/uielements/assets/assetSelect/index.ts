@@ -1,3 +1,1 @@
-import AssetSelect from './AssetSelect'
-
-export default AssetSelect
+export { AssetSelect } from './AssetSelect'

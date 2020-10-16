@@ -19,10 +19,10 @@ import {
   ApiError,
   AssetsWBChain
 } from '../../../services/wallet/types'
-import { PricePool } from '../../../views/pools/types'
-import ErrorView from '../../shared/error/ErrorView'
-import AssetIcon from '../../uielements/assets/assetIcon'
-import Label from '../../uielements/label'
+import { PricePool } from '../../../views/pools/Pools.types'
+import { ErrorView } from '../../shared/error/'
+import { AssetIcon } from '../../uielements/assets/assetIcon'
+import { Label } from '../../uielements/label'
 import * as Styled from './AssetsTableCollapsable.style'
 
 const { Panel } = Collapse
@@ -34,7 +34,7 @@ type Props = {
   selectAssetHandler?: (asset: Asset) => void
 }
 
-const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
+export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const { assetsWBChains = [], pricePool, poolDetails, selectAssetHandler = (_) => {} } = props
 
   const intl = useIntl()
@@ -281,5 +281,3 @@ const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     </Styled.Collapse>
   )
 }
-
-export default AssetsTableCollapsable

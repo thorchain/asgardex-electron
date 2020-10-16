@@ -5,7 +5,7 @@ import { storiesOf } from '@storybook/react'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../../shared/mock/assets'
-import AssetDetails from './AssetDetails'
+import { AssetDetails } from './index'
 
 storiesOf('Wallet/AssetsDetails', module)
   .add('BNB', () => {

@@ -2,8 +2,8 @@ import React from 'react'
 
 import { Asset } from '@thorchain/asgardex-util'
 
-import AssetIcon from '../assetIcon'
-import { Size as IconSize } from '../assetIcon/types'
+import { AssetIcon } from '../assetIcon'
+import { Size as IconSize } from '../assetIcon/AssetIcon.types'
 import * as Styled from './AssetPairOverlapped.style'
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
   className?: string
 }
 
-const AssetPairOverlapped: React.FC<Props> = (props): JSX.Element => {
+export const AssetPairOverlapped: React.FC<Props> = (props): JSX.Element => {
   const { asset, target, size = 'normal' } = props
 
   return (
@@ -27,5 +27,3 @@ const AssetPairOverlapped: React.FC<Props> = (props): JSX.Element => {
     </Styled.CoinsWrapper>
   )
 }
-
-export default AssetPairOverlapped

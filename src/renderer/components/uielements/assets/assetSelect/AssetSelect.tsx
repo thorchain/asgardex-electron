@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl'
 
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { PriceDataIndex } from '../../../../services/midgard/types'
-import AssetMenu from '../assetMenu'
+import { AssetMenu } from '../assetMenu'
 import {
   AssetSelectWrapper,
   AssetDropdownButton,
@@ -14,7 +14,7 @@ import {
   DropdownIconHolder,
   DropdownIcon
 } from './AssetSelect.style'
-import AssetSelectData from './AssetSelectData'
+import { AssetSelectData } from './AssetSelectData'
 
 type DropdownCarretProps = {
   open: boolean
@@ -42,7 +42,7 @@ type Props = {
   showAssetName?: boolean
 }
 
-const AssetSelect: React.FC<Props> = (props): JSX.Element => {
+export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
     assets = [],
@@ -122,5 +122,3 @@ const AssetSelect: React.FC<Props> = (props): JSX.Element => {
     </AssetSelectWrapper>
   )
 }
-
-export default AssetSelect

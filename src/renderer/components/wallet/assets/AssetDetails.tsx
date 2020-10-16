@@ -13,10 +13,10 @@ import { SendAction, isSendAction } from '../../../services/binance/types'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_ASSET_TX_HANDLER } from '../../../services/wallet/const'
 import { AssetTxsPageRD, LoadAssetTxsHandler, NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
-import AssetInfo from '../../uielements/assets/AssetInfo'
-import BackLink from '../../uielements/backLink'
-import Button, { RefreshButton } from '../../uielements/button'
-import TransactionsTable from '../TransactionsTable'
+import { AssetInfo } from '../../uielements/assets/assetInfo'
+import { BackLink } from '../../uielements/backLink'
+import { Button, RefreshButton } from '../../uielements/button'
+import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.style'
 
 type SendActionMenuItem = {
@@ -33,7 +33,7 @@ type Props = {
   loadAssetTxsHandler?: LoadAssetTxsHandler
 }
 
-const AssetDetails: React.FC<Props> = (props): JSX.Element => {
+export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
     txsPageRD,
     assetsWB: oAssetsWB,
@@ -207,7 +207,7 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           </Styled.TableHeadline>
         </Col>
         <Col span={24}>
-          <TransactionsTable
+          <TxsTable
             txsPageRD={txsPageRD}
             clickTxLinkHandler={clickTxLinkHandler}
             changePaginationHandler={onChangePagination}
@@ -217,4 +217,3 @@ const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     </>
   )
 }
-export default AssetDetails

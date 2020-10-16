@@ -4,7 +4,7 @@ import { storiesOf } from '@storybook/react'
 import { AssetBNB, AssetBTC, AssetRuneB1A, bn } from '@thorchain/asgardex-util'
 
 import { ASSETS_MAINNET } from '../../../../../shared/mock/assets'
-import AssetMenu from './AssetMenu'
+import { AssetMenu } from './AssetMenu'
 
 const assets = [AssetBNB, AssetBTC, AssetRuneB1A]
 const priceIndex = {

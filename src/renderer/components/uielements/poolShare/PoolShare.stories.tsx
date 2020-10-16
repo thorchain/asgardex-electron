@@ -4,7 +4,7 @@ import { storiesOf } from '@storybook/react'
 import { bn, assetToBase, assetAmount, AssetBNB, AssetRune67C, baseAmount } from '@thorchain/asgardex-util'
 
 import { ZERO_BN } from '../../../const'
-import PoolShare from './PoolShare'
+import { PoolShare } from './PoolShare'
 
 export const DefaultPoolShare = () => (
   <PoolShare

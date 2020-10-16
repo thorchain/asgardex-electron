@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import Button from '../../../components/uielements/button'
+import { Button } from '../../../components/uielements/button'
 import { media } from '../../../helpers/styleHelper'
 
 export const ViewContainer = styled('div')`

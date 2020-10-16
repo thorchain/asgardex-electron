@@ -4,8 +4,8 @@ import { radios } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 
 import { ASSETS_MAINNET } from '../../../../../shared/mock/assets'
-import AssetIcon from './AssetIcon'
-import { Size } from './types'
+import { AssetIcon } from './AssetIcon'
+import { Size } from './AssetIcon.types'
 
 type SizeOptions = {
   [key in Size]: Size

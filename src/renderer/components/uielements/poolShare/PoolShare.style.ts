@@ -2,7 +2,7 @@ import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
-import UILabel from '../label'
+import { Label as UILabel } from '../label'
 
 export const PoolShareWrapper = styled.div`
   width: 100%;

@@ -11,7 +11,7 @@ import {
   baseAmount
 } from '@thorchain/asgardex-util'
 
-import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/types'
+import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
 
 // BUSD testnet
 export const AssetBUSDBAF: Asset = { chain: 'BNB', symbol: 'BUSD-BAF', ticker: 'BUSD' }

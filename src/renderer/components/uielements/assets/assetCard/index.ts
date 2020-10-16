@@ -1,3 +1,1 @@
-import AssetCard from './AssetCard'
-
-export default AssetCard
+export { AssetCard } from './AssetCard'

@@ -24,7 +24,7 @@ import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { DefaultApi, GetPoolsDetailsViewEnum } from '../../types/generated/midgard/apis'
 import { PoolDetail } from '../../types/generated/midgard/models'
-import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/types'
+import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import {

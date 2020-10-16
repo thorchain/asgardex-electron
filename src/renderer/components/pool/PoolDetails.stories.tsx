@@ -3,7 +3,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { assetAmount, bn } from '@thorchain/asgardex-util'
 
-import PoolDetails from './PoolDetails'
+import { PoolDetails } from './PoolDetails'
 
 export const PoolDetailsStory = () => {
   return (

@@ -7,12 +7,12 @@ import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
-import AssetDetails from '../../components/wallet/assets/AssetDetails'
+import { AssetDetails } from '../../components/wallet/assets/AssetDetails'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
 
-const AssetDetailsView: React.FC = (): JSX.Element => {
+export const AssetDetailsView: React.FC = (): JSX.Element => {
   const {
     assetTxs$,
     assetsWBState$,
@@ -51,4 +51,3 @@ const AssetDetailsView: React.FC = (): JSX.Element => {
     </>
   )
 }
-export default AssetDetailsView

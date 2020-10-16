@@ -8,7 +8,7 @@ import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
-import AddStake from '../../../components/stake/add/AddStake'
+import { AddStake } from '../../../components/stake/add/AddStake'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'

@@ -7,20 +7,20 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
-import ErrorView from '../../components/shared/error/ErrorView'
+import { ErrorView } from '../../components/shared/error/'
 import { Stake } from '../../components/stake/Stake'
-import BackLink from '../../components/uielements/backLink'
+import { BackLink } from '../../components/uielements/backLink'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { StakeRouteParams } from '../../routes/stake'
 import { AddStakeView } from './add/AddStakeView'
 import { ShareView } from './share/ShareView'
-import WithdrawStakeView from './withdraw/WithdrawStakeView'
+import { WithdrawStakeView } from './withdraw/WithdrawStakeView'
 
 type Props = {}
 
-const StakeView: React.FC<Props> = (_) => {
+export const StakeView: React.FC<Props> = (_) => {
   const intl = useIntl()
 
   const { asset } = useParams<StakeRouteParams>()
@@ -90,5 +90,3 @@ const StakeView: React.FC<Props> = (_) => {
     </>
   )
 }
-
-export default StakeView

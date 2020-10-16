@@ -6,12 +6,12 @@ import * as appRoutes from '../routes/app'
 import * as playgroundRoutes from '../routes/playground'
 import * as poolsRoutes from '../routes/pools'
 import * as walletRoutes from '../routes/wallet'
-import NoContentView from './NoContentView'
-import PlaygroundView from './playground/PlaygroundView'
-import PoolsView from './pools/PoolsView'
-import WalletView from './wallet/WalletView'
+import { NoContentView } from './NoContentView'
+import { PlaygroundView } from './playground/PlaygroundView'
+import { PoolsView } from './pools/PoolsView'
+import { WalletView } from './wallet/WalletView'
 
-const ViewRoutes: React.FC<{}> = (): JSX.Element => {
+export const ViewRoutes: React.FC<{}> = (): JSX.Element => {
   return (
     <Switch>
       <Route path={appRoutes.base.path()} exact>
@@ -32,5 +32,3 @@ const ViewRoutes: React.FC<{}> = (): JSX.Element => {
     </Switch>
   )
 }
-
-export default ViewRoutes

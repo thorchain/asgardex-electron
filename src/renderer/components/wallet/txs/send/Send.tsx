@@ -5,10 +5,10 @@ import * as FP from 'fp-ts/lib/pipeable'
 import { useIntl } from 'react-intl'
 
 import { TxRD } from '../../../../services/wallet/types'
-import ErrorView from '../../../shared/error/ErrorView'
-import SuccessView from '../../../shared/success/SuccessView'
-import Button from '../../../uielements/button'
-import * as Styled from '../Form.style'
+import { ErrorView } from '../../../shared/error/'
+import { SuccessView } from '../../../shared/success/'
+import { Button } from '../../../uielements/button'
+import * as Styled from '../TxForm.style'
 
 /**
  * Send is a generic component to display states of `TxRD` for any chain
@@ -27,7 +27,7 @@ type Props = {
   errorActionHandler?: () => void
 }
 
-const Send: React.FC<Props> = (props): JSX.Element => {
+export const Send: React.FC<Props> = (props): JSX.Element => {
   const {
     txRD,
     inititalActionHandler = () => {},
@@ -72,5 +72,3 @@ const Send: React.FC<Props> = (props): JSX.Element => {
     </>
   )
 }
-
-export default Send

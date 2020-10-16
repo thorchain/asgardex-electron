@@ -4,7 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 
 import { ApiError, ErrorId } from '../../../../services/wallet/types'
-import Send from './Send'
+import { Send } from './index'
 
 const sendForm: JSX.Element = <h1>Send Form</h1>
 

@@ -15,7 +15,7 @@ import { TRANSFER_FEES } from '../../../../../shared/mock/fees'
 import { SendTxParams } from '../../../../services/binance/transaction'
 import { AddressValidation } from '../../../../services/binance/types'
 import { AssetWithBalance, AssetsWithBalance } from '../../../../services/wallet/types'
-import SendFormBNB from './SendFormBNB'
+import { SendFormBNB } from './index'
 
 const bnbAsset: AssetWithBalance = {
   asset: AssetBNB,

@@ -5,7 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, AssetBUSDBAF } from '../../const'
 import { getRunePricePool } from '../../helpers/poolHelper'
 import { ThorchainEndpoint, AssetDetail, PoolDetail } from '../../types/generated/midgard'
-import { PricePool, PricePools } from '../../views/pools/types'
+import { PricePool, PricePools } from '../../views/pools/Pools.types'
 import { PoolsState, PoolsStateRD } from './types'
 import {
   getAssetDetailIndex,

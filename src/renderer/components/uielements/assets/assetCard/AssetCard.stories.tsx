@@ -4,7 +4,7 @@ import { storiesOf } from '@storybook/react'
 import { bn, BaseAmount, AssetBNB, AssetBTC, AssetRuneB1A, assetAmount, assetToBase } from '@thorchain/asgardex-util'
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
-import AssetCard from './AssetCard'
+import { AssetCard } from './AssetCard'
 
 storiesOf('Components/Assets/AssetCard', module).add('default', () => {
   const [selectedAmount, setSelectedAmount] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
