@@ -7,6 +7,8 @@ const stake: StakeMessages = {
   'stake.share.total': 'Total value - RU',
   'stake.redemption.title': 'Current redemption value - RU',
   'stake.totalEarnings': 'Ваш общий доход от пула',
+  'stake.add.sym': 'Add {asset} - RU',
+  'stake.add.asym': 'Add {assetA} + {assetB} - RU',
   'stake.withdraw': 'Убрать',
   'stake.advancedMode': 'Расширенный режим',
   'stake.drag': 'Потяните',

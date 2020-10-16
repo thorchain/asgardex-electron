@@ -6,11 +6,13 @@ import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { ZERO_BASE_AMOUNT } from '../../../const'
+import { StakeType } from '../../../views/stake/AddStake/AddStakeView.types'
 import Drag from '../../uielements/drag'
 import * as Helper from './AddStake.helper'
 import * as Styled from './AddStake.style'
 
 type Props = {
+  type: StakeType
   asset: Asset
   runeAsset: Asset
   assetPrice: BigNumber
@@ -26,6 +28,7 @@ type Props = {
 }
 
 export const AddStake: React.FC<Props> = ({
+  type,
   asset,
   runeAsset,
   assetPrice,
@@ -43,6 +46,8 @@ export const AddStake: React.FC<Props> = ({
   const [runeAmountToStake, setRuneAmountToStake] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [assetAmountToStake, setAssetAmountToStake] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [percentValueToStake, setPercentValueToStake] = useState(0)
+
+  const isAsym = useMemo(() => type === 'asym', [type])
 
   const maxRuneAmountToStake = useMemo(
     (): BaseAmount => Helper.maxRuneAmountToStake({ poolData, runeBalance, assetBalance }),
@@ -130,28 +135,31 @@ export const AddStake: React.FC<Props> = ({
         <Col xs={24} xl={12}>
           <Styled.AssetCard
             disabled={disabled}
-            asset={runeAsset}
-            selectedAmount={runeAmountToStake}
-            maxAmount={maxRuneAmountToStake}
-            onChangeAssetAmount={runeAmountChangeHandler}
-            price={runePrice}
-            percentValue={percentValueToStake}
-            onChangePercent={changePercentHandler}
-            priceAsset={priceAsset}
-          />
-        </Col>
-        <Col xs={24} xl={12}>
-          <Styled.AssetCard
-            disabled={disabled}
             asset={asset}
             selectedAmount={assetAmountToStake}
             maxAmount={maxAssetAmountToStake}
             onChangeAssetAmount={assetAmountChangeHandler}
             price={assetPrice}
             assets={assets}
-            priceAsset={priceAsset}
+            percentValue={percentValueToStake}
+            onChangePercent={changePercentHandler}
             onChangeAsset={onChangeAsset}
+            priceAsset={priceAsset}
           />
+        </Col>
+
+        <Col xs={24} xl={12}>
+          {isAsym && (
+            <Styled.AssetCard
+              disabled={disabled}
+              asset={runeAsset}
+              selectedAmount={runeAmountToStake}
+              maxAmount={maxRuneAmountToStake}
+              onChangeAssetAmount={runeAmountChangeHandler}
+              price={runePrice}
+              priceAsset={priceAsset}
+            />
+          )}
         </Col>
       </Styled.CardsRow>
 

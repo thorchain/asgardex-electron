@@ -151,6 +151,8 @@ type StakeMessageKey =
   | 'stake.share.total'
   | 'stake.redemption.title'
   | 'stake.totalEarnings'
+  | 'stake.add.sym'
+  | 'stake.add.asym'
   | 'stake.withdraw'
   | 'stake.advancedMode'
   | 'stake.drag'

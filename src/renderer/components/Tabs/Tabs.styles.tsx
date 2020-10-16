@@ -35,6 +35,7 @@ export const TabLabel = styled(Label)`
   font-size: 16px;
   line-height: 19px;
   text-transform: uppercase;
+  white-space: nowrap;
 `
 
 export const ContentWrapper = styled('div')<{ centerContent?: boolean }>`

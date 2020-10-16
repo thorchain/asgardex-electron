@@ -7,6 +7,8 @@ const stake: StakeMessages = {
   'stake.share.poolshare': 'Pool share',
   'stake.redemption.title': 'Current redemption value',
   'stake.totalEarnings': 'Your total earnings from the pool',
+  'stake.add.sym': 'Add {asset}',
+  'stake.add.asym': 'Add {assetA} + {assetB}',
   'stake.withdraw': 'Withdraw',
   'stake.advancedMode': 'Advanced mode',
   'stake.drag': 'Drag to stake',

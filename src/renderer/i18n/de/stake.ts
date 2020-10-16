@@ -7,6 +7,8 @@ const stake: StakeMessages = {
   'stake.share.total': 'Gesamtwert',
   'stake.redemption.title': 'Aktueller Rückkaufwert',
   'stake.totalEarnings': 'Deine Gesamteinkommen vom Pool',
+  'stake.add.sym': '{asset} hinzügen',
+  'stake.add.asym': '{assetA} + {assetB} hinzügen',
   'stake.withdraw': 'Abheben',
   'stake.advancedMode': 'Expertenmodus',
   'stake.drag': 'Ziehen um zu Staken',
