@@ -14,8 +14,9 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { StakeRouteParams } from '../../routes/stake'
-import { AddStakeView } from './AddStake/AddStakeView'
-import { ShareView } from './Share/ShareView'
+import { AddStakeView } from './add/AddStakeView'
+import { ShareView } from './share/ShareView'
+import WithdrawStakeView from './withdraw/WithdrawStakeView'
 
 type Props = {}
 
@@ -80,7 +81,8 @@ const StakeView: React.FC<Props> = (_) => {
               asset={selectedAsset}
               keystoreState={keystoreState}
               ShareContent={ShareView}
-              AddStake={AddStakeView}
+              StakeContent={AddStakeView}
+              WidthdrawContent={WithdrawStakeView}
             />
           )
         )

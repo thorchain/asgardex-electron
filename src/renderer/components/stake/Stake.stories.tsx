@@ -5,8 +5,9 @@ import { AssetBNB } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
-import { AddSymStakeStory } from './AddStake/AddStake.stories'
+import { AddSymStakeStory } from './add/AddStake.stories'
 import { Stake } from './Stake'
+import { WithdrawStakeStory } from './withdraw/WithdrawStake.stories'
 
 storiesOf('Stake', module)
   .add('default', () => {
@@ -14,20 +15,30 @@ storiesOf('Stake', module)
       <Stake
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
-        AddStake={AddSymStakeStory}
+        StakeContent={AddSymStakeStory}
+        WidthdrawContent={WithdrawStakeStory}
         keystoreState={O.some(O.some({ phrase: 'phrase' }))}
       />
     )
   })
   .add('no wallet', () => {
-    return <Stake asset={AssetBNB} ShareContent={DefaultPoolShare} AddStake={AddSymStakeStory} keystoreState={O.none} />
+    return (
+      <Stake
+        asset={AssetBNB}
+        ShareContent={DefaultPoolShare}
+        StakeContent={AddSymStakeStory}
+        WidthdrawContent={WithdrawStakeStory}
+        keystoreState={O.none}
+      />
+    )
   })
   .add('locked', () => {
     return (
       <Stake
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
-        AddStake={AddSymStakeStory}
+        StakeContent={AddSymStakeStory}
+        WidthdrawContent={WithdrawStakeStory}
         keystoreState={O.some(O.none)}
       />
     )

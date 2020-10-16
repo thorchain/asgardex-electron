@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { ZERO_BASE_AMOUNT } from '../../../const'
-import { StakeType } from '../../../views/stake/AddStake/AddStakeView.types'
+import { StakeType } from '../../../types/asgardex'
 import Drag from '../../uielements/drag'
 import * as Helper from './AddStake.helper'
 import * as Styled from './AddStake.style'
@@ -27,7 +27,7 @@ type Props = {
   poolData: PoolData
 }
 
-export const AddStake: React.FC<Props> = ({
+const AddStake: React.FC<Props> = ({
   type,
   asset,
   runeAsset,
@@ -175,3 +175,5 @@ export const AddStake: React.FC<Props> = ({
     </Styled.Container>
   )
 }
+
+export default AddStake

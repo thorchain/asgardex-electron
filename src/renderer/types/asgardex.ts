@@ -21,6 +21,8 @@ export enum TxTypes {
   CREATE = 'create'
 }
 
+export type StakeType = 'sym' | 'asym'
+
 export const MAX_VALUE = 100
 
 export type TxStatus = {
