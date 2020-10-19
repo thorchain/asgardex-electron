@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, Chain } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
-import { Option } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
@@ -44,12 +44,15 @@ export type PoolsState = {
   assetDetails: AssetDetails
   poolAssets: PoolStringAssets
   poolDetails: PoolDetails
-  pricePools: Option<PricePools>
+  pricePools: O.Option<PricePools>
 }
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
 export type PoolsStateLD = LiveData<Error, PoolsState>
 
-export type SelectedPricePoolAsset = Option<PricePoolAsset>
+export type SelectedPoolAsset = O.Option<Asset>
+export type SelectedPoolChain = O.Option<Chain>
+
+export type SelectedPricePoolAsset = O.Option<PricePoolAsset>
 
 export type SelectedPricePool = PricePool
 
@@ -71,7 +74,7 @@ export type PoolsService = {
   setSelectedPricePoolAsset: (asset: PricePoolAsset) => void
   selectedPricePoolAsset$: Rx.Observable<SelectedPricePoolAsset>
   selectedPricePool$: Rx.Observable<SelectedPricePool>
-  selectedPricePoolAssetSymbol$: Rx.Observable<Option<string>>
+  selectedPricePoolAssetSymbol$: Rx.Observable<O.Option<string>>
   reloadPools: () => void
   poolAddresses$: ThorchainEndpointsLD
   runeAsset$: Rx.Observable<Asset>
