@@ -33,7 +33,7 @@ const reloadFeesByChain = (chain: Chain) => {
 }
 
 export const reloadFees$: Rx.Observable<O.Option<LoadFeesHandler>> = selectedPoolChain$.pipe(
-  RxOp.map(O.map((chain) => reloadFeesByChain(chain)))
+  RxOp.map(O.map(reloadFeesByChain))
 )
 
 const stakeFeeByChain$ = (chain: Chain): FeeLD => {
@@ -56,10 +56,7 @@ export const stakeFee$: FeeLD = selectedPoolChain$.pipe(
   RxOp.switchMap((oChain) =>
     FP.pipe(
       oChain,
-      O.fold(
-        () => Rx.of(RD.initial),
-        (chain) => stakeFeeByChain$(chain)
-      )
+      O.fold(() => Rx.of(RD.initial), stakeFeeByChain$)
     )
   )
 )

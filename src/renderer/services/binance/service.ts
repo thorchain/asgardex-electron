@@ -347,7 +347,7 @@ const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
  * Observable to load transaction fees from Binance API endpoint
  * If client is not available, it returns an `initial` state
  */
-const loadFees$ = (client: BinanceClient) =>
+const loadFees$ = (client: BinanceClient): FeesLD =>
   Rx.from(client.getFees()).pipe(
     map(RD.success),
     catchError((error) => Rx.of(RD.failure(error))),

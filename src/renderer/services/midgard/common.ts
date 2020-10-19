@@ -1,4 +1,3 @@
-import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -15,8 +14,6 @@ const selectedPoolAsset$: Observable<SelectedPoolAsset> = getSelectedPoolAsset$.
   RxOp.distinctUntilChanged(eqOAsset.equals)
 )
 
-const selectedPoolChain$: Observable<SelectedPoolChain> = selectedPoolAsset$.pipe(
-  RxOp.map(FP.flow(O.map(({ chain }) => chain)))
-)
+const selectedPoolChain$: Observable<SelectedPoolChain> = selectedPoolAsset$.pipe(RxOp.map(O.map(({ chain }) => chain)))
 
 export { selectedPoolAsset$, setSelectedPoolAsset, selectedPoolChain$ }

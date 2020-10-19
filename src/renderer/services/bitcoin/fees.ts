@@ -11,7 +11,7 @@ import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { FeeLD } from '../chain/types'
 import { Client$ } from './common'
-import { FeesService, FeesLD, FeesRD } from './types'
+import { FeesService, FeesLD } from './types'
 
 // reference to current client$
 const oClient$ = Rx.identity
@@ -23,7 +23,7 @@ const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
  * Observable to load transaction fees
  * If a client is not available, it returns an `initial` state
  */
-const loadFees$ = (client: BitcoinClient, memo?: string): Rx.Observable<FeesRD> =>
+const loadFees$ = (client: BitcoinClient, memo?: string): FeesLD =>
   Rx.from(client.calcFees(memo)).pipe(
     map(RD.success),
     catchError((error) => Rx.of(RD.failure(error))),
