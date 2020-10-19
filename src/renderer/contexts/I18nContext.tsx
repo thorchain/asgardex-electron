@@ -20,11 +20,7 @@ export const initialContext: I18nContextValue = {
 
 const I18nContext = createContext<I18nContextValue | null>(null)
 
-type Props = {
-  children: React.ReactNode
-}
-
-export const I18nProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
+export const I18nProvider: React.FC = ({ children }): JSX.Element => {
   const locale = useObservableState(locale$, initialLocale())
   const messages = useMemo(() => getMessagesByLocale(locale), [locale])
   return (

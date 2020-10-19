@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { WS, Client, Network as BinanceNetwork, BinanceClient, Address } from '@thorchain/asgardex-binance'
-import { Asset, BNBChain } from '@thorchain/asgardex-util'
+import { Asset, assetToBase, BNBChain } from '@thorchain/asgardex-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -27,9 +27,10 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
+import { FeeLD } from '../chain/types'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
-import { keystoreService, selectedAsset$ } from '../wallet/common'
+import { keystoreService, selectedAsset$ as selectedWalletAsset$ } from '../wallet/common'
 import { INITIAL_LOAD_TXS_PROPS } from '../wallet/const'
 import {
   AssetsWithBalanceRD,
@@ -42,7 +43,7 @@ import {
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import { BinanceClientState, FeeRD, FeesRD, TransferFeesRD, BinanceClientState$ } from './types'
+import { BinanceClientState, FeeRD, TransferFeesRD, BinanceClientState$, FeesLD } from './types'
 import { getWalletBalances, toTxsPage } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
@@ -304,7 +305,7 @@ const { get$: reloadAssetTxs$, set: reloadAssetTxs } = observableState<LoadAsset
 const assetTxs$: AssetTxsPageLD = Rx.combineLatest([
   client$,
   reloadAssetTxs$.pipe(debounceTime(300), startWith(INITIAL_LOAD_TXS_PROPS)),
-  selectedAsset$
+  selectedWalletAsset$
 ]).pipe(
   switchMap(([client, { limit, offset }, oAsset]) => {
     return FP.pipe(
@@ -339,11 +340,14 @@ const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
   shareReplay(1)
 )
 
+// `TriggerStream` to reload `Fees`
+const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
+
 /**
  * Observable to load transaction fees from Binance API endpoint
  * If client is not available, it returns an `initial` state
  */
-const loadFees$ = (client: BinanceClient): Observable<FeesRD> =>
+const loadFees$ = (client: BinanceClient): FeesLD =>
   Rx.from(client.getFees()).pipe(
     map(RD.success),
     catchError((error) => Rx.of(RD.failure(error))),
@@ -355,8 +359,19 @@ const loadFees$ = (client: BinanceClient): Observable<FeesRD> =>
  * Transaction fees
  * If a client is not available, it returns `None`
  */
-const fees$: Observable<FeesRD> = client$.pipe(
-  mergeMap(FP.pipe(O.fold(() => Rx.of(RD.initial), loadFees$))),
+const fees$: FeesLD = Rx.combineLatest([reloadFees$, client$]).pipe(
+  mergeMap(([_, oClient]) =>
+    FP.pipe(
+      // client and asset has to be available
+      oClient,
+      // ignore all assets from other chains than BNB
+      O.fold(
+        () => Rx.of(RD.initial),
+        (client) => loadFees$(client)
+      )
+    )
+  ),
+  startWith(RD.initial),
   shareReplay(1)
 )
 
@@ -369,18 +384,21 @@ const transferFees$: Observable<TransferFeesRD> = fees$.pipe(
       fees,
       RD.chain((fee) => RD.fromEither(getTransferFees(fee)))
     )
-  ),
-  shareReplay(1)
+  )
 )
 
 /**
  * Amount of feeze `Fee`
  */
-const freezeFee$: Observable<FeeRD> = FP.pipe(
-  fees$,
-  liveData.map(getFreezeFee),
-  liveData.chain(liveData.fromEither),
-  shareReplay(1)
+const freezeFee$: Observable<FeeRD> = FP.pipe(fees$, liveData.map(getFreezeFee), liveData.chain(liveData.fromEither))
+
+/**
+ * Amount of stake `Fee`
+ */
+export const stakeFee$: FeeLD = FP.pipe(
+  transferFees$,
+  liveData.map((fees) => fees.single),
+  liveData.map(assetToBase)
 )
 
 const wsTransfer$ = FP.pipe(
@@ -412,5 +430,6 @@ export {
   transaction,
   freeze,
   transferFees$,
-  freezeFee$
+  freezeFee$,
+  reloadFees
 }

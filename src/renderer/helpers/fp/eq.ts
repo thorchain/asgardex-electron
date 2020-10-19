@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, BaseAmount, assetToString } from '@thorchain/asgardex-util'
+import { Asset, BaseAmount, assetToString, Chain } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
@@ -18,6 +18,12 @@ export const eqAsset: Eq.Eq<Asset> = {
 }
 
 export const eqOAsset = O.getEq(eqAsset)
+
+export const eqChain: Eq.Eq<Chain> = {
+  equals: (x, y) => Eq.eqString.equals(x, y)
+}
+
+export const eqOChain = O.getEq(eqChain)
 
 export const eqBaseAmount: Eq.Eq<BaseAmount> = {
   equals: (x, y) => egBigNumber.equals(x.amount(), y.amount()) && x.decimal === y.decimal
