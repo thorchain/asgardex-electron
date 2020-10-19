@@ -17,7 +17,7 @@ type Props = {
   children: React.ReactNode
 }
 
-export const MidgardProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
+export const ChainProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
   return <ChainContext.Provider value={initialContext}>{children}</ChainContext.Provider>
 }
 

@@ -384,19 +384,13 @@ const transferFees$: Observable<TransferFeesRD> = fees$.pipe(
       fees,
       RD.chain((fee) => RD.fromEither(getTransferFees(fee)))
     )
-  ),
-  shareReplay(1)
+  )
 )
 
 /**
  * Amount of feeze `Fee`
  */
-const freezeFee$: Observable<FeeRD> = FP.pipe(
-  fees$,
-  liveData.map(getFreezeFee),
-  liveData.chain(liveData.fromEither),
-  shareReplay(1)
-)
+const freezeFee$: Observable<FeeRD> = FP.pipe(fees$, liveData.map(getFreezeFee), liveData.chain(liveData.fromEither))
 
 /**
  * Amount of stake `Fee`
@@ -404,8 +398,7 @@ const freezeFee$: Observable<FeeRD> = FP.pipe(
 export const stakeFee$: FeeLD = FP.pipe(
   transferFees$,
   liveData.map((fees) => fees.single),
-  liveData.map(assetToBase),
-  shareReplay(1)
+  liveData.map(assetToBase)
 )
 
 const wsTransfer$ = FP.pipe(

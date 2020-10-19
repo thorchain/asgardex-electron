@@ -49,8 +49,7 @@ const fees$: FeesLD = Rx.combineLatest([oClient$, reloadFees$]).pipe(
  */
 const fastTxFee$: FeeLD = FP.pipe(
   fees$,
-  liveData.map((fees) => baseAmount(fees.fast.feeTotal, BTC_DECIMAL)),
-  shareReplay(1)
+  liveData.map((fees) => baseAmount(fees.fast.feeTotal, BTC_DECIMAL))
 )
 
 /**
