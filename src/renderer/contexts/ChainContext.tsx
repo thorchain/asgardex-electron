@@ -13,11 +13,7 @@ const initialContext: ChainContextValue = {
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 
-type Props = {
-  children: React.ReactNode
-}
-
-export const ChainProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
+export const ChainProvider: React.FC = ({ children }): JSX.Element => {
   return <ChainContext.Provider value={initialContext}>{children}</ChainContext.Provider>
 }
 
