@@ -1,3 +1,1 @@
-import AddressInput from './addressInput'
-
-export default AddressInput
+export { AddressInput } from './AddressInput'

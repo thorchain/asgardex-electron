@@ -2,7 +2,7 @@ import React from 'react'
 
 import { storiesOf } from '@storybook/react'
 
-import PoolShareCard from './PoolShareCard'
+import { PoolShareCard } from './PoolShareCard'
 
 storiesOf('Components/PoolShareCard', module).add('default', () => {
   return (

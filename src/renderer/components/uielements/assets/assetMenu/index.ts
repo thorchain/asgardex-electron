@@ -1,3 +1,1 @@
-import AssetMenu from './AssetMenu'
-
-export default AssetMenu
+export { AssetMenu } from './AssetMenu'

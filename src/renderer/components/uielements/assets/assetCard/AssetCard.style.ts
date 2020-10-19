@@ -2,8 +2,8 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { InputBigNumber as BaseInputBigNumber } from '../../input'
-import Label from '../../label'
-import BaseAssetSelect from '../assetSelect'
+import { Label } from '../../label'
+import { AssetSelect as BaseAssetSelect } from '../assetSelect'
 
 const CONTAINER_SIDE_PADDING = 16
 

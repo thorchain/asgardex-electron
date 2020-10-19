@@ -8,7 +8,7 @@ type Props = {
   className?: string
 }
 
-const Selection: React.FC<Props> = ({ selected = 0, onSelect, className = '' }): JSX.Element => {
+export const Selection: React.FC<Props> = ({ selected = 0, onSelect, className = '' }): JSX.Element => {
   function handleClick(value: number) {
     onSelect(value)
   }
@@ -30,5 +30,3 @@ const Selection: React.FC<Props> = ({ selected = 0, onSelect, className = '' }):
     </SelectionWrapper>
   )
 }
-
-export default Selection

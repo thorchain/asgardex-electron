@@ -1,3 +1,1 @@
-import Trend from './trend'
-
-export default Trend
+export { Trend } from './Trend'

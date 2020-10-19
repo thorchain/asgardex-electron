@@ -8,7 +8,7 @@ import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import PoolShare from '../../../components/uielements/poolShare'
+import { PoolShare } from '../../../components/uielements/poolShare'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
 import { getDefaultRunePricePool } from '../../../helpers/poolHelper'

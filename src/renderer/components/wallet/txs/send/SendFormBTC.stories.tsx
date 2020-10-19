@@ -10,7 +10,7 @@ import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation } from '../../../../services/binance/types'
 import { SendTxParams } from '../../../../services/bitcoin/types'
 import { AssetWithBalance, AssetsWithBalance } from '../../../../services/wallet/types'
-import SendFormBTC from './SendFormBTC'
+import { SendFormBTC } from './index'
 
 const bnbAsset: AssetWithBalance = {
   asset: AssetBTC,

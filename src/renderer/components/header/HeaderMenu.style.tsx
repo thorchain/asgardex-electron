@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
-import Menu from '../shared/Menu'
+import { Menu } from '../shared/menu'
 
 export const HeaderDropdownWrapper = styled.div`
   width: 100%;

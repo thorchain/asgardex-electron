@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import UIButton from '../button'
+import { Button as UIButton } from '../button'
 
 export const SelectionWrapper = styled.div`
   display: flex;

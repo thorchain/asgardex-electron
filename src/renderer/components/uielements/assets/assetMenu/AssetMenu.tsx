@@ -4,8 +4,8 @@ import { Asset, assetToString, baseAmount } from '@thorchain/asgardex-util'
 
 import { eqAsset } from '../../../../helpers/fp/eq'
 import { PriceDataIndex } from '../../../../services/midgard/types'
-import FilterMenu from '../../filterMenu'
-import AssetData from '../assetData'
+import { FilterMenu } from '../../filterMenu'
+import { AssetData } from '../assetData/AssetData'
 
 const filterFunction = (asset: Asset, searchTerm: string) => {
   const { ticker } = asset
@@ -23,7 +23,7 @@ type Props = {
   searchPlaceholder?: string
 }
 
-const AssetMenu: React.FC<Props> = (props): JSX.Element => {
+export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
   const {
     searchPlaceholder,
     assets,
@@ -64,5 +64,3 @@ const AssetMenu: React.FC<Props> = (props): JSX.Element => {
     />
   )
 }
-
-export default AssetMenu

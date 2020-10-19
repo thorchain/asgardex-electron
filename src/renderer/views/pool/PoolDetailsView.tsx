@@ -8,8 +8,8 @@ import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import PoolDetails, { Props as PoolDetailProps } from '../../components/pool/PoolDetails'
-import PoolStatus from '../../components/uielements/poolStatus'
+import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
+import { PoolStatus } from '../../components/uielements/poolStatus'
 import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { PoolDetail } from '../../types/generated/midgard/models'
@@ -41,7 +41,7 @@ const defaultDetailsProps: PoolDetailProps = {
 const renderPendingView = () => <PoolDetails {...defaultDetailsProps} isLoading={true} />
 const renderInitialView = () => <PoolDetails {...defaultDetailsProps} />
 
-const PoolDetailsView: React.FC = () => {
+export const PoolDetailsView: React.FC = () => {
   const {
     service: {
       pools: { poolDetail$, priceRatio$, selectedPricePoolAssetSymbol$ }
@@ -80,5 +80,3 @@ const PoolDetailsView: React.FC = () => {
     )
   )
 }
-
-export default PoolDetailsView

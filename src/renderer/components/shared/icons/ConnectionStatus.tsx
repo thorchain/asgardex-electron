@@ -18,12 +18,10 @@ type Props = {
 
 type ConnectionStatusProps = Props & React.HTMLProps<HTMLDivElement>
 
-const ConnectionStatus = styled.div<ConnectionStatusProps>`
+export const ConnectionStatus = styled.div<ConnectionStatusProps>`
   width: 14px;
   height: 14px;
   border: none;
   border-radius: 50%;
   background-color: ${(props) => colors[props.color] || colors.red};
 `
-
-export default ConnectionStatus

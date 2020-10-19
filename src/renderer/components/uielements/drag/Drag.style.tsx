@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import BaseAssetIcon from '../assets/assetIcon'
-import Label from '../label'
+import { AssetIcon as BaseAssetIcon } from '../assets/assetIcon'
+import { Label } from '../label'
 
 type DragWrapperProps = {
   dragging: boolean

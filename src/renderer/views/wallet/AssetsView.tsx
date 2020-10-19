@@ -5,7 +5,7 @@ import { Asset, assetToString } from '@thorchain/asgardex-util'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
-import AssetsTableCollapsable from '../../components/wallet/assets/AssetsTableCollapsable'
+import { AssetsTableCollapsable } from '../../components/wallet/assets/AssetsTableCollapsable'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import {} from '../../helpers/assetHelper'
@@ -13,7 +13,7 @@ import { getDefaultRunePricePool } from '../../helpers/poolHelper'
 import * as walletRoutes from '../../routes/wallet'
 import { AssetsWBChains } from '../../services/wallet/types'
 
-const AssetsView: React.FC = (): JSX.Element => {
+export const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
   const { assetsWBChains$ } = useWalletContext()
 
@@ -45,5 +45,3 @@ const AssetsView: React.FC = (): JSX.Element => {
     />
   )
 }
-
-export default AssetsView

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import Label from '../../components/uielements/label'
+import { Label } from '../../components/uielements/label'
 
 export const TableAction = styled.div`
   display: flex;

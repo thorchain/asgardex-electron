@@ -3,11 +3,11 @@ import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 
-import Label from '../../../components/uielements/label'
+import { Label } from '../../../components/uielements/label'
 import * as walletRoutes from '../../../routes/wallet'
 import * as Styled from './NoWalletView.styles'
 
-const NoWalletView = () => {
+export const NoWalletView = () => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -41,5 +41,3 @@ const NoWalletView = () => {
     </Styled.ViewContainer>
   )
 }
-
-export default NoWalletView

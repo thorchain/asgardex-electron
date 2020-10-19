@@ -7,20 +7,18 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 
-import ErrorView from '../../../components/shared/error/ErrorView'
-import BackLink from '../../../components/uielements/backLink'
+import { ErrorView } from '../../../components/shared/error/'
+import { BackLink } from '../../../components/uielements/backLink'
 import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
 import { INITIAL_ASSETS_WB_STATE } from '../../../services/wallet/const'
-import SendViewBNB from './SendViewBNB'
-import SendViewBTC from './SendViewBTC'
-import SendViewETH from './SendViewETH'
+import { SendViewBNB, SendViewBTC, SendViewETH } from './index'
 
 type Props = {}
 
-const SendView: React.FC<Props> = (): JSX.Element => {
+export const SendView: React.FC<Props> = (): JSX.Element => {
   const { asset } = useParams<SendParams>()
   const intl = useIntl()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
@@ -85,5 +83,3 @@ const SendView: React.FC<Props> = (): JSX.Element => {
     )
   )
 }
-
-export default SendView

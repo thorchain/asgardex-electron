@@ -3,8 +3,8 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import UILabel from '../../../components/uielements/label'
-import UITable from '../../uielements/table'
+import { Label as UILabel } from '../../../components/uielements/label'
+import { Table as UITable } from '../../uielements/table'
 
 export const Table = styled(UITable)`
   .ant-table-tbody > tr > td {

@@ -22,14 +22,14 @@ import * as walletRoutes from '../../routes/wallet'
 import { PoolsStateRD, SelectedPricePoolAsset } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked, hasImportedKeystore } from '../../services/wallet/util'
-import { PricePoolAsset, PricePoolAssets } from '../../views/pools/types'
+import { PricePoolAsset, PricePoolAssets } from '../../views/pools/Pools.types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './HeaderComponent.style'
-import HeaderLang from './HeaderLang'
-import HeaderLock from './HeaderLock'
-import HeaderNetStatus from './HeaderNetStatus'
-import HeaderPriceSelector from './HeaderPriceSelector'
-import HeaderSettings from './HeaderSettings'
-import HeaderTheme from './HeaderTheme'
+import { HeaderLang } from './lang'
+import { HeaderLock } from './lock/'
+import { HeaderNetStatus } from './netstatus'
+import { HeaderPriceSelector } from './price'
+import { HeaderSettings } from './settings'
+import { HeaderTheme } from './theme'
 
 enum TabKey {
   POOLS = 'pools',
@@ -56,7 +56,7 @@ type Props = {
   binanceUrl: O.Option<string>
 }
 
-const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
+export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const {
     keystore,
     poolsState$,
@@ -315,5 +315,3 @@ const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     </HeaderContainer>
   )
 }
-
-export default HeaderComponent

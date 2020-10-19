@@ -71,4 +71,3 @@ export const AssetsNav: React.FC = (): JSX.Element => {
     </StyledMenu>
   )
 }
-export default AssetsNav

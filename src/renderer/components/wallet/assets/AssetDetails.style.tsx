@@ -2,8 +2,8 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import Headline from '../../uielements/headline'
-import UILabel from '../../uielements/label'
+import { Headline } from '../../uielements/headline'
+import { Label as UILabel } from '../../uielements/label'
 
 export const Divider = styled(A.Divider)`
   margin: 0px;

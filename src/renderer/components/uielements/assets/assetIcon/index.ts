@@ -1,3 +1,1 @@
-import AssetIcon from './AssetIcon'
-
-export default AssetIcon
+export { AssetIcon } from './AssetIcon'

@@ -3,7 +3,7 @@ import React from 'react'
 import { withKnobs, boolean, number } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 
-import TxTimer from './TxTimer'
+import { TxTimer } from './index'
 
 storiesOf('Components/TxTimer', module)
   .addDecorator(withKnobs)

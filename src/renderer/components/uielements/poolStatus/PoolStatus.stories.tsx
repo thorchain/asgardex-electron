@@ -3,7 +3,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { bn, assetAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 
-import PoolStatus from './PoolStatus'
+import { PoolStatus } from './PoolStatus'
 
 storiesOf('Components/PoolStatus', module).add('default', () => {
   return (

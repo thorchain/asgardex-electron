@@ -2,7 +2,7 @@ import React from 'react'
 
 import { storiesOf } from '@storybook/react'
 
-import StepBar from './StepBar'
+import { StepBar } from './index'
 
 storiesOf('Components/StepBar', module).add('default', () => {
   return (

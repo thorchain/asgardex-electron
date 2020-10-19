@@ -9,7 +9,7 @@ import { getDefaultRuneAsset } from '../../helpers/assetHelper'
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { StakeType } from '../../types/asgardex'
-import { AddWallet } from '../wallet/AddWallet'
+import { AddWallet } from '../wallet/add'
 import * as Styled from './Stake.styles'
 
 type TabKey = 'stake-sym' | 'stake-asym' | 'withdraw'

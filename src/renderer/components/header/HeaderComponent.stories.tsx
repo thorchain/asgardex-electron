@@ -8,7 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { Locale } from '../../../shared/i18n/types'
-import HeaderComponent from './HeaderComponent'
+import { HeaderComponent } from './HeaderComponent'
 
 const binanceUrl = O.some('https://testnet-dex.binance.org/api/v1')
 const midgardUrl = O.some('https://54.0.0.27')

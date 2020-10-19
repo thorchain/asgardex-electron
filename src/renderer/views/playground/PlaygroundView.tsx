@@ -10,9 +10,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { PoolsState } from '../../services/midgard/types'
 
-type Props = {}
-
-const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
+export const PlaygroundView: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
   const { subscribeTransfers, miniTickers$ } = useBinanceContext()
@@ -85,5 +83,3 @@ const PlaygroundView: React.FC<Props> = (_): JSX.Element => {
     </>
   )
 }
-
-export default PlaygroundView

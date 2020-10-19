@@ -19,9 +19,9 @@ import { BTC_DECIMAL, isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
-import Label from '../../label'
-import Slider from '../../slider'
-import AssetMenu from '../assetMenu'
+import { Label } from '../../label'
+import { Slider } from '../../slider'
+import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.style'
 
 type Props = {
@@ -43,7 +43,7 @@ type Props = {
   disabled?: boolean
 }
 
-const AssetCard: React.FC<Props> = (props): JSX.Element => {
+export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
     assets = [],
@@ -179,5 +179,3 @@ const AssetCard: React.FC<Props> = (props): JSX.Element => {
     </Styled.AssetCardWrapper>
   )
 }
-
-export default AssetCard

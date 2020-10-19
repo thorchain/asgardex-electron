@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { key, palette } from 'styled-theme'
 
-import Label from '../label'
+import { Label } from '../label'
 
 export const Wrapper = styled('div')`
   padding: ${key('sizes.gutter.vertical')};

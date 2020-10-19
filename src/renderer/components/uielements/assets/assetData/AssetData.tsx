@@ -9,9 +9,9 @@ import {
   Asset
 } from '@thorchain/asgardex-util'
 
-import { PricePoolAsset } from '../../../../views/pools/types'
-import Label from '../../label'
-import AssetIcon from '../assetIcon'
+import { PricePoolAsset } from '../../../../views/pools/Pools.types'
+import { Label } from '../../label'
+import { AssetIcon } from '../assetIcon'
 import { CoinDataWrapper, CoinDataWrapperType, CoinDataWrapperSize } from './AssetData.style'
 
 type Props = {
@@ -28,7 +28,7 @@ type Props = {
   type?: CoinDataWrapperType
 }
 
-const AssetData: React.FC<Props> = (props): JSX.Element => {
+export const AssetData: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
     assetValue,
@@ -80,5 +80,3 @@ const AssetData: React.FC<Props> = (props): JSX.Element => {
     </CoinDataWrapper>
   )
 }
-
-export default AssetData

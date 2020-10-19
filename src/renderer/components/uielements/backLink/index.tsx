@@ -1,3 +1,1 @@
-import BackLink from './BackLink'
-
-export default BackLink
+export { BackLink } from './BackLink'

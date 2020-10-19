@@ -6,7 +6,7 @@ type Props = {
   size?: number
 }
 
-const StepBar: React.FC<Props> = ({ size = 150, ...rest }): JSX.Element => {
+export const StepBar: React.FC<Props> = ({ size = 150, ...rest }): JSX.Element => {
   return (
     <StepBarWrapper size={size} {...rest}>
       <div className="step-start-dot" />
@@ -15,5 +15,3 @@ const StepBar: React.FC<Props> = ({ size = 150, ...rest }): JSX.Element => {
     </StepBarWrapper>
   )
 }
-
-export default StepBar

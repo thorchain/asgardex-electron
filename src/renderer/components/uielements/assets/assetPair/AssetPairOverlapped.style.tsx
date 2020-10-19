@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 import { sizes } from '../assetIcon/AssetIcon.style'
-import { Size as CoinSize } from '../assetIcon/types'
+import { Size as CoinSize } from '../assetIcon/AssetIcon.types'
 
 type WrapperProps = {
   size: CoinSize

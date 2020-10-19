@@ -2,8 +2,8 @@ import React from 'react'
 
 import { storiesOf } from '@storybook/react'
 
-import Button from '../../uielements/button'
-import SuccessView from './SuccessView'
+import { Button } from '../../uielements/button'
+import { SuccessView } from './index'
 
 storiesOf('Components/SuccessView', module)
   .add('default', () => {

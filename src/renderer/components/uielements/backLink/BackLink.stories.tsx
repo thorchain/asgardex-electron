@@ -2,7 +2,7 @@ import React from 'react'
 
 import { storiesOf } from '@storybook/react'
 
-import BackLink from './BackLink'
+import { BackLink } from './BackLink'
 
 storiesOf('Components/BackLink', module).add('default', () => {
   return (

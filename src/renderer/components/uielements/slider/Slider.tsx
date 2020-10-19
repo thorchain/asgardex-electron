@@ -12,7 +12,7 @@ type CustomProps = {
 
 type Props = CustomProps & SliderSingleProps
 
-const Slider: React.FC<Props> = ({
+export const Slider: React.FC<Props> = ({
   tooltipPlacement = 'bottom',
   withLabel = false,
   tipFormatter = (value) => `${value}%`,
@@ -40,5 +40,3 @@ const Slider: React.FC<Props> = ({
     </>
   )
 }
-
-export default Slider

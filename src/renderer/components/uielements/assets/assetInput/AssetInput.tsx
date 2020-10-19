@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import { FixmeType } from '../../../../types/asgardex'
 import { InputBigNumber } from '../../input'
 import { AssetInputWrapper } from './AssetInput.style'
-import { AssetInputProps } from './types'
+import { AssetInputProps } from './AssetInput.types'
 
 type Props = {
   title: string
@@ -17,7 +17,7 @@ type Props = {
   className?: string
 }
 
-const AssetInput: React.FC<Props> = (props): JSX.Element => {
+export const AssetInput: React.FC<Props> = (props): JSX.Element => {
   const { title, amount, status, label, inputProps = {}, className = '', onChange, ...otherProps } = props
 
   const inputRef = useRef<FixmeType>()
@@ -46,5 +46,3 @@ const AssetInput: React.FC<Props> = (props): JSX.Element => {
     </AssetInputWrapper>
   )
 }
-
-export default AssetInput

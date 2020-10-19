@@ -1,3 +1,1 @@
-import AssetInput from './AssetInput'
-
-export default AssetInput
+export { AssetInput } from './AssetInput'

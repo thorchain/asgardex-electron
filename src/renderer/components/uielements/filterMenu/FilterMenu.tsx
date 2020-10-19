@@ -20,7 +20,7 @@ type Props<T> = {
   closeMenu?: () => void
 }
 
-const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
+export const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
   const {
     onSelect = (_) => {},
     searchEnabled = false,
@@ -90,5 +90,3 @@ const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
     </div>
   )
 }
-
-export default FilterMenu

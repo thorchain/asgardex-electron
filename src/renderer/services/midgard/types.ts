@@ -14,7 +14,7 @@ import {
   ThorchainEndpoint,
   StakersAssetData
 } from '../../types/generated/midgard'
-import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/types'
+import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 
 export type PoolAsset = string
 export type PoolStringAssets = string[]

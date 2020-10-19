@@ -6,8 +6,8 @@ import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import { AssetWithAmount } from '../../../types/asgardex'
-import AssetData from '../assets/assetData'
-import FilterMenu from './FilterMenu'
+import { AssetData } from '../assets/assetData'
+import { FilterMenu } from './FilterMenu'
 
 storiesOf('Components/FilterMenu', module).add('coins example', () => {
   const filterFunction = (item: AssetWithAmount, searchTerm: string) => {

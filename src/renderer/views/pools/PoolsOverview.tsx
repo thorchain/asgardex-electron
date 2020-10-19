@@ -11,12 +11,12 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import ErrorView from '../../components/shared/error/ErrorView'
-import AssetIcon from '../../components/uielements/assets/assetIcon'
-import Button from '../../components/uielements/button'
-import Label from '../../components/uielements/label'
-import Table from '../../components/uielements/table'
-import Trend from '../../components/uielements/trend'
+import { ErrorView } from '../../components/shared/error/'
+import { AssetIcon } from '../../components/uielements/assets/assetIcon'
+import { Button } from '../../components/uielements/button'
+import { Label } from '../../components/uielements/label'
+import { Table } from '../../components/uielements/table'
+import { Trend } from '../../components/uielements/trend'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
@@ -29,13 +29,11 @@ import { Network } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState } from '../../services/midgard/types'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
+import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
+import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
-import { PoolTableRowData, PoolTableRowsData } from './types'
-import { getBlocksLeftForPendingPoolAsString } from './utils'
 
-type Props = {}
-
-const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
+export const PoolsOverview: React.FC = (): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -472,5 +470,3 @@ const PoolsOverview: React.FC<Props> = (_): JSX.Element => {
     </>
   )
 }
-
-export default PoolsOverview

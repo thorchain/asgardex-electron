@@ -12,7 +12,7 @@ import {
 import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
 import { Network } from '../services/app/types'
 import { DEFAULT_NETWORK } from '../services/const'
-import { PricePoolAsset } from '../views/pools/types'
+import { PricePoolAsset } from '../views/pools/Pools.types'
 import { eqAsset } from './fp/eq'
 
 /**
