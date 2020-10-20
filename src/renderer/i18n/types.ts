@@ -170,6 +170,7 @@ type StakeMessageKey =
   | 'stake.withdraw.receiveText'
   | 'stake.withdraw.fee'
   | 'stake.withdraw.feeNote'
+  | 'stake.withdraw.drag'
 
 export type StakeMessages = { [key in StakeMessageKey]: string }
 

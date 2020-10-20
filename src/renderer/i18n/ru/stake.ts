@@ -25,7 +25,8 @@ const stake: StakeMessages = {
   'stake.withdraw.choseText': 'Выберите сколько вы хотите изять от 0% до 100%',
   'stake.withdraw.receiveText': 'Вы полчучите',
   'stake.withdraw.fee': 'Комиссия',
-  'stake.withdraw.feeNote': 'Важно: {fee} BNB останется на вашем кошельке для покрытия комисий.'
+  'stake.withdraw.feeNote': 'Важно: {fee} BNB останется на вашем кошельке для покрытия комисий.',
+  'stake.withdraw.drag': 'Перетащите для изъявтия'
 }
 
 export default stake

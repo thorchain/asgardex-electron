@@ -23,9 +23,10 @@ const stake: StakeMessages = {
   'stake.pool.noStakes': "You don't have any shares in this pool",
   'stake.withdraw.title': 'Adjust withdrawal',
   'stake.withdraw.choseText': 'Choose from 0 to 100% of how much to withdraw.',
-  'stake.withdraw.receiveText': 'You receive.',
+  'stake.withdraw.receiveText': 'You should receive.',
   'stake.withdraw.fee': 'Fee',
-  'stake.withdraw.feeNote': 'Note: {fee} BNB will be left in your wallet for the transaction fees.'
+  'stake.withdraw.feeNote': 'Note: {fee} BNB will be left in your wallet for the transaction fees.',
+  'stake.withdraw.drag': 'Drag to withdraw'
 }
 
 export default stake
