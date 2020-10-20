@@ -10,7 +10,7 @@ import { isMiniToken } from '../../helpers/binanceHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { getRunePricePool } from '../../helpers/poolHelper'
 import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
-import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/types'
+import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { AssetDetails, AssetDetailMap, PoolDetails, PoolsStateRD, SelectedPricePoolAsset } from './types'
 
 export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} => {

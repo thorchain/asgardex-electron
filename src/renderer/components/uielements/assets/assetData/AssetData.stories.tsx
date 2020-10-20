@@ -4,7 +4,7 @@ import { storiesOf } from '@storybook/react'
 import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
 
 import { ASSETS_MAINNET } from '../../../../../shared/mock/assets'
-import AssetData from './AssetData'
+import { AssetData } from './AssetData'
 
 const assetValue = assetToBase(assetAmount(2.49274))
 const targetValue = assetToBase(assetAmount(0.49555))

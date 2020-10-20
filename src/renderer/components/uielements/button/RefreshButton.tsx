@@ -10,7 +10,7 @@ type Props = {
   clickHandler?: () => void
 }
 
-const RefreshButton: React.FC<Props> = (props): JSX.Element => {
+export const RefreshButton: React.FC<Props> = (props): JSX.Element => {
   const { label, clickHandler = () => {} } = props
   const intl = useIntl()
 
@@ -21,5 +21,3 @@ const RefreshButton: React.FC<Props> = (props): JSX.Element => {
     </Styled.RefreshButton>
   )
 }
-
-export default RefreshButton

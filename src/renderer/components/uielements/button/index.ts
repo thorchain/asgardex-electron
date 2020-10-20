@@ -1,6 +1,4 @@
-import Button from './button'
-import RefreshButton from './RefreshButton'
+import { Button } from './Button'
+import { RefreshButton } from './RefreshButton'
 
-export { RefreshButton }
-
-export default Button
+export { RefreshButton, Button }

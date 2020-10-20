@@ -1,3 +1,1 @@
-import StepBar from './StepBar'
-
-export default StepBar
+export { StepBar } from './StepBar'

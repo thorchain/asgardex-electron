@@ -7,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { getRunePricePool } from '../../../helpers/poolHelper'
 import { ApiError, AssetsWBChain, AssetsWBChains, ErrorId } from '../../../services/wallet/types'
-import AssetsTableCollapsable from './AssetsTableCollapsable'
+import { AssetsTableCollapsable } from './index'
 
 const assetsWBChainRUNE: AssetsWBChain = {
   address: 'thor1766mazrxs5asuscepa227r6ekr657234f8p7nf',

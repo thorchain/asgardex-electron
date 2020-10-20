@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
-import UIButton from '../../../uielements/button'
-import { Label } from '../Form.style'
+import { Button as UIButton } from '../../../uielements/button'
+import { Label } from '../TxForm.style'
 
 export const FeeLabel = styled(Label)`
   margin-bottom: 0;

@@ -3,9 +3,7 @@ import React, { useCallback } from 'react'
 import { Button } from 'antd'
 import { useHistory } from 'react-router-dom'
 
-type Props = {}
-
-const NoContentView: React.FC<Props> = (_): JSX.Element => {
+export const NoContentView: React.FC = (): JSX.Element => {
   const history = useHistory()
 
   const goBack = history.goBack
@@ -19,5 +17,3 @@ const NoContentView: React.FC<Props> = (_): JSX.Element => {
     </>
   )
 }
-
-export default NoContentView

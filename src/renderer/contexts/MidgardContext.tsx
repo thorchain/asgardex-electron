@@ -11,11 +11,7 @@ const initialContext: MidgardContextValue = {
 }
 const MidgardContext = createContext<MidgardContextValue | null>(null)
 
-type Props = {
-  children: React.ReactNode
-}
-
-export const MidgardProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
+export const MidgardProvider: React.FC = ({ children }): JSX.Element => {
   return <MidgardContext.Provider value={initialContext}>{children}</MidgardContext.Provider>
 }
 

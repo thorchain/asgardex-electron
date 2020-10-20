@@ -9,9 +9,9 @@ export type Pair = {
   target: Option<string>
 }
 
-export type AssetPair = {
+export type AssetWithAmount = {
   asset: Asset
-  price: BaseAmount
+  amount: BaseAmount
 }
 
 export enum TxTypes {
@@ -20,6 +20,8 @@ export enum TxTypes {
   WITHDRAW = 'withdraw',
   CREATE = 'create'
 }
+
+export type StakeType = 'sym' | 'asym'
 
 export const MAX_VALUE = 100
 

@@ -12,10 +12,10 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
-import ErrorView from '../../components/shared/error/ErrorView'
+import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap/Swap'
-import BackLink from '../../components/uielements/backLink'
-import Button from '../../components/uielements/button'
+import { BackLink } from '../../components/uielements/backLink'
+import { Button } from '../../components/uielements/button'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -28,13 +28,13 @@ import * as Styled from './SwapView.styles'
 
 type Props = {}
 
-const SwapView: React.FC<Props> = (_): JSX.Element => {
+export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { source, target } = useParams<SwapRouteParams>()
   const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, poolAddresses$, reloadPoolsState, runeAsset$, selectedPricePool$ }
+    pools: { poolsState$, poolAddresses$, reloadPools, runeAsset$, selectedPricePool$ }
   } = midgardService
   const { transaction, explorerUrl$ } = useBinanceContext()
   const { assetsWBState$ } = useWalletContext()
@@ -88,10 +88,10 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
       <ErrorView
         title={intl.formatMessage({ id: 'common.error' })}
         subTitle={e.message}
-        extra={<Button onClick={reloadPoolsState}>{intl.formatMessage({ id: 'common.retry' })}</Button>}
+        extra={<Button onClick={reloadPools}>{intl.formatMessage({ id: 'common.retry' })}</Button>}
       />
     ),
-    [reloadPoolsState, intl]
+    [intl, reloadPools]
   )
 
   return (
@@ -137,5 +137,3 @@ const SwapView: React.FC<Props> = (_): JSX.Element => {
     </>
   )
 }
-
-export default SwapView

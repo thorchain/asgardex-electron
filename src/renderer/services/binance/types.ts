@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balances, BinanceClient, Transfer, Fees, TxPage, WS } from '@thorchain/asgardex-binance'
+import { Balances, BinanceClient, Transfer, Fees, WS } from '@thorchain/asgardex-binance'
 import { Asset, AssetAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
@@ -18,8 +18,6 @@ export type AssetWithPrice = {
 }
 
 export type AssetsWithPrice = AssetWithPrice[]
-
-export type TxsRD = RD.RemoteData<Error, TxPage>
 
 export type BinanceClientState = ClientState<BinanceClient>
 export type BinanceClientState$ = Rx.Observable<ClientState<BinanceClient>>
@@ -70,6 +68,7 @@ export type TransferFees = {
 
 export type FeeRD = RD.RemoteData<Error, AssetAmount>
 export type FeesRD = RD.RemoteData<Error, Fees>
+export type FeesLD = LiveData<Error, Fees>
 export type TransferFeesRD = RD.RemoteData<Error, TransferFees>
 
 export type LoadTxsProps = {

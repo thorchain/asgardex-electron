@@ -1,1 +1,1 @@
-export { default } from './NoWalletView'
+export { NoWalletView } from './NoWalletView'

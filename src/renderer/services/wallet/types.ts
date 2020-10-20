@@ -36,6 +36,7 @@ export type AssetWithBalance = {
 export type AssetsWithBalance = AssetWithBalance[]
 export type NonEmptyAssetsWithBalance = NonEmptyArray<AssetWithBalance>
 
+export type AssetsWithBalanceLD = LiveData<ApiError, AssetsWithBalance>
 export type AssetsWithBalanceRD = RD.RemoteData<ApiError, AssetsWithBalance>
 export type AssetWithBalanceRD = RD.RemoteData<ApiError, AssetWithBalance>
 
@@ -55,8 +56,49 @@ export type AssetsWithBalanceState = {
   loading: boolean
 }
 
+export type AssetTxType = 'transfer' | 'freeze' | 'unfreeze' | 'unkown'
+
+export type AssetTxFrom = {
+  from: string // address or tx id
+  amount?: BaseAmount // amount sent from
+}
+
+export type AssetTxTo = {
+  to: string // to address
+  amount: BaseAmount // amount to send
+}
+
+export type AssetTx = {
+  asset: O.Option<Asset> // asset
+  from: AssetTxFrom[] // from address
+  to: AssetTxTo[] // to addresses
+  date: Date // timestamp of tx
+  type: AssetTxType // type
+  hash: string // Tx hash
+}
+
+export type AssetTxs = AssetTx[]
+
+export type AssetTxsPage = {
+  total: number
+  txs: AssetTxs
+}
+
+export type AssetTxsPageRD = RD.RemoteData<ApiError, AssetTxsPage>
+export type AssetTxsPageLD = LiveData<ApiError, AssetTxsPage>
+
+export type LoadAssetTxsProps = {
+  limit: number
+  offset: number
+}
+
+export type LoadAssetTxsHandler = (props: LoadAssetTxsProps) => void
+
+export type LoadBalancesHandler = () => void
+
 export enum ErrorId {
   GET_BALANCES,
+  GET_ASSET_TXS,
   SEND_TX
 }
 

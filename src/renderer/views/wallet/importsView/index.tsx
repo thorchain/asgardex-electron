@@ -1,3 +1,1 @@
-import ImportsView from './ImportsView'
-
-export default ImportsView
+export { ImportsView } from './ImportsView'

@@ -1,5 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, assetToString, bn, currencySymbolByAsset } from '@thorchain/asgardex-util'
+import {
+  Asset,
+  assetFromString,
+  assetToString,
+  bn,
+  currencySymbolByAsset,
+  isValidAsset
+} from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -7,27 +14,29 @@ import { some } from 'fp-ts/Option'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import { combineLatest } from 'rxjs'
-import { catchError, map, retry, shareReplay, startWith, switchMap, filter } from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { getRuneAsset, isPricePoolAsset } from '../../helpers/assetHelper'
+import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { DefaultApi, GetPoolsDetailsViewEnum } from '../../types/generated/midgard/apis'
 import { PoolDetail } from '../../types/generated/midgard/models'
-import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/types'
+import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import {
   AssetDetailsLD,
-  PoolAssetsLD,
+  PoolStringAssetsLD,
   PoolDetailLD,
   PoolDetailsLD,
   PoolsService,
   PoolsStateLD,
   SelectedPricePoolAsset,
-  ThorchainEndpointsLD
+  ThorchainEndpointsLD,
+  PoolAssetsLD
 } from './types'
 import { getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
 
@@ -42,22 +51,23 @@ const getStoredSelectedPricePoolAsset = (): SelectedPricePoolAsset =>
     O.filter(isPricePoolAsset)
   )
 
-const runeAsset$: Rx.Observable<Asset> = network$.pipe(map((network) => getRuneAsset({ network, chain: 'BNB' })))
+const runeAsset$: Rx.Observable<Asset> = network$.pipe(RxOp.map((network) => getRuneAsset({ network, chain: 'BNB' })))
 
 const createPoolsService = (
   byzantine$: LiveData<Error, string>,
-  getMidgardDefaultApi: (basePath: string) => DefaultApi
+  getMidgardDefaultApi: (basePath: string) => DefaultApi,
+  selectedPoolAsset$: Rx.Observable<O.Option<Asset>>
 ): PoolsService => {
   /**
    * Get data of `Pools` from Midgard
    */
   const apiGetPools$ = byzantine$.pipe(
-    map(RD.map(getMidgardDefaultApi)),
+    RxOp.map(RD.map(getMidgardDefaultApi)),
     liveData.chain((api) =>
       FP.pipe(
         api.getPools(),
-        map(RD.success),
-        catchError((e: Error) => Rx.of(RD.failure(e)))
+        RxOp.map(RD.success),
+        RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
     )
   )
@@ -71,8 +81,8 @@ const createPoolsService = (
       liveData.chain((endpoint) =>
         FP.pipe(
           getMidgardDefaultApi(endpoint).getAssetInfo({ asset }),
-          map(RD.success),
-          catchError((e: Error) => Rx.of(RD.failure(e)))
+          RxOp.map(RD.success),
+          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
       )
     )
@@ -88,8 +98,9 @@ const createPoolsService = (
             asset,
             view: isDetailed ? GetPoolsDetailsViewEnum.Full : GetPoolsDetailsViewEnum.Simple
           }),
-          map(RD.success),
-          catchError((e: Error) => Rx.of(RD.failure(e)))
+          // error if no pools are available
+          RxOp.map((assets) => (assets.length > 0 ? RD.success(assets) : RD.failure(new Error('No pools available')))),
+          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
       )
     )
@@ -98,36 +109,36 @@ const createPoolsService = (
    * Loading queue to get all needed data for `PoolsState`
    */
   const loadPoolsStateData$ = (): PoolsStateLD => {
-    const poolAssets$: PoolAssetsLD = FP.pipe(apiGetPools$, shareReplay(1))
+    const poolAssets$: PoolStringAssetsLD = FP.pipe(apiGetPools$, RxOp.shareReplay(1))
 
     const assetDetails$: AssetDetailsLD = FP.pipe(
       poolAssets$,
       liveData.map((assets) => assets.join(',')),
       liveData.chain(apiGetAssetInfo$),
-      shareReplay(1)
+      RxOp.shareReplay(1)
     )
 
     const poolDetails$: PoolDetailsLD = FP.pipe(
       poolAssets$,
       liveData.map((assets) => assets.join(',')),
       liveData.chain(apiGetPoolsData$),
-      shareReplay(1)
+      RxOp.shareReplay(1)
     )
 
     const pricePools$: LiveData<Error, O.Option<PricePools>> = combineLatest([poolDetails$, runeAsset$]).pipe(
-      map(([poolDetailsRD, runeAsset]) =>
+      RxOp.map(([poolDetailsRD, runeAsset]) =>
         FP.pipe(
           poolDetailsRD,
           RD.map((poolDetails) => some(getPricePools(poolDetails, runeAsset, PRICE_POOLS_WHITELIST)))
         )
       ),
-      shareReplay(1)
+      RxOp.shareReplay(1)
     )
 
     return FP.pipe(
       combineLatest([poolAssets$, assetDetails$, poolDetails$, pricePools$]),
-      map((state) => RD.combine(...state)),
-      map(
+      RxOp.map((state) => RD.combine(...state)),
+      RxOp.map(
         RD.map(([poolAssets, assetDetails, poolDetails, pricePools]) => {
           const prevAsset = getSelectedPricePoolAsset()
           const nullablePricePools = O.toNullable(pricePools)
@@ -143,39 +154,57 @@ const createPoolsService = (
           }
         })
       ),
-      startWith(RD.pending),
-      catchError((error: Error) => Rx.of(RD.failure(error))),
-      retry(MIDGARD_MAX_RETRY)
+      RxOp.startWith(RD.pending),
+      RxOp.catchError((error: Error) => Rx.of(RD.failure(error))),
+      RxOp.retry(MIDGARD_MAX_RETRY)
     )
   }
 
   // `TriggerStream` to reload data of pools
-  const { stream$: reloadPoolsState$, trigger: reloadPoolsState } = triggerStream()
+  const { stream$: reloadPools$, trigger: reloadPools } = triggerStream()
 
   /**
    * State of all pool data
    */
-  const poolsState$: PoolsStateLD = reloadPoolsState$.pipe(
+  const poolsState$: PoolsStateLD = reloadPools$.pipe(
     // start loading queue
-    switchMap(loadPoolsStateData$),
+    RxOp.switchMap(loadPoolsStateData$),
     // cache it to avoid reloading data by every subscription
-    shareReplay(1)
+    RxOp.shareReplay(1)
   )
 
   // `TriggerStream` to reload detailed data of pool
-  const { get$: reloadPoolDetailedState$, set: reloadPoolDetailedState } = observableState<O.Option<Asset>>(O.none)
+  const { stream$: reloadPoolDetail$, trigger: reloadPoolDetail } = triggerStream()
 
-  const poolDetailedState$: PoolDetailLD = reloadPoolDetailedState$.pipe(
-    filter(O.isSome),
-    switchMap((asset) => apiGetPoolsData$(assetToString(asset.value), true)),
+  /**
+   * Stream of `PoolDetail` data
+   * It's triggered by changes of `reloadPoolDetail$` or `selectedPoolAsset$`
+   */
+  const poolDetail$: PoolDetailLD = combineLatest([reloadPoolDetail$, selectedPoolAsset$]).pipe(
+    RxOp.filter(([_, selectedPoolAsset]) => O.isSome(selectedPoolAsset)),
+    RxOp.switchMap(([_, selectedPoolAsset]) =>
+      FP.pipe(
+        selectedPoolAsset,
+        O.fold(
+          () => Rx.of(RD.initial),
+          (asset) => apiGetPoolsData$(assetToString(asset), true)
+        )
+      )
+    ),
     liveData.chain(
       FP.flow(
         A.head,
         liveData.fromOption(() => Error('Empty response'))
       )
     ),
-    startWith(RD.pending),
-    shareReplay(1)
+    RxOp.startWith(RD.pending),
+    RxOp.shareReplay(1)
+  )
+
+  const availableAssets$: PoolAssetsLD = FP.pipe(
+    poolsState$,
+    liveData.map((poolsState) => poolsState.poolAssets),
+    liveData.map(A.filterMap((asset) => O.fromNullable(assetFromString(asset))))
   )
 
   const {
@@ -196,7 +225,7 @@ const createPoolsService = (
    * Selected currency symbol
    */
   const selectedPricePoolAssetSymbol$: Rx.Observable<O.Option<string>> = selectedPricePoolAsset$.pipe(
-    map(O.map(currencySymbolByAsset))
+    RxOp.map(O.map(currencySymbolByAsset))
   )
 
   /**
@@ -207,7 +236,7 @@ const createPoolsService = (
     poolsState$,
     selectedPricePoolAsset$
   ]).pipe(
-    map(([runeAsset, poolsState, selectedPricePoolAsset]) =>
+    RxOp.map(([runeAsset, poolsState, selectedPricePoolAsset]) =>
       pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset, runeAsset)
     )
   )
@@ -217,31 +246,37 @@ const createPoolsService = (
     liveData.chain((endpoint) =>
       FP.pipe(
         getMidgardDefaultApi(endpoint).getThorchainProxiedEndpoints(),
-        map(RD.success),
-        startWith(RD.pending),
-        catchError((e: Error) => Rx.of(RD.failure(e)))
+        RxOp.map(RD.success),
+        RxOp.startWith(RD.pending),
+        RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
     ),
     liveData.map((s) => s.current || []),
-    retry(MIDGARD_MAX_RETRY)
+    RxOp.retry(MIDGARD_MAX_RETRY)
   )
 
   /**
    * Use this to convert asset's price to selected price asset by multiplying to the priceRation inner value
    */
   const priceRatio$: Rx.Observable<BigNumber> = FP.pipe(
-    combineLatest([FP.pipe(poolsState$, map(RD.toOption)), selectedPricePoolAsset$]),
-    map(([pools, selectedAsset]) => sequenceTOption(pools, selectedAsset)),
-    map(
+    combineLatest([FP.pipe(poolsState$, RxOp.map(RD.toOption)), selectedPricePoolAsset$]),
+    RxOp.map(([pools, selectedAsset]) => sequenceTOption(pools, selectedAsset)),
+    RxOp.map(
       O.chain(([pools, selectedAsset]) =>
         FP.pipe(
           pools.assetDetails,
-          A.findFirst((assetDetail) => assetFromString(assetDetail?.asset ?? '') === selectedAsset)
+          A.findFirst((assetDetail) => {
+            const asset = assetFromString(assetDetail?.asset || '')
+            if (!asset || !isValidAsset(asset)) {
+              return false
+            }
+            return eqAsset.equals(asset, selectedAsset)
+          })
         )
       )
     ),
-    map(O.map((detail) => ONE_BN.dividedBy(bn(detail.priceRune || 1)))),
-    map(O.getOrElse(() => ONE_BN))
+    RxOp.map(O.map((detail) => ONE_BN.dividedBy(bn(detail.priceRune || 1)))),
+    RxOp.map(O.getOrElse(() => ONE_BN))
   )
 
   return {
@@ -250,12 +285,13 @@ const createPoolsService = (
     selectedPricePoolAsset$,
     selectedPricePool$,
     selectedPricePoolAssetSymbol$,
-    reloadPoolsState,
+    reloadPools,
     poolAddresses$,
     runeAsset$,
-    poolDetailedState$,
-    reloadPoolDetailedState,
-    priceRatio$
+    poolDetail$,
+    reloadPoolDetail,
+    priceRatio$,
+    availableAssets$
   }
 }
 

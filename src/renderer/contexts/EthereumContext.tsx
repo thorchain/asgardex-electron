@@ -17,11 +17,7 @@ const initialContext: EthereumContextValue = {
 
 const EthereumContext = createContext<EthereumContextValue | null>(null)
 
-type Props = {
-  children: React.ReactNode
-}
-
-export const EthereumProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
+export const EthereumProvider: React.FC = ({ children }): JSX.Element => {
   const { network$ } = useAppContext()
   useSubscription(network$, (network) => setNetworkState(network))
   return <EthereumContext.Provider value={initialContext}>{children}</EthereumContext.Provider>

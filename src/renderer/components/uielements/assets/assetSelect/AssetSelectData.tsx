@@ -3,8 +3,8 @@ import React from 'react'
 import { bn, formatBN, Asset } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
-import Label from '../../label'
-import AssetIcon from '../assetIcon'
+import { Label } from '../../label'
+import { AssetIcon } from '../assetIcon'
 import { AssetSelectDataWrapper, AssetSelectDataWrapperType, AssetSelectDataWrapperSize } from './AssetSelectData.style'
 
 type Props = {
@@ -18,7 +18,7 @@ type Props = {
   showAssetName?: boolean
 }
 
-const AssetSelectData: React.FC<Props> = (props): JSX.Element => {
+export const AssetSelectData: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
     target,
@@ -55,5 +55,3 @@ const AssetSelectData: React.FC<Props> = (props): JSX.Element => {
     </AssetSelectDataWrapper>
   )
 }
-
-export default AssetSelectData

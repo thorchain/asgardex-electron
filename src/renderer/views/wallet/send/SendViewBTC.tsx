@@ -7,8 +7,8 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 
-import Send from '../../../components/wallet/txs/send/Send'
-import SendFormBTC from '../../../components/wallet/txs/send/SendFormBTC'
+import { Send } from '../../../components/wallet/txs/send/'
+import { SendFormBTC } from '../../../components/wallet/txs/send/'
 import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getAssetWBByAsset } from '../../../helpers/walletHelper'
@@ -21,7 +21,7 @@ type Props = {
   reloadFeesHandler: () => void
 }
 
-const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
+export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
   const { btcAsset: selectedAsset, assetsWB, reloadFeesHandler } = props
 
   const oBtcAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
@@ -85,5 +85,3 @@ const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     )
   )
 }
-
-export default SendViewBTC

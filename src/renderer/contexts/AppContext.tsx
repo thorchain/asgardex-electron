@@ -15,11 +15,7 @@ const initialContext: AppContextValue = {
 
 const AppContext = createContext<AppContextValue | null>(null)
 
-type Props = {
-  children: React.ReactNode
-}
-
-export const AppProvider: React.FC<Props> = ({ children }: Props): JSX.Element => (
+export const AppProvider: React.FC = ({ children }): JSX.Element => (
   <AppContext.Provider value={initialContext}>{children}</AppContext.Provider>
 )
 

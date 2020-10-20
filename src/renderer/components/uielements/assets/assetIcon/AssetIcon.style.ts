@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { Size, Sizes, FontSizes } from './types'
+import { Size, Sizes, FontSizes } from './AssetIcon.types'
 
 type IconProps = {
   size: Size

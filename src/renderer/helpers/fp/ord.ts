@@ -1,8 +1,8 @@
-import { BaseAmount } from '@thorchain/asgardex-util'
+import { Asset, assetToString, BaseAmount } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as Ord from 'fp-ts/lib/Ord'
 
-import { eqBaseAmount, egBigNumber } from './eq'
+import { eqBaseAmount, egBigNumber, eqAsset } from './eq'
 
 export const ordBigNumber: Ord.Ord<BigNumber> = {
   equals: egBigNumber.equals,
@@ -12,4 +12,13 @@ export const ordBigNumber: Ord.Ord<BigNumber> = {
 export const ordBaseAmount: Ord.Ord<BaseAmount> = {
   equals: eqBaseAmount.equals,
   compare: (x, y) => ordBigNumber.compare(x.amount(), y.amount())
+}
+
+/**
+ * Comparing Assets
+ **/
+export const ordAsset: Ord.Ord<Asset> = {
+  equals: eqAsset.equals,
+  // comparing by using`assetToString`
+  compare: (x, y) => Ord.ordString.compare(assetToString(x), assetToString(y))
 }

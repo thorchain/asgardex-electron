@@ -11,7 +11,7 @@ import {
   pushTx,
   explorerUrl$,
   resetTx
-} from '../services/bitcoin'
+} from '../services/bitcoin/context'
 
 export type BitcoinContextValue = {
   client$: typeof client$
@@ -41,11 +41,7 @@ const initialContext: BitcoinContextValue = {
 
 const BitcoinContext = createContext<BitcoinContextValue | null>(null)
 
-type Props = {
-  children: React.ReactNode
-}
-
-export const BitcoinProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
+export const BitcoinProvider: React.FC = ({ children }): JSX.Element => {
   return <BitcoinContext.Provider value={initialContext}>{children}</BitcoinContext.Provider>
 }
 

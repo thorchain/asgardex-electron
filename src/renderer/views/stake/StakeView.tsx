@@ -1,69 +1,92 @@
 import React, { useEffect, useMemo } from 'react'
 
 import { assetFromString } from '@thorchain/asgardex-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
-import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
-/**
- * temporary data mock
- * @TODO @thatStrangeGuyThorchain replace mocck after
- * https://github.com/thorchain/asgardex-electron/issues/443 resolved
- */
-import { AddStakeStory } from '../../components/stake/AddStake/AddStake.stories'
+import { ErrorView } from '../../components/shared/error/'
 import { Stake } from '../../components/stake/Stake'
-import BackLink from '../../components/uielements/backLink'
+import { BackLink } from '../../components/uielements/backLink'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { StakeRouteParams } from '../../routes/stake'
-import { isLocked } from '../../services/wallet/util'
-import { PoolDetailsView } from './PoolDetails/PoolDetailsView'
-import { ShareView } from './Share/ShareView'
+import { AddStakeView } from './add/AddStakeView'
+import { ShareView } from './share/ShareView'
+import { WithdrawStakeView } from './withdraw/WithdrawStakeView'
 
 type Props = {}
 
-const StakeView: React.FC<Props> = (_) => {
-  const { asset: assetParam } = useParams<StakeRouteParams>()
-  const { service: midgardService } = useMidgardContext()
+export const StakeView: React.FC<Props> = (_) => {
+  const intl = useIntl()
+
+  const { asset } = useParams<StakeRouteParams>()
+  const {
+    service: {
+      setSelectedPoolAsset,
+      stake: { setAddress }
+    }
+  } = useMidgardContext()
   const { keystoreService } = useWalletContext()
   const { address$ } = useBinanceContext()
 
-  const keystore = useObservableState(keystoreService.keystore$, O.none)
+  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
 
-  const hasWallet = useMemo(() => !pipe(keystore, isLocked), [keystore])
+  // Set selected pool asset whenever an asset in route has been changed
+  // Needed to get all data for this pool (pool details etc.)
+  useEffect(() => {
+    setSelectedPoolAsset(oSelectedAsset)
+  }, [oSelectedAsset, setSelectedPoolAsset])
 
-  const asset = assetFromString(assetParam.toUpperCase())
+  // Important note:
+  // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`
+  // Because `useObservableState` will set its state NOT before first rendering loop,
+  // and `AddWallet` would be rendered for the first time,
+  // before a check of `keystoreState` can be done
+  const keystoreState = useObservableState(keystoreService.keystore$, undefined)
 
   const walletAddress = useObservableState(address$, O.none)
 
   useEffect(() => {
-    const oAsset = O.fromNullable(asset)
-    midgardService.pools.reloadPoolDetailedState(oAsset)
-    midgardService.stake.setPoolAsset(oAsset)
-    midgardService.stake.setAddress(walletAddress)
-  }, [asset, midgardService.pools, midgardService.stake, walletAddress])
-  if (!asset) {
-    return (
-      <>
-        <BackLink />
-      </>
-    )
+    setAddress(walletAddress)
+  }, [setAddress, walletAddress])
+
+  // Special case: `keystoreState` is `undefined` in first render loop
+  // (see comment at its definition using `useObservableState`)
+  if (keystoreState === undefined) {
+    return <></>
   }
 
   return (
     <>
       <BackLink />
-      <Stake
-        asset={asset}
-        hasWallet={hasWallet}
-        TopContent={PoolDetailsView}
-        ShareContent={ShareView}
-        AddStake={AddStakeStory}
-      />
+      {FP.pipe(
+        oSelectedAsset,
+        O.fold(
+          () => (
+            <ErrorView
+              title={intl.formatMessage(
+                { id: 'routes.invalid.asset' },
+                {
+                  asset
+                }
+              )}
+            />
+          ),
+          (selectedAsset) => (
+            <Stake
+              asset={selectedAsset}
+              keystoreState={keystoreState}
+              ShareContent={ShareView}
+              StakeContent={AddStakeView}
+              WidthdrawContent={WithdrawStakeView}
+            />
+          )
+        )
+      )}
     </>
   )
 }
-
-export default StakeView

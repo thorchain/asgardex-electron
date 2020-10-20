@@ -1,9 +1,19 @@
-import { baseAmount, bn } from '@thorchain/asgardex-util'
+import { baseAmount, bn, Chain } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { AssetWithBalance, ApiError, ErrorId } from '../../services/wallet/types'
-import { eqAsset, eqBaseAmount, eqAssetWithBalance, eqAssetsWithBalance, eqApiError, egBigNumber } from './eq'
+import {
+  eqAsset,
+  eqBaseAmount,
+  eqAssetWithBalance,
+  eqAssetsWithBalance,
+  eqApiError,
+  egBigNumber,
+  eqOAsset,
+  eqChain,
+  eqOChain
+} from './eq'
 
 describe('helpers/fp/eq', () => {
   describe('egBigNumber', () => {
@@ -14,6 +24,7 @@ describe('helpers/fp/eq', () => {
       expect(egBigNumber.equals(bn(1), bn(1.01))).toBeFalsy()
     })
   })
+
   describe('eqAsset', () => {
     it('is equal', () => {
       const a = ASSETS_TESTNET.RUNE
@@ -23,6 +34,53 @@ describe('helpers/fp/eq', () => {
       const a = ASSETS_TESTNET.RUNE
       const b = ASSETS_TESTNET.BNB
       expect(eqAsset.equals(a, b)).toBeFalsy()
+    })
+  })
+
+  describe('eqOAsset', () => {
+    it('same some(asset) are equal', () => {
+      const a = O.some(ASSETS_TESTNET.RUNE)
+      expect(eqOAsset.equals(a, a)).toBeTruthy()
+    })
+    it('different some(asset) are not equal', () => {
+      const a = O.some(ASSETS_TESTNET.RUNE)
+      const b = O.some(ASSETS_TESTNET.BNB)
+      expect(eqOAsset.equals(a, b)).toBeFalsy()
+    })
+    it('none/some are not equal', () => {
+      const b = O.some(ASSETS_TESTNET.BNB)
+      expect(eqOAsset.equals(O.none, b)).toBeFalsy()
+    })
+    it('none/none are equal', () => {
+      expect(eqOAsset.equals(O.none, O.none)).toBeTruthy()
+    })
+  })
+
+  describe('eqChain', () => {
+    it('is equal', () => {
+      expect(eqChain.equals('THOR', 'THOR')).toBeTruthy()
+    })
+    it('is not equal', () => {
+      expect(eqChain.equals('THOR', 'BNB')).toBeFalsy()
+    })
+  })
+
+  describe('eqOChain', () => {
+    it('same some(chain) are equal', () => {
+      const a: O.Option<Chain> = O.some('THOR')
+      expect(eqOChain.equals(a, a)).toBeTruthy()
+    })
+    it('different some(chain) are not equal', () => {
+      const a: O.Option<Chain> = O.some('THOR')
+      const b: O.Option<Chain> = O.some('BNB')
+      expect(eqOChain.equals(a, b)).toBeFalsy()
+    })
+    it('none/some are not equal', () => {
+      const b: O.Option<Chain> = O.some('BNB')
+      expect(eqOChain.equals(O.none, b)).toBeFalsy()
+    })
+    it('none/none are equal', () => {
+      expect(eqOChain.equals(O.none, O.none)).toBeTruthy()
     })
   })
 

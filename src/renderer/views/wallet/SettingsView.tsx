@@ -9,7 +9,7 @@ import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxO from 'rxjs/operators'
 
-import Settings from '../../components/wallet/Settings'
+import { Settings } from '../../components/wallet/settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
@@ -22,7 +22,7 @@ import { OnlineStatus, Network } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { UserAccountType } from '../../types/wallet'
 
-const SettingsView: React.FC = (): JSX.Element => {
+export const SettingsView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { lock, removeKeystore } = keystoreService
   const { network$, changeNetwork } = useAppContext()
@@ -148,5 +148,3 @@ const SettingsView: React.FC = (): JSX.Element => {
     </Row>
   )
 }
-
-export default SettingsView

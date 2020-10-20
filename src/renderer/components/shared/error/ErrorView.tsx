@@ -6,7 +6,7 @@ import * as Styled from './ErrorView.style'
 
 type Props = Omit<ResultProps, 'icon'>
 
-const ErrorView: React.FC<Props> = (props): JSX.Element => (
+export const ErrorView: React.FC<Props> = (props): JSX.Element => (
   <Styled.Result
     icon={
       <Styled.IconWrapper>
@@ -16,5 +16,3 @@ const ErrorView: React.FC<Props> = (props): JSX.Element => (
     {...props}
   />
 )
-
-export default ErrorView

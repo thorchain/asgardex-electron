@@ -1,25 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { storiesOf } from '@storybook/react'
 
-import Slider from './Slider'
+import { Slider } from './index'
 
 const marks = {
   0: '0%',
   100: '100%'
 }
 
+const style: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  width: '300px'
+}
+
 storiesOf('Components/Slider', module).add('default', () => {
+  const [currentValue, setCurrentValue] = useState(50)
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '300px'
-      }}>
-      <Slider defaultValue={30} />
-      <Slider defaultValue={30} withLabel />
-      <Slider defaultValue={30} marks={marks} />
+    <div style={style}>
+      <p>currentValue {currentValue}</p>
+      <Slider defaultValue={currentValue} onChange={setCurrentValue} />
+      <Slider value={currentValue} withLabel />
+      <Slider value={currentValue} marks={marks} />
     </div>
   )
 })

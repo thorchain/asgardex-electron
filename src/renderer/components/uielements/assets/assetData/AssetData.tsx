@@ -9,9 +9,9 @@ import {
   Asset
 } from '@thorchain/asgardex-util'
 
-import { PricePoolAsset } from '../../../../views/pools/types'
-import Label from '../../label'
-import AssetIcon from '../assetIcon'
+import { PricePoolAsset } from '../../../../views/pools/Pools.types'
+import { Label } from '../../label'
+import { AssetIcon } from '../assetIcon'
 import { CoinDataWrapper, CoinDataWrapperType, CoinDataWrapperSize } from './AssetData.style'
 
 type Props = {
@@ -28,7 +28,7 @@ type Props = {
   type?: CoinDataWrapperType
 }
 
-const AssetData: React.FC<Props> = (props): JSX.Element => {
+export const AssetData: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
     assetValue,
@@ -47,15 +47,12 @@ const AssetData: React.FC<Props> = (props): JSX.Element => {
   // @TODO (@thatStrangeGuy) add valid formatters
   const priceLabel = priceValid && formattedPrice !== '$ 0.00' ? formattedPrice : ''
 
-  const assetTicker = asset.ticker ?? 'unknown'
-  const targetTicker = target?.ticker ?? 'unknown'
-
   return (
     <CoinDataWrapper size={size} type={type}>
       {asset && <AssetIcon className="coinData-coin-avatar" asset={asset} size={size} />}
       <div className="coinData-asset-info">
         <Label className="coinData-asset-label" weight="600">
-          {`${assetTicker} ${target ? ':' : ''}`}
+          {`${asset.ticker} ${target ? ':' : ''}`}
         </Label>
         {assetValue && (
           <Label className="coinData-asset-value" weight="600">
@@ -66,7 +63,7 @@ const AssetData: React.FC<Props> = (props): JSX.Element => {
       {target && (
         <div className="coinData-target-info">
           <Label className="coinData-target-label" weight="600">
-            {targetTicker}
+            {target.ticker}
           </Label>
           {targetValue && (
             <Label className="coinData-target-value" weight="600">
@@ -83,5 +80,3 @@ const AssetData: React.FC<Props> = (props): JSX.Element => {
     </CoinDataWrapper>
   )
 }
-
-export default AssetData

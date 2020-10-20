@@ -23,7 +23,7 @@ type Props = {
   onEnd?: () => void
 }
 
-const TxTimer: React.FC<Props> = (props): JSX.Element => {
+export const TxTimer: React.FC<Props> = (props): JSX.Element => {
   const {
     status = false,
     value,
@@ -120,5 +120,3 @@ const TxTimer: React.FC<Props> = (props): JSX.Element => {
     </Styled.TxTimerWrapper>
   )
 }
-
-export default TxTimer

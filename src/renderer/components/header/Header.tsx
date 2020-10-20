@@ -9,9 +9,9 @@ import { useI18nContext } from '../../contexts/I18nContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { initialLocale } from '../../services/i18n/service'
-import HeaderComponent from './HeaderComponent'
+import { HeaderComponent } from './HeaderComponent'
 
-const Header: React.FC = (): JSX.Element => {
+export const Header: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { lock } = keystoreService
   const keystore = useObservableState(keystoreService.keystore$, O.none)
@@ -42,5 +42,3 @@ const Header: React.FC = (): JSX.Element => {
     />
   )
 }
-
-export default Header

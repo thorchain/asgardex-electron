@@ -13,15 +13,18 @@ const wallet: WalletMessages = {
   'wallet.action.unfreeze': 'Unfreeze',
   'wallet.action.remove': 'Remove wallet',
   'wallet.action.unlock': 'Unlock',
+  'wallet.action.connect': 'Connect',
+  'wallet.action.import': 'Import',
+  'wallet.action.create': 'Create',
+  'wallet.connect.instruction': 'Please connect your wallet',
   'wallet.unlock.title': 'Unlock your wallet',
+  'wallet.unlock.instruction': 'Please unlock your wallet',
   'wallet.unlock.phrase': 'Enter your your phrase',
   'wallet.unlock.error': 'Could not unlock the wallet. Please check you password and try it again',
   'wallet.imports.phrase': 'Phrase',
   'wallet.imports.wallet': 'Import existing wallet',
   'wallet.imports.enterphrase': 'Enter phrase',
   'wallet.txs.last90days': 'Transactions for last 90 days',
-  'wallet.empty.action.import': 'Import',
-  'wallet.empty.action.create': 'Create',
   'wallet.empty.phrase.import': 'Import an existing wallet with funds on it',
   'wallet.empty.phrase.create': 'Create a new wallet, and funds on it',
   'wallet.create.copy.phrase': 'Copy phrase below',
@@ -47,7 +50,6 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeLessThanFrozenBalance': 'Amount should be less than your frozen value',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee': 'Amount should be less than your balance minus fee',
   'wallet.errors.fee.notCovered': 'Fees are not covered by your balance ({balance})',
-  'wallet.errors.route.invalidAsset': 'Invalid asset in route: {asset}',
   'wallet.errors.invalidChain': 'Invalid chain: {chain}'
 }
 

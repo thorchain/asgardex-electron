@@ -1,3 +1,1 @@
-import ContentTitle from './ContentTitle'
-
-export default ContentTitle
+export { ContentTitle } from './ContentTitle'

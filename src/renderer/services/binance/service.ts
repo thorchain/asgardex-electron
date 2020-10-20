@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { WS, Client, Network as BinanceNetwork, BinanceClient, Address } from '@thorchain/asgardex-binance'
-import { Asset } from '@thorchain/asgardex-util'
+import { Asset, assetToBase, BNBChain } from '@thorchain/asgardex-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -27,16 +27,24 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
-import { MAX_PAGINATION_ITEMS } from '../const'
+import { FeeLD } from '../chain/types'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
-import { keystoreService } from '../wallet/service'
-import { AssetsWithBalanceRD, ApiError, ErrorId } from '../wallet/types'
+import { keystoreService, selectedAsset$ as selectedWalletAsset$ } from '../wallet/common'
+import { INITIAL_LOAD_TXS_PROPS } from '../wallet/const'
+import {
+  AssetsWithBalanceRD,
+  ApiError,
+  ErrorId,
+  AssetsWithBalanceLD,
+  AssetTxsPageLD,
+  LoadAssetTxsProps
+} from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import { BinanceClientState, FeeRD, FeesRD, TransferFeesRD, TxsRD, LoadTxsProps, BinanceClientState$ } from './types'
-import { getWalletBalances } from './utils'
+import { BinanceClientState, FeeRD, TransferFeesRD, BinanceClientState$, FeesLD } from './types'
+import { getWalletBalances, toTxsPage } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -207,9 +215,8 @@ const address$: Observable<O.Option<Address>> = client$.pipe(
 
 /**
  * Observable to load balances from Binance API endpoint
- * If client is not available, it returns an `initial` state
  */
-const loadBalances$ = (client: BinanceClient): Observable<AssetsWithBalanceRD> =>
+const loadBalances$ = (client: BinanceClient): AssetsWithBalanceLD =>
   Rx.from(client.getBalance()).pipe(
     mergeMap((balances) => Rx.of(RD.success(getWalletBalances(balances)))),
     catchError((error: Error) =>
@@ -247,13 +254,11 @@ const assetsWB$: Observable<AssetsWithBalanceRD> = Rx.combineLatest([
   shareReplay(1)
 )
 
-const { get$: selectedAsset$, set: setSelectedAsset } = observableState<O.Option<Asset>>(O.none)
-
 /**
  * Observable to load txs from Binance API endpoint
  * If client is not available, it returns an `initial` state
  */
-const loadTxsOfSelectedAsset$ = ({
+const loadAssetTxs$ = ({
   client,
   oAsset,
   limit,
@@ -263,7 +268,7 @@ const loadTxsOfSelectedAsset$ = ({
   oAsset: O.Option<Asset>
   limit: number
   offset: number
-}): Observable<TxsRD> => {
+}): AssetTxsPageLD => {
   const txAsset = FP.pipe(
     oAsset,
     O.fold(
@@ -278,39 +283,45 @@ const loadTxsOfSelectedAsset$ = ({
   const diffTime = 90 * 24 * 60 * 60 * 1000
   const startTime = endTime - diffTime
   return Rx.from(client.getTransactions({ txAsset, endTime, startTime, limit, offset })).pipe(
+    map(toTxsPage),
     map(RD.success),
-    catchError((error) => Rx.of(RD.failure(error))),
+    catchError((error) =>
+      Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
+    ),
     startWith(RD.pending),
     retry(BINANCE_MAX_RETRY)
   )
 }
 
-const initialLoadTxsProps: LoadTxsProps = {
-  limit: MAX_PAGINATION_ITEMS,
-  offset: 0
-}
-
-// `TriggerStream` to reload `Txs`
-const { get$: loadSelectedAssetTxs$, set: loadTxsSelectedAsset } = observableState<LoadTxsProps>(initialLoadTxsProps)
+// Observable State to reload `Txs` based on `LoadAssetTxsProps`
+const { get$: reloadAssetTxs$, set: reloadAssetTxs } = observableState<LoadAssetTxsProps>(INITIAL_LOAD_TXS_PROPS)
 
 /**
- * State of `Txs`
+ * `Txs` of selected asset
  *
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const txsSelectedAsset$: Observable<TxsRD> = Rx.combineLatest([
+const assetTxs$: AssetTxsPageLD = Rx.combineLatest([
   client$,
-  loadSelectedAssetTxs$.pipe(debounceTime(300)),
-  selectedAsset$
+  reloadAssetTxs$.pipe(debounceTime(300), startWith(INITIAL_LOAD_TXS_PROPS)),
+  selectedWalletAsset$
 ]).pipe(
   switchMap(([client, { limit, offset }, oAsset]) => {
     return FP.pipe(
       // client and asset has to be available
       sequenceTOption(client, oAsset),
+      // ignore all assets from other chains than BNB
+      O.filter(([_, { chain }]) => chain === BNBChain),
       O.fold(
-        () => Rx.of(RD.initial as TxsRD),
-        ([clientState, asset]) => loadTxsOfSelectedAsset$({ client: clientState, oAsset: O.some(asset), limit, offset })
+        () => Rx.of(RD.initial),
+        ([clientState, asset]) =>
+          loadAssetTxs$({
+            client: clientState,
+            oAsset: O.some(asset),
+            limit,
+            offset
+          })
       )
     )
   }),
@@ -329,11 +340,14 @@ const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
   shareReplay(1)
 )
 
+// `TriggerStream` to reload `Fees`
+const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
+
 /**
  * Observable to load transaction fees from Binance API endpoint
  * If client is not available, it returns an `initial` state
  */
-const loadFees$ = (client: BinanceClient): Observable<FeesRD> =>
+const loadFees$ = (client: BinanceClient): FeesLD =>
   Rx.from(client.getFees()).pipe(
     map(RD.success),
     catchError((error) => Rx.of(RD.failure(error))),
@@ -345,8 +359,19 @@ const loadFees$ = (client: BinanceClient): Observable<FeesRD> =>
  * Transaction fees
  * If a client is not available, it returns `None`
  */
-const fees$: Observable<FeesRD> = client$.pipe(
-  mergeMap(FP.pipe(O.fold(() => Rx.of(RD.initial), loadFees$))),
+const fees$: FeesLD = Rx.combineLatest([reloadFees$, client$]).pipe(
+  mergeMap(([_, oClient]) =>
+    FP.pipe(
+      // client and asset has to be available
+      oClient,
+      // ignore all assets from other chains than BNB
+      O.fold(
+        () => Rx.of(RD.initial),
+        (client) => loadFees$(client)
+      )
+    )
+  ),
+  startWith(RD.initial),
   shareReplay(1)
 )
 
@@ -359,18 +384,21 @@ const transferFees$: Observable<TransferFeesRD> = fees$.pipe(
       fees,
       RD.chain((fee) => RD.fromEither(getTransferFees(fee)))
     )
-  ),
-  shareReplay(1)
+  )
 )
 
 /**
  * Amount of feeze `Fee`
  */
-const freezeFee$: Observable<FeeRD> = FP.pipe(
-  fees$,
-  liveData.map(getFreezeFee),
-  liveData.chain(liveData.fromEither),
-  shareReplay(1)
+const freezeFee$: Observable<FeeRD> = FP.pipe(fees$, liveData.map(getFreezeFee), liveData.chain(liveData.fromEither))
+
+/**
+ * Amount of stake `Fee`
+ */
+export const stakeFee$: FeeLD = FP.pipe(
+  transferFees$,
+  liveData.map((fees) => fees.single),
+  liveData.map(assetToBase)
 )
 
 const wsTransfer$ = FP.pipe(
@@ -394,15 +422,14 @@ export {
   client$,
   clientViewState$,
   assetsWB$,
-  setSelectedAsset,
   reloadBalances,
-  txsSelectedAsset$,
-  loadTxsSelectedAsset,
+  assetTxs$,
+  reloadAssetTxs as loadAssetTxs,
   address$,
-  selectedAsset$,
   explorerUrl$,
   transaction,
   freeze,
   transferFees$,
-  freezeFee$
+  freezeFee$,
+  reloadFees
 }

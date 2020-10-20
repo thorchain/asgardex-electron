@@ -6,7 +6,7 @@ import { Row } from 'antd'
 import { SizeType } from 'antd/lib/config-provider/SizeContext'
 
 import { Input, InputPassword, InputTextArea } from './Input.style'
-import { Color } from './types'
+import { Color } from './Input.types'
 
 type ColorOptions = {
   [key in Color]: Color

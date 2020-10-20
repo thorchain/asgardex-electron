@@ -25,11 +25,11 @@ import { AddressValidation, FeesRD, SendTxParams } from '../../../../services/bi
 import { AssetsWithBalance, AssetWithBalance } from '../../../../services/wallet/types'
 import * as StyledR from '../../../shared/form/Radio.style'
 import { Input, InputBigNumber } from '../../../uielements/input'
-import AccountSelector from '../../AccountSelector'
-import * as Styled from '../Form.style'
-import { validateTxAmountInput } from '../util'
+import { AccountSelector } from '../../account'
+import * as Styled from '../TxForm.style'
+import { validateTxAmountInput } from '../TxForm.util'
+import { useChangeAssetHandler } from './Send.hooks'
 import * as StyledBTC from './SendFormBTC.style'
-import useChangeAssetHandler from './useChangeAssetHandler'
 
 export type FormValues = {
   recipient: string
@@ -48,7 +48,7 @@ type Props = {
   reloadFeesHandler: () => void
 }
 
-const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
+export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   const { onSubmit, assetsWB, assetWB, addressValidation, isLoading, fees: feesRD, reloadFeesHandler } = props
 
   const changeAssetHandler = useChangeAssetHandler()
@@ -311,5 +311,3 @@ const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     </Row>
   )
 }
-
-export default SendFormBTC

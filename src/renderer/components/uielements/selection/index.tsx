@@ -1,3 +1,1 @@
-import Selection from './Selection'
-
-export default Selection
+export { Selection } from './Selection'

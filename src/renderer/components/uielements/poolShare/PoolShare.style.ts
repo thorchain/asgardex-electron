@@ -1,18 +1,55 @@
+import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
-import Label from '../label'
+import { Label as UILabel } from '../label'
 
 export const PoolShareWrapper = styled.div`
-  background: ${palette('background', 1)};
-  padding: ${key('sizes.gutter.vertical')};
-  font-size: 16px;
+  width: 100%;
 `
 
-export const SharePercent = styled(Label).attrs({
-  align: 'center',
-  size: 'normal',
-  colo: 'dark'
+export const CardRow = styled(Row).attrs({
+  justify: 'center',
+  align: 'top'
 })`
-  font-weight: bold;
+  padding: ${key('sizes.gutter.vertical')};
+`
+
+export const RedemptionHeader = styled.div`
+  &:after {
+    content: '';
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: ${palette('gradient', 0)};
+  }
+`
+
+export const RedemptionAsset = styled(UILabel).attrs({
+  align: 'center',
+  color: 'dark'
+})`
+  padding: 0;
+  font-size: 16px;
+  font-weight: 'bold';
+  font-family: 'MainFontBold';
+`
+
+export const LabelPrimary = styled(UILabel).attrs({
+  align: 'center',
+  color: 'dark'
+})`
+  padding: 0 20px;
+  font-size: 16px;
+  font-weight: 'bold';
+  font-family: 'MainFontBold';
+`
+
+export const LabelSecondary = styled(UILabel).attrs({
+  align: 'center',
+  color: 'dark'
+})`
+  padding: 0 20px;
+  font-size: 16px;
+  font-family: 'MainFontRegular';
 `

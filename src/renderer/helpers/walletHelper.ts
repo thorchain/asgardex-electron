@@ -3,17 +3,22 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { ZERO_ASSET_AMOUNT } from '../const'
 import { NonEmptyAssetsWithBalance, AssetWithBalance, AssetsWithBalance } from '../services/wallet/types'
 import { isBnbAsset } from './assetHelper'
+import { eqAsset } from './fp/eq'
 import { sequenceTOption } from './fpHelpers'
 
-export const getAssetAmountByAsset = (balances: AssetsWithBalance, assetToFind: Asset): AssetAmount =>
+/**
+ * Tries to find an `AssetAmount` of an `Asset`
+ * in a given list of `AssetWithBalance`
+ *
+ * Note: Returns `None` if `Asset` has not been found this list.
+ * */
+export const getAssetAmountByAsset = (balances: AssetsWithBalance, assetToFind: Asset): O.Option<AssetAmount> =>
   FP.pipe(
     balances,
-    A.findFirst(({ asset }) => asset.symbol === assetToFind.symbol),
-    O.map((b) => baseToAsset(b.amount)),
-    O.getOrElse(() => ZERO_ASSET_AMOUNT)
+    A.findFirst(({ asset }) => eqAsset.equals(asset, assetToFind)),
+    O.map((assetWB) => baseToAsset(assetWB.amount))
   )
 
 export const getAssetWBByAsset = (

@@ -8,8 +8,8 @@ import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router'
 import * as Rx from 'rxjs/operators'
 
-import BackLink from '../../components/uielements/backLink'
-import Freeze from '../../components/wallet/txs/Freeze'
+import { BackLink } from '../../components/uielements/backLink'
+import { Freeze } from '../../components/wallet/txs/freeze/'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { getBnbAmountFromBalances, getAssetWBByAsset } from '../../helpers/walletHelper'
@@ -23,9 +23,9 @@ type Props = {
   freezeAction: FreezeAction
 }
 
-const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
+export const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
   const { asset } = useParams<SendParams>()
-  const oSelectedAsset = O.fromNullable(assetFromString(asset))
+  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
   const { freeze: freezeService, explorerUrl$, freezeFee$ } = useBinanceContext()
   const { assetsWBState$ } = useWalletContext()
@@ -62,5 +62,3 @@ const FreezeView: React.FC<Props> = ({ freezeAction }): JSX.Element => {
     </>
   )
 }
-
-export default FreezeView

@@ -4,7 +4,7 @@ import * as AI from 'antd/lib/input'
 import styled, { css } from 'styled-components'
 import { palette, key } from 'styled-theme'
 
-import { Color, Colors, FontSettings, InputType } from './types'
+import { Color, Colors, FontSettings, InputType } from './Input.types'
 
 const fontSettings: FontSettings = {
   small: {

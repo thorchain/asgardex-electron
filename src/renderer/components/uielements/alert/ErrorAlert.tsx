@@ -10,7 +10,7 @@ import * as Styled from './ErrorAlert.style'
 
 type Props = Omit<AlertProps, 'description' | 'type' | 'showIcon' | 'icon'> & { descriptions?: string[] }
 
-const ErrorAlert: React.FC<Props> = (props): JSX.Element => {
+export const ErrorAlert: React.FC<Props> = (props): JSX.Element => {
   const { descriptions } = props
 
   const description = FP.pipe(
@@ -25,5 +25,3 @@ const ErrorAlert: React.FC<Props> = (props): JSX.Element => {
 
   return <Styled.Alert type="error" showIcon icon={<InfoCircleOutlined />} description={description} {...props} />
 }
-
-export default ErrorAlert

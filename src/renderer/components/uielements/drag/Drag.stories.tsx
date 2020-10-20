@@ -4,7 +4,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
-import Drag from './Drag'
+import { Drag } from './Drag'
 
 storiesOf('Components/Drag', module).add('default', () => {
   return (

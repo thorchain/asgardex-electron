@@ -3,11 +3,11 @@ import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 
-import Label from '../../../components/uielements/label'
+import { Label } from '../../../components/uielements/label'
 import * as walletRoutes from '../../../routes/wallet'
 import * as Styled from './NoWalletView.styles'
 
-const NoWalletView = () => {
+export const NoWalletView = () => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -23,7 +23,7 @@ const NoWalletView = () => {
     <Styled.ViewContainer>
       <Styled.ActionContainer>
         <Styled.ActionButton round="true" onClick={importClick}>
-          {intl.formatMessage({ id: 'wallet.empty.action.import' })}
+          {intl.formatMessage({ id: 'wallet.action.import' })}
         </Styled.ActionButton>
         <Label align="center" color="gray" size="big" textTransform="uppercase">
           {intl.formatMessage({ id: 'wallet.empty.phrase.import' })}
@@ -32,7 +32,7 @@ const NoWalletView = () => {
 
       <Styled.ActionContainer>
         <Styled.ActionButton onClick={createClick} typevalue={'outline'} round="true">
-          {intl.formatMessage({ id: 'wallet.empty.action.create' })}
+          {intl.formatMessage({ id: 'wallet.action.create' })}
         </Styled.ActionButton>
         <Label align="center" color="gray" size="big" textTransform="uppercase">
           {intl.formatMessage({ id: 'wallet.empty.phrase.create' })}
@@ -41,5 +41,3 @@ const NoWalletView = () => {
     </Styled.ViewContainer>
   )
 }
-
-export default NoWalletView

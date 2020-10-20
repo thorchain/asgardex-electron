@@ -10,7 +10,7 @@ type Props = {
   className?: string
 }
 
-const Status: React.FC<Props> = (props): JSX.Element => {
+export const Status: React.FC<Props> = (props): JSX.Element => {
   const { title = '', value = '', direction = 'vertical', loading = false, className = '', ...otherProps } = props
 
   return (
@@ -30,5 +30,3 @@ const Status: React.FC<Props> = (props): JSX.Element => {
     </StatusWrapper>
   )
 }
-
-export default Status

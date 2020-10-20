@@ -47,6 +47,10 @@ export type CommonMessages = {
   [key in CommonMessageKey]: string
 }
 
+type RoutesMessageKey = 'routes.invalid.asset'
+
+export type RoutesMessages = { [key in RoutesMessageKey]: string }
+
 type PoolsMessageKey =
   | 'pools.depth'
   | 'pools.24hvol'
@@ -72,6 +76,11 @@ type WalletMessageKey =
   | 'wallet.action.unfreeze'
   | 'wallet.action.remove'
   | 'wallet.action.unlock'
+  | 'wallet.action.connect'
+  | 'wallet.action.import'
+  | 'wallet.action.create'
+  | 'wallet.connect.instruction'
+  | 'wallet.unlock.instruction'
   | 'wallet.unlock.title'
   | 'wallet.unlock.phrase'
   | 'wallet.unlock.error'
@@ -79,8 +88,6 @@ type WalletMessageKey =
   | 'wallet.imports.wallet'
   | 'wallet.imports.enterphrase'
   | 'wallet.txs.last90days'
-  | 'wallet.empty.action.import'
-  | 'wallet.empty.action.create'
   | 'wallet.empty.phrase.import'
   | 'wallet.empty.phrase.create'
   | 'wallet.create.title'
@@ -106,7 +113,6 @@ type WalletMessageKey =
   | 'wallet.errors.amount.shouldBeLessThanFrozenBalance'
   | 'wallet.errors.amount.shouldBeLessThanBalanceAndFee'
   | 'wallet.errors.fee.notCovered'
-  | 'wallet.errors.route.invalidAsset'
   | 'wallet.errors.invalidChain'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
@@ -139,9 +145,14 @@ type SwapMessageKey =
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
 type StakeMessageKey =
-  | 'stake.totalShare'
+  | 'stake.share.title'
+  | 'stake.share.units'
+  | 'stake.share.poolshare'
+  | 'stake.share.total'
+  | 'stake.redemption.title'
   | 'stake.totalEarnings'
-  | 'stake.poolShare'
+  | 'stake.add.sym'
+  | 'stake.add.asym'
   | 'stake.withdraw'
   | 'stake.advancedMode'
   | 'stake.drag'
@@ -162,7 +173,13 @@ type StakeMessageKey =
 
 export type StakeMessages = { [key in StakeMessageKey]: string }
 
-export type Messages = CommonMessages & PoolsMessages & WalletMessages & SettingMessages & SwapMessages & StakeMessages
+export type Messages = CommonMessages &
+  RoutesMessages &
+  PoolsMessages &
+  WalletMessages &
+  SettingMessages &
+  SwapMessages &
+  StakeMessages
 
 export enum Locale {
   EN = 'en',

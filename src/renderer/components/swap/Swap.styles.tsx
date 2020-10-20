@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
-import AssetInputBase from '../uielements/assets/assetInput'
+import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 
 export const Container = styled('div')`
   display: flex;
@@ -73,20 +73,20 @@ export const ValueItemContainer = styled('div')`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  
+
   &.valueItemContainer {
     &-out {
       margin-bottom: 10px;
     }
-    
+
     &-percent {
       margin-bottom: 50px;
     }
   }
-  
+
   ${media.md`
     flex-direction: row;
-    
+
     &>*:first-child {
       margin-right: 25px;
       min-width: 60%;

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { storiesOf } from '@storybook/react'
 
-import ErrorAlert from './ErrorAlert'
+import { ErrorAlert } from './ErrorAlert'
 
 const descriptions = ['This is error message 1.', 'This is error message 2.', 'This is error message 3.']
 

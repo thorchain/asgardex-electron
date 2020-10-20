@@ -4,8 +4,8 @@ import { radios, withKnobs } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 
 import { ASSETS_MAINNET } from '../../../../../shared/mock/assets'
-import { Size } from '../assetIcon/types'
-import AssetPairOverlapped from './AssetPairOverlapped'
+import { Size } from '../assetIcon/AssetIcon.types'
+import { AssetPairOverlapped } from './AssetPairOverlapped'
 
 type SizeOptions = Record<Size, Size>
 

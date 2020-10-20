@@ -6,10 +6,7 @@ import {
   client$,
   clientViewState$,
   address$,
-  setSelectedAsset,
-  txsSelectedAsset$,
-  selectedAsset$,
-  loadTxsSelectedAsset,
+  assetTxs$,
   explorerUrl$,
   transaction,
   freeze,
@@ -21,10 +18,7 @@ export type BinanceContextValue = {
   subscribeTransfers: typeof subscribeTransfers
   miniTickers$: typeof miniTickers$
   clientViewState$: typeof clientViewState$
-  setSelectedAsset: typeof setSelectedAsset
-  txsSelectedAsset$: typeof txsSelectedAsset$
-  loadTxsSelectedAsset: typeof loadTxsSelectedAsset
-  selectedAsset$: typeof selectedAsset$
+  assetTxs$: typeof assetTxs$
   address$: typeof address$
   explorerUrl$: typeof explorerUrl$
   transaction: typeof transaction
@@ -39,10 +33,7 @@ const initialContext: BinanceContextValue = {
   miniTickers$,
   client$,
   clientViewState$,
-  setSelectedAsset,
-  txsSelectedAsset$,
-  loadTxsSelectedAsset,
-  selectedAsset$,
+  assetTxs$,
   address$,
   explorerUrl$,
   transaction,
@@ -53,11 +44,7 @@ const initialContext: BinanceContextValue = {
 
 const BinanceContext = createContext<BinanceContextValue | null>(null)
 
-type Props = {
-  children: React.ReactNode
-}
-
-export const BinanceProvider: React.FC<Props> = ({ children }: Props): JSX.Element => {
+export const BinanceProvider: React.FC = ({ children }): JSX.Element => {
   return <BinanceContext.Provider value={initialContext}>{children}</BinanceContext.Provider>
 }
 

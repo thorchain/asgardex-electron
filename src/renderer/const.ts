@@ -7,10 +7,11 @@ import {
   AssetBTC,
   AssetETH,
   Asset,
-  assetToString
+  assetToString,
+  baseAmount
 } from '@thorchain/asgardex-util'
 
-import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/types'
+import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
 
 // BUSD testnet
 export const AssetBUSDBAF: Asset = { chain: 'BNB', symbol: 'BUSD-BAF', ticker: 'BUSD' }
@@ -48,3 +49,5 @@ export const ZERO_BN = bn(0)
 export const ONE_BN = bn(1)
 
 export const ZERO_ASSET_AMOUNT = assetAmount(ZERO_BN)
+
+export const ZERO_BASE_AMOUNT = baseAmount(ZERO_BN)

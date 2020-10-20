@@ -2,7 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import UILabel from '../../uielements/label'
+import { Label as UILabel } from '../../uielements/label'
 
 export const Radio = styled(A.Radio)`
   > .ant-radio .ant-radio-inner {

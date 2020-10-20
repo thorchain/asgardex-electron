@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import BaseAssetIcon from '../assets/assetIcon'
-import Label from '../label'
+import { AssetIcon as BaseAssetIcon } from '../assets/assetIcon'
+import { Label } from '../label'
 
 type DragWrapperProps = {
   dragging: boolean
@@ -16,7 +16,7 @@ export const DragContainer = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  width: 244px;
+  min-width: 244px;
   height: 40px;
   border: 1px solid ${palette('primary', 0)};
   padding: 0 4px;

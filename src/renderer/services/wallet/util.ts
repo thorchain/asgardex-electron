@@ -1,4 +1,4 @@
-import { assetToString, baseAmount } from '@thorchain/asgardex-util'
+import { Asset, assetToString, baseAmount } from '@thorchain/asgardex-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import { pipe, identity } from 'fp-ts/lib/function'
@@ -6,6 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import { isSome, Option } from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/Ord'
 
+import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import {
   KeystoreState,
@@ -59,3 +60,9 @@ export const sortBalances = (balances: AssetsWithBalance, orders: string[]) => {
       assetWithBalanceMonoid.concat(FP.pipe(left, A.sort(byTickersOrder)), FP.pipe(right, A.sort(byAsset)))
   )
 }
+
+export const getBalanceByAsset = (asset: Asset) => (balances: AssetsWithBalance) =>
+  FP.pipe(
+    balances,
+    A.findFirst((assetWithBalance) => eqAsset.equals(assetWithBalance.asset, asset))
+  )

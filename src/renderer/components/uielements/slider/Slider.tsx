@@ -6,14 +6,14 @@ import { TooltipPlacement } from 'antd/lib/tooltip'
 import { SliderWrapper, SliderLabel } from './Slider.style'
 import { toPoolData } from '../../../services/midgard/utils'
 
-interface Props extends SliderSingleProps {
-  className?: string
+type CustomProps = {
   tooltipPlacement?: TooltipPlacement
   withLabel?: boolean
 }
 
-const Slider: React.FC<Props> = ({
-  className = '',
+type Props = CustomProps & SliderSingleProps
+
+export const Slider: React.FC<Props> = ({
   tooltipPlacement = 'bottom',
   withLabel = false,
   tipFormatter = (value) => `${value}%`,
@@ -22,11 +22,11 @@ const Slider: React.FC<Props> = ({
 }): JSX.Element => {
   const ref = useRef()
   const getTooltipPopupContainer = useCallback((container: HTMLElement) => ref.current || container, [ref])
+
   return (
     <>
       <SliderWrapper
         ref={ref}
-        className={`slider-wrapper ${className}`}
         tooltipPlacement={tooltipPlacement}
         getTooltipPopupContainer={tooltipVisible ? getTooltipPopupContainer : undefined}
         tipFormatter={tipFormatter}
@@ -41,5 +41,3 @@ const Slider: React.FC<Props> = ({
     </>
   )
 }
-
-export default Slider

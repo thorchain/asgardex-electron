@@ -3,7 +3,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { bn } from '@thorchain/asgardex-util'
 
-import AssetInput from './AssetInput'
+import { AssetInput } from './AssetInput'
 
 storiesOf('Components/Assets/AssetInput', module).add('default', () => {
   return (
