@@ -1,5 +1,7 @@
 import styled from 'styled-components'
-import AssetIconBase from '../../uielements/assets/assetIcon'
+
+import { AssetIcon as AssetIconBase } from '../../uielements/assets/assetIcon'
+import { Drag as BaseDrag } from '../../uielements/drag'
 
 export const Container = styled('div')``
 
@@ -16,4 +18,9 @@ export const AssetContainer = styled('div')`
 
 export const AssetIcon = styled(AssetIconBase).attrs({ size: 'small' })`
   margin-right: 10px;
+`
+
+export const Drag = styled(BaseDrag)`
+  display: flex;
+  justify-content: center;
 `

@@ -84,5 +84,5 @@ export const TitleLabel = styled(Label)`
   text-align: center;
   font-size: 12px;
   text-transform: uppercase;
-  color: inherit;
+  color: ${palette('text', 2)};
 `

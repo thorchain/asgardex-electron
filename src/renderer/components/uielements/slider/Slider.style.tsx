@@ -70,6 +70,5 @@ export const SliderLabel = styled.div`
   justify-content: space-between;
   align-items: center;
   font-size: 12px;
-  font-family: 'MainFontRegular';
   color: ${palette('text', 1)};
 `

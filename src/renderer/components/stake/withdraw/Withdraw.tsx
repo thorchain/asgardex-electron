@@ -1,22 +1,32 @@
-import React, { useState } from 'react'
-import * as Styled from './Withdraw.styles'
-import { Asset, BaseAmount } from '@thorchain/asgardex-util'
+import React, { useCallback, useState } from 'react'
+
+import { Asset, formatAssetAmount } from '@thorchain/asgardex-util'
 import { useIntl } from 'react-intl'
-import Label from '../../uielements/label'
-import Slider from '../../uielements/slider'
-import Drag from '../../uielements/drag'
+
+import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/models'
+import { Label } from '../../uielements/label'
+import { Slider } from '../../uielements/slider'
+import { getWithdrawAmountsFactory } from './Withdraw.helper'
+import * as Styled from './Withdraw.styles'
 
 type Props = {
-  runeStakedAmount: BaseAmount
-  assetStakedAmount: BaseAmount
   stakedAsset: Asset
   runeAsset: Asset
-  onWithdraw: (asset: Asset, amount: BaseAmount) => void
+  poolDetail: PoolDetail
+  stakersAssetData: StakersAssetData
+  onWithdraw: (percent: number) => void
 }
 
-export const Withdraw: React.FC<Props> = ({ stakedAsset, runeAsset }) => {
+export const Withdraw: React.FC<Props> = ({ onWithdraw, stakedAsset, runeAsset, poolDetail, stakersAssetData }) => {
   const intl = useIntl()
   const [withdrawPercent, setWithdrawPercent] = useState(50)
+
+  const getWithdrawAmounts = useCallback(getWithdrawAmountsFactory(poolDetail, stakersAssetData), [
+    poolDetail,
+    stakersAssetData
+  ])
+
+  const withdrawAmounts = getWithdrawAmounts(withdrawPercent)
 
   return (
     <Styled.Container>
@@ -32,23 +42,31 @@ export const Withdraw: React.FC<Props> = ({ stakedAsset, runeAsset }) => {
         tooltipPlacement="bottom"
         withLabel={true}
       />
-      <Label textTransform={'uppercase'}>{intl.formatMessage({ id: 'stake.withdraw.receiveText' })}</Label>
+      <Label weight={'bold'} textTransform={'uppercase'}>
+        {intl.formatMessage({ id: 'stake.withdraw.receiveText' })}
+      </Label>
 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={runeAsset} />
-        <Label>{runeAsset.ticker} asdad</Label>
+        <Label weight={'bold'}>
+          {runeAsset.ticker} {formatAssetAmount({ amount: withdrawAmounts.runeWithdraw, decimal: 2 })}
+        </Label>
       </Styled.AssetContainer>
 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={stakedAsset} />
-        <Label>{stakedAsset.ticker} asdad</Label>
+        <Label weight={'bold'}>
+          {stakedAsset.ticker} {formatAssetAmount({ amount: withdrawAmounts.assetWithdraw, decimal: 2 })}
+        </Label>
       </Styled.AssetContainer>
 
-      <Drag
+      <Label>{intl.formatMessage({ id: 'stake.withdraw.fee' })}: 0.000375 BNB</Label>
+
+      <Styled.Drag
         title={intl.formatMessage({ id: 'stake.withdraw.drag' })}
         source={runeAsset}
         target={stakedAsset}
-        onConfirm={console.log}
+        onConfirm={() => onWithdraw(withdrawPercent)}
       />
     </Styled.Container>
   )
