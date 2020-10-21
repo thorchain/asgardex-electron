@@ -7,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
 import { AddSymStakeStory } from './add/AddStake.stories'
 import { Stake } from './Stake'
-import { WithdrawStakeStory } from './withdraw/WithdrawStake.stories'
+import { WithdrawStory } from './withdraw/Withdraw.stories'
 
 storiesOf('Stake', module)
   .add('default', () => {
@@ -16,7 +16,7 @@ storiesOf('Stake', module)
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
         StakeContent={AddSymStakeStory}
-        WidthdrawContent={WithdrawStakeStory}
+        WidthdrawContent={(props) => <WithdrawStory {...props} />}
         keystoreState={O.some(O.some({ phrase: 'phrase' }))}
       />
     )
@@ -27,7 +27,7 @@ storiesOf('Stake', module)
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
         StakeContent={AddSymStakeStory}
-        WidthdrawContent={WithdrawStakeStory}
+        WidthdrawContent={(props) => <WithdrawStory {...props} />}
         keystoreState={O.none}
       />
     )
@@ -38,7 +38,7 @@ storiesOf('Stake', module)
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
         StakeContent={AddSymStakeStory}
-        WidthdrawContent={WithdrawStakeStory}
+        WidthdrawContent={(props) => <WithdrawStory {...props} />}
         keystoreState={O.some(O.none)}
       />
     )

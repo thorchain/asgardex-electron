@@ -24,7 +24,7 @@ type Props = {
   asset: Asset
   ShareContent: React.ComponentType<{ asset: Asset }>
   StakeContent: React.ComponentType<{ asset: Asset; runeAsset: Asset; type: StakeType }>
-  WidthdrawContent: React.ComponentType<{ asset: Asset; runeAsset: Asset }>
+  WidthdrawContent: React.ComponentType<{ stakedAsset: Asset; runeAsset: Asset }>
   keystoreState: KeystoreState
 }
 
@@ -58,7 +58,7 @@ export const Stake: React.FC<Props> = (props) => {
       {
         key: 'withdraw',
         label: intl.formatMessage({ id: 'stake.withdraw' }),
-        content: <WidthdrawContent asset={asset} runeAsset={runeAsset} />
+        content: <WidthdrawContent stakedAsset={asset} runeAsset={runeAsset} />
       }
     ],
     [intl, asset, runeAsset]

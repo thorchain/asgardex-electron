@@ -1,11 +1,11 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { AssetBNB, AssetRune67C } from '@thorchain/asgardex-util'
+import { Asset, AssetBNB, AssetRune67C } from '@thorchain/asgardex-util'
 
 import { Withdraw } from './Withdraw'
 
-export const WithdrawStory = () => {
+export const WithdrawStory: React.FC<{ stakedAsset?: Asset; runeAsset?: Asset }> = (props) => {
   return (
     <Withdraw
       stakersAssetData={{
@@ -27,8 +27,9 @@ export const WithdrawStory = () => {
       stakedAsset={AssetBNB}
       runeAsset={AssetRune67C}
       onWithdraw={console.log}
+      {...props}
     />
   )
 }
 
-storiesOf('Components/Stake/Withdraw', module).add('default', WithdrawStory)
+storiesOf('Components/Stake/Withdraw', module).add('default', () => <WithdrawStory />)
