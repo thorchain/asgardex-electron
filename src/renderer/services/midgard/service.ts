@@ -17,14 +17,15 @@ import { createPoolsService } from './pools'
 import { createStakeService } from './stake'
 import { NetworkInfoRD, NetworkInfoLD, ThorchainConstantsLD, ByzantineLD, ThorchainLastblockLD } from './types'
 
-const BYZANTINE_MAX_RETRY = 5
-
 const MIDGARD_TESTNET_URL = process.env.REACT_APP_MIDGARD_TESTNET_URL
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
  */
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
+
+// `TriggerStream` to reload Byzantine
+const { stream$: reloadByzantine$, trigger: reloadByzantine } = triggerStream()
 
 const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
   (network: Network) => {
@@ -36,17 +37,18 @@ const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.
   RD.failure
 )
 
-/**
- * Endpoint provided by Byzantine
- */
-const byzantine$: ByzantineLD = network$.pipe(
+const latestNetwork$ = network$.pipe(
   // Since `getNetworkState` is created by `observableState` and it takes an initial value,
   // this stream might emit same values and we do need a "dirty check"
   // to avoid to create another instance of byzantine by having same `Network`
-  distinctUntilChanged(),
-  switchMap(nextByzantine$),
-  shareReplay(1),
-  retry(BYZANTINE_MAX_RETRY)
+  distinctUntilChanged()
+)
+/**
+ * Endpoint provided by Byzantine
+ */
+const byzantine$: ByzantineLD = Rx.combineLatest([latestNetwork$, reloadByzantine$]).pipe(
+  switchMap(([network]) => nextByzantine$(network)),
+  shareReplay(1)
 )
 
 /**
@@ -159,6 +161,7 @@ export const service = {
   reloadThorchainLastblock,
   setSelectedPoolAsset,
   apiEndpoint$: byzantine$,
+  reloadApiEndpoint: reloadByzantine,
   pools: createPoolsService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
   stake: createStakeService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$)
 }

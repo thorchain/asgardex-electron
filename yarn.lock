@@ -2923,12 +2923,12 @@
   dependencies:
     bip39 "^3.0.2"
 
-"@thorchain/asgardex-midgard@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-midgard/-/asgardex-midgard-1.0.0.tgz#9874540a23a9db3558a76271707aebf339f849b2"
-  integrity sha512-YMgrlP61VyR8qjDN5hVKTW7oG9tn1Z03Zd96WuD4t/7QNDZjPP0UOZKytwFta4RwZAsOCrmpK8D9g/1iyHE9Cw==
+"@thorchain/asgardex-midgard@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-midgard/-/asgardex-midgard-1.1.0.tgz#d5ae6e7786b7cbdfa32b3c494a491d03ed1d89ff"
+  integrity sha512-9yoSATanUf27IugpAgJWUNd872zYEZrZH/R+Qk2iUc5iIGtpuRnVQTKeBG1OJBUj4jwPz19LIC0WxMpqCwodWg==
   dependencies:
-    axios "^0.19.2"
+    axios "^0.20.0"
     lodash.shuffle "^4.2.0"
     store "^2.0.12"
 

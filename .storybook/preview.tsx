@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 
 import { AppProvider } from '../src/renderer/contexts/AppContext'
 import { ThemeProvider } from '../src/renderer/contexts/ThemeContext'
-import { AppWrapper } from '../src/renderer/App.style'
+import * as Styled from '../src/renderer/views/app/AppView.style'
 import { Locale } from '../src/shared/i18n/types'
 import { IntlProvider } from 'react-intl'
 import { getMessagesByLocale } from '../src/renderer/i18n'
@@ -29,7 +29,7 @@ const providerFn = ({ theme, children }) => (
     {/* We use IntlProvider instead of our our custom I18nProvider to provide messages, but w/o dependencies to Electron/Node source, which can't run in storybook */}
     <IntlProvider locale={locale} messages={messages} defaultLocale={locale}>
       <ThemeProvider theme={theme}>
-        <AppWrapper>{children}</AppWrapper>
+        <Styled.AppWrapper>{children}</Styled.AppWrapper>
       </ThemeProvider>
     </IntlProvider>
   </AppProvider>
