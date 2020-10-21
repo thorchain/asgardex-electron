@@ -8,12 +8,12 @@ import { WithdrawStory } from '../../../components/stake/withdraw/Withdraw.stori
 // import { Withdraw } from '../../../components/stake/withdraw'
 
 type Props = {
-  asset: Asset
+  stakedAsset: Asset
   runeAsset: Asset
 }
 
 export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
-  const { asset, runeAsset } = props
+  const { stakedAsset, runeAsset } = props
 
-  return <WithdrawStory runeAsset={runeAsset} stakedAsset={asset} />
+  return <WithdrawStory runeAsset={runeAsset} stakedAsset={stakedAsset} />
 }

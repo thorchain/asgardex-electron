@@ -5,7 +5,6 @@ import { useIntl } from 'react-intl'
 
 import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/models'
 import { Label } from '../../uielements/label'
-import { Slider } from '../../uielements/slider'
 import { getWithdrawAmountsFactory } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
@@ -25,7 +24,6 @@ export const Withdraw: React.FC<Props> = ({ onWithdraw, stakedAsset, runeAsset, 
     poolDetail,
     stakersAssetData
   ])
-
   const withdrawAmounts = getWithdrawAmounts(withdrawPercent)
 
   return (
@@ -35,13 +33,7 @@ export const Withdraw: React.FC<Props> = ({ onWithdraw, stakedAsset, runeAsset, 
       </Label>
       <Label>{intl.formatMessage({ id: 'stake.withdraw.choseText' })}</Label>
 
-      <Slider
-        key={'asset amount slider'}
-        value={withdrawPercent}
-        onChange={setWithdrawPercent}
-        tooltipPlacement="bottom"
-        withLabel={true}
-      />
+      <Styled.Slider key={'asset amount slider'} value={withdrawPercent} onChange={setWithdrawPercent} />
       <Label weight={'bold'} textTransform={'uppercase'}>
         {intl.formatMessage({ id: 'stake.withdraw.receiveText' })}
       </Label>
@@ -67,6 +59,8 @@ export const Withdraw: React.FC<Props> = ({ onWithdraw, stakedAsset, runeAsset, 
         source={runeAsset}
         target={stakedAsset}
         onConfirm={() => onWithdraw(withdrawPercent)}
+        // @TODO (@thatStrangeGuy) compare to BNB fee
+        disabled={withdrawPercent === 0}
       />
     </Styled.Container>
   )
