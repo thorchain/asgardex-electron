@@ -39,6 +39,7 @@ type CommonMessageKey =
   | 'common.max'
   | 'common.search'
   | 'common.retry'
+  | 'common.reload'
   | 'common.add'
   | 'common.swap'
   | 'common.liquidity'
@@ -130,6 +131,10 @@ type SettingMessageKey =
   | 'setting.notconnected'
 
 export type SettingMessages = { [key in SettingMessageKey]: string }
+
+type MidgardMessageKey = 'midgard.error.byzantine.title' | 'midgard.error.byzantine.description'
+
+export type MidgardMessages = { [key in MidgardMessageKey]: string }
 
 type SwapMessageKey =
   | 'swap.input'

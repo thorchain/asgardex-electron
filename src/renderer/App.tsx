@@ -2,9 +2,6 @@ import React from 'react'
 
 import { HashRouter as Router } from 'react-router-dom'
 
-import { AppWrapper, AppLayout } from './App.style'
-import { Footer } from './components/footer'
-import { Header } from './components/header/Header'
 import { AppProvider } from './contexts/AppContext'
 import { BinanceProvider } from './contexts/BinanceContext'
 import { BitcoinProvider } from './contexts/BitcoinContext'
@@ -13,25 +10,7 @@ import { I18nProvider } from './contexts/I18nContext'
 import { MidgardProvider } from './contexts/MidgardContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { WalletProvider } from './contexts/WalletContext'
-import { envOrDefault } from './helpers/envHelper'
-import { View } from './views/View'
-import { ViewRoutes } from './views/ViewRoutes'
-
-export const AppView: React.FC = (): JSX.Element => {
-  return (
-    <>
-      <AppWrapper>
-        <AppLayout>
-          <Header />
-          <View>
-            <ViewRoutes />
-          </View>
-          <Footer commitHash={envOrDefault($COMMIT_HASH, '')} isDev={$IS_DEV} />
-        </AppLayout>
-      </AppWrapper>
-    </>
-  )
-}
+import { AppView } from './views/app/AppView'
 
 export const App: React.FC = (): JSX.Element => {
   return (
