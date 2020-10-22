@@ -89,7 +89,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
     RD.map((state) => bnOrZero(state.price).multipliedBy(runPrice))
   )
 
-  const { stakeFee$, chainAsset$ } = useChainContext()
+  const { stakeFee$, chainAsset$, reloadFees } = useChainContext()
   const stakeFeeRD = useObservableState(stakeFee$, RD.initial)
   const oChainAsset = useObservableState(chainAsset$, O.none)
 
@@ -106,6 +106,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
         runeBalance={ZERO_BASE_AMOUNT}
         onStake={() => {}}
         fee={RD.initial}
+        reloadFee={() => {}}
         chainAsset={O.none}
         priceAsset={selectedPricePoolAsset}
         disabled={true}
@@ -135,6 +136,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
             runeBalance={runeBalance}
             onStake={console.log}
             fee={stakeFeeRD}
+            reloadFee={reloadFees}
             chainAsset={oChainAsset}
             priceAsset={selectedPricePoolAsset}
             assets={poolAssets}

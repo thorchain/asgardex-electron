@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 
+import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import {
   Asset,
@@ -9,7 +10,7 @@ import {
   formatAssetAmountCurrency,
   PoolData
 } from '@thorchain/asgardex-util'
-import { Col } from 'antd'
+import { Col, Row } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -32,6 +33,7 @@ type Props = {
   runeBalance: BaseAmount
   priceAsset?: Asset
   fee: FeeRD
+  reloadFee: () => void
   chainAsset: O.Option<Asset>
   assets?: Asset[]
   onStake: (stakeData: { asset: Asset; runeAsset: Asset; assetStake: BaseAmount; runeStake: BaseAmount }) => void
@@ -51,6 +53,7 @@ export const AddStake: React.FC<Props> = ({
   assets,
   priceAsset,
   fee: feeRD,
+  reloadFee,
   chainAsset: oChainAsset,
   onStake,
   onChangeAsset,
@@ -193,9 +196,18 @@ export const AddStake: React.FC<Props> = ({
             onChangeAsset={onChangeAsset}
             priceAsset={priceAsset}
           />
-          <Styled.FeeLabel>
-            {intl.formatMessage({ id: 'common.fee' })}: {feeLabel}
-          </Styled.FeeLabel>
+          <Row align="middle">
+            <Col>
+              <Styled.ReloadFeeButton onClick={reloadFee} disabled={RD.isPending(feeRD)}>
+                <SyncOutlined />
+              </Styled.ReloadFeeButton>
+            </Col>
+            <Col>
+              <Styled.FeeLabel disabled={RD.isPending(feeRD)}>
+                {intl.formatMessage({ id: 'common.fee' })}: {feeLabel}
+              </Styled.FeeLabel>
+            </Col>
+          </Row>
         </Col>
 
         <Col xs={24} xl={12}>

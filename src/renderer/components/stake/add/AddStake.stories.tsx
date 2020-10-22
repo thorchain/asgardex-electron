@@ -18,6 +18,7 @@ const poolData = {
 const assets = [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO]
 const chainAsset = O.some(AssetBNB)
 const fee = RD.success(assetToBase(TRANSFER_FEES.single))
+const reloadFeeHandler = () => console.log('reload fee')
 
 export const AddAsymStakeStory = () => {
   return (
@@ -31,6 +32,7 @@ export const AddAsymStakeStory = () => {
       runeBalance={runeBalance}
       onStake={console.log}
       onChangeAsset={console.log}
+      reloadFee={reloadFeeHandler}
       chainAsset={chainAsset}
       fee={fee}
       poolData={poolData}
@@ -53,6 +55,7 @@ export const AddSymStakeStory = () => {
       onChangeAsset={console.log}
       chainAsset={chainAsset}
       fee={fee}
+      reloadFee={reloadFeeHandler}
       poolData={poolData}
       priceAsset={AssetRune67C}
       assets={assets}
