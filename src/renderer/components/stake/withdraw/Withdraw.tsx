@@ -1,11 +1,11 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 
 import { Asset, assetAmount, formatAssetAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { Label } from '../../uielements/label'
-import { getWithdrawAmountsFactory } from './Withdraw.helper'
+import { getWithdrawAmounts } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
 type Props = {
@@ -15,10 +15,8 @@ type Props = {
   assetPrice: BigNumber
   selectedCurrencyAsset: Asset
   onWithdraw: (percent: number) => void
-  stakeUnits?: string
-  totalAssetInPool?: string
-  totalRuneInPool?: string
-  poolUnits?: string
+  runeShare: BigNumber
+  assetShare: BigNumber
 }
 
 export const Withdraw: React.FC<Props> = ({
@@ -28,19 +26,13 @@ export const Withdraw: React.FC<Props> = ({
   runePrice,
   assetPrice,
   selectedCurrencyAsset,
-  poolUnits,
-  totalRuneInPool,
-  totalAssetInPool,
-  stakeUnits
+  runeShare,
+  assetShare
 }) => {
   const intl = useIntl()
   const [withdrawPercent, setWithdrawPercent] = useState(50)
 
-  const getWithdrawAmounts = useCallback(
-    getWithdrawAmountsFactory(poolUnits, totalRuneInPool, totalAssetInPool, stakeUnits),
-    [poolUnits, totalRuneInPool, totalAssetInPool, stakeUnits]
-  )
-  const withdrawAmounts = getWithdrawAmounts(withdrawPercent)
+  const withdrawAmounts = getWithdrawAmounts(runeShare, assetShare, withdrawPercent)
 
   return (
     <Styled.Container>
