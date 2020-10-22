@@ -1,11 +1,8 @@
 import React, { useMemo } from 'react'
 
 import { Asset } from '@thorchain/asgardex-util'
-import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import { useMidgardContext } from '../../contexts/MidgardContext'
-import { getDefaultRuneAsset } from '../../helpers/assetHelper'
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { StakeType } from '../../types/asgardex'
@@ -22,26 +19,19 @@ type Tab = {
 
 type Props = {
   asset: Asset
+  runeAsset: Asset
   ShareContent: React.ComponentType<{ asset: Asset }>
   StakeContent: React.ComponentType<{ asset: Asset; runeAsset: Asset; type: StakeType }>
-  WidthdrawContent: React.ComponentType<{ asset: Asset; runeAsset: Asset }>
+  WidthdrawContent: React.ComponentType<{ stakedAsset: Asset; runeAsset: Asset }>
   keystoreState: KeystoreState
 }
 
 export const Stake: React.FC<Props> = (props) => {
-  const { ShareContent, StakeContent, WidthdrawContent, asset, keystoreState } = props
+  const { ShareContent, StakeContent, WidthdrawContent, runeAsset, asset, keystoreState } = props
   const intl = useIntl()
 
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
   const walletIsLocked = useMemo(() => isLocked(keystoreState), [keystoreState])
-
-  const {
-    service: {
-      pools: { runeAsset$ }
-    }
-  } = useMidgardContext()
-
-  const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset(asset.chain))
 
   const tabs = useMemo(
     (): Tab[] => [
@@ -58,7 +48,7 @@ export const Stake: React.FC<Props> = (props) => {
       {
         key: 'withdraw',
         label: intl.formatMessage({ id: 'stake.withdraw' }),
-        content: <WidthdrawContent asset={asset} runeAsset={runeAsset} />
+        content: <WidthdrawContent stakedAsset={asset} runeAsset={runeAsset} />
       }
     ],
     [intl, asset, runeAsset]

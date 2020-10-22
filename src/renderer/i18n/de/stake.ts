@@ -20,7 +20,13 @@ const stake: StakeMessages = {
   'stake.poolDetails.returnToDate': 'Ertrag bis heute',
   'stake.wallet.add': 'Wallet hinzufügen',
   'stake.wallet.connect': 'Bitte verbinde Deine Wallet',
-  'stake.pool.noStakes': 'Du hast keine Anteile in diesem Pool'
+  'stake.pool.noStakes': 'Du hast keine Anteile in diesem Pool',
+  'stake.withdraw.title': 'Adjust withdrawal - DE',
+  'stake.withdraw.choseText': 'Wähle einen Betrag zwischen 0 und 100% zum Abheben',
+  'stake.withdraw.receiveText': 'Du solltest erhalten',
+  'stake.withdraw.fee': 'Gebühren',
+  'stake.withdraw.feeNote': 'Hinweis: {fee} werden für die Transaktionsgebühr in Deiner Wallet belassen',
+  'stake.withdraw.drag': 'Ziehen um Betrag abzuheben'
 }
 
 export default stake

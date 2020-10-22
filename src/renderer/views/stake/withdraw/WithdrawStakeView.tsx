@@ -2,15 +2,18 @@ import React from 'react'
 
 import { Asset } from '@thorchain/asgardex-util'
 
-import { WithdrawStake } from '../../../components/stake/withdraw/WithdrawStake'
+// @TODO (@thatStrangeGuy) Get real component after https://github.com/thorchain/asgardex-electron/issues/447
+// @TODO (@thatStrangeGuy) Remove optional props from story component
+import { WithdrawStory } from '../../../components/stake/withdraw/Withdraw.stories'
+// import { Withdraw } from '../../../components/stake/withdraw'
 
 type Props = {
-  asset: Asset
+  stakedAsset: Asset
   runeAsset: Asset
 }
 
 export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
-  const { asset, runeAsset } = props
+  const { stakedAsset, runeAsset } = props
 
-  return <WithdrawStake asset={asset} runeAsset={runeAsset} />
+  return <WithdrawStory runeAsset={runeAsset} stakedAsset={stakedAsset} />
 }

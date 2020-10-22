@@ -65,11 +65,11 @@ export const SliderWrapper = styled(Slider)`
   }
 `
 
-export const SliderLabel = styled.div`
+export const SliderLabel = styled.div.attrs({ className: 'sliderLabel' })`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-family: inherit;
   font-size: 12px;
-  font-family: 'MainFontRegular';
   color: ${palette('text', 1)};
 `

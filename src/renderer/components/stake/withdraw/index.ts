@@ -1,1 +1,1 @@
-export { WithdrawStake } from './WithdrawStake'
+export { Withdraw } from './Withdraw'
