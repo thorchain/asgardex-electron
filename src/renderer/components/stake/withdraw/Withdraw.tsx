@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 
-import { Asset, formatAssetAmount } from '@thorchain/asgardex-util'
+import { Asset, formatAssetAmount, formatBN } from '@thorchain/asgardex-util'
+import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/models'
@@ -11,12 +12,24 @@ import * as Styled from './Withdraw.styles'
 type Props = {
   stakedAsset: Asset
   runeAsset: Asset
+  runePrice: BigNumber
+  assetPrice: BigNumber
+  currencySymbol: string
   poolDetail: PoolDetail
   stakersAssetData: StakersAssetData
   onWithdraw: (percent: number) => void
 }
 
-export const Withdraw: React.FC<Props> = ({ onWithdraw, stakedAsset, runeAsset, poolDetail, stakersAssetData }) => {
+export const Withdraw: React.FC<Props> = ({
+  onWithdraw,
+  stakedAsset,
+  runeAsset,
+  poolDetail,
+  stakersAssetData,
+  runePrice,
+  assetPrice,
+  currencySymbol
+}) => {
   const intl = useIntl()
   const [withdrawPercent, setWithdrawPercent] = useState(50)
 
@@ -41,14 +54,16 @@ export const Withdraw: React.FC<Props> = ({ onWithdraw, stakedAsset, runeAsset, 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={runeAsset} />
         <Label weight={'bold'}>
-          {runeAsset.ticker} {formatAssetAmount({ amount: withdrawAmounts.runeWithdraw, decimal: 2 })}
+          {runeAsset.ticker} {formatAssetAmount({ amount: withdrawAmounts.runeWithdraw, decimal: 2 })} ({currencySymbol}{' '}
+          {formatBN(withdrawAmounts.runeWithdraw.amount().times(runePrice))})
         </Label>
       </Styled.AssetContainer>
 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={stakedAsset} />
         <Label weight={'bold'}>
-          {stakedAsset.ticker} {formatAssetAmount({ amount: withdrawAmounts.assetWithdraw, decimal: 2 })}
+          {stakedAsset.ticker} {formatAssetAmount({ amount: withdrawAmounts.assetWithdraw, decimal: 2 })} (
+          {currencySymbol} {formatBN(withdrawAmounts.assetWithdraw.amount().times(assetPrice))})
         </Label>
       </Styled.AssetContainer>
 
