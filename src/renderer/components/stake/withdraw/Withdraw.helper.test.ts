@@ -2,12 +2,6 @@ import { bn } from '@thorchain/asgardex-util'
 
 import { getWithdrawAmountsFactory } from './Withdraw.helper'
 
-/*
-poolUnits
-totalRuneInPool
-totalAssetInPool
-stakeUnits
- */
 describe('stake/Withdraw.helper', () => {
   describe('getWithdrawAmounts', () => {
     const getWithdrawAmounts = getWithdrawAmountsFactory(
@@ -19,20 +13,20 @@ describe('stake/Withdraw.helper', () => {
 
     it('zero percentes', () => {
       const withdraws = getWithdrawAmounts(0)
-      expect(withdraws.runeWithdraw.amount()).toEqual(bnOrZero(0))
-      expect(withdraws.assetWithdraw.amount()).toEqual(bnOrZero(0))
+      expect(withdraws.runeWithdraw.amount()).toEqual(bn(0))
+      expect(withdraws.assetWithdraw.amount()).toEqual(bn(0))
     })
 
     it('50 percentes', () => {
       const withdraws = getWithdrawAmounts(50)
-      expect(withdraws.runeWithdraw.amount()).toEqual(bnOrZero(0.96505711))
-      expect(withdraws.assetWithdraw.amount()).toEqual(bnOrZero(0.01601249))
+      expect(withdraws.runeWithdraw.amount()).toEqual(bn(0.96505711))
+      expect(withdraws.assetWithdraw.amount()).toEqual(bn(0.01601249))
     })
 
     it('100 percentes', () => {
       const withdraws = getWithdrawAmounts(100)
-      expect(withdraws.runeWithdraw.amount()).toEqual(bnOrZero(1.93011422))
-      expect(withdraws.assetWithdraw.amount()).toEqual(bnOrZero(0.03202499))
+      expect(withdraws.runeWithdraw.amount()).toEqual(bn(1.93011422))
+      expect(withdraws.assetWithdraw.amount()).toEqual(bn(0.03202499))
     })
   })
 })
