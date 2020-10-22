@@ -1,18 +1,14 @@
-import { AssetAmount, baseAmount, baseToAsset, bn, bnOrZero } from '@thorchain/asgardex-util'
+import { AssetAmount, baseAmount, baseToAsset, bn } from '@thorchain/asgardex-util'
+import BigNumber from 'bignumber.js'
 
-import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/models'
-
-export const getWithdrawAmountsFactory = (poolDetail: PoolDetail, stakersAssetData: StakersAssetData) => {
-  const poolUnits = poolDetail.poolUnits
-  const totalRuneInPool = bnOrZero(poolDetail.runeDepth)
-  const totalAssetInPool = bnOrZero(poolDetail.assetDepth)
-
-  const { units: stakeUnits } = stakersAssetData
-
-  const stakeUnitsBN = bnOrZero(stakeUnits)
-
-  const runeShare = poolUnits ? totalRuneInPool.multipliedBy(stakeUnitsBN).div(poolUnits) : bn(0)
-  const assetShare = poolUnits ? totalAssetInPool.multipliedBy(stakeUnitsBN).div(poolUnits) : bn(0)
+export const getWithdrawAmountsFactory = (
+  poolUnits: BigNumber,
+  totalRuneInPool: BigNumber,
+  totalAssetInPool: BigNumber,
+  stakeUnits: BigNumber
+) => {
+  const runeShare = poolUnits ? totalRuneInPool.multipliedBy(stakeUnits).div(poolUnits) : bn(0)
+  const assetShare = poolUnits ? totalAssetInPool.multipliedBy(stakeUnits).div(poolUnits) : bn(0)
 
   return (percentAmount: number): { runeWithdraw: AssetAmount; assetWithdraw: AssetAmount } => {
     const percentBn = bn(percentAmount / 100)

@@ -1,26 +1,20 @@
-import { bnOrZero } from '@thorchain/asgardex-util'
+import { bn } from '@thorchain/asgardex-util'
 
 import { getWithdrawAmountsFactory } from './Withdraw.helper'
 
+/*
+poolUnits
+totalRuneInPool
+totalAssetInPool
+stakeUnits
+ */
 describe('stake/Withdraw.helper', () => {
   describe('getWithdrawAmounts', () => {
     const getWithdrawAmounts = getWithdrawAmountsFactory(
-      {
-        poolUnits: '178806928424995',
-        runeDepth: '480244483866649',
-        assetDepth: '7968349234845',
-        asset: 'BNB.BNB'
-      },
-      {
-        asset: 'BNB.BNB',
-        assetStaked: '2959329',
-        assetWithdrawn: '0',
-        dateFirstStaked: 1600943752,
-        heightLastStaked: 512555,
-        runeStaked: '200000000',
-        runeWithdrawn: '0',
-        units: '71862938'
-      }
+      bn('178806928424995'),
+      bn('480244483866649'),
+      bn('7968349234845'),
+      bn('71862938')
     )
 
     it('zero percentes', () => {

@@ -4,7 +4,6 @@ import { Asset, formatAssetAmount, formatBN } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
-import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/models'
 import { Label } from '../../uielements/label'
 import { getWithdrawAmountsFactory } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
@@ -15,8 +14,10 @@ type Props = {
   runePrice: BigNumber
   assetPrice: BigNumber
   currencySymbol: string
-  poolDetail: PoolDetail
-  stakersAssetData: StakersAssetData
+  poolUnits: BigNumber
+  totalRuneInPool: BigNumber
+  totalAssetInPool: BigNumber
+  stakeUnits: BigNumber
   onWithdraw: (percent: number) => void
 }
 
@@ -24,19 +25,21 @@ export const Withdraw: React.FC<Props> = ({
   onWithdraw,
   stakedAsset,
   runeAsset,
-  poolDetail,
-  stakersAssetData,
   runePrice,
   assetPrice,
-  currencySymbol
+  currencySymbol,
+  poolUnits,
+  totalRuneInPool,
+  totalAssetInPool,
+  stakeUnits
 }) => {
   const intl = useIntl()
   const [withdrawPercent, setWithdrawPercent] = useState(50)
 
-  const getWithdrawAmounts = useCallback(getWithdrawAmountsFactory(poolDetail, stakersAssetData), [
-    poolDetail,
-    stakersAssetData
-  ])
+  const getWithdrawAmounts = useCallback(
+    getWithdrawAmountsFactory(poolUnits, totalRuneInPool, totalAssetInPool, stakeUnits),
+    [poolUnits, totalRuneInPool, totalAssetInPool, stakeUnits]
+  )
   const withdrawAmounts = getWithdrawAmounts(withdrawPercent)
 
   return (
