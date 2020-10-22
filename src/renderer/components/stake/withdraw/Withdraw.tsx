@@ -61,7 +61,7 @@ export const Withdraw: React.FC<Props> = ({
           {formatAssetAmountCurrency({
             amount: assetAmount(withdrawAmounts.runeWithdraw.amount().times(runePrice)),
             asset: selectedCurrencyAsset,
-            decimal: 2
+            trimZeros: true
           })}
           )
         </Label>
@@ -73,8 +73,7 @@ export const Withdraw: React.FC<Props> = ({
           {stakedAsset.ticker} {formatAssetAmount({ amount: withdrawAmounts.assetWithdraw, decimal: 2 })}(
           {formatAssetAmountCurrency({
             amount: assetAmount(withdrawAmounts.assetWithdraw.amount().times(assetPrice)),
-            asset: selectedCurrencyAsset,
-            decimal: 2
+            trimZeros: true
           })}
           )
         </Label>
