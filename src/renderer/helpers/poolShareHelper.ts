@@ -1,9 +1,9 @@
 import { baseAmount, BaseAmount, bn, bnOrZero } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
-import { ZERO_BN } from '../../../const'
-import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
-import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/models'
+import { ZERO_BN } from '../const'
+import { PoolDetail, StakersAssetData } from '../types/generated/midgard/models'
+import { THORCHAIN_DECIMAL } from './assetHelper'
 
 /**
  * RUNE share of a pool in `BaseAmount`
