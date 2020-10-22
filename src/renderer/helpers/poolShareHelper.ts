@@ -8,7 +8,10 @@ import { THORCHAIN_DECIMAL } from './assetHelper'
 /**
  * RUNE share of a pool in `BaseAmount`
  */
-export const getRuneShare = ({ units }: Pick<StakersAssetData, 'units'>, pool: PoolDetail): BaseAmount => {
+export const getRuneShare = (
+  { units }: Pick<StakersAssetData, 'units'>,
+  pool: Pick<PoolDetail, 'runeDepth' | 'poolUnits'>
+): BaseAmount => {
   const runeDepth = bnOrZero(pool.runeDepth)
   const stakeUnits = bnOrZero(units)
   // Default is 1 as neutral element for division

@@ -14,11 +14,11 @@ type Props = {
   runePrice: BigNumber
   assetPrice: BigNumber
   selectedCurrencyAsset: Asset
-  poolUnits: BigNumber
-  totalRuneInPool: BigNumber
-  totalAssetInPool: BigNumber
-  stakeUnits: BigNumber
   onWithdraw: (percent: number) => void
+  stakeUnits?: string
+  totalAssetInPool?: string
+  totalRuneInPool?: string
+  poolUnits?: string
 }
 
 export const Withdraw: React.FC<Props> = ({

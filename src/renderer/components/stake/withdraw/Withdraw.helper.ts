@@ -1,14 +1,17 @@
 import { AssetAmount, baseAmount, baseToAsset, bn } from '@thorchain/asgardex-util'
-import BigNumber from 'bignumber.js'
+
+import { getAssetShare, getRuneShare } from '../../../helpers/poolShareHelper'
 
 export const getWithdrawAmountsFactory = (
-  poolUnits: BigNumber,
-  totalRuneInPool: BigNumber,
-  totalAssetInPool: BigNumber,
-  stakeUnits: BigNumber
+  poolUnits?: string,
+  totalRuneInPool?: string,
+  totalAssetInPool?: string,
+  stakeUnits?: string
 ) => {
-  const runeShare = poolUnits ? totalRuneInPool.multipliedBy(stakeUnits).div(poolUnits) : bn(0)
-  const assetShare = poolUnits ? totalAssetInPool.multipliedBy(stakeUnits).div(poolUnits) : bn(0)
+  const units = { units: stakeUnits }
+
+  const runeShare = getRuneShare(units, { runeDepth: totalRuneInPool, poolUnits }).amount()
+  const assetShare = getAssetShare(units, { assetDepth: totalAssetInPool, poolUnits }).amount()
 
   return (percentAmount: number): { runeWithdraw: AssetAmount; assetWithdraw: AssetAmount } => {
     const percentBn = bn(percentAmount / 100)
