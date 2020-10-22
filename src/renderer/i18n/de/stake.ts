@@ -22,11 +22,11 @@ const stake: StakeMessages = {
   'stake.wallet.connect': 'Bitte verbinde Deine Wallet',
   'stake.pool.noStakes': 'Du hast keine Anteile in diesem Pool',
   'stake.withdraw.title': 'Adjust withdrawal - DE',
-  'stake.withdraw.choseText': 'Choose from 0 to 100% of how much to withdraw. - DE',
-  'stake.withdraw.receiveText': 'You should receive. - DE',
-  'stake.withdraw.fee': 'Fee - DE',
-  'stake.withdraw.feeNote': 'Note: {fee} BNB will be left in your wallet for the transaction fees. - DE',
-  'stake.withdraw.drag': 'Drag to withdraw - DE'
+  'stake.withdraw.choseText': 'Wähle einen Betrag zwischen 0 und 100% zum Abheben',
+  'stake.withdraw.receiveText': 'Du solltest erhalten',
+  'stake.withdraw.fee': 'Gebühren',
+  'stake.withdraw.feeNote': 'Hinweis: {fee} werden für die Transaktionsgebühr in Deiner Wallet belassen',
+  'stake.withdraw.drag': 'Ziehen um Betrag abzuheben'
 }
 
 export default stake
