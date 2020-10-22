@@ -2,6 +2,7 @@ import { Col, Row } from 'antd'
 import styled from 'styled-components'
 
 import { AssetCard as BaseAssetCard } from '../../uielements/assets/assetCard'
+import { Label as UILabel } from '../../uielements/label'
 
 export const Container = styled('div')`
   display: flex;
@@ -31,4 +32,10 @@ export const AssetCard = styled(BaseAssetCard)`
 
 export const DragWrapper = styled('div')`
   padding: 20px;
+`
+
+export const FeeLabel = styled(UILabel).attrs({
+  size: 'normal'
+})`
+  padding: 0;
 `
