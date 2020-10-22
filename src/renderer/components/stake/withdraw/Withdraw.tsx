@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 
-import { Asset, formatAssetAmount, formatBN } from '@thorchain/asgardex-util'
+import { Asset, assetAmount, formatAssetAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
@@ -13,7 +13,7 @@ type Props = {
   runeAsset: Asset
   runePrice: BigNumber
   assetPrice: BigNumber
-  currencySymbol: string
+  selectedCurrencyAsset: Asset
   poolUnits: BigNumber
   totalRuneInPool: BigNumber
   totalAssetInPool: BigNumber
@@ -27,7 +27,7 @@ export const Withdraw: React.FC<Props> = ({
   runeAsset,
   runePrice,
   assetPrice,
-  currencySymbol,
+  selectedCurrencyAsset,
   poolUnits,
   totalRuneInPool,
   totalAssetInPool,
@@ -57,16 +57,26 @@ export const Withdraw: React.FC<Props> = ({
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={runeAsset} />
         <Label weight={'bold'}>
-          {runeAsset.ticker} {formatAssetAmount({ amount: withdrawAmounts.runeWithdraw, decimal: 2 })} ({currencySymbol}{' '}
-          {formatBN(withdrawAmounts.runeWithdraw.amount().times(runePrice))})
+          {runeAsset.ticker} {formatAssetAmount({ amount: withdrawAmounts.runeWithdraw, decimal: 2 })}(
+          {formatAssetAmountCurrency({
+            amount: assetAmount(withdrawAmounts.runeWithdraw.amount().times(runePrice)),
+            asset: selectedCurrencyAsset,
+            decimal: 2
+          })}
+          )
         </Label>
       </Styled.AssetContainer>
 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={stakedAsset} />
         <Label weight={'bold'}>
-          {stakedAsset.ticker} {formatAssetAmount({ amount: withdrawAmounts.assetWithdraw, decimal: 2 })} (
-          {currencySymbol} {formatBN(withdrawAmounts.assetWithdraw.amount().times(assetPrice))})
+          {stakedAsset.ticker} {formatAssetAmount({ amount: withdrawAmounts.assetWithdraw, decimal: 2 })}(
+          {formatAssetAmountCurrency({
+            amount: assetAmount(withdrawAmounts.assetWithdraw.amount().times(assetPrice)),
+            asset: selectedCurrencyAsset,
+            decimal: 2
+          })}
+          )
         </Label>
       </Styled.AssetContainer>
 
