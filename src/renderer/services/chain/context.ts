@@ -1,7 +1,6 @@
-import { chainAsset$ } from './asset'
-import { reloadFees, stakeFee$ } from './fees'
+import { reloadFees, stakeFees$ } from './fees'
 
 /**
  * Exports all functions and observables needed at UI level (provided by `ChainContext`)
  */
-export { reloadFees, stakeFee$, chainAsset$ }
+export { reloadFees, stakeFees$ }

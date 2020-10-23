@@ -5,11 +5,13 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { BASE_CHAIN } from '../../const'
+import { eqChain } from '../../helpers/fp/eq'
 import { triggerStream } from '../../helpers/stateHelper'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/context'
-import { selectedPoolChain$ } from '../midgard/common'
-import { FeeLD } from './types'
+import { selectedPoolAsset$, selectedPoolChain$ } from '../midgard/common'
+import { FeeLD, StakeFeesLD } from './types'
 
 const reloadFeesByChain = (chain: Chain) => {
   switch (chain) {
@@ -34,7 +36,21 @@ const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
 
 // reload fees
 Rx.combineLatest([selectedPoolChain$, reloadFees$])
-  .pipe(RxOp.switchMap(([oChain]) => Rx.of(FP.pipe(oChain, O.map(reloadFeesByChain)))))
+  .pipe(
+    RxOp.switchMap(([oChain]) =>
+      Rx.of(
+        FP.pipe(
+          oChain,
+          O.map((chain) => {
+            reloadFeesByChain(chain)
+            // reload base chain if it's different to selected chain (needed for fees to transfer RUNE assets on base chain)
+            if (!eqChain.equals(chain, BASE_CHAIN)) reloadFeesByChain(BASE_CHAIN)
+            return true
+          })
+        )
+      )
+    )
+  )
   .subscribe()
 
 const stakeFeeByChain$ = (chain: Chain): FeeLD => {
@@ -47,18 +63,29 @@ const stakeFeeByChain$ = (chain: Chain): FeeLD => {
       return Rx.of(RD.failure(new Error('Stake fee for ETH has not been implemented')))
     case 'THOR':
       return Rx.of(RD.failure(new Error('Stake fee for THOR has not been implemented')))
-    default:
-      return Rx.of(RD.failure(new Error(`Getting stake fees for ${chain} is not supported`)))
   }
 }
 
-const stakeFee$: FeeLD = selectedPoolChain$.pipe(
-  RxOp.switchMap((oChain) =>
+const stakeFees$: StakeFeesLD = selectedPoolAsset$.pipe(
+  RxOp.switchMap((oPoolAsset) =>
     FP.pipe(
-      oChain,
-      O.fold(() => Rx.of(RD.initial), stakeFeeByChain$)
+      oPoolAsset,
+      O.fold(
+        () => Rx.of(RD.initial),
+        (poolAsset) =>
+          FP.pipe(
+            Rx.combineLatest([stakeFeeByChain$(BASE_CHAIN), stakeFeeByChain$(poolAsset.chain)]),
+            RxOp.map((fees) => RD.combine(...fees)),
+            RxOp.map(
+              RD.map(([base, pool]) => ({
+                base,
+                pool
+              }))
+            )
+          )
+      )
     )
   )
 )
 
-export { stakeFee$, reloadFees }
+export { stakeFees$, reloadFees }

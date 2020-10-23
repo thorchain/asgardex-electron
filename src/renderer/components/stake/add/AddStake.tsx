@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
@@ -16,8 +16,9 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { ZERO_BASE_AMOUNT } from '../../../const'
-import { FeeRD } from '../../../services/chain/types'
+import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
+import { eqChain } from '../../../helpers/fp/eq'
+import { StakeFeesRD } from '../../../services/chain/types'
 import { StakeType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
 import * as Helper from './AddStake.helper'
@@ -32,9 +33,8 @@ type Props = {
   assetBalance: BaseAmount
   runeBalance: BaseAmount
   priceAsset?: Asset
-  fee: FeeRD
-  reloadFee: () => void
-  chainAsset: O.Option<Asset>
+  fees: StakeFeesRD
+  reloadFees: () => void
   assets?: Asset[]
   onStake: (stakeData: { asset: Asset; runeAsset: Asset; assetStake: BaseAmount; runeStake: BaseAmount }) => void
   onChangeAsset: (asset: Asset) => void
@@ -52,9 +52,8 @@ export const AddStake: React.FC<Props> = ({
   runeBalance,
   assets,
   priceAsset,
-  fee: feeRD,
-  reloadFee,
-  chainAsset: oChainAsset,
+  reloadFees,
+  fees,
   onStake,
   onChangeAsset,
   disabled = false,
@@ -147,36 +146,55 @@ export const AddStake: React.FC<Props> = ({
     })
   }, [onStake, asset, runeAsset, assetAmountToStake, runeAmountToStake])
 
-  const prevFeeRef = useRef<O.Option<BaseAmount>>(O.none)
-
   const formatFee = useCallback(
-    (fee: BaseAmount) =>
+    (fee: BaseAmount, asset) =>
       formatAssetAmountCurrency({
         amount: baseToAsset(fee),
-        asset: O.toUndefined(oChainAsset),
+        asset,
         trimZeros: true
       }),
-    [oChainAsset]
+    []
   )
 
-  const feeLabel = useMemo(
+  const hasCrossChainFee = useMemo(() => !eqChain.equals(asset.chain, BASE_CHAIN_ASSET.chain), [asset.chain])
+
+  // TODO(@Veado) Needed for validation
+  // issue: https://github.com/thorchain/asgardex-electron/issues/550
+  const _baseChainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        feeRD,
+        fees,
+        RD.toOption,
+        O.map(({ base }) => base)
+      ),
+    [fees]
+  )
+
+  // TODO(@Veado) Needed for validation
+  // issue: https://github.com/thorchain/asgardex-electron/issues/550
+  const _poolChainFee: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        fees,
+        RD.toOption,
+        O.map(({ pool }) => pool)
+      ),
+    [fees]
+  )
+
+  const feesLabel = useMemo(
+    () =>
+      FP.pipe(
+        fees,
         RD.fold(
           () => '...',
-          () =>
-            // show previous fees while re-loading
-            FP.pipe(
-              prevFeeRef.current,
-              O.map(formatFee),
-              O.getOrElse(() => '...')
-            ),
+          () => '...',
           (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
-          formatFee
+          ({ base, pool }) =>
+            `${formatFee(base, BASE_CHAIN_ASSET)} ${hasCrossChainFee ? '+ ' + formatFee(pool, asset) : ''}`
         )
       ),
-    [feeRD, formatFee, intl]
+    [asset, fees, formatFee, hasCrossChainFee, intl]
   )
 
   return (
@@ -198,13 +216,16 @@ export const AddStake: React.FC<Props> = ({
           />
           <Row align="middle">
             <Col>
-              <Styled.ReloadFeeButton onClick={reloadFee} disabled={RD.isPending(feeRD)}>
+              <Styled.ReloadFeeButton onClick={reloadFees} disabled={RD.isPending(fees)}>
                 <SyncOutlined />
               </Styled.ReloadFeeButton>
             </Col>
             <Col>
-              <Styled.FeeLabel disabled={RD.isPending(feeRD)}>
-                {intl.formatMessage({ id: 'common.fee' })}: {feeLabel}
+              <Styled.FeeLabel disabled={RD.isPending(fees)}>
+                {hasCrossChainFee
+                  ? intl.formatMessage({ id: 'common.fees' })
+                  : intl.formatMessage({ id: 'common.fee' })}
+                : {feesLabel}
               </Styled.FeeLabel>
             </Col>
           </Row>
