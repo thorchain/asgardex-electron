@@ -11,7 +11,8 @@ import {
   formatBN,
   getValueOfAsset1InAsset2,
   PoolData,
-  baseToAsset
+  baseToAsset,
+  getSwapMemo
 } from '@thorchain/asgardex-util'
 import { Spin } from 'antd'
 import { eqString } from 'fp-ts/Eq'
@@ -38,7 +39,7 @@ import { Drag } from '../uielements/drag'
 import { Modal } from '../uielements/modal'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
-import { getSwapData, getSwapMemo, assetWithPriceToAsset, pickAssetWithPrice } from './Swap.utils'
+import { getSwapData, assetWithPriceToAsset, pickAssetWithPrice } from './Swap.utils'
 
 type SwapProps = {
   balance?: number
@@ -246,8 +247,7 @@ export const Swap = ({
       assetsToSwap,
       // eslint-disable-next-line  array-callback-return
       O.map(([sourceAsset, targetAsset]) => {
-        // @todo thatStrangeGuy is address empty ?
-        const memo = getSwapMemo(targetAsset.symbol, '')
+        const memo = getSwapMemo({ asset: targetAsset })
         onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
       })
     )

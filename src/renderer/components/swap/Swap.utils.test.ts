@@ -2,15 +2,9 @@ import { assetToString, baseAmount, bn, PoolData } from '@thorchain/asgardex-uti
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
-import { getSwapMemo, isRuneSwap, getSlip, getSwapResult, getSwapData, pickAssetWithPrice } from './Swap.utils'
+import { isRuneSwap, getSlip, getSwapResult, getSwapData, pickAssetWithPrice } from './Swap.utils'
 
 describe('components/swap/utils', () => {
-  it('getSwapMemo', () => {
-    expect(getSwapMemo('symbol', '')).toEqual('SWAP:BNB.symbol')
-    expect(getSwapMemo('symbol', 'address')).toEqual('SWAP:BNB.symbol:address')
-    expect(getSwapMemo('symbol', '', 'limit')).toEqual('SWAP:BNB.symbol:limit')
-  })
-
   describe('isRuneSwap', () => {
     it('should return none if no RUNE asset', () => {
       expect(isRuneSwap(ASSETS_TESTNET.BOLT, ASSETS_TESTNET.BNB)).toBeNone()

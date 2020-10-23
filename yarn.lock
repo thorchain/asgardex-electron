@@ -2939,10 +2939,10 @@
   dependencies:
     polished "^3.6.3"
 
-"@thorchain/asgardex-util@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.5.0.tgz#afe63cb6a37caaacdfd7dc97bb95893ddf59aca9"
-  integrity sha512-FZqUdgcl46kKraLHEk8qpNAzFCetudTShnfk3DbT1EREYTBKiaM1HZRYDO3gWrBPjuq6bazqfdrP2Ol5uY1ApQ==
+"@thorchain/asgardex-util@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.6.0.tgz#ed1953ef092d8518f8f1b6512ffb1a928cbaa327"
+  integrity sha512-h5JvZponl+uifBXgZZMCUZZpfh29ETE5OzOYQ4IalmjEd0f/pTOdkuD/5Xci53m3INiVtDYxrwR+Z3uxu/rfYA==
 
 "@types/anymatch@*":
   version "1.3.1"

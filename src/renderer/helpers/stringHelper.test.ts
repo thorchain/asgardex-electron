@@ -1,34 +1,9 @@
 import { some } from 'fp-ts/lib/Option'
 
 import { Pair } from '../types/asgardex'
-import { getTickerFormat, getPair, compareShallowStr } from './stringHelper'
+import { getPair, compareShallowStr } from './stringHelper'
 
 describe('helpers/stringHelper/', () => {
-  // getTickerFormat
-
-  describe('getTickerFormat', () => {
-    it('should get a ticker from pool and symbol', () => {
-      const result = getTickerFormat('BNB.TUSDB-000')
-      expect(result).toEqual(some('tusdb'))
-    })
-    it('should get a ticker from symbol', () => {
-      const result = getTickerFormat('TUSDB-000')
-      expect(result).toEqual(some('tusdb'))
-    })
-    it('should parse a pair ', () => {
-      const result = getTickerFormat('STAKE:TUSDB-000')
-      expect(result).toEqual(some('stake:tusdb'))
-    })
-    it('should returns null of no symbol given ', () => {
-      const result = getTickerFormat()
-      expect(result).toBeNone()
-    })
-    it('should lowercase ticker only ', () => {
-      const result = getTickerFormat('XXX000')
-      expect(result).toEqual(some('xxx000'))
-    })
-  })
-
   // getPair
 
   describe('getPair', () => {
