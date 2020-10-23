@@ -1,14 +1,17 @@
 import { baseAmount, BaseAmount, bn, bnOrZero } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 
-import { ZERO_BN } from '../../../const'
-import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
-import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/models'
+import { ZERO_BN } from '../const'
+import { PoolDetail, StakersAssetData } from '../types/generated/midgard/models'
+import { THORCHAIN_DECIMAL } from './assetHelper'
 
 /**
  * RUNE share of a pool in `BaseAmount`
  */
-export const getRuneShare = ({ units }: Pick<StakersAssetData, 'units'>, pool: PoolDetail): BaseAmount => {
+export const getRuneShare = (
+  { units }: Pick<StakersAssetData, 'units'>,
+  pool: Pick<PoolDetail, 'runeDepth' | 'poolUnits'>
+): BaseAmount => {
   const runeDepth = bnOrZero(pool.runeDepth)
   const stakeUnits = bnOrZero(units)
   // Default is 1 as neutral element for division

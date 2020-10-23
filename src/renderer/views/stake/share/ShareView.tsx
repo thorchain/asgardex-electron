@@ -12,10 +12,10 @@ import { PoolShare } from '../../../components/uielements/poolShare'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
 import { getDefaultRunePricePool } from '../../../helpers/poolHelper'
+import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard'
-import * as helpers from './ShareView.helper'
 import * as Styled from './ShareView.styles'
 
 export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
@@ -44,9 +44,9 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
 
   const renderPoolShareReady = useCallback(
     (stake: StakersAssetData, poolDetail: PoolDetail) => {
-      const runeShare = helpers.getRuneShare(stake, poolDetail)
-      const assetShare = helpers.getAssetShare(stake, poolDetail)
-      const poolShare = helpers.getPoolShare(stake, poolDetail)
+      const runeShare = shareHelpers.getRuneShare(stake, poolDetail)
+      const assetShare = shareHelpers.getAssetShare(stake, poolDetail)
+      const poolShare = shareHelpers.getPoolShare(stake, poolDetail)
       // stake units are RUNE based, provided as `BaseAmount`
       const stakeUnits = baseAmount(bnOrZero(stake.units))
 

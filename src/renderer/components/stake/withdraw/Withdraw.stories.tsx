@@ -14,10 +14,8 @@ export const WithdrawStory: React.FC<{ stakedAsset?: Asset; runeAsset?: Asset }>
       runePrice={bn(1)}
       selectedCurrencyAsset={AssetRune67C}
       onWithdraw={console.log}
-      poolUnits={bn(178806928424995)}
-      totalRuneInPool={bn(480244483866649)}
-      totalAssetInPool={bn(7968349234845)}
-      stakeUnits={bn(71862938)}
+      runeShare={bn('193011422')}
+      assetShare={bn('3202499')}
       {...props}
     />
   )
