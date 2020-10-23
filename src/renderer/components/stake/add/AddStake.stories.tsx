@@ -1,9 +1,12 @@
 import React from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { bn, assetAmount, assetToBase, AssetRune67C, AssetBNB, baseAmount, AssetBTC } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
+import { TRANSFER_FEES } from '../../../../shared/mock/fees'
 import { AddStake } from './AddStake'
 
 const assetBalance = assetToBase(assetAmount(200))
@@ -13,6 +16,9 @@ const poolData = {
   runeBalance: baseAmount('2000')
 }
 const assets = [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO]
+const chainAsset = O.some(AssetBNB)
+const fee = RD.success(assetToBase(TRANSFER_FEES.single))
+const reloadFeeHandler = () => console.log('reload fee')
 
 export const AddAsymStakeStory = () => {
   return (
@@ -26,6 +32,9 @@ export const AddAsymStakeStory = () => {
       runeBalance={runeBalance}
       onStake={console.log}
       onChangeAsset={console.log}
+      reloadFee={reloadFeeHandler}
+      chainAsset={chainAsset}
+      fee={fee}
       poolData={poolData}
       priceAsset={AssetRune67C}
       assets={assets}
@@ -44,6 +53,9 @@ export const AddSymStakeStory = () => {
       runeBalance={runeBalance}
       onStake={console.log}
       onChangeAsset={console.log}
+      chainAsset={chainAsset}
+      fee={fee}
+      reloadFee={reloadFeeHandler}
       poolData={poolData}
       priceAsset={AssetRune67C}
       assets={assets}

@@ -2,7 +2,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import midgard from '@thorchain/asgardex-midgard'
 import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
-import { retry, catchError, map, shareReplay, startWith, switchMap, distinctUntilChanged } from 'rxjs/operators'
+import { retry, catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 
 import { isEnv } from '../../helpers/envHelper'
 import { fromPromise$ } from '../../helpers/rx/fromPromise'
@@ -37,16 +37,10 @@ const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.
   RD.failure
 )
 
-const latestNetwork$ = network$.pipe(
-  // Since `getNetworkState` is created by `observableState` and it takes an initial value,
-  // this stream might emit same values and we do need a "dirty check"
-  // to avoid to create another instance of byzantine by having same `Network`
-  distinctUntilChanged()
-)
 /**
  * Endpoint provided by Byzantine
  */
-const byzantine$: ByzantineLD = Rx.combineLatest([latestNetwork$, reloadByzantine$]).pipe(
+const byzantine$: ByzantineLD = Rx.combineLatest([network$, reloadByzantine$]).pipe(
   switchMap(([network]) => nextByzantine$(network)),
   shareReplay(1)
 )

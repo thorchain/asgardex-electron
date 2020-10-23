@@ -10,6 +10,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { AddStake } from '../../../components/stake/add/AddStake'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
@@ -88,6 +89,10 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
     RD.map((state) => bnOrZero(state.price).multipliedBy(runPrice))
   )
 
+  const { stakeFee$, chainAsset$, reloadFees } = useChainContext()
+  const stakeFeeRD = useObservableState(stakeFee$, RD.initial)
+  const oChainAsset = useObservableState(chainAsset$, O.none)
+
   const renderDisabledAddStake = useCallback(
     () => (
       <AddStake
@@ -100,6 +105,9 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
         assetBalance={ZERO_BASE_AMOUNT}
         runeBalance={ZERO_BASE_AMOUNT}
         onStake={() => {}}
+        fee={RD.initial}
+        reloadFee={() => {}}
+        chainAsset={O.none}
         priceAsset={selectedPricePoolAsset}
         disabled={true}
         poolData={{ runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }}
@@ -127,6 +135,9 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
             assetBalance={assetBalance}
             runeBalance={runeBalance}
             onStake={console.log}
+            fee={stakeFeeRD}
+            reloadFee={reloadFees}
+            chainAsset={oChainAsset}
             priceAsset={selectedPricePoolAsset}
             assets={poolAssets}
           />

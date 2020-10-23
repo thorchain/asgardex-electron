@@ -1,5 +1,5 @@
 import * as Rx from 'rxjs'
-import { startWith, mapTo } from 'rxjs/operators'
+import { startWith, mapTo, distinctUntilChanged } from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
 import { DEFAULT_NETWORK } from '../const'
@@ -15,6 +15,11 @@ const onlineStatus$ = Rx.merge(online$, offline$).pipe(startWith(navigator.onLin
 /**
  * State of `Network`
  */
-const { get$: network$, set: changeNetwork, get: getCurrentNetworkState } = observableState<Network>(DEFAULT_NETWORK)
+const { get$: getNetwork$, set: changeNetwork, get: getCurrentNetworkState } = observableState<Network>(DEFAULT_NETWORK)
+
+// Since `network$` based on `observableState` and it takes an initial value,
+// it might emit same values, we don't interested in.
+// So we do need a simple "dirty check" to provide "real" changes of selected network
+const network$ = getNetwork$.pipe(distinctUntilChanged())
 
 export { onlineStatus$, network$, changeNetwork, getCurrentNetworkState }

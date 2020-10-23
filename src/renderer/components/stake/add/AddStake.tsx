@@ -1,11 +1,23 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 
-import { Asset, baseAmount, BaseAmount, PoolData } from '@thorchain/asgardex-util'
-import { Col } from 'antd'
+import { SyncOutlined } from '@ant-design/icons'
+import * as RD from '@devexperts/remote-data-ts'
+import {
+  Asset,
+  baseAmount,
+  BaseAmount,
+  baseToAsset,
+  formatAssetAmountCurrency,
+  PoolData
+} from '@thorchain/asgardex-util'
+import { Col, Row } from 'antd'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { ZERO_BASE_AMOUNT } from '../../../const'
+import { FeeRD } from '../../../services/chain/types'
 import { StakeType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
 import * as Helper from './AddStake.helper'
@@ -20,6 +32,9 @@ type Props = {
   assetBalance: BaseAmount
   runeBalance: BaseAmount
   priceAsset?: Asset
+  fee: FeeRD
+  reloadFee: () => void
+  chainAsset: O.Option<Asset>
   assets?: Asset[]
   onStake: (stakeData: { asset: Asset; runeAsset: Asset; assetStake: BaseAmount; runeStake: BaseAmount }) => void
   onChangeAsset: (asset: Asset) => void
@@ -37,6 +52,9 @@ export const AddStake: React.FC<Props> = ({
   runeBalance,
   assets,
   priceAsset,
+  fee: feeRD,
+  reloadFee,
+  chainAsset: oChainAsset,
   onStake,
   onChangeAsset,
   disabled = false,
@@ -129,6 +147,38 @@ export const AddStake: React.FC<Props> = ({
     })
   }, [onStake, asset, runeAsset, assetAmountToStake, runeAmountToStake])
 
+  const prevFeeRef = useRef<O.Option<BaseAmount>>(O.none)
+
+  const formatFee = useCallback(
+    (fee: BaseAmount) =>
+      formatAssetAmountCurrency({
+        amount: baseToAsset(fee),
+        asset: O.toUndefined(oChainAsset),
+        trimZeros: true
+      }),
+    [oChainAsset]
+  )
+
+  const feeLabel = useMemo(
+    () =>
+      FP.pipe(
+        feeRD,
+        RD.fold(
+          () => '...',
+          () =>
+            // show previous fees while re-loading
+            FP.pipe(
+              prevFeeRef.current,
+              O.map(formatFee),
+              O.getOrElse(() => '...')
+            ),
+          (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
+          formatFee
+        )
+      ),
+    [feeRD, formatFee, intl]
+  )
+
   return (
     <Styled.Container>
       <Styled.CardsRow gutter={{ lg: 32 }}>
@@ -146,6 +196,18 @@ export const AddStake: React.FC<Props> = ({
             onChangeAsset={onChangeAsset}
             priceAsset={priceAsset}
           />
+          <Row align="middle">
+            <Col>
+              <Styled.ReloadFeeButton onClick={reloadFee} disabled={RD.isPending(feeRD)}>
+                <SyncOutlined />
+              </Styled.ReloadFeeButton>
+            </Col>
+            <Col>
+              <Styled.FeeLabel disabled={RD.isPending(feeRD)}>
+                {intl.formatMessage({ id: 'common.fee' })}: {feeLabel}
+              </Styled.FeeLabel>
+            </Col>
+          </Row>
         </Col>
 
         <Col xs={24} xl={12}>
