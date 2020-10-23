@@ -21,13 +21,6 @@ import { isRuneAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { AssetWithPrice } from '../../services/binance/types'
 
-const getAssetFormat = (symbol: string) => {
-  return `BNB.${symbol}`
-}
-
-export const getSwapMemo = (symbol: string, addr: string, sliplimit = '') =>
-  `SWAP:${getAssetFormat(symbol)}${addr ? `:${addr}` : ''}${sliplimit ? `:${sliplimit}` : ''}`
-
 /**
  * @returns none - neither sourceAsset neither targetAsset is RUNE
  *          some(true) - targetAsset is RUNE
