@@ -43,7 +43,7 @@ Rx.combineLatest([selectedPoolChain$, reloadFees$])
           oChain,
           O.map((chain) => {
             reloadFeesByChain(chain)
-            // reload base chain if it's different to selected chain (needed for fees to transfer RUNE assets on base chain)
+            // reload base-chain if it's different to selected pool-chain (needed for fees to transfer RUNE assets on base chain)
             if (!eqChain.equals(chain, BASE_CHAIN)) reloadFeesByChain(BASE_CHAIN)
             return true
           })

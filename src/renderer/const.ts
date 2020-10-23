@@ -24,8 +24,6 @@ export const BASE_CHAIN: Chain = 'BNB'
 
 /**
  * Asset of "base" chain RUNE is currently running on
- * BNB for now, but it will be changed to `NativeRUNE` in the near future
- * TODO(@veado): Change it if we go live with `NativeRUNE`
  */
 export const BASE_CHAIN_ASSET: Asset = getChainAsset(BASE_CHAIN)
 
