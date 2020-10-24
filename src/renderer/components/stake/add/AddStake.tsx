@@ -2,15 +2,8 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import {
-  Asset,
-  baseAmount,
-  BaseAmount,
-  baseToAsset,
-  formatAssetAmountCurrency,
-  PoolData
-} from '@thorchain/asgardex-util'
-import { Col, Row } from 'antd'
+import { Asset, baseAmount, BaseAmount, PoolData } from '@thorchain/asgardex-util'
+import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -146,16 +139,6 @@ export const AddStake: React.FC<Props> = ({
     })
   }, [onStake, asset, runeAsset, assetAmountToStake, runeAmountToStake])
 
-  const formatFee = useCallback(
-    (fee: BaseAmount, asset) =>
-      formatAssetAmountCurrency({
-        amount: baseToAsset(fee),
-        asset,
-        trimZeros: true
-      }),
-    []
-  )
-
   const hasCrossChainFee = useMemo(() => !eqChain.equals(asset.chain, BASE_CHAIN_ASSET.chain), [asset.chain])
 
   // TODO(@Veado) Needed for validation
@@ -177,7 +160,7 @@ export const AddStake: React.FC<Props> = ({
       FP.pipe(
         fees,
         RD.toOption,
-        O.map(({ pool }) => pool)
+        O.chain(({ cross }) => cross)
       ),
     [fees]
   )
@@ -190,11 +173,16 @@ export const AddStake: React.FC<Props> = ({
           () => '...',
           () => '...',
           (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
-          ({ base, pool }) =>
-            `${formatFee(base, BASE_CHAIN_ASSET)} ${hasCrossChainFee ? '+ ' + formatFee(pool, asset) : ''}`
+          ({ base, cross }) =>
+            // Show one or two fees
+            `${Helper.formatFee(base, BASE_CHAIN_ASSET)} ${FP.pipe(
+              cross,
+              O.map((crossFee) => ` + ${Helper.formatFee(crossFee, asset)}`),
+              O.getOrElse(() => '')
+            )}`
         )
       ),
-    [asset, fees, formatFee, hasCrossChainFee, intl]
+    [asset, fees, intl]
   )
 
   return (
@@ -214,7 +202,7 @@ export const AddStake: React.FC<Props> = ({
             onChangeAsset={onChangeAsset}
             priceAsset={priceAsset}
           />
-          <Row align="middle">
+          <Styled.FeeRow>
             <Col>
               <Styled.ReloadFeeButton onClick={reloadFees} disabled={RD.isPending(fees)}>
                 <SyncOutlined />
@@ -228,7 +216,7 @@ export const AddStake: React.FC<Props> = ({
                 : {feesLabel}
               </Styled.FeeLabel>
             </Col>
-          </Row>
+          </Styled.FeeRow>
         </Col>
 
         <Col xs={24} xl={12}>
