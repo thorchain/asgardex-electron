@@ -26,7 +26,7 @@ const stake: StakeMessages = {
   'stake.withdraw.receiveText': 'Du solltest erhalten',
   'stake.withdraw.fee': 'Gebühren',
   'stake.withdraw.feeNote': 'Hinweis: {fee} werden für die Transaktionsgebühr in Deiner Wallet belassen',
-  'stake.withdraw.drag': 'Ziehen um Betrag abzuheben'
+  'stake.withdraw.drag': 'Ziehen um Abzuheben'
 }
 
 export default stake

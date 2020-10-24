@@ -1,4 +1,5 @@
 import { bnOrZero, PoolData, assetFromString, Asset, Chain } from '@thorchain/asgardex-util'
+import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
@@ -116,3 +117,9 @@ export const getDeepestPool = (pools: PoolDetails): O.Option<PoolDetail> =>
     const prev = O.toNullable(acc)
     return runeDepth.isGreaterThanOrEqualTo(bnOrZero(prev?.runeDepth)) ? O.some(pool) : acc
   }, O.none)
+
+/**
+ * Converts Asset's pool price according to runePrice in selectedPriceAsset
+ */
+export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: PoolDetail) =>
+  bnOrZero(poolDetail.price).multipliedBy(runePrice)

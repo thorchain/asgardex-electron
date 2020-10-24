@@ -10,7 +10,6 @@ import { useIntl } from 'react-intl'
 
 import { PoolShare } from '../../../components/uielements/poolShare'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
-import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
 import { getDefaultRunePricePool } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
@@ -18,10 +17,10 @@ import { toPoolData } from '../../../services/midgard/utils'
 import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard'
 import * as Styled from './ShareView.styles'
 
-export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
+export const ShareView: React.FC<{ asset: Asset; runeAsset: Asset }> = ({ asset, runeAsset }) => {
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$, runeAsset$ },
+    pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$ },
     stake: { getStakes$ }
   } = midgardService
 
@@ -29,14 +28,10 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
 
   /**
    * We have to get a new stake-stream for every new asset
-   * DON'T remove `slint-disable-next-line ...` ;)
    * @description /src/renderer/services/midgard/stake.ts
    */
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const stakeData$ = useMemo(() => getStakes$(), [asset])
-  const stakeData = useObservableState<StakersAssetDataRD>(stakeData$, RD.initial)
+  const [stakeData] = useObservableState<StakersAssetDataRD>(getStakes$, RD.initial)
 
-  const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
 
