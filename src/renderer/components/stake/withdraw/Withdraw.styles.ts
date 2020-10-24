@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 import { AssetIcon as AssetIconBase } from '../../uielements/assets/assetIcon'
 import { Drag as BaseDrag } from '../../uielements/drag'
+import { Label as UILabel } from '../../uielements/label'
 import { Slider as BaseSlider } from '../../uielements/slider'
 
 export const Container = styled('div')`
@@ -35,4 +36,10 @@ export const Slider = styled(BaseSlider).attrs({
 export const Drag = styled(BaseDrag)`
   display: flex;
   justify-content: center;
+`
+
+export const OutputLabel = styled(UILabel).attrs({
+  weight: 'bold'
+})`
+  padding-left: 10px;
 `
