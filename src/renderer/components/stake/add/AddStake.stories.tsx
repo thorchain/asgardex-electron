@@ -3,6 +3,7 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { bn, assetAmount, assetToBase, AssetRune67C, AssetBNB, baseAmount, AssetBTC } from '@thorchain/asgardex-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { TRANSFER_FEES } from '../../../../shared/mock/fees'
@@ -18,7 +19,7 @@ const poolData = {
 const assets = [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO]
 const fees: StakeFeesRD = RD.success({
   base: assetToBase(TRANSFER_FEES.single),
-  pool: assetToBase(TRANSFER_FEES.single)
+  cross: O.none
 })
 const reloadFeesHandler = () => console.log('reload fees')
 
@@ -58,7 +59,7 @@ export const AddAsymCrossStakeStory = () => {
       reloadFees={reloadFeesHandler}
       fees={RD.success({
         base: assetToBase(TRANSFER_FEES.single),
-        pool: baseAmount(12300)
+        cross: O.some(baseAmount(12300))
       })}
       poolData={poolData}
       priceAsset={AssetRune67C}
