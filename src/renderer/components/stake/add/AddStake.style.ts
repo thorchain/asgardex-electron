@@ -1,6 +1,7 @@
 import { Col, Row } from 'antd'
 import styled from 'styled-components'
 
+import { media } from '../../../helpers/styleHelper'
 import { AssetCard as BaseAssetCard } from '../../uielements/assets/assetCard'
 import { Button as UIButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
@@ -34,11 +35,21 @@ export const AssetCard = styled(BaseAssetCard)`
 export const DragWrapper = styled('div')`
   padding: 20px;
 `
+export const FeeRow = styled(Row).attrs({
+  align: 'middle'
+})`
+  padding-bottom: 20px;
+
+  ${media.xl`
+  padding-bottom: 0px;
+`}
+`
 
 export const FeeLabel = styled(UILabel).attrs({
   size: 'normal'
 })`
   padding: 0;
+  min-width: 150px; /* needed for loader */
 `
 export const ReloadFeeButton = styled(UIButton).attrs({
   typevalue: 'outline'

@@ -14,6 +14,7 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
+import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as stakeRoutes from '../../../routes/stake'
 import { PoolDetailRD } from '../../../services/midgard/types'
@@ -90,31 +91,29 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
     RD.map(getAssetPoolPrice(runPrice))
   )
 
-  const { stakeFee$, chainAsset$, reloadFees } = useChainContext()
-  const stakeFeeRD = useObservableState(stakeFee$, RD.initial)
-  const oChainAsset = useObservableState(chainAsset$, O.none)
+  const { stakeFees$, reloadFees } = useChainContext()
+  const stakeFees = useObservableState(stakeFees$, RD.initial)
 
   const renderDisabledAddStake = useCallback(
     () => (
       <AddStake
         type={type}
-        onChangeAsset={() => {}}
+        onChangeAsset={emptyFunc}
         asset={asset}
         runeAsset={runeAsset}
         assetPrice={ZERO_BN}
         runePrice={ZERO_BN}
         assetBalance={ZERO_BASE_AMOUNT}
         runeBalance={ZERO_BASE_AMOUNT}
-        onStake={() => {}}
-        fee={RD.initial}
-        reloadFee={() => {}}
-        chainAsset={O.none}
+        onStake={emptyFunc}
+        fees={stakeFees}
+        reloadFees={emptyFunc}
         priceAsset={selectedPricePoolAsset}
         disabled={true}
         poolData={{ runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }}
       />
     ),
-    [asset, runeAsset, selectedPricePoolAsset, type]
+    [asset, runeAsset, selectedPricePoolAsset, stakeFees, type]
   )
 
   return FP.pipe(
@@ -136,9 +135,8 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
             assetBalance={assetBalance}
             runeBalance={runeBalance}
             onStake={console.log}
-            fee={stakeFeeRD}
-            reloadFee={reloadFees}
-            chainAsset={oChainAsset}
+            fees={stakeFees}
+            reloadFees={reloadFees}
             priceAsset={selectedPricePoolAsset}
             assets={poolAssets}
           />

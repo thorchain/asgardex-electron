@@ -8,14 +8,28 @@ import {
   AssetETH,
   Asset,
   assetToString,
-  baseAmount
+  baseAmount,
+  Chain
 } from '@thorchain/asgardex-util'
 
+import { getChainAsset } from './helpers/chainHelper'
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
 
-// BUSD testnet
+/**
+ * "Base" chain RUNE is currently running
+ * BNC for now, but it will be changed to `THOR` in the near future
+ * TODO(@veado): Change it if we go live with `NativeRUNE`
+ */
+export const BASE_CHAIN: Chain = 'BNB'
+
+/**
+ * Asset of "base" chain RUNE is currently running on
+ */
+export const BASE_CHAIN_ASSET: Asset = getChainAsset(BASE_CHAIN)
+
+// BUSD testnet (neded for pricing)
 export const AssetBUSDBAF: Asset = { chain: 'BNB', symbol: 'BUSD-BAF', ticker: 'BUSD' }
-// BUSD mainnet
+// BUSD mainnet (neded for pricing)
 export const AssetBUSDBD1: Asset = { chain: 'BNB', symbol: 'BUSD-BD1', ticker: 'BUSD' }
 
 export const PRICE_ASSETS: PricePoolAssets = [

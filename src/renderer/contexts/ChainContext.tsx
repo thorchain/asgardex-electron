@@ -1,17 +1,15 @@
 import React, { createContext, useContext } from 'react'
 
-import { stakeFee$, reloadFees, chainAsset$ } from '../services/chain/context'
+import { stakeFees$, reloadFees } from '../services/chain/context'
 
 type ChainContextValue = {
-  stakeFee$: typeof stakeFee$
+  stakeFees$: typeof stakeFees$
   reloadFees: typeof reloadFees
-  chainAsset$: typeof chainAsset$
 }
 
 const initialContext: ChainContextValue = {
-  stakeFee$,
-  reloadFees,
-  chainAsset$
+  stakeFees$,
+  reloadFees
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 

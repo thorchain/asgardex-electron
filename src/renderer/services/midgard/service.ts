@@ -154,6 +154,7 @@ export const service = {
   thorchainLastblockState$,
   reloadThorchainLastblock,
   setSelectedPoolAsset,
+  selectedPoolAsset$,
   apiEndpoint$: byzantine$,
   reloadApiEndpoint: reloadByzantine,
   pools: createPoolsService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),

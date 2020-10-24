@@ -7,6 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { TRANSFER_FEES } from '../../../../shared/mock/fees'
+import { StakeFeesRD } from '../../../services/chain/types'
 import { AddStake } from './AddStake'
 
 const assetBalance = assetToBase(assetAmount(200))
@@ -16,9 +17,11 @@ const poolData = {
   runeBalance: baseAmount('2000')
 }
 const assets = [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO]
-const chainAsset = O.some(AssetBNB)
-const fee = RD.success(assetToBase(TRANSFER_FEES.single))
-const reloadFeeHandler = () => console.log('reload fee')
+const fees: StakeFeesRD = RD.success({
+  base: assetToBase(TRANSFER_FEES.single),
+  cross: O.none
+})
+const reloadFeesHandler = () => console.log('reload fees')
 
 export const AddAsymStakeStory = () => {
   return (
@@ -32,15 +35,39 @@ export const AddAsymStakeStory = () => {
       runeBalance={runeBalance}
       onStake={console.log}
       onChangeAsset={console.log}
-      reloadFee={reloadFeeHandler}
-      chainAsset={chainAsset}
-      fee={fee}
+      reloadFees={reloadFeesHandler}
+      fees={fees}
       poolData={poolData}
       priceAsset={AssetRune67C}
       assets={assets}
     />
   )
 }
+
+export const AddAsymCrossStakeStory = () => {
+  return (
+    <AddStake
+      type="asym"
+      asset={AssetBTC}
+      runeAsset={AssetRune67C}
+      assetPrice={bn(2)}
+      runePrice={bn(1)}
+      assetBalance={assetBalance}
+      runeBalance={runeBalance}
+      onStake={console.log}
+      onChangeAsset={console.log}
+      reloadFees={reloadFeesHandler}
+      fees={RD.success({
+        base: assetToBase(TRANSFER_FEES.single),
+        cross: O.some(baseAmount(12300))
+      })}
+      poolData={poolData}
+      priceAsset={AssetRune67C}
+      assets={assets}
+    />
+  )
+}
+
 export const AddSymStakeStory = () => {
   return (
     <AddStake
@@ -53,9 +80,8 @@ export const AddSymStakeStory = () => {
       runeBalance={runeBalance}
       onStake={console.log}
       onChangeAsset={console.log}
-      chainAsset={chainAsset}
-      fee={fee}
-      reloadFee={reloadFeeHandler}
+      fees={fees}
+      reloadFees={reloadFeesHandler}
       poolData={poolData}
       priceAsset={AssetRune67C}
       assets={assets}
@@ -63,4 +89,7 @@ export const AddSymStakeStory = () => {
   )
 }
 
-storiesOf('Components/Stake/AddStake', module).add('sym', AddSymStakeStory).add('asym', AddAsymStakeStory)
+storiesOf('Components/Stake/AddStake', module)
+  .add('sym', AddSymStakeStory)
+  .add('asym', AddAsymStakeStory)
+  .add('asym - cross-chain', AddAsymCrossStakeStory)

@@ -6,11 +6,6 @@ import { sequenceTOptionFromArray, sequenceTRDFromArray } from './fpHelpers'
 
 describe('helpers/envHelper/', () => {
   describe('sequenceTOptionFromArray', () => {
-    it('returns none for an empty list', () => {
-      const result = FP.pipe([], sequenceTOptionFromArray)
-      expect(result).toBeNone()
-    })
-
     it('returns none for a list with none inside', () => {
       const result = FP.pipe([O.none, O.some(1)], sequenceTOptionFromArray)
       expect(result).toBeNone()
@@ -23,30 +18,24 @@ describe('helpers/envHelper/', () => {
   })
 
   describe('sequenceTRDFromArray', () => {
-    const onEmpty = () => 'empty'
-    it('returns `failure` for an empty list', () => {
-      const result = FP.pipe([], sequenceTRDFromArray<string, string>(onEmpty))
-      expect(result).toEqual(RD.failure('empty'))
-    })
-
     it('returns `failure` for a RD list with failures inside', () => {
-      const result = FP.pipe([RD.failure('another error'), RD.success(1)], sequenceTRDFromArray(onEmpty))
+      const result = FP.pipe([RD.failure('another error'), RD.success(1)], sequenceTRDFromArray)
       expect(result).toEqual(RD.failure('another error'))
     })
 
     it('returns `pending` for a RD list with `pending` inside', () => {
-      const result = FP.pipe([RD.success(1), RD.pending], sequenceTRDFromArray(onEmpty))
+      const result = FP.pipe([RD.success(1), RD.pending], sequenceTRDFromArray)
       expect(result).toEqual(RD.pending)
     })
 
     it('returns `pending` for a RD list with `pending` inside', () => {
       const progress = { loaded: 100, total: O.none }
-      const result = FP.pipe([RD.success(1), RD.progress(progress)], sequenceTRDFromArray(onEmpty))
+      const result = FP.pipe([RD.success(1), RD.progress(progress)], sequenceTRDFromArray)
       expect(result).toEqual(RD.progress(progress))
     })
 
     it('Lifts all `success` values', () => {
-      const result = FP.pipe([RD.success(1), RD.success(2)], sequenceTRDFromArray(onEmpty))
+      const result = FP.pipe([RD.success(1), RD.success(2)], sequenceTRDFromArray)
       expect(result).toEqual(RD.success([1, 2]))
     })
   })
