@@ -1,19 +1,20 @@
 import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetToString, bn, bnOrZero } from '@thorchain/asgardex-util'
+import { Asset, assetToString, bn } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
-import { AddStake } from '../../../components/stake/add/AddStake'
+import { AddStake } from '../../../components/stake/add'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
+import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as stakeRoutes from '../../../routes/stake'
 import { PoolDetailRD } from '../../../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../../../services/midgard/utils'
@@ -86,7 +87,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
   const assetPriceRD = FP.pipe(
     poolsState,
     // convert from RUNE price to selected pool asset price
-    RD.map((state) => bnOrZero(state.price).multipliedBy(runPrice))
+    RD.map(getAssetPoolPrice(runPrice))
   )
 
   const { stakeFee$, chainAsset$, reloadFees } = useChainContext()

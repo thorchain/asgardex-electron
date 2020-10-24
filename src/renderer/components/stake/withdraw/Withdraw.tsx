@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { Asset, assetAmount, formatAssetAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { Asset, assetAmount, BaseAmount, formatAssetAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
@@ -15,8 +15,9 @@ type Props = {
   assetPrice: BigNumber
   selectedCurrencyAsset: Asset
   onWithdraw: (percent: number) => void
-  runeShare: BigNumber
-  assetShare: BigNumber
+  runeShare: BaseAmount
+  assetShare: BaseAmount
+  disabled?: boolean
 }
 
 export const Withdraw: React.FC<Props> = ({
@@ -27,7 +28,8 @@ export const Withdraw: React.FC<Props> = ({
   assetPrice,
   selectedCurrencyAsset,
   runeShare,
-  assetShare
+  assetShare,
+  disabled
 }) => {
   const intl = useIntl()
   const [withdrawPercent, setWithdrawPercent] = useState(50)
@@ -41,7 +43,12 @@ export const Withdraw: React.FC<Props> = ({
       </Label>
       <Label>{intl.formatMessage({ id: 'stake.withdraw.choseText' })}</Label>
 
-      <Styled.Slider key={'asset amount slider'} value={withdrawPercent} onChange={setWithdrawPercent} />
+      <Styled.Slider
+        key={'asset amount slider'}
+        value={withdrawPercent}
+        onChange={setWithdrawPercent}
+        disabled={disabled}
+      />
       <Label weight={'bold'} textTransform={'uppercase'}>
         {intl.formatMessage({ id: 'stake.withdraw.receiveText' })}
       </Label>
@@ -80,7 +87,7 @@ export const Withdraw: React.FC<Props> = ({
         target={stakedAsset}
         onConfirm={() => onWithdraw(withdrawPercent)}
         // @TODO (@thatStrangeGuy) compare to BNB fee
-        disabled={withdrawPercent === 0}
+        disabled={withdrawPercent === 0 || disabled}
       />
     </Styled.Container>
   )

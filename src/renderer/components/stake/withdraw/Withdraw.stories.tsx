@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { Asset, AssetBNB, AssetRune67C, bn } from '@thorchain/asgardex-util'
+import { Asset, AssetBNB, AssetRune67C, baseAmount, bn } from '@thorchain/asgardex-util'
 
 import { Withdraw } from './Withdraw'
 
@@ -14,8 +14,8 @@ export const WithdrawStory: React.FC<{ stakedAsset?: Asset; runeAsset?: Asset }>
       runePrice={bn(1)}
       selectedCurrencyAsset={AssetRune67C}
       onWithdraw={console.log}
-      runeShare={bn('193011422')}
-      assetShare={bn('3202499')}
+      runeShare={baseAmount('193011422')}
+      assetShare={baseAmount('3202499')}
       {...props}
     />
   )
