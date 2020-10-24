@@ -20,7 +20,7 @@ type Tab = {
 type Props = {
   asset: Asset
   runeAsset: Asset
-  ShareContent: React.ComponentType<{ asset: Asset }>
+  ShareContent: React.ComponentType<{ asset: Asset; runeAsset: Asset }>
   StakeContent: React.ComponentType<{ asset: Asset; runeAsset: Asset; type: StakeType }>
   WidthdrawContent: React.ComponentType<{ stakedAsset: Asset; runeAsset: Asset }>
   keystoreState: KeystoreState
@@ -64,7 +64,7 @@ export const Stake: React.FC<Props> = (props) => {
             </Styled.StakeContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper>
-                <ShareContent asset={asset} />
+                <ShareContent runeAsset={runeAsset} asset={asset} />
               </Styled.ShareContentWrapper>
             </Styled.ShareContentCol>
           </>

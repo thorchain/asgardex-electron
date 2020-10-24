@@ -16,7 +16,7 @@ export const DragContainer = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  min-width: 244px;
+  width: 244px;
   height: 40px;
   border: 1px solid ${palette('primary', 0)};
   padding: 0 4px;
@@ -79,10 +79,12 @@ export const AssetIcon = styled(BaseAssetIcon)`
   cursor: pointer;
 `
 
-export const TitleLabel = styled(Label)`
-  width: 240px;
-  text-align: center;
+export const TitleLabel = styled(Label).attrs({
+  align: 'center'
+})`
+  width: 200px;
   font-size: 12px;
+  margin-left: 32px; /* icon size */
   text-transform: uppercase;
   color: ${palette('text', 2)};
 `
