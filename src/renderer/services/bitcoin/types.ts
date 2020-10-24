@@ -36,4 +36,5 @@ export type FeesService = {
   fees$: FeesLD
   stakeFee$: FeeLD
   reloadFees: () => void
+  reloadStakeFee: () => void
 }

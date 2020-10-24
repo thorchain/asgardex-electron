@@ -21,7 +21,7 @@ const reloadFeesByChain = (chain: Chain) => {
       BNB.reloadFees()
       break
     case 'BTC':
-      BTC.reloadFees()
+      BTC.reloadStakeFee()
       break
     case 'ETH':
       // not available yet

@@ -1,15 +1,18 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
-import { baseAmount } from '@thorchain/asgardex-util'
+import { baseAmount, getDepositMemo } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { catchError, map, mergeMap, shareReplay, startWith } from 'rxjs/operators'
 
 import { BTC_DECIMAL } from '../../helpers/assetHelper'
+import { isBtcChain } from '../../helpers/chainHelper'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { FeeLD } from '../chain/types'
+import { selectedPoolAsset$ } from '../midgard/common'
 import { Client$ } from './common'
 import { FeesService, FeesLD } from './types'
 
@@ -47,22 +50,35 @@ export const createFeesService = (oClient$: Client$): FeesService => {
     shareReplay(1)
   )
 
+  // `TriggerStream` to reload stake `fees`
+  const { stream$: reloadStakeFee$, trigger: reloadStakeFee } = triggerStream()
   /**
-   * Fee for fast tx
+   * Stake fees
+   * If a client is not available, it returns `None`
    */
-  const fastTxFee$: FeeLD = FP.pipe(
-    fees$,
-    liveData.map((fees) => baseAmount(fees.fast.feeTotal, BTC_DECIMAL))
+  const stakeFee$: FeeLD = Rx.combineLatest([oClient$, selectedPoolAsset$, reloadStakeFee$]).pipe(
+    mergeMap(([oClient, oAsset]) =>
+      FP.pipe(
+        sequenceTOption(oClient, oAsset),
+        O.fold(
+          () => Rx.of(RD.initial),
+          ([client, asset]) => {
+            // load fees for asset on BTC chain only
+            if (isBtcChain(asset.chain)) return loadFees$(client, getDepositMemo(asset))
+            return Rx.of(RD.initial)
+          }
+        )
+      )
+    ),
+    // extract fast fee only
+    liveData.map((fees) => baseAmount(fees.fast.feeTotal, BTC_DECIMAL)),
+    shareReplay(1)
   )
-
-  /**
-   * Fee for fast tx
-   */
-  const stakeFee$: FeeLD = fastTxFee$.pipe(Rx.identity)
 
   return {
     fees$,
     stakeFee$,
-    reloadFees
+    reloadFees,
+    reloadStakeFee
   }
 }
