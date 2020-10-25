@@ -10,7 +10,11 @@ export type LoadFeesHandler = () => void
 export type FeeRD = RD.RemoteData<Error, BaseAmount>
 export type FeeLD = LiveData<Error, BaseAmount>
 
-export type AddressRx = Rx.Observable<O.Option<string>>
+export type Address = string
+export type AddressRx = Rx.Observable<O.Option<Address>>
+
+export type Memo = string
+export type MemoRx = Rx.Observable<O.Option<Memo>>
 
 /**
  * Stake fees

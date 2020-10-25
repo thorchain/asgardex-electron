@@ -9,7 +9,7 @@ import { catchError, map, mergeMap, shareReplay, startWith, switchMap } from 'rx
 import { BTC_DECIMAL } from '../../helpers/assetHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
-import { FeeLD } from '../chain/types'
+import { FeeLD, Memo } from '../chain/types'
 import { Client$ } from './common'
 import { FeesService, FeesLD } from './types'
 
@@ -49,27 +49,24 @@ export const createFeesService = (oClient$: Client$): FeesService => {
 
   // `TriggerStream` to reload stake `fees`
   const { stream$: reloadStakeFee$, trigger: reloadStakeFee } = triggerStream()
+
   /**
    * Factory to create a stream of stake fees
    * @param memo Memo used for deposit transactions
    */
-  const stakeFee$ = (memo: string): FeeLD =>
+  const stakeFee$ = (memo: Memo): FeeLD =>
     Rx.combineLatest([oClient$, reloadStakeFee$]).pipe(
-      switchMap(([oClient, _]) =>
+      switchMap(([oClient]) =>
         FP.pipe(
           oClient,
           O.fold(
             () => Rx.of(RD.initial),
-            (client) => {
-              console.log('load fees memo:', memo)
-              return loadFees$(client, memo)
-            }
+            (client) => loadFees$(client, memo)
           )
         )
       ),
       // extract fast fee only
-      liveData.map((fees) => baseAmount(fees.fast.feeTotal, BTC_DECIMAL)),
-      shareReplay(1)
+      liveData.map((fees) => baseAmount(fees.fast.feeTotal, BTC_DECIMAL))
     )
 
   return {
