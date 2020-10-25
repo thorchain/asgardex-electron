@@ -53,27 +53,30 @@ export const createFeesService = (oClient$: Client$): FeesService => {
   // `TriggerStream` to reload stake `fees`
   const { stream$: reloadStakeFee$, trigger: reloadStakeFee } = triggerStream()
   /**
-   * Stake fees
-   * If a client is not available, it returns `None`
+   * Factory to create a stream of stake fees
+   * @param address Address of user's wallet address for base chain
    */
-  const stakeFee$: FeeLD = Rx.combineLatest([oClient$, selectedPoolAsset$, reloadStakeFee$]).pipe(
-    mergeMap(([oClient, oAsset]) =>
-      FP.pipe(
-        sequenceTOption(oClient, oAsset),
-        O.fold(
-          () => Rx.of(RD.initial),
-          ([client, asset]) => {
-            // load fees for asset on BTC chain only
-            if (isBtcChain(asset.chain)) return loadFees$(client, getDepositMemo(asset))
-            return Rx.of(RD.initial)
-          }
+  const stakeFee$ = (address: string): FeeLD =>
+    Rx.combineLatest([oClient$, selectedPoolAsset$, reloadStakeFee$]).pipe(
+      mergeMap(([oClient, oAsset]) =>
+        FP.pipe(
+          sequenceTOption(oClient, oAsset),
+          O.fold(
+            () => Rx.of(RD.initial),
+            ([client, asset]) => {
+              // load fees for asset on BTC chain only
+              console.log('getDepositMemo(asset, address):', getDepositMemo(asset, address))
+              // memo: STAKE:BTC.BTC:BASE_CHAIN_ADDRESS
+              if (isBtcChain(asset.chain)) return loadFees$(client, getDepositMemo(asset, address))
+              return Rx.of(RD.initial)
+            }
+          )
         )
-      )
-    ),
-    // extract fast fee only
-    liveData.map((fees) => baseAmount(fees.fast.feeTotal, BTC_DECIMAL)),
-    shareReplay(1)
-  )
+      ),
+      // extract fast fee only
+      liveData.map((fees) => baseAmount(fees.fast.feeTotal, BTC_DECIMAL)),
+      shareReplay(1)
+    )
 
   return {
     fees$,

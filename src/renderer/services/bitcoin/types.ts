@@ -34,7 +34,7 @@ export type TransactionService = {
 
 export type FeesService = {
   fees$: FeesLD
-  stakeFee$: FeeLD
+  stakeFee$: (address: string) => FeeLD
   reloadFees: () => void
   reloadStakeFee: () => void
 }
