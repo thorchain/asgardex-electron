@@ -13,7 +13,7 @@ import { triggerStream } from '../../helpers/stateHelper'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/context'
 import { selectedPoolAsset$, selectedPoolChain$ } from '../midgard/common'
-import { stakeMemoByChain$ } from './memo'
+import { stakeMemo$ } from './memo'
 import { FeeLD, StakeFeesLD } from './types'
 
 const reloadFeesByChain = (chain: Chain) => {
@@ -56,7 +56,7 @@ Rx.combineLatest([selectedPoolChain$, reloadFees$])
   .subscribe()
 
 const stakeFeeByChain$ = (chain: Chain): FeeLD =>
-  stakeMemoByChain$.pipe(
+  stakeMemo$.pipe(
     RxOp.switchMap((oMemo) =>
       FP.pipe(
         oMemo,

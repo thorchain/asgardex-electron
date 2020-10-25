@@ -14,7 +14,7 @@ import { MemoRx } from './types'
 /**
  * Stake memo
  */
-const stakeMemoByChain$: MemoRx = Rx.combineLatest([selectedPoolAsset$, baseAddress$]).pipe(
+const stakeMemo$: MemoRx = Rx.combineLatest([selectedPoolAsset$, baseAddress$]).pipe(
   RxOp.switchMap(([oPoolAsset, oBaseAddress]) =>
     Rx.of(
       FP.pipe(
@@ -31,4 +31,4 @@ const stakeMemoByChain$: MemoRx = Rx.combineLatest([selectedPoolAsset$, baseAddr
   )
 )
 
-export { stakeMemoByChain$ }
+export { stakeMemo$ }
