@@ -35,12 +35,13 @@ const crossAddress$: AddressRx = selectedPoolChain$.pipe(
       O.filter((chain) => !eqChain.equals(chain, BASE_CHAIN)),
       O.fold(() => Rx.of(O.none), addressByChain$)
     )
-  )
+  ),
+  RxOp.distinctUntilChanged()
 )
 
 /**
  * Users wallet address for base chain
  */
-const baseAddress$: AddressRx = addressByChain$(BASE_CHAIN)
+const baseAddress$: AddressRx = addressByChain$(BASE_CHAIN).pipe(RxOp.distinctUntilChanged())
 
 export { addressByChain$, crossAddress$, baseAddress$ }

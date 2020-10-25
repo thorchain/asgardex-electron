@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Chain } from '@thorchain/asgardex-util'
+import { Chain, getDepositMemo } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -55,12 +55,13 @@ Rx.combineLatest([selectedPoolChain$, reloadFees$])
   )
   .subscribe()
 
-const stakeFeeByChain$ = (chain: Chain, address = ''): FeeLD => {
+const stakeFeeByChain$ = (chain: Chain, memo = ''): FeeLD => {
   switch (chain) {
     case 'BNB':
       return BNB.stakeFee$
     case 'BTC':
-      return BTC.stakeFee$(address)
+      console.log('stakeFeeByChain XXX:', memo)
+      return BTC.stakeFee$(memo).pipe(RxOp.shareReplay(1))
     case 'ETH':
       return Rx.of(RD.failure(new Error('Stake fee for ETH has not been implemented')))
     case 'THOR':
@@ -68,26 +69,35 @@ const stakeFeeByChain$ = (chain: Chain, address = ''): FeeLD => {
   }
 }
 
-const stakeFees$: StakeFeesLD = Rx.combineLatest([selectedPoolAsset$, baseAddress$]).pipe(
+// const stakeFees$: StakeFeesLD = Rx.combineLatest([selectedPoolAsset$, baseAddress$]).pipe(
+const stakeFees$ = Rx.combineLatest([selectedPoolAsset$, baseAddress$]).pipe(
   RxOp.switchMap(([oPoolAsset, oBaseAddress]) =>
     FP.pipe(
       sequenceTOption(oPoolAsset, oBaseAddress),
-      O.map(([poolAsset, baseAddress]) =>
-        FP.pipe(
+      O.map(([poolAsset, baseAddress]) => {
+        console.log('poolAsset:', poolAsset)
+        console.log('baseAddress:', baseAddress)
+        return FP.pipe(
           Rx.combineLatest(
             eqChain.equals(BASE_CHAIN, poolAsset.chain)
-              ? // for deposits on base chain only, we DONT need an address
+              ? // for deposits on base chain only,
+                // we DONT need an address
                 [stakeFeeByChain$(BASE_CHAIN)]
-              : // for x-chain deposits, base address might be used to calculate fees (currently for BTC fees only)
-                [stakeFeeByChain$(BASE_CHAIN), stakeFeeByChain$(poolAsset.chain, baseAddress)]
+              : // for x-chain deposits,
+                // we do need to load fees for both chains,
+                // Also, memo might be needed to calculate fees (currently for BTC fees only)
+                [
+                  stakeFeeByChain$(BASE_CHAIN),
+                  stakeFeeByChain$(poolAsset.chain, getDepositMemo(poolAsset, baseAddress))
+                ]
           ),
           RxOp.map(sequenceTRDFromArray),
-          liveData.map(([base, cross]) => ({
+          liveData.map(([base]) => ({
             base,
-            cross: O.fromNullable(cross)
+            cross: O.fromNullable(base)
           }))
         )
-      ),
+      }),
       O.getOrElse((): StakeFeesLD => Rx.of(RD.initial))
     )
   )

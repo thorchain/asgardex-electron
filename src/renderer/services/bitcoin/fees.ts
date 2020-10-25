@@ -1,18 +1,15 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
-import { baseAmount, getDepositMemo } from '@thorchain/asgardex-util'
+import { baseAmount } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { catchError, map, mergeMap, shareReplay, startWith } from 'rxjs/operators'
+import { catchError, map, mergeMap, shareReplay, startWith, switchMap } from 'rxjs/operators'
 
 import { BTC_DECIMAL } from '../../helpers/assetHelper'
-import { isBtcChain } from '../../helpers/chainHelper'
-import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { FeeLD } from '../chain/types'
-import { selectedPoolAsset$ } from '../midgard/common'
 import { Client$ } from './common'
 import { FeesService, FeesLD } from './types'
 
@@ -54,21 +51,18 @@ export const createFeesService = (oClient$: Client$): FeesService => {
   const { stream$: reloadStakeFee$, trigger: reloadStakeFee } = triggerStream()
   /**
    * Factory to create a stream of stake fees
-   * @param address Address of user's wallet address for base chain
+   * @param memo Memo used for deposit transactions
    */
-  const stakeFee$ = (address: string): FeeLD =>
-    Rx.combineLatest([oClient$, selectedPoolAsset$, reloadStakeFee$]).pipe(
-      mergeMap(([oClient, oAsset]) =>
+  const stakeFee$ = (memo: string): FeeLD =>
+    Rx.combineLatest([oClient$, reloadStakeFee$]).pipe(
+      switchMap(([oClient, _]) =>
         FP.pipe(
-          sequenceTOption(oClient, oAsset),
+          oClient,
           O.fold(
             () => Rx.of(RD.initial),
-            ([client, asset]) => {
-              // load fees for asset on BTC chain only
-              console.log('getDepositMemo(asset, address):', getDepositMemo(asset, address))
-              // memo: STAKE:BTC.BTC:BASE_CHAIN_ADDRESS
-              if (isBtcChain(asset.chain)) return loadFees$(client, getDepositMemo(asset, address))
-              return Rx.of(RD.initial)
+            (client) => {
+              console.log('load fees memo:', memo)
+              return loadFees$(client, memo)
             }
           )
         )
