@@ -13,7 +13,7 @@ import { triggerStream } from '../../helpers/stateHelper'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/context'
 import { selectedPoolAsset$, selectedPoolChain$ } from '../midgard/common'
-import { stakeMemo$ } from './memo'
+import { crossChainStakeMemo$ } from './memo'
 import { FeeLD, StakeFeesLD } from './types'
 
 const reloadFeesByChain = (chain: Chain) => {
@@ -55,29 +55,29 @@ Rx.combineLatest([selectedPoolChain$, reloadFees$])
   )
   .subscribe()
 
-const stakeFeeByChain$ = (chain: Chain): FeeLD =>
-  stakeMemo$.pipe(
-    RxOp.switchMap((oMemo) =>
-      FP.pipe(
-        oMemo,
-        O.fold(
-          () => Rx.of(RD.initial),
-          (memo) => {
-            switch (chain) {
-              case 'BNB':
-                return BNB.stakeFee$
-              case 'BTC':
-                return BTC.stakeFee$(memo)
-              case 'ETH':
-                return Rx.of(RD.failure(new Error('Stake fee for ETH has not been implemented')))
-              case 'THOR':
-                return Rx.of(RD.failure(new Error('Stake fee for THOR has not been implemented')))
-            }
-          }
+const stakeFeeByChain$ = (chain: Chain): FeeLD => {
+  switch (chain) {
+    case 'BNB':
+      return BNB.stakeFee$
+    case 'BTC':
+      // stake fees of BTC based on memo
+      return crossChainStakeMemo$.pipe(
+        RxOp.switchMap((oMemo) =>
+          FP.pipe(
+            oMemo,
+            O.fold(
+              () => Rx.of(RD.initial),
+              (memo) => BTC.stakeFee$(memo)
+            )
+          )
         )
       )
-    )
-  )
+    case 'ETH':
+      return Rx.of(RD.failure(new Error('Stake fee for ETH has not been implemented')))
+    case 'THOR':
+      return Rx.of(RD.failure(new Error('Stake fee for THOR has not been implemented')))
+  }
+}
 
 const stakeFees$: StakeFeesLD = selectedPoolAsset$.pipe(
   RxOp.switchMap((oPoolAsset) =>

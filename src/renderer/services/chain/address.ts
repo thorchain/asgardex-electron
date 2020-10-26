@@ -5,7 +5,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { BASE_CHAIN } from '../../const'
-import { eqChain } from '../../helpers/fp/eq'
+import { eqChain, eqOString } from '../../helpers/fp/eq'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/context'
 import { selectedPoolChain$ } from '../midgard/common'
@@ -36,12 +36,12 @@ const crossAddress$: AddressRx = selectedPoolChain$.pipe(
       O.fold(() => Rx.of(O.none), addressByChain$)
     )
   ),
-  RxOp.distinctUntilChanged()
+  RxOp.distinctUntilChanged(eqOString.equals)
 )
 
 /**
  * Users wallet address for base chain
  */
-const baseAddress$: AddressRx = addressByChain$(BASE_CHAIN).pipe(RxOp.distinctUntilChanged())
+const baseAddress$: AddressRx = addressByChain$(BASE_CHAIN).pipe(RxOp.distinctUntilChanged(eqOString.equals))
 
 export { addressByChain$, crossAddress$, baseAddress$ }
