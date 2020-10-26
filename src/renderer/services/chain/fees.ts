@@ -16,7 +16,7 @@ import { selectedPoolAsset$, selectedPoolChain$ } from '../midgard/common'
 import { crossChainStakeMemo$ } from './memo'
 import { FeeLD, StakeFeesLD } from './types'
 
-const reloadFeesByChain = (chain: Chain) => {
+const reloadStakeFeesByChain = (chain: Chain) => {
   switch (chain) {
     case 'BNB':
       BNB.reloadFees()
@@ -34,20 +34,20 @@ const reloadFeesByChain = (chain: Chain) => {
   }
 }
 
-// `TriggerStream` to reload fees
-const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
+// `TriggerStream` to reload stake fees
+const { stream$: reloadStakeFees$, trigger: reloadStakeFees } = triggerStream()
 
 // reload fees
-Rx.combineLatest([selectedPoolChain$, reloadFees$])
+Rx.combineLatest([selectedPoolChain$, reloadStakeFees$])
   .pipe(
     RxOp.tap(([oChain, _]) =>
       FP.pipe(
         oChain,
         O.map((chain) => {
           // reload base-chain
-          reloadFeesByChain(BASE_CHAIN)
+          reloadStakeFeesByChain(BASE_CHAIN)
           // For x-chains transfers, load fees for x-chain, too
-          if (!eqChain.equals(chain, BASE_CHAIN)) reloadFeesByChain(chain)
+          if (!eqChain.equals(chain, BASE_CHAIN)) reloadStakeFeesByChain(chain)
           return true
         })
       )
@@ -104,4 +104,4 @@ const stakeFees$: StakeFeesLD = selectedPoolAsset$.pipe(
   )
 )
 
-export { stakeFees$, reloadFees }
+export { stakeFees$, reloadStakeFees }
