@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BaseAmount } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 
@@ -8,6 +9,12 @@ export type LoadFeesHandler = () => void
 
 export type FeeRD = RD.RemoteData<Error, BaseAmount>
 export type FeeLD = LiveData<Error, BaseAmount>
+
+export type Address = string
+export type AddressRx = Rx.Observable<O.Option<Address>>
+
+export type Memo = string
+export type MemoRx = Rx.Observable<O.Option<Memo>>
 
 /**
  * Stake fees

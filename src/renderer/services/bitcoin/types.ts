@@ -5,7 +5,7 @@ import { BaseAmount } from '@thorchain/asgardex-util'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { FeeLD } from '../chain/types'
+import { FeeLD, Memo } from '../chain/types'
 import { ClientState } from '../types'
 import { ApiError, AssetTxsPageLD } from '../wallet/types'
 
@@ -34,6 +34,7 @@ export type TransactionService = {
 
 export type FeesService = {
   fees$: FeesLD
-  stakeFee$: FeeLD
+  stakeFee$: (memo: Memo) => FeeLD
   reloadFees: () => void
+  reloadStakeFee: () => void
 }

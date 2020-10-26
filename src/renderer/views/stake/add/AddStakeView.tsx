@@ -91,7 +91,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
     RD.map(getAssetPoolPrice(runPrice))
   )
 
-  const { stakeFees$, reloadFees } = useChainContext()
+  const { stakeFees$, reloadStakeFees: reloadFees } = useChainContext()
   const stakeFees = useObservableState(stakeFees$, RD.initial)
 
   const renderDisabledAddStake = useCallback(
