@@ -6,7 +6,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { BASE_CHAIN } from '../../const'
-import { eqChain } from '../../helpers/fp/eq'
+import { isBaseChain } from '../../helpers/chainHelper'
 import { sequenceTRDFromArray } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
@@ -47,7 +47,7 @@ Rx.combineLatest([selectedPoolChain$, reloadStakeFees$])
           // reload base-chain
           reloadStakeFeesByChain(BASE_CHAIN)
           // For x-chains transfers, load fees for x-chain, too
-          if (!eqChain.equals(chain, BASE_CHAIN)) reloadStakeFeesByChain(chain)
+          if (!isBaseChain(chain)) reloadStakeFeesByChain(chain)
           return true
         })
       )
@@ -86,7 +86,7 @@ const stakeFees$: StakeFeesLD = selectedPoolAsset$.pipe(
       O.map((poolAsset) =>
         FP.pipe(
           Rx.combineLatest(
-            eqChain.equals(BASE_CHAIN, poolAsset.chain)
+            isBaseChain(poolAsset.chain)
               ? // for deposits on base chain, fee for base chain is needed only
                 [stakeFeeByChain$(BASE_CHAIN)]
               : // for x-chain deposits, we do need to load fees for base- AND x-chain,
