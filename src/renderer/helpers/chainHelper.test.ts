@@ -1,6 +1,6 @@
-import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '@thorchain/asgardex-util'
+import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@thorchain/asgardex-util'
 
-import { getChainAsset, isBtcChain } from './chainHelper'
+import { getChainAsset, isBaseChain, isBaseChainAsset, isBtcChain } from './chainHelper'
 
 describe('helpers/chainHelper', () => {
   describe('getChainAsset', () => {
@@ -18,11 +18,35 @@ describe('helpers/chainHelper', () => {
     })
   })
 
+  describe('isBaseChain', () => {
+    it('true for BNB chain', () => {
+      expect(isBaseChain('BNB')).toBeTruthy()
+    })
+    it('false for other chains', () => {
+      expect(isBaseChain('BTC')).toBeFalsy()
+      expect(isBaseChain('ETH')).toBeFalsy()
+      expect(isBaseChain('THOR')).toBeFalsy()
+    })
+  })
+
+  describe('isBaseChain', () => {
+    it('true for BNB asset', () => {
+      expect(isBaseChainAsset(AssetBNB)).toBeTruthy()
+    })
+    it('true for RUNE asset', () => {
+      expect(isBaseChainAsset(AssetRune67C)).toBeTruthy()
+      expect(isBaseChainAsset(AssetRuneB1A)).toBeTruthy()
+    })
+    it('false for other assets (e.g. ETH)', () => {
+      expect(isBaseChainAsset(AssetETH)).toBeFalsy()
+    })
+  })
+
   describe('isBtcChain', () => {
     it('true for BTC chain', () => {
       expect(isBtcChain('BTC')).toBeTruthy()
     })
-    it('false for others (e.g. ETH)', () => {
+    it('false for other chains (e.g. ETH)', () => {
       expect(isBtcChain('ETH')).toBeFalsy()
     })
   })

@@ -4,7 +4,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { isBaseChainAsset } from '../../helpers/chainHelper'
+import { isBaseChain, isBaseChainAsset } from '../../helpers/chainHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { selectedPoolAsset$ } from '../midgard/common'
 import { baseAddress$, crossAddress$ } from './address'
@@ -40,7 +40,7 @@ const crossChainStakeMemo$: MemoRx = Rx.combineLatest([selectedPoolAsset$, baseA
     FP.pipe(
       sequenceTOption(oPoolAsset, oBaseAddress),
       // cross-chain asset?
-      O.filter(([poolAsset]) => !isBaseChainAsset(poolAsset)),
+      O.filter(([{ chain }]) => !isBaseChain(chain)),
       // add address of base-chain wallet to memo
       O.map(([poolAsset, baseAddress]) => getDepositMemo(poolAsset, baseAddress))
     )

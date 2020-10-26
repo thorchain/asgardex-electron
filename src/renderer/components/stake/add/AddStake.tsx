@@ -10,7 +10,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
-import { eqChain } from '../../../helpers/fp/eq'
+import { isBaseChainAsset } from '../../../helpers/chainHelper'
 import { StakeFeesRD } from '../../../services/chain/types'
 import { StakeType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
@@ -139,7 +139,7 @@ export const AddStake: React.FC<Props> = ({
     })
   }, [onStake, asset, runeAsset, assetAmountToStake, runeAmountToStake])
 
-  const hasCrossChainFee = useMemo(() => !eqChain.equals(asset.chain, BASE_CHAIN_ASSET.chain), [asset.chain])
+  const hasCrossChainFee = useMemo(() => !isBaseChainAsset(asset), [asset])
 
   // TODO(@Veado) Needed for validation
   // issue: https://github.com/thorchain/asgardex-electron/issues/550
