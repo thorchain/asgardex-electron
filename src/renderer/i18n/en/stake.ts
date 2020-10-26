@@ -9,6 +9,7 @@ const stake: StakeMessages = {
   'stake.totalEarnings': 'Your total earnings from the pool',
   'stake.add.sym': 'Add {asset}',
   'stake.add.asym': 'Add {assetA} + {assetB}',
+  'stake.add.error.baseChainFeeNotCovered': 'Fee for tx on {chain} chain is not covered by your balance ({balance})',
   'stake.withdraw': 'Withdraw',
   'stake.advancedMode': 'Advanced mode',
   'stake.drag': 'Drag to stake',

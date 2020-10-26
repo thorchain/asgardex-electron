@@ -158,6 +158,7 @@ type StakeMessageKey =
   | 'stake.totalEarnings'
   | 'stake.add.sym'
   | 'stake.add.asym'
+  | 'stake.add.error.baseChainFeeNotCovered'
   | 'stake.withdraw'
   | 'stake.advancedMode'
   | 'stake.drag'

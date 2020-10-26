@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetToString, bn } from '@thorchain/asgardex-util'
+import { Asset, assetToString, BaseAmount, bn } from '@thorchain/asgardex-util'
+import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
@@ -9,7 +10,7 @@ import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
 import { AddStake } from '../../../components/stake/add'
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
@@ -60,20 +61,38 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
 
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
 
-  const assetBalance = FP.pipe(
-    assetsWB,
-    O.chain(getBalanceByAsset(asset)),
-    O.map((assetWithAmount) => {
-      return assetWithAmount.amount
-    }),
-    O.getOrElse(() => ZERO_BASE_AMOUNT)
+  const assetBalance: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        assetsWB,
+        O.chain(getBalanceByAsset(asset)),
+        O.map((assetWithAmount) => {
+          return assetWithAmount.amount
+        }),
+        O.getOrElse(() => ZERO_BASE_AMOUNT)
+      ),
+    [asset, assetsWB]
   )
 
-  const runeBalance = FP.pipe(
-    assetsWB,
-    O.chain(getBalanceByAsset(runeAsset)),
-    O.map((assetWithAmount) => assetWithAmount.amount),
-    O.getOrElse(() => ZERO_BASE_AMOUNT)
+  const runeBalance: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        assetsWB,
+        O.chain(getBalanceByAsset(runeAsset)),
+        O.map((assetWithAmount) => assetWithAmount.amount),
+        O.getOrElse(() => ZERO_BASE_AMOUNT)
+      ),
+    [assetsWB, runeAsset]
+  )
+
+  const baseChainAssetBalance: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        assetsWB,
+        O.chain(getBalanceByAsset(BASE_CHAIN_ASSET)),
+        O.map((assetWithAmount) => assetWithAmount.amount)
+      ),
+    [assetsWB]
   )
 
   const poolsStateRD = useObservableState(poolsState$, RD.initial)
@@ -85,7 +104,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
 
   const poolAssetsRD = useObservableState(availableAssets$, RD.initial)
 
-  const assetPriceRD = FP.pipe(
+  const assetPriceRD: RD.RemoteData<Error, BigNumber> = FP.pipe(
     poolsState,
     // convert from RUNE price to selected pool asset price
     RD.map(getAssetPoolPrice(runPrice))
@@ -105,6 +124,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
         runePrice={ZERO_BN}
         assetBalance={ZERO_BASE_AMOUNT}
         runeBalance={ZERO_BASE_AMOUNT}
+        baseChainAssetBalance={O.none}
         onStake={emptyFunc}
         fees={stakeFees}
         reloadFees={emptyFunc}
@@ -134,6 +154,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
             runePrice={runPrice}
             assetBalance={assetBalance}
             runeBalance={runeBalance}
+            baseChainAssetBalance={baseChainAssetBalance}
             onStake={console.log}
             fees={stakeFees}
             reloadFees={reloadFees}

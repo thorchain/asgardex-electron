@@ -2,15 +2,23 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, baseAmount, BaseAmount, PoolData } from '@thorchain/asgardex-util'
+import {
+  Asset,
+  baseAmount,
+  BaseAmount,
+  baseToAsset,
+  formatAssetAmountCurrency,
+  PoolData
+} from '@thorchain/asgardex-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
+import { BASE_CHAIN, BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
 import { isBaseChainAsset } from '../../../helpers/chainHelper'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { StakeFeesRD } from '../../../services/chain/types'
 import { StakeType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
@@ -25,6 +33,7 @@ type Props = {
   runePrice: BigNumber
   assetBalance: BaseAmount
   runeBalance: BaseAmount
+  baseChainAssetBalance: O.Option<BaseAmount>
   priceAsset?: Asset
   fees: StakeFeesRD
   reloadFees: () => void
@@ -43,6 +52,7 @@ export const AddStake: React.FC<Props> = ({
   runePrice,
   assetBalance,
   runeBalance,
+  baseChainAssetBalance: oBaseChainAssetBalance,
   assets,
   priceAsset,
   reloadFees,
@@ -143,7 +153,7 @@ export const AddStake: React.FC<Props> = ({
 
   // TODO(@Veado) Needed for validation
   // issue: https://github.com/thorchain/asgardex-electron/issues/550
-  const _baseChainFee: O.Option<BaseAmount> = useMemo(
+  const oBaseChainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
         fees,
@@ -152,6 +162,35 @@ export const AddStake: React.FC<Props> = ({
       ),
     [fees]
   )
+
+  const isBaseChainFeeError = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(oBaseChainFee, oBaseChainAssetBalance),
+      O.fold(
+        // Missing (or loading) fees does not mean we can't sent something. No error then.
+        () => !O.isNone(oBaseChainFee),
+        ([fee, baseChainAssetAmount]) => baseChainAssetAmount.amount().isLessThan(fee.amount())
+      )
+    )
+  }, [oBaseChainAssetBalance, oBaseChainFee])
+
+  const renderBaseChainFeeError = useMemo(() => {
+    const amount = FP.pipe(
+      oBaseChainAssetBalance,
+      O.getOrElse(() => ZERO_BASE_AMOUNT),
+      baseToAsset
+    )
+
+    const msg = intl.formatMessage(
+      { id: 'stake.add.error.baseChainFeeNotCovered' },
+      {
+        chain: BASE_CHAIN,
+        balance: formatAssetAmountCurrency({ amount, asset: BASE_CHAIN_ASSET, trimZeros: true })
+      }
+    )
+
+    return <Styled.FeeErrorLabel>{msg}</Styled.FeeErrorLabel>
+  }, [oBaseChainAssetBalance, intl])
 
   // TODO(@Veado) Needed for validation
   // issue: https://github.com/thorchain/asgardex-electron/issues/550
@@ -202,6 +241,7 @@ export const AddStake: React.FC<Props> = ({
             onChangeAsset={onChangeAsset}
             priceAsset={priceAsset}
           />
+          {isBaseChainFeeError && renderBaseChainFeeError}
           <Styled.FeeRow>
             <Col>
               <Styled.ReloadFeeButton onClick={reloadFees} disabled={RD.isPending(fees)}>

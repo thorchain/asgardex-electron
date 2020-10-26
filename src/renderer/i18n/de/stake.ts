@@ -9,6 +9,8 @@ const stake: StakeMessages = {
   'stake.totalEarnings': 'Deine Gesamteinkommen vom Pool',
   'stake.add.sym': '{asset} hinzügen',
   'stake.add.asym': '{assetA} + {assetB} hinzügen',
+  'stake.add.error.baseChainFeeNotCovered':
+    'Gebühren für die Transaktion über {chain} Chain sind nicht über Dein Guthaben ({balance}) gedeckt.',
   'stake.withdraw': 'Abheben',
   'stake.advancedMode': 'Expertenmodus',
   'stake.drag': 'Ziehen um zu Staken',

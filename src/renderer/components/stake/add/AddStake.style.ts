@@ -51,6 +51,15 @@ export const FeeLabel = styled(UILabel).attrs({
   padding: 0;
   min-width: 150px; /* needed for loader */
 `
+
+export const FeeErrorLabel = styled(UILabel).attrs({
+  color: 'error',
+  textTransform: 'uppercase'
+})`
+  margin-bottom: 14px;
+  font-family: 'MainFontRegular';
+`
+
 export const ReloadFeeButton = styled(UIButton).attrs({
   typevalue: 'outline'
 })`
