@@ -1,11 +1,10 @@
-import { getDepositMemo } from '@thorchain/asgardex-util'
+import { getDepositMemo, getWithdrawMemo } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { BASE_CHAIN } from '../../const'
-import { eqChain } from '../../helpers/fp/eq'
+import { isBaseChainAsset } from '../../helpers/chainHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { selectedPoolAsset$ } from '../midgard/common'
 import { baseAddress$, crossAddress$ } from './address'
@@ -19,7 +18,7 @@ const baseChainStakeMemo$: MemoRx = Rx.combineLatest([selectedPoolAsset$, crossA
     FP.pipe(
       oPoolAsset,
       // Deposit for base-chain asset?
-      O.filter((poolAsset) => eqChain.equals(poolAsset.chain, BASE_CHAIN)),
+      O.filter(isBaseChainAsset),
       // for base-chain deposits no need to add an address
       O.map(getDepositMemo),
       // for x-chain deposits, a wallet address for x-chain is needed
@@ -41,15 +40,31 @@ const crossChainStakeMemo$: MemoRx = Rx.combineLatest([selectedPoolAsset$, baseA
     FP.pipe(
       sequenceTOption(oPoolAsset, oBaseAddress),
       // cross-chain asset?
-      O.filter(([poolAsset]) => !eqChain.equals(poolAsset.chain, BASE_CHAIN)),
+      O.filter(([poolAsset]) => !isBaseChainAsset(poolAsset)),
       // add address of base-chain wallet to memo
       O.map(([poolAsset, baseAddress]) => getDepositMemo(poolAsset, baseAddress))
     )
   )
 )
 
+/**
+ * Unstake memo for txs sent on cross-chain
+ */
+const getCrossChainUnstakeMemo$ = (unstakePercent: number): MemoRx =>
+  selectedPoolAsset$.pipe(
+    RxOp.map((oPoolAsset) =>
+      FP.pipe(
+        oPoolAsset,
+        // cross-chain asset?
+        O.filter((poolAsset) => !isBaseChainAsset(poolAsset)),
+        // add address of base-chain wallet to memo
+        O.map((poolAsset) => getWithdrawMemo(poolAsset, unstakePercent))
+      )
+    )
+  )
+
 // TODO(@veado) Remove it later, but leave it for #537 https://github.com/thorchain/asgardex-electron/issues/537
 crossChainStakeMemo$.subscribe((value) => console.log('crossChainStakeMemo:', value))
 baseChainStakeMemo$.subscribe((value) => console.log('baseChainStakeMemo:', value))
 
-export { baseChainStakeMemo$, crossChainStakeMemo$ }
+export { baseChainStakeMemo$, crossChainStakeMemo$, getCrossChainUnstakeMemo$ }

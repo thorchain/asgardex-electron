@@ -1,10 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetAmount, BaseAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { BASE_CHAIN_ASSET } from '../../../const'
 import { eqAsset } from '../../../helpers/fp/eq'
+import { StakeFeesRD } from '../../../services/chain/types'
+import { Fees } from '../../uielements/fees'
 import { Label } from '../../uielements/label'
 import { getWithdrawAmounts } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
@@ -19,6 +25,7 @@ type Props = {
   runeShare: BaseAmount
   assetShare: BaseAmount
   disabled?: boolean
+  fees: StakeFeesRD
 }
 
 export const Withdraw: React.FC<Props> = ({
@@ -30,12 +37,43 @@ export const Withdraw: React.FC<Props> = ({
   selectedCurrencyAsset,
   runeShare,
   assetShare,
-  disabled
+  disabled,
+  fees: feesProp
 }) => {
   const intl = useIntl()
   const [withdrawPercent, setWithdrawPercent] = useState(50)
 
   const withdrawAmounts = getWithdrawAmounts(runeShare, assetShare, withdrawPercent)
+  const fees = useMemo(
+    () =>
+      FP.pipe(
+        feesProp,
+        RD.map((fees) =>
+          FP.pipe(
+            fees.cross,
+            O.fold(
+              () => [
+                {
+                  asset: BASE_CHAIN_ASSET,
+                  amount: fees.base
+                }
+              ],
+              (xFee) => [
+                {
+                  asset: BASE_CHAIN_ASSET,
+                  amount: fees.base
+                },
+                {
+                  asset: stakedAsset,
+                  amount: xFee
+                }
+              ]
+            )
+          )
+        )
+      ),
+    [feesProp, stakedAsset]
+  )
 
   return (
     <Styled.Container>
@@ -90,7 +128,9 @@ export const Withdraw: React.FC<Props> = ({
         </Styled.OutputLabel>
       </Styled.AssetContainer>
 
-      <Label>{intl.formatMessage({ id: 'stake.withdraw.fee' })}: 0.000375 BNB</Label>
+      <Label>
+        <Fees fees={fees} />
+      </Label>
 
       <Styled.Drag
         title={intl.formatMessage({ id: 'stake.withdraw.drag' })}

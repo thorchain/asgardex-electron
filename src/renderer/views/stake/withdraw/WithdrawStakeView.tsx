@@ -9,6 +9,7 @@ import { map } from 'rxjs/operators'
 
 import { Withdraw } from '../../../components/stake/withdraw'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 // import { useWalletContext } from '../../../contexts/WalletContext'
 import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
@@ -32,6 +33,10 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
       stake: { getStakes$ }
     }
   } = useMidgardContext()
+
+  const { unstakeFees$ } = useChainContext()
+
+  const fees = useObservableState(unstakeFees$, RD.initial)
 
   const runePrice = useObservableState(priceRatio$, bn(1))
 
@@ -70,6 +75,7 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
+        fees={fees}
         assetPrice={ZERO_BN}
         runePrice={runePrice}
         selectedCurrencyAsset={AssetRune67C}
@@ -81,7 +87,7 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         disabled
       />
     ),
-    [runeAsset, stakedAsset, runePrice]
+    [runeAsset, stakedAsset, runePrice, fees]
   )
 
   const renderWithdrawReady = useCallback(
@@ -95,9 +101,10 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         assetShare={shareHelpers.getAssetShare(stake, poolDetail)}
         runeAsset={runeAsset}
         stakedAsset={stakedAsset}
+        fees={fees}
       />
     ),
-    [runeAsset, stakedAsset, runePrice]
+    [runePrice, runeAsset, stakedAsset, fees]
   )
 
   return FP.pipe(
