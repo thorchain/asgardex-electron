@@ -19,7 +19,7 @@ export const getChainAsset = (chain: Chain): Asset => {
 /**
  * Check whether chain is BASE chain
  */
-export const isBaseChain = (chain: Chain): boolean => eqChain.equals(chain, BASE_CHAIN)
+export const isBaseChain = (chain: Chain): chain is typeof BASE_CHAIN => eqChain.equals(chain, BASE_CHAIN)
 
 /**
  * Check whether asset is a BASE chain asset
