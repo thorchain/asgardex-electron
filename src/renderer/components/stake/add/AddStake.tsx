@@ -32,8 +32,8 @@ type Props = {
   runeAsset: Asset
   assetPrice: BigNumber
   runePrice: BigNumber
-  assetBalance: BaseAmount
-  runeBalance: BaseAmount
+  assetBalance: O.Option<BaseAmount>
+  runeBalance: O.Option<BaseAmount>
   baseChainAssetBalance: O.Option<BaseAmount>
   crossChainAssetBalance: O.Option<BaseAmount>
   priceAsset?: Asset
@@ -52,8 +52,8 @@ export const AddStake: React.FC<Props> = ({
   runeAsset,
   assetPrice,
   runePrice,
-  assetBalance,
-  runeBalance,
+  assetBalance: oAssetBalance,
+  runeBalance: oRuneBalance,
   baseChainAssetBalance: oBaseChainAssetBalance,
   crossChainAssetBalance: oCrossChainAssetBalance,
   assets,
@@ -72,6 +72,24 @@ export const AddStake: React.FC<Props> = ({
 
   const isAsym = useMemo(() => type === 'asym', [type])
 
+  const assetBalance: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        oAssetBalance,
+        O.getOrElse(() => ZERO_BASE_AMOUNT)
+      ),
+    [oAssetBalance]
+  )
+
+  const runeBalance: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        oRuneBalance,
+        O.getOrElse(() => ZERO_BASE_AMOUNT)
+      ),
+    [oRuneBalance]
+  )
+
   const maxRuneAmountToStake = useMemo(
     (): BaseAmount => Helper.maxRuneAmountToStake({ poolData, runeBalance, assetBalance }),
     [assetBalance, poolData, runeBalance]
@@ -85,13 +103,26 @@ export const AddStake: React.FC<Props> = ({
   const hasAssetBalance = useMemo(() => assetBalance.amount().isGreaterThan(0), [assetBalance])
   const hasRuneBalance = useMemo(() => runeBalance.amount().isGreaterThan(0), [runeBalance])
 
-  const isBalanceError = useMemo(() => (type === 'sym' ? !hasAssetBalance : !hasAssetBalance && !hasRuneBalance), [
-    hasAssetBalance,
-    hasRuneBalance,
+  const isSymBalanceError = useMemo(() => !hasAssetBalance, [hasAssetBalance])
+
+  const isAsymBalanceError = useMemo(() => !hasAssetBalance && !hasRuneBalance, [hasAssetBalance, hasRuneBalance])
+
+  const isBalanceError = useMemo(() => (type === 'sym' ? isSymBalanceError : isAsymBalanceError), [
+    isAsymBalanceError,
+    isSymBalanceError,
     type
   ])
 
-  const disabledForm = useMemo(() => isBalanceError || disabled, [disabled, isBalanceError])
+  const showBalanceError = useMemo(
+    () =>
+      // Note:
+      // To avoid flickering of balance error for a short time at the beginning
+      // We never show error if balances are not available
+      type === 'sym'
+        ? O.isSome(oAssetBalance) && isSymBalanceError
+        : FP.pipe(sequenceTOption(oRuneBalance, oAssetBalance), (balances) => O.isSome(balances) && isAsymBalanceError),
+    [isAsymBalanceError, isSymBalanceError, oAssetBalance, oRuneBalance, type]
+  )
 
   const renderBalanceError = useMemo(() => {
     const noAssetBalancesMsg = intl.formatMessage(
@@ -312,10 +343,17 @@ export const AddStake: React.FC<Props> = ({
     [asset, fees, intl]
   )
 
+  const disabledForm = useMemo(() => isBalanceError || isBaseChainFeeError || isCrossChainFeeError || disabled, [
+    disabled,
+    isBalanceError,
+    isBaseChainFeeError,
+    isCrossChainFeeError
+  ])
+
   return (
     <Styled.Container>
       <Styled.BalanceErrorRow>
-        <Col xs={24}>{isBalanceError && renderBalanceError}</Col>
+        <Col xs={24}>{showBalanceError && renderBalanceError}</Col>
       </Styled.BalanceErrorRow>
       <Styled.CardsRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>

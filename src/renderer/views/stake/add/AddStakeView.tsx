@@ -61,26 +61,24 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
 
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
 
-  const assetBalance: BaseAmount = useMemo(
+  const assetBalance: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
         assetsWB,
         O.chain(getBalanceByAsset(asset)),
         O.map((assetWithAmount) => {
           return assetWithAmount.amount
-        }),
-        O.getOrElse(() => ZERO_BASE_AMOUNT)
+        })
       ),
     [asset, assetsWB]
   )
 
-  const runeBalance: BaseAmount = useMemo(
+  const runeBalance: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
         assetsWB,
         O.chain(getBalanceByAsset(runeAsset)),
-        O.map((assetWithAmount) => assetWithAmount.amount),
-        O.getOrElse(() => ZERO_BASE_AMOUNT)
+        O.map((assetWithAmount) => assetWithAmount.amount)
       ),
     [assetsWB, runeAsset]
   )
@@ -137,8 +135,8 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
         runeAsset={runeAsset}
         assetPrice={ZERO_BN}
         runePrice={ZERO_BN}
-        assetBalance={ZERO_BASE_AMOUNT}
-        runeBalance={ZERO_BASE_AMOUNT}
+        assetBalance={O.none}
+        runeBalance={O.none}
         baseChainAssetBalance={O.none}
         crossChainAssetBalance={O.none}
         onStake={emptyFunc}

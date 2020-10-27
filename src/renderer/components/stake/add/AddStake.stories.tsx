@@ -11,8 +11,8 @@ import { ZERO_BASE_AMOUNT } from '../../../const'
 import { StakeFeesRD } from '../../../services/chain/types'
 import { AddStake } from './AddStake'
 
-const assetBalance = assetToBase(assetAmount(200))
-const runeBalance = assetToBase(assetAmount(100))
+const assetBalance = O.some(assetToBase(assetAmount(200)))
+const runeBalance = O.some(assetToBase(assetAmount(100)))
 const baseChainAssetBalance = O.some(assetToBase(assetAmount(55)))
 const crossChainAssetBalance = O.some(assetToBase(assetAmount(44)))
 const poolData = {
@@ -108,8 +108,8 @@ storiesOf('Components/Stake/AddStake', module)
         runeAsset={AssetRune67C}
         assetPrice={bn(2)}
         runePrice={bn(1)}
-        assetBalance={ZERO_BASE_AMOUNT}
-        runeBalance={ZERO_BASE_AMOUNT}
+        assetBalance={O.some(ZERO_BASE_AMOUNT)}
+        runeBalance={O.some(ZERO_BASE_AMOUNT)}
         baseChainAssetBalance={O.none}
         crossChainAssetBalance={O.none}
         onStake={console.log}
@@ -152,8 +152,8 @@ storiesOf('Components/Stake/AddStake', module)
       runeAsset={AssetRune67C}
       assetPrice={bn(2)}
       runePrice={bn(1)}
-      assetBalance={ZERO_BASE_AMOUNT}
-      runeBalance={ZERO_BASE_AMOUNT}
+      assetBalance={O.some(ZERO_BASE_AMOUNT)}
+      runeBalance={O.some(ZERO_BASE_AMOUNT)}
       baseChainAssetBalance={baseChainAssetBalance}
       crossChainAssetBalance={crossChainAssetBalance}
       onStake={console.log}
