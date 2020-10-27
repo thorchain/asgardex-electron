@@ -1,11 +1,4 @@
-import {
-  Asset,
-  baseAmount,
-  BaseAmount,
-  baseToAsset,
-  formatAssetAmountCurrency,
-  PoolData
-} from '@thorchain/asgardex-util'
+import { baseAmount, BaseAmount, PoolData } from '@thorchain/asgardex-util'
 
 import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 
@@ -62,10 +55,3 @@ export const getAssetAmountToStake = (
     runeAmount.amount().times(poolAssetBalance.amount().dividedBy(poolRuneBalance.amount())),
     THORCHAIN_DECIMAL
   )
-
-export const formatFee = (fee: BaseAmount, asset: Asset) =>
-  formatAssetAmountCurrency({
-    amount: baseToAsset(fee),
-    asset,
-    trimZeros: true
-  })

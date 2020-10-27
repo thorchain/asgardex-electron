@@ -15,18 +15,13 @@ type Fee = {
 
 type Props = {
   fees: RD.RemoteData<Error, Fee[]>
+  hasCrossChainFee?: boolean
 }
 
-export const Fees: React.FC<Props> = ({ fees }) => {
+export const Fees: React.FC<Props> = ({ fees, hasCrossChainFee }) => {
   const intl = useIntl()
 
   const prevFeesRef = useRef<string>('...')
-
-  const isSingleFee = FP.pipe(
-    fees,
-    RD.map((fees) => fees.length === 1),
-    RD.getOrElse(() => false)
-  )
 
   const feesFormattedValue = useMemo(
     () =>
@@ -35,7 +30,7 @@ export const Fees: React.FC<Props> = ({ fees }) => {
         RD.map(
           FP.flow(
             A.map(formatFee),
-            A.reduce('', (acc, cur) => `${acc} ${cur}`)
+            A.reduce('', (acc, cur) => `${acc}${acc ? ' + ' : ' '}${cur}`)
           )
         ),
         RD.fold(
@@ -53,7 +48,7 @@ export const Fees: React.FC<Props> = ({ fees }) => {
 
   return (
     <>
-      {intl.formatMessage({ id: isSingleFee ? 'common.fee' : 'common.fees' })}:{feesFormattedValue}
+      {intl.formatMessage({ id: hasCrossChainFee ? 'common.fees' : 'common.fee' })}:{feesFormattedValue}
     </>
   )
 }

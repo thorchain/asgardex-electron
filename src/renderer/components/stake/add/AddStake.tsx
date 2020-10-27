@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, baseAmount, BaseAmount, PoolData } from '@thorchain/asgardex-util'
 import { Col } from 'antd'
@@ -14,6 +13,8 @@ import { isBaseChainAsset } from '../../../helpers/chainHelper'
 import { StakeFeesRD } from '../../../services/chain/types'
 import { StakeType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
+import { Fees } from '../../uielements/fees'
+import { ReloadButton } from '../../uielements/reloadButton'
 import * as Helper from './AddStake.helper'
 import * as Styled from './AddStake.style'
 
@@ -165,24 +166,35 @@ export const AddStake: React.FC<Props> = ({
     [fees]
   )
 
-  const feesLabel = useMemo(
+  const feesArray = useMemo(
     () =>
       FP.pipe(
         fees,
-        RD.fold(
-          () => '...',
-          () => '...',
-          (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
-          ({ base, cross }) =>
-            // Show one or two fees
-            `${Helper.formatFee(base, BASE_CHAIN_ASSET)} ${FP.pipe(
-              cross,
-              O.map((crossFee) => ` + ${Helper.formatFee(crossFee, asset)}`),
-              O.getOrElse(() => '')
-            )}`
+        RD.map((fees) =>
+          FP.pipe(
+            fees.cross,
+            O.fold(
+              () => [
+                {
+                  asset: BASE_CHAIN_ASSET,
+                  amount: fees.base
+                }
+              ],
+              (xFee) => [
+                {
+                  asset: BASE_CHAIN_ASSET,
+                  amount: fees.base
+                },
+                {
+                  asset,
+                  amount: xFee
+                }
+              ]
+            )
+          )
         )
       ),
-    [asset, fees, intl]
+    [asset, fees]
   )
 
   return (
@@ -204,17 +216,10 @@ export const AddStake: React.FC<Props> = ({
           />
           <Styled.FeeRow>
             <Col>
-              <Styled.ReloadFeeButton onClick={reloadFees} disabled={RD.isPending(fees)}>
-                <SyncOutlined />
-              </Styled.ReloadFeeButton>
+              <ReloadButton onClick={reloadFees} disabled={RD.isPending(fees)} />
             </Col>
             <Col>
-              <Styled.FeeLabel disabled={RD.isPending(fees)}>
-                {hasCrossChainFee
-                  ? intl.formatMessage({ id: 'common.fees' })
-                  : intl.formatMessage({ id: 'common.fee' })}
-                : {feesLabel}
-              </Styled.FeeLabel>
+              <Fees fees={feesArray} hasCrossChainFee={hasCrossChainFee} />
             </Col>
           </Styled.FeeRow>
         </Col>

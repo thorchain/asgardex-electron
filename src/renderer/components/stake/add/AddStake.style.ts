@@ -3,8 +3,6 @@ import styled from 'styled-components'
 
 import { media } from '../../../helpers/styleHelper'
 import { AssetCard as BaseAssetCard } from '../../uielements/assets/assetCard'
-import { Button as UIButton } from '../../uielements/button'
-import { Label as UILabel } from '../../uielements/label'
 
 export const Container = styled('div')`
   display: flex;
@@ -43,22 +41,4 @@ export const FeeRow = styled(Row).attrs({
   ${media.xl`
   padding-bottom: 0px;
 `}
-`
-
-export const FeeLabel = styled(UILabel).attrs({
-  size: 'normal'
-})`
-  padding: 0;
-  min-width: 150px; /* needed for loader */
-`
-export const ReloadFeeButton = styled(UIButton).attrs({
-  typevalue: 'outline'
-})`
-  &.ant-btn {
-    /* overridden */
-    min-width: auto;
-  }
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
 `

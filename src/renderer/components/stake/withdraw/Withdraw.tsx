@@ -9,6 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { BASE_CHAIN_ASSET } from '../../../const'
+import { isBaseChainAsset } from '../../../helpers/chainHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { StakeFeesRD } from '../../../services/chain/types'
 import { Fees } from '../../uielements/fees'
@@ -48,6 +49,7 @@ export const Withdraw: React.FC<Props> = ({
   const [withdrawPercent, setWithdrawPercent] = useState(disabledProp ? 0 : 50)
 
   const disabled = useMemo(() => withdrawPercent === 0 || disabledProp, [withdrawPercent, disabledProp])
+  const hasCrossChainFee = useMemo(() => !isBaseChainAsset(stakedAsset), [stakedAsset])
 
   const reloadFees = useCallback(
     (percent: number) => {
@@ -153,7 +155,7 @@ export const Withdraw: React.FC<Props> = ({
       <Label disabled={RD.isPending(fees)}>
         <Row align="middle">
           <ReloadButton onClick={() => reloadFees(withdrawPercent)} disabled={RD.isPending(fees)} />
-          <Fees fees={fees} />
+          <Fees fees={fees} hasCrossChainFee={hasCrossChainFee} />
         </Row>
       </Label>
 
