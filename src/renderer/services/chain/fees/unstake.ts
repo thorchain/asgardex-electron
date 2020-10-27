@@ -19,22 +19,20 @@ import { reloadStakeFeesByChain } from './fees.helper'
 const { get$: unstakePercent$, set: updateUnstakePercent } = observableState(0)
 
 // reload fees
-Rx.combineLatest([selectedPoolChain$, unstakePercent$])
-  .pipe(
-    RxOp.tap(([oChain, _]) =>
-      FP.pipe(
-        oChain,
-        O.map((chain) => {
-          // reload base-chain
-          reloadStakeFeesByChain(BASE_CHAIN)
-          // For x-chains transfers, load fees for x-chain, too
-          if (!isBaseChain(chain)) reloadStakeFeesByChain(chain)
-          return true
-        })
-      )
+const updateUnstakeFeesEffect$ = Rx.combineLatest([selectedPoolChain$, unstakePercent$]).pipe(
+  RxOp.tap(([oChain, _]) =>
+    FP.pipe(
+      oChain,
+      O.map((chain) => {
+        // reload base-chain
+        reloadStakeFeesByChain(BASE_CHAIN)
+        // For x-chains transfers, load fees for x-chain, too
+        if (!isBaseChain(chain)) reloadStakeFeesByChain(chain)
+        return true
+      })
     )
   )
-  .subscribe()
+)
 
 const unstakeFeeByChain$ = (chain: Chain): FeeLD => {
   switch (chain) {
@@ -78,4 +76,4 @@ const unstakeFees$: StakeFeesLD = FP.pipe(
   )
 )
 
-export { updateUnstakePercent, unstakeFees$ }
+export { updateUnstakePercent, unstakeFees$, updateUnstakeFeesEffect$ }

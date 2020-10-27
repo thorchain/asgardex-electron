@@ -21,22 +21,20 @@ import { reloadStakeFeesByChain } from './fees.helper'
 const { stream$: reloadStakeFees$, trigger: reloadStakeFees } = triggerStream()
 
 // reload fees
-Rx.combineLatest([selectedPoolChain$, reloadStakeFees$])
-  .pipe(
-    RxOp.tap(([oChain, _]) =>
-      FP.pipe(
-        oChain,
-        O.map((chain) => {
-          // reload base-chain
-          reloadStakeFeesByChain(BASE_CHAIN)
-          // For x-chains transfers, load fees for x-chain, too
-          if (!isBaseChain(chain)) reloadStakeFeesByChain(chain)
-          return true
-        })
-      )
+const updateStakeFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadStakeFees$]).pipe(
+  RxOp.tap(([oChain, _]) =>
+    FP.pipe(
+      oChain,
+      O.map((chain) => {
+        // reload base-chain
+        reloadStakeFeesByChain(BASE_CHAIN)
+        // For x-chains transfers, load fees for x-chain, too
+        if (!isBaseChain(chain)) reloadStakeFeesByChain(chain)
+        return true
+      })
     )
   )
-  .subscribe()
+)
 
 const stakeFeeByChain$ = (chain: Chain): FeeLD => {
   switch (chain) {
@@ -87,4 +85,4 @@ const stakeFees$: StakeFeesLD = selectedPoolChain$.pipe(
     )
   )
 )
-export { stakeFees$, reloadStakeFees }
+export { stakeFees$, reloadStakeFees, updateStakeFeesEffect$ }

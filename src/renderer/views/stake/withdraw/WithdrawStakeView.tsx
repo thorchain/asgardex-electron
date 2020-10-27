@@ -4,7 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetRune67C, bn } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
-import { useObservableState } from 'observable-hooks'
+import { useObservableState, useSubscription } from 'observable-hooks'
 import { map } from 'rxjs/operators'
 
 import { Withdraw } from '../../../components/stake/withdraw'
@@ -35,7 +35,9 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { unstakeFees$, updateUnstakePercent } = useChainContext()
+  const { unstakeFees$, updateUnstakePercent, updateUnstakeFeesEffect$ } = useChainContext()
+
+  useSubscription(updateUnstakeFeesEffect$)
 
   const fees = useObservableState(unstakeFees$, RD.initial)
 
