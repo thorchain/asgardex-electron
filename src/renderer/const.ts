@@ -9,7 +9,8 @@ import {
   Asset,
   assetToString,
   baseAmount,
-  AssetBNB
+  AssetBNB,
+  BNBChain
 } from '@thorchain/asgardex-util'
 
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
@@ -19,7 +20,7 @@ import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.t
  * BNC for now, but it will be changed to `THOR` in the near future
  * TODO(@veado): Change it if we go live with `NativeRUNE`
  */
-export const BASE_CHAIN = 'BNB' as const
+export const BASE_CHAIN = BNBChain
 
 /**
  * Asset of "base" chain RUNE is currently running on

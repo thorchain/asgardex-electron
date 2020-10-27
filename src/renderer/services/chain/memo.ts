@@ -58,7 +58,8 @@ const getCrossChainUnstakeMemo$ = (unstakePercent: number): MemoRx =>
         // cross-chain asset?
         O.filter((poolAsset) => !isBaseChainAsset(poolAsset)),
         // add address of base-chain wallet to memo
-        O.map((poolAsset) => getWithdrawMemo(poolAsset, unstakePercent))
+        /** getWithdrawMemo gets percents between 0 and 10000 */
+        O.map((poolAsset) => getWithdrawMemo(poolAsset, unstakePercent * 100))
       )
     )
   )

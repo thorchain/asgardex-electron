@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetAmount, BaseAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -12,6 +13,7 @@ import { eqAsset } from '../../../helpers/fp/eq'
 import { StakeFeesRD } from '../../../services/chain/types'
 import { Fees } from '../../uielements/fees'
 import { Label } from '../../uielements/label'
+import { ReloadButton } from '../../uielements/reloadButton'
 import { getWithdrawAmounts } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
@@ -22,6 +24,7 @@ type Props = {
   assetPrice: BigNumber
   selectedCurrencyAsset: Asset
   onWithdraw: (percent: number) => void
+  updateFees: (percent: number) => void
   runeShare: BaseAmount
   assetShare: BaseAmount
   disabled?: boolean
@@ -37,11 +40,30 @@ export const Withdraw: React.FC<Props> = ({
   selectedCurrencyAsset,
   runeShare,
   assetShare,
-  disabled,
-  fees: feesProp
+  disabled: disabledProp,
+  fees: feesProp,
+  updateFees
 }) => {
   const intl = useIntl()
-  const [withdrawPercent, setWithdrawPercent] = useState(50)
+  const [withdrawPercent, setWithdrawPercent] = useState(disabledProp ? 0 : 50)
+
+  const disabled = useMemo(() => withdrawPercent === 0 || disabledProp, [withdrawPercent, disabledProp])
+
+  const reloadFees = useCallback(
+    (percent: number) => {
+      // Just update without user's input
+      if (disabledProp) {
+        updateFees(0)
+      } else {
+        updateFees(percent)
+      }
+    },
+    [disabledProp, updateFees]
+  )
+
+  useEffect(() => {
+    reloadFees(withdrawPercent)
+  }, [reloadFees, withdrawPercent])
 
   const withdrawAmounts = getWithdrawAmounts(runeShare, assetShare, withdrawPercent)
   const fees = useMemo(
@@ -128,8 +150,11 @@ export const Withdraw: React.FC<Props> = ({
         </Styled.OutputLabel>
       </Styled.AssetContainer>
 
-      <Label>
-        <Fees fees={fees} />
+      <Label disabled={RD.isPending(fees)}>
+        <Row align="middle">
+          <ReloadButton onClick={() => reloadFees(withdrawPercent)} disabled={RD.isPending(fees)} />
+          <Fees fees={fees} />
+        </Row>
       </Label>
 
       <Styled.Drag
@@ -137,8 +162,7 @@ export const Withdraw: React.FC<Props> = ({
         source={runeAsset}
         target={stakedAsset}
         onConfirm={() => onWithdraw(withdrawPercent)}
-        // @TODO (@thatStrangeGuy) compare to BNB fee
-        disabled={withdrawPercent === 0 || disabled}
+        disabled={disabled}
       />
     </Styled.Container>
   )

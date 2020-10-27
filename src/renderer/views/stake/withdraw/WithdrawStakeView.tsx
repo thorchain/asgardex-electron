@@ -13,6 +13,7 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 // import { useWalletContext } from '../../../contexts/WalletContext'
 import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
+import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
@@ -34,7 +35,7 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { unstakeFees$ } = useChainContext()
+  const { unstakeFees$, updateUnstakePercent } = useChainContext()
 
   const fees = useObservableState(unstakeFees$, RD.initial)
 
@@ -79,15 +80,16 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         assetPrice={ZERO_BN}
         runePrice={runePrice}
         selectedCurrencyAsset={AssetRune67C}
-        onWithdraw={() => {}}
+        onWithdraw={emptyFunc}
         runeShare={ZERO_BASE_AMOUNT}
         assetShare={ZERO_BASE_AMOUNT}
         runeAsset={runeAsset}
         stakedAsset={stakedAsset}
+        updateFees={updateUnstakePercent}
         disabled
       />
     ),
-    [runeAsset, stakedAsset, runePrice, fees]
+    [fees, runePrice, runeAsset, stakedAsset, updateUnstakePercent]
   )
 
   const renderWithdrawReady = useCallback(
@@ -102,9 +104,10 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         runeAsset={runeAsset}
         stakedAsset={stakedAsset}
         fees={fees}
+        updateFees={updateUnstakePercent}
       />
     ),
-    [runePrice, runeAsset, stakedAsset, fees]
+    [runePrice, runeAsset, stakedAsset, fees, updateUnstakePercent]
   )
 
   return FP.pipe(
