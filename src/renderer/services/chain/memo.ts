@@ -44,7 +44,8 @@ const crossChainStakeMemo$: MemoRx = Rx.combineLatest([selectedPoolAsset$, baseA
       // add address of base-chain wallet to memo
       O.map(([poolAsset, baseAddress]) => getDepositMemo(poolAsset, baseAddress))
     )
-  )
+  ),
+  RxOp.shareReplay(1)
 )
 
 /**

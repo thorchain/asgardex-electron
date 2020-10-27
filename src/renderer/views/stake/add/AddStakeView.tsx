@@ -94,6 +94,14 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
   const { stakeFees$, reloadStakeFees: reloadFees } = useChainContext()
   const stakeFees = useObservableState(stakeFees$, RD.initial)
 
+  React.useEffect(() => {
+    console.log('render add stake view')
+
+    return () => {
+      console.log('unmount add stake view')
+    }
+  }, [])
+
   const renderDisabledAddStake = useCallback(
     () => (
       <AddStake

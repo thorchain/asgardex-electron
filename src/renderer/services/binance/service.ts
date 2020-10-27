@@ -371,7 +371,8 @@ const fees$: FeesLD = Rx.combineLatest([reloadFees$, client$]).pipe(
       )
     )
   ),
-  startWith(RD.initial)
+  startWith(RD.initial),
+  shareReplay(1)
 )
 
 /**

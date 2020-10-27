@@ -15,32 +15,33 @@ import * as BTC from '../../bitcoin/context'
 import { selectedPoolChain$ } from '../../midgard/common'
 import { crossChainStakeMemo$ } from '../memo'
 import { FeeLD, StakeFeesLD } from '../types'
+import { reloadStakeFeesByChain } from './fees.helper'
 
 // `TriggerStream` to reload stake fees
-const { stream$: innerReloadStakeFees$, trigger: _reloadStakeFees } = triggerStream()
+const { stream$: reloadStakeFees$, trigger: reloadStakeFees } = triggerStream()
 
-const reloadStakeFees$ = FP.pipe(
-  innerReloadStakeFees$,
-  RxOp.throttleTime(500),
-  RxOp.tap(() => {
-    console.log(' reload stakes')
-    // debugger
-  }),
-  RxOp.shareReplay(1)
+// reload fees
+Rx.combineLatest([selectedPoolChain$, reloadStakeFees$])
+  .pipe(
+    RxOp.tap(([oChain, _]) =>
+      FP.pipe(
+        oChain,
+        O.map((chain) => {
+          // reload base-chain
+          reloadStakeFeesByChain(BASE_CHAIN)
+          // For x-chains transfers, load fees for x-chain, too
+          if (!isBaseChain(chain)) reloadStakeFeesByChain(chain)
+          return true
+        })
+      )
+    )
   )
-
-  const reloadStakeFees = () => {
-    console.log('reload callback')
-    _reloadStakeFees()
-  }
+  .subscribe()
 
 const stakeFeeByChain$ = (chain: Chain): FeeLD => {
   switch (chain) {
     case 'BNB':
-      return FP.pipe(
-        reloadStakeFees$,
-        RxOp.switchMap(() => BNB.stakeFee$)
-      )
+      return BNB.stakeFee$
     case 'BTC':
       // stake fees of BTC based on memo
       return FP.pipe(
