@@ -45,8 +45,8 @@ const stakeFeeByChain$ = (chain: Chain): FeeLD => {
     case 'BTC':
       // stake fees of BTC based on memo
       return FP.pipe(
-        Rx.combineLatest(crossChainStakeMemo$, reloadStakeFees$),
-        RxOp.switchMap(([oMemo]) =>
+        crossChainStakeMemo$,
+        RxOp.switchMap((oMemo) =>
           FP.pipe(
             oMemo,
             O.fold(
