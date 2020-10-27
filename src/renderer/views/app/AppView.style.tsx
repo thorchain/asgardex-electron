@@ -2,7 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { ErrorAlert as UIErrorAlert } from '../../components/uielements/alert'
+import { Alert as UIAlert } from '../../components/uielements/alert'
 import { Label as UILabel } from '../../components/uielements/label'
 import { media } from '../../helpers/styleHelper'
 
@@ -35,7 +35,9 @@ export const AppLayout = styled(A.Layout)`
   background: ${palette('background', 3)};
 `
 
-export const ErrorAlert = styled(UIErrorAlert)`
+export const ErrorAlert = styled(UIAlert).attrs({
+  type: 'error'
+})`
   margin-bottom: 10px;
 
   ${media.lg`
