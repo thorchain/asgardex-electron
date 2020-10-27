@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react'
+import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { BaseAmount, Asset } from '@thorchain/asgardex-util'
@@ -21,8 +21,6 @@ type Props = {
 export const Fees: React.FC<Props> = ({ fees, hasCrossChainFee }) => {
   const intl = useIntl()
 
-  const prevFeesRef = useRef<string>('...')
-
   const feesFormattedValue = useMemo(
     () =>
       FP.pipe(
@@ -34,17 +32,10 @@ export const Fees: React.FC<Props> = ({ fees, hasCrossChainFee }) => {
           )
         ),
         RD.fold(
-          () => <>{prevFeesRef.current}</>,
-          () => <>{prevFeesRef.current}</>,
-          (error) => (
-            <>
-              {intl.formatMessage({ id: 'common.error' })}: {error.message}
-            </>
-          ),
-          (fees) => {
-            prevFeesRef.current = fees
-            return <>{fees}</>
-          }
+          () => '...',
+          () => '...',
+          (error) => `${intl.formatMessage({ id: 'common.error' })}: ${error.message}`,
+          FP.identity
         )
       ),
     [fees, intl]
@@ -52,7 +43,7 @@ export const Fees: React.FC<Props> = ({ fees, hasCrossChainFee }) => {
 
   return (
     <>
-      {intl.formatMessage({ id: hasCrossChainFee ? 'common.fees' : 'common.fee' })}:{feesFormattedValue}
+      {intl.formatMessage({ id: hasCrossChainFee ? 'common.fees' : 'common.fee' })}: {feesFormattedValue}
     </>
   )
 }
