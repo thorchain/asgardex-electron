@@ -11,12 +11,7 @@ const { get$: getSelectedPoolAsset$, set: setSelectedPoolAsset } = observableSta
 
 // "dirty check" to trigger "real" changes of an asset only
 const selectedPoolAsset$: Observable<SelectedPoolAsset> = getSelectedPoolAsset$.pipe(
-  RxOp.distinctUntilChanged((a, b) => {
-    const compare = eqOAsset.equals
-    // debugger
-    return compare(a, b)
-  }),
-  RxOp.tap((asset) => console.log('selected pool asset', asset)),
+  RxOp.distinctUntilChanged(eqOAsset.equals),
   RxOp.shareReplay(1)
 )
 

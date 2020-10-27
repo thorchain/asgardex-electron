@@ -83,8 +83,7 @@ const stakeFees$: StakeFeesLD = selectedPoolChain$.pipe(
           }))
         )
       ),
-      O.getOrElse((): StakeFeesLD => Rx.of(RD.initial)),
-      RxOp.shareReplay(1)
+      O.getOrElse((): StakeFeesLD => Rx.of(RD.initial))
     )
   )
 )
