@@ -53,6 +53,7 @@ export const StakeView: React.FC<Props> = (_) => {
   // Set selected pool asset whenever an asset in route has been changed
   // Needed to get all data for this pool (pool details etc.)
   useEffect(() => {
+    console.log('update from stake view')
     setSelectedPoolAsset(oSelectedAsset)
   }, [oSelectedAsset, setSelectedPoolAsset])
 

@@ -17,7 +17,22 @@ import { crossChainStakeMemo$ } from '../memo'
 import { FeeLD, StakeFeesLD } from '../types'
 
 // `TriggerStream` to reload stake fees
-const { stream$: reloadStakeFees$, trigger: reloadStakeFees } = triggerStream()
+const { stream$: innerReloadStakeFees$, trigger: _reloadStakeFees } = triggerStream()
+
+const reloadStakeFees$ = FP.pipe(
+  innerReloadStakeFees$,
+  RxOp.throttleTime(500),
+  RxOp.tap(() => {
+    console.log(' reload stakes')
+    // debugger
+  }),
+  RxOp.shareReplay(1)
+  )
+
+  const reloadStakeFees = () => {
+    console.log('reload callback')
+    _reloadStakeFees()
+  }
 
 const stakeFeeByChain$ = (chain: Chain): FeeLD => {
   switch (chain) {
@@ -67,7 +82,8 @@ const stakeFees$: StakeFeesLD = selectedPoolChain$.pipe(
           }))
         )
       ),
-      O.getOrElse((): StakeFeesLD => Rx.of(RD.initial))
+      O.getOrElse((): StakeFeesLD => Rx.of(RD.initial)),
+      RxOp.shareReplay(1)
     )
   )
 )
