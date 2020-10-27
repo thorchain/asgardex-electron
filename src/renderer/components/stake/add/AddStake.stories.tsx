@@ -61,6 +61,7 @@ export const AddAsymCrossStakeStory = () => {
       runeBalance={runeBalance}
       baseChainAssetBalance={baseChainAssetBalance}
       crossChainAssetBalance={O.none}
+      isCrossChain
       onStake={console.log}
       onChangeAsset={console.log}
       reloadFees={reloadFeesHandler}
@@ -179,6 +180,7 @@ storiesOf('Components/Stake/AddStake', module)
         runeBalance={runeBalance}
         baseChainAssetBalance={O.none}
         crossChainAssetBalance={O.none}
+        isCrossChain
         onStake={console.log}
         onChangeAsset={console.log}
         reloadFees={reloadFeesHandler}

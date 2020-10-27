@@ -36,6 +36,7 @@ type Props = {
   runeBalance: O.Option<BaseAmount>
   baseChainAssetBalance: O.Option<BaseAmount>
   crossChainAssetBalance: O.Option<BaseAmount>
+  isCrossChain?: boolean
   priceAsset?: Asset
   fees: StakeFeesRD
   reloadFees: () => void
@@ -56,6 +57,7 @@ export const AddStake: React.FC<Props> = ({
   runeBalance: oRuneBalance,
   baseChainAssetBalance: oBaseChainAssetBalance,
   crossChainAssetBalance: oCrossChainAssetBalance,
+  isCrossChain = false,
   assets,
   priceAsset,
   reloadFees,
@@ -299,6 +301,8 @@ export const AddStake: React.FC<Props> = ({
   )
 
   const isCrossChainFeeError = useMemo(() => {
+    if (!isCrossChain) return false
+
     return FP.pipe(
       sequenceTOption(oCrossChainFee, oCrossChainAssetBalance),
       O.fold(
@@ -307,7 +311,7 @@ export const AddStake: React.FC<Props> = ({
         ([fee, balance]) => balance.amount().isLessThan(fee.amount())
       )
     )
-  }, [oCrossChainFee, oCrossChainAssetBalance])
+  }, [isCrossChain, oCrossChainFee, oCrossChainAssetBalance])
 
   const renderCrossChainFeeError = useMemo(() => {
     const amount = FP.pipe(

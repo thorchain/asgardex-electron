@@ -14,6 +14,7 @@ import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
+import { getChainAsset, isBaseChainAsset, isCrossChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
@@ -44,6 +45,10 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
       pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, poolsState$ }
     }
   } = useMidgardContext()
+
+  const { stakeFees$, reloadStakeFees: reloadFees, isCrossChainStake$ } = useChainContext()
+  const stakeFees = useObservableState(stakeFees$, RD.initial)
+  const isCrossChain = useObservableState(isCrossChainStake$, false)
 
   const { assetsWBState$ } = useWalletContext()
 
@@ -83,30 +88,29 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
     [assetsWB, runeAsset]
   )
 
-  // TODO(@veado)
-  // - base chain asset === asset?
   const baseChainAssetBalance: O.Option<BaseAmount> = useMemo(
     () =>
-      FP.pipe(
-        assetsWB,
-        O.chain(getBalanceByAsset(BASE_CHAIN_ASSET)),
-        O.map((assetWithAmount) => assetWithAmount.amount)
-      ),
-    [assetsWB]
+      isBaseChainAsset(asset)
+        ? assetBalance
+        : FP.pipe(
+            assetsWB,
+            O.chain(getBalanceByAsset(BASE_CHAIN_ASSET)),
+            O.map((assetWithAmount) => assetWithAmount.amount)
+          ),
+    [asset, assetBalance, assetsWB]
   )
 
-  // TODO(@veado)
-  // - cross chain?
-  // - cross chain asset === asset?
-  const crossChainAssetBalance: O.Option<BaseAmount> = useMemo(
-    () =>
-      FP.pipe(
-        assetsWB,
-        O.chain(getBalanceByAsset(asset)),
-        O.map((assetWithAmount) => assetWithAmount.amount)
-      ),
-    [asset, assetsWB]
-  )
+  const crossChainAssetBalance: O.Option<BaseAmount> = useMemo(() => {
+    if (!isCrossChain) return O.none
+
+    return isCrossChainAsset(asset)
+      ? assetBalance
+      : FP.pipe(
+          assetsWB,
+          O.chain(getBalanceByAsset(getChainAsset(asset.chain))),
+          O.map((assetWithAmount) => assetWithAmount.amount)
+        )
+  }, [asset, assetBalance, assetsWB, isCrossChain])
 
   const poolsStateRD = useObservableState(poolsState$, RD.initial)
 
@@ -122,9 +126,6 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
     // convert from RUNE price to selected pool asset price
     RD.map(getAssetPoolPrice(runPrice))
   )
-
-  const { stakeFees$, reloadStakeFees: reloadFees } = useChainContext()
-  const stakeFees = useObservableState(stakeFees$, RD.initial)
 
   const renderDisabledAddStake = useCallback(
     () => (
@@ -144,10 +145,11 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
         reloadFees={emptyFunc}
         priceAsset={selectedPricePoolAsset}
         disabled={true}
+        isCrossChain={isCrossChain}
         poolData={{ runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }}
       />
     ),
-    [asset, runeAsset, selectedPricePoolAsset, stakeFees, type]
+    [asset, isCrossChain, runeAsset, selectedPricePoolAsset, stakeFees, type]
   )
 
   return FP.pipe(
@@ -158,24 +160,27 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
       renderDisabledAddStake,
       ([assetPrice, poolAssets, pool]) => {
         return (
-          <AddStake
-            type={type}
-            poolData={toPoolData(pool)}
-            onChangeAsset={onChangeAsset}
-            asset={asset}
-            runeAsset={runeAsset}
-            assetPrice={assetPrice}
-            runePrice={runPrice}
-            assetBalance={assetBalance}
-            runeBalance={runeBalance}
-            baseChainAssetBalance={baseChainAssetBalance}
-            crossChainAssetBalance={crossChainAssetBalance}
-            onStake={console.log}
-            fees={stakeFees}
-            reloadFees={reloadFees}
-            priceAsset={selectedPricePoolAsset}
-            assets={poolAssets}
-          />
+          <>
+            <AddStake
+              type={type}
+              poolData={toPoolData(pool)}
+              onChangeAsset={onChangeAsset}
+              asset={asset}
+              runeAsset={runeAsset}
+              assetPrice={assetPrice}
+              runePrice={runPrice}
+              assetBalance={assetBalance}
+              runeBalance={runeBalance}
+              baseChainAssetBalance={baseChainAssetBalance}
+              crossChainAssetBalance={crossChainAssetBalance}
+              isCrossChain={isCrossChain}
+              onStake={console.log}
+              fees={stakeFees}
+              reloadFees={reloadFees}
+              priceAsset={selectedPricePoolAsset}
+              assets={poolAssets}
+            />
+          </>
         )
       }
     )
