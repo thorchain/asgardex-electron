@@ -132,7 +132,7 @@ export const AddStake: React.FC<Props> = ({
     const title = intl.formatMessage({ id: 'stake.add.error.nobalances' })
 
     const msg = type === 'sym' ? symMsg : asymMsg
-    return <Styled.BalanceErrorAlert message={title} description={msg} />
+    return <Styled.BalanceAlert type="warning" message={title} description={msg} />
   }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl, runeAsset.ticker, type])
 
   const runeAmountChangeHandler = useCallback(

@@ -2,7 +2,7 @@ import { Row } from 'antd'
 import styled from 'styled-components'
 
 import { media } from '../../../helpers/styleHelper'
-import { ErrorAlert as UIErrorAlert } from '../../uielements/alert'
+import { Alert as UIAlert } from '../../uielements/alert'
 import { AssetCard as BaseAssetCard } from '../../uielements/assets/assetCard'
 import { Button as UIButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
@@ -32,7 +32,7 @@ export const BalanceErrorRow = styled(Row).attrs({})`
 `}
 `
 
-export const BalanceErrorAlert = styled(UIErrorAlert)`
+export const BalanceAlert = styled(UIAlert)`
   width: 100%;
   margin-right: 20px;
 `
