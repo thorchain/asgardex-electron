@@ -85,6 +85,8 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
     [assetsWB, runeAsset]
   )
 
+  // TODO(@veado)
+  // - base chain asset === asset?
   const baseChainAssetBalance: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
@@ -93,6 +95,19 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
         O.map((assetWithAmount) => assetWithAmount.amount)
       ),
     [assetsWB]
+  )
+
+  // TODO(@veado)
+  // - cross chain?
+  // - cross chain asset === asset?
+  const crossChainAssetBalance: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        assetsWB,
+        O.chain(getBalanceByAsset(asset)),
+        O.map((assetWithAmount) => assetWithAmount.amount)
+      ),
+    [asset, assetsWB]
   )
 
   const poolsStateRD = useObservableState(poolsState$, RD.initial)
@@ -125,6 +140,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
         assetBalance={ZERO_BASE_AMOUNT}
         runeBalance={ZERO_BASE_AMOUNT}
         baseChainAssetBalance={O.none}
+        crossChainAssetBalance={O.none}
         onStake={emptyFunc}
         fees={stakeFees}
         reloadFees={emptyFunc}
@@ -155,6 +171,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
             assetBalance={assetBalance}
             runeBalance={runeBalance}
             baseChainAssetBalance={baseChainAssetBalance}
+            crossChainAssetBalance={crossChainAssetBalance}
             onStake={console.log}
             fees={stakeFees}
             reloadFees={reloadFees}

@@ -4,6 +4,7 @@ import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import {
   Asset,
+  AssetAmount,
   baseAmount,
   BaseAmount,
   baseToAsset,
@@ -16,7 +17,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { BASE_CHAIN, BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
+import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
 import { isBaseChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { StakeFeesRD } from '../../../services/chain/types'
@@ -34,6 +35,7 @@ type Props = {
   assetBalance: BaseAmount
   runeBalance: BaseAmount
   baseChainAssetBalance: O.Option<BaseAmount>
+  crossChainAssetBalance: O.Option<BaseAmount>
   priceAsset?: Asset
   fees: StakeFeesRD
   reloadFees: () => void
@@ -53,6 +55,7 @@ export const AddStake: React.FC<Props> = ({
   assetBalance,
   runeBalance,
   baseChainAssetBalance: oBaseChainAssetBalance,
+  crossChainAssetBalance: oCrossChainAssetBalance,
   assets,
   priceAsset,
   reloadFees,
@@ -78,6 +81,59 @@ export const AddStake: React.FC<Props> = ({
     (): BaseAmount => Helper.maxAssetAmountToStake({ poolData, runeBalance, assetBalance }),
     [assetBalance, poolData, runeBalance]
   )
+
+  const hasAssetBalance = useMemo(() => assetBalance.amount().isGreaterThan(0), [assetBalance])
+  const hasRuneBalance = useMemo(() => runeBalance.amount().isGreaterThan(0), [runeBalance])
+
+  const isBalanceError = useMemo(() => (type === 'sym' ? !hasAssetBalance : !hasAssetBalance && !hasRuneBalance), [
+    hasAssetBalance,
+    hasRuneBalance,
+    type
+  ])
+
+  const disabledForm = useMemo(() => isBalanceError || disabled, [disabled, isBalanceError])
+
+  const renderBalanceError = useMemo(() => {
+    const noAssetBalancesMsg = intl.formatMessage(
+      { id: 'stake.add.error.nobalance1' },
+      {
+        asset: asset.ticker
+      }
+    )
+
+    const noRuneBalancesMsg = intl.formatMessage(
+      { id: 'stake.add.error.nobalance1' },
+      {
+        asset: runeAsset.ticker
+      }
+    )
+
+    const noRuneAndAssetBalancesMsg = intl.formatMessage(
+      { id: 'stake.add.error.nobalance2' },
+      {
+        asset1: asset.ticker,
+        asset2: runeAsset.ticker
+      }
+    )
+
+    // asym error message
+    const asymMsg =
+      // no balance for pool asset and rune
+      !hasAssetBalance && !hasRuneBalance
+        ? noRuneAndAssetBalancesMsg
+        : // no rune balance
+        !hasRuneBalance
+        ? noRuneBalancesMsg
+        : // no balance of pool asset
+          noAssetBalancesMsg
+
+    const symMsg = noAssetBalancesMsg
+
+    const title = intl.formatMessage({ id: 'stake.add.error.nobalances' })
+
+    const msg = type === 'sym' ? symMsg : asymMsg
+    return <Styled.BalanceErrorAlert message={title} description={msg} />
+  }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl, runeAsset.ticker, type])
 
   const runeAmountChangeHandler = useCallback(
     (runeInput: BaseAmount) => {
@@ -151,8 +207,21 @@ export const AddStake: React.FC<Props> = ({
 
   const hasCrossChainFee = useMemo(() => !isBaseChainAsset(asset), [asset])
 
-  // TODO(@Veado) Needed for validation
-  // issue: https://github.com/thorchain/asgardex-electron/issues/550
+  const renderFeeError = useCallback(
+    (fee: BaseAmount, balance: AssetAmount, asset: Asset) => {
+      const msg = intl.formatMessage(
+        { id: 'stake.add.error.chainFeeNotCovered' },
+        {
+          fee: Helper.formatFee(fee, asset),
+          balance: formatAssetAmountCurrency({ amount: balance, asset, trimZeros: true })
+        }
+      )
+
+      return <Styled.FeeErrorLabel>{msg}</Styled.FeeErrorLabel>
+    },
+    [intl]
+  )
+
   const oBaseChainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
@@ -169,7 +238,7 @@ export const AddStake: React.FC<Props> = ({
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oBaseChainFee),
-        ([fee, baseChainAssetAmount]) => baseChainAssetAmount.amount().isLessThan(fee.amount())
+        ([fee, balance]) => balance.amount().isLessThan(fee.amount())
       )
     )
   }, [oBaseChainAssetBalance, oBaseChainFee])
@@ -181,20 +250,14 @@ export const AddStake: React.FC<Props> = ({
       baseToAsset
     )
 
-    const msg = intl.formatMessage(
-      { id: 'stake.add.error.baseChainFeeNotCovered' },
-      {
-        chain: BASE_CHAIN,
-        balance: formatAssetAmountCurrency({ amount, asset: BASE_CHAIN_ASSET, trimZeros: true })
-      }
+    return FP.pipe(
+      oBaseChainFee,
+      O.map((fee) => renderFeeError(fee, amount, BASE_CHAIN_ASSET)),
+      O.getOrElse(() => <></>)
     )
+  }, [oBaseChainAssetBalance, oBaseChainFee, renderFeeError])
 
-    return <Styled.FeeErrorLabel>{msg}</Styled.FeeErrorLabel>
-  }, [oBaseChainAssetBalance, intl])
-
-  // TODO(@Veado) Needed for validation
-  // issue: https://github.com/thorchain/asgardex-electron/issues/550
-  const _poolChainFee: O.Option<BaseAmount> = useMemo(
+  const oCrossChainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
         fees,
@@ -203,6 +266,31 @@ export const AddStake: React.FC<Props> = ({
       ),
     [fees]
   )
+
+  const isCrossChainFeeError = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(oCrossChainFee, oCrossChainAssetBalance),
+      O.fold(
+        // Missing (or loading) fees does not mean we can't sent something. No error then.
+        () => !O.isNone(oCrossChainFee),
+        ([fee, balance]) => balance.amount().isLessThan(fee.amount())
+      )
+    )
+  }, [oCrossChainFee, oCrossChainAssetBalance])
+
+  const renderCrossChainFeeError = useMemo(() => {
+    const amount = FP.pipe(
+      oCrossChainAssetBalance,
+      O.getOrElse(() => ZERO_BASE_AMOUNT),
+      baseToAsset
+    )
+
+    return FP.pipe(
+      oCrossChainFee,
+      O.map((fee) => renderFeeError(fee, amount, asset)),
+      O.getOrElse(() => <></>)
+    )
+  }, [asset, oCrossChainAssetBalance, oCrossChainFee, renderFeeError])
 
   const feesLabel = useMemo(
     () =>
@@ -226,10 +314,13 @@ export const AddStake: React.FC<Props> = ({
 
   return (
     <Styled.Container>
+      <Styled.BalanceErrorRow>
+        <Col xs={24}>{isBalanceError && renderBalanceError}</Col>
+      </Styled.BalanceErrorRow>
       <Styled.CardsRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.AssetCard
-            disabled={disabled}
+            disabled={disabledForm}
             asset={asset}
             selectedAmount={assetAmountToStake}
             maxAmount={maxAssetAmountToStake}
@@ -241,7 +332,25 @@ export const AddStake: React.FC<Props> = ({
             onChangeAsset={onChangeAsset}
             priceAsset={priceAsset}
           />
-          {isBaseChainFeeError && renderBaseChainFeeError}
+        </Col>
+
+        <Col xs={24} xl={12}>
+          {isAsym && (
+            <Styled.AssetCard
+              disabled={disabledForm}
+              asset={runeAsset}
+              selectedAmount={runeAmountToStake}
+              maxAmount={maxRuneAmountToStake}
+              onChangeAssetAmount={runeAmountChangeHandler}
+              price={runePrice}
+              priceAsset={priceAsset}
+            />
+          )}
+        </Col>
+      </Styled.CardsRow>
+
+      <Styled.FeesRow gutter={{ lg: 32 }}>
+        <Col xs={24} xl={12}>
           <Styled.FeeRow>
             <Col>
               <Styled.ReloadFeeButton onClick={reloadFees} disabled={RD.isPending(fees)}>
@@ -257,30 +366,30 @@ export const AddStake: React.FC<Props> = ({
               </Styled.FeeLabel>
             </Col>
           </Styled.FeeRow>
+          <Styled.FeeErrorRow>
+            <Col>
+              <>
+                {
+                  // Don't show base-chain-fee error if we already display a error of balances
+                  !isBalanceError && isBaseChainFeeError && renderBaseChainFeeError
+                }
+                {
+                  // Don't show x-chain-fee error if we already display a error of balances
+                  !isBalanceError && isCrossChainFeeError && renderCrossChainFeeError
+                }
+              </>
+            </Col>
+          </Styled.FeeErrorRow>
         </Col>
-
-        <Col xs={24} xl={12}>
-          {isAsym && (
-            <Styled.AssetCard
-              disabled={disabled}
-              asset={runeAsset}
-              selectedAmount={runeAmountToStake}
-              maxAmount={maxRuneAmountToStake}
-              onChangeAssetAmount={runeAmountChangeHandler}
-              price={runePrice}
-              priceAsset={priceAsset}
-            />
-          )}
-        </Col>
-      </Styled.CardsRow>
+      </Styled.FeesRow>
 
       <Styled.DragWrapper>
         <Drag
           title={intl.formatMessage({ id: 'stake.drag' })}
-          source={runeAsset}
+          source={asset}
           target={asset}
           onConfirm={onStakeConfirmed}
-          disabled={disabled || runeAmountToStake.amount().isZero()}
+          disabled={disabledForm || runeAmountToStake.amount().isZero()}
         />
       </Styled.DragWrapper>
     </Styled.Container>
