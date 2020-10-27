@@ -14,6 +14,7 @@ import { StakeFeesRD } from '../../../services/chain/types'
 import { StakeType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
 import { Fees } from '../../uielements/fees'
+import { Label } from '../../uielements/label'
 import { ReloadButton } from '../../uielements/reloadButton'
 import * as Helper from './AddStake.helper'
 import * as Styled from './AddStake.style'
@@ -214,14 +215,12 @@ export const AddStake: React.FC<Props> = ({
             onChangeAsset={onChangeAsset}
             priceAsset={priceAsset}
           />
-          <Styled.FeeRow>
-            <Col>
+          <Label disabled={RD.isPending(feesArray)}>
+            <Styled.FeeRow>
               <ReloadButton onClick={reloadFees} disabled={RD.isPending(fees)} />
-            </Col>
-            <Col>
               <Fees fees={feesArray} hasCrossChainFee={hasCrossChainFee} />
-            </Col>
-          </Styled.FeeRow>
+            </Styled.FeeRow>
+          </Label>
         </Col>
 
         <Col xs={24} xl={12}>

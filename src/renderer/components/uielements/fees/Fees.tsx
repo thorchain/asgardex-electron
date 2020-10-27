@@ -36,14 +36,18 @@ export const Fees: React.FC<Props> = ({ fees, hasCrossChainFee }) => {
         RD.fold(
           () => <>{prevFeesRef.current}</>,
           () => <>{prevFeesRef.current}</>,
-          (error) => <>{error.message}</>,
+          (error) => (
+            <>
+              {intl.formatMessage({ id: 'common.error' })}: {error.message}
+            </>
+          ),
           (fees) => {
             prevFeesRef.current = fees
             return <>{fees}</>
           }
         )
       ),
-    [fees]
+    [fees, intl]
   )
 
   return (

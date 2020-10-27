@@ -12,57 +12,25 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { triggerStream } from '../../../helpers/stateHelper'
 import * as BNB from '../../binance/service'
 import * as BTC from '../../bitcoin/context'
-import { selectedPoolAsset$, selectedPoolChain$ } from '../../midgard/common'
+import { selectedPoolChain$ } from '../../midgard/common'
 import { crossChainStakeMemo$ } from '../memo'
 import { FeeLD, StakeFeesLD } from '../types'
-
-const reloadStakeFeesByChain = (chain: Chain) => {
-  switch (chain) {
-    case 'BNB':
-      BNB.reloadFees()
-      break
-    case 'BTC':
-      BTC.reloadStakeFee()
-      break
-    case 'ETH':
-      // not available yet
-      break
-    case 'THOR':
-      // not available yet
-      break
-    default:
-  }
-}
 
 // `TriggerStream` to reload stake fees
 const { stream$: reloadStakeFees$, trigger: reloadStakeFees } = triggerStream()
 
-// reload fees
-Rx.combineLatest([selectedPoolChain$, reloadStakeFees$])
-  .pipe(
-    RxOp.tap(([oChain, _]) =>
-      FP.pipe(
-        oChain,
-        O.map((chain) => {
-          // reload base-chain
-          reloadStakeFeesByChain(BASE_CHAIN)
-          // For x-chains transfers, load fees for x-chain, too
-          if (!isBaseChain(chain)) reloadStakeFeesByChain(chain)
-          return true
-        })
-      )
-    )
-  )
-  .subscribe()
-
 const stakeFeeByChain$ = (chain: Chain): FeeLD => {
   switch (chain) {
     case 'BNB':
-      return BNB.stakeFee$
+      return FP.pipe(
+        reloadStakeFees$,
+        RxOp.switchMap(() => BNB.stakeFee$)
+      )
     case 'BTC':
       // stake fees of BTC based on memo
-      return crossChainStakeMemo$.pipe(
-        RxOp.switchMap((oMemo) =>
+      return FP.pipe(
+        Rx.combineLatest(crossChainStakeMemo$, reloadStakeFees$),
+        RxOp.switchMap(([oMemo]) =>
           FP.pipe(
             oMemo,
             O.fold(
@@ -79,18 +47,18 @@ const stakeFeeByChain$ = (chain: Chain): FeeLD => {
   }
 }
 
-const stakeFees$: StakeFeesLD = selectedPoolAsset$.pipe(
-  RxOp.switchMap((oPoolAsset) =>
+const stakeFees$: StakeFeesLD = selectedPoolChain$.pipe(
+  RxOp.switchMap((oPoolChain) =>
     FP.pipe(
-      oPoolAsset,
-      O.map((poolAsset) =>
+      oPoolChain,
+      O.map((chain) =>
         FP.pipe(
           Rx.combineLatest(
-            isBaseChain(poolAsset.chain)
+            isBaseChain(chain)
               ? // for deposits on base chain, fee for base chain is needed only
                 [stakeFeeByChain$(BASE_CHAIN)]
               : // for x-chain deposits, we do need to load fees for base- AND x-chain,
-                [stakeFeeByChain$(BASE_CHAIN), stakeFeeByChain$(poolAsset.chain)]
+                [stakeFeeByChain$(BASE_CHAIN), stakeFeeByChain$(chain)]
           ),
           RxOp.map(sequenceTRDFromArray),
           liveData.map(([base, cross]) => ({
