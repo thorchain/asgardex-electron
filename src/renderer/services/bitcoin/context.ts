@@ -4,7 +4,7 @@ import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
 const { pushTx, txRD$, resetTx, loadAssetTxs, assetTxs$ } = createTransactionService(client$)
-const { fees$, reloadFees, stakeFee$, reloadStakeFee } = createFeesService(client$)
+const { fees$, reloadFees, stakeFee$, reloadStakeFee, stakeFeeRate$ } = createFeesService(client$)
 
 /**
  * Exports all functions and observables needed at UI level (provided by `BitcoinContext`)
@@ -24,5 +24,6 @@ export {
   resetTx,
   loadAssetTxs,
   assetTxs$,
-  reloadStakeFee
+  reloadStakeFee,
+  stakeFeeRate$
 }

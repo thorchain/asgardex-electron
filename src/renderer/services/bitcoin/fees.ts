@@ -11,7 +11,7 @@ import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { FeeLD, Memo } from '../chain/types'
 import { Client$ } from './common'
-import { FeesService, FeesLD } from './types'
+import { FeesService, FeesLD, FeeRateLD } from './types'
 
 /**
  * The only thing we export from this module is this factory
@@ -34,8 +34,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
     )
 
   /**
-   * Transaction fees
-   * If a client is not available, it returns `None`
+   * Transaction fees (no memo)
    */
   const fees$: FeesLD = Rx.combineLatest([oClient$, reloadFees$]).pipe(
     mergeMap(([oClient, _]) =>
@@ -47,6 +46,23 @@ export const createFeesService = (oClient$: Client$): FeesService => {
     shareReplay(1)
   )
 
+  /**
+   * Fees for transaction with memo included
+   */
+  const memoFees$ = (memo: Memo): FeesLD =>
+    Rx.combineLatest([oClient$, reloadFees$]).pipe(
+      mergeMap(([oClient]) =>
+        FP.pipe(
+          oClient,
+          O.fold(
+            () => Rx.of(RD.initial) as FeesLD,
+            (client) => loadFees$(client, memo)
+          )
+        )
+      ),
+      shareReplay(1)
+    )
+
   // `TriggerStream` to reload stake `fees`
   const { stream$: reloadStakeFee$, trigger: reloadStakeFee } = triggerStream()
 
@@ -55,23 +71,27 @@ export const createFeesService = (oClient$: Client$): FeesService => {
    * @param memo Memo used for deposit transactions
    */
   const stakeFee$ = (memo: Memo): FeeLD =>
-    Rx.combineLatest([oClient$, reloadStakeFee$]).pipe(
-      switchMap(([oClient]) =>
-        FP.pipe(
-          oClient,
-          O.fold(
-            () => Rx.of(RD.initial),
-            (client) => loadFees$(client, memo)
-          )
-        )
-      ),
-      // extract fast fee only
+    FP.pipe(
+      reloadStakeFee$,
+      switchMap(() => memoFees$(memo)),
       liveData.map((fees) => baseAmount(fees.fast.feeTotal, BTC_DECIMAL))
+    )
+
+  /**
+   * Factory to create a stream of stake fees
+   * @param memo Memo used for deposit transactions
+   */
+  const stakeFeeRate$ = (memo: Memo): FeeRateLD =>
+    FP.pipe(
+      reloadStakeFee$,
+      switchMap(() => memoFees$(memo)),
+      liveData.map((fees) => fees.fast.feeRate)
     )
 
   return {
     fees$,
     stakeFee$,
+    stakeFeeRate$,
     reloadFees,
     reloadStakeFee
   }

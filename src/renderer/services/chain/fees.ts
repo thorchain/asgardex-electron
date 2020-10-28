@@ -104,4 +104,4 @@ const stakeFees$: StakeFeesLD = selectedPoolAsset$.pipe(
   )
 )
 
-export { stakeFees$, reloadStakeFees }
+export { stakeFees$, reloadStakeFees, stakeFeeByChain$ }

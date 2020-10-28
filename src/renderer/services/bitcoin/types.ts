@@ -14,6 +14,7 @@ export type BitcoinClientState$ = Rx.Observable<ClientState<BitcoinClient>>
 
 export type FeesRD = RD.RemoteData<Error, FeeOptions>
 export type FeesLD = LiveData<Error, FeeOptions>
+export type FeeRateLD = LiveData<Error, number>
 
 export type AddressValidation = BitcoinClient['validateAddress']
 
@@ -35,6 +36,7 @@ export type TransactionService = {
 export type FeesService = {
   fees$: FeesLD
   stakeFee$: (memo: Memo) => FeeLD
+  stakeFeeRate$: (memo: Memo) => FeeRateLD
   reloadFees: () => void
   reloadStakeFee: () => void
 }
