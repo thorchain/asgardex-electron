@@ -13,7 +13,7 @@ export const Container = styled('div')`
   flex-direction: column;
 `
 
-export const ContentContainer = styled(Row).attrs({})`
+export const ContentContainer = styled(Row)`
   width: 100%;
   min-height: 100%;
 `

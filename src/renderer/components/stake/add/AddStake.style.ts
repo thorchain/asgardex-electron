@@ -23,7 +23,7 @@ export const CardsRow = styled(Row).attrs({
   width: 100%;
 `
 
-export const BalanceErrorRow = styled(Row).attrs({})`
+export const BalanceErrorRow = styled(Row)`
   width: 100%;
   padding: 20px 0px;
 
@@ -45,7 +45,7 @@ export const BalanceErrorLabel = styled(UILabel).attrs({
   padding: 0;
 `
 
-export const FeesRow = styled(Row).attrs({})`
+export const FeesRow = styled(Row)`
   width: 100%;
 `
 
