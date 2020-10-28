@@ -54,12 +54,12 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       pipe(
         poolAddresses,
         RD.map(A.head),
-        RD.chain(rdFromOption(() => Error(''))),
+        RD.chain(rdFromOption(() => Error('No pool address available in list'))),
         // eslint-disable-next-line array-callback-return
         RD.map((endpoint) => {
           if (endpoint.address) {
             transaction.pushTx({
-              to: endpoint.address || '',
+              to: endpoint.address,
               amount,
               asset: source,
               memo

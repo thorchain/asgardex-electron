@@ -51,7 +51,7 @@ const tx$ = ({
     startWith(RD.pending)
   )
 
-const pushTx = (clientState$: BinanceClientState$) => ({ to, amount, asset, memo }: SendTxParams) =>
+const pushTx = (clientState$: BinanceClientState$) => ({ to, amount, asset, memo }: SendTxParams): Rx.Subscription =>
   tx$({ clientState$, to, amount, asset, memo }).subscribe(setTxRD)
 
 const txWithState$ = (wsTransfer$: Rx.Observable<O.Option<WS.Transfer>>): TxWithStateLD =>
