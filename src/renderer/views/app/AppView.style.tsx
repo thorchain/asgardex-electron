@@ -35,9 +35,7 @@ export const AppLayout = styled(A.Layout)`
   background: ${palette('background', 3)};
 `
 
-export const ErrorAlert = styled(UIAlert).attrs({
-  type: 'error'
-})`
+export const Alert = styled(UIAlert)`
   margin-bottom: 10px;
 
   ${media.lg`
