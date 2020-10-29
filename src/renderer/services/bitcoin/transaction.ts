@@ -39,6 +39,9 @@ const tx$ = ({ client$, to, amount, feeRate, memo }: { client$: Client$ } & Send
 const pushTx = (client$: Client$) => ({ to, amount, feeRate, memo }: SendTxParams) =>
   tx$({ client$, to, amount, feeRate, memo }).subscribe(setTxRD)
 
+const sendStakeTx = (client$: Client$) => ({ to, amount, feeRate, memo }: SendTxParams) =>
+  tx$({ client$, to, amount, feeRate, memo })
+
 /**
  * Observable to load txs from Binance API endpoint
  * If client is not available, it returns an `initial` state
@@ -89,6 +92,7 @@ const assetTxs$ = (client$: Client$): AssetTxsPageLD =>
 const createTransactionService = (client$: Client$): TransactionService => ({
   txRD$,
   pushTx: pushTx(client$),
+  sendStakeTx: sendStakeTx(client$),
   assetTxs$: assetTxs$(client$),
   resetTx: () => setTxRD(RD.initial),
   loadAssetTxs

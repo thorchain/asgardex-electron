@@ -34,7 +34,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
     )
 
   /**
-   * Transaction fees (no memo)
+   * Transaction fees (no memo included)
    */
   const fees$: FeesLD = Rx.combineLatest([oClient$, reloadFees$]).pipe(
     mergeMap(([oClient, _]) =>
@@ -47,7 +47,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
   )
 
   /**
-   * Fees for transaction with memo included
+   * Transaction fees (memo included)
    */
   const memoFees$ = (memo: Memo): FeesLD =>
     Rx.combineLatest([oClient$, reloadFees$]).pipe(
