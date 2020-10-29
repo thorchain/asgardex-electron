@@ -3,9 +3,9 @@ import React, { createContext, useContext } from 'react'
 import {
   stakeFees$,
   reloadStakeFees,
-  unstakeFees$,
-  reloadUnstakeFees,
-  updateUnstakeFeesEffect$,
+  withdrawFees$,
+  reloadWithdrawFees,
+  updateWithdrawFeesEffect$,
   updateStakeFeesEffect$,
   isCrossChainStake$
 } from '../services/chain/context'
@@ -13,9 +13,9 @@ import {
 type ChainContextValue = {
   stakeFees$: typeof stakeFees$
   reloadStakeFees: typeof reloadStakeFees
-  unstakeFees$: typeof unstakeFees$
-  reloadUnstakeFees: typeof reloadUnstakeFees
-  updateUnstakeFeesEffect$: typeof updateUnstakeFeesEffect$
+  withdrawFees$: typeof withdrawFees$
+  reloadUnstakeFees: typeof reloadWithdrawFees
+  updateUnstakeFeesEffect$: typeof updateWithdrawFeesEffect$
   updateStakeFeesEffect$: typeof updateStakeFeesEffect$
   isCrossChainStake$: typeof isCrossChainStake$
 }
@@ -23,9 +23,9 @@ type ChainContextValue = {
 const initialContext: ChainContextValue = {
   stakeFees$,
   reloadStakeFees,
-  unstakeFees$,
-  reloadUnstakeFees,
-  updateUnstakeFeesEffect$,
+  withdrawFees$: withdrawFees$,
+  reloadUnstakeFees: reloadWithdrawFees,
+  updateUnstakeFeesEffect$: updateWithdrawFeesEffect$,
   updateStakeFeesEffect$,
   isCrossChainStake$
 }

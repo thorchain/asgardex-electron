@@ -10,7 +10,7 @@ import * as BTC from '../../bitcoin/context'
  * demand manual updating by triggering their own triggeStrams.
  *
  * @example
- * updateUnstakeFeesEffect$ at ./unstake.ts
+ * updateUnstakeFeesEffect$ at ./withdraw.ts
  * @example
  * updateStakeFeesEffect$ at ./stake.ts
  */

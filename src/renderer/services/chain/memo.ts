@@ -50,14 +50,14 @@ const crossChainStakeMemo$: MemoRx = Rx.combineLatest([selectedPoolAsset$, baseA
 /**
  * Unstake memo for txs
  */
-const getUnstakeMemo$ = (unstakePercent: number): MemoRx =>
+const getWithdrawMemo$ = (withdrawPercent: number): MemoRx =>
   selectedPoolAsset$.pipe(
     RxOp.map((oPoolAsset) =>
       FP.pipe(
         oPoolAsset,
         // add address of base-chain wallet to memo
         /** getWithdrawMemo gets percents between 0 and 10000 */
-        O.map((poolAsset) => getWithdrawMemo(poolAsset, unstakePercent * 100))
+        O.map((poolAsset) => getWithdrawMemo(poolAsset, withdrawPercent * 100))
       )
     )
   )
@@ -66,4 +66,4 @@ const getUnstakeMemo$ = (unstakePercent: number): MemoRx =>
 crossChainStakeMemo$.subscribe((value) => console.log('crossChainStakeMemo:', value))
 baseChainStakeMemo$.subscribe((value) => console.log('baseChainStakeMemo:', value))
 
-export { baseChainStakeMemo$, crossChainStakeMemo$, getUnstakeMemo$ }
+export { baseChainStakeMemo$, crossChainStakeMemo$, getWithdrawMemo$ }

@@ -28,6 +28,6 @@ export type StakeFees = { base: BaseAmount; cross: O.Option<BaseAmount> }
 export type StakeFeesRD = RD.RemoteData<Error, StakeFees>
 export type StakeFeesLD = LiveData<Error, StakeFees>
 
-export type UnstakeFee = BaseAmount
-export type UnstakeFeeRD = RD.RemoteData<Error, UnstakeFee>
-export type UnstakeFeeLD = LiveData<Error, UnstakeFee>
+export type WithdrawFee = BaseAmount
+export type WithdrawFeeRD = RD.RemoteData<Error, WithdrawFee>
+export type WithdrawFeeLD = LiveData<Error, WithdrawFee>

@@ -10,22 +10,20 @@ import { LiveData } from '../../../helpers/rx/liveData'
 import { triggerStream } from '../../../helpers/stateHelper'
 import * as BNB from '../../binance/service'
 import { selectedPoolChain$ } from '../../midgard/common'
-import { FeeLD, UnstakeFeeLD } from '../types'
+import { FeeLD, WithdrawFeeLD } from '../types'
 import { reloadStakeFeesByChain } from './fees.helper'
 
-// const { get$: unstakePercent$, set: updateUnstakePercent } = observableState(0)
-
-// `TriggerStream` to reload unstake fees
-const { stream$: reloadUnstakeFees$, trigger: reloadUnstakeFees } = triggerStream()
+// `TriggerStream` to reload withdraw fees
+const { stream$: reloadWithdrawFees$, trigger: reloadWithdrawFees } = triggerStream()
 
 /**
  * reload fees
  *
  * Has to be used ONLY on an appropriate screen
  * @example
- * useSubscription(updateUnstakeFeesEffect$)
+ * useSubscription(updateWithdrawFeesEffect$)
  */
-const updateUnstakeFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadUnstakeFees$]).pipe(
+const updateWithdrawFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadWithdrawFees$]).pipe(
   RxOp.tap(([oChain, _]) =>
     FP.pipe(
       oChain,
@@ -38,17 +36,17 @@ const updateUnstakeFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadUns
   )
 )
 
-const unstakeFeeByChain$ = (chain: Chain): FeeLD => {
+const withdrawFeeByChain$ = (chain: Chain): FeeLD => {
   // Calculate fees only for base chain (THOR or BNB)
   switch (chain) {
     case 'BNB':
       return FP.pipe(
-        reloadUnstakeFees$,
+        reloadWithdrawFees$,
         RxOp.switchMap(() => BNB.stakeFee$)
       )
 
     case 'THOR':
-      return Rx.of(RD.failure(new Error(`Unstake fee for ${chain.toUpperCase()} has not been implemented`)))
+      return Rx.of(RD.failure(new Error(`Withdraw fee for ${chain.toUpperCase()} has not been implemented`)))
 
     case 'BTC':
     case 'ETH':
@@ -56,14 +54,14 @@ const unstakeFeeByChain$ = (chain: Chain): FeeLD => {
   }
 }
 
-const unstakeFees$: UnstakeFeeLD = FP.pipe(
+const withdrawFees$: WithdrawFeeLD = FP.pipe(
   selectedPoolChain$,
   RxOp.switchMap(
     FP.flow(
-      O.map(() => unstakeFeeByChain$(BASE_CHAIN)),
+      O.map(() => withdrawFeeByChain$(BASE_CHAIN)),
       O.getOrElse((): LiveData<Error, BaseAmount> => Rx.of(RD.initial))
     )
   )
 )
 
-export { reloadUnstakeFees, unstakeFees$, updateUnstakeFeesEffect$ }
+export { reloadWithdrawFees, withdrawFees$, updateWithdrawFeesEffect$ }

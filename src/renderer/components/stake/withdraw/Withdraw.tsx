@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl'
 
 import { BASE_CHAIN_ASSET } from '../../../const'
 import { eqAsset } from '../../../helpers/fp/eq'
-import { UnstakeFeeRD } from '../../../services/chain/types'
+import { WithdrawFeeRD } from '../../../services/chain/types'
 import { Fees } from '../../uielements/fees'
 import { Label } from '../../uielements/label'
 import { ReloadButton } from '../../uielements/reloadButton'
@@ -27,7 +27,7 @@ type Props = {
   runeShare: BaseAmount
   assetShare: BaseAmount
   disabled?: boolean
-  fee: UnstakeFeeRD
+  fee: WithdrawFeeRD
 }
 
 export const Withdraw: React.FC<Props> = ({

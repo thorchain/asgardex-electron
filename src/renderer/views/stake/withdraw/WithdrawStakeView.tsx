@@ -35,11 +35,11 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { unstakeFees$, reloadUnstakeFees, updateUnstakeFeesEffect$ } = useChainContext()
+  const { withdrawFees$, reloadUnstakeFees, updateUnstakeFeesEffect$ } = useChainContext()
 
   useSubscription(updateUnstakeFeesEffect$)
 
-  const fees = useObservableState(unstakeFees$, RD.initial)
+  const fees = useObservableState(withdrawFees$, RD.initial)
 
   const runePrice = useObservableState(priceRatio$, bn(1))
 
