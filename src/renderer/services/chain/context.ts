@@ -1,3 +1,4 @@
+import { isCrossChainStake$ } from './common'
 import {
   reloadStakeFees,
   stakeFees$,
@@ -16,5 +17,6 @@ export {
   unstakeFees$,
   reloadUnstakeFees,
   updateStakeFeesEffect$,
-  updateUnstakeFeesEffect$
+  updateUnstakeFeesEffect$,
+  isCrossChainStake$
 }

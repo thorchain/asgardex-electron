@@ -8,7 +8,6 @@ import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
 import { BASE_CHAIN_ASSET } from '../../../const'
-import { isBaseChainAsset } from '../../../helpers/chainHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { UnstakeFeeRD } from '../../../services/chain/types'
 import { Fees } from '../../uielements/fees'
@@ -41,28 +40,26 @@ export const Withdraw: React.FC<Props> = ({
   runeShare,
   assetShare,
   disabled: disabledProp,
-  fee: feesProp,
+  fee,
   updateFees
 }) => {
   const intl = useIntl()
   const [withdrawPercent, setWithdrawPercent] = useState(disabledProp ? 0 : 50)
 
   const disabled = useMemo(() => withdrawPercent === 0 || disabledProp, [withdrawPercent, disabledProp])
-  const hasCrossChainFee = useMemo(() => !isBaseChainAsset(stakedAsset), [stakedAsset])
 
   const withdrawAmounts = getWithdrawAmounts(runeShare, assetShare, withdrawPercent)
   const fees = useMemo(
-    () =>
+    () => [
       FP.pipe(
-        feesProp,
-        RD.map((fee) => [
-          {
-            asset: BASE_CHAIN_ASSET,
-            amount: fee
-          }
-        ])
-      ),
-    [feesProp]
+        fee,
+        RD.map((fee) => ({
+          asset: BASE_CHAIN_ASSET,
+          amount: fee
+        }))
+      )
+    ],
+    [fee]
   )
 
   return (
@@ -118,10 +115,10 @@ export const Withdraw: React.FC<Props> = ({
         </Styled.OutputLabel>
       </Styled.AssetContainer>
 
-      <Label disabled={RD.isPending(fees)}>
+      <Label disabled={RD.isPending(fees[0])}>
         <Row align="middle">
-          <ReloadButton onClick={updateFees} disabled={RD.isPending(fees)} />
-          <Fees fees={fees} hasCrossChainFee={hasCrossChainFee} />
+          <ReloadButton onClick={updateFees} disabled={RD.isPending(fees[0])} />
+          <Fees fees={fees} />
         </Row>
       </Label>
 

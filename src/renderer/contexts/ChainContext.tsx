@@ -6,7 +6,8 @@ import {
   unstakeFees$,
   reloadUnstakeFees,
   updateUnstakeFeesEffect$,
-  updateStakeFeesEffect$
+  updateStakeFeesEffect$,
+  isCrossChainStake$
 } from '../services/chain/context'
 
 type ChainContextValue = {
@@ -16,6 +17,7 @@ type ChainContextValue = {
   reloadUnstakeFees: typeof reloadUnstakeFees
   updateUnstakeFeesEffect$: typeof updateUnstakeFeesEffect$
   updateStakeFeesEffect$: typeof updateStakeFeesEffect$
+  isCrossChainStake$: typeof isCrossChainStake$
 }
 
 const initialContext: ChainContextValue = {
@@ -24,7 +26,8 @@ const initialContext: ChainContextValue = {
   unstakeFees$,
   reloadUnstakeFees,
   updateUnstakeFeesEffect$,
-  updateStakeFeesEffect$
+  updateStakeFeesEffect$,
+  isCrossChainStake$
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 

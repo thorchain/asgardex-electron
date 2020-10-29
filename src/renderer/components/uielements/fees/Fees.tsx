@@ -6,6 +6,7 @@ import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import { useIntl } from 'react-intl'
 
+import { sequenceTRDFromArray } from '../../../helpers/fpHelpers'
 import { formatFee } from './Fees.helper'
 
 type Fee = {
@@ -14,17 +15,17 @@ type Fee = {
 }
 
 type Props = {
-  fees: RD.RemoteData<Error, Fee[]>
-  hasCrossChainFee?: boolean
+  fees: RD.RemoteData<Error, Fee>[]
 }
 
-export const Fees: React.FC<Props> = ({ fees, hasCrossChainFee }) => {
+export const Fees: React.FC<Props> = ({ fees }) => {
   const intl = useIntl()
 
   const feesFormattedValue = useMemo(
     () =>
       FP.pipe(
         fees,
+        sequenceTRDFromArray,
         RD.map(
           FP.flow(
             A.map(formatFee),
@@ -43,7 +44,7 @@ export const Fees: React.FC<Props> = ({ fees, hasCrossChainFee }) => {
 
   return (
     <>
-      {intl.formatMessage({ id: hasCrossChainFee ? 'common.fees' : 'common.fee' })}: {feesFormattedValue}
+      {intl.formatMessage({ id: fees.length > 1 ? 'common.fees' : 'common.fee' })}: {feesFormattedValue}
     </>
   )
 }

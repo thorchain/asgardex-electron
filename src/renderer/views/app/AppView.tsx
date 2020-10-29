@@ -38,7 +38,8 @@ export const AppView: React.FC = (): JSX.Element => {
     )
 
     return (
-      <Styled.ErrorAlert
+      <Styled.Alert
+        type="error"
         message={intl.formatMessage({ id: 'midgard.error.byzantine.title' })}
         description={description}
       />
