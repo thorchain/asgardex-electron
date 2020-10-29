@@ -1,11 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetAmount, BaseAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
+import { BASE_CHAIN_ASSET } from '../../../const'
+import { isBaseChainAsset } from '../../../helpers/chainHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
+import { UnstakeFeeRD } from '../../../services/chain/types'
+import { Fees } from '../../uielements/fees'
 import { Label } from '../../uielements/label'
+import { ReloadButton } from '../../uielements/reloadButton'
 import { getWithdrawAmounts } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
@@ -16,9 +24,11 @@ type Props = {
   assetPrice: BigNumber
   selectedCurrencyAsset: Asset
   onWithdraw: (percent: number) => void
+  updateFees: () => void
   runeShare: BaseAmount
   assetShare: BaseAmount
   disabled?: boolean
+  fee: UnstakeFeeRD
 }
 
 export const Withdraw: React.FC<Props> = ({
@@ -30,12 +40,30 @@ export const Withdraw: React.FC<Props> = ({
   selectedCurrencyAsset,
   runeShare,
   assetShare,
-  disabled
+  disabled: disabledProp,
+  fee: feesProp,
+  updateFees
 }) => {
   const intl = useIntl()
-  const [withdrawPercent, setWithdrawPercent] = useState(50)
+  const [withdrawPercent, setWithdrawPercent] = useState(disabledProp ? 0 : 50)
+
+  const disabled = useMemo(() => withdrawPercent === 0 || disabledProp, [withdrawPercent, disabledProp])
+  const hasCrossChainFee = useMemo(() => !isBaseChainAsset(stakedAsset), [stakedAsset])
 
   const withdrawAmounts = getWithdrawAmounts(runeShare, assetShare, withdrawPercent)
+  const fees = useMemo(
+    () =>
+      FP.pipe(
+        feesProp,
+        RD.map((fee) => [
+          {
+            asset: BASE_CHAIN_ASSET,
+            amount: fee
+          }
+        ])
+      ),
+    [feesProp]
+  )
 
   return (
     <Styled.Container>
@@ -90,15 +118,19 @@ export const Withdraw: React.FC<Props> = ({
         </Styled.OutputLabel>
       </Styled.AssetContainer>
 
-      <Label>{intl.formatMessage({ id: 'stake.withdraw.fee' })}: 0.000375 BNB</Label>
+      <Label disabled={RD.isPending(fees)}>
+        <Row align="middle">
+          <ReloadButton onClick={updateFees} disabled={RD.isPending(fees)} />
+          <Fees fees={fees} hasCrossChainFee={hasCrossChainFee} />
+        </Row>
+      </Label>
 
       <Styled.Drag
         title={intl.formatMessage({ id: 'stake.withdraw.drag' })}
         source={runeAsset}
         target={stakedAsset}
         onConfirm={() => onWithdraw(withdrawPercent)}
-        // @TODO (@thatStrangeGuy) compare to BNB fee
-        disabled={withdrawPercent === 0 || disabled}
+        disabled={disabled}
       />
     </Styled.Container>
   )

@@ -11,7 +11,8 @@ const { get$: getSelectedPoolAsset$, set: setSelectedPoolAsset } = observableSta
 
 // "dirty check" to trigger "real" changes of an asset only
 const selectedPoolAsset$: Observable<SelectedPoolAsset> = getSelectedPoolAsset$.pipe(
-  RxOp.distinctUntilChanged(eqOAsset.equals)
+  RxOp.distinctUntilChanged(eqOAsset.equals),
+  RxOp.shareReplay(1)
 )
 
 const selectedPoolChain$: Observable<SelectedPoolChain> = selectedPoolAsset$.pipe(RxOp.map(O.map(({ chain }) => chain)))

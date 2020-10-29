@@ -4,7 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetToString, bn } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
-import { useObservableState } from 'observable-hooks'
+import { useObservableState, useSubscription } from 'observable-hooks'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
@@ -91,7 +91,8 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
     RD.map(getAssetPoolPrice(runPrice))
   )
 
-  const { stakeFees$, reloadStakeFees: reloadFees } = useChainContext()
+  const { stakeFees$, reloadStakeFees: reloadFees, updateStakeFeesEffect$ } = useChainContext()
+  useSubscription(updateStakeFeesEffect$)
   const stakeFees = useObservableState(stakeFees$, RD.initial)
 
   const renderDisabledAddStake = useCallback(

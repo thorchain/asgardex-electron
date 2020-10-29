@@ -19,7 +19,8 @@ export const Tabs: React.FC<Props> = ({
   activeTabKey: activeTabKeyProp,
   centered = true,
   className,
-  tabBarExtraContent
+  tabBarExtraContent,
+  destroyInactiveTabPane
 }): JSX.Element => {
   const [activeTabKey, setActiveTabKey] = useState(tabs[defaultTabIndex || 0].key)
   const content = useMemo(
@@ -34,6 +35,7 @@ export const Tabs: React.FC<Props> = ({
 
   return (
     <Styled.Tabs
+      destroyInactiveTabPane={destroyInactiveTabPane}
       tabBarExtraContent={tabBarExtraContent}
       className={className}
       centered={centered}

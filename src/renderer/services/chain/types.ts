@@ -27,3 +27,7 @@ export type MemoRx = Rx.Observable<O.Option<Memo>>
 export type StakeFees = { base: BaseAmount; cross: O.Option<BaseAmount> }
 export type StakeFeesRD = RD.RemoteData<Error, StakeFees>
 export type StakeFeesLD = LiveData<Error, StakeFees>
+
+export type UnstakeFee = BaseAmount
+export type UnstakeFeeRD = RD.RemoteData<Error, UnstakeFee>
+export type UnstakeFeeLD = LiveData<Error, UnstakeFee>
