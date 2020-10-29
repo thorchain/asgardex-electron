@@ -84,7 +84,7 @@ export const TitleLabel = styled(Label).attrs({
 })`
   width: 200px;
   font-size: 12px;
-  margin-left: 32px; /* icon size */
+  margin: 0 32px; /* icon size */
   text-transform: uppercase;
   color: ${palette('text', 2)};
 `
