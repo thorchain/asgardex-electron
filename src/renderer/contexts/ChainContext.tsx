@@ -4,7 +4,7 @@ import {
   stakeFees$,
   reloadStakeFees,
   unstakeFees$,
-  updateUnstakePercent,
+  reloadUnstakeFees,
   updateUnstakeFeesEffect$,
   updateStakeFeesEffect$
 } from '../services/chain/context'
@@ -13,7 +13,7 @@ type ChainContextValue = {
   stakeFees$: typeof stakeFees$
   reloadStakeFees: typeof reloadStakeFees
   unstakeFees$: typeof unstakeFees$
-  updateUnstakePercent: typeof updateUnstakePercent
+  reloadUnstakeFees: typeof reloadUnstakeFees
   updateUnstakeFeesEffect$: typeof updateUnstakeFeesEffect$
   updateStakeFeesEffect$: typeof updateStakeFeesEffect$
 }
@@ -22,7 +22,7 @@ const initialContext: ChainContextValue = {
   stakeFees$,
   reloadStakeFees,
   unstakeFees$,
-  updateUnstakePercent,
+  reloadUnstakeFees,
   updateUnstakeFeesEffect$,
   updateStakeFeesEffect$
 }

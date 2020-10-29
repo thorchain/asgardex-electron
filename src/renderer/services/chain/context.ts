@@ -2,7 +2,7 @@ import {
   reloadStakeFees,
   stakeFees$,
   unstakeFees$,
-  updateUnstakePercent,
+  reloadUnstakeFees,
   updateStakeFeesEffect$,
   updateUnstakeFeesEffect$
 } from './fees'
@@ -14,7 +14,7 @@ export {
   reloadStakeFees,
   stakeFees$,
   unstakeFees$,
-  updateUnstakePercent,
+  reloadUnstakeFees,
   updateStakeFeesEffect$,
   updateUnstakeFeesEffect$
 }

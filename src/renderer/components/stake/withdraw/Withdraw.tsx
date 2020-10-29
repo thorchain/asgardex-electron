@@ -1,17 +1,16 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetAmount, BaseAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
 import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
-import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { BASE_CHAIN_ASSET } from '../../../const'
 import { isBaseChainAsset } from '../../../helpers/chainHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
-import { StakeFeesRD } from '../../../services/chain/types'
+import { UnstakeFeeRD } from '../../../services/chain/types'
 import { Fees } from '../../uielements/fees'
 import { Label } from '../../uielements/label'
 import { ReloadButton } from '../../uielements/reloadButton'
@@ -25,11 +24,11 @@ type Props = {
   assetPrice: BigNumber
   selectedCurrencyAsset: Asset
   onWithdraw: (percent: number) => void
-  updateFees: (percent: number) => void
+  updateFees: () => void
   runeShare: BaseAmount
   assetShare: BaseAmount
   disabled?: boolean
-  fees: StakeFeesRD
+  fee: UnstakeFeeRD
 }
 
 export const Withdraw: React.FC<Props> = ({
@@ -42,7 +41,7 @@ export const Withdraw: React.FC<Props> = ({
   runeShare,
   assetShare,
   disabled: disabledProp,
-  fees: feesProp,
+  fee: feesProp,
   updateFees
 }) => {
   const intl = useIntl()
@@ -51,52 +50,19 @@ export const Withdraw: React.FC<Props> = ({
   const disabled = useMemo(() => withdrawPercent === 0 || disabledProp, [withdrawPercent, disabledProp])
   const hasCrossChainFee = useMemo(() => !isBaseChainAsset(stakedAsset), [stakedAsset])
 
-  const reloadFees = useCallback(
-    (percent: number) => {
-      // Just update without user's input
-      if (disabledProp) {
-        updateFees(0)
-      } else {
-        updateFees(percent)
-      }
-    },
-    [disabledProp, updateFees]
-  )
-
-  useEffect(() => {
-    reloadFees(withdrawPercent)
-  }, [reloadFees, withdrawPercent])
-
   const withdrawAmounts = getWithdrawAmounts(runeShare, assetShare, withdrawPercent)
   const fees = useMemo(
     () =>
       FP.pipe(
         feesProp,
-        RD.map((fees) =>
-          FP.pipe(
-            fees.cross,
-            O.fold(
-              () => [
-                {
-                  asset: BASE_CHAIN_ASSET,
-                  amount: fees.base
-                }
-              ],
-              (xFee) => [
-                {
-                  asset: BASE_CHAIN_ASSET,
-                  amount: fees.base
-                },
-                {
-                  asset: stakedAsset,
-                  amount: xFee
-                }
-              ]
-            )
-          )
-        )
+        RD.map((fee) => [
+          {
+            asset: BASE_CHAIN_ASSET,
+            amount: fee
+          }
+        ])
       ),
-    [feesProp, stakedAsset]
+    [feesProp]
   )
 
   return (
@@ -154,7 +120,7 @@ export const Withdraw: React.FC<Props> = ({
 
       <Label disabled={RD.isPending(fees)}>
         <Row align="middle">
-          <ReloadButton onClick={() => reloadFees(withdrawPercent)} disabled={RD.isPending(fees)} />
+          <ReloadButton onClick={updateFees} disabled={RD.isPending(fees)} />
           <Fees fees={fees} hasCrossChainFee={hasCrossChainFee} />
         </Row>
       </Label>

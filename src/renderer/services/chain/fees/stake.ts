@@ -20,7 +20,13 @@ import { reloadStakeFeesByChain } from './fees.helper'
 // `TriggerStream` to reload stake fees
 const { stream$: reloadStakeFees$, trigger: reloadStakeFees } = triggerStream()
 
-// reload fees
+/**
+ * reload fees
+ *
+ * Has to be used ONLY on an appopriate screen
+ * @example
+ * useSubscription(updateStakeFeesEffect$) - ONLY
+ */
 const updateStakeFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadStakeFees$]).pipe(
   RxOp.tap(([oChain, _]) =>
     FP.pipe(

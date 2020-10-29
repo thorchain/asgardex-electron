@@ -35,7 +35,7 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { unstakeFees$, updateUnstakePercent, updateUnstakeFeesEffect$ } = useChainContext()
+  const { unstakeFees$, reloadUnstakeFees, updateUnstakeFeesEffect$ } = useChainContext()
 
   useSubscription(updateUnstakeFeesEffect$)
 
@@ -78,7 +78,7 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
-        fees={fees}
+        fee={fees}
         assetPrice={ZERO_BN}
         runePrice={runePrice}
         selectedCurrencyAsset={AssetRune67C}
@@ -87,11 +87,11 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         assetShare={ZERO_BASE_AMOUNT}
         runeAsset={runeAsset}
         stakedAsset={stakedAsset}
-        updateFees={updateUnstakePercent}
+        updateFees={reloadUnstakeFees}
         disabled
       />
     ),
-    [fees, runePrice, runeAsset, stakedAsset, updateUnstakePercent]
+    [fees, runePrice, runeAsset, stakedAsset, reloadUnstakeFees]
   )
 
   const renderWithdrawReady = useCallback(
@@ -105,11 +105,11 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         assetShare={shareHelpers.getAssetShare(stake, poolDetail)}
         runeAsset={runeAsset}
         stakedAsset={stakedAsset}
-        fees={fees}
-        updateFees={updateUnstakePercent}
+        fee={fees}
+        updateFees={reloadUnstakeFees}
       />
     ),
-    [runePrice, runeAsset, stakedAsset, fees, updateUnstakePercent]
+    [runePrice, runeAsset, stakedAsset, fees, reloadUnstakeFees]
   )
 
   return FP.pipe(
