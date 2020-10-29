@@ -12,7 +12,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import * as BNB from '../../binance/service'
 import * as BTC from '../../bitcoin/context'
 import { selectedPoolChain$ } from '../../midgard/common'
-import { getCrossChainUnstakeMemo$ } from '../memo'
+import { getUnstakeMemo$ } from '../memo'
 import { FeeLD, StakeFeesLD } from '../types'
 import { reloadStakeFeesByChain } from './fees.helper'
 
@@ -46,7 +46,7 @@ const unstakeFeeByChain$ = (chain: Chain): FeeLD => {
       // unstake fees of BTC based on memo
       return FP.pipe(
         unstakePercent$,
-        RxOp.switchMap(getCrossChainUnstakeMemo$),
+        RxOp.switchMap(getUnstakeMemo$),
         RxOp.switchMap(O.fold(() => Rx.of(RD.initial), BTC.stakeFee$))
       )
     case 'ETH':
