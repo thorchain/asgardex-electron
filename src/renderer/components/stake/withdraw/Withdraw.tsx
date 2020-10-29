@@ -49,14 +49,15 @@ export const Withdraw: React.FC<Props> = ({
   const disabled = useMemo(() => withdrawPercent === 0 || disabledProp, [withdrawPercent, disabledProp])
 
   const withdrawAmounts = getWithdrawAmounts(runeShare, assetShare, withdrawPercent)
-  const fees = useMemo(
+  const renderFee = useMemo(
     () => [
       FP.pipe(
         fee,
         RD.map((fee) => ({
           asset: BASE_CHAIN_ASSET,
           amount: fee
-        }))
+        })),
+        (feesRd) => <Fees fees={[feesRd]} />
       )
     ],
     [fee]
@@ -115,10 +116,10 @@ export const Withdraw: React.FC<Props> = ({
         </Styled.OutputLabel>
       </Styled.AssetContainer>
 
-      <Label disabled={RD.isPending(fees[0])}>
+      <Label disabled={RD.isPending(fee)}>
         <Row align="middle">
-          <ReloadButton onClick={updateFees} disabled={RD.isPending(fees[0])} />
-          <Fees fees={fees} />
+          <ReloadButton onClick={updateFees} disabled={RD.isPending(fee)} />
+          {renderFee}
         </Row>
       </Label>
 
