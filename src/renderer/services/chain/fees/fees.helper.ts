@@ -5,7 +5,7 @@ import * as BTC from '../../bitcoin/context'
 
 /**
  * @description
- * As some of fees' streams have shareReplay(1) resuscribing to that
+ * As some of fees' streams have shareReplay(1) re-subscribing to that
  * streams will affect nothing (instead of re-requesting data). They
  * demand manual updating by triggering their own triggeStrams.
  *

@@ -21,9 +21,9 @@ const { stream$: reloadUnstakeFees$, trigger: reloadUnstakeFees } = triggerStrea
 /**
  * reload fees
  *
- * Has to be used ONLY on an appopriate screen
+ * Has to be used ONLY on an appropriate screen
  * @example
- * useSubscription(updateUnstakeFeesEffect$) - ONLY
+ * useSubscription(updateUnstakeFeesEffect$)
  */
 const updateUnstakeFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadUnstakeFees$]).pipe(
   RxOp.tap(([oChain, _]) =>
