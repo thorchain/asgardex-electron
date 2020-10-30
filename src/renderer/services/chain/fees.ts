@@ -93,7 +93,7 @@ const stakeFeeByChain$ = (chain: Chain): FeeLD => {
             oMemo,
             O.fold(
               () => Rx.of(RD.initial),
-              (memo) => BTC.stakeFee$(memo)
+              (memo) => BTC.poolFee$(memo)
             )
           )
         )

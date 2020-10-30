@@ -67,10 +67,10 @@ export const createFeesService = (oClient$: Client$): FeesService => {
   const { stream$: reloadStakeFee$, trigger: reloadStakeFee } = triggerStream()
 
   /**
-   * Factory to create a stream of stake fees
-   * @param memo Memo used for deposit transactions
+   * Factory to create a stream for pool fees (stake / withdraw)
+   * @param memo Memo used for pool transactions
    */
-  const stakeFee$ = (memo: Memo): FeeLD =>
+  const poolFee$ = (memo: Memo): FeeLD =>
     FP.pipe(
       reloadStakeFee$,
       switchMap(() => memoFees$(memo)),
@@ -81,7 +81,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
    * Factory to create a stream of stake fees
    * @param memo Memo used for deposit transactions
    */
-  const stakeFeeRate$ = (memo: Memo): FeeRateLD =>
+  const poolFeeRate$ = (memo: Memo): FeeRateLD =>
     FP.pipe(
       reloadStakeFee$,
       switchMap(() => memoFees$(memo)),
@@ -90,8 +90,8 @@ export const createFeesService = (oClient$: Client$): FeesService => {
 
   return {
     fees$,
-    stakeFee$,
-    stakeFeeRate$,
+    poolFee$,
+    poolFeeRate$,
     reloadFees,
     reloadStakeFee
   }

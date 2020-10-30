@@ -36,8 +36,8 @@ export type TransactionService = {
 
 export type FeesService = {
   fees$: FeesLD
-  stakeFee$: (memo: Memo) => FeeLD
-  stakeFeeRate$: (memo: Memo) => FeeRateLD
+  poolFee$: (memo: Memo) => FeeLD
+  poolFeeRate$: (memo: Memo) => FeeRateLD
   reloadFees: () => void
   reloadStakeFee: () => void
 }

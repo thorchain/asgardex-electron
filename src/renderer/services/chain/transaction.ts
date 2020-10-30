@@ -47,7 +47,7 @@ const sendStakeTxByChain = ({
 
     case 'BTC':
       return checkMemo$((memo) =>
-        BTC.stakeFeeRate$(memo).pipe(
+        BTC.poolFeeRate$(memo).pipe(
           RxOp.map(
             RD.mapLeft(() => ({
               errorId: ErrorId.SEND_TX,
