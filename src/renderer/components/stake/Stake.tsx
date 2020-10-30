@@ -60,7 +60,7 @@ export const Stake: React.FC<Props> = (props) => {
         {walletIsImported && !walletIsLocked ? (
           <>
             <Styled.StakeContentCol xs={24} xl={15}>
-              <Styled.Tabs tabs={tabs} centered={false} defaultTabIndex={1} />
+              <Styled.Tabs destroyInactiveTabPane tabs={tabs} centered={false} defaultTabIndex={1} />
             </Styled.StakeContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper>
