@@ -4,14 +4,14 @@ import { baseAmount } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { catchError, map, mergeMap, shareReplay, startWith, switchMap } from 'rxjs/operators'
+import { catchError, map, mergeMap, shareReplay, startWith, switchMap, tap } from 'rxjs/operators'
 
 import { BTC_DECIMAL } from '../../helpers/assetHelper'
 import { liveData } from '../../helpers/rx/liveData'
-import { triggerStream } from '../../helpers/stateHelper'
+import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { FeeLD, Memo } from '../chain/types'
 import { Client$ } from './common'
-import { FeesService, FeesLD, FeeRateLD } from './types'
+import { FeesService, FeesLD, FeeRateLD, FeeRateRD } from './types'
 
 /**
  * The only thing we export from this module is this factory
@@ -77,6 +77,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
       liveData.map((fees) => baseAmount(fees.fast.feeTotal, BTC_DECIMAL))
     )
 
+  const { get: getPoolFeeRate, set: setPoolFeeRate } = observableState<FeeRateRD>(RD.initial)
   /**
    * Factory to create a stream of stake fees
    * @param memo Memo used for deposit transactions
@@ -85,13 +86,16 @@ export const createFeesService = (oClient$: Client$): FeesService => {
     FP.pipe(
       reloadStakeFee$,
       switchMap(() => memoFees$(memo)),
-      liveData.map((fees) => fees.fast.feeRate)
+      liveData.map((fees) => fees.fast.feeRate),
+      // we do need to store result in a subject to access it w/o subscribing a stream
+      tap(setPoolFeeRate)
     )
 
   return {
     fees$,
     poolFee$,
     poolFeeRate$,
+    getPoolFeeRate,
     reloadFees,
     reloadStakeFee
   }
