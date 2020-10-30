@@ -19,8 +19,8 @@ import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as stakeRoutes from '../../../routes/stake'
-import { PoolDetailRD } from '../../../services/midgard/types'
-import { getPoolDetail, toPoolData } from '../../../services/midgard/utils'
+import { PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
+import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 import { StakeType } from '../../../types/asgardex'
 
@@ -42,7 +42,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
 
   const {
     service: {
-      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, poolsState$ }
+      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$ }
     }
   } = useMidgardContext()
 
@@ -112,17 +112,10 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
         )
   }, [asset, assetBalance, assetsWB, isCrossChain])
 
-  const poolsStateRD = useObservableState(poolsState$, RD.initial)
-
-  const poolsState = FP.pipe(
-    poolsStateRD,
-    RD.chain((poolsState) => RD.fromOption(getPoolDetail(poolsState.poolDetails, asset), () => Error('no data')))
-  )
-
-  const poolAssetsRD = useObservableState(availableAssets$, RD.initial)
+  const poolAssetsRD: PoolAssetsRD = useObservableState(availableAssets$, RD.initial)
 
   const assetPriceRD: RD.RemoteData<Error, BigNumber> = FP.pipe(
-    poolsState,
+    poolDetailRD,
     // convert from RUNE price to selected pool asset price
     RD.map(getAssetPoolPrice(runPrice))
   )
@@ -158,12 +151,12 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
       renderDisabledAddStake,
       renderDisabledAddStake,
       renderDisabledAddStake,
-      ([assetPrice, poolAssets, pool]) => {
+      ([assetPrice, poolAssets, poolDetail]) => {
         return (
           <>
             <AddStake
               type={type}
-              poolData={toPoolData(pool)}
+              poolData={toPoolData(poolDetail)}
               onChangeAsset={onChangeAsset}
               asset={asset}
               runeAsset={runeAsset}
