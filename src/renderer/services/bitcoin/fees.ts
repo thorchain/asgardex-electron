@@ -79,8 +79,8 @@ export const createFeesService = (oClient$: Client$): FeesService => {
 
   const { get: getPoolFeeRate, set: setPoolFeeRate } = observableState<FeeRateRD>(RD.initial)
   /**
-   * Factory to create a stream of stake fees
-   * @param memo Memo used for deposit transactions
+   * Factory to create a stream of fees for pool transacions
+   * @param memo Memo used for pool transactions
    */
   const poolFeeRate$ = (memo: Memo): FeeRateLD =>
     FP.pipe(

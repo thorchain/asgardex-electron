@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { BaseAmount } from '@thorchain/asgardex-util'
+import { Asset, BaseAmount, Chain } from '@thorchain/asgardex-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
@@ -27,3 +27,5 @@ export type MemoRx = Rx.Observable<O.Option<Memo>>
 export type StakeFees = { base: BaseAmount; cross: O.Option<BaseAmount> }
 export type StakeFeesRD = RD.RemoteData<Error, StakeFees>
 export type StakeFeesLD = LiveData<Error, StakeFees>
+
+export type SendStakeTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }

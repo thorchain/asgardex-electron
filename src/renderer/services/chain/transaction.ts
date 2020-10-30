@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, BaseAmount, baseToAsset, Chain } from '@thorchain/asgardex-util'
+import { baseToAsset } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -7,21 +7,9 @@ import * as Rx from 'rxjs'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/context'
 import { ErrorId, TxLD } from '../wallet/types'
-import { Memo } from './types'
+import { SendStakeTxParams } from './types'
 
-const sendStakeTx = ({
-  chain,
-  asset,
-  poolAddress,
-  amount,
-  memo
-}: {
-  chain: Chain
-  asset: Asset
-  poolAddress: string
-  amount: BaseAmount
-  memo: Memo
-}): TxLD => {
+const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendStakeTxParams): TxLD => {
   // TODO (@Veado) Health check request for pool address
   // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
 

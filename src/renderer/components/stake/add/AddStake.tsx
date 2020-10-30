@@ -20,7 +20,8 @@ import { useIntl } from 'react-intl'
 import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
 import { isBaseChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { StakeFeesRD } from '../../../services/chain/types'
+import { Memo, SendStakeTxParams, StakeFeesRD } from '../../../services/chain/types'
+import { PoolAddress } from '../../../services/midgard/types'
 import { StakeType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
 import * as Helper from './AddStake.helper'
@@ -36,37 +37,44 @@ type Props = {
   runeBalance: O.Option<BaseAmount>
   baseChainAssetBalance: O.Option<BaseAmount>
   crossChainAssetBalance: O.Option<BaseAmount>
+  poolAddress: O.Option<PoolAddress>
   isCrossChain?: boolean
+  baseChainMemo: O.Option<Memo>
+  crossChainMemo: O.Option<Memo>
   priceAsset?: Asset
   fees: StakeFeesRD
   reloadFees: () => void
   assets?: Asset[]
-  onStake: (stakeData: { asset: Asset; runeAsset: Asset; assetStake: BaseAmount; runeStake: BaseAmount }) => void
+  onStake: (p: SendStakeTxParams) => void
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
 }
 
-export const AddStake: React.FC<Props> = ({
-  type,
-  asset,
-  runeAsset,
-  assetPrice,
-  runePrice,
-  assetBalance: oAssetBalance,
-  runeBalance: oRuneBalance,
-  baseChainAssetBalance: oBaseChainAssetBalance,
-  crossChainAssetBalance: oCrossChainAssetBalance,
-  isCrossChain = false,
-  assets,
-  priceAsset,
-  reloadFees,
-  fees,
-  onStake,
-  onChangeAsset,
-  disabled = false,
-  poolData
-}) => {
+export const AddStake: React.FC<Props> = (props) => {
+  const {
+    type,
+    asset,
+    runeAsset,
+    assetPrice,
+    runePrice,
+    assetBalance: oAssetBalance,
+    runeBalance: oRuneBalance,
+    baseChainAssetBalance: oBaseChainAssetBalance,
+    crossChainAssetBalance: oCrossChainAssetBalance,
+    isCrossChain = false,
+    baseChainMemo: oBaseChainMemo,
+    crossChainMemo: oCrossChainMemo,
+    poolAddress: oPoolAddress,
+    assets,
+    priceAsset,
+    reloadFees,
+    fees,
+    onChangeAsset,
+    disabled = false,
+    poolData
+  } = props
+
   const intl = useIntl()
   const [runeAmountToStake, setRuneAmountToStake] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [assetAmountToStake, setAssetAmountToStake] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
@@ -230,13 +238,52 @@ export const AddStake: React.FC<Props> = ({
   )
 
   const onStakeConfirmed = useCallback(() => {
-    onStake({
-      asset,
-      runeAsset,
-      assetStake: assetAmountToStake,
-      runeStake: runeAmountToStake
-    })
-  }, [onStake, asset, runeAsset, assetAmountToStake, runeAmountToStake])
+    const crossChainStakeTx = () =>
+      FP.pipe(
+        sequenceTOption(oPoolAddress, oBaseChainMemo, oCrossChainMemo),
+        O.map(([poolAddress, baseChainMemo, crossChainMemo]) => {
+          const baseChainStakeTxParam = {
+            chain: runeAsset.chain,
+            asset: BASE_CHAIN_ASSET,
+            poolAddress,
+            amount: assetAmountToStake,
+            memo: baseChainMemo
+          }
+          console.log('CROSS CHAIN Tx 1 (base):', baseChainStakeTxParam)
+          const crossChainStakeTxParam = {
+            chain: asset.chain,
+            asset: asset,
+            poolAddress,
+            amount: assetAmountToStake,
+            memo: crossChainMemo
+          }
+          console.log('CROSS CHAIN Tx 2 (cross):', crossChainStakeTxParam)
+
+          return true
+        })
+      )
+    const baseChainStakeTx = () =>
+      FP.pipe(
+        sequenceTOption(oPoolAddress, oBaseChainMemo),
+        O.map(([poolAddress, baseChainMemo]) => {
+          const baseChainStakeTxParam = {
+            chain: runeAsset.chain,
+            asset: BASE_CHAIN_ASSET,
+            poolAddress,
+            amount: assetAmountToStake,
+            memo: baseChainMemo
+          }
+          console.log('BASE CHAIN Tx:', baseChainStakeTxParam)
+          return true
+        })
+      )
+
+    FP.pipe(
+      isCrossChain ? crossChainStakeTx() : baseChainStakeTx(),
+      O.map((v) => console.log('success:', v)),
+      O.getOrElse(() => console.log('no data to run txs'))
+    )
+  }, [oPoolAddress, oBaseChainMemo, oCrossChainMemo, isCrossChain, runeAsset.chain, assetAmountToStake, asset])
 
   const hasCrossChainFee = useMemo(() => !isBaseChainAsset(asset), [asset])
 
