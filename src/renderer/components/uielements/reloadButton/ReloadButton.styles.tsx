@@ -5,15 +5,20 @@ import styled from 'styled-components'
 
 import { Button as UIButton } from '../../uielements/button'
 
-export const ReloadButton = styled(UIButton).attrs({
+export const ReloadButton = styled(UIButton).attrs((props) => ({
   typevalue: 'outline',
-  children: <SyncOutlined />
-})`
+  children: (
+    <>
+      <SyncOutlined />
+      {props.children && <span>{props.children}</span>}
+    </>
+  )
+}))`
   &.ant-btn {
     /* overridden */
     min-width: auto;
   }
-  width: 30px;
+  min-width: 30px;
   height: 30px;
   margin-right: 10px;
 `

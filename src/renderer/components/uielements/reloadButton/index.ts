@@ -1,1 +1,1 @@
-export * from './ReloadButton.style'
+export * from './ReloadButton.styles'
