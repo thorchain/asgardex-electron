@@ -5,7 +5,7 @@ import { Asset, assetToString, BaseAmount, bn } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
-import { useObservableState } from 'observable-hooks'
+import { useObservableState, useSubscription } from 'observable-hooks'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
@@ -48,7 +48,17 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
     }
   } = useMidgardContext()
 
-  const { stakeFees$, reloadStakeFees, isCrossChainStake$, symDepositTxMemo$, asymDepositTxMemo$ } = useChainContext()
+  const {
+    stakeFees$,
+    reloadStakeFees,
+    isCrossChainStake$,
+    symDepositTxMemo$,
+    asymDepositTxMemo$,
+    updateStakeFeesEffect$
+  } = useChainContext()
+
+  // subscribe to
+  useSubscription(updateStakeFeesEffect$)
 
   const [stakeFees] = useObservableState(() => stakeFees$(type), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(poolAddress$, O.none)

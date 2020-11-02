@@ -5,12 +5,20 @@ import {
   reloadStakeFees,
   isCrossChainStake$,
   symDepositTxMemo$,
-  asymDepositTxMemo$
+  asymDepositTxMemo$,
+  withdrawFees$,
+  reloadWithdrawFees,
+  updateWithdrawFeesEffect$,
+  updateStakeFeesEffect$
 } from '../services/chain/context'
 
 type ChainContextValue = {
   stakeFees$: typeof stakeFees$
   reloadStakeFees: typeof reloadStakeFees
+  withdrawFees$: typeof withdrawFees$
+  reloadWithdrawFees: typeof reloadWithdrawFees
+  updateWithdrawFeesEffect$: typeof updateWithdrawFeesEffect$
+  updateStakeFeesEffect$: typeof updateStakeFeesEffect$
   isCrossChainStake$: typeof isCrossChainStake$
   symDepositTxMemo$: typeof symDepositTxMemo$
   asymDepositTxMemo$: typeof asymDepositTxMemo$
@@ -19,6 +27,10 @@ type ChainContextValue = {
 const initialContext: ChainContextValue = {
   stakeFees$,
   reloadStakeFees,
+  withdrawFees$,
+  reloadWithdrawFees,
+  updateWithdrawFeesEffect$,
+  updateStakeFeesEffect$,
   isCrossChainStake$,
   symDepositTxMemo$,
   asymDepositTxMemo$

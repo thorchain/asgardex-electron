@@ -1,4 +1,4 @@
-import { getDepositMemo } from '@thorchain/asgardex-util'
+import { getDepositMemo, getWithdrawMemo } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -39,8 +39,23 @@ const asymDepositTxMemo$: MemoRx = selectedPoolAsset$.pipe(
   )
 )
 
+/**
+ * Unstake memo for txs
+ */
+const getWithdrawMemo$ = (withdrawPercent: number): MemoRx =>
+  selectedPoolAsset$.pipe(
+    RxOp.map((oPoolAsset) =>
+      FP.pipe(
+        oPoolAsset,
+        // add address of base-chain wallet to memo
+        /** getWithdrawMemo gets percents between 0 and 10000 */
+        O.map((poolAsset) => getWithdrawMemo(poolAsset, withdrawPercent * 100))
+      )
+    )
+  )
+
 // TODO(@veado) Remove it later, but leave it for #537 https://github.com/thorchain/asgardex-electron/issues/537
 symDepositTxMemo$.subscribe((value) => console.log('symDepositTxMemo:', value))
 asymDepositTxMemo$.subscribe((value) => console.log('asymDepositTxMemo:', value))
 
-export { symDepositTxMemo$, asymDepositTxMemo$, symDepositAssetTxMemo$ }
+export { symDepositTxMemo$, asymDepositTxMemo$, symDepositAssetTxMemo$, getWithdrawMemo$ }

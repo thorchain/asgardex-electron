@@ -4,14 +4,16 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetRune67C, bn } from '@thorchain/asgardex-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
-import { useObservableState } from 'observable-hooks'
+import { useObservableState, useSubscription } from 'observable-hooks'
 import { map } from 'rxjs/operators'
 
 import { Withdraw } from '../../../components/stake/withdraw'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 // import { useWalletContext } from '../../../contexts/WalletContext'
 import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
+import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
@@ -32,6 +34,12 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
       stake: { getStakes$ }
     }
   } = useMidgardContext()
+
+  const { withdrawFees$, reloadWithdrawFees, updateWithdrawFeesEffect$ } = useChainContext()
+
+  useSubscription(updateWithdrawFeesEffect$)
+
+  const fees = useObservableState(withdrawFees$, RD.initial)
 
   const runePrice = useObservableState(priceRatio$, bn(1))
 
@@ -70,18 +78,20 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
+        fee={fees}
         assetPrice={ZERO_BN}
         runePrice={runePrice}
         selectedCurrencyAsset={AssetRune67C}
-        onWithdraw={() => {}}
+        onWithdraw={emptyFunc}
         runeShare={ZERO_BASE_AMOUNT}
         assetShare={ZERO_BASE_AMOUNT}
         runeAsset={runeAsset}
         stakedAsset={stakedAsset}
+        updateFees={reloadWithdrawFees}
         disabled
       />
     ),
-    [runeAsset, stakedAsset, runePrice]
+    [fees, runePrice, runeAsset, stakedAsset, reloadWithdrawFees]
   )
 
   const renderWithdrawReady = useCallback(
@@ -95,9 +105,11 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         assetShare={shareHelpers.getAssetShare(stake, poolDetail)}
         runeAsset={runeAsset}
         stakedAsset={stakedAsset}
+        fee={fees}
+        updateFees={reloadWithdrawFees}
       />
     ),
-    [runeAsset, stakedAsset, runePrice]
+    [runePrice, runeAsset, stakedAsset, fees, reloadWithdrawFees]
   )
 
   return FP.pipe(

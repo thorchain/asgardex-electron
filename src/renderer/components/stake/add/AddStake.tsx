@@ -42,7 +42,7 @@ type Props = {
   symDepositMemo: O.Option<AsymDepositMemo>
   priceAsset?: Asset
   fees: StakeFeesRD
-  reloadFees: () => void
+  reloadFees: (type: StakeType) => void
   assets?: Asset[]
   onStake: (p: SendStakeTxParams) => void
   onChangeAsset: (asset: Asset) => void
@@ -396,6 +396,8 @@ export const AddStake: React.FC<Props> = (props) => {
     [asset, fees, intl]
   )
 
+  const reloadFeesHandler = useCallback(() => reloadFees(type), [reloadFees, type])
+
   const disabledForm = useMemo(() => isBalanceError || isBaseChainFeeError || isCrossChainFeeError || disabled, [
     disabled,
     isBalanceError,
@@ -444,7 +446,7 @@ export const AddStake: React.FC<Props> = (props) => {
         <Col xs={24} xl={12}>
           <Styled.FeeRow>
             <Col>
-              <Styled.ReloadFeeButton onClick={reloadFees} disabled={RD.isPending(fees)}>
+              <Styled.ReloadFeeButton onClick={reloadFeesHandler} disabled={RD.isPending(fees)}>
                 <SyncOutlined />
               </Styled.ReloadFeeButton>
             </Col>
