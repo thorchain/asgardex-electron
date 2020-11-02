@@ -24,7 +24,7 @@ export const Slider: React.FC<Props> = ({
   ...rest
 }): JSX.Element => {
   const ref = useRef()
-  const getTooltipPopupContainer = useCallback((container: HTMLElement) => ref.current || container, [ref])
+  const getTooltipPopupContainer = useCallback((container: HTMLElement) => container, [])
 
   const percentLabels = useMemo(
     () => (
