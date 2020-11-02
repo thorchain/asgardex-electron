@@ -20,7 +20,7 @@ import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as stakeRoutes from '../../../routes/stake'
-import { Memo, StakeFeesRD } from '../../../services/chain/types'
+import { AsymDepositMemo, Memo } from '../../../services/chain/types'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
@@ -48,14 +48,9 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
     }
   } = useMidgardContext()
 
-  const {
-    stakeFees$,
-    reloadStakeFees,
-    isCrossChainStake$,
-    baseChainStakeMemo$,
-    crossChainStakeMemo$
-  } = useChainContext()
-  const stakeFees: StakeFeesRD = useObservableState(stakeFees$, RD.initial)
+  const { stakeFees$, reloadStakeFees, isCrossChainStake$, symDepositTxMemo$, asymDepositTxMemo$ } = useChainContext()
+
+  const [stakeFees] = useObservableState(() => stakeFees$(type), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(poolAddress$, O.none)
   const isCrossChain = useObservableState(isCrossChainStake$, false)
 
@@ -121,8 +116,9 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
         )
   }, [asset, assetBalance, assetsWB, isCrossChain])
 
-  const baseChainStakeMemo: O.Option<Memo> = useObservableState(baseChainStakeMemo$, O.none)
-  const crossChainStakeMemo: O.Option<Memo> = useObservableState(crossChainStakeMemo$, O.none)
+  const symDepositTxMemo: O.Option<AsymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
+
+  const asymDepositTxMemo: O.Option<Memo> = useObservableState(asymDepositTxMemo$, O.none)
 
   const poolAssetsRD: PoolAssetsRD = useObservableState(availableAssets$, RD.initial)
 
@@ -155,8 +151,8 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
           disabled={true}
           isCrossChain={isCrossChain}
           poolAddress={O.none}
-          baseChainMemo={O.none}
-          crossChainMemo={O.none}
+          symDepositMemo={O.none}
+          asymDepositMemo={O.none}
           poolData={{ runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }}
         />
       </>
@@ -187,8 +183,8 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
               crossChainAssetBalance={crossChainAssetBalance}
               isCrossChain={isCrossChain}
               poolAddress={oPoolAddress}
-              baseChainMemo={baseChainStakeMemo}
-              crossChainMemo={crossChainStakeMemo}
+              symDepositMemo={symDepositTxMemo}
+              asymDepositMemo={asymDepositTxMemo}
               onStake={console.log}
               fees={stakeFees}
               reloadFees={reloadStakeFees}

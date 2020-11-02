@@ -4,24 +4,24 @@ import {
   stakeFees$,
   reloadStakeFees,
   isCrossChainStake$,
-  baseChainStakeMemo$,
-  crossChainStakeMemo$
+  symDepositTxMemo$,
+  asymDepositTxMemo$
 } from '../services/chain/context'
 
 type ChainContextValue = {
   stakeFees$: typeof stakeFees$
   reloadStakeFees: typeof reloadStakeFees
   isCrossChainStake$: typeof isCrossChainStake$
-  baseChainStakeMemo$: typeof baseChainStakeMemo$
-  crossChainStakeMemo$: typeof crossChainStakeMemo$
+  symDepositTxMemo$: typeof symDepositTxMemo$
+  asymDepositTxMemo$: typeof asymDepositTxMemo$
 }
 
 const initialContext: ChainContextValue = {
   stakeFees$,
   reloadStakeFees,
   isCrossChainStake$,
-  baseChainStakeMemo$,
-  crossChainStakeMemo$
+  symDepositTxMemo$,
+  asymDepositTxMemo$
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 

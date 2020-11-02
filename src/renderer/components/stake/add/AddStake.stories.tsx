@@ -46,8 +46,8 @@ export const AddAsymStakeStory = () => {
       priceAsset={AssetRune67C}
       assets={assets}
       poolAddress={O.none}
-      baseChainMemo={O.none}
-      crossChainMemo={O.none}
+      symDepositMemo={O.none}
+      asymDepositMemo={O.none}
     />
   )
 }
@@ -76,8 +76,8 @@ export const AddAsymCrossStakeStory = () => {
       priceAsset={AssetRune67C}
       assets={assets}
       poolAddress={O.none}
-      baseChainMemo={O.none}
-      crossChainMemo={O.none}
+      symDepositMemo={O.none}
+      asymDepositMemo={O.none}
     />
   )
 }
@@ -102,8 +102,8 @@ export const AddSymStakeStory = () => {
       priceAsset={AssetRune67C}
       assets={assets}
       poolAddress={O.none}
-      baseChainMemo={O.none}
-      crossChainMemo={O.none}
+      symDepositMemo={O.none}
+      asymDepositMemo={O.none}
     />
   )
 }
@@ -130,8 +130,8 @@ storiesOf('Components/Stake/AddStake', module)
         priceAsset={AssetRune67C}
         assets={assets}
         poolAddress={O.none}
-        baseChainMemo={O.none}
-        crossChainMemo={O.none}
+        symDepositMemo={O.none}
+        asymDepositMemo={O.none}
       />
     )
   })
@@ -155,8 +155,8 @@ storiesOf('Components/Stake/AddStake', module)
         priceAsset={AssetRune67C}
         assets={assets}
         poolAddress={O.none}
-        baseChainMemo={O.none}
-        crossChainMemo={O.none}
+        symDepositMemo={O.none}
+        asymDepositMemo={O.none}
       />
     )
   })
@@ -180,8 +180,8 @@ storiesOf('Components/Stake/AddStake', module)
       priceAsset={AssetRune67C}
       assets={assets}
       poolAddress={O.none}
-      baseChainMemo={O.none}
-      crossChainMemo={O.none}
+      symDepositMemo={O.none}
+      asymDepositMemo={O.none}
     />
   ))
 
@@ -210,8 +210,8 @@ storiesOf('Components/Stake/AddStake', module)
         priceAsset={AssetRune67C}
         assets={assets}
         poolAddress={O.none}
-        baseChainMemo={O.none}
-        crossChainMemo={O.none}
+        symDepositMemo={O.none}
+        asymDepositMemo={O.none}
       />
     )
   })

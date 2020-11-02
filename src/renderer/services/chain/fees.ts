@@ -10,10 +10,11 @@ import { isBaseChain } from '../../helpers/chainHelper'
 import { sequenceTRDFromArray } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
+import { StakeType } from '../../types/asgardex'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/context'
 import { selectedPoolAsset$, selectedPoolChain$ } from '../midgard/common'
-import { crossChainStakeMemo$ } from './memo'
+import { symDepositAssetTxMemo$, asymDepositTxMemo$ } from './memo'
 import { FeeLD, LoadFeesHandler, StakeFeesLD } from './types'
 
 export const reloadFees = () => {
@@ -81,13 +82,14 @@ Rx.combineLatest([selectedPoolChain$, reloadStakeFees$])
   )
   .subscribe()
 
-const stakeFeeByChain$ = (chain: Chain): FeeLD => {
+const stakeFeeByChain$ = (chain: Chain, type: StakeType): FeeLD => {
   switch (chain) {
     case 'BNB':
       return BNB.stakeFee$
     case 'BTC':
-      // stake fees of BTC based on memo
-      return crossChainStakeMemo$.pipe(
+      // deposit fee for BTC txs based on a memo,
+      // which depends on deposit type
+      return Rx.iif(() => type === 'asym', asymDepositTxMemo$, symDepositAssetTxMemo$).pipe(
         RxOp.switchMap((oMemo) =>
           FP.pipe(
             oMemo,
@@ -105,29 +107,32 @@ const stakeFeeByChain$ = (chain: Chain): FeeLD => {
   }
 }
 
-const stakeFees$: StakeFeesLD = selectedPoolAsset$.pipe(
-  RxOp.switchMap((oPoolAsset) =>
-    FP.pipe(
-      oPoolAsset,
-      O.map((poolAsset) =>
-        FP.pipe(
-          Rx.combineLatest(
-            isBaseChain(poolAsset.chain)
-              ? // for deposits on base chain, fee for base chain is needed only
-                [stakeFeeByChain$(BASE_CHAIN)]
-              : // for x-chain deposits, we do need to load fees for base- AND x-chain,
-                [stakeFeeByChain$(BASE_CHAIN), stakeFeeByChain$(poolAsset.chain)]
-          ),
-          RxOp.map(sequenceTRDFromArray),
-          liveData.map(([base, cross]) => ({
-            base,
-            cross: O.fromNullable(cross)
-          }))
-        )
-      ),
-      O.getOrElse((): StakeFeesLD => Rx.of(RD.initial))
+// TODO (@Veado) Store results of deposit txs into a state, so views will have access to it.
+// Needed to display success / error states of each transaction
+const stakeFees$ = (type: StakeType): StakeFeesLD =>
+  selectedPoolAsset$.pipe(
+    RxOp.switchMap((oPoolAsset) =>
+      FP.pipe(
+        oPoolAsset,
+        O.map((poolAsset) =>
+          FP.pipe(
+            Rx.combineLatest(
+              type === 'asym'
+                ? // for asym deposits, one tx needed only == one fe)
+                  [stakeFeeByChain$(BASE_CHAIN, type)]
+                : // for sym deposits, two txs needed == 2 fees,
+                  [stakeFeeByChain$(BASE_CHAIN, type), stakeFeeByChain$(poolAsset.chain, type)]
+            ),
+            RxOp.map(sequenceTRDFromArray),
+            liveData.map(([base, cross]) => ({
+              base,
+              cross: O.fromNullable(cross)
+            }))
+          )
+        ),
+        O.getOrElse((): StakeFeesLD => Rx.of(RD.initial))
+      )
     )
   )
-)
 
 export { stakeFees$, reloadStakeFees, stakeFeeByChain$ }

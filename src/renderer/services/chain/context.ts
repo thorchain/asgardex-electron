@@ -1,8 +1,8 @@
 import { isCrossChainStake$ } from './common'
 import { reloadStakeFees, stakeFees$ } from './fees'
-import { baseChainStakeMemo$, crossChainStakeMemo$ } from './memo'
+import { asymDepositTxMemo$, symDepositTxMemo$ } from './memo'
 
 /**
  * Exports all functions and observables needed at UI level (provided by `ChainContext`)
  */
-export { reloadStakeFees, stakeFees$, isCrossChainStake$, baseChainStakeMemo$, crossChainStakeMemo$ }
+export { reloadStakeFees, stakeFees$, isCrossChainStake$, symDepositTxMemo$, asymDepositTxMemo$ }

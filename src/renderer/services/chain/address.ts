@@ -26,9 +26,9 @@ const addressByChain$ = (chain: Chain): AddressRx => {
 }
 
 /**
- * Users wallet address for cross-chain
+ * Users wallet address for selected pool asset
  */
-const crossAddress$: AddressRx = selectedPoolChain$.pipe(
+const assetAddress$: AddressRx = selectedPoolChain$.pipe(
   RxOp.switchMap((oChain) =>
     FP.pipe(
       oChain,
@@ -41,8 +41,8 @@ const crossAddress$: AddressRx = selectedPoolChain$.pipe(
 )
 
 /**
- * Users wallet address for base chain
+ * Users wallet address for RUNE
  */
-const baseAddress$: AddressRx = addressByChain$(BASE_CHAIN).pipe(RxOp.distinctUntilChanged(eqOString.equals))
+const runeAddress$: AddressRx = addressByChain$(BASE_CHAIN).pipe(RxOp.distinctUntilChanged(eqOString.equals))
 
-export { addressByChain$, crossAddress$, baseAddress$ }
+export { addressByChain$, assetAddress$, runeAddress$ }
