@@ -7,15 +7,17 @@ import * as RxOp from 'rxjs/operators'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/common'
 import { loadAssetTxs as loadBtcTxs, assetTxs$ as btcTxs$ } from '../bitcoin/context'
+import { GetExplorerTxUrl } from '../clients/types'
 import { selectedAsset$ } from './common'
 import { ApiError, AssetTxsPageLD, ErrorId, LoadAssetTxsHandler } from './types'
 
-const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> => {
+const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<GetExplorerTxUrl>> => {
   switch (chain) {
     case 'BNB':
-      return BNB.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}/tx/`)))
+      // TODO (@thatThorchainGuy) Implemented it with https://github.com/thorchain/asgardex-electron/issues/573
+      return Rx.of(O.none)
     case 'BTC':
-      return BTC.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}tx/`)))
+      return BTC.getExplorerTxUrl$
     case 'ETH':
       // not implemented yet
       return Rx.of(O.none)
@@ -27,7 +29,7 @@ const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> =>
   }
 }
 
-export const explorerTxUrl$: Rx.Observable<O.Option<string>> = selectedAsset$.pipe(
+export const getExplorerTxUrl$: Rx.Observable<O.Option<GetExplorerTxUrl>> = selectedAsset$.pipe(
   RxOp.switchMap(
     O.fold(
       () => Rx.EMPTY,

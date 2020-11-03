@@ -1,5 +1,5 @@
 import { assetWB$, reloadBalances } from './balances'
-import { client$, clientViewState$, address$, explorerUrl$ } from './common'
+import { client$, clientViewState$, address$, getExplorerTxUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
@@ -13,7 +13,7 @@ export {
   client$,
   clientViewState$,
   address$,
-  explorerUrl$,
+  getExplorerTxUrl$,
   reloadBalances,
   assetWB$,
   fees$,

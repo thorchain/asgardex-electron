@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { FeeOptions } from '@thorchain/asgardex-bitcoin/lib/types/client-types'
+import { FeeOptions } from '@xchainjs/xchain-bitcoin/lib/types/client-types'
 import { assetAmount, AssetBTC, AssetRune67C, assetToBase, formatBaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 

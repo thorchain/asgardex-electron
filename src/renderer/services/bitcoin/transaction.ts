@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
+import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
 import { BTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -9,21 +9,16 @@ import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operato
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { selectedAsset$ } from '../wallet/common'
-import { ApiError, AssetTxsPageLD, ErrorId, TxRD } from '../wallet/types'
+import { ApiError, TxsPageLD, ErrorId, TxRD } from '../wallet/types'
 import { Client$ } from './common'
 import { SendTxParams, TransactionService } from './types'
-import { toTxsPage } from './utils'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
 const tx$ = ({ client$, to, amount, feeRate, memo }: { client$: Client$ } & SendTxParams): Rx.Observable<TxRD> =>
   client$.pipe(
     switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
-    switchMap((client) =>
-      memo
-        ? Rx.from(client.vaultTx({ addressTo: to, amount: amount.amount().toNumber(), memo, feeRate }))
-        : Rx.from(client.normalTx({ addressTo: to, amount: amount.amount().toNumber(), feeRate }))
-    ),
+    switchMap((client) => Rx.from(client.transfer({ recipient: to, amount, memo, feeRate }))),
     map(RD.success),
     catchError((error) =>
       Rx.of(
@@ -43,10 +38,10 @@ const pushTx = (client$: Client$) => ({ to, amount, feeRate, memo }: SendTxParam
  * Observable to load txs from Binance API endpoint
  * If client is not available, it returns an `initial` state
  */
-const loadAssetTxs$ = ({ client }: { client: BitcoinClient }): AssetTxsPageLD => {
+const loadAssetTxs$ = ({ client }: { client: BitcoinClient }): TxsPageLD => {
   const address = client.getAddress()
-  return Rx.from(client.getTransactions(address)).pipe(
-    map(toTxsPage),
+  return Rx.from(client.getTransactions({ address })).pipe(
+    // map(toTxsPage),
     map(RD.success),
     catchError((error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
@@ -63,7 +58,7 @@ const { stream$: reloadAssetTxs$, trigger: loadAssetTxs } = triggerStream()
 /**
  * `Txs` history for BTC
  */
-const assetTxs$ = (client$: Client$): AssetTxsPageLD =>
+const assetTxs$ = (client$: Client$): TxsPageLD =>
   Rx.combineLatest([client$, reloadAssetTxs$, selectedAsset$]).pipe(
     switchMap(([client, _, oAsset]) => {
       return FP.pipe(

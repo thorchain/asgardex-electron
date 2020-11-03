@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOptions, FeeOptionsKey } from '@thorchain/asgardex-bitcoin/lib/types/client-types'
+import { FeeOptions, FeeOptionsKey } from '@xchainjs/xchain-bitcoin/lib/types/client-types'
 import {
   assetAmount,
   AssetBTC,

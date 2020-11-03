@@ -102,6 +102,8 @@ export enum ErrorId {
   SEND_TX
 }
 
+// TODO(@Veado) Move type to clients/type
+
 export type ApiError = {
   errorId: ErrorId
   msg: string
@@ -109,6 +111,7 @@ export type ApiError = {
 
 export type NonEmptyApiErrors = NonEmptyArray<ApiError>
 
+// TODO (@thatThorchainGuy) Remove TxRD/TxLD with https://github.com/thorchain/asgardex-electron/issues/573
 /* RD/LD for sending transactions on different chains */
 export type TxRD = RD.RemoteData<ApiError, string>
 export type TxLD = LiveData<ApiError, string>

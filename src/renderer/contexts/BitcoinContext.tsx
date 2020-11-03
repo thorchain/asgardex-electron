@@ -9,14 +9,14 @@ import {
   txRD$,
   fees$,
   pushTx,
-  explorerUrl$,
+  getExplorerTxUrl$,
   resetTx
 } from '../services/bitcoin/context'
 
 export type BitcoinContextValue = {
   client$: typeof client$
   address$: typeof address$
-  explorerUrl$: typeof explorerUrl$
+  getExplorerTxUrl$: typeof getExplorerTxUrl$
   reloadBalances: typeof reloadBalances
   assetWB$: typeof assetWB$
   fees$: typeof fees$
@@ -29,7 +29,7 @@ export type BitcoinContextValue = {
 const initialContext: BitcoinContextValue = {
   client$,
   address$,
-  explorerUrl$,
+  getExplorerTxUrl$,
   reloadBalances,
   assetWB$,
   fees$,

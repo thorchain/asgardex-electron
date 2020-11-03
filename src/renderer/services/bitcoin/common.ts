@@ -1,4 +1,5 @@
-import { Client as BitcoinClient, Network as BitcoinNetwork } from '@thorchain/asgardex-bitcoin'
+import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
+import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -18,11 +19,12 @@ import { BitcoinClientState } from './types'
 /**
  * Binance network depending on selected `Network`
  */
-const bitcoinNetwork$: Observable<BitcoinNetwork> = network$.pipe(
+const bitcoinNetwork$: Observable<ClientNetwork> = network$.pipe(
   map((network) => {
-    if (network === 'testnet') return BitcoinNetwork.TEST
-    // In case of 'chaosnet' + 'mainnet` we use `BitcoinNetwork.MAIN`
-    return BitcoinNetwork.MAIN
+    // In case of 'chaosnet' + 'mainnet` we stick on `mainnet`
+    if (network === 'chaosnet') return 'mainnet'
+
+    return network
   })
 )
 
@@ -45,8 +47,9 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork
           O.chain((phrase) => {
             try {
               // Url of electrs
-              const electrsUrl = bitcoinNetwork === BitcoinNetwork.TEST ? ELECTRS_TESTNET : ELECTRS_MAINNET
-              const client = new BitcoinClient(bitcoinNetwork, electrsUrl, phrase)
+              const electrsUrl = bitcoinNetwork === 'testnet' ? ELECTRS_TESTNET : ELECTRS_MAINNET
+              // TODO (@Veado) Check if we still use electrs
+              const client = new BitcoinClient({ network: bitcoinNetwork, nodeUrl: electrsUrl, phrase })
               return O.some(right(client)) as BitcoinClientState
             } catch (error) {
               return O.some(left(error))
@@ -86,14 +89,10 @@ const address$: Observable<O.Option<string>> = client$.pipe(
 
 /**
  * Explorer url depending on selected network
- *
- * If a client is not available (e.g. by removing keystore), it returns `None`
- *
  */
-const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
-  map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
-  distinctUntilChanged(eqOString.equals),
+const getExplorerTxUrl$: Observable<O.Option<(txId: string) => string>> = client$.pipe(
+  map(FP.pipe(O.map((client) => client.getExplorerTxUrl))),
   shareReplay(1)
 )
 
-export { client$, clientViewState$, address$, explorerUrl$ }
+export { client$, clientViewState$, address$, getExplorerTxUrl$ }

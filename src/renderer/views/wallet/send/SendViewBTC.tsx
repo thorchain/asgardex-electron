@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
+import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
 import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -13,6 +13,7 @@ import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getAssetWBByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/bitcoin/types'
+import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { AssetsWithBalance, AssetWithBalance, NonEmptyAssetsWithBalance, TxRD } from '../../../services/wallet/types'
 
 type Props = {
@@ -26,10 +27,10 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
 
   const oBtcAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
 
-  const { fees$, pushTx, txRD$, client$, explorerUrl$, resetTx } = useBitcoinContext()
+  const { fees$, pushTx, txRD$, client$, getExplorerTxUrl$, resetTx } = useBitcoinContext()
 
   const txRD = useObservableState<TxRD>(txRD$, RD.initial)
-  const oExplorerUrl = useObservableState(explorerUrl$, O.none)
+  const oExplorerUrl: O.Option<GetExplorerTxUrl> = useObservableState(getExplorerTxUrl$, O.none)
   const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
 
   const fees = useObservableState(fees$, RD.initial)
@@ -69,8 +70,8 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     sequenceTOption(oBtcAssetWB, oExplorerUrl),
     O.fold(
       () => <></>,
-      ([btcAssetWB, explorerUrl]) => {
-        const successActionHandler = (txHash: string) => window.apiUrl.openExternal(`${explorerUrl}tx/${txHash}`)
+      ([btcAssetWB, getExplorerTxUrl]) => {
+        const successActionHandler = FP.flow(getExplorerTxUrl, window.apiUrl.openExternal)
 
         return (
           <Send
