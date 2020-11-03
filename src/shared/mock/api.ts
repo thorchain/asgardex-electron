@@ -1,4 +1,4 @@
-import { Keystore } from '@thorchain/asgardex-crypto'
+import { Keystore } from '@xchainjs/xchain-crypto'
 
 import { ApiLang, ApiKeystore, ApiUrl } from '../api/types'
 import { Locale } from '../i18n/types'

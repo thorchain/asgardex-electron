@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react'
 
-import { generatePhrase } from '@thorchain/asgardex-crypto'
+import { generatePhrase } from '@xchainjs/xchain-crypto'
 import Form, { Rule } from 'antd/lib/form'
 import { useIntl } from 'react-intl'
 
