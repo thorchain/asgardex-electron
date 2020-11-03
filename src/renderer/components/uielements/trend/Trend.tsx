@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons'
-import { bn, isValidBN, formatBN } from '@thorchain/asgardex-util'
+import { bn, isValidBN, formatBN } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
 import { Label } from '../label'

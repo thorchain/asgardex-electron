@@ -1,13 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
-import {
-  assetAmount,
-  formatAssetAmountCurrency,
-  AssetAmount,
-  bn,
-  baseToAsset,
-  AssetBNB
-} from '@thorchain/asgardex-util'
+import { assetAmount, formatAssetAmountCurrency, AssetAmount, bn, baseToAsset, AssetBNB } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'

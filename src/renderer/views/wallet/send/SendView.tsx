@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { Asset, assetFromString, assetToString } from '@thorchain/asgardex-util'
+import { Asset, assetFromString, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'

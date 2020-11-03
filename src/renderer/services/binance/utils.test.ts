@@ -8,7 +8,7 @@ import {
   AssetBNB,
   AssetRune67C,
   assetToString
-} from '@thorchain/asgardex-util'
+} from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 

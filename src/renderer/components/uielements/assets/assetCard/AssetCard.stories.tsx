@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn, BaseAmount, AssetBNB, AssetBTC, AssetRuneB1A, assetAmount, assetToBase } from '@thorchain/asgardex-util'
+import { bn, BaseAmount, AssetBNB, AssetBTC, AssetRuneB1A, assetAmount, assetToBase } from '@xchainjs/xchain-util'
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { AssetCard } from './AssetCard'

@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from 'react'
 
-import { Asset, formatAssetAmount, assetToString, AssetAmount } from '@thorchain/asgardex-util'
+import { Asset, formatAssetAmount, assetToString, AssetAmount } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'

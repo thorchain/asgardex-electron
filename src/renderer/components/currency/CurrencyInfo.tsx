@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { formatBN, bn } from '@thorchain/asgardex-util'
+import { formatBN, bn } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { AssetBNB, AssetBTC, AssetRuneB1A, bn } from '@thorchain/asgardex-util'
+import { AssetBNB, AssetBTC, AssetRuneB1A, bn } from '@xchainjs/xchain-util'
 
 import { ASSETS_MAINNET } from '../../../../../shared/mock/assets'
 import { AssetMenu } from './AssetMenu'

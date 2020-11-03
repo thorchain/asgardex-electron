@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Asset } from '@thorchain/asgardex-util'
+import { Asset } from '@xchainjs/xchain-util'
 
 import { AssetIcon } from '../assetIcon'
 import { Size as CoinSize } from '../assetIcon/AssetIcon.types'

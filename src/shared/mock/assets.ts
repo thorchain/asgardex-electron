@@ -1,4 +1,4 @@
-import { Asset, AssetBNB, AssetRune67C, AssetRuneB1A } from '@thorchain/asgardex-util'
+import { Asset, AssetBNB, AssetRune67C, AssetRuneB1A } from '@xchainjs/xchain-util'
 
 type Assets = 'RUNE' | 'BNB' | 'FTM' | 'TOMO' | 'BOLT'
 

@@ -1,4 +1,4 @@
-import { baseAmount, PoolData } from '@thorchain/asgardex-util'
+import { baseAmount, PoolData } from '@xchainjs/xchain-util'
 
 import { eqBaseAmount } from '../../../helpers/fp/eq'
 import {

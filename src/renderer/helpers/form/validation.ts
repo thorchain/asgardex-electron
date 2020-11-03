@@ -1,4 +1,4 @@
-import { isValidBN } from '@thorchain/asgardex-util'
+import { isValidBN } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/lib/function'

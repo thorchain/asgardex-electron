@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, bnOrZero, baseAmount, PoolData, Asset, assetToString } from '@thorchain/asgardex-util'
+import { assetFromString, bnOrZero, baseAmount, PoolData, Asset, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import { head } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'

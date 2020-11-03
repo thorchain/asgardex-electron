@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 
-import { assetFromString, Chain } from '@thorchain/asgardex-util'
+import { assetFromString, Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'

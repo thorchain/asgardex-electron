@@ -2,7 +2,7 @@ import React, { useMemo, useCallback } from 'react'
 
 import { LoadingOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset } from '@thorchain/asgardex-util'
+import { Asset } from '@xchainjs/xchain-util'
 
 import { isBnbAsset, isBtcAsset, isEthAsset, isRuneAsset } from '../../../../helpers/assetHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'

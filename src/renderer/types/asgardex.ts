@@ -1,4 +1,4 @@
-import { BaseAmount, Asset } from '@thorchain/asgardex-util'
+import { BaseAmount, Asset } from '@xchainjs/xchain-util'
 import { Option } from 'fp-ts/lib/Option'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

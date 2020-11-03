@@ -7,7 +7,7 @@ import {
   formatAssetAmount,
   baseAmount,
   Asset
-} from '@thorchain/asgardex-util'
+} from '@xchainjs/xchain-util'
 
 import { PricePoolAsset } from '../../../../views/pools/Pools.types'
 import { Label } from '../../label'

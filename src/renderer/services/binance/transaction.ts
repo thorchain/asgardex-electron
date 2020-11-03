@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@thorchain/asgardex-binance'
 import { WS } from '@thorchain/asgardex-binance'
-import { AssetAmount, Asset } from '@thorchain/asgardex-util'
+import { AssetAmount, Asset } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'

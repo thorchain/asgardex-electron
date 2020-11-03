@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { assetAmount, AssetBNB, assetToBase } from '@thorchain/asgardex-util'
+import { assetAmount, AssetBNB, assetToBase } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { AssetTx } from '../../../../services/wallet/types'

@@ -8,7 +8,7 @@ import {
   assetToBase,
   assetToString,
   formatAssetAmount
-} from '@thorchain/asgardex-util'
+} from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { TRANSFER_FEES } from '../../../../../shared/mock/fees'

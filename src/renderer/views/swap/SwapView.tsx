@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
-import { Asset, AssetAmount, assetFromString, bnOrZero } from '@thorchain/asgardex-util'
+import { Asset, AssetAmount, assetFromString, bnOrZero } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'

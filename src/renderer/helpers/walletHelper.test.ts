@@ -1,4 +1,4 @@
-import { baseAmount, assetFromString } from '@thorchain/asgardex-util'
+import { baseAmount, assetFromString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'

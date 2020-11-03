@@ -9,8 +9,8 @@ import {
   assetToBase,
   formatAssetAmountCurrency,
   assetAmount
-} from '@thorchain/asgardex-util'
-import * as AU from '@thorchain/asgardex-util'
+} from '@xchainjs/xchain-util'
+import * as AU from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 

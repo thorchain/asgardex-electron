@@ -3,7 +3,7 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { FeeOptions } from '@thorchain/asgardex-bitcoin/lib/types/client-types'
-import { assetAmount, AssetBTC, AssetRune67C, assetToBase, formatBaseAmount } from '@thorchain/asgardex-util'
+import { assetAmount, AssetBTC, AssetRune67C, assetToBase, formatBaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'

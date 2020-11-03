@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { baseAmount, AssetBTC } from '@thorchain/asgardex-util'
+import { baseAmount, AssetBTC } from '@xchainjs/xchain-util'
 
 import { BASE_CHAIN_ASSET } from '../../../const'
 import { Fees } from './'

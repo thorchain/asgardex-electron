@@ -2939,11 +2939,6 @@
   dependencies:
     polished "^3.6.3"
 
-"@thorchain/asgardex-util@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.6.1.tgz#f5322266f42fe1aba0766bbfbb61c28a241c37d7"
-  integrity sha512-CiDGosn9gz1hgT9ijsMumFVfnR3ychKhn7XPBhIsTGG8VdCu2dFDkkUkbHAx8rZNn2jTCPJaZTvT04YJ3anBjw==
-
 "@types/anymatch@*":
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/@types/anymatch/-/anymatch-1.3.1.tgz#336badc1beecb9dacc38bea2cf32adf627a8421a"
@@ -3800,6 +3795,11 @@
     strip-ansi "^4.0.0"
     text-table "^0.2.0"
     webpack-log "^1.1.2"
+
+"@xchainjs/xchain-util@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.1.0.tgz#b7464f089f21bcc96f50ddb4a80dff850667b6a4"
+  integrity sha512-vyCJvXda/7kHQqTMrleSWeiXfdhcWMbTlt3Ika1C50KHDvhD+eIVvf7kbNig3rmX1g4DJnOoOxRGFfp5AVMjxA==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"

@@ -12,7 +12,7 @@ import {
   AssetBNB,
   BNBChain,
   Chain
-} from '@thorchain/asgardex-util'
+} from '@xchainjs/xchain-util'
 
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
 

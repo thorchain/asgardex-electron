@@ -1,4 +1,4 @@
-import { assetAmount } from '@thorchain/asgardex-util'
+import { assetAmount } from '@xchainjs/xchain-util'
 
 import { TransferFees } from '../../renderer/services/binance/types'
 

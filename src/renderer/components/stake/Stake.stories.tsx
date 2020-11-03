@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { AssetBNB } from '@thorchain/asgardex-util'
+import { AssetBNB } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { getDefaultRuneAsset } from '../../helpers/assetHelper'
