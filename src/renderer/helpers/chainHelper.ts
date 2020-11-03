@@ -1,4 +1,4 @@
-import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRuneNative, Chain } from '@thorchain/asgardex-util'
+import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRuneNative, Chain } from '@xchainjs/xchain-util'
 
 import { BASE_CHAIN } from '../const'
 import { eqAsset, eqChain } from './fp/eq'

@@ -11,7 +11,7 @@ import {
   PoolData,
   bn,
   BaseAmount
-} from '@thorchain/asgardex-util'
+} from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as O from 'fp-ts/lib/Option'

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn } from '@thorchain/asgardex-util'
+import { bn } from '@xchainjs/xchain-util'
 import { Form, Row } from 'antd'
 import { Rule } from 'antd/lib/form'
 import BigNumber from 'bignumber.js'

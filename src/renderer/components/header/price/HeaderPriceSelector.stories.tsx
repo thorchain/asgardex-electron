@@ -2,7 +2,7 @@ import React from 'react'
 
 import { boolean } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import { AssetBTC, AssetETH, AssetRune67C } from '@thorchain/asgardex-util'
+import { AssetBTC, AssetETH, AssetRune67C } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { AssetBUSDBAF } from '../../../const'

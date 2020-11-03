@@ -1,4 +1,4 @@
-import { currencySymbolByAsset } from '@thorchain/asgardex-util'
+import { currencySymbolByAsset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 

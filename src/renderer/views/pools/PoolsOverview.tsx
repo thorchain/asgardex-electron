@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
 
 import { SyncOutlined, SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { assetToString, baseToAsset, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { assetToString, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as O from 'fp-ts/lib/Option'

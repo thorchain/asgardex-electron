@@ -1,4 +1,4 @@
-import { BaseAmount, Asset, formatAssetAmountCurrency, baseToAsset } from '@thorchain/asgardex-util'
+import { BaseAmount, Asset, formatAssetAmountCurrency, baseToAsset } from '@xchainjs/xchain-util'
 
 export const formatFee = ({ amount, asset }: { amount: BaseAmount; asset: Asset }) =>
   formatAssetAmountCurrency({

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn, assetAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { bn, assetAmount, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 
 import { PoolStatus } from './PoolStatus'
 

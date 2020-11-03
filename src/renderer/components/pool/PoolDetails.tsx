@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { AssetAmount, formatAssetAmount } from '@thorchain/asgardex-util'
+import { AssetAmount, formatAssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 

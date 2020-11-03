@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState, useRef, useEffect, forwardRef } from 'react'
 
-import { delay, bn, fixedBN, trimZeros } from '@thorchain/asgardex-util'
+import { delay, bn, fixedBN, trimZeros } from '@xchainjs/xchain-util'
 import { Input } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'

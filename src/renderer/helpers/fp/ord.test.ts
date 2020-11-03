@@ -1,4 +1,4 @@
-import { bn, baseAmount, AssetRuneB1A, AssetBTC } from '@thorchain/asgardex-util'
+import { bn, baseAmount, AssetRuneB1A, AssetBTC } from '@xchainjs/xchain-util'
 
 import { ordBigNumber, ordBaseAmount, ordAsset } from './ord'
 

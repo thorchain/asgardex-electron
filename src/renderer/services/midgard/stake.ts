@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetToString } from '@thorchain/asgardex-util'
+import { Asset, assetToString } from '@xchainjs/xchain-util'
 import * as F from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'

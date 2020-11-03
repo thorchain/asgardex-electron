@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRune67C, bn } from '@thorchain/asgardex-util'
+import { Asset, AssetRune67C, bn } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import { useObservableState, useSubscription } from 'observable-hooks'

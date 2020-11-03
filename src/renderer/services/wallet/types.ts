@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { BaseAmount, Asset, Chain } from '@thorchain/asgardex-util'
+import { BaseAmount, Asset, Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'

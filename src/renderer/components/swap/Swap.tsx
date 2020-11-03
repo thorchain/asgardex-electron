@@ -13,7 +13,7 @@ import {
   PoolData,
   baseToAsset,
   getSwapMemo
-} from '@thorchain/asgardex-util'
+} from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import { eqString } from 'fp-ts/Eq'
 import * as A from 'fp-ts/lib/Array'

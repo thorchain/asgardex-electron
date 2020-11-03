@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 
-import { Asset, BaseAmount, baseAmount } from '@thorchain/asgardex-util'
+import { Asset, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
 
 import { TxStatus } from '../../../types/asgardex'

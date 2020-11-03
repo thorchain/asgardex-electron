@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn } from '@thorchain/asgardex-util'
+import { bn } from '@xchainjs/xchain-util'
 
 import { AssetInput } from './AssetInput'
 

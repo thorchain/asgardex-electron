@@ -11,7 +11,7 @@ import {
   baseToAsset,
   bn,
   formatAssetAmountCurrency
-} from '@thorchain/asgardex-util'
+} from '@xchainjs/xchain-util'
 import { Row, Form, Col } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import BigNumber from 'bignumber.js'

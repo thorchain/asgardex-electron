@@ -1,4 +1,4 @@
-import { baseAmount, bn } from '@thorchain/asgardex-util'
+import { baseAmount, bn } from '@xchainjs/xchain-util'
 
 import { getWithdrawAmounts } from './Withdraw.helper'
 

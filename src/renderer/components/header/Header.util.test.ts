@@ -1,4 +1,4 @@
-import { AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@thorchain/asgardex-util'
+import { AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../../const'

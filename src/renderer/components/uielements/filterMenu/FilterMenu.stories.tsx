@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { assetAmount, assetToBase } from '@thorchain/asgardex-util'
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'

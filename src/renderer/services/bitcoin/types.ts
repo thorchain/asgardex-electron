@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
 import { FeeOptions } from '@thorchain/asgardex-bitcoin/lib/types/client-types'
-import { BaseAmount } from '@thorchain/asgardex-util'
+import { BaseAmount } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'

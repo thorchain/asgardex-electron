@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-import { assetFromString } from '@thorchain/asgardex-util'
+import { assetFromString } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router-dom'

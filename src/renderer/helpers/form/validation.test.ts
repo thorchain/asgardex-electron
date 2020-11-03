@@ -1,4 +1,4 @@
-import { bn } from '@thorchain/asgardex-util'
+import { bn } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 

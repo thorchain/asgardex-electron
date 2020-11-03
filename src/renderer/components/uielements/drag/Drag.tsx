@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
-import { Asset } from '@thorchain/asgardex-util'
+import { Asset } from '@xchainjs/xchain-util'
 import Draggable, { ControlPosition, DraggableBounds, DraggableEvent, DraggableEventHandler } from 'react-draggable'
 
 import { AssetIcon } from '../assets/assetIcon'

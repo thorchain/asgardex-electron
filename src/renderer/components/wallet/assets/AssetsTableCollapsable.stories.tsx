@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, assetToString, baseAmount } from '@thorchain/asgardex-util'
+import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { getRunePricePool } from '../../../helpers/poolHelper'

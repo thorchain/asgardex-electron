@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetBNB, Chain } from '@thorchain/asgardex-util'
+import { AssetBNB, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'

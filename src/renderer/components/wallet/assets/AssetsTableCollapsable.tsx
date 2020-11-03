@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, baseToAsset, chainToString, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { Asset, baseToAsset, chainToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
 import { ColumnType } from 'antd/lib/table'

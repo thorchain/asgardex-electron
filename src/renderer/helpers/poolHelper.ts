@@ -1,4 +1,4 @@
-import { bnOrZero, PoolData, assetFromString, Asset, Chain } from '@thorchain/asgardex-util'
+import { bnOrZero, PoolData, assetFromString, Asset, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'

@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 
-import { Asset, assetToString } from '@thorchain/asgardex-util'
+import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { useHistory } from 'react-router-dom'
 
 import * as walletRoutes from '../../../../routes/wallet'

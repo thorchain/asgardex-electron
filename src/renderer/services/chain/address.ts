@@ -1,4 +1,4 @@
-import { Chain } from '@thorchain/asgardex-util'
+import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'

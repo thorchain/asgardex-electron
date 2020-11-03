@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { Asset, formatAssetAmountCurrency, baseToAsset } from '@thorchain/asgardex-util'
+import { Asset, formatAssetAmountCurrency, baseToAsset } from '@xchainjs/xchain-util'
 import { Menu, Dropdown, Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 

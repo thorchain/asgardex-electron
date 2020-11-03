@@ -1,7 +1,7 @@
 import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { baseAmount, baseToAsset, bn, bnOrZero } from '@thorchain/asgardex-util'
+import { baseAmount, baseToAsset, bn, bnOrZero } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'

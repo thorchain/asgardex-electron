@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
-import { AssetBTC, baseAmount } from '@thorchain/asgardex-util'
+import { AssetBTC, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'

@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { BaseAmount } from '@thorchain/asgardex-util'
+import { BaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 

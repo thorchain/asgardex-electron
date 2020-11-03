@@ -1,4 +1,4 @@
-import { Asset, assetToString, baseAmount } from '@thorchain/asgardex-util'
+import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import { pipe, identity } from 'fp-ts/lib/function'
