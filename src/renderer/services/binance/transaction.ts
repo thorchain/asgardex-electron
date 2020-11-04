@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@thorchain/asgardex-binance'
 import { WS } from '@thorchain/asgardex-binance'
-import { AssetAmount, Asset } from '@xchainjs/xchain-util'
+import { AssetAmount, Asset, assetToBase } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
@@ -28,26 +28,37 @@ const tx$ = ({
   clientState$,
   to,
   amount,
-  asset: { symbol },
+  asset,
   memo
 }: { clientState$: BinanceClientState$ } & SendTxParams): Rx.Observable<TxRD> =>
   clientState$.pipe(
     map(getClient),
     switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY)),
-    switchMap((client) =>
-      memo
-        ? Rx.from(client.vaultTx({ addressTo: to, amount: amount.amount().toString(), asset: symbol, memo }))
-        : Rx.from(client.normalTx({ addressTo: to, amount: amount.amount().toString(), asset: symbol }))
+    switchMap(
+      (client) =>
+        Rx.from(
+          client.transfer({
+            asset,
+            amount: assetToBase(amount),
+            recipient: to,
+            memo
+          })
+        )
+
+      // memo
+      //   ? Rx.from(client.vaultTx({ addressTo: to, amount: amount.amount().toString(), asset: symbol, memo }))
+      //   : Rx.from(client.normalTx({ addressTo: to, amount: amount.amount().toString(), asset: symbol }))
     ),
-    map(({ result }) => O.fromNullable(result)),
-    map((transfers) =>
-      RD.fromOption(transfers, () => ({ errorId: ErrorId.SEND_TX, msg: 'Transaction: empty response' } as ApiError))
-    ),
-    liveData.map(A.head),
-    liveData.chain(
-      liveData.fromOption(() => ({ errorId: ErrorId.SEND_TX, msg: 'Transaction: no results received' } as ApiError))
-    ),
-    liveData.map(({ hash }) => hash),
+    map(RD.success),
+    // map(({ result }) => O.fromNullable(result)),
+    // map((transfers) =>
+    //   RD.fromOption(transfers, () => ({ errorId: ErrorId.SEND_TX, msg: 'Transaction: empty response' } as ApiError))
+    // ),
+    // liveData.map(A.head),
+    // liveData.chain(
+    //   liveData.fromOption(() => ({ errorId: ErrorId.SEND_TX, msg: 'Transaction: no results received' } as ApiError))
+    // ),
+    // liveData.map(({ hash }) => hash),
     startWith(RD.pending)
   )
 

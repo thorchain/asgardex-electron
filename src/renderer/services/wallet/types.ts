@@ -6,6 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
+import { TxType } from '@xchainjs/xchain-client'
 
 export type Phrase = string
 
@@ -56,7 +57,7 @@ export type AssetsWithBalanceState = {
   loading: boolean
 }
 
-export type AssetTxType = 'transfer' | 'freeze' | 'unfreeze' | 'unkown'
+export type AssetTxType = TxType
 
 export type AssetTxFrom = {
   from: string // address or tx id

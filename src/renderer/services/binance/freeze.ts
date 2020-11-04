@@ -9,6 +9,7 @@ import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { getClient } from '../utils'
 import { BinanceClientState$, FreezeRD, FreezeTxParams } from './types'
+import { assetToBase } from '@xchainjs/xchain-util'
 
 const { get$: txRD$, set: setTxRD } = observableState<FreezeRD>(RD.initial)
 
@@ -24,18 +25,26 @@ const tx$ = ({
     switchMap((client) => {
       // freeze
       if (action === 'freeze') {
-        return Rx.from(client.freeze({ amount: amount.amount().toString(), asset: asset.symbol }))
+        return Rx.from(client.freeze({ amount: assetToBase(amount), asset: asset }))
       }
       // unfreeze
       if (action === 'unfreeze') {
-        return Rx.from(client.unfreeze({ amount: amount.amount().toString(), asset: asset.symbol }))
+        return Rx.from(client.unfreeze({ amount: assetToBase(amount), asset: asset }))
       }
       return Rx.EMPTY
     }),
-    map(({ result }) => O.fromNullable(result)),
-    map((transfers) => RD.fromOption(transfers, () => Error('Transaction: empty response'))),
-    liveData.map(A.head),
-    liveData.chain(liveData.fromOption(() => Error('Transaction: no results received'))),
+    // map(s => s),
+    // map(({ result }) => O.fromNullable(result)),
+    // map((transfers) => RD.fromOption(transfers, () => Error('Transaction: empty response'))),
+    // liveData.map(A.head),
+    // liveData.chain(liveData.fromOption(() => Error('Transaction: no results received'))),
+    map(RD.success),
+    liveData.map(txHash => ({
+      code: 200,
+      hash: txHash,
+      log: 'ok',
+      ok: true,
+    })),
     catchError((error) => {
       return Rx.of(RD.failure(error))
     }),

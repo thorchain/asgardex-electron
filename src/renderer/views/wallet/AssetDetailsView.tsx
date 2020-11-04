@@ -18,8 +18,8 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     assetsWBState$,
     loadAssetTxsHandler$,
     reloadBalances$,
-    explorerTxUrl$,
-    setSelectedAsset
+    setSelectedAsset,
+    getExplorerTxUrl$
   } = useWalletContext()
 
   const { asset } = useParams<AssetDetailsParams>()
@@ -36,7 +36,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const [reloadBalances] = useObservableState(() => reloadBalances$.pipe(RxOp.map(O.toUndefined)))
   const [loadAssetTxsHandler] = useObservableState(() => loadAssetTxsHandler$.pipe(RxOp.map(O.toUndefined)))
 
-  const explorerTxUrl = useObservableState(explorerTxUrl$, O.none)
+  const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
   return (
     <>
@@ -46,7 +46,8 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         asset={oSelectedAsset}
         loadAssetTxsHandler={loadAssetTxsHandler}
         reloadBalancesHandler={reloadBalances}
-        explorerTxUrl={explorerTxUrl}
+        // explorerTxUrl={explorerTxUrl}
+        getExplorerTxUrl={getExplorerTxUrl}
       />
     </>
   )

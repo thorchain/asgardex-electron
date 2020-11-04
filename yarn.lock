@@ -2905,6 +2905,18 @@
     bitcoinjs-lib "^5.2.0"
     wif "^2.0.6"
 
+"@thorchain/asgardex-crypto@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-crypto/-/asgardex-crypto-0.1.0.tgz#6cfe05611840bf9adae85c20cf873c8a23289da2"
+  integrity sha512-cT2z6fKc8zwM5ShKsLb4qWbEx7+Yc+uAZiTWUvOYU1W03wHgt8A79d02v7f/NtNX/ZFTbyDRtkbrR7IgWMqpoQ==
+  dependencies:
+    bech32 "^1.1.4"
+    bip39 "^3.0.2"
+    crypto-js "^4.0.0"
+    foundry-primitives "^0.2.1"
+    hdkey "^2.0.1"
+    uuid "^8.1.0"
+
 "@thorchain/asgardex-ethereum@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@thorchain/asgardex-ethereum/-/asgardex-ethereum-0.2.0.tgz#11de1986eaace3d36cdfbae80bde908071e271e8"
@@ -2927,6 +2939,11 @@
   integrity sha512-5buWOPq9ztJdkskrSC6zHVa7fPA/dPPo5H9nYMs1u4g57o2N8YUczZYZmxld6F7junV5ng9ZbtBjQzEAYLG2WQ==
   dependencies:
     polished "^3.6.3"
+
+"@thorchain/asgardex-util@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.5.0.tgz#afe63cb6a37caaacdfd7dc97bb95893ddf59aca9"
+  integrity sha512-FZqUdgcl46kKraLHEk8qpNAzFCetudTShnfk3DbT1EREYTBKiaM1HZRYDO3gWrBPjuq6bazqfdrP2Ol5uY1ApQ==
 
 "@types/anymatch@*":
   version "1.3.1"
@@ -3784,6 +3801,21 @@
     strip-ansi "^4.0.0"
     text-table "^0.2.0"
     webpack-log "^1.1.2"
+
+"@xchainjs/xchain-binance@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-3.0.1.tgz#d8b817088a5db064823593a528d604feca60bae2"
+  integrity sha512-Ms7kzskSsY1GMgHbLp1q8Kf7driPsKz2BMUzEcvrodpMCAy6OQPBHCAA/K81mkFXX/o4NZ/arMBixtcozF1eMg==
+  dependencies:
+    "@thorchain/asgardex-crypto" "^0.1.0"
+    "@xchainjs/xchain-client" "^0.0.5"
+
+"@xchainjs/xchain-client@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.0.5.tgz#5c3195ca84deee7be87d1aa3c68d06edc1494930"
+  integrity sha512-lp8UtvXBpW6mYFw8heL6cFA4EAvEit6KywiZgC+hYWPvQ5Runcer82iufBeVHG7cd9D2Ui75+6BLd/AVgUzm+Q==
+  dependencies:
+    "@thorchain/asgardex-util" "^0.5.0"
 
 "@xchainjs/xchain-crypto@^0.1.0":
   version "0.1.0"
