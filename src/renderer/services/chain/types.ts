@@ -16,8 +16,8 @@ export type AddressRx = Rx.Observable<O.Option<Address>>
 export type Memo = string
 export type MemoRx = Rx.Observable<O.Option<Memo>>
 
-export type AsymDepositMemo = { rune: Memo; asset: Memo }
-export type AsymDepositMemoRx = Rx.Observable<O.Option<AsymDepositMemo>>
+export type SymDepositMemo = { rune: Memo; asset: Memo }
+export type SymDepositMemoRx = Rx.Observable<O.Option<SymDepositMemo>>
 
 /**
  * Stake fees

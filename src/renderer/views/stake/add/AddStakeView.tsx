@@ -20,7 +20,7 @@ import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as stakeRoutes from '../../../routes/stake'
-import { AsymDepositMemo, Memo } from '../../../services/chain/types'
+import { SymDepositMemo, Memo } from '../../../services/chain/types'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
@@ -126,7 +126,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
         )
   }, [asset, assetBalance, assetsWB, isCrossChain])
 
-  const symDepositTxMemo: O.Option<AsymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
+  const symDepositTxMemo: O.Option<SymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
 
   const asymDepositTxMemo: O.Option<Memo> = useObservableState(asymDepositTxMemo$, O.none)
 

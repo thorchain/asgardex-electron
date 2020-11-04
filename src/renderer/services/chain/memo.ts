@@ -7,12 +7,12 @@ import * as RxOp from 'rxjs/operators'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { selectedPoolAsset$ } from '../midgard/common'
 import { runeAddress$, assetAddress$ } from './address'
-import { AsymDepositMemoRx, MemoRx } from './types'
+import { SymDepositMemoRx, MemoRx } from './types'
 
 /**
  * Memo of symmetrical deposit txs
  */
-const symDepositTxMemo$: AsymDepositMemoRx = Rx.combineLatest([selectedPoolAsset$, runeAddress$, assetAddress$]).pipe(
+const symDepositTxMemo$: SymDepositMemoRx = Rx.combineLatest([selectedPoolAsset$, runeAddress$, assetAddress$]).pipe(
   RxOp.map(([oPoolAsset, oRuneAddress, oAssetAddress]) =>
     FP.pipe(
       sequenceTOption(oPoolAsset, oRuneAddress, oAssetAddress),
@@ -30,14 +30,7 @@ const symDepositAssetTxMemo$: MemoRx = symDepositTxMemo$.pipe(RxOp.map(FP.flow(O
 /**
  * Memo of asymmetrical deposit txs
  */
-const asymDepositTxMemo$: MemoRx = selectedPoolAsset$.pipe(
-  RxOp.map((oPoolAsset) =>
-    FP.pipe(
-      oPoolAsset,
-      O.map((poolAsset) => getDepositMemo(poolAsset))
-    )
-  )
-)
+const asymDepositTxMemo$: MemoRx = selectedPoolAsset$.pipe(RxOp.map(O.map(getDepositMemo)))
 
 /**
  * Unstake memo for txs

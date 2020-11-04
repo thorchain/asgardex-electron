@@ -254,7 +254,7 @@ const createPoolsService = (
       FP.flow(
         RD.toOption,
         O.chain(A.head),
-        O.chain(({ address }) => O.fromNullable(address))
+        O.mapNullable((head) => head.address)
       )
     )
   )

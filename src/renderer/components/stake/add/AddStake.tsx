@@ -19,7 +19,7 @@ import { useIntl } from 'react-intl'
 
 import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { AsymDepositMemo, Memo, SendStakeTxParams, StakeFeesRD } from '../../../services/chain/types'
+import { SymDepositMemo, Memo, SendStakeTxParams, StakeFeesRD } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { StakeType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
@@ -39,7 +39,7 @@ type Props = {
   poolAddress: O.Option<PoolAddress>
   isCrossChain?: boolean
   asymDepositMemo: O.Option<Memo>
-  symDepositMemo: O.Option<AsymDepositMemo>
+  symDepositMemo: O.Option<SymDepositMemo>
   priceAsset?: Asset
   fees: StakeFeesRD
   reloadFees: (type: StakeType) => void

@@ -51,7 +51,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
    */
   const memoFees$ = (memo: Memo): FeesLD =>
     Rx.combineLatest([oClient$, reloadFees$]).pipe(
-      mergeMap(([oClient]) =>
+      switchMap(([oClient]) =>
         FP.pipe(
           oClient,
           O.fold(

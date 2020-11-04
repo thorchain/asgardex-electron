@@ -94,7 +94,7 @@ const stakeFeeByChain$ = (chain: Chain, type: StakeType): FeeLD => {
   }
 }
 
-// TODO (@Veado) Store results of deposit txs into a state, so views will have access to it.
+// TODO (@Veado) Store results of deposit fees into a state, so views will have access to it.
 // Needed to display success / error states of each transaction
 const stakeFees$ = (type: StakeType): StakeFeesLD =>
   selectedPoolAsset$.pipe(
