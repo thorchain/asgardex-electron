@@ -1,4 +1,4 @@
-import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, baseAmount } from '@thorchain/asgardex-util'
+import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, baseAmount } from '@xchainjs/xchain-util'
 import { some, none } from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'

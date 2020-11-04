@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetAmount, BaseAmount, formatAssetAmountCurrency } from '@thorchain/asgardex-util'
+import { Asset, assetAmount, BaseAmount, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'

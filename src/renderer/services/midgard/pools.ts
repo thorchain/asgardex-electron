@@ -1,12 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import {
-  Asset,
-  assetFromString,
-  assetToString,
-  bn,
-  currencySymbolByAsset,
-  isValidAsset
-} from '@thorchain/asgardex-util'
+import { Asset, assetFromString, assetToString, bn, currencySymbolByAsset, isValidAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'

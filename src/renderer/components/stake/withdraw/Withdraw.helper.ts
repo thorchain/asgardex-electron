@@ -1,4 +1,4 @@
-import { AssetAmount, BaseAmount, baseAmount, baseToAsset, bn } from '@thorchain/asgardex-util'
+import { AssetAmount, BaseAmount, baseAmount, baseToAsset, bn } from '@xchainjs/xchain-util'
 
 export const getWithdrawAmounts = (
   runeShare: BaseAmount,

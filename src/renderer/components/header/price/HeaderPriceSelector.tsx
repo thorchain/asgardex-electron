@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 
-import { assetFromString, assetToString } from '@thorchain/asgardex-util'
+import { assetFromString, assetToString } from '@xchainjs/xchain-util'
 import { Row, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import * as FP from 'fp-ts/lib/function'

@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { baseToAsset, formatAssetAmount } from '@thorchain/asgardex-util'
+import { baseToAsset, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/lib/function'

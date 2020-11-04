@@ -1,11 +1,4 @@
-import {
-  Asset,
-  baseAmount,
-  BaseAmount,
-  baseToAsset,
-  formatAssetAmountCurrency,
-  PoolData
-} from '@thorchain/asgardex-util'
+import { Asset, baseAmount, BaseAmount, baseToAsset, formatAssetAmountCurrency, PoolData } from '@xchainjs/xchain-util'
 
 import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 

@@ -1,4 +1,4 @@
-import { assetAmount, bn } from '@thorchain/asgardex-util'
+import { assetAmount, bn } from '@xchainjs/xchain-util'
 
 import { TxAmountValidatorProps, validateTxAmountInput } from './TxForm.util'
 

@@ -1,5 +1,5 @@
 import { Tx, Txs, VOut, VIn } from '@thorchain/asgardex-bitcoin'
-import { AssetBTC, baseAmount } from '@thorchain/asgardex-util'
+import { AssetBTC, baseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { AssetTx, AssetTxFrom, AssetTxsPage, AssetTxTo } from '../wallet/types'

@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { AssetRune67C } from '@thorchain/asgardex-util'
+import { AssetRune67C } from '@xchainjs/xchain-util'
 import { none } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'

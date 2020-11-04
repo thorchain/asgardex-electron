@@ -1,5 +1,5 @@
 import { Fees, Fee, DexFees, TransferFee } from '@thorchain/asgardex-binance'
-import { assetAmount } from '@thorchain/asgardex-util'
+import { assetAmount } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 

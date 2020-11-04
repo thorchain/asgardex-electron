@@ -1,4 +1,4 @@
-import { BaseAmount, AssetAmount } from '@thorchain/asgardex-util'
+import { BaseAmount, AssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
 export type CalcResult = {

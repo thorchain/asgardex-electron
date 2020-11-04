@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { bn, formatBN, Asset } from '@thorchain/asgardex-util'
+import { bn, formatBN, Asset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
 import { Label } from '../../label'

@@ -1,4 +1,4 @@
-import { Asset, assetToString, BaseAmount } from '@thorchain/asgardex-util'
+import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as Ord from 'fp-ts/lib/Ord'
 

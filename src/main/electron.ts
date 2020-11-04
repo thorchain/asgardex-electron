@@ -1,6 +1,6 @@
 import { join } from 'path'
 
-import { Keystore } from '@thorchain/asgardex-crypto'
+import { Keystore } from '@xchainjs/xchain-crypto'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'

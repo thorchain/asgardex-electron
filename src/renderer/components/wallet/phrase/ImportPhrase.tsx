@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
-import * as crypto from '@thorchain/asgardex-crypto'
+import * as crypto from '@xchainjs/xchain-crypto'
 import { Form, Spin } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'

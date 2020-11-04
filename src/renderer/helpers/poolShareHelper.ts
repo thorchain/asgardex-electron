@@ -1,4 +1,4 @@
-import { baseAmount, BaseAmount, bn, bnOrZero } from '@thorchain/asgardex-util'
+import { baseAmount, BaseAmount, bn, bnOrZero } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
 import { ZERO_BN } from '../const'

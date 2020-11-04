@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as EthereumClient, Network as EthereumNetwork, Address } from '@thorchain/asgardex-ethereum'
-import { AssetETH, baseAmount } from '@thorchain/asgardex-util'
+import { AssetETH, baseAmount } from '@xchainjs/xchain-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'

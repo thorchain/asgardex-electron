@@ -9,7 +9,7 @@ import {
   baseToAsset,
   formatAssetAmountCurrency,
   baseAmount
-} from '@thorchain/asgardex-util'
+} from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'

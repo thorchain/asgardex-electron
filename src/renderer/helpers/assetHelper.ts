@@ -7,7 +7,7 @@ import {
   AssetRuneB1A,
   AssetRuneNative,
   Chain
-} from '@thorchain/asgardex-util'
+} from '@xchainjs/xchain-util'
 
 import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
 import { Network } from '../services/app/types'

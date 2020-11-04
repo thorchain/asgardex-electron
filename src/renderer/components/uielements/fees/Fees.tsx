@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { BaseAmount, Asset } from '@thorchain/asgardex-util'
+import { BaseAmount, Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import { useIntl } from 'react-intl'

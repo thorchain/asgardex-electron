@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetToString } from '@thorchain/asgardex-util'
+import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 

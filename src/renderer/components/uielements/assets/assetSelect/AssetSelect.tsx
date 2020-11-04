@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 
-import { delay, Asset, assetToString } from '@thorchain/asgardex-util'
+import { delay, Asset, assetToString } from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
 import { useIntl } from 'react-intl'
 

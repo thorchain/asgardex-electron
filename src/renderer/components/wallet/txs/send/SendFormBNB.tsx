@@ -1,14 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import { Address } from '@thorchain/asgardex-binance'
-import {
-  formatAssetAmountCurrency,
-  assetAmount,
-  AssetAmount,
-  bn,
-  baseToAsset,
-  AssetBNB
-} from '@thorchain/asgardex-util'
+import { formatAssetAmountCurrency, assetAmount, AssetAmount, bn, baseToAsset, AssetBNB } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'

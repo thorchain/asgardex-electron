@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { WS, Client, Network as BinanceNetwork, BinanceClient, Address } from '@thorchain/asgardex-binance'
-import { Asset, assetToBase, BNBChain } from '@thorchain/asgardex-util'
+import { Asset, assetToBase, BNBChain } from '@xchainjs/xchain-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'

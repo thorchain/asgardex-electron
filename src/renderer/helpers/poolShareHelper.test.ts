@@ -1,4 +1,4 @@
-import { baseAmount, bn } from '@thorchain/asgardex-util'
+import { baseAmount, bn } from '@xchainjs/xchain-util'
 
 import { ZERO_BN } from '../const'
 import { eqBaseAmount } from './fp/eq'

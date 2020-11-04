@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { Asset, AssetBNB, AssetRune67C, baseAmount, bn } from '@thorchain/asgardex-util'
+import { Asset, AssetBNB, AssetRune67C, baseAmount, bn } from '@xchainjs/xchain-util'
 
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { Withdraw } from './Withdraw'

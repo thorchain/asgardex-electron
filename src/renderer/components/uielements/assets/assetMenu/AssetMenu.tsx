@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 
-import { Asset, assetToString, baseAmount } from '@thorchain/asgardex-util'
+import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
 
 import { eqAsset } from '../../../../helpers/fp/eq'
 import { PriceDataIndex } from '../../../../services/midgard/types'

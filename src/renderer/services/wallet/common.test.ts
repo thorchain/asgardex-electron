@@ -8,7 +8,7 @@ jest.mock('electron', () => ({ ipcRenderer: { send: jest.fn() } }))
 const mockEncrypt = { encrypt: 'info' }
 const mockDecrypt = { phrase: 'phrases' }
 
-jest.mock('@thorchain/asgardex-crypto', () => ({
+jest.mock('@xchainjs/xchain-crypto', () => ({
   encryptToKeyStore: () => mockEncrypt,
   decryptFromKeystore: () => Promise.resolve(mockDecrypt.phrase)
 }))

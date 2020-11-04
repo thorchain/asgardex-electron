@@ -10,7 +10,7 @@ import {
   baseToAsset,
   formatAssetAmountCurrency,
   PoolData
-} from '@thorchain/asgardex-util'
+} from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'

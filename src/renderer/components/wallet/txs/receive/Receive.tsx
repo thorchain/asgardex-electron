@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react'
 
 import { Address } from '@thorchain/asgardex-binance'
-import { delay, Asset } from '@thorchain/asgardex-util'
+import { delay, Asset } from '@xchainjs/xchain-util'
 import { Grid, Row, Col, Spin } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'

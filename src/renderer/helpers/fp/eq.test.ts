@@ -1,4 +1,4 @@
-import { baseAmount, bn, Chain } from '@thorchain/asgardex-util'
+import { baseAmount, bn, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
