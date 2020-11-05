@@ -29,7 +29,8 @@ import {
   PoolsStateLD,
   SelectedPricePoolAsset,
   ThorchainEndpointsLD,
-  PoolAssetsLD
+  PoolAssetsLD,
+  PoolAddressRx
 } from './types'
 import { getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
 
@@ -248,6 +249,16 @@ const createPoolsService = (
     RxOp.retry(MIDGARD_MAX_RETRY)
   )
 
+  const poolAddress$: PoolAddressRx = poolAddresses$.pipe(
+    RxOp.map(
+      FP.flow(
+        RD.toOption,
+        O.chain(A.head),
+        O.mapNullable((head) => head.address)
+      )
+    )
+  )
+
   /**
    * Use this to convert asset's price to selected price asset by multiplying to the priceRation inner value
    */
@@ -280,6 +291,7 @@ const createPoolsService = (
     selectedPricePoolAssetSymbol$,
     reloadPools,
     poolAddresses$,
+    poolAddress$,
     runeAsset$,
     poolDetail$,
     reloadPoolDetail,

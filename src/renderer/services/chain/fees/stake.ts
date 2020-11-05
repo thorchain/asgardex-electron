@@ -9,16 +9,43 @@ import { BASE_CHAIN } from '../../../const'
 import { isBaseChain } from '../../../helpers/chainHelper'
 import { sequenceTRDFromArray } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
-import { triggerStream } from '../../../helpers/stateHelper'
+import { observableState } from '../../../helpers/stateHelper'
+import { StakeType } from '../../../types/asgardex'
 import * as BNB from '../../binance/service'
 import * as BTC from '../../bitcoin/context'
-import { selectedPoolChain$ } from '../../midgard/common'
-import { crossChainStakeMemo$ } from '../memo'
-import { FeeLD, StakeFeesLD } from '../types'
+import { selectedPoolAsset$, selectedPoolChain$ } from '../../midgard/common'
+import { symDepositAssetTxMemo$, asymDepositTxMemo$ } from '../memo'
+import { FeeLD, LoadFeesHandler, StakeFeesLD } from '../types'
 import { reloadStakeFeesByChain } from './fees.helper'
 
-// `TriggerStream` to reload stake fees
-const { stream$: reloadStakeFees$, trigger: reloadStakeFees } = triggerStream()
+export const reloadFees = () => {
+  BNB.reloadFees()
+  BTC.reloadFees()
+}
+
+const reloadFeesByChain = (chain: Chain) => {
+  switch (chain) {
+    case 'BNB':
+      return BNB.reloadFees
+    case 'BTC':
+      return BTC.reloadFees
+    case 'ETH':
+      // reload ETH balances - not available yet
+      return () => {}
+    case 'THOR':
+      // reload THOR fees - not available yet
+      return () => {}
+    default:
+      return () => {}
+  }
+}
+
+export const reloadFees$: Rx.Observable<O.Option<LoadFeesHandler>> = selectedPoolChain$.pipe(
+  RxOp.map(O.map(reloadFeesByChain))
+)
+
+// State to reload stake fees
+const { get$: reloadStakeFees$, set: reloadStakeFees } = observableState<StakeType>('asym')
 
 /**
  * reload fees
@@ -42,20 +69,20 @@ const updateStakeFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadStake
   )
 )
 
-const stakeFeeByChain$ = (chain: Chain): FeeLD => {
+const stakeFeeByChain$ = (chain: Chain, type: StakeType): FeeLD => {
   switch (chain) {
     case 'BNB':
       return BNB.stakeFee$
     case 'BTC':
-      // stake fees of BTC based on memo
-      return FP.pipe(
-        crossChainStakeMemo$,
+      // deposit fee for BTC txs based on a memo,
+      // which depends on deposit type
+      return Rx.iif(() => type === 'asym', asymDepositTxMemo$, symDepositAssetTxMemo$).pipe(
         RxOp.switchMap((oMemo) =>
           FP.pipe(
             oMemo,
             O.fold(
               () => Rx.of(RD.initial),
-              (memo) => BTC.stakeFee$(memo)
+              (memo) => BTC.poolFee$(memo)
             )
           )
         )
@@ -67,28 +94,32 @@ const stakeFeeByChain$ = (chain: Chain): FeeLD => {
   }
 }
 
-const stakeFees$: StakeFeesLD = selectedPoolChain$.pipe(
-  RxOp.switchMap((oPoolChain) =>
-    FP.pipe(
-      oPoolChain,
-      O.map((chain) =>
-        FP.pipe(
-          Rx.combineLatest(
-            isBaseChain(chain)
-              ? // for deposits on base chain, fee for base chain is needed only
-                [stakeFeeByChain$(BASE_CHAIN)]
-              : // for x-chain deposits, we do need to load fees for base- AND x-chain,
-                [stakeFeeByChain$(BASE_CHAIN), stakeFeeByChain$(chain)]
-          ),
-          RxOp.map(sequenceTRDFromArray),
-          liveData.map(([base, cross]) => ({
-            base,
-            cross: O.fromNullable(cross)
-          }))
-        )
-      ),
-      O.getOrElse((): StakeFeesLD => Rx.of(RD.initial))
+// TODO (@Veado) Store results of deposit fees into a state, so views will have access to it.
+// Needed to display success / error states of each transaction
+const stakeFees$ = (type: StakeType): StakeFeesLD =>
+  selectedPoolAsset$.pipe(
+    RxOp.switchMap((oPoolAsset) =>
+      FP.pipe(
+        oPoolAsset,
+        O.map((poolAsset) =>
+          FP.pipe(
+            Rx.combineLatest(
+              type === 'asym'
+                ? // for asym deposits, one tx needed only == one fe)
+                  [stakeFeeByChain$(BASE_CHAIN, type)]
+                : // for sym deposits, two txs needed == 2 fees,
+                  [stakeFeeByChain$(BASE_CHAIN, type), stakeFeeByChain$(poolAsset.chain, type)]
+            ),
+            RxOp.map(sequenceTRDFromArray),
+            liveData.map(([base, cross]) => ({
+              base,
+              cross: O.fromNullable(cross)
+            }))
+          )
+        ),
+        O.getOrElse((): StakeFeesLD => Rx.of(RD.initial))
+      )
     )
   )
-)
-export { stakeFees$, reloadStakeFees, updateStakeFeesEffect$ }
+
+export { stakeFees$, reloadStakeFees, stakeFeeByChain$, updateStakeFeesEffect$ }

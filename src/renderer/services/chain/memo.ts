@@ -4,48 +4,33 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { isBaseChain, isBaseChainAsset } from '../../helpers/chainHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { selectedPoolAsset$ } from '../midgard/common'
-import { baseAddress$, crossAddress$ } from './address'
-import { MemoRx } from './types'
+import { runeAddress$, assetAddress$ } from './address'
+import { SymDepositMemoRx, MemoRx } from './types'
 
 /**
- * Stake memo for txs sent on base-chain
+ * Memo of symmetrical deposit txs
  */
-const baseChainStakeMemo$: MemoRx = Rx.combineLatest([selectedPoolAsset$, crossAddress$]).pipe(
-  RxOp.map(([oPoolAsset, oCrossAddress]) =>
+const symDepositTxMemo$: SymDepositMemoRx = Rx.combineLatest([selectedPoolAsset$, runeAddress$, assetAddress$]).pipe(
+  RxOp.map(([oPoolAsset, oRuneAddress, oAssetAddress]) =>
     FP.pipe(
-      oPoolAsset,
-      // Deposit for base-chain asset?
-      O.filter(isBaseChainAsset),
-      // for base-chain deposits no need to add an address
-      O.map(getDepositMemo),
-      // for x-chain deposits, a wallet address for x-chain is needed
-      O.alt(() =>
-        FP.pipe(
-          sequenceTOption(oPoolAsset, oCrossAddress),
-          O.map(([poolAsset, crossAddress]) => getDepositMemo(poolAsset, crossAddress))
-        )
-      )
-    )
-  )
-)
-
-/**
- * Stake memo for txs sent on cross-chain
- */
-const crossChainStakeMemo$: MemoRx = Rx.combineLatest([selectedPoolAsset$, baseAddress$]).pipe(
-  RxOp.map(([oPoolAsset, oBaseAddress]) =>
-    FP.pipe(
-      sequenceTOption(oPoolAsset, oBaseAddress),
-      // cross-chain asset?
-      O.filter(([{ chain }]) => !isBaseChain(chain)),
+      sequenceTOption(oPoolAsset, oRuneAddress, oAssetAddress),
       // add address of base-chain wallet to memo
-      O.map(([poolAsset, baseAddress]) => getDepositMemo(poolAsset, baseAddress))
+      O.map(([poolAsset, runeAddress, assetAddress]) => ({
+        rune: getDepositMemo(poolAsset, assetAddress),
+        asset: getDepositMemo(poolAsset, runeAddress)
+      }))
     )
   )
 )
+
+const symDepositAssetTxMemo$: MemoRx = symDepositTxMemo$.pipe(RxOp.map(FP.flow(O.map(({ asset }) => asset))))
+
+/**
+ * Memo of asymmetrical deposit txs
+ */
+const asymDepositTxMemo$: MemoRx = selectedPoolAsset$.pipe(RxOp.map(O.map(getDepositMemo)))
 
 /**
  * Unstake memo for txs
@@ -63,7 +48,7 @@ const getWithdrawMemo$ = (withdrawPercent: number): MemoRx =>
   )
 
 // TODO(@veado) Remove it later, but leave it for #537 https://github.com/thorchain/asgardex-electron/issues/537
-crossChainStakeMemo$.subscribe((value) => console.log('crossChainStakeMemo:', value))
-baseChainStakeMemo$.subscribe((value) => console.log('baseChainStakeMemo:', value))
+symDepositTxMemo$.subscribe((value) => console.log('symDepositTxMemo:', value))
+asymDepositTxMemo$.subscribe((value) => console.log('asymDepositTxMemo:', value))
 
-export { baseChainStakeMemo$, crossChainStakeMemo$, getWithdrawMemo$ }
+export { symDepositTxMemo$, asymDepositTxMemo$, symDepositAssetTxMemo$, getWithdrawMemo$ }

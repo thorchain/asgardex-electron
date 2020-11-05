@@ -3,31 +3,37 @@ import React, { createContext, useContext } from 'react'
 import {
   stakeFees$,
   reloadStakeFees,
+  isCrossChainStake$,
+  symDepositTxMemo$,
+  asymDepositTxMemo$,
   withdrawFees$,
   reloadWithdrawFees,
   updateWithdrawFeesEffect$,
-  updateStakeFeesEffect$,
-  isCrossChainStake$
+  updateStakeFeesEffect$
 } from '../services/chain/context'
 
 type ChainContextValue = {
   stakeFees$: typeof stakeFees$
   reloadStakeFees: typeof reloadStakeFees
   withdrawFees$: typeof withdrawFees$
-  reloadUnstakeFees: typeof reloadWithdrawFees
-  updateUnstakeFeesEffect$: typeof updateWithdrawFeesEffect$
+  reloadWithdrawFees: typeof reloadWithdrawFees
+  updateWithdrawFeesEffect$: typeof updateWithdrawFeesEffect$
   updateStakeFeesEffect$: typeof updateStakeFeesEffect$
   isCrossChainStake$: typeof isCrossChainStake$
+  symDepositTxMemo$: typeof symDepositTxMemo$
+  asymDepositTxMemo$: typeof asymDepositTxMemo$
 }
 
 const initialContext: ChainContextValue = {
   stakeFees$,
   reloadStakeFees,
-  withdrawFees$: withdrawFees$,
-  reloadUnstakeFees: reloadWithdrawFees,
-  updateUnstakeFeesEffect$: updateWithdrawFeesEffect$,
+  withdrawFees$,
+  reloadWithdrawFees,
+  updateWithdrawFeesEffect$,
   updateStakeFeesEffect$,
-  isCrossChainStake$
+  isCrossChainStake$,
+  symDepositTxMemo$,
+  asymDepositTxMemo$
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 

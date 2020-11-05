@@ -21,6 +21,7 @@ export type PoolStringAssets = string[]
 export type PoolStringAssetsLD = LiveData<Error, PoolStringAssets>
 
 export type PoolAssets = Asset[]
+export type PoolAssetsRD = RD.RemoteData<Error, PoolAssets>
 export type PoolAssetsLD = LiveData<Error, PoolAssets>
 
 export type AssetDetails = AssetDetail[]
@@ -64,6 +65,9 @@ export type ThorchainConstantsLD = LiveData<Error, ThorchainConstants>
 
 export type ThorchainEndpointsLD = LiveData<Error, ThorchainEndpoint[]>
 
+export type PoolAddress = string
+export type PoolAddressRx = Rx.Observable<O.Option<PoolAddress>>
+
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 
@@ -77,6 +81,7 @@ export type PoolsService = {
   selectedPricePoolAssetSymbol$: Rx.Observable<O.Option<string>>
   reloadPools: () => void
   poolAddresses$: ThorchainEndpointsLD
+  poolAddress$: PoolAddressRx
   runeAsset$: Rx.Observable<Asset>
   poolDetail$: PoolDetailLD
   reloadPoolDetail: () => void

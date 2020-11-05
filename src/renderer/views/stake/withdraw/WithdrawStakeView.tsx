@@ -35,9 +35,9 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { withdrawFees$, reloadUnstakeFees, updateUnstakeFeesEffect$ } = useChainContext()
+  const { withdrawFees$, reloadWithdrawFees, updateWithdrawFeesEffect$ } = useChainContext()
 
-  useSubscription(updateUnstakeFeesEffect$)
+  useSubscription(updateWithdrawFeesEffect$)
 
   const fees = useObservableState(withdrawFees$, RD.initial)
 
@@ -87,11 +87,11 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         assetShare={ZERO_BASE_AMOUNT}
         runeAsset={runeAsset}
         stakedAsset={stakedAsset}
-        updateFees={reloadUnstakeFees}
+        updateFees={reloadWithdrawFees}
         disabled
       />
     ),
-    [fees, runePrice, runeAsset, stakedAsset, reloadUnstakeFees]
+    [fees, runePrice, runeAsset, stakedAsset, reloadWithdrawFees]
   )
 
   const renderWithdrawReady = useCallback(
@@ -106,10 +106,10 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         runeAsset={runeAsset}
         stakedAsset={stakedAsset}
         fee={fees}
-        updateFees={reloadUnstakeFees}
+        updateFees={reloadWithdrawFees}
       />
     ),
-    [runePrice, runeAsset, stakedAsset, fees, reloadUnstakeFees]
+    [runePrice, runeAsset, stakedAsset, fees, reloadWithdrawFees]
   )
 
   return FP.pipe(

@@ -1,4 +1,4 @@
-import { encryptToKeyStore, decryptFromKeystore, Keystore as CryptoKeystore } from '@thorchain/asgardex-crypto'
+import { encryptToKeyStore, decryptFromKeystore, Keystore as CryptoKeystore } from '@xchainjs/xchain-crypto'
 import { Asset } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import { distinctUntilChanged } from 'rxjs/operators'

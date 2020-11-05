@@ -45,6 +45,9 @@ export const AddAsymStakeStory = () => {
       poolData={poolData}
       priceAsset={AssetRune67C}
       assets={assets}
+      poolAddress={O.none}
+      symDepositMemo={O.none}
+      asymDepositMemo={O.none}
     />
   )
 }
@@ -72,6 +75,9 @@ export const AddAsymCrossStakeStory = () => {
       poolData={poolData}
       priceAsset={AssetRune67C}
       assets={assets}
+      poolAddress={O.none}
+      symDepositMemo={O.none}
+      asymDepositMemo={O.none}
     />
   )
 }
@@ -95,6 +101,9 @@ export const AddSymStakeStory = () => {
       poolData={poolData}
       priceAsset={AssetRune67C}
       assets={assets}
+      poolAddress={O.none}
+      symDepositMemo={O.none}
+      asymDepositMemo={O.none}
     />
   )
 }
@@ -120,6 +129,9 @@ storiesOf('Components/Stake/AddStake', module)
         poolData={poolData}
         priceAsset={AssetRune67C}
         assets={assets}
+        poolAddress={O.none}
+        symDepositMemo={O.none}
+        asymDepositMemo={O.none}
       />
     )
   })
@@ -142,6 +154,9 @@ storiesOf('Components/Stake/AddStake', module)
         poolData={poolData}
         priceAsset={AssetRune67C}
         assets={assets}
+        poolAddress={O.none}
+        symDepositMemo={O.none}
+        asymDepositMemo={O.none}
       />
     )
   })
@@ -164,6 +179,9 @@ storiesOf('Components/Stake/AddStake', module)
       poolData={poolData}
       priceAsset={AssetRune67C}
       assets={assets}
+      poolAddress={O.none}
+      symDepositMemo={O.none}
+      asymDepositMemo={O.none}
     />
   ))
 
@@ -191,6 +209,9 @@ storiesOf('Components/Stake/AddStake', module)
         poolData={poolData}
         priceAsset={AssetRune67C}
         assets={assets}
+        poolAddress={O.none}
+        symDepositMemo={O.none}
+        asymDepositMemo={O.none}
       />
     )
   })

@@ -1,6 +1,6 @@
 import * as path from 'path'
 
-import { Keystore } from '@thorchain/asgardex-crypto'
+import { Keystore } from '@xchainjs/xchain-crypto'
 import { ipcRenderer } from 'electron'
 import { app } from 'electron'
 import * as fs from 'fs-extra'
