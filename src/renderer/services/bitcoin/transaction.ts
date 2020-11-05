@@ -8,8 +8,9 @@ import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operato
 
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
+import { TxsPageLD } from '../clients/types'
 import { selectedAsset$ } from '../wallet/common'
-import { ApiError, TxsPageLD, ErrorId, TxRD } from '../wallet/types'
+import { ApiError, ErrorId, TxRD } from '../wallet/types'
 import { Client$ } from './common'
 import { SendTxParams, TransactionService } from './types'
 

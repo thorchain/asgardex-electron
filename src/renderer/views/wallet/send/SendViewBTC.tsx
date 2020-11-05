@@ -60,7 +60,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
         reloadFeesHandler={reloadFeesHandler}
-        fees={fees}
+        feesWithRates={fees}
       />
     ),
     [pushTx, assetsWB, txRD, addressValidation, reloadFeesHandler, fees]

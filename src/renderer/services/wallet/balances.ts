@@ -68,10 +68,15 @@ const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.addre
   )
 )
 
+// TODO (@Veado): Use `Balances` from xchain-client, but not `AssetsWithBalance`
+const btcAssetsWB$: Observable<AssetsWithBalanceRD> = BTC.balances$.pipe(
+  liveData.map(FP.flow(A.map((balance) => ({ ...balance, frozenAmount: O.fromNullable(balance.frozenAmount) }))))
+)
+
 /**
  * Transforms BTC data (address + `AssetWB`) into `AssetsWBChain`
  */
-const btcAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BTC.address$, BTC.assetWB$]).pipe(
+const btcAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BTC.address$, btcAssetsWB$]).pipe(
   map(
     ([address, assetWB]) =>
       ({
@@ -113,8 +118,6 @@ const ethAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([ETH.addre
  */
 export const assetsWBChains$ = Rx.combineLatest([btcAssetsWBChain$, ethAssetsWBChain$, bnbAssetsWBChain$])
 
-// Map single `AssetWB` into `[AssetsWB]`
-const btcAssetsWB$: Observable<AssetsWithBalanceRD> = BTC.assetWB$.pipe(liveData.map((asset) => [asset]))
 const ethAssetsWB$: Observable<AssetsWithBalanceRD> = ETH.assetWB$.pipe(liveData.map((asset) => [asset]))
 
 /**
