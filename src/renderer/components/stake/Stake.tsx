@@ -36,14 +36,14 @@ export const Stake: React.FC<Props> = (props) => {
   const tabs = useMemo(
     (): Tab[] => [
       {
-        key: 'stake-sym',
-        label: intl.formatMessage({ id: 'stake.add.sym' }, { asset: asset.ticker }),
-        content: <StakeContent asset={asset} runeAsset={runeAsset} type="sym" />
+        key: 'stake-asym',
+        label: intl.formatMessage({ id: 'stake.add.asym' }, { asset: asset.ticker }),
+        content: <StakeContent asset={asset} runeAsset={runeAsset} type="asym" />
       },
       {
-        key: 'stake-asym',
-        label: intl.formatMessage({ id: 'stake.add.asym' }, { assetA: asset.ticker, assetB: runeAsset.ticker }),
-        content: <StakeContent asset={asset} runeAsset={runeAsset} type="asym" />
+        key: 'stake-sym',
+        label: intl.formatMessage({ id: 'stake.add.sym' }, { assetA: asset.ticker, assetB: runeAsset.ticker }),
+        content: <StakeContent asset={asset} runeAsset={runeAsset} type="sym" />
       },
       {
         key: 'withdraw',

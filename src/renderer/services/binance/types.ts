@@ -85,4 +85,5 @@ export type TransactionService = {
   txWithState$: TxWithStateLD
   pushTx: (p: SendTxParams) => Rx.Subscription
   resetTx: () => void
+  sendStakeTx: (p: SendTxParams) => TxLD
 }

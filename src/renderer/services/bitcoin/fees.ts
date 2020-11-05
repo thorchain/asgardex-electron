@@ -4,14 +4,14 @@ import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { catchError, map, mergeMap, shareReplay, startWith, switchMap } from 'rxjs/operators'
+import { catchError, map, mergeMap, shareReplay, startWith, switchMap, tap } from 'rxjs/operators'
 
 import { BTC_DECIMAL } from '../../helpers/assetHelper'
 import { liveData } from '../../helpers/rx/liveData'
-import { triggerStream } from '../../helpers/stateHelper'
+import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { FeeLD, Memo } from '../chain/types'
 import { Client$ } from './common'
-import { FeesService, FeesLD } from './types'
+import { FeesService, FeesLD, FeeRateLD, FeeRateRD } from './types'
 
 /**
  * The only thing we export from this module is this factory
@@ -34,8 +34,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
     )
 
   /**
-   * Transaction fees
-   * If a client is not available, it returns `None`
+   * Transaction fees (no memo included)
    */
   const fees$: FeesLD = Rx.combineLatest([oClient$, reloadFees$]).pipe(
     mergeMap(([oClient, _]) =>
@@ -47,31 +46,56 @@ export const createFeesService = (oClient$: Client$): FeesService => {
     shareReplay(1)
   )
 
-  // `TriggerStream` to reload stake `fees`
-  const { stream$: reloadStakeFee$, trigger: reloadStakeFee } = triggerStream()
-
   /**
-   * Factory to create a stream of stake fees
-   * @param memo Memo used for deposit transactions
+   * Transaction fees (memo included)
    */
-  const stakeFee$ = (memo: Memo): FeeLD =>
-    Rx.combineLatest([oClient$, reloadStakeFee$]).pipe(
+  const memoFees$ = (memo: Memo): FeesLD =>
+    Rx.combineLatest([oClient$, reloadFees$]).pipe(
       switchMap(([oClient]) =>
         FP.pipe(
           oClient,
           O.fold(
-            () => Rx.of(RD.initial),
+            () => Rx.of(RD.initial) as FeesLD,
             (client) => loadFees$(client, memo)
           )
         )
       ),
-      // extract fast fee only
+      shareReplay(1)
+    )
+
+  // `TriggerStream` to reload stake `fees`
+  const { stream$: reloadStakeFee$, trigger: reloadStakeFee } = triggerStream()
+
+  /**
+   * Factory to create a stream for pool fees (stake / withdraw)
+   * @param memo Memo used for pool transactions
+   */
+  const poolFee$ = (memo: Memo): FeeLD =>
+    FP.pipe(
+      reloadStakeFee$,
+      switchMap(() => memoFees$(memo)),
       liveData.map((fees) => baseAmount(fees.fast.feeTotal, BTC_DECIMAL))
+    )
+
+  const { get: getPoolFeeRate, set: setPoolFeeRate } = observableState<FeeRateRD>(RD.initial)
+  /**
+   * Factory to create a stream of fees for pool transacions
+   * @param memo Memo used for pool transactions
+   */
+  const poolFeeRate$ = (memo: Memo): FeeRateLD =>
+    FP.pipe(
+      reloadStakeFee$,
+      switchMap(() => memoFees$(memo)),
+      liveData.map((fees) => fees.fast.feeRate),
+      // we do need to store result in a subject to access it w/o subscribing a stream
+      tap(setPoolFeeRate)
     )
 
   return {
     fees$,
-    stakeFee$,
+    poolFee$,
+    poolFeeRate$,
+    getPoolFeeRate,
     reloadFees,
     reloadStakeFee
   }

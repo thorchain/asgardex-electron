@@ -18,9 +18,9 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
-import { isBaseChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { StakeFeesRD } from '../../../services/chain/types'
+import { SymDepositMemo, Memo, SendStakeTxParams, StakeFeesRD } from '../../../services/chain/types'
+import { PoolAddress } from '../../../services/midgard/types'
 import { StakeType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
 import * as Helper from './AddStake.helper'
@@ -36,37 +36,44 @@ type Props = {
   runeBalance: O.Option<BaseAmount>
   baseChainAssetBalance: O.Option<BaseAmount>
   crossChainAssetBalance: O.Option<BaseAmount>
+  poolAddress: O.Option<PoolAddress>
   isCrossChain?: boolean
+  asymDepositMemo: O.Option<Memo>
+  symDepositMemo: O.Option<SymDepositMemo>
   priceAsset?: Asset
   fees: StakeFeesRD
-  reloadFees: () => void
+  reloadFees: (type: StakeType) => void
   assets?: Asset[]
-  onStake: (stakeData: { asset: Asset; runeAsset: Asset; assetStake: BaseAmount; runeStake: BaseAmount }) => void
+  onStake: (p: SendStakeTxParams) => void
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
 }
 
-export const AddStake: React.FC<Props> = ({
-  type,
-  asset,
-  runeAsset,
-  assetPrice,
-  runePrice,
-  assetBalance: oAssetBalance,
-  runeBalance: oRuneBalance,
-  baseChainAssetBalance: oBaseChainAssetBalance,
-  crossChainAssetBalance: oCrossChainAssetBalance,
-  isCrossChain = false,
-  assets,
-  priceAsset,
-  reloadFees,
-  fees,
-  onStake,
-  onChangeAsset,
-  disabled = false,
-  poolData
-}) => {
+export const AddStake: React.FC<Props> = (props) => {
+  const {
+    type,
+    asset,
+    runeAsset,
+    assetPrice,
+    runePrice,
+    assetBalance: oAssetBalance,
+    runeBalance: oRuneBalance,
+    baseChainAssetBalance: oBaseChainAssetBalance,
+    crossChainAssetBalance: oCrossChainAssetBalance,
+    isCrossChain = false,
+    asymDepositMemo: oAsymDepositMemo,
+    symDepositMemo: oSymDepositMemo,
+    poolAddress: oPoolAddress,
+    assets,
+    priceAsset,
+    reloadFees,
+    fees,
+    onChangeAsset,
+    disabled = false,
+    poolData
+  } = props
+
   const intl = useIntl()
   const [runeAmountToStake, setRuneAmountToStake] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [assetAmountToStake, setAssetAmountToStake] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
@@ -105,9 +112,9 @@ export const AddStake: React.FC<Props> = ({
   const hasAssetBalance = useMemo(() => assetBalance.amount().isGreaterThan(0), [assetBalance])
   const hasRuneBalance = useMemo(() => runeBalance.amount().isGreaterThan(0), [runeBalance])
 
-  const isSymBalanceError = useMemo(() => !hasAssetBalance, [hasAssetBalance])
+  const isAsymBalanceError = useMemo(() => !hasAssetBalance, [hasAssetBalance])
 
-  const isAsymBalanceError = useMemo(() => !hasAssetBalance && !hasRuneBalance, [hasAssetBalance, hasRuneBalance])
+  const isSymBalanceError = useMemo(() => !hasAssetBalance && !hasRuneBalance, [hasAssetBalance, hasRuneBalance])
 
   const isBalanceError = useMemo(() => (type === 'sym' ? isSymBalanceError : isAsymBalanceError), [
     isAsymBalanceError,
@@ -230,15 +237,57 @@ export const AddStake: React.FC<Props> = ({
   )
 
   const onStakeConfirmed = useCallback(() => {
-    onStake({
-      asset,
-      runeAsset,
-      assetStake: assetAmountToStake,
-      runeStake: runeAmountToStake
-    })
-  }, [onStake, asset, runeAsset, assetAmountToStake, runeAmountToStake])
+    const asymDepositTx = () =>
+      FP.pipe(
+        sequenceTOption(oPoolAddress, oAsymDepositMemo),
+        O.map(([poolAddress, asymDepositMemo]) => {
+          const baseChainStakeTxParam = {
+            chain: runeAsset.chain,
+            asset: BASE_CHAIN_ASSET,
+            poolAddress,
+            amount: assetAmountToStake,
+            memo: asymDepositMemo
+          }
+          console.log('ASYM Tx 1/1 ', baseChainStakeTxParam)
+          return true
+        })
+      )
 
-  const hasCrossChainFee = useMemo(() => !isBaseChainAsset(asset), [asset])
+    const symDepositTx = () =>
+      FP.pipe(
+        sequenceTOption(oPoolAddress, oSymDepositMemo),
+        O.map(([poolAddress, { rune: runeMemo, asset: assetMemo }]) => {
+          const runeTxParam = {
+            chain: runeAsset.chain,
+            asset: BASE_CHAIN_ASSET,
+            poolAddress,
+            // TODO (@Veado) Ask about amount of NativeRune tx, maybe it can be ZERO
+            // minimal tx amount of `RuneNative`
+            amount: baseAmount(1),
+            memo: runeMemo
+          }
+          console.log('SYM Tx 1/2 (rune):', runeTxParam)
+          const assetTxParam = {
+            chain: asset.chain,
+            asset: asset,
+            poolAddress,
+            amount: assetAmountToStake,
+            memo: assetMemo
+          }
+          console.log('SYM Tx 2/2 (asset):', assetTxParam)
+
+          return true
+        })
+      )
+
+    // TODO(@Veado) Call sendStakeTx of `services/chain/txs`
+    // and handle results (error/success) in a modal here in `AddStake`
+    FP.pipe(
+      type === 'asym' ? asymDepositTx() : symDepositTx(),
+      O.map((v) => console.log('success:', v)),
+      O.getOrElse(() => console.log('no data to run txs'))
+    )
+  }, [type, oPoolAddress, oSymDepositMemo, runeAsset.chain, assetAmountToStake, oAsymDepositMemo, asset])
 
   const renderFeeError = useCallback(
     (fee: BaseAmount, balance: AssetAmount, asset: Asset) => {
@@ -347,6 +396,8 @@ export const AddStake: React.FC<Props> = ({
     [asset, fees, intl]
   )
 
+  const reloadFeesHandler = useCallback(() => reloadFees(type), [reloadFees, type])
+
   const disabledForm = useMemo(() => isBalanceError || isBaseChainFeeError || isCrossChainFeeError || disabled, [
     disabled,
     isBalanceError,
@@ -377,7 +428,7 @@ export const AddStake: React.FC<Props> = ({
         </Col>
 
         <Col xs={24} xl={12}>
-          {isAsym && (
+          {!isAsym && (
             <Styled.AssetCard
               disabled={disabledForm}
               asset={runeAsset}
@@ -395,16 +446,14 @@ export const AddStake: React.FC<Props> = ({
         <Col xs={24} xl={12}>
           <Styled.FeeRow>
             <Col>
-              <Styled.ReloadFeeButton onClick={reloadFees} disabled={RD.isPending(fees)}>
+              <Styled.ReloadFeeButton onClick={reloadFeesHandler} disabled={RD.isPending(fees)}>
                 <SyncOutlined />
               </Styled.ReloadFeeButton>
             </Col>
             <Col>
               <Styled.FeeLabel disabled={RD.isPending(fees)}>
-                {hasCrossChainFee
-                  ? intl.formatMessage({ id: 'common.fees' })
-                  : intl.formatMessage({ id: 'common.fee' })}
-                : {feesLabel}
+                {isAsym ? intl.formatMessage({ id: 'common.fee' }) : intl.formatMessage({ id: 'common.fees' })}:{' '}
+                {feesLabel}
               </Styled.FeeLabel>
             </Col>
           </Styled.FeeRow>
