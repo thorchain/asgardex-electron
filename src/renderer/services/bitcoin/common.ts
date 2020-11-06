@@ -28,8 +28,9 @@ const bitcoinNetwork$: Observable<ClientNetwork> = network$.pipe(
   })
 )
 
-const ELECTRS_TESTNET = envOrDefault(process.env.REACT_APP_BITCOIN_ELECRTS_TESTNET_API, 'http://165.22.106.224')
-const ELECTRS_MAINNET = envOrDefault(process.env.REACT_APP_BITCOIN_ELECRTS_MAINNET_API, 'http://188.166.254.248')
+const BLOCKCHAIR_API_KEY = envOrDefault(process.env.REACT_APP_BLOCKCHAIR_API_KEY, 'undefined blockchair api key')
+const BLOCKCHAIR_TESTNET = 'https://api.blockchair.com/bitcoin/testnet'
+const BLOCKCHAIR_MAINNET = 'https://api.blockchair.com/bitcoin'
 
 /**
  * Stream to create an observable BitcoinClient depending on existing phrase in keystore
@@ -46,10 +47,13 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
-              // Url of electrs
-              const electrsUrl = bitcoinNetwork === 'testnet' ? ELECTRS_TESTNET : ELECTRS_MAINNET
-              // TODO (@Veado) Check if we still use electrs
-              const client = new BitcoinClient({ network: bitcoinNetwork, nodeUrl: electrsUrl, phrase })
+              const blockchairUrl = bitcoinNetwork === 'testnet' ? BLOCKCHAIR_TESTNET : BLOCKCHAIR_MAINNET
+              const client = new BitcoinClient({
+                network: bitcoinNetwork,
+                nodeUrl: blockchairUrl,
+                nodeApiKey: BLOCKCHAIR_API_KEY,
+                phrase
+              })
               return O.some(right(client)) as BitcoinClientState
             } catch (error) {
               return O.some(left(error))
