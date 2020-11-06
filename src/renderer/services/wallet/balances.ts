@@ -73,17 +73,14 @@ const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.addre
  */
 const btcAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BTC.address$, BTC.assetsWB$]).pipe(
   map(
-    ([address, assetWB]) =>
+    ([address, assetsWB]) =>
       ({
         chain: 'BTC',
         address: FP.pipe(
           address,
           O.getOrElse(() => '')
         ),
-        assetsWB: FP.pipe(
-          assetWB,
-          RD.map((assets) => [assets])
-        )
+        assetsWB
       } as AssetsWBChain)
   )
 )
@@ -131,6 +128,10 @@ export const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLate
       // filter results out
       // Transformation: RD<Error, AssetsWithBalance>`-> `AssetsWithBalance)[]`
       A.filterMap(RD.toOption),
+      (v) => {
+        console.log('assetsWBState$', v)
+        return v
+      },
       A.flatten,
       NEA.fromArray
     ),
