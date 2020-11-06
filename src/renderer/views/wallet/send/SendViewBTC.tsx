@@ -30,7 +30,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
   const { fees$, pushTx, txRD$, client$, getExplorerTxUrl$, resetTx } = useBitcoinContext()
 
   const txRD = useObservableState<TxRD>(txRD$, RD.initial)
-  const oExplorerUrl: O.Option<GetExplorerTxUrl> = useObservableState(getExplorerTxUrl$, O.none)
+  const oGetExplorerUrl: O.Option<GetExplorerTxUrl> = useObservableState(getExplorerTxUrl$, O.none)
   const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
 
   const fees = useObservableState(fees$, RD.initial)
@@ -67,7 +67,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
   )
 
   return FP.pipe(
-    sequenceTOption(oBtcAssetWB, oExplorerUrl),
+    sequenceTOption(oBtcAssetWB, oGetExplorerUrl),
     O.fold(
       () => <></>,
       ([btcAssetWB, getExplorerTxUrl]) => {

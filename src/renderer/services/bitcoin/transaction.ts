@@ -8,11 +8,11 @@ import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operato
 
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
-import { TxsPageLD } from '../clients/types'
 import { selectedAsset$ } from '../wallet/common'
-import { ApiError, ErrorId, TxRD } from '../wallet/types'
+import { ApiError, AssetTxsPageLD, ErrorId, TxRD } from '../wallet/types'
 import { Client$ } from './common'
 import { SendTxParams, TransactionService } from './types'
+import { toAssetTxsPage } from './utils'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
@@ -39,13 +39,15 @@ const sendStakeTx = (client$: Client$) => ({ to, amount, feeRate, memo }: SendTx
   tx$({ client$, to, amount, feeRate, memo })
 
 /**
- * Observable to load txs from Binance API endpoint
+ * Observable to load txs
  * If client is not available, it returns an `initial` state
  */
-const loadAssetTxs$ = ({ client }: { client: BitcoinClient }): TxsPageLD => {
+// TODO(@veado or @thatStrangeGuyThorchain) Use TxsPage instead of `AssetTxsPageLD`
+// @see https://github.com/thorchain/asgardex-electron/issues/585
+const loadAssetTxs$ = ({ client }: { client: BitcoinClient }): AssetTxsPageLD => {
   const address = client.getAddress()
   return Rx.from(client.getTransactions({ address })).pipe(
-    // map(toTxsPage),
+    map(toAssetTxsPage),
     map(RD.success),
     catchError((error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
@@ -62,7 +64,7 @@ const { stream$: reloadAssetTxs$, trigger: loadAssetTxs } = triggerStream()
 /**
  * `Txs` history for BTC
  */
-const assetTxs$ = (client$: Client$): TxsPageLD =>
+const assetTxs$ = (client$: Client$): AssetTxsPageLD =>
   Rx.combineLatest([client$, reloadAssetTxs$, selectedAsset$]).pipe(
     switchMap(([client, _, oAsset]) => {
       return FP.pipe(
