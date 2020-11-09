@@ -10,7 +10,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
 import { getClient } from '../utils'
-import { TxRD } from '../wallet/types'
+import { TxRD, TxLD } from '../wallet/types'
 import { BinanceClientState$, TransactionService, TxWithStateLD } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
@@ -22,13 +22,7 @@ export type SendTxParams = {
   memo?: string
 }
 
-const tx$ = ({
-  clientState$,
-  to,
-  amount,
-  asset,
-  memo
-}: { clientState$: BinanceClientState$ } & SendTxParams): Rx.Observable<TxRD> =>
+const tx$ = ({ clientState$, to, amount, asset, memo }: { clientState$: BinanceClientState$ } & SendTxParams): TxLD =>
   clientState$.pipe(
     map(getClient),
     switchMap((r) => (O.isSome(r) ? Rx.of(r.value) : Rx.EMPTY)),
@@ -46,8 +40,11 @@ const tx$ = ({
     startWith(RD.pending)
   )
 
-const pushTx = (clientState$: BinanceClientState$) => ({ to, amount, asset, memo }: SendTxParams) =>
+const pushTx = (clientState$: BinanceClientState$) => ({ to, amount, asset, memo }: SendTxParams): Rx.Subscription =>
   tx$({ clientState$, to, amount, asset, memo }).subscribe(setTxRD)
+
+const sendStakeTx = (clientState$: BinanceClientState$) => ({ to, amount, asset, memo }: SendTxParams): TxLD =>
+  tx$({ clientState$, to, amount, asset, memo })
 
 const txWithState$ = (wsTransfer$: Rx.Observable<O.Option<WS.Transfer>>): TxWithStateLD =>
   FP.pipe(
@@ -67,5 +64,6 @@ export const createTransactionService = (
   txRD$,
   txWithState$: txWithState$(wsTransfer$),
   pushTx: pushTx(client$),
+  sendStakeTx: sendStakeTx(client$),
   resetTx: () => setTxRD(RD.initial)
 })

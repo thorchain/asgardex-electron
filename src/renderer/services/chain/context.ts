@@ -7,6 +7,7 @@ import {
   updateStakeFeesEffect$,
   updateWithdrawFeesEffect$
 } from './fees'
+import { asymDepositTxMemo$, symDepositTxMemo$ } from './memo'
 
 /**
  * Exports all functions and observables needed at UI level (provided by `ChainContext`)
@@ -18,5 +19,7 @@ export {
   reloadWithdrawFees,
   updateStakeFeesEffect$,
   updateWithdrawFeesEffect$,
-  isCrossChainStake$
+  isCrossChainStake$,
+  symDepositTxMemo$,
+  asymDepositTxMemo$
 }
