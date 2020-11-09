@@ -15,7 +15,7 @@ const explorerUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> => {
     case 'BNB':
       return BNB.explorerUrl$
     case 'BTC':
-    return BTC.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}tx/`)))
+      return BTC.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}tx/`)))
     case 'ETH':
       // not implemented yet
       return Rx.of(O.none)
@@ -34,7 +34,7 @@ const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<(tx: string
     case 'BTC':
       // @TODO @veado implement this one with https://github.com/thorchain/asgardex-electron/issues/574
       return Rx.of(O.none)
-      // return BTC.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}tx/`)))
+    // return BTC.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}tx/`)))
     case 'ETH':
       // not implemented yet
       return Rx.of(O.none)

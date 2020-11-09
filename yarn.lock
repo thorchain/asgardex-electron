@@ -2905,18 +2905,6 @@
     bitcoinjs-lib "^5.2.0"
     wif "^2.0.6"
 
-"@thorchain/asgardex-crypto@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-crypto/-/asgardex-crypto-0.1.0.tgz#6cfe05611840bf9adae85c20cf873c8a23289da2"
-  integrity sha512-cT2z6fKc8zwM5ShKsLb4qWbEx7+Yc+uAZiTWUvOYU1W03wHgt8A79d02v7f/NtNX/ZFTbyDRtkbrR7IgWMqpoQ==
-  dependencies:
-    bech32 "^1.1.4"
-    bip39 "^3.0.2"
-    crypto-js "^4.0.0"
-    foundry-primitives "^0.2.1"
-    hdkey "^2.0.1"
-    uuid "^8.1.0"
-
 "@thorchain/asgardex-ethereum@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@thorchain/asgardex-ethereum/-/asgardex-ethereum-0.2.0.tgz#11de1986eaace3d36cdfbae80bde908071e271e8"
@@ -3802,13 +3790,13 @@
     text-table "^0.2.0"
     webpack-log "^1.1.2"
 
-"@xchainjs/xchain-binance@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-3.0.1.tgz#d8b817088a5db064823593a528d604feca60bae2"
-  integrity sha512-Ms7kzskSsY1GMgHbLp1q8Kf7driPsKz2BMUzEcvrodpMCAy6OQPBHCAA/K81mkFXX/o4NZ/arMBixtcozF1eMg==
+"@xchainjs/xchain-binance@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-3.1.0.tgz#12d5c216eaab9a905d4de5f4c5ff5db7804e15fd"
+  integrity sha512-0A9eKuIvf4+IKR8mq1tJ1BHb3lBILMa/PwVTbjy8JoEqa3Bmlz/1Lr4OnnqGfkoin6UzH4vdxYNm1Nn66pVCVA==
   dependencies:
-    "@thorchain/asgardex-crypto" "^0.1.0"
     "@xchainjs/xchain-client" "^0.0.5"
+    "@xchainjs/xchain-crypto" "^0.1.0"
 
 "@xchainjs/xchain-client@^0.0.5":
   version "0.0.5"
@@ -3816,6 +3804,13 @@
   integrity sha512-lp8UtvXBpW6mYFw8heL6cFA4EAvEit6KywiZgC+hYWPvQ5Runcer82iufBeVHG7cd9D2Ui75+6BLd/AVgUzm+Q==
   dependencies:
     "@thorchain/asgardex-util" "^0.5.0"
+
+"@xchainjs/xchain-client@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.0.7.tgz#7ca6c46f9c690d37663062f596a9210f847bfed7"
+  integrity sha512-4WglU0u8VmcN17kC9VdrdsnVimInSDJ/iDpJ1d8+S63GbJBZKt3W8ekP3xsy4z0I2RAQ9WBnv6aAyXuyCV2pPw==
+  dependencies:
+    "@xchainjs/xchain-util" "^0.1.0"
 
 "@xchainjs/xchain-crypto@^0.1.0":
   version "0.1.0"

@@ -1,9 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { WS, Client, Network as BinanceNetwork, Address } from '@xchainjs/xchain-binance'
 import { Asset, assetToBase, baseToAsset, BNBChain } from '@xchainjs/xchain-util'
+import * as A from 'fp-ts/lib/Array'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
-import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
@@ -21,7 +21,6 @@ import {
 import * as RxOperators from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
-import { } from '../../helpers/binanceHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { eqOString } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
@@ -44,8 +43,8 @@ import {
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import { BinanceClientState, FeeRD, TransferFeesRD, BinanceClientState$, FeesLD } from './types'
-import { getWalletBalances, toTxsPage } from './utils'
+import { BinanceClientState, FeeRD, TransferFeesRD, BinanceClientState$ } from './types'
+import { toTxsPage } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -288,12 +287,17 @@ const loadAssetTxs$ = ({
   const endTime = Date.now()
   // 90 day window - similar to ASGARDEX wallet approach,
   // see https://gitlab.com/thorchain/asgard-wallet/-/blob/develop/imports/api/wallet.js#L39-48
-  const diffTime = 90 * 24 * 60 * 60 * 1000
+  const diffTime = 90 * 24 * 60 * 60 * 1001
   const startTime = endTime - diffTime
   return Rx.from(
     // @TODO add txAsset to the xchain
-    // @ts-ignore
-    client.getTransactions({ txAsset, address: client.getAddress(), startTime: new Date(startTime), limit, offset })
+    client.getTransactions({
+      asset: txAsset,
+      address: client.getAddress(),
+      startTime: new Date(startTime),
+      limit,
+      offset
+    })
   ).pipe(
     map(toTxsPage),
     map(RD.success),
@@ -348,9 +352,7 @@ const assetTxs$: AssetTxsPageLD = Rx.combineLatest([
  *
  */
 export const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
-  // @TODO fix mock by openning getExplorerUrl
-  map(() => O.some('explorer url mock')),
-  // map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
+  map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
   shareReplay(1)
 )
 
@@ -361,19 +363,6 @@ const getExplorerTxUrl$: Observable<O.Option<(ts: string) => string>> = client$.
 
 // `TriggerStream` to reload `Fees`
 const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
-
-/**
- * Observable to load transaction fees from Binance API endpoint
- * If client is not available, it returns an `initial` state
- */
-// const loadFees$ = (client: Client): FeesLD =>
-//   Rx.from(client.getFees()).pipe(
-//     map(A.of),
-//     map(RD.success),
-//     catchError((error) => Rx.of(RD.failure(error))),
-//     startWith(RD.pending),
-//     retry(BINANCE_MAX_RETRY)
-//   )
 
 /**
  * Transaction fees
@@ -387,50 +376,36 @@ const transferFees$: Observable<TransferFeesRD> = Rx.combineLatest([reloadFees$,
       // ignore all assets from other chains than BNB
       O.fold(
         () => Rx.EMPTY,
-        (client) => Rx.from(client.getFees())
+        (client) => Rx.from(Promise.all([client.getFees(), client.getMultiSendFees()]))
       )
     )
   ),
   map(RD.success),
-  liveData.map((fee) => ({
-    single: baseToAsset(fee.average),
-    // @TODO: @thatStrangeGuy WRONG!!!!! Add appropriate data to the xchain
-    // right now only for the right typings
-    multi: baseToAsset(fee.average)
+  liveData.map(([singleFee, multiFees]) => ({
+    single: baseToAsset(singleFee.average),
+    multi: baseToAsset(multiFees.average)
   })),
   startWith(RD.initial),
   shareReplay(1)
 )
 
 /**
- * Filtered fees to return `TransferFees` only
- */
-// const transferFees$: Observable<TransferFeesRD> = fees$
-//   .pipe(
-//   map((fees) =>
-//     FP.pipe(
-//       fees,
-//       RD.chain((fee) => RD.fromEither(getTransferFees(fee)))
-//     )
-//   )
-// )
-
-/**
  * Amount of feeze `Fee`
  */
-// const freezeFee$: Observable<FeeRD> = FP.pipe(fees$, liveData.map(getFreezeFee), liveData.chain(liveData.fromEither))
 const freezeFee$: Observable<FeeRD> = FP.pipe(
-  Rx.combineLatest([client$, reloadFees$, ]),
-  switchMap(([oClient]) => FP.pipe(
-    oClient,
-    O.fold(
-      () => Rx.EMPTY,
-      client => Rx.from(client.getFreezeFees())
+  Rx.combineLatest([client$, reloadFees$]),
+  switchMap(([oClient]) =>
+    FP.pipe(
+      oClient,
+      O.fold(
+        () => Rx.EMPTY,
+        (client) => Rx.from(client.getFreezeFees())
+      )
     )
-  )),
+  ),
   map(RD.success),
   liveData.map((fee) => baseToAsset(fee.average)),
-  startWith(RD.initial),
+  startWith(RD.initial)
 )
 
 /**

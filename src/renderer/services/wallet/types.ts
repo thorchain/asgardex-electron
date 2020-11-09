@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { TxType } from '@xchainjs/xchain-client'
 import { BaseAmount, Asset, Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
@@ -6,7 +7,6 @@ import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { TxType } from '@xchainjs/xchain-client'
 
 export type Phrase = string
 

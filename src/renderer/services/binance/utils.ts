@@ -1,4 +1,5 @@
-import { Balance, Balances, TxPage, TxType } from '@xchainjs/xchain-binance'
+import { Balance, Balances } from '@xchainjs/xchain-binance'
+import { TxsPage, Tx } from '@xchainjs/xchain-client'
 import {
   getValueOfAsset1InAsset2,
   PoolData,
@@ -19,8 +20,7 @@ import * as O from 'fp-ts/lib/Option'
 import { BNB_DECIMAL, isRuneAsset } from '../../helpers/assetHelper'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
-import { AssetWithBalance, AssetsWithBalance, AssetTxsPage, AssetTx, AssetTxType } from '../wallet/types'
-import { TxsPage, Tx} from '@xchainjs/xchain-client'
+import { AssetWithBalance, AssetsWithBalance, AssetTxsPage, AssetTx } from '../wallet/types'
 
 /**
  * Helper to get a pool price value for a given `Balance`
@@ -75,31 +75,14 @@ export const getWalletBalances = (balances: Balances): AssetsWithBalance =>
     )
   }, [])
 
-// export const toAssetTxType = (txType: TxType): AssetTxType => {
-//   switch (txType) {
-//     case 'FREEZE_TOKEN':
-//       return 'freeze'
-//     case 'UN_FREEZE_TOKEN':
-//       return 'unfreeze'
-//     case 'TRANSFER':
-//       return 'transfer'
-//     default:
-//       return 'unknown'
-//   }
-// }
-
-export const toAssetTx = (tx: Tx): AssetTx => {
-  // const amount = assetToBase(assetAmount(bnOrZero(tx.value)))
-  return {
-    asset:  O.some(tx.asset),
-    from: tx.from,
-    to: tx.to,
-    date: tx.date,
-    // type: toAssetTxType(tx.txType),
-    type: tx.type,
-    hash: tx.hash
-  }
-}
+export const toAssetTx = (tx: Tx): AssetTx => ({
+  asset: O.some(tx.asset),
+  from: tx.from,
+  to: tx.to,
+  date: tx.date,
+  type: tx.type,
+  hash: tx.hash
+})
 
 export const toTxsPage = ({ total, txs }: TxsPage): AssetTxsPage => ({
   total,

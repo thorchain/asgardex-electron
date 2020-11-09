@@ -90,10 +90,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const clickTxLinkHandler = useCallback(
     (txHash: string) => {
-      FP.pipe(
-        O.ap(O.some(txHash))(getExplorerTxUrl),
-        O.map((url) => window.apiUrl.openExternal(`${url}${txHash}`))
-      )
+      FP.pipe(getExplorerTxUrl, O.ap(O.some(txHash)), O.map(window.apiUrl.openExternal))
     },
     [getExplorerTxUrl]
   )

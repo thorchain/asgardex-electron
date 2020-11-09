@@ -1,16 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { } from '@thorchain/asgardex-binance'
-import {
-  Balances,
-  Transfer,
-  // Fees,
-  Client,
-  Fees,
-  Client as BinanceClient,
-  Network as BinanceNetwork,
-  Address,
-  WS
-} from '@xchainjs/xchain-binance'
+import { Balances, Transfer, Fees, Client as BinanceClient, WS } from '@xchainjs/xchain-binance'
 import { Asset, AssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
