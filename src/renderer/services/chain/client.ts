@@ -9,6 +9,7 @@ import * as BTC from '../bitcoin/context'
 export const clientByChain$ = (chain: Chain): Observable<O.Option<XChainClient>> => {
   switch (chain) {
     case 'BNB':
+      // TODO (@Veado / @ThatStrangeGuy) Add BNB after https://github.com/thorchain/asgardex-electron/pull/583 has been merged
       return Rx.of(O.none)
     case 'BTC':
       return BTC.client$
