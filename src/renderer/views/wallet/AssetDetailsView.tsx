@@ -8,19 +8,14 @@ import { useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { AssetDetails } from '../../components/wallet/assets/AssetDetails'
+import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
-  const {
-    assetTxs$,
-    assetsWBState$,
-    loadAssetTxsHandler$,
-    reloadBalances$,
-    getExplorerTxUrl$,
-    setSelectedAsset
-  } = useWalletContext()
+  const { assetTxs$, assetsWBState$, loadAssetTxsHandler$, reloadBalances$, setSelectedAsset } = useWalletContext()
+  const { getExplorerTxUrl$ } = useChainContext()
 
   const { asset } = useParams<AssetDetailsParams>()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])

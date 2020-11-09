@@ -10,7 +10,6 @@ import { useHistory } from 'react-router-dom'
 import * as AH from '../../../helpers/assetHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { SendAction, isSendAction } from '../../../services/binance/types'
-import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_ASSET_TX_HANDLER } from '../../../services/wallet/const'
 import { AssetTxsPageRD, LoadAssetTxsHandler, NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
@@ -29,7 +28,7 @@ type Props = {
   txsPageRD: AssetTxsPageRD
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
   asset: O.Option<Asset>
-  getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
+  getExplorerTxUrl?: O.Option<string>
   reloadBalancesHandler?: () => void
   loadAssetTxsHandler?: LoadAssetTxsHandler
 }
@@ -92,7 +91,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     (txHash: string) => {
       FP.pipe(
         oGetExplorerTxUrl,
-        O.map((getExplorerTxUrl) => window.apiUrl.openExternal(getExplorerTxUrl(txHash)))
+        O.map((url) => window.apiUrl.openExternal(`${url}${txHash}`))
       )
     },
     [oGetExplorerTxUrl]

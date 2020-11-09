@@ -3,10 +3,13 @@ import { baseToAsset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/context'
+import { selectedAsset$ } from '../wallet/common'
 import { ErrorId, TxLD } from '../wallet/types'
+import { clientByChain$ } from './client'
 import { SendStakeTxParams } from './types'
 
 const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendStakeTxParams): TxLD => {
@@ -47,4 +50,24 @@ const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendStakeTxPar
   }
 }
 
-export { sendStakeTx }
+// TODO (@Veado) Move selectedAsset$ to service/chain
+const getExplorerTxUrl$: Rx.Observable<O.Option<string>> = selectedAsset$.pipe(
+  RxOp.switchMap(
+    O.fold(
+      () => Rx.of(O.none),
+      ({ chain }) =>
+        FP.pipe(
+          clientByChain$(chain),
+          RxOp.map(
+            O.map((client) =>
+              // we leave `txID` parameter empty to get just the url,
+              // but w/o the hash- the hash will be add by the view
+              client.getExplorerTxUrl('')
+            )
+          )
+        )
+    )
+  )
+)
+
+export { sendStakeTx, getExplorerTxUrl$ }
