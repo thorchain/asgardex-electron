@@ -13,7 +13,6 @@ import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getAssetWBByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/bitcoin/types'
-import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { AssetsWithBalance, AssetWithBalance, NonEmptyAssetsWithBalance, TxRD } from '../../../services/wallet/types'
 
 type Props = {
@@ -27,10 +26,9 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
 
   const oBtcAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
 
-  const { fees$, pushTx, txRD$, client$, getExplorerTxUrl$, resetTx } = useBitcoinContext()
+  const { fees$, pushTx, txRD$, client$, resetTx } = useBitcoinContext()
 
   const txRD = useObservableState<TxRD>(txRD$, RD.initial)
-  const oGetExplorerUrl: O.Option<GetExplorerTxUrl> = useObservableState(getExplorerTxUrl$, O.none)
   const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
 
   const fees = useObservableState(fees$, RD.initial)
@@ -67,20 +65,21 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
   )
 
   return FP.pipe(
-    sequenceTOption(oBtcAssetWB, oGetExplorerUrl),
+    sequenceTOption(oClient, oBtcAssetWB),
     O.fold(
       () => <></>,
-      ([btcAssetWB, getExplorerTxUrl]) => {
-        const successActionHandler = FP.flow(getExplorerTxUrl, window.apiUrl.openExternal)
-
+      ([client, btcAssetWB]) => {
+        const successActionHandler = FP.flow(client.getExplorerTxUrl, window.apiUrl.openExternal)
         return (
-          <Send
-            txRD={txRD}
-            successActionHandler={successActionHandler}
-            inititalActionHandler={resetTx}
-            errorActionHandler={resetTx}
-            sendForm={sendForm(btcAssetWB)}
-          />
+          <>
+            <Send
+              txRD={txRD}
+              successActionHandler={successActionHandler}
+              inititalActionHandler={resetTx}
+              errorActionHandler={resetTx}
+              sendForm={sendForm(btcAssetWB)}
+            />
+          </>
         )
       }
     )

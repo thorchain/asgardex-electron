@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeRate, FeesWithRates } from '@xchainjs/xchain-bitcoin/lib/types/client-types'
-import { FeeOptionKey, Fees } from '@xchainjs/xchain-client'
+import { FeeOptionKey } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBTC,
@@ -65,24 +65,24 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
-  const [selectedFeeKey, setSelectedFeeKey] = useState<FeeOptionKey>('fast')
+  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>('fastest')
 
   const [form] = Form.useForm<FormValues>()
 
-  const prevFeesRef = useRef<O.Option<Fees>>(O.none)
-
-  const feesAvailable = useMemo(() => O.isSome(prevFeesRef.current), [])
+  const prevFeesWithRatesRef = useRef<O.Option<FeesWithRates>>(O.none)
 
   const oFeesWithRates: O.Option<FeesWithRates> = useMemo(() => FP.pipe(feesWithRatesRD, RD.toOption), [
     feesWithRatesRD
   ])
+
+  const feesAvailable = useMemo(() => O.isSome(oFeesWithRates), [oFeesWithRates])
 
   // Store latest fees as `ref`
   // needed to display previous fee while reloading
   useEffect(() => {
     FP.pipe(
       oFeesWithRates,
-      O.map(({ fees }) => (prevFeesRef.current = O.some(fees)))
+      O.map((feesWithRates) => (prevFeesWithRatesRef.current = O.some(feesWithRates)))
     )
   }, [oFeesWithRates])
 
@@ -90,27 +90,27 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         oFeesWithRates,
-        O.map(({ fees }) => fees[selectedFeeKey])
+        O.map(({ fees }) => fees[selectedFeeOptionKey])
       ),
-    [oFeesWithRates, selectedFeeKey]
+    [oFeesWithRates, selectedFeeOptionKey]
   )
 
   const selectedFeeRate: O.Option<FeeRate> = useMemo(
     () =>
       FP.pipe(
         oFeesWithRates,
-        O.map(({ rates }) => rates[selectedFeeKey])
+        O.map(({ rates }) => rates[selectedFeeOptionKey])
       ),
-    [oFeesWithRates, selectedFeeKey]
+    [oFeesWithRates, selectedFeeOptionKey]
   )
 
   const oFeeBaseAmount: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
         oFeesWithRates,
-        O.map(({ fees }) => fees[selectedFeeKey])
+        O.map(({ fees }) => fees[selectedFeeOptionKey])
       ),
-    [oFeesWithRates, selectedFeeKey]
+    [oFeesWithRates, selectedFeeOptionKey]
   )
 
   const isFeeError = useMemo(() => {
@@ -133,10 +133,10 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
           () =>
             // show previous fees while re-loading
             FP.pipe(
-              prevFeesRef.current,
-              O.map((fees) =>
+              prevFeesWithRatesRef.current,
+              O.map(({ fees }) =>
                 formatAssetAmountCurrency({
-                  amount: baseToAsset(fees[selectedFeeKey]),
+                  amount: baseToAsset(fees[selectedFeeOptionKey]),
                   asset: AssetBTC,
                   trimZeros: true
                 })
@@ -146,13 +146,13 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
           (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
           ({ fees }) =>
             formatAssetAmountCurrency({
-              amount: baseToAsset(fees[selectedFeeKey]),
+              amount: baseToAsset(fees[selectedFeeOptionKey]),
               asset: AssetBTC,
               trimZeros: true
             })
         )
       ),
-    [feesWithRatesRD, intl, selectedFeeKey]
+    [feesWithRatesRD, intl, selectedFeeOptionKey]
   )
 
   const renderFeeError = useMemo(() => {
@@ -182,11 +182,11 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderFeeOptionsRadioGroup = useCallback(
-    (fees) => {
-      const onChangeHandler = (e: RadioChangeEvent) => setSelectedFeeKey(e.target.value)
+    ({ rates }: FeesWithRates) => {
+      const onChangeHandler = (e: RadioChangeEvent) => setSelectedFeeOptionKey(e.target.value)
       return (
-        <StyledR.Radio.Group onChange={onChangeHandler} value={selectedFeeKey} disabled={isLoading}>
-          {Object.keys(fees).map((key) => (
+        <StyledR.Radio.Group onChange={onChangeHandler} value={selectedFeeOptionKey} disabled={isLoading}>
+          {Object.keys(rates).map((key) => (
             <StyledR.Radio value={key as FeeOptionKey} key={key}>
               <StyledR.RadioLabel>{feeOptionsLabel[key as FeeOptionKey]}</StyledR.RadioLabel>
             </StyledR.Radio>
@@ -195,7 +195,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
       )
     },
 
-    [feeOptionsLabel, isLoading, selectedFeeKey]
+    [feeOptionsLabel, isLoading, selectedFeeOptionKey]
   )
 
   const renderFeeOptions = useMemo(
@@ -206,14 +206,14 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
           () =>
             // render radio group while reloading fees
             FP.pipe(
-              prevFeesRef.current,
+              prevFeesWithRatesRef.current,
               O.map(renderFeeOptionsRadioGroup),
               O.getOrElse(() => <></>)
             ),
           renderFeeOptionsRadioGroup
         )
       ),
-    [prevFeesRef, oFeesWithRates, renderFeeOptionsRadioGroup]
+    [prevFeesWithRatesRef, oFeesWithRates, renderFeeOptionsRadioGroup]
   )
 
   const addressValidator = useCallback(
@@ -273,7 +273,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
             // default value for BigNumberInput
             amount: bn(0),
             // Default value for RadioGroup of feeOptions
-            feeRate: 'fast'
+            feeRate: 'fastest'
           }}
           onFinish={onFinishHandler}
           labelCol={{ span: 24 }}>

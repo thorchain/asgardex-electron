@@ -31,7 +31,10 @@ storiesOf('Wallet/Send', module)
       <Send
         txRD={RD.success('0xabc123')}
         sendForm={sendForm}
-        successActionHandler={(hash: string) => console.log(`success action handler: ${hash}`)}
+        successActionHandler={(hash: string) => {
+          console.log(`success action handler: ${hash}`)
+          return Promise.resolve()
+        }}
       />
     )
   })

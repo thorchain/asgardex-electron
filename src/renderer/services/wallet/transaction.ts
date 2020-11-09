@@ -5,7 +5,6 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import * as BNB from '../binance/service'
-import * as BTC from '../bitcoin/common'
 import { loadAssetTxs as loadBtcTxs, assetTxs$ as btcTxs$ } from '../bitcoin/context'
 import { GetExplorerTxUrl } from '../clients/types'
 import { selectedAsset$ } from './common'
@@ -17,7 +16,8 @@ const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<GetExplorer
       // TODO (@thatThorchainGuy) Implemented it with https://github.com/thorchain/asgardex-electron/issues/573
       return Rx.of(O.none)
     case 'BTC':
-      return BTC.getExplorerTxUrl$
+      // TODO (@Veado) Provide explorer tx function
+      return Rx.of(O.none)
     case 'ETH':
       // not implemented yet
       return Rx.of(O.none)
