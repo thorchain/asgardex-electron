@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { Address } from '@thorchain/asgardex-binance'
+import { Address } from '@xchainjs/xchain-binance'
 import { formatAssetAmountCurrency, assetAmount, AssetAmount, bn, baseToAsset, AssetBNB } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'

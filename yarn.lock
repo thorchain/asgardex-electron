@@ -2890,11 +2890,6 @@
   dependencies:
     "@babel/runtime" "^7.10.2"
 
-"@thorchain/asgardex-binance@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-binance/-/asgardex-binance-3.0.1.tgz#ef516851b1f7d9fde28b43bb1bc0aab7bd1e1abc"
-  integrity sha512-Pg7jbDJlyvOe46QMFJKADwhe3xXkWQ0c754e6BulBJsXDLw8lzodOsP98hlJwukJXe7AE5jjyAiS/jfWA2WDiQ==
-
 "@thorchain/asgardex-ethereum@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@thorchain/asgardex-ethereum/-/asgardex-ethereum-0.2.0.tgz#11de1986eaace3d36cdfbae80bde908071e271e8"
@@ -3775,6 +3770,14 @@
     text-table "^0.2.0"
     webpack-log "^1.1.2"
 
+"@xchainjs/xchain-binance@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-3.1.1.tgz#22ae91d2d524d6f28bf97cc9bd62872739d42397"
+  integrity sha512-iu1n3PpKGfWCJDkb9avOBXEpvacqIjUGhXzSl0z4lON64GLR3EWsEzo/BPFpCMnq56NLRQwzwb8xliHAiDtAUQ==
+  dependencies:
+    "@xchainjs/xchain-client" "^0.0.7"
+    "@xchainjs/xchain-crypto" "^0.1.0"
+
 "@xchainjs/xchain-bitcoin@^0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.4.1.tgz#a6f2ef7de4061420826ce8294e9c353a573616fa"
@@ -3787,13 +3790,6 @@
     bip39 "^3.0.2"
     bitcoinjs-lib "^5.2.0"
     wif "^2.0.6"
-"@xchainjs/xchain-binance@^3.1.1":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-3.1.1.tgz#22ae91d2d524d6f28bf97cc9bd62872739d42397"
-  integrity sha512-iu1n3PpKGfWCJDkb9avOBXEpvacqIjUGhXzSl0z4lON64GLR3EWsEzo/BPFpCMnq56NLRQwzwb8xliHAiDtAUQ==
-  dependencies:
-    "@xchainjs/xchain-client" "^0.0.7"
-    "@xchainjs/xchain-crypto" "^0.1.0"
 
 "@xchainjs/xchain-client@^0.0.7":
   version "0.0.7"

@@ -1,4 +1,4 @@
-import { Balances } from '@thorchain/asgardex-binance'
+import { Balances } from '@xchainjs/xchain-binance'
 import {
   Asset,
   assetToBase,

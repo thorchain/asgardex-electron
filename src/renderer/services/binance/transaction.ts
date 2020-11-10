@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@thorchain/asgardex-binance'
-import { WS } from '@thorchain/asgardex-binance'
+import { Address, WS } from '@xchainjs/xchain-binance'
 import { AssetAmount, Asset, assetToBase } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
