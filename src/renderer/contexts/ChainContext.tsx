@@ -2,7 +2,6 @@ import React, { createContext, useContext } from 'react'
 
 import {
   clientByChain$,
-  getExplorerTxUrl$,
   stakeFees$,
   reloadStakeFees,
   isCrossChainStake$,
@@ -16,7 +15,6 @@ import {
 
 type ChainContextValue = {
   clientByChain$: typeof clientByChain$
-  getExplorerTxUrl$: typeof getExplorerTxUrl$
   stakeFees$: typeof stakeFees$
   reloadStakeFees: typeof reloadStakeFees
   withdrawFees$: typeof withdrawFees$
@@ -30,7 +28,6 @@ type ChainContextValue = {
 
 const initialContext: ChainContextValue = {
   clientByChain$,
-  getExplorerTxUrl$,
   stakeFees$,
   reloadStakeFees,
   withdrawFees$,
