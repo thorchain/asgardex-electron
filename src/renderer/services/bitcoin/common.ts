@@ -91,4 +91,13 @@ const address$: Observable<O.Option<string>> = client$.pipe(
   shareReplay(1)
 )
 
+/**
+ * Explorer url depending on selected network
+ *
+ */
+export const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
+  map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
+  shareReplay(1)
+)
+
 export { client$, clientViewState$, address$ }

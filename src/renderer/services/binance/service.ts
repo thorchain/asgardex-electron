@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { WS, Client, Network as BinanceNetwork, BinanceClient, Address } from '@thorchain/asgardex-binance'
-import { Asset, assetToBase, BNBChain } from '@xchainjs/xchain-util'
+import { WS, Client, Network as BinanceNetwork, Address } from '@xchainjs/xchain-binance'
+import { Asset, assetToBase, baseToAsset, BNBChain } from '@xchainjs/xchain-util'
+import * as A from 'fp-ts/lib/Array'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -20,7 +21,6 @@ import {
 import * as RxOperators from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
-import { getTransferFees, getFreezeFee } from '../../helpers/binanceHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { eqOString } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
@@ -43,8 +43,8 @@ import {
 import { getPhrase } from '../wallet/util'
 import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import { BinanceClientState, FeeRD, TransferFeesRD, BinanceClientState$, FeesLD } from './types'
-import { getWalletBalances, toTxsPage } from './utils'
+import { BinanceClientState, FeeRD, TransferFeesRD, BinanceClientState$ } from './types'
+import { toTxsPage } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -189,7 +189,7 @@ const clientState$: BinanceClientState$ = Rx.combineLatest([keystoreService.keys
   )
 )
 
-const client$: Observable<O.Option<BinanceClient>> = clientState$.pipe(map(getClient), shareReplay(1))
+const client$: Observable<O.Option<Client>> = clientState$.pipe(map(getClient), shareReplay(1))
 
 export type Client$ = typeof client$
 
@@ -216,9 +216,16 @@ const address$: Observable<O.Option<Address>> = client$.pipe(
 /**
  * Observable to load balances from Binance API endpoint
  */
-const loadBalances$ = (client: BinanceClient): AssetsWithBalanceLD =>
+const loadBalances$ = (client: Client): AssetsWithBalanceLD =>
   Rx.from(client.getBalance()).pipe(
-    mergeMap((balances) => Rx.of(RD.success(getWalletBalances(balances)))),
+    map(
+      A.map((balance) => ({
+        asset: balance.asset,
+        amount: balance.amount,
+        frozenAmount: O.fromNullable(balance.frozenAmount)
+      }))
+    ),
+    map(RD.success),
     catchError((error: Error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
     ),
@@ -264,7 +271,7 @@ const loadAssetTxs$ = ({
   limit,
   offset
 }: {
-  client: BinanceClient
+  client: Client
   oAsset: O.Option<Asset>
   limit: number
   offset: number
@@ -282,7 +289,15 @@ const loadAssetTxs$ = ({
   // see https://gitlab.com/thorchain/asgard-wallet/-/blob/develop/imports/api/wallet.js#L39-48
   const diffTime = 90 * 24 * 60 * 60 * 1000
   const startTime = endTime - diffTime
-  return Rx.from(client.getTransactions({ txAsset, endTime, startTime, limit, offset })).pipe(
+  return Rx.from(
+    client.getTransactions({
+      asset: txAsset,
+      address: client.getAddress(),
+      startTime: new Date(startTime),
+      limit,
+      offset
+    })
+  ).pipe(
     map(toTxsPage),
     map(RD.success),
     catchError((error) =>
@@ -335,8 +350,13 @@ const assetTxs$: AssetTxsPageLD = Rx.combineLatest([
  * If a client is not available (e.g. by removing keystore), it returns `None`
  *
  */
-const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
+export const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
   map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
+  shareReplay(1)
+)
+
+const getExplorerTxUrl$: Observable<O.Option<(ts: string) => string>> = client$.pipe(
+  map(FP.pipe(O.map((client) => client.getExplorerTxUrl))),
   shareReplay(1)
 )
 
@@ -344,53 +364,48 @@ const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
 const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
 
 /**
- * Observable to load transaction fees from Binance API endpoint
- * If client is not available, it returns an `initial` state
- */
-const loadFees$ = (client: BinanceClient): FeesLD =>
-  Rx.from(client.getFees()).pipe(
-    map(RD.success),
-    catchError((error) => Rx.of(RD.failure(error))),
-    startWith(RD.pending),
-    retry(BINANCE_MAX_RETRY)
-  )
-
-/**
  * Transaction fees
  * If a client is not available, it returns `None`
  */
-const fees$: FeesLD = Rx.combineLatest([reloadFees$, client$]).pipe(
-  mergeMap(([_, oClient]) =>
+const transferFees$: Observable<TransferFeesRD> = Rx.combineLatest([reloadFees$, client$]).pipe(
+  switchMap(([_, oClient]) =>
     FP.pipe(
       // client and asset has to be available
       oClient,
       // ignore all assets from other chains than BNB
       O.fold(
-        () => Rx.of(RD.initial),
-        (client) => loadFees$(client)
+        () => Rx.EMPTY,
+        (client) => Rx.from(Promise.all([client.getFees(), client.getMultiSendFees()]))
       )
     )
   ),
+  map(RD.success),
+  liveData.map(([singleFee, multiFees]) => ({
+    single: baseToAsset(singleFee.average),
+    multi: baseToAsset(multiFees.average)
+  })),
   startWith(RD.initial),
   shareReplay(1)
 )
 
 /**
- * Filtered fees to return `TransferFees` only
- */
-const transferFees$: Observable<TransferFeesRD> = fees$.pipe(
-  map((fees) =>
-    FP.pipe(
-      fees,
-      RD.chain((fee) => RD.fromEither(getTransferFees(fee)))
-    )
-  )
-)
-
-/**
  * Amount of feeze `Fee`
  */
-const freezeFee$: Observable<FeeRD> = FP.pipe(fees$, liveData.map(getFreezeFee), liveData.chain(liveData.fromEither))
+const freezeFee$: Observable<FeeRD> = FP.pipe(
+  Rx.combineLatest([client$, reloadFees$]),
+  switchMap(([oClient]) =>
+    FP.pipe(
+      oClient,
+      O.fold(
+        () => Rx.EMPTY,
+        (client) => Rx.from(client.getFreezeFees())
+      )
+    )
+  ),
+  map(RD.success),
+  liveData.map((fee) => baseToAsset(fee.average)),
+  startWith(RD.initial)
+)
 
 /**
  * Amount of stake `Fee`
@@ -426,7 +441,7 @@ export {
   assetTxs$,
   reloadAssetTxs as loadAssetTxs,
   address$,
-  explorerUrl$,
+  getExplorerTxUrl$,
   transaction,
   freeze,
   transferFees$,

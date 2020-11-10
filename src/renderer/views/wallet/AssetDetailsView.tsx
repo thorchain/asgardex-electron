@@ -8,14 +8,19 @@ import { useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { AssetDetails } from '../../components/wallet/assets/AssetDetails'
-import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
-  const { assetTxs$, assetsWBState$, loadAssetTxsHandler$, reloadBalances$, setSelectedAsset } = useWalletContext()
-  const { getExplorerTxUrl$ } = useChainContext()
+  const {
+    assetTxs$,
+    assetsWBState$,
+    loadAssetTxsHandler$,
+    reloadBalances$,
+    setSelectedAsset,
+    getExplorerTxUrl$
+  } = useWalletContext()
 
   const { asset } = useParams<AssetDetailsParams>()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
@@ -31,7 +36,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const [reloadBalances] = useObservableState(() => reloadBalances$.pipe(RxOp.map(O.toUndefined)))
   const [loadAssetTxsHandler] = useObservableState(() => loadAssetTxsHandler$.pipe(RxOp.map(O.toUndefined)))
 
-  const explorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
+  const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
   return (
     <>
@@ -41,7 +46,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         asset={oSelectedAsset}
         loadAssetTxsHandler={loadAssetTxsHandler}
         reloadBalancesHandler={reloadBalances}
-        getExplorerTxUrl={explorerTxUrl}
+        getExplorerTxUrl={getExplorerTxUrl}
       />
     </>
   )

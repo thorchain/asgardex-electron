@@ -10,10 +10,11 @@ import {
   reloadBalances$,
   keystoreService,
   selectedAsset$,
-  setSelectedAsset,
   loadAssetTxsHandler$,
   assetTxsByChain$,
-  assetTxs$
+  getExplorerTxUrl$,
+  assetTxs$,
+  setSelectedAsset
 } from '../services/wallet/context'
 
 type WalletContextValue = {
@@ -24,9 +25,10 @@ type WalletContextValue = {
   assetTxsByChain$: typeof assetTxsByChain$
   loadAssetTxsHandler$: typeof loadAssetTxsHandler$
   reloadBalances$: typeof reloadBalances$
-  setSelectedAsset: typeof setSelectedAsset
+  getExplorerTxUrl$: typeof getExplorerTxUrl$
   selectedAsset$: typeof selectedAsset$
   assetTxs$: typeof assetTxs$
+  setSelectedAsset: typeof setSelectedAsset
 }
 
 const initialContext: WalletContextValue = {
@@ -37,9 +39,10 @@ const initialContext: WalletContextValue = {
   assetsWBState$,
   assetsWBChains$,
   assetTxsByChain$,
-  setSelectedAsset,
+  getExplorerTxUrl$,
   selectedAsset$,
-  assetTxs$
+  assetTxs$,
+  setSelectedAsset
 }
 const WalletContext = createContext<Option<WalletContextValue>>(none)
 

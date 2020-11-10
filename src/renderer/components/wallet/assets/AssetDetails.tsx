@@ -28,7 +28,7 @@ type Props = {
   txsPageRD: AssetTxsPageRD
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
   asset: O.Option<Asset>
-  getExplorerTxUrl?: O.Option<string>
+  getExplorerTxUrl?: O.Option<(tx: string) => string>
   reloadBalancesHandler?: () => void
   loadAssetTxsHandler?: LoadAssetTxsHandler
 }
@@ -89,10 +89,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const clickTxLinkHandler = useCallback(
     (txHash: string) => {
-      FP.pipe(
-        oGetExplorerTxUrl,
-        O.map((url) => window.apiUrl.openExternal(`${url}${txHash}`))
-      )
+      FP.pipe(oGetExplorerTxUrl, O.ap(O.some(txHash)), O.map(window.apiUrl.openExternal))
     },
     [oGetExplorerTxUrl]
   )

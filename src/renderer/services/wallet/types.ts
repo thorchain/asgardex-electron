@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { TxType } from '@xchainjs/xchain-client'
 import { BaseAmount, Asset, Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
@@ -56,7 +57,7 @@ export type AssetsWithBalanceState = {
   loading: boolean
 }
 
-export type AssetTxType = 'transfer' | 'freeze' | 'unfreeze' | 'unkown'
+export type AssetTxType = TxType
 
 export type AssetTxFrom = {
   from: string // address or tx id

@@ -3787,6 +3787,13 @@
     bip39 "^3.0.2"
     bitcoinjs-lib "^5.2.0"
     wif "^2.0.6"
+"@xchainjs/xchain-binance@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-3.1.1.tgz#22ae91d2d524d6f28bf97cc9bd62872739d42397"
+  integrity sha512-iu1n3PpKGfWCJDkb9avOBXEpvacqIjUGhXzSl0z4lON64GLR3EWsEzo/BPFpCMnq56NLRQwzwb8xliHAiDtAUQ==
+  dependencies:
+    "@xchainjs/xchain-client" "^0.0.7"
+    "@xchainjs/xchain-crypto" "^0.1.0"
 
 "@xchainjs/xchain-client@^0.0.7":
   version "0.0.7"

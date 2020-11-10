@@ -45,12 +45,14 @@ jobs:
         if: runner.os != 'macOS'
         run: yarn package:ci
         env:
+          NODE_OPTIONS: --max-old-space-size=4096
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish macOS binaries
         if: runner.os == 'macOS'
         run: yarn package:ci
         env:
+          NODE_OPTIONS: --max-old-space-size=4096
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.MAC_CERTIFICATE }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
