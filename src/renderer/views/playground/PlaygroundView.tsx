@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { WS } from '@thorchain/asgardex-binance'
+import { WS } from '@xchainjs/xchain-binance'
 import { Button } from 'antd'
 import { useObservableState, useSubscription, useObservable } from 'observable-hooks'
 import { useIntl } from 'react-intl'
