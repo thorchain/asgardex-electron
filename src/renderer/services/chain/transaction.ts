@@ -61,7 +61,7 @@ const getExplorerTxUrl$: Rx.Observable<O.Option<string>> = selectedAsset$.pipe(
           RxOp.map(
             O.map((client) =>
               // we leave `txID` parameter empty to get just the url,
-              // but w/o the hash- the hash will be add by the view
+              // but w/o the hash - the hash will be added by the view
               client.getExplorerTxUrl('')
             )
           )

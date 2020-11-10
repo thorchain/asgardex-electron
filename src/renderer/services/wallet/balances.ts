@@ -128,10 +128,6 @@ export const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLate
       // filter results out
       // Transformation: RD<Error, AssetsWithBalance>`-> `AssetsWithBalance)[]`
       A.filterMap(RD.toOption),
-      (v) => {
-        console.log('assetsWBState$', v)
-        return v
-      },
       A.flatten,
       NEA.fromArray
     ),

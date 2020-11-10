@@ -17,7 +17,7 @@ const loadBalances$ = (client: BitcoinClient): AssetsWithBalanceLD =>
   Rx.from(client.getBalance()).pipe(
     // Remove transformation `Balance` -> `AssetWithBalance` to use `Balance` only
     // https://github.com/thorchain/asgardex-electron/issues/584
-    map(FP.flow(A.map((balance) => ({ ...balance, frozenAmount: O.fromNullable(balance.frozenAmount) })))),
+    map(A.map((balance) => ({ ...balance, frozenAmount: O.fromNullable(balance.frozenAmount) }))),
     map(RD.success),
     catchError((error: Error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
