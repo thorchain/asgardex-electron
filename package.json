@@ -55,7 +55,6 @@
     "@devexperts/rx-utils": "^1.0.0-alpha.14",
     "@devexperts/utils": "^1.0.0-alpha.14",
     "@openapitools/openapi-generator-cli": "^1.0.15-4.3.1",
-    "@thorchain/asgardex-binance": "^3.0.1",
     "@thorchain/asgardex-bitcoin": "^0.5.0",
     "@thorchain/asgardex-ethereum": "^0.2.0",
     "@thorchain/asgardex-midgard": "^1.1.0",
