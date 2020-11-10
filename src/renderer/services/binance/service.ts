@@ -287,10 +287,9 @@ const loadAssetTxs$ = ({
   const endTime = Date.now()
   // 90 day window - similar to ASGARDEX wallet approach,
   // see https://gitlab.com/thorchain/asgard-wallet/-/blob/develop/imports/api/wallet.js#L39-48
-  const diffTime = 90 * 24 * 60 * 60 * 1001
+  const diffTime = 90 * 24 * 60 * 60 * 1000
   const startTime = endTime - diffTime
   return Rx.from(
-    // @TODO add txAsset to the xchain
     client.getTransactions({
       asset: txAsset,
       address: client.getAddress(),
