@@ -1,4 +1,5 @@
-import { Balance, Balances, Tx, TxPage, TxType } from '@thorchain/asgardex-binance'
+import { Balance, Balances } from '@xchainjs/xchain-binance'
+import { TxsPage, Tx } from '@xchainjs/xchain-client'
 import {
   getValueOfAsset1InAsset2,
   PoolData,
@@ -19,7 +20,7 @@ import * as O from 'fp-ts/lib/Option'
 import { BNB_DECIMAL, isRuneAsset } from '../../helpers/assetHelper'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
-import { AssetWithBalance, AssetsWithBalance, AssetTxsPage, AssetTx, AssetTxType } from '../wallet/types'
+import { AssetWithBalance, AssetsWithBalance, AssetTxsPage, AssetTx } from '../wallet/types'
 
 /**
  * Helper to get a pool price value for a given `Balance`
@@ -57,7 +58,7 @@ export const bncSymbolToAsset = (symbol: string): O.Option<Asset> =>
 export const bncSymbolToAssetString = (symbol: string) => `${AssetBNB.chain}.${symbol}`
 
 export const getWalletBalances = (balances: Balances): AssetsWithBalance =>
-  balances.reduce((acc, { symbol, free, frozen }: Balance) => {
+  balances.reduce((acc: AssetsWithBalance, { symbol, free, frozen }: Balance) => {
     const oAsset = bncSymbolToAsset(symbol)
     // ignore balances w/o symbols
     return FP.pipe(
@@ -72,34 +73,18 @@ export const getWalletBalances = (balances: Balances): AssetsWithBalance =>
       }),
       O.getOrElse(() => acc)
     )
-  }, [] as AssetsWithBalance)
+  }, [])
 
-export const toAssetTxType = (txType: TxType): AssetTxType => {
-  switch (txType) {
-    case 'FREEZE_TOKEN':
-      return 'freeze'
-    case 'UN_FREEZE_TOKEN':
-      return 'unfreeze'
-    case 'TRANSFER':
-      return 'transfer'
-    default:
-      return 'unkown'
-  }
-}
+export const toAssetTx = (tx: Tx): AssetTx => ({
+  asset: O.some(tx.asset),
+  from: tx.from,
+  to: tx.to,
+  date: tx.date,
+  type: tx.type,
+  hash: tx.hash
+})
 
-export const toAssetTx = (tx: Tx): AssetTx => {
-  const amount = assetToBase(assetAmount(bnOrZero(tx.value)))
-  return {
-    asset: bncSymbolToAsset(tx.txAsset),
-    from: [{ from: tx.fromAddr, amount }],
-    to: [{ to: tx.toAddr, amount }],
-    date: new Date(tx.timeStamp),
-    type: toAssetTxType(tx.txType),
-    hash: tx.txHash
-  }
-}
-
-export const toTxsPage = ({ total, tx }: TxPage): AssetTxsPage => ({
+export const toTxsPage = ({ total, txs }: TxsPage): AssetTxsPage => ({
   total,
-  txs: tx.map(toAssetTx)
+  txs: txs.map(toAssetTx)
 })

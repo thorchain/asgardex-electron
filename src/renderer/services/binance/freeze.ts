@@ -1,6 +1,5 @@
-// import { BncClient } from '@binance-chain/javascript-sdk/lib/client'
 import * as RD from '@devexperts/remote-data-ts'
-import * as A from 'fp-ts/lib/Array'
+import { assetToBase } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
@@ -24,18 +23,21 @@ const tx$ = ({
     switchMap((client) => {
       // freeze
       if (action === 'freeze') {
-        return Rx.from(client.freeze({ amount: amount.amount().toString(), asset: asset.symbol }))
+        return Rx.from(client.freeze({ amount: assetToBase(amount), asset: asset }))
       }
       // unfreeze
       if (action === 'unfreeze') {
-        return Rx.from(client.unfreeze({ amount: amount.amount().toString(), asset: asset.symbol }))
+        return Rx.from(client.unfreeze({ amount: assetToBase(amount), asset: asset }))
       }
       return Rx.EMPTY
     }),
-    map(({ result }) => O.fromNullable(result)),
-    map((transfers) => RD.fromOption(transfers, () => Error('Transaction: empty response'))),
-    liveData.map(A.head),
-    liveData.chain(liveData.fromOption(() => Error('Transaction: no results received'))),
+    map(RD.success),
+    liveData.map((txHash) => ({
+      code: 200,
+      hash: txHash,
+      log: 'ok',
+      ok: true
+    })),
     catchError((error) => {
       return Rx.of(RD.failure(error))
     }),

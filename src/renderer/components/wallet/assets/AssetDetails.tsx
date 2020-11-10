@@ -29,6 +29,7 @@ type Props = {
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
   asset: O.Option<Asset>
   explorerTxUrl?: O.Option<string>
+  getExplorerTxUrl?: O.Option<(tx: string) => string>
   reloadBalancesHandler?: () => void
   loadAssetTxsHandler?: LoadAssetTxsHandler
 }
@@ -40,7 +41,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     asset: oAsset,
     reloadBalancesHandler = () => {},
     loadAssetTxsHandler = EMPTY_ASSET_TX_HANDLER,
-    explorerTxUrl = O.none
+    getExplorerTxUrl = O.none
   } = props
 
   const [sendAction, setSendAction] = useState<SendAction>('send')
@@ -89,12 +90,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const clickTxLinkHandler = useCallback(
     (txHash: string) => {
-      FP.pipe(
-        explorerTxUrl,
-        O.map((url) => window.apiUrl.openExternal(`${url}${txHash}`))
-      )
+      FP.pipe(getExplorerTxUrl, O.ap(O.some(txHash)), O.map(window.apiUrl.openExternal))
     },
-    [explorerTxUrl]
+    [getExplorerTxUrl]
   )
 
   const changeActionMenuClickHandler = ({ key }: { key: React.Key }) => {

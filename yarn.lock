@@ -3785,6 +3785,21 @@
     text-table "^0.2.0"
     webpack-log "^1.1.2"
 
+"@xchainjs/xchain-binance@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-3.1.1.tgz#22ae91d2d524d6f28bf97cc9bd62872739d42397"
+  integrity sha512-iu1n3PpKGfWCJDkb9avOBXEpvacqIjUGhXzSl0z4lON64GLR3EWsEzo/BPFpCMnq56NLRQwzwb8xliHAiDtAUQ==
+  dependencies:
+    "@xchainjs/xchain-client" "^0.0.7"
+    "@xchainjs/xchain-crypto" "^0.1.0"
+
+"@xchainjs/xchain-client@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.0.7.tgz#7ca6c46f9c690d37663062f596a9210f847bfed7"
+  integrity sha512-4WglU0u8VmcN17kC9VdrdsnVimInSDJ/iDpJ1d8+S63GbJBZKt3W8ekP3xsy4z0I2RAQ9WBnv6aAyXuyCV2pPw==
+  dependencies:
+    "@xchainjs/xchain-util" "^0.1.0"
+
 "@xchainjs/xchain-crypto@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-crypto/-/xchain-crypto-0.1.0.tgz#1b914f287da40214b8459c5907ed0dec438374bf"

@@ -10,10 +10,10 @@ import { loadAssetTxs as loadBtcTxs, assetTxs$ as btcTxs$ } from '../bitcoin/con
 import { selectedAsset$ } from './common'
 import { ApiError, AssetTxsPageLD, ErrorId, LoadAssetTxsHandler } from './types'
 
-const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> => {
+const explorerUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> => {
   switch (chain) {
     case 'BNB':
-      return BNB.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}/tx/`)))
+      return BNB.explorerUrl$
     case 'BTC':
       return BTC.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}tx/`)))
     case 'ETH':
@@ -27,7 +27,35 @@ const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> =>
   }
 }
 
-export const explorerTxUrl$: Rx.Observable<O.Option<string>> = selectedAsset$.pipe(
+const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<(tx: string) => string>> => {
+  switch (chain) {
+    case 'BNB':
+      return BNB.getExplorerTxUrl$
+    case 'BTC':
+      // @TODO @veado implement this one with https://github.com/thorchain/asgardex-electron/issues/574
+      return Rx.of(O.none)
+    // return BTC.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}tx/`)))
+    case 'ETH':
+      // not implemented yet
+      return Rx.of(O.none)
+    case 'THOR':
+      // reload THOR balances - not available yet
+      return Rx.of(O.none)
+    default:
+      return Rx.of(O.none)
+  }
+}
+
+export const explorerUrl$: Rx.Observable<O.Option<string>> = selectedAsset$.pipe(
+  RxOp.switchMap(
+    O.fold(
+      () => Rx.EMPTY,
+      ({ chain }) => explorerUrlByChain$(chain)
+    )
+  )
+)
+
+export const getExplorerTxUrl$: Rx.Observable<O.Option<(tx: string) => string>> = selectedAsset$.pipe(
   RxOp.switchMap(
     O.fold(
       () => Rx.EMPTY,
