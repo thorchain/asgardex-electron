@@ -28,6 +28,7 @@ import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import { FeeLD } from '../chain/types'
+import { GetExplorerTxUrl } from '../clients/types'
 import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
 import { keystoreService, selectedAsset$ as selectedWalletAsset$ } from '../wallet/common'
@@ -355,7 +356,7 @@ export const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
   shareReplay(1)
 )
 
-const getExplorerTxUrl$: Observable<O.Option<(ts: string) => string>> = client$.pipe(
+const getExplorerTxUrl$: Observable<O.Option<GetExplorerTxUrl>> = client$.pipe(
   map(FP.pipe(O.map((client) => client.getExplorerTxUrl))),
   shareReplay(1)
 )

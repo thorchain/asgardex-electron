@@ -13,16 +13,18 @@ import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getAssetWBByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/bitcoin/types'
+import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { AssetsWithBalance, AssetWithBalance, NonEmptyAssetsWithBalance, TxRD } from '../../../services/wallet/types'
 
 type Props = {
   btcAsset: Asset
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
+  getExplorerTxUrl: O.Option<GetExplorerTxUrl>
   reloadFeesHandler: () => void
 }
 
 export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
-  const { btcAsset: selectedAsset, assetsWB, reloadFeesHandler } = props
+  const { btcAsset: selectedAsset, assetsWB, reloadFeesHandler, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
 
   const oBtcAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
 
@@ -65,12 +67,13 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
   )
 
   return FP.pipe(
-    sequenceTOption(oClient, oBtcAssetWB),
+    sequenceTOption(oGetExplorerTxUrl, oBtcAssetWB),
     O.fold(
       () => <></>,
-      ([client, btcAssetWB]) => {
+      ([getExplorerTxUrl, btcAssetWB]) => {
+        console.log('getExplorerTxUrl:', getExplorerTxUrl('hash'))
         const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
-          client.getExplorerTxUrl,
+          getExplorerTxUrl,
           window.apiUrl.openExternal
         )
         return (

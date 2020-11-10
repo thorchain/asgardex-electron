@@ -9,3 +9,5 @@ export type TxsPageLD = LiveData<ApiError, TxsPage>
 
 export type BalancesRD = RD.RemoteData<ApiError, Balances>
 export type BalancesLD = LiveData<ApiError, Balances>
+
+export type GetExplorerTxUrl = (txHash: string) => string

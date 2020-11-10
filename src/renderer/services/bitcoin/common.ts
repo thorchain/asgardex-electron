@@ -10,6 +10,7 @@ import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators
 import { envOrDefault } from '../../helpers/envHelper'
 import { eqOString } from '../../helpers/fp/eq'
 import { network$ } from '../app/service'
+import { GetExplorerTxUrl } from '../clients/types'
 import { ClientStateForViews } from '../types'
 import { getClientStateForViews, getClient } from '../utils'
 import { keystoreService } from '../wallet/common'
@@ -95,9 +96,18 @@ const address$: Observable<O.Option<string>> = client$.pipe(
  * Explorer url depending on selected network
  *
  */
-export const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
+const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
   map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
   shareReplay(1)
 )
 
-export { client$, clientViewState$, address$ }
+/**
+ * Explorer url depending on selected network
+ *
+ */
+const getExplorerTxUrl$: Observable<O.Option<GetExplorerTxUrl>> = client$.pipe(
+  map(FP.pipe(O.map((client) => client.getExplorerTxUrl))),
+  shareReplay(1)
+)
+
+export { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$ }
