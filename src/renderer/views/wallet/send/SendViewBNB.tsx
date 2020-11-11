@@ -74,7 +74,6 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     O.fold(
       () => <></>,
       ([selectedAssetWB, getExplorerTxUrl]) => {
-        console.log('getExplorerTxUrl:', getExplorerTxUrl('hash'))
         const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
           getExplorerTxUrl,
           window.apiUrl.openExternal

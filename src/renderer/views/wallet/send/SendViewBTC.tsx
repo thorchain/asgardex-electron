@@ -71,7 +71,6 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     O.fold(
       () => <></>,
       ([getExplorerTxUrl, btcAssetWB]) => {
-        console.log('getExplorerTxUrl:', getExplorerTxUrl('hash'))
         const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
           getExplorerTxUrl,
           window.apiUrl.openExternal
