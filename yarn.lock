@@ -3778,10 +3778,10 @@
     "@xchainjs/xchain-client" "^0.0.7"
     "@xchainjs/xchain-crypto" "^0.1.0"
 
-"@xchainjs/xchain-bitcoin@^0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.4.1.tgz#a6f2ef7de4061420826ce8294e9c353a573616fa"
-  integrity sha512-n3aeCOhPoWpH+nOzhnDVQQDC8+GNOIV4kGgVVyiHZst8EpDsiDFeLP+swUsBdQjfMhHeyBjQAuithRjqSOaN+A==
+"@xchainjs/xchain-bitcoin@^0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.4.3.tgz#9c0320897745ae1c4db06f2410b0687b0a7febfb"
+  integrity sha512-3q1Ob6ii8Ntr9GmFhFIRpZGUCtwtjVADd/XCkwNXBAMlIKsBt3Yz5PKas2sOR1ug57XVufxydmle6YWJlf903w==
   dependencies:
     "@xchainjs/xchain-client" "^0.0.7"
     "@xchainjs/xchain-crypto" "^0.1.0"
