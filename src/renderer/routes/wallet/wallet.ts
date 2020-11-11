@@ -97,29 +97,3 @@ export const send: Route<SendParams> = {
     }
   }
 }
-
-export type FreezeParams = { asset: string }
-export const freeze: Route<FreezeParams> = {
-  template: `${assetDetail.template}/freeze`,
-  path: ({ asset }) => {
-    if (asset) {
-      return `${assetDetail.path({ asset })}/freeze`
-    } else {
-      // Redirect to assets route if passed param is empty
-      return assets.path()
-    }
-  }
-}
-
-export type UnfreezeParams = { asset: string }
-export const unfreeze: Route<UnfreezeParams> = {
-  template: `${assetDetail.template}/unfreeze`,
-  path: ({ asset }) => {
-    if (asset) {
-      return `${assetDetail.path({ asset })}/unfreeze`
-    } else {
-      // Redirect to assets route if passed param is empty
-      return assets.path()
-    }
-  }
-}

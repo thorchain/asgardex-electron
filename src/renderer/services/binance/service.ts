@@ -42,9 +42,8 @@ import {
   LoadAssetTxsProps
 } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
-import { createFreezeService } from './freeze'
 import { createTransactionService } from './transaction'
-import { BinanceClientState, FeeRD, TransferFeesRD, BinanceClientState$ } from './types'
+import { BinanceClientState, TransferFeesRD, BinanceClientState$ } from './types'
 import { toTxsPage } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
@@ -222,8 +221,7 @@ const loadBalances$ = (client: Client): AssetsWithBalanceLD =>
     map(
       A.map((balance) => ({
         asset: balance.asset,
-        amount: balance.amount,
-        frozenAmount: O.fromNullable(balance.frozenAmount)
+        amount: balance.amount
       }))
     ),
     map(RD.success),
@@ -390,25 +388,6 @@ const transferFees$: Observable<TransferFeesRD> = Rx.combineLatest([reloadFees$,
 )
 
 /**
- * Amount of feeze `Fee`
- */
-const freezeFee$: Observable<FeeRD> = FP.pipe(
-  Rx.combineLatest([client$, reloadFees$]),
-  switchMap(([oClient]) =>
-    FP.pipe(
-      oClient,
-      O.fold(
-        () => Rx.EMPTY,
-        (client) => Rx.from(client.getFreezeFees())
-      )
-    )
-  ),
-  map(RD.success),
-  liveData.map((fee) => baseToAsset(fee.average)),
-  startWith(RD.initial)
-)
-
-/**
  * Amount of stake `Fee`
  */
 export const stakeFee$: FeeLD = FP.pipe(
@@ -427,8 +406,6 @@ const wsTransfer$ = FP.pipe(
 
 const transaction = createTransactionService(clientState$, wsTransfer$)
 
-const freeze = createFreezeService(clientState$)
-
 /**
  * Object with all "public" functions and observables
  */
@@ -444,8 +421,6 @@ export {
   address$,
   getExplorerTxUrl$,
   transaction,
-  freeze,
   transferFees$,
-  freezeFee$,
   reloadFees
 }

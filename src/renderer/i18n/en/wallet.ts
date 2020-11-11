@@ -9,8 +9,6 @@ const wallet: WalletMessages = {
   'wallet.column.value': 'Value',
   'wallet.action.send': 'Send',
   'wallet.action.receive': 'Receive',
-  'wallet.action.freeze': 'Freeze',
-  'wallet.action.unfreeze': 'Unfreeze',
   'wallet.action.remove': 'Remove wallet',
   'wallet.action.unlock': 'Unlock',
   'wallet.action.connect': 'Connect',
@@ -47,7 +45,6 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeNumber': 'Amount should be a number',
   'wallet.errors.amount.shouldBeGreaterThan': 'Amount should be greater than {amount}',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Amount should be less than your balance',
-  'wallet.errors.amount.shouldBeLessThanFrozenBalance': 'Amount should be less than your frozen value',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee': 'Amount should be less than your balance minus fee',
   'wallet.errors.fee.notCovered': 'Fees are not covered by your balance ({balance})',
   'wallet.errors.invalidChain': 'Invalid chain: {chain}'

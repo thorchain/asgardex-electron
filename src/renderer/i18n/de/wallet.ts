@@ -9,8 +9,6 @@ const wallet: WalletMessages = {
   'wallet.column.value': 'Wert',
   'wallet.action.send': 'Senden',
   'wallet.action.receive': 'Empfangen',
-  'wallet.action.freeze': 'Einfrieren',
-  'wallet.action.unfreeze': 'Freigeben',
   'wallet.action.remove': 'Wallet entfernen',
   'wallet.action.unlock': 'Entsperren',
   'wallet.action.import': 'Importieren',
@@ -47,8 +45,6 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeNumber': 'Der eingegebene Wert sollte eine Nummer sein',
   'wallet.errors.amount.shouldBeGreaterThan': 'Der eingegebene Betrag sollte höher als {amount} betragen',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Der eingegebene Betrag sollte nicht höher als Dein Guthaben sein',
-  'wallet.errors.amount.shouldBeLessThanFrozenBalance':
-    'Der eingegebene Wert sollte nicht höher als Dein eingefrorenes Guthaben sein',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Der eingegebene Wert sollte nicht höher als Dein Guthaben abzgl. Gebühren sein',
   'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Dein Guthaben ({balance}) gedeckt',

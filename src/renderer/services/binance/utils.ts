@@ -1,4 +1,4 @@
-import { Balance, Balances } from '@xchainjs/xchain-binance'
+import { Balances } from '@xchainjs/xchain-binance'
 import { TxsPage, Tx } from '@xchainjs/xchain-client'
 import {
   getValueOfAsset1InAsset2,
@@ -10,10 +10,9 @@ import {
   getValueOfRuneInAsset,
   Asset,
   assetToBase,
-  bn,
-  isValidBN,
   AssetBNB
 } from '@xchainjs/xchain-util'
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -57,23 +56,18 @@ export const bncSymbolToAsset = (symbol: string): O.Option<Asset> =>
  **/
 export const bncSymbolToAssetString = (symbol: string) => `${AssetBNB.chain}.${symbol}`
 
-export const getWalletBalances = (balances: Balances): AssetsWithBalance =>
-  balances.reduce((acc: AssetsWithBalance, { symbol, free, frozen }: Balance) => {
-    const oAsset = bncSymbolToAsset(symbol)
-    // ignore balances w/o symbols
-    return FP.pipe(
-      oAsset,
-      O.map((asset) => {
-        const amountBN = bnOrZero(free)
-        const amount = assetToBase(assetAmount(amountBN, BNB_DECIMAL))
-        const frozenAmountBN = bn(frozen)
-        const frozenAmount = isValidBN(frozenAmountBN) ? O.some(assetToBase(assetAmount(frozenAmountBN))) : O.none
+type GetWalletBalances = (balances: Balances) => AssetsWithBalance
+export const getWalletBalances: GetWalletBalances = A.filterMap(({ symbol, free }) =>
+  FP.pipe(
+    bncSymbolToAsset(symbol),
+    O.map((asset) => {
+      const amountBN = bnOrZero(free)
+      const amount = assetToBase(assetAmount(amountBN, BNB_DECIMAL))
 
-        return [...acc, { asset, amount, frozenAmount }]
-      }),
-      O.getOrElse(() => acc)
-    )
-  }, [])
+      return { asset, amount }
+    })
+  )
+)
 
 export const toAssetTx = (tx: Tx): AssetTx => ({
   asset: O.some(tx.asset),

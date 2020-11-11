@@ -9,8 +9,6 @@ const wallet: WalletMessages = {
   'wallet.column.value': 'Количество',
   'wallet.action.send': 'Отправить',
   'wallet.action.receive': 'Получить',
-  'wallet.action.freeze': 'Freeze - RU',
-  'wallet.action.unfreeze': 'Unfreeze - RU',
   'wallet.action.remove': 'Удалить кошелек',
   'wallet.action.unlock': 'Разблокировать',
   'wallet.action.import': 'Импортировать',
@@ -47,7 +45,6 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeNumber': 'Количество должно быть числом',
   'wallet.errors.amount.shouldBeGreaterThan': 'Количество должно быть больше, чем {amount}',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Количество должно быть меньше вашего баланса',
-  'wallet.errors.amount.shouldBeLessThanFrozenBalance': 'Amount should be less than your frozen value - RU',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Количество должно быть меньше, чем ваш баланс после вычета комисси',
   'wallet.errors.fee.notCovered': ' Комиссия не покрывается вашим банаслом ({balance})',

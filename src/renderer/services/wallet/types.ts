@@ -31,7 +31,6 @@ export type KeystoreService = {
 export type AssetWithBalance = {
   asset: Asset
   amount: BaseAmount
-  frozenAmount: O.Option<BaseAmount>
 }
 
 export type AssetsWithBalance = AssetWithBalance[]

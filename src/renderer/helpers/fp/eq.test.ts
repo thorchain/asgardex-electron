@@ -124,7 +124,6 @@ describe('helpers/fp/eq', () => {
     it('is equal', () => {
       const a: AssetWithBalance = {
         amount: baseAmount('1'),
-        frozenAmount: O.none,
         asset: ASSETS_TESTNET.BNB
       }
       expect(eqAssetWithBalance.equals(a, a)).toBeTruthy()
@@ -132,7 +131,6 @@ describe('helpers/fp/eq', () => {
     it('is not equal', () => {
       const a: AssetWithBalance = {
         amount: baseAmount('1'),
-        frozenAmount: O.none,
         asset: ASSETS_TESTNET.BNB
       }
       // b = same as a, but another amount
@@ -140,26 +138,19 @@ describe('helpers/fp/eq', () => {
         ...a,
         amount: baseAmount('2')
       }
-      // c = same as a, but another frozenAmount
+      // c = same as a, but another asset
       const c: AssetWithBalance = {
-        ...a,
-        frozenAmount: O.some(baseAmount('1'))
-      }
-      // d = same as a, but another frozenAmount
-      const d: AssetWithBalance = {
         ...a,
         asset: ASSETS_TESTNET.RUNE
       }
       expect(eqAssetWithBalance.equals(a, b)).toBeFalsy()
       expect(eqAssetWithBalance.equals(a, c)).toBeFalsy()
-      expect(eqAssetWithBalance.equals(a, d)).toBeFalsy()
     })
   })
 
   describe('eqAssetsWithBalance', () => {
     const a: AssetWithBalance = {
       amount: baseAmount('1'),
-      frozenAmount: O.none,
       asset: ASSETS_TESTNET.RUNE
     }
     const b: AssetWithBalance = {

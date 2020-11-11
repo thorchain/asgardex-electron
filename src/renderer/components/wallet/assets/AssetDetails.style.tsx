@@ -46,14 +46,3 @@ export const TableHeadline = styled(Headline)`
   width: 100%;
   text-align: ${({ isDesktop }: TableHeadlineProps) => (isDesktop ? 'left' : 'center')};
 `
-
-export const ActionMenu = styled(A.Menu)`
-  background-color: ${palette('background', 1)};
-`
-
-export const ActionMenuItem = styled(A.Menu.Item)`
-  background-color: ${palette('background', 1)};
-  &:hover {
-    background-color: ${palette('background', 2)};
-  }
-`

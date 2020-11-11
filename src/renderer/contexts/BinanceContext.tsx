@@ -9,9 +9,7 @@ import {
   assetTxs$,
   getExplorerTxUrl$,
   transaction,
-  freeze,
   transferFees$,
-  freezeFee$,
   explorerUrl$
 } from '../services/binance/service'
 
@@ -24,10 +22,8 @@ export type BinanceContextValue = {
   explorerUrl$: typeof explorerUrl$
   getExplorerTxUrl$: typeof getExplorerTxUrl$
   transaction: typeof transaction
-  freeze: typeof freeze
   client$: typeof client$
   transferFees$: typeof transferFees$
-  freezeFee$: typeof freezeFee$
 }
 
 const initialContext: BinanceContextValue = {
@@ -40,9 +36,7 @@ const initialContext: BinanceContextValue = {
   explorerUrl$,
   getExplorerTxUrl$,
   transaction,
-  freeze,
-  transferFees$,
-  freezeFee$
+  transferFees$
 }
 
 const BinanceContext = createContext<BinanceContextValue | null>(null)

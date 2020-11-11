@@ -1,17 +1,4 @@
-import {
-  base,
-  imports,
-  locked,
-  settings,
-  assets,
-  stakes,
-  bonds,
-  assetDetail,
-  send,
-  receive,
-  freeze,
-  unfreeze
-} from './wallet'
+import { base, imports, locked, settings, assets, stakes, bonds, assetDetail, send, receive } from './wallet'
 
 describe('Wallet routes', () => {
   describe('base routes', () => {
@@ -102,24 +89,6 @@ describe('Wallet routes', () => {
     })
     it('path ', () => {
       expect(send.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB/send')
-    })
-  })
-
-  describe('freeze route', () => {
-    it('template', () => {
-      expect(freeze.template).toEqual('/wallet/assets/detail/:asset/freeze')
-    })
-    it('path ', () => {
-      expect(freeze.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB/freeze')
-    })
-  })
-
-  describe('unfreeze route', () => {
-    it('template', () => {
-      expect(unfreeze.template).toEqual('/wallet/assets/detail/:asset/unfreeze')
-    })
-    it('path ', () => {
-      expect(unfreeze.path({ asset: 'BNB.BNB' })).toEqual('/wallet/assets/detail/BNB.BNB/unfreeze')
     })
   })
 })

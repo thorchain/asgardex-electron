@@ -3,7 +3,6 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, assetToString, baseAmount } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/lib/Option'
 
 import { getRunePricePool } from '../../../helpers/poolHelper'
 import { ApiError, AssetsWBChain, AssetsWBChains, ErrorId } from '../../../services/wallet/types'
@@ -33,7 +32,6 @@ const assetsWBChains: AssetsWBChains = [
     assetsWB: RD.success([
       {
         amount: baseAmount('12200000000'),
-        frozenAmount: O.none,
         asset: AssetRune67C
       }
     ])
@@ -43,7 +41,6 @@ const assetsWBChains: AssetsWBChains = [
     assetsWB: RD.success([
       {
         amount: baseAmount('1230000'),
-        frozenAmount: O.none,
         asset: AssetBTC
       }
     ])
@@ -53,12 +50,10 @@ const assetsWBChains: AssetsWBChains = [
     assetsWB: RD.success([
       {
         amount: baseAmount('1000000'),
-        frozenAmount: O.none,
         asset: AssetBNB
       },
       {
         amount: baseAmount('300000000'),
-        frozenAmount: O.none,
         asset: AssetETH
       }
     ])

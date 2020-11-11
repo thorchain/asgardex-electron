@@ -88,8 +88,7 @@ const loadBalances$ = (client: EthereumClient): Observable<AssetWithBalanceRD> =
       Rx.of(
         RD.success({
           asset: AssetETH,
-          amount: baseAmount(balance.toString(), ETH_DECIMAL),
-          frozenAmount: O.none
+          amount: baseAmount(balance.toString(), ETH_DECIMAL)
         } as AssetWithBalance)
       )
     ),

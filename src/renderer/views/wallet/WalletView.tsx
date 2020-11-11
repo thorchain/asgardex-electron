@@ -15,7 +15,6 @@ import { AssetDetailsView } from './AssetDetailsView'
 import { AssetsView } from './AssetsView'
 import { BondsView } from './BondsView'
 import { CreateView } from './CreateView/CreateView'
-import { FreezeView } from './FreezeView'
 import { ImportsView } from './importsView/ImportsView'
 import { NoWalletView } from './NoWalletView/NoWalletView'
 import { ReceiveView } from './ReceiveView'
@@ -75,12 +74,6 @@ export const WalletView: React.FC = (): JSX.Element => {
           </Route>
           <Route path={walletRoutes.send.template} exact>
             <SendView />
-          </Route>
-          <Route path={walletRoutes.freeze.template} exact>
-            <FreezeView freezeAction="freeze" />
-          </Route>
-          <Route path={walletRoutes.unfreeze.template} exact>
-            <FreezeView freezeAction="unfreeze" />
           </Route>
           <Route path={walletRoutes.assetDetail.template} exact>
             <AssetDetailsView />

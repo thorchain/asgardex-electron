@@ -3770,20 +3770,20 @@
     text-table "^0.2.0"
     webpack-log "^1.1.2"
 
-"@xchainjs/xchain-binance@^3.1.1":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-3.1.1.tgz#22ae91d2d524d6f28bf97cc9bd62872739d42397"
-  integrity sha512-iu1n3PpKGfWCJDkb9avOBXEpvacqIjUGhXzSl0z4lON64GLR3EWsEzo/BPFpCMnq56NLRQwzwb8xliHAiDtAUQ==
+"@xchainjs/xchain-binance@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-4.0.0.tgz#fafd11fa77c8aa4c32cfa481318199645830d7fb"
+  integrity sha512-OShHf3HxL0tasSeSjsWEifeBrplqzKSbPintY6stv0F43JAqzi5YFeCwHNkWMZ5e0NCWWOOTHEhxfzkVsuh/vQ==
   dependencies:
-    "@xchainjs/xchain-client" "^0.0.7"
+    "@xchainjs/xchain-client" "^0.1.0"
     "@xchainjs/xchain-crypto" "^0.1.0"
 
-"@xchainjs/xchain-bitcoin@^0.4.3":
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.4.3.tgz#9c0320897745ae1c4db06f2410b0687b0a7febfb"
-  integrity sha512-3q1Ob6ii8Ntr9GmFhFIRpZGUCtwtjVADd/XCkwNXBAMlIKsBt3Yz5PKas2sOR1ug57XVufxydmle6YWJlf903w==
+"@xchainjs/xchain-bitcoin@^0.4.4":
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.4.4.tgz#38bc186fa0c3821a90bb239fcd824f3730fe7490"
+  integrity sha512-wFJbL6mQ5+yZD9Lp2cZgsPdyXPryeBEDWWm85iib6FRHti/TDz9o3DTW0I259B1LONJNtNcTfR8MdHPPzHRM9Q==
   dependencies:
-    "@xchainjs/xchain-client" "^0.0.7"
+    "@xchainjs/xchain-client" "^0.1.0"
     "@xchainjs/xchain-crypto" "^0.1.0"
     axios "^0.20.0"
     axios-mock-adapter "^1.19.0"
@@ -3791,10 +3791,10 @@
     bitcoinjs-lib "^5.2.0"
     wif "^2.0.6"
 
-"@xchainjs/xchain-client@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.0.7.tgz#7ca6c46f9c690d37663062f596a9210f847bfed7"
-  integrity sha512-4WglU0u8VmcN17kC9VdrdsnVimInSDJ/iDpJ1d8+S63GbJBZKt3W8ekP3xsy4z0I2RAQ9WBnv6aAyXuyCV2pPw==
+"@xchainjs/xchain-client@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.1.0.tgz#756057832839a1a428f1cf2941fb3ac28a280742"
+  integrity sha512-cah1HDu9CZIl0/+WXMPMTRmcsfeaKA/5DEQdglxY8Xv5PlUalKFZwbNp2kKt+isHEfOp8GtsbEcPbv8lSLc/mw==
   dependencies:
     "@xchainjs/xchain-util" "^0.1.0"
 
