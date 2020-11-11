@@ -9,8 +9,8 @@ import * as Styled from './Drag.style'
 type Props = {
   className?: string
   reset?: boolean
-  source: Asset
-  target: Asset
+  source?: Asset
+  target?: Asset
   title?: string
   onConfirm?: () => void
   onDrag?: () => void
@@ -114,6 +114,18 @@ export const Drag: React.FC<Props> = ({
     onDrag: handleDragging,
     onStop: handleDragStop
   }
+
+  const sourceIcon = useMemo(
+    () => (source ? <Styled.AssetIcon asset={source} size="small" /> : <Styled.BlueIconPlaceholder />),
+    [source]
+  )
+
+  const targetIcon = useMemo(
+    () =>
+      target ? <AssetIcon className="target-asset" asset={target} size="small" /> : <Styled.ConfirmIconPlaceholder />,
+    [target]
+  )
+
   return (
     <div className={`drag-wrapper ${className}`}>
       <Styled.DragContainer
@@ -124,12 +136,10 @@ export const Drag: React.FC<Props> = ({
         dragging={dragging}
         {...rest}>
         <Draggable disabled={disabled} position={pos} axis="x" bounds={dragBounds} {...dragHandlers}>
-          <div className="source-asset">
-            <Styled.AssetIcon asset={source} size="small" />
-          </div>
+          <div className="source-asset">{sourceIcon}</div>
         </Draggable>
         {title && <Styled.TitleLabel color="input">{title}</Styled.TitleLabel>}
-        <AssetIcon className="target-asset" asset={target} size="small" />
+        {targetIcon}
       </Styled.DragContainer>
     </div>
   )

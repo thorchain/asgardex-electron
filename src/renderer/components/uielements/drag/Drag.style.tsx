@@ -1,3 +1,6 @@
+import React from 'react'
+
+import { CheckOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -11,6 +14,8 @@ type DragWrapperProps = {
   success: boolean
   disabled: boolean
 }
+
+const ICON_SIZE = '32px'
 
 export const DragContainer = styled.div`
   position: relative;
@@ -31,10 +36,10 @@ export const DragContainer = styled.div`
   overflow: hidden;
 
   .coinIcon-wrapper {
-    min-width: 32px;
-    max-width: 32px;
-    min-height: 32px;
-    max-height: 32px;
+    min-width: ${ICON_SIZE};
+    max-width: ${ICON_SIZE};
+    min-height: ${ICON_SIZE};
+    max-height: ${ICON_SIZE};
     border-radius: 50%;
     cursor: pointer;
 
@@ -54,6 +59,7 @@ export const DragContainer = styled.div`
     position: absolute;
     z-index: 500;
     border-radius: 50%;
+    overflow: hidden;
     ${(props) => props.missed && 'transition: all .8s'};
 
     &:hover {
@@ -69,6 +75,7 @@ export const DragContainer = styled.div`
     right: 4px;
     opacity: ${(props) => (props.overlap || props.success ? '1' : '0.5')};
     border-radius: 50%;
+    overflow: hidden;
     z-index: 300;
 
     ${(props) => props.success && 'box-shadow: 0px 0px 4px 1px #50E3C2'};
@@ -79,12 +86,32 @@ export const AssetIcon = styled(BaseAssetIcon)`
   cursor: pointer;
 `
 
+export const BlueIconPlaceholder = styled('div')`
+  cursor: pointer;
+  background: ${palette('secondary', 0)};
+  width: ${ICON_SIZE};
+  height: ${ICON_SIZE};
+`
+
+export const ConfirmIconPlaceholder = styled('div').attrs({
+  className: 'target-asset',
+  children: <CheckOutlined />
+})`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: ${ICON_SIZE};
+  height: ${ICON_SIZE};
+  background: ${palette('primary', 0)};
+  color: ${palette('background', 0)};
+`
+
 export const TitleLabel = styled(Label).attrs({
   align: 'center'
 })`
   width: 200px;
   font-size: 12px;
-  margin: 0 32px; /* icon size */
+  margin: 0 ${ICON_SIZE}; /* icon size */
   text-transform: uppercase;
   color: ${palette('text', 2)};
 `
