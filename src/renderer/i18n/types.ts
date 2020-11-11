@@ -109,7 +109,6 @@ type WalletMessageKey =
   | 'wallet.errors.amount.shouldBeNumber'
   | 'wallet.errors.amount.shouldBeGreaterThan'
   | 'wallet.errors.amount.shouldBeLessThanBalance'
-  | 'wallet.errors.amount.shouldBeLessThanFrozenBalance'
   | 'wallet.errors.amount.shouldBeLessThanBalanceAndFee'
   | 'wallet.errors.fee.notCovered'
   | 'wallet.errors.invalidChain'
