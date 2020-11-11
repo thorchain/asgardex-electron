@@ -10,6 +10,7 @@ import { useHistory } from 'react-router-dom'
 import * as AH from '../../../helpers/assetHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { SendAction, isSendAction } from '../../../services/binance/types'
+import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_ASSET_TX_HANDLER } from '../../../services/wallet/const'
 import { AssetTxsPageRD, LoadAssetTxsHandler, NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
@@ -28,8 +29,7 @@ type Props = {
   txsPageRD: AssetTxsPageRD
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
   asset: O.Option<Asset>
-  explorerTxUrl?: O.Option<string>
-  getExplorerTxUrl?: O.Option<(tx: string) => string>
+  getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: () => void
   loadAssetTxsHandler?: LoadAssetTxsHandler
 }
@@ -41,7 +41,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     asset: oAsset,
     reloadBalancesHandler = () => {},
     loadAssetTxsHandler = EMPTY_ASSET_TX_HANDLER,
-    getExplorerTxUrl = O.none
+    getExplorerTxUrl: oGetExplorerTxUrl = O.none
   } = props
 
   const [sendAction, setSendAction] = useState<SendAction>('send')
@@ -90,9 +90,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const clickTxLinkHandler = useCallback(
     (txHash: string) => {
-      FP.pipe(getExplorerTxUrl, O.ap(O.some(txHash)), O.map(window.apiUrl.openExternal))
+      FP.pipe(oGetExplorerTxUrl, O.ap(O.some(txHash)), O.map(window.apiUrl.openExternal))
     },
-    [getExplorerTxUrl]
+    [oGetExplorerTxUrl]
   )
 
   const changeActionMenuClickHandler = ({ key }: { key: React.Key }) => {

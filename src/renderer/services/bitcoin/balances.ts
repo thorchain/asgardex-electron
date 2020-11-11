@@ -1,32 +1,24 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
-import { AssetBTC, baseAmount } from '@xchainjs/xchain-util'
+import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { Observable } from 'rxjs'
-import { mergeMap, catchError, shareReplay, startWith, debounceTime } from 'rxjs/operators'
+import { mergeMap, catchError, shareReplay, startWith, debounceTime, map } from 'rxjs/operators'
 
-import { BTC_DECIMAL } from '../../helpers/assetHelper'
 import { triggerStream } from '../../helpers/stateHelper'
-import { AssetWithBalanceRD, AssetWithBalance, ApiError, ErrorId } from '../wallet/types'
+import { ApiError, AssetsWithBalanceLD, ErrorId } from '../wallet/types'
 import { client$ } from './common'
 
 /**
  * Observable to load balances from Binance API endpoint
- * If client is not available, it returns an `initial` state
  */
-const loadBalances$ = (client: BitcoinClient): Observable<AssetWithBalanceRD> =>
+const loadBalances$ = (client: BitcoinClient): AssetsWithBalanceLD =>
   Rx.from(client.getBalance()).pipe(
-    mergeMap((balance) =>
-      Rx.of(
-        RD.success({
-          asset: AssetBTC,
-          amount: baseAmount(balance, BTC_DECIMAL),
-          frozenAmount: O.none
-        } as AssetWithBalance)
-      )
-    ),
+    // Remove transformation `Balance` -> `AssetWithBalance` to use `Balance` only
+    // https://github.com/thorchain/asgardex-electron/issues/584
+    map(A.map((balance) => ({ ...balance, frozenAmount: O.fromNullable(balance.frozenAmount) }))),
+    map(RD.success),
     catchError((error: Error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
     ),
@@ -42,10 +34,7 @@ const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const assetWB$: Observable<AssetWithBalanceRD> = Rx.combineLatest([
-  reloadBalances$.pipe(debounceTime(300)),
-  client$
-]).pipe(
+const assetsWB$: AssetsWithBalanceLD = Rx.combineLatest([reloadBalances$.pipe(debounceTime(300)), client$]).pipe(
   mergeMap(([_, client]) => {
     return FP.pipe(
       client,
@@ -61,4 +50,4 @@ const assetWB$: Observable<AssetWithBalanceRD> = Rx.combineLatest([
   shareReplay(1)
 )
 
-export { loadBalances$, assetWB$, reloadBalances }
+export { loadBalances$, assetsWB$, reloadBalances }

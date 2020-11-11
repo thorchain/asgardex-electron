@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
+import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
 import { BTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -12,18 +12,14 @@ import { selectedAsset$ } from '../wallet/common'
 import { ApiError, AssetTxsPageLD, ErrorId, TxRD } from '../wallet/types'
 import { Client$ } from './common'
 import { SendTxParams, TransactionService } from './types'
-import { toTxsPage } from './utils'
+import { toAssetTxsPage } from './utils'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
 const tx$ = ({ client$, to, amount, feeRate, memo }: { client$: Client$ } & SendTxParams): Rx.Observable<TxRD> =>
   client$.pipe(
     switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
-    switchMap((client) =>
-      memo
-        ? Rx.from(client.vaultTx({ addressTo: to, amount: amount.amount().toNumber(), memo, feeRate }))
-        : Rx.from(client.normalTx({ addressTo: to, amount: amount.amount().toNumber(), feeRate }))
-    ),
+    switchMap((client) => Rx.from(client.transfer({ recipient: to, amount, memo, feeRate }))),
     map(RD.success),
     catchError((error) =>
       Rx.of(
@@ -43,13 +39,15 @@ const sendStakeTx = (client$: Client$) => ({ to, amount, feeRate, memo }: SendTx
   tx$({ client$, to, amount, feeRate, memo })
 
 /**
- * Observable to load txs from Binance API endpoint
+ * Observable to load txs
  * If client is not available, it returns an `initial` state
  */
+// TODO(@veado or @thatStrangeGuyThorchain) Use TxsPage instead of `AssetTxsPageLD`
+// @see https://github.com/thorchain/asgardex-electron/issues/585
 const loadAssetTxs$ = ({ client }: { client: BitcoinClient }): AssetTxsPageLD => {
   const address = client.getAddress()
-  return Rx.from(client.getTransactions(address)).pipe(
-    map(toTxsPage),
+  return Rx.from(client.getTransactions({ address })).pipe(
+    map(toAssetTxsPage),
     map(RD.success),
     catchError((error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))

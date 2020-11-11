@@ -46,7 +46,6 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         asset={oSelectedAsset}
         loadAssetTxsHandler={loadAssetTxsHandler}
         reloadBalancesHandler={reloadBalances}
-        // explorerTxUrl={explorerTxUrl}
         getExplorerTxUrl={getExplorerTxUrl}
       />
     </>

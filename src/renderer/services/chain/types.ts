@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Fees } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -9,6 +10,9 @@ export type LoadFeesHandler = () => void
 
 export type FeeRD = RD.RemoteData<Error, BaseAmount>
 export type FeeLD = LiveData<Error, BaseAmount>
+
+export type FeesRD = RD.RemoteData<Error, Fees>
+export type FeesLD = LiveData<Error, Fees>
 
 export type Address = string
 export type AddressRx = Rx.Observable<O.Option<Address>>

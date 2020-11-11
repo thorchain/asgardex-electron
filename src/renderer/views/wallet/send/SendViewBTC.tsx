@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
+import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
 import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -13,23 +13,24 @@ import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getAssetWBByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/bitcoin/types'
+import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { AssetsWithBalance, AssetWithBalance, NonEmptyAssetsWithBalance, TxRD } from '../../../services/wallet/types'
 
 type Props = {
   btcAsset: Asset
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
+  getExplorerTxUrl: O.Option<GetExplorerTxUrl>
   reloadFeesHandler: () => void
 }
 
 export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
-  const { btcAsset: selectedAsset, assetsWB, reloadFeesHandler } = props
+  const { btcAsset: selectedAsset, assetsWB, reloadFeesHandler, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
 
   const oBtcAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
 
-  const { fees$, pushTx, txRD$, client$, explorerUrl$, resetTx } = useBitcoinContext()
+  const { fees$, pushTx, txRD$, client$, resetTx } = useBitcoinContext()
 
   const txRD = useObservableState<TxRD>(txRD$, RD.initial)
-  const oExplorerUrl = useObservableState(explorerUrl$, O.none)
   const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
 
   const fees = useObservableState(fees$, RD.initial)
@@ -59,27 +60,31 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
         reloadFeesHandler={reloadFeesHandler}
-        fees={fees}
+        feesWithRates={fees}
       />
     ),
     [pushTx, assetsWB, txRD, addressValidation, reloadFeesHandler, fees]
   )
 
   return FP.pipe(
-    sequenceTOption(oBtcAssetWB, oExplorerUrl),
+    sequenceTOption(oGetExplorerTxUrl, oBtcAssetWB),
     O.fold(
       () => <></>,
-      ([btcAssetWB, explorerUrl]) => {
-        const successActionHandler = (txHash: string) => window.apiUrl.openExternal(`${explorerUrl}tx/${txHash}`)
-
+      ([getExplorerTxUrl, btcAssetWB]) => {
+        const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
+          getExplorerTxUrl,
+          window.apiUrl.openExternal
+        )
         return (
-          <Send
-            txRD={txRD}
-            successActionHandler={successActionHandler}
-            inititalActionHandler={resetTx}
-            errorActionHandler={resetTx}
-            sendForm={sendForm(btcAssetWB)}
-          />
+          <>
+            <Send
+              txRD={txRD}
+              successActionHandler={successActionHandler}
+              inititalActionHandler={resetTx}
+              errorActionHandler={resetTx}
+              sendForm={sendForm(btcAssetWB)}
+            />
+          </>
         )
       }
     )

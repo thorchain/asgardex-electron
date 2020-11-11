@@ -23,8 +23,9 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
   const intl = useIntl()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
-  const { assetsWBState$ } = useWalletContext()
+  const { assetsWBState$, getExplorerTxUrl$ } = useWalletContext()
   const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
+  const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
   const { reloadFees } = useBitcoinContext()
 
@@ -49,9 +50,16 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
     (asset: Asset) => {
       switch (asset.chain) {
         case 'BNB':
-          return <SendViewBNB selectedAsset={asset} assetsWB={assetsWB} />
+          return <SendViewBNB selectedAsset={asset} assetsWB={assetsWB} getExplorerTxUrl={getExplorerTxUrl} />
         case 'BTC':
-          return <SendViewBTC btcAsset={asset} assetsWB={assetsWB} reloadFeesHandler={reloadFees} />
+          return (
+            <SendViewBTC
+              btcAsset={asset}
+              assetsWB={assetsWB}
+              reloadFeesHandler={reloadFees}
+              getExplorerTxUrl={getExplorerTxUrl}
+            />
+          )
         case 'ETH':
           return <SendViewETH />
         default:
@@ -67,7 +75,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [assetsWB, intl, reloadFees]
+    [assetsWB, getExplorerTxUrl, intl, reloadFees]
   )
 
   return FP.pipe(

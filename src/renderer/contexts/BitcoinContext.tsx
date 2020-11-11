@@ -5,20 +5,18 @@ import {
   address$,
   reloadBalances,
   reloadFees,
-  assetWB$,
+  assetsWB$,
   txRD$,
   fees$,
   pushTx,
-  explorerUrl$,
   resetTx
 } from '../services/bitcoin/context'
 
 export type BitcoinContextValue = {
   client$: typeof client$
   address$: typeof address$
-  explorerUrl$: typeof explorerUrl$
   reloadBalances: typeof reloadBalances
-  assetWB$: typeof assetWB$
+  assetsWB$: typeof assetsWB$
   fees$: typeof fees$
   txRD$: typeof txRD$
   pushTx: typeof pushTx
@@ -29,9 +27,8 @@ export type BitcoinContextValue = {
 const initialContext: BitcoinContextValue = {
   client$,
   address$,
-  explorerUrl$,
   reloadBalances,
-  assetWB$,
+  assetsWB$,
   fees$,
   txRD$,
   pushTx,

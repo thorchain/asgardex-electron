@@ -103,6 +103,8 @@ export enum ErrorId {
   SEND_TX
 }
 
+// TODO(@Veado) Move type to clients/type
+
 export type ApiError = {
   errorId: ErrorId
   msg: string

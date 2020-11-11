@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@thorchain/asgardex-bitcoin'
-import { FeeOptions } from '@thorchain/asgardex-bitcoin/lib/types/client-types'
+import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
+import { FeeRate, FeesWithRates } from '@xchainjs/xchain-bitcoin'
 import { BaseAmount } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 
@@ -12,12 +12,11 @@ import { ApiError, AssetTxsPageLD, TxLD } from '../wallet/types'
 export type BitcoinClientState = ClientState<BitcoinClient>
 export type BitcoinClientState$ = Rx.Observable<ClientState<BitcoinClient>>
 
-export type FeesRD = RD.RemoteData<Error, FeeOptions>
-export type FeesLD = LiveData<Error, FeeOptions>
+export type FeeRateRD = RD.RemoteData<Error, FeeRate>
+export type FeeRateLD = LiveData<Error, FeeRate>
 
-export type FeeRate = number
-export type FeeRateRD = RD.RemoteData<Error, number>
-export type FeeRateLD = LiveData<Error, number>
+export type FeesWithRatesRD = RD.RemoteData<Error, FeesWithRates>
+export type FeesWithRatesLD = LiveData<Error, FeesWithRates>
 
 export type AddressValidation = BitcoinClient['validateAddress']
 
@@ -38,7 +37,7 @@ export type TransactionService = {
 }
 
 export type FeesService = {
-  fees$: FeesLD
+  fees$: FeesWithRatesLD
   poolFee$: (memo: Memo) => FeeLD
   poolFeeRate$: (memo: Memo) => FeeRateLD
   getPoolFeeRate: () => FeeRateRD

@@ -47,6 +47,7 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REACT_APP_BLOCKCHAIR_API_KEY: ${{ secrets.REACT_APP_BLOCKCHAIR_API_KEY }}
 
       - name: Publish macOS binaries
         if: runner.os == 'macOS'
@@ -58,6 +59,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
           SIGNING_APPLE_ID: ${{ secrets.SIGNING_APPLE_ID }}
           SIGNING_APP_PASSWORD: ${{ secrets.SIGNING_APP_PASSWORD }}
+          REACT_APP_BLOCKCHAIR_API_KEY: ${{ secrets.REACT_APP_BLOCKCHAIR_API_KEY }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2

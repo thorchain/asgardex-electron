@@ -5,8 +5,8 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import * as BNB from '../binance/service'
-import * as BTC from '../bitcoin/common'
-import { loadAssetTxs as loadBtcTxs, assetTxs$ as btcTxs$ } from '../bitcoin/context'
+import * as BTC from '../bitcoin/context'
+import { GetExplorerTxUrl } from '../clients/types'
 import { selectedAsset$ } from './common'
 import { ApiError, AssetTxsPageLD, ErrorId, LoadAssetTxsHandler } from './types'
 
@@ -15,7 +15,7 @@ const explorerUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> => {
     case 'BNB':
       return BNB.explorerUrl$
     case 'BTC':
-      return BTC.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}tx/`)))
+      return BTC.explorerUrl$
     case 'ETH':
       // not implemented yet
       return Rx.of(O.none)
@@ -27,14 +27,12 @@ const explorerUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> => {
   }
 }
 
-const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<(tx: string) => string>> => {
+const explorerTxUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<GetExplorerTxUrl>> => {
   switch (chain) {
     case 'BNB':
       return BNB.getExplorerTxUrl$
     case 'BTC':
-      // @TODO @veado implement this one with https://github.com/thorchain/asgardex-electron/issues/574
-      return Rx.of(O.none)
-    // return BTC.explorerUrl$.pipe(RxOp.map(O.map((url) => `${url}tx/`)))
+      return BTC.getExplorerTxUrl$
     case 'ETH':
       // not implemented yet
       return Rx.of(O.none)
@@ -55,7 +53,7 @@ export const explorerUrl$: Rx.Observable<O.Option<string>> = selectedAsset$.pipe
   )
 )
 
-export const getExplorerTxUrl$: Rx.Observable<O.Option<(tx: string) => string>> = selectedAsset$.pipe(
+export const getExplorerTxUrl$: Rx.Observable<O.Option<GetExplorerTxUrl>> = selectedAsset$.pipe(
   RxOp.switchMap(
     O.fold(
       () => Rx.EMPTY,
@@ -69,7 +67,7 @@ const loadAssetTxsHandlerByChain = (chain: Chain): O.Option<LoadAssetTxsHandler>
     case 'BNB':
       return O.some(() => BNB.loadAssetTxs)
     case 'BTC':
-      return O.some(() => loadBtcTxs)
+      return O.some(() => BTC.loadAssetTxs)
     case 'ETH':
       // not implemented yet
       return O.none
@@ -95,7 +93,7 @@ export const assetTxsByChain$ = (chain: Chain): AssetTxsPageLD => {
     case 'BNB':
       return BNB.assetTxs$
     case 'BTC':
-      return btcTxs$
+      return BTC.assetTxs$
     case 'ETH':
       return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
     case 'THOR':

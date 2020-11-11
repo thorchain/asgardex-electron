@@ -14,23 +14,24 @@ import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getAssetWBByAsset } from '../../../helpers/walletHelper'
 import { useSingleTxFee } from '../../../hooks/useSingleTxFee'
 import { AddressValidation } from '../../../services/binance/types'
+import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { AssetsWithBalance, AssetWithBalance, NonEmptyAssetsWithBalance, TxRD } from '../../../services/wallet/types'
 
 type Props = {
   selectedAsset: Asset
   assetsWB: O.Option<NonEmptyAssetsWithBalance>
+  getExplorerTxUrl: O.Option<GetExplorerTxUrl>
 }
 
 export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, assetsWB } = props
+  const { selectedAsset, assetsWB, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
 
   const oSelectedAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
 
-  const { transaction: transactionService, explorerUrl$, client$, transferFees$ } = useBinanceContext()
+  const { transaction: transactionService, client$, transferFees$ } = useBinanceContext()
 
   const { txRD$, resetTx, pushTx } = transactionService
   const txRD = useObservableState<TxRD>(txRD$, RD.initial)
-  const oExplorerUrl = useObservableState(explorerUrl$, O.none)
   const oClient = useObservableState<O.Option<BinanceClient>>(client$, O.none)
 
   const fee = useSingleTxFee(transferFees$)
@@ -69,11 +70,14 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
   )
 
   return FP.pipe(
-    sequenceTOption(oSelectedAssetWB, oExplorerUrl),
+    sequenceTOption(oSelectedAssetWB, oGetExplorerTxUrl),
     O.fold(
       () => <></>,
-      ([selectedAssetWB, explorerUrl]) => {
-        const successActionHandler = (txHash: string) => window.apiUrl.openExternal(`${explorerUrl}/tx/${txHash}`)
+      ([selectedAssetWB, getExplorerTxUrl]) => {
+        const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
+          getExplorerTxUrl,
+          window.apiUrl.openExternal
+        )
         return (
           <Send
             txRD={txRD}

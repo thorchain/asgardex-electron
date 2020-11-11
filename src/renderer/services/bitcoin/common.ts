@@ -1,4 +1,5 @@
-import { Client as BitcoinClient, Network as BitcoinNetwork } from '@thorchain/asgardex-bitcoin'
+import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
+import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -9,6 +10,7 @@ import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators
 import { envOrDefault } from '../../helpers/envHelper'
 import { eqOString } from '../../helpers/fp/eq'
 import { network$ } from '../app/service'
+import { GetExplorerTxUrl } from '../clients/types'
 import { ClientStateForViews } from '../types'
 import { getClientStateForViews, getClient } from '../utils'
 import { keystoreService } from '../wallet/common'
@@ -18,16 +20,18 @@ import { BitcoinClientState } from './types'
 /**
  * Binance network depending on selected `Network`
  */
-const bitcoinNetwork$: Observable<BitcoinNetwork> = network$.pipe(
+const bitcoinNetwork$: Observable<ClientNetwork> = network$.pipe(
   map((network) => {
-    if (network === 'testnet') return BitcoinNetwork.TEST
-    // In case of 'chaosnet' + 'mainnet` we use `BitcoinNetwork.MAIN`
-    return BitcoinNetwork.MAIN
+    // In case of 'chaosnet' + 'mainnet` we stick on `mainnet`
+    if (network === 'chaosnet') return 'mainnet'
+
+    return network
   })
 )
 
-const ELECTRS_TESTNET = envOrDefault(process.env.REACT_APP_BITCOIN_ELECRTS_TESTNET_API, 'http://165.22.106.224')
-const ELECTRS_MAINNET = envOrDefault(process.env.REACT_APP_BITCOIN_ELECRTS_MAINNET_API, 'http://188.166.254.248')
+const BLOCKCHAIR_API_KEY = envOrDefault(process.env.REACT_APP_BLOCKCHAIR_API_KEY, 'undefined blockchair api key')
+const BLOCKCHAIR_TESTNET = 'https://api.blockchair.com/bitcoin/testnet'
+const BLOCKCHAIR_MAINNET = 'https://api.blockchair.com/bitcoin'
 
 /**
  * Stream to create an observable BitcoinClient depending on existing phrase in keystore
@@ -44,9 +48,13 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
-              // Url of electrs
-              const electrsUrl = bitcoinNetwork === BitcoinNetwork.TEST ? ELECTRS_TESTNET : ELECTRS_MAINNET
-              const client = new BitcoinClient(bitcoinNetwork, electrsUrl, phrase)
+              const blockchairUrl = bitcoinNetwork === 'testnet' ? BLOCKCHAIR_TESTNET : BLOCKCHAIR_MAINNET
+              const client = new BitcoinClient({
+                network: bitcoinNetwork,
+                nodeUrl: blockchairUrl,
+                nodeApiKey: BLOCKCHAIR_API_KEY,
+                phrase
+              })
               return O.some(right(client)) as BitcoinClientState
             } catch (error) {
               return O.some(left(error))
@@ -87,13 +95,19 @@ const address$: Observable<O.Option<string>> = client$.pipe(
 /**
  * Explorer url depending on selected network
  *
- * If a client is not available (e.g. by removing keystore), it returns `None`
- *
  */
 const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
   map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
-  distinctUntilChanged(eqOString.equals),
   shareReplay(1)
 )
 
-export { client$, clientViewState$, address$, explorerUrl$ }
+/**
+ * Explorer url depending on selected network
+ *
+ */
+const getExplorerTxUrl$: Observable<O.Option<GetExplorerTxUrl>> = client$.pipe(
+  map(FP.pipe(O.map((client) => client.getExplorerTxUrl))),
+  shareReplay(1)
+)
+
+export { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$ }

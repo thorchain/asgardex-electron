@@ -23,7 +23,7 @@ type Props = {
   txRD: TxRD
   sendForm: JSX.Element
   inititalActionHandler?: () => void
-  successActionHandler?: (txHash: string) => void
+  successActionHandler?: (txHash: string) => Promise<void>
   errorActionHandler?: () => void
 }
 
@@ -31,7 +31,7 @@ export const Send: React.FC<Props> = (props): JSX.Element => {
   const {
     txRD,
     inititalActionHandler = () => {},
-    successActionHandler = (_: string) => {},
+    successActionHandler = async () => Promise.resolve(),
     sendForm,
     errorActionHandler = () => {}
   } = props

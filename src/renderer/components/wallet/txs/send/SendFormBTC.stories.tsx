@@ -2,8 +2,9 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { FeeOptions } from '@thorchain/asgardex-bitcoin/lib/types/client-types'
-import { assetAmount, AssetBTC, AssetRune67C, assetToBase, formatBaseAmount } from '@xchainjs/xchain-util'
+import { FeeRates } from '@xchainjs/xchain-bitcoin'
+import { Fees } from '@xchainjs/xchain-client'
+import { assetAmount, AssetBTC, AssetRune67C, assetToBase, baseAmount, formatBaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
@@ -26,13 +27,20 @@ const runeAsset: AssetWithBalance = {
 
 const balances: AssetsWithBalance = [bnbAsset, runeAsset]
 
-const feeOptions: FeeOptions = {
-  fast: { feeRate: 1, feeTotal: 3000 },
-  regular: { feeRate: 2, feeTotal: 2000 },
-  slow: { feeRate: 3, feeTotal: 1000 }
+const fees: Fees = {
+  type: 'base',
+  fastest: baseAmount(3000),
+  fast: baseAmount(2000),
+  average: baseAmount(1000)
 }
 
-const feesRD = RD.success(feeOptions)
+const rates: FeeRates = {
+  fastest: 5,
+  fast: 3,
+  average: 2
+}
+
+const feesWithRatesRD = RD.success({ fees, rates })
 
 const addressValidation: AddressValidation = (_) => true
 
@@ -49,7 +57,7 @@ storiesOf('Wallet/SendFormBTC', module)
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
-      fees={feesRD}
+      feesWithRates={feesWithRatesRD}
     />
   ))
   .add('pending', () => (
@@ -58,7 +66,7 @@ storiesOf('Wallet/SendFormBTC', module)
       assetsWB={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
-      fees={feesRD}
+      feesWithRates={feesWithRatesRD}
       reloadFeesHandler={reloadFeesHandler}
       isLoading={true}
     />
@@ -70,7 +78,7 @@ storiesOf('Wallet/SendFormBTC', module)
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
-      fees={RD.pending}
+      feesWithRates={RD.pending}
     />
   ))
   .add('failure fees', () => (
@@ -80,7 +88,7 @@ storiesOf('Wallet/SendFormBTC', module)
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
-      fees={RD.failure(Error('Could not load fee for any reason'))}
+      feesWithRates={RD.failure(Error('Could not load fee and rates for any reason'))}
     />
   ))
   .add('amount < fees', () => (
@@ -90,6 +98,6 @@ storiesOf('Wallet/SendFormBTC', module)
       onSubmit={onSubmitHandler}
       reloadFeesHandler={reloadFeesHandler}
       addressValidation={addressValidation}
-      fees={feesRD}
+      feesWithRates={feesWithRatesRD}
     />
   ))

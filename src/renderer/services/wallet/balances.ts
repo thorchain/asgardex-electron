@@ -71,19 +71,16 @@ const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.addre
 /**
  * Transforms BTC data (address + `AssetWB`) into `AssetsWBChain`
  */
-const btcAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BTC.address$, BTC.assetWB$]).pipe(
+const btcAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BTC.address$, BTC.assetsWB$]).pipe(
   map(
-    ([address, assetWB]) =>
+    ([address, assetsWB]) =>
       ({
         chain: 'BTC',
         address: FP.pipe(
           address,
           O.getOrElse(() => '')
         ),
-        assetsWB: FP.pipe(
-          assetWB,
-          RD.map((assets) => [assets])
-        )
+        assetsWB
       } as AssetsWBChain)
   )
 )
@@ -113,8 +110,6 @@ const ethAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([ETH.addre
  */
 export const assetsWBChains$ = Rx.combineLatest([btcAssetsWBChain$, ethAssetsWBChain$, bnbAssetsWBChain$])
 
-// Map single `AssetWB` into `[AssetsWB]`
-const btcAssetsWB$: Observable<AssetsWithBalanceRD> = BTC.assetWB$.pipe(liveData.map((asset) => [asset]))
 const ethAssetsWB$: Observable<AssetsWithBalanceRD> = ETH.assetWB$.pipe(liveData.map((asset) => [asset]))
 
 /**
@@ -124,7 +119,7 @@ const ethAssetsWB$: Observable<AssetsWithBalanceRD> = ETH.assetWB$.pipe(liveData
  */
 export const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLatest([
   BNB.assetsWB$,
-  btcAssetsWB$,
+  BTC.assetsWB$,
   ethAssetsWB$
 ]).pipe(
   map((assetsWBList) => ({
