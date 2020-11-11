@@ -33,7 +33,6 @@ describe('services/binance/utils/', () => {
     it('returns a price for BNB in USD', () => {
       const balance: AssetWithBalance = {
         amount: baseAmount('1'),
-        frozenAmount: O.none,
         asset: AssetBNB
       }
       const result = FP.pipe(
@@ -49,7 +48,6 @@ describe('services/binance/utils/', () => {
     it('returns a price for RUNE in USD', () => {
       const balance: AssetWithBalance = {
         amount: baseAmount('1'),
-        frozenAmount: O.none,
         asset: AssetRune67C
       }
       const result = FP.pipe(
@@ -65,7 +63,6 @@ describe('services/binance/utils/', () => {
     it('returns a no price if no pools are available', () => {
       const balance: AssetWithBalance = {
         amount: baseAmount('1'),
-        frozenAmount: O.none,
         asset: AssetBNB
       }
       const result = getPoolPriceValue(balance, [], usdPool)
@@ -128,14 +125,6 @@ describe('services/binance/utils/', () => {
         ticker: 'BNB'
       })
       expect(result[0].amount.amount()).toEqual(assetToBase(assetAmount(1)).amount())
-      expect(
-        FP.pipe(
-          result[0].frozenAmount,
-          // Check transformation of `AssetAmount` to `BaseAmount`
-          O.map((a) => a.amount().isEqualTo(1100000000)),
-          O.getOrElse(() => false)
-        )
-      ).toBeTruthy()
 
       // Check RUNE balance
       expect(result[1].asset).toEqual({
@@ -144,7 +133,6 @@ describe('services/binance/utils/', () => {
         ticker: 'RUNE'
       })
       expect(result[1].amount.amount()).toEqual(assetToBase(assetAmount(2)).amount())
-      expect(result[1].frozenAmount).toBeNone()
     })
   })
 })

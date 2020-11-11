@@ -1,1 +1,0 @@
-export { Freeze } from './Freeze'

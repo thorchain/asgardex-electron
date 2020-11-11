@@ -10,8 +10,6 @@ import {
   getValueOfRuneInAsset,
   Asset,
   assetToBase,
-  bn,
-  isValidBN,
   AssetBNB
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -58,7 +56,7 @@ export const bncSymbolToAsset = (symbol: string): O.Option<Asset> =>
 export const bncSymbolToAssetString = (symbol: string) => `${AssetBNB.chain}.${symbol}`
 
 export const getWalletBalances = (balances: Balances): AssetsWithBalance =>
-  balances.reduce((acc: AssetsWithBalance, { symbol, free, frozen }: Balance) => {
+  balances.reduce((acc: AssetsWithBalance, { symbol, free }: Balance) => {
     const oAsset = bncSymbolToAsset(symbol)
     // ignore balances w/o symbols
     return FP.pipe(
@@ -66,10 +64,8 @@ export const getWalletBalances = (balances: Balances): AssetsWithBalance =>
       O.map((asset) => {
         const amountBN = bnOrZero(free)
         const amount = assetToBase(assetAmount(amountBN, BNB_DECIMAL))
-        const frozenAmountBN = bn(frozen)
-        const frozenAmount = isValidBN(frozenAmountBN) ? O.some(assetToBase(assetAmount(frozenAmountBN))) : O.none
 
-        return [...acc, { asset, amount, frozenAmount }]
+        return [...acc, { asset, amount }]
       }),
       O.getOrElse(() => acc)
     )

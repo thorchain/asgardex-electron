@@ -29,13 +29,10 @@ export const eqBaseAmount: Eq.Eq<BaseAmount> = {
   equals: (x, y) => egBigNumber.equals(x.amount(), y.amount()) && x.decimal === y.decimal
 }
 
-const eqOptionBaseAmount = O.getEq(eqBaseAmount)
+export const eqOptionBaseAmount = O.getEq(eqBaseAmount)
 
 export const eqAssetWithBalance: Eq.Eq<AssetWithBalance> = {
-  equals: (x, y) =>
-    eqAsset.equals(x.asset, y.asset) &&
-    eqBaseAmount.equals(x.amount, y.amount) &&
-    eqOptionBaseAmount.equals(x.frozenAmount, y.frozenAmount)
+  equals: (x, y) => eqAsset.equals(x.asset, y.asset) && eqBaseAmount.equals(x.amount, y.amount)
 }
 
 export const eqErrorId = Eq.eqNumber

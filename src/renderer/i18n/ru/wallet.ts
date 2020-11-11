@@ -9,8 +9,6 @@ const wallet: WalletMessages = {
   'wallet.column.value': 'Количество',
   'wallet.action.send': 'Отправить',
   'wallet.action.receive': 'Получить',
-  'wallet.action.freeze': 'Freeze - RU',
-  'wallet.action.unfreeze': 'Unfreeze - RU',
   'wallet.action.remove': 'Удалить кошелек',
   'wallet.action.unlock': 'Разблокировать',
   'wallet.action.import': 'Импортировать',

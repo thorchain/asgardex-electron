@@ -45,10 +45,6 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
 
   const renderTypeColumn = useCallback((_, { type }: AssetTx) => {
     switch (type) {
-      case 'freeze':
-        return <Styled.FreezeIcon />
-      case 'unfreeze':
-        return <Styled.UnfreezeIcon />
       case 'transfer':
         return <Styled.TransferIcon />
       default:

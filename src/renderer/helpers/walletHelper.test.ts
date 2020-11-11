@@ -8,10 +8,10 @@ import { NonEmptyAssetsWithBalance } from '../services/wallet/types'
 import { getAssetAmountByAsset, getBnbAmountFromBalances, getAssetWBByAsset } from './walletHelper'
 
 describe('walletHelper', () => {
-  const RUNE_WB = { amount: baseAmount('12300000000'), asset: ASSETS_TESTNET.RUNE, frozenAmount: O.none }
+  const RUNE_WB = { amount: baseAmount('12300000000'), asset: ASSETS_TESTNET.RUNE }
   const BNB = O.fromNullable(assetFromString('BNB.BNB'))
-  const BOLT_WB = { amount: baseAmount('23400000000'), asset: ASSETS_TESTNET.BOLT, frozenAmount: O.none }
-  const BNB_WB = { amount: baseAmount('45600000000'), asset: ASSETS_TESTNET.BNB, frozenAmount: O.none }
+  const BOLT_WB = { amount: baseAmount('23400000000'), asset: ASSETS_TESTNET.BOLT }
+  const BNB_WB = { amount: baseAmount('45600000000'), asset: ASSETS_TESTNET.BNB }
 
   describe('amountByAsset', () => {
     it('returns amount of RUNE', () => {

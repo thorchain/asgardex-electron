@@ -9,8 +9,6 @@ const wallet: WalletMessages = {
   'wallet.column.value': 'Value',
   'wallet.action.send': 'Send',
   'wallet.action.receive': 'Receive',
-  'wallet.action.freeze': 'Freeze',
-  'wallet.action.unfreeze': 'Unfreeze',
   'wallet.action.remove': 'Remove wallet',
   'wallet.action.unlock': 'Unlock',
   'wallet.action.connect': 'Connect',

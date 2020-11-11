@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
-import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -17,7 +16,6 @@ const loadBalances$ = (client: BitcoinClient): AssetsWithBalanceLD =>
   Rx.from(client.getBalance()).pipe(
     // Remove transformation `Balance` -> `AssetWithBalance` to use `Balance` only
     // https://github.com/thorchain/asgardex-electron/issues/584
-    map(A.map((balance) => ({ ...balance, frozenAmount: O.fromNullable(balance.frozenAmount) }))),
     map(RD.success),
     catchError((error: Error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))

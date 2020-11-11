@@ -19,14 +19,12 @@ import { SendFormBNB } from './index'
 
 const bnbAsset: AssetWithBalance = {
   asset: AssetBNB,
-  amount: assetToBase(assetAmount(1.23)),
-  frozenAmount: O.none
+  amount: assetToBase(assetAmount(1.23))
 }
 
 const runeAsset: AssetWithBalance = {
   asset: AssetRune67C,
-  amount: assetToBase(assetAmount(2)),
-  frozenAmount: O.none
+  amount: assetToBase(assetAmount(2))
 }
 
 const balances: AssetsWithBalance = [bnbAsset, runeAsset]

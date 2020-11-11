@@ -1,15 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { Asset, assetToString } from '@xchainjs/xchain-util'
-import { Row, Col, Grid, Dropdown } from 'antd'
+import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import * as AH from '../../../helpers/assetHelper'
 import * as walletRoutes from '../../../routes/wallet'
-import { SendAction, isSendAction } from '../../../services/binance/types'
 import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_ASSET_TX_HANDLER } from '../../../services/wallet/const'
@@ -19,11 +17,6 @@ import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
 import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.style'
-
-type SendActionMenuItem = {
-  key: SendAction
-  label: string
-}
 
 type Props = {
   txsPageRD: AssetTxsPageRD
@@ -44,7 +37,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     getExplorerTxUrl: oGetExplorerTxUrl = O.none
   } = props
 
-  const [sendAction, setSendAction] = useState<SendAction>('send')
   const [currentPage, setCurrentPage] = useState(1)
 
   const assetAsString = useMemo(
@@ -57,26 +49,13 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [oAsset]
   )
 
-  const isRuneAsset = useMemo(() => FP.pipe(oAsset, O.filter(AH.isRuneAsset), O.isSome), [oAsset])
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   const history = useHistory()
   const intl = useIntl()
 
   const walletActionSendClick = useCallback(() => {
-    switch (sendAction) {
-      case 'send':
-        history.push(walletRoutes.send.path({ asset: assetAsString }))
-        break
-      case 'freeze':
-        history.push(walletRoutes.freeze.path({ asset: assetAsString }))
-        break
-      case 'unfreeze':
-        history.push(walletRoutes.unfreeze.path({ asset: assetAsString }))
-        break
-      default:
-      // nothing to do
-    }
-  }, [assetAsString, history, sendAction])
+    history.push(walletRoutes.send.path({ asset: assetAsString }))
+  }, [assetAsString, history])
 
   const walletActionReceiveClick = useCallback(
     () => history.push(walletRoutes.receive.path({ asset: assetAsString })),
@@ -94,49 +73,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     },
     [oGetExplorerTxUrl]
   )
-
-  const changeActionMenuClickHandler = ({ key }: { key: React.Key }) => {
-    if (isSendAction(key.toString())) {
-      setSendAction(key as SendAction)
-    }
-  }
-
-  const menuItems: SendActionMenuItem[] = useMemo(
-    () => [
-      {
-        key: 'send',
-        label: intl.formatMessage({ id: 'wallet.action.send' })
-      },
-      {
-        key: 'freeze',
-        label: intl.formatMessage({ id: 'wallet.action.freeze' })
-      },
-      {
-        key: 'unfreeze',
-        label: intl.formatMessage({ id: 'wallet.action.unfreeze' })
-      }
-    ],
-    [intl]
-  )
-
-  const sendButtonLabel = useMemo(() => menuItems.find(({ key }) => key === sendAction)?.label ?? '', [
-    sendAction,
-    menuItems
-  ])
-
-  const changeActionMenu = useMemo(() => {
-    return (
-      <Styled.ActionMenu onClick={changeActionMenuClickHandler}>
-        {menuItems.map(({ key, label }) => (
-          <Styled.ActionMenuItem key={key}>
-            <Row justify="center">
-              <Styled.Label>{label}</Styled.Label>
-            </Row>
-          </Styled.ActionMenuItem>
-        ))}
-      </Styled.ActionMenu>
-    )
-  }, [menuItems])
 
   const onChangePagination = useCallback(
     (pageNo) => {
@@ -168,22 +104,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
             <Styled.ActionWrapper>
               <Row justify="center">
                 <Button type="primary" round="true" sizevalue="xnormal" onClick={walletActionSendClick}>
-                  {sendButtonLabel}
+                  {intl.formatMessage({ id: 'wallet.action.send' })}
                 </Button>
               </Row>
-              {isRuneAsset && (
-                <Row justify="center">
-                  <Dropdown overlay={changeActionMenu} placement="bottomCenter" trigger={['click']}>
-                    {/* Important note:
-                        Label has to be wrapped into a `div` to avoid error render messages
-                        such as "Function components cannot be given refs"
-                     */}
-                    <div>
-                      <Styled.Label>{intl.formatMessage({ id: 'common.change' })}</Styled.Label>
-                    </div>
-                  </Dropdown>
-                </Row>
-              )}
             </Styled.ActionWrapper>
           </Styled.ActionCol>
           <Styled.ActionCol sm={{ span: 24 }} md={{ span: 12 }}>
