@@ -5,22 +5,22 @@ import { storiesOf } from '@storybook/react'
 import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, assetToString, baseAmount } from '@xchainjs/xchain-util'
 
 import { getRunePricePool } from '../../../helpers/poolHelper'
-import { ApiError, AssetsWBChain, AssetsWBChains, ErrorId } from '../../../services/wallet/types'
+import { ApiError, ChainBalance, AssetsWBChains, ErrorId } from '../../../services/wallet/types'
 import { AssetsTableCollapsable } from './index'
 
-const assetsWBChainRUNE: AssetsWBChain = {
+const assetsWBChainRUNE: ChainBalance = {
   address: 'thor1766mazrxs5asuscepa227r6ekr657234f8p7nf',
   chain: 'THOR',
   assetsWB: RD.initial
 }
 
-const assetsWBChainBNB: AssetsWBChain = {
+const assetsWBChainBNB: ChainBalance = {
   address: 'bnb1zzapwywxrxa2wyyrp93ls5l0a6ftxju5phmhu9',
   chain: 'BNB',
   assetsWB: RD.initial
 }
 
-const assetsWBChainBTC: AssetsWBChain = {
+const assetsWBChainBTC: ChainBalance = {
   address: 'bc11766mazrxs5asuscepa227r6ekr657234f8p7nf',
   chain: 'BTC',
   assetsWB: RD.initial

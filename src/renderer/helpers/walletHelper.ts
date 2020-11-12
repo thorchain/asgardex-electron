@@ -1,30 +1,28 @@
+import { Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { NonEmptyAssetsWithBalance, AssetWithBalance, AssetsWithBalance } from '../services/wallet/types'
+import { NonEmptyBalances } from '../services/wallet/types'
 import { isBnbAsset } from './assetHelper'
 import { eqAsset } from './fp/eq'
 import { sequenceTOption } from './fpHelpers'
 
 /**
  * Tries to find an `AssetAmount` of an `Asset`
- * in a given list of `AssetWithBalance`
+ * in a given list of `Balance`
  *
  * Note: Returns `None` if `Asset` has not been found this list.
  * */
-export const getAssetAmountByAsset = (balances: AssetsWithBalance, assetToFind: Asset): O.Option<AssetAmount> =>
+export const getAssetAmountByAsset = (balances: Balances, assetToFind: Asset): O.Option<AssetAmount> =>
   FP.pipe(
     balances,
     A.findFirst(({ asset }) => eqAsset.equals(asset, assetToFind)),
     O.map((assetWB) => baseToAsset(assetWB.amount))
   )
 
-export const getAssetWBByAsset = (
-  oAssetsWB: O.Option<NonEmptyAssetsWithBalance>,
-  oAsset: O.Option<Asset>
-): O.Option<AssetWithBalance> =>
+export const getBalanceByAsset = (oAssetsWB: O.Option<NonEmptyBalances>, oAsset: O.Option<Asset>): O.Option<Balance> =>
   FP.pipe(
     sequenceTOption(oAssetsWB, oAsset),
     O.chain(([assetsWB, asset]) =>
@@ -35,7 +33,7 @@ export const getAssetWBByAsset = (
     )
   )
 
-export const getBnbAmountFromBalances = (balances: AssetsWithBalance): O.Option<AssetAmount> =>
+export const getBnbAmountFromBalances = (balances: Balances): O.Option<AssetAmount> =>
   FP.pipe(
     balances,
     A.findFirst(({ asset }) => isBnbAsset(asset)),

@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BinanceClient } from '@xchainjs/xchain-binance'
+import { Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -11,22 +12,22 @@ import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormBNB } from '../../../components/wallet/txs/send/'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { getAssetWBByAsset } from '../../../helpers/walletHelper'
+import { getBalanceByAsset } from '../../../helpers/walletHelper'
 import { useSingleTxFee } from '../../../hooks/useSingleTxFee'
 import { AddressValidation } from '../../../services/binance/types'
 import { GetExplorerTxUrl } from '../../../services/clients/types'
-import { AssetsWithBalance, AssetWithBalance, NonEmptyAssetsWithBalance, TxRD } from '../../../services/wallet/types'
+import { NonEmptyBalances, TxRD } from '../../../services/wallet/types'
 
 type Props = {
   selectedAsset: Asset
-  assetsWB: O.Option<NonEmptyAssetsWithBalance>
+  assetsWB: O.Option<NonEmptyBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
 }
 
 export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
   const { selectedAsset, assetsWB, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
 
-  const oSelectedAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
+  const oSelectedAssetWB = useMemo(() => getBalanceByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
 
   const { transaction: transactionService, client$, transferFees$ } = useBinanceContext()
 
@@ -53,13 +54,13 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
    * Custom send form used by BNB chain only
    */
   const sendForm = useCallback(
-    (selectedAsset: AssetWithBalance) => (
+    (selectedAsset: Balance) => (
       <SendFormBNB
         assetWB={selectedAsset}
         onSubmit={pushTx}
         assetsWB={FP.pipe(
           assetsWB,
-          O.getOrElse(() => [] as AssetsWithBalance)
+          O.getOrElse(() => [] as Balances)
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}

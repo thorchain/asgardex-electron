@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { TxType } from '@xchainjs/xchain-client'
+import { Balance, Balances, TxType } from '@xchainjs/xchain-client'
 import { BaseAmount, Asset, Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
@@ -28,30 +28,24 @@ export type KeystoreService = {
   lock: () => void
 }
 
-export type AssetWithBalance = {
-  asset: Asset
-  amount: BaseAmount
-}
+export type NonEmptyBalances = NonEmptyArray<Balance>
 
-export type AssetsWithBalance = AssetWithBalance[]
-export type NonEmptyAssetsWithBalance = NonEmptyArray<AssetWithBalance>
+export type BalancesLD = LiveData<ApiError, Balances>
+export type BalancesRD = RD.RemoteData<ApiError, Balances>
+export type BalanceRD = RD.RemoteData<ApiError, Balance>
 
-export type AssetsWithBalanceLD = LiveData<ApiError, AssetsWithBalance>
-export type AssetsWithBalanceRD = RD.RemoteData<ApiError, AssetsWithBalance>
-export type AssetWithBalanceRD = RD.RemoteData<ApiError, AssetWithBalance>
-
-export type AssetsWBChain = {
+export type ChainBalance = {
   address: string
   chain: Chain
-  assetsWB: AssetsWithBalanceRD
+  assetsWB: BalancesRD
 }
 
-export type AssetsWBChains = AssetsWBChain[]
+export type AssetsWBChains = ChainBalance[]
 
-export const assetWithBalanceMonoid = getMonoid<AssetWithBalance>()
+export const BalanceMonoid = getMonoid<Balance>()
 
 export type AssetsWithBalanceState = {
-  assetsWB: O.Option<NonEmptyAssetsWithBalance>
+  assetsWB: O.Option<NonEmptyBalances>
   errors: O.Option<NonEmptyApiErrors>
   loading: boolean
 }

@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import { Address } from '@xchainjs/xchain-binance'
+import { Balance, Balances } from '@xchainjs/xchain-client'
 import { formatAssetAmountCurrency, assetAmount, AssetAmount, bn, baseToAsset, AssetBNB } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -14,7 +15,6 @@ import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getBnbAmountFromBalances } from '../../../../helpers/walletHelper'
 import { SendTxParams } from '../../../../services/binance/transaction'
 import { AddressValidation } from '../../../../services/binance/types'
-import { AssetsWithBalance, AssetWithBalance } from '../../../../services/wallet/types'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
@@ -28,8 +28,8 @@ export type FormValues = {
 }
 
 type Props = {
-  assetsWB: AssetsWithBalance
-  assetWB: AssetWithBalance
+  assetsWB: Balances
+  assetWB: Balance
   onSubmit: ({ to, amount, asset, memo }: SendTxParams) => void
   isLoading?: boolean
   addressValidation: AddressValidation

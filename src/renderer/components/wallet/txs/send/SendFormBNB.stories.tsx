@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
+import { Balance, Balances } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBNB,
@@ -14,20 +15,19 @@ import * as O from 'fp-ts/lib/Option'
 import { TRANSFER_FEES } from '../../../../../shared/mock/fees'
 import { SendTxParams } from '../../../../services/binance/transaction'
 import { AddressValidation } from '../../../../services/binance/types'
-import { AssetWithBalance, AssetsWithBalance } from '../../../../services/wallet/types'
 import { SendFormBNB } from './index'
 
-const bnbAsset: AssetWithBalance = {
+const bnbAsset: Balance = {
   asset: AssetBNB,
   amount: assetToBase(assetAmount(1.23))
 }
 
-const runeAsset: AssetWithBalance = {
+const runeAsset: Balance = {
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(2))
 }
 
-const balances: AssetsWithBalance = [bnbAsset, runeAsset]
+const balances: Balances = [bnbAsset, runeAsset]
 
 const fee = O.some(TRANSFER_FEES.single)
 

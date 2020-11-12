@@ -6,16 +6,14 @@ import * as Rx from 'rxjs'
 import { mergeMap, catchError, shareReplay, startWith, debounceTime, map } from 'rxjs/operators'
 
 import { triggerStream } from '../../helpers/stateHelper'
-import { ApiError, AssetsWithBalanceLD, ErrorId } from '../wallet/types'
+import { ApiError, BalancesLD, ErrorId } from '../wallet/types'
 import { client$ } from './common'
 
 /**
  * Observable to load balances from Binance API endpoint
  */
-const loadBalances$ = (client: BitcoinClient): AssetsWithBalanceLD =>
+const loadBalances$ = (client: BitcoinClient): BalancesLD =>
   Rx.from(client.getBalance()).pipe(
-    // Remove transformation `Balance` -> `AssetWithBalance` to use `Balance` only
-    // https://github.com/thorchain/asgardex-electron/issues/584
     map(RD.success),
     catchError((error: Error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
@@ -32,7 +30,7 @@ const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const assetsWB$: AssetsWithBalanceLD = Rx.combineLatest([reloadBalances$.pipe(debounceTime(300)), client$]).pipe(
+const assetsWB$: BalancesLD = Rx.combineLatest([reloadBalances$.pipe(debounceTime(300)), client$]).pipe(
   mergeMap(([_, client]) => {
     return FP.pipe(
       client,

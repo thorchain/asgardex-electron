@@ -3,26 +3,25 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { FeeRates } from '@xchainjs/xchain-bitcoin'
-import { Fees } from '@xchainjs/xchain-client'
+import { Balance, Balances, Fees } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBTC, AssetRune67C, assetToBase, baseAmount, formatBaseAmount } from '@xchainjs/xchain-util'
 
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation } from '../../../../services/binance/types'
 import { SendTxParams } from '../../../../services/bitcoin/types'
-import { AssetWithBalance, AssetsWithBalance } from '../../../../services/wallet/types'
 import { SendFormBTC } from './index'
 
-const bnbAsset: AssetWithBalance = {
+const bnbAsset: Balance = {
   asset: AssetBTC,
   amount: assetToBase(assetAmount(1.23, BTC_DECIMAL))
 }
 
-const runeAsset: AssetWithBalance = {
+const runeAsset: Balance = {
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(2, BTC_DECIMAL))
 }
 
-const balances: AssetsWithBalance = [bnbAsset, runeAsset]
+const balances: Balances = [bnbAsset, runeAsset]
 
 const fees: Fees = {
   type: 'base',

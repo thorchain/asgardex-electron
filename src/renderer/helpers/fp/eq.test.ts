@@ -1,13 +1,14 @@
+import { Balance } from '@xchainjs/xchain-client'
 import { baseAmount, bn, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
-import { AssetWithBalance, ApiError, ErrorId } from '../../services/wallet/types'
+import { ApiError, ErrorId } from '../../services/wallet/types'
 import {
   eqAsset,
   eqBaseAmount,
-  eqAssetWithBalance,
-  eqAssetsWithBalance,
+  eqBalance,
+  eqBalances,
   eqApiError,
   egBigNumber,
   eqOAsset,
@@ -120,55 +121,55 @@ describe('helpers/fp/eq', () => {
     })
   })
 
-  describe('eqAssetWithBalance', () => {
+  describe('eqBalance', () => {
     it('is equal', () => {
-      const a: AssetWithBalance = {
+      const a: Balance = {
         amount: baseAmount('1'),
         asset: ASSETS_TESTNET.BNB
       }
-      expect(eqAssetWithBalance.equals(a, a)).toBeTruthy()
+      expect(eqBalance.equals(a, a)).toBeTruthy()
     })
     it('is not equal', () => {
-      const a: AssetWithBalance = {
+      const a: Balance = {
         amount: baseAmount('1'),
         asset: ASSETS_TESTNET.BNB
       }
       // b = same as a, but another amount
-      const b: AssetWithBalance = {
+      const b: Balance = {
         ...a,
         amount: baseAmount('2')
       }
       // c = same as a, but another asset
-      const c: AssetWithBalance = {
+      const c: Balance = {
         ...a,
         asset: ASSETS_TESTNET.RUNE
       }
-      expect(eqAssetWithBalance.equals(a, b)).toBeFalsy()
-      expect(eqAssetWithBalance.equals(a, c)).toBeFalsy()
+      expect(eqBalance.equals(a, b)).toBeFalsy()
+      expect(eqBalance.equals(a, c)).toBeFalsy()
     })
   })
 
   describe('eqAssetsWithBalance', () => {
-    const a: AssetWithBalance = {
+    const a: Balance = {
       amount: baseAmount('1'),
       asset: ASSETS_TESTNET.RUNE
     }
-    const b: AssetWithBalance = {
+    const b: Balance = {
       ...a,
       asset: ASSETS_TESTNET.BNB
     }
-    const c: AssetWithBalance = {
+    const c: Balance = {
       ...a,
       asset: ASSETS_TESTNET.BOLT
     }
     it('is equal', () => {
-      expect(eqAssetsWithBalance.equals([a, b], [a, b])).toBeTruthy()
+      expect(eqBalances.equals([a, b], [a, b])).toBeTruthy()
     })
     it('is not equal wit different elements', () => {
-      expect(eqAssetsWithBalance.equals([a, b], [b, c])).toBeFalsy()
+      expect(eqBalances.equals([a, b], [b, c])).toBeFalsy()
     })
     it('is not equal if elements has been flipped', () => {
-      expect(eqAssetsWithBalance.equals([a, b], [b, a])).toBeFalsy()
+      expect(eqBalances.equals([a, b], [b, a])).toBeFalsy()
     })
   })
 })

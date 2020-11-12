@@ -33,14 +33,7 @@ import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
 import { keystoreService, selectedAsset$ as selectedWalletAsset$ } from '../wallet/common'
 import { INITIAL_LOAD_TXS_PROPS } from '../wallet/const'
-import {
-  AssetsWithBalanceRD,
-  ApiError,
-  ErrorId,
-  AssetsWithBalanceLD,
-  AssetTxsPageLD,
-  LoadAssetTxsProps
-} from '../wallet/types'
+import { BalancesRD, ApiError, ErrorId, BalancesLD, AssetTxsPageLD, LoadAssetTxsProps } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createTransactionService } from './transaction'
 import { BinanceClientState, TransferFeesRD, BinanceClientState$ } from './types'
@@ -216,7 +209,7 @@ const address$: Observable<O.Option<Address>> = client$.pipe(
 /**
  * Observable to load balances from Binance API endpoint
  */
-const loadBalances$ = (client: Client): AssetsWithBalanceLD =>
+const loadBalances$ = (client: Client): BalancesLD =>
   Rx.from(client.getBalance()).pipe(
     map(
       A.map((balance) => ({
@@ -241,10 +234,7 @@ const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const assetsWB$: Observable<AssetsWithBalanceRD> = Rx.combineLatest([
-  reloadBalances$.pipe(debounceTime(300)),
-  client$
-]).pipe(
+const assetsWB$: Observable<BalancesRD> = Rx.combineLatest([reloadBalances$.pipe(debounceTime(300)), client$]).pipe(
   mergeMap(([_, client]) => {
     return FP.pipe(
       client,
