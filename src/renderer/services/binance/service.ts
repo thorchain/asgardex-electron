@@ -178,6 +178,7 @@ const clientState$: BinanceClientState$ = Rx.combineLatest([keystoreService.keys
           O.chain((phrase) => {
             try {
               const client = new Client({ phrase, network: binanceNetwork })
+
               return O.some(right(client)) as BinanceClientState
             } catch (error) {
               return O.some(left(error))

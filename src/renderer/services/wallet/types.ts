@@ -26,6 +26,7 @@ export type KeystoreService = {
   removeKeystore: () => Promise<void>
   unlock: (state: KeystoreState, password: string) => Promise<void>
   lock: () => void
+  validatePassword$: (password: string) => LiveData<Error, boolean>
 }
 
 export type AssetWithBalance = {

@@ -40,6 +40,7 @@ import { Modal } from '../uielements/modal'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
 import { getSwapData, assetWithPriceToAsset, pickAssetWithPrice } from './Swap.utils'
+import { PrivateModal } from '../modal/private'
 
 type SwapProps = {
   balance?: number
@@ -54,6 +55,8 @@ type SwapProps = {
   goToTransaction?: (txHash: string) => void
   runeAsset: Asset
   activePricePool: PricePool
+  passwordValidationResult: RD.RemoteData<Error, boolean>
+  setPasswordToValidate: (password: string) => void
 }
 
 export const Swap = ({
@@ -67,8 +70,11 @@ export const Swap = ({
   goToTransaction,
   resetTx,
   runeAsset,
-  activePricePool
+  activePricePool,
+  passwordValidationResult,
+  setPasswordToValidate
 }: SwapProps) => {
+  console.log('passwordValidationResult --- ', passwordValidationResult)
   const intl = useIntl()
   const history = useHistory()
   // convert to hash map here instead of using getPoolDetail
@@ -240,17 +246,20 @@ export const Swap = ({
     [oAssetWB, intl]
   )
 
+  const [showPrivateModal, setShowPrivateModal] = useState(false)
+
   const isSwapDisabled = useMemo(() => changeAmount.eq(0) || FP.pipe(assetsWB, O.isNone), [assetsWB, changeAmount])
 
   const onSwapConfirmed = useCallback(() => {
-    FP.pipe(
-      assetsToSwap,
-      // eslint-disable-next-line  array-callback-return
-      O.map(([sourceAsset, targetAsset]) => {
-        const memo = getSwapMemo({ asset: targetAsset })
-        onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
-      })
-    )
+    setShowPrivateModal(true)
+    // FP.pipe(
+    //   assetsToSwap,
+    //   // eslint-disable-next-line  array-callback-return
+    //   O.map(([sourceAsset, targetAsset]) => {
+    //     const memo = getSwapMemo({ asset: targetAsset })
+    //     onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
+    //   })
+    // )
   }, [assetsToSwap, onConfirmSwap, changeAmount])
 
   const slider = useMemo(
@@ -369,6 +378,7 @@ export const Swap = ({
 
   return (
     <Styled.Container>
+      <PrivateModal visible={showPrivateModal} onChangePassword={setPasswordToValidate} />
       <Styled.PendingContainer>{pendingState}</Styled.PendingContainer>
       <Styled.ContentContainer>
         <Styled.Header>

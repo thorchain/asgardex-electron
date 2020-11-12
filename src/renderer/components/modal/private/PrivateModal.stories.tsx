@@ -41,3 +41,15 @@ storiesOf('Components/Private Modal', module)
       </div>
     )
   })
+  .add('new one', () => {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '300px'
+        }}>
+        <PrivateModal visible invalidPassword={false} validatingPassword password="PASSWORD" />
+      </div>
+    )
+  })

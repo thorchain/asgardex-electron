@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import { LockOutlined } from '@ant-design/icons'
 import { Form } from 'antd'
@@ -8,31 +8,46 @@ import { StyledModal } from './PrivateModal.style'
 
 type Props = {
   visible: boolean
-  invalidPassword: boolean
-  validatingPassword: boolean
-  password: string
+  invalidPassword?: boolean
+  validatingPassword?: boolean
+  password?: string
   onChangePassword?: (password: string) => void
   onOk?: () => void
   onCancel?: () => void
+  targetPassword?: string
+  onSuccess?: () => void
 }
 
 export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
-  const { visible, invalidPassword, validatingPassword, password, onChangePassword, onOk, onCancel } = props
+  const {
+    visible,
+    invalidPassword,
+    validatingPassword,
+    // password,
+    onChangePassword,
+    onOk,
+    onCancel,
+    targetPassword = ''
+  } = props
+
+  const [password, setPassword] = useState('')
 
   const onChangePasswordHandler = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (onChangePassword) {
-        onChangePassword(e.target.value)
-      }
+      setPassword(e.target.value)
     },
     [onChangePassword]
   )
 
+  const onConfirm = useCallback(() => {
+    console.log('confirm --- ', password)
+    onChangePassword && onChangePassword(password)
+  }, [onChangePassword, password])
   return (
     <StyledModal
       title="PASSWORD CONFIRMATION"
       visible={visible}
-      onOk={!validatingPassword ? onOk : undefined}
+      onOk={!validatingPassword ? onConfirm : undefined}
       onCancel={onCancel}
       maskClosable={false}
       closable={false}
