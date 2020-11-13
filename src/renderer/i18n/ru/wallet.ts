@@ -48,7 +48,10 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Количество должно быть меньше, чем ваш баланс после вычета комисси',
   'wallet.errors.fee.notCovered': ' Комиссия не покрывается вашим банаслом ({balance})',
-  'wallet.errors.invalidChain': 'Invalid chain: {chain} - RU'
+  'wallet.errors.invalidChain': 'Invalid chain: {chain} - RU',
+  'wallet.password.confirmation': 'Подтверждение пароля',
+  'wallet.password.confirmation.pending': 'Проверка пароля',
+  'wallet.password.confirmation.error': 'Неверный пароль'
 }
 
 export default wallet

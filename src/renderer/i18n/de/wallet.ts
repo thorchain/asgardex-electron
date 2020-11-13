@@ -48,7 +48,10 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Der eingegebene Wert sollte nicht höher als Dein Guthaben abzgl. Gebühren sein',
   'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Dein Guthaben ({balance}) gedeckt',
-  'wallet.errors.invalidChain': 'Invalide Chain: {chain}'
+  'wallet.errors.invalidChain': 'Invalide Chain: {chain}',
+  'wallet.password.confirmation': 'Password confirmation - DE',
+  'wallet.password.confirmation.pending': 'Validating password - DE',
+  'wallet.password.confirmation.error': 'Password is wrong - DE'
 }
 
 export default wallet

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 
 import { LockOutlined } from '@ant-design/icons'
 import { Form } from 'antd'
+import { useIntl } from 'react-intl'
 
 import { Input } from '../../uielements/input'
 import { StyledModal } from './PrivateModal.style'
@@ -18,6 +19,7 @@ type Props = {
 
 export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
   const { visible, invalidPassword, validatingPassword, onConfirm, onOk, onCancel, isSuccess } = props
+  const intl = useIntl()
 
   /**
    * Call onOk on success only
@@ -42,18 +44,19 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
   }, [onConfirm, password])
   return (
     <StyledModal
-      title="PASSWORD CONFIRMATION"
+      // title="PASSWORD CONFIRMATION"
+      title={intl.formatMessage({ id: 'wallet.password.confirmation' })}
       visible={visible}
       onOk={!validatingPassword ? onConfirmCb : undefined}
       onCancel={onCancel}
       maskClosable={false}
       closable={false}
-      okText="CONFIRM"
-      cancelText="CANCEL">
+      okText={intl.formatMessage({ id: 'common.confirm' })}
+      cancelText={intl.formatMessage({ id: 'common.cancel' })}>
       <Form autoComplete="off">
         <Form.Item
           className={invalidPassword ? 'has-error' : ''}
-          extra={validatingPassword ? 'Validating password ...' : ''}>
+          extra={validatingPassword ? intl.formatMessage({ id: 'wallet.password.confirmation.pending' }) + '...' : ''}>
           <Input
             type="password"
             typevalue="ghost"
@@ -63,7 +66,9 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
             prefix={<LockOutlined />}
             autoComplete="off"
           />
-          {invalidPassword && <div className="ant-form-explain">Password is wrong!</div>}
+          {invalidPassword && (
+            <div className="ant-form-explain">{intl.formatMessage({ id: 'wallet.password.confirmation.error' })}!</div>
+          )}
         </Form.Item>
       </Form>
     </StyledModal>

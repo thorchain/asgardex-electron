@@ -22,6 +22,7 @@ const common: CommonMessages = {
   'common.phrase': 'Phrase',
   'common.submit': 'Submit',
   'common.confirm': 'Confirm',
+  'common.cancel': 'Cancel',
   'common.next': 'Next',
   'common.finish': 'Finish',
   'common.copy': 'Copy',
