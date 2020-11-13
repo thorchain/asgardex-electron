@@ -1,4 +1,5 @@
 import { Balances } from '@xchainjs/xchain-binance'
+import { Balance } from '@xchainjs/xchain-client'
 import {
   Asset,
   assetToBase,
@@ -13,7 +14,6 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { PoolDetails } from '../midgard/types'
-import { AssetWithBalance } from '../wallet/types'
 import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue, getWalletBalances } from './utils'
 
 describe('services/binance/utils/', () => {
@@ -31,7 +31,7 @@ describe('services/binance/utils/', () => {
     }
 
     it('returns a price for BNB in USD', () => {
-      const balance: AssetWithBalance = {
+      const balance: Balance = {
         amount: baseAmount('1'),
         asset: AssetBNB
       }
@@ -46,7 +46,7 @@ describe('services/binance/utils/', () => {
     })
 
     it('returns a price for RUNE in USD', () => {
-      const balance: AssetWithBalance = {
+      const balance: Balance = {
         amount: baseAmount('1'),
         asset: AssetRune67C
       }
@@ -61,7 +61,7 @@ describe('services/binance/utils/', () => {
     })
 
     it('returns a no price if no pools are available', () => {
-      const balance: AssetWithBalance = {
+      const balance: Balance = {
         amount: baseAmount('1'),
         asset: AssetBNB
       }
@@ -92,7 +92,7 @@ describe('services/binance/utils/', () => {
   })
 
   describe('getWalletBalances', () => {
-    it('maps `Balances` -> `AssetWithBalances`', () => {
+    it('maps `BinanceBalances` -> `Balances`', () => {
       const balances: Balances = [
         {
           free: '1',

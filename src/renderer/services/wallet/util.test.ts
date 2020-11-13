@@ -1,8 +1,9 @@
+import { Balances } from '@xchainjs/xchain-client'
 import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, baseAmount } from '@xchainjs/xchain-util'
 import { some, none } from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
-import { KeystoreState, KeystoreContent, AssetsWithBalance } from './types'
+import { KeystoreState, KeystoreContent } from './types'
 import {
   getKeystoreContent,
   hasKeystoreContent,
@@ -125,7 +126,7 @@ describe('services/wallet/util/', () => {
           asset: ASSETS_TESTNET.RUNE,
           amount: baseAmount(0)
         }
-      ] as AssetsWithBalance
+      ] as Balances
       expect(filterNullableBalances(target)).toEqual([target[1], target[3]])
     })
   })
@@ -150,7 +151,7 @@ describe('services/wallet/util/', () => {
             {
               asset: ASSETS_TESTNET.RUNE
             }
-          ] as AssetsWithBalance,
+          ] as Balances,
           [AssetBTC.ticker, AssetETH.ticker, AssetRune67C.ticker, AssetBNB.ticker]
         )
       ).toEqual([

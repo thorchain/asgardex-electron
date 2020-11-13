@@ -11,7 +11,7 @@ import * as walletRoutes from '../../../routes/wallet'
 import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_ASSET_TX_HANDLER } from '../../../services/wallet/const'
-import { AssetTxsPageRD, LoadAssetTxsHandler, NonEmptyAssetsWithBalance } from '../../../services/wallet/types'
+import { AssetTxsPageRD, LoadAssetTxsHandler, NonEmptyBalances } from '../../../services/wallet/types'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
@@ -20,7 +20,7 @@ import * as Styled from './AssetDetails.style'
 
 type Props = {
   txsPageRD: AssetTxsPageRD
-  assetsWB: O.Option<NonEmptyAssetsWithBalance>
+  assetsWB: O.Option<NonEmptyBalances>
   asset: O.Option<Asset>
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: () => void

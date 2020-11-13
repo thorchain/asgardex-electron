@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
+import { Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -11,14 +12,14 @@ import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormBTC } from '../../../components/wallet/txs/send/'
 import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { getAssetWBByAsset } from '../../../helpers/walletHelper'
+import { getBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/bitcoin/types'
 import { GetExplorerTxUrl } from '../../../services/clients/types'
-import { AssetsWithBalance, AssetWithBalance, NonEmptyAssetsWithBalance, TxRD } from '../../../services/wallet/types'
+import { NonEmptyBalances, TxRD } from '../../../services/wallet/types'
 
 type Props = {
   btcAsset: Asset
-  assetsWB: O.Option<NonEmptyAssetsWithBalance>
+  assetsWB: O.Option<NonEmptyBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
   reloadFeesHandler: () => void
 }
@@ -26,7 +27,7 @@ type Props = {
 export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
   const { btcAsset: selectedAsset, assetsWB, reloadFeesHandler, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
 
-  const oBtcAssetWB = useMemo(() => getAssetWBByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
+  const oBtcAssetWB = useMemo(() => getBalanceByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
 
   const { fees$, pushTx, txRD$, client$, resetTx } = useBitcoinContext()
 
@@ -49,13 +50,13 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
    * Custom send form used by BNB chain only
    */
   const sendForm = useCallback(
-    (assetWB: AssetWithBalance) => (
+    (assetWB: Balance) => (
       <SendFormBTC
         assetWB={assetWB}
         onSubmit={pushTx}
         assetsWB={FP.pipe(
           assetsWB,
-          O.getOrElse(() => [] as AssetsWithBalance)
+          O.getOrElse(() => [] as Balances)
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}

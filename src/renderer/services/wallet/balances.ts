@@ -19,7 +19,7 @@ import * as BTC from '../bitcoin/context'
 import * as ETH from '../ethereum/service'
 import { selectedAsset$ } from './common'
 import { INITIAL_ASSETS_WB_STATE } from './const'
-import { AssetsWBChain, AssetsWithBalanceRD, AssetsWithBalanceState, LoadBalancesHandler } from './types'
+import { ChainBalance, BalancesRD, AssetsWithBalanceState, LoadBalancesHandler } from './types'
 import { sortBalances } from './util'
 
 export const reloadBalances = () => {
@@ -51,7 +51,7 @@ export const reloadBalances$: Rx.Observable<O.Option<LoadBalancesHandler>> = sel
 /**
  * Transforms BNB data (address + `AssetsWB`) into `AssetsWBChain`
  */
-const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.address$, BNB.assetsWB$, network$]).pipe(
+const bnbAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BNB.address$, BNB.assetsWB$, network$]).pipe(
   map(
     ([address, assetsWB, network]) =>
       ({
@@ -64,14 +64,14 @@ const bnbAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BNB.addre
           assetsWB,
           RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getRuneAsset({ network, chain: 'BNB' }).ticker]))
         )
-      } as AssetsWBChain)
+      } as ChainBalance)
   )
 )
 
 /**
  * Transforms BTC data (address + `AssetWB`) into `AssetsWBChain`
  */
-const btcAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BTC.address$, BTC.assetsWB$]).pipe(
+const btcAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BTC.address$, BTC.assetsWB$]).pipe(
   map(
     ([address, assetsWB]) =>
       ({
@@ -81,14 +81,14 @@ const btcAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([BTC.addre
           O.getOrElse(() => '')
         ),
         assetsWB
-      } as AssetsWBChain)
+      } as ChainBalance)
   )
 )
 
 /**
  * Transforms ETH data (address + `AssetsWBChain`) into `AssetsWBChain`
  */
-const ethAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([ETH.address$, ETH.assetWB$]).pipe(
+const ethAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([ETH.address$, ETH.assetWB$]).pipe(
   map(
     ([address, assetWBRD]) =>
       ({
@@ -101,7 +101,7 @@ const ethAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([ETH.addre
           assetWBRD,
           RD.map((assetWB) => [assetWB])
         )
-      } as AssetsWBChain)
+      } as ChainBalance)
   )
 )
 
@@ -110,7 +110,7 @@ const ethAssetsWBChain$: Observable<AssetsWBChain> = Rx.combineLatest([ETH.addre
  */
 export const assetsWBChains$ = Rx.combineLatest([btcAssetsWBChain$, ethAssetsWBChain$, bnbAssetsWBChain$])
 
-const ethAssetsWB$: Observable<AssetsWithBalanceRD> = ETH.assetWB$.pipe(liveData.map((asset) => [asset]))
+const ethAssetsWB$: Observable<BalancesRD> = ETH.assetWB$.pipe(liveData.map((asset) => [asset]))
 
 /**
  * Transform a list of AssetsWithBalanceRD

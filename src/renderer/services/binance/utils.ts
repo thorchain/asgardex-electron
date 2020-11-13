@@ -1,5 +1,5 @@
-import { Balances } from '@xchainjs/xchain-binance'
-import { TxsPage, Tx } from '@xchainjs/xchain-client'
+import { Balances as BinanceBalances } from '@xchainjs/xchain-binance'
+import { TxsPage, Tx, Balance, Balances } from '@xchainjs/xchain-client'
 import {
   getValueOfAsset1InAsset2,
   PoolData,
@@ -19,13 +19,13 @@ import * as O from 'fp-ts/lib/Option'
 import { BNB_DECIMAL, isRuneAsset } from '../../helpers/assetHelper'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
-import { AssetWithBalance, AssetsWithBalance, AssetTxsPage, AssetTx } from '../wallet/types'
+import { AssetTxsPage, AssetTx } from '../wallet/types'
 
 /**
  * Helper to get a pool price value for a given `Balance`
  */
 export const getPoolPriceValue = (
-  { asset, amount }: AssetWithBalance,
+  { asset, amount }: Balance,
   poolDetails: PoolDetails,
   selectedPricePoolData: PoolData
 ): O.Option<BaseAmount> => {
@@ -56,7 +56,7 @@ export const bncSymbolToAsset = (symbol: string): O.Option<Asset> =>
  **/
 export const bncSymbolToAssetString = (symbol: string) => `${AssetBNB.chain}.${symbol}`
 
-type GetWalletBalances = (balances: Balances) => AssetsWithBalance
+type GetWalletBalances = (balances: BinanceBalances) => Balances
 export const getWalletBalances: GetWalletBalances = A.filterMap(({ symbol, free }) =>
   FP.pipe(
     bncSymbolToAsset(symbol),

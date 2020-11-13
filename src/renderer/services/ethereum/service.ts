@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as EthereumClient, Network as EthereumNetwork, Address } from '@thorchain/asgardex-ethereum'
+import { Balance } from '@xchainjs/xchain-client'
 import { AssetETH, baseAmount } from '@xchainjs/xchain-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
@@ -15,7 +16,7 @@ import { Network } from '../app/types'
 import { DEFAULT_NETWORK } from '../const'
 import { getClient } from '../utils'
 import { keystoreService } from '../wallet/common'
-import { ApiError, AssetWithBalance, AssetWithBalanceRD, ErrorId } from '../wallet/types'
+import { ApiError, BalanceRD, ErrorId } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { EthereumClientState } from './types'
 
@@ -82,14 +83,14 @@ const address$: Observable<O.Option<Address>> = client$.pipe(
  * Observable to load balances from Binance API endpoint
  * If client is not available, it returns an `initial` state
  */
-const loadBalances$ = (client: EthereumClient): Observable<AssetWithBalanceRD> =>
+const loadBalances$ = (client: EthereumClient): Observable<BalanceRD> =>
   Rx.from(client.getBalance()).pipe(
     mergeMap((balance) =>
       Rx.of(
         RD.success({
           asset: AssetETH,
           amount: baseAmount(balance.toString(), ETH_DECIMAL)
-        } as AssetWithBalance)
+        } as Balance)
       )
     ),
     catchError((error: Error) =>
@@ -107,10 +108,7 @@ const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const assetWB$: Observable<AssetWithBalanceRD> = Rx.combineLatest([
-  reloadBalances$.pipe(debounceTime(300)),
-  client$
-]).pipe(
+const assetWB$: Observable<BalanceRD> = Rx.combineLatest([reloadBalances$.pipe(debounceTime(300)), client$]).pipe(
   mergeMap(([_, client]) => {
     return FP.pipe(
       client,

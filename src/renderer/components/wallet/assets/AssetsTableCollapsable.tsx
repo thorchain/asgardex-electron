@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset, baseToAsset, chainToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
@@ -11,14 +12,7 @@ import { useIntl } from 'react-intl'
 
 import { getPoolPriceValue } from '../../../services/binance/utils'
 import { PoolDetails } from '../../../services/midgard/types'
-import {
-  AssetWithBalance,
-  AssetsWBChains,
-  AssetsWithBalanceRD,
-  AssetsWithBalance,
-  ApiError,
-  AssetsWBChain
-} from '../../../services/wallet/types'
+import { AssetsWBChains, BalancesRD, ApiError, ChainBalance } from '../../../services/wallet/types'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
@@ -46,10 +40,10 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const [collapseChangedByUser, setCollapseChangedByUser] = useState(false)
 
   // store previous data of asset data to render these while reloading
-  const previousAssetsTableData = useRef<AssetsWithBalance[]>([])
+  const previousAssetsTableData = useRef<Balances[]>([])
 
   const onRow = useCallback(
-    ({ asset }: AssetWithBalance) => {
+    ({ asset }: Balance) => {
       return {
         onClick: () => selectAssetHandler(asset)
       }
@@ -62,11 +56,11 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     // https://github.com/thorchain/asgardex-electron/issues/476
   }, [])
 
-  const iconColumn: ColumnType<AssetWithBalance> = useMemo(
+  const iconColumn: ColumnType<Balance> = useMemo(
     () => ({
       title: '',
       width: 120,
-      render: ({ asset }: AssetWithBalance) => (
+      render: ({ asset }: Balance) => (
         <Row justify="center" align="middle">
           <AssetIcon asset={asset} size="normal" />
         </Row>
@@ -75,23 +69,23 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     []
   )
 
-  const nameColumn: ColumnType<AssetWithBalance> = useMemo(
+  const nameColumn: ColumnType<Balance> = useMemo(
     () => ({
       width: 140,
-      render: ({ asset }: AssetWithBalance) => <Label>{asset.symbol}</Label>
+      render: ({ asset }: Balance) => <Label>{asset.symbol}</Label>
     }),
     []
   )
 
-  const tickerColumn: ColumnType<AssetWithBalance> = useMemo(
+  const tickerColumn: ColumnType<Balance> = useMemo(
     () => ({
       width: 80,
-      render: ({ asset }: AssetWithBalance) => <Label nowrap>{asset.ticker}</Label>
+      render: ({ asset }: Balance) => <Label nowrap>{asset.ticker}</Label>
     }),
     []
   )
 
-  const renderBalanceColumn = ({ asset, amount }: AssetWithBalance) => {
+  const renderBalanceColumn = ({ asset, amount }: Balance) => {
     const balance = formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 3 })
     return (
       <Label nowrap align="right">
@@ -100,7 +94,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     )
   }
 
-  const balanceColumn: ColumnType<AssetWithBalance> = useMemo(
+  const balanceColumn: ColumnType<Balance> = useMemo(
     () => ({
       render: renderBalanceColumn
     }),
@@ -108,7 +102,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderPriceColumn = useCallback(
-    (assetWB: AssetWithBalance) => {
+    (assetWB: Balance) => {
       const oPrice = getPoolPriceValue(assetWB, poolDetails, pricePool.poolData)
       const label = FP.pipe(
         oPrice,
@@ -125,7 +119,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     [poolDetails, pricePool.asset, pricePool.poolData]
   )
 
-  const priceColumn: ColumnType<AssetWithBalance> = useMemo(
+  const priceColumn: ColumnType<Balance> = useMemo(
     () => ({
       width: 300,
       render: renderPriceColumn
@@ -133,10 +127,10 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     [renderPriceColumn]
   )
 
-  const hideColumn: ColumnType<AssetWithBalance> = useMemo(
+  const hideColumn: ColumnType<Balance> = useMemo(
     () => ({
       width: 20,
-      render: ({ asset }: AssetWithBalance) => (
+      render: ({ asset }: Balance) => (
         <Row
           justify="center"
           align="middle"
@@ -170,7 +164,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   }, [balanceColumn, hideColumn, iconColumn, nameColumn, priceColumn, screenMap, tickerColumn])
 
   const renderAssetsTable = useCallback(
-    (tableData: AssetsWithBalance, loading = false) => {
+    (tableData: Balances, loading = false) => {
       return (
         <Styled.Table
           showHeader={false}
@@ -186,7 +180,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderAssetsWBState = useCallback(
-    (assetsWB: AssetsWithBalanceRD, index: number) =>
+    (assetsWB: BalancesRD, index: number) =>
       FP.pipe(
         assetsWB,
         RD.fold(
@@ -214,7 +208,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   // Panel
   const renderPanel = useCallback(
-    ({ chain, address, assetsWB }: AssetsWBChain, key: number) => {
+    ({ chain, address, assetsWB }: ChainBalance, key: number) => {
       const assetsTxt = FP.pipe(
         assetsWB,
         RD.fold(

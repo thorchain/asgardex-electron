@@ -1,17 +1,17 @@
 import React, { useCallback, useMemo } from 'react'
 
+import { Balances } from '@xchainjs/xchain-client'
 import { Asset, formatAssetAmountCurrency, baseToAsset } from '@xchainjs/xchain-util'
 import { Menu, Dropdown, Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 
-import { AssetsWithBalance } from '../../../services/wallet/types'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
 import { Size as IconSize } from '../../uielements/assets/assetIcon/AssetIcon.types'
 import * as Styled from './AccountSelector.style'
 
 type Props = {
   selectedAsset: Asset
-  assets: AssetsWithBalance
+  assets: Balances
   onChange?: (asset: Asset) => void
   size?: IconSize
 }

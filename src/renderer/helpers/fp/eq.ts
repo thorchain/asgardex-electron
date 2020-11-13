@@ -1,11 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, assetToString, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
 import * as O from 'fp-ts/lib/Option'
 
-import { AssetWithBalance, ApiError, AssetsWithBalance } from '../../services/wallet/types'
+import { ApiError } from '../../services/wallet/types'
 
 export const eqOString = O.getEq(Eq.eqString)
 
@@ -31,7 +32,7 @@ export const eqBaseAmount: Eq.Eq<BaseAmount> = {
 
 export const eqOptionBaseAmount = O.getEq(eqBaseAmount)
 
-export const eqAssetWithBalance: Eq.Eq<AssetWithBalance> = {
+export const eqBalance: Eq.Eq<Balance> = {
   equals: (x, y) => eqAsset.equals(x.asset, y.asset) && eqBaseAmount.equals(x.amount, y.amount)
 }
 
@@ -42,7 +43,7 @@ export const eqApiError = Eq.getStructEq<ApiError>({
   msg: Eq.eqString
 })
 
-export const eqAssetsWithBalance = A.getEq(eqAssetWithBalance)
+export const eqBalances = A.getEq(eqBalance)
 
-export const eqAssetWithBalanceRD = RD.getEq<ApiError, AssetWithBalance>(eqApiError, eqAssetWithBalance)
-export const eqAssetsWithBalanceRD = RD.getEq<ApiError, AssetsWithBalance>(eqApiError, eqAssetsWithBalance)
+export const eqBalanceRD = RD.getEq<ApiError, Balance>(eqApiError, eqBalance)
+export const eqAssetsWithBalanceRD = RD.getEq<ApiError, Balances>(eqApiError, eqBalances)
