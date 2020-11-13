@@ -24,7 +24,7 @@ import { rdFromOption } from '../../helpers/fpHelpers'
 import { getDefaultRunePricePool } from '../../helpers/poolHelper'
 import { SwapRouteParams } from '../../routes/swap'
 import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
-import { ConfirmPasswordView } from '../wallet/ConfirmPassrword'
+import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
 import * as Styled from './SwapView.styles'
 
 type Props = {}
