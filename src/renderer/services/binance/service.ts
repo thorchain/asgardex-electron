@@ -272,16 +272,10 @@ const loadTxs$ = ({
     )
   )
 
-  const endTime = Date.now()
-  // 90 day window - similar to ASGARDEX wallet approach,
-  // see https://gitlab.com/thorchain/asgard-wallet/-/blob/develop/imports/api/wallet.js#L39-48
-  const diffTime = 90 * 24 * 60 * 60 * 1000
-  const startTime = endTime - diffTime
   return Rx.from(
     client.getTransactions({
       asset: txAsset,
       address: client.getAddress(),
-      startTime: new Date(startTime),
       limit,
       offset
     })
@@ -304,11 +298,7 @@ const { get$: reloadTxs$, set: reloadTxs } = observableState<LoadTxsProps>(INITI
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const txs$: TxsPageLD = Rx.combineLatest([
-  client$,
-  reloadTxs$.pipe(debounceTime(300), startWith(INITIAL_LOAD_TXS_PROPS)),
-  selectedWalletAsset$
-]).pipe(
+const txs$: TxsPageLD = Rx.combineLatest([client$, reloadTxs$, selectedWalletAsset$]).pipe(
   switchMap(([client, { limit, offset }, oAsset]) => {
     return FP.pipe(
       // client and asset has to be available
