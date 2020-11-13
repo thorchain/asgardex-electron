@@ -8,7 +8,7 @@ import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/context'
 import { GetExplorerTxUrl } from '../clients/types'
 import { selectedAsset$ } from './common'
-import { ApiError, AssetTxsPageLD, ErrorId, LoadAssetTxsHandler } from './types'
+import { ApiError, TxsPageLD, ErrorId, LoadTxsHandler } from './types'
 
 const explorerUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> => {
   switch (chain) {
@@ -62,12 +62,12 @@ export const getExplorerTxUrl$: Rx.Observable<O.Option<GetExplorerTxUrl>> = sele
   )
 )
 
-const loadAssetTxsHandlerByChain = (chain: Chain): O.Option<LoadAssetTxsHandler> => {
+const loadTxsHandlerByChain = (chain: Chain): O.Option<LoadTxsHandler> => {
   switch (chain) {
     case 'BNB':
-      return O.some(() => BNB.loadAssetTxs)
+      return O.some(() => BNB.reloadTxs)
     case 'BTC':
-      return O.some(() => BTC.loadAssetTxs)
+      return O.some(() => BTC.loadTxs)
     case 'ETH':
       // not implemented yet
       return O.none
@@ -79,21 +79,21 @@ const loadAssetTxsHandlerByChain = (chain: Chain): O.Option<LoadAssetTxsHandler>
   }
 }
 
-export const loadAssetTxsHandler$: Rx.Observable<O.Option<LoadAssetTxsHandler>> = selectedAsset$.pipe(
+export const loadTxsHandler$: Rx.Observable<O.Option<LoadTxsHandler>> = selectedAsset$.pipe(
   RxOp.switchMap(
     O.fold(
       () => Rx.EMPTY,
-      ({ chain }) => Rx.of(loadAssetTxsHandlerByChain(chain))
+      ({ chain }) => Rx.of(loadTxsHandlerByChain(chain))
     )
   )
 )
 
-export const assetTxsByChain$ = (chain: Chain): AssetTxsPageLD => {
+export const txsByChain$ = (chain: Chain): TxsPageLD => {
   switch (chain) {
     case 'BNB':
-      return BNB.assetTxs$
+      return BNB.txs$
     case 'BTC':
-      return BTC.assetTxs$
+      return BTC.txs$
     case 'ETH':
       return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
     case 'THOR':
@@ -103,11 +103,11 @@ export const assetTxsByChain$ = (chain: Chain): AssetTxsPageLD => {
   }
 }
 
-export const assetTxs$: AssetTxsPageLD = selectedAsset$.pipe(
+export const txs$: TxsPageLD = selectedAsset$.pipe(
   RxOp.switchMap(
     O.fold(
       () => Rx.EMPTY,
-      ({ chain }) => assetTxsByChain$(chain)
+      ({ chain }) => txsByChain$(chain)
     )
   )
 )

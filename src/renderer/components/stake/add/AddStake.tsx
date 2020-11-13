@@ -267,14 +267,14 @@ export const AddStake: React.FC<Props> = (props) => {
             memo: runeMemo
           }
           console.log('SYM Tx 1/2 (rune):', runeTxParam)
-          const assetTxParam = {
+          const txParam = {
             chain: asset.chain,
             asset: asset,
             poolAddress,
             amount: assetAmountToStake,
             memo: assetMemo
           }
-          console.log('SYM Tx 2/2 (asset):', assetTxParam)
+          console.log('SYM Tx 2/2 (asset):', txParam)
 
           return true
         })

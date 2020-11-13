@@ -9,10 +9,9 @@ import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operato
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { selectedAsset$ } from '../wallet/common'
-import { ApiError, AssetTxsPageLD, ErrorId, TxRD } from '../wallet/types'
+import { ApiError, TxsPageLD, ErrorId, TxRD } from '../wallet/types'
 import { Client$ } from './common'
 import { SendTxParams, TransactionService } from './types'
-import { toAssetTxsPage } from './utils'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
@@ -42,12 +41,9 @@ const sendStakeTx = (client$: Client$) => ({ to, amount, feeRate, memo }: SendTx
  * Observable to load txs
  * If client is not available, it returns an `initial` state
  */
-// TODO(@veado or @thatStrangeGuyThorchain) Use TxsPage instead of `AssetTxsPageLD`
-// @see https://github.com/thorchain/asgardex-electron/issues/585
-const loadAssetTxs$ = ({ client }: { client: BitcoinClient }): AssetTxsPageLD => {
+const loadTxs$ = ({ client }: { client: BitcoinClient }): TxsPageLD => {
   const address = client.getAddress()
   return Rx.from(client.getTransactions({ address })).pipe(
-    map(toAssetTxsPage),
     map(RD.success),
     catchError((error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
@@ -59,13 +55,13 @@ const loadAssetTxs$ = ({ client }: { client: BitcoinClient }): AssetTxsPageLD =>
 // `TriggerStream` to reload `Txs`
 // TODO (@Veado) Change to `observableState` to add pagination (similar to txs history of Binance)
 // https://github.com/thorchain/asgardex-electron/issues/508
-const { stream$: reloadAssetTxs$, trigger: loadAssetTxs } = triggerStream()
+const { stream$: reloadTxs$, trigger: loadTxs } = triggerStream()
 
 /**
  * `Txs` history for BTC
  */
-const assetTxs$ = (client$: Client$): AssetTxsPageLD =>
-  Rx.combineLatest([client$, reloadAssetTxs$, selectedAsset$]).pipe(
+const txs$ = (client$: Client$): TxsPageLD =>
+  Rx.combineLatest([client$, reloadTxs$, selectedAsset$]).pipe(
     switchMap(([client, _, oAsset]) => {
       return FP.pipe(
         // client and asset has to be available
@@ -77,7 +73,7 @@ const assetTxs$ = (client$: Client$): AssetTxsPageLD =>
         O.fold(
           () => Rx.of(RD.initial),
           ([clientState]) =>
-            loadAssetTxs$({
+            loadTxs$({
               client: clientState
             })
         )
@@ -91,9 +87,9 @@ const createTransactionService = (client$: Client$): TransactionService => ({
   txRD$,
   pushTx: pushTx(client$),
   sendStakeTx: sendStakeTx(client$),
-  assetTxs$: assetTxs$(client$),
+  txs$: txs$(client$),
   resetTx: () => setTxRD(RD.initial),
-  loadAssetTxs
+  loadTxs: loadTxs
 })
 
 export { createTransactionService }

@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Tx, Txs, TxsPage } from '@xchainjs/xchain-client'
 import { baseToAsset, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
@@ -11,13 +12,13 @@ import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 
 import { ZERO_BN } from '../../../../const'
 import { MAX_ITEMS_PER_PAGE } from '../../../../services/const'
-import { ApiError, AssetTx, AssetTxs, AssetTxsPage, AssetTxsPageRD } from '../../../../services/wallet/types'
+import { ApiError, TxsPageRD } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error'
 import { Pagination } from '../../../uielements/pagination'
 import * as Styled from './TxsTable.style'
 
 type Props = {
-  txsPageRD: AssetTxsPageRD
+  txsPageRD: TxsPageRD
   clickTxLinkHandler: (txHash: string) => void
   changePaginationHandler: (page: number) => void
 }
@@ -28,7 +29,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   // store previous data of Txs to render these while reloading
-  const previousTxs = useRef<O.Option<AssetTxsPage>>(O.none)
+  const previousTxs = useRef<O.Option<TxsPage>>(O.none)
 
   // Helper to render a text with a line break
   // That's needed to have multline texts in ant's table cell
@@ -43,7 +44,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     []
   )
 
-  const renderTypeColumn = useCallback((_, { type }: AssetTx) => {
+  const renderTypeColumn = useCallback((_, { type }: Tx) => {
     switch (type) {
       case 'transfer':
         return <Styled.TransferIcon />
@@ -52,7 +53,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     }
   }, [])
 
-  const typeColumn: ColumnType<AssetTx> = {
+  const typeColumn: ColumnType<Tx> = {
     key: 'txType',
     title: '',
     align: 'center',
@@ -62,7 +63,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   }
 
   const renderFromColumn = useCallback(
-    (_, { from }: AssetTx) =>
+    (_, { from }: Tx) =>
       from.map(({ from }, index) => {
         const key = `${from}-${index}`
         return renderTextWithBreak(from, key)
@@ -70,13 +71,13 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [renderTextWithBreak]
   )
 
-  const fromColumn: ColumnType<AssetTx> = {
+  const fromColumn: ColumnType<Tx> = {
     key: 'fromAddr',
     title: intl.formatMessage({ id: 'common.from' }),
     align: 'left',
     ellipsis: true,
     render: renderFromColumn,
-    sorter: ({ from: fromA }: AssetTx, { from: fromB }: AssetTx) =>
+    sorter: ({ from: fromA }: Tx, { from: fromB }: Tx) =>
       // For simplicity we sort first item only
       // TODO (@Veado) Play around to get a user-friendly sort option
       ordString.compare(fromA[0]?.from ?? '', fromB[0]?.from ?? ''),
@@ -84,7 +85,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   }
 
   const renderToColumn = useCallback(
-    (_, { to }: AssetTx) =>
+    (_, { to }: Tx) =>
       to.map(({ to }, index) => {
         const key = `${to}-${index}`
         return renderTextWithBreak(to, key)
@@ -92,13 +93,13 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [renderTextWithBreak]
   )
 
-  const toColumn: ColumnType<AssetTx> = {
+  const toColumn: ColumnType<Tx> = {
     key: 'toAddr',
     title: intl.formatMessage({ id: 'common.to' }),
     align: 'left',
     ellipsis: true,
     render: renderToColumn,
-    sorter: ({ to: toA }: AssetTx, { to: toB }: AssetTx) =>
+    sorter: ({ to: toA }: Tx, { to: toB }: Tx) =>
       // For simplicity we sort first item only
       // TODO (@Veado) Play around to get a user-friendly sort option
       ordString.compare(toA[0]?.to ?? '', toB[0]?.to ?? ''),
@@ -106,7 +107,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   }
 
   const renderDateColumn = useCallback(
-    (_, { date }: AssetTx) => (
+    (_, { date }: Tx) => (
       <Row gutter={[8, 0]}>
         <Col>
           <Styled.Text>
@@ -128,19 +129,19 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [isDesktopView]
   )
 
-  const dateColumn: ColumnType<AssetTx> = {
+  const dateColumn: ColumnType<Tx> = {
     key: 'timeStamp',
     title: intl.formatMessage({ id: 'common.date' }),
     align: 'left',
     width: isDesktopView ? 200 : 180,
     render: renderDateColumn,
-    sorter: (a: AssetTx, b: AssetTx) => a.date.getTime() - b.date.getTime(),
+    sorter: (a: Tx, b: Tx) => a.date.getTime() - b.date.getTime(),
     sortDirections: ['descend', 'ascend'],
     defaultSortOrder: 'descend'
   }
 
   const renderAmountColumn = useCallback(
-    (_, { to }: AssetTx) =>
+    (_, { to }: Tx) =>
       to.map(({ amount, to }, index) => {
         const key = `${to}-${index}`
         const text = formatAssetAmount({ amount: baseToAsset(amount), trimZeros: true })
@@ -149,24 +150,23 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [renderTextWithBreak]
   )
 
-  const amountColumn: ColumnType<AssetTx> = {
+  const amountColumn: ColumnType<Tx> = {
     key: 'value',
     title: intl.formatMessage({ id: 'common.amount' }),
     align: 'left',
     width: 200,
     render: renderAmountColumn,
-    sorter: ({ to: toA }: AssetTx, { to: toB }: AssetTx) =>
+    sorter: ({ to: toA }: Tx, { to: toB }: Tx) =>
       // For simplicity we sort first item only
       // TODO (@Veado) Play around to get a user-friendly sort option
       (toA[0]?.amount.amount() ?? ZERO_BN).comparedTo(toB[0]?.amount.amount() ?? ZERO_BN),
     sortDirections: ['descend', 'ascend']
   }
 
-  const renderLinkColumn = useCallback(
-    ({ hash }: AssetTx) => <Styled.LinkIcon onClick={() => clickTxLinkHandler(hash)} />,
-    [clickTxLinkHandler]
-  )
-  const linkColumn: ColumnType<AssetTx> = {
+  const renderLinkColumn = useCallback(({ hash }: Tx) => <Styled.LinkIcon onClick={() => clickTxLinkHandler(hash)} />, [
+    clickTxLinkHandler
+  ])
+  const linkColumn: ColumnType<Tx> = {
     key: 'txHash',
     title: '',
     align: 'center',
@@ -174,12 +174,12 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     render: renderLinkColumn
   }
 
-  const desktopColumns: ColumnsType<AssetTx> = [typeColumn, fromColumn, toColumn, amountColumn, dateColumn, linkColumn]
+  const desktopColumns: ColumnsType<Tx> = [typeColumn, fromColumn, toColumn, amountColumn, dateColumn, linkColumn]
 
-  const mobileColumns: ColumnsType<AssetTx> = [typeColumn, amountColumn, dateColumn, linkColumn]
+  const mobileColumns: ColumnsType<Tx> = [typeColumn, amountColumn, dateColumn, linkColumn]
 
   const renderTable = useCallback(
-    ({ total, txs }: AssetTxsPage, loading = false) => {
+    ({ total, txs }: TxsPage, loading = false) => {
       const columns = isDesktopView ? desktopColumns : mobileColumns
       return (
         <>
@@ -199,7 +199,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [desktopColumns, isDesktopView, mobileColumns, changePaginationHandler]
   )
 
-  const emptyTableData = useMemo((): AssetTxsPage => ({ total: 0, txs: [] as AssetTxs }), [])
+  const emptyTableData = useMemo((): TxsPage => ({ total: 0, txs: [] as Txs }), [])
 
   const renderContent = useMemo(
     () => (
@@ -214,7 +214,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
             return renderTable(data, true)
           },
           ({ msg }: ApiError) => <ErrorView title={msg} />,
-          (data: AssetTxsPage): JSX.Element => {
+          (data: TxsPage): JSX.Element => {
             previousTxs.current = O.some(data)
             return renderTable(data)
           }
