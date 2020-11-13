@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
@@ -24,6 +24,7 @@ import { rdFromOption } from '../../helpers/fpHelpers'
 import { getDefaultRunePricePool } from '../../helpers/poolHelper'
 import { SwapRouteParams } from '../../routes/swap'
 import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
+import { ConfirmPasswordView } from '../wallet/ConfirmPassrword'
 import * as Styled from './SwapView.styles'
 
 type Props = {}
@@ -37,7 +38,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     pools: { poolsState$, poolAddresses$, reloadPools, runeAsset$, selectedPricePool$ }
   } = midgardService
   const { transaction, explorerUrl$ } = useBinanceContext()
-  const { assetsWBState$, keystoreService } = useWalletContext()
+  const { assetsWBState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
 
@@ -48,14 +49,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
 
   const [txWithState] = useObservableState(() => transaction.txWithState$, RD.initial)
-
-  const [passwordToValidate, setPasswordToValidate] = useState('')
-
-  const passwordValidationResult$ = useMemo(() => keystoreService.validatePassword$(passwordToValidate), [
-    passwordToValidate
-  ])
-
-  const passwordValidationResult = useObservableState(passwordValidationResult$, RD.initial)
 
   const onConfirmSwap = useCallback(
     (source: Asset, amount: AssetAmount, memo: string) => {
@@ -128,8 +121,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
               return (
                 <Swap
-                  passwordValidationResult={passwordValidationResult}
-                  setPasswordToValidate={setPasswordToValidate}
+                  PasswordConfirmation={ConfirmPasswordView}
                   runeAsset={runeAsset}
                   activePricePool={selectedPricePool}
                   txWithState={txWithState}

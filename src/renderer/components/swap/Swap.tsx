@@ -40,7 +40,6 @@ import { Modal } from '../uielements/modal'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
 import { getSwapData, assetWithPriceToAsset, pickAssetWithPrice } from './Swap.utils'
-import { PrivateModal } from '../modal/private'
 
 type SwapProps = {
   balance?: number
@@ -55,8 +54,7 @@ type SwapProps = {
   goToTransaction?: (txHash: string) => void
   runeAsset: Asset
   activePricePool: PricePool
-  passwordValidationResult: RD.RemoteData<Error, boolean>
-  setPasswordToValidate: (password: string) => void
+  PasswordConfirmation?: React.FC<{ onSuccess: () => void; onClose: () => void }>
 }
 
 export const Swap = ({
@@ -71,10 +69,8 @@ export const Swap = ({
   resetTx,
   runeAsset,
   activePricePool,
-  passwordValidationResult,
-  setPasswordToValidate
+  PasswordConfirmation = () => <></>
 }: SwapProps) => {
-  console.log('passwordValidationResult --- ', passwordValidationResult)
   const intl = useIntl()
   const history = useHistory()
   // convert to hash map here instead of using getPoolDetail
@@ -252,15 +248,7 @@ export const Swap = ({
 
   const onSwapConfirmed = useCallback(() => {
     setShowPrivateModal(true)
-    // FP.pipe(
-    //   assetsToSwap,
-    //   // eslint-disable-next-line  array-callback-return
-    //   O.map(([sourceAsset, targetAsset]) => {
-    //     const memo = getSwapMemo({ asset: targetAsset })
-    //     onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
-    //   })
-    // )
-  }, [assetsToSwap, onConfirmSwap, changeAmount])
+  }, [setShowPrivateModal])
 
   const slider = useMemo(
     () =>
@@ -376,9 +364,28 @@ export const Swap = ({
     ]
   )
 
+  const closePrivateModal = useCallback(() => {
+    setShowPrivateModal(false)
+  }, [setShowPrivateModal])
+
+  // PasswordConfirmation
+  const onPasswordValidationSucceed = useCallback(() => {
+    FP.pipe(
+      assetsToSwap,
+      // eslint-disable-next-line  array-callback-return
+      O.map(([sourceAsset, targetAsset]) => {
+        const memo = getSwapMemo({ asset: targetAsset })
+        closePrivateModal()
+        onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
+      })
+    )
+  }, [assetsToSwap, onConfirmSwap, changeAmount, closePrivateModal])
+
   return (
     <Styled.Container>
-      <PrivateModal visible={showPrivateModal} onChangePassword={setPasswordToValidate} />
+      {showPrivateModal && PasswordConfirmation && (
+        <PasswordConfirmation onSuccess={onPasswordValidationSucceed} onClose={() => setShowPrivateModal(false)} />
+      )}
       <Styled.PendingContainer>{pendingState}</Styled.PendingContainer>
       <Styled.ContentContainer>
         <Styled.Header>

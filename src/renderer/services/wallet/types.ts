@@ -26,7 +26,11 @@ export type KeystoreService = {
   removeKeystore: () => Promise<void>
   unlock: (state: KeystoreState, password: string) => Promise<void>
   lock: () => void
-  validatePassword$: (password: string) => LiveData<Error, boolean>
+  /**
+   * Use RemoteData as result of validation
+   * No need to store any success data. Only status
+   */
+  validatePassword$: (password: string) => LiveData<Error, null>
 }
 
 export type AssetWithBalance = {

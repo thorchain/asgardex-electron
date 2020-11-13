@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import { LockOutlined } from '@ant-design/icons'
 import { Form } from 'antd'
@@ -11,24 +11,23 @@ type Props = {
   invalidPassword?: boolean
   validatingPassword?: boolean
   password?: string
-  onChangePassword?: (password: string) => void
+  onConfirm?: (password: string) => void
   onOk?: () => void
   onCancel?: () => void
-  targetPassword?: string
-  onSuccess?: () => void
+  isSuccess?: boolean
 }
 
 export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
-  const {
-    visible,
-    invalidPassword,
-    validatingPassword,
-    // password,
-    onChangePassword,
-    onOk,
-    onCancel,
-    targetPassword = ''
-  } = props
+  const { visible, invalidPassword, validatingPassword, onConfirm, onOk, onCancel, isSuccess } = props
+
+  /**
+   * Call onOk on success only
+   */
+  useEffect(() => {
+    if (isSuccess && onOk) {
+      onOk()
+    }
+  }, [isSuccess, onOk])
 
   const [password, setPassword] = useState('')
 
@@ -36,24 +35,23 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPassword(e.target.value)
     },
-    [onChangePassword]
+    [setPassword]
   )
 
-  const onConfirm = useCallback(() => {
-    console.log('confirm --- ', password)
-    onChangePassword && onChangePassword(password)
-  }, [onChangePassword, password])
+  const onConfirmP = useCallback(() => {
+    onConfirm && onConfirm(password)
+  }, [onConfirm, password])
   return (
     <StyledModal
       title="PASSWORD CONFIRMATION"
       visible={visible}
-      onOk={!validatingPassword ? onConfirm : undefined}
+      onOk={!validatingPassword ? onConfirmP : undefined}
       onCancel={onCancel}
       maskClosable={false}
       closable={false}
       okText="CONFIRM"
       cancelText="CANCEL">
-      <Form onFinish={onOk} autoComplete="off">
+      <Form autoComplete="off">
         <Form.Item
           className={invalidPassword ? 'has-error' : ''}
           extra={validatingPassword ? 'Validating password ...' : ''}>
