@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { LockOutlined } from '@ant-design/icons'
 import { Form } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { Input } from '../../uielements/input'
-import { StyledModal } from './PrivateModal.style'
+import * as Styled from './PrivateModal.style'
 
 type Props = {
   visible: boolean
@@ -43,8 +42,7 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
     onConfirm && onConfirm(password)
   }, [onConfirm, password])
   return (
-    <StyledModal
-      // title="PASSWORD CONFIRMATION"
+    <Styled.Modal
       title={intl.formatMessage({ id: 'wallet.password.confirmation' })}
       visible={visible}
       onOk={!validatingPassword ? onConfirmCb : undefined}
@@ -59,11 +57,11 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
           extra={validatingPassword ? intl.formatMessage({ id: 'wallet.password.confirmation.pending' }) + '...' : ''}>
           <Input
             type="password"
-            typevalue="ghost"
+            typevalue="normal"
             size="large"
             value={password}
             onChange={onChangePasswordHandler}
-            prefix={<LockOutlined />}
+            prefix={<Styled.LockOutlined />}
             autoComplete="off"
           />
           {invalidPassword && (
@@ -71,6 +69,6 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
           )}
         </Form.Item>
       </Form>
-    </StyledModal>
+    </Styled.Modal>
   )
 }
