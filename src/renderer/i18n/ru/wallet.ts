@@ -14,9 +14,9 @@ const wallet: WalletMessages = {
   'wallet.action.import': 'Импортировать',
   'wallet.action.create': 'Создать',
   'wallet.action.connect': 'Connect - RU',
-  'wallet.connect.instruction': 'Please connect your wallet - RU',
+  'wallet.connect.instruction': 'Пожалуйста подключите ваш кошелек',
   'wallet.unlock.title': 'Разблокировать кошелек',
-  'wallet.unlock.instruction': 'Please unlock your wallet - RU',
+  'wallet.unlock.instruction': 'Пожалуйста разблокируйте ваш кошелек',
   'wallet.unlock.phrase': 'Введите ваш пароль',
   'wallet.unlock.error': 'Не получилось разблокировать кошелек. Пожалуйста, проверьте пароль и попробуйте еще раз',
   'wallet.imports.phrase': 'Фраза',
@@ -40,15 +40,18 @@ const wallet: WalletMessages = {
   'wallet.send.fast': 'Быстро',
   'wallet.send.average': 'Средне',
   'wallet.errors.balancesFailed': 'Нет загруженных балансов. {errorMsg} (API Id: {apiId})',
-  'wallet.errors.address.empty': "Address can't be empty - RU",
-  'wallet.errors.address.invalid': 'Address is invalid - RU',
+  'wallet.errors.address.empty': 'Адрес не может быть путсым',
+  'wallet.errors.address.invalid': 'Адес недействителен',
   'wallet.errors.amount.shouldBeNumber': 'Количество должно быть числом',
   'wallet.errors.amount.shouldBeGreaterThan': 'Количество должно быть больше, чем {amount}',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Количество должно быть меньше вашего баланса',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Количество должно быть меньше, чем ваш баланс после вычета комисси',
   'wallet.errors.fee.notCovered': ' Комиссия не покрывается вашим банаслом ({balance})',
-  'wallet.errors.invalidChain': 'Invalid chain: {chain} - RU'
+  'wallet.errors.invalidChain': 'Цепь недействительна',
+  'wallet.password.confirmation': 'Подтверждение пароля',
+  'wallet.password.confirmation.pending': 'Проверка пароля',
+  'wallet.password.confirmation.error': 'Неверный пароль'
 }
 
 export default wallet

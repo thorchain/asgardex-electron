@@ -55,6 +55,7 @@ type SwapProps = {
   goToTransaction?: (txHash: string) => void
   runeAsset: Asset
   activePricePool: PricePool
+  PasswordConfirmation: React.FC<{ onSuccess: () => void; onClose: () => void }>
 }
 
 export const Swap = ({
@@ -68,7 +69,8 @@ export const Swap = ({
   goToTransaction,
   resetTx,
   runeAsset,
-  activePricePool
+  activePricePool,
+  PasswordConfirmation
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
@@ -238,18 +240,13 @@ export const Swap = ({
     [oAssetWB, intl]
   )
 
+  const [showPrivateModal, setShowPrivateModal] = useState(false)
+
   const isSwapDisabled = useMemo(() => changeAmount.eq(0) || FP.pipe(assetsWB, O.isNone), [assetsWB, changeAmount])
 
   const onSwapConfirmed = useCallback(() => {
-    FP.pipe(
-      assetsToSwap,
-      // eslint-disable-next-line  array-callback-return
-      O.map(([sourceAsset, targetAsset]) => {
-        const memo = getSwapMemo({ asset: targetAsset })
-        onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
-      })
-    )
-  }, [assetsToSwap, onConfirmSwap, changeAmount])
+    setShowPrivateModal(true)
+  }, [setShowPrivateModal])
 
   const slider = useMemo(
     () =>
@@ -365,8 +362,27 @@ export const Swap = ({
     ]
   )
 
+  const closePrivateModal = useCallback(() => {
+    setShowPrivateModal(false)
+  }, [setShowPrivateModal])
+
+  const onPasswordValidationSucceed = useCallback(() => {
+    FP.pipe(
+      assetsToSwap,
+      // eslint-disable-next-line  array-callback-return
+      O.map(([sourceAsset, targetAsset]) => {
+        const memo = getSwapMemo({ asset: targetAsset })
+        closePrivateModal()
+        onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
+      })
+    )
+  }, [assetsToSwap, onConfirmSwap, changeAmount, closePrivateModal])
+
   return (
     <Styled.Container>
+      {showPrivateModal && (
+        <PasswordConfirmation onSuccess={onPasswordValidationSucceed} onClose={() => setShowPrivateModal(false)} />
+      )}
       <Styled.PendingContainer>{pendingState}</Styled.PendingContainer>
       <Styled.ContentContainer>
         <Styled.Header>

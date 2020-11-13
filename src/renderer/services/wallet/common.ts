@@ -1,9 +1,13 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { encryptToKeyStore, decryptFromKeystore, Keystore as CryptoKeystore } from '@xchainjs/xchain-crypto'
 import { Asset } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
-import { distinctUntilChanged } from 'rxjs/operators'
+import { from, of } from 'rxjs'
+import { catchError, distinctUntilChanged, map, startWith, switchMap } from 'rxjs/operators'
 
 import { eqOAsset } from '../../helpers/fp/eq'
+import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { INITIAL_KEYSTORE_STATE } from './const'
 import { Phrase, KeystoreService, KeystoreState } from './types'
@@ -64,12 +68,25 @@ window.apiKeystore.exists().then(
   (_) => setKeystoreState(O.none /*not imported*/)
 )
 
+const validatePassword$ = (password: string) =>
+  password
+    ? FP.pipe(
+        from(window.apiKeystore.get()),
+        switchMap((keystore) => from(decryptFromKeystore(keystore, password))),
+        map(RD.success),
+        liveData.map(() => null),
+        catchError((err) => of(RD.failure(err))),
+        startWith(RD.pending)
+      )
+    : of(RD.initial)
+
 export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystore,
   removeKeystore,
   lock: () => setKeystoreState(O.some(O.none)),
-  unlock: addPhrase
+  unlock: addPhrase,
+  validatePassword$
 }
 
 const { get$: getSelectedAsset$, set: setSelectedAsset } = observableState<O.Option<Asset>>(O.none)
