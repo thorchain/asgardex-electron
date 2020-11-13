@@ -1,5 +1,5 @@
 import { Balances as BinanceBalances } from '@xchainjs/xchain-binance'
-import { TxsPage, Tx, Balance, Balances } from '@xchainjs/xchain-client'
+import { Balance, Balances } from '@xchainjs/xchain-client'
 import {
   getValueOfAsset1InAsset2,
   PoolData,
@@ -19,7 +19,6 @@ import * as O from 'fp-ts/lib/Option'
 import { BNB_DECIMAL, isRuneAsset } from '../../helpers/assetHelper'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
-import { AssetTxsPage, AssetTx } from '../wallet/types'
 
 /**
  * Helper to get a pool price value for a given `Balance`
@@ -68,17 +67,3 @@ export const getWalletBalances: GetWalletBalances = A.filterMap(({ symbol, free 
     })
   )
 )
-
-export const toAssetTx = (tx: Tx): AssetTx => ({
-  asset: O.some(tx.asset),
-  from: tx.from,
-  to: tx.to,
-  date: tx.date,
-  type: tx.type,
-  hash: tx.hash
-})
-
-export const toTxsPage = ({ total, txs }: TxsPage): AssetTxsPage => ({
-  total,
-  txs: txs.map(toAssetTx)
-})

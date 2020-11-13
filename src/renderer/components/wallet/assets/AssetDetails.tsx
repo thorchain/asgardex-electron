@@ -10,8 +10,8 @@ import { useHistory } from 'react-router-dom'
 import * as walletRoutes from '../../../routes/wallet'
 import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
-import { EMPTY_ASSET_TX_HANDLER } from '../../../services/wallet/const'
-import { AssetTxsPageRD, LoadAssetTxsHandler, NonEmptyBalances } from '../../../services/wallet/types'
+import { EMPTY_TX_HANDLER } from '../../../services/wallet/const'
+import { TxsPageRD, LoadTxsHandler, NonEmptyBalances } from '../../../services/wallet/types'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
@@ -19,12 +19,12 @@ import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.style'
 
 type Props = {
-  txsPageRD: AssetTxsPageRD
+  txsPageRD: TxsPageRD
   assetsWB: O.Option<NonEmptyBalances>
   asset: O.Option<Asset>
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: () => void
-  loadAssetTxsHandler?: LoadAssetTxsHandler
+  loadTxsHandler?: LoadTxsHandler
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -33,7 +33,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     assetsWB: oAssetsWB,
     asset: oAsset,
     reloadBalancesHandler = () => {},
-    loadAssetTxsHandler = EMPTY_ASSET_TX_HANDLER,
+    loadTxsHandler = EMPTY_TX_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none
   } = props
 
@@ -63,9 +63,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   )
 
   const refreshHandler = useCallback(() => {
-    loadAssetTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
+    loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
     reloadBalancesHandler()
-  }, [currentPage, loadAssetTxsHandler, reloadBalancesHandler])
+  }, [currentPage, loadTxsHandler, reloadBalancesHandler])
 
   const clickTxLinkHandler = useCallback(
     (txHash: string) => {
@@ -76,10 +76,10 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const onChangePagination = useCallback(
     (pageNo) => {
-      loadAssetTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (pageNo - 1) * MAX_ITEMS_PER_PAGE })
+      loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (pageNo - 1) * MAX_ITEMS_PER_PAGE })
       setCurrentPage(pageNo)
     },
-    [loadAssetTxsHandler]
+    [loadTxsHandler]
   )
 
   return (

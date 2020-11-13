@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balance, Balances, TxType } from '@xchainjs/xchain-client'
-import { BaseAmount, Asset, Chain } from '@xchainjs/xchain-util'
+import { Balance, Balances, TxsPage } from '@xchainjs/xchain-client'
+import { Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -55,43 +55,15 @@ export type AssetsWithBalanceState = {
   loading: boolean
 }
 
-export type AssetTxType = TxType
+export type TxsPageRD = RD.RemoteData<ApiError, TxsPage>
+export type TxsPageLD = LiveData<ApiError, TxsPage>
 
-export type AssetTxFrom = {
-  from: string // address or tx id
-  amount?: BaseAmount // amount sent from
-}
-
-export type AssetTxTo = {
-  to: string // to address
-  amount: BaseAmount // amount to send
-}
-
-export type AssetTx = {
-  asset: O.Option<Asset> // asset
-  from: AssetTxFrom[] // from address
-  to: AssetTxTo[] // to addresses
-  date: Date // timestamp of tx
-  type: AssetTxType // type
-  hash: string // Tx hash
-}
-
-export type AssetTxs = AssetTx[]
-
-export type AssetTxsPage = {
-  total: number
-  txs: AssetTxs
-}
-
-export type AssetTxsPageRD = RD.RemoteData<ApiError, AssetTxsPage>
-export type AssetTxsPageLD = LiveData<ApiError, AssetTxsPage>
-
-export type LoadAssetTxsProps = {
+export type LoadTxsProps = {
   limit: number
   offset: number
 }
 
-export type LoadAssetTxsHandler = (props: LoadAssetTxsProps) => void
+export type LoadTxsHandler = (props: LoadTxsProps) => void
 
 export type LoadBalancesHandler = () => void
 

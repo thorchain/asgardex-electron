@@ -33,11 +33,10 @@ import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
 import { keystoreService, selectedAsset$ as selectedWalletAsset$ } from '../wallet/common'
 import { INITIAL_LOAD_TXS_PROPS } from '../wallet/const'
-import { BalancesRD, ApiError, ErrorId, BalancesLD, AssetTxsPageLD, LoadAssetTxsProps } from '../wallet/types'
+import { BalancesRD, ApiError, ErrorId, BalancesLD, TxsPageLD, LoadTxsProps } from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createTransactionService } from './transaction'
 import { BinanceClientState, TransferFeesRD, BinanceClientState$ } from './types'
-import { toTxsPage } from './utils'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -254,7 +253,7 @@ const assetsWB$: Observable<BalancesRD> = Rx.combineLatest([reloadBalances$.pipe
  * Observable to load txs from Binance API endpoint
  * If client is not available, it returns an `initial` state
  */
-const loadAssetTxs$ = ({
+const loadTxs$ = ({
   client,
   oAsset,
   limit,
@@ -264,7 +263,7 @@ const loadAssetTxs$ = ({
   oAsset: O.Option<Asset>
   limit: number
   offset: number
-}): AssetTxsPageLD => {
+}): TxsPageLD => {
   const txAsset = FP.pipe(
     oAsset,
     O.fold(
@@ -287,7 +286,6 @@ const loadAssetTxs$ = ({
       offset
     })
   ).pipe(
-    map(toTxsPage),
     map(RD.success),
     catchError((error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
@@ -297,8 +295,8 @@ const loadAssetTxs$ = ({
   )
 }
 
-// Observable State to reload `Txs` based on `LoadAssetTxsProps`
-const { get$: reloadAssetTxs$, set: reloadAssetTxs } = observableState<LoadAssetTxsProps>(INITIAL_LOAD_TXS_PROPS)
+// Observable State to reload `Txs` based on `LoadTxsProps`
+const { get$: reloadTxs$, set: reloadTxs } = observableState<LoadTxsProps>(INITIAL_LOAD_TXS_PROPS)
 
 /**
  * `Txs` of selected asset
@@ -306,9 +304,9 @@ const { get$: reloadAssetTxs$, set: reloadAssetTxs } = observableState<LoadAsset
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const assetTxs$: AssetTxsPageLD = Rx.combineLatest([
+const txs$: TxsPageLD = Rx.combineLatest([
   client$,
-  reloadAssetTxs$.pipe(debounceTime(300), startWith(INITIAL_LOAD_TXS_PROPS)),
+  reloadTxs$.pipe(debounceTime(300), startWith(INITIAL_LOAD_TXS_PROPS)),
   selectedWalletAsset$
 ]).pipe(
   switchMap(([client, { limit, offset }, oAsset]) => {
@@ -320,7 +318,7 @@ const assetTxs$: AssetTxsPageLD = Rx.combineLatest([
       O.fold(
         () => Rx.of(RD.initial),
         ([clientState, asset]) =>
-          loadAssetTxs$({
+          loadTxs$({
             client: clientState,
             oAsset: O.some(asset),
             limit,
@@ -406,8 +404,8 @@ export {
   clientViewState$,
   assetsWB$,
   reloadBalances,
-  assetTxs$,
-  reloadAssetTxs as loadAssetTxs,
+  txs$,
+  reloadTxs,
   address$,
   getExplorerTxUrl$,
   transaction,

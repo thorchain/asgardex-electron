@@ -6,7 +6,7 @@ import {
   client$,
   clientViewState$,
   address$,
-  assetTxs$,
+  txs$,
   getExplorerTxUrl$,
   transaction,
   transferFees$,
@@ -17,7 +17,7 @@ export type BinanceContextValue = {
   subscribeTransfers: typeof subscribeTransfers
   miniTickers$: typeof miniTickers$
   clientViewState$: typeof clientViewState$
-  assetTxs$: typeof assetTxs$
+  txs$: typeof txs$
   address$: typeof address$
   explorerUrl$: typeof explorerUrl$
   getExplorerTxUrl$: typeof getExplorerTxUrl$
@@ -31,7 +31,7 @@ const initialContext: BinanceContextValue = {
   miniTickers$,
   client$,
   clientViewState$,
-  assetTxs$,
+  txs$,
   address$,
   explorerUrl$,
   getExplorerTxUrl$,
