@@ -10,7 +10,6 @@ type Props = {
   visible: boolean
   invalidPassword?: boolean
   validatingPassword?: boolean
-  password?: string
   onConfirm?: (password: string) => void
   onOk?: () => void
   onCancel?: () => void
@@ -38,14 +37,14 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
     [setPassword]
   )
 
-  const onConfirmP = useCallback(() => {
+  const onConfirmCb = useCallback(() => {
     onConfirm && onConfirm(password)
   }, [onConfirm, password])
   return (
     <StyledModal
       title="PASSWORD CONFIRMATION"
       visible={visible}
-      onOk={!validatingPassword ? onConfirmP : undefined}
+      onOk={!validatingPassword ? onConfirmCb : undefined}
       onCancel={onCancel}
       maskClosable={false}
       closable={false}

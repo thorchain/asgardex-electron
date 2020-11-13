@@ -54,7 +54,7 @@ type SwapProps = {
   goToTransaction?: (txHash: string) => void
   runeAsset: Asset
   activePricePool: PricePool
-  PasswordConfirmation?: React.FC<{ onSuccess: () => void; onClose: () => void }>
+  PasswordConfirmation: React.FC<{ onSuccess: () => void; onClose: () => void }>
 }
 
 export const Swap = ({
@@ -69,7 +69,7 @@ export const Swap = ({
   resetTx,
   runeAsset,
   activePricePool,
-  PasswordConfirmation = () => <></>
+  PasswordConfirmation
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
@@ -368,7 +368,6 @@ export const Swap = ({
     setShowPrivateModal(false)
   }, [setShowPrivateModal])
 
-  // PasswordConfirmation
   const onPasswordValidationSucceed = useCallback(() => {
     FP.pipe(
       assetsToSwap,
@@ -383,7 +382,7 @@ export const Swap = ({
 
   return (
     <Styled.Container>
-      {showPrivateModal && PasswordConfirmation && (
+      {showPrivateModal && (
         <PasswordConfirmation onSuccess={onPasswordValidationSucceed} onClose={() => setShowPrivateModal(false)} />
       )}
       <Styled.PendingContainer>{pendingState}</Styled.PendingContainer>
