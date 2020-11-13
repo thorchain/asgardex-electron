@@ -125,8 +125,6 @@ export const Withdraw: React.FC<Props> = ({
 
       <Styled.Drag
         title={intl.formatMessage({ id: 'stake.withdraw.drag' })}
-        source={runeAsset}
-        target={stakedAsset}
         onConfirm={() => onWithdraw(withdrawPercent)}
         disabled={disabled}
       />
