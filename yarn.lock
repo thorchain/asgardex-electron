@@ -13427,9 +13427,9 @@ objectorarray@^1.0.4:
   integrity sha512-91k8bjcldstRz1bG6zJo8lWD7c6QXcB4nTDUqiEvIL1xAsLoZlOOZZG+nd6YPz+V7zY1580J4Xxh1vZtyv4i/w==
 
 observable-hooks@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/observable-hooks/-/observable-hooks-3.0.0.tgz#bfe3c9ad268dad4701b7bc48173512f3276d77ac"
-  integrity sha512-NmVWLZNyh6TK3oilHIEKvLOO2Hcub/XmT3F4qIuf6MCBGjsZs1gLdr985vp3EwCH6nTQSJ/+bCj/y+Gl/B/gwQ==
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/observable-hooks/-/observable-hooks-3.1.2.tgz#f76f04320467f706d16c6cfdee343fc4a52aa7fc"
+  integrity sha512-RJRDg5WgqmKz88hPsW/u91buUSICpcSxgm8c792HkF01lHNAtuqOzI/rQM11TNjcXQY6iKIbpPW+WqO7Ggiohg==
 
 obuf@^1.0.0, obuf@^1.1.2:
   version "1.1.2"
