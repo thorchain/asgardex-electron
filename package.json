@@ -78,7 +78,7 @@
     "react-circular-progressbar": "^2.0.3",
     "react-dom": "^16.13.1",
     "react-draggable": "^4.4.3",
-    "react-intl": "^5.4.5",
+    "react-intl": "^5.10.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
     "react-test-renderer": "^16.13.1",
