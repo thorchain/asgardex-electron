@@ -64,6 +64,7 @@ export type LoadTxsProps = {
 }
 
 export type LoadTxsHandler = (props: LoadTxsProps) => void
+export type ResetTxsPageHandler = () => void
 
 export type LoadBalancesHandler = () => void
 

@@ -1,6 +1,6 @@
 import { reloadBalances, reloadBalances$, assetsWBState$, assetsWBChains$ } from './balances'
 import { keystoreService, removeKeystore, setSelectedAsset, selectedAsset$ } from './common'
-import { txs$, loadTxsHandler$, txsByChain$, explorerUrl$, getExplorerTxUrl$ } from './transaction'
+import { txs$, loadTxsHandler$, txsByChain$, explorerUrl$, getExplorerTxUrl$, resetTxsPageByChain } from './transaction'
 
 /**
  * Exports all functions and observables needed at UI level (provided by `WalletContext`)
@@ -11,6 +11,7 @@ export {
   setSelectedAsset,
   selectedAsset$,
   loadTxsHandler$,
+  resetTxsPageByChain,
   txsByChain$,
   explorerUrl$,
   getExplorerTxUrl$,

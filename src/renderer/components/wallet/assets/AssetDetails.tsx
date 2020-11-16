@@ -7,11 +7,11 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import { emptyFunc } from '../../../helpers/funcHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
-import { EMPTY_TX_HANDLER } from '../../../services/wallet/const'
-import { TxsPageRD, LoadTxsHandler, NonEmptyBalances } from '../../../services/wallet/types'
+import { TxsPageRD, LoadTxsHandler, NonEmptyBalances, LoadTxsProps } from '../../../services/wallet/types'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
@@ -24,7 +24,7 @@ type Props = {
   asset: O.Option<Asset>
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: () => void
-  loadTxsHandler?: LoadTxsHandler
+  loadTxsHandler?: O.Option<LoadTxsHandler>
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -32,8 +32,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     txsPageRD,
     assetsWB: oAssetsWB,
     asset: oAsset,
-    reloadBalancesHandler = () => {},
-    loadTxsHandler = EMPTY_TX_HANDLER,
+    reloadBalancesHandler = emptyFunc,
+    loadTxsHandler: oLoadTxsHandler = O.none,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none
   } = props
 
@@ -60,6 +60,15 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const walletActionReceiveClick = useCallback(
     () => history.push(walletRoutes.receive.path({ asset: assetAsString })),
     [assetAsString, history]
+  )
+
+  const loadTxsHandler = useCallback(
+    (p: LoadTxsProps) =>
+      FP.pipe(
+        oLoadTxsHandler,
+        O.map((handler) => handler(p))
+      ),
+    [oLoadTxsHandler]
   )
 
   const refreshHandler = useCallback(() => {

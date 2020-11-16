@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeeLD, Memo } from '../chain/types'
 import { ClientState } from '../types'
-import { TxsPageLD, TxLD, LoadTxsProps } from '../wallet/types'
+import { TxsPageLD, TxLD, LoadTxsProps, ResetTxsPageHandler } from '../wallet/types'
 
 export type BitcoinClientState = ClientState<BitcoinClient>
 export type BitcoinClientState$ = Rx.Observable<ClientState<BitcoinClient>>
@@ -32,6 +32,7 @@ export type TransactionService = {
   pushTx: (p: SendTxParams) => Rx.Subscription
   sendStakeTx: (p: SendTxParams) => TxLD
   resetTx: () => void
+  resetTxsPage: ResetTxsPageHandler
   txs$: TxsPageLD
   loadTxs: (p: LoadTxsProps) => void
 }

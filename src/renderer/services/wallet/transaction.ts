@@ -4,11 +4,12 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { emptyFunc } from '../../helpers/funcHelper'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/context'
 import { GetExplorerTxUrl } from '../clients/types'
 import { selectedAsset$ } from './common'
-import { ApiError, TxsPageLD, ErrorId, LoadTxsHandler } from './types'
+import { ApiError, TxsPageLD, ErrorId, LoadTxsHandler, ResetTxsPageHandler } from './types'
 
 const explorerUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> => {
   switch (chain) {
@@ -65,14 +66,14 @@ export const getExplorerTxUrl$: Rx.Observable<O.Option<GetExplorerTxUrl>> = sele
 const loadTxsHandlerByChain = (chain: Chain): O.Option<LoadTxsHandler> => {
   switch (chain) {
     case 'BNB':
-      return O.some(() => BNB.reloadTxs)
+      return O.some(BNB.loadTxs)
     case 'BTC':
-      return O.some(() => BTC.loadTxs)
+      return O.some(BTC.loadTxs)
     case 'ETH':
       // not implemented yet
       return O.none
     case 'THOR':
-      // reload THOR balances - not available yet
+      // not implemented yet
       return O.none
     default:
       return O.none
@@ -111,3 +112,20 @@ export const txs$: TxsPageLD = selectedAsset$.pipe(
     )
   )
 )
+
+export const resetTxsPageByChain = (chain: Chain): ResetTxsPageHandler => {
+  switch (chain) {
+    case 'BNB':
+      return BNB.resetTxsPage
+    case 'BTC':
+      return BTC.resetTxsPage
+    case 'ETH':
+      // not implemented yet
+      return emptyFunc
+    case 'THOR':
+      // reload THOR balances - not available yet
+      return emptyFunc
+    default:
+      return emptyFunc
+  }
+}

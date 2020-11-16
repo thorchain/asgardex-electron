@@ -33,7 +33,15 @@ import { ClientStateForViews } from '../types'
 import { getClient, getClientStateForViews } from '../utils'
 import { keystoreService, selectedAsset$ as selectedWalletAsset$ } from '../wallet/common'
 import { INITIAL_LOAD_TXS_PROPS } from '../wallet/const'
-import { BalancesRD, ApiError, ErrorId, BalancesLD, TxsPageLD, LoadTxsProps } from '../wallet/types'
+import {
+  BalancesRD,
+  ApiError,
+  ErrorId,
+  BalancesLD,
+  TxsPageLD,
+  LoadTxsProps,
+  ResetTxsPageHandler
+} from '../wallet/types'
 import { getPhrase } from '../wallet/util'
 import { createTransactionService } from './transaction'
 import { BinanceClientState, TransferFeesRD, BinanceClientState$ } from './types'
@@ -284,13 +292,14 @@ const loadTxs$ = ({
     catchError((error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
     ),
-    startWith(RD.pending),
-    retry(BINANCE_MAX_RETRY)
+    startWith(RD.pending)
   )
 }
 
 // Observable State to reload `Txs` based on `LoadTxsProps`
-const { get$: reloadTxs$, set: reloadTxs } = observableState<LoadTxsProps>(INITIAL_LOAD_TXS_PROPS)
+const { get$: loadTxsProps$, set: setLoadTxsProps } = observableState<LoadTxsProps>(INITIAL_LOAD_TXS_PROPS)
+
+const resetTxsPage: ResetTxsPageHandler = () => setLoadTxsProps(INITIAL_LOAD_TXS_PROPS)
 
 /**
  * `Txs` of selected asset
@@ -298,9 +307,9 @@ const { get$: reloadTxs$, set: reloadTxs } = observableState<LoadTxsProps>(INITI
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const txs$: TxsPageLD = Rx.combineLatest([client$, reloadTxs$, selectedWalletAsset$]).pipe(
-  switchMap(([client, { limit, offset }, oAsset]) => {
-    return FP.pipe(
+const txs$: TxsPageLD = Rx.combineLatest([client$, loadTxsProps$, selectedWalletAsset$]).pipe(
+  switchMap(([client, { limit, offset }, oAsset]) =>
+    FP.pipe(
       // client and asset has to be available
       sequenceTOption(client, oAsset),
       // ignore all assets from other chains than BNB
@@ -316,9 +325,7 @@ const txs$: TxsPageLD = Rx.combineLatest([client$, reloadTxs$, selectedWalletAss
           })
       )
     )
-  }),
-  // cache it to avoid reloading data by every subscription
-  shareReplay(1)
+  )
 )
 
 /**
@@ -395,7 +402,8 @@ export {
   assetsWB$,
   reloadBalances,
   txs$,
-  reloadTxs,
+  setLoadTxsProps as loadTxs,
+  resetTxsPage,
   address$,
   getExplorerTxUrl$,
   transaction,
