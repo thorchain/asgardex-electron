@@ -16,4 +16,4 @@ export const INITIAL_LOAD_TXS_PROPS: LoadTxsProps = {
   offset: 0
 }
 
-export const EMPTY_TX_HANDLER: LoadTxsHandler = (_: LoadTxsProps) => {}
+export const EMPTY_LOAD_TXS_HANDLER: LoadTxsHandler = (_: LoadTxsProps) => {}

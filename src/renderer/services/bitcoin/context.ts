@@ -3,7 +3,7 @@ import { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$ } 
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
-const { pushTx, txRD$, resetTx, sendStakeTx, loadTxs, txs$, resetTxsPage } = createTransactionService(client$)
+const { pushTx, txRD$, resetTx, sendStakeTx, txs$ } = createTransactionService(client$)
 const { fees$, reloadFees, poolFee$, getPoolFeeRate, reloadStakeFee, poolFeeRate$ } = createFeesService(client$)
 
 /**
@@ -25,9 +25,7 @@ export {
   reloadFees,
   txRD$,
   resetTx,
-  loadTxs,
   txs$,
   reloadStakeFee,
-  poolFeeRate$,
-  resetTxsPage
+  poolFeeRate$
 }
