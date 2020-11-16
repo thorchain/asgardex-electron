@@ -7,10 +7,11 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import { emptyFunc } from '../../../helpers/funcHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { GetExplorerTxUrl } from '../../../services/clients/types'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
-import { EMPTY_TX_HANDLER } from '../../../services/wallet/const'
+import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import { TxsPageRD, LoadTxsHandler, NonEmptyBalances } from '../../../services/wallet/types'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
@@ -32,8 +33,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     txsPageRD,
     assetsWB: oAssetsWB,
     asset: oAsset,
-    reloadBalancesHandler = () => {},
-    loadTxsHandler = EMPTY_TX_HANDLER,
+    reloadBalancesHandler = emptyFunc,
+    loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none
   } = props
 

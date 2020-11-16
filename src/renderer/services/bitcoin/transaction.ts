@@ -1,15 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
-import { BTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators'
+import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
-import { sequenceTOption } from '../../helpers/fpHelpers'
 import { observableState } from '../../helpers/stateHelper'
-import { selectedAsset$ } from '../wallet/common'
-import { INITIAL_LOAD_TXS_PROPS } from '../wallet/const'
 import { ApiError, TxsPageLD, ErrorId, TxRD, LoadTxsProps } from '../wallet/types'
 import { Client$ } from './common'
 import { SendTxParams, TransactionService } from './types'
@@ -53,23 +49,17 @@ const loadTxs$ = ({ client, limit, offset }: { client: BitcoinClient; limit: num
   )
 }
 
-// Observable State to reload `Txs` based on `LoadTxsProps`
-const { get$: reloadTxs$, set: loadTxs } = observableState<LoadTxsProps>(INITIAL_LOAD_TXS_PROPS)
-
 /**
  * `Txs` history for BTC
  */
-const txs$ = (client$: Client$): TxsPageLD =>
-  Rx.combineLatest([client$, reloadTxs$, selectedAsset$]).pipe(
-    switchMap(([client, { limit, offset }, oAsset]) => {
-      return FP.pipe(
-        // client and asset has to be available
-        sequenceTOption(client, oAsset),
-        // ignore all assets from other chains than BTC
-        O.filter(([_, { chain }]) => chain === BTCChain),
+const txs$ = (client$: Client$) => ({ limit, offset }: LoadTxsProps): TxsPageLD =>
+  client$.pipe(
+    switchMap((client) =>
+      FP.pipe(
+        client,
         O.fold(
           () => Rx.of(RD.initial),
-          ([clientState]) =>
+          (clientState) =>
             loadTxs$({
               client: clientState,
               limit,
@@ -77,9 +67,7 @@ const txs$ = (client$: Client$): TxsPageLD =>
             })
         )
       )
-    }),
-    // cache it
-    shareReplay(1)
+    )
   )
 
 const createTransactionService = (client$: Client$): TransactionService => ({
@@ -87,8 +75,7 @@ const createTransactionService = (client$: Client$): TransactionService => ({
   pushTx: pushTx(client$),
   sendStakeTx: sendStakeTx(client$),
   txs$: txs$(client$),
-  resetTx: () => setTxRD(RD.initial),
-  loadTxs
+  resetTx: () => setTxRD(RD.initial)
 })
 
 export { createTransactionService }

@@ -29,11 +29,10 @@ export type SendTxParams = {
 
 export type TransactionService = {
   txRD$: TxLD
-  pushTx: (p: SendTxParams) => Rx.Subscription
+  pushTx: (_: SendTxParams) => Rx.Subscription
   sendStakeTx: (p: SendTxParams) => TxLD
   resetTx: () => void
-  txs$: TxsPageLD
-  loadTxs: (p: LoadTxsProps) => void
+  txs$: (_: LoadTxsProps) => TxsPageLD
 }
 
 export type FeesService = {

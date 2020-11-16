@@ -16,10 +16,11 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const {
     txs$,
     assetsWBState$,
-    loadTxsHandler$,
+    loadTxs,
     reloadBalances$,
     setSelectedAsset,
-    getExplorerTxUrl$
+    getExplorerTxUrl$,
+    resetTxsPage
   } = useWalletContext()
 
   const { asset } = useParams<AssetDetailsParams>()
@@ -34,9 +35,13 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
 
   const [reloadBalances] = useObservableState(() => reloadBalances$.pipe(RxOp.map(O.toUndefined)))
-  const [loadTxsHandler] = useObservableState(() => loadTxsHandler$.pipe(RxOp.map(O.toUndefined)))
-
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
+
+  useEffect(() => {
+    return () => resetTxsPage()
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>
@@ -44,7 +49,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         txsPageRD={txsRD}
         assetsWB={assetsWB}
         asset={oSelectedAsset}
-        loadTxsHandler={loadTxsHandler}
+        loadTxsHandler={loadTxs}
         reloadBalancesHandler={reloadBalances}
         getExplorerTxUrl={getExplorerTxUrl}
       />

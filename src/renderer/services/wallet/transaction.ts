@@ -1,14 +1,17 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Chain } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { observableState } from '../../helpers/stateHelper'
 import * as BNB from '../binance/service'
 import * as BTC from '../bitcoin/context'
 import { GetExplorerTxUrl } from '../clients/types'
 import { selectedAsset$ } from './common'
-import { ApiError, TxsPageLD, ErrorId, LoadTxsHandler } from './types'
+import { INITIAL_LOAD_TXS_PROPS } from './const'
+import { ApiError, TxsPageLD, ErrorId, LoadTxsHandler, ResetTxsPageHandler, LoadTxsProps } from './types'
 
 const explorerUrlByChain$ = (chain: Chain): Rx.Observable<O.Option<string>> => {
   switch (chain) {
@@ -62,52 +65,43 @@ export const getExplorerTxUrl$: Rx.Observable<O.Option<GetExplorerTxUrl>> = sele
   )
 )
 
-const loadTxsHandlerByChain = (chain: Chain): O.Option<LoadTxsHandler> => {
-  switch (chain) {
-    case 'BNB':
-      return O.some(() => BNB.reloadTxs)
-    case 'BTC':
-      return O.some(() => BTC.loadTxs)
-    case 'ETH':
-      // not implemented yet
-      return O.none
-    case 'THOR':
-      // reload THOR balances - not available yet
-      return O.none
-    default:
-      return O.none
-  }
-}
+/**
+ * State of `LoadTxsProps`, which triggers reload of txs history
+ */
+const { get$: loadTxsProps$, set: setLoadTxsProps } = observableState<LoadTxsProps>(INITIAL_LOAD_TXS_PROPS)
 
-export const loadTxsHandler$: Rx.Observable<O.Option<LoadTxsHandler>> = selectedAsset$.pipe(
-  RxOp.switchMap(
-    O.fold(
-      () => Rx.EMPTY,
-      ({ chain }) => Rx.of(loadTxsHandlerByChain(chain))
-    )
-  )
-)
+export { setLoadTxsProps }
 
-export const txsByChain$ = (chain: Chain): TxsPageLD => {
-  switch (chain) {
-    case 'BNB':
-      return BNB.txs$
-    case 'BTC':
-      return BTC.txs$
-    case 'ETH':
-      return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
-    case 'THOR':
-      return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
-    default:
-      return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${chain}` } as ApiError))
-  }
-}
+export const loadTxs: LoadTxsHandler = setLoadTxsProps
 
-export const txs$: TxsPageLD = selectedAsset$.pipe(
-  RxOp.switchMap(
-    O.fold(
-      () => Rx.EMPTY,
-      ({ chain }) => txsByChain$(chain)
+export const resetTxsPage: ResetTxsPageHandler = () => setLoadTxsProps(INITIAL_LOAD_TXS_PROPS)
+
+/**
+ * Factory create a stream of `TxsPageRD` based on selected asset
+ */
+export const txs$: TxsPageLD = Rx.combineLatest([selectedAsset$, loadTxsProps$]).pipe(
+  RxOp.switchMap(([oAsset, loadTxsProps]) =>
+    FP.pipe(
+      oAsset,
+      O.fold(
+        () => Rx.of(RD.initial),
+        (asset) => {
+          switch (asset.chain) {
+            case 'BNB':
+              return BNB.txs$(asset, loadTxsProps)
+            case 'BTC':
+              return BTC.txs$(loadTxsProps)
+            case 'ETH':
+              return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
+            case 'THOR':
+              return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
+            default:
+              return Rx.of(
+                RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` } as ApiError)
+              )
+          }
+        }
+      )
     )
   )
 )
