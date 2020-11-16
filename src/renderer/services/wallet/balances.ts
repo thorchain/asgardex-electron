@@ -88,7 +88,8 @@ const btcAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BTC.addres
 /**
  * Transforms ETH data (address + `AssetsWBChain`) into `AssetsWBChain`
  */
-const ethAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([ETH.address$, ETH.assetWB$]).pipe(
+// TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
+const _ethAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([ETH.address$, ETH.assetWB$]).pipe(
   map(
     ([address, assetWBRD]) =>
       ({
@@ -108,9 +109,15 @@ const ethAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([ETH.addres
 /**
  * List of `AssetsWBChain` for all available chains (order is important)
  */
-export const assetsWBChains$ = Rx.combineLatest([btcAssetsWBChain$, ethAssetsWBChain$, bnbAssetsWBChain$])
+export const assetsWBChains$ = Rx.combineLatest([
+  btcAssetsWBChain$,
+  /* //TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH */
+  /* ethAssetsWBChain$ */
+  bnbAssetsWBChain$
+])
 
-const ethAssetsWB$: Observable<BalancesRD> = ETH.assetWB$.pipe(liveData.map((asset) => [asset]))
+// TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
+const _ethAssetsWB$: Observable<BalancesRD> = ETH.assetWB$.pipe(liveData.map((asset) => [asset]))
 
 /**
  * Transform a list of AssetsWithBalanceRD
@@ -119,8 +126,9 @@ const ethAssetsWB$: Observable<BalancesRD> = ETH.assetWB$.pipe(liveData.map((ass
  */
 export const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLatest([
   BNB.assetsWB$,
-  BTC.assetsWB$,
-  ethAssetsWB$
+  BTC.assetsWB$
+  // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
+  // ethAssetsWB$
 ]).pipe(
   map((assetsWBList) => ({
     assetsWB: FP.pipe(
