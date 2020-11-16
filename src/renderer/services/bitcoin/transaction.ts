@@ -7,9 +7,10 @@ import * as Rx from 'rxjs'
 import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { observableState, triggerStream } from '../../helpers/stateHelper'
+import { observableState } from '../../helpers/stateHelper'
 import { selectedAsset$ } from '../wallet/common'
-import { ApiError, TxsPageLD, ErrorId, TxRD } from '../wallet/types'
+import { INITIAL_LOAD_TXS_PROPS } from '../wallet/const'
+import { ApiError, TxsPageLD, ErrorId, TxRD, LoadTxsProps } from '../wallet/types'
 import { Client$ } from './common'
 import { SendTxParams, TransactionService } from './types'
 
@@ -41,9 +42,9 @@ const sendStakeTx = (client$: Client$) => ({ to, amount, feeRate, memo }: SendTx
  * Observable to load txs
  * If client is not available, it returns an `initial` state
  */
-const loadTxs$ = ({ client }: { client: BitcoinClient }): TxsPageLD => {
+const loadTxs$ = ({ client, limit, offset }: { client: BitcoinClient; limit: number; offset: number }): TxsPageLD => {
   const address = client.getAddress()
-  return Rx.from(client.getTransactions({ address })).pipe(
+  return Rx.from(client.getTransactions({ address, limit, offset })).pipe(
     map(RD.success),
     catchError((error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
@@ -52,21 +53,17 @@ const loadTxs$ = ({ client }: { client: BitcoinClient }): TxsPageLD => {
   )
 }
 
-// `TriggerStream` to reload `Txs`
-// TODO (@Veado) Change to `observableState` to add pagination (similar to txs history of Binance)
-// https://github.com/thorchain/asgardex-electron/issues/508
-const { stream$: reloadTxs$, trigger: loadTxs } = triggerStream()
+// Observable State to reload `Txs` based on `LoadTxsProps`
+const { get$: reloadTxs$, set: loadTxs } = observableState<LoadTxsProps>(INITIAL_LOAD_TXS_PROPS)
 
 /**
  * `Txs` history for BTC
  */
 const txs$ = (client$: Client$): TxsPageLD =>
   Rx.combineLatest([client$, reloadTxs$, selectedAsset$]).pipe(
-    switchMap(([client, _, oAsset]) => {
+    switchMap(([client, { limit, offset }, oAsset]) => {
       return FP.pipe(
         // client and asset has to be available
-        // TODO (@Veado) Add pagination (similar to txs history of Binance)
-        // https://github.com/thorchain/asgardex-electron/issues/508
         sequenceTOption(client, oAsset),
         // ignore all assets from other chains than BTC
         O.filter(([_, { chain }]) => chain === BTCChain),
@@ -74,7 +71,9 @@ const txs$ = (client$: Client$): TxsPageLD =>
           () => Rx.of(RD.initial),
           ([clientState]) =>
             loadTxs$({
-              client: clientState
+              client: clientState,
+              limit,
+              offset
             })
         )
       )
@@ -89,7 +88,7 @@ const createTransactionService = (client$: Client$): TransactionService => ({
   sendStakeTx: sendStakeTx(client$),
   txs$: txs$(client$),
   resetTx: () => setTxRD(RD.initial),
-  loadTxs: loadTxs
+  loadTxs
 })
 
 export { createTransactionService }
