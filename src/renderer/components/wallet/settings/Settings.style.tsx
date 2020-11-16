@@ -16,6 +16,7 @@ export const TitleWrapper = styled.div`
 
 export const Title = styled(UILabel)`
   color: ${palette('text', 1)};
+  padding: 0 40px;
   text-transform: uppercase;
   font-family: 'MainFontRegular';
   font-weight: 600;
@@ -29,7 +30,7 @@ export const Divider = styled(A.Divider)`
 `
 
 export const Subtitle = styled(UILabel)`
-  margin: 10px 0px;
+  margin: 10px 0;
   color: ${palette('text', 0)};
   text-transform: uppercase;
   font-family: 'MainFontRegular';
