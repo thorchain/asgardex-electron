@@ -15,6 +15,8 @@ type CurrencyInfo = {
   slip?: BigNumber
 }
 
+// For some reason eslint does not see that CurrencyInfo is used by Swap.tsx
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: CurrencyInfo) => {
   return pipe(
     sequenceTOption(from, to),

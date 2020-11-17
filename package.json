@@ -81,7 +81,7 @@
     "react-draggable": "^4.4.3",
     "react-intl": "^5.10.1",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.1",
+    "react-scripts": "^4.0.0",
     "react-test-renderer": "^16.13.1",
     "rxjs": "^6.6.3",
     "styled-components": "^5.1.1",
