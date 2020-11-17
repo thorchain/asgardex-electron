@@ -353,9 +353,9 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
             return <ErrorView title={msg} extra={renderRefreshBtn} />
           },
           // success state
-          (pools: PoolsState): JSX.Element => {
+          ({ poolDetails }: PoolsState): JSX.Element => {
             const poolViewData = getPoolTableRowsData({
-              poolDetails: pools.poolDetails,
+              poolDetails,
               pricePoolData: selectedPricePool.poolData,
               poolStatus: PoolDetailStatusEnum.Enabled,
               network
@@ -441,9 +441,9 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
           // error state - we just show an empty table, an error will be shown on pools table
           (_: Error) => renderPendingPoolsTable([]),
           // success state
-          (state: PoolsState): JSX.Element => {
+          ({ poolDetails }: PoolsState): JSX.Element => {
             const poolViewData = getPoolTableRowsData({
-              poolDetails: state.poolDetails,
+              poolDetails,
               pricePoolData: selectedPricePool.poolData,
               poolStatus: PoolDetailStatusEnum.Bootstrapped,
               network

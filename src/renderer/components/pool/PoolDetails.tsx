@@ -20,7 +20,6 @@ export type Props = {
   totalStakers: number
   totalStakersTrend?: BigNumber
   // decimal value in percents
-  returnToDate: string
   priceSymbol?: string
   isLoading?: boolean
 }
@@ -31,7 +30,6 @@ export const PoolDetails: React.FC<Props> = ({
   allTimeVolume,
   totalStakers,
   totalSwaps,
-  returnToDate,
   priceSymbol = '',
   depthTrend,
   volume24hrTrend,
@@ -97,7 +95,7 @@ export const PoolDetails: React.FC<Props> = ({
         <PoolStatus
           isLoading={isLoading}
           label={intl.formatMessage({ id: 'stake.poolDetails.returnToDate' })}
-          displayValue={returnToDate + '%'}
+          displayValue={'XXX %'}
         />
       </Styled.Col>
     </Styled.Container>

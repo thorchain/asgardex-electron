@@ -59,12 +59,17 @@ const createPoolsService = (
     RxOp.map(RD.map(getMidgardDefaultApi)),
     liveData.chain((api) =>
       FP.pipe(
-        api.getPools(),
+        api.getPools({ status: undefined }),
         RxOp.map(RD.success),
         RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
     )
   )
+
+  // /**
+  //  * Get data of `Pools` from Midgard
+  //  */
+  // const apiGetPoolsEnabled$ = apiGetPools$({ status: GetPoolsStatusEnum.Enabled })
 
   /**
    * Get data of `AssetDetails` from Midgard
