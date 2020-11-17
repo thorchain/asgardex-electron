@@ -90,14 +90,6 @@ export const PoolDetails: React.FC<Props> = ({
           displayValue={abbreviateNumber(totalStakers)}
         />
       </Styled.Col>
-
-      <Styled.Col>
-        <PoolStatus
-          isLoading={isLoading}
-          label={intl.formatMessage({ id: 'stake.poolDetails.returnToDate' })}
-          displayValue={'XXX %'}
-        />
-      </Styled.Col>
     </Styled.Container>
   )
 }
