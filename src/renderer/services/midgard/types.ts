@@ -25,6 +25,7 @@ export type PoolAssetsRD = RD.RemoteData<Error, PoolAssets>
 export type PoolAssetsLD = LiveData<Error, PoolAssets>
 
 export type AssetDetails = AssetDetail[]
+export type AssetDetailsRD = RD.RemoteData<Error, AssetDetails>
 export type AssetDetailsLD = LiveData<Error, AssetDetails>
 
 export type AssetDetailMap = {
@@ -49,6 +50,14 @@ export type PoolsState = {
 }
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
 export type PoolsStateLD = LiveData<Error, PoolsState>
+
+export type PendingPoolsState = {
+  assetDetails: AssetDetails
+  poolAssets: PoolStringAssets
+  poolDetails: PoolDetails
+}
+export type PendingPoolsStateRD = RD.RemoteData<Error, PendingPoolsState>
+export type PendingPoolsStateLD = LiveData<Error, PendingPoolsState>
 
 export type SelectedPoolAsset = O.Option<Asset>
 export type SelectedPoolChain = O.Option<Chain>
@@ -75,16 +84,17 @@ export type ByzantineLD = LiveData<Error, string>
 
 export type PoolsService = {
   poolsState$: LiveData<Error, PoolsState>
+  pendingPoolsState$: LiveData<Error, PendingPoolsState>
   setSelectedPricePoolAsset: (asset: PricePoolAsset) => void
   selectedPricePoolAsset$: Rx.Observable<SelectedPricePoolAsset>
   selectedPricePool$: Rx.Observable<SelectedPricePool>
   selectedPricePoolAssetSymbol$: Rx.Observable<O.Option<string>>
   reloadPools: () => void
+  reloadPendingPools: () => void
   poolAddresses$: ThorchainEndpointsLD
   poolAddress$: PoolAddressRx
   runeAsset$: Rx.Observable<Asset>
   poolDetail$: PoolDetailLD
-  reloadPoolDetail: () => void
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
 }

@@ -27,7 +27,7 @@ import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { Network } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolsState } from '../../services/midgard/types'
+import { PendingPoolsState, PoolsState } from '../../services/midgard/types'
 import { PoolDetailStatusEnum } from '../../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
@@ -43,11 +43,12 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const {
     thorchainLastblockState$,
     thorchainConstantsState$,
-    pools: { poolsState$, selectedPricePool$, reloadPools },
+    pools: { poolsState$, pendingPoolsState$, selectedPricePool$, reloadPools, reloadPendingPools },
     reloadThorchainLastblock,
     reloadNetworkInfo
   } = midgardService
   const poolsRD = useObservableState(poolsState$, RD.pending)
+  const pendingPoolsRD = useObservableState(pendingPoolsState$, RD.pending)
   const thorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(thorchainConstantsState$, RD.pending)
 
@@ -101,8 +102,9 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
 
   const clickRefreshHandler = useCallback(() => {
     reloadPools()
+    reloadPendingPools()
     reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPools])
+  }, [reloadNetworkInfo, reloadPendingPools, reloadPools])
 
   const renderRefreshBtn = useMemo(
     () => (
@@ -441,7 +443,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
           // error state - we just show an empty table, an error will be shown on pools table
           (_: Error) => renderPendingPoolsTable([]),
           // success state
-          ({ poolDetails }: PoolsState): JSX.Element => {
+          ({ poolDetails }: PendingPoolsState): JSX.Element => {
             const poolViewData = getPoolTableRowsData({
               poolDetails,
               pricePoolData: selectedPricePool.poolData,
@@ -451,10 +453,10 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
             previousPendingPools.current = some(poolViewData)
             return renderPendingPoolsTable(poolViewData)
           }
-        )(poolsRD)}
+        )(pendingPoolsRD)}
       </>
     ),
-    [poolsRD, renderPendingPoolsTable, selectedPricePool.poolData, network]
+    [pendingPoolsRD, renderPendingPoolsTable, selectedPricePool.poolData, network]
   )
 
   return (
