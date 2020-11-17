@@ -53,14 +53,17 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     }
   }, [])
 
-  const typeColumn: ColumnType<Tx> = {
-    key: 'txType',
-    title: '',
-    align: 'center',
-    width: 60,
-    render: renderTypeColumn,
-    sortDirections: ['descend', 'ascend']
-  }
+  const typeColumn: ColumnType<Tx> = useMemo(
+    () => ({
+      key: 'txType',
+      title: '',
+      align: 'center',
+      width: 60,
+      render: renderTypeColumn,
+      sortDirections: ['descend', 'ascend']
+    }),
+    [renderTypeColumn]
+  )
 
   const renderFromColumn = useCallback(
     (_, { from }: Tx) =>
@@ -71,18 +74,21 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [renderTextWithBreak]
   )
 
-  const fromColumn: ColumnType<Tx> = {
-    key: 'fromAddr',
-    title: intl.formatMessage({ id: 'common.from' }),
-    align: 'left',
-    ellipsis: true,
-    render: renderFromColumn,
-    sorter: ({ from: fromA }: Tx, { from: fromB }: Tx) =>
-      // For simplicity we sort first item only
-      // TODO (@Veado) Play around to get a user-friendly sort option
-      ordString.compare(fromA[0]?.from ?? '', fromB[0]?.from ?? ''),
-    sortDirections: ['descend', 'ascend']
-  }
+  const fromColumn: ColumnType<Tx> = useMemo(
+    () => ({
+      key: 'fromAddr',
+      title: intl.formatMessage({ id: 'common.from' }),
+      align: 'left',
+      ellipsis: true,
+      render: renderFromColumn,
+      sorter: ({ from: fromA }: Tx, { from: fromB }: Tx) =>
+        // For simplicity we sort first item only
+        // TODO (@Veado) Play around to get a user-friendly sort option
+        ordString.compare(fromA[0]?.from ?? '', fromB[0]?.from ?? ''),
+      sortDirections: ['descend', 'ascend']
+    }),
+    [intl, renderFromColumn]
+  )
 
   const renderToColumn = useCallback(
     (_, { to }: Tx) =>
@@ -93,18 +99,21 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [renderTextWithBreak]
   )
 
-  const toColumn: ColumnType<Tx> = {
-    key: 'toAddr',
-    title: intl.formatMessage({ id: 'common.to' }),
-    align: 'left',
-    ellipsis: true,
-    render: renderToColumn,
-    sorter: ({ to: toA }: Tx, { to: toB }: Tx) =>
-      // For simplicity we sort first item only
-      // TODO (@Veado) Play around to get a user-friendly sort option
-      ordString.compare(toA[0]?.to ?? '', toB[0]?.to ?? ''),
-    sortDirections: ['descend', 'ascend']
-  }
+  const toColumn: ColumnType<Tx> = useMemo(
+    () => ({
+      key: 'toAddr',
+      title: intl.formatMessage({ id: 'common.to' }),
+      align: 'left',
+      ellipsis: true,
+      render: renderToColumn,
+      sorter: ({ to: toA }: Tx, { to: toB }: Tx) =>
+        // For simplicity we sort first item only
+        // TODO (@Veado) Play around to get a user-friendly sort option
+        ordString.compare(toA[0]?.to ?? '', toB[0]?.to ?? ''),
+      sortDirections: ['descend', 'ascend']
+    }),
+    [intl, renderToColumn]
+  )
 
   const renderDateColumn = useCallback(
     (_, { date }: Tx) => (
@@ -129,16 +138,19 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [isDesktopView]
   )
 
-  const dateColumn: ColumnType<Tx> = {
-    key: 'timeStamp',
-    title: intl.formatMessage({ id: 'common.date' }),
-    align: 'left',
-    width: isDesktopView ? 200 : 180,
-    render: renderDateColumn,
-    sorter: (a: Tx, b: Tx) => a.date.getTime() - b.date.getTime(),
-    sortDirections: ['descend', 'ascend'],
-    defaultSortOrder: 'descend'
-  }
+  const dateColumn: ColumnType<Tx> = useMemo(
+    () => ({
+      key: 'timeStamp',
+      title: intl.formatMessage({ id: 'common.date' }),
+      align: 'left',
+      width: isDesktopView ? 200 : 180,
+      render: renderDateColumn,
+      sorter: (a: Tx, b: Tx) => a.date.getTime() - b.date.getTime(),
+      sortDirections: ['descend', 'ascend'],
+      defaultSortOrder: 'descend'
+    }),
+    [intl, isDesktopView, renderDateColumn]
+  )
 
   const renderAmountColumn = useCallback(
     (_, { to }: Tx) =>
@@ -150,33 +162,47 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [renderTextWithBreak]
   )
 
-  const amountColumn: ColumnType<Tx> = {
-    key: 'value',
-    title: intl.formatMessage({ id: 'common.amount' }),
-    align: 'left',
-    width: 200,
-    render: renderAmountColumn,
-    sorter: ({ to: toA }: Tx, { to: toB }: Tx) =>
-      // For simplicity we sort first item only
-      // TODO (@Veado) Play around to get a user-friendly sort option
-      (toA[0]?.amount.amount() ?? ZERO_BN).comparedTo(toB[0]?.amount.amount() ?? ZERO_BN),
-    sortDirections: ['descend', 'ascend']
-  }
+  const amountColumn: ColumnType<Tx> = useMemo(
+    () => ({
+      key: 'value',
+      title: intl.formatMessage({ id: 'common.amount' }),
+      align: 'left',
+      width: 200,
+      render: renderAmountColumn,
+      sorter: ({ to: toA }: Tx, { to: toB }: Tx) =>
+        // For simplicity we sort first item only
+        // TODO (@Veado) Play around to get a user-friendly sort option
+        (toA[0]?.amount.amount() ?? ZERO_BN).comparedTo(toB[0]?.amount.amount() ?? ZERO_BN),
+      sortDirections: ['descend', 'ascend']
+    }),
+    [intl, renderAmountColumn]
+  )
 
   const renderLinkColumn = useCallback(({ hash }: Tx) => <Styled.LinkIcon onClick={() => clickTxLinkHandler(hash)} />, [
     clickTxLinkHandler
   ])
-  const linkColumn: ColumnType<Tx> = {
-    key: 'txHash',
-    title: '',
-    align: 'center',
-    width: 60,
-    render: renderLinkColumn
-  }
+  const linkColumn: ColumnType<Tx> = useMemo(
+    () => ({
+      key: 'txHash',
+      title: '',
+      align: 'center',
+      width: 60,
+      render: renderLinkColumn
+    }),
+    [renderLinkColumn]
+  )
 
-  const desktopColumns: ColumnsType<Tx> = [typeColumn, fromColumn, toColumn, amountColumn, dateColumn, linkColumn]
+  const desktopColumns: ColumnsType<Tx> = useMemo(
+    () => [typeColumn, fromColumn, toColumn, amountColumn, dateColumn, linkColumn],
+    [typeColumn, fromColumn, toColumn, amountColumn, dateColumn, linkColumn]
+  )
 
-  const mobileColumns: ColumnsType<Tx> = [typeColumn, amountColumn, dateColumn, linkColumn]
+  const mobileColumns: ColumnsType<Tx> = useMemo(() => [typeColumn, amountColumn, dateColumn, linkColumn], [
+    typeColumn,
+    amountColumn,
+    dateColumn,
+    linkColumn
+  ])
 
   const renderTable = useCallback(
     ({ total, txs }: TxsPage, loading = false) => {

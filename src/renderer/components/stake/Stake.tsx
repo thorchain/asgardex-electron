@@ -51,7 +51,7 @@ export const Stake: React.FC<Props> = (props) => {
         content: <WidthdrawContent stakedAsset={asset} runeAsset={runeAsset} />
       }
     ],
-    [intl, asset, runeAsset]
+    [intl, asset, runeAsset, StakeContent, WidthdrawContent]
   )
 
   return (
