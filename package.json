@@ -53,7 +53,7 @@
     "@devexperts/remote-data-ts": "^2.0.4",
     "@devexperts/rx-utils": "^1.0.0-alpha.14",
     "@devexperts/utils": "^1.0.0-alpha.14",
-    "@openapitools/openapi-generator-cli": "^1.0.15-4.3.1",
+    "@openapitools/openapi-generator-cli": "^2.1.4",
     "@thorchain/asgardex-ethereum": "^0.2.0",
     "@thorchain/asgardex-midgard": "^1.1.0",
     "@thorchain/asgardex-theme": "^0.1.1",
