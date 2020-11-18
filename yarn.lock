@@ -3310,7 +3310,7 @@
     lz-string "^1.4.4"
     pretty-format "^26.6.2"
 
-"@testing-library/jest-dom@^5.11.2":
+"@testing-library/jest-dom@^5.11.6":
   version "5.11.6"
   resolved "https://registry.yarnpkg.com/@testing-library/jest-dom/-/jest-dom-5.11.6.tgz#782940e82e5cd17bc0a36f15156ba16f3570ac81"
   integrity sha512-cVZyUNRWwUKI0++yepYpYX7uhrP398I+tGz4zOlLVlUYnZS+Svuxv4fwLeCIy7TnBYKXUaOlQr3vopxL8ZfEnA==
@@ -3324,7 +3324,7 @@
     lodash "^4.17.15"
     redent "^3.0.0"
 
-"@testing-library/react-hooks@^3.4.1":
+"@testing-library/react-hooks@^3.4.2":
   version "3.4.2"
   resolved "https://registry.yarnpkg.com/@testing-library/react-hooks/-/react-hooks-3.4.2.tgz#8deb94f7684e0d896edd84a4c90e5b79a0810bc2"
   integrity sha512-RfPG0ckOzUIVeIqlOc1YztKgFW+ON8Y5xaSPbiBkfj9nMkkiLhLeBXT5icfPX65oJV/zCZu4z8EVnUc6GY9C5A==
@@ -3340,7 +3340,7 @@
     "@babel/runtime" "^7.10.3"
     "@testing-library/dom" "^7.22.3"
 
-"@testing-library/user-event@^12.1.0":
+"@testing-library/user-event@^12.2.2":
   version "12.2.2"
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-12.2.2.tgz#22d0047da745289335240f523dfe74c889ec96cb"
   integrity sha512-mTYL9LrwiSeyorStUOMuRGQDn1ca40tIhuv//o/K3lY8wBEp+9Im90MFVx5i3u7zCPmavn3uWZs/10chsbI8Tg==
@@ -18722,7 +18722,7 @@ testcafe-legacy-api@4.0.0:
     pinkie "^2.0.1"
     strip-bom "^2.0.0"
 
-testcafe-react-selectors@^4.0.0:
+testcafe-react-selectors@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/testcafe-react-selectors/-/testcafe-react-selectors-4.1.1.tgz#d601538e7c9a52d416918374b597d66f8338339a"
   integrity sha512-UcLKcicDGQagU7HIxE4cVjGBE2vqKop29C64CrcGmPYKsfVjMCuNLfBgtsbqsnjzMtoNlcUTrlMa+IGSkwXFLA==
@@ -18752,7 +18752,7 @@ testcafe-reporter-xunit@^2.1.0:
   resolved "https://registry.yarnpkg.com/testcafe-reporter-xunit/-/testcafe-reporter-xunit-2.1.0.tgz#e6d66c572ce15af266706af0fd610b2a841dd443"
   integrity sha1-5tZsVyzhWvJmcGrw/WELKoQd1EM=
 
-testcafe@^1.8.8:
+testcafe@^1.9.4:
   version "1.9.4"
   resolved "https://registry.yarnpkg.com/testcafe/-/testcafe-1.9.4.tgz#a9fb9981e15cbbd559a93429adad527259921a9c"
   integrity sha512-tiG0a47vvwuI6xle002wQitpEGG3Oi+qJOjFAgXT7rPYzcHrPRYP2rgefvCw/VE/qsGRHzyvDDYH3FbQMojDAA==
