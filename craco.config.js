@@ -31,6 +31,10 @@ module.exports = {
       }
     }
   },
+  // Some overrides to fix
+  // `craco:  *** Cannot find ESLint loader (eslint-loader). ***`
+  // by using latest CRA 4
+  // @see https://github.com/gsoft-inc/craco/issues/205#issuecomment-716631300
   plugins: [
     {
       plugin: {
