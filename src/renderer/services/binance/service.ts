@@ -142,68 +142,6 @@ const miniTickers$ = ws$.pipe(
 const BINANCE_MAX_RETRY = 3
 
 /**
- * Binance network depending on `Network`
- */
-const binanceNetwork$: Observable<BinanceNetwork> = network$.pipe(
-  mergeMap((network) => {
-    if (network === 'testnet') return Rx.of('testnet' as BinanceNetwork)
-    // chaosnet + mainnet are using Binance mainnet url
-    return Rx.of('mainnet' as BinanceNetwork)
-  })
-)
-
-/**
- * Stream to create an observable BinanceClient depending on existing phrase in keystore
- *
- * Whenever a phrase has been added to keystore, a new BinanceClient will be created.
- * By the other hand: Whenever a phrase has been removed, the client is set to `none`
- * A BinanceClient will never be created as long as no phrase is available
- */
-const clientState$: BinanceClientState$ = Rx.combineLatest([keystoreService.keystore$, binanceNetwork$]).pipe(
-  mergeMap(
-    ([keystore, binanceNetwork]) =>
-      Observable.create((observer: Observer<BinanceClientState>) => {
-        const client: BinanceClientState = FP.pipe(
-          getPhrase(keystore),
-          O.chain((phrase) => {
-            try {
-              const client = new Client({ phrase, network: binanceNetwork })
-              return O.some(right(client)) as BinanceClientState
-            } catch (error) {
-              return O.some(left(error))
-            }
-          })
-        )
-        observer.next(client)
-      }) as Observable<BinanceClientState>
-  )
-)
-
-const client$: Observable<O.Option<Client>> = clientState$.pipe(map(getClient), shareReplay(1))
-
-export type Client$ = typeof client$
-
-/**
- * Helper stream to provide "ready-to-go" state of latest `BinanceClient`, but w/o exposing the client
- * It's needed by views only.
- */
-const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(
-  map((clientState) => getClientStateForViews(clientState))
-)
-
-/**
- * Current `Address` depending on selected network
- *
- * If a client is not available (e.g. by removing keystore), it returns `None`
- *
- */
-const address$: Observable<O.Option<Address>> = client$.pipe(
-  map(FP.pipe(O.chain((client) => FP.pipe(client.getAddress(), O.fromNullable)))),
-  distinctUntilChanged(eqOString.equals),
-  shareReplay(1)
-)
-
-/**
  * Observable to load balances from Binance API endpoint
  */
 const loadBalances$ = (client: Client): BalancesLD =>
@@ -310,22 +248,6 @@ const txs$ = (asset: Asset, { limit, offset }: LoadTxsProps): TxsPageLD =>
       )
     )
   )
-
-/**
- * Explorer url depending on selected network
- *
- * If a client is not available (e.g. by removing keystore), it returns `None`
- *
- */
-export const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
-  map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
-  shareReplay(1)
-)
-
-const getExplorerTxUrl$: Observable<O.Option<GetExplorerTxUrl>> = client$.pipe(
-  map(FP.pipe(O.map((client) => client.getExplorerTxUrl))),
-  shareReplay(1)
-)
 
 // `TriggerStream` to reload `Fees`
 const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()

@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balances, Transfer, Fees, Client as BinanceClient, WS } from '@xchainjs/xchain-binance'
+import { Balances, Transfer, Fees, Client, WS } from '@xchainjs/xchain-binance'
 import { Asset, AssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
@@ -10,6 +10,8 @@ import { ClientState } from '../types'
 import { ApiError, TxLD } from '../wallet/types'
 import { SendTxParams } from './transaction'
 
+export type Client$ = Rx.Observable<O.Option<Client>>
+
 export type BalancesRD = RD.RemoteData<Error, Balances>
 
 export type AssetWithPrice = {
@@ -19,12 +21,12 @@ export type AssetWithPrice = {
 
 export type AssetsWithPrice = AssetWithPrice[]
 
-export type BinanceClientState = ClientState<BinanceClient>
-export type BinanceClientState$ = Rx.Observable<ClientState<BinanceClient>>
+export type BinanceClientState = ClientState<Client>
+export type BinanceClientState$ = Rx.Observable<ClientState<Client>>
 
 export type TransferRD = RD.RemoteData<Error, Transfer>
 
-export type AddressValidation = BinanceClient['validateAddress']
+export type AddressValidation = Client['validateAddress']
 
 /**
  * Fees of Transfers
