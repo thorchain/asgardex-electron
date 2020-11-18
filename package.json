@@ -86,7 +86,7 @@
     "styled-components": "^5.2.1",
     "styled-theme": "^0.3.3",
     "typescript": "^4.0.5",
-    "uuid": "^8.3.0"
+    "uuid": "^8.3.1"
   },
   "devDependencies": {
     "@hot-loader/react-dom": "^16.13.0",
