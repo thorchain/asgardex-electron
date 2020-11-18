@@ -62,7 +62,7 @@ const createPoolsService = (
   // Factory to get `Pools` from Midgard
   const apiGetPools$ = (request: GetPoolsRequest) =>
     byzantine$.pipe(
-      RxOp.map(RD.map(getMidgardDefaultApi)),
+      liveData.map(getMidgardDefaultApi),
       liveData.chain((api) =>
         FP.pipe(
           api.getPools(request),
@@ -205,17 +205,11 @@ const createPoolsService = (
     const poolDetails$ = getPoolDetails$(poolAssets$)
 
     return FP.pipe(
-      combineLatest([poolAssets$, assetDetails$, poolDetails$]),
-      RxOp.map((state) => RD.combine(...state)),
-      RxOp.map(
-        RD.map(([poolAssets, assetDetails, poolDetails]) => {
-          return {
-            poolAssets,
-            assetDetails,
-            poolDetails
-          }
-        })
-      ),
+      liveData.sequenceS({
+        poolAssets: poolAssets$,
+        assetDetails: assetDetails$,
+        poolDetails: poolDetails$
+      }),
       RxOp.startWith(RD.pending),
       RxOp.catchError((error: Error) => Rx.of(RD.failure(error))),
       RxOp.retry(MIDGARD_MAX_RETRY)
