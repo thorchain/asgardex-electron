@@ -9,7 +9,7 @@ import * as Ord from 'fp-ts/lib/Ord'
 import { ONE_ASSET_BASE_AMOUNT } from '../const'
 import { Network } from '../services/app/types'
 import { PoolDetails } from '../services/midgard/types'
-import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
+import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
 import { getDefaultRuneAsset } from './assetHelper'
@@ -41,22 +41,15 @@ export const getDefaultRunePricePool = (chain: Chain = 'BNB') => getRunePricePoo
 export const getPoolTableRowsData = ({
   poolDetails,
   pricePoolData,
-  poolStatus,
   network
 }: {
   poolDetails: PoolDetails
   pricePoolData: PoolData
-  poolStatus: PoolDetailStatusEnum
   network: Network
 }): PoolTableRowsData => {
-  // filter pool details
-  const filteredPoolDetails: PoolDetails = FP.pipe(
-    poolDetails,
-    A.filter((poolDetail) => poolDetail.status === poolStatus)
-  )
   // get symbol of deepest pool
   const oDeepestPoolSymbol: O.Option<string> = FP.pipe(
-    filteredPoolDetails,
+    poolDetails,
     getDeepestPool,
     O.chain((poolDetail) => O.fromNullable(poolDetail.asset)),
     O.chain((assetString) => O.fromNullable(assetFromString(assetString))),
@@ -65,7 +58,7 @@ export const getPoolTableRowsData = ({
 
   // Transform `PoolDetails` -> PoolRowType
   return FP.pipe(
-    filteredPoolDetails,
+    poolDetails,
     A.mapWithIndex<PoolDetail, O.Option<PoolTableRowData>>((index, poolDetail) => {
       // get symbol of PoolDetail
       const oPoolDetailSymbol: O.Option<string> = FP.pipe(
@@ -102,11 +95,6 @@ export const getPoolTableRowsData = ({
     A.reverse
   )
 }
-
-export const filterPendingPools = (pools: PoolDetails) =>
-  pools.filter((pool: PoolDetail) => pool.status === PoolDetailStatusEnum.Bootstrapped)
-
-export const hasPendingPools = (pools: PoolDetails) => filterPendingPools(pools).length > 0
 
 /**
  * Filters a pool out with hightest value of run
