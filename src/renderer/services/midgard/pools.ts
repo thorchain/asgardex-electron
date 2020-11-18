@@ -3,6 +3,7 @@ import { Asset, assetFromString, assetToString, bn, currencySymbolByAsset, isVal
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import { some } from 'fp-ts/Option'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
@@ -121,8 +122,10 @@ const createPoolsService = (
   const getAssetDetails$: (poolAssets$: PoolStringAssetsLD) => AssetDetailsLD = (poolAssets$) =>
     FP.pipe(
       poolAssets$,
-      liveData.map((assets) => assets.join(',')),
-      liveData.chain(apiGetAssetInfo$),
+      liveData.map(NEA.fromArray),
+      liveData.map(O.map((assets) => assets.join(','))),
+      // provide an empty list of `AssetDetails` in case of empty list of pools
+      liveData.chain(O.fold(() => liveData.of([]), apiGetAssetInfo$)),
       RxOp.shareReplay(1)
     )
 
@@ -130,8 +133,10 @@ const createPoolsService = (
   const getPoolDetails$: (poolAssets$: PoolStringAssetsLD) => PoolDetailsLD = (poolAssets$) =>
     FP.pipe(
       poolAssets$,
-      liveData.map((assets) => assets.join(',')),
-      liveData.chain(apiGetPoolsData$),
+      liveData.map(NEA.fromArray),
+      liveData.map(O.map((assets) => assets.join(','))),
+      // provide an empty list of `PoolDetails` in case of empty list of pools
+      liveData.chain(O.fold(() => liveData.of([]), apiGetPoolsData$)),
       RxOp.shareReplay(1)
     )
 
