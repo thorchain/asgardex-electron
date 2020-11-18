@@ -49,7 +49,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.3.0",
     "@binance-chain/javascript-sdk": "^4.1.1",
-    "@craco/craco": "^5.6.4",
+    "@craco/craco": "^5.8.0",
     "@devexperts/remote-data-ts": "^2.0.4",
     "@devexperts/rx-utils": "^1.0.0-alpha.14",
     "@devexperts/utils": "^1.0.0-alpha.14",
