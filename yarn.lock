@@ -14001,7 +14001,7 @@ objectorarray@^1.0.4:
   resolved "https://registry.yarnpkg.com/objectorarray/-/objectorarray-1.0.4.tgz#d69b2f0ff7dc2701903d308bb85882f4ddb49483"
   integrity sha512-91k8bjcldstRz1bG6zJo8lWD7c6QXcB4nTDUqiEvIL1xAsLoZlOOZZG+nd6YPz+V7zY1580J4Xxh1vZtyv4i/w==
 
-observable-hooks@^3.0.0:
+observable-hooks@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/observable-hooks/-/observable-hooks-3.1.2.tgz#f76f04320467f706d16c6cfdee343fc4a52aa7fc"
   integrity sha512-RJRDg5WgqmKz88hPsW/u91buUSICpcSxgm8c792HkF01lHNAtuqOzI/rQM11TNjcXQY6iKIbpPW+WqO7Ggiohg==
