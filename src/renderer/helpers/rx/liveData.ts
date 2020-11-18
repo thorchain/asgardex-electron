@@ -16,7 +16,7 @@ import { Observable } from 'rxjs'
 export type LiveData<E, A> = Observable<RemoteData<E, A>>
 
 export const URI = '//LiveData'
-export type URI = typeof URI
+export type URIType = typeof URI
 declare module 'fp-ts/lib/HKT' {
   interface URItoKind2<E, A> {
     [URI]: LiveData<E, A>
@@ -29,7 +29,7 @@ const foldableValueRemoteData: FoldableValue2<typeof remoteData.URI> & MonadThro
   throwError: failure
 }
 
-export const instanceLiveData: MonadThrow2<URI> & CoproductLeft<URI> & Filterable2<URI> = {
+export const instanceLiveData: MonadThrow2<URIType> & CoproductLeft<URIType> & Filterable2<URIType> = {
   URI,
   ...getLiveDataM(instanceObservable, foldableValueRemoteData)
 }

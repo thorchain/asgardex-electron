@@ -9,13 +9,15 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { AssetWithPrice } from '../../services/binance/types'
 import * as Styled from './CurrencyInfo.styles'
 
-type CurrencyInfo = {
+type CurrencyInfoProps = {
   from?: O.Option<AssetWithPrice>
   to?: O.Option<AssetWithPrice>
   slip?: BigNumber
 }
 
-export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: CurrencyInfo) => {
+// For some reason eslint does not see that CurrencyInfo is used by Swap.tsx
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: CurrencyInfoProps) => {
   return pipe(
     sequenceTOption(from, to),
     O.map(([from, to]) => (
