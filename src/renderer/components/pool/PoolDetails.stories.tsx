@@ -15,7 +15,6 @@ export const PoolDetailsStory = () => {
       allTimeVolume={assetAmount(12000)}
       totalSwaps={7042}
       totalStakers={307}
-      returnToDate={'44.64'}
       priceSymbol={'R'}
     />
   )

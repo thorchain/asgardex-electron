@@ -20,15 +20,14 @@ import { Trend } from '../../components/uielements/trend'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
-import { getDefaultRunePricePool, getPoolTableRowsData, hasPendingPools, sortByDepth } from '../../helpers/poolHelper'
+import { getDefaultRunePricePool, getPoolTableRowsData, sortByDepth } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { Network } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolsState } from '../../services/midgard/types'
-import { PoolDetailStatusEnum } from '../../types/generated/midgard'
+import { PendingPoolsState, PoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
@@ -43,11 +42,12 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const {
     thorchainLastblockState$,
     thorchainConstantsState$,
-    pools: { poolsState$, selectedPricePool$, reloadPools },
+    pools: { poolsState$, pendingPoolsState$, selectedPricePool$, reloadPools, reloadPendingPools },
     reloadThorchainLastblock,
     reloadNetworkInfo
   } = midgardService
   const poolsRD = useObservableState(poolsState$, RD.pending)
+  const pendingPoolsRD = useObservableState(pendingPoolsState$, RD.pending)
   const thorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(thorchainConstantsState$, RD.pending)
 
@@ -73,10 +73,10 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   }, [reloadThorchainLastblock])
 
   const pendingCountdownInterval = useMemo(() => {
-    const pools = RD.toNullable(poolsRD)
+    const pendingPools = RD.toNullable(pendingPoolsRD)
     // start countdown if we do have pending pools available only
-    return pools && hasPendingPools(pools.poolDetails) ? 5000 : INACTIVE_INTERVAL
-  }, [poolsRD])
+    return pendingPools && pendingPools.poolDetails.length > 0 ? 5000 : INACTIVE_INTERVAL
+  }, [pendingPoolsRD])
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
 
@@ -101,8 +101,9 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
 
   const clickRefreshHandler = useCallback(() => {
     reloadPools()
+    reloadPendingPools()
     reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPools])
+  }, [reloadNetworkInfo, reloadPendingPools, reloadPools])
 
   const renderRefreshBtn = useMemo(
     () => (
@@ -353,11 +354,10 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
             return <ErrorView title={msg} extra={renderRefreshBtn} />
           },
           // success state
-          (pools: PoolsState): JSX.Element => {
+          ({ poolDetails }: PoolsState): JSX.Element => {
             const poolViewData = getPoolTableRowsData({
-              poolDetails: pools.poolDetails,
+              poolDetails,
               pricePoolData: selectedPricePool.poolData,
-              poolStatus: PoolDetailStatusEnum.Enabled,
               network
             })
             previousPools.current = some(poolViewData)
@@ -441,20 +441,19 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
           // error state - we just show an empty table, an error will be shown on pools table
           (_: Error) => renderPendingPoolsTable([]),
           // success state
-          (state: PoolsState): JSX.Element => {
+          ({ poolDetails }: PendingPoolsState): JSX.Element => {
             const poolViewData = getPoolTableRowsData({
-              poolDetails: state.poolDetails,
+              poolDetails,
               pricePoolData: selectedPricePool.poolData,
-              poolStatus: PoolDetailStatusEnum.Bootstrapped,
               network
             })
             previousPendingPools.current = some(poolViewData)
             return renderPendingPoolsTable(poolViewData)
           }
-        )(poolsRD)}
+        )(pendingPoolsRD)}
       </>
     ),
-    [poolsRD, renderPendingPoolsTable, selectedPricePool.poolData, network]
+    [pendingPoolsRD, renderPendingPoolsTable, selectedPricePool.poolData, network]
   )
 
   return (

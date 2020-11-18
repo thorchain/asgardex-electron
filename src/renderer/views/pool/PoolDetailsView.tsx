@@ -27,15 +27,12 @@ const getTotalSwaps = (data: PoolDetail) => Number(data.swappingTxCount || 0)
 
 const getTotalStakers = (data: PoolDetail) => Number(data.stakersCount || 0)
 
-const getReturnToDate = (data: PoolDetail) => (parseFloat(data.poolROI || '0') * 100).toFixed(2)
-
 const defaultDetailsProps: PoolDetailProps = {
   depth: ZERO_ASSET_AMOUNT,
   volume24hr: ZERO_ASSET_AMOUNT,
   allTimeVolume: ZERO_ASSET_AMOUNT,
   totalSwaps: 0,
-  totalStakers: 0,
-  returnToDate: ''
+  totalStakers: 0
 }
 
 const renderPendingView = () => <PoolDetails {...defaultDetailsProps} isLoading={true} />
@@ -72,7 +69,6 @@ export const PoolDetailsView: React.FC = () => {
             allTimeVolume={getAllTimeVolume(data, priceRatio)}
             totalSwaps={getTotalSwaps(data)}
             totalStakers={getTotalStakers(data)}
-            returnToDate={getReturnToDate(data)}
             priceSymbol={O.toUndefined(priceSymbol)}
           />
         )

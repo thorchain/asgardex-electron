@@ -1,47 +1,17 @@
-import { PoolData, assetAmount, assetToBase, AssetRune67C } from '@xchainjs/xchain-util'
+import { PoolData, assetAmount, assetToBase, AssetRune67C, assetToString } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
 import { PoolDetailStatusEnum, PoolDetail } from '../types/generated/midgard'
-import { filterPendingPools, getDeepestPool, getPoolTableRowsData } from './poolHelper'
+import { getDeepestPool, getPoolTableRowsData } from './poolHelper'
 
 describe('helpers/poolHelper/', () => {
   const pool1: PoolDetail = { status: PoolDetailStatusEnum.Bootstrapped, runeDepth: '1000' }
   const pool2: PoolDetail = { status: PoolDetailStatusEnum.Enabled, runeDepth: '2000' }
   const pool3: PoolDetail = { status: PoolDetailStatusEnum.Disabled, runeDepth: '0' }
   const pool4: PoolDetail = { status: PoolDetailStatusEnum.Bootstrapped, runeDepth: '4000' }
-
-  describe('filterPendingPools', () => {
-    const pool4: PoolDetail = { status: PoolDetailStatusEnum.Bootstrapped }
-
-    it('filters pending pools', () => {
-      const pools = [pool1, pool2, pool3, pool4]
-      const result = filterPendingPools(pools).length
-      expect(result).toEqual(2)
-    })
-
-    it('does not filter any pending pools', () => {
-      const pools = [pool2, pool3]
-      const result = filterPendingPools(pools).length
-      expect(result).toEqual(0)
-    })
-  })
-
-  describe('hasPendingPools', () => {
-    it('has pending pools', () => {
-      const pools = [pool1, pool2, pool3, pool4]
-      const result = filterPendingPools(pools).length
-      expect(result).toBeTruthy()
-    })
-
-    it('has not pending pools', () => {
-      const pools = [pool2, pool3]
-      const result = filterPendingPools(pools).length
-      expect(result).toBeFalsy()
-    })
-  })
 
   describe('getDeepestPool', () => {
     it('returns deepest pool', () => {
@@ -60,15 +30,21 @@ describe('helpers/poolHelper/', () => {
   describe('getPoolTableRowsData', () => {
     const poolDetails: PoolDetails = [
       {
-        asset: 'BNB.TOMOB-1E1',
+        asset: assetToString(ASSETS_TESTNET.TOMO),
         status: PoolDetailStatusEnum.Enabled
       },
       {
-        asset: 'BNB.FTM-585',
+        asset: assetToString(ASSETS_TESTNET.FTM),
         status: PoolDetailStatusEnum.Enabled
+      }
+    ]
+    const pendingPoolDetails: PoolDetails = [
+      {
+        asset: assetToString(ASSETS_TESTNET.BOLT),
+        status: PoolDetailStatusEnum.Bootstrapped
       },
       {
-        asset: 'BNB.BOLT-E42',
+        asset: assetToString(ASSETS_TESTNET.FTM),
         status: PoolDetailStatusEnum.Bootstrapped
       }
     ]
@@ -80,25 +56,26 @@ describe('helpers/poolHelper/', () => {
 
     it('returns data for pending pools', () => {
       const result = getPoolTableRowsData({
-        poolDetails,
+        poolDetails: pendingPoolDetails,
         pricePoolData,
-        poolStatus: PoolDetailStatusEnum.Bootstrapped,
         network: 'testnet'
       })
-      expect(result.length).toEqual(1)
+      expect(result.length).toEqual(2)
+      // Note: `getPoolTableRowsData` reverses the order of given `poolDetails`
       expect(result[0].pool.asset).toEqual(AssetRune67C)
-      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.BOLT)
+      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.FTM)
+      expect(result[1].pool.asset).toEqual(AssetRune67C)
+      expect(result[1].pool.target).toEqual(ASSETS_TESTNET.BOLT)
     })
 
     it('returns data for available pools', () => {
       const result = getPoolTableRowsData({
         poolDetails,
         pricePoolData,
-        poolStatus: PoolDetailStatusEnum.Enabled,
         network: 'testnet'
       })
       expect(result.length).toEqual(2)
-
+      // Note: `getPoolTableRowsData` reverses the order of given `poolDetails`
       expect(result[0].pool.asset).toEqual(AssetRune67C)
       expect(result[0].pool.target).toEqual(ASSETS_TESTNET.FTM)
       expect(result[1].pool.asset).toEqual(AssetRune67C)

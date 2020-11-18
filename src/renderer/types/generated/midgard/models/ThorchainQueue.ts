@@ -13,12 +13,17 @@
 
 /**
  * @export
- * @interface ThorchainStringConstants
+ * @interface ThorchainQueue
  */
-export interface ThorchainStringConstants {
+export interface ThorchainQueue {
     /**
-     * @type {string}
-     * @memberof ThorchainStringConstants
+     * @type {number}
+     * @memberof ThorchainQueue
      */
-    DefaultPoolStatus?: string;
+    outbound?: number;
+    /**
+     * @type {number}
+     * @memberof ThorchainQueue
+     */
+    swap?: number;
 }
