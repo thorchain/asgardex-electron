@@ -1,5 +1,9 @@
-import { Client as EthereumClient } from '@thorchain/asgardex-ethereum'
+import { Client } from '@thorchain/asgardex-ethereum'
+import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
 
 import { ClientState } from '../types'
 
-export type EthereumClientState = ClientState<EthereumClient>
+export type Client$ = Rx.Observable<O.Option<Client>>
+
+export type EthereumClientState = ClientState<Client>
