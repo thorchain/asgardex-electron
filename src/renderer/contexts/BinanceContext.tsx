@@ -1,42 +1,54 @@
 import React, { createContext, useContext } from 'react'
 
 import {
-  subscribeTransfers,
-  miniTickers$,
   client$,
   clientViewState$,
-  address$,
-  txs$,
-  getExplorerTxUrl$,
-  transaction,
-  transferFees$,
-  explorerUrl$
-} from '../services/binance/service'
-
-export type BinanceContextValue = {
-  subscribeTransfers: typeof subscribeTransfers
-  miniTickers$: typeof miniTickers$
-  clientViewState$: typeof clientViewState$
-  txs$: typeof txs$
-  address$: typeof address$
-  explorerUrl$: typeof explorerUrl$
-  getExplorerTxUrl$: typeof getExplorerTxUrl$
-  transaction: typeof transaction
-  client$: typeof client$
-  transferFees$: typeof transferFees$
-}
-
-const initialContext: BinanceContextValue = {
   subscribeTransfers,
   miniTickers$,
-  client$,
-  clientViewState$,
   txs$,
+  resetTx,
+  pushTx,
+  sendStakeTx,
+  txRD$,
+  txWithState$,
   address$,
   explorerUrl$,
   getExplorerTxUrl$,
-  transaction,
-  transferFees$
+  fees$
+} from '../services/binance'
+
+export type BinanceContextValue = {
+  client$: typeof client$
+  clientViewState$: typeof clientViewState$
+  subscribeTransfers: typeof subscribeTransfers
+  miniTickers$: typeof miniTickers$
+  txs$: typeof txs$
+  resetTx: typeof resetTx
+  pushTx: typeof pushTx
+  sendStakeTx: typeof sendStakeTx
+  txRD$: typeof txRD$
+  txWithState$: typeof txWithState$
+  address$: typeof address$
+  explorerUrl$: typeof explorerUrl$
+  getExplorerTxUrl$: typeof getExplorerTxUrl$
+  fees$: typeof fees$
+}
+
+const initialContext: BinanceContextValue = {
+  client$,
+  clientViewState$,
+  subscribeTransfers,
+  miniTickers$,
+  txs$,
+  resetTx,
+  pushTx,
+  sendStakeTx,
+  txRD$,
+  txWithState$,
+  address$,
+  explorerUrl$,
+  getExplorerTxUrl$,
+  fees$
 }
 
 const BinanceContext = createContext<BinanceContextValue | null>(null)

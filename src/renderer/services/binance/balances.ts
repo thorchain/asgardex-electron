@@ -1,18 +1,18 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
+import { Client } from '@xchainjs/xchain-binance'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { mergeMap, catchError, shareReplay, startWith, debounceTime, map } from 'rxjs/operators'
+import { Observable } from 'rxjs'
+import { map, mergeMap, catchError, shareReplay, startWith, debounceTime } from 'rxjs/operators'
 
-import { triggerStream } from '../../helpers/stateHelper'
-import { ApiError, BalancesLD, ErrorId } from '../wallet/types'
-import { client$ } from './common'
+import { BalancesRD, ApiError, ErrorId, BalancesLD } from '../wallet/types'
+import { client$, reloadBalances$ } from './common'
 
 /**
  * Observable to load balances from Binance API endpoint
  */
-const loadBalances$ = (client: BitcoinClient): BalancesLD =>
+const loadBalances$ = (client: Client): BalancesLD =>
   Rx.from(client.getBalance()).pipe(
     map(RD.success),
     catchError((error: Error) =>
@@ -21,16 +21,13 @@ const loadBalances$ = (client: BitcoinClient): BalancesLD =>
     startWith(RD.pending)
   )
 
-// `TriggerStream` to reload `Balances`
-const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
-
 /**
- * State of `Balance`s provided as `BalancesLD`
+ * State of `Balances`
  *
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const assetsWB$: BalancesLD = Rx.combineLatest([reloadBalances$.pipe(debounceTime(300)), client$]).pipe(
+const balances$: Observable<BalancesRD> = Rx.combineLatest([reloadBalances$.pipe(debounceTime(300)), client$]).pipe(
   mergeMap(([_, client]) => {
     return FP.pipe(
       client,
@@ -46,4 +43,4 @@ const assetsWB$: BalancesLD = Rx.combineLatest([reloadBalances$.pipe(debounceTim
   shareReplay(1)
 )
 
-export { loadBalances$, assetsWB$, reloadBalances }
+export { loadBalances$, balances$ }

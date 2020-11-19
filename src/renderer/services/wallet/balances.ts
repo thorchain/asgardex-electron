@@ -14,12 +14,12 @@ import { eqAssetsWithBalanceRD } from '../../helpers/fp/eq'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { network$ } from '../app/service'
-import * as BNB from '../binance/service'
+import * as BNB from '../binance'
 import * as BTC from '../bitcoin/context'
 import * as ETH from '../ethereum/service'
 import { selectedAsset$ } from './common'
-import { INITIAL_ASSETS_WB_STATE } from './const'
-import { ChainBalance, BalancesRD, AssetsWithBalanceState, LoadBalancesHandler } from './types'
+import { INITIAL_BALANCES_STATE } from './const'
+import { ChainBalance, BalancesRD, BalancesState, LoadBalancesHandler } from './types'
 import { sortBalances } from './util'
 
 export const reloadBalances = () => {
@@ -51,9 +51,9 @@ export const reloadBalances$: Rx.Observable<O.Option<LoadBalancesHandler>> = sel
 /**
  * Transforms BNB data (address + `AssetsWB`) into `AssetsWBChain`
  */
-const bnbAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BNB.address$, BNB.assetsWB$, network$]).pipe(
+const bnbAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BNB.address$, BNB.balances$, network$]).pipe(
   map(
-    ([address, assetsWB, network]) =>
+    ([address, balances, network]) =>
       ({
         chain: 'BNB',
         address: FP.pipe(
@@ -61,7 +61,7 @@ const bnbAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BNB.addres
           O.getOrElse(() => '')
         ),
         assetsWB: FP.pipe(
-          assetsWB,
+          balances,
           RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getRuneAsset({ network, chain: 'BNB' }).ticker]))
         )
       } as ChainBalance)
@@ -124,24 +124,24 @@ const _ethAssetsWB$: Observable<BalancesRD> = ETH.assetWB$.pipe(liveData.map((as
  * into a "single" state of `AssetsWithBalanceState`
  * Because we need to have loading / error / data combined in one "state" object in some cases
  */
-export const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLatest([
-  BNB.assetsWB$,
+export const balancesState$: Observable<BalancesState> = Rx.combineLatest([
+  BNB.balances$,
   BTC.assetsWB$
   // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
   // ethAssetsWB$
 ]).pipe(
-  map((assetsWBList) => ({
-    assetsWB: FP.pipe(
-      assetsWBList,
+  map((balancesList) => ({
+    balances: FP.pipe(
+      balancesList,
       // filter results out
       // Transformation: RD<Error, AssetsWithBalance>`-> `AssetsWithBalance)[]`
       A.filterMap(RD.toOption),
       A.flatten,
       NEA.fromArray
     ),
-    loading: FP.pipe(assetsWBList, A.elem(eqAssetsWithBalanceRD)(RD.pending)),
+    loading: FP.pipe(balancesList, A.elem(eqAssetsWithBalanceRD)(RD.pending)),
     errors: FP.pipe(
-      assetsWBList,
+      balancesList,
       // filter errors out
       A.filter(RD.isFailure),
       // Transformation to get Errors out of RD:
@@ -152,5 +152,5 @@ export const assetsWBState$: Observable<AssetsWithBalanceState> = Rx.combineLate
       O.chain(NEA.fromArray)
     )
   })),
-  startWith(INITIAL_ASSETS_WB_STATE)
+  startWith(INITIAL_BALANCES_STATE)
 )

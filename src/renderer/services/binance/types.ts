@@ -1,13 +1,14 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balances, Transfer, Fees, Client, WS } from '@xchainjs/xchain-binance'
+import { Balances, Transfer, Client, WS } from '@xchainjs/xchain-binance'
 import { Asset, AssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
+import { FeesLD } from '../clients/types'
 import { ClientState } from '../types'
-import { ApiError, TxLD } from '../wallet/types'
+import { ApiError, TxLD, TxsPageLD } from '../wallet/types'
 import { SendTxParams } from './transaction'
 
 export type Client$ = Rx.Observable<O.Option<Client>>
@@ -46,10 +47,10 @@ export type TransferFees = {
   multi: AssetAmount
 }
 
-export type FeeRD = RD.RemoteData<Error, AssetAmount>
-export type FeesRD = RD.RemoteData<Error, Fees>
-export type FeesLD = LiveData<Error, Fees>
-export type TransferFeesRD = RD.RemoteData<Error, TransferFees>
+export type FeesService = {
+  fees$: FeesLD
+  reloadFees: () => void
+}
 
 export type LoadTxsProps = {
   limit: number
@@ -62,8 +63,9 @@ export type TxWithStateLD = LiveData<ApiError, TxWithState>
 
 export type TransactionService = {
   txRD$: TxLD
-  txWithState$: TxWithStateLD
   pushTx: (p: SendTxParams) => Rx.Subscription
-  resetTx: () => void
   sendStakeTx: (p: SendTxParams) => TxLD
+  resetTx: () => void
+  txs$: (asset: Asset, props: LoadTxsProps) => TxsPageLD
+  txWithState$: TxWithStateLD
 }
