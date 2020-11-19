@@ -20,15 +20,14 @@ import { Trend } from '../../components/uielements/trend'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
-import { getDefaultRunePricePool, getPoolTableRowsData, hasPendingPools, sortByDepth } from '../../helpers/poolHelper'
+import { getDefaultRunePricePool, getPoolTableRowsData, sortByDepth } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { Network } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolsState } from '../../services/midgard/types'
-import { PoolDetailStatusEnum } from '../../types/generated/midgard'
+import { PendingPoolsState, PoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
 import { ActionColumn, TableAction, BlockLeftLabel } from './PoolsOverview.style'
@@ -43,11 +42,12 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const {
     thorchainLastblockState$,
     thorchainConstantsState$,
-    pools: { poolsState$, selectedPricePool$, reloadPools },
+    pools: { poolsState$, pendingPoolsState$, selectedPricePool$, reloadPools, reloadPendingPools },
     reloadThorchainLastblock,
     reloadNetworkInfo
   } = midgardService
   const poolsRD = useObservableState(poolsState$, RD.pending)
+  const pendingPoolsRD = useObservableState(pendingPoolsState$, RD.pending)
   const thorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(thorchainConstantsState$, RD.pending)
 
@@ -73,10 +73,10 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   }, [reloadThorchainLastblock])
 
   const pendingCountdownInterval = useMemo(() => {
-    const pools = RD.toNullable(poolsRD)
+    const pendingPools = RD.toNullable(pendingPoolsRD)
     // start countdown if we do have pending pools available only
-    return pools && hasPendingPools(pools.poolDetails) ? 5000 : INACTIVE_INTERVAL
-  }, [poolsRD])
+    return pendingPools && pendingPools.poolDetails.length > 0 ? 5000 : INACTIVE_INTERVAL
+  }, [pendingPoolsRD])
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
 
@@ -101,8 +101,9 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
 
   const clickRefreshHandler = useCallback(() => {
     reloadPools()
+    reloadPendingPools()
     reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPools])
+  }, [reloadNetworkInfo, reloadPendingPools, reloadPools])
 
   const renderRefreshBtn = useMemo(
     () => (
@@ -135,12 +136,15 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     [clickStakeHandler, clickSwapHandler, intl]
   )
 
-  const btnPoolsColumn = {
-    key: 'btn',
-    title: renderBtnColTitle,
-    width: 280,
-    render: renderBtnPoolsColumn
-  }
+  const btnPoolsColumn = useMemo(
+    () => ({
+      key: 'btn',
+      title: renderBtnColTitle,
+      width: 280,
+      render: renderBtnPoolsColumn
+    }),
+    [renderBtnColTitle, renderBtnPoolsColumn]
+  )
 
   const renderPoolColumn = useCallback(
     ({ pool }: PoolTableRowData) => (
@@ -150,13 +154,16 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     ),
     []
   )
-  const poolColumn: ColumnType<PoolTableRowData> = {
-    key: 'pool',
-    align: 'center',
-    title: intl.formatMessage({ id: 'common.pool' }),
-    width: 100,
-    render: renderPoolColumn
-  }
+  const poolColumn: ColumnType<PoolTableRowData> = useMemo(
+    () => ({
+      key: 'pool',
+      align: 'center',
+      title: intl.formatMessage({ id: 'common.pool' }),
+      width: 100,
+      render: renderPoolColumn
+    }),
+    [renderPoolColumn, intl]
+  )
 
   const renderPoolColumnMobile = useCallback(
     ({ pool }: PoolTableRowData) => (
@@ -166,11 +173,14 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     ),
     []
   )
-  const poolColumnMobile: ColumnType<PoolTableRowData> = {
-    key: 'pool',
-    title: intl.formatMessage({ id: 'common.pool' }),
-    render: renderPoolColumnMobile
-  }
+  const poolColumnMobile: ColumnType<PoolTableRowData> = useMemo(
+    () => ({
+      key: 'pool',
+      title: intl.formatMessage({ id: 'common.pool' }),
+      render: renderPoolColumnMobile
+    }),
+    [renderPoolColumnMobile, intl]
+  )
 
   const renderAssetColumn = useCallback(
     ({ pool }: PoolTableRowData) => <Label align="center">{pool.target.ticker}</Label>,
@@ -181,14 +191,17 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
       poolA.target.symbol.localeCompare(poolB.target.symbol),
     []
   )
-  const assetColumn: ColumnType<PoolTableRowData> = {
-    key: 'asset',
-    title: intl.formatMessage({ id: 'common.asset' }),
-    render: renderAssetColumn,
-    sorter: sortAssetColumn,
-    sortDirections: ['descend', 'ascend'],
-    defaultSortOrder: 'descend'
-  }
+  const assetColumn: ColumnType<PoolTableRowData> = useMemo(
+    () => ({
+      key: 'asset',
+      title: intl.formatMessage({ id: 'common.asset' }),
+      render: renderAssetColumn,
+      sorter: sortAssetColumn,
+      sortDirections: ['descend', 'ascend'],
+      defaultSortOrder: 'descend'
+    }),
+    [intl, sortAssetColumn, renderAssetColumn]
+  )
 
   const renderPriceColumn = useCallback(
     ({ poolPrice }: PoolTableRowData) => (
@@ -207,14 +220,17 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     []
   )
 
-  const priceColumn: ColumnType<PoolTableRowData> = {
-    key: 'poolprice',
-    align: 'right',
-    title: intl.formatMessage({ id: 'common.price' }),
-    render: renderPriceColumn,
-    sorter: sortPriceColumn,
-    sortDirections: ['descend', 'ascend']
-  }
+  const priceColumn: ColumnType<PoolTableRowData> = useMemo(
+    () => ({
+      key: 'poolprice',
+      align: 'right',
+      title: intl.formatMessage({ id: 'common.price' }),
+      render: renderPriceColumn,
+      sorter: sortPriceColumn,
+      sortDirections: ['descend', 'ascend']
+    }),
+    [renderPriceColumn, sortPriceColumn, intl]
+  )
 
   const renderDepthColumn = useCallback(
     ({ depthPrice }: PoolTableRowData) => (
@@ -229,16 +245,19 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     [selectedPricePool.asset]
   )
 
-  const depthColumn: ColumnType<PoolTableRowData> = {
-    key: 'depth',
-    align: 'right',
-    title: intl.formatMessage({ id: 'pools.depth' }),
-    render: renderDepthColumn,
-    sorter: sortByDepth,
-    sortDirections: ['descend', 'ascend'],
-    // Note: `defaultSortOrder` has no effect here, that's we do a default sort in `getPoolTableRowsData`
-    defaultSortOrder: 'descend'
-  }
+  const depthColumn: ColumnType<PoolTableRowData> = useMemo(
+    () => ({
+      key: 'depth',
+      align: 'right',
+      title: intl.formatMessage({ id: 'pools.depth' }),
+      render: renderDepthColumn,
+      sorter: sortByDepth,
+      sortDirections: ['descend', 'ascend'],
+      // Note: `defaultSortOrder` has no effect here, that's we do a default sort in `getPoolTableRowsData`
+      defaultSortOrder: 'descend'
+    }),
+    [intl, renderDepthColumn]
+  )
 
   const renderVolumeColumn = useCallback(
     ({ volumePrice }: PoolTableRowData) => (
@@ -256,14 +275,17 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.volumePrice, b.volumePrice),
     []
   )
-  const volumeColumn: ColumnType<PoolTableRowData> = {
-    key: 'vol',
-    align: 'right',
-    title: intl.formatMessage({ id: 'pools.24hvol' }),
-    render: renderVolumeColumn,
-    sorter: sortVolumeColumn,
-    sortDirections: ['descend', 'ascend']
-  }
+  const volumeColumn: ColumnType<PoolTableRowData> = useMemo(
+    () => ({
+      key: 'vol',
+      align: 'right',
+      title: intl.formatMessage({ id: 'pools.24hvol' }),
+      render: renderVolumeColumn,
+      sorter: sortVolumeColumn,
+      sortDirections: ['descend', 'ascend']
+    }),
+    [intl, renderVolumeColumn, sortVolumeColumn]
+  )
 
   const renderTransactionColumn = useCallback(
     ({ transactionPrice }: PoolTableRowData) => (
@@ -281,14 +303,17 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.transactionPrice, b.transactionPrice),
     []
   )
-  const transactionColumn: ColumnType<PoolTableRowData> = {
-    key: 'transaction',
-    align: 'right',
-    title: intl.formatMessage({ id: 'pools.avgsize' }),
-    render: renderTransactionColumn,
-    sorter: sortTransactionColumn,
-    sortDirections: ['descend', 'ascend']
-  }
+  const transactionColumn: ColumnType<PoolTableRowData> = useMemo(
+    () => ({
+      key: 'transaction',
+      align: 'right',
+      title: intl.formatMessage({ id: 'pools.avgsize' }),
+      render: renderTransactionColumn,
+      sorter: sortTransactionColumn,
+      sortDirections: ['descend', 'ascend']
+    }),
+    [intl, renderTransactionColumn, sortTransactionColumn]
+  )
 
   const renderSlipColumn = useCallback(({ slip }: PoolTableRowData) => <Trend amount={slip} />, [])
   const sortSlipColumn = useCallback(
@@ -296,37 +321,59 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     []
   )
 
-  const slipColumn: ColumnType<PoolTableRowData> = {
-    key: 'slip',
-    align: 'center',
-    title: intl.formatMessage({ id: 'pools.avgslip' }),
-    render: renderSlipColumn,
-    sorter: sortSlipColumn,
-    sortDirections: ['descend', 'ascend']
-  }
+  const slipColumn: ColumnType<PoolTableRowData> = useMemo(
+    () => ({
+      key: 'slip',
+      align: 'center',
+      title: intl.formatMessage({ id: 'pools.avgslip' }),
+      render: renderSlipColumn,
+      sorter: sortSlipColumn,
+      sortDirections: ['descend', 'ascend']
+    }),
+    [intl, renderSlipColumn, sortSlipColumn]
+  )
 
-  const tradeColumn: ColumnType<PoolTableRowData> = {
-    key: 'trade',
-    align: 'center',
-    title: intl.formatMessage({ id: 'pools.trades' }),
-    render: ({ trades }: PoolTableRowData) => <Label align="center">{trades.toString()}</Label>,
-    sorter: (a: PoolTableRowData, b: PoolTableRowData) => ordBigNumber.compare(a.trades, b.trades),
-    sortDirections: ['descend', 'ascend']
-  }
+  const tradeColumn: ColumnType<PoolTableRowData> = useMemo(
+    () => ({
+      key: 'trade',
+      align: 'center',
+      title: intl.formatMessage({ id: 'pools.trades' }),
+      render: ({ trades }: PoolTableRowData) => <Label align="center">{trades.toString()}</Label>,
+      sorter: (a: PoolTableRowData, b: PoolTableRowData) => ordBigNumber.compare(a.trades, b.trades),
+      sortDirections: ['descend', 'ascend']
+    }),
+    [intl]
+  )
 
-  const desktopPoolsColumns: ColumnsType<PoolTableRowData> = [
-    poolColumn,
-    assetColumn,
-    priceColumn,
-    depthColumn,
-    volumeColumn,
-    transactionColumn,
-    slipColumn,
-    tradeColumn,
+  const desktopPoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
+    () => [
+      poolColumn,
+      assetColumn,
+      priceColumn,
+      depthColumn,
+      volumeColumn,
+      transactionColumn,
+      slipColumn,
+      tradeColumn,
+      btnPoolsColumn
+    ],
+    [
+      poolColumn,
+      assetColumn,
+      priceColumn,
+      depthColumn,
+      volumeColumn,
+      transactionColumn,
+      slipColumn,
+      tradeColumn,
+      btnPoolsColumn
+    ]
+  )
+
+  const mobilePoolsColumns: ColumnsType<PoolTableRowData> = useMemo(() => [poolColumnMobile, btnPoolsColumn], [
+    poolColumnMobile,
     btnPoolsColumn
-  ]
-
-  const mobilePoolsColumns: ColumnsType<PoolTableRowData> = [poolColumnMobile, btnPoolsColumn]
+  ])
 
   const renderPoolsTable = useCallback(
     (tableData: PoolTableRowData[], loading = false) => {
@@ -353,11 +400,10 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
             return <ErrorView title={msg} extra={renderRefreshBtn} />
           },
           // success state
-          (pools: PoolsState): JSX.Element => {
+          ({ poolDetails }: PoolsState): JSX.Element => {
             const poolViewData = getPoolTableRowsData({
-              poolDetails: pools.poolDetails,
+              poolDetails,
               pricePoolData: selectedPricePool.poolData,
-              poolStatus: PoolDetailStatusEnum.Enabled,
               network
             })
             previousPools.current = some(poolViewData)
@@ -381,12 +427,15 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     [clickStakeHandler]
   )
 
-  const btnPendingPoolsColumn = {
-    key: 'btn',
-    title: '',
-    width: 200,
-    render: renderBtnPendingPoolsColumn
-  }
+  const btnPendingPoolsColumn = useMemo(
+    () => ({
+      key: 'btn',
+      title: '',
+      width: 200,
+      render: renderBtnPendingPoolsColumn
+    }),
+    [renderBtnPendingPoolsColumn]
+  )
 
   const renderBlockLeftColumn = useCallback(
     (_: string, record: PoolTableRowData) => {
@@ -401,23 +450,25 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     [blocksLeft]
   )
 
-  const blockLeftColumn = {
-    key: 'blocks',
-    title: intl.formatMessage({ id: 'pools.blocksleft' }),
-    width: 80,
-    render: renderBlockLeftColumn
-  }
+  const blockLeftColumn = useMemo(
+    () => ({
+      key: 'blocks',
+      title: intl.formatMessage({ id: 'pools.blocksleft' }),
+      width: 80,
+      render: renderBlockLeftColumn
+    }),
+    [renderBlockLeftColumn, intl]
+  )
 
-  const desktopPendingPoolsColumns: ColumnsType<PoolTableRowData> = [
-    poolColumn,
-    assetColumn,
-    priceColumn,
-    depthColumn,
-    blockLeftColumn,
-    btnPendingPoolsColumn
-  ]
+  const desktopPendingPoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
+    () => [poolColumn, assetColumn, priceColumn, depthColumn, blockLeftColumn, btnPendingPoolsColumn],
+    [poolColumn, assetColumn, priceColumn, depthColumn, blockLeftColumn, btnPendingPoolsColumn]
+  )
 
-  const mobilePendingPoolsColumns: ColumnsType<PoolTableRowData> = [poolColumnMobile, btnPendingPoolsColumn]
+  const mobilePendingPoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
+    () => [poolColumnMobile, btnPendingPoolsColumn],
+    [poolColumnMobile, btnPendingPoolsColumn]
+  )
 
   const renderPendingPoolsTable = useCallback(
     (tableData: PoolTableRowData[], loading = false) => {
@@ -441,20 +492,19 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
           // error state - we just show an empty table, an error will be shown on pools table
           (_: Error) => renderPendingPoolsTable([]),
           // success state
-          (state: PoolsState): JSX.Element => {
+          ({ poolDetails }: PendingPoolsState): JSX.Element => {
             const poolViewData = getPoolTableRowsData({
-              poolDetails: state.poolDetails,
+              poolDetails,
               pricePoolData: selectedPricePool.poolData,
-              poolStatus: PoolDetailStatusEnum.Bootstrapped,
               network
             })
             previousPendingPools.current = some(poolViewData)
             return renderPendingPoolsTable(poolViewData)
           }
-        )(poolsRD)}
+        )(pendingPoolsRD)}
       </>
     ),
-    [poolsRD, renderPendingPoolsTable, selectedPricePool.poolData, network]
+    [pendingPoolsRD, renderPendingPoolsTable, selectedPricePool.poolData, network]
   )
 
   return (

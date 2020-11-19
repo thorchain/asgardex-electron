@@ -24,7 +24,7 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
 
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
-  const iconStyle = { fontSize: '1.5em', cursor: disabled ? 'not-allowed' : 'pointer' }
+  const iconStyle = useMemo(() => ({ fontSize: '1.5em', cursor: disabled ? 'not-allowed' : 'pointer' }), [disabled])
 
   const clickHandler = useCallback((_: React.MouseEvent) => onPress(), [onPress])
 

@@ -3,7 +3,7 @@ import { join } from 'path'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
+// import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
@@ -64,7 +64,11 @@ const closeHandler = () => {
 
 const setupDevEnv = async () => {
   try {
-    await installExtension(REACT_DEVELOPER_TOOLS)
+    // Disable `REACT_DEVELOPER_TOOLS` temporary
+    // It causes issues by using latest CRA 4
+    // https://github.com/facebook/create-react-app/issues/9893
+    // // TODO (@Veado / @ThatStrangeGuy) Bring it back once CRA 4 has been fixed
+    // await installExtension(REACT_DEVELOPER_TOOLS)
   } catch (e) {
     warn('unable to install devtools', e)
   }

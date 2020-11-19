@@ -21,7 +21,6 @@ const stake: StakeMessages = {
   'stake.poolDetails.allTimeVal': 'Количество за все время',
   'stake.poolDetails.totalSwaps': 'Всего свапов',
   'stake.poolDetails.totalStakers': 'Всего держателей',
-  'stake.poolDetails.returnToDate': 'Доходность',
   'stake.wallet.add': 'Добавить',
   'stake.wallet.connect': 'Пожалуйсста добавьте свой кошелек',
   'stake.pool.noStakes': 'У вас нет доли в этом пуле',

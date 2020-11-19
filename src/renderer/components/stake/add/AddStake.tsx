@@ -477,8 +477,6 @@ export const AddStake: React.FC<Props> = (props) => {
       <Styled.DragWrapper>
         <Drag
           title={intl.formatMessage({ id: 'stake.drag' })}
-          source={asset}
-          target={asset}
           onConfirm={onStakeConfirmed}
           disabled={disabledForm || runeAmountToStake.amount().isZero()}
         />

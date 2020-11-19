@@ -14,16 +14,17 @@ jest.mock('@xchainjs/xchain-crypto', () => ({
 }))
 
 describe('services/keystore/service/', () => {
-  it('removeKeystore', async (done) => {
-    await removeKeystore()
-    keystoreService.keystore$
-      .pipe(
-        tap((val) => {
-          expect(val).toBeNone()
-          done()
-        })
-      )
-      .subscribe()
+  it('removeKeystore', (done) => {
+    removeKeystore().then(() =>
+      keystoreService.keystore$
+        .pipe(
+          tap((val) => {
+            expect(val).toBeNone()
+            done()
+          })
+        )
+        .subscribe()
+    )
   })
 
   describe('addPhrase', () => {
@@ -32,34 +33,35 @@ describe('services/keystore/service/', () => {
       await expect(keystoreService.unlock(none, password)).rejects.toBeTruthy()
     })
 
-    it('should call setKeystoreState', async (done) => {
-      await keystoreService.unlock(some(some({ phrase: 'phrase' })), password)
-
-      keystoreService.keystore$
-        .pipe(
-          tap((val) => {
-            expect(val).toEqual(some(some(mockDecrypt)))
-            done()
-          })
-        )
-        .subscribe()
+    it('should call setKeystoreState', (done) => {
+      keystoreService.unlock(some(some({ phrase: 'phrase' })), password).then(() => {
+        keystoreService.keystore$
+          .pipe(
+            tap((val) => {
+              expect(val).toEqual(some(some(mockDecrypt)))
+              done()
+            })
+          )
+          .subscribe()
+      })
     })
   })
 
-  it('addKeystore', async (done) => {
+  it('addKeystore', (done) => {
     const removeKeystoreSpy = jest.spyOn(keystoreService, 'removeKeystore')
     const phrase = 'phrase'
     const password = 'password'
     removeKeystoreSpy.mockImplementationOnce(() => Promise.resolve())
 
-    await keystoreService.addKeystore(phrase, password)
-    keystoreService.keystore$
-      .pipe(
-        tap((val) => {
-          expect(val).toEqual(some(some({ phrase })))
-          done()
-        })
-      )
-      .subscribe()
+    keystoreService.addKeystore(phrase, password).then(() => {
+      keystoreService.keystore$
+        .pipe(
+          tap((val) => {
+            expect(val).toEqual(some(some({ phrase })))
+            done()
+          })
+        )
+        .subscribe()
+    })
   })
 })
