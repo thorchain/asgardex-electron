@@ -17,11 +17,6 @@ import { getPhrase } from '../wallet/util'
 import { BinanceClientState, BinanceClientState$, Client$ } from './types'
 
 /**
- * `common` module
- * includes streams shared in other modules
- */
-
-/**
  * Binance network depending on `Network`
  */
 const binanceNetwork$: Observable<BinanceNetwork> = network$.pipe(

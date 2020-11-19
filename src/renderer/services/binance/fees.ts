@@ -21,7 +21,6 @@ const fees$: (client: Client$) => FeesLD = (client$) =>
       FP.pipe(
         // client and asset has to be available
         oClient,
-        // ignore all assets from other chains than BNB
         O.fold(
           () => Rx.EMPTY,
           (client) => Rx.from(client.getFees())

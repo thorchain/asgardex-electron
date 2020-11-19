@@ -11,25 +11,25 @@ import { AssetsTableCollapsable } from './index'
 const assetsWBChainRUNE: ChainBalance = {
   address: 'thor1766mazrxs5asuscepa227r6ekr657234f8p7nf',
   chain: 'THOR',
-  assetsWB: RD.initial
+  balances: RD.initial
 }
 
 const assetsWBChainBNB: ChainBalance = {
   address: 'bnb1zzapwywxrxa2wyyrp93ls5l0a6ftxju5phmhu9',
   chain: 'BNB',
-  assetsWB: RD.initial
+  balances: RD.initial
 }
 
 const assetsWBChainBTC: ChainBalance = {
   address: 'bc11766mazrxs5asuscepa227r6ekr657234f8p7nf',
   chain: 'BTC',
-  assetsWB: RD.initial
+  balances: RD.initial
 }
 
 const assetsWBChains: AssetsWBChains = [
   {
     ...assetsWBChainRUNE,
-    assetsWB: RD.success([
+    balances: RD.success([
       {
         amount: baseAmount('12200000000'),
         asset: AssetRune67C
@@ -38,7 +38,7 @@ const assetsWBChains: AssetsWBChains = [
   },
   {
     ...assetsWBChainBTC,
-    assetsWB: RD.success([
+    balances: RD.success([
       {
         amount: baseAmount('1230000'),
         asset: AssetBTC
@@ -47,7 +47,7 @@ const assetsWBChains: AssetsWBChains = [
   },
   {
     ...assetsWBChainBNB,
-    assetsWB: RD.success([
+    balances: RD.success([
       {
         amount: baseAmount('1000000'),
         asset: AssetBNB
@@ -63,22 +63,22 @@ const assetsWBChains: AssetsWBChains = [
 const assetsWBChainsLoading: AssetsWBChains = [
   {
     ...assetsWBChainRUNE,
-    assetsWB: RD.pending
+    balances: RD.pending
   },
   {
     ...assetsWBChainBTC,
-    assetsWB: RD.pending
+    balances: RD.pending
   }
 ]
 const apiError: ApiError = { errorId: ErrorId.GET_BALANCES, msg: 'error message' }
 const assetsWBChainsError: AssetsWBChains = [
   {
     ...assetsWBChainRUNE,
-    assetsWB: RD.failure({ ...apiError, msg: 'RUNE error' })
+    balances: RD.failure({ ...apiError, msg: 'RUNE error' })
   },
   {
     ...assetsWBChainBTC,
-    assetsWB: RD.failure({ ...apiError, msg: 'BTC error' })
+    balances: RD.failure({ ...apiError, msg: 'BTC error' })
   }
 ]
 

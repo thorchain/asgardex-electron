@@ -40,7 +40,7 @@ export type FormValues = {
 }
 
 type Props = {
-  assetsWB: Balances
+  balances: Balances
   assetWB: Balance
   onSubmit: ({ to, amount, feeRate, memo }: SendTxParams) => void
   isLoading?: boolean
@@ -52,7 +52,7 @@ type Props = {
 export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   const {
     onSubmit,
-    assetsWB,
+    balances,
     assetWB,
     addressValidation,
     isLoading,
@@ -265,7 +265,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeAssetHandler} selectedAsset={assetWB.asset} assets={assetsWB} />
+        <AccountSelector onChange={changeAssetHandler} selectedAsset={assetWB.asset} assets={balances} />
         <Styled.Form
           form={form}
           initialValues={{

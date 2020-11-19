@@ -21,14 +21,17 @@ import { NonEmptyBalances, TxRD } from '../../../services/wallet/types'
 
 type Props = {
   selectedAsset: Asset
-  assetsWB: O.Option<NonEmptyBalances>
+  balances: O.Option<NonEmptyBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
 }
 
 export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, assetsWB, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
+  const { selectedAsset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
 
-  const oSelectedAssetWB = useMemo(() => getBalanceByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
+  const oSelectedAssetWB = useMemo(() => getBalanceByAsset(oBalances, O.some(selectedAsset)), [
+    oBalances,
+    selectedAsset
+  ])
 
   const { client$, fees$, txRD$, resetTx, pushTx } = useBinanceContext()
 
@@ -63,10 +66,10 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
   const sendForm = useCallback(
     (selectedAsset: Balance) => (
       <SendFormBNB
-        assetWB={selectedAsset}
+        balance={selectedAsset}
         onSubmit={pushTx}
-        assetsWB={FP.pipe(
-          assetsWB,
+        balances={FP.pipe(
+          oBalances,
           O.getOrElse(() => [] as Balances)
         )}
         isLoading={RD.isPending(txRD)}
@@ -74,7 +77,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         fee={fee}
       />
     ),
-    [pushTx, assetsWB, txRD, addressValidation, fee]
+    [pushTx, oBalances, txRD, addressValidation, fee]
   )
 
   return FP.pipe(

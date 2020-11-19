@@ -39,8 +39,8 @@ const onSubmitHandler = ({ to, amount, asset, memo }: SendTxParams) =>
 storiesOf('Wallet/SendFormBNB', module)
   .add('send bnb', () => (
     <SendFormBNB
-      assetWB={bnbAsset}
-      assetsWB={balances}
+      balance={bnbAsset}
+      balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       fee={fee}
@@ -48,8 +48,8 @@ storiesOf('Wallet/SendFormBNB', module)
   ))
   .add('send rune', () => (
     <SendFormBNB
-      assetWB={runeAsset}
-      assetsWB={balances}
+      balance={runeAsset}
+      balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       fee={fee}
@@ -57,8 +57,8 @@ storiesOf('Wallet/SendFormBNB', module)
   ))
   .add('pending', () => (
     <SendFormBNB
-      assetWB={bnbAsset}
-      assetsWB={balances}
+      balance={bnbAsset}
+      balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       fee={fee}
@@ -67,8 +67,8 @@ storiesOf('Wallet/SendFormBNB', module)
   ))
   .add('no fees', () => (
     <SendFormBNB
-      assetWB={bnbAsset}
-      assetsWB={balances}
+      balance={bnbAsset}
+      balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       fee={O.none}
@@ -76,8 +76,8 @@ storiesOf('Wallet/SendFormBNB', module)
   ))
   .add('bnb amount < fees', () => (
     <SendFormBNB
-      assetWB={bnbAsset}
-      assetsWB={balances}
+      balance={bnbAsset}
+      balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       fee={O.some(assetAmount(1.234))}

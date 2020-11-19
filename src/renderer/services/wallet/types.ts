@@ -42,7 +42,7 @@ export type BalanceRD = RD.RemoteData<ApiError, Balance>
 export type ChainBalance = {
   address: string
   chain: Chain
-  assetsWB: BalancesRD
+  balances: BalancesRD
 }
 
 export type AssetsWBChains = ChainBalance[]

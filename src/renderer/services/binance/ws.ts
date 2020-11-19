@@ -3,7 +3,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { map, mergeMap, switchMap } from 'rxjs/operators'
-import * as RxOperators from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
 import { envOrDefault } from '../../helpers/envHelper'
@@ -117,9 +117,9 @@ const miniTickers$ = ws$.pipe(
 const wsTransfer$ = FP.pipe(
   address$,
   switchMap(O.fold(() => Rx.EMPTY, subscribeTransfers)),
-  RxOperators.map(O.some),
-  RxOperators.tap(O.map(reloadBalances)),
-  RxOperators.startWith(O.none)
+  RxOp.map(O.some),
+  RxOp.tap(O.map(reloadBalances)),
+  RxOp.startWith(O.none)
 )
 
 export { subscribeTransfers, miniTickers$, wsTransfer$ }

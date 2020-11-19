@@ -13,7 +13,6 @@ import { TransactionService, Client$, TxWithStateLD } from './types'
 
 /**
  * Observable to load txs from Binance API endpoint
- * If client is not available, it returns an `initial` state
  */
 const loadTxs$ = ({
   client,

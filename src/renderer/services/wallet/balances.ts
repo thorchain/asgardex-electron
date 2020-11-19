@@ -60,7 +60,7 @@ const bnbAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BNB.addres
           address,
           O.getOrElse(() => '')
         ),
-        assetsWB: FP.pipe(
+        balances: FP.pipe(
           balances,
           RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getRuneAsset({ network, chain: 'BNB' }).ticker]))
         )
@@ -80,7 +80,7 @@ const btcAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BTC.addres
           address,
           O.getOrElse(() => '')
         ),
-        assetsWB
+        balances: assetsWB
       } as ChainBalance)
   )
 )
@@ -98,7 +98,7 @@ const _ethAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([ETH.addre
           address,
           O.getOrElse(() => '')
         ),
-        assetsWB: FP.pipe(
+        balances: FP.pipe(
           assetWBRD,
           RD.map((assetWB) => [assetWB])
         )

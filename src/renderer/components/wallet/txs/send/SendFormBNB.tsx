@@ -28,8 +28,8 @@ export type FormValues = {
 }
 
 type Props = {
-  assetsWB: Balances
-  assetWB: Balance
+  balances: Balances
+  balance: Balance
   onSubmit: ({ to, amount, asset, memo }: SendTxParams) => void
   isLoading?: boolean
   addressValidation: AddressValidation
@@ -37,7 +37,7 @@ type Props = {
 }
 
 export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit, assetsWB, assetWB, isLoading = false, addressValidation, fee: oFee } = props
+  const { onSubmit, balances, balance, isLoading = false, addressValidation, fee: oFee } = props
   const intl = useIntl()
 
   const changeAssetHandler = useChangeAssetHandler()
@@ -46,12 +46,12 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
 
   const oBnbAmount: O.Option<AssetAmount> = useMemo(() => {
     // return balance of current asset (if BNB)
-    if (isBnbAsset(assetWB.asset)) {
-      return O.some(baseToAsset(assetWB.amount))
+    if (isBnbAsset(balance.asset)) {
+      return O.some(baseToAsset(balance.amount))
     }
     // or check list of other assets to get bnb balance
-    return FP.pipe(assetsWB, getBnbAmountFromBalances)
-  }, [assetWB, assetsWB])
+    return FP.pipe(balances, getBnbAmountFromBalances)
+  }, [balance, balances])
 
   const feeLabel = useMemo(
     () =>
@@ -123,31 +123,31 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
         ),
         assetAmount
       )
-      const maxAmount = isBnbAsset(assetWB.asset) ? maxBnbAmount : baseToAsset(assetWB.amount)
+      const maxAmount = isBnbAsset(balance.asset) ? maxBnbAmount : baseToAsset(balance.amount)
       // error messages
       const errors = {
         msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
         msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
-        msg3: isBnbAsset(assetWB.asset)
+        msg3: isBnbAsset(balance.asset)
           ? intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalanceAndFee' })
           : intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
       }
       return validateTxAmountInput({ input: value, maxAmount, errors })
     },
-    [assetWB, oFee, intl, oBnbAmount]
+    [balance, oFee, intl, oBnbAmount]
   )
 
   const onFinishHandler = useCallback(
     ({ amount, recipient, memo }: FormValues) => {
-      onSubmit({ to: recipient, amount: assetAmount(amount), asset: assetWB.asset, memo })
+      onSubmit({ to: recipient, amount: assetAmount(amount), asset: balance.asset, memo })
     },
-    [onSubmit, assetWB]
+    [onSubmit, balance]
   )
 
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeAssetHandler} selectedAsset={assetWB.asset} assets={assetsWB} />
+        <AccountSelector onChange={changeAssetHandler} selectedAsset={balance.asset} assets={balances} />
         <Styled.Form form={form} initialValues={{ amount: bn(0) }} onFinish={onFinishHandler} labelCol={{ span: 24 }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
@@ -162,8 +162,8 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
               <>
                 {intl.formatMessage({ id: 'common.max' })}:{' '}
                 {formatAssetAmountCurrency({
-                  amount: baseToAsset(assetWB.amount),
-                  asset: assetWB.asset,
+                  amount: baseToAsset(balance.amount),
+                  asset: balance.asset,
                   trimZeros: true
                 })}
                 <br />

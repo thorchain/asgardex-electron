@@ -50,12 +50,12 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
     (asset: Asset) => {
       switch (asset.chain) {
         case 'BNB':
-          return <SendViewBNB selectedAsset={asset} assetsWB={balances} getExplorerTxUrl={getExplorerTxUrl} />
+          return <SendViewBNB selectedAsset={asset} balances={balances} getExplorerTxUrl={getExplorerTxUrl} />
         case 'BTC':
           return (
             <SendViewBTC
               btcAsset={asset}
-              assetsWB={balances}
+              balances={balances}
               reloadFeesHandler={reloadFees}
               getExplorerTxUrl={getExplorerTxUrl}
             />

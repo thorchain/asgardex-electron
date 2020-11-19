@@ -36,19 +36,19 @@ describe('walletHelper', () => {
 
   describe('getAssetWBByAsset', () => {
     it('returns amount of BNB', () => {
-      const assetsWB: O.Option<NonEmptyBalances> = NEA.fromArray([RUNE_WB, BOLT_WB, BNB_WB])
-      const result = O.toNullable(getBalanceByAsset(assetsWB, BNB))
+      const balances: O.Option<NonEmptyBalances> = NEA.fromArray([RUNE_WB, BOLT_WB, BNB_WB])
+      const result = O.toNullable(getBalanceByAsset(balances, BNB))
       expect(result?.asset.symbol).toEqual('BNB')
       expect(result?.amount.amount().toString()).toEqual('45600000000')
     })
     it('returns none if BNB is not available', () => {
-      const assetsWB: O.Option<NonEmptyBalances> = NEA.fromArray([RUNE_WB, BOLT_WB])
-      const result = getBalanceByAsset(assetsWB, BNB)
+      const balances: O.Option<NonEmptyBalances> = NEA.fromArray([RUNE_WB, BOLT_WB])
+      const result = getBalanceByAsset(balances, BNB)
       expect(result).toBeNone()
     })
     it('returns none for empty lists of `AssetWB`', () => {
-      const assetsWB: O.Option<NonEmptyBalances> = NEA.fromArray([])
-      const result = getBalanceByAsset(assetsWB, BNB)
+      const balances: O.Option<NonEmptyBalances> = NEA.fromArray([])
+      const result = getBalanceByAsset(balances, BNB)
       expect(result).toBeNone()
     })
   })
