@@ -18,7 +18,7 @@ import { getPhrase } from '../wallet/util'
 import { BitcoinClientState } from './types'
 
 /**
- * Binance network depending on selected `Network`
+ * Bitcoin network depending on selected `Network`
  */
 const bitcoinNetwork$: Observable<ClientNetwork> = network$.pipe(
   map((network) => {
@@ -55,18 +55,16 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork
                 nodeApiKey: BLOCKCHAIR_API_KEY,
                 phrase
               })
-              return O.some(right(client)) as BitcoinClientState
+              return O.some(right(client))
             } catch (error) {
               return O.some(left(error))
             }
           })
         )
         observer.next(client)
-      }) as Observable<BitcoinClientState>
+      })
   )
 )
-
-export type ClientState$ = typeof clientState$
 
 const client$: Observable<O.Option<BitcoinClient>> = clientState$.pipe(map(getClient), shareReplay(1))
 
