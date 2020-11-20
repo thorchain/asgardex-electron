@@ -14,7 +14,7 @@ export const AddWallet: React.FC<Props> = ({ isLocked = false }) => {
   const intl = useIntl()
   const history = useHistory()
   const onButtonClick = useCallback(() => {
-    history.push(walletRoutes.base.path())
+    history.push(walletRoutes.base.path(history.location.pathname))
   }, [history])
 
   const intlLabelId = isLocked ? 'wallet.unlock.instruction' : 'wallet.connect.instruction'
