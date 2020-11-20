@@ -10,7 +10,7 @@ import {
   fees$,
   pushTx,
   resetTx
-} from '../services/bitcoin/context'
+} from '../services/bitcoin'
 
 export type BitcoinContextValue = {
   client$: typeof client$
