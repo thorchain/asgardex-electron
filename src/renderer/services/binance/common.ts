@@ -1,16 +1,15 @@
-import { Client, Network as BinanceNetwork, Address } from '@xchainjs/xchain-binance'
+import { Client, Network as BinanceNetwork } from '@xchainjs/xchain-binance'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators'
+import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
-import { eqOString } from '../../helpers/fp/eq'
 import { triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import * as C from '../clients'
-import { ExplorerUrl$, GetExplorerTxUrl$ } from '../clients/types'
+import { Address$, ExplorerUrl$, GetExplorerTxUrl$ } from '../clients/types'
 import { ClientStateForViews } from '../clients/types'
 import { getClient, getClientStateForViews } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
@@ -65,15 +64,8 @@ const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(map(
 
 /**
  * Current `Address` depending on selected network
- *
- * If a client is not available (e.g. by removing keystore), it returns `None`
- *
  */
-const address$: Observable<O.Option<Address>> = client$.pipe(
-  map(FP.pipe(O.chain((client) => FP.pipe(client.getAddress(), O.fromNullable)))),
-  distinctUntilChanged(eqOString.equals),
-  shareReplay(1)
-)
+const address$: Address$ = C.address$(client$)
 
 /**
  * Explorer url depending on selected network

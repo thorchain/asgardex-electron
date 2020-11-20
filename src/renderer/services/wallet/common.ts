@@ -18,7 +18,7 @@ const selectedAsset$ = getSelectedAsset$.pipe(distinctUntilChanged(eqOAsset.equa
 const selectedChain$ = selectedAsset$.pipe(RxOp.map(O.map(({ chain }) => chain)), distinctUntilChanged(eqOChain.equals))
 
 /**
- * Client depending on selected chain
+ * Wallet client depends on selected chain
  */
 const client$ = getClientByChain$(selectedChain$)
 

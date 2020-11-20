@@ -16,9 +16,6 @@ export type FeeLD = LiveData<Error, BaseAmount>
 export type FeesRD = RD.RemoteData<Error, Fees>
 export type FeesLD = LiveData<Error, Fees>
 
-export type Address = string
-export type AddressRx = Rx.Observable<O.Option<Address>>
-
 export type Memo = string
 export type MemoRx = Rx.Observable<O.Option<Memo>>
 

@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { XChainClient } from '@xchainjs/xchain-client'
+import { Address, XChainClient } from '@xchainjs/xchain-client'
 import { TxsPage, Balances, Fees } from '@xchainjs/xchain-client'
 import * as E from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
@@ -38,3 +38,5 @@ export type ExplorerUrl$ = Rx.Observable<O.Option<string>>
 export type GetExplorerTxUrl = (txHash: string) => string
 
 export type GetExplorerTxUrl$ = Rx.Observable<O.Option<GetExplorerTxUrl>>
+
+export type Address$ = Rx.Observable<O.Option<Address>>
