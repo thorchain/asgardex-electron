@@ -5,7 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import * as BNB from '../binance/service'
-import * as BTC from '../bitcoin/context'
+import * as BTC from '../bitcoin'
 import { ErrorId, TxLD } from '../wallet/types'
 import { SendStakeTxParams } from './types'
 

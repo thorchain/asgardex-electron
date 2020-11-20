@@ -1,7 +1,7 @@
 import { Chain } from '@xchainjs/xchain-util'
 
 import * as BNB from '../../binance/service'
-import * as BTC from '../../bitcoin/context'
+import * as BTC from '../../bitcoin'
 
 /**
  * @description
