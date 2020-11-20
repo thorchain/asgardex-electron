@@ -108,6 +108,7 @@ export const WalletView: React.FC = (): JSX.Element => {
           <Redirect
             to={{
               pathname: walletRoutes.locked.path(),
+              search: location.search,
               state: { from: location } as RedirectRouteState
             }}
           />

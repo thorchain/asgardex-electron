@@ -2,6 +2,7 @@ import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
 import { Modal } from 'antd'
 import Form, { Rule } from 'antd/lib/form'
+import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -9,6 +10,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 
 import { IS_PRODUCTION } from '../../../../shared/const'
 import { envOrDefault } from '../../../helpers/envHelper'
+import { getUrlSearchParam } from '../../../helpers/url.helper'
 import * as appRoutes from '../../../routes/app'
 import { RedirectRouteState } from '../../../routes/types'
 import * as walletRoutes from '../../../routes/wallet'
@@ -63,8 +65,11 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
   // Re-direct to previous view after unlocking the wallet
   useEffect(() => {
     if (!isLocked(keystore) && !!validPassword) {
-      const from = location.state?.from?.pathname ?? walletRoutes.assets.template
-      history.push(from)
+      FP.pipe(
+        getUrlSearchParam(location.search, walletRoutes.REDIRECT_PARAMETER_NAME),
+        O.alt(() => O.some(location.state?.from?.pathname ?? walletRoutes.assets.template)),
+        O.map(history.push)
+      )
     }
   }, [keystore, validPassword, location, history])
 

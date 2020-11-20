@@ -1,10 +1,12 @@
 import { Route } from '../types'
 import * as createRoutes from './create'
 
-export const base: Route<void> = {
+type RedirectUrl = string
+
+export const base: Route<RedirectUrl | void> = {
   template: '/wallet',
-  path() {
-    return this.template
+  path(redirectUrl) {
+    return redirectUrl ? `${this.template}?redirectUrl=${redirectUrl}` : this.template
   }
 }
 
@@ -22,10 +24,12 @@ export const imports: Route<void> = {
   }
 }
 
-export const locked: Route<void> = {
+export const REDIRECT_PARAMETER_NAME = 'redirectUrl'
+
+export const locked: Route<RedirectUrl | void> = {
   template: `${base.template}/locked`,
-  path() {
-    return this.template
+  path(redirectUrl) {
+    return redirectUrl ? `${this.template}?${REDIRECT_PARAMETER_NAME}=${redirectUrl}` : this.template
   }
 }
 
