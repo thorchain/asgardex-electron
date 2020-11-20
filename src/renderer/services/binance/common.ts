@@ -60,9 +60,7 @@ const client$: Client$ = clientState$.pipe(map(getClient), shareReplay(1))
  * Helper stream to provide "ready-to-go" state of latest `BinanceClient`, but w/o exposing the client
  * It's needed by views only.
  */
-const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(
-  map((clientState) => getClientStateForViews(clientState))
-)
+const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(map(getClientStateForViews))
 
 /**
  * Current `Address` depending on selected network
@@ -84,6 +82,7 @@ const address$: Observable<O.Option<Address>> = client$.pipe(
  */
 const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
   map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
+  distinctUntilChanged(eqOString.equals),
   shareReplay(1)
 )
 
