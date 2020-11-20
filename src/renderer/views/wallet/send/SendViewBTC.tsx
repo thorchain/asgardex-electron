@@ -14,7 +14,7 @@ import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/bitcoin/types'
-import { GetExplorerTxUrl } from '../../../services/clients/types'
+import { GetExplorerTxUrl } from '../../../services/clients'
 import { NonEmptyBalances, TxRD } from '../../../services/wallet/types'
 
 type Props = {

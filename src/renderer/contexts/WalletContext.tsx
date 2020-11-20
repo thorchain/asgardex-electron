@@ -15,7 +15,7 @@ import {
   txs$,
   setSelectedAsset,
   resetTxsPage
-} from '../services/wallet/context'
+} from '../services/wallet'
 
 type WalletContextValue = {
   keystoreService: typeof keystoreService

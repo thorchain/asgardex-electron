@@ -6,6 +6,8 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 
+export type Chain$ = Rx.Observable<O.Option<Chain>>
+
 export type LoadFeesHandler = () => void
 
 export type FeeRD = RD.RemoteData<Error, BaseAmount>

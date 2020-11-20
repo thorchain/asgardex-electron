@@ -8,8 +8,8 @@ import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators
 
 import { eqOString } from '../../helpers/fp/eq'
 import { network$ } from '../app/service'
-import { getClient } from '../utils'
-import { keystoreService } from '../wallet/common'
+import { getClient } from '../clients/utils'
+import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { Client$, EthereumClientState } from './types'
 

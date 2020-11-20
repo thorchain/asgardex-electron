@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeesLD } from '../clients/types'
-import { ClientState } from '../types'
+import { ClientState } from '../clients/types'
 import { ApiError, TxLD, TxsPageLD } from '../wallet/types'
 import { SendTxParams } from './transaction'
 
