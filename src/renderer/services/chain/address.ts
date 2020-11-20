@@ -8,7 +8,7 @@ import { BASE_CHAIN } from '../../const'
 import { isBaseChain } from '../../helpers/chainHelper'
 import { eqOString } from '../../helpers/fp/eq'
 import * as BNB from '../binance/service'
-import * as BTC from '../bitcoin/context'
+import * as BTC from '../bitcoin'
 import { selectedPoolChain$ } from '../midgard/common'
 import { AddressRx } from './types'
 

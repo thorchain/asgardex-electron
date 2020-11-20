@@ -7,7 +7,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
 import * as BNB from '../binance/service'
-import * as BTC from '../bitcoin/context'
+import * as BTC from '../bitcoin'
 import { GetExplorerTxUrl } from '../clients/types'
 import { selectedAsset$ } from './common'
 import { INITIAL_LOAD_TXS_PROPS } from './const'

@@ -4,7 +4,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 import * as Rx from 'rxjs'
 
-import * as BTC from '../bitcoin/context'
+import * as BTC from '../bitcoin'
 
 export const clientByChain$ = (chain: Chain): Observable<O.Option<XChainClient>> => {
   switch (chain) {
