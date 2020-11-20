@@ -42,15 +42,15 @@ export type BalanceRD = RD.RemoteData<ApiError, Balance>
 export type ChainBalance = {
   address: string
   chain: Chain
-  assetsWB: BalancesRD
+  balances: BalancesRD
 }
 
 export type AssetsWBChains = ChainBalance[]
 
 export const BalanceMonoid = getMonoid<Balance>()
 
-export type AssetsWithBalanceState = {
-  assetsWB: O.Option<NonEmptyBalances>
+export type BalancesState = {
+  balances: O.Option<NonEmptyBalances>
   errors: O.Option<NonEmptyApiErrors>
   loading: boolean
 }

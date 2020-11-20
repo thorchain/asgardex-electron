@@ -10,12 +10,12 @@ import * as RxOp from 'rxjs/operators'
 import { AssetDetails } from '../../components/wallet/assets/AssetDetails'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { AssetDetailsParams } from '../../routes/wallet'
-import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
+import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const {
     txs$,
-    assetsWBState$,
+    balancesState$: assetsWBState$,
     loadTxs,
     reloadBalances$,
     setSelectedAsset,
@@ -32,7 +32,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   useEffect(() => setSelectedAsset(oSelectedAsset), [])
 
   const txsRD = useObservableState(txs$, RD.initial)
-  const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
+  const { balances } = useObservableState(assetsWBState$, INITIAL_BALANCES_STATE)
 
   const [reloadBalances] = useObservableState(() => reloadBalances$.pipe(RxOp.map(O.toUndefined)))
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
@@ -47,7 +47,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     <>
       <AssetDetails
         txsPageRD={txsRD}
-        assetsWB={assetsWB}
+        balances={balances}
         asset={oSelectedAsset}
         loadTxsHandler={loadTxs}
         reloadBalancesHandler={reloadBalances}

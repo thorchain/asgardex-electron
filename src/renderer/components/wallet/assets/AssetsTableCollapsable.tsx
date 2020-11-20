@@ -180,9 +180,9 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderAssetsWBState = useCallback(
-    (assetsWB: BalancesRD, index: number) =>
+    (balancesRD: BalancesRD, index: number) =>
       FP.pipe(
-        assetsWB,
+        balancesRD,
         RD.fold(
           // initial state
           () => renderAssetsTable([]),
@@ -208,7 +208,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   // Panel
   const renderPanel = useCallback(
-    ({ chain, address, assetsWB }: ChainBalance, key: number) => {
+    ({ chain, address, balances: assetsWB }: ChainBalance, key: number) => {
       const assetsTxt = FP.pipe(
         assetsWB,
         RD.fold(

@@ -11,7 +11,7 @@ import { sequenceTRDFromArray } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { StakeType } from '../../../types/asgardex'
-import * as BNB from '../../binance/service'
+import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import { selectedPoolAsset$, selectedPoolChain$ } from '../../midgard/common'
 import { symDepositAssetTxMemo$, asymDepositTxMemo$ } from '../memo'
@@ -72,7 +72,7 @@ const updateStakeFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadStake
 const stakeFeeByChain$ = (chain: Chain, type: StakeType): FeeLD => {
   switch (chain) {
     case 'BNB':
-      return BNB.stakeFee$
+      return BNB.fees$.pipe(liveData.map((fees) => fees.fast))
     case 'BTC':
       // deposit fee for BTC txs based on a memo,
       // which depends on deposit type

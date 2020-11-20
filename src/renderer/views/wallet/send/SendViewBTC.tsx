@@ -19,15 +19,20 @@ import { NonEmptyBalances, TxRD } from '../../../services/wallet/types'
 
 type Props = {
   btcAsset: Asset
-  assetsWB: O.Option<NonEmptyBalances>
+  balances: O.Option<NonEmptyBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
   reloadFeesHandler: () => void
 }
 
 export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
-  const { btcAsset: selectedAsset, assetsWB, reloadFeesHandler, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
+  const {
+    btcAsset: selectedAsset,
+    balances: oBalances,
+    reloadFeesHandler,
+    getExplorerTxUrl: oGetExplorerTxUrl = O.none
+  } = props
 
-  const oBtcAssetWB = useMemo(() => getBalanceByAsset(assetsWB, O.some(selectedAsset)), [assetsWB, selectedAsset])
+  const oBtcAssetWB = useMemo(() => getBalanceByAsset(oBalances, O.some(selectedAsset)), [oBalances, selectedAsset])
 
   const { fees$, pushTx, txRD$, client$, resetTx } = useBitcoinContext()
 
@@ -54,8 +59,8 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
       <SendFormBTC
         assetWB={assetWB}
         onSubmit={pushTx}
-        assetsWB={FP.pipe(
-          assetsWB,
+        balances={FP.pipe(
+          oBalances,
           O.getOrElse(() => [] as Balances)
         )}
         isLoading={RD.isPending(txRD)}
@@ -64,7 +69,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
         feesWithRates={fees}
       />
     ),
-    [pushTx, assetsWB, txRD, addressValidation, reloadFeesHandler, fees]
+    [pushTx, oBalances, txRD, addressValidation, reloadFeesHandler, fees]
   )
 
   return FP.pipe(

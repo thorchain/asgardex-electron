@@ -6,9 +6,9 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { BASE_CHAIN } from '../../../const'
-import { LiveData } from '../../../helpers/rx/liveData'
+import { liveData, LiveData } from '../../../helpers/rx/liveData'
 import { triggerStream } from '../../../helpers/stateHelper'
-import * as BNB from '../../binance/service'
+import * as BNB from '../../binance'
 import { selectedPoolChain$ } from '../../midgard/common'
 import { FeeLD, WithdrawFeeLD } from '../types'
 import { reloadStakeFeesByChain } from './fees.helper'
@@ -42,7 +42,7 @@ const withdrawFeeByChain$ = (chain: Chain): FeeLD => {
     case 'BNB':
       return FP.pipe(
         reloadWithdrawFees$,
-        RxOp.switchMap(() => BNB.stakeFee$)
+        RxOp.switchMap(() => BNB.fees$.pipe(liveData.map((fees) => fees.fast)))
       )
 
     case 'THOR':

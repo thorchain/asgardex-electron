@@ -4,7 +4,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import * as BNB from '../binance/service'
+import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import { ErrorId, TxLD } from '../wallet/types'
 import { SendStakeTxParams } from './types'
@@ -24,7 +24,7 @@ const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendStakeTxPar
 
   switch (chain) {
     case 'BNB':
-      return BNB.transaction.sendStakeTx({ to: poolAddress, amount: baseToAsset(amount), asset, memo })
+      return BNB.sendStakeTx({ to: poolAddress, amount: baseToAsset(amount), asset, memo })
 
     case 'BTC':
       return FP.pipe(

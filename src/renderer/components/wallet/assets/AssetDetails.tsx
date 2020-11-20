@@ -21,7 +21,7 @@ import * as Styled from './AssetDetails.style'
 
 type Props = {
   txsPageRD: TxsPageRD
-  assetsWB: O.Option<NonEmptyBalances>
+  balances: O.Option<NonEmptyBalances>
   asset: O.Option<Asset>
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: () => void
@@ -31,7 +31,7 @@ type Props = {
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
     txsPageRD,
-    assetsWB: oAssetsWB,
+    balances: oBalances,
     asset: oAsset,
     reloadBalancesHandler = emptyFunc,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
@@ -95,7 +95,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          <AssetInfo asset={oAsset} assetsWB={oAssetsWB} />
+          <AssetInfo asset={oAsset} assetsWB={oBalances} />
         </Col>
 
         <Styled.Divider />

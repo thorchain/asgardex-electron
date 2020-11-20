@@ -49,7 +49,7 @@ storiesOf('Wallet/SendFormBTC', module)
   .add('send', () => (
     <SendFormBTC
       assetWB={bnbAsset}
-      assetsWB={balances}
+      balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
@@ -59,7 +59,7 @@ storiesOf('Wallet/SendFormBTC', module)
   .add('pending', () => (
     <SendFormBTC
       assetWB={bnbAsset}
-      assetsWB={balances}
+      balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       feesWithRates={feesWithRatesRD}
@@ -70,7 +70,7 @@ storiesOf('Wallet/SendFormBTC', module)
   .add('loading fees', () => (
     <SendFormBTC
       assetWB={bnbAsset}
-      assetsWB={balances}
+      balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
@@ -80,7 +80,7 @@ storiesOf('Wallet/SendFormBTC', module)
   .add('failure fees', () => (
     <SendFormBTC
       assetWB={bnbAsset}
-      assetsWB={balances}
+      balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
@@ -90,7 +90,7 @@ storiesOf('Wallet/SendFormBTC', module)
   .add('amount < fees', () => (
     <SendFormBTC
       assetWB={bnbAsset}
-      assetsWB={balances}
+      balances={balances}
       onSubmit={onSubmitHandler}
       reloadFeesHandler={reloadFeesHandler}
       addressValidation={addressValidation}

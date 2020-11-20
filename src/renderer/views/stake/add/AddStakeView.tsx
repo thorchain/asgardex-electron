@@ -64,7 +64,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(poolAddress$, O.none)
   const isCrossChain = useObservableState(isCrossChainStake$, false)
 
-  const { assetsWBState$ } = useWalletContext()
+  const { balancesState$ } = useWalletContext()
 
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
@@ -72,8 +72,8 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
   const [assetsWB] = useObservableState(
     () =>
       FP.pipe(
-        assetsWBState$,
-        RxOp.map((assetsWBState) => assetsWBState.assetsWB)
+        balancesState$,
+        RxOp.map((state) => state.balances)
       ),
     O.none
   )

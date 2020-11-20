@@ -23,7 +23,7 @@ import { getDefaultRuneAsset, isRuneAsset } from '../../helpers/assetHelper'
 import { rdFromOption } from '../../helpers/fpHelpers'
 import { getDefaultRunePricePool } from '../../helpers/poolHelper'
 import { SwapRouteParams } from '../../routes/swap'
-import { INITIAL_ASSETS_WB_STATE } from '../../services/wallet/const'
+import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
 import * as Styled from './SwapView.styles'
 
@@ -37,8 +37,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const {
     pools: { poolsState$, poolAddresses$, reloadPools, runeAsset$, selectedPricePool$ }
   } = midgardService
-  const { transaction, explorerUrl$ } = useBinanceContext()
-  const { assetsWBState$ } = useWalletContext()
+  const { explorerUrl$, txWithState$, pushTx, resetTx } = useBinanceContext()
+  const { balancesState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
 
@@ -46,9 +46,9 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const selectedPricePool = useObservableState(selectedPricePool$, getDefaultRunePricePool())
 
-  const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
+  const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
-  const [txWithState] = useObservableState(() => transaction.txWithState$, RD.initial)
+  const [txWithState] = useObservableState(() => txWithState$, RD.initial)
 
   const onConfirmSwap = useCallback(
     (source: Asset, amount: AssetAmount, memo: string) => {
@@ -62,7 +62,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
         // eslint-disable-next-line array-callback-return
         RD.map((endpoint) => {
           if (endpoint.address) {
-            transaction.pushTx({
+            pushTx({
               to: endpoint.address,
               amount,
               asset: source,
@@ -72,7 +72,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
         })
       )
     },
-    [poolAddresses, transaction]
+    [poolAddresses, pushTx]
   )
 
   const explorerUrl = useObservableState(explorerUrl$, O.none)
@@ -125,14 +125,14 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   runeAsset={runeAsset}
                   activePricePool={selectedPricePool}
                   txWithState={txWithState}
-                  resetTx={transaction.resetTx}
+                  resetTx={resetTx}
                   goToTransaction={goToTransaction}
                   sourceAsset={O.fromNullable(assetFromString(source.toUpperCase()))}
                   targetAsset={O.fromNullable(assetFromString(target.toUpperCase()))}
                   onConfirmSwap={onConfirmSwap}
                   availableAssets={availableAssets}
                   poolDetails={state.poolDetails}
-                  assetsWB={assetsWB}
+                  assetsWB={balances}
                 />
               )
             }

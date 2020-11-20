@@ -6,13 +6,13 @@ import * as Rx from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
-import { ApiError, TxsPageLD, ErrorId, TxRD, LoadTxsProps } from '../wallet/types'
+import { ApiError, TxsPageLD, ErrorId, TxRD, LoadTxsProps, TxLD } from '../wallet/types'
 import { Client$ } from './common'
 import { SendTxParams, TransactionService } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
-const tx$ = ({ client$, to, amount, feeRate, memo }: { client$: Client$ } & SendTxParams): Rx.Observable<TxRD> =>
+const tx$ = ({ client$, to, amount, feeRate, memo }: { client$: Client$ } & SendTxParams): TxLD =>
   client$.pipe(
     switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
     switchMap((client) => Rx.from(client.transfer({ recipient: to, amount, memo, feeRate }))),
@@ -54,14 +54,14 @@ const loadTxs$ = ({ client, limit, offset }: { client: BitcoinClient; limit: num
  */
 const txs$ = (client$: Client$) => ({ limit, offset }: LoadTxsProps): TxsPageLD =>
   client$.pipe(
-    switchMap((client) =>
+    switchMap((oClient) =>
       FP.pipe(
-        client,
+        oClient,
         O.fold(
           () => Rx.of(RD.initial),
-          (clientState) =>
+          (client) =>
             loadTxs$({
-              client: clientState,
+              client,
               limit,
               offset
             })

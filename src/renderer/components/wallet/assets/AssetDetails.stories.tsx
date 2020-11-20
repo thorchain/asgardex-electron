@@ -9,8 +9,8 @@ import { AssetDetails } from './index'
 
 storiesOf('Wallet/AssetsDetails', module)
   .add('BNB', () => {
-    return <AssetDetails txsPageRD={RD.initial} assetsWB={O.none} asset={O.some(ASSETS_TESTNET.BNB)} />
+    return <AssetDetails txsPageRD={RD.initial} balances={O.none} asset={O.some(ASSETS_TESTNET.BNB)} />
   })
   .add('RUNE', () => {
-    return <AssetDetails txsPageRD={RD.initial} assetsWB={O.none} asset={O.some(ASSETS_TESTNET.RUNE)} />
+    return <AssetDetails txsPageRD={RD.initial} balances={O.none} asset={O.some(ASSETS_TESTNET.RUNE)} />
   })

@@ -13,7 +13,7 @@ import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
-import { INITIAL_ASSETS_WB_STATE } from '../../../services/wallet/const'
+import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { SendViewBNB, SendViewBTC, SendViewETH } from './index'
 
 type Props = {}
@@ -23,8 +23,8 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
   const intl = useIntl()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
-  const { assetsWBState$, getExplorerTxUrl$ } = useWalletContext()
-  const { assetsWB } = useObservableState(assetsWBState$, INITIAL_ASSETS_WB_STATE)
+  const { balancesState$, getExplorerTxUrl$ } = useWalletContext()
+  const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
   const { reloadFees } = useBitcoinContext()
@@ -50,12 +50,12 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
     (asset: Asset) => {
       switch (asset.chain) {
         case 'BNB':
-          return <SendViewBNB selectedAsset={asset} assetsWB={assetsWB} getExplorerTxUrl={getExplorerTxUrl} />
+          return <SendViewBNB selectedAsset={asset} balances={balances} getExplorerTxUrl={getExplorerTxUrl} />
         case 'BTC':
           return (
             <SendViewBTC
               btcAsset={asset}
-              assetsWB={assetsWB}
+              balances={balances}
               reloadFeesHandler={reloadFees}
               getExplorerTxUrl={getExplorerTxUrl}
             />
@@ -75,7 +75,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [assetsWB, getExplorerTxUrl, intl, reloadFees]
+    [balances, getExplorerTxUrl, intl, reloadFees]
   )
 
   return FP.pipe(
