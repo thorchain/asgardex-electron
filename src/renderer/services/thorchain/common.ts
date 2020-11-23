@@ -1,7 +1,6 @@
 import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import { Client } from '@xchainjs/xchain-thorchain'
 import { right, left } from 'fp-ts/lib/Either'
-// import { left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -12,7 +11,7 @@ import { network$ } from '../app/service'
 import { getClient } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
-import { Client$, ThorchainClientState } from './types'
+import { Client$, ClientState } from './types'
 
 /**
  * Thorchain network depending on selected `Network`
@@ -36,8 +35,8 @@ const thorchainNetwork$: Observable<ClientNetwork> = network$.pipe(
 const clientState$ = Rx.combineLatest([keystoreService.keystore$, thorchainNetwork$]).pipe(
   mergeMap(
     ([keystore, network]) =>
-      new Observable((observer: Observer<ThorchainClientState>) => {
-        const client: ThorchainClientState = FP.pipe(
+      new Observable((observer: Observer<ClientState>) => {
+        const client: ClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
@@ -45,9 +44,9 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, thorchainNetwo
                 network: network,
                 phrase
               })
-              return O.some(right(client)) as ThorchainClientState
+              return O.some(right(client)) as ClientState
             } catch (error) {
-              return O.some(left(error)) as ThorchainClientState
+              return O.some(left(error)) as ClientState
             }
           })
         )
