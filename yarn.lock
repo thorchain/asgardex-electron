@@ -4282,6 +4282,18 @@
     hdkey "^2.0.1"
     uuid "^8.1.0"
 
+"@xchainjs/xchain-crypto@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-crypto/-/xchain-crypto-0.2.2.tgz#bb567a2525ab7bd8b28512af653360257ed6cca4"
+  integrity sha512-hZmNsXRkoXyvS6Bo9Wm1Spj+dHUA1hKqMVReU6cGeyp2vxDGkgdGxWofOPMvugDWeWlI2LUgYRre9KaQe2JOtw==
+  dependencies:
+    bech32 "^1.1.4"
+    bip39 "^3.0.2"
+    crypto-js "^4.0.0"
+    foundry-primitives "^0.2.1"
+    hdkey "^2.0.1"
+    uuid "^8.1.0"
+
 "@xchainjs/xchain-thorchain@^0.4.2":
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.4.2.tgz#1c4d7db146f0afe0f9b279d822c2435d8300cb86"

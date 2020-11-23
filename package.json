@@ -63,7 +63,7 @@
     "@xchainjs/xchain-bitcoin": "^0.5.1",
     "@xchainjs/xchain-client": "^0.1.0",
     "@xchainjs/xchain-cosmos": "^0.4.2",
-    "@xchainjs/xchain-crypto": "^0.2.1",
+    "@xchainjs/xchain-crypto": "^0.2.2",
     "@xchainjs/xchain-thorchain": "^0.4.2",
     "@xchainjs/xchain-util": "^0.1.0",
     "antd": "^4.8.4",
