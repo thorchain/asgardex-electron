@@ -1,5 +1,5 @@
 import { Keystore } from '@xchainjs/xchain-crypto'
-import { PubKeyEd25519 } from '@xchainjs/xchain-crypto/lib/ed25519'
+import { PubKeyEd25519 } from '@xchainjs/xchain-crypto/'
 
 import { ApiLang, ApiKeystore, ApiUrl } from '../api/types'
 import { Locale } from '../i18n/types'
