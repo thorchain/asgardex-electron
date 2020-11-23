@@ -6,7 +6,7 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeeLD, Memo } from '../chain/types'
-import { ClientState } from '../types'
+import { ClientState } from '../clients/types'
 import { TxsPageLD, TxLD, LoadTxsProps } from '../wallet/types'
 
 export type BitcoinClientState = ClientState<BitcoinClient>

@@ -1,18 +1,18 @@
-import { Client, Network as BinanceNetwork, Address } from '@xchainjs/xchain-binance'
+import { Client, Network as BinanceNetwork } from '@xchainjs/xchain-binance'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators'
+import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
-import { eqOString } from '../../helpers/fp/eq'
 import { triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
-import { GetExplorerTxUrl } from '../clients/types'
-import { ClientStateForViews } from '../types'
-import { getClient, getClientStateForViews } from '../utils'
-import { keystoreService } from '../wallet/common'
+import * as C from '../clients'
+import { Address$, ExplorerUrl$, GetExplorerTxUrl$ } from '../clients/types'
+import { ClientStateForViews } from '../clients/types'
+import { getClient, getClientStateForViews } from '../clients/utils'
+import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { BinanceClientState, BinanceClientState$, Client$ } from './types'
 
@@ -64,32 +64,18 @@ const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(map(
 
 /**
  * Current `Address` depending on selected network
- *
- * If a client is not available (e.g. by removing keystore), it returns `None`
- *
  */
-const address$: Observable<O.Option<Address>> = client$.pipe(
-  map(FP.pipe(O.chain((client) => FP.pipe(client.getAddress(), O.fromNullable)))),
-  distinctUntilChanged(eqOString.equals),
-  shareReplay(1)
-)
+const address$: Address$ = C.address$(client$)
 
 /**
  * Explorer url depending on selected network
- *
- * If a client is not available (e.g. by removing keystore), it returns `None`
- *
  */
-const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
-  map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
-  distinctUntilChanged(eqOString.equals),
-  shareReplay(1)
-)
+const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
 
-const getExplorerTxUrl$: Observable<O.Option<GetExplorerTxUrl>> = client$.pipe(
-  map(FP.pipe(O.map((client) => client.getExplorerTxUrl))),
-  shareReplay(1)
-)
+/**
+ * Explorer url depending on selected network
+ */
+const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
 
 // `TriggerStream` to reload `Balances`
 const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()

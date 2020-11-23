@@ -30,7 +30,7 @@ const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-const assetsWB$: BalancesLD = Rx.combineLatest([reloadBalances$.pipe(debounceTime(300)), client$]).pipe(
+const balances$: BalancesLD = Rx.combineLatest([reloadBalances$.pipe(debounceTime(300)), client$]).pipe(
   mergeMap(([_, client]) => {
     return FP.pipe(
       client,
@@ -46,4 +46,4 @@ const assetsWB$: BalancesLD = Rx.combineLatest([reloadBalances$.pipe(debounceTim
   shareReplay(1)
 )
 
-export { loadBalances$, assetsWB$, reloadBalances }
+export { loadBalances$, balances$, reloadBalances }

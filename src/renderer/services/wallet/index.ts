@@ -1,5 +1,6 @@
 import { reloadBalances, reloadBalances$, balancesState$, assetsWBChains$ } from './balances'
-import { keystoreService, removeKeystore, setSelectedAsset, selectedAsset$ } from './common'
+import { setSelectedAsset, selectedAsset$ } from './common'
+import { keystoreService, removeKeystore } from './keystore'
 import { txs$, loadTxs, explorerUrl$, getExplorerTxUrl$, resetTxsPage } from './transaction'
 
 /**

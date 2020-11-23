@@ -1,7 +1,7 @@
 import { none, some } from 'fp-ts/lib/Option'
 import { tap } from 'rxjs/operators'
 
-import { removeKeystore, keystoreService } from './common'
+import { removeKeystore, keystoreService } from './keystore'
 
 jest.mock('electron', () => ({ ipcRenderer: { send: jest.fn() } }))
 

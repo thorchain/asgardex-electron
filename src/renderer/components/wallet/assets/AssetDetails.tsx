@@ -9,7 +9,7 @@ import { useHistory } from 'react-router-dom'
 
 import { emptyFunc } from '../../../helpers/funcHelper'
 import * as walletRoutes from '../../../routes/wallet'
-import { GetExplorerTxUrl } from '../../../services/clients/types'
+import { GetExplorerTxUrl } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import { TxsPageRD, LoadTxsHandler, NonEmptyBalances } from '../../../services/wallet/types'
