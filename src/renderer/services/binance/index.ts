@@ -4,7 +4,7 @@ import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 import { subscribeTransfers, miniTickers$, wsTransfer$ } from './ws'
 
-const { txs$, pushTx, resetTx, txRD$, sendStakeTx, txWithState$ } = createTransactionService(client$, wsTransfer$)
+const { txs$, pushTx, resetTx, txRD$, sendStakeTx } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService(client$)
 
 export {
@@ -22,7 +22,6 @@ export {
   pushTx,
   resetTx,
   sendStakeTx,
-  txWithState$,
   txRD$,
   reloadFees,
   fees$
