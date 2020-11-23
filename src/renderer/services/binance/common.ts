@@ -14,7 +14,7 @@ import { ClientStateForViews } from '../clients/types'
 import { getClient, getClientStateForViews } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
-import { BinanceClientState, BinanceClientState$, Client$ } from './types'
+import { ClientState, ClientState$, Client$ } from './types'
 
 /**
  * Binance network depending on `Network`
@@ -34,23 +34,23 @@ const binanceNetwork$: Observable<BinanceNetwork> = network$.pipe(
  * By the other hand: Whenever a phrase has been removed, the client is set to `none`
  * A BinanceClient will never be created as long as no phrase is available
  */
-const clientState$: BinanceClientState$ = Rx.combineLatest([keystoreService.keystore$, binanceNetwork$]).pipe(
+const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, binanceNetwork$]).pipe(
   mergeMap(
     ([keystore, binanceNetwork]) =>
-      new Observable((observer: Observer<BinanceClientState>) => {
-        const client: BinanceClientState = FP.pipe(
+      new Observable((observer: Observer<ClientState>) => {
+        const client: ClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
               const client = new Client({ phrase, network: binanceNetwork })
-              return O.some(right(client)) as BinanceClientState
+              return O.some(right(client)) as ClientState
             } catch (error) {
               return O.some(left(error))
             }
           })
         )
         observer.next(client)
-      }) as Observable<BinanceClientState>
+      }) as Observable<ClientState>
   )
 )
 

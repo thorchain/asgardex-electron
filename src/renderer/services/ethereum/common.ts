@@ -11,7 +11,7 @@ import { Address$ } from '../clients'
 import { getClient } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
-import { Client$, EthereumClientState } from './types'
+import { Client$, ClientState } from './types'
 
 /**
  * Binance network depending on `Network`
@@ -34,20 +34,20 @@ const ethereumNetwork$: Observable<EthereumNetwork> = network$.pipe(
 const clientState$ = Rx.combineLatest([keystoreService.keystore$, ethereumNetwork$]).pipe(
   mergeMap(
     ([keystore, network]) =>
-      new Observable((observer: Observer<EthereumClientState>) => {
-        const client: EthereumClientState = FP.pipe(
+      new Observable((observer: Observer<ClientState>) => {
+        const client: ClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
               const client = new EthereumClient(network, phrase)
-              return O.some(right(client)) as EthereumClientState
+              return O.some(right(client)) as ClientState
             } catch (error) {
               return O.some(left(error))
             }
           })
         )
         observer.next(client)
-      }) as Observable<EthereumClientState>
+      }) as Observable<ClientState>
   )
 )
 

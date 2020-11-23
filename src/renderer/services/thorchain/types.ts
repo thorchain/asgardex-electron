@@ -1,10 +1,8 @@
 import { Client } from '@xchainjs/xchain-thorchain'
-import * as O from 'fp-ts/lib/Option'
-import * as Rx from 'rxjs'
 
-import { ClientState } from '../clients'
+import * as C from '../clients'
 
-export type Client$ = Rx.Observable<O.Option<Client>>
+export type Client$ = C.Client$<Client>
 
-export type ThorchainClientState = ClientState<Client>
-export type ThorchainClientState$ = Rx.Observable<ClientState<Client>>
+export type ClientState = C.ClientState<Client>
+export type ClientState$ = C.ClientState$<Client>

@@ -15,7 +15,7 @@ import { ClientStateForViews } from '../clients/types'
 import { getClientStateForViews, getClient } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
-import { BitcoinClientState } from './types'
+import { ClientState } from './types'
 
 /**
  * Bitcoin network depending on selected `Network`
@@ -43,8 +43,8 @@ const BLOCKCHAIR_MAINNET = 'https://api.blockchair.com/bitcoin'
 const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork$]).pipe(
   mergeMap(
     ([keystore, bitcoinNetwork]) =>
-      new Observable((observer: Observer<BitcoinClientState>) => {
-        const client: BitcoinClientState = FP.pipe(
+      new Observable((observer: Observer<ClientState>) => {
+        const client: ClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
@@ -67,8 +67,6 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork
 )
 
 const client$: Observable<O.Option<BitcoinClient>> = clientState$.pipe(map(getClient), shareReplay(1))
-
-export type Client$ = typeof client$
 
 /**
  * Helper stream to provide "ready-to-go" state of latest `BitcoinClient`, but w/o exposing the client
