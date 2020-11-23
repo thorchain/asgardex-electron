@@ -5,20 +5,20 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators'
+import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
 import { envOrDefault } from '../../helpers/envHelper'
-import { eqOString } from '../../helpers/fp/eq'
 import { network$ } from '../app/service'
-import { GetExplorerTxUrl } from '../clients/types'
-import { ClientStateForViews } from '../types'
-import { getClientStateForViews, getClient } from '../utils'
-import { keystoreService } from '../wallet/common'
+import * as C from '../clients'
+import { Address$, ExplorerUrl$, GetExplorerTxUrl$ } from '../clients/types'
+import { ClientStateForViews } from '../clients/types'
+import { getClientStateForViews, getClient } from '../clients/utils'
+import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { BitcoinClientState } from './types'
 
 /**
- * Binance network depending on selected `Network`
+ * Bitcoin network depending on selected `Network`
  */
 const bitcoinNetwork$: Observable<ClientNetwork> = network$.pipe(
   map((network) => {
@@ -55,18 +55,16 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork
                 nodeApiKey: BLOCKCHAIR_API_KEY,
                 phrase
               })
-              return O.some(right(client)) as BitcoinClientState
+              return O.some(right(client))
             } catch (error) {
               return O.some(left(error))
             }
           })
         )
         observer.next(client)
-      }) as Observable<BitcoinClientState>
+      })
   )
 )
-
-export type ClientState$ = typeof clientState$
 
 const client$: Observable<O.Option<BitcoinClient>> = clientState$.pipe(map(getClient), shareReplay(1))
 
@@ -80,33 +78,16 @@ const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(map(
 
 /**
  * Current `Address` depending on selected network
- *
- * If a client is not available (e.g. by removing keystore), it returns `None`
- *
  */
-const address$: Observable<O.Option<string>> = client$.pipe(
-  map(FP.pipe(O.chain((client) => O.some(client.getAddress())))),
-  distinctUntilChanged(eqOString.equals),
-  shareReplay(1)
-)
+const address$: Address$ = C.address$(client$)
 
 /**
  * Explorer url depending on selected network
- *
  */
-const explorerUrl$: Observable<O.Option<string>> = client$.pipe(
-  map(FP.pipe(O.map((client) => client.getExplorerUrl()))),
-  distinctUntilChanged(eqOString.equals),
-  shareReplay(1)
-)
-
+const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
 /**
  * Explorer url depending on selected network
- *
  */
-const getExplorerTxUrl$: Observable<O.Option<GetExplorerTxUrl>> = client$.pipe(
-  map(FP.pipe(O.map((client) => client.getExplorerTxUrl))),
-  shareReplay(1)
-)
+const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
 
 export { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$ }

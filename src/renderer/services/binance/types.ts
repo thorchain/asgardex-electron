@@ -6,8 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { FeesLD } from '../clients/types'
-import { ClientState } from '../types'
+import { FeesLD, ClientState } from '../clients'
 import { TxLD, TxsPageLD } from '../wallet/types'
 import { SendTxParams } from './transaction'
 

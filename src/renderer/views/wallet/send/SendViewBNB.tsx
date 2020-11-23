@@ -16,7 +16,7 @@ import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { getBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/binance/types'
-import { GetExplorerTxUrl } from '../../../services/clients/types'
+import { GetExplorerTxUrl } from '../../../services/clients'
 import { NonEmptyBalances, TxRD } from '../../../services/wallet/types'
 
 type Props = {

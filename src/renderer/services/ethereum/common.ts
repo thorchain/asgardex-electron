@@ -1,15 +1,15 @@
-import { Client as EthereumClient, Network as EthereumNetwork, Address } from '@thorchain/asgardex-ethereum'
+import { Client as EthereumClient, Network as EthereumNetwork } from '@thorchain/asgardex-ethereum'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, shareReplay, distinctUntilChanged } from 'rxjs/operators'
+import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
-import { eqOString } from '../../helpers/fp/eq'
 import { network$ } from '../app/service'
-import { getClient } from '../utils'
-import { keystoreService } from '../wallet/common'
+import { Address$ } from '../clients'
+import { getClient } from '../clients/utils'
+import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { Client$, EthereumClientState } from './types'
 
@@ -55,14 +55,10 @@ const client$: Client$ = clientState$.pipe(map(getClient), shareReplay(1))
 
 /**
  * Current `Address` depending on selected network
- *
- * If a client is not available (e.g. by removing keystore), it returns `None`
- *
  */
-const address$: Observable<O.Option<Address>> = client$.pipe(
-  map(FP.pipe(O.chain((client) => O.some(client.getAddress())))),
-  distinctUntilChanged(eqOString.equals),
-  shareReplay(1)
-)
+// TODO (@veado) Update if xchain-ethereum has been updated
+// https://github.com/xchainjs/xchainjs-lib/issues/105
+// const address$: Address$ = C.address$(client$)
+const address$: Address$ = Rx.of(O.none)
 
 export { client$, address$ }

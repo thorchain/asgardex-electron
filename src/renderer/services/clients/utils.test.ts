@@ -2,7 +2,7 @@ import { Client } from '@xchainjs/xchain-binance'
 import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 
-import { ClientState } from './types'
+import { ClientState } from '../clients/types'
 import { getClient, hasClient, getClientStateForViews } from './utils'
 
 // Mocking non default class exports
