@@ -1,7 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
 import midgard from '@thorchain/asgardex-midgard'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 import { pipe } from 'fp-ts/pipeable'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 import { retry, catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 
 import { isEnv } from '../../helpers/envHelper'
@@ -44,6 +47,8 @@ const byzantine$: ByzantineLD = Rx.combineLatest([network$, reloadByzantine$]).p
   switchMap(([network]) => nextByzantine$(network)),
   shareReplay(1)
 )
+
+const midgardApi$ = pipe(byzantine$, liveData.map(getMidgardDefaultApi), shareReplay(1))
 
 /**
  * Get `ThorchainLastblock` data from Midgard
@@ -135,6 +140,71 @@ const networkInfo$: NetworkInfoLD = reloadNetworkInfo$.pipe(
   shareReplay(1)
 )
 
+/**
+ * Used only until midgard provides real endpoint
+ * The only thing this mock is doing is "sending"
+ * 'ok' status for the 5th time
+ */
+const midgardApiWithGetTxInfoMock$ = pipe(
+  midgardApi$,
+  liveData.map((api) => ({
+    ...api,
+    getTxInfo: (_txId: string) => {
+      /**
+       * shareReplay stream is to have a single shared
+       * subscription to have increased interval value
+       */
+      const source$ = FP.pipe(Rx.interval(1000), RxOp.shareReplay(1))
+
+      return FP.pipe(
+        source$,
+        RxOp.map((times) => {
+          if (times < 5) {
+            return {
+              status: 'pending' as const
+            }
+          }
+          return {
+            status: 'ok' as const
+          }
+        })
+      )
+    }
+  }))
+)
+
+const getTransactionState$ = (txId: string): LiveData<Error, O.Option<string>> => {
+  return pipe(
+    midgardApiWithGetTxInfoMock$,
+    liveData.chain((api) =>
+      pipe(
+        api.getTxInfo(txId),
+        RxOp.tap(({ status }) => {
+          // @todo Change condition when remove mocks
+          if (status === 'pending') {
+            // throw an error for and handle it with retryWhen
+            // to automatically re-request data until status is "ok"
+            throw Error('')
+          }
+        }),
+        RxOp.retryWhen((errors) =>
+          FP.pipe(
+            errors,
+            // Set 1s delay to avoid DDoS to the Midgard
+            RxOp.delay(1000)
+          )
+        ),
+        // Take the only one completed result
+        RxOp.take(1),
+        RxOp.map(() => O.some(txId)),
+        startWith(O.none),
+        RxOp.map(RD.success),
+        RxOp.catchError(() => Rx.of(RD.failure(Error('Could load tx info'))))
+      )
+    )
+  )
+}
+
 export type MidgardService = {
   networkInfo$: NetworkInfoLD
   reloadNetworkInfo: () => void
@@ -143,6 +213,7 @@ export type MidgardService = {
   reloadThorchainLastblock: () => void
   setSelectedPoolAsset: () => void
   apiEndpoint$: ByzantineLD
+  getTransactionState$: (txId: string) => LiveData<Error, O.Option<string>>
 }
 /**
  * Service object with all "public" functions and observables we want to provide
@@ -158,5 +229,6 @@ export const service = {
   apiEndpoint$: byzantine$,
   reloadApiEndpoint: reloadByzantine,
   pools: createPoolsService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
-  stake: createStakeService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$)
+  stake: createStakeService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
+  getTransactionState$
 }

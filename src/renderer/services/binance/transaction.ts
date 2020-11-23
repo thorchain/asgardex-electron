@@ -1,15 +1,14 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { WS, Client, Address } from '@xchainjs/xchain-binance'
+import { Client, Address } from '@xchainjs/xchain-binance'
 import { Asset, AssetAmount, assetToBase } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import * as RxOp from 'rxjs/operators'
 import { map, catchError, startWith, switchMap } from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
 import { ApiError, ErrorId, TxsPageLD, LoadTxsProps, TxRD, TxLD } from '../wallet/types'
-import { TransactionService, Client$, TxWithStateLD } from './types'
+import { TransactionService, Client$ } from './types'
 
 /**
  * Observable to load txs from Binance API endpoint
@@ -106,27 +105,12 @@ const pushTx = (client$: Client$) => ({ to, amount, asset, memo }: SendTxParams)
 const sendStakeTx = (client$: Client$) => ({ to, amount, asset, memo }: SendTxParams): TxLD =>
   tx$({ client$, to, amount, asset, memo })
 
-const txWithState$ = (wsTransfer$: Rx.Observable<O.Option<WS.Transfer>>): TxWithStateLD =>
-  FP.pipe(
-    Rx.combineLatest([txRD$, wsTransfer$]),
-    RxOp.map(([tx, state]) =>
-      FP.pipe(
-        tx,
-        RD.map((txHash) => ({ txHash, state }))
-      )
-    )
-  )
-
-export const createTransactionService = (
-  client$: Client$,
-  wsTransfer$: Rx.Observable<O.Option<WS.Transfer>>
-): TransactionService => {
+export const createTransactionService = (client$: Client$): TransactionService => {
   return {
     txRD$,
     pushTx: pushTx(client$),
     sendStakeTx: sendStakeTx(client$),
     txs$: txs$(client$),
-    txWithState$: txWithState$(wsTransfer$),
     resetTx: () => setTxRD(RD.initial)
   }
 }

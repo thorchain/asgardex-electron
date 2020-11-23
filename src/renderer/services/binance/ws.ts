@@ -1,15 +1,10 @@
 import { WS } from '@xchainjs/xchain-binance'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { map, mergeMap, switchMap } from 'rxjs/operators'
-import * as RxOp from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
 import { envOrDefault } from '../../helpers/envHelper'
 import { network$ } from '../app/service'
-import { address$ } from '../bitcoin/common'
-import { reloadBalances } from './common'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
   process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
@@ -114,12 +109,4 @@ const miniTickers$ = ws$.pipe(
   )
 )
 
-const wsTransfer$ = FP.pipe(
-  address$,
-  switchMap(O.fold(() => Rx.EMPTY, subscribeTransfers)),
-  RxOp.map(O.some),
-  RxOp.tap(O.map(reloadBalances)),
-  RxOp.startWith(O.none)
-)
-
-export { subscribeTransfers, miniTickers$, wsTransfer$ }
+export { subscribeTransfers, miniTickers$ }
