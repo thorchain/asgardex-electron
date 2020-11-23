@@ -151,8 +151,8 @@ const midgardApiWithGetTxInfoMock$ = pipe(
     ...api,
     getTxInfo: (_txId: string) => {
       /**
-       * shareReplay stream hoh have a single shared subscription
-       * to have increased interval value
+       * shareReplay stream is to have a single shared
+       * subscription to have increased interval value
        */
       const source$ = FP.pipe(Rx.interval(1000), RxOp.shareReplay(1))
 

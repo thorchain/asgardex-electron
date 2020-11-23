@@ -39,7 +39,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     pools: { poolsState$, poolAddresses$, reloadPools, runeAsset$, selectedPricePool$ },
     getTransactionState$
   } = midgardService
-  const { explorerUrl$, /*txWithState$,*/ pushTx, resetTx, txRD$ } = useBinanceContext()
+  const { explorerUrl$, pushTx, resetTx, txRD$ } = useBinanceContext()
   const { balancesState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
