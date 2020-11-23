@@ -116,6 +116,8 @@ type WalletMessageKey =
   | 'wallet.errors.amount.shouldBeLessThanBalanceAndFee'
   | 'wallet.errors.fee.notCovered'
   | 'wallet.errors.invalidChain'
+  | 'wallet.add.device.error.title'
+  | 'wallet.add.device.error.description'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 

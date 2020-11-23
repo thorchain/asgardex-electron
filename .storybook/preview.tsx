@@ -15,6 +15,7 @@ import { getMessagesByLocale } from '../src/renderer/i18n'
 import * as mockApi from '../src/shared/mock/api'
 
 // Mock api provided by main renderer
+window.apiHDWallet = { ...mockApi.apiHDWallet }
 window.apiKeystore = { ...mockApi.apiKeystore }
 window.apiLang = {...mockApi.apiLang }
 window.apiUrl = {...mockApi.apiUrl }

@@ -9,6 +9,7 @@ import log from 'electron-log'
 import { warn } from 'electron-log'
 
 import { Locale } from '../shared/i18n/types'
+import { getBTCAddress } from './api/hdwallet'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist } from './api/keystore'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
@@ -120,6 +121,7 @@ const initIPC = () => {
   ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, () => removeKeystore())
   ipcMain.handle(IPCMessages.GET_KEYSTORE, () => getKeystore())
   ipcMain.handle(IPCMessages.KEYSTORE_EXIST, () => keystoreExist())
+  ipcMain.handle(IPCMessages.GET_BTC_ADDRESS, () => getBTCAddress())
 }
 
 const init = async () => {

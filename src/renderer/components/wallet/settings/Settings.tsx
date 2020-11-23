@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import { StopOutlined } from '@ant-design/icons'
-import { Row, Col, Button, List, Dropdown } from 'antd'
+import { Row, Col, Button, List, Dropdown, notification } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -40,6 +40,23 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     removeKeystore()
   }, [removeKeystore])
 
+  const addDevice = useCallback(
+    async (chainName: string) => {
+      console.log(chainName)
+      try {
+        const res = await window.apiHDWallet.getBTCAddress()
+        console.log('addDevice > btc address >', res)
+      } catch (err) {
+        console.log('addDevice > ', err)
+        notification.error({
+          message: intl.formatMessage({ id: 'wallet.add.device.error.title' }),
+          description: intl.formatMessage({ id: 'wallet.add.device.error.description' })
+        })
+      }
+    },
+    [intl]
+  )
+
   const accounts = useMemo(
     () =>
       pipe(
@@ -66,6 +83,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                         </Styled.AccountContent>
                       </Styled.ChainContent>
                     ))}
+                    <Button onClick={() => addDevice(item.chainName)}>ADD DEVICE</Button>
                   </Styled.ListItem>
                 )}
               />
@@ -74,7 +92,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [intl, userAccounts]
+    [addDevice, intl, userAccounts]
   )
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(
