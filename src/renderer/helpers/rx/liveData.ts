@@ -1,4 +1,4 @@
-import { remoteData, RemoteData, failure, isSuccess } from '@devexperts/remote-data-ts'
+import { remoteData, RemoteData, failure, isSuccess, mapLeft as mapLeftRd } from '@devexperts/remote-data-ts'
 import { instanceObservable } from '@devexperts/rx-utils/dist/observable.utils'
 import { getLiveDataM } from '@devexperts/utils/dist/adt/live-data.utils'
 import { FoldableValue2 } from '@devexperts/utils/dist/typeclasses/foldable-value/foldable-value'
@@ -12,6 +12,7 @@ import { Filterable2 } from 'fp-ts/lib/Filterable'
 import { MonadThrow2 } from 'fp-ts/lib/MonadThrow'
 import { pipeable } from 'fp-ts/lib/pipeable'
 import { Observable } from 'rxjs'
+import { map as mapStream } from 'rxjs/operators'
 
 export type LiveData<E, A> = Observable<RemoteData<E, A>>
 
@@ -40,7 +41,8 @@ export const liveData = {
   sequenceS: sequenceS(instanceLiveData),
   sequenceT: sequenceT(instanceLiveData),
   sequenceArray: array.sequence(instanceLiveData),
-  combine: coproductMapLeft(instanceLiveData)
+  combine: coproductMapLeft(instanceLiveData),
+  mapLeft: <L, V, A>(f: (l: L) => V) => (fla: LiveData<L, A>): LiveData<V, A> => fla.pipe(mapStream(mapLeftRd(f)))
 }
 
 export type LiveDataInnerType<T> = T extends LiveData<unknown, infer K> ? K : never
