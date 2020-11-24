@@ -20,15 +20,25 @@ import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { OnlineStatus, Network } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
+import { HDWalletInfo } from '../../services/wallet/types'
 import { UserAccountType } from '../../types/wallet'
 
 export const SettingsView: React.FC = (): JSX.Element => {
-  const { keystoreService } = useWalletContext()
+  const { keystoreService, hdWalletService } = useWalletContext()
   const { lock, removeKeystore } = keystoreService
+  const { connectBTC } = hdWalletService
   const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
+  const hdWalletState = useObservableState(hdWalletService.info$, O.none)
+  let hdWalletInfo: HDWalletInfo = { bitcoinAddress: '' }
+
+  if (O.isSome(hdWalletState)) {
+    if (O.isSome(hdWalletState.value)) {
+      hdWalletInfo = hdWalletState.value.value
+    }
+  }
 
   const binanceAddress$ = useMemo(
     () =>
@@ -90,13 +100,18 @@ export const SettingsView: React.FC = (): JSX.Element => {
                     name: 'Main',
                     address,
                     type: 'internal'
+                  },
+                  {
+                    name: 'Ledger',
+                    address: hdWalletInfo.bitcoinAddress,
+                    type: 'external'
                   }
-                ]
+                ].filter(({ address }) => !!address)
               } as UserAccountType)
           )
         )
       ),
-    [bitcoinContext.address$]
+    [bitcoinContext.address$, hdWalletInfo.bitcoinAddress]
   )
 
   const { service: midgardService } = useMidgardContext()
@@ -148,6 +163,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           lockWallet={lock}
           removeKeystore={removeKeystore}
           userAccounts={userAccounts}
+          connectBTC={connectBTC}
         />
       </Col>
     </Row>

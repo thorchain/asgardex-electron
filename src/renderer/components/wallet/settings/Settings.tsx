@@ -22,6 +22,7 @@ type Props = {
   userAccounts?: O.Option<UserAccountType[]>
   lockWallet?: () => void
   removeKeystore?: () => void
+  connectBTC?: () => Promise<void>
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -33,6 +34,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     userAccounts = O.none,
     lockWallet = () => {},
     removeKeystore = () => {},
+    connectBTC = async () => {},
     changeNetwork
   } = props
 
@@ -44,8 +46,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     async (chainName: string) => {
       console.log(chainName)
       try {
-        const res = await window.apiHDWallet.getBTCAddress()
-        console.log('addDevice > btc address >', res)
+        await connectBTC()
       } catch (err) {
         console.log('addDevice > ', err)
         notification.error({
@@ -54,7 +55,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         })
       }
     },
-    [intl]
+    [connectBTC, intl]
   )
 
   const accounts = useMemo(

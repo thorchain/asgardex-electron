@@ -8,9 +8,9 @@ import IPCMessages from '../ipc/messages'
 export const getBTCAddress = async () => {
   const transport = await TransportNodeHid.open('')
   const appBtc = new AppBtc(transport)
-  const address = appBtc.getWalletPublicKey("44'/0'/0'/0/0")
+  const info = await appBtc.getWalletPublicKey("44'/0'/0'/0/0")
   await transport.close()
-  return address
+  return info.bitcoinAddress
 }
 
 export const apiHDWallet: ApiHDWallet = {

@@ -33,6 +33,15 @@ export type KeystoreService = {
   validatePassword$: (password: string) => LiveData<Error, null>
 }
 
+export type HDWalletInfo = { bitcoinAddress: string }
+
+export type HDWalletState = O.Option<O.Option<HDWalletInfo>>
+
+export type HDWalletService = {
+  info$: Observable<HDWalletState>
+  connectBTC: () => Promise<void>
+}
+
 export type NonEmptyBalances = NonEmptyArray<Balance>
 
 export type BalancesLD = LiveData<ApiError, Balances>
