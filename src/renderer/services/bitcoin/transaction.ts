@@ -7,7 +7,7 @@ import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
 import { ApiError, TxsPageLD, ErrorId, TxRD, LoadTxsProps, TxLD } from '../wallet/types'
-import { Client$ } from './common'
+import { Client$ } from './types'
 import { SendTxParams, TransactionService } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
