@@ -1,10 +1,13 @@
+// Patched version of `sr25519.js` (`cosmos-client`) to run in web
+// see https://www.npmjs.com/package/cosmos-client#to-use-in-web
+
 async function load(module, imports) {
   if (typeof Response === 'function' && module instanceof Response) {
     if (typeof WebAssembly.instantiateStreaming === 'function') {
       try {
         return await WebAssembly.instantiateStreaming(module, imports)
       } catch (e) {
-        if (module.headers.get('Content-Type') != 'application/wasm') {
+        if (module.headers.get('Content-Type') !== 'application/wasm') {
           console.warn(
             '`WebAssembly.instantiateStreaming` failed because your server does not serve wasm with `application/wasm` MIME type. Falling back to `WebAssembly.instantiate` which is slower. Original error:\n',
             e

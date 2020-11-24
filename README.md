@@ -56,6 +56,12 @@ yarn prebuild
 yarn dev
 ```
 
+In case Node@12 might run into memory issues locally set `--max-old-space-size` as follow:
+
+```
+export NODE_OPTIONS="--max-old-space-size=4096"
+```
+
 ### How to auto-unlock a locked wallet while hot-reloading the app (for development only, disabled in production build)
 
 Use `REACT_APP_WALLET_PASSWORD` to run the app by replacing `password` with your own password
