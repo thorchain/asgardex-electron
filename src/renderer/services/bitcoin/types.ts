@@ -1,16 +1,18 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
+import { Client } from '@xchainjs/xchain-bitcoin'
 import { FeeRate, FeesWithRates } from '@xchainjs/xchain-bitcoin'
 import { BaseAmount } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeeLD, Memo } from '../chain/types'
-import { ClientState } from '../clients/types'
+import * as C from '../clients'
 import { TxsPageLD, TxLD, LoadTxsProps } from '../wallet/types'
 
-export type BitcoinClientState = ClientState<BitcoinClient>
-export type BitcoinClientState$ = Rx.Observable<ClientState<BitcoinClient>>
+export type Client$ = C.Client$<Client>
+
+export type ClientState = C.ClientState<Client>
+export type ClientState$ = C.ClientState$<Client>
 
 export type FeeRateRD = RD.RemoteData<Error, FeeRate>
 export type FeeRateLD = LiveData<Error, FeeRate>
@@ -18,7 +20,7 @@ export type FeeRateLD = LiveData<Error, FeeRate>
 export type FeesWithRatesRD = RD.RemoteData<Error, FeesWithRates>
 export type FeesWithRatesLD = LiveData<Error, FeesWithRates>
 
-export type AddressValidation = BitcoinClient['validateAddress']
+export type AddressValidation = Client['validateAddress']
 
 export type SendTxParams = {
   to: string // to address

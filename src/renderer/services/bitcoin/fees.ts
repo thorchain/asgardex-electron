@@ -8,7 +8,7 @@ import { catchError, map, mergeMap, shareReplay, startWith, switchMap, tap } fro
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { FeeLD, Memo } from '../chain/types'
-import { Client$ } from './common'
+import { Client$ } from './types'
 import { FeesService, FeeRateLD, FeeRateRD, FeesWithRatesLD } from './types'
 
 /**

@@ -6,11 +6,14 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { FeesLD, ClientState } from '../clients'
+import * as C from '../clients'
 import { TxLD, TxsPageLD } from '../wallet/types'
 import { SendTxParams } from './transaction'
 
-export type Client$ = Rx.Observable<O.Option<Client>>
+export type Client$ = C.Client$<Client>
+
+export type ClientState = C.ClientState<Client>
+export type ClientState$ = C.ClientState$<Client>
 
 export type BalancesRD = RD.RemoteData<Error, Balances>
 
@@ -20,9 +23,6 @@ export type AssetWithPrice = {
 }
 
 export type AssetsWithPrice = AssetWithPrice[]
-
-export type BinanceClientState = ClientState<Client>
-export type BinanceClientState$ = Rx.Observable<ClientState<Client>>
 
 export type TransferRD = RD.RemoteData<Error, Transfer>
 
@@ -47,7 +47,7 @@ export type TransferFees = {
 }
 
 export type FeesService = {
-  fees$: FeesLD
+  fees$: C.FeesLD
   reloadFees: () => void
 }
 

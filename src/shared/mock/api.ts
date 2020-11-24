@@ -1,4 +1,5 @@
 import { Keystore } from '@xchainjs/xchain-crypto'
+import { PubKeyEd25519 } from '@xchainjs/xchain-crypto/'
 
 import { ApiLang, ApiKeystore, ApiUrl } from '../api/types'
 import { Locale } from '../i18n/types'
@@ -10,6 +11,10 @@ export const apiKeystore: ApiKeystore = {
   get: () =>
     Promise.resolve({
       address: '',
+      publickeys: {
+        ed25519: new PubKeyEd25519(Buffer.from('empty')),
+        secp256k1: null
+      },
       crypto: {
         cipher: '',
         ciphertext: '',

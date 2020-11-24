@@ -17,6 +17,7 @@ import { ApiError } from '../wallet/types'
  * (3) Some(Left) -> An error while trying to instantiate a client
  */
 export type ClientState<C> = Option<E.Either<Error, C>>
+export type ClientState$<C> = Rx.Observable<ClientState<C>>
 
 // Something like `EitherT<Option>` Monad
 export const ClientStateM = getEitherM(option)
@@ -24,6 +25,8 @@ export const ClientStateM = getEitherM(option)
 export type ClientStateForViews = 'notready' | 'ready' | 'error'
 
 export type XChainClient$ = Rx.Observable<O.Option<XChainClient>>
+
+export type Client$<C> = Rx.Observable<O.Option<C>>
 
 export type FeesRD = RD.RemoteData<Error, Fees>
 export type FeesLD = LiveData<Error, Fees>

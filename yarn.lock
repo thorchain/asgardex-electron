@@ -4229,16 +4229,14 @@
     "@xchainjs/xchain-client" "^0.1.0"
     "@xchainjs/xchain-crypto" "^0.1.0"
 
-"@xchainjs/xchain-bitcoin@^0.4.4":
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.4.4.tgz#38bc186fa0c3821a90bb239fcd824f3730fe7490"
-  integrity sha512-wFJbL6mQ5+yZD9Lp2cZgsPdyXPryeBEDWWm85iib6FRHti/TDz9o3DTW0I259B1LONJNtNcTfR8MdHPPzHRM9Q==
+"@xchainjs/xchain-bitcoin@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.5.1.tgz#fffdc58736ac8ccd502e03944c7d89ac33e982bf"
+  integrity sha512-ZwzV38b1Qw4lPEkJKjjvrMIcaI54nbY4In7BxVYTtaZUIc47pworbZ8qOkR8KI2k14yqxbW9OD5qWdXN/97oEQ==
   dependencies:
     "@xchainjs/xchain-client" "^0.1.0"
-    "@xchainjs/xchain-crypto" "^0.1.0"
+    "@xchainjs/xchain-crypto" "^0.2.1"
     axios "^0.20.0"
-    axios-mock-adapter "^1.19.0"
-    bip39 "^3.0.2"
     bitcoinjs-lib "^5.2.0"
     wif "^2.0.6"
 
@@ -4248,6 +4246,17 @@
   integrity sha512-cah1HDu9CZIl0/+WXMPMTRmcsfeaKA/5DEQdglxY8Xv5PlUalKFZwbNp2kKt+isHEfOp8GtsbEcPbv8lSLc/mw==
   dependencies:
     "@xchainjs/xchain-util" "^0.1.0"
+
+"@xchainjs/xchain-cosmos@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.4.2.tgz#d2ef3c4ba09f366a6797d46263f3a71d3725037b"
+  integrity sha512-BLnukeJzgrLUmIbGeNrcF7mp/u1XYKoer5sXdHdcGx8BftyVfyV7iDQJPvem58Z4nHF9SF1Az/s49ix/ESs5Zw==
+  dependencies:
+    "@xchainjs/xchain-client" "^0.1.0"
+    "@xchainjs/xchain-crypto" "^0.2.1"
+    "@xchainjs/xchain-util" "^0.1.0"
+    axios "^0.21.0"
+    nock "^13.0.5"
 
 "@xchainjs/xchain-crypto@^0.1.0":
   version "0.1.0"
@@ -4260,6 +4269,41 @@
     foundry-primitives "^0.2.1"
     hdkey "^2.0.1"
     uuid "^8.1.0"
+
+"@xchainjs/xchain-crypto@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-crypto/-/xchain-crypto-0.2.1.tgz#ba8d0d1e958a5c0b259a5875e67a64154225bc32"
+  integrity sha512-P79t1naYndyKRkL5U4rpkuyvQsqO+RaRQonTMXrbI9Hx35ueIcbDfwsTBkdWgZ5mkf2qKsv3Zcoad8TAJ8zQWA==
+  dependencies:
+    bech32 "^1.1.4"
+    bip39 "^3.0.2"
+    crypto-js "^4.0.0"
+    foundry-primitives "^0.2.1"
+    hdkey "^2.0.1"
+    uuid "^8.1.0"
+
+"@xchainjs/xchain-crypto@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-crypto/-/xchain-crypto-0.2.2.tgz#bb567a2525ab7bd8b28512af653360257ed6cca4"
+  integrity sha512-hZmNsXRkoXyvS6Bo9Wm1Spj+dHUA1hKqMVReU6cGeyp2vxDGkgdGxWofOPMvugDWeWlI2LUgYRre9KaQe2JOtw==
+  dependencies:
+    bech32 "^1.1.4"
+    bip39 "^3.0.2"
+    crypto-js "^4.0.0"
+    foundry-primitives "^0.2.1"
+    hdkey "^2.0.1"
+    uuid "^8.1.0"
+
+"@xchainjs/xchain-thorchain@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.4.2.tgz#1c4d7db146f0afe0f9b279d822c2435d8300cb86"
+  integrity sha512-Bzog7Zqn9BHxbPU3NdNnipQJnm9qJVJNmdbESFQwbasGKO9HMeq6sjFA5XAKe51QLob32mzjHvyuremN/ks82g==
+  dependencies:
+    "@xchainjs/xchain-client" "^0.1.0"
+    "@xchainjs/xchain-cosmos" "^0.4.2"
+    "@xchainjs/xchain-crypto" "^0.2.1"
+    axios "^0.21.0"
+    nock "^13.0.5"
 
 "@xchainjs/xchain-util@^0.1.0":
   version "0.1.0"
@@ -4941,15 +4985,7 @@ axe-core@^4.0.2:
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.1.0.tgz#93d395e6262ecdde5cb52a5d06533d0a0c7bb4cd"
   integrity sha512-9atDIOTDLsWL+1GbBec6omflaT5Cxh88J0GtJtGfCVIXpI02rXHkju59W5mMqWa7eiC5OR168v3TK3kUKBW98g==
 
-axios-mock-adapter@^1.19.0:
-  version "1.19.0"
-  resolved "https://registry.yarnpkg.com/axios-mock-adapter/-/axios-mock-adapter-1.19.0.tgz#9d72e321a6c5418e1eff067aa99761a86c5188a4"
-  integrity sha512-D+0U4LNPr7WroiBDvWilzTMYPYTuZlbo6BI8YHZtj7wYQS8NkARlP9KBt8IWWHTQJ0q/8oZ0ClPBtKCCkx8cQg==
-  dependencies:
-    fast-deep-equal "^3.1.3"
-    is-buffer "^2.0.3"
-
-axios@0.21.0:
+axios@0.21.0, axios@^0.21.0:
   version "0.21.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.0.tgz#26df088803a2350dff2c27f96fef99fe49442aca"
   integrity sha512-fmkJBknJKoZwem3/IKSSLpkdNXZeBu5Q7GA/aRsr2btgrptmSCxi2oFjZHqGdK9DoTil9PIHlPIZw2EcRJXRvw==
@@ -7595,6 +7631,19 @@ cosmiconfig@^7.0.0:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
+cosmos-client@^0.39.2:
+  version "0.39.2"
+  resolved "https://registry.yarnpkg.com/cosmos-client/-/cosmos-client-0.39.2.tgz#332da4a8b5935c5309afb03f2fd6de808a4e35f0"
+  integrity sha512-ISGmjrQA5dpJfRi289fQQIrrhcb7R79fPmvWGG1iOjjIaT++h5nMxE8upmVTsxYPSJZxLEntbQgKeeZ3HaY8PA==
+  dependencies:
+    axios "^0.19.2"
+    bech32 "^1.1.3"
+    bip32 "^2.0.5"
+    bip39 "^3.0.2"
+    sr25519 "^0.2.0"
+    tiny-secp256k1 "^1.1.3"
+    tweetnacl "^1.0.1"
+
 create-ecdh@^4.0.0:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/create-ecdh/-/create-ecdh-4.0.3.tgz#c9111b6f33045c4697f144787f9254cdc77c45ff"
@@ -9665,7 +9714,7 @@ fast-deep-equal@^2.0.1:
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-2.0.1.tgz#7b05218ddf9667bf7f370bf7fdb2cb15fdd0aa49"
   integrity sha1-ewUhjd+WZ79/Nwv3/bLLFf3Qqkk=
 
-fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
+fast-deep-equal@^3.1.1:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz#3a7d56b559d6cbc3eb512325244e619a65c6c525"
   integrity sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==
@@ -11421,11 +11470,6 @@ is-buffer@^1.1.5:
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
   integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
 
-is-buffer@^2.0.3:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-2.0.5.tgz#ebc252e400d22ff8d77fa09888821a24a658c191"
-  integrity sha512-i2R6zNFDwgEHJyQUtJEk0XFi1i0dPFn/oqjK3/vPCcDeJvW5NQ83V8QbicfF1SupOaB0h8ntgBC2YiE7dfyctQ==
-
 is-buffer@~2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-2.0.4.tgz#3e572f23c8411a5cfd9557c849e3665e0b290623"
@@ -12915,6 +12959,11 @@ lodash.memoize@4.x, lodash.memoize@^4.1.2:
   resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
   integrity sha1-vMbEmkKihA7Zl/Mj6tpezRguC/4=
 
+lodash.set@^4.3.2:
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/lodash.set/-/lodash.set-4.3.2.tgz#d8757b1da807dde24816b0d6a84bea1a76230b23"
+  integrity sha1-2HV7HagH3eJIFrDWqEvqGnYjCyM=
+
 lodash.shuffle@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/lodash.shuffle/-/lodash.shuffle-4.2.0.tgz#145b5053cf875f6f5c2a33f48b6e9948c6ec7b4b"
@@ -13623,10 +13672,20 @@ no-case@^3.0.3:
     lower-case "^2.0.1"
     tslib "^1.10.0"
 
+nock@^13.0.5:
+  version "13.0.5"
+  resolved "https://registry.yarnpkg.com/nock/-/nock-13.0.5.tgz#a618c6f86372cb79fac04ca9a2d1e4baccdb2414"
+  integrity sha512-1ILZl0zfFm2G4TIeJFW0iHknxr2NyA+aGCMTjDVUsBY4CkMRispF1pfIYkTRdAR/3Bg+UzdEuK0B6HczMQZcCg==
+  dependencies:
+    debug "^4.1.0"
+    json-stringify-safe "^5.0.1"
+    lodash.set "^4.3.2"
+    propagate "^2.0.0"
+
 node-abi@^2.18.0, node-abi@^2.7.0:
-  version "2.18.0"
-  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.18.0.tgz#1f5486cfd7d38bd4f5392fa44a4ad4d9a0dffbf4"
-  integrity sha512-yi05ZoiuNNEbyT/xXfSySZE+yVnQW6fxPZuFbLyS1s6b5Kw3HzV2PHOM4XR+nsjzkHxByK+2Wg+yCQbe35l8dw==
+  version "2.19.3"
+  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.19.3.tgz#252f5dcab12dad1b5503b2d27eddd4733930282d"
+  integrity sha512-9xZrlyfvKhWme2EXFKQhZRp1yNWT/uI1luYPr3sFl+H4keYY4xR+1jO7mvTTijIsHf1M+QDe9uWuKeEpLInIlg==
   dependencies:
     semver "^5.4.1"
 
@@ -15471,6 +15530,11 @@ prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0,
     loose-envify "^1.4.0"
     object-assign "^4.1.1"
     react-is "^16.8.1"
+
+propagate@^2.0.0:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/propagate/-/propagate-2.0.1.tgz#40cdedab18085c792334e64f0ac17256d38f9a45"
+  integrity sha512-vGrhOavPSTz4QVNuBNdcNXePNdNMaO1xj9yBeH1ScQPjk/rhg9sSlCXPhMkFuaNNW/syTvYqsnbIJxMBfRbbag==
 
 property-information@^5.0.0:
   version "5.6.0"
@@ -17975,6 +18039,11 @@ sprintf-js@~1.0.2:
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
 
+sr25519@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/sr25519/-/sr25519-0.2.0.tgz#80e1632c1e7c07eae00cf5303dc804d87e76fb15"
+  integrity sha512-dRyJ09XOOl6tBRwQ3ZwkukyvhY3mHLC5k45aBBp+xjKEpjPPU4oL2JCQqisNhL96/gzwsI1PMxZ52svfQurNLw==
+
 sshpk@^1.7.0:
   version "1.16.1"
   resolved "https://registry.yarnpkg.com/sshpk/-/sshpk-1.16.1.tgz#fb661c0bef29b39db40769ee39fa70093d6f6877"
@@ -19187,7 +19256,7 @@ tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
   integrity sha1-WuaBd/GS1EViadEIr6k/+HQ/T2Q=
 
-tweetnacl@^1.0.3:
+tweetnacl@^1.0.1, tweetnacl@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.3.tgz#ac0af71680458d8a6378d0d0d050ab1407d35596"
   integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
