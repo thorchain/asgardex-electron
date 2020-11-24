@@ -1,3 +1,4 @@
-import { client$ } from './common'
+import { reloadBalances, balances$ } from './balances'
+import { client$, address$ } from './common'
 
-export { client$ }
+export { address$, client$, reloadBalances, balances$ }

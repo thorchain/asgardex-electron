@@ -10,9 +10,6 @@ import { map, mergeMap, shareReplay } from 'rxjs/operators'
 import { envOrDefault } from '../../helpers/envHelper'
 import { network$ } from '../app/service'
 import * as C from '../clients'
-import { Address$, ExplorerUrl$, GetExplorerTxUrl$ } from '../clients/types'
-import { ClientStateForViews } from '../clients/types'
-import { getClientStateForViews, getClient } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState } from './types'
@@ -66,26 +63,26 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork
   )
 )
 
-const client$: Observable<O.Option<BitcoinClient>> = clientState$.pipe(map(getClient), shareReplay(1))
+const client$: Observable<O.Option<BitcoinClient>> = clientState$.pipe(map(C.getClient), shareReplay(1))
 
 /**
  * Helper stream to provide "ready-to-go" state of latest `BitcoinClient`, but w/o exposing the client
  * It's needed by views only.
  */
-const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(map(getClientStateForViews))
+const clientViewState$: Observable<C.ClientStateForViews> = clientState$.pipe(map(C.getClientStateForViews))
 
 /**
- * Current `Address` depending on selected network
+ * BTC `Address`
  */
-const address$: Address$ = C.address$(client$)
+const address$: C.Address$ = C.address$(client$)
 
 /**
  * Explorer url depending on selected network
  */
-const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
+const explorerUrl$: C.ExplorerUrl$ = C.explorerUrl$(client$)
 /**
  * Explorer url depending on selected network
  */
-const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
+const getExplorerTxUrl$: C.GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
 
 export { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$ }

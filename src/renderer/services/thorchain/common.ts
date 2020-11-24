@@ -8,6 +8,7 @@ import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
 import { network$ } from '../app/service'
+import * as C from '../clients'
 import { getClient } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
@@ -57,4 +58,9 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, thorchainNetwo
 
 const client$: Client$ = clientState$.pipe(map(getClient), shareReplay(1))
 
-export { client$, clientState$ }
+/**
+ * `Address`
+ */
+const address$: C.Address$ = C.address$(client$)
+
+export { client$, clientState$, address$ }

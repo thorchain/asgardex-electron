@@ -45,7 +45,7 @@ export type ChainBalance = {
   balances: BalancesRD
 }
 
-export type AssetsWBChains = ChainBalance[]
+export type ChainBalances = ChainBalance[]
 
 export const BalanceMonoid = getMonoid<Balance>()
 

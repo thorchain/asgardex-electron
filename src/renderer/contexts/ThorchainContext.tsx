@@ -1,13 +1,17 @@
 import React, { createContext, useContext } from 'react'
 
-import { client$ } from '../services/thorchain'
+import { client$, balances$, reloadBalances } from '../services/thorchain'
 
 export type ThorchainContextValue = {
   client$: typeof client$
+  reloadBalances: typeof reloadBalances
+  balances$: typeof balances$
 }
 
 const initialContext: ThorchainContextValue = {
-  client$
+  client$,
+  reloadBalances,
+  balances$
 }
 
 const ThorchainContext = createContext<ThorchainContextValue | null>(null)

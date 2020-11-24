@@ -18,7 +18,7 @@ export const Table = styled(UITable)`
   }
 `
 
-export const HeaderRow = styled(A.Row)`
+export const HeaderRow = styled(A.Row).attrs({ align: 'middle' })`
   font-size: 14px;
   font-family: 'MainFontRegular';
   color: ${palette('gray', 2)};
@@ -58,6 +58,7 @@ export const ExpandIcon = styled(CaretRightOutlined)`
   svg {
     color: ${palette('primary', 0)};
   }
+  top: 10px; /* overridden */
 `
 
 export const HideIcon = styled(EyeInvisibleOutlined)`

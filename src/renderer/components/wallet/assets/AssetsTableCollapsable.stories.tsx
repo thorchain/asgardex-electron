@@ -5,30 +5,30 @@ import { storiesOf } from '@storybook/react'
 import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, assetToString, baseAmount } from '@xchainjs/xchain-util'
 
 import { getRunePricePool } from '../../../helpers/poolHelper'
-import { ApiError, ChainBalance, AssetsWBChains, ErrorId } from '../../../services/wallet/types'
+import { ApiError, ChainBalance, ChainBalances, ErrorId } from '../../../services/wallet/types'
 import { AssetsTableCollapsable } from './index'
 
-const assetsWBChainRUNE: ChainBalance = {
+const runeBalance: ChainBalance = {
   address: 'thor1766mazrxs5asuscepa227r6ekr657234f8p7nf',
   chain: 'THOR',
   balances: RD.initial
 }
 
-const assetsWBChainBNB: ChainBalance = {
+const bnbBalance: ChainBalance = {
   address: 'bnb1zzapwywxrxa2wyyrp93ls5l0a6ftxju5phmhu9',
   chain: 'BNB',
   balances: RD.initial
 }
 
-const assetsWBChainBTC: ChainBalance = {
+const btcBalance: ChainBalance = {
   address: 'bc11766mazrxs5asuscepa227r6ekr657234f8p7nf',
   chain: 'BTC',
   balances: RD.initial
 }
 
-const assetsWBChains: AssetsWBChains = [
+const chainBalances: ChainBalances = [
   {
-    ...assetsWBChainRUNE,
+    ...runeBalance,
     balances: RD.success([
       {
         amount: baseAmount('12200000000'),
@@ -37,7 +37,7 @@ const assetsWBChains: AssetsWBChains = [
     ])
   },
   {
-    ...assetsWBChainBTC,
+    ...btcBalance,
     balances: RD.success([
       {
         amount: baseAmount('1230000'),
@@ -46,7 +46,7 @@ const assetsWBChains: AssetsWBChains = [
     ])
   },
   {
-    ...assetsWBChainBNB,
+    ...bnbBalance,
     balances: RD.success([
       {
         amount: baseAmount('1000000'),
@@ -60,24 +60,24 @@ const assetsWBChains: AssetsWBChains = [
   }
 ]
 
-const assetsWBChainsLoading: AssetsWBChains = [
+const chainBalancesLoading: ChainBalances = [
   {
-    ...assetsWBChainRUNE,
+    ...runeBalance,
     balances: RD.pending
   },
   {
-    ...assetsWBChainBTC,
+    ...btcBalance,
     balances: RD.pending
   }
 ]
 const apiError: ApiError = { errorId: ErrorId.GET_BALANCES, msg: 'error message' }
-const assetsWBChainsError: AssetsWBChains = [
+const chainBalancesError: ChainBalances = [
   {
-    ...assetsWBChainRUNE,
+    ...runeBalance,
     balances: RD.failure({ ...apiError, msg: 'RUNE error' })
   },
   {
-    ...assetsWBChainBTC,
+    ...btcBalance,
     balances: RD.failure({ ...apiError, msg: 'BTC error' })
   }
 ]
@@ -88,7 +88,7 @@ const pricePool = getRunePricePool(AssetRune67C)
 storiesOf('Wallet/AssetsTableCollapsable', module).add('initial', () => {
   return (
     <AssetsTableCollapsable
-      assetsWBChains={assetsWBChains}
+      chainBalances={chainBalances}
       poolDetails={[]}
       selectAssetHandler={selectAssetHandler}
       pricePool={pricePool}
@@ -96,8 +96,8 @@ storiesOf('Wallet/AssetsTableCollapsable', module).add('initial', () => {
   )
 })
 storiesOf('Wallet/AssetsTableCollapsable', module).add('loading', () => {
-  return <AssetsTableCollapsable assetsWBChains={assetsWBChainsLoading} poolDetails={[]} pricePool={pricePool} />
+  return <AssetsTableCollapsable chainBalances={chainBalancesLoading} poolDetails={[]} pricePool={pricePool} />
 })
 storiesOf('Wallet/AssetsTableCollapsable', module).add('error', () => {
-  return <AssetsTableCollapsable assetsWBChains={assetsWBChainsError} poolDetails={[]} pricePool={pricePool} />
+  return <AssetsTableCollapsable chainBalances={chainBalancesError} poolDetails={[]} pricePool={pricePool} />
 })
