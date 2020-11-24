@@ -1,3 +1,5 @@
+import { Chain } from '@xchainjs/xchain-util'
+
 type AccountType = {
   name: string
   address: string
@@ -5,6 +7,6 @@ type AccountType = {
 }
 
 export type UserAccountType = {
-  chainName: string
+  chainName: Chain
   accounts: AccountType[]
 }

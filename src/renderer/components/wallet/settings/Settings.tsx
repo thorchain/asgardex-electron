@@ -22,7 +22,7 @@ type Props = {
   userAccounts?: O.Option<UserAccountType[]>
   lockWallet?: () => void
   removeKeystore?: () => void
-  connectBTC?: () => Promise<void>
+  connectBTC?: () => void
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -34,7 +34,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     userAccounts = O.none,
     lockWallet = () => {},
     removeKeystore = () => {},
-    connectBTC = async () => {},
+    connectBTC = () => {},
     changeNetwork
   } = props
 
@@ -45,9 +45,12 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   const addDevice = useCallback(
     async (chainName: string) => {
       try {
+        console.log(chainName)
         switch (chainName) {
-          case 'Bitcoin Chain':
+          case 'BTC':
             await connectBTC()
+            break
+          case 'BNB':
             break
           default:
             break

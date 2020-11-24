@@ -37,7 +37,7 @@ export type HDWalletInfo = { bitcoinAddress: string }
 
 export type HDWalletService = {
   info$: Observable<HDWalletInfo>
-  connectBTC: () => Promise<void>
+  connectBTC: () => void
 }
 
 export type NonEmptyBalances = NonEmptyArray<Balance>

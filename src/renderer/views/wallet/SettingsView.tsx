@@ -41,7 +41,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map(
             (address) =>
               ({
-                chainName: 'Binancechain',
+                chainName: 'BNB',
                 accounts: [
                   {
                     name: 'Main',
@@ -64,7 +64,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map(
             (address) =>
               ({
-                chainName: 'Ethereum chain',
+                chainName: 'ETH',
                 accounts: [
                   {
                     name: 'Main',
@@ -87,7 +87,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map(
             (address) =>
               ({
-                chainName: 'Bitcoin chain',
+                chainName: 'BTC',
                 accounts: [
                   {
                     name: 'Main',
