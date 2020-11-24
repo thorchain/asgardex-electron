@@ -35,10 +35,8 @@ export type KeystoreService = {
 
 export type HDWalletInfo = { bitcoinAddress: string }
 
-export type HDWalletState = O.Option<O.Option<HDWalletInfo>>
-
 export type HDWalletService = {
-  info$: Observable<HDWalletState>
+  info$: Observable<HDWalletInfo>
   connectBTC: () => Promise<void>
 }
 

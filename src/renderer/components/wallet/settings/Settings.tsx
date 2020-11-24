@@ -44,9 +44,14 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   const addDevice = useCallback(
     async (chainName: string) => {
-      console.log(chainName)
       try {
-        await connectBTC()
+        switch (chainName) {
+          case 'Bitcoin Chain':
+            await connectBTC()
+            break
+          default:
+            break
+        }
       } catch (err) {
         console.log('addDevice > ', err)
         notification.error({

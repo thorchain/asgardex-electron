@@ -20,7 +20,7 @@ import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { OnlineStatus, Network } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { HDWalletInfo } from '../../services/wallet/types'
+import { INITIAL_HDWALLET_STATE } from '../../services/wallet/const'
 import { UserAccountType } from '../../types/wallet'
 
 export const SettingsView: React.FC = (): JSX.Element => {
@@ -31,14 +31,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const binanceContext = useBinanceContext()
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
-  const hdWalletState = useObservableState(hdWalletService.info$, O.none)
-  let hdWalletInfo: HDWalletInfo = { bitcoinAddress: '' }
-
-  if (O.isSome(hdWalletState)) {
-    if (O.isSome(hdWalletState.value)) {
-      hdWalletInfo = hdWalletState.value.value
-    }
-  }
+  const hdWalletInfo = useObservableState(hdWalletService.info$, INITIAL_HDWALLET_STATE)
 
   const binanceAddress$ = useMemo(
     () =>
