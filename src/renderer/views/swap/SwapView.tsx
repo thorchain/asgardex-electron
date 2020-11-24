@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
 import { ErrorView } from '../../components/shared/error/'
-import { Swap } from '../../components/swap/Swap'
+import { Swap } from '../../components/swap'
 import { BackLink } from '../../components/uielements/backLink'
 import { Button } from '../../components/uielements/button'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -22,6 +22,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { getDefaultRuneAsset, isRuneAsset } from '../../helpers/assetHelper'
 import { rdFromOption } from '../../helpers/fpHelpers'
 import { getDefaultRunePricePool } from '../../helpers/poolHelper'
+import { liveData } from '../../helpers/rx/liveData'
 import { SwapRouteParams } from '../../routes/swap'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
@@ -35,9 +36,10 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, poolAddresses$, reloadPools, runeAsset$, selectedPricePool$ }
+    pools: { poolsState$, poolAddresses$, reloadPools, runeAsset$, selectedPricePool$ },
+    getTransactionState$
   } = midgardService
-  const { explorerUrl$, txWithState$, pushTx, resetTx } = useBinanceContext()
+  const { explorerUrl$, pushTx, resetTx, txRD$ } = useBinanceContext()
   const { balancesState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
@@ -47,6 +49,24 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const selectedPricePool = useObservableState(selectedPricePool$, getDefaultRunePricePool())
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
+
+  const txWithState$ = useMemo(
+    () =>
+      FP.pipe(
+        txRD$,
+        liveData.mapLeft((e) => Error(e.msg)),
+        liveData.chain((tx) =>
+          FP.pipe(
+            getTransactionState$(tx),
+            liveData.map((state) => ({
+              state,
+              txHash: tx
+            }))
+          )
+        )
+      ),
+    [txRD$, getTransactionState$]
+  )
 
   const [txWithState] = useObservableState(() => txWithState$, RD.initial)
 

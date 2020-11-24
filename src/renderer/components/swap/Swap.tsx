@@ -29,7 +29,7 @@ import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/binance/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
-import { ApiError, NonEmptyBalances } from '../../services/wallet/types'
+import { NonEmptyBalances } from '../../services/wallet/types'
 import { TxStatus, TxTypes } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 import { CurrencyInfo } from '../currency'
@@ -274,7 +274,7 @@ export const Swap = ({
         RD.fold(
           () => null,
           () => <Spin />,
-          (error: ApiError) => (
+          (error) => (
             <Modal
               closable
               visible
@@ -282,7 +282,7 @@ export const Swap = ({
               onOk={onSwapConfirmed}
               okText={intl.formatMessage({ id: 'common.retry' })}
               onCancel={resetTx}>
-              {error.msg}
+              {error.message}
             </Modal>
           ),
           (r) =>
