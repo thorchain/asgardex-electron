@@ -50,4 +50,4 @@ async function init(input) {
   return wasm
 }
 
-export default init
+exports.default = init

@@ -6,7 +6,6 @@ import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
-import { triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import * as C from '../clients'
 import { Address$, ExplorerUrl$, GetExplorerTxUrl$ } from '../clients/types'
@@ -77,16 +76,4 @@ const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
  */
 const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
 
-// `TriggerStream` to reload `Balances`
-const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
-
-export {
-  client$,
-  clientState$,
-  clientViewState$,
-  address$,
-  explorerUrl$,
-  getExplorerTxUrl$,
-  reloadBalances$,
-  reloadBalances
-}
+export { client$, clientState$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$ }

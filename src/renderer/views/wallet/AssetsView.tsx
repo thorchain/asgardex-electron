@@ -11,13 +11,13 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import {} from '../../helpers/assetHelper'
 import { getDefaultRunePricePool } from '../../helpers/poolHelper'
 import * as walletRoutes from '../../routes/wallet'
-import { AssetsWBChains } from '../../services/wallet/types'
+import { ChainBalances } from '../../services/wallet/types'
 
 export const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const { assetsWBChains$ } = useWalletContext()
+  const { chainBalances$ } = useWalletContext()
 
-  const assetsWBChains = useObservableState(assetsWBChains$, [] as AssetsWBChains)
+  const chainBalances = useObservableState(chainBalances$, [] as ChainBalances)
 
   const {
     service: {
@@ -38,7 +38,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
 
   return (
     <AssetsTableCollapsable
-      assetsWBChains={assetsWBChains}
+      chainBalances={chainBalances}
       pricePool={selectedPricePool}
       poolDetails={poolDetails}
       selectAssetHandler={selectAssetHandler}

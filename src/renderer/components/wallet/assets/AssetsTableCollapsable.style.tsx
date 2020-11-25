@@ -52,6 +52,10 @@ export const Collapse = styled(A.Collapse)`
   &.ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header {
     border-bottom: 1px solid ${palette('gray', 1)};
   }
+
+  &.ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
+    top: 10px;
+  }
 `
 
 export const ExpandIcon = styled(CaretRightOutlined)`

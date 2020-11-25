@@ -1,5 +1,5 @@
-import { balances$ } from './balances'
-import { client$, clientViewState$, address$, reloadBalances, explorerUrl$, getExplorerTxUrl$ } from './common'
+import { balances$, reloadBalances } from './balances'
+import { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 import { subscribeTransfers, miniTickers$ } from './ws'

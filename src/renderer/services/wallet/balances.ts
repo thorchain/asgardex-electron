@@ -16,16 +16,20 @@ import { liveData } from '../../helpers/rx/liveData'
 import { network$ } from '../app/service'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
+import { BalancesRD } from '../clients'
 import * as ETH from '../ethereum'
+import * as THOR from '../thorchain'
 import { selectedAsset$ } from './common'
 import { INITIAL_BALANCES_STATE } from './const'
-import { ChainBalance, BalancesRD, BalancesState, LoadBalancesHandler } from './types'
+import { ChainBalance, BalancesState, LoadBalancesHandler } from './types'
 import { sortBalances } from './util'
 
 export const reloadBalances = () => {
   BTC.reloadBalances()
   BNB.reloadBalances()
-  ETH.reloadBalances()
+  // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
+  // ETH.reloadBalances()
+  THOR.reloadBalances()
 }
 
 const reloadBalancesByChain = (chain: Chain) => {
@@ -37,8 +41,7 @@ const reloadBalancesByChain = (chain: Chain) => {
     case 'ETH':
       return ETH.reloadBalances
     case 'THOR':
-      // reload THOR balances - not available yet
-      return () => {}
+      return THOR.reloadBalances
     default:
       return () => {}
   }
@@ -51,7 +54,24 @@ export const reloadBalances$: Rx.Observable<O.Option<LoadBalancesHandler>> = sel
 /**
  * Transforms BNB data (address + `AssetsWB`) into `AssetsWBChain`
  */
-const bnbAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BNB.address$, BNB.balances$, network$]).pipe(
+const thorBalance$: Observable<ChainBalance> = Rx.combineLatest([THOR.address$, THOR.balances$]).pipe(
+  map(
+    ([address, balances]) =>
+      ({
+        chain: 'THOR',
+        address: FP.pipe(
+          address,
+          O.getOrElse(() => '')
+        ),
+        balances
+      } as ChainBalance)
+  )
+)
+
+/**
+ * Transforms BNB data (address + `AssetsWB`) into `AssetsWBChain`
+ */
+const bnbBalance$: Observable<ChainBalance> = Rx.combineLatest([BNB.address$, BNB.balances$, network$]).pipe(
   map(
     ([address, balances, network]) =>
       ({
@@ -71,16 +91,16 @@ const bnbAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BNB.addres
 /**
  * Transforms BTC data (address + `AssetWB`) into `AssetsWBChain`
  */
-const btcAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BTC.address$, BTC.balances$]).pipe(
+const btcBalance$: Observable<ChainBalance> = Rx.combineLatest([BTC.address$, BTC.balances$]).pipe(
   map(
-    ([address, assetsWB]) =>
+    ([address, balances]) =>
       ({
         chain: 'BTC',
         address: FP.pipe(
           address,
           O.getOrElse(() => '')
         ),
-        balances: assetsWB
+        balances
       } as ChainBalance)
   )
 )
@@ -89,7 +109,7 @@ const btcAssetsWBChain$: Observable<ChainBalance> = Rx.combineLatest([BTC.addres
  * Transforms ETH data (address + `AssetsWBChain`) into `AssetsWBChain`
  */
 // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
-const _ethBalancesChain$: Observable<ChainBalance> = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
+const _ethBalance$: Observable<ChainBalance> = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
   map(
     ([address, balancesRD]) =>
       ({
@@ -109,22 +129,24 @@ const _ethBalancesChain$: Observable<ChainBalance> = Rx.combineLatest([ETH.addre
 /**
  * List of `AssetsWBChain` for all available chains (order is important)
  */
-export const assetsWBChains$ = Rx.combineLatest([
-  btcAssetsWBChain$,
+export const chainBalances$ = Rx.combineLatest([
+  thorBalance$,
+  btcBalance$,
   /* //TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH */
   /* ethBalancesChain$ */
-  bnbAssetsWBChain$
+  bnbBalance$
 ])
 
 // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
 const _ethBalances$: Observable<BalancesRD> = ETH.balances$.pipe(liveData.map((asset) => [asset]))
 
 /**
- * Transform a list of AssetsWithBalanceRD
- * into a "single" state of `AssetsWithBalanceState`
- * Because we need to have loading / error / data combined in one "state" object in some cases
+ * Transform a list of BalancesLD
+ * into a "single" state of `BalancesState`
+ * to provide loading / error / data states in a single "state" object
  */
 export const balancesState$: Observable<BalancesState> = Rx.combineLatest([
+  THOR.balances$,
   BNB.balances$,
   BTC.balances$
   // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
