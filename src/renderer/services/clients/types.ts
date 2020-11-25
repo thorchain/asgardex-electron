@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, Balance, XChainClient } from '@xchainjs/xchain-client'
 import { TxsPage, Balances, Fees } from '@xchainjs/xchain-client'
+import { Asset } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
 import * as O from 'fp-ts/lib/Option'
@@ -9,7 +10,7 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import { ApiError } from '../wallet/types'
-
+import { TxLD } from '../wallet/types'
 /**
  * Three States:
  * (1) None -> no client has been instantiated
@@ -31,6 +32,13 @@ export type Client$<C> = Rx.Observable<O.Option<C>>
 export type FeesRD = RD.RemoteData<Error, Fees>
 export type FeesLD = LiveData<Error, Fees>
 
+export type LoadTxsParams = {
+  limit: number
+  offset: number
+}
+
+export type TxsParams = { asset: O.Option<Asset> } & LoadTxsParams
+
 export type TxsPageRD = RD.RemoteData<ApiError, TxsPage>
 export type TxsPageLD = LiveData<ApiError, TxsPage>
 
@@ -45,3 +53,11 @@ export type GetExplorerTxUrl = (txHash: string) => string
 export type GetExplorerTxUrl$ = Rx.Observable<O.Option<GetExplorerTxUrl>>
 
 export type Address$ = Rx.Observable<O.Option<Address>>
+
+export type TransactionService<SendTxParams> = {
+  txRD$: TxLD
+  pushTx: (_: SendTxParams) => Rx.Subscription
+  sendStakeTx: (_: SendTxParams) => TxLD
+  resetTx: () => void
+  txs$: (_: TxsParams) => TxsPageLD
+}

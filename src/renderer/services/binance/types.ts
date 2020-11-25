@@ -1,14 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Balances, Transfer, Client } from '@xchainjs/xchain-binance'
+import { Address } from '@xchainjs/xchain-binance'
 import { Asset, AssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
-import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
-import { TxLD, TxsPageLD } from '../wallet/types'
-import { SendTxParams } from './transaction'
 
 export type Client$ = C.Client$<Client>
 
@@ -60,10 +58,11 @@ export type TxWithState = { txHash: string; state: O.Option<string> }
 export type TxWithStateRD = RD.RemoteData<Error, TxWithState>
 export type TxWithStateLD = LiveData<Error, TxWithState>
 
-export type TransactionService = {
-  txRD$: TxLD
-  pushTx: (p: SendTxParams) => Rx.Subscription
-  sendStakeTx: (p: SendTxParams) => TxLD
-  resetTx: () => void
-  txs$: (asset: Asset, props: LoadTxsProps) => TxsPageLD
+export type SendTxParams = {
+  to: Address
+  amount: AssetAmount
+  asset: Asset
+  memo?: string
 }
+
+export type TransactionService = C.TransactionService<SendTxParams>

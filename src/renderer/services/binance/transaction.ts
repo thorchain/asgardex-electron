@@ -1,86 +1,15 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client, Address } from '@xchainjs/xchain-binance'
-import { Asset, AssetAmount, assetToBase } from '@xchainjs/xchain-util'
-import * as FP from 'fp-ts/lib/function'
+import { assetToBase } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { map, catchError, startWith, switchMap } from 'rxjs/operators'
+import { map, startWith, switchMap } from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
-import { ApiError, ErrorId, TxsPageLD, LoadTxsProps, TxRD, TxLD } from '../wallet/types'
-import { TransactionService, Client$ } from './types'
-
-/**
- * Observable to load txs from Binance API endpoint
- */
-const loadTxs$ = ({
-  client,
-  oAsset,
-  limit,
-  offset
-}: {
-  client: Client
-  oAsset: O.Option<Asset>
-  limit: number
-  offset: number
-}): TxsPageLD => {
-  const txAsset = FP.pipe(
-    oAsset,
-    O.fold(
-      () => undefined,
-      (asset) => asset.symbol
-    )
-  )
-
-  return Rx.from(
-    client.getTransactions({
-      asset: txAsset,
-      address: client.getAddress(),
-      limit,
-      offset
-    })
-  ).pipe(
-    map(RD.success),
-    catchError((error) =>
-      Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
-    ),
-    startWith(RD.pending)
-  )
-}
-
-/**
- * `Txs` of selected asset
- *
- * Data will be loaded by first subscription only
- * If a client is not available (e.g. by removing keystore), it returns an `initial` state
- */
-const txs$ = (client$: Client$) => (asset: Asset, { limit, offset }: LoadTxsProps): TxsPageLD =>
-  client$.pipe(
-    switchMap((oClient) =>
-      FP.pipe(
-        oClient,
-        O.fold(
-          () => Rx.of(RD.initial),
-          (client) =>
-            loadTxs$({
-              client,
-              oAsset: O.some(asset),
-              limit,
-              offset
-            })
-        )
-      )
-    )
-  )
+import * as C from '../clients'
+import { TxRD, TxLD } from '../wallet/types'
+import { Client$, SendTxParams, TransactionService } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
-
-export type SendTxParams = {
-  to: Address
-  amount: AssetAmount
-  asset: Asset
-  memo?: string
-}
 
 const tx$ = ({ client$, to, amount, asset, memo }: { client$: Client$ } & SendTxParams): TxLD =>
   client$.pipe(
@@ -110,7 +39,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
     txRD$,
     pushTx: pushTx(client$),
     sendStakeTx: sendStakeTx(client$),
-    txs$: txs$(client$),
+    txs$: C.txs$(client$),
     resetTx: () => setTxRD(RD.initial)
   }
 }
