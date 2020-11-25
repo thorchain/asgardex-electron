@@ -111,19 +111,22 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     [addressValidation, intl]
   )
 
+  // max amount for bnb
+  const maxAmount = useMemo(() => {
+    const maxBnbAmount = FP.pipe(
+      sequenceTOption(oFee, oBnbAmount),
+      O.fold(
+        // Set maxAmount to zero if we dont know anything about bnb and fee amounts
+        () => ZERO_BN,
+        ([fee, bnbAmount]) => bnbAmount.amount().minus(fee.amount())
+      ),
+      assetAmount
+    )
+    return isBnbAsset(balance.asset) ? maxBnbAmount : baseToAsset(balance.amount)
+  }, [oFee, oBnbAmount])
+
   const amountValidator = useCallback(
     async (_: unknown, value: BigNumber) => {
-      // max amount for bnb
-      const maxBnbAmount = FP.pipe(
-        sequenceTOption(oFee, oBnbAmount),
-        O.fold(
-          // Set maxAmount to zero if we dont know anything about bnb and fee amounts
-          () => ZERO_BN,
-          ([fee, bnbAmount]) => bnbAmount.amount().minus(fee.amount())
-        ),
-        assetAmount
-      )
-      const maxAmount = isBnbAsset(balance.asset) ? maxBnbAmount : baseToAsset(balance.amount)
       // error messages
       const errors = {
         msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
@@ -162,7 +165,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
               <>
                 {intl.formatMessage({ id: 'common.max' })}:{' '}
                 {formatAssetAmountCurrency({
-                  amount: baseToAsset(balance.amount),
+                  amount: maxAmount,
                   asset: balance.asset,
                   trimZeros: true
                 })}
