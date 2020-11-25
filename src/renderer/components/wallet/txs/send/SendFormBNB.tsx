@@ -123,7 +123,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
       assetAmount
     )
     return isBnbAsset(balance.asset) ? maxBnbAmount : baseToAsset(balance.amount)
-  }, [oFee, oBnbAmount])
+  }, [oFee, oBnbAmount, balance])
 
   const amountValidator = useCallback(
     async (_: unknown, value: BigNumber) => {
@@ -137,7 +137,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
       }
       return validateTxAmountInput({ input: value, maxAmount, errors })
     },
-    [balance, oFee, intl, oBnbAmount]
+    [balance, intl, maxAmount]
   )
 
   const onFinishHandler = useCallback(
