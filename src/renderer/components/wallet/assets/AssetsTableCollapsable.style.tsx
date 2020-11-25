@@ -18,7 +18,7 @@ export const Table = styled(UITable)`
   }
 `
 
-export const HeaderRow = styled(A.Row).attrs({ align: 'middle' })`
+export const HeaderRow = styled(A.Row)`
   font-size: 14px;
   font-family: 'MainFontRegular';
   color: ${palette('gray', 2)};
@@ -52,13 +52,16 @@ export const Collapse = styled(A.Collapse)`
   &.ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header {
     border-bottom: 1px solid ${palette('gray', 1)};
   }
+
+  &.ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
+    top: 10px;
+  }
 `
 
 export const ExpandIcon = styled(CaretRightOutlined)`
   svg {
     color: ${palette('primary', 0)};
   }
-  top: 10px; /* overridden */
 `
 
 export const HideIcon = styled(EyeInvisibleOutlined)`
