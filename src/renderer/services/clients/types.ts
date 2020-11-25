@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, XChainClient } from '@xchainjs/xchain-client'
+import { Address, Balance, XChainClient } from '@xchainjs/xchain-client'
 import { TxsPage, Balances, Fees } from '@xchainjs/xchain-client'
 import * as E from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
@@ -33,6 +33,8 @@ export type FeesLD = LiveData<Error, Fees>
 
 export type TxsPageRD = RD.RemoteData<ApiError, TxsPage>
 export type TxsPageLD = LiveData<ApiError, TxsPage>
+
+export type BalanceRD = RD.RemoteData<ApiError, Balance>
 
 export type BalancesRD = RD.RemoteData<ApiError, Balances>
 export type BalancesLD = LiveData<ApiError, Balances>

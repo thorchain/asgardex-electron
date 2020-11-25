@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balance, Balances, TxsPage } from '@xchainjs/xchain-client'
+import { Balance, TxsPage } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
@@ -7,6 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
+import { BalancesRD } from '../clients'
 
 export type Phrase = string
 
@@ -33,12 +34,6 @@ export type KeystoreService = {
   validatePassword$: (password: string) => LiveData<Error, null>
 }
 
-export type NonEmptyBalances = NonEmptyArray<Balance>
-
-export type BalancesLD = LiveData<ApiError, Balances>
-export type BalancesRD = RD.RemoteData<ApiError, Balances>
-export type BalanceRD = RD.RemoteData<ApiError, Balance>
-
 export type ChainBalance = {
   address: string
   chain: Chain
@@ -48,6 +43,8 @@ export type ChainBalance = {
 export type ChainBalances = ChainBalance[]
 
 export const BalanceMonoid = getMonoid<Balance>()
+
+export type NonEmptyBalances = NonEmptyArray<Balance>
 
 export type BalancesState = {
   balances: O.Option<NonEmptyBalances>

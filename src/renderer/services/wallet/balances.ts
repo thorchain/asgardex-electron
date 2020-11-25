@@ -16,11 +16,12 @@ import { liveData } from '../../helpers/rx/liveData'
 import { network$ } from '../app/service'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
+import { BalancesRD } from '../clients'
 import * as ETH from '../ethereum'
 import * as THOR from '../thorchain'
 import { selectedAsset$ } from './common'
 import { INITIAL_BALANCES_STATE } from './const'
-import { ChainBalance, BalancesRD, BalancesState, LoadBalancesHandler } from './types'
+import { ChainBalance, BalancesState, LoadBalancesHandler } from './types'
 import { sortBalances } from './util'
 
 export const reloadBalances = () => {
