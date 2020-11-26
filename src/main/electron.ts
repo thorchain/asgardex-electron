@@ -9,8 +9,8 @@ import log from 'electron-log'
 import { warn } from 'electron-log'
 
 import { Locale } from '../shared/i18n/types'
-import { getBTCAddress } from './api/hdwallet'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist } from './api/keystore'
+import { getBTCAddress } from './api/ledger'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
