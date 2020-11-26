@@ -13,6 +13,7 @@ import { Settings } from '../../components/wallet/settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
+import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -20,18 +21,18 @@ import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { OnlineStatus, Network } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { INITIAL_HDWALLET_STATE } from '../../services/wallet/const'
 import { UserAccountType } from '../../types/wallet'
 
 export const SettingsView: React.FC = (): JSX.Element => {
-  const { keystoreService, hdWalletService } = useWalletContext()
+  const { keystoreService } = useWalletContext()
   const { lock, removeKeystore } = keystoreService
-  const { connectBTC } = hdWalletService
   const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
-  const hdWalletInfo = useObservableState(hdWalletService.info$, INITIAL_HDWALLET_STATE)
+  const chainContext = useChainContext()
+  const { retrieveLedgerAddress } = chainContext
+  console.log('ledgerAddressRD$ >', bitcoinContext.ledgerAddressRD$)
 
   const binanceAddress$ = useMemo(
     () =>
@@ -93,18 +94,13 @@ export const SettingsView: React.FC = (): JSX.Element => {
                     name: 'Main',
                     address,
                     type: 'internal'
-                  },
-                  {
-                    name: 'Ledger',
-                    address: hdWalletInfo.bitcoinAddress,
-                    type: 'external'
                   }
-                ].filter(({ address }) => !!address)
+                ]
               } as UserAccountType)
           )
         )
       ),
-    [bitcoinContext.address$, hdWalletInfo.bitcoinAddress]
+    [bitcoinContext.address$]
   )
 
   const { service: midgardService } = useMidgardContext()
@@ -156,7 +152,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           lockWallet={lock}
           removeKeystore={removeKeystore}
           userAccounts={userAccounts}
-          connectBTC={connectBTC}
+          retrieveLedgerAddress={retrieveLedgerAddress}
         />
       </Col>
     </Row>

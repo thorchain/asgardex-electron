@@ -5,6 +5,7 @@ import { some } from 'fp-ts/lib/Option'
 
 import { BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
 import { Network } from '../../../services/app/types'
+import { LedgerGetAddressParams } from '../../../services/chain/types'
 import { Settings } from './index'
 
 storiesOf('Wallet/Settings', module).add('default', () => {
@@ -15,6 +16,7 @@ storiesOf('Wallet/Settings', module).add('default', () => {
       clientUrl={some(BNB_ADDRESS_TESTNET)}
       lockWallet={() => console.log('lock')}
       removeKeystore={() => console.log('removeKeystore')}
+      retrieveLedgerAddress={({ chain }: LedgerGetAddressParams) => console.log('retrieve ledger address ', chain)}
     />
   )
 })

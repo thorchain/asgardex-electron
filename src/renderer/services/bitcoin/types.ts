@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeeLD, Memo } from '../chain/types'
 import { ClientState } from '../clients/types'
-import { TxsPageLD, TxLD, LoadTxsProps } from '../wallet/types'
+import { TxsPageLD, TxLD, LoadTxsProps, LedgerAddressLD } from '../wallet/types'
 
 export type BitcoinClientState = ClientState<BitcoinClient>
 export type BitcoinClientState$ = Rx.Observable<ClientState<BitcoinClient>>
@@ -42,4 +42,9 @@ export type FeesService = {
   getPoolFeeRate: () => FeeRateRD
   reloadFees: () => void
   reloadStakeFee: () => void
+}
+
+export type LedgerService = {
+  ledgerAddressRD$: LedgerAddressLD
+  retrieveLedgerAddress: () => void
 }

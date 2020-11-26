@@ -1,6 +1,5 @@
 import { reloadBalances, reloadBalances$, balancesState$, assetsWBChains$ } from './balances'
 import { setSelectedAsset, selectedAsset$ } from './common'
-import { hdWalletService } from './hdwallet'
 import { keystoreService, removeKeystore } from './keystore'
 import { txs$, loadTxs, explorerUrl$, getExplorerTxUrl$, resetTxsPage } from './transaction'
 
@@ -20,6 +19,5 @@ export {
   reloadBalances,
   reloadBalances$,
   balancesState$,
-  assetsWBChains$,
-  hdWalletService
+  assetsWBChains$
 }

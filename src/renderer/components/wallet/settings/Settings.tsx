@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import { StopOutlined } from '@ant-design/icons'
+import { Chain } from '@xchainjs/xchain-util'
 import { Row, Col, Button, List, Dropdown, notification } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import * as O from 'fp-ts/lib/Option'
@@ -10,6 +11,7 @@ import { useIntl } from 'react-intl'
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
 import { Network } from '../../../services/app/types'
+import { LedgerGetAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { UserAccountType } from '../../../types/wallet'
 import * as Styled from './Settings.style'
@@ -22,7 +24,7 @@ type Props = {
   userAccounts?: O.Option<UserAccountType[]>
   lockWallet?: () => void
   removeKeystore?: () => void
-  connectBTC?: () => void
+  retrieveLedgerAddress: ({ chain }: LedgerGetAddressParams) => void
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -34,7 +36,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     userAccounts = O.none,
     lockWallet = () => {},
     removeKeystore = () => {},
-    connectBTC = () => {},
+    retrieveLedgerAddress,
     changeNetwork
   } = props
 
@@ -43,18 +45,9 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   }, [removeKeystore])
 
   const addDevice = useCallback(
-    async (chainName: string) => {
+    async (chainName: Chain) => {
       try {
-        console.log(chainName)
-        switch (chainName) {
-          case 'BTC':
-            await connectBTC()
-            break
-          case 'BNB':
-            break
-          default:
-            break
-        }
+        retrieveLedgerAddress({ chain: chainName })
       } catch (err) {
         console.log('addDevice > ', err)
         notification.error({
@@ -63,7 +56,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         })
       }
     },
-    [connectBTC, intl]
+    [intl, retrieveLedgerAddress]
   )
 
   const accounts = useMemo(

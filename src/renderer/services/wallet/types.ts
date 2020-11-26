@@ -32,14 +32,6 @@ export type KeystoreService = {
    */
   validatePassword$: (password: string) => LiveData<Error, null>
 }
-
-export type HDWalletInfo = { bitcoinAddress: string }
-
-export type HDWalletService = {
-  info$: Observable<HDWalletInfo>
-  connectBTC: () => void
-}
-
 export type NonEmptyBalances = NonEmptyArray<Balance>
 
 export type BalancesLD = LiveData<ApiError, Balances>
@@ -93,3 +85,6 @@ export type NonEmptyApiErrors = NonEmptyArray<ApiError>
 /* RD/LD for sending transactions on different chains */
 export type TxRD = RD.RemoteData<ApiError, string>
 export type TxLD = LiveData<ApiError, string>
+
+export type LedgerAddressRD = RD.RemoteData<Error, string>
+export type LedgerAddressLD = LiveData<Error, string>
