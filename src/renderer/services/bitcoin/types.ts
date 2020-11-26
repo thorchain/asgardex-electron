@@ -2,12 +2,10 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Client } from '@xchainjs/xchain-bitcoin'
 import { FeeRate, FeesWithRates } from '@xchainjs/xchain-bitcoin'
 import { BaseAmount } from '@xchainjs/xchain-util'
-import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeeLD, Memo } from '../chain/types'
 import * as C from '../clients'
-import { TxsPageLD, TxLD, LoadTxsProps } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -29,14 +27,7 @@ export type SendTxParams = {
   memo?: string
 }
 
-export type TransactionService = {
-  txRD$: TxLD
-  pushTx: (_: SendTxParams) => Rx.Subscription
-  sendStakeTx: (p: SendTxParams) => TxLD
-  resetTx: () => void
-  txs$: (_: LoadTxsProps) => TxsPageLD
-}
-
+export type TransactionService = C.TransactionService<SendTxParams>
 export type FeesService = {
   fees$: FeesWithRatesLD
   poolFee$: (memo: Memo) => FeeLD

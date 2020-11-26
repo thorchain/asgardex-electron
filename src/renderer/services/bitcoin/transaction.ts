@@ -1,14 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
-import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
-import { ApiError, TxsPageLD, ErrorId, TxRD, LoadTxsProps, TxLD } from '../wallet/types'
-import { Client$ } from './types'
-import { SendTxParams, TransactionService } from './types'
+import * as C from '../clients'
+import { ApiError, ErrorId, TxRD, TxLD } from '../wallet/types'
+import { SendTxParams, TransactionService, Client$ } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
@@ -34,47 +32,11 @@ const pushTx = (client$: Client$) => ({ to, amount, feeRate, memo }: SendTxParam
 const sendStakeTx = (client$: Client$) => ({ to, amount, feeRate, memo }: SendTxParams) =>
   tx$({ client$, to, amount, feeRate, memo })
 
-/**
- * Observable to load txs
- * If client is not available, it returns an `initial` state
- */
-const loadTxs$ = ({ client, limit, offset }: { client: BitcoinClient; limit: number; offset: number }): TxsPageLD => {
-  const address = client.getAddress()
-  return Rx.from(client.getTransactions({ address, limit, offset })).pipe(
-    map(RD.success),
-    catchError((error) =>
-      Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
-    ),
-    startWith(RD.pending)
-  )
-}
-
-/**
- * `Txs` history for BTC
- */
-const txs$ = (client$: Client$) => ({ limit, offset }: LoadTxsProps): TxsPageLD =>
-  client$.pipe(
-    switchMap((oClient) =>
-      FP.pipe(
-        oClient,
-        O.fold(
-          () => Rx.of(RD.initial),
-          (client) =>
-            loadTxs$({
-              client,
-              limit,
-              offset
-            })
-        )
-      )
-    )
-  )
-
 const createTransactionService = (client$: Client$): TransactionService => ({
   txRD$,
   pushTx: pushTx(client$),
   sendStakeTx: sendStakeTx(client$),
-  txs$: txs$(client$),
+  txs$: C.txs$(client$),
   resetTx: () => setTxRD(RD.initial)
 })
 

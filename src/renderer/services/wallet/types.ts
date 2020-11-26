@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balance, TxsPage } from '@xchainjs/xchain-client'
+import { Balance } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
@@ -7,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { BalancesRD } from '../clients'
+import { BalancesRD, LoadTxsParams } from '../clients'
 
 export type Phrase = string
 
@@ -52,15 +52,7 @@ export type BalancesState = {
   loading: boolean
 }
 
-export type TxsPageRD = RD.RemoteData<ApiError, TxsPage>
-export type TxsPageLD = LiveData<ApiError, TxsPage>
-
-export type LoadTxsProps = {
-  limit: number
-  offset: number
-}
-
-export type LoadTxsHandler = (props: LoadTxsProps) => void
+export type LoadTxsHandler = (props: LoadTxsParams) => void
 export type ResetTxsPageHandler = () => void
 
 export type LoadBalancesHandler = () => void

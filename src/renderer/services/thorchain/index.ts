@@ -1,4 +1,7 @@
 import { reloadBalances, balances$ } from './balances'
 import { client$, address$ } from './common'
+import { createTransactionService } from './transaction'
 
-export { address$, client$, reloadBalances, balances$ }
+const { txs$ } = createTransactionService(client$)
+
+export { address$, client$, reloadBalances, balances$, txs$ }
