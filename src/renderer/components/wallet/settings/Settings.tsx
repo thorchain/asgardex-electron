@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import { StopOutlined } from '@ant-design/icons'
 import { Chain } from '@xchainjs/xchain-util'
-import { Row, Col, Button, List, Dropdown, notification } from 'antd'
+import { Row, Col, Button, List, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -45,18 +45,10 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   }, [removeKeystore])
 
   const addDevice = useCallback(
-    async (chainName: Chain) => {
-      try {
-        retrieveLedgerAddress({ chain: chainName })
-      } catch (err) {
-        console.log('addDevice > ', err)
-        notification.error({
-          message: intl.formatMessage({ id: 'wallet.add.device.error.title' }),
-          description: intl.formatMessage({ id: 'wallet.add.device.error.description' })
-        })
-      }
+    (chainName: Chain) => {
+      retrieveLedgerAddress({ chain: chainName })
     },
-    [intl, retrieveLedgerAddress]
+    [retrieveLedgerAddress]
   )
 
   const accounts = useMemo(
