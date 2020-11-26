@@ -33,7 +33,7 @@ const fee = O.some(TRANSFER_FEES.single)
 
 const addressValidation: AddressValidation = (_) => true
 
-const onSubmitHandler = ({ recipient, amount, asset = AssetBNB, memo }: SendTxParams) =>
+const onSubmitHandler = ({ recipient, amount, asset, memo }: SendTxParams) =>
   console.log(
     `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
       asset
