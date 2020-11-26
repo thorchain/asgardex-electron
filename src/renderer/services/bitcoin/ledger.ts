@@ -7,7 +7,7 @@ import { observableState } from '../../helpers/stateHelper'
 import { LedgerAddressRD } from '../wallet/types'
 import { LedgerService } from './types'
 
-const { get$: ledgerAddressRD$, set: setLedgerAddressRD } = observableState<LedgerAddressRD>(RD.initial)
+const { get$: ledgerAddress$, set: setLedgerAddressRD } = observableState<LedgerAddressRD>(RD.initial)
 
 const retrieveLedgerAddress = () =>
   FP.pipe(
@@ -18,7 +18,7 @@ const retrieveLedgerAddress = () =>
   ).subscribe(setLedgerAddressRD)
 
 const createLedgerService = (): LedgerService => ({
-  ledgerAddressRD$,
+  ledgerAddress$,
   retrieveLedgerAddress
 })
 

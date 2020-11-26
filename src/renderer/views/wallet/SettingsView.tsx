@@ -1,11 +1,12 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Col, Row } from 'antd'
+import { Col, notification, Row } from 'antd'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxO from 'rxjs/operators'
 
@@ -24,6 +25,7 @@ import { DEFAULT_NETWORK } from '../../services/const'
 import { UserAccountType } from '../../types/wallet'
 
 export const SettingsView: React.FC = (): JSX.Element => {
+  const intl = useIntl()
   const { keystoreService } = useWalletContext()
   const { lock, removeKeystore } = keystoreService
   const { network$, changeNetwork } = useAppContext()
@@ -32,7 +34,6 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const bitcoinContext = useBitcoinContext()
   const chainContext = useChainContext()
   const { retrieveLedgerAddress } = chainContext
-  console.log('ledgerAddressRD$ >', bitcoinContext.ledgerAddressRD$)
 
   const binanceAddress$ = useMemo(
     () =>
@@ -80,6 +81,8 @@ export const SettingsView: React.FC = (): JSX.Element => {
     [ethContext.address$]
   )
 
+  const bitcoinLedgerAddress = useObservableState(bitcoinContext.ledgerAddress$, RD.initial)
+
   const bitcoinAddress$ = useMemo(
     () =>
       pipe(
@@ -94,13 +97,18 @@ export const SettingsView: React.FC = (): JSX.Element => {
                     name: 'Main',
                     address,
                     type: 'internal'
+                  },
+                  {
+                    name: 'Ledger',
+                    address: RD.isSuccess(bitcoinLedgerAddress) ? bitcoinLedgerAddress.value : '',
+                    type: 'external'
                   }
-                ]
+                ].filter(({ address }) => !!address)
               } as UserAccountType)
           )
         )
       ),
-    [bitcoinContext.address$]
+    [bitcoinContext.address$, bitcoinLedgerAddress]
   )
 
   const { service: midgardService } = useMidgardContext()
@@ -140,6 +148,15 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const userAccounts = useObservableState(userAccounts$, O.none)
 
   const apiVersion = envOrDefault($VERSION, '-')
+
+  useEffect(() => {
+    if (RD.isFailure(bitcoinLedgerAddress)) {
+      notification.error({
+        message: intl.formatMessage({ id: 'wallet.add.device.error.title' }),
+        description: intl.formatMessage({ id: 'wallet.add.device.error.description' })
+      })
+    }
+  }, [bitcoinLedgerAddress, intl])
 
   return (
     <Row>

@@ -5,6 +5,8 @@ const retrieveLedgerAddress = ({ chain }: LedgerGetAddressParams): void => {
   switch (chain) {
     case 'BTC':
       return BTC.retrieveLedgerAddress()
+    default:
+      break
   }
 }
 
