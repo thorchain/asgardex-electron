@@ -8,7 +8,7 @@ import {
   updateStakeFeesEffect$,
   updateWithdrawFeesEffect$
 } from './fees'
-import { retrieveLedgerAddress } from './ledger'
+import { retrieveLedgerAddress, removeLedgerAddress } from './ledger'
 import { asymDepositTxMemo$, symDepositTxMemo$ } from './memo'
 
 /**
@@ -25,5 +25,6 @@ export {
   isCrossChainStake$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
-  retrieveLedgerAddress
+  retrieveLedgerAddress,
+  removeLedgerAddress
 }

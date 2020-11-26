@@ -40,4 +40,4 @@ export type WithdrawFee = BaseAmount
 export type WithdrawFeeRD = RD.RemoteData<Error, WithdrawFee>
 export type WithdrawFeeLD = LiveData<Error, WithdrawFee>
 
-export type LedgerGetAddressParams = { chain: Chain }
+export type LedgerAddressParams = { chain: Chain }

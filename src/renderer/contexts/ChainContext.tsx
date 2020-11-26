@@ -11,7 +11,8 @@ import {
   reloadWithdrawFees,
   updateWithdrawFeesEffect$,
   updateStakeFeesEffect$,
-  retrieveLedgerAddress
+  retrieveLedgerAddress,
+  removeLedgerAddress
 } from '../services/chain/context'
 
 type ChainContextValue = {
@@ -26,6 +27,7 @@ type ChainContextValue = {
   symDepositTxMemo$: typeof symDepositTxMemo$
   asymDepositTxMemo$: typeof asymDepositTxMemo$
   retrieveLedgerAddress: typeof retrieveLedgerAddress
+  removeLedgerAddress: typeof removeLedgerAddress
 }
 
 const initialContext: ChainContextValue = {
@@ -39,7 +41,8 @@ const initialContext: ChainContextValue = {
   isCrossChainStake$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
-  retrieveLedgerAddress
+  retrieveLedgerAddress,
+  removeLedgerAddress
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 

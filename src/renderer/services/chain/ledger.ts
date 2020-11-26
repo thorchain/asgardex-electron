@@ -1,7 +1,9 @@
-import * as BTC from '../bitcoin'
-import { LedgerGetAddressParams } from './types'
+import { Chain } from '@xchainjs/xchain-util'
 
-const retrieveLedgerAddress = ({ chain }: LedgerGetAddressParams): void => {
+import * as BTC from '../bitcoin'
+import { LedgerAddressParams } from './types'
+
+const retrieveLedgerAddress = ({ chain }: LedgerAddressParams): void => {
   switch (chain) {
     case 'BTC':
       return BTC.retrieveLedgerAddress()
@@ -10,4 +12,13 @@ const retrieveLedgerAddress = ({ chain }: LedgerGetAddressParams): void => {
   }
 }
 
-export { retrieveLedgerAddress }
+const removeLedgerAddress = (chain: Chain): void => {
+  switch (chain) {
+    case 'BTC':
+      return BTC.removeLedgerAddress()
+    default:
+      break
+  }
+}
+
+export { retrieveLedgerAddress, removeLedgerAddress }

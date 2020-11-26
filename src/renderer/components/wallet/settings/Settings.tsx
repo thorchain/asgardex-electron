@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import { PlusCircleFilled, StopOutlined } from '@ant-design/icons'
 import { Chain } from '@xchainjs/xchain-util'
-import { Row, Col, List, Dropdown } from 'antd'
+import { Row, Col, List, Dropdown, Button } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -11,7 +11,7 @@ import { useIntl } from 'react-intl'
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
 import { Network } from '../../../services/app/types'
-import { LedgerGetAddressParams } from '../../../services/chain/types'
+import { LedgerAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { UserAccountType } from '../../../types/wallet'
 import * as Styled from './Settings.style'
@@ -24,7 +24,8 @@ type Props = {
   userAccounts?: O.Option<UserAccountType[]>
   lockWallet?: () => void
   removeKeystore?: () => void
-  retrieveLedgerAddress: ({ chain }: LedgerGetAddressParams) => void
+  retrieveLedgerAddress: ({ chain }: LedgerAddressParams) => void
+  removeLedgerAddress: (chain: Chain) => void
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -37,6 +38,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     lockWallet = () => {},
     removeKeystore = () => {},
     retrieveLedgerAddress,
+    removeLedgerAddress,
     changeNetwork
   } = props
 
@@ -45,10 +47,17 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   }, [removeKeystore])
 
   const addDevice = useCallback(
-    (chainName: Chain) => {
-      retrieveLedgerAddress({ chain: chainName })
+    (chain: Chain) => {
+      retrieveLedgerAddress({ chain })
     },
     [retrieveLedgerAddress]
+  )
+
+  const removeDevice = useCallback(
+    (chain: Chain) => {
+      removeLedgerAddress(chain)
+    },
+    [removeLedgerAddress]
   )
 
   const accounts = useMemo(
@@ -70,9 +79,9 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                         <Styled.AccountContent>
                           <Styled.AccountAddress>{acc.address}</Styled.AccountAddress>
                           {acc.type === 'external' && (
-                            <Styled.Button type="link" danger>
+                            <Button type="link" danger onClick={() => removeDevice(item.chainName)}>
                               <StopOutlined />
-                            </Styled.Button>
+                            </Button>
                           )}
                         </Styled.AccountContent>
                       </Styled.ChainContent>
@@ -92,7 +101,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [addDevice, intl, userAccounts]
+    [addDevice, intl, removeDevice, userAccounts]
   )
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(

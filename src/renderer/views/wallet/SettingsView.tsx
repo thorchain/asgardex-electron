@@ -33,7 +33,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
   const chainContext = useChainContext()
-  const { retrieveLedgerAddress } = chainContext
+  const { retrieveLedgerAddress, removeLedgerAddress } = chainContext
 
   const binanceAddress$ = useMemo(
     () =>
@@ -170,6 +170,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           removeKeystore={removeKeystore}
           userAccounts={userAccounts}
           retrieveLedgerAddress={retrieveLedgerAddress}
+          removeLedgerAddress={removeLedgerAddress}
         />
       </Col>
     </Row>

@@ -47,4 +47,5 @@ export type FeesService = {
 export type LedgerService = {
   ledgerAddress$: LedgerAddressLD
   retrieveLedgerAddress: () => void
+  removeLedgerAddress: () => void
 }
