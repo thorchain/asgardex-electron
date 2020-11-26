@@ -11,7 +11,7 @@ import {
   reloadWithdrawFees,
   updateWithdrawFeesEffect$,
   updateStakeFeesEffect$
-} from '../services/chain/context'
+} from '../services/chain'
 
 type ChainContextValue = {
   clientByChain$: typeof clientByChain$
