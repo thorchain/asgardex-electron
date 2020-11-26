@@ -2353,10 +2353,10 @@
     "@ledgerhq/logs" "^5.22.0"
     node-hid "^1.3.0"
 
-"@ledgerhq/hw-transport-node-hid-noevents@^5.30.0":
-  version "5.30.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid-noevents/-/hw-transport-node-hid-noevents-5.30.0.tgz#b8eb2a6f9e2b00e826252acdf4be16f601160ed0"
-  integrity sha512-pvApZQnIEJxHtOituz9ehbpTzDYwqUXRmqbUe757inkhQ3EhvmZzWmg2zJAt1yKLRcTs5Si/t7PTvK/UW4p20A==
+"@ledgerhq/hw-transport-node-hid-noevents@^5.31.1":
+  version "5.31.1"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid-noevents/-/hw-transport-node-hid-noevents-5.31.1.tgz#99a8fa545f820970ad63baf443ffe1686dde4616"
+  integrity sha512-dT8k5z3xpu0fgzrbs6RH7i22bEp/BbtYQco9aFK3mCExCv+ogDsLqSSZgi+Q46MennVN4hkiUSA+5NhCd4YDxQ==
   dependencies:
     "@ledgerhq/devices" "^5.30.0"
     "@ledgerhq/errors" "^5.30.0"
@@ -2379,14 +2379,14 @@
     usb "^1.6.3"
 
 "@ledgerhq/hw-transport-node-hid@^5.30.0":
-  version "5.30.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-5.30.0.tgz#3aa78a59c8649a6a487c9bc92277ec8de0da2fbe"
-  integrity sha512-AfvU9ejc7hjnLUI7Ju2WXA+3yJuY9d8BbQVW/6gXUUy4cJbMxHyymNjX+xv6aYzDo1RdgGIXBDntxDbTlyjgPA==
+  version "5.31.1"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-5.31.1.tgz#5f11c2b28d4524dc55f84633810d3406d3bdfd6a"
+  integrity sha512-ru/PpgkHhUorsDO0OXqDp+grw0zKXHph/UW11HTN/X0rx2sO1UfBNkqxfd+4UIPEKJmvx4hA/E0Il0Tw44SgYA==
   dependencies:
     "@ledgerhq/devices" "^5.30.0"
     "@ledgerhq/errors" "^5.30.0"
     "@ledgerhq/hw-transport" "^5.30.0"
-    "@ledgerhq/hw-transport-node-hid-noevents" "^5.30.0"
+    "@ledgerhq/hw-transport-node-hid-noevents" "^5.31.1"
     "@ledgerhq/logs" "^5.30.0"
     lodash "^4.17.20"
     node-hid "1.3.0"
@@ -13725,7 +13725,7 @@ no-case@^3.0.3:
     lower-case "^2.0.1"
     tslib "^1.10.0"
 
-node-abi@^2.18.0, node-abi@^2.19.3, node-abi@^2.7.0:
+node-abi@^2.18.0, node-abi@^2.7.0:
   version "2.19.3"
   resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.19.3.tgz#252f5dcab12dad1b5503b2d27eddd4733930282d"
   integrity sha512-9xZrlyfvKhWme2EXFKQhZRp1yNWT/uI1luYPr3sFl+H4keYY4xR+1jO7mvTTijIsHf1M+QDe9uWuKeEpLInIlg==

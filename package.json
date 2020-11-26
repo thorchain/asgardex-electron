@@ -75,7 +75,6 @@
     "fp-ts-rxjs": "^0.6.11",
     "fs-extra": "^9.0.1",
     "lodash.shuffle": "^4.2.0",
-    "node-abi": "^2.19.3",
     "observable-hooks": "^3.1.2",
     "qrcode": "^1.4.4",
     "react": "^16.13.1",
