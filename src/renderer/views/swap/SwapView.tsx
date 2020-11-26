@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
-import { Asset, AssetAmount, assetFromString, bnOrZero } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetFromString, assetToBase, bnOrZero } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -83,8 +83,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
         RD.map((endpoint) => {
           if (endpoint.address) {
             pushTx({
-              to: endpoint.address,
-              amount,
+              recipient: endpoint.address,
+              amount: assetToBase(amount),
               asset: source,
               memo
             })

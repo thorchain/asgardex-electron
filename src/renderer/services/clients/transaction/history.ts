@@ -1,12 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { XChainClient } from '@xchainjs/xchain-client'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import { map, catchError, startWith, switchMap } from 'rxjs/operators'
 
-import { ApiError, ErrorId } from '../wallet/types'
-import { XChainClient$, TxsPageLD, TxsParams } from './types'
+import { ApiError, ErrorId } from '../../wallet/types'
+import { XChainClient$, TxsPageLD, TxsParams } from '../types'
 
 /**
  * Observable to load txs from Binance API endpoint
@@ -19,13 +19,7 @@ const loadTxs$ = ({
 }: {
   client: XChainClient
 } & TxsParams): TxsPageLD => {
-  const txAsset = FP.pipe(
-    asset,
-    O.fold(
-      () => undefined,
-      ({ symbol }) => symbol
-    )
-  )
+  const txAsset = asset && asset.symbol
 
   return Rx.from(
     client.getTransactions({
@@ -49,7 +43,7 @@ const loadTxs$ = ({
  * Data will be loaded by first subscription only
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const txs$: (client$: XChainClient$) => (params: TxsParams) => TxsPageLD = (client$) => ({
+export const txs$: <T extends XChainClient$<any>>(client$: T) => (params: TxsParams) => TxsPageLD = (client$) => ({
   asset,
   limit,
   offset

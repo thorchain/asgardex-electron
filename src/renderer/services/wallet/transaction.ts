@@ -8,7 +8,7 @@ import { observableState } from '../../helpers/stateHelper'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as C from '../clients'
-import { ExplorerUrl$, GetExplorerTxUrl$, TxsPageLD, LoadTxsParams } from '../clients/types'
+import { ExplorerUrl$, GetExplorerTxUrl$, TxsPageLD, LoadTxsParams } from '../clients'
 import * as THOR from '../thorchain'
 import { client$, selectedAsset$ } from './common'
 import { INITIAL_LOAD_TXS_PROPS } from './const'
@@ -41,13 +41,13 @@ export const txs$: TxsPageLD = Rx.combineLatest([selectedAsset$, loadTxsProps$])
         (asset) => {
           switch (asset.chain) {
             case 'BNB':
-              return BNB.txs$({ asset: O.some(asset), limit, offset })
+              return BNB.txs$({ asset, limit, offset })
             case 'BTC':
-              return BTC.txs$({ asset: O.none, limit, offset })
+              return BTC.txs$({ asset: undefined, limit, offset })
             case 'ETH':
               return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
             case 'THOR':
-              return THOR.txs$({ asset: O.none, limit, offset })
+              return THOR.txs$({ asset: undefined, limit, offset })
             default:
               return Rx.of(
                 RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` } as ApiError)

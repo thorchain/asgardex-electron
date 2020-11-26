@@ -8,6 +8,7 @@ import {
   AssetRune67C,
   assetToBase,
   assetToString,
+  baseToAsset,
   formatAssetAmount
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
@@ -32,8 +33,12 @@ const fee = O.some(TRANSFER_FEES.single)
 
 const addressValidation: AddressValidation = (_) => true
 
-const onSubmitHandler = ({ to, amount, asset, memo }: SendTxParams) =>
-  console.log(`to: ${to}, amount ${formatAssetAmount({ amount })}, asset: ${assetToString(asset)}, memo: ${memo}`)
+const onSubmitHandler = ({ recipient, amount, asset = AssetBNB, memo }: SendTxParams) =>
+  console.log(
+    `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
+      asset
+    )}, memo: ${memo}`
+  )
 
 storiesOf('Wallet/SendFormBNB', module)
   .add('send bnb', () => (

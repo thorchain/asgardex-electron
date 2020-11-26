@@ -1,8 +1,5 @@
+import { TransactionService } from '../bitcoin/types'
 import * as C from '../clients'
 import { Client$ } from './types'
 
-export const createTransactionService = (client$: Client$) => {
-  return {
-    txs$: C.txs$(client$)
-  }
-}
+export const createTransactionService: (client$: Client$) => TransactionService = C.transactionServiceFactory

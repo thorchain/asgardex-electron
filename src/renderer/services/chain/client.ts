@@ -5,11 +5,10 @@ import * as RxOp from 'rxjs/operators'
 
 import * as BNC from '../binance'
 import * as BTC from '../bitcoin'
-import { XChainClient$ } from '../clients'
 import { selectedPoolChain$ } from '../midgard/common'
 import { Chain$ } from './types'
 
-export const clientByChain$ = (chain: Chain): XChainClient$ => {
+export const clientByChain$ = (chain: Chain) => {
   switch (chain) {
     case 'BNB':
       return BNC.client$
@@ -24,7 +23,7 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
   }
 }
 
-export const getClientByChain$: (chain$: Chain$) => XChainClient$ = (chain$) =>
+export const getClientByChain$ = (chain$: Chain$) =>
   chain$.pipe(
     RxOp.switchMap(
       O.fold(
