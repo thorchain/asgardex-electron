@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Balance } from '@xchainjs/xchain-client'
+import { Address, Balance, XChainClient } from '@xchainjs/xchain-client'
 import { TxsPage, Balances, Fees } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
@@ -25,7 +25,7 @@ export const ClientStateM = getEitherM(option)
 
 export type ClientStateForViews = 'notready' | 'ready' | 'error'
 
-export type XChainClient$<T> = Rx.Observable<O.Option<T>>
+export type XChainClient$<T = XChainClient> = Rx.Observable<O.Option<T>>
 
 export type Client$<C> = Rx.Observable<O.Option<C>>
 

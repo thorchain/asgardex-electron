@@ -31,10 +31,7 @@ const loadBalances$: (client: XChainClient) => BalancesLD = (client) =>
  *
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const balances$: <T extends XChainClient$<any>>(client$: T, trigger$: TriggerStream$) => BalancesLD = (
-  client$,
-  trigger$
-) =>
+export const balances$: (client$: XChainClient$, trigger$: TriggerStream$) => BalancesLD = (client$, trigger$) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.mergeMap(([_, oClient]) => {
       return FP.pipe(
