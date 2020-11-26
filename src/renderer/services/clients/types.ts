@@ -37,7 +37,7 @@ export type LoadTxsParams = {
   offset: number
 }
 
-export type TxsParams = { asset?: Asset } & LoadTxsParams
+export type TxsParams = { asset: O.Option<Asset> } & LoadTxsParams
 
 export type TxsPageRD = RD.RemoteData<ApiError, TxsPage>
 export type TxsPageLD = LiveData<ApiError, TxsPage>

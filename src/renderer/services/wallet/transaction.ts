@@ -41,13 +41,13 @@ export const txs$: TxsPageLD = Rx.combineLatest([selectedAsset$, loadTxsProps$])
         (asset) => {
           switch (asset.chain) {
             case 'BNB':
-              return BNB.txs$({ asset, limit, offset })
+              return BNB.txs$({ asset: O.some(asset), limit, offset })
             case 'BTC':
-              return BTC.txs$({ asset: undefined, limit, offset })
+              return BTC.txs$({ asset: O.none, limit, offset })
             case 'ETH':
               return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
             case 'THOR':
-              return THOR.txs$({ asset: undefined, limit, offset })
+              return THOR.txs$({ asset: O.none, limit, offset })
             default:
               return Rx.of(
                 RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` } as ApiError)

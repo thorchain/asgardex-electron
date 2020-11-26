@@ -19,7 +19,11 @@ const loadTxs$ = ({
 }: {
   client: XChainClient
 } & TxsParams): TxsPageLD => {
-  const txAsset = asset && asset.symbol
+  const txAsset = FP.pipe(
+    asset,
+    O.map(({ symbol }) => symbol),
+    O.toUndefined
+  )
 
   return Rx.from(
     client.getTransactions({
