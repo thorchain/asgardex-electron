@@ -10,7 +10,8 @@ const settings: SettingMessages = {
   'setting.view.phrase': 'Показать фразу',
   'setting.midgard': 'Midgard',
   'setting.version': 'Версия',
-  'setting.notconnected': 'Нет соединения'
+  'setting.notconnected': 'Нет соединения',
+  'setting.add.device': 'ADD DEVICE'
 }
 
 export default settings

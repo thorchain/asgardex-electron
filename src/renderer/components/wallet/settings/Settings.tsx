@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { StopOutlined } from '@ant-design/icons'
+import { PlusCircleFilled, StopOutlined } from '@ant-design/icons'
 import { Chain } from '@xchainjs/xchain-util'
-import { Row, Col, Button, List, Dropdown } from 'antd'
+import { Row, Col, List, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -70,14 +70,20 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                         <Styled.AccountContent>
                           <Styled.AccountAddress>{acc.address}</Styled.AccountAddress>
                           {acc.type === 'external' && (
-                            <Button type="link" danger>
+                            <Styled.Button type="link" danger>
                               <StopOutlined />
-                            </Button>
+                            </Styled.Button>
                           )}
                         </Styled.AccountContent>
                       </Styled.ChainContent>
                     ))}
-                    <Button onClick={() => addDevice(item.chainName)}>ADD DEVICE</Button>
+                    <Styled.Button
+                      onClick={() => addDevice(item.chainName)}
+                      typevalue="transparent"
+                      style={{ margin: '10px 0 15px 12px', boxShadow: 'none' }}>
+                      <PlusCircleFilled />
+                      {intl.formatMessage({ id: 'setting.add.device' })}
+                    </Styled.Button>
                   </Styled.ListItem>
                 )}
               />

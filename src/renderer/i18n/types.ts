@@ -132,6 +132,7 @@ type SettingMessageKey =
   | 'setting.midgard'
   | 'setting.version'
   | 'setting.notconnected'
+  | 'setting.add.device'
 
 export type SettingMessages = { [key in SettingMessageKey]: string }
 
