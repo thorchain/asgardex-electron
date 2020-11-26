@@ -37,8 +37,10 @@ export const observableState = <T>(initial: T): ObservableState<T> => {
   }
 }
 
+export type TriggerStream$ = Observable<string>
+
 export type TriggerStream = {
-  stream$: Observable<string>
+  stream$: TriggerStream$
   trigger: () => void
 }
 

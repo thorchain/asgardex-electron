@@ -227,18 +227,21 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     [addressValidation, intl]
   )
 
-  const amountValidator = useCallback(
-    async (_: unknown, value: BigNumber) => {
-      // max amount
-      const maxAmount = FP.pipe(
+  const maxAmount = useMemo(
+    () =>
+      FP.pipe(
         selectedFee,
         O.map((fee) => assetWB.amount.amount().minus(fee.amount())),
         // Set maxAmount to zero as long as we dont have a feeRate
         O.getOrElse(() => ZERO_BN),
         baseAmount,
         baseToAsset
-      )
+      ),
+    [assetWB.amount, selectedFee]
+  )
 
+  const amountValidator = useCallback(
+    async (_: unknown, value: BigNumber) => {
       // error messages
       const errors = {
         msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
@@ -247,7 +250,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
       }
       return validateTxAmountInput({ input: value, maxAmount, errors })
     },
-    [assetWB.amount, intl, selectedFee]
+    [intl, maxAmount]
   )
 
   const onFinishHandler = useCallback(
@@ -288,7 +291,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
             <Styled.Label size="big" style={{ marginBottom: 0, paddingBottom: 0 }}>
               {intl.formatMessage({ id: 'common.max' })}:{' '}
               {formatAssetAmountCurrency({
-                amount: baseToAsset(assetWB.amount),
+                amount: maxAmount,
                 asset: assetWB.asset,
                 trimZeros: true
               })}

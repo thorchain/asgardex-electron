@@ -10,7 +10,8 @@ import { mergeMap, shareReplay, catchError, startWith, debounceTime } from 'rxjs
 
 import { ETH_DECIMAL } from '../../helpers/assetHelper'
 import { triggerStream } from '../../helpers/stateHelper'
-import { ApiError, BalanceRD, ErrorId } from '../wallet/types'
+import { BalanceRD } from '../clients'
+import { ApiError, ErrorId } from '../wallet/types'
 import { client$ } from './common'
 
 /**

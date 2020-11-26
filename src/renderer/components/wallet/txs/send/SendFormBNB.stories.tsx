@@ -13,8 +13,7 @@ import {
 import * as O from 'fp-ts/lib/Option'
 
 import { TRANSFER_FEES } from '../../../../../shared/mock/fees'
-import { SendTxParams } from '../../../../services/binance/transaction'
-import { AddressValidation } from '../../../../services/binance/types'
+import { AddressValidation, SendTxParams } from '../../../../services/binance/types'
 import { SendFormBNB } from './index'
 
 const bnbAsset: Balance = {

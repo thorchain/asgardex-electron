@@ -11,8 +11,9 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { getPoolPriceValue } from '../../../services/binance/utils'
+import { BalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
-import { AssetsWBChains, BalancesRD, ApiError, ChainBalance } from '../../../services/wallet/types'
+import { ChainBalances, ApiError, ChainBalance } from '../../../services/wallet/types'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
@@ -22,14 +23,14 @@ import * as Styled from './AssetsTableCollapsable.style'
 const { Panel } = Collapse
 
 type Props = {
-  assetsWBChains: AssetsWBChains
+  chainBalances: ChainBalances
   pricePool: PricePool
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: Asset) => void
 }
 
 export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
-  const { assetsWBChains = [], pricePool, poolDetails, selectAssetHandler = (_) => {} } = props
+  const { chainBalances = [], pricePool, poolDetails, selectAssetHandler = (_) => {} } = props
 
   const intl = useIntl()
   const screenMap: ScreenMap = Grid.useBreakpoint()
@@ -102,8 +103,8 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderPriceColumn = useCallback(
-    (assetWB: Balance) => {
-      const oPrice = getPoolPriceValue(assetWB, poolDetails, pricePool.poolData)
+    (balance: Balance) => {
+      const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
       const label = FP.pipe(
         oPrice,
         O.map((price) => formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })),
@@ -179,7 +180,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     [onRow, columns]
   )
 
-  const renderAssetsWBState = useCallback(
+  const renderBalances = useCallback(
     (balancesRD: BalancesRD, index: number) =>
       FP.pipe(
         balancesRD,
@@ -208,15 +209,15 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   // Panel
   const renderPanel = useCallback(
-    ({ chain, address, balances: assetsWB }: ChainBalance, key: number) => {
+    ({ chain, address, balances: balancesRD }: ChainBalance, key: number) => {
       const assetsTxt = FP.pipe(
-        assetsWB,
+        balancesRD,
         RD.fold(
           () => '',
           () => intl.formatMessage({ id: 'common.loading' }),
           (_: ApiError) => intl.formatMessage({ id: 'common.error' }),
-          (assetsWB) => {
-            const length = assetsWB.length
+          (balances) => {
+            const length = balances.length
             const i18nKey = length === 1 ? 'common.asset' : 'common.assets'
             return `(${length} ${intl.formatMessage({ id: i18nKey })})`
           }
@@ -231,27 +232,28 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             <Styled.HeaderAddress>{address}</Styled.HeaderAddress>
           </Col>
           <Col xs={10} md={6} lg={10}>
-            <Styled.HeaderLabel color={RD.isFailure(assetsWB) ? 'error' : 'gray'}>{`${assetsTxt}`}</Styled.HeaderLabel>
+            <Styled.HeaderLabel
+              color={RD.isFailure(balancesRD) ? 'error' : 'gray'}>{`${assetsTxt}`}</Styled.HeaderLabel>
           </Col>
         </Styled.HeaderRow>
       )
       return (
         <Panel header={header} key={key}>
-          {renderAssetsWBState(assetsWB, key)}
+          {renderBalances(balancesRD, key)}
         </Panel>
       )
     },
-    [intl, renderAssetsWBState]
+    [intl, renderBalances]
   )
 
   // open all panels by default
   useEffect(() => {
     // don't change openPanelKeys if user has already changed panel state
     if (!collapseChangedByUser) {
-      const keys = assetsWBChains.map((_, i) => i.toString())
+      const keys = chainBalances.map((_, i) => i.toString())
       setOpenPanelKeys(keys)
     }
-  }, [assetsWBChains, collapseChangedByUser])
+  }, [chainBalances, collapseChangedByUser])
 
   const onChangeCollpaseHandler = useCallback((key: string | string[]) => {
     if (Array.isArray(key)) {
@@ -271,7 +273,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       expandIconPosition="right"
       onChange={onChangeCollpaseHandler}
       ghost>
-      {assetsWBChains.map(renderPanel)}
+      {chainBalances.map(renderPanel)}
     </Styled.Collapse>
   )
 }

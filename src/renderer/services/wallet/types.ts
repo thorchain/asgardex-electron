@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balance, Balances, TxsPage } from '@xchainjs/xchain-client'
+import { Balance } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
@@ -7,6 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
+import { BalancesRD, LoadTxsParams } from '../clients'
 
 export type Phrase = string
 
@@ -32,11 +33,6 @@ export type KeystoreService = {
    */
   validatePassword$: (password: string) => LiveData<Error, null>
 }
-export type NonEmptyBalances = NonEmptyArray<Balance>
-
-export type BalancesLD = LiveData<ApiError, Balances>
-export type BalancesRD = RD.RemoteData<ApiError, Balances>
-export type BalanceRD = RD.RemoteData<ApiError, Balance>
 
 export type ChainBalance = {
   address: string
@@ -44,9 +40,11 @@ export type ChainBalance = {
   balances: BalancesRD
 }
 
-export type AssetsWBChains = ChainBalance[]
+export type ChainBalances = ChainBalance[]
 
 export const BalanceMonoid = getMonoid<Balance>()
+
+export type NonEmptyBalances = NonEmptyArray<Balance>
 
 export type BalancesState = {
   balances: O.Option<NonEmptyBalances>
@@ -54,15 +52,7 @@ export type BalancesState = {
   loading: boolean
 }
 
-export type TxsPageRD = RD.RemoteData<ApiError, TxsPage>
-export type TxsPageLD = LiveData<ApiError, TxsPage>
-
-export type LoadTxsProps = {
-  limit: number
-  offset: number
-}
-
-export type LoadTxsHandler = (props: LoadTxsProps) => void
+export type LoadTxsHandler = (props: LoadTxsParams) => void
 export type ResetTxsPageHandler = () => void
 
 export type LoadBalancesHandler = () => void

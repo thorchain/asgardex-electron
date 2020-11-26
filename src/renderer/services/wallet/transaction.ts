@@ -8,10 +8,11 @@ import { observableState } from '../../helpers/stateHelper'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as C from '../clients'
-import { ExplorerUrl$, GetExplorerTxUrl$ } from '../clients/types'
+import { ExplorerUrl$, GetExplorerTxUrl$, TxsPageLD, LoadTxsParams } from '../clients/types'
+import * as THOR from '../thorchain'
 import { client$, selectedAsset$ } from './common'
 import { INITIAL_LOAD_TXS_PROPS } from './const'
-import { ApiError, TxsPageLD, ErrorId, LoadTxsHandler, ResetTxsPageHandler, LoadTxsProps } from './types'
+import { ApiError, ErrorId, LoadTxsHandler, ResetTxsPageHandler } from './types'
 
 export const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
 
@@ -20,7 +21,7 @@ export const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
 /**
  * State of `LoadTxsProps`, which triggers reload of txs history
  */
-const { get$: loadTxsProps$, set: setLoadTxsProps } = observableState<LoadTxsProps>(INITIAL_LOAD_TXS_PROPS)
+const { get$: loadTxsProps$, set: setLoadTxsProps } = observableState<LoadTxsParams>(INITIAL_LOAD_TXS_PROPS)
 
 export { setLoadTxsProps }
 
@@ -32,7 +33,7 @@ export const resetTxsPage: ResetTxsPageHandler = () => setLoadTxsProps(INITIAL_L
  * Factory create a stream of `TxsPageRD` based on selected asset
  */
 export const txs$: TxsPageLD = Rx.combineLatest([selectedAsset$, loadTxsProps$]).pipe(
-  RxOp.switchMap(([oAsset, loadTxsProps]) =>
+  RxOp.switchMap(([oAsset, { limit, offset }]) =>
     FP.pipe(
       oAsset,
       O.fold(
@@ -40,13 +41,13 @@ export const txs$: TxsPageLD = Rx.combineLatest([selectedAsset$, loadTxsProps$])
         (asset) => {
           switch (asset.chain) {
             case 'BNB':
-              return BNB.txs$(asset, loadTxsProps)
+              return BNB.txs$({ asset: O.some(asset), limit, offset })
             case 'BTC':
-              return BTC.txs$(loadTxsProps)
+              return BTC.txs$({ asset: O.none, limit, offset })
             case 'ETH':
               return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
             case 'THOR':
-              return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
+              return THOR.txs$({ asset: O.none, limit, offset })
             default:
               return Rx.of(
                 RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` } as ApiError)

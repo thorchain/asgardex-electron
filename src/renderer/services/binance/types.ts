@@ -1,17 +1,17 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balances, Transfer, Client, WS } from '@xchainjs/xchain-binance'
+import { Balances, Transfer, Client } from '@xchainjs/xchain-binance'
+import { Address } from '@xchainjs/xchain-binance'
 import { Asset, AssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
-import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { FeesLD } from '../clients/types'
-import { ClientState } from '../clients/types'
-import { ApiError, TxLD, TxsPageLD } from '../wallet/types'
-import { SendTxParams } from './transaction'
+import * as C from '../clients'
 
-export type Client$ = Rx.Observable<O.Option<Client>>
+export type Client$ = C.Client$<Client>
+
+export type ClientState = C.ClientState<Client>
+export type ClientState$ = C.ClientState$<Client>
 
 export type BalancesRD = RD.RemoteData<Error, Balances>
 
@@ -21,9 +21,6 @@ export type AssetWithPrice = {
 }
 
 export type AssetsWithPrice = AssetWithPrice[]
-
-export type BinanceClientState = ClientState<Client>
-export type BinanceClientState$ = Rx.Observable<ClientState<Client>>
 
 export type TransferRD = RD.RemoteData<Error, Transfer>
 
@@ -48,7 +45,7 @@ export type TransferFees = {
 }
 
 export type FeesService = {
-  fees$: FeesLD
+  fees$: C.FeesLD
   reloadFees: () => void
 }
 
@@ -57,15 +54,15 @@ export type LoadTxsProps = {
   offset: number
 }
 
-export type TxWithState = { txHash: string; state: O.Option<WS.Transfer> }
-export type TxWithStateRD = RD.RemoteData<ApiError, TxWithState>
-export type TxWithStateLD = LiveData<ApiError, TxWithState>
+export type TxWithState = { txHash: string; state: O.Option<string> }
+export type TxWithStateRD = RD.RemoteData<Error, TxWithState>
+export type TxWithStateLD = LiveData<Error, TxWithState>
 
-export type TransactionService = {
-  txRD$: TxLD
-  pushTx: (p: SendTxParams) => Rx.Subscription
-  sendStakeTx: (p: SendTxParams) => TxLD
-  resetTx: () => void
-  txs$: (asset: Asset, props: LoadTxsProps) => TxsPageLD
-  txWithState$: TxWithStateLD
+export type SendTxParams = {
+  to: Address
+  amount: AssetAmount
+  asset: Asset
+  memo?: string
 }
+
+export type TransactionService = C.TransactionService<SendTxParams>
