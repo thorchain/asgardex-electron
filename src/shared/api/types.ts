@@ -17,8 +17,13 @@ export type ApiUrl = {
   openExternal: (url: string) => Promise<void>
 }
 
+export type LedgerAddressResponse = {
+  result: string
+  error?: Error
+}
+
 export type ApiHDWallet = {
-  getBTCAddress: () => Promise<string>
+  getBTCAddress: () => Promise<LedgerAddressResponse>
 }
 
 declare global {

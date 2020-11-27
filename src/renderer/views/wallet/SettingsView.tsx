@@ -153,7 +153,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
     if (RD.isFailure(bitcoinLedgerAddress)) {
       notification.error({
         message: intl.formatMessage({ id: 'wallet.add.device.error.title' }),
-        description: intl.formatMessage({ id: 'wallet.add.device.error.description' })
+        description: bitcoinLedgerAddress.error.message
       })
     }
   }, [bitcoinLedgerAddress, intl])

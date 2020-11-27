@@ -7,8 +7,8 @@ export const getBTCAddress = async () => {
     const appBtc = new AppBtc(transport)
     const info = await appBtc.getWalletPublicKey("44'/0'/0'/0/0")
     await transport.close()
-    return info.bitcoinAddress
-  } catch (e) {
-    return Promise.reject(e)
+    return { result: info.bitcoinAddress }
+  } catch (error) {
+    return { result: '', error: new Error(error.message) }
   }
 }

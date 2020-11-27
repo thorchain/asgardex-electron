@@ -49,5 +49,5 @@ export const apiUrl: ApiUrl = {
 
 // Mock `apiHDWallet`
 export const apiHDWallet: ApiHDWallet = {
-  getBTCAddress: () => Promise.resolve('btc_addr')
+  getBTCAddress: () => Promise.resolve({ result: 'btc_address' })
 }
