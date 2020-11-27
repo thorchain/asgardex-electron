@@ -8,7 +8,7 @@ import { pipe } from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
-import * as RxO from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
 import { LedgerErrorId } from '../../../shared/api/types'
 import { Settings } from '../../components/wallet/settings'
@@ -40,7 +40,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
     () =>
       pipe(
         binanceContext.address$,
-        RxO.map(
+        RxOp.map(
           O.map(
             (address) =>
               ({
@@ -63,7 +63,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
     () =>
       pipe(
         ethContext.address$,
-        RxO.map(
+        RxOp.map(
           O.map(
             (address) =>
               ({
@@ -88,7 +88,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
     () =>
       pipe(
         bitcoinContext.address$,
-        RxO.map(
+        RxOp.map(
           O.map(
             (address) =>
               ({
@@ -120,7 +120,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
 
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxO.map(RD.toOption)), [
+  const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxOp.map(RD.toOption)), [
     midgardService.apiEndpoint$
   ])
 
@@ -141,8 +141,8 @@ export const SettingsView: React.FC = (): JSX.Element => {
           /* ethAddress$, */
           bitcoinAddress$
         ]),
-        RxO.map(A.filter(O.isSome)),
-        RxO.map(sequenceTOptionFromArray)
+        RxOp.map(A.filter(O.isSome)),
+        RxOp.map(sequenceTOptionFromArray)
       ),
     [binanceAddress$, bitcoinAddress$]
   )
