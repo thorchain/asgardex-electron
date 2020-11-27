@@ -14,7 +14,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { getDefaultRuneAsset } from '../../helpers/assetHelper'
-import { StakeRouteParams } from '../../routes/stake'
+import { DepositRouteParams } from '../../routes/deposit'
 import { AddStakeView } from './add/AddStakeView'
 import { ShareView } from './share/ShareView'
 import { WithdrawStakeView } from './withdraw/WithdrawStakeView'
@@ -24,7 +24,7 @@ type Props = {}
 export const StakeView: React.FC<Props> = (_) => {
   const intl = useIntl()
 
-  const { asset } = useParams<StakeRouteParams>()
+  const { asset } = useParams<DepositRouteParams>()
   const {
     service: {
       setSelectedPoolAsset,

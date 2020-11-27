@@ -19,7 +19,7 @@ import { getChainAsset, isBaseChainAsset, isCrossChainAsset } from '../../../hel
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
-import * as stakeRoutes from '../../../routes/stake'
+import * as stakeRoutes from '../../../routes/deposit'
 import { SymDepositMemo, Memo } from '../../../services/chain/types'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
@@ -37,7 +37,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
 
   const onChangeAsset = useCallback(
     (asset: Asset) => {
-      history.replace(stakeRoutes.stake.path({ asset: assetToString(asset) }))
+      history.replace(stakeRoutes.deposit.path({ asset: assetToString(asset) }))
     },
     [history]
   )
