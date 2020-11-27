@@ -170,6 +170,7 @@ export const AccountContent = styled(UILabel)`
 export const AccountAddress = styled(UILabel)`
   display: inline-block;
   width: calc(70%);
+  padding: 0px;
   white-space: nowrap;
   overflow: hidden;
   font-family: 'MainFontRegular';

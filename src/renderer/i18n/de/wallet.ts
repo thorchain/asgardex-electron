@@ -51,7 +51,9 @@ const wallet: WalletMessages = {
   'wallet.errors.invalidChain': 'Invalide Chain: {chain}',
   'wallet.password.confirmation': 'Password confirmation - DE',
   'wallet.password.confirmation.pending': 'Validating password - DE',
-  'wallet.password.confirmation.error': 'Password is wrong - DE'
+  'wallet.password.confirmation.error': 'Password is wrong - DE',
+  'wallet.add.device.error.title': 'Ledger Device Error - DE',
+  'wallet.add.device.error.description': 'Please confirm if you unlocked the device and opened the correct app - DE'
 }
 
 export default wallet
