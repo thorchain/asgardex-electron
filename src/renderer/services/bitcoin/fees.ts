@@ -62,7 +62,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
     )
 
   // `TriggerStream` to reload stake `fees`
-  const { stream$: reloadStakeFee$, trigger: reloadStakeFee } = triggerStream()
+  const { stream$: reloadDepositFee$, trigger: reloadDepositFee } = triggerStream()
 
   /**
    * Factory to create a stream for pool fees (stake / withdraw)
@@ -70,7 +70,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
    */
   const poolFee$ = (memo: Memo): FeeLD =>
     FP.pipe(
-      reloadStakeFee$,
+      reloadDepositFee$,
       switchMap(() => memoFees$(memo)),
       liveData.map(({ fees }) => fees.fast)
     )
@@ -82,7 +82,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
    */
   const poolFeeRate$ = (memo: Memo): FeeRateLD =>
     FP.pipe(
-      reloadStakeFee$,
+      reloadDepositFee$,
       switchMap(() => memoFees$(memo)),
       liveData.map(({ rates }) => rates.fast),
       // we do need to store result in a subject to access it w/o subscribing a stream
@@ -95,6 +95,6 @@ export const createFeesService = (oClient$: Client$): FeesService => {
     poolFeeRate$,
     getPoolFeeRate,
     reloadFees,
-    reloadStakeFee
+    reloadDepositFee
   }
 }

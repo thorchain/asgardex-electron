@@ -6,9 +6,9 @@ import * as Rx from 'rxjs'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import { ErrorId, TxLD } from '../wallet/types'
-import { SendStakeTxParams } from './types'
+import { SendDepositTxParams } from './types'
 
-const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendStakeTxParams): TxLD => {
+const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositTxParams): TxLD => {
   // TODO (@Veado) Health check request for pool address
   // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
 
