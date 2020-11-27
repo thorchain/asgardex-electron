@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client } from '@xchainjs/xchain-bitcoin'
+import { Client, Network } from '@xchainjs/xchain-bitcoin'
 import { FeeRate, FeesWithRates } from '@xchainjs/xchain-bitcoin'
 import { BaseAmount } from '@xchainjs/xchain-util'
 
@@ -40,6 +40,6 @@ export type FeesService = {
 
 export type LedgerService = {
   ledgerAddress$: LedgerAddressLD
-  retrieveLedgerAddress: () => void
+  retrieveLedgerAddress: (network: Network) => void
   removeLedgerAddress: () => void
 }

@@ -1,5 +1,6 @@
 import { join } from 'path'
 
+import { Network } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
@@ -121,7 +122,7 @@ const initIPC = () => {
   ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, () => removeKeystore())
   ipcMain.handle(IPCMessages.GET_KEYSTORE, () => getKeystore())
   ipcMain.handle(IPCMessages.KEYSTORE_EXIST, () => keystoreExist())
-  ipcMain.handle(IPCMessages.GET_BTC_ADDRESS, () => getBTCAddress())
+  ipcMain.handle(IPCMessages.GET_BTC_ADDRESS, (_, network: Network) => getBTCAddress(network))
 }
 
 const init = async () => {

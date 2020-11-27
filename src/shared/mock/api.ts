@@ -1,3 +1,4 @@
+import { Network } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { PubKeyEd25519 } from '@xchainjs/xchain-crypto/'
 import * as E from 'fp-ts/Either'
@@ -50,5 +51,5 @@ export const apiUrl: ApiUrl = {
 
 // Mock `apiHDWallet`
 export const apiHDWallet: ApiHDWallet = {
-  getBTCAddress: () => Promise.resolve(E.right('btc_address'))
+  getBTCAddress: (_: Network) => Promise.resolve(E.right('btc_address'))
 }

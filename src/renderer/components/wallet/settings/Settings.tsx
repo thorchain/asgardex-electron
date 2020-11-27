@@ -24,7 +24,7 @@ type Props = {
   userAccounts?: O.Option<UserAccountType[]>
   lockWallet?: () => void
   removeKeystore?: () => void
-  retrieveLedgerAddress: ({ chain }: LedgerAddressParams) => void
+  retrieveLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
   removeLedgerAddress: (chain: Chain) => void
 }
 
@@ -48,9 +48,16 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   const addDevice = useCallback(
     (chain: Chain) => {
-      retrieveLedgerAddress({ chain })
+      switch (selectedNetwork) {
+        case 'mainnet':
+        case 'testnet':
+          retrieveLedgerAddress({ chain, network: selectedNetwork })
+          break
+        default:
+          break
+      }
     },
-    [retrieveLedgerAddress]
+    [retrieveLedgerAddress, selectedNetwork]
   )
 
   const removeDevice = useCallback(
@@ -86,13 +93,15 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                         </Styled.AccountContent>
                       </Styled.ChainContent>
                     ))}
-                    <Styled.Button
-                      onClick={() => addDevice(item.chainName)}
-                      typevalue="transparent"
-                      style={{ margin: '10px 0 15px 12px', boxShadow: 'none' }}>
-                      <PlusCircleFilled />
-                      {intl.formatMessage({ id: 'setting.add.device' })}
-                    </Styled.Button>
+                    {selectedNetwork !== 'chaosnet' && (
+                      <Styled.Button
+                        onClick={() => addDevice(item.chainName)}
+                        typevalue="transparent"
+                        style={{ margin: '10px 0 15px 12px', boxShadow: 'none' }}>
+                        <PlusCircleFilled />
+                        {intl.formatMessage({ id: 'setting.add.device' })}
+                      </Styled.Button>
+                    )}
                   </Styled.ListItem>
                 )}
               />
@@ -101,7 +110,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [addDevice, intl, removeDevice, userAccounts]
+    [addDevice, intl, removeDevice, selectedNetwork, userAccounts]
   )
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(

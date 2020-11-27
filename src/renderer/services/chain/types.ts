@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Fees } from '@xchainjs/xchain-client'
+import { Fees, Network } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -40,4 +40,4 @@ export type WithdrawFee = BaseAmount
 export type WithdrawFeeRD = RD.RemoteData<Error, WithdrawFee>
 export type WithdrawFeeLD = LiveData<Error, WithdrawFee>
 
-export type LedgerAddressParams = { chain: Chain }
+export type LedgerAddressParams = { chain: Chain; network: Network }

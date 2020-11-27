@@ -3,10 +3,10 @@ import { Chain } from '@xchainjs/xchain-util'
 import * as BTC from '../bitcoin'
 import { LedgerAddressParams } from './types'
 
-const retrieveLedgerAddress = ({ chain }: LedgerAddressParams): void => {
+const retrieveLedgerAddress = ({ chain, network }: LedgerAddressParams): void => {
   switch (chain) {
     case 'BTC':
-      return BTC.retrieveLedgerAddress()
+      return BTC.retrieveLedgerAddress(network)
     default:
       break
   }
