@@ -6,13 +6,14 @@ import * as RxOp from 'rxjs/operators'
 
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { selectedPoolAsset$ } from '../midgard/common'
-import { runeAddress$, assetAddress$ } from './address'
+import * as THOR from '../thorchain'
+import { assetAddress$ } from './address'
 import { SymDepositMemoRx, MemoRx } from './types'
 
 /**
  * Memo of symmetrical deposit txs
  */
-const symDepositTxMemo$: SymDepositMemoRx = Rx.combineLatest([selectedPoolAsset$, runeAddress$, assetAddress$]).pipe(
+const symDepositTxMemo$: SymDepositMemoRx = Rx.combineLatest([selectedPoolAsset$, THOR.address$, assetAddress$]).pipe(
   RxOp.map(([oPoolAsset, oRuneAddress, oAssetAddress]) =>
     FP.pipe(
       sequenceTOption(oPoolAsset, oRuneAddress, oAssetAddress),

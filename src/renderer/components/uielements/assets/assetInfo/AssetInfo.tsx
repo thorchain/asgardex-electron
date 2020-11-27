@@ -6,7 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
-import { loadingString } from '../../../../helpers/stringHelper'
+import { loadingString, emptyString } from '../../../../helpers/stringHelper'
 import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
 import { NonEmptyBalances } from '../../../../services/wallet/types'
 import { AssetIcon } from '../assetIcon'
@@ -46,7 +46,7 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
             FP.pipe(
               previousBalance.current,
               O.map((amount) => formatAssetAmount({ amount, trimZeros: true })),
-              O.getOrElse(() => loadingString)
+              O.getOrElse(() => emptyString)
             ),
           ([assetsWB, asset]) =>
             FP.pipe(

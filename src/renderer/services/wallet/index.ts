@@ -1,3 +1,4 @@
+import { address$ } from './address'
 import { reloadBalances, reloadBalances$, balancesState$, chainBalances$ } from './balances'
 import { setSelectedAsset, selectedAsset$ } from './common'
 import { keystoreService, removeKeystore } from './keystore'
@@ -7,6 +8,7 @@ import { txs$, loadTxs, explorerUrl$, getExplorerTxUrl$, resetTxsPage } from './
  * Exports all functions and observables needed at UI level (provided by `WalletContext`)
  */
 export {
+  address$,
   keystoreService,
   removeKeystore,
   setSelectedAsset,

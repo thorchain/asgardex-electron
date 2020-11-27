@@ -13,7 +13,7 @@ import {
   updateStakeFeesEffect$,
   retrieveLedgerAddress,
   removeLedgerAddress
-} from '../services/chain/context'
+} from '../services/chain/index'
 
 type ChainContextValue = {
   clientByChain$: typeof clientByChain$

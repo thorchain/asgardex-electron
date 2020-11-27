@@ -44,9 +44,7 @@ const loadTxs$ = ({
 }
 
 /**
- * `Txs` of selected asset
- *
- * Data will be loaded by first subscription only
+ * `Txs` state by given client
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
 export const txs$: (client$: XChainClient$) => (params: TxsParams) => TxsPageLD = (client$) => ({
