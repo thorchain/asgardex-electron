@@ -1,11 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balance } from '@xchainjs/xchain-client'
+import { Address, Balance } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
+import { LedgerErrorId } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { BalancesRD, LoadTxsParams } from '../clients'
 
@@ -76,5 +77,5 @@ export type NonEmptyApiErrors = NonEmptyArray<ApiError>
 export type TxRD = RD.RemoteData<ApiError, string>
 export type TxLD = LiveData<ApiError, string>
 
-export type LedgerAddressRD = RD.RemoteData<Error, string>
-export type LedgerAddressLD = LiveData<Error, string>
+export type LedgerAddressRD = RD.RemoteData<LedgerErrorId, Address>
+export type LedgerAddressLD = LiveData<LedgerErrorId, Address>

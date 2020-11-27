@@ -116,10 +116,19 @@ type WalletMessageKey =
   | 'wallet.errors.amount.shouldBeLessThanBalanceAndFee'
   | 'wallet.errors.fee.notCovered'
   | 'wallet.errors.invalidChain'
-  | 'wallet.add.device.error.title'
-  | 'wallet.add.device.error.description'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
+
+type LedgerMessageKey =
+  | 'ledger.add.device.error.title'
+  | 'ledger.errors.no.device'
+  | 'ledger.errors.already.in.use'
+  | 'ledger.errors.no.app'
+  | 'ledger.errors.wrong.app'
+  | 'ledger.errors.denied'
+  | 'ledger.errors.unknown'
+
+export type LedgerMessages = { [key in LedgerMessageKey]: string }
 
 type SettingMessageKey =
   | 'setting.title'
@@ -192,7 +201,8 @@ export type Messages = CommonMessages &
   WalletMessages &
   SettingMessages &
   SwapMessages &
-  StakeMessages
+  StakeMessages &
+  LedgerMessages
 
 export enum Locale {
   EN = 'en',
