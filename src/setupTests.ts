@@ -8,7 +8,7 @@ import { Option, isNone } from 'fp-ts/lib/Option'
 import { RunHelpers } from 'rxjs/internal/testing/TestScheduler'
 import { TestScheduler } from 'rxjs/testing'
 
-import { ApiKeystore, ApiLang, ApiUrl } from './shared/api/types'
+import { ApiKeystore, ApiLang, ApiUrl, ApiHDWallet } from './shared/api/types'
 import * as mockApi from './shared/mock/api'
 
 type RunObservableCallback<T> = (helpers: RunHelpers) => T
@@ -24,6 +24,7 @@ declare global {
   }
 
   interface Window {
+    apiHDWallet: ApiHDWallet
     apiKeystore: ApiKeystore
     apiLang: ApiLang
     apiUrl: ApiUrl
@@ -49,6 +50,7 @@ global.runObservable = <T>(callback: RunObservableCallback<T>) => {
 global.window.apiKeystore = { ...mockApi.apiKeystore }
 global.window.apiLang = { ...mockApi.apiLang }
 global.window.apiUrl = { ...mockApi.apiUrl }
+global.window.apiHDWallet = { ...mockApi.apiHDWallet }
 
 /**
  * Definition of custom matchers

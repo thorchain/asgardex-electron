@@ -6,6 +6,7 @@ import { BaseAmount } from '@xchainjs/xchain-util'
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeeLD, Memo } from '../chain/types'
 import * as C from '../clients'
+import { LedgerAddressLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -35,4 +36,10 @@ export type FeesService = {
   getPoolFeeRate: () => FeeRateRD
   reloadFees: () => void
   reloadStakeFee: () => void
+}
+
+export type LedgerService = {
+  ledgerAddress$: LedgerAddressLD
+  retrieveLedgerAddress: () => void
+  removeLedgerAddress: () => void
 }

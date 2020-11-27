@@ -10,7 +10,8 @@ const settings: SettingMessages = {
   'setting.view.phrase': 'Phrase ansehen',
   'setting.midgard': 'Midgard',
   'setting.version': 'Version',
-  'setting.notconnected': 'Offline'
+  'setting.notconnected': 'Offline',
+  'setting.add.device': 'ADD DEVICE'
 }
 
 export default settings

@@ -39,3 +39,5 @@ export type SendStakeTxParams = { chain: Chain; asset: Asset; poolAddress: strin
 export type WithdrawFee = BaseAmount
 export type WithdrawFeeRD = RD.RemoteData<Error, WithdrawFee>
 export type WithdrawFeeLD = LiveData<Error, WithdrawFee>
+
+export type LedgerAddressParams = { chain: Chain }
