@@ -9,7 +9,7 @@ import { useObservableState, useSubscription } from 'observable-hooks'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
-import { AddStake } from '../../../components/stake/add'
+import { AddDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
 import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
@@ -24,15 +24,15 @@ import { SymDepositMemo, Memo } from '../../../services/chain/types'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
-import { StakeType } from '../../../types/asgardex'
+import { DepositType } from '../../../types/asgardex'
 
 type Props = {
   asset: Asset
   runeAsset: Asset
-  type: StakeType
+  type: DepositType
 }
 
-export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' }) => {
+export const AddDepositView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' }) => {
   const history = useHistory()
 
   const onChangeAsset = useCallback(
@@ -143,7 +143,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
       <>
         {/* TODO (@Veado) i18n */}
         {error && <Alert type="error" message="Something went wrong" description={error.toString()} />}
-        <AddStake
+        <AddDeposit
           type={type}
           onChangeAsset={emptyFunc}
           asset={asset}
@@ -154,7 +154,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
           runeBalance={O.none}
           baseChainAssetBalance={O.none}
           crossChainAssetBalance={O.none}
-          onStake={emptyFunc}
+          onDeposit={emptyFunc}
           fees={stakeFees}
           reloadFees={emptyFunc}
           priceAsset={selectedPricePoolAsset}
@@ -179,7 +179,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
       ([assetPrice, poolAssets, poolDetail]) => {
         return (
           <>
-            <AddStake
+            <AddDeposit
               type={type}
               poolData={toPoolData(poolDetail)}
               onChangeAsset={onChangeAsset}
@@ -195,7 +195,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
               poolAddress={oPoolAddress}
               symDepositMemo={symDepositTxMemo}
               asymDepositMemo={asymDepositTxMemo}
-              onStake={console.log}
+              onDeposit={console.log}
               fees={stakeFees}
               reloadFees={reloadStakeFees}
               priceAsset={selectedPricePoolAsset}

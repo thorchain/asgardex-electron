@@ -7,21 +7,21 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
-import { ErrorView } from '../../components/shared/error/'
-import { Stake } from '../../components/stake/Stake'
+import { Deposit } from '../../components/deposit/Deposit'
+import { ErrorView } from '../../components/shared/error'
 import { BackLink } from '../../components/uielements/backLink'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { getDefaultRuneAsset } from '../../helpers/assetHelper'
 import { StakeRouteParams } from '../../routes/stake'
-import { AddStakeView } from './add/AddStakeView'
+import { AddDepositView } from './add/AddDepositView'
 import { ShareView } from './share/ShareView'
-import { WithdrawStakeView } from './withdraw/WithdrawStakeView'
+import { WithdrawDepositView } from './withdraw/WithdrawDepositView'
 
 type Props = {}
 
-export const StakeView: React.FC<Props> = (_) => {
+export const DepositView: React.FC<Props> = (_) => {
   const intl = useIntl()
 
   const { asset } = useParams<StakeRouteParams>()
@@ -92,13 +92,13 @@ export const StakeView: React.FC<Props> = (_) => {
             />
           ),
           (selectedAsset) => (
-            <Stake
+            <Deposit
               runeAsset={runeAsset}
               asset={selectedAsset}
               keystoreState={keystoreState}
               ShareContent={ShareView}
-              StakeContent={AddStakeView}
-              WidthdrawContent={WithdrawStakeView}
+              DepositContent={AddDepositView}
+              WidthdrawContent={WithdrawDepositView}
             />
           )
         )

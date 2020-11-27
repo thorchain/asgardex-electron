@@ -30,7 +30,7 @@ const createStakeService = (
    * effects at the subscription callback as stream is completed.
    * That's why we need to create new stream via factory to have
    * a single stream per http request
-   * @example /src/renderer/views/stake/StakeView.tsx
+   * @example /src/renderer/views/deposit/DepositView.tsx
    */
   const getStakes$ = (): StakersAssetDataLD =>
     FP.pipe(

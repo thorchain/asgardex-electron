@@ -25,4 +25,4 @@ export const WithdrawStory: React.FC<{ stakedAsset?: Asset; runeAsset?: Asset }>
   )
 }
 
-storiesOf('Components/Stake/Withdraw', module).add('default', () => <WithdrawStory />)
+storiesOf('Components/Deposit/Withdraw', module).add('default', () => <WithdrawStory />)

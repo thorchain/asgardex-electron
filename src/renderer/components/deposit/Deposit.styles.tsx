@@ -42,7 +42,7 @@ export const ShareContentWrapper = styled.div`
   `};
 `
 
-export const StakeContentCol = styled(Col).attrs({})`
+export const DepositContentCol = styled(Col).attrs({})`
   background: ${palette('background', 0)};
   min-height: auto;
   ${media.xl`

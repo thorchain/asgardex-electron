@@ -21,7 +21,7 @@ export enum TxTypes {
   CREATE = 'create'
 }
 
-export type StakeType = 'sym' | 'asym'
+export type DepositType = 'sym' | 'asym'
 
 export const MAX_VALUE = 100
 
