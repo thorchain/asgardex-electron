@@ -1,5 +1,4 @@
-import { Send } from './Send'
-import { SendFormBNB } from './SendFormBNB'
-import { SendFormBTC } from './SendFormBTC'
-
-export { Send, SendFormBNB, SendFormBTC }
+export { Send } from './Send'
+export { SendFormBNB } from './SendFormBNB'
+export { SendFormBTC } from './SendFormBTC'
+export { SendFormTHOR } from './SendFormTHOR'
