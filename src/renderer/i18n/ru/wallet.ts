@@ -51,8 +51,7 @@ const wallet: WalletMessages = {
   'wallet.errors.invalidChain': 'Цепь недействительна',
   'wallet.password.confirmation': 'Подтверждение пароля',
   'wallet.password.confirmation.pending': 'Проверка пароля',
-  'wallet.password.confirmation.error': 'Неверный пароль',
-  'wallet.add.device.error.title': 'Ledger Device Error - RU'
+  'wallet.password.confirmation.error': 'Неверный пароль'
 }
 
 export default wallet

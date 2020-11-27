@@ -4,6 +4,7 @@ import antdData from 'antd/lib/locale-provider/en_GB'
 
 import { Messages } from '../types'
 import common from './common'
+import ledger from './ledger'
 import midgard from './midgard'
 import pools from './pools'
 import routes from './routes'
@@ -21,5 +22,6 @@ export default {
   ...settings,
   ...swap,
   ...stake,
-  ...midgard
+  ...midgard,
+  ...ledger
 } as Messages

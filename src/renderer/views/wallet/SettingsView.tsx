@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxO from 'rxjs/operators'
 
+import { LedgerErrorId } from '../../../shared/api/types'
 import { Settings } from '../../components/wallet/settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -151,9 +152,30 @@ export const SettingsView: React.FC = (): JSX.Element => {
 
   useEffect(() => {
     if (RD.isFailure(bitcoinLedgerAddress)) {
+      let description
+      switch (bitcoinLedgerAddress.error) {
+        case LedgerErrorId.NO_DEVICE:
+          description = intl.formatMessage({ id: 'ledger.errors.no.device' })
+          break
+        case LedgerErrorId.ALREADY_IN_USE:
+          description = intl.formatMessage({ id: 'ledger.errors.already.in.use' })
+          break
+        case LedgerErrorId.NO_APP:
+          description = intl.formatMessage({ id: 'ledger.errors.no.app' })
+          break
+        case LedgerErrorId.WRONG_APP:
+          description = intl.formatMessage({ id: 'ledger.errors.wrong.app' })
+          break
+        case LedgerErrorId.DENIED:
+          description = intl.formatMessage({ id: 'ledger.errors.denied' })
+          break
+        default:
+          description = intl.formatMessage({ id: 'ledger.errors.unknown' })
+          break
+      }
       notification.error({
-        message: intl.formatMessage({ id: 'wallet.add.device.error.title' }),
-        description: bitcoinLedgerAddress.error.message
+        message: intl.formatMessage({ id: 'ledger.add.device.error.title' }),
+        description
       })
     }
   }, [bitcoinLedgerAddress, intl])

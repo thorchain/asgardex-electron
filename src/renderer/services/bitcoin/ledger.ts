@@ -1,20 +1,21 @@
 import * as RD from '@devexperts/remote-data-ts'
+import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
-import { LedgerAddressResponse } from '../../../shared/api/types'
+import { LedgerErrorId } from '../../../shared/api/types'
 import { observableState } from '../../helpers/stateHelper'
 import { LedgerAddressRD } from '../wallet/types'
 import { LedgerService } from './types'
 
 const { get$: ledgerAddress$, set: setLedgerAddressRD } = observableState<LedgerAddressRD>(RD.initial)
 
-const errorHandler = (value: LedgerAddressResponse) => {
-  if (value.error) {
-    return Promise.reject(value.error)
+const errorHandler = (value: E.Either<LedgerErrorId, string>) => {
+  if (E.isLeft(value)) {
+    return Promise.reject(value.left)
   }
-  return Promise.resolve(value.result)
+  return Promise.resolve(value.right)
 }
 
 const retrieveLedgerAddress = () =>
@@ -23,7 +24,7 @@ const retrieveLedgerAddress = () =>
     switchMap((value) => Rx.from(errorHandler(value))),
     map(RD.success),
     startWith(RD.pending),
-    catchError((err) => Rx.of(RD.failure(err)))
+    catchError((error) => Rx.of(RD.failure(error)))
   ).subscribe(setLedgerAddressRD)
 
 const createLedgerService = (): LedgerService => ({
