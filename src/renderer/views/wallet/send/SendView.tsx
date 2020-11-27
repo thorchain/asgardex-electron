@@ -15,6 +15,7 @@ import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { SendViewBNB, SendViewBTC, SendViewETH } from './index'
+import { SendViewTHOR } from './SendViewTHOR'
 
 type Props = {}
 
@@ -62,6 +63,8 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
         case 'ETH':
           return <SendViewETH />
+        case 'THOR':
+          return <SendViewTHOR thorAsset={asset} balances={balances} getExplorerTxUrl={getExplorerTxUrl} />
         default:
           return (
             <h1>

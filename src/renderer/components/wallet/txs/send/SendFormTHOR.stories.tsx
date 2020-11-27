@@ -4,8 +4,7 @@ import { storiesOf } from '@storybook/react'
 import { Balance, Balances } from '@xchainjs/xchain-client'
 import {
   assetAmount,
-  AssetBNB,
-  AssetRune67C,
+  AssetRuneNative,
   assetToBase,
   assetToString,
   baseToAsset,
@@ -15,19 +14,14 @@ import * as O from 'fp-ts/lib/Option'
 
 import { TRANSFER_FEES } from '../../../../../shared/mock/fees'
 import { AddressValidation, SendTxParams } from '../../../../services/binance/types'
-import { SendFormBNB } from './index'
-
-const bnbAsset: Balance = {
-  asset: AssetBNB,
-  amount: assetToBase(assetAmount(1.23))
-}
+import { SendFormTHOR } from './index'
 
 const runeAsset: Balance = {
-  asset: AssetRune67C,
+  asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2))
 }
 
-const balances: Balances = [bnbAsset, runeAsset]
+const balances: Balances = [runeAsset]
 
 const fee = O.some(TRANSFER_FEES.single)
 
@@ -40,18 +34,9 @@ const onSubmitHandler = ({ recipient, amount, asset, memo }: SendTxParams) =>
     )}, memo: ${memo}`
   )
 
-storiesOf('Wallet/SendFormBNB', module)
-  .add('send bnb', () => (
-    <SendFormBNB
-      balance={bnbAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      fee={fee}
-    />
-  ))
-  .add('send rune', () => (
-    <SendFormBNB
+storiesOf('Wallet/SendFormTHOR', module)
+  .add('send', () => (
+    <SendFormTHOR
       balance={runeAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
@@ -60,8 +45,8 @@ storiesOf('Wallet/SendFormBNB', module)
     />
   ))
   .add('pending', () => (
-    <SendFormBNB
-      balance={bnbAsset}
+    <SendFormTHOR
+      balance={runeAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -70,20 +55,11 @@ storiesOf('Wallet/SendFormBNB', module)
     />
   ))
   .add('no fees', () => (
-    <SendFormBNB
-      balance={bnbAsset}
+    <SendFormTHOR
+      balance={runeAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       fee={O.none}
-    />
-  ))
-  .add('bnb amount < fees', () => (
-    <SendFormBNB
-      balance={bnbAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      fee={O.some(assetAmount(1.234))}
     />
   ))

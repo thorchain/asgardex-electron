@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { Address } from '@xchainjs/xchain-binance'
 import { Balance, Balances } from '@xchainjs/xchain-client'
 import {
   formatAssetAmountCurrency,
@@ -8,7 +7,7 @@ import {
   AssetAmount,
   bn,
   baseToAsset,
-  AssetBNB,
+  AssetRuneNative,
   assetToBase
 } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
@@ -18,10 +17,10 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
-import { isBnbAsset } from '../../../../helpers/assetHelper'
+import { isRuneNativeAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
-import { getBnbAmountFromBalances } from '../../../../helpers/walletHelper'
-import { AddressValidation, SendTxParams } from '../../../../services/binance/types'
+import { getRuneNativeAmountFromBalances } from '../../../../helpers/walletHelper'
+import { AddressValidation, SendTxParams } from '../../../../services/thorchain/types'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
@@ -29,7 +28,7 @@ import { validateTxAmountInput } from '../TxForm.util'
 import { useChangeAssetHandler } from './Send.hooks'
 
 export type FormValues = {
-  recipient: Address
+  recipient: string
   amount: string
   memo?: string
 }
@@ -43,7 +42,7 @@ type Props = {
   fee: O.Option<AssetAmount>
 }
 
-export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
+export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
   const { onSubmit, balances, balance, isLoading = false, addressValidation, fee: oFee } = props
   const intl = useIntl()
 
@@ -51,13 +50,13 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
 
   const [form] = Form.useForm<FormValues>()
 
-  const oBnbAmount: O.Option<AssetAmount> = useMemo(() => {
-    // return balance of current asset (if BNB)
-    if (isBnbAsset(balance.asset)) {
+  const oRuneNativeAmount: O.Option<AssetAmount> = useMemo(() => {
+    // return balance of current asset (if RuneNative)
+    if (isRuneNativeAsset(balance.asset)) {
       return O.some(baseToAsset(balance.amount))
     }
-    // or check list of other assets to get bnb balance
-    return FP.pipe(balances, getBnbAmountFromBalances)
+    // or check list of other assets to get RuneNative balance
+    return FP.pipe(balances, getRuneNativeAmountFromBalances)
   }, [balance, balances])
 
   const feeLabel = useMemo(
@@ -66,7 +65,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
         oFee,
         O.fold(
           () => '--',
-          (fee) => formatAssetAmountCurrency({ amount: fee, asset: AssetBNB, trimZeros: true })
+          (fee) => formatAssetAmountCurrency({ amount: fee, asset: AssetRuneNative, trimZeros: true })
         )
       ),
     [oFee]
@@ -74,28 +73,28 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
 
   const isFeeError = useMemo(() => {
     return FP.pipe(
-      sequenceTOption(oFee, oBnbAmount),
+      sequenceTOption(oFee, oRuneNativeAmount),
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oFee),
-        ([fee, bnbAmount]) => bnbAmount.amount().isLessThan(fee.amount())
+        ([fee, runeAmount]) => runeAmount.amount().isLessThan(fee.amount())
       )
     )
-  }, [oBnbAmount, oFee])
+  }, [oRuneNativeAmount, oFee])
 
   const renderFeeError = useMemo(() => {
     if (!isFeeError) return <></>
 
     const amount = FP.pipe(
-      oBnbAmount,
-      // no bnb asset == zero amount
+      oRuneNativeAmount,
+      // no RuneNative asset == zero amount
       O.getOrElse(() => ZERO_ASSET_AMOUNT)
     )
 
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
       {
-        balance: formatAssetAmountCurrency({ amount, asset: AssetBNB, trimZeros: true })
+        balance: formatAssetAmountCurrency({ amount, asset: AssetRuneNative, trimZeros: true })
       }
     )
 
@@ -104,7 +103,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
         {msg}
       </Styled.Label>
     )
-  }, [oBnbAmount, intl, isFeeError])
+  }, [oRuneNativeAmount, intl, isFeeError])
 
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
@@ -118,19 +117,19 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     [addressValidation, intl]
   )
 
-  // max amount for bnb
+  // max amount for RuneNative
   const maxAmount = useMemo(() => {
-    const maxBnbAmount = FP.pipe(
-      sequenceTOption(oFee, oBnbAmount),
+    const maxRuneAmount = FP.pipe(
+      sequenceTOption(oFee, oRuneNativeAmount),
       O.fold(
-        // Set maxAmount to zero if we dont know anything about bnb and fee amounts
+        // Set maxAmount to zero if we dont know anything about RuneNative and fee amounts
         () => ZERO_BN,
-        ([fee, bnbAmount]) => bnbAmount.amount().minus(fee.amount())
+        ([fee, runeAmount]) => runeAmount.amount().minus(fee.amount())
       ),
       assetAmount
     )
-    return isBnbAsset(balance.asset) ? maxBnbAmount : baseToAsset(balance.amount)
-  }, [oFee, oBnbAmount, balance])
+    return isRuneNativeAsset(balance.asset) ? maxRuneAmount : baseToAsset(balance.amount)
+  }, [oFee, oRuneNativeAmount, balance])
 
   const amountValidator = useCallback(
     async (_: unknown, value: BigNumber) => {
@@ -138,7 +137,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
       const errors = {
         msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
         msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
-        msg3: isBnbAsset(balance.asset)
+        msg3: isRuneNativeAsset(balance.asset)
           ? intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalanceAndFee' })
           : intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
       }

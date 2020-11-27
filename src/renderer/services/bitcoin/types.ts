@@ -22,7 +22,7 @@ export type FeesWithRatesLD = LiveData<Error, FeesWithRates>
 export type AddressValidation = Client['validateAddress']
 
 export type SendTxParams = {
-  to: string // to address
+  recipient: string // to address
   amount: BaseAmount
   feeRate: number
   memo?: string

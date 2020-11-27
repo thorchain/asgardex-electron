@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { baseToAsset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -24,7 +23,7 @@ const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendStakeTxPar
 
   switch (chain) {
     case 'BNB':
-      return BNB.sendStakeTx({ to: poolAddress, amount: baseToAsset(amount), asset, memo })
+      return BNB.sendStakeTx({ recipient: poolAddress, amount, asset, memo })
 
     case 'BTC':
       return FP.pipe(
@@ -33,7 +32,7 @@ const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendStakeTxPar
         O.fold(
           // TODO (@veado) i18n
           () => stakeTxFailure$('Fee rate for BTC transaction not available'),
-          (feeRate) => BTC.sendStakeTx({ to: poolAddress, amount, feeRate, memo })
+          (feeRate) => BTC.sendStakeTx({ recipient: poolAddress, amount, feeRate, memo })
         )
       )
 

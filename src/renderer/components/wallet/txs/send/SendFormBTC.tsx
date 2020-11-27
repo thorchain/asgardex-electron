@@ -42,7 +42,7 @@ export type FormValues = {
 type Props = {
   balances: Balances
   assetWB: Balance
-  onSubmit: ({ to, amount, feeRate, memo }: SendTxParams) => void
+  onSubmit: ({ recipient, amount, feeRate, memo }: SendTxParams) => void
   isLoading?: boolean
   addressValidation: AddressValidation
   feesWithRates: FeesWithRatesRD
@@ -258,7 +258,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         selectedFeeRate,
         O.map((feeRate) => {
-          onSubmit({ to: recipient, amount: assetToBase(assetAmount(amount)), feeRate, memo })
+          onSubmit({ recipient, amount: assetToBase(assetAmount(amount)), feeRate, memo })
           return true
         })
       ),

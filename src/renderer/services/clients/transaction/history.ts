@@ -1,12 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { XChainClient } from '@xchainjs/xchain-client'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import { map, catchError, startWith, switchMap } from 'rxjs/operators'
 
-import { ApiError, ErrorId } from '../wallet/types'
-import { XChainClient$, TxsPageLD, TxsParams } from './types'
+import { ApiError, ErrorId } from '../../wallet/types'
+import { XChainClient$, TxsPageLD, TxsParams } from '../types'
 
 /**
  * Observable to load txs from Binance API endpoint
@@ -21,10 +21,8 @@ const loadTxs$ = ({
 } & TxsParams): TxsPageLD => {
   const txAsset = FP.pipe(
     asset,
-    O.fold(
-      () => undefined,
-      ({ symbol }) => symbol
-    )
+    O.map(({ symbol }) => symbol),
+    O.toUndefined
   )
 
   return Rx.from(

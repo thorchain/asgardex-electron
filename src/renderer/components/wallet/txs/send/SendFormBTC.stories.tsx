@@ -40,8 +40,10 @@ const feesWithRatesRD = RD.success({ fees, rates })
 
 const addressValidation: AddressValidation = (_) => true
 
-const onSubmitHandler = ({ to, amount, feeRate, memo }: SendTxParams) =>
-  console.log(`to: ${to}, amount ${formatBaseAmount(amount)}, feeRate: ${JSON.stringify(feeRate)}, memo: ${memo}`)
+const onSubmitHandler = ({ recipient, amount, feeRate, memo }: SendTxParams) =>
+  console.log(
+    `to: ${recipient}, amount ${formatBaseAmount(amount)}, feeRate: ${JSON.stringify(feeRate)}, memo: ${memo}`
+  )
 
 const reloadFeesHandler = () => console.log('reload fees')
 

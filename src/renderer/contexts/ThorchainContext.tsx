@@ -1,17 +1,42 @@
 import React, { createContext, useContext } from 'react'
 
-import { client$, balances$, reloadBalances } from '../services/thorchain'
+import {
+  client$,
+  balances$,
+  reloadBalances,
+  txs$,
+  reloadFees,
+  fees$,
+  txRD$,
+  sendStakeTx,
+  resetTx,
+  pushTx
+} from '../services/thorchain'
 
 export type ThorchainContextValue = {
   client$: typeof client$
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
+  txs$: typeof txs$
+  reloadFees: typeof reloadFees
+  fees$: typeof fees$
+  pushTx: typeof pushTx
+  resetTx: typeof resetTx
+  sendStakeTx: typeof sendStakeTx
+  txRD$: typeof txRD$
 }
 
 const initialContext: ThorchainContextValue = {
   client$,
   reloadBalances,
-  balances$
+  balances$,
+  txs$,
+  pushTx,
+  resetTx,
+  sendStakeTx,
+  txRD$,
+  reloadFees,
+  fees$
 }
 
 const ThorchainContext = createContext<ThorchainContextValue | null>(null)

@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Balances, Transfer, Client } from '@xchainjs/xchain-binance'
 import { Address } from '@xchainjs/xchain-binance'
-import { Asset, AssetAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 
@@ -59,8 +59,8 @@ export type TxWithStateRD = RD.RemoteData<Error, TxWithState>
 export type TxWithStateLD = LiveData<Error, TxWithState>
 
 export type SendTxParams = {
-  to: Address
-  amount: AssetAmount
+  recipient: Address
+  amount: BaseAmount
   asset: Asset
   memo?: string
 }
