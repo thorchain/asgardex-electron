@@ -1,7 +1,7 @@
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { PubKeyEd25519 } from '@xchainjs/xchain-crypto/'
 
-import { ApiLang, ApiKeystore, ApiUrl } from '../api/types'
+import { ApiLang, ApiKeystore, ApiUrl, ApiHDWallet } from '../api/types'
 import { Locale } from '../i18n/types'
 
 // Mock "empty" `apiKeystore`
@@ -45,4 +45,9 @@ export const apiLang: ApiLang = {
 // Mock `apiUrl`
 export const apiUrl: ApiUrl = {
   openExternal: (url: string) => Promise.resolve(console.log('openExternal called: ', url))
+}
+
+// Mock `apiHDWallet`
+export const apiHDWallet: ApiHDWallet = {
+  getBTCAddress: () => Promise.resolve('btc_addr')
 }

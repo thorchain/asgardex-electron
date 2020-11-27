@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron'
 
+import { apiHDWallet } from './api/hdwallet'
 import { apiKeystore } from './api/keystore'
 import { apiLang } from './api/lang'
 import { apiUrl } from './api/url'
@@ -15,3 +16,5 @@ contextBridge.exposeInMainWorld('apiKeystore', apiKeystore)
 contextBridge.exposeInMainWorld('apiLang', apiLang)
 // `apiUrl` object
 contextBridge.exposeInMainWorld('apiUrl', apiUrl)
+// `apiHDWallet` object
+contextBridge.exposeInMainWorld('apiHDWallet', apiHDWallet)

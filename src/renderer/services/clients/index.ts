@@ -1,3 +1,4 @@
+export * from './address'
 export * from './common'
 export * from './types'
 export * from './utils'

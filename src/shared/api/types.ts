@@ -17,10 +17,15 @@ export type ApiUrl = {
   openExternal: (url: string) => Promise<void>
 }
 
+export type ApiHDWallet = {
+  getBTCAddress: () => Promise<string>
+}
+
 declare global {
   interface Window {
     apiKeystore: ApiKeystore
     apiLang: ApiLang
     apiUrl: ApiUrl
+    apiHDWallet: ApiHDWallet
   }
 }
