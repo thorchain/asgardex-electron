@@ -1,2 +1,2 @@
-export * from './stake'
+export * from './deposit'
 export * from './withdraw'
