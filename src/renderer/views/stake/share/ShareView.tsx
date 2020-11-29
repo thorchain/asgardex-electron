@@ -1,7 +1,14 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, baseAmount, bnOrZero, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  AssetRuneNative,
+  baseAmount,
+  bnOrZero,
+  getValueOfAsset1InAsset2,
+  getValueOfRuneInAsset
+} from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
@@ -17,7 +24,7 @@ import { toPoolData } from '../../../services/midgard/utils'
 import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard'
 import * as Styled from './ShareView.styles'
 
-export const ShareView: React.FC<{ asset: Asset; runeAsset: Asset }> = ({ asset, runeAsset }) => {
+export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const { service: midgardService } = useMidgardContext()
   const {
     pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$ },
@@ -52,7 +59,7 @@ export const ShareView: React.FC<{ asset: Asset; runeAsset: Asset }> = ({ asset,
 
       return (
         <PoolShare
-          sourceAsset={runeAsset}
+          sourceAsset={AssetRuneNative}
           targetAsset={asset}
           poolShare={poolShare}
           stakeUnits={stakeUnits}
@@ -65,7 +72,7 @@ export const ShareView: React.FC<{ asset: Asset; runeAsset: Asset }> = ({ asset,
         />
       )
     },
-    [asset, oPriceAsset, pricePoolData, runeAsset]
+    [asset, oPriceAsset, pricePoolData]
   )
 
   const renderPoolShare = useMemo(

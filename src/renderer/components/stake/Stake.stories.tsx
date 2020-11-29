@@ -4,7 +4,6 @@ import { storiesOf } from '@storybook/react'
 import { AssetBNB } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { getDefaultRuneAsset } from '../../helpers/assetHelper'
 import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
 import { AddSymStakeStory } from './add/AddStake.stories'
 import { Stake } from './Stake'
@@ -14,7 +13,6 @@ storiesOf('Stake', module)
   .add('default', () => {
     return (
       <Stake
-        runeAsset={getDefaultRuneAsset()}
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
         StakeContent={AddSymStakeStory}
@@ -26,7 +24,6 @@ storiesOf('Stake', module)
   .add('no wallet', () => {
     return (
       <Stake
-        runeAsset={getDefaultRuneAsset()}
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
         StakeContent={AddSymStakeStory}
@@ -38,7 +35,6 @@ storiesOf('Stake', module)
   .add('locked', () => {
     return (
       <Stake
-        runeAsset={getDefaultRuneAsset()}
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
         StakeContent={AddSymStakeStory}

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 
-import { assetFromString, Chain } from '@xchainjs/xchain-util'
+import { assetFromString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -13,7 +13,6 @@ import { BackLink } from '../../components/uielements/backLink'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { getDefaultRuneAsset } from '../../helpers/assetHelper'
 import { StakeRouteParams } from '../../routes/stake'
 import { AddStakeView } from './add/AddStakeView'
 import { ShareView } from './share/ShareView'
@@ -28,27 +27,13 @@ export const StakeView: React.FC<Props> = (_) => {
   const {
     service: {
       setSelectedPoolAsset,
-      stake: { setAddress },
-      pools: { runeAsset$ }
+      stake: { setAddress }
     }
   } = useMidgardContext()
   const { keystoreService } = useWalletContext()
   const { address$ } = useBinanceContext()
 
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
-
-  const runeAsset = useObservableState(
-    runeAsset$,
-    getDefaultRuneAsset(
-      FP.pipe(
-        oSelectedAsset,
-        O.map((asset) => asset.chain),
-        // In this case we don't care about deafult value as invalid
-        // asset will be processed in a separate branch of O.fold
-        O.getOrElse((): Chain => 'BNB')
-      )
-    )
-  )
 
   // Set selected pool asset whenever an asset in route has been changed
   // Needed to get all data for this pool (pool details etc.)
@@ -93,7 +78,6 @@ export const StakeView: React.FC<Props> = (_) => {
           ),
           (selectedAsset) => (
             <Stake
-              runeAsset={runeAsset}
               asset={selectedAsset}
               keystoreState={keystoreState}
               ShareContent={ShareView}
