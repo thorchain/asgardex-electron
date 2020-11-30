@@ -162,38 +162,38 @@ type SwapMessageKey =
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
-type StakeMessageKey =
-  | 'stake.share.title'
-  | 'stake.share.units'
-  | 'stake.share.poolshare'
-  | 'stake.share.total'
-  | 'stake.redemption.title'
-  | 'stake.totalEarnings'
-  | 'stake.add.sym'
-  | 'stake.add.asym'
-  | 'stake.add.error.chainFeeNotCovered'
-  | 'stake.add.error.nobalances'
-  | 'stake.add.error.nobalance1'
-  | 'stake.add.error.nobalance2'
-  | 'stake.withdraw'
-  | 'stake.advancedMode'
-  | 'stake.drag'
-  | 'stake.poolDetails.depth'
-  | 'stake.poolDetails.24hvol'
-  | 'stake.poolDetails.allTimeVal'
-  | 'stake.poolDetails.totalSwaps'
-  | 'stake.poolDetails.totalStakers'
-  | 'stake.pool.noStakes'
-  | 'stake.wallet.add'
-  | 'stake.wallet.connect'
-  | 'stake.withdraw.title'
-  | 'stake.withdraw.choseText'
-  | 'stake.withdraw.receiveText'
-  | 'stake.withdraw.fee'
-  | 'stake.withdraw.feeNote'
-  | 'stake.withdraw.drag'
+type DepositMessageKey =
+  | 'deposit.share.title'
+  | 'deposit.share.units'
+  | 'deposit.share.poolshare'
+  | 'deposit.share.total'
+  | 'deposit.redemption.title'
+  | 'deposit.totalEarnings'
+  | 'deposit.add.sym'
+  | 'deposit.add.asym'
+  | 'deposit.add.error.chainFeeNotCovered'
+  | 'deposit.add.error.nobalances'
+  | 'deposit.add.error.nobalance1'
+  | 'deposit.add.error.nobalance2'
+  | 'deposit.withdraw'
+  | 'deposit.advancedMode'
+  | 'deposit.drag'
+  | 'deposit.poolDetails.depth'
+  | 'deposit.poolDetails.24hvol'
+  | 'deposit.poolDetails.allTimeVal'
+  | 'deposit.poolDetails.totalSwaps'
+  | 'deposit.poolDetails.totalUsers'
+  | 'deposit.pool.noStakes'
+  | 'deposit.wallet.add'
+  | 'deposit.wallet.connect'
+  | 'deposit.withdraw.title'
+  | 'deposit.withdraw.choseText'
+  | 'deposit.withdraw.receiveText'
+  | 'deposit.withdraw.fee'
+  | 'deposit.withdraw.feeNote'
+  | 'deposit.withdraw.drag'
 
-export type StakeMessages = { [key in StakeMessageKey]: string }
+export type DepositMessages = { [key in DepositMessageKey]: string }
 
 export type Messages = CommonMessages &
   RoutesMessages &
@@ -201,7 +201,7 @@ export type Messages = CommonMessages &
   WalletMessages &
   SettingMessages &
   SwapMessages &
-  StakeMessages &
+  DepositMessages &
   LedgerMessages
 
 export enum Locale {

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetAmount, BaseAmount, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { Asset, assetAmount, AssetRuneNative, BaseAmount, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
@@ -18,7 +18,6 @@ import * as Styled from './Withdraw.styles'
 
 type Props = {
   stakedAsset: Asset
-  runeAsset: Asset
   runePrice: BigNumber
   assetPrice: BigNumber
   selectedCurrencyAsset: Asset
@@ -33,7 +32,6 @@ type Props = {
 export const Withdraw: React.FC<Props> = ({
   onWithdraw,
   stakedAsset,
-  runeAsset,
   runePrice,
   assetPrice,
   selectedCurrencyAsset,
@@ -66,9 +64,9 @@ export const Withdraw: React.FC<Props> = ({
   return (
     <Styled.Container>
       <Label weight="bold" textTransform="uppercase">
-        {intl.formatMessage({ id: 'stake.withdraw.title' })}
+        {intl.formatMessage({ id: 'deposit.withdraw.title' })}
       </Label>
-      <Label>{intl.formatMessage({ id: 'stake.withdraw.choseText' })}</Label>
+      <Label>{intl.formatMessage({ id: 'deposit.withdraw.choseText' })}</Label>
 
       <Styled.Slider
         key={'asset amount slider'}
@@ -77,19 +75,19 @@ export const Withdraw: React.FC<Props> = ({
         disabled={disabled}
       />
       <Label weight={'bold'} textTransform={'uppercase'}>
-        {intl.formatMessage({ id: 'stake.withdraw.receiveText' })}
+        {intl.formatMessage({ id: 'deposit.withdraw.receiveText' })}
       </Label>
 
       <Styled.AssetContainer>
-        <Styled.AssetIcon asset={runeAsset} />
+        <Styled.AssetIcon asset={AssetRuneNative} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
             amount: withdrawAmounts.runeWithdraw,
-            asset: runeAsset,
+            asset: AssetRuneNative,
             trimZeros: true
           })}
           {/* show pricing if price asset is different only */}
-          {!eqAsset.equals(runeAsset, selectedCurrencyAsset) &&
+          {!eqAsset.equals(AssetRuneNative, selectedCurrencyAsset) &&
             ` (${formatAssetAmountCurrency({
               amount: assetAmount(withdrawAmounts.runeWithdraw.amount().times(runePrice)),
               asset: selectedCurrencyAsset,
@@ -124,7 +122,7 @@ export const Withdraw: React.FC<Props> = ({
       </Label>
 
       <Styled.Drag
-        title={intl.formatMessage({ id: 'stake.withdraw.drag' })}
+        title={intl.formatMessage({ id: 'deposit.withdraw.drag' })}
         onConfirm={() => onWithdraw(withdrawPercent)}
         disabled={disabled}
       />

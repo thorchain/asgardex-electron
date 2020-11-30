@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetToString, BaseAmount, bn } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, assetToString, BaseAmount, bn } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -19,7 +19,7 @@ import { getChainAsset, isBaseChainAsset, isCrossChainAsset } from '../../../hel
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
-import * as stakeRoutes from '../../../routes/stake'
+import * as stakeRoutes from '../../../routes/deposit'
 import { SymDepositMemo, Memo } from '../../../services/chain/types'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
@@ -28,16 +28,15 @@ import { StakeType } from '../../../types/asgardex'
 
 type Props = {
   asset: Asset
-  runeAsset: Asset
   type: StakeType
 }
 
-export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' }) => {
+export const AddStakeView: React.FC<Props> = ({ asset, type = 'asym' }) => {
   const history = useHistory()
 
   const onChangeAsset = useCallback(
     (asset: Asset) => {
-      history.replace(stakeRoutes.stake.path({ asset: assetToString(asset) }))
+      history.replace(stakeRoutes.deposit.path({ asset: assetToString(asset) }))
     },
     [history]
   )
@@ -49,16 +48,16 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
   } = useMidgardContext()
 
   const {
-    stakeFees$,
-    reloadStakeFees,
-    isCrossChainStake$,
+    depositFees$: stakeFees$,
+    reloadDepositFees: reloadStakeFees,
+    isCrossChainDeposit$: isCrossChainStake$,
     symDepositTxMemo$,
     asymDepositTxMemo$,
-    updateStakeFeesEffect$
+    updateDepositFeesEffect$
   } = useChainContext()
 
   // subscribe to
-  useSubscription(updateStakeFeesEffect$)
+  useSubscription(updateDepositFeesEffect$)
 
   const [stakeFees] = useObservableState(() => stakeFees$(type), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(poolAddress$, O.none)
@@ -69,7 +68,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
 
-  const [assetsWB] = useObservableState(
+  const [balances] = useObservableState(
     () =>
       FP.pipe(
         balancesState$,
@@ -83,35 +82,33 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
   const assetBalance: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        assetsWB,
+        balances,
         O.chain(getBalanceByAsset(asset)),
-        O.map((assetWithAmount) => {
-          return assetWithAmount.amount
-        })
+        O.map(({ amount }) => amount)
       ),
-    [asset, assetsWB]
+    [asset, balances]
   )
 
   const runeBalance: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        assetsWB,
-        O.chain(getBalanceByAsset(runeAsset)),
-        O.map((assetWithAmount) => assetWithAmount.amount)
+        balances,
+        O.chain(getBalanceByAsset(AssetRuneNative)),
+        O.map(({ amount }) => amount)
       ),
-    [assetsWB, runeAsset]
+    [balances]
   )
 
-  const baseChainAssetBalance: O.Option<BaseAmount> = useMemo(
+  const chainAssetBalance: O.Option<BaseAmount> = useMemo(
     () =>
       isBaseChainAsset(asset)
         ? assetBalance
         : FP.pipe(
-            assetsWB,
+            balances,
             O.chain(getBalanceByAsset(BASE_CHAIN_ASSET)),
-            O.map((assetWithAmount) => assetWithAmount.amount)
+            O.map(({ amount }) => amount)
           ),
-    [asset, assetBalance, assetsWB]
+    [asset, assetBalance, balances]
   )
 
   const crossChainAssetBalance: O.Option<BaseAmount> = useMemo(() => {
@@ -120,11 +117,11 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
     return isCrossChainAsset(asset)
       ? assetBalance
       : FP.pipe(
-          assetsWB,
+          balances,
           O.chain(getBalanceByAsset(getChainAsset(asset.chain))),
           O.map((assetWithAmount) => assetWithAmount.amount)
         )
-  }, [asset, assetBalance, assetsWB, isCrossChain])
+  }, [asset, assetBalance, balances, isCrossChain])
 
   const symDepositTxMemo: O.Option<SymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
 
@@ -147,7 +144,6 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
           type={type}
           onChangeAsset={emptyFunc}
           asset={asset}
-          runeAsset={runeAsset}
           assetPrice={ZERO_BN}
           runePrice={ZERO_BN}
           assetBalance={O.none}
@@ -167,7 +163,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
         />
       </>
     ),
-    [asset, isCrossChain, runeAsset, selectedPricePoolAsset, stakeFees, type]
+    [asset, isCrossChain, selectedPricePoolAsset, stakeFees, type]
   )
 
   return FP.pipe(
@@ -184,12 +180,11 @@ export const AddStakeView: React.FC<Props> = ({ asset, runeAsset, type = 'asym' 
               poolData={toPoolData(poolDetail)}
               onChangeAsset={onChangeAsset}
               asset={asset}
-              runeAsset={runeAsset}
               assetPrice={assetPrice}
               runePrice={runPrice}
               assetBalance={assetBalance}
               runeBalance={runeBalance}
-              baseChainAssetBalance={baseChainAssetBalance}
+              baseChainAssetBalance={chainAssetBalance}
               crossChainAssetBalance={crossChainAssetBalance}
               isCrossChain={isCrossChain}
               poolAddress={oPoolAddress}

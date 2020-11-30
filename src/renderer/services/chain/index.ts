@@ -1,11 +1,11 @@
 import { clientByChain$ } from './client'
-import { isCrossChainStake$ } from './common'
+import { isCrossChainDeposit$ } from './common'
 import {
-  reloadStakeFees,
-  stakeFees$,
+  reloadDepositFees,
+  depositFees$,
   withdrawFees$,
   reloadWithdrawFees,
-  updateStakeFeesEffect$,
+  updateDepositFeesEffect$,
   updateWithdrawFeesEffect$
 } from './fees'
 import { retrieveLedgerAddress, removeLedgerAddress } from './ledger'
@@ -16,13 +16,13 @@ import { asymDepositTxMemo$, symDepositTxMemo$ } from './memo'
  */
 export {
   clientByChain$,
-  reloadStakeFees,
-  stakeFees$,
+  reloadDepositFees,
+  depositFees$,
   withdrawFees$,
   reloadWithdrawFees,
-  updateStakeFeesEffect$,
+  updateDepositFeesEffect$,
   updateWithdrawFeesEffect$,
-  isCrossChainStake$,
+  isCrossChainDeposit$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   retrieveLedgerAddress,

@@ -31,7 +31,6 @@ export const AddAsymStakeStory = () => {
     <AddStake
       type="asym"
       asset={AssetBNB}
-      runeAsset={AssetRune67C}
       assetPrice={bn(2)}
       runePrice={bn(1)}
       assetBalance={assetBalance}
@@ -57,7 +56,6 @@ export const AddAsymCrossStakeStory = () => {
     <AddStake
       type="asym"
       asset={AssetBTC}
-      runeAsset={AssetRune67C}
       assetPrice={bn(2)}
       runePrice={bn(1)}
       assetBalance={assetBalance}
@@ -87,7 +85,6 @@ export const AddSymStakeStory = () => {
     <AddStake
       type="sym"
       asset={AssetBNB}
-      runeAsset={AssetRune67C}
       assetPrice={bn(2)}
       runePrice={bn(1)}
       assetBalance={assetBalance}
@@ -115,7 +112,6 @@ storiesOf('Components/Stake/AddStake', module)
       <AddStake
         type="sym"
         asset={AssetBNB}
-        runeAsset={AssetRune67C}
         assetPrice={bn(2)}
         runePrice={bn(1)}
         assetBalance={O.some(ZERO_BASE_AMOUNT)}
@@ -140,7 +136,6 @@ storiesOf('Components/Stake/AddStake', module)
       <AddStake
         type="sym"
         asset={AssetBNB}
-        runeAsset={AssetRune67C}
         assetPrice={bn(2)}
         runePrice={bn(1)}
         assetBalance={assetBalance}
@@ -165,7 +160,6 @@ storiesOf('Components/Stake/AddStake', module)
     <AddStake
       type="asym"
       asset={AssetBNB}
-      runeAsset={AssetRune67C}
       assetPrice={bn(2)}
       runePrice={bn(1)}
       assetBalance={O.some(ZERO_BASE_AMOUNT)}
@@ -191,7 +185,6 @@ storiesOf('Components/Stake/AddStake', module)
       <AddStake
         type="asym"
         asset={AssetBTC}
-        runeAsset={AssetRune67C}
         assetPrice={bn(2)}
         runePrice={bn(1)}
         assetBalance={assetBalance}

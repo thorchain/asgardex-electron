@@ -48,6 +48,8 @@ export const ETH_DECIMAL = 18
 
 /**
  * Returns RUNE asset depending on network and chain
+ *
+ * @deprecated Use `AssetRuneNative`
  */
 export const getRuneAsset = ({ network = 'testnet', chain = 'BNB' }: { network?: Network; chain: Chain }): Asset => {
   // For future implementation only - we don't support Native Rune yet...
@@ -58,6 +60,8 @@ export const getRuneAsset = ({ network = 'testnet', chain = 'BNB' }: { network?:
 
 /**
  * Returns RUNE asset depending on DEFAULT_NETWORK
+ *
+ * @deprecated Use `AssetRuneNative`
  */
 export const getDefaultRuneAsset = (chain: Chain = 'BNB') => getRuneAsset({ network: DEFAULT_NETWORK, chain })
 /**

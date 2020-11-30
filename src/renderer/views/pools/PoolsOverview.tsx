@@ -22,7 +22,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
 import { getDefaultRunePricePool, getPoolTableRowsData, sortByDepth } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
-import * as stakeRoutes from '../../routes/stake'
+import * as stakeRoutes from '../../routes/deposit'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { Network } from '../../services/app/types'
@@ -90,7 +90,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     [getSwapPath, history]
   )
 
-  const getStakePath = stakeRoutes.stake.path
+  const getStakePath = stakeRoutes.deposit.path
 
   const clickStakeHandler = useCallback(
     (asset: string) => {

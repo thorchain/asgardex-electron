@@ -2,8 +2,8 @@ import React from 'react'
 
 import { Route, Switch } from 'react-router-dom'
 
+import * as stakeRoutes from '../../routes/deposit'
 import * as poolsRoutes from '../../routes/pools'
-import * as stakeRoutes from '../../routes/stake'
 import * as swapRoutes from '../../routes/swap'
 import { StakeView } from '../stake/StakeView'
 import { SwapView } from '../swap/SwapView'
@@ -18,7 +18,7 @@ export const PoolsView: React.FC = (): JSX.Element => {
       <Route path={swapRoutes.swap.template} exact>
         <SwapView />
       </Route>
-      <Route path={stakeRoutes.stake.template} exact>
+      <Route path={stakeRoutes.deposit.template} exact>
         <StakeView />
       </Route>
     </Switch>
