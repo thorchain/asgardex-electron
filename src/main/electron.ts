@@ -1,6 +1,5 @@
 import { join } from 'path'
 
-import { Network } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
@@ -9,6 +8,7 @@ import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
 
+import { Network } from '../shared/api/types'
 import { Locale } from '../shared/i18n/types'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist } from './api/keystore'
 import { getBTCAddress } from './api/ledger'
