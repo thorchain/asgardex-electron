@@ -24,7 +24,7 @@ const deposit: DepositMessages = {
   'deposit.poolDetails.totalUsers': 'Gesamtanzahl User',
   'deposit.wallet.add': 'Wallet hinzufügen',
   'deposit.wallet.connect': 'Bitte verbinde Deine Wallet',
-  'deposit.pool.noStakes': 'Du hast keine Anteile in diesem Pool',
+  'deposit.pool.noDeposit': 'Du hast keine Anteile in diesem Pool',
   'deposit.withdraw.title': 'Auszahlung anpassen',
   'deposit.withdraw.choseText': 'Wähle einen Betrag zwischen 0 und 100% zum Auszahlen',
   'deposit.withdraw.receiveText': 'Du solltest erhalten',

@@ -54,21 +54,21 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
 
       const poolData = toPoolData(poolDetail)
 
-      const assetStakedPrice = getValueOfAsset1InAsset2(assetShare, poolData, pricePoolData)
-      const runeStakedPrice = getValueOfRuneInAsset(runeShare, pricePoolData)
+      const assetDepositPrice = getValueOfAsset1InAsset2(assetShare, poolData, pricePoolData)
+      const runeDepositPrice = getValueOfRuneInAsset(runeShare, pricePoolData)
 
       return (
         <PoolShare
           sourceAsset={AssetRuneNative}
           targetAsset={asset}
           poolShare={poolShare}
-          stakeUnits={stakeUnits}
-          assetStakedShare={assetShare}
+          depositUnits={stakeUnits}
+          assetDepositShare={assetShare}
           priceAsset={FP.pipe(oPriceAsset, O.toUndefined)}
           loading={false}
-          assetStakedPrice={assetStakedPrice}
-          runeStakedPrice={runeStakedPrice}
-          runeStakedShare={runeShare}
+          assetDepositPrice={assetDepositPrice}
+          runeDepositPrice={runeDepositPrice}
+          runeDepositShare={runeShare}
         />
       )
     },
@@ -80,9 +80,9 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
       FP.pipe(
         RD.combine(stakeData, poolDetailRD),
         RD.fold(
-          () => <Styled.EmptyData description={intl.formatMessage({ id: 'deposit.pool.noStakes' })} />,
+          () => <Styled.EmptyData description={intl.formatMessage({ id: 'deposit.pool.noDeposit' })} />,
           () => <Spin />,
-          () => <Styled.EmptyData description={intl.formatMessage({ id: 'deposit.pool.noStakes' })} />,
+          () => <Styled.EmptyData description={intl.formatMessage({ id: 'deposit.pool.noDeposit' })} />,
           ([stake, pool]) => renderPoolShareReady(stake, pool)
         )
       ),

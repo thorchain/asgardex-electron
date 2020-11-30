@@ -66,7 +66,7 @@ type PoolsMessageKey =
 export type PoolsMessages = { [key in PoolsMessageKey]: string }
 
 type WalletMessageKey =
-  | 'wallet.nav.stakes'
+  | 'wallet.nav.deposits'
   | 'wallet.nav.bonds'
   | 'wallet.column.name'
   | 'wallet.column.ticker'
@@ -183,7 +183,7 @@ type DepositMessageKey =
   | 'deposit.poolDetails.allTimeVal'
   | 'deposit.poolDetails.totalSwaps'
   | 'deposit.poolDetails.totalUsers'
-  | 'deposit.pool.noStakes'
+  | 'deposit.pool.noDeposit'
   | 'deposit.wallet.add'
   | 'deposit.wallet.connect'
   | 'deposit.withdraw.title'

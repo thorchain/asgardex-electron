@@ -36,17 +36,17 @@ export const Deposit: React.FC<Props> = (props) => {
     (): Tab[] => [
       {
         key: 'deposit-asym',
-        label: intl.formatMessage({ id: 'stake.add.asym' }, { asset: asset.ticker }),
+        label: intl.formatMessage({ id: 'deposit.add.asym' }, { asset: asset.ticker }),
         content: <DepositContent asset={asset} type="asym" />
       },
       {
         key: 'deposit-sym',
-        label: intl.formatMessage({ id: 'stake.add.sym' }, { assetA: asset.ticker, assetB: AssetRuneNative.ticker }),
+        label: intl.formatMessage({ id: 'deposit.add.sym' }, { assetA: asset.ticker, assetB: AssetRuneNative.ticker }),
         content: <DepositContent asset={asset} type="sym" />
       },
       {
         key: 'withdraw',
-        label: intl.formatMessage({ id: 'stake.withdraw' }),
+        label: intl.formatMessage({ id: 'deposit.withdraw' }),
         content: <WidthdrawContent depositAsset={asset} />
       }
     ],

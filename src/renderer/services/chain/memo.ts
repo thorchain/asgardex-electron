@@ -34,7 +34,7 @@ const symDepositAssetTxMemo$: MemoRx = symDepositTxMemo$.pipe(RxOp.map(FP.flow(O
 const asymDepositTxMemo$: MemoRx = selectedPoolAsset$.pipe(RxOp.map(O.map(getDepositMemo)))
 
 /**
- * Unstake memo for txs
+ * Withdraw memo for txs
  */
 const getWithdrawMemo$ = (withdrawPercent: number): MemoRx =>
   selectedPoolAsset$.pipe(

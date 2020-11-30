@@ -13,7 +13,7 @@ const sendDepositTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositT
   // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
 
   // helper to create `RemoteData<ApiError, never>` observable
-  const stakeTxFailure$ = (msg: string) =>
+  const depositTxFailure$ = (msg: string) =>
     Rx.of(
       RD.failure({
         errorId: ErrorId.SEND_TX,
@@ -31,18 +31,18 @@ const sendDepositTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositT
         RD.toOption,
         O.fold(
           // TODO (@veado) i18n
-          () => stakeTxFailure$('Fee rate for BTC transaction not available'),
+          () => depositTxFailure$('Fee rate for BTC transaction not available'),
           (feeRate) => BTC.sendDepositTx({ recipient: poolAddress, amount, feeRate, memo })
         )
       )
 
     case 'ETH':
       // not available yet
-      return stakeTxFailure$('Stake tx has not been implemented for ETH yet')
+      return depositTxFailure$('Deposit tx has not been implemented for ETH yet')
 
     case 'THOR':
       // not available yet
-      return stakeTxFailure$('Stake tx has not been implemented for THORChain yet')
+      return depositTxFailure$('Deposit tx has not been implemented for THORChain yet')
   }
 }
 
