@@ -4,12 +4,12 @@ import antdData from 'antd/lib/locale-provider/de_DE'
 
 import { Messages } from '../types'
 import common from './common'
+import deposit from './deposit'
 import ledger from './ledger'
 import midgard from './midgard'
 import pools from './pools'
 import routes from './routes'
 import settings from './settings'
-import stake from './stake'
 import swap from './swap'
 import wallet from './wallet'
 
@@ -21,7 +21,7 @@ export default {
   ...wallet,
   ...settings,
   ...swap,
-  ...stake,
+  ...deposit,
   ...midgard,
   ...ledger
 } as Messages

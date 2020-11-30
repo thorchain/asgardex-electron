@@ -64,9 +64,9 @@ export const Withdraw: React.FC<Props> = ({
   return (
     <Styled.Container>
       <Label weight="bold" textTransform="uppercase">
-        {intl.formatMessage({ id: 'stake.withdraw.title' })}
+        {intl.formatMessage({ id: 'deposit.withdraw.title' })}
       </Label>
-      <Label>{intl.formatMessage({ id: 'stake.withdraw.choseText' })}</Label>
+      <Label>{intl.formatMessage({ id: 'deposit.withdraw.choseText' })}</Label>
 
       <Styled.Slider
         key={'asset amount slider'}
@@ -75,7 +75,7 @@ export const Withdraw: React.FC<Props> = ({
         disabled={disabled}
       />
       <Label weight={'bold'} textTransform={'uppercase'}>
-        {intl.formatMessage({ id: 'stake.withdraw.receiveText' })}
+        {intl.formatMessage({ id: 'deposit.withdraw.receiveText' })}
       </Label>
 
       <Styled.AssetContainer>
@@ -122,7 +122,7 @@ export const Withdraw: React.FC<Props> = ({
       </Label>
 
       <Styled.Drag
-        title={intl.formatMessage({ id: 'stake.withdraw.drag' })}
+        title={intl.formatMessage({ id: 'deposit.withdraw.drag' })}
         onConfirm={() => onWithdraw(withdrawPercent)}
         disabled={disabled}
       />

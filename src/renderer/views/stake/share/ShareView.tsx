@@ -80,9 +80,9 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
       FP.pipe(
         RD.combine(stakeData, poolDetailRD),
         RD.fold(
-          () => <Styled.EmptyData description={intl.formatMessage({ id: 'stake.pool.noStakes' })} />,
+          () => <Styled.EmptyData description={intl.formatMessage({ id: 'deposit.pool.noStakes' })} />,
           () => <Spin />,
-          () => <Styled.EmptyData description={intl.formatMessage({ id: 'stake.pool.noStakes' })} />,
+          () => <Styled.EmptyData description={intl.formatMessage({ id: 'deposit.pool.noStakes' })} />,
           ([stake, pool]) => renderPoolShareReady(stake, pool)
         )
       ),

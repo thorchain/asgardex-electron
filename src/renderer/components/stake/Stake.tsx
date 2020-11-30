@@ -9,7 +9,7 @@ import { StakeType } from '../../types/asgardex'
 import { AddWallet } from '../wallet/add'
 import * as Styled from './Stake.styles'
 
-type TabKey = 'stake-sym' | 'stake-asym' | 'withdraw'
+type TabKey = 'deposit-sym' | 'deposit-asym' | 'withdraw'
 
 type Tab = {
   key: TabKey
@@ -35,18 +35,18 @@ export const Stake: React.FC<Props> = (props) => {
   const tabs = useMemo(
     (): Tab[] => [
       {
-        key: 'stake-asym',
-        label: intl.formatMessage({ id: 'stake.add.asym' }, { asset: asset.ticker }),
+        key: 'deposit-asym',
+        label: intl.formatMessage({ id: 'deposit.add.asym' }, { asset: asset.ticker }),
         content: <StakeContent asset={asset} type="asym" />
       },
       {
-        key: 'stake-sym',
-        label: intl.formatMessage({ id: 'stake.add.sym' }, { assetA: asset.ticker, assetB: AssetRuneNative.ticker }),
+        key: 'deposit-sym',
+        label: intl.formatMessage({ id: 'deposit.add.sym' }, { assetA: asset.ticker, assetB: AssetRuneNative.ticker }),
         content: <StakeContent asset={asset} type="sym" />
       },
       {
         key: 'withdraw',
-        label: intl.formatMessage({ id: 'stake.withdraw' }),
+        label: intl.formatMessage({ id: 'deposit.withdraw' }),
         content: <WidthdrawContent stakedAsset={asset} />
       }
     ],

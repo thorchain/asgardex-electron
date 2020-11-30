@@ -134,21 +134,21 @@ export const AddStake: React.FC<Props> = (props) => {
 
   const renderBalanceError = useMemo(() => {
     const noAssetBalancesMsg = intl.formatMessage(
-      { id: 'stake.add.error.nobalance1' },
+      { id: 'deposit.add.error.nobalance1' },
       {
         asset: asset.ticker
       }
     )
 
     const noRuneBalancesMsg = intl.formatMessage(
-      { id: 'stake.add.error.nobalance1' },
+      { id: 'deposit.add.error.nobalance1' },
       {
         asset: AssetRuneNative.ticker
       }
     )
 
     const noRuneAndAssetBalancesMsg = intl.formatMessage(
-      { id: 'stake.add.error.nobalance2' },
+      { id: 'deposit.add.error.nobalance2' },
       {
         asset1: asset.ticker,
         asset2: AssetRuneNative.ticker
@@ -168,7 +168,7 @@ export const AddStake: React.FC<Props> = (props) => {
 
     const symMsg = noAssetBalancesMsg
 
-    const title = intl.formatMessage({ id: 'stake.add.error.nobalances' })
+    const title = intl.formatMessage({ id: 'deposit.add.error.nobalances' })
 
     const msg = type === 'sym' ? symMsg : asymMsg
     return <Styled.BalanceAlert type="warning" message={title} description={msg} />
@@ -291,7 +291,7 @@ export const AddStake: React.FC<Props> = (props) => {
   const renderFeeError = useCallback(
     (fee: BaseAmount, balance: AssetAmount, asset: Asset) => {
       const msg = intl.formatMessage(
-        { id: 'stake.add.error.chainFeeNotCovered' },
+        { id: 'deposit.add.error.chainFeeNotCovered' },
         {
           fee: Helper.formatFee(fee, asset),
           balance: formatAssetAmountCurrency({ amount: balance, asset, trimZeros: true })
@@ -475,7 +475,7 @@ export const AddStake: React.FC<Props> = (props) => {
 
       <Styled.DragWrapper>
         <Drag
-          title={intl.formatMessage({ id: 'stake.drag' })}
+          title={intl.formatMessage({ id: 'deposit.drag' })}
           onConfirm={onStakeConfirmed}
           disabled={disabledForm || runeAmountToStake.amount().isZero()}
         />
