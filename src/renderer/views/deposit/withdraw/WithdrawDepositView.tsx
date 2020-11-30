@@ -7,11 +7,10 @@ import * as FP from 'fp-ts/function'
 import { useObservableState, useSubscription } from 'observable-hooks'
 import { map } from 'rxjs/operators'
 
-import { Withdraw } from '../../../components/stake/withdraw'
+import { Withdraw } from '../../../components/deposit/withdraw'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
-// import { useWalletContext } from '../../../contexts/WalletContext'
 import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
@@ -21,12 +20,11 @@ import { getPoolDetail } from '../../../services/midgard/utils'
 import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/models'
 
 type Props = {
-  stakedAsset: Asset
+  depositAsset: Asset
 }
 
-export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
-  const { stakedAsset } = props
-
+export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
+  const { depositAsset } = props
   const {
     service: {
       pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$, poolsState$ },
@@ -48,7 +46,7 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
    * @description /src/renderer/services/midgard/stake.ts
    */
 
-  const [stakeData] = useObservableState<StakersAssetDataRD>(getStakes$, RD.initial)
+  const [depositData] = useObservableState<StakersAssetDataRD>(getStakes$, RD.initial)
 
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
 
@@ -65,7 +63,7 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
 
   const poolsState = FP.pipe(
     poolsStateRD,
-    RD.chain((poolsState) => RD.fromOption(getPoolDetail(poolsState.poolDetails, stakedAsset), () => Error('no data')))
+    RD.chain((poolsState) => RD.fromOption(getPoolDetail(poolsState.poolDetails, depositAsset), () => Error('no data')))
   )
 
   const assetPriceRD = FP.pipe(
@@ -84,33 +82,33 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         onWithdraw={emptyFunc}
         runeShare={ZERO_BASE_AMOUNT}
         assetShare={ZERO_BASE_AMOUNT}
-        stakedAsset={stakedAsset}
+        depositAsset={depositAsset}
         updateFees={reloadWithdrawFees}
         disabled
       />
     ),
-    [fees, runePrice, stakedAsset, reloadWithdrawFees]
+    [fees, runePrice, depositAsset, reloadWithdrawFees]
   )
 
   const renderWithdrawReady = useCallback(
-    ([assetPrice, stake, poolDetail, priceAsset]: [BigNumber, StakersAssetData, PoolDetail, Asset]) => (
+    ([assetPrice, deposit, poolDetail, priceAsset]: [BigNumber, StakersAssetData, PoolDetail, Asset]) => (
       <Withdraw
         assetPrice={assetPrice}
         runePrice={runePrice}
         selectedCurrencyAsset={priceAsset}
         onWithdraw={console.log}
-        runeShare={shareHelpers.getRuneShare(stake, poolDetail)}
-        assetShare={shareHelpers.getAssetShare(stake, poolDetail)}
-        stakedAsset={stakedAsset}
+        runeShare={shareHelpers.getRuneShare(deposit, poolDetail)}
+        assetShare={shareHelpers.getAssetShare(deposit, poolDetail)}
+        depositAsset={depositAsset}
         fee={fees}
         updateFees={reloadWithdrawFees}
       />
     ),
-    [runePrice, stakedAsset, fees, reloadWithdrawFees]
+    [runePrice, depositAsset, fees, reloadWithdrawFees]
   )
 
   return FP.pipe(
-    RD.combine(assetPriceRD, stakeData, poolDetailRD, priceAssetRD),
+    RD.combine(assetPriceRD, depositData, poolDetailRD, priceAssetRD),
     RD.fold(renderEmptyForm, renderEmptyForm, renderEmptyForm, renderWithdrawReady)
   )
 }

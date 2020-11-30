@@ -10,7 +10,7 @@ import { isBaseChain } from '../../../helpers/chainHelper'
 import { sequenceTRDFromArray } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
-import { StakeType } from '../../../types/asgardex'
+import { DepositType } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import { selectedPoolAsset$, selectedPoolChain$ } from '../../midgard/common'
@@ -45,7 +45,7 @@ export const reloadFees$: Rx.Observable<O.Option<LoadFeesHandler>> = selectedPoo
 )
 
 // State to reload deposit fees
-const { get$: reloadDepositFees$, set: reloadDepositFees } = observableState<StakeType>('asym')
+const { get$: reloadDepositFees$, set: reloadDepositFees } = observableState<DepositType>('asym')
 
 /**
  * reload fees
@@ -69,7 +69,7 @@ const updateDepositFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadDep
   )
 )
 
-const depositFeeByChain$ = (chain: Chain, type: StakeType): FeeLD => {
+const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
   switch (chain) {
     case 'BNB':
       return BNB.fees$.pipe(liveData.map((fees) => fees.fast))
@@ -96,7 +96,7 @@ const depositFeeByChain$ = (chain: Chain, type: StakeType): FeeLD => {
 
 // TODO (@Veado) Store results of deposit fees into a state, so views will have access to it.
 // Needed to display success / error states of each transaction
-const depositFees$ = (type: StakeType): DepositFeesLD =>
+const depositFees$ = (type: DepositType): DepositFeesLD =>
   selectedPoolAsset$.pipe(
     RxOp.switchMap((oPoolAsset) =>
       FP.pipe(

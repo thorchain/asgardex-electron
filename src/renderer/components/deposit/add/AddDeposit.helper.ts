@@ -2,7 +2,7 @@ import { Asset, baseAmount, BaseAmount, baseToAsset, formatAssetAmountCurrency, 
 
 import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 
-export const maxRuneAmountToStake = ({
+export const maxRuneAmountToDeposit = ({
   poolData,
   runeBalance,
   assetBalance
@@ -19,7 +19,7 @@ export const maxRuneAmountToStake = ({
   return maxRuneAmount.isGreaterThan(runeBalance.amount()) ? runeBalance : baseAmount(maxRuneAmount)
 }
 
-export const maxAssetAmountToStake = ({
+export const maxAssetAmountToDeposit = ({
   poolData,
   runeBalance,
   assetBalance
@@ -36,7 +36,7 @@ export const maxAssetAmountToStake = ({
   return maxAssetAmount.isGreaterThan(assetBalance.amount()) ? assetBalance : baseAmount(maxAssetAmount)
 }
 
-export const getRuneAmountToStake = (
+export const getRuneAmountToDeposit = (
   assetAmount: BaseAmount,
   { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance }: PoolData
 ): BaseAmount =>
@@ -46,7 +46,7 @@ export const getRuneAmountToStake = (
     THORCHAIN_DECIMAL
   )
 
-export const getAssetAmountToStake = (
+export const getAssetAmountToDeposit = (
   runeAmount: BaseAmount,
   { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance }: PoolData
 ): BaseAmount =>

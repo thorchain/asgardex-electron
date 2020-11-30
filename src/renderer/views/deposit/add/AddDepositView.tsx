@@ -19,7 +19,7 @@ import { getChainAsset, isBaseChainAsset, isCrossChainAsset } from '../../../hel
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
-import * as depositRoutes from '../../../routes/deposit'
+import * as stakeRoutes from '../../../routes/deposit'
 import { SymDepositMemo, Memo } from '../../../services/chain/types'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
@@ -31,12 +31,12 @@ type Props = {
   type: DepositType
 }
 
-export const AddStakeView: React.FC<Props> = ({ asset, type = 'asym' }) => {
+export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
   const history = useHistory()
 
   const onChangeAsset = useCallback(
     (asset: Asset) => {
-      history.replace(depositRoutes.deposit.path({ asset: assetToString(asset) }))
+      history.replace(stakeRoutes.deposit.path({ asset: assetToString(asset) }))
     },
     [history]
   )
@@ -48,7 +48,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, type = 'asym' }) => {
   } = useMidgardContext()
 
   const {
-    depositFees$,
+    depositFees$: stakeFees$,
     reloadDepositFees: reloadStakeFees,
     isCrossChainDeposit$: isCrossChainStake$,
     symDepositTxMemo$,
@@ -59,7 +59,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, type = 'asym' }) => {
   // subscribe to
   useSubscription(updateDepositFeesEffect$)
 
-  const [depositFees] = useObservableState(() => depositFees$(type), RD.initial)
+  const [stakeFees] = useObservableState(() => stakeFees$(type), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(poolAddress$, O.none)
   const isCrossChain = useObservableState(isCrossChainStake$, false)
 
@@ -151,7 +151,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, type = 'asym' }) => {
           baseChainAssetBalance={O.none}
           crossChainAssetBalance={O.none}
           onDeposit={emptyFunc}
-          fees={depositFees}
+          fees={stakeFees}
           reloadFees={emptyFunc}
           priceAsset={selectedPricePoolAsset}
           disabled={true}
@@ -163,7 +163,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, type = 'asym' }) => {
         />
       </>
     ),
-    [asset, isCrossChain, selectedPricePoolAsset, depositFees, type]
+    [asset, isCrossChain, selectedPricePoolAsset, stakeFees, type]
   )
 
   return FP.pipe(
@@ -191,7 +191,7 @@ export const AddStakeView: React.FC<Props> = ({ asset, type = 'asym' }) => {
               symDepositMemo={symDepositTxMemo}
               asymDepositMemo={asymDepositTxMemo}
               onDeposit={console.log}
-              fees={depositFees}
+              fees={stakeFees}
               reloadFees={reloadStakeFees}
               priceAsset={selectedPricePoolAsset}
               assets={poolAssets}

@@ -17,7 +17,7 @@ import { getWithdrawAmounts } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
 type Props = {
-  stakedAsset: Asset
+  depositAsset: Asset
   runePrice: BigNumber
   assetPrice: BigNumber
   selectedCurrencyAsset: Asset
@@ -31,7 +31,7 @@ type Props = {
 
 export const Withdraw: React.FC<Props> = ({
   onWithdraw,
-  stakedAsset,
+  depositAsset,
   runePrice,
   assetPrice,
   selectedCurrencyAsset,
@@ -97,15 +97,15 @@ export const Withdraw: React.FC<Props> = ({
       </Styled.AssetContainer>
 
       <Styled.AssetContainer>
-        <Styled.AssetIcon asset={stakedAsset} />
+        <Styled.AssetIcon asset={depositAsset} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
             amount: withdrawAmounts.assetWithdraw,
-            asset: stakedAsset,
+            asset: depositAsset,
             trimZeros: true
           })}
           {/* show pricing if price asset is different only */}
-          {!eqAsset.equals(stakedAsset, selectedCurrencyAsset) &&
+          {!eqAsset.equals(depositAsset, selectedCurrencyAsset) &&
             ` (${formatAssetAmountCurrency({
               amount: assetAmount(withdrawAmounts.assetWithdraw.amount().times(assetPrice)),
               asset: selectedCurrencyAsset,

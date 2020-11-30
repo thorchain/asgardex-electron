@@ -11,7 +11,7 @@ export const WithdrawStory: React.FC<{ stakedAsset?: Asset; runeAsset?: Asset }>
   return (
     <Withdraw
       fee={RD.initial}
-      stakedAsset={AssetBNB}
+      depositAsset={AssetBNB}
       runeAsset={AssetRune67C}
       assetPrice={bn(60.972)}
       runePrice={bn(1)}
@@ -25,4 +25,4 @@ export const WithdrawStory: React.FC<{ stakedAsset?: Asset; runeAsset?: Asset }>
   )
 }
 
-storiesOf('Components/Stake/Withdraw', module).add('default', () => <WithdrawStory />)
+storiesOf('Components/Deposit/Withdraw', module).add('default', () => <WithdrawStory />)

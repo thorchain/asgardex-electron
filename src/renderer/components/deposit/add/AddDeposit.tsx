@@ -22,13 +22,13 @@ import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { SymDepositMemo, Memo, SendDepositTxParams, DepositFeesRD } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
-import { StakeType } from '../../../types/asgardex'
+import { DepositType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
-import * as Helper from './AddStake.helper'
-import * as Styled from './AddStake.style'
+import * as Helper from './AddDeposit.helper'
+import * as Styled from './AddDeposit.style'
 
 type Props = {
-  type: StakeType
+  type: DepositType
   asset: Asset
   assetPrice: BigNumber
   runePrice: BigNumber
@@ -42,15 +42,15 @@ type Props = {
   symDepositMemo: O.Option<SymDepositMemo>
   priceAsset?: Asset
   fees: DepositFeesRD
-  reloadFees: (type: StakeType) => void
+  reloadFees: (type: DepositType) => void
   assets?: Asset[]
-  onStake: (p: SendDepositTxParams) => void
+  onDeposit: (p: SendDepositTxParams) => void
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
 }
 
-export const AddStake: React.FC<Props> = (props) => {
+export const AddDeposit: React.FC<Props> = (props) => {
   const {
     type,
     asset,
@@ -74,9 +74,9 @@ export const AddStake: React.FC<Props> = (props) => {
   } = props
 
   const intl = useIntl()
-  const [runeAmountToStake, setRuneAmountToStake] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
-  const [assetAmountToStake, setAssetAmountToStake] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
-  const [percentValueToStake, setPercentValueToStake] = useState(0)
+  const [runeAmountToDeposit, setRuneAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+  const [assetAmountToDeposit, setAssetAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+  const [percentValueToDeposit, setPercentValueToDeposit] = useState(0)
 
   const isAsym = useMemo(() => type === 'asym', [type])
 
@@ -98,13 +98,13 @@ export const AddStake: React.FC<Props> = (props) => {
     [oRuneBalance]
   )
 
-  const maxRuneAmountToStake = useMemo(
-    (): BaseAmount => Helper.maxRuneAmountToStake({ poolData, runeBalance, assetBalance }),
+  const maxRuneAmountToDeposit = useMemo(
+    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance }),
     [assetBalance, poolData, runeBalance]
   )
 
-  const maxAssetAmountToStake = useMemo(
-    (): BaseAmount => Helper.maxAssetAmountToStake({ poolData, runeBalance, assetBalance }),
+  const maxAssetAmountToDeposit = useMemo(
+    (): BaseAmount => Helper.maxAssetAmountToDeposit({ poolData, runeBalance, assetBalance }),
     [assetBalance, poolData, runeBalance]
   )
 
@@ -176,78 +176,78 @@ export const AddStake: React.FC<Props> = (props) => {
 
   const runeAmountChangeHandler = useCallback(
     (runeInput: BaseAmount) => {
-      let runeQuantity = runeInput.amount().isGreaterThan(maxRuneAmountToStake.amount())
-        ? maxRuneAmountToStake
+      let runeQuantity = runeInput.amount().isGreaterThan(maxRuneAmountToDeposit.amount())
+        ? maxRuneAmountToDeposit
         : runeInput
-      const assetQuantity = Helper.getAssetAmountToStake(runeQuantity, poolData)
+      const assetQuantity = Helper.getAssetAmountToDeposit(runeQuantity, poolData)
 
-      if (assetQuantity.amount().isGreaterThan(maxRuneAmountToStake.amount())) {
-        runeQuantity = Helper.getRuneAmountToStake(maxRuneAmountToStake, poolData)
-        setRuneAmountToStake(runeQuantity)
-        setAssetAmountToStake(maxRuneAmountToStake)
-        setPercentValueToStake(100)
+      if (assetQuantity.amount().isGreaterThan(maxRuneAmountToDeposit.amount())) {
+        runeQuantity = Helper.getRuneAmountToDeposit(maxRuneAmountToDeposit, poolData)
+        setRuneAmountToDeposit(runeQuantity)
+        setAssetAmountToDeposit(maxRuneAmountToDeposit)
+        setPercentValueToDeposit(100)
       } else {
-        setRuneAmountToStake(runeQuantity)
-        setAssetAmountToStake(assetQuantity)
-        // formula: runeQuantity * 100 / maxRuneAmountToStake
-        const percentToStake = maxRuneAmountToStake.amount().isGreaterThan(0)
-          ? runeQuantity.amount().multipliedBy(100).dividedBy(maxRuneAmountToStake.amount()).toNumber()
+        setRuneAmountToDeposit(runeQuantity)
+        setAssetAmountToDeposit(assetQuantity)
+        // formula: runeQuantity * 100 / maxRuneAmountToDeposit
+        const percentToDeposit = maxRuneAmountToDeposit.amount().isGreaterThan(0)
+          ? runeQuantity.amount().multipliedBy(100).dividedBy(maxRuneAmountToDeposit.amount()).toNumber()
           : 0
-        setPercentValueToStake(percentToStake)
+        setPercentValueToDeposit(percentToDeposit)
       }
     },
-    [maxRuneAmountToStake, poolData]
+    [maxRuneAmountToDeposit, poolData]
   )
 
   const assetAmountChangeHandler = useCallback(
     (assetInput: BaseAmount) => {
-      let assetQuantity = assetInput.amount().isGreaterThan(maxRuneAmountToStake.amount())
-        ? maxRuneAmountToStake
+      let assetQuantity = assetInput.amount().isGreaterThan(maxRuneAmountToDeposit.amount())
+        ? maxRuneAmountToDeposit
         : assetInput
-      const runeQuantity = Helper.getRuneAmountToStake(assetQuantity, poolData)
+      const runeQuantity = Helper.getRuneAmountToDeposit(assetQuantity, poolData)
 
-      if (runeQuantity.amount().isGreaterThan(maxRuneAmountToStake.amount())) {
-        assetQuantity = Helper.getAssetAmountToStake(runeQuantity, poolData)
-        setRuneAmountToStake(maxRuneAmountToStake)
-        setAssetAmountToStake(assetQuantity)
-        setPercentValueToStake(100)
+      if (runeQuantity.amount().isGreaterThan(maxRuneAmountToDeposit.amount())) {
+        assetQuantity = Helper.getAssetAmountToDeposit(runeQuantity, poolData)
+        setRuneAmountToDeposit(maxRuneAmountToDeposit)
+        setAssetAmountToDeposit(assetQuantity)
+        setPercentValueToDeposit(100)
       } else {
-        setRuneAmountToStake(runeQuantity)
-        setAssetAmountToStake(assetQuantity)
-        // assetQuantity * 100 / maxAssetAmountToStake
-        const percentToStake = maxRuneAmountToStake.amount().isGreaterThan(0)
-          ? assetQuantity.amount().multipliedBy(100).dividedBy(maxRuneAmountToStake.amount()).toNumber()
+        setRuneAmountToDeposit(runeQuantity)
+        setAssetAmountToDeposit(assetQuantity)
+        // assetQuantity * 100 / maxAssetAmountToDeposit
+        const percentToDeposit = maxRuneAmountToDeposit.amount().isGreaterThan(0)
+          ? assetQuantity.amount().multipliedBy(100).dividedBy(maxRuneAmountToDeposit.amount()).toNumber()
           : 0
-        setPercentValueToStake(percentToStake)
+        setPercentValueToDeposit(percentToDeposit)
       }
     },
-    [maxRuneAmountToStake, poolData]
+    [maxRuneAmountToDeposit, poolData]
   )
 
   const changePercentHandler = useCallback(
     (percent: number) => {
-      const runeAmountBN = maxRuneAmountToStake.amount().dividedBy(100).multipliedBy(percent)
-      const assetAmountBN = maxAssetAmountToStake.amount().dividedBy(100).multipliedBy(percent)
-      setRuneAmountToStake(baseAmount(runeAmountBN))
-      setAssetAmountToStake(baseAmount(assetAmountBN))
-      setPercentValueToStake(percent)
+      const runeAmountBN = maxRuneAmountToDeposit.amount().dividedBy(100).multipliedBy(percent)
+      const assetAmountBN = maxAssetAmountToDeposit.amount().dividedBy(100).multipliedBy(percent)
+      setRuneAmountToDeposit(baseAmount(runeAmountBN))
+      setAssetAmountToDeposit(baseAmount(assetAmountBN))
+      setPercentValueToDeposit(percent)
     },
-    [maxAssetAmountToStake, maxRuneAmountToStake]
+    [maxAssetAmountToDeposit, maxRuneAmountToDeposit]
   )
 
-  const onStakeConfirmed = useCallback(() => {
+  const confirmDepositHandler = useCallback(() => {
     const asymDepositTx = () =>
       FP.pipe(
         sequenceTOption(oPoolAddress, oAsymDepositMemo),
         O.map(([poolAddress, asymDepositMemo]) => {
-          const baseChainStakeTxParam = {
+          const baseChainDepositTxParam = {
             chain: AssetRuneNative.chain,
             asset: BASE_CHAIN_ASSET,
             poolAddress,
-            amount: assetAmountToStake,
+            amount: assetAmountToDeposit,
             memo: asymDepositMemo
           }
-          console.log('ASYM Tx 1/1 ', baseChainStakeTxParam)
+          console.log('ASYM Tx 1/1 ', baseChainDepositTxParam)
           return true
         })
       )
@@ -270,7 +270,7 @@ export const AddStake: React.FC<Props> = (props) => {
             chain: asset.chain,
             asset: asset,
             poolAddress,
-            amount: assetAmountToStake,
+            amount: assetAmountToDeposit,
             memo: assetMemo
           }
           console.log('SYM Tx 2/2 (asset):', txParam)
@@ -286,7 +286,7 @@ export const AddStake: React.FC<Props> = (props) => {
       O.map((v) => console.log('success:', v)),
       O.getOrElse(() => console.log('no data to run txs'))
     )
-  }, [type, oPoolAddress, oSymDepositMemo, assetAmountToStake, oAsymDepositMemo, asset])
+  }, [type, oPoolAddress, oSymDepositMemo, assetAmountToDeposit, oAsymDepositMemo, asset])
 
   const renderFeeError = useCallback(
     (fee: BaseAmount, balance: AssetAmount, asset: Asset) => {
@@ -414,12 +414,12 @@ export const AddStake: React.FC<Props> = (props) => {
           <Styled.AssetCard
             disabled={disabledForm}
             asset={asset}
-            selectedAmount={assetAmountToStake}
-            maxAmount={maxAssetAmountToStake}
+            selectedAmount={assetAmountToDeposit}
+            maxAmount={maxAssetAmountToDeposit}
             onChangeAssetAmount={assetAmountChangeHandler}
             price={assetPrice}
             assets={assets}
-            percentValue={percentValueToStake}
+            percentValue={percentValueToDeposit}
             onChangePercent={changePercentHandler}
             onChangeAsset={onChangeAsset}
             priceAsset={priceAsset}
@@ -431,8 +431,8 @@ export const AddStake: React.FC<Props> = (props) => {
             <Styled.AssetCard
               disabled={disabledForm}
               asset={AssetRuneNative}
-              selectedAmount={runeAmountToStake}
-              maxAmount={maxRuneAmountToStake}
+              selectedAmount={runeAmountToDeposit}
+              maxAmount={maxRuneAmountToDeposit}
               onChangeAssetAmount={runeAmountChangeHandler}
               price={runePrice}
               priceAsset={priceAsset}
@@ -476,8 +476,8 @@ export const AddStake: React.FC<Props> = (props) => {
       <Styled.DragWrapper>
         <Drag
           title={intl.formatMessage({ id: 'deposit.drag' })}
-          onConfirm={onStakeConfirmed}
-          disabled={disabledForm || runeAmountToStake.amount().isZero()}
+          onConfirm={confirmDepositHandler}
+          disabled={disabledForm || runeAmountToDeposit.amount().isZero()}
         />
       </Styled.DragWrapper>
     </Styled.Container>

@@ -5,17 +5,17 @@ import { AssetBNB } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
-import { AddSymStakeStory } from './add/AddStake.stories'
-import { Stake } from './Stake'
+import { AddSymDepositStory } from './add/AddDeposit.stories'
+import { Deposit } from './Deposit'
 import { WithdrawStory } from './withdraw/Withdraw.stories'
 
-storiesOf('Stake', module)
+storiesOf('Deposit', module)
   .add('default', () => {
     return (
-      <Stake
+      <Deposit
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
-        StakeContent={AddSymStakeStory}
+        DepositContent={AddSymDepositStory}
         WidthdrawContent={(props) => <WithdrawStory {...props} />}
         keystoreState={O.some(O.some({ phrase: 'phrase' }))}
       />
@@ -23,10 +23,10 @@ storiesOf('Stake', module)
   })
   .add('no wallet', () => {
     return (
-      <Stake
+      <Deposit
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
-        StakeContent={AddSymStakeStory}
+        DepositContent={AddSymDepositStory}
         WidthdrawContent={(props) => <WithdrawStory {...props} />}
         keystoreState={O.none}
       />
@@ -34,10 +34,10 @@ storiesOf('Stake', module)
   })
   .add('locked', () => {
     return (
-      <Stake
+      <Deposit
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
-        StakeContent={AddSymStakeStory}
+        DepositContent={AddSymDepositStory}
         WidthdrawContent={(props) => <WithdrawStory {...props} />}
         keystoreState={O.some(O.none)}
       />

@@ -9,7 +9,7 @@ import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { TRANSFER_FEES } from '../../../../shared/mock/fees'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { DepositFeesRD } from '../../../services/chain/types'
-import { AddStake } from './AddStake'
+import { AddDeposit } from './AddDeposit'
 
 const assetBalance = O.some(assetToBase(assetAmount(200)))
 const runeBalance = O.some(assetToBase(assetAmount(100)))
@@ -26,9 +26,9 @@ const fees: DepositFeesRD = RD.success({
 })
 const reloadFeesHandler = () => console.log('reload fees')
 
-export const AddAsymStakeStory = () => {
+export const AddAsymDepositStory = () => {
   return (
-    <AddStake
+    <AddDeposit
       type="asym"
       asset={AssetBNB}
       assetPrice={bn(2)}
@@ -37,7 +37,7 @@ export const AddAsymStakeStory = () => {
       runeBalance={runeBalance}
       baseChainAssetBalance={baseChainAssetBalance}
       crossChainAssetBalance={crossChainAssetBalance}
-      onStake={console.log}
+      onDeposit={console.log}
       onChangeAsset={console.log}
       reloadFees={reloadFeesHandler}
       fees={fees}
@@ -51,9 +51,9 @@ export const AddAsymStakeStory = () => {
   )
 }
 
-export const AddAsymCrossStakeStory = () => {
+export const AddAsymCrossDepositStory = () => {
   return (
-    <AddStake
+    <AddDeposit
       type="asym"
       asset={AssetBTC}
       assetPrice={bn(2)}
@@ -63,7 +63,7 @@ export const AddAsymCrossStakeStory = () => {
       baseChainAssetBalance={baseChainAssetBalance}
       crossChainAssetBalance={O.none}
       isCrossChain
-      onStake={console.log}
+      onDeposit={console.log}
       onChangeAsset={console.log}
       reloadFees={reloadFeesHandler}
       fees={RD.success({
@@ -80,9 +80,9 @@ export const AddAsymCrossStakeStory = () => {
   )
 }
 
-export const AddSymStakeStory = () => {
+export const AddSymDepositStory = () => {
   return (
-    <AddStake
+    <AddDeposit
       type="sym"
       asset={AssetBNB}
       assetPrice={bn(2)}
@@ -91,7 +91,7 @@ export const AddSymStakeStory = () => {
       runeBalance={runeBalance}
       baseChainAssetBalance={baseChainAssetBalance}
       crossChainAssetBalance={O.none}
-      onStake={console.log}
+      onDeposit={console.log}
       onChangeAsset={console.log}
       fees={fees}
       reloadFees={reloadFeesHandler}
@@ -105,11 +105,11 @@ export const AddSymStakeStory = () => {
   )
 }
 
-storiesOf('Components/Stake/AddStake', module)
-  .add('sym', AddSymStakeStory)
+storiesOf('Components/Deposit/AddDeposit', module)
+  .add('sym', AddSymDepositStory)
   .add('sym - balance error', () => {
     return (
-      <AddStake
+      <AddDeposit
         type="sym"
         asset={AssetBNB}
         assetPrice={bn(2)}
@@ -118,7 +118,7 @@ storiesOf('Components/Stake/AddStake', module)
         runeBalance={O.some(ZERO_BASE_AMOUNT)}
         baseChainAssetBalance={O.none}
         crossChainAssetBalance={O.none}
-        onStake={console.log}
+        onDeposit={console.log}
         onChangeAsset={console.log}
         fees={fees}
         reloadFees={reloadFeesHandler}
@@ -133,7 +133,7 @@ storiesOf('Components/Stake/AddStake', module)
   })
   .add('sym - fee error', () => {
     return (
-      <AddStake
+      <AddDeposit
         type="sym"
         asset={AssetBNB}
         assetPrice={bn(2)}
@@ -142,7 +142,7 @@ storiesOf('Components/Stake/AddStake', module)
         runeBalance={runeBalance}
         baseChainAssetBalance={O.none}
         crossChainAssetBalance={O.none}
-        onStake={console.log}
+        onDeposit={console.log}
         onChangeAsset={console.log}
         fees={fees}
         reloadFees={reloadFeesHandler}
@@ -155,9 +155,9 @@ storiesOf('Components/Stake/AddStake', module)
       />
     )
   })
-  .add('asym', AddAsymStakeStory)
+  .add('asym', AddAsymDepositStory)
   .add('asym - balance error', () => (
-    <AddStake
+    <AddDeposit
       type="asym"
       asset={AssetBNB}
       assetPrice={bn(2)}
@@ -166,7 +166,7 @@ storiesOf('Components/Stake/AddStake', module)
       runeBalance={O.some(ZERO_BASE_AMOUNT)}
       baseChainAssetBalance={baseChainAssetBalance}
       crossChainAssetBalance={crossChainAssetBalance}
-      onStake={console.log}
+      onDeposit={console.log}
       onChangeAsset={console.log}
       reloadFees={reloadFeesHandler}
       fees={fees}
@@ -179,10 +179,10 @@ storiesOf('Components/Stake/AddStake', module)
     />
   ))
 
-  .add('asym - cross-chain', AddAsymCrossStakeStory)
+  .add('asym - cross-chain', AddAsymCrossDepositStory)
   .add('asym - cross chain - fee error', () => {
     return (
-      <AddStake
+      <AddDeposit
         type="asym"
         asset={AssetBTC}
         assetPrice={bn(2)}
@@ -192,7 +192,7 @@ storiesOf('Components/Stake/AddStake', module)
         baseChainAssetBalance={O.none}
         crossChainAssetBalance={O.none}
         isCrossChain
-        onStake={console.log}
+        onDeposit={console.log}
         onChangeAsset={console.log}
         reloadFees={reloadFeesHandler}
         fees={RD.success({
