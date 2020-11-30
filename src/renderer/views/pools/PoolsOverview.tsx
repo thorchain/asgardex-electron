@@ -22,7 +22,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
 import { getDefaultRunePricePool, getPoolTableRowsData, sortByDepth } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
-import * as stakeRoutes from '../../routes/deposit'
+import * as depositRoutes from '../../routes/deposit'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { Network } from '../../services/app/types'
@@ -90,13 +90,13 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     [getSwapPath, history]
   )
 
-  const getStakePath = stakeRoutes.deposit.path
+  const getDepositPath = depositRoutes.deposit.path
 
-  const clickStakeHandler = useCallback(
+  const clickDepositHandler = useCallback(
     (asset: string) => {
-      history.push(getStakePath({ asset }))
+      history.push(getDepositPath({ asset }))
     },
-    [history, getStakePath]
+    [history, getDepositPath]
   )
 
   const clickRefreshHandler = useCallback(() => {
@@ -120,7 +120,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <TableAction>
-        <Button round="true" onClick={() => clickStakeHandler(assetToString(pool.target))} typevalue="outline">
+        <Button round="true" onClick={() => clickDepositHandler(assetToString(pool.target))} typevalue="outline">
           <PlusOutlined />
           {intl.formatMessage({ id: 'common.liquidity' })}
         </Button>
@@ -133,7 +133,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
       </TableAction>
     ),
 
-    [clickStakeHandler, clickSwapHandler, intl]
+    [clickDepositHandler, clickSwapHandler, intl]
   )
 
   const btnPoolsColumn = useMemo(
@@ -418,13 +418,13 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const renderBtnPendingPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <TableAction>
-        <Button round="true" onClick={() => clickStakeHandler(pool.target.symbol)} typevalue="outline">
+        <Button round="true" onClick={() => clickDepositHandler(pool.target.symbol)} typevalue="outline">
           <PlusOutlined />
           liquidity
         </Button>
       </TableAction>
     ),
-    [clickStakeHandler]
+    [clickDepositHandler]
   )
 
   const btnPendingPoolsColumn = useMemo(

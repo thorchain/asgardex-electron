@@ -98,4 +98,3 @@ export enum TxDetailsTypeEnum {
     Refund = 'refund',
     DoubleSwap = 'doubleSwap'
 }
-

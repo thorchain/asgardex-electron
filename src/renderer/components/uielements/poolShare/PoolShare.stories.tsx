@@ -10,14 +10,14 @@ export const DefaultPoolShare = () => (
   <PoolShare
     sourceAsset={AssetRune67C}
     targetAsset={AssetBNB}
-    assetStakedPrice={assetToBase(assetAmount(120.1))}
-    assetStakedShare={assetToBase(assetAmount(500))}
+    assetDepositPrice={assetToBase(assetAmount(120.1))}
+    assetDepositShare={assetToBase(assetAmount(500))}
     priceAsset={AssetRune67C}
     loading={false}
-    runeStakedPrice={assetToBase(assetAmount(400))}
-    runeStakedShare={assetToBase(assetAmount(500))}
+    runeDepositPrice={assetToBase(assetAmount(400))}
+    runeDepositShare={assetToBase(assetAmount(500))}
     poolShare={bn(100)}
-    stakeUnits={assetToBase(assetAmount(2.01))}
+    depositUnits={assetToBase(assetAmount(2.01))}
   />
 )
 
@@ -35,14 +35,14 @@ storiesOf('Components/PoolShare', module)
         <PoolShare
           sourceAsset={AssetRune67C}
           targetAsset={AssetBNB}
-          assetStakedPrice={baseAmount(0)}
-          assetStakedShare={baseAmount(0)}
+          assetDepositPrice={baseAmount(0)}
+          assetDepositShare={baseAmount(0)}
           priceAsset={AssetRune67C}
           loading={true}
-          runeStakedPrice={baseAmount(0)}
-          runeStakedShare={baseAmount(0)}
+          runeDepositPrice={baseAmount(0)}
+          runeDepositShare={baseAmount(0)}
           poolShare={ZERO_BN}
-          stakeUnits={baseAmount(0)}
+          depositUnits={baseAmount(0)}
         />
       </div>
     )

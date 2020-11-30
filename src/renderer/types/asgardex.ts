@@ -15,7 +15,7 @@ export type AssetWithAmount = {
 }
 
 export enum TxTypes {
-  STAKE = 'stake',
+  DEPOSIT = 'deposit',
   SWAP = 'swap',
   WITHDRAW = 'withdraw',
   CREATE = 'create'

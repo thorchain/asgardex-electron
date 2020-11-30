@@ -23,7 +23,7 @@ const deposit: DepositMessages = {
   'deposit.poolDetails.totalUsers': 'Total users',
   'deposit.wallet.add': 'Add wallet',
   'deposit.wallet.connect': 'Please connect your wallet',
-  'deposit.pool.noStakes': "You don't have any shares in this pool",
+  'deposit.pool.noDeposit': "You don't have any shares in this pool",
   'deposit.withdraw.title': 'Adjust withdrawal',
   'deposit.withdraw.choseText': 'Choose from 0 to 100% of how much to withdraw.',
   'deposit.withdraw.receiveText': 'You should receive.',

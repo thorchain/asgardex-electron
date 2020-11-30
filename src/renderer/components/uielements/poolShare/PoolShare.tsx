@@ -21,35 +21,35 @@ import { PoolShareCard } from './PoolShareCard'
 type Props = {
   sourceAsset: Asset
   targetAsset: Asset
-  runeStakedShare: BaseAmount
-  runeStakedPrice: BaseAmount
+  runeDepositShare: BaseAmount
+  runeDepositPrice: BaseAmount
   loading?: boolean
   priceAsset?: Asset
-  assetStakedShare: BaseAmount
-  assetStakedPrice: BaseAmount
+  assetDepositShare: BaseAmount
+  assetDepositPrice: BaseAmount
   poolShare: BigNumber
-  stakeUnits: BaseAmount
+  depositUnits: BaseAmount
 }
 
 export const PoolShare: React.FC<Props> = (props): JSX.Element => {
   const {
     sourceAsset,
-    runeStakedShare,
-    runeStakedPrice,
+    runeDepositShare,
+    runeDepositPrice,
     loading,
     priceAsset,
     targetAsset,
-    assetStakedShare,
-    assetStakedPrice,
+    assetDepositShare,
+    assetDepositPrice,
     poolShare,
-    stakeUnits
+    depositUnits
   } = props
 
   const intl = useIntl()
 
-  const totalStakedPrice = useMemo(() => baseAmount(runeStakedPrice.amount().plus(assetStakedPrice.amount())), [
-    assetStakedPrice,
-    runeStakedPrice
+  const totalDepositPrice = useMemo(() => baseAmount(runeDepositPrice.amount().plus(assetDepositPrice.amount())), [
+    assetDepositPrice,
+    runeDepositPrice
   ])
 
   const ref: RefObject<HTMLDivElement> = useRef(null)
@@ -86,17 +86,17 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
           </Styled.CardRow>
         </Styled.RedemptionHeader>
         <Styled.CardRow>
-          {renderRedemptionCol(runeStakedShare, runeStakedPrice)}
-          {renderRedemptionCol(assetStakedShare, assetStakedPrice)}
+          {renderRedemptionCol(runeDepositShare, runeDepositPrice)}
+          {renderRedemptionCol(assetDepositShare, assetDepositPrice)}
         </Styled.CardRow>
       </>
     ),
     [
-      assetStakedPrice,
-      assetStakedShare,
+      assetDepositPrice,
+      assetDepositShare,
       renderRedemptionCol,
-      runeStakedPrice,
-      runeStakedShare,
+      runeDepositPrice,
+      runeDepositShare,
       sourceAsset.ticker,
       targetAsset.ticker
     ]
@@ -112,7 +112,7 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
             </Col>
           </Styled.CardRow>
         </Styled.RedemptionHeader>
-        <Styled.CardRow>{renderRedemptionCol(runeStakedShare, runeStakedPrice)}</Styled.CardRow>
+        <Styled.CardRow>{renderRedemptionCol(runeDepositShare, runeDepositPrice)}</Styled.CardRow>
         <Styled.RedemptionHeader>
           <Styled.CardRow>
             <Col span={24}>
@@ -120,15 +120,15 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
             </Col>
           </Styled.CardRow>
         </Styled.RedemptionHeader>
-        <Styled.CardRow>{renderRedemptionCol(assetStakedShare, assetStakedPrice)}</Styled.CardRow>
+        <Styled.CardRow>{renderRedemptionCol(assetDepositShare, assetDepositPrice)}</Styled.CardRow>
       </>
     ),
     [
-      assetStakedPrice,
-      assetStakedShare,
+      assetDepositPrice,
+      assetDepositShare,
       renderRedemptionCol,
-      runeStakedPrice,
-      runeStakedShare,
+      runeDepositPrice,
+      runeDepositShare,
       sourceAsset.ticker,
       targetAsset.ticker
     ]
@@ -148,7 +148,7 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
               {intl.formatMessage({ id: 'deposit.share.units' })}
             </Styled.LabelSecondary>
             <Styled.LabelPrimary loading={loading}>{`${formatBaseAsAssetAmount({
-              amount: stakeUnits,
+              amount: depositUnits,
               decimal: 2
             })}`}</Styled.LabelPrimary>
           </Col>
@@ -168,7 +168,7 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
               {intl.formatMessage({ id: 'deposit.share.total' })}
             </Styled.LabelSecondary>
             <Styled.LabelPrimary loading={loading}>
-              {formatAssetAmountCurrency({ amount: baseToAsset(totalStakedPrice), asset: priceAsset, decimal: 2 })}
+              {formatAssetAmountCurrency({ amount: baseToAsset(totalDepositPrice), asset: priceAsset, decimal: 2 })}
             </Styled.LabelPrimary>
           </Col>
         </Styled.CardRow>

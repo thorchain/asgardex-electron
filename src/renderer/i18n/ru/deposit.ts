@@ -23,7 +23,7 @@ const deposit: DepositMessages = {
   'deposit.poolDetails.totalUsers': 'Всего держателей',
   'deposit.wallet.add': 'Добавить',
   'deposit.wallet.connect': 'Пожалуйсста добавьте свой кошелек',
-  'deposit.pool.noStakes': 'У вас нет доли в этом пуле',
+  'deposit.pool.noDeposit': 'У вас нет доли в этом пуле',
   'deposit.withdraw.title': 'Установить вывод',
   'deposit.withdraw.choseText': 'Выберите сколько вы хотите изять от 0% до 100%',
   'deposit.withdraw.receiveText': 'Вы полчучите',

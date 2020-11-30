@@ -49,8 +49,8 @@ export const assets: Route<void> = {
   }
 }
 
-export const stakes: Route<void> = {
-  template: `${base.template}/stakes`,
+export const deposits: Route<void> = {
+  template: `${base.template}/deposits`,
   path() {
     return this.template
   }

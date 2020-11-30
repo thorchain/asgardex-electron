@@ -1,4 +1,4 @@
-import { base, imports, locked, settings, assets, stakes, bonds, assetDetail, send, receive } from './wallet'
+import { base, imports, locked, settings, assets, deposits, bonds, assetDetail, send, receive } from './wallet'
 
 describe('Wallet routes', () => {
   describe('base routes', () => {
@@ -45,12 +45,12 @@ describe('Wallet routes', () => {
       expect(assets.path()).toEqual('/wallet/assets')
     })
   })
-  describe('stakes route', () => {
+  describe('deposits route', () => {
     it('template', () => {
-      expect(stakes.template).toEqual('/wallet/stakes')
+      expect(deposits.template).toEqual('/wallet/deposits')
     })
     it('path ', () => {
-      expect(stakes.path()).toEqual('/wallet/stakes')
+      expect(deposits.path()).toEqual('/wallet/deposits')
     })
   })
   describe('bonds route', () => {

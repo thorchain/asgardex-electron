@@ -61,11 +61,11 @@ export const createFeesService = (oClient$: Client$): FeesService => {
       shareReplay(1)
     )
 
-  // `TriggerStream` to reload stake `fees`
+  // `TriggerStream` to reload deposit `fees`
   const { stream$: reloadDepositFee$, trigger: reloadDepositFee } = triggerStream()
 
   /**
-   * Factory to create a stream for pool fees (stake / withdraw)
+   * Factory to create a stream for pool fees (deposit / withdraw)
    * @param memo Memo used for pool transactions
    */
   const poolFee$ = (memo: Memo): FeeLD =>
