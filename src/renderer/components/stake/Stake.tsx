@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
 
 import { KeystoreState } from '../../services/wallet/types'
@@ -19,15 +19,14 @@ type Tab = {
 
 type Props = {
   asset: Asset
-  runeAsset: Asset
-  ShareContent: React.ComponentType<{ asset: Asset; runeAsset: Asset }>
-  StakeContent: React.ComponentType<{ asset: Asset; runeAsset: Asset; type: StakeType }>
-  WidthdrawContent: React.ComponentType<{ stakedAsset: Asset; runeAsset: Asset }>
+  ShareContent: React.ComponentType<{ asset: Asset }>
+  StakeContent: React.ComponentType<{ asset: Asset; type: StakeType }>
+  WidthdrawContent: React.ComponentType<{ stakedAsset: Asset }>
   keystoreState: KeystoreState
 }
 
 export const Stake: React.FC<Props> = (props) => {
-  const { ShareContent, StakeContent, WidthdrawContent, runeAsset, asset, keystoreState } = props
+  const { ShareContent, StakeContent, WidthdrawContent, asset, keystoreState } = props
   const intl = useIntl()
 
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
@@ -38,20 +37,20 @@ export const Stake: React.FC<Props> = (props) => {
       {
         key: 'stake-asym',
         label: intl.formatMessage({ id: 'stake.add.asym' }, { asset: asset.ticker }),
-        content: <StakeContent asset={asset} runeAsset={runeAsset} type="asym" />
+        content: <StakeContent asset={asset} type="asym" />
       },
       {
         key: 'stake-sym',
-        label: intl.formatMessage({ id: 'stake.add.sym' }, { assetA: asset.ticker, assetB: runeAsset.ticker }),
-        content: <StakeContent asset={asset} runeAsset={runeAsset} type="sym" />
+        label: intl.formatMessage({ id: 'stake.add.sym' }, { assetA: asset.ticker, assetB: AssetRuneNative.ticker }),
+        content: <StakeContent asset={asset} type="sym" />
       },
       {
         key: 'withdraw',
         label: intl.formatMessage({ id: 'stake.withdraw' }),
-        content: <WidthdrawContent stakedAsset={asset} runeAsset={runeAsset} />
+        content: <WidthdrawContent stakedAsset={asset} />
       }
     ],
-    [intl, asset, runeAsset, StakeContent, WidthdrawContent]
+    [intl, asset, StakeContent, WidthdrawContent]
   )
 
   return (
@@ -64,7 +63,7 @@ export const Stake: React.FC<Props> = (props) => {
             </Styled.StakeContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper>
-                <ShareContent runeAsset={runeAsset} asset={asset} />
+                <ShareContent asset={asset} />
               </Styled.ShareContentWrapper>
             </Styled.ShareContentCol>
           </>

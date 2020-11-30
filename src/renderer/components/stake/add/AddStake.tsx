@@ -5,6 +5,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import {
   Asset,
   AssetAmount,
+  AssetRuneNative,
   baseAmount,
   BaseAmount,
   baseToAsset,
@@ -29,7 +30,6 @@ import * as Styled from './AddStake.style'
 type Props = {
   type: StakeType
   asset: Asset
-  runeAsset: Asset
   assetPrice: BigNumber
   runePrice: BigNumber
   assetBalance: O.Option<BaseAmount>
@@ -54,7 +54,6 @@ export const AddStake: React.FC<Props> = (props) => {
   const {
     type,
     asset,
-    runeAsset,
     assetPrice,
     runePrice,
     assetBalance: oAssetBalance,
@@ -144,7 +143,7 @@ export const AddStake: React.FC<Props> = (props) => {
     const noRuneBalancesMsg = intl.formatMessage(
       { id: 'stake.add.error.nobalance1' },
       {
-        asset: runeAsset.ticker
+        asset: AssetRuneNative.ticker
       }
     )
 
@@ -152,7 +151,7 @@ export const AddStake: React.FC<Props> = (props) => {
       { id: 'stake.add.error.nobalance2' },
       {
         asset1: asset.ticker,
-        asset2: runeAsset.ticker
+        asset2: AssetRuneNative.ticker
       }
     )
 
@@ -173,7 +172,7 @@ export const AddStake: React.FC<Props> = (props) => {
 
     const msg = type === 'sym' ? symMsg : asymMsg
     return <Styled.BalanceAlert type="warning" message={title} description={msg} />
-  }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl, runeAsset.ticker, type])
+  }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl, type])
 
   const runeAmountChangeHandler = useCallback(
     (runeInput: BaseAmount) => {
@@ -242,7 +241,7 @@ export const AddStake: React.FC<Props> = (props) => {
         sequenceTOption(oPoolAddress, oAsymDepositMemo),
         O.map(([poolAddress, asymDepositMemo]) => {
           const baseChainStakeTxParam = {
-            chain: runeAsset.chain,
+            chain: AssetRuneNative.chain,
             asset: BASE_CHAIN_ASSET,
             poolAddress,
             amount: assetAmountToStake,
@@ -258,7 +257,7 @@ export const AddStake: React.FC<Props> = (props) => {
         sequenceTOption(oPoolAddress, oSymDepositMemo),
         O.map(([poolAddress, { rune: runeMemo, asset: assetMemo }]) => {
           const runeTxParam = {
-            chain: runeAsset.chain,
+            chain: AssetRuneNative.chain,
             asset: BASE_CHAIN_ASSET,
             poolAddress,
             // TODO (@Veado) Ask about amount of NativeRune tx, maybe it can be ZERO
@@ -287,7 +286,7 @@ export const AddStake: React.FC<Props> = (props) => {
       O.map((v) => console.log('success:', v)),
       O.getOrElse(() => console.log('no data to run txs'))
     )
-  }, [type, oPoolAddress, oSymDepositMemo, runeAsset.chain, assetAmountToStake, oAsymDepositMemo, asset])
+  }, [type, oPoolAddress, oSymDepositMemo, assetAmountToStake, oAsymDepositMemo, asset])
 
   const renderFeeError = useCallback(
     (fee: BaseAmount, balance: AssetAmount, asset: Asset) => {
@@ -431,7 +430,7 @@ export const AddStake: React.FC<Props> = (props) => {
           {!isAsym && (
             <Styled.AssetCard
               disabled={disabledForm}
-              asset={runeAsset}
+              asset={AssetRuneNative}
               selectedAmount={runeAmountToStake}
               maxAmount={maxRuneAmountToStake}
               onChangeAssetAmount={runeAmountChangeHandler}

@@ -22,11 +22,10 @@ import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/m
 
 type Props = {
   stakedAsset: Asset
-  runeAsset: Asset
 }
 
 export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
-  const { stakedAsset, runeAsset } = props
+  const { stakedAsset } = props
 
   const {
     service: {
@@ -85,13 +84,12 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         onWithdraw={emptyFunc}
         runeShare={ZERO_BASE_AMOUNT}
         assetShare={ZERO_BASE_AMOUNT}
-        runeAsset={runeAsset}
         stakedAsset={stakedAsset}
         updateFees={reloadWithdrawFees}
         disabled
       />
     ),
-    [fees, runePrice, runeAsset, stakedAsset, reloadWithdrawFees]
+    [fees, runePrice, stakedAsset, reloadWithdrawFees]
   )
 
   const renderWithdrawReady = useCallback(
@@ -103,13 +101,12 @@ export const WithdrawStakeView: React.FC<Props> = (props): JSX.Element => {
         onWithdraw={console.log}
         runeShare={shareHelpers.getRuneShare(stake, poolDetail)}
         assetShare={shareHelpers.getAssetShare(stake, poolDetail)}
-        runeAsset={runeAsset}
         stakedAsset={stakedAsset}
         fee={fees}
         updateFees={reloadWithdrawFees}
       />
     ),
-    [runePrice, runeAsset, stakedAsset, fees, reloadWithdrawFees]
+    [runePrice, stakedAsset, fees, reloadWithdrawFees]
   )
 
   return FP.pipe(
