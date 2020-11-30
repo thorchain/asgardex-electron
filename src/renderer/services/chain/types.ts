@@ -23,18 +23,18 @@ export type SymDepositMemo = { rune: Memo; asset: Memo }
 export type SymDepositMemoRx = Rx.Observable<O.Option<SymDepositMemo>>
 
 /**
- * Stake fees
+ * Deposit fees
  *
  * For deposits we do need one or two fees:
  *
  * base: Fee for "base-chain" pool (base chain is the chain where RUNE is running)
  * cross: Fee for a cross "pool-chain" (for cross-chain deposits only - it will be `none` in other case)
  */
-export type StakeFees = { base: BaseAmount; cross: O.Option<BaseAmount> }
-export type StakeFeesRD = RD.RemoteData<Error, StakeFees>
-export type StakeFeesLD = LiveData<Error, StakeFees>
+export type DepositFees = { base: BaseAmount; cross: O.Option<BaseAmount> }
+export type DepositFeesRD = RD.RemoteData<Error, DepositFees>
+export type DepositFeesLD = LiveData<Error, DepositFees>
 
-export type SendStakeTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
+export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
 export type WithdrawFee = BaseAmount
 export type WithdrawFeeRD = RD.RemoteData<Error, WithdrawFee>

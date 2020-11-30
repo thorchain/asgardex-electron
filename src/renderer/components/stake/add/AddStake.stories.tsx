@@ -8,7 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { TRANSFER_FEES } from '../../../../shared/mock/fees'
 import { ZERO_BASE_AMOUNT } from '../../../const'
-import { StakeFeesRD } from '../../../services/chain/types'
+import { DepositFeesRD } from '../../../services/chain/types'
 import { AddStake } from './AddStake'
 
 const assetBalance = O.some(assetToBase(assetAmount(200)))
@@ -20,7 +20,7 @@ const poolData = {
   runeBalance: baseAmount('2000')
 }
 const assets = [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO]
-const fees: StakeFeesRD = RD.success({
+const fees: DepositFeesRD = RD.success({
   base: assetToBase(TRANSFER_FEES.single),
   cross: O.none
 })

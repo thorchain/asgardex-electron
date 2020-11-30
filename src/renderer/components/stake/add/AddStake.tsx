@@ -20,7 +20,7 @@ import { useIntl } from 'react-intl'
 
 import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { SymDepositMemo, Memo, SendStakeTxParams, StakeFeesRD } from '../../../services/chain/types'
+import { SymDepositMemo, Memo, SendDepositTxParams, DepositFeesRD } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { StakeType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
@@ -41,10 +41,10 @@ type Props = {
   asymDepositMemo: O.Option<Memo>
   symDepositMemo: O.Option<SymDepositMemo>
   priceAsset?: Asset
-  fees: StakeFeesRD
+  fees: DepositFeesRD
   reloadFees: (type: StakeType) => void
   assets?: Asset[]
-  onStake: (p: SendStakeTxParams) => void
+  onStake: (p: SendDepositTxParams) => void
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
@@ -279,7 +279,7 @@ export const AddStake: React.FC<Props> = (props) => {
         })
       )
 
-    // TODO(@Veado) Call sendStakeTx of `services/chain/txs`
+    // TODO(@Veado) Call sendDepositTx of `services/chain/txs`
     // and handle results (error/success) in a modal here in `AddStake`
     FP.pipe(
       type === 'asym' ? asymDepositTx() : symDepositTx(),

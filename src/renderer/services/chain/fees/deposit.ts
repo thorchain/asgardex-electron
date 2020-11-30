@@ -15,7 +15,7 @@ import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import { selectedPoolAsset$, selectedPoolChain$ } from '../../midgard/common'
 import { symDepositAssetTxMemo$, asymDepositTxMemo$ } from '../memo'
-import { FeeLD, LoadFeesHandler, StakeFeesLD } from '../types'
+import { FeeLD, LoadFeesHandler, DepositFeesLD } from '../types'
 import { reloadDepositFeesByChain } from './fees.helper'
 
 export const reloadFees = () => {
@@ -96,7 +96,7 @@ const depositFeeByChain$ = (chain: Chain, type: StakeType): FeeLD => {
 
 // TODO (@Veado) Store results of deposit fees into a state, so views will have access to it.
 // Needed to display success / error states of each transaction
-const depositFees$ = (type: StakeType): StakeFeesLD =>
+const depositFees$ = (type: StakeType): DepositFeesLD =>
   selectedPoolAsset$.pipe(
     RxOp.switchMap((oPoolAsset) =>
       FP.pipe(
@@ -117,7 +117,7 @@ const depositFees$ = (type: StakeType): StakeFeesLD =>
             }))
           )
         ),
-        O.getOrElse((): StakeFeesLD => Rx.of(RD.initial))
+        O.getOrElse((): DepositFeesLD => Rx.of(RD.initial))
       )
     )
   )

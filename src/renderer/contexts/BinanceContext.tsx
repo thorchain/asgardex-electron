@@ -8,7 +8,7 @@ import {
   txs$,
   resetTx,
   pushTx,
-  sendStakeTx,
+  sendDepositTx,
   txRD$,
   address$,
   explorerUrl$,
@@ -24,7 +24,7 @@ export type BinanceContextValue = {
   txs$: typeof txs$
   resetTx: typeof resetTx
   pushTx: typeof pushTx
-  sendStakeTx: typeof sendStakeTx
+  sendDepositTx: typeof sendDepositTx
   txRD$: typeof txRD$
   address$: typeof address$
   explorerUrl$: typeof explorerUrl$
@@ -40,7 +40,7 @@ const initialContext: BinanceContextValue = {
   txs$,
   resetTx,
   pushTx,
-  sendStakeTx,
+  sendDepositTx,
   txRD$,
   address$,
   explorerUrl$,

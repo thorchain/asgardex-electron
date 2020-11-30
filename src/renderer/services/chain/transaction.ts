@@ -6,9 +6,9 @@ import * as Rx from 'rxjs'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import { ErrorId, TxLD } from '../wallet/types'
-import { SendStakeTxParams } from './types'
+import { SendDepositTxParams } from './types'
 
-const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendStakeTxParams): TxLD => {
+const sendDepositTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositTxParams): TxLD => {
   // TODO (@Veado) Health check request for pool address
   // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
 
@@ -23,7 +23,7 @@ const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendStakeTxPar
 
   switch (chain) {
     case 'BNB':
-      return BNB.sendStakeTx({ recipient: poolAddress, amount, asset, memo })
+      return BNB.sendDepositTx({ recipient: poolAddress, amount, asset, memo })
 
     case 'BTC':
       return FP.pipe(
@@ -32,7 +32,7 @@ const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendStakeTxPar
         O.fold(
           // TODO (@veado) i18n
           () => stakeTxFailure$('Fee rate for BTC transaction not available'),
-          (feeRate) => BTC.sendStakeTx({ recipient: poolAddress, amount, feeRate, memo })
+          (feeRate) => BTC.sendDepositTx({ recipient: poolAddress, amount, feeRate, memo })
         )
       )
 
@@ -46,4 +46,4 @@ const sendStakeTx = ({ chain, asset, poolAddress, amount, memo }: SendStakeTxPar
   }
 }
 
-export { sendStakeTx }
+export { sendDepositTx }
