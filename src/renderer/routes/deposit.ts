@@ -2,13 +2,13 @@ import { base as poolsBase } from './pools'
 import { Route } from './types'
 
 export const base: Route<void> = {
-  template: `${poolsBase.template}/stake`,
+  template: `${poolsBase.template}/deposit`,
   path() {
     return this.template
   }
 }
-export type StakeRouteParams = { asset: string }
-export const stake: Route<StakeRouteParams> = {
+export type DepositRouteParams = { asset: string }
+export const deposit: Route<DepositRouteParams> = {
   template: `${base.template}/:asset`,
   path: ({ asset }) => {
     if (asset) {
