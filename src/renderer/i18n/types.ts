@@ -193,7 +193,7 @@ type DepositMessageKey =
   | 'deposit.withdraw.feeNote'
   | 'deposit.withdraw.drag'
 
-export type StakeMessages = { [key in DepositMessageKey]: string }
+export type DepositMessages = { [key in DepositMessageKey]: string }
 
 export type Messages = CommonMessages &
   RoutesMessages &
@@ -201,7 +201,7 @@ export type Messages = CommonMessages &
   WalletMessages &
   SettingMessages &
   SwapMessages &
-  StakeMessages &
+  DepositMessages &
   LedgerMessages
 
 export enum Locale {

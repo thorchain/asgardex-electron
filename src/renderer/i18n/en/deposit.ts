@@ -1,6 +1,6 @@
-import { StakeMessages } from '../types'
+import { DepositMessages } from '../types'
 
-const deposit: StakeMessages = {
+const deposit: DepositMessages = {
   'deposit.share.title': 'Your pool share',
   'deposit.share.units': 'Liquidity units',
   'deposit.share.total': 'Total value',

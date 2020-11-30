@@ -1,11 +1,11 @@
-import { StakeMessages } from '../types'
+import { DepositMessages } from '../types'
 
-const deposit: StakeMessages = {
+const deposit: DepositMessages = {
   'deposit.share.title': 'Ваша общая доля в пуле',
-  'deposit.share.units': 'Liquidity units - RU',
+  'deposit.share.units': 'Единицы ликвидности',
   'deposit.share.poolshare': 'Доля в пуле',
-  'deposit.share.total': 'Total value - RU',
-  'deposit.redemption.title': 'Current redemption value - RU',
+  'deposit.share.total': 'Общее значение',
+  'deposit.redemption.title': 'Текущая стоимость покупки',
   'deposit.totalEarnings': 'Ваш общий доход от пула',
   'deposit.add.asym': 'Добавить {asset}',
   'deposit.add.sym': 'Добавить {assetA} + {assetB}',
