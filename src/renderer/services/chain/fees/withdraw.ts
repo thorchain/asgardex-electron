@@ -11,7 +11,7 @@ import { triggerStream } from '../../../helpers/stateHelper'
 import * as BNB from '../../binance'
 import { selectedPoolChain$ } from '../../midgard/common'
 import { FeeLD, WithdrawFeeLD } from '../types'
-import { reloadStakeFeesByChain } from './fees.helper'
+import { reloadDepositFeesByChain } from './fees.helper'
 
 // `TriggerStream` to reload withdraw fees
 const { stream$: reloadWithdrawFees$, trigger: reloadWithdrawFees } = triggerStream()
@@ -29,7 +29,7 @@ const updateWithdrawFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadWi
       oChain,
       O.map(() => {
         // reload base-chain
-        reloadStakeFeesByChain(BASE_CHAIN)
+        reloadDepositFeesByChain(BASE_CHAIN)
         return true
       })
     )

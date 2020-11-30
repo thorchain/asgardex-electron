@@ -2,28 +2,28 @@ import React, { createContext, useContext } from 'react'
 
 import {
   clientByChain$,
-  stakeFees$,
-  reloadStakeFees,
-  isCrossChainStake$,
+  depositFees$,
+  reloadDepositFees,
+  isCrossChainDeposit$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   withdrawFees$,
   reloadWithdrawFees,
   updateWithdrawFeesEffect$,
-  updateStakeFeesEffect$,
+  updateDepositFeesEffect$,
   retrieveLedgerAddress,
   removeLedgerAddress
 } from '../services/chain/index'
 
 type ChainContextValue = {
   clientByChain$: typeof clientByChain$
-  stakeFees$: typeof stakeFees$
-  reloadStakeFees: typeof reloadStakeFees
+  depositFees$: typeof depositFees$
+  reloadDepositFees: typeof reloadDepositFees
   withdrawFees$: typeof withdrawFees$
   reloadWithdrawFees: typeof reloadWithdrawFees
   updateWithdrawFeesEffect$: typeof updateWithdrawFeesEffect$
-  updateStakeFeesEffect$: typeof updateStakeFeesEffect$
-  isCrossChainStake$: typeof isCrossChainStake$
+  updateDepositFeesEffect$: typeof updateDepositFeesEffect$
+  isCrossChainDeposit$: typeof isCrossChainDeposit$
   symDepositTxMemo$: typeof symDepositTxMemo$
   asymDepositTxMemo$: typeof asymDepositTxMemo$
   retrieveLedgerAddress: typeof retrieveLedgerAddress
@@ -32,13 +32,13 @@ type ChainContextValue = {
 
 const initialContext: ChainContextValue = {
   clientByChain$,
-  stakeFees$,
-  reloadStakeFees,
+  depositFees$,
+  reloadDepositFees,
   withdrawFees$,
   reloadWithdrawFees,
   updateWithdrawFeesEffect$,
-  updateStakeFeesEffect$,
-  isCrossChainStake$,
+  updateDepositFeesEffect$,
+  isCrossChainDeposit$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   retrieveLedgerAddress,

@@ -47,7 +47,7 @@ export const PoolDetails: React.FC<Props> = ({
           isLoading={isLoading}
           fullValue={`${priceSymbol} ${formatAssetAmount({ amount: depth, trimZeros: true })}`}
           trend={depthTrend}
-          label={intl.formatMessage({ id: 'stake.poolDetails.depth' })}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.depth' })}
           displayValue={`${priceSymbol} ${abbreviateNumber(depth.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
@@ -57,7 +57,7 @@ export const PoolDetails: React.FC<Props> = ({
           isLoading={isLoading}
           fullValue={`${priceSymbol} ${formatAssetAmount({ amount: volume24hr, trimZeros: true })}`}
           trend={volume24hrTrend}
-          label={intl.formatMessage({ id: 'stake.poolDetails.24hvol' })}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.24hvol' })}
           displayValue={`${priceSymbol} ${abbreviateNumber(volume24hr.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
@@ -67,7 +67,7 @@ export const PoolDetails: React.FC<Props> = ({
           isLoading={isLoading}
           fullValue={`${priceSymbol} ${formatAssetAmount({ amount: allTimeVolume, trimZeros: true })}`}
           trend={allTimeVolumeTrend}
-          label={intl.formatMessage({ id: 'stake.poolDetails.allTimeVal' })}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.allTimeVal' })}
           displayValue={`${priceSymbol} ${abbreviateNumber(allTimeVolume.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
@@ -77,7 +77,7 @@ export const PoolDetails: React.FC<Props> = ({
           isLoading={isLoading}
           fullValue={`${totalSwaps}`}
           trend={totalSwapsTrend}
-          label={intl.formatMessage({ id: 'stake.poolDetails.totalSwaps' })}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.totalSwaps' })}
           displayValue={abbreviateNumber(totalSwaps)}
         />
       </Styled.Col>
@@ -86,7 +86,7 @@ export const PoolDetails: React.FC<Props> = ({
         <PoolStatus
           isLoading={isLoading}
           trend={totalStakersTrend}
-          label={intl.formatMessage({ id: 'stake.poolDetails.totalStakers' })}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.totalUsers' })}
           displayValue={abbreviateNumber(totalStakers)}
         />
       </Styled.Col>

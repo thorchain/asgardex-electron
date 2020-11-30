@@ -4,7 +4,6 @@ import { storiesOf } from '@storybook/react'
 import { AssetBNB } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { getDefaultRuneAsset } from '../../helpers/assetHelper'
 import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
 import { AddSymDepositStory } from './add/AddDeposit.stories'
 import { Deposit } from './Deposit'
@@ -14,7 +13,6 @@ storiesOf('Deposit', module)
   .add('default', () => {
     return (
       <Deposit
-        runeAsset={getDefaultRuneAsset()}
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
         DepositContent={AddSymDepositStory}
@@ -26,7 +24,6 @@ storiesOf('Deposit', module)
   .add('no wallet', () => {
     return (
       <Deposit
-        runeAsset={getDefaultRuneAsset()}
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
         DepositContent={AddSymDepositStory}
@@ -38,7 +35,6 @@ storiesOf('Deposit', module)
   .add('locked', () => {
     return (
       <Deposit
-        runeAsset={getDefaultRuneAsset()}
         asset={AssetBNB}
         ShareContent={DefaultPoolShare}
         DepositContent={AddSymDepositStory}

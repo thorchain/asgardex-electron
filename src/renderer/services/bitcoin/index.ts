@@ -4,8 +4,8 @@ import { createFeesService } from './fees'
 import { createLedgerService } from './ledger'
 import { createTransactionService } from './transaction'
 
-const { pushTx, txRD$, resetTx, sendStakeTx, txs$ } = createTransactionService(client$)
-const { fees$, reloadFees, poolFee$, getPoolFeeRate, reloadStakeFee, poolFeeRate$ } = createFeesService(client$)
+const { pushTx, txRD$, resetTx, sendDepositTx, txs$ } = createTransactionService(client$)
+const { fees$, reloadFees, poolFee$, getPoolFeeRate, reloadDepositFee, poolFeeRate$ } = createFeesService(client$)
 const { ledgerAddress$, retrieveLedgerAddress, removeLedgerAddress } = createLedgerService()
 
 export {
@@ -20,12 +20,12 @@ export {
   poolFee$,
   getPoolFeeRate,
   pushTx,
-  sendStakeTx,
+  sendDepositTx,
   reloadFees,
   txRD$,
   resetTx,
   txs$,
-  reloadStakeFee,
+  reloadDepositFee,
   poolFeeRate$,
   ledgerAddress$,
   retrieveLedgerAddress,

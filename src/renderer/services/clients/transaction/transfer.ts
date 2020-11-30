@@ -45,12 +45,12 @@ export const createTransferService = <Client extends XChainClient, T extends XCh
 
   const pushTx = (params: TransferParams): Rx.Subscription => tx$(params).subscribe(setTxRD)
 
-  const sendStakeTx = (params: TransferParams): TxLD => tx$(params)
+  const sendDepositTx = (params: TransferParams): TxLD => tx$(params)
 
   return {
     txRD$,
     pushTx,
     resetTx: () => setTxRD(RD.initial),
-    sendStakeTx
+    sendDepositTx
   }
 }

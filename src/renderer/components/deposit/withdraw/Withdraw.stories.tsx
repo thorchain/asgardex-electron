@@ -11,7 +11,7 @@ export const WithdrawStory: React.FC<{ stakedAsset?: Asset; runeAsset?: Asset }>
   return (
     <Withdraw
       fee={RD.initial}
-      stakedAsset={AssetBNB}
+      depositAsset={AssetBNB}
       runeAsset={AssetRune67C}
       assetPrice={bn(60.972)}
       runePrice={bn(1)}

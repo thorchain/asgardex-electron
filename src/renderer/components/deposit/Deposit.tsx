@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
 
 import { KeystoreState } from '../../services/wallet/types'
@@ -19,15 +19,14 @@ type Tab = {
 
 type Props = {
   asset: Asset
-  runeAsset: Asset
-  ShareContent: React.ComponentType<{ asset: Asset; runeAsset: Asset }>
-  DepositContent: React.ComponentType<{ asset: Asset; runeAsset: Asset; type: DepositType }>
-  WidthdrawContent: React.ComponentType<{ depositAsset: Asset; runeAsset: Asset }>
+  ShareContent: React.ComponentType<{ asset: Asset }>
+  DepositContent: React.ComponentType<{ asset: Asset; type: DepositType }>
+  WidthdrawContent: React.ComponentType<{ depositAsset: Asset }>
   keystoreState: KeystoreState
 }
 
 export const Deposit: React.FC<Props> = (props) => {
-  const { ShareContent, DepositContent, WidthdrawContent, runeAsset, asset, keystoreState } = props
+  const { ShareContent, DepositContent, WidthdrawContent, asset, keystoreState } = props
   const intl = useIntl()
 
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
@@ -38,20 +37,20 @@ export const Deposit: React.FC<Props> = (props) => {
       {
         key: 'deposit-asym',
         label: intl.formatMessage({ id: 'stake.add.asym' }, { asset: asset.ticker }),
-        content: <DepositContent asset={asset} runeAsset={runeAsset} type="asym" />
+        content: <DepositContent asset={asset} type="asym" />
       },
       {
         key: 'deposit-sym',
-        label: intl.formatMessage({ id: 'stake.add.sym' }, { assetA: asset.ticker, assetB: runeAsset.ticker }),
-        content: <DepositContent asset={asset} runeAsset={runeAsset} type="sym" />
+        label: intl.formatMessage({ id: 'stake.add.sym' }, { assetA: asset.ticker, assetB: AssetRuneNative.ticker }),
+        content: <DepositContent asset={asset} type="sym" />
       },
       {
         key: 'withdraw',
         label: intl.formatMessage({ id: 'stake.withdraw' }),
-        content: <WidthdrawContent depositAsset={asset} runeAsset={runeAsset} />
+        content: <WidthdrawContent depositAsset={asset} />
       }
     ],
-    [intl, asset, runeAsset, DepositContent, WidthdrawContent]
+    [intl, asset, DepositContent, WidthdrawContent]
   )
 
   return (
@@ -64,7 +63,7 @@ export const Deposit: React.FC<Props> = (props) => {
             </Styled.DepositContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper>
-                <ShareContent runeAsset={runeAsset} asset={asset} />
+                <ShareContent asset={asset} />
               </Styled.ShareContentWrapper>
             </Styled.ShareContentCol>
           </>

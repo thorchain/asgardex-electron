@@ -6,7 +6,7 @@ import * as RxOp from 'rxjs/operators'
 import { isCrossChain } from '../../helpers/chainHelper'
 import { selectedPoolChain$ } from '../midgard/common'
 
-const isCrossChainStake$: Rx.Observable<boolean> = selectedPoolChain$.pipe(
+const isCrossChainDeposit$: Rx.Observable<boolean> = selectedPoolChain$.pipe(
   RxOp.map(
     FP.flow(
       O.map(isCrossChain),
@@ -16,4 +16,4 @@ const isCrossChainStake$: Rx.Observable<boolean> = selectedPoolChain$.pipe(
   RxOp.distinctUntilChanged()
 )
 
-export { isCrossChainStake$ }
+export { isCrossChainDeposit$ }

@@ -141,11 +141,11 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.PoolShareWrapper ref={ref}>
-      <PoolShareCard title={intl.formatMessage({ id: 'stake.share.title' })}>
+      <PoolShareCard title={intl.formatMessage({ id: 'deposit.share.title' })}>
         <Styled.CardRow>
           <Col span={smallWidth ? 24 : 12} style={{ paddingBottom: smallWidth ? '20px' : '0' }}>
             <Styled.LabelSecondary textTransform="uppercase">
-              {intl.formatMessage({ id: 'stake.share.units' })}
+              {intl.formatMessage({ id: 'deposit.share.units' })}
             </Styled.LabelSecondary>
             <Styled.LabelPrimary loading={loading}>{`${formatBaseAsAssetAmount({
               amount: stakeUnits,
@@ -154,18 +154,18 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
           </Col>
           <Col span={smallWidth ? 24 : 12}>
             <Styled.LabelSecondary textTransform="uppercase">
-              {intl.formatMessage({ id: 'stake.share.poolshare' })}
+              {intl.formatMessage({ id: 'deposit.share.poolshare' })}
             </Styled.LabelSecondary>
             <Styled.LabelPrimary loading={loading}>{`${formatBN(poolShare)}%`}</Styled.LabelPrimary>
           </Col>
         </Styled.CardRow>
       </PoolShareCard>
-      <PoolShareCard title={intl.formatMessage({ id: 'stake.redemption.title' })}>
+      <PoolShareCard title={intl.formatMessage({ id: 'deposit.redemption.title' })}>
         {renderRedemption}
         <Styled.CardRow>
           <Col span={24}>
             <Styled.LabelSecondary textTransform="uppercase">
-              {intl.formatMessage({ id: 'stake.share.total' })}
+              {intl.formatMessage({ id: 'deposit.share.total' })}
             </Styled.LabelSecondary>
             <Styled.LabelPrimary loading={loading}>
               {formatAssetAmountCurrency({ amount: baseToAsset(totalStakedPrice), asset: priceAsset, decimal: 2 })}

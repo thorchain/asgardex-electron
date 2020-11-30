@@ -35,7 +35,7 @@ export type FeesService = {
   poolFeeRate$: (memo: Memo) => FeeRateLD
   getPoolFeeRate: () => FeeRateRD
   reloadFees: () => void
-  reloadStakeFee: () => void
+  reloadDepositFee: () => void
 }
 
 export type LedgerService = {

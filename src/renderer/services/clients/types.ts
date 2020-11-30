@@ -57,7 +57,7 @@ export type Address$ = Rx.Observable<O.Option<Address>>
 export type TransactionService<SendTxParams> = {
   txRD$: TxLD
   pushTx: (_: SendTxParams) => Rx.Subscription
-  sendStakeTx: (_: SendTxParams) => TxLD
+  sendDepositTx: (_: SendTxParams) => TxLD
   resetTx: () => void
   txs$: (_: TxsParams) => TxsPageLD
 }

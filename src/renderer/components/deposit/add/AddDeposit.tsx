@@ -5,6 +5,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import {
   Asset,
   AssetAmount,
+  AssetRuneNative,
   baseAmount,
   BaseAmount,
   baseToAsset,
@@ -19,7 +20,7 @@ import { useIntl } from 'react-intl'
 
 import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { SymDepositMemo, Memo, SendStakeTxParams, StakeFeesRD } from '../../../services/chain/types'
+import { SymDepositMemo, Memo, SendDepositTxParams, DepositFeesRD } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { DepositType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
@@ -29,7 +30,6 @@ import * as Styled from './AddDeposit.style'
 type Props = {
   type: DepositType
   asset: Asset
-  runeAsset: Asset
   assetPrice: BigNumber
   runePrice: BigNumber
   assetBalance: O.Option<BaseAmount>
@@ -41,10 +41,10 @@ type Props = {
   asymDepositMemo: O.Option<Memo>
   symDepositMemo: O.Option<SymDepositMemo>
   priceAsset?: Asset
-  fees: StakeFeesRD
+  fees: DepositFeesRD
   reloadFees: (type: DepositType) => void
   assets?: Asset[]
-  onDeposit: (p: SendStakeTxParams) => void
+  onDeposit: (p: SendDepositTxParams) => void
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
@@ -54,7 +54,6 @@ export const AddDeposit: React.FC<Props> = (props) => {
   const {
     type,
     asset,
-    runeAsset,
     assetPrice,
     runePrice,
     assetBalance: oAssetBalance,
@@ -135,24 +134,24 @@ export const AddDeposit: React.FC<Props> = (props) => {
 
   const renderBalanceError = useMemo(() => {
     const noAssetBalancesMsg = intl.formatMessage(
-      { id: 'stake.add.error.nobalance1' },
+      { id: 'deposit.add.error.nobalance1' },
       {
         asset: asset.ticker
       }
     )
 
     const noRuneBalancesMsg = intl.formatMessage(
-      { id: 'stake.add.error.nobalance1' },
+      { id: 'deposit.add.error.nobalance1' },
       {
-        asset: runeAsset.ticker
+        asset: AssetRuneNative.ticker
       }
     )
 
     const noRuneAndAssetBalancesMsg = intl.formatMessage(
-      { id: 'stake.add.error.nobalance2' },
+      { id: 'deposit.add.error.nobalance2' },
       {
         asset1: asset.ticker,
-        asset2: runeAsset.ticker
+        asset2: AssetRuneNative.ticker
       }
     )
 
@@ -169,11 +168,11 @@ export const AddDeposit: React.FC<Props> = (props) => {
 
     const symMsg = noAssetBalancesMsg
 
-    const title = intl.formatMessage({ id: 'stake.add.error.nobalances' })
+    const title = intl.formatMessage({ id: 'deposit.add.error.nobalances' })
 
     const msg = type === 'sym' ? symMsg : asymMsg
     return <Styled.BalanceAlert type="warning" message={title} description={msg} />
-  }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl, runeAsset.ticker, type])
+  }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl, type])
 
   const runeAmountChangeHandler = useCallback(
     (runeInput: BaseAmount) => {
@@ -242,7 +241,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
         sequenceTOption(oPoolAddress, oAsymDepositMemo),
         O.map(([poolAddress, asymDepositMemo]) => {
           const baseChainDepositTxParam = {
-            chain: runeAsset.chain,
+            chain: AssetRuneNative.chain,
             asset: BASE_CHAIN_ASSET,
             poolAddress,
             amount: assetAmountToDeposit,
@@ -258,7 +257,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
         sequenceTOption(oPoolAddress, oSymDepositMemo),
         O.map(([poolAddress, { rune: runeMemo, asset: assetMemo }]) => {
           const runeTxParam = {
-            chain: runeAsset.chain,
+            chain: AssetRuneNative.chain,
             asset: BASE_CHAIN_ASSET,
             poolAddress,
             // TODO (@Veado) Ask about amount of NativeRune tx, maybe it can be ZERO
@@ -280,19 +279,19 @@ export const AddDeposit: React.FC<Props> = (props) => {
         })
       )
 
-    // TODO(@Veado) Call sendStakeTx of `services/chain/txs`
+    // TODO(@Veado) Call sendDepositTx of `services/chain/txs`
     // and handle results (error/success) in a modal here in `AddStake`
     FP.pipe(
       type === 'asym' ? asymDepositTx() : symDepositTx(),
       O.map((v) => console.log('success:', v)),
       O.getOrElse(() => console.log('no data to run txs'))
     )
-  }, [type, oPoolAddress, oSymDepositMemo, runeAsset.chain, assetAmountToDeposit, oAsymDepositMemo, asset])
+  }, [type, oPoolAddress, oSymDepositMemo, assetAmountToDeposit, oAsymDepositMemo, asset])
 
   const renderFeeError = useCallback(
     (fee: BaseAmount, balance: AssetAmount, asset: Asset) => {
       const msg = intl.formatMessage(
-        { id: 'stake.add.error.chainFeeNotCovered' },
+        { id: 'deposit.add.error.chainFeeNotCovered' },
         {
           fee: Helper.formatFee(fee, asset),
           balance: formatAssetAmountCurrency({ amount: balance, asset, trimZeros: true })
@@ -431,7 +430,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
           {!isAsym && (
             <Styled.AssetCard
               disabled={disabledForm}
-              asset={runeAsset}
+              asset={AssetRuneNative}
               selectedAmount={runeAmountToDeposit}
               maxAmount={maxRuneAmountToDeposit}
               onChangeAssetAmount={runeAmountChangeHandler}
@@ -476,7 +475,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
 
       <Styled.DragWrapper>
         <Drag
-          title={intl.formatMessage({ id: 'stake.drag' })}
+          title={intl.formatMessage({ id: 'deposit.drag' })}
           onConfirm={confirmDepositHandler}
           disabled={disabledForm || runeAmountToDeposit.amount().isZero()}
         />

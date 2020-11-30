@@ -8,7 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { TRANSFER_FEES } from '../../../../shared/mock/fees'
 import { ZERO_BASE_AMOUNT } from '../../../const'
-import { StakeFeesRD } from '../../../services/chain/types'
+import { DepositFeesRD } from '../../../services/chain/types'
 import { AddDeposit } from './AddDeposit'
 
 const assetBalance = O.some(assetToBase(assetAmount(200)))
@@ -20,7 +20,7 @@ const poolData = {
   runeBalance: baseAmount('2000')
 }
 const assets = [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO]
-const fees: StakeFeesRD = RD.success({
+const fees: DepositFeesRD = RD.success({
   base: assetToBase(TRANSFER_FEES.single),
   cross: O.none
 })
@@ -31,7 +31,6 @@ export const AddAsymDepositStory = () => {
     <AddDeposit
       type="asym"
       asset={AssetBNB}
-      runeAsset={AssetRune67C}
       assetPrice={bn(2)}
       runePrice={bn(1)}
       assetBalance={assetBalance}
@@ -57,7 +56,6 @@ export const AddAsymCrossDepositStory = () => {
     <AddDeposit
       type="asym"
       asset={AssetBTC}
-      runeAsset={AssetRune67C}
       assetPrice={bn(2)}
       runePrice={bn(1)}
       assetBalance={assetBalance}
@@ -87,7 +85,6 @@ export const AddSymDepositStory = () => {
     <AddDeposit
       type="sym"
       asset={AssetBNB}
-      runeAsset={AssetRune67C}
       assetPrice={bn(2)}
       runePrice={bn(1)}
       assetBalance={assetBalance}
@@ -115,7 +112,6 @@ storiesOf('Components/Deposit/AddDeposit', module)
       <AddDeposit
         type="sym"
         asset={AssetBNB}
-        runeAsset={AssetRune67C}
         assetPrice={bn(2)}
         runePrice={bn(1)}
         assetBalance={O.some(ZERO_BASE_AMOUNT)}
@@ -140,7 +136,6 @@ storiesOf('Components/Deposit/AddDeposit', module)
       <AddDeposit
         type="sym"
         asset={AssetBNB}
-        runeAsset={AssetRune67C}
         assetPrice={bn(2)}
         runePrice={bn(1)}
         assetBalance={assetBalance}
@@ -165,7 +160,6 @@ storiesOf('Components/Deposit/AddDeposit', module)
     <AddDeposit
       type="asym"
       asset={AssetBNB}
-      runeAsset={AssetRune67C}
       assetPrice={bn(2)}
       runePrice={bn(1)}
       assetBalance={O.some(ZERO_BASE_AMOUNT)}
@@ -191,7 +185,6 @@ storiesOf('Components/Deposit/AddDeposit', module)
       <AddDeposit
         type="asym"
         asset={AssetBTC}
-        runeAsset={AssetRune67C}
         assetPrice={bn(2)}
         runePrice={bn(1)}
         assetBalance={assetBalance}

@@ -15,8 +15,8 @@ import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import { selectedPoolAsset$, selectedPoolChain$ } from '../../midgard/common'
 import { symDepositAssetTxMemo$, asymDepositTxMemo$ } from '../memo'
-import { FeeLD, LoadFeesHandler, StakeFeesLD } from '../types'
-import { reloadStakeFeesByChain } from './fees.helper'
+import { FeeLD, LoadFeesHandler, DepositFeesLD } from '../types'
+import { reloadDepositFeesByChain } from './fees.helper'
 
 export const reloadFees = () => {
   BNB.reloadFees()
@@ -44,32 +44,32 @@ export const reloadFees$: Rx.Observable<O.Option<LoadFeesHandler>> = selectedPoo
   RxOp.map(O.map(reloadFeesByChain))
 )
 
-// State to reload stake fees
-const { get$: reloadStakeFees$, set: reloadStakeFees } = observableState<DepositType>('asym')
+// State to reload deposit fees
+const { get$: reloadDepositFees$, set: reloadDepositFees } = observableState<DepositType>('asym')
 
 /**
  * reload fees
  *
  * Has to be used ONLY on an appropriate view
  * @example
- * useSubscription(updateStakeFeesEffect$)
+ * useSubscription(updateDepositFeesEffect$)
  */
-const updateStakeFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadStakeFees$]).pipe(
+const updateDepositFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadDepositFees$]).pipe(
   RxOp.tap(([oChain, _]) =>
     FP.pipe(
       oChain,
       O.map((chain) => {
         // reload base-chain
-        reloadStakeFeesByChain(BASE_CHAIN)
+        reloadDepositFeesByChain(BASE_CHAIN)
         // For x-chains transfers, load fees for x-chain, too
-        if (!isBaseChain(chain)) reloadStakeFeesByChain(chain)
+        if (!isBaseChain(chain)) reloadDepositFeesByChain(chain)
         return true
       })
     )
   )
 )
 
-const stakeFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
+const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
   switch (chain) {
     case 'BNB':
       return BNB.fees$.pipe(liveData.map((fees) => fees.fast))
@@ -88,15 +88,15 @@ const stakeFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
         )
       )
     case 'ETH':
-      return Rx.of(RD.failure(new Error('Stake fee for ETH has not been implemented')))
+      return Rx.of(RD.failure(new Error('Deposit fee for ETH has not been implemented')))
     case 'THOR':
-      return Rx.of(RD.failure(new Error('Stake fee for THOR has not been implemented')))
+      return Rx.of(RD.failure(new Error('Deposit fee for THOR has not been implemented')))
   }
 }
 
 // TODO (@Veado) Store results of deposit fees into a state, so views will have access to it.
 // Needed to display success / error states of each transaction
-const stakeFees$ = (type: DepositType): StakeFeesLD =>
+const depositFees$ = (type: DepositType): DepositFeesLD =>
   selectedPoolAsset$.pipe(
     RxOp.switchMap((oPoolAsset) =>
       FP.pipe(
@@ -106,9 +106,9 @@ const stakeFees$ = (type: DepositType): StakeFeesLD =>
             Rx.combineLatest(
               type === 'asym'
                 ? // for asym deposits, one tx needed only == one fe)
-                  [stakeFeeByChain$(BASE_CHAIN, type)]
+                  [depositFeeByChain$(BASE_CHAIN, type)]
                 : // for sym deposits, two txs needed == 2 fees,
-                  [stakeFeeByChain$(BASE_CHAIN, type), stakeFeeByChain$(poolAsset.chain, type)]
+                  [depositFeeByChain$(BASE_CHAIN, type), depositFeeByChain$(poolAsset.chain, type)]
             ),
             RxOp.map(sequenceTRDFromArray),
             liveData.map(([base, cross]) => ({
@@ -117,9 +117,9 @@ const stakeFees$ = (type: DepositType): StakeFeesLD =>
             }))
           )
         ),
-        O.getOrElse((): StakeFeesLD => Rx.of(RD.initial))
+        O.getOrElse((): DepositFeesLD => Rx.of(RD.initial))
       )
     )
   )
 
-export { stakeFees$, reloadStakeFees, stakeFeeByChain$, updateStakeFeesEffect$ }
+export { depositFees$, reloadDepositFees, depositFeeByChain$, updateDepositFeesEffect$ }
