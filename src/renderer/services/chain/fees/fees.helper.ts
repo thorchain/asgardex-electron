@@ -10,11 +10,11 @@ import * as BTC from '../../bitcoin'
  * demand manual updating by triggering their own triggeStrams.
  *
  * @example
- * updateUnstakeFeesEffect$ at ./withdraw.ts
+ * updateWithdrawFeesEffect$ at ./withdraw.ts
  * @example
- * updateStakeFeesEffect$ at ./stake.ts
+ * updateDepositFeesEffect$ at ./deposit.ts
  */
-export const reloadStakeFeesByChain = (chain: Chain) => {
+export const reloadDepositFeesByChain = (chain: Chain) => {
   switch (chain) {
     case 'BNB':
       BNB.reloadFees()

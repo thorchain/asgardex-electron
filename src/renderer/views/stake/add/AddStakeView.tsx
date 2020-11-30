@@ -48,16 +48,16 @@ export const AddStakeView: React.FC<Props> = ({ asset, type = 'asym' }) => {
   } = useMidgardContext()
 
   const {
-    stakeFees$,
-    reloadStakeFees,
-    isCrossChainStake$,
+    depositFees$: stakeFees$,
+    reloadDepositFees: reloadStakeFees,
+    isCrossChainDeposit$: isCrossChainStake$,
     symDepositTxMemo$,
     asymDepositTxMemo$,
-    updateStakeFeesEffect$
+    updateDepositFeesEffect$
   } = useChainContext()
 
   // subscribe to
-  useSubscription(updateStakeFeesEffect$)
+  useSubscription(updateDepositFeesEffect$)
 
   const [stakeFees] = useObservableState(() => stakeFees$(type), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(poolAddress$, O.none)
