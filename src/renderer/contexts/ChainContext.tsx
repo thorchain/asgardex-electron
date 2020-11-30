@@ -12,7 +12,7 @@ import {
   updateWithdrawFeesEffect$,
   updateDepositFeesEffect$,
   retrieveLedgerAddress,
-  removeLedgerAddress
+  resetLedgerAddress
 } from '../services/chain/index'
 
 type ChainContextValue = {
@@ -27,7 +27,7 @@ type ChainContextValue = {
   symDepositTxMemo$: typeof symDepositTxMemo$
   asymDepositTxMemo$: typeof asymDepositTxMemo$
   retrieveLedgerAddress: typeof retrieveLedgerAddress
-  removeLedgerAddress: typeof removeLedgerAddress
+  resetLedgerAddress: typeof resetLedgerAddress
 }
 
 const initialContext: ChainContextValue = {
@@ -42,7 +42,7 @@ const initialContext: ChainContextValue = {
   symDepositTxMemo$,
   asymDepositTxMemo$,
   retrieveLedgerAddress,
-  removeLedgerAddress
+  resetLedgerAddress
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 

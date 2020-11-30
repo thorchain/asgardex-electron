@@ -34,7 +34,9 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
   const chainContext = useChainContext()
-  const { retrieveLedgerAddress, removeLedgerAddress } = chainContext
+  const { retrieveLedgerAddress, resetLedgerAddress } = chainContext
+
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const binanceAddress$ = useMemo(
     () =>
@@ -82,7 +84,13 @@ export const SettingsView: React.FC = (): JSX.Element => {
     [ethContext.address$]
   )
 
-  const bitcoinLedgerAddress = useObservableState(bitcoinContext.ledgerAddress$, RD.initial)
+  const bitcoinLedgerMainnetAddress = useObservableState(bitcoinContext.ledgerMainnetAddress$, RD.initial)
+  const bitcoinLedgerTestnetAddress = useObservableState(bitcoinContext.ledgerTestnetAddress$, RD.initial)
+  let bitcoinLedgerAddress = bitcoinLedgerMainnetAddress
+
+  if (network === 'testnet') {
+    bitcoinLedgerAddress = bitcoinLedgerTestnetAddress
+  }
 
   const bitcoinAddress$ = useMemo(
     () =>
@@ -117,8 +125,6 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const { onlineStatus$ } = useAppContext()
 
   const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
-
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxOp.map(RD.toOption)), [
     midgardService.apiEndpoint$
@@ -177,8 +183,9 @@ export const SettingsView: React.FC = (): JSX.Element => {
         message: intl.formatMessage({ id: 'ledger.add.device.error.title' }),
         description
       })
+      resetLedgerAddress({ chain: 'BTC', network: network === 'testnet' ? 'testnet' : 'mainnet' })
     }
-  }, [bitcoinLedgerAddress, intl])
+  }, [bitcoinLedgerAddress, intl, network, resetLedgerAddress])
 
   return (
     <Row>
@@ -192,7 +199,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           removeKeystore={removeKeystore}
           userAccounts={userAccounts}
           retrieveLedgerAddress={retrieveLedgerAddress}
-          removeLedgerAddress={removeLedgerAddress}
+          removeLedgerAddress={resetLedgerAddress}
         />
       </Col>
     </Row>

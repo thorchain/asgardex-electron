@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { Chain } from '@xchainjs/xchain-util'
 import { some } from 'fp-ts/lib/Option'
 
 import { BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
@@ -20,7 +19,9 @@ storiesOf('Wallet/Settings', module).add('default', () => {
       retrieveLedgerAddress={({ chain, network }: LedgerAddressParams) =>
         console.log('retrieve ledger address: ', chain, network)
       }
-      removeLedgerAddress={(chain: Chain) => console.log('remove ledger address: ', chain)}
+      removeLedgerAddress={({ chain, network }: LedgerAddressParams) =>
+        console.log('remove ledger address: ', chain, network)
+      }
     />
   )
 })

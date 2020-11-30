@@ -8,7 +8,8 @@ import { observableState } from '../../helpers/stateHelper'
 import { LedgerAddressRD } from '../wallet/types'
 import { LedgerService } from './types'
 
-const { get$: ledgerAddress$, set: setLedgerAddressRD } = observableState<LedgerAddressRD>(RD.initial)
+const { get$: ledgerMainnetAddress$, set: setLedgerMainnetAddressRD } = observableState<LedgerAddressRD>(RD.initial)
+const { get$: ledgerTestnetAddress$, set: setLedgerTestnetAddressRD } = observableState<LedgerAddressRD>(RD.initial)
 
 const retrieveLedgerAddress = (network: Network) =>
   FP.pipe(
@@ -16,12 +17,33 @@ const retrieveLedgerAddress = (network: Network) =>
     map(RD.fromEither),
     startWith(RD.pending),
     catchError((error) => Rx.of(RD.failure(error)))
-  ).subscribe(setLedgerAddressRD)
+  ).subscribe((value) => {
+    switch (network) {
+      case 'testnet':
+        setLedgerTestnetAddressRD(value)
+        break
+      default:
+        setLedgerMainnetAddressRD(value)
+        break
+    }
+  })
+
+const resetLedgerAddress = (network: Network) => {
+  switch (network) {
+    case 'testnet':
+      setLedgerTestnetAddressRD(RD.initial)
+      break
+    default:
+      setLedgerMainnetAddressRD(RD.initial)
+      break
+  }
+}
 
 const createLedgerService = (): LedgerService => ({
-  ledgerAddress$,
+  ledgerMainnetAddress$,
+  ledgerTestnetAddress$,
   retrieveLedgerAddress,
-  removeLedgerAddress: () => setLedgerAddressRD(RD.initial)
+  resetLedgerAddress
 })
 
 export { createLedgerService }

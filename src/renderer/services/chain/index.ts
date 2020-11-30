@@ -8,7 +8,7 @@ import {
   updateDepositFeesEffect$,
   updateWithdrawFeesEffect$
 } from './fees'
-import { retrieveLedgerAddress, removeLedgerAddress } from './ledger'
+import { retrieveLedgerAddress, resetLedgerAddress } from './ledger'
 import { asymDepositTxMemo$, symDepositTxMemo$ } from './memo'
 
 /**
@@ -26,5 +26,5 @@ export {
   symDepositTxMemo$,
   asymDepositTxMemo$,
   retrieveLedgerAddress,
-  removeLedgerAddress
+  resetLedgerAddress
 }

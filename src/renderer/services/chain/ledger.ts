@@ -1,5 +1,3 @@
-import { Chain } from '@xchainjs/xchain-util'
-
 import * as BTC from '../bitcoin'
 import { LedgerAddressParams } from './types'
 
@@ -12,13 +10,13 @@ const retrieveLedgerAddress = ({ chain, network }: LedgerAddressParams): void =>
   }
 }
 
-const removeLedgerAddress = (chain: Chain): void => {
+const resetLedgerAddress = ({ chain, network }: LedgerAddressParams): void => {
   switch (chain) {
     case 'BTC':
-      return BTC.removeLedgerAddress()
+      return BTC.resetLedgerAddress(network)
     default:
       break
   }
 }
 
-export { retrieveLedgerAddress, removeLedgerAddress }
+export { retrieveLedgerAddress, resetLedgerAddress }

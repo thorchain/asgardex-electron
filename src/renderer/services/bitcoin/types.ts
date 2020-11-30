@@ -39,7 +39,8 @@ export type FeesService = {
 }
 
 export type LedgerService = {
-  ledgerAddress$: LedgerAddressLD
+  ledgerMainnetAddress$: LedgerAddressLD
+  ledgerTestnetAddress$: LedgerAddressLD
   retrieveLedgerAddress: (network: Network) => void
-  removeLedgerAddress: () => void
+  resetLedgerAddress: (network: Network) => void
 }

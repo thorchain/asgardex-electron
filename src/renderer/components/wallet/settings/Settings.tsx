@@ -25,7 +25,7 @@ type Props = {
   lockWallet?: () => void
   removeKeystore?: () => void
   retrieveLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
-  removeLedgerAddress: (chain: Chain) => void
+  removeLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -62,9 +62,16 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   const removeDevice = useCallback(
     (chain: Chain) => {
-      removeLedgerAddress(chain)
+      switch (selectedNetwork) {
+        case 'mainnet':
+        case 'testnet':
+          removeLedgerAddress({ chain, network: selectedNetwork })
+          break
+        default:
+          break
+      }
     },
-    [removeLedgerAddress]
+    [removeLedgerAddress, selectedNetwork]
   )
 
   const accounts = useMemo(
