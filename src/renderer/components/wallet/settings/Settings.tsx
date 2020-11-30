@@ -8,9 +8,9 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../../shared/api/types'
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
-import { Network } from '../../../services/app/types'
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { UserAccountType } from '../../../types/wallet'
@@ -25,7 +25,8 @@ type Props = {
   lockWallet?: () => void
   removeKeystore?: () => void
   retrieveLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
-  removeLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
+  removeLedgerAddress: (chain: Chain) => void
+  resetAllLedgerAddress: () => void
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -39,6 +40,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     removeKeystore = () => {},
     retrieveLedgerAddress,
     removeLedgerAddress,
+    resetAllLedgerAddress,
     changeNetwork
   } = props
 
@@ -48,30 +50,16 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   const addDevice = useCallback(
     (chain: Chain) => {
-      switch (selectedNetwork) {
-        case 'mainnet':
-        case 'testnet':
-          retrieveLedgerAddress({ chain, network: selectedNetwork })
-          break
-        default:
-          break
-      }
+      retrieveLedgerAddress({ chain, network: selectedNetwork })
     },
     [retrieveLedgerAddress, selectedNetwork]
   )
 
   const removeDevice = useCallback(
     (chain: Chain) => {
-      switch (selectedNetwork) {
-        case 'mainnet':
-        case 'testnet':
-          removeLedgerAddress({ chain, network: selectedNetwork })
-          break
-        default:
-          break
-      }
+      removeLedgerAddress(chain)
     },
-    [removeLedgerAddress, selectedNetwork]
+    [removeLedgerAddress]
   )
 
   const accounts = useMemo(
@@ -100,15 +88,13 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                         </Styled.AccountContent>
                       </Styled.ChainContent>
                     ))}
-                    {selectedNetwork !== 'chaosnet' && (
-                      <Styled.Button
-                        onClick={() => addDevice(item.chainName)}
-                        typevalue="transparent"
-                        style={{ margin: '10px 0 15px 12px', boxShadow: 'none' }}>
-                        <PlusCircleFilled />
-                        {intl.formatMessage({ id: 'setting.add.device' })}
-                      </Styled.Button>
-                    )}
+                    <Styled.Button
+                      onClick={() => addDevice(item.chainName)}
+                      typevalue="transparent"
+                      style={{ margin: '10px 0 15px 12px', boxShadow: 'none' }}>
+                      <PlusCircleFilled />
+                      {intl.formatMessage({ id: 'setting.add.device' })}
+                    </Styled.Button>
                   </Styled.ListItem>
                 )}
               />
@@ -117,15 +103,16 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [addDevice, intl, removeDevice, selectedNetwork, userAccounts]
+    [addDevice, intl, removeDevice, userAccounts]
   )
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(
     (param) => {
       const asset = param.key as Network
       changeNetwork(asset)
+      resetAllLedgerAddress()
     },
-    [changeNetwork]
+    [changeNetwork, resetAllLedgerAddress]
   )
 
   const networkMenu = useMemo(

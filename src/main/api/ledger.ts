@@ -1,19 +1,20 @@
 import AppBtc from '@ledgerhq/hw-app-btc'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
-import { Network } from '@xchainjs/xchain-client'
 import * as E from 'fp-ts/Either'
 
 import { LedgerErrorId } from '../../shared/api/types'
+import { Network } from '../../shared/api/types'
+import { LEDGER } from '../../shared/const'
 
 export const getBTCAddress = async (network: Network) => {
   try {
     const transport = await TransportNodeHid.open('')
     const appBtc = new AppBtc(transport)
     let info
-    if (network === 'mainnet') {
-      info = await appBtc.getWalletPublicKey("44'/0'/0'/0/0")
+    if (network === 'testnet') {
+      info = await appBtc.getWalletPublicKey(LEDGER.GET_BTC_TESTNET_ADDRESS)
     } else {
-      info = await appBtc.getWalletPublicKey("44'/1'/0'/0/0")
+      info = await appBtc.getWalletPublicKey(LEDGER.GET_BTC_MAINNET_ADDRESS)
     }
     await transport.close()
     return E.right(info.bitcoinAddress)

@@ -1,9 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Fees, Network } from '@xchainjs/xchain-client'
+import { Fees } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>

@@ -11,6 +11,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { LedgerErrorId } from '../../../shared/api/types'
+import { Network } from '../../../shared/api/types'
 import { Settings } from '../../components/wallet/settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -21,7 +22,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
-import { OnlineStatus, Network } from '../../services/app/types'
+import { OnlineStatus } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { UserAccountType } from '../../types/wallet'
 
@@ -34,9 +35,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
   const chainContext = useChainContext()
-  const { retrieveLedgerAddress, resetLedgerAddress } = chainContext
-
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+  const { retrieveLedgerAddress, resetLedgerAddress, resetAllLedgerAddress } = chainContext
 
   const binanceAddress$ = useMemo(
     () =>
@@ -84,13 +83,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
     [ethContext.address$]
   )
 
-  const bitcoinLedgerMainnetAddress = useObservableState(bitcoinContext.ledgerMainnetAddress$, RD.initial)
-  const bitcoinLedgerTestnetAddress = useObservableState(bitcoinContext.ledgerTestnetAddress$, RD.initial)
-  let bitcoinLedgerAddress = bitcoinLedgerMainnetAddress
-
-  if (network === 'testnet') {
-    bitcoinLedgerAddress = bitcoinLedgerTestnetAddress
-  }
+  const bitcoinLedgerAddress = useObservableState(bitcoinContext.ledgerAddress$, RD.initial)
 
   const bitcoinAddress$ = useMemo(
     () =>
@@ -125,6 +118,8 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const { onlineStatus$ } = useAppContext()
 
   const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
+
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxOp.map(RD.toOption)), [
     midgardService.apiEndpoint$
@@ -183,9 +178,8 @@ export const SettingsView: React.FC = (): JSX.Element => {
         message: intl.formatMessage({ id: 'ledger.add.device.error.title' }),
         description
       })
-      resetLedgerAddress({ chain: 'BTC', network: network === 'testnet' ? 'testnet' : 'mainnet' })
     }
-  }, [bitcoinLedgerAddress, intl, network, resetLedgerAddress])
+  }, [bitcoinLedgerAddress, intl])
 
   return (
     <Row>
@@ -200,6 +194,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           userAccounts={userAccounts}
           retrieveLedgerAddress={retrieveLedgerAddress}
           removeLedgerAddress={resetLedgerAddress}
+          resetAllLedgerAddress={resetAllLedgerAddress}
         />
       </Col>
     </Row>

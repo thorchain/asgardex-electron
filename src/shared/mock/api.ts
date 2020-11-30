@@ -1,8 +1,8 @@
-import { Network } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { PubKeyEd25519 } from '@xchainjs/xchain-crypto/'
 import * as E from 'fp-ts/Either'
 
+import { Network } from '../api/types'
 import { ApiLang, ApiKeystore, ApiUrl, ApiHDWallet } from '../api/types'
 import { Locale } from '../i18n/types'
 

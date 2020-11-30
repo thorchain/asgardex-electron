@@ -1,4 +1,4 @@
-import { Address, Network } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Either } from 'fp-ts/lib/Either'
 
@@ -18,6 +18,8 @@ export type ApiLang = {
 export type ApiUrl = {
   openExternal: (url: string) => Promise<void>
 }
+
+export type Network = 'testnet' | 'chaosnet' | 'mainnet'
 
 export enum LedgerErrorId {
   NO_DEVICE,
