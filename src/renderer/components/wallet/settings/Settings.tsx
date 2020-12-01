@@ -26,7 +26,7 @@ type Props = {
   removeKeystore?: () => void
   retrieveLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
   removeLedgerAddress: (chain: Chain) => void
-  resetAllLedgerAddress: () => void
+  removeAllLedgerAddress: () => void
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -40,7 +40,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     removeKeystore = () => {},
     retrieveLedgerAddress,
     removeLedgerAddress,
-    resetAllLedgerAddress,
+    removeAllLedgerAddress,
     changeNetwork
   } = props
 
@@ -110,9 +110,9 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     (param) => {
       const asset = param.key as Network
       changeNetwork(asset)
-      resetAllLedgerAddress()
+      removeAllLedgerAddress()
     },
-    [changeNetwork, resetAllLedgerAddress]
+    [changeNetwork, removeAllLedgerAddress]
   )
 
   const networkMenu = useMemo(

@@ -12,9 +12,9 @@ export const getBTCAddress = async (network: Network) => {
     const appBtc = new AppBtc(transport)
     let info
     if (network === 'testnet') {
-      info = await appBtc.getWalletPublicKey(LEDGER.GET_BTC_TESTNET_ADDRESS)
+      info = await appBtc.getWalletPublicKey(LEDGER.GET_BTC_TESTNET_ADDRESS, { format: 'bech32' })
     } else {
-      info = await appBtc.getWalletPublicKey(LEDGER.GET_BTC_MAINNET_ADDRESS)
+      info = await appBtc.getWalletPublicKey(LEDGER.GET_BTC_MAINNET_ADDRESS, { format: 'bech32' })
     }
     await transport.close()
     return E.right(info.bitcoinAddress)

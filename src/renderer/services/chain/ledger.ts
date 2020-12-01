@@ -12,18 +12,18 @@ const retrieveLedgerAddress = ({ chain, network }: LedgerAddressParams): void =>
   }
 }
 
-const resetLedgerAddress = (chain: Chain): void => {
+const removeLedgerAddress = (chain: Chain): void => {
   switch (chain) {
     case 'BTC':
-      return BTC.resetLedgerAddress()
+      return BTC.removeLedgerAddress()
     default:
       break
   }
 }
 
-const resetAllLedgerAddress = (): void => {
-  BTC.resetLedgerAddress()
-  // add more resetLedgerAddress later
+const removeAllLedgerAddress = (): void => {
+  BTC.removeLedgerAddress()
+  // add more removeLedgerAddress later
 }
 
-export { retrieveLedgerAddress, resetLedgerAddress, resetAllLedgerAddress }
+export { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress }

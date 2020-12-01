@@ -21,7 +21,7 @@ storiesOf('Wallet/Settings', module).add('default', () => {
         console.log('retrieve ledger address: ', chain, network)
       }
       removeLedgerAddress={(chain: Chain) => console.log('remove ledger address: ', chain)}
-      resetAllLedgerAddress={() => console.log('reset all ledger address')}
+      removeAllLedgerAddress={() => console.log('reset all ledger address')}
     />
   )
 })

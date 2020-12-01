@@ -21,7 +21,7 @@ const retrieveLedgerAddress = (network: Network) =>
 const createLedgerService = (): LedgerService => ({
   ledgerAddress$,
   retrieveLedgerAddress,
-  resetLedgerAddress: () => setLedgerAddressRD(RD.initial)
+  removeLedgerAddress: () => setLedgerAddressRD(RD.initial)
 })
 
 export { createLedgerService }
