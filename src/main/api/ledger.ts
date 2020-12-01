@@ -6,6 +6,27 @@ import { LedgerErrorId } from '../../shared/api/types'
 import { Network } from '../../shared/api/types'
 import { LEDGER } from '../../shared/const'
 
+const getErrorId = (message: string, statusText: string): LedgerErrorId => {
+  if (message === 'NoDevice') {
+    return LedgerErrorId.NO_DEVICE
+  }
+  if (message.includes('cannot open device')) {
+    return LedgerErrorId.ALREADY_IN_USE
+  }
+  switch (statusText) {
+    case 'SECURITY_STATUS_NOT_SATISFIED':
+      return LedgerErrorId.NO_APP
+    case 'CLA_NOT_SUPPORTED':
+      return LedgerErrorId.WRONG_APP
+    case 'INS_NOT_SUPPORTED':
+      return LedgerErrorId.WRONG_APP
+    case 'CONDITIONS_OF_USE_NOT_SATISFIED':
+      return LedgerErrorId.DENIED
+    default:
+      return LedgerErrorId.UNKNOWN
+  }
+}
+
 export const getBTCAddress = async (network: Network) => {
   try {
     const transport = await TransportNodeHid.open('')
@@ -19,23 +40,20 @@ export const getBTCAddress = async (network: Network) => {
     await transport.close()
     return E.right(info.bitcoinAddress)
   } catch (error) {
-    if (error.message === 'NoDevice') {
-      return E.left(LedgerErrorId.NO_DEVICE)
+    return E.left(getErrorId(error.message, error.statusText))
+  }
+}
+
+export const getBNBAddress = async (network: Network) => {
+  try {
+    let address
+    if (network === 'testnet') {
+      address = 'Binance Testnet Address'
+    } else {
+      address = 'Binance Mainnet Address'
     }
-    if (error.message.includes('cannot open device')) {
-      return E.left(LedgerErrorId.ALREADY_IN_USE)
-    }
-    switch (error.statusText) {
-      case 'SECURITY_STATUS_NOT_SATISFIED':
-        return E.left(LedgerErrorId.NO_APP)
-      case 'CLA_NOT_SUPPORTED':
-        return E.left(LedgerErrorId.WRONG_APP)
-      case 'INS_NOT_SUPPORTED':
-        return E.left(LedgerErrorId.WRONG_APP)
-      case 'CONDITIONS_OF_USE_NOT_SATISFIED':
-        return E.left(LedgerErrorId.DENIED)
-      default:
-        return E.left(LedgerErrorId.UNKNOWN)
-    }
+    return E.right(address)
+  } catch (error) {
+    return E.left(getErrorId(error.message, error.statusText))
   }
 }

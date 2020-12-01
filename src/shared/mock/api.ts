@@ -51,5 +51,6 @@ export const apiUrl: ApiUrl = {
 
 // Mock `apiHDWallet`
 export const apiHDWallet: ApiHDWallet = {
-  getBTCAddress: (_: Network) => Promise.resolve(E.right('btc_address'))
+  getBTCAddress: (_: Network) => Promise.resolve(E.right('btc_address')),
+  getBNBAddress: (_: Network) => Promise.resolve(E.right('bnb_address'))
 }

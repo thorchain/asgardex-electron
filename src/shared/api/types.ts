@@ -32,6 +32,7 @@ export enum LedgerErrorId {
 
 export type ApiHDWallet = {
   getBTCAddress: (network: Network) => Promise<Either<LedgerErrorId, Address>>
+  getBNBAddress: (network: Network) => Promise<Either<LedgerErrorId, Address>>
 }
 
 declare global {

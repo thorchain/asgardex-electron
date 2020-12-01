@@ -11,7 +11,7 @@ import { warn } from 'electron-log'
 import { Network } from '../shared/api/types'
 import { Locale } from '../shared/i18n/types'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist } from './api/keystore'
-import { getBTCAddress } from './api/ledger'
+import { getBTCAddress, getBNBAddress } from './api/ledger'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
@@ -123,6 +123,7 @@ const initIPC = () => {
   ipcMain.handle(IPCMessages.GET_KEYSTORE, () => getKeystore())
   ipcMain.handle(IPCMessages.KEYSTORE_EXIST, () => keystoreExist())
   ipcMain.handle(IPCMessages.GET_BTC_ADDRESS, (_, network: Network) => getBTCAddress(network))
+  ipcMain.handle(IPCMessages.GET_BNB_ADDRESS, (_, network: Network) => getBNBAddress(network))
 }
 
 const init = async () => {

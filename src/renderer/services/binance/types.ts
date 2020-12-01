@@ -5,8 +5,10 @@ import { Asset, AssetAmount, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 
+import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
+import { LedgerAddressLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -66,3 +68,9 @@ export type SendTxParams = {
 }
 
 export type TransactionService = C.TransactionService<SendTxParams>
+
+export type LedgerService = {
+  ledgerAddress$: LedgerAddressLD
+  retrieveLedgerAddress: (network: Network) => void
+  removeLedgerAddress: () => void
+}
