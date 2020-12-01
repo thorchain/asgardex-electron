@@ -19,6 +19,8 @@ export type ApiUrl = {
   openExternal: (url: string) => Promise<void>
 }
 
+export type Network = 'testnet' | 'chaosnet' | 'mainnet'
+
 export enum LedgerErrorId {
   NO_DEVICE,
   ALREADY_IN_USE,
@@ -29,7 +31,7 @@ export enum LedgerErrorId {
 }
 
 export type ApiHDWallet = {
-  getBTCAddress: () => Promise<Either<LedgerErrorId, Address>>
+  getBTCAddress: (network: Network) => Promise<Either<LedgerErrorId, Address>>
 }
 
 declare global {

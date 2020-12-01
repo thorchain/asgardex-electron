@@ -3,6 +3,7 @@ import { Client } from '@xchainjs/xchain-bitcoin'
 import { FeeRate, FeesWithRates } from '@xchainjs/xchain-bitcoin'
 import { BaseAmount } from '@xchainjs/xchain-util'
 
+import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeeLD, Memo } from '../chain/types'
 import * as C from '../clients'
@@ -40,6 +41,6 @@ export type FeesService = {
 
 export type LedgerService = {
   ledgerAddress$: LedgerAddressLD
-  retrieveLedgerAddress: () => void
+  retrieveLedgerAddress: (network: Network) => void
   removeLedgerAddress: () => void
 }

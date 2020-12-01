@@ -8,9 +8,9 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../../shared/api/types'
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
-import { Network } from '../../../services/app/types'
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { UserAccountType } from '../../../types/wallet'
@@ -24,8 +24,9 @@ type Props = {
   userAccounts?: O.Option<UserAccountType[]>
   lockWallet?: () => void
   removeKeystore?: () => void
-  retrieveLedgerAddress: ({ chain }: LedgerAddressParams) => void
+  retrieveLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
   removeLedgerAddress: (chain: Chain) => void
+  removeAllLedgerAddress: () => void
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -39,6 +40,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     removeKeystore = () => {},
     retrieveLedgerAddress,
     removeLedgerAddress,
+    removeAllLedgerAddress,
     changeNetwork
   } = props
 
@@ -48,9 +50,9 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   const addDevice = useCallback(
     (chain: Chain) => {
-      retrieveLedgerAddress({ chain })
+      retrieveLedgerAddress({ chain, network: selectedNetwork })
     },
-    [retrieveLedgerAddress]
+    [retrieveLedgerAddress, selectedNetwork]
   )
 
   const removeDevice = useCallback(
@@ -108,8 +110,9 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     (param) => {
       const asset = param.key as Network
       changeNetwork(asset)
+      removeAllLedgerAddress()
     },
-    [changeNetwork]
+    [changeNetwork, removeAllLedgerAddress]
   )
 
   const networkMenu = useMemo(

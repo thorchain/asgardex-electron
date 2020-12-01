@@ -1,4 +1,4 @@
-import { Network } from './app/types'
+import { Network } from '../../shared/api/types'
 
 export const DEFAULT_NETWORK: Network = 'testnet'
 export const AVAILABLE_NETWORKS: Network[] = ['testnet', 'chaosnet', 'mainnet']

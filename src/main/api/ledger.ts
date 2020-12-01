@@ -3,12 +3,19 @@ import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import * as E from 'fp-ts/Either'
 
 import { LedgerErrorId } from '../../shared/api/types'
+import { Network } from '../../shared/api/types'
+import { LEDGER } from '../../shared/const'
 
-export const getBTCAddress = async () => {
+export const getBTCAddress = async (network: Network) => {
   try {
     const transport = await TransportNodeHid.open('')
     const appBtc = new AppBtc(transport)
-    const info = await appBtc.getWalletPublicKey("44'/0'/0'/0/0")
+    let info
+    if (network === 'testnet') {
+      info = await appBtc.getWalletPublicKey(LEDGER.GET_BTC_TESTNET_ADDRESS, { format: 'bech32' })
+    } else {
+      info = await appBtc.getWalletPublicKey(LEDGER.GET_BTC_MAINNET_ADDRESS, { format: 'bech32' })
+    }
     await transport.close()
     return E.right(info.bitcoinAddress)
   } catch (error) {

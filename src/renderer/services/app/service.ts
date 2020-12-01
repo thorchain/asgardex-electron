@@ -1,9 +1,10 @@
 import * as Rx from 'rxjs'
 import { startWith, mapTo, distinctUntilChanged } from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { observableState } from '../../helpers/stateHelper'
 import { DEFAULT_NETWORK } from '../const'
-import { OnlineStatus, Network } from './types'
+import { OnlineStatus } from './types'
 
 // Check online status
 // https://www.electronjs.org/docs/tutorial/online-offline-events

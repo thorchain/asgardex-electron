@@ -11,6 +11,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { LedgerErrorId } from '../../../shared/api/types'
+import { Network } from '../../../shared/api/types'
 import { Settings } from '../../components/wallet/settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -21,7 +22,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
-import { OnlineStatus, Network } from '../../services/app/types'
+import { OnlineStatus } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { UserAccountType } from '../../types/wallet'
 
@@ -34,7 +35,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
   const chainContext = useChainContext()
-  const { retrieveLedgerAddress, removeLedgerAddress } = chainContext
+  const { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } = chainContext
 
   const binanceAddress$ = useMemo(
     () =>
@@ -193,6 +194,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           userAccounts={userAccounts}
           retrieveLedgerAddress={retrieveLedgerAddress}
           removeLedgerAddress={removeLedgerAddress}
+          removeAllLedgerAddress={removeAllLedgerAddress}
         />
       </Col>
     </Row>
