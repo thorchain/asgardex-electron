@@ -2,6 +2,7 @@ import { ledger, crypto } from '@binance-chain/javascript-sdk'
 import LedgerApp from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import AppBtc from '@ledgerhq/hw-app-btc'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
+import { Chain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { LedgerErrorId } from '../../shared/api/types'
@@ -29,7 +30,7 @@ const getErrorId = (message: string, statusText: string): LedgerErrorId => {
   }
 }
 
-export const getBTCAddress = async (network: Network) => {
+const getBTCAddress = async (network: Network) => {
   try {
     const transport = await TransportNodeHid.open('')
     const appBtc = new AppBtc(transport)
@@ -46,22 +47,34 @@ export const getBTCAddress = async (network: Network) => {
   }
 }
 
-export const getBNBAddress = async (network: Network) => {
+const getBNBAddress = async (network: Network) => {
   try {
     const timeout = 50000
     const transport = await ledger.transports.node.create(timeout)
     const app: LedgerApp = new ledger.app(transport, 100000, 100000)
     const hdPath = [44, 714, 0, 0, 0]
     // get public key
-    const publicKey = (await app.getPublicKey(hdPath)).pk
-    if (publicKey) {
+    const { pk } = await app.getPublicKey(hdPath)
+    await transport.close()
+    if (pk) {
       // get address from pubkey
-      const address = crypto.getAddressFromPublicKey(publicKey.toString('hex'), network === 'testnet' ? 'tbnb' : 'bnb')
+      const address = crypto.getAddressFromPublicKey(pk.toString('hex'), network === 'testnet' ? 'tbnb' : 'bnb')
       return E.right(address)
     } else {
       return E.left(LedgerErrorId.UNKNOWN)
     }
   } catch (error) {
     return E.left(getErrorId(error.message, error.statusText))
+  }
+}
+
+export const getLedgerAddress = (chain: Chain, network: Network) => {
+  switch (chain) {
+    case 'BNB':
+      return getBNBAddress(network)
+    case 'BTC':
+      return getBTCAddress(network)
+    default:
+      break
   }
 }

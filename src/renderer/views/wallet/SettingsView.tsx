@@ -55,7 +55,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
                   },
                   {
                     name: 'Ledger',
-                    address: RD.isSuccess(binanceLedgerAddress) ? binanceLedgerAddress.value : '',
+                    address: RD.getOrElse(() => '')(binanceLedgerAddress),
                     type: 'external'
                   }
                 ].filter(({ address }) => !!address)
@@ -107,7 +107,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
                   },
                   {
                     name: 'Ledger',
-                    address: RD.isSuccess(bitcoinLedgerAddress) ? bitcoinLedgerAddress.value : '',
+                    address: RD.getOrElse(() => '')(bitcoinLedgerAddress),
                     type: 'external'
                   }
                 ].filter(({ address }) => !!address)
