@@ -1,3 +1,5 @@
+import { ledger, crypto } from '@binance-chain/javascript-sdk'
+import LedgerApp from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import AppBtc from '@ledgerhq/hw-app-btc'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import * as E from 'fp-ts/Either'
@@ -46,13 +48,19 @@ export const getBTCAddress = async (network: Network) => {
 
 export const getBNBAddress = async (network: Network) => {
   try {
-    let address
-    if (network === 'testnet') {
-      address = 'Binance Testnet Address'
+    const timeout = 50000
+    const transport = await ledger.transports.node.create(timeout)
+    const app: LedgerApp = new ledger.app(transport, 100000, 100000)
+    const hdPath = [44, 714, 0, 0, 0]
+    // get public key
+    const publicKey = (await app.getPublicKey(hdPath)).pk
+    if (publicKey) {
+      // get address from pubkey
+      const address = crypto.getAddressFromPublicKey(publicKey.toString('hex'), network === 'testnet' ? 'tbnb' : 'bnb')
+      return E.right(address)
     } else {
-      address = 'Binance Mainnet Address'
+      return E.left(LedgerErrorId.UNKNOWN)
     }
-    return E.right(address)
   } catch (error) {
     return E.left(getErrorId(error.message, error.statusText))
   }
