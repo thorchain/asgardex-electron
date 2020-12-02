@@ -15,6 +15,7 @@ export * from './PoolDetail';
 export * from './PoolEarningDetail';
 export * from './StakersAddressData';
 export * from './StakersAssetData';
+export * from './StatsChanges';
 export * from './StatsData';
 export * from './ThorchainBooleanConstants';
 export * from './ThorchainConstants';

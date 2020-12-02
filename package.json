@@ -20,7 +20,7 @@
     "test:e2e": "yarn build && yarn test:cafe",
     "test:cafe": "cross-env NODE_ENV=production testcafe electron:./ ./e2e/**/*.e2e.ts",
     "generate:types": "yarn clean:types:midgard && yarn generate:types:midgard",
-    "generate:types:midgard": "TS_POST_PROCESS_FILE=./node_modules/.bin/prettier openapi-generator generate -i http://18.192.153.11:8080/v1/swagger.json -g typescript-rxjs -o ./src/renderer/types/generated/midgard --reserved-words-mappings in=in --enable-post-process-file",
+    "generate:types:midgard": "TS_POST_PROCESS_FILE=./node_modules/.bin/prettier openapi-generator-cli generate -i https://testnet.multichain.midgard.thorchain.info/v1/swagger.json -g typescript-rxjs -o ./src/renderer/types/generated/midgard --reserved-words-mappings in=in --enable-post-process-file",
     "clean:types:midgard": "rm -rf ./src/renderer/types/generated/midgard",
     "storybook": "start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public",
