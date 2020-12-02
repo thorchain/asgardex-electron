@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Chain } from '@xchainjs/xchain-util'
 import { Col, notification, Row } from 'antd'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -10,8 +11,7 @@ import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { LedgerErrorId } from '../../../shared/api/types'
-import { Network } from '../../../shared/api/types'
+import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { Settings } from '../../components/wallet/settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -37,6 +37,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const chainContext = useChainContext()
   const { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } = chainContext
 
+  const binanceLedgerAddress = useObservableState(binanceContext.ledgerAddress$, RD.initial)
   const binanceAddress$ = useMemo(
     () =>
       pipe(
@@ -51,13 +52,18 @@ export const SettingsView: React.FC = (): JSX.Element => {
                     name: 'Main',
                     address,
                     type: 'internal'
+                  },
+                  {
+                    name: 'Ledger',
+                    address: RD.getOrElse(() => '')(binanceLedgerAddress),
+                    type: 'external'
                   }
-                ]
+                ].filter(({ address }) => !!address)
               } as UserAccountType)
           )
         )
       ),
-    [binanceContext.address$]
+    [binanceContext.address$, binanceLedgerAddress]
   )
   // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
   const _ethAddress$ = useMemo(
@@ -84,7 +90,6 @@ export const SettingsView: React.FC = (): JSX.Element => {
   )
 
   const bitcoinLedgerAddress = useObservableState(bitcoinContext.ledgerAddress$, RD.initial)
-
   const bitcoinAddress$ = useMemo(
     () =>
       pipe(
@@ -102,7 +107,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
                   },
                   {
                     name: 'Ledger',
-                    address: RD.isSuccess(bitcoinLedgerAddress) ? bitcoinLedgerAddress.value : '',
+                    address: RD.getOrElse(() => '')(bitcoinLedgerAddress),
                     type: 'external'
                   }
                 ].filter(({ address }) => !!address)
@@ -152,34 +157,40 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const apiVersion = envOrDefault($VERSION, '-')
 
   useEffect(() => {
-    if (RD.isFailure(bitcoinLedgerAddress)) {
-      let description
-      switch (bitcoinLedgerAddress.error) {
-        case LedgerErrorId.NO_DEVICE:
-          description = intl.formatMessage({ id: 'ledger.errors.no.device' })
-          break
-        case LedgerErrorId.ALREADY_IN_USE:
-          description = intl.formatMessage({ id: 'ledger.errors.already.in.use' })
-          break
-        case LedgerErrorId.NO_APP:
-          description = intl.formatMessage({ id: 'ledger.errors.no.app' })
-          break
-        case LedgerErrorId.WRONG_APP:
-          description = intl.formatMessage({ id: 'ledger.errors.wrong.app' })
-          break
-        case LedgerErrorId.DENIED:
-          description = intl.formatMessage({ id: 'ledger.errors.denied' })
-          break
-        default:
-          description = intl.formatMessage({ id: 'ledger.errors.unknown' })
-          break
+    const getLedgerErrorDescription = (ledgerAddress: RD.RemoteData<LedgerErrorId, string>, chain: Chain) => {
+      if (RD.isFailure(ledgerAddress)) {
+        let description
+        switch (ledgerAddress.error) {
+          case LedgerErrorId.NO_DEVICE:
+            description = intl.formatMessage({ id: 'ledger.errors.no.device' })
+            break
+          case LedgerErrorId.ALREADY_IN_USE:
+            description = intl.formatMessage({ id: 'ledger.errors.already.in.use' })
+            break
+          case LedgerErrorId.NO_APP:
+            description = intl.formatMessage({ id: 'ledger.errors.no.app' })
+            break
+          case LedgerErrorId.WRONG_APP:
+            description = intl.formatMessage({ id: 'ledger.errors.wrong.app' })
+            break
+          case LedgerErrorId.DENIED:
+            description = intl.formatMessage({ id: 'ledger.errors.denied' })
+            break
+          default:
+            description = intl.formatMessage({ id: 'ledger.errors.unknown' })
+            break
+        }
+        notification.error({
+          message: intl.formatMessage({ id: 'ledger.add.device.error.title' }),
+          description
+        })
+        removeLedgerAddress(chain)
       }
-      notification.error({
-        message: intl.formatMessage({ id: 'ledger.add.device.error.title' }),
-        description
-      })
     }
-  }, [bitcoinLedgerAddress, intl])
+
+    getLedgerErrorDescription(binanceLedgerAddress, 'BNB')
+    getLedgerErrorDescription(bitcoinLedgerAddress, 'BTC')
+  }, [binanceLedgerAddress, bitcoinLedgerAddress, intl, removeLedgerAddress])
 
   return (
     <Row>

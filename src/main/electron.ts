@@ -1,6 +1,7 @@
 import { join } from 'path'
 
 import { Keystore } from '@xchainjs/xchain-crypto'
+import { Chain } from '@xchainjs/xchain-util'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
 // import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
@@ -11,7 +12,7 @@ import { warn } from 'electron-log'
 import { Network } from '../shared/api/types'
 import { Locale } from '../shared/i18n/types'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist } from './api/keystore'
-import { getBTCAddress } from './api/ledger'
+import { getLedgerAddress } from './api/ledger'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
@@ -122,7 +123,9 @@ const initIPC = () => {
   ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, () => removeKeystore())
   ipcMain.handle(IPCMessages.GET_KEYSTORE, () => getKeystore())
   ipcMain.handle(IPCMessages.KEYSTORE_EXIST, () => keystoreExist())
-  ipcMain.handle(IPCMessages.GET_BTC_ADDRESS, (_, network: Network) => getBTCAddress(network))
+  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, (_, chain: Chain, network: Network) =>
+    getLedgerAddress(chain, network)
+  )
 }
 
 const init = async () => {

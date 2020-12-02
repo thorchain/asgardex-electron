@@ -1,5 +1,6 @@
 import { Address } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
+import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
 
 import { Locale } from '../../shared/i18n/types'
@@ -31,7 +32,7 @@ export enum LedgerErrorId {
 }
 
 export type ApiHDWallet = {
-  getBTCAddress: (network: Network) => Promise<Either<LedgerErrorId, Address>>
+  getLedgerAddress: (chain: Chain, network: Network) => Promise<Either<LedgerErrorId, Address>>
 }
 
 declare global {

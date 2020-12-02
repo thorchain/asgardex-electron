@@ -13,7 +13,8 @@ import {
   address$,
   explorerUrl$,
   getExplorerTxUrl$,
-  fees$
+  fees$,
+  ledgerAddress$
 } from '../services/binance'
 
 export type BinanceContextValue = {
@@ -30,6 +31,7 @@ export type BinanceContextValue = {
   explorerUrl$: typeof explorerUrl$
   getExplorerTxUrl$: typeof getExplorerTxUrl$
   fees$: typeof fees$
+  ledgerAddress$: typeof ledgerAddress$
 }
 
 const initialContext: BinanceContextValue = {
@@ -45,7 +47,8 @@ const initialContext: BinanceContextValue = {
   address$,
   explorerUrl$,
   getExplorerTxUrl$,
-  fees$
+  fees$,
+  ledgerAddress$
 }
 
 const BinanceContext = createContext<BinanceContextValue | null>(null)
