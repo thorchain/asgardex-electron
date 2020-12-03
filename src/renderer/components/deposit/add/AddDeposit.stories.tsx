@@ -25,7 +25,7 @@ const symFees: DepositFeesRD = RD.success({
 
 const asymFees: DepositFeesRD = RD.success({
   thor: O.none,
-  asset: baseAmount(12300)
+  asset: baseAmount(123)
 })
 
 const reloadFeesHandler = () => console.log('reload fees')
@@ -155,7 +155,7 @@ storiesOf('Components/Deposit/AddDeposit', module)
         asset={AssetBTC}
         assetPrice={bn(2)}
         runePrice={bn(1)}
-        assetBalance={O.some(ZERO_BASE_AMOUNT)}
+        assetBalance={O.some(baseAmount(1))}
         runeBalance={runeBalance}
         chainAssetBalance={O.none}
         onDeposit={console.log}

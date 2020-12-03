@@ -18,7 +18,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
+import { ZERO_BASE_AMOUNT } from '../../../const'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { SymDepositMemo, Memo, SendDepositTxParams, DepositFeesRD } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
@@ -236,14 +236,13 @@ export const AddDeposit: React.FC<Props> = (props) => {
       FP.pipe(
         sequenceTOption(oPoolAddress, oAsymDepositMemo),
         O.map(([poolAddress, asymDepositMemo]) => {
-          const baseChainDepositTxParam = {
-            chain: AssetRuneNative.chain,
-            asset: BASE_CHAIN_ASSET,
+          const asymDepositTxParam = {
+            asset: asset,
             poolAddress,
             amount: assetAmountToDeposit,
             memo: asymDepositMemo
           }
-          console.log('ASYM Tx 1/1 ', baseChainDepositTxParam)
+          console.log('ASYM Tx 1/1 ', asymDepositTxParam)
           return true
         })
       )
@@ -252,24 +251,22 @@ export const AddDeposit: React.FC<Props> = (props) => {
       FP.pipe(
         sequenceTOption(oPoolAddress, oSymDepositMemo),
         O.map(([poolAddress, { rune: runeMemo, asset: assetMemo }]) => {
-          const runeTxParam = {
-            chain: AssetRuneNative.chain,
-            asset: BASE_CHAIN_ASSET,
+          const thorchainTxParam = {
+            asset: AssetRuneNative,
             poolAddress,
-            // TODO (@Veado) Ask about amount of NativeRune tx, maybe it can be ZERO
+            // TODO (@Veado) NativeRune tx, maybe it can be ZERO
             // minimal tx amount of `RuneNative`
             amount: baseAmount(1),
             memo: runeMemo
           }
-          console.log('SYM Tx 1/2 (rune):', runeTxParam)
-          const txParam = {
-            chain: asset.chain,
+          console.log('SYM Tx 1/2 (thorchain):', thorchainTxParam)
+          const assetChainTxParam = {
             asset: asset,
             poolAddress,
             amount: assetAmountToDeposit,
             memo: assetMemo
           }
-          console.log('SYM Tx 2/2 (asset):', txParam)
+          console.log('SYM Tx 2/2 (asset chain):', assetChainTxParam)
 
           return true
         })
@@ -320,6 +317,20 @@ export const AddDeposit: React.FC<Props> = (props) => {
     )
   }, [oRuneBalance, oThorchainFee])
 
+  const renderThorchainFeeError = useMemo(() => {
+    const amount = FP.pipe(
+      oRuneBalance,
+      O.getOrElse(() => ZERO_BASE_AMOUNT),
+      baseToAsset
+    )
+
+    return FP.pipe(
+      oThorchainFee,
+      O.map((fee) => renderFeeError(fee, amount, AssetRuneNative)),
+      O.getOrElse(() => <></>)
+    )
+  }, [oRuneBalance, oThorchainFee, renderFeeError])
+
   const oAssetChainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
@@ -330,6 +341,17 @@ export const AddDeposit: React.FC<Props> = (props) => {
     [fees]
   )
 
+  const isAssetChainFeeError = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(oAssetChainFee, oChainAssetBalance),
+      O.fold(
+        // Missing (or loading) fees does not mean we can't sent something. No error then.
+        () => !O.isNone(oAssetChainFee),
+        ([fee, balance]) => balance.amount().isLessThan(fee.amount())
+      )
+    )
+  }, [oAssetChainFee, oChainAssetBalance])
+
   const renderAssetChainFeeError = useMemo(() => {
     const amount = FP.pipe(
       oChainAssetBalance,
@@ -339,10 +361,10 @@ export const AddDeposit: React.FC<Props> = (props) => {
 
     return FP.pipe(
       oAssetChainFee,
-      O.map((fee) => renderFeeError(fee, amount, BASE_CHAIN_ASSET)),
+      O.map((fee) => renderFeeError(fee, amount, asset)),
       O.getOrElse(() => <></>)
     )
-  }, [oChainAssetBalance, oAssetChainFee, renderFeeError])
+  }, [oChainAssetBalance, oAssetChainFee, renderFeeError, asset])
 
   const feesLabel = useMemo(
     () =>
@@ -430,12 +452,12 @@ export const AddDeposit: React.FC<Props> = (props) => {
             <Col>
               <>
                 {
-                  // Don't show base-chain-fee error if we already display a error of balances
-                  !isBalanceError && isThorchainFeeError && renderAssetChainFeeError
+                  // Don't show thorchain fee error if we already display a error of balances
+                  !isBalanceError && isThorchainFeeError && renderThorchainFeeError
                 }
                 {
-                  // Don't show x-chain-fee error if we already display a error of balances
-                  !isBalanceError
+                  // Don't show asset chain fee error if we already display a error of balances
+                  !isBalanceError && isAssetChainFeeError && renderAssetChainFeeError
                 }
               </>
             </Col>

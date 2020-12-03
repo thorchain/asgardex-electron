@@ -19,14 +19,16 @@ import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.t
 /**
  * "Base" chain RUNE is currently running
  * BNC for now, but it will be changed to `THOR` in the near future
- * TODO(@veado): Change it if we go live with `NativeRUNE`
+ * @deprecated
+ * TODO(@veado): Remove it
  */
 export const BASE_CHAIN: Chain = BNBChain
 
 /**
  * Asset of "base" chain RUNE is currently running on
  * AssetBNB for now, but it will be changed to `NativeRUNE` in the near future
- * TODO(@veado): Change it if we go live with `NativeRUNE`
+ * @deprecated
+ * TODO(@veado): Remove it
  */
 export const BASE_CHAIN_ASSET: Asset = AssetBNB
 

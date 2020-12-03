@@ -2,6 +2,7 @@ import { Chain } from '@xchainjs/xchain-util'
 
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
+import * as THOR from '../../thorchain'
 
 /**
  * @description
@@ -26,7 +27,7 @@ export const reloadDepositFeesByChain = (chain: Chain) => {
       // not available yet
       break
     case 'THOR':
-      // not available yet
+      THOR.reloadFees()
       break
     default:
   }
