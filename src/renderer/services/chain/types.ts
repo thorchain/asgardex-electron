@@ -26,12 +26,12 @@ export type SymDepositMemoRx = Rx.Observable<O.Option<SymDepositMemo>>
 /**
  * Deposit fees
  *
- * For deposits we do need one or two fees:
+ * For deposits we do need one fee (asymmetrical deposit) or two fees (symmetrical deposit):
  *
- * base: Fee for "base-chain" pool (base chain is the chain where RUNE is running)
- * cross: Fee for a cross "pool-chain" (for cross-chain deposits only - it will be `none` in other case)
+ * thor: Fee for transaction on Thorchain. Needed for sym deposit txs. It's `O.none` for asym deposit txs
+ * asset: Fee for transaction on asset chain
  */
-export type DepositFees = { base: BaseAmount; cross: O.Option<BaseAmount> }
+export type DepositFees = { thor: O.Option<BaseAmount>; asset: BaseAmount }
 export type DepositFeesRD = RD.RemoteData<Error, DepositFees>
 export type DepositFeesLD = LiveData<Error, DepositFees>
 

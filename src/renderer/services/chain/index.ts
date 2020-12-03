@@ -5,7 +5,7 @@ import {
   depositFees$,
   withdrawFees$,
   reloadWithdrawFees,
-  updateDepositFeesEffect$,
+  reloadDepositFeesEffect$,
   updateWithdrawFeesEffect$
 } from './fees'
 import { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } from './ledger'
@@ -20,7 +20,7 @@ export {
   depositFees$,
   withdrawFees$,
   reloadWithdrawFees,
-  updateDepositFeesEffect$,
+  reloadDepositFeesEffect$,
   updateWithdrawFeesEffect$,
   isCrossChainDeposit$,
   symDepositTxMemo$,
