@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, Chain } from '@xchainjs/xchain-util'
+import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -71,6 +71,10 @@ export type ThorchainLastblockLD = LiveData<Error, ThorchainLastblock>
 
 export type ThorchainConstantsRD = RD.RemoteData<Error, ThorchainConstants>
 export type ThorchainConstantsLD = LiveData<Error, ThorchainConstants>
+
+export type NativeFee = O.Option<BaseAmount>
+export type NativeFeeRD = RD.RemoteData<Error, NativeFee>
+export type NativeFeeLD = LiveData<Error, NativeFee>
 
 export type ThorchainEndpointsLD = LiveData<Error, ThorchainEndpoint[]>
 
