@@ -12,7 +12,7 @@ import * as BTC from '../../bitcoin'
  * @example
  * updateWithdrawFeesEffect$ at ./withdraw.ts
  * @example
- * updateDepositFeesEffect$ at ./deposit.ts
+ * reloadDepositFeesEffect$ at ./deposit.ts
  */
 export const reloadDepositFeesByChain = (chain: Chain) => {
   switch (chain) {

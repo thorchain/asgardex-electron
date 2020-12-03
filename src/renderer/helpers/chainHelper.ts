@@ -18,21 +18,29 @@ export const getChainAsset = (chain: Chain): Asset => {
 
 /**
  * Check whether chain is BASE chain
+ * @deprecated
+ * TODO (@Veado) Remove it
  */
 export const isBaseChain = (chain: Chain): chain is typeof BASE_CHAIN => eqChain.equals(chain, BASE_CHAIN)
 
 /**
  * Check whether asset is a BASE chain asset
+ * @deprecated
+ * TODO (@Veado) Remove it
  */
 export const isBaseChainAsset = ({ chain }: Asset): boolean => isBaseChain(chain)
 
 /**
  * Check whether chain is a CROSS chain
+ * @deprecated
+ * TODO (@Veado) Remove it
  */
 export const isCrossChain = (chain: Chain): boolean => !isBaseChain(chain)
 
 /**
  * Check whether asset is a CROSS chain asset
+ * @deprecated
+ * TODO (@Veado) Remove it
  */
 export const isCrossChainAsset = (asset: Asset): boolean => {
   if (isBaseChainAsset(asset)) return false
