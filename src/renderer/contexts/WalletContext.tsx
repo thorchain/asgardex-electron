@@ -4,7 +4,6 @@ import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
 import {
-  address$,
   reloadBalances,
   balancesState$,
   chainBalances$,
@@ -19,7 +18,6 @@ import {
 } from '../services/wallet'
 
 type WalletContextValue = {
-  address$: typeof address$
   keystoreService: typeof keystoreService
   reloadBalances: typeof reloadBalances
   balancesState$: typeof balancesState$
@@ -34,7 +32,6 @@ type WalletContextValue = {
 }
 
 const initialContext: WalletContextValue = {
-  address$,
   keystoreService,
   reloadBalances,
   reloadBalances$,
