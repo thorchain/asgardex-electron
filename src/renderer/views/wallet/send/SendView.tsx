@@ -20,7 +20,7 @@ import { SendViewTHOR } from './SendViewTHOR'
 type Props = {}
 
 export const SendView: React.FC<Props> = (): JSX.Element => {
-  const { asset } = useParams<SendParams>()
+  const { asset, wallet } = useParams<SendParams>()
   const intl = useIntl()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
@@ -87,7 +87,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
       () => renderAssetError,
       (asset) => (
         <>
-          <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(asset) })} />
+          <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(asset), wallet })} />
           {renderSendView(asset)}
         </>
       )

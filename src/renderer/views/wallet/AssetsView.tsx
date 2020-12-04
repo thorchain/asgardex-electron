@@ -31,7 +31,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
 
   const selectAssetHandler = useCallback(
     (asset: Asset, walletAddress: string) =>
-      history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset), walletAddress })),
+      history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset), wallet: walletAddress })),
     [history]
   )
 

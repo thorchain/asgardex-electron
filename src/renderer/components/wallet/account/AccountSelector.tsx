@@ -1,18 +1,18 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { Balances } from '@xchainjs/xchain-client'
 import { Asset, formatAssetAmountCurrency, baseToAsset } from '@xchainjs/xchain-util'
 import { Menu, Dropdown, Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 
+import { WalletBalance } from '../../../types/wallet'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
 import { Size as IconSize } from '../../uielements/assets/assetIcon/AssetIcon.types'
 import * as Styled from './AccountSelector.style'
 
 type Props = {
   selectedAsset: Asset
-  assets: Balances
-  onChange?: (asset: Asset) => void
+  assets: WalletBalance[]
+  onChange?: (asset: Asset, wallet: string) => void
   size?: IconSize
 }
 
@@ -31,9 +31,9 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
     () => (
       <Menu>
         {filteredAssets.map((assetWB, i: number) => {
-          const { asset, amount } = assetWB
+          const { asset, amount, wallet } = assetWB
           return (
-            <Menu.Item key={i} onClick={() => onChange(asset)}>
+            <Menu.Item key={i} onClick={() => onChange(asset, wallet)}>
               <Row align={'middle'} gutter={[8, 0]}>
                 <Col>
                   <AssetIcon asset={asset} size={'small'} />

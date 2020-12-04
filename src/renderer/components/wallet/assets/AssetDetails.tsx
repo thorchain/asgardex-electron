@@ -26,6 +26,7 @@ type Props = {
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: () => void
   loadTxsHandler?: LoadTxsHandler
+  walletAddress?: string
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -35,7 +36,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     asset: oAsset,
     reloadBalancesHandler = emptyFunc,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
-    getExplorerTxUrl: oGetExplorerTxUrl = O.none
+    getExplorerTxUrl: oGetExplorerTxUrl = O.none,
+    walletAddress = ''
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -55,12 +57,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const walletActionSendClick = useCallback(() => {
-    history.push(walletRoutes.send.path({ asset: assetAsString }))
-  }, [assetAsString, history])
+    history.push(walletRoutes.send.path({ asset: assetAsString, wallet: walletAddress }))
+  }, [assetAsString, history, walletAddress])
 
   const walletActionReceiveClick = useCallback(
-    () => history.push(walletRoutes.receive.path({ asset: assetAsString })),
-    [assetAsString, history]
+    () => history.push(walletRoutes.receive.path({ asset: assetAsString, wallet: walletAddress })),
+    [assetAsString, history, walletAddress]
   )
 
   const refreshHandler = useCallback(() => {

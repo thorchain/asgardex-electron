@@ -63,13 +63,12 @@ export const bonds: Route<void> = {
   }
 }
 
-export type AssetDetailsParams = { asset: string }
-export type AssetDetailsQuery = { walletAddress: string }
-export const assetDetail: Route<AssetDetailsParams & Partial<AssetDetailsQuery>> = {
-  template: `${assets.template}/detail/:asset`,
-  path: ({ asset, walletAddress }) => {
-    if (asset) {
-      return `${assets.template}/detail/${asset}?walletAddress=${walletAddress}`
+export type AssetDetailsParams = { asset: string; wallet: string }
+export const assetDetail: Route<AssetDetailsParams> = {
+  template: `${assets.template}/detail/:wallet/:asset`,
+  path: ({ asset, wallet }) => {
+    if (asset && !!wallet) {
+      return `${assets.template}/detail/${wallet}/${asset}`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()
@@ -77,12 +76,12 @@ export const assetDetail: Route<AssetDetailsParams & Partial<AssetDetailsQuery>>
   }
 }
 
-export type ReceiveParams = { asset: string }
+export type ReceiveParams = { asset: string; wallet: string }
 export const receive: Route<ReceiveParams> = {
   template: `${assetDetail.template}/receive`,
-  path: ({ asset }) => {
-    if (asset) {
-      return `${assetDetail.path({ asset })}/receive`
+  path: ({ asset, wallet }) => {
+    if (asset && !!wallet) {
+      return `${assetDetail.path({ asset, wallet })}/receive`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()
@@ -90,12 +89,12 @@ export const receive: Route<ReceiveParams> = {
   }
 }
 
-export type SendParams = { asset: string }
+export type SendParams = { asset: string; wallet: string }
 export const send: Route<SendParams> = {
   template: `${assetDetail.template}/send`,
-  path: ({ asset }) => {
-    if (asset) {
-      return `${assetDetail.path({ asset })}/send`
+  path: ({ asset, wallet }) => {
+    if (asset && !!wallet) {
+      return `${assetDetail.path({ asset, wallet })}/send`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()

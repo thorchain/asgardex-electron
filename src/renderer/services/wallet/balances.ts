@@ -107,7 +107,7 @@ const btcBalance$: Observable<ChainBalance> = Rx.combineLatest([BTC.address$, BT
 /**
  * Same as btcBalance$ but for address from BTC.ledgerAddress$
  */
-const btcLedgerBalance$: Observable<ChainBalance> = FP.pipe(
+const btcLedgerChainBalance$: Observable<ChainBalance> = FP.pipe(
   BTC.ledgerAddress$,
   RxOp.switchMap((addressRd) =>
     FP.pipe(
@@ -140,6 +140,11 @@ const btcLedgerBalance$: Observable<ChainBalance> = FP.pipe(
   shareReplay(1)
 )
 
+const btcLedgerBalance$ = FP.pipe(
+  btcLedgerChainBalance$,
+  RxOp.map((ledgerBalances) => ledgerBalances.balances)
+)
+
 /**
  * Transforms ETH data (address + `AssetsWBChain`) into `AssetsWBChain`
  */
@@ -167,7 +172,7 @@ const _ethBalance$: Observable<ChainBalance> = Rx.combineLatest([ETH.address$, E
 export const chainBalances$ = Rx.combineLatest([
   thorBalance$,
   btcBalance$,
-  btcLedgerBalance$,
+  btcLedgerChainBalance$,
   /* //TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH */
   /* ethBalancesChain$ */
   bnbBalance$
@@ -184,6 +189,7 @@ const _ethBalances$: Observable<BalancesRD> = ETH.balances$.pipe(liveData.map((a
 export const balancesState$: Observable<BalancesState> = Rx.combineLatest([
   THOR.balances$,
   BNB.balances$,
+  btcLedgerBalance$,
   BTC.balances$
   // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
   // ethBalances$

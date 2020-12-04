@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
 import { Address } from '@xchainjs/xchain-binance'
-import { Balance, Balances } from '@xchainjs/xchain-client'
 import {
   formatAssetAmountCurrency,
   assetAmount,
@@ -22,6 +21,7 @@ import { isBnbAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getBnbAmountFromBalances } from '../../../../helpers/walletHelper'
 import { AddressValidation, SendTxParams } from '../../../../services/binance/types'
+import { WalletBalance } from '../../../../types/wallet'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
@@ -35,8 +35,8 @@ export type FormValues = {
 }
 
 type Props = {
-  balances: Balances
-  balance: Balance
+  balances: WalletBalance[]
+  balance: WalletBalance
   onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) => void
   isLoading?: boolean
   addressValidation: AddressValidation

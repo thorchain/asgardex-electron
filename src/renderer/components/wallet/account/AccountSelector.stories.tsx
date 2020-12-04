@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, assetToString } from '@xchainjs/xchain-util'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { AccountSelector } from './index'
@@ -13,7 +13,8 @@ storiesOf('Wallet/AccountSelector', module)
         selectedAsset={ASSETS_MAINNET.BOLT}
         assets={[ASSETS_MAINNET.BNB, ASSETS_MAINNET.TOMO].map((asset) => ({
           asset,
-          amount: assetToBase(assetAmount(1))
+          amount: assetToBase(assetAmount(1)),
+          wallet: `${assetToString(asset)} wallet`
         }))}
       />
     )

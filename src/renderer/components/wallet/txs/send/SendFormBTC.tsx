@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeRate, FeesWithRates } from '@xchainjs/xchain-bitcoin/lib/types/client-types'
-import { Balance, Balances, FeeOptionKey } from '@xchainjs/xchain-client'
+import { FeeOptionKey } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBTC,
@@ -24,6 +24,7 @@ import { useIntl } from 'react-intl'
 import { ZERO_BN } from '../../../../const'
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation, FeesWithRatesRD, SendTxParams } from '../../../../services/bitcoin/types'
+import { WalletBalance } from '../../../../types/wallet'
 import * as StyledR from '../../../shared/form/Radio.style'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
@@ -40,8 +41,8 @@ export type FormValues = {
 }
 
 type Props = {
-  balances: Balances
-  assetWB: Balance
+  balances: WalletBalance[]
+  assetWB: WalletBalance
   onSubmit: ({ recipient, amount, feeRate, memo }: SendTxParams) => void
   isLoading?: boolean
   addressValidation: AddressValidation

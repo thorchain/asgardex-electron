@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BinanceClient } from '@xchainjs/xchain-binance'
-import { Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -18,6 +17,7 @@ import { getBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/binance/types'
 import { GetExplorerTxUrl } from '../../../services/clients'
 import { NonEmptyBalances, TxRD } from '../../../services/wallet/types'
+import { WalletBalance } from '../../../types/wallet'
 
 type Props = {
   selectedAsset: Asset
@@ -64,13 +64,13 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
    * Custom send form used by BNB chain only
    */
   const sendForm = useCallback(
-    (selectedAsset: Balance) => (
+    (selectedAsset: WalletBalance) => (
       <SendFormBNB
         balance={selectedAsset}
         onSubmit={pushTx}
         balances={FP.pipe(
           oBalances,
-          O.getOrElse(() => [] as Balances)
+          O.getOrElse(() => [] as WalletBalance[])
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}

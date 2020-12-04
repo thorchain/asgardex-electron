@@ -1,11 +1,13 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { XChainClient } from '@xchainjs/xchain-client'
+import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 import { catchError, startWith, map, shareReplay, debounceTime } from 'rxjs/operators'
 
+import { liveData } from '../../helpers/rx/liveData'
 import { TriggerStream$ } from '../../helpers/stateHelper'
 import { ApiError, ErrorId } from '../wallet/types'
 import { BalancesLD, XChainClient$ } from './types'
@@ -16,6 +18,12 @@ import { BalancesLD, XChainClient$ } from './types'
 const loadBalances$: (client: XChainClient, address?: string) => BalancesLD = (client, address) =>
   Rx.from(client.getBalance(address)).pipe(
     map(RD.success),
+    liveData.map(
+      A.map((balance) => ({
+        ...balance,
+        wallet: address || client.getAddress()
+      }))
+    ),
     catchError((error: Error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
     ),
