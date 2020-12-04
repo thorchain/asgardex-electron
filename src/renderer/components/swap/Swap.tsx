@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Balance } from '@xchainjs/xchain-client'
@@ -27,7 +27,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getBalanceByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/binance/types'
-import { PoolDetails } from '../../services/midgard/types'
+import { NativeFeeRD, PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { NonEmptyBalances } from '../../services/wallet/types'
 import { TxStatus, TxTypes } from '../../types/asgardex'
@@ -50,6 +50,7 @@ type SwapProps = {
   onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
   poolDetails?: PoolDetails
   assetsWB?: O.Option<NonEmptyBalances>
+  nativeTxFee: NativeFeeRD
   txWithState?: TxWithStateRD
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
@@ -65,6 +66,7 @@ export const Swap = ({
   targetAsset: targetAssetProp,
   poolDetails = [],
   assetsWB = O.none,
+  nativeTxFee,
   txWithState = RD.initial,
   goToTransaction,
   resetTx,
@@ -93,6 +95,10 @@ export const Swap = ({
     sourceAsset,
     targetAsset
   ])
+
+  // TODO (@Veado) Just for debugging - it will be remove in #652
+  // by implementing fee handling - see https://github.com/thorchain/asgardex-electron/issues/652
+  useEffect(() => console.log('nativeTxFee', nativeTxFee), [nativeTxFee])
 
   const setSourceAsset = useCallback(
     (asset: Asset) => {
@@ -454,7 +460,8 @@ export const Swap = ({
             )
           )
         )}
-        {/* TODO (@thatThorchainGuy): Get 'BNB' fee from service  */}
+        {/* TODO (@thatThorchainGuy|@Veado): Get fee from service  */}
+        {/* see: https://github.com/thorchain/asgardex-electron/issues/652  */}
         <div>fee: 0.000375 + 1 RUNE</div>
       </Styled.SubmitContainer>
     </Styled.Container>

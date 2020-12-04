@@ -125,6 +125,11 @@ export interface ThorchainInt64Constants {
      * @type {number}
      * @memberof ThorchainInt64Constants
      */
+    NativeChainGasFee?: number;
+    /**
+     * @type {number}
+     * @memberof ThorchainInt64Constants
+     */
     TransactionFee?: number;
     /**
      * @type {number}
