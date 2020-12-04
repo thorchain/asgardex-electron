@@ -26,7 +26,7 @@ type Props = {
   chainBalances: ChainBalances
   pricePool: PricePool
   poolDetails: PoolDetails
-  selectAssetHandler?: (asset: Asset) => void
+  selectAssetHandler?: (asset: Asset, walletAddress: string) => void
 }
 
 export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
@@ -44,9 +44,9 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const previousAssetsTableData = useRef<Balances[]>([])
 
   const onRow = useCallback(
-    ({ asset }: Balance) => {
+    (walletAddress: string) => ({ asset }: Balance) => {
       return {
-        onClick: () => selectAssetHandler(asset)
+        onClick: () => selectAssetHandler(asset, walletAddress)
       }
     },
     [selectAssetHandler]
@@ -165,14 +165,14 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   }, [balanceColumn, hideColumn, iconColumn, nameColumn, priceColumn, screenMap, tickerColumn])
 
   const renderAssetsTable = useCallback(
-    (tableData: Balances, loading = false) => {
+    (tableData: Balances, walletAddress: string, loading = false) => {
       return (
         <Styled.Table
           showHeader={false}
           dataSource={tableData}
           loading={loading}
           rowKey={({ asset }) => asset.symbol}
-          onRow={onRow}
+          onRow={onRow(walletAddress)}
           columns={columns}
         />
       )
@@ -181,16 +181,16 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderBalances = useCallback(
-    (balancesRD: BalancesRD, index: number) =>
+    (balancesRD: BalancesRD, index: number, walletAddress: string) =>
       FP.pipe(
         balancesRD,
         RD.fold(
           // initial state
-          () => renderAssetsTable([]),
+          () => renderAssetsTable([], walletAddress),
           // loading state
           () => {
             const data = previousAssetsTableData.current[index] ?? []
-            return renderAssetsTable(data, true)
+            return renderAssetsTable(data, walletAddress, true)
           },
           // error state
           ({ msg }: ApiError) => {
@@ -200,7 +200,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           (assetsWB) => {
             const prev = previousAssetsTableData.current
             prev[index] = assetsWB
-            return renderAssetsTable(assetsWB)
+            return renderAssetsTable(assetsWB, walletAddress)
           }
         )
       ),
@@ -248,7 +248,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       )
       return (
         <Panel header={header} key={key}>
-          {renderBalances(balancesRD, key)}
+          {renderBalances(balancesRD, key, address)}
         </Panel>
       )
     },

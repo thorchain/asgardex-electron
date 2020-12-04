@@ -64,11 +64,12 @@ export const bonds: Route<void> = {
 }
 
 export type AssetDetailsParams = { asset: string }
-export const assetDetail: Route<AssetDetailsParams> = {
+export type AssetDetailsQuery = { walletAddress: string }
+export const assetDetail: Route<AssetDetailsParams & Partial<AssetDetailsQuery>> = {
   template: `${assets.template}/detail/:asset`,
-  path: ({ asset }) => {
+  path: ({ asset, walletAddress }) => {
     if (asset) {
-      return `${assets.template}/detail/${asset}`
+      return `${assets.template}/detail/${asset}?walletAddress=${walletAddress}`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()

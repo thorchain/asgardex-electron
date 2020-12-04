@@ -15,7 +15,8 @@ const loadTxs$ = ({
   client,
   asset,
   limit,
-  offset
+  offset,
+  walletAddress
 }: {
   client: XChainClient
 } & TxsParams): TxsPageLD => {
@@ -25,10 +26,12 @@ const loadTxs$ = ({
     O.toUndefined
   )
 
+  const address = FP.pipe(walletAddress, O.getOrElse(client.getAddress))
+
   return Rx.from(
     client.getTransactions({
       asset: txAsset,
-      address: client.getAddress(),
+      address,
       limit,
       offset
     })
@@ -48,7 +51,8 @@ const loadTxs$ = ({
 export const txs$: (client$: XChainClient$) => (params: TxsParams) => TxsPageLD = (client$) => ({
   asset,
   limit,
-  offset
+  offset,
+  walletAddress
 }) =>
   client$.pipe(
     switchMap((oClient) =>
@@ -61,7 +65,8 @@ export const txs$: (client$: XChainClient$) => (params: TxsParams) => TxsPageLD 
               client,
               asset,
               limit,
-              offset
+              offset,
+              walletAddress
             })
         )
       )

@@ -9,12 +9,13 @@ import * as RxOp from 'rxjs/operators'
 
 import { AssetDetails } from '../../components/wallet/assets/AssetDetails'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { AssetDetailsParams } from '../../routes/wallet'
+import { useSearchQuery } from '../../hooks/useSearchQuery'
+import { AssetDetailsParams, AssetDetailsQuery } from '../../routes/wallet'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const {
-    txs$,
+    getTxs$,
     balancesState$,
     loadTxs,
     reloadBalances$,
@@ -24,6 +25,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   } = useWalletContext()
 
   const { asset } = useParams<AssetDetailsParams>()
+  const { walletAddress } = useSearchQuery<AssetDetailsQuery>()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
   // Set selected asset once
@@ -31,7 +33,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setSelectedAsset(oSelectedAsset), [])
 
-  const txsRD = useObservableState(txs$, RD.initial)
+  const [txsRD] = useObservableState(() => getTxs$(walletAddress), RD.initial)
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
   const [reloadBalances] = useObservableState(() => reloadBalances$.pipe(RxOp.map(O.toUndefined)))

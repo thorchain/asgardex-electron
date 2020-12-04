@@ -30,7 +30,8 @@ export const AssetsView: React.FC = (): JSX.Element => {
   const selectedPricePool = useObservableState(selectedPricePool$, getDefaultRunePricePool())
 
   const selectAssetHandler = useCallback(
-    (asset: Asset) => history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset) })),
+    (asset: Asset, walletAddress: string) =>
+      history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset), walletAddress })),
     [history]
   )
 
