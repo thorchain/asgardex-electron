@@ -210,7 +210,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   // Panel
   const renderPanel = useCallback(
     ({ chain, address, balances: balancesRD }: ChainBalance, key: number) => {
-      if (!address) {
+      /**
+       * We need to push initial value to the ledger-based streams
+       * 'cuz chainBalances$ stream is created by 'combineLatest'
+       * which will not emit anything if some of stream has
+       * not emitted at least once
+       */
+      if (!address && RD.isInitial(balancesRD)) {
         return null
       }
       const assetsTxt = FP.pipe(
