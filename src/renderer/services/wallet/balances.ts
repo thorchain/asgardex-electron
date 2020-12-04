@@ -1,12 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetBNB, Chain } from '@xchainjs/xchain-util'
+import { AssetBNB, BTCChain, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
-import { map, startWith } from 'rxjs/operators'
+import { map, shareReplay, startWith } from 'rxjs/operators'
 import * as RxOp from 'rxjs/operators'
 
 import { getRuneAsset } from '../../helpers/assetHelper'
@@ -104,6 +104,41 @@ const btcBalance$: Observable<ChainBalance> = Rx.combineLatest([BTC.address$, BT
       } as ChainBalance)
   )
 )
+/**
+ * Same as btcBalance$ but for address from BTC.ledgerAddress$
+ */
+const btcLedgerBalance$: Observable<ChainBalance> = FP.pipe(
+  BTC.ledgerAddress$,
+  RxOp.switchMap((addressRd) =>
+    FP.pipe(
+      addressRd,
+      RD.map(BTC.getBalanceByAddress$),
+      RD.map(
+        RxOp.map(
+          (balances) =>
+            ({
+              chain: BTCChain,
+              address: FP.pipe(
+                addressRd,
+                // This stream's branch is based on Successful addressRd
+                // so addressRd will always have a value here
+                RD.getOrElse(() => '')
+              ),
+              balances
+            } as ChainBalance)
+        )
+      ),
+      RD.getOrElse(() =>
+        Rx.of({
+          chain: BTCChain,
+          address: '',
+          balances: RD.initial
+        } as ChainBalance)
+      )
+    )
+  ),
+  shareReplay(1)
+)
 
 /**
  * Transforms ETH data (address + `AssetsWBChain`) into `AssetsWBChain`
@@ -132,6 +167,7 @@ const _ethBalance$: Observable<ChainBalance> = Rx.combineLatest([ETH.address$, E
 export const chainBalances$ = Rx.combineLatest([
   thorBalance$,
   btcBalance$,
+  btcLedgerBalance$,
   /* //TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH */
   /* ethBalancesChain$ */
   bnbBalance$

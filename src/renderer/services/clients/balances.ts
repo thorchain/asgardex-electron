@@ -13,8 +13,8 @@ import { BalancesLD, XChainClient$ } from './types'
 /**
  * Observable to request balances based on given `XChainClient`
  */
-const loadBalances$: (client: XChainClient) => BalancesLD = (client) =>
-  Rx.from(client.getBalance()).pipe(
+const loadBalances$: (client: XChainClient, address?: string) => BalancesLD = (client, address) =>
+  Rx.from(client.getBalance(address)).pipe(
     map(RD.success),
     catchError((error: Error) =>
       Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
@@ -41,6 +41,26 @@ export const balances$: (client$: XChainClient$, trigger$: TriggerStream$) => Ba
           () => Rx.of(RD.initial),
           // or start request and return state
           loadBalances$
+        )
+      )
+    }),
+    // cache it to avoid reloading data by every subscription
+    shareReplay(1)
+  )
+
+export const balancesByAddress$: (
+  client$: XChainClient$,
+  trigger$: TriggerStream$
+) => (address: string) => BalancesLD = (client$, trigger$) => (address) =>
+  Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
+    RxOp.mergeMap(([_, oClient]) => {
+      return FP.pipe(
+        oClient,
+        O.fold(
+          // if a client is not available, "reset" state to "initial"
+          () => Rx.of(RD.initial),
+          // or start request and return state
+          (client) => loadBalances$(client, address)
         )
       )
     }),

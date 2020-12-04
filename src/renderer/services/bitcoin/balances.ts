@@ -8,4 +8,7 @@ const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
 // State of balances loaded by Client
 const balances$: C.BalancesLD = C.balances$(client$, reloadBalances$)
 
-export { balances$, reloadBalances }
+// State of balances loaded by Client and Address
+const getBalanceByAddress$ = C.balancesByAddress$(client$, reloadBalances$)
+
+export { balances$, reloadBalances, getBalanceByAddress$ }
