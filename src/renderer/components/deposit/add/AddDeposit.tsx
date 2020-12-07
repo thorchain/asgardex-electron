@@ -18,7 +18,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT } from '../../../const'
+import { ZERO_BASE_AMOUNT } from '../../../const'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { SymDepositMemo, Memo, SendDepositTxParams, DepositFeesRD } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
@@ -34,10 +34,8 @@ type Props = {
   runePrice: BigNumber
   assetBalance: O.Option<BaseAmount>
   runeBalance: O.Option<BaseAmount>
-  baseChainAssetBalance: O.Option<BaseAmount>
-  crossChainAssetBalance: O.Option<BaseAmount>
+  chainAssetBalance: O.Option<BaseAmount>
   poolAddress: O.Option<PoolAddress>
-  isCrossChain?: boolean
   asymDepositMemo: O.Option<Memo>
   symDepositMemo: O.Option<SymDepositMemo>
   priceAsset?: Asset
@@ -58,9 +56,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
     runePrice,
     assetBalance: oAssetBalance,
     runeBalance: oRuneBalance,
-    baseChainAssetBalance: oBaseChainAssetBalance,
-    crossChainAssetBalance: oCrossChainAssetBalance,
-    isCrossChain = false,
+    chainAssetBalance: oChainAssetBalance,
     asymDepositMemo: oAsymDepositMemo,
     symDepositMemo: oSymDepositMemo,
     poolAddress: oPoolAddress,
@@ -240,14 +236,13 @@ export const AddDeposit: React.FC<Props> = (props) => {
       FP.pipe(
         sequenceTOption(oPoolAddress, oAsymDepositMemo),
         O.map(([poolAddress, asymDepositMemo]) => {
-          const baseChainDepositTxParam = {
-            chain: AssetRuneNative.chain,
-            asset: BASE_CHAIN_ASSET,
+          const asymDepositTxParam = {
+            asset: asset,
             poolAddress,
             amount: assetAmountToDeposit,
             memo: asymDepositMemo
           }
-          console.log('ASYM Tx 1/1 ', baseChainDepositTxParam)
+          console.log('ASYM Tx 1/1 ', asymDepositTxParam)
           return true
         })
       )
@@ -256,24 +251,22 @@ export const AddDeposit: React.FC<Props> = (props) => {
       FP.pipe(
         sequenceTOption(oPoolAddress, oSymDepositMemo),
         O.map(([poolAddress, { rune: runeMemo, asset: assetMemo }]) => {
-          const runeTxParam = {
-            chain: AssetRuneNative.chain,
-            asset: BASE_CHAIN_ASSET,
+          const thorchainTxParam = {
+            asset: AssetRuneNative,
             poolAddress,
-            // TODO (@Veado) Ask about amount of NativeRune tx, maybe it can be ZERO
+            // TODO (@Veado) NativeRune tx, maybe it can be ZERO
             // minimal tx amount of `RuneNative`
             amount: baseAmount(1),
             memo: runeMemo
           }
-          console.log('SYM Tx 1/2 (rune):', runeTxParam)
-          const txParam = {
-            chain: asset.chain,
+          console.log('SYM Tx 1/2 (thorchain):', thorchainTxParam)
+          const assetChainTxParam = {
             asset: asset,
             poolAddress,
             amount: assetAmountToDeposit,
             memo: assetMemo
           }
-          console.log('SYM Tx 2/2 (asset):', txParam)
+          console.log('SYM Tx 2/2 (asset chain):', assetChainTxParam)
 
           return true
         })
@@ -303,77 +296,75 @@ export const AddDeposit: React.FC<Props> = (props) => {
     [intl]
   )
 
-  const oBaseChainFee: O.Option<BaseAmount> = useMemo(
+  const oThorchainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
         fees,
         RD.toOption,
-        O.map(({ base }) => base)
+        O.chain(({ thor }) => thor)
       ),
     [fees]
   )
 
-  const isBaseChainFeeError = useMemo(() => {
+  const isThorchainFeeError = useMemo(() => {
     return FP.pipe(
-      sequenceTOption(oBaseChainFee, oBaseChainAssetBalance),
+      sequenceTOption(oThorchainFee, oRuneBalance),
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
-        () => !O.isNone(oBaseChainFee),
+        () => !O.isNone(oThorchainFee),
         ([fee, balance]) => balance.amount().isLessThan(fee.amount())
       )
     )
-  }, [oBaseChainAssetBalance, oBaseChainFee])
+  }, [oRuneBalance, oThorchainFee])
 
-  const renderBaseChainFeeError = useMemo(() => {
+  const renderThorchainFeeError = useMemo(() => {
     const amount = FP.pipe(
-      oBaseChainAssetBalance,
+      oRuneBalance,
       O.getOrElse(() => ZERO_BASE_AMOUNT),
       baseToAsset
     )
 
     return FP.pipe(
-      oBaseChainFee,
-      O.map((fee) => renderFeeError(fee, amount, BASE_CHAIN_ASSET)),
+      oThorchainFee,
+      O.map((fee) => renderFeeError(fee, amount, AssetRuneNative)),
       O.getOrElse(() => <></>)
     )
-  }, [oBaseChainAssetBalance, oBaseChainFee, renderFeeError])
+  }, [oRuneBalance, oThorchainFee, renderFeeError])
 
-  const oCrossChainFee: O.Option<BaseAmount> = useMemo(
+  const oAssetChainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
         fees,
         RD.toOption,
-        O.chain(({ cross }) => cross)
+        O.map(({ asset }) => asset)
       ),
     [fees]
   )
 
-  const isCrossChainFeeError = useMemo(() => {
-    if (!isCrossChain) return false
-
+  const isAssetChainFeeError = useMemo(() => {
     return FP.pipe(
-      sequenceTOption(oCrossChainFee, oCrossChainAssetBalance),
+      sequenceTOption(oAssetChainFee, oChainAssetBalance),
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
-        () => !O.isNone(oCrossChainFee),
+        () => !O.isNone(oAssetChainFee),
         ([fee, balance]) => balance.amount().isLessThan(fee.amount())
       )
     )
-  }, [isCrossChain, oCrossChainFee, oCrossChainAssetBalance])
+  }, [oAssetChainFee, oChainAssetBalance])
 
-  const renderCrossChainFeeError = useMemo(() => {
+  const renderAssetChainFeeError = useMemo(() => {
     const amount = FP.pipe(
-      oCrossChainAssetBalance,
+      oChainAssetBalance,
       O.getOrElse(() => ZERO_BASE_AMOUNT),
       baseToAsset
     )
 
     return FP.pipe(
-      oCrossChainFee,
+      oAssetChainFee,
       O.map((fee) => renderFeeError(fee, amount, asset)),
       O.getOrElse(() => <></>)
     )
-  }, [asset, oCrossChainAssetBalance, oCrossChainFee, renderFeeError])
+  }, [oChainAssetBalance, oAssetChainFee, renderFeeError, asset])
 
   const feesLabel = useMemo(
     () =>
@@ -383,13 +374,15 @@ export const AddDeposit: React.FC<Props> = (props) => {
           () => '...',
           () => '...',
           (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
-          ({ base, cross }) =>
-            // Show one or two fees
-            `${Helper.formatFee(base, BASE_CHAIN_ASSET)} ${FP.pipe(
-              cross,
-              O.map((crossFee) => ` + ${Helper.formatFee(crossFee, asset)}`),
+          ({ thor: oThorFee, asset: assetFee }) =>
+            // Show one (asym deposit)
+            // or
+            // two fees (sym)
+            `${FP.pipe(
+              oThorFee,
+              O.map((thorFee) => `${Helper.formatFee(thorFee, AssetRuneNative)} + `),
               O.getOrElse(() => '')
-            )}`
+            )} ${Helper.formatFee(assetFee, asset)}`
         )
       ),
     [asset, fees, intl]
@@ -397,11 +390,10 @@ export const AddDeposit: React.FC<Props> = (props) => {
 
   const reloadFeesHandler = useCallback(() => reloadFees(type), [reloadFees, type])
 
-  const disabledForm = useMemo(() => isBalanceError || isBaseChainFeeError || isCrossChainFeeError || disabled, [
+  const disabledForm = useMemo(() => isBalanceError || isThorchainFeeError || disabled, [
     disabled,
     isBalanceError,
-    isBaseChainFeeError,
-    isCrossChainFeeError
+    isThorchainFeeError
   ])
 
   return (
@@ -460,12 +452,12 @@ export const AddDeposit: React.FC<Props> = (props) => {
             <Col>
               <>
                 {
-                  // Don't show base-chain-fee error if we already display a error of balances
-                  !isBalanceError && isBaseChainFeeError && renderBaseChainFeeError
+                  // Don't show thorchain fee error if we already display a error of balances
+                  !isBalanceError && isThorchainFeeError && renderThorchainFeeError
                 }
                 {
-                  // Don't show x-chain-fee error if we already display a error of balances
-                  !isBalanceError && isCrossChainFeeError && renderCrossChainFeeError
+                  // Don't show asset chain fee error if we already display a error of balances
+                  !isBalanceError && isAssetChainFeeError && renderAssetChainFeeError
                 }
               </>
             </Col>

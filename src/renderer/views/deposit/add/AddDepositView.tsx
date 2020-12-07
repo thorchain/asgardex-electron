@@ -15,7 +15,7 @@ import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
-import { getChainAsset, isBaseChainAsset, isCrossChainAsset } from '../../../helpers/chainHelper'
+import { isBaseChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
@@ -50,18 +50,16 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
   const {
     depositFees$,
     reloadDepositFees,
-    isCrossChainDeposit$,
     symDepositTxMemo$,
     asymDepositTxMemo$,
-    updateDepositFeesEffect$
+    reloadDepositFeesEffect$
   } = useChainContext()
 
   // subscribe to
-  useSubscription(updateDepositFeesEffect$)
+  useSubscription(reloadDepositFeesEffect$)
 
   const [depositFees] = useObservableState(() => depositFees$(type), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(poolAddress$, O.none)
-  const isCrossChain = useObservableState(isCrossChainDeposit$, false)
 
   const { balancesState$ } = useWalletContext()
 
@@ -111,18 +109,6 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
     [asset, assetBalance, balances]
   )
 
-  const crossChainAssetBalance: O.Option<BaseAmount> = useMemo(() => {
-    if (!isCrossChain) return O.none
-
-    return isCrossChainAsset(asset)
-      ? assetBalance
-      : FP.pipe(
-          balances,
-          O.chain(getBalanceByAsset(getChainAsset(asset.chain))),
-          O.map((assetWithAmount) => assetWithAmount.amount)
-        )
-  }, [asset, assetBalance, balances, isCrossChain])
-
   const symDepositTxMemo: O.Option<SymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
 
   const asymDepositTxMemo: O.Option<Memo> = useObservableState(asymDepositTxMemo$, O.none)
@@ -148,14 +134,12 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
           runePrice={ZERO_BN}
           assetBalance={O.none}
           runeBalance={O.none}
-          baseChainAssetBalance={O.none}
-          crossChainAssetBalance={O.none}
+          chainAssetBalance={O.none}
           onDeposit={emptyFunc}
           fees={depositFees}
           reloadFees={emptyFunc}
           priceAsset={selectedPricePoolAsset}
           disabled={true}
-          isCrossChain={isCrossChain}
           poolAddress={O.none}
           symDepositMemo={O.none}
           asymDepositMemo={O.none}
@@ -163,7 +147,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
         />
       </>
     ),
-    [asset, isCrossChain, selectedPricePoolAsset, depositFees, type]
+    [asset, selectedPricePoolAsset, depositFees, type]
   )
 
   return FP.pipe(
@@ -184,9 +168,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
               runePrice={runPrice}
               assetBalance={assetBalance}
               runeBalance={runeBalance}
-              baseChainAssetBalance={chainAssetBalance}
-              crossChainAssetBalance={crossChainAssetBalance}
-              isCrossChain={isCrossChain}
+              chainAssetBalance={chainAssetBalance}
               poolAddress={oPoolAddress}
               symDepositMemo={symDepositTxMemo}
               asymDepositMemo={asymDepositTxMemo}

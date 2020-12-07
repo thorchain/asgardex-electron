@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import midgard from '@thorchain/asgardex-midgard'
+import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -8,6 +9,7 @@ import * as RxOp from 'rxjs/operators'
 import { retry, catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { isEnv } from '../../helpers/envHelper'
 import { fromPromise$ } from '../../helpers/rx/fromPromise'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
@@ -18,7 +20,14 @@ import { MIDGARD_MAX_RETRY } from '../const'
 import { selectedPoolAsset$, setSelectedPoolAsset } from './common'
 import { createPoolsService } from './pools'
 import { createStakeService } from './stake'
-import { NetworkInfoRD, NetworkInfoLD, ThorchainConstantsLD, ByzantineLD, ThorchainLastblockLD } from './types'
+import {
+  NetworkInfoRD,
+  NetworkInfoLD,
+  ThorchainConstantsLD,
+  ByzantineLD,
+  ThorchainLastblockLD,
+  NativeFeeLD
+} from './types'
 
 const MIDGARD_TESTNET_URL = process.env.REACT_APP_MIDGARD_TESTNET_URL
 
@@ -108,6 +117,15 @@ const thorchainConstantsState$: ThorchainConstantsLD = apiGetThorchainConstants$
   startWith(RD.pending),
   retry(MIDGARD_MAX_RETRY),
   shareReplay(1)
+)
+
+const nativeTxFee$: NativeFeeLD = thorchainConstantsState$.pipe(
+  liveData.map((constants) =>
+    FP.pipe(
+      O.fromNullable(constants.int_64_values?.NativeChainGasFee),
+      O.map((value) => baseAmount(value, THORCHAIN_DECIMAL))
+    )
+  )
 )
 
 /**
@@ -210,6 +228,7 @@ export type MidgardService = {
   reloadNetworkInfo: () => void
   thorchainConstantsState$: ThorchainConstantsLD
   thorchainLastblockState$: ThorchainLastblockLD
+  nativeTxFee$: NativeFeeLD
   reloadThorchainLastblock: () => void
   setSelectedPoolAsset: () => void
   apiEndpoint$: ByzantineLD
@@ -223,6 +242,7 @@ export const service = {
   reloadNetworkInfo,
   thorchainConstantsState$,
   thorchainLastblockState$,
+  nativeTxFee$,
   reloadThorchainLastblock,
   setSelectedPoolAsset,
   selectedPoolAsset$,
