@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Balance, XChainClient } from '@xchainjs/xchain-client'
-import { TxsPage, Balances, Fees } from '@xchainjs/xchain-client'
+import { Address, XChainClient } from '@xchainjs/xchain-client'
+import { TxsPage, Fees } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
@@ -9,6 +9,7 @@ import { Option, option } from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
+import { WalletBalance } from '../../types/wallet'
 import { ApiError } from '../wallet/types'
 import { TxLD } from '../wallet/types'
 /**
@@ -37,15 +38,15 @@ export type LoadTxsParams = {
   offset: number
 }
 
-export type TxsParams = { asset: O.Option<Asset> } & LoadTxsParams
+export type TxsParams = { asset: O.Option<Asset>; walletAddress: O.Option<string> } & LoadTxsParams
 
 export type TxsPageRD = RD.RemoteData<ApiError, TxsPage>
 export type TxsPageLD = LiveData<ApiError, TxsPage>
 
-export type BalanceRD = RD.RemoteData<ApiError, Balance>
+export type BalanceRD = RD.RemoteData<ApiError, WalletBalance>
 
-export type BalancesRD = RD.RemoteData<ApiError, Balances>
-export type BalancesLD = LiveData<ApiError, Balances>
+export type WalletBalancesRD = RD.RemoteData<ApiError, WalletBalance[]>
+export type WalletBalancesLD = LiveData<ApiError, WalletBalance[]>
 
 export type ExplorerUrl$ = Rx.Observable<O.Option<string>>
 export type GetExplorerTxUrl = (txHash: string) => string

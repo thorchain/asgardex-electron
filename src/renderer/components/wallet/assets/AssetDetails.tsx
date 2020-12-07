@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
@@ -12,7 +13,7 @@ import * as walletRoutes from '../../../routes/wallet'
 import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
-import { LoadTxsHandler, NonEmptyBalances } from '../../../services/wallet/types'
+import { LoadTxsHandler, NonEmptyWalletBalances } from '../../../services/wallet/types'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
@@ -21,11 +22,12 @@ import * as Styled from './AssetDetails.style'
 
 type Props = {
   txsPageRD: TxsPageRD
-  balances: O.Option<NonEmptyBalances>
+  balances: O.Option<NonEmptyWalletBalances>
   asset: O.Option<Asset>
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: () => void
   loadTxsHandler?: LoadTxsHandler
+  walletAddress?: Address
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -35,7 +37,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     asset: oAsset,
     reloadBalancesHandler = emptyFunc,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
-    getExplorerTxUrl: oGetExplorerTxUrl = O.none
+    getExplorerTxUrl: oGetExplorerTxUrl = O.none,
+    walletAddress = ''
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -55,12 +58,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const walletActionSendClick = useCallback(() => {
-    history.push(walletRoutes.send.path({ asset: assetAsString }))
-  }, [assetAsString, history])
+    history.push(walletRoutes.send.path({ asset: assetAsString, walletAddress }))
+  }, [assetAsString, history, walletAddress])
 
   const walletActionReceiveClick = useCallback(
-    () => history.push(walletRoutes.receive.path({ asset: assetAsString })),
-    [assetAsString, history]
+    () => history.push(walletRoutes.receive.path({ asset: assetAsString, walletAddress })),
+    [assetAsString, history, walletAddress]
   )
 
   const refreshHandler = useCallback(() => {

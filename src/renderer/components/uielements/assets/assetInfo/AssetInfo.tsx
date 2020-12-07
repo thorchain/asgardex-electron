@@ -8,7 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { loadingString, emptyString } from '../../../../helpers/stringHelper'
 import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
-import { NonEmptyBalances } from '../../../../services/wallet/types'
+import { NonEmptyWalletBalances } from '../../../../services/wallet/types'
 import { AssetIcon } from '../assetIcon'
 import * as Styled from './AssetInfo.style'
 
@@ -17,7 +17,7 @@ type Props = {
   // balances are optional:
   // No balances == don't render price
   // balances == render price
-  assetsWB?: O.Option<NonEmptyBalances>
+  assetsWB?: O.Option<NonEmptyWalletBalances>
 }
 
 export const AssetInfo: React.FC<Props> = (props): JSX.Element => {

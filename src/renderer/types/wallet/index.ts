@@ -1,3 +1,4 @@
+import { Address, Balance } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 
 type AccountType = {
@@ -10,3 +11,5 @@ export type UserAccountType = {
   chainName: Chain
   accounts: AccountType[]
 }
+
+export type WalletBalance = Balance & { walletAddress: Address }

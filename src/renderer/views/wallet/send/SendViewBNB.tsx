@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BinanceClient } from '@xchainjs/xchain-binance'
-import { Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -14,22 +13,23 @@ import { SendFormBNB } from '../../../components/wallet/txs/send/'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
-import { getBalanceByAsset } from '../../../helpers/walletHelper'
+import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/binance/types'
 import { GetExplorerTxUrl } from '../../../services/clients'
-import { NonEmptyBalances, TxRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, TxRD } from '../../../services/wallet/types'
+import { WalletBalance } from '../../../types/wallet'
 
 type Props = {
   selectedAsset: Asset
-  balances: O.Option<NonEmptyBalances>
+  walletBalances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
 }
 
 export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
+  const { selectedAsset, walletBalances: oWalletBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
 
-  const oSelectedAssetWB = useMemo(() => getBalanceByAsset(oBalances, O.some(selectedAsset)), [
-    oBalances,
+  const oSelectedWalletBalance = useMemo(() => getWalletBalanceByAsset(oWalletBalances, O.some(selectedAsset)), [
+    oWalletBalances,
     selectedAsset
   ])
 
@@ -64,27 +64,27 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
    * Custom send form used by BNB chain only
    */
   const sendForm = useCallback(
-    (selectedAsset: Balance) => (
+    (selectedAssetWalletBalance: WalletBalance) => (
       <SendFormBNB
-        balance={selectedAsset}
+        balance={selectedAssetWalletBalance}
         onSubmit={pushTx}
         balances={FP.pipe(
-          oBalances,
-          O.getOrElse(() => [] as Balances)
+          oWalletBalances,
+          O.getOrElse(() => [] as WalletBalance[])
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
         fee={fee}
       />
     ),
-    [pushTx, oBalances, txRD, addressValidation, fee]
+    [pushTx, oWalletBalances, txRD, addressValidation, fee]
   )
 
   return FP.pipe(
-    sequenceTOption(oSelectedAssetWB, oGetExplorerTxUrl),
+    sequenceTOption(oSelectedWalletBalance, oGetExplorerTxUrl),
     O.fold(
       () => <></>,
-      ([selectedAssetWB, getExplorerTxUrl]) => {
+      ([selectedWalletBalance, getExplorerTxUrl]) => {
         const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
           getExplorerTxUrl,
           window.apiUrl.openExternal
@@ -95,7 +95,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
             successActionHandler={successActionHandler}
             inititalActionHandler={resetTx}
             errorActionHandler={resetTx}
-            sendForm={sendForm(selectedAssetWB)}
+            sendForm={sendForm(selectedWalletBalance)}
           />
         )
       }

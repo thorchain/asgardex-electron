@@ -32,29 +32,30 @@ export const resetTxsPage: ResetTxsPageHandler = () => setLoadTxsProps(INITIAL_L
 /**
  * Factory create a stream of `TxsPageRD` based on selected asset
  */
-export const txs$: TxsPageLD = Rx.combineLatest([selectedAsset$, loadTxsProps$]).pipe(
-  RxOp.switchMap(([oAsset, { limit, offset }]) =>
-    FP.pipe(
-      oAsset,
-      O.fold(
-        () => Rx.of(RD.initial),
-        (asset) => {
-          switch (asset.chain) {
-            case 'BNB':
-              return BNB.txs$({ asset: O.some(asset), limit, offset })
-            case 'BTC':
-              return BTC.txs$({ asset: O.none, limit, offset })
-            case 'ETH':
-              return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
-            case 'THOR':
-              return THOR.txs$({ asset: O.none, limit, offset })
-            default:
-              return Rx.of(
-                RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` } as ApiError)
-              )
+export const getTxs$: (walletAddress: O.Option<string>) => TxsPageLD = (walletAddress = O.none) =>
+  Rx.combineLatest([selectedAsset$, loadTxsProps$]).pipe(
+    RxOp.switchMap(([oAsset, { limit, offset }]) =>
+      FP.pipe(
+        oAsset,
+        O.fold(
+          () => Rx.of(RD.initial),
+          (asset) => {
+            switch (asset.chain) {
+              case 'BNB':
+                return BNB.txs$({ asset: O.some(asset), limit, offset, walletAddress })
+              case 'BTC':
+                return BTC.txs$({ asset: O.none, limit, offset, walletAddress })
+              case 'ETH':
+                return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
+              case 'THOR':
+                return THOR.txs$({ asset: O.none, limit, offset, walletAddress })
+              default:
+                return Rx.of(
+                  RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` } as ApiError)
+                )
+            }
           }
-        }
+        )
       )
     )
   )
-)

@@ -3,25 +3,28 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { FeeRates } from '@xchainjs/xchain-bitcoin'
-import { Balance, Balances, Fees } from '@xchainjs/xchain-client'
+import { Fees } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBTC, AssetRune67C, assetToBase, baseAmount, formatBaseAmount } from '@xchainjs/xchain-util'
 
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation } from '../../../../services/binance/types'
 import { SendTxParams } from '../../../../services/bitcoin/types'
+import { WalletBalance } from '../../../../types/wallet'
 import { SendFormBTC } from './index'
 
-const bnbAsset: Balance = {
+const bnbAsset: WalletBalance = {
   asset: AssetBTC,
-  amount: assetToBase(assetAmount(1.23, BTC_DECIMAL))
+  amount: assetToBase(assetAmount(1.23, BTC_DECIMAL)),
+  walletAddress: 'bnb wallet'
 }
 
-const runeAsset: Balance = {
+const runeAsset: WalletBalance = {
   asset: AssetRune67C,
-  amount: assetToBase(assetAmount(2, BTC_DECIMAL))
+  amount: assetToBase(assetAmount(2, BTC_DECIMAL)),
+  walletAddress: 'rune wallet'
 }
 
-const balances: Balances = [bnbAsset, runeAsset]
+const balances: WalletBalance[] = [bnbAsset, runeAsset]
 
 const fees: Fees = {
   type: 'base',
@@ -50,7 +53,7 @@ const reloadFeesHandler = () => console.log('reload fees')
 storiesOf('Wallet/SendFormBTC', module)
   .add('send', () => (
     <SendFormBTC
-      assetWB={bnbAsset}
+      walletBalance={bnbAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -60,7 +63,7 @@ storiesOf('Wallet/SendFormBTC', module)
   ))
   .add('pending', () => (
     <SendFormBTC
-      assetWB={bnbAsset}
+      walletBalance={bnbAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -71,7 +74,7 @@ storiesOf('Wallet/SendFormBTC', module)
   ))
   .add('loading fees', () => (
     <SendFormBTC
-      assetWB={bnbAsset}
+      walletBalance={bnbAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -81,7 +84,7 @@ storiesOf('Wallet/SendFormBTC', module)
   ))
   .add('failure fees', () => (
     <SendFormBTC
-      assetWB={bnbAsset}
+      walletBalance={bnbAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -91,7 +94,7 @@ storiesOf('Wallet/SendFormBTC', module)
   ))
   .add('amount < fees', () => (
     <SendFormBTC
-      assetWB={bnbAsset}
+      walletBalance={bnbAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       reloadFeesHandler={reloadFeesHandler}

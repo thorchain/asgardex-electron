@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeRate, FeesWithRates } from '@xchainjs/xchain-bitcoin/lib/types/client-types'
-import { Balance, Balances, FeeOptionKey } from '@xchainjs/xchain-client'
+import { FeeOptionKey } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBTC,
@@ -24,6 +24,7 @@ import { useIntl } from 'react-intl'
 import { ZERO_BN } from '../../../../const'
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation, FeesWithRatesRD, SendTxParams } from '../../../../services/bitcoin/types'
+import { WalletBalance } from '../../../../types/wallet'
 import * as StyledR from '../../../shared/form/Radio.style'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
@@ -40,8 +41,8 @@ export type FormValues = {
 }
 
 type Props = {
-  balances: Balances
-  assetWB: Balance
+  balances: WalletBalance[]
+  walletBalance: WalletBalance
   onSubmit: ({ recipient, amount, feeRate, memo }: SendTxParams) => void
   isLoading?: boolean
   addressValidation: AddressValidation
@@ -53,7 +54,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   const {
     onSubmit,
     balances,
-    assetWB,
+    walletBalance,
     addressValidation,
     isLoading,
     feesWithRates: feesWithRatesRD,
@@ -118,10 +119,10 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => false,
-        (fee) => assetWB.amount.amount().isLessThan(fee.amount())
+        (fee) => walletBalance.amount.amount().isLessThan(fee.amount())
       )
     )
-  }, [assetWB.amount, oFeeBaseAmount])
+  }, [walletBalance.amount, oFeeBaseAmount])
 
   const selectedFeeLabel = useMemo(
     () =>
@@ -160,7 +161,11 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
       {
-        balance: formatAssetAmountCurrency({ amount: baseToAsset(assetWB.amount), asset: AssetBTC, trimZeros: true })
+        balance: formatAssetAmountCurrency({
+          amount: baseToAsset(walletBalance.amount),
+          asset: AssetBTC,
+          trimZeros: true
+        })
       }
     )
 
@@ -169,7 +174,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
         {msg}
       </Styled.Label>
     )
-  }, [assetWB.amount, intl, isFeeError])
+  }, [walletBalance.amount, intl, isFeeError])
 
   const feeOptionsLabel: Record<FeeOptionKey, string> = useMemo(
     () => ({
@@ -231,13 +236,13 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         selectedFee,
-        O.map((fee) => assetWB.amount.amount().minus(fee.amount())),
+        O.map((fee) => walletBalance.amount.amount().minus(fee.amount())),
         // Set maxAmount to zero as long as we dont have a feeRate
         O.getOrElse(() => ZERO_BN),
         baseAmount,
         baseToAsset
       ),
-    [assetWB.amount, selectedFee]
+    [walletBalance.amount, selectedFee]
   )
 
   const amountValidator = useCallback(
@@ -268,7 +273,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeAssetHandler} selectedAsset={assetWB.asset} assets={balances} />
+        <AccountSelector onChange={changeAssetHandler} selectedAsset={walletBalance.asset} walletBalances={balances} />
         <Styled.Form
           form={form}
           initialValues={{
@@ -292,7 +297,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
               {intl.formatMessage({ id: 'common.max' })}:{' '}
               {formatAssetAmountCurrency({
                 amount: maxAmount,
-                asset: assetWB.asset,
+                asset: walletBalance.asset,
                 trimZeros: true
               })}
             </Styled.Label>

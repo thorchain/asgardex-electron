@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Balance, Balances } from '@xchainjs/xchain-client'
 import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain'
 import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -9,26 +8,26 @@ import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
-import { Send } from '../../../components/wallet/txs/send/'
-import { SendFormTHOR } from '../../../components/wallet/txs/send/SendFormTHOR'
+import { Send, SendFormTHOR } from '../../../components/wallet/txs/send/'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
-import { getBalanceByAsset } from '../../../helpers/walletHelper'
+import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { GetExplorerTxUrl } from '../../../services/clients'
 import { AddressValidation } from '../../../services/thorchain/types'
-import { NonEmptyBalances, TxRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, TxRD } from '../../../services/wallet/types'
+import { WalletBalance } from '../../../types/wallet'
 
 type Props = {
   thorAsset: Asset
-  balances: O.Option<NonEmptyBalances>
+  balances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
 }
 
 export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
   const { thorAsset: selectedAsset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
 
-  const selectedAssetBalance = useMemo(() => getBalanceByAsset(oBalances, O.some(selectedAsset)), [
+  const selectedAssetBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(selectedAsset)), [
     oBalances,
     selectedAsset
   ])
@@ -62,13 +61,13 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
    * Custom send form used by THOR chain only
    */
   const sendForm = useCallback(
-    (balance: Balance) => (
+    (balance: WalletBalance) => (
       <SendFormTHOR
         balance={balance}
         onSubmit={pushTx}
         balances={FP.pipe(
           oBalances,
-          O.getOrElse(() => [] as Balances)
+          O.getOrElse(() => [] as WalletBalance[])
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}

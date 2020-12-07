@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { Balance, Balances } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetRuneNative,
@@ -14,14 +13,16 @@ import * as O from 'fp-ts/lib/Option'
 
 import { TRANSFER_FEES } from '../../../../../shared/mock/fees'
 import { AddressValidation, SendTxParams } from '../../../../services/binance/types'
+import { WalletBalance } from '../../../../types/wallet'
 import { SendFormTHOR } from './index'
 
-const runeAsset: Balance = {
+const runeWalletBalance: WalletBalance = {
   asset: AssetRuneNative,
-  amount: assetToBase(assetAmount(2))
+  amount: assetToBase(assetAmount(2)),
+  walletAddress: 'rune wallet'
 }
 
-const balances: Balances = [runeAsset]
+const balances: WalletBalance[] = [runeWalletBalance]
 
 const fee = O.some(TRANSFER_FEES.single)
 
@@ -37,7 +38,7 @@ const onSubmitHandler = ({ recipient, amount, asset, memo }: SendTxParams) =>
 storiesOf('Wallet/SendFormTHOR', module)
   .add('send', () => (
     <SendFormTHOR
-      balance={runeAsset}
+      balance={runeWalletBalance}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -46,7 +47,7 @@ storiesOf('Wallet/SendFormTHOR', module)
   ))
   .add('pending', () => (
     <SendFormTHOR
-      balance={runeAsset}
+      balance={runeWalletBalance}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -56,7 +57,7 @@ storiesOf('Wallet/SendFormTHOR', module)
   ))
   .add('no fees', () => (
     <SendFormTHOR
-      balance={runeAsset}
+      balance={runeWalletBalance}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}

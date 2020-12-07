@@ -32,7 +32,8 @@ const chainBalances: ChainBalances = [
     balances: RD.success([
       {
         amount: baseAmount('12200000000'),
-        asset: AssetRune67C
+        asset: AssetRune67C,
+        walletAddress: 'Rune wallet'
       }
     ])
   },
@@ -41,7 +42,8 @@ const chainBalances: ChainBalances = [
     balances: RD.success([
       {
         amount: baseAmount('1230000'),
-        asset: AssetBTC
+        asset: AssetBTC,
+        walletAddress: 'BTC wallet'
       }
     ])
   },
@@ -50,11 +52,13 @@ const chainBalances: ChainBalances = [
     balances: RD.success([
       {
         amount: baseAmount('1000000'),
-        asset: AssetBNB
+        asset: AssetBNB,
+        walletAddress: 'BNB wallet'
       },
       {
         amount: baseAmount('300000000'),
-        asset: AssetETH
+        asset: AssetETH,
+        walletAddress: 'ETH wallet'
       }
     ])
   }

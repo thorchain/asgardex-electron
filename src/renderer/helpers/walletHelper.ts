@@ -1,10 +1,10 @@
-import { Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { NonEmptyBalances } from '../services/wallet/types'
+import { NonEmptyWalletBalances } from '../services/wallet/types'
+import { WalletBalance } from '../types/wallet'
 import { isBnbAsset, isRuneNativeAsset } from './assetHelper'
 import { eqAsset } from './fp/eq'
 import { sequenceTOption } from './fpHelpers'
@@ -15,32 +15,35 @@ import { sequenceTOption } from './fpHelpers'
  *
  * Note: Returns `None` if `Asset` has not been found this list.
  * */
-export const getAssetAmountByAsset = (balances: Balances, assetToFind: Asset): O.Option<AssetAmount> =>
+export const getAssetAmountByAsset = (balances: WalletBalance[], assetToFind: Asset): O.Option<AssetAmount> =>
   FP.pipe(
     balances,
     A.findFirst(({ asset }) => eqAsset.equals(asset, assetToFind)),
-    O.map((assetWB) => baseToAsset(assetWB.amount))
+    O.map((walletBalance) => baseToAsset(walletBalance.amount))
   )
 
-export const getBalanceByAsset = (oAssetsWB: O.Option<NonEmptyBalances>, oAsset: O.Option<Asset>): O.Option<Balance> =>
+export const getWalletBalanceByAsset = (
+  oWalletBalances: O.Option<NonEmptyWalletBalances>,
+  oAsset: O.Option<Asset>
+): O.Option<WalletBalance> =>
   FP.pipe(
-    sequenceTOption(oAssetsWB, oAsset),
-    O.chain(([assetsWB, asset]) =>
+    sequenceTOption(oWalletBalances, oAsset),
+    O.chain(([walletBalances, asset]) =>
       FP.pipe(
-        assetsWB,
+        walletBalances,
         A.findFirst(({ asset: assetInList }) => assetInList.symbol === asset.symbol)
       )
     )
   )
 
-export const getBnbAmountFromBalances = (balances: Balances): O.Option<AssetAmount> =>
+export const getBnbAmountFromBalances = (balances: WalletBalance[]): O.Option<AssetAmount> =>
   FP.pipe(
     balances,
     A.findFirst(({ asset }) => isBnbAsset(asset)),
     O.map(({ amount }) => baseToAsset(amount))
   )
 
-export const getRuneNativeAmountFromBalances = (balances: Balances): O.Option<AssetAmount> =>
+export const getRuneNativeAmountFromBalances = (balances: WalletBalance[]): O.Option<AssetAmount> =>
   FP.pipe(
     balances,
     A.findFirst(({ asset }) => isRuneNativeAsset(asset)),

@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
 import { Address } from '@xchainjs/xchain-binance'
-import { Balance, Balances } from '@xchainjs/xchain-client'
 import {
   formatAssetAmountCurrency,
   assetAmount,
@@ -22,6 +21,7 @@ import { isBnbAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getBnbAmountFromBalances } from '../../../../helpers/walletHelper'
 import { AddressValidation, SendTxParams } from '../../../../services/binance/types'
+import { WalletBalance } from '../../../../types/wallet'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
@@ -35,8 +35,8 @@ export type FormValues = {
 }
 
 type Props = {
-  balances: Balances
-  balance: Balance
+  balances: WalletBalance[]
+  balance: WalletBalance
   onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) => void
   isLoading?: boolean
   addressValidation: AddressValidation
@@ -157,7 +157,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeAssetHandler} selectedAsset={balance.asset} assets={balances} />
+        <AccountSelector onChange={changeAssetHandler} selectedAsset={balance.asset} walletBalances={balances} />
         <Styled.Form form={form} initialValues={{ amount: bn(0) }} onFinish={onFinishHandler} labelCol={{ span: 24 }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>

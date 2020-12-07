@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Balance } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
@@ -8,7 +8,8 @@ import { Observable } from 'rxjs'
 
 import { LedgerErrorId } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { BalancesRD, LoadTxsParams } from '../clients'
+import { WalletBalance } from '../../types/wallet'
+import { WalletBalancesRD, LoadTxsParams } from '../clients'
 
 export type Phrase = string
 
@@ -38,17 +39,17 @@ export type KeystoreService = {
 export type ChainBalance = {
   address: string
   chain: Chain
-  balances: BalancesRD
+  balances: WalletBalancesRD
 }
 
 export type ChainBalances = ChainBalance[]
 
-export const BalanceMonoid = getMonoid<Balance>()
+export const BalanceMonoid = getMonoid<WalletBalance>()
 
-export type NonEmptyBalances = NonEmptyArray<Balance>
+export type NonEmptyWalletBalances = NonEmptyArray<WalletBalance>
 
 export type BalancesState = {
-  balances: O.Option<NonEmptyBalances>
+  balances: O.Option<NonEmptyWalletBalances>
   errors: O.Option<NonEmptyApiErrors>
   loading: boolean
 }

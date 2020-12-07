@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client } from '@thorchain/asgardex-ethereum'
-import { Balance } from '@xchainjs/xchain-client'
 import { AssetETH, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -24,8 +23,9 @@ const loadBalances$ = (client: Client): Observable<BalanceRD> =>
       Rx.of(
         RD.success({
           asset: AssetETH,
-          amount: baseAmount(balance.toString(), ETH_DECIMAL)
-        } as Balance)
+          amount: baseAmount(balance.toString(), ETH_DECIMAL),
+          walletAddress: client.getAddress()
+        })
       )
     ),
     catchError((error: Error) =>

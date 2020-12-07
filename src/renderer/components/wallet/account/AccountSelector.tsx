@@ -1,39 +1,39 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { Balances } from '@xchainjs/xchain-client'
 import { Asset, formatAssetAmountCurrency, baseToAsset } from '@xchainjs/xchain-util'
 import { Menu, Dropdown, Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 
+import { WalletBalance } from '../../../types/wallet'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
 import { Size as IconSize } from '../../uielements/assets/assetIcon/AssetIcon.types'
 import * as Styled from './AccountSelector.style'
 
 type Props = {
   selectedAsset: Asset
-  assets: Balances
-  onChange?: (asset: Asset) => void
+  walletBalances: WalletBalance[]
+  onChange?: (asset: Asset, walletAddress: string) => void
   size?: IconSize
 }
 
 export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, assets, onChange = (_) => {}, size = 'normal' } = props
+  const { selectedAsset, walletBalances, onChange = (_) => {}, size = 'normal' } = props
 
   const intl = useIntl()
 
-  const filteredAssets = useMemo(() => assets.filter(({ asset }) => asset.symbol !== selectedAsset.symbol), [
-    assets,
-    selectedAsset
-  ])
-  const enableDropdown = filteredAssets.length > 0
+  const filteredWalletBalances = useMemo(
+    () => walletBalances.filter(({ asset }) => asset.symbol !== selectedAsset.symbol),
+    [walletBalances, selectedAsset]
+  )
+  const enableDropdown = filteredWalletBalances.length > 0
 
   const menu = useCallback(
     () => (
       <Menu>
-        {filteredAssets.map((assetWB, i: number) => {
-          const { asset, amount } = assetWB
+        {filteredWalletBalances.map((walletBalance, i: number) => {
+          const { asset, amount, walletAddress } = walletBalance
           return (
-            <Menu.Item key={i} onClick={() => onChange(asset)}>
+            <Menu.Item key={i} onClick={() => onChange(asset, walletAddress)}>
               <Row align={'middle'} gutter={[8, 0]}>
                 <Col>
                   <AssetIcon asset={asset} size={'small'} />
@@ -46,7 +46,7 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
         })}
       </Menu>
     ),
-    [filteredAssets, onChange]
+    [filteredWalletBalances, onChange]
   )
 
   return (

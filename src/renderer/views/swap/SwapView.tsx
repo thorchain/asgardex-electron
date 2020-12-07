@@ -155,7 +155,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   onConfirmSwap={onConfirmSwap}
                   availableAssets={availableAssets}
                   poolDetails={state.poolDetails}
-                  assetsWB={balances}
+                  walletBalances={balances}
                   nativeTxFee={nativeTxFee}
                 />
               )
