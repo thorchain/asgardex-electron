@@ -215,6 +215,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
        * 'cuz chainBalances$ stream is created by 'combineLatest'
        * which will not emit anything if some of stream has
        * not emitted at least once
+       * @see btcLedgerChainBalance$'s getOrElse branch at src/renderer/services/wallet/balances.ts
        */
       if (!address && RD.isInitial(balancesRD)) {
         return null
