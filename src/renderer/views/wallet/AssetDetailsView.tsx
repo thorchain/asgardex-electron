@@ -26,7 +26,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     resetTxsPage
   } = useWalletContext()
 
-  const { asset, wallet } = useParams<AssetDetailsParams>()
+  const { asset, walletAddress } = useParams<AssetDetailsParams>()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
   // Set selected asset once
@@ -34,7 +34,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setSelectedAsset(oSelectedAsset), [])
 
-  const [txsRD] = useObservableState(() => getTxs$(O.some(wallet)), RD.initial)
+  const [txsRD] = useObservableState(() => getTxs$(O.some(walletAddress)), RD.initial)
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
   const [reloadBalances] = useObservableState(() => reloadBalances$.pipe(RxOp.map(O.toUndefined)))
@@ -53,8 +53,12 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
    */
   const walletBalances = useMemo(
     () =>
-      FP.pipe(balances, O.map(A.filter((walletBalance) => walletBalance.wallet === wallet)), O.chain(NEA.fromArray)),
-    [balances, wallet]
+      FP.pipe(
+        balances,
+        O.map(A.filter((walletBalance) => walletBalance.walletAddress === walletAddress)),
+        O.chain(NEA.fromArray)
+      ),
+    [balances, walletAddress]
   )
 
   return (
@@ -66,7 +70,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         loadTxsHandler={loadTxs}
         reloadBalancesHandler={reloadBalances}
         getExplorerTxUrl={getExplorerTxUrl}
-        walletAddress={wallet}
+        walletAddress={walletAddress}
       />
     </>
   )

@@ -12,7 +12,7 @@ import * as walletRoutes from '../../../routes/wallet'
 import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
-import { LoadTxsHandler, NonEmptyBalances } from '../../../services/wallet/types'
+import { LoadTxsHandler, NonEmptyWalletBalances } from '../../../services/wallet/types'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
@@ -21,7 +21,7 @@ import * as Styled from './AssetDetails.style'
 
 type Props = {
   txsPageRD: TxsPageRD
-  balances: O.Option<NonEmptyBalances>
+  balances: O.Option<NonEmptyWalletBalances>
   asset: O.Option<Asset>
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: () => void
@@ -57,11 +57,11 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const walletActionSendClick = useCallback(() => {
-    history.push(walletRoutes.send.path({ asset: assetAsString, wallet: walletAddress }))
+    history.push(walletRoutes.send.path({ asset: assetAsString, walletAddress }))
   }, [assetAsString, history, walletAddress])
 
   const walletActionReceiveClick = useCallback(
-    () => history.push(walletRoutes.receive.path({ asset: assetAsString, wallet: walletAddress })),
+    () => history.push(walletRoutes.receive.path({ asset: assetAsString, walletAddress })),
     [assetAsString, history, walletAddress]
   )
 

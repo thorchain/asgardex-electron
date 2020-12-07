@@ -10,18 +10,18 @@ import { catchError, startWith, map, shareReplay, debounceTime } from 'rxjs/oper
 import { liveData } from '../../helpers/rx/liveData'
 import { TriggerStream$ } from '../../helpers/stateHelper'
 import { ApiError, ErrorId } from '../wallet/types'
-import { BalancesLD, XChainClient$ } from './types'
+import { WalletBalancesLD, XChainClient$ } from './types'
 
 /**
  * Observable to request balances based on given `XChainClient`
  */
-const loadBalances$: (client: XChainClient, address?: string) => BalancesLD = (client, address) =>
+const loadBalances$: (client: XChainClient, address?: string) => WalletBalancesLD = (client, address) =>
   Rx.from(client.getBalance(address)).pipe(
     map(RD.success),
     liveData.map(
       A.map((balance) => ({
         ...balance,
-        wallet: address || client.getAddress()
+        walletAddress: address || client.getAddress()
       }))
     ),
     catchError((error: Error) =>
@@ -39,7 +39,7 @@ const loadBalances$: (client: XChainClient, address?: string) => BalancesLD = (c
  *
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const balances$: (client$: XChainClient$, trigger$: TriggerStream$) => BalancesLD = (client$, trigger$) =>
+export const balances$: (client$: XChainClient$, trigger$: TriggerStream$) => WalletBalancesLD = (client$, trigger$) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.mergeMap(([_, oClient]) => {
       return FP.pipe(
@@ -59,7 +59,7 @@ export const balances$: (client$: XChainClient$, trigger$: TriggerStream$) => Ba
 export const balancesByAddress$: (
   client$: XChainClient$,
   trigger$: TriggerStream$
-) => (address: string) => BalancesLD = (client$, trigger$) => (address) =>
+) => (address: string) => WalletBalancesLD = (client$, trigger$) => (address) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.mergeMap(([_, oClient]) => {
       return FP.pipe(

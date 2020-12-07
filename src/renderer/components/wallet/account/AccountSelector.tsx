@@ -11,29 +11,29 @@ import * as Styled from './AccountSelector.style'
 
 type Props = {
   selectedAsset: Asset
-  assets: WalletBalance[]
-  onChange?: (asset: Asset, wallet: string) => void
+  walletBalances: WalletBalance[]
+  onChange?: (asset: Asset, walletAddress: string) => void
   size?: IconSize
 }
 
 export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, assets, onChange = (_) => {}, size = 'normal' } = props
+  const { selectedAsset, walletBalances, onChange = (_) => {}, size = 'normal' } = props
 
   const intl = useIntl()
 
-  const filteredAssets = useMemo(() => assets.filter(({ asset }) => asset.symbol !== selectedAsset.symbol), [
-    assets,
-    selectedAsset
-  ])
-  const enableDropdown = filteredAssets.length > 0
+  const filteredWalletBalances = useMemo(
+    () => walletBalances.filter(({ asset }) => asset.symbol !== selectedAsset.symbol),
+    [walletBalances, selectedAsset]
+  )
+  const enableDropdown = filteredWalletBalances.length > 0
 
   const menu = useCallback(
     () => (
       <Menu>
-        {filteredAssets.map((assetWB, i: number) => {
-          const { asset, amount, wallet } = assetWB
+        {filteredWalletBalances.map((walletBalance, i: number) => {
+          const { asset, amount, walletAddress } = walletBalance
           return (
-            <Menu.Item key={i} onClick={() => onChange(asset, wallet)}>
+            <Menu.Item key={i} onClick={() => onChange(asset, walletAddress)}>
               <Row align={'middle'} gutter={[8, 0]}>
                 <Col>
                   <AssetIcon asset={asset} size={'small'} />
@@ -46,7 +46,7 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
         })}
       </Menu>
     ),
-    [filteredAssets, onChange]
+    [filteredWalletBalances, onChange]
   )
 
   return (

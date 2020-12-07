@@ -63,12 +63,12 @@ export const bonds: Route<void> = {
   }
 }
 
-export type AssetDetailsParams = { asset: string; wallet: string }
+export type AssetDetailsParams = { asset: string; walletAddress: string }
 export const assetDetail: Route<AssetDetailsParams> = {
-  template: `${assets.template}/detail/:wallet/:asset`,
-  path: ({ asset, wallet }) => {
-    if (asset && !!wallet) {
-      return `${assets.template}/detail/${wallet}/${asset}`
+  template: `${assets.template}/detail/:walletAddress/:asset`,
+  path: ({ asset, walletAddress }) => {
+    if (asset && !!walletAddress) {
+      return `${assets.template}/detail/${walletAddress}/${asset}`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()
@@ -76,12 +76,12 @@ export const assetDetail: Route<AssetDetailsParams> = {
   }
 }
 
-export type ReceiveParams = { asset: string; wallet: string }
+export type ReceiveParams = { asset: string; walletAddress: string }
 export const receive: Route<ReceiveParams> = {
   template: `${assetDetail.template}/receive`,
-  path: ({ asset, wallet }) => {
-    if (asset && !!wallet) {
-      return `${assetDetail.path({ asset, wallet })}/receive`
+  path: ({ asset, walletAddress }) => {
+    if (asset && !!walletAddress) {
+      return `${assetDetail.path({ asset, walletAddress })}/receive`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()
@@ -89,12 +89,12 @@ export const receive: Route<ReceiveParams> = {
   }
 }
 
-export type SendParams = { asset: string; wallet: string }
+export type SendParams = { asset: string; walletAddress: string }
 export const send: Route<SendParams> = {
   template: `${assetDetail.template}/send`,
-  path: ({ asset, wallet }) => {
-    if (asset && !!wallet) {
-      return `${assetDetail.path({ asset, wallet })}/send`
+  path: ({ asset, walletAddress }) => {
+    if (asset && !!walletAddress) {
+      return `${assetDetail.path({ asset, walletAddress })}/send`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()

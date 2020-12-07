@@ -16,7 +16,7 @@ import { liveData } from '../../helpers/rx/liveData'
 import { network$ } from '../app/service'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
-import { BalancesRD } from '../clients'
+import { WalletBalancesRD } from '../clients'
 import * as ETH from '../ethereum'
 import * as THOR from '../thorchain'
 import { selectedAsset$ } from './common'
@@ -179,7 +179,7 @@ export const chainBalances$ = Rx.combineLatest([
 ])
 
 // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
-const _ethBalances$: Observable<BalancesRD> = ETH.balances$.pipe(liveData.map((asset) => [asset]))
+const _ethBalances$: Observable<WalletBalancesRD> = ETH.balances$.pipe(liveData.map((asset) => [asset]))
 
 /**
  * Transform a list of BalancesLD

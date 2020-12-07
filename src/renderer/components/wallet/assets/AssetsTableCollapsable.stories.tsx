@@ -33,7 +33,7 @@ const chainBalances: ChainBalances = [
       {
         amount: baseAmount('12200000000'),
         asset: AssetRune67C,
-        wallet: 'Rune wallet'
+        walletAddress: 'Rune wallet'
       }
     ])
   },
@@ -43,7 +43,7 @@ const chainBalances: ChainBalances = [
       {
         amount: baseAmount('1230000'),
         asset: AssetBTC,
-        wallet: 'BTC wallet'
+        walletAddress: 'BTC wallet'
       }
     ])
   },
@@ -53,12 +53,12 @@ const chainBalances: ChainBalances = [
       {
         amount: baseAmount('1000000'),
         asset: AssetBNB,
-        wallet: 'BNB wallet'
+        walletAddress: 'BNB wallet'
       },
       {
         amount: baseAmount('300000000'),
         asset: AssetETH,
-        wallet: 'ETH wallet'
+        walletAddress: 'ETH wallet'
       }
     ])
   }

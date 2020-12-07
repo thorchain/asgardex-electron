@@ -11,7 +11,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { getPoolPriceValue } from '../../../services/binance/utils'
-import { BalancesRD } from '../../../services/clients'
+import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
 import { ChainBalances, ApiError, ChainBalance } from '../../../services/wallet/types'
 import { PricePool } from '../../../views/pools/Pools.types'
@@ -181,7 +181,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderBalances = useCallback(
-    (balancesRD: BalancesRD, index: number, walletAddress: string) =>
+    (balancesRD: WalletBalancesRD, index: number, walletAddress: string) =>
       FP.pipe(
         balancesRD,
         RD.fold(

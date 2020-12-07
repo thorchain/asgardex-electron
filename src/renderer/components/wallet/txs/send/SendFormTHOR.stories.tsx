@@ -16,13 +16,13 @@ import { AddressValidation, SendTxParams } from '../../../../services/binance/ty
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormTHOR } from './index'
 
-const runeAsset: WalletBalance = {
+const runeWalletBalance: WalletBalance = {
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2)),
-  wallet: 'rune wallet'
+  walletAddress: 'rune wallet'
 }
 
-const balances: WalletBalance[] = [runeAsset]
+const balances: WalletBalance[] = [runeWalletBalance]
 
 const fee = O.some(TRANSFER_FEES.single)
 
@@ -38,7 +38,7 @@ const onSubmitHandler = ({ recipient, amount, asset, memo }: SendTxParams) =>
 storiesOf('Wallet/SendFormTHOR', module)
   .add('send', () => (
     <SendFormTHOR
-      balance={runeAsset}
+      balance={runeWalletBalance}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -47,7 +47,7 @@ storiesOf('Wallet/SendFormTHOR', module)
   ))
   .add('pending', () => (
     <SendFormTHOR
-      balance={runeAsset}
+      balance={runeWalletBalance}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -57,7 +57,7 @@ storiesOf('Wallet/SendFormTHOR', module)
   ))
   .add('no fees', () => (
     <SendFormTHOR
-      balance={runeAsset}
+      balance={runeWalletBalance}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}

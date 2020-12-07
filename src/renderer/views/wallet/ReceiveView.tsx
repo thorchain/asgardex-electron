@@ -8,8 +8,8 @@ import { Receive } from '../../components/wallet/txs/receive'
 import { ReceiveParams } from '../../routes/wallet'
 
 export const ReceiveView: React.FC = (): JSX.Element => {
-  const { asset, wallet } = useParams<ReceiveParams>()
+  const { asset, walletAddress } = useParams<ReceiveParams>()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
-  return <Receive address={O.some(wallet)} asset={oSelectedAsset} />
+  return <Receive address={O.some(walletAddress)} asset={oSelectedAsset} />
 }

@@ -24,12 +24,12 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { getBalanceByAsset } from '../../helpers/walletHelper'
+import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/binance/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
-import { NonEmptyBalances } from '../../services/wallet/types'
+import { NonEmptyWalletBalances } from '../../services/wallet/types'
 import { TxStatus, TxTypes } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 import { CurrencyInfo } from '../currency'
@@ -49,7 +49,7 @@ type SwapProps = {
   targetAsset: O.Option<Asset>
   onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
   poolDetails?: PoolDetails
-  assetsWB?: O.Option<NonEmptyBalances>
+  assetsWB?: O.Option<NonEmptyWalletBalances>
   txWithState?: TxWithStateRD
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
@@ -130,7 +130,10 @@ export const Swap = ({
 
   const [changeAmount, setChangeAmount] = useState(bn(0))
 
-  const oAssetWB: O.Option<Balance> = useMemo(() => getBalanceByAsset(assetsWB, sourceAsset), [assetsWB, sourceAsset])
+  const oAssetWB: O.Option<Balance> = useMemo(() => getWalletBalanceByAsset(assetsWB, sourceAsset), [
+    assetsWB,
+    sourceAsset
+  ])
 
   const setChangeAmountFromPercentValue = useCallback(
     (percents) => {

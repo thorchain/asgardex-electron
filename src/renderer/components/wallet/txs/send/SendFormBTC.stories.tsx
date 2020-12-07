@@ -15,13 +15,13 @@ import { SendFormBTC } from './index'
 const bnbAsset: WalletBalance = {
   asset: AssetBTC,
   amount: assetToBase(assetAmount(1.23, BTC_DECIMAL)),
-  wallet: 'bnb wallet'
+  walletAddress: 'bnb wallet'
 }
 
 const runeAsset: WalletBalance = {
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(2, BTC_DECIMAL)),
-  wallet: 'rune wallet'
+  walletAddress: 'rune wallet'
 }
 
 const balances: WalletBalance[] = [bnbAsset, runeAsset]
@@ -53,7 +53,7 @@ const reloadFeesHandler = () => console.log('reload fees')
 storiesOf('Wallet/SendFormBTC', module)
   .add('send', () => (
     <SendFormBTC
-      assetWB={bnbAsset}
+      walletBalance={bnbAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -63,7 +63,7 @@ storiesOf('Wallet/SendFormBTC', module)
   ))
   .add('pending', () => (
     <SendFormBTC
-      assetWB={bnbAsset}
+      walletBalance={bnbAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -74,7 +74,7 @@ storiesOf('Wallet/SendFormBTC', module)
   ))
   .add('loading fees', () => (
     <SendFormBTC
-      assetWB={bnbAsset}
+      walletBalance={bnbAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -84,7 +84,7 @@ storiesOf('Wallet/SendFormBTC', module)
   ))
   .add('failure fees', () => (
     <SendFormBTC
-      assetWB={bnbAsset}
+      walletBalance={bnbAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
@@ -94,7 +94,7 @@ storiesOf('Wallet/SendFormBTC', module)
   ))
   .add('amount < fees', () => (
     <SendFormBTC
-      assetWB={bnbAsset}
+      walletBalance={bnbAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       reloadFeesHandler={reloadFeesHandler}

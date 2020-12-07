@@ -64,55 +64,55 @@ describe('Wallet routes', () => {
 
   describe('asset detail route', () => {
     it('template', () => {
-      expect(assetDetail.template).toEqual('/wallet/assets/detail/:wallet/:asset')
+      expect(assetDetail.template).toEqual('/wallet/assets/detail/:walletAddress/:asset')
     })
     it('returns path by given asset parameter', () => {
-      expect(assetDetail.path({ asset: 'BNB.BNB', wallet: 'walletAddress' })).toEqual(
+      expect(assetDetail.path({ asset: 'BNB.BNB', walletAddress: 'walletAddress' })).toEqual(
         '/wallet/assets/detail/walletAddress/BNB.BNB'
       )
     })
     it('redirects to base path if asset is empty', () => {
-      expect(assetDetail.path({ asset: '', wallet: 'some wallet' })).toEqual(assets.path())
+      expect(assetDetail.path({ asset: '', walletAddress: 'some wallet' })).toEqual(assets.path())
     })
 
     it('redirects to base path if address is empty', () => {
-      expect(assetDetail.path({ asset: 'some asset', wallet: '' })).toEqual(assets.path())
+      expect(assetDetail.path({ asset: 'some asset', walletAddress: '' })).toEqual(assets.path())
     })
   })
 
   describe('receive route', () => {
     it('template', () => {
-      expect(receive.template).toEqual('/wallet/assets/detail/:wallet/:asset/receive')
+      expect(receive.template).toEqual('/wallet/assets/detail/:walletAddress/:asset/receive')
     })
     it('path ', () => {
-      expect(receive.path({ asset: 'BNB.BNB', wallet: 'walletAddress' })).toEqual(
+      expect(receive.path({ asset: 'BNB.BNB', walletAddress: 'walletAddress' })).toEqual(
         '/wallet/assets/detail/walletAddress/BNB.BNB/receive'
       )
     })
     it('redirects to base path if asset is empty', () => {
-      expect(receive.path({ asset: '', wallet: 'some wallet' })).toEqual(assets.path())
+      expect(receive.path({ asset: '', walletAddress: 'some wallet' })).toEqual(assets.path())
     })
 
     it('redirects to base path if address is empty', () => {
-      expect(receive.path({ asset: 'some asset', wallet: '' })).toEqual(assets.path())
+      expect(receive.path({ asset: 'some asset', walletAddress: '' })).toEqual(assets.path())
     })
   })
 
   describe('send route', () => {
     it('template', () => {
-      expect(send.template).toEqual('/wallet/assets/detail/:wallet/:asset/send')
+      expect(send.template).toEqual('/wallet/assets/detail/:walletAddress/:asset/send')
     })
     it('path ', () => {
-      expect(send.path({ asset: 'BNB.BNB', wallet: 'walletAddress' })).toEqual(
+      expect(send.path({ asset: 'BNB.BNB', walletAddress: 'walletAddress' })).toEqual(
         '/wallet/assets/detail/walletAddress/BNB.BNB/send'
       )
     })
     it('redirects to base path if asset is empty', () => {
-      expect(send.path({ asset: '', wallet: 'some wallet' })).toEqual(assets.path())
+      expect(send.path({ asset: '', walletAddress: 'some wallet' })).toEqual(assets.path())
     })
 
     it('redirects to base path if address is empty', () => {
-      expect(send.path({ asset: 'some asset', wallet: '' })).toEqual(assets.path())
+      expect(send.path({ asset: 'some asset', walletAddress: '' })).toEqual(assets.path())
     })
   })
 })

@@ -9,8 +9,8 @@ export const useChangeAssetHandler = () => {
   const history = useHistory()
 
   const handler = useCallback(
-    (asset: Asset, wallet: string) => {
-      const path = walletRoutes.send.path({ asset: assetToString(asset), wallet })
+    (asset: Asset, walletAddress: string) => {
+      const path = walletRoutes.send.path({ asset: assetToString(asset), walletAddress })
       history.push(path)
     },
     [history]

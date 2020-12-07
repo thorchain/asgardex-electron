@@ -157,7 +157,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeAssetHandler} selectedAsset={balance.asset} assets={balances} />
+        <AccountSelector onChange={changeAssetHandler} selectedAsset={balance.asset} walletBalances={balances} />
         <Styled.Form form={form} initialValues={{ amount: bn(0) }} onFinish={onFinishHandler} labelCol={{ span: 24 }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>

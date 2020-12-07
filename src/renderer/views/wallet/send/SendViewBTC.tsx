@@ -11,15 +11,15 @@ import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormBTC } from '../../../components/wallet/txs/send/'
 import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { getBalanceByAsset } from '../../../helpers/walletHelper'
+import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/bitcoin/types'
 import { GetExplorerTxUrl } from '../../../services/clients'
-import { NonEmptyBalances, TxRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, TxRD } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 
 type Props = {
   btcAsset: Asset
-  balances: O.Option<NonEmptyBalances>
+  balances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
   reloadFeesHandler: () => void
 }
@@ -32,7 +32,10 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     getExplorerTxUrl: oGetExplorerTxUrl = O.none
   } = props
 
-  const oBtcAssetWB = useMemo(() => getBalanceByAsset(oBalances, O.some(selectedAsset)), [oBalances, selectedAsset])
+  const oBtcAssetWB = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(selectedAsset)), [
+    oBalances,
+    selectedAsset
+  ])
 
   const { fees$, pushTx, txRD$, client$, resetTx } = useBitcoinContext()
 
@@ -57,7 +60,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
   const sendForm = useCallback(
     (assetWB: WalletBalance) => (
       <SendFormBTC
-        assetWB={assetWB}
+        walletBalance={assetWB}
         onSubmit={pushTx}
         balances={FP.pipe(
           oBalances,

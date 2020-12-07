@@ -4,8 +4,8 @@ import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
-import { NonEmptyBalances } from '../services/wallet/types'
-import { getAssetAmountByAsset, getBnbAmountFromBalances, getBalanceByAsset } from './walletHelper'
+import { NonEmptyWalletBalances } from '../services/wallet/types'
+import { getAssetAmountByAsset, getBnbAmountFromBalances, getWalletBalanceByAsset } from './walletHelper'
 
 describe('walletHelper', () => {
   const RUNE_WB = { amount: baseAmount('12300000000'), asset: ASSETS_TESTNET.RUNE }
@@ -36,19 +36,19 @@ describe('walletHelper', () => {
 
   describe('getAssetWBByAsset', () => {
     it('returns amount of BNB', () => {
-      const balances: O.Option<NonEmptyBalances> = NEA.fromArray([RUNE_WB, BOLT_WB, BNB_WB])
-      const result = O.toNullable(getBalanceByAsset(balances, BNB))
+      const balances: O.Option<NonEmptyWalletBalances> = NEA.fromArray([RUNE_WB, BOLT_WB, BNB_WB])
+      const result = O.toNullable(getWalletBalanceByAsset(balances, BNB))
       expect(result?.asset.symbol).toEqual('BNB')
       expect(result?.amount.amount().toString()).toEqual('45600000000')
     })
     it('returns none if BNB is not available', () => {
-      const balances: O.Option<NonEmptyBalances> = NEA.fromArray([RUNE_WB, BOLT_WB])
-      const result = getBalanceByAsset(balances, BNB)
+      const balances: O.Option<NonEmptyWalletBalances> = NEA.fromArray([RUNE_WB, BOLT_WB])
+      const result = getWalletBalanceByAsset(balances, BNB)
       expect(result).toBeNone()
     })
     it('returns none for empty lists of `AssetWB`', () => {
-      const balances: O.Option<NonEmptyBalances> = NEA.fromArray([])
-      const result = getBalanceByAsset(balances, BNB)
+      const balances: O.Option<NonEmptyWalletBalances> = NEA.fromArray([])
+      const result = getWalletBalanceByAsset(balances, BNB)
       expect(result).toBeNone()
     })
   })

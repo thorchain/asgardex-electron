@@ -11,14 +11,14 @@ storiesOf('Wallet/AccountSelector', module)
     return (
       <AccountSelector
         selectedAsset={ASSETS_MAINNET.BOLT}
-        assets={[ASSETS_MAINNET.BNB, ASSETS_MAINNET.TOMO].map((asset) => ({
+        walletBalances={[ASSETS_MAINNET.BNB, ASSETS_MAINNET.TOMO].map((asset) => ({
           asset,
           amount: assetToBase(assetAmount(1)),
-          wallet: `${assetToString(asset)} wallet`
+          walletAddress: `${assetToString(asset)} wallet`
         }))}
       />
     )
   })
   .add('w/o dropdown', () => {
-    return <AccountSelector selectedAsset={ASSETS_MAINNET.BOLT} assets={[]} />
+    return <AccountSelector selectedAsset={ASSETS_MAINNET.BOLT} walletBalances={[]} />
   })
