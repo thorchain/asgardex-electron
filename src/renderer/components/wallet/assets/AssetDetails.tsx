@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
@@ -26,7 +27,7 @@ type Props = {
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: () => void
   loadTxsHandler?: LoadTxsHandler
-  walletAddress?: string
+  walletAddress?: Address
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
