@@ -1,17 +1,16 @@
 import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRune67C, bn } from '@xchainjs/xchain-util'
+import { Asset, AssetRune67C, AssetRuneNative, bn } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
-import { useObservableState, useSubscription } from 'observable-hooks'
+import { useObservableState } from 'observable-hooks'
 import { map } from 'rxjs/operators'
 
 import { Withdraw } from '../../../components/deposit/withdraw'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
-import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
@@ -32,9 +31,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { withdrawFees$, reloadWithdrawFees, updateWithdrawFeesEffect$ } = useChainContext()
-
-  useSubscription(updateWithdrawFeesEffect$)
+  const { withdrawFees$, reloadWithdrawFees } = useChainContext()
 
   const fees = useObservableState(withdrawFees$, RD.initial)
 
@@ -56,7 +53,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         selectedPricePoolAsset$,
         map((asset) => RD.fromOption(asset, () => Error(''))),
         // In case there is no asset for any reason set basic RUNE asset as alt value
-        map(RD.alt((): RD.RemoteData<Error, Asset> => RD.success(getDefaultRuneAsset())))
+        map(RD.alt((): RD.RemoteData<Error, Asset> => RD.success(AssetRuneNative)))
       ),
     RD.initial
   )
@@ -75,7 +72,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
-        fee={fees}
+        fees={fees}
         assetPrice={ZERO_BN}
         runePrice={runePrice}
         selectedCurrencyAsset={AssetRune67C}
@@ -100,7 +97,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         runeShare={shareHelpers.getRuneShare(deposit, poolDetail)}
         assetShare={shareHelpers.getAssetShare(deposit, poolDetail)}
         depositAsset={depositAsset}
-        fee={fees}
+        fees={fees}
         updateFees={reloadWithdrawFees}
       />
     ),

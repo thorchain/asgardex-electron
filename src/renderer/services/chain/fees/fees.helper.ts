@@ -11,8 +11,6 @@ import * as THOR from '../../thorchain'
  * demand manual updating by triggering their own triggeStrams.
  *
  * @example
- * updateWithdrawFeesEffect$ at ./withdraw.ts
- * @example
  * reloadDepositFeesEffect$ at ./deposit.ts
  */
 export const reloadDepositFeesByChain = (chain: Chain) => {

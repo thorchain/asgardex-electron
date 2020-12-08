@@ -7,10 +7,8 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
-import { BASE_CHAIN_ASSET } from '../../../const'
 import { eqAsset } from '../../../helpers/fp/eq'
-import { WithdrawFeeRD } from '../../../services/chain/types'
-import { Fees } from '../../uielements/fees'
+import { WithdrawFeesRD } from '../../../services/chain/types'
 import { Label } from '../../uielements/label'
 import { ReloadButton } from '../../uielements/reloadButton'
 import { getWithdrawAmounts } from './Withdraw.helper'
@@ -26,7 +24,7 @@ type Props = {
   runeShare: BaseAmount
   assetShare: BaseAmount
   disabled?: boolean
-  fee: WithdrawFeeRD
+  fees: WithdrawFeesRD
 }
 
 export const Withdraw: React.FC<Props> = ({
@@ -38,7 +36,7 @@ export const Withdraw: React.FC<Props> = ({
   runeShare,
   assetShare,
   disabled: disabledProp,
-  fee,
+  fees,
   updateFees
 }) => {
   const intl = useIntl()
@@ -50,15 +48,17 @@ export const Withdraw: React.FC<Props> = ({
   const renderFee = useMemo(
     () => [
       FP.pipe(
-        fee,
-        RD.map((fee) => ({
-          asset: BASE_CHAIN_ASSET,
-          amount: fee
-        })),
-        (feesRd) => <Fees fees={[feesRd]} />
+        fees,
+        RD.fold(
+          () => '...',
+          () => '...',
+          (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
+          ({ thorMemo, assetOut, thorOut }) =>
+            `thorMemo: ${thorMemo.amount()} + assetFee: ${assetOut.amount()} + thorOut: ${thorOut.amount()} +`
+        )
       )
     ],
-    [fee]
+    [fees, intl]
   )
 
   return (
@@ -114,9 +114,9 @@ export const Withdraw: React.FC<Props> = ({
         </Styled.OutputLabel>
       </Styled.AssetContainer>
 
-      <Label disabled={RD.isPending(fee)}>
+      <Label disabled={RD.isPending(fees)}>
         <Row align="middle">
-          <ReloadButton onClick={updateFees} disabled={RD.isPending(fee)} />
+          <ReloadButton onClick={updateFees} disabled={RD.isPending(fees)} />
           {renderFee}
         </Row>
       </Label>

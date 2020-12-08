@@ -10,7 +10,7 @@ import { Withdraw } from './Withdraw'
 export const WithdrawStory: React.FC<{ stakedAsset?: Asset; runeAsset?: Asset }> = (props) => {
   return (
     <Withdraw
-      fee={RD.initial}
+      fees={RD.initial}
       depositAsset={AssetBNB}
       runeAsset={AssetRune67C}
       assetPrice={bn(60.972)}
