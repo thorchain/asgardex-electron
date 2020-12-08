@@ -1,6 +1,6 @@
-import { ledger, crypto } from '@binance-chain/javascript-sdk'
-import LedgerApp from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
-import AppBtc from '@ledgerhq/hw-app-btc'
+import { crypto } from '@binance-chain/javascript-sdk'
+import LedgerAppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
+import LedgerAppBTC from '@ledgerhq/hw-app-btc'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { LedgerTxInfo } from '@xchainjs/xchain-bitcoin/lib/utils'
 import { Chain } from '@xchainjs/xchain-util'
@@ -34,8 +34,8 @@ const getErrorId = (message: string, statusText: string): LedgerErrorId => {
 const getBTCAddress = async (network: Network) => {
   try {
     const transport = await TransportNodeHid.open('')
-    const appBtc = new AppBtc(transport)
-    const info = await appBtc.getWalletPublicKey(
+    const ledgerApp = new LedgerAppBTC(transport)
+    const info = await ledgerApp.getWalletPublicKey(
       network === 'testnet' ? LEDGER.BTC_DERIVE_PATH.TESTNET : LEDGER.BTC_DERIVE_PATH.MAINNET,
       { format: 'bech32' }
     )
@@ -49,12 +49,9 @@ const getBTCAddress = async (network: Network) => {
 
 const getBNBAddress = async (network: Network) => {
   try {
-    const timeout = 50000
-    const transport = await ledger.transports.node.create(timeout)
-    const app: LedgerApp = new ledger.app(transport, 100000, 100000)
-    const hdPath = [44, 714, 0, 0, 0]
-    // get public key
-    const { pk } = await app.getPublicKey(hdPath)
+    const transport = await TransportNodeHid.open('')
+    const ledgerApp = new LedgerAppBNB(transport)
+    const { pk } = await ledgerApp.getPublicKey(LEDGER.BNB_DERIVE_PATH_ARRAY)
     await transport.close()
     if (pk) {
       // get address from pubkey
@@ -82,16 +79,16 @@ export const getLedgerAddress = (chain: Chain, network: Network) => {
 const signBtcTxInLedger = async (network: Network, ledgerTx: LedgerTxInfo) => {
   try {
     const transport = await TransportNodeHid.open('')
-    const appBtc = new AppBtc(transport)
+    const ledgerApp = new LedgerAppBTC(transport)
     const txs = ledgerTx.utxos.map((utxo) => {
       return {
-        tx: appBtc.splitTransaction(utxo.txHex, true),
+        tx: ledgerApp.splitTransaction(utxo.txHex, true),
         ...utxo
       }
     })
-    const newTx = appBtc.splitTransaction(ledgerTx.newTxHex, true)
-    const outputScriptHex = appBtc.serializeTransactionOutputs(newTx).toString('hex')
-    const txHex = await appBtc.createPaymentTransactionNew({
+    const newTx = ledgerApp.splitTransaction(ledgerTx.newTxHex, true)
+    const outputScriptHex = ledgerApp.serializeTransactionOutputs(newTx).toString('hex')
+    const txHex = await ledgerApp.createPaymentTransactionNew({
       inputs: txs.map((utxo) => {
         return [utxo.tx, utxo.index, null, null]
       }),

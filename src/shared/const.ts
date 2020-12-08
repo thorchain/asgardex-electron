@@ -17,5 +17,6 @@ export const LEDGER = {
   BTC_DERIVE_PATH: {
     MAINNET: "84'/0'/0'/0/0",
     TESTNET: "84'/1'/0'/0/0"
-  }
+  },
+  BNB_DERIVE_PATH_ARRAY: [44, 714, 0, 0, 0]
 }
