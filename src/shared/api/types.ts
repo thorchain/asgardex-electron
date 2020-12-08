@@ -1,3 +1,4 @@
+import { LedgerTxInfo } from '@xchainjs/xchain-bitcoin/lib/utils'
 import { Address } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
@@ -33,6 +34,7 @@ export enum LedgerErrorId {
 
 export type ApiHDWallet = {
   getLedgerAddress: (chain: Chain, network: Network) => Promise<Either<LedgerErrorId, Address>>
+  signTxInLedger: (chain: Chain, network: Network, ledgerTx: LedgerTxInfo) => Promise<Either<LedgerErrorId, string>>
 }
 
 declare global {

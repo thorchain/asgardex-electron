@@ -14,6 +14,8 @@ export enum ExternalUrl {
 export const LEDGER = {
   // Ledger now uses bip44 derivation path
   // For more details, please check - https://ledger.readthedocs.io/en/latest/background/hd_use_cases.html
-  GET_BTC_MAINNET_ADDRESS: "173'/0'/0'/0/0",
-  GET_BTC_TESTNET_ADDRESS: "173'/1'/0'/0/0"
+  BTC_DERIVE_PATH: {
+    MAINNET: "84'/0'/0'/0/0",
+    TESTNET: "84'/1'/0'/0/0"
+  }
 }

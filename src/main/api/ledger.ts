@@ -2,6 +2,7 @@ import { ledger, crypto } from '@binance-chain/javascript-sdk'
 import LedgerApp from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import AppBtc from '@ledgerhq/hw-app-btc'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
+import { LedgerTxInfo } from '@xchainjs/xchain-bitcoin/lib/utils'
 import { Chain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
@@ -34,13 +35,12 @@ const getBTCAddress = async (network: Network) => {
   try {
     const transport = await TransportNodeHid.open('')
     const appBtc = new AppBtc(transport)
-    let info
-    if (network === 'testnet') {
-      info = await appBtc.getWalletPublicKey(LEDGER.GET_BTC_TESTNET_ADDRESS, { format: 'bech32' })
-    } else {
-      info = await appBtc.getWalletPublicKey(LEDGER.GET_BTC_MAINNET_ADDRESS, { format: 'bech32' })
-    }
+    const info = await appBtc.getWalletPublicKey(
+      network === 'testnet' ? LEDGER.BTC_DERIVE_PATH.TESTNET : LEDGER.BTC_DERIVE_PATH.MAINNET,
+      { format: 'bech32' }
+    )
     await transport.close()
+
     return E.right(info.bitcoinAddress)
   } catch (error) {
     return E.left(getErrorId(error.message, error.statusText))
@@ -74,6 +74,48 @@ export const getLedgerAddress = (chain: Chain, network: Network) => {
       return getBNBAddress(network)
     case 'BTC':
       return getBTCAddress(network)
+    default:
+      break
+  }
+}
+
+const signBtcTxInLedger = async (network: Network, ledgerTx: LedgerTxInfo) => {
+  try {
+    const transport = await TransportNodeHid.open('')
+    const appBtc = new AppBtc(transport)
+    const txs = ledgerTx.utxos.map((utxo) => {
+      return {
+        tx: appBtc.splitTransaction(utxo.txHex, true),
+        ...utxo
+      }
+    })
+    const newTx = appBtc.splitTransaction(ledgerTx.newTxHex, true)
+    const outputScriptHex = appBtc.serializeTransactionOutputs(newTx).toString('hex')
+    const txHex = await appBtc.createPaymentTransactionNew({
+      inputs: txs.map((utxo) => {
+        return [utxo.tx, utxo.index, null, null]
+      }),
+      associatedKeysets: txs.map((_) =>
+        network === 'testnet' ? LEDGER.BTC_DERIVE_PATH.TESTNET : LEDGER.BTC_DERIVE_PATH.MAINNET
+      ),
+      outputScriptHex,
+      segwit: true,
+      additionals: ['bitcoin', 'bech32']
+    })
+    await transport.close()
+
+    return E.right(txHex)
+  } catch (error) {
+    return E.left(getErrorId(error.message, error.statusText))
+  }
+}
+
+export const signTxInLedger = (chain: Chain, network: Network, ledgerTx: LedgerTxInfo) => {
+  switch (chain) {
+    case 'BNB':
+      break
+    case 'BTC':
+      return signBtcTxInLedger(network, ledgerTx)
     default:
       break
   }
