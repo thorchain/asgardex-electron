@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { XChainClient } from '@xchainjs/xchain-client'
+import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
+import * as Either from 'fp-ts/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
@@ -28,9 +29,7 @@ export const createLedgerService = (): LedgerService => ({
   removeLedgerAddress: () => setLedgerAddressRD(RD.initial)
 })
 
-export const createLedgerTransferService = <Client extends XChainClient, T extends XChainClient$<Client>>(
-  client$: T
-) => {
+export const createLedgerTransferService = (client$: XChainClient$<BitcoinClient>) => {
   const { get$: ledgerTxRD$, set: setLedgerTxRD } = observableState<TxRD>(RD.initial)
 
   /**
@@ -45,14 +44,23 @@ export const createLedgerTransferService = <Client extends XChainClient, T exten
    * @example BTC client has extended TxParams interface
    * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-bitcoin/src/client.ts#L396
    */
-  type TransferParams = Parameters<Client['transfer']>[0]
+  type TransferParams = Parameters<BitcoinClient['createTxForLedger']>[0]
 
-  const ledgerTx$ = (params: TransferParams): TxLD =>
+  const ledgerTx$ = (params: TransferParams, network: Network): TxLD =>
     client$.pipe(
       RxOp.switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
-      RxOp.switchMap((client) => Rx.from(client.transfer(params))),
-      RxOp.map(RD.success),
-      RxOp.catchError(
+      RxOp.switchMap(async (client) => {
+        const ledgerTxInfo = await client.createTxForLedger(params)
+        const signResult = await window.apiHDWallet.signTxInLedger('BTC', network, ledgerTxInfo)
+        if (Either.isRight(signResult)) {
+          return await client.broadcastTx(signResult.right)
+        } else {
+          throw new Error('Ledger Error')
+        }
+      }),
+      map(RD.success),
+      startWith(RD.pending),
+      catchError(
         (e): TxLD =>
           Rx.of(
             RD.failure({
@@ -60,11 +68,11 @@ export const createLedgerTransferService = <Client extends XChainClient, T exten
               errorId: ErrorId.SEND_TX
             })
           )
-      ),
-      RxOp.startWith(RD.pending)
+      )
     )
 
-  const pushLedgerTx = (params: TransferParams): Rx.Subscription => ledgerTx$(params).subscribe(setLedgerTxRD)
+  const pushLedgerTx = (params: TransferParams, network: Network): Rx.Subscription =>
+    ledgerTx$(params, network).subscribe(setLedgerTxRD)
 
   return {
     ledgerTxRD$,
