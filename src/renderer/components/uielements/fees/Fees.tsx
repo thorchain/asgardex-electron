@@ -8,6 +8,7 @@ import { useIntl } from 'react-intl'
 
 import { sequenceTRDFromArray } from '../../../helpers/fpHelpers'
 import { formatFee } from './Fees.helper'
+import * as Styled from './Fees.styles'
 
 type Fee = {
   amount: BaseAmount
@@ -16,9 +17,10 @@ type Fee = {
 
 type Props = {
   fees: RD.RemoteData<Error, Fee>[]
+  reloadFees?: () => void
 }
 
-export const Fees: React.FC<Props> = ({ fees }) => {
+export const Fees: React.FC<Props> = ({ fees, reloadFees }) => {
   const intl = useIntl()
 
   const feesFormattedValue = useMemo(
@@ -43,8 +45,16 @@ export const Fees: React.FC<Props> = ({ fees }) => {
   )
 
   return (
-    <>
+    <Styled.Container>
+      {reloadFees && (
+        <Styled.ReloadFeeButton
+          onClick={(e) => {
+            e.preventDefault()
+            reloadFees()
+          }}
+        />
+      )}
       {intl.formatMessage({ id: fees.length > 1 ? 'common.fees' : 'common.fee' })}: {feesFormattedValue}
-    </>
+    </Styled.Container>
   )
 }

@@ -1,8 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Client } from '@xchainjs/xchain-thorchain'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { map, shareReplay, startWith, switchMap } from 'rxjs/operators'
+import { catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 
 import { triggerStream } from '../../helpers/stateHelper'
 import { FeesLD } from '../clients'
@@ -21,13 +22,16 @@ const fees$: (client: Client$) => FeesLD = (client$) =>
       FP.pipe(
         // client and asset has to be available
         oClient,
+        O.alt(() => O.some(new Client({}))),
         O.fold(
           () => Rx.EMPTY,
           (client) => Rx.from(client.getFees())
-        )
+        ),
+        map(RD.success),
+        startWith(RD.pending),
+        catchError((_) => Rx.of(RD.failure(Error('Error to load fees for THOR chain'))))
       )
     ),
-    map(RD.success),
     startWith(RD.initial),
     shareReplay(1)
   )

@@ -27,6 +27,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/binance/types'
+import { ChainFeeRD } from '../../services/chain/types'
 import { NativeFeeRD, PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { NonEmptyWalletBalances } from '../../services/wallet/types'
@@ -36,7 +37,7 @@ import { CurrencyInfo } from '../currency'
 import { SwapModal } from '../modal/swap'
 import { CalcResult } from '../modal/swap/SwapModal.types'
 import { AssetSelect } from '../uielements/assets/assetSelect'
-import { Drag } from '../uielements/drag'
+import { Fees } from '../uielements/fees'
 import { Modal } from '../uielements/modal'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
@@ -51,12 +52,15 @@ type SwapProps = {
   poolDetails?: PoolDetails
   walletBalances?: O.Option<NonEmptyWalletBalances>
   nativeTxFee: NativeFeeRD
+  targetChainFee?: ChainFeeRD
+  sourceChainFee?: ChainFeeRD
   txWithState?: TxWithStateRD
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
   runeAsset: Asset
   activePricePool: PricePool
   PasswordConfirmation: React.FC<{ onSuccess: () => void; onClose: () => void }>
+  reloadFees?: () => void
 }
 
 export const Swap = ({
@@ -67,12 +71,15 @@ export const Swap = ({
   poolDetails = [],
   walletBalances = O.none,
   nativeTxFee,
+  targetChainFee = RD.initial,
+  sourceChainFee = RD.initial,
   txWithState = RD.initial,
   goToTransaction,
   resetTx,
   runeAsset,
   activePricePool,
-  PasswordConfirmation
+  PasswordConfirmation,
+  reloadFees
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
@@ -390,6 +397,16 @@ export const Swap = ({
     )
   }, [assetsToSwap, onConfirmSwap, changeAmount, closePrivateModal])
 
+  const chainFess = useMemo(() => [sourceChainFee, targetChainFee], [sourceChainFee, targetChainFee])
+
+  const fees = useMemo(
+    () =>
+      chainFess
+        .map(RD.map((fee) => ({ asset: fee.chainAsset, amount: fee.amount })))
+        .filter((fee) => !RD.isFailure(fee)),
+    [chainFess]
+  )
+
   return (
     <Styled.Container>
       {showPrivateModal && (
@@ -456,7 +473,7 @@ export const Swap = ({
           O.fold(
             () => <></>,
             ([source, target]) => (
-              <Drag
+              <Styled.Drag
                 disabled={isSwapDisabled}
                 onConfirm={onSwapConfirmed}
                 title={intl.formatMessage({ id: 'swap.drag' })}
@@ -468,7 +485,7 @@ export const Swap = ({
         )}
         {/* TODO (@thatThorchainGuy|@Veado): Get fee from service  */}
         {/* see: https://github.com/thorchain/asgardex-electron/issues/652  */}
-        <div>fee: 0.000375 + 1 RUNE</div>
+        <Fees fees={fees} reloadFees={reloadFees} />
       </Styled.SubmitContainer>
     </Styled.Container>
   )

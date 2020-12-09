@@ -17,6 +17,14 @@ export type FeeLD = LiveData<Error, BaseAmount>
 export type FeesRD = RD.RemoteData<Error, Fees>
 export type FeesLD = LiveData<Error, Fees>
 
+export type ChainFee = {
+  chainAsset: Asset
+  amount: BaseAmount
+}
+
+export type ChainFeeRD = RD.RemoteData<Error, ChainFee>
+export type ChainFeeLD = LiveData<Error, ChainFee>
+
 export type Memo = string
 export type MemoRx = Rx.Observable<O.Option<Memo>>
 

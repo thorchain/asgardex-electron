@@ -38,6 +38,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
     mergeMap(([oClient, _]) =>
       FP.pipe(
         oClient,
+        O.alt(() => O.some(new BitcoinClient({}))),
         O.fold(() => Rx.of(RD.initial), loadFees$)
       )
     ),

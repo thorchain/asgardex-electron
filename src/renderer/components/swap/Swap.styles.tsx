@@ -4,6 +4,7 @@ import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
+import { Drag as BaseDrag } from '../uielements/drag'
 
 export const Container = styled('div')`
   display: flex;
@@ -137,4 +138,8 @@ export const AssetInput = styled(AssetInputBase)`
   & .ant-input {
     border: none;
   }
+`
+
+export const Drag = styled(BaseDrag)`
+  margin-bottom: 10px;
 `
