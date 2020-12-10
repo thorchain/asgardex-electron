@@ -9,7 +9,7 @@ const { fees$, reloadFees, poolFee$, memoFees$, getPoolFeeRate, reloadDepositFee
   client$
 )
 const { ledgerAddress$, retrieveLedgerAddress, removeLedgerAddress } = createLedgerService()
-const { pushLedgerTx, ledgerTxRD$, resetLedgerTx } = createLedgerTransferService(client$)
+const { pushLedgerTx, ledgerTxRD$, resetLedgerTx } = createLedgerTransferService()
 
 export {
   client$,

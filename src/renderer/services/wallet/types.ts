@@ -62,7 +62,8 @@ export type LoadBalancesHandler = () => void
 export enum ErrorId {
   GET_BALANCES,
   GET_ASSET_TXS,
-  SEND_TX
+  SEND_TX,
+  SEND_LEDGER_TX
 }
 
 // TODO(@Veado) Move type to clients/type
@@ -72,11 +73,19 @@ export type ApiError = {
   msg: string
 }
 
+export type LedgerApiError = {
+  ledgerErrorId?: LedgerErrorId
+  errorId: ErrorId
+  msg: string
+}
+
 export type NonEmptyApiErrors = NonEmptyArray<ApiError>
 
 /* RD/LD for sending transactions on different chains */
 export type TxRD = RD.RemoteData<ApiError, string>
 export type TxLD = LiveData<ApiError, string>
+export type LedgerTxRD = RD.RemoteData<LedgerApiError, string>
+export type LedgerTxLD = LiveData<LedgerApiError, string>
 
 export type LedgerAddressRD = RD.RemoteData<LedgerErrorId, Address>
 export type LedgerAddressLD = LiveData<LedgerErrorId, Address>
