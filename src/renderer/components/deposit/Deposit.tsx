@@ -21,7 +21,7 @@ type Props = {
   asset: Asset
   ShareContent: React.ComponentType<{ asset: Asset }>
   DepositContent: React.ComponentType<{ asset: Asset; type: DepositType }>
-  WidthdrawContent: React.ComponentType<{ depositAsset: Asset }>
+  WidthdrawContent: React.ComponentType<{ asset: Asset }>
   keystoreState: KeystoreState
 }
 
@@ -47,7 +47,7 @@ export const Deposit: React.FC<Props> = (props) => {
       {
         key: 'withdraw',
         label: intl.formatMessage({ id: 'deposit.withdraw' }),
-        content: <WidthdrawContent depositAsset={asset} />
+        content: <WidthdrawContent asset={asset} />
       }
     ],
     [intl, asset, DepositContent, WidthdrawContent]

@@ -11,11 +11,11 @@ import * as RxOp from 'rxjs/operators'
 
 import { AddDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
-import { BASE_CHAIN_ASSET, ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
-import { isBaseChainAsset } from '../../../helpers/chainHelper'
+import { getChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
@@ -99,14 +99,12 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
 
   const chainAssetBalance: O.Option<BaseAmount> = useMemo(
     () =>
-      isBaseChainAsset(asset)
-        ? assetBalance
-        : FP.pipe(
-            balances,
-            O.chain(getBalanceByAsset(BASE_CHAIN_ASSET)),
-            O.map(({ amount }) => amount)
-          ),
-    [asset, assetBalance, balances]
+      FP.pipe(
+        balances,
+        O.chain(getBalanceByAsset(getChainAsset(asset.chain))),
+        O.map(({ amount }) => amount)
+      ),
+    [asset, balances]
   )
 
   const symDepositTxMemo: O.Option<SymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)

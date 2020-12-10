@@ -43,3 +43,11 @@ export const OutputLabel = styled(UILabel).attrs({
 })`
   padding-left: 10px;
 `
+
+export const FeeErrorLabel = styled(UILabel).attrs({
+  color: 'error',
+  textTransform: 'uppercase'
+})`
+  font-family: 'MainFontRegular';
+  padding: 0;
+`
