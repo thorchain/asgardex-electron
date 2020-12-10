@@ -5,6 +5,7 @@ import { palette } from 'styled-theme'
 import { media } from '../../helpers/styleHelper'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 import { Drag as BaseDrag } from '../uielements/drag'
+import { Label as UILabel } from '../uielements/label'
 
 export const Container = styled('div')`
   display: flex;
@@ -74,6 +75,7 @@ export const ValueItemContainer = styled('div')`
   flex-direction: column;
   align-items: center;
   width: 100%;
+  position: relative;
 
   &.valueItemContainer {
     &-out {
@@ -81,7 +83,7 @@ export const ValueItemContainer = styled('div')`
     }
 
     &-percent {
-      margin-bottom: 50px;
+      padding-bottom: 50px;
     }
   }
 
@@ -134,7 +136,9 @@ export const PendingContainer = styled('div')`
   }
 `
 
-export const AssetInput = styled(AssetInputBase)`
+export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
+  border-color: ${({ hasError }) => (hasError ? palette('error', 0) : palette('primary', 0))};
+
   & .ant-input {
     border: none;
   }
@@ -142,4 +146,22 @@ export const AssetInput = styled(AssetInputBase)`
 
 export const Drag = styled(BaseDrag)`
   margin-bottom: 10px;
+`
+
+export const ErrorLabel = styled(UILabel)`
+  margin-bottom: 14px;
+  font-family: 'MainFontRegular';
+  text-transform: uppercase;
+  color: ${palette('error', 0)};
+  text-align: center;
+`
+
+export const BalanceErrorLabel = styled(ErrorLabel)`
+  text-align: center;
+
+  ${media.md`
+    text-align: left;
+    position: absolute;
+    bottom: 0;
+  `}
 `

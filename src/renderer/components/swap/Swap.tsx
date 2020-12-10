@@ -469,7 +469,9 @@ export const Swap = ({
       O.getOrElse(() => '')
     )
 
-    return <div>left balance for {sourceChainAsset} should cover the fees</div>
+    return (
+      <Styled.BalanceErrorLabel>left balance for {sourceChainAsset} should cover the fees</Styled.BalanceErrorLabel>
+    )
   }, [sourceChainBalanceError, sourceAsset])
 
   const targetChainBalanceError = useMemo(
@@ -505,7 +507,7 @@ export const Swap = ({
       O.getOrElse(() => '')
     )
 
-    return <div>balance for {targetChainAsset} should cover the fees</div>
+    return <Styled.ErrorLabel>balance for {targetChainAsset} should cover the fees</Styled.ErrorLabel>
   }, [targetChainBalanceError, targetAsset])
 
   const fees = useMemo(() => chainFees.map(RD.map((fee) => ({ asset: fee.chainAsset, amount: fee.amount }))), [
@@ -546,6 +548,7 @@ export const Swap = ({
               label={balanceLabel}
               onChange={setChangeAmount}
               amount={changeAmount}
+              hasError={sourceChainBalanceError}
             />
             {FP.pipe(
               sourceAsset,
@@ -559,8 +562,8 @@ export const Swap = ({
           <Styled.ValueItemContainer className={'valueItemContainer-percent'}>
             <Styled.SliderContainer>{slider}</Styled.SliderContainer>
             <Styled.SwapOutlined disabled={!canSwitchAssets} onClick={onSwitchAssets} />
+            {sourceChainErrorLabel}
           </Styled.ValueItemContainer>
-
           <Styled.ValueItemContainer className={'valueItemContainer-in'}>
             <Styled.InValue>
               <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}:</Styled.InValueTitle>
@@ -594,7 +597,6 @@ export const Swap = ({
           )
         )}
         <Fees fees={fees} reloadFees={reloadFees} />
-        {sourceChainErrorLabel}
         {targetChainErrorLabel}
       </Styled.SubmitContainer>
     </Styled.Container>
