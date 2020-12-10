@@ -13,7 +13,9 @@ import {
   getValueOfAsset1InAsset2,
   PoolData,
   baseToAsset,
-  getSwapMemo
+  getSwapMemo,
+  BaseAmount,
+  baseAmount
 } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import { eqString } from 'fp-ts/Eq'
@@ -23,7 +25,10 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 
-import { sequenceTOption } from '../../helpers/fpHelpers'
+import { ZERO_BN } from '../../const'
+import { getChainAsset } from '../../helpers/chainHelper'
+import { eqAsset } from '../../helpers/fp/eq'
+import { sequenceTOption, sequenceTRDFromArray } from '../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/binance/types'
@@ -258,11 +263,6 @@ export const Swap = ({
 
   const [showPrivateModal, setShowPrivateModal] = useState(false)
 
-  const isSwapDisabled = useMemo(() => changeAmount.eq(0) || FP.pipe(walletBalances, O.isNone), [
-    walletBalances,
-    changeAmount
-  ])
-
   const onSwapConfirmed = useCallback(() => {
     setShowPrivateModal(true)
   }, [setShowPrivateModal])
@@ -397,14 +397,124 @@ export const Swap = ({
     )
   }, [assetsToSwap, onConfirmSwap, changeAmount, closePrivateModal])
 
-  const chainFess = useMemo(() => [sourceChainFee, targetChainFee], [sourceChainFee, targetChainFee])
+  const chainFees = useMemo(() => [sourceChainFee, targetChainFee].filter((fee) => !RD.isFailure(fee)), [
+    sourceChainFee,
+    targetChainFee
+  ])
 
-  const fees = useMemo(
+  // Need to collect all fees based on chain to compare it to final balance
+  const oFeesByChainHashMap = useMemo(
     () =>
-      chainFess
-        .map(RD.map((fee) => ({ asset: fee.chainAsset, amount: fee.amount })))
-        .filter((fee) => !RD.isFailure(fee)),
-    [chainFess]
+      FP.pipe(
+        sequenceTRDFromArray(chainFees),
+        RD.map(
+          A.reduce({}, (acc: Record<string, BaseAmount>, cur) => {
+            const keyByAsset = assetToString(cur.chainAsset)
+            const previousFee = acc[keyByAsset]?.amount() || ZERO_BN
+            acc[keyByAsset] = baseAmount(previousFee.plus(cur.amount.amount()))
+            return acc
+          })
+        ),
+        RD.toOption
+      ),
+    [chainFees]
+  )
+
+  const isDifferentCains = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(sourceAsset, targetAsset),
+        O.chain(([source, target]) => (source.chain !== target.chain ? O.some(true) : O.none))
+      ),
+    [sourceAsset, targetAsset]
+  )
+
+  const sourceChainBalanceError = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(sourceAsset, walletBalances),
+        O.map(([sourceAsset, walletBalances]) => {
+          const balanceMinusAmount = FP.pipe(
+            walletBalances,
+            A.findFirst((walletBalance) => eqAsset.equals(walletBalance.asset, sourceAsset)),
+            O.map((sourceBalance) => baseToAsset(sourceBalance.amount).amount().minus(changeAmount)),
+            O.map(FP.flow(assetAmount, assetToBase))
+          )
+
+          return FP.pipe(
+            sequenceTOption(balanceMinusAmount, oFeesByChainHashMap),
+            O.map(([leftBalance, fees]) => {
+              const sourceChainAssetString = assetToString(getChainAsset(sourceAsset.chain))
+              const sourceChainFeeAmount = fees[sourceChainAssetString]?.amount() || ZERO_BN
+
+              return leftBalance.amount().minus(sourceChainFeeAmount)
+            }),
+            O.map((result) => result.isNegative()),
+            O.getOrElse(() => false)
+          )
+        }),
+        O.getOrElse(() => false)
+      ),
+    [changeAmount, sourceAsset, walletBalances, oFeesByChainHashMap]
+  )
+
+  const sourceChainErrorLabel = useMemo(() => {
+    if (!sourceChainBalanceError) {
+      return <></>
+    }
+    const sourceChainAsset = FP.pipe(
+      sourceAsset,
+      O.map(({ chain }) => getChainAsset(chain)),
+      O.map((asset) => asset.symbol),
+      O.getOrElse(() => '')
+    )
+
+    return <div>left balance for {sourceChainAsset} should cover the fees</div>
+  }, [sourceChainBalanceError, sourceAsset])
+
+  const targetChainBalanceError = useMemo(
+    () =>
+      FP.pipe(
+        // Dont need to calculate in case of same chain.
+        // In this case we aclready included it in sourceChainFee
+        sequenceTOption(targetAsset, walletBalances, oFeesByChainHashMap, isDifferentCains),
+        O.chain(([targetAsset, walletBalances, feesByChainHashMap]) => {
+          return FP.pipe(
+            walletBalances,
+            A.findFirst((walletBalance) => eqAsset.equals(walletBalance.asset, targetAsset)),
+            O.map((targetBalance) => {
+              const targetChainAsset = getChainAsset(targetAsset.chain)
+              const feeAmount = feesByChainHashMap[assetToString(targetChainAsset)]?.amount() || ZERO_BN
+              return targetBalance.amount.amount().minus(feeAmount).isNegative()
+            })
+          )
+        }),
+        O.getOrElse(() => false)
+      ),
+    [targetAsset, isDifferentCains, walletBalances, oFeesByChainHashMap]
+  )
+
+  const targetChainErrorLabel = useMemo(() => {
+    if (!targetChainBalanceError) {
+      return <></>
+    }
+    const targetChainAsset = FP.pipe(
+      targetAsset,
+      O.map(({ chain }) => getChainAsset(chain)),
+      O.map((asset) => asset.symbol),
+      O.getOrElse(() => '')
+    )
+
+    return <div>balance for {targetChainAsset} should cover the fees</div>
+  }, [targetChainBalanceError, targetAsset])
+
+  const fees = useMemo(() => chainFees.map(RD.map((fee) => ({ asset: fee.chainAsset, amount: fee.amount }))), [
+    chainFees
+  ])
+
+  const isSwapDisabled = useMemo(
+    () => changeAmount.eq(0) || FP.pipe(walletBalances, O.isNone) || targetChainBalanceError || sourceChainBalanceError,
+    [walletBalances, changeAmount, targetChainBalanceError, sourceChainBalanceError]
   )
 
   return (
@@ -483,9 +593,9 @@ export const Swap = ({
             )
           )
         )}
-        {/* TODO (@thatThorchainGuy|@Veado): Get fee from service  */}
-        {/* see: https://github.com/thorchain/asgardex-electron/issues/652  */}
         <Fees fees={fees} reloadFees={reloadFees} />
+        {sourceChainErrorLabel}
+        {targetChainErrorLabel}
       </Styled.SubmitContainer>
     </Styled.Container>
   )
