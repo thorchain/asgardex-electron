@@ -434,10 +434,18 @@ export const Swap = ({
       FP.pipe(
         sequenceTOption(sourceAsset, walletBalances),
         O.map(([sourceAsset, walletBalances]) => {
+          // If sourceAsset is the same as source chain
+          // we should subtract changeAmount
+          const shouldSubtractChangeAmount = eqAsset.equals(sourceAsset, getChainAsset(sourceAsset.chain))
+
           const balanceMinusAmount = FP.pipe(
             walletBalances,
             A.findFirst((walletBalance) => eqAsset.equals(walletBalance.asset, sourceAsset)),
-            O.map((sourceBalance) => baseToAsset(sourceBalance.amount).amount().minus(changeAmount)),
+            O.map((sourceBalance) =>
+              baseToAsset(sourceBalance.amount)
+                .amount()
+                .minus(shouldSubtractChangeAmount ? changeAmount : ZERO_BN)
+            ),
             O.map(FP.flow(assetAmount, assetToBase))
           )
 
@@ -470,9 +478,11 @@ export const Swap = ({
     )
 
     return (
-      <Styled.BalanceErrorLabel>left balance for {sourceChainAsset} should cover the fees</Styled.BalanceErrorLabel>
+      <Styled.BalanceErrorLabel>
+        {intl.formatMessage({ id: 'swap.errors.amount.balanceShouldCoverChainFee' }, { asset: sourceChainAsset })}{' '}
+      </Styled.BalanceErrorLabel>
     )
-  }, [sourceChainBalanceError, sourceAsset])
+  }, [sourceChainBalanceError, sourceAsset, intl])
 
   const targetChainBalanceError = useMemo(
     () =>
@@ -507,8 +517,12 @@ export const Swap = ({
       O.getOrElse(() => '')
     )
 
-    return <Styled.ErrorLabel>balance for {targetChainAsset} should cover the fees</Styled.ErrorLabel>
-  }, [targetChainBalanceError, targetAsset])
+    return (
+      <Styled.ErrorLabel>
+        {intl.formatMessage({ id: 'swap.errors.amount.balanceShouldCoverChainFee' }, { asset: targetChainAsset })}{' '}
+      </Styled.ErrorLabel>
+    )
+  }, [targetChainBalanceError, targetAsset, intl])
 
   const fees = useMemo(() => chainFees.map(RD.map((fee) => ({ asset: fee.chainAsset, amount: fee.amount }))), [
     chainFees
