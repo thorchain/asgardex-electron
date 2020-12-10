@@ -10,7 +10,7 @@ import { sequenceTRDFromArray } from '../../../helpers/fpHelpers'
 import { formatFee } from './Fees.helper'
 import * as Styled from './Fees.styles'
 
-type Fee = {
+export type Fee = {
   amount: BaseAmount
   asset: Asset
 }

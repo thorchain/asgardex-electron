@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Balance } from '@xchainjs/xchain-client'
@@ -13,9 +13,7 @@ import {
   getValueOfAsset1InAsset2,
   PoolData,
   baseToAsset,
-  getSwapMemo,
-  BaseAmount,
-  baseAmount
+  getSwapMemo
 } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import { eqString } from 'fp-ts/Eq'
@@ -28,12 +26,12 @@ import { useHistory } from 'react-router'
 import { ZERO_BN } from '../../const'
 import { getChainAsset } from '../../helpers/chainHelper'
 import { eqAsset } from '../../helpers/fp/eq'
-import { sequenceTOption, sequenceTRDFromArray } from '../../helpers/fpHelpers'
+import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/binance/types'
-import { ChainFeeRD } from '../../services/chain/types'
-import { NativeFeeRD, PoolDetails } from '../../services/midgard/types'
+import { SwapFeesRDS } from '../../services/chain/types'
+import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { NonEmptyWalletBalances } from '../../services/wallet/types'
 import { TxStatus, TxTypes } from '../../types/asgardex'
@@ -42,7 +40,7 @@ import { CurrencyInfo } from '../currency'
 import { SwapModal } from '../modal/swap'
 import { CalcResult } from '../modal/swap/SwapModal.types'
 import { AssetSelect } from '../uielements/assets/assetSelect'
-import { Fees } from '../uielements/fees'
+import { Fee, Fees } from '../uielements/fees'
 import { Modal } from '../uielements/modal'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
@@ -56,9 +54,6 @@ type SwapProps = {
   onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
   poolDetails?: PoolDetails
   walletBalances?: O.Option<NonEmptyWalletBalances>
-  nativeTxFee: NativeFeeRD
-  targetChainFee?: ChainFeeRD
-  sourceChainFee?: ChainFeeRD
   txWithState?: TxWithStateRD
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
@@ -66,6 +61,7 @@ type SwapProps = {
   activePricePool: PricePool
   PasswordConfirmation: React.FC<{ onSuccess: () => void; onClose: () => void }>
   reloadFees?: () => void
+  swapFees?: SwapFeesRDS
 }
 
 export const Swap = ({
@@ -75,16 +71,14 @@ export const Swap = ({
   targetAsset: targetAssetProp,
   poolDetails = [],
   walletBalances = O.none,
-  nativeTxFee,
-  targetChainFee = RD.initial,
-  sourceChainFee = RD.initial,
   txWithState = RD.initial,
   goToTransaction,
   resetTx,
   runeAsset,
   activePricePool,
   PasswordConfirmation,
-  reloadFees
+  reloadFees,
+  swapFees = { source: RD.initial, target: RD.initial }
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
@@ -107,10 +101,6 @@ export const Swap = ({
     sourceAsset,
     targetAsset
   ])
-
-  // TODO (@Veado) Just for debugging - it will be remove in #652
-  // by implementing fee handling - see https://github.com/thorchain/asgardex-electron/issues/652
-  useEffect(() => console.log('nativeTxFee', nativeTxFee), [nativeTxFee])
 
   const setSourceAsset = useCallback(
     (asset: Asset) => {
@@ -397,39 +387,31 @@ export const Swap = ({
     )
   }, [assetsToSwap, onConfirmSwap, changeAmount, closePrivateModal])
 
-  const chainFees = useMemo(() => [sourceChainFee, targetChainFee].filter((fee) => !RD.isFailure(fee)), [
-    sourceChainFee,
-    targetChainFee
-  ])
-
-  // Need to collect all fees based on chain to compare it to final balance
-  const oFeesByChainHashMap = useMemo(
+  const sourceChainFee: RD.RemoteData<Error, Fee> = useMemo(
     () =>
       FP.pipe(
-        sequenceTRDFromArray(chainFees),
-        RD.map(
-          A.reduce({}, (acc: Record<string, BaseAmount>, cur) => {
-            const keyByAsset = assetToString(cur.chainAsset)
-            const previousFee = acc[keyByAsset]?.amount() || ZERO_BN
-            acc[keyByAsset] = baseAmount(previousFee.plus(cur.amount.amount()))
-            return acc
-          })
+        sequenceTRD(
+          swapFees.source,
+          RD.fromOption(sourceAsset, () => Error('No source asset'))
         ),
-        RD.toOption
+        RD.map(([amount, sourceAsset]) => ({ asset: getChainAsset(sourceAsset.chain), amount }))
       ),
-    [chainFees]
+    [swapFees, sourceAsset]
   )
 
-  const isDifferentCains = useMemo(
+  const targetChainFee: RD.RemoteData<Error, Fee> = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(sourceAsset, targetAsset),
-        O.chain(([source, target]) => (source.chain !== target.chain ? O.some(true) : O.none))
+        sequenceTRD(
+          swapFees.target,
+          RD.fromOption(targetAsset, () => Error('No target asset'))
+        ),
+        RD.map(([amount, targetAsset]) => ({ asset: getChainAsset(targetAsset.chain), amount }))
       ),
-    [sourceAsset, targetAsset]
+    [swapFees, targetAsset]
   )
 
-  const sourceChainBalanceError = useMemo(
+  const sourceChainBalanceError: boolean = useMemo(
     () =>
       FP.pipe(
         sequenceTOption(sourceAsset, walletBalances),
@@ -450,23 +432,22 @@ export const Swap = ({
           )
 
           return FP.pipe(
-            sequenceTOption(balanceMinusAmount, oFeesByChainHashMap),
-            O.map(([leftBalance, fees]) => {
-              const sourceChainAssetString = assetToString(getChainAsset(sourceAsset.chain))
-              const sourceChainFeeAmount = fees[sourceChainAssetString]?.amount() || ZERO_BN
+            sequenceTOption(balanceMinusAmount, FP.pipe(sourceChainFee, RD.toOption)),
+            O.map(([leftBalance, sourceChainFee]) => {
+              const sourceChainFeeAmount = sourceChainFee.amount.amount()
 
               return leftBalance.amount().minus(sourceChainFeeAmount)
             }),
             O.map((result) => result.isNegative()),
-            O.getOrElse(() => false)
+            O.getOrElse((): boolean => false)
           )
         }),
-        O.getOrElse(() => false)
+        O.getOrElse((): boolean => false)
       ),
-    [changeAmount, sourceAsset, walletBalances, oFeesByChainHashMap]
+    [changeAmount, sourceAsset, walletBalances, sourceChainFee]
   )
 
-  const sourceChainErrorLabel = useMemo(() => {
+  const sourceChainErrorLabel: JSX.Element = useMemo(() => {
     if (!sourceChainBalanceError) {
       return <></>
     }
@@ -484,53 +465,14 @@ export const Swap = ({
     )
   }, [sourceChainBalanceError, sourceAsset, intl])
 
-  const targetChainBalanceError = useMemo(
-    () =>
-      FP.pipe(
-        // Dont need to calculate in case of same chain.
-        // In this case we aclready included it in sourceChainFee
-        sequenceTOption(targetAsset, walletBalances, oFeesByChainHashMap, isDifferentCains),
-        O.chain(([targetAsset, walletBalances, feesByChainHashMap]) => {
-          return FP.pipe(
-            walletBalances,
-            A.findFirst((walletBalance) => eqAsset.equals(walletBalance.asset, targetAsset)),
-            O.map((targetBalance) => {
-              const targetChainAsset = getChainAsset(targetAsset.chain)
-              const feeAmount = feesByChainHashMap[assetToString(targetChainAsset)]?.amount() || ZERO_BN
-              return targetBalance.amount.amount().minus(feeAmount).isNegative()
-            })
-          )
-        }),
-        O.getOrElse(() => false)
-      ),
-    [targetAsset, isDifferentCains, walletBalances, oFeesByChainHashMap]
+  const fees: RD.RemoteData<Error, Fee>[] = useMemo(
+    () => [sourceChainFee, targetChainFee].filter((fee) => !RD.isFailure(fee)),
+    [sourceChainFee, targetChainFee]
   )
 
-  const targetChainErrorLabel = useMemo(() => {
-    if (!targetChainBalanceError) {
-      return <></>
-    }
-    const targetChainAsset = FP.pipe(
-      targetAsset,
-      O.map(({ chain }) => getChainAsset(chain)),
-      O.map((asset) => asset.symbol),
-      O.getOrElse(() => '')
-    )
-
-    return (
-      <Styled.ErrorLabel>
-        {intl.formatMessage({ id: 'swap.errors.amount.balanceShouldCoverChainFee' }, { asset: targetChainAsset })}{' '}
-      </Styled.ErrorLabel>
-    )
-  }, [targetChainBalanceError, targetAsset, intl])
-
-  const fees = useMemo(() => chainFees.map(RD.map((fee) => ({ asset: fee.chainAsset, amount: fee.amount }))), [
-    chainFees
-  ])
-
-  const isSwapDisabled = useMemo(
-    () => changeAmount.eq(0) || FP.pipe(walletBalances, O.isNone) || targetChainBalanceError || sourceChainBalanceError,
-    [walletBalances, changeAmount, targetChainBalanceError, sourceChainBalanceError]
+  const isSwapDisabled: boolean = useMemo(
+    () => changeAmount.eq(0) || FP.pipe(walletBalances, O.isNone) || sourceChainBalanceError,
+    [walletBalances, changeAmount, sourceChainBalanceError]
   )
 
   return (
@@ -611,7 +553,6 @@ export const Swap = ({
           )
         )}
         <Fees fees={fees} reloadFees={reloadFees} />
-        {targetChainErrorLabel}
       </Styled.SubmitContainer>
     </Styled.Container>
   )

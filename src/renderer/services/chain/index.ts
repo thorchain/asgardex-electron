@@ -7,8 +7,8 @@ import {
   reloadWithdrawFees,
   reloadDepositFeesEffect$,
   updateWithdrawFeesEffect$,
-  feesByAssetChain$,
-  reloadChainFees
+  reloadSwapFees,
+  swapFees$
 } from './fees'
 import { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } from './ledger'
 import { asymDepositTxMemo$, symDepositTxMemo$ } from './memo'
@@ -30,6 +30,6 @@ export {
   retrieveLedgerAddress,
   removeLedgerAddress,
   removeAllLedgerAddress,
-  feesByAssetChain$,
-  reloadChainFees
+  reloadSwapFees,
+  swapFees$
 }

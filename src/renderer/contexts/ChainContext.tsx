@@ -14,8 +14,8 @@ import {
   retrieveLedgerAddress,
   removeLedgerAddress,
   removeAllLedgerAddress,
-  feesByAssetChain$,
-  reloadChainFees
+  reloadSwapFees,
+  swapFees$
 } from '../services/chain'
 
 type ChainContextValue = {
@@ -32,8 +32,8 @@ type ChainContextValue = {
   retrieveLedgerAddress: typeof retrieveLedgerAddress
   removeLedgerAddress: typeof removeLedgerAddress
   removeAllLedgerAddress: typeof removeAllLedgerAddress
-  feesByAssetChain$: typeof feesByAssetChain$
-  reloadChainFees: typeof reloadChainFees
+  reloadSwapFees: typeof reloadSwapFees
+  swapFees$: typeof swapFees$
 }
 
 const initialContext: ChainContextValue = {
@@ -50,8 +50,8 @@ const initialContext: ChainContextValue = {
   retrieveLedgerAddress,
   removeLedgerAddress,
   removeAllLedgerAddress,
-  feesByAssetChain$: feesByAssetChain$,
-  reloadChainFees: reloadChainFees
+  reloadSwapFees: reloadSwapFees,
+  swapFees$: swapFees$
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 

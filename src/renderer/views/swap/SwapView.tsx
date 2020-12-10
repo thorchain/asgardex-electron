@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
-import { Asset, AssetAmount, assetFromString, assetToBase, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetFromString, assetToBase, bnOrZero } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -22,12 +22,11 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { getDefaultRuneAsset, isRuneAsset } from '../../helpers/assetHelper'
-import { getChainAsset } from '../../helpers/chainHelper'
-import { rdFromOption } from '../../helpers/fpHelpers'
+import { rdFromOption, sequenceTOption } from '../../helpers/fpHelpers'
 import { getDefaultRunePricePool } from '../../helpers/poolHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { SwapRouteParams } from '../../routes/swap'
-import { ChainFeeLD } from '../../services/chain/types'
+import { SwapFeeLD, SwapFeeRD, SwapFeesLDS, SwapFeesRDS } from '../../services/chain/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
 import * as Styled from './SwapView.styles'
@@ -41,16 +40,13 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { service: midgardService } = useMidgardContext()
   const {
     pools: { poolsState$, poolAddresses$, reloadPools, runeAsset$, selectedPricePool$ },
-    getTransactionState$,
-    nativeTxFee$
+    getTransactionState$
   } = midgardService
-  const { feesByAssetChain$, reloadChainFees } = useChainContext()
+  const { reloadSwapFees, swapFees$ } = useChainContext()
   const { explorerUrl$, pushTx, resetTx, txRD$ } = useBinanceContext()
   const { balancesState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
-
-  const nativeTxFee = useObservableState(nativeTxFee$, RD.initial)
 
   const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
 
@@ -129,41 +125,39 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const oSource = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
   const oTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
 
-  const sourceChainFee$: ChainFeeLD = useMemo(
+  const swapFeesLDS: O.Option<SwapFeesLDS> = useMemo(
     () =>
       FP.pipe(
-        oSource,
-        O.map((asset) =>
-          FP.pipe(
-            feesByAssetChain$(asset),
-            liveData.map((fees) => ({ chainAsset: getChainAsset(asset.chain), amount: fees.fastest }))
-          )
-        ),
-        O.getOrElse((): ChainFeeLD => Rx.of(RD.initial))
+        sequenceTOption(oSource, oTarget),
+        O.map(([sourceAsset, targetAsset]) => swapFees$(sourceAsset, targetAsset))
       ),
-    [oSource, feesByAssetChain$]
+    [oSource, oTarget, swapFees$]
+  )
+  const sourceFee: SwapFeeRD = useObservableState(
+    FP.pipe(
+      swapFeesLDS,
+      O.map((fees) => fees.source),
+      O.getOrElse((): SwapFeeLD => Rx.EMPTY)
+    ),
+    RD.initial
   )
 
-  const targetChainFee$: ChainFeeLD = useMemo(
-    () =>
-      FP.pipe(
-        oTarget,
-        O.map((asset) =>
-          FP.pipe(
-            feesByAssetChain$(asset),
-            liveData.map((fees) => ({
-              chainAsset: getChainAsset(asset.chain),
-              amount: baseAmount(fees.fastest.amount().times(3))
-            }))
-          )
-        ),
-        O.getOrElse((): ChainFeeLD => Rx.of(RD.initial))
-      ),
-    [oTarget, feesByAssetChain$]
+  const targetFee: SwapFeeRD = useObservableState(
+    FP.pipe(
+      swapFeesLDS,
+      O.map((fees) => fees.target),
+      O.getOrElse((): SwapFeeLD => Rx.EMPTY)
+    ),
+    RD.initial
   )
 
-  const targetChainFee = useObservableState(sourceChainFee$)
-  const sourceChainFee = useObservableState(targetChainFee$)
+  const swapFeesRDS: SwapFeesRDS = useMemo(
+    () => ({
+      source: sourceFee,
+      target: targetFee
+    }),
+    [sourceFee, targetFee]
+  )
 
   return (
     <>
@@ -200,10 +194,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   availableAssets={availableAssets}
                   poolDetails={state.poolDetails}
                   walletBalances={balances}
-                  nativeTxFee={nativeTxFee}
-                  targetChainFee={targetChainFee}
-                  sourceChainFee={sourceChainFee}
-                  reloadFees={reloadChainFees}
+                  reloadFees={reloadSwapFees}
+                  swapFees={swapFeesRDS}
                 />
               )
             }
