@@ -4,7 +4,7 @@ import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
-import { Drag as BaseDrag } from '../uielements/drag'
+import { Drag as UIDrag } from '../uielements/drag'
 import { Label as UILabel } from '../uielements/label'
 
 export const Container = styled('div')`
@@ -144,7 +144,7 @@ export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
   }
 `
 
-export const Drag = styled(BaseDrag)`
+export const Drag = styled(UIDrag)`
   margin-bottom: 10px;
 `
 
