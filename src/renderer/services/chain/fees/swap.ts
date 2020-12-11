@@ -1,6 +1,16 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Fees } from '@xchainjs/xchain-client'
-import { Chain, Asset, BNBChain, THORChain, BTCChain, ETHChain, baseAmount, BaseAmount } from '@xchainjs/xchain-util'
+import {
+  Chain,
+  Asset,
+  BNBChain,
+  THORChain,
+  BTCChain,
+  ETHChain,
+  baseAmount,
+  BaseAmount,
+  getSwapMemo
+} from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 
@@ -9,7 +19,7 @@ import { LiveData, liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as THOR from '../../thorchain'
-import { FeesLD, SwapFeesLDS } from '../types'
+import { FeesLD, Memo, SwapFeesLDS } from '../types'
 
 const reloadSwapFees = () => {
   BNB.reloadFees()
@@ -17,12 +27,7 @@ const reloadSwapFees = () => {
   THOR.reloadFees()
 }
 
-/**
- * @todo rethink about using common fees at all views
- * and move view-related calculations directly to the views
- * instead of creating fee-services for every situations
- */
-const feesByChain$ = (chain: Chain): FeesLD => {
+const feesByChain$ = (chain: Chain, memo?: Memo): FeesLD => {
   switch (chain) {
     case BNBChain:
       return BNB.fees$
@@ -32,7 +37,11 @@ const feesByChain$ = (chain: Chain): FeesLD => {
 
     case BTCChain:
       return FP.pipe(
-        BTC.fees$,
+        /**
+         * SWAP memo includes only target asset info so
+         * there will not be any memo in case BTC is a targetAsset
+         */
+        memo ? BTC.memoFees$(memo) : BTC.fees$,
         liveData.map((btcFees) => btcFees.fees)
       )
     case ETHChain:
@@ -42,8 +51,8 @@ const feesByChain$ = (chain: Chain): FeesLD => {
 
 type SwapFeeType = 'source' | 'target'
 
-const swapFee$ = (asset: Asset, type: SwapFeeType): LiveData<Error, BaseAmount> => {
-  const feeByChain$: LiveData<Error, Fees> = feesByChain$(getChainAsset(asset.chain).chain)
+const swapFee$ = (asset: Asset, type: SwapFeeType, memo?: Memo): LiveData<Error, BaseAmount> => {
+  const feeByChain$: LiveData<Error, Fees> = feesByChain$(getChainAsset(asset.chain).chain, memo)
 
   const multiplier = type === 'source' ? 1 : 3
 
@@ -54,9 +63,11 @@ const swapFee$ = (asset: Asset, type: SwapFeeType): LiveData<Error, BaseAmount> 
   )
 }
 
-const swapFees$ = (sourceAsset: Asset, targetAsset: Asset): SwapFeesLDS => ({
-  source: swapFee$(sourceAsset, 'source'),
-  target: swapFee$(targetAsset, 'target')
-})
+const swapFees$ = (sourceAsset: Asset, targetAsset: Asset): SwapFeesLDS => {
+  return {
+    source: swapFee$(sourceAsset, 'source', getSwapMemo({ asset: sourceAsset })),
+    target: swapFee$(targetAsset, 'target')
+  }
+}
 
 export { reloadSwapFees, swapFees$ }
