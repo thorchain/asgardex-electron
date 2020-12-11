@@ -51,11 +51,13 @@ export const Withdraw: React.FC<Props> = ({
     () => [
       FP.pipe(
         fee,
-        RD.map((fee) => ({
-          asset: BASE_CHAIN_ASSET,
-          amount: fee
-        })),
-        (feesRd) => <Fees fees={[feesRd]} />
+        RD.map((fee) => [
+          {
+            asset: BASE_CHAIN_ASSET,
+            amount: fee
+          }
+        ]),
+        (feesRd) => <Fees fees={feesRd} />
       )
     ],
     [fee]

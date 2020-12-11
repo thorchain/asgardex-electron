@@ -26,7 +26,7 @@ import { rdFromOption, sequenceTOption } from '../../helpers/fpHelpers'
 import { getDefaultRunePricePool } from '../../helpers/poolHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { SwapRouteParams } from '../../routes/swap'
-import { SwapFeeLD, SwapFeeRD, SwapFeesLDS, SwapFeesRDS } from '../../services/chain/types'
+import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
 import * as Styled from './SwapView.styles'
@@ -125,39 +125,17 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const oSource = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
   const oTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
 
-  const swapFeesLDS: O.Option<SwapFeesLDS> = useMemo(
+  const swapFeesLD: SwapFeesLD = useMemo(
     () =>
       FP.pipe(
         sequenceTOption(oSource, oTarget),
-        O.map(([sourceAsset, targetAsset]) => swapFees$(sourceAsset, targetAsset))
+        O.map(([sourceAsset, targetAsset]) => swapFees$(sourceAsset, targetAsset)),
+        O.getOrElse((): SwapFeesLD => Rx.EMPTY)
       ),
     [oSource, oTarget, swapFees$]
   )
-  const sourceFee: SwapFeeRD = useObservableState(
-    FP.pipe(
-      swapFeesLDS,
-      O.map((fees) => fees.source),
-      O.getOrElse((): SwapFeeLD => Rx.EMPTY)
-    ),
-    RD.initial
-  )
 
-  const targetFee: SwapFeeRD = useObservableState(
-    FP.pipe(
-      swapFeesLDS,
-      O.map((fees) => fees.target),
-      O.getOrElse((): SwapFeeLD => Rx.EMPTY)
-    ),
-    RD.initial
-  )
-
-  const swapFeesRDS: SwapFeesRDS = useMemo(
-    () => ({
-      source: sourceFee,
-      target: targetFee
-    }),
-    [sourceFee, targetFee]
-  )
+  const swapFeesRD: SwapFeesRD = useObservableState(swapFeesLD, RD.initial)
 
   return (
     <>
@@ -195,7 +173,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   poolDetails={state.poolDetails}
                   walletBalances={balances}
                   reloadFees={reloadSwapFees}
-                  fees={swapFeesRDS}
+                  fees={swapFeesRD}
                 />
               )
             }

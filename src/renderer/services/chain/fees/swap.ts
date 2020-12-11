@@ -19,7 +19,7 @@ import { LiveData, liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as THOR from '../../thorchain'
-import { FeesLD, Memo, SwapFeesLDS } from '../types'
+import { FeesLD, Memo, SwapFeesLD } from '../types'
 
 const reloadSwapFees = () => {
   BNB.reloadFees()
@@ -63,11 +63,11 @@ const swapFee$ = (asset: Asset, type: SwapFeeType, memo?: Memo): LiveData<Error,
   )
 }
 
-const swapFees$ = (sourceAsset: Asset, targetAsset: Asset): SwapFeesLDS => {
-  return {
+const swapFees$ = (sourceAsset: Asset, targetAsset: Asset): SwapFeesLD => {
+  return liveData.sequenceS({
     source: swapFee$(sourceAsset, 'source', getSwapMemo({ asset: sourceAsset })),
     target: swapFee$(targetAsset, 'target')
-  }
+  })
 }
 
 export { reloadSwapFees, swapFees$ }

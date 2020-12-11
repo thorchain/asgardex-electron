@@ -13,7 +13,8 @@ import {
   getValueOfAsset1InAsset2,
   PoolData,
   baseToAsset,
-  getSwapMemo
+  getSwapMemo,
+  BaseAmount
 } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import { eqString } from 'fp-ts/Eq'
@@ -30,7 +31,7 @@ import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/binance/types'
-import { SwapFeesRDS } from '../../services/chain/types'
+import { SwapFeesRD } from '../../services/chain/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { NonEmptyWalletBalances } from '../../services/wallet/types'
@@ -61,7 +62,7 @@ type SwapProps = {
   activePricePool: PricePool
   PasswordConfirmation: React.FC<{ onSuccess: () => void; onClose: () => void }>
   reloadFees?: () => void
-  fees?: SwapFeesRDS
+  fees?: SwapFeesRD
 }
 
 export const Swap = ({
@@ -78,7 +79,7 @@ export const Swap = ({
   activePricePool,
   PasswordConfirmation,
   reloadFees,
-  fees: feesProp = { source: RD.initial, target: RD.initial }
+  fees: feesProp = RD.initial
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
@@ -387,28 +388,22 @@ export const Swap = ({
     )
   }, [assetsToSwap, onConfirmSwap, changeAmount, closePrivateModal])
 
-  const sourceChainFee: RD.RemoteData<Error, Fee> = useMemo(
+  const sourceChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        sequenceTRD(
-          feesProp.source,
-          RD.fromOption(sourceAsset, () => Error('No source asset'))
-        ),
-        RD.map(([amount, sourceAsset]) => ({ asset: getChainAsset(sourceAsset.chain), amount }))
+        feesProp,
+        RD.map(({ source }) => source)
       ),
-    [feesProp, sourceAsset]
+    [feesProp]
   )
 
-  const targetChainFee: RD.RemoteData<Error, Fee> = useMemo(
+  const targetChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        sequenceTRD(
-          feesProp.target,
-          RD.fromOption(targetAsset, () => Error('No target asset'))
-        ),
-        RD.map(([amount, targetAsset]) => ({ asset: getChainAsset(targetAsset.chain), amount }))
+        feesProp,
+        RD.map(({ target }) => target)
       ),
-    [feesProp, targetAsset]
+    [feesProp]
   )
 
   const sourceChainBalanceError: boolean = useMemo(
@@ -434,7 +429,7 @@ export const Swap = ({
           return FP.pipe(
             sequenceTOption(balanceMinusAmount, FP.pipe(sourceChainFee, RD.toOption)),
             O.map(([leftBalance, sourceChainFee]) => {
-              const sourceChainFeeAmount = sourceChainFee.amount.amount()
+              const sourceChainFeeAmount = sourceChainFee.amount()
 
               return leftBalance.amount().minus(sourceChainFeeAmount)
             }),
@@ -465,9 +460,21 @@ export const Swap = ({
     )
   }, [sourceChainBalanceError, sourceAsset, intl])
 
-  const fees: RD.RemoteData<Error, Fee>[] = useMemo(
-    () => [sourceChainFee, targetChainFee].filter((fee) => !RD.isFailure(fee)),
-    [sourceChainFee, targetChainFee]
+  const fees: RD.RemoteData<Error, Fee[]> = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTRD(
+          sourceChainFee,
+          targetChainFee,
+          RD.fromOption(sourceAsset, () => Error('No source asset')),
+          RD.fromOption(targetAsset, () => Error('No target asset'))
+        ),
+        RD.map(([sourceFee, targetFee, sourceAsset, targetAsset]) => [
+          { asset: getChainAsset(sourceAsset.chain), amount: sourceFee },
+          { asset: getChainAsset(targetAsset.chain), amount: targetFee }
+        ])
+      ),
+    [sourceChainFee, targetChainFee, sourceAsset, targetAsset]
   )
 
   const isSwapDisabled: boolean = useMemo(
@@ -552,7 +559,7 @@ export const Swap = ({
             )
           )
         )}
-        <Fees fees={fees} reloadFees={reloadFees} />
+        {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFees} />}
       </Styled.SubmitContainer>
     </Styled.Container>
   )

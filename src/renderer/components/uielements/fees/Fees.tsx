@@ -6,7 +6,6 @@ import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import { useIntl } from 'react-intl'
 
-import { sequenceTRDFromArray } from '../../../helpers/fpHelpers'
 import { formatFee } from './Fees.helper'
 import * as Styled from './Fees.styles'
 
@@ -16,7 +15,7 @@ export type Fee = {
 }
 
 type Props = {
-  fees: RD.RemoteData<Error, Fee>[]
+  fees: RD.RemoteData<Error, Fee[]>
   reloadFees?: () => void
 }
 
@@ -27,11 +26,16 @@ export const Fees: React.FC<Props> = ({ fees, reloadFees }) => {
     () =>
       FP.pipe(
         fees,
-        sequenceTRDFromArray,
-        RD.map(
-          FP.flow(
+        RD.map((fees) =>
+          FP.pipe(
+            fees,
             A.map(formatFee),
-            A.reduce('', (acc, cur) => `${acc}${acc ? ' + ' : ' '}${cur}`)
+            A.reduceWithIndex(
+              intl.formatMessage({ id: fees.length > 1 ? 'common.fees' : 'common.fee' }),
+              (index, acc, cur) => {
+                return index === 0 ? `${acc}: ${cur}` : `${acc} + ${cur}`
+              }
+            )
           )
         ),
         RD.fold(
@@ -54,7 +58,7 @@ export const Fees: React.FC<Props> = ({ fees, reloadFees }) => {
           }}
         />
       )}
-      {intl.formatMessage({ id: fees.length > 1 ? 'common.fees' : 'common.fee' })}: {feesFormattedValue}
+      {feesFormattedValue}
     </Styled.Container>
   )
 }
