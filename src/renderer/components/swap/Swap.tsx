@@ -61,7 +61,7 @@ type SwapProps = {
   activePricePool: PricePool
   PasswordConfirmation: React.FC<{ onSuccess: () => void; onClose: () => void }>
   reloadFees?: () => void
-  swapFees?: SwapFeesRDS
+  fees?: SwapFeesRDS
 }
 
 export const Swap = ({
@@ -78,7 +78,7 @@ export const Swap = ({
   activePricePool,
   PasswordConfirmation,
   reloadFees,
-  swapFees = { source: RD.initial, target: RD.initial }
+  fees: feesProp = { source: RD.initial, target: RD.initial }
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
@@ -391,24 +391,24 @@ export const Swap = ({
     () =>
       FP.pipe(
         sequenceTRD(
-          swapFees.source,
+          feesProp.source,
           RD.fromOption(sourceAsset, () => Error('No source asset'))
         ),
         RD.map(([amount, sourceAsset]) => ({ asset: getChainAsset(sourceAsset.chain), amount }))
       ),
-    [swapFees, sourceAsset]
+    [feesProp, sourceAsset]
   )
 
   const targetChainFee: RD.RemoteData<Error, Fee> = useMemo(
     () =>
       FP.pipe(
         sequenceTRD(
-          swapFees.target,
+          feesProp.target,
           RD.fromOption(targetAsset, () => Error('No target asset'))
         ),
         RD.map(([amount, targetAsset]) => ({ asset: getChainAsset(targetAsset.chain), amount }))
       ),
-    [swapFees, targetAsset]
+    [feesProp, targetAsset]
   )
 
   const sourceChainBalanceError: boolean = useMemo(

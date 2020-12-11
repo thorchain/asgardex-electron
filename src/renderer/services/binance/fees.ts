@@ -17,7 +17,7 @@ const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
  * Transaction fees
  */
 const fees$: (client: Client$) => FeesLD = (client$) =>
-  Rx.combineLatest([reloadFees$, client$.pipe(startWith(O.none as O.Option<Client>))]).pipe(
+  Rx.combineLatest([reloadFees$, client$]).pipe(
     switchMap(([_, oClient]) =>
       FP.pipe(
         // client and asset has to be available
