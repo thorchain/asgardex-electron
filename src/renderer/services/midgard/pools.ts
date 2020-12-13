@@ -229,7 +229,7 @@ const createPoolsService = (
   )
 
   /**
-   * Stream of `PoolDetail` data
+   * Stream of `PoolDetail` data based on selected pool asset
    * It's triggered by changes of selectedPoolAsset$`
    */
   const poolDetail$: PoolDetailLD = selectedPoolAsset$.pipe(

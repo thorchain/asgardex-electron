@@ -1,5 +1,7 @@
+import { Row } from 'antd'
 import styled from 'styled-components'
 
+import { media } from '../../../helpers/styleHelper'
 import { AssetIcon as AssetIconBase } from '../../uielements/assets/assetIcon'
 import { Drag as BaseDrag } from '../../uielements/drag'
 import { Label as UILabel } from '../../uielements/label'
@@ -42,6 +44,39 @@ export const OutputLabel = styled(UILabel).attrs({
   weight: 'bold'
 })`
   padding-left: 10px;
+`
+export const FeesRow = styled(Row)`
+  width: 100%;
+`
+
+export const FeeRow = styled(Row).attrs({
+  align: 'middle'
+})`
+  padding-bottom: 20px;
+
+  ${media.xl`
+    padding-bottom: 0px;
+`}
+`
+
+export const FeeErrorRow = styled(Row).attrs({
+  align: 'middle'
+})`
+  padding-bottom: 20px;
+
+  ${media.xl`
+    padding-top: 20px;
+    padding-bottom: 0px;
+`}
+`
+
+export const FeeLabel = styled(UILabel).attrs({
+  size: 'normal',
+  textTransform: 'uppercase'
+})`
+  font-family: 'MainFontRegular';
+  padding: 0;
+  min-width: 150px; /* needed for loader */
 `
 
 export const FeeErrorLabel = styled(UILabel).attrs({

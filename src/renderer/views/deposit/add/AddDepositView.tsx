@@ -11,7 +11,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { AddDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { ZERO_BN, ZERO_POOL_DATA } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
@@ -141,7 +141,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
           poolAddress={O.none}
           symDepositMemo={O.none}
           asymDepositMemo={O.none}
-          poolData={{ runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }}
+          poolData={ZERO_POOL_DATA}
         />
       </>
     ),

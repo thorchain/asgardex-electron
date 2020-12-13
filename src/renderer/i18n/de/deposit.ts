@@ -30,7 +30,11 @@ const deposit: DepositMessages = {
   'deposit.withdraw.receiveText': 'Du solltest erhalten',
   'deposit.withdraw.fee': 'Gebühren',
   'deposit.withdraw.feeNote': 'Hinweis: {fee} werden für die Transaktionsgebühr in Deiner Wallet belassen',
-  'deposit.withdraw.drag': 'Ziehen um Auszuzahlen'
+  'deposit.withdraw.drag': 'Ziehen um Auszuzahlen',
+  'deposit.withdraw.add.error.thorMemoFeeNotCovered':
+    'Gebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
+  'deposit.withdraw.add.error.outFeeNotCovered':
+    'Gebühr in Höhe von {fee} ist nicht über den zu erwartenen Auszahlungsbetrag {amount} gedeckt'
 }
 
 export default deposit

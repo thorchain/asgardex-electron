@@ -192,6 +192,8 @@ type DepositMessageKey =
   | 'deposit.withdraw.fee'
   | 'deposit.withdraw.feeNote'
   | 'deposit.withdraw.drag'
+  | 'deposit.withdraw.add.error.thorMemoFeeNotCovered'
+  | 'deposit.withdraw.add.error.outFeeNotCovered'
 
 export type DepositMessages = { [key in DepositMessageKey]: string }
 

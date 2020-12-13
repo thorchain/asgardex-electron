@@ -11,7 +11,8 @@ import {
   baseAmount,
   AssetBNB,
   BNBChain,
-  Chain
+  Chain,
+  PoolData
 } from '@xchainjs/xchain-util'
 
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
@@ -70,3 +71,5 @@ export const ONE_BN = bn(1)
 export const ZERO_ASSET_AMOUNT = assetAmount(ZERO_BN)
 
 export const ZERO_BASE_AMOUNT = baseAmount(ZERO_BN)
+
+export const ZERO_POOL_DATA: PoolData = { runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }
