@@ -283,14 +283,8 @@ const createPoolsService = (
   /**
    * Selected price pool
    */
-  const selectedPricePool$: Rx.Observable<PricePool> = combineLatest([
-    runeAsset$,
-    poolsState$,
-    selectedPricePoolAsset$
-  ]).pipe(
-    RxOp.map(([runeAsset, poolsState, selectedPricePoolAsset]) =>
-      pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset, runeAsset)
-    )
+  const selectedPricePool$: Rx.Observable<PricePool> = combineLatest([poolsState$, selectedPricePoolAsset$]).pipe(
+    RxOp.map(([poolsState, selectedPricePoolAsset]) => pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset))
   )
 
   const poolAddresses$: ThorchainEndpointsLD = FP.pipe(
