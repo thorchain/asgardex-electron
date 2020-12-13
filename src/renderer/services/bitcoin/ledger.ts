@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { broadcastTx, createTxInfo, LedgerTxInfoParams } from '@xchainjs/xchain-bitcoin'
-import * as Either from 'fp-ts/Either'
+import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
@@ -26,14 +26,11 @@ const ledgerTx$ = (params: LedgerTxInfoParams): LedgerTxLD =>
   FP.pipe(
     Rx.from(createTxInfo(params)),
     switchMap((ledgerTxInfo) => window.apiHDWallet.signTxInLedger('BTC', params.network, ledgerTxInfo)),
-    switchMap((signResult) =>
-      Either.isRight(signResult)
-        ? Rx.from(broadcastTx({ txHex: signResult.right, nodeUrl: params.nodeUrl, nodeApiKey: params.nodeApiKey }))
-        : Rx.from(() =>
-            Promise.reject({
-              ledgerErrorId: signResult.left
-            })
-          )
+    switchMap(
+      E.fold(
+        (ledgerErrorId) => Rx.from(Promise.reject({ ledgerErrorId })),
+        (txHex) => Rx.from(broadcastTx({ txHex, nodeUrl: params.nodeUrl, nodeApiKey: params.nodeApiKey }))
+      )
     ),
     map(RD.success),
     startWith(RD.pending),
