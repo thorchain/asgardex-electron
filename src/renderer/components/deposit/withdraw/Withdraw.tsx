@@ -13,7 +13,7 @@ import {
   getValueOfAsset1InAsset2,
   PoolData
 } from '@xchainjs/xchain-util'
-import { Col } from 'antd'
+import { Col, Grid } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -80,6 +80,9 @@ export const Withdraw: React.FC<Props> = ({
   reloadFees: updateFees
 }) => {
   const intl = useIntl()
+
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
 
   const _isAsym = useMemo(() => type === 'asym', [type])
@@ -240,30 +243,38 @@ export const Withdraw: React.FC<Props> = ({
             {intl.formatMessage({ id: 'common.error' })} {error?.message ?? ''}
           </>
         ),
-        ({ thorMemo, thorOut, assetOut }) => (
-          <>
-            {intl.formatMessage(
-              { id: 'deposit.withdraw.fees' },
-              {
-                thorMemo: formatFee({
-                  amount: thorMemo,
-                  asset: AssetRuneNative
-                }),
-                assetOut: formatFee({
-                  amount: calculateAssetChainFee(assetOut),
-                  asset
-                }),
-                thorOut: formatFee({
-                  amount: thorOut,
-                  asset: AssetRuneNative
-                })
-              }
-            )}
-          </>
-        )
+        ({ thorMemo, thorOut, assetOut }) => {
+          const formattedThorMemoFee = formatFee({
+            amount: thorMemo,
+            asset: AssetRuneNative
+          })
+          const formattedAssetOutFee = formatFee({
+            amount: calculateAssetChainFee(assetOut),
+            asset
+          })
+          const formattedThorOutFee = formatFee({
+            amount: thorOut,
+            asset: AssetRuneNative
+          })
+
+          if (!isDesktopView) {
+            return `${intl.formatMessage({
+              id: 'common.fees'
+            })}: ${formattedThorMemoFee} + ${formattedThorOutFee} + ${formattedAssetOutFee}`
+          }
+
+          return (
+            <>
+              {intl.formatMessage(
+                { id: 'deposit.withdraw.fees' },
+                { thorMemo: formattedThorMemoFee, assetOut: formattedAssetOutFee, thorOut: formattedThorOutFee }
+              )}
+            </>
+          )
+        }
       )
     )
-  }, [asset, calculateAssetChainFee, fees, intl])
+  }, [asset, calculateAssetChainFee, fees, intl, isDesktopView])
 
   const disabledForm = useMemo(() => withdrawPercent <= 0 || disabled, [withdrawPercent, disabled])
 
@@ -321,7 +332,7 @@ export const Withdraw: React.FC<Props> = ({
       </Styled.AssetContainer>
 
       <Styled.FeesRow gutter={{ lg: 32 }}>
-        <Col xs={24} xl={12}>
+        <Col>
           <Styled.FeeRow>
             <Col>
               <ReloadButton onClick={updateFees} disabled={RD.isPending(fees)} />
