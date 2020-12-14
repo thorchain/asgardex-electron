@@ -467,7 +467,7 @@ export const Swap = ({
       )),
       O.getOrElse(() => <></>)
     )
-  }, [sourceChainBalanceError, sourceAsset, intl, oAssetWB, sourceChainFee])
+  }, [sourceChainBalanceError, intl, oAssetWB, sourceChainFee])
 
   const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
     const chainFee = FP.pipe(
@@ -501,6 +501,18 @@ export const Swap = ({
     return swapData.swapResult.minus(targetFee).isNegative()
   }, [targetChainFeeAmountInTargetAsset, swapData, changeAmount])
 
+  const outputLabel = useMemo(
+    () =>
+      FP.pipe(
+        targetAsset,
+        O.map((asset) =>
+          formatAssetAmountCurrency({ amount: assetAmount(swapData.swapResult), asset, trimZeros: true })
+        ),
+        O.getOrElse(() => formatBN(swapData.swapResult, 7))
+      ),
+    [targetAsset, swapData]
+  )
+
   const targetChainFeeErrorLabel = useMemo(() => {
     if (!targetChainFeeError) {
       return null
@@ -516,18 +528,14 @@ export const Swap = ({
             { id: 'swap.errors.amount.outputShouldCoverChainFee' },
             {
               fee: formatAssetAmountCurrency({ amount: feeAssetAmount, asset, trimZeros: true }),
-              amount: formatAssetAmountCurrency({
-                asset,
-                trimZeros: true,
-                amount: assetAmount(swapData.swapResult)
-              })
+              amount: outputLabel
             }
           )}
         </Styled.ErrorLabel>
       )),
       O.getOrElse(() => <></>)
     )
-  }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset, swapData.swapResult])
+  }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset, outputLabel])
 
   const fees: RD.RemoteData<Error, Fee[]> = useMemo(
     () =>
@@ -550,18 +558,6 @@ export const Swap = ({
     walletBalances,
     changeAmount
   ])
-
-  const outputLabel = useMemo(
-    () =>
-      FP.pipe(
-        targetAsset,
-        O.map((asset) =>
-          formatAssetAmountCurrency({ amount: assetAmount(swapData.swapResult), asset, trimZeros: true })
-        ),
-        O.getOrElse(() => formatBN(swapData.swapResult, 7))
-      ),
-    [targetAsset, swapData]
-  )
 
   return (
     <Styled.Container>
