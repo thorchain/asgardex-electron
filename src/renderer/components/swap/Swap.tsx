@@ -471,7 +471,15 @@ export const Swap = ({
       targetAsset,
       O.map((asset) => {
         const chainAsset = getChainAsset(asset.chain)
-        return getValueOfAsset1InAsset2(chainFee, poolData[assetToString(chainAsset)], poolData[assetToString(asset)])
+        const chainAssetPoolData: PoolData | undefined = poolData[assetToString(chainAsset)]
+        const assetPoolData: PoolData | undefined = poolData[assetToString(asset)]
+        if (!chainAssetPoolData || !assetPoolData) {
+          return ZERO_BASE_AMOUNT
+        }
+
+        return eqAsset.equals(chainAsset, asset)
+          ? chainFee
+          : getValueOfAsset1InAsset2(chainFee, chainAssetPoolData, assetPoolData)
       }),
       O.getOrElse(() => ZERO_BASE_AMOUNT)
     )
@@ -522,10 +530,12 @@ export const Swap = ({
     [sourceChainFee, targetChainFeeAmountInTargetAsset, sourceAsset, targetAsset]
   )
 
-  const isSwapDisabled: boolean = useMemo(
-    () => changeAmount.eq(0) || FP.pipe(walletBalances, O.isNone) || sourceChainBalanceError || targetChainFeeError,
-    [walletBalances, changeAmount, sourceChainBalanceError, targetChainFeeError]
-  )
+  const isSwapDisabled: boolean = useMemo(() => changeAmount.eq(0) || FP.pipe(walletBalances, O.isNone), [
+    walletBalances,
+    changeAmount,
+    sourceChainBalanceError,
+    targetChainFeeError
+  ])
 
   const outputLabel = useMemo(
     () =>
