@@ -38,7 +38,7 @@ export const getAssetDetail = (assets: AssetDetails, ticker: string): O.Option<A
     O.fromNullable
   )
 
-export const getPricePools = (pools: PoolDetails, runeAsset: Asset, whitelist?: PricePoolAssets): PricePools => {
+export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): PricePools => {
   const poolDetails = !whitelist
     ? pools
     : pools.filter((detail) => whitelist.find((asset) => detail?.asset === assetToString(asset)))

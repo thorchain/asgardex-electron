@@ -5,7 +5,6 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { sequenceTRDFromArray } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { triggerStream } from '../../../helpers/stateHelper'
 import * as BNB from '../../binance'
@@ -48,8 +47,7 @@ const withdrawFees$: WithdrawFeesLD = Rx.combineLatest([selectedPoolChain$, relo
       oPoolChain,
       O.map((chain) =>
         FP.pipe(
-          Rx.combineLatest([withdrawFeeByChain$(chain), withdrawFeeByChain$('THOR')]),
-          RxOp.map(sequenceTRDFromArray),
+          liveData.sequenceT(withdrawFeeByChain$(chain), withdrawFeeByChain$('THOR')),
           liveData.map(([asset, thor]) => ({
             thorMemo: thor,
             thorOut: baseAmount(thor.amount().times(3)),

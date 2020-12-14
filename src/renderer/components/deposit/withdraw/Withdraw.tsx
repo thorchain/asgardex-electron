@@ -19,7 +19,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { ZERO_BASE_AMOUNT } from '../../../const'
+import { ZERO_ASSET_AMOUNT } from '../../../const'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
@@ -67,7 +67,6 @@ export const Withdraw: React.FC<Props> = ({
   asset,
   assetPoolData,
   onWithdraw,
-  asset: depositAsset,
   runePrice,
   assetPrice,
   chainAssetPoolData,
@@ -107,8 +106,8 @@ export const Withdraw: React.FC<Props> = ({
   const renderThorMemoFeeError = useMemo(() => {
     const runeBalance = FP.pipe(
       oRuneBalance,
-      O.getOrElse(() => ZERO_BASE_AMOUNT),
-      baseToAsset
+      O.map(baseToAsset),
+      O.getOrElse(() => ZERO_ASSET_AMOUNT)
     )
 
     return FP.pipe(
@@ -314,15 +313,15 @@ export const Withdraw: React.FC<Props> = ({
       </Styled.AssetContainer>
 
       <Styled.AssetContainer>
-        <Styled.AssetIcon asset={depositAsset} />
+        <Styled.AssetIcon asset={asset} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
             amount: withdrawAmounts.assetWithdraw,
-            asset: depositAsset,
+            asset: asset,
             trimZeros: true
           })}
           {/* show pricing if price asset is different only */}
-          {!eqAsset.equals(depositAsset, selectedPriceAsset) &&
+          {!eqAsset.equals(asset, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
               amount: assetAmount(withdrawAmounts.assetWithdraw.amount().times(assetPrice)),
               asset: selectedPriceAsset,

@@ -1,13 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import {
-  AssetBNB,
-  AssetBTC,
-  AssetETH,
-  AssetRune67C,
-  AssetRuneB1A,
-  AssetRuneNative,
-  assetToString
-} from '@xchainjs/xchain-util'
+import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneNative, assetToString } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, AssetBUSDBAF } from '../../const'
@@ -76,7 +68,7 @@ describe('services/midgard/utils/', () => {
     const lok: PoolDetail = { asset: 'BNB.LOK-3C0', assetDepth: '5', runeDepth: '5' }
 
     it('returns list of price pools in a right order', () => {
-      const result = getPricePools([tomob, eth, BUSDBAF, btc, lok], AssetRuneB1A, PRICE_POOLS_WHITELIST)
+      const result = getPricePools([tomob, eth, BUSDBAF, btc, lok], PRICE_POOLS_WHITELIST)
       // RUNE pool
       const pool0 = result[0]
       expect(pool0.asset).toEqual(AssetRuneNative)
@@ -100,7 +92,7 @@ describe('services/midgard/utils/', () => {
     })
 
     it('returns RUNE price and btc pools in a right order', () => {
-      const result = getPricePools([tomob, lok, btc], AssetRuneB1A, PRICE_POOLS_WHITELIST)
+      const result = getPricePools([tomob, lok, btc], PRICE_POOLS_WHITELIST)
       expect(result.length).toEqual(2)
       // RUNE pool
       const pool0 = result[0]
@@ -111,7 +103,7 @@ describe('services/midgard/utils/', () => {
     })
 
     it('returns RUNE price pool only if another "price" pool is not available', () => {
-      const result = getPricePools([tomob, lok], AssetRuneNative, PRICE_POOLS_WHITELIST)
+      const result = getPricePools([tomob, lok], PRICE_POOLS_WHITELIST)
       expect(result.length).toEqual(1)
       // RUNE pool
       const pool0 = result[0]
