@@ -104,6 +104,8 @@ export const Withdraw: React.FC<Props> = ({
   }, [oFees, oRuneBalance, withdrawPercent])
 
   const renderThorMemoFeeError = useMemo(() => {
+    if (!isThorMemoFeeError) return <></>
+
     const runeBalance = FP.pipe(
       oRuneBalance,
       O.map(baseToAsset),
@@ -130,7 +132,7 @@ export const Withdraw: React.FC<Props> = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [oRuneBalance, oFees, intl])
+  }, [isThorMemoFeeError, oRuneBalance, oFees, intl])
 
   /**
    * Helper to calculate chain fee
@@ -171,6 +173,8 @@ export const Withdraw: React.FC<Props> = ({
   }, [oAssetChainFee, oFees, withdrawAmounts.assetWithdraw, withdrawPercent])
 
   const renderAssetChainFeeError = useMemo(() => {
+    if (!isAssetChainFeeError) return <></>
+
     return FP.pipe(
       oAssetChainFee,
       O.map((fee) => {
@@ -190,7 +194,7 @@ export const Withdraw: React.FC<Props> = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [oAssetChainFee, intl, asset, withdrawAmounts])
+  }, [isAssetChainFeeError, oAssetChainFee, intl, asset, withdrawAmounts.assetWithdraw])
 
   const isThorOutFeeError = useMemo(() => {
     if (withdrawPercent <= 0) return false
@@ -205,6 +209,8 @@ export const Withdraw: React.FC<Props> = ({
   }, [oFees, withdrawAmounts.runeWithdraw, withdrawPercent])
 
   const renderThorOutFeeError = useMemo(() => {
+    if (!isThorOutFeeError) return <></>
+
     return FP.pipe(
       oFees,
       O.map(({ thorOut }) => {
@@ -228,7 +234,7 @@ export const Withdraw: React.FC<Props> = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [oFees, intl, withdrawAmounts.runeWithdraw])
+  }, [isThorOutFeeError, oFees, intl, withdrawAmounts.runeWithdraw])
 
   const renderFee = useMemo(() => {
     const loading = <>...</>
@@ -345,9 +351,9 @@ export const Withdraw: React.FC<Props> = ({
           <Styled.FeeErrorRow>
             <Col>
               <>
-                {!!isThorMemoFeeError && renderThorMemoFeeError}
-                {!!isThorOutFeeError && renderThorOutFeeError}
-                {!!isAssetChainFeeError && renderAssetChainFeeError}
+                {renderThorMemoFeeError}
+                {renderThorOutFeeError}
+                {renderAssetChainFeeError}
               </>
             </Col>
           </Styled.FeeErrorRow>
