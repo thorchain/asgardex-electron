@@ -10,8 +10,10 @@ const swap: SwapMessages = {
   'swap.output': 'Ausgabe',
   'swap.drag': 'Ziehen um zu Swappen',
   'swap.searchAsset': 'Suche Asset',
-  'swap.errors.amount.balanceShouldCoverChainFee': 'Balance for ({asset}) should cover a fee - DE',
-  'swap.errors.amount.outputShouldCoverChainFee': 'Output should cover a fee {fee} - DE'
+  'swap.errors.amount.balanceShouldCoverChainFee':
+    'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
+  'swap.errors.amount.outputShouldCoverChainFee':
+    'Auszahlungsgebühr in Höhe von {fee} ist nicht über den zu erwartenen Auszahlungsbetrag (momentan {amount}) gedeckt'
 }
 
 export default swap

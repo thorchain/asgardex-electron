@@ -447,19 +447,27 @@ export const Swap = ({
     if (!sourceChainBalanceError) {
       return <></>
     }
-    const sourceChainAsset = FP.pipe(
-      sourceAsset,
-      O.map(({ chain }) => getChainAsset(chain)),
-      O.map((asset) => asset.symbol),
-      O.getOrElse(() => '')
-    )
 
-    return (
-      <Styled.BalanceErrorLabel>
-        {intl.formatMessage({ id: 'swap.errors.amount.balanceShouldCoverChainFee' }, { asset: sourceChainAsset })}{' '}
-      </Styled.BalanceErrorLabel>
+    return FP.pipe(
+      sequenceTOption(RD.toOption(sourceChainFee), oAssetWB),
+      O.map(([fee, assetWB]) => (
+        <Styled.BalanceErrorLabel key="sourceChainErrorLabel">
+          {intl.formatMessage(
+            { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
+            {
+              balance: formatAssetAmountCurrency({
+                asset: assetWB.asset,
+                amount: baseToAsset(assetWB.amount),
+                trimZeros: true
+              }),
+              fee: formatAssetAmountCurrency({ asset: assetWB.asset, trimZeros: true, amount: baseToAsset(fee) })
+            }
+          )}
+        </Styled.BalanceErrorLabel>
+      )),
+      O.getOrElse(() => <></>)
     )
-  }, [sourceChainBalanceError, sourceAsset, intl])
+  }, [sourceChainBalanceError, sourceAsset, intl, oAssetWB, sourceChainFee])
 
   const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
     const chainFee = FP.pipe(
@@ -500,18 +508,26 @@ export const Swap = ({
 
     const feeAssetAmount = baseToAsset(targetChainFeeAmountInTargetAsset)
 
-    const feeLabel = FP.pipe(
+    return FP.pipe(
       targetAsset,
-      O.map((asset) => formatAssetAmountCurrency({ amount: feeAssetAmount, asset, trimZeros: true })),
-      O.getOrElse(() => formatBN(feeAssetAmount.amount()))
+      O.map((asset) => (
+        <Styled.ErrorLabel key="targetChainFeeErrorLabel">
+          {intl.formatMessage(
+            { id: 'swap.errors.amount.outputShouldCoverChainFee' },
+            {
+              fee: formatAssetAmountCurrency({ amount: feeAssetAmount, asset, trimZeros: true }),
+              amount: formatAssetAmountCurrency({
+                asset,
+                trimZeros: true,
+                amount: assetAmount(swapData.swapResult)
+              })
+            }
+          )}
+        </Styled.ErrorLabel>
+      )),
+      O.getOrElse(() => <></>)
     )
-
-    return (
-      <Styled.ErrorLabel>
-        {intl.formatMessage({ id: 'swap.errors.amount.outputShouldCoverChainFee' }, { fee: feeLabel })}
-      </Styled.ErrorLabel>
-    )
-  }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset])
+  }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset, swapData.swapResult])
 
   const fees: RD.RemoteData<Error, Fee[]> = useMemo(
     () =>
@@ -588,9 +604,11 @@ export const Swap = ({
           </Styled.ValueItemContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-percent'}>
-            <Styled.SliderContainer>{slider}</Styled.SliderContainer>
+            <Styled.SliderContainer>
+              {slider}
+              {sourceChainErrorLabel}
+            </Styled.SliderContainer>
             <Styled.SwapOutlined disabled={!canSwitchAssets} onClick={onSwitchAssets} />
-            {sourceChainErrorLabel}
           </Styled.ValueItemContainer>
           <Styled.ValueItemContainer className={'valueItemContainer-in'}>
             <Styled.InValue>

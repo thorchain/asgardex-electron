@@ -73,7 +73,7 @@ export const ContentContainer = styled('div')`
 export const ValueItemContainer = styled('div')`
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: baseline;
   width: 100%;
   position: relative;
 
@@ -98,6 +98,7 @@ export const ValueItemContainer = styled('div')`
 `
 
 export const SliderContainer = styled('div')`
+  width: 100%;
   min-width: 212px;
 `
 
@@ -157,11 +158,5 @@ export const ErrorLabel = styled(UILabel)`
 `
 
 export const BalanceErrorLabel = styled(ErrorLabel)`
-  text-align: center;
-
-  ${media.md`
-    text-align: left;
-    position: absolute;
-    bottom: 0;
-  `}
+  text-align: left;
 `

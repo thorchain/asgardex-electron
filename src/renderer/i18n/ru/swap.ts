@@ -10,8 +10,10 @@ const swap: SwapMessages = {
   'swap.output': 'Получаете',
   'swap.drag': 'Перетащите для обмена',
   'swap.searchAsset': 'Поиск Ассета',
-  'swap.errors.amount.balanceShouldCoverChainFee': 'Балас для ({asset}) должен покрывать комиссию',
-  'swap.errors.amount.outputShouldCoverChainFee': 'Получаемое значение должно покрывать комиссию {fee}'
+  'swap.errors.amount.balanceShouldCoverChainFee':
+    'Комиссия транзакции {fee} дожна покрываться вашим балансом (сейчас {balance}).',
+  'swap.errors.amount.outputShouldCoverChainFee':
+    'Исходящая комиссия {fee} должна покрываться получаемым количеством (сейчас {amount}).'
 }
 
 export default swap
