@@ -8,7 +8,7 @@ import { CURRENCY_WHEIGHTS } from '../../const'
 import { isBUSDAsset } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
 import { eqAsset } from '../../helpers/fp/eq'
-import { getRunePricePool } from '../../helpers/poolHelper'
+import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { AssetDetails, AssetDetailMap, PoolDetails, PoolsStateRD, SelectedPricePoolAsset } from './types'
@@ -38,7 +38,7 @@ export const getAssetDetail = (assets: AssetDetails, ticker: string): O.Option<A
     O.fromNullable
   )
 
-export const getPricePools = (pools: PoolDetails, runeAsset: Asset, whitelist?: PricePoolAssets): PricePools => {
+export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): PricePools => {
   const poolDetails = !whitelist
     ? pools
     : pools.filter((detail) => whitelist.find((asset) => detail?.asset === assetToString(asset)))
@@ -55,7 +55,7 @@ export const getPricePools = (pools: PoolDetails, runeAsset: Asset, whitelist?: 
     })
     // sort by weights (high weight wins)
     .sort((a, b) => (CURRENCY_WHEIGHTS[assetToString(b.asset)] || 0) - (CURRENCY_WHEIGHTS[assetToString(a.asset)] || 0))
-  return [getRunePricePool(runeAsset), ...pricePools]
+  return [RUNE_PRICE_POOL, ...pricePools]
 }
 
 /**
@@ -82,14 +82,13 @@ export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolA
  */
 export const pricePoolSelectorFromRD = (
   poolsRD: PoolsStateRD,
-  selectedPricePoolAsset: SelectedPricePoolAsset,
-  runeAsset: Asset
+  selectedPricePoolAsset: SelectedPricePoolAsset
 ): PricePool =>
   FP.pipe(
     RD.toOption(poolsRD),
     O.chain((pools) => pools.pricePools),
     O.map((pricePools) => pricePoolSelector(pricePools, selectedPricePoolAsset)),
-    O.getOrElse(() => getRunePricePool(runeAsset))
+    O.getOrElse(() => RUNE_PRICE_POOL)
   )
 
 /**
@@ -119,7 +118,7 @@ export const getPoolDetailsHashMap = (poolDetails: PoolDetails, runeAsset: Asset
     return { ...acc, [cur.asset]: toPoolData(cur) }
   }, {} as Record<string, PoolData>)
 
-  const runePricePool = getRunePricePool(runeAsset)
+  const runePricePool = RUNE_PRICE_POOL
 
   res[assetToString(runeAsset)] = {
     ...runePricePool.poolData

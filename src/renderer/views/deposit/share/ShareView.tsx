@@ -17,7 +17,7 @@ import { useIntl } from 'react-intl'
 
 import { PoolShare } from '../../../components/uielements/poolShare'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
-import { getDefaultRunePricePool } from '../../../helpers/poolHelper'
+import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
@@ -42,7 +42,7 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
 
-  const { poolData: pricePoolData } = useObservableState(selectedPricePool$, getDefaultRunePricePool())
+  const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const renderPoolShareReady = useCallback(
     (stake: StakersAssetData, poolDetail: PoolDetail) => {

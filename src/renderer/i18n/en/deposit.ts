@@ -27,9 +27,13 @@ const deposit: DepositMessages = {
   'deposit.withdraw.title': 'Adjust withdrawal',
   'deposit.withdraw.choseText': 'Choose from 0 to 100% of how much to withdraw.',
   'deposit.withdraw.receiveText': 'You should receive.',
-  'deposit.withdraw.fee': 'Fee',
+  'deposit.withdraw.fees': 'Transaction fee: {thorMemo}, Outbounding fees: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Note: {fee} BNB will be left in your wallet for the transaction fees.',
-  'deposit.withdraw.drag': 'Drag to withdraw'
+  'deposit.withdraw.drag': 'Drag to withdraw',
+  'deposit.withdraw.add.error.thorMemoFeeNotCovered':
+    'Transaction fee {fee} needs to be covered by your balance (currently {balance}).',
+  'deposit.withdraw.add.error.outFeeNotCovered':
+    'Outbounding fee of {fee} needs to be covered by receiving amount (currently {amount}).'
 }
 
 export default deposit

@@ -1,4 +1,4 @@
-import { bnOrZero, PoolData, assetFromString, Asset, Chain } from '@xchainjs/xchain-util'
+import { bnOrZero, PoolData, assetFromString, Chain, AssetRuneNative } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
@@ -12,7 +12,6 @@ import { PoolDetails } from '../services/midgard/types'
 import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
-import { getDefaultRuneAsset } from './assetHelper'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
 
@@ -26,17 +25,19 @@ const ordByDepth = Ord.ord.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRo
  *
  * Note: We don't have a "RUNE" pool in THORChain, but do need such thing for pricing
  */
-export const getRunePricePool = (runeAsset: Asset): PricePool => ({
-  asset: runeAsset,
+export const RUNE_PRICE_POOL: PricePool = {
+  asset: AssetRuneNative,
   poolData: { assetBalance: ONE_ASSET_BASE_AMOUNT, runeBalance: ONE_ASSET_BASE_AMOUNT }
-})
+}
 
 /**
  * Returns default RUNE based `PricePool`
  *
  * Note: We don't have a "RUNE" pool in THORChain, but do need such thing for pricing
+ *
+ * @deprecated Use `getRunePricePool`
  */
-export const getDefaultRunePricePool = (chain: Chain = 'BNB') => getRunePricePool(getDefaultRuneAsset(chain))
+export const getDefaultRunePricePool = (_: Chain = 'BNB') => RUNE_PRICE_POOL
 
 export const getPoolTableRowsData = ({
   poolDetails,

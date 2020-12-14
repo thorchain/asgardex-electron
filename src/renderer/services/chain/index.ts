@@ -6,7 +6,6 @@ import {
   withdrawFees$,
   reloadWithdrawFees,
   reloadDepositFeesEffect$,
-  updateWithdrawFeesEffect$,
   reloadSwapFees,
   swapFees$
 } from './fees'
@@ -23,7 +22,6 @@ export {
   withdrawFees$,
   reloadWithdrawFees,
   reloadDepositFeesEffect$,
-  updateWithdrawFeesEffect$,
   isCrossChainDeposit$,
   symDepositTxMemo$,
   asymDepositTxMemo$,

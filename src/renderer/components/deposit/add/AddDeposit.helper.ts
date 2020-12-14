@@ -1,4 +1,4 @@
-import { Asset, baseAmount, BaseAmount, baseToAsset, formatAssetAmountCurrency, PoolData } from '@xchainjs/xchain-util'
+import { baseAmount, BaseAmount, PoolData } from '@xchainjs/xchain-util'
 
 import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 
@@ -55,10 +55,3 @@ export const getAssetAmountToDeposit = (
     runeAmount.amount().times(poolAssetBalance.amount().dividedBy(poolRuneBalance.amount())),
     THORCHAIN_DECIMAL
   )
-
-export const formatFee = (fee: BaseAmount, asset: Asset) =>
-  formatAssetAmountCurrency({
-    amount: baseToAsset(fee),
-    asset,
-    trimZeros: true
-  })

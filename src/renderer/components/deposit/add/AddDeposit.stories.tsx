@@ -12,7 +12,7 @@ import { AddDeposit } from './AddDeposit'
 
 const assetBalance = O.some(assetToBase(assetAmount(200)))
 const runeBalance = O.some(assetToBase(assetAmount(100)))
-const baseChainAssetBalance = O.some(assetToBase(assetAmount(55)))
+const chainAssetBalance = O.some(assetToBase(assetAmount(55)))
 const poolData = {
   assetBalance: baseAmount('1000'),
   runeBalance: baseAmount('2000')
@@ -39,7 +39,7 @@ export const AddAsymDepositStory = () => {
       runePrice={bn(1)}
       assetBalance={assetBalance}
       runeBalance={runeBalance}
-      chainAssetBalance={baseChainAssetBalance}
+      chainAssetBalance={chainAssetBalance}
       onDeposit={console.log}
       onChangeAsset={console.log}
       reloadFees={reloadFeesHandler}
@@ -63,7 +63,7 @@ export const AddSymDepositStory = () => {
       runePrice={bn(1)}
       assetBalance={assetBalance}
       runeBalance={runeBalance}
-      chainAssetBalance={baseChainAssetBalance}
+      chainAssetBalance={chainAssetBalance}
       onDeposit={console.log}
       onChangeAsset={console.log}
       fees={symFees}
@@ -135,7 +135,7 @@ storiesOf('Components/Deposit/AddDeposit', module)
       runePrice={bn(1)}
       assetBalance={O.some(ZERO_BASE_AMOUNT)}
       runeBalance={O.some(ZERO_BASE_AMOUNT)}
-      chainAssetBalance={baseChainAssetBalance}
+      chainAssetBalance={chainAssetBalance}
       onDeposit={console.log}
       onChangeAsset={console.log}
       reloadFees={reloadFeesHandler}
