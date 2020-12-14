@@ -76,7 +76,6 @@ export const FeeLabel = styled(UILabel).attrs({
 })`
   font-family: 'MainFontRegular';
   padding: 0;
-  min-width: 150px; /* needed for loader */
 `
 
 export const FeeErrorLabel = styled(UILabel).attrs({
@@ -85,4 +84,5 @@ export const FeeErrorLabel = styled(UILabel).attrs({
 })`
   font-family: 'MainFontRegular';
   padding: 0;
+  margin-bottom: 10px;
 `

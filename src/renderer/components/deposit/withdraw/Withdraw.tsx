@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import {
@@ -88,18 +88,18 @@ export const Withdraw: React.FC<Props> = ({
 
   const oFees: O.Option<WithdrawFees> = useMemo(() => FP.pipe(fees, RD.toOption), [fees])
 
-  const isThorMemoFeeError: boolean = useMemo(
-    () =>
-      FP.pipe(
-        sequenceTOption(oFees, oRuneBalance),
-        O.fold(
-          // Missing (or loading) fees does not mean we can't sent something. No error then.
-          () => !O.isNone(oFees),
-          ([{ thorMemo }, balance]) => balance.amount().isLessThan(thorMemo.amount())
-        )
-      ),
-    [oFees, oRuneBalance]
-  )
+  const isThorMemoFeeError: boolean = useMemo(() => {
+    if (withdrawPercent <= 0) return false
+
+    return FP.pipe(
+      sequenceTOption(oFees, oRuneBalance),
+      O.fold(
+        // Missing (or loading) fees does not mean we can't sent something. No error then.
+        () => !O.isNone(oFees),
+        ([{ thorMemo }, balance]) => balance.amount().isLessThan(thorMemo.amount())
+      )
+    )
+  }, [oFees, oRuneBalance, withdrawPercent])
 
   const renderThorMemoFeeError = useMemo(() => {
     const runeBalance = FP.pipe(
@@ -123,39 +123,54 @@ export const Withdraw: React.FC<Props> = ({
             balance: formatAssetAmountCurrency({ amount: runeBalance, asset: AssetRuneNative, trimZeros: true })
           }
         )
-        // It seems `key`  has to be set for any reason to avoid "Missing "key" prop for element in iterator"
-        return <Styled.FeeErrorLabel key="memo-fee-error">{msg}</Styled.FeeErrorLabel>
+        // `key`  has to be set for any reason to avoid "Missing "key" prop for element in iterator"
+        return <Styled.FeeErrorLabel key="memo2-fee-error">{msg}</Styled.FeeErrorLabel>
       }),
       O.getOrElse(() => <></>)
     )
   }, [oRuneBalance, oFees, intl])
 
   /**
-   * Calculated asset chain fee in price of asset
+   * Helper to calculate chain fee
+   * Fee might be calculated into price of asset
    */
-  const oAssetChainFeePrice: O.Option<BaseAmount> = useMemo(
+  const calculateAssetChainFee = useCallback(
+    (fee: BaseAmount): BaseAmount => {
+      // ignore price calculations for assets, which are chain assets
+      if (eqAsset.equals(asset, getChainAsset(asset.chain))) return fee
+      // calculate asset price of fee
+      return getValueOfAsset1InAsset2(fee, assetPoolData, chainAssetPoolData)
+    },
+    [asset, assetPoolData, chainAssetPoolData]
+  )
+  /**
+   * Asset chain fee
+   */
+  const oAssetChainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
         oFees,
-        O.map(({ assetOut }) => getValueOfAsset1InAsset2(assetOut, assetPoolData, chainAssetPoolData))
+        O.map(({ assetOut }) => calculateAssetChainFee(assetOut))
       ),
-    [oFees, assetPoolData, chainAssetPoolData]
+    [calculateAssetChainFee, oFees]
   )
 
   const isAssetChainFeeError = useMemo(() => {
+    if (withdrawPercent <= 0) return false
+
     return FP.pipe(
-      oAssetChainFeePrice,
+      oAssetChainFee,
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oFees),
-        (assetOutFeePrice) => assetToBase(withdrawAmounts.assetWithdraw).amount().isLessThan(assetOutFeePrice.amount())
+        (fee) => assetToBase(withdrawAmounts.assetWithdraw).amount().isLessThan(fee.amount())
       )
     )
-  }, [oAssetChainFeePrice, oFees, withdrawAmounts.assetWithdraw])
+  }, [oAssetChainFee, oFees, withdrawAmounts.assetWithdraw, withdrawPercent])
 
   const renderAssetChainFeeError = useMemo(() => {
     return FP.pipe(
-      oAssetChainFeePrice,
+      oAssetChainFee,
       O.map((fee) => {
         const msg = intl.formatMessage(
           { id: 'deposit.withdraw.add.error.outFeeNotCovered' },
@@ -165,17 +180,18 @@ export const Withdraw: React.FC<Props> = ({
               asset,
               trimZeros: true
             }),
-            balance: formatAssetAmountCurrency({ amount: withdrawAmounts.assetWithdraw, asset, trimZeros: true })
+            amount: formatAssetAmountCurrency({ amount: withdrawAmounts.assetWithdraw, asset, trimZeros: true })
           }
         )
-        // It seems `key`  has to be set for any reason to avoid "Missing "key" prop for element in iterator"
+        // `key`  has to be set for any reason to avoid "Missing "key" prop for element in iterator"
         return <Styled.FeeErrorLabel key="asset-fee-out-error">{msg}</Styled.FeeErrorLabel>
       }),
       O.getOrElse(() => <></>)
     )
-  }, [oAssetChainFeePrice, intl, asset, withdrawAmounts])
+  }, [oAssetChainFee, intl, asset, withdrawAmounts])
 
   const isThorOutFeeError = useMemo(() => {
+    if (withdrawPercent <= 0) return false
     return FP.pipe(
       oFees,
       O.fold(
@@ -184,7 +200,7 @@ export const Withdraw: React.FC<Props> = ({
         ({ thorOut }) => assetToBase(withdrawAmounts.runeWithdraw).amount().isLessThan(thorOut.amount())
       )
     )
-  }, [oFees, withdrawAmounts])
+  }, [oFees, withdrawAmounts.runeWithdraw, withdrawPercent])
 
   const renderThorOutFeeError = useMemo(() => {
     return FP.pipe(
@@ -198,14 +214,14 @@ export const Withdraw: React.FC<Props> = ({
               asset: AssetRuneNative,
               trimZeros: true
             }),
-            balance: formatAssetAmountCurrency({
+            amount: formatAssetAmountCurrency({
               amount: withdrawAmounts.runeWithdraw,
               asset: AssetRuneNative,
               trimZeros: true
             })
           }
         )
-        // It seems `key`  has to be set for any reason to avoid "Missing "key" prop for element in iterator"
+        // `key`  has to be set for any reason to avoid "Missing "key" prop for element in iterator"
         return <Styled.FeeErrorLabel key="thor-fee-out-error">{msg}</Styled.FeeErrorLabel>
       }),
       O.getOrElse(() => <></>)
@@ -213,47 +229,43 @@ export const Withdraw: React.FC<Props> = ({
   }, [oFees, intl, withdrawAmounts.runeWithdraw])
 
   const renderFee = useMemo(() => {
-    const loading = <>{intl.formatMessage({ id: 'common.fees' })}: ...</>
+    const loading = <>...</>
     return FP.pipe(
       fees,
       RD.fold(
         () => loading,
         () => loading,
         (error) => (
-          <Styled.FeeErrorLabel key="memo-error">
+          <>
             {intl.formatMessage({ id: 'common.error' })} {error?.message ?? ''}
-          </Styled.FeeErrorLabel>
+          </>
         ),
-        ({ thorMemo, assetOut, thorOut }) => (
-          <Styled.FeeLabel>
-            {intl.formatMessage({ id: 'common.fees' })}
-            {': '}
-            {formatFee({
-              amount: thorMemo,
-              asset: AssetRuneNative
-            })}
-            {' + '}
-            {formatFee({
-              amount: getValueOfAsset1InAsset2(assetOut, assetPoolData, chainAssetPoolData),
-              asset: getChainAsset(asset.chain)
-            })}
-            {' + '}
-            {formatFee({
-              amount: thorOut,
-              asset: AssetRuneNative
-            })}
-          </Styled.FeeLabel>
+        ({ thorMemo, thorOut, assetOut }) => (
+          <>
+            {intl.formatMessage(
+              { id: 'deposit.withdraw.fees' },
+              {
+                thorMemo: formatFee({
+                  amount: thorMemo,
+                  asset: AssetRuneNative
+                }),
+                assetOut: formatFee({
+                  amount: calculateAssetChainFee(assetOut),
+                  asset
+                }),
+                thorOut: formatFee({
+                  amount: thorOut,
+                  asset: AssetRuneNative
+                })
+              }
+            )}
+          </>
         )
       )
     )
-  }, [asset, assetPoolData, chainAssetPoolData, fees, intl])
+  }, [asset, calculateAssetChainFee, fees, intl])
 
-  const disabledForm = useMemo(() => withdrawPercent === 0 || disabled || isThorMemoFeeError || isAssetChainFeeError, [
-    withdrawPercent,
-    disabled,
-    isThorMemoFeeError,
-    isAssetChainFeeError
-  ])
+  const disabledForm = useMemo(() => withdrawPercent <= 0 || disabled, [withdrawPercent, disabled])
 
   return (
     <Styled.Container>
@@ -315,7 +327,9 @@ export const Withdraw: React.FC<Props> = ({
               <ReloadButton onClick={updateFees} disabled={RD.isPending(fees)} />
             </Col>
             <Col>
-              <Styled.FeeLabel disabled={RD.isPending(fees)}>{renderFee}</Styled.FeeLabel>
+              <Styled.FeeLabel disabled={RD.isPending(fees)} color={RD.isFailure(fees) ? 'error' : 'normal'}>
+                {renderFee}
+              </Styled.FeeLabel>
             </Col>
           </Styled.FeeRow>
           <Styled.FeeErrorRow>

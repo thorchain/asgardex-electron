@@ -27,12 +27,13 @@ const deposit: DepositMessages = {
   'deposit.withdraw.title': 'Установить вывод',
   'deposit.withdraw.choseText': 'Выберите сколько вы хотите изять от 0% до 100%',
   'deposit.withdraw.receiveText': 'Вы полчучите',
-  'deposit.withdraw.fee': 'Комиссия',
+  'deposit.withdraw.fees': 'Transaction fee: {thorMemo}, Outbounding fees: {thorOut} + {assetOut} - RU',
   'deposit.withdraw.feeNote': 'Важно: {fee} BNB останется на вашем кошельке для покрытия комисий.',
   'deposit.withdraw.drag': 'Перетащите для изъявтия',
-  'deposit.withdraw.add.error.thorMemoFeeNotCovered': 'Fee {fee} needs to be covered by your balance: {balance} - RU',
+  'deposit.withdraw.add.error.thorMemoFeeNotCovered':
+    'Transaction fee of {fee} needs to be covered by your balance (currently {balance}) - RU',
   'deposit.withdraw.add.error.outFeeNotCovered':
-    'Fee {fee} needs to be covered by expected withdrawing amount {amount} - RU'
+    'Outbounding fee of {fee} needs to be covered by receiving amount (currently {amount}) - RU'
 }
 
 export default deposit

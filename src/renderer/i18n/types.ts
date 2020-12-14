@@ -189,7 +189,7 @@ type DepositMessageKey =
   | 'deposit.withdraw.title'
   | 'deposit.withdraw.choseText'
   | 'deposit.withdraw.receiveText'
-  | 'deposit.withdraw.fee'
+  | 'deposit.withdraw.fees'
   | 'deposit.withdraw.feeNote'
   | 'deposit.withdraw.drag'
   | 'deposit.withdraw.add.error.thorMemoFeeNotCovered'
