@@ -14,7 +14,8 @@ import {
   PoolData,
   baseToAsset,
   getSwapMemo,
-  BaseAmount
+  BaseAmount,
+  formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import { eqString } from 'fp-ts/Eq'
@@ -24,7 +25,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 
-import { ZERO_BN } from '../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import { getChainAsset } from '../../helpers/chainHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
@@ -460,26 +461,82 @@ export const Swap = ({
     )
   }, [sourceChainBalanceError, sourceAsset, intl])
 
+  const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
+    const chainFee = FP.pipe(
+      targetChainFee,
+      RD.getOrElse(() => ZERO_BASE_AMOUNT)
+    )
+
+    return FP.pipe(
+      targetAsset,
+      O.map((asset) => {
+        const chainAsset = getChainAsset(asset.chain)
+        return getValueOfAsset1InAsset2(chainFee, poolData[assetToString(chainAsset)], poolData[assetToString(asset)])
+      }),
+      O.getOrElse(() => ZERO_BASE_AMOUNT)
+    )
+  }, [targetChainFee, targetAsset, poolData])
+
+  const targetChainFeeError = useMemo((): boolean => {
+    if (changeAmount.isZero()) {
+      return false
+    }
+    const targetFee = FP.pipe(targetChainFeeAmountInTargetAsset, baseToAsset, (assetAmount) => assetAmount.amount())
+    return swapData.swapResult.minus(targetFee).isNegative()
+  }, [targetChainFeeAmountInTargetAsset, swapData, changeAmount])
+
+  const targetChainFeeErrorLabel = useMemo(() => {
+    if (!targetChainFeeError) {
+      return null
+    }
+
+    const feeAssetAmount = baseToAsset(targetChainFeeAmountInTargetAsset)
+
+    const feeLabel = FP.pipe(
+      targetAsset,
+      O.map((asset) => formatAssetAmountCurrency({ amount: feeAssetAmount, asset, trimZeros: true })),
+      O.getOrElse(() => formatBN(feeAssetAmount.amount()))
+    )
+
+    return (
+      <Styled.ErrorLabel>
+        {intl.formatMessage({ id: 'swap.errors.amount.outputShouldCoverChainFee' }, { fee: feeLabel })}
+      </Styled.ErrorLabel>
+    )
+  }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset])
+
   const fees: RD.RemoteData<Error, Fee[]> = useMemo(
     () =>
       FP.pipe(
         sequenceTRD(
           sourceChainFee,
-          targetChainFee,
+          RD.success(targetChainFeeAmountInTargetAsset),
           RD.fromOption(sourceAsset, () => Error('No source asset')),
           RD.fromOption(targetAsset, () => Error('No target asset'))
         ),
         RD.map(([sourceFee, targetFee, sourceAsset, targetAsset]) => [
           { asset: getChainAsset(sourceAsset.chain), amount: sourceFee },
-          { asset: getChainAsset(targetAsset.chain), amount: targetFee }
+          { asset: targetAsset, amount: targetFee }
         ])
       ),
-    [sourceChainFee, targetChainFee, sourceAsset, targetAsset]
+    [sourceChainFee, targetChainFeeAmountInTargetAsset, sourceAsset, targetAsset]
   )
 
   const isSwapDisabled: boolean = useMemo(
-    () => changeAmount.eq(0) || FP.pipe(walletBalances, O.isNone) || sourceChainBalanceError,
-    [walletBalances, changeAmount, sourceChainBalanceError]
+    () => changeAmount.eq(0) || FP.pipe(walletBalances, O.isNone) || sourceChainBalanceError || targetChainFeeError,
+    [walletBalances, changeAmount, sourceChainBalanceError, targetChainFeeError]
+  )
+
+  const outputLabel = useMemo(
+    () =>
+      FP.pipe(
+        targetAsset,
+        O.map((asset) =>
+          formatAssetAmountCurrency({ amount: assetAmount(swapData.swapResult), asset, trimZeros: true })
+        ),
+        O.getOrElse(() => formatBN(swapData.swapResult, 7))
+      ),
+    [targetAsset, swapData]
   )
 
   return (
@@ -511,7 +568,7 @@ export const Swap = ({
               label={balanceLabel}
               onChange={setChangeAmount}
               amount={changeAmount}
-              hasError={sourceChainBalanceError}
+              hasError={sourceChainBalanceError || targetChainFeeError}
             />
             {FP.pipe(
               sourceAsset,
@@ -530,7 +587,7 @@ export const Swap = ({
           <Styled.ValueItemContainer className={'valueItemContainer-in'}>
             <Styled.InValue>
               <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}:</Styled.InValueTitle>
-              <div>{formatBN(swapData.swapResult, 7)}</div>
+              <div>{outputLabel}</div>
             </Styled.InValue>
             {FP.pipe(
               targetAsset,
@@ -560,6 +617,7 @@ export const Swap = ({
           )
         )}
         {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFees} />}
+        {targetChainFeeErrorLabel}
       </Styled.SubmitContainer>
     </Styled.Container>
   )

@@ -160,6 +160,7 @@ type SwapMessageKey =
   | 'swap.viewTransaction'
   | 'swap.swapping'
   | 'swap.errors.amount.balanceShouldCoverChainFee'
+  | 'swap.errors.amount.outputShouldCoverChainFee'
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
