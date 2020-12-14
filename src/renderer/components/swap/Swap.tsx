@@ -532,9 +532,7 @@ export const Swap = ({
 
   const isSwapDisabled: boolean = useMemo(() => changeAmount.eq(0) || FP.pipe(walletBalances, O.isNone), [
     walletBalances,
-    changeAmount,
-    sourceChainBalanceError,
-    targetChainFeeError
+    changeAmount
   ])
 
   const outputLabel = useMemo(
