@@ -24,6 +24,7 @@ import { SymDepositMemo, Memo, SendDepositTxParams, DepositFeesRD } from '../../
 import { PoolAddress } from '../../../services/midgard/types'
 import { DepositType } from '../../../types/asgardex'
 import { Drag } from '../../uielements/drag'
+import { formatFee } from '../../uielements/fees/Fees.helper'
 import * as Helper from './AddDeposit.helper'
 import * as Styled from './AddDeposit.style'
 
@@ -286,7 +287,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
       const msg = intl.formatMessage(
         { id: 'deposit.add.error.chainFeeNotCovered' },
         {
-          fee: Helper.formatFee(fee, asset),
+          fee: formatFee({ amount: fee, asset }),
           balance: formatAssetAmountCurrency({ amount: balance, asset, trimZeros: true })
         }
       )
@@ -380,9 +381,9 @@ export const AddDeposit: React.FC<Props> = (props) => {
             // two fees (sym)
             `${FP.pipe(
               oThorFee,
-              O.map((thorFee) => `${Helper.formatFee(thorFee, AssetRuneNative)} + `),
+              O.map((thorFee) => `${formatFee({ amount: thorFee, asset: AssetRuneNative })} + `),
               O.getOrElse(() => '')
-            )} ${Helper.formatFee(assetFee, asset)}`
+            )} ${formatFee({ amount: assetFee, asset })}`
         )
       ),
     [asset, fees, intl]

@@ -1,30 +1,34 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRune67C, bn } from '@xchainjs/xchain-util'
+import { Asset, AssetRune67C, AssetRuneNative, BaseAmount, bn, PoolData } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
-import { useObservableState, useSubscription } from 'observable-hooks'
+import * as O from 'fp-ts/lib/Option'
+import { useObservableState } from 'observable-hooks'
 import { map } from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
 import { Withdraw } from '../../../components/deposit/withdraw'
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN, ZERO_POOL_DATA } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
-import { getDefaultRuneAsset } from '../../../helpers/assetHelper'
+import { useWalletContext } from '../../../contexts/WalletContext'
+import { getChainAsset } from '../../../helpers/chainHelper'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
-import { getPoolDetail } from '../../../services/midgard/utils'
+import { getPoolDetail, toPoolData } from '../../../services/midgard/utils'
+import { getBalanceByAsset } from '../../../services/wallet/util'
 import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/models'
 
 type Props = {
-  depositAsset: Asset
+  asset: Asset
 }
 
 export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
-  const { depositAsset } = props
+  const { asset } = props
   const {
     service: {
       pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$, poolsState$ },
@@ -32,9 +36,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { withdrawFees$, reloadWithdrawFees, updateWithdrawFeesEffect$ } = useChainContext()
-
-  useSubscription(updateWithdrawFeesEffect$)
+  const { withdrawFees$, reloadWithdrawFees } = useChainContext()
 
   const fees = useObservableState(withdrawFees$, RD.initial)
 
@@ -50,65 +52,110 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
 
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
 
-  const [priceAssetRD]: [RD.RemoteData<Error, Asset>, unknown] = useObservableState(
+  const [selectedPriceAssetRD]: [RD.RemoteData<Error, Asset>, unknown] = useObservableState(
     () =>
       FP.pipe(
         selectedPricePoolAsset$,
         map((asset) => RD.fromOption(asset, () => Error(''))),
         // In case there is no asset for any reason set basic RUNE asset as alt value
-        map(RD.alt((): RD.RemoteData<Error, Asset> => RD.success(getDefaultRuneAsset())))
+        map(RD.alt((): RD.RemoteData<Error, Asset> => RD.success(AssetRuneNative)))
       ),
     RD.initial
   )
 
-  const poolsState = FP.pipe(
-    poolsStateRD,
-    RD.chain((poolsState) => RD.fromOption(getPoolDetail(poolsState.poolDetails, depositAsset), () => Error('no data')))
-  )
-
-  const assetPriceRD = FP.pipe(
-    poolsState,
+  const assetPriceRD: RD.RemoteData<Error, BigNumber> = FP.pipe(
+    poolDetailRD,
     // convert from RUNE price to selected pool asset price
     RD.map(getAssetPoolPrice(runePrice))
+  )
+
+  const chainAssetPoolDataRD: RD.RemoteData<Error, PoolData> = FP.pipe(
+    poolsStateRD,
+    // get `PoolDetail` of `asset.chain` asset
+    RD.chain((poolsState) =>
+      RD.fromOption(getPoolDetail(poolsState.poolDetails, getChainAsset(asset.chain)), () => Error('no data'))
+    ),
+    // convert from RUNE price to selected pool asset price
+    RD.map(toPoolData)
+  )
+
+  const assetPoolDataRD: RD.RemoteData<Error, PoolData> = FP.pipe(poolDetailRD, RD.map(toPoolData))
+
+  const { balancesState$ } = useWalletContext()
+
+  const [balances] = useObservableState(
+    () =>
+      FP.pipe(
+        balancesState$,
+        RxOp.map((state) => state.balances)
+      ),
+    O.none
+  )
+
+  const runeBalance: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        balances,
+        O.chain(getBalanceByAsset(AssetRuneNative)),
+        O.map(({ amount }) => amount)
+      ),
+    [balances]
   )
 
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
-        fee={fees}
+        // currently we support sym withdraw only - asym will be added later
+        type={'sym'}
+        fees={fees}
         assetPrice={ZERO_BN}
+        assetPoolData={ZERO_POOL_DATA}
         runePrice={runePrice}
-        selectedCurrencyAsset={AssetRune67C}
+        chainAssetPoolData={ZERO_POOL_DATA}
+        runeBalance={runeBalance}
+        selectedPriceAsset={AssetRune67C}
         onWithdraw={emptyFunc}
         runeShare={ZERO_BASE_AMOUNT}
         assetShare={ZERO_BASE_AMOUNT}
-        depositAsset={depositAsset}
-        updateFees={reloadWithdrawFees}
+        asset={asset}
+        reloadFees={reloadWithdrawFees}
         disabled
       />
     ),
-    [fees, runePrice, depositAsset, reloadWithdrawFees]
+    [fees, runePrice, runeBalance, asset, reloadWithdrawFees]
   )
 
   const renderWithdrawReady = useCallback(
-    ([assetPrice, deposit, poolDetail, priceAsset]: [BigNumber, StakersAssetData, PoolDetail, Asset]) => (
+    ([assetPrice, depositData, poolDetail, selectedPriceAsset, assetPoolData, chainAssetPoolData]: [
+      BigNumber,
+      StakersAssetData,
+      PoolDetail,
+      Asset,
+      PoolData,
+      PoolData
+    ]) => (
       <Withdraw
+        // currently we support sym withdraw only - asym will be added later
+        type={'sym'}
         assetPrice={assetPrice}
+        assetPoolData={assetPoolData}
         runePrice={runePrice}
-        selectedCurrencyAsset={priceAsset}
+        chainAssetPoolData={chainAssetPoolData}
+        runeBalance={runeBalance}
+        selectedPriceAsset={selectedPriceAsset}
         onWithdraw={console.log}
-        runeShare={shareHelpers.getRuneShare(deposit, poolDetail)}
-        assetShare={shareHelpers.getAssetShare(deposit, poolDetail)}
-        depositAsset={depositAsset}
-        fee={fees}
-        updateFees={reloadWithdrawFees}
+        runeShare={shareHelpers.getRuneShare(depositData, poolDetail)}
+        assetShare={shareHelpers.getAssetShare(depositData, poolDetail)}
+        asset={asset}
+        fees={fees}
+        reloadFees={reloadWithdrawFees}
       />
     ),
-    [runePrice, depositAsset, fees, reloadWithdrawFees]
+    [runePrice, runeBalance, asset, fees, reloadWithdrawFees]
   )
 
   return FP.pipe(
-    RD.combine(assetPriceRD, depositData, poolDetailRD, priceAssetRD),
+    RD.combine(assetPriceRD, depositData, poolDetailRD, selectedPriceAssetRD, assetPoolDataRD, chainAssetPoolDataRD),
     RD.fold(renderEmptyForm, renderEmptyForm, renderEmptyForm, renderWithdrawReady)
   )
 }

@@ -4,7 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, assetToString, baseAmount } from '@xchainjs/xchain-util'
 
-import { getRunePricePool } from '../../../helpers/poolHelper'
+import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import { ApiError, ChainBalance, ChainBalances, ErrorId } from '../../../services/wallet/types'
 import { AssetsTableCollapsable } from './index'
 
@@ -87,7 +87,7 @@ const chainBalancesError: ChainBalances = [
 ]
 
 const selectAssetHandler = (asset: Asset) => console.log('asset selected ', assetToString(asset))
-const pricePool = getRunePricePool(AssetRune67C)
+const pricePool = RUNE_PRICE_POOL
 
 storiesOf('Wallet/AssetsTableCollapsable', module).add('initial', () => {
   return (

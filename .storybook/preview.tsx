@@ -1,7 +1,6 @@
 import React from 'react'
 import themes from '@thorchain/asgardex-theme'
 import { addDecorator } from '@storybook/react/dist/client/preview'
-import { configure } from '@storybook/react'
 import { withThemes } from '@react-theming/storybook-addon'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 
@@ -43,11 +42,3 @@ addDecorator((story) => (
     <Route path="/" component={() => story()} />
   </Router>
 ))
-
-const req = require.context('../src', true, /\.stories\.(ts|tsx)$/)
-
-function loadStories() {
-  req.keys().forEach((filename) => req(filename))
-}
-
-configure(loadStories, module)

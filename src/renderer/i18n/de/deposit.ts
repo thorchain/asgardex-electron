@@ -28,9 +28,13 @@ const deposit: DepositMessages = {
   'deposit.withdraw.title': 'Auszahlung anpassen',
   'deposit.withdraw.choseText': 'Wähle einen Betrag zwischen 0 und 100% zum Auszahlen',
   'deposit.withdraw.receiveText': 'Du solltest erhalten',
-  'deposit.withdraw.fee': 'Gebühren',
+  'deposit.withdraw.fees': 'Transaktionsgebühr: {thorMemo}, Auszahlungsgebühren: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Hinweis: {fee} werden für die Transaktionsgebühr in Deiner Wallet belassen',
-  'deposit.withdraw.drag': 'Ziehen um Auszuzahlen'
+  'deposit.withdraw.drag': 'Ziehen um Auszuzahlen',
+  'deposit.withdraw.add.error.thorMemoFeeNotCovered':
+    'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
+  'deposit.withdraw.add.error.outFeeNotCovered':
+    'Auszahlungsgebühr in Höhe von {fee} ist nicht über den zu erwartenen Auszahlungsbetrag (momentan {amount}) gedeckt'
 }
 
 export default deposit

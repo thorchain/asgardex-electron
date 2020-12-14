@@ -22,6 +22,7 @@ export enum TxTypes {
 }
 
 export type DepositType = 'sym' | 'asym'
+export type WithdrawType = 'sym' | 'asym'
 
 export const MAX_VALUE = 100
 

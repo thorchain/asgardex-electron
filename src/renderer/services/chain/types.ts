@@ -37,8 +37,17 @@ export type DepositFeesLD = LiveData<Error, DepositFees>
 
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
-export type WithdrawFee = BaseAmount
-export type WithdrawFeeRD = RD.RemoteData<Error, WithdrawFee>
-export type WithdrawFeeLD = LiveData<Error, WithdrawFee>
+/**
+ * Withdraw fees
+ *
+ * To withdraw we do need three fees:
+ *
+ * memo: Fee to send memo transaction on Thorchain
+ * thorOut: Outbound transaction fee an user is charged for each outbound (withdraw). It's 3 times of `fast` fee.
+ * assetOut : Outbound transaction fee an user is charged for each outbound (withdraw). It's 3 times of `fast` fee.
+ */
+export type WithdrawFees = { thorMemo: BaseAmount; thorOut: BaseAmount; assetOut: BaseAmount }
+export type WithdrawFeesRD = RD.RemoteData<Error, WithdrawFees>
+export type WithdrawFeesLD = LiveData<Error, WithdrawFees>
 
 export type LedgerAddressParams = { chain: Chain; network: Network }

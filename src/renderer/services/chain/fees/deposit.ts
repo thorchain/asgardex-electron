@@ -11,7 +11,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import { DepositType } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
-import { selectedPoolAsset$, selectedPoolChain$ } from '../../midgard/common'
+import { selectedPoolChain$ } from '../../midgard/common'
 import * as THOR from '../../thorchain'
 import { symDepositAssetTxMemo$, asymDepositTxMemo$ } from '../memo'
 import { FeeLD, LoadFeesHandler, DepositFeesLD } from '../types'
@@ -102,18 +102,18 @@ const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
 }
 
 const depositFees$ = (type: DepositType): DepositFeesLD =>
-  selectedPoolAsset$.pipe(
-    RxOp.switchMap((oPoolAsset) =>
+  selectedPoolChain$.pipe(
+    RxOp.switchMap((oPoolChain) =>
       FP.pipe(
-        oPoolAsset,
-        O.map((poolAsset) =>
+        oPoolChain,
+        O.map((chain) =>
           FP.pipe(
             Rx.combineLatest(
               type === 'asym'
                 ? // for asym deposits, one tx needed at asset chain only == one fee)
-                  [depositFeeByChain$(poolAsset.chain, type)]
+                  [depositFeeByChain$(chain, type)]
                 : // for sym deposits, two txs at thorchain an asset chain needed == 2 fees,
-                  [depositFeeByChain$(poolAsset.chain, type), depositFeeByChain$('THOR', type)]
+                  [depositFeeByChain$(chain, type), depositFeeByChain$('THOR', type)]
             ),
             RxOp.map(sequenceTRDFromArray),
             liveData.map(([asset, thor]) => ({

@@ -1,67 +1,63 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Chain, BaseAmount } from '@xchainjs/xchain-util'
+import { Chain, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { BASE_CHAIN } from '../../../const'
-import { liveData, LiveData } from '../../../helpers/rx/liveData'
+import { liveData } from '../../../helpers/rx/liveData'
 import { triggerStream } from '../../../helpers/stateHelper'
 import * as BNB from '../../binance'
+import * as BTC from '../../bitcoin'
 import { selectedPoolChain$ } from '../../midgard/common'
-import { FeeLD, WithdrawFeeLD } from '../types'
-import { reloadDepositFeesByChain } from './fees.helper'
+import * as THOR from '../../thorchain'
+import { getWithdrawMemo$ } from '../memo'
+import { FeeLD, WithdrawFeesLD } from '../types'
 
 // `TriggerStream` to reload withdraw fees
 const { stream$: reloadWithdrawFees$, trigger: reloadWithdrawFees } = triggerStream()
 
-/**
- * reload fees
- *
- * Has to be used ONLY on an appropriate screen
- * @example
- * useSubscription(updateWithdrawFeesEffect$)
- */
-const updateWithdrawFeesEffect$ = Rx.combineLatest([selectedPoolChain$, reloadWithdrawFees$]).pipe(
-  RxOp.tap(([oChain, _]) =>
-    FP.pipe(
-      oChain,
-      O.map(() => {
-        // reload base-chain
-        reloadDepositFeesByChain(BASE_CHAIN)
-        return true
-      })
-    )
-  )
-)
-
 const withdrawFeeByChain$ = (chain: Chain): FeeLD => {
-  // Calculate fees only for base chain (THOR or BNB)
   switch (chain) {
     case 'BNB':
-      return FP.pipe(
-        reloadWithdrawFees$,
-        RxOp.switchMap(() => BNB.fees$.pipe(liveData.map((fees) => fees.fast)))
-      )
-
-    case 'THOR':
-      return Rx.of(RD.failure(new Error(`Withdraw fee for ${chain.toUpperCase()} has not been implemented`)))
-
+      return BNB.fees$.pipe(liveData.map(({ fast }) => fast))
     case 'BTC':
+      // deposit fee for BTC txs based on withdraw memo
+      return getWithdrawMemo$.pipe(
+        RxOp.switchMap((oMemo) =>
+          FP.pipe(
+            oMemo,
+            O.fold(
+              () => Rx.of(RD.initial),
+              (memo) => BTC.poolFee$(memo)
+            )
+          )
+        )
+      )
     case 'ETH':
-      return Rx.of(RD.failure(Error(`${chain.toUpperCase} is not a base chain`)))
+      return Rx.of(RD.failure(new Error('Deposit fee for ETH has not been implemented')))
+    case 'THOR':
+      return THOR.fees$.pipe(liveData.map(({ fast }) => fast))
   }
 }
 
-const withdrawFees$: WithdrawFeeLD = FP.pipe(
-  selectedPoolChain$,
-  RxOp.switchMap(
-    FP.flow(
-      O.map(() => withdrawFeeByChain$(BASE_CHAIN)),
-      O.getOrElse((): LiveData<Error, BaseAmount> => Rx.of(RD.initial))
+const withdrawFees$: WithdrawFeesLD = Rx.combineLatest([selectedPoolChain$, reloadWithdrawFees$]).pipe(
+  RxOp.switchMap(([oPoolChain, _]) =>
+    FP.pipe(
+      oPoolChain,
+      O.map((chain) =>
+        FP.pipe(
+          liveData.sequenceT(withdrawFeeByChain$(chain), withdrawFeeByChain$('THOR')),
+          liveData.map(([asset, thor]) => ({
+            thorMemo: thor,
+            thorOut: baseAmount(thor.amount().times(3)),
+            assetOut: baseAmount(asset.amount().times(3))
+          }))
+        )
+      ),
+      O.getOrElse((): WithdrawFeesLD => Rx.of(RD.initial))
     )
   )
 )
 
-export { reloadWithdrawFees, withdrawFees$, updateWithdrawFeesEffect$ }
+export { reloadWithdrawFees, withdrawFees$ }
