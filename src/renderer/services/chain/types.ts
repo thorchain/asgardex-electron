@@ -17,14 +17,6 @@ export type FeeLD = LiveData<Error, BaseAmount>
 export type FeesRD = RD.RemoteData<Error, Fees>
 export type FeesLD = LiveData<Error, Fees>
 
-export type SwapFeeRD = RD.RemoteData<Error, BaseAmount>
-export type SwapFeeLD = LiveData<Error, BaseAmount>
-
-export type SwapFeesLDS = {
-  source: SwapFeeLD
-  target: SwapFeeLD
-}
-
 type SwapFees = {
   source: BaseAmount
   target: BaseAmount
