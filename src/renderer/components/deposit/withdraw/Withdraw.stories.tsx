@@ -30,7 +30,7 @@ const chainAssetPoolData = {
   runeBalance: baseAmount('2000')
 }
 
-export const WithdrawStory: BaseStory<{ stakedAsset?: Asset; runeAsset?: Asset }, JSX.Element> = () => (
+export const WithdrawStory: BaseStory<{ asset?: Asset }, JSX.Element> = () => (
   <Withdraw
     type={'asym'}
     fees={RD.success({ thorMemo: baseAmount(1000), thorOut: baseAmount(3000), assetOut: baseAmount(3000) })}
