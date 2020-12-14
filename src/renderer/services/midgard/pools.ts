@@ -148,11 +148,11 @@ const createPoolsService = (
     const assetDetails$ = getAssetDetails$(poolAssets$)
     const poolDetails$ = getPoolDetails$(poolAssets$)
 
-    const pricePools$: LiveData<Error, O.Option<PricePools>> = combineLatest([poolDetails$, runeAsset$]).pipe(
-      RxOp.map(([poolDetailsRD, runeAsset]) =>
+    const pricePools$: LiveData<Error, O.Option<PricePools>> = poolDetails$.pipe(
+      RxOp.map((poolDetailsRD) =>
         FP.pipe(
           poolDetailsRD,
-          RD.map((poolDetails) => some(getPricePools(poolDetails, runeAsset, PRICE_POOLS_WHITELIST)))
+          RD.map((poolDetails) => some(getPricePools(poolDetails, PRICE_POOLS_WHITELIST)))
         )
       ),
       RxOp.shareReplay(1)
