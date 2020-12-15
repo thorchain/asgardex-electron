@@ -92,6 +92,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
   return {
     fees$,
     poolFee$,
+    memoFees$,
     poolFeeRate$,
     getPoolFeeRate,
     reloadFees,

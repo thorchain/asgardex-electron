@@ -32,6 +32,7 @@ export type SendTxParams = {
 export type TransactionService = C.TransactionService<SendTxParams>
 export type FeesService = {
   fees$: FeesWithRatesLD
+  memoFees$: (memo: Memo) => FeesWithRatesLD
   poolFee$: (memo: Memo) => FeeLD
   poolFeeRate$: (memo: Memo) => FeeRateLD
   getPoolFeeRate: () => FeeRateRD

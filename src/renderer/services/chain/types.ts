@@ -17,6 +17,14 @@ export type FeeLD = LiveData<Error, BaseAmount>
 export type FeesRD = RD.RemoteData<Error, Fees>
 export type FeesLD = LiveData<Error, Fees>
 
+type SwapFees = {
+  source: BaseAmount
+  target: BaseAmount
+}
+
+export type SwapFeesRD = RD.RemoteData<Error, SwapFees>
+export type SwapFeesLD = LiveData<Error, SwapFees>
+
 export type Memo = string
 export type MemoRx = Rx.Observable<O.Option<Memo>>
 

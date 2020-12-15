@@ -11,19 +11,22 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
+import * as Rx from 'rxjs'
 
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
 import { BackLink } from '../../components/uielements/backLink'
 import { Button } from '../../components/uielements/button'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { getDefaultRuneAsset, isRuneAsset } from '../../helpers/assetHelper'
-import { rdFromOption } from '../../helpers/fpHelpers'
+import { rdFromOption, sequenceTOption } from '../../helpers/fpHelpers'
 import { getDefaultRunePricePool } from '../../helpers/poolHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { SwapRouteParams } from '../../routes/swap'
+import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
 import * as Styled from './SwapView.styles'
@@ -37,15 +40,13 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { service: midgardService } = useMidgardContext()
   const {
     pools: { poolsState$, poolAddresses$, reloadPools, runeAsset$, selectedPricePool$ },
-    getTransactionState$,
-    nativeTxFee$
+    getTransactionState$
   } = midgardService
+  const { reloadSwapFees, swapFees$ } = useChainContext()
   const { explorerUrl$, pushTx, resetTx, txRD$ } = useBinanceContext()
   const { balancesState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
-
-  const nativeTxFee = useObservableState(nativeTxFee$, RD.initial)
 
   const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
 
@@ -121,6 +122,21 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     [intl, reloadPools]
   )
 
+  const oSource = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
+  const oTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
+
+  const swapFeesLD: SwapFeesLD = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(oSource, oTarget),
+        O.map(([sourceAsset, targetAsset]) => swapFees$(sourceAsset, targetAsset)),
+        O.getOrElse((): SwapFeesLD => Rx.EMPTY)
+      ),
+    [oSource, oTarget, swapFees$]
+  )
+
+  const swapFeesRD: SwapFeesRD = useObservableState(swapFeesLD, RD.initial)
+
   return (
     <>
       <BackLink />
@@ -150,13 +166,14 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   txWithState={txWithState}
                   resetTx={resetTx}
                   goToTransaction={goToTransaction}
-                  sourceAsset={O.fromNullable(assetFromString(source.toUpperCase()))}
-                  targetAsset={O.fromNullable(assetFromString(target.toUpperCase()))}
+                  sourceAsset={oSource}
+                  targetAsset={oTarget}
                   onConfirmSwap={onConfirmSwap}
                   availableAssets={availableAssets}
                   poolDetails={state.poolDetails}
                   walletBalances={balances}
-                  nativeTxFee={nativeTxFee}
+                  reloadFees={reloadSwapFees}
+                  fees={swapFeesRD}
                 />
               )
             }
