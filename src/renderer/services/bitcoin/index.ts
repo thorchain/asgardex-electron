@@ -8,7 +8,14 @@ const { pushTx, txRD$, resetTx, sendDepositTx, txs$ } = createTransactionService
 const { fees$, reloadFees, poolFee$, memoFees$, getPoolFeeRate, reloadDepositFee, poolFeeRate$ } = createFeesService(
   client$
 )
-const { ledgerAddress$, retrieveLedgerAddress, removeLedgerAddress } = createLedgerService()
+const {
+  ledgerAddress$,
+  retrieveLedgerAddress,
+  removeLedgerAddress,
+  pushLedgerTx,
+  ledgerTxRD$,
+  resetLedgerTx
+} = createLedgerService()
 
 export {
   client$,
@@ -33,5 +40,8 @@ export {
   poolFeeRate$,
   ledgerAddress$,
   retrieveLedgerAddress,
-  removeLedgerAddress
+  removeLedgerAddress,
+  pushLedgerTx,
+  ledgerTxRD$,
+  resetLedgerTx
 }

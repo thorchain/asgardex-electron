@@ -1,13 +1,14 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client } from '@xchainjs/xchain-bitcoin'
+import { Client, LedgerTxInfoParams } from '@xchainjs/xchain-bitcoin'
 import { FeeRate, FeesWithRates } from '@xchainjs/xchain-bitcoin'
 import { BaseAmount } from '@xchainjs/xchain-util'
+import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeeLD, Memo } from '../chain/types'
 import * as C from '../clients'
-import { LedgerAddressLD } from '../wallet/types'
+import { LedgerAddressLD, LedgerTxLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -44,4 +45,7 @@ export type LedgerService = {
   ledgerAddress$: LedgerAddressLD
   retrieveLedgerAddress: (network: Network) => void
   removeLedgerAddress: () => void
+  ledgerTxRD$: LedgerTxLD
+  pushLedgerTx: (_: LedgerTxInfoParams) => Rx.Subscription
+  resetLedgerTx: () => void
 }
