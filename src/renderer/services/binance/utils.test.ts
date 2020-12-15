@@ -1,10 +1,10 @@
+import { PoolData } from '@thorchain/asgardex-util'
 import { Balances } from '@xchainjs/xchain-binance'
 import { Balance } from '@xchainjs/xchain-client'
 import {
   Asset,
   assetToBase,
   assetAmount,
-  PoolData,
   baseAmount,
   AssetBNB,
   AssetRune67C,

@@ -1,4 +1,5 @@
-import { bnOrZero, PoolData, assetFromString, Chain, AssetRuneNative } from '@xchainjs/xchain-util'
+import { PoolData } from '@thorchain/asgardex-util'
+import { bnOrZero, assetFromString, Chain, AssetRuneNative } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'

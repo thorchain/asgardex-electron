@@ -1,3 +1,4 @@
+import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRuneNative, Chain } from '@xchainjs/xchain-util'
 
 import { BASE_CHAIN } from '../const'
@@ -13,6 +14,9 @@ export const getChainAsset = (chain: Chain): Asset => {
       return AssetETH
     case 'THOR':
       return AssetRuneNative
+    // Need to export AssetAtom, AssetDot to xchain-util, not ready yet
+    default:
+      return AssetAtom
   }
 }
 

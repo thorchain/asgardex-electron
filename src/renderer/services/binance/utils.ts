@@ -1,17 +1,7 @@
+import { getValueOfAsset1InAsset2, PoolData, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
 import { Balances as BinanceBalances } from '@xchainjs/xchain-binance'
 import { Balance, Balances } from '@xchainjs/xchain-client'
-import {
-  getValueOfAsset1InAsset2,
-  PoolData,
-  BaseAmount,
-  assetAmount,
-  bnOrZero,
-  assetFromString,
-  getValueOfRuneInAsset,
-  Asset,
-  assetToBase,
-  AssetBNB
-} from '@xchainjs/xchain-util'
+import { BaseAmount, assetAmount, bnOrZero, assetFromString, Asset, assetToBase, AssetBNB } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'

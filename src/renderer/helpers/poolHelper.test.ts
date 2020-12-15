@@ -1,4 +1,5 @@
-import { PoolData, assetAmount, assetToBase, AssetRune67C, assetToString } from '@xchainjs/xchain-util'
+import { PoolData } from '@thorchain/asgardex-util'
+import { assetAmount, assetToBase, AssetRune67C, assetToString } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'

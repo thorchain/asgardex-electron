@@ -1,16 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { getSwapMemo } from '@thorchain/asgardex-util'
 import { Fees } from '@xchainjs/xchain-client'
-import {
-  Chain,
-  Asset,
-  BNBChain,
-  THORChain,
-  BTCChain,
-  ETHChain,
-  baseAmount,
-  BaseAmount,
-  getSwapMemo
-} from '@xchainjs/xchain-util'
+import { Chain, Asset, BNBChain, THORChain, BTCChain, baseAmount, BaseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 
@@ -44,7 +35,7 @@ const feesByChain$ = (chain: Chain, memo?: Memo): FeesLD => {
         memo ? BTC.memoFees$(memo) : BTC.fees$,
         liveData.map((btcFees) => btcFees.fees)
       )
-    case ETHChain:
+    default:
       return Rx.of(RD.failure(Error(`${chain.toUpperCase} fees is not implemented yet`)))
   }
 }

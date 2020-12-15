@@ -1,11 +1,5 @@
-import {
-  bnOrZero,
-  PoolData,
-  getValueOfAsset1InAsset2,
-  baseAmount,
-  getValueOfRuneInAsset,
-  assetFromString
-} from '@xchainjs/xchain-util'
+import { PoolData, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
+import { bnOrZero, baseAmount, assetFromString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'

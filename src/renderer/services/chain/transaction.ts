@@ -36,13 +36,9 @@ const sendDepositTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositT
         )
       )
 
-    case 'ETH':
+    default:
       // not available yet
-      return depositTxFailure$('Deposit tx has not been implemented for ETH yet')
-
-    case 'THOR':
-      // not available yet
-      return depositTxFailure$('Deposit tx has not been implemented for THORChain yet')
+      return depositTxFailure$(`Deposit tx has not been implemented for ${chain.toUpperCase} yet`)
   }
 }
 
