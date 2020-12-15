@@ -508,7 +508,7 @@ export const Swap = ({
         O.map((asset) =>
           formatAssetAmountCurrency({ amount: assetAmount(swapData.swapResult), asset, trimZeros: true })
         ),
-        O.getOrElse(() => formatBN(swapData.swapResult, 7))
+        O.getOrElse(() => formatBN(ZERO_BN))
       ),
     [targetAsset, swapData]
   )
