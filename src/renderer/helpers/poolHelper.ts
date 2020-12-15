@@ -111,4 +111,4 @@ export const getDeepestPool = (pools: PoolDetails): O.Option<PoolDetail> =>
  * Converts Asset's pool price according to runePrice in selectedPriceAsset
  */
 export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: PoolDetail) =>
-  bnOrZero(poolDetail.price).multipliedBy(runePrice)
+  bnOrZero(poolDetail.assetPrice).multipliedBy(runePrice)

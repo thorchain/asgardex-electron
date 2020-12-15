@@ -6,15 +6,20 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import {
-  AssetDetail,
   PoolDetail,
-  NetworkInfo,
-  ThorchainLastblock,
-  ThorchainConstants,
-  ThorchainEndpoint,
-  StakersAssetData
+  Network as NetworkInfo
+  // ThorchainLastblock,
+  // ThorchainConstants,
+  // ThorchainEndpoint
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
+
+// eslint-disable-next-line
+type ThorchainLastblock = any
+// eslint-disable-next-line
+type ThorchainConstants = any
+// eslint-disable-next-line
+type ThorchainEndpoint = any
 
 export type PoolAsset = string
 export type PoolStringAssets = string[]
@@ -23,6 +28,53 @@ export type PoolStringAssetsLD = LiveData<Error, PoolStringAssets>
 export type PoolAssets = Asset[]
 export type PoolAssetsRD = RD.RemoteData<Error, PoolAssets>
 export type PoolAssetsLD = LiveData<Error, PoolAssets>
+
+export type AssetDetail = {
+  asset: string
+  dateCreated: number
+  priceRune: string
+}
+
+export interface StakersAssetData {
+  /**
+   * Asset
+   * @type {string}
+   */
+  asset?: string
+  /**
+   * Total of assets staked
+   * @type {string}
+   */
+  assetStaked?: string
+  /**
+   * Total of assets withdrawn
+   * @type {string}
+   */
+  assetWithdrawn?: string
+  /**
+   * @type {number}
+   */
+  dateFirstStaked?: number
+  /**
+   * @type {number}
+   */
+  heightLastStaked?: number
+  /**
+   * Total of rune staked
+   * @type {string}
+   */
+  runeStaked?: string
+  /**
+   * Total of rune withdrawn
+   * @type {string}
+   */
+  runeWithdrawn?: string
+  /**
+   * Represents ownership of a pool.
+   * @type {string}
+   */
+  units?: string
+}
 
 export type AssetDetails = AssetDetail[]
 export type AssetDetailsRD = RD.RemoteData<Error, AssetDetails>
@@ -81,6 +133,10 @@ export type ThorchainEndpointsLD = LiveData<Error, ThorchainEndpoint[]>
 export type PoolAddress = string
 export type PoolAddressRx = Rx.Observable<O.Option<PoolAddress>>
 
+/**
+ * ???
+ * totalStaked -> totalPooledRune
+ */
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 

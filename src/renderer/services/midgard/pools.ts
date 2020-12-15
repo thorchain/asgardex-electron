@@ -4,8 +4,8 @@ import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
-import { some } from 'fp-ts/Option'
 import * as O from 'fp-ts/Option'
+import { some } from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import { combineLatest } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -16,28 +16,23 @@ import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
-import {
-  DefaultApi,
-  GetPoolsDetailsViewEnum,
-  GetPoolsRequest,
-  GetPoolsStatusEnum
-} from '../../types/generated/midgard/apis'
+import { DefaultApi, GetPoolsRequest, GetPoolsStatusEnum } from '../../types/generated/midgard/apis'
 import { PoolDetail } from '../../types/generated/midgard/models'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import {
   AssetDetailsLD,
-  PoolStringAssetsLD,
+  PendingPoolsStateLD,
+  PoolAddressRx,
+  PoolAssetsLD,
   PoolDetailLD,
   PoolDetailsLD,
   PoolsService,
   PoolsStateLD,
+  PoolStringAssetsLD,
   SelectedPricePoolAsset,
-  ThorchainEndpointsLD,
-  PoolAssetsLD,
-  PoolAddressRx,
-  PendingPoolsStateLD
+  ThorchainEndpointsLD
 } from './types'
 import { getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
 
@@ -67,6 +62,7 @@ const createPoolsService = (
         FP.pipe(
           api.getPools(request),
           RxOp.map(RD.success),
+          liveData.map(A.map((pool) => pool.asset)),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
       )
@@ -75,44 +71,52 @@ const createPoolsService = (
   /**
    * Data of enabled `Pools` from Midgard
    */
-  const apiGetPoolsEnabled$ = apiGetPools$({ status: GetPoolsStatusEnum.Enabled })
+  const apiGetPoolsEnabled$: LiveData<Error, string[]> = apiGetPools$({ status: GetPoolsStatusEnum.Available })
 
   /**
    * Ddata of pending `Pools` from Midgard
    */
-  const apiGetPoolsPending$ = apiGetPools$({ status: GetPoolsStatusEnum.Bootstrap })
+  const apiGetPoolsPending$: LiveData<Error, string[]> = apiGetPools$({ status: GetPoolsStatusEnum.Staged })
 
   /**
    * Data of `AssetDetails` from Midgard
    */
-  const apiGetAssetInfo$: (asset: string) => AssetDetailsLD = (asset) =>
+  const apiGetAssetInfo$: (assetOrAssets: string | string[]) => AssetDetailsLD = (assetOrAssets) =>
     FP.pipe(
       byzantine$,
-      liveData.chain((endpoint) =>
-        FP.pipe(
-          getMidgardDefaultApi(endpoint).getAssetInfo({ asset }),
+      liveData.chain((endpoint) => {
+        const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
+        return FP.pipe(
+          getMidgardDefaultApi(endpoint).getPools({ status: GetPoolsStatusEnum.Available }),
+          RxOp.map(A.filter((pool) => assets.includes(pool.asset))),
           RxOp.map(RD.success),
+          liveData.map(
+            A.map((poolDetails) => ({
+              asset: poolDetails.asset,
+              dateCreated: 0, // check whether we need it ?
+              priceRune: poolDetails.assetPrice
+            }))
+          ),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
-      )
+      })
     )
 
   /**
    * `PoolDetails` data from Midgard
    */
-  const apiGetPoolsData$: (asset: string, isDetailed?: boolean) => LiveData<Error, PoolDetail[]> = (
-    asset,
-    isDetailed = false
-  ) =>
+  const apiGetPoolsData$: (asset: string) => LiveData<Error, PoolDetail[]> = (asset) =>
     byzantine$.pipe(
       liveData.chain((endpoint) =>
         FP.pipe(
-          getMidgardDefaultApi(endpoint).getPoolsDetails({
-            asset,
-            view: isDetailed ? GetPoolsDetailsViewEnum.Full : GetPoolsDetailsViewEnum.Simple
+          getMidgardDefaultApi(endpoint).getPools({
+            status: GetPoolsStatusEnum.Available
           }),
           // error if no pools are available
-          RxOp.map((assets) => (assets.length > 0 ? RD.success(assets) : RD.failure(new Error('No pools available')))),
+          RxOp.map((poolDetails: PoolDetail[]) =>
+            poolDetails.length > 0 ? RD.success(poolDetails) : RD.failure(new Error('No pools available'))
+          ),
+          liveData.map(A.filter((poolDetail) => poolDetail.asset === asset)),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
       )
@@ -123,7 +127,6 @@ const createPoolsService = (
     FP.pipe(
       poolAssets$,
       liveData.map(NEA.fromArray),
-      liveData.map(O.map((assets) => assets.join(','))),
       // provide an empty list of `AssetDetails` in case of empty list of pools
       liveData.chain(O.fold(() => liveData.of([]), apiGetAssetInfo$)),
       RxOp.shareReplay(1)
@@ -239,7 +242,7 @@ const createPoolsService = (
         selectedPoolAsset,
         O.fold(
           () => Rx.of(RD.initial),
-          (asset) => apiGetPoolsData$(assetToString(asset), true)
+          (asset) => apiGetPoolsData$(assetToString(asset))
         )
       )
     ),
@@ -289,14 +292,19 @@ const createPoolsService = (
 
   const poolAddresses$: ThorchainEndpointsLD = FP.pipe(
     byzantine$,
-    liveData.chain((endpoint) =>
-      FP.pipe(
+    liveData.chain((endpoint) => {
+      getMidgardDefaultApi(endpoint)
+      return FP.pipe(
+        // eslint-disable-next-line
+        // @ts-ignore
         getMidgardDefaultApi(endpoint).getThorchainProxiedEndpoints(),
         RxOp.map(RD.success),
         RxOp.startWith(RD.pending),
         RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
-    ),
+    }),
+    // eslint-disable-next-line
+    // @ts-ignore
     liveData.map((s) => s.current || []),
     RxOp.retry(MIDGARD_MAX_RETRY)
   )

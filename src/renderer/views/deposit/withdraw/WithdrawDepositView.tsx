@@ -18,10 +18,10 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
-import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
+import { PoolDetailRD, StakersAssetData, StakersAssetDataRD } from '../../../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
-import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard/models'
+import { PoolDetail } from '../../../types/generated/midgard/models'
 
 type Props = {
   asset: Asset
