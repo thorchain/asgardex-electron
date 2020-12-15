@@ -21,7 +21,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { getDefaultRuneAsset, isRuneAsset } from '../../helpers/assetHelper'
+import { getDefaultRuneAsset, isRuneBnbAsset } from '../../helpers/assetHelper'
 import { rdFromOption, sequenceTOption } from '../../helpers/fpHelpers'
 import { getDefaultRunePricePool } from '../../helpers/poolHelper'
 import { liveData } from '../../helpers/rx/liveData'
@@ -152,7 +152,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                 .filter((a) => a.asset !== undefined && !!a.asset)
                 .map((a) => ({ asset: assetFromString(a.asset as string) as Asset, priceRune: bnOrZero(a.priceRune) }))
 
-              const hasRuneAsset = Boolean(availableAssets.find(({ asset }) => isRuneAsset(asset)))
+              const hasRuneAsset = Boolean(availableAssets.find(({ asset }) => isRuneBnbAsset(asset)))
 
               if (!hasRuneAsset && runeAsset) {
                 availableAssets.unshift({ asset: runeAsset, priceRune: bnOrZero(1) })
