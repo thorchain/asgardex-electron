@@ -94,10 +94,14 @@ const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
           )
         )
       )
-    case 'ETH':
-      return Rx.of(RD.failure(new Error('Deposit fee for ETH has not been implemented')))
     case 'THOR':
       return THOR.fees$.pipe(liveData.map(({ fast }) => fast))
+    case 'ETH':
+      return Rx.of(RD.failure(Error('Deposit fee for ETH has not been implemented')))
+    case 'GAIA':
+      return Rx.of(RD.failure(Error('Deposit fee for Cosmos has not been implemented')))
+    case 'POLKA':
+      return Rx.of(RD.failure(Error('Deposit fee for Polkadot has not been implemented')))
   }
 }
 

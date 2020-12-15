@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { getValueOfAsset1InAsset2, PoolData, getSwapMemo } from '@thorchain/asgardex-util'
 import { Balance } from '@xchainjs/xchain-client'
 import {
   Asset,
@@ -10,10 +11,7 @@ import {
   assetToString,
   bn,
   formatBN,
-  getValueOfAsset1InAsset2,
-  PoolData,
   baseToAsset,
-  getSwapMemo,
   BaseAmount,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'

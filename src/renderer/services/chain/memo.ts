@@ -1,4 +1,4 @@
-import { getDepositMemo, getWithdrawMemo } from '@xchainjs/xchain-util'
+import { getDepositMemo, getWithdrawMemo } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'

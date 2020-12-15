@@ -1,3 +1,4 @@
+import { PoolData } from '@thorchain/asgardex-util'
 import {
   assetToBase,
   assetAmount,
@@ -11,8 +12,7 @@ import {
   baseAmount,
   AssetBNB,
   BNBChain,
-  Chain,
-  PoolData
+  Chain
 } from '@xchainjs/xchain-util'
 
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'

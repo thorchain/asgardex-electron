@@ -1,4 +1,5 @@
-import { bn, assetAmount, PoolData, assetToBase, AssetRune67C } from '@xchainjs/xchain-util'
+import { PoolData } from '@thorchain/asgardex-util'
+import { bn, assetAmount, assetToBase, AssetRune67C } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 

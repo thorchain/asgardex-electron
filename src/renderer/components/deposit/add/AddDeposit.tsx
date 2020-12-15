@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
+import { PoolData } from '@thorchain/asgardex-util'
 import {
   Asset,
   AssetAmount,
@@ -9,8 +10,7 @@ import {
   baseAmount,
   BaseAmount,
   baseToAsset,
-  formatAssetAmountCurrency,
-  PoolData
+  formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
