@@ -8,6 +8,7 @@ const wallet: WalletMessages = {
   'wallet.column.balance': 'Saldo',
   'wallet.column.value': 'Wert',
   'wallet.action.send': 'Senden',
+  'wallet.action.upgrade': 'Upgrade',
   'wallet.action.receive': 'Empfangen',
   'wallet.action.remove': 'Wallet entfernen',
   'wallet.action.unlock': 'Entsperren',

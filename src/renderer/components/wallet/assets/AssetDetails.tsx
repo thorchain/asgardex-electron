@@ -8,7 +8,10 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import { isRuneBnbAsset } from '../../../helpers/assetHelper'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
+import { getAssetAmountByAsset } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
@@ -47,7 +50,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         oAsset,
-        O.map((a) => assetToString(a)),
+        O.map((asset) => assetToString(asset)),
         O.getOrElse(() => '')
       ),
     [oAsset]
@@ -86,6 +89,23 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [loadTxsHandler]
   )
 
+  const runeIsUpgradeable = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(oAsset, oBalances),
+        O.filter(([asset]) => isRuneBnbAsset(asset)),
+        O.chain(([asset, balances]) => getAssetAmountByAsset(balances, asset)),
+        O.map((amount) => amount.amount().isGreaterThan(0)),
+        O.getOrElse(() => false)
+      ),
+    [oAsset, oBalances]
+  )
+
+  const actionColSpanDesktop = runeIsUpgradeable ? 8 : 12
+  const actionColSpanMobile = 24
+
+  const upgradeRune = useCallback((_) => console.log('upgrade'), [])
+
   return (
     <>
       <Row justify="space-between">
@@ -104,7 +124,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         <Styled.Divider />
 
         <Styled.ActionRow>
-          <Styled.ActionCol sm={{ span: 24 }} md={{ span: 12 }}>
+          <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
             <Styled.ActionWrapper>
               <Row justify="center">
                 <Button type="primary" round="true" sizevalue="xnormal" onClick={walletActionSendClick}>
@@ -113,7 +133,18 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               </Row>
             </Styled.ActionWrapper>
           </Styled.ActionCol>
-          <Styled.ActionCol sm={{ span: 24 }} md={{ span: 12 }}>
+          {runeIsUpgradeable && (
+            <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
+              <Styled.ActionWrapper>
+                <Row justify="center">
+                  <Button type="primary" round="true" sizevalue="xnormal" color="warning" onClick={upgradeRune}>
+                    {intl.formatMessage({ id: 'wallet.action.upgrade' })}
+                  </Button>
+                </Row>
+              </Styled.ActionWrapper>
+            </Styled.ActionCol>
+          )}
+          <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
             <Styled.ActionWrapper>
               <Row justify="center">
                 <Button typevalue="outline" round="true" sizevalue="xnormal" onClick={walletActionReceiveClick}>
