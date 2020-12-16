@@ -56,71 +56,78 @@ const createPoolsService = (
 ): PoolsService => {
   // Factory to get `Pools` from Midgard
   const apiGetPools$ = (request: GetPoolsRequest) =>
-    byzantine$.pipe(
+    FP.pipe(
+      Rx.combineLatest([byzantine$, reloadPools$]),
+      RxOp.map(([byzantine]) => byzantine),
       liveData.map(getMidgardDefaultApi),
       liveData.chain((api) =>
         FP.pipe(
           api.getPools(request),
           RxOp.map(RD.success),
-          liveData.map(A.map((pool) => pool.asset)),
+          RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
-      )
+      ),
+      RxOp.shareReplay(1)
     )
+
+  // `TriggerStream` to reload data of pools
+  const { stream$: reloadPools$, trigger: reloadPools } = triggerStream()
 
   /**
    * Data of enabled `Pools` from Midgard
    */
-  const apiGetPoolsEnabled$: LiveData<Error, string[]> = apiGetPools$({ status: GetPoolsStatusEnum.Available })
+  const apiGetPoolsEnabled$: LiveData<Error, PoolDetail[]> = apiGetPools$({ status: GetPoolsStatusEnum.Available })
 
   /**
    * Ddata of pending `Pools` from Midgard
    */
-  const apiGetPoolsPending$: LiveData<Error, string[]> = apiGetPools$({ status: GetPoolsStatusEnum.Staged })
+  const apiGetPoolsPending$: LiveData<Error, PoolDetail[]> = apiGetPools$({ status: GetPoolsStatusEnum.Staged })
 
   /**
    * Data of `AssetDetails` from Midgard
    */
-  const apiGetAssetInfo$: (assetOrAssets: string | string[]) => AssetDetailsLD = (assetOrAssets) =>
-    FP.pipe(
-      byzantine$,
-      liveData.chain((endpoint) => {
-        const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
-        return FP.pipe(
-          getMidgardDefaultApi(endpoint).getPools({ status: GetPoolsStatusEnum.Available }),
-          RxOp.map(A.filter((pool) => assets.includes(pool.asset))),
-          RxOp.map(RD.success),
-          liveData.map(
-            A.map((poolDetails) => ({
-              asset: poolDetails.asset,
-              dateCreated: 0, // check whether we need it ?
-              priceRune: poolDetails.assetPrice
-            }))
-          ),
-          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
-        )
-      })
+  const apiGetAssetInfo$: (assetOrAssets: string | string[]) => AssetDetailsLD = (assetOrAssets) => {
+    const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
+
+    return FP.pipe(
+      apiGetPoolsEnabled$,
+      liveData.map(A.filter((pool) => assets.includes(pool.asset))),
+      liveData.map(
+        A.map((poolDetails) => ({
+          asset: poolDetails.asset,
+          /**
+           * Use mocked zero date as midgard v2 does not provide this
+           * info yet.
+           * @todo (@thatStrangeGuy) remove dateCreated from target type as we dont use it anywhere
+           */
+          dateCreated: 0,
+          priceRune: poolDetails.assetPrice
+        }))
+      ),
+      RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
     )
+  }
 
   /**
    * `PoolDetails` data from Midgard
    */
-  const apiGetPoolsData$: (asset: string) => LiveData<Error, PoolDetail[]> = (asset) =>
-    byzantine$.pipe(
-      liveData.chain((endpoint) =>
-        FP.pipe(
-          getMidgardDefaultApi(endpoint).getPools({
-            status: GetPoolsStatusEnum.Available
-          }),
-          // error if no pools are available
-          RxOp.map((poolDetails: PoolDetail[]) =>
-            poolDetails.length > 0 ? RD.success(poolDetails) : RD.failure(new Error('No pools available'))
-          ),
-          liveData.map(A.filter((poolDetail) => poolDetail.asset === asset)),
-          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+  const apiGetPoolsData$: (assetOrAssets: string | string[]) => LiveData<Error, PoolDetail[]> = (assetOrAssets) => {
+    const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
+
+    return FP.pipe(
+      apiGetPoolsEnabled$,
+      liveData.map(A.filter((poolDetail) => assets.includes(poolDetail.asset))),
+      liveData.map(NEA.fromArray),
+      liveData.chain(
+        O.fold(
+          (): LiveData<Error, PoolDetail[]> => Rx.of(RD.failure(new Error('No pools available'))),
+          (poolsDetails): LiveData<Error, PoolDetail[]> => Rx.of(RD.success(poolsDetails))
         )
-      )
+      ),
+      RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
     )
+  }
 
   // Factory to create a stream to get data of `AssetDetails`
   const getAssetDetails$: (poolAssets$: PoolStringAssetsLD) => AssetDetailsLD = (poolAssets$) =>
@@ -137,7 +144,6 @@ const createPoolsService = (
     FP.pipe(
       poolAssets$,
       liveData.map(NEA.fromArray),
-      liveData.map(O.map((assets) => assets.join(','))),
       // provide an empty list of `PoolDetails` in case of empty list of pools
       liveData.chain(O.fold(() => liveData.of([]), apiGetPoolsData$)),
       RxOp.shareReplay(1)
@@ -147,7 +153,7 @@ const createPoolsService = (
    * Loading queue to get all needed data for `PoolsState`
    */
   const loadPoolsStateData$ = (): PoolsStateLD => {
-    const poolAssets$: PoolStringAssetsLD = FP.pipe(apiGetPoolsEnabled$, RxOp.shareReplay(1))
+    const poolAssets$: PoolStringAssetsLD = FP.pipe(apiGetPoolsEnabled$, liveData.map(A.map(({ asset }) => asset)))
     const assetDetails$ = getAssetDetails$(poolAssets$)
     const poolDetails$ = getPoolDetails$(poolAssets$)
 
@@ -186,9 +192,6 @@ const createPoolsService = (
     )
   }
 
-  // `TriggerStream` to reload data of pools
-  const { stream$: reloadPools$, trigger: reloadPools } = triggerStream()
-
   /**
    * State of all pool data
    */
@@ -203,7 +206,7 @@ const createPoolsService = (
    * Loading queue to get all needed data for `PendingPoolsState`
    */
   const loadPendingPoolsStateData$ = (): PendingPoolsStateLD => {
-    const poolAssets$: PoolStringAssetsLD = FP.pipe(apiGetPoolsPending$, RxOp.shareReplay(1))
+    const poolAssets$: PoolStringAssetsLD = FP.pipe(apiGetPoolsPending$, liveData.map(A.map(({ asset }) => asset)))
     const assetDetails$ = getAssetDetails$(poolAssets$)
     const poolDetails$ = getPoolDetails$(poolAssets$)
 
@@ -219,12 +222,10 @@ const createPoolsService = (
     )
   }
 
-  // `TriggerStream` to reload data of pending pools
-  const { stream$: reloadPendingPools$, trigger: reloadPendingPools } = triggerStream()
   /**
    * State of data of pendings pools
    */
-  const pendingPoolsState$: PendingPoolsStateLD = reloadPendingPools$.pipe(
+  const pendingPoolsState$: PendingPoolsStateLD = reloadPools$.pipe(
     // start loading queue
     RxOp.switchMap(loadPendingPoolsStateData$),
     // cache it to avoid reloading data by every subscription
@@ -295,16 +296,12 @@ const createPoolsService = (
     liveData.chain((endpoint) => {
       getMidgardDefaultApi(endpoint)
       return FP.pipe(
-        // eslint-disable-next-line
-        // @ts-ignore
-        getMidgardDefaultApi(endpoint).getThorchainProxiedEndpoints(),
+        getMidgardDefaultApi(endpoint).getProxiedInboundAddresses(),
         RxOp.map(RD.success),
         RxOp.startWith(RD.pending),
         RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
     }),
-    // eslint-disable-next-line
-    // @ts-ignore
     liveData.map((s) => s.current || []),
     RxOp.retry(MIDGARD_MAX_RETRY)
   )
@@ -351,7 +348,6 @@ const createPoolsService = (
     selectedPricePool$,
     selectedPricePoolAssetSymbol$,
     reloadPools,
-    reloadPendingPools,
     poolAddresses$,
     poolAddress$,
     runeAsset$,

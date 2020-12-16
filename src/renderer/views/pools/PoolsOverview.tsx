@@ -42,7 +42,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const {
     thorchainLastblockState$,
     thorchainConstantsState$,
-    pools: { poolsState$, pendingPoolsState$, selectedPricePool$, reloadPools, reloadPendingPools },
+    pools: { poolsState$, pendingPoolsState$, selectedPricePool$, reloadPools },
     reloadThorchainLastblock,
     reloadNetworkInfo
   } = midgardService
@@ -57,6 +57,8 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     const lastblock = RD.toNullable(thorchainLastblockRD)
     const constants = RD.toNullable(thorchainConstantsRD)
     if (lastblock && constants) {
+      // eslint-disable-next-line
+      // @ts-ignore
       setBlocksLeft(getBlocksLeftForPendingPoolAsString(constants, lastblock))
     }
   }, [thorchainConstantsRD, thorchainLastblockRD])
@@ -101,9 +103,8 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
 
   const clickRefreshHandler = useCallback(() => {
     reloadPools()
-    reloadPendingPools()
     reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPendingPools, reloadPools])
+  }, [reloadNetworkInfo, reloadPools])
 
   const renderRefreshBtn = useMemo(
     () => (

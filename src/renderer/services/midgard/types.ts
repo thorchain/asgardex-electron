@@ -7,19 +7,14 @@ import * as Rx from 'rxjs'
 import { LiveData } from '../../helpers/rx/liveData'
 import {
   PoolDetail,
-  Network as NetworkInfo
-  // ThorchainLastblock,
-  // ThorchainConstants,
-  // ThorchainEndpoint
+  Network as NetworkInfo,
+  ConstantsSchema as ThorchainConstants,
+  LastblockItem,
+  InboundAddressesItem as ThorchainEndpoint
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 
-// eslint-disable-next-line
-type ThorchainLastblock = any
-// eslint-disable-next-line
-type ThorchainConstants = any
-// eslint-disable-next-line
-type ThorchainEndpoint = any
+export type ThorchainLastblock = LastblockItem[]
 
 export type PoolAsset = string
 export type PoolStringAssets = string[]
@@ -150,7 +145,6 @@ export type PoolsService = {
   selectedPricePool$: Rx.Observable<SelectedPricePool>
   selectedPricePoolAssetSymbol$: Rx.Observable<O.Option<string>>
   reloadPools: () => void
-  reloadPendingPools: () => void
   poolAddresses$: ThorchainEndpointsLD
   poolAddress$: PoolAddressRx
   runeAsset$: Rx.Observable<Asset>
