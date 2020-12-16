@@ -3,7 +3,6 @@ import React, { useCallback, useMemo } from 'react'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, formatAssetAmountCurrency, baseToAsset } from '@xchainjs/xchain-util'
 import { Menu, Dropdown, Row, Col } from 'antd'
-import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { WalletBalances } from '../../../services/clients'
@@ -14,7 +13,7 @@ import * as Styled from './AccountSelector.style'
 type Props = {
   selectedAsset: Asset
   walletBalances: WalletBalances
-  onChange?: (asset: Asset, walletAddress: O.Option<Address>) => void
+  onChange?: (asset: Asset, walletAddress: Address) => void
   size?: IconSize
 }
 

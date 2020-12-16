@@ -57,10 +57,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
       FP.pipe(
         sequenceTOption(oBalances, oWalletAddress),
         O.map(([balances, walletAddress]) =>
-          balances.filter(
-            (walletBalance) =>
-              O.isSome(walletBalance.walletAddress) && walletBalance.walletAddress.value === walletAddress
-          )
+          balances.filter((walletBalance) => walletBalance.walletAddress === walletAddress)
         ),
         O.chain(NEA.fromArray)
       ),

@@ -20,7 +20,7 @@ import { SendFormTHOR } from './index'
 const runeWalletBalance: WalletBalance = {
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2)),
-  walletAddress: O.some('rune wallet')
+  walletAddress: 'rune wallet address'
 }
 
 const balances: WalletBalances = [runeWalletBalance]

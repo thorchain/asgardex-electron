@@ -45,7 +45,7 @@ const chainBalances: ChainBalances = [
       {
         amount: baseAmount('12200000000'),
         asset: AssetRune67C,
-        walletAddress: O.some('Rune wallet address')
+        walletAddress: 'Rune wallet address'
       }
     ])
   },
@@ -55,7 +55,7 @@ const chainBalances: ChainBalances = [
       {
         amount: baseAmount('1230000'),
         asset: AssetBTC,
-        walletAddress: O.some('BTC wallet address')
+        walletAddress: 'BTC wallet address'
       }
     ])
   },
@@ -65,12 +65,12 @@ const chainBalances: ChainBalances = [
       {
         amount: baseAmount('1000000'),
         asset: AssetBNB,
-        walletAddress: O.some('BNB wallet address')
+        walletAddress: 'BNB wallet address'
       },
       {
         amount: baseAmount('300000000'),
         asset: AssetETH,
-        walletAddress: O.some('ETH wallet address')
+        walletAddress: 'ETH wallet address'
       }
     ])
   }

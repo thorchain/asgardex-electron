@@ -21,13 +21,13 @@ import { SendFormBNB } from './index'
 const bnbAsset: WalletBalance = {
   asset: AssetBNB,
   amount: assetToBase(assetAmount(1.23)),
-  walletAddress: O.some('AssetBNB wallet')
+  walletAddress: 'AssetBNB wallet address'
 }
 
 const runeAsset: WalletBalance = {
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(2)),
-  walletAddress: O.some('AssetRune67C wallet')
+  walletAddress: 'AssetRune67C wallet address'
 }
 
 const balances: WalletBalances = [bnbAsset, runeAsset]

@@ -43,7 +43,8 @@ export type TxsParams = { asset: O.Option<Asset>; walletAddress: O.Option<string
 export type TxsPageRD = RD.RemoteData<ApiError, TxsPage>
 export type TxsPageLD = LiveData<ApiError, TxsPage>
 
-export type BalanceRD = RD.RemoteData<ApiError, WalletBalance>
+export type WalletBalanceRD = RD.RemoteData<ApiError, WalletBalance>
+export type WalletBalanceLD = LiveData<ApiError, WalletBalance>
 
 export type WalletBalances = WalletBalance[]
 export type WalletBalancesRD = RD.RemoteData<ApiError, WalletBalances>

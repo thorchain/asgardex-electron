@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, XChainClient } from '@xchainjs/xchain-client'
+import { XChainClient } from '@xchainjs/xchain-client'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -13,30 +13,36 @@ import { ApiError, ErrorId } from '../wallet/types'
 import { WalletBalancesLD, XChainClient$ } from './types'
 
 /**
- * Observable to request balances based on given `XChainClient`
+ * Observable to request balances by given `XChainClient` and `Address` (optional)
+ * `Balances` are mapped into `WalletBalances`
+ *
+ * If `address` is not set, it tries to get `Address` of `Client` (which can fail).
  */
-const loadBalances$: (client: XChainClient, address?: string) => WalletBalancesLD = (client, address) => {
-  // get wallet address once before mapping all balances
-  const walletAddress: O.Option<Address> = FP.pipe(
+const loadBalances$: (client: XChainClient, address?: string) => WalletBalancesLD = (client, address) =>
+  FP.pipe(
     address,
     O.fromNullable,
-    O.alt(() => O.tryCatch(() => client.getAddress()))
+    // Try to use client address, if parameter `address` is undefined
+    O.alt(() => O.tryCatch(() => client.getAddress())),
+    O.fold(
+      // TODO (@Veado) i18n
+      () => Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: 'Could not get address' } as ApiError)),
+      (walletAddress) =>
+        Rx.from(client.getBalance(walletAddress)).pipe(
+          map(RD.success),
+          liveData.map(
+            A.map((balance) => ({
+              ...balance,
+              walletAddress
+            }))
+          ),
+          catchError((error: Error) =>
+            Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
+          ),
+          startWith(RD.pending)
+        )
+    )
   )
-
-  return Rx.from(client.getBalance(address)).pipe(
-    map(RD.success),
-    liveData.map(
-      A.map((balance) => ({
-        ...balance,
-        walletAddress
-      }))
-    ),
-    catchError((error: Error) =>
-      Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
-    ),
-    startWith(RD.pending)
-  )
-}
 
 /**
  * State of `Balances` loaded by given `XChainClient`

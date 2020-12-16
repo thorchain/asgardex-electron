@@ -5,7 +5,6 @@ import { storiesOf } from '@storybook/react'
 import { FeeRates } from '@xchainjs/xchain-bitcoin'
 import { Fees } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBTC, AssetRune67C, assetToBase, baseAmount, formatBaseAmount } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/lib/Option'
 
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation } from '../../../../services/binance/types'
@@ -17,13 +16,13 @@ import { SendFormBTC } from './index'
 const bnbAsset: WalletBalance = {
   asset: AssetBTC,
   amount: assetToBase(assetAmount(1.23, BTC_DECIMAL)),
-  walletAddress: O.some('bnb wallet')
+  walletAddress: 'btc wallet address'
 }
 
 const runeAsset: WalletBalance = {
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(2, BTC_DECIMAL)),
-  walletAddress: O.some('rune wallet')
+  walletAddress: 'rune wallet address'
 }
 
 const balances: WalletBalances = [bnbAsset, runeAsset]
