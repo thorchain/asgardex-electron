@@ -3,23 +3,24 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
-import { ThorchainConstants, ThorchainLastblock } from '../../types/generated/midgard'
-import { PoolDetail, PoolDetailStatusEnum } from '../../types/generated/midgard/models/PoolDetail'
+import { ThorchainLastblock } from '../../services/midgard/types'
+import { ConstantsSchema as ThorchainConstants } from '../../types/generated/midgard'
+import { PoolDetail, GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolTableRowData } from './Pools.types'
 import { getPoolTableRowData, getBlocksLeftForPendingPool, getBlocksLeftForPendingPoolAsString } from './Pools.utils'
 
 describe('views/pools/utils', () => {
   describe('getPoolTableRowData', () => {
-    const lokPoolDetail: PoolDetail = {
+    const lokPoolDetail = {
       asset: 'BNB.FTM-585',
       assetDepth: '11000000000',
       runeDepth: '10000000000',
-      poolVolume24hr: '10000000000',
-      poolTxAverage: '10000000000',
-      poolSlipAverage: '0.0011',
-      swappingTxCount: '123',
-      status: PoolDetailStatusEnum.Bootstrapped
-    }
+      volume24h: '10000000000',
+      // poolTxAverage: '10000000000',
+      // poolSlipAverage: '0.0011',
+      // swappingTxCount: '123',
+      status: GetPoolsStatusEnum.Staged
+    } as PoolDetail
 
     const pricePoolData: PoolData = {
       runeBalance: assetToBase(assetAmount(10)),
@@ -38,7 +39,7 @@ describe('views/pools/utils', () => {
         transactionPrice: assetToBase(assetAmount(1000)),
         slip: bn('0.11'),
         trades: bn(123),
-        status: PoolDetailStatusEnum.Enabled,
+        status: GetPoolsStatusEnum.Available,
         deepest: false,
         key: 'hi'
       }
@@ -57,7 +58,11 @@ describe('views/pools/utils', () => {
           expect(data.pool).toEqual(expected.pool)
           expect(data.depthPrice.amount().toNumber()).toEqual(expected.depthPrice.amount().toNumber())
           expect(data.volumePrice.amount().toNumber()).toEqual(expected.volumePrice.amount().toNumber())
-          expect(data.transactionPrice.amount().toNumber()).toEqual(expected.transactionPrice.amount().toNumber())
+          /**
+           * Mock it with fixed 0 as midgard v2 doe not have data for poolDetail?.poolTxAverage
+           * target result: expected.transactionPrice.amount().toNumber()
+           */
+          expect(data.transactionPrice.amount().toNumber()).toEqual(0)
           expect(data.slip.toNumber()).toEqual(expected.slip.toNumber())
           expect(data.trades.toNumber()).toEqual(expected.trades.toNumber())
           return true
@@ -67,20 +72,22 @@ describe('views/pools/utils', () => {
   })
 
   describe('getBlocksLeftForPendingPool', () => {
-    const constants: ThorchainConstants = {
+    const constants = {
       int_64_values: { NewPoolCycle: 3001 }
-    }
-    const lastblock: ThorchainLastblock = {
-      thorchain: 2000
-    }
+    } as ThorchainConstants
+    const lastblock = [
+      {
+        thorchain: '2000'
+      }
+    ] as ThorchainLastblock
     it('returns number of blocks left', () => {
       const result = O.toNullable(getBlocksLeftForPendingPool(constants, lastblock))
       expect(result).toEqual(1001)
     })
     it('returns None if NewPoolCycle is not available', () => {
-      const constants2: ThorchainConstants = {
+      const constants2 = {
         int_64_values: {}
-      }
+      } as ThorchainConstants
       const result = getBlocksLeftForPendingPool(constants2, lastblock)
       expect(result).toBeNone()
     })
@@ -92,25 +99,27 @@ describe('views/pools/utils', () => {
   })
 
   describe('getBlocksLeftForPendingPoolAsString', () => {
-    const constants: ThorchainConstants = {
+    const constants = {
       int_64_values: { NewPoolCycle: 1234 }
-    }
-    const lastblock: ThorchainLastblock = {
-      thorchain: 1000
-    }
+    } as ThorchainConstants
+    const lastblock = [
+      {
+        thorchain: '1000'
+      }
+    ] as ThorchainLastblock
     it('returns number of blocks left', () => {
       const result = getBlocksLeftForPendingPoolAsString(constants, lastblock)
       expect(result).toEqual('234')
     })
     it('returns empty string if NewPoolCycle is not available', () => {
-      const constants2: ThorchainConstants = {
+      const constants2 = {
         int_64_values: {}
-      }
+      } as ThorchainConstants
       const result = getBlocksLeftForPendingPoolAsString(constants2, lastblock)
       expect(result).toEqual('')
     })
     it('returns empty string if lastblock (thorchain) is not available', () => {
-      const lastblock2: ThorchainLastblock = {}
+      const lastblock2: ThorchainLastblock = []
       const result = getBlocksLeftForPendingPoolAsString(constants, lastblock2)
       expect(result).toEqual('')
     })
