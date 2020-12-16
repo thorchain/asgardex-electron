@@ -21,19 +21,22 @@ import { ApiError, ChainBalance, ChainBalances, ErrorId } from '../../../service
 import { AssetsTableCollapsable } from './index'
 
 const runeBalance: ChainBalance = {
-  address: O.some('thor1766mazrxs5asuscepa227r6ekr657234f8p7nf'),
+  walletType: 'keystore',
+  walletAddress: O.some('thor1766mazrxs5asuscepa227r6ekr657234f8p7nf'),
   chain: THORChain,
   balances: RD.initial
 }
 
 const bnbBalance: ChainBalance = {
-  address: O.some('bnb1zzapwywxrxa2wyyrp93ls5l0a6ftxju5phmhu9'),
+  walletType: 'keystore',
+  walletAddress: O.some('bnb1zzapwywxrxa2wyyrp93ls5l0a6ftxju5phmhu9'),
   chain: BNBChain,
   balances: RD.initial
 }
 
 const btcBalance: ChainBalance = {
-  address: O.some('bc11766mazrxs5asuscepa227r6ekr657234f8p7nf'),
+  walletType: 'ledger',
+  walletAddress: O.some('bc11766mazrxs5asuscepa227r6ekr657234f8p7nf'),
   chain: BTCChain,
   balances: RD.initial
 }

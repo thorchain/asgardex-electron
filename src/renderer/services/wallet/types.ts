@@ -11,6 +11,8 @@ import { LiveData } from '../../helpers/rx/liveData'
 import { WalletBalance } from '../../types/wallet'
 import { LoadTxsParams, WalletBalancesRD } from '../clients'
 
+export type WalletType = 'keystore' | 'ledger'
+
 export type Phrase = string
 
 export type KeystoreContent = { phrase: Phrase }
@@ -41,7 +43,8 @@ export type KeystoreService = {
  * Currently needed in `AssetView` - TODO(@Veado) Think about to extract it into view layer (as helper or so)
  */
 export type ChainBalance = {
-  address: O.Option<Address>
+  walletType: WalletType
+  walletAddress: O.Option<Address>
   chain: Chain
   balances: WalletBalancesRD
 }

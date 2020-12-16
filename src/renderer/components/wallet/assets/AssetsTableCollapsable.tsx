@@ -217,7 +217,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   // Panel
   const renderPanel = useCallback(
-    ({ chain, address: oWalletAddress, balances: balancesRD }: ChainBalance, key: number) => {
+    ({ chain, walletAddress: oWalletAddress, balances: balancesRD }: ChainBalance, key: number) => {
       /**
        * We need to push initial value to the ledger-based streams
        * 'cuz chainBalances$ stream is created by 'combineLatest'

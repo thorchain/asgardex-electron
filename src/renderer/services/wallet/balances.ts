@@ -16,7 +16,7 @@ import { liveData } from '../../helpers/rx/liveData'
 import { network$ } from '../app/service'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
-import { WalletBalancesLD } from '../clients'
+import { WalletBalancesLD, WalletBalancesRD } from '../clients'
 import * as ETH from '../ethereum'
 import * as THOR from '../thorchain'
 import { selectedAsset$ } from './common'
@@ -57,9 +57,10 @@ export const reloadBalances$: Rx.Observable<O.Option<LoadBalancesHandler>> = sel
  * Transforms THOR balances into `ChainBalances`
  */
 const thorChainBalance$: ChainBalance$ = Rx.combineLatest([THOR.address$, THOR.balances$]).pipe(
-  map(([address, balances]) => ({
+  map(([walletAddress, balances]) => ({
+    walletType: 'keystore',
     chain: THORChain,
-    address,
+    walletAddress,
     balances
   }))
 )
@@ -68,9 +69,10 @@ const thorChainBalance$: ChainBalance$ = Rx.combineLatest([THOR.address$, THOR.b
  * Transforms BNB balances into `ChainBalances`
  */
 const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([BNB.address$, BNB.balances$, network$]).pipe(
-  map(([address, balances, network]) => ({
+  map(([walletAddress, balances, network]) => ({
+    walletType: 'keystore',
     chain: BNBChain,
-    address,
+    walletAddress,
     balances: FP.pipe(
       balances,
       RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getRuneAsset({ network, chain: 'BNB' }).ticker]))
@@ -82,9 +84,10 @@ const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([BNB.address$, BNB.bala
  * Transforms BTC balances into `ChainBalance`
  */
 const btcChainBalance$: ChainBalance$ = Rx.combineLatest([BTC.address$, BTC.balances$]).pipe(
-  map(([address, balances]) => ({
+  map(([walletAddress, balances]) => ({
+    walletType: 'keystore',
     chain: BTCChain,
-    address,
+    walletAddress,
     balances
   }))
 )
@@ -94,23 +97,22 @@ const btcLedgerChainBalance$: ChainBalance$ = FP.pipe(
   RxOp.switchMap((addressRd) =>
     FP.pipe(
       addressRd,
-      RD.map(BTC.getBalanceByAddress$),
+      RD.map((address) => BTC.getBalanceByAddress$(address, 'ledger')),
       RD.map(
-        RxOp.map(
-          (balances) =>
-            ({
-              chain: BTCChain,
-              address: FP.pipe(addressRd, RD.toOption),
-              balances
-            } as ChainBalance)
-        )
+        RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
+          walletType: 'ledger',
+          chain: BTCChain,
+          walletAddress: FP.pipe(addressRd, RD.toOption),
+          balances
+        }))
       ),
       RD.getOrElse(() =>
-        Rx.of({
+        Rx.of<ChainBalance>({
+          walletType: 'ledger',
           chain: BTCChain,
-          address: O.none,
+          walletAddress: O.none,
           balances: RD.initial
-        } as ChainBalance)
+        })
       )
     )
   ),
@@ -127,9 +129,10 @@ const btcLedgerBalance$ = FP.pipe(
  */
 // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
 const _ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
-  map(([address, balancesRD]) => ({
+  map(([walletAddress, balancesRD]) => ({
+    walletType: 'keystore',
     chain: ETHChain,
-    address,
+    walletAddress,
     balances: FP.pipe(
       balancesRD,
       RD.map((balances) => [balances])
