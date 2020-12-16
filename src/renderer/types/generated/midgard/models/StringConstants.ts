@@ -11,23 +11,14 @@
  * Do not edit the class manually.
  */
 
-import { Observable } from 'rxjs';
-import { BaseAPI } from '../runtime';
-
 /**
- * no description
+ * @export
+ * @interface StringConstants
  */
-export class SpecificationApi extends BaseAPI {
-
+export interface StringConstants {
     /**
-     * Returns human and machine readable swagger/openapi specification
-     * Get Swagger
+     * @type {string}
+     * @memberof StringConstants
      */
-    getSwagger = (): Observable<void> => {
-        return this.request<void>({
-            path: '/v2/swagger.json',
-            method: 'GET',
-        });
-    };
-
+    DefaultPoolStatus: string;
 }

@@ -1,0 +1,1693 @@
+{
+  "components": {
+    "responses": {
+      "ConstantsResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConstantsSchema"
+            }
+          }
+        },
+        "description": "Thornode Constants response."
+      },
+      "DepthHistoryResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DepthHistory"
+            }
+          }
+        },
+        "description": "Depth and price history"
+      },
+      "EarningsHistoryResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/EarningsHistory"
+            }
+          }
+        },
+        "description": "earnings history"
+      },
+      "HealthResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "database": {
+                  "description": "True means healthy, connected to database",
+                  "type": "boolean"
+                },
+                "inSync": {
+                  "description": "True means healthy. False means Midgard is still catching up to the chain",
+                  "type": "boolean"
+                },
+                "scannerHeight": {
+                  "description": "Int64, the current block count",
+                  "type": "string"
+                }
+              },
+              "required": ["database", "scannerHeight", "inSync"],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Returns health status for Midgard"
+      },
+      "InboundAddressesResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "current": {
+                  "items": {
+                    "$ref": "#/components/schemas/InboundAddressesItem"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": ["current"],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Thornode Indbound Adresses response."
+      },
+      "LastblockResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "current": {
+                  "items": {
+                    "$ref": "#/components/schemas/LastblockItem"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": ["current"],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Thornode Lastblock response."
+      },
+      "LiquidityHistoryResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/LiquidityHistory"
+            }
+          }
+        },
+        "description": "Withdrawals and deposits history"
+      },
+      "MemberDetailsResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/MemberDetails"
+            }
+          }
+        },
+        "description": "object containing liquidity provider data for a specific member"
+      },
+      "MembersResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "items": {
+                "description": "Member address",
+                "example": "tbnb1fj2lqj8dvr5pumfchc7ntlfqd2v6zdxqwjewf5",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          }
+        },
+        "description": "array of all the members"
+      },
+      "NetworkResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Network"
+            }
+          }
+        },
+        "description": "Returns an object containing Network data"
+      },
+      "NodeKeyResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "items": {
+                "$ref": "#/components/schemas/NodeKey"
+              },
+              "type": "array"
+            }
+          }
+        },
+        "description": "Returns an object containing Network data"
+      },
+      "PoolResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PoolDetail"
+            }
+          }
+        },
+        "description": "Object containing details for one pool"
+      },
+      "PoolsResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "items": {
+                "$ref": "#/components/schemas/PoolDetail"
+              },
+              "type": "array"
+            }
+          }
+        },
+        "description": "Array of pool details"
+      },
+      "QueueResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "outbound": {
+                  "example": "0",
+                  "type": "string"
+                },
+                "swap": {
+                  "example": "0",
+                  "type": "string"
+                }
+              },
+              "required": ["swap", "outbound"],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Thornode Queue response."
+      },
+      "StatsResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/StatsData"
+            }
+          }
+        },
+        "description": "object containing global BEPSwap data"
+      },
+      "SwapHistoryResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SwapHistory"
+            }
+          }
+        },
+        "description": "Swap count, volume, fee and slip history"
+      },
+      "TxResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "count": {
+                  "description": "Int64, count of txs matching the filters.",
+                  "type": "string"
+                },
+                "txs": {
+                  "items": {
+                    "$ref": "#/components/schemas/TxDetails"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": ["count", "txs"],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Returns an array of transactions"
+      }
+    },
+    "schemas": {
+      "BlockRewards": {
+        "properties": {
+          "blockReward": {
+            "type": "string"
+          },
+          "bondReward": {
+            "type": "string"
+          },
+          "poolReward": {
+            "type": "string"
+          }
+        },
+        "required": ["blockReward", "bondReward", "poolReward"],
+        "type": "object"
+      },
+      "BondMetrics": {
+        "properties": {
+          "averageActiveBond": {
+            "description": "Int64, Average bond of active nodes.",
+            "type": "string"
+          },
+          "averageStandbyBond": {
+            "description": "Int64, Average bond of standby nodes",
+            "type": "string"
+          },
+          "maximumActiveBond": {
+            "description": "Int64, Maxinum bond of active nodes.",
+            "type": "string"
+          },
+          "maximumStandbyBond": {
+            "description": "Int64, Maximum bond of standby nodes",
+            "type": "string"
+          },
+          "medianActiveBond": {
+            "description": "Int64, Median bond of active nodes.",
+            "type": "string"
+          },
+          "medianStandbyBond": {
+            "description": "Int64, Median bond of standby nodes",
+            "type": "string"
+          },
+          "minimumActiveBond": {
+            "description": "Int64, Minumum bond of active nodes.",
+            "type": "string"
+          },
+          "minimumStandbyBond": {
+            "description": "Int64, Minumum bond of standby nodes",
+            "type": "string"
+          },
+          "totalActiveBond": {
+            "description": "Int64, Total bond of active nodes.",
+            "type": "string"
+          },
+          "totalStandbyBond": {
+            "description": "Int64, Total bond of standby nodes",
+            "type": "string"
+          }
+        },
+        "required": [
+          "totalActiveBond",
+          "averageActiveBond",
+          "medianActiveBond",
+          "minimumActiveBond",
+          "maximumActiveBond",
+          "totalStandbyBond",
+          "averageStandbyBond",
+          "medianStandbyBond",
+          "minimumStandbyBond",
+          "maximumStandbyBond"
+        ],
+        "type": "object"
+      },
+      "BoolConstants": {
+        "properties": {
+          "StrictBondLiquidityRatio": {
+            "example": false,
+            "type": "boolean"
+          }
+        },
+        "required": ["StrictBondLiquidityRatio"],
+        "type": "object"
+      },
+      "ConstantsSchema": {
+        "properties": {
+          "bool_values": {
+            "$ref": "#/components/schemas/BoolConstants"
+          },
+          "int_64_values": {
+            "$ref": "#/components/schemas/Int64Constants"
+          },
+          "string_values": {
+            "$ref": "#/components/schemas/StringConstants"
+          }
+        },
+        "required": ["int_64_values", "bool_values", "string_values"],
+        "type": "object"
+      },
+      "DepthHistory": {
+        "properties": {
+          "intervals": {
+            "$ref": "#/components/schemas/DepthHistoryIntervals"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/DepthHistoryMeta"
+          }
+        },
+        "required": ["meta", "intervals"],
+        "type": "object"
+      },
+      "DepthHistoryIntervals": {
+        "items": {
+          "$ref": "#/components/schemas/DepthHistoryItem"
+        },
+        "type": "array"
+      },
+      "DepthHistoryItem": {
+        "properties": {
+          "assetDepth": {
+            "description": "Int64, the amount of Asset in the pool.",
+            "type": "string"
+          },
+          "assetPrice": {
+            "description": "Float, price of asset in rune. I.e. rune amount / asset amount.",
+            "type": "string"
+          },
+          "endTime": {
+            "description": "Int64, The end time of bucket in unix timestamp",
+            "type": "string"
+          },
+          "runeDepth": {
+            "description": "Int64, the amount of Rune in the pool.",
+            "type": "string"
+          },
+          "startTime": {
+            "description": "Int64, The beginning time of bucket in unix timestamp",
+            "type": "string"
+          }
+        },
+        "required": ["startTime", "endTime", "assetDepth", "runeDepth", "assetPrice"],
+        "type": "object"
+      },
+      "DepthHistoryMeta": {
+        "properties": {
+          "endTime": {
+            "description": "Int64, The end time of bucket in unix timestamp",
+            "type": "string"
+          },
+          "startTime": {
+            "description": "Int64, The beginning time of bucket in unix timestamp",
+            "type": "string"
+          }
+        },
+        "required": ["startTime", "endTime"],
+        "type": "object"
+      },
+      "EarningsHistory": {
+        "properties": {
+          "intervals": {
+            "$ref": "#/components/schemas/EarningsHistoryIntervals"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/EarningsHistoryItem"
+          }
+        },
+        "required": ["meta", "intervals"],
+        "type": "object"
+      },
+      "EarningsHistoryIntervals": {
+        "items": {
+          "$ref": "#/components/schemas/EarningsHistoryItem"
+        },
+        "type": "array"
+      },
+      "EarningsHistoryItem": {
+        "properties": {
+          "avgNodeCount": {
+            "description": "float64, Average amount of active nodes during the time interval",
+            "type": "string"
+          },
+          "blockRewards": {
+            "description": "Int64, Total block rewards emitted during the time interval",
+            "type": "string"
+          },
+          "bondingEarnings": {
+            "description": "Int64, Share of earnings sent to nodes during the time interval",
+            "type": "string"
+          },
+          "earnings": {
+            "description": "Int64, System income generated during the time interval. It is the sum of liquidity fees and block rewards.",
+            "type": "string"
+          },
+          "endTime": {
+            "description": "Int64, The end time of interval in unix timestamp",
+            "type": "string"
+          },
+          "liquidityEarnings": {
+            "description": "Int64, Share of earnings sent to pools during the time interval",
+            "type": "string"
+          },
+          "liquidityFees": {
+            "description": "Int64, Total liquidity fees, converted to RUNE, collected during the time interval.",
+            "type": "string"
+          },
+          "pools": {
+            "description": "Earnings data for each pool for the time interval",
+            "items": {
+              "$ref": "#/components/schemas/EarningsHistoryItemPool"
+            },
+            "type": "array"
+          },
+          "startTime": {
+            "description": "Int64, The beginning time of interval in unix timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "startTime",
+          "endTime",
+          "liquidityFees",
+          "blockRewards",
+          "earnings",
+          "bondingEarnings",
+          "liquidityEarnings",
+          "avgNodeCount",
+          "pools"
+        ],
+        "type": "object"
+      },
+      "EarningsHistoryItemPool": {
+        "description": "pool earnings data during the time interval",
+        "properties": {
+          "earnings": {
+            "description": "Int64, Share of earnings sent to the pool during the time interval",
+            "type": "string"
+          },
+          "pool": {
+            "description": "asset for the given pool",
+            "type": "string"
+          }
+        },
+        "required": ["pool", "earnings"],
+        "type": "object"
+      },
+      "InboundAddressesItem": {
+        "properties": {
+          "address": {
+            "example": "bcrt1q257g60tcxvu4dvflpszgkwq34d5vw6pg726gf3",
+            "type": "string"
+          },
+          "chain": {
+            "example": "BTC",
+            "type": "string"
+          },
+          "halted": {
+            "description": "indicate whether this chain has halted",
+            "example": false,
+            "type": "boolean"
+          },
+          "pub_key": {
+            "example": "tthorpub1addwnpepqd9nqqmgay6mju0yq72ptjucmk9atawtev4v4n6wkee5y26q80eccg0xk37",
+            "type": "string"
+          }
+        },
+        "required": ["chain", "pub_key", "address", "halted"],
+        "type": "object"
+      },
+      "Int64Constants": {
+        "properties": {
+          "AsgardSize": {
+            "example": 30,
+            "format": "int64",
+            "type": "integer"
+          },
+          "BadValidatorRate": {
+            "example": 60,
+            "format": "int64",
+            "type": "integer"
+          },
+          "BlocksPerYear": {
+            "example": 6311390,
+            "format": "int64",
+            "type": "integer"
+          },
+          "ChurnInterval": {
+            "example": 60,
+            "format": "int64",
+            "type": "integer"
+          },
+          "ChurnRetryInterval": {
+            "example": 30,
+            "format": "int64",
+            "type": "integer"
+          },
+          "CliTxCost": {
+            "example": 0,
+            "format": "int64",
+            "type": "integer"
+          },
+          "DesiredValidatorSet": {
+            "example": 12,
+            "format": "int64",
+            "type": "integer"
+          },
+          "DoubleSignMaxAge": {
+            "example": 24,
+            "format": "int64",
+            "type": "integer"
+          },
+          "EmissionCurve": {
+            "example": 6,
+            "format": "int64",
+            "type": "integer"
+          },
+          "FailKeygenSlashPoints": {
+            "example": 720,
+            "format": "int64",
+            "type": "integer"
+          },
+          "FailKeysignSlashPoints": {
+            "example": 2,
+            "format": "int64",
+            "type": "integer"
+          },
+          "FundMigrationInterval": {
+            "example": 60,
+            "format": "int64",
+            "type": "integer"
+          },
+          "JailTimeKeygen": {
+            "example": 10,
+            "format": "int64",
+            "type": "integer"
+          },
+          "JailTimeKeysign": {
+            "example": 10,
+            "format": "int64",
+            "type": "integer"
+          },
+          "LackOfObservationPenalty": {
+            "example": 2,
+            "format": "int64",
+            "type": "integer"
+          },
+          "LiquidityLockUpBlocks": {
+            "example": 0,
+            "format": "int64",
+            "type": "integer"
+          },
+          "MinimumBondInRune": {
+            "example": 100000000,
+            "format": "int64",
+            "type": "integer"
+          },
+          "MinimumNodesForBFT": {
+            "example": 4,
+            "format": "int64",
+            "type": "integer"
+          },
+          "MinimumNodesForYggdrasil": {
+            "example": 6,
+            "format": "int64",
+            "type": "integer"
+          },
+          "NativeChainGasFee": {
+            "example": 10000000,
+            "format": "int64",
+            "type": "integer"
+          },
+          "NewPoolCycle": {
+            "example": 51840,
+            "format": "int64",
+            "type": "integer"
+          },
+          "ObservationDelayFlexibility": {
+            "example": 5,
+            "format": "int64",
+            "type": "integer"
+          },
+          "ObserveSlashPoints": {
+            "example": 1,
+            "format": "int64",
+            "type": "integer"
+          },
+          "OldValidatorRate": {
+            "example": 60,
+            "format": "int64",
+            "type": "integer"
+          },
+          "OutboundTransactionFee": {
+            "example": 100000000,
+            "format": "int64",
+            "type": "integer"
+          },
+          "SigningTransactionPeriod": {
+            "example": 300,
+            "format": "int64",
+            "type": "integer"
+          },
+          "YggFundLimit": {
+            "example": 5,
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "AsgardSize",
+          "BadValidatorRate",
+          "BlocksPerYear",
+          "ChurnInterval",
+          "ChurnRetryInterval",
+          "CliTxCost",
+          "DesiredValidatorSet",
+          "DoubleSignMaxAge",
+          "EmissionCurve",
+          "FailKeygenSlashPoints",
+          "FailKeysignSlashPoints",
+          "FundMigrationInterval",
+          "JailTimeKeygen",
+          "JailTimeKeysign",
+          "LackOfObservationPenalty",
+          "LiquidityLockUpBlocks",
+          "MinimumBondInRune",
+          "MinimumNodesForBFT",
+          "MinimumNodesForYggdrasil",
+          "NativeChainGasFee",
+          "NewPoolCycle",
+          "ObservationDelayFlexibility",
+          "ObserveSlashPoints",
+          "OldValidatorRate",
+          "OutboundTransactionFee",
+          "SigningTransactionPeriod",
+          "YggFundLimit"
+        ],
+        "type": "object"
+      },
+      "LastblockItem": {
+        "properties": {
+          "chain": {
+            "example": "BNB",
+            "type": "string"
+          },
+          "last_observed_in": {
+            "example": "1590",
+            "type": "string"
+          },
+          "last_signed_out": {
+            "example": "109",
+            "type": "string"
+          },
+          "thorchain": {
+            "example": "1548",
+            "type": "string"
+          }
+        },
+        "required": ["chain", "last_observed_in", "last_signed_out", "thorchain"],
+        "type": "object"
+      },
+      "LiquidityHistory": {
+        "properties": {
+          "intervals": {
+            "$ref": "#/components/schemas/LiquidityHistoryIntervals"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/LiquidityHistoryItem"
+          }
+        },
+        "required": ["meta", "intervals"],
+        "type": "object"
+      },
+      "LiquidityHistoryIntervals": {
+        "items": {
+          "$ref": "#/components/schemas/LiquidityHistoryItem"
+        },
+        "type": "array"
+      },
+      "LiquidityHistoryItem": {
+        "properties": {
+          "deposits": {
+            "description": "Int64, total deposits (liquidity additions) during the time interval",
+            "type": "string"
+          },
+          "endTime": {
+            "description": "Int64, The end time of bucket in unix timestamp",
+            "type": "string"
+          },
+          "net": {
+            "description": "Int64, net liquidity changes (withdrawals - deposits) during the time interval",
+            "type": "string"
+          },
+          "startTime": {
+            "description": "Int64, The beginning time of bucket in unix timestamp",
+            "type": "string"
+          },
+          "withdrawals": {
+            "description": "Int64, total withdrawals during the time interval",
+            "type": "string"
+          }
+        },
+        "required": ["startTime", "endTime", "withdrawals", "deposits", "net"],
+        "type": "object"
+      },
+      "MemberDetails": {
+        "properties": {
+          "pools": {
+            "description": "Liquidity provider data for all the pools of a given member",
+            "items": {
+              "$ref": "#/components/schemas/MemberPoolDetails"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["pools"],
+        "type": "object"
+      },
+      "MemberPoolDetails": {
+        "properties": {
+          "assetAdded": {
+            "description": "Int64, total asset added to the pool by member",
+            "type": "string"
+          },
+          "assetWithdrawn": {
+            "description": "Int64, total asset withdrawn from the pool by member",
+            "type": "string"
+          },
+          "dateFirstAdded": {
+            "description": "Int64, Unix timestamp for the first time member deposited into the pool",
+            "type": "string"
+          },
+          "dateLastAdded": {
+            "description": "Int64, Unix timestamp for the last time member deposited into the pool",
+            "type": "string"
+          },
+          "liquidityUnits": {
+            "description": "Int64, pool liquidity units that belong the the member",
+            "type": "string"
+          },
+          "pool": {
+            "description": "Pool rest of the data refers to",
+            "type": "string"
+          },
+          "runeAdded": {
+            "description": "Int64, total RUNE added to the pool by member",
+            "type": "string"
+          },
+          "runeWithdrawn": {
+            "description": "Int64, total RUNE withdrawn from the pool by member",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pool",
+          "assetAdded",
+          "assetWithdrawn",
+          "dateFirstAdded",
+          "dateLastAdded",
+          "liquidityUnits",
+          "runeAdded",
+          "runeWithdrawn"
+        ],
+        "type": "object"
+      },
+      "Network": {
+        "properties": {
+          "activeBonds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "activeNodeCount": {
+            "description": "Int64, Number of Active Nodes",
+            "type": "string"
+          },
+          "blockRewards": {
+            "$ref": "#/components/schemas/BlockRewards"
+          },
+          "bondMetrics": {
+            "$ref": "#/components/schemas/BondMetrics"
+          },
+          "bondingAPY": {
+            "description": "Float, (1 + (bondReward * blocksPerMonth/totalActiveBond)) ^ 12 -1",
+            "type": "string"
+          },
+          "bondingROI": {
+            "type": "string"
+          },
+          "liquidityAPY": {
+            "description": "Float, (1 + (stakeReward * blocksPerMonth/totalDepth of active pools)) ^ 12 -1",
+            "type": "string"
+          },
+          "nextChurnHeight": {
+            "description": "Int64, next height of blocks.",
+            "type": "string"
+          },
+          "poolActivationCountdown": {
+            "description": "Int64, the remaining time of pool activation (in blocks).",
+            "type": "string"
+          },
+          "poolShareFactor": {
+            "type": "string"
+          },
+          "stakingROI": {
+            "type": "string"
+          },
+          "standbyBonds": {
+            "description": "Array of Standby Bonds",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "standbyNodeCount": {
+            "description": "Int64, Number of Standby Nodes",
+            "type": "string"
+          },
+          "totalPooledRune": {
+            "description": "Int64, Total Rune pooled in all pools.",
+            "type": "string"
+          },
+          "totalReserve": {
+            "description": "Int64, Total left in Reserve",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bondMetrics",
+          "blockRewards",
+          "activeBonds",
+          "standbyBonds",
+          "activeNodeCount",
+          "standbyNodeCount",
+          "totalPooledRune",
+          "totalReserve",
+          "nextChurnHeight",
+          "poolActivationCountdown",
+          "poolShareFactor",
+          "bondingROI",
+          "bondingAPY",
+          "liquidityAPY"
+        ],
+        "type": "object"
+      },
+      "NodeKey": {
+        "properties": {
+          "ed25519": {
+            "description": "ed25519 public key",
+            "type": "string"
+          },
+          "secp256k1": {
+            "description": "secp256k1 public key",
+            "type": "string"
+          }
+        },
+        "required": ["secp256k1", "ed25519"],
+        "type": "object"
+      },
+      "PoolDetail": {
+        "properties": {
+          "asset": {
+            "type": "string"
+          },
+          "assetDepth": {
+            "description": "Int64, the amount of Asset in the pool.",
+            "type": "string"
+          },
+          "assetPrice": {
+            "description": "Float, price of asset in rune. I.e. rune amount / asset amount.",
+            "type": "string"
+          },
+          "poolAPY": {
+            "description": "Float, Average Percentage Yield: annual return estimated using last weeks income, taking compound interest into account.",
+            "type": "string"
+          },
+          "runeDepth": {
+            "description": "Int64, the amount of Rune in the pool.",
+            "type": "string"
+          },
+          "status": {
+            "description": "The state of the pool, e.g. Available, Staged.",
+            "type": "string"
+          },
+          "units": {
+            "description": "Int64, Liquidity Units in the pool.",
+            "type": "string"
+          },
+          "volume24h": {
+            "description": "Int64, the total volume of swaps in the last 24h to and from Rune denoted in Rune.",
+            "type": "string"
+          }
+        },
+        "required": ["asset", "volume24h", "assetDepth", "runeDepth", "assetPrice", "poolAPY", "status", "units"],
+        "type": "object"
+      },
+      "StatsData": {
+        "properties": {
+          "dailyActiveUsers": {
+            "description": "Daily active users (unique addresses interacting)",
+            "type": "string"
+          },
+          "dailyTx": {
+            "description": "Daily transactions",
+            "type": "string"
+          },
+          "monthlyActiveUsers": {
+            "description": "Monthly active users",
+            "type": "string"
+          },
+          "monthlyTx": {
+            "description": "Monthly transactions",
+            "type": "string"
+          },
+          "totalAssetBuys": {
+            "description": "Total buying transactions",
+            "type": "string"
+          },
+          "totalAssetSells": {
+            "description": "Total selling transactions",
+            "type": "string"
+          },
+          "totalDepth": {
+            "description": "Total RUNE balances",
+            "type": "string"
+          },
+          "totalStakeTx": {
+            "description": "Total staking transactions",
+            "type": "string"
+          },
+          "totalStaked": {
+            "description": "Total staked (in RUNE Value).",
+            "type": "string"
+          },
+          "totalTx": {
+            "description": "Total transactions",
+            "type": "string"
+          },
+          "totalUsers": {
+            "description": "Total unique swappers \u0026 members",
+            "type": "string"
+          },
+          "totalVolume": {
+            "description": "Total (in RUNE Value) of all assets swapped since start.",
+            "type": "string"
+          },
+          "totalWithdrawTx": {
+            "description": "Total withdrawing transactions",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dailyActiveUsers",
+          "dailyTx",
+          "monthlyActiveUsers",
+          "monthlyTx",
+          "totalUsers",
+          "totalTx",
+          "totalVolume",
+          "totalStaked",
+          "totalDepth",
+          "totalAssetBuys",
+          "totalAssetSells",
+          "totalStakeTx",
+          "totalWithdrawTx"
+        ],
+        "type": "object"
+      },
+      "StringConstants": {
+        "properties": {
+          "DefaultPoolStatus": {
+            "example": "Enabled",
+            "type": "string"
+          }
+        },
+        "required": ["DefaultPoolStatus"],
+        "type": "object"
+      },
+      "SwapHistory": {
+        "properties": {
+          "intervals": {
+            "$ref": "#/components/schemas/SwapHistoryIntervals"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/SwapHistoryItem"
+          }
+        },
+        "required": ["meta", "intervals"],
+        "type": "object"
+      },
+      "SwapHistoryIntervals": {
+        "items": {
+          "$ref": "#/components/schemas/SwapHistoryItem"
+        },
+        "type": "array"
+      },
+      "SwapHistoryItem": {
+        "properties": {
+          "averageSlip": {
+            "description": "Int64, the average slip by swap. Big swaps have the same weight as small swaps",
+            "type": "string"
+          },
+          "endTime": {
+            "description": "Int64, The end time of bucket in unix timestamp",
+            "type": "string"
+          },
+          "startTime": {
+            "description": "Int64, The beginning time of bucket in unix timestamp",
+            "type": "string"
+          },
+          "toAssetCount": {
+            "description": "Int64, count of swaps from rune to asset",
+            "type": "string"
+          },
+          "toAssetVolume": {
+            "description": "Int64, volume of swaps from rune to asset denoted in rune",
+            "type": "string"
+          },
+          "toRuneCount": {
+            "description": "Int64, count of swaps from asset to rune",
+            "type": "string"
+          },
+          "toRuneVolume": {
+            "description": "Int64, volume of swaps from asset to rune denoted in rune",
+            "type": "string"
+          },
+          "totalCount": {
+            "description": "Int64, toAssetCount + toRuneCount",
+            "type": "string"
+          },
+          "totalFees": {
+            "description": "Int64, the sum of all fees collected denoted in rune",
+            "type": "string"
+          },
+          "totalVolume": {
+            "description": "Int64, toAssetVolume + toRuneVolume (denoted in rune)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "startTime",
+          "endTime",
+          "toAssetCount",
+          "toRuneCount",
+          "totalCount",
+          "toAssetVolume",
+          "toRuneVolume",
+          "totalVolume",
+          "totalFees",
+          "averageSlip"
+        ],
+        "type": "object"
+      },
+      "TxDetails": {
+        "properties": {
+          "date": {
+            "description": "Int64, Unix timestamp.",
+            "type": "string"
+          },
+          "events": {
+            "$ref": "#/components/schemas/event"
+          },
+          "height": {
+            "type": "string"
+          },
+          "in": {
+            "$ref": "#/components/schemas/tx"
+          },
+          "out": {
+            "items": {
+              "$ref": "#/components/schemas/tx"
+            },
+            "type": "array"
+          },
+          "pool": {
+            "type": "string"
+          },
+          "status": {
+            "enum": ["success", "refund"],
+            "type": "string"
+          },
+          "type": {
+            "enum": ["swap", "stake", "unstake", "rewards", "add", "pool", "gas", "refund", "doubleSwap"],
+            "type": "string"
+          }
+        },
+        "required": ["pool", "type", "status", "in", "out", "date", "height", "events"],
+        "type": "object"
+      },
+      "coin": {
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "asset": {
+            "type": "string"
+          }
+        },
+        "required": ["asset", "amount"],
+        "type": "object"
+      },
+      "coins": {
+        "items": {
+          "$ref": "#/components/schemas/coin"
+        },
+        "type": "array"
+      },
+      "event": {
+        "properties": {
+          "fee": {
+            "type": "string"
+          },
+          "slip": {
+            "type": "string"
+          },
+          "stakeUnits": {
+            "type": "string"
+          }
+        },
+        "required": ["fee", "stakeUnits", "slip"],
+        "type": "object"
+      },
+      "option": {
+        "properties": {
+          "asymmetry": {
+            "type": "string"
+          },
+          "priceTarget": {
+            "type": "string"
+          },
+          "withdrawBasisPoints": {
+            "type": "string"
+          }
+        },
+        "required": ["priceTarget", "withdrawBasisPoints", "asymmetry"],
+        "type": "object"
+      },
+      "tx": {
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "coins": {
+            "$ref": "#/components/schemas/coins"
+          },
+          "memo": {
+            "type": "string"
+          },
+          "options": {
+            "$ref": "#/components/schemas/option"
+          },
+          "txID": {
+            "type": "string"
+          }
+        },
+        "required": ["txID", "memo", "address", "coins", "options"],
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "contact": {
+      "email": "devs@thorchain.org"
+    },
+    "description": "The Midgard Public API queries THORChain and any chains linked via the Bifröst and prepares information about the network to be readily available for public users. The API parses transaction event data from THORChain and stores them in a time-series database to make time-dependent queries easy. Midgard does not hold critical information. To interact with BEPSwap and Asgardex, users should query THORChain directly.",
+    "title": "Midgard Public API",
+    "version": "2.0.0-alpha.2"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/v2/doc": {
+      "get": {
+        "description": "Swagger/OpenAPI 3.0 specification generated documents.",
+        "operationId": "GetDocs",
+        "responses": {
+          "200": {
+            "description": "swagger/OpenAPI 3.0 spec generated docs"
+          }
+        },
+        "summary": "Get Documentation",
+        "tags": ["Documentation"]
+      }
+    },
+    "/v2/health": {
+      "get": {
+        "description": "Returns an object containing the health response of the API",
+        "operationId": "GetHealth",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/HealthResponse"
+          }
+        },
+        "summary": "Get Health"
+      }
+    },
+    "/v2/history/depths/{pool}": {
+      "get": {
+        "description": "Returns the asset and rune depths and price.\nThe values report the state at the end of each interval.\n\nBucketing parameters:\n* Interval is required, possible values: 5min, hour, day, week, month, quarter, year.\n* count: optional int, (1..100)\n* from/to: optional int, unix second.\n\nProviding all count/from/to will result in error. Possible configurations:\n* last 10 days: interval=day\u0026count=10\n* last 10 days before to: interval=day\u0026count=10\u0026to=1234567890\n* interval=day\u0026count=10\u0026from=1234567890    - next 10 days after from.\n* interval=day\u0026from=1100000\u0026to=1100000     - days between from and to. It will fail if more than 100 intervals are requested.\n",
+        "operationId": "GetDepthHistory",
+        "parameters": [
+          {
+            "description": "Return stats for this single pool.",
+            "in": "path",
+            "name": "pool",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Interval of calculations",
+            "in": "query",
+            "name": "interval",
+            "required": true,
+            "schema": {
+              "enum": ["5min", "hour", "day", "week", "month", "quarter", "year"],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start time of the query as unix timestamp",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "End time of the query as unix timestamp",
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DepthHistoryResponse"
+          }
+        },
+        "summary": "Depth and price history"
+      }
+    },
+    "/v2/history/earnings": {
+      "get": {
+        "description": "Returns earnings data for the specified interval.",
+        "operationId": "GetEarningsHistory",
+        "parameters": [
+          {
+            "description": "Interval of calculations",
+            "in": "query",
+            "name": "interval",
+            "required": true,
+            "schema": {
+              "enum": ["5min", "hour", "day", "week", "month", "quarter", "year"],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start time of the query as unix timestamp",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "End time of the query as unix timestamp",
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EarningsHistoryResponse"
+          }
+        },
+        "summary": "Earnings related history"
+      }
+    },
+    "/v2/history/liquidity_changes": {
+      "get": {
+        "description": "Returns withdrawals and deposits for given time interval. If pool is not specified returns for all pools",
+        "operationId": "GetLiquidityHistory",
+        "parameters": [
+          {
+            "description": "Return stats for given pool. Returns sum of all pools if missing.",
+            "in": "query",
+            "name": "pool",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Interval of calculations",
+            "in": "query",
+            "name": "interval",
+            "required": true,
+            "schema": {
+              "enum": ["5min", "hour", "day", "week", "month", "quarter", "year"],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start time of the query as unix timestamp",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "End time of the query as unix timestamp",
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LiquidityHistoryResponse"
+          }
+        },
+        "summary": "Liquidity changes related history"
+      }
+    },
+    "/v2/history/swaps": {
+      "get": {
+        "description": "Returns swap count, volume, fees, slip in specified interval. If pool is not specified returns for all pools",
+        "operationId": "GetSwapHistory",
+        "parameters": [
+          {
+            "description": "Return history given pool. Returns sum of all pools if missing.",
+            "in": "query",
+            "name": "pool",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Interval of calculations",
+            "in": "query",
+            "name": "interval",
+            "required": true,
+            "schema": {
+              "enum": ["5min", "hour", "day", "week", "month", "quarter", "year"],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Start time of the query as unix timestamp",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "End time of the query as unix timestamp",
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SwapHistoryResponse"
+          }
+        },
+        "summary": "Swaps related history"
+      }
+    },
+    "/v2/members": {
+      "get": {
+        "description": "Returns an array containing the RUNE addresses for all members.",
+        "operationId": "GetMembersAdresses",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MembersResponse"
+          }
+        },
+        "summary": "Get members"
+      }
+    },
+    "/v2/members/{address}": {
+      "get": {
+        "description": "Returns an array of statistics per pool for a given member RUNE address.",
+        "operationId": "GetMemberDetail",
+        "parameters": [
+          {
+            "description": "Unique member RUNE address",
+            "example": "bnb1jxfh2g85q3v0tdq56fnevx6xcxtcnhtsmcu64m",
+            "in": "path",
+            "name": "address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MemberDetailsResponse"
+          }
+        },
+        "summary": "Details of a member"
+      }
+    },
+    "/v2/network": {
+      "get": {
+        "description": "Returns an object containing Network data",
+        "operationId": "GetNetworkData",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/NetworkResponse"
+          }
+        },
+        "summary": "Get Network Data"
+      }
+    },
+    "/v2/nodes": {
+      "get": {
+        "description": "Returns an object containing Node public keys",
+        "operationId": "GetNodes",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/NodeKeyResponse"
+          }
+        },
+        "summary": "Get Node public keys"
+      }
+    },
+    "/v2/pool/{asset}": {
+      "get": {
+        "description": "Returns details of the pool: depths, price, 24h volume, APY. ",
+        "operationId": "GetPool",
+        "parameters": [
+          {
+            "description": "pool name.",
+            "example": "BNB.TOMOB-1E1",
+            "in": "path",
+            "name": "asset",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PoolResponse"
+          }
+        },
+        "summary": "Get details for a specific pool"
+      }
+    },
+    "/v2/pools": {
+      "get": {
+        "description": "Returns an array containing details for a set of pools.",
+        "operationId": "GetPools",
+        "parameters": [
+          {
+            "description": "Interval of calculations",
+            "in": "query",
+            "name": "status",
+            "required": true,
+            "schema": {
+              "enum": ["available", "staged", "suspended"],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PoolsResponse"
+          }
+        },
+        "summary": "Get Asset Pools"
+      }
+    },
+    "/v2/stats": {
+      "get": {
+        "description": "Returns an object containing global stats for all pools and all transactions.",
+        "operationId": "GetStats",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/StatsResponse"
+          }
+        },
+        "summary": "Get Global Stats"
+      }
+    },
+    "/v2/swagger.json": {
+      "get": {
+        "description": "Returns human and machine readable swagger/openapi specification",
+        "operationId": "GetSwagger",
+        "responses": {
+          "200": {
+            "description": "human and machine readable swagger/openapi specification"
+          }
+        },
+        "summary": "Get Swagger",
+        "tags": ["Specification"]
+      }
+    },
+    "/v2/thorchain/constants": {
+      "get": {
+        "description": "Constant values used by THORChain , some of the values can be overrided by mimir",
+        "operationId": "GetProxiedConstants",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConstantsResponse"
+          }
+        },
+        "summary": "Get the Proxied THORChain Constants"
+      }
+    },
+    "/v2/thorchain/inbound_addresses": {
+      "get": {
+        "description": "Inbound addresses will return a list of address , one per chain. The address might change frequently if THORChain has multiple asgards.",
+        "operationId": "GetProxiedInboundAddresses",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/InboundAddressesResponse"
+          }
+        },
+        "summary": "Get the Proxied THORChain Inbound Addresses"
+      }
+    },
+    "/v2/thorchain/lastblock": {
+      "get": {
+        "description": "Retrieve lastest block infomation across all chains.",
+        "operationId": "GetProxiedLastblock",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LastblockResponse"
+          }
+        },
+        "summary": "Get the Proxied THORChain Lastblock"
+      }
+    },
+    "/v2/thorchain/queue": {
+      "get": {
+        "description": "Returns the proxied queue endpoint from a local thornode",
+        "operationId": "GetProxiedQueue",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/QueueResponse"
+          }
+        },
+        "summary": "Get the Proxied THORChain Queue"
+      }
+    },
+    "/v2/tx": {
+      "get": {
+        "description": "Return an array containing the event details",
+        "operationId": "GetTxDetails",
+        "parameters": [
+          {
+            "description": "Address of sender or recipient of any in/out tx in event",
+            "example": "tbnb1fj2lqj8dvr5pumfchc7ntlfqd2v6zdxqwjewf5",
+            "in": "query",
+            "name": "address",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID of any in/out tx in event",
+            "example": "2F624637DE179665BA3322B864DB9F30001FD37B4E0D22A0B6ECE6A5B078DAB4",
+            "in": "query",
+            "name": "txid",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Any asset used in event (CHAIN.SYMBOL)",
+            "example": "BNB.TOMOB-1E1",
+            "in": "query",
+            "name": "asset",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "One or more comma separated unique types of event",
+            "example": ["swap", "stake", "unstake", "add", "refund", "doubleSwap"],
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "pagination limit",
+            "in": "query",
+            "name": "limit",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "maximum": 50,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "pagination offset",
+            "in": "query",
+            "name": "offset",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TxResponse"
+          }
+        },
+        "summary": "List transactions or get details for specific transactions."
+      }
+    }
+  }
+}
