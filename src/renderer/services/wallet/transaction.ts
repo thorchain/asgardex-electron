@@ -53,7 +53,7 @@ export const getTxs$: (walletAddress: O.Option<string>) => TxsPageLD = (walletAd
                 return THOR.txs$({ asset: O.none, limit, offset, walletAddress })
               default:
                 return Rx.of(
-                  RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg2: `Unsupported chain ${asset.chain}` })
+                  RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` })
                 )
             }
           }
