@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Balance, Balances } from '@xchainjs/xchain-client'
+import { Address, Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset, baseToAsset, chainToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 import { getPoolPriceValue } from '../../../services/binance/utils'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
-import { ApiError, ChainBalance, ChainBalancesRD } from '../../../services/wallet/types'
+import { ApiError, ChainBalance, ChainBalances } from '../../../services/wallet/types'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
@@ -23,7 +23,7 @@ import * as Styled from './AssetsTableCollapsable.style'
 const { Panel } = Collapse
 
 type Props = {
-  chainBalances: ChainBalancesRD[]
+  chainBalances: ChainBalances
   pricePool: PricePool
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: Asset, walletAddress: string) => void
@@ -181,8 +181,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderBalances = useCallback(
-    (balancesRD: WalletBalancesRD, index: number, walletAddress: string) =>
-      FP.pipe(
+    (balancesRD: WalletBalancesRD, index: number, oWalletAddress: O.Option<Address>) => {
+      // TODO(@Veado) Add i18n
+      const walletAddress = FP.pipe(
+        oWalletAddress,
+        O.getOrElse(() => 'unknown address')
+      )
+      return FP.pipe(
         balancesRD,
         RD.fold(
           // initial state
@@ -203,7 +208,8 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             return renderAssetsTable(assetsWB, walletAddress)
           }
         )
-      ),
+      )
+    },
     [renderAssetsTable]
   )
 

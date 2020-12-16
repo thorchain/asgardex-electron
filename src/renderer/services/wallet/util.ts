@@ -9,6 +9,7 @@ import * as Ord from 'fp-ts/Ord'
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { WalletBalance } from '../../types/wallet'
+import { WalletBalances } from '../clients'
 import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid } from './types'
 
 export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> => pipe(state, O.chain(identity))

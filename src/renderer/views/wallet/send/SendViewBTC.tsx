@@ -13,7 +13,7 @@ import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/bitcoin/types'
-import { GetExplorerTxUrl } from '../../../services/clients'
+import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { NonEmptyWalletBalances, TxRD } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 
