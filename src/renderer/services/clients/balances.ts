@@ -34,7 +34,10 @@ const loadBalances$ = ({
     O.alt(() => O.tryCatch(() => client.getAddress())),
     O.fold(
       // TODO (@Veado) i18n
-      () => Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: 'Could not get address' } as ApiError)),
+      () =>
+        Rx.of(
+          RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: 'Could not get address' })
+        ),
       (walletAddress) =>
         Rx.from(client.getBalance(walletAddress)).pipe(
           map(RD.success),
@@ -46,7 +49,9 @@ const loadBalances$ = ({
             }))
           ),
           catchError((error: Error) =>
-            Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
+            Rx.of(
+              RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' })
+            )
           ),
           startWith(RD.pending)
         )

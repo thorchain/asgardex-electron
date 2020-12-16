@@ -20,7 +20,14 @@ const loadBalances$ = (client: Client): WalletBalanceLD =>
   FP.pipe(
     O.tryCatch(() => client.getAddress()),
     O.fold(
-      () => Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: 'Cant get address from client' } as ApiError)),
+      () =>
+        Rx.of(
+          RD.failure<ApiError>({
+            errorId: ErrorId.GET_BALANCES,
+            // TODO (@Veado) Add i18n
+            msg: 'Cant get address from client'
+          })
+        ),
       (walletAddress) =>
         Rx.from(client.getBalance()).pipe(
           mergeMap((balance) =>
@@ -33,7 +40,9 @@ const loadBalances$ = (client: Client): WalletBalanceLD =>
             )
           ),
           catchError((error: Error) =>
-            Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
+            Rx.of(
+              RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' })
+            )
           ),
           startWith(RD.pending)
         )

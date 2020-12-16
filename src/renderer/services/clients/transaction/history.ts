@@ -38,7 +38,9 @@ const loadTxs$ = ({
   ).pipe(
     map(RD.success),
     catchError((error) =>
-      Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() } as ApiError))
+      Rx.of(
+        RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() })
+      )
     ),
     startWith(RD.pending)
   )

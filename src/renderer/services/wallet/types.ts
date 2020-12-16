@@ -39,7 +39,7 @@ export type KeystoreService = {
 }
 
 /**
- * Wrapped WalletBalancesRD into an object to provide more information (address + chain)
+ * Wraps WalletBalancesRD into an object to provide extra information (`Address` + `Chain` + `WalletType`)
  * Currently needed in `AssetView` - TODO(@Veado) Think about to extract it into view layer (as helper or so)
  */
 export type ChainBalance = {
