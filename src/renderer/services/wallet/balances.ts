@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetBNB, BNBChain, BTCChain, Chain, THORChain } from '@xchainjs/xchain-util'
+import { AssetBNB, BNBChain, BTCChain, Chain, ETHChain, THORChain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -128,7 +128,7 @@ const btcLedgerBalance$ = FP.pipe(
 // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
 const _ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
   map(([address, balancesRD]) => ({
-    chain: 'ETH',
+    chain: ETHChain,
     address,
     balances: FP.pipe(
       balancesRD,
