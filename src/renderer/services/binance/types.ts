@@ -1,14 +1,16 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Transfer, Client } from '@xchainjs/xchain-binance'
 import { Address } from '@xchainjs/xchain-binance'
+import { TxParams } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
-import { LedgerAddressLD } from '../wallet/types'
+import { LedgerAddressLD, LedgerTxLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -71,4 +73,7 @@ export type LedgerService = {
   ledgerAddress$: LedgerAddressLD
   retrieveLedgerAddress: (network: Network) => void
   removeLedgerAddress: () => void
+  ledgerTxRD$: LedgerTxLD
+  pushLedgerTx: (_: TxParams & { sender: Address; network: Network }) => Rx.Subscription
+  resetLedgerTx: () => void
 }

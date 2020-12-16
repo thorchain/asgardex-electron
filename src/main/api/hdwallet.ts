@@ -1,8 +1,7 @@
-import { LedgerTxInfo } from '@xchainjs/xchain-bitcoin'
 import { Chain } from '@xchainjs/xchain-util'
 import { ipcRenderer } from 'electron'
 
-import { Network } from '../../shared/api/types'
+import { LedgerTxInfo, Network } from '../../shared/api/types'
 import { ApiHDWallet } from '../../shared/api/types'
 import IPCMessages from '../ipc/messages'
 

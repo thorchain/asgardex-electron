@@ -1,5 +1,6 @@
-import { LedgerTxInfo } from '@xchainjs/xchain-bitcoin'
-import { Address } from '@xchainjs/xchain-client'
+import { BncClient } from '@binance-chain/javascript-sdk'
+import { LedgerTxInfo as LedgerBTCTxInfo } from '@xchainjs/xchain-bitcoin'
+import { Address, TxParams } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
@@ -31,6 +32,15 @@ export enum LedgerErrorId {
   DENIED,
   UNKNOWN
 }
+
+export type LedgerBNBTxInfo = TxParams & {
+  sender: Address
+  client: BncClient
+  handleLedgerPresign: Function
+  handleLedgerVerifySuccess: Function
+  handleLedgerVerifyFailed: Function
+}
+export type LedgerTxInfo = LedgerBTCTxInfo | LedgerBNBTxInfo
 
 export type ApiHDWallet = {
   getLedgerAddress: (chain: Chain, network: Network) => Promise<Either<LedgerErrorId, Address>>
