@@ -14,22 +14,23 @@ import * as O from 'fp-ts/lib/Option'
 
 import { TRANSFER_FEES } from '../../../../../shared/mock/fees'
 import { AddressValidation, SendTxParams } from '../../../../services/binance/types'
+import { WalletBalances } from '../../../../services/clients'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormBNB } from './index'
 
 const bnbAsset: WalletBalance = {
   asset: AssetBNB,
   amount: assetToBase(assetAmount(1.23)),
-  walletAddress: 'AssetBNB wallet'
+  walletAddress: O.some('AssetBNB wallet')
 }
 
 const runeAsset: WalletBalance = {
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(2)),
-  walletAddress: 'AssetRune67C wallet'
+  walletAddress: O.some('AssetRune67C wallet')
 }
 
-const balances: WalletBalance[] = [bnbAsset, runeAsset]
+const balances: WalletBalances = [bnbAsset, runeAsset]
 
 const fee = O.some(TRANSFER_FEES.single)
 

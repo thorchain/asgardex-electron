@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetBNB, BTCChain, Chain } from '@xchainjs/xchain-util'
+import { AssetBNB, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -16,12 +16,12 @@ import { liveData } from '../../helpers/rx/liveData'
 import { network$ } from '../app/service'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
-import { WalletBalancesRD } from '../clients'
+import { WalletBalancesLD, WalletBalancesRD } from '../clients'
 import * as ETH from '../ethereum'
 import * as THOR from '../thorchain'
 import { selectedAsset$ } from './common'
 import { INITIAL_BALANCES_STATE } from './const'
-import { ChainBalance, BalancesState, LoadBalancesHandler } from './types'
+import { BalancesState, LoadBalancesHandler } from './types'
 import { sortBalances } from './util'
 
 export const reloadBalances = () => {
@@ -52,134 +52,84 @@ export const reloadBalances$: Rx.Observable<O.Option<LoadBalancesHandler>> = sel
 )
 
 /**
- * Transforms BNB data (address + `AssetsWB`) into `AssetsWBChain`
+ * Transforms THOR data (address + `WalletBalance`) into `ChainBalances`
  */
-const thorBalance$: Observable<ChainBalance> = Rx.combineLatest([THOR.address$, THOR.balances$]).pipe(
-  map(
-    ([address, balances]) =>
-      ({
-        chain: 'THOR',
-        address: FP.pipe(
-          address,
-          O.getOrElse(() => '')
-        ),
-        balances
-      } as ChainBalance)
-  )
+const _thorBalance$ = Rx.combineLatest([THOR.address$, THOR.balances$]).pipe(
+  map(([address, balances]) => ({
+    chain: 'THOR',
+    address,
+    balances
+  }))
 )
 
 /**
- * Transforms BNB data (address + `AssetsWB`) into `AssetsWBChain`
+ * Transforms BNB data (address + `WalletBalance`) into `ChainBalances`
  */
-const bnbBalance$: Observable<ChainBalance> = Rx.combineLatest([BNB.address$, BNB.balances$, network$]).pipe(
-  map(
-    ([address, balances, network]) =>
-      ({
-        chain: 'BNB',
-        address: FP.pipe(
-          address,
-          O.getOrElse(() => '')
-        ),
-        balances: FP.pipe(
-          balances,
-          RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getRuneAsset({ network, chain: 'BNB' }).ticker]))
-        )
-      } as ChainBalance)
-  )
+const _bnbBalance$ = Rx.combineLatest([BNB.address$, BNB.balances$, network$]).pipe(
+  map(([address, balances, network]) => ({
+    chain: 'BNB',
+    address,
+    balances: FP.pipe(
+      balances,
+      RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getRuneAsset({ network, chain: 'BNB' }).ticker]))
+    )
+  }))
 )
 
 /**
- * Transforms BTC data (address + `AssetWB`) into `AssetsWBChain`
+ * Transforms BTC data (address + `WalletBalance`) into `ChainBalance`
  */
-const btcBalance$: Observable<ChainBalance> = Rx.combineLatest([BTC.address$, BTC.balances$]).pipe(
-  map(
-    ([address, balances]) =>
-      ({
-        chain: 'BTC',
-        address: FP.pipe(
-          address,
-          O.getOrElse(() => '')
-        ),
-        balances
-      } as ChainBalance)
-  )
+const _btcBalance$ = Rx.combineLatest([BTC.address$, BTC.balances$]).pipe(
+  map(([address, balances]) => ({
+    chain: 'BTC',
+    address,
+    balances
+  }))
 )
-/**
- * Same as btcBalance$ but for address from BTC.ledgerAddress$
- */
-const btcLedgerChainBalance$: Observable<ChainBalance> = FP.pipe(
+
+const btcLedgerBalance$: WalletBalancesLD = FP.pipe(
   BTC.ledgerAddress$,
   RxOp.switchMap((addressRd) =>
     FP.pipe(
       addressRd,
-      RD.map(BTC.getBalanceByAddress$),
-      RD.map(
-        RxOp.map(
-          (balances) =>
-            ({
-              chain: BTCChain,
-              address: FP.pipe(
-                addressRd,
-                // This stream's branch is based on Successful addressRd
-                // so addressRd will always have a value here
-                RD.getOrElse(() => '')
-              ),
-              balances
-            } as ChainBalance)
-        )
-      ),
-      RD.getOrElse(() =>
-        Rx.of({
-          chain: BTCChain,
-          address: '',
-          balances: RD.initial
-        } as ChainBalance)
-      )
+      RD.map((address) => BTC.getBalanceByAddress$(address)),
+      RD.map(RxOp.map((balances) => balances)),
+      RD.getOrElse(() => Rx.of(RD.initial as WalletBalancesRD))
     )
   ),
   shareReplay(1)
 )
 
-const btcLedgerBalance$ = FP.pipe(
-  btcLedgerChainBalance$,
-  RxOp.map((ledgerBalances) => ledgerBalances.balances)
-)
-
 /**
- * Transforms ETH data (address + `AssetsWBChain`) into `AssetsWBChain`
+ * Transforms ETH data (address + `WalletBalance`) into `ChainBalance`
  */
 // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
-const _ethBalance$: Observable<ChainBalance> = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
-  map(
-    ([address, balancesRD]) =>
-      ({
-        chain: 'ETH',
-        address: FP.pipe(
-          address,
-          O.getOrElse(() => '')
-        ),
-        balances: FP.pipe(
-          balancesRD,
-          RD.map((balances) => [balances])
-        )
-      } as ChainBalance)
-  )
+const _ethBalance$ = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
+  map(([address, balancesRD]) => ({
+    chain: 'ETH',
+    address,
+    balances: FP.pipe(
+      balancesRD,
+      RD.map((balances) => [balances])
+    )
+  }))
 )
 
 /**
- * List of `AssetsWBChain` for all available chains (order is important)
+ * List of `ChainBalances` for all available chains (order is important)
  */
-export const chainBalances$ = Rx.combineLatest([
-  thorBalance$,
-  btcBalance$,
-  btcLedgerChainBalance$,
+export const balances$: Observable<WalletBalancesRD[]> = Rx.combineLatest([
+  THOR.balances$,
+  BNB.balances$,
+  btcLedgerBalance$,
+  BTC.balances$
   /* //TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH */
   /* ethBalancesChain$ */
-  bnbBalance$
+  // bnbBalance$
 ])
 
 // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
-const _ethBalances$: Observable<WalletBalancesRD> = ETH.balances$.pipe(liveData.map((asset) => [asset]))
+const _ethBalances$: WalletBalancesLD = ETH.balances$.pipe(liveData.map((asset) => [asset]))
 
 /**
  * Transform a list of BalancesLD
@@ -203,6 +153,7 @@ export const balancesState$: Observable<BalancesState> = Rx.combineLatest([
       A.flatten,
       NEA.fromArray
     ),
+    // TODO(@Veado) Update eqAssetsWithBalanceRD
     loading: FP.pipe(balancesList, A.elem(eqAssetsWithBalanceRD)(RD.pending)),
     errors: FP.pipe(
       balancesList,

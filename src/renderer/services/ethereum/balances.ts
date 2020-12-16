@@ -24,7 +24,7 @@ const loadBalances$ = (client: Client): Observable<BalanceRD> =>
         RD.success({
           asset: AssetETH,
           amount: baseAmount(balance.toString(), ETH_DECIMAL),
-          walletAddress: client.getAddress()
+          walletAddress: O.tryCatch(() => client.getAddress())
         })
       )
     ),

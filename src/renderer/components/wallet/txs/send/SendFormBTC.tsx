@@ -41,7 +41,7 @@ export type FormValues = {
 }
 
 type Props = {
-  balances: WalletBalance[]
+  balances: WalletBalances
   walletBalance: WalletBalance
   onSubmit: ({ recipient, amount, feeRate, memo }: SendTxParams) => void
   isLoading?: boolean

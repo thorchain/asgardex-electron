@@ -9,7 +9,7 @@ import { Observable } from 'rxjs'
 import { LedgerErrorId } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { WalletBalance } from '../../types/wallet'
-import { WalletBalancesRD, LoadTxsParams } from '../clients'
+import { LoadTxsParams, WalletBalances } from '../clients'
 
 export type Phrase = string
 
@@ -37,12 +37,14 @@ export type KeystoreService = {
 }
 
 export type ChainBalance = {
-  address: string
+  address: O.Option<Address>
   chain: Chain
-  balances: WalletBalancesRD
+  balances: WalletBalances
 }
 
 export type ChainBalances = ChainBalance[]
+export type ChainBalancesRD = RD.RemoteData<ApiError, ChainBalance>
+export type ChainBalancesLD = LiveData<ApiError, ChainBalance>
 
 export const BalanceMonoid = getMonoid<WalletBalance>()
 

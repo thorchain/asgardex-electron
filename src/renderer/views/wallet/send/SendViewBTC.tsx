@@ -64,7 +64,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
         onSubmit={pushTx}
         balances={FP.pipe(
           oBalances,
-          O.getOrElse(() => [] as WalletBalance[])
+          O.getOrElse(() => [] as WalletBalances)
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}

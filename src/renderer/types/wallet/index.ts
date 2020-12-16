@@ -1,5 +1,6 @@
 import { Address, Balance } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
 type AccountType = {
   name: string
@@ -12,4 +13,4 @@ export type UserAccountType = {
   accounts: AccountType[]
 }
 
-export type WalletBalance = Balance & { walletAddress: Address }
+export type WalletBalance = Balance & { walletAddress: O.Option<Address> }

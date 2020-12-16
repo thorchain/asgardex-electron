@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 import { getPoolPriceValue } from '../../../services/binance/utils'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
-import { ChainBalances, ApiError, ChainBalance } from '../../../services/wallet/types'
+import { ApiError, ChainBalance, ChainBalancesRD } from '../../../services/wallet/types'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
@@ -23,7 +23,7 @@ import * as Styled from './AssetsTableCollapsable.style'
 const { Panel } = Collapse
 
 type Props = {
-  chainBalances: ChainBalances
+  chainBalances: ChainBalancesRD[]
   pricePool: PricePool
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: Asset, walletAddress: string) => void

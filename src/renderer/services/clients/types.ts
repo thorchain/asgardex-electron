@@ -45,8 +45,9 @@ export type TxsPageLD = LiveData<ApiError, TxsPage>
 
 export type BalanceRD = RD.RemoteData<ApiError, WalletBalance>
 
-export type WalletBalancesRD = RD.RemoteData<ApiError, WalletBalance[]>
-export type WalletBalancesLD = LiveData<ApiError, WalletBalance[]>
+export type WalletBalances = WalletBalance[]
+export type WalletBalancesRD = RD.RemoteData<ApiError, WalletBalances>
+export type WalletBalancesLD = LiveData<ApiError, WalletBalances>
 
 export type ExplorerUrl$ = Rx.Observable<O.Option<string>>
 export type GetExplorerTxUrl = (txHash: string) => string

@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { XChainClient } from '@xchainjs/xchain-client'
+import { Address, XChainClient } from '@xchainjs/xchain-client'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -15,13 +15,20 @@ import { WalletBalancesLD, XChainClient$ } from './types'
 /**
  * Observable to request balances based on given `XChainClient`
  */
-const loadBalances$: (client: XChainClient, address?: string) => WalletBalancesLD = (client, address) =>
-  Rx.from(client.getBalance(address)).pipe(
+const loadBalances$: (client: XChainClient, address?: string) => WalletBalancesLD = (client, address) => {
+  // get wallet address once before mapping all balances
+  const walletAddress: O.Option<Address> = FP.pipe(
+    address,
+    O.fromNullable,
+    O.alt(() => O.tryCatch(() => client.getAddress()))
+  )
+
+  return Rx.from(client.getBalance(address)).pipe(
     map(RD.success),
     liveData.map(
       A.map((balance) => ({
         ...balance,
-        walletAddress: address || client.getAddress()
+        walletAddress
       }))
     ),
     catchError((error: Error) =>
@@ -29,6 +36,7 @@ const loadBalances$: (client: XChainClient, address?: string) => WalletBalancesL
     ),
     startWith(RD.pending)
   )
+}
 
 /**
  * State of `Balances` loaded by given `XChainClient`
