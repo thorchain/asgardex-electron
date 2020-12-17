@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { XChainClient } from '@xchainjs/xchain-client'
+import { Address, XChainClient } from '@xchainjs/xchain-client'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -9,25 +9,53 @@ import { catchError, startWith, map, shareReplay, debounceTime } from 'rxjs/oper
 
 import { liveData } from '../../helpers/rx/liveData'
 import { TriggerStream$ } from '../../helpers/stateHelper'
-import { ApiError, ErrorId } from '../wallet/types'
+import { ApiError, ErrorId, WalletType } from '../wallet/types'
 import { WalletBalancesLD, XChainClient$ } from './types'
 
 /**
- * Observable to request balances based on given `XChainClient`
+ * Observable to request balances by given `XChainClient` and `Address` (optional)
+ * `Balances` are mapped into `WalletBalances`
+ *
+ * If `address` is not set, it tries to get `Address` of `Client` (which can fail).
  */
-const loadBalances$: (client: XChainClient, address?: string) => WalletBalancesLD = (client, address) =>
-  Rx.from(client.getBalance(address)).pipe(
-    map(RD.success),
-    liveData.map(
-      A.map((balance) => ({
-        ...balance,
-        walletAddress: address || client.getAddress()
-      }))
-    ),
-    catchError((error: Error) =>
-      Rx.of(RD.failure({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' } as ApiError))
-    ),
-    startWith(RD.pending)
+const loadBalances$ = ({
+  client,
+  address,
+  walletType = 'keystore'
+}: {
+  client: XChainClient
+  walletType?: WalletType
+  address?: Address
+}): WalletBalancesLD =>
+  FP.pipe(
+    address,
+    O.fromNullable,
+    // Try to use client address, if parameter `address` is undefined
+    O.alt(() => O.tryCatch(() => client.getAddress())),
+    O.fold(
+      // TODO (@Veado) i18n
+      () =>
+        Rx.of(
+          RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: 'Could not get address' })
+        ),
+      (walletAddress) =>
+        Rx.from(client.getBalance(walletAddress)).pipe(
+          map(RD.success),
+          liveData.map(
+            A.map((balance) => ({
+              ...balance,
+              walletType,
+              walletAddress
+            }))
+          ),
+          catchError((error: Error) =>
+            Rx.of(
+              RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' })
+            )
+          ),
+          startWith(RD.pending)
+        )
+    )
   )
 
 /**
@@ -48,7 +76,10 @@ export const balances$: (client$: XChainClient$, trigger$: TriggerStream$) => Wa
           // if a client is not available, "reset" state to "initial"
           () => Rx.of(RD.initial),
           // or start request and return state
-          loadBalances$
+          (client) =>
+            loadBalances$({
+              client
+            })
         )
       )
     }),
@@ -59,7 +90,7 @@ export const balances$: (client$: XChainClient$, trigger$: TriggerStream$) => Wa
 export const balancesByAddress$: (
   client$: XChainClient$,
   trigger$: TriggerStream$
-) => (address: string) => WalletBalancesLD = (client$, trigger$) => (address) =>
+) => (address: string, walletType: WalletType) => WalletBalancesLD = (client$, trigger$) => (address, walletType) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.mergeMap(([_, oClient]) => {
       return FP.pipe(
@@ -68,7 +99,7 @@ export const balancesByAddress$: (
           // if a client is not available, "reset" state to "initial"
           () => Rx.of(RD.initial),
           // or start request and return state
-          (client) => loadBalances$(client, address)
+          (client) => loadBalances$({ client, address, walletType })
         )
       )
     }),

@@ -13,7 +13,7 @@ import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/bitcoin/types'
-import { GetExplorerTxUrl } from '../../../services/clients'
+import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { NonEmptyWalletBalances, TxRD } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 
@@ -64,7 +64,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
         onSubmit={pushTx}
         balances={FP.pipe(
           oBalances,
-          O.getOrElse(() => [] as WalletBalance[])
+          O.getOrElse(() => [] as WalletBalances)
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}

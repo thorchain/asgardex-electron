@@ -1,4 +1,5 @@
-import { baseAmount, BaseAmount, PoolData } from '@xchainjs/xchain-util'
+import { PoolData } from '@thorchain/asgardex-util'
+import { baseAmount, BaseAmount } from '@xchainjs/xchain-util'
 
 import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 

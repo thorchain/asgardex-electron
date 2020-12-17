@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRune67C, AssetRuneNative, BaseAmount, bn, PoolData } from '@xchainjs/xchain-util'
+import { PoolData } from '@thorchain/asgardex-util'
+import { Asset, AssetRune67C, AssetRuneNative, BaseAmount, bn } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'

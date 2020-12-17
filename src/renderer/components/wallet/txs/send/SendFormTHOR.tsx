@@ -19,6 +19,7 @@ import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
 import { isRuneNativeAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getRuneNativeAmountFromBalances } from '../../../../helpers/walletHelper'
+import { WalletBalances } from '../../../../services/clients'
 import { AddressValidation, SendTxParams } from '../../../../services/thorchain/types'
 import { WalletBalance } from '../../../../types/wallet'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -34,7 +35,7 @@ export type FormValues = {
 }
 
 type Props = {
-  balances: WalletBalance[]
+  balances: WalletBalances
   balance: WalletBalance
   onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) => void
   isLoading?: boolean

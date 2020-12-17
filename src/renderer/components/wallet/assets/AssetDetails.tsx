@@ -8,6 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
@@ -27,7 +28,7 @@ type Props = {
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: () => void
   loadTxsHandler?: LoadTxsHandler
-  walletAddress?: Address
+  walletAddress?: O.Option<Address>
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -38,17 +39,16 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     reloadBalancesHandler = emptyFunc,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
-    walletAddress = ''
+    walletAddress: oWalletAddress = O.none
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
 
-  const assetAsString = useMemo(
+  const oAssetAsString: O.Option<string> = useMemo(
     () =>
       FP.pipe(
         oAsset,
-        O.map((a) => assetToString(a)),
-        O.getOrElse(() => '')
+        O.map((asset) => assetToString(asset))
       ),
     [oAsset]
   )
@@ -58,13 +58,22 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const walletActionSendClick = useCallback(() => {
-    history.push(walletRoutes.send.path({ asset: assetAsString, walletAddress }))
-  }, [assetAsString, history, walletAddress])
+    const routeParams = FP.pipe(
+      sequenceTOption(oWalletAddress, oAssetAsString),
+      O.map(([walletAddress, asset]) => ({ asset, walletAddress })),
+      O.getOrElse(() => ({ asset: '', walletAddress: '' }))
+    )
+    history.push(walletRoutes.send.path(routeParams))
+  }, [oAssetAsString, history, oWalletAddress])
 
-  const walletActionReceiveClick = useCallback(
-    () => history.push(walletRoutes.receive.path({ asset: assetAsString, walletAddress })),
-    [assetAsString, history, walletAddress]
-  )
+  const walletActionReceiveClick = useCallback(() => {
+    const routeParams = FP.pipe(
+      sequenceTOption(oWalletAddress, oAssetAsString),
+      O.map(([walletAddress, asset]) => ({ asset, walletAddress })),
+      O.getOrElse(() => ({ asset: '', walletAddress: '' }))
+    )
+    history.push(walletRoutes.receive.path(routeParams))
+  }, [oAssetAsString, history, oWalletAddress])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })

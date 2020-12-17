@@ -1,4 +1,5 @@
-import { BaseAmount, PoolData, Asset } from '@xchainjs/xchain-util'
+import { PoolData } from '@thorchain/asgardex-util'
+import { BaseAmount, Asset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 

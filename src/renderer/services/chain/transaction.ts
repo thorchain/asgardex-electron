@@ -38,11 +38,19 @@ const sendDepositTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositT
 
     case 'ETH':
       // not available yet
-      return depositTxFailure$('Deposit tx has not been implemented for ETH yet')
+      return depositTxFailure$(`Deposit tx has not been implemented for ETH yet`)
 
     case 'THOR':
       // not available yet
-      return depositTxFailure$('Deposit tx has not been implemented for THORChain yet')
+      return depositTxFailure$(`Deposit tx has not been implemented for Thorchain yet`)
+
+    case 'GAIA':
+      // not available yet
+      return depositTxFailure$(`Deposit tx has not been implemented for Cosmos yet`)
+
+    case 'POLKA':
+      // not available yet
+      return depositTxFailure$(`Deposit tx has not been implemented for Polkadot yet`)
   }
 }
 

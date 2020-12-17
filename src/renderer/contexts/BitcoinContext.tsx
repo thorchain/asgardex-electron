@@ -10,7 +10,10 @@ import {
   fees$,
   pushTx,
   resetTx,
-  ledgerAddress$
+  ledgerAddress$,
+  ledgerTxRD$,
+  pushLedgerTx,
+  resetLedgerTx
 } from '../services/bitcoin'
 
 export type BitcoinContextValue = {
@@ -24,6 +27,9 @@ export type BitcoinContextValue = {
   reloadFees: typeof reloadFees
   resetTx: typeof resetTx
   ledgerAddress$: typeof ledgerAddress$
+  ledgerTxRD$: typeof ledgerTxRD$
+  pushLedgerTx: typeof pushLedgerTx
+  resetLedgerTx: typeof resetLedgerTx
 }
 
 const initialContext: BitcoinContextValue = {
@@ -36,7 +42,10 @@ const initialContext: BitcoinContextValue = {
   pushTx,
   reloadFees,
   resetTx,
-  ledgerAddress$
+  ledgerAddress$,
+  ledgerTxRD$,
+  pushLedgerTx,
+  resetLedgerTx
 }
 
 const BitcoinContext = createContext<BitcoinContextValue | null>(null)

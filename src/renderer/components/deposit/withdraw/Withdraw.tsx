@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import {
   Asset,
   assetAmount,
@@ -9,9 +10,7 @@ import {
   baseAmount,
   BaseAmount,
   baseToAsset,
-  formatAssetAmountCurrency,
-  getValueOfAsset1InAsset2,
-  PoolData
+  formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Col, Grid } from 'antd'
 import BigNumber from 'bignumber.js'

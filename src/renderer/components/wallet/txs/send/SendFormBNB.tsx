@@ -21,6 +21,7 @@ import { isBnbAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getBnbAmountFromBalances } from '../../../../helpers/walletHelper'
 import { AddressValidation, SendTxParams } from '../../../../services/binance/types'
+import { WalletBalances } from '../../../../services/clients'
 import { WalletBalance } from '../../../../types/wallet'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
@@ -35,7 +36,7 @@ export type FormValues = {
 }
 
 type Props = {
-  balances: WalletBalance[]
+  balances: WalletBalances
   balance: WalletBalance
   onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) => void
   isLoading?: boolean

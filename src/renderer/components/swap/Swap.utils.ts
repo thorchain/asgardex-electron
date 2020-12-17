@@ -1,17 +1,5 @@
-import {
-  Asset,
-  assetAmount,
-  assetToBase,
-  assetToString,
-  baseToAsset,
-  getDoubleSwapOutput,
-  getDoubleSwapSlip,
-  getSwapOutput,
-  getSwapSlip,
-  PoolData,
-  bn,
-  BaseAmount
-} from '@xchainjs/xchain-util'
+import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip, PoolData } from '@thorchain/asgardex-util'
+import { Asset, assetAmount, assetToBase, assetToString, baseToAsset, bn, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as O from 'fp-ts/lib/Option'

@@ -1,14 +1,8 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import {
-  Asset,
-  AssetRuneNative,
-  baseAmount,
-  bnOrZero,
-  getValueOfAsset1InAsset2,
-  getValueOfRuneInAsset
-} from '@xchainjs/xchain-util'
+import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
+import { Asset, AssetRuneNative, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
