@@ -5,7 +5,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/ConstantsSchema"
+              "$ref": "#/components/schemas/Constants"
             }
           }
         },
@@ -35,22 +35,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "properties": {
-                "database": {
-                  "description": "True means healthy, connected to database",
-                  "type": "boolean"
-                },
-                "inSync": {
-                  "description": "True means healthy. False means Midgard is still catching up to the chain",
-                  "type": "boolean"
-                },
-                "scannerHeight": {
-                  "description": "Int64, the current block count",
-                  "type": "string"
-                }
-              },
-              "required": ["database", "scannerHeight", "inSync"],
-              "type": "object"
+              "$ref": "#/components/schemas/Health"
             }
           }
         },
@@ -60,16 +45,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "properties": {
-                "current": {
-                  "items": {
-                    "$ref": "#/components/schemas/InboundAddressesItem"
-                  },
-                  "type": "array"
-                }
-              },
-              "required": ["current"],
-              "type": "object"
+              "$ref": "#/components/schemas/InboundAddresses"
             }
           }
         },
@@ -79,16 +55,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "properties": {
-                "current": {
-                  "items": {
-                    "$ref": "#/components/schemas/LastblockItem"
-                  },
-                  "type": "array"
-                }
-              },
-              "required": ["current"],
-              "type": "object"
+              "$ref": "#/components/schemas/Lastblock"
             }
           }
         },
@@ -118,12 +85,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "items": {
-                "description": "Member address",
-                "example": "tbnb1fj2lqj8dvr5pumfchc7ntlfqd2v6zdxqwjewf5",
-                "type": "string"
-              },
-              "type": "array"
+              "$ref": "#/components/schemas/Members"
             }
           }
         },
@@ -143,14 +105,11 @@
         "content": {
           "application/json": {
             "schema": {
-              "items": {
-                "$ref": "#/components/schemas/NodeKey"
-              },
-              "type": "array"
+              "$ref": "#/components/schemas/NodeKeys"
             }
           }
         },
-        "description": "Returns an object containing Network data"
+        "description": "Returns an object containing Node public key data"
       },
       "PoolResponse": {
         "content": {
@@ -166,10 +125,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "items": {
-                "$ref": "#/components/schemas/PoolDetail"
-              },
-              "type": "array"
+              "$ref": "#/components/schemas/PoolDetails"
             }
           }
         },
@@ -179,18 +135,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "properties": {
-                "outbound": {
-                  "example": "0",
-                  "type": "string"
-                },
-                "swap": {
-                  "example": "0",
-                  "type": "string"
-                }
-              },
-              "required": ["swap", "outbound"],
-              "type": "object"
+              "$ref": "#/components/schemas/Queue"
             }
           }
         },
@@ -323,7 +268,7 @@
         "required": ["StrictBondLiquidityRatio"],
         "type": "object"
       },
-      "ConstantsSchema": {
+      "Constants": {
         "properties": {
           "bool_values": {
             "$ref": "#/components/schemas/BoolConstants"
@@ -482,6 +427,36 @@
           }
         },
         "required": ["pool", "earnings"],
+        "type": "object"
+      },
+      "Health": {
+        "properties": {
+          "database": {
+            "description": "True means healthy, connected to database",
+            "type": "boolean"
+          },
+          "inSync": {
+            "description": "True means healthy. False means Midgard is still catching up to the chain",
+            "type": "boolean"
+          },
+          "scannerHeight": {
+            "description": "Int64, the current block count",
+            "type": "string"
+          }
+        },
+        "required": ["database", "scannerHeight", "inSync"],
+        "type": "object"
+      },
+      "InboundAddresses": {
+        "properties": {
+          "current": {
+            "items": {
+              "$ref": "#/components/schemas/InboundAddressesItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["current"],
         "type": "object"
       },
       "InboundAddressesItem": {
@@ -676,6 +651,18 @@
         ],
         "type": "object"
       },
+      "Lastblock": {
+        "properties": {
+          "current": {
+            "items": {
+              "$ref": "#/components/schemas/LastblockItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["current"],
+        "type": "object"
+      },
       "LastblockItem": {
         "properties": {
           "chain": {
@@ -802,6 +789,14 @@
         ],
         "type": "object"
       },
+      "Members": {
+        "items": {
+          "description": "Member address",
+          "example": "tbnb1fj2lqj8dvr5pumfchc7ntlfqd2v6zdxqwjewf5",
+          "type": "string"
+        },
+        "type": "array"
+      },
       "Network": {
         "properties": {
           "activeBonds": {
@@ -824,9 +819,6 @@
             "description": "Float, (1 + (bondReward * blocksPerMonth/totalActiveBond)) ^ 12 -1",
             "type": "string"
           },
-          "bondingROI": {
-            "type": "string"
-          },
           "liquidityAPY": {
             "description": "Float, (1 + (stakeReward * blocksPerMonth/totalDepth of active pools)) ^ 12 -1",
             "type": "string"
@@ -840,9 +832,6 @@
             "type": "string"
           },
           "poolShareFactor": {
-            "type": "string"
-          },
-          "stakingROI": {
             "type": "string"
           },
           "standbyBonds": {
@@ -877,7 +866,6 @@
           "nextChurnHeight",
           "poolActivationCountdown",
           "poolShareFactor",
-          "bondingROI",
           "bondingAPY",
           "liquidityAPY"
         ],
@@ -887,15 +875,28 @@
         "properties": {
           "ed25519": {
             "description": "ed25519 public key",
+            "example": "thorpub1addwnpepqgxwdf3ure0pg5fwnpeux3ym9n06267lkres54zwjh4c8048ezhj5024qyr",
+            "type": "string"
+          },
+          "nodeAddress": {
+            "description": "node thorchain address",
+            "example": "thor102y0m3uptg0vvudeyh00r2fnz70wq7d8y7mu2g",
             "type": "string"
           },
           "secp256k1": {
             "description": "secp256k1 public key",
+            "example": "thorpub1addwnpepqgxwdf3ure0pg5fwnpeux3ym9n06267lkres54zwjh4c8048ezhj5024qyr",
             "type": "string"
           }
         },
-        "required": ["secp256k1", "ed25519"],
+        "required": ["nodeAddress", "secp256k1", "ed25519"],
         "type": "object"
+      },
+      "NodeKeys": {
+        "items": {
+          "$ref": "#/components/schemas/NodeKey"
+        },
+        "type": "array"
       },
       "PoolDetail": {
         "properties": {
@@ -932,6 +933,26 @@
           }
         },
         "required": ["asset", "volume24h", "assetDepth", "runeDepth", "assetPrice", "poolAPY", "status", "units"],
+        "type": "object"
+      },
+      "PoolDetails": {
+        "items": {
+          "$ref": "#/components/schemas/PoolDetail"
+        },
+        "type": "array"
+      },
+      "Queue": {
+        "properties": {
+          "outbound": {
+            "example": "0",
+            "type": "string"
+          },
+          "swap": {
+            "example": "0",
+            "type": "string"
+          }
+        },
+        "required": ["swap", "outbound"],
         "type": "object"
       },
       "StatsData": {
@@ -1235,7 +1256,7 @@
     },
     "/v2/history/depths/{pool}": {
       "get": {
-        "description": "Returns the asset and rune depths and price.\nThe values report the state at the end of each interval.\n\nBucketing parameters:\n* Interval is required, possible values: 5min, hour, day, week, month, quarter, year.\n* count: optional int, (1..100)\n* from/to: optional int, unix second.\n\nProviding all count/from/to will result in error. Possible configurations:\n* last 10 days: interval=day\u0026count=10\n* last 10 days before to: interval=day\u0026count=10\u0026to=1234567890\n* interval=day\u0026count=10\u0026from=1234567890    - next 10 days after from.\n* interval=day\u0026from=1100000\u0026to=1100000     - days between from and to. It will fail if more than 100 intervals are requested.\n",
+        "description": "Returns the asset and rune depths and price.\nThe values report the state at the end of each interval.\n\nBucketing parameters:\n* Interval is required, possible values: 5min, hour, day, week, month, quarter, year.\n* count: optional int, [1..100]\n* from/to: optional int, unix second.\n\nProviding all count/from/to will result in error. Possible configurations:\n* last 10 days: interval=day\u0026count=10\n* last 10 days before to: interval=day\u0026count=10\u0026to=1608825600\n* next 10 days after from: interval=day\u0026count=10\u0026from=1606780800\n* Days between from and to. It will fail if more than 100 intervals are requested: interval=day\u0026from=1606780800\u0026to=1608825600\n\nPagination is possible with from\u0026count and then using the retuned meta.endTime as the from prameter of the next query.\n",
         "operationId": "GetDepthHistory",
         "parameters": [
           {
@@ -1249,6 +1270,7 @@
           },
           {
             "description": "Interval of calculations",
+            "example": "day",
             "in": "query",
             "name": "interval",
             "required": true,
@@ -1258,20 +1280,29 @@
             }
           },
           {
-            "description": "Start time of the query as unix timestamp",
+            "description": "Number of intervals to return. Should be between [1..100].",
+            "example": 30,
             "in": "query",
-            "name": "from",
-            "required": true,
+            "name": "count",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "End time of the query as unix timestamp. If only count is given, defaults to now.",
+            "example": 1608825600,
+            "in": "query",
+            "name": "to",
             "schema": {
               "format": "int64",
               "type": "integer"
             }
           },
           {
-            "description": "End time of the query as unix timestamp",
+            "description": "Start time of the query as unix timestamp",
+            "example": 1606780800,
             "in": "query",
-            "name": "to",
-            "required": true,
+            "name": "from",
             "schema": {
               "format": "int64",
               "type": "integer"
@@ -1288,11 +1319,12 @@
     },
     "/v2/history/earnings": {
       "get": {
-        "description": "Returns earnings data for the specified interval.",
+        "description": "Returns earnings data for the specified interval.\n\nBucketing parameters:\n* Interval is required, possible values: 5min, hour, day, week, month, quarter, year.\n* count: optional int, [1..100]\n* from/to: optional int, unix second.\n\nProviding all count/from/to will result in error. Possible configurations:\n* last 10 days: interval=day\u0026count=10\n* last 10 days before to: interval=day\u0026count=10\u0026to=1608825600\n* next 10 days after from: interval=day\u0026count=10\u0026from=1606780800\n* Days between from and to. It will fail if more than 100 intervals are requested: interval=day\u0026from=1606780800\u0026to=1608825600\n\nPagination is possible with from\u0026count and then using the retuned meta.endTime as the from prameter of the next query.\n",
         "operationId": "GetEarningsHistory",
         "parameters": [
           {
             "description": "Interval of calculations",
+            "example": "day",
             "in": "query",
             "name": "interval",
             "required": true,
@@ -1302,20 +1334,29 @@
             }
           },
           {
-            "description": "Start time of the query as unix timestamp",
+            "description": "Number of intervals to return. Should be between [1..100].",
+            "example": 30,
             "in": "query",
-            "name": "from",
-            "required": true,
+            "name": "count",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "End time of the query as unix timestamp. If only count is given, defaults to now.",
+            "example": 1608825600,
+            "in": "query",
+            "name": "to",
             "schema": {
               "format": "int64",
               "type": "integer"
             }
           },
           {
-            "description": "End time of the query as unix timestamp",
+            "description": "Start time of the query as unix timestamp",
+            "example": 1606780800,
             "in": "query",
-            "name": "to",
-            "required": true,
+            "name": "from",
             "schema": {
               "format": "int64",
               "type": "integer"
@@ -1332,7 +1373,7 @@
     },
     "/v2/history/liquidity_changes": {
       "get": {
-        "description": "Returns withdrawals and deposits for given time interval. If pool is not specified returns for all pools",
+        "description": "Returns withdrawals and deposits for given time interval.\nIf pool is not specified returns for all pools\n\nBucketing parameters:\n* Interval is required, possible values: 5min, hour, day, week, month, quarter, year.\n* count: optional int, [1..100]\n* from/to: optional int, unix second.\n\nProviding all count/from/to will result in error. Possible configurations:\n* last 10 days: interval=day\u0026count=10\n* last 10 days before to: interval=day\u0026count=10\u0026to=1608825600\n* next 10 days after from: interval=day\u0026count=10\u0026from=1606780800\n* Days between from and to. It will fail if more than 100 intervals are requested: interval=day\u0026from=1606780800\u0026to=1608825600\n\nPagination is possible with from\u0026count and then using the retuned meta.endTime as the from prameter of the next query.\n",
         "operationId": "GetLiquidityHistory",
         "parameters": [
           {
@@ -1340,12 +1381,12 @@
             "in": "query",
             "name": "pool",
             "schema": {
-              "format": "int64",
-              "type": "integer"
+              "type": "string"
             }
           },
           {
             "description": "Interval of calculations",
+            "example": "day",
             "in": "query",
             "name": "interval",
             "required": true,
@@ -1355,20 +1396,29 @@
             }
           },
           {
-            "description": "Start time of the query as unix timestamp",
+            "description": "Number of intervals to return. Should be between [1..100].",
+            "example": 30,
             "in": "query",
-            "name": "from",
-            "required": true,
+            "name": "count",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "End time of the query as unix timestamp. If only count is given, defaults to now.",
+            "example": 1608825600,
+            "in": "query",
+            "name": "to",
             "schema": {
               "format": "int64",
               "type": "integer"
             }
           },
           {
-            "description": "End time of the query as unix timestamp",
+            "description": "Start time of the query as unix timestamp",
+            "example": 1606780800,
             "in": "query",
-            "name": "to",
-            "required": true,
+            "name": "from",
             "schema": {
               "format": "int64",
               "type": "integer"
@@ -1385,7 +1435,7 @@
     },
     "/v2/history/swaps": {
       "get": {
-        "description": "Returns swap count, volume, fees, slip in specified interval. If pool is not specified returns for all pools",
+        "description": "Returns swap count, volume, fees, slip in specified interval.\nIf pool is not specified returns for all pools\n\nBucketing parameters:\n* Interval is required, possible values: 5min, hour, day, week, month, quarter, year.\n* count: optional int, [1..100]\n* from/to: optional int, unix second.\n\nProviding all count/from/to will result in error. Possible configurations:\n* last 10 days: interval=day\u0026count=10\n* last 10 days before to: interval=day\u0026count=10\u0026to=1608825600\n* next 10 days after from: interval=day\u0026count=10\u0026from=1606780800\n* Days between from and to. It will fail if more than 100 intervals are requested: interval=day\u0026from=1606780800\u0026to=1608825600\n\nPagination is possible with from\u0026count and then using the retuned meta.endTime as the from prameter of the next query.\n",
         "operationId": "GetSwapHistory",
         "parameters": [
           {
@@ -1398,6 +1448,7 @@
           },
           {
             "description": "Interval of calculations",
+            "example": "day",
             "in": "query",
             "name": "interval",
             "required": true,
@@ -1407,20 +1458,29 @@
             }
           },
           {
-            "description": "Start time of the query as unix timestamp",
+            "description": "Number of intervals to return. Should be between [1..100].",
+            "example": 30,
             "in": "query",
-            "name": "from",
-            "required": true,
+            "name": "count",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "End time of the query as unix timestamp. If only count is given, defaults to now.",
+            "example": 1608825600,
+            "in": "query",
+            "name": "to",
             "schema": {
               "format": "int64",
               "type": "integer"
             }
           },
           {
-            "description": "End time of the query as unix timestamp",
+            "description": "Start time of the query as unix timestamp",
+            "example": 1606780800,
             "in": "query",
-            "name": "to",
-            "required": true,
+            "name": "from",
             "schema": {
               "format": "int64",
               "type": "integer"
@@ -1485,7 +1545,7 @@
     },
     "/v2/nodes": {
       "get": {
-        "description": "Returns an object containing Node public keys",
+        "description": "Returns a list of Node public keys",
         "operationId": "GetNodes",
         "responses": {
           "200": {
@@ -1525,10 +1585,9 @@
         "operationId": "GetPools",
         "parameters": [
           {
-            "description": "Interval of calculations",
+            "description": "Filter for only pools with this status.",
             "in": "query",
             "name": "status",
-            "required": true,
             "schema": {
               "enum": ["available", "staged", "suspended"],
               "type": "string"

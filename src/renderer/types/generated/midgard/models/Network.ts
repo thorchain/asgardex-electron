@@ -49,11 +49,6 @@ export interface Network {
      */
     bondingAPY: string;
     /**
-     * @type {string}
-     * @memberof Network
-     */
-    bondingROI: string;
-    /**
      * Float, (1 + (stakeReward * blocksPerMonth/totalDepth of active pools)) ^ 12 -1
      * @type {string}
      * @memberof Network
@@ -76,11 +71,6 @@ export interface Network {
      * @memberof Network
      */
     poolShareFactor: string;
-    /**
-     * @type {string}
-     * @memberof Network
-     */
-    stakingROI?: string;
     /**
      * Array of Standby Bonds
      * @type {Array<string>}

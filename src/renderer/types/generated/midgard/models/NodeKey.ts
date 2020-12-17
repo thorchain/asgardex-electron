@@ -23,6 +23,12 @@ export interface NodeKey {
      */
     ed25519: string;
     /**
+     * node thorchain address
+     * @type {string}
+     * @memberof NodeKey
+     */
+    nodeAddress: string;
+    /**
      * secp256k1 public key
      * @type {string}
      * @memberof NodeKey

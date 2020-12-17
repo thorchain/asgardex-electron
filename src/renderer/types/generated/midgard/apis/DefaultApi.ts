@@ -14,19 +14,19 @@
 import { Observable } from 'rxjs';
 import { BaseAPI, HttpQuery, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import {
-    ConstantsSchema,
+    Constants,
     DepthHistory,
     EarningsHistory,
+    Health,
+    InboundAddresses,
     InlineResponse200,
-    InlineResponse2001,
-    InlineResponse2002,
-    InlineResponse2003,
-    InlineResponse2004,
+    Lastblock,
     LiquidityHistory,
     MemberDetails,
     Network,
     NodeKey,
     PoolDetail,
+    Queue,
     StatsData,
     SwapHistory,
 } from '../models';
@@ -34,21 +34,24 @@ import {
 export interface GetDepthHistoryRequest {
     pool: string;
     interval: GetDepthHistoryIntervalEnum;
-    from: number;
-    to: number;
+    count?: number;
+    to?: number;
+    from?: number;
 }
 
 export interface GetEarningsHistoryRequest {
     interval: GetEarningsHistoryIntervalEnum;
-    from: number;
-    to: number;
+    count?: number;
+    to?: number;
+    from?: number;
 }
 
 export interface GetLiquidityHistoryRequest {
     interval: GetLiquidityHistoryIntervalEnum;
-    from: number;
-    to: number;
-    pool?: number;
+    pool?: string;
+    count?: number;
+    to?: number;
+    from?: number;
 }
 
 export interface GetMemberDetailRequest {
@@ -60,14 +63,15 @@ export interface GetPoolRequest {
 }
 
 export interface GetPoolsRequest {
-    status: GetPoolsStatusEnum;
+    status?: GetPoolsStatusEnum;
 }
 
 export interface GetSwapHistoryRequest {
     interval: GetSwapHistoryIntervalEnum;
-    from: number;
-    to: number;
     pool?: string;
+    count?: number;
+    to?: number;
+    from?: number;
 }
 
 export interface GetTxDetailsRequest {
@@ -85,20 +89,20 @@ export interface GetTxDetailsRequest {
 export class DefaultApi extends BaseAPI {
 
     /**
-     * Returns the asset and rune depths and price. The values report the state at the end of each interval.  Bucketing parameters: * Interval is required, possible values: 5min, hour, day, week, month, quarter, year. * count: optional int, (1..100) * from/to: optional int, unix second.  Providing all count/from/to will result in error. Possible configurations: * last 10 days: interval=day&count=10 * last 10 days before to: interval=day&count=10&to=1234567890 * interval=day&count=10&from=1234567890    - next 10 days after from. * interval=day&from=1100000&to=1100000     - days between from and to. It will fail if more than 100 intervals are requested. 
+     * Returns the asset and rune depths and price. The values report the state at the end of each interval.  Bucketing parameters: * Interval is required, possible values: 5min, hour, day, week, month, quarter, year. * count: optional int, [1..100] * from/to: optional int, unix second.  Providing all count/from/to will result in error. Possible configurations: * last 10 days: interval=day&count=10 * last 10 days before to: interval=day&count=10&to=1608825600 * next 10 days after from: interval=day&count=10&from=1606780800 * Days between from and to. It will fail if more than 100 intervals are requested: interval=day&from=1606780800&to=1608825600  Pagination is possible with from&count and then using the retuned meta.endTime as the from prameter of the next query. 
      * Depth and price history
      */
-    getDepthHistory = ({ pool, interval, from, to }: GetDepthHistoryRequest): Observable<DepthHistory> => {
+    getDepthHistory = ({ pool, interval, count, to, from }: GetDepthHistoryRequest): Observable<DepthHistory> => {
         throwIfNullOrUndefined(pool, 'getDepthHistory');
         throwIfNullOrUndefined(interval, 'getDepthHistory');
-        throwIfNullOrUndefined(from, 'getDepthHistory');
-        throwIfNullOrUndefined(to, 'getDepthHistory');
 
         const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
             'interval': interval,
-            'from': from,
-            'to': to,
         };
+
+        if (count != null) { query['count'] = count; }
+        if (to != null) { query['to'] = to; }
+        if (from != null) { query['from'] = from; }
 
         return this.request<DepthHistory>({
             path: '/v2/history/depths/{pool}'.replace('{pool}', encodeURI(pool)),
@@ -108,19 +112,19 @@ export class DefaultApi extends BaseAPI {
     };
 
     /**
-     * Returns earnings data for the specified interval.
+     * Returns earnings data for the specified interval.  Bucketing parameters: * Interval is required, possible values: 5min, hour, day, week, month, quarter, year. * count: optional int, [1..100] * from/to: optional int, unix second.  Providing all count/from/to will result in error. Possible configurations: * last 10 days: interval=day&count=10 * last 10 days before to: interval=day&count=10&to=1608825600 * next 10 days after from: interval=day&count=10&from=1606780800 * Days between from and to. It will fail if more than 100 intervals are requested: interval=day&from=1606780800&to=1608825600  Pagination is possible with from&count and then using the retuned meta.endTime as the from prameter of the next query. 
      * Earnings related history
      */
-    getEarningsHistory = ({ interval, from, to }: GetEarningsHistoryRequest): Observable<EarningsHistory> => {
+    getEarningsHistory = ({ interval, count, to, from }: GetEarningsHistoryRequest): Observable<EarningsHistory> => {
         throwIfNullOrUndefined(interval, 'getEarningsHistory');
-        throwIfNullOrUndefined(from, 'getEarningsHistory');
-        throwIfNullOrUndefined(to, 'getEarningsHistory');
 
         const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
             'interval': interval,
-            'from': from,
-            'to': to,
         };
+
+        if (count != null) { query['count'] = count; }
+        if (to != null) { query['to'] = to; }
+        if (from != null) { query['from'] = from; }
 
         return this.request<EarningsHistory>({
             path: '/v2/history/earnings',
@@ -133,29 +137,28 @@ export class DefaultApi extends BaseAPI {
      * Returns an object containing the health response of the API
      * Get Health
      */
-    getHealth = (): Observable<InlineResponse200> => {
-        return this.request<InlineResponse200>({
+    getHealth = (): Observable<Health> => {
+        return this.request<Health>({
             path: '/v2/health',
             method: 'GET',
         });
     };
 
     /**
-     * Returns withdrawals and deposits for given time interval. If pool is not specified returns for all pools
+     * Returns withdrawals and deposits for given time interval. If pool is not specified returns for all pools  Bucketing parameters: * Interval is required, possible values: 5min, hour, day, week, month, quarter, year. * count: optional int, [1..100] * from/to: optional int, unix second.  Providing all count/from/to will result in error. Possible configurations: * last 10 days: interval=day&count=10 * last 10 days before to: interval=day&count=10&to=1608825600 * next 10 days after from: interval=day&count=10&from=1606780800 * Days between from and to. It will fail if more than 100 intervals are requested: interval=day&from=1606780800&to=1608825600  Pagination is possible with from&count and then using the retuned meta.endTime as the from prameter of the next query. 
      * Liquidity changes related history
      */
-    getLiquidityHistory = ({ interval, from, to, pool }: GetLiquidityHistoryRequest): Observable<LiquidityHistory> => {
+    getLiquidityHistory = ({ interval, pool, count, to, from }: GetLiquidityHistoryRequest): Observable<LiquidityHistory> => {
         throwIfNullOrUndefined(interval, 'getLiquidityHistory');
-        throwIfNullOrUndefined(from, 'getLiquidityHistory');
-        throwIfNullOrUndefined(to, 'getLiquidityHistory');
 
         const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
             'interval': interval,
-            'from': from,
-            'to': to,
         };
 
         if (pool != null) { query['pool'] = pool; }
+        if (count != null) { query['count'] = count; }
+        if (to != null) { query['to'] = to; }
+        if (from != null) { query['from'] = from; }
 
         return this.request<LiquidityHistory>({
             path: '/v2/history/liquidity_changes',
@@ -200,7 +203,7 @@ export class DefaultApi extends BaseAPI {
     };
 
     /**
-     * Returns an object containing Node public keys
+     * Returns a list of Node public keys
      * Get Node public keys
      */
     getNodes = (): Observable<Array<NodeKey>> => {
@@ -228,11 +231,10 @@ export class DefaultApi extends BaseAPI {
      * Get Asset Pools
      */
     getPools = ({ status }: GetPoolsRequest): Observable<Array<PoolDetail>> => {
-        throwIfNullOrUndefined(status, 'getPools');
 
-        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            'status': status,
-        };
+        const query: HttpQuery = {};
+
+        if (status != null) { query['status'] = status; }
 
         return this.request<Array<PoolDetail>>({
             path: '/v2/pools',
@@ -245,8 +247,8 @@ export class DefaultApi extends BaseAPI {
      * Constant values used by THORChain , some of the values can be overrided by mimir
      * Get the Proxied THORChain Constants
      */
-    getProxiedConstants = (): Observable<ConstantsSchema> => {
-        return this.request<ConstantsSchema>({
+    getProxiedConstants = (): Observable<Constants> => {
+        return this.request<Constants>({
             path: '/v2/thorchain/constants',
             method: 'GET',
         });
@@ -256,8 +258,8 @@ export class DefaultApi extends BaseAPI {
      * Inbound addresses will return a list of address , one per chain. The address might change frequently if THORChain has multiple asgards.
      * Get the Proxied THORChain Inbound Addresses
      */
-    getProxiedInboundAddresses = (): Observable<InlineResponse2001> => {
-        return this.request<InlineResponse2001>({
+    getProxiedInboundAddresses = (): Observable<InboundAddresses> => {
+        return this.request<InboundAddresses>({
             path: '/v2/thorchain/inbound_addresses',
             method: 'GET',
         });
@@ -267,8 +269,8 @@ export class DefaultApi extends BaseAPI {
      * Retrieve lastest block infomation across all chains.
      * Get the Proxied THORChain Lastblock
      */
-    getProxiedLastblock = (): Observable<InlineResponse2002> => {
-        return this.request<InlineResponse2002>({
+    getProxiedLastblock = (): Observable<Lastblock> => {
+        return this.request<Lastblock>({
             path: '/v2/thorchain/lastblock',
             method: 'GET',
         });
@@ -278,8 +280,8 @@ export class DefaultApi extends BaseAPI {
      * Returns the proxied queue endpoint from a local thornode
      * Get the Proxied THORChain Queue
      */
-    getProxiedQueue = (): Observable<InlineResponse2003> => {
-        return this.request<InlineResponse2003>({
+    getProxiedQueue = (): Observable<Queue> => {
+        return this.request<Queue>({
             path: '/v2/thorchain/queue',
             method: 'GET',
         });
@@ -297,21 +299,20 @@ export class DefaultApi extends BaseAPI {
     };
 
     /**
-     * Returns swap count, volume, fees, slip in specified interval. If pool is not specified returns for all pools
+     * Returns swap count, volume, fees, slip in specified interval. If pool is not specified returns for all pools  Bucketing parameters: * Interval is required, possible values: 5min, hour, day, week, month, quarter, year. * count: optional int, [1..100] * from/to: optional int, unix second.  Providing all count/from/to will result in error. Possible configurations: * last 10 days: interval=day&count=10 * last 10 days before to: interval=day&count=10&to=1608825600 * next 10 days after from: interval=day&count=10&from=1606780800 * Days between from and to. It will fail if more than 100 intervals are requested: interval=day&from=1606780800&to=1608825600  Pagination is possible with from&count and then using the retuned meta.endTime as the from prameter of the next query. 
      * Swaps related history
      */
-    getSwapHistory = ({ interval, from, to, pool }: GetSwapHistoryRequest): Observable<SwapHistory> => {
+    getSwapHistory = ({ interval, pool, count, to, from }: GetSwapHistoryRequest): Observable<SwapHistory> => {
         throwIfNullOrUndefined(interval, 'getSwapHistory');
-        throwIfNullOrUndefined(from, 'getSwapHistory');
-        throwIfNullOrUndefined(to, 'getSwapHistory');
 
         const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
             'interval': interval,
-            'from': from,
-            'to': to,
         };
 
         if (pool != null) { query['pool'] = pool; }
+        if (count != null) { query['count'] = count; }
+        if (to != null) { query['to'] = to; }
+        if (from != null) { query['from'] = from; }
 
         return this.request<SwapHistory>({
             path: '/v2/history/swaps',
@@ -324,7 +325,7 @@ export class DefaultApi extends BaseAPI {
      * Return an array containing the event details
      * List transactions or get details for specific transactions.
      */
-    getTxDetails = ({ limit, offset, address, txid, asset, type }: GetTxDetailsRequest): Observable<InlineResponse2004> => {
+    getTxDetails = ({ limit, offset, address, txid, asset, type }: GetTxDetailsRequest): Observable<InlineResponse200> => {
         throwIfNullOrUndefined(limit, 'getTxDetails');
         throwIfNullOrUndefined(offset, 'getTxDetails');
 
@@ -338,7 +339,7 @@ export class DefaultApi extends BaseAPI {
         if (asset != null) { query['asset'] = asset; }
         if (type != null) { query['type'] = type; }
 
-        return this.request<InlineResponse2004>({
+        return this.request<InlineResponse200>({
             path: '/v2/tx',
             method: 'GET',
             query,

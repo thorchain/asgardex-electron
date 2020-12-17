@@ -11,30 +11,19 @@
  * Do not edit the class manually.
  */
 
-import {
-    BoolConstants,
-    Int64Constants,
-    StringConstants,
-} from './';
-
 /**
  * @export
- * @interface ConstantsSchema
+ * @interface Queue
  */
-export interface ConstantsSchema {
+export interface Queue {
     /**
-     * @type {BoolConstants}
-     * @memberof ConstantsSchema
+     * @type {string}
+     * @memberof Queue
      */
-    bool_values: BoolConstants;
+    outbound: string;
     /**
-     * @type {Int64Constants}
-     * @memberof ConstantsSchema
+     * @type {string}
+     * @memberof Queue
      */
-    int_64_values: Int64Constants;
-    /**
-     * @type {StringConstants}
-     * @memberof ConstantsSchema
-     */
-    string_values: StringConstants;
+    swap: string;
 }
