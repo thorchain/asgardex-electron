@@ -2,8 +2,7 @@ import { baseAmount, BaseAmount, bn, bnOrZero } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
 import { ZERO_BN } from '../const'
-import { StakersAssetData } from '../services/midgard/types'
-import { PoolDetail } from '../types/generated/midgard/models'
+import { PoolDetail, StakersAssetData } from '../services/midgard/types'
 import { THORCHAIN_DECIMAL } from './assetHelper'
 
 /**

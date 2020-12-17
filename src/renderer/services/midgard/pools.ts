@@ -16,8 +16,12 @@ import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
-import { DefaultApi, GetPoolsRequest, GetPoolsStatusEnum } from '../../types/generated/midgard/apis'
-import { PoolDetail } from '../../types/generated/midgard/models'
+import {
+  DefaultApi,
+  GetPoolsRequest,
+  GetPoolsStatusEnum,
+  GetSwapHistoryIntervalEnum
+} from '../../types/generated/midgard/apis'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
@@ -32,7 +36,8 @@ import {
   PoolsStateLD,
   PoolStringAssetsLD,
   SelectedPricePoolAsset,
-  ThorchainEndpointsLD
+  ThorchainEndpointsLD,
+  PoolDetails
 } from './types'
 import { getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
 
@@ -54,18 +59,68 @@ const createPoolsService = (
   getMidgardDefaultApi: (basePath: string) => DefaultApi,
   selectedPoolAsset$: Rx.Observable<O.Option<Asset>>
 ): PoolsService => {
+  const midgardDefailtApi$ = FP.pipe(byzantine$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
+
   // Factory to get `Pools` from Midgard
   const apiGetPools$ = (request: GetPoolsRequest) =>
     FP.pipe(
-      Rx.combineLatest([byzantine$, reloadPools$]),
-      RxOp.map(([byzantine]) => byzantine),
-      liveData.map(getMidgardDefaultApi),
+      Rx.combineLatest([midgardDefailtApi$, reloadPools$]),
+      RxOp.map(([api]) => api),
       liveData.chain((api) =>
         FP.pipe(
           api.getPools(request),
           RxOp.map(RD.success),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+        )
+      ),
+      liveData.chain((details) =>
+        FP.pipe(
+          details,
+          A.map(({ asset }) =>
+            FP.pipe(
+              midgardDefailtApi$,
+              liveData.chain((api) =>
+                FP.pipe(
+                  // As midgard v2 is missing poolSlipAverage and swappingTxCount
+                  // field we have to get them from getSwapHistory
+                  api.getSwapHistory({
+                    pool: asset,
+                    interval: GetSwapHistoryIntervalEnum.Year,
+                    // Emulate ALL period of a pool life
+                    // And get data for last 10 years
+                    from: Date.now() - 360 * 3600 * 24 * 10,
+                    to: Date.now()
+                  }),
+                  RxOp.map(RD.success),
+                  liveData.map(({ meta }) => meta),
+                  RxOp.catchError(() => Rx.of(RD.failure(Error('Failed to load swaps history')))),
+                  RxOp.startWith(RD.pending)
+                )
+              ),
+              liveData.map(({ averageSlip, totalCount }) => ({
+                poolSlipAverage: averageSlip,
+                swappingTxCount: totalCount
+              })),
+              /**
+               * Set default value for all failed items to avoid falling into
+               * the error branch on the next step by liveData.sequenceArray
+               */
+              liveData.altOnError((): { poolSlipAverage: string; swappingTxCount: string } => ({
+                poolSlipAverage: '0',
+                swappingTxCount: '0'
+              }))
+            )
+          ),
+          liveData.sequenceArray,
+          liveData.map(
+            A.mapWithIndex((index, swapData) => ({
+              ...swapData,
+              // Here we can be sure in indexing 'cuz we have the same order
+              // as details 'cuz we build this array based on details themselves
+              ...details[index]
+            }))
+          )
         )
       ),
       RxOp.shareReplay(1)
@@ -77,12 +132,12 @@ const createPoolsService = (
   /**
    * Data of enabled `Pools` from Midgard
    */
-  const apiGetPoolsEnabled$: LiveData<Error, PoolDetail[]> = apiGetPools$({ status: GetPoolsStatusEnum.Available })
+  const apiGetPoolsEnabled$: LiveData<Error, PoolDetails> = apiGetPools$({ status: GetPoolsStatusEnum.Available })
 
   /**
    * Ddata of pending `Pools` from Midgard
    */
-  const apiGetPoolsPending$: LiveData<Error, PoolDetail[]> = apiGetPools$({ status: GetPoolsStatusEnum.Staged })
+  const apiGetPoolsPending$: LiveData<Error, PoolDetails> = apiGetPools$({ status: GetPoolsStatusEnum.Staged })
 
   /**
    * Data of `AssetDetails` from Midgard
@@ -112,7 +167,7 @@ const createPoolsService = (
   /**
    * `PoolDetails` data from Midgard
    */
-  const apiGetPoolsData$: (assetOrAssets: string | string[]) => LiveData<Error, PoolDetail[]> = (assetOrAssets) => {
+  const apiGetPoolsData$: (assetOrAssets: string | string[]) => LiveData<Error, PoolDetails> = (assetOrAssets) => {
     const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
 
     return FP.pipe(
@@ -121,8 +176,8 @@ const createPoolsService = (
       liveData.map(NEA.fromArray),
       liveData.chain(
         O.fold(
-          (): LiveData<Error, PoolDetail[]> => Rx.of(RD.failure(new Error('No pools available'))),
-          (poolsDetails): LiveData<Error, PoolDetail[]> => Rx.of(RD.success(poolsDetails))
+          (): LiveData<Error, PoolDetails> => Rx.of(RD.failure(new Error('No pools available'))),
+          (poolsDetails): LiveData<Error, PoolDetails> => Rx.of(RD.success(poolsDetails))
         )
       ),
       RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
@@ -292,11 +347,10 @@ const createPoolsService = (
   )
 
   const poolAddresses$: ThorchainEndpointsLD = FP.pipe(
-    byzantine$,
-    liveData.chain((endpoint) => {
-      getMidgardDefaultApi(endpoint)
+    midgardDefailtApi$,
+    liveData.chain((api) => {
       return FP.pipe(
-        getMidgardDefaultApi(endpoint).getProxiedInboundAddresses(),
+        api.getProxiedInboundAddresses(),
         RxOp.map(RD.success),
         RxOp.startWith(RD.pending),
         RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))

@@ -12,7 +12,7 @@ import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/Poo
 import { PoolStatus } from '../../components/uielements/poolStatus'
 import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { PoolDetail } from '../../types/generated/midgard/models'
+import { PoolDetail } from '../../services/midgard/types'
 
 const getDepth = (data: PoolDetail, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(priceRatio)))
@@ -23,7 +23,7 @@ const get24hrVolume = (data: PoolDetail, priceRatio: BigNumber = bn(1)) =>
 const getAllTimeVolume = (data: PoolDetail, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(/*data.poolVolume*/ 0).multipliedBy(priceRatio)))
 
-const getTotalSwaps = (_data: PoolDetail) => Number(/*data.swappingTxCount || */ 0)
+const getTotalSwaps = (data: PoolDetail) => Number(data.swappingTxCount)
 
 const getTotalStakers = (_data: PoolDetail) => Number(/*data.stakersCount ||*/ 0)
 

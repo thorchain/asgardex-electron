@@ -2,9 +2,9 @@ import { PoolData, assetAmount, assetToBase, AssetRune67C, assetToString } from 
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
-import { PoolDetails } from '../services/midgard/types'
+import { PoolDetails, PoolDetail } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
-import { GetPoolsStatusEnum, PoolDetail } from '../types/generated/midgard'
+import { GetPoolsStatusEnum } from '../types/generated/midgard'
 import { getDeepestPool, getPoolTableRowsData } from './poolHelper'
 
 describe('helpers/poolHelper/', () => {

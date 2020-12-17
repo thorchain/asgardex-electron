@@ -13,13 +13,9 @@ import { none, Option, some } from 'fp-ts/lib/Option'
 import { Network } from '../../../shared/api/types'
 import { ONE_ASSET_BASE_AMOUNT, ZERO_BASE_AMOUNT } from '../../const'
 import { getRuneAsset } from '../../helpers/assetHelper'
+import { PoolDetail } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
-import {
-  PoolDetail,
-  GetPoolsStatusEnum,
-  ConstantsSchema as ThorchainConstants,
-  LastblockItem
-} from '../../types/generated/midgard'
+import { GetPoolsStatusEnum, ConstantsSchema as ThorchainConstants, LastblockItem } from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './Pools.types'
 
 const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {
@@ -70,8 +66,8 @@ export const getPoolTableRowData = ({
       const transaction = ZERO_BASE_AMOUNT
       const transactionPrice = getValueOfRuneInAsset(transaction, pricePoolData)
 
-      const slip = bnOrZero(/*poolDetail?.poolSlipAverage*/ 0).multipliedBy(100)
-      const trades = bnOrZero(/*poolDetail?.swappingTxCount*/ 0)
+      const slip = bnOrZero(poolDetail?.poolSlipAverage).multipliedBy(100)
+      const trades = bnOrZero(poolDetail?.swappingTxCount)
       const status = stringToGetPoolsStatus(poolDetail?.status)
 
       const pool: Pool = {

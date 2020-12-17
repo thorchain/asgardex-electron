@@ -3,9 +3,9 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
-import { ThorchainLastblock } from '../../services/midgard/types'
+import { ThorchainLastblock, PoolDetail } from '../../services/midgard/types'
 import { ConstantsSchema as ThorchainConstants } from '../../types/generated/midgard'
-import { PoolDetail, GetPoolsStatusEnum } from '../../types/generated/midgard'
+import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolTableRowData } from './Pools.types'
 import { getPoolTableRowData, getBlocksLeftForPendingPool, getBlocksLeftForPendingPoolAsString } from './Pools.utils'
 
@@ -17,8 +17,8 @@ describe('views/pools/utils', () => {
       runeDepth: '10000000000',
       volume24h: '10000000000',
       // poolTxAverage: '10000000000',
-      // poolSlipAverage: '0.0011',
-      // swappingTxCount: '123',
+      poolSlipAverage: '0.0011',
+      swappingTxCount: '123',
       status: GetPoolsStatusEnum.Staged
     } as PoolDetail
 

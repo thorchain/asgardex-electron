@@ -6,11 +6,11 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import {
-  PoolDetail,
   Network as NetworkInfo,
   ConstantsSchema as ThorchainConstants,
   LastblockItem,
-  InboundAddressesItem as ThorchainEndpoint
+  InboundAddressesItem as ThorchainEndpoint,
+  PoolDetail as MidgardPoolDetail
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 
@@ -77,6 +77,11 @@ export type AssetDetailsLD = LiveData<Error, AssetDetails>
 
 export type AssetDetailMap = {
   [key in Chain]: AssetDetail
+}
+
+export type PoolDetail = MidgardPoolDetail & {
+  poolSlipAverage: string
+  swappingTxCount: string
 }
 
 export type PoolDetailRD = RD.RemoteData<Error, PoolDetail>
