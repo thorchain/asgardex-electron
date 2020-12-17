@@ -13,7 +13,7 @@ import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
-import { GetExplorerTxUrl } from '../../../services/clients'
+import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { AddressValidation } from '../../../services/thorchain/types'
 import { NonEmptyWalletBalances, TxRD } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
@@ -67,7 +67,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
         onSubmit={pushTx}
         balances={FP.pipe(
           oBalances,
-          O.getOrElse(() => [] as WalletBalance[])
+          O.getOrElse(() => [] as WalletBalances)
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Balance, Balances } from '@xchainjs/xchain-client'
+import { Address, Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset, baseToAsset, chainToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 import { getPoolPriceValue } from '../../../services/binance/utils'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
-import { ChainBalances, ApiError, ChainBalance } from '../../../services/wallet/types'
+import { ApiError, ChainBalance, ChainBalances } from '../../../services/wallet/types'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
@@ -43,10 +43,17 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   // store previous data of asset data to render these while reloading
   const previousAssetsTableData = useRef<Balances[]>([])
 
-  const onRow = useCallback(
-    (walletAddress: string) => ({ asset }: Balance) => {
+  const onRowHandler = useCallback(
+    (oWalletAddress: O.Option<Address>) => ({ asset }: Balance) => {
+      const onClick = FP.pipe(
+        oWalletAddress,
+        O.map((walletAddress) => () => selectAssetHandler(asset, walletAddress)),
+        // TODO(@Veado) Add error message / alert
+        O.getOrElse(() => () => console.error('Unknown address'))
+      )
+
       return {
-        onClick: () => selectAssetHandler(asset, walletAddress)
+        onClick
       }
     },
     [selectAssetHandler]
@@ -165,32 +172,32 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   }, [balanceColumn, hideColumn, iconColumn, nameColumn, priceColumn, screenMap, tickerColumn])
 
   const renderAssetsTable = useCallback(
-    (tableData: Balances, walletAddress: string, loading = false) => {
+    (tableData: Balances, oWalletAddress: O.Option<Address>, loading = false) => {
       return (
         <Styled.Table
           showHeader={false}
           dataSource={tableData}
           loading={loading}
           rowKey={({ asset }) => asset.symbol}
-          onRow={onRow(walletAddress)}
+          onRow={onRowHandler(oWalletAddress)}
           columns={columns}
         />
       )
     },
-    [onRow, columns]
+    [onRowHandler, columns]
   )
 
   const renderBalances = useCallback(
-    (balancesRD: WalletBalancesRD, index: number, walletAddress: string) =>
-      FP.pipe(
+    (balancesRD: WalletBalancesRD, index: number, oWalletAddress: O.Option<Address>) => {
+      return FP.pipe(
         balancesRD,
         RD.fold(
           // initial state
-          () => renderAssetsTable([], walletAddress),
+          () => renderAssetsTable([], oWalletAddress),
           // loading state
           () => {
             const data = previousAssetsTableData.current[index] ?? []
-            return renderAssetsTable(data, walletAddress, true)
+            return renderAssetsTable(data, oWalletAddress, true)
           },
           // error state
           ({ msg }: ApiError) => {
@@ -200,16 +207,17 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           (assetsWB) => {
             const prev = previousAssetsTableData.current
             prev[index] = assetsWB
-            return renderAssetsTable(assetsWB, walletAddress)
+            return renderAssetsTable(assetsWB, oWalletAddress)
           }
         )
-      ),
+      )
+    },
     [renderAssetsTable]
   )
 
   // Panel
   const renderPanel = useCallback(
-    ({ chain, address, balances: balancesRD }: ChainBalance, key: number) => {
+    ({ chain, walletAddress: oWalletAddress, balances: balancesRD }: ChainBalance, key: number) => {
       /**
        * We need to push initial value to the ledger-based streams
        * 'cuz chainBalances$ stream is created by 'combineLatest'
@@ -217,7 +225,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
        * not emitted at least once
        * @see btcLedgerChainBalance$'s getOrElse branch at src/renderer/services/wallet/balances.ts
        */
-      if (!address && RD.isInitial(balancesRD)) {
+      if (O.isNone(oWalletAddress) && RD.isInitial(balancesRD)) {
         return null
       }
       const assetsTxt = FP.pipe(
@@ -233,13 +241,20 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           }
         )
       )
+
+      const walletAddress = FP.pipe(
+        oWalletAddress,
+        // TODO(@Veado) Add i18
+        O.getOrElse(() => 'Unknown address')
+      )
+
       const header = (
         <Styled.HeaderRow>
           <Col xs={14} md={6} lg={4}>
             <Styled.HeaderLabel>{chainToString(chain)}</Styled.HeaderLabel>
           </Col>
           <Col xs={0} md={12} lg={10}>
-            <Styled.HeaderAddress>{address}</Styled.HeaderAddress>
+            <Styled.HeaderAddress>{walletAddress}</Styled.HeaderAddress>
           </Col>
           <Col xs={10} md={6} lg={10}>
             <Styled.HeaderLabel
@@ -249,7 +264,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       )
       return (
         <Panel header={header} key={key}>
-          {renderBalances(balancesRD, key, address)}
+          {renderBalances(balancesRD, key, oWalletAddress)}
         </Panel>
       )
     },

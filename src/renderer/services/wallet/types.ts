@@ -9,7 +9,9 @@ import { Observable } from 'rxjs'
 import { LedgerErrorId } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { WalletBalance } from '../../types/wallet'
-import { WalletBalancesRD, LoadTxsParams } from '../clients'
+import { LoadTxsParams, WalletBalancesRD } from '../clients'
+
+export type WalletType = 'keystore' | 'ledger'
 
 export type Phrase = string
 
@@ -36,13 +38,25 @@ export type KeystoreService = {
   validatePassword$: (password: string) => LiveData<Error, null>
 }
 
+/**
+ * Wraps WalletBalancesRD into an object to provide extra information (`Address` + `Chain` + `WalletType`)
+ * Currently needed in `AssetView` - TODO(@Veado) Think about to extract it into view layer (as helper or so)
+ */
 export type ChainBalance = {
-  address: string
+  walletType: WalletType
+  walletAddress: O.Option<Address>
   chain: Chain
   balances: WalletBalancesRD
 }
 
+export type ChainBalance$ = Observable<ChainBalance>
+export type ChainBalanceRD = RD.RemoteData<ApiError, ChainBalance>
+export type ChainBalanceLD = LiveData<ApiError, ChainBalance>
+
 export type ChainBalances = ChainBalance[]
+export type ChainBalances$ = Observable<ChainBalances>
+export type ChainBalancesRD = RD.RemoteData<ApiError, ChainBalances>
+export type ChainBalancesLD = LiveData<ApiError, ChainBalances>
 
 export const BalanceMonoid = getMonoid<WalletBalance>()
 

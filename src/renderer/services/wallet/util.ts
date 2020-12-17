@@ -9,6 +9,7 @@ import * as Ord from 'fp-ts/Ord'
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { WalletBalance } from '../../types/wallet'
+import { WalletBalances } from '../clients'
 import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid } from './types'
 
 export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> => pipe(state, O.chain(identity))
@@ -25,7 +26,7 @@ export const hasImportedKeystore = (state: KeystoreState): boolean => isSome(sta
 
 export const isLocked = (state: KeystoreState): boolean => !hasImportedKeystore(state) || !hasKeystoreContent(state)
 
-export const filterNullableBalances = (balances: WalletBalance[]) => {
+export const filterNullableBalances = (balances: WalletBalances) => {
   return FP.pipe(
     balances,
     A.filter(({ amount }) => Ord.gt(ordBaseAmount)(amount, baseAmount(0)))
@@ -36,13 +37,13 @@ export const filterNullableBalances = (balances: WalletBalance[]) => {
 // be grouped by their chains in alphabetic order
 const byAsset = Ord.ord.contramap(Ord.ordString, (balance: WalletBalance) => assetToString(balance.asset))
 
-export const sortBalances = (balances: WalletBalance[], orders: string[]) => {
+export const sortBalances = (balances: WalletBalances, orders: string[]) => {
   const getBalanceIndex = (balance: WalletBalance) => orders.findIndex((ticker) => ticker === balance.asset.ticker)
   const byTickersOrder = Ord.ord.contramap(Ord.ordNumber, getBalanceIndex)
   return FP.pipe(
     balances,
     // split array for 2 parts: sortable assets and the rest
-    A.reduce([[], []] as [WalletBalance[], WalletBalance[]], (acc, cur) => {
+    A.reduce([[], []] as [WalletBalances, WalletBalances], (acc, cur) => {
       if (orders.includes(cur.asset.ticker)) {
         acc[0].push(cur)
       } else {
@@ -54,7 +55,7 @@ export const sortBalances = (balances: WalletBalance[], orders: string[]) => {
   )
 }
 
-export const getBalanceByAsset = (asset: Asset) => (balances: WalletBalance[]) =>
+export const getBalanceByAsset = (asset: Asset) => (balances: WalletBalances) =>
   FP.pipe(
     balances,
     A.findFirst((assetWithBalance) => eqAsset.equals(assetWithBalance.asset, asset))

@@ -96,7 +96,7 @@ export const send: Route<SendParams> = {
     if (asset && !!walletAddress) {
       return `${assetDetail.path({ asset, walletAddress })}/send`
     } else {
-      // Redirect to assets route if passed param is empty
+      // Redirect to assets route if passed params are empty
       return assets.path()
     }
   }
