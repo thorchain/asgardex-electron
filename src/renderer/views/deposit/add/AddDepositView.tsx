@@ -59,6 +59,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
   useSubscription(reloadDepositFeesEffect$)
 
   const [depositFees] = useObservableState(() => depositFees$(type), RD.initial)
+  // TODO (@Veado) Use `selectedPoolAddress$` - will be available with one of next PRs
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(poolAddress$, O.none)
 
   const { balancesState$ } = useWalletContext()

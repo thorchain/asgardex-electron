@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetToBase, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -11,7 +11,7 @@ import { useHistory } from 'react-router-dom'
 import { isRuneBnbAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
-import { getAssetAmountByAsset } from '../../../helpers/walletHelper'
+import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { SendTxParams } from '../../../services/binance/types'
 import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
@@ -19,6 +19,7 @@ import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { PoolAddress } from '../../../services/midgard/types'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import { LoadTxsHandler, NonEmptyWalletBalances } from '../../../services/wallet/types'
+import { WalletBalance } from '../../../types/wallet'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
@@ -34,7 +35,6 @@ type Props = {
   loadTxsHandler?: LoadTxsHandler
   walletAddress?: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
-  runeAddress: O.Option<Address>
   upgradeRuneHandler: (_: SendTxParams) => void
 }
 
@@ -45,7 +45,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     balances: oBalances,
     asset: oAsset,
     poolAddress: oPoolAddress,
-    runeAddress: oRuneAddress,
     reloadBalancesHandler = emptyFunc,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
@@ -102,14 +101,27 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const isRuneAsset: boolean = useMemo(() => FP.pipe(oRuneAsset, O.isSome), [oRuneAsset])
 
+  const oRuneBalance: O.Option<WalletBalance> = useMemo(() => getWalletBalanceByAsset(oBalances, oRuneAsset), [
+    oRuneAsset,
+    oBalances
+  ])
+
   const oRuneAmount: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oRuneAsset, oBalances),
-        O.chain(([runeAsset, balances]) => getAssetAmountByAsset(balances, runeAsset)),
-        O.map(assetToBase)
+        oRuneBalance,
+        O.map(({ amount }) => amount)
       ),
-    [oRuneAsset, oBalances]
+    [oRuneBalance]
+  )
+
+  const oRuneAddress: O.Option<Address> = useMemo(
+    () =>
+      FP.pipe(
+        oRuneBalance,
+        O.map(({ walletAddress }) => walletAddress)
+      ),
+    [oRuneBalance]
   )
 
   const runeUpgradeDisabled: boolean = useMemo(

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString } from '@xchainjs/xchain-util'
+import { assetFromString, BNBChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as NEA from 'fp-ts/NonEmptyArray'
@@ -11,12 +11,19 @@ import * as RxOp from 'rxjs/operators'
 
 import { AssetDetails } from '../../components/wallet/assets'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
+import { getPoolAddressByChain } from '../../services/midgard/utils'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
+  const { asset, walletAddress } = useParams<AssetDetailsParams>()
+  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
+  const oWalletAddress = useMemo(() => O.fromNullable(walletAddress || undefined), [walletAddress])
+
   const {
     getTxs$,
     balancesState$,
@@ -27,16 +34,23 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     resetTxsPage
   } = useWalletContext()
 
-  const { asset, walletAddress } = useParams<AssetDetailsParams>()
-  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
-  const oWalletAddress = useMemo(() => O.fromNullable(walletAddress || undefined), [walletAddress])
+  const {
+    service: {
+      pools: { poolAddresses$ }
+    }
+  } = useMidgardContext()
 
-  const { pushTx } = useBinanceContext()
-  // TODO(@Veado) Get BNB pool address
-  const bnbPoolAddress = O.none
+  const [bnbPoolAddress] = useObservableState(
+    () =>
+      FP.pipe(
+        poolAddresses$,
+        liveData.map((endpoints) => getPoolAddressByChain(endpoints, BNBChain)),
+        RxOp.map(FP.flow(RD.toOption, O.flatten))
+      ),
+    O.none
+  )
 
-  // TODO(@Veado) Get RUNE address
-  const runeAddress = O.none
+  const { pushTx: sendBnbTx } = useBinanceContext()
 
   // Set selected asset once
   // Needed to get all data for this asset (transactions etc.)
@@ -83,8 +97,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         getExplorerTxUrl={getExplorerTxUrl}
         walletAddress={oWalletAddress}
         poolAddress={bnbPoolAddress}
-        runeAddress={runeAddress}
-        upgradeRuneHandler={pushTx}
+        upgradeRuneHandler={sendBnbTx}
       />
     </>
   )
