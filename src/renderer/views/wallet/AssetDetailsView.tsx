@@ -11,6 +11,7 @@ import { useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { AssetDetails } from '../../components/wallet/assets'
+import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
@@ -28,6 +29,13 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
 
   const { asset, walletAddress } = useParams<AssetDetailsParams>()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
+
+  const { pushTx } = useBinanceContext()
+  // TODO(@Veado) Get BNB pool address
+  const bnbPoolAddress = O.none
+
+  // TODO(@Veado) Get RUNE address
+  const runeAddress = O.none
 
   // Set selected asset once
   // Needed to get all data for this asset (transactions etc.)
@@ -71,6 +79,9 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         reloadBalancesHandler={reloadBalances}
         getExplorerTxUrl={getExplorerTxUrl}
         walletAddress={walletAddress}
+        poolAddress={bnbPoolAddress}
+        runeAddress={runeAddress}
+        upgradeRuneHandler={pushTx}
       />
     </>
   )
