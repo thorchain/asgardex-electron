@@ -1,4 +1,4 @@
-import { bn, assetAmount, PoolData, assetToBase, AssetRune67C } from '@xchainjs/xchain-util'
+import { bn, assetAmount, PoolData, assetToBase, AssetRune67C, BNBChain, AssetBNB } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -77,23 +77,24 @@ describe('views/pools/utils', () => {
     } as ThorchainConstants
     const lastblock = [
       {
-        thorchain: '2000'
+        thorchain: '2000',
+        chain: BNBChain
       }
     ] as ThorchainLastblock
     it('returns number of blocks left', () => {
-      const result = O.toNullable(getBlocksLeftForPendingPool(constants, lastblock))
+      const result = O.toNullable(getBlocksLeftForPendingPool(constants, lastblock, AssetBNB))
       expect(result).toEqual(1001)
     })
     it('returns None if NewPoolCycle is not available', () => {
       const constants2 = {
         int_64_values: {}
       } as ThorchainConstants
-      const result = getBlocksLeftForPendingPool(constants2, lastblock)
+      const result = getBlocksLeftForPendingPool(constants2, lastblock, AssetBNB)
       expect(result).toBeNone()
     })
     it('returns NOne if lastblock (thorchain) is not available', () => {
-      const lastblock2: ThorchainLastblock = {}
-      const result = getBlocksLeftForPendingPool(constants, lastblock2)
+      const lastblock2: ThorchainLastblock = []
+      const result = getBlocksLeftForPendingPool(constants, lastblock2, AssetBNB)
       expect(result).toBeNone()
     })
   })
@@ -104,23 +105,24 @@ describe('views/pools/utils', () => {
     } as ThorchainConstants
     const lastblock = [
       {
-        thorchain: '1000'
+        thorchain: '1000',
+        chain: BNBChain
       }
     ] as ThorchainLastblock
     it('returns number of blocks left', () => {
-      const result = getBlocksLeftForPendingPoolAsString(constants, lastblock)
+      const result = getBlocksLeftForPendingPoolAsString(constants, lastblock, AssetBNB)
       expect(result).toEqual('234')
     })
     it('returns empty string if NewPoolCycle is not available', () => {
       const constants2 = {
         int_64_values: {}
       } as ThorchainConstants
-      const result = getBlocksLeftForPendingPoolAsString(constants2, lastblock)
+      const result = getBlocksLeftForPendingPoolAsString(constants2, lastblock, AssetBNB)
       expect(result).toEqual('')
     })
     it('returns empty string if lastblock (thorchain) is not available', () => {
       const lastblock2: ThorchainLastblock = []
-      const result = getBlocksLeftForPendingPoolAsString(constants, lastblock2)
+      const result = getBlocksLeftForPendingPoolAsString(constants, lastblock2, AssetBNB)
       expect(result).toEqual('')
     })
   })

@@ -4,7 +4,8 @@ import {
   getValueOfAsset1InAsset2,
   baseAmount,
   getValueOfRuneInAsset,
-  assetFromString
+  assetFromString,
+  Asset
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -93,21 +94,27 @@ export const getPoolTableRowData = ({
 
 export const getBlocksLeftForPendingPool = (
   constants: ThorchainConstants,
-  lastblock: LastblockItem
+  lastblocks: LastblockItem[],
+  asset: Asset
 ): Option<number> => {
   const newPoolCycle = constants?.int_64_values?.NewPoolCycle
-  const lastHeight = Number(lastblock?.thorchain)
+  const lastHeight = Number(lastblocks.find((blockInfo) => blockInfo.chain === asset?.chain)?.thorchain)
 
   if (!newPoolCycle || !lastHeight) return none
 
   return some(newPoolCycle - (lastHeight % newPoolCycle))
 }
 
-export const getBlocksLeftForPendingPoolAsString = (constants: ThorchainConstants, lastblock: LastblockItem): string =>
-  FP.pipe(
-    getBlocksLeftForPendingPool(constants, lastblock),
+export const getBlocksLeftForPendingPoolAsString = (
+  constants: ThorchainConstants,
+  lastblocks: LastblockItem[],
+  stringAsset: Asset
+): string => {
+  return FP.pipe(
+    getBlocksLeftForPendingPool(constants, lastblocks, stringAsset),
     O.fold(
       () => '',
       (blocksLeft) => blocksLeft.toString()
     )
   )
+}
