@@ -51,12 +51,9 @@ const createStakeService = (
         asset: poolDetails.pool,
         assetStaked: poolDetails.assetAdded,
         assetWithdrawn: poolDetails.assetWithdrawn,
-        // is it correct ?
         dateFirstStaked: Number(poolDetails.dateFirstAdded),
-        // heightLastStaked: 0,
         runeStaked: poolDetails.runeAdded,
         runeWithdrawn: poolDetails.runeWithdrawn,
-        // is it correct ?
         units: poolDetails.liquidityUnits
       })),
       catchError((e) => {

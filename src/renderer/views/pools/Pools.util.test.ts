@@ -59,7 +59,7 @@ describe('views/pools/utils', () => {
           expect(data.depthPrice.amount().toNumber()).toEqual(expected.depthPrice.amount().toNumber())
           expect(data.volumePrice.amount().toNumber()).toEqual(expected.volumePrice.amount().toNumber())
           /**
-           * Mock it with fixed 0 as midgard v2 doe not have data for poolDetail?.poolTxAverage
+           * Mock it with fixed 0 as midgard v2 does not have data for poolDetail?.poolTxAverage
            * target result: expected.transactionPrice.amount().toNumber()
            */
           expect(data.transactionPrice.amount().toNumber()).toEqual(0)

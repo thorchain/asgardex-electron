@@ -61,7 +61,7 @@ export const getPoolTableRowData = ({
       const volumePrice = getValueOfRuneInAsset(volumeAmount, pricePoolData)
 
       /**
-       * Mock it with fixed 0 as midgard v2 doe not have data for it
+       * Mock it with fixed 0 as midgard v2 does not have data for it
        * target result: baseAmount(bnOrZero(poolDetail?.poolTxAverage))
        */
       const transaction = ZERO_BASE_AMOUNT
