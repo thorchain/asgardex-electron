@@ -2,7 +2,7 @@ import { baseAmount, BaseAmount, bn, bnOrZero } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
 import { ZERO_BN } from '../const'
-import { PoolDetail, StakersAssetData } from '../types/generated/midgard/models'
+import { PoolDetail, StakersAssetData } from '../services/midgard/types'
 import { THORCHAIN_DECIMAL } from './assetHelper'
 
 /**
@@ -10,12 +10,12 @@ import { THORCHAIN_DECIMAL } from './assetHelper'
  */
 export const getRuneShare = (
   { units }: Pick<StakersAssetData, 'units'>,
-  pool: Pick<PoolDetail, 'runeDepth' | 'poolUnits'>
+  pool: Pick<PoolDetail, 'runeDepth' | 'units'>
 ): BaseAmount => {
   const runeDepth = bnOrZero(pool.runeDepth)
   const stakeUnits = bnOrZero(units)
   // Default is 1 as neutral element for division
-  const poolUnits = bn(pool.poolUnits || 1)
+  const poolUnits = bn(pool.units || 1)
 
   const runeShare = runeDepth.multipliedBy(stakeUnits).div(poolUnits)
   return baseAmount(runeShare, THORCHAIN_DECIMAL)
@@ -26,7 +26,7 @@ export const getRuneShare = (
  */
 export const getAssetShare = (
   { units }: Pick<StakersAssetData, 'units'>,
-  { assetDepth, poolUnits }: Pick<PoolDetail, 'assetDepth' | 'poolUnits'>
+  { assetDepth, units: poolUnits }: Pick<PoolDetail, 'assetDepth' | 'units'>
 ): BaseAmount => {
   const assetDepthBN = bnOrZero(assetDepth)
   const stakeUnitsBN = bnOrZero(units)
@@ -49,5 +49,5 @@ export const getAssetSharePrice = (assetShare: BigNumber, price: BigNumber, pric
  */
 export const getPoolShare = (
   { units }: Pick<StakersAssetData, 'units'>,
-  { poolUnits }: Pick<PoolDetail, 'poolUnits'>
+  { units: poolUnits }: Pick<PoolDetail, 'units'>
 ): BigNumber => (poolUnits ? bnOrZero(units).div(poolUnits).multipliedBy(100) : ZERO_BN)
