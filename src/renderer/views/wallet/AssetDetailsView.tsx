@@ -7,12 +7,14 @@ import * as O from 'fp-ts/lib/Option'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router-dom'
+import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { AssetDetails } from '../../components/wallet/assets'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { isRuneBnbAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
@@ -23,6 +25,11 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const { asset, walletAddress } = useParams<AssetDetailsParams>()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
   const oWalletAddress = useMemo(() => O.fromNullable(walletAddress || undefined), [walletAddress])
+
+  // Set selected asset once
+  // Needed to get all data for this asset (transactions etc.)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => setSelectedAsset(oSelectedAsset), [])
 
   const {
     getTxs$,
@@ -43,19 +50,24 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const [bnbPoolAddress] = useObservableState(
     () =>
       FP.pipe(
-        poolAddresses$,
-        liveData.map((endpoints) => getPoolAddressByChain(endpoints, BNBChain)),
-        RxOp.map(FP.flow(RD.toOption, O.flatten))
+        oSelectedAsset,
+        // We do need bnb pool address for BNB.RUNE assets only
+        O.filter(isRuneBnbAsset),
+        O.fold(
+          // No subscription of `poolAddresses$ ` needed for other assets than BNB.RUNE
+          () => Rx.of(O.none),
+          () =>
+            FP.pipe(
+              poolAddresses$,
+              liveData.map((endpoints) => getPoolAddressByChain(endpoints, BNBChain)),
+              RxOp.map(FP.flow(RD.toOption, O.flatten))
+            )
+        )
       ),
     O.none
   )
 
   const { pushTx: sendBnbTx } = useBinanceContext()
-
-  // Set selected asset once
-  // Needed to get all data for this asset (transactions etc.)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setSelectedAsset(oSelectedAsset), [])
 
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
@@ -65,7 +77,6 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
 
   useEffect(() => {
     return () => resetTxsPage()
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
