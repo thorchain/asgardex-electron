@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { assetFromString, bnOrZero, baseAmount, Asset, assetToString } from '@xchainjs/xchain-util'
+import { assetFromString, bnOrZero, baseAmount, Asset, assetToString, Chain } from '@xchainjs/xchain-util'
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import { head } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -12,7 +13,15 @@ import { eqAsset } from '../../helpers/fp/eq'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
-import { AssetDetails, AssetDetailMap, PoolDetails, PoolsStateRD, SelectedPricePoolAsset } from './types'
+import {
+  AssetDetails,
+  AssetDetailMap,
+  PoolDetails,
+  PoolsStateRD,
+  SelectedPricePoolAsset,
+  PoolAddress,
+  ThorchainEndpoints
+} from './types'
 
 export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} => {
   let assetDataIndex = {}
@@ -142,3 +151,11 @@ export const toPoolData = (detail: PoolDetail): PoolData => ({
 export const filterPoolAssets = (poolAssets: string[]) => {
   return poolAssets.filter((poolAsset) => !isMiniToken(assetFromString(poolAsset) || { symbol: '' }))
 }
+
+export const getPoolAddressByChain = (endpoints: ThorchainEndpoints, chain: Chain): O.Option<PoolAddress> =>
+  FP.pipe(
+    endpoints,
+    A.findFirst((endpoint) => endpoint.chain === chain),
+    O.map(({ address }) => address),
+    O.chain(O.fromNullable)
+  )
