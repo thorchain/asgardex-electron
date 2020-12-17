@@ -29,7 +29,6 @@ const balances = getBalances([bnbBalance, runeBalance])
 
 const upgradeRuneHandler = (p: SendTxParams) => console.log('Upgrade', p)
 const poolAddress = O.some('pool address')
-const runeAddress = O.some('rune account address')
 
 export const Story1: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
@@ -38,7 +37,6 @@ export const Story1: BaseStory<never, JSX.Element> = () => (
     asset={O.some(AssetBNB)}
     upgradeRuneHandler={upgradeRuneHandler}
     poolAddress={poolAddress}
-    runeAddress={runeAddress}
   />
 )
 Story1.storyName = 'BNB'
@@ -50,7 +48,6 @@ export const Story2: BaseStory<never, JSX.Element> = () => (
     asset={O.some(AssetRune67C)}
     upgradeRuneHandler={upgradeRuneHandler}
     poolAddress={poolAddress}
-    runeAddress={runeAddress}
   />
 )
 Story2.storyName = 'RUNE'
@@ -62,7 +59,6 @@ export const Story3: BaseStory<never, JSX.Element> = () => (
     asset={O.some(AssetRune67C)}
     upgradeRuneHandler={upgradeRuneHandler}
     poolAddress={poolAddress}
-    runeAddress={runeAddress}
   />
 )
 Story3.storyName = 'RUNE - disabled - no balance'
