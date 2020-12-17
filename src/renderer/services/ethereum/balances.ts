@@ -15,6 +15,8 @@ import { client$ } from './common'
 /**
  * Observable to load balances
  * If client is not available, it returns an `initial` state
+ *
+ * TODO (@Veado / @ThatStrangeGuy) Use `loadBalances$` of `services/clients` once `xchain-ethereum` has been updated
  */
 const loadBalances$ = (client: Client): WalletBalanceLD =>
   FP.pipe(

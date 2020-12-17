@@ -37,7 +37,7 @@ const initialContext: WalletContextValue = {
   reloadBalances$,
   loadTxs,
   balancesState$,
-  chainBalances$: chainBalances$,
+  chainBalances$,
   getExplorerTxUrl$,
   selectedAsset$,
   getTxs$,
