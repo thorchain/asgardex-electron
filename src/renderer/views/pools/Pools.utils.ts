@@ -16,7 +16,7 @@ import { ONE_ASSET_BASE_AMOUNT, ZERO_BASE_AMOUNT } from '../../const'
 import { getRuneAsset } from '../../helpers/assetHelper'
 import { PoolDetail } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
-import { GetPoolsStatusEnum, ConstantsSchema as ThorchainConstants, LastblockItem } from '../../types/generated/midgard'
+import { GetPoolsStatusEnum, Constants as ThorchainConstants, LastblockItem } from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './Pools.types'
 
 const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {

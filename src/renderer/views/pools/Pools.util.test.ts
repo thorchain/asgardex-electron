@@ -4,7 +4,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { ThorchainLastblock, PoolDetail } from '../../services/midgard/types'
-import { ConstantsSchema as ThorchainConstants } from '../../types/generated/midgard'
+import { Constants as ThorchainConstants } from '../../types/generated/midgard'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolTableRowData } from './Pools.types'
 import { getPoolTableRowData, getBlocksLeftForPendingPool, getBlocksLeftForPendingPoolAsString } from './Pools.utils'

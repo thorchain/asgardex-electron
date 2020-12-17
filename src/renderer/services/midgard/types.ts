@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 import { LiveData } from '../../helpers/rx/liveData'
 import {
   Network as NetworkInfo,
-  ConstantsSchema as ThorchainConstants,
+  Constants as ThorchainConstants,
   LastblockItem,
   InboundAddressesItem as ThorchainEndpoint,
   PoolDetail as MidgardPoolDetail
