@@ -8,7 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { isRuneBnbAsset } from '../../../helpers/assetHelper'
+import * as AssetHelper from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
@@ -97,51 +97,55 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [loadTxsHandler]
   )
 
-  const oRuneAsset: O.Option<Asset> = useMemo(() => FP.pipe(oAsset, O.filter(isRuneBnbAsset)), [oAsset])
+  const oRuneBnbAsset: O.Option<Asset> = useMemo(() => FP.pipe(oAsset, O.filter(AssetHelper.isRuneBnbAsset)), [oAsset])
 
-  const isRuneAsset: boolean = useMemo(() => FP.pipe(oRuneAsset, O.isSome), [oRuneAsset])
+  const isRuneBnbAsset: boolean = useMemo(() => FP.pipe(oRuneBnbAsset, O.isSome), [oRuneBnbAsset])
 
-  const oRuneBalance: O.Option<WalletBalance> = useMemo(() => getWalletBalanceByAsset(oBalances, oRuneAsset), [
-    oRuneAsset,
+  const oRuneBnbBalance: O.Option<WalletBalance> = useMemo(() => getWalletBalanceByAsset(oBalances, oRuneBnbAsset), [
+    oRuneBnbAsset,
     oBalances
   ])
 
-  const oRuneAmount: O.Option<BaseAmount> = useMemo(
+  const oRuneBnbAmount: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        oRuneBalance,
+        oRuneBnbBalance,
         O.map(({ amount }) => amount)
       ),
-    [oRuneBalance]
+    [oRuneBnbBalance]
   )
 
-  const oRuneAddress: O.Option<Address> = useMemo(
+  /**  */
+  const oRuneNativeAddress: O.Option<Address> = useMemo(
     () =>
       FP.pipe(
-        oRuneBalance,
+        oAsset,
+        // ignore other assets than RuneNative
+        O.filter(AssetHelper.isRuneNativeAsset),
+        O.chain((runeNativeAsset) => getWalletBalanceByAsset(oBalances, O.some(runeNativeAsset))),
         O.map(({ walletAddress }) => walletAddress)
       ),
-    [oRuneBalance]
+    [oAsset, oBalances]
   )
 
   const runeUpgradeDisabled: boolean = useMemo(
     () =>
-      isRuneAsset &&
+      isRuneBnbAsset &&
       FP.pipe(
-        oRuneAmount,
+        oRuneBnbAmount,
         O.map((amount) => amount.amount().isLessThanOrEqualTo(0)),
         O.getOrElse<boolean>(() => true)
       ),
-    [isRuneAsset, oRuneAmount]
+    [isRuneBnbAsset, oRuneBnbAmount]
   )
 
-  const actionColSpanDesktop = isRuneAsset ? 8 : 12
+  const actionColSpanDesktop = isRuneBnbAsset ? 8 : 12
   const actionColSpanMobile = 24
 
   const upgradeRune = useCallback(
     (_) =>
       FP.pipe(
-        sequenceTOption(oRuneAsset, oRuneAmount, oPoolAddress, oRuneAddress),
+        sequenceTOption(oRuneBnbAsset, oRuneBnbAmount, oPoolAddress, oRuneNativeAddress),
         O.map(([asset, amount, recipient, runeAddress]) => {
           console.log('upgradeRuneHandler', recipient, amount, asset, runeAddress)
           upgradeRuneHandler({ recipient, amount, asset, memo: `SWITCH:${runeAddress}` })
@@ -152,12 +156,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           return false
         })
       ),
-    [oPoolAddress, oRuneAmount, oRuneAsset, oRuneAddress, upgradeRuneHandler]
+    [oPoolAddress, oRuneBnbAmount, oRuneBnbAsset, oRuneNativeAddress, upgradeRuneHandler]
   )
 
   return (
     <>
-      <div>{JSON.stringify(isRuneAsset)}</div>
+      <div>{JSON.stringify(isRuneBnbAsset)}</div>
       <Row justify="space-between">
         <Col>
           <BackLink path={walletRoutes.assets.path()} />
@@ -183,7 +187,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               </Row>
             </Styled.ActionWrapper>
           </Styled.ActionCol>
-          {isRuneAsset && (
+          {isRuneBnbAsset && (
             <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
               <Styled.ActionWrapper>
                 <Row justify="center">
