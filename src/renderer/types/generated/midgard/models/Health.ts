@@ -11,18 +11,27 @@
  * Do not edit the class manually.
  */
 
-import {
-    InboundAddressesItem,
-} from './';
-
 /**
  * @export
- * @interface InlineResponse2001
+ * @interface Health
  */
-export interface InlineResponse2001 {
+export interface Health {
     /**
-     * @type {Array<InboundAddressesItem>}
-     * @memberof InlineResponse2001
+     * True means healthy, connected to database
+     * @type {boolean}
+     * @memberof Health
      */
-    current: Array<InboundAddressesItem>;
+    database: boolean;
+    /**
+     * True means healthy. False means Midgard is still catching up to the chain
+     * @type {boolean}
+     * @memberof Health
+     */
+    inSync: boolean;
+    /**
+     * Int64, the current block count
+     * @type {string}
+     * @memberof Health
+     */
+    scannerHeight: string;
 }

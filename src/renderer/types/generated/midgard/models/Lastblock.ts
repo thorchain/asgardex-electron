@@ -11,19 +11,18 @@
  * Do not edit the class manually.
  */
 
+import {
+    LastblockItem,
+} from './';
+
 /**
  * @export
- * @interface InlineResponse2003
+ * @interface Lastblock
  */
-export interface InlineResponse2003 {
+export interface Lastblock {
     /**
-     * @type {string}
-     * @memberof InlineResponse2003
+     * @type {Array<LastblockItem>}
+     * @memberof Lastblock
      */
-    outbound: string;
-    /**
-     * @type {string}
-     * @memberof InlineResponse2003
-     */
-    swap: string;
+    current: Array<LastblockItem>;
 }

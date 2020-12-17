@@ -12,23 +12,29 @@
  */
 
 import {
-    TxDetails,
+    BoolConstants,
+    Int64Constants,
+    StringConstants,
 } from './';
 
 /**
  * @export
- * @interface InlineResponse2004
+ * @interface Constants
  */
-export interface InlineResponse2004 {
+export interface Constants {
     /**
-     * Int64, count of txs matching the filters.
-     * @type {string}
-     * @memberof InlineResponse2004
+     * @type {BoolConstants}
+     * @memberof Constants
      */
-    count: string;
+    bool_values: BoolConstants;
     /**
-     * @type {Array<TxDetails>}
-     * @memberof InlineResponse2004
+     * @type {Int64Constants}
+     * @memberof Constants
      */
-    txs: Array<TxDetails>;
+    int_64_values: Int64Constants;
+    /**
+     * @type {StringConstants}
+     * @memberof Constants
+     */
+    string_values: StringConstants;
 }

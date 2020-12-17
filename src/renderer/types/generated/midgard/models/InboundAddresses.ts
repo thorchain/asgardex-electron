@@ -12,17 +12,17 @@
  */
 
 import {
-    LastblockItem,
+    InboundAddressesItem,
 } from './';
 
 /**
  * @export
- * @interface InlineResponse2002
+ * @interface InboundAddresses
  */
-export interface InlineResponse2002 {
+export interface InboundAddresses {
     /**
-     * @type {Array<LastblockItem>}
-     * @memberof InlineResponse2002
+     * @type {Array<InboundAddressesItem>}
+     * @memberof InboundAddresses
      */
-    current: Array<LastblockItem>;
+    current: Array<InboundAddressesItem>;
 }

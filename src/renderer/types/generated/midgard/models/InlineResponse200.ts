@@ -11,27 +11,24 @@
  * Do not edit the class manually.
  */
 
+import {
+    TxDetails,
+} from './';
+
 /**
  * @export
  * @interface InlineResponse200
  */
 export interface InlineResponse200 {
     /**
-     * True means healthy, connected to database
-     * @type {boolean}
-     * @memberof InlineResponse200
-     */
-    database: boolean;
-    /**
-     * True means healthy. False means Midgard is still catching up to the chain
-     * @type {boolean}
-     * @memberof InlineResponse200
-     */
-    inSync: boolean;
-    /**
-     * Int64, the current block count
+     * Int64, count of txs matching the filters.
      * @type {string}
      * @memberof InlineResponse200
      */
-    scannerHeight: string;
+    count: string;
+    /**
+     * @type {Array<TxDetails>}
+     * @memberof InlineResponse200
+     */
+    txs: Array<TxDetails>;
 }
