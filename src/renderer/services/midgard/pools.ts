@@ -176,6 +176,7 @@ const createPoolsService = (
       liveData.map(NEA.fromArray),
       liveData.chain(
         O.fold(
+          // TODO (@thatStrangeGuy | @veado) Add i18n
           (): LiveData<Error, PoolDetails> => Rx.of(RD.failure(new Error('No pools available'))),
           (poolsDetails): LiveData<Error, PoolDetails> => Rx.of(RD.success(poolsDetails))
         )
