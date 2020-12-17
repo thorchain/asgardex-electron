@@ -46,12 +46,14 @@ export const getTxs$: (walletAddress: O.Option<string>) => TxsPageLD = (walletAd
               case 'BTC':
                 return BTC.txs$({ asset: O.none, limit, offset, walletAddress })
               case 'ETH':
-                return Rx.of(RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' } as ApiError))
+                return Rx.of(
+                  RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' })
+                )
               case 'THOR':
                 return THOR.txs$({ asset: O.none, limit, offset, walletAddress })
               default:
                 return Rx.of(
-                  RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` } as ApiError)
+                  RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` })
                 )
             }
           }

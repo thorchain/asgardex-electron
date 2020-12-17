@@ -6,7 +6,7 @@ import { Address$, XChainClient$ } from '../clients/types'
 
 export const address$: (client$: XChainClient$) => Address$ = (client$) =>
   client$.pipe(
-    RxOp.map(O.map((client) => client.getAddress())),
+    RxOp.map(O.chain((client) => O.tryCatch(() => client.getAddress()))),
     RxOp.distinctUntilChanged(eqOString.equals),
     RxOp.shareReplay(1)
   )

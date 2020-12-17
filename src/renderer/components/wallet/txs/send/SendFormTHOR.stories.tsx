@@ -13,16 +13,17 @@ import * as O from 'fp-ts/lib/Option'
 
 import { TRANSFER_FEES } from '../../../../../shared/mock/fees'
 import { AddressValidation, SendTxParams } from '../../../../services/binance/types'
+import { WalletBalances } from '../../../../services/clients'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormTHOR } from './index'
 
 const runeWalletBalance: WalletBalance = {
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2)),
-  walletAddress: 'rune wallet'
+  walletAddress: 'rune wallet address'
 }
 
-const balances: WalletBalance[] = [runeWalletBalance]
+const balances: WalletBalances = [runeWalletBalance]
 
 const fee = O.some(TRANSFER_FEES.single)
 

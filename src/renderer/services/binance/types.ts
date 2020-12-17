@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Balances, Transfer, Client } from '@xchainjs/xchain-binance'
+import { Transfer, Client } from '@xchainjs/xchain-binance'
 import { Address } from '@xchainjs/xchain-binance'
 import { Asset, AssetAmount, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -14,8 +14,6 @@ export type Client$ = C.Client$<Client>
 
 export type ClientState = C.ClientState<Client>
 export type ClientState$ = C.ClientState$<Client>
-
-export type BalancesRD = RD.RemoteData<Error, Balances>
 
 export type AssetWithPrice = {
   asset: Asset

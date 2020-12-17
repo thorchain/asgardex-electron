@@ -32,7 +32,7 @@ type Props = {
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: () => void
   loadTxsHandler?: LoadTxsHandler
-  walletAddress?: Address
+  walletAddress?: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
   runeAddress: O.Option<Address>
   upgradeRuneHandler: (_: SendTxParams) => void
@@ -49,33 +49,34 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     reloadBalancesHandler = emptyFunc,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
-    walletAddress = ''
+    walletAddress: oWalletAddress = O.none
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
 
-  const assetAsString = useMemo(
-    () =>
-      FP.pipe(
-        oAsset,
-        O.map((asset) => assetToString(asset)),
-        O.getOrElse(() => '')
-      ),
-    [oAsset]
-  )
+  const oAssetAsString: O.Option<string> = useMemo(() => FP.pipe(oAsset, O.map(assetToString)), [oAsset])
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   const history = useHistory()
   const intl = useIntl()
 
   const walletActionSendClick = useCallback(() => {
-    history.push(walletRoutes.send.path({ asset: assetAsString, walletAddress }))
-  }, [assetAsString, history, walletAddress])
+    const routeParams = FP.pipe(
+      sequenceTOption(oWalletAddress, oAssetAsString),
+      O.map(([walletAddress, asset]) => ({ asset, walletAddress })),
+      O.getOrElse(() => ({ asset: '', walletAddress: '' }))
+    )
+    history.push(walletRoutes.send.path(routeParams))
+  }, [oAssetAsString, history, oWalletAddress])
 
-  const walletActionReceiveClick = useCallback(
-    () => history.push(walletRoutes.receive.path({ asset: assetAsString, walletAddress })),
-    [assetAsString, history, walletAddress]
-  )
+  const walletActionReceiveClick = useCallback(() => {
+    const routeParams = FP.pipe(
+      sequenceTOption(oWalletAddress, oAssetAsString),
+      O.map(([walletAddress, asset]) => ({ asset, walletAddress })),
+      O.getOrElse(() => ({ asset: '', walletAddress: '' }))
+    )
+    history.push(walletRoutes.receive.path(routeParams))
+  }, [oAssetAsString, history, oWalletAddress])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })

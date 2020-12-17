@@ -15,7 +15,7 @@ import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/binance/types'
-import { GetExplorerTxUrl } from '../../../services/clients'
+import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { NonEmptyWalletBalances, TxRD } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 
@@ -70,7 +70,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         onSubmit={pushTx}
         balances={FP.pipe(
           oWalletBalances,
-          O.getOrElse(() => [] as WalletBalance[])
+          O.getOrElse(() => [] as WalletBalances)
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}

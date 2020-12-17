@@ -24,6 +24,7 @@ import { useIntl } from 'react-intl'
 import { ZERO_BN } from '../../../../const'
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation, FeesWithRatesRD, SendTxParams } from '../../../../services/bitcoin/types'
+import { WalletBalances } from '../../../../services/clients'
 import { WalletBalance } from '../../../../types/wallet'
 import * as StyledR from '../../../shared/form/Radio.style'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -41,7 +42,7 @@ export type FormValues = {
 }
 
 type Props = {
-  balances: WalletBalance[]
+  balances: WalletBalances
   walletBalance: WalletBalance
   onSubmit: ({ recipient, amount, feeRate, memo }: SendTxParams) => void
   isLoading?: boolean

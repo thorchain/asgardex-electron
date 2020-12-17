@@ -20,7 +20,7 @@ storiesOf('Wallet/Send', module)
   .add('send error', () => {
     return (
       <Send
-        txRD={RD.failure({ errorId: ErrorId.SEND_TX, msg: 'Sending tx failed' } as ApiError)}
+        txRD={RD.failure<ApiError>({ errorId: ErrorId.SEND_TX, msg: 'Sending tx failed' })}
         sendForm={sendForm}
         errorActionHandler={() => console.log('error action handler')}
       />
