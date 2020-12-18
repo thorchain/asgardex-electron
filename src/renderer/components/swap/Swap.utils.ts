@@ -5,7 +5,7 @@ import * as A from 'fp-ts/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 
-import { isRuneBnbAsset } from '../../helpers/assetHelper'
+import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { AssetWithPrice } from '../../services/binance/types'
 
@@ -15,11 +15,11 @@ import { AssetWithPrice } from '../../services/binance/types'
  *          some(false) - sourceAsset is RUNE
  */
 export const isRuneSwap = (sourceAsset: Asset, targetAsset: Asset) => {
-  if (isRuneBnbAsset(targetAsset)) {
+  if (isRuneNativeAsset(targetAsset)) {
     return O.some(true)
   }
 
-  if (isRuneBnbAsset(sourceAsset)) {
+  if (isRuneNativeAsset(sourceAsset)) {
     return O.some(false)
   }
 
