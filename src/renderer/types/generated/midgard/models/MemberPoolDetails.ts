@@ -13,54 +13,55 @@
 
 /**
  * @export
- * @interface PoolDetail
+ * @interface MemberPoolDetails
  */
-export interface PoolDetail {
+export interface MemberPoolDetails {
     /**
+     * Int64, total asset added to the pool by member
      * @type {string}
-     * @memberof PoolDetail
+     * @memberof MemberPoolDetails
      */
-    asset: string;
+    assetAdded: string;
     /**
-     * Int64, the amount of Asset in the pool.
+     * Int64, total asset withdrawn from the pool by member
      * @type {string}
-     * @memberof PoolDetail
+     * @memberof MemberPoolDetails
      */
-    assetDepth: string;
+    assetWithdrawn: string;
     /**
-     * Float, price of asset in rune. I.e. rune amount / asset amount.
+     * Int64, Unix timestamp for the first time member deposited into the pool
      * @type {string}
-     * @memberof PoolDetail
+     * @memberof MemberPoolDetails
      */
-    assetPrice: string;
+    dateFirstAdded: string;
     /**
-     * Float, Average Percentage Yield: annual return estimated using last weeks income, taking compound interest into account.
+     * Int64, Unix timestamp for the last time member deposited into the pool
      * @type {string}
-     * @memberof PoolDetail
+     * @memberof MemberPoolDetails
      */
-    poolAPY: string;
+    dateLastAdded: string;
     /**
-     * Int64, the amount of Rune in the pool.
+     * Int64, pool liquidity units that belong the the member
      * @type {string}
-     * @memberof PoolDetail
+     * @memberof MemberPoolDetails
      */
-    runeDepth: string;
+    liquidityUnits: string;
     /**
-     * The state of the pool, e.g. Available, Staged.
+     * Pool rest of the data refers to
      * @type {string}
-     * @memberof PoolDetail
+     * @memberof MemberPoolDetails
      */
-    status: string;
+    pool: string;
     /**
-     * Int64, Liquidity Units in the pool.
+     * Int64, total RUNE added to the pool by member
      * @type {string}
-     * @memberof PoolDetail
+     * @memberof MemberPoolDetails
      */
-    units: string;
+    runeAdded: string;
     /**
-     * Int64, the total volume of swaps in the last 24h to and from Rune denoted in Rune.
+     * Int64, total RUNE withdrawn from the pool by member
      * @type {string}
-     * @memberof PoolDetail
+     * @memberof MemberPoolDetails
      */
-    volume24h: string;
+    runeWithdrawn: string;
 }

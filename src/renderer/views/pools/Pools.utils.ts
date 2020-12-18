@@ -1,15 +1,30 @@
 import { PoolData, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
-import { bnOrZero, baseAmount, assetFromString } from '@xchainjs/xchain-util'
+import { bnOrZero, baseAmount, assetFromString, Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
 import { Network } from '../../../shared/api/types'
-import { ONE_ASSET_BASE_AMOUNT } from '../../const'
+import { ONE_ASSET_BASE_AMOUNT, ZERO_BASE_AMOUNT } from '../../const'
 import { getRuneAsset } from '../../helpers/assetHelper'
+import { PoolDetail } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
-import { PoolDetail, PoolDetailStatusEnum, ThorchainLastblock, ThorchainConstants } from '../../types/generated/midgard'
+import { GetPoolsStatusEnum, Constants as ThorchainConstants, LastblockItem } from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './Pools.types'
+
+const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {
+  switch (str) {
+    case GetPoolsStatusEnum.Suspended: {
+      return GetPoolsStatusEnum.Suspended
+    }
+    case GetPoolsStatusEnum.Available:
+      return GetPoolsStatusEnum.Available
+    case GetPoolsStatusEnum.Staged:
+      return GetPoolsStatusEnum.Staged
+    default:
+      return GetPoolsStatusEnum.Suspended
+  }
+}
 
 export const getPoolTableRowData = ({
   poolDetail,
@@ -35,15 +50,19 @@ export const getPoolTableRowData = ({
       const depthAmount = baseAmount(bnOrZero(poolDetail?.runeDepth))
       const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
 
-      const volumeAmount = baseAmount(bnOrZero(poolDetail?.poolVolume24hr))
+      const volumeAmount = baseAmount(bnOrZero(poolDetail.volume24h))
       const volumePrice = getValueOfRuneInAsset(volumeAmount, pricePoolData)
 
-      const transaction = baseAmount(bnOrZero(poolDetail?.poolTxAverage))
+      /**
+       * Mock it with fixed 0 as midgard v2 does not have data for it
+       * target result: baseAmount(bnOrZero(poolDetail?.poolTxAverage))
+       */
+      const transaction = ZERO_BASE_AMOUNT
       const transactionPrice = getValueOfRuneInAsset(transaction, pricePoolData)
 
       const slip = bnOrZero(poolDetail?.poolSlipAverage).multipliedBy(100)
       const trades = bnOrZero(poolDetail?.swappingTxCount)
-      const status = poolDetail?.status ?? PoolDetailStatusEnum.Disabled
+      const status = stringToGetPoolsStatus(poolDetail?.status)
 
       const pool: Pool = {
         // As long as we don't have Native RUNE, its an RUNE asset of BNB chain
@@ -68,10 +87,11 @@ export const getPoolTableRowData = ({
 
 export const getBlocksLeftForPendingPool = (
   constants: ThorchainConstants,
-  lastblock: ThorchainLastblock
+  lastblocks: LastblockItem[],
+  asset: Asset
 ): Option<number> => {
   const newPoolCycle = constants?.int_64_values?.NewPoolCycle
-  const lastHeight = lastblock?.thorchain
+  const lastHeight = Number(lastblocks.find((blockInfo) => blockInfo.chain === asset?.chain)?.thorchain)
 
   if (!newPoolCycle || !lastHeight) return none
 
@@ -80,12 +100,14 @@ export const getBlocksLeftForPendingPool = (
 
 export const getBlocksLeftForPendingPoolAsString = (
   constants: ThorchainConstants,
-  lastblock: ThorchainLastblock
-): string =>
-  FP.pipe(
-    getBlocksLeftForPendingPool(constants, lastblock),
+  lastblocks: LastblockItem[],
+  stringAsset: Asset
+): string => {
+  return FP.pipe(
+    getBlocksLeftForPendingPool(constants, lastblocks, stringAsset),
     O.fold(
       () => '',
       (blocksLeft) => blocksLeft.toString()
     )
   )
+}

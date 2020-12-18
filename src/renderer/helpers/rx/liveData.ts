@@ -42,7 +42,18 @@ export const liveData = {
   sequenceT: sequenceT(instanceLiveData),
   sequenceArray: array.sequence(instanceLiveData),
   combine: coproductMapLeft(instanceLiveData),
-  mapLeft: <L, V, A>(f: (l: L) => V) => (fla: LiveData<L, A>): LiveData<V, A> => fla.pipe(RxOp.map(RD.mapLeft(f)))
+  mapLeft: <L, V, A>(f: (l: L) => V) => (fla: LiveData<L, A>): LiveData<V, A> => fla.pipe(RxOp.map(RD.mapLeft(f))),
+  altOnError: <L, A>(f: (l: L) => A) => (fla: LiveData<L, A>): LiveData<L, A> =>
+    fla.pipe(
+      RxOp.map(
+        RD.fold(
+          () => RD.initial,
+          () => RD.pending,
+          (e) => RD.success(f(e)),
+          (val) => RD.success(val)
+        )
+      )
+    )
 }
 
 export type LiveDataInnerType<T> = T extends LiveData<unknown, infer K> ? K : never

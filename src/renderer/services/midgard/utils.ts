@@ -11,7 +11,6 @@ import { isBUSDAsset } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { AssetDetail, PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import {
   AssetDetails,
@@ -20,7 +19,9 @@ import {
   PoolsStateRD,
   SelectedPricePoolAsset,
   PoolAddress,
-  ThorchainEndpoints
+  ThorchainEndpoints,
+  AssetDetail,
+  PoolDetail
 } from './types'
 
 export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} => {

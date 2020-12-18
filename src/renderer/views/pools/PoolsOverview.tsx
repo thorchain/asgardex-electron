@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 
 import { SyncOutlined, SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
@@ -42,7 +42,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const {
     thorchainLastblockState$,
     thorchainConstantsState$,
-    pools: { poolsState$, pendingPoolsState$, selectedPricePool$, reloadPools, reloadPendingPools },
+    pools: { poolsState$, pendingPoolsState$, selectedPricePool$, reloadPools },
     reloadThorchainLastblock,
     reloadNetworkInfo
   } = midgardService
@@ -50,16 +50,6 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const pendingPoolsRD = useObservableState(pendingPoolsState$, RD.pending)
   const thorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(thorchainConstantsState$, RD.pending)
-
-  const [blocksLeft, setBlocksLeft] = useState('')
-
-  useEffect(() => {
-    const lastblock = RD.toNullable(thorchainLastblockRD)
-    const constants = RD.toNullable(thorchainConstantsRD)
-    if (lastblock && constants) {
-      setBlocksLeft(getBlocksLeftForPendingPoolAsString(constants, lastblock))
-    }
-  }, [thorchainConstantsRD, thorchainLastblockRD])
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -101,9 +91,8 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
 
   const clickRefreshHandler = useCallback(() => {
     reloadPools()
-    reloadPendingPools()
     reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPendingPools, reloadPools])
+  }, [reloadNetworkInfo, reloadPools])
 
   const renderRefreshBtn = useMemo(
     () => (
@@ -437,9 +426,15 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     [renderBtnPendingPoolsColumn]
   )
 
+  const lastblock = useMemo(() => RD.toNullable(thorchainLastblockRD), [thorchainLastblockRD])
+  const constants = useMemo(() => RD.toNullable(thorchainConstantsRD), [thorchainConstantsRD])
+
   const renderBlockLeftColumn = useCallback(
     (_: string, record: PoolTableRowData) => {
-      const { deepest } = record
+      const { deepest, pool } = record
+
+      const blocksLeft =
+        lastblock && constants ? getBlocksLeftForPendingPoolAsString(constants, lastblock, pool.asset) : ''
 
       return (
         <TableAction>
@@ -447,7 +442,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
         </TableAction>
       )
     },
-    [blocksLeft]
+    [lastblock, constants]
   )
 
   const blockLeftColumn = useMemo(

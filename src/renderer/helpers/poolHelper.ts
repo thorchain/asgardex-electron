@@ -10,9 +10,8 @@ import * as Ord from 'fp-ts/lib/Ord'
 
 import { Network } from '../../shared/api/types'
 import { ONE_ASSET_BASE_AMOUNT } from '../const'
-import { PoolDetails } from '../services/midgard/types'
+import { PoolDetail, PoolDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
-import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
 import { isRuneNativeAsset } from './assetHelper'
@@ -115,7 +114,7 @@ export const getDeepestPool = (pools: PoolDetails): O.Option<PoolDetail> =>
  * Converts Asset's pool price according to runePrice in selectedPriceAsset
  */
 export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: PoolDetail) =>
-  bnOrZero(poolDetail.price).multipliedBy(runePrice)
+  bnOrZero(poolDetail.assetPrice).multipliedBy(runePrice)
 
 /**
  * Helper to get a pool price value for a given `Balance`
