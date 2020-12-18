@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, BNBChain } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-client'
+import { Asset, assetFromString, BNBChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as NEA from 'fp-ts/NonEmptyArray'
@@ -23,8 +24,15 @@ import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const { asset, walletAddress } = useParams<AssetDetailsParams>()
-  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
-  const oWalletAddress = useMemo(() => O.fromNullable(walletAddress || undefined), [walletAddress])
+  const oSelectedAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
+  const oWalletAddress = useMemo(
+    () =>
+      FP.pipe(
+        walletAddress,
+        O.fromPredicate<Address>(() => !!walletAddress)
+      ),
+    [walletAddress]
+  )
 
   // Set selected asset once
   // Needed to get all data for this asset (transactions etc.)
