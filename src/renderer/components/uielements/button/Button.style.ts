@@ -241,7 +241,7 @@ export const ButtonWrapper = styled(Button)<Props>`
 
     &:disabled {
       background: ${(props) => getThemeValue(props.color, props.typevalue)?.background ?? 'transparent'};
-      opacity: 0.5;
+      opacity: 0.75;
     }
 
     /* provide focus styles over the underlying styles */
