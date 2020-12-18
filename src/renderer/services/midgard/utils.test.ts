@@ -244,7 +244,7 @@ describe('services/midgard/utils/', () => {
     })
   })
 
-  describe.only('getPoolAddressByChain', () => {
+  describe('getPoolAddressByChain', () => {
     const bnbAddress = 'bnb pool address'
     const endpointBNB: ThorchainEndpoint = { address: bnbAddress, chain: BNBChain }
     const thorAddress = 'thor pool address'

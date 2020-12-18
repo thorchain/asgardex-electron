@@ -1,75 +1,11 @@
-import { PoolData } from '@thorchain/asgardex-util'
 import { Balances } from '@xchainjs/xchain-binance'
-import { Balance } from '@xchainjs/xchain-client'
-import {
-  Asset,
-  assetToBase,
-  assetAmount,
-  baseAmount,
-  AssetBNB,
-  AssetRune67C,
-  assetToString
-} from '@xchainjs/xchain-util'
+import { Asset, assetToBase, assetAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { PoolDetails } from '../midgard/types'
-import { bncSymbolToAsset, bncSymbolToAssetString, getPoolPriceValue, getWalletBalances } from './utils'
+import { bncSymbolToAsset, bncSymbolToAssetString, getWalletBalances } from './utils'
 
 describe('services/binance/utils/', () => {
-  describe('getPoolPriceValue', () => {
-    const poolDetails: PoolDetails = [
-      {
-        asset: assetToString(AssetBNB),
-        assetDepth: '1000000000',
-        runeDepth: '10000000000'
-      }
-    ]
-    const usdPool: PoolData = {
-      assetBalance: assetToBase(assetAmount(110000)),
-      runeBalance: assetToBase(assetAmount(100000))
-    }
-
-    it('returns a price for BNB in USD', () => {
-      const balance: Balance = {
-        amount: baseAmount('1'),
-        asset: AssetBNB
-      }
-      const result = FP.pipe(
-        getPoolPriceValue(balance, poolDetails, usdPool),
-        O.fold(
-          () => 'failure',
-          (price) => price.amount().toString()
-        )
-      )
-      expect(result).toEqual('11')
-    })
-
-    it('returns a price for RUNE in USD', () => {
-      const balance: Balance = {
-        amount: baseAmount('1'),
-        asset: AssetRune67C
-      }
-      const result = FP.pipe(
-        getPoolPriceValue(balance, [], usdPool),
-        O.fold(
-          () => 'failure',
-          (price) => price.amount().toString()
-        )
-      )
-      expect(result).toEqual('1')
-    })
-
-    it('returns a no price if no pools are available', () => {
-      const balance: Balance = {
-        amount: baseAmount('1'),
-        asset: AssetBNB
-      }
-      const result = getPoolPriceValue(balance, [], usdPool)
-      expect(result).toBeNone()
-    })
-  })
-
   describe('bncSymbolToAssetString', () => {
     it('creates a RUNE `Asset` as string', () => {
       const result = bncSymbolToAssetString('RUNE-B1A')
