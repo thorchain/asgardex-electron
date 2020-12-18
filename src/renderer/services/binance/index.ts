@@ -14,7 +14,7 @@ const {
   ledgerTxRD$,
   pushLedgerTx,
   resetLedgerTx
-} = createLedgerService(client$)
+} = createLedgerService()
 
 export {
   client$,
