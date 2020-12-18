@@ -39,7 +39,7 @@ export const RUNE_PRICE_POOL: PricePool = {
  *
  * Note: We don't have a "RUNE" pool in THORChain, but do need such thing for pricing
  *
- * @deprecated Use `getRunePricePool`
+ * @deprecated Use `RUNE_PRICE_POOL`
  */
 export const getDefaultRunePricePool = (_: Chain = 'BNB') => RUNE_PRICE_POOL
 
