@@ -1,11 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { createTxInfo, LedgerTxInfoParams, sendRawTransaction } from '@xchainjs/xchain-binance'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
+import { LedgerBNCTxInfo, Network } from '../../../shared/api/types'
 import { observableState } from '../../helpers/stateHelper'
 import { ErrorId, LedgerAddressRD, LedgerTxLD, LedgerTxRD } from '../wallet/types'
 import { LedgerService } from './types'
@@ -22,31 +21,31 @@ const retrieveLedgerAddress = (network: Network) =>
 
 const { get$: ledgerTxRD$, set: setLedgerTxRD } = observableState<LedgerTxRD>(RD.initial)
 
-const ledgerTx$ = (params: LedgerTxInfoParams): LedgerTxLD =>
+const ledgerTx$ = (network: Network, params: LedgerBNCTxInfo): LedgerTxLD =>
   FP.pipe(
-    Rx.from(createTxInfo(params)),
-    switchMap((ledgerTxInfo) => window.apiHDWallet.signTxInLedger('BNB', params.network, ledgerTxInfo)),
+    Rx.from(window.apiHDWallet.signTxInLedger('BNB', network, params)),
     switchMap(
       E.fold(
-        (ledgerErrorId) => Rx.from(Promise.reject({ ledgerErrorId })),
-        (signedBz) => Rx.from(sendRawTransaction(params.network, signedBz))
+        (ledgerErrorId) => Promise.reject(ledgerErrorId),
+        (txHash) => Promise.resolve(txHash)
       )
     ),
     map(RD.success),
     startWith(RD.pending),
     catchError(
-      (e): LedgerTxLD =>
+      (ledgerErrorId): LedgerTxLD =>
         Rx.of(
           RD.failure({
-            msg: !e.ledgerErrorId && e.toString(),
+            msg: '',
             errorId: ErrorId.SEND_LEDGER_TX,
-            ledgerErrorId: e.ledgerErrorId
+            ledgerErrorId
           })
         )
     )
   )
 
-const pushLedgerTx = (params: LedgerTxInfoParams): Rx.Subscription => ledgerTx$(params).subscribe(setLedgerTxRD)
+const pushLedgerTx = (network: Network, params: LedgerBNCTxInfo): Rx.Subscription =>
+  ledgerTx$(network, params).subscribe(setLedgerTxRD)
 
 export const createLedgerService = (): LedgerService => ({
   ledgerAddress$,

@@ -1,34 +1,35 @@
-import { crypto } from '@binance-chain/javascript-sdk'
+import { BncClient, crypto } from '@binance-chain/javascript-sdk'
 import LedgerAppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import LedgerAppBTC from '@ledgerhq/hw-app-btc'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
-import { getDerivePath as getBNBDerivePath, LedgerTxInfo as LedgerBNCTxInfo } from '@xchainjs/xchain-binance'
+import { getDerivePath as getBNBDerivePath } from '@xchainjs/xchain-binance'
 import { getDerivePath as getBTCDerivePath, LedgerTxInfo as LedgerBTCTxInfo } from '@xchainjs/xchain-bitcoin'
-import { Chain } from '@xchainjs/xchain-util'
+import { TxHash } from '@xchainjs/xchain-client'
+import { AssetBNB, baseToAsset, Chain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
-import { LedgerErrorId, LedgerTxInfo } from '../../shared/api/types'
+import { LedgerBNCTxInfo, LedgerErrorId, LedgerTxInfo } from '../../shared/api/types'
 import { Network } from '../../shared/api/types'
 
-const getErrorId = (message: string, statusText: string): LedgerErrorId => {
-  if (message === 'NoDevice') {
+const getErrorId = (message: string): LedgerErrorId => {
+  console.log(111, message)
+  if (message.includes('0x6804')) {
     return LedgerErrorId.NO_DEVICE
   }
   if (message.includes('cannot open device')) {
     return LedgerErrorId.ALREADY_IN_USE
   }
-  switch (statusText) {
-    case 'SECURITY_STATUS_NOT_SATISFIED':
-      return LedgerErrorId.NO_APP
-    case 'CLA_NOT_SUPPORTED':
-      return LedgerErrorId.WRONG_APP
-    case 'INS_NOT_SUPPORTED':
-      return LedgerErrorId.WRONG_APP
-    case 'CONDITIONS_OF_USE_NOT_SATISFIED':
-      return LedgerErrorId.DENIED
-    default:
-      return LedgerErrorId.UNKNOWN
+  if (message.includes('Security not satisfied')) {
+    return LedgerErrorId.NO_APP
   }
+  if (message.includes('CLA_NOT_SUPPORTED') || message.includes('INS_NOT_SUPPORTED')) {
+    return LedgerErrorId.WRONG_APP
+  }
+  if (message.includes('CONDITIONS_OF_USE_NOT_SATISFIED') || message.includes('no signers')) {
+    return LedgerErrorId.DENIED
+  }
+
+  return LedgerErrorId.UNKNOWN
 }
 
 const getBTCAddress = async (transport: TransportNodeHid, network: Network) => {
@@ -41,7 +42,7 @@ const getBTCAddress = async (transport: TransportNodeHid, network: Network) => {
 
     return E.right(info.bitcoinAddress)
   } catch (error) {
-    return E.left(getErrorId(error.message, error.statusText))
+    return E.left(getErrorId(error.toString()))
   }
 }
 
@@ -58,7 +59,7 @@ const getBNBAddress = async (transport: TransportNodeHid, network: Network) => {
       return E.left(LedgerErrorId.UNKNOWN)
     }
   } catch (error) {
-    return E.left(getErrorId(error.message, error.statusText))
+    return E.left(getErrorId(error.toString()))
   }
 }
 
@@ -79,7 +80,7 @@ export const getLedgerAddress = async (chain: Chain, network: Network) => {
     await transport.close()
     return res
   } catch (error) {
-    return E.left(getErrorId(error.message, error.statusText))
+    return E.left(getErrorId(error.toString()))
   }
 }
 
@@ -111,7 +112,7 @@ const signBTCTxInLedger = async (
 
     return E.right(txHex)
   } catch (error) {
-    return E.left(getErrorId(error.message, error.statusText))
+    return E.left(getErrorId(error.toString()))
   }
 }
 
@@ -121,20 +122,33 @@ const signBNCTxInLedger = async (
   ledgerTxInfo: LedgerBNCTxInfo
 ): Promise<E.Either<LedgerErrorId, string>> => {
   try {
-    const { tx, signMsg } = ledgerTxInfo
+    const { sender, recipient, asset, amount, memo } = ledgerTxInfo
     const ledgerApp = new LedgerAppBNB(transport)
     const derive_path = getBNBDerivePath(0)
     await ledgerApp.showAddress(network === 'testnet' ? 'tbnb' : 'bnb', derive_path)
-    const { pk } = await ledgerApp.getPublicKey(derive_path)
-    const signRes = await ledgerApp.sign(tx.getSignBytes(signMsg), derive_path)
-    if (signRes && signRes.signature && pk) {
-      const pubkey = crypto.getPublicKey(pk.toString('hex'))
-      tx.addSignature(pubkey, signRes.signature)
-    }
 
-    return E.right(tx.serialize())
+    const client = new BncClient(network === 'testnet' ? 'https://testnet-dex.binance.org' : 'https://dex.binance.org')
+    client.initChain()
+
+    client.useLedgerSigningDelegate(
+      ledgerApp,
+      () => {},
+      () => {},
+      () => {},
+      derive_path
+    )
+
+    const transferResult = await client.transfer(
+      sender,
+      recipient,
+      baseToAsset(amount).amount().toString(),
+      asset ? asset.symbol : AssetBNB.symbol,
+      memo
+    )
+
+    return E.right(transferResult.result.map((txResult: { hash?: TxHash }) => txResult?.hash ?? '')[0])
   } catch (error) {
-    return E.left(getErrorId(error.message, error.statusText))
+    return E.left(getErrorId(error.toString()))
   }
 }
 
@@ -159,6 +173,6 @@ export const signTxInLedger = async (
     await transport.close()
     return res
   } catch (error) {
-    return E.left(getErrorId(error.message, error.statusText))
+    return E.left(getErrorId(error.toString()))
   }
 }

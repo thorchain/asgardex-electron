@@ -1,6 +1,5 @@
-import { LedgerTxInfo as LedgerBNCTxInfo } from '@xchainjs/xchain-binance'
 import { LedgerTxInfo as LedgerBTCTxInfo } from '@xchainjs/xchain-bitcoin'
-import { Address } from '@xchainjs/xchain-client'
+import { Address, TxParams } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
@@ -31,6 +30,10 @@ export enum LedgerErrorId {
   WRONG_APP,
   DENIED,
   UNKNOWN
+}
+
+export type LedgerBNCTxInfo = TxParams & {
+  sender: Address
 }
 
 export type LedgerTxInfo = LedgerBTCTxInfo | LedgerBNCTxInfo
