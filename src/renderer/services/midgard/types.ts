@@ -6,15 +6,15 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import {
-  AssetDetail,
-  PoolDetail,
-  NetworkInfo,
-  ThorchainLastblock,
-  ThorchainConstants,
-  ThorchainEndpoint,
-  StakersAssetData
+  Network as NetworkInfo,
+  Constants as ThorchainConstants,
+  LastblockItem,
+  InboundAddressesItem as ThorchainEndpoint,
+  PoolDetail as MidgardPoolDetail
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
+
+export type ThorchainLastblock = LastblockItem[]
 
 export type PoolAsset = string
 export type PoolStringAssets = string[]
@@ -24,12 +24,64 @@ export type PoolAssets = Asset[]
 export type PoolAssetsRD = RD.RemoteData<Error, PoolAssets>
 export type PoolAssetsLD = LiveData<Error, PoolAssets>
 
+export type AssetDetail = {
+  asset: string
+  dateCreated: number
+  priceRune: string
+}
+
+export interface StakersAssetData {
+  /**
+   * Asset
+   * @type {string}
+   */
+  asset?: string
+  /**
+   * Total of assets staked
+   * @type {string}
+   */
+  assetStaked?: string
+  /**
+   * Total of assets withdrawn
+   * @type {string}
+   */
+  assetWithdrawn?: string
+  /**
+   * @type {number}
+   */
+  dateFirstStaked?: number
+  /**
+   * @type {number}
+   */
+  heightLastStaked?: number
+  /**
+   * Total of rune staked
+   * @type {string}
+   */
+  runeStaked?: string
+  /**
+   * Total of rune withdrawn
+   * @type {string}
+   */
+  runeWithdrawn?: string
+  /**
+   * Represents ownership of a pool.
+   * @type {string}
+   */
+  units?: string
+}
+
 export type AssetDetails = AssetDetail[]
 export type AssetDetailsRD = RD.RemoteData<Error, AssetDetails>
 export type AssetDetailsLD = LiveData<Error, AssetDetails>
 
 export type AssetDetailMap = {
   [key in Chain]: AssetDetail
+}
+
+export type PoolDetail = MidgardPoolDetail & {
+  poolSlipAverage: string
+  swappingTxCount: string
 }
 
 export type PoolDetailRD = RD.RemoteData<Error, PoolDetail>
@@ -94,7 +146,6 @@ export type PoolsService = {
   selectedPricePool$: Rx.Observable<SelectedPricePool>
   selectedPricePoolAssetSymbol$: Rx.Observable<O.Option<string>>
   reloadPools: () => void
-  reloadPendingPools: () => void
   poolAddresses$: ThorchainEndpointsLD
   poolAddress$: PoolAddressRx
   runeAsset$: Rx.Observable<Asset>

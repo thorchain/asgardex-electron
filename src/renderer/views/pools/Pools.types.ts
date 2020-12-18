@@ -3,7 +3,8 @@ import { BaseAmount, Asset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 
-import { PoolDetailStatusEnum } from '../../types/generated/midgard'
+// import { PoolDetailStatusEnum } from '../../types/generated/midgard'
+import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 
 export type Pool = {
   asset: Asset
@@ -31,7 +32,7 @@ export type PoolTableRowData = {
   poolPrice: BaseAmount
   slip: BigNumber
   trades: BigNumber
-  status: PoolDetailStatusEnum
+  status: GetPoolsStatusEnum
   deepest?: boolean
   key: string
 }

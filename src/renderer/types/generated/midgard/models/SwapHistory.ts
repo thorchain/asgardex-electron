@@ -11,23 +11,23 @@
  * Do not edit the class manually.
  */
 
-import { Observable } from 'rxjs';
-import { BaseAPI } from '../runtime';
+import {
+    SwapHistoryItem,
+} from './';
 
 /**
- * no description
+ * @export
+ * @interface SwapHistory
  */
-export class SpecificationApi extends BaseAPI {
-
+export interface SwapHistory {
     /**
-     * Returns human and machine readable swagger/openapi specification
-     * Get Swagger
+     * @type {Array<SwapHistoryItem>}
+     * @memberof SwapHistory
      */
-    getSwagger = (): Observable<void> => {
-        return this.request<void>({
-            path: '/v2/swagger.json',
-            method: 'GET',
-        });
-    };
-
+    intervals: Array<SwapHistoryItem>;
+    /**
+     * @type {SwapHistoryItem}
+     * @memberof SwapHistory
+     */
+    meta: SwapHistoryItem;
 }

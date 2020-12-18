@@ -13,9 +13,8 @@ import { PoolShare } from '../../../components/uielements/poolShare'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
-import { PoolDetailRD, StakersAssetDataRD } from '../../../services/midgard/types'
+import { PoolDetailRD, StakersAssetData, StakersAssetDataRD, PoolDetail } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
-import { PoolDetail, StakersAssetData } from '../../../types/generated/midgard'
 import * as Styled from './ShareView.styles'
 
 export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {

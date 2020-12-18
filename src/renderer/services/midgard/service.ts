@@ -65,8 +65,9 @@ const midgardApi$ = pipe(byzantine$, liveData.map(getMidgardDefaultApi), shareRe
 const apiGetThorchainLastblock$ = byzantine$.pipe(
   liveData.chain((endpoint) =>
     pipe(
-      getMidgardDefaultApi(endpoint).getThorchainProxiedLastblock(),
+      getMidgardDefaultApi(endpoint).getProxiedLastblock(),
       map(RD.success),
+      liveData.map(({ current }) => current),
       catchError((e: Error) => Rx.of(RD.failure(e)))
     )
   )
@@ -103,7 +104,7 @@ const apiGetThorchainConstants$ = pipe(
   byzantine$,
   liveData.chain((endpoint) =>
     pipe(
-      getMidgardDefaultApi(endpoint).getThorchainProxiedConstants(),
+      getMidgardDefaultApi(endpoint).getProxiedConstants(),
       map(RD.success),
       catchError((e: Error) => Rx.of(RD.failure(e)))
     )

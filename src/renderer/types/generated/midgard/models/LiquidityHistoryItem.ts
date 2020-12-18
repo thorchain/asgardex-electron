@@ -13,22 +13,37 @@
 
 /**
  * @export
- * @interface Event
+ * @interface LiquidityHistoryItem
  */
-export interface Event {
+export interface LiquidityHistoryItem {
     /**
+     * Int64, total deposits (liquidity additions) during the time interval
      * @type {string}
-     * @memberof Event
+     * @memberof LiquidityHistoryItem
      */
-    fee: string;
+    deposits: string;
     /**
+     * Int64, The end time of bucket in unix timestamp
      * @type {string}
-     * @memberof Event
+     * @memberof LiquidityHistoryItem
      */
-    slip: string;
+    endTime: string;
     /**
+     * Int64, net liquidity changes (withdrawals - deposits) during the time interval
      * @type {string}
-     * @memberof Event
+     * @memberof LiquidityHistoryItem
      */
-    stakeUnits: string;
+    net: string;
+    /**
+     * Int64, The beginning time of bucket in unix timestamp
+     * @type {string}
+     * @memberof LiquidityHistoryItem
+     */
+    startTime: string;
+    /**
+     * Int64, total withdrawals during the time interval
+     * @type {string}
+     * @memberof LiquidityHistoryItem
+     */
+    withdrawals: string;
 }
