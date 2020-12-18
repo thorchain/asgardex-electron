@@ -7,8 +7,8 @@ import {
   miniTickers$,
   txs$,
   resetTx,
-  pushTx,
-  sendDepositTx,
+  subscribeTx,
+  sendTx,
   txRD$,
   address$,
   explorerUrl$,
@@ -24,8 +24,8 @@ export type BinanceContextValue = {
   miniTickers$: typeof miniTickers$
   txs$: typeof txs$
   resetTx: typeof resetTx
-  pushTx: typeof pushTx
-  sendDepositTx: typeof sendDepositTx
+  subscribeTx: typeof subscribeTx
+  sendTx: typeof sendTx
   txRD$: typeof txRD$
   address$: typeof address$
   explorerUrl$: typeof explorerUrl$
@@ -41,8 +41,8 @@ const initialContext: BinanceContextValue = {
   miniTickers$,
   txs$,
   resetTx,
-  pushTx,
-  sendDepositTx,
+  subscribeTx,
+  sendTx,
   txRD$,
   address$,
   explorerUrl$,

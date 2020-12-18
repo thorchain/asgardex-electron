@@ -32,7 +32,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
     selectedAsset
   ])
 
-  const { fees$, pushTx, txRD$, client$, resetTx } = useThorchainContext()
+  const { fees$, subscribeTx, txRD$, client$, resetTx } = useThorchainContext()
 
   const txRD = useObservableState<TxRD>(txRD$, RD.initial)
   const oClient = useObservableState<O.Option<ThorchainClient>>(client$, O.none)
@@ -64,7 +64,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
     (balance: WalletBalance) => (
       <SendFormTHOR
         balance={balance}
-        onSubmit={pushTx}
+        onSubmit={subscribeTx}
         balances={FP.pipe(
           oBalances,
           O.getOrElse(() => [] as WalletBalances)
@@ -74,7 +74,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
         fee={fee}
       />
     ),
-    [pushTx, oBalances, txRD, addressValidation, fee]
+    [subscribeTx, oBalances, txRD, addressValidation, fee]
   )
 
   return FP.pipe(

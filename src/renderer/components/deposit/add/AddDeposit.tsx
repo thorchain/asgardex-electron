@@ -273,7 +273,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
         })
       )
 
-    // TODO(@Veado) Call sendDepositTx of `services/chain/txs`
+    // TODO(@Veado) Call sendTx of `services/chain/txs`
     // and handle results (error/success) in a modal here in `AddStake`
     FP.pipe(
       type === 'asym' ? asymDepositTx() : symDepositTx(),

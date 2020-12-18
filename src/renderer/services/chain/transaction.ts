@@ -8,7 +8,7 @@ import * as BTC from '../bitcoin'
 import { ErrorId, TxLD } from '../wallet/types'
 import { SendDepositTxParams } from './types'
 
-const sendDepositTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositTxParams): TxLD => {
+const sendTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositTxParams): TxLD => {
   // TODO (@Veado) Health check request for pool address
   // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
 
@@ -23,7 +23,7 @@ const sendDepositTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositT
 
   switch (chain) {
     case 'BNB':
-      return BNB.sendDepositTx({ recipient: poolAddress, amount, asset, memo })
+      return BNB.sendTx({ recipient: poolAddress, amount, asset, memo })
 
     case 'BTC':
       return FP.pipe(
@@ -32,7 +32,7 @@ const sendDepositTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositT
         O.fold(
           // TODO (@veado) i18n
           () => depositTxFailure$('Fee rate for BTC transaction not available'),
-          (feeRate) => BTC.sendDepositTx({ recipient: poolAddress, amount, feeRate, memo })
+          (feeRate) => BTC.sendTx({ recipient: poolAddress, amount, feeRate, memo })
         )
       )
 
@@ -54,4 +54,4 @@ const sendDepositTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositT
   }
 }
 
-export { sendDepositTx }
+export { sendTx }
