@@ -361,6 +361,8 @@ const createPoolsService = (
     RxOp.retry(MIDGARD_MAX_RETRY)
   )
 
+  // TODO (@Veado) Does not make sense to get address of first pool
+  // Change `poolAddress$` to `selectedPoolAddress$` by using `selectedAsset$` and `getPoolAddressByChain`
   const poolAddress$: PoolAddressRx = poolAddresses$.pipe(
     RxOp.map(
       FP.flow(

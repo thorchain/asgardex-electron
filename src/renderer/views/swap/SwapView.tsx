@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
-import { Asset, AssetAmount, assetFromString, assetToBase, bnOrZero } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetFromString, AssetRuneNative, assetToBase, bnOrZero } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -21,9 +21,9 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { getDefaultRuneAsset, isRuneAsset } from '../../helpers/assetHelper'
+import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { rdFromOption, sequenceTOption } from '../../helpers/fpHelpers'
-import { getDefaultRunePricePool } from '../../helpers/poolHelper'
+import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { SwapRouteParams } from '../../routes/swap'
 import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
@@ -39,7 +39,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, poolAddresses$, reloadPools, runeAsset$, selectedPricePool$ },
+    pools: { poolsState$, poolAddresses$, reloadPools, selectedPricePool$ },
     getTransactionState$
   } = midgardService
   const { reloadSwapFees, swapFees$ } = useChainContext()
@@ -48,9 +48,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const poolsState = useObservableState(poolsState$, initial)
   const [poolAddresses] = useObservableState(() => poolAddresses$, initial)
 
-  const runeAsset = useObservableState(runeAsset$, getDefaultRuneAsset())
-
-  const selectedPricePool = useObservableState(selectedPricePool$, getDefaultRunePricePool())
+  const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
@@ -152,16 +150,15 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                 .filter((a) => a.asset !== undefined && !!a.asset)
                 .map((a) => ({ asset: assetFromString(a.asset as string) as Asset, priceRune: bnOrZero(a.priceRune) }))
 
-              const hasRuneAsset = Boolean(availableAssets.find(({ asset }) => isRuneAsset(asset)))
+              const hasRuneAsset = Boolean(availableAssets.find(({ asset }) => isRuneNativeAsset(asset)))
 
-              if (!hasRuneAsset && runeAsset) {
-                availableAssets.unshift({ asset: runeAsset, priceRune: bnOrZero(1) })
+              if (!hasRuneAsset) {
+                availableAssets.unshift({ asset: AssetRuneNative, priceRune: bnOrZero(1) })
               }
 
               return (
                 <Swap
                   PasswordConfirmation={ConfirmPasswordView}
-                  runeAsset={runeAsset}
                   activePricePool={selectedPricePool}
                   txWithState={txWithState}
                   resetTx={resetTx}

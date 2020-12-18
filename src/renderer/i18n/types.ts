@@ -73,6 +73,7 @@ type WalletMessageKey =
   | 'wallet.column.balance'
   | 'wallet.column.value'
   | 'wallet.action.send'
+  | 'wallet.action.upgrade'
   | 'wallet.action.receive'
   | 'wallet.action.remove'
   | 'wallet.action.unlock'

@@ -65,9 +65,9 @@ export const getRuneAsset = ({ network = 'testnet', chain = 'BNB' }: { network?:
  */
 export const getDefaultRuneAsset = (chain: Chain = 'BNB') => getRuneAsset({ network: DEFAULT_NETWORK, chain })
 /**
- * Check whether an asset is a RUNE asset
+ * Check whether an asset is a BNB.RUNE asset
  */
-export const isRuneAsset = (asset: Asset): boolean =>
+export const isRuneBnbAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetRune67C) || eqAsset.equals(asset, AssetRuneB1A)
 
 /**

@@ -128,7 +128,8 @@ export type NativeFee = O.Option<BaseAmount>
 export type NativeFeeRD = RD.RemoteData<Error, NativeFee>
 export type NativeFeeLD = LiveData<Error, NativeFee>
 
-export type ThorchainEndpointsLD = LiveData<Error, ThorchainEndpoint[]>
+export type ThorchainEndpoints = ThorchainEndpoint[]
+export type ThorchainEndpointsLD = LiveData<Error, ThorchainEndpoints>
 
 export type PoolAddress = string
 export type PoolAddressRx = Rx.Observable<O.Option<PoolAddress>>

@@ -1,5 +1,6 @@
-import { PoolData } from '@thorchain/asgardex-util'
-import { bnOrZero, assetFromString, Chain, AssetRuneNative } from '@xchainjs/xchain-util'
+import { getValueOfAsset1InAsset2, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util'
+import { Balance } from '@xchainjs/xchain-client'
+import { bnOrZero, assetFromString, Chain, AssetRuneNative, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
@@ -10,8 +11,10 @@ import * as Ord from 'fp-ts/lib/Ord'
 import { Network } from '../../shared/api/types'
 import { ONE_ASSET_BASE_AMOUNT } from '../const'
 import { PoolDetail, PoolDetails } from '../services/midgard/types'
+import { getPoolDetail, toPoolData } from '../services/midgard/utils'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
+import { isRuneNativeAsset } from './assetHelper'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
 
@@ -35,7 +38,7 @@ export const RUNE_PRICE_POOL: PricePool = {
  *
  * Note: We don't have a "RUNE" pool in THORChain, but do need such thing for pricing
  *
- * @deprecated Use `getRunePricePool`
+ * @deprecated Use `RUNE_PRICE_POOL`
  */
 export const getDefaultRunePricePool = (_: Chain = 'BNB') => RUNE_PRICE_POOL
 
@@ -112,3 +115,27 @@ export const getDeepestPool = (pools: PoolDetails): O.Option<PoolDetail> =>
  */
 export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: PoolDetail) =>
   bnOrZero(poolDetail.assetPrice).multipliedBy(runePrice)
+
+/**
+ * Helper to get a pool price value for a given `Balance`
+ */
+export const getPoolPriceValue = (
+  { asset, amount }: Balance,
+  poolDetails: PoolDetails,
+  selectedPricePoolData: PoolData
+): O.Option<BaseAmount> => {
+  return FP.pipe(
+    getPoolDetail(poolDetails, asset),
+    O.map(toPoolData),
+    // calculate value based on `pricePoolData`
+    O.map((poolData) => getValueOfAsset1InAsset2(amount, poolData, selectedPricePoolData)),
+    O.alt(() => {
+      // Calculate RUNE values based on `pricePoolData`
+      if (isRuneNativeAsset(asset)) {
+        return O.some(getValueOfRuneInAsset(amount, selectedPricePoolData))
+      }
+      // In all other cases we don't have any price pool and no price
+      return O.none
+    })
+  )
+}

@@ -13,7 +13,8 @@ import {
   formatBN,
   baseToAsset,
   BaseAmount,
-  formatAssetAmountCurrency
+  formatAssetAmountCurrency,
+  AssetRuneNative
 } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import { eqString } from 'fp-ts/Eq'
@@ -57,7 +58,6 @@ type SwapProps = {
   txWithState?: TxWithStateRD
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
-  runeAsset: Asset
   activePricePool: PricePool
   PasswordConfirmation: React.FC<{ onSuccess: () => void; onClose: () => void }>
   reloadFees?: () => void
@@ -74,7 +74,6 @@ export const Swap = ({
   txWithState = RD.initial,
   goToTransaction,
   resetTx,
-  runeAsset,
   activePricePool,
   PasswordConfirmation,
   reloadFees,
@@ -83,9 +82,8 @@ export const Swap = ({
   const intl = useIntl()
   const history = useHistory()
   // convert to hash map here instead of using getPoolDetail
-  const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, runeAsset), [
-    poolDetails,
-    runeAsset
+  const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [
+    poolDetails
   ])
   const oSourceAssetWP: O.Option<AssetWithPrice> = useMemo(() => pickAssetWithPrice(availableAssets, sourceAssetProp), [
     availableAssets,

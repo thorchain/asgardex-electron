@@ -1,5 +1,5 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import { assetToString, baseAmount, bn } from '@xchainjs/xchain-util'
+import { AssetRuneNative, assetToString, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -12,11 +12,11 @@ describe('components/swap/utils', () => {
     })
 
     it('should return some(true) if target asset is RUNE', () => {
-      expect(isRuneSwap(ASSETS_TESTNET.BOLT, ASSETS_TESTNET.RUNE)).toEqual(O.some(true))
+      expect(isRuneSwap(ASSETS_TESTNET.BOLT, AssetRuneNative)).toEqual(O.some(true))
     })
 
     it('should return some(false) if source asset is RUNE', () => {
-      expect(isRuneSwap(ASSETS_TESTNET.RUNE, ASSETS_TESTNET.BOLT)).toEqual(O.some(false))
+      expect(isRuneSwap(AssetRuneNative, ASSETS_TESTNET.BOLT)).toEqual(O.some(false))
     })
   })
 
@@ -38,8 +38,8 @@ describe('components/swap/utils', () => {
 
     it('should return zero result if no poolData', () => {
       expect(getSlip(ASSETS_TESTNET.BNB, ASSETS_TESTNET.BOLT, baseAmount(bn(123)), {})).toEqual(bn(0))
-      expect(getSlip(ASSETS_TESTNET.RUNE, ASSETS_TESTNET.BOLT, baseAmount(bn(123)), {})).toEqual(bn(0))
-      expect(getSlip(ASSETS_TESTNET.BNB, ASSETS_TESTNET.RUNE, baseAmount(bn(123)), {})).toEqual(bn(0))
+      expect(getSlip(AssetRuneNative, ASSETS_TESTNET.BOLT, baseAmount(bn(123)), {})).toEqual(bn(0))
+      expect(getSlip(ASSETS_TESTNET.BNB, AssetRuneNative, baseAmount(bn(123)), {})).toEqual(bn(0))
     })
 
     it('should calculate slip when data enabled', () => {
@@ -49,19 +49,19 @@ describe('components/swap/utils', () => {
 
       expect(getSlip(ASSETS_TESTNET.BOLT, ASSETS_TESTNET.BNB, baseAmount(bn(1)), poolsData)).toEqual(bn('0.5'))
 
-      expect(getSlip(ASSETS_TESTNET.RUNE, ASSETS_TESTNET.BNB, baseAmount(bn(1)), poolsData)).toEqual(
+      expect(getSlip(AssetRuneNative, ASSETS_TESTNET.BNB, baseAmount(bn(1)), poolsData)).toEqual(
         bn('0.33333333333333333333')
       )
 
-      expect(getSlip(ASSETS_TESTNET.BNB, ASSETS_TESTNET.RUNE, baseAmount(bn(1)), poolsData)).toEqual(bn('0.25'))
+      expect(getSlip(ASSETS_TESTNET.BNB, AssetRuneNative, baseAmount(bn(1)), poolsData)).toEqual(bn('0'))
     })
   })
 
   describe('getSwapResult', () => {
     it('should return zero result if no poolData', () => {
       expect(getSwapResult(ASSETS_TESTNET.BNB, ASSETS_TESTNET.BOLT, baseAmount(bn(123)), {})).toEqual(bn(0))
-      expect(getSwapResult(ASSETS_TESTNET.RUNE, ASSETS_TESTNET.BOLT, baseAmount(bn(123)), {})).toEqual(bn(0))
-      expect(getSwapResult(ASSETS_TESTNET.BNB, ASSETS_TESTNET.RUNE, baseAmount(bn(123)), {})).toEqual(bn(0))
+      expect(getSwapResult(AssetRuneNative, ASSETS_TESTNET.BOLT, baseAmount(bn(123)), {})).toEqual(bn(0))
+      expect(getSwapResult(ASSETS_TESTNET.BNB, AssetRuneNative, baseAmount(bn(123)), {})).toEqual(bn(0))
     })
 
     it('should calculate swap output when data enabled', () => {
@@ -74,7 +74,7 @@ describe('components/swap/utils', () => {
           assetBalance: baseAmount(50000000),
           runeBalance: baseAmount(1)
         },
-        [assetToString(ASSETS_TESTNET.RUNE)]: {
+        [assetToString(AssetRuneNative)]: {
           assetBalance: baseAmount(30),
           runeBalance: baseAmount(40000000000000)
         },
@@ -86,11 +86,9 @@ describe('components/swap/utils', () => {
 
       expect(getSwapResult(ASSETS_TESTNET.BNB, ASSETS_TESTNET.BOLT, baseAmount(bn(1)), poolsData)).toEqual(bn('0.125'))
 
-      expect(getSwapResult(ASSETS_TESTNET.RUNE, ASSETS_TESTNET.BOLT, baseAmount(bn(1)), poolsData)).toEqual(bn('0.125'))
+      expect(getSwapResult(AssetRuneNative, ASSETS_TESTNET.BOLT, baseAmount(bn(1)), poolsData)).toEqual(bn('0.125'))
 
-      expect(getSwapResult(ASSETS_TESTNET.FTM, ASSETS_TESTNET.RUNE, baseAmount(bn(1)), poolsData)).toEqual(
-        bn('1.33332444')
-      )
+      expect(getSwapResult(ASSETS_TESTNET.FTM, AssetRuneNative, baseAmount(bn(1)), poolsData)).toEqual(bn('1.33332444'))
     })
   })
 
@@ -111,13 +109,13 @@ describe('components/swap/utils', () => {
           assetBalance: baseAmount(3000000),
           runeBalance: baseAmount(4000000)
         },
-        [assetToString(ASSETS_TESTNET.RUNE)]: {
+        [assetToString(AssetRuneNative)]: {
           assetBalance: baseAmount(3000000),
           runeBalance: baseAmount(4000000)
         }
       }
 
-      expect(getSwapData(bn(0.0001), O.some(ASSETS_TESTNET.BNB), O.some(ASSETS_TESTNET.RUNE), poolsData)).toEqual({
+      expect(getSwapData(bn(0.0001), O.some(ASSETS_TESTNET.BNB), O.some(AssetRuneNative), poolsData)).toEqual({
         slip: bn('0.00332225913621262458'),
         swapResult: bn('0.00013245')
       })
@@ -133,19 +131,19 @@ describe('components/swap/utils', () => {
       expect(
         pickAssetWithPrice(
           [
-            { asset: ASSETS_TESTNET.RUNE, priceRune: bn(0) },
+            { asset: AssetRuneNative, priceRune: bn(0) },
             { asset: ASSETS_TESTNET.BOLT, priceRune: bn(0) }
           ],
           O.some(ASSETS_TESTNET.FTM)
         )
-      ).toEqual(O.some({ asset: ASSETS_TESTNET.RUNE, priceRune: bn(0) }))
+      ).toEqual(O.some({ asset: AssetRuneNative, priceRune: bn(0) }))
     })
 
     it('should pick asset', () => {
       expect(
         pickAssetWithPrice(
           [
-            { asset: ASSETS_TESTNET.RUNE, priceRune: bn(0) },
+            { asset: AssetRuneNative, priceRune: bn(0) },
             { asset: ASSETS_TESTNET.BOLT, priceRune: bn(0) },
             { asset: ASSETS_TESTNET.FTM, priceRune: bn(0) }
           ],

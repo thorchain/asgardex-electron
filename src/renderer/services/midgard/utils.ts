@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { assetFromString, bnOrZero, baseAmount, Asset, assetToString } from '@xchainjs/xchain-util'
+import { assetFromString, bnOrZero, baseAmount, Asset, assetToString, Chain } from '@xchainjs/xchain-util'
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import { head } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -17,6 +18,8 @@ import {
   PoolDetails,
   PoolsStateRD,
   SelectedPricePoolAsset,
+  PoolAddress,
+  ThorchainEndpoints,
   AssetDetail,
   PoolDetail
 } from './types'
@@ -149,3 +152,11 @@ export const toPoolData = (detail: PoolDetail): PoolData => ({
 export const filterPoolAssets = (poolAssets: string[]) => {
   return poolAssets.filter((poolAsset) => !isMiniToken(assetFromString(poolAsset) || { symbol: '' }))
 }
+
+export const getPoolAddressByChain = (endpoints: ThorchainEndpoints, chain: Chain): O.Option<PoolAddress> =>
+  FP.pipe(
+    endpoints,
+    A.findFirst((endpoint) => endpoint.chain === chain),
+    O.map(({ address }) => address),
+    O.chain(O.fromNullable)
+  )

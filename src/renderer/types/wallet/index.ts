@@ -13,3 +13,4 @@ export type UserAccountType = {
 }
 
 export type WalletBalance = Balance & { walletAddress: Address }
+export type WalletBalances = WalletBalance[]

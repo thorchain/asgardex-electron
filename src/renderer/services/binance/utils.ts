@@ -6,7 +6,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { BNB_DECIMAL, isRuneAsset } from '../../helpers/assetHelper'
+import { BNB_DECIMAL, isRuneNativeAsset } from '../../helpers/assetHelper'
 import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
 
@@ -25,7 +25,7 @@ export const getPoolPriceValue = (
     O.map((poolData) => getValueOfAsset1InAsset2(amount, poolData, selectedPricePoolData)),
     O.alt(() => {
       // Calculate RUNE values based on `pricePoolData`
-      if (isRuneAsset(asset)) {
+      if (isRuneNativeAsset(asset)) {
         return O.some(getValueOfRuneInAsset(amount, selectedPricePoolData))
       }
       // In all other cases we don't have any price pool and no price

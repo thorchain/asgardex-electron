@@ -1,12 +1,22 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import { assetAmount, assetToBase, AssetRune67C, assetToString } from '@xchainjs/xchain-util'
+import { Balance } from '@xchainjs/xchain-client'
+import {
+  assetAmount,
+  assetToBase,
+  AssetRune67C,
+  assetToString,
+  baseAmount,
+  AssetRuneNative,
+  AssetBNB
+} from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { PoolDetails, PoolDetail } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
 import { GetPoolsStatusEnum } from '../types/generated/midgard'
-import { getDeepestPool, getPoolTableRowsData } from './poolHelper'
+import { getDeepestPool, getPoolPriceValue, getPoolTableRowsData } from './poolHelper'
 
 describe('helpers/poolHelper/', () => {
   const pool1 = { status: GetPoolsStatusEnum.Staged, runeDepth: '1000' } as PoolDetail
@@ -94,6 +104,59 @@ describe('helpers/poolHelper/', () => {
       const result = toPoolData(poolDetail)
       expect(result.assetBalance.amount().toNumber()).toEqual(11000000000)
       expect(result.runeBalance.amount().toNumber()).toEqual(10000000000)
+    })
+  })
+
+  describe('getPoolPriceValue', () => {
+    const poolDetails: PoolDetails = [
+      {
+        asset: assetToString(AssetBNB),
+        assetDepth: '1000000000',
+        runeDepth: '10000000000'
+      }
+    ]
+    const usdPool: PoolData = {
+      assetBalance: assetToBase(assetAmount(110000)),
+      runeBalance: assetToBase(assetAmount(100000))
+    }
+
+    it('returns a price for BNB in USD', () => {
+      const balance: Balance = {
+        amount: baseAmount('1'),
+        asset: AssetBNB
+      }
+      const result = FP.pipe(
+        getPoolPriceValue(balance, poolDetails, usdPool),
+        O.fold(
+          () => 'failure',
+          (price) => price.amount().toString()
+        )
+      )
+      expect(result).toEqual('11')
+    })
+
+    it('returns a price for RUNE in USD', () => {
+      const balance: Balance = {
+        amount: baseAmount('1'),
+        asset: AssetRuneNative
+      }
+      const result = FP.pipe(
+        getPoolPriceValue(balance, [], usdPool),
+        O.fold(
+          () => 'failure',
+          (price) => price.amount().toString()
+        )
+      )
+      expect(result).toEqual('1')
+    })
+
+    it('returns a no price if no pools are available', () => {
+      const balance: Balance = {
+        amount: baseAmount('1'),
+        asset: AssetBNB
+      }
+      const result = getPoolPriceValue(balance, [], usdPool)
+      expect(result).toBeNone()
     })
   })
 })

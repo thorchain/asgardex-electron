@@ -1,9 +1,19 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneNative, assetToString } from '@xchainjs/xchain-util'
+import {
+  AssetBNB,
+  AssetBTC,
+  AssetETH,
+  AssetRune67C,
+  AssetRuneNative,
+  assetToString,
+  BNBChain,
+  BTCChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, AssetBUSDBAF } from '../../const'
-import { eqAsset } from '../../helpers/fp/eq'
+import { eqAsset, eqOString } from '../../helpers/fp/eq'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { InboundAddressesItem as ThorchainEndpoint } from '../../types/generated/midgard'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
@@ -17,7 +27,8 @@ import {
   getPoolDetail,
   toPoolData,
   filterPoolAssets,
-  getPoolDetailsHashMap
+  getPoolDetailsHashMap,
+  getPoolAddressByChain
 } from './utils'
 
 type PoolDataMock = { asset?: string }
@@ -230,6 +241,27 @@ describe('services/midgard/utils/', () => {
     })
     it('filters out mini tokens', () => {
       expect(filterPoolAssets(['BNB.BNB', 'BNB.MINIA-7A2M', 'BNB.RUNE-B1A'])).toEqual(['BNB.BNB', 'BNB.RUNE-B1A'])
+    })
+  })
+
+  describe('getPoolAddressByChain', () => {
+    const bnbAddress = 'bnb pool address'
+    const endpointBNB: ThorchainEndpoint = { address: bnbAddress, chain: BNBChain }
+    const thorAddress = 'thor pool address'
+    const endpointThor: ThorchainEndpoint = { address: thorAddress, chain: THORChain }
+    const btcAddress = 'btc pool address'
+    const endpointBTC: ThorchainEndpoint = { address: btcAddress, chain: BTCChain }
+    it('returns BNBChain if list of endpoints are empty', () => {
+      const result = getPoolAddressByChain([endpointBNB, endpointThor, endpointBTC], BNBChain)
+      expect(eqOString.equals(result, O.some(bnbAddress))).toBeTruthy()
+    })
+
+    it('returns none if list of endpoints are empty', () => {
+      expect(getPoolAddressByChain([], BNBChain)).toBeNone()
+    })
+
+    it('returns none if chain is not in list of endpoints', () => {
+      expect(getPoolAddressByChain([endpointBNB, endpointThor], BTCChain)).toBeNone()
     })
   })
 })
