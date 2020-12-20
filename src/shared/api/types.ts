@@ -41,6 +41,7 @@ export type LedgerTxInfo = LedgerBTCTxInfo | LedgerBNCTxInfo
 export type ApiHDWallet = {
   getLedgerAddress: (chain: Chain, network: Network) => Promise<Either<LedgerErrorId, Address>>
   signTxInLedger: (chain: Chain, network: Network, ledgerTxInfo: LedgerTxInfo) => Promise<Either<LedgerErrorId, string>>
+  sendTxInLedger: (chain: Chain, network: Network, ledgerTxInfo: LedgerTxInfo) => Promise<Either<LedgerErrorId, string>>
 }
 
 declare global {

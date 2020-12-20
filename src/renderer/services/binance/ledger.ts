@@ -23,7 +23,7 @@ const { get$: ledgerTxRD$, set: setLedgerTxRD } = observableState<LedgerTxRD>(RD
 
 const ledgerTx$ = (network: Network, params: LedgerBNCTxInfo): LedgerTxLD =>
   FP.pipe(
-    Rx.from(window.apiHDWallet.signTxInLedger('BNB', network, params)),
+    Rx.from(window.apiHDWallet.sendTxInLedger('BNB', network, params)),
     switchMap(
       E.fold(
         (ledgerErrorId) => Promise.reject(ledgerErrorId),

@@ -1,8 +1,8 @@
-import { BncClient, crypto } from '@binance-chain/javascript-sdk'
+import { crypto } from '@binance-chain/javascript-sdk'
 import LedgerAppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import LedgerAppBTC from '@ledgerhq/hw-app-btc'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
-import { getDerivePath as getBNBDerivePath } from '@xchainjs/xchain-binance'
+import { Client as XChainBinanceClient, getDerivePath as getBNBDerivePath } from '@xchainjs/xchain-binance'
 import { getDerivePath as getBTCDerivePath, LedgerTxInfo as LedgerBTCTxInfo } from '@xchainjs/xchain-bitcoin'
 import { TxHash } from '@xchainjs/xchain-client'
 import { AssetBNB, baseToAsset, Chain } from '@xchainjs/xchain-util'
@@ -12,8 +12,7 @@ import { LedgerBNCTxInfo, LedgerErrorId, LedgerTxInfo } from '../../shared/api/t
 import { Network } from '../../shared/api/types'
 
 const getErrorId = (message: string): LedgerErrorId => {
-  console.log(111, message)
-  if (message.includes('0x6804')) {
+  if (message.includes('NoDevice') || message.includes('0x6804')) {
     return LedgerErrorId.NO_DEVICE
   }
   if (message.includes('cannot open device')) {
@@ -116,21 +115,23 @@ const signBTCTxInLedger = async (
   }
 }
 
-const signBNCTxInLedger = async (
+const sendBNCTxInLedger = async (
   transport: TransportNodeHid,
   network: Network,
   ledgerTxInfo: LedgerBNCTxInfo
 ): Promise<E.Either<LedgerErrorId, string>> => {
   try {
     const { sender, recipient, asset, amount, memo } = ledgerTxInfo
+    const client = new XChainBinanceClient({ network: network === 'testnet' ? 'testnet' : 'mainnet' })
     const ledgerApp = new LedgerAppBNB(transport)
     const derive_path = getBNBDerivePath(0)
-    await ledgerApp.showAddress(network === 'testnet' ? 'tbnb' : 'bnb', derive_path)
+    const hpr = network === 'testnet' ? 'tbnb' : 'bnb' // This will be replaced later with "const hpr = client.getPrefix()"
+    await ledgerApp.showAddress(hpr, derive_path)
 
-    const client = new BncClient(network === 'testnet' ? 'https://testnet-dex.binance.org' : 'https://dex.binance.org')
-    client.initChain()
+    const bncClient = client.getBncClient()
+    bncClient.initChain()
 
-    client.useLedgerSigningDelegate(
+    bncClient.useLedgerSigningDelegate(
       ledgerApp,
       () => {},
       () => {},
@@ -138,7 +139,7 @@ const signBNCTxInLedger = async (
       derive_path
     )
 
-    const transferResult = await client.transfer(
+    const transferResult = await bncClient.transfer(
       sender,
       recipient,
       baseToAsset(amount).amount().toString(),
@@ -164,8 +165,27 @@ export const signTxInLedger = async (
       case 'BTC':
         res = await signBTCTxInLedger(transport, network, ledgerTxInfo as LedgerBTCTxInfo)
         break
+      default:
+        res = E.left(LedgerErrorId.NO_APP)
+    }
+    await transport.close()
+    return res
+  } catch (error) {
+    return E.left(getErrorId(error.toString()))
+  }
+}
+
+export const sendTxInLedger = async (
+  chain: Chain,
+  network: Network,
+  ledgerTxInfo: LedgerTxInfo
+): Promise<E.Either<LedgerErrorId, string>> => {
+  try {
+    const transport = await TransportNodeHid.open('')
+    let res
+    switch (chain) {
       case 'BNB':
-        res = await signBNCTxInLedger(transport, network, ledgerTxInfo as LedgerBNCTxInfo)
+        res = await sendBNCTxInLedger(transport, network, ledgerTxInfo as LedgerBNCTxInfo)
         break
       default:
         res = E.left(LedgerErrorId.NO_APP)
