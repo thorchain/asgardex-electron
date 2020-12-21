@@ -1,7 +1,15 @@
 import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
-import { isRuneBnbAsset, isBnbAsset, getRuneAsset, isBtcAsset, isEthAsset, isPricePoolAsset } from './assetHelper'
+import {
+  isRuneBnbAsset,
+  isBnbAsset,
+  getRuneAsset,
+  isBtcAsset,
+  isEthAsset,
+  isPricePoolAsset,
+  isRuneNativeAsset
+} from './assetHelper'
 
 describe('helpers/assetHelper', () => {
   describe('getRuneAsset', () => {
@@ -27,6 +35,16 @@ describe('helpers/assetHelper', () => {
 
     it('returns false for any other asset than RUNE', () => {
       expect(isRuneBnbAsset(AssetBNB)).toBeFalsy()
+    })
+  })
+
+  describe('isRuneNativeAsset', () => {
+    it('checks rune asset for testnet', () => {
+      expect(isRuneNativeAsset(AssetRuneNative)).toBeTruthy()
+    })
+
+    it('returns false for any other asset than RUNE', () => {
+      expect(isRuneNativeAsset(AssetBNB)).toBeFalsy()
     })
   })
 

@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { broadcastTx, createTxInfo, LedgerTxInfoParams } from '@xchainjs/xchain-bitcoin'
+import { BTCChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
@@ -14,7 +15,7 @@ const { get$: ledgerAddress$, set: setLedgerAddressRD } = observableState<Ledger
 
 const retrieveLedgerAddress = (network: Network) =>
   FP.pipe(
-    Rx.from(window.apiHDWallet.getLedgerAddress('BTC', network)),
+    Rx.from(window.apiHDWallet.getLedgerAddress(BTCChain, network)),
     map(RD.fromEither),
     startWith(RD.pending),
     catchError((error) => Rx.of(RD.failure(error)))
@@ -25,7 +26,7 @@ const { get$: ledgerTxRD$, set: setLedgerTxRD } = observableState<LedgerTxRD>(RD
 const ledgerTx$ = (params: LedgerTxInfoParams): LedgerTxLD =>
   FP.pipe(
     Rx.from(createTxInfo(params)),
-    switchMap((ledgerTxInfo) => window.apiHDWallet.signTxInLedger('BTC', params.network, ledgerTxInfo)),
+    switchMap((ledgerTxInfo) => window.apiHDWallet.signTxInLedger(BTCChain, params.network, ledgerTxInfo)),
     switchMap(
       E.fold(
         (ledgerErrorId) => Rx.from(Promise.reject({ ledgerErrorId })),

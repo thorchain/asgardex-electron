@@ -5,9 +5,16 @@ import { createLedgerService } from './ledger'
 import { createTransactionService } from './transaction'
 import { subscribeTransfers, miniTickers$ } from './ws'
 
-const { txs$, pushTx, resetTx, txRD$, sendDepositTx } = createTransactionService(client$)
+const { txs$, subscribeTx, resetTx, txRD$, sendTx } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService(client$)
-const { ledgerAddress$, retrieveLedgerAddress, removeLedgerAddress } = createLedgerService()
+const {
+  ledgerAddress$,
+  retrieveLedgerAddress,
+  removeLedgerAddress,
+  ledgerTxRD$,
+  pushLedgerTx,
+  resetLedgerTx
+} = createLedgerService()
 
 export {
   client$,
@@ -20,13 +27,16 @@ export {
   miniTickers$,
   balances$,
   txs$,
-  pushTx,
+  sendTx,
+  subscribeTx,
   resetTx,
-  sendDepositTx,
   txRD$,
   reloadFees,
   fees$,
   ledgerAddress$,
   retrieveLedgerAddress,
-  removeLedgerAddress
+  removeLedgerAddress,
+  ledgerTxRD$,
+  pushLedgerTx,
+  resetLedgerTx
 }

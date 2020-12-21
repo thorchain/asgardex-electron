@@ -8,9 +8,9 @@ import {
   reloadFees,
   fees$,
   txRD$,
-  sendDepositTx,
+  sendTx,
   resetTx,
-  pushTx
+  subscribeTx
 } from '../services/thorchain'
 
 export type ThorchainContextValue = {
@@ -20,9 +20,9 @@ export type ThorchainContextValue = {
   txs$: typeof txs$
   reloadFees: typeof reloadFees
   fees$: typeof fees$
-  pushTx: typeof pushTx
+  subscribeTx: typeof subscribeTx
   resetTx: typeof resetTx
-  sendDepositTx: typeof sendDepositTx
+  sendTx: typeof sendTx
   txRD$: typeof txRD$
 }
 
@@ -31,9 +31,9 @@ const initialContext: ThorchainContextValue = {
   reloadBalances,
   balances$,
   txs$,
-  pushTx,
+  subscribeTx,
   resetTx,
-  sendDepositTx,
+  sendTx,
   txRD$,
   reloadFees,
   fees$

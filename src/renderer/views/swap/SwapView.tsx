@@ -43,7 +43,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     setSelectedPoolAsset
   } = midgardService
   const { reloadSwapFees, swapFees$ } = useChainContext()
-  const { explorerUrl$, pushTx, resetTx, txRD$ } = useBinanceContext()
+  const { explorerUrl$, subscribeTx, resetTx, txRD$ } = useBinanceContext()
   const { balancesState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
   const poolAddress = useObservableState(selectedPoolAddress$, O.none)
@@ -94,7 +94,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
         // eslint-disable-next-line array-callback-return
         O.map((endpoint) => {
           if (endpoint) {
-            pushTx({
+            subscribeTx({
               recipient: endpoint,
               amount: assetToBase(amount),
               asset: source,
@@ -104,7 +104,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
         })
       )
     },
-    [poolAddress, pushTx]
+    [poolAddress, subscribeTx]
   )
 
   const explorerUrl = useObservableState(explorerUrl$, O.none)

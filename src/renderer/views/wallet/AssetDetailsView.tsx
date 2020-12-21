@@ -75,7 +75,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     O.none
   )
 
-  const { pushTx: sendBnbTx } = useBinanceContext()
+  const { sendTx: sendBnbTx } = useBinanceContext()
 
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
@@ -116,7 +116,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         getExplorerTxUrl={getExplorerTxUrl}
         walletAddress={oWalletAddress}
         poolAddress={bnbPoolAddress}
-        upgradeRuneHandler={sendBnbTx}
+        sendTx={sendBnbTx}
       />
     </>
   )

@@ -3,7 +3,7 @@ import { client$, address$ } from './common'
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
-const { txs$, pushTx, resetTx, sendDepositTx, txRD$ } = createTransactionService(client$)
+const { txs$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService(client$)
 
-export { address$, client$, reloadBalances, balances$, txs$, reloadFees, fees$, pushTx, resetTx, sendDepositTx, txRD$ }
+export { address$, client$, reloadBalances, balances$, txs$, reloadFees, fees$, subscribeTx, resetTx, sendTx, txRD$ }

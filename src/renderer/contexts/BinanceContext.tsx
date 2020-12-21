@@ -7,14 +7,17 @@ import {
   miniTickers$,
   txs$,
   resetTx,
-  pushTx,
-  sendDepositTx,
+  subscribeTx,
+  sendTx,
   txRD$,
   address$,
   explorerUrl$,
   getExplorerTxUrl$,
   fees$,
-  ledgerAddress$
+  ledgerAddress$,
+  ledgerTxRD$,
+  pushLedgerTx,
+  resetLedgerTx
 } from '../services/binance'
 
 export type BinanceContextValue = {
@@ -24,14 +27,17 @@ export type BinanceContextValue = {
   miniTickers$: typeof miniTickers$
   txs$: typeof txs$
   resetTx: typeof resetTx
-  pushTx: typeof pushTx
-  sendDepositTx: typeof sendDepositTx
+  subscribeTx: typeof subscribeTx
+  sendTx: typeof sendTx
   txRD$: typeof txRD$
   address$: typeof address$
   explorerUrl$: typeof explorerUrl$
   getExplorerTxUrl$: typeof getExplorerTxUrl$
   fees$: typeof fees$
   ledgerAddress$: typeof ledgerAddress$
+  ledgerTxRD$: typeof ledgerTxRD$
+  pushLedgerTx: typeof pushLedgerTx
+  resetLedgerTx: typeof resetLedgerTx
 }
 
 const initialContext: BinanceContextValue = {
@@ -41,14 +47,17 @@ const initialContext: BinanceContextValue = {
   miniTickers$,
   txs$,
   resetTx,
-  pushTx,
-  sendDepositTx,
+  subscribeTx,
+  sendTx,
   txRD$,
   address$,
   explorerUrl$,
   getExplorerTxUrl$,
   fees$,
-  ledgerAddress$
+  ledgerAddress$,
+  ledgerTxRD$,
+  pushLedgerTx,
+  resetLedgerTx
 }
 
 const BinanceContext = createContext<BinanceContextValue | null>(null)
