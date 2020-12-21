@@ -42,7 +42,7 @@ const sendTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositTxParams
       return depositTxFailure$(`Deposit tx has not been implemented for ETH yet`)
 
     case 'THOR':
-      return THOR.sendDepositTx({ recipient: poolAddress, amount, asset, memo })
+      return THOR.sendTx({ recipient: poolAddress, amount, asset, memo })
 
     case 'GAIA':
       // not available yet
