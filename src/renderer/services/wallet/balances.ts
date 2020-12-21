@@ -6,11 +6,10 @@ import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
-import { map, shareReplay, startWith } from 'rxjs/operators'
 import * as RxOp from 'rxjs/operators'
 
 import { getRuneAsset } from '../../helpers/assetHelper'
-import { eqAssetsWithBalanceRD } from '../../helpers/fp/eq'
+import { eqBalancesRD } from '../../helpers/fp/eq'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { network$ } from '../app/service'
@@ -57,7 +56,7 @@ export const reloadBalances$: Rx.Observable<O.Option<LoadBalancesHandler>> = sel
  * Transforms THOR balances into `ChainBalances`
  */
 const thorChainBalance$: ChainBalance$ = Rx.combineLatest([THOR.address$, THOR.balances$]).pipe(
-  map(([walletAddress, balances]) => ({
+  RxOp.map(([walletAddress, balances]) => ({
     walletType: 'keystore',
     chain: THORChain,
     walletAddress,
@@ -69,7 +68,7 @@ const thorChainBalance$: ChainBalance$ = Rx.combineLatest([THOR.address$, THOR.b
  * Transforms BNB balances into `ChainBalances`
  */
 const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([BNB.address$, BNB.balances$, network$]).pipe(
-  map(([walletAddress, balances, network]) => ({
+  RxOp.map(([walletAddress, balances, network]) => ({
     walletType: 'keystore',
     chain: BNBChain,
     walletAddress,
@@ -84,7 +83,7 @@ const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([BNB.address$, BNB.bala
  * Transforms BTC balances into `ChainBalance`
  */
 const btcChainBalance$: ChainBalance$ = Rx.combineLatest([BTC.address$, BTC.balances$]).pipe(
-  map(([walletAddress, balances]) => ({
+  RxOp.map(([walletAddress, balances]) => ({
     walletType: 'keystore',
     chain: BTCChain,
     walletAddress,
@@ -116,7 +115,7 @@ const btcLedgerChainBalance$: ChainBalance$ = FP.pipe(
       )
     )
   ),
-  shareReplay(1)
+  RxOp.shareReplay(1)
 )
 
 const btcLedgerBalance$ = FP.pipe(
@@ -129,7 +128,7 @@ const btcLedgerBalance$ = FP.pipe(
  */
 // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
 const _ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
-  map(([walletAddress, balancesRD]) => ({
+  RxOp.map(([walletAddress, balancesRD]) => ({
     walletType: 'keystore',
     chain: ETHChain,
     walletAddress,
@@ -147,10 +146,9 @@ export const chainBalances$: ChainBalances$ = Rx.combineLatest([
   thorChainBalance$,
   btcChainBalance$,
   btcLedgerChainBalance$,
-  bnbChainBalance$,
+  bnbChainBalance$
   /* //TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH */
   /* _ethChainBalance$ */
-  bnbChainBalance$
 ])
 
 // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
@@ -160,6 +158,8 @@ const _ethBalances$: WalletBalancesLD = ETH.balances$.pipe(liveData.map((asset) 
  * Transform a list of BalancesLD
  * into a "single" state of `BalancesState`
  * to provide loading / error / data states in a single "state" object
+ *
+ * Note: Empty/zero balances won't be included in this list!!
  */
 export const balancesState$: Observable<BalancesState> = Rx.combineLatest([
   THOR.balances$,
@@ -169,17 +169,16 @@ export const balancesState$: Observable<BalancesState> = Rx.combineLatest([
   // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
   // ethBalances$
 ]).pipe(
-  map((balancesList) => ({
+  RxOp.map((balancesList) => ({
     balances: FP.pipe(
       balancesList,
       // filter results out
-      // Transformation: RD<Error, AssetsWithBalance>`-> `AssetsWithBalance)[]`
+      // Transformation: RD<ApiError, WalletBalances>[]`-> `WalletBalances[]`
       A.filterMap(RD.toOption),
       A.flatten,
       NEA.fromArray
     ),
-    // TODO(@Veado) Update eqAssetsWithBalanceRD
-    loading: FP.pipe(balancesList, A.elem(eqAssetsWithBalanceRD)(RD.pending)),
+    loading: FP.pipe(balancesList, A.elem(eqBalancesRD)(RD.pending)),
     errors: FP.pipe(
       balancesList,
       // filter errors out
@@ -192,5 +191,5 @@ export const balancesState$: Observable<BalancesState> = Rx.combineLatest([
       O.chain(NEA.fromArray)
     )
   })),
-  startWith(INITIAL_BALANCES_STATE)
+  RxOp.startWith(INITIAL_BALANCES_STATE)
 )

@@ -1,6 +1,7 @@
 import React, { createContext, useContext } from 'react'
 
 import {
+  addressByChain$,
   clientByChain$,
   depositFees$,
   reloadDepositFees,
@@ -18,6 +19,7 @@ import {
 } from '../services/chain'
 
 type ChainContextValue = {
+  addressByChain$: typeof addressByChain$
   clientByChain$: typeof clientByChain$
   depositFees$: typeof depositFees$
   reloadDepositFees: typeof reloadDepositFees
@@ -35,6 +37,7 @@ type ChainContextValue = {
 }
 
 const initialContext: ChainContextValue = {
+  addressByChain$,
   clientByChain$,
   depositFees$,
   reloadDepositFees,

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetRuneNative, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import Modal from 'antd/lib/modal/Modal'
 import * as FP from 'fp-ts/lib/function'
@@ -11,6 +11,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 import * as Rx from 'rxjs'
 
+import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import * as AssetHelper from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { emptyFunc } from '../../../helpers/funcHelper'
@@ -37,6 +38,7 @@ type Props = {
   reloadBalancesHandler?: () => void
   loadTxsHandler?: LoadTxsHandler
   walletAddress?: O.Option<Address>
+  runeNativeAddress?: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
   sendTx: (_: SendTxParams) => TxLD
 }
@@ -51,7 +53,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     reloadBalancesHandler = emptyFunc,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
-    walletAddress: oWalletAddress = O.none
+    walletAddress: oWalletAddress = O.none,
+    runeNativeAddress: oRuneNativeAddress = O.none
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -134,16 +137,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [oRuneBnbBalance]
   )
 
-  /**  */
-  const oRuneNativeAddress: O.Option<Address> = useMemo(
-    () =>
-      FP.pipe(
-        getWalletBalanceByAsset(oBalances, O.some(AssetRuneNative)),
-        O.map(({ walletAddress }) => walletAddress)
-      ),
-    [oBalances]
-  )
-
   const runeUpgradeDisabled: boolean = useMemo(
     () =>
       isRuneBnbAsset &&
@@ -162,7 +155,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     (_) =>
       FP.pipe(
         sequenceTOption(oRuneBnbAsset, oRuneBnbAmount, oPoolAddress, oRuneNativeAddress),
-        O.map(([asset, amount, recipient, runeAddress]) => {
+        O.map(([asset, _amount, recipient, runeAddress]) => {
+          // TODO (@Veado): Remove it if we have everything set up for upgrade feature - just for testing
+          const amount = ONE_ASSET_BASE_AMOUNT
           const subscription = sendTx({ recipient, amount, asset, memo: `SWITCH:${runeAddress}` }).subscribe(setBnbTxRD)
           // store subscription
           setBnbTxSub(O.some(subscription))
