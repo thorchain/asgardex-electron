@@ -1,4 +1,4 @@
-import { baseAmount, assetFromString } from '@xchainjs/xchain-util'
+import { baseAmount, assetFromString, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -8,14 +8,22 @@ import { NonEmptyWalletBalances } from '../services/wallet/types'
 import { getAssetAmountByAsset, getBnbAmountFromBalances, getWalletBalanceByAsset } from './walletHelper'
 
 describe('walletHelper', () => {
-  const RUNE_WB = { amount: baseAmount('12300000000'), asset: ASSETS_TESTNET.RUNE }
+  const RUNE_WB = {
+    amount: baseAmount('12300000000'),
+    asset: AssetRuneNative,
+    walletAddress: 'rune native wallet address'
+  }
   const BNB = O.fromNullable(assetFromString('BNB.BNB'))
-  const BOLT_WB = { amount: baseAmount('23400000000'), asset: ASSETS_TESTNET.BOLT }
-  const BNB_WB = { amount: baseAmount('45600000000'), asset: ASSETS_TESTNET.BNB }
+  const BOLT_WB = {
+    amount: baseAmount('23400000000'),
+    asset: ASSETS_TESTNET.BOLT,
+    walletAddress: 'bolt wallet address'
+  }
+  const BNB_WB = { amount: baseAmount('45600000000'), asset: ASSETS_TESTNET.BNB, walletAddress: 'bnb wallet address' }
 
   describe('amountByAsset', () => {
     it('returns amount of RUNE', () => {
-      const result = getAssetAmountByAsset([RUNE_WB, BOLT_WB, BNB_WB], ASSETS_TESTNET.RUNE)
+      const result = getAssetAmountByAsset([RUNE_WB, BOLT_WB, BNB_WB], AssetRuneNative)
       expect(
         FP.pipe(
           result,
@@ -34,7 +42,7 @@ describe('walletHelper', () => {
     })
   })
 
-  describe('getAssetWBByAsset', () => {
+  describe('getWalletBalanceByAsset', () => {
     it('returns amount of BNB', () => {
       const balances: O.Option<NonEmptyWalletBalances> = NEA.fromArray([RUNE_WB, BOLT_WB, BNB_WB])
       const result = O.toNullable(getWalletBalanceByAsset(balances, BNB))

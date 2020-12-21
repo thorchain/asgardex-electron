@@ -33,7 +33,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     selectedAsset
   ])
 
-  const { client$, fees$, txRD$, resetTx, pushTx } = useBinanceContext()
+  const { client$, fees$, txRD$, resetTx, subscribeTx } = useBinanceContext()
 
   const txRD = useObservableState<TxRD>(txRD$, RD.initial)
   const [fee] = useObservableState<O.Option<AssetAmount>>(
@@ -67,7 +67,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     (selectedAssetWalletBalance: WalletBalance) => (
       <SendFormBNB
         balance={selectedAssetWalletBalance}
-        onSubmit={pushTx}
+        onSubmit={subscribeTx}
         balances={FP.pipe(
           oWalletBalances,
           O.getOrElse(() => [] as WalletBalances)
@@ -77,7 +77,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         fee={fee}
       />
     ),
-    [pushTx, oWalletBalances, txRD, addressValidation, fee]
+    [subscribeTx, oWalletBalances, txRD, addressValidation, fee]
   )
 
   return FP.pipe(

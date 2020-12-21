@@ -37,7 +37,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     selectedAsset
   ])
 
-  const { fees$, pushTx, txRD$, client$, resetTx } = useBitcoinContext()
+  const { fees$, subscribeTx, txRD$, client$, resetTx } = useBitcoinContext()
 
   const txRD = useObservableState<TxRD>(txRD$, RD.initial)
   const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
@@ -61,7 +61,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     (assetWB: WalletBalance) => (
       <SendFormBTC
         walletBalance={assetWB}
-        onSubmit={pushTx}
+        onSubmit={subscribeTx}
         balances={FP.pipe(
           oBalances,
           O.getOrElse(() => [] as WalletBalances)
@@ -72,7 +72,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
         feesWithRates={fees}
       />
     ),
-    [pushTx, oBalances, txRD, addressValidation, reloadFeesHandler, fees]
+    [subscribeTx, oBalances, txRD, addressValidation, reloadFeesHandler, fees]
   )
 
   return FP.pipe(

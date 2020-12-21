@@ -43,7 +43,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
 
   const {
     service: {
-      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, poolAddress$ }
+      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, selectedPoolAddress$ }
     }
   } = useMidgardContext()
 
@@ -60,7 +60,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
 
   const [depositFees] = useObservableState(() => depositFees$(type), RD.initial)
   // TODO (@Veado) Use `selectedPoolAddress$` - will be available with one of next PRs
-  const oPoolAddress: O.Option<PoolAddress> = useObservableState(poolAddress$, O.none)
+  const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
   const { balancesState$ } = useWalletContext()
 

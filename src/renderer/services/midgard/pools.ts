@@ -39,7 +39,7 @@ import {
   ThorchainEndpointsLD,
   PoolDetails
 } from './types'
-import { getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
+import { getPoolAddressByChain, getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
 
@@ -361,16 +361,15 @@ const createPoolsService = (
     RxOp.retry(MIDGARD_MAX_RETRY)
   )
 
-  // TODO (@Veado) Does not make sense to get address of first pool
-  // Change `poolAddress$` to `selectedPoolAddress$` by using `selectedAsset$` and `getPoolAddressByChain`
-  const poolAddress$: PoolAddressRx = poolAddresses$.pipe(
-    RxOp.map(
-      FP.flow(
+  const selectedPoolAddress$: PoolAddressRx = combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
+    RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
+      return FP.pipe(
+        poolAddresses,
         RD.toOption,
-        O.chain(A.head),
-        O.mapNullable((head) => head.address)
+        (oPoolAddresses) => sequenceTOption(oPoolAddresses, oSelectedPoolAsset),
+        O.chain(([poolAddresses, selectedPoolAsset]) => getPoolAddressByChain(poolAddresses, selectedPoolAsset.chain))
       )
-    )
+    })
   )
 
   /**
@@ -406,7 +405,7 @@ const createPoolsService = (
     selectedPricePoolAssetSymbol$,
     reloadPools,
     poolAddresses$,
-    poolAddress$,
+    selectedPoolAddress$: selectedPoolAddress$,
     runeAsset$,
     poolDetail$,
     priceRatio$,

@@ -9,7 +9,12 @@ import { TxRD, TxLD, ErrorId } from '../../wallet/types'
 import { XChainClient$ } from '../types'
 
 export const createTransferService = <Client extends XChainClient, T extends XChainClient$<Client>>(client$: T) => {
-  // Create stream per EACH service to avoid possible data merging between different chains
+  /**
+   * State of a tx send by `subscribeTx`
+   *
+   * Note: Creates a state for EACH service
+   * to avoid possible data merging between different chains
+   */
   const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
   /**
@@ -43,14 +48,20 @@ export const createTransferService = <Client extends XChainClient, T extends XCh
       RxOp.startWith(RD.pending)
     )
 
-  const pushTx = (params: TransferParams): Rx.Subscription => tx$(params).subscribe(setTxRD)
+  /**
+   * Sends a tx by given `TransferParams`
+   */
+  const sendTx = (params: TransferParams): TxLD => tx$(params)
 
-  const sendDepositTx = (params: TransferParams): TxLD => tx$(params)
+  /**
+   * Same as `sendTx`, but subscribing the result and store it into state
+   */
+  const subscribeTx = (params: TransferParams): Rx.Subscription => tx$(params).subscribe(setTxRD)
 
   return {
     txRD$,
-    pushTx,
-    resetTx: () => setTxRD(RD.initial),
-    sendDepositTx
+    subscribeTx,
+    sendTx,
+    resetTx: () => setTxRD(RD.initial)
   }
 }

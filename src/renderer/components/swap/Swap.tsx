@@ -32,7 +32,7 @@ import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/binance/types'
 import { SwapFeesRD } from '../../services/chain/types'
-import { PoolDetails } from '../../services/midgard/types'
+import { PoolAddress, PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { NonEmptyWalletBalances } from '../../services/wallet/types'
 import { TxStatus, TxTypes } from '../../types/asgardex'
@@ -62,6 +62,7 @@ type SwapProps = {
   PasswordConfirmation: React.FC<{ onSuccess: () => void; onClose: () => void }>
   reloadFees?: () => void
   fees?: SwapFeesRD
+  poolAddress?: O.Option<PoolAddress>
 }
 
 export const Swap = ({
@@ -77,7 +78,8 @@ export const Swap = ({
   activePricePool,
   PasswordConfirmation,
   reloadFees,
-  fees: feesProp = RD.initial
+  fees: feesProp = RD.initial,
+  poolAddress = O.none
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
@@ -375,15 +377,15 @@ export const Swap = ({
 
   const onPasswordValidationSucceed = useCallback(() => {
     FP.pipe(
-      assetsToSwap,
+      sequenceTOption(assetsToSwap, poolAddress),
       // eslint-disable-next-line  array-callback-return
-      O.map(([sourceAsset, targetAsset]) => {
-        const memo = getSwapMemo({ asset: targetAsset })
+      O.map(([[sourceAsset, targetAsset], poolAddress]) => {
+        const memo = getSwapMemo({ asset: targetAsset, address: poolAddress })
         closePrivateModal()
         onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
       })
     )
-  }, [assetsToSwap, onConfirmSwap, changeAmount, closePrivateModal])
+  }, [assetsToSwap, onConfirmSwap, changeAmount, closePrivateModal, poolAddress])
 
   const sourceChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
     () =>

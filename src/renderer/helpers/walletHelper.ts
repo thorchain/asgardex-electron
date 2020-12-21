@@ -32,7 +32,7 @@ export const getWalletBalanceByAsset = (
     O.chain(([walletBalances, asset]) =>
       FP.pipe(
         walletBalances,
-        A.findFirst(({ asset: assetInList }) => assetInList.symbol === asset.symbol)
+        A.findFirst(({ asset: assetInList }) => eqAsset.equals(assetInList, asset))
       )
     )
   )
