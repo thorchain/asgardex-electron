@@ -1,6 +1,5 @@
 import { join } from 'path'
 
-import { LedgerTxInfo } from '@xchainjs/xchain-bitcoin'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
@@ -10,10 +9,10 @@ import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
 
-import { Network } from '../shared/api/types'
+import { LedgerTxInfo, Network } from '../shared/api/types'
 import { Locale } from '../shared/i18n/types'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist } from './api/keystore'
-import { getLedgerAddress, signTxInLedger } from './api/ledger'
+import { getLedgerAddress, sendTxInLedger, signTxInLedger } from './api/ledger'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
@@ -129,6 +128,9 @@ const initIPC = () => {
   )
   ipcMain.handle(IPCMessages.SIGN_LEDGER_TX, (_, chain: Chain, network: Network, ledgerTxInfo: LedgerTxInfo) =>
     signTxInLedger(chain, network, ledgerTxInfo)
+  )
+  ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, chain: Chain, network: Network, ledgerTxInfo: LedgerTxInfo) =>
+    sendTxInLedger(chain, network, ledgerTxInfo)
   )
 }
 

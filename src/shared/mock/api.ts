@@ -51,5 +51,6 @@ export const apiUrl: ApiUrl = {
 // Mock `apiHDWallet`
 export const apiHDWallet: ApiHDWallet = {
   getLedgerAddress: () => Promise.resolve(E.right('ledger_address')),
-  signTxInLedger: () => Promise.resolve(E.right('signed_tx'))
+  signTxInLedger: () => Promise.resolve(E.right('signed_tx')),
+  sendTxInLedger: () => Promise.resolve(E.right('tx_hash'))
 }

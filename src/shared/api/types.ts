@@ -1,5 +1,5 @@
-import { LedgerTxInfo } from '@xchainjs/xchain-bitcoin'
-import { Address } from '@xchainjs/xchain-client'
+import { LedgerTxInfo as LedgerBTCTxInfo } from '@xchainjs/xchain-bitcoin'
+import { Address, TxParams } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
@@ -32,9 +32,16 @@ export enum LedgerErrorId {
   UNKNOWN
 }
 
+export type LedgerBNCTxInfo = TxParams & {
+  sender: Address
+}
+
+export type LedgerTxInfo = LedgerBTCTxInfo | LedgerBNCTxInfo
+
 export type ApiHDWallet = {
   getLedgerAddress: (chain: Chain, network: Network) => Promise<Either<LedgerErrorId, Address>>
   signTxInLedger: (chain: Chain, network: Network, ledgerTxInfo: LedgerTxInfo) => Promise<Either<LedgerErrorId, string>>
+  sendTxInLedger: (chain: Chain, network: Network, ledgerTxInfo: LedgerTxInfo) => Promise<Either<LedgerErrorId, string>>
 }
 
 declare global {
