@@ -159,7 +159,7 @@ const _ethBalances$: WalletBalancesLD = ETH.balances$.pipe(liveData.map((asset) 
  * into a "single" state of `BalancesState`
  * to provide loading / error / data states in a single "state" object
  *
- * Note: Empty/zero balances won't be included in this list!!
+ * Note: Empty list of balances won't be included in `BalancesState`!!
  */
 export const balancesState$: Observable<BalancesState> = Rx.combineLatest([
   THOR.balances$,

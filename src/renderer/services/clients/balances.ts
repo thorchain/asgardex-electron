@@ -18,7 +18,8 @@ import { WalletBalancesLD, XChainClient$ } from './types'
  *
  * If `address` is not set, it tries to get `Address` of `Client` (which can fail).
  *
- * Empty / zero balances won't be included
+ * Empty list of balances returned by client will be ignored and not part of `WalletBalances`
+ *
  */
 const loadBalances$ = ({
   client,

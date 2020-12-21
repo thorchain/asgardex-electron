@@ -10,6 +10,7 @@ import * as ETH from '../ethereum'
 import * as THOR from '../thorchain'
 import { client$ } from './client'
 
+// TODO (@veado | @thatStrangeGuyThorchain) Think about returning `Address` of other wallets (Ledger), too
 const addressByChain$ = (chain: Chain): Address$ => {
   switch (chain) {
     case BNBChain:
