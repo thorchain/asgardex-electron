@@ -1,6 +1,6 @@
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { LedgerTxInfo as LedgerBTCTxInfo } from '@xchainjs/xchain-bitcoin'
-import { Chain } from '@xchainjs/xchain-util'
+import { BNBChain, BTCChain, Chain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { LedgerBNCTxInfo, LedgerErrorId, LedgerTxInfo, Network } from '../../../shared/api/types'
@@ -13,10 +13,10 @@ export const getLedgerAddress = async (chain: Chain, network: Network) => {
     const transport = await TransportNodeHid.open('')
     let res
     switch (chain) {
-      case 'BNB':
+      case BNBChain:
         res = await getBNBAddress(transport, network)
         break
-      case 'BTC':
+      case BTCChain:
         res = await getBTCAddress(transport, network)
         break
       default:
@@ -36,9 +36,9 @@ export const signTxInLedger = async (
 ): Promise<E.Either<LedgerErrorId, string>> => {
   try {
     const transport = await TransportNodeHid.open('')
-    let res
+    let res: E.Either<LedgerErrorId, string>
     switch (chain) {
-      case 'BTC':
+      case BTCChain:
         res = await signBTCTxInLedger(transport, network, ledgerTxInfo as LedgerBTCTxInfo)
         break
       default:
@@ -58,9 +58,9 @@ export const sendTxInLedger = async (
 ): Promise<E.Either<LedgerErrorId, string>> => {
   try {
     const transport = await TransportNodeHid.open('')
-    let res
+    let res: E.Either<LedgerErrorId, string>
     switch (chain) {
-      case 'BNB':
+      case BNBChain:
         res = await sendBNCTxInLedger(transport, network, ledgerTxInfo as LedgerBNCTxInfo)
         break
       default:
