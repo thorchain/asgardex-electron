@@ -148,7 +148,7 @@ export type PoolsService = {
   selectedPricePoolAssetSymbol$: Rx.Observable<O.Option<string>>
   reloadPools: () => void
   poolAddresses$: ThorchainEndpointsLD
-  poolAddress$: PoolAddressRx
+  selectedPoolAddress$: PoolAddressRx
   runeAsset$: Rx.Observable<Asset>
   poolDetail$: PoolDetailLD
   priceRatio$: Rx.Observable<BigNumber>
