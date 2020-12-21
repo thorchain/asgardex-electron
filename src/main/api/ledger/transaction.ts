@@ -4,7 +4,7 @@ import * as E from 'fp-ts/Either'
 
 import { LedgerBNCTxInfo, LedgerBTCTxInfo, LedgerErrorId, LedgerTxInfo, Network } from '../../../shared/api/types'
 import { sendTx as sendBNCTx } from './binance'
-import { sendTx as signBTCTx } from './bitcoin'
+import { sendTx as sendBTCTx } from './bitcoin'
 import { getErrorId } from './utils'
 
 export const sendTx = async (
@@ -20,7 +20,7 @@ export const sendTx = async (
         res = await sendBNCTx(transport, network, txInfo as LedgerBNCTxInfo)
         break
       case BTCChain:
-        res = await signBTCTx(transport, network, txInfo as LedgerBTCTxInfo)
+        res = await sendBTCTx(transport, network, txInfo as LedgerBTCTxInfo)
         break
       default:
         res = E.left(LedgerErrorId.NO_APP)
