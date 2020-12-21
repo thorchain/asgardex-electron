@@ -91,11 +91,6 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => {
-    console.log('ADV oBalances:', oBalances)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [oBalances])
-
   /**
    * Need to filter balances only for appropriate wallet
    * as AssetDetails uses just A.findFirst by asset and
