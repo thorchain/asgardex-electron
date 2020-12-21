@@ -4,6 +4,7 @@ import { Form } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { Input } from '../../uielements/input'
+import { Label } from '../../uielements/label'
 import * as Styled from './PrivateModal.style'
 
 type Props = {
@@ -65,7 +66,9 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
             autoComplete="off"
           />
           {invalidPassword && (
-            <div className="ant-form-explain">{intl.formatMessage({ id: 'wallet.password.confirmation.error' })}!</div>
+            <Label color="error" textTransform="capitalize">
+              {intl.formatMessage({ id: 'wallet.password.confirmation.error' })}!
+            </Label>
           )}
         </Form.Item>
       </Form>

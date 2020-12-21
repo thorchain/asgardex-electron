@@ -12,7 +12,7 @@ import { CalcResult } from './SwapModal.types'
 storiesOf('Components/Swap Modal', module).add('default', () => {
   const txStatus: TxStatus = {
     modal: true,
-    value: 75,
+    value: 25,
     status: true,
     type: TxTypes.SWAP,
     startTime: Date.now(),

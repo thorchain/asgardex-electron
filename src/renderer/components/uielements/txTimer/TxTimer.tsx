@@ -9,7 +9,7 @@ import * as Styled from './TxTimer.style'
 
 import 'react-circular-progressbar/dist/styles.css'
 
-type Props = {
+export type Props = {
   className?: string
   interval?: number
   maxSec?: number
@@ -48,7 +48,7 @@ export const TxTimer: React.FC<Props> = (props): JSX.Element => {
       return true
     }
     return value >= maxValue
-  }, [maxSec, value, maxValue, totalDuration])
+  }, [maxSec, maxValue, totalDuration, value])
 
   // Callback for counting
   const countHandler = useCallback(() => {
@@ -97,26 +97,31 @@ export const TxTimer: React.FC<Props> = (props): JSX.Element => {
     totalDuration < 10 ? Number(totalDuration).toFixed(1) : Math.round(totalDuration).toString()
 
   return (
-    <Styled.TxTimerWrapper className={`txTimer-wrapper ${className}`}>
-      <div className="timerchart-icon">
-        {!active && <div className="confirm-icon">{!refunded ? <Styled.SuccessIcon /> : <RefundIcon />}</div>}
-      </div>
-      {active && (
-        <CircularProgressbar
-          className={CircularProgressbarStyle}
-          value={value}
-          text={`${totalDurationString}s`}
-          strokeWidth={7}
-          counterClockwise
-          styles={buildStyles({
-            textColor: theme.dark.palette.primary[0],
-            textSize: '14px',
-            pathColor: theme.dark.palette.primary[0],
-            trailColor: theme.dark.palette.background[2],
-            pathTransition: 'stroke-dashoffset 0.5s linear 0s'
-          })}
-        />
-      )}
-    </Styled.TxTimerWrapper>
+    <>
+      <div>active: {active.toString()}</div>
+      <div>totalDuration: {totalDuration}</div>
+      <div>isEnd: {isEnd().toString()}</div>
+      <Styled.TxTimerWrapper className={`txTimer-wrapper ${className}`}>
+        <div className="timerchart-icon">
+          {!active && <Styled.IconWrapper>{!refunded ? <Styled.SuccessIcon /> : <RefundIcon />}</Styled.IconWrapper>}
+        </div>
+        {active && (
+          <CircularProgressbar
+            className={CircularProgressbarStyle}
+            value={value}
+            text={`${totalDurationString}s`}
+            strokeWidth={7}
+            counterClockwise
+            styles={buildStyles({
+              textColor: theme.dark.palette.primary[0] || '#23DCC8',
+              textSize: '14px',
+              pathColor: theme.dark.palette.primary[0] || '#23DCC8',
+              trailColor: 'rgba(242, 243, 243, 0.5)',
+              pathTransition: 'stroke-dashoffset 0.5s linear 0s'
+            })}
+          />
+        )}
+      </Styled.TxTimerWrapper>
+    </>
   )
 }

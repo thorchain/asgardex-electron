@@ -52,7 +52,10 @@ const wallet: WalletMessages = {
   'wallet.errors.invalidChain': 'Цепь недействительна',
   'wallet.password.confirmation': 'Подтверждение пароля',
   'wallet.password.confirmation.pending': 'Проверка пароля',
-  'wallet.password.confirmation.error': 'Неверный пароль'
+  'wallet.password.confirmation.error': 'Неверный пароль',
+  'wallet.upgrade.pending': 'You are upgrading - RU',
+  'wallet.upgrade.success': 'You have been upgraded successfull - RU',
+  'wallet.upgrade.error': 'Error while upgrading - RU'
 }
 
 export default wallet
