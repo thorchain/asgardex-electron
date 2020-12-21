@@ -5,6 +5,7 @@ import * as Rx from 'rxjs'
 
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
+import * as THOR from '../thorchain'
 import { ErrorId, TxLD } from '../wallet/types'
 import { SendDepositTxParams } from './types'
 
@@ -41,8 +42,7 @@ const sendTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositTxParams
       return depositTxFailure$(`Deposit tx has not been implemented for ETH yet`)
 
     case 'THOR':
-      // not available yet
-      return depositTxFailure$(`Deposit tx has not been implemented for Thorchain yet`)
+      return THOR.sendDepositTx({ recipient: poolAddress, amount, asset, memo })
 
     case 'GAIA':
       // not available yet
