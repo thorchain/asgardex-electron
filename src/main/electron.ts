@@ -12,7 +12,7 @@ import { warn } from 'electron-log'
 import { LedgerTxInfo, Network } from '../shared/api/types'
 import { Locale } from '../shared/i18n/types'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist } from './api/keystore'
-import { getLedgerAddress, sendTxInLedger, signTxInLedger } from './api/ledger'
+import { getAddress, sendTx, signTx } from './api/ledger'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
@@ -123,14 +123,12 @@ const initIPC = () => {
   ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, () => removeKeystore())
   ipcMain.handle(IPCMessages.GET_KEYSTORE, () => getKeystore())
   ipcMain.handle(IPCMessages.KEYSTORE_EXIST, () => keystoreExist())
-  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, (_, chain: Chain, network: Network) =>
-    getLedgerAddress(chain, network)
-  )
+  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, (_, chain: Chain, network: Network) => getAddress(chain, network))
   ipcMain.handle(IPCMessages.SIGN_LEDGER_TX, (_, chain: Chain, network: Network, ledgerTxInfo: LedgerTxInfo) =>
-    signTxInLedger(chain, network, ledgerTxInfo)
+    signTx(chain, network, ledgerTxInfo)
   )
   ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, chain: Chain, network: Network, ledgerTxInfo: LedgerTxInfo) =>
-    sendTxInLedger(chain, network, ledgerTxInfo)
+    sendTx(chain, network, ledgerTxInfo)
   )
 }
 
