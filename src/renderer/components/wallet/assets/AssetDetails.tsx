@@ -1,12 +1,15 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
+import Modal from 'antd/lib/modal/Modal'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
+import * as Rx from 'rxjs'
 
 import * as AssetHelper from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
@@ -18,7 +21,7 @@ import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { PoolAddress } from '../../../services/midgard/types'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
-import { LoadTxsHandler, NonEmptyWalletBalances } from '../../../services/wallet/types'
+import { LoadTxsHandler, NonEmptyWalletBalances, TxLD, TxRD } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
@@ -35,12 +38,12 @@ type Props = {
   loadTxsHandler?: LoadTxsHandler
   walletAddress?: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
-  upgradeRuneHandler: (_: SendTxParams) => void
+  sendTx: (_: SendTxParams) => TxLD
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
-    upgradeRuneHandler,
+    sendTx,
     txsPageRD,
     balances: oBalances,
     asset: oAsset,
@@ -52,6 +55,22 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
+
+  // (Possible) subscription of upgrade tx
+  const [bnbTxSub, setBnbTxSub] = useState<O.Option<Rx.Subscription>>(O.none)
+  // State of upgrade tx
+  const [bnbTxRD, setBnbTxRD] = useState<TxRD>(RD.initial)
+
+  // unsubscribe of possible previous subscription of upgrade tx
+  // It will be called whenever state of `bnbTxSub` changed
+  useEffect(() => {
+    return () => {
+      FP.pipe(
+        bnbTxSub,
+        O.map((sub) => sub.unsubscribe())
+      )
+    }
+  }, [bnbTxSub])
 
   const oAssetAsString: O.Option<string> = useMemo(() => FP.pipe(oAsset, O.map(assetToString)), [oAsset])
 
@@ -119,13 +138,10 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const oRuneNativeAddress: O.Option<Address> = useMemo(
     () =>
       FP.pipe(
-        oAsset,
-        // ignore other assets than RuneNative
-        O.filter(AssetHelper.isRuneNativeAsset),
-        O.chain((runeNativeAsset) => getWalletBalanceByAsset(oBalances, O.some(runeNativeAsset))),
+        getWalletBalanceByAsset(oBalances, O.some(AssetRuneNative)),
         O.map(({ walletAddress }) => walletAddress)
       ),
-    [oAsset, oBalances]
+    [oBalances]
   )
 
   const runeUpgradeDisabled: boolean = useMemo(
@@ -133,10 +149,10 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       isRuneBnbAsset &&
       FP.pipe(
         oRuneBnbAmount,
-        O.map((amount) => amount.amount().isLessThanOrEqualTo(0)),
+        O.map((amount) => amount.amount().isLessThanOrEqualTo(0) || RD.isPending(bnbTxRD)),
         O.getOrElse<boolean>(() => true)
       ),
-    [isRuneBnbAsset, oRuneBnbAmount]
+    [bnbTxRD, isRuneBnbAsset, oRuneBnbAmount]
   )
 
   const actionColSpanDesktop = isRuneBnbAsset ? 8 : 12
@@ -147,8 +163,10 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         sequenceTOption(oRuneBnbAsset, oRuneBnbAmount, oPoolAddress, oRuneNativeAddress),
         O.map(([asset, amount, recipient, runeAddress]) => {
-          console.log('upgradeRuneHandler', recipient, amount, asset, runeAddress)
-          upgradeRuneHandler({ recipient, amount, asset, memo: `SWITCH:${runeAddress}` })
+          const subscription = sendTx({ recipient, amount, asset, memo: `SWITCH:${runeAddress}` }).subscribe(setBnbTxRD)
+          // store subscription
+          setBnbTxSub(O.some(subscription))
+
           return true
         }),
         O.getOrElse(() => {
@@ -156,12 +174,39 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           return false
         })
       ),
-    [oPoolAddress, oRuneBnbAmount, oRuneBnbAsset, oRuneNativeAddress, upgradeRuneHandler]
+    [oPoolAddress, oRuneBnbAmount, oRuneBnbAsset, oRuneNativeAddress, sendTx]
+  )
+
+  const closeModal = useCallback(() => {
+    setBnbTxSub(O.none)
+    setBnbTxRD(RD.initial)
+  }, [])
+
+  // TODO(@Veado) Build custom UI for Modal (tx timer etc.)
+  const renderTxModal = useMemo(
+    () => (
+      <Modal visible={!RD.isInitial(bnbTxRD)} title="Upgrade tx" onOk={closeModal} onCancel={closeModal}>
+        {FP.pipe(
+          bnbTxRD,
+          RD.fold(
+            () => <>initial</>,
+            () => <>progress ...</>,
+            ({ errorId, msg }) => (
+              <>
+                Error {errorId} / {msg}
+              </>
+            ),
+            (txHash) => <>txHash {txHash}</>
+          )
+        )}
+      </Modal>
+    ),
+    [bnbTxRD, closeModal]
   )
 
   return (
     <>
-      <div>{JSON.stringify(isRuneBnbAsset)}</div>
+      {renderTxModal}
       <Row justify="space-between">
         <Col>
           <BackLink path={walletRoutes.assets.path()} />
@@ -197,7 +242,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
                     sizevalue="xnormal"
                     color="warning"
                     onClick={upgradeRune}
-                    disabled={runeUpgradeDisabled}>
+                    disabled={runeUpgradeDisabled}
+                    loading={RD.isPending(bnbTxRD)}>
                     {intl.formatMessage({ id: 'wallet.action.upgrade' })}
                   </Button>
                 </Row>
