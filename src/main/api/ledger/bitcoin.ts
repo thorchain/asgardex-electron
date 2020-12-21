@@ -3,10 +3,10 @@ import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { getDerivePath, LedgerTxInfo } from '@xchainjs/xchain-bitcoin'
 import * as E from 'fp-ts/Either'
 
-import { LedgerErrorId, Network } from '../../../../shared/api/types'
-import { getErrorId } from '../utils'
+import { LedgerErrorId, Network } from '../../../shared/api/types'
+import { getErrorId } from './utils'
 
-export const getBTCAddress = async (transport: TransportNodeHid, network: Network) => {
+export const getAddress = async (transport: TransportNodeHid, network: Network) => {
   try {
     const ledgerApp = new LedgerAppBTC(transport)
     const derive_path = getDerivePath(0)
@@ -20,7 +20,7 @@ export const getBTCAddress = async (transport: TransportNodeHid, network: Networ
   }
 }
 
-export const signBTCTxInLedger = async (
+export const signTx = async (
   transport: TransportNodeHid,
   network: Network,
   ledgerTxInfo: LedgerTxInfo

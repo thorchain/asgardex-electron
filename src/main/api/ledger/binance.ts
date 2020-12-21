@@ -6,10 +6,10 @@ import { TxHash } from '@xchainjs/xchain-client'
 import { AssetBNB, baseToAsset } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
-import { LedgerBNCTxInfo, LedgerErrorId, Network } from '../../../../shared/api/types'
-import { getErrorId } from '../utils'
+import { LedgerBNCTxInfo, LedgerErrorId, Network } from '../../../shared/api/types'
+import { getErrorId } from './utils'
 
-export const getBNBAddress = async (transport: TransportNodeHid, network: Network) => {
+export const getAddress = async (transport: TransportNodeHid, network: Network) => {
   try {
     const ledgerApp = new LedgerAppBNB(transport)
     const derive_path = getDerivePath(0)
@@ -26,7 +26,7 @@ export const getBNBAddress = async (transport: TransportNodeHid, network: Networ
   }
 }
 
-export const sendBNCTxInLedger = async (
+export const sendTx = async (
   transport: TransportNodeHid,
   network: Network,
   ledgerTxInfo: LedgerBNCTxInfo
