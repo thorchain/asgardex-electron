@@ -1,4 +1,4 @@
-import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, baseAmount } from '@xchainjs/xchain-util'
+import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
 import { some, none } from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -192,7 +192,7 @@ describe('services/wallet/util/', () => {
             asset: ASSETS_TESTNET.BNB
           },
           {
-            asset: ASSETS_TESTNET.RUNE
+            asset: AssetRuneNative
           }
         ] as WalletBalances)
       ).toEqual(
