@@ -17,7 +17,8 @@ import {
   swapFees$,
   sendTx,
   txRD$,
-  resetTx
+  resetTx,
+  getExplorerUrlByAsset$
 } from '../services/chain'
 
 type ChainContextValue = {
@@ -38,6 +39,7 @@ type ChainContextValue = {
   sendTx: typeof sendTx
   txRD$: typeof txRD$
   resetTx: typeof resetTx
+  getExplorerUrlByAsset$: typeof getExplorerUrlByAsset$
 }
 
 const initialContext: ChainContextValue = {
@@ -57,7 +59,8 @@ const initialContext: ChainContextValue = {
   swapFees$,
   sendTx,
   txRD$,
-  resetTx
+  resetTx,
+  getExplorerUrlByAsset$
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 

@@ -63,4 +63,9 @@ const client$: Client$ = clientState$.pipe(map(getClient), shareReplay(1))
  */
 const address$: C.Address$ = C.address$(client$)
 
-export { client$, clientState$, address$ }
+/**
+ * Explorer url depending on selected network
+ */
+const getExplorerTxUrl$: C.GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
+
+export { client$, clientState$, address$, getExplorerTxUrl$ }

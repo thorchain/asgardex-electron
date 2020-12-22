@@ -1,5 +1,6 @@
 import { clientByChain$ } from './client'
 import { isCrossChainDeposit$ } from './common'
+import { getExplorerUrlByAsset$ } from './explorerUrl'
 import {
   reloadDepositFees,
   depositFees$,
@@ -33,5 +34,6 @@ export {
   swapFees$,
   sendTx,
   txRD$,
-  resetTx
+  resetTx,
+  getExplorerUrlByAsset$
 }

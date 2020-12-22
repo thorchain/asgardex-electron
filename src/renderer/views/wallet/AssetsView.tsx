@@ -8,8 +8,7 @@ import { useHistory } from 'react-router-dom'
 import { AssetsTableCollapsable } from '../../components/wallet/assets/AssetsTableCollapsable'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import {} from '../../helpers/assetHelper'
-import { getDefaultRunePricePool } from '../../helpers/poolHelper'
+import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import * as walletRoutes from '../../routes/wallet'
 import { ChainBalances } from '../../services/wallet/types'
 
@@ -27,7 +26,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
 
   const poolsRD = useObservableState(poolsState$, RD.pending)
 
-  const selectedPricePool = useObservableState(selectedPricePool$, getDefaultRunePricePool())
+  const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const selectAssetHandler = useCallback(
     (asset: Asset, walletAddress: string) =>

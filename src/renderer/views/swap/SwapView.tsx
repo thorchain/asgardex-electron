@@ -16,7 +16,6 @@ import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
 import { BackLink } from '../../components/uielements/backLink'
 import { Button } from '../../components/uielements/button'
-import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -42,8 +41,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     getTransactionState$,
     setSelectedPoolAsset
   } = midgardService
-  const { reloadSwapFees, swapFees$, txRD$, sendTx: subscribeTx, resetTx } = useChainContext()
-  const { explorerUrl$ } = useBinanceContext()
+  const { reloadSwapFees, swapFees$, txRD$, sendTx: subscribeTx, resetTx, getExplorerUrlByAsset$ } = useChainContext()
   const { balancesState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
   const poolAddress = useObservableState(selectedPoolAddress$, O.none)
@@ -59,6 +57,13 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       setSelectedPoolAsset(O.none)
     }
   }, [oTarget, setSelectedPoolAsset])
+
+  // Reset all common data on SwapView unmount
+  useEffect(() => {
+    return () => {
+      resetTx()
+    }
+  }, [])
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
@@ -107,13 +112,14 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     [poolAddress, subscribeTx]
   )
 
-  const explorerUrl = useObservableState(explorerUrl$, O.none)
+  const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [source])
+  const explorerUrl = useObservableState(getExplorerUrl$, O.none)
 
   const goToTransaction = useCallback(
     (txHash: string) => {
       FP.pipe(
         explorerUrl,
-        O.map((url) => window.apiUrl.openExternal(`${url}/tx/${txHash}`))
+        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
       )
     },
     [explorerUrl]

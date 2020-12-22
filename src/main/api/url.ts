@@ -6,6 +6,7 @@ import { ApiUrl } from '../../shared/api/types'
 
 const EXTERNALS_WHITELIST = [
   'thorchain.org',
+  'thorchain.net',
   'docs.thorchain.org',
   't.me',
   'twitter.com',

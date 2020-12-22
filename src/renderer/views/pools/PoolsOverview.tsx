@@ -11,22 +11,19 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error/'
 import { AssetIcon } from '../../components/uielements/assets/assetIcon'
 import { Button } from '../../components/uielements/button'
 import { Label } from '../../components/uielements/label'
 import { Table } from '../../components/uielements/table'
 import { Trend } from '../../components/uielements/trend'
-import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
-import { getDefaultRunePricePool, getPoolTableRowsData, sortByDepth } from '../../helpers/poolHelper'
+import { getPoolTableRowsData, RUNE_PRICE_POOL, sortByDepth } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as depositRoutes from '../../routes/deposit'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
-import { DEFAULT_NETWORK } from '../../services/const'
 import { PendingPoolsState, PoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
@@ -36,8 +33,6 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
-  const { network$ } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
   const { service: midgardService } = useMidgardContext()
   const {
     thorchainLastblockState$,
@@ -70,7 +65,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
 
-  const selectedPricePool = useObservableState(selectedPricePool$, getDefaultRunePricePool())
+  const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const getSwapPath = swapRoutes.swap.path
   const clickSwapHandler = useCallback(
@@ -392,8 +387,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
           ({ poolDetails }: PoolsState): JSX.Element => {
             const poolViewData = getPoolTableRowsData({
               poolDetails,
-              pricePoolData: selectedPricePool.poolData,
-              network
+              pricePoolData: selectedPricePool.poolData
             })
             previousPools.current = some(poolViewData)
             return renderPoolsTable(poolViewData)
@@ -401,7 +395,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
         )(poolsRD)}
       </>
     ),
-    [network, poolsRD, renderPoolsTable, renderRefreshBtn, selectedPricePool.poolData]
+    [poolsRD, renderPoolsTable, renderRefreshBtn, selectedPricePool.poolData]
   )
 
   const renderBtnPendingPoolsColumn = useCallback(
@@ -490,8 +484,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
           ({ poolDetails }: PendingPoolsState): JSX.Element => {
             const poolViewData = getPoolTableRowsData({
               poolDetails,
-              pricePoolData: selectedPricePool.poolData,
-              network
+              pricePoolData: selectedPricePool.poolData
             })
             previousPendingPools.current = some(poolViewData)
             return renderPendingPoolsTable(poolViewData)
@@ -499,7 +492,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
         )(pendingPoolsRD)}
       </>
     ),
-    [pendingPoolsRD, renderPendingPoolsTable, selectedPricePool.poolData, network]
+    [pendingPoolsRD, renderPendingPoolsTable, selectedPricePool.poolData]
   )
 
   return (
