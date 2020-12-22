@@ -3765,13 +3765,6 @@
   dependencies:
     "@babel/runtime" "^7.10.2"
 
-"@thorchain/asgardex-ethereum@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-ethereum/-/asgardex-ethereum-0.2.0.tgz#11de1986eaace3d36cdfbae80bde908071e271e8"
-  integrity sha512-WoWL/ZkFSp0JzgrfdIt19qCJwwfUn+t4KUmpQ1VOV49+mtKqECCBG8JM87ckGMgBz4o/f5bAakSDfwMlvA4wlw==
-  dependencies:
-    bip39 "^3.0.2"
-
 "@thorchain/asgardex-midgard@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@thorchain/asgardex-midgard/-/asgardex-midgard-1.1.0.tgz#d5ae6e7786b7cbdfa32b3c494a491d03ed1d89ff"
@@ -4747,6 +4740,16 @@
     foundry-primitives "^0.2.1"
     hdkey "^2.0.1"
     uuid "^8.1.0"
+
+"@xchainjs/xchain-ethereum@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.3.0.tgz#230faaa1862776c9ca7cbb206443dcf5bd683c53"
+  integrity sha512-VW+AFxJev0dem85UnGXjB1pXXNYwBfeFFV8ihWImj/vIi4fme9roRmNUDJ9YeEuefQZXskKSTXdDExH5XslvHg==
+  dependencies:
+    "@xchainjs/xchain-client" "^0.2.0"
+    "@xchainjs/xchain-crypto" "^0.2.2"
+    "@xchainjs/xchain-util" "^0.2.0"
+    axios "^0.21.0"
 
 "@xchainjs/xchain-polkadot@^0.2.0":
   version "0.2.0"
