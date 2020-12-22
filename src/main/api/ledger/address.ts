@@ -10,7 +10,7 @@ import { getErrorId } from './utils'
 export const getAddress = async (chain: Chain, network: Network) => {
   try {
     const transport = await TransportNodeHid.open('')
-    let res
+    let res: E.Either<LedgerErrorId, string>
     switch (chain) {
       case BNBChain:
         res = await getBNBAddress(transport, network)

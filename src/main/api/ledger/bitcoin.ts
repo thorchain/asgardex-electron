@@ -1,16 +1,16 @@
-import LedgerAppBTC from '@ledgerhq/hw-app-btc'
+import AppBTC from '@ledgerhq/hw-app-btc'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
-import { getDerivePath, LedgerTxInfo } from '@xchainjs/xchain-bitcoin'
+import { broadcastTx, createTxInfo, getDerivePath } from '@xchainjs/xchain-bitcoin'
 import * as E from 'fp-ts/Either'
 
-import { LedgerErrorId, Network } from '../../../shared/api/types'
+import { LedgerBTCTxInfo, LedgerErrorId, Network } from '../../../shared/api/types'
 import { getErrorId } from './utils'
 
 export const getAddress = async (transport: TransportNodeHid, network: Network) => {
   try {
-    const ledgerApp = new LedgerAppBTC(transport)
+    const app = new AppBTC(transport)
     const derive_path = getDerivePath(0)
-    const info = await ledgerApp.getWalletPublicKey(network === 'testnet' ? derive_path.testnet : derive_path.mainnet, {
+    const info = await app.getWalletPublicKey(network === 'testnet' ? derive_path.testnet : derive_path.mainnet, {
       format: 'bech32'
     })
 
@@ -20,23 +20,27 @@ export const getAddress = async (transport: TransportNodeHid, network: Network) 
   }
 }
 
-export const signTx = async (
+export const sendTx = async (
   transport: TransportNodeHid,
   network: Network,
-  ledgerTxInfo: LedgerTxInfo
+  txInfo: LedgerBTCTxInfo
 ): Promise<E.Either<LedgerErrorId, string>> => {
   try {
-    const ledgerApp = new LedgerAppBTC(transport)
+    const app = new AppBTC(transport)
     const derive_path = getDerivePath(0)
-    const txs = ledgerTxInfo.utxos.map((utxo) => {
+    const { utxos, newTxHex } = await createTxInfo({
+      ...txInfo,
+      network: network === 'testnet' ? 'testnet' : 'mainnet'
+    })
+    const txs = utxos.map((utxo) => {
       return {
-        tx: ledgerApp.splitTransaction(utxo.txHex, true),
+        tx: app.splitTransaction(utxo.txHex, true),
         ...utxo
       }
     })
-    const newTx = ledgerApp.splitTransaction(ledgerTxInfo.newTxHex, true)
-    const outputScriptHex = ledgerApp.serializeTransactionOutputs(newTx).toString('hex')
-    const txHex = await ledgerApp.createPaymentTransactionNew({
+    const newTx = app.splitTransaction(newTxHex, true)
+    const outputScriptHex = app.serializeTransactionOutputs(newTx).toString('hex')
+    const txHex = await app.createPaymentTransactionNew({
       inputs: txs.map((utxo) => {
         return [utxo.tx, utxo.index, null, null]
       }),
@@ -45,8 +49,9 @@ export const signTx = async (
       segwit: true,
       additionals: ['bitcoin', 'bech32']
     })
+    const txHash = await broadcastTx({ txHex, nodeUrl: txInfo.nodeUrl, nodeApiKey: txInfo.nodeApiKey })
 
-    return E.right(txHex)
+    return E.right(txHash)
   } catch (error) {
     return E.left(getErrorId(error.toString()))
   }
