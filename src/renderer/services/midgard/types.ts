@@ -149,6 +149,7 @@ export type PoolsService = {
   reloadPools: () => void
   poolAddresses$: ThorchainEndpointsLD
   selectedPoolAddress$: PoolAddressRx
+  poolAddressByAsset$: (asset: Asset) => PoolAddressRx
   runeAsset$: Rx.Observable<Asset>
   poolDetail$: PoolDetailLD
   priceRatio$: Rx.Observable<BigNumber>

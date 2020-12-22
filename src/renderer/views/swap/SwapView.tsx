@@ -25,6 +25,7 @@ import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { SwapRouteParams } from '../../routes/swap'
 import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
+import { PoolAddressRx } from '../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
 import * as Styled from './SwapView.styles'
@@ -37,14 +38,13 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, selectedPoolAddress$, reloadPools, selectedPricePool$ },
+    pools: { poolsState$, reloadPools, selectedPricePool$, poolAddressByAsset$ },
     getTransactionState$,
     setSelectedPoolAsset
   } = midgardService
   const { reloadSwapFees, swapFees$, txRD$, sendTx: subscribeTx, resetTx, getExplorerUrlByAsset$ } = useChainContext()
   const { balancesState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
-  const poolAddress = useObservableState(selectedPoolAddress$, O.none)
 
   const oSource = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
   const oTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
@@ -89,18 +89,41 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const [txWithState] = useObservableState(() => txWithState$, RD.initial)
 
+  const sourcePoolAddress$ = useMemo(
+    () =>
+      FP.pipe(
+        oSource,
+        O.map(poolAddressByAsset$),
+        O.getOrElse((): PoolAddressRx => Rx.EMPTY)
+      ),
+    [oSource, poolAddressByAsset$]
+  )
+
+  const targetPoolAddress$ = useMemo(
+    () =>
+      FP.pipe(
+        oTarget,
+        O.map(poolAddressByAsset$),
+        O.getOrElse((): PoolAddressRx => Rx.EMPTY)
+      ),
+    [oTarget, poolAddressByAsset$]
+  )
+
+  const sourcePoolAddress = useObservableState(sourcePoolAddress$, O.none)
+  const targetPoolAddress = useObservableState(targetPoolAddress$, O.none)
+
   const onConfirmSwap = useCallback(
     (source: Asset, amount: AssetAmount, memo: string) => {
       pipe(
-        poolAddress,
+        sourcePoolAddress,
         // TODO (@Veado)
         // Do a health check for pool address before sending tx
         // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
         // eslint-disable-next-line array-callback-return
-        O.map((endpoint) => {
-          if (endpoint) {
+        O.map((poolAddress) => {
+          if (poolAddress) {
             subscribeTx({
-              poolAddress: endpoint,
+              poolAddress,
               amount: assetToBase(amount),
               asset: source,
               memo
@@ -109,7 +132,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
         })
       )
     },
-    [poolAddress, subscribeTx]
+    [sourcePoolAddress, subscribeTx]
   )
 
   const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [
@@ -187,7 +210,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   walletBalances={balances}
                   reloadFees={reloadSwapFees}
                   fees={swapFeesRD}
-                  poolAddress={poolAddress}
+                  poolAddress={targetPoolAddress}
                 />
               )
             }
