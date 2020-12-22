@@ -1,7 +1,7 @@
 import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
-import { chain, isSome, map, Option } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/Ord'
 
 import { eqAsset } from '../../helpers/fp/eq'
@@ -10,17 +10,18 @@ import { WalletBalance } from '../../types/wallet'
 import { WalletBalances } from '../clients'
 import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid } from './types'
 
-export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> => FP.pipe(state, chain(FP.identity))
+export const getKeystoreContent = (state: KeystoreState): O.Option<KeystoreContent> =>
+  FP.pipe(state, O.chain(FP.identity))
 
-export const getPhrase = (state: KeystoreState): Option<Phrase> =>
+export const getPhrase = (state: KeystoreState): O.Option<Phrase> =>
   FP.pipe(
     getKeystoreContent(state),
-    map(({ phrase }) => phrase)
+    O.map(({ phrase }) => phrase)
   )
 
-export const hasKeystoreContent = (state: KeystoreState): boolean => isSome(getKeystoreContent(state))
+export const hasKeystoreContent = (state: KeystoreState): boolean => O.isSome(getKeystoreContent(state))
 
-export const hasImportedKeystore = (state: KeystoreState): boolean => isSome(state)
+export const hasImportedKeystore = (state: KeystoreState): boolean => O.isSome(state)
 
 export const isLocked = (state: KeystoreState): boolean => !hasImportedKeystore(state) || !hasKeystoreContent(state)
 
