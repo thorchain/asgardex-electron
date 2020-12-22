@@ -1,8 +1,8 @@
-import { Balances } from '@xchainjs/xchain-client'
 import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, baseAmount } from '@xchainjs/xchain-util'
 import { some, none } from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { WalletBalances } from '../../types/wallet'
 import { KeystoreState, KeystoreContent } from './types'
 import {
   getKeystoreContent,
@@ -11,7 +11,8 @@ import {
   isLocked,
   getPhrase,
   sortBalances,
-  filterNullableBalances
+  filterNullableBalances,
+  getBalanceByAsset
 } from './util'
 
 describe('services/wallet/util/', () => {
@@ -126,7 +127,7 @@ describe('services/wallet/util/', () => {
           asset: ASSETS_TESTNET.RUNE,
           amount: baseAmount(0)
         }
-      ] as Balances
+      ] as WalletBalances
       expect(filterNullableBalances(target)).toEqual([target[1], target[3]])
     })
   })
@@ -151,7 +152,7 @@ describe('services/wallet/util/', () => {
             {
               asset: ASSETS_TESTNET.RUNE
             }
-          ] as Balances,
+          ] as WalletBalances,
           [AssetBTC.ticker, AssetETH.ticker, AssetRune67C.ticker, AssetBNB.ticker]
         )
       ).toEqual([
@@ -171,6 +172,34 @@ describe('services/wallet/util/', () => {
           asset: ASSETS_TESTNET.TOMO
         }
       ])
+    })
+  })
+
+  describe('getBalanceByAsset', () => {
+    it('get balance by asset', () => {
+      expect(
+        getBalanceByAsset(AssetBNB)([
+          {
+            asset: ASSETS_TESTNET.TOMO
+          },
+          {
+            asset: ASSETS_TESTNET.BOLT
+          },
+          {
+            asset: ASSETS_TESTNET.FTM
+          },
+          {
+            asset: ASSETS_TESTNET.BNB
+          },
+          {
+            asset: ASSETS_TESTNET.RUNE
+          }
+        ] as WalletBalances)
+      ).toEqual(
+        some({
+          asset: ASSETS_TESTNET.BNB
+        })
+      )
     })
   })
 })

@@ -1,9 +1,7 @@
 import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
-import { pipe, identity } from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
-import { isSome, Option } from 'fp-ts/lib/Option'
+import { chain, isSome, map, Option } from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/Ord'
 
 import { eqAsset } from '../../helpers/fp/eq'
@@ -12,12 +10,12 @@ import { WalletBalance } from '../../types/wallet'
 import { WalletBalances } from '../clients'
 import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid } from './types'
 
-export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> => pipe(state, O.chain(identity))
+export const getKeystoreContent = (state: KeystoreState): Option<KeystoreContent> => FP.pipe(state, chain(FP.identity))
 
 export const getPhrase = (state: KeystoreState): Option<Phrase> =>
-  pipe(
+  FP.pipe(
     getKeystoreContent(state),
-    O.map(({ phrase }) => phrase)
+    map(({ phrase }) => phrase)
   )
 
 export const hasKeystoreContent = (state: KeystoreState): boolean => isSome(getKeystoreContent(state))
