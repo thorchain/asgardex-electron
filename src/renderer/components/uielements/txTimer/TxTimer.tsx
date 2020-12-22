@@ -13,12 +13,13 @@ export type Props = {
   className?: string
   interval?: number
   maxSec?: number
-  maxValue: number
+  maxValue?: number
   maxDuration?: number
   refunded?: boolean
   startTime?: number
   status: boolean
-  value: number
+  /** value for progress bar (optional)  */
+  value?: number
   onChange?: () => void
   onEnd?: () => void
 }
@@ -26,34 +27,47 @@ export type Props = {
 export const TxTimer: React.FC<Props> = (props): JSX.Element => {
   const {
     status = false,
-    value,
-    maxValue,
+    value = NaN,
+    maxValue = 100,
     maxSec = 0,
     startTime = Date.now(),
     onChange = () => {},
     interval = 1000,
-    maxDuration,
+    maxDuration = 100,
     refunded = false,
     onEnd = () => {},
     className = ''
   } = props
 
-  const [active, setActive] = useState(false)
+  const [active, setActive] = useState(true)
   const [totalDuration, setTotalDuration] = useState<number>(0)
+  // internal value if value has not been set
+  const [internalValue, setInternalValue] = useState<number>(0)
 
-  // Check if counter has reached the end
+  // Check if duration has reached the end
   const isEnd = useCallback(() => {
     // Check of `maxSec` wins over `maxValue`
     if (maxSec > 0 && totalDuration >= maxSec) {
       return true
     }
-    return value >= maxValue
-  }, [maxSec, maxValue, totalDuration, value])
+    // check value or internalValue
+    return (value || internalValue) >= maxValue
+  }, [internalValue, maxSec, maxValue, totalDuration, value])
 
   // Callback for counting
   const countHandler = useCallback(() => {
+    // update `internalValue` if value is not set
+    if (!value) {
+      setInternalValue((current) => {
+        if (current < 80) {
+          return current + 15
+        }
+
+        return current + 1
+      })
+    }
     onChange()
-  }, [onChange])
+  }, [onChange, value])
 
   // Interval to inform outside world about counting
   const countInterval = status && !isEnd() ? interval : INACTIVE_INTERVAL
@@ -70,7 +84,7 @@ export const TxTimer: React.FC<Props> = (props): JSX.Element => {
   const countSecInterval = startTime && status && !isEnd() ? 100 : INACTIVE_INTERVAL
   useInterval(countSecHandler, countSecInterval)
 
-  // Reset everything at end
+  // Reset everything at the end
   const handleEndTimer = useCallback(() => {
     onEnd()
     setTotalDuration(0)
@@ -90,17 +104,23 @@ export const TxTimer: React.FC<Props> = (props): JSX.Element => {
     setActive(status)
   }, [status])
 
+  // reset `totalDuration`
+  useEffect(() => {
+    if (isEnd() || !active) {
+      setTotalDuration(0)
+    }
+  }, [active, isEnd])
+
   const hide = isEnd() && !active
   const CircularProgressbarStyle = `${hide ? 'hide' : ''} timerchart-circular-progressbar`
 
   const totalDurationString =
     totalDuration < 10 ? Number(totalDuration).toFixed(1) : Math.round(totalDuration).toString()
 
+  const progressBarValue = value || internalValue
+
   return (
     <>
-      <div>active: {active.toString()}</div>
-      <div>totalDuration: {totalDuration}</div>
-      <div>isEnd: {isEnd().toString()}</div>
       <Styled.TxTimerWrapper className={`txTimer-wrapper ${className}`}>
         <div className="timerchart-icon">
           {!active && <Styled.IconWrapper>{!refunded ? <Styled.SuccessIcon /> : <RefundIcon />}</Styled.IconWrapper>}
@@ -108,7 +128,7 @@ export const TxTimer: React.FC<Props> = (props): JSX.Element => {
         {active && (
           <CircularProgressbar
             className={CircularProgressbarStyle}
-            value={value}
+            value={progressBarValue}
             text={`${totalDurationString}s`}
             strokeWidth={7}
             counterClockwise
