@@ -63,7 +63,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     return () => {
       resetTx()
     }
-  }, [])
+  }, [resetTx])
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
@@ -112,7 +112,10 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     [poolAddress, subscribeTx]
   )
 
-  const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [source])
+  const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [
+    source,
+    getExplorerUrlByAsset$
+  ])
   const explorerUrl = useObservableState(getExplorerUrl$, O.none)
 
   const goToTransaction = useCallback(
