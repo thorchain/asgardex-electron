@@ -124,7 +124,7 @@ describe('services/wallet/util/', () => {
           amount: baseAmount(2)
         },
         {
-          asset: ASSETS_TESTNET.RUNE,
+          asset: AssetRuneNative,
           amount: baseAmount(0)
         }
       ] as WalletBalances
@@ -150,14 +150,14 @@ describe('services/wallet/util/', () => {
               asset: ASSETS_TESTNET.BNB
             },
             {
-              asset: ASSETS_TESTNET.RUNE
+              asset: AssetRuneNative
             }
           ] as WalletBalances,
           [AssetBTC.ticker, AssetETH.ticker, AssetRune67C.ticker, AssetBNB.ticker]
         )
       ).toEqual([
         {
-          asset: ASSETS_TESTNET.RUNE
+          asset: AssetRuneNative
         },
         {
           asset: ASSETS_TESTNET.BNB
