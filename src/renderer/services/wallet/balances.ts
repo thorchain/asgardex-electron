@@ -145,7 +145,7 @@ export const chainBalances$: ChainBalances$ = Rx.combineLatest([
   btcLedgerChainBalance$,
   bnbChainBalance$,
   /* //TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH */
-  /* _ethChainBalance$ */
+  /* ETH.balances$ */
   bnbChainBalance$
 ])
 
