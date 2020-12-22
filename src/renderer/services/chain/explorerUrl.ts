@@ -13,7 +13,6 @@ const explorerUrlFailure$ = Rx.of(O.none)
  * Cain-based Explorer url depending on selected network
  */
 const getExplorerUrlByAsset$ = (asset: Asset | null): GetExplorerTxUrl$ => {
-  console.log('asset for explore', asset)
   if (asset === null) {
     return explorerUrlFailure$
   }
