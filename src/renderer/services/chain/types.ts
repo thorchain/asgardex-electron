@@ -45,6 +45,8 @@ export type DepositFeesLD = LiveData<Error, DepositFees>
 
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
+export type SendTxParams = { asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
+
 /**
  * Withdraw fees
  *
