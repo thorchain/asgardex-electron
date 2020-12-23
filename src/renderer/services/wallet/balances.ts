@@ -127,7 +127,7 @@ const btcLedgerBalance$ = FP.pipe(
  */
 // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
 const _ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
-  map(([walletAddress, balances]) => ({
+  RxOp.map(([walletAddress, balances]) => ({
     walletType: 'keystore',
     chain: ETHChain,
     walletAddress,
