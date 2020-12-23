@@ -35,6 +35,7 @@ type CommonMessageKey =
   | 'common.assets'
   | 'common.price'
   | 'common.transaction'
+  | 'common.viewTransaction'
   | 'common.fee'
   | 'common.fees'
   | 'common.max'
@@ -117,6 +118,9 @@ type WalletMessageKey =
   | 'wallet.errors.amount.shouldBeLessThanBalanceAndFee'
   | 'wallet.errors.fee.notCovered'
   | 'wallet.errors.invalidChain'
+  | 'wallet.upgrade.pending'
+  | 'wallet.upgrade.success'
+  | 'wallet.upgrade.error'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 
@@ -158,7 +162,6 @@ type SwapMessageKey =
   | 'swap.searchAsset'
   | 'swap.state.pending'
   | 'swap.state.success'
-  | 'swap.viewTransaction'
   | 'swap.swapping'
   | 'swap.errors.amount.balanceShouldCoverChainFee'
   | 'swap.errors.amount.outputShouldCoverChainFee'

@@ -37,6 +37,7 @@ const common: CommonMessages = {
   'common.pool': 'Пул',
   'common.price': 'Цена',
   'common.transaction': 'Транзакция',
+  'common.viewTransaction': 'Посмотреть транзакцию',
   'common.fee': 'Комиссия',
   'common.fees': 'Комиссии',
   'common.max': 'Макс.',

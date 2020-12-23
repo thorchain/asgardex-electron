@@ -99,7 +99,7 @@ export const SwapModal: React.FC<Props> = (props): JSX.Element => {
                   </Styled.ViewButton>
                 )}
                 <Styled.ViewTransaction onClick={onViewTxClick} href="#" target="_blank" rel="noopener noreferrer">
-                  {intl.formatMessage({ id: 'swap.viewTransaction' })}
+                  {intl.formatMessage({ id: 'common.viewTransaction' })}
                 </Styled.ViewTransaction>
               </Styled.BtnCopyWrapper>
             </Styled.HashWrapper>

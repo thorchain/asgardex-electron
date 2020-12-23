@@ -10,28 +10,6 @@ export const TxTimerWrapper = styled.div`
   overflow: hidden;
   color: ${palette('gray', 0)};
 
-  .timerchart-icon {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: ${palette('gradient', 0)};
-
-    width: 100%;
-    height: 100%;
-
-    .confirm-icon {
-      line-height: 1em;
-    }
-
-    &:empty {
-      display: none;
-    }
-  }
-
   .timerchart-circular-progressbar {
     position: absolute;
     top: 0px;
@@ -42,6 +20,27 @@ export const TxTimerWrapper = styled.div`
     &.hide {
       visibility: hidden;
     }
+  }
+`
+export const IconWrapper = styled.div`
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: ${palette('gradient', 0)};
+
+  width: 100%;
+  height: 100%;
+
+  .confirm-icon {
+    line-height: 1em;
+  }
+
+  &:empty {
+    display: none;
   }
 `
 
