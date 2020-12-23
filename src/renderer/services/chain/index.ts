@@ -1,3 +1,4 @@
+import { assetAddress$ } from './address'
 import { clientByChain$ } from './client'
 import { isCrossChainDeposit$ } from './common'
 import { getExplorerUrlByAsset$ } from './explorerUrl'
@@ -35,5 +36,6 @@ export {
   sendTx,
   txRD$,
   resetTx,
-  getExplorerUrlByAsset$
+  getExplorerUrlByAsset$,
+  assetAddress$
 }

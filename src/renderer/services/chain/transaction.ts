@@ -13,7 +13,7 @@ import { SendTxParams } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
-const tx$ = ({ asset, poolAddress, amount, memo }: SendTxParams): TxLD => {
+const tx$ = ({ asset, recipient, amount, memo }: SendTxParams): TxLD => {
   // TODO (@Veado) Health check request for pool address
   // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
 
@@ -28,7 +28,7 @@ const tx$ = ({ asset, poolAddress, amount, memo }: SendTxParams): TxLD => {
 
   switch (asset.chain) {
     case BNBChain:
-      return BNB.sendTx({ recipient: poolAddress, amount, asset, memo })
+      return BNB.sendTx({ recipient, amount, asset, memo })
 
     case BTCChain:
       return FP.pipe(
@@ -37,7 +37,7 @@ const tx$ = ({ asset, poolAddress, amount, memo }: SendTxParams): TxLD => {
         O.fold(
           // TODO (@veado) i18n
           () => txFailure$('Fee rate for BTC transaction not available'),
-          (feeRate) => BTC.sendTx({ recipient: poolAddress, amount, feeRate, memo })
+          (feeRate) => BTC.sendTx({ recipient, amount, feeRate, memo })
         )
       )
 
@@ -46,7 +46,7 @@ const tx$ = ({ asset, poolAddress, amount, memo }: SendTxParams): TxLD => {
       return txFailure$(`Tx stuff has not been implemented for ETH yet`)
 
     case THORChain:
-      return THOR.sendTx({ recipient: poolAddress, amount, asset, memo })
+      return THOR.sendTx({ recipient, amount, asset, memo })
 
     case CosmosChain:
       // not available yet
@@ -58,8 +58,8 @@ const tx$ = ({ asset, poolAddress, amount, memo }: SendTxParams): TxLD => {
   }
 }
 
-const sendTx = ({ asset, poolAddress, amount, memo }: SendTxParams): void => {
-  tx$({ asset, poolAddress, amount, memo }).subscribe(setTxRD)
+const sendTx = ({ asset, recipient, amount, memo }: SendTxParams): void => {
+  tx$({ asset, recipient, amount, memo }).subscribe(setTxRD)
 }
 
 const resetTx = () => {

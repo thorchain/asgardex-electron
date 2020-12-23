@@ -42,7 +42,15 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     getTransactionState$,
     setSelectedPoolAsset
   } = midgardService
-  const { reloadSwapFees, swapFees$, txRD$, sendTx: subscribeTx, resetTx, getExplorerUrlByAsset$ } = useChainContext()
+  const {
+    reloadSwapFees,
+    swapFees$,
+    txRD$,
+    sendTx: subscribeTx,
+    resetTx,
+    getExplorerUrlByAsset$,
+    assetAddress$
+  } = useChainContext()
   const { balancesState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
 
@@ -99,18 +107,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     [oSource, poolAddressByAsset$]
   )
 
-  const targetPoolAddress$ = useMemo(
-    () =>
-      FP.pipe(
-        oTarget,
-        O.map(poolAddressByAsset$),
-        O.getOrElse((): PoolAddressRx => Rx.EMPTY)
-      ),
-    [oTarget, poolAddressByAsset$]
-  )
-
   const sourcePoolAddress = useObservableState(sourcePoolAddress$, O.none)
-  const targetPoolAddress = useObservableState(targetPoolAddress$, O.none)
+  const targetWalletAddress = useObservableState(assetAddress$, O.none)
 
   const onConfirmSwap = useCallback(
     (source: Asset, amount: AssetAmount, memo: string) => {
@@ -123,7 +121,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
         O.map((poolAddress) => {
           if (poolAddress) {
             subscribeTx({
-              poolAddress,
+              recipient: poolAddress,
               amount: assetToBase(amount),
               asset: source,
               memo
@@ -210,7 +208,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   walletBalances={balances}
                   reloadFees={reloadSwapFees}
                   fees={swapFeesRD}
-                  poolAddress={targetPoolAddress}
+                  targetWalletAddress={targetWalletAddress}
                 />
               )
             }

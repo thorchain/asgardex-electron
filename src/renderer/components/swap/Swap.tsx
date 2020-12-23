@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, PoolData, getSwapMemo } from '@thorchain/asgardex-util'
-import { Balance } from '@xchainjs/xchain-client'
+import { Address, Balance } from '@xchainjs/xchain-client'
 import {
   Asset,
   assetAmount,
@@ -32,7 +32,7 @@ import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/binance/types'
 import { SwapFeesRD } from '../../services/chain/types'
-import { PoolAddress, PoolDetails } from '../../services/midgard/types'
+import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { NonEmptyWalletBalances } from '../../services/wallet/types'
 import { TxStatus, TxTypes } from '../../types/asgardex'
@@ -62,7 +62,7 @@ type SwapProps = {
   PasswordConfirmation: React.FC<{ onSuccess: () => void; onClose: () => void }>
   reloadFees?: () => void
   fees?: SwapFeesRD
-  poolAddress?: O.Option<PoolAddress>
+  targetWalletAddress?: O.Option<Address>
 }
 
 export const Swap = ({
@@ -79,7 +79,7 @@ export const Swap = ({
   PasswordConfirmation,
   reloadFees,
   fees: feesProp = RD.initial,
-  poolAddress = O.none
+  targetWalletAddress = O.none
 }: SwapProps) => {
   const intl = useIntl()
   const history = useHistory()
@@ -377,15 +377,15 @@ export const Swap = ({
 
   const onPasswordValidationSucceed = useCallback(() => {
     FP.pipe(
-      sequenceTOption(assetsToSwap, poolAddress),
+      sequenceTOption(assetsToSwap, targetWalletAddress),
       // eslint-disable-next-line  array-callback-return
-      O.map(([[sourceAsset, targetAsset], poolAddress]) => {
-        const memo = getSwapMemo({ asset: targetAsset, address: poolAddress })
+      O.map(([[sourceAsset, targetAsset], address]) => {
+        const memo = getSwapMemo({ asset: targetAsset, address })
         closePrivateModal()
         onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
       })
     )
-  }, [assetsToSwap, onConfirmSwap, changeAmount, closePrivateModal, poolAddress])
+  }, [assetsToSwap, onConfirmSwap, changeAmount, closePrivateModal, targetWalletAddress])
 
   const sourceChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
     () =>
