@@ -1,32 +1,27 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset } from '@xchainjs/xchain-util'
+import { TxHash } from '@xchainjs/xchain-client'
 import * as FP from 'fp-ts/lib/function'
-import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
-import { takeWhile } from 'rxjs/operators'
 
+import { emptyFunc } from '../../../helpers/funcHelper'
 import { TxRD } from '../../../services/wallet/types'
 import { TxTimer } from '../../uielements/txTimer'
 import * as Styled from './TxModal.style'
 
 export type Props = {
-  asset: Asset
   txRD: TxRD
-  onClose?: () => void
-  onViewTxClick?: (e: React.MouseEvent) => void
+  onClose: () => void
+  onViewTxClick?: (txHash: TxHash) => void
   maxSec?: number
   startTime?: number
 }
 
 export const TxModal: React.FC<Props> = (props): JSX.Element => {
-  const { txRD, startTime = Date.now() } = props
+  const { txRD, startTime, onClose, onViewTxClick = emptyFunc } = props
 
   const intl = useIntl()
-
-  const [txTimerValue] = useObservableState(() => Rx.interval(100).pipe(takeWhile((v) => v <= 95)), 0)
 
   const i18nTitleId = useMemo(
     () =>
@@ -42,34 +37,46 @@ export const TxModal: React.FC<Props> = (props): JSX.Element => {
     [txRD]
   )
 
-  return (
-    <Styled.Modal visible={true} title={intl.formatMessage({ id: i18nTitleId })} footer={null}>
-      <div>txTimerValue {txTimerValue}</div>
-      <Styled.ContentRow>
-        <Styled.TimerContainer>
-          <TxTimer
-            status={true}
-            value={txTimerValue}
-            maxValue={100}
-            maxDuration={Number.MAX_SAFE_INTEGER}
-            onEnd={undefined}
-            startTime={startTime}
-          />
-        </Styled.TimerContainer>
-      </Styled.ContentRow>
-      {RD.isSuccess(txRD) && (
-        <Styled.HashWrapper>
-          <Styled.BtnCopyWrapper>
-            <Styled.ViewButton color="success" onClick={() => 'onClick'}>
-              {intl.formatMessage({ id: 'common.finish' })}
-            </Styled.ViewButton>
+  const renderTimer = useMemo(
+    () =>
+      FP.pipe(
+        txRD,
+        RD.fold(
+          () => <TxTimer status={true} />,
+          () => <TxTimer status={true} maxValue={100} startTime={startTime} />,
+          (error) => <Styled.ErrorView subTitle={error?.msg || intl.formatMessage({ id: 'common.error' })} />,
+          () => <TxTimer status={false} />
+        )
+      ),
+    [intl, startTime, txRD]
+  )
 
-            <Styled.ViewTransaction onClick={() => 'onclick'} href="#" target="_blank" rel="noopener noreferrer">
-              {intl.formatMessage({ id: 'common.viewTransaction' })}
-            </Styled.ViewTransaction>
-          </Styled.BtnCopyWrapper>
-        </Styled.HashWrapper>
-      )}
+  const renderResultDetails = useMemo(
+    () =>
+      FP.pipe(
+        txRD,
+        RD.map((txHash) => (
+          <Styled.ResultDetailsContainer key={txHash}>
+            <Styled.BtnCopyWrapper>
+              <Styled.ViewButton color="success" onClick={onClose}>
+                {intl.formatMessage({ id: 'common.finish' })}
+              </Styled.ViewButton>
+
+              <Styled.ViewTransaction onClick={() => onViewTxClick(txHash)}>
+                {intl.formatMessage({ id: 'common.viewTransaction' })}
+              </Styled.ViewTransaction>
+            </Styled.BtnCopyWrapper>
+          </Styled.ResultDetailsContainer>
+        )),
+        RD.getOrElse(() => <></>)
+      ),
+    [intl, onClose, onViewTxClick, txRD]
+  )
+
+  return (
+    <Styled.Modal visible={true} title={intl.formatMessage({ id: i18nTitleId })} footer={null} onCancel={onClose}>
+      <Styled.ContentRow>{renderTimer}</Styled.ContentRow>
+      {renderResultDetails}
     </Styled.Modal>
   )
 }

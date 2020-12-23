@@ -52,9 +52,9 @@ const wallet: WalletMessages = {
   'wallet.password.confirmation': 'Password confirmation',
   'wallet.password.confirmation.pending': 'Validating password',
   'wallet.password.confirmation.error': 'Password is wrong',
-  'wallet.upgrade.pending': 'You are upgrading',
-  'wallet.upgrade.success': 'You have been upgraded successfull',
-  'wallet.upgrade.error': 'Error while upgrading'
+  'wallet.upgrade.pending': 'Upgrading',
+  'wallet.upgrade.success': 'Successfull upgrade',
+  'wallet.upgrade.error': 'Upgrade error'
 }
 
 export default wallet

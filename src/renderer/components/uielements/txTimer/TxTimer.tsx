@@ -16,11 +16,12 @@ export type Props = {
   maxValue?: number
   maxDuration?: number
   refunded?: boolean
+  /** Start time to count seconds (optional) Without a startTime no counter will start internally  */
   startTime?: number
   status: boolean
   /** value for progress bar (optional)  */
   value?: number
-  onChange?: () => void
+  onChange?: (_: number) => void
   onEnd?: () => void
 }
 
@@ -30,7 +31,7 @@ export const TxTimer: React.FC<Props> = (props): JSX.Element => {
     value = NaN,
     maxValue = 100,
     maxSec = 0,
-    startTime = Date.now(),
+    startTime = NaN,
     onChange = () => {},
     interval = 1000,
     maxDuration = 100,
@@ -62,15 +63,19 @@ export const TxTimer: React.FC<Props> = (props): JSX.Element => {
         if (current < 80) {
           return current + 15
         }
+        // stop at 95%, 100% has to be set from outside via `value` or `active`
+        if (current < 95) {
+          return current + 1
+        }
 
-        return current + 1
+        return current
       })
     }
-    onChange()
-  }, [onChange, value])
+    onChange(value || internalValue)
+  }, [internalValue, onChange, value])
 
   // Interval to inform outside world about counting
-  const countInterval = status && !isEnd() ? interval : INACTIVE_INTERVAL
+  const countInterval = startTime && active && !isEnd() ? interval : INACTIVE_INTERVAL
 
   useInterval(countHandler, countInterval)
 
@@ -81,7 +86,7 @@ export const TxTimer: React.FC<Props> = (props): JSX.Element => {
   }, [startTime])
 
   // Interval to count seconds
-  const countSecInterval = startTime && status && !isEnd() ? 100 : INACTIVE_INTERVAL
+  const countSecInterval = startTime && active && !isEnd() ? 100 : INACTIVE_INTERVAL
   useInterval(countSecHandler, countSecInterval)
 
   // Reset everything at the end
@@ -93,11 +98,11 @@ export const TxTimer: React.FC<Props> = (props): JSX.Element => {
 
   // Delay the end of counting - for UX purposes only
   useEffect(() => {
-    if (isEnd() && status) {
+    if (isEnd() && active) {
       const id = setTimeout(handleEndTimer, maxDuration)
       return () => clearTimeout(id)
     }
-  }, [handleEndTimer, isEnd, status, maxDuration])
+  }, [handleEndTimer, isEnd, active, maxDuration])
 
   // Internal `active` state depends on `status`
   useEffect(() => {

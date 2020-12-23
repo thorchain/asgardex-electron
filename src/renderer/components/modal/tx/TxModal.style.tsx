@@ -2,6 +2,7 @@ import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { ErrorView as UIErrorView } from '../../shared/error'
 import { Button } from '../../uielements/button'
 import { Modal as UIModal } from '../../uielements/modal'
 
@@ -15,24 +16,19 @@ export const Modal = styled(UIModal)`
   }
 `
 
-export const ContentRow = styled(Row)`
-  align-items: center;
+export const ContentRow = styled(Row).attrs({
+  align: 'middle',
+  justify: 'center'
+})`
   width: 100%;
   padding: 30px 0;
   border-bottom: 1px solid ${palette('gray', 0)};
 `
 
-export const TimerContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: 30px;
-`
-
-export const HashWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`
+export const ResultDetailsContainer = styled(Row).attrs({
+  align: 'middle',
+  justify: 'center'
+})``
 
 export const BtnCopyWrapper = styled.div`
   display: flex;
@@ -58,4 +54,8 @@ export const ViewButton = styled(Button)`
 export const ViewTransaction = styled.a`
   margin-top: 24px;
   color: ${palette('primary', 0)};
+`
+
+export const ErrorView = styled(UIErrorView)`
+  padding: 0px;
 `
