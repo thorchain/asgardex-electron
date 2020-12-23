@@ -2,7 +2,15 @@ import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
-import { Asset, AssetAmount, assetFromString, AssetRuneNative, assetToBase, bnOrZero } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  AssetAmount,
+  assetFromString,
+  AssetRuneNative,
+  assetToBase,
+  bnOrZero,
+  THORChain
+} from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -114,19 +122,26 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     (source: Asset, amount: AssetAmount, memo: string) => {
       pipe(
         sourcePoolAddress,
+        O.alt(() => {
+          // For THOR chain we will send Deposit tx instead of
+          // plain ones. It does not need any additional address
+          if (source.chain === THORChain) {
+            return O.some('')
+          }
+          return O.none
+        }),
         // TODO (@Veado)
         // Do a health check for pool address before sending tx
         // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
         // eslint-disable-next-line array-callback-return
         O.map((poolAddress) => {
-          if (poolAddress) {
-            subscribeTx({
-              recipient: poolAddress,
-              amount: assetToBase(amount),
-              asset: source,
-              memo
-            })
-          }
+          subscribeTx({
+            recipient: poolAddress,
+            amount: assetToBase(amount),
+            asset: source,
+            memo,
+            txType: 'swap'
+          })
         })
       )
     },

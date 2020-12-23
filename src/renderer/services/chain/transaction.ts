@@ -13,7 +13,7 @@ import { SendTxParams } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
-const tx$ = ({ asset, recipient, amount, memo }: SendTxParams): TxLD => {
+const tx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => {
   // TODO (@Veado) Health check request for pool address
   // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
 
@@ -45,8 +45,12 @@ const tx$ = ({ asset, recipient, amount, memo }: SendTxParams): TxLD => {
       // not available yet
       return txFailure$(`Tx stuff has not been implemented for ETH yet`)
 
-    case THORChain:
-      return THOR.sendTx({ recipient, amount, asset, memo })
+    case THORChain: {
+      if (txType === 'swap') {
+        return THOR.sendDepositTx({ amount, asset, memo })
+      }
+      return THOR.sendTx({ amount, asset, memo, recipient })
+    }
 
     case CosmosChain:
       // not available yet
@@ -58,8 +62,8 @@ const tx$ = ({ asset, recipient, amount, memo }: SendTxParams): TxLD => {
   }
 }
 
-const sendTx = ({ asset, recipient, amount, memo }: SendTxParams): void => {
-  tx$({ asset, recipient, amount, memo }).subscribe(setTxRD)
+const sendTx = ({ asset, recipient, amount, memo, txType }: SendTxParams): void => {
+  tx$({ asset, recipient, amount, memo, txType }).subscribe(setTxRD)
 }
 
 const resetTx = () => {
