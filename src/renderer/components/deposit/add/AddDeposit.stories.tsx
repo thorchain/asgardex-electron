@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { bn, assetAmount, assetToBase, AssetRune67C, AssetBNB, baseAmount, AssetBTC } from '@xchainjs/xchain-util'
+import { bn, assetAmount, assetToBase, AssetBNB, baseAmount, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
@@ -45,7 +45,7 @@ export const AddAsymDepositStory = () => {
       reloadFees={reloadFeesHandler}
       fees={asymFees}
       poolData={poolData}
-      priceAsset={AssetRune67C}
+      priceAsset={AssetRuneNative}
       assets={assets}
       poolAddress={O.none}
       symDepositMemo={O.none}
@@ -69,7 +69,7 @@ export const AddSymDepositStory = () => {
       fees={symFees}
       reloadFees={reloadFeesHandler}
       poolData={poolData}
-      priceAsset={AssetRune67C}
+      priceAsset={AssetRuneNative}
       assets={assets}
       poolAddress={O.none}
       symDepositMemo={O.none}
@@ -95,7 +95,7 @@ storiesOf('Components/Deposit/AddDeposit', module)
         fees={symFees}
         reloadFees={reloadFeesHandler}
         poolData={poolData}
-        priceAsset={AssetRune67C}
+        priceAsset={AssetRuneNative}
         assets={assets}
         poolAddress={O.none}
         symDepositMemo={O.none}
@@ -118,7 +118,7 @@ storiesOf('Components/Deposit/AddDeposit', module)
         fees={symFees}
         reloadFees={reloadFeesHandler}
         poolData={poolData}
-        priceAsset={AssetRune67C}
+        priceAsset={AssetRuneNative}
         assets={assets}
         poolAddress={O.none}
         symDepositMemo={O.none}
@@ -141,7 +141,7 @@ storiesOf('Components/Deposit/AddDeposit', module)
       reloadFees={reloadFeesHandler}
       fees={asymFees}
       poolData={poolData}
-      priceAsset={AssetRune67C}
+      priceAsset={AssetRuneNative}
       assets={assets}
       poolAddress={O.none}
       symDepositMemo={O.none}
@@ -163,7 +163,7 @@ storiesOf('Components/Deposit/AddDeposit', module)
         reloadFees={reloadFeesHandler}
         fees={asymFees}
         poolData={poolData}
-        priceAsset={AssetRune67C}
+        priceAsset={AssetRuneNative}
         assets={assets}
         poolAddress={O.none}
         symDepositMemo={O.none}

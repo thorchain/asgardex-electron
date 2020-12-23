@@ -4,7 +4,14 @@ import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { FeeRates } from '@xchainjs/xchain-bitcoin'
 import { Fees } from '@xchainjs/xchain-client'
-import { assetAmount, AssetBTC, AssetRune67C, assetToBase, baseAmount, formatBaseAmount } from '@xchainjs/xchain-util'
+import {
+  assetAmount,
+  AssetBTC,
+  AssetRuneNative,
+  assetToBase,
+  baseAmount,
+  formatBaseAmount
+} from '@xchainjs/xchain-util'
 
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation } from '../../../../services/binance/types'
@@ -20,7 +27,7 @@ const bnbAsset: WalletBalance = {
 }
 
 const runeAsset: WalletBalance = {
-  asset: AssetRune67C,
+  asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2, BTC_DECIMAL)),
   walletAddress: 'rune wallet address'
 }

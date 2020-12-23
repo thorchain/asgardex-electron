@@ -63,7 +63,7 @@ export const getRuneAsset = ({ network = 'testnet', chain = 'BNB' }: { network?:
  *
  * @deprecated Use `AssetRuneNative`
  */
-export const getDefaultRuneAsset = (chain: Chain = 'BNB') => getRuneAsset({ network: DEFAULT_NETWORK, chain })
+export const getDefaultRuneAsset = (chain: Chain = 'THOR') => getRuneAsset({ network: DEFAULT_NETWORK, chain })
 /**
  * Check whether an asset is a BNB.RUNE asset
  */
