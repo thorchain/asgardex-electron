@@ -1,12 +1,12 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { AssetBNB, AssetBTC, AssetRuneB1A, bn } from '@xchainjs/xchain-util'
+import { AssetBNB, AssetBTC, AssetRuneNative, bn } from '@xchainjs/xchain-util'
 
 import { ASSETS_MAINNET } from '../../../../../shared/mock/assets'
 import { AssetMenu } from './AssetMenu'
 
-const assets = [AssetBNB, AssetBTC, AssetRuneB1A]
+const assets = [AssetBNB, AssetBTC, AssetRuneNative]
 const priceIndex = {
   RUNE: bn(1),
   BNB: bn(2),

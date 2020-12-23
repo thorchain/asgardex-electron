@@ -11,11 +11,10 @@ import * as RxOp from 'rxjs/operators'
 import { getRuneAsset } from '../../helpers/assetHelper'
 import { eqBalancesRD } from '../../helpers/fp/eq'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
-import { liveData } from '../../helpers/rx/liveData'
 import { network$ } from '../app/service'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
-import { WalletBalancesLD, WalletBalancesRD } from '../clients'
+import { WalletBalancesRD } from '../clients'
 import * as ETH from '../ethereum'
 import * as THOR from '../thorchain'
 import { selectedAsset$ } from './common'
@@ -128,14 +127,11 @@ const btcLedgerBalance$ = FP.pipe(
  */
 // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
 const _ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
-  RxOp.map(([walletAddress, balancesRD]) => ({
+  map(([walletAddress, balances]) => ({
     walletType: 'keystore',
     chain: ETHChain,
     walletAddress,
-    balances: FP.pipe(
-      balancesRD,
-      RD.map((balances) => [balances])
-    )
+    balances
   }))
 )
 
@@ -148,11 +144,8 @@ export const chainBalances$: ChainBalances$ = Rx.combineLatest([
   btcLedgerChainBalance$,
   bnbChainBalance$
   /* //TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH */
-  /* _ethChainBalance$ */
+  /* ETH.balances$ */
 ])
-
-// TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
-const _ethBalances$: WalletBalancesLD = ETH.balances$.pipe(liveData.map((asset) => [asset]))
 
 /**
  * Transform a list of BalancesLD

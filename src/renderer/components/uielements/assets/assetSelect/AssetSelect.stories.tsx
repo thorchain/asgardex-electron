@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { AssetBNB, AssetBTC, AssetRuneB1A, bn } from '@xchainjs/xchain-util'
+import { AssetBNB, AssetBTC, AssetRuneNative, bn } from '@xchainjs/xchain-util'
 
 import { AssetSelect } from './AssetSelect'
 
@@ -10,7 +10,7 @@ storiesOf('Components/Assets/AssetSelect', module).add('default', () => {
     <div style={{ display: 'flex', padding: '20px' }}>
       <AssetSelect
         asset={AssetBNB}
-        assets={[AssetBNB, AssetBTC, AssetRuneB1A]}
+        assets={[AssetBNB, AssetBTC, AssetRuneNative]}
         priceIndex={{
           RUNE: bn(1),
           BNB: bn(2),

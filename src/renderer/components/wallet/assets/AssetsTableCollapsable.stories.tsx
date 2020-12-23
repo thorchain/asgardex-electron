@@ -8,7 +8,7 @@ import {
   AssetBNB,
   AssetBTC,
   AssetETH,
-  AssetRune67C,
+  AssetRuneNative,
   assetToString,
   baseAmount,
   BNBChain,
@@ -47,7 +47,7 @@ const chainBalances: ChainBalances = [
     balances: RD.success([
       {
         amount: baseAmount('12200000000'),
-        asset: AssetRune67C,
+        asset: AssetRuneNative,
         walletAddress: 'Rune wallet address'
       }
     ])

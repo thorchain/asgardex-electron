@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn, BaseAmount, AssetBNB, AssetBTC, AssetRuneB1A, assetAmount, assetToBase } from '@xchainjs/xchain-util'
+import { bn, BaseAmount, AssetBNB, AssetBTC, assetAmount, assetToBase, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { AssetCard } from './AssetCard'
@@ -21,7 +21,7 @@ storiesOf('Components/Assets/AssetCard', module).add('default', () => {
       <AssetCard
         title="Title here"
         asset={AssetBNB}
-        assets={[AssetBNB, AssetBTC, AssetRuneB1A]}
+        assets={[AssetBNB, AssetBTC, AssetRuneNative]}
         selectedAmount={selectedAmount}
         onChangeAssetAmount={onChangeAssetAmount}
         onChangePercent={onChangePercent}

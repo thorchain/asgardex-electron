@@ -1,5 +1,5 @@
 import { crypto } from '@binance-chain/javascript-sdk'
-import LedgerAppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
+import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Client, getDerivePath } from '@xchainjs/xchain-binance'
 import { TxHash } from '@xchainjs/xchain-client'
@@ -11,9 +11,9 @@ import { getErrorId } from './utils'
 
 export const getAddress = async (transport: TransportNodeHid, network: Network) => {
   try {
-    const ledgerApp = new LedgerAppBNB(transport)
+    const app = new AppBNB(transport)
     const derive_path = getDerivePath(0)
-    const { pk } = await ledgerApp.getPublicKey(derive_path)
+    const { pk } = await app.getPublicKey(derive_path)
     if (pk) {
       // get address from pubkey
       const address = crypto.getAddressFromPublicKey(pk.toString('hex'), network === 'testnet' ? 'tbnb' : 'bnb')
@@ -29,21 +29,21 @@ export const getAddress = async (transport: TransportNodeHid, network: Network) 
 export const sendTx = async (
   transport: TransportNodeHid,
   network: Network,
-  ledgerTxInfo: LedgerBNCTxInfo
+  txInfo: LedgerBNCTxInfo
 ): Promise<E.Either<LedgerErrorId, string>> => {
   try {
-    const { sender, recipient, asset, amount, memo } = ledgerTxInfo
+    const { sender, recipient, asset, amount, memo } = txInfo
     const client = new Client({ network: network === 'testnet' ? 'testnet' : 'mainnet' })
-    const ledgerApp = new LedgerAppBNB(transport)
+    const app = new AppBNB(transport)
     const derive_path = getDerivePath(0)
     const hpr = network === 'testnet' ? 'tbnb' : 'bnb' // This will be replaced later with "const hpr = client.getPrefix()"
-    await ledgerApp.showAddress(hpr, derive_path)
+    await app.showAddress(hpr, derive_path)
 
     const bncClient = client.getBncClient()
     bncClient.initChain()
 
     bncClient.useLedgerSigningDelegate(
-      ledgerApp,
+      app,
       () => {},
       () => {},
       () => {},
