@@ -7,6 +7,7 @@ import * as Eq from 'fp-ts/lib/Eq'
 import * as O from 'fp-ts/lib/Option'
 
 import { ApiError } from '../../services/wallet/types'
+import { WalletBalance } from '../../types/wallet'
 
 export const eqOString = O.getEq(Eq.eqString)
 
@@ -47,3 +48,9 @@ export const eqBalances = A.getEq(eqBalance)
 
 export const eqBalanceRD = RD.getEq<ApiError, Balance>(eqApiError, eqBalance)
 export const eqAssetsWithBalanceRD = RD.getEq<ApiError, Balances>(eqApiError, eqBalances)
+
+export const eqWalletBalance: Eq.Eq<WalletBalance> = {
+  equals: (x, y) => eqBalance.equals(x, y) && x.walletAddress === y.walletAddress
+}
+export const eqOWalletBalance = O.getEq(eqWalletBalance)
+export const eqWalletBalances = A.getEq(eqWalletBalance)
