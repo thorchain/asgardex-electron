@@ -3,8 +3,6 @@ import {
   assetToBase,
   assetAmount,
   bn,
-  AssetRuneB1A,
-  AssetRune67C,
   AssetBTC,
   AssetETH,
   Asset,
@@ -12,7 +10,8 @@ import {
   baseAmount,
   AssetBNB,
   BNBChain,
-  Chain
+  Chain,
+  AssetRuneNative
 } from '@xchainjs/xchain-util'
 
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
@@ -38,14 +37,7 @@ export const AssetBUSDBAF: Asset = { chain: 'BNB', symbol: 'BUSD-BAF', ticker: '
 // BUSD mainnet (neded for pricing)
 export const AssetBUSDBD1: Asset = { chain: 'BNB', symbol: 'BUSD-BD1', ticker: 'BUSD' }
 
-export const PRICE_ASSETS: PricePoolAssets = [
-  AssetRune67C,
-  AssetRuneB1A,
-  AssetETH,
-  AssetBTC,
-  AssetBUSDBAF,
-  AssetBUSDBD1
-]
+export const PRICE_ASSETS: PricePoolAssets = [AssetRuneNative, AssetETH, AssetBTC, AssetBUSDBAF, AssetBUSDBD1]
 
 // Weight of currencies needed for pricing
 // The higher the value the higher the weight
@@ -54,8 +46,7 @@ export const CURRENCY_WHEIGHTS: PricePoolCurrencyWeights = {
   [assetToString(AssetBUSDBD1)]: 1,
   [assetToString(AssetETH)]: 2,
   [assetToString(AssetBTC)]: 3,
-  [assetToString(AssetRune67C)]: 4,
-  [assetToString(AssetRuneB1A)]: 5
+  [assetToString(AssetRuneNative)]: 4
 }
 
 // One `AssetAmount` in `BaseAmount` as const, since we just need it at different places
