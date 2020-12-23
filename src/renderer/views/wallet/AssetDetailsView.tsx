@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetFromString, BNBChain } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, BNBChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as NEA from 'fp-ts/NonEmptyArray'
@@ -13,6 +13,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { AssetDetails } from '../../components/wallet/assets'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneBnbAsset } from '../../helpers/assetHelper'
@@ -75,6 +76,8 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     O.none
   )
 
+  const { addressByChain$ } = useChainContext()
+
   const { sendTx: sendBnbTx } = useBinanceContext()
 
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
@@ -105,6 +108,21 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     [oBalances, oWalletAddress]
   )
 
+  const [oRuneNativeAddress] = useObservableState(
+    () =>
+      FP.pipe(
+        oSelectedAsset,
+        // We do need rune native address to upgrade BNB.RUNE only
+        O.filter(isRuneBnbAsset),
+        O.fold(
+          // No subscription of `poolAddresses$ ` needed for other assets than BNB.RUNE
+          () => Rx.of(O.none),
+          () => addressByChain$(THORChain)
+        )
+      ),
+    O.none
+  )
+
   return (
     <>
       <AssetDetails
@@ -115,6 +133,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         reloadBalancesHandler={reloadBalances}
         getExplorerTxUrl={getExplorerTxUrl}
         walletAddress={oWalletAddress}
+        runeNativeAddress={oRuneNativeAddress}
         poolAddress={bnbPoolAddress}
         sendTx={sendBnbTx}
       />

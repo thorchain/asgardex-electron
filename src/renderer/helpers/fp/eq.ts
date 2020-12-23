@@ -47,6 +47,8 @@ export const eqApiError = Eq.getStructEq<ApiError>({
 export const eqBalances = A.getEq(eqBalance)
 
 export const eqBalanceRD = RD.getEq<ApiError, Balance>(eqApiError, eqBalance)
+export const eqBalancesRD = RD.getEq<ApiError, Balances>(eqApiError, eqBalances)
+
 export const eqAssetsWithBalanceRD = RD.getEq<ApiError, Balances>(eqApiError, eqBalances)
 
 export const eqWalletBalance: Eq.Eq<WalletBalance> = {
