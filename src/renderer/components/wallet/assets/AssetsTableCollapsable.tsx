@@ -111,7 +111,6 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   const renderPriceColumn = useCallback(
     (balance: Balance) => {
-      console.log(111, pricePool)
       const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
       const label = FP.pipe(
         oPrice,
