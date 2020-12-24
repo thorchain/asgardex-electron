@@ -1,8 +1,11 @@
+import React from 'react'
+
 import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { Button } from '../../uielements/button'
+import { Button as UIButton } from '../../uielements/button'
+import { ExternalLinkIcon as UIExternalLinkIcon } from '../../uielements/common/Common.style'
 import { Modal } from '../../uielements/modal'
 
 export const SwapModalWrapper = styled(Modal)`
@@ -80,13 +83,21 @@ export const BtnCopyWrapper = styled.div`
   cursor: pointer;
 `
 
-export const ViewButton = styled(Button)`
+export const ViewButton = styled(UIButton)`
   width: 300px;
   height: 40px;
   margin-top: 24px;
 `
 
-export const ViewTransaction = styled.a`
+const ExternalLinkIcon = styled(UIExternalLinkIcon)`
+  svg {
+    color: ${palette('primary', 0)};
+  }
+`
+
+export const ViewTransaction = styled(UIButton).attrs({
+  typevalue: 'transparent',
+  icon: <ExternalLinkIcon />
+})`
   margin-top: 24px;
-  color: ${palette('primary', 0)};
 `

@@ -10,19 +10,22 @@ import { TxModal } from './TxModal'
 const onClose = () => console.log('onClose')
 const onViewTxClick = (txHash: TxHash) => console.log('txHash', txHash)
 
-export const StoryInitial: Story = () => <TxModal txRD={RD.initial} onClose={onClose} />
+export const StoryInitial: Story = () => <TxModal title="intial" txRD={RD.initial} onClose={onClose} />
 StoryInitial.storyName = 'initial'
 
-export const StoryPending: Story = () => <TxModal startTime={Date.now()} txRD={RD.pending} onClose={onClose} />
+export const StoryPending: Story = () => (
+  <TxModal title="pending" startTime={Date.now()} txRD={RD.pending} onClose={onClose} />
+)
 StoryPending.storyName = 'pending'
 
 export const StorySuccess: Story = () => (
-  <TxModal txRD={RD.success('txhash')} onClose={onClose} onViewTxClick={onViewTxClick} />
+  <TxModal title="success" txRD={RD.success('txhash')} onClose={onClose} onViewTxClick={onViewTxClick} />
 )
 StorySuccess.storyName = 'success'
 
 export const StoryFailure: Story = () => (
   <TxModal
+    title="error"
     startTime={Date.now()}
     txRD={RD.failure({ errorId: ErrorId.SEND_TX, msg: 'something went wrong' })}
     onClose={onClose}

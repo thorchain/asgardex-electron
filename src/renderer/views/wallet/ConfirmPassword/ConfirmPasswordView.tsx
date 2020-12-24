@@ -37,39 +37,34 @@ export const ConfirmPasswordView: React.FC<{
     closePrivateModal()
   }, [onSuccess, closePrivateModal])
 
-  const confirmProps = useMemo(
-    () =>
-      FP.pipe(
-        passwordValidationResult,
-        RD.fold(
-          () => ({
-            onCancel: closePrivateModal,
-            visible: true,
-            onConfirm: setPasswordToValidate
-          }),
-          () => ({
-            visible: true,
-            validatingPassword: true,
-            onCancel: closePrivateModal,
-            onConfirm: () => null
-          }),
-          () => ({
-            visible: true,
-            invalidPassword: true,
-            onCancel: closePrivateModal,
-            onConfirm: setPasswordToValidate
-          }),
-          () => ({
-            visible: true,
-            onCancel: closePrivateModal,
-            onOk: onPasswordValidationSucceed,
-            onConfirm: setPasswordToValidate,
-            isSuccess: true
-          })
-        )
-      ),
-    [passwordValidationResult, setPasswordToValidate, closePrivateModal, onPasswordValidationSucceed]
-  )
+  const confirmProps = useMemo(() => {
+    const props = { onCancel: closePrivateModal, visible: true }
+    return FP.pipe(
+      passwordValidationResult,
+      RD.fold(
+        () => ({
+          ...props,
+          onConfirm: setPasswordToValidate
+        }),
+        () => ({
+          ...props,
+          validatingPassword: true,
+          onConfirm: () => null
+        }),
+        () => ({
+          ...props,
+          invalidPassword: true,
+          onConfirm: setPasswordToValidate
+        }),
+        () => ({
+          ...props,
+          onOk: onPasswordValidationSucceed,
+          onConfirm: setPasswordToValidate,
+          isSuccess: true
+        })
+      )
+    )
+  }, [passwordValidationResult, setPasswordToValidate, closePrivateModal, onPasswordValidationSucceed])
 
   return <PrivateModal {...confirmProps} />
 }

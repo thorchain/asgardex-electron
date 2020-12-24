@@ -10,8 +10,9 @@ import * as RxOp from 'rxjs/operators'
 
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { SendTxParams } from '../../../services/binance/types'
-import { ErrorId, TxRD } from '../../../services/wallet/types'
+import { ErrorId, TxLD, TxRD } from '../../../services/wallet/types'
 import { WalletBalance, WalletBalances } from '../../../types/wallet'
+import { PrivateModal } from '../../modal/private'
 import { AssetDetails } from './index'
 
 const bnbBalance: WalletBalance = {
@@ -36,19 +37,19 @@ const runeBalanceEmpty: WalletBalance = { ...runeBnbBalance, amount: ZERO_BASE_A
 const getBalances = (balances: WalletBalances) => NEA.fromArray<WalletBalance>(balances)
 const balances = getBalances([bnbBalance, runeBnbBalance, runeNativeBalance])
 
-const mockTxLD = (states: TxRD[]) =>
+const mockTxLD = (states: TxRD[]): TxLD =>
   Rx.interval(1000).pipe(
     RxOp.map((value) => states[value]),
     RxOp.takeUntil(Rx.timer(3000)),
     RxOp.startWith(RD.pending)
   )
 
-const sendUpgradeRuneTx = (p: SendTxParams) => {
+const sendUpgradeRuneTx = (p: SendTxParams): TxLD => {
   console.log('SendTxParams:', p)
   return mockTxLD([RD.pending, RD.success('tx-hash')])
 }
 
-const sendUpgradeRuneTxError = (p: SendTxParams) => {
+const sendUpgradeRuneTxError = (p: SendTxParams): TxLD => {
   console.log('SendTxParams:', p)
   return mockTxLD([
     RD.pending,
@@ -58,51 +59,64 @@ const sendUpgradeRuneTxError = (p: SendTxParams) => {
     })
   ])
 }
+
 const poolAddress = O.some('pool address')
 
-export const Story1: BaseStory<never, JSX.Element> = () => (
+const thorAddress = O.some('thor address')
+
+const UpgradeConfirmationModal: React.FC<{ onSuccess: () => void; onClose: () => void }> = ({ onSuccess, onClose }) => (
+  <PrivateModal visible onOk={onClose} onCancel={onClose} onConfirm={onSuccess} />
+)
+
+export const StoryBNB: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     txsPageRD={RD.initial}
     balances={balances}
     asset={O.some(AssetBNB)}
     sendTx={sendUpgradeRuneTx}
     poolAddress={poolAddress}
+    UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
-Story1.storyName = 'BNB'
+StoryBNB.storyName = 'BNB'
 
-export const Story2: BaseStory<never, JSX.Element> = () => (
+export const StoryRuneTxSuccess: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     txsPageRD={RD.initial}
     balances={balances}
     asset={O.some(AssetRune67C)}
     sendTx={sendUpgradeRuneTx}
+    runeNativeAddress={thorAddress}
     poolAddress={poolAddress}
+    UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
-Story2.storyName = 'RUNE - tx success'
+StoryRuneTxSuccess.storyName = 'RUNE - tx success'
 
-export const Story22: BaseStory<never, JSX.Element> = () => (
+export const StoryRuneTxError: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     txsPageRD={RD.initial}
     balances={balances}
     asset={O.some(AssetRune67C)}
     sendTx={sendUpgradeRuneTxError}
+    runeNativeAddress={thorAddress}
     poolAddress={poolAddress}
+    UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
-Story22.storyName = 'RUNE - tx error'
+StoryRuneTxError.storyName = 'RUNE - tx error'
 
-export const Story3: BaseStory<never, JSX.Element> = () => (
+export const StoryRuneNoBalances: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     txsPageRD={RD.initial}
     balances={getBalances([runeBalanceEmpty])}
     asset={O.some(AssetRune67C)}
     sendTx={sendUpgradeRuneTx}
     poolAddress={poolAddress}
+    UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
-Story3.storyName = 'RUNE - disabled - no balance'
+StoryRuneNoBalances.storyName = 'RUNE - disabled - no balance'
 
 export default {
   title: 'Wallet/AssetsDetails'

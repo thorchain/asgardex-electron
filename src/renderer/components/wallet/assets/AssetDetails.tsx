@@ -4,7 +4,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
-import Modal from 'antd/lib/modal/Modal'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -24,11 +23,19 @@ import { PoolAddress } from '../../../services/midgard/types'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import { LoadTxsHandler, NonEmptyWalletBalances, TxLD, TxRD } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
+import { TxModal } from '../../modal/tx'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
 import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.style'
+
+type UpgradeTxState = {
+  startTime: O.Option<number>
+  txRD: TxRD
+}
+
+const INITIAL_TX_UPGRADE_STATE: UpgradeTxState = { startTime: O.none, txRD: RD.initial }
 
 type Props = {
   txsPageRD: TxsPageRD
@@ -41,6 +48,7 @@ type Props = {
   runeNativeAddress?: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
   sendTx: (_: SendTxParams) => TxLD
+  UpgradeConfirmationModal: React.FC<{ onSuccess: () => void; onClose: () => void }>
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -54,26 +62,29 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
     walletAddress: oWalletAddress = O.none,
-    runeNativeAddress: oRuneNativeAddress = O.none
+    runeNativeAddress: oRuneNativeAddress = O.none,
+    UpgradeConfirmationModal
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
 
+  // State for visibility of Modal to confirm upgrade
+  const [showConfirmUpgradeModal, setShowConfirmUpgradeModal] = useState(false)
   // (Possible) subscription of upgrade tx
-  const [bnbTxSub, setBnbTxSub] = useState<O.Option<Rx.Subscription>>(O.none)
+  const [upgradeTxSub, setUpgradeTxSub] = useState<O.Option<Rx.Subscription>>(O.none)
   // State of upgrade tx
-  const [bnbTxRD, setBnbTxRD] = useState<TxRD>(RD.initial)
+  const [upgradeTxState, setUpgradeTxState] = useState<UpgradeTxState>(INITIAL_TX_UPGRADE_STATE)
 
-  // unsubscribe of possible previous subscription of upgrade tx
+  // unsubscribe of (possible) previous subscription of upgrade tx
   // It will be called whenever state of `bnbTxSub` changed
   useEffect(() => {
     return () => {
       FP.pipe(
-        bnbTxSub,
+        upgradeTxSub,
         O.map((sub) => sub.unsubscribe())
       )
     }
-  }, [bnbTxSub])
+  }, [upgradeTxSub])
 
   const oAssetAsString: O.Option<string> = useMemo(() => FP.pipe(oAsset, O.map(assetToString)), [oAsset])
 
@@ -142,66 +153,112 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       isRuneBnbAsset &&
       FP.pipe(
         oRuneBnbAmount,
-        O.map((amount) => amount.amount().isLessThanOrEqualTo(0) || RD.isPending(bnbTxRD)),
+        O.map((amount) => amount.amount().isLessThanOrEqualTo(0) || RD.isPending(upgradeTxState.txRD)),
         O.getOrElse<boolean>(() => true)
       ),
-    [bnbTxRD, isRuneBnbAsset, oRuneBnbAmount]
+    [upgradeTxState, isRuneBnbAsset, oRuneBnbAmount]
   )
 
   const actionColSpanDesktop = isRuneBnbAsset ? 8 : 12
   const actionColSpanMobile = 24
 
-  const upgradeRune = useCallback(
-    (_) =>
-      FP.pipe(
-        sequenceTOption(oRuneBnbAsset, oRuneBnbAmount, oPoolAddress, oRuneNativeAddress),
-        O.map(([asset, _amount, recipient, runeAddress]) => {
-          // TODO (@Veado): Remove it if we have everything set up for upgrade feature - just for testing
-          const amount = ONE_ASSET_BASE_AMOUNT
-          const subscription = sendTx({ recipient, amount, asset, memo: `SWITCH:${runeAddress}` }).subscribe(setBnbTxRD)
-          // store subscription
-          setBnbTxSub(O.some(subscription))
-
-          return true
-        }),
-        O.getOrElse(() => {
-          console.log("upgradeRuneHandler can't be called")
-          return false
+  const upgradeRune = useCallback(() => {
+    FP.pipe(
+      sequenceTOption(oRuneBnbAsset, oRuneBnbAmount, oPoolAddress, oRuneNativeAddress),
+      O.map(([asset, _amount, recipient, runeAddress]) => {
+        // TODO (@Veado): Remove it if we have everything set up for upgrade feature - just for testing
+        const amount = ONE_ASSET_BASE_AMOUNT
+        const startTime = Date.now()
+        const subscription = sendTx({ recipient, amount, asset, memo: `SWITCH:${runeAddress}` }).subscribe((txRD) => {
+          console.log('txrd', txRD)
+          setUpgradeTxState({ startTime: O.some(startTime), txRD })
         })
+        // store subscription
+        setUpgradeTxSub(O.some(subscription))
+
+        return true
+      }),
+      O.getOrElse(() => {
+        console.error("upgradeRuneHandler can't be called")
+        return false
+      })
+    )
+  }, [oPoolAddress, oRuneBnbAmount, oRuneBnbAsset, oRuneNativeAddress, sendTx])
+
+  const closeUpgradeTxModal = useCallback(() => {
+    // reset subscription
+    setUpgradeTxSub(O.none)
+    // reset tx state
+    setUpgradeTxState(INITIAL_TX_UPGRADE_STATE)
+    // reload balances
+    refreshHandler()
+  }, [refreshHandler])
+
+  const upgradeTxModalTitle = useMemo(
+    () =>
+      FP.pipe(
+        upgradeTxState.txRD,
+        RD.fold(
+          () => 'wallet.upgrade.pending',
+          () => 'wallet.upgrade.pending',
+          () => 'wallet.upgrade.error',
+          () => 'wallet.upgrade.success'
+        ),
+        (id) => intl.formatMessage({ id })
       ),
-    [oPoolAddress, oRuneBnbAmount, oRuneBnbAsset, oRuneNativeAddress, sendTx]
+    [intl, upgradeTxState]
   )
 
-  const closeModal = useCallback(() => {
-    setBnbTxSub(O.none)
-    setBnbTxRD(RD.initial)
-  }, [])
-
-  // TODO(@Veado) Build custom UI for Modal (tx timer etc.)
-  const renderTxModal = useMemo(
-    () => (
-      <Modal visible={!RD.isInitial(bnbTxRD)} title="Upgrade tx" onOk={closeModal} onCancel={closeModal}>
-        {FP.pipe(
-          bnbTxRD,
-          RD.fold(
-            () => <>initial</>,
-            () => <>progress ...</>,
-            ({ errorId, msg }) => (
-              <>
-                Error {errorId} / {msg}
-              </>
-            ),
-            (txHash) => <>txHash {txHash}</>
+  const renderUpgradeTxModal = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(upgradeTxSub, upgradeTxState.startTime),
+        O.fold(
+          () => <></>,
+          ([_, startTime]) => (
+            <TxModal
+              title={upgradeTxModalTitle}
+              onClose={closeUpgradeTxModal}
+              txRD={upgradeTxState.txRD}
+              startTime={startTime}
+              onViewTxClick={clickTxLinkHandler}
+            />
           )
-        )}
-      </Modal>
-    ),
-    [bnbTxRD, closeModal]
+        )
+      ),
+    [
+      upgradeTxSub,
+      upgradeTxState.startTime,
+      upgradeTxState.txRD,
+      upgradeTxModalTitle,
+      closeUpgradeTxModal,
+      clickTxLinkHandler
+    ]
+  )
+
+  const upgradeConfirmationHandler = useCallback(() => {
+    // close confirmation modal
+    setShowConfirmUpgradeModal(false)
+    upgradeRune()
+  }, [upgradeRune])
+
+  const renderConfirmUpgradeModal = useMemo(
+    () =>
+      showConfirmUpgradeModal ? (
+        <UpgradeConfirmationModal
+          onSuccess={upgradeConfirmationHandler}
+          onClose={() => setShowConfirmUpgradeModal(false)}
+        />
+      ) : (
+        <></>
+      ),
+    [UpgradeConfirmationModal, showConfirmUpgradeModal, upgradeConfirmationHandler]
   )
 
   return (
     <>
-      {renderTxModal}
+      {renderConfirmUpgradeModal}
+      {renderUpgradeTxModal}
       <Row justify="space-between">
         <Col>
           <BackLink path={walletRoutes.assets.path()} />
@@ -236,9 +293,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
                     round="true"
                     sizevalue="xnormal"
                     color="warning"
-                    onClick={upgradeRune}
+                    onClick={() => setShowConfirmUpgradeModal(true)}
                     disabled={runeUpgradeDisabled}
-                    loading={RD.isPending(bnbTxRD)}>
+                    loading={RD.isPending(upgradeTxState.txRD)}>
                     {intl.formatMessage({ id: 'wallet.action.upgrade' })}
                   </Button>
                 </Row>

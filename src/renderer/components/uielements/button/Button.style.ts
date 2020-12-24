@@ -179,7 +179,8 @@ const getThemes = () => {
     value.transparent = {
       text: palette('success', 0),
       action: {
-        text: palette('success', 1)
+        text: palette('success', 1),
+        background: 'transparent'
       }
     }
 

@@ -12,6 +12,7 @@ import * as Styled from './TxModal.style'
 
 export type Props = {
   txRD: TxRD
+  title: string
   onClose: () => void
   onViewTxClick?: (txHash: TxHash) => void
   maxSec?: number
@@ -19,23 +20,9 @@ export type Props = {
 }
 
 export const TxModal: React.FC<Props> = (props): JSX.Element => {
-  const { txRD, startTime, onClose, onViewTxClick = emptyFunc } = props
+  const { title, txRD, startTime, onClose, onViewTxClick = emptyFunc } = props
 
   const intl = useIntl()
-
-  const i18nTitleId = useMemo(
-    () =>
-      FP.pipe(
-        txRD,
-        RD.fold(
-          () => 'wallet.upgrade.pending',
-          () => 'wallet.upgrade.pending',
-          () => 'wallet.upgrade.error',
-          () => 'wallet.upgrade.success'
-        )
-      ),
-    [txRD]
-  )
 
   const renderTimer = useMemo(
     () =>
@@ -52,29 +39,30 @@ export const TxModal: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderResultDetails = useMemo(
-    () =>
-      FP.pipe(
-        txRD,
-        RD.map((txHash) => (
-          <Styled.ResultDetailsContainer key={txHash}>
-            <Styled.BtnCopyWrapper>
-              <Styled.ViewButton color="success" onClick={onClose}>
-                {intl.formatMessage({ id: 'common.finish' })}
-              </Styled.ViewButton>
+    () => (
+      <Styled.ResultDetailsContainer>
+        <Styled.BtnCopyWrapper>
+          <Styled.ViewButton disabled={RD.isInitial(txRD) || RD.isPending(txRD)} color="success" onClick={onClose}>
+            {intl.formatMessage({ id: RD.isFailure(txRD) ? 'common.cancel' : 'common.finish' })}
+          </Styled.ViewButton>
 
-              <Styled.ViewTransaction onClick={() => onViewTxClick(txHash)}>
+          {FP.pipe(
+            txRD,
+            RD.map((txHash) => (
+              <Styled.ViewTxButton onClick={() => onViewTxClick(txHash)} key={txHash}>
                 {intl.formatMessage({ id: 'common.viewTransaction' })}
-              </Styled.ViewTransaction>
-            </Styled.BtnCopyWrapper>
-          </Styled.ResultDetailsContainer>
-        )),
-        RD.getOrElse(() => <></>)
-      ),
+              </Styled.ViewTxButton>
+            )),
+            RD.getOrElse(() => <></>)
+          )}
+        </Styled.BtnCopyWrapper>
+      </Styled.ResultDetailsContainer>
+    ),
     [intl, onClose, onViewTxClick, txRD]
   )
 
   return (
-    <Styled.Modal visible={true} title={intl.formatMessage({ id: i18nTitleId })} footer={null} onCancel={onClose}>
+    <Styled.Modal visible title={title} footer={null} onCancel={onClose}>
       <Styled.ContentRow>{renderTimer}</Styled.ContentRow>
       {renderResultDetails}
     </Styled.Modal>

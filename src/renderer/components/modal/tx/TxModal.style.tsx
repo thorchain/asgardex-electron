@@ -1,9 +1,12 @@
+import React from 'react'
+
 import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { ErrorView as UIErrorView } from '../../shared/error'
-import { Button } from '../../uielements/button'
+import { Button as UIButton } from '../../uielements/button'
+import { ExternalLinkIcon as UIExternalLinkIcon } from '../../uielements/common/Common.style'
 import { Modal as UIModal } from '../../uielements/modal'
 
 export const Modal = styled(UIModal)`
@@ -45,16 +48,22 @@ export const BtnCopyWrapper = styled.div`
   cursor: pointer;
 `
 
-export const ViewButton = styled(Button)`
+export const ViewButton = styled(UIButton)`
   width: 300px;
   height: 40px;
-  margin-top: 24px;
+  margin: 24px 0;
 `
 
-export const ViewTransaction = styled.a`
-  margin-top: 24px;
-  color: ${palette('primary', 0)};
+const ExternalLinkIcon = styled(UIExternalLinkIcon)`
+  svg {
+    color: ${palette('primary', 0)};
+  }
 `
+
+export const ViewTxButton = styled(UIButton).attrs({
+  typevalue: 'transparent',
+  icon: <ExternalLinkIcon />
+})``
 
 export const ErrorView = styled(UIErrorView)`
   padding: 0px;
