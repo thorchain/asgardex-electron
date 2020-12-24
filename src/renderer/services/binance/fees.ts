@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client } from '@xchainjs/xchain-binance'
+import { Fees } from '@xchainjs/xchain-client'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -16,8 +17,10 @@ const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
 /**
  * Transaction fees
  */
-const fees$: (client: Client$) => FeesLD = (client$) =>
-  Rx.combineLatest([reloadFees$, client$]).pipe(
+const fees$: (client: Client$) => FeesLD = (client$) => {
+  let defaultFees: Fees
+
+  return Rx.combineLatest([reloadFees$, client$]).pipe(
     switchMap(([_, oClient]) =>
       FP.pipe(
         // client and asset has to be available
@@ -25,16 +28,20 @@ const fees$: (client: Client$) => FeesLD = (client$) =>
         O.alt(() => O.some(new Client({}))),
         O.fold(
           () => Rx.EMPTY,
-          (client) => Rx.from(client.getFees())
+          (client) => {
+            defaultFees = client.getDefaultFees()
+            return Rx.from(client.getFees())
+          }
         ),
         map(RD.success),
         startWith(RD.pending),
-        catchError((_) => Rx.of(RD.failure(Error('Error to load fees for BNB chain'))))
+        catchError((_) => Rx.of(RD.success(defaultFees)))
       )
     ),
     startWith(RD.initial),
     shareReplay(1)
   )
+}
 
 export const createFeesService = (client$: Client$): FeesService => ({
   reloadFees,
