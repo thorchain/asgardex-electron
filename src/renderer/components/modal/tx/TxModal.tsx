@@ -38,25 +38,48 @@ export const TxModal: React.FC<Props> = (props): JSX.Element => {
     [intl, startTime, txRD]
   )
 
-  const renderResultDetails = useMemo(
-    () =>
-      FP.pipe(
-        txRD,
-        RD.map((txHash) => (
-          <Styled.ResultDetailsContainer key={txHash}>
-            <Styled.BtnCopyWrapper>
-              <Styled.ViewButton color="success" onClick={onClose}>
-                {intl.formatMessage({ id: 'common.finish' })}
-              </Styled.ViewButton>
+  // const renderResultDetails = useMemo(
+  //   () =>
+  //     FP.pipe(
+  //       txRD,
+  //       RD.map((txHash) => (
+  //         <Styled.ResultDetailsContainer key={txHash}>
+  //           <Styled.BtnCopyWrapper>
+  //             <Styled.ViewButton color="success" onClick={onClose}>
+  //               {intl.formatMessage({ id: 'common.finish' })}
+  //             </Styled.ViewButton>
 
-              <Styled.ViewTransaction onClick={() => onViewTxClick(txHash)}>
+  //             <Styled.ViewTransaction onClick={() => onViewTxClick(txHash)}>
+  //               {intl.formatMessage({ id: 'common.viewTransaction' })}
+  //             </Styled.ViewTransaction>
+  //           </Styled.BtnCopyWrapper>
+  //         </Styled.ResultDetailsContainer>
+  //       )),
+  //       RD.getOrElse(() => <></>)
+  //     ),
+  //   [intl, onClose, onViewTxClick, txRD]
+  // )
+
+  const renderResultDetails = useMemo(
+    () => (
+      <Styled.ResultDetailsContainer>
+        <Styled.BtnCopyWrapper>
+          <Styled.ViewButton disabled={RD.isInitial(txRD) || RD.isPending(txRD)} color="success" onClick={onClose}>
+            {intl.formatMessage({ id: RD.isFailure(txRD) ? 'common.cancel' : 'common.finish' })}
+          </Styled.ViewButton>
+
+          {FP.pipe(
+            txRD,
+            RD.map((txHash) => (
+              <Styled.ViewTxButton onClick={() => onViewTxClick(txHash)} key={txHash}>
                 {intl.formatMessage({ id: 'common.viewTransaction' })}
-              </Styled.ViewTransaction>
-            </Styled.BtnCopyWrapper>
-          </Styled.ResultDetailsContainer>
-        )),
-        RD.getOrElse(() => <></>)
-      ),
+              </Styled.ViewTxButton>
+            )),
+            RD.getOrElse(() => <></>)
+          )}
+        </Styled.BtnCopyWrapper>
+      </Styled.ResultDetailsContainer>
+    ),
     [intl, onClose, onViewTxClick, txRD]
   )
 
