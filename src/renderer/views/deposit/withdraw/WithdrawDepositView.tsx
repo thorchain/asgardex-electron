@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { Asset, AssetRune67C, AssetRuneNative, BaseAmount, bn } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, BaseAmount, bn } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -113,7 +113,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         runePrice={runePrice}
         chainAssetPoolData={ZERO_POOL_DATA}
         runeBalance={runeBalance}
-        selectedPriceAsset={AssetRune67C}
+        selectedPriceAsset={AssetRuneNative}
         onWithdraw={emptyFunc}
         runeShare={ZERO_BASE_AMOUNT}
         assetShare={ZERO_BASE_AMOUNT}

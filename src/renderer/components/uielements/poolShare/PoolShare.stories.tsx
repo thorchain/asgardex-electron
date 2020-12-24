@@ -1,18 +1,18 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn, assetToBase, assetAmount, AssetBNB, AssetRune67C, baseAmount } from '@xchainjs/xchain-util'
+import { bn, assetToBase, assetAmount, AssetBNB, baseAmount, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { ZERO_BN } from '../../../const'
 import { PoolShare } from './PoolShare'
 
 export const DefaultPoolShare = () => (
   <PoolShare
-    sourceAsset={AssetRune67C}
+    sourceAsset={AssetRuneNative}
     targetAsset={AssetBNB}
     assetDepositPrice={assetToBase(assetAmount(120.1))}
     assetDepositShare={assetToBase(assetAmount(500))}
-    priceAsset={AssetRune67C}
+    priceAsset={AssetRuneNative}
     loading={false}
     runeDepositPrice={assetToBase(assetAmount(400))}
     runeDepositShare={assetToBase(assetAmount(500))}
@@ -33,11 +33,11 @@ storiesOf('Components/PoolShare', module)
     return (
       <div style={{ padding: '20px' }}>
         <PoolShare
-          sourceAsset={AssetRune67C}
+          sourceAsset={AssetRuneNative}
           targetAsset={AssetBNB}
           assetDepositPrice={baseAmount(0)}
           assetDepositShare={baseAmount(0)}
-          priceAsset={AssetRune67C}
+          priceAsset={AssetRuneNative}
           loading={true}
           runeDepositPrice={baseAmount(0)}
           runeDepositShare={baseAmount(0)}

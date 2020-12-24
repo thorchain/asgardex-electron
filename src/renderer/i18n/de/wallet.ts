@@ -50,9 +50,12 @@ const wallet: WalletMessages = {
     'Der eingegebene Wert sollte nicht höher als Dein Guthaben abzgl. Gebühren sein',
   'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Dein Guthaben ({balance}) gedeckt',
   'wallet.errors.invalidChain': 'Invalide Chain: {chain}',
-  'wallet.password.confirmation': 'Password confirmation - DE',
-  'wallet.password.confirmation.pending': 'Validating password - DE',
-  'wallet.password.confirmation.error': 'Password is wrong - DE'
+  'wallet.password.confirmation': 'Password bestätigen',
+  'wallet.password.confirmation.pending': 'Überprüfe Passwort',
+  'wallet.password.confirmation.error': 'Passwort ist falsch',
+  'wallet.upgrade.pending': 'Upgraden',
+  'wallet.upgrade.success': 'Updgrade erfolgreich',
+  'wallet.upgrade.error': 'Upgrade error'
 }
 
 export default wallet

@@ -1,8 +1,8 @@
-import { Balances } from '@xchainjs/xchain-client'
-import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, baseAmount } from '@xchainjs/xchain-util'
+import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
 import { some, none } from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { eqOWalletBalance, eqWalletBalances } from '../../helpers/fp/eq'
 import { KeystoreState, KeystoreContent } from './types'
 import {
   getKeystoreContent,
@@ -11,7 +11,8 @@ import {
   isLocked,
   getPhrase,
   sortBalances,
-  filterNullableBalances
+  filterNullableBalances,
+  getBalanceByAsset
 } from './util'
 
 describe('services/wallet/util/', () => {
@@ -108,69 +109,108 @@ describe('services/wallet/util/', () => {
       const target = [
         {
           asset: ASSETS_TESTNET.TOMO,
-          amount: baseAmount(0)
+          amount: baseAmount(0),
+          walletAddress: 'ADDRESS_TOMO'
         },
         {
           asset: ASSETS_TESTNET.BOLT,
-          amount: baseAmount(1)
+          amount: baseAmount(1),
+          walletAddress: 'ADDRESS_BOLT'
         },
         {
           asset: ASSETS_TESTNET.FTM,
-          amount: baseAmount(0)
+          amount: baseAmount(0),
+          walletAddress: 'ADDRESS_FTM'
         },
         {
           asset: ASSETS_TESTNET.BNB,
-          amount: baseAmount(2)
+          amount: baseAmount(2),
+          walletAddress: 'ADDRESS_BNB'
         },
         {
-          asset: ASSETS_TESTNET.RUNE,
-          amount: baseAmount(0)
+          asset: AssetRuneNative,
+          amount: baseAmount(0),
+          walletAddress: 'ADDRESS_RUNENATIVE'
         }
-      ] as Balances
-      expect(filterNullableBalances(target)).toEqual([target[1], target[3]])
+      ]
+      const nullableBalances = filterNullableBalances(target)
+      expect(eqWalletBalances.equals(nullableBalances, [target[1], target[3]])).toBeTruthy()
     })
   })
 
   describe('sortBalances', () => {
     it('sorts balances based on orders', () => {
-      expect(
-        sortBalances(
-          [
-            {
-              asset: ASSETS_TESTNET.TOMO
-            },
-            {
-              asset: ASSETS_TESTNET.BOLT
-            },
-            {
-              asset: ASSETS_TESTNET.FTM
-            },
-            {
-              asset: ASSETS_TESTNET.BNB
-            },
-            {
-              asset: ASSETS_TESTNET.RUNE
-            }
-          ] as Balances,
-          [AssetBTC.ticker, AssetETH.ticker, AssetRune67C.ticker, AssetBNB.ticker]
-        )
-      ).toEqual([
+      const target = [
         {
-          asset: ASSETS_TESTNET.RUNE
+          asset: ASSETS_TESTNET.TOMO,
+          amount: baseAmount(0),
+          walletAddress: 'ADDRESS_TOMO'
         },
         {
-          asset: ASSETS_TESTNET.BNB
+          asset: ASSETS_TESTNET.BOLT,
+          amount: baseAmount(1),
+          walletAddress: 'ADDRESS_BOLT'
         },
         {
-          asset: ASSETS_TESTNET.BOLT
+          asset: ASSETS_TESTNET.FTM,
+          amount: baseAmount(0),
+          walletAddress: 'ADDRESS_FTM'
         },
         {
-          asset: ASSETS_TESTNET.FTM
+          asset: ASSETS_TESTNET.BNB,
+          amount: baseAmount(2),
+          walletAddress: 'ADDRESS_BNB'
         },
         {
-          asset: ASSETS_TESTNET.TOMO
+          asset: AssetRuneNative,
+          amount: baseAmount(0),
+          walletAddress: 'ADDRESS_RUNENATIVE'
+        }
+      ]
+      const balances = sortBalances(target, [AssetBTC.ticker, AssetETH.ticker, AssetRune67C.ticker, AssetBNB.ticker])
+      expect(eqWalletBalances.equals(balances, [target[4], target[3], target[1], target[2], target[0]])).toBeTruthy()
+    })
+  })
+
+  describe('getBalanceByAsset', () => {
+    it('get balance by asset', () => {
+      const balanceByAsset = getBalanceByAsset(AssetBNB)([
+        {
+          asset: ASSETS_TESTNET.TOMO,
+          amount: baseAmount(0),
+          walletAddress: 'ADDRESS_TOMO'
+        },
+        {
+          asset: ASSETS_TESTNET.BOLT,
+          amount: baseAmount(1),
+          walletAddress: 'ADDRESS_BOLT'
+        },
+        {
+          asset: ASSETS_TESTNET.FTM,
+          amount: baseAmount(0),
+          walletAddress: 'ADDRESS_FTM'
+        },
+        {
+          asset: ASSETS_TESTNET.BNB,
+          amount: baseAmount(2),
+          walletAddress: 'ADDRESS_BNB'
+        },
+        {
+          asset: AssetRuneNative,
+          amount: baseAmount(0),
+          walletAddress: 'ADDRESS_RUNENATIVE'
         }
       ])
+      expect(
+        eqOWalletBalance.equals(
+          balanceByAsset,
+          some({
+            asset: ASSETS_TESTNET.BNB,
+            amount: baseAmount(2),
+            walletAddress: 'ADDRESS_BNB'
+          })
+        )
+      ).toBeTruthy()
     })
   })
 })

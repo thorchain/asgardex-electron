@@ -1,4 +1,4 @@
-import { assetAddress$ } from './address'
+import { addressByChain$, assetAddress$ } from './address'
 import { clientByChain$ } from './client'
 import { isCrossChainDeposit$ } from './common'
 import { getExplorerUrlByAsset$ } from './explorerUrl'
@@ -19,6 +19,7 @@ import { sendTx, txRD$, resetTx } from './transaction'
  * Exports all functions and observables needed at UI level (provided by `ChainContext`)
  */
 export {
+  addressByChain$,
   clientByChain$,
   reloadDepositFees,
   depositFees$,

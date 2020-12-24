@@ -8,8 +8,6 @@ import IPCMessages from '../ipc/messages'
 export const apiHDWallet: ApiHDWallet = {
   getLedgerAddress: (chain: Chain, network: Network) =>
     ipcRenderer.invoke(IPCMessages.GET_LEDGER_ADDRESS, chain, network),
-  signTxInLedger: (chain: Chain, network: Network, ledgerTxInfo: LedgerTxInfo) =>
-    ipcRenderer.invoke(IPCMessages.SIGN_LEDGER_TX, chain, network, ledgerTxInfo),
-  sendTxInLedger: (chain: Chain, network: Network, ledgerTxInfo: LedgerTxInfo) =>
-    ipcRenderer.invoke(IPCMessages.SIGN_LEDGER_TX, chain, network, ledgerTxInfo)
+  sendTxInLedger: (chain: Chain, network: Network, txInfo: LedgerTxInfo) =>
+    ipcRenderer.invoke(IPCMessages.SEND_LEDGER_TX, chain, network, txInfo)
 }
