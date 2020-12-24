@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { ExportOutlined } from '@ant-design/icons'
 import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { Button as UIButton } from '../../uielements/button'
+import { ExternalLinkIcon as UIExternalLinkIcon } from '../../uielements/common/Common.style'
 import { Modal } from '../../uielements/modal'
 
 export const SwapModalWrapper = styled(Modal)`
@@ -89,9 +89,15 @@ export const ViewButton = styled(UIButton)`
   margin-top: 24px;
 `
 
+const ExternalLinkIcon = styled(UIExternalLinkIcon)`
+  svg {
+    color: ${palette('primary', 0)};
+  }
+`
+
 export const ViewTransaction = styled(UIButton).attrs({
   typevalue: 'transparent',
-  icon: <ExportOutlined />
+  icon: <ExternalLinkIcon />
 })`
   margin-top: 24px;
 `

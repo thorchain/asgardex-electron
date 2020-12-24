@@ -1,12 +1,12 @@
 import React from 'react'
 
-import { ExportOutlined } from '@ant-design/icons'
 import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { ErrorView as UIErrorView } from '../../shared/error'
 import { Button as UIButton } from '../../uielements/button'
+import { ExternalLinkIcon as UIExternalLinkIcon } from '../../uielements/common/Common.style'
 import { Modal as UIModal } from '../../uielements/modal'
 
 export const Modal = styled(UIModal)`
@@ -54,9 +54,15 @@ export const ViewButton = styled(UIButton)`
   margin: 24px 0;
 `
 
+const ExternalLinkIcon = styled(UIExternalLinkIcon)`
+  svg {
+    color: ${palette('primary', 0)};
+  }
+`
+
 export const ViewTxButton = styled(UIButton).attrs({
   typevalue: 'transparent',
-  icon: <ExportOutlined />
+  icon: <ExternalLinkIcon />
 })``
 
 export const ErrorView = styled(UIErrorView)`

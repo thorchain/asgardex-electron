@@ -1,4 +1,4 @@
-import { SelectOutlined, SwapOutlined } from '@ant-design/icons'
+import { SwapOutlined } from '@ant-design/icons'
 import { Typography } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -23,15 +23,6 @@ export const Text = styled(Typography.Text)`
   text-transform: uppercase;
   font-family: 'MainFontRegular';
   color: ${palette('text', 1)};
-`
-
-export const LinkIcon = styled(SelectOutlined)`
-  svg {
-    height: 20px;
-    width: 20px;
-    transform: scale(-1, 1) translateX(5px);
-    color: ${palette('text', 1)};
-  }
 `
 
 export const TransferIcon = styled(SwapOutlined)`

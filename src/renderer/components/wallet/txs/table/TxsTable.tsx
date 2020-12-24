@@ -15,6 +15,7 @@ import { TxsPageRD } from '../../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../../services/const'
 import { ApiError } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error'
+import * as CommonStyled from '../../../uielements/common/Common.style'
 import { Pagination } from '../../../uielements/pagination'
 import * as Styled from './TxsTable.style'
 
@@ -179,9 +180,10 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [intl, renderAmountColumn]
   )
 
-  const renderLinkColumn = useCallback(({ hash }: Tx) => <Styled.LinkIcon onClick={() => clickTxLinkHandler(hash)} />, [
-    clickTxLinkHandler
-  ])
+  const renderLinkColumn = useCallback(
+    ({ hash }: Tx) => <CommonStyled.ExternalLinkIcon onClick={() => clickTxLinkHandler(hash)} />,
+    [clickTxLinkHandler]
+  )
   const linkColumn: ColumnType<Tx> = useMemo(
     () => ({
       key: 'txHash',

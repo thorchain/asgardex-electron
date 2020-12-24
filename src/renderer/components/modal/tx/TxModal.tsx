@@ -38,28 +38,6 @@ export const TxModal: React.FC<Props> = (props): JSX.Element => {
     [intl, startTime, txRD]
   )
 
-  // const renderResultDetails = useMemo(
-  //   () =>
-  //     FP.pipe(
-  //       txRD,
-  //       RD.map((txHash) => (
-  //         <Styled.ResultDetailsContainer key={txHash}>
-  //           <Styled.BtnCopyWrapper>
-  //             <Styled.ViewButton color="success" onClick={onClose}>
-  //               {intl.formatMessage({ id: 'common.finish' })}
-  //             </Styled.ViewButton>
-
-  //             <Styled.ViewTransaction onClick={() => onViewTxClick(txHash)}>
-  //               {intl.formatMessage({ id: 'common.viewTransaction' })}
-  //             </Styled.ViewTransaction>
-  //           </Styled.BtnCopyWrapper>
-  //         </Styled.ResultDetailsContainer>
-  //       )),
-  //       RD.getOrElse(() => <></>)
-  //     ),
-  //   [intl, onClose, onViewTxClick, txRD]
-  // )
-
   const renderResultDetails = useMemo(
     () => (
       <Styled.ResultDetailsContainer>
