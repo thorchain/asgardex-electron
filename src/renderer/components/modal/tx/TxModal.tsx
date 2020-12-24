@@ -12,6 +12,7 @@ import * as Styled from './TxModal.style'
 
 export type Props = {
   txRD: TxRD
+  title: string
   onClose: () => void
   onViewTxClick?: (txHash: TxHash) => void
   maxSec?: number
@@ -19,23 +20,9 @@ export type Props = {
 }
 
 export const TxModal: React.FC<Props> = (props): JSX.Element => {
-  const { txRD, startTime, onClose, onViewTxClick = emptyFunc } = props
+  const { title, txRD, startTime, onClose, onViewTxClick = emptyFunc } = props
 
   const intl = useIntl()
-
-  const i18nTitleId = useMemo(
-    () =>
-      FP.pipe(
-        txRD,
-        RD.fold(
-          () => 'wallet.upgrade.pending',
-          () => 'wallet.upgrade.pending',
-          () => 'wallet.upgrade.error',
-          () => 'wallet.upgrade.success'
-        )
-      ),
-    [txRD]
-  )
 
   const renderTimer = useMemo(
     () =>
@@ -74,7 +61,7 @@ export const TxModal: React.FC<Props> = (props): JSX.Element => {
   )
 
   return (
-    <Styled.Modal visible={true} title={intl.formatMessage({ id: i18nTitleId })} footer={null} onCancel={onClose}>
+    <Styled.Modal visible title={title} footer={null} onCancel={onClose}>
       <Styled.ContentRow>{renderTimer}</Styled.ContentRow>
       {renderResultDetails}
     </Styled.Modal>

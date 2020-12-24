@@ -55,7 +55,7 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
       <Form autoComplete="off">
         <Form.Item
           className={invalidPassword ? 'has-error' : ''}
-          extra={validatingPassword ? intl.formatMessage({ id: 'wallet.password.confirmation.pending' }) + '...' : ''}>
+          extra={validatingPassword ? `${intl.formatMessage({ id: 'wallet.password.confirmation.pending' })}...` : ''}>
           <Input
             type="password"
             typevalue="normal"
@@ -66,7 +66,7 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
             autoComplete="off"
           />
           {invalidPassword && (
-            <Label color="error" textTransform="capitalize">
+            <Label color="error" textTransform="uppercase">
               {intl.formatMessage({ id: 'wallet.password.confirmation.error' })}!
             </Label>
           )}

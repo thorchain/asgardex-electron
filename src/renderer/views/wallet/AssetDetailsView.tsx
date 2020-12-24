@@ -22,6 +22,7 @@ import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { getPoolAddressByChain } from '../../services/midgard/utils'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
+import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const { asset, walletAddress } = useParams<AssetDetailsParams>()
@@ -136,6 +137,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         runeNativeAddress={oRuneNativeAddress}
         poolAddress={bnbPoolAddress}
         sendTx={sendBnbTx}
+        UpgradeConfirmationModal={ConfirmPasswordView}
       />
     </>
   )
