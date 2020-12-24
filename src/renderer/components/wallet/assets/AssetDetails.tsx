@@ -179,14 +179,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         return true
       }),
       O.getOrElse(() => {
-        console.log(
-          'oRuneBnbAsset, oRuneBnbAmount, oPoolAddress, oRuneNativeAddress:',
-          oRuneBnbAsset,
-          oRuneBnbAmount,
-          oPoolAddress,
-          oRuneNativeAddress
-        )
-        console.log("upgradeRuneHandler can't be called")
+        console.error("upgradeRuneHandler can't be called")
         return false
       })
     )
@@ -220,27 +213,27 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         sequenceTOption(upgradeTxSub, upgradeTxState.startTime),
-        O.map((v) => {
-          console.log('v:', v)
-          return v
-        }),
         O.fold(
           () => <></>,
-          ([_, startTime]) => {
-            console.log('render:', startTime)
-            return (
-              <TxModal
-                title={upgradeTxModalTitle}
-                onClose={closeUpgradeTxModal}
-                txRD={upgradeTxState.txRD}
-                startTime={startTime}
-                onViewTxClick={(_) => {}}
-              />
-            )
-          }
+          ([_, startTime]) => (
+            <TxModal
+              title={upgradeTxModalTitle}
+              onClose={closeUpgradeTxModal}
+              txRD={upgradeTxState.txRD}
+              startTime={startTime}
+              onViewTxClick={clickTxLinkHandler}
+            />
+          )
         )
       ),
-    [upgradeTxSub, upgradeTxState, upgradeTxModalTitle, closeUpgradeTxModal]
+    [
+      upgradeTxSub,
+      upgradeTxState.startTime,
+      upgradeTxState.txRD,
+      upgradeTxModalTitle,
+      closeUpgradeTxModal,
+      clickTxLinkHandler
+    ]
   )
 
   const upgradeConfirmationHandler = useCallback(() => {
