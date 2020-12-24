@@ -372,6 +372,13 @@ const createPoolsService = (
     })
   )
 
+  const poolAddressByAsset$ = (asset: Asset): PoolAddressRx =>
+    FP.pipe(
+      poolAddresses$,
+      liveData.toOptionMap$((addresses) => getPoolAddressByChain(addresses, asset.chain)),
+      RxOp.map(O.flatten)
+    )
+
   /**
    * Use this to convert asset's price to selected price asset by multiplying to the priceRation inner value
    */
@@ -409,7 +416,8 @@ const createPoolsService = (
     runeAsset$,
     poolDetail$,
     priceRatio$,
-    availableAssets$
+    availableAssets$,
+    poolAddressByAsset$
   }
 }
 

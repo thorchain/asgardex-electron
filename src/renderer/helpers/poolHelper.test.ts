@@ -1,14 +1,6 @@
 import { PoolData } from '@thorchain/asgardex-util'
 import { Balance } from '@xchainjs/xchain-client'
-import {
-  assetAmount,
-  assetToBase,
-  AssetRune67C,
-  assetToString,
-  baseAmount,
-  AssetRuneNative,
-  AssetBNB
-} from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, assetToString, baseAmount, AssetRuneNative, AssetBNB } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -68,28 +60,26 @@ describe('helpers/poolHelper/', () => {
     it('returns data for pending pools', () => {
       const result = getPoolTableRowsData({
         poolDetails: pendingPoolDetails,
-        pricePoolData,
-        network: 'testnet'
+        pricePoolData
       })
       expect(result.length).toEqual(2)
       // Note: `getPoolTableRowsData` reverses the order of given `poolDetails`
-      expect(result[0].pool.asset).toEqual(AssetRune67C)
+      expect(result[0].pool.asset).toEqual(AssetRuneNative)
       expect(result[0].pool.target).toEqual(ASSETS_TESTNET.FTM)
-      expect(result[1].pool.asset).toEqual(AssetRune67C)
+      expect(result[1].pool.asset).toEqual(AssetRuneNative)
       expect(result[1].pool.target).toEqual(ASSETS_TESTNET.BOLT)
     })
 
     it('returns data for available pools', () => {
       const result = getPoolTableRowsData({
         poolDetails,
-        pricePoolData,
-        network: 'testnet'
+        pricePoolData
       })
       expect(result.length).toEqual(2)
       // Note: `getPoolTableRowsData` reverses the order of given `poolDetails`
-      expect(result[0].pool.asset).toEqual(AssetRune67C)
+      expect(result[0].pool.asset).toEqual(AssetRuneNative)
       expect(result[0].pool.target).toEqual(ASSETS_TESTNET.FTM)
-      expect(result[1].pool.asset).toEqual(AssetRune67C)
+      expect(result[1].pool.asset).toEqual(AssetRuneNative)
       expect(result[1].pool.target).toEqual(ASSETS_TESTNET.TOMO)
     })
   })

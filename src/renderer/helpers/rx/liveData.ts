@@ -11,6 +11,7 @@ import { array } from 'fp-ts/lib/Array'
 import { Filterable2 } from 'fp-ts/lib/Filterable'
 import { MonadThrow2 } from 'fp-ts/lib/MonadThrow'
 import { pipeable } from 'fp-ts/lib/pipeable'
+import * as O from 'fp-ts/Option'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
@@ -43,6 +44,17 @@ export const liveData = {
   sequenceArray: array.sequence(instanceLiveData),
   combine: coproductMapLeft(instanceLiveData),
   mapLeft: <L, V, A>(f: (l: L) => V) => (fla: LiveData<L, A>): LiveData<V, A> => fla.pipe(RxOp.map(RD.mapLeft(f))),
+  /**
+   * LiveData<L,A> => Observable<Option<A>>
+   */
+  toOption$: <L, A>(fla: LiveData<L, A>): Observable<O.Option<A>> => fla.pipe(RxOp.map(RD.toOption)),
+  /**
+   *  1. Maps inner value of LiveData<L, A> with fab => LiveData<L, B>
+   *  2. LiveData<L,A> => Observable<Option<A>>
+   *
+   */
+  toOptionMap$: <L, A, B>(fab: (fa: A) => B) => (fla: LiveData<L, A>): Observable<O.Option<B>> =>
+    fla.pipe(RxOp.map(RD.map(fab)), RxOp.map(RD.toOption)),
   altOnError: <L, A>(f: (l: L) => A) => (fla: LiveData<L, A>): LiveData<L, A> =>
     fla.pipe(
       RxOp.map(

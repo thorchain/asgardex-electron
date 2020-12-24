@@ -1,5 +1,5 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import { bn, assetAmount, assetToBase, AssetRune67C, BNBChain, AssetBNB } from '@xchainjs/xchain-util'
+import { bn, assetAmount, assetToBase, BNBChain, AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -31,7 +31,7 @@ describe('views/pools/utils', () => {
     it('transforms data for a FTM pool', () => {
       const expected: PoolTableRowData = {
         pool: {
-          asset: AssetRune67C,
+          asset: AssetRuneNative,
           target: ASSETS_TESTNET.FTM
         },
         poolPrice: assetToBase(assetAmount(2)),
@@ -47,8 +47,7 @@ describe('views/pools/utils', () => {
 
       const result = getPoolTableRowData({
         poolDetail: lokPoolDetail,
-        pricePoolData: pricePoolData,
-        network: 'testnet'
+        pricePoolData: pricePoolData
       })
 
       expect(O.isSome(result)).toBeTruthy()

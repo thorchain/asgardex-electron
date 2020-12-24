@@ -1,12 +1,10 @@
 import { PoolData, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
-import { bnOrZero, baseAmount, assetFromString, Asset } from '@xchainjs/xchain-util'
+import { bnOrZero, baseAmount, assetFromString, Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
-import { Network } from '../../../shared/api/types'
 import { ONE_ASSET_BASE_AMOUNT, ZERO_BASE_AMOUNT } from '../../const'
-import { getRuneAsset } from '../../helpers/assetHelper'
 import { PoolDetail } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
 import { GetPoolsStatusEnum, Constants as ThorchainConstants, LastblockItem } from '../../types/generated/midgard'
@@ -28,12 +26,10 @@ const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {
 
 export const getPoolTableRowData = ({
   poolDetail,
-  pricePoolData,
-  network
+  pricePoolData
 }: {
   poolDetail: PoolDetail
   pricePoolData: PoolData
-  network: Network
 }): O.Option<PoolTableRowData> => {
   const assetString = poolDetail?.asset ?? ''
   const oPoolDetailAsset = O.fromNullable(assetFromString(assetString))
@@ -66,7 +62,7 @@ export const getPoolTableRowData = ({
 
       const pool: Pool = {
         // As long as we don't have Native RUNE, its an RUNE asset of BNB chain
-        asset: getRuneAsset({ network, chain: 'BNB' }),
+        asset: AssetRuneNative,
         target: poolDetailAsset
       }
 

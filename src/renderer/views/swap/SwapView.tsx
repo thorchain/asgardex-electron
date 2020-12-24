@@ -2,7 +2,15 @@ import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
-import { Asset, AssetAmount, assetFromString, AssetRuneNative, assetToBase, bnOrZero } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  AssetAmount,
+  assetFromString,
+  AssetRuneNative,
+  assetToBase,
+  bnOrZero,
+  THORChain
+} from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -16,17 +24,19 @@ import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
 import { BackLink } from '../../components/uielements/backLink'
 import { Button } from '../../components/uielements/button'
-import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
+import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { SwapRouteParams } from '../../routes/swap'
 import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
+import { PoolAddressRx } from '../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
+import { TxTypes } from '../../types/asgardex'
 import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
 import * as Styled from './SwapView.styles'
 
@@ -38,15 +48,21 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, selectedPoolAddress$, reloadPools, selectedPricePool$ },
+    pools: { poolsState$, reloadPools, selectedPricePool$, poolAddressByAsset$ },
     getTransactionState$,
     setSelectedPoolAsset
   } = midgardService
-  const { reloadSwapFees, swapFees$ } = useChainContext()
-  const { explorerUrl$, subscribeTx, resetTx, txRD$ } = useBinanceContext()
+  const {
+    reloadSwapFees,
+    swapFees$,
+    txRD$,
+    sendTx: subscribeTx,
+    resetTx,
+    getExplorerUrlByAsset$,
+    assetAddress$
+  } = useChainContext()
   const { balancesState$ } = useWalletContext()
   const poolsState = useObservableState(poolsState$, initial)
-  const poolAddress = useObservableState(selectedPoolAddress$, O.none)
 
   const oSource = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
   const oTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
@@ -59,6 +75,13 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       setSelectedPoolAsset(O.none)
     }
   }, [oTarget, setSelectedPoolAsset])
+
+  // Reset all common data on SwapView unmount
+  useEffect(() => {
+    return () => {
+      resetTx()
+    }
+  }, [resetTx])
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
@@ -84,36 +107,60 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const [txWithState] = useObservableState(() => txWithState$, RD.initial)
 
+  const sourcePoolAddress$ = useMemo(
+    () =>
+      FP.pipe(
+        oSource,
+        O.map(poolAddressByAsset$),
+        O.getOrElse((): PoolAddressRx => Rx.EMPTY)
+      ),
+    [oSource, poolAddressByAsset$]
+  )
+
+  const sourcePoolAddress = useObservableState(sourcePoolAddress$, O.none)
+  const targetWalletAddress = useObservableState(assetAddress$, O.none)
+
   const onConfirmSwap = useCallback(
     (source: Asset, amount: AssetAmount, memo: string) => {
       pipe(
-        poolAddress,
+        sourcePoolAddress,
+        O.alt(() => {
+          // For THOR chain we will send Deposit tx instead of
+          // plain ones. It does not need any additional address
+          if (eqChain.equals(source.chain, THORChain)) {
+            return O.some('')
+          }
+          return O.none
+        }),
         // TODO (@Veado)
         // Do a health check for pool address before sending tx
         // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
         // eslint-disable-next-line array-callback-return
-        O.map((endpoint) => {
-          if (endpoint) {
-            subscribeTx({
-              recipient: endpoint,
-              amount: assetToBase(amount),
-              asset: source,
-              memo
-            })
-          }
+        O.map((poolAddress) => {
+          subscribeTx({
+            recipient: poolAddress,
+            amount: assetToBase(amount),
+            asset: source,
+            memo,
+            txType: TxTypes.SWAP
+          })
         })
       )
     },
-    [poolAddress, subscribeTx]
+    [sourcePoolAddress, subscribeTx]
   )
 
-  const explorerUrl = useObservableState(explorerUrl$, O.none)
+  const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [
+    source,
+    getExplorerUrlByAsset$
+  ])
+  const explorerUrl = useObservableState(getExplorerUrl$, O.none)
 
   const goToTransaction = useCallback(
     (txHash: string) => {
       FP.pipe(
         explorerUrl,
-        O.map((url) => window.apiUrl.openExternal(`${url}/tx/${txHash}`))
+        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
       )
     },
     [explorerUrl]
@@ -178,7 +225,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   walletBalances={balances}
                   reloadFees={reloadSwapFees}
                   fees={swapFeesRD}
-                  poolAddress={poolAddress}
+                  targetWalletAddress={targetWalletAddress}
                 />
               )
             }

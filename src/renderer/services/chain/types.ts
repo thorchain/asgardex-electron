@@ -6,6 +6,7 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
+import { TxTypes } from '../../types/asgardex'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
 
@@ -44,6 +45,8 @@ export type DepositFeesRD = RD.RemoteData<Error, DepositFees>
 export type DepositFeesLD = LiveData<Error, DepositFees>
 
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
+
+export type SendTxParams = { asset: Asset; recipient: string; amount: BaseAmount; memo: Memo; txType: TxTypes }
 
 /**
  * Withdraw fees

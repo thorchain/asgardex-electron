@@ -1,20 +1,25 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { BNBChain, BTCChain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
+import { observableState } from '../../helpers/stateHelper'
+import { TxTypes } from '../../types/asgardex'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as THOR from '../thorchain'
-import { ErrorId, TxLD } from '../wallet/types'
-import { SendDepositTxParams } from './types'
+import { ErrorId, TxLD, TxRD } from '../wallet/types'
+import { SendTxParams } from './types'
 
-const sendTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositTxParams): TxLD => {
+const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
+
+const tx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => {
   // TODO (@Veado) Health check request for pool address
   // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
 
   // helper to create `RemoteData<ApiError, never>` observable
-  const depositTxFailure$ = (msg: string) =>
+  const txFailure$ = (msg: string) =>
     Rx.of(
       RD.failure({
         errorId: ErrorId.SEND_TX,
@@ -22,36 +27,48 @@ const sendTx = ({ chain, asset, poolAddress, amount, memo }: SendDepositTxParams
       })
     )
 
-  switch (chain) {
-    case 'BNB':
-      return BNB.sendTx({ recipient: poolAddress, amount, asset, memo })
+  switch (asset.chain) {
+    case BNBChain:
+      return BNB.sendTx({ recipient, amount, asset, memo })
 
-    case 'BTC':
+    case BTCChain:
       return FP.pipe(
         BTC.getPoolFeeRate(),
         RD.toOption,
         O.fold(
           // TODO (@veado) i18n
-          () => depositTxFailure$('Fee rate for BTC transaction not available'),
-          (feeRate) => BTC.sendTx({ recipient: poolAddress, amount, feeRate, memo })
+          () => txFailure$('Fee rate for BTC transaction not available'),
+          (feeRate) => BTC.sendTx({ recipient, amount, feeRate, memo })
         )
       )
 
-    case 'ETH':
+    case ETHChain:
       // not available yet
-      return depositTxFailure$(`Deposit tx has not been implemented for ETH yet`)
+      return txFailure$(`Tx stuff has not been implemented for ETH yet`)
 
-    case 'THOR':
-      return THOR.sendTx({ recipient: poolAddress, amount, asset, memo })
+    case THORChain: {
+      if (txType === TxTypes.SWAP) {
+        return THOR.sendDepositTx({ amount, asset, memo })
+      }
+      return THOR.sendTx({ amount, asset, memo, recipient })
+    }
 
-    case 'GAIA':
+    case CosmosChain:
       // not available yet
-      return depositTxFailure$(`Deposit tx has not been implemented for Cosmos yet`)
+      return txFailure$(`Tx stuff has not been implemented for Cosmos yet`)
 
-    case 'POLKA':
+    case PolkadotChain:
       // not available yet
-      return depositTxFailure$(`Deposit tx has not been implemented for Polkadot yet`)
+      return txFailure$(`Tx stuff has not been implemented for Polkadot yet`)
   }
 }
 
-export { sendTx }
+const sendTx = ({ asset, recipient, amount, memo, txType }: SendTxParams): void => {
+  tx$({ asset, recipient, amount, memo, txType }).subscribe(setTxRD)
+}
+
+const resetTx = () => {
+  setTxRD(RD.initial)
+}
+
+export { sendTx, txRD$, resetTx }
