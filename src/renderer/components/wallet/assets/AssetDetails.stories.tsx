@@ -64,7 +64,6 @@ const poolAddress = O.some('pool address')
 
 const thorAddress = O.some('thor address')
 
-// React.FC<{ onSuccess: () => void; onClose: () => void }>
 const UpgradeConfirmationModal: React.FC<{ onSuccess: () => void; onClose: () => void }> = ({ onSuccess, onClose }) => (
   <PrivateModal visible onOk={onClose} onCancel={onClose} onConfirm={onSuccess} />
 )
