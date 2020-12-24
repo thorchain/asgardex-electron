@@ -5,6 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { observableState } from '../../helpers/stateHelper'
+import { TxTypes } from '../../types/asgardex'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as THOR from '../thorchain'
@@ -46,7 +47,7 @@ const tx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => 
       return txFailure$(`Tx stuff has not been implemented for ETH yet`)
 
     case THORChain: {
-      if (txType === 'swap') {
+      if (txType === TxTypes.SWAP) {
         return THOR.sendDepositTx({ amount, asset, memo })
       }
       return THOR.sendTx({ amount, asset, memo, recipient })

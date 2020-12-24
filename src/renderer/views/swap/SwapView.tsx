@@ -28,6 +28,7 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
+import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { liveData } from '../../helpers/rx/liveData'
@@ -35,6 +36,7 @@ import { SwapRouteParams } from '../../routes/swap'
 import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
 import { PoolAddressRx } from '../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
+import { TxTypes } from '../../types/asgardex'
 import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
 import * as Styled from './SwapView.styles'
 
@@ -125,7 +127,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
         O.alt(() => {
           // For THOR chain we will send Deposit tx instead of
           // plain ones. It does not need any additional address
-          if (source.chain === THORChain) {
+          if (eqChain.equals(source.chain, THORChain)) {
             return O.some('')
           }
           return O.none
@@ -140,7 +142,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
             amount: assetToBase(amount),
             asset: source,
             memo,
-            txType: 'swap'
+            txType: TxTypes.SWAP
           })
         })
       )
