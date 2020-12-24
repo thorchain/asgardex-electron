@@ -27,7 +27,7 @@ export const createFeesService = (oClient$: Client$): FeesService => {
   const loadFees$ = (client: BitcoinClient, memo?: string): FeesWithRatesLD =>
     Rx.from(client.getFeesWithRates(memo)).pipe(
       map(RD.success),
-      catchError((error) => Rx.of(RD.failure(error))),
+      catchError(() => Rx.of(RD.success(client.getDefaultFeesWithRates()))),
       startWith(RD.pending)
     )
 
