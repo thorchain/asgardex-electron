@@ -36,10 +36,10 @@ storiesOf('Components/Swap Modal', module).add('default', () => {
       <SwapModal
         calcResult={calcResult}
         isCompleted={false}
-        swapSource={ASSETS_MAINNET.RUNE}
-        priceFrom={assetToBase(assetAmount(5))}
-        priceTo={assetToBase(assetAmount(5))}
-        swapTarget={ASSETS_MAINNET.BNB}
+        swapSourceAsset={ASSETS_MAINNET.RUNE}
+        amountToSwapInSelectedPriceAsset={assetToBase(assetAmount(5))}
+        swapResultByBasePriceAsset={assetToBase(assetAmount(5))}
+        swapTargetAsset={ASSETS_MAINNET.BNB}
         txStatus={txStatus}
         visible
         maxSec={1}

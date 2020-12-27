@@ -13,14 +13,14 @@ import * as Styled from './SwapModal.style'
 import { CalcResult } from './SwapModal.types'
 
 type Props = {
-  baseAsset?: PricePoolAsset
+  basePriceAsset?: PricePoolAsset
   calcResult: CalcResult
-  swapSource: Asset
-  swapTarget: Asset
+  swapSourceAsset: Asset
+  swapTargetAsset: Asset
   txStatus: TxStatus
   isCompleted?: boolean
-  priceFrom?: BaseAmount
-  priceTo?: BaseAmount
+  amountToSwapInSelectedPriceAsset?: BaseAmount
+  swapResultByBasePriceAsset?: BaseAmount
   visible?: boolean
   onClose?: () => void
   onChangeTxTimer?: () => void
@@ -32,13 +32,13 @@ type Props = {
 
 export const SwapModal: React.FC<Props> = (props): JSX.Element => {
   const {
-    baseAsset,
+    basePriceAsset,
     calcResult,
     isCompleted = false,
-    priceFrom = baseAmount(0),
-    priceTo = baseAmount(0),
-    swapSource,
-    swapTarget,
+    amountToSwapInSelectedPriceAsset = baseAmount(0),
+    swapResultByBasePriceAsset = baseAmount(0),
+    swapSourceAsset,
+    swapTargetAsset,
     txStatus,
     visible = false,
     onClose = () => {},
@@ -83,8 +83,12 @@ export const SwapModal: React.FC<Props> = (props): JSX.Element => {
           <Styled.CoinDataWrapper>
             <StepBar size={50} />
             <Styled.CoinDataContainer>
-              <AssetData priceBaseAsset={baseAsset} asset={swapSource} price={priceFrom} />
-              <AssetData priceBaseAsset={baseAsset} asset={swapTarget} price={priceTo} />
+              <AssetData
+                priceBaseAsset={basePriceAsset}
+                asset={swapSourceAsset}
+                price={amountToSwapInSelectedPriceAsset}
+              />
+              <AssetData priceBaseAsset={basePriceAsset} asset={swapTargetAsset} price={swapResultByBasePriceAsset} />
             </Styled.CoinDataContainer>
           </Styled.CoinDataWrapper>
         </Styled.SwapModalContentRow>
