@@ -4591,21 +4591,12 @@
     axios "^0.19.2"
     nock "^13.0.4"
 
-<<<<<<< HEAD
-"@xchainjs/xchain-thorchain@^0.6.1":
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.6.2.tgz#a5bf460daf0dbeab5f991f0c454bc82e169a31ba"
-  integrity sha512-M/Hf5YWn9JWsO8k9M8mPJH4CpOuFZunoTb5NOrNuMwp2Uh7U3mgmi0t4Qt6GAouUIXNyDz4jOqCC/0VS1ZvhAw==
-  dependencies:
-    "@xchainjs/xchain-client" "^0.2.1"
-=======
 "@xchainjs/xchain-thorchain@^0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.7.0.tgz#28bb6d6d3762abb382e43db23c4b1a42947210e3"
   integrity sha512-/5Es6Y3IHB0bML7WhneC5bQA/B5tXzQElASmdRtm1sCQ9twHlGVCFS9femWPf7RRvtS+bD87CQ7zfXTcG5qYZw==
   dependencies:
     "@xchainjs/xchain-client" "^0.3.0"
->>>>>>> update xchain lib versions
     "@xchainjs/xchain-cosmos" "^0.5.1"
     "@xchainjs/xchain-crypto" "^0.2.1"
     axios "^0.21.0"
