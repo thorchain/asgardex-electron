@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 
 import { Asset, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { TxStatus } from '../../../types/asgardex'
@@ -10,11 +11,10 @@ import { StepBar } from '../../uielements/stepBar'
 import { Trend } from '../../uielements/trend'
 import { TxTimer } from '../../uielements/txTimer'
 import * as Styled from './SwapModal.style'
-import { CalcResult } from './SwapModal.types'
 
 type Props = {
   basePriceAsset?: PricePoolAsset
-  calcResult: CalcResult
+  slip: BigNumber
   swapSourceAsset: Asset
   swapTargetAsset: Asset
   txStatus: TxStatus
@@ -33,7 +33,7 @@ type Props = {
 export const SwapModal: React.FC<Props> = (props): JSX.Element => {
   const {
     basePriceAsset,
-    calcResult,
+    slip,
     isCompleted = false,
     amountToSwapInSelectedPriceAsset = baseAmount(0),
     swapResultByBasePriceAsset = baseAmount(0),
@@ -51,8 +51,7 @@ export const SwapModal: React.FC<Props> = (props): JSX.Element => {
   const [openSwapModal, setOpenSwapModal] = useState<boolean>(visible)
   const intl = useIntl()
 
-  const swapTitleKey = isCompleted ? 'swap.state.success' : 'swap.state.pending'
-  const { slip: slipAmount } = calcResult
+  const swapTitleKey = isCompleted ? 'swap.state.success' : 'swap.swapping'
   const { status, value, startTime, hash } = txStatus
 
   const onCloseModal = useCallback(() => {
@@ -91,9 +90,11 @@ export const SwapModal: React.FC<Props> = (props): JSX.Element => {
               <AssetData priceBaseAsset={basePriceAsset} asset={swapTargetAsset} price={swapResultByBasePriceAsset} />
             </Styled.CoinDataContainer>
           </Styled.CoinDataWrapper>
+          <Styled.TrendContainer>
+            <Trend amount={slip} />
+          </Styled.TrendContainer>
         </Styled.SwapModalContentRow>
         <Styled.SwapInfoWrapper>
-          <Trend amount={slipAmount} />
           {hash && (
             <Styled.HashWrapper>
               <Styled.BtnCopyWrapper>
