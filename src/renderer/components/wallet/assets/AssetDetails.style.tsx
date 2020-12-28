@@ -36,6 +36,13 @@ export const ActionCol = styled(A.Col)`
 export const ActionWrapper = styled.div`
   width: 100%;
 `
+export const FeeRow = styled(A.Row).attrs({
+  justify: 'center',
+  align: 'middle'
+})`
+  width: 100%;
+  padding-top: 10px;
+`
 
 type TableHeadlineProps = {
   isDesktop: boolean
@@ -46,3 +53,9 @@ export const TableHeadline = styled(Headline)`
   width: 100%;
   text-align: ${({ isDesktop }: TableHeadlineProps) => (isDesktop ? 'left' : 'center')};
 `
+
+export const UpgradeFeeErrorLabel = styled(UILabel).attrs({
+  color: 'error',
+  textTransform: 'uppercase',
+  align: 'center'
+})``

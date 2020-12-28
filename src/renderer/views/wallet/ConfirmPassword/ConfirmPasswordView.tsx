@@ -13,10 +13,7 @@ import { useWalletContext } from '../../../contexts/WalletContext'
  * Just a modal 'connected' to the all appropriate services
  */
 
-export const ConfirmPasswordView: React.FC<{
-  onSuccess: () => void
-  onClose: () => void
-}> = ({ onSuccess, onClose }) => {
+export const ConfirmPasswordView: React.FC<ConfirmationModalProps> = ({ onSuccess, onClose }) => {
   const [passwordToValidate, setPasswordToValidate] = useState('')
 
   const { keystoreService } = useWalletContext()
