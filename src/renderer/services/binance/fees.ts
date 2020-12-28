@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client } from '@xchainjs/xchain-binance'
+import { Client, getDefaultFees } from '@xchainjs/xchain-binance'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -29,7 +29,7 @@ const fees$: (client: Client$) => FeesLD = (client$) =>
         ),
         map(RD.success),
         startWith(RD.pending),
-        catchError((_) => Rx.of(RD.failure(Error('Error to load fees for BNB chain'))))
+        catchError((_) => Rx.of(RD.success(getDefaultFees())))
       )
     ),
     startWith(RD.initial),
