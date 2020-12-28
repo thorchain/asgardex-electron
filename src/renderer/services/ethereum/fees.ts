@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client } from '@xchainjs/xchain-ethereum'
+import { Client, getDefaultFees } from '@xchainjs/xchain-ethereum'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -30,7 +30,7 @@ const fees$: (client: Client$) => FeesLD = (client$) =>
         map(RD.success),
         startWith(RD.pending),
         // TODO: (@sarawut11 / @veado / @thatStrangeGuyThorchain) Add i18n
-        catchError((_) => Rx.of(RD.failure(Error('Error to load fees for Ethereum chain'))))
+        catchError((_) => Rx.of(RD.success(getDefaultFees())))
       )
     ),
     startWith(RD.initial),
