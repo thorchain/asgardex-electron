@@ -27,7 +27,6 @@ export const StorySuccess: Story = () => (
     swapResultByBasePriceAsset={price}
     swapTargetAsset={AssetBNB}
     txStatus={txStatus}
-    visible
     maxSec={1}
   />
 )
@@ -42,7 +41,6 @@ export const StoryCompleted: Story = () => (
     swapResultByBasePriceAsset={price}
     swapTargetAsset={AssetBNB}
     txStatus={txStatus}
-    visible
     maxSec={1}
   />
 )

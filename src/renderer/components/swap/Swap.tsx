@@ -39,7 +39,6 @@ import { TxStatus, TxTypes } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 import { CurrencyInfo } from '../currency'
 import { SwapModal } from '../modal/swap'
-import { CalcResult } from '../modal/swap/SwapModal.types'
 import { AssetSelect } from '../uielements/assets/assetSelect'
 import { Fee, Fees } from '../uielements/fees'
 import { Modal } from '../uielements/modal'
@@ -73,7 +72,7 @@ export const Swap = ({
   poolDetails = [],
   walletBalances = O.none,
   txWithState = RD.initial,
-  goToTransaction,
+  goToTransaction = (_) => {},
   resetTx,
   activePricePool,
   PasswordConfirmation,
@@ -281,7 +280,7 @@ export const Swap = ({
       FP.pipe(
         txWithState,
         RD.fold(
-          () => null,
+          () => <></>,
           () => <Spin />,
           (error) => (
             <Modal
@@ -294,9 +293,9 @@ export const Swap = ({
               {error.message}
             </Modal>
           ),
-          (r) =>
+          ({ state, txHash }) =>
             FP.pipe(
-              r.state,
+              state,
               O.map(
                 (): TxStatus => ({
                   modal: true,
@@ -338,7 +337,7 @@ export const Swap = ({
                   <SwapModal
                     key={'swap modal result'}
                     basePriceAsset={activePricePool.asset}
-                    calcResult={{ slip: swapData.slip } as CalcResult}
+                    slip={swapData.slip}
                     swapSourceAsset={sourceAssetWP.asset}
                     swapTargetAsset={targetAssetWP.asset}
                     amountToSwapInSelectedPriceAsset={amountToSwapInSelectedPriceAsset}
@@ -346,14 +345,13 @@ export const Swap = ({
                     onClose={resetTx}
                     onClickFinish={resetTx}
                     isCompleted={!txStatus.status}
-                    visible
                     onViewTxClick={(e) => {
                       e.preventDefault()
-                      goToTransaction && goToTransaction(r.txHash)
+                      goToTransaction(txHash)
                     }}
                     txStatus={{
                       ...txStatus,
-                      hash: r.txHash
+                      hash: txHash
                     }}
                   />
                 )

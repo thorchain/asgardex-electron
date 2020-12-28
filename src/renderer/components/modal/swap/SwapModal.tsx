@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 
 import { Asset, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -21,7 +21,6 @@ type Props = {
   isCompleted?: boolean
   amountToSwapInSelectedPriceAsset?: BaseAmount
   swapResultByBasePriceAsset?: BaseAmount
-  visible?: boolean
   onClose?: () => void
   onChangeTxTimer?: () => void
   onEndTxTimer?: () => void
@@ -40,7 +39,6 @@ export const SwapModal: React.FC<Props> = (props): JSX.Element => {
     swapSourceAsset,
     swapTargetAsset,
     txStatus,
-    visible = false,
     onClose = () => {},
     onChangeTxTimer = () => {},
     onClickFinish = () => {},
@@ -48,21 +46,20 @@ export const SwapModal: React.FC<Props> = (props): JSX.Element => {
     onViewTxClick = () => {},
     maxSec = Number.MAX_SAFE_INTEGER
   } = props
-  const [openSwapModal, setOpenSwapModal] = useState<boolean>(visible)
+
   const intl = useIntl()
 
   const swapTitleKey = isCompleted ? 'swap.state.success' : 'swap.swapping'
   const { status, value, startTime, hash } = txStatus
 
   const onCloseModal = useCallback(() => {
-    setOpenSwapModal(!openSwapModal)
-    if (onClose) onClose()
-  }, [openSwapModal, onClose])
+    onClose()
+  }, [onClose])
 
   return (
     <Styled.SwapModalWrapper
       title={intl.formatMessage({ id: swapTitleKey })}
-      visible={openSwapModal}
+      visible
       footer={null}
       onCancel={onCloseModal}>
       <Styled.SwapModalContent>
