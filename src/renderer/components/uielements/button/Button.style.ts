@@ -219,6 +219,7 @@ export const ButtonWrapper = styled(Button)<Props>`
     font-size: ${(props) => fontSettings[props.sizevalue].size};
     font-weight: ${(props) => props.weight};
     letter-spacing: ${(props) => fontSettings[props.sizevalue].spacing};
+    box-shadow: none; /* overridden */
 
     text-transform: uppercase;
 
