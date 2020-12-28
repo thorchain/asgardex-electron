@@ -39,7 +39,6 @@ import { TxStatus, TxTypes } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 import { CurrencyInfo } from '../currency'
 import { SwapModal } from '../modal/swap'
-import { CalcResult } from '../modal/swap/SwapModal.types'
 import { AssetSelect } from '../uielements/assets/assetSelect'
 import { Fee, Fees } from '../uielements/fees'
 import { Modal } from '../uielements/modal'
@@ -73,7 +72,7 @@ export const Swap = ({
   poolDetails = [],
   walletBalances = O.none,
   txWithState = RD.initial,
-  goToTransaction,
+  goToTransaction = (_) => {},
   resetTx,
   activePricePool,
   PasswordConfirmation,
@@ -281,7 +280,7 @@ export const Swap = ({
       FP.pipe(
         txWithState,
         RD.fold(
-          () => null,
+          () => <></>,
           () => <Spin />,
           (error) => (
             <Modal
@@ -294,9 +293,9 @@ export const Swap = ({
               {error.message}
             </Modal>
           ),
-          (r) =>
+          ({ state, txHash }) =>
             FP.pipe(
-              r.state,
+              state,
               O.map(
                 (): TxStatus => ({
                   modal: true,
@@ -316,43 +315,47 @@ export const Swap = ({
                   })
               ),
               O.chain((txStatus) => sequenceTOption(oSourceAssetWP, oTargetAssetWP, O.some(txStatus))),
-              O.map(([sourceAssetWP, targetAssetWP, txStatus]) => (
-                <SwapModal
-                  key={'swap modal result'}
-                  baseAsset={activePricePool.asset}
-                  calcResult={{ slip: swapData.slip } as CalcResult}
-                  swapSource={sourceAssetWP.asset}
-                  swapTarget={targetAssetWP.asset}
-                  priceFrom={
-                    poolData[assetToString(sourceAssetWP.asset)] &&
-                    getValueOfAsset1InAsset2(
-                      assetToBase(assetAmount(1)),
-                      poolData[assetToString(sourceAssetWP.asset)],
-                      activePricePool.poolData
-                    )
-                  }
-                  priceTo={
-                    poolData[assetToString(targetAssetWP.asset)] &&
-                    getValueOfAsset1InAsset2(
-                      assetToBase(assetAmount(1)),
-                      poolData[assetToString(targetAssetWP.asset)],
-                      activePricePool.poolData
-                    )
-                  }
-                  onClose={resetTx}
-                  onClickFinish={resetTx}
-                  isCompleted={!txStatus.status}
-                  visible
-                  onViewTxClick={(e) => {
-                    e.preventDefault()
-                    goToTransaction && goToTransaction(r.txHash)
-                  }}
-                  txStatus={{
-                    ...txStatus,
-                    hash: r.txHash
-                  }}
-                />
-              )),
+              O.map(([sourceAssetWP, targetAssetWP, txStatus]) => {
+                const swapResultByBasePriceAsset =
+                  poolData[assetToString(targetAssetWP.asset)] &&
+                  // Convert swapResult to the selected price asset values
+                  getValueOfAsset1InAsset2(
+                    assetToBase(assetAmount(swapData.swapResult)),
+                    poolData[assetToString(targetAssetWP.asset)],
+                    activePricePool.poolData
+                  )
+
+                const amountToSwapInSelectedPriceAsset =
+                  poolData[assetToString(sourceAssetWP.asset)] &&
+                  getValueOfAsset1InAsset2(
+                    assetToBase(assetAmount(changeAmount)),
+                    poolData[assetToString(sourceAssetWP.asset)],
+                    activePricePool.poolData
+                  )
+
+                return (
+                  <SwapModal
+                    key={'swap modal result'}
+                    basePriceAsset={activePricePool.asset}
+                    slip={swapData.slip}
+                    swapSourceAsset={sourceAssetWP.asset}
+                    swapTargetAsset={targetAssetWP.asset}
+                    amountToSwapInSelectedPriceAsset={amountToSwapInSelectedPriceAsset}
+                    swapResultByBasePriceAsset={swapResultByBasePriceAsset}
+                    onClose={resetTx}
+                    onClickFinish={resetTx}
+                    isCompleted={!txStatus.status}
+                    onViewTxClick={(e) => {
+                      e.preventDefault()
+                      goToTransaction(txHash)
+                    }}
+                    txStatus={{
+                      ...txStatus,
+                      hash: txHash
+                    }}
+                  />
+                )
+              }),
               O.toNullable
             )
         )
@@ -367,7 +370,8 @@ export const Swap = ({
       oTargetAssetWP,
       swapData,
       activePricePool,
-      poolData
+      poolData,
+      changeAmount
     ]
   )
 

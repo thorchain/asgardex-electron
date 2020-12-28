@@ -57,31 +57,27 @@ export const CoinDataContainer = styled.div`
   }
 `
 
-export const SwapInfoWrapper = styled(Row)`
-  display: flex;
-  flex-direction: column;
-  padding: 20px 0;
+export const SwapInfoWrapper = styled(Row).attrs({
+  justify: 'center'
+})`
+  padding-bottom: 20px;
 `
 
-export const HashWrapper = styled.div`
-  display: flex;
-  align-items: center;
+export const TrendContainer = styled(Row).attrs({
+  justify: 'center'
+})`
+  padding-top: 20px;
+  width: 100%;
 `
 
-export const BtnCopyWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+export const HashWrapper = styled(Row).attrs({
+  justify: 'center'
+})``
 
-  border: 1px solid ${palette('gradient', 0)};
-  border-radius: 6px;
-  padding: 1px 4px;
-  margin-right: 6px;
-  margin-bottom: 16px;
-  color: ${palette('gradient', 0)};
-  cursor: pointer;
-`
+export const BtnCopyWrapper = styled(Row).attrs({
+  justify: 'center',
+  align: 'middle'
+})``
 
 export const ViewButton = styled(UIButton)`
   width: 300px;
