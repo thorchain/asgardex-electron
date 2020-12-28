@@ -58,7 +58,7 @@ type Props = {
   runeNativeAddress?: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
   sendUpgradeTx: (_: SendTxParams) => TxLD
-  reloadeUpgradeFeeHandler: FP.Lazy<void>
+  reloadUpgradeFeeHandler: FP.Lazy<void>
   upgradeFee: FeeRD
   UpgradeConfirmationModal: React.FC<ConfirmationModalProps>
 }
@@ -76,7 +76,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     walletAddress: oWalletAddress = O.none,
     runeNativeAddress: oRuneNativeAddress = O.none,
     upgradeFee,
-    reloadeUpgradeFeeHandler,
+    reloadUpgradeFeeHandler,
     UpgradeConfirmationModal
   } = props
 
@@ -289,16 +289,18 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const oUpgradeFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(upgradeFee, RD.toOption), [upgradeFee])
 
-  const isUpgradeFeeError = useMemo(() => {
-    return FP.pipe(
-      sequenceTOption(oUpgradeFee, oBnbBalance),
-      O.fold(
-        // Missing (or loading) fees does not mean we can't sent something. No error then.
-        () => !O.isNone(oUpgradeFee),
-        ([fee, bnbAmount]) => bnbAmount.amount().isLessThan(fee.amount())
-      )
-    )
-  }, [oBnbBalance, oUpgradeFee])
+  const isUpgradeFeeError = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(oUpgradeFee, oBnbBalance),
+        O.fold(
+          // Missing (or loading) fees does not mean we can't sent something. No error then.
+          () => !O.isNone(oUpgradeFee),
+          ([fee, bnbAmount]) => bnbAmount.amount().isLessThan(fee.amount())
+        )
+      ),
+    [oBnbBalance, oUpgradeFee]
+  )
 
   const renderUpgradeFeeError = useMemo(() => {
     if (!isUpgradeFeeError) return <></>
@@ -385,7 +387,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
                   </Button>
                 </Row>
                 <Styled.FeeRow>
-                  <Fees fees={uiFeesRD} reloadFees={reloadeUpgradeFeeHandler} />
+                  <Fees fees={uiFeesRD} reloadFees={reloadUpgradeFeeHandler} />
                 </Styled.FeeRow>
                 {renderUpgradeFeeError}
               </Styled.ActionWrapper>

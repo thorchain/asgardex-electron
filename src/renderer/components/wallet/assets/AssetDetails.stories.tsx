@@ -82,7 +82,7 @@ export const StoryBNB: BaseStory<never, JSX.Element> = () => (
     sendUpgradeTx={sendUpgradeRuneTx}
     poolAddress={poolAddress}
     upgradeFee={RD.initial}
-    reloadeUpgradeFeeHandler={reloadUpgradeFeeHandler}
+    reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
     UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
@@ -97,7 +97,7 @@ export const StoryRuneTxSuccess: BaseStory<never, JSX.Element> = () => (
     runeNativeAddress={thorAddress}
     poolAddress={poolAddress}
     upgradeFee={upgradeFee}
-    reloadeUpgradeFeeHandler={reloadUpgradeFeeHandler}
+    reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
     UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
@@ -112,7 +112,7 @@ export const StoryRuneTxError: BaseStory<never, JSX.Element> = () => (
     runeNativeAddress={thorAddress}
     poolAddress={poolAddress}
     upgradeFee={upgradeFee}
-    reloadeUpgradeFeeHandler={reloadUpgradeFeeHandler}
+    reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
     UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
@@ -126,7 +126,7 @@ export const StoryRuneNoBalances: BaseStory<never, JSX.Element> = () => (
     sendUpgradeTx={sendUpgradeRuneTx}
     poolAddress={poolAddress}
     upgradeFee={upgradeFee}
-    reloadeUpgradeFeeHandler={reloadUpgradeFeeHandler}
+    reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
     UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
@@ -140,7 +140,7 @@ export const StoryRuneFeeNotCovered: BaseStory<never, JSX.Element> = () => (
     sendUpgradeTx={sendUpgradeRuneTx}
     poolAddress={poolAddress}
     upgradeFee={upgradeFee}
-    reloadeUpgradeFeeHandler={reloadUpgradeFeeHandler}
+    reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
     UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )

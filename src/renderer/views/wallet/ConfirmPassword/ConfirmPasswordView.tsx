@@ -5,6 +5,7 @@ import * as FP from 'fp-ts/function'
 import { useObservableState } from 'observable-hooks'
 
 import { PrivateModal } from '../../../components/modal/private'
+import { ConfirmationModalProps } from '../../../components/uielements/common/Common.types'
 import { useWalletContext } from '../../../contexts/WalletContext'
 
 /**

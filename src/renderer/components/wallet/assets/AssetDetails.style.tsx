@@ -2,6 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { media } from '../../../helpers/styleHelper'
 import { Headline } from '../../uielements/headline'
 import { Label as UILabel } from '../../uielements/label'
 
@@ -58,4 +59,10 @@ export const UpgradeFeeErrorLabel = styled(UILabel).attrs({
   color: 'error',
   textTransform: 'uppercase',
   align: 'center'
-})``
+})`
+  padding: 10px 50px 0 50px;
+
+  ${media.md`
+      padding: 10px 0 0 0;
+  `};
+`

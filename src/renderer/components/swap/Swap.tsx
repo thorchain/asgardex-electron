@@ -41,7 +41,7 @@ import { CurrencyInfo } from '../currency'
 import { SwapModal } from '../modal/swap'
 import { AssetSelect } from '../uielements/assets/assetSelect'
 import { ConfirmationModalProps } from '../uielements/common/Common.types'
-import { Fee, Fees } from '../uielements/fees'
+import { Fees, UIFeesRD } from '../uielements/fees'
 import { Modal } from '../uielements/modal'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
@@ -540,7 +540,7 @@ export const Swap = ({
     )
   }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset, outputLabel])
 
-  const fees: RD.RemoteData<Error, Fee[]> = useMemo(
+  const fees: UIFeesRD = useMemo(
     () =>
       FP.pipe(
         sequenceTRD(
