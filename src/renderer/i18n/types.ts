@@ -160,7 +160,6 @@ type SwapMessageKey =
   | 'swap.output'
   | 'swap.drag'
   | 'swap.searchAsset'
-  | 'swap.state.pending'
   | 'swap.state.success'
   | 'swap.swapping'
   | 'swap.errors.amount.balanceShouldCoverChainFee'

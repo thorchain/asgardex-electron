@@ -2,7 +2,6 @@ import { SwapMessages } from '../types'
 
 const swap: SwapMessages = {
   'swap.swapping': 'Обменять',
-  'swap.state.pending': 'Обмен обрабатывается',
   'swap.state.success': 'Обмен совершён',
   'swap.input': 'Отдаете',
   'swap.balance': 'Баланс',
