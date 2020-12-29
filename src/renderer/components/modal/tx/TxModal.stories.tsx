@@ -1,10 +1,14 @@
 import React from 'react'
 
+import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
+import { Row } from 'antd'
 
 import { ErrorId } from '../../../services/wallet/types'
+import { Button } from '../../uielements/button'
+import { Label } from '../../uielements/label'
 import { TxModal } from './TxModal'
 
 const onClose = () => console.log('onClose')
@@ -32,6 +36,29 @@ export const StoryFailure: Story = () => (
   />
 )
 StoryFailure.storyName = 'failure'
+
+const extraContent = (): JSX.Element => (
+  <Row align="middle" justify="center">
+    <Label align="center" color="warning" textTransform="uppercase">
+      Extra Content
+    </Label>
+    <Button onClick={() => console.log('extra button clicked')} typevalue="outline" color="warning">
+      <SyncOutlined />
+      Extra Button
+    </Button>
+  </Row>
+)
+
+export const StoryExtra: Story = () => (
+  <TxModal
+    title="success"
+    txRD={RD.success('txhash')}
+    onClose={onClose}
+    onViewTxClick={onViewTxClick}
+    extra={extraContent()}
+  />
+)
+StoryExtra.storyName = 'extra content'
 
 const meta: Meta = {
   component: TxModal,
