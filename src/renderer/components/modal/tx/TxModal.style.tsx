@@ -28,6 +28,17 @@ export const ContentRow = styled(Row).attrs({
   border-bottom: 1px solid ${palette('gray', 0)};
 `
 
+export const SubContentRow = styled(Row).attrs({
+  align: 'middle',
+  justify: 'center'
+})`
+  width: 100%;
+  padding-bottom: 30px;
+  :last-child {
+    padding-bottom: 0;
+  }
+`
+
 export const ResultDetailsContainer = styled(Row).attrs({
   align: 'middle',
   justify: 'center'
