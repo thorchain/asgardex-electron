@@ -10,9 +10,8 @@ import * as RxOp from 'rxjs/operators'
 
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { SendTxParams } from '../../../services/binance/types'
-import { ErrorId, TxLD, TxRD } from '../../../services/wallet/types'
+import { ErrorId, TxLD, TxRD, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance, WalletBalances } from '../../../types/wallet'
-import { PrivateModal } from '../../modal/private'
 import { AssetDetails } from './index'
 
 const bnbBalance: WalletBalance = {
@@ -64,9 +63,8 @@ const poolAddress = O.some('pool address')
 
 const thorAddress = O.some('thor address')
 
-const UpgradeConfirmationModal: React.FC<{ onSuccess: () => void; onClose: () => void }> = ({ onSuccess, onClose }) => (
-  <PrivateModal visible onOk={onClose} onCancel={onClose} onConfirm={onSuccess} />
-)
+const validatePasswordInitial$: ValidatePasswordHandler = (_) => Rx.of(RD.initial)
+const validatePasswordSuccess$: ValidatePasswordHandler = (_) => Rx.of(RD.success(undefined))
 
 export const StoryBNB: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
@@ -75,7 +73,7 @@ export const StoryBNB: BaseStory<never, JSX.Element> = () => (
     asset={O.some(AssetBNB)}
     sendTx={sendUpgradeRuneTx}
     poolAddress={poolAddress}
-    UpgradeConfirmationModal={UpgradeConfirmationModal}
+    validatePassword$={validatePasswordInitial$}
   />
 )
 StoryBNB.storyName = 'BNB'
@@ -88,7 +86,7 @@ export const StoryRuneTxSuccess: BaseStory<never, JSX.Element> = () => (
     sendTx={sendUpgradeRuneTx}
     runeNativeAddress={thorAddress}
     poolAddress={poolAddress}
-    UpgradeConfirmationModal={UpgradeConfirmationModal}
+    validatePassword$={validatePasswordSuccess$}
   />
 )
 StoryRuneTxSuccess.storyName = 'RUNE - tx success'
@@ -101,7 +99,7 @@ export const StoryRuneTxError: BaseStory<never, JSX.Element> = () => (
     sendTx={sendUpgradeRuneTxError}
     runeNativeAddress={thorAddress}
     poolAddress={poolAddress}
-    UpgradeConfirmationModal={UpgradeConfirmationModal}
+    validatePassword$={validatePasswordSuccess$}
   />
 )
 StoryRuneTxError.storyName = 'RUNE - tx error'
@@ -113,7 +111,7 @@ export const StoryRuneNoBalances: BaseStory<never, JSX.Element> = () => (
     asset={O.some(AssetRune67C)}
     sendTx={sendUpgradeRuneTx}
     poolAddress={poolAddress}
-    UpgradeConfirmationModal={UpgradeConfirmationModal}
+    validatePassword$={validatePasswordInitial$}
   />
 )
 StoryRuneNoBalances.storyName = 'RUNE - disabled - no balance'
