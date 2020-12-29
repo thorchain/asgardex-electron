@@ -12,7 +12,7 @@ import {
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { TRANSFER_FEES } from '../../../../../shared/mock/fees'
+import { BNB_TRANSFER_FEES } from '../../../../../shared/mock/fees'
 import { AddressValidation, SendTxParams } from '../../../../services/binance/types'
 import { WalletBalances } from '../../../../services/clients'
 import { WalletBalance } from '../../../../types/wallet'
@@ -32,7 +32,7 @@ const runeAsset: WalletBalance = {
 
 const balances: WalletBalances = [bnbAsset, runeAsset]
 
-const fee = O.some(TRANSFER_FEES.single)
+const fee = O.some(BNB_TRANSFER_FEES.single)
 
 const addressValidation: AddressValidation = (_) => true
 

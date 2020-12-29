@@ -2,6 +2,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Address, TxHash } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
+import * as FP from 'fp-ts/lib/function'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
@@ -25,17 +26,20 @@ export type KeystoreContent = { phrase: Phrase }
  */
 export type KeystoreState = O.Option<O.Option<KeystoreContent>>
 
+export type ValidatePasswordHandler = (password: string) => LiveData<Error, void>
+export type ValidatePasswordLD = LiveData<Error, void>
+
 export type KeystoreService = {
   keystore$: Observable<KeystoreState>
   addKeystore: (phrase: Phrase, password: string) => Promise<void>
   removeKeystore: () => Promise<void>
   unlock: (state: KeystoreState, password: string) => Promise<void>
-  lock: () => void
+  lock: FP.Lazy<void>
   /**
    * Use RemoteData as result of validation
    * No need to store any success data. Only status
    */
-  validatePassword$: (password: string) => LiveData<Error, null>
+  validatePassword$: ValidatePasswordHandler
 }
 
 /**

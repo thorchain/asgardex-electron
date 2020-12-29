@@ -8,7 +8,7 @@ import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { INITIAL_KEYSTORE_STATE } from './const'
-import { Phrase, KeystoreService, KeystoreState } from './types'
+import { Phrase, KeystoreService, KeystoreState, ValidatePasswordLD } from './types'
 import { hasImportedKeystore } from './util'
 
 const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(INITIAL_KEYSTORE_STATE)
@@ -66,13 +66,13 @@ window.apiKeystore.exists().then(
   (_) => setKeystoreState(O.none /*not imported*/)
 )
 
-const validatePassword$ = (password: string) =>
+const validatePassword$ = (password: string): ValidatePasswordLD =>
   password
     ? FP.pipe(
         Rx.from(window.apiKeystore.get()),
         switchMap((keystore) => Rx.from(decryptFromKeystore(keystore, password))),
         map(RD.success),
-        liveData.map(() => null),
+        liveData.map(() => undefined),
         catchError((err) => Rx.of(RD.failure(err))),
         startWith(RD.pending)
       )

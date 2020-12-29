@@ -5,7 +5,6 @@ import { TxHash } from '@xchainjs/xchain-client'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
-import { emptyFunc } from '../../../helpers/funcHelper'
 import { TxRD } from '../../../services/wallet/types'
 import { TxTimer } from '../../uielements/txTimer'
 import * as Styled from './TxModal.style'
@@ -13,7 +12,7 @@ import * as Styled from './TxModal.style'
 export type Props = {
   txRD: TxRD
   title: string
-  onClose: () => void
+  onClose: FP.Lazy<void>
   onViewTxClick?: (txHash: TxHash) => void
   maxSec?: number
   startTime?: number
@@ -21,7 +20,7 @@ export type Props = {
 }
 
 export const TxModal: React.FC<Props> = (props): JSX.Element => {
-  const { title, txRD, startTime, onClose, onViewTxClick = emptyFunc, extra = <></> } = props
+  const { title, txRD, startTime, onClose, onViewTxClick = FP.constVoid, extra = <></> } = props
 
   const intl = useIntl()
 

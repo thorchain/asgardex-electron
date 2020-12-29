@@ -2,6 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { media } from '../../../helpers/styleHelper'
 import { Headline } from '../../uielements/headline'
 import { Label as UILabel } from '../../uielements/label'
 
@@ -36,6 +37,13 @@ export const ActionCol = styled(A.Col)`
 export const ActionWrapper = styled.div`
   width: 100%;
 `
+export const FeeRow = styled(A.Row).attrs({
+  justify: 'center',
+  align: 'middle'
+})`
+  width: 100%;
+  padding-top: 10px;
+`
 
 type TableHeadlineProps = {
   isDesktop: boolean
@@ -45,4 +53,16 @@ export const TableHeadline = styled(Headline)`
   padding: 40px 0 20px 0;
   width: 100%;
   text-align: ${({ isDesktop }: TableHeadlineProps) => (isDesktop ? 'left' : 'center')};
+`
+
+export const UpgradeFeeErrorLabel = styled(UILabel).attrs({
+  color: 'error',
+  textTransform: 'uppercase',
+  align: 'center'
+})`
+  padding: 10px 50px 0 50px;
+
+  ${media.md`
+      padding: 10px 0 0 0;
+  `};
 `
