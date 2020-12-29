@@ -34,13 +34,13 @@ import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/b
 import { SwapFeesRD } from '../../services/chain/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
-import { NonEmptyWalletBalances } from '../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../services/wallet/types'
 import { TxStatus, TxTypes } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 import { CurrencyInfo } from '../currency'
+import { PasswordModal } from '../modal/password'
 import { SwapModal } from '../modal/swap'
 import { AssetSelect } from '../uielements/assets/assetSelect'
-import { ConfirmationModalProps } from '../uielements/common/Common.types'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Modal } from '../uielements/modal'
 import { Slider } from '../uielements/slider'
@@ -59,7 +59,7 @@ type SwapProps = {
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
   activePricePool: PricePool
-  PasswordConfirmation: React.FC<ConfirmationModalProps>
+  validatePassword$: ValidatePasswordHandler
   reloadFees?: () => void
   fees?: SwapFeesRD
   targetWalletAddress?: O.Option<Address>
@@ -76,7 +76,7 @@ export const Swap = ({
   goToTransaction = (_) => {},
   resetTx,
   activePricePool,
-  PasswordConfirmation,
+  validatePassword$,
   reloadFees,
   fees: feesProp = RD.initial,
   targetWalletAddress = O.none
@@ -565,7 +565,11 @@ export const Swap = ({
   return (
     <Styled.Container>
       {showPrivateModal && (
-        <PasswordConfirmation onSuccess={onPasswordValidationSucceed} onClose={() => setShowPrivateModal(false)} />
+        <PasswordModal
+          onSuccess={onPasswordValidationSucceed}
+          onClose={() => setShowPrivateModal(false)}
+          validatePassword$={validatePassword$}
+        />
       )}
       <Styled.PendingContainer>{pendingState}</Styled.PendingContainer>
       <Styled.ContentContainer>

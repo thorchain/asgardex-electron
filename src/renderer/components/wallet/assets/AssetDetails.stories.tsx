@@ -11,10 +11,8 @@ import * as RxOp from 'rxjs/operators'
 import { BNB_TRANSFER_FEES } from '../../../../shared/mock/fees'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { SendTxParams } from '../../../services/binance/types'
-import { ErrorId, TxLD, TxRD } from '../../../services/wallet/types'
+import { ErrorId, TxLD, TxRD, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance, WalletBalances } from '../../../types/wallet'
-import { PrivateModal } from '../../modal/private'
-import { ConfirmationModalProps } from '../../uielements/common/Common.types'
 import { AssetDetails } from './index'
 
 const bnbBalance: WalletBalance = {
@@ -67,12 +65,11 @@ const poolAddress = O.some('pool address')
 
 const thorAddress = O.some('thor address')
 
+const validatePasswordInitial$: ValidatePasswordHandler = (_) => Rx.of(RD.initial)
+const validatePasswordSuccess$: ValidatePasswordHandler = (_) => Rx.of(RD.success(undefined))
+
 const upgradeFee = RD.success(assetToBase(BNB_TRANSFER_FEES.single))
 const reloadUpgradeFeeHandler = () => console.log('reload upgrade fee')
-
-const UpgradeConfirmationModal: React.FC<ConfirmationModalProps> = ({ onSuccess, onClose }) => (
-  <PrivateModal visible onOk={onClose} onCancel={onClose} onConfirm={onSuccess} />
-)
 
 export const StoryBNB: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
@@ -81,9 +78,9 @@ export const StoryBNB: BaseStory<never, JSX.Element> = () => (
     asset={O.some(AssetBNB)}
     sendUpgradeTx={sendUpgradeRuneTx}
     poolAddress={poolAddress}
+    validatePassword$={validatePasswordInitial$}
     upgradeFee={RD.initial}
     reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
-    UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
 StoryBNB.storyName = 'BNB'
@@ -96,9 +93,9 @@ export const StoryRuneTxSuccess: BaseStory<never, JSX.Element> = () => (
     sendUpgradeTx={sendUpgradeRuneTx}
     runeNativeAddress={thorAddress}
     poolAddress={poolAddress}
+    validatePassword$={validatePasswordSuccess$}
     upgradeFee={upgradeFee}
     reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
-    UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
 StoryRuneTxSuccess.storyName = 'RUNE - tx success'
@@ -111,9 +108,9 @@ export const StoryRuneTxError: BaseStory<never, JSX.Element> = () => (
     sendUpgradeTx={sendUpgradeRuneTxError}
     runeNativeAddress={thorAddress}
     poolAddress={poolAddress}
+    validatePassword$={validatePasswordSuccess$}
     upgradeFee={upgradeFee}
     reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
-    UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
 StoryRuneTxError.storyName = 'RUNE - tx error'
@@ -125,9 +122,9 @@ export const StoryRuneNoBalances: BaseStory<never, JSX.Element> = () => (
     asset={O.some(AssetRune67C)}
     sendUpgradeTx={sendUpgradeRuneTx}
     poolAddress={poolAddress}
+    validatePassword$={validatePasswordInitial$}
     upgradeFee={upgradeFee}
     reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
-    UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
 StoryRuneNoBalances.storyName = 'RUNE - disabled - no balance'
@@ -139,9 +136,9 @@ export const StoryRuneFeeNotCovered: BaseStory<never, JSX.Element> = () => (
     asset={O.some(AssetRune67C)}
     sendUpgradeTx={sendUpgradeRuneTx}
     poolAddress={poolAddress}
+    validatePassword$={validatePasswordInitial$}
     upgradeFee={upgradeFee}
     reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
-    UpgradeConfirmationModal={UpgradeConfirmationModal}
   />
 )
 StoryRuneFeeNotCovered.storyName = 'RUNE - fee not covered'

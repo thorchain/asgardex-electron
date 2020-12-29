@@ -37,7 +37,6 @@ import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
 import { PoolAddressRx } from '../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import { TxTypes } from '../../types/asgardex'
-import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
 import * as Styled from './SwapView.styles'
 
 type Props = {}
@@ -61,7 +60,12 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     getExplorerUrlByAsset$,
     assetAddress$
   } = useChainContext()
-  const { balancesState$ } = useWalletContext()
+
+  const {
+    balancesState$,
+    keystoreService: { validatePassword$ }
+  } = useWalletContext()
+
   const poolsState = useObservableState(poolsState$, initial)
 
   const oSource = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
@@ -212,7 +216,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
               return (
                 <Swap
-                  PasswordConfirmation={ConfirmPasswordView}
+                  validatePassword$={validatePassword$}
                   activePricePool={selectedPricePool}
                   txWithState={txWithState}
                   resetTx={resetTx}

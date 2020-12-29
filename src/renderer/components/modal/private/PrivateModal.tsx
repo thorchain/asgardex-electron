@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
 import { Form } from 'antd'
+import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { Input } from '../../uielements/input'
@@ -12,20 +13,29 @@ type Props = {
   invalidPassword?: boolean
   validatingPassword?: boolean
   onConfirm?: (password: string) => void
-  onOk?: () => void
-  onCancel?: () => void
+  onOk?: FP.Lazy<void>
+  onCancel?: FP.Lazy<void>
   isSuccess?: boolean
 }
 
 export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
-  const { visible, invalidPassword, validatingPassword, onConfirm, onOk, onCancel, isSuccess } = props
+  const {
+    visible,
+    invalidPassword,
+    validatingPassword,
+    onConfirm = FP.constVoid,
+    onOk = FP.constVoid,
+    onCancel = FP.constVoid,
+    isSuccess
+  } = props
+
   const intl = useIntl()
 
   /**
    * Call onOk on success only
    */
   useEffect(() => {
-    if (isSuccess && onOk) {
+    if (isSuccess) {
       onOk()
     }
   }, [isSuccess, onOk])
@@ -40,8 +50,9 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
   )
 
   const onConfirmCb = useCallback(() => {
-    onConfirm && onConfirm(password)
+    onConfirm(password)
   }, [onConfirm, password])
+
   return (
     <Styled.Modal
       title={intl.formatMessage({ id: 'wallet.password.confirmation' })}

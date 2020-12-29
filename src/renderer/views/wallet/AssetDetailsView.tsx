@@ -22,7 +22,6 @@ import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { getPoolAddressByChain } from '../../services/midgard/utils'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
-import { ConfirmPasswordView } from '../wallet/ConfirmPassword'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const { asset, walletAddress } = useParams<AssetDetailsParams>()
@@ -48,7 +47,8 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     reloadBalances$,
     setSelectedAsset,
     getExplorerTxUrl$,
-    resetTxsPage
+    resetTxsPage,
+    keystoreService: { validatePassword$ }
   } = useWalletContext()
 
   const {
@@ -161,10 +161,10 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         walletAddress={oWalletAddress}
         runeNativeAddress={oRuneNativeAddress}
         poolAddress={bnbPoolAddress}
+        validatePassword$={validatePassword$}
         sendUpgradeTx={sendUpgradeTx}
         upgradeFee={upgradeFee}
         reloadUpgradeFeeHandler={reloadUpgradeFee}
-        UpgradeConfirmationModal={ConfirmPasswordView}
       />
     </>
   )

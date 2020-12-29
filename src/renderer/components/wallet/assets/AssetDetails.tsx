@@ -29,13 +29,19 @@ import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { PoolAddress } from '../../../services/midgard/types'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
-import { LoadTxsHandler, NonEmptyWalletBalances, TxLD, TxRD } from '../../../services/wallet/types'
+import {
+  LoadTxsHandler,
+  NonEmptyWalletBalances,
+  TxLD,
+  TxRD,
+  ValidatePasswordHandler
+} from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
+import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
-import { ConfirmationModalProps } from '../../uielements/common/Common.types'
 import { UIFeesRD, Fees } from '../../uielements/fees'
 import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.style'
@@ -57,10 +63,10 @@ type Props = {
   walletAddress?: O.Option<Address>
   runeNativeAddress?: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
+  validatePassword$: ValidatePasswordHandler
   sendUpgradeTx: (_: SendTxParams) => TxLD
   reloadUpgradeFeeHandler: FP.Lazy<void>
   upgradeFee: FeeRD
-  UpgradeConfirmationModal: React.FC<ConfirmationModalProps>
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -75,9 +81,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
     walletAddress: oWalletAddress = O.none,
     runeNativeAddress: oRuneNativeAddress = O.none,
+    validatePassword$,
     upgradeFee,
-    reloadUpgradeFeeHandler,
-    UpgradeConfirmationModal
+    reloadUpgradeFeeHandler
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -249,14 +255,15 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const renderConfirmUpgradeModal = useMemo(
     () =>
       showConfirmUpgradeModal ? (
-        <UpgradeConfirmationModal
+        <PasswordModal
           onSuccess={upgradeConfirmationHandler}
           onClose={() => setShowConfirmUpgradeModal(false)}
+          validatePassword$={validatePassword$}
         />
       ) : (
         <></>
       ),
-    [UpgradeConfirmationModal, showConfirmUpgradeModal, upgradeConfirmationHandler]
+    [showConfirmUpgradeModal, upgradeConfirmationHandler, validatePassword$]
   )
 
   const uiFeesRD: UIFeesRD = useMemo(

@@ -5,25 +5,22 @@ import * as FP from 'fp-ts/function'
 import { useObservableState } from 'observable-hooks'
 
 import { PrivateModal } from '../../../components/modal/private'
-import { ConfirmationModalProps } from '../../../components/uielements/common/Common.types'
-import { useWalletContext } from '../../../contexts/WalletContext'
+import { ValidatePasswordLD } from '../../../services/wallet/types'
 
 /**
- * @Note
- * This is not a 'usual' view
- * Just a modal 'connected' to the all appropriate services
+ * Wrapper around `PrivateModal` to validate password using `validatePassword$` stream
  */
 
-export const ConfirmPasswordView: React.FC<ConfirmationModalProps> = ({ onSuccess, onClose }) => {
+export type Props = {
+  onSuccess: FP.Lazy<void>
+  onClose: FP.Lazy<void>
+  validatePassword$: (_: string) => ValidatePasswordLD
+}
+
+export const PasswordModal: React.FC<Props> = ({ onSuccess, onClose, validatePassword$ }) => {
   const [passwordToValidate, setPasswordToValidate] = useState('')
 
-  const { keystoreService } = useWalletContext()
-  const passwordValidationResult$ = useMemo(() => keystoreService.validatePassword$(passwordToValidate), [
-    passwordToValidate,
-    keystoreService
-  ])
-
-  const passwordValidationResult = useObservableState(passwordValidationResult$, RD.initial)
+  const [passwordValidationRD] = useObservableState(() => validatePassword$(passwordToValidate), RD.initial)
 
   const closePrivateModal = useCallback(() => {
     onClose()
@@ -38,7 +35,7 @@ export const ConfirmPasswordView: React.FC<ConfirmationModalProps> = ({ onSucces
   const confirmProps = useMemo(() => {
     const props = { onCancel: closePrivateModal, visible: true }
     return FP.pipe(
-      passwordValidationResult,
+      passwordValidationRD,
       RD.fold(
         () => ({
           ...props,
@@ -62,7 +59,7 @@ export const ConfirmPasswordView: React.FC<ConfirmationModalProps> = ({ onSucces
         })
       )
     )
-  }, [passwordValidationResult, setPasswordToValidate, closePrivateModal, onPasswordValidationSucceed])
+  }, [passwordValidationRD, setPasswordToValidate, closePrivateModal, onPasswordValidationSucceed])
 
   return <PrivateModal {...confirmProps} />
 }
