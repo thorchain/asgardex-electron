@@ -5,6 +5,7 @@ import * as FP from 'fp-ts/function'
 import { useObservableState } from 'observable-hooks'
 
 import { PrivateModal } from '../../../components/modal/private'
+import { ConfirmationModalProps } from '../../../components/uielements/common/Common.types'
 import { useWalletContext } from '../../../contexts/WalletContext'
 
 /**
@@ -13,10 +14,7 @@ import { useWalletContext } from '../../../contexts/WalletContext'
  * Just a modal 'connected' to the all appropriate services
  */
 
-export const ConfirmPasswordView: React.FC<{
-  onSuccess: () => void
-  onClose: () => void
-}> = ({ onSuccess, onClose }) => {
+export const ConfirmPasswordView: React.FC<ConfirmationModalProps> = ({ onSuccess, onClose }) => {
   const [passwordToValidate, setPasswordToValidate] = useState('')
 
   const { keystoreService } = useWalletContext()

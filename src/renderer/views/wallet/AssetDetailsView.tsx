@@ -57,16 +57,24 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const [bnbPoolAddress] = useObservableState(
+  const oRuneBnbAsset: O.Option<Asset> = useMemo(
     () =>
       FP.pipe(
         oSelectedAsset,
         // We do need bnb pool address for BNB.RUNE assets only
-        O.filter(isRuneBnbAsset),
+        O.filter(isRuneBnbAsset)
+      ),
+    [oSelectedAsset]
+  )
+
+  const [bnbPoolAddress] = useObservableState(
+    () =>
+      FP.pipe(
+        oRuneBnbAsset,
         O.fold(
           // No subscription of `poolAddresses$ ` needed for other assets than BNB.RUNE
           () => Rx.of(O.none),
-          () =>
+          (_) =>
             FP.pipe(
               poolAddresses$,
               liveData.map((endpoints) => getPoolAddressByChain(endpoints, BNBChain)),
@@ -79,7 +87,24 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
 
   const { addressByChain$ } = useChainContext()
 
-  const { sendTx: sendBnbTx } = useBinanceContext()
+  const { sendTx: sendUpgradeTx, fees$, reloadFees: reloadUpgradeFee } = useBinanceContext()
+
+  const [upgradeFee] = useObservableState(
+    () =>
+      FP.pipe(
+        oRuneBnbAsset,
+        O.fold(
+          // No subscription of `fees$ ` needed for other assets than BNB.RUNE
+          () => Rx.EMPTY,
+          (_) =>
+            FP.pipe(
+              fees$,
+              liveData.map((fees) => fees.fast)
+            )
+        )
+      ),
+    RD.initial
+  )
 
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
@@ -136,7 +161,9 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         walletAddress={oWalletAddress}
         runeNativeAddress={oRuneNativeAddress}
         poolAddress={bnbPoolAddress}
-        sendTx={sendBnbTx}
+        sendUpgradeTx={sendUpgradeTx}
+        upgradeFee={upgradeFee}
+        reloadUpgradeFeeHandler={reloadUpgradeFee}
         UpgradeConfirmationModal={ConfirmPasswordView}
       />
     </>

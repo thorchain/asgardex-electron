@@ -2,7 +2,14 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  AssetBNB,
+  assetToString,
+  BaseAmount,
+  baseToAsset,
+  formatAssetAmountCurrency
+} from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -12,11 +19,12 @@ import * as Rx from 'rxjs'
 
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import * as AssetHelper from '../../../helpers/assetHelper'
+import { getChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { emptyFunc } from '../../../helpers/funcHelper'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { SendTxParams } from '../../../services/binance/types'
+import { FeeRD } from '../../../services/chain/types'
 import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { PoolAddress } from '../../../services/midgard/types'
@@ -27,6 +35,8 @@ import { TxModal } from '../../modal/tx'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
+import { ConfirmationModalProps } from '../../uielements/common/Common.types'
+import { UIFeesRD, Fees } from '../../uielements/fees'
 import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.style'
 
@@ -42,27 +52,31 @@ type Props = {
   balances: O.Option<NonEmptyWalletBalances>
   asset: O.Option<Asset>
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
-  reloadBalancesHandler?: () => void
+  reloadBalancesHandler?: FP.Lazy<void>
   loadTxsHandler?: LoadTxsHandler
   walletAddress?: O.Option<Address>
   runeNativeAddress?: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
-  sendTx: (_: SendTxParams) => TxLD
-  UpgradeConfirmationModal: React.FC<{ onSuccess: () => void; onClose: () => void }>
+  sendUpgradeTx: (_: SendTxParams) => TxLD
+  reloadUpgradeFeeHandler: FP.Lazy<void>
+  upgradeFee: FeeRD
+  UpgradeConfirmationModal: React.FC<ConfirmationModalProps>
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
-    sendTx,
+    sendUpgradeTx,
     txsPageRD,
     balances: oBalances,
     asset: oAsset,
     poolAddress: oPoolAddress,
-    reloadBalancesHandler = emptyFunc,
+    reloadBalancesHandler = FP.constVoid,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
     walletAddress: oWalletAddress = O.none,
     runeNativeAddress: oRuneNativeAddress = O.none,
+    upgradeFee,
+    reloadUpgradeFeeHandler,
     UpgradeConfirmationModal
   } = props
 
@@ -148,17 +162,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [oRuneBnbBalance]
   )
 
-  const runeUpgradeDisabled: boolean = useMemo(
-    () =>
-      isRuneBnbAsset &&
-      FP.pipe(
-        oRuneBnbAmount,
-        O.map((amount) => amount.amount().isLessThanOrEqualTo(0) || RD.isPending(upgradeTxState.txRD)),
-        O.getOrElse<boolean>(() => true)
-      ),
-    [upgradeTxState, isRuneBnbAsset, oRuneBnbAmount]
-  )
-
   const actionColSpanDesktop = isRuneBnbAsset ? 8 : 12
   const actionColSpanMobile = 24
 
@@ -169,10 +172,11 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         // TODO (@Veado): Remove it if we have everything set up for upgrade feature - just for testing
         const amount = ONE_ASSET_BASE_AMOUNT
         const startTime = Date.now()
-        const subscription = sendTx({ recipient, amount, asset, memo: `SWITCH:${runeAddress}` }).subscribe((txRD) => {
-          console.log('txrd', txRD)
-          setUpgradeTxState({ startTime: O.some(startTime), txRD })
-        })
+        const subscription = sendUpgradeTx({ recipient, amount, asset, memo: `SWITCH:${runeAddress}` }).subscribe(
+          (txRD) => {
+            setUpgradeTxState({ startTime: O.some(startTime), txRD })
+          }
+        )
         // store subscription
         setUpgradeTxSub(O.some(subscription))
 
@@ -183,7 +187,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         return false
       })
     )
-  }, [oPoolAddress, oRuneBnbAmount, oRuneBnbAsset, oRuneNativeAddress, sendTx])
+  }, [oPoolAddress, oRuneBnbAmount, oRuneBnbAsset, oRuneNativeAddress, sendUpgradeTx])
 
   const closeUpgradeTxModal = useCallback(() => {
     // reset subscription
@@ -255,6 +259,88 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [UpgradeConfirmationModal, showConfirmUpgradeModal, upgradeConfirmationHandler]
   )
 
+  const uiFeesRD: UIFeesRD = useMemo(
+    () =>
+      FP.pipe(
+        oRuneBnbAsset,
+        O.fold(
+          () => RD.initial,
+          (runeBnbAsset) =>
+            FP.pipe(
+              upgradeFee,
+              RD.map((fee) => [{ asset: getChainAsset(runeBnbAsset.chain), amount: fee }])
+            )
+        )
+      ),
+    [oRuneBnbAsset, upgradeFee]
+  )
+
+  const oBnbBalance: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        // we do care about bnb balance if RuneBNB is selected only
+        oRuneBnbAsset,
+        O.chain((_) => getWalletBalanceByAsset(oBalances, O.some(AssetBNB))),
+        O.map(({ amount }) => amount)
+      ),
+    [oRuneBnbAsset, oBalances]
+  )
+
+  const oUpgradeFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(upgradeFee, RD.toOption), [upgradeFee])
+
+  const isUpgradeFeeError = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(oUpgradeFee, oBnbBalance),
+        O.fold(
+          // Missing (or loading) fees does not mean we can't sent something. No error then.
+          () => !O.isNone(oUpgradeFee),
+          ([fee, bnbAmount]) => bnbAmount.amount().isLessThan(fee.amount())
+        )
+      ),
+    [oBnbBalance, oUpgradeFee]
+  )
+
+  const renderUpgradeFeeError = useMemo(() => {
+    if (!isUpgradeFeeError) return <></>
+
+    return FP.pipe(
+      sequenceTOption(oUpgradeFee, oBnbBalance),
+      O.map(([fee, bnbAmount]) => {
+        const msg = intl.formatMessage(
+          { id: 'wallet.upgrade.feeError' },
+          {
+            fee: formatAssetAmountCurrency({
+              amount: baseToAsset(fee),
+              asset: AssetBNB,
+              trimZeros: true
+            }),
+            balance: formatAssetAmountCurrency({
+              amount: baseToAsset(bnbAmount),
+              asset: AssetBNB,
+              trimZeros: true
+            })
+          }
+        )
+        // `key`  has to be set to avoid "Missing "key" prop for element in iterator"
+        return <Styled.UpgradeFeeErrorLabel key="upgrade-fee-error">{msg}</Styled.UpgradeFeeErrorLabel>
+      }),
+      O.getOrElse(() => <></>)
+    )
+  }, [intl, isUpgradeFeeError, oBnbBalance, oUpgradeFee])
+
+  const runeUpgradeDisabled: boolean = useMemo(
+    () =>
+      isRuneBnbAsset &&
+      (isUpgradeFeeError ||
+        FP.pipe(
+          oRuneBnbAmount,
+          O.map((amount) => amount.amount().isLessThanOrEqualTo(0) || RD.isPending(upgradeTxState.txRD)),
+          O.getOrElse<boolean>(() => true)
+        )),
+    [upgradeTxState, isRuneBnbAsset, oRuneBnbAmount, isUpgradeFeeError]
+  )
+
   return (
     <>
       {renderConfirmUpgradeModal}
@@ -299,6 +385,10 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
                     {intl.formatMessage({ id: 'wallet.action.upgrade' })}
                   </Button>
                 </Row>
+                <Styled.FeeRow>
+                  <Fees fees={uiFeesRD} reloadFees={reloadUpgradeFeeHandler} />
+                </Styled.FeeRow>
+                {renderUpgradeFeeError}
               </Styled.ActionWrapper>
             </Styled.ActionCol>
           )}

@@ -121,6 +121,7 @@ type WalletMessageKey =
   | 'wallet.upgrade.pending'
   | 'wallet.upgrade.success'
   | 'wallet.upgrade.error'
+  | 'wallet.upgrade.feeError'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 

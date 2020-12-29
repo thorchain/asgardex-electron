@@ -40,7 +40,8 @@ import { PricePool } from '../../views/pools/Pools.types'
 import { CurrencyInfo } from '../currency'
 import { SwapModal } from '../modal/swap'
 import { AssetSelect } from '../uielements/assets/assetSelect'
-import { Fee, Fees } from '../uielements/fees'
+import { ConfirmationModalProps } from '../uielements/common/Common.types'
+import { Fees, UIFeesRD } from '../uielements/fees'
 import { Modal } from '../uielements/modal'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
@@ -58,7 +59,7 @@ type SwapProps = {
   resetTx?: () => void
   goToTransaction?: (txHash: string) => void
   activePricePool: PricePool
-  PasswordConfirmation: React.FC<{ onSuccess: () => void; onClose: () => void }>
+  PasswordConfirmation: React.FC<ConfirmationModalProps>
   reloadFees?: () => void
   fees?: SwapFeesRD
   targetWalletAddress?: O.Option<Address>
@@ -539,7 +540,7 @@ export const Swap = ({
     )
   }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset, outputLabel])
 
-  const fees: RD.RemoteData<Error, Fee[]> = useMemo(
+  const fees: UIFeesRD = useMemo(
     () =>
       FP.pipe(
         sequenceTRD(

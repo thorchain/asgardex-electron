@@ -1,21 +1,16 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { BaseAmount, Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import { useIntl } from 'react-intl'
 
 import { formatFee } from './Fees.helper'
 import * as Styled from './Fees.styles'
-
-export type Fee = {
-  amount: BaseAmount
-  asset: Asset
-}
+import { UIFeesRD } from './Fees.types'
 
 type Props = {
-  fees: RD.RemoteData<Error, Fee[]>
+  fees: UIFeesRD
   reloadFees?: () => void
 }
 

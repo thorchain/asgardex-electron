@@ -3,10 +3,9 @@ import { assetAmount } from '@xchainjs/xchain-util'
 import { TransferFees } from '../../renderer/services/binance/types'
 
 /**
- * @deprecated
- * TODO(@Veado) Remove it
+ * BNB fees
  **/
-export const TRANSFER_FEES: TransferFees = {
+export const BNB_TRANSFER_FEES: TransferFees = {
   single: assetAmount(0.000375),
   multi: assetAmount(0.0003)
 }
