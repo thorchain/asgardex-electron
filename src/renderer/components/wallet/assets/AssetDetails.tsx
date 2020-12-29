@@ -174,7 +174,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         const startTime = Date.now()
         const subscription = sendUpgradeTx({ recipient, amount, asset, memo: `SWITCH:${runeAddress}` }).subscribe(
           (txRD) => {
-            console.log('txrd', txRD)
             setUpgradeTxState({ startTime: O.some(startTime), txRD })
           }
         )
