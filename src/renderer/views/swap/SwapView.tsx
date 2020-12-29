@@ -95,7 +95,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     () =>
       FP.pipe(
         txRD$,
-        liveData.mapLeft((e) => Error(e.msg)),
         liveData.chain((tx) =>
           FP.pipe(
             getTransactionState$(tx),

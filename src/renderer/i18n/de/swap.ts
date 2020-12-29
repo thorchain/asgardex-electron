@@ -1,7 +1,8 @@
 import { SwapMessages } from '../types'
 
 const swap: SwapMessages = {
-  'swap.swapping': 'Tauschen',
+  'swap.state.pending': 'Tauschen',
+  'swap.state.error': 'Tausch error',
   'swap.state.success': 'Erfolgreich getauscht',
   'swap.input': 'Eingabe',
   'swap.balance': 'Guthaben',

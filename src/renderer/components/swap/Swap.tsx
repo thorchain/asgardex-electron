@@ -16,7 +16,6 @@ import {
   formatAssetAmountCurrency,
   AssetRuneNative
 } from '@xchainjs/xchain-util'
-import { Spin } from 'antd'
 import { eqString } from 'fp-ts/Eq'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -34,16 +33,17 @@ import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/b
 import { SwapFeesRD } from '../../services/chain/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
-import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../services/wallet/types'
-import { TxStatus, TxTypes } from '../../types/asgardex'
+import { NonEmptyWalletBalances, TxRD, ValidatePasswordHandler } from '../../services/wallet/types'
 import { PricePool } from '../../views/pools/Pools.types'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
-import { SwapModal } from '../modal/swap'
+import { TxModal } from '../modal/tx'
+import { AssetData } from '../uielements/assets/assetData'
 import { AssetSelect } from '../uielements/assets/assetSelect'
 import { Fees, UIFeesRD } from '../uielements/fees'
-import { Modal } from '../uielements/modal'
 import { Slider } from '../uielements/slider'
+import { StepBar } from '../uielements/stepBar'
+import { Trend } from '../uielements/trend'
 import * as Styled from './Swap.styles'
 import { getSwapData, assetWithPriceToAsset, pickAssetWithPrice } from './Swap.utils'
 
@@ -55,8 +55,8 @@ type SwapProps = {
   onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
   poolDetails?: PoolDetails
   walletBalances?: O.Option<NonEmptyWalletBalances>
-  txWithState?: TxWithStateRD
-  resetTx?: () => void
+  txWithState: TxWithStateRD
+  resetTx?: FP.Lazy<void>
   goToTransaction?: (txHash: string) => void
   activePricePool: PricePool
   validatePassword$: ValidatePasswordHandler
@@ -72,9 +72,9 @@ export const Swap = ({
   targetAsset: targetAssetProp,
   poolDetails = [],
   walletBalances = O.none,
-  txWithState = RD.initial,
+  txWithState,
   goToTransaction = (_) => {},
-  resetTx,
+  resetTx = FP.constVoid,
   activePricePool,
   validatePassword$,
   reloadFees,
@@ -276,105 +276,188 @@ export const Swap = ({
     [oAssetWB, changeAmount, setChangeAmountFromPercentValue]
   )
 
-  const pendingState = useMemo(
+  const txModalTitle = useMemo(
     () =>
       FP.pipe(
         txWithState,
         RD.fold(
-          () => <></>,
-          () => <Spin />,
-          (error) => (
-            <Modal
-              closable
-              visible
-              title={intl.formatMessage({ id: 'common.error' })}
-              onOk={onSwapConfirmed}
-              okText={intl.formatMessage({ id: 'common.retry' })}
-              onCancel={resetTx}>
-              {error.message}
-            </Modal>
-          ),
-          ({ state, txHash }) =>
-            FP.pipe(
-              state,
-              O.map(
-                (): TxStatus => ({
-                  modal: true,
-                  value: 100,
-                  status: false,
-                  type: TxTypes.SWAP
-                })
-              ),
-              O.alt(
-                (): O.Option<TxStatus> =>
-                  O.some({
-                    modal: true,
-                    value: 50,
-                    status: true,
-                    startTime: Date.now(),
-                    type: TxTypes.SWAP
-                  })
-              ),
-              O.chain((txStatus) => sequenceTOption(oSourceAssetWP, oTargetAssetWP, O.some(txStatus))),
-              O.map(([sourceAssetWP, targetAssetWP, txStatus]) => {
-                const swapResultByBasePriceAsset =
-                  poolData[assetToString(targetAssetWP.asset)] &&
-                  // Convert swapResult to the selected price asset values
-                  getValueOfAsset1InAsset2(
-                    assetToBase(assetAmount(swapData.swapResult)),
-                    poolData[assetToString(targetAssetWP.asset)],
-                    activePricePool.poolData
-                  )
-
-                const amountToSwapInSelectedPriceAsset =
-                  poolData[assetToString(sourceAssetWP.asset)] &&
-                  getValueOfAsset1InAsset2(
-                    assetToBase(assetAmount(changeAmount)),
-                    poolData[assetToString(sourceAssetWP.asset)],
-                    activePricePool.poolData
-                  )
-
-                return (
-                  <SwapModal
-                    key={'swap modal result'}
-                    basePriceAsset={activePricePool.asset}
-                    slip={swapData.slip}
-                    swapSourceAsset={sourceAssetWP.asset}
-                    swapTargetAsset={targetAssetWP.asset}
-                    amountToSwapInSelectedPriceAsset={amountToSwapInSelectedPriceAsset}
-                    swapResultByBasePriceAsset={swapResultByBasePriceAsset}
-                    onClose={resetTx}
-                    onClickFinish={resetTx}
-                    isCompleted={!txStatus.status}
-                    onViewTxClick={(e) => {
-                      e.preventDefault()
-                      goToTransaction(txHash)
-                    }}
-                    txStatus={{
-                      ...txStatus,
-                      hash: txHash
-                    }}
-                  />
-                )
-              }),
-              O.toNullable
-            )
-        )
+          () => 'swap.state.pending',
+          () => 'swap.state.pending',
+          () => 'swap.state.error',
+          () => 'swap.state.success'
+        ),
+        (id) => intl.formatMessage({ id })
       ),
-    [
-      intl,
-      txWithState,
-      goToTransaction,
-      onSwapConfirmed,
-      resetTx,
-      oSourceAssetWP,
-      oTargetAssetWP,
-      swapData,
-      activePricePool,
-      poolData,
-      changeAmount
-    ]
+    [intl, txWithState]
   )
+
+  const txRD: TxRD = useMemo(
+    () =>
+      FP.pipe(
+        txWithState,
+        RD.map(({ txHash }) => txHash)
+      ),
+    [txWithState]
+  )
+
+  const extraTxModalContent = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(oSourceAssetWP, oTargetAssetWP),
+      O.map(([sourceAssetWP, targetAssetWP]) => {
+        const swapResultByBasePriceAsset =
+          poolData[assetToString(targetAssetWP.asset)] &&
+          // Convert swapResult to the selected price asset values
+          getValueOfAsset1InAsset2(
+            assetToBase(assetAmount(swapData.swapResult)),
+            poolData[assetToString(targetAssetWP.asset)],
+            activePricePool.poolData
+          )
+
+        const amountToSwapInSelectedPriceAsset =
+          poolData[assetToString(sourceAssetWP.asset)] &&
+          getValueOfAsset1InAsset2(
+            assetToBase(assetAmount(changeAmount)),
+            poolData[assetToString(sourceAssetWP.asset)],
+            activePricePool.poolData
+          )
+
+        const basePriceAsset = activePricePool.asset
+        const swapTargetAsset = targetAssetWP.asset
+
+        return (
+          <>
+            <Styled.CoinDataWrapper>
+              <StepBar size={50} />
+              <Styled.CoinDataContainer>
+                <AssetData
+                  priceBaseAsset={basePriceAsset}
+                  asset={swapTargetAsset}
+                  price={amountToSwapInSelectedPriceAsset}
+                />
+                <AssetData priceBaseAsset={basePriceAsset} asset={swapTargetAsset} price={swapResultByBasePriceAsset} />
+              </Styled.CoinDataContainer>
+            </Styled.CoinDataWrapper>
+            <Styled.TrendContainer>
+              <Trend amount={swapData.slip} />
+            </Styled.TrendContainer>
+          </>
+        )
+      }),
+      O.getOrElse(() => <></>)
+    )
+  }, [oSourceAssetWP, oTargetAssetWP, poolData, swapData, activePricePool, changeAmount])
+
+  const renderTxModal = useMemo(() => {
+    return (
+      <TxModal
+        title={txModalTitle}
+        onClose={resetTx}
+        txRD={txRD}
+        onViewTxClick={goToTransaction}
+        extra={extraTxModalContent}
+      />
+    )
+  }, [extraTxModalContent, goToTransaction, resetTx, txModalTitle, txRD])
+
+  // const pendingState = useMemo(
+  //   () =>
+  //     FP.pipe(
+  //       txWithState,
+  //       RD.fold(
+  //         () => <></>,
+  //         () => <Spin />,
+  //         (error) => (
+  //           <Modal
+  //             closable
+  //             visible
+  //             title={intl.formatMessage({ id: 'common.error' })}
+  //             onOk={onSwapConfirmed}
+  //             okText={intl.formatMessage({ id: 'common.retry' })}
+  //             onCancel={resetTx}>
+  //             {error.message}
+  //           </Modal>
+  //         ),
+  //         ({ state, txHash }) =>
+  //           FP.pipe(
+  //             state,
+  //             O.map(
+  //               (): TxStatus => ({
+  //                 modal: true,
+  //                 value: 100,
+  //                 status: false,
+  //                 type: TxTypes.SWAP
+  //               })
+  //             ),
+  //             O.alt(
+  //               (): O.Option<TxStatus> =>
+  //                 O.some({
+  //                   modal: true,
+  //                   value: 50,
+  //                   status: true,
+  //                   startTime: Date.now(),
+  //                   type: TxTypes.SWAP
+  //                 })
+  //             ),
+  //             O.chain((txStatus) => sequenceTOption(oSourceAssetWP, oTargetAssetWP, O.some(txStatus))),
+  //             O.map(([sourceAssetWP, targetAssetWP, txStatus]) => {
+  //               const swapResultByBasePriceAsset =
+  //                 poolData[assetToString(targetAssetWP.asset)] &&
+  //                 // Convert swapResult to the selected price asset values
+  //                 getValueOfAsset1InAsset2(
+  //                   assetToBase(assetAmount(swapData.swapResult)),
+  //                   poolData[assetToString(targetAssetWP.asset)],
+  //                   activePricePool.poolData
+  //                 )
+
+  //               const amountToSwapInSelectedPriceAsset =
+  //                 poolData[assetToString(sourceAssetWP.asset)] &&
+  //                 getValueOfAsset1InAsset2(
+  //                   assetToBase(assetAmount(changeAmount)),
+  //                   poolData[assetToString(sourceAssetWP.asset)],
+  //                   activePricePool.poolData
+  //                 )
+
+  //               return (
+  //                 <SwapModal
+  //                   key={'swap modal result'}
+  //                   basePriceAsset={activePricePool.asset}
+  //                   slip={swapData.slip}
+  //                   swapSourceAsset={sourceAssetWP.asset}
+  //                   swapTargetAsset={targetAssetWP.asset}
+  //                   amountToSwapInSelectedPriceAsset={amountToSwapInSelectedPriceAsset}
+  //                   swapResultByBasePriceAsset={swapResultByBasePriceAsset}
+  //                   onClose={resetTx}
+  //                   onClickFinish={resetTx}
+  //                   isCompleted={!txStatus.status}
+  //                   onViewTxClick={(e) => {
+  //                     e.preventDefault()
+  //                     goToTransaction(txHash)
+  //                   }}
+  //                   txStatus={{
+  //                     ...txStatus,
+  //                     hash: txHash
+  //                   }}
+  //                 />
+  //               )
+  //             }),
+  //             O.toNullable
+  //           )
+  //       )
+  //     ),
+  //   [
+  //     intl,
+  //     txWithState,
+  //     goToTransaction,
+  //     onSwapConfirmed,
+  //     resetTx,
+  //     oSourceAssetWP,
+  //     oTargetAssetWP,
+  //     swapData,
+  //     activePricePool,
+  //     poolData,
+  //     changeAmount
+  //   ]
+  // )
 
   const closePrivateModal = useCallback(() => {
     setShowPrivateModal(false)
@@ -571,14 +654,14 @@ export const Swap = ({
           validatePassword$={validatePassword$}
         />
       )}
-      <Styled.PendingContainer>{pendingState}</Styled.PendingContainer>
+      <Styled.PendingContainer>{renderTxModal}</Styled.PendingContainer>
       <Styled.ContentContainer>
         <Styled.Header>
           {FP.pipe(
             assetsToSwap,
             O.map(
               ([sourceAsset, targetAsset]) =>
-                `${intl.formatMessage({ id: 'swap.swapping' })} ${sourceAsset.ticker} >> ${targetAsset.ticker}`
+                `${intl.formatMessage({ id: 'swap.state.pending' })} ${sourceAsset.ticker} >> ${targetAsset.ticker}`
             ),
             O.getOrElse(() => 'No such assets')
           )}
