@@ -22,12 +22,6 @@ export const PasswordModal: React.FC<Props> = ({ onSuccess, onClose, validatePas
 
   const [passwordValidationRD] = useObservableState(() => validatePassword$(passwordToValidate), RD.initial)
 
-  // const { keystoreService } = useWalletContext()
-  // const passwordValidationResult$: ValidatePasswordLD = useMemo(
-  //   () => keystoreService.validatePassword$(passwordToValidate),
-  //   [passwordToValidate, keystoreService]
-  // )
-
   const closePrivateModal = useCallback(() => {
     onClose()
     setPasswordToValidate('')
