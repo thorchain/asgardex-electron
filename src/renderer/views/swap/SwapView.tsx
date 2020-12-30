@@ -55,7 +55,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     reloadSwapFees,
     swapFees$,
     txRD$,
-    sendTx: subscribeTx,
+    subscribeTx,
     resetTx,
     getExplorerUrlByAsset$,
     assetAddress$

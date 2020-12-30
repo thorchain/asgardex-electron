@@ -14,7 +14,7 @@ import { SendTxParams } from './types'
 
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
-const tx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => {
+const sendTx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => {
   // TODO (@Veado) Health check request for pool address
   // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
 
@@ -63,12 +63,12 @@ const tx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => 
   }
 }
 
-const sendTx = ({ asset, recipient, amount, memo, txType }: SendTxParams): void => {
-  tx$({ asset, recipient, amount, memo, txType }).subscribe(setTxRD)
+const subscribeTx = ({ asset, recipient, amount, memo, txType }: SendTxParams): void => {
+  sendTx$({ asset, recipient, amount, memo, txType }).subscribe(setTxRD)
 }
 
 const resetTx = () => {
   setTxRD(RD.initial)
 }
 
-export { sendTx, txRD$, resetTx }
+export { subscribeTx, txRD$, resetTx }
