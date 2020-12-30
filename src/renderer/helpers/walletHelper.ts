@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances } from '../services/wallet/types'
 import { WalletBalance } from '../types/wallet'
-import { isBnbAsset, isRuneNativeAsset } from './assetHelper'
+import { isBnbAsset, isEthAsset, isRuneNativeAsset } from './assetHelper'
 import { eqAsset } from './fp/eq'
 import { sequenceTOption } from './fpHelpers'
 
@@ -41,6 +41,13 @@ export const getBnbAmountFromBalances = (balances: WalletBalances): O.Option<Ass
   FP.pipe(
     balances,
     A.findFirst(({ asset }) => isBnbAsset(asset)),
+    O.map(({ amount }) => baseToAsset(amount))
+  )
+
+export const getEthAmountFromBalances = (balances: WalletBalances): O.Option<AssetAmount> =>
+  FP.pipe(
+    balances,
+    A.findFirst(({ asset }) => isEthAsset(asset)),
     O.map(({ amount }) => baseToAsset(amount))
   )
 

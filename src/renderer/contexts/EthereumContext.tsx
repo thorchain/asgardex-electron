@@ -1,15 +1,48 @@
 import React, { createContext, useContext } from 'react'
 
-import { client$, address$ } from '../services/ethereum'
+import {
+  client$,
+  clientViewState$,
+  txs$,
+  resetTx,
+  subscribeTx,
+  sendTx,
+  txRD$,
+  address$,
+  explorerUrl$,
+  getExplorerTxUrl$,
+  fees$,
+  reloadFees
+} from '../services/ethereum'
 
 export type EthereumContextValue = {
   client$: typeof client$
+  clientViewState$: typeof clientViewState$
+  txs$: typeof txs$
+  resetTx: typeof resetTx
+  subscribeTx: typeof subscribeTx
+  sendTx: typeof sendTx
+  txRD$: typeof txRD$
   address$: typeof address$
+  explorerUrl$: typeof explorerUrl$
+  getExplorerTxUrl$: typeof getExplorerTxUrl$
+  fees$: typeof fees$
+  reloadFees: typeof reloadFees
 }
 
 const initialContext: EthereumContextValue = {
   client$,
-  address$
+  clientViewState$,
+  txs$,
+  resetTx,
+  subscribeTx,
+  sendTx,
+  txRD$,
+  address$,
+  explorerUrl$,
+  getExplorerTxUrl$,
+  fees$,
+  reloadFees
 }
 
 const EthereumContext = createContext<EthereumContextValue | null>(null)

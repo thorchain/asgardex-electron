@@ -62,7 +62,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             />
           )
         case 'ETH':
-          return <SendViewETH />
+          return <SendViewETH selectedAsset={asset} walletBalances={balances} getExplorerTxUrl={getExplorerTxUrl} />
         case 'THOR':
           return <SendViewTHOR thorAsset={asset} balances={balances} getExplorerTxUrl={getExplorerTxUrl} />
         default:
