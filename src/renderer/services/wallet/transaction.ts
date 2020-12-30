@@ -9,6 +9,7 @@ import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as C from '../clients'
 import { ExplorerUrl$, GetExplorerTxUrl$, TxsPageLD, LoadTxsParams } from '../clients'
+import * as ETH from '../ethereum'
 import * as THOR from '../thorchain'
 import { client$, selectedAsset$ } from './common'
 import { INITIAL_LOAD_TXS_PROPS } from './const'
@@ -46,9 +47,7 @@ export const getTxs$: (walletAddress: O.Option<string>) => TxsPageLD = (walletAd
               case 'BTC':
                 return BTC.txs$({ asset: O.none, limit, offset, walletAddress })
               case 'ETH':
-                return Rx.of(
-                  RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: 'Not implemented yet' })
-                )
+                return ETH.txs$({ asset: O.some(asset), limit, offset, walletAddress })
               case 'THOR':
                 return THOR.txs$({ asset: O.none, limit, offset, walletAddress })
               default:

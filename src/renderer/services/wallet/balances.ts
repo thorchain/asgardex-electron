@@ -25,8 +25,7 @@ import { sortBalances } from './util'
 export const reloadBalances = () => {
   BTC.reloadBalances()
   BNB.reloadBalances()
-  // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
-  // ETH.reloadBalances()
+  ETH.reloadBalances()
   THOR.reloadBalances()
 }
 
@@ -37,9 +36,7 @@ const reloadBalancesByChain = (chain: Chain) => {
     case 'BTC':
       return BTC.reloadBalances
     case 'ETH':
-      // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
-      // return ETH.reloadBalances
-      return () => {}
+      return ETH.reloadBalances
     case 'THOR':
       return THOR.reloadBalances
     default:
@@ -125,8 +122,7 @@ const btcLedgerBalance$ = FP.pipe(
 /**
  * Transforms ETH data (address + `WalletBalance`) into `ChainBalance`
  */
-// TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
-const _ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
+const ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
   RxOp.map(([walletAddress, balances]) => ({
     walletType: 'keystore',
     chain: ETHChain,
@@ -142,9 +138,8 @@ export const chainBalances$: ChainBalances$ = Rx.combineLatest([
   thorChainBalance$,
   btcChainBalance$,
   btcLedgerChainBalance$,
-  bnbChainBalance$
-  /* //TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH */
-  /* ETH.balances$ */
+  bnbChainBalance$,
+  ethChainBalance$
 ])
 
 /**
@@ -158,9 +153,8 @@ export const balancesState$: Observable<BalancesState> = Rx.combineLatest([
   THOR.balances$,
   BNB.balances$,
   btcLedgerBalance$,
-  BTC.balances$
-  // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
-  // ethBalances$
+  BTC.balances$,
+  ETH.balances$
 ]).pipe(
   RxOp.map((balancesList) => ({
     balances: FP.pipe(

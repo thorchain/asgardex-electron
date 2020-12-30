@@ -65,8 +65,8 @@ export const SettingsView: React.FC = (): JSX.Element => {
       ),
     [binanceContext.address$, binanceLedgerAddress]
   )
-  // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
-  const _ethAddress$ = useMemo(
+
+  const ethAddress$ = useMemo(
     () =>
       pipe(
         ethContext.address$,
@@ -141,16 +141,11 @@ export const SettingsView: React.FC = (): JSX.Element => {
     () =>
       pipe(
         // combineLatest is for the future additional accounts
-        Rx.combineLatest([
-          binanceAddress$,
-          /* TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH */
-          /* ethAddress$, */
-          bitcoinAddress$
-        ]),
+        Rx.combineLatest([binanceAddress$, ethAddress$, bitcoinAddress$]),
         RxOp.map(A.filter(O.isSome)),
         RxOp.map(sequenceTOptionFromArray)
       ),
-    [binanceAddress$, bitcoinAddress$]
+    [binanceAddress$, bitcoinAddress$, ethAddress$]
   )
   const userAccounts = useObservableState(userAccounts$, O.none)
 
