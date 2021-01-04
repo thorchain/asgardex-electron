@@ -6,6 +6,7 @@ import * as RxOp from 'rxjs/operators'
 import * as BNC from '../binance'
 import * as BTC from '../bitcoin'
 import { XChainClient$ } from '../clients'
+import * as ETH from '../ethereum'
 import { selectedPoolChain$ } from '../midgard/common'
 import * as THOR from '../thorchain'
 import { Chain$ } from './types'
@@ -17,7 +18,7 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
     case 'BTC':
       return BTC.client$
     case 'ETH':
-      return Rx.of(O.none)
+      return ETH.client$
     case 'THOR':
       return THOR.client$
     default:
