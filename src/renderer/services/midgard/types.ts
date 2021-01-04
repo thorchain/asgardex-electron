@@ -154,7 +154,11 @@ export type PoolsService = {
   poolDetail$: PoolDetailLD
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
+  validatePool$: (_: string) => ValidatePoolLD
 }
 
 export type StakersAssetDataRD = RD.RemoteData<Error, StakersAssetData>
 export type StakersAssetDataLD = LiveData<Error, StakersAssetData>
+
+export type ValidatePoolRD = RD.RemoteData<Error, boolean>
+export type ValidatePoolLD = LiveData<Error, boolean>

@@ -157,8 +157,15 @@ const networkInfo$: NetworkInfoLD = reloadNetworkInfo$.pipe(
   shareReplay(1)
 )
 
-const getTransactionState$ = (txId: string): LiveData<ApiError, O.Option<string>> => {
-  return FP.pipe(
+/**
+ * Midgard will provide an endpoint to check if transaction has been included finally
+ *
+ * Important note: This endpoint has not been implemented yet - we mock a successful result here at the meantime
+ *
+ * @param txId Transaction hash
+ */
+const txStatus$ = (txId: string): LiveData<ApiError, O.Option<string>> =>
+  FP.pipe(
     Rx.of(),
     RxOp.delay(1500),
     RxOp.map(() => O.some(txId)),
@@ -170,7 +177,6 @@ const getTransactionState$ = (txId: string): LiveData<ApiError, O.Option<string>
     ),
     startWith(RD.pending)
   )
-}
 
 export type MidgardService = {
   networkInfo$: NetworkInfoLD
@@ -199,5 +205,5 @@ export const service = {
   reloadApiEndpoint: reloadByzantine,
   pools: createPoolsService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
   stake: createStakeService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
-  getTransactionState$
+  txStatus$
 }
