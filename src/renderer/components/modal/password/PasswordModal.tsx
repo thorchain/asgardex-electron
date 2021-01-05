@@ -10,7 +10,6 @@ import { ValidatePasswordLD } from '../../../services/wallet/types'
 /**
  * Wrapper around `PrivateModal` to validate password using `validatePassword$` stream
  */
-
 export type Props = {
   onSuccess: FP.Lazy<void>
   onClose: FP.Lazy<void>
@@ -20,7 +19,12 @@ export type Props = {
 export const PasswordModal: React.FC<Props> = ({ onSuccess, onClose, validatePassword$ }) => {
   const [passwordToValidate, setPasswordToValidate] = useState('')
 
-  const [passwordValidationRD] = useObservableState(() => validatePassword$(passwordToValidate), RD.initial)
+  const passwordValidationResult$ = useMemo(() => validatePassword$(passwordToValidate), [
+    passwordToValidate,
+    validatePassword$
+  ])
+
+  const passwordValidationRD = useObservableState(passwordValidationResult$, RD.initial)
 
   const closePrivateModal = useCallback(() => {
     onClose()
@@ -61,5 +65,11 @@ export const PasswordModal: React.FC<Props> = ({ onSuccess, onClose, validatePas
     )
   }, [passwordValidationRD, setPasswordToValidate, closePrivateModal, onPasswordValidationSucceed])
 
-  return <PrivateModal {...confirmProps} />
+  return (
+    <>
+      <div> passwordToValidate: {JSON.stringify(passwordToValidate)}</div>
+      <div>passwordValidationRD: {JSON.stringify(passwordValidationRD)}</div>
+      <PrivateModal {...confirmProps} />
+    </>
+  )
 }
