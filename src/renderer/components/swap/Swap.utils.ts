@@ -1,10 +1,11 @@
 import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip, PoolData } from '@thorchain/asgardex-util'
-import { Asset, assetAmount, assetToBase, assetToString, baseToAsset, bn, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, bn, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { AssetWithPrice } from '../../services/binance/types'
@@ -57,7 +58,7 @@ export const getSwapResult = (
   targetAsset: Asset,
   changeAmount: BaseAmount,
   pools: Record<string, PoolData>
-) =>
+): BaseAmount =>
   pipe(
     isRuneSwap(sourceAsset, targetAsset),
     O.chain((toRune) => {
@@ -76,35 +77,37 @@ export const getSwapResult = (
         O.map(([source, target]) => getDoubleSwapOutput(changeAmount, source, target))
       )
     ),
-    O.map((swapResult) => baseToAsset(swapResult).amount()),
-    O.getOrElse(() => bn(0))
+    O.getOrElse(() => ZERO_BASE_AMOUNT)
   )
 
-const defaultSwapData = {
-  slip: bn(0),
-  swapResult: bn(0)
+export type SwapData = {
+  readonly slip: BigNumber
+  readonly swapResult: BaseAmount
+}
+
+export const DEFAULT_SWAP_DATA: SwapData = {
+  slip: ZERO_BN,
+  swapResult: ZERO_BASE_AMOUNT
 }
 
 export const getSwapData = (
-  swapAmount: BigNumber,
+  swapAmount: BaseAmount,
   sourceAsset: O.Option<Asset>,
   targetAsset: O.Option<Asset>,
   pools: Record<string, PoolData>
-) => {
-  return pipe(
+): SwapData =>
+  pipe(
     sequenceTOption(sourceAsset, targetAsset),
     O.map(([sourceAsset, targetAsset]) => {
-      const swapBaseAmount = assetToBase(assetAmount(swapAmount))
-      const slip = getSlip(sourceAsset, targetAsset, swapBaseAmount, pools)
-      const swapResult = getSwapResult(sourceAsset, targetAsset, swapBaseAmount, pools)
+      const slip = getSlip(sourceAsset, targetAsset, swapAmount, pools)
+      const swapResult = getSwapResult(sourceAsset, targetAsset, swapAmount, pools)
       return {
         slip,
         swapResult
       }
     }),
-    O.getOrElse(() => defaultSwapData)
+    O.getOrElse(() => DEFAULT_SWAP_DATA)
   )
-}
 
 export const pickAssetWithPrice = (availableAssets: AssetWithPrice[], asset: O.Option<Asset>) =>
   pipe(

@@ -8,7 +8,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 
 import { ErrorView } from '../../components/shared/error/'
@@ -32,6 +32,7 @@ type Props = {}
 export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { source, target } = useParams<SwapRouteParams>()
   const intl = useIntl()
+  const history = useHistory()
 
   const { service: midgardService } = useMidgardContext()
   const {
@@ -116,6 +117,12 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const swapFeesRD: SwapFeesRD = useObservableState(swapFeesLD, RD.initial)
 
+  const onChangePath = useCallback(
+    (path) => {
+      history.replace(path)
+    },
+    [history]
+  )
   return (
     <>
       <BackLink />
@@ -153,6 +160,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   targetWalletAddress={targetWalletAddress}
                   swap$={swap$}
                   reloadBalances={reloadBalances}
+                  onChangePath={onChangePath}
                 />
               )
             }
