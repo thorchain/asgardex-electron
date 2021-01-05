@@ -4,11 +4,13 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { TxTypes } from '../../../types/asgardex'
 import { service as midgardService } from '../../midgard/service'
-import { INITIAL_SWAP_TX_STATE } from '../const'
+import { ErrorId } from '../../wallet/types'
+import { INITIAL_SWAP_STATE } from '../const'
 import { SwapParams, SwapState, SwapState$ } from '../types'
 import { sendTx$ } from './common'
 
@@ -24,43 +26,63 @@ const { pools: midgardPoolsService, txStatus$: midgardTxStatus$ } = midgardServi
  * @returns SwapTxState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
  *
  */
-export const swap$ = ({ poolAddress, asset, amount, memo }: SwapParams): SwapState$ => {
+export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapParams): SwapState$ => {
   // Observable state of loading process
-  const { get$: getState$, get: getState, set: setState } = observableState<SwapState>(INITIAL_SWAP_TX_STATE)
+  const { get$: getState$, get: getState, set: setState } = observableState<SwapState>(INITIAL_SWAP_STATE)
 
   // total of progress
   const total = O.some(100)
 
-  Rx.of(poolAddress).pipe(
-    // Update progress
-    RxOp.tap(() =>
-      setState({ ...getState(), startTime: O.some(Date.now()), txRD: RD.progress({ loaded: 10, total }) })
-    ),
-    // 1. validate pool address
-    RxOp.switchMap(midgardPoolsService.validatePool$),
-    // Update progress
-    RxOp.tap(() => setState({ ...getState(), txRD: RD.progress({ loaded: 33, total }) })),
-    // 2. send swap tx
-    RxOp.switchMap(() => sendTx$({ asset, recipient: poolAddress, amount, memo, txType: TxTypes.SWAP })),
-    // Update state
-    liveData.map((txHash) => {
-      setState({ ...getState(), txHash: O.some(txHash), txRD: RD.progress({ loaded: 66, total }) })
-      return txHash
-    }),
-    // 3. check tx finality via midgard (not implemented yet)
-    liveData.chain(midgardTxStatus$),
-    // Update state
-    liveData.map((txHash) => setState({ ...getState(), txHash, txRD: RD.success(O.getOrElse(() => '')(txHash)) })),
-    // handle errors
-    RxOp.catchError((error) => {
-      setState({ ...getState(), txRD: RD.failure(error) })
-      return Rx.EMPTY
-    })
+  FP.pipe(
+    oPoolAddress,
+    // For RuneNative we send `MsgNativeTx` w/o need for a pool address address,
+    // so we can leave it empty
+    O.alt(() => (isRuneNativeAsset(asset) ? O.some('') : O.none)),
+    O.fold(
+      // invalid pool address will fail
+      () => setState({ ...getState(), txRD: RD.failure({ errorId: ErrorId.SEND_TX, msg: 'invalid pool address' }) }),
+      // valid pool address (even an empty one for Thorchain)
+      (poolAddress) => {
+        Rx.of(poolAddress).pipe(
+          // Update progress
+          RxOp.tap(() => setState({ ...getState(), txRD: RD.progress({ loaded: 10, total }) })),
+          // 1. validate pool address or node (for `RuneNative` only)
+          RxOp.switchMap((p) =>
+            Rx.iif(
+              () => isRuneNativeAsset(asset),
+              midgardPoolsService.validateNode$(),
+              midgardPoolsService.validatePool$(p)
+            )
+          ),
+          // Update progress
+          RxOp.tap(() => setState({ ...getState(), txRD: RD.progress({ loaded: 33, total }) })),
+          // 2. send swap tx
+          RxOp.switchMap(() => sendTx$({ asset, recipient: poolAddress, amount, memo, txType: TxTypes.SWAP })),
+          // Update state
+          liveData.map((txHash) => {
+            setState({ ...getState(), txHash: O.some(txHash), txRD: RD.progress({ loaded: 66, total }) })
+            return txHash
+          }),
+          // 3. check tx finality via midgard (not implemented yet)
+          liveData.chain(midgardTxStatus$),
+          // Update state
+          liveData.map((txHash) =>
+            setState({ ...getState(), txHash, txRD: RD.success(O.getOrElse(() => '')(txHash)) })
+          ),
+          // handle errors
+          RxOp.catchError((error) => {
+            setState({ ...getState(), txRD: RD.failure(error) })
+            return Rx.EMPTY
+          })
+        )
+      }
+    )
   )
 
-  // timer to update loaded state
-  const timer$ = Rx.timer(1500)
+  // timer to update loaded state (in pending state only)
+  const timer$ = Rx.timer(1500).pipe(RxOp.filter(() => RD.isPending(getState().txRD)))
 
+  // Return stream of `SwapState$` depending on state updates and timer
   return Rx.combineLatest([getState$, timer$]).pipe(
     RxOp.switchMap(([state, _]) =>
       Rx.of(

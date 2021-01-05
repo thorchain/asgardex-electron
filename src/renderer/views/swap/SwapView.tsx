@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, AssetRuneNative, bnOrZero, THORChain } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, AssetRuneNative, bnOrZero } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -13,19 +13,16 @@ import * as Rx from 'rxjs'
 
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
-import { ConfirmSwapParams } from '../../components/swap/Swap'
 import { BackLink } from '../../components/uielements/backLink'
 import { Button } from '../../components/uielements/button'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
-import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { SwapRouteParams } from '../../routes/swap'
-import { INITIAL_SWAP_TX_STATE } from '../../services/chain/const'
-import { SwapFeesLD, SwapFeesRD, SwapState } from '../../services/chain/types'
+import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
 import { PoolAddressRx } from '../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import * as Styled from './SwapView.styles'
@@ -45,6 +42,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const {
     balancesState$,
+    reloadBalances,
     keystoreService: { validatePassword$ }
   } = useWalletContext()
 
@@ -62,11 +60,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     }
   }, [oTarget, setSelectedPoolAsset])
 
-  // Reset all common data on SwapView unmount
-  useEffect(() => {
-    return () => {}
-  }, [])
-
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
@@ -83,34 +76,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const sourcePoolAddress = useObservableState(sourcePoolAddress$, O.none)
   const targetWalletAddress = useObservableState(assetAddress$, O.none)
-
-  const [swapState, setSwapState] = useState<SwapState>(INITIAL_SWAP_TX_STATE)
-
-  const onConfirmSwap = useCallback(
-    ({ asset, amount, memo }: ConfirmSwapParams) => {
-      console.log('onConfirmSwap:')
-      FP.pipe(
-        sourcePoolAddress,
-        O.alt(() => {
-          // For THOR chain we will send Deposit tx instead of
-          // plain ones. It does not need any additional address
-          if (eqChain.equals(asset.chain, THORChain)) {
-            return O.some('')
-          }
-          return O.none
-        }),
-        O.map((poolAddress) => {
-          return swap$({
-            poolAddress,
-            amount,
-            asset,
-            memo
-          }).subscribe(setSwapState)
-        })
-      )
-    },
-    [sourcePoolAddress, swap$]
-  )
 
   const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [
     source,
@@ -149,8 +114,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     [oSource, oTarget, swapFees$]
   )
 
-  const onCloseTxModal = useCallback(() => setSwapState(INITIAL_SWAP_TX_STATE), [])
-
   const swapFeesRD: SwapFeesRD = useObservableState(swapFeesLD, RD.initial)
 
   return (
@@ -181,15 +144,15 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   goToTransaction={goToTransaction}
                   sourceAsset={oSource}
                   targetAsset={oTarget}
-                  onConfirmSwap={onConfirmSwap}
-                  onCloseTxModal={onCloseTxModal}
-                  swapState={swapState}
+                  sourcePoolAddress={sourcePoolAddress}
                   availableAssets={availableAssets}
                   poolDetails={state.poolDetails}
                   walletBalances={balances}
                   reloadFees={reloadSwapFees}
                   fees={swapFeesRD}
                   targetWalletAddress={targetWalletAddress}
+                  swap$={swap$}
+                  reloadBalances={reloadBalances}
                 />
               )
             }

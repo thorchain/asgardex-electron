@@ -65,11 +65,5 @@ export const PasswordModal: React.FC<Props> = ({ onSuccess, onClose, validatePas
     )
   }, [passwordValidationRD, setPasswordToValidate, closePrivateModal, onPasswordValidationSucceed])
 
-  return (
-    <>
-      <div> passwordToValidate: {JSON.stringify(passwordToValidate)}</div>
-      <div>passwordValidationRD: {JSON.stringify(passwordValidationRD)}</div>
-      <PrivateModal {...confirmProps} />
-    </>
-  )
+  return <PrivateModal {...confirmProps} />
 }

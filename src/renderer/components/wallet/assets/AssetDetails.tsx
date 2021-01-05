@@ -229,6 +229,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
             <TxModal
               title={upgradeTxModalTitle}
               onClose={closeUpgradeTxModal}
+              onFinish={closeUpgradeTxModal}
               txRD={upgradeTxState.txRD}
               startTime={startTime}
               onViewTxClick={clickTxLinkHandler}

@@ -38,7 +38,8 @@ import {
   SelectedPricePoolAsset,
   ThorchainEndpointsLD,
   PoolDetails,
-  ValidatePoolLD
+  ValidatePoolLD,
+  ValidateNodeLD
 } from './types'
 import { getPoolAddressByChain, getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
 
@@ -414,6 +415,16 @@ const createPoolsService = (
       RxOp.startWith(RD.initial)
     )
 
+  // TODO (@Veado) Validate node
+  // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
+  const validateNode$ = (): ValidateNodeLD =>
+    // mock validation for now
+    Rx.of().pipe(
+      RxOp.delay(1000),
+      RxOp.map((_) => RD.success(true)),
+      RxOp.startWith(RD.initial)
+    )
+
   return {
     poolsState$,
     pendingPoolsState$,
@@ -429,7 +440,8 @@ const createPoolsService = (
     priceRatio$,
     availableAssets$,
     poolAddressByAsset$,
-    validatePool$
+    validatePool$,
+    validateNode$
   }
 }
 

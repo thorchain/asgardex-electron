@@ -22,7 +22,7 @@ import { INITIAL_BALANCES_STATE } from './const'
 import { BalancesState, LoadBalancesHandler, ChainBalances$, ChainBalance$, ChainBalance } from './types'
 import { sortBalances } from './util'
 
-export const reloadBalances = () => {
+export const reloadBalances: FP.Lazy<void> = () => {
   BTC.reloadBalances()
   BNB.reloadBalances()
   // TODO (@veado | @thatStrangeGuyThorchain) Enable to support ETH
@@ -30,7 +30,7 @@ export const reloadBalances = () => {
   THOR.reloadBalances()
 }
 
-const reloadBalancesByChain = (chain: Chain) => {
+const reloadBalancesByChain: (chain: Chain) => FP.Lazy<void> = (chain) => {
   switch (chain) {
     case 'BNB':
       return BNB.reloadBalances

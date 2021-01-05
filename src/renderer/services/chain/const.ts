@@ -3,8 +3,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { SwapState } from './types'
 
-export const INITIAL_SWAP_TX_STATE: SwapState = {
-  startTime: O.none,
+export const INITIAL_SWAP_STATE: SwapState = {
   txRD: RD.initial,
   txHash: O.none
 }

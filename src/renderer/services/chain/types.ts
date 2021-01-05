@@ -68,8 +68,6 @@ export type LedgerAddressParams = { chain: Chain; network: Network }
  * State to reflect status of a swap by doing different requests
  */
 export type SwapState = {
-  // start time of all requests
-  readonly startTime: O.Option<number>
   // RD of all requests
   readonly txRD: RD.RemoteData<ApiError, TxHash>
   // TxHash needs to be independent from `txRD`
@@ -81,8 +79,10 @@ export type SwapState = {
 export type SwapState$ = Rx.Observable<SwapState>
 
 export type SwapParams = {
-  poolAddress: string
-  asset: Asset
-  amount: BaseAmount
-  memo: string
+  readonly poolAddress: O.Option<string>
+  readonly asset: Asset
+  readonly amount: BaseAmount
+  readonly memo: string
 }
+
+export type SwapStateHandler = (p: SwapParams) => SwapState$
