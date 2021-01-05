@@ -32,7 +32,7 @@ import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
 import { validateTxAmountInput } from '../TxForm.util'
 import { useChangeAssetHandler } from './Send.hooks'
-import * as StyledBTC from './SendFormBTC.style'
+import * as StyledForm from './SendForm.style'
 
 export type FormValues = {
   recipient: string
@@ -304,18 +304,18 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
             </Styled.Label>
             <Row align="middle">
               <Col>
-                <StyledBTC.FeeLabel
+                <StyledForm.FeeLabel
                   size="big"
                   color={RD.isFailure(feesWithRatesRD) ? 'error' : 'primary'}
                   style={{ paddingTop: 0 }}
                   disabled={RD.isPending(feesWithRatesRD)}>
                   {intl.formatMessage({ id: 'common.fees' })}: {selectedFeeLabel}
-                </StyledBTC.FeeLabel>
+                </StyledForm.FeeLabel>
               </Col>
               <Col>
-                <StyledBTC.FeeButton onClick={reloadFeesHandler} disabled={RD.isPending(feesWithRatesRD)}>
+                <StyledForm.FeeButton onClick={reloadFeesHandler} disabled={RD.isPending(feesWithRatesRD)}>
                   <SyncOutlined />
-                </StyledBTC.FeeButton>
+                </StyledForm.FeeButton>
               </Col>
             </Row>
             {renderFeeError}

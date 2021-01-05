@@ -17,7 +17,7 @@ import { getPhrase } from '../wallet/util'
 import { Client$, ClientState } from './types'
 
 /**
- * Binance network depending on `Network`
+ * Ethereum network depending on `Network`
  */
 const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(
   map((network) => {
@@ -69,7 +69,7 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, ethereumNetwor
 const client$: Client$ = clientState$.pipe(map(getClient), shareReplay(1))
 
 /**
- * Helper stream to provide "ready-to-go" state of latest `BinanceClient`, but w/o exposing the client
+ * Helper stream to provide "ready-to-go" state of latest `EthereumClient`, but w/o exposing the client
  * It's needed by views only.
  */
 const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(map(getClientStateForViews))

@@ -2,17 +2,15 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as EthereumClient } from '@xchainjs/xchain-ethereum'
-import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
-import * as RxOp from 'rxjs/operators'
 
 import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormETH } from '../../../components/wallet/txs/send/'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { AddressValidation } from '../../../services/ethereum/types'
@@ -23,10 +21,16 @@ type Props = {
   selectedAsset: Asset
   walletBalances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
+  reloadFeesHandler: () => void
 }
 
 export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, walletBalances: oWalletBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
+  const {
+    selectedAsset,
+    walletBalances: oWalletBalances,
+    getExplorerTxUrl: oGetExplorerTxUrl = O.none,
+    reloadFeesHandler
+  } = props
 
   const oSelectedWalletBalance = useMemo(() => getWalletBalanceByAsset(oWalletBalances, O.some(selectedAsset)), [
     oWalletBalances,
@@ -36,15 +40,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
   const { client$, fees$, txRD$, resetTx, subscribeTx } = useEthereumContext()
 
   const txRD = useObservableState<TxRD>(txRD$, RD.initial)
-  const [fee] = useObservableState<O.Option<AssetAmount>>(
-    () =>
-      FP.pipe(
-        fees$,
-        liveData.map((fees) => baseToAsset(fees.fast)),
-        RxOp.map(RD.toOption)
-      ),
-    O.none
-  )
+  const fees = useObservableState(fees$, RD.initial)
   const oClient = useObservableState<O.Option<EthereumClient>>(client$, O.none)
 
   /**
@@ -74,10 +70,11 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
-        fee={fee}
+        reloadFeesHandler={reloadFeesHandler}
+        fees={fees}
       />
     ),
-    [subscribeTx, oWalletBalances, txRD, addressValidation, fee]
+    [subscribeTx, oWalletBalances, txRD, addressValidation, reloadFeesHandler, fees]
   )
 
   return FP.pipe(

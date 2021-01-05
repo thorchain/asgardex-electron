@@ -1,17 +1,18 @@
 import React from 'react'
 
-import { storiesOf } from '@storybook/react'
+import * as RD from '@devexperts/remote-data-ts'
+import { Meta, Story } from '@storybook/react'
+import { Fees } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetETH,
   assetToBase,
   assetToString,
+  baseAmount,
   baseToAsset,
   formatAssetAmount
 } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/lib/Option'
 
-import { BNB_TRANSFER_FEES } from '../../../../../shared/mock/fees'
 import { WalletBalances } from '../../../../services/clients'
 import { AddressValidation, SendTxParams } from '../../../../services/ethereum/types'
 import { WalletBalance } from '../../../../types/wallet'
@@ -25,52 +26,90 @@ const ethAsset: WalletBalance = {
 
 const balances: WalletBalances = [ethAsset]
 
-const fee = O.some(BNB_TRANSFER_FEES.single)
+const fees: Fees = {
+  type: 'base',
+  fastest: baseAmount(3000),
+  fast: baseAmount(2000),
+  average: baseAmount(1000)
+}
+
+const feesRD = RD.success(fees)
 
 const addressValidation: AddressValidation = (_) => true
 
-const onSubmitHandler = ({ recipient, amount, asset, memo }: SendTxParams) =>
+const onSubmitHandler = ({ recipient, amount, asset, memo, fee }: SendTxParams) =>
   console.log(
     `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
       asset
-    )}, memo: ${memo}`
+    )}, memo: ${memo}, fee: ${fee}`
   )
 
-storiesOf('Wallet/SendFormETH', module)
-  .add('send eth', () => (
-    <SendFormETH
-      balance={ethAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      fee={fee}
-    />
-  ))
-  .add('pending', () => (
-    <SendFormETH
-      balance={ethAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      fee={fee}
-      isLoading={true}
-    />
-  ))
-  .add('no fees', () => (
-    <SendFormETH
-      balance={ethAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      fee={O.none}
-    />
-  ))
-  .add('eth amount < fees', () => (
-    <SendFormETH
-      balance={ethAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      fee={O.some(assetAmount(1.234))}
-    />
-  ))
+const reloadFeesHandler = () => console.log('reload fees')
+
+export const StorySend: Story = () => (
+  <SendFormETH
+    balance={ethAsset}
+    balances={balances}
+    onSubmit={onSubmitHandler}
+    addressValidation={addressValidation}
+    reloadFeesHandler={reloadFeesHandler}
+    fees={feesRD}
+  />
+)
+StorySend.storyName = 'success'
+
+export const StoryPending: Story = () => (
+  <SendFormETH
+    balance={ethAsset}
+    balances={balances}
+    onSubmit={onSubmitHandler}
+    addressValidation={addressValidation}
+    reloadFeesHandler={reloadFeesHandler}
+    fees={feesRD}
+    isLoading={true}
+  />
+)
+StoryPending.storyName = 'pending'
+
+export const StoryLoadingFees: Story = () => (
+  <SendFormETH
+    balance={ethAsset}
+    balances={balances}
+    onSubmit={onSubmitHandler}
+    addressValidation={addressValidation}
+    reloadFeesHandler={reloadFeesHandler}
+    fees={RD.pending}
+  />
+)
+StoryLoadingFees.storyName = 'loading fees'
+
+export const StoryFailureFees: Story = () => (
+  <SendFormETH
+    balance={ethAsset}
+    balances={balances}
+    onSubmit={onSubmitHandler}
+    addressValidation={addressValidation}
+    reloadFeesHandler={reloadFeesHandler}
+    fees={RD.failure(Error('Could not load fee and rates for any reason'))}
+  />
+)
+StoryFailureFees.storyName = 'failure fees'
+
+const meta: Meta = {
+  component: SendFormETH,
+  title: 'Components/SendFormETH',
+  decorators: [
+    (S: Story) => (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '300px'
+        }}>
+        <S />
+      </div>
+    )
+  ]
+}
+
+export default meta
