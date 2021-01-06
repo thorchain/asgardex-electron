@@ -52,7 +52,7 @@ const wallet: WalletMessages = {
   'wallet.password.confirmation.pending': 'Überprüfe Passwort',
   'wallet.password.confirmation.error': 'Passwort ist falsch',
   'wallet.password.repeat': 'Passwort wiederholen',
-  'wallet.password.mismatch': 'Passwort stimmit nicht überein',
+  'wallet.password.mismatch': 'Passwort stimmt nicht überein',
   'wallet.upgrade.pending': 'Upgraden',
   'wallet.upgrade.success': 'Updgrade erfolgreich',
   'wallet.upgrade.error': 'Upgrade error',
