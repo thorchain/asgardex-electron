@@ -33,16 +33,20 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
   // total of progress
   const total = O.some(100)
 
-  FP.pipe(
+  const requests$ = FP.pipe(
     oPoolAddress,
     // For RuneNative we send `MsgNativeTx` w/o need for a pool address address,
     // so we can leave it empty
     O.alt(() => (isRuneNativeAsset(asset) ? O.some('') : O.none)),
+
     O.fold(
       // invalid pool address will fail
-      () => setState({ ...getState(), txRD: RD.failure({ errorId: ErrorId.SEND_TX, msg: 'invalid pool address' }) }),
+      () => {
+        setState({ ...getState(), txRD: RD.failure({ errorId: ErrorId.SEND_TX, msg: 'invalid pool address' }) })
+        return Rx.EMPTY
+      },
       // valid pool address (even an empty one for Thorchain)
-      (poolAddress) => {
+      (poolAddress) =>
         Rx.of(poolAddress).pipe(
           // Update progress
           RxOp.tap(() => setState({ ...getState(), txRD: RD.progress({ loaded: 10, total }) })),
@@ -75,7 +79,6 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
             return Rx.EMPTY
           })
         )
-      }
     )
   )
 
@@ -83,8 +86,8 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
   const timer$ = Rx.timer(1500).pipe(RxOp.filter(() => RD.isPending(getState().txRD)))
 
   // Return stream of `SwapState$` depending on state updates and timer
-  return Rx.combineLatest([getState$, timer$]).pipe(
-    RxOp.switchMap(([state, _]) =>
+  return Rx.combineLatest([getState$, timer$, requests$]).pipe(
+    RxOp.switchMap(([state]) =>
       Rx.of(
         FP.pipe(
           state.txRD,

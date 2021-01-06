@@ -7,6 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { mockValidatePassword$ } from '../../../shared/mock/wallet'
 import { ONE_BN } from '../../const'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
@@ -73,17 +74,7 @@ const defaultProps: SwapProps = {
   activePricePool: RUNE_PRICE_POOL,
   // mock password validation
   // Password: "123"
-  validatePassword$: (password: string) =>
-    Rx.of(password).pipe(
-      // ignore emtpy strings
-      RxOp.takeWhile((v) => !!v),
-      // short delay needed to render modal, which will close in other cases
-      RxOp.debounceTime(500),
-      RxOp.tap((pw) => console.log('validatePassword$ ', pw)),
-      RxOp.switchMap((pw) =>
-        Rx.iif(() => pw === '123', Rx.of(RD.success(undefined)), Rx.of(RD.failure(new Error('invalid password'))))
-      )
-    ),
+  validatePassword$: mockValidatePassword$,
   reloadFees: () => console.log('reloadFees'),
   reloadBalances: () => console.log('reloadBalances'),
   fees: RD.success({ source: baseAmount(10000000), target: baseAmount(3000) }),
@@ -91,8 +82,8 @@ const defaultProps: SwapProps = {
   onChangePath: (path) => console.log('change path', path)
 }
 
-export const StorySwapDefault: Story = () => <Swap {...defaultProps} />
-StorySwapDefault.storyName = 'default'
+export const StoryDefault: Story = () => <Swap {...defaultProps} />
+StoryDefault.storyName = 'default'
 
 const meta: Meta = {
   component: Swap,

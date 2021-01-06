@@ -276,7 +276,6 @@ export const Swap = ({
   const [showPrivateModal, setShowPrivateModal] = useState(false)
 
   const onSwapConfirmed = useCallback(() => {
-    console.log('onSwapConfirmed:')
     setShowPrivateModal(true)
   }, [setShowPrivateModal])
 
@@ -391,16 +390,17 @@ export const Swap = ({
   }, [extraTxModalContent, goToTransaction, onCloseTxModal, onFinishTxModal, swapStartTime, swapState, txModalTitle])
 
   const closePrivateModal = useCallback(() => {
-    console.log('closePrivateModal')
     setShowPrivateModal(false)
   }, [setShowPrivateModal])
 
   const onPasswordValidationSucceed = useCallback(() => {
+    // close private modal
+    closePrivateModal()
+
     FP.pipe(
       sequenceTOption(assetsToSwap, targetWalletAddress),
       O.map(([{ source, target }, address]) => {
         const memo = getSwapMemo({ asset: target, address })
-        closePrivateModal()
         // set start time
         setSwapStartTime(Date.now())
         // subscribe to swap$
@@ -586,12 +586,10 @@ export const Swap = ({
 
   return (
     <Styled.Container>
-      <div>showPrivateModal {showPrivateModal.toString()}</div>
       {showPrivateModal && (
         <PasswordModal
           onSuccess={onPasswordValidationSucceed}
           onClose={() => {
-            console.log('onCloseHandler')
             setShowPrivateModal(false)
           }}
           validatePassword$={validatePassword$}

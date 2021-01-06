@@ -166,9 +166,9 @@ const networkInfo$: NetworkInfoLD = reloadNetworkInfo$.pipe(
  */
 const txStatus$ = (txId: string): LiveData<ApiError, O.Option<string>> =>
   FP.pipe(
-    Rx.of(),
-    RxOp.delay(1500),
-    RxOp.map(() => O.some(txId)),
+    Rx.of(txId),
+    RxOp.delay(2500),
+    RxOp.map(O.some),
     RxOp.map(RD.success),
     RxOp.catchError(() =>
       Rx.of(
