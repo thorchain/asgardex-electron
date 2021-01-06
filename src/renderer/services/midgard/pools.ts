@@ -409,7 +409,7 @@ const createPoolsService = (
   // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
   const validatePool$ = (_: string): ValidatePoolLD =>
     // mock validation for now
-    Rx.of().pipe(
+    Rx.of(null).pipe(
       RxOp.delay(1500),
       RxOp.map((_) => RD.success(true)),
       RxOp.startWith(RD.initial)

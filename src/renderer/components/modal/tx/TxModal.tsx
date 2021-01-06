@@ -13,6 +13,7 @@ import * as Styled from './TxModal.style'
 export type Props = {
   txHash?: O.Option<TxHash>
   txRD: TxRD
+  timerValue?: number
   title: string
   onClose: FP.Lazy<void>
   onFinish: FP.Lazy<void>
@@ -31,7 +32,8 @@ export const TxModal: React.FC<Props> = (props): JSX.Element => {
     onClose,
     onFinish,
     onViewTxClick = FP.constVoid,
-    extra = <></>
+    extra = <></>,
+    timerValue = NaN
   } = props
 
   const intl = useIntl()
@@ -43,14 +45,14 @@ export const TxModal: React.FC<Props> = (props): JSX.Element => {
           txRD,
           RD.fold(
             () => <TxTimer status={true} />,
-            () => <TxTimer status={true} maxValue={100} startTime={startTime} />,
+            () => <TxTimer status={true} maxValue={100} value={timerValue} startTime={startTime} />,
             (error) => <Styled.ErrorView subTitle={error?.msg || intl.formatMessage({ id: 'common.error' })} />,
             () => <TxTimer status={false} />
           )
         )}
       </Styled.SubContentRow>
     ),
-    [intl, startTime, txRD]
+    [intl, startTime, txRD, timerValue]
   )
 
   const renderExtra = useMemo(() => <Styled.SubContentRow>{extra}</Styled.SubContentRow>, [extra])

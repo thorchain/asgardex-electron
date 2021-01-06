@@ -108,15 +108,20 @@ export const Swap = ({
   // (Possible) subscription of swap$
   const [swapSub, setSwapSub] = useState<O.Option<Rx.Subscription>>(O.none)
 
+  // unsubscribe swap$ subscription
+  const unsubScribeSwapSub = useCallback(() => {
+    FP.pipe(
+      swapSub,
+      O.map((sub) => sub.unsubscribe())
+    )
+  }, [swapSub])
+
   useEffect(() => {
     // Unsubscribe of (possible) previous subscription of `swap$`
     return () => {
-      FP.pipe(
-        swapSub,
-        O.map((sub) => sub.unsubscribe())
-      )
+      unsubScribeSwapSub()
     }
-  }, [swapSub])
+  }, [unsubScribeSwapSub])
 
   // Swap state
   const [swapState, setSwapState] = useState<SwapState>(INITIAL_SWAP_STATE)
@@ -273,11 +278,11 @@ export const Swap = ({
     [oAssetWB, intl]
   )
 
-  const [showPrivateModal, setShowPrivateModal] = useState(false)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
 
   const onSwapConfirmed = useCallback(() => {
-    setShowPrivateModal(true)
-  }, [setShowPrivateModal])
+    setShowPasswordModal(true)
+  }, [setShowPasswordModal])
 
   const slider = useMemo(
     () =>
@@ -333,8 +338,14 @@ export const Swap = ({
           poolData[assetToString(sourceAsset)] &&
           getValueOfAsset1InAsset2(changeAmount, poolData[assetToString(sourceAsset)], activePricePool.poolData)
 
+        // TODO (@Veado) Add i18n
+        const stepLabels = ['Health check...', 'Send swap transaction...', 'Check swap result...']
+        const stepLabel = RD.isPending(swapState.txRD) ? stepLabels[swapState.step - 1] : 'Done!'
         return (
           <>
+            <Styled.StepContainer>
+              <Styled.StepLabel>{stepLabel}</Styled.StepLabel>
+            </Styled.StepContainer>
             <Styled.CoinDataWrapper>
               <StepBar size={50} />
               <Styled.CoinDataContainer>
@@ -354,17 +365,30 @@ export const Swap = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [oSourceAssetWP, oTargetAssetWP, poolData, swapData, activePricePool, changeAmount])
+  }, [
+    oSourceAssetWP,
+    oTargetAssetWP,
+    activePricePool.asset,
+    activePricePool.poolData,
+    poolData,
+    swapData.swapResult,
+    swapData.slip,
+    changeAmount,
+    swapState.txRD,
+    swapState.step
+  ])
 
   const onCloseTxModal = useCallback(() => {
+    // unsubscribe
+    unsubScribeSwapSub()
     // reset swap$ subscription
     setSwapSub(O.none)
     // reset swap state
     setSwapState(INITIAL_SWAP_STATE)
-  }, [])
+  }, [unsubScribeSwapSub])
 
   const onFinishTxModal = useCallback(() => {
-    // We do same as with closing
+    // Do same things as with closing
     onCloseTxModal()
     // but also refresh balances
     reloadBalances()
@@ -372,8 +396,23 @@ export const Swap = ({
 
   const renderTxModal = useMemo(() => {
     const { txHash, txRD } = swapState
+
     // don't render TxModal in initial state
     if (RD.isInitial(txRD)) return <></>
+
+    // Get timer value
+    const timerValue = FP.pipe(
+      txRD,
+      RD.fold(
+        () => 0,
+        FP.flow(
+          O.map(({ loaded }) => loaded),
+          O.getOrElse(() => 0)
+        ),
+        () => 0,
+        () => 100
+      )
+    )
 
     return (
       <TxModal
@@ -383,19 +422,25 @@ export const Swap = ({
         startTime={swapStartTime}
         txRD={txRD}
         txHash={txHash}
+        timerValue={timerValue}
         onViewTxClick={goToTransaction}
         extra={extraTxModalContent}
       />
     )
   }, [extraTxModalContent, goToTransaction, onCloseTxModal, onFinishTxModal, swapStartTime, swapState, txModalTitle])
 
-  const closePrivateModal = useCallback(() => {
-    setShowPrivateModal(false)
-  }, [setShowPrivateModal])
+  const closePasswordModal = useCallback(() => {
+    setShowPasswordModal(false)
+  }, [setShowPasswordModal])
 
-  const onPasswordValidationSucceed = useCallback(() => {
+  const onClosePasswordModal = useCallback(() => {
+    // close password modal
+    closePasswordModal()
+  }, [closePasswordModal])
+
+  const onSucceedPasswordModal = useCallback(() => {
     // close private modal
-    closePrivateModal()
+    closePasswordModal()
 
     FP.pipe(
       sequenceTOption(assetsToSwap, targetWalletAddress),
@@ -417,7 +462,7 @@ export const Swap = ({
         return true
       })
     )
-  }, [assetsToSwap, changeAmount, closePrivateModal, oSourcePoolAddress, swap$, targetWalletAddress])
+  }, [assetsToSwap, changeAmount, closePasswordModal, oSourcePoolAddress, swap$, targetWalletAddress])
 
   const sourceChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
     () =>
@@ -586,12 +631,10 @@ export const Swap = ({
 
   return (
     <Styled.Container>
-      {showPrivateModal && (
+      {showPasswordModal && (
         <PasswordModal
-          onSuccess={onPasswordValidationSucceed}
-          onClose={() => {
-            setShowPrivateModal(false)
-          }}
+          onSuccess={onSucceedPasswordModal}
+          onClose={onClosePasswordModal}
           validatePassword$={validatePassword$}
         />
       )}
@@ -601,8 +644,7 @@ export const Swap = ({
           {FP.pipe(
             assetsToSwap,
             O.map(
-              ({ source, target }) =>
-                `${intl.formatMessage({ id: 'swap.state.pending' })} ${source.ticker} >> ${target.ticker}`
+              ({ source, target }) => `${intl.formatMessage({ id: 'common.swap' })} ${source.ticker} > ${target.ticker}`
             ),
             O.getOrElse(() => `${intl.formatMessage({ id: 'swap.state.error' })} - No such assets`)
           )}

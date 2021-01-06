@@ -96,7 +96,6 @@ export const ValueItemContainer = styled('div')`
       min-width: 60%;
    `}
   }
-
 `
 
 export const SliderContainer = styled('div')`
@@ -184,4 +183,21 @@ export const TrendContainer = styled(Row).attrs({
 })`
   padding-top: 20px;
   width: 100%;
+`
+
+export const StepContainer = styled(Row).attrs({
+  justify: 'center'
+})`
+  width: 100%;
+  padding: 10px 0;
+`
+
+export const StepLabel = styled(UILabel).attrs({
+  size: 'small',
+  color: 'gray'
+})`
+  padding-top: 0;
+  font-family: 'MainFontRegular';
+  text-transform: uppercase;
+  text-align: center;
 `

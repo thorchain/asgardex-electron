@@ -26,7 +26,7 @@ const defaultProps: SwapProps = {
   swap$: (params) =>
     Rx.of(params).pipe(
       RxOp.tap((params) => console.log('swap$ ', params)),
-      RxOp.switchMap((_) => Rx.of({ ...INITIAL_SWAP_STATE, txRD: RD.success('tx-hash') }))
+      RxOp.switchMap((_) => Rx.of({ ...INITIAL_SWAP_STATE, step: 3, txRD: RD.success('tx-hash') }))
     ),
   poolDetails: [
     {

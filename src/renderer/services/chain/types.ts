@@ -68,6 +68,8 @@ export type LedgerAddressParams = { chain: Chain; network: Network }
  * State to reflect status of a swap by doing different requests
  */
 export type SwapState = {
+  // Number of current step
+  readonly step: number
   // RD of all requests
   readonly txRD: RD.RemoteData<ApiError, TxHash>
   // TxHash needs to be independent from `txRD`
