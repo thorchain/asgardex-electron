@@ -8,6 +8,7 @@ import { Button, RefreshButton } from '../../uielements/button'
 import { InputPassword as Input } from '../../uielements/input'
 import { Phrase } from './index'
 import * as Styled from './NewPhrase.styles'
+import * as StyledPhrase from './Phrase.styles'
 import { PhraseInfo } from './Phrase.types'
 
 type Props = {
@@ -48,7 +49,7 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Ele
           if (!value || getFieldValue('password') === value) {
             return Promise.resolve()
           }
-          return Promise.reject(intl.formatMessage({ id: 'wallet.create.password.mismatch' }))
+          return Promise.reject(intl.formatMessage({ id: 'wallet.password.mismatch' }))
         }
       })
     ],
@@ -68,15 +69,15 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Ele
       </Styled.TitleContainer>
       <Phrase words={phraseWords} readOnly={true} />
       <Styled.Form form={form} onFinish={handleFormFinish} labelCol={{ span: 24 }}>
-        <Styled.PasswordContainer>
-          <Styled.PasswordItem name="password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
+        <StyledPhrase.PasswordContainer>
+          <StyledPhrase.PasswordItem name="password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
             <Input
               size="large"
               type="password"
               placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
             />
-          </Styled.PasswordItem>
-          <Styled.PasswordItem
+          </StyledPhrase.PasswordItem>
+          <StyledPhrase.PasswordItem
             name="repeatPassword"
             dependencies={['password']}
             validateTrigger={['onSubmit', 'onBlur']}
@@ -84,10 +85,10 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Ele
             <Input
               size="large"
               type="password"
-              placeholder={intl.formatMessage({ id: 'wallet.create.password.repeat' }).toUpperCase()}
+              placeholder={intl.formatMessage({ id: 'wallet.password.repeat' }).toUpperCase()}
             />
-          </Styled.PasswordItem>
-        </Styled.PasswordContainer>
+          </StyledPhrase.PasswordItem>
+        </StyledPhrase.PasswordContainer>
         <Styled.SubmitItem>
           <Button size="large" type="primary" round="true" htmlType="submit">
             {loadingMsg || intl.formatMessage({ id: 'common.next' })}
