@@ -16,6 +16,7 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import * as walletRoutes from '../../../routes/wallet'
 import { Button } from '../../uielements/button'
 import { InputPassword, InputTextArea } from '../../uielements/input'
+import * as Styled from './Phrase.styles'
 
 export const ImportPhrase: React.FC = (): JSX.Element => {
   const history = useHistory()
@@ -46,7 +47,6 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
   }, [clientViewState, history, keystore])
 
   const [validPhrase, setValidPhrase] = useState(false)
-  const [validPassword, setValidPassword] = useState(false)
 
   const phraseValidator = useCallback(async (_: Rule, value: string) => {
     if (!value) {
@@ -57,16 +57,6 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
     setValidPhrase(valid)
     // TODO(@Veado): i18n
     return valid ? Promise.resolve() : Promise.reject('Invalid mnemonic seed phrase')
-  }, [])
-
-  const passwordValidator = useCallback(async (_: Rule, value: string) => {
-    if (!value) {
-      setValidPassword(false)
-      // TODO(@Veado): i18n
-      return Promise.reject('Value for password required')
-    }
-    setValidPassword(true)
-    return Promise.resolve()
   }, [])
 
   const submitForm = useCallback(
@@ -80,6 +70,21 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
       })
     },
     [keystoreService]
+  )
+
+  const rules: Rule[] = useMemo(
+    () => [
+      { required: true },
+      ({ getFieldValue }) => ({
+        validator(_, value) {
+          if (!value || getFieldValue('password') === value) {
+            return Promise.resolve()
+          }
+          return Promise.reject(intl.formatMessage({ id: 'wallet.password.mismatch' }))
+        }
+      })
+    ],
+    [intl]
   )
 
   const renderError = useMemo(
@@ -113,19 +118,26 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
               rows={5}
             />
           </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, validator: passwordValidator }]}
-            validateTrigger={['onSubmit', 'onChange']}>
-            <InputPassword
-              color="primary"
-              size="middle"
-              typevalue="normal"
-              security="password"
-              placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
-              style={{ maxWidth: 280 }}
-            />
-          </Form.Item>
+          <Styled.PasswordContainer>
+            <Styled.PasswordItem name="password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
+              <InputPassword
+                size="large"
+                type="password"
+                placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
+              />
+            </Styled.PasswordItem>
+            <Styled.PasswordItem
+              name="repeatPassword"
+              dependencies={['password']}
+              validateTrigger={['onSubmit', 'onBlur']}
+              rules={rules}>
+              <InputPassword
+                size="large"
+                type="password"
+                placeholder={intl.formatMessage({ id: 'wallet.password.repeat' }).toUpperCase()}
+              />
+            </Styled.PasswordItem>
+          </Styled.PasswordContainer>
         </Spin>
         <Form.Item style={{ display: 'grid', justifyContent: 'flex-end' }}>
           <Button
@@ -134,7 +146,7 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
             htmlType="submit"
             round="true"
             style={{ width: 150 }}
-            disabled={!validPassword || !validPhrase || importing}>
+            disabled={!validPhrase || importing}>
             Import
           </Button>
         </Form.Item>

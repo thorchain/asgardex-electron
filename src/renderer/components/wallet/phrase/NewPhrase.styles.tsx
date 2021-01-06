@@ -28,13 +28,6 @@ export const Form = styled(InnerForm)`
   justify-content: space-between;
 `
 
-export const PasswordContainer = styled(A.Row)`
-  max-width: 280px;
-`
-export const PasswordItem = styled(A.Form.Item)`
-  width: 100%;
-`
-
 export const SubmitItem = styled(A.Form.Item)`
   display: flex;
   flex-direction: column;

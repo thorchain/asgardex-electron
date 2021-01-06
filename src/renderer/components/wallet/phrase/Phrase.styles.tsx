@@ -39,3 +39,10 @@ export const EnterPhraseContainer = styled(A.Form.Item)`
 export const Row = styled(A.Row)`
   margin-bottom: 32px;
 `
+
+export const PasswordContainer = styled(A.Row)`
+  max-width: 280px;
+`
+export const PasswordItem = styled(A.Form.Item)`
+  width: 100%;
+`
