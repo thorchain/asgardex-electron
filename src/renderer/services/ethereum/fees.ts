@@ -29,7 +29,6 @@ const fees$: (client: Client$) => FeesLD = (client$) =>
         ),
         map(RD.success),
         startWith(RD.pending),
-        // TODO: (@sarawut11 / @veado / @thatStrangeGuyThorchain) Add i18n
         catchError((_) => Rx.of(RD.success(getDefaultFees())))
       )
     ),
