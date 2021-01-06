@@ -4522,30 +4522,12 @@
     bitcoinjs-lib "^5.2.0"
     wif "^2.0.6"
 
-"@xchainjs/xchain-client@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.2.0.tgz#af33996dbfeacb34d76ccd7f4ea2347f07e65e76"
-  integrity sha512-4w9zKgwbbJRz21+onklbcgYfqunXvFdzn2MTjy98hPQH1z7zBMkHRSC0sEvtqs3rFKSb5giqjEeazUlkXpSWyA==
-  dependencies:
-    "@xchainjs/xchain-util" "^0.2.0"
-
 "@xchainjs/xchain-client@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.3.0.tgz#76f4ddb5ddea2fa0fd584b0b294a6b8f922219db"
   integrity sha512-3xYYdoJEEqjaIDtg8W41J//x1FACxdMPRmI6UefQkEbFBm1L/ZPzp6boN2EajgMSa97Eu7P+a0I1gpCI62Hw1Q==
   dependencies:
     "@xchainjs/xchain-util" "^0.2.0"
-
-"@xchainjs/xchain-cosmos@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.5.1.tgz#4113b7f9dda5855c12905a2f65ac31e1fc0bf3b9"
-  integrity sha512-S3uK8xkiIn+Xq86MJxaNizgpkEkI2DQa/r4Ya0LHbX+vBXOXwAXm1XIdHRPR9NMyZ/YpPJWCxyZq2rHTuTXZ5A==
-  dependencies:
-    "@xchainjs/xchain-client" "^0.2.0"
-    "@xchainjs/xchain-crypto" "^0.2.1"
-    "@xchainjs/xchain-util" "^0.2.0"
-    axios "^0.21.0"
-    nock "^13.0.5"
 
 "@xchainjs/xchain-cosmos@^0.6.0":
   version "0.6.0"
@@ -4591,13 +4573,13 @@
     axios "^0.19.2"
     nock "^13.0.4"
 
-"@xchainjs/xchain-thorchain@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.7.0.tgz#28bb6d6d3762abb382e43db23c4b1a42947210e3"
-  integrity sha512-/5Es6Y3IHB0bML7WhneC5bQA/B5tXzQElASmdRtm1sCQ9twHlGVCFS9femWPf7RRvtS+bD87CQ7zfXTcG5qYZw==
+"@xchainjs/xchain-thorchain@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.7.1.tgz#2cd40870b6ae9d904c3d91b0ffc52633969f9c6d"
+  integrity sha512-ms21cwv8hwk2lDC/4K3jLcm7J+ApnK2ayyk0CxICIf7SgLQyQDpmOd7RVSTk7eUboPokXhQtKZ77thCrhI5wpg==
   dependencies:
     "@xchainjs/xchain-client" "^0.3.0"
-    "@xchainjs/xchain-cosmos" "^0.5.1"
+    "@xchainjs/xchain-cosmos" "^0.6.0"
     "@xchainjs/xchain-crypto" "^0.2.1"
     axios "^0.21.0"
     nock "^13.0.5"
