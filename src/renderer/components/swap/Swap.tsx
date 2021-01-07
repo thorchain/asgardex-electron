@@ -358,12 +358,22 @@ export const Swap = ({
             <Styled.CoinDataWrapper>
               <StepBar size={50} />
               <Styled.CoinDataContainer>
-                <AssetData
-                  priceBaseAsset={basePriceAsset}
-                  asset={sourceAsset}
-                  price={amountToSwapInSelectedPriceAsset}
-                />
-                <AssetData priceBaseAsset={basePriceAsset} asset={targetAsset} price={swapResultByBasePriceAsset} />
+                <Styled.AssetDataWrapper>
+                  <AssetData
+                    asset={sourceAsset}
+                    amount={changeAmount}
+                    priceAsset={!eqAsset.equals(sourceAsset, basePriceAsset) ? basePriceAsset : undefined}
+                    price={amountToSwapInSelectedPriceAsset}
+                  />
+                </Styled.AssetDataWrapper>
+                <Styled.AssetDataWrapper>
+                  <AssetData
+                    asset={targetAsset}
+                    amount={swapData.swapResult}
+                    priceAsset={!eqAsset.equals(targetAsset, basePriceAsset) ? basePriceAsset : undefined}
+                    price={swapResultByBasePriceAsset}
+                  />
+                </Styled.AssetDataWrapper>
               </Styled.CoinDataContainer>
             </Styled.CoinDataWrapper>
             <Styled.TrendContainer>
@@ -578,7 +588,7 @@ export const Swap = ({
     return swapData.swapResult.amount().minus(targetFee).isNegative()
   }, [targetChainFeeAmountInTargetAsset, swapData, changeAmount])
 
-  const outputLabel = useMemo(
+  const swapResultLabel = useMemo(
     () =>
       FP.pipe(
         targetAsset,
@@ -605,14 +615,14 @@ export const Swap = ({
             { id: 'swap.errors.amount.outputShouldCoverChainFee' },
             {
               fee: formatAssetAmountCurrency({ amount: feeAssetAmount, asset, trimZeros: true }),
-              amount: outputLabel
+              amount: swapResultLabel
             }
           )}
         </Styled.ErrorLabel>
       )),
       O.getOrElse(() => <></>)
     )
-  }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset, outputLabel])
+  }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset, swapResultLabel])
 
   const fees: UIFeesRD = useMemo(
     () =>
@@ -690,10 +700,10 @@ export const Swap = ({
             <Styled.SwapOutlined disabled={!canSwitchAssets} onClick={onSwitchAssets} />
           </Styled.ValueItemContainer>
           <Styled.ValueItemContainer className={'valueItemContainer-in'}>
-            <Styled.InValue>
+            <Styled.InValueContainer>
               <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}:</Styled.InValueTitle>
-              <div>{outputLabel}</div>
-            </Styled.InValue>
+              <Styled.InValueLabel>{swapResultLabel}</Styled.InValueLabel>
+            </Styled.InValueContainer>
             {FP.pipe(
               targetAsset,
               O.fold(

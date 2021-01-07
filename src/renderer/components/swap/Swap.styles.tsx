@@ -86,6 +86,10 @@ export const ValueItemContainer = styled('div')`
     &-percent {
       padding-bottom: 50px;
     }
+
+    &-in {
+      align-items: middle;
+    }
   }
 
   ${media.md`
@@ -103,7 +107,7 @@ export const SliderContainer = styled('div')`
   min-width: 212px;
 `
 
-export const InValue = styled('div')`
+export const InValueContainer = styled('div')`
   display: flex;
   flex-direction: row;
 
@@ -112,8 +116,19 @@ export const InValue = styled('div')`
   `}
 `
 
-export const InValueTitle = styled('div')`
+export const InValueTitle = styled(UILabel).attrs({
+  color: 'gray',
+  textTransform: 'uppercase',
+  size: 'small'
+})`
   margin-right: 10px;
+  padding: 0;
+`
+
+export const InValueLabel = styled(UILabel).attrs({
+  color: 'normal'
+})`
+  padding-bottom: 0;
 `
 
 export const SubmitContainer = styled('div')`
@@ -167,14 +182,20 @@ export const CoinDataWrapper = styled(Row).attrs({
   align: 'middle'
 })``
 
-export const CoinDataContainer = styled.div`
-  display: flex;
-  flex-direction: column;
+export const CoinDataContainer = styled(Row).attrs({
+  align: 'middle'
+})`
+  padding-left: 20px;
+`
 
-  .coinData-wrapper {
-    &:first-child {
-      padding-bottom: 20px;
-    }
+export const AssetDataWrapper = styled(Row).attrs({
+  align: 'middle'
+})`
+  width: 100%;
+  margin-bottom: 30px;
+
+  &:last-child {
+    margin: 0;
   }
 `
 
