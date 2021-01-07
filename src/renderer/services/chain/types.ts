@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Fees, TxHash } from '@xchainjs/xchain-client'
+import { FeeOptionKey, Fees, TxHash } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -47,7 +47,14 @@ export type DepositFeesLD = LiveData<Error, DepositFees>
 
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
-export type SendTxParams = { asset: Asset; recipient: string; amount: BaseAmount; memo: Memo; txType: TxTypes }
+export type SendTxParams = {
+  asset: Asset
+  recipient: string
+  amount: BaseAmount
+  memo: Memo
+  txType: TxTypes
+  feeOptionKey: FeeOptionKey
+}
 
 /**
  * Withdraw fees

@@ -41,7 +41,10 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
         <p className="asset-amount-label">{label}</p>
       </div>
       <div className="asset-input-content" ref={inputRef}>
-        <InputBigNumber value={amount} onChange={onChangeHandler} {...inputProps} />
+        {/*
+          Decimal is hardcoded temporary to 8
+        TODO (@veado): Fix it https://github.com/thorchain/asgardex-electron/issues/714 */}
+        <InputBigNumber value={amount} onChange={onChangeHandler} {...inputProps} decimal={8} />
       </div>
     </AssetInputWrapper>
   )

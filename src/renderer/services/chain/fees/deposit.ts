@@ -89,7 +89,7 @@ const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
             oMemo,
             O.fold(
               () => Rx.of(RD.initial),
-              (memo) => BTC.poolFee$(memo)
+              (memo) => BTC.memoFees$(memo).pipe(liveData.map(({ fees }) => fees.fast))
             )
           )
         )

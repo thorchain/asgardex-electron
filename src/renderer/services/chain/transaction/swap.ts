@@ -66,7 +66,14 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
           liveData.chain((_) => {
             setState({ ...getState(), step: 2, txRD: RD.progress({ loaded: 50, total }) })
             // 2. send swap tx
-            return sendTx$({ asset, recipient: poolAddress, amount, memo, txType: TxTypes.SWAP })
+            return sendTx$({
+              asset,
+              recipient: poolAddress,
+              amount,
+              memo,
+              txType: TxTypes.SWAP,
+              feeOptionKey: 'fastest'
+            })
           }),
           liveData.chain((txHash) => {
             // Update state

@@ -37,7 +37,7 @@ export const eqBalance: Eq.Eq<Balance> = {
   equals: (x, y) => eqAsset.equals(x.asset, y.asset) && eqBaseAmount.equals(x.amount, y.amount)
 }
 
-export const eqErrorId = Eq.eqNumber
+export const eqErrorId = Eq.eqString
 
 export const eqApiError = Eq.getStructEq<ApiError>({
   errorId: eqErrorId,

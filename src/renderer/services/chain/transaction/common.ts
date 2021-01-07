@@ -1,9 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BNBChain, BTCChain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
+import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
@@ -18,7 +18,7 @@ import { SendTxParams } from '../types'
  */
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
-const sendTx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => {
+const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }: SendTxParams): TxLD => {
   // helper to create `RemoteData<ApiError, never>` observable
   const txFailure$ = (msg: string) =>
     Rx.of(
@@ -34,13 +34,12 @@ const sendTx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD
 
     case BTCChain:
       return FP.pipe(
-        BTC.getPoolFeeRate(),
-        RD.toOption,
-        O.fold(
-          // TODO (@veado) i18n
-          () => txFailure$('Fee rate for BTC transaction not available'),
-          (feeRate) => BTC.sendTx({ recipient, amount, feeRate, memo })
-        )
+        BTC.memoFees$(memo),
+        liveData.mapLeft((error) => ({
+          errorId: ErrorId.GET_FEES,
+          msg: error?.message ?? error.toString()
+        })),
+        liveData.chain(({ rates }) => BTC.sendTx({ recipient, amount, feeRate: rates[feeOptionKey], memo }))
       )
 
     case ETHChain:
@@ -69,8 +68,8 @@ const sendTx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD
  * Don't subscribe different txs to store it into (same) state
  * Create different functions to swap (in `services/chain/transaction/swap), to deposit, to withdraw etc.
  */
-const subscribeTx = ({ asset, recipient, amount, memo, txType }: SendTxParams): void => {
-  sendTx$({ asset, recipient, amount, memo, txType }).subscribe(setTxRD)
+const subscribeTx = (params: SendTxParams): void => {
+  sendTx$(params).subscribe(setTxRD)
 }
 
 const resetTx = () => {
