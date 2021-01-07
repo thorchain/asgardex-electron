@@ -37,7 +37,9 @@ import {
   PoolStringAssetsLD,
   SelectedPricePoolAsset,
   ThorchainEndpointsLD,
-  PoolDetails
+  PoolDetails,
+  ValidatePoolLD,
+  ValidateNodeLD
 } from './types'
 import { getPoolAddressByChain, getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
 
@@ -51,7 +53,9 @@ const getStoredSelectedPricePoolAsset = (): SelectedPricePoolAsset =>
     O.chain(O.fromNullable),
     O.filter(isPricePoolAsset)
   )
-
+/**
+ * @deprecated Use `AssetRuneNative` only
+ */
 const runeAsset$: Rx.Observable<Asset> = network$.pipe(RxOp.map((network) => getRuneAsset({ network, chain: 'BNB' })))
 
 const createPoolsService = (
@@ -403,6 +407,27 @@ const createPoolsService = (
     RxOp.map(O.getOrElse(() => ONE_BN))
   )
 
+  // TODO (@Veado) Validate pool address
+  // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
+  const validatePool$ = (_: string): ValidatePoolLD =>
+    // mock validation for now
+    Rx.of(null).pipe(
+      RxOp.delay(1500),
+      RxOp.map((_) => RD.success(true)),
+      RxOp.startWith(RD.initial)
+    )
+
+  // TODO (@Veado) Validate node
+  // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
+  const validateNode$ = (): ValidateNodeLD =>
+    // mock validation for now
+    Rx.of(null).pipe(
+      RxOp.delay(1500),
+      RxOp.map((_) => RD.success(true)),
+      // RxOp.map((_) => RD.failure({ errorId: ErrorId.GET_BALANCES, msg: 'invalid node ' })),
+      RxOp.startWith(RD.initial)
+    )
+
   return {
     poolsState$,
     pendingPoolsState$,
@@ -412,12 +437,14 @@ const createPoolsService = (
     selectedPricePoolAssetSymbol$,
     reloadPools,
     poolAddresses$,
-    selectedPoolAddress$: selectedPoolAddress$,
+    selectedPoolAddress$,
     runeAsset$,
     poolDetail$,
     priceRatio$,
     availableAssets$,
-    poolAddressByAsset$
+    poolAddressByAsset$,
+    validatePool$,
+    validateNode$
   }
 }
 

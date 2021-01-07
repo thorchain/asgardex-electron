@@ -33,10 +33,6 @@ export const SubContentRow = styled(Row).attrs({
   justify: 'center'
 })`
   width: 100%;
-  padding-bottom: 30px;
-  :last-child {
-    padding-bottom: 0;
-  }
 `
 
 export const ResultDetailsContainer = styled(Row).attrs({

@@ -81,6 +81,7 @@ export enum ErrorId {
   GET_BALANCES,
   GET_ASSET_TXS,
   SEND_TX,
+  GET_TX_STATUS,
   SEND_LEDGER_TX
 }
 

@@ -2,22 +2,13 @@ import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { fold, initial } from '@devexperts/remote-data-ts'
-import {
-  Asset,
-  AssetAmount,
-  assetFromString,
-  AssetRuneNative,
-  assetToBase,
-  bnOrZero,
-  THORChain
-} from '@xchainjs/xchain-util'
+import { Asset, assetFromString, AssetRuneNative, bnOrZero } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
-import { pipe } from 'fp-ts/lib/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 
 import { ErrorView } from '../../components/shared/error/'
@@ -28,15 +19,12 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
-import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { liveData } from '../../helpers/rx/liveData'
 import { SwapRouteParams } from '../../routes/swap'
 import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
 import { PoolAddressRx } from '../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
-import { TxTypes } from '../../types/asgardex'
 import * as Styled from './SwapView.styles'
 
 type Props = {}
@@ -44,25 +32,18 @@ type Props = {}
 export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { source, target } = useParams<SwapRouteParams>()
   const intl = useIntl()
+  const history = useHistory()
 
   const { service: midgardService } = useMidgardContext()
   const {
     pools: { poolsState$, reloadPools, selectedPricePool$, poolAddressByAsset$ },
-    getTransactionState$,
     setSelectedPoolAsset
   } = midgardService
-  const {
-    reloadSwapFees,
-    swapFees$,
-    txRD$,
-    sendTx: subscribeTx,
-    resetTx,
-    getExplorerUrlByAsset$,
-    assetAddress$
-  } = useChainContext()
+  const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, assetAddress$, swap$ } = useChainContext()
 
   const {
     balancesState$,
+    reloadBalances,
     keystoreService: { validatePassword$ }
   } = useWalletContext()
 
@@ -80,36 +61,9 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     }
   }, [oTarget, setSelectedPoolAsset])
 
-  // Reset all common data on SwapView unmount
-  useEffect(() => {
-    return () => {
-      resetTx()
-    }
-  }, [resetTx])
-
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
-
-  const txWithState$ = useMemo(
-    () =>
-      FP.pipe(
-        txRD$,
-        liveData.mapLeft((e) => Error(e.msg)),
-        liveData.chain((tx) =>
-          FP.pipe(
-            getTransactionState$(tx),
-            liveData.map((state) => ({
-              state,
-              txHash: tx
-            }))
-          )
-        )
-      ),
-    [txRD$, getTransactionState$]
-  )
-
-  const [txWithState] = useObservableState(() => txWithState$, RD.initial)
 
   const sourcePoolAddress$ = useMemo(
     () =>
@@ -123,36 +77,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const sourcePoolAddress = useObservableState(sourcePoolAddress$, O.none)
   const targetWalletAddress = useObservableState(assetAddress$, O.none)
-
-  const onConfirmSwap = useCallback(
-    (source: Asset, amount: AssetAmount, memo: string) => {
-      pipe(
-        sourcePoolAddress,
-        O.alt(() => {
-          // For THOR chain we will send Deposit tx instead of
-          // plain ones. It does not need any additional address
-          if (eqChain.equals(source.chain, THORChain)) {
-            return O.some('')
-          }
-          return O.none
-        }),
-        // TODO (@Veado)
-        // Do a health check for pool address before sending tx
-        // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
-        // eslint-disable-next-line array-callback-return
-        O.map((poolAddress) => {
-          subscribeTx({
-            recipient: poolAddress,
-            amount: assetToBase(amount),
-            asset: source,
-            memo,
-            txType: TxTypes.SWAP
-          })
-        })
-      )
-    },
-    [sourcePoolAddress, subscribeTx]
-  )
 
   const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [
     source,
@@ -193,11 +117,17 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const swapFeesRD: SwapFeesRD = useObservableState(swapFeesLD, RD.initial)
 
+  const onChangePath = useCallback(
+    (path) => {
+      history.replace(path)
+    },
+    [history]
+  )
   return (
     <>
       <BackLink />
       <Styled.ContentContainer>
-        {pipe(
+        {FP.pipe(
           poolsState,
           fold(
             () => <></>,
@@ -218,18 +148,19 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                 <Swap
                   validatePassword$={validatePassword$}
                   activePricePool={selectedPricePool}
-                  txWithState={txWithState}
-                  resetTx={resetTx}
                   goToTransaction={goToTransaction}
                   sourceAsset={oSource}
                   targetAsset={oTarget}
-                  onConfirmSwap={onConfirmSwap}
+                  sourcePoolAddress={sourcePoolAddress}
                   availableAssets={availableAssets}
                   poolDetails={state.poolDetails}
                   walletBalances={balances}
                   reloadFees={reloadSwapFees}
                   fees={swapFeesRD}
                   targetWalletAddress={targetWalletAddress}
+                  swap$={swap$}
+                  reloadBalances={reloadBalances}
+                  onChangePath={onChangePath}
                 />
               )
             }

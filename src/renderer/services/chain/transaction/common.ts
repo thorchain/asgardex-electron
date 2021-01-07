@@ -4,20 +4,21 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { observableState } from '../../helpers/stateHelper'
-import { TxTypes } from '../../types/asgardex'
-import * as BNB from '../binance'
-import * as BTC from '../bitcoin'
-import * as THOR from '../thorchain'
-import { ErrorId, TxLD, TxRD } from '../wallet/types'
-import { SendTxParams } from './types'
+import { observableState } from '../../../helpers/stateHelper'
+import { TxTypes } from '../../../types/asgardex'
+import * as BNB from '../../binance'
+import * as BTC from '../../bitcoin'
+import * as THOR from '../../thorchain'
+import { ErrorId, TxLD, TxRD } from '../../wallet/types'
+import { SendTxParams } from '../types'
 
+/**
+ * @deprecated  Don't use this (same) state for all transactions
+ * Create custom state for swap, deposit, withdraw txs ...
+ */
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
-const tx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => {
-  // TODO (@Veado) Health check request for pool address
-  // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
-
+const sendTx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => {
   // helper to create `RemoteData<ApiError, never>` observable
   const txFailure$ = (msg: string) =>
     Rx.of(
@@ -63,12 +64,17 @@ const tx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => 
   }
 }
 
-const sendTx = ({ asset, recipient, amount, memo, txType }: SendTxParams): void => {
-  tx$({ asset, recipient, amount, memo, txType }).subscribe(setTxRD)
+/**
+ * @deprecated
+ * Don't subscribe different txs to store it into (same) state
+ * Create different functions to swap (in `services/chain/transaction/swap), to deposit, to withdraw etc.
+ */
+const subscribeTx = ({ asset, recipient, amount, memo, txType }: SendTxParams): void => {
+  sendTx$({ asset, recipient, amount, memo, txType }).subscribe(setTxRD)
 }
 
 const resetTx = () => {
   setTxRD(RD.initial)
 }
 
-export { sendTx, txRD$, resetTx }
+export { sendTx$, subscribeTx, txRD$, resetTx }

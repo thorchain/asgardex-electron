@@ -1,4 +1,5 @@
 import { SwapOutlined as ASwapOutlined } from '@ant-design/icons/lib'
+import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -159,4 +160,44 @@ export const ErrorLabel = styled(UILabel)`
 
 export const BalanceErrorLabel = styled(ErrorLabel)`
   text-align: left;
+`
+
+export const CoinDataWrapper = styled(Row).attrs({
+  justify: 'center',
+  align: 'middle'
+})``
+
+export const CoinDataContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  .coinData-wrapper {
+    &:first-child {
+      padding-bottom: 20px;
+    }
+  }
+`
+
+export const TrendContainer = styled(Row).attrs({
+  justify: 'center'
+})`
+  padding-top: 20px;
+  width: 100%;
+`
+
+export const StepContainer = styled(Row).attrs({
+  justify: 'center'
+})`
+  width: 100%;
+  padding: 10px 0;
+`
+
+export const StepLabel = styled(UILabel).attrs({
+  size: 'small',
+  color: 'gray'
+})`
+  padding-top: 0;
+  font-family: 'MainFontRegular';
+  text-transform: uppercase;
+  text-align: center;
 `

@@ -13,7 +13,7 @@ import {
 } from './fees'
 import { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } from './ledger'
 import { asymDepositTxMemo$, symDepositTxMemo$ } from './memo'
-import { sendTx, txRD$, resetTx } from './transaction'
+import { subscribeTx, txRD$, resetTx, swap$ } from './transaction'
 
 /**
  * Exports all functions and observables needed at UI level (provided by `ChainContext`)
@@ -34,9 +34,10 @@ export {
   removeAllLedgerAddress,
   reloadSwapFees,
   swapFees$,
-  sendTx,
+  subscribeTx,
   txRD$,
   resetTx,
   getExplorerUrlByAsset$,
-  assetAddress$
+  assetAddress$,
+  swap$
 }

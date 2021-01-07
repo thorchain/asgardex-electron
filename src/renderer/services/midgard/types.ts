@@ -13,6 +13,7 @@ import {
   PoolDetail as MidgardPoolDetail
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
+import { ApiError } from '../wallet/types'
 
 export type ThorchainLastblock = LastblockItem[]
 
@@ -154,7 +155,15 @@ export type PoolsService = {
   poolDetail$: PoolDetailLD
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
+  validatePool$: (poolAddress: string) => ValidatePoolLD
+  validateNode$: (/* node address or something ? */) => ValidateNodeLD
 }
 
 export type StakersAssetDataRD = RD.RemoteData<Error, StakersAssetData>
 export type StakersAssetDataLD = LiveData<Error, StakersAssetData>
+
+export type ValidatePoolRD = RD.RemoteData<ApiError, boolean>
+export type ValidatePoolLD = LiveData<ApiError, boolean>
+
+export type ValidateNodeRD = RD.RemoteData<ApiError, boolean>
+export type ValidateNodeLD = LiveData<ApiError, boolean>

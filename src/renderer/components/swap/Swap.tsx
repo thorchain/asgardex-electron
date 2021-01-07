@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, PoolData, getSwapMemo } from '@thorchain/asgardex-util'
@@ -6,83 +6,86 @@ import { Address, Balance } from '@xchainjs/xchain-client'
 import {
   Asset,
   assetAmount,
-  AssetAmount,
   assetToBase,
   assetToString,
-  bn,
   formatBN,
   baseToAsset,
   BaseAmount,
   formatAssetAmountCurrency,
-  AssetRuneNative
+  AssetRuneNative,
+  baseAmount
 } from '@xchainjs/xchain-util'
-import { Spin } from 'antd'
 import { eqString } from 'fp-ts/Eq'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import * as Rx from 'rxjs'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import { getChainAsset } from '../../helpers/chainHelper'
 import { eqAsset } from '../../helpers/fp/eq'
-import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { swap } from '../../routes/swap'
-import { AssetsWithPrice, AssetWithPrice, TxWithStateRD } from '../../services/binance/types'
-import { SwapFeesRD } from '../../services/chain/types'
+import { AssetsWithPrice, AssetWithPrice } from '../../services/binance/types'
+import { INITIAL_SWAP_STATE } from '../../services/chain/const'
+import { SwapFeesRD, SwapState, SwapStateHandler } from '../../services/chain/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../services/wallet/types'
-import { TxStatus, TxTypes } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
-import { SwapModal } from '../modal/swap'
+import { TxModal } from '../modal/tx'
+import { AssetData } from '../uielements/assets/assetData'
 import { AssetSelect } from '../uielements/assets/assetSelect'
 import { Fees, UIFeesRD } from '../uielements/fees'
-import { Modal } from '../uielements/modal'
 import { Slider } from '../uielements/slider'
+import { StepBar } from '../uielements/stepBar'
+import { Trend } from '../uielements/trend'
 import * as Styled from './Swap.styles'
 import { getSwapData, assetWithPriceToAsset, pickAssetWithPrice } from './Swap.utils'
 
-type SwapProps = {
-  balance?: number
+export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string }
+
+export type SwapProps = {
   availableAssets: AssetsWithPrice
   sourceAsset: O.Option<Asset>
   targetAsset: O.Option<Asset>
-  onConfirmSwap: (source: Asset, amount: AssetAmount, memo: string) => void
-  poolDetails?: PoolDetails
-  walletBalances?: O.Option<NonEmptyWalletBalances>
-  txWithState?: TxWithStateRD
-  resetTx?: () => void
-  goToTransaction?: (txHash: string) => void
+  sourcePoolAddress: O.Option<string>
+  swap$: SwapStateHandler
+  poolDetails: PoolDetails
+  walletBalances: O.Option<NonEmptyWalletBalances>
+  goToTransaction: (txHash: string) => void
   activePricePool: PricePool
   validatePassword$: ValidatePasswordHandler
-  reloadFees?: () => void
-  fees?: SwapFeesRD
-  targetWalletAddress?: O.Option<Address>
+  reloadFees: FP.Lazy<void>
+  reloadBalances: FP.Lazy<void>
+  fees: SwapFeesRD
+  targetWalletAddress: O.Option<Address>
+  onChangePath: (path: string) => void
 }
 
 export const Swap = ({
   availableAssets,
-  onConfirmSwap,
   sourceAsset: sourceAssetProp,
   targetAsset: targetAssetProp,
-  poolDetails = [],
-  walletBalances = O.none,
-  txWithState = RD.initial,
+  sourcePoolAddress: oSourcePoolAddress,
+  swap$,
+  poolDetails,
+  walletBalances,
   goToTransaction = (_) => {},
-  resetTx,
   activePricePool,
   validatePassword$,
-  reloadFees,
+  reloadFees = FP.constVoid,
+  reloadBalances = FP.constVoid,
   fees: feesProp = RD.initial,
-  targetWalletAddress = O.none
+  targetWalletAddress,
+  onChangePath
 }: SwapProps) => {
   const intl = useIntl()
-  const history = useHistory()
+
   // convert to hash map here instead of using getPoolDetail
   const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [
     poolDetails
@@ -97,17 +100,41 @@ export const Swap = ({
   ])
   const sourceAsset: O.Option<Asset> = useMemo(() => assetWithPriceToAsset(oSourceAssetWP), [oSourceAssetWP])
   const targetAsset: O.Option<Asset> = useMemo(() => assetWithPriceToAsset(oTargetAssetWP), [oTargetAssetWP])
-  const assetsToSwap: O.Option<[Asset, Asset]> = useMemo(() => sequenceTOption(sourceAsset, targetAsset), [
-    sourceAsset,
-    targetAsset
-  ])
+  const assetsToSwap: O.Option<{ source: Asset; target: Asset }> = useMemo(
+    () => sequenceSOption({ source: sourceAsset, target: targetAsset }),
+    [sourceAsset, targetAsset]
+  )
+
+  // (Possible) subscription of swap$
+  const [swapSub, setSwapSub] = useState<O.Option<Rx.Subscription>>(O.none)
+
+  // unsubscribe swap$ subscription
+  const unsubScribeSwapSub = useCallback(() => {
+    FP.pipe(
+      swapSub,
+      O.map((sub) => sub.unsubscribe())
+    )
+  }, [swapSub])
+
+  useEffect(() => {
+    // Unsubscribe of (possible) previous subscription of `swap$`
+    return () => {
+      unsubScribeSwapSub()
+    }
+  }, [unsubScribeSwapSub])
+
+  // Swap state
+  const [swapState, setSwapState] = useState<SwapState>(INITIAL_SWAP_STATE)
+
+  // Swap start time
+  const [swapStartTime, setSwapStartTime] = useState<number>(0)
 
   const setSourceAsset = useCallback(
     (asset: Asset) => {
       FP.pipe(
         targetAsset,
         O.map((targetAsset) =>
-          history.replace(
+          onChangePath(
             swap.path({
               source: assetToString(asset),
               target: assetToString(targetAsset)
@@ -116,7 +143,7 @@ export const Swap = ({
         )
       )
     },
-    [history, targetAsset]
+    [onChangePath, targetAsset]
   )
 
   const setTargetAsset = useCallback(
@@ -124,7 +151,7 @@ export const Swap = ({
       FP.pipe(
         sourceAsset,
         O.map((sourceAsset) =>
-          history.replace(
+          onChangePath(
             swap.path({
               source: assetToString(sourceAsset),
               target: assetToString(asset)
@@ -133,10 +160,10 @@ export const Swap = ({
         )
       )
     },
-    [history, sourceAsset]
+    [onChangePath, sourceAsset]
   )
 
-  const [changeAmount, setChangeAmount] = useState(bn(0))
+  const [changeAmount, setChangeAmount] = useState(ZERO_BASE_AMOUNT)
 
   const oAssetWB: O.Option<Balance> = useMemo(() => getWalletBalanceByAsset(walletBalances, sourceAsset), [
     walletBalances,
@@ -148,8 +175,9 @@ export const Swap = ({
       FP.pipe(
         oAssetWB,
         O.map((assetWB) => {
-          const assetAmountBN = baseToAsset(assetWB.amount).amount()
-          return setChangeAmount(assetAmountBN.multipliedBy(Number(percents) / 100))
+          const assetAmountBN = assetWB.amount.amount()
+          const amountFromPercentage = assetAmountBN.multipliedBy(Number(percents) / 100)
+          return setChangeAmount(baseAmount(amountFromPercentage))
         })
       )
     },
@@ -178,10 +206,10 @@ export const Swap = ({
 
     return FP.pipe(
       assetsToSwap,
-      O.map(([sourceAsset, targetAsset]) =>
+      O.map(({ source, target }) =>
         FP.pipe(
           filteredAssets,
-          A.filter((asset) => asset.symbol !== sourceAsset.symbol && asset.symbol !== targetAsset.symbol)
+          A.filter((asset) => asset.symbol !== source.symbol && asset.symbol !== target.symbol)
         )
       ),
       O.getOrElse(() => allAssets)
@@ -191,10 +219,10 @@ export const Swap = ({
   const assetsToSwapTo = useMemo((): Asset[] => {
     return FP.pipe(
       assetsToSwap,
-      O.map(([sourceAsset, targetAsset]) =>
+      O.map(({ source, target }) =>
         FP.pipe(
           allAssets,
-          A.filter((asset) => asset.symbol !== sourceAsset.symbol && asset.symbol !== targetAsset.symbol)
+          A.filter((asset) => asset.symbol !== source.symbol && asset.symbol !== target.symbol)
         )
       ),
       O.getOrElse(() => allAssets)
@@ -219,17 +247,16 @@ export const Swap = ({
     }
     FP.pipe(
       assetsToSwap,
-      // eslint-disable-next-line  array-callback-return
-      O.map(([sourceAsset, targetAsset]) => {
-        history.replace(
+      O.map(({ source, target }) =>
+        onChangePath(
           swap.path({
-            target: assetToString(sourceAsset),
-            source: assetToString(targetAsset)
+            target: assetToString(source),
+            source: assetToString(target)
           })
         )
-      })
+      )
     )
-  }, [assetsToSwap, history, canSwitchAssets])
+  }, [assetsToSwap, onChangePath, canSwitchAssets])
 
   const swapData = useMemo(() => getSwapData(changeAmount, sourceAsset, targetAsset, poolData), [
     changeAmount,
@@ -251,146 +278,200 @@ export const Swap = ({
     [oAssetWB, intl]
   )
 
-  const [showPrivateModal, setShowPrivateModal] = useState(false)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
 
   const onSwapConfirmed = useCallback(() => {
-    setShowPrivateModal(true)
-  }, [setShowPrivateModal])
+    setShowPasswordModal(true)
+  }, [setShowPasswordModal])
 
   const slider = useMemo(
     () =>
       FP.pipe(
         oAssetWB,
-        O.map((assetWB) => (
-          <Slider
-            key={'swap percentage slider'}
-            value={(changeAmount.toNumber() / baseToAsset(assetWB.amount).amount().toNumber()) * 100}
-            onChange={setChangeAmountFromPercentValue}
-            tooltipVisible={true}
-            withLabel={true}
-            tooltipPlacement={'top'}
-          />
-        )),
+        O.map((assetWB) => {
+          const percentage = changeAmount.amount().dividedBy(assetWB.amount.amount()).multipliedBy(100).toNumber()
+          return (
+            <Slider
+              key={'swap percentage slider'}
+              value={percentage}
+              onChange={setChangeAmountFromPercentValue}
+              tooltipVisible={true}
+              withLabel={true}
+              tooltipPlacement={'top'}
+            />
+          )
+        }),
         O.toNullable
       ),
     [oAssetWB, changeAmount, setChangeAmountFromPercentValue]
   )
 
-  const pendingState = useMemo(
+  const txModalTitle = useMemo(
     () =>
       FP.pipe(
-        txWithState,
+        swapState.txRD,
         RD.fold(
-          () => <></>,
-          () => <Spin />,
-          (error) => (
-            <Modal
-              closable
-              visible
-              title={intl.formatMessage({ id: 'common.error' })}
-              onOk={onSwapConfirmed}
-              okText={intl.formatMessage({ id: 'common.retry' })}
-              onCancel={resetTx}>
-              {error.message}
-            </Modal>
-          ),
-          ({ state, txHash }) =>
-            FP.pipe(
-              state,
-              O.map(
-                (): TxStatus => ({
-                  modal: true,
-                  value: 100,
-                  status: false,
-                  type: TxTypes.SWAP
-                })
-              ),
-              O.alt(
-                (): O.Option<TxStatus> =>
-                  O.some({
-                    modal: true,
-                    value: 50,
-                    status: true,
-                    startTime: Date.now(),
-                    type: TxTypes.SWAP
-                  })
-              ),
-              O.chain((txStatus) => sequenceTOption(oSourceAssetWP, oTargetAssetWP, O.some(txStatus))),
-              O.map(([sourceAssetWP, targetAssetWP, txStatus]) => {
-                const swapResultByBasePriceAsset =
-                  poolData[assetToString(targetAssetWP.asset)] &&
-                  // Convert swapResult to the selected price asset values
-                  getValueOfAsset1InAsset2(
-                    assetToBase(assetAmount(swapData.swapResult)),
-                    poolData[assetToString(targetAssetWP.asset)],
-                    activePricePool.poolData
-                  )
-
-                const amountToSwapInSelectedPriceAsset =
-                  poolData[assetToString(sourceAssetWP.asset)] &&
-                  getValueOfAsset1InAsset2(
-                    assetToBase(assetAmount(changeAmount)),
-                    poolData[assetToString(sourceAssetWP.asset)],
-                    activePricePool.poolData
-                  )
-
-                return (
-                  <SwapModal
-                    key={'swap modal result'}
-                    basePriceAsset={activePricePool.asset}
-                    slip={swapData.slip}
-                    swapSourceAsset={sourceAssetWP.asset}
-                    swapTargetAsset={targetAssetWP.asset}
-                    amountToSwapInSelectedPriceAsset={amountToSwapInSelectedPriceAsset}
-                    swapResultByBasePriceAsset={swapResultByBasePriceAsset}
-                    onClose={resetTx}
-                    onClickFinish={resetTx}
-                    isCompleted={!txStatus.status}
-                    onViewTxClick={(e) => {
-                      e.preventDefault()
-                      goToTransaction(txHash)
-                    }}
-                    txStatus={{
-                      ...txStatus,
-                      hash: txHash
-                    }}
-                  />
-                )
-              }),
-              O.toNullable
-            )
-        )
+          () => 'swap.state.pending',
+          () => 'swap.state.pending',
+          () => 'swap.state.error',
+          () => 'swap.state.success'
+        ),
+        (id) => intl.formatMessage({ id })
       ),
-    [
-      intl,
-      txWithState,
-      goToTransaction,
-      onSwapConfirmed,
-      resetTx,
-      oSourceAssetWP,
-      oTargetAssetWP,
-      swapData,
-      activePricePool,
-      poolData,
-      changeAmount
-    ]
+    [intl, swapState]
   )
 
-  const closePrivateModal = useCallback(() => {
-    setShowPrivateModal(false)
-  }, [setShowPrivateModal])
+  const extraTxModalContent = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(oSourceAssetWP, oTargetAssetWP),
+      O.map(([sourceAssetWP, targetAssetWP]) => {
+        const basePriceAsset = activePricePool.asset
+        const targetAsset = targetAssetWP.asset
+        const sourceAsset = sourceAssetWP.asset
 
-  const onPasswordValidationSucceed = useCallback(() => {
+        const swapResultByBasePriceAsset =
+          poolData[assetToString(targetAsset)] &&
+          // Convert swapResult to the selected price asset values
+          getValueOfAsset1InAsset2(swapData.swapResult, poolData[assetToString(targetAsset)], activePricePool.poolData)
+
+        const amountToSwapInSelectedPriceAsset =
+          poolData[assetToString(sourceAsset)] &&
+          getValueOfAsset1InAsset2(changeAmount, poolData[assetToString(sourceAsset)], activePricePool.poolData)
+
+        // TODO (@Veado) Add i18n
+        const stepLabels = ['Health check...', 'Send swap transaction...', 'Check swap result...']
+        const stepLabel = FP.pipe(
+          swapState.txRD,
+          RD.fold(
+            () => '',
+            () => stepLabels[swapState.step - 1],
+            () => '',
+            () => 'Done!'
+          )
+        )
+
+        return (
+          <>
+            <Styled.StepContainer>
+              <Styled.StepLabel>{stepLabel}</Styled.StepLabel>
+            </Styled.StepContainer>
+            <Styled.CoinDataWrapper>
+              <StepBar size={50} />
+              <Styled.CoinDataContainer>
+                <AssetData
+                  priceBaseAsset={basePriceAsset}
+                  asset={sourceAsset}
+                  price={amountToSwapInSelectedPriceAsset}
+                />
+                <AssetData priceBaseAsset={basePriceAsset} asset={targetAsset} price={swapResultByBasePriceAsset} />
+              </Styled.CoinDataContainer>
+            </Styled.CoinDataWrapper>
+            <Styled.TrendContainer>
+              <Trend amount={swapData.slip} />
+            </Styled.TrendContainer>
+          </>
+        )
+      }),
+      O.getOrElse(() => <></>)
+    )
+  }, [
+    oSourceAssetWP,
+    oTargetAssetWP,
+    activePricePool.asset,
+    activePricePool.poolData,
+    poolData,
+    swapData.swapResult,
+    swapData.slip,
+    changeAmount,
+    swapState.txRD,
+    swapState.step
+  ])
+
+  const onCloseTxModal = useCallback(() => {
+    // unsubscribe
+    unsubScribeSwapSub()
+    // reset swap$ subscription
+    setSwapSub(O.none)
+    // reset swap state
+    setSwapState(INITIAL_SWAP_STATE)
+  }, [unsubScribeSwapSub])
+
+  const onFinishTxModal = useCallback(() => {
+    // Do same things as with closing
+    onCloseTxModal()
+    // but also refresh balances
+    reloadBalances()
+  }, [onCloseTxModal, reloadBalances])
+
+  const renderTxModal = useMemo(() => {
+    const { txHash, txRD } = swapState
+
+    // don't render TxModal in initial state
+    if (RD.isInitial(txRD)) return <></>
+
+    // Get timer value
+    const timerValue = FP.pipe(
+      txRD,
+      RD.fold(
+        () => 0,
+        FP.flow(
+          O.map(({ loaded }) => loaded),
+          O.getOrElse(() => 0)
+        ),
+        () => 0,
+        () => 100
+      )
+    )
+
+    return (
+      <TxModal
+        title={txModalTitle}
+        onClose={onCloseTxModal}
+        onFinish={onFinishTxModal}
+        startTime={swapStartTime}
+        txRD={txRD}
+        txHash={txHash}
+        timerValue={timerValue}
+        onViewTxClick={goToTransaction}
+        extra={extraTxModalContent}
+      />
+    )
+  }, [extraTxModalContent, goToTransaction, onCloseTxModal, onFinishTxModal, swapStartTime, swapState, txModalTitle])
+
+  const closePasswordModal = useCallback(() => {
+    setShowPasswordModal(false)
+  }, [setShowPasswordModal])
+
+  const onClosePasswordModal = useCallback(() => {
+    // close password modal
+    closePasswordModal()
+  }, [closePasswordModal])
+
+  const onSucceedPasswordModal = useCallback(() => {
+    // close private modal
+    closePasswordModal()
+
     FP.pipe(
       sequenceTOption(assetsToSwap, targetWalletAddress),
-      // eslint-disable-next-line  array-callback-return
-      O.map(([[sourceAsset, targetAsset], address]) => {
-        const memo = getSwapMemo({ asset: targetAsset, address })
-        closePrivateModal()
-        onConfirmSwap(sourceAsset, assetAmount(changeAmount), memo)
+      O.map(([{ source, target }, address]) => {
+        const memo = getSwapMemo({ asset: target, address })
+        // set start time
+        setSwapStartTime(Date.now())
+        // subscribe to swap$
+        const sub = swap$({
+          poolAddress: oSourcePoolAddress,
+          asset: source,
+          amount: changeAmount,
+          memo
+        }).subscribe(setSwapState)
+
+        // store subscription - needed to unsubscribe while unmounting
+        setSwapSub(O.some(sub))
+
+        return true
       })
     )
-  }, [assetsToSwap, onConfirmSwap, changeAmount, closePrivateModal, targetWalletAddress])
+  }, [assetsToSwap, changeAmount, closePasswordModal, oSourcePoolAddress, swap$, targetWalletAddress])
 
   const sourceChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
     () =>
@@ -416,28 +497,21 @@ export const Swap = ({
         sequenceTOption(sourceAsset, walletBalances),
         O.map(([sourceAsset, walletBalances]) => {
           // If sourceAsset is the same as source chain
-          // we should subtract changeAmount
+          // we should substract changeAmount
           const shouldSubtractChangeAmount = eqAsset.equals(sourceAsset, getChainAsset(sourceAsset.chain))
 
-          const balanceMinusAmount = FP.pipe(
+          const oBalanceMinusAmount: O.Option<BaseAmount> = FP.pipe(
             walletBalances,
             A.findFirst((walletBalance) => eqAsset.equals(walletBalance.asset, sourceAsset)),
             O.map((sourceBalance) =>
-              baseToAsset(sourceBalance.amount)
-                .amount()
-                .minus(shouldSubtractChangeAmount ? changeAmount : ZERO_BN)
+              sourceBalance.amount.amount().minus(shouldSubtractChangeAmount ? changeAmount.amount() : ZERO_BN)
             ),
-            O.map(FP.flow(assetAmount, assetToBase))
+            O.map(FP.flow(baseAmount))
           )
 
           return FP.pipe(
-            sequenceTOption(balanceMinusAmount, FP.pipe(sourceChainFee, RD.toOption)),
-            O.map(([leftBalance, sourceChainFee]) => {
-              const sourceChainFeeAmount = sourceChainFee.amount()
-
-              return leftBalance.amount().minus(sourceChainFeeAmount)
-            }),
-            O.map((result) => result.isNegative()),
+            sequenceTOption(oBalanceMinusAmount, RD.toOption(sourceChainFee)),
+            O.map(([leftBalance, sourceChainFee]) => leftBalance.amount().minus(sourceChainFee.amount()).isNegative()),
             O.getOrElse((): boolean => false)
           )
         }),
@@ -497,11 +571,11 @@ export const Swap = ({
   }, [targetChainFee, targetAsset, poolData])
 
   const targetChainFeeError = useMemo((): boolean => {
-    if (changeAmount.isZero()) {
+    if (changeAmount.amount().isZero()) {
       return false
     }
     const targetFee = FP.pipe(targetChainFeeAmountInTargetAsset, baseToAsset, (assetAmount) => assetAmount.amount())
-    return swapData.swapResult.minus(targetFee).isNegative()
+    return swapData.swapResult.amount().minus(targetFee).isNegative()
   }, [targetChainFeeAmountInTargetAsset, swapData, changeAmount])
 
   const outputLabel = useMemo(
@@ -509,7 +583,7 @@ export const Swap = ({
       FP.pipe(
         targetAsset,
         O.map((asset) =>
-          formatAssetAmountCurrency({ amount: assetAmount(swapData.swapResult), asset, trimZeros: true })
+          formatAssetAmountCurrency({ amount: baseToAsset(swapData.swapResult), asset, trimZeros: true })
         ),
         O.getOrElse(() => formatBN(ZERO_BN))
       ),
@@ -546,7 +620,9 @@ export const Swap = ({
         sequenceTRD(
           sourceChainFee,
           RD.success(targetChainFeeAmountInTargetAsset),
+          // TODO (@Veado) Add i18n
           RD.fromOption(sourceAsset, () => Error('No source asset')),
+          // TODO (@Veado) Add i18n
           RD.fromOption(targetAsset, () => Error('No target asset'))
         ),
         RD.map(([sourceFee, targetFee, sourceAsset, targetAsset]) => [
@@ -557,30 +633,29 @@ export const Swap = ({
     [sourceChainFee, targetChainFeeAmountInTargetAsset, sourceAsset, targetAsset]
   )
 
-  const isSwapDisabled: boolean = useMemo(() => changeAmount.eq(0) || FP.pipe(walletBalances, O.isNone), [
+  const isSwapDisabled: boolean = useMemo(() => changeAmount.amount().isZero() || FP.pipe(walletBalances, O.isNone), [
     walletBalances,
     changeAmount
   ])
 
   return (
     <Styled.Container>
-      {showPrivateModal && (
+      {showPasswordModal && (
         <PasswordModal
-          onSuccess={onPasswordValidationSucceed}
-          onClose={() => setShowPrivateModal(false)}
+          onSuccess={onSucceedPasswordModal}
+          onClose={onClosePasswordModal}
           validatePassword$={validatePassword$}
         />
       )}
-      <Styled.PendingContainer>{pendingState}</Styled.PendingContainer>
+      <Styled.PendingContainer>{renderTxModal}</Styled.PendingContainer>
       <Styled.ContentContainer>
         <Styled.Header>
           {FP.pipe(
             assetsToSwap,
             O.map(
-              ([sourceAsset, targetAsset]) =>
-                `${intl.formatMessage({ id: 'swap.swapping' })} ${sourceAsset.ticker} >> ${targetAsset.ticker}`
+              ({ source, target }) => `${intl.formatMessage({ id: 'common.swap' })} ${source.ticker} > ${target.ticker}`
             ),
-            O.getOrElse(() => 'No such assets')
+            O.getOrElse(() => `${intl.formatMessage({ id: 'swap.state.error' })} - No such assets`)
           )}
         </Styled.Header>
 
@@ -590,11 +665,12 @@ export const Swap = ({
           </Styled.CurrencyInfoContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-out'}>
+            {/* Note: Input value is shown as AssetAmount */}
             <Styled.AssetInput
               title={intl.formatMessage({ id: 'swap.input' })}
               label={balanceLabel}
-              onChange={setChangeAmount}
-              amount={changeAmount}
+              onChange={(value) => setChangeAmount(assetToBase(assetAmount(value)))}
+              amount={baseToAsset(changeAmount).amount()}
               hasError={sourceChainBalanceError || targetChainFeeError}
             />
             {FP.pipe(

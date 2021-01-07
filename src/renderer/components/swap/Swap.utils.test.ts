@@ -1,9 +1,11 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import { AssetRuneNative, assetToString, baseAmount, bn } from '@xchainjs/xchain-util'
+import { assetAmount, AssetRuneNative, assetToBase, assetToString, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
-import { isRuneSwap, getSlip, getSwapResult, getSwapData, pickAssetWithPrice } from './Swap.utils'
+import { ONE_ASSET_BASE_AMOUNT, ZERO_BASE_AMOUNT } from '../../const'
+import { eqBaseAmount } from '../../helpers/fp/eq'
+import { DEFAULT_SWAP_DATA, isRuneSwap, getSlip, getSwapResult, getSwapData, pickAssetWithPrice } from './Swap.utils'
 
 describe('components/swap/utils', () => {
   describe('isRuneSwap', () => {
@@ -59,9 +61,20 @@ describe('components/swap/utils', () => {
 
   describe('getSwapResult', () => {
     it('should return zero result if no poolData', () => {
-      expect(getSwapResult(ASSETS_TESTNET.BNB, ASSETS_TESTNET.BOLT, baseAmount(bn(123)), {})).toEqual(bn(0))
-      expect(getSwapResult(AssetRuneNative, ASSETS_TESTNET.BOLT, baseAmount(bn(123)), {})).toEqual(bn(0))
-      expect(getSwapResult(ASSETS_TESTNET.BNB, AssetRuneNative, baseAmount(bn(123)), {})).toEqual(bn(0))
+      expect(
+        eqBaseAmount.equals(
+          getSwapResult(ASSETS_TESTNET.BNB, ASSETS_TESTNET.BOLT, baseAmount(123), {}),
+          ZERO_BASE_AMOUNT
+        )
+      ).toBeTruthy()
+
+      expect(
+        eqBaseAmount.equals(getSwapResult(AssetRuneNative, ASSETS_TESTNET.BOLT, baseAmount(123), {}), ZERO_BASE_AMOUNT)
+      ).toBeTruthy()
+
+      expect(
+        eqBaseAmount.equals(getSwapResult(ASSETS_TESTNET.BNB, AssetRuneNative, baseAmount(123), {}), ZERO_BASE_AMOUNT)
+      ).toBeTruthy()
     })
 
     it('should calculate swap output when data enabled', () => {
@@ -84,23 +97,27 @@ describe('components/swap/utils', () => {
         }
       }
 
-      expect(getSwapResult(ASSETS_TESTNET.BNB, ASSETS_TESTNET.BOLT, baseAmount(bn(1)), poolsData)).toEqual(bn('0.125'))
+      expect(
+        eqBaseAmount.equals(
+          getSwapResult(ASSETS_TESTNET.BNB, ASSETS_TESTNET.BOLT, baseAmount(1), poolsData),
+          assetToBase(assetAmount('0.125'))
+        )
+      ).toBeTruthy()
 
-      expect(getSwapResult(AssetRuneNative, ASSETS_TESTNET.BOLT, baseAmount(bn(1)), poolsData)).toEqual(bn('0.125'))
-
-      expect(getSwapResult(ASSETS_TESTNET.FTM, AssetRuneNative, baseAmount(bn(1)), poolsData)).toEqual(bn('1.33332444'))
+      expect(
+        eqBaseAmount.equals(
+          getSwapResult(ASSETS_TESTNET.FTM, AssetRuneNative, baseAmount(1), poolsData),
+          assetToBase(assetAmount('1.33332444'))
+        )
+      ).toBeTruthy()
     })
   })
 
   describe('getSwapData', () => {
-    const defaultValue = {
-      slip: bn(0),
-      swapResult: bn(0)
-    }
     it('should return default value', () => {
-      expect(getSwapData(bn(1), O.none, O.none, {})).toEqual(defaultValue)
-      expect(getSwapData(bn(1), O.some(ASSETS_TESTNET.FTM), O.none, {})).toEqual(defaultValue)
-      expect(getSwapData(bn(1), O.none, O.some(ASSETS_TESTNET.FTM), {})).toEqual(defaultValue)
+      expect(getSwapData(ONE_ASSET_BASE_AMOUNT, O.none, O.none, {})).toEqual(DEFAULT_SWAP_DATA)
+      expect(getSwapData(ONE_ASSET_BASE_AMOUNT, O.some(ASSETS_TESTNET.FTM), O.none, {})).toEqual(DEFAULT_SWAP_DATA)
+      expect(getSwapData(ONE_ASSET_BASE_AMOUNT, O.none, O.some(ASSETS_TESTNET.FTM), {})).toEqual(DEFAULT_SWAP_DATA)
     })
 
     it('should calculate swap data', () => {
@@ -115,10 +132,15 @@ describe('components/swap/utils', () => {
         }
       }
 
-      expect(getSwapData(bn(0.0001), O.some(ASSETS_TESTNET.BNB), O.some(AssetRuneNative), poolsData)).toEqual({
-        slip: bn('0.00332225913621262458'),
-        swapResult: bn('0.00013245')
-      })
+      const { slip, swapResult } = getSwapData(
+        assetToBase(assetAmount(0.0001)),
+        O.some(ASSETS_TESTNET.BNB),
+        O.some(AssetRuneNative),
+        poolsData
+      )
+
+      expect(slip.isEqualTo(bn('0.00332225913621262458'))).toBeTruthy()
+      expect(eqBaseAmount.equals(swapResult, baseAmount('13245'))).toBeTruthy()
     })
   })
 

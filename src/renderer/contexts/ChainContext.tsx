@@ -16,11 +16,12 @@ import {
   removeAllLedgerAddress,
   reloadSwapFees,
   swapFees$,
-  sendTx,
+  subscribeTx,
   txRD$,
   resetTx,
   getExplorerUrlByAsset$,
-  assetAddress$
+  assetAddress$,
+  swap$
 } from '../services/chain'
 
 type ChainContextValue = {
@@ -39,11 +40,12 @@ type ChainContextValue = {
   removeAllLedgerAddress: typeof removeAllLedgerAddress
   reloadSwapFees: typeof reloadSwapFees
   swapFees$: typeof swapFees$
-  sendTx: typeof sendTx
+  subscribeTx: typeof subscribeTx
   txRD$: typeof txRD$
   resetTx: typeof resetTx
   getExplorerUrlByAsset$: typeof getExplorerUrlByAsset$
   assetAddress$: typeof assetAddress$
+  swap$: typeof swap$
 }
 
 const initialContext: ChainContextValue = {
@@ -62,11 +64,12 @@ const initialContext: ChainContextValue = {
   removeAllLedgerAddress,
   reloadSwapFees: reloadSwapFees,
   swapFees$,
-  sendTx,
+  subscribeTx,
   txRD$,
   resetTx,
   getExplorerUrlByAsset$,
-  assetAddress$
+  assetAddress$,
+  swap$
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 
