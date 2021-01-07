@@ -78,6 +78,11 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
           liveData.map((txHash) =>
             setState({ ...getState(), txHash, txRD: RD.success(O.getOrElse(() => '')(txHash)) })
           ),
+          // Add failures to state
+          liveData.mapLeft((apiError) => {
+            setState({ ...getState(), txRD: RD.failure(apiError) })
+            return apiError
+          }),
           // handle errors
           RxOp.catchError((error) => {
             setState({ ...getState(), txRD: RD.failure(error) })

@@ -340,7 +340,16 @@ export const Swap = ({
 
         // TODO (@Veado) Add i18n
         const stepLabels = ['Health check...', 'Send swap transaction...', 'Check swap result...']
-        const stepLabel = RD.isPending(swapState.txRD) ? stepLabels[swapState.step - 1] : 'Done!'
+        const stepLabel = FP.pipe(
+          swapState.txRD,
+          RD.fold(
+            () => '',
+            () => stepLabels[swapState.step - 1],
+            () => '',
+            () => 'Done!'
+          )
+        )
+
         return (
           <>
             <Styled.StepContainer>
