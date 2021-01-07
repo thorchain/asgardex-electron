@@ -53,7 +53,9 @@ const getStoredSelectedPricePoolAsset = (): SelectedPricePoolAsset =>
     O.chain(O.fromNullable),
     O.filter(isPricePoolAsset)
   )
-
+/**
+ * @deprecated Use `AssetRuneNative` only
+ */
 const runeAsset$: Rx.Observable<Asset> = network$.pipe(RxOp.map((network) => getRuneAsset({ network, chain: 'BNB' })))
 
 const createPoolsService = (
@@ -422,6 +424,7 @@ const createPoolsService = (
     Rx.of(null).pipe(
       RxOp.delay(1500),
       RxOp.map((_) => RD.success(true)),
+      // RxOp.map((_) => RD.failure({ errorId: ErrorId.GET_BALANCES, msg: 'invalid node ' })),
       RxOp.startWith(RD.initial)
     )
 
