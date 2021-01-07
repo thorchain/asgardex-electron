@@ -5,11 +5,10 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
-import { FeeLD, Memo } from '../chain/types'
+import { Memo } from '../chain/types'
 import { Client$, FeesWithRatesRD } from './types'
-import { FeesService, FeeRateLD, FeesWithRatesLD } from './types'
+import { FeesService, FeesWithRatesLD } from './types'
 
 /**
  * The only thing we export from this module is this factory
@@ -61,38 +60,9 @@ export const createFeesService = (oClient$: Client$): FeesService => {
       RxOp.shareReplay(1)
     )
 
-  // `TriggerStream` to reload deposit `fees`
-  const { stream$: reloadDepositFee$, trigger: reloadDepositFee } = triggerStream()
-
-  /**
-   * Factory to create a stream to get fastest `Fee`
-   * for pool related transactions (swap / deposit / withdraw)
-   * @param memo Memo used for pool transactions
-   */
-  const poolFee$ = (memo: Memo): FeeLD =>
-    FP.pipe(
-      reloadDepositFee$,
-      RxOp.switchMap(() => memoFees$(memo)),
-      liveData.map(({ fees }) => fees.fast)
-    )
-  /**
-   * Factory to create a stream to get fastest `FeeRate`
-   * for pool related transactions (swap / deposit / withdraw)
-   * @param memo Memo used for pool transactions
-   */
-  const poolFeeRate$ = (memo: Memo): FeeRateLD =>
-    FP.pipe(
-      reloadDepositFee$,
-      RxOp.switchMap(() => memoFees$(memo)),
-      liveData.map(({ rates }) => rates.fast)
-    )
-
   return {
     fees$,
-    poolFee$,
     memoFees$,
-    poolFeeRate$,
-    reloadFees,
-    reloadDepositFee
+    reloadFees
   }
 }

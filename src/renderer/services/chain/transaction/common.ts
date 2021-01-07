@@ -18,7 +18,7 @@ import { SendTxParams } from '../types'
  */
 const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
-const sendTx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => {
+const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }: SendTxParams): TxLD => {
   // helper to create `RemoteData<ApiError, never>` observable
   const txFailure$ = (msg: string) =>
     Rx.of(
@@ -34,12 +34,12 @@ const sendTx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD
 
     case BTCChain:
       return FP.pipe(
-        BTC.poolFeeRate$(memo),
+        BTC.memoFees$(memo),
         liveData.mapLeft((error) => ({
           errorId: ErrorId.GET_FEES,
           msg: error?.message ?? error.toString()
         })),
-        liveData.chain((feeRate) => BTC.sendTx({ recipient, amount, feeRate, memo }))
+        liveData.chain(({ rates }) => BTC.sendTx({ recipient, amount, feeRate: rates[feeOptionKey], memo }))
       )
 
     case ETHChain:
@@ -68,8 +68,8 @@ const sendTx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD
  * Don't subscribe different txs to store it into (same) state
  * Create different functions to swap (in `services/chain/transaction/swap), to deposit, to withdraw etc.
  */
-const subscribeTx = ({ asset, recipient, amount, memo, txType }: SendTxParams): void => {
-  sendTx$({ asset, recipient, amount, memo, txType }).subscribe(setTxRD)
+const subscribeTx = (params: SendTxParams): void => {
+  sendTx$(params).subscribe(setTxRD)
 }
 
 const resetTx = () => {
