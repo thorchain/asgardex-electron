@@ -138,8 +138,8 @@ export const chainBalances$: ChainBalances$ = Rx.combineLatest([
   thorChainBalance$,
   btcChainBalance$,
   btcLedgerChainBalance$,
-  bnbChainBalance$,
-  ethChainBalance$
+  ethChainBalance$,
+  bnbChainBalance$
 ])
 
 /**
