@@ -36,8 +36,8 @@ const sendTx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD
       return FP.pipe(
         BTC.poolFeeRate$(memo),
         liveData.mapLeft((error) => ({
-          errorId: ErrorId.GET_BALANCES,
-          msg: error?.message ?? 'Fee rate for sending BTC transaction not available'
+          errorId: ErrorId.GET_FEES,
+          msg: error?.message ?? error.toString()
         })),
         liveData.chain((feeRate) => BTC.sendTx({ recipient, amount, feeRate, memo }))
       )
