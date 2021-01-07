@@ -9,7 +9,6 @@ import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../shared/mock/wallet'
 import { ONE_BN } from '../../const'
-import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { Swap, SwapProps } from './Swap'
 
@@ -71,7 +70,6 @@ const defaultProps: SwapProps = {
   goToTransaction: (txHash) => {
     console.log(txHash)
   },
-  activePricePool: RUNE_PRICE_POOL,
   // mock password validation
   // Password: "123"
   validatePassword$: mockValidatePassword$,

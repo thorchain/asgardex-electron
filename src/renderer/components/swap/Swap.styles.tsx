@@ -88,7 +88,7 @@ export const ValueItemContainer = styled('div')`
     }
 
     &-in {
-      align-items: middle;
+      align-items: center;
     }
   }
 
@@ -182,16 +182,15 @@ export const CoinDataWrapper = styled(Row).attrs({
   align: 'middle'
 })``
 
-export const CoinDataContainer = styled(Row).attrs({
+export const StepBarContainer = styled(Row).attrs({
   align: 'middle'
-})`
-  padding-left: 20px;
+})``
+
+export const AssetDataContainer = styled.div`
+  padding: 0 20px;
 `
 
-export const AssetDataWrapper = styled(Row).attrs({
-  align: 'middle'
-})`
-  width: 100%;
+export const AssetDataWrapper = styled.div`
   margin-bottom: 30px;
 
   &:last-child {

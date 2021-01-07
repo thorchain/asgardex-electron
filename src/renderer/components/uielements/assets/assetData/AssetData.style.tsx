@@ -8,9 +8,7 @@ export type AssetDataSize = 'small' | 'big'
 
 export const Wrapper = styled(Row).attrs({
   align: 'middle'
-})`
-  width: 100%;
-`
+})``
 
 export const AssetIcon = styled(UIAssetIcon)``
 
