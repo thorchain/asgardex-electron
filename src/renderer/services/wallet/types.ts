@@ -78,11 +78,12 @@ export type ResetTxsPageHandler = () => void
 export type LoadBalancesHandler = () => void
 
 export enum ErrorId {
-  GET_BALANCES,
-  GET_ASSET_TXS,
-  SEND_TX,
-  GET_TX_STATUS,
-  SEND_LEDGER_TX
+  GET_BALANCES = 'GET_BALANCES',
+  GET_FEES = 'GET_FEES',
+  GET_ASSET_TXS = 'GET_ASSET_TXS',
+  SEND_TX = 'SEND_TX',
+  GET_TX_STATUS = 'GET_TX_STATUS',
+  SEND_LEDGER_TX = 'SEND_LEDGER_TX'
 }
 
 // TODO(@Veado) Move type to clients/type

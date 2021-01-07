@@ -1,9 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BNBChain, BTCChain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
+import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
@@ -34,13 +34,12 @@ const sendTx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD
 
     case BTCChain:
       return FP.pipe(
-        BTC.getPoolFeeRate(),
-        RD.toOption,
-        O.fold(
-          // TODO (@veado) i18n
-          () => txFailure$('Fee rate for BTC transaction not available'),
-          (feeRate) => BTC.sendTx({ recipient, amount, feeRate, memo })
-        )
+        BTC.poolFeeRate$(memo),
+        liveData.mapLeft((error) => ({
+          errorId: ErrorId.GET_BALANCES,
+          msg: error?.message ?? 'Fee rate for sending BTC transaction not available'
+        })),
+        liveData.chain((feeRate) => BTC.sendTx({ recipient, amount, feeRate, memo }))
       )
 
     case ETHChain:

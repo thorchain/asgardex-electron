@@ -22,7 +22,7 @@ const withdrawFeeByChain$ = (chain: Chain): FeeLD => {
     case 'BNB':
       return BNB.fees$.pipe(liveData.map(({ fast }) => fast))
     case 'BTC':
-      // deposit fee for BTC txs based on withdraw memo
+      // withdraw fee for BTC txs based on withdraw memo
       return getWithdrawMemo$.pipe(
         RxOp.switchMap((oMemo) =>
           FP.pipe(
