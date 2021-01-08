@@ -34,7 +34,6 @@ import { SwapFeesRD, SwapState, SwapStateHandler } from '../../services/chain/ty
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../services/wallet/types'
-import { PricePool } from '../../views/pools/Pools.types'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
@@ -58,7 +57,6 @@ export type SwapProps = {
   poolDetails: PoolDetails
   walletBalances: O.Option<NonEmptyWalletBalances>
   goToTransaction: (txHash: string) => void
-  activePricePool: PricePool
   validatePassword$: ValidatePasswordHandler
   reloadFees: FP.Lazy<void>
   reloadBalances: FP.Lazy<void>
@@ -76,7 +74,6 @@ export const Swap = ({
   poolDetails,
   walletBalances,
   goToTransaction = (_) => {},
-  activePricePool,
   validatePassword$,
   reloadFees = FP.constVoid,
   reloadBalances = FP.constVoid,
@@ -325,18 +322,8 @@ export const Swap = ({
     return FP.pipe(
       sequenceTOption(oSourceAssetWP, oTargetAssetWP),
       O.map(([sourceAssetWP, targetAssetWP]) => {
-        const basePriceAsset = activePricePool.asset
         const targetAsset = targetAssetWP.asset
         const sourceAsset = sourceAssetWP.asset
-
-        const swapResultByBasePriceAsset =
-          poolData[assetToString(targetAsset)] &&
-          // Convert swapResult to the selected price asset values
-          getValueOfAsset1InAsset2(swapData.swapResult, poolData[assetToString(targetAsset)], activePricePool.poolData)
-
-        const amountToSwapInSelectedPriceAsset =
-          poolData[assetToString(sourceAsset)] &&
-          getValueOfAsset1InAsset2(changeAmount, poolData[assetToString(sourceAsset)], activePricePool.poolData)
 
         // TODO (@Veado) Add i18n
         const stepLabels = ['Health check...', 'Send swap transaction...', 'Check swap result...']
@@ -356,15 +343,17 @@ export const Swap = ({
               <Styled.StepLabel>{stepLabel}</Styled.StepLabel>
             </Styled.StepContainer>
             <Styled.CoinDataWrapper>
-              <StepBar size={50} />
-              <Styled.CoinDataContainer>
-                <AssetData
-                  priceBaseAsset={basePriceAsset}
-                  asset={sourceAsset}
-                  price={amountToSwapInSelectedPriceAsset}
-                />
-                <AssetData priceBaseAsset={basePriceAsset} asset={targetAsset} price={swapResultByBasePriceAsset} />
-              </Styled.CoinDataContainer>
+              <Styled.StepBarContainer>
+                <StepBar size={50} />
+              </Styled.StepBarContainer>
+              <Styled.AssetDataContainer>
+                <Styled.AssetDataWrapper>
+                  <AssetData asset={sourceAsset} amount={changeAmount} />
+                </Styled.AssetDataWrapper>
+                <Styled.AssetDataWrapper>
+                  <AssetData asset={targetAsset} amount={swapData.swapResult} />
+                </Styled.AssetDataWrapper>
+              </Styled.AssetDataContainer>
             </Styled.CoinDataWrapper>
             <Styled.TrendContainer>
               <Trend amount={swapData.slip} />
@@ -374,18 +363,7 @@ export const Swap = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [
-    oSourceAssetWP,
-    oTargetAssetWP,
-    activePricePool.asset,
-    activePricePool.poolData,
-    poolData,
-    swapData.swapResult,
-    swapData.slip,
-    changeAmount,
-    swapState.txRD,
-    swapState.step
-  ])
+  }, [oSourceAssetWP, oTargetAssetWP, swapData.swapResult, swapData.slip, changeAmount, swapState.txRD, swapState.step])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe
@@ -578,7 +556,7 @@ export const Swap = ({
     return swapData.swapResult.amount().minus(targetFee).isNegative()
   }, [targetChainFeeAmountInTargetAsset, swapData, changeAmount])
 
-  const outputLabel = useMemo(
+  const swapResultLabel = useMemo(
     () =>
       FP.pipe(
         targetAsset,
@@ -605,14 +583,14 @@ export const Swap = ({
             { id: 'swap.errors.amount.outputShouldCoverChainFee' },
             {
               fee: formatAssetAmountCurrency({ amount: feeAssetAmount, asset, trimZeros: true }),
-              amount: outputLabel
+              amount: swapResultLabel
             }
           )}
         </Styled.ErrorLabel>
       )),
       O.getOrElse(() => <></>)
     )
-  }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset, outputLabel])
+  }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset, swapResultLabel])
 
   const fees: UIFeesRD = useMemo(
     () =>
@@ -690,10 +668,10 @@ export const Swap = ({
             <Styled.SwapOutlined disabled={!canSwitchAssets} onClick={onSwitchAssets} />
           </Styled.ValueItemContainer>
           <Styled.ValueItemContainer className={'valueItemContainer-in'}>
-            <Styled.InValue>
+            <Styled.InValueContainer>
               <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}:</Styled.InValueTitle>
-              <div>{outputLabel}</div>
-            </Styled.InValue>
+              <Styled.InValueLabel>{swapResultLabel}</Styled.InValueLabel>
+            </Styled.InValueContainer>
             {FP.pipe(
               targetAsset,
               O.fold(

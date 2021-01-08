@@ -20,7 +20,6 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { SwapRouteParams } from '../../routes/swap'
 import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
 import { PoolAddressRx } from '../../services/midgard/types'
@@ -36,7 +35,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, reloadPools, selectedPricePool$, poolAddressByAsset$ },
+    pools: { poolsState$, reloadPools, poolAddressByAsset$ },
     setSelectedPoolAsset
   } = midgardService
   const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, assetAddress$, swap$ } = useChainContext()
@@ -60,8 +59,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       setSelectedPoolAsset(O.none)
     }
   }, [oTarget, setSelectedPoolAsset])
-
-  const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
@@ -147,7 +144,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
               return (
                 <Swap
                   validatePassword$={validatePassword$}
-                  activePricePool={selectedPricePool}
                   goToTransaction={goToTransaction}
                   sourceAsset={oSource}
                   targetAsset={oTarget}
