@@ -24,10 +24,10 @@ describe('helpers/fp/ord', () => {
   })
   describe('ordAsset', () => {
     it('is less', () => {
-      expect(ordAsset.compare(AssetRuneNative, AssetBTC)).toEqual(-1)
+      expect(ordAsset.compare(AssetRuneNative, AssetBTC)).toEqual(1)
     })
     it('is grreater', () => {
-      expect(ordAsset.compare(AssetBTC, AssetRuneNative)).toEqual(1)
+      expect(ordAsset.compare(AssetBTC, AssetRuneNative)).toEqual(-1)
     })
     it('is equal', () => {
       expect(ordAsset.compare(AssetBTC, AssetBTC)).toEqual(0)
