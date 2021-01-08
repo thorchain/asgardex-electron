@@ -20,8 +20,8 @@ storiesOf('Components/Assets/AssetPair', module)
     const size = radios('size', sizeOptions, 'small')
     return (
       <div style={{ display: 'flex' }}>
-        <AssetPair from={ASSETS_MAINNET.RUNE} to={ASSETS_MAINNET.BNB} size={size} />
-        <AssetPair from={ASSETS_MAINNET.RUNE} to={ASSETS_MAINNET.BNB} size={size} />
+        <AssetPair from={ASSETS_MAINNET.FTM} to={ASSETS_MAINNET.BNB} size={size} />
+        <AssetPair from={ASSETS_MAINNET.FTM} to={ASSETS_MAINNET.BNB} size={size} />
       </div>
     )
   })

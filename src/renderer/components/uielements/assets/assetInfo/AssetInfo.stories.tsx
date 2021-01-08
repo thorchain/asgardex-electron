@@ -8,8 +8,8 @@ import { AssetInfo } from './AssetInfo'
 
 storiesOf('Wallet/AssetInfo', module)
   .add('default', () => {
-    return <AssetInfo assetsWB={O.none} asset={O.some(ASSETS_TESTNET.RUNE)} />
+    return <AssetInfo assetsWB={O.none} asset={O.some(ASSETS_TESTNET.FTM)} />
   })
   .add('w/o price', () => {
-    return <AssetInfo asset={O.some(ASSETS_TESTNET.RUNE)} />
+    return <AssetInfo asset={O.some(ASSETS_TESTNET.FTM)} />
   })

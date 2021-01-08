@@ -29,7 +29,6 @@ storiesOf('Components/FilterMenu', module).add('coins example', () => {
       asset="TOMOB-1E1"
       data={
         [
-          { asset: ASSETS_MAINNET.RUNE, amount: ONE_ASSET_BASE_AMOUNT },
           { asset: ASSETS_MAINNET.FTM, amount: ONE_ASSET_BASE_AMOUNT },
           { asset: ASSETS_MAINNET.TOMO, amount: ONE_ASSET_BASE_AMOUNT },
           { asset: ASSETS_MAINNET.BNB, amount: assetToBase(assetAmount(0.00387)) }

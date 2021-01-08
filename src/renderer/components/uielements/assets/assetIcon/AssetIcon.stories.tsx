@@ -26,7 +26,6 @@ storiesOf('Components/assets/AssetIcon', module).add('default', () => {
       <div style={{ display: 'flex' }}>
         <AssetIcon asset={ASSETS_MAINNET.BNB} size={size} />
         <AssetIcon asset={ASSETS_MAINNET.BOLT} size={size} />
-        <AssetIcon asset={ASSETS_MAINNET.RUNE} size={size} />
         <AssetIcon asset={ASSETS_MAINNET.FTM} size={size} />
         <AssetIcon asset={ASSETS_MAINNET.TOMO} size={size} />
       </div>

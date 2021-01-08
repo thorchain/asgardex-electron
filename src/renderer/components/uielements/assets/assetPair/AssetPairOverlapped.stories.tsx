@@ -25,7 +25,6 @@ storiesOf('Components/assets/AssetPairOverlapped', module)
       <div>
         <div style={{ display: 'flex' }}>
           <AssetPairOverlapped asset={ASSETS_MAINNET.BNB} target={ASSETS_MAINNET.BOLT} size={size} />
-          <AssetPairOverlapped asset={ASSETS_MAINNET.BNB} target={ASSETS_MAINNET.RUNE} size={size} />
           <AssetPairOverlapped asset={ASSETS_MAINNET.BNB} target={ASSETS_MAINNET.FTM} size={size} />
           <AssetPairOverlapped asset={ASSETS_MAINNET.BNB} target={ASSETS_MAINNET.TOMO} size={size} />
         </div>

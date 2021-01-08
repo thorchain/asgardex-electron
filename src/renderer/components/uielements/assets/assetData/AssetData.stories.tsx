@@ -16,7 +16,6 @@ storiesOf('Components/assets/AssetData', module).add('default', () => {
       <AssetData asset={ASSETS_MAINNET.BNB} price={price} />
       <AssetData asset={ASSETS_MAINNET.BNB} assetValue={assetValue} price={price} />
       <AssetData asset={ASSETS_MAINNET.FTM} assetValue={assetValue} price={price} />
-      <AssetData asset={ASSETS_MAINNET.RUNE} assetValue={assetValue} price={price} />
       <AssetData asset={ASSETS_MAINNET.BOLT} assetValue={assetValue} price={price} />
       <AssetData asset={ASSETS_MAINNET.TOMO} assetValue={assetValue} price={price} />
       <AssetData
