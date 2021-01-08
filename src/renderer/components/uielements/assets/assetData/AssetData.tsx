@@ -1,82 +1,59 @@
 import React from 'react'
 
-import {
-  BaseAmount,
-  formatAssetAmountCurrency,
-  baseToAsset,
-  formatAssetAmount,
-  baseAmount,
-  Asset
-} from '@xchainjs/xchain-util'
+import { BaseAmount, formatAssetAmountCurrency, baseToAsset, baseAmount, Asset } from '@xchainjs/xchain-util'
+import { Col } from 'antd'
 
 import { PricePoolAsset } from '../../../../views/pools/Pools.types'
-import { Label } from '../../label'
-import { AssetIcon } from '../assetIcon'
-import { CoinDataWrapper, CoinDataWrapperType, CoinDataWrapperSize } from './AssetData.style'
+import * as Styled from './AssetData.style'
+
+/**
+ * AssetData - Component to show data of an asset:
+ *
+ * |------|-------------------|-------------------|------------------|
+ * | icon | ticker (optional) | amount (optional) | price (optional) |
+ * |------|-------------------|-------------------|------------------|
+ *
+ */
 
 type Props = {
   asset: Asset
-  assetValue?: BaseAmount
-  target?: Asset
-  targetValue?: BaseAmount
+  noTicker?: boolean
+  amount?: BaseAmount
   price?: BaseAmount
-  // Asset which was used for calculating price
-  // Usually it's an asset from PriceSelector
-  priceBaseAsset?: PricePoolAsset
-  priceValid?: boolean
-  size?: CoinDataWrapperSize
-  type?: CoinDataWrapperType
+  priceAsset?: PricePoolAsset
+  size?: Styled.AssetDataSize
 }
 
 export const AssetData: React.FC<Props> = (props): JSX.Element => {
-  const {
-    asset,
-    assetValue,
-    target,
-    targetValue,
-    price = baseAmount(0),
-    priceBaseAsset,
-    priceValid = true,
-    size = 'small',
-    type = 'normal'
-  } = props
+  const { asset, amount: assetAmount, noTicker = false, price = baseAmount(0), priceAsset, size = 'small' } = props
 
-  const formattedPrice = priceBaseAsset
-    ? formatAssetAmountCurrency({ amount: baseToAsset(price), asset: priceBaseAsset, trimZeros: true })
+  const priceLabel = priceAsset
+    ? formatAssetAmountCurrency({ amount: baseToAsset(price), asset: priceAsset, trimZeros: true })
     : ''
-  // @TODO (@thatStrangeGuy) add valid formatters
-  const priceLabel = priceValid && formattedPrice !== '$ 0.00' ? formattedPrice : ''
 
   return (
-    <CoinDataWrapper size={size} type={type}>
-      {asset && <AssetIcon className="coinData-coin-avatar" asset={asset} size={size} />}
-      <div className="coinData-asset-info">
-        <Label className="coinData-asset-label" weight="600">
-          {`${asset.ticker} ${target ? ':' : ''}`}
-        </Label>
-        {assetValue && (
-          <Label className="coinData-asset-value" weight="600">
-            {formatAssetAmount({ amount: baseToAsset(assetValue), trimZeros: true })}
-          </Label>
-        )}
-      </div>
-      {target && (
-        <div className="coinData-target-info">
-          <Label className="coinData-target-label" weight="600">
-            {target.ticker}
-          </Label>
-          {targetValue && (
-            <Label className="coinData-target-value" weight="600">
-              {formatAssetAmount({ amount: baseToAsset(targetValue), trimZeros: true })}
-            </Label>
-          )}
-        </div>
+    <Styled.Wrapper>
+      <Col>
+        <Styled.AssetIcon asset={asset} size={size} />
+      </Col>
+      {!noTicker && (
+        <Col>
+          <Styled.TickerLabel size={size}>{asset.ticker}</Styled.TickerLabel>
+        </Col>
       )}
-      <div className="asset-price-info">
-        <Label size="small" color="gray" weight="bold">
-          {priceLabel}
-        </Label>
-      </div>
-    </CoinDataWrapper>
+      {assetAmount && (
+        <Col>
+          <Styled.AmountLabel size={size}>
+            {formatAssetAmountCurrency({ amount: baseToAsset(assetAmount), asset, trimZeros: true })}
+          </Styled.AmountLabel>
+        </Col>
+      )}
+
+      {!!priceLabel && (
+        <Col>
+          <Styled.PriceLabel size={size}>{priceLabel}</Styled.PriceLabel>
+        </Col>
+      )}
+    </Styled.Wrapper>
   )
 }
