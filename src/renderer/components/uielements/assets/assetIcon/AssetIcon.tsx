@@ -4,7 +4,7 @@ import { LoadingOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset } from '@xchainjs/xchain-util'
 
-import { isBnbAsset, isBtcAsset, isEthAsset, isRuneNativeAsset } from '../../../../helpers/assetHelper'
+import { isBnbAsset, isBtcAsset, isEthAsset, isRuneBnbAsset, isRuneNativeAsset } from '../../../../helpers/assetHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
 import { bnbIcon, btcIcon, ethIcon, runeIcon } from '../../../icons'

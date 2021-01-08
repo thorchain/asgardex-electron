@@ -1,5 +1,6 @@
 import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@xchainjs/xchain-util'
 
+import { Network } from '../../shared/api/types'
 import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { eqAsset } from './fp/eq'
@@ -34,6 +35,10 @@ export const BTC_DECIMAL = 8
  * 0.000000000000000001 ether == 1 wei
  * */
 export const ETH_DECIMAL = 18
+
+export const getBnbRuneAsset = (network: Network = 'testnet'): Asset => {
+  return network === 'testnet' ? AssetRune67C : AssetRuneB1A
+}
 
 export const isRuneBnbAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetRune67C) || eqAsset.equals(asset, AssetRuneB1A)
