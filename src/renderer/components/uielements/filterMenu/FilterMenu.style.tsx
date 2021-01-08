@@ -21,4 +21,8 @@ export const Menu = styled(AntdMenu)`
     align-items: center;
     color: ${palette('text', 0)};
   }
+
+  .ant-menu-item {
+    height: auto;
+  }
 `
