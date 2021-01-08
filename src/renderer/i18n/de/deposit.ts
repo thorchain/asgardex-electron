@@ -9,6 +9,9 @@ const deposit: DepositMessages = {
   'deposit.totalEarnings': 'Deine Gesamteinkommen vom Pool',
   'deposit.add.asym': '{asset} hinzufügen',
   'deposit.add.sym': '{assetA} + {assetB} hinzufügen',
+  'deposit.add.state.pending': 'Einzahlen',
+  'deposit.add.state.success': 'Erfolgreich eingezahlt',
+  'deposit.add.state.error': 'Error beim Einzahlen',
   'deposit.add.error.chainFeeNotCovered':
     'Gebühren in Höhe von {fee} sind nicht über Dein Guthaben gedeckt: {balance}.',
   'deposit.add.error.nobalances': 'Kein Guthaben',
