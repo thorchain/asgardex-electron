@@ -12,7 +12,7 @@ storiesOf('Components/Drag', module)
       <div style={{ padding: '20px' }}>
         <Drag
           source={ASSETS_MAINNET.BNB}
-          target={ASSETS_MAINNET.FTM}
+          target={ASSETS_MAINNET.RUNE}
           title="Drag to swap"
           onConfirm={() => alert('Confirmed!')}
         />

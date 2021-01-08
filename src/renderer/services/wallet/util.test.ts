@@ -1,4 +1,4 @@
-import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative, baseAmount, RUNE_TICKER } from '@xchainjs/xchain-util'
+import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
 import { some, none } from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -167,7 +167,7 @@ describe('services/wallet/util/', () => {
           walletAddress: 'ADDRESS_RUNENATIVE'
         }
       ]
-      const balances = sortBalances(target, [AssetBTC.ticker, AssetETH.ticker, RUNE_TICKER, AssetBNB.ticker])
+      const balances = sortBalances(target, [AssetBTC.ticker, AssetETH.ticker, AssetRuneNative.ticker, AssetBNB.ticker])
       expect(eqWalletBalances.equals(balances, [target[4], target[3], target[1], target[2], target[0]])).toBeTruthy()
     })
   })

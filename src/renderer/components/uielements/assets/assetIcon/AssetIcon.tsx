@@ -29,7 +29,7 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
       return ethIcon
     }
     // RUNE
-    if (isRuneNativeAsset(asset)) {
+    if (isRuneBnbAsset(asset) || isRuneNativeAsset(asset)) {
       return runeIcon
     }
     // BNB

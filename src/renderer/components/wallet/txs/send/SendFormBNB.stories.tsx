@@ -4,6 +4,7 @@ import { storiesOf } from '@storybook/react'
 import {
   assetAmount,
   AssetBNB,
+  AssetRune67C,
   assetToBase,
   assetToString,
   baseToAsset,
@@ -23,7 +24,13 @@ const bnbAsset: WalletBalance = {
   walletAddress: 'AssetBNB wallet address'
 }
 
-const balances: WalletBalances = [bnbAsset]
+const runeAsset: WalletBalance = {
+  asset: AssetRune67C,
+  amount: assetToBase(assetAmount(2)),
+  walletAddress: 'AssetRune67C wallet address'
+}
+
+const balances: WalletBalances = [bnbAsset, runeAsset]
 
 const fee = O.some(BNB_TRANSFER_FEES.single)
 
@@ -40,6 +47,15 @@ storiesOf('Wallet/SendFormBNB', module)
   .add('send bnb', () => (
     <SendFormBNB
       balance={bnbAsset}
+      balances={balances}
+      onSubmit={onSubmitHandler}
+      addressValidation={addressValidation}
+      fee={fee}
+    />
+  ))
+  .add('send rune', () => (
+    <SendFormBNB
+      balance={runeAsset}
       balances={balances}
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}

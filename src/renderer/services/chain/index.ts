@@ -1,6 +1,5 @@
 import { addressByChain$, assetAddress$ } from './address'
 import { clientByChain$ } from './client'
-import { isCrossChainDeposit$ } from './common'
 import { getExplorerUrlByAsset$ } from './explorerUrl'
 import {
   reloadDepositFees,
@@ -26,7 +25,6 @@ export {
   withdrawFees$,
   reloadWithdrawFees,
   reloadDepositFeesEffect$,
-  isCrossChainDeposit$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   retrieveLedgerAddress,

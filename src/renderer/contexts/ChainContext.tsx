@@ -5,7 +5,6 @@ import {
   clientByChain$,
   depositFees$,
   reloadDepositFees,
-  isCrossChainDeposit$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   withdrawFees$,
@@ -29,7 +28,6 @@ type ChainContextValue = {
   withdrawFees$: typeof withdrawFees$
   reloadWithdrawFees: typeof reloadWithdrawFees
   reloadDepositFeesEffect$: typeof reloadDepositFeesEffect$
-  isCrossChainDeposit$: typeof isCrossChainDeposit$
   symDepositTxMemo$: typeof symDepositTxMemo$
   asymDepositTxMemo$: typeof asymDepositTxMemo$
   retrieveLedgerAddress: typeof retrieveLedgerAddress
@@ -50,7 +48,6 @@ const initialContext: ChainContextValue = {
   withdrawFees$,
   reloadWithdrawFees,
   reloadDepositFeesEffect$,
-  isCrossChainDeposit$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   retrieveLedgerAddress,
