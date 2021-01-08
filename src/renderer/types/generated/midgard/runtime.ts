@@ -136,14 +136,6 @@ export class BaseAPI {
         Object.assign(Object.create(Object.getPrototypeOf(this)), this);
 }
 
-/**
- * @deprecated
- * export for not being a breaking change
- */
-export class RequiredError extends Error {
-    name: 'RequiredError' = 'RequiredError';
-}
-
 export const COLLECTION_FORMATS = {
     csv: ',',
     ssv: ' ',
@@ -179,15 +171,6 @@ const queryString = (params: HttpQuery): string => Object.keys(params)
 
 // alias fallback for not being a breaking change
 export const querystring = queryString;
-
-/**
- * @deprecated
- */
-export const throwIfRequired = (params: {[key: string]: any}, key: string, nickname: string) => {
-    if (!params || params[key] == null) {
-        throw new RequiredError(`Required parameter ${key} was null or undefined when calling ${nickname}.`);
-    }
-};
 
 export const throwIfNullOrUndefined = (value: any, nickname?: string) => {
     if (value == null) {
