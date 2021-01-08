@@ -8,10 +8,8 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getRuneAsset } from '../../helpers/assetHelper'
 import { eqBalancesRD } from '../../helpers/fp/eq'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
-import { network$ } from '../app/service'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import { WalletBalancesRD } from '../clients'
@@ -63,14 +61,14 @@ const thorChainBalance$: ChainBalance$ = Rx.combineLatest([THOR.address$, THOR.b
 /**
  * Transforms BNB balances into `ChainBalances`
  */
-const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([BNB.address$, BNB.balances$, network$]).pipe(
-  RxOp.map(([walletAddress, balances, network]) => ({
+const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([BNB.address$, BNB.balances$]).pipe(
+  RxOp.map(([walletAddress, balances]) => ({
     walletType: 'keystore',
     chain: BNBChain,
     walletAddress,
     balances: FP.pipe(
       balances,
-      RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getRuneAsset({ network, chain: 'BNB' }).ticker]))
+      RD.map((assets) => sortBalances(assets, [AssetBNB.ticker]))
     )
   }))
 )

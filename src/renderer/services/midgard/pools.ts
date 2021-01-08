@@ -11,7 +11,7 @@ import { combineLatest } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
-import { getRuneAsset, isPricePoolAsset } from '../../helpers/assetHelper'
+import { isPricePoolAsset } from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
@@ -23,7 +23,6 @@ import {
   GetSwapHistoryIntervalEnum
 } from '../../types/generated/midgard/apis'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
-import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import {
   AssetDetailsLD,
@@ -53,10 +52,6 @@ const getStoredSelectedPricePoolAsset = (): SelectedPricePoolAsset =>
     O.chain(O.fromNullable),
     O.filter(isPricePoolAsset)
   )
-/**
- * @deprecated Use `AssetRuneNative` only
- */
-const runeAsset$: Rx.Observable<Asset> = network$.pipe(RxOp.map((network) => getRuneAsset({ network, chain: 'BNB' })))
 
 const createPoolsService = (
   byzantine$: LiveData<Error, string>,
@@ -438,7 +433,6 @@ const createPoolsService = (
     reloadPools,
     poolAddresses$,
     selectedPoolAddress$,
-    runeAsset$,
     poolDetail$,
     priceRatio$,
     availableAssets$,
@@ -448,4 +442,4 @@ const createPoolsService = (
   }
 }
 
-export { runeAsset$, createPoolsService, getStoredSelectedPricePoolAsset as getSelectedPricePool }
+export { createPoolsService, getStoredSelectedPricePoolAsset as getSelectedPricePool }

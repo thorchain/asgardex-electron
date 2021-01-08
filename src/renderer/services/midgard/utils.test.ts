@@ -3,7 +3,6 @@ import {
   AssetBNB,
   AssetBTC,
   AssetETH,
-  AssetRune67C,
   AssetRuneNative,
   assetToString,
   BNBChain,
@@ -58,13 +57,8 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('getAssetDetail', () => {
-    const runeDetail = { asset: assetToString(AssetRune67C) } as AssetDetail
     const bnbDetail = { asset: assetToString(AssetBNB) } as AssetDetail
 
-    it('returns details of RUNE', () => {
-      const result = getAssetDetail([runeDetail, bnbDetail], AssetRune67C.ticker)
-      expect(result).toEqual(O.some(runeDetail))
-    })
     it('returns None if no RUNE details available', () => {
       const result = getAssetDetail([bnbDetail], 'TOMOB')
       expect(result).toBeNone()
@@ -200,13 +194,8 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('getPoolDetail', () => {
-    const runeDetail = { asset: assetToString(AssetRune67C) } as PoolDetail
     const bnbDetail = { asset: assetToString(AssetBNB) } as PoolDetail
 
-    it('returns details of RUNE pool', () => {
-      const result = getPoolDetail([runeDetail, bnbDetail], AssetRune67C)
-      expect(result).toEqual(O.some(runeDetail))
-    })
     it('returns None if no RUNE details available', () => {
       const result = getPoolDetail([bnbDetail], AssetBTC)
       expect(result).toBeNone()
@@ -214,11 +203,10 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('getPoolDetailsHashMap', () => {
-    const runeDetail = { asset: assetToString(AssetRune67C) } as PoolDetail
     const bnbDetail = { asset: assetToString(AssetBNB) } as PoolDetail
 
     it('returns hashMap of pool details', () => {
-      const result = getPoolDetailsHashMap([runeDetail, bnbDetail], AssetRune67C)
+      const result = getPoolDetailsHashMap([bnbDetail], AssetBNB)
 
       /**
        * Compare stringified structures 'cause
@@ -228,7 +216,6 @@ describe('services/midgard/utils/', () => {
        */
       expect(JSON.stringify(result)).toEqual(
         JSON.stringify({
-          [assetToString(AssetRune67C)]: toPoolData(runeDetail),
           [assetToString(AssetBNB)]: toPoolData(bnbDetail)
         })
       )

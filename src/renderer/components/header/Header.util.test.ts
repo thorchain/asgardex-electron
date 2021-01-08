@@ -1,4 +1,4 @@
-import { AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@xchainjs/xchain-util'
+import { AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../../const'
@@ -8,8 +8,6 @@ import { toHeaderCurrencyLabel, headerNetStatusSubheadline, headerNetStatusColor
 describe('header/util', () => {
   describe('toHeaderCurrencyItem', () => {
     it('returns label for RUNE', () => {
-      expect(toHeaderCurrencyLabel(AssetRune67C)).toEqual('ᚱ RUNE')
-      expect(toHeaderCurrencyLabel(AssetRuneB1A)).toEqual('ᚱ RUNE')
       expect(toHeaderCurrencyLabel(AssetRuneNative)).toEqual('ᚱ RUNE')
     })
 

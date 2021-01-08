@@ -12,10 +12,10 @@ import {
   baseAmount,
   bn
 } from '@xchainjs/xchain-util'
+import { constVoid } from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_POOL_DATA } from '../../../const'
-import { emptyFunc } from '../../../helpers/funcHelper'
 import { Withdraw } from './Withdraw'
 
 const runeBalance = O.some(assetToBase(assetAmount(100)))
@@ -44,7 +44,7 @@ export const WithdrawStory: BaseStory<{ asset?: Asset }, JSX.Element> = () => (
     onWithdraw={console.log}
     runeShare={baseAmount('193011422')}
     assetShare={baseAmount('3202499')}
-    reloadFees={emptyFunc}
+    reloadFees={constVoid}
   />
 )
 WithdrawStory.storyName = 'asym'
@@ -63,7 +63,7 @@ export const AsymErrorNoFeesStory: BaseStory<never, JSX.Element> = () => (
     onWithdraw={console.log}
     runeShare={baseAmount('193011422')}
     assetShare={baseAmount('3202499')}
-    reloadFees={emptyFunc}
+    reloadFees={constVoid}
   />
 )
 AsymErrorNoFeesStory.storyName = 'asym - error: no fee'
@@ -82,7 +82,7 @@ export const AsymErrorThorMemoFeeStory: BaseStory<never, JSX.Element> = () => (
     onWithdraw={console.log}
     runeShare={baseAmount('193011422')}
     assetShare={baseAmount('3202499')}
-    reloadFees={emptyFunc}
+    reloadFees={constVoid}
   />
 )
 AsymErrorThorMemoFeeStory.storyName = 'asym - error: thorMemo fee'
@@ -101,7 +101,7 @@ export const AsymErrorThorOutFeeStory: BaseStory<never, JSX.Element> = () => (
     onWithdraw={console.log}
     runeShare={baseAmount('10000000')}
     assetShare={baseAmount('300000000')}
-    reloadFees={emptyFunc}
+    reloadFees={constVoid}
   />
 )
 AsymErrorThorOutFeeStory.storyName = 'asym - error: thorOut fee'
@@ -123,7 +123,7 @@ export const AsymErrorAssetOutFeeStory: BaseStory<never, JSX.Element> = () => (
     onWithdraw={console.log}
     runeShare={baseAmount('10000000')}
     assetShare={baseAmount('3000000')}
-    reloadFees={emptyFunc}
+    reloadFees={constVoid}
   />
 )
 AsymErrorAssetOutFeeStory.storyName = 'asym - error: assetOut fee'
@@ -145,7 +145,7 @@ export const AsymErrorAllFeesStory: BaseStory<never, JSX.Element> = () => (
     onWithdraw={console.log}
     runeShare={baseAmount('10000000')}
     assetShare={baseAmount('3000000')}
-    reloadFees={emptyFunc}
+    reloadFees={constVoid}
   />
 )
 AsymErrorAllFeesStory.storyName = 'asym - error: all fees'

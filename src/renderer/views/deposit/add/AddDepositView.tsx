@@ -17,7 +17,6 @@ import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
-import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as depositRoutes from '../../../routes/deposit'
 import { SymDepositMemo, Memo } from '../../../services/chain/types'
@@ -127,16 +126,16 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
         {error && <Alert type="error" message="Something went wrong" description={error.toString()} />}
         <AddDeposit
           type={type}
-          onChangeAsset={emptyFunc}
+          onChangeAsset={FP.constVoid}
           asset={asset}
           assetPrice={ZERO_BN}
           runePrice={ZERO_BN}
           assetBalance={O.none}
           runeBalance={O.none}
           chainAssetBalance={O.none}
-          onDeposit={emptyFunc}
+          onDeposit={FP.constVoid}
           fees={depositFees}
-          reloadFees={emptyFunc}
+          reloadFees={FP.constVoid}
           priceAsset={selectedPricePoolAsset}
           disabled={true}
           poolAddress={O.none}
