@@ -1,5 +1,6 @@
 import React, { useRef, useCallback } from 'react'
 
+import { assetAmount, assetToBase, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
 import { FixmeType } from '../../../../types/asgardex'
@@ -10,13 +11,21 @@ import { AssetInputProps } from './AssetInput.types'
 type Props = {
   title: string
   status?: string
-  amount: BigNumber
+  amount: BaseAmount
   label: string
   inputProps?: AssetInputProps
-  onChange: (value: BigNumber) => void
+  onChange: (value: BaseAmount) => void
   className?: string
 }
 
+/**
+ * Wrapper around `InputBigNumber` component
+ *
+ * For input values, it takes and returns `BaseAmount`. It converts `BaseAmount` -> `AssetAmount` and vice versa,
+ * to display and format values in `InputBigNumber` similar to values of `AssetAmount`
+ *
+ * Decimal of `InputBigNumber` depends on `decimal` of given `amount`.
+ */
 export const AssetInput: React.FC<Props> = (props): JSX.Element => {
   const { title, amount, status, label, inputProps = {}, className = '', onChange, ...otherProps } = props
 
@@ -24,9 +33,9 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
 
   const onChangeHandler = useCallback(
     (value: BigNumber) => {
-      onChange(value)
+      onChange(assetToBase(assetAmount(value, amount.decimal)))
     },
-    [onChange]
+    [amount.decimal, onChange]
   )
 
   const handleClickWrapper = useCallback(() => {
@@ -41,10 +50,12 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
         <p className="asset-amount-label">{label}</p>
       </div>
       <div className="asset-input-content" ref={inputRef}>
-        {/*
-          Decimal is hardcoded temporary to 8
-        TODO (@veado): Fix it https://github.com/thorchain/asgardex-electron/issues/714 */}
-        <InputBigNumber value={amount} onChange={onChangeHandler} {...inputProps} decimal={8} />
+        <InputBigNumber
+          value={baseToAsset(amount).amount()}
+          onChange={onChangeHandler}
+          {...inputProps}
+          decimal={amount.decimal}
+        />
       </div>
     </AssetInputWrapper>
   )

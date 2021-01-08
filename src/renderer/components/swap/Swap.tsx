@@ -5,15 +5,14 @@ import { getValueOfAsset1InAsset2, PoolData, getSwapMemo } from '@thorchain/asga
 import { Address, Balance } from '@xchainjs/xchain-client'
 import {
   Asset,
-  assetAmount,
-  assetToBase,
   assetToString,
   formatBN,
   baseToAsset,
   BaseAmount,
   formatAssetAmountCurrency,
   AssetRuneNative,
-  baseAmount
+  baseAmount,
+  assetAmount
 } from '@xchainjs/xchain-util'
 import { eqString } from 'fp-ts/Eq'
 import * as A from 'fp-ts/lib/Array'
@@ -160,25 +159,47 @@ export const Swap = ({
     [onChangePath, sourceAsset]
   )
 
-  const [changeAmount, setChangeAmount] = useState(ZERO_BASE_AMOUNT)
-
   const oAssetWB: O.Option<Balance> = useMemo(() => getWalletBalanceByAsset(walletBalances, sourceAsset), [
     walletBalances,
     sourceAsset
   ])
 
-  const setChangeAmountFromPercentValue = useCallback(
+  /**
+   * Returns `decimal` needed by `amountToSwap`
+   *
+   * It tries to get `decimal` from balances of selected asset in wallet.
+   * Why from wallet balances? API of xchain-* provides balances with correct decimals.
+   *
+   * If no balances are available, it returns default `decimal` value of an `AssetAmount` (which is `8`)
+   *
+   *
+   * */
+  const amountToSwapDecimal = useMemo(
+    () =>
+      FP.pipe(
+        oAssetWB,
+        O.map((assetWB) => assetWB.amount.decimal),
+        // use default `decimal` in other cases
+        O.getOrElse(() => assetAmount(1).decimal)
+      ),
+
+    [oAssetWB]
+  )
+
+  const [amountToSwap, setAmountToSwap] = useState(baseAmount(0, amountToSwapDecimal))
+
+  const setAmountToSwapFromPercentValue = useCallback(
     (percents) => {
       FP.pipe(
         oAssetWB,
         O.map((assetWB) => {
           const assetAmountBN = assetWB.amount.amount()
           const amountFromPercentage = assetAmountBN.multipliedBy(Number(percents) / 100)
-          return setChangeAmount(baseAmount(amountFromPercentage))
+          return setAmountToSwap(baseAmount(amountFromPercentage, amountToSwapDecimal))
         })
       )
     },
-    [setChangeAmount, oAssetWB]
+    [oAssetWB, amountToSwapDecimal]
   )
 
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
@@ -255,8 +276,8 @@ export const Swap = ({
     )
   }, [assetsToSwap, onChangePath, canSwitchAssets])
 
-  const swapData = useMemo(() => getSwapData(changeAmount, sourceAsset, targetAsset, poolData), [
-    changeAmount,
+  const swapData = useMemo(() => getSwapData(amountToSwap, sourceAsset, targetAsset, poolData), [
+    amountToSwap,
     sourceAsset,
     targetAsset,
     poolData
@@ -286,12 +307,12 @@ export const Swap = ({
       FP.pipe(
         oAssetWB,
         O.map((assetWB) => {
-          const percentage = changeAmount.amount().dividedBy(assetWB.amount.amount()).multipliedBy(100).toNumber()
+          const percentage = amountToSwap.amount().dividedBy(assetWB.amount.amount()).multipliedBy(100).toNumber()
           return (
             <Slider
               key={'swap percentage slider'}
               value={percentage}
-              onChange={setChangeAmountFromPercentValue}
+              onChange={setAmountToSwapFromPercentValue}
               tooltipVisible={true}
               withLabel={true}
               tooltipPlacement={'top'}
@@ -300,7 +321,7 @@ export const Swap = ({
         }),
         O.toNullable
       ),
-    [oAssetWB, changeAmount, setChangeAmountFromPercentValue]
+    [oAssetWB, amountToSwap, setAmountToSwapFromPercentValue]
   )
 
   const txModalTitle = useMemo(
@@ -348,7 +369,7 @@ export const Swap = ({
               </Styled.StepBarContainer>
               <Styled.AssetDataContainer>
                 <Styled.AssetDataWrapper>
-                  <AssetData asset={sourceAsset} amount={changeAmount} />
+                  <AssetData asset={sourceAsset} amount={amountToSwap} />
                 </Styled.AssetDataWrapper>
                 <Styled.AssetDataWrapper>
                   <AssetData asset={targetAsset} amount={swapData.swapResult} />
@@ -363,7 +384,7 @@ export const Swap = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [oSourceAssetWP, oTargetAssetWP, swapData.swapResult, swapData.slip, changeAmount, swapState.txRD, swapState.step])
+  }, [oSourceAssetWP, oTargetAssetWP, swapData.swapResult, swapData.slip, amountToSwap, swapState.txRD, swapState.step])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe
@@ -439,7 +460,7 @@ export const Swap = ({
         const sub = swap$({
           poolAddress: oSourcePoolAddress,
           asset: source,
-          amount: changeAmount,
+          amount: amountToSwap,
           memo
         }).subscribe(setSwapState)
 
@@ -449,7 +470,7 @@ export const Swap = ({
         return true
       })
     )
-  }, [assetsToSwap, changeAmount, closePasswordModal, oSourcePoolAddress, swap$, targetWalletAddress])
+  }, [assetsToSwap, amountToSwap, closePasswordModal, oSourcePoolAddress, swap$, targetWalletAddress])
 
   const sourceChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
     () =>
@@ -475,14 +496,14 @@ export const Swap = ({
         sequenceTOption(sourceAsset, walletBalances),
         O.map(([sourceAsset, walletBalances]) => {
           // If sourceAsset is the same as source chain
-          // we should substract changeAmount
-          const shouldSubtractChangeAmount = eqAsset.equals(sourceAsset, getChainAsset(sourceAsset.chain))
+          // we should substract `amountToSwap`
+          const subtractAmountToSwap = eqAsset.equals(sourceAsset, getChainAsset(sourceAsset.chain))
 
           const oBalanceMinusAmount: O.Option<BaseAmount> = FP.pipe(
             walletBalances,
             A.findFirst((walletBalance) => eqAsset.equals(walletBalance.asset, sourceAsset)),
             O.map((sourceBalance) =>
-              sourceBalance.amount.amount().minus(shouldSubtractChangeAmount ? changeAmount.amount() : ZERO_BN)
+              sourceBalance.amount.amount().minus(subtractAmountToSwap ? amountToSwap.amount() : ZERO_BN)
             ),
             O.map(FP.flow(baseAmount))
           )
@@ -495,7 +516,7 @@ export const Swap = ({
         }),
         O.getOrElse((): boolean => false)
       ),
-    [changeAmount, sourceAsset, walletBalances, sourceChainFee]
+    [amountToSwap, sourceAsset, walletBalances, sourceChainFee]
   )
 
   const sourceChainErrorLabel: JSX.Element = useMemo(() => {
@@ -549,12 +570,12 @@ export const Swap = ({
   }, [targetChainFee, targetAsset, poolData])
 
   const targetChainFeeError = useMemo((): boolean => {
-    if (changeAmount.amount().isZero()) {
+    if (amountToSwap.amount().isZero()) {
       return false
     }
     const targetFee = FP.pipe(targetChainFeeAmountInTargetAsset, baseToAsset, (assetAmount) => assetAmount.amount())
     return swapData.swapResult.amount().minus(targetFee).isNegative()
-  }, [targetChainFeeAmountInTargetAsset, swapData, changeAmount])
+  }, [targetChainFeeAmountInTargetAsset, swapData, amountToSwap])
 
   const swapResultLabel = useMemo(
     () =>
@@ -611,9 +632,9 @@ export const Swap = ({
     [sourceChainFee, targetChainFeeAmountInTargetAsset, sourceAsset, targetAsset]
   )
 
-  const isSwapDisabled: boolean = useMemo(() => changeAmount.amount().isZero() || FP.pipe(walletBalances, O.isNone), [
+  const isSwapDisabled: boolean = useMemo(() => amountToSwap.amount().isZero() || FP.pipe(walletBalances, O.isNone), [
     walletBalances,
-    changeAmount
+    amountToSwap
   ])
 
   return (
@@ -647,8 +668,8 @@ export const Swap = ({
             <Styled.AssetInput
               title={intl.formatMessage({ id: 'swap.input' })}
               label={balanceLabel}
-              onChange={(value) => setChangeAmount(assetToBase(assetAmount(value)))}
-              amount={baseToAsset(changeAmount).amount()}
+              onChange={setAmountToSwap}
+              amount={amountToSwap}
               hasError={sourceChainBalanceError || targetChainFeeError}
             />
             {FP.pipe(
