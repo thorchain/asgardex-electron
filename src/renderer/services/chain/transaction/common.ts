@@ -4,19 +4,12 @@ import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 
 import { liveData } from '../../../helpers/rx/liveData'
-import { observableState } from '../../../helpers/stateHelper'
 import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as THOR from '../../thorchain'
-import { ErrorId, TxLD, TxRD } from '../../wallet/types'
+import { ErrorId, TxLD } from '../../wallet/types'
 import { SendTxParams } from '../types'
-
-/**
- * @deprecated  Don't use this (same) state for all transactions
- * Create custom state for swap, deposit, withdraw txs ...
- */
-const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
 
 const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }: SendTxParams): TxLD => {
   // helper to create `RemoteData<ApiError, never>` observable
@@ -63,17 +56,4 @@ const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }: SendT
   }
 }
 
-/**
- * @deprecated
- * Don't subscribe different txs to store it into (same) state
- * Create different functions to swap (in `services/chain/transaction/swap), to deposit, to withdraw etc.
- */
-const subscribeTx = (params: SendTxParams): void => {
-  sendTx$(params).subscribe(setTxRD)
-}
-
-const resetTx = () => {
-  setTxRD(RD.initial)
-}
-
-export { sendTx$, subscribeTx, txRD$, resetTx }
+export { sendTx$ }
