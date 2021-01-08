@@ -28,10 +28,6 @@ describe('components/swap/utils', () => {
         assetBalance: baseAmount(1),
         runeBalance: baseAmount(2)
       },
-      [assetToString(ASSETS_TESTNET.RUNE)]: {
-        assetBalance: baseAmount(3),
-        runeBalance: baseAmount(4)
-      },
       [assetToString(ASSETS_TESTNET.BOLT)]: {
         assetBalance: baseAmount(5),
         runeBalance: baseAmount(6)

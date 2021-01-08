@@ -28,11 +28,11 @@ describe('helpers/fp/eq', () => {
 
   describe('eqAsset', () => {
     it('is equal', () => {
-      const a = ASSETS_TESTNET.RUNE
+      const a = ASSETS_TESTNET.BNB
       expect(eqAsset.equals(a, a)).toBeTruthy()
     })
     it('is not equal', () => {
-      const a = ASSETS_TESTNET.RUNE
+      const a = ASSETS_TESTNET.FTM
       const b = ASSETS_TESTNET.BNB
       expect(eqAsset.equals(a, b)).toBeFalsy()
     })
@@ -40,11 +40,11 @@ describe('helpers/fp/eq', () => {
 
   describe('eqOAsset', () => {
     it('same some(asset) are equal', () => {
-      const a = O.some(ASSETS_TESTNET.RUNE)
+      const a = O.some(ASSETS_TESTNET.BNB)
       expect(eqOAsset.equals(a, a)).toBeTruthy()
     })
     it('different some(asset) are not equal', () => {
-      const a = O.some(ASSETS_TESTNET.RUNE)
+      const a = O.some(ASSETS_TESTNET.FTM)
       const b = O.some(ASSETS_TESTNET.BNB)
       expect(eqOAsset.equals(a, b)).toBeFalsy()
     })
@@ -142,7 +142,7 @@ describe('helpers/fp/eq', () => {
       // c = same as a, but another asset
       const c: Balance = {
         ...a,
-        asset: ASSETS_TESTNET.RUNE
+        asset: ASSETS_TESTNET.FTM
       }
       expect(eqBalance.equals(a, b)).toBeFalsy()
       expect(eqBalance.equals(a, c)).toBeFalsy()
@@ -152,7 +152,7 @@ describe('helpers/fp/eq', () => {
   describe('eqAssetsWithBalance', () => {
     const a: Balance = {
       amount: baseAmount('1'),
-      asset: ASSETS_TESTNET.RUNE
+      asset: ASSETS_TESTNET.FTM
     }
     const b: Balance = {
       ...a,
