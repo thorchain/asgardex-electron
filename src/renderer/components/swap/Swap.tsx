@@ -324,21 +324,6 @@ export const Swap = ({
     [oAssetWB, amountToSwap, setAmountToSwapFromPercentValue]
   )
 
-  const txModalTitle = useMemo(
-    () =>
-      FP.pipe(
-        swapState.txRD,
-        RD.fold(
-          () => 'swap.state.pending',
-          () => 'swap.state.pending',
-          () => 'swap.state.error',
-          () => 'swap.state.success'
-        ),
-        (id) => intl.formatMessage({ id })
-      ),
-    [intl, swapState]
-  )
-
   const extraTxModalContent = useMemo(() => {
     return FP.pipe(
       sequenceTOption(oSourceAssetWP, oTargetAssetWP),
@@ -422,6 +407,18 @@ export const Swap = ({
       )
     )
 
+    // title
+    const txModalTitle = FP.pipe(
+      txRD,
+      RD.fold(
+        () => 'swap.state.pending',
+        () => 'swap.state.pending',
+        () => 'swap.state.error',
+        () => 'swap.state.success'
+      ),
+      (id) => intl.formatMessage({ id })
+    )
+
     return (
       <TxModal
         title={txModalTitle}
@@ -435,7 +432,7 @@ export const Swap = ({
         extra={extraTxModalContent}
       />
     )
-  }, [extraTxModalContent, goToTransaction, onCloseTxModal, onFinishTxModal, swapStartTime, swapState, txModalTitle])
+  }, [extraTxModalContent, goToTransaction, intl, onCloseTxModal, onFinishTxModal, swapStartTime, swapState])
 
   const closePasswordModal = useCallback(() => {
     setShowPasswordModal(false)
@@ -639,14 +636,6 @@ export const Swap = ({
 
   return (
     <Styled.Container>
-      {showPasswordModal && (
-        <PasswordModal
-          onSuccess={onSucceedPasswordModal}
-          onClose={onClosePasswordModal}
-          validatePassword$={validatePassword$}
-        />
-      )}
-      <Styled.PendingContainer>{renderTxModal}</Styled.PendingContainer>
       <Styled.ContentContainer>
         <Styled.Header>
           {FP.pipe(
@@ -723,6 +712,14 @@ export const Swap = ({
         {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFees} />}
         {targetChainFeeErrorLabel}
       </Styled.SubmitContainer>
+      {showPasswordModal && (
+        <PasswordModal
+          onSuccess={onSucceedPasswordModal}
+          onClose={onClosePasswordModal}
+          validatePassword$={validatePassword$}
+        />
+      )}
+      {renderTxModal}
     </Styled.Container>
   )
 }
