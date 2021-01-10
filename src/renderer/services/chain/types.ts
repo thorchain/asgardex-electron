@@ -113,7 +113,7 @@ export type DepositState = {
 export type DepositState$ = Rx.Observable<DepositState>
 
 // TODO (@Veado) Define all needed params
-// It's currently a placeholder only and will be updated in next PR
+// It's currently a placeholder only and will be implemented with #537
 export type DepositParams = {
   readonly memo: string
 }

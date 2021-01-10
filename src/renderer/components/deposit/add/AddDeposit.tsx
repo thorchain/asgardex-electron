@@ -22,7 +22,14 @@ import * as Rx from 'rxjs'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { INITIAL_DEPOSIT_STATE } from '../../../services/chain/const'
-import { SymDepositMemo, Memo, SendDepositTxParams, DepositFeesRD, DepositState } from '../../../services/chain/types'
+import {
+  SymDepositMemo,
+  Memo,
+  SendDepositTxParams,
+  DepositFeesRD,
+  DepositState,
+  DepositStateHandler
+} from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { DepositType } from '../../../types/asgardex'
@@ -55,6 +62,7 @@ export type Props = {
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
+  deposit$: DepositStateHandler
 }
 
 export const AddDeposit: React.FC<Props> = (props) => {
@@ -78,7 +86,8 @@ export const AddDeposit: React.FC<Props> = (props) => {
     fees,
     onChangeAsset,
     disabled = false,
-    poolData
+    poolData,
+    deposit$
   } = props
 
   const intl = useIntl()
@@ -460,7 +469,8 @@ export const AddDeposit: React.FC<Props> = (props) => {
     // close private modal
     closePasswordModal()
 
-    const asymDepositTx = () =>
+    // _asymDepositTx is temporary - will be changed with #537
+    const _asymDepositTx = () =>
       FP.pipe(
         sequenceTOption(oPoolAddress, oAsymDepositMemo),
         O.map(([poolAddress, asymDepositMemo]) => {
@@ -474,8 +484,8 @@ export const AddDeposit: React.FC<Props> = (props) => {
           return true
         })
       )
-
-    const symDepositTx = () =>
+    // _symDepositTx is temporary - will be changed with #537
+    const _symDepositTx = () =>
       FP.pipe(
         sequenceTOption(oPoolAddress, oSymDepositMemo),
         O.map(([poolAddress, { rune: runeMemo, asset: assetMemo }]) => {
@@ -500,14 +510,11 @@ export const AddDeposit: React.FC<Props> = (props) => {
         })
       )
 
-    // TODO(@Veado) Call sendTx of `services/chain/txs`
-    // and handle results (error/success) in a modal here in `AddStake`
-    FP.pipe(
-      type === 'asym' ? asymDepositTx() : symDepositTx(),
-      O.map((v) => console.log('success:', v)),
-      O.getOrElse(() => console.log('no data to run txs'))
-    )
-  }, [closePasswordModal, type, oPoolAddress, oAsymDepositMemo, asset, assetAmountToDeposit, oSymDepositMemo])
+    // Temporary run of deposit$ - will be implemented with #537
+    const sub = deposit$({ memo: '' }).subscribe(setDepositState)
+
+    setDepositSub(O.some(sub))
+  }, [closePasswordModal, deposit$, oPoolAddress, oAsymDepositMemo, asset, assetAmountToDeposit, oSymDepositMemo])
 
   const disabledForm = useMemo(() => isBalanceError || isThorchainFeeError || disabled, [
     disabled,
