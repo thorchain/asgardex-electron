@@ -4,23 +4,23 @@ import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons'
 import { bn, isValidBN, formatBN } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
-import { Label } from '../label'
-import { TrendWrapper } from './Trend.style'
+import * as Styled from './Trend.style'
 
 type Props = {
   amount?: BigNumber
+  className?: string
 }
 
 export const Trend: React.FC<Props> = (props): JSX.Element => {
-  const { amount = bn(0), ...otherProps } = props
+  const { amount = bn(0), className } = props
   const trend = isValidBN(amount) && amount.isGreaterThanOrEqualTo(0)
   const trendIcon = trend ? <ArrowUpOutlined /> : <ArrowDownOutlined />
-  const trendVal = `${formatBN(amount)}%`
+  const value = `${formatBN(amount)}%`
 
   return (
-    <TrendWrapper trend={trend} {...otherProps}>
+    <Styled.Wrapper trend={trend} className={className}>
       {trendIcon}
-      <Label>{trendVal}</Label>
-    </TrendWrapper>
+      <Styled.Label color={trend ? 'primary' : 'error'}>{value}</Styled.Label>
+    </Styled.Wrapper>
   )
 }

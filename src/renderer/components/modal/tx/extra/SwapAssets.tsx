@@ -3,8 +3,6 @@ import React from 'react'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
-import { StepBar } from '../../../uielements/stepBar'
-import { Trend } from '../../../uielements/trend'
 import * as Styled from './SwapAssets.styles'
 
 export type Props = {
@@ -20,17 +18,13 @@ export const SwapAssets: React.FC<Props> = (props): JSX.Element => {
     <>
       <Styled.StepLabel>{stepDescription}</Styled.StepLabel>
       <Styled.DataWrapper>
-        <Styled.StepBarContainer>
-          <StepBar size={50} />
-        </Styled.StepBarContainer>
+        <Styled.StepBar size={50} />
         <Styled.AssetsContainer>
           <Styled.AssetData asset={source.asset} amount={source.amount} />
           <Styled.AssetData asset={target.asset} amount={target.amount} />
         </Styled.AssetsContainer>
       </Styled.DataWrapper>
-      <Styled.TrendContainer>
-        <Trend amount={slip} />
-      </Styled.TrendContainer>
+      <Styled.Trend amount={slip} />
     </>
   )
 }
