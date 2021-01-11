@@ -138,22 +138,6 @@ export const SubmitContainer = styled('div')`
   align-items: center;
 `
 
-export const PendingContainer = styled('div')`
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  top: 60px;
-  left: 0;
-  z-index: 9;
-  background-color: ${palette('gradient', 1)};
-
-  &:not(:empty) {
-    width: 100%;
-    height: 100%;
-  }
-`
-
 export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
   border-color: ${({ hasError }) => (hasError ? palette('error', 0) : palette('primary', 0))};
 
