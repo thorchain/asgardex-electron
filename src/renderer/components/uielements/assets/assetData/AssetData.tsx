@@ -34,7 +34,7 @@ export const AssetData: React.FC<Props> = (props): JSX.Element => {
     price = baseAmount(0),
     priceAsset,
     size = 'small',
-    className = ''
+    className
   } = props
 
   const priceLabel = priceAsset
