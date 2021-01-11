@@ -13,37 +13,13 @@
 
 /**
  * @export
- * @interface DepthHistoryItem
+ * @interface AddLiquidityMetadata
  */
-export interface DepthHistoryItem {
+export interface AddLiquidityMetadata {
     /**
-     * Int64, the amount of Asset in the pool
+     * Int64, amount of liquidity units assigned to the member as result of the liquidity deposit
      * @type {string}
-     * @memberof DepthHistoryItem
+     * @memberof AddLiquidityMetadata
      */
-    assetDepth: string;
-    /**
-     * Float, price of asset in rune. I.e. rune amount / asset amount
-     * @type {string}
-     * @memberof DepthHistoryItem
-     */
-    assetPrice: string;
-    /**
-     * Int64, The end time of bucket in unix timestamp
-     * @type {string}
-     * @memberof DepthHistoryItem
-     */
-    endTime: string;
-    /**
-     * Int64, the amount of Rune in the pool
-     * @type {string}
-     * @memberof DepthHistoryItem
-     */
-    runeDepth: string;
-    /**
-     * Int64, The beginning time of bucket in unix timestamp
-     * @type {string}
-     * @memberof DepthHistoryItem
-     */
-    startTime: string;
+    liquidityUnits: string;
 }

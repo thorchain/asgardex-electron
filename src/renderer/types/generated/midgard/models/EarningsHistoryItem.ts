@@ -39,7 +39,7 @@ export interface EarningsHistoryItem {
      */
     bondingEarnings: string;
     /**
-     * Int64, System income generated during the time interval. It is the sum of liquidity fees and block rewards.
+     * Int64, System income generated during the time interval. It is the sum of liquidity fees and block rewards
      * @type {string}
      * @memberof EarningsHistoryItem
      */
@@ -57,7 +57,7 @@ export interface EarningsHistoryItem {
      */
     liquidityEarnings: string;
     /**
-     * Int64, Total liquidity fees, converted to RUNE, collected during the time interval.
+     * Int64, Total liquidity fees, converted to RUNE, collected during the time interval
      * @type {string}
      * @memberof EarningsHistoryItem
      */

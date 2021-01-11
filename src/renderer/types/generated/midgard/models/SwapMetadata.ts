@@ -11,24 +11,37 @@
  * Do not edit the class manually.
  */
 
+import {
+    Coin,
+} from './';
+
 /**
  * @export
- * @interface Event
+ * @interface SwapMetadata
  */
-export interface Event {
+export interface SwapMetadata {
     /**
+     * Int64 (10^8), RUNE amount charged as swap liquidity fee
      * @type {string}
-     * @memberof Event
+     * @memberof SwapMetadata
      */
-    fee: string;
+    liquidityFee: string;
     /**
-     * @type {string}
-     * @memberof Event
+     * List of network fees associated to an action. One network fee is charged for each outbound transaction
+     * @type {Array<Coin>}
+     * @memberof SwapMetadata
      */
-    slip: string;
+    networkFees: Array<Coin>;
     /**
+     * Int64 (Basis points, 0-10000, where 10000=100%), trade slip percentage
      * @type {string}
-     * @memberof Event
+     * @memberof SwapMetadata
      */
-    stakeUnits: string;
+    tradeSlip: string;
+    /**
+     * Int64 (10^8), minimum output amount specified for the swap
+     * @type {string}
+     * @memberof SwapMetadata
+     */
+    tradeTarget: string;
 }

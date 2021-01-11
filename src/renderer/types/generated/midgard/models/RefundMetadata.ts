@@ -11,39 +11,25 @@
  * Do not edit the class manually.
  */
 
+import {
+    Coin,
+} from './';
+
 /**
  * @export
- * @interface DepthHistoryItem
+ * @interface RefundMetadata
  */
-export interface DepthHistoryItem {
+export interface RefundMetadata {
     /**
-     * Int64, the amount of Asset in the pool
-     * @type {string}
-     * @memberof DepthHistoryItem
+     * List of network fees associated to an action. One network fee is charged for each outbound transaction
+     * @type {Array<Coin>}
+     * @memberof RefundMetadata
      */
-    assetDepth: string;
+    networkFees: Array<Coin>;
     /**
-     * Float, price of asset in rune. I.e. rune amount / asset amount
+     * Reason for the refund
      * @type {string}
-     * @memberof DepthHistoryItem
+     * @memberof RefundMetadata
      */
-    assetPrice: string;
-    /**
-     * Int64, The end time of bucket in unix timestamp
-     * @type {string}
-     * @memberof DepthHistoryItem
-     */
-    endTime: string;
-    /**
-     * Int64, the amount of Rune in the pool
-     * @type {string}
-     * @memberof DepthHistoryItem
-     */
-    runeDepth: string;
-    /**
-     * Int64, The beginning time of bucket in unix timestamp
-     * @type {string}
-     * @memberof DepthHistoryItem
-     */
-    startTime: string;
+    reason: string;
 }

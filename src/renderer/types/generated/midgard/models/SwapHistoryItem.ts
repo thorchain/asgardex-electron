@@ -17,7 +17,7 @@
  */
 export interface SwapHistoryItem {
     /**
-     * Int64, the average slip by swap. Big swaps have the same weight as small swaps
+     * Float, the average slip by swap. Big swaps have the same weight as small swaps
      * @type {string}
      * @memberof SwapHistoryItem
      */
