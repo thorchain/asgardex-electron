@@ -36,12 +36,10 @@ import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../services/
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
-import { AssetData } from '../uielements/assets/assetData'
+import { SwapAssets } from '../modal/tx/extra'
 import { AssetSelect } from '../uielements/assets/assetSelect'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
-import { StepBar } from '../uielements/stepBar'
-import { Trend } from '../uielements/trend'
 import * as Styled from './Swap.styles'
 import { getSwapData, assetWithPriceToAsset, pickAssetWithPrice } from './Swap.utils'
 
@@ -344,27 +342,13 @@ export const Swap = ({
         )
 
         return (
-          <>
-            <Styled.StepContainer>
-              <Styled.StepLabel>{stepLabel}</Styled.StepLabel>
-            </Styled.StepContainer>
-            <Styled.CoinDataWrapper>
-              <Styled.StepBarContainer>
-                <StepBar size={50} />
-              </Styled.StepBarContainer>
-              <Styled.AssetDataContainer>
-                <Styled.AssetDataWrapper>
-                  <AssetData asset={sourceAsset} amount={amountToSwap} />
-                </Styled.AssetDataWrapper>
-                <Styled.AssetDataWrapper>
-                  <AssetData asset={targetAsset} amount={swapData.swapResult} />
-                </Styled.AssetDataWrapper>
-              </Styled.AssetDataContainer>
-            </Styled.CoinDataWrapper>
-            <Styled.TrendContainer>
-              <Trend amount={swapData.slip} />
-            </Styled.TrendContainer>
-          </>
+          <SwapAssets
+            key="swap-assets"
+            source={{ asset: sourceAsset, amount: amountToSwap }}
+            target={{ asset: targetAsset, amount: swapData.swapResult }}
+            stepDescription={stepLabel}
+            slip={swapData.slip}
+          />
         )
       }),
       O.getOrElse(() => <></>)
