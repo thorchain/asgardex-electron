@@ -1,1 +1,2 @@
-export { SwapAssets } from './SwapAssets'
+export * from './SwapAssets'
+export * from './DepositAssets'
