@@ -1,17 +1,19 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-type TrendWrapperProps = {
+import { Label as UILabel } from '../label'
+
+type WrapperProps = {
   trend: boolean
 }
 
-export const TrendWrapper = styled.span`
+export const Wrapper = styled.div<WrapperProps>`
   display: flex;
-  justify-content: center;
   align-items: center;
-  color: ${(props: TrendWrapperProps) => (props.trend ? palette('primary', 0) : palette('error', 0))};
-  .label-wrapper {
-    padding: 0 3px;
-    color: ${(props: TrendWrapperProps) => (props.trend ? palette('primary', 0) : palette('error', 0))};
-  }
+  color: ${({ trend }) => (trend ? palette('primary', 0) : palette('error', 0))};
+`
+
+export const Label = styled(UILabel)`
+  padding: 0 3px;
+  width: auto; /* overridden */
 `

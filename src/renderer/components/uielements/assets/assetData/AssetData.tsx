@@ -22,17 +22,27 @@ export type Props = {
   price?: BaseAmount
   priceAsset?: PricePoolAsset
   size?: Styled.AssetDataSize
+  // `className` is needed by `styled components`
+  className?: string
 }
 
 export const AssetData: React.FC<Props> = (props): JSX.Element => {
-  const { asset, amount: assetAmount, noTicker = false, price = baseAmount(0), priceAsset, size = 'small' } = props
+  const {
+    asset,
+    amount: assetAmount,
+    noTicker = false,
+    price = baseAmount(0),
+    priceAsset,
+    size = 'small',
+    className
+  } = props
 
   const priceLabel = priceAsset
     ? formatAssetAmountCurrency({ amount: baseToAsset(price), asset: priceAsset, trimZeros: true })
     : ''
 
   return (
-    <Styled.Wrapper>
+    <Styled.Wrapper className={className}>
       <Col>
         <Styled.AssetIcon asset={asset} size={size} />
       </Col>

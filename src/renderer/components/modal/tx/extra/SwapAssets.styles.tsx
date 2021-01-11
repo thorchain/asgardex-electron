@@ -1,9 +1,9 @@
-import React from 'react'
-
 import styled from 'styled-components'
 
-import { AssetData as UIAssetData, Props as AssetDataProps } from '../../../uielements/assets/assetData'
+import { AssetData as UIAssetData } from '../../../uielements/assets/assetData'
 import { Label as UILabel } from '../../../uielements/label'
+import { StepBar as UIStepBar } from '../../../uielements/stepBar'
+import { Trend as UITrend } from '../../../uielements/trend'
 
 export const StepLabel = styled(UILabel).attrs({
   size: 'small',
@@ -23,9 +23,8 @@ export const DataWrapper = styled.div`
   align-items: center;
 `
 
-export const StepBarContainer = styled.div`
-  display: flex;
-  align-items: center;
+export const StepBar = styled(UIStepBar)`
+  justify-content: center;
 `
 
 export const AssetsContainer = styled.div`
@@ -33,23 +32,16 @@ export const AssetsContainer = styled.div`
   display: flex;
   flex-direction: column;
 `
-const AssetDataContainer = styled.div`
-  margin-bottom: 10px;
 
+export const AssetData = styled(UIAssetData)`
+  margin-bottom: 20px;
   &:last-child {
     margin: 0;
   }
 `
 
-export const AssetData = styled((props: AssetDataProps) => (
-  <AssetDataContainer>
-    <UIAssetData {...props} />
-  </AssetDataContainer>
-))``
-
-export const TrendContainer = styled.div`
-  padding-top: 20px;
+export const Trend = styled(UITrend)`
   width: 100%;
-  display: flex;
-  justify-content: center;
+  padding-top: 20px;
+  justify-content: center; /* overridden */
 `
