@@ -1,29 +1,9 @@
 import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
-import {
-  isRuneBnbAsset,
-  isBnbAsset,
-  getRuneAsset,
-  isBtcAsset,
-  isEthAsset,
-  isPricePoolAsset,
-  isRuneNativeAsset
-} from './assetHelper'
+import { isBnbAsset, isBtcAsset, isEthAsset, isPricePoolAsset, isRuneBnbAsset, isRuneNativeAsset } from './assetHelper'
 
 describe('helpers/assetHelper', () => {
-  describe('getRuneAsset', () => {
-    it('returns Rune asset for testnet / BNB chain', () => {
-      expect(getRuneAsset({ network: 'testnet', chain: 'BNB' })).toEqual(AssetRune67C)
-    })
-    it('returns Rune asset for mainnet / BNB chain', () => {
-      expect(getRuneAsset({ network: 'mainnet', chain: 'BNB' })).toEqual(AssetRuneB1A)
-    })
-    it('returns Rune asset for Thorchain', () => {
-      expect(getRuneAsset({ chain: 'THOR' })).toEqual(AssetRuneNative)
-    })
-  })
-
   describe('isRuneBnbAsset', () => {
     it('checks rune asset for testnet', () => {
       expect(isRuneBnbAsset(AssetRuneB1A)).toBeTruthy()

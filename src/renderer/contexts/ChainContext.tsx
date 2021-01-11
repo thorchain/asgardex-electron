@@ -5,7 +5,6 @@ import {
   clientByChain$,
   depositFees$,
   reloadDepositFees,
-  isCrossChainDeposit$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   withdrawFees$,
@@ -16,9 +15,6 @@ import {
   removeAllLedgerAddress,
   reloadSwapFees,
   swapFees$,
-  subscribeTx,
-  txRD$,
-  resetTx,
   getExplorerUrlByAsset$,
   assetAddress$,
   swap$
@@ -32,7 +28,6 @@ type ChainContextValue = {
   withdrawFees$: typeof withdrawFees$
   reloadWithdrawFees: typeof reloadWithdrawFees
   reloadDepositFeesEffect$: typeof reloadDepositFeesEffect$
-  isCrossChainDeposit$: typeof isCrossChainDeposit$
   symDepositTxMemo$: typeof symDepositTxMemo$
   asymDepositTxMemo$: typeof asymDepositTxMemo$
   retrieveLedgerAddress: typeof retrieveLedgerAddress
@@ -40,9 +35,6 @@ type ChainContextValue = {
   removeAllLedgerAddress: typeof removeAllLedgerAddress
   reloadSwapFees: typeof reloadSwapFees
   swapFees$: typeof swapFees$
-  subscribeTx: typeof subscribeTx
-  txRD$: typeof txRD$
-  resetTx: typeof resetTx
   getExplorerUrlByAsset$: typeof getExplorerUrlByAsset$
   assetAddress$: typeof assetAddress$
   swap$: typeof swap$
@@ -56,7 +48,6 @@ const initialContext: ChainContextValue = {
   withdrawFees$,
   reloadWithdrawFees,
   reloadDepositFeesEffect$,
-  isCrossChainDeposit$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   retrieveLedgerAddress,
@@ -64,9 +55,6 @@ const initialContext: ChainContextValue = {
   removeAllLedgerAddress,
   reloadSwapFees: reloadSwapFees,
   swapFees$,
-  subscribeTx,
-  txRD$,
-  resetTx,
   getExplorerUrlByAsset$,
   assetAddress$,
   swap$

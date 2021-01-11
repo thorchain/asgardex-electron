@@ -1,17 +1,7 @@
-import {
-  Asset,
-  AssetBNB,
-  AssetBTC,
-  AssetETH,
-  AssetRune67C,
-  AssetRuneB1A,
-  AssetRuneNative,
-  Chain
-} from '@xchainjs/xchain-util'
+import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { Network } from '../../shared/api/types'
 import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
-import { DEFAULT_NETWORK } from '../services/const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { eqAsset } from './fp/eq'
 
@@ -46,27 +36,10 @@ export const BTC_DECIMAL = 8
  * */
 export const ETH_DECIMAL = 18
 
-/**
- * Returns RUNE asset depending on network and chain
- *
- * @deprecated Use `AssetRuneNative`
- */
-export const getRuneAsset = ({ network = 'testnet', chain = 'BNB' }: { network?: Network; chain: Chain }): Asset => {
-  // For future implementation only - we don't support Native Rune yet...
-  if (chain === 'THOR') return AssetRuneNative
-  // in other cases RUNE is running on Binance chain
+export const getBnbRuneAsset = (network: Network = 'testnet'): Asset => {
   return network === 'testnet' ? AssetRune67C : AssetRuneB1A
 }
 
-/**
- * Returns RUNE asset depending on DEFAULT_NETWORK
- *
- * @deprecated Use `AssetRuneNative`
- */
-export const getDefaultRuneAsset = (chain: Chain = 'THOR') => getRuneAsset({ network: DEFAULT_NETWORK, chain })
-/**
- * Check whether an asset is a BNB.RUNE asset
- */
 export const isRuneBnbAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetRune67C) || eqAsset.equals(asset, AssetRuneB1A)
 

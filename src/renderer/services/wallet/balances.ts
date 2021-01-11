@@ -8,7 +8,7 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getRuneAsset } from '../../helpers/assetHelper'
+import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { eqBalancesRD } from '../../helpers/fp/eq'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { network$ } from '../app/service'
@@ -70,7 +70,7 @@ const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([BNB.address$, BNB.bala
     walletAddress,
     balances: FP.pipe(
       balances,
-      RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getRuneAsset({ network, chain: 'BNB' }).ticker]))
+      RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getBnbRuneAsset(network).ticker]))
     )
   }))
 )
