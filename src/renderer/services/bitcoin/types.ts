@@ -6,7 +6,7 @@ import * as Rx from 'rxjs'
 
 import { LedgerBTCTxInfo, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { FeeLD, Memo } from '../chain/types'
+import { Memo } from '../chain/types'
 import * as C from '../clients'
 import { LedgerAddressLD, LedgerTxLD } from '../wallet/types'
 
@@ -34,11 +34,7 @@ export type TransactionService = C.TransactionService<SendTxParams>
 export type FeesService = {
   fees$: FeesWithRatesLD
   memoFees$: (memo: Memo) => FeesWithRatesLD
-  poolFee$: (memo: Memo) => FeeLD
-  poolFeeRate$: (memo: Memo) => FeeRateLD
-  getPoolFeeRate: () => FeeRateRD
   reloadFees: () => void
-  reloadDepositFee: () => void
 }
 
 export type LedgerService = {

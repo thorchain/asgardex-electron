@@ -17,13 +17,13 @@
  */
 export interface DepthHistoryItem {
     /**
-     * Int64, the amount of Asset in the pool.
+     * Int64, the amount of Asset in the pool
      * @type {string}
      * @memberof DepthHistoryItem
      */
     assetDepth: string;
     /**
-     * Float, price of asset in rune. I.e. rune amount / asset amount.
+     * Float, price of asset in rune. I.e. rune amount / asset amount
      * @type {string}
      * @memberof DepthHistoryItem
      */
@@ -35,7 +35,7 @@ export interface DepthHistoryItem {
      */
     endTime: string;
     /**
-     * Int64, the amount of Rune in the pool.
+     * Int64, the amount of Rune in the pool
      * @type {string}
      * @memberof DepthHistoryItem
      */

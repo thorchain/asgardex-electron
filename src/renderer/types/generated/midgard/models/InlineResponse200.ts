@@ -12,7 +12,7 @@
  */
 
 import {
-    TxDetails,
+    Action,
 } from './';
 
 /**
@@ -21,14 +21,14 @@ import {
  */
 export interface InlineResponse200 {
     /**
-     * Int64, count of txs matching the filters.
+     * @type {Array<Action>}
+     * @memberof InlineResponse200
+     */
+    actions: Array<Action>;
+    /**
+     * Int64, number of results matching the given filters.
      * @type {string}
      * @memberof InlineResponse200
      */
     count: string;
-    /**
-     * @type {Array<TxDetails>}
-     * @memberof InlineResponse200
-     */
-    txs: Array<TxDetails>;
 }

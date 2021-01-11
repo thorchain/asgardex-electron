@@ -1,23 +1,17 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BNBChain, BTCChain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { observableState } from '../../helpers/stateHelper'
-import { TxTypes } from '../../types/asgardex'
-import * as BNB from '../binance'
-import * as BTC from '../bitcoin'
-import * as THOR from '../thorchain'
-import { ErrorId, TxLD, TxRD } from '../wallet/types'
-import { SendTxParams } from './types'
+import { liveData } from '../../../helpers/rx/liveData'
+import { TxTypes } from '../../../types/asgardex'
+import * as BNB from '../../binance'
+import * as BTC from '../../bitcoin'
+import * as THOR from '../../thorchain'
+import { ErrorId, TxLD } from '../../wallet/types'
+import { SendTxParams } from '../types'
 
-const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
-
-const tx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => {
-  // TODO (@Veado) Health check request for pool address
-  // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
-
+const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }: SendTxParams): TxLD => {
   // helper to create `RemoteData<ApiError, never>` observable
   const txFailure$ = (msg: string) =>
     Rx.of(
@@ -33,13 +27,12 @@ const tx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => 
 
     case BTCChain:
       return FP.pipe(
-        BTC.getPoolFeeRate(),
-        RD.toOption,
-        O.fold(
-          // TODO (@veado) i18n
-          () => txFailure$('Fee rate for BTC transaction not available'),
-          (feeRate) => BTC.sendTx({ recipient, amount, feeRate, memo })
-        )
+        BTC.memoFees$(memo),
+        liveData.mapLeft((error) => ({
+          errorId: ErrorId.GET_FEES,
+          msg: error?.message ?? error.toString()
+        })),
+        liveData.chain(({ rates }) => BTC.sendTx({ recipient, amount, feeRate: rates[feeOptionKey], memo }))
       )
 
     case ETHChain:
@@ -63,12 +56,4 @@ const tx$ = ({ asset, recipient, amount, memo, txType }: SendTxParams): TxLD => 
   }
 }
 
-const sendTx = ({ asset, recipient, amount, memo, txType }: SendTxParams): void => {
-  tx$({ asset, recipient, amount, memo, txType }).subscribe(setTxRD)
-}
-
-const resetTx = () => {
-  setTxRD(RD.initial)
-}
-
-export { sendTx, txRD$, resetTx }
+export { sendTx$ }

@@ -80,10 +80,15 @@ export const ValueItemContainer = styled('div')`
   &.valueItemContainer {
     &-out {
       margin-bottom: 10px;
+      align-items: center;
     }
 
     &-percent {
       padding-bottom: 50px;
+    }
+
+    &-in {
+      align-items: center;
     }
   }
 
@@ -102,7 +107,7 @@ export const SliderContainer = styled('div')`
   min-width: 212px;
 `
 
-export const InValue = styled('div')`
+export const InValueContainer = styled('div')`
   display: flex;
   flex-direction: row;
 
@@ -111,30 +116,25 @@ export const InValue = styled('div')`
   `}
 `
 
-export const InValueTitle = styled('div')`
+export const InValueTitle = styled(UILabel).attrs({
+  color: 'gray',
+  textTransform: 'uppercase',
+  size: 'small'
+})`
   margin-right: 10px;
+  padding: 0;
+`
+
+export const InValueLabel = styled(UILabel).attrs({
+  color: 'normal'
+})`
+  padding-bottom: 0;
 `
 
 export const SubmitContainer = styled('div')`
   display: flex;
   flex-direction: column;
   align-items: center;
-`
-
-export const PendingContainer = styled('div')`
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  top: 60px;
-  left: 0;
-  z-index: 9;
-  background-color: ${palette('gradient', 1)};
-
-  &:not(:empty) {
-    width: 100%;
-    height: 100%;
-  }
 `
 
 export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`

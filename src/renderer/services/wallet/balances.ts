@@ -8,7 +8,7 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getRuneAsset } from '../../helpers/assetHelper'
+import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { eqBalancesRD } from '../../helpers/fp/eq'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { network$ } from '../app/service'
@@ -22,14 +22,14 @@ import { INITIAL_BALANCES_STATE } from './const'
 import { BalancesState, LoadBalancesHandler, ChainBalances$, ChainBalance$, ChainBalance } from './types'
 import { sortBalances } from './util'
 
-export const reloadBalances = () => {
+export const reloadBalances: FP.Lazy<void> = () => {
   BTC.reloadBalances()
   BNB.reloadBalances()
   ETH.reloadBalances()
   THOR.reloadBalances()
 }
 
-const reloadBalancesByChain = (chain: Chain) => {
+const reloadBalancesByChain: (chain: Chain) => FP.Lazy<void> = (chain) => {
   switch (chain) {
     case 'BNB':
       return BNB.reloadBalances
@@ -70,7 +70,7 @@ const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([BNB.address$, BNB.bala
     walletAddress,
     balances: FP.pipe(
       balances,
-      RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getRuneAsset({ network, chain: 'BNB' }).ticker]))
+      RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getBnbRuneAsset(network).ticker]))
     )
   }))
 )
@@ -138,8 +138,8 @@ export const chainBalances$: ChainBalances$ = Rx.combineLatest([
   thorChainBalance$,
   btcChainBalance$,
   btcLedgerChainBalance$,
-  bnbChainBalance$,
-  ethChainBalance$
+  ethChainBalance$,
+  bnbChainBalance$
 ])
 
 /**

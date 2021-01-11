@@ -12,16 +12,19 @@
  */
 
 /**
+ * Represents a digital currency amount
  * @export
  * @interface Coin
  */
 export interface Coin {
     /**
+     * Int64 (10^8), asset Amount.
      * @type {string}
      * @memberof Coin
      */
     amount: string;
     /**
+     * Asset in CHAIN.SYMBOL format
      * @type {string}
      * @memberof Coin
      */

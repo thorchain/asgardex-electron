@@ -1,6 +1,5 @@
 import { addressByChain$, assetAddress$ } from './address'
 import { clientByChain$ } from './client'
-import { isCrossChainDeposit$ } from './common'
 import { getExplorerUrlByAsset$ } from './explorerUrl'
 import {
   reloadDepositFees,
@@ -13,7 +12,7 @@ import {
 } from './fees'
 import { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } from './ledger'
 import { asymDepositTxMemo$, symDepositTxMemo$ } from './memo'
-import { sendTx, txRD$, resetTx } from './transaction'
+import { swap$ } from './transaction'
 
 /**
  * Exports all functions and observables needed at UI level (provided by `ChainContext`)
@@ -26,7 +25,6 @@ export {
   withdrawFees$,
   reloadWithdrawFees,
   reloadDepositFeesEffect$,
-  isCrossChainDeposit$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   retrieveLedgerAddress,
@@ -34,9 +32,7 @@ export {
   removeAllLedgerAddress,
   reloadSwapFees,
   swapFees$,
-  sendTx,
-  txRD$,
-  resetTx,
   getExplorerUrlByAsset$,
-  assetAddress$
+  assetAddress$,
+  swap$
 }

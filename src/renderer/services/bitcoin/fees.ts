@@ -3,13 +3,12 @@ import { Client as BitcoinClient, getDefaultFeesWithRates } from '@xchainjs/xcha
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { catchError, map, mergeMap, shareReplay, startWith, switchMap, tap } from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
-import { liveData } from '../../helpers/rx/liveData'
-import { observableState, triggerStream } from '../../helpers/stateHelper'
-import { FeeLD, Memo } from '../chain/types'
-import { Client$ } from './types'
-import { FeesService, FeeRateLD, FeeRateRD, FeesWithRatesLD } from './types'
+import { triggerStream } from '../../helpers/stateHelper'
+import { Memo } from '../chain/types'
+import { Client$, FeesWithRatesRD } from './types'
+import { FeesService, FeesWithRatesLD } from './types'
 
 /**
  * The only thing we export from this module is this factory
@@ -26,22 +25,22 @@ export const createFeesService = (oClient$: Client$): FeesService => {
    */
   const loadFees$ = (client: BitcoinClient, memo?: string): FeesWithRatesLD =>
     Rx.from(client.getFeesWithRates(memo)).pipe(
-      map(RD.success),
-      catchError(() => Rx.of(RD.success(getDefaultFeesWithRates()))),
-      startWith(RD.pending)
+      RxOp.map(RD.success),
+      RxOp.catchError(() => Rx.of(RD.success(getDefaultFeesWithRates()))),
+      RxOp.startWith(RD.pending)
     )
 
   /**
    * Transaction fees (no memo included)
    */
   const fees$: FeesWithRatesLD = Rx.combineLatest([oClient$, reloadFees$]).pipe(
-    mergeMap(([oClient, _]) =>
+    RxOp.mergeMap(([oClient, _]) =>
       FP.pipe(
         oClient,
-        O.fold(() => Rx.of(RD.initial), loadFees$)
+        O.fold(() => Rx.of<FeesWithRatesRD>(RD.initial), loadFees$)
       )
     ),
-    shareReplay(1)
+    RxOp.shareReplay(1)
   )
 
   /**
@@ -49,53 +48,21 @@ export const createFeesService = (oClient$: Client$): FeesService => {
    */
   const memoFees$ = (memo: Memo): FeesWithRatesLD =>
     Rx.combineLatest([oClient$, reloadFees$]).pipe(
-      switchMap(([oClient]) =>
+      RxOp.switchMap(([oClient]) =>
         FP.pipe(
           oClient,
           O.fold(
-            () => Rx.of(RD.initial) as FeesWithRatesLD,
+            () => Rx.of<FeesWithRatesRD>(RD.initial),
             (client) => loadFees$(client, memo)
           )
         )
       ),
-      shareReplay(1)
-    )
-
-  // `TriggerStream` to reload deposit `fees`
-  const { stream$: reloadDepositFee$, trigger: reloadDepositFee } = triggerStream()
-
-  /**
-   * Factory to create a stream for pool fees (deposit / withdraw)
-   * @param memo Memo used for pool transactions
-   */
-  const poolFee$ = (memo: Memo): FeeLD =>
-    FP.pipe(
-      reloadDepositFee$,
-      switchMap(() => memoFees$(memo)),
-      liveData.map(({ fees }) => fees.fast)
-    )
-
-  const { get: getPoolFeeRate, set: setPoolFeeRate } = observableState<FeeRateRD>(RD.initial)
-  /**
-   * Factory to create a stream of fees for pool transacions
-   * @param memo Memo used for pool transactions
-   */
-  const poolFeeRate$ = (memo: Memo): FeeRateLD =>
-    FP.pipe(
-      reloadDepositFee$,
-      switchMap(() => memoFees$(memo)),
-      liveData.map(({ rates }) => rates.fast),
-      // we do need to store result in a subject to access it w/o subscribing a stream
-      tap(setPoolFeeRate)
+      RxOp.shareReplay(1)
     )
 
   return {
     fees$,
-    poolFee$,
     memoFees$,
-    poolFeeRate$,
-    getPoolFeeRate,
-    reloadFees,
-    reloadDepositFee
+    reloadFees
   }
 }

@@ -30,7 +30,6 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
     }
     // RUNE
     if (isRuneBnbAsset(asset) || isRuneNativeAsset(asset)) {
-      // Always use "our" Rune asset
       return runeIcon
     }
     // BNB

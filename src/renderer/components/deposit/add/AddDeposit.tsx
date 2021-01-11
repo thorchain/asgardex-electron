@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
@@ -17,18 +17,30 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
 
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { SymDepositMemo, Memo, SendDepositTxParams, DepositFeesRD } from '../../../services/chain/types'
+import { INITIAL_DEPOSIT_STATE } from '../../../services/chain/const'
+import {
+  SymDepositMemo,
+  Memo,
+  SendDepositTxParams,
+  DepositFeesRD,
+  DepositState,
+  DepositStateHandler
+} from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
+import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { DepositType } from '../../../types/asgardex'
+import { PasswordModal } from '../../modal/password'
+import { TxModal } from '../../modal/tx'
 import { Drag } from '../../uielements/drag'
 import { formatFee } from '../../uielements/fees/Fees.helper'
 import * as Helper from './AddDeposit.helper'
 import * as Styled from './AddDeposit.style'
 
-type Props = {
+export type Props = {
   type: DepositType
   asset: Asset
   assetPrice: BigNumber
@@ -42,11 +54,15 @@ type Props = {
   priceAsset?: Asset
   fees: DepositFeesRD
   reloadFees: (type: DepositType) => void
+  reloadBalances: FP.Lazy<void>
+  goToTransaction: (txHash: string) => void
+  validatePassword$: ValidatePasswordHandler
   assets?: Asset[]
   onDeposit: (p: SendDepositTxParams) => void
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
+  deposit$: DepositStateHandler
 }
 
 export const AddDeposit: React.FC<Props> = (props) => {
@@ -61,13 +77,17 @@ export const AddDeposit: React.FC<Props> = (props) => {
     asymDepositMemo: oAsymDepositMemo,
     symDepositMemo: oSymDepositMemo,
     poolAddress: oPoolAddress,
+    goToTransaction = (_) => {},
+    validatePassword$,
     assets,
     priceAsset,
     reloadFees,
+    reloadBalances = FP.constVoid,
     fees,
     onChangeAsset,
     disabled = false,
-    poolData
+    poolData,
+    deposit$
   } = props
 
   const intl = useIntl()
@@ -76,6 +96,30 @@ export const AddDeposit: React.FC<Props> = (props) => {
   const [percentValueToDeposit, setPercentValueToDeposit] = useState(0)
 
   const isAsym = useMemo(() => type === 'asym', [type])
+
+  // (Possible) subscription of swap$
+  const [depositSub, setDepositSub] = useState<O.Option<Rx.Subscription>>(O.none)
+
+  // unsubscribe deposit$ subscription
+  const unsubscribeDepositSub = useCallback(() => {
+    FP.pipe(
+      depositSub,
+      O.map((sub) => sub.unsubscribe())
+    )
+  }, [depositSub])
+
+  useEffect(() => {
+    // Unsubscribe of (possible) previous subscription of `swap$`
+    return () => {
+      unsubscribeDepositSub()
+    }
+  }, [unsubscribeDepositSub])
+
+  // Deposit state
+  const [depositState, setDepositState] = useState<DepositState>(INITIAL_DEPOSIT_STATE)
+
+  // Deposit start time
+  const [depositStartTime, _setDepositStartTime] = useState<number>(0)
 
   const assetBalance: BaseAmount = useMemo(
     () =>
@@ -232,55 +276,11 @@ export const AddDeposit: React.FC<Props> = (props) => {
     [maxAssetAmountToDeposit, maxRuneAmountToDeposit]
   )
 
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+
   const confirmDepositHandler = useCallback(() => {
-    const asymDepositTx = () =>
-      FP.pipe(
-        sequenceTOption(oPoolAddress, oAsymDepositMemo),
-        O.map(([poolAddress, asymDepositMemo]) => {
-          const asymDepositTxParam = {
-            asset: asset,
-            poolAddress,
-            amount: assetAmountToDeposit,
-            memo: asymDepositMemo
-          }
-          console.log('ASYM Tx 1/1 ', asymDepositTxParam)
-          return true
-        })
-      )
-
-    const symDepositTx = () =>
-      FP.pipe(
-        sequenceTOption(oPoolAddress, oSymDepositMemo),
-        O.map(([poolAddress, { rune: runeMemo, asset: assetMemo }]) => {
-          const thorchainTxParam = {
-            asset: AssetRuneNative,
-            poolAddress,
-            // TODO (@Veado) NativeRune tx, maybe it can be ZERO
-            // minimal tx amount of `RuneNative`
-            amount: baseAmount(1),
-            memo: runeMemo
-          }
-          console.log('SYM Tx 1/2 (thorchain):', thorchainTxParam)
-          const assetChainTxParam = {
-            asset: asset,
-            poolAddress,
-            amount: assetAmountToDeposit,
-            memo: assetMemo
-          }
-          console.log('SYM Tx 2/2 (asset chain):', assetChainTxParam)
-
-          return true
-        })
-      )
-
-    // TODO(@Veado) Call sendTx of `services/chain/txs`
-    // and handle results (error/success) in a modal here in `AddStake`
-    FP.pipe(
-      type === 'asym' ? asymDepositTx() : symDepositTx(),
-      O.map((v) => console.log('success:', v)),
-      O.getOrElse(() => console.log('no data to run txs'))
-    )
-  }, [type, oPoolAddress, oSymDepositMemo, assetAmountToDeposit, oAsymDepositMemo, asset])
+    setShowPasswordModal(true)
+  }, [setShowPasswordModal])
 
   const renderFeeError = useCallback(
     (fee: BaseAmount, balance: AssetAmount, asset: Asset) => {
@@ -391,6 +391,131 @@ export const AddDeposit: React.FC<Props> = (props) => {
 
   const reloadFeesHandler = useCallback(() => reloadFees(type), [reloadFees, type])
 
+  const extraTxModalContent = useMemo(() => <>Extra TxModal content</>, [])
+
+  const onCloseTxModal = useCallback(() => {
+    // unsubscribe
+    unsubscribeDepositSub()
+    // reset deposit$ subscription
+    setDepositSub(O.none)
+    // reset deposit state
+    setDepositState(INITIAL_DEPOSIT_STATE)
+  }, [unsubscribeDepositSub])
+
+  const onFinishTxModal = useCallback(() => {
+    // Do same things as with closing
+    onCloseTxModal()
+    // but also refresh balances
+    reloadBalances()
+  }, [onCloseTxModal, reloadBalances])
+
+  const renderTxModal = useMemo(() => {
+    const { txHash, txRD } = depositState
+
+    // don't render TxModal in initial state
+    if (RD.isInitial(txRD)) return <></>
+
+    // Get timer value
+    const timerValue = FP.pipe(
+      txRD,
+      RD.fold(
+        () => 0,
+        FP.flow(
+          O.map(({ loaded }) => loaded),
+          O.getOrElse(() => 0)
+        ),
+        () => 0,
+        () => 100
+      )
+    )
+
+    // title
+    const txModalTitle = FP.pipe(
+      txRD,
+      RD.fold(
+        () => 'deposit.add.state.pending',
+        () => 'deposit.add.state.pending',
+        () => 'deposit.add.state.error',
+        () => 'deposit.add.state.success'
+      ),
+      (id) => intl.formatMessage({ id })
+    )
+
+    return (
+      <TxModal
+        title={txModalTitle}
+        onClose={onCloseTxModal}
+        onFinish={onFinishTxModal}
+        startTime={depositStartTime}
+        txRD={txRD}
+        txHash={txHash}
+        timerValue={timerValue}
+        onViewTxClick={goToTransaction}
+        extra={extraTxModalContent}
+      />
+    )
+  }, [depositState, onCloseTxModal, onFinishTxModal, depositStartTime, goToTransaction, extraTxModalContent, intl])
+
+  const closePasswordModal = useCallback(() => {
+    setShowPasswordModal(false)
+  }, [setShowPasswordModal])
+
+  const onClosePasswordModal = useCallback(() => {
+    // close password modal
+    closePasswordModal()
+  }, [closePasswordModal])
+
+  const onSucceedPasswordModal = useCallback(() => {
+    // close private modal
+    closePasswordModal()
+
+    // _asymDepositTx is temporary - will be changed with #537
+    const _asymDepositTx = () =>
+      FP.pipe(
+        sequenceTOption(oPoolAddress, oAsymDepositMemo),
+        O.map(([poolAddress, asymDepositMemo]) => {
+          const asymDepositTxParam = {
+            asset: asset,
+            poolAddress,
+            amount: assetAmountToDeposit,
+            memo: asymDepositMemo
+          }
+          console.log('ASYM Tx 1/1 ', asymDepositTxParam)
+          return true
+        })
+      )
+    // _symDepositTx is temporary - will be changed with #537
+    const _symDepositTx = () =>
+      FP.pipe(
+        sequenceTOption(oPoolAddress, oSymDepositMemo),
+        O.map(([poolAddress, { rune: runeMemo, asset: assetMemo }]) => {
+          const thorchainTxParam = {
+            asset: AssetRuneNative,
+            poolAddress,
+            // TODO (@Veado) NativeRune tx, maybe it can be ZERO
+            // minimal tx amount of `RuneNative`
+            amount: baseAmount(1),
+            memo: runeMemo
+          }
+          console.log('SYM Tx 1/2 (thorchain):', thorchainTxParam)
+          const assetChainTxParam = {
+            asset: asset,
+            poolAddress,
+            amount: assetAmountToDeposit,
+            memo: assetMemo
+          }
+          console.log('SYM Tx 2/2 (asset chain):', assetChainTxParam)
+
+          return true
+        })
+      )
+
+    // Temporary run of deposit$ - will be implemented with #537
+    const sub = deposit$({ memo: '' }).subscribe(setDepositState)
+
+    setDepositSub(O.some(sub))
+  }, [closePasswordModal, deposit$, oPoolAddress, oAsymDepositMemo, asset, assetAmountToDeposit, oSymDepositMemo])
+
   const disabledForm = useMemo(() => isBalanceError || isThorchainFeeError || disabled, [
     disabled,
     isBalanceError,
@@ -473,6 +598,14 @@ export const AddDeposit: React.FC<Props> = (props) => {
           disabled={disabledForm || runeAmountToDeposit.amount().isZero()}
         />
       </Styled.DragWrapper>
+      {showPasswordModal && (
+        <PasswordModal
+          onSuccess={onSucceedPasswordModal}
+          onClose={onClosePasswordModal}
+          validatePassword$={validatePassword$}
+        />
+      )}
+      {renderTxModal}
     </Styled.Container>
   )
 }

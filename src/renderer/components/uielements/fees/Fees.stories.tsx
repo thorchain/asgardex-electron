@@ -2,14 +2,13 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import { baseAmount, AssetBTC } from '@xchainjs/xchain-util'
+import { baseAmount, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 
-import { BASE_CHAIN_ASSET } from '../../../const'
 import { Fees } from './'
 
 const baseFee = {
   amount: baseAmount('31500'),
-  asset: BASE_CHAIN_ASSET
+  asset: AssetRuneNative
 }
 
 export const DefaultPoolShare = () => <Fees fees={RD.success([baseFee])} />

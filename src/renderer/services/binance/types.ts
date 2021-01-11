@@ -9,7 +9,7 @@ import * as Rx from 'rxjs'
 import { LedgerBNCTxInfo, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
-import { LedgerAddressLD, LedgerTxLD } from '../wallet/types'
+import { ApiError, LedgerAddressLD, LedgerTxLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -56,8 +56,8 @@ export type LoadTxsProps = {
 }
 
 export type TxWithState = { txHash: string; state: O.Option<string> }
-export type TxWithStateRD = RD.RemoteData<Error, TxWithState>
-export type TxWithStateLD = LiveData<Error, TxWithState>
+export type TxWithStateRD = RD.RemoteData<ApiError, TxWithState>
+export type TxWithStateLD = LiveData<ApiError, TxWithState>
 
 export type SendTxParams = {
   recipient: Address

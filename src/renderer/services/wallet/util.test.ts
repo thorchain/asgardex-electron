@@ -1,4 +1,4 @@
-import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
+import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
 import { some, none } from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -123,7 +123,7 @@ describe('services/wallet/util/', () => {
           walletAddress: 'ADDRESS_FTM'
         },
         {
-          asset: ASSETS_TESTNET.BNB,
+          asset: AssetBNB,
           amount: baseAmount(2),
           walletAddress: 'ADDRESS_BNB'
         },
@@ -157,7 +157,7 @@ describe('services/wallet/util/', () => {
           walletAddress: 'ADDRESS_FTM'
         },
         {
-          asset: ASSETS_TESTNET.BNB,
+          asset: AssetBNB,
           amount: baseAmount(2),
           walletAddress: 'ADDRESS_BNB'
         },
@@ -167,7 +167,7 @@ describe('services/wallet/util/', () => {
           walletAddress: 'ADDRESS_RUNENATIVE'
         }
       ]
-      const balances = sortBalances(target, [AssetBTC.ticker, AssetETH.ticker, AssetRune67C.ticker, AssetBNB.ticker])
+      const balances = sortBalances(target, [AssetBTC.ticker, AssetETH.ticker, AssetRuneNative.ticker, AssetBNB.ticker])
       expect(eqWalletBalances.equals(balances, [target[4], target[3], target[1], target[2], target[0]])).toBeTruthy()
     })
   })
@@ -191,7 +191,7 @@ describe('services/wallet/util/', () => {
           walletAddress: 'ADDRESS_FTM'
         },
         {
-          asset: ASSETS_TESTNET.BNB,
+          asset: AssetBNB,
           amount: baseAmount(2),
           walletAddress: 'ADDRESS_BNB'
         },
@@ -205,7 +205,7 @@ describe('services/wallet/util/', () => {
         eqOWalletBalance.equals(
           balanceByAsset,
           some({
-            asset: ASSETS_TESTNET.BNB,
+            asset: AssetBNB,
             amount: baseAmount(2),
             walletAddress: 'ADDRESS_BNB'
           })

@@ -12,38 +12,35 @@
  */
 
 import {
-    Coin,
-    Option,
+    AddLiquidityMetadata,
+    RefundMetadata,
+    SwapMetadata,
+    WithdrawMetadata,
 } from './';
 
 /**
  * @export
- * @interface Tx
+ * @interface Metadata
  */
-export interface Tx {
+export interface Metadata {
     /**
-     * @type {string}
-     * @memberof Tx
+     * @type {AddLiquidityMetadata}
+     * @memberof Metadata
      */
-    address: string;
+    addLiquidity?: AddLiquidityMetadata;
     /**
-     * @type {Array<Coin>}
-     * @memberof Tx
+     * @type {RefundMetadata}
+     * @memberof Metadata
      */
-    coins: Array<Coin>;
+    refund?: RefundMetadata;
     /**
-     * @type {string}
-     * @memberof Tx
+     * @type {SwapMetadata}
+     * @memberof Metadata
      */
-    memo: string;
+    swap?: SwapMetadata;
     /**
-     * @type {Option}
-     * @memberof Tx
+     * @type {WithdrawMetadata}
+     * @memberof Metadata
      */
-    options: Option;
-    /**
-     * @type {string}
-     * @memberof Tx
-     */
-    txID: string;
+    withdraw?: WithdrawMetadata;
 }

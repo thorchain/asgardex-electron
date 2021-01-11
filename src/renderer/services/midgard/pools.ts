@@ -11,7 +11,7 @@ import { combineLatest } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
-import { getRuneAsset, isPricePoolAsset } from '../../helpers/assetHelper'
+import { isPricePoolAsset } from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
@@ -23,7 +23,6 @@ import {
   GetSwapHistoryIntervalEnum
 } from '../../types/generated/midgard/apis'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
-import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import {
   AssetDetailsLD,
@@ -37,7 +36,9 @@ import {
   PoolStringAssetsLD,
   SelectedPricePoolAsset,
   ThorchainEndpointsLD,
-  PoolDetails
+  PoolDetails,
+  ValidatePoolLD,
+  ValidateNodeLD
 } from './types'
 import { getPoolAddressByChain, getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
 
@@ -51,8 +52,6 @@ const getStoredSelectedPricePoolAsset = (): SelectedPricePoolAsset =>
     O.chain(O.fromNullable),
     O.filter(isPricePoolAsset)
   )
-
-const runeAsset$: Rx.Observable<Asset> = network$.pipe(RxOp.map((network) => getRuneAsset({ network, chain: 'BNB' })))
 
 const createPoolsService = (
   byzantine$: LiveData<Error, string>,
@@ -403,6 +402,27 @@ const createPoolsService = (
     RxOp.map(O.getOrElse(() => ONE_BN))
   )
 
+  // TODO (@Veado) Validate pool address
+  // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
+  const validatePool$ = (_: string): ValidatePoolLD =>
+    // mock validation for now
+    Rx.of(null).pipe(
+      RxOp.delay(1500),
+      RxOp.map((_) => RD.success(true)),
+      RxOp.startWith(RD.initial)
+    )
+
+  // TODO (@Veado) Validate node
+  // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
+  const validateNode$ = (): ValidateNodeLD =>
+    // mock validation for now
+    Rx.of(null).pipe(
+      RxOp.delay(1500),
+      RxOp.map((_) => RD.success(true)),
+      // RxOp.map((_) => RD.failure({ errorId: ErrorId.GET_BALANCES, msg: 'invalid node ' })),
+      RxOp.startWith(RD.initial)
+    )
+
   return {
     poolsState$,
     pendingPoolsState$,
@@ -412,13 +432,14 @@ const createPoolsService = (
     selectedPricePoolAssetSymbol$,
     reloadPools,
     poolAddresses$,
-    selectedPoolAddress$: selectedPoolAddress$,
-    runeAsset$,
+    selectedPoolAddress$,
     poolDetail$,
     priceRatio$,
     availableAssets$,
-    poolAddressByAsset$
+    poolAddressByAsset$,
+    validatePool$,
+    validateNode$
   }
 }
 
-export { runeAsset$, createPoolsService, getStoredSelectedPricePoolAsset as getSelectedPricePool }
+export { createPoolsService, getStoredSelectedPricePoolAsset as getSelectedPricePool }
