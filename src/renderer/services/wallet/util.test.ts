@@ -123,7 +123,7 @@ describe('services/wallet/util/', () => {
           walletAddress: 'ADDRESS_FTM'
         },
         {
-          asset: ASSETS_TESTNET.BNB,
+          asset: AssetBNB,
           amount: baseAmount(2),
           walletAddress: 'ADDRESS_BNB'
         },
@@ -157,7 +157,7 @@ describe('services/wallet/util/', () => {
           walletAddress: 'ADDRESS_FTM'
         },
         {
-          asset: ASSETS_TESTNET.BNB,
+          asset: AssetBNB,
           amount: baseAmount(2),
           walletAddress: 'ADDRESS_BNB'
         },
@@ -191,7 +191,7 @@ describe('services/wallet/util/', () => {
           walletAddress: 'ADDRESS_FTM'
         },
         {
-          asset: ASSETS_TESTNET.BNB,
+          asset: AssetBNB,
           amount: baseAmount(2),
           walletAddress: 'ADDRESS_BNB'
         },
@@ -205,7 +205,7 @@ describe('services/wallet/util/', () => {
         eqOWalletBalance.equals(
           balanceByAsset,
           some({
-            asset: ASSETS_TESTNET.BNB,
+            asset: AssetBNB,
             amount: baseAmount(2),
             walletAddress: 'ADDRESS_BNB'
           })

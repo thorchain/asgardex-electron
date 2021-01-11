@@ -3,7 +3,6 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { AssetBNB, AssetBTC, AssetRuneNative, bn } from '@xchainjs/xchain-util'
 
-import { ASSETS_MAINNET } from '../../../../../shared/mock/assets'
 import { AssetMenu } from './AssetMenu'
 
 const assets = [AssetBNB, AssetBTC, AssetRuneNative]
@@ -18,7 +17,7 @@ storiesOf('Components/Assets/AssetMenu', module).add('with search', () => {
     <div style={{ display: 'flex', padding: '20px' }}>
       <AssetMenu
         withSearch={true}
-        asset={ASSETS_MAINNET.BNB}
+        asset={AssetBNB}
         assets={assets}
         priceIndex={priceIndex}
         searchDisable={[]}
@@ -32,7 +31,7 @@ storiesOf('Components/Assets/AssetMenu', module).add('without search', () => {
   return (
     <div style={{ display: 'flex', padding: '20px' }}>
       <AssetMenu
-        asset={ASSETS_MAINNET.BNB}
+        asset={AssetBNB}
         assets={assets}
         priceIndex={priceIndex}
         withSearch={false}

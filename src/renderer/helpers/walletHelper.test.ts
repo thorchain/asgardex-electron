@@ -1,4 +1,4 @@
-import { baseAmount, assetFromString, AssetRuneNative } from '@xchainjs/xchain-util'
+import { baseAmount, assetFromString, AssetRuneNative, AssetBNB } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -19,7 +19,7 @@ describe('walletHelper', () => {
     asset: ASSETS_TESTNET.BOLT,
     walletAddress: 'bolt wallet address'
   }
-  const BNB_WB = { amount: baseAmount('45600000000'), asset: ASSETS_TESTNET.BNB, walletAddress: 'bnb wallet address' }
+  const BNB_WB = { amount: baseAmount('45600000000'), asset: AssetBNB, walletAddress: 'bnb wallet address' }
 
   describe('amountByAsset', () => {
     it('returns amount of RUNE', () => {
