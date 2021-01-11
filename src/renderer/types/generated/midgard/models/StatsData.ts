@@ -65,7 +65,7 @@ export interface StatsData {
      */
     totalStakeTx: string;
     /**
-     * Total staked (in RUNE Value).
+     * Total staked (in RUNE Value)
      * @type {string}
      * @memberof StatsData
      */
@@ -83,7 +83,7 @@ export interface StatsData {
      */
     totalUsers: string;
     /**
-     * Total (in RUNE Value) of all assets swapped since start.
+     * Total (in RUNE Value) of all assets swapped since start
      * @type {string}
      * @memberof StatsData
      */

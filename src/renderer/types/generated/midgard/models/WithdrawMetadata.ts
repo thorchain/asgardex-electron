@@ -11,39 +11,37 @@
  * Do not edit the class manually.
  */
 
+import {
+    Coin,
+} from './';
+
 /**
  * @export
- * @interface DepthHistoryItem
+ * @interface WithdrawMetadata
  */
-export interface DepthHistoryItem {
+export interface WithdrawMetadata {
     /**
-     * Int64, the amount of Asset in the pool
+     * Decimal (-1.0 <=> 1.0), indicates how assymetrical the withdrawal was. 0 means totally symetrical
      * @type {string}
-     * @memberof DepthHistoryItem
+     * @memberof WithdrawMetadata
      */
-    assetDepth: string;
+    asymmetry: string;
     /**
-     * Float, price of asset in rune. I.e. rune amount / asset amount
+     * Int64 (Basis points, 0-10000, where 10000=100%), percentage of total pool ownership withdrawn
      * @type {string}
-     * @memberof DepthHistoryItem
+     * @memberof WithdrawMetadata
      */
-    assetPrice: string;
+    basisPoints: string;
     /**
-     * Int64, The end time of bucket in unix timestamp
+     * Int64, amount of liquidity units removed from the member as result of the withdrawal
      * @type {string}
-     * @memberof DepthHistoryItem
+     * @memberof WithdrawMetadata
      */
-    endTime: string;
+    liquidityUnits: string;
     /**
-     * Int64, the amount of Rune in the pool
-     * @type {string}
-     * @memberof DepthHistoryItem
+     * List of network fees associated to an action. One network fee is charged for each outbound transaction
+     * @type {Array<Coin>}
+     * @memberof WithdrawMetadata
      */
-    runeDepth: string;
-    /**
-     * Int64, The beginning time of bucket in unix timestamp
-     * @type {string}
-     * @memberof DepthHistoryItem
-     */
-    startTime: string;
+    networkFees: Array<Coin>;
 }
