@@ -59,7 +59,7 @@ describe('components/swap/utils', () => {
 
       expect(getSlip(AssetRuneNative, AssetBNB, baseAmount(bn(1)), poolsData)).toEqual(bn('0.33333333333333333333'))
 
-      expect(getSlip(AssetBNB, AssetRuneNative, baseAmount(bn(1)), poolsData)).toEqual(bn('0'))
+      expect(getSlip(AssetBNB, AssetRuneNative, baseAmount(bn(1)), poolsData)).toEqual(bn('0.25'))
     })
   })
 
