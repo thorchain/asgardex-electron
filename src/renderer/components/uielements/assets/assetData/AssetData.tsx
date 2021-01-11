@@ -15,7 +15,7 @@ import * as Styled from './AssetData.style'
  *
  */
 
-type Props = {
+export type Props = {
   asset: Asset
   noTicker?: boolean
   amount?: BaseAmount
