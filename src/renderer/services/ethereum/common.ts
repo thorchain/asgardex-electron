@@ -27,8 +27,6 @@ const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(
 )
 
 const ETHPLORER_API_KEY = envOrDefault(process.env.REACT_APP_ETHPLORER_API_KEY, '')
-const ETHPLORER_TESTNET = 'https://kovan-api.ethplorer.io'
-const ETHPLORER_MAINNET = 'https://api.ethplorer.io'
 const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
 
 /**
@@ -46,10 +44,8 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, ethereumNetwor
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
-              const ethplorerUrl = network === 'testnet' ? ETHPLORER_TESTNET : ETHPLORER_MAINNET
               const client = new Client({
                 network,
-                ethplorerUrl,
                 ethplorerApiKey: ETHPLORER_API_KEY,
                 etherscanApiKey: ETHERSCAN_API_KEY,
                 phrase
