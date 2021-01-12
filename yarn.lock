@@ -4511,10 +4511,10 @@
     "@xchainjs/xchain-client" "^0.3.0"
     "@xchainjs/xchain-crypto" "^0.2.0"
 
-"@xchainjs/xchain-bitcoin@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.7.0.tgz#314be68fa48caf3c74c98a6962668329aa83a016"
-  integrity sha512-Hown6wnhvDfLzEqxZGgOTHNgPHjQNgJzeN9h+UqOTns0eAJQojE2i1H9nXEqLWYxSEN+D1HyFDk8cbJwyiQT+A==
+"@xchainjs/xchain-bitcoin@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.7.1.tgz#dc325360cdae4b3478bd244240e11b4b27f5c120"
+  integrity sha512-Z5B2MSYOhLkDBT5hgyeSjhGRMyAdLmAmRjyc/xLer57T+h1LXR1l9of5gJb8qFYBFp5lYT0GOK0zCPTn4MJBYA==
   dependencies:
     "@xchainjs/xchain-client" "^0.3.0"
     "@xchainjs/xchain-crypto" "^0.2.1"
@@ -4552,10 +4552,10 @@
     hdkey "^2.0.1"
     uuid "^8.1.0"
 
-"@xchainjs/xchain-ethereum@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.4.0.tgz#0db953d99b8652bf5b563da2b36889da89fcfc94"
-  integrity sha512-x0jxuwimofJCaMI2VhdVnSkyPVSQpAg2CrDRXJjpbUKjQL4FTwl1I1Rz5caRwcmtRGjkqZI+4Tf9u97mWpAi9w==
+"@xchainjs/xchain-ethereum@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.5.1.tgz#35a2825e11240be81ca55a551e264afed2fa4156"
+  integrity sha512-f6F/nlChqoEGHucSbTAfYu33a7jghx8+ZenKPIK9TqMnO15cIKOW+QOK6Ys1RRhoakoYdNkb5Ch50V+kqm+V3g==
   dependencies:
     "@xchainjs/xchain-client" "^0.3.0"
     "@xchainjs/xchain-crypto" "^0.2.2"
