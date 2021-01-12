@@ -7401,16 +7401,16 @@ cosmiconfig@^7.0.0:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
-cosmos-client@^0.39.12:
-  version "0.39.12"
-  resolved "https://registry.yarnpkg.com/cosmos-client/-/cosmos-client-0.39.12.tgz#f6a9d2607c61aacf22a1aff5917eae43bb023d4b"
-  integrity sha512-9DGAkuOHWqiQELVAee32XFw5GZTRUNQnpynVSJm0ukQ85YCCQxvUm25UNmeP3wpBuYO8x2P9+71+/lopL7Mufw==
+cosmos-client@^0.39.2:
+  version "0.39.2"
+  resolved "https://registry.yarnpkg.com/cosmos-client/-/cosmos-client-0.39.2.tgz#332da4a8b5935c5309afb03f2fd6de808a4e35f0"
+  integrity sha512-ISGmjrQA5dpJfRi289fQQIrrhcb7R79fPmvWGG1iOjjIaT++h5nMxE8upmVTsxYPSJZxLEntbQgKeeZ3HaY8PA==
   dependencies:
     axios "^0.19.2"
     bech32 "^1.1.3"
     bip32 "^2.0.5"
     bip39 "^3.0.2"
-    sr25519 "^0.5.0"
+    sr25519 "^0.2.0"
     tiny-secp256k1 "^1.1.3"
     tweetnacl "^1.0.1"
 
@@ -17944,10 +17944,10 @@ sprintf-js@~1.0.2:
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
 
-sr25519@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/sr25519/-/sr25519-0.5.0.tgz#7a5d8e9378a29d332c84905331fe93d72962eed6"
-  integrity sha512-CGE9heF4K88Qm0N3YJ4tXMQ2iyQCDgxBAe3uReV4evnnNI6NzRcugy5a4/a+4cwkVUn1whbDVnEZu3JU6MR35w==
+sr25519@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/sr25519/-/sr25519-0.2.0.tgz#80e1632c1e7c07eae00cf5303dc804d87e76fb15"
+  integrity sha512-dRyJ09XOOl6tBRwQ3ZwkukyvhY3mHLC5k45aBBp+xjKEpjPPU4oL2JCQqisNhL96/gzwsI1PMxZ52svfQurNLw==
 
 sshpk@^1.7.0:
   version "1.16.1"
