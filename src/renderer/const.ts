@@ -8,29 +8,10 @@ import {
   Asset,
   assetToString,
   baseAmount,
-  AssetBNB,
-  BNBChain,
-  Chain,
   AssetRuneNative
 } from '@xchainjs/xchain-util'
 
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
-
-/**
- * "Base" chain RUNE is currently running
- * BNC for now, but it will be changed to `THOR` in the near future
- * @deprecated
- * TODO(@veado): Remove it
- */
-export const BASE_CHAIN: Chain = BNBChain
-
-/**
- * Asset of "base" chain RUNE is currently running on
- * AssetBNB for now, but it will be changed to `NativeRUNE` in the near future
- * @deprecated
- * TODO(@veado): Remove it
- */
-export const BASE_CHAIN_ASSET: Asset = AssetBNB
 
 // BUSD testnet (neded for pricing)
 export const AssetBUSDBAF: Asset = { chain: 'BNB', symbol: 'BUSD-BAF', ticker: 'BUSD' }

@@ -17,7 +17,7 @@
  */
 export interface BondMetrics {
     /**
-     * Int64, Average bond of active nodes.
+     * Int64, Average bond of active nodes
      * @type {string}
      * @memberof BondMetrics
      */
@@ -29,7 +29,7 @@ export interface BondMetrics {
      */
     averageStandbyBond: string;
     /**
-     * Int64, Maxinum bond of active nodes.
+     * Int64, Maxinum bond of active nodes
      * @type {string}
      * @memberof BondMetrics
      */
@@ -41,7 +41,7 @@ export interface BondMetrics {
      */
     maximumStandbyBond: string;
     /**
-     * Int64, Median bond of active nodes.
+     * Int64, Median bond of active nodes
      * @type {string}
      * @memberof BondMetrics
      */
@@ -53,7 +53,7 @@ export interface BondMetrics {
      */
     medianStandbyBond: string;
     /**
-     * Int64, Minumum bond of active nodes.
+     * Int64, Minumum bond of active nodes
      * @type {string}
      * @memberof BondMetrics
      */
@@ -65,7 +65,7 @@ export interface BondMetrics {
      */
     minimumStandbyBond: string;
     /**
-     * Int64, Total bond of active nodes.
+     * Int64, Total bond of active nodes
      * @type {string}
      * @memberof BondMetrics
      */

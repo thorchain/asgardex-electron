@@ -55,13 +55,13 @@ export interface Network {
      */
     liquidityAPY: string;
     /**
-     * Int64, next height of blocks.
+     * Int64, next height of blocks
      * @type {string}
      * @memberof Network
      */
     nextChurnHeight: string;
     /**
-     * Int64, the remaining time of pool activation (in blocks).
+     * Int64, the remaining time of pool activation (in blocks)
      * @type {string}
      * @memberof Network
      */
@@ -84,7 +84,7 @@ export interface Network {
      */
     standbyNodeCount: string;
     /**
-     * Int64, Total Rune pooled in all pools.
+     * Int64, Total Rune pooled in all pools
      * @type {string}
      * @memberof Network
      */

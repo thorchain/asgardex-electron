@@ -2,8 +2,8 @@ import React from 'react'
 
 import { withKnobs, radios } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
+import { AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
 
-import { ASSETS_MAINNET } from '../../../../../shared/mock/assets'
 import { Size as CoinSize } from '../assetIcon/AssetIcon.types'
 import { AssetPair } from './AssetPair'
 
@@ -20,8 +20,8 @@ storiesOf('Components/Assets/AssetPair', module)
     const size = radios('size', sizeOptions, 'small')
     return (
       <div style={{ display: 'flex' }}>
-        <AssetPair from={ASSETS_MAINNET.RUNE} to={ASSETS_MAINNET.BNB} size={size} />
-        <AssetPair from={ASSETS_MAINNET.RUNE} to={ASSETS_MAINNET.BNB} size={size} />
+        <AssetPair from={AssetRuneNative} to={AssetBNB} size={size} />
+        <AssetPair from={AssetRuneNative} to={AssetBNB} size={size} />
       </div>
     )
   })

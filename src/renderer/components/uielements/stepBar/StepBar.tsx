@@ -1,17 +1,18 @@
 import React from 'react'
 
-import { StepBarWrapper } from './StepBar.style'
+import * as Styled from './StepBar.style'
 
-type Props = {
+export type Props = {
   size?: number
+  className?: string
 }
 
-export const StepBar: React.FC<Props> = ({ size = 150, ...rest }): JSX.Element => {
+export const StepBar: React.FC<Props> = ({ size = 150, className }): JSX.Element => {
   return (
-    <StepBarWrapper size={size} {...rest}>
-      <div className="step-start-dot" />
-      <div className="step-bar-line" />
-      <div className="step-end-dot" />
-    </StepBarWrapper>
+    <Styled.Container className={className}>
+      <Styled.Dot />
+      <Styled.Line size={size} />
+      <Styled.Dot />
+    </Styled.Container>
   )
 }

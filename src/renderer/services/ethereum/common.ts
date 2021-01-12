@@ -28,7 +28,7 @@ const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(
 
 const ETHPLORER_URL_TESTNET = 'https://kovan-api.ethplorer.io'
 const ETHPLORER_URL_MAINNET = 'https://api.ethplorer.io'
-const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, 'undefined etherscan api key')
+const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
 const ETHPLORER_API_KEY = envOrDefault(process.env.REACT_APP_ETHPLORER_API_KEY, 'freekey')
 
 /**

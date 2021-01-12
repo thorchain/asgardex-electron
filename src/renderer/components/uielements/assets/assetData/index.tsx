@@ -1,3 +1,1 @@
-import { AssetData } from './AssetData'
-
-export { AssetData }
+export * from './AssetData'

@@ -11,24 +11,37 @@
  * Do not edit the class manually.
  */
 
+import {
+    Coin,
+} from './';
+
 /**
+ * Transaction data
  * @export
- * @interface Option
+ * @interface Transaction
  */
-export interface Option {
+export interface Transaction {
     /**
+     * Sender address
      * @type {string}
-     * @memberof Option
+     * @memberof Transaction
      */
-    asymmetry: string;
+    address: string;
     /**
-     * @type {string}
-     * @memberof Option
+     * @type {Array<Coin>}
+     * @memberof Transaction
      */
-    priceTarget: string;
+    coins: Array<Coin>;
     /**
+     * Transaction memo
      * @type {string}
-     * @memberof Option
+     * @memberof Transaction
      */
-    withdrawBasisPoints: string;
+    memo: string;
+    /**
+     * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
+     * @type {string}
+     * @memberof Transaction
+     */
+    txID: string;
 }

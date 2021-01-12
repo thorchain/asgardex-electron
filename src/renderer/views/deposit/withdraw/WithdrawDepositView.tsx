@@ -16,7 +16,6 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getChainAsset } from '../../../helpers/chainHelper'
-import { emptyFunc } from '../../../helpers/funcHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { PoolDetailRD, StakersAssetData, StakersAssetDataRD, PoolDetail } from '../../../services/midgard/types'
@@ -114,7 +113,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         chainAssetPoolData={ZERO_POOL_DATA}
         runeBalance={runeBalance}
         selectedPriceAsset={AssetRuneNative}
-        onWithdraw={emptyFunc}
+        onWithdraw={FP.constVoid}
         runeShare={ZERO_BASE_AMOUNT}
         assetShare={ZERO_BASE_AMOUNT}
         asset={asset}

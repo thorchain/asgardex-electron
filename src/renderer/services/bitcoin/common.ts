@@ -26,7 +26,7 @@ const bitcoinNetwork$: Observable<ClientNetwork> = network$.pipe(
   })
 )
 
-const BLOCKCHAIR_API_KEY = envOrDefault(process.env.REACT_APP_BLOCKCHAIR_API_KEY, 'undefined blockchair api key')
+const BLOCKCHAIR_API_KEY = envOrDefault(process.env.REACT_APP_BLOCKCHAIR_API_KEY, '')
 const BLOCKCHAIR_TESTNET = 'https://api.blockchair.com/bitcoin/testnet'
 const BLOCKCHAIR_MAINNET = 'https://api.blockchair.com/bitcoin'
 
