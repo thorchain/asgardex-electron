@@ -1,13 +1,14 @@
 import React from 'react'
 
-import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
-import * as Styled from './SwapAssets.styles'
+import * as Styled from './Common.styles'
+import * as C from './Common.types'
+import * as SwapStyled from './SwapAssets.styles'
 
 export type Props = {
-  source: { asset: Asset; amount: BaseAmount }
-  target: { asset: Asset; amount: BaseAmount }
+  source: C.AssetData
+  target: C.AssetData
   slip: BigNumber
   stepDescription: string
 }
@@ -24,7 +25,7 @@ export const SwapAssets: React.FC<Props> = (props): JSX.Element => {
           <Styled.AssetData asset={target.asset} amount={target.amount} />
         </Styled.AssetsContainer>
       </Styled.DataWrapper>
-      <Styled.Trend amount={slip} />
+      <SwapStyled.Trend amount={slip} />
     </>
   )
 }
