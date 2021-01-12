@@ -1,14 +1,15 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as EthereumClient } from '@xchainjs/xchain-ethereum'
-import { Asset } from '@xchainjs/xchain-util'
+import { Client as EthereumClient, getTokenAddress } from '@xchainjs/xchain-ethereum'
+import { Asset, BaseAmount, ETHChain, formatBaseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
 import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormETH } from '../../../components/wallet/txs/send/'
+import { ZERO_BASE_AMOUNT } from '../../../const'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
@@ -57,6 +58,33 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
   )
 
   /**
+   * estimate fee provided by EthereumClient
+   */
+  const estimateFee = useCallback(
+    (asset: Asset, recipient: string, amount: BaseAmount, gasPrice: string) =>
+      FP.pipe(
+        oClient,
+        O.map((client) =>
+          asset.chain === ETHChain
+            ? client.estimateGasNormalTx({
+                recipient,
+                amount,
+                overrides: {
+                  gasPrice
+                }
+              })
+            : client.estimateGasERC20Tx({
+                assetAddress: getTokenAddress(asset) || '',
+                recipient,
+                amount: formatBaseAmount(amount)
+              })
+        ),
+        O.getOrElse(() => Promise.resolve(ZERO_BASE_AMOUNT))
+      ),
+    [oClient]
+  )
+
+  /**
    * Custom send form used by ETH chain only
    */
   const sendForm = useCallback(
@@ -72,9 +100,10 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
         addressValidation={addressValidation}
         reloadFeesHandler={reloadFeesHandler}
         fees={fees}
+        estimateFee={estimateFee}
       />
     ),
-    [subscribeTx, oWalletBalances, txRD, addressValidation, reloadFeesHandler, fees]
+    [subscribeTx, oWalletBalances, txRD, addressValidation, reloadFeesHandler, fees, estimateFee]
   )
 
   return FP.pipe(

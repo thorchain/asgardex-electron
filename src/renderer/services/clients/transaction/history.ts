@@ -11,7 +11,7 @@ import { ApiError, ErrorId } from '../../wallet/types'
 import { XChainClient$, TxsPageLD, TxsParams } from '../types'
 
 /**
- * Observable to load txs from Binance API endpoint
+ * Observable to load txs
  */
 const loadTxs$ = ({
   client,

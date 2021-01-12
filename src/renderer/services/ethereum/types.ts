@@ -19,7 +19,7 @@ export type SendTxParams = {
   recipient: string // to address
   amount: BaseAmount
   asset: Asset
-  fee: BaseAmount
+  gasPrice?: BaseAmount
   memo?: string
 }
 

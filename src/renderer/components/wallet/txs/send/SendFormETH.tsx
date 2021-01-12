@@ -12,7 +12,8 @@ import {
   baseToAsset,
   AssetETH,
   assetToBase,
-  BaseAmount
+  BaseAmount,
+  Asset
 } from '@xchainjs/xchain-util'
 import { Row, Form, Col } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
@@ -45,15 +46,25 @@ export type FormValues = {
 type Props = {
   balances: WalletBalances
   balance: WalletBalance
-  onSubmit: ({ recipient, amount, asset, memo, fee }: SendTxParams) => void
+  onSubmit: ({ recipient, amount, asset, memo, gasPrice }: SendTxParams) => void
   isLoading?: boolean
   addressValidation: AddressValidation
   fees: FeesRD
+  estimateFee: (asset: Asset, recipient: string, amount: BaseAmount, gasPrice: string) => Promise<BaseAmount>
   reloadFeesHandler: () => void
 }
 
 export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit, balances, balance, isLoading = false, addressValidation, fees: feesRD, reloadFeesHandler } = props
+  const {
+    onSubmit,
+    balances,
+    balance,
+    isLoading = false,
+    addressValidation,
+    fees: feesRD,
+    // estimateFee,
+    reloadFeesHandler
+  } = props
   const intl = useIntl()
 
   const changeAssetHandler = useChangeAssetHandler()
@@ -85,6 +96,22 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       ),
     [oFees, selectedFeeOptionKey]
   )
+
+  // const txFee: O.Option<Promise<BaseAmount>> = useMemo(
+  //   () =>
+  //     FP.pipe(
+  //       selectedFee,
+  //       O.map((fee) =>
+  //         estimateFee(
+  //           balance.asset,
+  //           form.getFieldValue('recipient'),
+  //           assetToBase(assetAmount(form.getFieldValue('amount'))),
+  //           formatBaseAmount(fee)
+  //         )
+  //       )
+  //     ),
+  //   [balance.asset, estimateFee, form, selectedFee]
+  // )
 
   const oEthAmount: O.Option<AssetAmount> = useMemo(() => {
     // return balance of current asset (if ETH)
@@ -228,7 +255,9 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         // Set maxAmount to zero if we dont know anything about eth and fee amounts
         () => ZERO_BN,
-        ([fee, ethAmount]) => ethAmount.amount().minus(fee.amount())
+        ([fee, ethAmount]) => {
+          return ethAmount.amount().minus(fee.amount())
+        }
       ),
       assetAmount
     )
@@ -255,7 +284,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         selectedFee,
         O.map((fee) => {
-          onSubmit({ recipient, amount: assetToBase(assetAmount(amount)), asset: balance.asset, memo, fee })
+          onSubmit({ recipient, amount: assetToBase(assetAmount(amount)), asset: balance.asset, memo, gasPrice: fee })
           return true
         })
       ),

@@ -13,6 +13,7 @@ import {
   formatAssetAmount
 } from '@xchainjs/xchain-util'
 
+import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { WalletBalances } from '../../../../services/clients'
 import { AddressValidation, SendTxParams } from '../../../../services/ethereum/types'
 import { WalletBalance } from '../../../../types/wallet'
@@ -37,11 +38,13 @@ const feesRD = RD.success(fees)
 
 const addressValidation: AddressValidation = (_) => true
 
-const onSubmitHandler = ({ recipient, amount, asset, memo, fee }: SendTxParams) =>
+const estimateFee = () => Promise.resolve(ZERO_BASE_AMOUNT)
+
+const onSubmitHandler = ({ recipient, amount, asset, memo, gasPrice }: SendTxParams) =>
   console.log(
     `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
       asset
-    )}, memo: ${memo}, fee: ${fee}`
+    )}, memo: ${memo}, fee: ${gasPrice}`
   )
 
 const reloadFeesHandler = () => console.log('reload fees')
@@ -54,6 +57,7 @@ export const StorySend: Story = () => (
     addressValidation={addressValidation}
     reloadFeesHandler={reloadFeesHandler}
     fees={feesRD}
+    estimateFee={estimateFee}
   />
 )
 StorySend.storyName = 'success'
@@ -66,6 +70,7 @@ export const StoryPending: Story = () => (
     addressValidation={addressValidation}
     reloadFeesHandler={reloadFeesHandler}
     fees={feesRD}
+    estimateFee={estimateFee}
     isLoading={true}
   />
 )
@@ -79,6 +84,7 @@ export const StoryLoadingFees: Story = () => (
     addressValidation={addressValidation}
     reloadFeesHandler={reloadFeesHandler}
     fees={RD.pending}
+    estimateFee={estimateFee}
   />
 )
 StoryLoadingFees.storyName = 'loading fees'
@@ -91,6 +97,7 @@ export const StoryFailureFees: Story = () => (
     addressValidation={addressValidation}
     reloadFeesHandler={reloadFeesHandler}
     fees={RD.failure(Error('Could not load fee and rates for any reason'))}
+    estimateFee={estimateFee}
   />
 )
 StoryFailureFees.storyName = 'failure fees'
