@@ -26,10 +26,8 @@ const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(
   })
 )
 
-const BLOCKCHAIR_API_KEY = envOrDefault(process.env.REACT_APP_BLOCKCHAIR_API_KEY, 'undefined blockchair api key')
-const BLOCKCHAIR_TESTNET = 'https://api.blockchair.com/ethereum/testnet'
-const BLOCKCHAIR_MAINNET = 'https://api.blockchair.com/ethereum'
-const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, 'undefined etherscan api key')
+const ETHPLORER_API_KEY = envOrDefault(process.env.REACT_APP_ETHPLORER_API_KEY, '')
+const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
 
 /**
  * Stream to create an observable EthereumClient depending on existing phrase in keystore
@@ -46,11 +44,9 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, ethereumNetwor
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
-              const blockchairUrl = network === 'testnet' ? BLOCKCHAIR_TESTNET : BLOCKCHAIR_MAINNET
               const client = new Client({
                 network,
-                blockchairUrl: blockchairUrl,
-                blockchairNodeApiKey: BLOCKCHAIR_API_KEY,
+                ethplorerApiKey: ETHPLORER_API_KEY,
                 etherscanApiKey: ETHERSCAN_API_KEY,
                 phrase
               })
