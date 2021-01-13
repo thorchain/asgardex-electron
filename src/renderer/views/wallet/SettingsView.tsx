@@ -19,6 +19,7 @@ import { useBitcoinContext } from '../../contexts/BitcoinContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
@@ -29,11 +30,12 @@ import { UserAccountType } from '../../types/wallet'
 export const SettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const { keystoreService } = useWalletContext()
-  const { lock, removeKeystore } = keystoreService
+  const { lock, removeKeystore, exportKeystore } = keystoreService
   const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
+  const thorchaincontext = useThorchainContext()
   const chainContext = useChainContext()
   const { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } = chainContext
 
@@ -118,6 +120,12 @@ export const SettingsView: React.FC = (): JSX.Element => {
     [bitcoinContext.address$, bitcoinLedgerAddress]
   )
 
+  const oRuneNativeAddress = useObservableState(thorchaincontext.address$, O.none)
+  const runeNativeAddress = pipe(
+    oRuneNativeAddress,
+    O.getOrElse(() => '')
+  )
+
   const { service: midgardService } = useMidgardContext()
 
   const { onlineStatus$ } = useAppContext()
@@ -197,6 +205,8 @@ export const SettingsView: React.FC = (): JSX.Element => {
           clientUrl={clientUrl}
           lockWallet={lock}
           removeKeystore={removeKeystore}
+          exportKeystore={exportKeystore}
+          runeNativeAddress={runeNativeAddress}
           userAccounts={userAccounts}
           retrieveLedgerAddress={retrieveLedgerAddress}
           removeLedgerAddress={removeLedgerAddress}

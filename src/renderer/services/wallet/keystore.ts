@@ -5,6 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { INITIAL_KEYSTORE_STATE } from './const'
@@ -32,6 +33,26 @@ const addKeystore = async (phrase: Phrase, password: string) => {
 export const removeKeystore = async () => {
   await window.apiKeystore.remove()
   setKeystoreState(O.none)
+}
+
+/**
+ * Exports a keystore
+ */
+const exportKeystore = async (runeNativeAddress: string, selectedNetwork: Network) => {
+  try {
+    const keystore: CryptoKeystore = await window.apiKeystore.get()
+    const defaultFileName =
+      selectedNetwork === 'testnet'
+        ? `asgardex-keystore-${runeNativeAddress.substring(0, 8)}_${runeNativeAddress.substring(
+            runeNativeAddress.length - 3
+          )}.json`
+        : `asgardex-keystore-${runeNativeAddress.substring(0, 7)}_${runeNativeAddress.substring(
+            runeNativeAddress.length - 3
+          )}.json`
+    return await window.apiKeystore.export(defaultFileName, keystore)
+  } catch (error) {
+    return Promise.reject(error)
+  }
 }
 
 const addPhrase = async (state: KeystoreState, password: string) => {
@@ -82,6 +103,7 @@ export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystore,
   removeKeystore,
+  exportKeystore,
   lock: () => setKeystoreState(O.some(O.none)),
   unlock: addPhrase,
   validatePassword$

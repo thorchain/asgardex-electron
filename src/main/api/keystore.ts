@@ -1,8 +1,7 @@
 import * as path from 'path'
 
 import { Keystore } from '@xchainjs/xchain-crypto'
-import { ipcRenderer } from 'electron'
-import { app } from 'electron'
+import { app, dialog, ipcRenderer } from 'electron'
 import * as fs from 'fs-extra'
 
 import { ApiKeystore } from '../../shared/api/types'
@@ -24,6 +23,16 @@ export const removeKeystore = async () => fs.remove(KEY_FILE)
 export const getKeystore = async () => fs.readJSON(KEY_FILE)
 export const keystoreExist = async () => fs.pathExists(KEY_FILE)
 
+export const exportKeystore = async (defaultFileName: string, keystore: Keystore) => {
+  const savePath = await dialog.showSaveDialog({
+    defaultPath: defaultFileName
+  })
+  if (!savePath.canceled && savePath.filePath) {
+    await fs.ensureFile(savePath.filePath)
+    return fs.writeJSON(savePath.filePath, keystore)
+  }
+}
+
 // key file path
 export const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
 
@@ -31,5 +40,7 @@ export const apiKeystore: ApiKeystore = {
   save: (keystore: Keystore) => ipcRenderer.invoke(IPCMessages.SAVE_KEYSTORE, keystore),
   remove: () => ipcRenderer.invoke(IPCMessages.REMOVE_KEYSTORE, KEY_FILE),
   get: () => ipcRenderer.invoke(IPCMessages.GET_KEYSTORE, KEY_FILE),
-  exists: () => ipcRenderer.invoke(IPCMessages.KEYSTORE_EXIST)
+  exists: () => ipcRenderer.invoke(IPCMessages.KEYSTORE_EXIST),
+  export: (defaultFileName: string, keystore: Keystore) =>
+    ipcRenderer.invoke(IPCMessages.EXPORT_KEYSTORE, defaultFileName, keystore)
 }

@@ -22,8 +22,10 @@ type Props = {
   changeNetwork: (network: Network) => void
   clientUrl: O.Option<string>
   userAccounts?: O.Option<UserAccountType[]>
+  runeNativeAddress: string
   lockWallet?: () => void
   removeKeystore?: () => void
+  exportKeystore?: (runeNativeAddress: string, selectedNetwork: Network) => void
   retrieveLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
   removeLedgerAddress: (chain: Chain) => void
   removeAllLedgerAddress: () => void
@@ -36,8 +38,10 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     clientUrl,
     selectedNetwork,
     userAccounts = O.none,
+    runeNativeAddress = '',
     lockWallet = () => {},
     removeKeystore = () => {},
+    exportKeystore = () => {},
     retrieveLedgerAddress,
     removeLedgerAddress,
     removeAllLedgerAddress,
@@ -145,7 +149,10 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
             <Row>
               <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
                 <Styled.OptionCard bordered={false}>
-                  <Styled.OptionLabel color="primary" size="big">
+                  <Styled.OptionLabel
+                    color="primary"
+                    size="big"
+                    onClick={() => exportKeystore(runeNativeAddress, selectedNetwork)}>
                     {intl.formatMessage({ id: 'setting.export' })}
                   </Styled.OptionLabel>
                 </Styled.OptionCard>
