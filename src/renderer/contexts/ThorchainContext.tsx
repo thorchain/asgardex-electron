@@ -1,6 +1,7 @@
 import React, { createContext, useContext } from 'react'
 
 import {
+  address$,
   client$,
   balances$,
   reloadBalances,
@@ -15,6 +16,7 @@ import {
 
 export type ThorchainContextValue = {
   client$: typeof client$
+  address$: typeof address$
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
   txs$: typeof txs$
@@ -28,6 +30,7 @@ export type ThorchainContextValue = {
 
 const initialContext: ThorchainContextValue = {
   client$,
+  address$,
   reloadBalances,
   balances$,
   txs$,
