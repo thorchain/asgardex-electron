@@ -1,4 +1,4 @@
-import { BNBChain, THORChain } from '@xchainjs/xchain-util'
+import { BNBChain, CosmosChain, THORChain } from '@xchainjs/xchain-util'
 
 export const truncateAddress = (addr: string, chain: string, network: string): string => {
   const first = addr.substr(0, getAddressPrefixLength(chain, network) + 3)
@@ -12,6 +12,8 @@ export const getAddressPrefixLength = (chain: string, network: string): number =
       return network === 'testnet' ? 4 : 3
     case THORChain:
       return network === 'testnet' ? 5 : 4
+    case CosmosChain:
+      return 6
     default:
       return 3
   }
