@@ -17,7 +17,7 @@
     "package:ci": "yarn postinstall && yarn build && yarn package:electron --publish always",
     "postinstall": "node scripts/fix.sr25519.js && electron-builder install-app-deps",
     "lint": "eslint \"{src,e2e,}/**/*.{ts,tsx}\" --fix",
-    "test:e2e": "yarn build && yarn test:cafe",
+    "_test:e2e": "yarn build && yarn test:cafe",
     "test:cafe": "cross-env NODE_ENV=production testcafe electron:./ ./e2e/**/*.e2e.ts",
     "generate:types": "yarn clean:types:midgard && yarn generate:types:midgard",
     "generate:types:midgard": "TS_POST_PROCESS_FILE=./node_modules/.bin/prettier openapi-generator-cli generate -i https://testnet.midgard.thorchain.info/v2/swagger.json -g typescript-rxjs -o ./src/renderer/types/generated/midgard --reserved-words-mappings in=in --enable-post-process-file",
