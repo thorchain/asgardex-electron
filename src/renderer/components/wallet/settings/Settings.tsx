@@ -11,6 +11,7 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../shared/api/types'
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
+import { truncateAddress } from '../../../helpers/addressHelper'
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { UserAccountType } from '../../../types/wallet'
@@ -79,7 +80,10 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                       <Styled.ChainContent key={j}>
                         <Styled.AccountPlaceholder>{acc.name}</Styled.AccountPlaceholder>
                         <Styled.AccountContent>
-                          <Styled.AccountAddress>{acc.address}</Styled.AccountAddress>
+                          <Styled.AccountAddress>
+                            <label>{acc.address}</label>
+                            <label>{truncateAddress(acc.address, item.chainName, selectedNetwork)}</label>
+                          </Styled.AccountAddress>
                           {acc.type === 'external' && (
                             <Button type="link" danger onClick={() => removeDevice(item.chainName)}>
                               <StopOutlined />
@@ -103,7 +107,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [addDevice, intl, removeDevice, userAccounts]
+    [addDevice, intl, removeDevice, selectedNetwork, userAccounts]
   )
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(
