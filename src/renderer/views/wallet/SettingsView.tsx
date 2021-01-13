@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Chain } from '@xchainjs/xchain-util'
+import { Chain, THORChain } from '@xchainjs/xchain-util'
 import { Col, notification, Row } from 'antd'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -19,6 +19,7 @@ import { useBitcoinContext } from '../../contexts/BitcoinContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
@@ -32,6 +33,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const { lock, removeKeystore } = keystoreService
   const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
+  const thorchainContext = useThorchainContext()
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
   const chainContext = useChainContext()
@@ -118,6 +120,29 @@ export const SettingsView: React.FC = (): JSX.Element => {
     [bitcoinContext.address$, bitcoinLedgerAddress]
   )
 
+  const thorchainAddress$ = useMemo(
+    () =>
+      pipe(
+        thorchainContext.address$,
+        RxOp.map(
+          O.map(
+            (address) =>
+              ({
+                chainName: THORChain,
+                accounts: [
+                  {
+                    name: 'Main',
+                    address,
+                    type: 'internal'
+                  }
+                ].filter(({ address }) => !!address)
+              } as UserAccountType)
+          )
+        )
+      ),
+    [thorchainContext.address$]
+  )
+
   const { service: midgardService } = useMidgardContext()
 
   const { onlineStatus$ } = useAppContext()
@@ -141,11 +166,11 @@ export const SettingsView: React.FC = (): JSX.Element => {
     () =>
       pipe(
         // combineLatest is for the future additional accounts
-        Rx.combineLatest([binanceAddress$, ethAddress$, bitcoinAddress$]),
+        Rx.combineLatest([thorchainAddress$, binanceAddress$, ethAddress$, bitcoinAddress$]),
         RxOp.map(A.filter(O.isSome)),
         RxOp.map(sequenceTOptionFromArray)
       ),
-    [binanceAddress$, bitcoinAddress$, ethAddress$]
+    [thorchainAddress$, binanceAddress$, bitcoinAddress$, ethAddress$]
   )
   const userAccounts = useObservableState(userAccounts$, O.none)
 
