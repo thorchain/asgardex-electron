@@ -30,12 +30,13 @@ import { UserAccountType } from '../../types/wallet'
 export const SettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const { keystoreService } = useWalletContext()
-  const { lock, removeKeystore } = keystoreService
+  const { lock, removeKeystore, exportKeystore } = keystoreService
   const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
   const thorchainContext = useThorchainContext()
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
+  const thorchaincontext = useThorchainContext()
   const chainContext = useChainContext()
   const { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } = chainContext
 
@@ -118,6 +119,12 @@ export const SettingsView: React.FC = (): JSX.Element => {
         )
       ),
     [bitcoinContext.address$, bitcoinLedgerAddress]
+  )
+
+  const oRuneNativeAddress = useObservableState(thorchaincontext.address$, O.none)
+  const runeNativeAddress = pipe(
+    oRuneNativeAddress,
+    O.getOrElse(() => '')
   )
 
   const thorchainAddress$ = useMemo(
@@ -222,6 +229,8 @@ export const SettingsView: React.FC = (): JSX.Element => {
           clientUrl={clientUrl}
           lockWallet={lock}
           removeKeystore={removeKeystore}
+          exportKeystore={exportKeystore}
+          runeNativeAddress={runeNativeAddress}
           userAccounts={userAccounts}
           retrieveLedgerAddress={retrieveLedgerAddress}
           removeLedgerAddress={removeLedgerAddress}

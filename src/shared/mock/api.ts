@@ -35,7 +35,8 @@ export const apiKeystore: ApiKeystore = {
       version: 0,
       meta: ''
     }),
-  exists: () => Promise.resolve(true)
+  exists: () => Promise.resolve(true),
+  export: () => Promise.resolve()
 }
 
 // Mock `apiLang`

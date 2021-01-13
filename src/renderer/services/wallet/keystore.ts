@@ -1,10 +1,13 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { encryptToKeyStore, decryptFromKeystore, Keystore as CryptoKeystore } from '@xchainjs/xchain-crypto'
+import { THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
+import { truncateAddress } from '../../helpers/addressHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { INITIAL_KEYSTORE_STATE } from './const'
@@ -32,6 +35,19 @@ const addKeystore = async (phrase: Phrase, password: string) => {
 export const removeKeystore = async () => {
   await window.apiKeystore.remove()
   setKeystoreState(O.none)
+}
+
+/**
+ * Exports a keystore
+ */
+const exportKeystore = async (runeNativeAddress: string, network: Network) => {
+  try {
+    const keystore: CryptoKeystore = await window.apiKeystore.get()
+    const defaultFileName = `asgardex-keystore-${truncateAddress(runeNativeAddress, THORChain, network)}.json`
+    return await window.apiKeystore.export(defaultFileName, keystore)
+  } catch (error) {
+    return Promise.reject(error)
+  }
 }
 
 const addPhrase = async (state: KeystoreState, password: string) => {
@@ -82,6 +98,7 @@ export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystore,
   removeKeystore,
+  exportKeystore,
   lock: () => setKeystoreState(O.some(O.none)),
   unlock: addPhrase,
   validatePassword$

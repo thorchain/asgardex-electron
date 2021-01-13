@@ -11,6 +11,7 @@ export type ApiKeystore = {
   remove: () => Promise<void>
   get: () => Promise<Keystore>
   exists: () => Promise<boolean>
+  export: (defaultFileName: string, keystore: Keystore) => Promise<void>
 }
 
 export type ApiLang = {

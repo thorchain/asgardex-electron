@@ -7,7 +7,7 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
-import { LedgerErrorId } from '../../../shared/api/types'
+import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { WalletBalance } from '../../types/wallet'
 import { LoadTxsParams, WalletBalancesRD } from '../clients'
@@ -33,6 +33,7 @@ export type KeystoreService = {
   keystore$: Observable<KeystoreState>
   addKeystore: (phrase: Phrase, password: string) => Promise<void>
   removeKeystore: () => Promise<void>
+  exportKeystore: (runeNativeAddress: string, network: Network) => Promise<void>
   unlock: (state: KeystoreState, password: string) => Promise<void>
   lock: FP.Lazy<void>
   /**

@@ -17,6 +17,8 @@ storiesOf('Wallet/Settings', module).add('default', () => {
       clientUrl={some(BNB_ADDRESS_TESTNET)}
       lockWallet={() => console.log('lock')}
       removeKeystore={() => console.log('removeKeystore')}
+      exportKeystore={() => console.log('exportKeystore')}
+      runeNativeAddress={'runeNativeAddress'}
       retrieveLedgerAddress={({ chain, network }: LedgerAddressParams) =>
         console.log('retrieve ledger address: ', chain, network)
       }
