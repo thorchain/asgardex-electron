@@ -33,7 +33,7 @@ export type KeystoreService = {
   keystore$: Observable<KeystoreState>
   addKeystore: (phrase: Phrase, password: string) => Promise<void>
   removeKeystore: () => Promise<void>
-  exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => Promise<void>
+  exportKeystore: (runeNativeAddress: string, network: Network) => Promise<void>
   unlock: (state: KeystoreState, password: string) => Promise<void>
   lock: FP.Lazy<void>
   /**

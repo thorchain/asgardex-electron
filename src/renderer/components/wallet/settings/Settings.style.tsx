@@ -2,6 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { media } from '../../../helpers/styleHelper'
 import { Button as UIButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
 
@@ -169,13 +170,37 @@ export const AccountContent = styled(UILabel)`
 
 export const AccountAddress = styled(UILabel)`
   display: inline-block;
-  width: calc(70%);
   padding: 0px;
   white-space: nowrap;
   overflow: hidden;
   font-family: 'MainFontRegular';
   font-size: 16px;
   text-overflow: ellipsis;
+
+  label:nth-child(1) {
+    display: none;
+    ${media.sm`
+      display: block;
+    `}
+    ${media.md`
+      display: none;
+    `}
+    ${media.xl`
+      display: block;
+    `}
+  }
+  label:nth-child(2) {
+    display: block;
+    ${media.sm`
+      display: none;
+    `}
+    ${media.md`
+      display: block;
+    `}
+    ${media.xl`
+      display: none;
+    `}
+  }
 `
 
 export const DeviceText = styled(UILabel)`

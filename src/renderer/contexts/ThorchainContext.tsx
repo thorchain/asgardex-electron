@@ -17,6 +17,7 @@ import {
 export type ThorchainContextValue = {
   address$: typeof address$
   client$: typeof client$
+  address$: typeof address$
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
   txs$: typeof txs$
@@ -31,6 +32,7 @@ export type ThorchainContextValue = {
 const initialContext: ThorchainContextValue = {
   address$,
   client$,
+  address$,
   reloadBalances,
   balances$,
   txs$,
