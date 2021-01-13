@@ -16,7 +16,7 @@ import { getPhrase } from '../wallet/util'
 import { Client$, ClientState } from './types'
 
 /**
- * Binance network depending on `Network`
+ * Ethereum network depending on `Network`
  */
 const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(
   map((network) => {
@@ -26,8 +26,8 @@ const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(
   })
 )
 
-const ETHPLORER_API_KEY = envOrDefault(process.env.REACT_APP_ETHPLORER_API_KEY, '')
 const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
+const ETHPLORER_API_KEY = envOrDefault(process.env.REACT_APP_ETHPLORER_API_KEY, 'freekey')
 
 /**
  * Stream to create an observable EthereumClient depending on existing phrase in keystore
@@ -46,8 +46,8 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, ethereumNetwor
             try {
               const client = new Client({
                 network,
-                ethplorerApiKey: ETHPLORER_API_KEY,
                 etherscanApiKey: ETHERSCAN_API_KEY,
+                ethplorerApiKey: ETHPLORER_API_KEY,
                 phrase
               })
               return O.some(right(client)) as ClientState

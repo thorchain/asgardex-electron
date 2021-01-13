@@ -12,6 +12,18 @@ module.exports = {
       webpackConfig.target = 'web'
       // support hot reload of hooks
       webpackConfig.resolve.alias['react-dom'] = '@hot-loader/react-dom'
+
+      /**
+       * CRA doesn't support .mjs files
+       * some of packages are provided as .mjs files (e.g. @polkadot/api)
+       * @see similar issue https://github.com/formatjs/formatjs/issues/1395#issuecomment-518823361
+       */
+      webpackConfig.module.rules.push({
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: 'javascript/auto'
+      })
+
       return webpackConfig
     },
     plugins: [
