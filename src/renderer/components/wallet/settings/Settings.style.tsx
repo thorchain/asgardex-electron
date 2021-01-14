@@ -126,7 +126,7 @@ export const AccountCard = styled(A.Card)`
 `
 
 export const ListItem = styled(A.List.Item)`
-  padding: 20px 20px 0;
+  padding: 20px 20px;
   flex-direction: column;
   align-items: start;
   border: none;
