@@ -1,10 +1,13 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router-dom'
 
 import { PageTitle } from '../../../components/page/PageTitle'
 import { Tabs } from '../../../components/tabs'
+import { ImportKeystore } from '../../../components/wallet/keystore'
 import { ImportPhrase } from '../../../components/wallet/phrase/'
+import * as walletRoutes from '../../../routes/wallet'
 import * as Styled from './ImportsView.style'
 
 enum TabKey {
@@ -12,25 +15,61 @@ enum TabKey {
   KEYSTORE = 'keystore'
 }
 
-type Tab = {
-  key: TabKey
-  label: string
-  content: React.ReactNode
-}
-
 export const ImportsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
-  const items: Tab[] = useMemo(
+  const history = useHistory()
+
+  const [activeTab, setActiveTab] = useState(TabKey.PHRASE)
+
+  const items = useMemo(
     () => [
-      { key: TabKey.PHRASE, label: intl.formatMessage({ id: 'wallet.imports.phrase' }), content: <ImportPhrase /> }
+      {
+        key: TabKey.KEYSTORE,
+        label: (
+          <span onClick={() => history.push(walletRoutes.imports.keystore.template)}>
+            {intl.formatMessage({ id: 'common.keystore' })}
+          </span>
+        ),
+        content: <ImportKeystore />
+      },
+      {
+        key: TabKey.PHRASE,
+        label: (
+          <span onClick={() => history.push(walletRoutes.imports.phrase.template)}>
+            {intl.formatMessage({ id: 'wallet.imports.phrase' })}
+          </span>
+        ),
+        content: <ImportPhrase />
+      }
     ],
-    [intl]
+    [history, intl]
   )
+
+  /**
+   * Need to initial sync tabs' state with history.
+   * Call only for onMount
+   */
+  useEffect(() => {
+    history.replace(walletRoutes.imports.phrase.path())
+  }, [history])
+
+  /**
+   * Need to sync tabs' state with history
+   */
+  useEffect(() => {
+    return history.listen((location) => {
+      if (location.pathname.includes(walletRoutes.imports.keystore.template)) {
+        setActiveTab(TabKey.KEYSTORE)
+      } else if (location.pathname.includes(walletRoutes.imports.phrase.template)) {
+        setActiveTab(TabKey.PHRASE)
+      }
+    })
+  }, [history, activeTab])
 
   return (
     <Styled.ImportsViewWrapper>
       <PageTitle>{intl.formatMessage({ id: 'wallet.imports.wallet' })}</PageTitle>
-      <Tabs tabs={items} />
+      <Tabs tabs={items} defaultTabIndex={1} activeTabKey={activeTab} />
     </Styled.ImportsViewWrapper>
   )
 }

@@ -86,6 +86,8 @@ type WalletMessageKey =
   | 'wallet.unlock.title'
   | 'wallet.unlock.phrase'
   | 'wallet.unlock.error'
+  | 'wallet.imports.keystore.select'
+  | 'wallet.imports.keystore.upload'
   | 'wallet.imports.phrase'
   | 'wallet.imports.wallet'
   | 'wallet.imports.enterphrase'
