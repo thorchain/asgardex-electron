@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { PlusCircleFilled, StopOutlined } from '@ant-design/icons'
 import { Chain } from '@xchainjs/xchain-util'
-import { Row, Col, List, Dropdown, Button } from 'antd'
+import { Row, Col, List, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -43,8 +42,12 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     lockWallet = () => {},
     removeKeystore = () => {},
     exportKeystore = () => {},
+    /* Hide `addDevice` for all chains temporarily
     retrieveLedgerAddress,
+    */
+    /* Hide `removeDevice` for all chains temporarily
     removeLedgerAddress,
+    */
     removeAllLedgerAddress,
     changeNetwork
   } = props
@@ -53,19 +56,23 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     removeKeystore()
   }, [removeKeystore])
 
+  /* Hide `addDevice` for all chains temporarily
   const addDevice = useCallback(
     (chain: Chain) => {
       retrieveLedgerAddress({ chain, network: selectedNetwork })
     },
     [retrieveLedgerAddress, selectedNetwork]
   )
+  */
 
+  /* Hide `removeDevice` for all chains temporarily
   const removeDevice = useCallback(
     (chain: Chain) => {
       removeLedgerAddress(chain)
     },
     [removeLedgerAddress]
   )
+  */
 
   const accounts = useMemo(
     () =>
@@ -88,14 +95,17 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                             <label>{acc.address}</label>
                             <label>{truncateAddress(acc.address, item.chainName, selectedNetwork)}</label>
                           </Styled.AccountAddress>
+                          {/* Hide `removeDevice` for all chains temporarily
                           {acc.type === 'external' && (
                             <Button type="link" danger onClick={() => removeDevice(item.chainName)}>
                               <StopOutlined />
                             </Button>
                           )}
+                          */}
                         </Styled.AccountContent>
                       </Styled.ChainContent>
                     ))}
+                    {/* Hide `addDevice` for all chains temporarily
                     <Styled.Button
                       onClick={() => addDevice(item.chainName)}
                       typevalue="transparent"
@@ -103,6 +113,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                       <PlusCircleFilled />
                       {intl.formatMessage({ id: 'setting.add.device' })}
                     </Styled.Button>
+                    */}
                   </Styled.ListItem>
                 )}
               />
@@ -111,7 +122,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [addDevice, intl, removeDevice, selectedNetwork, userAccounts]
+    [intl, selectedNetwork, userAccounts]
   )
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(
