@@ -120,7 +120,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
   const [depositState, setDepositState] = useState<AsymDepositState>(INITIAL_ASYM_DEPOSIT_STATE)
 
   // Deposit start time
-  const [depositStartTime, _setDepositStartTime] = useState<number>(0)
+  const [depositStartTime, setDepositStartTime] = useState<number>(0)
 
   const assetBalance: BaseAmount = useMemo(
     () =>
@@ -489,6 +489,9 @@ export const AddDeposit: React.FC<Props> = (props) => {
   const onSucceedPasswordModal = useCallback(() => {
     // close private modal
     closePasswordModal()
+
+    // set start time
+    setDepositStartTime(Date.now())
 
     if (type === 'asym') {
       // send asym deposit tx
