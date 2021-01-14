@@ -1,7 +1,9 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
+import { CheckCircleTwoTone } from '@ant-design/icons'
+import { Keystore } from '@xchainjs/xchain-crypto'
 import { Form, Spin } from 'antd'
-import { Rule } from 'antd/lib/form'
+import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
@@ -24,12 +26,14 @@ export const ImportKeystore: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
   const { keystoreService } = useWalletContext()
-  const keystore = useObservableState(keystoreService.keystore$, none)
+  const { loadKeystore } = keystoreService
 
   const { clientViewState$ } = useBinanceContext()
   const clientViewState = useObservableState(clientViewState$, 'notready')
   const [importing, setImporting] = useState(false)
   const [importError, setImportError] = useState<Option<Error>>(none)
+  const [keystore, setKeystore] = useState({})
+  const [keystoreLoad, setKeystoreLoad] = useState(false)
 
   useEffect(() => {
     if (clientViewState === 'error') {
@@ -43,64 +47,69 @@ export const ImportKeystore: React.FC = (): JSX.Element => {
       // redirect to wallets assets view
       history.push(walletRoutes.assets.template)
     }
-  }, [clientViewState, history, keystore])
+  }, [clientViewState, history])
 
-  const submitForm = useCallback(() => {}, [])
-
-  const rules: Rule[] = useMemo(
-    () => [
-      { required: true },
-      ({ getFieldValue }) => ({
-        validator(_, value) {
-          if (!value || getFieldValue('password') === value) {
-            return Promise.resolve()
-          }
-          return Promise.reject(intl.formatMessage({ id: 'wallet.password.mismatch' }))
-        }
+  const submitForm = useCallback(
+    ({ password }: Store) => {
+      setImportError(none)
+      setImporting(true)
+      keystoreService.importKeystore(keystore as Keystore, password).catch((error) => {
+        setImporting(false)
+        // TODO(@Veado): i18n
+        setImportError(some(error))
       })
-    ],
-    [intl]
+    },
+    [keystore, keystoreService]
   )
+
+  const uploadKeystore = async () => {
+    try {
+      const keystore: Keystore = await loadKeystore()
+      if (keystore) {
+        setKeystore(keystore)
+        setKeystoreLoad(true)
+        setImportError(none)
+      }
+    } catch (_) {
+      setImportError(some(new Error('Invalid Keystore')))
+    }
+  }
 
   const renderError = useMemo(
     () =>
       O.fold(
         () => <></>,
-        // TODO(@Sarawut): i18n
-        (error: Error) => <Paragraph>Error while importing keystore: {error.toString()}</Paragraph>
+        // TODO(@Veado): i18n
+        (error: Error) => (
+          <Paragraph style={{ color: 'red' }}>
+            Error while {keystoreLoad ? 'loading' : 'importing'} keystore: {error.toString()}
+          </Paragraph>
+        )
       )(importError),
-    [importError]
+    [importError, keystoreLoad]
   )
 
   return (
     <>
-      {renderError}
       <Styled.Form form={form} onFinish={submitForm} labelCol={{ span: 24 }}>
+        {renderError}
         <Spin spinning={importing} tip={intl.formatMessage({ id: 'common.loading' })}>
           <Styled.KeystoreLabel>{intl.formatMessage({ id: 'wallet.imports.keystore.select' })}</Styled.KeystoreLabel>
           <Form.Item>
-            <Styled.KeystoreButton>
+            <Styled.KeystoreButton onClick={uploadKeystore}>
               <UploadIcon style={{ marginRight: 10, marginTop: -3 }} />
               {intl.formatMessage({ id: 'wallet.imports.keystore.upload' })}
+              {keystoreLoad && (
+                <CheckCircleTwoTone twoToneColor="#50e3c2" style={{ position: 'absolute', right: 15 }} />
+              )}
             </Styled.KeystoreButton>
           </Form.Item>
           <Styled.PasswordContainer>
-            <Styled.PasswordItem name="password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
+            <Styled.PasswordItem name="password">
               <InputPassword
                 size="large"
                 type="password"
                 placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
-              />
-            </Styled.PasswordItem>
-            <Styled.PasswordItem
-              name="repeatPassword"
-              dependencies={['password']}
-              validateTrigger={['onSubmit', 'onBlur']}
-              rules={rules}>
-              <InputPassword
-                size="large"
-                type="password"
-                placeholder={intl.formatMessage({ id: 'wallet.password.repeat' }).toUpperCase()}
               />
             </Styled.PasswordItem>
           </Styled.PasswordContainer>
@@ -112,7 +121,7 @@ export const ImportKeystore: React.FC = (): JSX.Element => {
             htmlType="submit"
             round="true"
             style={{ width: 150, marginTop: 50 }}
-            disabled={importing}>
+            disabled={!keystoreLoad || importing}>
             Import
           </Button>
         </Form.Item>

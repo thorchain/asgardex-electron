@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, TxHash } from '@xchainjs/xchain-client'
+import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -33,7 +34,9 @@ export type KeystoreService = {
   keystore$: Observable<KeystoreState>
   addKeystore: (phrase: Phrase, password: string) => Promise<void>
   removeKeystore: () => Promise<void>
+  importKeystore: (keystore: Keystore, password: string) => Promise<void>
   exportKeystore: (runeNativeAddress: string, network: Network) => Promise<void>
+  loadKeystore: () => Promise<Keystore>
   unlock: (state: KeystoreState, password: string) => Promise<void>
   lock: FP.Lazy<void>
   /**

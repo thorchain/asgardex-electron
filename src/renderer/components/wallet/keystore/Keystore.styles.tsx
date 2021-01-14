@@ -18,6 +18,7 @@ export const KeystoreLabel = styled(A.Form.Item)`
 `
 
 export const KeystoreButton = styled.div`
+  position: relative;
   max-width: 280px;
   height: 35px;
   font-family: Roboto;

@@ -37,6 +37,17 @@ export const removeKeystore = async () => {
   setKeystoreState(O.none)
 }
 
+const importKeystore = async (keystore: CryptoKeystore, password: string) => {
+  try {
+    const phrase = await decryptFromKeystore(keystore, password)
+    setKeystoreState(O.some(O.some({ phrase })))
+    return Promise.resolve()
+  } catch (error) {
+    // TODO(@Veado) i18n
+    return Promise.reject(`Could not decrypt phrase from keystore: ${error}`)
+  }
+}
+
 /**
  * Exports a keystore
  */
@@ -45,6 +56,17 @@ const exportKeystore = async (runeNativeAddress: string, network: Network) => {
     const keystore: CryptoKeystore = await window.apiKeystore.get()
     const defaultFileName = `asgardex-keystore-${truncateAddress(runeNativeAddress, THORChain, network)}.json`
     return await window.apiKeystore.export(defaultFileName, keystore)
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
+/**
+ * loads a keystore
+ */
+const loadKeystore = async () => {
+  try {
+    return await window.apiKeystore.load()
   } catch (error) {
     return Promise.reject(error)
   }
@@ -98,7 +120,9 @@ export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystore,
   removeKeystore,
+  importKeystore,
   exportKeystore,
+  loadKeystore,
   lock: () => setKeystoreState(O.some(O.none)),
   unlock: addPhrase,
   validatePassword$
