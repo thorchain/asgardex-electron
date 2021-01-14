@@ -93,7 +93,12 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                         <Styled.AccountContent>
                           <Styled.AccountAddress>
                             <label>{acc.address}</label>
-                            <label>{truncateAddress(acc.address, item.chainName, selectedNetwork)}</label>
+                            <label>
+                              <Styled.Tooltip title={acc.address}>
+                                {truncateAddress(acc.address, item.chainName, selectedNetwork)}
+                              </Styled.Tooltip>
+                              <Styled.CopyLabel copyable={{ text: acc.address }} />
+                            </label>
                           </Styled.AccountAddress>
                           {/* Hide `removeDevice` for all chains temporarily
                           {acc.type === 'external' && (
