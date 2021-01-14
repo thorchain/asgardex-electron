@@ -4,7 +4,6 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { TxTypes } from '../../../types/asgardex'
@@ -46,9 +45,6 @@ export const asymDeposit$ = ({
   // and `AsymDepositState` will be updated step by step
   const requests$ = FP.pipe(
     oPoolAddress,
-    // For RuneNative we send `MsgNativeTx` w/o need for a pool address address,
-    // so we can leave it empty
-    O.alt(() => (isRuneNativeAsset(asset) ? O.some('') : O.none)),
 
     O.fold(
       // invalid pool address will fail
@@ -59,14 +55,8 @@ export const asymDeposit$ = ({
       // valid pool address (even an empty one for Thorchain)
       (poolAddress) =>
         Rx.of(poolAddress).pipe(
-          // 1. validate pool address or node (for `RuneNative` only)
-          RxOp.switchMap((poolAddress) =>
-            Rx.iif(
-              () => isRuneNativeAsset(asset),
-              midgardPoolsService.validateNode$(),
-              midgardPoolsService.validatePool$(poolAddress)
-            )
-          ),
+          // 1. validate pool address
+          RxOp.switchMap((poolAddress) => midgardPoolsService.validatePool$(poolAddress)),
           // Update progress
           liveData.chain((_) => {
             setState({ ...getState(), step: 2, txRD: RD.progress({ loaded: 50, total }) })
