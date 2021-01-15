@@ -116,3 +116,30 @@ export type AsymDepositParams = {
 }
 
 export type AsymDepositStateHandler = (p: AsymDepositParams) => AsymDepositState$
+
+export type SymDepositTxResult = { rune: TxHash; asset: TxHash }
+export type SymDepositValidationResult = { pool: boolean; node: boolean }
+export type SymDepositFinalityResult = { rune: O.Option<TxHash>; asset: O.Option<TxHash> }
+
+/**
+ * State to reflect status of a deposit by doing different requests
+ */
+export type SymDepositState = {
+  // Number of current step
+  readonly step: number
+  // Tx hashes of deposit transactions
+  readonly txHashes: SymDepositTxResult
+  // RD of all requests
+  readonly txRD: RD.RemoteData<ApiError, SymDepositFinalityResult>
+}
+
+export type SymDepositState$ = Rx.Observable<SymDepositState>
+
+export type SymDepositParams = {
+  readonly poolAddress: O.Option<string>
+  readonly asset: Asset
+  readonly amounts: { rune: BaseAmount; asset: BaseAmount }
+  readonly memos: SymDepositMemo
+}
+
+export type SymDepositStateHandler = (p: SymDepositParams) => SymDepositState$

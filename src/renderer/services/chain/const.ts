@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import * as O from 'fp-ts/lib/Option'
 
-import { AsymDepositState, SwapState } from './types'
+import { AsymDepositState, SwapState, SymDepositState } from './types'
 
 export const MAX_SWAP_STEPS = 3
 
@@ -12,6 +12,11 @@ export const INITIAL_SWAP_STATE: SwapState = {
 }
 
 export const INITIAL_ASYM_DEPOSIT_STATE: AsymDepositState = {
+  step: 1,
+  txRD: RD.initial
+}
+
+export const INITIAL_SYM_DEPOSIT_STATE: SymDepositState = {
   step: 1,
   txRD: RD.initial
 }

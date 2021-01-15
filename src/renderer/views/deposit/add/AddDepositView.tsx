@@ -49,6 +49,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
   const {
     depositFees$,
     asymDeposit$,
+    symDeposit$,
     reloadDepositFees,
     symDepositTxMemo$,
     asymDepositTxMemo$,
@@ -165,10 +166,21 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
           reloadBalances={reloadBalances}
           poolData={ZERO_POOL_DATA}
           asymDeposit$={asymDeposit$}
+          symDeposit$={symDeposit$}
         />
       </>
     ),
-    [validatePassword$, goToTransaction, type, asset, depositFees, selectedPricePoolAsset, reloadBalances, asymDeposit$]
+    [
+      validatePassword$,
+      goToTransaction,
+      type,
+      asset,
+      depositFees,
+      selectedPricePoolAsset,
+      reloadBalances,
+      asymDeposit$,
+      symDeposit$
+    ]
   )
 
   return FP.pipe(
@@ -203,6 +215,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
               reloadBalances={reloadBalances}
               assets={poolAssets}
               asymDeposit$={asymDeposit$}
+              symDeposit$={symDeposit$}
             />
           </>
         )
