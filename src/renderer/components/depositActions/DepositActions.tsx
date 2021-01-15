@@ -31,7 +31,7 @@ export const DepositActions: React.FC<Props> = ({ bondContent, unbondContent, le
         content: leaveContent
       }
     ],
-    [intl]
+    [intl, bondContent, unbondContent, leaveContent]
   )
 
   const [activeTabKey, setActiveTabKey] = useState(tabs[0].key)
