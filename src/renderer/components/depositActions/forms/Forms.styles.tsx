@@ -23,7 +23,12 @@ export const SubmitButtonContainer = styled(Form.Item).attrs({
   `}
 `
 
-export const SubmitButton = styled(UIButton)``
+export const SubmitButton = styled(UIButton).attrs({
+  color: 'primary',
+  round: 'true'
+})`
+  width: 100%;
+`
 
 export const InputContainer = styled('div')`
   margin-bottom: 10px;
