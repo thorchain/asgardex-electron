@@ -10,7 +10,8 @@ import {
   Constants as ThorchainConstants,
   LastblockItem,
   InboundAddressesItem as ThorchainEndpoint,
-  PoolDetail as MidgardPoolDetail
+  PoolDetail as MidgardPoolDetail,
+  Health
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { ApiError } from '../wallet/types'
@@ -140,6 +141,9 @@ export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 
 export type ByzantineLD = LiveData<Error, string>
 
+export type HealthRD = RD.RemoteData<Error, Health>
+export type HealthLD = LiveData<Error, Health>
+
 export type PoolsService = {
   poolsState$: LiveData<Error, PoolsState>
   pendingPoolsState$: LiveData<Error, PendingPoolsState>
@@ -155,7 +159,6 @@ export type PoolsService = {
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
   validatePool$: (poolAddress: string, chain: Chain) => ValidatePoolLD
-  validateNode$: (/* node address or something ? */) => ValidateNodeLD
 }
 
 export type StakersAssetDataRD = RD.RemoteData<Error, StakersAssetData>

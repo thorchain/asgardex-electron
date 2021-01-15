@@ -14,7 +14,7 @@ import { INITIAL_SWAP_STATE } from '../const'
 import { SwapParams, SwapState, SwapState$ } from '../types'
 import { sendTx$, txStatus$ } from './common'
 
-const { pools: midgardPoolsService } = midgardService
+const { pools: midgardPoolsService, validateNode$ } = midgardService
 
 /**
  * Swap stream does 3 steps:
@@ -58,7 +58,9 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
           RxOp.switchMap((poolAddress) =>
             Rx.iif(
               () => isRuneNativeAsset(asset),
-              midgardPoolsService.validateNode$(),
+              // We don't have a RUNE pool, so we just validate current connected node
+              validateNode$(),
+              // in other case we have to validate pool address
               midgardPoolsService.validatePool$(poolAddress, asset.chain)
             )
           ),

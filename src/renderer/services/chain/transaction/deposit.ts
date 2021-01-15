@@ -14,7 +14,7 @@ import { INITIAL_ASYM_DEPOSIT_STATE } from '../const'
 import { AsymDepositParams, AsymDepositState, AsymDepositState$ } from '../types'
 import { sendTx$, txStatus$ } from './common'
 
-const { pools: midgardPoolsService } = midgardService
+const { pools: midgardPoolsService, validateNode$ } = midgardService
 
 /**
  * Asym deposit stream does 3 steps:
@@ -62,7 +62,9 @@ export const asymDeposit$ = ({
           RxOp.switchMap((poolAddress) =>
             Rx.iif(
               () => isRuneNativeAsset(asset),
-              midgardPoolsService.validateNode$(),
+              // We don't have a RUNE pool, so we just validate current connected node
+              validateNode$(),
+              // in other case we have to validate pool address
               midgardPoolsService.validatePool$(poolAddress, asset.chain)
             )
           ),
