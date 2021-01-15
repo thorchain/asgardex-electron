@@ -1,8 +1,16 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, assetToString, bn, currencySymbolByAsset, isValidAsset } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  assetFromString,
+  assetToString,
+  bn,
+  Chain,
+  currencySymbolByAsset,
+  isValidAsset
+} from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
-import * as FP from 'fp-ts/function'
+import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 import { some } from 'fp-ts/Option'
@@ -24,6 +32,7 @@ import {
 } from '../../types/generated/midgard/apis'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
 import { MIDGARD_MAX_RETRY } from '../const'
+import { ErrorId } from '../wallet/types'
 import {
   AssetDetailsLD,
   PendingPoolsStateLD,
@@ -356,8 +365,7 @@ const createPoolsService = (
         RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
     }),
-    liveData.map((s) => s.current || []),
-    RxOp.retry(MIDGARD_MAX_RETRY)
+    liveData.map((s) => s.current || [])
   )
 
   const selectedPoolAddress$: PoolAddressRx = combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
@@ -371,12 +379,14 @@ const createPoolsService = (
     })
   )
 
-  const poolAddressByAsset$ = (asset: Asset): PoolAddressRx =>
+  const poolAddressByChain$ = (chain: Chain): PoolAddressRx =>
     FP.pipe(
       poolAddresses$,
-      liveData.toOptionMap$((addresses) => getPoolAddressByChain(addresses, asset.chain)),
+      liveData.toOptionMap$((addresses) => getPoolAddressByChain(addresses, chain)),
       RxOp.map(O.flatten)
     )
+
+  const poolAddressByAsset$ = ({ chain }: Asset): PoolAddressRx => poolAddressByChain$(chain)
 
   /**
    * Use this to convert asset's price to selected price asset by multiplying to the priceRation inner value
@@ -402,14 +412,37 @@ const createPoolsService = (
     RxOp.map(O.getOrElse(() => ONE_BN))
   )
 
-  // TODO (@Veado) Validate pool address
-  // Issue #497: https://github.com/thorchain/asgardex-electron/issues/497
-  const validatePool$ = (_: string): ValidatePoolLD =>
-    // mock validation for now
-    Rx.of(null).pipe(
-      RxOp.delay(1500),
-      RxOp.map((_) => RD.success(true)),
-      RxOp.startWith(RD.initial)
+  /**
+   * Validates pool address
+   *
+   * @param poolAddress Pool address to validate
+   * @param chain Chain of pool to validate
+   */
+  const validatePool$ = (poolAddress: string, chain: Chain): ValidatePoolLD =>
+    poolAddressByChain$(chain).pipe(
+      RxOp.map((oAddress) =>
+        FP.pipe(
+          oAddress,
+          O.filter((address) => address === poolAddress),
+          O.map(() => true)
+        )
+      ),
+      RxOp.map((oResult) =>
+        RD.fromOption(oResult, () => ({
+          errorId: ErrorId.VALIDATE_POOL,
+          // TODO (@veado) Add i18n
+          msg: `Pool with address ${poolAddress} is not available`
+        }))
+      ),
+      RxOp.startWith(RD.pending),
+      RxOp.catchError((e: Error) =>
+        Rx.of(
+          RD.failure({
+            errorId: ErrorId.VALIDATE_POOL,
+            msg: e?.message ?? e.toString()
+          })
+        )
+      )
     )
 
   // TODO (@Veado) Validate node

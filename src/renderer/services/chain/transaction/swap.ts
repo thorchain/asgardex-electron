@@ -59,7 +59,7 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
             Rx.iif(
               () => isRuneNativeAsset(asset),
               midgardPoolsService.validateNode$(),
-              midgardPoolsService.validatePool$(poolAddress)
+              midgardPoolsService.validatePool$(poolAddress, asset.chain)
             )
           ),
           // Update progress

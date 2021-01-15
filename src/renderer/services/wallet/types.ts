@@ -84,7 +84,8 @@ export enum ErrorId {
   GET_ASSET_TXS = 'GET_ASSET_TXS',
   SEND_TX = 'SEND_TX',
   GET_TX_STATUS = 'GET_TX_STATUS',
-  SEND_LEDGER_TX = 'SEND_LEDGER_TX'
+  SEND_LEDGER_TX = 'SEND_LEDGER_TX',
+  VALIDATE_POOL = 'VALIDATE_POOL'
 }
 
 // TODO(@Veado) Move type to clients/type

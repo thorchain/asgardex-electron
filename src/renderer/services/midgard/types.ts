@@ -154,7 +154,7 @@ export type PoolsService = {
   poolDetail$: PoolDetailLD
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
-  validatePool$: (poolAddress: string) => ValidatePoolLD
+  validatePool$: (poolAddress: string, chain: Chain) => ValidatePoolLD
   validateNode$: (/* node address or something ? */) => ValidateNodeLD
 }
 
