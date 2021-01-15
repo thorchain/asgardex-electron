@@ -434,14 +434,12 @@ const createPoolsService = (
           msg: `Pool with address ${poolAddress} is not available`
         }))
       ),
-      (v) => v,
       RxOp.startWith(RD.pending),
       RxOp.catchError((e: Error) =>
         Rx.of(
           RD.failure({
             errorId: ErrorId.VALIDATE_POOL,
-            // TODO (@veado) Add i18n
-            msg: e?.message ?? 'Could not fetch pool addresses to validate'
+            msg: e?.message ?? e.toString()
           })
         )
       )
