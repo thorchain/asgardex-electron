@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { storiesOf } from '@storybook/react'
 // import { AssetRuneNative } from '@xchainjs/xchain-util'
 // import * as O from 'fp-ts/lib/Option'
 
@@ -9,28 +8,8 @@ import { storiesOf } from '@storybook/react'
 import { DepositActions } from './DepositActions'
 // import { WithdrawStory } from './withdraw/Withdraw.stories'
 
-storiesOf('DepositActions', module).add('default', () => {
-  return <DepositActions />
-})
-// .add('no wallet', () => {
-//   return (
-//     <Deposit
-//       asset={AssetBNB}
-//       ShareContent={DefaultPoolShare}
-//       DepositContent={SymDeposit}
-//       WidthdrawContent={(props) => <WithdrawStory {...props} />}
-//       keystoreState={O.none}
-//     />
-//   )
-// })
-// .add('locked', () => {
-//   return (
-//     <Deposit
-//       asset={AssetBNB}
-//       ShareContent={DefaultPoolShare}
-//       DepositContent={SymDeposit}
-//       WidthdrawContent={(props) => <WithdrawStory {...props} />}
-//       keystoreState={O.some(O.none)}
-//     />
-//   )
-// })
+export const Default = () => <DepositActions />
+
+export default {
+  title: 'Wallet/DepositActions'
+}

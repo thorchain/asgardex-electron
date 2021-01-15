@@ -1,33 +1,35 @@
 import { AssetRuneNative } from '@xchainjs/xchain-util'
+import * as A from 'antd'
 import styled from 'styled-components'
+import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
 import { AssetIcon as UIAssetIcon } from '../uielements/assets/assetIcon'
 import { Label as UILabel } from '../uielements/label'
-
-// import { palette } from 'styled-theme'
-// import { Tabs as TabsBase } from '../tabs/Tabs'
 
 export const Container = styled('div')`
   min-height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
+  padding: 10px;
+
+  ${media.sm`
+    padding: 30px 30px 150px;
+  `}
 `
 
-export const Header = styled('div')``
-
-export const HeaderContent = styled('div')`
+export const Header = styled('div')`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  margin-bottom: 20px;
 
   ${media.sm`
     justify-content: flex-start;
     flex-direction: row;
-    padding: 30px 30px 150px;
+    margin-bottom: 50px;
   `}
 `
 
@@ -63,3 +65,44 @@ export const HeaderSubtitle = styled(UILabel).attrs({ weight: 'bold' })`
     text-align: left;
   `}
 `
+
+export const FormWrapper = styled('div')``
+
+export const FormTitle = styled(UILabel)`
+  text-transform: uppercase;
+  font-size: 16px;
+  padding: 0;
+  margin-bottom: 5px;
+`
+
+export const Tabs = styled(A.Tabs)``
+
+export const TabButtonsContainer = styled('div')`
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 15px;
+`
+
+export const TabButton = styled('button')`
+  outline: none;
+  padding: 0 10px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  margin-right: 5px;
+  color: ${palette('primary', 0)};
+  font-weight: bold;
+  font-size: 16px;
+
+  &:first-child {
+    padding-left: 0;
+  }
+
+  &:last-child {
+    padding-right: 0;
+    margin: 0;
+  }
+`
+
+export const TabPane = styled(A.Tabs.TabPane)``
