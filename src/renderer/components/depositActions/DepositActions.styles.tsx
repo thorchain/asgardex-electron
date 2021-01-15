@@ -66,7 +66,11 @@ export const HeaderSubtitle = styled(UILabel).attrs({ weight: 'bold' })`
   `}
 `
 
-export const FormWrapper = styled('div')``
+export const FormWrapper = styled('div')`
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+`
 
 export const FormTitle = styled(UILabel)`
   text-transform: uppercase;
@@ -75,7 +79,15 @@ export const FormTitle = styled(UILabel)`
   margin-bottom: 5px;
 `
 
-export const Tabs = styled(A.Tabs)``
+export const Tabs = styled(A.Tabs)`
+  ${media.sm`
+    flex-grow: 1;
+
+    & .ant-tabs-content-holder {
+      display: flex;
+    }
+  `}
+`
 
 export const TabButtonsContainer = styled('div')`
   display: flex;

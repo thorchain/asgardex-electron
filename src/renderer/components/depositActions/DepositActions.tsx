@@ -4,9 +4,13 @@ import { useIntl } from 'react-intl'
 
 import * as Styled from './DepositActions.styles'
 
-type Props = {}
+type Props = {
+  bondContent: JSX.Element
+  unbondContent: JSX.Element
+  leaveContent: JSX.Element
+}
 
-export const DepositActions: React.FC<Props> = () => {
+export const DepositActions: React.FC<Props> = ({ bondContent, unbondContent, leaveContent }) => {
   const intl = useIntl()
 
   const tabs = useMemo(
@@ -14,17 +18,17 @@ export const DepositActions: React.FC<Props> = () => {
       {
         key: 'bond',
         label: 'bond',
-        content: <div>bond content</div>
+        content: bondContent
       },
       {
         key: 'unbond',
         label: 'unbond',
-        content: <div>unbond content</div>
+        content: unbondContent
       },
       {
         key: 'leave',
         label: 'leave',
-        content: <div>leave content</div>
+        content: leaveContent
       }
     ],
     []
@@ -45,18 +49,15 @@ export const DepositActions: React.FC<Props> = () => {
         <Styled.FormTitle>{intl.formatMessage({ id: 'deposit.interact.actions' })}</Styled.FormTitle>
         <Styled.Tabs
           activeKey={activeTabKey}
-          renderTabBar={(_props) => {
-            console.log(_props)
-            return (
-              <Styled.TabButtonsContainer>
-                {tabs.map((tab) => (
-                  <Styled.TabButton key={tab.key} onClick={() => setActiveTabKey(tab.key)}>
-                    {tab.label}
-                  </Styled.TabButton>
-                ))}
-              </Styled.TabButtonsContainer>
-            )
-          }}>
+          renderTabBar={() => (
+            <Styled.TabButtonsContainer>
+              {tabs.map((tab) => (
+                <Styled.TabButton key={tab.key} onClick={() => setActiveTabKey(tab.key)}>
+                  {tab.label}
+                </Styled.TabButton>
+              ))}
+            </Styled.TabButtonsContainer>
+          )}>
           {tabs.map((tab) => (
             <Styled.TabPane tab={tab.label} key={tab.key}>
               {tab.content}
