@@ -99,29 +99,27 @@ export const asymDeposit$ = ({
   // That's we combine streams `getState$` (state updates) and `timer$` (counter)
   // Note: `requests$` has to be added to subscribe it once only (it won't do anything otherwise)
   return Rx.combineLatest([getState$, timer$, requests$]).pipe(
-    RxOp.switchMap(([state]) =>
-      Rx.of(
-        FP.pipe(
-          state.txRD,
-          RD.fold(
-            // ignore initial state + return same state (no changes)
-            () => state,
-            // For `pending` we fake progress state in last third
-            (oProgress) =>
-              FP.pipe(
-                oProgress,
-                O.map(({ loaded }) => {
-                  // From 75 to 97 we count progress with small steps, but stop it at 98
-                  const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
-                  return { ...state, txRD: RD.progress({ loaded: updatedLoaded, total }) }
-                }),
-                O.getOrElse(() => state)
-              ),
-            // ignore `failure` state + return same state (no changes)
-            () => state,
-            // ignore `success` state + return same state (no changes)
-            () => state
-          )
+    RxOp.map(([state]) =>
+      FP.pipe(
+        state.txRD,
+        RD.fold(
+          // ignore initial state + return same state (no changes)
+          () => state,
+          // For `pending` we fake progress state in last third
+          (oProgress) =>
+            FP.pipe(
+              oProgress,
+              O.map(({ loaded }) => {
+                // From 75 to 97 we count progress with small steps, but stop it at 98
+                const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
+                return { ...state, txRD: RD.progress({ loaded: updatedLoaded, total }) }
+              }),
+              O.getOrElse(() => state)
+            ),
+          // ignore `failure` state + return same state (no changes)
+          () => state,
+          // ignore `success` state + return same state (no changes)
+          () => state
         )
       )
     ),
