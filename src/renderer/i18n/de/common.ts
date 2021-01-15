@@ -46,7 +46,10 @@ const common: CommonMessages = {
   'common.reload': 'Neuladen',
   'common.add': 'Einzahlen',
   'common.swap': 'Swap',
-  'common.liquidity': 'Liquidität'
+  'common.liquidity': 'Liquidität',
+  'common.validations.lessThen': 'Should be less then {value} - DE',
+  'common.validations.graterThen': 'Should be grater then {value} - DE',
+  'common.validations.shouldNotBeEmpty': 'Should not be empty - DE'
 }
 
 export default common

@@ -1,10 +1,12 @@
 import React from 'react'
 
+import { assetAmount } from '@xchainjs/xchain-util'
+
 import { Bond as BondView } from './Bond'
 import { Leave as LeaveView } from './Leave'
 import { Unbond as UnbondView } from './Unbond'
 
-export const Bond = () => <BondView onFinish={console.log} />
+export const Bond = () => <BondView onFinish={console.log} max={assetAmount(100)} />
 
 export const Unbond = () => <UnbondView onFinish={console.log} />
 

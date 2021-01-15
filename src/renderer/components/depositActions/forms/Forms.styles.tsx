@@ -39,3 +39,9 @@ export const InputLabel = styled(UILabel)`
   text-transform: uppercase;
   color: ${palette('gray', 2)};
 `
+export const MaxValue = styled(UILabel)`
+  font-size: 16px;
+  color: ${palette('primary', 0)};
+  text-transform: uppercase;
+  padding: 0;
+`

@@ -44,7 +44,7 @@ export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp }) => {
             rules={[
               {
                 required: true,
-                message: 'memo is required'
+                message: intl.formatMessage({ id: 'common.validations.shouldNotBeEmpty' })
               }
             ]}>
             <Input size="large" placeholder={memoPlaceholder} />

@@ -45,6 +45,9 @@ type CommonMessageKey =
   | 'common.add'
   | 'common.swap'
   | 'common.liquidity'
+  | 'common.validations.lessThen'
+  | 'common.validations.graterThen'
+  | 'common.validations.shouldNotBeEmpty'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

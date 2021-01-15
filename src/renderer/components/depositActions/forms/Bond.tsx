@@ -1,6 +1,14 @@
 import React, { useCallback } from 'react'
 
-import { assetAmount, assetToBase, BaseAmount } from '@xchainjs/xchain-util'
+import {
+  AssetAmount,
+  assetAmount,
+  AssetRuneNative,
+  assetToBase,
+  BaseAmount,
+  formatAssetAmount,
+  formatAssetAmountCurrency
+} from '@xchainjs/xchain-util'
 import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
@@ -16,8 +24,9 @@ type FormValues = { memo: string; amount: BigNumber }
 
 type Props = {
   onFinish: (boundData: { memo: string; amount: BaseAmount }) => void
+  max: AssetAmount
 }
-export const Bond: React.FC<Props> = ({ onFinish: onFinishProp }) => {
+export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max }) => {
   const intl = useIntl()
   const [form] = Form.useForm<FormValues>()
 
@@ -29,6 +38,26 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp }) => {
       })
     },
     [onFinishProp]
+  )
+
+  const amountValidator = useCallback(
+    (_, value: string, cb: (error?: string) => void) => {
+      const numberValue = Number(value)
+      if (numberValue <= 0 || Number.isNaN(numberValue)) {
+        cb(intl.formatMessage({ id: 'common.validations.graterThen' }, { value: 0 }))
+      }
+      if (max.amount().isLessThan(Number(value))) {
+        cb(
+          intl.formatMessage(
+            { id: 'common.validations.lessThen' },
+            { value: formatAssetAmount({ amount: max, decimal: 2, trimZeros: true }) }
+          )
+        )
+      } else {
+        cb()
+      }
+    },
+    [max, intl]
   )
 
   return (
@@ -47,7 +76,7 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp }) => {
             rules={[
               {
                 required: true,
-                message: 'memo is required'
+                message: intl.formatMessage({ id: 'common.validations.shouldNotBeEmpty' })
               }
             ]}>
             <Input size="large" placeholder={bondMemoPlaceholder} />
@@ -56,9 +85,18 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp }) => {
 
         <Styled.InputContainer>
           <Styled.InputLabel>amount</Styled.InputLabel>
-          <Styled.Form.Item name="amount">
-            <InputBigNumber size="large" placeholder={bondMemoPlaceholder} decimal={4} />
+          <Styled.Form.Item
+            name="amount"
+            rules={[
+              {
+                validator: amountValidator
+              }
+            ]}>
+            <InputBigNumber size="large" decimal={4} />
           </Styled.Form.Item>
+          <Styled.MaxValue>
+            max {formatAssetAmountCurrency({ amount: max, decimal: 2, asset: AssetRuneNative, trimZeros: true })}
+          </Styled.MaxValue>
         </Styled.InputContainer>
       </div>
 
