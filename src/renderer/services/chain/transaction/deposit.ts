@@ -63,7 +63,7 @@ export const asymDeposit$ = ({
             Rx.iif(
               () => isRuneNativeAsset(asset),
               midgardPoolsService.validateNode$(),
-              midgardPoolsService.validatePool$(poolAddress)
+              midgardPoolsService.validatePool$(poolAddress, asset.chain)
             )
           ),
           // Update progress

@@ -50,8 +50,4 @@ const getWithdrawMemo$: MemoRx = Rx.combineLatest([selectedPoolAsset$, withdrawP
   )
 )
 
-// TODO(@veado) Remove it later, but leave it for #537 https://github.com/thorchain/asgardex-electron/issues/537
-symDepositTxMemo$.subscribe((value) => console.log('symDepositTxMemo:', value))
-asymDepositTxMemo$.subscribe((value) => console.log('asymDepositTxMemo:', value))
-
 export { setWithdrawPercent, symDepositTxMemo$, asymDepositTxMemo$, symDepositAssetTxMemo$, getWithdrawMemo$ }
