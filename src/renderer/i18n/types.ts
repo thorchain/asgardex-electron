@@ -170,6 +170,8 @@ type SwapMessageKey =
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
 type DepositMessageKey =
+  | 'deposit.interact.title'
+  | 'deposit.interact.subtitle'
   | 'deposit.share.title'
   | 'deposit.share.units'
   | 'deposit.share.poolshare'
