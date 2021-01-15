@@ -1,6 +1,9 @@
 import { DepositMessages } from '../types'
 
 const deposit: DepositMessages = {
+  'deposit.interact.actions.bond': 'Вложить',
+  'deposit.interact.actions.unbond': 'Изъять',
+  'deposit.interact.actions.leave': 'Покинуть',
   'deposit.interact.title': 'Вклад',
   'deposit.interact.subtitle': 'Взаимодействие с thorchain',
   'deposit.interact.actions': 'Доступные действия',
