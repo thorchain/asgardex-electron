@@ -13,13 +13,17 @@ export const Form = styled(A.Form)`
   flex-direction: column;
 `
 
-export const SubmitButton = styled(UIButton)`
+export const SubmitButtonContainer = styled(Form.Item).attrs({
+  shouldUpdate: true
+})`
   width: 100%;
   ${media.sm`
     width: auto;
     align-self: flex-end;
   `}
 `
+
+export const SubmitButton = styled(UIButton)``
 
 export const InputContainer = styled('div')`
   margin-bottom: 10px;

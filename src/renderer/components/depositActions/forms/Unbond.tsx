@@ -52,11 +52,15 @@ export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp }) => {
         </Styled.InputContainer>
       </div>
 
-      <Styled.SubmitButton
-        disabled={!!form.getFieldsError().filter(({ errors }) => errors.length).length}
-        htmlType="submit">
-        {intl.formatMessage({ id: 'wallet.action.send' })}
-      </Styled.SubmitButton>
+      <Styled.SubmitButtonContainer>
+        {() => (
+          <Styled.SubmitButton
+            disabled={!!form.getFieldsError().filter(({ errors }) => errors.length).length}
+            htmlType="submit">
+            {intl.formatMessage({ id: 'wallet.action.send' })}
+          </Styled.SubmitButton>
+        )}
+      </Styled.SubmitButtonContainer>
     </Styled.Form>
   )
 }

@@ -59,7 +59,7 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max }) => {
     },
     [max, intl]
   )
-
+  console.log(form.getFieldsError())
   return (
     <Styled.Form
       form={form}
@@ -100,11 +100,15 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max }) => {
         </Styled.InputContainer>
       </div>
 
-      <Styled.SubmitButton
-        disabled={!!form.getFieldsError().filter(({ errors }) => errors.length).length}
-        htmlType="submit">
-        {intl.formatMessage({ id: 'wallet.action.send' })}
-      </Styled.SubmitButton>
+      <Styled.SubmitButtonContainer>
+        {() => (
+          <Styled.SubmitButton
+            disabled={!!form.getFieldsError().filter(({ errors }) => errors.length).length}
+            htmlType="submit">
+            {intl.formatMessage({ id: 'wallet.action.send' })}
+          </Styled.SubmitButton>
+        )}
+      </Styled.SubmitButtonContainer>
     </Styled.Form>
   )
 }
