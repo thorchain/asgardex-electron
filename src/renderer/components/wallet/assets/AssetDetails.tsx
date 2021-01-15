@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { getSwitchMemo } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
@@ -178,11 +179,10 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         // TODO (@Veado): Remove it if we have everything set up for upgrade feature - just for testing
         const amount = ONE_ASSET_BASE_AMOUNT
         const startTime = Date.now()
-        const subscription = sendUpgradeTx({ recipient, amount, asset, memo: `SWITCH:${runeAddress}` }).subscribe(
-          (txRD) => {
-            setUpgradeTxState({ startTime: O.some(startTime), txRD })
-          }
-        )
+        const memo = getSwitchMemo(runeAddress)
+        const subscription = sendUpgradeTx({ recipient, amount, asset, memo }).subscribe((txRD) => {
+          setUpgradeTxState({ startTime: O.some(startTime), txRD })
+        })
         // store subscription
         setUpgradeTxSub(O.some(subscription))
 

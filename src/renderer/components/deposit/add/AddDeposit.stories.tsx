@@ -19,7 +19,7 @@ import * as RxOp from 'rxjs/operators'
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { ZERO_BASE_AMOUNT } from '../../../const'
-import { INITIAL_DEPOSIT_STATE } from '../../../services/chain/const'
+import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { SendDepositTxParams } from '../../../services/chain/types'
 import { AddDeposit, Props as AddDepositProps } from './AddDeposit'
 
@@ -55,10 +55,10 @@ const defaultProps: AddDepositProps = {
   // Password: "123"
   validatePassword$: mockValidatePassword$,
   // mock successfull result of deposit$
-  deposit$: (params) =>
+  asymDeposit$: (params) =>
     Rx.of(params).pipe(
       RxOp.tap((params) => console.log('deposit$ ', params)),
-      RxOp.switchMap((_) => Rx.of({ ...INITIAL_DEPOSIT_STATE, step: 3, txRD: RD.success('tx-hash') }))
+      RxOp.switchMap((_) => Rx.of({ ...INITIAL_ASYM_DEPOSIT_STATE, step: 3, txRD: RD.success('tx-hash') }))
     )
 }
 

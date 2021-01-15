@@ -4,7 +4,6 @@ import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
-import * as RxOp from 'rxjs/operators'
 import { retry, catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
@@ -16,7 +15,6 @@ import { triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
-import { ApiError, ErrorId } from '../wallet/types'
 import { selectedPoolAsset$, setSelectedPoolAsset } from './common'
 import { createPoolsService } from './pools'
 import { createStakeService } from './stake'
@@ -157,27 +155,6 @@ const networkInfo$: NetworkInfoLD = reloadNetworkInfo$.pipe(
   shareReplay(1)
 )
 
-/**
- * Midgard will provide an endpoint to check if transaction has been included finally
- *
- * Important note: This endpoint has not been implemented yet - we mock a successful result here at the meantime
- *
- * @param txId Transaction hash
- */
-const txStatus$ = (txId: string): LiveData<ApiError, O.Option<string>> =>
-  FP.pipe(
-    Rx.of(txId),
-    RxOp.delay(2500),
-    RxOp.map(O.some),
-    RxOp.map(RD.success),
-    RxOp.catchError(() =>
-      Rx.of(
-        RD.failure<ApiError>({ errorId: ErrorId.GET_TX_STATUS, msg: 'Could load tx info' })
-      )
-    ),
-    startWith(RD.pending)
-  )
-
 export type MidgardService = {
   networkInfo$: NetworkInfoLD
   reloadNetworkInfo: () => void
@@ -204,6 +181,5 @@ export const service = {
   apiEndpoint$: byzantine$,
   reloadApiEndpoint: reloadByzantine,
   pools: createPoolsService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
-  stake: createStakeService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
-  txStatus$
+  stake: createStakeService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$)
 }
