@@ -7,7 +7,6 @@ import { PageTitle } from '../../../components/page'
 import { Tabs } from '../../../components/tabs'
 import * as walletRoutes from '../../../routes/wallet'
 import * as Styled from './CreateView.styles'
-import { KeystoreView } from './KeystoreView'
 import { PhraseView } from './PhraseView'
 
 enum TabKey {
@@ -23,6 +22,7 @@ export const CreateView = () => {
 
   const items = useMemo(
     () => [
+      /* Remove keystore option 
       {
         key: TabKey.KEYSTORE,
         label: (
@@ -32,6 +32,7 @@ export const CreateView = () => {
         ),
         content: <KeystoreView />
       },
+      */
       {
         key: TabKey.PHRASE,
         label: (
@@ -69,7 +70,7 @@ export const CreateView = () => {
   return (
     <Styled.Container>
       <PageTitle>{intl.formatMessage({ id: 'wallet.create.title' })}</PageTitle>
-      <Tabs tabs={items} defaultTabIndex={1} activeTabKey={activeTab} />
+      <Tabs tabs={items} defaultTabIndex={0} activeTabKey={activeTab} />
     </Styled.Container>
   )
 }
