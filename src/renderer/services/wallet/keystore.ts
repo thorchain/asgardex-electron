@@ -67,7 +67,7 @@ const loadKeystore$ = (): LoadKeystoreLD => {
   return FP.pipe(
     Rx.from(window.apiKeystore.load()),
     map(RD.success),
-    catchError((error) => Rx.of(RD.failure(error))),
+    catchError((err) => Rx.of(RD.failure(err))),
     startWith(RD.pending)
   )
 }

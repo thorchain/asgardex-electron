@@ -126,7 +126,7 @@ const initIPC = () => {
   ipcMain.handle(IPCMessages.EXPORT_KEYSTORE, (_, defaultFileName: string, keystore: Keystore) =>
     exportKeystore(defaultFileName, keystore)
   )
-  ipcMain.handle(IPCMessages.LOAD_KEYSTORE, (_) => loadKeystore())
+  ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
   ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, (_, chain: Chain, network: Network) => getAddress(chain, network))
   ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, chain: Chain, network: Network, txInfo: LedgerTxInfo) =>
     sendTx(chain, network, txInfo)

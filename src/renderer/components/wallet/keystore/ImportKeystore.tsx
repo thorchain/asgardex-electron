@@ -41,7 +41,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
   useEffect(() => {
     if (clientViewState === 'error') {
       setImporting(false)
-      setImportError(O.some(new Error('Could not create an instance of Client')))
+      setImportError(O.some(new Error(`${intl.formatMessage({ id: 'wallet.imports.error.instance' })}`)))
     }
     if (clientViewState === 'ready') {
       // reset states
@@ -50,7 +50,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
       // redirect to wallets assets view
       history.push(walletRoutes.assets.template)
     }
-  }, [clientViewState, history])
+  }, [clientViewState, history, intl])
 
   const submitForm = useCallback(
     ({ password }: Store) => {
@@ -60,7 +60,6 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
         importKeystore$(keystore as Keystore, password),
         liveData.mapLeft((error) => {
           setImporting(false)
-          // TODO(@Veado): i18n
           setImportError(O.some(error))
         })
       )
@@ -69,8 +68,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
   )
 
   const uploadKeystore = () => {
-    FP.pipe(
-      loadKeystore$(),
+    loadKeystore$().pipe(
       liveData.map((keystore) => {
         if (keystore) {
           setKeystore(keystore)
@@ -90,13 +88,15 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         () => <></>,
         // TODO(@Veado): i18n
-        (error: Error) => (
+        (_: Error) => (
           <Paragraph style={{ color: 'red' }}>
-            Error while {keystoreLoad ? 'loading' : 'importing'} keystore: {error.toString()}
+            {keystoreLoad
+              ? intl.formatMessage({ id: 'wallet.imports.error.keystore.load' })
+              : intl.formatMessage({ id: 'wallet.imports.error.keystore.import' })}
           </Paragraph>
         )
       )(importError),
-    [importError, keystoreLoad]
+    [importError, intl, keystoreLoad]
   )
 
   return (

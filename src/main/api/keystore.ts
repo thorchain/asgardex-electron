@@ -37,7 +37,7 @@ export const loadKeystore = async () => {
   try {
     const filePath = await dialog.showOpenDialog({})
     if (!filePath.canceled) {
-      return fs.readJSON(filePath.filePaths[0])
+      return await fs.readJSON(filePath.filePaths[0])
     }
   } catch (err) {
     return Promise.reject(err)
