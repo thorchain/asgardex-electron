@@ -7,6 +7,7 @@ import { PageTitle } from '../../../components/page/PageTitle'
 import { Tabs } from '../../../components/tabs'
 import { ImportKeystore } from '../../../components/wallet/keystore'
 import { ImportPhrase } from '../../../components/wallet/phrase/'
+import { useWalletContext } from '../../../contexts/WalletContext'
 import * as walletRoutes from '../../../routes/wallet'
 import * as Styled from './ImportsView.style'
 
@@ -18,6 +19,8 @@ enum TabKey {
 export const ImportsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const history = useHistory()
+  const { keystoreService } = useWalletContext()
+  const { importKeystore$, loadKeystore$ } = keystoreService
 
   const [activeTab, setActiveTab] = useState(TabKey.PHRASE)
 
@@ -30,7 +33,7 @@ export const ImportsView: React.FC = (): JSX.Element => {
             {intl.formatMessage({ id: 'common.keystore' })}
           </span>
         ),
-        content: <ImportKeystore />
+        content: <ImportKeystore loadKeystore$={loadKeystore$} importKeystore$={importKeystore$} />
       },
       {
         key: TabKey.PHRASE,
@@ -42,7 +45,7 @@ export const ImportsView: React.FC = (): JSX.Element => {
         content: <ImportPhrase />
       }
     ],
-    [history, intl]
+    [history, importKeystore$, intl, loadKeystore$]
   )
 
   /**

@@ -30,13 +30,16 @@ export type KeystoreState = O.Option<O.Option<KeystoreContent>>
 export type ValidatePasswordHandler = (password: string) => LiveData<Error, void>
 export type ValidatePasswordLD = LiveData<Error, void>
 
+export type ImportKeystoreLD = LiveData<Error, void>
+export type LoadKeystoreLD = LiveData<Error, Keystore>
+
 export type KeystoreService = {
   keystore$: Observable<KeystoreState>
   addKeystore: (phrase: Phrase, password: string) => Promise<void>
   removeKeystore: () => Promise<void>
-  importKeystore: (keystore: Keystore, password: string) => Promise<void>
+  importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
   exportKeystore: (runeNativeAddress: string, network: Network) => Promise<void>
-  loadKeystore: () => Promise<Keystore>
+  loadKeystore$: () => LoadKeystoreLD
   unlock: (state: KeystoreState, password: string) => Promise<void>
   lock: FP.Lazy<void>
   /**

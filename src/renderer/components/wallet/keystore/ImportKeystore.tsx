@@ -1,49 +1,52 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
-import { CheckCircleTwoTone } from '@ant-design/icons'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Form, Spin } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { none, Option, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { ReactComponent as UploadIcon } from '../../../assets/svg/icon-upload-keystore.svg'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
-import { useWalletContext } from '../../../contexts/WalletContext'
+import { liveData } from '../../../helpers/rx/liveData'
 import * as walletRoutes from '../../../routes/wallet'
+import { ImportKeystoreLD, LoadKeystoreLD } from '../../../services/wallet/types'
 import { Button } from '../../uielements/button'
 import { InputPassword } from '../../uielements/input'
 import * as Styled from './Keystore.styles'
 
-export const ImportKeystore: React.FC = (): JSX.Element => {
+type Props = {
+  importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
+  loadKeystore$: () => LoadKeystoreLD
+}
+
+export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
+  const { importKeystore$, loadKeystore$ } = props
+
   const history = useHistory()
   const [form] = Form.useForm()
 
   const intl = useIntl()
 
-  const { keystoreService } = useWalletContext()
-  const { loadKeystore } = keystoreService
-
   const { clientViewState$ } = useBinanceContext()
   const clientViewState = useObservableState(clientViewState$, 'notready')
   const [importing, setImporting] = useState(false)
-  const [importError, setImportError] = useState<Option<Error>>(none)
+  const [importError, setImportError] = useState<O.Option<Error>>(O.none)
   const [keystore, setKeystore] = useState({})
   const [keystoreLoad, setKeystoreLoad] = useState(false)
 
   useEffect(() => {
     if (clientViewState === 'error') {
       setImporting(false)
-      setImportError(some(new Error('Could not create instance of Client')))
+      setImportError(O.some(new Error('Could not create an instance of Client')))
     }
     if (clientViewState === 'ready') {
       // reset states
       setImporting(false)
-      setImportError(none)
+      setImportError(O.none)
       // redirect to wallets assets view
       history.push(walletRoutes.assets.template)
     }
@@ -51,28 +54,35 @@ export const ImportKeystore: React.FC = (): JSX.Element => {
 
   const submitForm = useCallback(
     ({ password }: Store) => {
-      setImportError(none)
+      setImportError(O.none)
       setImporting(true)
-      keystoreService.importKeystore(keystore as Keystore, password).catch((error) => {
-        setImporting(false)
-        // TODO(@Veado): i18n
-        setImportError(some(error))
-      })
+      FP.pipe(
+        importKeystore$(keystore as Keystore, password),
+        liveData.mapLeft((error) => {
+          setImporting(false)
+          // TODO(@Veado): i18n
+          setImportError(O.some(error))
+        })
+      )
     },
-    [keystore, keystoreService]
+    [importKeystore$, keystore]
   )
 
-  const uploadKeystore = async () => {
-    try {
-      const keystore: Keystore = await loadKeystore()
-      if (keystore) {
-        setKeystore(keystore)
-        setKeystoreLoad(true)
-        setImportError(none)
-      }
-    } catch (_) {
-      setImportError(some(new Error('Invalid Keystore')))
-    }
+  const uploadKeystore = () => {
+    FP.pipe(
+      loadKeystore$(),
+      liveData.map((keystore) => {
+        if (keystore) {
+          setKeystore(keystore)
+          setKeystoreLoad(true)
+          setImportError(O.none)
+        }
+        return FP.constVoid
+      }),
+      liveData.mapLeft((_) => {
+        setImportError(O.some(new Error('Invalid Keystore')))
+      })
+    )
   }
 
   const renderError = useMemo(
@@ -97,11 +107,9 @@ export const ImportKeystore: React.FC = (): JSX.Element => {
           <Styled.KeystoreLabel>{intl.formatMessage({ id: 'wallet.imports.keystore.select' })}</Styled.KeystoreLabel>
           <Form.Item>
             <Styled.KeystoreButton onClick={uploadKeystore}>
-              <UploadIcon style={{ marginRight: 10, marginTop: -3 }} />
+              <Styled.UploadIcon />
               {intl.formatMessage({ id: 'wallet.imports.keystore.upload' })}
-              {keystoreLoad && (
-                <CheckCircleTwoTone twoToneColor="#50e3c2" style={{ position: 'absolute', right: 15 }} />
-              )}
+              {keystoreLoad && <Styled.UploadCheckIcon twoToneColor="#50e3c2" />}
             </Styled.KeystoreButton>
           </Form.Item>
           <Styled.PasswordContainer>

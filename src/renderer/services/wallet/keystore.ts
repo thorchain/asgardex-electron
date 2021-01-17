@@ -11,7 +11,7 @@ import { truncateAddress } from '../../helpers/addressHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { INITIAL_KEYSTORE_STATE } from './const'
-import { Phrase, KeystoreService, KeystoreState, ValidatePasswordLD } from './types'
+import { Phrase, KeystoreService, KeystoreState, ValidatePasswordLD, ImportKeystoreLD, LoadKeystoreLD } from './types'
 import { hasImportedKeystore } from './util'
 
 const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(INITIAL_KEYSTORE_STATE)
@@ -37,15 +37,14 @@ export const removeKeystore = async () => {
   setKeystoreState(O.none)
 }
 
-const importKeystore = async (keystore: CryptoKeystore, password: string) => {
-  try {
-    const phrase = await decryptFromKeystore(keystore, password)
-    setKeystoreState(O.some(O.some({ phrase })))
-    return Promise.resolve()
-  } catch (error) {
-    // TODO(@Veado) i18n
-    return Promise.reject(`Could not decrypt phrase from keystore: ${error}`)
-  }
+const importKeystore$ = (keystore: CryptoKeystore, password: string): ImportKeystoreLD => {
+  return FP.pipe(
+    Rx.from(decryptFromKeystore(keystore, password)),
+    switchMap((phrase) => Rx.of(setKeystoreState(O.some(O.some({ phrase }))))),
+    map(RD.success),
+    catchError((error) => Rx.of(RD.failure(new Error(`Could not decrypt phrase from keystore: ${error}`)))),
+    startWith(RD.pending)
+  )
 }
 
 /**
@@ -64,12 +63,13 @@ const exportKeystore = async (runeNativeAddress: string, network: Network) => {
 /**
  * loads a keystore
  */
-const loadKeystore = async () => {
-  try {
-    return await window.apiKeystore.load()
-  } catch (error) {
-    return Promise.reject(error)
-  }
+const loadKeystore$ = (): LoadKeystoreLD => {
+  return FP.pipe(
+    Rx.from(window.apiKeystore.load()),
+    map(RD.success),
+    catchError((error) => Rx.of(RD.failure(error))),
+    startWith(RD.pending)
+  )
 }
 
 const addPhrase = async (state: KeystoreState, password: string) => {
@@ -120,9 +120,9 @@ export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystore,
   removeKeystore,
-  importKeystore,
+  importKeystore$,
   exportKeystore,
-  loadKeystore,
+  loadKeystore$,
   lock: () => setKeystoreState(O.some(O.none)),
   unlock: addPhrase,
   validatePassword$
