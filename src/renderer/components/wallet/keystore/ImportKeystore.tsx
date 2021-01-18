@@ -67,13 +67,14 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         loadKeystoreState,
         RD.map((state) => {
+          unsubScribeKeystoreSub()
           const sub = importKeystore$(state, password).subscribe(setImportKeystoreState)
           setKeystoreSub(O.some(sub))
           return true
         })
       )
     },
-    [importKeystore$, loadKeystoreState]
+    [importKeystore$, loadKeystoreState, unsubScribeKeystoreSub]
   )
 
   const uploadKeystore = () => {
