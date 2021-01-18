@@ -29,26 +29,20 @@ export const Leave: React.FC<Props> = ({ onFinish: onFinishProp }) => {
   )
 
   return (
-    <Styled.Form
-      form={form}
-      /**
-       * typescast here caused by TS can not infer "any" type from onFinish cb and gives unknown here
-       */
-      onFinish={(data) => onFinish(data as FormValues)}
-      initialValues={{ memo: memoPlaceholder }}>
+    <Styled.Form form={form} onFinish={onFinish} initialValues={{ memo: memoPlaceholder }}>
       <div>
         <Styled.InputContainer>
-          <Styled.InputLabel>memo</Styled.InputLabel>
-          <Styled.Form.Item
+          <Styled.InputLabel>{intl.formatMessage({ id: 'common.memo' })}</Styled.InputLabel>
+          <Form.Item
             name="memo"
             rules={[
               {
                 required: true,
-                message: intl.formatMessage({ id: 'common.validations.shouldNotBeEmpty' })
+                message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' })
               }
             ]}>
             <Input size="large" placeholder={memoPlaceholder} />
-          </Styled.Form.Item>
+          </Form.Item>
         </Styled.InputContainer>
       </div>
 

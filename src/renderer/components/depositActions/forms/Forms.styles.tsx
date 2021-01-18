@@ -3,17 +3,18 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
+import { InnerForm } from '../../shared/form'
 import { Button as UIButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
 
-export const Form = styled(A.Form)`
+export const Form = styled(InnerForm)`
   display: flex;
   height: 100%;
   justify-content: space-between;
   flex-direction: column;
 `
 
-export const SubmitButtonContainer = styled(Form.Item).attrs({
+export const SubmitButtonContainer = styled(A.Form.Item).attrs({
   shouldUpdate: true
 })`
   width: 100%;

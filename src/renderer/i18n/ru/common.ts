@@ -46,10 +46,7 @@ const common: CommonMessages = {
   'common.reload': 'Reload - RU',
   'common.add': 'Добавить',
   'common.swap': 'Обмен',
-  'common.liquidity': 'Ликвиидиность',
-  'common.validations.lessThen': 'Должно быть меньше, чем {value}',
-  'common.validations.graterThen': 'Должно быть больше, чем {value}',
-  'common.validations.shouldNotBeEmpty': 'Не должно быть пустым'
+  'common.liquidity': 'Ликвиидиность'
 }
 
 export default common

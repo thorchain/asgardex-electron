@@ -44,13 +44,13 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max }) => {
     (_, value: string, cb: (error?: string) => void) => {
       const numberValue = Number(value)
       if (numberValue <= 0 || Number.isNaN(numberValue)) {
-        cb(intl.formatMessage({ id: 'common.validations.graterThen' }, { value: 0 }))
+        cb(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 }))
       }
       if (max.amount().isLessThan(Number(value))) {
         cb(
           intl.formatMessage(
-            { id: 'common.validations.lessThen' },
-            { value: formatAssetAmount({ amount: max, decimal: 2, trimZeros: true }) }
+            { id: 'wallet.validations.lessThen' },
+            { value: formatAssetAmount({ amount: max, decimal: 8, trimZeros: true }) }
           )
         )
       } else {
@@ -59,33 +59,27 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max }) => {
     },
     [max, intl]
   )
-  console.log(form.getFieldsError())
+
   return (
-    <Styled.Form
-      form={form}
-      /**
-       * typescast here caused by TS can not infer "any" type from onFinish cb and gives unknown here
-       */
-      onFinish={(data) => onFinish(data as FormValues)}
-      initialValues={{ memo: bondMemoPlaceholder }}>
+    <Styled.Form form={form} onFinish={onFinish} initialValues={{ memo: bondMemoPlaceholder }}>
       <div>
         <Styled.InputContainer>
-          <Styled.InputLabel>memo</Styled.InputLabel>
-          <Styled.Form.Item
+          <Styled.InputLabel>{intl.formatMessage({ id: 'common.memo' })}</Styled.InputLabel>
+          <Form.Item
             name="memo"
             rules={[
               {
                 required: true,
-                message: intl.formatMessage({ id: 'common.validations.shouldNotBeEmpty' })
+                message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' })
               }
             ]}>
             <Input size="large" placeholder={bondMemoPlaceholder} />
-          </Styled.Form.Item>
+          </Form.Item>
         </Styled.InputContainer>
 
         <Styled.InputContainer>
-          <Styled.InputLabel>amount</Styled.InputLabel>
-          <Styled.Form.Item
+          <Styled.InputLabel>{intl.formatMessage({ id: 'common.amount' })}</Styled.InputLabel>
+          <Form.Item
             name="amount"
             rules={[
               {
@@ -93,9 +87,10 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max }) => {
               }
             ]}>
             <InputBigNumber size="large" decimal={4} />
-          </Styled.Form.Item>
+          </Form.Item>
           <Styled.MaxValue>
-            max {formatAssetAmountCurrency({ amount: max, decimal: 2, asset: AssetRuneNative, trimZeros: true })}
+            {intl.formatMessage({ id: 'common.max' })}{' '}
+            {formatAssetAmountCurrency({ amount: max, decimal: 8, asset: AssetRuneNative, trimZeros: true })}
           </Styled.MaxValue>
         </Styled.InputContainer>
       </div>

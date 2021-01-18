@@ -45,9 +45,6 @@ type CommonMessageKey =
   | 'common.add'
   | 'common.swap'
   | 'common.liquidity'
-  | 'common.validations.lessThen'
-  | 'common.validations.graterThen'
-  | 'common.validations.shouldNotBeEmpty'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -125,6 +122,9 @@ type WalletMessageKey =
   | 'wallet.upgrade.success'
   | 'wallet.upgrade.error'
   | 'wallet.upgrade.feeError'
+  | 'wallet.validations.lessThen'
+  | 'wallet.validations.graterThen'
+  | 'wallet.validations.shouldNotBeEmpty'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 
