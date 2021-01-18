@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Form, Spin } from 'antd'
 import { Store } from 'antd/lib/form/interface'
@@ -9,9 +10,9 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
+import * as Rx from 'rxjs'
 
 import { useBinanceContext } from '../../../contexts/BinanceContext'
-import { liveData } from '../../../helpers/rx/liveData'
 import * as walletRoutes from '../../../routes/wallet'
 import { ImportKeystoreLD, LoadKeystoreLD } from '../../../services/wallet/types'
 import { Button } from '../../uielements/button'
@@ -33,83 +34,96 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
 
   const { clientViewState$ } = useBinanceContext()
   const clientViewState = useObservableState(clientViewState$, 'notready')
-  const [importing, setImporting] = useState(false)
-  const [importError, setImportError] = useState<O.Option<Error>>(O.none)
-  const [keystore, setKeystore] = useState({})
-  const [keystoreLoad, setKeystoreLoad] = useState(false)
+  const [loadKeystoreState, setLoadKeystoreState] = useState<RD.RemoteData<Error, Keystore>>(RD.initial)
+  const [importKeystoreState, setImportKeystoreState] = useState<RD.RemoteData<Error, void>>(RD.initial)
+
+  // (Possible) subscription of loadKeystore$ or importKeystore$
+  const [keystoreSub, setKeystoreSub] = useState<O.Option<Rx.Subscription>>(O.none)
+
+  // unsubscribe loadKeystore$ or importKeystore$ subscriptions
+  const unsubScribeKeystoreSub = useCallback(() => {
+    FP.pipe(
+      keystoreSub,
+      O.map((sub) => sub.unsubscribe())
+    )
+  }, [keystoreSub])
 
   useEffect(() => {
-    if (clientViewState === 'error') {
-      setImporting(false)
-      setImportError(O.some(new Error(`${intl.formatMessage({ id: 'wallet.imports.error.instance' })}`)))
-    }
     if (clientViewState === 'ready') {
-      // reset states
-      setImporting(false)
-      setImportError(O.none)
-      // redirect to wallets assets view
+      unsubScribeKeystoreSub()
       history.push(walletRoutes.assets.template)
     }
-  }, [clientViewState, history, intl])
+  }, [clientViewState, history, intl, unsubScribeKeystoreSub])
+
+  // clean up subscription
+  useEffect(() => {
+    return () => {
+      unsubScribeKeystoreSub()
+    }
+  }, [unsubScribeKeystoreSub])
 
   const submitForm = useCallback(
     ({ password }: Store) => {
-      setImportError(O.none)
-      setImporting(true)
       FP.pipe(
-        importKeystore$(keystore as Keystore, password),
-        liveData.mapLeft((error) => {
-          setImporting(false)
-          setImportError(O.some(error))
+        loadKeystoreState,
+        RD.map((state) => {
+          const sub = importKeystore$(state, password).subscribe(setImportKeystoreState)
+          setKeystoreSub(O.some(sub))
+          return true
         })
       )
     },
-    [importKeystore$, keystore]
+    [importKeystore$, loadKeystoreState]
   )
 
   const uploadKeystore = () => {
-    loadKeystore$().pipe(
-      liveData.map((keystore) => {
-        if (keystore) {
-          setKeystore(keystore)
-          setKeystoreLoad(true)
-          setImportError(O.none)
-        }
-        return FP.constVoid
-      }),
-      liveData.mapLeft((_) => {
-        setImportError(O.some(new Error('Invalid Keystore')))
-      })
-    )
+    unsubScribeKeystoreSub()
+    const sub = loadKeystore$().subscribe(setLoadKeystoreState)
+    setKeystoreSub(O.some(sub))
   }
 
-  const renderError = useMemo(
+  const renderError = useCallback((msg: string) => <Paragraph style={{ color: 'red' }}>{msg}</Paragraph>, [])
+
+  const renderImportError = useMemo(
     () =>
-      O.fold(
-        () => <></>,
-        // TODO(@Veado): i18n
-        (_: Error) => (
-          <Paragraph style={{ color: 'red' }}>
-            {keystoreLoad
-              ? intl.formatMessage({ id: 'wallet.imports.error.keystore.load' })
-              : intl.formatMessage({ id: 'wallet.imports.error.keystore.import' })}
-          </Paragraph>
+      FP.pipe(
+        importKeystoreState,
+        RD.fold(
+          () => <></>,
+          () => <></>,
+          (_) => renderError(intl.formatMessage({ id: 'wallet.imports.error.keystore.import' })),
+          () => <></>
         )
-      )(importError),
-    [importError, intl, keystoreLoad]
+      ),
+    [importKeystoreState, intl, renderError]
+  )
+
+  const renderLoadError = useMemo(
+    () =>
+      FP.pipe(
+        loadKeystoreState,
+        RD.fold(
+          () => <></>,
+          () => <></>,
+          (_) => renderError(intl.formatMessage({ id: 'wallet.imports.error.keystore.load' })),
+          () => <></>
+        )
+      ),
+    [loadKeystoreState, intl, renderError]
   )
 
   return (
     <>
       <Styled.Form form={form} onFinish={submitForm} labelCol={{ span: 24 }}>
-        {renderError}
-        <Spin spinning={importing} tip={intl.formatMessage({ id: 'common.loading' })}>
+        {renderLoadError}
+        {renderImportError}
+        <Spin spinning={RD.isPending(importKeystoreState)} tip={intl.formatMessage({ id: 'common.loading' })}>
           <Styled.KeystoreLabel>{intl.formatMessage({ id: 'wallet.imports.keystore.select' })}</Styled.KeystoreLabel>
           <Form.Item>
             <Styled.KeystoreButton onClick={uploadKeystore}>
               <Styled.UploadIcon />
               {intl.formatMessage({ id: 'wallet.imports.keystore.upload' })}
-              {keystoreLoad && <Styled.UploadCheckIcon twoToneColor="#50e3c2" />}
+              {RD.isSuccess(loadKeystoreState) && <Styled.UploadCheckIcon twoToneColor="#50e3c2" />}
             </Styled.KeystoreButton>
           </Form.Item>
           <Styled.PasswordContainer>
@@ -129,8 +143,8 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
             htmlType="submit"
             round="true"
             style={{ width: 150, marginTop: 50 }}
-            disabled={!keystoreLoad || importing}>
-            Import
+            disabled={!RD.isSuccess(loadKeystoreState) || RD.isPending(importKeystoreState)}>
+            {intl.formatMessage({ id: 'wallet.action.import' }).toUpperCase()}
           </Button>
         </Form.Item>
       </Styled.Form>

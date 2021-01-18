@@ -14,7 +14,7 @@ export const Form = styled(InnerForm)`
 
 export const KeystoreLabel = styled(A.Form.Item)`
   font-family: 'MainFontRegular';
-  color: #4a5564;
+  color: #303942;
   font-size: 16px;
   text-transform: uppercase;
 `
