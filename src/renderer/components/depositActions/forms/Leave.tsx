@@ -1,14 +1,13 @@
 import React, { useCallback } from 'react'
 
+import { getLeaveMemo } from '@thorchain/asgardex-util'
 import { Form } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { Input } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 
-const getLeavedMemo = (thorAddress: string) => `LEAVE:${thorAddress}`
-
-const memoPlaceholder = getLeavedMemo('THORADDRESS')
+const memoPlaceholder = getLeaveMemo('THORADDRESS')
 
 type FormValues = { memo: string }
 

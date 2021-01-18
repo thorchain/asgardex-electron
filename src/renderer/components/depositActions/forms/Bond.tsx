@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react'
 
+import { getBondMemo } from '@thorchain/asgardex-util'
 import {
   AssetAmount,
   assetAmount,
@@ -15,8 +16,6 @@ import { useIntl } from 'react-intl'
 
 import { Input, InputBigNumber } from '../../uielements/input'
 import * as Styled from './Forms.styles'
-
-const getBondMemo = (thorAddress: string) => `BOND:${thorAddress}`
 
 const bondMemoPlaceholder = getBondMemo('THORADDRESS')
 

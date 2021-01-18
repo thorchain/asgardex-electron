@@ -1,14 +1,14 @@
 import React, { useCallback } from 'react'
 
+import { getUnbondMemo } from '@thorchain/asgardex-util'
+import { baseAmount } from '@xchainjs/xchain-util'
 import { Form } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { Input } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 
-const getUnbondMemo = (thorAddress: string) => `UNBOND:${thorAddress}:UNITS`
-
-const memoPlaceholder = getUnbondMemo('THORADDRESS')
+const memoPlaceholder = getUnbondMemo('THORADDRESS', baseAmount(0)).replace('0', 'UNITS')
 
 type FormValues = { memo: string }
 
