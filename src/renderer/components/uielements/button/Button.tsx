@@ -1,23 +1,9 @@
 import React from 'react'
 
-import { ButtonProps } from 'antd/lib/button'
-
 import { ButtonWrapper } from './Button.style'
-import { ButtonColor, ButtonSize, ButtonWeight, ButtonType, ButtonRound } from './Button.types'
+import { ButtonProps } from './Button.types'
 
-type ComponentProps = {
-  sizevalue?: ButtonSize
-  color?: ButtonColor
-  weight?: ButtonWeight
-  typevalue?: ButtonType
-  focused?: boolean
-  round?: ButtonRound
-  className?: string
-}
-
-export type Props = ComponentProps & ButtonProps
-
-export const Button: React.FC<Props> = (props): JSX.Element => {
+export const Button: React.FC<ButtonProps> = (props): JSX.Element => {
   const {
     children,
     sizevalue = 'normal',
