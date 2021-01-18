@@ -1,14 +1,16 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BNBChain, BTCChain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
-import { liveData } from '../../../helpers/rx/liveData'
+import { LiveData, liveData } from '../../../helpers/rx/liveData'
 import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as THOR from '../../thorchain'
-import { ErrorId, TxLD } from '../../wallet/types'
+import { ApiError, ErrorId, TxLD } from '../../wallet/types'
 import { SendTxParams } from '../types'
 
 const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }: SendTxParams): TxLD => {
@@ -40,7 +42,7 @@ const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }: SendT
       return txFailure$(`Tx stuff has not been implemented for ETH yet`)
 
     case THORChain: {
-      if (txType === TxTypes.SWAP) {
+      if (txType === TxTypes.SWAP || txType === TxTypes.DEPOSIT) {
         return THOR.sendDepositTx({ amount, asset, memo })
       }
       return THOR.sendTx({ amount, asset, memo, recipient })
@@ -56,4 +58,26 @@ const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }: SendT
   }
 }
 
-export { sendTx$ }
+/**
+ * Check if transaction has been included finally
+ *
+ * It's mocked currently and will be fully implemented by #755
+ * @see https://github.com/thorchain/asgardex-electron/issues/755
+ *
+ * @param txId Transaction hash
+ */
+const txStatus$ = (txId: string): LiveData<ApiError, O.Option<string>> =>
+  FP.pipe(
+    Rx.of(txId),
+    RxOp.delay(2500),
+    RxOp.map(O.some),
+    RxOp.map(RD.success),
+    RxOp.catchError(() =>
+      Rx.of(
+        RD.failure<ApiError>({ errorId: ErrorId.GET_TX_STATUS, msg: 'Could load tx info' })
+      )
+    ),
+    RxOp.startWith(RD.pending)
+  )
+
+export { sendTx$, txStatus$ }

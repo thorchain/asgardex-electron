@@ -5,7 +5,6 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
-import { retry, catchError, map, shareReplay, startWith, switchMap } from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
@@ -16,7 +15,7 @@ import { triggerStream } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
-import { ApiError, ErrorId } from '../wallet/types'
+import { ErrorId } from '../wallet/types'
 import { selectedPoolAsset$, setSelectedPoolAsset } from './common'
 import { createPoolsService } from './pools'
 import { createStakeService } from './stake'
@@ -26,7 +25,9 @@ import {
   ThorchainConstantsLD,
   ByzantineLD,
   ThorchainLastblockLD,
-  NativeFeeLD
+  NativeFeeLD,
+  HealthLD,
+  ValidateNodeLD
 } from './types'
 
 const MIDGARD_TESTNET_URL = process.env.REACT_APP_MIDGARD_TESTNET_URL
@@ -53,8 +54,8 @@ const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.
  * Endpoint provided by Byzantine
  */
 const byzantine$: ByzantineLD = Rx.combineLatest([network$, reloadByzantine$]).pipe(
-  switchMap(([network]) => nextByzantine$(network)),
-  shareReplay(1)
+  RxOp.switchMap(([network]) => nextByzantine$(network)),
+  RxOp.shareReplay(1)
 )
 
 /**
@@ -64,9 +65,9 @@ const apiGetThorchainLastblock$ = byzantine$.pipe(
   liveData.chain((endpoint) =>
     FP.pipe(
       getMidgardDefaultApi(endpoint).getProxiedLastblock(),
-      map(RD.success),
+      RxOp.map(RD.success),
       liveData.map(({ current }) => current),
-      catchError((e: Error) => Rx.of(RD.failure(e)))
+      RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
     )
   )
 )
@@ -80,9 +81,9 @@ const { stream$: reloadThorchainLastblock$, trigger: reloadThorchainLastblock } 
 const loadThorchainLastblock$ = () =>
   apiGetThorchainLastblock$.pipe(
     // catch any errors if there any
-    catchError((error: Error) => Rx.of(RD.failure(error))),
-    startWith(RD.pending),
-    retry(MIDGARD_MAX_RETRY)
+    RxOp.catchError((error: Error) => Rx.of(RD.failure(error))),
+    RxOp.startWith(RD.pending),
+    RxOp.retry(MIDGARD_MAX_RETRY)
   )
 
 /**
@@ -90,9 +91,9 @@ const loadThorchainLastblock$ = () =>
  */
 const thorchainLastblockState$: ThorchainLastblockLD = reloadThorchainLastblock$.pipe(
   // start request
-  switchMap((_) => loadThorchainLastblock$()),
+  RxOp.switchMap((_) => loadThorchainLastblock$()),
   // cache it to avoid reloading data by every subscription
-  shareReplay(1)
+  RxOp.shareReplay(1)
 )
 
 /**
@@ -103,8 +104,8 @@ const apiGetThorchainConstants$ = FP.pipe(
   liveData.chain((endpoint) =>
     FP.pipe(
       getMidgardDefaultApi(endpoint).getProxiedConstants(),
-      map(RD.success),
-      catchError((e: Error) => Rx.of(RD.failure(e)))
+      RxOp.map(RD.success),
+      RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
     )
   )
 )
@@ -113,9 +114,9 @@ const apiGetThorchainConstants$ = FP.pipe(
  * Provides data of `ThorchainConstants`
  */
 const thorchainConstantsState$: ThorchainConstantsLD = apiGetThorchainConstants$.pipe(
-  startWith(RD.pending),
-  retry(MIDGARD_MAX_RETRY),
-  shareReplay(1)
+  RxOp.startWith(RD.pending),
+  RxOp.retry(MIDGARD_MAX_RETRY),
+  RxOp.shareReplay(1)
 )
 
 const nativeTxFee$: NativeFeeLD = thorchainConstantsState$.pipe(
@@ -136,10 +137,10 @@ const loadNetworkInfo$ = (): Rx.Observable<NetworkInfoRD> =>
     liveData.chain((endpoint) =>
       FP.pipe(
         getMidgardDefaultApi(endpoint).getNetworkData(),
-        map(RD.success),
-        startWith(RD.pending),
-        catchError((e: Error) => Rx.of(RD.failure(e))),
-        retry(MIDGARD_MAX_RETRY)
+        RxOp.map(RD.success),
+        RxOp.startWith(RD.pending),
+        RxOp.catchError((e: Error) => Rx.of(RD.failure(e))),
+        RxOp.retry(MIDGARD_MAX_RETRY)
       )
     )
   )
@@ -152,30 +153,31 @@ const { stream$: reloadNetworkInfo$, trigger: reloadNetworkInfo } = triggerStrea
  */
 const networkInfo$: NetworkInfoLD = reloadNetworkInfo$.pipe(
   // start request
-  switchMap(loadNetworkInfo$),
+  RxOp.switchMap(loadNetworkInfo$),
   // cache it to avoid reloading data by every subscription
-  shareReplay(1)
+  RxOp.shareReplay(1)
 )
 
-/**
- * Midgard will provide an endpoint to check if transaction has been included finally
- *
- * Important note: This endpoint has not been implemented yet - we mock a successful result here at the meantime
- *
- * @param txId Transaction hash
- */
-const txStatus$ = (txId: string): LiveData<ApiError, O.Option<string>> =>
-  FP.pipe(
-    Rx.of(txId),
-    RxOp.delay(2500),
-    RxOp.map(O.some),
-    RxOp.map(RD.success),
-    RxOp.catchError(() =>
-      Rx.of(
-        RD.failure<ApiError>({ errorId: ErrorId.GET_TX_STATUS, msg: 'Could load tx info' })
-      )
-    ),
-    startWith(RD.pending)
+const health$: HealthLD = FP.pipe(
+  byzantine$,
+  liveData.chain((endpoint) =>
+    FP.pipe(
+      getMidgardDefaultApi(endpoint).getHealth(),
+      RxOp.map(RD.success),
+      RxOp.startWith(RD.pending),
+      RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+    )
+  )
+)
+
+const validateNode$ = (): ValidateNodeLD =>
+  health$.pipe(
+    liveData.map((_) => true),
+    liveData.mapLeft((error) => ({
+      errorId: ErrorId.VALIDATE_NODE,
+      msg: error?.message ?? error.toString()
+    })),
+    RxOp.startWith(RD.initial)
   )
 
 export type MidgardService = {
@@ -188,6 +190,7 @@ export type MidgardService = {
   setSelectedPoolAsset: () => void
   apiEndpoint$: ByzantineLD
   getTransactionState$: (txId: string) => LiveData<Error, O.Option<string>>
+  validateNode$: () => ValidateNodeLD
 }
 /**
  * Service object with all "public" functions and observables we want to provide
@@ -205,5 +208,5 @@ export const service = {
   reloadApiEndpoint: reloadByzantine,
   pools: createPoolsService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
   stake: createStakeService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
-  txStatus$
+  validateNode$
 }

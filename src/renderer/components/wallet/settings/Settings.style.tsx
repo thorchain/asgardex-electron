@@ -126,7 +126,7 @@ export const AccountCard = styled(A.Card)`
 `
 
 export const ListItem = styled(A.List.Item)`
-  padding: 20px 20px 0;
+  padding: 20px 20px;
   flex-direction: column;
   align-items: start;
   border: none;
@@ -245,3 +245,21 @@ export const NetworkTitle = styled(NetworkLabel)`
   padding-right: 10px;
   width: auto;
 `
+
+export const CopyLabel = styled(A.Typography.Text)`
+  text-transform: uppercase;
+  font-family: 'MainFontRegular';
+  color: ${palette('primary', 0)};
+  /* icon */
+  svg {
+    color: ${palette('primary', 0)};
+  }
+`
+
+export const Tooltip = styled(A.Tooltip).attrs({
+  placement: 'bottom',
+  overlayStyle: {
+    wordBreak: 'break-all',
+    maxWidth: '500px'
+  }
+})``

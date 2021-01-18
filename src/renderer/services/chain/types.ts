@@ -99,23 +99,20 @@ export type SwapStateHandler = (p: SwapParams) => SwapState$
 /**
  * State to reflect status of a deposit by doing different requests
  */
-export type DepositState = {
+export type AsymDepositState = {
   // Number of current step
   readonly step: number
   // RD of all requests
   readonly txRD: RD.RemoteData<ApiError, TxHash>
-  // TxHash needs to be independent from `txRD`
-  // because we have to handle three different requests
-  // and `TxHash` is already provided by second (but not last) request
-  readonly txHash: O.Option<TxHash>
 }
 
-export type DepositState$ = Rx.Observable<DepositState>
+export type AsymDepositState$ = Rx.Observable<AsymDepositState>
 
-// TODO (@Veado) Define all needed params
-// It's currently a placeholder only and will be implemented with #537
-export type DepositParams = {
+export type AsymDepositParams = {
+  readonly poolAddress: O.Option<string>
+  readonly asset: Asset
+  readonly amount: BaseAmount
   readonly memo: string
 }
 
-export type DepositStateHandler = (p: DepositParams) => SwapState$
+export type AsymDepositStateHandler = (p: AsymDepositParams) => AsymDepositState$
