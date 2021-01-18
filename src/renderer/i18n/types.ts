@@ -122,6 +122,9 @@ type WalletMessageKey =
   | 'wallet.upgrade.success'
   | 'wallet.upgrade.error'
   | 'wallet.upgrade.feeError'
+  | 'wallet.validations.lessThen'
+  | 'wallet.validations.graterThen'
+  | 'wallet.validations.shouldNotBeEmpty'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 
@@ -170,6 +173,12 @@ type SwapMessageKey =
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
 type DepositMessageKey =
+  | 'deposit.interact.title'
+  | 'deposit.interact.subtitle'
+  | 'deposit.interact.actions'
+  | 'deposit.interact.actions.bond'
+  | 'deposit.interact.actions.unbond'
+  | 'deposit.interact.actions.leave'
   | 'deposit.share.title'
   | 'deposit.share.units'
   | 'deposit.share.poolshare'
