@@ -40,7 +40,7 @@ export const removeKeystore = async () => {
 const importKeystore$ = (keystore: CryptoKeystore, password: string): ImportKeystoreLD => {
   return FP.pipe(
     Rx.from(decryptFromKeystore(keystore, password)),
-    switchMap((phrase) => Rx.of(setKeystoreState(O.some(O.some({ phrase }))))),
+    switchMap((phrase) => addKeystore(phrase, password)),
     map(RD.success),
     catchError((error) => Rx.of(RD.failure(new Error(`Could not decrypt phrase from keystore: ${error}`)))),
     startWith(RD.pending)
