@@ -42,7 +42,7 @@ import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
-import { Button, RefreshButton } from '../../uielements/button'
+import { Button, RefreshButton, ViewTxButton } from '../../uielements/button'
 import { UIFeesRD, Fees } from '../../uielements/fees'
 import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.style'
@@ -232,7 +232,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               onFinish={closeUpgradeTxModal}
               txRD={upgradeTxState.txRD}
               startTime={startTime}
-              onViewTxClick={clickTxLinkHandler}
+              extraResult={<ViewTxButton txHash={RD.toOption(upgradeTxState.txRD)} onClick={clickTxLinkHandler} />}
             />
           )
         )
