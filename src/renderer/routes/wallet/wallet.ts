@@ -49,6 +49,13 @@ export const assets: Route<void> = {
   }
 }
 
+export const deposit: Route<void> = {
+  template: `${base.template}/deposit`,
+  path() {
+    return this.template
+  }
+}
+
 export const deposits: Route<void> = {
   template: `${base.template}/deposits`,
   path() {

@@ -15,6 +15,7 @@ const wallet: WalletMessages = {
   'wallet.action.connect': 'Connect',
   'wallet.action.import': 'Import',
   'wallet.action.create': 'Create',
+  'wallet.action.deposit': 'Deposit',
   'wallet.connect.instruction': 'Please connect your wallet',
   'wallet.unlock.title': 'Unlock your wallet',
   'wallet.unlock.instruction': 'Please unlock your wallet',

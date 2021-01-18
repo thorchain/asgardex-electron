@@ -81,6 +81,7 @@ type WalletMessageKey =
   | 'wallet.action.connect'
   | 'wallet.action.import'
   | 'wallet.action.create'
+  | 'wallet.action.deposit'
   | 'wallet.connect.instruction'
   | 'wallet.unlock.instruction'
   | 'wallet.unlock.title'
