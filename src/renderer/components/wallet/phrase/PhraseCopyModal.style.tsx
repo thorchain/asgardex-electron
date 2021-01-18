@@ -12,24 +12,23 @@ export const Modal = styled(BaseModal)`
       margin-bottom: 0;
     }
   }
-  .ant-modal-footer,
-  .cancel-ant-btn,
-  .ok-ant-btn {
-    display: none;
+  .ant-modal-footer {
+    display: flex;
+    justify-content: center;
   }
 `
 
 export const CopyLabel = styled(A.Typography.Text)`
-  display: block;
-  width: fit-content;
-  margin-top: 20px;
-  margin-left: auto;
-  margin-right: auto;
+  display: flex;
+  place-items: center;
   &,
   .ant-typography-copy {
     text-transform: uppercase;
     font-family: 'MainFontRegular';
     color: ${palette('primary', 0)} !important;
+  }
+  svg {
+    margin-left: 5px;
   }
 `
 

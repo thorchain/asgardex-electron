@@ -52,7 +52,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     */
     removeAllLedgerAddress,
     changeNetwork,
-    phrase = O.none
+    phrase: oPhrase = O.none
   } = props
 
   const [showPhrase, setShowPhrase] = useState(false)
@@ -79,14 +79,14 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   )
   */
 
-  const wallet_phrase = useMemo(
+  const phrase = useMemo(
     () =>
       pipe(
-        phrase,
+        oPhrase,
         O.map((phrase) => phrase),
         O.getOrElse(() => '')
       ),
-    [phrase]
+    [oPhrase]
   )
 
   const accounts = useMemo(
@@ -169,7 +169,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
-      <PhraseCopyModal phrase={wallet_phrase} visible={showPhrase} onClose={() => setShowPhrase(false)} />
+      <PhraseCopyModal phrase={phrase} visible={showPhrase} onClose={() => setShowPhrase(false)} />
       <Row>
         <Col span={24}>
           <Styled.TitleWrapper>
@@ -207,7 +207,8 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                     color="primary"
                     typevalue="outline"
                     round="true"
-                    onClick={() => setShowPhrase(true)}>
+                    onClick={() => setShowPhrase(true)}
+                    disabled={O.isNone(oPhrase) ? true : false}>
                     {intl.formatMessage({ id: 'setting.view.phrase' })}
                   </Styled.Button>
                 </Styled.OptionCard>
