@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { storiesOf, Story, Meta } from '@storybook/react'
+import { storiesOf } from '@storybook/react'
 
 import { PhraseCopyModal } from './PhraseCopyModal'
 
@@ -10,22 +10,3 @@ const sample_phrase = 'rural bright ball negative already grass good grant natio
 storiesOf('Phrase/Copy', module).add('default', () => {
   return <PhraseCopyModal phrase={sample_phrase} visible={true} onClose={onClose} />
 })
-
-const meta: Meta = {
-  component: PhraseCopyModal,
-  title: 'Components/Phrase Copy Modal',
-  decorators: [
-    (S: Story) => (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '300px'
-        }}>
-        <S />
-      </div>
-    )
-  ]
-}
-
-export default meta
