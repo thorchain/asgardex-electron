@@ -1,6 +1,7 @@
 import { CheckCircleTwoTone } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
+import { palette } from 'styled-theme'
 
 import { ReactComponent as UploadKeystoreIcon } from '../../../assets/svg/icon-upload-keystore.svg'
 import { InnerForm } from '../../shared/form/Form.style'
@@ -14,7 +15,7 @@ export const Form = styled(InnerForm)`
 
 export const KeystoreLabel = styled(A.Form.Item)`
   font-family: 'MainFontRegular';
-  color: #303942;
+  color: ${palette('text', 0)};
   font-size: 16px;
   text-transform: uppercase;
 `
