@@ -24,8 +24,10 @@ type FormValues = { memo: string; amount: BigNumber }
 type Props = {
   onFinish: (boundData: { memo: string; amount: BaseAmount }) => void
   max: AssetAmount
+  isLoading?: boolean
+  loadingProgress?: string
 }
-export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max }) => {
+export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading = false, loadingProgress }) => {
   const intl = useIntl()
   const [form] = Form.useForm<FormValues>()
 
@@ -72,7 +74,7 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max }) => {
                 message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' })
               }
             ]}>
-            <Input size="large" placeholder={bondMemoPlaceholder} />
+            <Input disabled={isLoading} size="large" placeholder={bondMemoPlaceholder} />
           </Form.Item>
         </Styled.InputContainer>
 
@@ -85,7 +87,7 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max }) => {
                 validator: amountValidator
               }
             ]}>
-            <InputBigNumber size="large" decimal={4} />
+            <InputBigNumber disabled={isLoading} size="large" decimal={4} />
           </Form.Item>
           <Styled.MaxValue>
             {intl.formatMessage({ id: 'common.max' })}{' '}
@@ -96,11 +98,15 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max }) => {
 
       <Styled.SubmitButtonContainer>
         {() => (
-          <Styled.SubmitButton
-            disabled={!!form.getFieldsError().filter(({ errors }) => errors.length).length}
-            htmlType="submit">
-            {intl.formatMessage({ id: 'wallet.action.send' })}
-          </Styled.SubmitButton>
+          <>
+            {loadingProgress && <Styled.LoadingProgress>{loadingProgress}</Styled.LoadingProgress>}
+            <Styled.SubmitButton
+              loading={isLoading}
+              disabled={isLoading || !!form.getFieldsError().filter(({ errors }) => errors.length).length}
+              htmlType="submit">
+              {intl.formatMessage({ id: 'wallet.action.send' })}
+            </Styled.SubmitButton>
+          </>
         )}
       </Styled.SubmitButtonContainer>
     </Styled.Form>

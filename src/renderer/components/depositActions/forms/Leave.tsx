@@ -9,12 +9,14 @@ import * as Styled from './Forms.styles'
 
 const memoPlaceholder = getLeaveMemo('THORADDRESS')
 
-type FormValues = { memo: string }
+type FormValues = { memo: string; isLoading?: boolean; loadingProgress?: string }
 
 type Props = {
   onFinish: (leaveData: { memo: string }) => void
+  isLoading?: boolean
+  loadingProgress?: string
 }
-export const Leave: React.FC<Props> = ({ onFinish: onFinishProp }) => {
+export const Leave: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = false, loadingProgress }) => {
   const intl = useIntl()
   const [form] = Form.useForm<FormValues>()
 
@@ -40,18 +42,22 @@ export const Leave: React.FC<Props> = ({ onFinish: onFinishProp }) => {
                 message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' })
               }
             ]}>
-            <Input size="large" placeholder={memoPlaceholder} />
+            <Input disabled={isLoading} size="large" placeholder={memoPlaceholder} />
           </Form.Item>
         </Styled.InputContainer>
       </div>
 
       <Styled.SubmitButtonContainer>
         {() => (
-          <Styled.SubmitButton
-            disabled={!!form.getFieldsError().filter(({ errors }) => errors.length).length}
-            htmlType="submit">
-            {intl.formatMessage({ id: 'wallet.action.send' })}
-          </Styled.SubmitButton>
+          <>
+            {loadingProgress && <Styled.LoadingProgress>{loadingProgress}</Styled.LoadingProgress>}
+            <Styled.SubmitButton
+              loading={isLoading}
+              disabled={isLoading || !!form.getFieldsError().filter(({ errors }) => errors.length).length}
+              htmlType="submit">
+              {intl.formatMessage({ id: 'wallet.action.send' })}
+            </Styled.SubmitButton>
+          </>
         )}
       </Styled.SubmitButtonContainer>
     </Styled.Form>

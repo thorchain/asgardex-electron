@@ -14,8 +14,10 @@ type FormValues = { memo: string }
 
 type Props = {
   onFinish: (unboundData: { memo: string }) => void
+  isLoading?: boolean
+  loadingProgress?: string
 }
-export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp }) => {
+export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = false, loadingProgress }) => {
   const intl = useIntl()
   const [form] = Form.useForm<FormValues>()
 
@@ -48,11 +50,15 @@ export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp }) => {
 
       <Styled.SubmitButtonContainer>
         {() => (
-          <Styled.SubmitButton
-            disabled={!!form.getFieldsError().filter(({ errors }) => errors.length).length}
-            htmlType="submit">
-            {intl.formatMessage({ id: 'wallet.action.send' })}
-          </Styled.SubmitButton>
+          <>
+            {loadingProgress && <Styled.LoadingProgress>{loadingProgress}</Styled.LoadingProgress>}
+            <Styled.SubmitButton
+              loading={isLoading}
+              disabled={isLoading || !!form.getFieldsError().filter(({ errors }) => errors.length).length}
+              htmlType="submit">
+              {intl.formatMessage({ id: 'wallet.action.send' })}
+            </Styled.SubmitButton>
+          </>
         )}
       </Styled.SubmitButtonContainer>
     </Styled.Form>

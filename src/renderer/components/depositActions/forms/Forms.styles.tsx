@@ -55,3 +55,7 @@ export const MaxValue = styled(UILabel)`
   text-transform: uppercase;
   padding: 0;
 `
+
+export const LoadingProgress = styled(UILabel)`
+  text-align: right;
+`
