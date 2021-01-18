@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
+import { CheckCircleTwoTone, UploadOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Form, Spin } from 'antd'
@@ -121,10 +122,9 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
         <Spin spinning={RD.isPending(importKeystoreState)} tip={intl.formatMessage({ id: 'common.loading' })}>
           <Styled.KeystoreLabel>{intl.formatMessage({ id: 'wallet.imports.keystore.select' })}</Styled.KeystoreLabel>
           <Form.Item>
-            <Styled.KeystoreButton onClick={uploadKeystore}>
-              <Styled.UploadIcon />
+            <Styled.KeystoreButton typevalue={'outline'} onClick={uploadKeystore}>
+              {RD.isSuccess(loadKeystoreState) ? <CheckCircleTwoTone twoToneColor="#50e3c2" /> : <UploadOutlined />}
               {intl.formatMessage({ id: 'wallet.imports.keystore.upload' })}
-              {RD.isSuccess(loadKeystoreState) && <Styled.UploadCheckIcon twoToneColor="#50e3c2" />}
             </Styled.KeystoreButton>
           </Form.Item>
           <Styled.PasswordContainer>
