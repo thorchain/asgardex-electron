@@ -1,5 +1,4 @@
-import { Button } from './Button'
-import { RefreshButton } from './RefreshButton'
-import { ViewTxButton } from './ViewTxButton'
-
-export { RefreshButton, Button, ViewTxButton }
+export * from './Button.types'
+export { Button } from './Button'
+export { RefreshButton } from './RefreshButton'
+export { ViewTxButton } from './ViewTxButton'

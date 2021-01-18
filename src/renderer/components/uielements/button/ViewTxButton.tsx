@@ -18,10 +18,7 @@ export const ViewTxButton: React.FC<Props> = ({ onClick, txHash: oTxHash, label 
 
   const onClickHandler = useCallback(
     (_) => {
-      FP.pipe(
-        oTxHash,
-        O.fold(FP.constUndefined, (txHash) => onClick(txHash))
-      )
+      FP.pipe(oTxHash, O.fold(FP.constUndefined, onClick))
     },
     [oTxHash, onClick]
   )

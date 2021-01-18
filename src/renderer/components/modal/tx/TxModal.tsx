@@ -1,10 +1,12 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { TxHash } from '@xchainjs/xchain-client'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
-import { TxRD } from '../../../services/wallet/types'
+import { ApiError, TxRD } from '../../../services/wallet/types'
+import { ButtonProps as UIButtonProps } from '../../uielements/button'
 import { TxTimer } from '../../uielements/txTimer'
 import * as Styled from './TxModal.style'
 
@@ -48,20 +50,31 @@ export const TxModal: React.FC<Props> = (props): JSX.Element => {
     [extraResult]
   )
 
-  const renderResult = useMemo(
-    () => (
+  const renderResult = useMemo(() => {
+    const defaultButtonProps: UIButtonProps = {
+      color: 'success',
+      disabled: false,
+      onClick: onClose,
+      children: <>{intl.formatMessage({ id: 'common.finish' })}</>
+    }
+
+    const buttonProps: UIButtonProps = FP.pipe(
+      txRD,
+      RD.fold<ApiError, TxHash, UIButtonProps>(
+        () => ({ ...defaultButtonProps, disabled: true }),
+        () => ({ ...defaultButtonProps, disabled: true }),
+        () => ({ ...defaultButtonProps, children: intl.formatMessage({ id: 'common.finish' }) }),
+        () => ({ ...defaultButtonProps, onClick: onFinish })
+      )
+    )
+
+    return (
       <Styled.ResultContainer>
-        <Styled.ResultButton
-          disabled={RD.isInitial(txRD) || RD.isPending(txRD)}
-          color="success"
-          onClick={RD.isSuccess(txRD) ? onFinish : onClose}>
-          {intl.formatMessage({ id: RD.isFailure(txRD) ? 'common.cancel' : 'common.finish' })}
-        </Styled.ResultButton>
+        <Styled.ResultButton {...buttonProps} />
         {renderExtraResult}
       </Styled.ResultContainer>
-    ),
-    [intl, onClose, onFinish, renderExtraResult, txRD]
-  )
+    )
+  }, [intl, onClose, onFinish, renderExtraResult, txRD])
 
   return (
     <Styled.Modal visible title={title} footer={null} onCancel={onClose}>
