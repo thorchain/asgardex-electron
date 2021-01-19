@@ -39,7 +39,16 @@ export const PhraseView = styled.div`
 `
 
 export const Item = styled.div`
+  position: relative;
   width: 25%;
-  min-width: 100px;
+  padding: 0px 20px;
+  min-width: 120px;
   text-align: center;
+`
+
+export const Number = styled.div`
+  position: absolute;
+  top: -5px;
+  right: 10px;
+  font-size: 10px;
 `

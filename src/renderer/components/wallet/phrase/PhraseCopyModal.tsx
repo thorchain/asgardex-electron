@@ -42,7 +42,10 @@ export const PhraseCopyModal: React.FC<Props> = (props): JSX.Element => {
       }>
       <Styled.PhraseView>
         {phrase.split(' ').map((item, index) => (
-          <Styled.Item key={index}>{item}</Styled.Item>
+          <Styled.Item key={index}>
+            {item}
+            <Styled.Number>{index + 1}</Styled.Number>
+          </Styled.Item>
         ))}
       </Styled.PhraseView>
     </Styled.Modal>
