@@ -86,9 +86,14 @@ type WalletMessageKey =
   | 'wallet.unlock.title'
   | 'wallet.unlock.phrase'
   | 'wallet.unlock.error'
+  | 'wallet.imports.keystore.select'
+  | 'wallet.imports.keystore.upload'
   | 'wallet.imports.phrase'
   | 'wallet.imports.wallet'
   | 'wallet.imports.enterphrase'
+  | 'wallet.imports.error.instance'
+  | 'wallet.imports.error.keystore.load'
+  | 'wallet.imports.error.keystore.import'
   | 'wallet.txs.last90days'
   | 'wallet.empty.phrase.import'
   | 'wallet.empty.phrase.create'
@@ -122,6 +127,9 @@ type WalletMessageKey =
   | 'wallet.upgrade.success'
   | 'wallet.upgrade.error'
   | 'wallet.upgrade.feeError'
+  | 'wallet.validations.lessThen'
+  | 'wallet.validations.graterThen'
+  | 'wallet.validations.shouldNotBeEmpty'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 
@@ -170,6 +178,12 @@ type SwapMessageKey =
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
 type DepositMessageKey =
+  | 'deposit.interact.title'
+  | 'deposit.interact.subtitle'
+  | 'deposit.interact.actions'
+  | 'deposit.interact.actions.bond'
+  | 'deposit.interact.actions.unbond'
+  | 'deposit.interact.actions.leave'
   | 'deposit.share.title'
   | 'deposit.share.units'
   | 'deposit.share.poolshare'

@@ -131,7 +131,7 @@ export const WalletView: React.FC = (): JSX.Element => {
       <Route path={walletRoutes.locked.template} exact>
         <UnlockView />
       </Route>
-      <Route path={walletRoutes.imports.template} exact>
+      <Route path={walletRoutes.imports.base.template}>
         <ImportsView />
       </Route>
       <Route path={walletRoutes.base.template} render={renderWalletRoute} />

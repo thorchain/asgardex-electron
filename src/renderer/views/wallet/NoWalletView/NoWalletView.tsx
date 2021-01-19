@@ -12,7 +12,7 @@ export const NoWalletView = () => {
   const intl = useIntl()
 
   const importClick = useCallback(() => {
-    history.push(walletRoutes.imports.path())
+    history.push(walletRoutes.imports.base.path())
   }, [history])
 
   const createClick = useCallback(() => {

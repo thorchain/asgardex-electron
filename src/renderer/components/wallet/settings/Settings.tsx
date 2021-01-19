@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { Chain } from '@xchainjs/xchain-util'
 import { Row, Col, List, Dropdown } from 'antd'
@@ -14,6 +14,7 @@ import { truncateAddress } from '../../../helpers/addressHelper'
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { UserAccountType } from '../../../types/wallet'
+import { PhraseCopyModal } from '../phrase'
 import * as Styled from './Settings.style'
 
 type Props = {
@@ -29,6 +30,7 @@ type Props = {
   retrieveLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
   removeLedgerAddress: (chain: Chain) => void
   removeAllLedgerAddress: () => void
+  phrase?: O.Option<string>
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -49,8 +51,11 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     removeLedgerAddress,
     */
     removeAllLedgerAddress,
-    changeNetwork
+    changeNetwork,
+    phrase: oPhrase = O.none
   } = props
+
+  const [showPhrase, setShowPhrase] = useState(false)
 
   const removeWallet = useCallback(() => {
     removeKeystore()
@@ -73,6 +78,16 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     [removeLedgerAddress]
   )
   */
+
+  const phrase = useMemo(
+    () =>
+      pipe(
+        oPhrase,
+        O.map((phrase) => phrase),
+        O.getOrElse(() => '')
+      ),
+    [oPhrase]
+  )
 
   const accounts = useMemo(
     () =>
@@ -154,6 +169,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
+      <PhraseCopyModal phrase={phrase} visible={showPhrase} onClose={() => setShowPhrase(false)} />
       <Row>
         <Col span={24}>
           <Styled.TitleWrapper>
@@ -186,7 +202,13 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
               </Styled.WalletCol>
               <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
                 <Styled.OptionCard bordered={false}>
-                  <Styled.Button sizevalue="xnormal" color="primary" typevalue="outline" round="true" disabled>
+                  <Styled.Button
+                    sizevalue="xnormal"
+                    color="primary"
+                    typevalue="outline"
+                    round="true"
+                    onClick={() => setShowPhrase(true)}
+                    disabled={O.isNone(oPhrase) ? true : false}>
                     {intl.formatMessage({ id: 'setting.view.phrase' })}
                   </Styled.Button>
                 </Styled.OptionCard>

@@ -36,7 +36,33 @@ export const apiKeystore: ApiKeystore = {
       meta: ''
     }),
   exists: () => Promise.resolve(true),
-  export: () => Promise.resolve()
+  export: () => Promise.resolve(),
+  load: () =>
+    Promise.resolve({
+      address: '',
+      publickeys: {
+        ed25519: new PubKeyEd25519(Buffer.from('empty')),
+        secp256k1: null
+      },
+      crypto: {
+        cipher: '',
+        ciphertext: '',
+        cipherparams: {
+          iv: ''
+        },
+        kdf: '',
+        kdfparams: {
+          prf: '',
+          dklen: 0,
+          salt: '',
+          c: 0
+        },
+        mac: ''
+      },
+      id: '',
+      version: 0,
+      meta: ''
+    })
 }
 
 // Mock `apiLang`

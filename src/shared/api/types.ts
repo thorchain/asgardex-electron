@@ -12,6 +12,7 @@ export type ApiKeystore = {
   get: () => Promise<Keystore>
   exists: () => Promise<boolean>
   export: (defaultFileName: string, keystore: Keystore) => Promise<void>
+  load: () => Promise<Keystore>
 }
 
 export type ApiLang = {

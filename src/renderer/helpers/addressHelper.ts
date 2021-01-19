@@ -1,20 +1,30 @@
-import { BNBChain, CosmosChain, THORChain } from '@xchainjs/xchain-util'
+import { getPrefix as getBinancePrefix } from '@xchainjs/xchain-binance'
+import { getPrefix as getBitcoinPrefix } from '@xchainjs/xchain-bitcoin'
+import { getPrefix as getCosmosPrefix } from '@xchainjs/xchain-cosmos'
+import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
+import { getPrefix as getPolkadotPrefix } from '@xchainjs/xchain-polkadot'
+import { getPrefix as getThorchainPrefix } from '@xchainjs/xchain-thorchain'
+import { Chain, BNBChain, BTCChain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
 
-export const truncateAddress = (addr: string, chain: string, network: string): string => {
-  const first = addr.substr(0, getAddressPrefixLength(chain, network) + 3)
+export const truncateAddress = (addr: string, chain: Chain, network: string): string => {
+  const first = addr.substr(0, Math.max(getAddressPrefixLength(chain, network) + 3, 6))
   const last = addr.substr(addr.length - 3, 3)
   return `${first}...${last}`
 }
 
-export const getAddressPrefixLength = (chain: string, network: string): number => {
+export const getAddressPrefixLength = (chain: Chain, network: string): number => {
   switch (chain) {
     case BNBChain:
-      return network === 'testnet' ? 4 : 3
-    case THORChain:
-      return network === 'testnet' ? 5 : 4
+      return getBinancePrefix(network).length
+    case BTCChain:
+      return getBitcoinPrefix(network).length
     case CosmosChain:
-      return 6
-    default:
-      return 3
+      return getCosmosPrefix().length
+    case ETHChain:
+      return getEthereumPrefix().length
+    case PolkadotChain:
+      return getPolkadotPrefix(network).length
+    case THORChain:
+      return getThorchainPrefix(network).length
   }
 }

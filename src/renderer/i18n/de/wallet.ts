@@ -20,9 +20,14 @@ const wallet: WalletMessages = {
   'wallet.unlock.instruction': 'Bitte entsperre Deine Wallet',
   'wallet.unlock.phrase': 'Bitte gebe Deine Phrase ein',
   'wallet.unlock.error': 'Die Wallet konnte nicht entsperrt werden. Bitte überprüfe Dein Passwort und versuche es .',
+  'wallet.imports.keystore.select': 'Wähle Keystore-Datei',
+  'wallet.imports.keystore.upload': 'Wähle Deine Keystore-Datei zum Import',
   'wallet.imports.phrase': 'Phrase',
   'wallet.imports.wallet': 'Importiere eine bestehende Wallet',
   'wallet.imports.enterphrase': 'Phrase eingeben',
+  'wallet.imports.error.instance': 'Es konnte keine Instanz vom Client erstellt werden',
+  'wallet.imports.error.keystore.load': 'Fehler beim Laden der Keystore-Datei',
+  'wallet.imports.error.keystore.import': 'Fehler beim Importieren der Keystore-Datei',
   'wallet.txs.last90days': 'Transaktionen der vergangenen 90 Tage',
   'wallet.empty.phrase.import': 'Importiere eine bestehende Wallet mit Guthaben',
   'wallet.empty.phrase.create': 'Erstelle eine neue Wallet und füge ein Guthaben hinzu',
@@ -56,7 +61,10 @@ const wallet: WalletMessages = {
   'wallet.upgrade.pending': 'Upgraden',
   'wallet.upgrade.success': 'Updgrade erfolgreich',
   'wallet.upgrade.error': 'Upgrade error',
-  'wallet.upgrade.feeError': 'Die Upgrade Gebühr {fee} ist nicht über Dein Guthaben {balance} gedeckt'
+  'wallet.upgrade.feeError': 'Die Upgrade Gebühr {fee} ist nicht über Dein Guthaben {balance} gedeckt',
+  'wallet.validations.lessThen': 'Der eingegebene Betrag sollte weniger als {value} betragen',
+  'wallet.validations.graterThen': 'Der eingegebene Betrag sollte höher als {amount} betragen',
+  'wallet.validations.shouldNotBeEmpty': 'Der eingegebene Werte sollte nicht leer sein.'
 }
 
 export default wallet

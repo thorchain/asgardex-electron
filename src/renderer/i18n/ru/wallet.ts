@@ -22,7 +22,12 @@ const wallet: WalletMessages = {
   'wallet.unlock.error': 'Не получилось разблокировать кошелек. Пожалуйста, проверьте пароль и попробуйте еще раз',
   'wallet.imports.phrase': 'Фраза',
   'wallet.imports.wallet': 'Импортировать существующий кошелек',
+  'wallet.imports.keystore.select': 'select keystore file - RU',
+  'wallet.imports.keystore.upload': 'Choose file to upload - RU',
   'wallet.imports.enterphrase': 'Введите фразу',
+  'wallet.imports.error.instance': 'Could not create an instance of Client - RU',
+  'wallet.imports.error.keystore.load': 'Error while loading keystore - RU',
+  'wallet.imports.error.keystore.import': 'Error while importing keystore - RU',
   'wallet.txs.last90days': 'Транзакции за последние 90 дней',
   'wallet.empty.phrase.import': 'Импортировать существующий кошелек с балансом',
   'wallet.empty.phrase.create': 'Создать новый кошелек с балансом',
@@ -56,7 +61,10 @@ const wallet: WalletMessages = {
   'wallet.upgrade.pending': 'Upgrading - RU',
   'wallet.upgrade.success': 'Successfull upgrade - RU',
   'wallet.upgrade.error': 'Upgrade error - RU',
-  'wallet.upgrade.feeError': 'Upgrade fee {fee} is not covered by your balance {balance} - RU'
+  'wallet.upgrade.feeError': 'Upgrade fee {fee} is not covered by your balance {balance} - RU',
+  'wallet.validations.lessThen': 'Должно быть меньше, чем {value}',
+  'wallet.validations.graterThen': 'Должно быть больше, чем {value}',
+  'wallet.validations.shouldNotBeEmpty': 'Не должно быть пустым'
 }
 
 export default wallet

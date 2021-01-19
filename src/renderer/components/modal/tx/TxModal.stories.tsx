@@ -8,13 +8,13 @@ import { Row } from 'antd'
 import * as O from 'fp-ts/lib/Option'
 
 import { ErrorId } from '../../../services/wallet/types'
-import { Button } from '../../uielements/button'
+import { Button, ViewTxButton } from '../../uielements/button'
 import { Label } from '../../uielements/label'
 import { TxModal } from './TxModal'
 
 const onClose = () => console.log('onClose')
 const onFinish = () => console.log('onFinish')
-const onViewTxClick = (txHash: TxHash) => console.log('txHash', txHash)
+const _onViewTxClick = (txHash: TxHash) => console.log('txHash', txHash)
 
 export const StoryInitial: Story = () => (
   <TxModal title="intial" txRD={RD.initial} onClose={onClose} onFinish={onFinish} />
@@ -27,25 +27,12 @@ export const StoryPending: Story = () => (
 StoryPending.storyName = 'pending'
 
 export const StoryPendingTxHash: Story = () => (
-  <TxModal
-    title="pending"
-    startTime={Date.now()}
-    txRD={RD.pending}
-    onClose={onClose}
-    txHash={O.some('any-tx-hash')}
-    onFinish={onFinish}
-  />
+  <TxModal title="pending" startTime={Date.now()} txRD={RD.pending} onClose={onClose} onFinish={onFinish} />
 )
 StoryPendingTxHash.storyName = 'pending + txHash'
 
 export const StorySuccess: Story = () => (
-  <TxModal
-    title="success"
-    txRD={RD.success('txhash')}
-    onClose={onClose}
-    onViewTxClick={onViewTxClick}
-    onFinish={onFinish}
-  />
+  <TxModal title="success" txRD={RD.success('txhash')} onClose={onClose} onFinish={onFinish} />
 )
 StorySuccess.storyName = 'success'
 
@@ -72,17 +59,26 @@ const extraContent = (): JSX.Element => (
   </Row>
 )
 
+const extraResult = (): JSX.Element => (
+  <ViewTxButton txHash={O.some('hash')} onClick={(txHash: TxHash) => console.log('txHash', txHash)} />
+)
+
 export const StoryExtra: Story = () => (
+  <TxModal title="success" txRD={RD.success('txhash')} onClose={onClose} onFinish={onFinish} extra={extraContent()} />
+)
+StoryExtra.storyName = 'success + extra content'
+
+export const StoryExtraResult: Story = () => (
   <TxModal
     title="success"
     txRD={RD.success('txhash')}
     onClose={onClose}
     onFinish={onFinish}
-    onViewTxClick={onViewTxClick}
     extra={extraContent()}
+    extraResult={extraResult()}
   />
 )
-StoryExtra.storyName = 'success + extra content'
+StoryExtraResult.storyName = 'success + extra content + extra result'
 
 const meta: Meta = {
   component: TxModal,

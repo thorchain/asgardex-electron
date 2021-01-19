@@ -12,10 +12,14 @@ describe('Wallet routes', () => {
 
   describe('imports route', () => {
     it('template', () => {
-      expect(imports.template).toEqual('/wallet/imports')
+      expect(imports.base.template).toEqual('/wallet/import')
+      expect(imports.keystore.template).toEqual('/wallet/import/keystore')
+      expect(imports.phrase.template).toEqual('/wallet/import/phrase')
     })
     it('path', () => {
-      expect(imports.path()).toEqual('/wallet/imports')
+      expect(imports.base.path()).toEqual('/wallet/import')
+      expect(imports.keystore.path()).toEqual('/wallet/import/keystore')
+      expect(imports.phrase.path()).toEqual('/wallet/import/phrase')
     })
   })
 

@@ -38,6 +38,7 @@ import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
 import { AssetSelect } from '../uielements/assets/assetSelect'
+import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
@@ -410,9 +411,8 @@ export const Swap = ({
         onFinish={onFinishTxModal}
         startTime={swapStartTime}
         txRD={txRD}
-        txHash={txHash}
+        extraResult={<ViewTxButton txHash={txHash} onClick={goToTransaction} />}
         timerValue={timerValue}
-        onViewTxClick={goToTransaction}
         extra={extraTxModalContent}
       />
     )

@@ -11,7 +11,7 @@ import { truncateAddress } from '../../helpers/addressHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { INITIAL_KEYSTORE_STATE } from './const'
-import { Phrase, KeystoreService, KeystoreState, ValidatePasswordLD } from './types'
+import { Phrase, KeystoreService, KeystoreState, ValidatePasswordLD, ImportKeystoreLD, LoadKeystoreLD } from './types'
 import { hasImportedKeystore } from './util'
 
 const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(INITIAL_KEYSTORE_STATE)
@@ -37,6 +37,16 @@ export const removeKeystore = async () => {
   setKeystoreState(O.none)
 }
 
+const importKeystore$ = (keystore: CryptoKeystore, password: string): ImportKeystoreLD => {
+  return FP.pipe(
+    Rx.from(decryptFromKeystore(keystore, password)),
+    switchMap((phrase) => addKeystore(phrase, password)),
+    map(RD.success),
+    catchError((error) => Rx.of(RD.failure(new Error(`Could not decrypt phrase from keystore: ${error}`)))),
+    startWith(RD.pending)
+  )
+}
+
 /**
  * Exports a keystore
  */
@@ -48,6 +58,18 @@ const exportKeystore = async (runeNativeAddress: string, network: Network) => {
   } catch (error) {
     return Promise.reject(error)
   }
+}
+
+/**
+ * loads a keystore
+ */
+const loadKeystore$ = (): LoadKeystoreLD => {
+  return FP.pipe(
+    Rx.from(window.apiKeystore.load()),
+    map(RD.success),
+    catchError((err) => Rx.of(RD.failure(err))),
+    startWith(RD.pending)
+  )
 }
 
 const addPhrase = async (state: KeystoreState, password: string) => {
@@ -98,7 +120,9 @@ export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystore,
   removeKeystore,
+  importKeystore$,
   exportKeystore,
+  loadKeystore$,
   lock: () => setKeystoreState(O.some(O.none)),
   unlock: addPhrase,
   validatePassword$
