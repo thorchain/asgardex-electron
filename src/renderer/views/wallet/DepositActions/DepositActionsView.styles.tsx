@@ -14,6 +14,7 @@ export const ContentContainer = styled('div')`
 `
 
 export const SuccessView = styled(SuccessViewUI)`
+  padding: 0;
   & .ant-result-content {
     width: 100%;
     display: flex;
@@ -26,6 +27,7 @@ export const SuccessView = styled(SuccessViewUI)`
 `
 
 export const ErrorView = styled(ErrorViewUI)`
+  padding: 0;
   & .ant-result-content {
     width: 100%;
     display: flex;
