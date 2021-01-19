@@ -1,62 +1,39 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetRuneNative, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
-import * as A from 'fp-ts/Array'
+import { AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
-import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import * as RxOp from 'rxjs/operators'
 
-import { Bond } from '../../../components/depositActions/forms'
+import { Leave } from '../../../components/depositActions/forms/Leave'
 import { Button } from '../../../components/uielements/button'
-import { ZERO_ASSET_AMOUNT } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
-import { useWalletContext } from '../../../contexts/WalletContext'
-import { eqAsset } from '../../../helpers/fp/eq'
 import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { AsymDepositState } from '../../../services/chain/types'
 import * as Styled from './DepositActionsView.styles'
 
 type Props = {
-  walletAddress: string
   goToTransaction: (txHash: string) => void
 }
 
-export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) => {
-  const { balancesState$ } = useWalletContext()
+export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
   const [depositState, setDepositState] = useState<AsymDepositState>(INITIAL_ASYM_DEPOSIT_STATE)
   const { asymDeposit$ } = useChainContext()
   const intl = useIntl()
 
-  const [runeBalance] = useObservableState(
-    () =>
-      FP.pipe(
-        balancesState$,
-        RxOp.map(({ balances }) => balances),
-        RxOp.map(
-          FP.flow(
-            O.chain(
-              A.findFirst(
-                ({ walletAddress: balanceWalletAddress, asset }) =>
-                  balanceWalletAddress === walletAddress && eqAsset.equals(asset, AssetRuneNative)
-              )
-            ),
-            O.map(({ amount }) => amount),
-            O.map(baseToAsset),
-            O.getOrElse(() => ZERO_ASSET_AMOUNT)
-          )
-        )
+  const leaveTx = useCallback(
+    ({ memo }: { memo: string }) =>
+      /**
+       * Send minimal amount
+       * @docs https://docs.thorchain.org/thornodes/leaving#leaving
+       */
+      asymDeposit$({ amount: baseAmount(1), memo, asset: AssetRuneNative, poolAddress: O.none }).subscribe(
+        setDepositState
       ),
-    ZERO_ASSET_AMOUNT
-  )
-
-  const bondTx = useCallback(
-    ({ amount, memo }: { amount: BaseAmount; memo: string }) =>
-      asymDeposit$({ amount, memo, asset: AssetRuneNative, poolAddress: O.none }).subscribe(setDepositState),
     [asymDeposit$, setDepositState]
   )
+
   const resetResults = useCallback(() => {
     setDepositState(INITIAL_ASYM_DEPOSIT_STATE)
   }, [setDepositState])
@@ -74,8 +51,8 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
   return FP.pipe(
     depositState.txRD,
     RD.fold(
-      () => <Bond max={runeBalance} onFinish={bondTx} />,
-      () => <Bond isLoading={true} max={runeBalance} onFinish={FP.identity} loadingProgress={stepLabel} />,
+      () => <Leave onFinish={leaveTx} />,
+      () => <Leave isLoading={true} onFinish={FP.identity} loadingProgress={stepLabel} />,
       ({ msg }) => (
         <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.add.state.error' })} subTitle={msg}>
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
