@@ -395,12 +395,16 @@ export const AddDeposit: React.FC<Props> = (props) => {
 
   const extraTxModalContent = useMemo(() => {
     // TODO (@Veado) Add i18n
-    const stepLabels = ['Health check...', 'Send deposit transaction...', 'Check deposit result...']
+    const stepLabels = [
+      intl.formatMessage({ id: 'deposit.add.state.healthCheck' }),
+      intl.formatMessage({ id: 'deposit.add.state.sending' }),
+      intl.formatMessage({ id: 'deposit.add.state.checkResults' })
+    ]
     const stepLabel = FP.pipe(
       depositState.txRD,
       RD.fold(
         () => '',
-        () => stepLabels[depositState.step - 1],
+        () => `${stepLabels[depositState.step - 1]}...`,
         () => '',
         () => 'Done!'
       )

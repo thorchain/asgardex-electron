@@ -73,24 +73,28 @@ export const BondView: React.FC<Props> = ({ walletAddress }) => {
     setDepositState(INITIAL_ASYM_DEPOSIT_STATE)
   }, [])
 
-  /**
-   * INITIAL_ASYM_DEPOSIT_STATE starts wit step 1 but we don't need any label for initial state
-   */
-  const stepLabels = [undefined, 'Health check...', 'Send deposit transaction...', 'Check deposit result...']
-  const stepLabel = useMemo(() => stepLabels[depositState.step - 1], [depositState.step, stepLabels])
+  const stepLabels = useMemo(
+    () => [
+      intl.formatMessage({ id: 'deposit.add.state.healthCheck' }),
+      intl.formatMessage({ id: 'deposit.add.state.sending' }),
+      intl.formatMessage({ id: 'deposit.add.state.checkResults' })
+    ],
+    [intl]
+  )
+  const stepLabel = useMemo(() => `${stepLabels[depositState.step - 1]}...`, [depositState.step, stepLabels])
 
   return FP.pipe(
     depositState.txRD,
     RD.fold(
-      () => <Bond max={runeBalance} onFinish={bondTx} loadingProgress={stepLabel} />,
+      () => <Bond max={runeBalance} onFinish={bondTx} />,
       () => <Bond isLoading={true} max={runeBalance} onFinish={FP.identity} loadingProgress={stepLabel} />,
       ({ msg }) => (
-        <Styled.ErrorView title={msg}>
+        <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.add.state.error' })} subTitle={msg}>
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.ErrorView>
       ),
       (txHash) => (
-        <Styled.SuccessView title={intl.formatMessage({ id: 'common.success' })}>
+        <Styled.SuccessView title={intl.formatMessage({ id: 'deposit.add.state.success' })}>
           <Styled.ViewTxButton onClick={goToTransaction} txHash={O.some(txHash)} />
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>
