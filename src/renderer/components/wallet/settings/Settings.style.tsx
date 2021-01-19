@@ -87,6 +87,10 @@ export const Button = styled(UIButton)`
   span {
     font-size: 14px;
   }
+
+  :disabled:hover {
+    color: ${palette('primary', 0)} !important;
+  }
 `
 
 export const Placeholder = styled(UILabel)`
