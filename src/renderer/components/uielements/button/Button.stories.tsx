@@ -30,7 +30,7 @@ const StoryWrapper = styled.div`
   }
 `
 
-storiesOf('Components/Button', module)
+storiesOf('Components/button/Button', module)
   .add('default', () => {
     return (
       <StoryWrapper>

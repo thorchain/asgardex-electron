@@ -36,6 +36,7 @@ import { DepositType } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
+import { ViewTxButton } from '../../uielements/button'
 import { Drag } from '../../uielements/drag'
 import { formatFee } from '../../uielements/fees/Fees.helper'
 import * as Helper from './AddDeposit.helper'
@@ -469,9 +470,8 @@ export const AddDeposit: React.FC<Props> = (props) => {
         onFinish={onFinishTxModal}
         startTime={depositStartTime}
         txRD={txRD}
-        txHash={RD.toOption(txRD)}
         timerValue={timerValue}
-        onViewTxClick={goToTransaction}
+        extraResult={<ViewTxButton txHash={RD.toOption(txRD)} onClick={goToTransaction} />}
         extra={extraTxModalContent}
       />
     )

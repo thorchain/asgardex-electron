@@ -25,12 +25,13 @@ import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { OnlineStatus } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
+import { getPhrase } from '../../services/wallet/util'
 import { UserAccountType } from '../../types/wallet'
 
 export const SettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const { keystoreService } = useWalletContext()
-  const { lock, removeKeystore, exportKeystore } = keystoreService
+  const { keystore$, lock, removeKeystore, exportKeystore } = keystoreService
   const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
   const thorchainContext = useThorchainContext()
@@ -39,6 +40,9 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const thorchaincontext = useThorchainContext()
   const chainContext = useChainContext()
   const { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } = chainContext
+
+  const phrase$ = useMemo(() => pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
+  const phrase = useObservableState(phrase$, O.none)
 
   const binanceLedgerAddress = useObservableState(binanceContext.ledgerAddress$, RD.initial)
   const binanceAddress$ = useMemo(
@@ -235,6 +239,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           retrieveLedgerAddress={retrieveLedgerAddress}
           removeLedgerAddress={removeLedgerAddress}
           removeAllLedgerAddress={removeAllLedgerAddress}
+          phrase={phrase}
         />
       </Col>
     </Row>

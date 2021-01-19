@@ -1,0 +1,34 @@
+import React from 'react'
+
+import * as RD from '@devexperts/remote-data-ts'
+import { Meta, Story } from '@storybook/react'
+import * as Rx from 'rxjs'
+
+import { ImportKeystore } from './index'
+
+const importKeystoreInitial$ = () => Rx.of(RD.initial)
+const loadKeystoreInitial$ = () => Rx.of(RD.initial)
+
+export const StoryInitial: Story = () => (
+  <ImportKeystore importKeystore$={importKeystoreInitial$} loadKeystore$={loadKeystoreInitial$} />
+)
+StoryInitial.storyName = 'initial'
+
+const meta: Meta = {
+  component: ImportKeystore,
+  title: 'Components/Wallet/Keystore',
+  decorators: [
+    (S: Story) => (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '300px'
+        }}>
+        <S />
+      </div>
+    )
+  ]
+}
+
+export default meta

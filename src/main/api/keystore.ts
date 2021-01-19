@@ -33,6 +33,17 @@ export const exportKeystore = async (defaultFileName: string, keystore: Keystore
   }
 }
 
+export const loadKeystore = async () => {
+  try {
+    const filePath = await dialog.showOpenDialog({})
+    if (!filePath.canceled) {
+      return await fs.readJSON(filePath.filePaths[0])
+    }
+  } catch (err) {
+    return Promise.reject(err)
+  }
+}
+
 // key file path
 export const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
 
@@ -42,5 +53,6 @@ export const apiKeystore: ApiKeystore = {
   get: () => ipcRenderer.invoke(IPCMessages.GET_KEYSTORE, KEY_FILE),
   exists: () => ipcRenderer.invoke(IPCMessages.KEYSTORE_EXIST),
   export: (defaultFileName: string, keystore: Keystore) =>
-    ipcRenderer.invoke(IPCMessages.EXPORT_KEYSTORE, defaultFileName, keystore)
+    ipcRenderer.invoke(IPCMessages.EXPORT_KEYSTORE, defaultFileName, keystore),
+  load: () => ipcRenderer.invoke(IPCMessages.LOAD_KEYSTORE)
 }
