@@ -32,7 +32,7 @@ export const StoryPendingTxHash: Story = () => (
 StoryPendingTxHash.storyName = 'pending + txHash'
 
 export const StorySuccess: Story = () => (
-  <TxModal title="success" txRD={RD.success('txhash')} onClose={onClose} onFinish={onFinish} />
+  <TxModal title="success" txRD={RD.success(true)} onClose={onClose} onFinish={onFinish} />
 )
 StorySuccess.storyName = 'success'
 
@@ -64,14 +64,14 @@ const extraResult = (): JSX.Element => (
 )
 
 export const StoryExtra: Story = () => (
-  <TxModal title="success" txRD={RD.success('txhash')} onClose={onClose} onFinish={onFinish} extra={extraContent()} />
+  <TxModal title="success" txRD={RD.success(true)} onClose={onClose} onFinish={onFinish} extra={extraContent()} />
 )
 StoryExtra.storyName = 'success + extra content'
 
 export const StoryExtraResult: Story = () => (
   <TxModal
     title="success"
-    txRD={RD.success('txhash')}
+    txRD={RD.success(true)}
     onClose={onClose}
     onFinish={onFinish}
     extra={extraContent()}

@@ -1,17 +1,16 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { TxHash } from '@xchainjs/xchain-client'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
-import { ApiError, TxRD } from '../../../services/wallet/types'
+import { ApiError } from '../../../services/wallet/types'
 import { ButtonProps as UIButtonProps } from '../../uielements/button'
 import { TxTimer } from '../../uielements/txTimer'
 import * as Styled from './TxModal.style'
 
 export type Props = {
-  txRD: TxRD
+  txRD: RD.RemoteData<ApiError, boolean>
   timerValue?: number
   title: string
   onClose: FP.Lazy<void>
@@ -60,7 +59,7 @@ export const TxModal: React.FC<Props> = (props): JSX.Element => {
 
     const buttonProps: UIButtonProps = FP.pipe(
       txRD,
-      RD.fold<ApiError, TxHash, UIButtonProps>(
+      RD.fold<ApiError, boolean, UIButtonProps>(
         () => ({ ...defaultButtonProps, disabled: true }),
         () => ({ ...defaultButtonProps, disabled: true }),
         () => ({ ...defaultButtonProps, children: intl.formatMessage({ id: 'common.finish' }) }),

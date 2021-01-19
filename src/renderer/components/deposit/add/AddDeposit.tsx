@@ -407,15 +407,40 @@ export const AddDeposit: React.FC<Props> = (props) => {
 
   const reloadFeesHandler = useCallback(() => reloadFees(type), [reloadFees, type])
 
-  const extraTxModalContent = useMemo(() => {
+  const asymTxModalExtraContent = useMemo(() => {
     // TODO (@Veado) Add i18n
-    const stepLabels = ['Health check...', 'Send deposit transaction...', 'Check deposit result...']
-    const stepLabel = FP.pipe(
-      asymDepositState.txRD,
+    const asymStepLabels = ['Health check...', 'Send deposit transaction...', 'Check deposit result...']
+    const asymStepLabel = FP.pipe(
+      asymDepositState.deposit,
       RD.fold(
         () => '',
-        () => stepLabels[asymDepositState.step - 1],
+        () => asymStepLabels[asymDepositState.step - 1],
         () => '',
+        // TODO (@Veado) Add i18n
+        () => 'Done!'
+      )
+    )
+
+    return (
+      <DepositAssets target={{ asset, amount: assetAmountToDeposit }} source={O.none} stepDescription={asymStepLabel} />
+    )
+  }, [asymDepositState.deposit, asymDepositState.step, asset, assetAmountToDeposit])
+
+  const symTxModalExtraContent = useMemo(() => {
+    // TODO (@Veado) Add i18n
+    const stepDescriptions = [
+      'Health check...',
+      'Send RUNE transaction...',
+      'Send Asset transaction...',
+      'Check deposit result...'
+    ]
+    const stepDescription = FP.pipe(
+      symDepositState.deposit,
+      RD.fold(
+        () => '',
+        () => stepDescriptions[symDepositState.step - 1],
+        () => '',
+        // TODO (@Veado) Add i18n
         () => 'Done!'
       )
     )
@@ -423,11 +448,11 @@ export const AddDeposit: React.FC<Props> = (props) => {
     return (
       <DepositAssets
         target={{ asset, amount: assetAmountToDeposit }}
-        source={type === 'asym' ? O.none : O.some({ asset: AssetRuneNative, amount: runeAmountToDeposit })}
-        stepDescription={stepLabel}
+        source={O.some({ asset: AssetRuneNative, amount: runeAmountToDeposit })}
+        stepDescription={stepDescription}
       />
     )
-  }, [asset, assetAmountToDeposit, asymDepositState.step, asymDepositState.txRD, runeAmountToDeposit, type])
+  }, [symDepositState.deposit, symDepositState.step, asset, assetAmountToDeposit, runeAmountToDeposit])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe
@@ -447,16 +472,16 @@ export const AddDeposit: React.FC<Props> = (props) => {
   }, [onCloseTxModal, reloadBalances])
 
   const renderTxModal = useMemo(() => {
-    const { txRD: asymRD } = asymDepositState
-    const { txRD: symRD } = symDepositState
-    const txRD = type === 'asym' ? asymRD : symRD
+    const { deposit: asymRD, depositTx: asymDepositTx } = asymDepositState
+    const { deposit: symRD, depositTxs: symDepositTxs } = symDepositState
+    const depositRD = type === 'asym' ? asymRD : symRD
 
     // don't render TxModal in initial state
-    if (RD.isInitial(txRD)) return <></>
+    if (RD.isInitial(depositRD)) return <></>
 
     // Get timer value
     const timerValue = FP.pipe(
-      txRD,
+      depositRD,
       RD.fold(
         () => 0,
         FP.flow(
@@ -470,7 +495,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
 
     // title
     const txModalTitle = FP.pipe(
-      txRD,
+      depositRD,
       RD.fold(
         () => 'deposit.add.state.pending',
         () => 'deposit.add.state.pending',
@@ -480,28 +505,51 @@ export const AddDeposit: React.FC<Props> = (props) => {
       (id) => intl.formatMessage({ id })
     )
 
+    const asymExtraResult = <ViewTxButton txHash={RD.toOption(asymDepositTx)} onClick={goToTransaction} />
+    const symExtraResult = (
+      <Styled.AsymExtraContainer>
+        {FP.pipe(symDepositTxs.rune, RD.toOption, (oTxHash) => (
+          <Styled.ViewTxButtonTop
+            txHash={oTxHash}
+            onClick={goToTransaction}
+            // TODO (@Veado) Add i18n
+            label={`View ${AssetRuneNative.symbol} transaction`}
+          />
+        ))}
+        {FP.pipe(symDepositTxs.asset, RD.toOption, (oTxHash) => (
+          // TODO (@Veado) Add i18n
+          <ViewTxButton txHash={oTxHash} onClick={goToTransaction} label={`View ${asset.symbol} transaction`} />
+        ))}
+      </Styled.AsymExtraContainer>
+    )
+
+    const extraResult = type === 'asym' ? asymExtraResult : symExtraResult
+    const extra = type === 'asym' ? asymTxModalExtraContent : symTxModalExtraContent
+
     return (
       <TxModal
         title={txModalTitle}
         onClose={onCloseTxModal}
         onFinish={onFinishTxModal}
         startTime={depositStartTime}
-        txRD={txRD}
+        txRD={depositRD}
         timerValue={timerValue}
-        extraResult={<ViewTxButton txHash={RD.toOption(txRD)} onClick={goToTransaction} />}
-        extra={extraTxModalContent}
+        extraResult={extraResult}
+        extra={extra}
       />
     )
   }, [
     asymDepositState,
     symDepositState,
     type,
+    goToTransaction,
+    asymTxModalExtraContent,
+    symTxModalExtraContent,
     onCloseTxModal,
     onFinishTxModal,
     depositStartTime,
-    goToTransaction,
-    extraTxModalContent,
-    intl
+    intl,
+    asset.symbol
   ])
 
   const closePasswordModal = useCallback(() => {
@@ -663,6 +711,8 @@ export const AddDeposit: React.FC<Props> = (props) => {
           validatePassword$={validatePassword$}
         />
       )}
+      <div>asym: {JSON.stringify(asymDepositState)}</div>
+      <div>sym: {JSON.stringify(symDepositState)}</div>
       {renderTxModal}
     </Styled.Container>
   )

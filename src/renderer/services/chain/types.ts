@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { TxTypes } from '../../types/asgardex'
-import { ApiError } from '../wallet/types'
+import { ApiError, TxRD } from '../wallet/types'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
 
@@ -77,12 +77,10 @@ export type LedgerAddressParams = { chain: Chain; network: Network }
 export type SwapState = {
   // Number of current step
   readonly step: number
+  // swap transaction
+  readonly swapTx: TxRD
   // RD of all requests
-  readonly txRD: RD.RemoteData<ApiError, TxHash>
-  // TxHash needs to be independent from `txRD`
-  // because we have to handle three different requests
-  // and `TxHash` is already provided by second (but not last) request
-  readonly txHash: O.Option<TxHash>
+  readonly swap: RD.RemoteData<ApiError, boolean>
 }
 
 export type SwapState$ = Rx.Observable<SwapState>
@@ -102,8 +100,10 @@ export type SwapStateHandler = (p: SwapParams) => SwapState$
 export type AsymDepositState = {
   // Number of current step
   readonly step: number
+  // deposit transaction
+  readonly depositTx: TxRD
   // RD of all requests
-  readonly txRD: RD.RemoteData<ApiError, TxHash>
+  readonly deposit: RD.RemoteData<ApiError, boolean>
 }
 
 export type AsymDepositState$ = Rx.Observable<AsymDepositState>
@@ -117,8 +117,8 @@ export type AsymDepositParams = {
 
 export type AsymDepositStateHandler = (p: AsymDepositParams) => AsymDepositState$
 
-export type SymDepositTxResult = { rune: TxHash; asset: TxHash }
 export type SymDepositValidationResult = { pool: boolean; node: boolean }
+export type SymDepositTxs = { rune: TxRD; asset: TxRD }
 export type SymDepositFinalityResult = { rune: O.Option<TxHash>; asset: O.Option<TxHash> }
 
 /**
@@ -127,10 +127,10 @@ export type SymDepositFinalityResult = { rune: O.Option<TxHash>; asset: O.Option
 export type SymDepositState = {
   // Number of current step
   readonly step: number
-  // Tx hashes of deposit transactions
-  readonly txHashes: SymDepositTxResult
-  // RD of all requests
-  readonly txRD: RD.RemoteData<ApiError, SymDepositFinalityResult>
+  // deposit transactions
+  readonly depositTxs: SymDepositTxs
+  // RD for all needed steps
+  readonly deposit: RD.RemoteData<ApiError, boolean>
 }
 
 export type SymDepositState$ = Rx.Observable<SymDepositState>
