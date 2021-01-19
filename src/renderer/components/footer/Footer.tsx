@@ -2,7 +2,6 @@ import React, { useCallback } from 'react'
 
 import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined, BugOutlined } from '@ant-design/icons'
 import { Row, Col, Grid } from 'antd'
-// import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { ExternalUrl } from '../../../shared/const'
@@ -35,8 +34,6 @@ type Props = {
 export const Footer: React.FC<Props> = (props): JSX.Element => {
   const { commitHash, isDev } = props
 
-  // const intl = useIntl()
-
   const history = useHistory()
   const screens = Grid.useBreakpoint()
 
@@ -57,6 +54,7 @@ export const Footer: React.FC<Props> = (props): JSX.Element => {
           </Row>
         </Col>
         <Col span={24} md={14}>
+          {/* Disable buttons temporarily for the release (https://github.com/thorchain/asgardex-electron/pull/777) */}
           {/* <FooterLinkWrapper justify="center">
             <FooterLink to="/stats">{intl.formatMessage({ id: 'common.stats' })}</FooterLink>
             <FooterLink to="/network">{intl.formatMessage({ id: 'common.network' })}</FooterLink>

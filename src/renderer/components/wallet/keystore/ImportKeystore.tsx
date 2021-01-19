@@ -81,7 +81,10 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
   const uploadKeystore = () => {
     unsubScribeKeystoreSub()
     setImportKeystoreState(RD.initial)
-    const sub = loadKeystore$().subscribe(setLoadKeystoreState)
+    const sub = loadKeystore$().subscribe((state) => {
+      if (RD.isSuccess(state) && !state.value) setLoadKeystoreState(RD.initial)
+      else setLoadKeystoreState(state)
+    })
     setKeystoreSub(O.some(sub))
   }
 
@@ -124,11 +127,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
           <Styled.KeystoreLabel>{intl.formatMessage({ id: 'wallet.imports.keystore.select' })}</Styled.KeystoreLabel>
           <Form.Item>
             <Styled.KeystoreButton typevalue={'outline'} onClick={uploadKeystore}>
-              {RD.isSuccess(loadKeystoreState) && loadKeystoreState.value ? (
-                <CheckCircleTwoTone twoToneColor="#50e3c2" />
-              ) : (
-                <UploadOutlined />
-              )}
+              {RD.isSuccess(loadKeystoreState) ? <CheckCircleTwoTone twoToneColor="#50e3c2" /> : <UploadOutlined />}
               {intl.formatMessage({ id: 'wallet.imports.keystore.upload' })}
             </Styled.KeystoreButton>
           </Form.Item>
