@@ -77,12 +77,12 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
       () => <Bond max={runeBalance} onFinish={bondTx} />,
       () => <Bond isLoading={true} max={runeBalance} onFinish={FP.identity} loadingProgress={stepLabel} />,
       ({ msg }) => (
-        <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.add.state.error' })} subTitle={msg}>
+        <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.bond.state.error' })} subTitle={msg}>
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.ErrorView>
       ),
       (txHash) => (
-        <Styled.SuccessView title={intl.formatMessage({ id: 'deposit.add.state.success' })}>
+        <Styled.SuccessView title={intl.formatMessage({ id: 'deposit.bond.state.success' })}>
           <Styled.ViewTxButton onClick={goToTransaction} txHash={O.some(txHash)} />
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>
