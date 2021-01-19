@@ -61,7 +61,10 @@ const wallet: WalletMessages = {
   'wallet.upgrade.pending': 'Upgraden',
   'wallet.upgrade.success': 'Updgrade erfolgreich',
   'wallet.upgrade.error': 'Upgrade error',
-  'wallet.upgrade.feeError': 'Die Upgrade Gebühr {fee} ist nicht über Dein Guthaben {balance} gedeckt'
+  'wallet.upgrade.feeError': 'Die Upgrade Gebühr {fee} ist nicht über Dein Guthaben {balance} gedeckt',
+  'wallet.validations.lessThen': 'Der eingegebene Betrag sollte weniger als {value} betragen',
+  'wallet.validations.graterThen': 'Der eingegebene Betrag sollte höher als {amount} betragen',
+  'wallet.validations.shouldNotBeEmpty': 'Der eingegebene Werte sollte nicht leer sein.'
 }
 
 export default wallet

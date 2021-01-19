@@ -60,7 +60,10 @@ const wallet: WalletMessages = {
   'wallet.upgrade.pending': 'Upgrading',
   'wallet.upgrade.success': 'Successfull upgrade',
   'wallet.upgrade.error': 'Upgrade error',
-  'wallet.upgrade.feeError': 'Upgrade fee {fee} is not covered by your balance {balance}'
+  'wallet.upgrade.feeError': 'Upgrade fee {fee} is not covered by your balance {balance}',
+  'wallet.validations.lessThen': 'Should be less then {value}',
+  'wallet.validations.graterThen': 'Should be grater then {value}',
+  'wallet.validations.shouldNotBeEmpty': 'Should not be empty'
 }
 
 export default wallet
