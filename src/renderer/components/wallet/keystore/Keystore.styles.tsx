@@ -26,25 +26,6 @@ export const KeystoreButton = styled(Button)`
   margin-bottom: 50px;
 `
 
-// export const KeystoreButton = styled.div`
-//   position: relative;
-//   max-width: 280px;
-//   height: 35px;
-//   text-transform: uppercase;
-//   font-family: 'MainFontRegular';
-//   background: #f0fffc;
-//   border: 1px solid #50e3c2;
-//   box-sizing: border-box;
-//   border-radius: 4px;
-//   color: #50e3c2;
-//   font-size: 14px;
-//   cursor: pointer;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   margin-bottom: 50px;
-// `
-
 export const Row = styled(A.Row)`
   margin-bottom: 32px;
 `
