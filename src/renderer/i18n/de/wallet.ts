@@ -26,7 +26,7 @@ const wallet: WalletMessages = {
   'wallet.imports.wallet': 'Importiere eine bestehende Wallet',
   'wallet.imports.enterphrase': 'Phrase eingeben',
   'wallet.imports.error.instance': 'Es konnte keine Instanz vom Client erstellt werden',
-  'wallet.imports.error.keystore.load': 'Ungültiger Keystore',
+  'wallet.imports.error.keystore.load': 'Ungültige Keystore-Datei',
   'wallet.imports.error.keystore.import': 'Ungültiges Passwort',
   'wallet.txs.last90days': 'Transaktionen der vergangenen 90 Tage',
   'wallet.empty.phrase.import': 'Importiere eine bestehende Wallet mit Guthaben',
