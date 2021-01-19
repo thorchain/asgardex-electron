@@ -132,8 +132,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   }, [oAssetAsString, history, oWalletAddress])
 
   const walletActionDepositClick = useCallback(() => {
-    history.push(walletRoutes.deposit.path())
-  }, [oAssetAsString, history, oWalletAddress])
+    FP.pipe(
+      oWalletAddress,
+      O.map((walletAddress) => walletRoutes.deposit.path({ walletAddress })),
+      O.map(history.push)
+    )
+  }, [oWalletAddress, history.push])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })

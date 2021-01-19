@@ -11,9 +11,10 @@ type Props = {
   label?: string
   txHash: O.Option<TxHash>
   onClick: (txHash: string) => void
+  className?: string
 }
 
-export const ViewTxButton: React.FC<Props> = ({ onClick, txHash: oTxHash, label }): JSX.Element => {
+export const ViewTxButton: React.FC<Props> = ({ onClick, txHash: oTxHash, label, className }): JSX.Element => {
   const intl = useIntl()
 
   const onClickHandler = useCallback(
@@ -24,7 +25,7 @@ export const ViewTxButton: React.FC<Props> = ({ onClick, txHash: oTxHash, label 
   )
 
   return (
-    <Styled.ViewTxButton onClick={onClickHandler} disabled={O.isNone(oTxHash)}>
+    <Styled.ViewTxButton onClick={onClickHandler} disabled={O.isNone(oTxHash)} className={className}>
       {label || intl.formatMessage({ id: 'common.viewTransaction' })}
     </Styled.ViewTxButton>
   )

@@ -15,6 +15,7 @@ import { AssetDetailsView } from './AssetDetailsView'
 import { AssetsView } from './AssetsView'
 import { BondsView } from './BondsView'
 import { CreateView } from './CreateView'
+import { DepositActionView } from './DepositActions'
 import { DepositsView } from './DepositsView'
 import { ImportsView } from './importsView'
 import { NoWalletView } from './NoWalletView'
@@ -58,6 +59,9 @@ export const WalletView: React.FC = (): JSX.Element => {
             {reloadButton(reloadBalances)}
             <AssetsNav />
             <AssetsView />
+          </Route>
+          <Route path={walletRoutes.deposit.template} exact>
+            <DepositActionView />
           </Route>
           <Route path={walletRoutes.deposits.template} exact>
             {reloadButton(reloadBalances)}
