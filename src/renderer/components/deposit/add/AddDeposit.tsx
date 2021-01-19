@@ -394,7 +394,6 @@ export const AddDeposit: React.FC<Props> = (props) => {
   const reloadFeesHandler = useCallback(() => reloadFees(type), [reloadFees, type])
 
   const extraTxModalContent = useMemo(() => {
-    // TODO (@Veado) Add i18n
     const stepLabels = [
       intl.formatMessage({ id: 'deposit.add.state.healthCheck' }),
       intl.formatMessage({ id: 'deposit.add.state.sending' }),
@@ -417,7 +416,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
         stepDescription={stepLabel}
       />
     )
-  }, [asset, assetAmountToDeposit, depositState.step, depositState.txRD, runeAmountToDeposit, type])
+  }, [asset, assetAmountToDeposit, depositState.step, depositState.txRD, runeAmountToDeposit, type, intl])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe
