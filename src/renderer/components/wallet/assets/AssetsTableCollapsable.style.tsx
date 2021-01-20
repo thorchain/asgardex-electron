@@ -59,6 +59,7 @@ export const Collapse = styled(A.Collapse)`
 `
 
 export const ExpandIcon = styled(CaretRightOutlined)`
+  margin-top: -13px;
   svg {
     color: ${palette('primary', 0)};
   }

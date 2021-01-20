@@ -50,12 +50,12 @@ const inputStyle = css<InputProps>`
   border-color: ${({ color = 'primary', typevalue = 'normal' }) =>
     typevalue === 'ghost' ? 'transparent' : colors[color]};
 
-  background: ${palette('background', 1)};
+  background: transparent !important;
   color: ${palette('text', 0)};
   input,
   input:-internal-autofill-selected {
     color: ${palette('text', 0)};
-    background: ${palette('background', 1)};
+    background: transparent;
   }
 
   &:hover,
