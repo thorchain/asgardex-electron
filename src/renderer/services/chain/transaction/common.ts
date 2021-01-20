@@ -108,13 +108,13 @@ const txStatus$ = (txHash: string, chain: Chain): TxLD => {
 
   return FP.pipe(
     Rx.interval(5000),
-    // Run interval as long as we don't have a valid result or MAX number of requests is reached
+    // Run interval as long as we don't have a valid result or MAX number of requests
     RxOp.takeUntil(stopInterval$),
     // count requests
     RxOp.tap(() => setCount(getCount() + 1)),
     RxOp.switchMap((_) => getTxByChain$(txHash, chain)),
-    // Map result into an option...
     liveData.map((result) => {
+      // update state to stop polling
       setHasResult(true)
       return result
     }),

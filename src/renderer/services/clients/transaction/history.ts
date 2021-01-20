@@ -76,7 +76,7 @@ export const txsByClient$: (client$: XChainClient$) => (params: TxsParams) => Tx
   )
 
 /**
- * Observable to load data of single txs
+ * Observable to load data of a `Tx`
  */
 const loadTx$ = (client: XChainClient, txHash: TxHash): TxLD =>
   Rx.from(client.getTransactionData(txHash)).pipe(
@@ -90,7 +90,7 @@ const loadTx$ = (client: XChainClient, txHash: TxHash): TxLD =>
   )
 
 /**
- * Data of single `Tx` by given client
+ * Gets data of a `Tx` by given client
  * If a client is not available, it returns an `initial` state
  */
 export const txByClient$: (client$: XChainClient$) => (txHash: TxHash) => TxLD = (client$) => (txHash) =>
