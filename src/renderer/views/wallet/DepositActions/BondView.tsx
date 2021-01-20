@@ -26,7 +26,7 @@ type Props = {
 
 export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) => {
   const { balancesState$ } = useWalletContext()
-  const [depositState, setDepositState] = useState<InteractState>(INITIAL_INTERACT_STATE)
+  const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
   const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
@@ -53,12 +53,12 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
   )
 
   const bondTx = useCallback(
-    ({ amount, memo }: { amount: BaseAmount; memo: string }) => interact$({ amount, memo }).subscribe(setDepositState),
-    [interact$, setDepositState]
+    ({ amount, memo }: { amount: BaseAmount; memo: string }) => interact$({ amount, memo }).subscribe(setInteractState),
+    [interact$, setInteractState]
   )
   const resetResults = useCallback(() => {
-    setDepositState(INITIAL_INTERACT_STATE)
-  }, [setDepositState])
+    setInteractState(INITIAL_INTERACT_STATE)
+  }, [setInteractState])
 
   const stepLabels = useMemo(
     () => [
@@ -67,10 +67,17 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
     ],
     [intl]
   )
-  const stepLabel = useMemo(() => `${stepLabels[depositState.step - 1]}...`, [depositState.step, stepLabels])
+  const stepLabel = useMemo(
+    () =>
+      `${intl.formatMessage(
+        { id: 'common.step' },
+        { total: interactState.stepsTotal, current: interactState.step }
+      )}: ${stepLabels[interactState.step - 1]}...`,
+    [interactState.step, stepLabels, intl]
+  )
 
   return FP.pipe(
-    depositState.txRD,
+    interactState.txRD,
     RD.fold(
       () => <Bond max={runeBalance} onFinish={bondTx} />,
       () => <Bond isLoading={true} max={runeBalance} onFinish={FP.identity} loadingProgress={stepLabel} />,

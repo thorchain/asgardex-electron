@@ -18,7 +18,7 @@ type Props = {
 }
 
 export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
-  const [depositState, setDepositState] = useState<InteractState>(INITIAL_INTERACT_STATE)
+  const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
   const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
@@ -28,13 +28,13 @@ export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
        * it does not matter which amount to send
        * @docs https://docs.thorchain.org/thornodes/leaving#unbonding
        */
-      interact$({ amount: baseAmount(1), memo }).subscribe(setDepositState),
-    [interact$, setDepositState]
+      interact$({ amount: baseAmount(1), memo }).subscribe(setInteractState),
+    [interact$, setInteractState]
   )
 
   const resetResults = useCallback(() => {
-    setDepositState(INITIAL_INTERACT_STATE)
-  }, [setDepositState])
+    setInteractState(INITIAL_INTERACT_STATE)
+  }, [setInteractState])
 
   const stepLabels = useMemo(
     () => [
@@ -43,10 +43,17 @@ export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
     ],
     [intl]
   )
-  const stepLabel = useMemo(() => `${stepLabels[depositState.step - 1]}...`, [depositState.step, stepLabels])
+  const stepLabel = useMemo(
+    () =>
+      `${intl.formatMessage(
+        { id: 'common.step' },
+        { total: interactState.stepsTotal, current: interactState.step }
+      )}: ${stepLabels[interactState.step - 1]}...`,
+    [interactState.step, stepLabels, intl]
+  )
 
   return FP.pipe(
-    depositState.txRD,
+    interactState.txRD,
     RD.fold(
       () => <Unbond onFinish={unbondTx} />,
       () => <Unbond isLoading={true} onFinish={FP.identity} loadingProgress={stepLabel} />,

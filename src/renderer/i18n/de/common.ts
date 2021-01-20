@@ -46,7 +46,8 @@ const common: CommonMessages = {
   'common.reload': 'Neuladen',
   'common.add': 'Einzahlen',
   'common.swap': 'Swap',
-  'common.liquidity': 'Liquidität'
+  'common.liquidity': 'Liquidität',
+  'common.step': 'Step {current}/{total} - DE'
 }
 
 export default common
