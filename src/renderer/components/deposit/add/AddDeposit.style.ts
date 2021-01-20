@@ -5,6 +5,7 @@ import { media } from '../../../helpers/styleHelper'
 import { Alert as UIAlert } from '../../uielements/alert'
 import { AssetCard as BaseAssetCard } from '../../uielements/assets/assetCard'
 import { Button as UIButton } from '../../uielements/button'
+import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
 
 export const Container = styled('div')`
@@ -104,4 +105,15 @@ export const ReloadFeeButton = styled(UIButton).attrs({
   width: 30px;
   height: 30px;
   margin-right: 10px;
+`
+
+export const AsymExtraContainer = styled('div')`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+`
+
+export const ViewTxButtonTop = styled(UIViewTxButton)`
+  padding-bottom: 20px;
 `

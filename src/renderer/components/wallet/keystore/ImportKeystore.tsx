@@ -80,6 +80,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
 
   const uploadKeystore = () => {
     unsubScribeKeystoreSub()
+    setImportKeystoreState(RD.initial)
     const sub = loadKeystore$().subscribe(setLoadKeystoreState)
     setKeystoreSub(O.some(sub))
   }
