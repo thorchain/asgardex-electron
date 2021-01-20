@@ -66,7 +66,7 @@ const exportKeystore = async (runeNativeAddress: string, network: Network) => {
 const loadKeystore$ = (): LoadKeystoreLD => {
   return FP.pipe(
     Rx.from(window.apiKeystore.load()),
-    map(RD.success),
+    map((keystore) => (keystore ? RD.success(keystore) : RD.initial)), // handle undeifined keystore in case when the user click cancel in openDialog
     catchError((err) => Rx.of(RD.failure(err))),
     startWith(RD.pending)
   )
