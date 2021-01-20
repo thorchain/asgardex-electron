@@ -3,7 +3,6 @@ import React, { useCallback, useMemo, useState } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
-import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { Leave } from '../../../components/depositActions/forms/Leave'
@@ -13,11 +12,9 @@ import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
 import * as Styled from './DepositActionsView.styles'
 
-type Props = {
-  goToTransaction: (txHash: string) => void
-}
+type Props = {}
 
-export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
+export const LeaveView: React.FC<Props> = () => {
   const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
   const { interact$ } = useThorchainContext()
   const intl = useIntl()
@@ -38,8 +35,8 @@ export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
 
   const stepLabels = useMemo(
     () => [
-      intl.formatMessage({ id: 'deposit.add.state.sending' }),
-      intl.formatMessage({ id: 'deposit.add.state.checkResults' })
+      intl.formatMessage({ id: 'deposit.interact.leave.sending' }),
+      intl.formatMessage({ id: 'deposit.interact.leave.checkResults' })
     ],
     [intl]
   )
@@ -49,7 +46,7 @@ export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
         { id: 'common.step' },
         { total: interactState.stepsTotal, current: interactState.step }
       )}: ${stepLabels[interactState.step - 1]}...`,
-    [interactState.step, stepLabels, intl]
+    [interactState, stepLabels, intl]
   )
 
   return FP.pipe(
@@ -62,9 +59,8 @@ export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.ErrorView>
       ),
-      (txHash) => (
-        <Styled.SuccessView title={intl.formatMessage({ id: 'deposit.leave.state.success' })}>
-          <Styled.ViewTxButton onClick={goToTransaction} txHash={O.some(txHash)} />
+      () => (
+        <Styled.SuccessView>
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>
       )

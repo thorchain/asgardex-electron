@@ -21,10 +21,9 @@ import * as Styled from './DepositActionsView.styles'
 
 type Props = {
   walletAddress: string
-  goToTransaction: (txHash: string) => void
 }
 
-export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) => {
+export const BondView: React.FC<Props> = ({ walletAddress }) => {
   const { balancesState$ } = useWalletContext()
   const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
   const { interact$ } = useThorchainContext()
@@ -62,8 +61,8 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
 
   const stepLabels = useMemo(
     () => [
-      intl.formatMessage({ id: 'deposit.add.state.sending' }),
-      intl.formatMessage({ id: 'deposit.add.state.checkResults' })
+      intl.formatMessage({ id: 'deposit.interact.bond.sending' }),
+      intl.formatMessage({ id: 'deposit.interact.bond.checkResults' })
     ],
     [intl]
   )
@@ -73,7 +72,7 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
         { id: 'common.step' },
         { total: interactState.stepsTotal, current: interactState.step }
       )}: ${stepLabels[interactState.step - 1]}...`,
-    [interactState.step, stepLabels, intl]
+    [interactState, stepLabels, intl]
   )
 
   return FP.pipe(
@@ -86,9 +85,8 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.ErrorView>
       ),
-      (txHash) => (
-        <Styled.SuccessView title={intl.formatMessage({ id: 'deposit.bond.state.success' })}>
-          <Styled.ViewTxButton onClick={goToTransaction} txHash={O.some(txHash)} />
+      () => (
+        <Styled.SuccessView>
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>
       )
