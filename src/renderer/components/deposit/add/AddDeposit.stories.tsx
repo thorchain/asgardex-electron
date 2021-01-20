@@ -19,8 +19,8 @@ import * as RxOp from 'rxjs/operators'
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { ZERO_BASE_AMOUNT } from '../../../const'
-import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
-import { SendDepositTxParams } from '../../../services/chain/types'
+import { INITIAL_ASYM_DEPOSIT_STATE, INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
+import { AsymDepositState, SendDepositTxParams, SymDepositState } from '../../../services/chain/types'
 import { AddDeposit, Props as AddDepositProps } from './AddDeposit'
 
 const defaultProps: AddDepositProps = {
@@ -45,20 +45,43 @@ const defaultProps: AddDepositProps = {
   priceAsset: AssetRuneNative,
   assets: [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO],
   poolAddress: O.none,
-  symDepositMemo: O.none,
-  asymDepositMemo: O.none,
+  symDepositMemo: O.some({ rune: 'rune-memo', asset: 'asset-memo' }),
+  asymDepositMemo: O.some('asym-memo'),
   reloadBalances: () => console.log('reloadBalances'),
-  goToTransaction: (txHash) => {
+  viewAssetTx: (txHash) => {
+    console.log(txHash)
+  },
+  viewRuneTx: (txHash) => {
     console.log(txHash)
   },
   // mock password validation
   // Password: "123"
   validatePassword$: mockValidatePassword$,
-  // mock successfull result of deposit$
+  // mock successfull result of asym. deposit$
   asymDeposit$: (params) =>
     Rx.of(params).pipe(
+      RxOp.tap((params) => console.log('asymDeposit$ ', params)),
+      RxOp.switchMap((_) =>
+        Rx.of<AsymDepositState>({
+          ...INITIAL_ASYM_DEPOSIT_STATE,
+          step: 3,
+          depositTx: RD.success('tx-hash'),
+          deposit: RD.success(true)
+        })
+      )
+    ),
+  // mock successfull result of sym. deposit$
+  symDeposit$: (params) =>
+    Rx.of(params).pipe(
       RxOp.tap((params) => console.log('deposit$ ', params)),
-      RxOp.switchMap((_) => Rx.of({ ...INITIAL_ASYM_DEPOSIT_STATE, step: 3, txRD: RD.success('tx-hash') }))
+      RxOp.switchMap((_) =>
+        Rx.of<SymDepositState>({
+          ...INITIAL_SYM_DEPOSIT_STATE,
+          step: 4,
+          depositTxs: { rune: RD.success('rune-tx-hash'), asset: RD.success('asset-tx-hash') },
+          deposit: RD.success(true)
+        })
+      )
     )
 }
 

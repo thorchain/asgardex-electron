@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { TxTypes } from '../../types/asgardex'
-import { ApiError } from '../wallet/types'
+import { ApiError, TxRD } from '../wallet/types'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
 
@@ -77,12 +77,10 @@ export type LedgerAddressParams = { chain: Chain; network: Network }
 export type SwapState = {
   // Number of current step
   readonly step: number
+  // swap transaction
+  readonly swapTx: TxRD
   // RD of all requests
-  readonly txRD: RD.RemoteData<ApiError, TxHash>
-  // TxHash needs to be independent from `txRD`
-  // because we have to handle three different requests
-  // and `TxHash` is already provided by second (but not last) request
-  readonly txHash: O.Option<TxHash>
+  readonly swap: RD.RemoteData<ApiError, boolean>
 }
 
 export type SwapState$ = Rx.Observable<SwapState>
@@ -97,13 +95,15 @@ export type SwapParams = {
 export type SwapStateHandler = (p: SwapParams) => SwapState$
 
 /**
- * State to reflect status of a deposit by doing different requests
+ * State to reflect status of an asym. deposit by doing different requests
  */
 export type AsymDepositState = {
   // Number of current step
   readonly step: number
+  // deposit transaction
+  readonly depositTx: TxRD
   // RD of all requests
-  readonly txRD: RD.RemoteData<ApiError, TxHash>
+  readonly deposit: RD.RemoteData<ApiError, boolean>
 }
 
 export type AsymDepositState$ = Rx.Observable<AsymDepositState>
@@ -116,3 +116,30 @@ export type AsymDepositParams = {
 }
 
 export type AsymDepositStateHandler = (p: AsymDepositParams) => AsymDepositState$
+
+export type SymDepositValidationResult = { pool: boolean; node: boolean }
+export type SymDepositTxs = { rune: TxRD; asset: TxRD }
+export type SymDepositFinalityResult = { rune: O.Option<TxHash>; asset: O.Option<TxHash> }
+
+/**
+ * State to reflect status of a sym. deposit by doing different requests
+ */
+export type SymDepositState = {
+  // Number of current step
+  readonly step: number
+  // deposit transactions
+  readonly depositTxs: SymDepositTxs
+  // RD for all needed steps
+  readonly deposit: RD.RemoteData<ApiError, boolean>
+}
+
+export type SymDepositState$ = Rx.Observable<SymDepositState>
+
+export type SymDepositParams = {
+  readonly poolAddress: O.Option<string>
+  readonly asset: Asset
+  readonly amounts: { rune: BaseAmount; asset: BaseAmount }
+  readonly memos: SymDepositMemo
+}
+
+export type SymDepositStateHandler = (p: SymDepositParams) => SymDepositState$

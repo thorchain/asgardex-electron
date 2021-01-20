@@ -333,7 +333,7 @@ export const Swap = ({
         // TODO (@Veado) Add i18n
         const stepLabels = ['Health check...', 'Send swap transaction...', 'Check swap result...']
         const stepLabel = FP.pipe(
-          swapState.txRD,
+          swapState.swap,
           RD.fold(
             () => '',
             () => stepLabels[swapState.step - 1],
@@ -354,7 +354,7 @@ export const Swap = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [oSourceAssetWP, oTargetAssetWP, swapData.swapResult, swapData.slip, amountToSwap, swapState.txRD, swapState.step])
+  }, [oSourceAssetWP, oTargetAssetWP, swapData.swapResult, swapData.slip, amountToSwap, swapState.swap, swapState.step])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe
@@ -373,14 +373,14 @@ export const Swap = ({
   }, [onCloseTxModal, reloadBalances])
 
   const renderTxModal = useMemo(() => {
-    const { txHash, txRD } = swapState
+    const { swapTx, swap } = swapState
 
     // don't render TxModal in initial state
-    if (RD.isInitial(txRD)) return <></>
+    if (RD.isInitial(swap)) return <></>
 
     // Get timer value
     const timerValue = FP.pipe(
-      txRD,
+      swap,
       RD.fold(
         () => 0,
         FP.flow(
@@ -394,7 +394,7 @@ export const Swap = ({
 
     // title
     const txModalTitle = FP.pipe(
-      txRD,
+      swap,
       RD.fold(
         () => 'swap.state.pending',
         () => 'swap.state.pending',
@@ -410,8 +410,8 @@ export const Swap = ({
         onClose={onCloseTxModal}
         onFinish={onFinishTxModal}
         startTime={swapStartTime}
-        txRD={txRD}
-        extraResult={<ViewTxButton txHash={txHash} onClick={goToTransaction} />}
+        txRD={swap}
+        extraResult={<ViewTxButton txHash={RD.toOption(swapTx)} onClick={goToTransaction} />}
         timerValue={timerValue}
         extra={extraTxModalContent}
       />

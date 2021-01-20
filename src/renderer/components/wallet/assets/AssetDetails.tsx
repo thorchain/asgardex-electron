@@ -230,7 +230,10 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               title={upgradeTxModalTitle}
               onClose={closeUpgradeTxModal}
               onFinish={closeUpgradeTxModal}
-              txRD={upgradeTxState.txRD}
+              txRD={FP.pipe(
+                upgradeTxState.txRD,
+                RD.map((_) => true)
+              )}
               startTime={startTime}
               extraResult={<ViewTxButton txHash={RD.toOption(upgradeTxState.txRD)} onClick={clickTxLinkHandler} />}
             />

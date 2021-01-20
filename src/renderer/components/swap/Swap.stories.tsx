@@ -10,6 +10,7 @@ import * as RxOp from 'rxjs/operators'
 import { mockValidatePassword$ } from '../../../shared/mock/wallet'
 import { ONE_BN } from '../../const'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
+import { SwapState } from '../../services/chain/types'
 import { Swap, SwapProps } from './Swap'
 
 /* Mock all (default) data needed by `Swap` commponent */
@@ -26,7 +27,7 @@ const defaultProps: SwapProps = {
     Rx.of(params).pipe(
       RxOp.tap((params) => console.log('swap$ ', params)),
       RxOp.switchMap((_) =>
-        Rx.of({ ...INITIAL_SWAP_STATE, step: 3, txRD: RD.success('tx-hash'), txHash: O.some('tx-hash') })
+        Rx.of<SwapState>({ ...INITIAL_SWAP_STATE, step: 3, swapTx: RD.success('tx-hash'), swap: RD.success(true) })
       )
     ),
   poolDetails: [
