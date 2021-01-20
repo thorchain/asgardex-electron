@@ -9,7 +9,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
-import { Bond } from '../../../components/depositActions/forms'
+import { Bond } from '../../../components/interact/forms'
 import { Button } from '../../../components/uielements/button'
 import { ZERO_ASSET_AMOUNT } from '../../../const'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
@@ -17,7 +17,7 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
-import * as Styled from './DepositActionsView.styles'
+import * as Styled from './InteractView.styles'
 
 type Props = {
   walletAddress: string

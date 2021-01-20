@@ -5,25 +5,25 @@ import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
-import { Unbond } from '../../../components/depositActions/forms/Unbond'
+import { Leave } from '../../../components/interact/forms/Leave'
 import { Button } from '../../../components/uielements/button'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
-import * as Styled from './DepositActionsView.styles'
+import * as Styled from './InteractView.styles'
 
 type Props = {}
 
-export const UnbondView: React.FC<Props> = () => {
+export const LeaveView: React.FC<Props> = () => {
   const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
   const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
-  const unbondTx = useCallback(
+  const leaveTx = useCallback(
     ({ memo }: { memo: string }) =>
       /**
-       * it does not matter which amount to send
-       * @docs https://docs.thorchain.org/thornodes/leaving#unbonding
+       * Send minimal amount
+       * @docs https://docs.thorchain.org/thornodes/leaving#leaving
        */
       interact$({ amount: baseAmount(1), memo }).subscribe(setInteractState),
     [interact$, setInteractState]
@@ -35,8 +35,8 @@ export const UnbondView: React.FC<Props> = () => {
 
   const stepLabels = useMemo(
     () => [
-      intl.formatMessage({ id: 'deposit.interact.unbond.sending' }),
-      intl.formatMessage({ id: 'deposit.interact.unbond.checkResults' })
+      intl.formatMessage({ id: 'deposit.interact.leave.sending' }),
+      intl.formatMessage({ id: 'deposit.interact.leave.checkResults' })
     ],
     [intl]
   )
@@ -52,10 +52,10 @@ export const UnbondView: React.FC<Props> = () => {
   return FP.pipe(
     interactState.txRD,
     RD.fold(
-      () => <Unbond onFinish={unbondTx} />,
-      () => <Unbond isLoading={true} onFinish={FP.identity} loadingProgress={stepLabel} />,
+      () => <Leave onFinish={leaveTx} />,
+      () => <Leave isLoading={true} onFinish={FP.identity} loadingProgress={stepLabel} />,
       ({ msg }) => (
-        <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.unbond.state.error' })} subTitle={msg}>
+        <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.leave.state.error' })} subTitle={msg}>
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.ErrorView>
       ),
