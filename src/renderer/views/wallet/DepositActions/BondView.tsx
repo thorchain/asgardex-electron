@@ -15,8 +15,8 @@ import { ZERO_ASSET_AMOUNT } from '../../../const'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqAsset } from '../../../helpers/fp/eq'
-import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
-import { AsymDepositState } from '../../../services/chain/types'
+import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
+import { InteractState } from '../../../services/thorchain/types'
 import * as Styled from './DepositActionsView.styles'
 
 type Props = {
@@ -26,7 +26,7 @@ type Props = {
 
 export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) => {
   const { balancesState$ } = useWalletContext()
-  const [depositState, setDepositState] = useState<AsymDepositState>(INITIAL_ASYM_DEPOSIT_STATE)
+  const [depositState, setDepositState] = useState<InteractState>(INITIAL_INTERACT_STATE)
   const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
@@ -57,12 +57,11 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
     [interact$, setDepositState]
   )
   const resetResults = useCallback(() => {
-    setDepositState(INITIAL_ASYM_DEPOSIT_STATE)
+    setDepositState(INITIAL_INTERACT_STATE)
   }, [setDepositState])
 
   const stepLabels = useMemo(
     () => [
-      intl.formatMessage({ id: 'deposit.add.state.healthCheck' }),
       intl.formatMessage({ id: 'deposit.add.state.sending' }),
       intl.formatMessage({ id: 'deposit.add.state.checkResults' })
     ],
