@@ -711,8 +711,6 @@ export const AddDeposit: React.FC<Props> = (props) => {
           validatePassword$={validatePassword$}
         />
       )}
-      <div>asym: {JSON.stringify(asymDepositState)}</div>
-      <div>sym: {JSON.stringify(symDepositState)}</div>
       {renderTxModal}
     </Styled.Container>
   )

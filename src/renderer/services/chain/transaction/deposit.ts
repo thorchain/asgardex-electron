@@ -209,8 +209,7 @@ export const symDeposit$ = ({
             })
           ),
           // 2. send RUNE deposit txs
-          liveData.chain<ApiError, SymDepositValidationResult, TxHash>((v) => {
-            console.log('requests$ v:', v)
+          liveData.chain<ApiError, SymDepositValidationResult, TxHash>((_) => {
             setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 40, total }) })
             return sendTx$({
               asset: AssetRuneNative,
@@ -236,10 +235,9 @@ export const symDeposit$ = ({
           // 3. send asset deposit txs
           liveData.chain<ApiError, TxHash, TxHash>((_) => {
             setState({ ...getState(), step: 3, deposit: RD.progress({ loaded: 60, total }) })
-
             return sendTx$({
               asset,
-              recipient: '',
+              recipient: poolAddress,
               amount: amounts.asset,
               memo: memos.asset,
               txType: TxTypes.DEPOSIT,
@@ -265,7 +263,6 @@ export const symDeposit$ = ({
             setState({ ...currentState, step: 4, deposit: RD.progress({ loaded: 80, total }) })
 
             const { rune: runeTxRD, asset: assetTxRD } = currentState.depositTxs
-
             return FP.pipe(
               sequenceSOption({ runeTxHash: RD.toOption(runeTxRD), assetTxHash: RD.toOption(assetTxRD) }),
               O.fold(
@@ -289,7 +286,7 @@ export const symDeposit$ = ({
                     ...getState(),
                     deposit: RD.failure({
                       errorId: ErrorId.VALIDATE_RESULT,
-                      msg: 'Could not get finality for any reason'
+                      msg: 'Could not get finality'
                     })
                   }),
                 (_) => setState({ ...getState(), deposit: RD.success(true) })
