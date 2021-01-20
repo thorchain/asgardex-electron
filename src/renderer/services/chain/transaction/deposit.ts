@@ -164,7 +164,7 @@ export const asymDeposit$ = ({
  * 3. Send deposit ASSET transaction
  * 4. Check status of both transactions
  *
- * @returns SwapTxState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
+ * @returns SymDepositState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
  *
  */
 export const symDeposit$ = ({

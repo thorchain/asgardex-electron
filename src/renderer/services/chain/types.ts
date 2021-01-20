@@ -95,7 +95,7 @@ export type SwapParams = {
 export type SwapStateHandler = (p: SwapParams) => SwapState$
 
 /**
- * State to reflect status of a deposit by doing different requests
+ * State to reflect status of an asym. deposit by doing different requests
  */
 export type AsymDepositState = {
   // Number of current step
@@ -122,7 +122,7 @@ export type SymDepositTxs = { rune: TxRD; asset: TxRD }
 export type SymDepositFinalityResult = { rune: O.Option<TxHash>; asset: O.Option<TxHash> }
 
 /**
- * State to reflect status of a deposit by doing different requests
+ * State to reflect status of a sym. deposit by doing different requests
  */
 export type SymDepositState = {
   // Number of current step
