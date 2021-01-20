@@ -59,7 +59,8 @@ export type Props = {
   fees: DepositFeesRD
   reloadFees: (type: DepositType) => void
   reloadBalances: FP.Lazy<void>
-  goToTransaction: (txHash: string) => void
+  viewAssetTx: (txHash: string) => void
+  viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
   assets?: Asset[]
   onDeposit: (p: SendDepositTxParams) => void
@@ -82,7 +83,8 @@ export const AddDeposit: React.FC<Props> = (props) => {
     asymDepositMemo: oAsymDepositMemo,
     symDepositMemo: oSymDepositMemo,
     poolAddress: oPoolAddress,
-    goToTransaction = (_) => {},
+    viewAssetTx = (_) => {},
+    viewRuneTx = (_) => {},
     validatePassword$,
     assets,
     priceAsset,
@@ -505,20 +507,20 @@ export const AddDeposit: React.FC<Props> = (props) => {
       (id) => intl.formatMessage({ id })
     )
 
-    const asymExtraResult = <ViewTxButton txHash={RD.toOption(asymDepositTx)} onClick={goToTransaction} />
+    const asymExtraResult = <ViewTxButton txHash={RD.toOption(asymDepositTx)} onClick={viewAssetTx} />
     const symExtraResult = (
       <Styled.AsymExtraContainer>
         {FP.pipe(symDepositTxs.rune, RD.toOption, (oTxHash) => (
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
-            onClick={goToTransaction}
+            onClick={viewRuneTx}
             // TODO (@Veado) Add i18n
             label={`View ${AssetRuneNative.symbol} transaction`}
           />
         ))}
         {FP.pipe(symDepositTxs.asset, RD.toOption, (oTxHash) => (
           // TODO (@Veado) Add i18n
-          <ViewTxButton txHash={oTxHash} onClick={goToTransaction} label={`View ${asset.symbol} transaction`} />
+          <ViewTxButton txHash={oTxHash} onClick={viewAssetTx} label={`View ${asset.symbol} transaction`} />
         ))}
       </Styled.AsymExtraContainer>
     )
@@ -542,13 +544,14 @@ export const AddDeposit: React.FC<Props> = (props) => {
     asymDepositState,
     symDepositState,
     type,
-    goToTransaction,
+    viewAssetTx,
     asymTxModalExtraContent,
     symTxModalExtraContent,
     onCloseTxModal,
     onFinishTxModal,
     depositStartTime,
     intl,
+    viewRuneTx,
     asset.symbol
   ])
 

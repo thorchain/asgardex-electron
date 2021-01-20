@@ -48,7 +48,10 @@ const defaultProps: AddDepositProps = {
   symDepositMemo: O.some({ rune: 'rune-memo', asset: 'asset-memo' }),
   asymDepositMemo: O.some('asym-memo'),
   reloadBalances: () => console.log('reloadBalances'),
-  goToTransaction: (txHash) => {
+  viewAssetTx: (txHash) => {
+    console.log(txHash)
+  },
+  viewRuneTx: (txHash) => {
     console.log(txHash)
   },
   // mock password validation
