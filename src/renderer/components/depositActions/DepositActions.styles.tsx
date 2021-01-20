@@ -95,7 +95,7 @@ export const TabButtonsContainer = styled('div')`
   margin-bottom: 15px;
 `
 
-export const TabButton = styled('button')`
+export const TabButton = styled('button')<{ isActive?: boolean }>`
   outline: none;
   padding: 0 10px;
   border: 0;
@@ -104,7 +104,7 @@ export const TabButton = styled('button')`
   text-transform: uppercase;
   margin-right: 5px;
   color: ${palette('primary', 0)};
-  font-weight: bold;
+  ${({ isActive }) => (isActive ? 'font-weight: bold; text-decoration: underline' : '')};
   font-size: 16px;
 
   &:first-child {

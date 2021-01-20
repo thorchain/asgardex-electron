@@ -52,7 +52,10 @@ export const DepositActions: React.FC<Props> = ({ bondContent, unbondContent, le
           renderTabBar={() => (
             <Styled.TabButtonsContainer>
               {tabs.map((tab) => (
-                <Styled.TabButton key={tab.key} onClick={() => setActiveTabKey(tab.key)}>
+                <Styled.TabButton
+                  isActive={tab.key === activeTabKey}
+                  key={tab.key}
+                  onClick={() => setActiveTabKey(tab.key)}>
                   {tab.label}
                 </Styled.TabButton>
               ))}
