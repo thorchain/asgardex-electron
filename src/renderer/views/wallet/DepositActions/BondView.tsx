@@ -12,7 +12,7 @@ import * as RxOp from 'rxjs/operators'
 import { Bond } from '../../../components/depositActions/forms'
 import { Button } from '../../../components/uielements/button'
 import { ZERO_ASSET_AMOUNT } from '../../../const'
-import { useChainContext } from '../../../contexts/ChainContext'
+import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
@@ -27,7 +27,7 @@ type Props = {
 export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) => {
   const { balancesState$ } = useWalletContext()
   const [depositState, setDepositState] = useState<AsymDepositState>(INITIAL_ASYM_DEPOSIT_STATE)
-  const { asymDeposit$ } = useChainContext()
+  const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
   const [runeBalance] = useObservableState(
@@ -53,9 +53,8 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
   )
 
   const bondTx = useCallback(
-    ({ amount, memo }: { amount: BaseAmount; memo: string }) =>
-      asymDeposit$({ amount, memo, asset: AssetRuneNative, poolAddress: O.none }).subscribe(setDepositState),
-    [asymDeposit$, setDepositState]
+    ({ amount, memo }: { amount: BaseAmount; memo: string }) => interact$({ amount, memo }).subscribe(setDepositState),
+    [interact$, setDepositState]
   )
   const resetResults = useCallback(() => {
     setDepositState(INITIAL_ASYM_DEPOSIT_STATE)

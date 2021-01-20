@@ -1,14 +1,14 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
+import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { Leave } from '../../../components/depositActions/forms/Leave'
 import { Button } from '../../../components/uielements/button'
-import { useChainContext } from '../../../contexts/ChainContext'
+import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { AsymDepositState } from '../../../services/chain/types'
 import * as Styled from './DepositActionsView.styles'
@@ -19,7 +19,7 @@ type Props = {
 
 export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
   const [depositState, setDepositState] = useState<AsymDepositState>(INITIAL_ASYM_DEPOSIT_STATE)
-  const { asymDeposit$ } = useChainContext()
+  const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
   const leaveTx = useCallback(
@@ -28,10 +28,8 @@ export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
        * Send minimal amount
        * @docs https://docs.thorchain.org/thornodes/leaving#leaving
        */
-      asymDeposit$({ amount: baseAmount(1), memo, asset: AssetRuneNative, poolAddress: O.none }).subscribe(
-        setDepositState
-      ),
-    [asymDeposit$, setDepositState]
+      interact$({ amount: baseAmount(1), memo }).subscribe(setDepositState),
+    [interact$, setDepositState]
   )
 
   const resetResults = useCallback(() => {
