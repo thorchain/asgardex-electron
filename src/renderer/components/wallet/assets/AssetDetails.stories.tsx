@@ -11,7 +11,7 @@ import * as RxOp from 'rxjs/operators'
 import { BNB_TRANSFER_FEES } from '../../../../shared/mock/fees'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { SendTxParams } from '../../../services/binance/types'
-import { ErrorId, TxLD, TxRD, ValidatePasswordHandler } from '../../../services/wallet/types'
+import { ErrorId, TxHashLD, TxHashRD, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance, WalletBalances } from '../../../types/wallet'
 import { AssetDetails } from './index'
 
@@ -38,19 +38,19 @@ const bnbBalanceEmpty: WalletBalance = { ...bnbBalance, amount: ZERO_BASE_AMOUNT
 const getBalances = (balances: WalletBalances) => NEA.fromArray<WalletBalance>(balances)
 const balances = getBalances([bnbBalance, runeBnbBalance, runeNativeBalance])
 
-const mockTxLD = (states: TxRD[]): TxLD =>
+const mockTxLD = (states: TxHashRD[]): TxHashLD =>
   Rx.interval(1000).pipe(
     RxOp.map((value) => states[value]),
     RxOp.takeUntil(Rx.timer(3000)),
     RxOp.startWith(RD.pending)
   )
 
-const sendUpgradeRuneTx = (p: SendTxParams): TxLD => {
+const sendUpgradeRuneTx = (p: SendTxParams): TxHashLD => {
   console.log('SendTxParams:', p)
   return mockTxLD([RD.pending, RD.success('tx-hash')])
 }
 
-const sendUpgradeRuneTxError = (p: SendTxParams): TxLD => {
+const sendUpgradeRuneTxError = (p: SendTxParams): TxHashLD => {
   console.log('SendTxParams:', p)
   return mockTxLD([
     RD.pending,

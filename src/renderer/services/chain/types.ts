@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOptionKey, Fees, TxHash } from '@xchainjs/xchain-client'
+import { FeeOptionKey, Fees, Tx } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { TxTypes } from '../../types/asgardex'
-import { ApiError, TxRD } from '../wallet/types'
+import { ApiError, TxHashRD } from '../wallet/types'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
 
@@ -78,7 +78,7 @@ export type SwapState = {
   // Number of current step
   readonly step: number
   // swap transaction
-  readonly swapTx: TxRD
+  readonly swapTx: TxHashRD
   // RD of all requests
   readonly swap: RD.RemoteData<ApiError, boolean>
 }
@@ -101,7 +101,7 @@ export type AsymDepositState = {
   // Number of current step
   readonly step: number
   // deposit transaction
-  readonly depositTx: TxRD
+  readonly depositTx: TxHashRD
   // RD of all requests
   readonly deposit: RD.RemoteData<ApiError, boolean>
 }
@@ -118,8 +118,8 @@ export type AsymDepositParams = {
 export type AsymDepositStateHandler = (p: AsymDepositParams) => AsymDepositState$
 
 export type SymDepositValidationResult = { pool: boolean; node: boolean }
-export type SymDepositTxs = { rune: TxRD; asset: TxRD }
-export type SymDepositFinalityResult = { rune: O.Option<TxHash>; asset: O.Option<TxHash> }
+export type SymDepositTxs = { rune: TxHashRD; asset: TxHashRD }
+export type SymDepositFinalityResult = { rune: Tx; asset: Tx }
 
 /**
  * State to reflect status of a sym. deposit by doing different requests

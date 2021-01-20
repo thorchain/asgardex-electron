@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, XChainClient } from '@xchainjs/xchain-client'
+import { Address, TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { TxsPage, Fees } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
@@ -10,8 +10,8 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import { WalletBalance } from '../../types/wallet'
-import { ApiError } from '../wallet/types'
-import { TxLD } from '../wallet/types'
+import { ApiError, TxLD } from '../wallet/types'
+import { TxHashLD } from '../wallet/types'
 /**
  * Three States:
  * (1) None -> no client has been instantiated
@@ -58,9 +58,10 @@ export type GetExplorerTxUrl$ = Rx.Observable<O.Option<GetExplorerTxUrl>>
 export type Address$ = Rx.Observable<O.Option<Address>>
 
 export type TransactionService<SendTxParams> = {
-  txRD$: TxLD
+  txRD$: TxHashLD
   subscribeTx: (_: SendTxParams) => Rx.Subscription
-  sendTx: (_: SendTxParams) => TxLD
+  sendTx: (_: SendTxParams) => TxHashLD
   resetTx: () => void
   txs$: (_: TxsParams) => TxsPageLD
+  tx$: (txHash: TxHash) => TxLD
 }

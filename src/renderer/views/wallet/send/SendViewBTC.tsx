@@ -14,7 +14,7 @@ import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/bitcoin/types'
 import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, TxRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, TxHashRD } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 
 type Props = {
@@ -39,7 +39,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
 
   const { fees$, subscribeTx, txRD$, client$, resetTx } = useBitcoinContext()
 
-  const txRD = useObservableState<TxRD>(txRD$, RD.initial)
+  const txRD = useObservableState<TxHashRD>(txRD$, RD.initial)
   const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
 
   const fees = useObservableState(fees$, RD.initial)

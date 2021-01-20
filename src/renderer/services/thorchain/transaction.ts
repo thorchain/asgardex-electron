@@ -5,20 +5,20 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import * as C from '../clients'
-import { TxLD, ErrorId } from '../wallet/types'
+import { TxHashLD, ErrorId } from '../wallet/types'
 import { Client$ } from './types'
 import { TransactionService } from './types'
 
 export const createTransactionService: (client$: Client$) => TransactionService = C.transactionServiceFactory
 
 export const createDepositService = (client$: Client$) => {
-  const tx$ = (params: DepositParam): TxLD =>
+  const tx$ = (params: DepositParam): TxHashLD =>
     client$.pipe(
       RxOp.switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
       RxOp.switchMap((client) => Rx.from(client.deposit(params))),
       RxOp.map(RD.success),
       RxOp.catchError(
-        (e): TxLD =>
+        (e): TxHashLD =>
           Rx.of(
             RD.failure({
               msg: e.toString(),
@@ -32,7 +32,7 @@ export const createDepositService = (client$: Client$) => {
   /**
    * Sends a deposit request by given `DepositParam`
    */
-  const sendTx = (params: DepositParam): TxLD => tx$(params)
+  const sendTx = (params: DepositParam): TxHashLD => tx$(params)
 
   return {
     sendTx

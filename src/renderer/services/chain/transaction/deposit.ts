@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { AssetRuneNative } from '@xchainjs/xchain-util'
+import { AssetRuneNative, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -81,9 +81,9 @@ export const asymDeposit$ = ({
               midgardPoolsService.validatePool$(poolAddress, asset.chain)
             )
           ),
-          // Update progress
           liveData.chain((_) => {
-            setState({ ...getState(), step: 2, depositTx: RD.pending, deposit: RD.progress({ loaded: 50, total }) })
+            // Update progress
+            setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 50, total }) })
             // 2. send deposit tx
             return sendTx$({
               asset,
@@ -102,11 +102,12 @@ export const asymDeposit$ = ({
               depositTx: RD.success(txHash),
               deposit: RD.progress({ loaded: 75, total })
             })
-            // 3. check tx finality via midgard (not implemented yet)
-            return txStatus$(txHash)
+            // 3. check tx finality by polling its tx data
+            return txStatus$(txHash, asset.chain)
           }),
           // Update state
-          liveData.map((oTxHash) => setState({ ...getState(), deposit: RD.success(O.isSome(oTxHash)) })),
+          liveData.map((_) => setState({ ...getState(), deposit: RD.success(true) })),
+
           // Add failures to state
           liveData.mapLeft((apiError) => {
             setState({ ...getState(), deposit: RD.failure(apiError) })
@@ -266,33 +267,19 @@ export const symDeposit$ = ({
             return FP.pipe(
               sequenceSOption({ runeTxHash: RD.toOption(runeTxRD), assetTxHash: RD.toOption(assetTxRD) }),
               O.fold(
-                () =>
-                  Rx.of(
-                    RD.failure({ errorId: ErrorId.SEND_TX, msg: 'Something went wrong to send deposit txs before' })
-                  ),
-                // 4. check tx finality via midgard (mocked, not implemented yet)
+                () => Rx.of(RD.failure({ errorId: ErrorId.SEND_TX, msg: 'Something went wrong to send deposit txs' })),
+                // 4. check tx finality
                 ({ runeTxHash, assetTxHash }) =>
-                  liveData.sequenceS({ asset: txStatus$(assetTxHash), rune: txStatus$(runeTxHash) })
+                  liveData.sequenceS({
+                    asset: txStatus$(assetTxHash, asset.chain),
+                    rune: txStatus$(runeTxHash, THORChain)
+                  })
               )
             )
           }),
-          // Update state
           liveData.map<SymDepositFinalityResult, SymDepositFinalityResult>((finality) => {
-            FP.pipe(
-              sequenceSOption(finality),
-              O.fold(
-                () =>
-                  setState({
-                    ...getState(),
-                    deposit: RD.failure({
-                      errorId: ErrorId.VALIDATE_RESULT,
-                      msg: 'Could not get finality'
-                    })
-                  }),
-                (_) => setState({ ...getState(), deposit: RD.success(true) })
-              )
-            )
-
+            // Update state
+            setState({ ...getState(), deposit: RD.success(true) })
             return finality
           }),
           // Add failures to state
