@@ -30,7 +30,7 @@ export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<Ap
   const total = O.some(100)
 
   // Observable state of loading process
-  // we start with progress of 25%
+  // we start with progress of 33%
   const { get$: getState$, get: getState, set: setState } = observableState<InteractState>({
     ...INITIAL_INTERACT_STATE,
     txRD: RD.progress({ loaded: 33, total })
