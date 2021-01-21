@@ -87,7 +87,7 @@ describe('helpers/assetHelper', () => {
       expect(isChainAsset(AssetRuneNative)).toBeTruthy()
     })
     it('returns false for BUSDB', () => {
-      expect(isChainAsset(AssetBUSDBAF)).toBeTruthy()
+      expect(isChainAsset(AssetBUSDBAF)).toBeFalsy()
     })
   })
 })
