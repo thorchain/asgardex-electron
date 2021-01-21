@@ -3,6 +3,7 @@ import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetR
 import { Network } from '../../shared/api/types'
 import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
+import { getChainAsset } from './chainHelper'
 import { eqAsset } from './fp/eq'
 
 /**
@@ -73,3 +74,5 @@ export const isBUSDAsset = (asset: Asset): boolean =>
 export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
   // all of PoolAsset except BNB -> see `PricePoolAsset`
   PRICE_ASSETS.includes(asset)
+
+export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, getChainAsset(asset.chain))
