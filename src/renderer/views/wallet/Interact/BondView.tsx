@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { AssetRuneNative, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
@@ -7,6 +7,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Bond } from '../../../components/interact/forms'
@@ -30,6 +31,8 @@ export const BondView: React.FC<Props> = ({ walletAddress }) => {
   const { interactService$ } = useThorchainContext()
   const { txStatus$ } = useChainContext()
   const intl = useIntl()
+
+  const possibleSubRef = useRef<null | Rx.Subscription>(null)
 
   const [runeBalance] = useObservableState(
     () =>
@@ -56,7 +59,12 @@ export const BondView: React.FC<Props> = ({ walletAddress }) => {
   const interact$ = useMemo(() => interactService$(txStatus$), [interactService$, txStatus$])
 
   const bondTx = useCallback(
-    ({ amount, memo }: { amount: BaseAmount; memo: string }) => interact$({ amount, memo }).subscribe(setInteractState),
+    ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
+      if (possibleSubRef.current) {
+        possibleSubRef.current.unsubscribe()
+      }
+      possibleSubRef.current = interact$({ amount, memo }).subscribe(setInteractState)
+    },
     [interact$, setInteractState]
   )
   const resetResults = useCallback(() => {
@@ -75,6 +83,15 @@ export const BondView: React.FC<Props> = ({ walletAddress }) => {
       )}: ${stepLabels[interactState.step - 1]}...`,
     [interactState, stepLabels, intl]
   )
+
+  useEffect(() => {
+    // Unsubscribe from possible subscription when unmount
+    return () => {
+      if (possibleSubRef.current) {
+        possibleSubRef.current.unsubscribe()
+      }
+    }
+  }, [])
 
   return FP.pipe(
     interactState.txRD,

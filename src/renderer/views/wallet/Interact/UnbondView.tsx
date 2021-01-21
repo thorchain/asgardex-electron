@@ -1,9 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
 
 import { Unbond } from '../../../components/interact/forms/Unbond'
 import { Button } from '../../../components/uielements/button'
@@ -21,15 +22,21 @@ export const UnbondView: React.FC<Props> = () => {
   const { txStatus$ } = useChainContext()
   const intl = useIntl()
 
+  const possibleSubRef = useRef<null | Rx.Subscription>(null)
+
   const interact$ = useMemo(() => interactService$(txStatus$), [interactService$, txStatus$])
 
   const unbondTx = useCallback(
-    ({ memo }: { memo: string }) =>
+    ({ memo }: { memo: string }) => {
+      if (possibleSubRef.current) {
+        possibleSubRef.current.unsubscribe()
+      }
       /**
        * it does not matter which amount to send
        * @docs https://docs.thorchain.org/thornodes/leaving#unbonding
        */
-      interact$({ amount: baseAmount(1), memo }).subscribe(setInteractState),
+      possibleSubRef.current = interact$({ amount: baseAmount(1), memo }).subscribe(setInteractState)
+    },
     [interact$, setInteractState]
   )
 
@@ -49,6 +56,15 @@ export const UnbondView: React.FC<Props> = () => {
       )}: ${stepLabels[interactState.step - 1]}...`,
     [interactState, stepLabels, intl]
   )
+
+  useEffect(() => {
+    // Unsubscribe from possible subscription when unmount
+    return () => {
+      if (possibleSubRef.current) {
+        possibleSubRef.current.unsubscribe()
+      }
+    }
+  }, [])
 
   return FP.pipe(
     interactState.txRD,
