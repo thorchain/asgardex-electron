@@ -410,13 +410,20 @@ export const AddDeposit: React.FC<Props> = (props) => {
   const reloadFeesHandler = useCallback(() => reloadFees(type), [reloadFees, type])
 
   const asymTxModalExtraContent = useMemo(() => {
-    // TODO (@Veado) Add i18n
-    const asymStepLabels = ['Health check...', 'Send deposit transaction...', 'Check deposit result...']
+    const asymStepLabels = [
+      intl.formatMessage({ id: 'common.tx.healthCheck' }),
+      intl.formatMessage({ id: 'common.tx.sending' }),
+      intl.formatMessage({ id: 'common.tx.checkResult' })
+    ]
     const asymStepLabel = FP.pipe(
       asymDepositState.deposit,
       RD.fold(
         () => '',
-        () => asymStepLabels[asymDepositState.step - 1],
+        () =>
+          `${intl.formatMessage(
+            { id: 'common.step' },
+            { current: asymDepositState.step, total: asymDepositState.stepsTotal }
+          )}: ${asymStepLabels[asymDepositState.step - 1]}`,
         () => '',
         // TODO (@Veado) Add i18n
         () => 'Done!'
@@ -426,21 +433,24 @@ export const AddDeposit: React.FC<Props> = (props) => {
     return (
       <DepositAssets target={{ asset, amount: assetAmountToDeposit }} source={O.none} stepDescription={asymStepLabel} />
     )
-  }, [asymDepositState.deposit, asymDepositState.step, asset, assetAmountToDeposit])
+  }, [asymDepositState.deposit, asymDepositState.step, asymDepositState.stepsTotal, asset, assetAmountToDeposit, intl])
 
   const symTxModalExtraContent = useMemo(() => {
-    // TODO (@Veado) Add i18n
     const stepDescriptions = [
-      'Health check...',
-      'Send RUNE transaction...',
-      'Send Asset transaction...',
-      'Check deposit result...'
+      intl.formatMessage({ id: 'common.tx.healthCheck' }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: AssetRuneNative.symbol }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: asset.symbol }),
+      intl.formatMessage({ id: 'common.tx.checkResult' })
     ]
     const stepDescription = FP.pipe(
       symDepositState.deposit,
       RD.fold(
         () => '',
-        () => stepDescriptions[symDepositState.step - 1],
+        () =>
+          `${intl.formatMessage(
+            { id: 'common.step' },
+            { current: symDepositState.step, total: symDepositState.stepsTotal }
+          )}: ${stepDescriptions[symDepositState.step - 1]}`,
         () => '',
         // TODO (@Veado) Add i18n
         () => 'Done!'
@@ -454,7 +464,15 @@ export const AddDeposit: React.FC<Props> = (props) => {
         stepDescription={stepDescription}
       />
     )
-  }, [symDepositState.deposit, symDepositState.step, asset, assetAmountToDeposit, runeAmountToDeposit])
+  }, [
+    symDepositState.deposit,
+    symDepositState.step,
+    symDepositState.stepsTotal,
+    asset,
+    assetAmountToDeposit,
+    runeAmountToDeposit,
+    intl
+  ])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe

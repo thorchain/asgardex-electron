@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 
 import { useIntl } from 'react-intl'
 
-import * as Styled from './DepositActions.styles'
+import * as Styled from './Interact.styles'
 
 type Props = {
   bondContent: JSX.Element
@@ -10,7 +10,7 @@ type Props = {
   leaveContent: JSX.Element
 }
 
-export const DepositActions: React.FC<Props> = ({ bondContent, unbondContent, leaveContent }) => {
+export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveContent }) => {
   const intl = useIntl()
 
   const tabs = useMemo(
@@ -52,7 +52,10 @@ export const DepositActions: React.FC<Props> = ({ bondContent, unbondContent, le
           renderTabBar={() => (
             <Styled.TabButtonsContainer>
               {tabs.map((tab) => (
-                <Styled.TabButton key={tab.key} onClick={() => setActiveTabKey(tab.key)}>
+                <Styled.TabButton
+                  isActive={tab.key === activeTabKey}
+                  key={tab.key}
+                  onClick={() => setActiveTabKey(tab.key)}>
                   {tab.label}
                 </Styled.TabButton>
               ))}

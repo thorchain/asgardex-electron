@@ -46,7 +46,12 @@ const common: CommonMessages = {
   'common.reload': 'Reload - RU',
   'common.add': 'Добавить',
   'common.swap': 'Обмен',
-  'common.liquidity': 'Ликвиидиность'
+  'common.liquidity': 'Ликвиидиность',
+  'common.step': 'Шаг {current}/{total}',
+  'common.tx.healthCheck': 'Проверка сервера',
+  'common.tx.sending': 'Отправка транзакиции',
+  'common.tx.sendingAsset': 'Отправка транзакиции {assetSymbol}',
+  'common.tx.checkResult': 'Проверка результата'
 }
 
 export default common

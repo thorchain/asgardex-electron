@@ -330,13 +330,20 @@ export const Swap = ({
         const targetAsset = targetAssetWP.asset
         const sourceAsset = sourceAssetWP.asset
 
-        // TODO (@Veado) Add i18n
-        const stepLabels = ['Health check...', 'Send swap transaction...', 'Check swap result...']
+        const stepLabels = [
+          intl.formatMessage({ id: 'common.tx.healthCheck' }),
+          intl.formatMessage({ id: 'common.tx.sending' }),
+          intl.formatMessage({ id: 'common.tx.checkResult' })
+        ]
         const stepLabel = FP.pipe(
           swapState.swap,
           RD.fold(
             () => '',
-            () => stepLabels[swapState.step - 1],
+            () =>
+              `${intl.formatMessage(
+                { id: 'common.step' },
+                { current: swapState.step, total: swapState.stepsTotal }
+              )}: ${stepLabels[swapState.step - 1]}`,
             () => '',
             () => 'Done!'
           )
@@ -354,7 +361,17 @@ export const Swap = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [oSourceAssetWP, oTargetAssetWP, swapData.swapResult, swapData.slip, amountToSwap, swapState.swap, swapState.step])
+  }, [
+    oSourceAssetWP,
+    oTargetAssetWP,
+    swapData.swapResult,
+    swapData.slip,
+    amountToSwap,
+    swapState.swap,
+    swapState.step,
+    swapState.stepsTotal,
+    intl
+  ])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe
