@@ -385,21 +385,23 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const reloadFeesHandler = useCallback(() => reloadFees('sym'), [reloadFees])
 
   const txModalExtraContent = useMemo(() => {
-    // TODO (@Veado) Add i18n
     const stepDescriptions = [
-      'Health check...',
-      'Send RUNE transaction...',
-      'Send Asset transaction...',
-      'Check deposit result...'
+      intl.formatMessage({ id: 'common.tx.healthCheck' }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: AssetRuneNative.symbol }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: asset.symbol }),
+      intl.formatMessage({ id: 'common.tx.checkResult' })
     ]
     const stepDescription = FP.pipe(
       depositState.deposit,
       RD.fold(
         () => '',
-        () => stepDescriptions[depositState.step - 1],
+        () =>
+          `${intl.formatMessage(
+            { id: 'common.step' },
+            { current: depositState.step, total: depositState.stepsTotal }
+          )}: ${stepDescriptions[depositState.step - 1]}`,
         () => '',
-        // TODO (@Veado) Add i18n
-        () => 'Done!'
+        () => `${intl.formatMessage({ id: 'common.done' })}!`
       )
     )
 
@@ -410,7 +412,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         stepDescription={stepDescription}
       />
     )
-  }, [depositState.deposit, depositState.step, asset, assetAmountToDeposit, runeAmountToDeposit])
+  }, [intl, asset, depositState, assetAmountToDeposit, runeAmountToDeposit])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe

@@ -275,22 +275,33 @@ export const AsymDeposit: React.FC<Props> = (props) => {
 
   const txModalExtraContent = useMemo(() => {
     // TODO (@Veado) Add i18n
-    const asymStepLabels = ['Health check...', 'Send deposit transaction...', 'Check deposit result...']
-    const asymStepLabel = FP.pipe(
+    const stepDescriptions = [
+      intl.formatMessage({ id: 'common.tx.healthCheck' }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: asset.symbol }),
+      intl.formatMessage({ id: 'common.tx.checkResult' })
+    ]
+    const stepDescription = FP.pipe(
       depositState.deposit,
       RD.fold(
         () => '',
-        () => asymStepLabels[depositState.step - 1],
+        () =>
+          `${intl.formatMessage(
+            { id: 'common.step' },
+            { current: depositState.step, total: depositState.stepsTotal }
+          )}: ${stepDescriptions[depositState.step - 1]}`,
         () => '',
-        // TODO (@Veado) Add i18n
-        () => 'Done!'
+        () => `${intl.formatMessage({ id: 'common.done' })}!`
       )
     )
 
     return (
-      <DepositAssets target={{ asset, amount: assetAmountToDeposit }} source={O.none} stepDescription={asymStepLabel} />
+      <DepositAssets
+        target={{ asset, amount: assetAmountToDeposit }}
+        source={O.none}
+        stepDescription={stepDescription}
+      />
     )
-  }, [depositState.deposit, depositState.step, asset, assetAmountToDeposit])
+  }, [intl, asset, depositState, assetAmountToDeposit])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe

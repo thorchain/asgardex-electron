@@ -21,6 +21,12 @@ export const SubmitButtonContainer = styled(A.Form.Item).attrs({
   ${media.sm`
     width: auto;
     align-self: flex-end;
+    
+    & .ant-form-item-control-input-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
   `}
 `
 
@@ -29,6 +35,10 @@ export const SubmitButton = styled(UIButton).attrs({
   round: 'true'
 })`
   width: 100%;
+
+  ${media.sm`
+    width: auto;
+  `}
 `
 
 export const InputContainer = styled('div')`

@@ -43,7 +43,7 @@ export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = fa
                 message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' })
               }
             ]}>
-            <Input size="large" placeholder={memoPlaceholder} />
+            <Input disabled={isLoading} size="large" placeholder={memoPlaceholder} />
           </Form.Item>
         </Styled.InputContainer>
       </div>

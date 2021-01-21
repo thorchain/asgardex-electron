@@ -77,6 +77,8 @@ export type LedgerAddressParams = { chain: Chain; network: Network }
 export type SwapState = {
   // Number of current step
   readonly step: number
+  // Constant total amount of steps
+  readonly stepsTotal: 3
   // swap transaction
   readonly swapTx: TxHashRD
   // RD of all requests
@@ -100,6 +102,8 @@ export type SwapStateHandler = (p: SwapParams) => SwapState$
 export type AsymDepositState = {
   // Number of current step
   readonly step: number
+  // Constant total amount of steps
+  readonly stepsTotal: 3
   // deposit transaction
   readonly depositTx: TxHashRD
   // RD of all requests
@@ -127,6 +131,8 @@ export type SymDepositFinalityResult = { rune: Tx; asset: Tx }
 export type SymDepositState = {
   // Number of current step
   readonly step: number
+  // Constant total amount of steps
+  readonly stepsTotal: 4
   // deposit transactions
   readonly depositTxs: SymDepositTxs
   // RD for all needed steps

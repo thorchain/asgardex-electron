@@ -158,7 +158,7 @@ export const asymDeposit$ = ({
 }
 
 /**
- * Symetrical deposit stream does 3 steps:
+ * Symetrical deposit stream does 4 steps:
  *
  * 1. Validate pool address + node
  * 2. Send deposit RUNE transaction

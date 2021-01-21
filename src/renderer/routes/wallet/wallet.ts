@@ -45,6 +45,14 @@ export const assets: Route<void> = {
   }
 }
 
+export type DepositParams = { walletAddress: string }
+export const deposit: Route<DepositParams> = {
+  template: `${base.template}/deposit/:walletAddress`,
+  path({ walletAddress }) {
+    return `${base.template}/deposit/${walletAddress}`
+  }
+}
+
 export const deposits: Route<void> = {
   template: `${base.template}/deposits`,
   path() {

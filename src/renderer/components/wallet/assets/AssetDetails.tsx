@@ -6,6 +6,7 @@ import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
   AssetBNB,
+  AssetRuneNative,
   assetToString,
   BaseAmount,
   baseToAsset,
@@ -21,6 +22,7 @@ import * as Rx from 'rxjs'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import * as AssetHelper from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
+import { eqOAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
@@ -131,6 +133,14 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     history.push(walletRoutes.receive.path(routeParams))
   }, [oAssetAsString, history, oWalletAddress])
 
+  const walletActionDepositClick = useCallback(() => {
+    FP.pipe(
+      oWalletAddress,
+      O.map((walletAddress) => walletRoutes.deposit.path({ walletAddress })),
+      O.map(history.push)
+    )
+  }, [oWalletAddress, history.push])
+
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
     reloadBalancesHandler()
@@ -155,6 +165,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const isRuneBnbAsset: boolean = useMemo(() => FP.pipe(oRuneBnbAsset, O.isSome), [oRuneBnbAsset])
 
+  const isRuneNativeAsset: boolean = useMemo(() => eqOAsset.equals(oAsset, O.some(AssetRuneNative)), [oAsset])
+
   const oRuneBnbBalance: O.Option<WalletBalance> = useMemo(() => getWalletBalanceByAsset(oBalances, oRuneBnbAsset), [
     oRuneBnbAsset,
     oBalances
@@ -169,7 +181,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [oRuneBnbBalance]
   )
 
-  const actionColSpanDesktop = isRuneBnbAsset ? 8 : 12
+  const actionColSpanDesktop = isRuneBnbAsset || isRuneNativeAsset ? 8 : 12
   const actionColSpanMobile = 24
 
   const upgradeRune = useCallback(() => {
@@ -412,6 +424,17 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               </Row>
             </Styled.ActionWrapper>
           </Styled.ActionCol>
+          {isRuneNativeAsset && (
+            <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
+              <Styled.ActionWrapper>
+                <Row justify="center">
+                  <Button typevalue="outline" round="true" sizevalue="xnormal" onClick={walletActionDepositClick}>
+                    {intl.formatMessage({ id: 'wallet.action.deposit' })}
+                  </Button>
+                </Row>
+              </Styled.ActionWrapper>
+            </Styled.ActionCol>
+          )}
         </Styled.ActionRow>
         <Styled.Divider />
       </Row>
