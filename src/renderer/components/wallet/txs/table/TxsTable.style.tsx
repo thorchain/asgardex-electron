@@ -1,4 +1,5 @@
 import { SwapOutlined } from '@ant-design/icons'
+import * as A from 'antd'
 import { Typography } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -30,5 +31,13 @@ export const TransferIcon = styled(SwapOutlined)`
     height: 20px;
     width: 20px;
     color: ${palette('text', 1)};
+  }
+`
+
+export const CopyLabel = styled(A.Typography.Text)`
+  text-transform: uppercase;
+  color: ${palette('primary', 0)};
+  svg {
+    color: ${palette('primary', 0)};
   }
 `

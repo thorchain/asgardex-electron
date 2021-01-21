@@ -18,6 +18,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../../shared/api/types'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import * as AssetHelper from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
@@ -68,6 +69,7 @@ type Props = {
   sendUpgradeTx: (_: SendTxParams) => TxLD
   reloadUpgradeFeeHandler: FP.Lazy<void>
   upgradeFee: FeeRD
+  network: O.Option<Network>
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -84,7 +86,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     runeNativeAddress: oRuneNativeAddress = O.none,
     validatePassword$,
     upgradeFee,
-    reloadUpgradeFeeHandler
+    reloadUpgradeFeeHandler,
+    network: oNetwork
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -426,6 +429,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
             txsPageRD={txsPageRD}
             clickTxLinkHandler={clickTxLinkHandler}
             changePaginationHandler={onChangePagination}
+            asset={oAsset}
+            network={oNetwork}
           />
         </Col>
       </Row>

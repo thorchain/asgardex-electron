@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react'
 
 import { Address } from '@xchainjs/xchain-binance'
-import { delay, Asset } from '@xchainjs/xchain-util'
+import { delay, Asset, Chain } from '@xchainjs/xchain-util'
 import { Grid, Row, Col, Spin } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import QRCode from 'qrcode'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../../../shared/api/types'
+import { truncateAddress } from '../../../../helpers/addressHelper'
 import { AssetInfo } from '../../../uielements/assets/assetInfo'
 import { BackLink } from '../../../uielements/backLink'
 import * as Styled from './Receive.style'
@@ -15,10 +17,11 @@ import * as Styled from './Receive.style'
 type Props = {
   address: O.Option<Address>
   asset: O.Option<Asset>
+  network: O.Option<Network>
 }
 
 export const Receive: React.FC<Props> = (props): JSX.Element => {
-  const { address: oAddress, asset: oAsset } = props
+  const { address: oAddress, asset: oAsset, network: oNetwork } = props
 
   const [errMsg, setErrorMsg] = useState('')
   const [hasQR, setHasQR] = useState(false)
@@ -60,6 +63,25 @@ export const Receive: React.FC<Props> = (props): JSX.Element => {
 
   const hasAddress = O.isSome(oAddress)
 
+  const chain = useMemo(
+    () =>
+      FP.pipe(
+        oAsset,
+        O.map((asset) => asset.chain),
+        O.getOrElse(() => '')
+      ),
+    [oAsset]
+  )
+
+  const network = useMemo(
+    () =>
+      FP.pipe(
+        oNetwork,
+        O.getOrElse(() => '')
+      ),
+    [oNetwork]
+  )
+
   return (
     <>
       <Row>
@@ -79,15 +101,11 @@ export const Receive: React.FC<Props> = (props): JSX.Element => {
             </Styled.QRWrapper>
           </Styled.Card>
           <Styled.Div>
-            {isDesktopView ? (
-              <label htmlFor="clipboard-btn">
-                <Styled.Address size="large">{addressLabel}</Styled.Address>
-              </label>
-            ) : (
-              <Styled.AddressWrapper htmlFor="clipboard-btn">
-                <Styled.Address size="large">{addressLabel}</Styled.Address>
-              </Styled.AddressWrapper>
-            )}
+            <label htmlFor="clipboard-btn">
+              <Styled.Address size="large">
+                {isDesktopView ? addressLabel : truncateAddress(addressLabel, chain as Chain, network)}
+              </Styled.Address>
+            </label>
             {hasAddress && (
               <Styled.CopyLabel copyable={{ text: addressLabel }}>
                 {intl.formatMessage({ id: 'common.copy' })}

@@ -1,8 +1,8 @@
 import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Tx, Txs, TxsPage } from '@xchainjs/xchain-client'
-import { baseToAsset, formatAssetAmount } from '@xchainjs/xchain-util'
+import { Address, Tx, Txs, TxsPage } from '@xchainjs/xchain-client'
+import { Asset, baseToAsset, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/lib/function'
@@ -10,11 +10,13 @@ import * as O from 'fp-ts/lib/Option'
 import { ordString } from 'fp-ts/lib/Ord'
 import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 
+import { Network } from '../../../../../shared/api/types'
 import { ZERO_BN } from '../../../../const'
 import { TxsPageRD } from '../../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../../services/const'
 import { ApiError } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error'
+import { AddressEllipsis } from '../../../uielements/addressEllipsis'
 import * as CommonStyled from '../../../uielements/common/Common.style'
 import { Pagination } from '../../../uielements/pagination'
 import * as Styled from './TxsTable.style'
@@ -23,12 +25,31 @@ type Props = {
   txsPageRD: TxsPageRD
   clickTxLinkHandler: (txHash: string) => void
   changePaginationHandler: (page: number) => void
+  network: O.Option<Network>
+  asset: O.Option<Asset>
 }
 
 export const TxsTable: React.FC<Props> = (props): JSX.Element => {
-  const { txsPageRD, clickTxLinkHandler, changePaginationHandler } = props
+  const { txsPageRD, clickTxLinkHandler, changePaginationHandler, network: oNetwork, asset: oAsset } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+  const network = useMemo(
+    () =>
+      FP.pipe(
+        oNetwork,
+        O.getOrElse(() => '')
+      ),
+    [oNetwork]
+  )
+  const chain = useMemo(
+    () =>
+      FP.pipe(
+        oAsset,
+        O.map((asset) => asset.chain),
+        O.getOrElse(() => '')
+      ),
+    [oAsset]
+  )
 
   // store previous data of Txs to render these while reloading
   const previousTxs = useRef<O.Option<TxsPage>>(O.none)
@@ -44,6 +65,20 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       </Styled.Text>
     ),
     []
+  )
+
+  const renderAddressWithBreak = useCallback(
+    (address: Address, key: string) => (
+      <Styled.Text key={key}>
+        <div>
+          <AddressEllipsis chain={chain} network={network}>
+            <span>{address}</span>
+            <Styled.CopyLabel copyable={{ text: address }} />
+          </AddressEllipsis>
+        </div>
+      </Styled.Text>
+    ),
+    [chain, network]
   )
 
   const renderTypeColumn = useCallback((_, { type }: Tx) => {
@@ -71,9 +106,9 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     (_, { from }: Tx) =>
       from.map(({ from }, index) => {
         const key = `${from}-${index}`
-        return renderTextWithBreak(from, key)
+        return renderAddressWithBreak(from, key)
       }),
-    [renderTextWithBreak]
+    [renderAddressWithBreak]
   )
 
   const fromColumn: ColumnType<Tx> = useMemo(
@@ -96,9 +131,9 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     (_, { to }: Tx) =>
       to.map(({ to }, index) => {
         const key = `${to}-${index}`
-        return renderTextWithBreak(to, key)
+        return renderAddressWithBreak(to, key)
       }),
-    [renderTextWithBreak]
+    [renderAddressWithBreak]
   )
 
   const toColumn: ColumnType<Tx> = useMemo(

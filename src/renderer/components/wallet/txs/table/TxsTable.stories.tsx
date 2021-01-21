@@ -4,6 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { Tx } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBNB, assetToBase } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { TxsTable } from './TxsTable'
 
@@ -28,6 +29,8 @@ storiesOf('Wallet/TxsTable', module).add('default', () => {
       txsPageRD={txsRD}
       clickTxLinkHandler={(txHash: string) => console.log('txHash ', txHash)}
       changePaginationHandler={(page: number) => console.log('page:', page)}
+      network={O.some('testnet')}
+      asset={O.some(AssetBNB)}
     />
   )
 })

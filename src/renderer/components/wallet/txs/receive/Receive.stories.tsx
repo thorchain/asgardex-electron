@@ -9,8 +9,8 @@ import { Receive } from './index'
 
 storiesOf('Wallet/Receive', module)
   .add('default', () => {
-    return <Receive address={O.some(BNB_ADDRESS_TESTNET)} asset={O.some(AssetBNB)} />
+    return <Receive address={O.some(BNB_ADDRESS_TESTNET)} asset={O.some(AssetBNB)} network={O.none} />
   })
   .add('no address, no asset', () => {
-    return <Receive address={O.none} asset={O.none} />
+    return <Receive address={O.none} asset={O.none} network={O.none} />
   })
