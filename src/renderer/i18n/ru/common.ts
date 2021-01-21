@@ -50,6 +50,7 @@ const common: CommonMessages = {
   'common.step': 'Шаг {current}/{total}',
   'common.tx.healthCheck': 'Проверка сервера',
   'common.tx.sending': 'Отправка транзакиции',
+  'common.tx.sendingAsset': 'Отправка транзакиции {assetSymbol}',
   'common.tx.checkResult': 'Проверка результата'
 }
 

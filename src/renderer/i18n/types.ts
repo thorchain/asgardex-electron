@@ -48,6 +48,7 @@ type CommonMessageKey =
   | 'common.step'
   | 'common.tx.healthCheck'
   | 'common.tx.sending'
+  | 'common.tx.sendingAsset'
   | 'common.tx.checkResult'
 
 export type CommonMessages = {

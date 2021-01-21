@@ -50,6 +50,7 @@ const common: CommonMessages = {
   'common.step': 'Schritt {current}/{total}',
   'common.tx.healthCheck': 'Systemcheck',
   'common.tx.sending': 'Sende Transaktion',
+  'common.tx.sendingAsset': 'Sende {assetSymbol} Transaktion',
   'common.tx.checkResult': 'Überprüfe Ergebnis'
 }
 

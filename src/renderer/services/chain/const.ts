@@ -20,6 +20,7 @@ export const INITIAL_ASYM_DEPOSIT_STATE: AsymDepositState = {
 
 export const INITIAL_SYM_DEPOSIT_STATE: SymDepositState = {
   step: 1,
+  stepsTotal: 4,
   depositTxs: { rune: RD.initial, asset: RD.initial },
   deposit: RD.initial
 }

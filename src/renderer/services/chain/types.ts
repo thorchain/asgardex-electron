@@ -131,6 +131,8 @@ export type SymDepositFinalityResult = { rune: Tx; asset: Tx }
 export type SymDepositState = {
   // Number of current step
   readonly step: number
+  // Constant total amount of steps
+  readonly stepsTotal: 4
   // deposit transactions
   readonly depositTxs: SymDepositTxs
   // RD for all needed steps
