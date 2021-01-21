@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, TxHash } from '@xchainjs/xchain-client'
+import { Address, Tx, TxHash } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
@@ -89,7 +89,7 @@ export enum ErrorId {
   GET_FEES = 'GET_FEES',
   GET_ASSET_TXS = 'GET_ASSET_TXS',
   SEND_TX = 'SEND_TX',
-  GET_TX_STATUS = 'GET_TX_STATUS',
+  GET_TX = 'GET_TX',
   SEND_LEDGER_TX = 'SEND_LEDGER_TX',
   VALIDATE_POOL = 'VALIDATE_POOL',
   VALIDATE_NODE = 'VALIDATE_NODE',
@@ -111,11 +111,14 @@ export type LedgerApiError = {
 
 export type NonEmptyApiErrors = NonEmptyArray<ApiError>
 
+export type TxRD = RD.RemoteData<ApiError, Tx>
+export type TxLD = LiveData<ApiError, Tx>
+
 /* RD/LD for sending transactions on different chains */
-export type TxRD = RD.RemoteData<ApiError, TxHash>
-export type TxLD = LiveData<ApiError, TxHash>
-export type LedgerTxRD = RD.RemoteData<LedgerApiError, string>
-export type LedgerTxLD = LiveData<LedgerApiError, string>
+export type TxHashRD = RD.RemoteData<ApiError, TxHash>
+export type TxHashLD = LiveData<ApiError, TxHash>
+export type LedgerTxHashRD = RD.RemoteData<LedgerApiError, string>
+export type LedgerTxHashLD = LiveData<LedgerApiError, string>
 
 export type LedgerAddressRD = RD.RemoteData<LedgerErrorId, Address>
 export type LedgerAddressLD = LiveData<LedgerErrorId, Address>

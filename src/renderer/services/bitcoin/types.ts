@@ -8,7 +8,7 @@ import { LedgerBTCTxInfo, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { Memo } from '../chain/types'
 import * as C from '../clients'
-import { LedgerAddressLD, LedgerTxLD } from '../wallet/types'
+import { LedgerAddressLD, LedgerTxHashLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -41,7 +41,7 @@ export type LedgerService = {
   ledgerAddress$: LedgerAddressLD
   retrieveLedgerAddress: (network: Network) => void
   removeLedgerAddress: () => void
-  ledgerTxRD$: LedgerTxLD
+  ledgerTxRD$: LedgerTxHashLD
   pushLedgerTx: (network: Network, params: LedgerBTCTxInfo) => Rx.Subscription
   resetLedgerTx: () => void
 }

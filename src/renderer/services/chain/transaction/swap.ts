@@ -64,7 +64,6 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
               midgardPoolsService.validatePool$(poolAddress, asset.chain)
             )
           ),
-          // Update progress
           liveData.chain((_) => {
             setState({ ...getState(), step: 2, swapTx: RD.pending, swap: RD.progress({ loaded: 50, total }) })
             // 2. send swap tx
@@ -80,11 +79,12 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
           liveData.chain((txHash) => {
             // Update state
             setState({ ...getState(), step: 3, swapTx: RD.success(txHash), swap: RD.progress({ loaded: 75, total }) })
-            // 3. check tx finality via midgard (not implemented yet)
-            return txStatus$(txHash)
+            // 3. check tx finality by polling its tx data
+            return txStatus$(txHash, asset.chain)
           }),
           // Update state
-          liveData.map((oTxHash) => setState({ ...getState(), swap: RD.success(O.isSome(oTxHash)) })),
+          liveData.map((_) => setState({ ...getState(), swap: RD.success(true) })),
+
           // Add failures to state
           liveData.mapLeft((apiError) => {
             setState({ ...getState(), swap: RD.failure(apiError) })
