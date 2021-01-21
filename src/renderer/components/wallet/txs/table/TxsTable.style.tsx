@@ -20,7 +20,7 @@ export const Table = styled(UITable)`
 
 export const Text = styled(Typography.Text)`
   font-size: 16px;
-  text-transform: uppercase;
+  text-transform: lowercase;
   font-family: 'MainFontRegular';
   color: ${palette('text', 1)};
 `

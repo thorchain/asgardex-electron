@@ -80,7 +80,6 @@ export const AddressWrapper = styled.label`
 export const Address = styled(UILabel)`
   text-overflow: ellipsis;
   overflow: hidden;
-  text-transform: uppercase;
   font-family: 'MainFontRegular';
 `
 
