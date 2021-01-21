@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { storiesOf } from '@storybook/react'
+import { Story, Meta } from '@storybook/react'
 import {
   assetAmount,
   AssetBNB,
@@ -13,10 +13,10 @@ import {
 import * as O from 'fp-ts/lib/Option'
 
 import { BNB_TRANSFER_FEES } from '../../../../../shared/mock/fees'
-import { AddressValidation, SendTxParams } from '../../../../services/binance/types'
+import { SendTxParams } from '../../../../services/binance/types'
 import { WalletBalances } from '../../../../services/clients'
 import { WalletBalance } from '../../../../types/wallet'
-import { SendFormBNB } from './index'
+import { SendFormBNB, Props as SendFormBNBProps } from './SendFormBNB'
 
 const bnbAsset: WalletBalance = {
   asset: AssetBNB,
@@ -32,61 +32,46 @@ const runeAsset: WalletBalance = {
 
 const balances: WalletBalances = [bnbAsset, runeAsset]
 
-const fee = O.some(BNB_TRANSFER_FEES.single)
+const defaultProps: SendFormBNBProps = {
+  balances,
+  balance: bnbAsset,
+  onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) =>
+    console.log(
+      `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
+        asset
+      )}, memo: ${memo}`
+    ),
 
-const addressValidation: AddressValidation = (_) => true
+  isLoading: false,
+  addressValidation: (_) => true,
+  fee: O.some(BNB_TRANSFER_FEES.single)
+}
 
-const onSubmitHandler = ({ recipient, amount, asset, memo }: SendTxParams) =>
-  console.log(
-    `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
-      asset
-    )}, memo: ${memo}`
-  )
+export const SendBnb: Story = () => <SendFormBNB {...defaultProps} />
 
-storiesOf('Wallet/SendFormBNB', module)
-  .add('send bnb', () => (
-    <SendFormBNB
-      balance={bnbAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      fee={fee}
-    />
-  ))
-  .add('send rune', () => (
-    <SendFormBNB
-      balance={runeAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      fee={fee}
-    />
-  ))
-  .add('pending', () => (
-    <SendFormBNB
-      balance={bnbAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      fee={fee}
-      isLoading={true}
-    />
-  ))
-  .add('no fees', () => (
-    <SendFormBNB
-      balance={bnbAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      fee={O.none}
-    />
-  ))
-  .add('bnb amount < fees', () => (
-    <SendFormBNB
-      balance={bnbAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      fee={O.some(assetAmount(1.234))}
-    />
-  ))
+export const SendRune: Story = () => {
+  const props: SendFormBNBProps = { ...defaultProps, balance: runeAsset }
+  return <SendFormBNB {...props} />
+}
+
+export const Pending: Story = () => {
+  const props: SendFormBNBProps = { ...defaultProps, isLoading: true }
+  return <SendFormBNB {...props} />
+}
+
+export const NoFees: Story = () => {
+  const props: SendFormBNBProps = { ...defaultProps, fee: O.none }
+  return <SendFormBNB {...props} />
+}
+
+export const FeeNotCovered: Story = () => {
+  const props: SendFormBNBProps = { ...defaultProps, fee: O.some(assetAmount(1.234)) }
+  return <SendFormBNB {...props} />
+}
+
+const meta: Meta = {
+  component: SendFormBNB,
+  title: 'Wallet/SendFormBNB'
+}
+
+export default meta
