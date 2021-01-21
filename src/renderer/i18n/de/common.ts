@@ -47,7 +47,10 @@ const common: CommonMessages = {
   'common.add': 'Einzahlen',
   'common.swap': 'Swap',
   'common.liquidity': 'Liquidität',
-  'common.step': 'Step {current}/{total} - DE'
+  'common.step': 'Schritt {current}/{total}',
+  'common.tx.healthCheck': 'Systemcheck',
+  'common.tx.sending': 'Sende Transaktion',
+  'common.tx.checkResult': 'Überprüfe Ergebnis'
 }
 
 export default common

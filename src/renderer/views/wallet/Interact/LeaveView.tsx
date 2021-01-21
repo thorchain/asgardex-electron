@@ -37,10 +37,7 @@ export const LeaveView: React.FC<Props> = () => {
   }, [setInteractState])
 
   const stepLabels = useMemo(
-    () => [
-      intl.formatMessage({ id: 'deposit.interact.leave.sending' }),
-      intl.formatMessage({ id: 'deposit.interact.leave.checkResults' })
-    ],
+    () => [intl.formatMessage({ id: 'common.tx.sending' }), intl.formatMessage({ id: 'common.tx.checkResult' })],
     [intl]
   )
   const stepLabel = useMemo(

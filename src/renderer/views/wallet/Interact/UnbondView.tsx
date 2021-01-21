@@ -38,10 +38,7 @@ export const UnbondView: React.FC<Props> = () => {
   }, [setInteractState])
 
   const stepLabels = useMemo(
-    () => [
-      intl.formatMessage({ id: 'deposit.interact.unbond.sending' }),
-      intl.formatMessage({ id: 'deposit.interact.unbond.checkResults' })
-    ],
+    () => [intl.formatMessage({ id: 'common.tx.sending' }), intl.formatMessage({ id: 'common.tx.checkResult' })],
     [intl]
   )
   const stepLabel = useMemo(

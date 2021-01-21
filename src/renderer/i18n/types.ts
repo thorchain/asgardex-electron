@@ -46,6 +46,9 @@ type CommonMessageKey =
   | 'common.swap'
   | 'common.liquidity'
   | 'common.step'
+  | 'common.tx.healthCheck'
+  | 'common.tx.sending'
+  | 'common.tx.checkResult'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -204,12 +207,6 @@ type DepositMessageKey =
   | 'deposit.add.error.nobalances'
   | 'deposit.add.error.nobalance1'
   | 'deposit.add.error.nobalance2'
-  | 'deposit.interact.bond.sending'
-  | 'deposit.interact.bond.checkResults'
-  | 'deposit.interact.unbond.sending'
-  | 'deposit.interact.unbond.checkResults'
-  | 'deposit.interact.leave.sending'
-  | 'deposit.interact.leave.checkResults'
   | 'deposit.bond.state.error'
   | 'deposit.unbond.state.error'
   | 'deposit.leave.state.error'

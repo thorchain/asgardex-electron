@@ -64,10 +64,7 @@ export const BondView: React.FC<Props> = ({ walletAddress }) => {
   }, [setInteractState])
 
   const stepLabels = useMemo(
-    () => [
-      intl.formatMessage({ id: 'deposit.interact.bond.sending' }),
-      intl.formatMessage({ id: 'deposit.interact.bond.checkResults' })
-    ],
+    () => [intl.formatMessage({ id: 'common.tx.sending' }), intl.formatMessage({ id: 'common.tx.checkResult' })],
     [intl]
   )
   const stepLabel = useMemo(
