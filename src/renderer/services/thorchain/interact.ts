@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { DepositParam } from '@xchainjs/xchain-thorchain'
-import { AssetRuneNative } from '@xchainjs/xchain-util'
+import { AssetRuneNative, Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -9,32 +9,10 @@ import * as RxOp from 'rxjs/operators'
 import { liveData } from '../../helpers/rx/liveData'
 import { LiveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
-import { ErrorId } from '../wallet/types'
+import { TxLD } from '../wallet/types'
 import { ApiError } from '../wallet/types'
 import { INITIAL_INTERACT_STATE } from './const'
 import { InteractParams, InteractState, InteractState$ } from './types'
-
-/**
- * Check if transaction has been included finally
- *
- * It's mocked currently and will be fully implemented by #755
- * @see https://github.com/thorchain/asgardex-electron/issues/755
- *
- * @param txId Transaction hash
- */
-const txStatus$ = (txId: string): LiveData<ApiError, O.Option<string>> =>
-  FP.pipe(
-    Rx.of(txId),
-    RxOp.delay(2500),
-    RxOp.map(O.some),
-    RxOp.map(RD.success),
-    RxOp.catchError(() =>
-      Rx.of(
-        RD.failure<ApiError>({ errorId: ErrorId.GET_TX_STATUS, msg: 'Could load tx info' })
-      )
-    ),
-    RxOp.startWith(RD.pending)
-  )
 
 /**
  * Interact stream does 2 steps:
@@ -45,10 +23,9 @@ const txStatus$ = (txId: string): LiveData<ApiError, O.Option<string>> =>
  * @returns InteractState$ - Observable state to reflect loading status. It provides all data we do need to display
  *
  */
-export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<ApiError, string>) => ({
-  amount,
-  memo
-}: InteractParams): InteractState$ => {
+export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<ApiError, string>) => (
+  getTxStatus: (txHash: string, chain: Chain) => TxLD
+) => ({ amount, memo }: InteractParams): InteractState$ => {
   // total of progress
   const total = O.some(100)
 
@@ -72,10 +49,10 @@ export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<Ap
       // Update state
       setState({ ...getState(), step: 2, txRD: RD.progress({ loaded: 66, total }) })
       // 2. check tx finality via midgard (not implemented yet)
-      return txStatus$(txHash)
+      return getTxStatus(txHash, AssetRuneNative.chain)
     }),
     // Update state
-    liveData.map((txHash) => setState({ ...getState(), txRD: RD.success(O.getOrElse(() => '')(txHash)) })),
+    liveData.map(({ hash: txHash }) => setState({ ...getState(), txRD: RD.success(txHash) })),
     // Add failures to state
     liveData.mapLeft((apiError) => {
       setState({ ...getState(), txRD: RD.failure(apiError) })

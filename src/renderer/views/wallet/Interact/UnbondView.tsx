@@ -7,6 +7,7 @@ import { useIntl } from 'react-intl'
 
 import { Unbond } from '../../../components/interact/forms/Unbond'
 import { Button } from '../../../components/uielements/button'
+import { useChainContext } from '../../../contexts/ChainContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
@@ -16,8 +17,11 @@ type Props = {}
 
 export const UnbondView: React.FC<Props> = () => {
   const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
-  const { interact$ } = useThorchainContext()
+  const { interactService$ } = useThorchainContext()
+  const { txStatus$ } = useChainContext()
   const intl = useIntl()
+
+  const interact$ = useMemo(() => interactService$(txStatus$), [interactService$, txStatus$])
 
   const unbondTx = useCallback(
     ({ memo }: { memo: string }) =>

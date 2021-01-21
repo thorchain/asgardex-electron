@@ -7,7 +7,7 @@ import { createDepositService, createTransactionService } from './transaction'
 const { txs$, tx$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService(client$)
 const { sendTx: sendDepositTx } = createDepositService(client$)
-const interact$ = createInteractService$(sendDepositTx)
+const interactService$ = createInteractService$(sendDepositTx)
 
 export {
   address$,
@@ -24,5 +24,5 @@ export {
   txRD$,
   getExplorerTxUrl$,
   sendDepositTx,
-  interact$
+  interactService$
 }
