@@ -32,7 +32,7 @@ export const BondView: React.FC<Props> = ({ walletAddress }) => {
   const { txStatus$ } = useChainContext()
   const intl = useIntl()
 
-  const possibleSubRef = useRef<null | Rx.Subscription>(null)
+  const possibleSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
 
   const [runeBalance] = useObservableState(
     () =>
@@ -58,14 +58,19 @@ export const BondView: React.FC<Props> = ({ walletAddress }) => {
 
   const interact$ = useMemo(() => interactService$(txStatus$), [interactService$, txStatus$])
 
+  const unsubscribeSub = useCallback(() => {
+    FP.pipe(
+      possibleSubRef.current,
+      O.map((sub) => sub.unsubscribe())
+    )
+  }, [])
+
   const bondTx = useCallback(
     ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
-      if (possibleSubRef.current) {
-        possibleSubRef.current.unsubscribe()
-      }
-      possibleSubRef.current = interact$({ amount, memo }).subscribe(setInteractState)
+      unsubscribeSub()
+      possibleSubRef.current = O.some(interact$({ amount, memo }).subscribe(setInteractState))
     },
-    [interact$, setInteractState]
+    [interact$, setInteractState, unsubscribeSub]
   )
   const resetResults = useCallback(() => {
     setInteractState(INITIAL_INTERACT_STATE)
@@ -87,11 +92,9 @@ export const BondView: React.FC<Props> = ({ walletAddress }) => {
   useEffect(() => {
     // Unsubscribe from possible subscription when unmount
     return () => {
-      if (possibleSubRef.current) {
-        possibleSubRef.current.unsubscribe()
-      }
+      unsubscribeSub()
     }
-  }, [])
+  }, [unsubscribeSub])
 
   return FP.pipe(
     interactState.txRD,

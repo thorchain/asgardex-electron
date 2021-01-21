@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
@@ -22,22 +23,26 @@ export const LeaveView: React.FC<Props> = () => {
   const { txStatus$ } = useChainContext()
   const intl = useIntl()
 
-  const possibleSubRef = useRef<null | Rx.Subscription>(null)
+  const possibleSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
+
+  const unsubscribeSub = useCallback(() => {
+    FP.pipe(
+      possibleSubRef.current,
+      O.map((sub) => sub.unsubscribe())
+    )
+  }, [])
 
   const interact$ = useMemo(() => interactService$(txStatus$), [interactService$, txStatus$])
   const leaveTx = useCallback(
     ({ memo }: { memo: string }) => {
-      if (possibleSubRef.current) {
-        possibleSubRef.current.unsubscribe()
-      }
-
+      unsubscribeSub()
       /**
        * Send minimal amount
        * @docs https://docs.thorchain.org/thornodes/leaving#leaving
        */
-      possibleSubRef.current = interact$({ amount: baseAmount(1), memo }).subscribe(setInteractState)
+      possibleSubRef.current = O.some(interact$({ amount: baseAmount(1), memo }).subscribe(setInteractState))
     },
-    [interact$, setInteractState]
+    [interact$, setInteractState, unsubscribeSub]
   )
 
   const resetResults = useCallback(() => {
@@ -60,11 +65,9 @@ export const LeaveView: React.FC<Props> = () => {
   useEffect(() => {
     // Unsubscribe from possible subscription when unmount
     return () => {
-      if (possibleSubRef.current) {
-        possibleSubRef.current.unsubscribe()
-      }
+      unsubscribeSub()
     }
-  }, [])
+  }, [unsubscribeSub])
 
   return FP.pipe(
     interactState.txRD,
