@@ -6,6 +6,7 @@ import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
   AssetBNB,
+  AssetRuneNative,
   assetToString,
   BaseAmount,
   baseToAsset,
@@ -21,6 +22,7 @@ import * as Rx from 'rxjs'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import * as AssetHelper from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
+import { eqOAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
@@ -163,9 +165,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const isRuneBnbAsset: boolean = useMemo(() => FP.pipe(oRuneBnbAsset, O.isSome), [oRuneBnbAsset])
 
-  const isRuneNativeAsset: boolean = useMemo(() => FP.pipe(oAsset, O.filter(AssetHelper.isRuneNativeAsset), O.isSome), [
-    oAsset
-  ])
+  const isRuneNativeAsset: boolean = useMemo(() => eqOAsset.equals(oAsset, O.some(AssetRuneNative)), [oAsset])
 
   const oRuneBnbBalance: O.Option<WalletBalance> = useMemo(() => getWalletBalanceByAsset(oBalances, oRuneBnbAsset), [
     oRuneBnbAsset,
