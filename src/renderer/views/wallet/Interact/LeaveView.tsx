@@ -15,9 +15,11 @@ import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
 import * as Styled from './InteractView.styles'
 
-type Props = {}
+type Props = {
+  goToTransaction: (txHash: string) => void
+}
 
-export const LeaveView: React.FC<Props> = () => {
+export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
   const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
   const { interactService$ } = useThorchainContext()
   const { txStatus$ } = useChainContext()
@@ -79,8 +81,9 @@ export const LeaveView: React.FC<Props> = () => {
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.ErrorView>
       ),
-      () => (
-        <Styled.SuccessView>
+      (txHash) => (
+        <Styled.SuccessView title={intl.formatMessage({ id: 'common.success' })}>
+          <Styled.ViewTxButton txHash={O.some(txHash)} onClick={goToTransaction} />
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>
       )

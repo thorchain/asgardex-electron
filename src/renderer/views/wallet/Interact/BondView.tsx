@@ -23,9 +23,10 @@ import * as Styled from './InteractView.styles'
 
 type Props = {
   walletAddress: string
+  goToTransaction: (txHash: string) => void
 }
 
-export const BondView: React.FC<Props> = ({ walletAddress }) => {
+export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) => {
   const { balancesState$ } = useWalletContext()
   const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
   const { interactService$ } = useThorchainContext()
@@ -106,8 +107,9 @@ export const BondView: React.FC<Props> = ({ walletAddress }) => {
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.ErrorView>
       ),
-      () => (
-        <Styled.SuccessView>
+      (txHash) => (
+        <Styled.SuccessView title={intl.formatMessage({ id: 'common.success' })}>
+          <Styled.ViewTxButton txHash={O.some(txHash)} onClick={goToTransaction} />
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>
       )

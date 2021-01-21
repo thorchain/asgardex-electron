@@ -3,6 +3,7 @@ import { palette } from 'styled-theme'
 
 import { ErrorView as ErrorViewUI } from '../../../components/shared/error'
 import { SuccessView as SuccessViewUI } from '../../../components/shared/success'
+import { ViewTxButton as ViewTxButtonUI } from '../../../components/uielements/button'
 
 export const ContentContainer = styled('div')`
   display: flex;
@@ -36,4 +37,8 @@ export const ErrorView = styled(ErrorViewUI)`
     background: none;
     padding-top: 0;
   }
+`
+
+export const ViewTxButton = styled(ViewTxButtonUI)`
+  margin-bottom: 15px;
 `
