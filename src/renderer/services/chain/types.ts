@@ -77,6 +77,8 @@ export type LedgerAddressParams = { chain: Chain; network: Network }
 export type SwapState = {
   // Number of current step
   readonly step: number
+  // Constant total amount of steps
+  readonly stepsTotal: 3
   // swap transaction
   readonly swapTx: TxHashRD
   // RD of all requests

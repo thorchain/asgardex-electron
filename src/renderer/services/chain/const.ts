@@ -7,6 +7,7 @@ export const MAX_SWAP_STEPS = 3
 export const INITIAL_SWAP_STATE: SwapState = {
   step: 1,
   swapTx: RD.initial,
+  stepsTotal: MAX_SWAP_STEPS,
   swap: RD.initial
 }
 
