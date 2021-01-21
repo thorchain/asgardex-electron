@@ -5,7 +5,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { observableState } from '../../../helpers/stateHelper'
-import { TxRD, TxLD, ErrorId } from '../../wallet/types'
+import { TxHashRD, TxHashLD, ErrorId } from '../../wallet/types'
 import { XChainClient$ } from '../types'
 
 export const createTransferService = <Client extends XChainClient, T extends XChainClient$<Client>>(client$: T) => {
@@ -15,7 +15,7 @@ export const createTransferService = <Client extends XChainClient, T extends XCh
    * Note: Creates a state for EACH service
    * to avoid possible data merging between different chains
    */
-  const { get$: txRD$, set: setTxRD } = observableState<TxRD>(RD.initial)
+  const { get$: txRD$, set: setTxRD } = observableState<TxHashRD>(RD.initial)
 
   /**
    * According to the Client's interface
@@ -31,13 +31,13 @@ export const createTransferService = <Client extends XChainClient, T extends XCh
    */
   type TransferParams = Parameters<Client['transfer']>[0]
 
-  const tx$ = (params: TransferParams): TxLD =>
+  const tx$ = (params: TransferParams): TxHashLD =>
     client$.pipe(
       RxOp.switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
       RxOp.switchMap((client) => Rx.from(client.transfer(params))),
       RxOp.map(RD.success),
       RxOp.catchError(
-        (e): TxLD =>
+        (e): TxHashLD =>
           Rx.of(
             RD.failure({
               msg: e.toString(),
@@ -51,7 +51,7 @@ export const createTransferService = <Client extends XChainClient, T extends XCh
   /**
    * Sends a tx by given `TransferParams`
    */
-  const sendTx = (params: TransferParams): TxLD => tx$(params)
+  const sendTx = (params: TransferParams): TxHashLD => tx$(params)
 
   /**
    * Same as `sendTx`, but subscribing the result and store it into state

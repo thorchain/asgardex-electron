@@ -16,7 +16,7 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/binance/types'
 import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, TxRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, TxHashRD } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 
 type Props = {
@@ -35,7 +35,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
 
   const { client$, fees$, txRD$, resetTx, subscribeTx } = useBinanceContext()
 
-  const txRD = useObservableState<TxRD>(txRD$, RD.initial)
+  const txRD = useObservableState<TxHashRD>(txRD$, RD.initial)
   const [fee] = useObservableState<O.Option<AssetAmount>>(
     () =>
       FP.pipe(

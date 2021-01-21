@@ -4,7 +4,7 @@ import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
 import { createDepositService, createTransactionService } from './transaction'
 
-const { txs$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
+const { txs$, tx$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService(client$)
 const { sendTx: sendDepositTx } = createDepositService(client$)
 const interact$ = createInteractService$(sendDepositTx)
@@ -15,6 +15,7 @@ export {
   reloadBalances,
   balances$,
   txs$,
+  tx$,
   reloadFees,
   fees$,
   subscribeTx,

@@ -1,15 +1,15 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { XChainClient } from '@xchainjs/xchain-client'
+import { TxHash, XChainClient } from '@xchainjs/xchain-client'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
-import { map, catchError, startWith, switchMap } from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
-import { ApiError, ErrorId } from '../../wallet/types'
+import { ApiError, ErrorId, TxLD } from '../../wallet/types'
 import { XChainClient$, TxsPageLD, TxsParams } from '../types'
 
 /**
- * Observable to load txs from Binance API endpoint
+ * Observable to load txs
  */
 const loadTxs$ = ({
   client,
@@ -36,13 +36,13 @@ const loadTxs$ = ({
       offset
     })
   ).pipe(
-    map(RD.success),
-    catchError((error) =>
+    RxOp.map(RD.success),
+    RxOp.catchError((error) =>
       Rx.of(
         RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() })
       )
     ),
-    startWith(RD.pending)
+    RxOp.startWith(RD.pending)
   )
 }
 
@@ -50,14 +50,14 @@ const loadTxs$ = ({
  * `Txs` state by given client
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const txs$: (client$: XChainClient$) => (params: TxsParams) => TxsPageLD = (client$) => ({
+export const txsByClient$: (client$: XChainClient$) => (params: TxsParams) => TxsPageLD = (client$) => ({
   asset,
   limit,
   offset,
   walletAddress
 }) =>
   client$.pipe(
-    switchMap((oClient) =>
+    RxOp.switchMap((oClient) =>
       FP.pipe(
         oClient,
         O.fold(
@@ -70,6 +70,37 @@ export const txs$: (client$: XChainClient$) => (params: TxsParams) => TxsPageLD 
               offset,
               walletAddress
             })
+        )
+      )
+    )
+  )
+
+/**
+ * Observable to load data of a `Tx`
+ */
+const loadTx$ = (client: XChainClient, txHash: TxHash): TxLD =>
+  Rx.from(client.getTransactionData(txHash)).pipe(
+    RxOp.map(RD.success),
+    RxOp.catchError((error) =>
+      Rx.of(
+        RD.failure<ApiError>({ errorId: ErrorId.GET_TX, msg: error?.message ?? error.toString() })
+      )
+    ),
+    RxOp.startWith(RD.pending)
+  )
+
+/**
+ * Gets data of a `Tx` by given client
+ * If a client is not available, it returns an `initial` state
+ */
+export const txByClient$: (client$: XChainClient$) => (txHash: TxHash) => TxLD = (client$) => (txHash) =>
+  client$.pipe(
+    RxOp.switchMap((oClient) =>
+      FP.pipe(
+        oClient,
+        O.fold(
+          () => Rx.of(RD.initial),
+          (client) => loadTx$(client, txHash)
         )
       )
     )

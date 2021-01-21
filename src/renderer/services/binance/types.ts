@@ -9,7 +9,7 @@ import * as Rx from 'rxjs'
 import { LedgerBNCTxInfo, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
-import { ApiError, LedgerAddressLD, LedgerTxLD } from '../wallet/types'
+import { ApiError, LedgerAddressLD, LedgerTxHashLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -72,7 +72,7 @@ export type LedgerService = {
   ledgerAddress$: LedgerAddressLD
   retrieveLedgerAddress: (network: Network) => void
   removeLedgerAddress: () => void
-  ledgerTxRD$: LedgerTxLD
+  ledgerTxRD$: LedgerTxHashLD
   pushLedgerTx: (network: Network, params: LedgerBNCTxInfo) => Rx.Subscription
   resetLedgerTx: () => void
 }

@@ -33,8 +33,8 @@ import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import {
   LoadTxsHandler,
   NonEmptyWalletBalances,
-  TxLD,
-  TxRD,
+  TxHashLD,
+  TxHashRD,
   ValidatePasswordHandler
 } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
@@ -49,7 +49,7 @@ import * as Styled from './AssetDetails.style'
 
 type UpgradeTxState = {
   startTime: O.Option<number>
-  txRD: TxRD
+  txRD: TxHashRD
 }
 
 const INITIAL_TX_UPGRADE_STATE: UpgradeTxState = { startTime: O.none, txRD: RD.initial }
@@ -65,7 +65,7 @@ type Props = {
   runeNativeAddress?: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
   validatePassword$: ValidatePasswordHandler
-  sendUpgradeTx: (_: SendTxParams) => TxLD
+  sendUpgradeTx: (_: SendTxParams) => TxHashLD
   reloadUpgradeFeeHandler: FP.Lazy<void>
   upgradeFee: FeeRD
 }
