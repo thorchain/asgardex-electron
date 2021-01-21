@@ -102,6 +102,8 @@ export type SwapStateHandler = (p: SwapParams) => SwapState$
 export type AsymDepositState = {
   // Number of current step
   readonly step: number
+  // Constant total amount of steps
+  readonly stepsTotal: 3
   // deposit transaction
   readonly depositTx: TxHashRD
   // RD of all requests

@@ -14,6 +14,7 @@ export const INITIAL_SWAP_STATE: SwapState = {
 export const INITIAL_ASYM_DEPOSIT_STATE: AsymDepositState = {
   step: 1,
   depositTx: RD.initial,
+  stepsTotal: 3,
   deposit: RD.initial
 }
 
