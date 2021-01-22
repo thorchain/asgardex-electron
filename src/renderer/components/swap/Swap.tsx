@@ -191,14 +191,19 @@ export const Swap = ({
     (targetAmount: BaseAmount) => {
       FP.pipe(
         oAssetWB,
-        O.map(({ amount: maxAmount }) => {
-          const res = targetAmount.amount().isGreaterThan(maxAmount.amount())
-            ? { ...maxAmount }
+        O.map(({ amount: maxAmount }) =>
+          targetAmount.amount().isGreaterThan(maxAmount.amount())
+            ? /**
+               * New object instance is needed to make
+               * AssetInput component react to the new value.
+               * In case maxAmount has the same pointer
+               * AssetInput will not be updated as a React-component
+               * but native input element will change its
+               * inner value and user will see inappropriate value
+               */
+              { ...maxAmount }
             : baseAmount(targetAmount.amount(), maxAmount.decimal)
-
-          console.log('res --- ', res.amount().toString())
-          return res
-        }),
+        ),
         O.map(setAmountToSwapInternal)
       )
     },

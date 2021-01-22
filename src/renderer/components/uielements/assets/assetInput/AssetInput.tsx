@@ -42,8 +42,6 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
     inputRef.current?.firstChild?.focus()
   }, [])
 
-  console.log('amount -- ', amount.amount().toString())
-
   return (
     <AssetInputWrapper className={`assetInput-wrapper ${className}`} onClick={handleClickWrapper} {...otherProps}>
       <div className="asset-input-header">
