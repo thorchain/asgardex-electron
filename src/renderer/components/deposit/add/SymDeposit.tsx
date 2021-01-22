@@ -59,6 +59,8 @@ export type Props = {
   deposit$: SymDepositStateHandler
 }
 
+type SelectedInput = 'asset' | 'rune' | 'none'
+
 export const SymDeposit: React.FC<Props> = (props) => {
   const {
     asset,
@@ -87,6 +89,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const [runeAmountToDeposit, setRuneAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [assetAmountToDeposit, setAssetAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [percentValueToDeposit, setPercentValueToDeposit] = useState(0)
+  const [selectedInput, setSelectedInput] = useState<SelectedInput>('none')
 
   // (Possible) subscription of `xyzDeposit$`
   // DON'T use `_setDepositSubUnsafe` to update state (it's unsafe) - use `setDepositSub`!!
@@ -248,13 +251,16 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const runeAmountChangeHandler = useCallback(
     (runeInput: BaseAmount) => {
+      // Do nothing if we don't entered input for rune
+      if (selectedInput !== 'rune') return
+
       let runeQuantity = runeInput.amount().isGreaterThan(maxRuneAmountToDeposit.amount())
-        ? maxRuneAmountToDeposit
+        ? { ...maxRuneAmountToDeposit } // Use copy to avoid missmatch with values in input fields
         : runeInput
       const assetQuantity = Helper.getAssetAmountToDeposit(runeQuantity, poolData)
 
       if (assetQuantity.amount().isGreaterThan(maxAssetAmountToDeposit.amount())) {
-        runeQuantity = Helper.getRuneAmountToDeposit(maxRuneAmountToDeposit, poolData)
+        runeQuantity = Helper.getRuneAmountToDeposit(maxAssetAmountToDeposit, poolData)
         setRuneAmountToDeposit(runeQuantity)
         setAssetAmountToDeposit(maxAssetAmountToDeposit)
         setPercentValueToDeposit(100)
@@ -268,13 +274,16 @@ export const SymDeposit: React.FC<Props> = (props) => {
         setPercentValueToDeposit(percentToDeposit)
       }
     },
-    [maxAssetAmountToDeposit, maxRuneAmountToDeposit, poolData]
+    [maxAssetAmountToDeposit, maxRuneAmountToDeposit, poolData, selectedInput]
   )
 
   const assetAmountChangeHandler = useCallback(
     (assetInput: BaseAmount) => {
+      // Do nothing if we don't entered input for asset
+      if (selectedInput !== 'asset') return
+
       let assetQuantity = assetInput.amount().isGreaterThan(maxAssetAmountToDeposit.amount())
-        ? maxAssetAmountToDeposit
+        ? { ...maxAssetAmountToDeposit } // Use copy to avoid missmatch with values in input fields
         : assetInput
       const runeQuantity = Helper.getRuneAmountToDeposit(assetQuantity, poolData)
 
@@ -293,7 +302,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         setPercentValueToDeposit(percentToDeposit)
       }
     },
-    [maxAssetAmountToDeposit, maxRuneAmountToDeposit, poolData]
+    [maxAssetAmountToDeposit, maxRuneAmountToDeposit, poolData, selectedInput]
   )
 
   const changePercentHandler = useCallback(
@@ -578,6 +587,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
             selectedAmount={assetAmountToDeposit}
             maxAmount={maxAssetAmountToDeposit}
             onChangeAssetAmount={assetAmountChangeHandler}
+            inputOnFocusHandler={() => setSelectedInput('asset')}
+            inputOnBlurHandler={() => setSelectedInput('none')}
             price={assetPrice}
             assets={assets}
             percentValue={percentValueToDeposit}
@@ -594,6 +605,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
             selectedAmount={runeAmountToDeposit}
             maxAmount={maxRuneAmountToDeposit}
             onChangeAssetAmount={runeAmountChangeHandler}
+            inputOnFocusHandler={() => setSelectedInput('rune')}
+            inputOnBlurHandler={() => setSelectedInput('none')}
             price={runePrice}
             priceAsset={priceAsset}
           />
