@@ -29,7 +29,7 @@ export const BalanceErrorRow = styled(Row)`
   padding: 20px 0px;
 
   ${media.xl`
-    padding: 0 20px;
+    padding: 20px;
 `}
 `
 

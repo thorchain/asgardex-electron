@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import {
@@ -22,13 +21,7 @@ import * as Rx from 'rxjs'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
-import {
-  SymDepositMemo,
-  SendDepositTxParams,
-  DepositFeesRD,
-  SymDepositState,
-  SymDepositStateHandler
-} from '../../../services/chain/types'
+import { SymDepositMemo, DepositFeesRD, SymDepositState, SymDepositStateHandler } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { DepositType } from '../../../types/asgardex'
@@ -37,6 +30,7 @@ import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { ViewTxButton } from '../../uielements/button'
 import { Drag } from '../../uielements/drag'
+import { Fees, UIFeesRD } from '../../uielements/fees'
 import { formatFee } from '../../uielements/fees/Fees.helper'
 import * as Helper from './Deposit.helper'
 import * as Styled from './Deposit.style'
@@ -58,7 +52,6 @@ export type Props = {
   viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
   assets?: Asset[]
-  onDeposit: (p: SendDepositTxParams) => void
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
@@ -360,28 +353,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [oChainAssetBalance, oAssetChainFee, renderFeeError, asset])
 
-  const feesLabel = useMemo(
-    () =>
-      FP.pipe(
-        fees,
-        RD.fold(
-          () => '...',
-          () => '...',
-          (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
-          ({ thor: oThorFee, asset: assetFee }) =>
-            // Show one (asym deposit)
-            // or
-            // two fees (sym)
-            `${FP.pipe(
-              oThorFee,
-              O.map((thorFee) => `${formatFee({ amount: thorFee, asset: AssetRuneNative })} + `),
-              O.getOrElse(() => '')
-            )} ${formatFee({ amount: assetFee, asset })}`
-        )
-      ),
-    [asset, fees, intl]
-  )
-
   const reloadFeesHandler = useCallback(() => reloadFees('sym'), [reloadFees])
 
   const txModalExtraContent = useMemo(() => {
@@ -552,6 +523,23 @@ export const SymDeposit: React.FC<Props> = (props) => {
     isThorchainFeeError
   ])
 
+  const uiFeesRD: UIFeesRD = useMemo(
+    () =>
+      FP.pipe(
+        fees,
+        RD.map(({ asset: assetFeeAmount, thor: oThorFeeAmount }) => {
+          const fees = [{ asset, amount: assetFeeAmount }]
+
+          return FP.pipe(
+            oThorFeeAmount,
+            O.map((thorFeeAmount) => [...fees, { asset: AssetRuneNative, amount: thorFeeAmount }]),
+            O.getOrElse(() => fees)
+          )
+        })
+      ),
+    [asset, fees]
+  )
+
   return (
     <Styled.Container>
       <Styled.BalanceErrorRow>
@@ -590,16 +578,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       <Styled.FeesRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.FeeRow>
-            <Col>
-              <Styled.ReloadFeeButton onClick={reloadFeesHandler} disabled={RD.isPending(fees)}>
-                <SyncOutlined />
-              </Styled.ReloadFeeButton>
-            </Col>
-            <Col>
-              <Styled.FeeLabel disabled={RD.isPending(fees)}>
-                {intl.formatMessage({ id: 'common.fees' })}: {feesLabel}
-              </Styled.FeeLabel>
-            </Col>
+            <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} />
           </Styled.FeeRow>
           <Styled.FeeErrorRow>
             <Col>

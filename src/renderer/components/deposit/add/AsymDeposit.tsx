@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import {
   Asset,
   AssetAmount,
-  AssetRuneNative,
   baseAmount,
   BaseAmount,
   baseToAsset,
@@ -23,13 +21,7 @@ import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { isChainAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
-import {
-  Memo,
-  SendDepositTxParams,
-  DepositFeesRD,
-  AsymDepositState,
-  AsymDepositStateHandler
-} from '../../../services/chain/types'
+import { Memo, DepositFeesRD, AsymDepositState, AsymDepositStateHandler } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { DepositType } from '../../../types/asgardex'
@@ -38,6 +30,7 @@ import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { ViewTxButton } from '../../uielements/button'
 import { Drag } from '../../uielements/drag'
+import { Fees, UIFeesRD } from '../../uielements/fees'
 import { formatFee } from '../../uielements/fees/Fees.helper'
 import * as Styled from './Deposit.style'
 
@@ -55,7 +48,6 @@ export type Props = {
   viewAssetTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
   assets?: Asset[]
-  onDeposit: (p: SendDepositTxParams) => void
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
@@ -182,13 +174,11 @@ export const AsymDeposit: React.FC<Props> = (props) => {
 
   const assetAmountChangeHandler = useCallback(
     (assetInput: BaseAmount) => {
-      setAssetAmountToDeposit(assetInput)
+      // We don't accept more that `maxAssetAmountToDeposit`
+      const value = assetInput.amount().gt(maxAssetAmountToDeposit.amount()) ? maxAssetAmountToDeposit : assetInput
+      setAssetAmountToDeposit(value)
       // assetQuantity * 100 / maxAssetAmountToDeposit
-      const percentToDeposit = assetInput
-        .amount()
-        .multipliedBy(100)
-        .dividedBy(maxAssetAmountToDeposit.amount())
-        .toNumber()
+      const percentToDeposit = value.amount().multipliedBy(100).dividedBy(maxAssetAmountToDeposit.amount()).toNumber()
       setPercentValueToDeposit(percentToDeposit)
     },
     [maxAssetAmountToDeposit]
@@ -249,32 +239,9 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     )
   }, [oChainAssetBalance, oAssetChainFee, renderFeeError, asset])
 
-  const feesLabel = useMemo(
-    () =>
-      FP.pipe(
-        fees,
-        RD.fold(
-          () => '...',
-          () => '...',
-          (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
-          ({ thor: oThorFee, asset: assetFee }) =>
-            // Show one (asym deposit)
-            // or
-            // two fees (sym)
-            `${FP.pipe(
-              oThorFee,
-              O.map((thorFee) => `${formatFee({ amount: thorFee, asset: AssetRuneNative })} + `),
-              O.getOrElse(() => '')
-            )} ${formatFee({ amount: assetFee, asset })}`
-        )
-      ),
-    [asset, fees, intl]
-  )
-
   const reloadFeesHandler = useCallback(() => reloadFees('asym'), [reloadFees])
 
   const txModalExtraContent = useMemo(() => {
-    // TODO (@Veado) Add i18n
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
       intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: asset.symbol }),
@@ -401,6 +368,15 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     )
   }, [closePasswordModal, oMemo, deposit$, asset, oPoolAddress, assetAmountToDeposit, setDepositSub])
 
+  const uiFeesRD: UIFeesRD = useMemo(
+    () =>
+      FP.pipe(
+        fees,
+        RD.map(({ asset: assetFeeAmount }) => [{ asset, amount: assetFeeAmount }])
+      ),
+    [asset, fees]
+  )
+
   const disabledForm = useMemo(() => isBalanceError || disabled, [disabled, isBalanceError])
 
   return (
@@ -430,16 +406,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
       <Styled.FeesRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.FeeRow>
-            <Col>
-              <Styled.ReloadFeeButton onClick={reloadFeesHandler} disabled={RD.isPending(fees)}>
-                <SyncOutlined />
-              </Styled.ReloadFeeButton>
-            </Col>
-            <Col>
-              <Styled.FeeLabel disabled={RD.isPending(fees)}>
-                {intl.formatMessage({ id: 'common.fee' })}: {feesLabel}
-              </Styled.FeeLabel>
-            </Col>
+            <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} />
           </Styled.FeeRow>
           <Styled.FeeErrorRow>
             <Col>

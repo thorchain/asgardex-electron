@@ -20,7 +20,7 @@ import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
-import { AsymDepositState, SendDepositTxParams } from '../../../services/chain/types'
+import { AsymDepositState } from '../../../services/chain/types'
 import { AsymDeposit, Props as AsymDepositProps } from './AsymDeposit'
 
 const defaultProps: AsymDepositProps = {
@@ -28,7 +28,6 @@ const defaultProps: AsymDepositProps = {
   assetPrice: bn(2),
   assetBalance: O.some(assetToBase(assetAmount(200))),
   chainAssetBalance: O.some(assetToBase(assetAmount(55))),
-  onDeposit: (p: SendDepositTxParams) => console.log('on Deposit fees', p),
   onChangeAsset: (a: Asset) => console.log('change asset', a),
   reloadFees: () => console.log('reload fees'),
   fees: RD.success({

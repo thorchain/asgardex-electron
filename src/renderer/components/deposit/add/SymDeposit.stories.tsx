@@ -20,7 +20,7 @@ import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
-import { SendDepositTxParams, SymDepositState } from '../../../services/chain/types'
+import { SymDepositState } from '../../../services/chain/types'
 import { SymDeposit, Props as SymDepositProps } from './SymDeposit'
 
 const defaultProps: SymDepositProps = {
@@ -30,12 +30,11 @@ const defaultProps: SymDepositProps = {
   assetBalance: O.some(assetToBase(assetAmount(200))),
   runeBalance: O.some(assetToBase(assetAmount(100))),
   chainAssetBalance: O.some(assetToBase(assetAmount(55))),
-  onDeposit: (p: SendDepositTxParams) => console.log('on Deposit fees', p),
   onChangeAsset: (a: Asset) => console.log('change asset', a),
   reloadFees: () => console.log('reload fees'),
   fees: RD.success({
-    thor: O.none,
-    asset: baseAmount(123)
+    thor: O.some(baseAmount(100)),
+    asset: baseAmount(12300)
   }),
   poolData: {
     assetBalance: baseAmount('1000'),

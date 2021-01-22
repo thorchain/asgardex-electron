@@ -57,7 +57,6 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
   useSubscription(reloadDepositFeesEffect$)
 
   const [depositFees] = useObservableState(() => depositFees$('sym'), RD.initial)
-  // TODO (@Veado) Use `selectedPoolAddress$` - will be available with one of next PRs
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
   const {
@@ -162,7 +161,6 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
           assetBalance={O.none}
           runeBalance={O.none}
           chainAssetBalance={O.none}
-          onDeposit={FP.constVoid}
           fees={depositFees}
           reloadFees={FP.constVoid}
           priceAsset={selectedPricePoolAsset}
@@ -210,8 +208,6 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
               chainAssetBalance={chainAssetBalance}
               poolAddress={oPoolAddress}
               memo={depositTxMemo}
-              // Placeholder for callback - will be implemented with #537
-              onDeposit={console.log}
               fees={depositFees}
               reloadFees={reloadDepositFees}
               priceAsset={selectedPricePoolAsset}
