@@ -15,8 +15,6 @@ type CurrencyInfoProps = {
   slip?: BigNumber
 }
 
-// For some reason eslint does not see that CurrencyInfo is used by Swap.tsx
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: CurrencyInfoProps) => {
   return pipe(
     sequenceTOption(from, to),
@@ -24,6 +22,9 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: Curre
       <Styled.Container key={'currency info'}>
         <div>
           1 {from.asset.ticker} = {formatBN(from.priceRune.dividedBy(to.priceRune), 5)} {to.asset.ticker}
+        </div>
+        <div>
+          1 {to.asset.ticker} = {formatBN(to.priceRune.dividedBy(from.priceRune), 5)} {from.asset.ticker}
         </div>
         <div>slip: {slip.multipliedBy(100).toFormat(2)}%</div>
       </Styled.Container>
