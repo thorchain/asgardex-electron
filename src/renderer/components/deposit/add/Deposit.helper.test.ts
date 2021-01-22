@@ -7,9 +7,9 @@ import {
   getRuneAmountToDeposit,
   maxAssetAmountToDeposit,
   maxRuneAmountToDeposit
-} from './AddDeposit.helper'
+} from './Deposit.helper'
 
-describe('deposit/AddDeposit.helper', () => {
+describe('deposit/Deposit.helper', () => {
   // pool balances
   const poolData: PoolData = {
     runeBalance: baseAmount(2000), //  1 RUNE == 0.5 ASSET

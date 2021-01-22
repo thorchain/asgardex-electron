@@ -14,7 +14,8 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { DepositRouteParams } from '../../routes/deposit'
-import { AddDepositView } from './add/AddDepositView'
+import { AsymDepositView } from './add/AsymDepositView'
+import { SymDepositView } from './add/SymDepositView'
 import { ShareView } from './share/ShareView'
 import { WithdrawDepositView } from './withdraw/WithdrawDepositView'
 
@@ -81,7 +82,8 @@ export const DepositView: React.FC<Props> = (_) => {
               asset={selectedAsset}
               keystoreState={keystoreState}
               ShareContent={ShareView}
-              DepositContent={AddDepositView}
+              SymDepositContent={SymDepositView}
+              AsymDepositContent={AsymDepositView}
               WidthdrawContent={WithdrawDepositView}
             />
           )
