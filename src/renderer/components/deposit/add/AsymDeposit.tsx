@@ -177,10 +177,14 @@ export const AsymDeposit: React.FC<Props> = (props) => {
   const assetAmountChangeHandler = useCallback(
     (assetInput: BaseAmount) => {
       // We don't accept more that `maxAssetAmountToDeposit`
-      const value = assetInput.amount().gt(maxAssetAmountToDeposit.amount()) ? maxAssetAmountToDeposit : assetInput
+      const value = assetInput.amount().isGreaterThan(maxAssetAmountToDeposit.amount())
+        ? { ...maxAssetAmountToDeposit } // Use copy to avoid missmatch with values in input fields
+        : assetInput
       setAssetAmountToDeposit(value)
       // assetQuantity * 100 / maxAssetAmountToDeposit
-      const percentToDeposit = value.amount().multipliedBy(100).dividedBy(maxAssetAmountToDeposit.amount()).toNumber()
+      const percentToDeposit = maxAssetAmountToDeposit.amount().isGreaterThan(0)
+        ? value.amount().multipliedBy(100).dividedBy(maxAssetAmountToDeposit.amount()).toNumber()
+        : 0
       setPercentValueToDeposit(percentToDeposit)
     },
     [maxAssetAmountToDeposit]
