@@ -18,7 +18,8 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
-import { ZERO_BASE_AMOUNT } from '../../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { isChainAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { SymDepositMemo, DepositFeesRD, SymDepositState, SymDepositStateHandler } from '../../../services/chain/types'
@@ -138,15 +139,59 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oRuneBalance]
   )
 
-  const maxRuneAmountToDeposit = useMemo(
-    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance }),
-    [assetBalance, poolData, runeBalance]
+  const oThorchainFee: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        fees,
+        RD.toOption,
+        O.chain(({ thor }) => thor)
+      ),
+    [fees]
   )
 
-  const maxAssetAmountToDeposit = useMemo(
-    (): BaseAmount => Helper.maxAssetAmountToDeposit({ poolData, runeBalance, assetBalance }),
-    [assetBalance, poolData, runeBalance]
+  const maxRuneAmountToDeposit = useMemo((): BaseAmount => {
+    const maxAmount = Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance })
+
+    // Consider fees
+    return FP.pipe(
+      oThorchainFee,
+      // Check: maxAmount > fee
+      O.filter((fee) => maxAmount.amount().isGreaterThan(fee.amount())),
+      // Substract fee from maxAmount
+      O.map((fee) => maxAmount.amount().minus(fee.amount())),
+      // Set maxAmount to zero as long as we dont have a feeRate
+      O.getOrElse(() => ZERO_BN),
+      baseAmount
+    )
+  }, [assetBalance, oThorchainFee, poolData, runeBalance])
+
+  const oAssetChainFee: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        fees,
+        RD.toOption,
+        O.map(({ asset }) => asset)
+      ),
+    [fees]
   )
+
+  const maxAssetAmountToDeposit = useMemo((): BaseAmount => {
+    const maxAmount = Helper.maxAssetAmountToDeposit({ poolData, runeBalance, assetBalance })
+    // substract fees if needed
+    if (isChainAsset(asset)) {
+      return FP.pipe(
+        oAssetChainFee,
+        // Check: maxAmount > fee
+        O.filter((fee) => maxAmount.amount().isGreaterThan(fee.amount())),
+        // Substract fee from maxAmount
+        O.map((fee) => maxAmount.amount().minus(fee.amount())),
+        // Set maxAmount to zero as long as we dont have a feeRate
+        O.getOrElse(() => ZERO_BN),
+        baseAmount
+      )
+    }
+    return maxAmount
+  }, [asset, assetBalance, oAssetChainFee, poolData, runeBalance])
 
   const hasAssetBalance = useMemo(() => assetBalance.amount().isGreaterThan(0), [assetBalance])
   const hasRuneBalance = useMemo(() => runeBalance.amount().isGreaterThan(0), [runeBalance])
@@ -208,10 +253,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
         : runeInput
       const assetQuantity = Helper.getAssetAmountToDeposit(runeQuantity, poolData)
 
-      if (assetQuantity.amount().isGreaterThan(maxRuneAmountToDeposit.amount())) {
+      if (assetQuantity.amount().isGreaterThan(maxAssetAmountToDeposit.amount())) {
         runeQuantity = Helper.getRuneAmountToDeposit(maxRuneAmountToDeposit, poolData)
         setRuneAmountToDeposit(runeQuantity)
-        setAssetAmountToDeposit(maxRuneAmountToDeposit)
+        setAssetAmountToDeposit(maxAssetAmountToDeposit)
         setPercentValueToDeposit(100)
       } else {
         setRuneAmountToDeposit(runeQuantity)
@@ -223,13 +268,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
         setPercentValueToDeposit(percentToDeposit)
       }
     },
-    [maxRuneAmountToDeposit, poolData]
+    [maxAssetAmountToDeposit, maxRuneAmountToDeposit, poolData]
   )
 
   const assetAmountChangeHandler = useCallback(
     (assetInput: BaseAmount) => {
-      let assetQuantity = assetInput.amount().isGreaterThan(maxRuneAmountToDeposit.amount())
-        ? maxRuneAmountToDeposit
+      let assetQuantity = assetInput.amount().isGreaterThan(maxAssetAmountToDeposit.amount())
+        ? maxAssetAmountToDeposit
         : assetInput
       const runeQuantity = Helper.getRuneAmountToDeposit(assetQuantity, poolData)
 
@@ -242,13 +287,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
         setRuneAmountToDeposit(runeQuantity)
         setAssetAmountToDeposit(assetQuantity)
         // assetQuantity * 100 / maxAssetAmountToDeposit
-        const percentToDeposit = maxRuneAmountToDeposit.amount().isGreaterThan(0)
-          ? assetQuantity.amount().multipliedBy(100).dividedBy(maxRuneAmountToDeposit.amount()).toNumber()
+        const percentToDeposit = maxAssetAmountToDeposit.amount().isGreaterThan(0)
+          ? assetQuantity.amount().multipliedBy(100).dividedBy(maxAssetAmountToDeposit.amount()).toNumber()
           : 0
         setPercentValueToDeposit(percentToDeposit)
       }
     },
-    [maxRuneAmountToDeposit, poolData]
+    [maxAssetAmountToDeposit, maxRuneAmountToDeposit, poolData]
   )
 
   const changePercentHandler = useCallback(
@@ -283,16 +328,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [intl]
   )
 
-  const oThorchainFee: O.Option<BaseAmount> = useMemo(
-    () =>
-      FP.pipe(
-        fees,
-        RD.toOption,
-        O.chain(({ thor }) => thor)
-      ),
-    [fees]
-  )
-
   const isThorchainFeeError = useMemo(() => {
     return FP.pipe(
       sequenceTOption(oThorchainFee, oRuneBalance),
@@ -317,16 +352,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
       O.getOrElse(() => <></>)
     )
   }, [oRuneBalance, oThorchainFee, renderFeeError])
-
-  const oAssetChainFee: O.Option<BaseAmount> = useMemo(
-    () =>
-      FP.pipe(
-        fees,
-        RD.toOption,
-        O.map(({ asset }) => asset)
-      ),
-    [fees]
-  )
 
   const isAssetChainFeeError = useMemo(() => {
     return FP.pipe(

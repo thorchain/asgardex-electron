@@ -135,7 +135,9 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     if (isChainAsset(asset)) {
       return FP.pipe(
         sequenceTOption(oAssetChainFee, oAssetBalance),
+        // Check: maxAmount > fee
         O.filter(([fee]) => assetBalance.amount().isGreaterThan(fee.amount())),
+        // Substract fee from balance
         O.map(([fee, balance]) => balance.amount().minus(fee.amount())),
         // Set maxAmount to zero as long as we dont have a feeRate
         O.getOrElse(() => ZERO_BN),
