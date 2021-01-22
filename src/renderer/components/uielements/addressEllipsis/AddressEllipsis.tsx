@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
@@ -48,18 +48,22 @@ export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
     [chain, network]
   )
 
+  const prepareEllipse = () => {}
+
   const measuredParent = useCallback(
     (node) => {
-      const prepareEllipse = () => prepEllipse(node, node.childNodes[0], node.childNodes[1])
       if (node !== null) {
+        const prepareEllipse = () => prepEllipse(node, node.childNodes[0], node.childNodes[1])
         window.addEventListener('resize', prepareEllipse)
-        prepEllipse(node, node.childNodes[0], node.childNodes[1])
-      } else {
-        window.removeEventListener('resize', prepareEllipse)
+        prepareEllipse()
       }
     },
     [prepEllipse]
   )
+
+  useEffect(() => {
+    return () => window.removeEventListener('resize', prepareEllipse)
+  }, [])
 
   return (
     <Styled.Container>

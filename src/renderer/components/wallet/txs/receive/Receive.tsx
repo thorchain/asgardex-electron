@@ -63,7 +63,15 @@ export const Receive: React.FC<Props> = (props): JSX.Element => {
 
   const hasAddress = O.isSome(oAddress)
 
-  const chain = O.isSome(oAsset) ? oAsset.value.chain : ''
+  const renderAddress = useMemo(() => {
+    return FP.pipe(
+      oAsset,
+      O.fold(
+        () => addressLabel,
+        (asset) => truncateAddress(addressLabel, asset.chain, network)
+      )
+    )
+  }, [addressLabel, network, oAsset])
 
   return (
     <>
@@ -85,9 +93,7 @@ export const Receive: React.FC<Props> = (props): JSX.Element => {
           </Styled.Card>
           <Styled.Div>
             <label htmlFor="clipboard-btn">
-              <Styled.Address size="large">
-                {!isDesktopView && chain ? truncateAddress(addressLabel, chain, network) : addressLabel}
-              </Styled.Address>
+              <Styled.Address size="large">{isDesktopView ? addressLabel : renderAddress}</Styled.Address>
             </label>
             {hasAddress && (
               <Styled.CopyLabel copyable={{ text: addressLabel }}>
