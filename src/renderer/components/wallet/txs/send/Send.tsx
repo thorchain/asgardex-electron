@@ -19,7 +19,7 @@ import * as Styled from '../TxForm.style'
  * success: SuccessView
  *
  * */
-type Props = {
+export type Props = {
   txRD: TxHashRD
   sendForm: JSX.Element
   inititalActionHandler?: () => void
