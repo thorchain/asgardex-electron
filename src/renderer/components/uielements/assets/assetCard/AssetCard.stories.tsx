@@ -11,6 +11,9 @@ storiesOf('Components/Assets/AssetCard', module).add('default', () => {
   const [percent, setPercent] = useState(0)
 
   const onChangeAssetAmount = useCallback((value) => setSelectedAmount(value), [])
+  const inputOnBlurHandler = () => console.log('onBlur')
+  const inputOnFocusHandler = () => console.log('onFocus')
+
   const onChangePercent = useCallback((percent) => {
     console.log('percent', percent)
     setPercent(percent)
@@ -24,6 +27,8 @@ storiesOf('Components/Assets/AssetCard', module).add('default', () => {
         assets={[AssetBNB, AssetBTC, AssetRuneNative]}
         selectedAmount={selectedAmount}
         onChangeAssetAmount={onChangeAssetAmount}
+        inputOnFocusHandler={inputOnFocusHandler}
+        inputOnBlurHandler={inputOnBlurHandler}
         onChangePercent={onChangePercent}
         price={bn(600)}
         priceIndex={{

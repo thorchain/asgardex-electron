@@ -1,7 +1,15 @@
 import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
-import { isBnbAsset, isBtcAsset, isEthAsset, isPricePoolAsset, isRuneBnbAsset, isRuneNativeAsset } from './assetHelper'
+import {
+  isBnbAsset,
+  isBtcAsset,
+  isChainAsset,
+  isEthAsset,
+  isPricePoolAsset,
+  isRuneBnbAsset,
+  isRuneNativeAsset
+} from './assetHelper'
 
 describe('helpers/assetHelper', () => {
   describe('isRuneBnbAsset', () => {
@@ -68,6 +76,18 @@ describe('helpers/assetHelper', () => {
     })
     it('returns false for deprecated asset ', () => {
       expect(isPricePoolAsset({ chain: 'BNB', symbol: 'RUNE-1AF', ticker: 'RUNE' })).toBeFalsy()
+    })
+  })
+
+  describe('isChainAsset', () => {
+    it('returns false for BNB', () => {
+      expect(isChainAsset(AssetBNB)).toBeTruthy()
+    })
+    it('returns true for RUNE Native ', () => {
+      expect(isChainAsset(AssetRuneNative)).toBeTruthy()
+    })
+    it('returns false for BUSDB', () => {
+      expect(isChainAsset(AssetBUSDBAF)).toBeFalsy()
     })
   })
 })

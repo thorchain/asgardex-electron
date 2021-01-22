@@ -13,6 +13,7 @@ import {
 import * as AU from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/lib/function'
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { BTC_DECIMAL, isBtcAsset } from '../../../../helpers/assetHelper'
@@ -38,6 +39,8 @@ type Props = {
   percentValue?: number
   withSearch?: boolean
   onChangeAssetAmount?: (value: BaseAmount) => void
+  inputOnBlurHandler?: FP.Lazy<void>
+  inputOnFocusHandler?: FP.Lazy<void>
   onChangeAsset?: (asset: Asset) => void
   onChangePercent?: (percent: number) => void
   disabled?: boolean
@@ -56,6 +59,8 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     withSearch = false,
     searchDisable = [],
     onChangeAssetAmount = (_: BaseAmount) => {},
+    inputOnBlurHandler = FP.constVoid,
+    inputOnFocusHandler = FP.constVoid,
     onChangeAsset = (_: Asset) => {},
     onChangePercent = (_: number) => {},
     children = null,
@@ -152,6 +157,8 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
                   onChange={changeAssetAmountHandler}
                   decimal={selectedAmount.decimal}
                   max={maxAmountBn.toString()}
+                  onBlur={inputOnBlurHandler}
+                  onFocus={inputOnFocusHandler}
                 />
                 <Styled.AssetCardFooter>
                   <Styled.FooterLabel>{priceLabel}</Styled.FooterLabel>
