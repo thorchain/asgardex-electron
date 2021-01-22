@@ -8,6 +8,8 @@ import * as O from 'fp-ts/lib/Option'
 import QRCode from 'qrcode'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../../../shared/api/types'
+import { truncateAddress } from '../../../../helpers/addressHelper'
 import { AssetInfo } from '../../../uielements/assets/assetInfo'
 import { BackLink } from '../../../uielements/backLink'
 import * as Styled from './Receive.style'
@@ -15,10 +17,11 @@ import * as Styled from './Receive.style'
 type Props = {
   address: O.Option<Address>
   asset: O.Option<Asset>
+  network: Network
 }
 
 export const Receive: React.FC<Props> = (props): JSX.Element => {
-  const { address: oAddress, asset: oAsset } = props
+  const { address: oAddress, asset: oAsset, network } = props
 
   const [errMsg, setErrorMsg] = useState('')
   const [hasQR, setHasQR] = useState(false)
@@ -60,6 +63,16 @@ export const Receive: React.FC<Props> = (props): JSX.Element => {
 
   const hasAddress = O.isSome(oAddress)
 
+  const renderAddress = useMemo(() => {
+    return FP.pipe(
+      oAsset,
+      O.fold(
+        () => addressLabel,
+        (asset) => truncateAddress(addressLabel, asset.chain, network)
+      )
+    )
+  }, [addressLabel, network, oAsset])
+
   return (
     <>
       <Row>
@@ -79,15 +92,9 @@ export const Receive: React.FC<Props> = (props): JSX.Element => {
             </Styled.QRWrapper>
           </Styled.Card>
           <Styled.Div>
-            {isDesktopView ? (
-              <label htmlFor="clipboard-btn">
-                <Styled.Address size="large">{addressLabel}</Styled.Address>
-              </label>
-            ) : (
-              <Styled.AddressWrapper htmlFor="clipboard-btn">
-                <Styled.Address size="large">{addressLabel}</Styled.Address>
-              </Styled.AddressWrapper>
-            )}
+            <label htmlFor="clipboard-btn">
+              <Styled.Address size="large">{isDesktopView ? addressLabel : renderAddress}</Styled.Address>
+            </label>
             {hasAddress && (
               <Styled.CopyLabel copyable={{ text: addressLabel }}>
                 {intl.formatMessage({ id: 'common.copy' })}

@@ -9,7 +9,7 @@ import { useObservableState, useSubscription } from 'observable-hooks'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
-import { AddDeposit } from '../../../components/deposit/add'
+import { SymDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
 import { ZERO_BN, ZERO_POOL_DATA } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
@@ -19,18 +19,16 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as depositRoutes from '../../../routes/deposit'
-import { SymDepositMemo, Memo } from '../../../services/chain/types'
+import { SymDepositMemo } from '../../../services/chain/types'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
-import { DepositType } from '../../../types/asgardex'
 
 type Props = {
   asset: Asset
-  type: DepositType
 }
 
-export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
+export const SymDepositView: React.FC<Props> = ({ asset }) => {
   const history = useHistory()
 
   const onChangeAsset = useCallback(
@@ -48,11 +46,9 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
 
   const {
     depositFees$,
-    asymDeposit$,
     symDeposit$,
     reloadDepositFees,
     symDepositTxMemo$,
-    asymDepositTxMemo$,
     reloadDepositFeesEffect$,
     getExplorerUrlByAsset$
   } = useChainContext()
@@ -60,8 +56,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
   // subscribe to
   useSubscription(reloadDepositFeesEffect$)
 
-  const [depositFees] = useObservableState(() => depositFees$(type), RD.initial)
-  // TODO (@Veado) Use `selectedPoolAddress$` - will be available with one of next PRs
+  const [depositFees] = useObservableState(() => depositFees$('sym'), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
   const {
@@ -114,9 +109,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
     [asset, balances]
   )
 
-  const symDepositTxMemo: O.Option<SymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
-
-  const asymDepositTxMemo: O.Option<Memo> = useObservableState(asymDepositTxMemo$, O.none)
+  const depositTxMemo: O.Option<SymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
 
   const poolAssetsRD: PoolAssetsRD = useObservableState(availableAssets$, RD.initial)
 
@@ -157,11 +150,10 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
       <>
         {/* TODO (@Veado) i18n */}
         {error && <Alert type="error" message="Something went wrong" description={error.toString()} />}
-        <AddDeposit
+        <SymDeposit
           validatePassword$={validatePassword$}
           viewRuneTx={viewRuneTx}
           viewAssetTx={viewAssetTx}
-          type={type}
           onChangeAsset={FP.constVoid}
           asset={asset}
           assetPrice={ZERO_BN}
@@ -169,18 +161,15 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
           assetBalance={O.none}
           runeBalance={O.none}
           chainAssetBalance={O.none}
-          onDeposit={FP.constVoid}
           fees={depositFees}
           reloadFees={FP.constVoid}
           priceAsset={selectedPricePoolAsset}
           disabled={true}
           poolAddress={O.none}
-          symDepositMemo={O.none}
-          asymDepositMemo={O.none}
+          memo={O.none}
           reloadBalances={reloadBalances}
           poolData={ZERO_POOL_DATA}
-          asymDeposit$={asymDeposit$}
-          symDeposit$={symDeposit$}
+          deposit$={symDeposit$}
         />
       </>
     ),
@@ -188,12 +177,10 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
       validatePassword$,
       viewRuneTx,
       viewAssetTx,
-      type,
       asset,
       depositFees,
       selectedPricePoolAsset,
       reloadBalances,
-      asymDeposit$,
       symDeposit$
     ]
   )
@@ -207,11 +194,10 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
       ([assetPrice, poolAssets, poolDetail]) => {
         return (
           <>
-            <AddDeposit
+            <SymDeposit
               validatePassword$={validatePassword$}
               viewRuneTx={viewRuneTx}
               viewAssetTx={viewAssetTx}
-              type={type}
               poolData={toPoolData(poolDetail)}
               onChangeAsset={onChangeAsset}
               asset={asset}
@@ -221,17 +207,13 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
               runeBalance={runeBalance}
               chainAssetBalance={chainAssetBalance}
               poolAddress={oPoolAddress}
-              symDepositMemo={symDepositTxMemo}
-              asymDepositMemo={asymDepositTxMemo}
-              // Placeholder for callback - will be implemented with #537
-              onDeposit={console.log}
+              memo={depositTxMemo}
               fees={depositFees}
               reloadFees={reloadDepositFees}
               priceAsset={selectedPricePoolAsset}
               reloadBalances={reloadBalances}
               assets={poolAssets}
-              asymDeposit$={asymDeposit$}
-              symDeposit$={symDeposit$}
+              deposit$={symDeposit$}
             />
           </>
         )

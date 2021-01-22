@@ -46,6 +46,7 @@ type CommonMessageKey =
   | 'common.swap'
   | 'common.liquidity'
   | 'common.step'
+  | 'common.done'
   | 'common.tx.healthCheck'
   | 'common.tx.sending'
   | 'common.tx.sendingAsset'

@@ -5,7 +5,6 @@ import { useIntl } from 'react-intl'
 
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import { DepositType } from '../../types/asgardex'
 import { AddWallet } from '../wallet/add'
 import * as Styled from './Deposit.styles'
 
@@ -20,13 +19,14 @@ type Tab = {
 type Props = {
   asset: Asset
   ShareContent: React.ComponentType<{ asset: Asset }>
-  DepositContent: React.ComponentType<{ asset: Asset; type: DepositType }>
+  AsymDepositContent: React.ComponentType<{ asset: Asset }>
+  SymDepositContent: React.ComponentType<{ asset: Asset }>
   WidthdrawContent: React.ComponentType<{ asset: Asset }>
   keystoreState: KeystoreState
 }
 
 export const Deposit: React.FC<Props> = (props) => {
-  const { ShareContent, DepositContent, WidthdrawContent, asset, keystoreState } = props
+  const { ShareContent, AsymDepositContent, SymDepositContent, WidthdrawContent, asset, keystoreState } = props
   const intl = useIntl()
 
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
@@ -37,12 +37,12 @@ export const Deposit: React.FC<Props> = (props) => {
       {
         key: 'deposit-asym',
         label: intl.formatMessage({ id: 'deposit.add.asym' }, { asset: asset.ticker }),
-        content: <DepositContent asset={asset} type="asym" />
+        content: <AsymDepositContent asset={asset} />
       },
       {
         key: 'deposit-sym',
         label: intl.formatMessage({ id: 'deposit.add.sym' }, { assetA: asset.ticker, assetB: AssetRuneNative.ticker }),
-        content: <DepositContent asset={asset} type="sym" />
+        content: <SymDepositContent asset={asset} />
       },
       {
         key: 'withdraw',
@@ -50,7 +50,7 @@ export const Deposit: React.FC<Props> = (props) => {
         content: <WidthdrawContent asset={asset} />
       }
     ],
-    [intl, asset, DepositContent, WidthdrawContent]
+    [intl, asset, AsymDepositContent, SymDepositContent, WidthdrawContent]
   )
 
   return (
