@@ -103,11 +103,11 @@ export const InputBigNumber = forwardRef<Input, Props>(
               broadcastValue.current = v
               // trigger `onChange` handler
               onChange(v)
+              // store entered value in state
+              setEnteredValue(O.some(newValue))
               return v
             })
           )
-          // store entered value in state
-          setEnteredValue(O.some(newValue))
         }
       },
       [broadcastValue, decimal, onChange]
