@@ -185,7 +185,25 @@ export const Swap = ({
     [oAssetWB]
   )
 
-  const [amountToSwap, setAmountToSwap] = useState(baseAmount(0, amountToSwapDecimal))
+  const [amountToSwap, setAmountToSwapInternal] = useState(baseAmount(0, amountToSwapDecimal))
+
+  const setAmountToSwap = useCallback(
+    (targetAmount: BaseAmount) => {
+      FP.pipe(
+        oAssetWB,
+        O.map(({ amount: maxAmount }) => {
+          const res = targetAmount.amount().isGreaterThan(maxAmount.amount())
+            ? { ...maxAmount }
+            : baseAmount(targetAmount.amount(), maxAmount.decimal)
+
+          console.log('res --- ', res.amount().toString())
+          return res
+        }),
+        O.map(setAmountToSwapInternal)
+      )
+    },
+    [setAmountToSwapInternal, oAssetWB]
+  )
 
   const setAmountToSwapFromPercentValue = useCallback(
     (percents) => {
@@ -198,7 +216,7 @@ export const Swap = ({
         })
       )
     },
-    [oAssetWB, amountToSwapDecimal]
+    [oAssetWB, amountToSwapDecimal, setAmountToSwap]
   )
 
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
