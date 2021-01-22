@@ -19,6 +19,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../../shared/api/types'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import * as AssetHelper from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
@@ -70,6 +71,7 @@ type Props = {
   sendUpgradeTx: (_: SendTxParams) => TxHashLD
   reloadUpgradeFeeHandler: FP.Lazy<void>
   upgradeFee: FeeRD
+  network: Network
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -86,7 +88,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     runeNativeAddress: oRuneNativeAddress = O.none,
     validatePassword$,
     upgradeFee,
-    reloadUpgradeFeeHandler
+    reloadUpgradeFeeHandler,
+    network
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -364,6 +367,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [upgradeTxState, isRuneBnbAsset, oRuneBnbAmount, isUpgradeFeeError]
   )
 
+  const chain = O.isSome(oAsset) ? oAsset.value.chain : ''
+
   return (
     <>
       {renderConfirmUpgradeModal}
@@ -445,11 +450,15 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           </Styled.TableHeadline>
         </Col>
         <Col span={24}>
-          <TxsTable
-            txsPageRD={txsPageRD}
-            clickTxLinkHandler={clickTxLinkHandler}
-            changePaginationHandler={onChangePagination}
-          />
+          {chain && (
+            <TxsTable
+              txsPageRD={txsPageRD}
+              clickTxLinkHandler={clickTxLinkHandler}
+              changePaginationHandler={onChangePagination}
+              chain={chain}
+              network={network}
+            />
+          )}
         </Col>
       </Row>
     </>

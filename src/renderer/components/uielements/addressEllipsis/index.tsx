@@ -1,0 +1,1 @@
+export { AddressEllipsis } from './AddressEllipsis'
