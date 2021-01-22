@@ -105,3 +105,10 @@ export const send: Route<SendParams> = {
     }
   }
 }
+
+export const upgradeBnbRune: Route<void> = {
+  template: `${assetDetail.template}/upgrade-bnb-rune`,
+  path() {
+    return this.template
+  }
+}

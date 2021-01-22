@@ -1,4 +1,16 @@
-import { base, imports, locked, settings, assets, deposits, bonds, assetDetail, send, receive } from './wallet'
+import {
+  base,
+  imports,
+  locked,
+  settings,
+  assets,
+  deposits,
+  bonds,
+  assetDetail,
+  send,
+  receive,
+  upgradeBnbRune
+} from './wallet'
 
 describe('Wallet routes', () => {
   describe('base routes', () => {
@@ -117,6 +129,15 @@ describe('Wallet routes', () => {
 
     it('redirects to base path if address is empty', () => {
       expect(send.path({ asset: 'some asset', walletAddress: '' })).toEqual(assets.path())
+    })
+  })
+
+  describe('upgrade route', () => {
+    it('template', () => {
+      expect(upgradeBnbRune.template).toEqual('/wallet/upgrade-bnb-rune')
+    })
+    it('path ', () => {
+      expect(upgradeBnbRune.path()).toEqual('/wallet/upgrade-bnb-rune')
     })
   })
 })
