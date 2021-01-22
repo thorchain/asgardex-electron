@@ -53,12 +53,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   const renderAddressWithBreak = useCallback(
     (address: Address, key: string) => (
       <Styled.Text key={key}>
-        <div>
-          <AddressEllipsis address={address} chain={chain} network={network}>
-            {/* <span>{address}</span>
-            <Styled.CopyLabel copyable={{ text: address }} /> */}
-          </AddressEllipsis>
-        </div>
+        <AddressEllipsis address={address} chain={chain} network={network} />
       </Styled.Text>
     ),
     [chain, network]

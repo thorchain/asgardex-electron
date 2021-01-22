@@ -62,9 +62,11 @@ export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
   )
 
   return (
-    <Styled.Container ref={measuredParent}>
-      <Styled.Address>{address}</Styled.Address>
-      <Styled.CopyLabel copyable={{ text: address }} />
+    <Styled.Container>
+      <Styled.AddressContainer ref={measuredParent}>
+        <Styled.Address>{address}</Styled.Address>
+        <Styled.CopyLabel copyable={{ text: address }} />
+      </Styled.AddressContainer>
     </Styled.Container>
   )
 }
