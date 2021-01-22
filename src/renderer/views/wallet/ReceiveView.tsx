@@ -17,5 +17,5 @@ export const ReceiveView: React.FC = (): JSX.Element => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  return <Receive address={O.some(walletAddress)} asset={oSelectedAsset} network={O.some(network)} />
+  return <Receive address={O.some(walletAddress)} asset={oSelectedAsset} network={network} />
 }

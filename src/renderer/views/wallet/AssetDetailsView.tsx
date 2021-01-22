@@ -171,7 +171,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         sendUpgradeTx={sendUpgradeTx}
         upgradeFee={upgradeFee}
         reloadUpgradeFeeHandler={reloadUpgradeFee}
-        network={O.some(network)}
+        network={network}
       />
     </>
   )

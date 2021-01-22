@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, Tx, Txs, TxsPage } from '@xchainjs/xchain-client'
-import { Asset, baseToAsset, formatAssetAmount } from '@xchainjs/xchain-util'
+import { baseToAsset, Chain, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/lib/function'
@@ -25,31 +25,14 @@ type Props = {
   txsPageRD: TxsPageRD
   clickTxLinkHandler: (txHash: string) => void
   changePaginationHandler: (page: number) => void
-  network: O.Option<Network>
-  asset: O.Option<Asset>
+  network: Network
+  chain: Chain
 }
 
 export const TxsTable: React.FC<Props> = (props): JSX.Element => {
-  const { txsPageRD, clickTxLinkHandler, changePaginationHandler, network: oNetwork, asset: oAsset } = props
+  const { txsPageRD, clickTxLinkHandler, changePaginationHandler, network, chain } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
-  const network = useMemo(
-    () =>
-      FP.pipe(
-        oNetwork,
-        O.getOrElse(() => '')
-      ),
-    [oNetwork]
-  )
-  const chain = useMemo(
-    () =>
-      FP.pipe(
-        oAsset,
-        O.map((asset) => asset.chain),
-        O.getOrElse(() => '')
-      ),
-    [oAsset]
-  )
 
   // store previous data of Txs to render these while reloading
   const previousTxs = useRef<O.Option<TxsPage>>(O.none)
@@ -71,9 +54,9 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     (address: Address, key: string) => (
       <Styled.Text key={key}>
         <div>
-          <AddressEllipsis chain={chain} network={network}>
-            <span>{address}</span>
-            <Styled.CopyLabel copyable={{ text: address }} />
+          <AddressEllipsis address={address} chain={chain} network={network}>
+            {/* <span>{address}</span>
+            <Styled.CopyLabel copyable={{ text: address }} /> */}
           </AddressEllipsis>
         </div>
       </Styled.Text>

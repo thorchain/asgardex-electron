@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react'
 
 import { Address } from '@xchainjs/xchain-binance'
-import { delay, Asset, Chain } from '@xchainjs/xchain-util'
+import { delay, Asset } from '@xchainjs/xchain-util'
 import { Grid, Row, Col, Spin } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -17,11 +17,11 @@ import * as Styled from './Receive.style'
 type Props = {
   address: O.Option<Address>
   asset: O.Option<Asset>
-  network: O.Option<Network>
+  network: Network
 }
 
 export const Receive: React.FC<Props> = (props): JSX.Element => {
-  const { address: oAddress, asset: oAsset, network: oNetwork } = props
+  const { address: oAddress, asset: oAsset, network } = props
 
   const [errMsg, setErrorMsg] = useState('')
   const [hasQR, setHasQR] = useState(false)
@@ -63,24 +63,7 @@ export const Receive: React.FC<Props> = (props): JSX.Element => {
 
   const hasAddress = O.isSome(oAddress)
 
-  const chain = useMemo(
-    () =>
-      FP.pipe(
-        oAsset,
-        O.map((asset) => asset.chain),
-        O.getOrElse(() => '')
-      ),
-    [oAsset]
-  )
-
-  const network = useMemo(
-    () =>
-      FP.pipe(
-        oNetwork,
-        O.getOrElse(() => '')
-      ),
-    [oNetwork]
-  )
+  const chain = O.isSome(oAsset) ? oAsset.value.chain : ''
 
   return (
     <>
@@ -103,7 +86,7 @@ export const Receive: React.FC<Props> = (props): JSX.Element => {
           <Styled.Div>
             <label htmlFor="clipboard-btn">
               <Styled.Address size="large">
-                {isDesktopView ? addressLabel : truncateAddress(addressLabel, chain as Chain, network)}
+                {!isDesktopView && chain ? truncateAddress(addressLabel, chain, network) : addressLabel}
               </Styled.Address>
             </label>
             {hasAddress && (

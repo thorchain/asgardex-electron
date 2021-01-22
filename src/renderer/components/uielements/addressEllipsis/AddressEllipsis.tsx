@@ -1,30 +1,41 @@
 import { useCallback } from 'react'
 
+import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 
+import { Network } from '../../../../shared/api/types'
 import { truncateAddress } from '../../../helpers/addressHelper'
+import * as Styled from './AddressEllipsis.style'
+
+/**
+ * Custome address ellipsis component
+ * Based on https://github.com/bluepeter/react-middle-ellipsis/
+ */
 
 type Props = {
-  chain: string
-  network: string
+  address: Address
+  chain: Chain
+  network: Network
 }
 
 export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
-  const { chain, network } = props
+  const { address, chain, network } = props
   const prepEllipse = useCallback(
-    (node: HTMLElement) => {
+    (node: HTMLElement, txtToEllipse: HTMLElement, copyIcon: HTMLElement) => {
       const parent = node.parentElement
       if (parent) {
-        const txtToEllipse: HTMLElement | null = node.childNodes[0] as HTMLElement
-        const copyIcon: HTMLElement | null = node.childNodes[1] as HTMLElement
-
-        if (txtToEllipse !== null) {
+        if (txtToEllipse) {
           if (txtToEllipse.hasAttribute('data-original')) {
             txtToEllipse.textContent = txtToEllipse.getAttribute('data-original')
           }
 
           if (
-            !isEllipse(node.offsetWidth > parent.offsetWidth ? parent : node, txtToEllipse, chain, network) &&
+            !ellipse({
+              parentNode: node.offsetWidth > parent.offsetWidth ? parent : node,
+              txtNode: txtToEllipse,
+              chain,
+              network
+            }) &&
             copyIcon
           ) {
             copyIcon.hidden = true
@@ -39,29 +50,36 @@ export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
 
   const measuredParent = useCallback(
     (node) => {
+      const prepareEllipse = () => prepEllipse(node, node.childNodes[0], node.childNodes[1])
       if (node !== null) {
-        window.addEventListener('resize', () => {
-          prepEllipse(node)
-        })
-        prepEllipse(node)
+        window.addEventListener('resize', prepareEllipse)
+        prepEllipse(node, node.childNodes[0], node.childNodes[1])
+      } else {
+        window.removeEventListener('resize', prepareEllipse)
       }
     },
     [prepEllipse]
   )
 
   return (
-    <div
-      ref={measuredParent}
-      style={{
-        wordBreak: 'keep-all',
-        overflowWrap: 'normal'
-      }}>
-      {props.children}
-    </div>
+    <Styled.Container ref={measuredParent}>
+      <Styled.Address>{address}</Styled.Address>
+      <Styled.CopyLabel copyable={{ text: address }} />
+    </Styled.Container>
   )
 }
 
-const isEllipse = (parentNode: HTMLElement, txtNode: HTMLElement, chain: string, network: string): boolean => {
+const ellipse = ({
+  parentNode,
+  txtNode,
+  chain,
+  network
+}: {
+  parentNode: HTMLElement
+  txtNode: HTMLElement
+  chain: Chain
+  network: Network
+}): boolean => {
   const containerWidth = parentNode.offsetWidth
   const txtWidth = txtNode.offsetWidth
 
@@ -78,7 +96,7 @@ const isEllipse = (parentNode: HTMLElement, txtNode: HTMLElement, chain: string,
       }
 
       if (delEachSide) {
-        txtNode.textContent = truncateAddress(str, chain as Chain, network)
+        txtNode.textContent = truncateAddress(str, chain, network)
         return true
       }
     }

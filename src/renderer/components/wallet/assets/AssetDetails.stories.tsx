@@ -81,7 +81,7 @@ export const StoryBNB: BaseStory<never, JSX.Element> = () => (
     validatePassword$={validatePasswordInitial$}
     upgradeFee={RD.initial}
     reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
-    network={O.some('testnet')}
+    network="testnet"
   />
 )
 StoryBNB.storyName = 'BNB'
@@ -97,7 +97,7 @@ export const StoryRuneTxSuccess: BaseStory<never, JSX.Element> = () => (
     validatePassword$={validatePasswordSuccess$}
     upgradeFee={upgradeFee}
     reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
-    network={O.some('testnet')}
+    network="testnet"
   />
 )
 StoryRuneTxSuccess.storyName = 'RUNE - tx success'
@@ -113,7 +113,7 @@ export const StoryRuneTxError: BaseStory<never, JSX.Element> = () => (
     validatePassword$={validatePasswordSuccess$}
     upgradeFee={upgradeFee}
     reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
-    network={O.some('testnet')}
+    network="testnet"
   />
 )
 StoryRuneTxError.storyName = 'RUNE - tx error'
@@ -128,7 +128,7 @@ export const StoryRuneNoBalances: BaseStory<never, JSX.Element> = () => (
     validatePassword$={validatePasswordInitial$}
     upgradeFee={upgradeFee}
     reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
-    network={O.some('testnet')}
+    network="testnet"
   />
 )
 StoryRuneNoBalances.storyName = 'RUNE - disabled - no balance'
@@ -143,7 +143,7 @@ export const StoryRuneFeeNotCovered: BaseStory<never, JSX.Element> = () => (
     validatePassword$={validatePasswordInitial$}
     upgradeFee={upgradeFee}
     reloadUpgradeFeeHandler={reloadUpgradeFeeHandler}
-    network={O.some('testnet')}
+    network="mainnet"
   />
 )
 StoryRuneFeeNotCovered.storyName = 'RUNE - fee not covered'

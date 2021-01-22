@@ -69,7 +69,7 @@ type Props = {
   sendUpgradeTx: (_: SendTxParams) => TxLD
   reloadUpgradeFeeHandler: FP.Lazy<void>
   upgradeFee: FeeRD
-  network: O.Option<Network>
+  network: Network
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -87,7 +87,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     validatePassword$,
     upgradeFee,
     reloadUpgradeFeeHandler,
-    network: oNetwork
+    network
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -355,6 +355,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [upgradeTxState, isRuneBnbAsset, oRuneBnbAmount, isUpgradeFeeError]
   )
 
+  const chain = O.isSome(oAsset) ? oAsset.value.chain : ''
+
   return (
     <>
       {renderConfirmUpgradeModal}
@@ -425,13 +427,15 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           </Styled.TableHeadline>
         </Col>
         <Col span={24}>
-          <TxsTable
-            txsPageRD={txsPageRD}
-            clickTxLinkHandler={clickTxLinkHandler}
-            changePaginationHandler={onChangePagination}
-            asset={oAsset}
-            network={oNetwork}
-          />
+          {chain && (
+            <TxsTable
+              txsPageRD={txsPageRD}
+              clickTxLinkHandler={clickTxLinkHandler}
+              changePaginationHandler={onChangePagination}
+              chain={chain}
+              network={network}
+            />
+          )}
         </Col>
       </Row>
     </>
