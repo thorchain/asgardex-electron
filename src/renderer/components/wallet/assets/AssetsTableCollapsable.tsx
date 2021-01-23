@@ -275,7 +275,10 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   useEffect(() => {
     // don't change openPanelKeys if user has already changed panel state
     if (!collapseChangedByUser) {
-      const keys = chainBalances.map((_, i) => i.toString())
+      const keys: string[] = []
+      chainBalances.forEach((chainBalance, index) => {
+        if (RD.isSuccess(chainBalance.balances) && chainBalance.balances.value.length) keys.push(index.toString())
+      })
       setOpenPanelKeys(keys)
     }
   }, [chainBalances, collapseChangedByUser])

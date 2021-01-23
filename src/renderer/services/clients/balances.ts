@@ -44,6 +44,7 @@ const loadBalances$ = ({
       (walletAddress) =>
         Rx.from(client.getBalance(walletAddress)).pipe(
           map(RD.success),
+          liveData.map(A.filter((balance) => !balance.amount.amount().isZero())),
           liveData.map(
             A.map((balance) => ({
               ...balance,
