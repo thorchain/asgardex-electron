@@ -6,6 +6,7 @@ import { Asset, baseToAsset, chainToString, formatAssetAmountCurrency } from '@x
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
 import { ColumnType } from 'antd/lib/table'
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -275,7 +276,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   useEffect(() => {
     // don't change openPanelKeys if user has already changed panel state
     if (!collapseChangedByUser) {
-      const keys = chainBalances.map((_, i) => i.toString())
+      // filter out empty list of balances
+      const keys = FP.pipe(
+        chainBalances,
+        A.map(({ balances }) => balances),
+        A.filterMap(RD.toOption),
+        A.filterMapWithIndex((i, balances) => (balances.length > 0 ? O.some(i.toString()) : O.none))
+      )
       setOpenPanelKeys(keys)
     }
   }, [chainBalances, collapseChangedByUser])
