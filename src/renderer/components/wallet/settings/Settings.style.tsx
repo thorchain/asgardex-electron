@@ -1,3 +1,4 @@
+import { SelectOutlined } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -266,3 +267,13 @@ export const Tooltip = styled(A.Tooltip).attrs({
     maxWidth: '500px'
   }
 })``
+
+export const AddressLinkIcon = styled(SelectOutlined)`
+  margin-left: 10px;
+  svg {
+    height: 16px;
+    width: 16px;
+    transform: scale(-1, 1) translateX(5px);
+    color: ${palette('text', 1)};
+  }
+`

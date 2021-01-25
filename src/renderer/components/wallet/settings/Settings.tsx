@@ -15,7 +15,6 @@ import { truncateAddress } from '../../../helpers/addressHelper'
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { UserAccountType } from '../../../types/wallet'
-import * as CommonStyled from '../../uielements/common/Common.style'
 import { PhraseCopyModal } from '../phrase'
 import * as Styled from './Settings.style'
 
@@ -111,12 +110,17 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                         <Styled.AccountPlaceholder>{acc.name}</Styled.AccountPlaceholder>
                         <Styled.AccountContent>
                           <Styled.AccountAddress>
-                            <label>{acc.address}</label>
+                            <label>
+                              {acc.address}
+                              <Styled.AddressLinkIcon
+                                onClick={() => clickAddressLinkHandler(item.chainName, acc.address)}
+                              />
+                            </label>
                             <label>
                               <Styled.Tooltip title={acc.address}>
                                 {truncateAddress(acc.address, item.chainName, selectedNetwork)}
                               </Styled.Tooltip>
-                              <CommonStyled.ExternalLinkIcon
+                              <Styled.AddressLinkIcon
                                 onClick={() => clickAddressLinkHandler(item.chainName, acc.address)}
                               />
                               <Styled.CopyLabel copyable={{ text: acc.address }} />
