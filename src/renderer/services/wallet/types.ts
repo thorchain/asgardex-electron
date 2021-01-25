@@ -122,3 +122,23 @@ export type LedgerTxHashLD = LiveData<LedgerApiError, string>
 
 export type LedgerAddressRD = RD.RemoteData<LedgerErrorId, Address>
 export type LedgerAddressLD = LiveData<LedgerErrorId, Address>
+
+/**
+ * State to reflect status of sending txs
+ *
+ * Two steps are needed:
+ * 1. Send tx
+ * 2. Check status of tx
+ *
+ */
+export type SendTxState = {
+  // State of steps (current step + total number of steps)
+  readonly steps: { current: number; readonly total: number }
+  // Hash of transaction
+  readonly txHash: O.Option<TxHash>
+  // RD of all steps
+  readonly status: RD.RemoteData<ApiError, void>
+}
+
+export type TxStatusRD = RD.RemoteData<ApiError, TxHash>
+export type TxStatusLD = LiveData<ApiError, TxHash>
