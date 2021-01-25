@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
+import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { Row, Col, List, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
@@ -14,6 +15,7 @@ import { truncateAddress } from '../../../helpers/addressHelper'
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { UserAccountType } from '../../../types/wallet'
+import * as CommonStyled from '../../uielements/common/Common.style'
 import { PhraseCopyModal } from '../phrase'
 import * as Styled from './Settings.style'
 
@@ -31,6 +33,7 @@ type Props = {
   removeLedgerAddress: (chain: Chain) => void
   removeAllLedgerAddress: () => void
   phrase?: O.Option<string>
+  clickAddressLinkHandler: (chain: Chain, address: Address) => void
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -52,7 +55,8 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     */
     removeAllLedgerAddress,
     changeNetwork,
-    phrase: oPhrase = O.none
+    phrase: oPhrase = O.none,
+    clickAddressLinkHandler
   } = props
 
   const [showPhrase, setShowPhrase] = useState(false)
@@ -112,6 +116,9 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                               <Styled.Tooltip title={acc.address}>
                                 {truncateAddress(acc.address, item.chainName, selectedNetwork)}
                               </Styled.Tooltip>
+                              <CommonStyled.ExternalLinkIcon
+                                onClick={() => clickAddressLinkHandler(item.chainName, acc.address)}
+                              />
                               <Styled.CopyLabel copyable={{ text: acc.address }} />
                             </label>
                           </Styled.AccountAddress>
@@ -142,7 +149,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [intl, selectedNetwork, userAccounts]
+    [clickAddressLinkHandler, intl, selectedNetwork, userAccounts]
   )
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(

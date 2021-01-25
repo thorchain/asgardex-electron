@@ -108,7 +108,6 @@ export const ClientLabel = styled(UILabel)`
   color: ${palette('text', 1)};
   font-family: 'MainFontRegular';
   font-size: 16px;
-  text-transform: uppercase;
 `
 
 export const ClientButton = styled(UILabel)`

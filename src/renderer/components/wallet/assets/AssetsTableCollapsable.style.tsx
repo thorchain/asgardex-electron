@@ -75,3 +75,13 @@ export const HideIcon = styled(EyeInvisibleOutlined)`
   */
   cursor: pointer;
 `
+
+export const CopyLabelContainer = styled.span``
+
+export const CopyLabel = styled(A.Typography.Text)`
+  text-transform: uppercase;
+  color: ${palette('primary', 0)};
+  svg {
+    color: ${palette('primary', 0)};
+  }
+`

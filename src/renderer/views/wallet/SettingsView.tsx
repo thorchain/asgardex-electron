@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { Chain, THORChain } from '@xchainjs/xchain-util'
 import { Col, notification, Row } from 'antd'
+import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -39,7 +41,12 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const bitcoinContext = useBitcoinContext()
   const thorchaincontext = useThorchainContext()
   const chainContext = useChainContext()
-  const { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } = chainContext
+  const {
+    retrieveLedgerAddress,
+    removeLedgerAddress,
+    removeAllLedgerAddress,
+    getExplorerAddressByChain$
+  } = chainContext
 
   const phrase$ = useMemo(() => pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
   const phrase = useObservableState(phrase$, O.none)
@@ -187,6 +194,12 @@ export const SettingsView: React.FC = (): JSX.Element => {
 
   const apiVersion = envOrDefault($VERSION, '-')
 
+  const getExplorerAddressUrl = useObservableState(getExplorerAddressByChain$('BNB'), O.none)
+  const clickAddressLinkHandler = (chain: Chain, address: Address) => {
+    console.log('how to use the param chain in getExplorerAddressUrl')
+    FP.pipe(getExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+  }
+
   useEffect(() => {
     const getLedgerErrorDescription = (ledgerAddress: RD.RemoteData<LedgerErrorId, string>, chain: Chain) => {
       if (RD.isFailure(ledgerAddress)) {
@@ -240,6 +253,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           removeLedgerAddress={removeLedgerAddress}
           removeAllLedgerAddress={removeAllLedgerAddress}
           phrase={phrase}
+          clickAddressLinkHandler={clickAddressLinkHandler}
         />
       </Col>
     </Row>

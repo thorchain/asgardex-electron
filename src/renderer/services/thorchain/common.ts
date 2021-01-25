@@ -68,4 +68,9 @@ const address$: C.Address$ = C.address$(client$)
  */
 const getExplorerTxUrl$: C.GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
 
-export { client$, clientState$, address$, getExplorerTxUrl$ }
+/**
+ * Explorer url depending on selected network
+ */
+const getExplorerAddressUrl$: C.GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
+
+export { client$, clientState$, address$, getExplorerTxUrl$, getExplorerAddressUrl$ }

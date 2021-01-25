@@ -52,8 +52,11 @@ export type WalletBalancesLD = LiveData<ApiError, WalletBalances>
 
 export type ExplorerUrl$ = Rx.Observable<O.Option<string>>
 export type GetExplorerTxUrl = (txHash: string) => string
+export type GetExplorerAddressUrl = (address: string) => string
 
 export type GetExplorerTxUrl$ = Rx.Observable<O.Option<GetExplorerTxUrl>>
+
+export type GetExplorerAddressUrl$ = Rx.Observable<O.Option<GetExplorerAddressUrl>>
 
 export type Address$ = Rx.Observable<O.Option<Address>>
 
