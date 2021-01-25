@@ -4,8 +4,22 @@ import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
 
-import { STORE_FILES } from '../const'
 import { Locale } from '../i18n/types'
+
+export type CommonStorage = Readonly<{ locale: Locale }>
+
+/**
+ * Hash map of common store files
+ * Record<fileName, defaultValues>
+ * fileNames are available files to store data
+ * @see StoreFileName
+ */
+export type StoreFilesContent = Readonly<{
+  commonStorage: CommonStorage
+}>
+
+export type StoreFileName = keyof StoreFilesContent
+export type StoreFileData<FileName extends StoreFileName> = StoreFilesContent[FileName]
 
 export type ApiKeystore = {
   save: (keystore: Keystore) => Promise<void>
@@ -16,14 +30,12 @@ export type ApiKeystore = {
   load: () => Promise<Keystore>
 }
 
-export type StoreFileName = keyof typeof STORE_FILES
-export type StoreFileData<FileName extends StoreFileName> = typeof STORE_FILES[FileName]
-
 /**
  * Available public API interface to interact with files at the file system
  */
 export type ApiFileStoreService<T> = {
-  save: (data: T) => Promise<void>
+  // Returns new state
+  save: (data: Partial<T>) => Promise<T>
   remove: () => Promise<void>
   get: () => Promise<T>
   exists: () => Promise<boolean>
@@ -76,6 +88,6 @@ declare global {
     apiLang: ApiLang
     apiUrl: ApiUrl
     apiHDWallet: ApiHDWallet
-    apiConfig: ApiFileStoreService<StoreFileData<'config'>>
+    commonStorage: ApiFileStoreService<StoreFileData<'commonStorage'>>
   }
 }

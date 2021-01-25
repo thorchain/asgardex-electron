@@ -25,4 +25,4 @@ contextBridge.exposeInMainWorld('apiUrl', apiUrl)
 // `apiHDWallet` object
 contextBridge.exposeInMainWorld('apiHDWallet', apiHDWallet)
 // `configStoreFileService` object
-contextBridge.exposeInMainWorld('apiConfig', getFileStoreApi('config'))
+contextBridge.exposeInMainWorld('commonStorage', getFileStoreApi('commonStorage'))

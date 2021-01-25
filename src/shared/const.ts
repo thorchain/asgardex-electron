@@ -1,4 +1,5 @@
 import { envOrDefault } from '../renderer/helpers/envHelper'
+import { StoreFilesContent } from './api/types'
 import { Locale } from './i18n/types'
 
 export const IS_PRODUCTION = envOrDefault(process.env.NODE_ENV, '') === 'production'
@@ -13,11 +14,9 @@ export enum ExternalUrl {
 }
 
 /**
- * Hash map of common store files
- * Record<fileName, defaultValues>
- * fileName - will be available files to store data
- * @see StoreFileName type at the /src/shared/api/types.ts
+ * When adding a new store file do not forget to expose
+ * public api for it at src/main/preload.ts
  */
-export const STORE_FILES = {
-  config: { locale: Locale.EN }
-} as const
+export const STORE_FILES_DEFAULTS: StoreFilesContent = {
+  commonStorage: { locale: Locale.EN }
+}

@@ -40,7 +40,8 @@ const getFileContent = async <T>(fullFilePathname: string, defaultValue: T): Pro
 const saveFile = async <T>(fullFilePathname: string, data: Partial<T>, defaultValue: T) => {
   const fileData = await getFileContent(fullFilePathname, defaultValue)
   // Combine Partial data with previously saved data
-  return fs.writeJSON(fullFilePathname, { ...fileData, ...data })
+  await fs.writeJSON(fullFilePathname, { ...fileData, ...data })
+  return await getFileContent(fullFilePathname, defaultValue)
 }
 
 export const getFileStoreService = <T extends object>(fileStoreName: StoreFileName, defaultValue: T) => {
@@ -63,14 +64,14 @@ export const getFileStoreService = <T extends object>(fileStoreName: StoreFileNa
 
 /**
  * Provides real-world-to-electron public API  for
- * declared STORE_FILES (src/shared/const.ts) only
+ * declared STORE_FILES_DEFAULTS (src/shared/const.ts) only
  */
 export const getFileStoreApi = <FileName extends StoreFileName>(
   storeFileName: FileName
 ): ApiFileStoreService<StoreFileData<FileName>> => {
   const ipcMessages = getStoreFilesIPCMessages(storeFileName)
   return {
-    save: (data: StoreFileData<FileName>) => ipcRenderer.invoke(ipcMessages.SAVE_FILE, data),
+    save: (data) => ipcRenderer.invoke(ipcMessages.SAVE_FILE, data),
     remove: () => ipcRenderer.invoke(ipcMessages.REMOVE_FILE),
     get: () => ipcRenderer.invoke(ipcMessages.GET_FILE),
     exists: () => ipcRenderer.invoke(ipcMessages.FILE_EXIST)
