@@ -255,7 +255,16 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             <Styled.HeaderLabel>{chainToString(chain)}</Styled.HeaderLabel>
           </Col>
           <Col xs={0} md={12} lg={10}>
-            <Styled.HeaderAddress>{walletAddress}</Styled.HeaderAddress>
+            <Styled.HeaderAddress>
+              {walletAddress}
+              <Styled.CopyLabelContainer
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                }}>
+                <Styled.CopyLabel copyable={{ text: walletAddress }} />
+              </Styled.CopyLabelContainer>
+            </Styled.HeaderAddress>
           </Col>
           <Col xs={10} md={6} lg={10}>
             <Styled.HeaderLabel

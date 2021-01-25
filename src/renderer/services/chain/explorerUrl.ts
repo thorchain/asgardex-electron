@@ -4,7 +4,7 @@ import * as Rx from 'rxjs'
 
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
-import { GetExplorerTxUrl$ } from '../clients'
+import { GetExplorerAddressUrl$, GetExplorerTxUrl$ } from '../clients'
 import * as THOR from '../thorchain'
 
 const explorerUrlFailure$ = Rx.of(O.none)
@@ -40,4 +40,34 @@ const getExplorerUrlByAsset$ = (asset: Asset | null): GetExplorerTxUrl$ => {
   }
 }
 
-export { getExplorerUrlByAsset$ }
+/**
+ * Coin-based Explorer url depending on selected network
+ */
+const getExplorerAddressByChain$ = (chain: string): GetExplorerAddressUrl$ => {
+  switch (chain) {
+    case BNBChain:
+      return BNB.getExplorerAddressUrl$
+
+    case BTCChain:
+      return BTC.getExplorerAddressUrl$
+
+    case ETHChain:
+      // not available yet
+      return explorerUrlFailure$
+
+    case THORChain:
+      return THOR.getExplorerAddressUrl$
+
+    case CosmosChain:
+      // not available yet
+      return explorerUrlFailure$
+
+    case PolkadotChain:
+      // not available yet
+      return explorerUrlFailure$
+  }
+
+  return explorerUrlFailure$
+}
+
+export { getExplorerUrlByAsset$, getExplorerAddressByChain$ }

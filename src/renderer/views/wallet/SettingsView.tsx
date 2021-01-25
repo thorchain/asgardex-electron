@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Chain, THORChain } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-client'
+import { BNBChain, BTCChain, Chain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
 import { Col, notification, Row } from 'antd'
+import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -39,7 +41,12 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const bitcoinContext = useBitcoinContext()
   const thorchaincontext = useThorchainContext()
   const chainContext = useChainContext()
-  const { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } = chainContext
+  const {
+    retrieveLedgerAddress,
+    removeLedgerAddress,
+    removeAllLedgerAddress,
+    getExplorerAddressByChain$
+  } = chainContext
 
   const phrase$ = useMemo(() => pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
   const phrase = useObservableState(phrase$, O.none)
@@ -187,6 +194,36 @@ export const SettingsView: React.FC = (): JSX.Element => {
 
   const apiVersion = envOrDefault($VERSION, '-')
 
+  const getBNBExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(BNBChain), O.none)
+  const getBTCExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(BTCChain), O.none)
+  const getETHExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(ETHChain), O.none)
+  const getTHORExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(THORChain), O.none)
+  const getCosmosExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(CosmosChain), O.none)
+  const getPolkadotExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(PolkadotChain), O.none)
+
+  const clickAddressLinkHandler = (chain: Chain, address: Address) => {
+    switch (chain) {
+      case BNBChain:
+        FP.pipe(getBNBExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case BTCChain:
+        FP.pipe(getBTCExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case ETHChain:
+        FP.pipe(getETHExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case THORChain:
+        FP.pipe(getTHORExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case CosmosChain:
+        FP.pipe(getCosmosExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case PolkadotChain:
+        FP.pipe(getPolkadotExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+    }
+  }
+
   useEffect(() => {
     const getLedgerErrorDescription = (ledgerAddress: RD.RemoteData<LedgerErrorId, string>, chain: Chain) => {
       if (RD.isFailure(ledgerAddress)) {
@@ -240,6 +277,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           removeLedgerAddress={removeLedgerAddress}
           removeAllLedgerAddress={removeAllLedgerAddress}
           phrase={phrase}
+          clickAddressLinkHandler={clickAddressLinkHandler}
         />
       </Col>
     </Row>

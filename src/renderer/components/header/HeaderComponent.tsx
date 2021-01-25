@@ -257,11 +257,11 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
               </Col>
               <Col>
                 <Row align="middle">
+                  {renderHeaderLang}
                   {renderHeaderCurrency}
                   <HeaderTheme isDesktopView={isDesktopView} />
                   {renderHeaderLock}
                   {renderHeaderSettings}
-                  {renderHeaderLang}
                 </Row>
               </Col>
             </>
@@ -301,13 +301,13 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
             visible={menuVisible}
             key="top">
             {links}
+            <HeaderDrawerItem>{renderHeaderLang}</HeaderDrawerItem>
             <HeaderDrawerItem>{renderHeaderCurrency}</HeaderDrawerItem>
             <HeaderDrawerItem>
               <HeaderTheme isDesktopView={isDesktopView} />
             </HeaderDrawerItem>
             <HeaderDrawerItem>{renderHeaderLock}</HeaderDrawerItem>
             <HeaderDrawerItem>{renderHeaderSettings}</HeaderDrawerItem>
-            <HeaderDrawerItem>{renderHeaderLang}</HeaderDrawerItem>
             {renderHeaderNetStatus}
           </HeaderDrawer>
         )}
