@@ -2,6 +2,8 @@ import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
+import * as A from 'fp-ts/lib/Array'
+import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 
@@ -16,7 +18,10 @@ export const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
   const { chainBalances$ } = useWalletContext()
 
-  const chainBalances = useObservableState(chainBalances$, [] as ChainBalances)
+  const chainBalances = FP.pipe(
+    useObservableState(chainBalances$, [] as ChainBalances),
+    A.filter((chainBalance) => RD.isSuccess(chainBalance.balances))
+  )
 
   const {
     service: {
