@@ -276,15 +276,12 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   useEffect(() => {
     // don't change openPanelKeys if user has already changed panel state
     if (!collapseChangedByUser) {
+      // filter out empty list of balances
       const keys = FP.pipe(
         chainBalances,
         A.map(({ balances }) => balances),
         A.filterMap(RD.toOption),
-        A.filterMapWithIndex((i, balances) =>
-          balances.length === 0 || (balances.length === 1 && balances[0].amount.amount().isZero())
-            ? O.none
-            : O.some(i.toString())
-        )
+        A.filterMapWithIndex((i, balances) => (balances.length > 0 ? O.some(i.toString()) : O.none))
       )
       setOpenPanelKeys(keys)
     }

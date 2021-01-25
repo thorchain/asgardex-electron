@@ -2,10 +2,10 @@ import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
-import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
+import * as RxOp from 'rxjs/operators'
 
 import { AssetsTableCollapsable } from '../../components/wallet/assets/AssetsTableCollapsable'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -18,9 +18,21 @@ export const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
   const { chainBalances$ } = useWalletContext()
 
-  const chainBalances = FP.pipe(
-    useObservableState(chainBalances$, [] as ChainBalances),
-    A.filter((chainBalance) => RD.isSuccess(chainBalance.balances))
+  // accept balances > 0 only
+  const [chainBalances] = useObservableState(
+    () =>
+      chainBalances$.pipe(
+        RxOp.map((chainBalances) =>
+          chainBalances.map((chainBalance) => ({
+            ...chainBalance,
+            balances: FP.pipe(
+              chainBalance.balances,
+              RD.map((balances) => balances.filter((balance) => balance.amount.amount().isGreaterThan(0)))
+            )
+          }))
+        )
+      ),
+    [] as ChainBalances
   )
 
   const {
