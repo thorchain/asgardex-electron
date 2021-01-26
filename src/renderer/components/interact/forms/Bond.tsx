@@ -17,9 +17,7 @@ import { useIntl } from 'react-intl'
 import { Input, InputBigNumber } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 
-const bondMemoPlaceholder = getBondMemo('THORADDRESS')
-
-type FormValues = { memo: string; amount: BigNumber }
+type FormValues = { thorAddress: string; amount: BigNumber }
 
 type Props = {
   onFinish: (boundData: { memo: string; amount: BaseAmount }) => void
@@ -32,9 +30,9 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading =
   const [form] = Form.useForm<FormValues>()
 
   const onFinish = useCallback(
-    ({ memo, amount }: FormValues) => {
+    ({ thorAddress, amount }: FormValues) => {
       onFinishProp({
-        memo,
+        memo: getBondMemo(thorAddress),
         amount: assetToBase(assetAmount(amount))
       })
     },
@@ -62,19 +60,23 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading =
   )
 
   return (
-    <Styled.Form form={form} onFinish={onFinish} initialValues={{ memo: bondMemoPlaceholder }}>
+    <Styled.Form form={form} onFinish={onFinish} initialValues={{ thorAddress: '' }}>
       <div>
         <Styled.InputContainer>
-          <Styled.InputLabel>{intl.formatMessage({ id: 'common.memo' })}</Styled.InputLabel>
+          <Styled.InputLabel>{intl.formatMessage({ id: 'common.thorAddress' })}</Styled.InputLabel>
           <Form.Item
-            name="memo"
+            name="thorAddress"
             rules={[
               {
                 required: true,
                 message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' })
               }
             ]}>
-            <Input disabled={isLoading} size="large" placeholder={bondMemoPlaceholder} />
+            <Input
+              disabled={isLoading}
+              size="large"
+              placeholder={intl.formatMessage({ id: 'common.thorAddress' }).toLowerCase()}
+            />
           </Form.Item>
         </Styled.InputContainer>
 

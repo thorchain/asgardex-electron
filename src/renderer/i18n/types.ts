@@ -47,6 +47,7 @@ type CommonMessageKey =
   | 'common.liquidity'
   | 'common.step'
   | 'common.done'
+  | 'common.thorAddress'
   | 'common.tx.healthCheck'
   | 'common.tx.sending'
   | 'common.tx.sendingAsset'
