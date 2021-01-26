@@ -169,7 +169,8 @@ storiesOf('Components/button/Button', module)
       outline: 'outline',
       normal: 'normal',
       ghost: 'ghost',
-      transparent: 'transparent'
+      transparent: 'transparent',
+      underline: 'underline'
     }
 
     const size = radios('size', sizeOptions, 'normal')

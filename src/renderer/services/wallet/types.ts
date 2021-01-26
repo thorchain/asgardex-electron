@@ -34,7 +34,7 @@ export type ImportKeystoreLD = LiveData<Error, void>
 export type LoadKeystoreLD = LiveData<Error, Keystore>
 
 export type KeystoreService = {
-  keystore$: Observable<KeystoreState>
+  keystore$: Rx.Observable<KeystoreState>
   addKeystore: (phrase: Phrase, password: string) => Promise<void>
   removeKeystore: () => Promise<void>
   importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
@@ -60,12 +60,12 @@ export type ChainBalance = {
   balances: WalletBalancesRD
 }
 
-export type ChainBalance$ = Observable<ChainBalance>
+export type ChainBalance$ = Rx.Observable<ChainBalance>
 export type ChainBalanceRD = RD.RemoteData<ApiError, ChainBalance>
 export type ChainBalanceLD = LiveData<ApiError, ChainBalance>
 
 export type ChainBalances = ChainBalance[]
-export type ChainBalances$ = Observable<ChainBalances>
+export type ChainBalances$ = Rx.Observable<ChainBalances>
 export type ChainBalancesRD = RD.RemoteData<ApiError, ChainBalances>
 export type ChainBalancesLD = LiveData<ApiError, ChainBalances>
 

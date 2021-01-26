@@ -12,10 +12,7 @@ export const Label = styled(UILabel).attrs({
   padding: 0;
 `
 
-export const Button = styled(UIButton).attrs({
-  typevalue: 'underline',
-  sizevalue: 'normal'
-})`
+export const Button = styled(UIButton)`
   padding: 0px;
   min-width: auto !important;
   margin-right: 5px;

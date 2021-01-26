@@ -26,12 +26,12 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
   return (
     <Row align="middle">
       <Col>
-        <Styled.Button onClick={onClickHandler} disabled={disabled} {...otherProps}>
+        <Styled.Button onClick={onClickHandler} disabled={disabled} typevalue="underline" {...otherProps}>
           {intl.formatMessage({ id: 'common.max' })}:
         </Styled.Button>
       </Col>
       <Col flex="auto">
-        <Styled.Label size="big" style={{ paddingBottom: '0px' }} disabled={disabled}>
+        <Styled.Label style={{ paddingBottom: '0px' }} disabled={disabled}>
           {formatAssetAmountCurrency({
             amount: baseToAsset(amount),
             asset,
