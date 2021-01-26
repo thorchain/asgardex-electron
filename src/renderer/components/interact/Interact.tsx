@@ -18,22 +18,38 @@ export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveCon
     () => [
       {
         key: 'bond',
-        label: intl.formatMessage({ id: 'deposit.interact.actions.bond' }),
+        label: (isActive: boolean) => (
+          <Styled.TabLabel isActive={isActive}>
+            {intl.formatMessage({ id: 'deposit.interact.actions.bond' })}
+          </Styled.TabLabel>
+        ),
         content: bondContent
       },
       {
         key: 'unbond',
-        label: intl.formatMessage({ id: 'deposit.interact.actions.unbond' }),
+        label: (isActive: boolean) => (
+          <Styled.UnbondLabel isActive={isActive}>
+            {intl.formatMessage({ id: 'deposit.interact.actions.unbond' })}
+          </Styled.UnbondLabel>
+        ),
         content: unbondContent
       },
       {
         key: 'leave',
-        label: intl.formatMessage({ id: 'deposit.interact.actions.leave' }),
+        label: (isActive: boolean) => (
+          <Styled.LeaveLabel isActive={isActive}>
+            {intl.formatMessage({ id: 'deposit.interact.actions.leave' })}
+          </Styled.LeaveLabel>
+        ),
         content: leaveContent
       },
       {
         key: 'other',
-        label: intl.formatMessage({ id: 'deposit.interact.actions.custom' }),
+        label: (isActive: boolean) => (
+          <Styled.TabLabel isActive={isActive}>
+            {intl.formatMessage({ id: 'deposit.interact.actions.custom' })}
+          </Styled.TabLabel>
+        ),
         content: otherContent
       }
     ],
@@ -58,11 +74,8 @@ export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveCon
           renderTabBar={() => (
             <Styled.TabButtonsContainer>
               {tabs.map((tab) => (
-                <Styled.TabButton
-                  isActive={tab.key === activeTabKey}
-                  key={tab.key}
-                  onClick={() => setActiveTabKey(tab.key)}>
-                  {tab.label}
+                <Styled.TabButton key={tab.key} onClick={() => setActiveTabKey(tab.key)}>
+                  {tab.label(tab.key === activeTabKey)}
                 </Styled.TabButton>
               ))}
             </Styled.TabButtonsContainer>
