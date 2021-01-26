@@ -191,6 +191,7 @@ type DepositMessageKey =
   | 'deposit.interact.actions.bond'
   | 'deposit.interact.actions.unbond'
   | 'deposit.interact.actions.leave'
+  | 'deposit.interact.actions.custom'
   | 'deposit.share.title'
   | 'deposit.share.units'
   | 'deposit.share.poolshare'
