@@ -53,6 +53,7 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
         <InputBigNumber
           value={baseToAsset(amount).amount()}
           onChange={onChangeHandler}
+          size={'large'}
           {...inputProps}
           decimal={amount.decimal}
         />

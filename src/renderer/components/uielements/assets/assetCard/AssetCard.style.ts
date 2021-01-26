@@ -96,8 +96,9 @@ export const AssetSelect = styled(BaseAssetSelect)`
   }
 `
 
-export const InputBigNumber = styled(BaseInputBigNumber)`
-  font-size: 18px;
+export const InputBigNumber = styled(BaseInputBigNumber).attrs({
+  size: 'large'
+})`
   padding: 0;
   margin-bottom: 5px;
   box-shadow: none !important;
