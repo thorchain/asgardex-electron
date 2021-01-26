@@ -184,6 +184,14 @@ const getThemes = () => {
       }
     }
 
+    value.underline = {
+      text: palette('success', 0),
+      action: {
+        text: palette('success', 1),
+        background: 'transparent'
+      }
+    }
+
     theme[colorType as ButtonColor] = value
   })
 
@@ -222,6 +230,7 @@ export const ButtonWrapper = styled(Button)<Props>`
     box-shadow: none; /* overridden */
 
     text-transform: uppercase;
+    text-decoration: ${({ typevalue }) => (typevalue === 'underline' ? 'underline' : 'none')};
 
     /* set theme colors away from antd defaults */
     &,
@@ -261,6 +270,7 @@ export const ButtonWrapper = styled(Button)<Props>`
       &:focus,
       &:active {
         color: ${(props) => getThemeValue(props.color, props.typevalue)?.action?.text ?? ''};
+        text-decoration: ${({ typevalue }) => (typevalue === 'underline' ? 'underline' : 'none')};
         border-color: ${(props) => getThemeValue(props.color, props.typevalue)?.action?.border ?? 'transparent'};
         background: ${(props) =>
           props.typevalue === 'normal'

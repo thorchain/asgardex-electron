@@ -4,7 +4,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 
 import { ApiError, ErrorId } from '../../../../services/wallet/types'
-import { Default as UpgradeDefault, Pending as UpgradePending } from '../upgrade/UpgradeForm.stories'
 import { Send, Props as SendProps } from './Send'
 import { SendBnb, Pending as SendBnbPending } from './SendFormBNB.stories'
 
@@ -35,7 +34,7 @@ export const Error: Story = () => {
   const props: SendProps = {
     ...defaultProps,
     txRD: RD.failure<ApiError>({ errorId: ErrorId.SEND_TX, msg: 'Sending tx failed' }),
-    sendForm: <UpgradeDefault />
+    sendForm: <SendBnb />
   }
   return <Send {...props} />
 }
@@ -45,23 +44,11 @@ export const Success: Story = () => {
   const props: SendProps = {
     ...defaultProps,
     txRD: RD.success('0xabc123'),
-    sendForm: <UpgradeDefault />
+    sendForm: <SendBnb />
   }
   return <Send {...props} />
 }
 Success.storyName = 'success'
-
-export const DefaultUpgrade: Story = () => {
-  const props: SendProps = { ...defaultProps, sendForm: <UpgradeDefault /> }
-  return <Send {...props} />
-}
-DefaultUpgrade.storyName = 'upgrade - default'
-
-export const PendingUpgrade: Story = () => {
-  const props: SendProps = { ...defaultProps, txRD: RD.pending, sendForm: <UpgradePending /> }
-  return <Send {...props} />
-}
-PendingUpgrade.storyName = 'upgrade - pending'
 
 const meta: Meta = {
   component: Send,

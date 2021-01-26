@@ -5,28 +5,26 @@ import { getSwitchMemo } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
-  AssetAmount,
+  assetAmount,
   AssetBNB,
-  baseAmount,
+  assetToBase,
   BaseAmount,
   baseToAsset,
-  bn,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
-import { Row, Form } from 'antd'
+import { Row, Form, Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
-import { ZERO_ASSET_AMOUNT } from '../../../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { getChainAsset } from '../../../../helpers/chainHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getBnbAmountFromBalances, getRuneBnBAmountFromBalances } from '../../../../helpers/walletHelper'
 import { SendTxParams } from '../../../../services/binance/types'
 import { FeeRD } from '../../../../services/chain/types'
-import { GetExplorerTxUrl } from '../../../../services/clients'
 import { PoolAddressRD } from '../../../../services/midgard/types'
 import { NonEmptyWalletBalances, TxHashLD, TxHashRD, ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { PasswordModal } from '../../../modal/password'
@@ -61,14 +59,15 @@ export type Props = {
   sendUpgradeTx: (_: SendTxParams) => TxHashLD
   balances: O.Option<NonEmptyWalletBalances>
   reloadFeeHandler: FP.Lazy<void>
-  getExplorerTxUrl: GetExplorerTxUrl
   successActionHandler?: (txHash: string) => Promise<void>
   errorActionHandler?: FP.Lazy<void>
 }
 
 type FormValues = {
-  amount: string
+  amount: BigNumber
 }
+
+const INITIAL_FORM_VALUES: FormValues = { amount: ZERO_BN }
 
 export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const {
@@ -94,6 +93,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const [upgradeTxSub, setUpgradeTxSub] = useState<O.Option<Rx.Subscription>>(O.none)
   // State of upgrade tx
   const [upgradeTxState, setUpgradeTxState] = useState<UpgradeTxState>({ txRD: RD.initial })
+  const [amountToUpgrade, setAmountToUpgrade] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 
   // unsubscribe of (possible) previous subscription of upgrade tx
   // It will be called whenever state of `bnbTxSub` changed
@@ -106,38 +106,40 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     }
   }, [upgradeTxSub])
 
-  const oRuneBnbAmount: O.Option<AssetAmount> = useMemo(
-    () =>
-      FP.pipe(
-        oBalances,
-        O.chain((balances) => getRuneBnBAmountFromBalances(balances))
-      ),
+  const oRuneBnbAmount: O.Option<BaseAmount> = useMemo(
+    () => FP.pipe(oBalances, O.chain(FP.flow(getRuneBnBAmountFromBalances, O.map(assetToBase)))),
     [oBalances]
   )
 
-  const oBnbAmount: O.Option<AssetAmount> = useMemo(
-    () =>
-      FP.pipe(
-        oBalances,
-        O.chain((balances) => getBnbAmountFromBalances(balances))
-      ),
+  const oBnbAmount: O.Option<BaseAmount> = useMemo(
+    () => FP.pipe(oBalances, O.chain(FP.flow(getBnbAmountFromBalances, O.map(assetToBase)))),
     [oBalances]
   )
 
-  const maxAmount: AssetAmount = useMemo(
+  const maxAmount: BaseAmount = useMemo(
     () =>
       FP.pipe(
         oRuneBnbAmount,
-        O.getOrElse(() => ZERO_ASSET_AMOUNT)
+        O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
     [oRuneBnbAmount]
   )
+
+  useEffect(() => {
+    setAmountToUpgrade(maxAmount)
+  }, [maxAmount])
+
+  useEffect(() => {
+    form.setFieldsValue({
+      amount: baseToAsset(amountToUpgrade).amount()
+    })
+  }, [amountToUpgrade, form])
 
   const amountValidator = useCallback(
     async (_: unknown, value: BigNumber) =>
       validateTxAmountInput({
         input: value,
-        maxAmount,
+        maxAmount: baseToAsset(maxAmount),
         errors: {
           msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
           msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
@@ -147,27 +149,29 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [intl, maxAmount]
   )
 
-  const onSubmit = useCallback(
-    ({ amount }: FormValues) => {
-      FP.pipe(
-        RD.toOption(bnbPoolAddressRD),
-        O.map((bnbPoolAddress) => {
-          const memo = getSwitchMemo(runeNativeAddress)
-          const subscription = sendUpgradeTx({
-            recipient: bnbPoolAddress,
-            amount: baseAmount(amount),
-            asset: runeAsset,
-            memo
-          }).subscribe((txRD) => {
-            setUpgradeTxState({ txRD })
-          })
-          // store subscription
-          setUpgradeTxSub(O.some(subscription))
+  const onChangeInput = useCallback((value: BigNumber) => setAmountToUpgrade(assetToBase(assetAmount(value))), [])
+
+  const onSubmit = useCallback(() => setShowConfirmUpgradeModal(true), [])
+
+  const upgrade = useCallback(() => {
+    FP.pipe(
+      RD.toOption(bnbPoolAddressRD),
+      O.map((bnbPoolAddress) => {
+        const memo = getSwitchMemo(runeNativeAddress)
+        const subscription = sendUpgradeTx({
+          recipient: bnbPoolAddress,
+          amount: amountToUpgrade,
+          asset: runeAsset,
+          memo
+        }).subscribe((txRD) => {
+          setUpgradeTxState({ txRD })
         })
-      )
-    },
-    [bnbPoolAddressRD, runeAsset, runeNativeAddress, sendUpgradeTx]
-  )
+        // store subscription
+        setUpgradeTxSub(O.some(subscription))
+        return true
+      })
+    )
+  }, [amountToUpgrade, bnbPoolAddressRD, runeAsset, runeNativeAddress, sendUpgradeTx])
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
 
@@ -197,7 +201,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
               trimZeros: true
             }),
             balance: formatAssetAmountCurrency({
-              amount: bnbAmount,
+              amount: baseToAsset(bnbAmount),
               asset: AssetBNB,
               trimZeros: true
             })
@@ -241,17 +245,27 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [intl, successActionHandler]
   )
 
+  const addMaxAmountHandler = useCallback(() => setAmountToUpgrade(maxAmount), [maxAmount])
+
+  const isLoading = useMemo(() => RD.isPending(upgradeTxState.txRD), [upgradeTxState.txRD])
+
+  const isDisabled: boolean = useMemo(
+    () =>
+      isFeeError ||
+      FP.pipe(
+        oRuneBnbAmount,
+        O.map((amount) => amount.amount().isLessThanOrEqualTo(0) || RD.isPending(upgradeTxState.txRD)),
+        O.getOrElse<boolean>(() => true)
+      ),
+    [isFeeError, oRuneBnbAmount, upgradeTxState.txRD]
+  )
+
   const renderUpgradeForm = useMemo(
     () => (
       <Row>
         <Styled.Col span={24}>
           <AccountSelector selectedAsset={runeAsset} walletBalances={[]} />
-          <Styled.Form
-            form={form}
-            initialValues={{ amount: bn(0) }}
-            onFinish={onSubmit}
-            labelCol={{ span: 24 }}
-            style={{ padding: '30px' }}>
+          <Styled.Form form={form} initialValues={INITIAL_FORM_VALUES} onFinish={onSubmit} labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
               <Styled.FormItem
@@ -262,23 +276,31 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
                   }
                 ]}
                 name="amount">
-                <InputBigNumber min={0} size="large" disabled={isLoading} decimal={8} />
+                <InputBigNumber size="large" disabled={isLoading} decimal={8} onChange={onChangeInput} />
               </Styled.FormItem>
-              <Styled.Label size="big">
-                {intl.formatMessage({ id: 'common.max' })}:{' '}
-                {formatAssetAmountCurrency({
-                  amount: maxAmount,
-                  asset: runeAsset,
-                  trimZeros: true
-                })}
-              </Styled.Label>
-              <Styled.FeeRow>
+              <Row align="middle">
+                <Col>
+                  <Styled.ButtonMax onClick={addMaxAmountHandler}>
+                    {intl.formatMessage({ id: 'common.max' })}:
+                  </Styled.ButtonMax>
+                </Col>
+                <Col flex="auto">
+                  <Styled.Label size="big" style={{ paddingBottom: '0px' }}>
+                    {formatAssetAmountCurrency({
+                      amount: baseToAsset(maxAmount),
+                      asset: runeAsset,
+                      trimZeros: true
+                    })}
+                  </Styled.Label>
+                </Col>
+              </Row>
+              <Row>
                 <Fees fees={uiFeesRD} reloadFees={reloadFeeHandler} />
-              </Styled.FeeRow>
+              </Row>
               {renderFeeError}
             </Styled.SubForm>
             <Styled.SubmitItem>
-              <Styled.Button loading={isLoading} color="warning" disabled={isFeeError} htmlType="submit">
+              <Styled.Button loading={isLoading} htmlType="submit" disabled={isDisabled}>
                 {intl.formatMessage({ id: 'wallet.action.upgrade' })}
               </Styled.Button>
             </Styled.SubmitItem>
@@ -286,8 +308,28 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
         </Styled.Col>
       </Row>
     ),
-    [runeAsset]
+    [
+      addMaxAmountHandler,
+      amountValidator,
+      form,
+      intl,
+      isDisabled,
+      isLoading,
+      maxAmount,
+      onChangeInput,
+      onSubmit,
+      reloadFeeHandler,
+      renderFeeError,
+      runeAsset,
+      uiFeesRD
+    ]
   )
+
+  const upgradeConfirmationHandler = useCallback(() => {
+    // close confirmation modal
+    setShowConfirmUpgradeModal(false)
+    upgrade()
+  }, [upgrade])
 
   const renderConfirmUpgradeModal = useMemo(
     () =>
@@ -308,7 +350,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const renderUpgradeStatus = useMemo(
     () =>
       FP.pipe(
-        upgradeTxState.status,
+        upgradeTxState.txRD,
         RD.fold(
           () => renderUpgradeForm,
           () => renderUpgradeForm,
@@ -316,7 +358,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
           (hash) => <SuccessView title={intl.formatMessage({ id: 'common.success' })} extra={renderSuccessBtn(hash)} />
         )
       ),
-    [intl, renderErrorBtn, renderSuccessBtn, renderUpgradeForm]
+    [intl, renderErrorBtn, renderSuccessBtn, renderUpgradeForm, upgradeTxState.txRD]
   )
 
   return (
