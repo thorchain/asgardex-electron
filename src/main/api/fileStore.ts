@@ -1,15 +1,11 @@
 import path from 'path'
 
-import { app, ipcRenderer, ipcMain } from 'electron'
+import { ipcRenderer, ipcMain } from 'electron'
 import * as fs from 'fs-extra'
 
 import { ApiFileStoreService, StoreFileData, StoreFileName } from '../../shared/api/types'
 import { getStoreFilesIPCMessages } from '../../shared/ipc/fileStore'
-
-const APP_NAME = app?.name ?? 'ASGARDEX'
-
-const APP_DATA_DIR = path.join(app?.getPath('appData') ?? './testdata', APP_NAME)
-export const STORAGE_DIR = path.join(APP_DATA_DIR, 'storage')
+import { STORAGE_DIR } from './const'
 
 // If `fullFilePathname' does not exist, `fs.remove` silently does nothing.
 // @see https://github.com/jprichardson/node-fs-extra/blob/master/docs/remove.md
