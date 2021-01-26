@@ -13,6 +13,11 @@ const removeFile = async (fullFilePathname: string) => fs.remove(fullFilePathnam
 
 const isFileExist = async (fullFilePathname: string) => fs.pathExists(fullFilePathname)
 
+/**
+ * @returns
+ * 1. in case it's impossible to read from file will return Promise.resolve(defaultValue)
+ * 2. in case content was read returns Promise.resolve(fileContent)
+ */
 const getFileContent = async <T>(fullFilePathname: string, defaultValue: T): Promise<T> => {
   // If wile does not exist create a new one with defaultValue as content
   if (!(await isFileExist(fullFilePathname))) {
@@ -31,13 +36,18 @@ const getFileContent = async <T>(fullFilePathname: string, defaultValue: T): Pro
   }
 }
 /**
- * Saves combined store-file's content with partial provided data to the file
+ * Saves combined store-file's content with partial provided data to the file.
+ * Will return rejected Promise in case if fs.writeJSON was failed to write to the file
+ *
+ * @returns
+ * 1. in case content was written: Promise.resolve(composedContent)
+ * 2. in case there was any issue while writing: Promise.reject
  */
 const saveToFile = async <T>(fullFilePathname: string, data: Partial<T>, defaultValue: T) => {
   const fileData = await getFileContent(fullFilePathname, defaultValue)
   // Combine Partial data with previously saved data
-  await fs.writeJSON(fullFilePathname, { ...fileData, ...data })
-  return await getFileContent(fullFilePathname, defaultValue)
+  const targetData: T = { ...fileData, ...data }
+  return fs.writeJSON(fullFilePathname, targetData).then(() => targetData)
 }
 
 export const getFileStoreService = <T extends object>(fileStoreName: StoreFileName, defaultValue: T) => {
