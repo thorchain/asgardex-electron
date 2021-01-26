@@ -31,9 +31,9 @@ const getFileContent = async <T>(fullFilePathname: string, defaultValue: T): Pro
   }
 }
 /**
- * Replaces store-file's content with partial provided data
+ * Saves combined store-file's content with partial provided data to the file
  */
-const saveFile = async <T>(fullFilePathname: string, data: Partial<T>, defaultValue: T) => {
+const saveToFile = async <T>(fullFilePathname: string, data: Partial<T>, defaultValue: T) => {
   const fileData = await getFileContent(fullFilePathname, defaultValue)
   // Combine Partial data with previously saved data
   await fs.writeJSON(fullFilePathname, { ...fileData, ...data })
@@ -47,7 +47,7 @@ export const getFileStoreService = <T extends object>(fileStoreName: StoreFileNa
   const ipcMessages = getStoreFilesIPCMessages(fileStoreName)
 
   const registerIpcHandlersMain = () => {
-    ipcMain.handle(ipcMessages.SAVE_FILE, (_, data: T) => saveFile(fullFilePathname, data, defaultValue))
+    ipcMain.handle(ipcMessages.SAVE_FILE, (_, data: T) => saveToFile(fullFilePathname, data, defaultValue))
     ipcMain.handle(ipcMessages.REMOVE_FILE, () => removeFile(fullFilePathname))
     ipcMain.handle(ipcMessages.GET_FILE, () => getFileContent(fullFilePathname, defaultValue))
     ipcMain.handle(ipcMessages.FILE_EXIST, () => isFileExist(fullFilePathname))
