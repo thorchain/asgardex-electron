@@ -8,10 +8,10 @@ type Props = {
   bondContent: JSX.Element
   unbondContent: JSX.Element
   leaveContent: JSX.Element
-  otherContent: JSX.Element
+  customContent: JSX.Element
 }
 
-export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveContent, otherContent }) => {
+export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveContent, customContent }) => {
   const intl = useIntl()
 
   const tabs = useMemo(
@@ -50,10 +50,10 @@ export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveCon
             {intl.formatMessage({ id: 'deposit.interact.actions.custom' })}
           </Styled.TabLabel>
         ),
-        content: otherContent
+        content: customContent
       }
     ],
-    [intl, bondContent, unbondContent, leaveContent, otherContent]
+    [intl, bondContent, unbondContent, leaveContent, customContent]
   )
 
   const [activeTabKey, setActiveTabKey] = useState(tabs[0].key)

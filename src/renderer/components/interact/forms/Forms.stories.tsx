@@ -3,8 +3,8 @@ import React from 'react'
 import { assetAmount } from '@xchainjs/xchain-util'
 
 import { Bond as BondView } from './Bond'
+import { Custom as CustomView } from './Custom'
 import { Leave as LeaveView } from './Leave'
-import { Other as OtherView } from './Other'
 import { Unbond as UnbondView } from './Unbond'
 
 export const Bond = () => <BondView onFinish={console.log} max={assetAmount(100)} />
@@ -19,9 +19,14 @@ export const LeavePending = () => (
   <LeaveView isLoading={true} loadingProgress={'progress step example'} onFinish={console.log} />
 )
 
-export const Other = () => <OtherView onFinish={console.log} max={assetAmount(100)} />
-export const OtherPending = () => (
-  <OtherView isLoading={true} loadingProgress={'progress step example'} onFinish={console.log} max={assetAmount(100)} />
+export const Custom = () => <CustomView onFinish={console.log} max={assetAmount(100)} />
+export const CustomPending = () => (
+  <CustomView
+    isLoading={true}
+    loadingProgress={'progress step example'}
+    onFinish={console.log}
+    max={assetAmount(100)}
+  />
 )
 
 export default {

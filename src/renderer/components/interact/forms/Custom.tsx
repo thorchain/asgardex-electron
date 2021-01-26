@@ -24,7 +24,7 @@ type Props = {
   isLoading?: boolean
   loadingProgress?: string
 }
-export const Other: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading = false, loadingProgress }) => {
+export const Custom: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading = false, loadingProgress }) => {
   const intl = useIntl()
   const [form] = Form.useForm<FormValues>()
 
