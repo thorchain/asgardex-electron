@@ -36,7 +36,7 @@ export const CustomView: React.FC<Props> = ({ goToTransaction }) => {
     )
   }, [])
 
-  const bondTx = useCallback(
+  const customTx = useCallback(
     ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
       unsubscribeSub()
       possibleSubRef.current = O.some(interact$({ amount, memo }).subscribe(setInteractState))
@@ -70,10 +70,10 @@ export const CustomView: React.FC<Props> = ({ goToTransaction }) => {
   return FP.pipe(
     interactState.txRD,
     RD.fold(
-      () => <Custom onFinish={bondTx} />,
+      () => <Custom onFinish={customTx} />,
       () => <Custom isLoading={true} onFinish={FP.identity} loadingProgress={stepLabel} />,
       ({ msg }) => (
-        <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.bond.state.error' })} subTitle={msg}>
+        <Styled.ErrorView title={intl.formatMessage({ id: 'common.error' })} subTitle={msg}>
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.ErrorView>
       ),

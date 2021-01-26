@@ -65,13 +65,10 @@ export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<Ap
     })
   )
 
-  // Just a timer used to update loaded state (in pending state only)
-  const timer$ = Rx.timer(1500).pipe(RxOp.filter(() => RD.isPending(getState().txRD)))
-
   // We do need to fake progress in last step
   // That's we combine streams `getState$` (state updates) and `timer$` (counter)
   // Note: `requests$` has to be added to subscribe it once only (it won't do anything otherwise)
-  return Rx.combineLatest([getState$, timer$, requests$]).pipe(
+  return Rx.combineLatest([getState$, requests$]).pipe(
     RxOp.map(([state]) =>
       FP.pipe(
         state.txRD,
