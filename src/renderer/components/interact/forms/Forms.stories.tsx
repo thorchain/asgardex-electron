@@ -19,14 +19,9 @@ export const LeavePending = () => (
   <LeaveView isLoading={true} loadingProgress={'progress step example'} onFinish={console.log} />
 )
 
-export const Custom = () => <CustomView onFinish={console.log} max={assetAmount(100)} />
+export const Custom = () => <CustomView onFinish={console.log} />
 export const CustomPending = () => (
-  <CustomView
-    isLoading={true}
-    loadingProgress={'progress step example'}
-    onFinish={console.log}
-    max={assetAmount(100)}
-  />
+  <CustomView isLoading={true} loadingProgress={'progress step example'} onFinish={console.log} />
 )
 
 export default {
