@@ -69,14 +69,6 @@ export const ButtonLinkIcon = styled(SelectOutlined)`
   }
 `
 
-export const ButtonMax = styled(UIButton).attrs({
-  typevalue: 'underline',
-  sizevalue: 'normal'
-})`
-  padding: 0px;
-  min-width: auto !important;
-`
-
 export const Text = styled('span')`
   color: ${palette('text', 2)};
 `

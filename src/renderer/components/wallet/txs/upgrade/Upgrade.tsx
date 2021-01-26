@@ -12,7 +12,7 @@ import {
   baseToAsset,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
-import { Row, Form, Col } from 'antd'
+import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -31,6 +31,7 @@ import { PasswordModal } from '../../../modal/password'
 import { ErrorView } from '../../../shared/error'
 import { SuccessView } from '../../../shared/success'
 import { Button } from '../../../uielements/button'
+import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { Fees, UIFeesRD } from '../../../uielements/fees'
 import { InputBigNumber } from '../../../uielements/input/InputBigNumber'
 import { AccountSelector } from '../../account'
@@ -278,22 +279,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
                 name="amount">
                 <InputBigNumber size="large" disabled={isLoading} decimal={8} onChange={onChangeInput} />
               </Styled.FormItem>
-              <Row align="middle">
-                <Col>
-                  <Styled.ButtonMax onClick={addMaxAmountHandler}>
-                    {intl.formatMessage({ id: 'common.max' })}:
-                  </Styled.ButtonMax>
-                </Col>
-                <Col flex="auto">
-                  <Styled.Label size="big" style={{ paddingBottom: '0px' }}>
-                    {formatAssetAmountCurrency({
-                      amount: baseToAsset(maxAmount),
-                      asset: runeAsset,
-                      trimZeros: true
-                    })}
-                  </Styled.Label>
-                </Col>
-              </Row>
+              <MaxBalanceButton balance={{ amount: maxAmount, asset: runeAsset }} onClick={addMaxAmountHandler} />
+
               <Row>
                 <Fees fees={uiFeesRD} reloadFees={reloadFeeHandler} />
               </Row>
