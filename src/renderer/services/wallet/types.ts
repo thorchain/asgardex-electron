@@ -6,7 +6,7 @@ import { getMonoid } from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
-import { Observable } from 'rxjs'
+import * as Rx from 'rxjs'
 
 import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
@@ -124,21 +124,19 @@ export type LedgerAddressRD = RD.RemoteData<LedgerErrorId, Address>
 export type LedgerAddressLD = LiveData<LedgerErrorId, Address>
 
 /**
- * State to reflect status of sending txs
+ * State to reflect status of upgrading Rune
  *
  * Two steps are needed:
+ * 1. Health check (pool address)
  * 1. Send tx
  * 2. Check status of tx
  *
  */
-export type SendTxState = {
+export type UpgradeRuneTxState = {
   // State of steps (current step + total number of steps)
   readonly steps: { current: number; readonly total: number }
-  // Hash of transaction
-  readonly txHash: O.Option<TxHash>
   // RD of all steps
-  readonly status: RD.RemoteData<ApiError, void>
+  readonly status: RD.RemoteData<ApiError, TxHash>
 }
 
-export type TxStatusRD = RD.RemoteData<ApiError, TxHash>
-export type TxStatusLD = LiveData<ApiError, TxHash>
+export type UpgradeRuneTxState$ = Rx.Observable<UpgradeRuneTxState>

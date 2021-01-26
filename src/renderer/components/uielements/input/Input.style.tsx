@@ -58,6 +58,11 @@ const inputStyle = css<InputProps>`
     background: transparent;
   }
 
+  .ant-input {
+    color: ${palette('text', 0)};
+    background-color: ${palette('background', 0)};
+  }
+
   &:hover,
   &:focus {
     border-color: ${({ color = 'primary' }) => colors[color]};

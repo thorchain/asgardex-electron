@@ -6,7 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
@@ -23,7 +23,7 @@ import { liveData } from '../../helpers/rx/liveData'
 import { UpgradeBnbRuneParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { getPoolAddressByChain } from '../../services/midgard/utils'
-import { INITIAL_BALANCES_STATE, INITIAL_SEND_TX_STATE } from '../../services/wallet/const'
+import { INITIAL_BALANCES_STATE, INITIAL_UPGRADE_RUNE_STATE } from '../../services/wallet/const'
 
 type Props = {}
 
@@ -31,19 +31,26 @@ type ErrorViewData = { invalidAsset: boolean; missingRuneAddress: boolean; missi
 
 export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const { runeAsset: runeAssetString, walletAddress } = useParams<UpgradeBnbRuneParams>()
+
   const intl = useIntl()
+
   // accept BNB.Rune only
   const oRuneBnbAsset = useMemo(
     () => FP.pipe(assetFromString(runeAssetString), O.fromNullable, O.filter(isRuneBnbAsset)),
     [runeAssetString]
   )
 
-  const { balancesState$, getExplorerTxUrl$ } = useWalletContext()
+  const {
+    balancesState$,
+    getExplorerTxUrl$,
+    keystoreService: { validatePassword$ },
+    reloadBalances
+  } = useWalletContext()
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
   const oGetExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
-  const { fees$: bnbFees$ } = useBinanceContext()
+  const { fees$: bnbFees$, reloadFees: reloadBnbFees } = useBinanceContext()
   const { addressByChain$ } = useChainContext()
 
   const {
@@ -137,20 +144,30 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
           missingRuneAddress: O.isNone(oRuneNativeAddress),
           missingExplorerUrl: O.isNone(oGetExplorerTxUrl)
         }),
-      ([runeBnbAsset, runeNativeAddress, getExplorerTxUrl]) => (
-        <>
-          <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(runeBnbAsset), walletAddress })} />
-          <Upgrade
-            runeAsset={runeBnbAsset}
-            runeNativeAddress={runeNativeAddress}
-            bnbPoolAddressRD={bnbPoolAddressRD}
-            upgradeFee={upgradeFeeRD}
-            sendTxState={INITIAL_SEND_TX_STATE}
-            balances={oBalances}
-            getExplorerTxUrl={getExplorerTxUrl}
-          />
-        </>
-      )
+      ([runeBnbAsset, runeNativeAddress, getExplorerTxUrl]) => {
+        const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
+          getExplorerTxUrl,
+          window.apiUrl.openExternal
+        )
+        return (
+          <>
+            <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(runeBnbAsset), walletAddress })} />
+            <Upgrade
+              runeAsset={runeBnbAsset}
+              runeNativeAddress={runeNativeAddress}
+              bnbPoolAddressRD={bnbPoolAddressRD}
+              validatePassword$={validatePassword$}
+              // TODO (@Veado) [Upgrade] Refactor business logic #798
+              upgrade$={(_) => Rx.of(INITIAL_UPGRADE_RUNE_STATE)}
+              reloadFeeHandler={reloadBnbFees}
+              fee={upgradeFeeRD}
+              balances={oBalances}
+              successActionHandler={successActionHandler}
+              reloadBalancesHandler={reloadBalances}
+            />
+          </>
+        )
+      }
     )
   )
 }

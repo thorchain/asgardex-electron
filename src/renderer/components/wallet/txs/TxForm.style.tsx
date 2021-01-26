@@ -72,3 +72,38 @@ export const ButtonLinkIcon = styled(SelectOutlined)`
 export const Text = styled('span')`
   color: ${palette('text', 2)};
 `
+
+export const SuccessExtraContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`
+
+export const SuccessExtraButton = styled(UIButton).attrs({
+  round: 'true',
+  sizevalue: 'normal'
+})`
+  margin-bottom: 10px;
+`
+
+export const SubmitContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  padding-top: 10px;
+`
+
+export const SubmitStatus = styled(UILabel).attrs({
+  size: 'small',
+  color: 'gray',
+  align: 'right'
+})`
+  padding: 0;
+  padding-right: 10px;
+  font-family: 'MainFontRegular';
+  text-transform: uppercase;
+`
