@@ -9,8 +9,10 @@ import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
 
-import { LedgerTxInfo, Network } from '../shared/api/types'
+import { LedgerTxInfo, Network, StoreFileName } from '../shared/api/types'
+import { STORE_FILES_DEFAULTS } from '../shared/const'
 import { Locale } from '../shared/i18n/types'
+import { getFileStoreService } from './api/fileStore'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist, exportKeystore, loadKeystore } from './api/keystore'
 import { getAddress, sendTx } from './api/ledger'
 import IPCMessages from './ipc/messages'
@@ -131,6 +133,11 @@ const initIPC = () => {
   ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, chain: Chain, network: Network, txInfo: LedgerTxInfo) =>
     sendTx(chain, network, txInfo)
   )
+
+  // Register all file-stored data services
+  Object.entries(STORE_FILES_DEFAULTS).forEach(([name, defaultValue]) => {
+    getFileStoreService(name as StoreFileName, defaultValue).registerIpcHandlersMain()
+  })
 }
 
 const init = async () => {

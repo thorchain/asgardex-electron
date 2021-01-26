@@ -1,16 +1,12 @@
 import * as path from 'path'
 
 import { Keystore } from '@xchainjs/xchain-crypto'
-import { app, dialog, ipcRenderer } from 'electron'
+import { dialog, ipcRenderer } from 'electron'
 import * as fs from 'fs-extra'
 
 import { ApiKeystore } from '../../shared/api/types'
 import IPCMessages from '../ipc/messages'
-
-const APP_NAME = app?.name ?? 'ASGARDEX'
-
-const APP_DATA_DIR = path.join(app?.getPath('appData') ?? './testdata', APP_NAME)
-export const STORAGE_DIR = path.join(APP_DATA_DIR, 'storage')
+import { STORAGE_DIR } from './const'
 
 export const saveKeystore = async (keystore: Keystore) => {
   await fs.ensureFile(KEY_FILE)

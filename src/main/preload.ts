@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron'
 
+import { getFileStoreApi } from './api/fileStore'
 import { apiHDWallet } from './api/hdwallet'
 import { apiKeystore } from './api/keystore'
 import { apiLang } from './api/lang'
@@ -10,6 +11,11 @@ import { apiUrl } from './api/url'
 // even if `contextIsolation` is enabled
 // https://www.electronjs.org/docs/api/context-bridge
 
+/**
+ * When exposing anything to the real world do not forget to
+ * declare appropriate types for global Window interface
+ * at the src/shared/api/types.ts
+ */
 // `apiKeystore` object
 contextBridge.exposeInMainWorld('apiKeystore', apiKeystore)
 // `apiLang` object
@@ -18,3 +24,5 @@ contextBridge.exposeInMainWorld('apiLang', apiLang)
 contextBridge.exposeInMainWorld('apiUrl', apiUrl)
 // `apiHDWallet` object
 contextBridge.exposeInMainWorld('apiHDWallet', apiHDWallet)
+// `configStoreFileService` object
+contextBridge.exposeInMainWorld('commonStorage', getFileStoreApi('commonStorage'))
