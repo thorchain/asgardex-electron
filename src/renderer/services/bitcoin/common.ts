@@ -10,6 +10,7 @@ import { map, mergeMap, shareReplay } from 'rxjs/operators'
 import { envOrDefault } from '../../helpers/envHelper'
 import { network$ } from '../app/service'
 import * as C from '../clients'
+import { GetExplorerAddressUrl$ } from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState } from './types'
@@ -85,4 +86,9 @@ const explorerUrl$: C.ExplorerUrl$ = C.explorerUrl$(client$)
  */
 const getExplorerTxUrl$: C.GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
 
-export { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$ }
+/**
+ * Explorer url depending on selected network
+ */
+const getExplorerAddressUrl$: GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
+
+export { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ }

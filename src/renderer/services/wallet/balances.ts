@@ -140,7 +140,11 @@ export const chainBalances$: ChainBalances$ = Rx.combineLatest([
   btcLedgerChainBalance$,
   ethChainBalance$,
   bnbChainBalance$
-])
+]).pipe(
+  // we ignore all `ChainBalances` with state of `initial` balances
+  // (e.g. a not connected Ledger )
+  RxOp.map(A.filter(({ balances }) => !RD.isInitial(balances)))
+)
 
 /**
  * Transform a list of BalancesLD

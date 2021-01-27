@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
+import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { Row, Col, List, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
@@ -31,6 +32,7 @@ type Props = {
   removeLedgerAddress: (chain: Chain) => void
   removeAllLedgerAddress: () => void
   phrase?: O.Option<string>
+  clickAddressLinkHandler: (chain: Chain, address: Address) => void
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -52,7 +54,8 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     */
     removeAllLedgerAddress,
     changeNetwork,
-    phrase: oPhrase = O.none
+    phrase: oPhrase = O.none,
+    clickAddressLinkHandler
   } = props
 
   const [showPhrase, setShowPhrase] = useState(false)
@@ -107,11 +110,19 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                         <Styled.AccountPlaceholder>{acc.name}</Styled.AccountPlaceholder>
                         <Styled.AccountContent>
                           <Styled.AccountAddress>
-                            <label>{acc.address}</label>
+                            <label>
+                              {acc.address}
+                              <Styled.AddressLinkIcon
+                                onClick={() => clickAddressLinkHandler(item.chainName, acc.address)}
+                              />
+                            </label>
                             <label>
                               <Styled.Tooltip title={acc.address}>
                                 {truncateAddress(acc.address, item.chainName, selectedNetwork)}
                               </Styled.Tooltip>
+                              <Styled.AddressLinkIcon
+                                onClick={() => clickAddressLinkHandler(item.chainName, acc.address)}
+                              />
                               <Styled.CopyLabel copyable={{ text: acc.address }} />
                             </label>
                           </Styled.AccountAddress>
@@ -142,7 +153,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [intl, selectedNetwork, userAccounts]
+    [clickAddressLinkHandler, intl, selectedNetwork, userAccounts]
   )
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(

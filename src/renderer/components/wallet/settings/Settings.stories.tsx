@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
+import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { some } from 'fp-ts/lib/Option'
 
@@ -24,6 +25,9 @@ storiesOf('Wallet/Settings', module).add('default', () => {
       }
       removeLedgerAddress={(chain: Chain) => console.log('remove ledger address: ', chain)}
       removeAllLedgerAddress={() => console.log('reset all ledger address')}
+      clickAddressLinkHandler={(chain: Chain, address: Address) =>
+        console.log('click address link handler', chain, address)
+      }
     />
   )
 })

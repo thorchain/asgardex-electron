@@ -1,5 +1,5 @@
 import { reloadBalances, balances$ } from './balances'
-import { client$, address$, getExplorerTxUrl$ } from './common'
+import { client$, address$, getExplorerTxUrl$, getExplorerAddressUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
 import { createDepositService, createTransactionService } from './transaction'
@@ -23,6 +23,7 @@ export {
   sendTx,
   txRD$,
   getExplorerTxUrl$,
+  getExplorerAddressUrl$,
   sendDepositTx,
   interactService$
 }

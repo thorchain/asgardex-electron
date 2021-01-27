@@ -14,6 +14,6 @@ export const ViewWrapper = styled(Layout.Content)`
   `}
 
   ${media.lg`
-    padding: 70px 50px;
+    padding: 30px 50px;
   `}
 `

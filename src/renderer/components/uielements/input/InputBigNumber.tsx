@@ -94,6 +94,11 @@ export const InputBigNumber = forwardRef<Input, Props>(
             // ignore empty input
             O.filter((v) => v !== ''),
             O.alt(() => O.some('0')),
+            O.map((v) => {
+              // store entered value in state
+              setEnteredValue(O.some(v))
+              return v
+            }),
             // format value
             O.map((v) => fixedBN(v, decimal)),
             // different value as before?
@@ -103,8 +108,6 @@ export const InputBigNumber = forwardRef<Input, Props>(
               broadcastValue.current = v
               // trigger `onChange` handler
               onChange(v)
-              // store entered value in state
-              setEnteredValue(O.some(newValue))
               return v
             })
           )
