@@ -1,4 +1,16 @@
-import { base, imports, locked, settings, assets, deposits, bonds, assetDetail, send, receive } from './wallet'
+import {
+  base,
+  imports,
+  locked,
+  settings,
+  assets,
+  deposits,
+  bonds,
+  assetDetail,
+  send,
+  receive,
+  upgradeBnbRune
+} from './wallet'
 
 describe('Wallet routes', () => {
   describe('base routes', () => {
@@ -117,6 +129,28 @@ describe('Wallet routes', () => {
 
     it('redirects to base path if address is empty', () => {
       expect(send.path({ asset: 'some asset', walletAddress: '' })).toEqual(assets.path())
+    })
+  })
+
+  describe.only('upgrade route', () => {
+    it('template', () => {
+      expect(upgradeBnbRune.template).toEqual('/wallet/assets/detail/:walletAddress/:asset/upgrade')
+    })
+    it('path for BNB.RUNE-67C ', () => {
+      expect(upgradeBnbRune.path({ runeAsset: 'BNB.RUNE-67C', walletAddress: 'walletAddress' })).toEqual(
+        '/wallet/assets/detail/walletAddress/BNB.RUNE-67C/upgrade'
+      )
+    })
+    it('path for BNB.RUNE-B1A ', () => {
+      expect(upgradeBnbRune.path({ runeAsset: 'BNB.RUNE-B1A', walletAddress: 'walletAddress' })).toEqual(
+        '/wallet/assets/detail/walletAddress/BNB.RUNE-B1A/upgrade'
+      )
+    })
+    it('redirects to base path for BNB assets ', () => {
+      expect(upgradeBnbRune.path({ runeAsset: 'BNB.BNB', walletAddress: 'walletAddress' })).toEqual('/wallet/assets')
+    })
+    it('redirects to base path for empty addresses ', () => {
+      expect(upgradeBnbRune.path({ runeAsset: 'BNB.RUNE-67C', walletAddress: '' })).toEqual('/wallet/assets')
     })
   })
 })

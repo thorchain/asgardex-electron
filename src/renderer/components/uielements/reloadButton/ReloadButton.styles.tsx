@@ -17,8 +17,8 @@ export const ReloadButton = styled(UIButton).attrs((props) => ({
   &.ant-btn {
     /* overridden */
     min-width: auto;
+    padding: 4px 8px;
   }
-  min-width: 30px;
   height: 30px;
   margin-right: 10px;
 `

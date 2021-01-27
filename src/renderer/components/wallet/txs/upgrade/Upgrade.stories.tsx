@@ -1,0 +1,110 @@
+import React from 'react'
+
+import * as RD from '@devexperts/remote-data-ts'
+import { Story, Meta } from '@storybook/react'
+import { assetAmount, AssetBNB, AssetRune67C, AssetRuneNative, assetToBase, baseAmount } from '@xchainjs/xchain-util'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
+import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
+
+import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { SendTxParams } from '../../../../services/binance/types'
+import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/wallet/const'
+import { ErrorId, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/wallet/types'
+import { WalletBalance, WalletBalances } from '../../../../types/wallet'
+import { Upgrade, Props as UpgradeProps } from './Upgrade'
+
+const mockTxState$ = (states: UpgradeRuneTxState[]): UpgradeRuneTxState$ =>
+  Rx.interval(1000).pipe(
+    // stop interval stream if we don't have state in states anymore
+    RxOp.takeWhile((value) => !!states[value]),
+    RxOp.map((value) => states[value]),
+    RxOp.startWith(INITIAL_UPGRADE_RUNE_STATE)
+  )
+
+const bnbBalance: WalletBalance = {
+  asset: AssetBNB,
+  amount: assetToBase(assetAmount(1001)),
+  walletAddress: 'BNB address'
+}
+
+const runeBnbBalance: WalletBalance = {
+  asset: AssetRune67C,
+  amount: assetToBase(assetAmount(2002)),
+  walletAddress: 'BNB.Rune address'
+}
+
+const runeNativeBalance: WalletBalance = {
+  asset: AssetRuneNative,
+  amount: assetToBase(assetAmount(0)),
+  walletAddress: 'Rune native address'
+}
+
+const getBalances = (balances: WalletBalances) => NEA.fromArray<WalletBalance>(balances)
+
+// total steps
+const total = 3
+
+const defaultProps: UpgradeProps = {
+  runeAsset: AssetRune67C,
+  runeNativeAddress: 'rune-native-address',
+  bnbPoolAddressRD: RD.success('bnb-pool-address'),
+  validatePassword$: mockValidatePassword$,
+  fee: RD.success(baseAmount(37500)),
+  upgrade$: (p: SendTxParams): UpgradeRuneTxState$ => {
+    console.log('sendUpgradeTx:', p)
+    return mockTxState$([
+      { steps: { current: 1, total }, status: RD.pending },
+      { steps: { current: 2, total }, status: RD.pending },
+      { steps: { current: 3, total }, status: RD.pending },
+      { steps: { current: 3, total }, status: RD.success('tx-hash') }
+    ])
+  },
+  balances: getBalances([bnbBalance, runeBnbBalance, runeNativeBalance]),
+  reloadFeeHandler: () => console.log('reload fee'),
+  successActionHandler: (txHash) => {
+    console.log('success handler ' + txHash)
+    return Promise.resolve(undefined)
+  },
+  reloadBalancesHandler: () => console.log('reload balances')
+}
+
+export const Default: Story = () => <Upgrade {...defaultProps} />
+Default.storyName = 'default'
+
+export const HealthCheckFailure: Story = () => {
+  const props: UpgradeProps = {
+    ...defaultProps,
+    upgrade$: (_: SendTxParams): UpgradeRuneTxState$ =>
+      mockTxState$([
+        {
+          steps: { current: 1, total },
+          status: RD.failure({ errorId: ErrorId.VALIDATE_POOL, msg: 'invalid pool address' })
+        }
+      ])
+  }
+  return <Upgrade {...props} />
+}
+HealthCheckFailure.storyName = 'health check failure'
+
+export const NoFees: Story = () => {
+  const props: UpgradeProps = { ...defaultProps, fee: RD.failure(Error('no fees')) }
+  return <Upgrade {...props} />
+}
+NoFees.storyName = 'no fees'
+
+export const FeesNotCovered: Story = () => {
+  const props: UpgradeProps = {
+    ...defaultProps,
+    balances: getBalances([{ ...bnbBalance, amount: baseAmount(30) }, runeBnbBalance, runeNativeBalance])
+  }
+  return <Upgrade {...props} />
+}
+FeesNotCovered.storyName = 'fees not covered'
+
+const meta: Meta = {
+  component: Upgrade,
+  title: 'Wallet/Upgrade'
+}
+
+export default meta

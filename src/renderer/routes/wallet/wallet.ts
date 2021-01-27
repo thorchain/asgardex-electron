@@ -1,3 +1,9 @@
+import { assetFromString, assetToString } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
+
+import { isRuneBnbAsset } from '../../helpers/assetHelper'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { Route } from '../types'
 import * as createRoutes from './create'
 import * as importRoutes from './imports'
@@ -103,5 +109,27 @@ export const send: Route<SendParams> = {
       // Redirect to assets route if passed params are empty
       return assets.path()
     }
+  }
+}
+
+export type UpgradeBnbRuneParams = { runeAsset: string; walletAddress: string }
+export const upgradeBnbRune: Route<UpgradeBnbRuneParams> = {
+  template: `${assetDetail.template}/upgrade`,
+  path: ({ runeAsset: runeAssetString, walletAddress }) => {
+    // Validate asset string to accept BNB.Rune only
+    const oAsset = FP.pipe(assetFromString(runeAssetString), O.fromNullable, O.filter(isRuneBnbAsset))
+    // Simple validation of address
+    const oWalletAddress = FP.pipe(
+      walletAddress,
+      O.fromPredicate((s: string) => s.length > 0)
+    )
+    return FP.pipe(
+      sequenceTOption(oAsset, oWalletAddress),
+      O.fold(
+        // Redirect to assets route if passed params are empty
+        () => assets.path(),
+        ([asset, walletAddress]) => `${assetDetail.path({ asset: assetToString(asset), walletAddress })}/upgrade`
+      )
+    )
   }
 }

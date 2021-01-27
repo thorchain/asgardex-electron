@@ -6,7 +6,7 @@ import { getMonoid } from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
-import { Observable } from 'rxjs'
+import * as Rx from 'rxjs'
 
 import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
@@ -34,7 +34,7 @@ export type ImportKeystoreLD = LiveData<Error, void>
 export type LoadKeystoreLD = LiveData<Error, Keystore>
 
 export type KeystoreService = {
-  keystore$: Observable<KeystoreState>
+  keystore$: Rx.Observable<KeystoreState>
   addKeystore: (phrase: Phrase, password: string) => Promise<void>
   removeKeystore: () => Promise<void>
   importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
@@ -60,12 +60,12 @@ export type ChainBalance = {
   balances: WalletBalancesRD
 }
 
-export type ChainBalance$ = Observable<ChainBalance>
+export type ChainBalance$ = Rx.Observable<ChainBalance>
 export type ChainBalanceRD = RD.RemoteData<ApiError, ChainBalance>
 export type ChainBalanceLD = LiveData<ApiError, ChainBalance>
 
 export type ChainBalances = ChainBalance[]
-export type ChainBalances$ = Observable<ChainBalances>
+export type ChainBalances$ = Rx.Observable<ChainBalances>
 export type ChainBalancesRD = RD.RemoteData<ApiError, ChainBalances>
 export type ChainBalancesLD = LiveData<ApiError, ChainBalances>
 
@@ -122,3 +122,22 @@ export type LedgerTxHashLD = LiveData<LedgerApiError, string>
 
 export type LedgerAddressRD = RD.RemoteData<LedgerErrorId, Address>
 export type LedgerAddressLD = LiveData<LedgerErrorId, Address>
+
+/**
+ * State to reflect status of upgrading Rune
+ *
+ * Three steps are needed:
+ * 1. Health check (pool address)
+ * 1. Send tx
+ * 2. Check status of tx
+ *
+ */
+
+export type UpgradeRuneTxState = {
+  // State of steps (current step + total number of steps)
+  readonly steps: { current: number; readonly total: 3 }
+  // RD of all steps
+  readonly status: RD.RemoteData<ApiError, TxHash>
+}
+
+export type UpgradeRuneTxState$ = Rx.Observable<UpgradeRuneTxState>

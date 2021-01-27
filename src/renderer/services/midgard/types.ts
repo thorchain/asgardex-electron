@@ -133,6 +133,7 @@ export type ThorchainEndpointsLD = LiveData<Error, ThorchainEndpoints>
 
 export type PoolAddress = string
 export type PoolAddressRx = Rx.Observable<O.Option<PoolAddress>>
+export type PoolAddressRD = RD.RemoteData<Error, PoolAddress>
 
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
