@@ -69,27 +69,34 @@ export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<Ap
   // That's we combine streams `getState$` (state updates) and `timer$` (counter)
   // Note: `requests$` has to be added to subscribe it once only (it won't do anything otherwise)
   return Rx.combineLatest([getState$, requests$]).pipe(
-    RxOp.map(([state]) =>
+    RxOp.switchMap(([state]) =>
       FP.pipe(
         state.txRD,
         RD.fold(
           // ignore initial state + return same state (no changes)
-          () => state,
+          () => Rx.of(state),
           // For `pending` we fake progress state in last third
           (oProgress) =>
             FP.pipe(
-              oProgress,
-              O.map(({ loaded }) => {
-                // From 66 to 97 we count progress with small steps, but stop it at 98
-                const updatedLoaded = loaded >= 66 && loaded <= 97 ? loaded++ : loaded
-                return { ...state, txRD: RD.progress({ loaded: updatedLoaded, total }) }
-              }),
-              O.getOrElse(() => state)
+              // Just a timer used to update loaded state (in pending state only)
+              Rx.interval(1500),
+              RxOp.map(
+                (): InteractState =>
+                  FP.pipe(
+                    oProgress,
+                    O.map(({ loaded }) => {
+                      // From 66 to 97 we count progress with small steps, but stop it at 98
+                      const updatedLoaded = loaded >= 66 && loaded <= 97 ? ++loaded : loaded
+                      return { ...state, txRD: RD.progress({ loaded: updatedLoaded, total }) }
+                    }),
+                    O.getOrElse(() => state)
+                  )
+              )
             ),
           // ignore `failure` state + return same state (no changes)
-          () => state,
+          () => Rx.of(state),
           // ignore `success` state + return same state (no changes)
-          () => state
+          () => Rx.of(state)
         )
       )
     ),
