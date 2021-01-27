@@ -35,8 +35,6 @@ import {
   ValidatePasswordHandler
 } from '../../../../services/wallet/types'
 import { PasswordModal } from '../../../modal/password'
-import { ErrorView } from '../../../shared/error'
-import { SuccessView } from '../../../shared/success'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
 import { Fees, UIFeesRD } from '../../../uielements/fees'
@@ -44,6 +42,7 @@ import { InputBigNumber } from '../../../uielements/input/InputBigNumber'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
 import { validateTxAmountInput } from '../TxForm.util'
+import * as CStyled from './Upgrade.styles'
 
 export type Props = {
   runeAsset: Asset
@@ -315,8 +314,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   const renderUpgradeForm = useMemo(
     () => (
-      <Row>
-        <Styled.Col span={24}>
+      <CStyled.FormWrapper>
+        <CStyled.FormContainer>
           <AccountSelector selectedAsset={runeAsset} walletBalances={[]} />
           <Styled.Form form={form} initialValues={INITIAL_FORM_VALUES} onFinish={onSubmit} labelCol={{ span: 24 }}>
             <Styled.SubForm>
@@ -346,8 +345,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
               </Styled.Button>
             </Styled.SubmitContainer>
           </Styled.Form>
-        </Styled.Col>
-      </Row>
+        </CStyled.FormContainer>
+      </CStyled.FormWrapper>
     ),
     [
       addMaxAmountHandler,
@@ -395,14 +394,14 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
           () => renderUpgradeForm,
           () => renderUpgradeForm,
           (error) => (
-            <ErrorView
+            <CStyled.ErrorView
               title={intl.formatMessage({ id: 'wallet.upgrade.error' })}
               subTitle={error.msg}
               extra={renderErrorBtn}
             />
           ),
           (hash) => (
-            <SuccessView
+            <CStyled.SuccessView
               title={intl.formatMessage({ id: 'wallet.upgrade.success' })}
               extra={renderSuccessExtra(hash)}
             />
@@ -420,7 +419,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
         RD.toOption,
         O.fold(
           () => (
-            <ErrorView
+            <CStyled.ErrorView
               // TODO (@Veado) Add i18n
               title="BNB pool address could not be loaded"
               extra={renderErrorBtn}
