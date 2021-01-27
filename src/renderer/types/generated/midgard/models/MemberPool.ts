@@ -13,55 +13,67 @@
 
 /**
  * @export
- * @interface MemberPoolDetails
+ * @interface MemberPool
  */
-export interface MemberPoolDetails {
+export interface MemberPool {
     /**
      * Int64, total asset added to the pool by member
      * @type {string}
-     * @memberof MemberPoolDetails
+     * @memberof MemberPool
      */
     assetAdded: string;
     /**
+     * asset address used by the member
+     * @type {string}
+     * @memberof MemberPool
+     */
+    assetAddress: string;
+    /**
      * Int64, total asset withdrawn from the pool by member
      * @type {string}
-     * @memberof MemberPoolDetails
+     * @memberof MemberPool
      */
     assetWithdrawn: string;
     /**
      * Int64, Unix timestamp for the first time member deposited into the pool
      * @type {string}
-     * @memberof MemberPoolDetails
+     * @memberof MemberPool
      */
     dateFirstAdded: string;
     /**
      * Int64, Unix timestamp for the last time member deposited into the pool
      * @type {string}
-     * @memberof MemberPoolDetails
+     * @memberof MemberPool
      */
     dateLastAdded: string;
     /**
      * Int64, pool liquidity units that belong the the member
      * @type {string}
-     * @memberof MemberPoolDetails
+     * @memberof MemberPool
      */
     liquidityUnits: string;
     /**
      * Pool rest of the data refers to
      * @type {string}
-     * @memberof MemberPoolDetails
+     * @memberof MemberPool
      */
     pool: string;
     /**
      * Int64, total RUNE added to the pool by member
      * @type {string}
-     * @memberof MemberPoolDetails
+     * @memberof MemberPool
      */
     runeAdded: string;
     /**
+     * rune address used by the member
+     * @type {string}
+     * @memberof MemberPool
+     */
+    runeAddress: string;
+    /**
      * Int64, total RUNE withdrawn from the pool by member
      * @type {string}
-     * @memberof MemberPoolDetails
+     * @memberof MemberPool
      */
     runeWithdrawn: string;
 }

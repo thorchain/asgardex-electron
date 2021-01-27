@@ -22,31 +22,49 @@ export interface PoolLegacyDetail {
      */
     asset: string;
     /**
-     * Int64, the amount of Asset in the pool
+     * same as assetDepth from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     assetDepth: string;
     /**
-     * Float, price of asset in rune. I.e. rune amount / asset amount
+     * same as addAssetLiquidityVolume from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
-    assetPrice: string;
+    assetStakedTotal: string;
     /**
-     * Int64, same as history/swaps:toAssetCount
+     * same as toAssetCount from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     buyAssetCount: string;
     /**
-     * Float, same as history/swaps:toRuneVolume/toRuneCount
+     * same as toAssetFees / toAssetCount from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    buyFeeAverage: string;
+    /**
+     * same as toAssetFees from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    buyFeesTotal: string;
+    /**
+     * same as toAssetAverageSlip from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    buySlipAverage: string;
+    /**
+     * same as toAssetVolume / toAssetCount from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     buyTxAverage: string;
     /**
-     * Int64, same as history/swaps:toAssetVolume
+     * same as toAssetVolume from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
@@ -58,35 +76,47 @@ export interface PoolLegacyDetail {
      */
     poolAPY: string;
     /**
-     * Int64, same as assetDepth + runeDepth
+     * same as 2*runeDepth from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     poolDepth: string;
     /**
-     * Float, same as history/swaps:totalFees/totalCount
+     * same as totalFees / swapCount from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     poolFeeAverage: string;
     /**
-     * Int64, same as history/swaps:totalFees
+     * same as totalFees from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     poolFeesTotal: string;
     /**
-     * Float, same as history/swaps:averageSlip
+     * same as averageSlip from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     poolSlipAverage: string;
     /**
-     * Float, same as history/swaps:totalVolume/totalCount
+     * same as addLiquidityVolume from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    poolStakedTotal: string;
+    /**
+     * same as swapVolume / swapCount from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     poolTxAverage: string;
+    /**
+     * same as units from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    poolUnits: string;
     /**
      * Int64, same as buyVolume + sellVolume
      * @type {string}
@@ -94,35 +124,89 @@ export interface PoolLegacyDetail {
      */
     poolVolume: string;
     /**
-     * Int64, the amount of Rune in the pool
+     * same as assetPrice from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    price: string;
+    /**
+     * same as runeDepth from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     runeDepth: string;
     /**
-     * Int64, same as history/swaps:toRuneCount
+     * same as addRuneLiquidityVolume from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    runeStakedTotal: string;
+    /**
+     * same as toRuneCount from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     sellAssetCount: string;
     /**
-     * Float, same as history/swaps:toAssetVolume/toAssetCount
+     * same as toRuneFees / toRuneCount from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    sellFeeAverage: string;
+    /**
+     * same as toRuneFees from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    sellFeesTotal: string;
+    /**
+     * same as toRuneAverageSlip from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    sellSlipAverage: string;
+    /**
+     * same as toRuneVolume / toRuneCount from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     sellTxAverage: string;
     /**
-     * Int64, same as history/swaps:toRuneVolume
+     * same as toRuneVolume from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     sellVolume: string;
     /**
-     * The state of the pool, e.g. Available, Staged
+     * same as addLiquidityCount from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    stakeTxCount: string;
+    /**
+     * same as uniqueMemberCount from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    stakersCount: string;
+    /**
+     * same as addLiquidityCount + withdrawCount from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    stakingTxCount: string;
+    /**
+     * same as status from pool/stats
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     status: string;
+    /**
+     * Int64, same as history/swaps:uniqueSwapperCount
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    swappersCount: string;
     /**
      * Int64, same as history/swaps:totalCount
      * @type {string}
@@ -130,15 +214,15 @@ export interface PoolLegacyDetail {
      */
     swappingTxCount: string;
     /**
-     * Int64, Liquidity Units in the pool
-     * @type {string}
-     * @memberof PoolLegacyDetail
-     */
-    units: string;
-    /**
-     * Int64, the total volume of swaps in the last 24h to and from Rune denoted in Rune
+     * Int64, same as swapVolume pool/stats?period=24h
      * @type {string}
      * @memberof PoolLegacyDetail
      */
     volume24h: string;
+    /**
+     * same as withdrawCount from pool/stats
+     * @type {string}
+     * @memberof PoolLegacyDetail
+     */
+    withdrawTxCount: string;
 }

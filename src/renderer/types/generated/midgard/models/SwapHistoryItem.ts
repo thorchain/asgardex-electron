@@ -35,11 +35,23 @@ export interface SwapHistoryItem {
      */
     startTime: string;
     /**
+     * Float, the average slip for swaps to asset. Big swaps have the same weight as small swaps 
+     * @type {string}
+     * @memberof SwapHistoryItem
+     */
+    toAssetAverageSlip: string;
+    /**
      * Int64, count of swaps from rune to asset
      * @type {string}
      * @memberof SwapHistoryItem
      */
     toAssetCount: string;
+    /**
+     * Int64, the fees collected from swaps to asset denoted in rune
+     * @type {string}
+     * @memberof SwapHistoryItem
+     */
+    toAssetFees: string;
     /**
      * Int64, volume of swaps from rune to asset denoted in rune
      * @type {string}
@@ -47,11 +59,23 @@ export interface SwapHistoryItem {
      */
     toAssetVolume: string;
     /**
+     * Float, the average slip for swaps to rune. Big swaps have the same weight as small swaps 
+     * @type {string}
+     * @memberof SwapHistoryItem
+     */
+    toRuneAverageSlip: string;
+    /**
      * Int64, count of swaps from asset to rune
      * @type {string}
      * @memberof SwapHistoryItem
      */
     toRuneCount: string;
+    /**
+     * Int64, the fees collected from swaps to rune
+     * @type {string}
+     * @memberof SwapHistoryItem
+     */
+    toRuneFees: string;
     /**
      * Int64, volume of swaps from asset to rune denoted in rune
      * @type {string}

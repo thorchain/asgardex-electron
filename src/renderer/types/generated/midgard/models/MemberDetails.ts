@@ -12,7 +12,7 @@
  */
 
 import {
-    MemberPoolDetails,
+    MemberPool,
 } from './';
 
 /**
@@ -21,9 +21,9 @@ import {
  */
 export interface MemberDetails {
     /**
-     * Liquidity provider data for all the pools of a given member
-     * @type {Array<MemberPoolDetails>}
+     * List details of all the liquidity providers identified with the given address
+     * @type {Array<MemberPool>}
      * @memberof MemberDetails
      */
-    pools: Array<MemberPoolDetails>;
+    pools: Array<MemberPool>;
 }

@@ -184,7 +184,7 @@ export const querystring = queryString;
  * @deprecated
  */
 export const throwIfRequired = (params: {[key: string]: any}, key: string, nickname: string) => {
-    if (!params || params[key] == null) {
+    if (!params || params[key] == null) {
         throw new RequiredError(`Required parameter ${key} was null or undefined when calling ${nickname}.`);
     }
 };

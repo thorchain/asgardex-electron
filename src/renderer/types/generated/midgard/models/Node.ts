@@ -11,23 +11,27 @@
  * Do not edit the class manually.
  */
 
-import { Observable } from 'rxjs';
-import { BaseAPI } from '../runtime';
-
 /**
- * no description
+ * @export
+ * @interface Node
  */
-export class DocumentationApi extends BaseAPI {
-
+export interface Node {
     /**
-     * Swagger/OpenAPI 3.0 specification generated documents.
-     * Get Documentation
+     * ed25519 public key
+     * @type {string}
+     * @memberof Node
      */
-    getDocs = (): Observable<void> => {
-        return this.request<void>({
-            path: '/v2/doc',
-            method: 'GET',
-        });
-    };
-
+    ed25519: string;
+    /**
+     * node thorchain address
+     * @type {string}
+     * @memberof Node
+     */
+    nodeAddress: string;
+    /**
+     * secp256k1 public key
+     * @type {string}
+     * @memberof Node
+     */
+    secp256k1: string;
 }
