@@ -17,11 +17,29 @@
  */
 export interface LiquidityHistoryItem {
     /**
-     * Int64, total deposits (liquidity additions) during the time interval
+     * Int64 (10^8), total assets deposited during the time interval. Denoted in Rune using the price at deposit time. 
      * @type {string}
      * @memberof LiquidityHistoryItem
      */
-    deposits: string;
+    addAssetLiquidityVolume: string;
+    /**
+     * Int64, number of deposits during the time interval. 
+     * @type {string}
+     * @memberof LiquidityHistoryItem
+     */
+    addLiquidityCount: string;
+    /**
+     * Int64 (10^8), total of rune and asset deposits. Denoted in Rune (using the price at deposit time). 
+     * @type {string}
+     * @memberof LiquidityHistoryItem
+     */
+    addLiquidityVolume: string;
+    /**
+     * Int64 (10^8), total Rune deposited during the time interval. 
+     * @type {string}
+     * @memberof LiquidityHistoryItem
+     */
+    addRuneLiquidityVolume: string;
     /**
      * Int64, The end time of bucket in unix timestamp
      * @type {string}
@@ -41,9 +59,27 @@ export interface LiquidityHistoryItem {
      */
     startTime: string;
     /**
-     * Int64, total withdrawals during the time interval
+     * Int64 (10^8), total assets withdrawn during the time interval. Denoted in Rune using the price at withdraw time. 
      * @type {string}
      * @memberof LiquidityHistoryItem
      */
-    withdrawals: string;
+    withdrawAssetVolume: string;
+    /**
+     * Int64, number of withdraw during the time interval. 
+     * @type {string}
+     * @memberof LiquidityHistoryItem
+     */
+    withdrawCount: string;
+    /**
+     * Int64 (10^8), total Rune withdrawn during the time interval. 
+     * @type {string}
+     * @memberof LiquidityHistoryItem
+     */
+    withdrawRuneVolume: string;
+    /**
+     * Int64 (10^8), total of rune and asset withdrawals. Denoted in Rune (using the price at withdraw time). 
+     * @type {string}
+     * @memberof LiquidityHistoryItem
+     */
+    withdrawVolume: string;
 }

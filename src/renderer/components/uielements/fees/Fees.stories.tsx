@@ -17,6 +17,9 @@ storiesOf('Components/Fees', module)
   .add('The only fee', () => {
     return <DefaultPoolShare />
   })
+  .add('reload fee', () => {
+    return <Fees fees={RD.success([baseFee])} reloadFees={() => console.log('reload fees')} />
+  })
   .add('Multiple fees', () => {
     return (
       <Fees

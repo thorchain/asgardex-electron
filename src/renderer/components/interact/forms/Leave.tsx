@@ -7,9 +7,7 @@ import { useIntl } from 'react-intl'
 import { Input } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 
-const memoPlaceholder = getLeaveMemo('THORADDRESS')
-
-type FormValues = { memo: string; isLoading?: boolean; loadingProgress?: string }
+type FormValues = { thorAddress: string; isLoading?: boolean; loadingProgress?: string }
 
 type Props = {
   onFinish: (leaveData: { memo: string }) => void
@@ -21,28 +19,28 @@ export const Leave: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = fal
   const [form] = Form.useForm<FormValues>()
 
   const onFinish = useCallback(
-    ({ memo }: FormValues) => {
+    ({ thorAddress }: FormValues) => {
       onFinishProp({
-        memo
+        memo: getLeaveMemo(thorAddress)
       })
     },
     [onFinishProp]
   )
 
   return (
-    <Styled.Form form={form} onFinish={onFinish} initialValues={{ memo: memoPlaceholder }}>
+    <Styled.Form form={form} onFinish={onFinish} initialValues={{ thorAddress: '' }}>
       <div>
         <Styled.InputContainer>
-          <Styled.InputLabel>{intl.formatMessage({ id: 'common.memo' })}</Styled.InputLabel>
+          <Styled.InputLabel>{intl.formatMessage({ id: 'common.thorAddress' })}</Styled.InputLabel>
           <Form.Item
-            name="memo"
+            name="thorAddress"
             rules={[
               {
                 required: true,
                 message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' })
               }
             ]}>
-            <Input disabled={isLoading} size="large" placeholder={memoPlaceholder} />
+            <Input disabled={isLoading} size="large" />
           </Form.Item>
         </Styled.InputContainer>
       </div>

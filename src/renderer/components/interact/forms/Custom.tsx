@@ -1,59 +1,41 @@
 import React, { useCallback } from 'react'
 
-import { getUnbondMemo } from '@thorchain/asgardex-util'
-import { assetAmount, assetToBase, bnOrZero } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, BaseAmount } from '@xchainjs/xchain-util'
 import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
-import * as E from 'fp-ts/Either'
-import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
-import { ZERO_BN } from '../../../const'
-import { greaterThan } from '../../../helpers/form/validation'
 import { Input, InputBigNumber } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 
-type FormValues = { thorAddress: string; amount: BigNumber }
+type FormValues = { memo: string; amount: BigNumber }
 
 type Props = {
-  onFinish: (unboundData: { memo: string }) => void
+  onFinish: (boundData: { memo: string; amount: BaseAmount }) => void
   isLoading?: boolean
   loadingProgress?: string
 }
-export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = false, loadingProgress }) => {
+export const Custom: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = false, loadingProgress }) => {
   const intl = useIntl()
   const [form] = Form.useForm<FormValues>()
 
   const onFinish = useCallback(
-    ({ thorAddress, amount }: FormValues) => {
+    ({ memo, amount }: FormValues) => {
       onFinishProp({
-        memo: getUnbondMemo(thorAddress, assetToBase(assetAmount(amount)))
+        memo,
+        amount: assetToBase(assetAmount(amount))
       })
     },
     [onFinishProp]
-  )
-
-  const amountValidator = useCallback(
-    (_, value: string) => {
-      return FP.pipe(
-        bnOrZero(value),
-        greaterThan(ZERO_BN)(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 })),
-        E.fold(
-          (e) => Promise.reject(e),
-          () => Promise.resolve()
-        )
-      )
-    },
-    [intl]
   )
 
   return (
     <Styled.Form form={form} onFinish={onFinish} initialValues={{ memo: '' }}>
       <div>
         <Styled.InputContainer>
-          <Styled.InputLabel>{intl.formatMessage({ id: 'common.thorAddress' })}</Styled.InputLabel>
+          <Styled.InputLabel>{intl.formatMessage({ id: 'common.memo' })}</Styled.InputLabel>
           <Form.Item
-            name="thorAddress"
+            name="memo"
             rules={[
               {
                 required: true,
@@ -66,13 +48,7 @@ export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = fa
 
         <Styled.InputContainer>
           <Styled.InputLabel>{intl.formatMessage({ id: 'common.amount' })}</Styled.InputLabel>
-          <Form.Item
-            name="amount"
-            rules={[
-              {
-                validator: amountValidator
-              }
-            ]}>
+          <Form.Item name="amount">
             <InputBigNumber disabled={isLoading} size="large" decimal={4} />
           </Form.Item>
         </Styled.InputContainer>

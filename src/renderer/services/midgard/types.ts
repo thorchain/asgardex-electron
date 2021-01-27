@@ -19,8 +19,6 @@ import { ApiError } from '../wallet/types'
 export type ThorchainLastblock = LastblockItem[]
 
 export type PoolAsset = string
-export type PoolStringAssets = string[]
-export type PoolStringAssetsLD = LiveData<Error, PoolStringAssets>
 
 export type PoolAssets = Asset[]
 export type PoolAssetsRD = RD.RemoteData<Error, PoolAssets>
@@ -98,7 +96,7 @@ export type PriceDataIndex = {
 
 export type PoolsState = {
   assetDetails: AssetDetails
-  poolAssets: PoolStringAssets
+  poolAssets: PoolAssets
   poolDetails: PoolDetails
   pricePools: O.Option<PricePools>
 }
@@ -107,7 +105,7 @@ export type PoolsStateLD = LiveData<Error, PoolsState>
 
 export type PendingPoolsState = {
   assetDetails: AssetDetails
-  poolAssets: PoolStringAssets
+  poolAssets: PoolAssets
   poolDetails: PoolDetails
 }
 export type PendingPoolsStateRD = RD.RemoteData<Error, PendingPoolsState>
@@ -135,6 +133,7 @@ export type ThorchainEndpointsLD = LiveData<Error, ThorchainEndpoints>
 
 export type PoolAddress = string
 export type PoolAddressRx = Rx.Observable<O.Option<PoolAddress>>
+export type PoolAddressRD = RD.RemoteData<Error, PoolAddress>
 
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>

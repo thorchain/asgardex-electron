@@ -16,7 +16,7 @@ const fontSettings: FontSettings = {
     spacing: '0.5px'
   },
   large: {
-    size: key('sizes.font.normal', '12px'),
+    size: '24px',
     spacing: '0.5px'
   }
 }
@@ -56,6 +56,11 @@ const inputStyle = css<InputProps>`
   input:-internal-autofill-selected {
     color: ${palette('text', 0)};
     background: transparent;
+  }
+
+  .ant-input {
+    color: ${palette('text', 0)};
+    background-color: ${palette('background', 0)};
   }
 
   &:hover,

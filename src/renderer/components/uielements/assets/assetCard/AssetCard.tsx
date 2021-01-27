@@ -152,7 +152,6 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
               <Styled.AssetData>
                 <Styled.InputBigNumber
                   disabled={disabled}
-                  size="middle"
                   value={selectedAmountBn}
                   onChange={changeAssetAmountHandler}
                   decimal={selectedAmount.decimal}

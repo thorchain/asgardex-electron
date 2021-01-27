@@ -1,1 +1,1 @@
-export { UpgradeForm } from './UpgradeForm'
+export { Upgrade } from './Upgrade'
