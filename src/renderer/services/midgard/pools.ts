@@ -219,9 +219,8 @@ const createPoolsService = (
   const loadPoolsStateData$ = (): PoolsStateLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
       apiGetPoolsEnabled$,
-      liveData.map(A.map(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
-      // Filter out all unknown / invalid asset created from asset strings
-      liveData.map(A.filterMap((oAsset) => oAsset))
+      // Filter out all unknown / invalid assets created from asset strings
+      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable)))
     )
     const assetDetails$ = getAssetDetails$(poolAssets$)
     const poolDetails$ = getPoolDetails$(poolAssets$)
@@ -277,9 +276,8 @@ const createPoolsService = (
   const loadPendingPoolsStateData$ = (): PendingPoolsStateLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
       apiGetPoolsPending$,
-      liveData.map(A.map(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
-      // Filter out all unknown / invalid asset created from asset strings
-      liveData.map(A.filterMap((oAsset) => oAsset))
+      // Filter out all unknown / invalid assets created from asset strings
+      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable)))
     )
     const assetDetails$ = getAssetDetails$(poolAssets$)
     const poolDetails$ = getPoolDetails$(poolAssets$)
