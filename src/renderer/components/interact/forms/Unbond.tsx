@@ -33,25 +33,18 @@ export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = fa
     [onFinishProp]
   )
 
-  // graterThan returns pure function and there is no need to calidate its deps
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const graterThenZero = useCallback(
-    greaterThan(ZERO_BN)(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 })),
-    [intl]
-  )
-
   const amountValidator = useCallback(
     (_, value: string) => {
       return FP.pipe(
         bnOrZero(value),
-        graterThenZero,
+        greaterThan(ZERO_BN)(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 })),
         E.fold(
           (e) => Promise.reject(e),
           () => Promise.resolve()
         )
       )
     },
-    [graterThenZero]
+    [intl]
   )
 
   return (

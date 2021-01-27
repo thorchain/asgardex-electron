@@ -43,39 +43,24 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading =
     },
     [onFinishProp]
   )
-
-  // graterThan returns pure function and there is no need to validate its deps
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const graterThenZero = useCallback(
-    greaterThan(ZERO_BN)(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 })),
-    [intl]
-  )
-
-  // lessThanOrEqualTo returns pure function and there is no need to validate its deps
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const lessOrEqualToMax = useCallback(
-    lessThanOrEqualTo(max.amount())(
-      intl.formatMessage(
-        { id: 'wallet.validations.lessThen' },
-        { value: formatAssetAmount({ amount: max, decimal: 8, trimZeros: true }) }
-      )
-    ),
-    [max, intl]
-  )
-
   const amountValidator = useCallback(
     (_, value: string) => {
       return FP.pipe(
         bnOrZero(value),
-        lessOrEqualToMax,
-        E.chain(graterThenZero),
+        lessThanOrEqualTo(max.amount())(
+          intl.formatMessage(
+            { id: 'wallet.validations.lessThen' },
+            { value: formatAssetAmount({ amount: max, decimal: 8, trimZeros: true }) }
+          )
+        ),
+        E.chain(greaterThan(ZERO_BN)(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 }))),
         E.fold(
           (e) => Promise.reject(e),
           () => Promise.resolve()
         )
       )
     },
-    [graterThenZero, lessOrEqualToMax]
+    [max, intl]
   )
 
   return (
