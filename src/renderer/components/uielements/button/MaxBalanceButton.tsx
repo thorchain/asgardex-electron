@@ -31,7 +31,7 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
         </Styled.Button>
       </Col>
       <Col flex="auto">
-        <Styled.Label style={{ paddingBottom: '0px' }} disabled={disabled}>
+        <Styled.Label disabled={disabled}>
           {formatAssetAmountCurrency({
             amount: baseToAsset(amount),
             asset,

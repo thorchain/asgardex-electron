@@ -126,15 +126,16 @@ export type LedgerAddressLD = LiveData<LedgerErrorId, Address>
 /**
  * State to reflect status of upgrading Rune
  *
- * Two steps are needed:
+ * Three steps are needed:
  * 1. Health check (pool address)
  * 1. Send tx
  * 2. Check status of tx
  *
  */
+
 export type UpgradeRuneTxState = {
   // State of steps (current step + total number of steps)
-  readonly steps: { current: number; readonly total: number }
+  readonly steps: { current: number; readonly total: 3 }
   // RD of all steps
   readonly status: RD.RemoteData<ApiError, TxHash>
 }

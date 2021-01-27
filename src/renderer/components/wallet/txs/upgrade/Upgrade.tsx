@@ -157,7 +157,6 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   const amountValidator = useCallback(
     async (_: unknown, value: BigNumber) => {
-      console.log('validator:', value.toString())
       return validateTxAmountInput({
         input: value,
         maxAmount: baseToAsset(maxAmount),
