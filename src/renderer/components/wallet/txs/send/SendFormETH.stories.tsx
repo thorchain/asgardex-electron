@@ -15,9 +15,10 @@ import {
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { WalletBalances } from '../../../../services/clients'
-import { AddressValidation, SendTxParams } from '../../../../services/ethereum/types'
+import { SendTxParams } from '../../../../services/ethereum/types'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormETH } from './index'
+import { Props as SendFormETHProps } from './SendFormETH'
 
 const ethAsset: WalletBalance = {
   asset: AssetETH,
@@ -36,87 +37,51 @@ const fees: Fees = {
 
 const feesRD = RD.success(fees)
 
-const addressValidation: AddressValidation = (_) => true
-
 const estimateFee = () => Promise.resolve(ZERO_BASE_AMOUNT)
-
-const onSubmitHandler = ({ recipient, amount, asset, memo, gasPrice }: SendTxParams) =>
-  console.log(
-    `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
-      asset
-    )}, memo: ${memo}, fee: ${gasPrice}`
-  )
 
 const reloadFeesHandler = () => console.log('reload fees')
 
-export const StorySend: Story = () => (
-  <SendFormETH
-    balance={ethAsset}
-    balances={balances}
-    onSubmit={onSubmitHandler}
-    addressValidation={addressValidation}
-    reloadFeesHandler={reloadFeesHandler}
-    fees={feesRD}
-    estimateFee={estimateFee}
-  />
-)
-StorySend.storyName = 'success'
+const defaultProps: SendFormETHProps = {
+  balances,
+  balance: ethAsset,
+  onSubmit: ({ recipient, amount, asset, memo, gasPrice }: SendTxParams) =>
+    console.log(
+      `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
+        asset
+      )}, memo: ${memo}, fee: ${gasPrice}`
+    ),
 
-export const StoryPending: Story = () => (
-  <SendFormETH
-    balance={ethAsset}
-    balances={balances}
-    onSubmit={onSubmitHandler}
-    addressValidation={addressValidation}
-    reloadFeesHandler={reloadFeesHandler}
-    fees={feesRD}
-    estimateFee={estimateFee}
-    isLoading={true}
-  />
-)
-StoryPending.storyName = 'pending'
+  isLoading: false,
+  addressValidation: () => true,
+  fees: feesRD,
+  estimateFee,
+  reloadFeesHandler
+}
 
-export const StoryLoadingFees: Story = () => (
-  <SendFormETH
-    balance={ethAsset}
-    balances={balances}
-    onSubmit={onSubmitHandler}
-    addressValidation={addressValidation}
-    reloadFeesHandler={reloadFeesHandler}
-    fees={RD.pending}
-    estimateFee={estimateFee}
-  />
-)
-StoryLoadingFees.storyName = 'loading fees'
+export const SendETH: Story = () => <SendFormETH {...defaultProps} />
+SendETH.storyName = 'success'
 
-export const StoryFailureFees: Story = () => (
-  <SendFormETH
-    balance={ethAsset}
-    balances={balances}
-    onSubmit={onSubmitHandler}
-    addressValidation={addressValidation}
-    reloadFeesHandler={reloadFeesHandler}
-    fees={RD.failure(Error('Could not load fee and rates for any reason'))}
-    estimateFee={estimateFee}
-  />
-)
-StoryFailureFees.storyName = 'failure fees'
+export const Pending: Story = () => {
+  const props: SendFormETHProps = { ...defaultProps, isLoading: true }
+  return <SendFormETH {...props} />
+}
+
+export const LoadingFees: Story = () => {
+  const props: SendFormETHProps = { ...defaultProps, fees: RD.pending }
+  return <SendFormETH {...props} />
+}
+
+export const FailtureFees: Story = () => {
+  const props: SendFormETHProps = {
+    ...defaultProps,
+    fees: RD.failure(Error('Could not load fee and rates for any reason'))
+  }
+  return <SendFormETH {...props} />
+}
 
 const meta: Meta = {
   component: SendFormETH,
-  title: 'Components/SendFormETH',
-  decorators: [
-    (S: Story) => (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '300px'
-        }}>
-        <S />
-      </div>
-    )
-  ]
+  title: 'Wallet/SendFormETH'
 }
 
 export default meta

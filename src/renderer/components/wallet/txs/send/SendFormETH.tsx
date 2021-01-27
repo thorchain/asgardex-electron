@@ -43,7 +43,7 @@ export type FormValues = {
   memo?: string
 }
 
-type Props = {
+export type Props = {
   balances: WalletBalances
   balance: WalletBalance
   onSubmit: ({ recipient, amount, asset, memo, gasPrice }: SendTxParams) => void
@@ -128,7 +128,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => false,
-        ([fee, ethAmount]) => ethAmount.amount().isLessThan(fee.amount())
+        ([fee, ethAmount]) => ethAmount.amount().isLessThan(baseToAsset(fee).amount())
       )
     )
   }, [oEthAmount, selectedFee])
@@ -256,7 +256,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
         // Set maxAmount to zero if we dont know anything about eth and fee amounts
         () => ZERO_BN,
         ([fee, ethAmount]) => {
-          return ethAmount.amount().minus(fee.amount())
+          return ethAmount.amount().minus(baseToAsset(fee).amount())
         }
       ),
       assetAmount
@@ -315,14 +315,12 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               <InputBigNumber min={0} size="large" disabled={isLoading} decimal={8} />
             </Styled.FormItem>
             <Styled.Label size="big" style={{ marginBottom: 0, paddingBottom: 0 }}>
-              <>
-                {intl.formatMessage({ id: 'common.max' })}:{' '}
-                {formatAssetAmountCurrency({
-                  amount: maxAmount,
-                  asset: balance.asset,
-                  trimZeros: true
-                })}
-              </>
+              {intl.formatMessage({ id: 'common.max' })}:{' '}
+              {formatAssetAmountCurrency({
+                amount: maxAmount,
+                asset: balance.asset,
+                trimZeros: true
+              })}
             </Styled.Label>
             <Row align="middle">
               <Col>

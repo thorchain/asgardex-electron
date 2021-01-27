@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as EthereumClient, getTokenAddress } from '@xchainjs/xchain-ethereum'
-import { Asset, BaseAmount, ETHChain, formatBaseAmount } from '@xchainjs/xchain-util'
+import { Client as EthereumClient } from '@xchainjs/xchain-ethereum'
+import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
@@ -15,7 +15,7 @@ import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { AddressValidation } from '../../../services/ethereum/types'
-import { NonEmptyWalletBalances, TxRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, TxHashRD } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 
 type Props = {
@@ -40,7 +40,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
 
   const { client$, fees$, txRD$, resetTx, subscribeTx } = useEthereumContext()
 
-  const txRD = useObservableState<TxRD>(txRD$, RD.initial)
+  const txRD = useObservableState<TxHashRD>(txRD$, RD.initial)
   const fees = useObservableState(fees$, RD.initial)
   const oClient = useObservableState<O.Option<EthereumClient>>(client$, O.none)
 
@@ -65,19 +65,14 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         oClient,
         O.map((client) =>
-          asset.chain === ETHChain
-            ? client.estimateGasNormalTx({
-                recipient,
-                amount,
-                overrides: {
-                  gasPrice
-                }
-              })
-            : client.estimateGasERC20Tx({
-                assetAddress: getTokenAddress(asset) || '',
-                recipient,
-                amount: formatBaseAmount(amount)
-              })
+          client.estimateGas({
+            asset,
+            recipient,
+            amount,
+            overrides: {
+              gasPrice
+            }
+          })
         ),
         O.getOrElse(() => Promise.resolve(ZERO_BASE_AMOUNT))
       ),
