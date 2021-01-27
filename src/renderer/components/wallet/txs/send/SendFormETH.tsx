@@ -50,7 +50,7 @@ export type Props = {
   isLoading?: boolean
   addressValidation: AddressValidation
   fees: FeesRD
-  estimateFee: (asset: Asset, recipient: string, amount: BaseAmount, gasPrice: string) => Promise<BaseAmount>
+  estimateFee: (asset: Asset, recipient: string, amount: BaseAmount, gasPrice: BaseAmount) => Promise<BaseAmount>
   reloadFeesHandler: () => void
 }
 
@@ -96,22 +96,6 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       ),
     [oFees, selectedFeeOptionKey]
   )
-
-  // const txFee: O.Option<Promise<BaseAmount>> = useMemo(
-  //   () =>
-  //     FP.pipe(
-  //       selectedFee,
-  //       O.map((fee) =>
-  //         estimateFee(
-  //           balance.asset,
-  //           form.getFieldValue('recipient'),
-  //           assetToBase(assetAmount(form.getFieldValue('amount'))),
-  //           formatBaseAmount(fee)
-  //         )
-  //       )
-  //     ),
-  //   [balance.asset, estimateFee, form, selectedFee]
-  // )
 
   const oEthAmount: O.Option<AssetAmount> = useMemo(() => {
     // return balance of current asset (if ETH)

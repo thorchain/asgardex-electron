@@ -61,7 +61,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
    * estimate fee provided by EthereumClient
    */
   const estimateFee = useCallback(
-    (asset: Asset, recipient: string, amount: BaseAmount, gasPrice: string) =>
+    (asset: Asset, recipient: string, amount: BaseAmount, gasPrice: BaseAmount) =>
       FP.pipe(
         oClient,
         O.map((client) =>
@@ -70,7 +70,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
             recipient,
             amount,
             overrides: {
-              gasPrice
+              gasPrice: gasPrice.amount()
             }
           })
         ),
