@@ -84,7 +84,8 @@ export const ValueItemContainer = styled('div')`
     }
 
     &-percent {
-      padding-bottom: 50px;
+      align-items: center;
+      margin: 20px 0;
     }
 
     &-in {

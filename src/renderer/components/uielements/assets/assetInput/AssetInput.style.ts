@@ -7,7 +7,7 @@ export const AssetInputWrapper = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 212px;
-  height: 60px;
+  height: 70px;
   padding: 8px;
   border: 1px solid ${palette('gray', 0)};
   border-radius: 2px;
