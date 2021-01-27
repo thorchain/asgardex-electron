@@ -20,8 +20,19 @@ import { BaseAPI } from '../runtime';
 export class SpecificationApi extends BaseAPI {
 
     /**
+     * Swagger/OpenAPI 3.0 specification generated documents.
+     * Documentation
+     */
+    getDocs = (): Observable<void> => {
+        return this.request<void>({
+            path: '/v2/doc',
+            method: 'GET',
+        });
+    };
+
+    /**
      * Returns human and machine readable swagger/openapi specification
-     * Get Swagger
+     * Swagger File
      */
     getSwagger = (): Observable<void> => {
         return this.request<void>({

@@ -2,6 +2,7 @@ import React, { useMemo, useCallback, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { WS } from '@xchainjs/xchain-binance'
+import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { Button } from 'antd'
 import { useObservableState, useSubscription, useObservable } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -55,8 +56,8 @@ export const PlaygroundView: React.FC = (): JSX.Element => {
               {!hasPools && <h3>No pools available.</h3>}
               {hasPools && (
                 <ul>
-                  {s.poolAssets.map((pool: string, index: number) => (
-                    <li key={index}>{pool}</li>
+                  {s.poolAssets.map((pool: Asset, index: number) => (
+                    <li key={index}>{assetToString(pool)}</li>
                   ))}
                 </ul>
               )}

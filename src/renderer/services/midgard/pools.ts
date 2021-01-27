@@ -42,7 +42,6 @@ import {
   PoolDetailsLD,
   PoolsService,
   PoolsStateLD,
-  PoolStringAssetsLD,
   SelectedPricePoolAsset,
   ThorchainEndpointsLD,
   PoolDetails,
@@ -193,9 +192,10 @@ const createPoolsService = (
   }
 
   // Factory to create a stream to get data of `AssetDetails`
-  const getAssetDetails$: (poolAssets$: PoolStringAssetsLD) => AssetDetailsLD = (poolAssets$) =>
+  const getAssetDetails$: (poolAssets$: PoolAssetsLD) => AssetDetailsLD = (poolAssets$) =>
     FP.pipe(
       poolAssets$,
+      liveData.map(A.map(assetToString)),
       liveData.map(NEA.fromArray),
       // provide an empty list of `AssetDetails` in case of empty list of pools
       liveData.chain(O.fold(() => liveData.of([]), apiGetAssetInfo$)),
@@ -203,9 +203,10 @@ const createPoolsService = (
     )
 
   // Factory to create a stream to get data of `PoolDetails`
-  const getPoolDetails$: (poolAssets$: PoolStringAssetsLD) => PoolDetailsLD = (poolAssets$) =>
+  const getPoolDetails$: (poolAssets$: PoolAssetsLD) => PoolDetailsLD = (poolAssets$) =>
     FP.pipe(
       poolAssets$,
+      liveData.map(A.map(assetToString)),
       liveData.map(NEA.fromArray),
       // provide an empty list of `PoolDetails` in case of empty list of pools
       liveData.chain(O.fold(() => liveData.of([]), apiGetPoolsData$)),
@@ -216,7 +217,11 @@ const createPoolsService = (
    * Loading queue to get all needed data for `PoolsState`
    */
   const loadPoolsStateData$ = (): PoolsStateLD => {
-    const poolAssets$: PoolStringAssetsLD = FP.pipe(apiGetPoolsEnabled$, liveData.map(A.map(({ asset }) => asset)))
+    const poolAssets$: PoolAssetsLD = FP.pipe(
+      apiGetPoolsEnabled$,
+      // Filter out all unknown / invalid assets created from asset strings
+      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable)))
+    )
     const assetDetails$ = getAssetDetails$(poolAssets$)
     const poolDetails$ = getPoolDetails$(poolAssets$)
 
@@ -269,7 +274,11 @@ const createPoolsService = (
    * Loading queue to get all needed data for `PendingPoolsState`
    */
   const loadPendingPoolsStateData$ = (): PendingPoolsStateLD => {
-    const poolAssets$: PoolStringAssetsLD = FP.pipe(apiGetPoolsPending$, liveData.map(A.map(({ asset }) => asset)))
+    const poolAssets$: PoolAssetsLD = FP.pipe(
+      apiGetPoolsPending$,
+      // Filter out all unknown / invalid assets created from asset strings
+      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable)))
+    )
     const assetDetails$ = getAssetDetails$(poolAssets$)
     const poolDetails$ = getPoolDetails$(poolAssets$)
 
@@ -322,8 +331,7 @@ const createPoolsService = (
 
   const availableAssets$: PoolAssetsLD = FP.pipe(
     poolsState$,
-    liveData.map((poolsState) => poolsState.poolAssets),
-    liveData.map(A.filterMap((asset) => O.fromNullable(assetFromString(asset))))
+    liveData.map((poolsState) => poolsState.poolAssets)
   )
 
   const {
