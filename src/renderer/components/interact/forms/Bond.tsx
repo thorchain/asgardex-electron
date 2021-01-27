@@ -7,6 +7,7 @@ import {
   AssetRuneNative,
   assetToBase,
   BaseAmount,
+  bnOrZero,
   formatAssetAmount,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
@@ -15,6 +16,7 @@ import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { Input, InputBigNumber } from '../../uielements/input'
+import { validateTxAmountInput } from '../../wallet/txs/TxForm.util'
 import * as Styled from './Forms.styles'
 
 type FormValues = { thorAddress: string; amount: BigNumber }
@@ -40,21 +42,20 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading =
   )
 
   const amountValidator = useCallback(
-    (_, value: string, cb: (error?: string) => void) => {
-      const numberValue = Number(value)
-      if (numberValue <= 0 || Number.isNaN(numberValue)) {
-        cb(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 }))
-      }
-      if (max.amount().isLessThan(Number(value))) {
-        cb(
-          intl.formatMessage(
+    (_, value: string) => {
+      return validateTxAmountInput({
+        input: bnOrZero(value),
+        maxAmount: max,
+        errors: {
+          // We have InputBigNumber beneath and it allows input only of BN
+          msg1: '',
+          msg2: intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 }),
+          msg3: intl.formatMessage(
             { id: 'wallet.validations.lessThen' },
             { value: formatAssetAmount({ amount: max, decimal: 8, trimZeros: true }) }
           )
-        )
-      } else {
-        cb()
-      }
+        }
+      })
     },
     [max, intl]
   )

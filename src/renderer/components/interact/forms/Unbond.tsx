@@ -1,12 +1,13 @@
 import React, { useCallback } from 'react'
 
 import { getUnbondMemo } from '@thorchain/asgardex-util'
-import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, bnOrZero } from '@xchainjs/xchain-util'
 import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { Input, InputBigNumber } from '../../uielements/input'
+import { validateTxAmountInput } from '../../wallet/txs/TxForm.util'
 import * as Styled from './Forms.styles'
 
 type FormValues = { thorAddress: string; amount: BigNumber }
@@ -30,16 +31,19 @@ export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = fa
   )
 
   const amountValidator = useCallback(
-    (_, value: string, cb: (error?: string) => void) => {
-      const numberValue = Number(value)
-      if (numberValue <= 0 || Number.isNaN(numberValue)) {
-        cb(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 }))
-      }
-      if (Number(value) <= 0) {
-        cb(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 }))
-      } else {
-        cb()
-      }
+    (_, value: string) => {
+      return validateTxAmountInput({
+        input: bnOrZero(value),
+        // User inputs his THOR-node address manually and we dont know how much he has bounded
+        maxAmount: assetAmount(Number.POSITIVE_INFINITY),
+        errors: {
+          // We have InputBigNumber beneath and it allows input only of BN
+          msg1: '',
+          msg2: intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 }),
+          // As max value is Number.POSITIVE_INFINITY no need to pass this
+          msg3: ''
+        }
+      })
     },
     [intl]
   )
