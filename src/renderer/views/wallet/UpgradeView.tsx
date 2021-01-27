@@ -22,8 +22,9 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { UpgradeBnbRuneParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
+import { INITIAL_UPGRADE_RUNE_STATE } from '../../services/chain/const'
 import { getPoolAddressByChain } from '../../services/midgard/utils'
-import { INITIAL_BALANCES_STATE, INITIAL_UPGRADE_RUNE_STATE } from '../../services/wallet/const'
+import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 type Props = {}
 

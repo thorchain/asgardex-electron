@@ -9,8 +9,9 @@ import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { SendTxParams } from '../../../../services/binance/types'
-import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/wallet/const'
-import { ErrorId, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/wallet/types'
+import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
+import { UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
+import { ErrorId } from '../../../../services/wallet/types'
 import { WalletBalance, WalletBalances } from '../../../../types/wallet'
 import { Upgrade, Props as UpgradeProps } from './Upgrade'
 
