@@ -13,10 +13,13 @@ import {
 } from '@xchainjs/xchain-util'
 import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
+import * as E from 'fp-ts/Either'
+import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
+import { ZERO_BN } from '../../../const'
+import { greaterThan, lessThanOrEqualTo } from '../../../helpers/form/validation'
 import { Input, InputBigNumber } from '../../uielements/input'
-import { validateTxAmountInput } from '../../wallet/txs/TxForm.util'
 import * as Styled from './Forms.styles'
 
 type FormValues = { thorAddress: string; amount: BigNumber }
@@ -41,23 +44,38 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading =
     [onFinishProp]
   )
 
+  // graterThan returns pure function and there is no need to validate its deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const graterThenZero = useCallback(
+    greaterThan(ZERO_BN)(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 })),
+    [intl]
+  )
+
+  // lessThanOrEqualTo returns pure function and there is no need to validate its deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const lessOrEqualToMax = useCallback(
+    lessThanOrEqualTo(max.amount())(
+      intl.formatMessage(
+        { id: 'wallet.validations.lessThen' },
+        { value: formatAssetAmount({ amount: max, decimal: 8, trimZeros: true }) }
+      )
+    ),
+    [max, intl]
+  )
+
   const amountValidator = useCallback(
     (_, value: string) => {
-      return validateTxAmountInput({
-        input: bnOrZero(value),
-        maxAmount: max,
-        errors: {
-          // We have InputBigNumber beneath and it allows input only of BN
-          msg1: '',
-          msg2: intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 }),
-          msg3: intl.formatMessage(
-            { id: 'wallet.validations.lessThen' },
-            { value: formatAssetAmount({ amount: max, decimal: 8, trimZeros: true }) }
-          )
-        }
-      })
+      return FP.pipe(
+        bnOrZero(value),
+        lessOrEqualToMax,
+        E.chain(graterThenZero),
+        E.fold(
+          (e) => Promise.reject(e),
+          () => Promise.resolve()
+        )
+      )
     },
-    [max, intl]
+    [graterThenZero, lessOrEqualToMax]
   )
 
   return (
