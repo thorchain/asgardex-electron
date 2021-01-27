@@ -49,6 +49,7 @@ const common: CommonMessages = {
   'common.liquidity': 'Liquidität',
   'common.step': 'Schritt {current}/{total}',
   'common.done': 'Fertig',
+  'common.thorAddress': 'THOR Addresse',
   'common.tx.healthCheck': 'Systemcheck',
   'common.tx.sending': 'Sende Transaktion',
   'common.tx.sendingAsset': 'Sende {assetSymbol} Transaktion',

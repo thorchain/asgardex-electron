@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { baseAmount } from '@xchainjs/xchain-util'
+import { BaseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
-import { Unbond } from '../../../components/interact/forms/Unbond'
+import { Custom } from '../../../components/interact/forms/Custom'
 import { Button } from '../../../components/uielements/button'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
@@ -19,13 +19,15 @@ type Props = {
   goToTransaction: (txHash: string) => void
 }
 
-export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
+export const CustomView: React.FC<Props> = ({ goToTransaction }) => {
   const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
   const { interactService$ } = useThorchainContext()
   const { txStatus$ } = useChainContext()
   const intl = useIntl()
 
   const oSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
+
+  const interact$ = useMemo(() => interactService$(txStatus$), [interactService$, txStatus$])
 
   const unsubscribeSub = useCallback(() => {
     FP.pipe(
@@ -34,20 +36,13 @@ export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
     )
   }, [])
 
-  const interact$ = useMemo(() => interactService$(txStatus$), [interactService$, txStatus$])
-
-  const unbondTx = useCallback(
-    ({ memo }: { memo: string }) => {
+  const customTx = useCallback(
+    ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
       unsubscribeSub()
-      /**
-       * it does not matter which amount to send
-       * @docs https://docs.thorchain.org/thornodes/leaving#unbonding
-       */
-      oSubRef.current = O.some(interact$({ amount: baseAmount(1), memo }).subscribe(setInteractState))
+      oSubRef.current = O.some(interact$({ amount, memo }).subscribe(setInteractState))
     },
     [interact$, setInteractState, unsubscribeSub]
   )
-
   const resetResults = useCallback(() => {
     setInteractState(INITIAL_INTERACT_STATE)
   }, [setInteractState])
@@ -75,10 +70,10 @@ export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
   return FP.pipe(
     interactState.txRD,
     RD.fold(
-      () => <Unbond onFinish={unbondTx} />,
-      () => <Unbond isLoading={true} onFinish={FP.identity} loadingProgress={stepLabel} />,
+      () => <Custom onFinish={customTx} />,
+      () => <Custom isLoading={true} onFinish={FP.identity} loadingProgress={stepLabel} />,
       ({ msg }) => (
-        <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.unbond.state.error' })} subTitle={msg}>
+        <Styled.ErrorView title={intl.formatMessage({ id: 'common.error' })} subTitle={msg}>
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.ErrorView>
       ),

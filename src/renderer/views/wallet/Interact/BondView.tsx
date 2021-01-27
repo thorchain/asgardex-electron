@@ -33,7 +33,7 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
   const { txStatus$ } = useChainContext()
   const intl = useIntl()
 
-  const possibleSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
+  const oSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
 
   const [runeBalance] = useObservableState(
     () =>
@@ -61,7 +61,7 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
 
   const unsubscribeSub = useCallback(() => {
     FP.pipe(
-      possibleSubRef.current,
+      oSubRef.current,
       O.map((sub) => sub.unsubscribe())
     )
   }, [])
@@ -69,7 +69,7 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
   const bondTx = useCallback(
     ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
       unsubscribeSub()
-      possibleSubRef.current = O.some(interact$({ amount, memo }).subscribe(setInteractState))
+      oSubRef.current = O.some(interact$({ amount, memo }).subscribe(setInteractState))
     },
     [interact$, setInteractState, unsubscribeSub]
   )

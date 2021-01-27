@@ -95,7 +95,19 @@ export const TabButtonsContainer = styled('div')`
   margin-bottom: 15px;
 `
 
-export const TabButton = styled('button')<{ isActive?: boolean }>`
+export const TabLabel = styled('span')<{ isActive?: boolean }>`
+  ${({ isActive }) => (isActive ? 'font-weight: bold; text-decoration: underline' : '')};
+`
+
+export const UnbondLabel = styled(TabLabel)`
+  color: ${palette('warning', 0)};
+`
+
+export const LeaveLabel = styled(TabLabel)`
+  color: ${palette('error', 0)};
+`
+
+export const TabButton = styled('button')`
   outline: none;
   padding: 0 10px;
   border: 0;
@@ -104,7 +116,6 @@ export const TabButton = styled('button')<{ isActive?: boolean }>`
   text-transform: uppercase;
   margin-right: 5px;
   color: ${palette('primary', 0)};
-  ${({ isActive }) => (isActive ? 'font-weight: bold; text-decoration: underline' : '')};
   font-size: 16px;
 
   &:first-child {

@@ -12,6 +12,7 @@ import { BackLink } from '../../../components/uielements/backLink'
 import { useChainContext } from '../../../contexts/ChainContext'
 import * as walletRoutes from '../../../routes/wallet'
 import { BondView } from './BondView'
+import { CustomView } from './CustomView'
 import * as Styled from './InteractView.styles'
 import { LeaveView } from './LeaveView'
 import { UnbondView } from './UnbondView'
@@ -45,6 +46,7 @@ export const InteractView: React.FC = () => {
           bondContent={<BondView walletAddress={walletAddress} goToTransaction={goToTransaction} />}
           leaveContent={<LeaveView goToTransaction={goToTransaction} />}
           unbondContent={<UnbondView goToTransaction={goToTransaction} />}
+          customContent={<CustomView goToTransaction={goToTransaction} />}
         />
       </Styled.ContentContainer>
     </>

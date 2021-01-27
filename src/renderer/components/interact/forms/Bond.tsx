@@ -7,19 +7,22 @@ import {
   AssetRuneNative,
   assetToBase,
   BaseAmount,
+  bnOrZero,
   formatAssetAmount,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
+import * as E from 'fp-ts/Either'
+import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
+import { ZERO_BN } from '../../../const'
+import { greaterThan, lessThanOrEqualTo } from '../../../helpers/form/validation'
 import { Input, InputBigNumber } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 
-const bondMemoPlaceholder = getBondMemo('THORADDRESS')
-
-type FormValues = { memo: string; amount: BigNumber }
+type FormValues = { thorAddress: string; amount: BigNumber }
 
 type Props = {
   onFinish: (boundData: { memo: string; amount: BaseAmount }) => void
@@ -32,49 +35,48 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading =
   const [form] = Form.useForm<FormValues>()
 
   const onFinish = useCallback(
-    ({ memo, amount }: FormValues) => {
+    ({ thorAddress, amount }: FormValues) => {
       onFinishProp({
-        memo,
+        memo: getBondMemo(thorAddress),
         amount: assetToBase(assetAmount(amount))
       })
     },
     [onFinishProp]
   )
-
   const amountValidator = useCallback(
-    (_, value: string, cb: (error?: string) => void) => {
-      const numberValue = Number(value)
-      if (numberValue <= 0 || Number.isNaN(numberValue)) {
-        cb(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 }))
-      }
-      if (max.amount().isLessThan(Number(value))) {
-        cb(
+    (_, value: string) => {
+      return FP.pipe(
+        bnOrZero(value),
+        lessThanOrEqualTo(max.amount())(
           intl.formatMessage(
             { id: 'wallet.validations.lessThen' },
             { value: formatAssetAmount({ amount: max, decimal: 8, trimZeros: true }) }
           )
+        ),
+        E.chain(greaterThan(ZERO_BN)(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 }))),
+        E.fold(
+          (e) => Promise.reject(e),
+          () => Promise.resolve()
         )
-      } else {
-        cb()
-      }
+      )
     },
     [max, intl]
   )
 
   return (
-    <Styled.Form form={form} onFinish={onFinish} initialValues={{ memo: bondMemoPlaceholder }}>
+    <Styled.Form form={form} onFinish={onFinish} initialValues={{ thorAddress: '' }}>
       <div>
         <Styled.InputContainer>
-          <Styled.InputLabel>{intl.formatMessage({ id: 'common.memo' })}</Styled.InputLabel>
+          <Styled.InputLabel>{intl.formatMessage({ id: 'common.thorAddress' })}</Styled.InputLabel>
           <Form.Item
-            name="memo"
+            name="thorAddress"
             rules={[
               {
                 required: true,
                 message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' })
               }
             ]}>
-            <Input disabled={isLoading} size="large" placeholder={bondMemoPlaceholder} />
+            <Input disabled={isLoading} size="large" />
           </Form.Item>
         </Styled.InputContainer>
 
