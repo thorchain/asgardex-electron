@@ -30,7 +30,7 @@ const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(
 const ETHPLORER_API_KEY = envOrDefault(process.env.REACT_APP_ETHPLORER_API_KEY, 'undefined ethplorer api key')
 const ETHPLORER_TESTNET = 'https://kovan-api.ethplorer.io'
 const ETHPLORER_MAINNET = 'https://api.ethplorer.io'
-const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, 'undefined etherscan api key')
+const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
 
 /**
  * Stream to create an observable EthereumClient depending on existing phrase in keystore

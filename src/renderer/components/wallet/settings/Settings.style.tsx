@@ -1,7 +1,9 @@
+import { SelectOutlined } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { media } from '../../../helpers/styleHelper'
 import { Button as UIButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
 
@@ -86,6 +88,10 @@ export const Button = styled(UIButton)`
   span {
     font-size: 14px;
   }
+
+  :disabled:hover {
+    color: ${palette('primary', 0)} !important;
+  }
 `
 
 export const Placeholder = styled(UILabel)`
@@ -103,7 +109,6 @@ export const ClientLabel = styled(UILabel)`
   color: ${palette('text', 1)};
   font-family: 'MainFontRegular';
   font-size: 16px;
-  text-transform: uppercase;
 `
 
 export const ClientButton = styled(UILabel)`
@@ -125,7 +130,7 @@ export const AccountCard = styled(A.Card)`
 `
 
 export const ListItem = styled(A.List.Item)`
-  padding: 20px 20px 0;
+  padding: 20px 20px;
   flex-direction: column;
   align-items: start;
   border: none;
@@ -169,13 +174,37 @@ export const AccountContent = styled(UILabel)`
 
 export const AccountAddress = styled(UILabel)`
   display: inline-block;
-  width: calc(70%);
   padding: 0px;
   white-space: nowrap;
   overflow: hidden;
   font-family: 'MainFontRegular';
   font-size: 16px;
   text-overflow: ellipsis;
+
+  label:nth-child(1) {
+    display: none;
+    ${media.sm`
+      display: block;
+    `}
+    ${media.md`
+      display: none;
+    `}
+    ${media.xl`
+      display: block;
+    `}
+  }
+  label:nth-child(2) {
+    display: block;
+    ${media.sm`
+      display: none;
+    `}
+    ${media.md`
+      display: block;
+    `}
+    ${media.xl`
+      display: none;
+    `}
+  }
 `
 
 export const DeviceText = styled(UILabel)`
@@ -219,4 +248,32 @@ export const NetworkLabel = styled(UILabel).attrs({
 export const NetworkTitle = styled(NetworkLabel)`
   padding-right: 10px;
   width: auto;
+`
+
+export const CopyLabel = styled(A.Typography.Text)`
+  text-transform: uppercase;
+  font-family: 'MainFontRegular';
+  color: ${palette('primary', 0)};
+  /* icon */
+  svg {
+    color: ${palette('primary', 0)};
+  }
+`
+
+export const Tooltip = styled(A.Tooltip).attrs({
+  placement: 'bottom',
+  overlayStyle: {
+    wordBreak: 'break-all',
+    maxWidth: '500px'
+  }
+})``
+
+export const AddressLinkIcon = styled(SelectOutlined)`
+  margin-left: 10px;
+  svg {
+    height: 16px;
+    width: 16px;
+    transform: scale(-1, 1) translateX(5px);
+    color: ${palette('text', 1)};
+  }
 `

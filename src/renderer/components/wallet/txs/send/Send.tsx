@@ -4,7 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/lib/pipeable'
 import { useIntl } from 'react-intl'
 
-import { TxRD } from '../../../../services/wallet/types'
+import { TxHashRD } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error/'
 import { SuccessView } from '../../../shared/success/'
 import { Button } from '../../../uielements/button'
@@ -19,8 +19,8 @@ import * as Styled from '../TxForm.style'
  * success: SuccessView
  *
  * */
-type Props = {
-  txRD: TxRD
+export type Props = {
+  txRD: TxHashRD
   sendForm: JSX.Element
   inititalActionHandler?: () => void
   successActionHandler?: (txHash: string) => Promise<void>

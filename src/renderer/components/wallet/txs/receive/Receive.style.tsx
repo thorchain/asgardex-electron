@@ -67,20 +67,9 @@ export const MobileCard = styled(Card)`
   }
 `
 
-export const AddressWrapper = styled.label`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  div {
-    width: 50%;
-  }
-`
-
 export const Address = styled(UILabel)`
   text-overflow: ellipsis;
   overflow: hidden;
-  text-transform: uppercase;
   font-family: 'MainFontRegular';
 `
 

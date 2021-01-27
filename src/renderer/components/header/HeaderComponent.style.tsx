@@ -12,7 +12,7 @@ export const HeaderContainer = styled(Layout.Header)`
 
   /* id's defined in svg */
   #asgardex_logo {
-    > :not(:first-child) {
+    > * {
       fill: ${palette('text', 1)};
     }
   }

@@ -35,7 +35,7 @@ export type FormValues = {
   memo?: string
 }
 
-type Props = {
+export type Props = {
   balances: WalletBalances
   balance: WalletBalance
   onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) => void

@@ -7,10 +7,9 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState, useSubscription } from 'observable-hooks'
 import { useHistory } from 'react-router'
-import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { AddDeposit } from '../../../components/deposit/add'
+import { SymDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
 import { ZERO_BN, ZERO_POOL_DATA } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
@@ -20,19 +19,16 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as depositRoutes from '../../../routes/deposit'
-import { INITIAL_DEPOSIT_STATE } from '../../../services/chain/const'
-import { SymDepositMemo, Memo, DepositParams } from '../../../services/chain/types'
+import { SymDepositMemo } from '../../../services/chain/types'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
-import { DepositType } from '../../../types/asgardex'
 
 type Props = {
   asset: Asset
-  type: DepositType
 }
 
-export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
+export const SymDepositView: React.FC<Props> = ({ asset }) => {
   const history = useHistory()
 
   const onChangeAsset = useCallback(
@@ -50,9 +46,9 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
 
   const {
     depositFees$,
+    symDeposit$,
     reloadDepositFees,
     symDepositTxMemo$,
-    asymDepositTxMemo$,
     reloadDepositFeesEffect$,
     getExplorerUrlByAsset$
   } = useChainContext()
@@ -60,8 +56,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
   // subscribe to
   useSubscription(reloadDepositFeesEffect$)
 
-  const [depositFees] = useObservableState(() => depositFees$(type), RD.initial)
-  // TODO (@Veado) Use `selectedPoolAddress$` - will be available with one of next PRs
+  const [depositFees] = useObservableState(() => depositFees$('sym'), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
   const {
@@ -114,9 +109,7 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
     [asset, balances]
   )
 
-  const symDepositTxMemo: O.Option<SymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
-
-  const asymDepositTxMemo: O.Option<Memo> = useObservableState(asymDepositTxMemo$, O.none)
+  const depositTxMemo: O.Option<SymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
 
   const poolAssetsRD: PoolAssetsRD = useObservableState(availableAssets$, RD.initial)
 
@@ -126,31 +119,41 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
     RD.map(getAssetPoolPrice(runPrice))
   )
 
-  const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(asset), [asset, getExplorerUrlByAsset$])
-  const explorerUrl = useObservableState(getExplorerUrl$, O.none)
+  const getAssetExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(asset), [asset, getExplorerUrlByAsset$])
+  const assetExplorerUrl = useObservableState(getAssetExplorerUrl$, O.none)
 
-  const goToTransaction = useCallback(
+  const viewAssetTx = useCallback(
     (txHash: string) => {
       FP.pipe(
-        explorerUrl,
+        assetExplorerUrl,
         O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
       )
     },
-    [explorerUrl]
+    [assetExplorerUrl]
   )
 
-  // Placeholder - will be implemented with #537
-  const deposit$ = (_: DepositParams) => Rx.of(INITIAL_DEPOSIT_STATE)
+  const getRuneExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(AssetRuneNative), [getExplorerUrlByAsset$])
+  const runeExplorerUrl = useObservableState(getRuneExplorerUrl$, O.none)
+
+  const viewRuneTx = useCallback(
+    (txHash: string) => {
+      FP.pipe(
+        runeExplorerUrl,
+        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
+      )
+    },
+    [runeExplorerUrl]
+  )
 
   const renderDisabledAddDeposit = useCallback(
     (error?: Error) => (
       <>
         {/* TODO (@Veado) i18n */}
         {error && <Alert type="error" message="Something went wrong" description={error.toString()} />}
-        <AddDeposit
+        <SymDeposit
           validatePassword$={validatePassword$}
-          goToTransaction={goToTransaction}
-          type={type}
+          viewRuneTx={viewRuneTx}
+          viewAssetTx={viewAssetTx}
           onChangeAsset={FP.constVoid}
           asset={asset}
           assetPrice={ZERO_BN}
@@ -158,21 +161,28 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
           assetBalance={O.none}
           runeBalance={O.none}
           chainAssetBalance={O.none}
-          onDeposit={FP.constVoid}
           fees={depositFees}
           reloadFees={FP.constVoid}
           priceAsset={selectedPricePoolAsset}
           disabled={true}
           poolAddress={O.none}
-          symDepositMemo={O.none}
-          asymDepositMemo={O.none}
+          memo={O.none}
           reloadBalances={reloadBalances}
           poolData={ZERO_POOL_DATA}
-          deposit$={deposit$}
+          deposit$={symDeposit$}
         />
       </>
     ),
-    [validatePassword$, goToTransaction, type, asset, depositFees, selectedPricePoolAsset, reloadBalances]
+    [
+      validatePassword$,
+      viewRuneTx,
+      viewAssetTx,
+      asset,
+      depositFees,
+      selectedPricePoolAsset,
+      reloadBalances,
+      symDeposit$
+    ]
   )
 
   return FP.pipe(
@@ -184,10 +194,10 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
       ([assetPrice, poolAssets, poolDetail]) => {
         return (
           <>
-            <AddDeposit
+            <SymDeposit
               validatePassword$={validatePassword$}
-              goToTransaction={goToTransaction}
-              type={type}
+              viewRuneTx={viewRuneTx}
+              viewAssetTx={viewAssetTx}
               poolData={toPoolData(poolDetail)}
               onChangeAsset={onChangeAsset}
               asset={asset}
@@ -197,16 +207,13 @@ export const AddDepositView: React.FC<Props> = ({ asset, type = 'asym' }) => {
               runeBalance={runeBalance}
               chainAssetBalance={chainAssetBalance}
               poolAddress={oPoolAddress}
-              symDepositMemo={symDepositTxMemo}
-              asymDepositMemo={asymDepositTxMemo}
-              // Placeholder for callback - will be implemented with #537
-              onDeposit={console.log}
+              memo={depositTxMemo}
               fees={depositFees}
               reloadFees={reloadDepositFees}
               priceAsset={selectedPricePoolAsset}
               reloadBalances={reloadBalances}
               assets={poolAssets}
-              deposit$={deposit$}
+              deposit$={symDeposit$}
             />
           </>
         )

@@ -3,7 +3,7 @@ import { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$ } 
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
-const { txs$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
+const { txs$, tx$: loadTx$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService(client$)
 
 export {
@@ -20,5 +20,6 @@ export {
   resetTx,
   txRD$,
   reloadFees,
-  fees$
+  fees$,
+  loadTx$
 }

@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOptionKey, Fees, TxHash } from '@xchainjs/xchain-client'
+import { FeeOptionKey, Fees, Tx } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { TxTypes } from '../../types/asgardex'
-import { ApiError } from '../wallet/types'
+import { ApiError, TxHashRD } from '../wallet/types'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
 
@@ -77,12 +77,12 @@ export type LedgerAddressParams = { chain: Chain; network: Network }
 export type SwapState = {
   // Number of current step
   readonly step: number
+  // Constant total amount of steps
+  readonly stepsTotal: 3
+  // swap transaction
+  readonly swapTx: TxHashRD
   // RD of all requests
-  readonly txRD: RD.RemoteData<ApiError, TxHash>
-  // TxHash needs to be independent from `txRD`
-  // because we have to handle three different requests
-  // and `TxHash` is already provided by second (but not last) request
-  readonly txHash: O.Option<TxHash>
+  readonly swap: RD.RemoteData<ApiError, boolean>
 }
 
 export type SwapState$ = Rx.Observable<SwapState>
@@ -97,25 +97,55 @@ export type SwapParams = {
 export type SwapStateHandler = (p: SwapParams) => SwapState$
 
 /**
- * State to reflect status of a deposit by doing different requests
+ * State to reflect status of an asym. deposit by doing different requests
  */
-export type DepositState = {
+export type AsymDepositState = {
   // Number of current step
   readonly step: number
+  // Constant total amount of steps
+  readonly stepsTotal: 3
+  // deposit transaction
+  readonly depositTx: TxHashRD
   // RD of all requests
-  readonly txRD: RD.RemoteData<ApiError, TxHash>
-  // TxHash needs to be independent from `txRD`
-  // because we have to handle three different requests
-  // and `TxHash` is already provided by second (but not last) request
-  readonly txHash: O.Option<TxHash>
+  readonly deposit: RD.RemoteData<ApiError, boolean>
 }
 
-export type DepositState$ = Rx.Observable<DepositState>
+export type AsymDepositState$ = Rx.Observable<AsymDepositState>
 
-// TODO (@Veado) Define all needed params
-// It's currently a placeholder only and will be implemented with #537
-export type DepositParams = {
+export type AsymDepositParams = {
+  readonly poolAddress: O.Option<string>
+  readonly asset: Asset
+  readonly amount: BaseAmount
   readonly memo: string
 }
 
-export type DepositStateHandler = (p: DepositParams) => SwapState$
+export type AsymDepositStateHandler = (p: AsymDepositParams) => AsymDepositState$
+
+export type SymDepositValidationResult = { pool: boolean; node: boolean }
+export type SymDepositTxs = { rune: TxHashRD; asset: TxHashRD }
+export type SymDepositFinalityResult = { rune: Tx; asset: Tx }
+
+/**
+ * State to reflect status of a sym. deposit by doing different requests
+ */
+export type SymDepositState = {
+  // Number of current step
+  readonly step: number
+  // Constant total amount of steps
+  readonly stepsTotal: 4
+  // deposit transactions
+  readonly depositTxs: SymDepositTxs
+  // RD for all needed steps
+  readonly deposit: RD.RemoteData<ApiError, boolean>
+}
+
+export type SymDepositState$ = Rx.Observable<SymDepositState>
+
+export type SymDepositParams = {
+  readonly poolAddress: O.Option<string>
+  readonly asset: Asset
+  readonly amounts: { rune: BaseAmount; asset: BaseAmount }
+  readonly memos: SymDepositMemo
+}
+
+export type SymDepositStateHandler = (p: SymDepositParams) => SymDepositState$

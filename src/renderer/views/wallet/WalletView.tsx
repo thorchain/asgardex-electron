@@ -17,6 +17,7 @@ import { BondsView } from './BondsView'
 import { CreateView } from './CreateView'
 import { DepositsView } from './DepositsView'
 import { ImportsView } from './importsView'
+import { InteractView } from './Interact'
 import { NoWalletView } from './NoWalletView'
 import { ReceiveView } from './ReceiveView'
 import { SendView } from './send'
@@ -58,6 +59,9 @@ export const WalletView: React.FC = (): JSX.Element => {
             {reloadButton(reloadBalances)}
             <AssetsNav />
             <AssetsView />
+          </Route>
+          <Route path={walletRoutes.deposit.template} exact>
+            <InteractView />
           </Route>
           <Route path={walletRoutes.deposits.template} exact>
             {reloadButton(reloadBalances)}
@@ -131,7 +135,7 @@ export const WalletView: React.FC = (): JSX.Element => {
       <Route path={walletRoutes.locked.template} exact>
         <UnlockView />
       </Route>
-      <Route path={walletRoutes.imports.template} exact>
+      <Route path={walletRoutes.imports.base.template}>
         <ImportsView />
       </Route>
       <Route path={walletRoutes.base.template} render={renderWalletRoute} />

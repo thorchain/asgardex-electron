@@ -1,6 +1,12 @@
 import { DepositMessages } from '../types'
 
 const deposit: DepositMessages = {
+  'deposit.interact.title': 'Deposit',
+  'deposit.interact.subtitle': 'Interact with THORchain',
+  'deposit.interact.actions': 'Available actions',
+  'deposit.interact.actions.bond': 'Bond',
+  'deposit.interact.actions.unbond': 'Unbond',
+  'deposit.interact.actions.leave': 'Leave',
   'deposit.share.title': 'Your pool share',
   'deposit.share.units': 'Liquidity units',
   'deposit.share.total': 'Total value',
@@ -9,6 +15,9 @@ const deposit: DepositMessages = {
   'deposit.totalEarnings': 'Your total earnings from the pool',
   'deposit.add.asym': 'Add {asset}',
   'deposit.add.sym': 'Add {assetA} + {assetB}',
+  'deposit.add.state.healthCheck': 'Health check',
+  'deposit.add.state.sending': 'Send deposit transaction',
+  'deposit.add.state.checkResults': 'Check deposit result',
   'deposit.add.state.pending': 'Adding liquidity',
   'deposit.add.state.success': 'Successful deposit',
   'deposit.add.state.error': 'Deposit error',
@@ -16,6 +25,9 @@ const deposit: DepositMessages = {
   'deposit.add.error.nobalances': 'No balances',
   'deposit.add.error.nobalance1': "You don't have any balance of {asset} in your wallet to deposit.",
   'deposit.add.error.nobalance2': "You don't have any balances of {asset1} and {asset2} in your wallet to deposit.",
+  'deposit.bond.state.error': 'Bond error',
+  'deposit.unbond.state.error': 'Unbond error',
+  'deposit.leave.state.error': 'Leave error',
   'deposit.withdraw': 'Withdraw',
   'deposit.advancedMode': 'Advanced mode',
   'deposit.drag': 'Drag to deposit',

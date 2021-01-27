@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Chain } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-client'
+import { BNBChain, BTCChain, Chain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
 import { Col, notification, Row } from 'antd'
+import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -19,23 +21,35 @@ import { useBitcoinContext } from '../../contexts/BitcoinContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { OnlineStatus } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
+import { getPhrase } from '../../services/wallet/util'
 import { UserAccountType } from '../../types/wallet'
 
 export const SettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const { keystoreService } = useWalletContext()
-  const { lock, removeKeystore } = keystoreService
+  const { keystore$, lock, removeKeystore, exportKeystore } = keystoreService
   const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
+  const thorchainContext = useThorchainContext()
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
+  const thorchaincontext = useThorchainContext()
   const chainContext = useChainContext()
-  const { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } = chainContext
+  const {
+    retrieveLedgerAddress,
+    removeLedgerAddress,
+    removeAllLedgerAddress,
+    getExplorerAddressByChain$
+  } = chainContext
+
+  const phrase$ = useMemo(() => pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
+  const phrase = useObservableState(phrase$, O.none)
 
   const binanceLedgerAddress = useObservableState(binanceContext.ledgerAddress$, RD.initial)
   const binanceAddress$ = useMemo(
@@ -118,6 +132,35 @@ export const SettingsView: React.FC = (): JSX.Element => {
     [bitcoinContext.address$, bitcoinLedgerAddress]
   )
 
+  const oRuneNativeAddress = useObservableState(thorchaincontext.address$, O.none)
+  const runeNativeAddress = pipe(
+    oRuneNativeAddress,
+    O.getOrElse(() => '')
+  )
+
+  const thorchainAddress$ = useMemo(
+    () =>
+      pipe(
+        thorchainContext.address$,
+        RxOp.map(
+          O.map(
+            (address) =>
+              ({
+                chainName: THORChain,
+                accounts: [
+                  {
+                    name: 'Main',
+                    address,
+                    type: 'internal'
+                  }
+                ].filter(({ address }) => !!address)
+              } as UserAccountType)
+          )
+        )
+      ),
+    [thorchainContext.address$]
+  )
+
   const { service: midgardService } = useMidgardContext()
 
   const { onlineStatus$ } = useAppContext()
@@ -141,15 +184,45 @@ export const SettingsView: React.FC = (): JSX.Element => {
     () =>
       pipe(
         // combineLatest is for the future additional accounts
-        Rx.combineLatest([binanceAddress$, ethAddress$, bitcoinAddress$]),
+        Rx.combineLatest([thorchainAddress$, binanceAddress$, ethAddress$, bitcoinAddress$]),
         RxOp.map(A.filter(O.isSome)),
         RxOp.map(sequenceTOptionFromArray)
       ),
-    [binanceAddress$, bitcoinAddress$, ethAddress$]
+    [thorchainAddress$, binanceAddress$, bitcoinAddress$, ethAddress$]
   )
   const userAccounts = useObservableState(userAccounts$, O.none)
 
   const apiVersion = envOrDefault($VERSION, '-')
+
+  const getBNBExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(BNBChain), O.none)
+  const getBTCExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(BTCChain), O.none)
+  const getETHExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(ETHChain), O.none)
+  const getTHORExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(THORChain), O.none)
+  const getCosmosExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(CosmosChain), O.none)
+  const getPolkadotExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(PolkadotChain), O.none)
+
+  const clickAddressLinkHandler = (chain: Chain, address: Address) => {
+    switch (chain) {
+      case BNBChain:
+        FP.pipe(getBNBExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case BTCChain:
+        FP.pipe(getBTCExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case ETHChain:
+        FP.pipe(getETHExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case THORChain:
+        FP.pipe(getTHORExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case CosmosChain:
+        FP.pipe(getCosmosExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case PolkadotChain:
+        FP.pipe(getPolkadotExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+    }
+  }
 
   useEffect(() => {
     const getLedgerErrorDescription = (ledgerAddress: RD.RemoteData<LedgerErrorId, string>, chain: Chain) => {
@@ -197,10 +270,14 @@ export const SettingsView: React.FC = (): JSX.Element => {
           clientUrl={clientUrl}
           lockWallet={lock}
           removeKeystore={removeKeystore}
+          exportKeystore={exportKeystore}
+          runeNativeAddress={runeNativeAddress}
           userAccounts={userAccounts}
           retrieveLedgerAddress={retrieveLedgerAddress}
           removeLedgerAddress={removeLedgerAddress}
           removeAllLedgerAddress={removeAllLedgerAddress}
+          phrase={phrase}
+          clickAddressLinkHandler={clickAddressLinkHandler}
         />
       </Col>
     </Row>

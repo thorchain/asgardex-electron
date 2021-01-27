@@ -11,7 +11,9 @@ import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { AssetDetails } from '../../components/wallet/assets'
+import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -20,6 +22,7 @@ import { isRuneBnbAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { getPoolAddressByChain } from '../../services/midgard/utils'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
@@ -149,6 +152,9 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     O.none
   )
 
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+
   return (
     <>
       <AssetDetails
@@ -165,6 +171,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         sendUpgradeTx={sendUpgradeTx}
         upgradeFee={upgradeFee}
         reloadUpgradeFeeHandler={reloadUpgradeFee}
+        network={network}
       />
     </>
   )

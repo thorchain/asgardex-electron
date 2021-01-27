@@ -12,9 +12,9 @@ import { service as midgardService } from '../../midgard/service'
 import { ErrorId } from '../../wallet/types'
 import { INITIAL_SWAP_STATE } from '../const'
 import { SwapParams, SwapState, SwapState$ } from '../types'
-import { sendTx$ } from './common'
+import { sendTx$, txStatus$ } from './common'
 
-const { pools: midgardPoolsService, txStatus$: midgardTxStatus$ } = midgardService
+const { pools: midgardPoolsService, validateNode$ } = midgardService
 
 /**
  * Swap stream does 3 steps:
@@ -34,7 +34,7 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
   // we start with progress of 25%
   const { get$: getState$, get: getState, set: setState } = observableState<SwapState>({
     ...INITIAL_SWAP_STATE,
-    txRD: RD.progress({ loaded: 25, total })
+    swap: RD.progress({ loaded: 25, total })
   })
 
   // All requests will be done in a sequence
@@ -48,7 +48,7 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
     O.fold(
       // invalid pool address will fail
       () => {
-        setState({ ...getState(), txRD: RD.failure({ errorId: ErrorId.SEND_TX, msg: 'invalid pool address' }) })
+        setState({ ...getState(), swap: RD.failure({ errorId: ErrorId.SEND_TX, msg: 'invalid pool address' }) })
         return Rx.EMPTY
       },
       // valid pool address (even an empty one for Thorchain)
@@ -58,13 +58,14 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
           RxOp.switchMap((poolAddress) =>
             Rx.iif(
               () => isRuneNativeAsset(asset),
-              midgardPoolsService.validateNode$(),
-              midgardPoolsService.validatePool$(poolAddress)
+              // We don't have a RUNE pool, so we just validate current connected node
+              validateNode$(),
+              // in other case we have to validate pool address
+              midgardPoolsService.validatePool$(poolAddress, asset.chain)
             )
           ),
-          // Update progress
           liveData.chain((_) => {
-            setState({ ...getState(), step: 2, txRD: RD.progress({ loaded: 50, total }) })
+            setState({ ...getState(), step: 2, swapTx: RD.pending, swap: RD.progress({ loaded: 50, total }) })
             // 2. send swap tx
             return sendTx$({
               asset,
@@ -77,22 +78,21 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
           }),
           liveData.chain((txHash) => {
             // Update state
-            setState({ ...getState(), step: 3, txHash: O.some(txHash), txRD: RD.progress({ loaded: 75, total }) })
-            // 3. check tx finality via midgard (not implemented yet)
-            return midgardTxStatus$(txHash)
+            setState({ ...getState(), step: 3, swapTx: RD.success(txHash), swap: RD.progress({ loaded: 75, total }) })
+            // 3. check tx finality by polling its tx data
+            return txStatus$(txHash, asset.chain)
           }),
           // Update state
-          liveData.map((txHash) =>
-            setState({ ...getState(), txHash, txRD: RD.success(O.getOrElse(() => '')(txHash)) })
-          ),
+          liveData.map((_) => setState({ ...getState(), swap: RD.success(true) })),
+
           // Add failures to state
           liveData.mapLeft((apiError) => {
-            setState({ ...getState(), txRD: RD.failure(apiError) })
+            setState({ ...getState(), swap: RD.failure(apiError) })
             return apiError
           }),
           // handle errors
           RxOp.catchError((error) => {
-            setState({ ...getState(), txRD: RD.failure(error) })
+            setState({ ...getState(), swap: RD.failure(error) })
             return Rx.EMPTY
           })
         )
@@ -100,7 +100,7 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
   )
 
   // Just a timer used to update loaded state (in pending state only)
-  const timer$ = Rx.timer(1500).pipe(RxOp.filter(() => RD.isPending(getState().txRD)))
+  const timer$ = Rx.timer(1500).pipe(RxOp.filter(() => RD.isPending(getState().swap)))
 
   // We do need to fake progress in last step
   // That's we combine streams `getState$` (state updates) and `timer$` (counter)
@@ -109,7 +109,7 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
     RxOp.switchMap(([state]) =>
       Rx.of(
         FP.pipe(
-          state.txRD,
+          state.swap,
           RD.fold(
             // ignore initial state + return same state (no changes)
             () => state,
@@ -118,7 +118,7 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
               FP.pipe(
                 oProgress,
                 O.map(({ loaded }) => {
-                  // From 66 to 97 we count progress with small steps, but stop it at 98
+                  // From 75 to 97 we count progress with small steps, but stop it at 98
                   const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
                   return { ...state, txRD: RD.progress({ loaded: updatedLoaded, total }) }
                 }),

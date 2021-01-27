@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import {
@@ -19,29 +18,25 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
-import { ZERO_BASE_AMOUNT } from '../../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { isChainAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { INITIAL_DEPOSIT_STATE } from '../../../services/chain/const'
-import {
-  SymDepositMemo,
-  Memo,
-  SendDepositTxParams,
-  DepositFeesRD,
-  DepositState,
-  DepositStateHandler
-} from '../../../services/chain/types'
+import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
+import { SymDepositMemo, DepositFeesRD, SymDepositState, SymDepositStateHandler } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { DepositType } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
+import { DepositAssets } from '../../modal/tx/extra'
+import { ViewTxButton } from '../../uielements/button'
 import { Drag } from '../../uielements/drag'
+import { Fees, UIFeesRD } from '../../uielements/fees'
 import { formatFee } from '../../uielements/fees/Fees.helper'
-import * as Helper from './AddDeposit.helper'
-import * as Styled from './AddDeposit.style'
+import * as Helper from './Deposit.helper'
+import * as Styled from './Deposit.style'
 
 export type Props = {
-  type: DepositType
   asset: Asset
   assetPrice: BigNumber
   runePrice: BigNumber
@@ -49,35 +44,35 @@ export type Props = {
   runeBalance: O.Option<BaseAmount>
   chainAssetBalance: O.Option<BaseAmount>
   poolAddress: O.Option<PoolAddress>
-  asymDepositMemo: O.Option<Memo>
-  symDepositMemo: O.Option<SymDepositMemo>
+  memo: O.Option<SymDepositMemo>
   priceAsset?: Asset
   fees: DepositFeesRD
   reloadFees: (type: DepositType) => void
   reloadBalances: FP.Lazy<void>
-  goToTransaction: (txHash: string) => void
+  viewAssetTx: (txHash: string) => void
+  viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
   assets?: Asset[]
-  onDeposit: (p: SendDepositTxParams) => void
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
-  deposit$: DepositStateHandler
+  deposit$: SymDepositStateHandler
 }
 
-export const AddDeposit: React.FC<Props> = (props) => {
+type SelectedInput = 'asset' | 'rune' | 'none'
+
+export const SymDeposit: React.FC<Props> = (props) => {
   const {
-    type,
     asset,
     assetPrice,
     runePrice,
     assetBalance: oAssetBalance,
     runeBalance: oRuneBalance,
     chainAssetBalance: oChainAssetBalance,
-    asymDepositMemo: oAsymDepositMemo,
-    symDepositMemo: oSymDepositMemo,
+    memo: oMemo,
     poolAddress: oPoolAddress,
-    goToTransaction = (_) => {},
+    viewAssetTx = (_) => {},
+    viewRuneTx = (_) => {},
     validatePassword$,
     assets,
     priceAsset,
@@ -94,11 +89,11 @@ export const AddDeposit: React.FC<Props> = (props) => {
   const [runeAmountToDeposit, setRuneAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [assetAmountToDeposit, setAssetAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [percentValueToDeposit, setPercentValueToDeposit] = useState(0)
+  const [selectedInput, setSelectedInput] = useState<SelectedInput>('none')
 
-  const isAsym = useMemo(() => type === 'asym', [type])
-
-  // (Possible) subscription of swap$
-  const [depositSub, setDepositSub] = useState<O.Option<Rx.Subscription>>(O.none)
+  // (Possible) subscription of `xyzDeposit$`
+  // DON'T use `_setDepositSubUnsafe` to update state (it's unsafe) - use `setDepositSub`!!
+  const [depositSub, _setDepositSub] = useState<O.Option<Rx.Subscription>>(O.none)
 
   // unsubscribe deposit$ subscription
   const unsubscribeDepositSub = useCallback(() => {
@@ -108,18 +103,26 @@ export const AddDeposit: React.FC<Props> = (props) => {
     )
   }, [depositSub])
 
+  const setDepositSub = useCallback(
+    (state) => {
+      unsubscribeDepositSub()
+      _setDepositSub(state)
+    },
+    [unsubscribeDepositSub]
+  )
+
   useEffect(() => {
-    // Unsubscribe of (possible) previous subscription of `swap$`
+    // Unsubscribe of (possible) previous subscription of `deposit$`
     return () => {
       unsubscribeDepositSub()
     }
   }, [unsubscribeDepositSub])
 
   // Deposit state
-  const [depositState, setDepositState] = useState<DepositState>(INITIAL_DEPOSIT_STATE)
+  const [depositState, setDepositState] = useState<SymDepositState>(INITIAL_SYM_DEPOSIT_STATE)
 
   // Deposit start time
-  const [depositStartTime, _setDepositStartTime] = useState<number>(0)
+  const [depositStartTime, setDepositStartTime] = useState<number>(0)
 
   const assetBalance: BaseAmount = useMemo(
     () =>
@@ -139,38 +142,72 @@ export const AddDeposit: React.FC<Props> = (props) => {
     [oRuneBalance]
   )
 
-  const maxRuneAmountToDeposit = useMemo(
-    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance }),
-    [assetBalance, poolData, runeBalance]
+  const oThorchainFee: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        fees,
+        RD.toOption,
+        O.chain(({ thor }) => thor)
+      ),
+    [fees]
   )
 
-  const maxAssetAmountToDeposit = useMemo(
-    (): BaseAmount => Helper.maxAssetAmountToDeposit({ poolData, runeBalance, assetBalance }),
-    [assetBalance, poolData, runeBalance]
+  const maxRuneAmountToDeposit = useMemo((): BaseAmount => {
+    const maxAmount = Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance })
+
+    // Consider fees
+    return FP.pipe(
+      oThorchainFee,
+      // Check: maxAmount > fee
+      O.filter((fee) => maxAmount.amount().isGreaterThan(fee.amount())),
+      // Substract fee from maxAmount
+      O.map((fee) => maxAmount.amount().minus(fee.amount())),
+      // Set maxAmount to zero as long as we dont have a feeRate
+      O.getOrElse(() => ZERO_BN),
+      baseAmount
+    )
+  }, [assetBalance, oThorchainFee, poolData, runeBalance])
+
+  const oAssetChainFee: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        fees,
+        RD.toOption,
+        O.map(({ asset }) => asset)
+      ),
+    [fees]
   )
+
+  const maxAssetAmountToDeposit = useMemo((): BaseAmount => {
+    const maxAmount = Helper.maxAssetAmountToDeposit({ poolData, runeBalance, assetBalance })
+    // substract fees if needed
+    if (isChainAsset(asset)) {
+      return FP.pipe(
+        oAssetChainFee,
+        // Check: maxAmount > fee
+        O.filter((fee) => maxAmount.amount().isGreaterThan(fee.amount())),
+        // Substract fee from maxAmount
+        O.map((fee) => maxAmount.amount().minus(fee.amount())),
+        // Set maxAmount to zero as long as we dont have a feeRate
+        O.getOrElse(() => ZERO_BN),
+        baseAmount
+      )
+    }
+    return maxAmount
+  }, [asset, assetBalance, oAssetChainFee, poolData, runeBalance])
 
   const hasAssetBalance = useMemo(() => assetBalance.amount().isGreaterThan(0), [assetBalance])
   const hasRuneBalance = useMemo(() => runeBalance.amount().isGreaterThan(0), [runeBalance])
 
-  const isAsymBalanceError = useMemo(() => !hasAssetBalance, [hasAssetBalance])
-
-  const isSymBalanceError = useMemo(() => !hasAssetBalance && !hasRuneBalance, [hasAssetBalance, hasRuneBalance])
-
-  const isBalanceError = useMemo(() => (type === 'sym' ? isSymBalanceError : isAsymBalanceError), [
-    isAsymBalanceError,
-    isSymBalanceError,
-    type
-  ])
+  const isBalanceError = useMemo(() => !hasAssetBalance && !hasRuneBalance, [hasAssetBalance, hasRuneBalance])
 
   const showBalanceError = useMemo(
     () =>
       // Note:
       // To avoid flickering of balance error for a short time at the beginning
       // We never show error if balances are not available
-      type === 'sym'
-        ? O.isSome(oAssetBalance) && isSymBalanceError
-        : FP.pipe(sequenceTOption(oRuneBalance, oAssetBalance), (balances) => O.isSome(balances) && isAsymBalanceError),
-    [isAsymBalanceError, isSymBalanceError, oAssetBalance, oRuneBalance, type]
+      O.isSome(oAssetBalance) && isBalanceError,
+    [isBalanceError, oAssetBalance]
   )
 
   const renderBalanceError = useMemo(() => {
@@ -197,7 +234,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
     )
 
     // asym error message
-    const asymMsg =
+    const msg =
       // no balance for pool asset and rune
       !hasAssetBalance && !hasRuneBalance
         ? noRuneAndAssetBalancesMsg
@@ -207,25 +244,25 @@ export const AddDeposit: React.FC<Props> = (props) => {
         : // no balance of pool asset
           noAssetBalancesMsg
 
-    const symMsg = noAssetBalancesMsg
-
     const title = intl.formatMessage({ id: 'deposit.add.error.nobalances' })
 
-    const msg = type === 'sym' ? symMsg : asymMsg
     return <Styled.BalanceAlert type="warning" message={title} description={msg} />
-  }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl, type])
+  }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl])
 
   const runeAmountChangeHandler = useCallback(
     (runeInput: BaseAmount) => {
+      // Do nothing if we don't entered input for rune
+      if (selectedInput !== 'rune') return
+
       let runeQuantity = runeInput.amount().isGreaterThan(maxRuneAmountToDeposit.amount())
-        ? maxRuneAmountToDeposit
+        ? { ...maxRuneAmountToDeposit } // Use copy to avoid missmatch with values in input fields
         : runeInput
       const assetQuantity = Helper.getAssetAmountToDeposit(runeQuantity, poolData)
 
-      if (assetQuantity.amount().isGreaterThan(maxRuneAmountToDeposit.amount())) {
-        runeQuantity = Helper.getRuneAmountToDeposit(maxRuneAmountToDeposit, poolData)
+      if (assetQuantity.amount().isGreaterThan(maxAssetAmountToDeposit.amount())) {
+        runeQuantity = Helper.getRuneAmountToDeposit(maxAssetAmountToDeposit, poolData)
         setRuneAmountToDeposit(runeQuantity)
-        setAssetAmountToDeposit(maxRuneAmountToDeposit)
+        setAssetAmountToDeposit(maxAssetAmountToDeposit)
         setPercentValueToDeposit(100)
       } else {
         setRuneAmountToDeposit(runeQuantity)
@@ -237,13 +274,16 @@ export const AddDeposit: React.FC<Props> = (props) => {
         setPercentValueToDeposit(percentToDeposit)
       }
     },
-    [maxRuneAmountToDeposit, poolData]
+    [maxAssetAmountToDeposit, maxRuneAmountToDeposit, poolData, selectedInput]
   )
 
   const assetAmountChangeHandler = useCallback(
     (assetInput: BaseAmount) => {
-      let assetQuantity = assetInput.amount().isGreaterThan(maxRuneAmountToDeposit.amount())
-        ? maxRuneAmountToDeposit
+      // Do nothing if we don't entered input for asset
+      if (selectedInput !== 'asset') return
+
+      let assetQuantity = assetInput.amount().isGreaterThan(maxAssetAmountToDeposit.amount())
+        ? { ...maxAssetAmountToDeposit } // Use copy to avoid missmatch with values in input fields
         : assetInput
       const runeQuantity = Helper.getRuneAmountToDeposit(assetQuantity, poolData)
 
@@ -256,13 +296,13 @@ export const AddDeposit: React.FC<Props> = (props) => {
         setRuneAmountToDeposit(runeQuantity)
         setAssetAmountToDeposit(assetQuantity)
         // assetQuantity * 100 / maxAssetAmountToDeposit
-        const percentToDeposit = maxRuneAmountToDeposit.amount().isGreaterThan(0)
-          ? assetQuantity.amount().multipliedBy(100).dividedBy(maxRuneAmountToDeposit.amount()).toNumber()
+        const percentToDeposit = maxAssetAmountToDeposit.amount().isGreaterThan(0)
+          ? assetQuantity.amount().multipliedBy(100).dividedBy(maxAssetAmountToDeposit.amount()).toNumber()
           : 0
         setPercentValueToDeposit(percentToDeposit)
       }
     },
-    [maxRuneAmountToDeposit, poolData]
+    [maxAssetAmountToDeposit, maxRuneAmountToDeposit, poolData, selectedInput]
   )
 
   const changePercentHandler = useCallback(
@@ -297,16 +337,6 @@ export const AddDeposit: React.FC<Props> = (props) => {
     [intl]
   )
 
-  const oThorchainFee: O.Option<BaseAmount> = useMemo(
-    () =>
-      FP.pipe(
-        fees,
-        RD.toOption,
-        O.chain(({ thor }) => thor)
-      ),
-    [fees]
-  )
-
   const isThorchainFeeError = useMemo(() => {
     return FP.pipe(
       sequenceTOption(oThorchainFee, oRuneBalance),
@@ -331,16 +361,6 @@ export const AddDeposit: React.FC<Props> = (props) => {
       O.getOrElse(() => <></>)
     )
   }, [oRuneBalance, oThorchainFee, renderFeeError])
-
-  const oAssetChainFee: O.Option<BaseAmount> = useMemo(
-    () =>
-      FP.pipe(
-        fees,
-        RD.toOption,
-        O.map(({ asset }) => asset)
-      ),
-    [fees]
-  )
 
   const isAssetChainFeeError = useMemo(() => {
     return FP.pipe(
@@ -367,31 +387,37 @@ export const AddDeposit: React.FC<Props> = (props) => {
     )
   }, [oChainAssetBalance, oAssetChainFee, renderFeeError, asset])
 
-  const feesLabel = useMemo(
-    () =>
-      FP.pipe(
-        fees,
-        RD.fold(
-          () => '...',
-          () => '...',
-          (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
-          ({ thor: oThorFee, asset: assetFee }) =>
-            // Show one (asym deposit)
-            // or
-            // two fees (sym)
-            `${FP.pipe(
-              oThorFee,
-              O.map((thorFee) => `${formatFee({ amount: thorFee, asset: AssetRuneNative })} + `),
-              O.getOrElse(() => '')
-            )} ${formatFee({ amount: assetFee, asset })}`
-        )
-      ),
-    [asset, fees, intl]
-  )
+  const reloadFeesHandler = useCallback(() => reloadFees('sym'), [reloadFees])
 
-  const reloadFeesHandler = useCallback(() => reloadFees(type), [reloadFees, type])
+  const txModalExtraContent = useMemo(() => {
+    const stepDescriptions = [
+      intl.formatMessage({ id: 'common.tx.healthCheck' }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: AssetRuneNative.symbol }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: asset.symbol }),
+      intl.formatMessage({ id: 'common.tx.checkResult' })
+    ]
+    const stepDescription = FP.pipe(
+      depositState.deposit,
+      RD.fold(
+        () => '',
+        () =>
+          `${intl.formatMessage(
+            { id: 'common.step' },
+            { current: depositState.step, total: depositState.stepsTotal }
+          )}: ${stepDescriptions[depositState.step - 1]}`,
+        () => '',
+        () => `${intl.formatMessage({ id: 'common.done' })}!`
+      )
+    )
 
-  const extraTxModalContent = useMemo(() => <>Extra TxModal content</>, [])
+    return (
+      <DepositAssets
+        target={{ asset, amount: assetAmountToDeposit }}
+        source={O.some({ asset: AssetRuneNative, amount: runeAmountToDeposit })}
+        stepDescription={stepDescription}
+      />
+    )
+  }, [intl, asset, depositState, assetAmountToDeposit, runeAmountToDeposit])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe
@@ -399,8 +425,8 @@ export const AddDeposit: React.FC<Props> = (props) => {
     // reset deposit$ subscription
     setDepositSub(O.none)
     // reset deposit state
-    setDepositState(INITIAL_DEPOSIT_STATE)
-  }, [unsubscribeDepositSub])
+    setDepositState(INITIAL_SYM_DEPOSIT_STATE)
+  }, [setDepositSub, unsubscribeDepositSub])
 
   const onFinishTxModal = useCallback(() => {
     // Do same things as with closing
@@ -410,14 +436,14 @@ export const AddDeposit: React.FC<Props> = (props) => {
   }, [onCloseTxModal, reloadBalances])
 
   const renderTxModal = useMemo(() => {
-    const { txHash, txRD } = depositState
+    const { deposit: depositRD, depositTxs: symDepositTxs } = depositState
 
     // don't render TxModal in initial state
-    if (RD.isInitial(txRD)) return <></>
+    if (RD.isInitial(depositRD)) return <></>
 
     // Get timer value
     const timerValue = FP.pipe(
-      txRD,
+      depositRD,
       RD.fold(
         () => 0,
         FP.flow(
@@ -431,7 +457,7 @@ export const AddDeposit: React.FC<Props> = (props) => {
 
     // title
     const txModalTitle = FP.pipe(
-      txRD,
+      depositRD,
       RD.fold(
         () => 'deposit.add.state.pending',
         () => 'deposit.add.state.pending',
@@ -441,20 +467,46 @@ export const AddDeposit: React.FC<Props> = (props) => {
       (id) => intl.formatMessage({ id })
     )
 
+    const extraResult = (
+      <Styled.AsymExtraContainer>
+        {FP.pipe(symDepositTxs.rune, RD.toOption, (oTxHash) => (
+          <Styled.ViewTxButtonTop
+            txHash={oTxHash}
+            onClick={viewRuneTx}
+            // TODO (@Veado) Add i18n
+            label={`View ${AssetRuneNative.symbol} transaction`}
+          />
+        ))}
+        {FP.pipe(symDepositTxs.asset, RD.toOption, (oTxHash) => (
+          // TODO (@Veado) Add i18n
+          <ViewTxButton txHash={oTxHash} onClick={viewAssetTx} label={`View ${asset.symbol} transaction`} />
+        ))}
+      </Styled.AsymExtraContainer>
+    )
+
     return (
       <TxModal
         title={txModalTitle}
         onClose={onCloseTxModal}
         onFinish={onFinishTxModal}
         startTime={depositStartTime}
-        txRD={txRD}
-        txHash={txHash}
+        txRD={depositRD}
         timerValue={timerValue}
-        onViewTxClick={goToTransaction}
-        extra={extraTxModalContent}
+        extraResult={extraResult}
+        extra={txModalExtraContent}
       />
     )
-  }, [depositState, onCloseTxModal, onFinishTxModal, depositStartTime, goToTransaction, extraTxModalContent, intl])
+  }, [
+    depositState,
+    viewAssetTx,
+    txModalExtraContent,
+    onCloseTxModal,
+    onFinishTxModal,
+    depositStartTime,
+    intl,
+    viewRuneTx,
+    asset.symbol
+  ])
 
   const closePasswordModal = useCallback(() => {
     setShowPasswordModal(false)
@@ -469,58 +521,58 @@ export const AddDeposit: React.FC<Props> = (props) => {
     // close private modal
     closePasswordModal()
 
-    // _asymDepositTx is temporary - will be changed with #537
-    const _asymDepositTx = () =>
-      FP.pipe(
-        sequenceTOption(oPoolAddress, oAsymDepositMemo),
-        O.map(([poolAddress, asymDepositMemo]) => {
-          const asymDepositTxParam = {
-            asset: asset,
-            poolAddress,
-            amount: assetAmountToDeposit,
-            memo: asymDepositMemo
-          }
-          console.log('ASYM Tx 1/1 ', asymDepositTxParam)
-          return true
-        })
-      )
-    // _symDepositTx is temporary - will be changed with #537
-    const _symDepositTx = () =>
-      FP.pipe(
-        sequenceTOption(oPoolAddress, oSymDepositMemo),
-        O.map(([poolAddress, { rune: runeMemo, asset: assetMemo }]) => {
-          const thorchainTxParam = {
-            asset: AssetRuneNative,
-            poolAddress,
-            // TODO (@Veado) NativeRune tx, maybe it can be ZERO
-            // minimal tx amount of `RuneNative`
-            amount: baseAmount(1),
-            memo: runeMemo
-          }
-          console.log('SYM Tx 1/2 (thorchain):', thorchainTxParam)
-          const assetChainTxParam = {
-            asset: asset,
-            poolAddress,
-            amount: assetAmountToDeposit,
-            memo: assetMemo
-          }
-          console.log('SYM Tx 2/2 (asset chain):', assetChainTxParam)
+    // set start time
+    setDepositStartTime(Date.now())
 
-          return true
-        })
-      )
+    FP.pipe(
+      oMemo,
+      O.map((memos) => {
+        const sub = deposit$({
+          asset,
+          poolAddress: oPoolAddress,
+          amounts: { rune: runeAmountToDeposit, asset: assetAmountToDeposit },
+          memos
+        }).subscribe(setDepositState)
 
-    // Temporary run of deposit$ - will be implemented with #537
-    const sub = deposit$({ memo: '' }).subscribe(setDepositState)
+        // store subscription - needed to unsubscribe while unmounting
+        setDepositSub(O.some(sub))
 
-    setDepositSub(O.some(sub))
-  }, [closePasswordModal, deposit$, oPoolAddress, oAsymDepositMemo, asset, assetAmountToDeposit, oSymDepositMemo])
+        return true
+      })
+    )
+  }, [
+    closePasswordModal,
+    asset,
+    oPoolAddress,
+    assetAmountToDeposit,
+    setDepositSub,
+    oMemo,
+    deposit$,
+    runeAmountToDeposit
+  ])
 
   const disabledForm = useMemo(() => isBalanceError || isThorchainFeeError || disabled, [
     disabled,
     isBalanceError,
     isThorchainFeeError
   ])
+
+  const uiFeesRD: UIFeesRD = useMemo(
+    () =>
+      FP.pipe(
+        fees,
+        RD.map(({ asset: assetFeeAmount, thor: oThorFeeAmount }) => {
+          const fees = [{ asset, amount: assetFeeAmount }]
+
+          return FP.pipe(
+            oThorFeeAmount,
+            O.map((thorFeeAmount) => [...fees, { asset: AssetRuneNative, amount: thorFeeAmount }]),
+            O.getOrElse(() => fees)
+          )
+        })
+      ),
+    [asset, fees]
+  )
 
   return (
     <Styled.Container>
@@ -535,6 +587,8 @@ export const AddDeposit: React.FC<Props> = (props) => {
             selectedAmount={assetAmountToDeposit}
             maxAmount={maxAssetAmountToDeposit}
             onChangeAssetAmount={assetAmountChangeHandler}
+            inputOnFocusHandler={() => setSelectedInput('asset')}
+            inputOnBlurHandler={() => setSelectedInput('none')}
             price={assetPrice}
             assets={assets}
             percentValue={percentValueToDeposit}
@@ -545,34 +599,24 @@ export const AddDeposit: React.FC<Props> = (props) => {
         </Col>
 
         <Col xs={24} xl={12}>
-          {!isAsym && (
-            <Styled.AssetCard
-              disabled={disabledForm}
-              asset={AssetRuneNative}
-              selectedAmount={runeAmountToDeposit}
-              maxAmount={maxRuneAmountToDeposit}
-              onChangeAssetAmount={runeAmountChangeHandler}
-              price={runePrice}
-              priceAsset={priceAsset}
-            />
-          )}
+          <Styled.AssetCard
+            disabled={disabledForm}
+            asset={AssetRuneNative}
+            selectedAmount={runeAmountToDeposit}
+            maxAmount={maxRuneAmountToDeposit}
+            onChangeAssetAmount={runeAmountChangeHandler}
+            inputOnFocusHandler={() => setSelectedInput('rune')}
+            inputOnBlurHandler={() => setSelectedInput('none')}
+            price={runePrice}
+            priceAsset={priceAsset}
+          />
         </Col>
       </Styled.CardsRow>
 
       <Styled.FeesRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.FeeRow>
-            <Col>
-              <Styled.ReloadFeeButton onClick={reloadFeesHandler} disabled={RD.isPending(fees)}>
-                <SyncOutlined />
-              </Styled.ReloadFeeButton>
-            </Col>
-            <Col>
-              <Styled.FeeLabel disabled={RD.isPending(fees)}>
-                {isAsym ? intl.formatMessage({ id: 'common.fee' }) : intl.formatMessage({ id: 'common.fees' })}:{' '}
-                {feesLabel}
-              </Styled.FeeLabel>
-            </Col>
+            <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} />
           </Styled.FeeRow>
           <Styled.FeeErrorRow>
             <Col>

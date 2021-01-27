@@ -15,7 +15,7 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { AddressValidation } from '../../../services/thorchain/types'
-import { NonEmptyWalletBalances, TxRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, TxHashRD } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 
 type Props = {
@@ -34,7 +34,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
 
   const { fees$, subscribeTx, txRD$, client$, resetTx } = useThorchainContext()
 
-  const txRD = useObservableState<TxRD>(txRD$, RD.initial)
+  const txRD = useObservableState<TxHashRD>(txRD$, RD.initial)
   const oClient = useObservableState<O.Option<ThorchainClient>>(client$, O.none)
 
   const [fee] = useObservableState<O.Option<AssetAmount>>(

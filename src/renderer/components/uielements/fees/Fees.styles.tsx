@@ -2,6 +2,7 @@ import React from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
+import { palette } from 'styled-theme'
 
 import { Button as UIButton } from '../button'
 
@@ -21,4 +22,5 @@ export const ReloadFeeButton = styled(UIButton).attrs({
 export const Container = styled('div')`
   display: flex;
   align-items: center;
+  color: ${palette('text', 0)};
 `

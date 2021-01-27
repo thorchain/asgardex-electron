@@ -4,8 +4,8 @@ import Text from 'antd/lib/typography/Text'
 import { useObservableState } from 'observable-hooks'
 import { palette } from 'styled-theme'
 
-import { ReactComponent as LockIcon } from '../../../assets/svg/icon-lock.svg'
-import { ReactComponent as UnlockIcon } from '../../../assets/svg/icon-unlock.svg'
+import { ReactComponent as LockWarningIcon } from '../../../assets/svg/icon-lock-warning.svg'
+import { ReactComponent as UnlockWarningIcon } from '../../../assets/svg/icon-unlock-warning.svg'
 import { useThemeContext } from '../../../contexts/ThemeContext'
 import { HeaderIconWrapper } from '../HeaderIcon.style'
 
@@ -32,8 +32,8 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
   const desktopView = useMemo(
     () => (
       <>
-        {isLocked && <LockIcon style={iconStyle} />}
-        {!isLocked && <UnlockIcon style={iconStyle} />}
+        {isLocked && <LockWarningIcon style={iconStyle} />}
+        {!isLocked && <UnlockWarningIcon style={iconStyle} />}
       </>
     ),
     [iconStyle, isLocked]
@@ -44,8 +44,8 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
     return (
       <>
         {!isDesktopView && <Text style={{ color, textTransform: 'uppercase' }}>{label}</Text>}
-        {!isLocked && <UnlockIcon style={iconStyle} />}
-        {isLocked && <LockIcon style={iconStyle} />}
+        {!isLocked && <UnlockWarningIcon style={iconStyle} />}
+        {isLocked && <LockWarningIcon style={iconStyle} />}
       </>
     )
   }, [color, iconStyle, isDesktopView, isLocked])

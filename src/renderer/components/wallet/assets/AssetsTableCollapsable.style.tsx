@@ -59,6 +59,7 @@ export const Collapse = styled(A.Collapse)`
 `
 
 export const ExpandIcon = styled(CaretRightOutlined)`
+  margin-top: -13px;
   svg {
     color: ${palette('primary', 0)};
   }
@@ -73,4 +74,14 @@ export const HideIcon = styled(EyeInvisibleOutlined)`
     see https://github.com/thorchain/asgardex-electron/issues/476
   */
   cursor: pointer;
+`
+
+export const CopyLabelContainer = styled.span``
+
+export const CopyLabel = styled(A.Typography.Text)`
+  text-transform: uppercase;
+  color: ${palette('primary', 0)};
+  svg {
+    color: ${palette('primary', 0)};
+  }
 `

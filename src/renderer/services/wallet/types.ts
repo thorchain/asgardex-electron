@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, TxHash } from '@xchainjs/xchain-client'
+import { Address, Tx, TxHash } from '@xchainjs/xchain-client'
+import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -7,7 +8,7 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 
-import { LedgerErrorId } from '../../../shared/api/types'
+import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { WalletBalance } from '../../types/wallet'
 import { LoadTxsParams, WalletBalancesRD } from '../clients'
@@ -29,10 +30,16 @@ export type KeystoreState = O.Option<O.Option<KeystoreContent>>
 export type ValidatePasswordHandler = (password: string) => LiveData<Error, void>
 export type ValidatePasswordLD = LiveData<Error, void>
 
+export type ImportKeystoreLD = LiveData<Error, void>
+export type LoadKeystoreLD = LiveData<Error, Keystore>
+
 export type KeystoreService = {
   keystore$: Observable<KeystoreState>
   addKeystore: (phrase: Phrase, password: string) => Promise<void>
   removeKeystore: () => Promise<void>
+  importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
+  exportKeystore: (runeNativeAddress: string, network: Network) => Promise<void>
+  loadKeystore$: () => LoadKeystoreLD
   unlock: (state: KeystoreState, password: string) => Promise<void>
   lock: FP.Lazy<void>
   /**
@@ -82,8 +89,11 @@ export enum ErrorId {
   GET_FEES = 'GET_FEES',
   GET_ASSET_TXS = 'GET_ASSET_TXS',
   SEND_TX = 'SEND_TX',
-  GET_TX_STATUS = 'GET_TX_STATUS',
-  SEND_LEDGER_TX = 'SEND_LEDGER_TX'
+  GET_TX = 'GET_TX',
+  SEND_LEDGER_TX = 'SEND_LEDGER_TX',
+  VALIDATE_POOL = 'VALIDATE_POOL',
+  VALIDATE_NODE = 'VALIDATE_NODE',
+  VALIDATE_RESULT = 'VALIDATE_RESULT'
 }
 
 // TODO(@Veado) Move type to clients/type
@@ -101,11 +111,14 @@ export type LedgerApiError = {
 
 export type NonEmptyApiErrors = NonEmptyArray<ApiError>
 
+export type TxRD = RD.RemoteData<ApiError, Tx>
+export type TxLD = LiveData<ApiError, Tx>
+
 /* RD/LD for sending transactions on different chains */
-export type TxRD = RD.RemoteData<ApiError, TxHash>
-export type TxLD = LiveData<ApiError, TxHash>
-export type LedgerTxRD = RD.RemoteData<LedgerApiError, string>
-export type LedgerTxLD = LiveData<LedgerApiError, string>
+export type TxHashRD = RD.RemoteData<ApiError, TxHash>
+export type TxHashLD = LiveData<ApiError, TxHash>
+export type LedgerTxHashRD = RD.RemoteData<LedgerApiError, string>
+export type LedgerTxHashLD = LiveData<LedgerApiError, string>
 
 export type LedgerAddressRD = RD.RemoteData<LedgerErrorId, Address>
 export type LedgerAddressLD = LiveData<LedgerErrorId, Address>

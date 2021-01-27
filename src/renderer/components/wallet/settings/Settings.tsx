@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
-import { PlusCircleFilled, StopOutlined } from '@ant-design/icons'
+import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
-import { Row, Col, List, Dropdown, Button } from 'antd'
+import { Row, Col, List, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -11,9 +11,11 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../shared/api/types'
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
+import { truncateAddress } from '../../../helpers/addressHelper'
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { UserAccountType } from '../../../types/wallet'
+import { PhraseCopyModal } from '../phrase'
 import * as Styled from './Settings.style'
 
 type Props = {
@@ -22,11 +24,15 @@ type Props = {
   changeNetwork: (network: Network) => void
   clientUrl: O.Option<string>
   userAccounts?: O.Option<UserAccountType[]>
+  runeNativeAddress: string
   lockWallet?: () => void
   removeKeystore?: () => void
+  exportKeystore?: (runeNativeAddress: string, selectedNetwork: Network) => void
   retrieveLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
   removeLedgerAddress: (chain: Chain) => void
   removeAllLedgerAddress: () => void
+  phrase?: O.Option<string>
+  clickAddressLinkHandler: (chain: Chain, address: Address) => void
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -36,30 +42,54 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     clientUrl,
     selectedNetwork,
     userAccounts = O.none,
+    runeNativeAddress = '',
     lockWallet = () => {},
     removeKeystore = () => {},
+    exportKeystore = () => {},
+    /* Hide `addDevice` for all chains temporarily
     retrieveLedgerAddress,
+    */
+    /* Hide `removeDevice` for all chains temporarily
     removeLedgerAddress,
+    */
     removeAllLedgerAddress,
-    changeNetwork
+    changeNetwork,
+    phrase: oPhrase = O.none,
+    clickAddressLinkHandler
   } = props
+
+  const [showPhrase, setShowPhrase] = useState(false)
 
   const removeWallet = useCallback(() => {
     removeKeystore()
   }, [removeKeystore])
 
+  /* Hide `addDevice` for all chains temporarily
   const addDevice = useCallback(
     (chain: Chain) => {
       retrieveLedgerAddress({ chain, network: selectedNetwork })
     },
     [retrieveLedgerAddress, selectedNetwork]
   )
+  */
 
+  /* Hide `removeDevice` for all chains temporarily
   const removeDevice = useCallback(
     (chain: Chain) => {
       removeLedgerAddress(chain)
     },
     [removeLedgerAddress]
+  )
+  */
+
+  const phrase = useMemo(
+    () =>
+      pipe(
+        oPhrase,
+        O.map((phrase) => phrase),
+        O.getOrElse(() => '')
+      ),
+    [oPhrase]
   )
 
   const accounts = useMemo(
@@ -79,15 +109,34 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                       <Styled.ChainContent key={j}>
                         <Styled.AccountPlaceholder>{acc.name}</Styled.AccountPlaceholder>
                         <Styled.AccountContent>
-                          <Styled.AccountAddress>{acc.address}</Styled.AccountAddress>
+                          <Styled.AccountAddress>
+                            <label>
+                              {acc.address}
+                              <Styled.AddressLinkIcon
+                                onClick={() => clickAddressLinkHandler(item.chainName, acc.address)}
+                              />
+                            </label>
+                            <label>
+                              <Styled.Tooltip title={acc.address}>
+                                {truncateAddress(acc.address, item.chainName, selectedNetwork)}
+                              </Styled.Tooltip>
+                              <Styled.AddressLinkIcon
+                                onClick={() => clickAddressLinkHandler(item.chainName, acc.address)}
+                              />
+                              <Styled.CopyLabel copyable={{ text: acc.address }} />
+                            </label>
+                          </Styled.AccountAddress>
+                          {/* Hide `removeDevice` for all chains temporarily
                           {acc.type === 'external' && (
                             <Button type="link" danger onClick={() => removeDevice(item.chainName)}>
                               <StopOutlined />
                             </Button>
                           )}
+                          */}
                         </Styled.AccountContent>
                       </Styled.ChainContent>
                     ))}
+                    {/* Hide `addDevice` for all chains temporarily
                     <Styled.Button
                       onClick={() => addDevice(item.chainName)}
                       typevalue="transparent"
@@ -95,6 +144,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                       <PlusCircleFilled />
                       {intl.formatMessage({ id: 'setting.add.device' })}
                     </Styled.Button>
+                    */}
                   </Styled.ListItem>
                 )}
               />
@@ -103,7 +153,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [addDevice, intl, removeDevice, userAccounts]
+    [clickAddressLinkHandler, intl, selectedNetwork, userAccounts]
   )
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(
@@ -130,6 +180,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
+      <PhraseCopyModal phrase={phrase} visible={showPhrase} onClose={() => setShowPhrase(false)} />
       <Row>
         <Col span={24}>
           <Styled.TitleWrapper>
@@ -145,7 +196,10 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
             <Row>
               <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
                 <Styled.OptionCard bordered={false}>
-                  <Styled.OptionLabel color="primary" size="big">
+                  <Styled.OptionLabel
+                    color="primary"
+                    size="big"
+                    onClick={() => exportKeystore(runeNativeAddress, selectedNetwork)}>
                     {intl.formatMessage({ id: 'setting.export' })}
                   </Styled.OptionLabel>
                 </Styled.OptionCard>
@@ -159,7 +213,13 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
               </Styled.WalletCol>
               <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
                 <Styled.OptionCard bordered={false}>
-                  <Styled.Button sizevalue="xnormal" color="primary" typevalue="outline" round="true" disabled>
+                  <Styled.Button
+                    sizevalue="xnormal"
+                    color="primary"
+                    typevalue="outline"
+                    round="true"
+                    onClick={() => setShowPhrase(true)}
+                    disabled={O.isNone(oPhrase) ? true : false}>
                     {intl.formatMessage({ id: 'setting.view.phrase' })}
                   </Styled.Button>
                 </Styled.OptionCard>

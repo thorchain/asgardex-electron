@@ -9,9 +9,11 @@ import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
 
-import { LedgerTxInfo, Network } from '../shared/api/types'
+import { LedgerTxInfo, Network, StoreFileName } from '../shared/api/types'
+import { STORE_FILES_DEFAULTS } from '../shared/const'
 import { Locale } from '../shared/i18n/types'
-import { saveKeystore, removeKeystore, getKeystore, keystoreExist } from './api/keystore'
+import { getFileStoreService } from './api/fileStore'
+import { saveKeystore, removeKeystore, getKeystore, keystoreExist, exportKeystore, loadKeystore } from './api/keystore'
 import { getAddress, sendTx } from './api/ledger'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
@@ -123,10 +125,19 @@ const initIPC = () => {
   ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, () => removeKeystore())
   ipcMain.handle(IPCMessages.GET_KEYSTORE, () => getKeystore())
   ipcMain.handle(IPCMessages.KEYSTORE_EXIST, () => keystoreExist())
+  ipcMain.handle(IPCMessages.EXPORT_KEYSTORE, (_, defaultFileName: string, keystore: Keystore) =>
+    exportKeystore(defaultFileName, keystore)
+  )
+  ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
   ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, (_, chain: Chain, network: Network) => getAddress(chain, network))
   ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, chain: Chain, network: Network, txInfo: LedgerTxInfo) =>
     sendTx(chain, network, txInfo)
   )
+
+  // Register all file-stored data services
+  Object.entries(STORE_FILES_DEFAULTS).forEach(([name, defaultValue]) => {
+    getFileStoreService(name as StoreFileName, defaultValue).registerIpcHandlersMain()
+  })
 }
 
 const init = async () => {

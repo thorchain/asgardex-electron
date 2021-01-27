@@ -1,11 +1,11 @@
 import { balances$, reloadBalances } from './balances'
-import { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$ } from './common'
+import { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createLedgerService } from './ledger'
 import { createTransactionService } from './transaction'
 import { subscribeTransfers, miniTickers$ } from './ws'
 
-const { txs$, subscribeTx, resetTx, txRD$, sendTx } = createTransactionService(client$)
+const { txs$, tx$, subscribeTx, resetTx, txRD$, sendTx } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService(client$)
 const {
   ledgerAddress$,
@@ -23,10 +23,12 @@ export {
   reloadBalances,
   explorerUrl$,
   getExplorerTxUrl$,
+  getExplorerAddressUrl$,
   subscribeTransfers,
   miniTickers$,
   balances$,
   txs$,
+  tx$,
   sendTx,
   subscribeTx,
   resetTx,

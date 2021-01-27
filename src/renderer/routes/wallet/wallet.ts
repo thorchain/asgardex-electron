@@ -1,5 +1,6 @@
 import { Route } from '../types'
 import * as createRoutes from './create'
+import * as importRoutes from './imports'
 
 type RedirectUrl = string
 
@@ -17,12 +18,7 @@ export const noWallet: Route<void> = {
   }
 }
 
-export const imports: Route<void> = {
-  template: `${base.template}/imports`,
-  path() {
-    return this.template
-  }
-}
+export const imports = importRoutes
 
 export const REDIRECT_PARAMETER_NAME = 'redirectUrl'
 
@@ -46,6 +42,14 @@ export const assets: Route<void> = {
   template: `${base.template}/assets`,
   path() {
     return this.template
+  }
+}
+
+export type DepositParams = { walletAddress: string }
+export const deposit: Route<DepositParams> = {
+  template: `${base.template}/deposit/:walletAddress`,
+  path({ walletAddress }) {
+    return `${base.template}/deposit/${walletAddress}`
   }
 }
 

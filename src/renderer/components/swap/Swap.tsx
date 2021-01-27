@@ -38,6 +38,7 @@ import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
 import { AssetSelect } from '../uielements/assets/assetSelect'
+import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
@@ -184,7 +185,30 @@ export const Swap = ({
     [oAssetWB]
   )
 
-  const [amountToSwap, setAmountToSwap] = useState(baseAmount(0, amountToSwapDecimal))
+  const [amountToSwap, setAmountToSwapInternal] = useState(baseAmount(0, amountToSwapDecimal))
+
+  const setAmountToSwap = useCallback(
+    (targetAmount: BaseAmount) => {
+      FP.pipe(
+        oAssetWB,
+        O.map(({ amount: maxAmount }) =>
+          targetAmount.amount().isGreaterThan(maxAmount.amount())
+            ? /**
+               * New object instance is needed to make
+               * AssetInput component react to the new value.
+               * In case maxAmount has the same pointer
+               * AssetInput will not be updated as a React-component
+               * but native input element will change its
+               * inner value and user will see inappropriate value
+               */
+              { ...maxAmount }
+            : baseAmount(targetAmount.amount(), maxAmount.decimal)
+        ),
+        O.map(setAmountToSwapInternal)
+      )
+    },
+    [setAmountToSwapInternal, oAssetWB]
+  )
 
   const setAmountToSwapFromPercentValue = useCallback(
     (percents) => {
@@ -197,7 +221,7 @@ export const Swap = ({
         })
       )
     },
-    [oAssetWB, amountToSwapDecimal]
+    [oAssetWB, amountToSwapDecimal, setAmountToSwap]
   )
 
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
@@ -329,13 +353,20 @@ export const Swap = ({
         const targetAsset = targetAssetWP.asset
         const sourceAsset = sourceAssetWP.asset
 
-        // TODO (@Veado) Add i18n
-        const stepLabels = ['Health check...', 'Send swap transaction...', 'Check swap result...']
+        const stepLabels = [
+          intl.formatMessage({ id: 'common.tx.healthCheck' }),
+          intl.formatMessage({ id: 'common.tx.sending' }),
+          intl.formatMessage({ id: 'common.tx.checkResult' })
+        ]
         const stepLabel = FP.pipe(
-          swapState.txRD,
+          swapState.swap,
           RD.fold(
             () => '',
-            () => stepLabels[swapState.step - 1],
+            () =>
+              `${intl.formatMessage(
+                { id: 'common.step' },
+                { current: swapState.step, total: swapState.stepsTotal }
+              )}: ${stepLabels[swapState.step - 1]}`,
             () => '',
             () => 'Done!'
           )
@@ -353,7 +384,17 @@ export const Swap = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [oSourceAssetWP, oTargetAssetWP, swapData.swapResult, swapData.slip, amountToSwap, swapState.txRD, swapState.step])
+  }, [
+    oSourceAssetWP,
+    oTargetAssetWP,
+    swapData.swapResult,
+    swapData.slip,
+    amountToSwap,
+    swapState.swap,
+    swapState.step,
+    swapState.stepsTotal,
+    intl
+  ])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe
@@ -372,14 +413,14 @@ export const Swap = ({
   }, [onCloseTxModal, reloadBalances])
 
   const renderTxModal = useMemo(() => {
-    const { txHash, txRD } = swapState
+    const { swapTx, swap } = swapState
 
     // don't render TxModal in initial state
-    if (RD.isInitial(txRD)) return <></>
+    if (RD.isInitial(swap)) return <></>
 
     // Get timer value
     const timerValue = FP.pipe(
-      txRD,
+      swap,
       RD.fold(
         () => 0,
         FP.flow(
@@ -393,7 +434,7 @@ export const Swap = ({
 
     // title
     const txModalTitle = FP.pipe(
-      txRD,
+      swap,
       RD.fold(
         () => 'swap.state.pending',
         () => 'swap.state.pending',
@@ -409,10 +450,9 @@ export const Swap = ({
         onClose={onCloseTxModal}
         onFinish={onFinishTxModal}
         startTime={swapStartTime}
-        txRD={txRD}
-        txHash={txHash}
+        txRD={swap}
+        extraResult={<ViewTxButton txHash={RD.toOption(swapTx)} onClick={goToTransaction} />}
         timerValue={timerValue}
-        onViewTxClick={goToTransaction}
         extra={extraTxModalContent}
       />
     )

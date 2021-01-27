@@ -3,8 +3,9 @@ import styled from 'styled-components'
 
 import { media } from '../../../helpers/styleHelper'
 import { Alert as UIAlert } from '../../uielements/alert'
-import { AssetCard as BaseAssetCard } from '../../uielements/assets/assetCard'
+import { AssetCard as UIAssetCard } from '../../uielements/assets/assetCard'
 import { Button as UIButton } from '../../uielements/button'
+import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
 
 export const Container = styled('div')`
@@ -28,7 +29,7 @@ export const BalanceErrorRow = styled(Row)`
   padding: 20px 0px;
 
   ${media.xl`
-    padding: 0 20px;
+    padding: 20px;
 `}
 `
 
@@ -49,7 +50,7 @@ export const FeesRow = styled(Row)`
   width: 100%;
 `
 
-export const AssetCard = styled(BaseAssetCard)`
+export const AssetCard = styled(UIAssetCard)`
   width: 100%;
 `
 
@@ -104,4 +105,15 @@ export const ReloadFeeButton = styled(UIButton).attrs({
   width: 30px;
   height: 30px;
   margin-right: 10px;
+`
+
+export const AsymExtraContainer = styled('div')`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+`
+
+export const ViewTxButtonTop = styled(UIViewTxButton)`
+  padding-bottom: 20px;
 `

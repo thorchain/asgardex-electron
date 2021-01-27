@@ -2,14 +2,13 @@ import React, { useCallback } from 'react'
 
 import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined, BugOutlined } from '@ant-design/icons'
 import { Row, Col, Grid } from 'antd'
-import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { ExternalUrl } from '../../../shared/const'
 import { ReactComponent as TelegramIcon } from '../../assets/svg/icon-telegram.svg'
 import { ReactComponent as ThorChainIcon } from '../../assets/svg/logo-thorchain.svg'
 import * as playgroundRoutes from '../../routes/playground'
-import { FooterContainer, FooterLink, FooterIconWrapper, FooterLinkWrapper } from './Footer.style'
+import { FooterContainer, FooterIconWrapper } from './Footer.style'
 
 type IconProps = {
   url: string
@@ -35,8 +34,6 @@ type Props = {
 export const Footer: React.FC<Props> = (props): JSX.Element => {
   const { commitHash, isDev } = props
 
-  const intl = useIntl()
-
   const history = useHistory()
   const screens = Grid.useBreakpoint()
 
@@ -57,11 +54,12 @@ export const Footer: React.FC<Props> = (props): JSX.Element => {
           </Row>
         </Col>
         <Col span={24} md={14}>
-          <FooterLinkWrapper justify="center">
+          {/* Disable buttons temporarily for the release (https://github.com/thorchain/asgardex-electron/pull/777) */}
+          {/* <FooterLinkWrapper justify="center">
             <FooterLink to="/stats">{intl.formatMessage({ id: 'common.stats' })}</FooterLink>
             <FooterLink to="/network">{intl.formatMessage({ id: 'common.network' })}</FooterLink>
             <FooterLink to="/faqs">{intl.formatMessage({ id: 'common.faqs' })}</FooterLink>
-          </FooterLinkWrapper>
+          </FooterLinkWrapper> */}
         </Col>
         <Col span={24} md={6}>
           <Row justify={screens.md ? 'end' : 'center'}>

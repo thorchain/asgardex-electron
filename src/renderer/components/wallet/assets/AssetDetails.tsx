@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { getSwitchMemo } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
   AssetBNB,
+  AssetRuneNative,
   assetToString,
   BaseAmount,
   baseToAsset,
@@ -17,9 +19,11 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../../shared/api/types'
 import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import * as AssetHelper from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
+import { eqOAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
@@ -32,8 +36,8 @@ import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import {
   LoadTxsHandler,
   NonEmptyWalletBalances,
-  TxLD,
-  TxRD,
+  TxHashLD,
+  TxHashRD,
   ValidatePasswordHandler
 } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
@@ -41,14 +45,14 @@ import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
-import { Button, RefreshButton } from '../../uielements/button'
+import { Button, RefreshButton, ViewTxButton } from '../../uielements/button'
 import { UIFeesRD, Fees } from '../../uielements/fees'
 import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.style'
 
 type UpgradeTxState = {
   startTime: O.Option<number>
-  txRD: TxRD
+  txRD: TxHashRD
 }
 
 const INITIAL_TX_UPGRADE_STATE: UpgradeTxState = { startTime: O.none, txRD: RD.initial }
@@ -64,9 +68,10 @@ type Props = {
   runeNativeAddress?: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
   validatePassword$: ValidatePasswordHandler
-  sendUpgradeTx: (_: SendTxParams) => TxLD
+  sendUpgradeTx: (_: SendTxParams) => TxHashLD
   reloadUpgradeFeeHandler: FP.Lazy<void>
   upgradeFee: FeeRD
+  network: Network
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -83,7 +88,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     runeNativeAddress: oRuneNativeAddress = O.none,
     validatePassword$,
     upgradeFee,
-    reloadUpgradeFeeHandler
+    reloadUpgradeFeeHandler,
+    network
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -130,6 +136,14 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     history.push(walletRoutes.receive.path(routeParams))
   }, [oAssetAsString, history, oWalletAddress])
 
+  const walletActionDepositClick = useCallback(() => {
+    FP.pipe(
+      oWalletAddress,
+      O.map((walletAddress) => walletRoutes.deposit.path({ walletAddress })),
+      O.map(history.push)
+    )
+  }, [oWalletAddress, history.push])
+
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
     reloadBalancesHandler()
@@ -154,6 +168,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const isRuneBnbAsset: boolean = useMemo(() => FP.pipe(oRuneBnbAsset, O.isSome), [oRuneBnbAsset])
 
+  const isRuneNativeAsset: boolean = useMemo(() => eqOAsset.equals(oAsset, O.some(AssetRuneNative)), [oAsset])
+
   const oRuneBnbBalance: O.Option<WalletBalance> = useMemo(() => getWalletBalanceByAsset(oBalances, oRuneBnbAsset), [
     oRuneBnbAsset,
     oBalances
@@ -168,7 +184,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [oRuneBnbBalance]
   )
 
-  const actionColSpanDesktop = isRuneBnbAsset ? 8 : 12
+  const actionColSpanDesktop = isRuneBnbAsset || isRuneNativeAsset ? 8 : 12
   const actionColSpanMobile = 24
 
   const upgradeRune = useCallback(() => {
@@ -178,11 +194,10 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         // TODO (@Veado): Remove it if we have everything set up for upgrade feature - just for testing
         const amount = ONE_ASSET_BASE_AMOUNT
         const startTime = Date.now()
-        const subscription = sendUpgradeTx({ recipient, amount, asset, memo: `SWITCH:${runeAddress}` }).subscribe(
-          (txRD) => {
-            setUpgradeTxState({ startTime: O.some(startTime), txRD })
-          }
-        )
+        const memo = getSwitchMemo(runeAddress)
+        const subscription = sendUpgradeTx({ recipient, amount, asset, memo }).subscribe((txRD) => {
+          setUpgradeTxState({ startTime: O.some(startTime), txRD })
+        })
         // store subscription
         setUpgradeTxSub(O.some(subscription))
 
@@ -230,9 +245,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               title={upgradeTxModalTitle}
               onClose={closeUpgradeTxModal}
               onFinish={closeUpgradeTxModal}
-              txRD={upgradeTxState.txRD}
+              txRD={FP.pipe(
+                upgradeTxState.txRD,
+                RD.map((_) => true)
+              )}
               startTime={startTime}
-              onViewTxClick={clickTxLinkHandler}
+              extraResult={<ViewTxButton txHash={RD.toOption(upgradeTxState.txRD)} onClick={clickTxLinkHandler} />}
             />
           )
         )
@@ -349,6 +367,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [upgradeTxState, isRuneBnbAsset, oRuneBnbAmount, isUpgradeFeeError]
   )
 
+  const chain = O.isSome(oAsset) ? oAsset.value.chain : ''
+
   return (
     <>
       {renderConfirmUpgradeModal}
@@ -409,6 +429,17 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               </Row>
             </Styled.ActionWrapper>
           </Styled.ActionCol>
+          {isRuneNativeAsset && (
+            <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
+              <Styled.ActionWrapper>
+                <Row justify="center">
+                  <Button typevalue="outline" round="true" sizevalue="xnormal" onClick={walletActionDepositClick}>
+                    {intl.formatMessage({ id: 'wallet.action.deposit' })}
+                  </Button>
+                </Row>
+              </Styled.ActionWrapper>
+            </Styled.ActionCol>
+          )}
         </Styled.ActionRow>
         <Styled.Divider />
       </Row>
@@ -419,11 +450,15 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           </Styled.TableHeadline>
         </Col>
         <Col span={24}>
-          <TxsTable
-            txsPageRD={txsPageRD}
-            clickTxLinkHandler={clickTxLinkHandler}
-            changePaginationHandler={onChangePagination}
-          />
+          {chain && (
+            <TxsTable
+              txsPageRD={txsPageRD}
+              clickTxLinkHandler={clickTxLinkHandler}
+              changePaginationHandler={onChangePagination}
+              chain={chain}
+              network={network}
+            />
+          )}
         </Col>
       </Row>
     </>
