@@ -47,6 +47,9 @@ storiesOf('Components/button/Button', module)
           <Button sizevalue="small" color="primary" typevalue="normal" focused>
             Primary Normal Small
           </Button>
+          <Button sizevalue="small" color="primary" typevalue="underline">
+            Primary Underline Small
+          </Button>
         </Row>
         <Row>
           <Button sizevalue="normal" color="primary">
@@ -60,6 +63,9 @@ storiesOf('Components/button/Button', module)
           </Button>
           <Button sizevalue="normal" color="primary" typevalue="normal" focused>
             Primary Normal Normal
+          </Button>
+          <Button sizevalue="normal" color="primary" typevalue="underline" focused>
+            Primary Underline Normal
           </Button>
         </Row>
         <Row>
@@ -89,6 +95,9 @@ storiesOf('Components/button/Button', module)
           </Button>
           <Button sizevalue="big" color="primary" typevalue="normal" focused>
             Primary Normal Big
+          </Button>
+          <Button sizevalue="big" color="primary" typevalue="underline" focused>
+            Primary Underline Big
           </Button>
         </Row>
         <Row>
@@ -160,7 +169,8 @@ storiesOf('Components/button/Button', module)
       outline: 'outline',
       normal: 'normal',
       ghost: 'ghost',
-      transparent: 'transparent'
+      transparent: 'transparent',
+      underline: 'underline'
     }
 
     const size = radios('size', sizeOptions, 'normal')

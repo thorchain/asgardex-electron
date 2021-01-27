@@ -4,7 +4,22 @@ import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
 
-import { Locale } from '../../shared/i18n/types'
+import { Locale } from '../i18n/types'
+
+export type CommonStorage = Readonly<{ locale: Locale }>
+
+/**
+ * Hash map of common store files
+ * Record<fileName, defaultValues>
+ * fileNames are available files to store data
+ * @see StoreFileName
+ */
+export type StoreFilesContent = Readonly<{
+  commonStorage: CommonStorage
+}>
+
+export type StoreFileName = keyof StoreFilesContent
+export type StoreFileData<FileName extends StoreFileName> = StoreFilesContent[FileName]
 
 export type ApiKeystore = {
   save: (keystore: Keystore) => Promise<void>
@@ -13,6 +28,17 @@ export type ApiKeystore = {
   exists: () => Promise<boolean>
   export: (defaultFileName: string, keystore: Keystore) => Promise<void>
   load: () => Promise<Keystore>
+}
+
+/**
+ * Available public API interface to interact with files at the file system
+ */
+export type ApiFileStoreService<T> = {
+  // Returns new state
+  save: (data: Partial<T>) => Promise<T>
+  remove: () => Promise<void>
+  get: () => Promise<T>
+  exists: () => Promise<boolean>
 }
 
 export type ApiLang = {
@@ -54,9 +80,14 @@ export type ApiHDWallet = {
 
 declare global {
   interface Window {
+    /**
+     * When declaring anything from the electron-world do not forget to
+     * expose appropriate API at the src/main/preload.ts
+     */
     apiKeystore: ApiKeystore
     apiLang: ApiLang
     apiUrl: ApiUrl
     apiHDWallet: ApiHDWallet
+    commonStorage: ApiFileStoreService<StoreFileData<'commonStorage'>>
   }
 }

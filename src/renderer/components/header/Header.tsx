@@ -8,7 +8,6 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { initialLocale } from '../../services/i18n/service'
 import { HeaderComponent } from './HeaderComponent'
 
 export const Header: React.FC = (): JSX.Element => {
@@ -25,7 +24,7 @@ export const Header: React.FC = (): JSX.Element => {
   const { explorerUrl$ } = useBinanceContext()
   const explorerUrl = useObservableState(explorerUrl$, O.none)
 
-  const { changeLocale, locale$ } = useI18nContext()
+  const { changeLocale, locale$, initialLocale } = useI18nContext()
   const currentLocale = useObservableState(locale$, initialLocale)
 
   return (

@@ -185,7 +185,30 @@ export const Swap = ({
     [oAssetWB]
   )
 
-  const [amountToSwap, setAmountToSwap] = useState(baseAmount(0, amountToSwapDecimal))
+  const [amountToSwap, setAmountToSwapInternal] = useState(baseAmount(0, amountToSwapDecimal))
+
+  const setAmountToSwap = useCallback(
+    (targetAmount: BaseAmount) => {
+      FP.pipe(
+        oAssetWB,
+        O.map(({ amount: maxAmount }) =>
+          targetAmount.amount().isGreaterThan(maxAmount.amount())
+            ? /**
+               * New object instance is needed to make
+               * AssetInput component react to the new value.
+               * In case maxAmount has the same pointer
+               * AssetInput will not be updated as a React-component
+               * but native input element will change its
+               * inner value and user will see inappropriate value
+               */
+              { ...maxAmount }
+            : baseAmount(targetAmount.amount(), maxAmount.decimal)
+        ),
+        O.map(setAmountToSwapInternal)
+      )
+    },
+    [setAmountToSwapInternal, oAssetWB]
+  )
 
   const setAmountToSwapFromPercentValue = useCallback(
     (percents) => {
@@ -198,7 +221,7 @@ export const Swap = ({
         })
       )
     },
-    [oAssetWB, amountToSwapDecimal]
+    [oAssetWB, amountToSwapDecimal, setAmountToSwap]
   )
 
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])

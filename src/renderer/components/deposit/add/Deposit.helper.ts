@@ -1,5 +1,6 @@
 import { PoolData } from '@thorchain/asgardex-util'
 import { baseAmount, BaseAmount } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 
 import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 
@@ -30,7 +31,7 @@ export const maxAssetAmountToDeposit = ({
   assetBalance: BaseAmount
 }): BaseAmount => {
   const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
-  const maxAssetAmount = poolAssetBalance
+  const maxAssetAmount: BigNumber = poolAssetBalance
     .amount()
     .dividedBy(poolRuneBalance.amount())
     .multipliedBy(runeBalance.amount())

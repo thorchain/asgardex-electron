@@ -8,7 +8,7 @@ import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
 import { network$ } from '../app/service'
 import * as C from '../clients'
-import { Address$, ExplorerUrl$, GetExplorerTxUrl$ } from '../clients/types'
+import { Address$, ExplorerUrl$, GetExplorerTxUrl$, GetExplorerAddressUrl$ } from '../clients/types'
 import { ClientStateForViews } from '../clients/types'
 import { getClient, getClientStateForViews } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
@@ -76,4 +76,9 @@ const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
  */
 const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
 
-export { client$, clientState$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$ }
+/**
+ * Explorer url depending on selected network
+ */
+const getExplorerAddressUrl$: GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
+
+export { client$, clientState$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ }
