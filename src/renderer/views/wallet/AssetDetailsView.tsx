@@ -2,28 +2,21 @@ import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetFromString, BNBChain, THORChain } from '@xchainjs/xchain-util'
+import { Asset, assetFromString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router-dom'
-import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { AssetDetails } from '../../components/wallet/assets'
 import { useAppContext } from '../../contexts/AppContext'
-import { useBinanceContext } from '../../contexts/BinanceContext'
-import { useChainContext } from '../../contexts/ChainContext'
-import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { isRuneBnbAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { getPoolAddressByChain } from '../../services/midgard/utils'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
@@ -50,64 +43,8 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     reloadBalances$,
     setSelectedAsset,
     getExplorerTxUrl$,
-    resetTxsPage,
-    keystoreService: { validatePassword$ }
+    resetTxsPage
   } = useWalletContext()
-
-  const {
-    service: {
-      pools: { poolAddresses$ }
-    }
-  } = useMidgardContext()
-
-  const oRuneBnbAsset: O.Option<Asset> = useMemo(
-    () =>
-      FP.pipe(
-        oSelectedAsset,
-        // We do need bnb pool address for BNB.RUNE assets only
-        O.filter(isRuneBnbAsset)
-      ),
-    [oSelectedAsset]
-  )
-
-  const [bnbPoolAddress] = useObservableState(
-    () =>
-      FP.pipe(
-        oRuneBnbAsset,
-        O.fold(
-          // No subscription of `poolAddresses$ ` needed for other assets than BNB.RUNE
-          () => Rx.of(O.none),
-          (_) =>
-            FP.pipe(
-              poolAddresses$,
-              liveData.map((endpoints) => getPoolAddressByChain(endpoints, BNBChain)),
-              RxOp.map(FP.flow(RD.toOption, O.flatten))
-            )
-        )
-      ),
-    O.none
-  )
-
-  const { addressByChain$ } = useChainContext()
-
-  const { sendTx: sendUpgradeTx, fees$, reloadFees: reloadUpgradeFee } = useBinanceContext()
-
-  const [upgradeFee] = useObservableState(
-    () =>
-      FP.pipe(
-        oRuneBnbAsset,
-        O.fold(
-          // No subscription of `fees$ ` needed for other assets than BNB.RUNE
-          () => Rx.EMPTY,
-          (_) =>
-            FP.pipe(
-              fees$,
-              liveData.map((fees) => fees.fast)
-            )
-        )
-      ),
-    RD.initial
-  )
 
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
@@ -137,21 +74,6 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     [oBalances, oWalletAddress]
   )
 
-  const [oRuneNativeAddress] = useObservableState(
-    () =>
-      FP.pipe(
-        oSelectedAsset,
-        // We do need rune native address to upgrade BNB.RUNE only
-        O.filter(isRuneBnbAsset),
-        O.fold(
-          // No subscription of `poolAddresses$ ` needed for other assets than BNB.RUNE
-          () => Rx.of(O.none),
-          () => addressByChain$(THORChain)
-        )
-      ),
-    O.none
-  )
-
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
@@ -165,12 +87,6 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         reloadBalancesHandler={reloadBalances}
         getExplorerTxUrl={getExplorerTxUrl}
         walletAddress={oWalletAddress}
-        runeNativeAddress={oRuneNativeAddress}
-        poolAddress={bnbPoolAddress}
-        validatePassword$={validatePassword$}
-        sendUpgradeTx={sendUpgradeTx}
-        upgradeFee={upgradeFee}
-        reloadUpgradeFeeHandler={reloadUpgradeFee}
         network={network}
       />
     </>

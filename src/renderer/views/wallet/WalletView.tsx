@@ -23,6 +23,7 @@ import { ReceiveView } from './ReceiveView'
 import { SendView } from './send'
 import { SettingsView } from './SettingsView'
 import { UnlockView } from './UnlockView'
+import { UpgradeView } from './UpgradeView'
 
 export const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService, reloadBalances } = useWalletContext()
@@ -78,6 +79,9 @@ export const WalletView: React.FC = (): JSX.Element => {
           </Route>
           <Route path={walletRoutes.send.template} exact>
             <SendView />
+          </Route>
+          <Route path={walletRoutes.upgradeBnbRune.template} exact>
+            <UpgradeView />
           </Route>
           <Route path={walletRoutes.assetDetail.template} exact>
             <AssetDetailsView />

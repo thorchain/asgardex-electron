@@ -20,7 +20,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneBnbAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
-import { UpgradeBnbRuneParams } from '../../routes/wallet'
+import { AssetDetailsParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../services/chain/const'
 import { getPoolAddressByChain } from '../../services/midgard/utils'
@@ -31,15 +31,14 @@ type Props = {}
 type ErrorViewData = { invalidAsset: boolean; missingRuneAddress: boolean; missingExplorerUrl: boolean }
 
 export const UpgradeView: React.FC<Props> = (): JSX.Element => {
-  const { runeAsset: runeAssetString, walletAddress } = useParams<UpgradeBnbRuneParams>()
+  const { asset, walletAddress } = useParams<AssetDetailsParams>()
 
   const intl = useIntl()
 
   // accept BNB.Rune only
-  const oRuneBnbAsset = useMemo(
-    () => FP.pipe(assetFromString(runeAssetString), O.fromNullable, O.filter(isRuneBnbAsset)),
-    [runeAssetString]
-  )
+  const oRuneBnbAsset = useMemo(() => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isRuneBnbAsset)), [
+    asset
+  ])
 
   const {
     balancesState$,
@@ -122,7 +121,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
           title={intl.formatMessage(
             { id: 'routes.invalid.asset' },
             {
-              runeAssetString
+              runeAssetString: asset
             }
           )}
           // TODO (@Veado) Add i18n
@@ -130,7 +129,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
         />
       </>
     ),
-    [runeAssetString, intl]
+    [asset, intl]
   )
 
   return FP.pipe(
