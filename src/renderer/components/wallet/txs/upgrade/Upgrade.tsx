@@ -25,15 +25,11 @@ import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { emptyString } from '../../../../helpers/stringHelper'
 import { getBnbAmountFromBalances, getRuneBnBAmountFromBalances } from '../../../../helpers/walletHelper'
 import { SendTxParams } from '../../../../services/binance/types'
+import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
+import { UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
 import { FeeRD } from '../../../../services/chain/types'
 import { PoolAddressRD } from '../../../../services/midgard/types'
-import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/wallet/const'
-import {
-  NonEmptyWalletBalances,
-  UpgradeRuneTxState,
-  UpgradeRuneTxState$,
-  ValidatePasswordHandler
-} from '../../../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'

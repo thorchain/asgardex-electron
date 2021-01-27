@@ -18,7 +18,8 @@ export enum TxTypes {
   DEPOSIT = 'deposit',
   SWAP = 'swap',
   WITHDRAW = 'withdraw',
-  CREATE = 'create'
+  CREATE = 'create',
+  UPGRADE = 'upgrade'
 }
 
 export type DepositType = 'sym' | 'asym'
