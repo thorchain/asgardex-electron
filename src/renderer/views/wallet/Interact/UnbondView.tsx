@@ -25,11 +25,11 @@ export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
   const { txStatus$ } = useChainContext()
   const intl = useIntl()
 
-  const possibleSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
+  const oSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
 
   const unsubscribeSub = useCallback(() => {
     FP.pipe(
-      possibleSubRef.current,
+      oSubRef.current,
       O.map((sub) => sub.unsubscribe())
     )
   }, [])
@@ -43,7 +43,7 @@ export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
        * it does not matter which amount to send
        * @docs https://docs.thorchain.org/thornodes/leaving#unbonding
        */
-      possibleSubRef.current = O.some(interact$({ amount: baseAmount(1), memo }).subscribe(setInteractState))
+      oSubRef.current = O.some(interact$({ amount: baseAmount(1), memo }).subscribe(setInteractState))
     },
     [interact$, setInteractState, unsubscribeSub]
   )

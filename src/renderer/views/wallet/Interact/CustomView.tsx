@@ -25,13 +25,13 @@ export const CustomView: React.FC<Props> = ({ goToTransaction }) => {
   const { txStatus$ } = useChainContext()
   const intl = useIntl()
 
-  const possibleSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
+  const oSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
 
   const interact$ = useMemo(() => interactService$(txStatus$), [interactService$, txStatus$])
 
   const unsubscribeSub = useCallback(() => {
     FP.pipe(
-      possibleSubRef.current,
+      oSubRef.current,
       O.map((sub) => sub.unsubscribe())
     )
   }, [])
@@ -39,7 +39,7 @@ export const CustomView: React.FC<Props> = ({ goToTransaction }) => {
   const customTx = useCallback(
     ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
       unsubscribeSub()
-      possibleSubRef.current = O.some(interact$({ amount, memo }).subscribe(setInteractState))
+      oSubRef.current = O.some(interact$({ amount, memo }).subscribe(setInteractState))
     },
     [interact$, setInteractState, unsubscribeSub]
   )
