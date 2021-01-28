@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances } from '../services/wallet/types'
 import { WalletBalance } from '../types/wallet'
-import { isBnbAsset, isRuneBnbAsset, isRuneNativeAsset } from './assetHelper'
+import { isBnbAsset, isEthAsset, isRuneBnbAsset, isRuneNativeAsset } from './assetHelper'
 import { eqAsset } from './fp/eq'
 import { sequenceTOption } from './fpHelpers'
 
@@ -37,23 +37,24 @@ export const getWalletBalanceByAsset = (
     )
   )
 
-export const getBnbAmountFromBalances = (balances: WalletBalances): O.Option<AssetAmount> =>
+export const getAssetAmountFromBalances = (
+  balances: WalletBalances,
+  isAsset: (asset: Asset) => boolean
+): O.Option<AssetAmount> =>
   FP.pipe(
     balances,
-    A.findFirst(({ asset }) => isBnbAsset(asset)),
+    A.findFirst(({ asset }) => isAsset(asset)),
     O.map(({ amount }) => baseToAsset(amount))
   )
+
+export const getBnbAmountFromBalances = (balances: WalletBalances): O.Option<AssetAmount> =>
+  getAssetAmountFromBalances(balances, isBnbAsset)
+
+export const getEthAmountFromBalances = (balances: WalletBalances): O.Option<AssetAmount> =>
+  getAssetAmountFromBalances(balances, isEthAsset)
 
 export const getRuneNativeAmountFromBalances = (balances: WalletBalances): O.Option<AssetAmount> =>
-  FP.pipe(
-    balances,
-    A.findFirst(({ asset }) => isRuneNativeAsset(asset)),
-    O.map(({ amount }) => baseToAsset(amount))
-  )
+  getAssetAmountFromBalances(balances, isRuneNativeAsset)
 
 export const getRuneBnBAmountFromBalances = (balances: WalletBalances): O.Option<AssetAmount> =>
-  FP.pipe(
-    balances,
-    A.findFirst(({ asset }) => isRuneBnbAsset(asset)),
-    O.map(({ amount }) => baseToAsset(amount))
-  )
+  getAssetAmountFromBalances(balances, isRuneBnbAsset)

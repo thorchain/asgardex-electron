@@ -5,6 +5,7 @@ import * as Rx from 'rxjs'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import { GetExplorerAddressUrl$, GetExplorerTxUrl$ } from '../clients'
+import * as ETH from '../ethereum'
 import * as THOR from '../thorchain'
 
 const explorerUrlFailure$ = Rx.of(O.none)
@@ -24,8 +25,7 @@ const getExplorerUrlByAsset$ = (asset: Asset | null): GetExplorerTxUrl$ => {
       return BTC.getExplorerTxUrl$
 
     case ETHChain:
-      // not available yet
-      return explorerUrlFailure$
+      return ETH.getExplorerTxUrl$
 
     case THORChain:
       return THOR.getExplorerTxUrl$

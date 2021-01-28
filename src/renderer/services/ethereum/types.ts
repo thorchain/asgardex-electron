@@ -1,5 +1,5 @@
-import { Client } from '@xchainjs/xchain-ethereum'
-import { BaseAmount } from '@xchainjs/xchain-util'
+import { Address, Client } from '@xchainjs/xchain-ethereum'
+import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 
 import * as C from '../clients'
 
@@ -16,8 +16,10 @@ export type FeesService = {
 }
 
 export type SendTxParams = {
-  recipient: string // to address
+  recipient: Address
   amount: BaseAmount
+  asset: Asset
+  gasPrice?: BaseAmount
   memo?: string
 }
 
