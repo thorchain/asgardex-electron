@@ -134,6 +134,7 @@ export type ThorchainEndpointsLD = LiveData<Error, ThorchainEndpoints>
 export type PoolAddress = string
 export type PoolAddressRx = Rx.Observable<O.Option<PoolAddress>>
 export type PoolAddressRD = RD.RemoteData<Error, PoolAddress>
+export type PoolAddressLD = LiveData<Error, PoolAddress>
 
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
@@ -163,8 +164,6 @@ export type PoolsService = {
 export type StakersAssetDataRD = RD.RemoteData<Error, StakersAssetData>
 export type StakersAssetDataLD = LiveData<Error, StakersAssetData>
 
-export type ValidatePoolRD = RD.RemoteData<ApiError, boolean>
 export type ValidatePoolLD = LiveData<ApiError, boolean>
 
-export type ValidateNodeRD = RD.RemoteData<ApiError, boolean>
 export type ValidateNodeLD = LiveData<ApiError, boolean>

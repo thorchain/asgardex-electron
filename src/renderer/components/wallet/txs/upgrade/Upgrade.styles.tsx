@@ -3,9 +3,10 @@ import { palette } from 'styled-theme'
 
 import { ErrorView as UIErrorView } from '../../../shared/error'
 import { SuccessView as UISuccessView } from '../../../shared/success'
+import { Fees as UIFees } from '../../../uielements/fees'
 
 export const FormWrapper = styled.div`
-  min-height: 100%;
+  padding: 20px 30px;
   display: flex;
   background-color: ${palette('background', 0)};
 `
@@ -15,13 +16,15 @@ export const FormContainer = styled.div`
 `
 
 export const SuccessView = styled(UISuccessView)`
-  min-height: 100%;
   display: flex;
   align-items: center;
 `
 
 export const ErrorView = styled(UIErrorView)`
-  min-height: 100%;
   display: flex;
   align-items: center;
+`
+
+export const Fees = styled(UIFees)`
+  padding: 20px 0 70px 0;
 `

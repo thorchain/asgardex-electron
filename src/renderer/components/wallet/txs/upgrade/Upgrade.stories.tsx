@@ -8,9 +8,8 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
-import { SendTxParams } from '../../../../services/binance/types'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
-import { UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
+import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
 import { ErrorId } from '../../../../services/wallet/types'
 import { WalletBalance, WalletBalances } from '../../../../types/wallet'
 import { Upgrade, Props as UpgradeProps } from './Upgrade'
@@ -52,8 +51,8 @@ const defaultProps: UpgradeProps = {
   bnbPoolAddressRD: RD.success('bnb-pool-address'),
   validatePassword$: mockValidatePassword$,
   fee: RD.success(baseAmount(37500)),
-  upgrade$: (p: SendTxParams): UpgradeRuneTxState$ => {
-    console.log('sendUpgradeTx:', p)
+  upgrade$: (p: UpgradeRuneParams): UpgradeRuneTxState$ => {
+    console.log('upgrade$:', p)
     return mockTxState$([
       { steps: { current: 1, total }, status: RD.pending },
       { steps: { current: 2, total }, status: RD.pending },
@@ -76,7 +75,7 @@ Default.storyName = 'default'
 export const HealthCheckFailure: Story = () => {
   const props: UpgradeProps = {
     ...defaultProps,
-    upgrade$: (_: SendTxParams): UpgradeRuneTxState$ =>
+    upgrade$: (_: UpgradeRuneParams): UpgradeRuneTxState$ =>
       mockTxState$([
         {
           steps: { current: 1, total },
