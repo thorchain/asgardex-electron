@@ -141,6 +141,18 @@ type WalletMessageKey =
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 
+type BondsMessageKey =
+  | 'bonds.node'
+  | 'bonds.bond'
+  | 'bonds.award'
+  | 'bonds.status'
+  | 'bonds.status.active'
+  | 'bonds.status.standby'
+  | 'bonds.status.disabled'
+  | 'bonds.info'
+
+export type BondsMessages = { [key in BondsMessageKey]: string }
+
 type LedgerMessageKey =
   | 'ledger.add.device.error.title'
   | 'ledger.errors.no.device'
@@ -243,7 +255,8 @@ export type Messages = CommonMessages &
   SettingMessages &
   SwapMessages &
   DepositMessages &
-  LedgerMessages
+  LedgerMessages &
+  BondsMessages
 
 export enum Locale {
   EN = 'en',
