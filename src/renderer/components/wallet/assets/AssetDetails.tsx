@@ -1,61 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
-import { getSwitchMemo } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
-import {
-  Asset,
-  AssetBNB,
-  AssetRuneNative,
-  assetToString,
-  BaseAmount,
-  baseToAsset,
-  formatAssetAmountCurrency
-} from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
-import * as Rx from 'rxjs'
 
 import { Network } from '../../../../shared/api/types'
-import { ONE_ASSET_BASE_AMOUNT } from '../../../const'
 import * as AssetHelper from '../../../helpers/assetHelper'
-import { getChainAsset } from '../../../helpers/chainHelper'
 import { eqOAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
-import { SendTxParams } from '../../../services/binance/types'
-import { FeeRD } from '../../../services/chain/types'
 import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
-import { PoolAddress } from '../../../services/midgard/types'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
-import {
-  LoadTxsHandler,
-  NonEmptyWalletBalances,
-  TxHashLD,
-  TxHashRD,
-  ValidatePasswordHandler
-} from '../../../services/wallet/types'
+import { LoadTxsHandler, NonEmptyWalletBalances } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
-import { PasswordModal } from '../../modal/password'
-import { TxModal } from '../../modal/tx'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
-import { Button, RefreshButton, ViewTxButton } from '../../uielements/button'
-import { UIFeesRD, Fees } from '../../uielements/fees'
+import { Button, RefreshButton } from '../../uielements/button'
 import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.style'
-
-type UpgradeTxState = {
-  startTime: O.Option<number>
-  txRD: TxHashRD
-}
-
-const INITIAL_TX_UPGRADE_STATE: UpgradeTxState = { startTime: O.none, txRD: RD.initial }
 
 type Props = {
   txsPageRD: TxsPageRD
@@ -65,54 +33,22 @@ type Props = {
   reloadBalancesHandler?: FP.Lazy<void>
   loadTxsHandler?: LoadTxsHandler
   walletAddress?: O.Option<Address>
-  runeNativeAddress?: O.Option<Address>
-  poolAddress: O.Option<PoolAddress>
-  validatePassword$: ValidatePasswordHandler
-  sendUpgradeTx: (_: SendTxParams) => TxHashLD
-  reloadUpgradeFeeHandler: FP.Lazy<void>
-  upgradeFee: FeeRD
   network: Network
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
-    sendUpgradeTx,
     txsPageRD,
     balances: oBalances,
     asset: oAsset,
-    poolAddress: oPoolAddress,
     reloadBalancesHandler = FP.constVoid,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
     walletAddress: oWalletAddress = O.none,
-    runeNativeAddress: oRuneNativeAddress = O.none,
-    validatePassword$,
-    upgradeFee,
-    reloadUpgradeFeeHandler,
     network
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
-
-  // State for visibility of Modal to confirm upgrade
-  const [showConfirmUpgradeModal, setShowConfirmUpgradeModal] = useState(false)
-  // (Possible) subscription of upgrade tx
-  const [upgradeTxSub, setUpgradeTxSub] = useState<O.Option<Rx.Subscription>>(O.none)
-  // State of upgrade tx
-  const [upgradeTxState, setUpgradeTxState] = useState<UpgradeTxState>(INITIAL_TX_UPGRADE_STATE)
-
-  // unsubscribe of (possible) previous subscription of upgrade tx
-  // It will be called whenever state of `bnbTxSub` changed
-  useEffect(() => {
-    return () => {
-      FP.pipe(
-        upgradeTxSub,
-        O.map((sub) => sub.unsubscribe())
-      )
-    }
-  }, [upgradeTxSub])
-
-  const oAssetAsString: O.Option<string> = useMemo(() => FP.pipe(oAsset, O.map(assetToString)), [oAsset])
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   const history = useHistory()
@@ -120,21 +56,21 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const walletActionSendClick = useCallback(() => {
     const routeParams = FP.pipe(
-      sequenceTOption(oWalletAddress, oAssetAsString),
-      O.map(([walletAddress, asset]) => ({ asset, walletAddress })),
+      sequenceTOption(oWalletAddress, oAsset),
+      O.map(([walletAddress, asset]) => ({ asset: assetToString(asset), walletAddress })),
       O.getOrElse(() => ({ asset: '', walletAddress: '' }))
     )
     history.push(walletRoutes.send.path(routeParams))
-  }, [oAssetAsString, history, oWalletAddress])
+  }, [oAsset, history, oWalletAddress])
 
   const walletActionReceiveClick = useCallback(() => {
     const routeParams = FP.pipe(
-      sequenceTOption(oWalletAddress, oAssetAsString),
-      O.map(([walletAddress, asset]) => ({ asset, walletAddress })),
+      sequenceTOption(oWalletAddress, oAsset),
+      O.map(([walletAddress, asset]) => ({ asset: assetToString(asset), walletAddress })),
       O.getOrElse(() => ({ asset: '', walletAddress: '' }))
     )
     history.push(walletRoutes.receive.path(routeParams))
-  }, [oAssetAsString, history, oWalletAddress])
+  }, [oAsset, history, oWalletAddress])
 
   const walletActionDepositClick = useCallback(() => {
     FP.pipe(
@@ -142,7 +78,18 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       O.map((walletAddress) => walletRoutes.deposit.path({ walletAddress })),
       O.map(history.push)
     )
-  }, [oWalletAddress, history.push])
+  }, [oWalletAddress, history])
+
+  const walletActionUpgradeRuneBnbClick = useCallback(() => {
+    FP.pipe(
+      sequenceTOption(oWalletAddress, oAsset),
+      O.filter(([_, asset]) => AssetHelper.isRuneBnbAsset(asset)),
+      O.map(([walletAddress, asset]) =>
+        walletRoutes.upgradeBnbRune.path({ asset: assetToString(asset), walletAddress })
+      ),
+      O.map(history.push)
+    )
+  }, [oWalletAddress, history, oAsset])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
@@ -187,192 +134,21 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const actionColSpanDesktop = isRuneBnbAsset || isRuneNativeAsset ? 8 : 12
   const actionColSpanMobile = 24
 
-  const upgradeRune = useCallback(() => {
-    FP.pipe(
-      sequenceTOption(oRuneBnbAsset, oRuneBnbAmount, oPoolAddress, oRuneNativeAddress),
-      O.map(([asset, _amount, recipient, runeAddress]) => {
-        // TODO (@Veado): Remove it if we have everything set up for upgrade feature - just for testing
-        const amount = ONE_ASSET_BASE_AMOUNT
-        const startTime = Date.now()
-        const memo = getSwitchMemo(runeAddress)
-        const subscription = sendUpgradeTx({ recipient, amount, asset, memo }).subscribe((txRD) => {
-          setUpgradeTxState({ startTime: O.some(startTime), txRD })
-        })
-        // store subscription
-        setUpgradeTxSub(O.some(subscription))
-
-        return true
-      }),
-      O.getOrElse(() => {
-        console.error("upgradeRuneHandler can't be called")
-        return false
-      })
-    )
-  }, [oPoolAddress, oRuneBnbAmount, oRuneBnbAsset, oRuneNativeAddress, sendUpgradeTx])
-
-  const closeUpgradeTxModal = useCallback(() => {
-    // reset subscription
-    setUpgradeTxSub(O.none)
-    // reset tx state
-    setUpgradeTxState(INITIAL_TX_UPGRADE_STATE)
-    // reload balances
-    refreshHandler()
-  }, [refreshHandler])
-
-  const upgradeTxModalTitle = useMemo(
-    () =>
-      FP.pipe(
-        upgradeTxState.txRD,
-        RD.fold(
-          () => 'wallet.upgrade.pending',
-          () => 'wallet.upgrade.pending',
-          () => 'wallet.upgrade.error',
-          () => 'wallet.upgrade.success'
-        ),
-        (id) => intl.formatMessage({ id })
-      ),
-    [intl, upgradeTxState]
-  )
-
-  const renderUpgradeTxModal = useMemo(
-    () =>
-      FP.pipe(
-        sequenceTOption(upgradeTxSub, upgradeTxState.startTime),
-        O.fold(
-          () => <></>,
-          ([_, startTime]) => (
-            <TxModal
-              title={upgradeTxModalTitle}
-              onClose={closeUpgradeTxModal}
-              onFinish={closeUpgradeTxModal}
-              txRD={FP.pipe(
-                upgradeTxState.txRD,
-                RD.map((_) => true)
-              )}
-              startTime={startTime}
-              extraResult={<ViewTxButton txHash={RD.toOption(upgradeTxState.txRD)} onClick={clickTxLinkHandler} />}
-            />
-          )
-        )
-      ),
-    [
-      upgradeTxSub,
-      upgradeTxState.startTime,
-      upgradeTxState.txRD,
-      upgradeTxModalTitle,
-      closeUpgradeTxModal,
-      clickTxLinkHandler
-    ]
-  )
-
-  const upgradeConfirmationHandler = useCallback(() => {
-    // close confirmation modal
-    setShowConfirmUpgradeModal(false)
-    upgradeRune()
-  }, [upgradeRune])
-
-  const renderConfirmUpgradeModal = useMemo(
-    () =>
-      showConfirmUpgradeModal ? (
-        <PasswordModal
-          onSuccess={upgradeConfirmationHandler}
-          onClose={() => setShowConfirmUpgradeModal(false)}
-          validatePassword$={validatePassword$}
-        />
-      ) : (
-        <></>
-      ),
-    [showConfirmUpgradeModal, upgradeConfirmationHandler, validatePassword$]
-  )
-
-  const uiFeesRD: UIFeesRD = useMemo(
-    () =>
-      FP.pipe(
-        oRuneBnbAsset,
-        O.fold(
-          () => RD.initial,
-          (runeBnbAsset) =>
-            FP.pipe(
-              upgradeFee,
-              RD.map((fee) => [{ asset: getChainAsset(runeBnbAsset.chain), amount: fee }])
-            )
-        )
-      ),
-    [oRuneBnbAsset, upgradeFee]
-  )
-
-  const oBnbBalance: O.Option<BaseAmount> = useMemo(
-    () =>
-      FP.pipe(
-        // we do care about bnb balance if RuneBNB is selected only
-        oRuneBnbAsset,
-        O.chain((_) => getWalletBalanceByAsset(oBalances, O.some(AssetBNB))),
-        O.map(({ amount }) => amount)
-      ),
-    [oRuneBnbAsset, oBalances]
-  )
-
-  const oUpgradeFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(upgradeFee, RD.toOption), [upgradeFee])
-
-  const isUpgradeFeeError = useMemo(
-    () =>
-      FP.pipe(
-        sequenceTOption(oUpgradeFee, oBnbBalance),
-        O.fold(
-          // Missing (or loading) fees does not mean we can't sent something. No error then.
-          () => !O.isNone(oUpgradeFee),
-          ([fee, bnbAmount]) => bnbAmount.amount().isLessThan(fee.amount())
-        )
-      ),
-    [oBnbBalance, oUpgradeFee]
-  )
-
-  const renderUpgradeFeeError = useMemo(() => {
-    if (!isUpgradeFeeError) return <></>
-
-    return FP.pipe(
-      sequenceTOption(oUpgradeFee, oBnbBalance),
-      O.map(([fee, bnbAmount]) => {
-        const msg = intl.formatMessage(
-          { id: 'wallet.upgrade.feeError' },
-          {
-            fee: formatAssetAmountCurrency({
-              amount: baseToAsset(fee),
-              asset: AssetBNB,
-              trimZeros: true
-            }),
-            balance: formatAssetAmountCurrency({
-              amount: baseToAsset(bnbAmount),
-              asset: AssetBNB,
-              trimZeros: true
-            })
-          }
-        )
-        // `key`  has to be set to avoid "Missing "key" prop for element in iterator"
-        return <Styled.UpgradeFeeErrorLabel key="upgrade-fee-error">{msg}</Styled.UpgradeFeeErrorLabel>
-      }),
-      O.getOrElse(() => <></>)
-    )
-  }, [intl, isUpgradeFeeError, oBnbBalance, oUpgradeFee])
-
   const runeUpgradeDisabled: boolean = useMemo(
     () =>
       isRuneBnbAsset &&
-      (isUpgradeFeeError ||
-        FP.pipe(
-          oRuneBnbAmount,
-          O.map((amount) => amount.amount().isLessThanOrEqualTo(0) || RD.isPending(upgradeTxState.txRD)),
-          O.getOrElse<boolean>(() => true)
-        )),
-    [upgradeTxState, isRuneBnbAsset, oRuneBnbAmount, isUpgradeFeeError]
+      FP.pipe(
+        oRuneBnbAmount,
+        O.map((amount) => amount.amount().isLessThan(0)),
+        O.getOrElse<boolean>(() => true)
+      ),
+    [isRuneBnbAsset, oRuneBnbAmount]
   )
 
   const chain = O.isSome(oAsset) ? oAsset.value.chain : ''
 
   return (
     <>
-      {renderConfirmUpgradeModal}
-      {renderUpgradeTxModal}
       <Row justify="space-between">
         <Col>
           <BackLink path={walletRoutes.assets.path()} />
@@ -407,16 +183,11 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
                     round="true"
                     sizevalue="xnormal"
                     color="warning"
-                    onClick={() => setShowConfirmUpgradeModal(true)}
-                    disabled={runeUpgradeDisabled}
-                    loading={RD.isPending(upgradeTxState.txRD)}>
+                    onClick={walletActionUpgradeRuneBnbClick}
+                    disabled={runeUpgradeDisabled}>
                     {intl.formatMessage({ id: 'wallet.action.upgrade' })}
                   </Button>
                 </Row>
-                <Styled.FeeRow>
-                  <Fees fees={uiFeesRD} reloadFees={reloadUpgradeFeeHandler} />
-                </Styled.FeeRow>
-                {renderUpgradeFeeError}
               </Styled.ActionWrapper>
             </Styled.ActionCol>
           )}

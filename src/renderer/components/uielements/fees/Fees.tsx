@@ -12,9 +12,10 @@ import { UIFeesRD } from './Fees.types'
 type Props = {
   fees: UIFeesRD
   reloadFees?: () => void
+  className?: string
 }
 
-export const Fees: React.FC<Props> = ({ fees, reloadFees }) => {
+export const Fees: React.FC<Props> = ({ fees, reloadFees, className }) => {
   const intl = useIntl()
 
   const feesFormattedValue = useMemo(
@@ -44,7 +45,7 @@ export const Fees: React.FC<Props> = ({ fees, reloadFees }) => {
   )
 
   return (
-    <Styled.Container>
+    <Styled.Container className={className}>
       {reloadFees && (
         <Styled.ReloadFeeButton
           onClick={(e) => {

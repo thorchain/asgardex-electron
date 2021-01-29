@@ -37,6 +37,7 @@ import {
   AssetDetailsLD,
   PendingPoolsStateLD,
   PoolAddressRx,
+  PoolAddressLD,
   PoolAssetsLD,
   PoolDetailLD,
   PoolDetailsLD,
@@ -65,12 +66,12 @@ const createPoolsService = (
   getMidgardDefaultApi: (basePath: string) => DefaultApi,
   selectedPoolAsset$: Rx.Observable<O.Option<Asset>>
 ): PoolsService => {
-  const midgardDefailtApi$ = FP.pipe(byzantine$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
+  const midgardDefaultApi$ = FP.pipe(byzantine$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
 
   // Factory to get `Pools` from Midgard
   const apiGetPools$ = (request: GetPoolsRequest) =>
     FP.pipe(
-      Rx.combineLatest([midgardDefailtApi$, reloadPools$]),
+      Rx.combineLatest([midgardDefaultApi$, reloadPools$]),
       RxOp.map(([api]) => api),
       liveData.chain((api) =>
         FP.pipe(
@@ -85,7 +86,7 @@ const createPoolsService = (
           details,
           A.map(({ asset }) =>
             FP.pipe(
-              midgardDefailtApi$,
+              midgardDefaultApi$,
               liveData.chain((api) =>
                 FP.pipe(
                   // As midgard v2 is missing poolSlipAverage and swappingTxCount
@@ -363,7 +364,7 @@ const createPoolsService = (
   )
 
   const poolAddresses$: ThorchainEndpointsLD = FP.pipe(
-    midgardDefailtApi$,
+    midgardDefaultApi$,
     liveData.chain((api) => {
       return FP.pipe(
         api.getProxiedInboundAddresses(),
@@ -386,14 +387,27 @@ const createPoolsService = (
     })
   )
 
-  const poolAddressByChain$ = (chain: Chain): PoolAddressRx =>
+  const oPoolAddressByChain$ = (chain: Chain): PoolAddressRx =>
     FP.pipe(
       poolAddresses$,
       liveData.toOptionMap$((addresses) => getPoolAddressByChain(addresses, chain)),
       RxOp.map(O.flatten)
     )
 
-  const poolAddressByAsset$ = ({ chain }: Asset): PoolAddressRx => poolAddressByChain$(chain)
+  const poolAddressByChain$ = (chain: Chain): PoolAddressLD =>
+    FP.pipe(
+      poolAddresses$,
+      liveData.map((endpoints) => getPoolAddressByChain(endpoints, chain)),
+      RxOp.map((rd) =>
+        FP.pipe(
+          rd,
+          // TODO @(Veado) Add i18n
+          RD.chain((oAddress) => RD.fromOption(oAddress, () => Error('Could not find pool address')))
+        )
+      )
+    )
+
+  const poolAddressByAsset$ = ({ chain }: Asset): PoolAddressRx => oPoolAddressByChain$(chain)
 
   /**
    * Use this to convert asset's price to selected price asset by multiplying to the priceRation inner value
@@ -425,23 +439,19 @@ const createPoolsService = (
    * @param poolAddress Pool address to validate
    * @param chain Chain of pool to validate
    */
-  const validatePool$ = (poolAddress: string, chain: Chain): ValidatePoolLD =>
-    poolAddressByChain$(chain).pipe(
-      RxOp.map((oAddress) =>
-        FP.pipe(
-          oAddress,
-          O.filter((address) => address === poolAddress),
-          O.map(() => true)
-        )
+  const validatePool$ = (poolAddress: string, chain: Chain): ValidatePoolLD => {
+    return poolAddressByChain$(chain).pipe(
+      liveData.chain((address) =>
+        address === poolAddress
+          ? Rx.of(RD.success(true))
+          : // TODO (@veado) Add i18n
+            Rx.of(RD.failure(Error(`Pool with address ${poolAddress} is not available`)))
       ),
-      RxOp.map((oResult) =>
-        RD.fromOption(oResult, () => ({
-          errorId: ErrorId.VALIDATE_POOL,
-          // TODO (@veado) Add i18n
-          msg: `Pool with address ${poolAddress} is not available`
-        }))
-      ),
-      RxOp.startWith(RD.pending),
+      liveData.mapLeft((error) => ({
+        errorId: ErrorId.VALIDATE_POOL,
+        msg: error?.message ?? error.toString()
+      })),
+      // RxOp.startWith(RD.pending),
       RxOp.catchError((error: Error) =>
         Rx.of(
           RD.failure({
@@ -451,6 +461,7 @@ const createPoolsService = (
         )
       )
     )
+  }
 
   return {
     poolsState$,

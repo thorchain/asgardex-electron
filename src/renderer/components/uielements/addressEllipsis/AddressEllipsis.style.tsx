@@ -5,8 +5,9 @@ import { palette } from 'styled-theme'
 export const Container = styled.div``
 
 export const AddressContainer = styled.div`
-  wordbreak: keep-all;
-  overflowwrap: normal;
+  display: flex;
+  word-break: keep-all;
+  overflow-wrap: normal;
 `
 
 export const Address = styled.span``

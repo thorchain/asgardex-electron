@@ -3,6 +3,7 @@
 import antdData from 'antd/lib/locale-provider/de_DE'
 
 import { Messages } from '../types'
+import bonds from './bonds'
 import common from './common'
 import deposit from './deposit'
 import ledger from './ledger'
@@ -23,5 +24,6 @@ export default {
   ...swap,
   ...deposit,
   ...midgard,
-  ...ledger
+  ...ledger,
+  ...bonds
 } as Messages
