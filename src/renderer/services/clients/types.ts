@@ -26,7 +26,7 @@ export const ClientStateM = getEitherM(option)
 
 export type ClientStateForViews = 'notready' | 'ready' | 'error'
 
-export type XChainClient$<T = XChainClient> = Rx.Observable<O.Option<T>>
+export type XChainClient$<T = void> = Rx.Observable<O.Option<XChainClient<T>>>
 
 export type Client$<C> = Rx.Observable<O.Option<C>>
 

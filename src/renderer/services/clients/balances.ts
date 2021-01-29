@@ -21,12 +21,12 @@ import { WalletBalancesLD, XChainClient$ } from './types'
  * Empty list of balances returned by client will be ignored and not part of `WalletBalances`
  *
  */
-const loadBalances$ = ({
+const loadBalances$ = <T = void>({
   client,
   address,
   walletType = 'keystore'
 }: {
-  client: XChainClient
+  client: XChainClient<T>
   walletType?: WalletType
   address?: Address
 }): WalletBalancesLD =>
@@ -70,7 +70,10 @@ const loadBalances$ = ({
  *
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const balances$: (client$: XChainClient$, trigger$: TriggerStream$) => WalletBalancesLD = (client$, trigger$) =>
+export const balances$: <T = void>(client$: XChainClient$<T>, trigger$: TriggerStream$) => WalletBalancesLD = (
+  client$,
+  trigger$
+) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.mergeMap(([_, oClient]) => {
       return FP.pipe(

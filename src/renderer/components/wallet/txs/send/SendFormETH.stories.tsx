@@ -1,83 +1,103 @@
-import React from 'react'
+// import React from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
-import { Meta, Story } from '@storybook/react'
-import { Fees } from '@xchainjs/xchain-client'
-import {
-  assetAmount,
-  AssetETH,
-  assetToBase,
-  assetToString,
-  baseAmount,
-  baseToAsset,
-  formatAssetAmount
-} from '@xchainjs/xchain-util'
+// import * as RD from '@devexperts/remote-data-ts'
+import { Meta } from '@storybook/react'
+// import { Fees } from '@xchainjs/xchain-client'
+// import { GasLimits, GasPrices } from '@xchainjs/xchain-ethereum'
+// import {
+//   assetAmount,
+//   AssetETH,
+//   AssetRuneNative,
+//   assetToBase,
+//   assetToString,
+//   baseAmount,
+//   baseToAsset,
+//   formatAssetAmount
+// } from '@xchainjs/xchain-util'
+// import { BigNumber } from 'ethers'
 
-import { ZERO_BASE_AMOUNT } from '../../../../const'
-import { WalletBalances } from '../../../../services/clients'
-import { SendTxParams } from '../../../../services/ethereum/types'
-import { WalletBalance } from '../../../../types/wallet'
+// import { ZERO_BASE_AMOUNT } from '../../../../const'
+// import { WalletBalances } from '../../../../services/clients'
+// import { SendTxParams } from '../../../../services/ethereum/types'
+// import { WalletBalance } from '../../../../types/wallet'
 import { SendFormETH } from './index'
-import { Props as SendFormETHProps } from './SendFormETH'
+// import { Props as SendFormETHProps } from './SendFormETH'
 
-const ethAsset: WalletBalance = {
-  asset: AssetETH,
-  amount: assetToBase(assetAmount(1.23)),
-  walletAddress: 'AssetETH wallet address'
-}
+// const ethAsset: WalletBalance = {
+//   asset: AssetETH,
+//   amount: assetToBase(assetAmount(1.23)),
+//   walletAddress: 'AssetETH wallet address'
+// }
 
-const balances: WalletBalances = [ethAsset]
+// const runeAsset: WalletBalance = {
+//   asset: AssetRuneNative,
+//   amount: assetToBase(assetAmount(2)),
+//   walletAddress: 'rune wallet address'
+// }
 
-const fees: Fees = {
-  type: 'base',
-  fastest: baseAmount(3000),
-  fast: baseAmount(2000),
-  average: baseAmount(1000)
-}
+// const balances: WalletBalances = [ethAsset, runeAsset]
 
-const feesRD = RD.success(fees)
+// const fees: Fees = {
+//   type: 'base',
+//   fastest: baseAmount(3000),
+//   fast: baseAmount(2000),
+//   average: baseAmount(1000)
+// }
 
-const estimateFee = () => Promise.resolve(ZERO_BASE_AMOUNT)
+// const gasPrices: GasPrices = {
+//   fastest: baseAmount(3),
+//   fast: baseAmount(2),
+//   average: baseAmount(1)
+// }
 
-const reloadFeesHandler = () => console.log('reload fees')
+// const gasLimits: GasLimits = {
+//   fastest: BigNumber.from(300),
+//   fast: BigNumber.from(200),
+//   average: BigNumber.from(100)
+// }
 
-const defaultProps: SendFormETHProps = {
-  balances,
-  balance: ethAsset,
-  onSubmit: ({ recipient, amount, asset, memo, gasPrice }: SendTxParams) =>
-    console.log(
-      `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
-        asset
-      )}, memo: ${memo}, fee: ${gasPrice}`
-    ),
+// const feesRD = RD.success({ fees, gasPrices, gasLimits })
 
-  isLoading: false,
-  addressValidation: () => true,
-  fees: feesRD,
-  estimateFee,
-  reloadFeesHandler
-}
+// const onSubmitHandler = ({ recipient, amount, asset, memo, gasPrice, gasLimit }: SendTxParams) =>
+//   console.log(
+//     `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
+//       asset
+//     )}, memo: ${memo}, gasPrice: ${gasPrice}, gasLimit: ${gasLimit}`
+//   )
 
-export const SendETH: Story = () => <SendFormETH {...defaultProps} />
-SendETH.storyName = 'success'
+// const reloadFeesHandler = () => console.log('reload fees')
 
-export const Pending: Story = () => {
-  const props: SendFormETHProps = { ...defaultProps, isLoading: true }
-  return <SendFormETH {...props} />
-}
+// const fees$ = () => console.log('get fees')
 
-export const LoadingFees: Story = () => {
-  const props: SendFormETHProps = { ...defaultProps, fees: RD.pending }
-  return <SendFormETH {...props} />
-}
+// const defaultProps: SendFormETHProps = {
+//   balances,
+//   balance: ethAsset,
+//   onSubmit: onSubmitHandler,
+//   isLoading: false,
+//   fees$,
+//   reloadFeesHandler
+// }
 
-export const FailtureFees: Story = () => {
-  const props: SendFormETHProps = {
-    ...defaultProps,
-    fees: RD.failure(Error('Could not load fee and rates for any reason'))
-  }
-  return <SendFormETH {...props} />
-}
+// export const SendETH: Story = () => <SendFormETH {...defaultProps} />
+// SendETH.storyName = 'success'
+
+// export const Pending: Story = () => {
+//   const props: SendFormETHProps = { ...defaultProps, isLoading: true }
+//   return <SendFormETH {...props} />
+// }
+
+// export const LoadingFees: Story = () => {
+//   const props: SendFormETHProps = { ...defaultProps, fees: RD.pending }
+//   return <SendFormETH {...props} />
+// }
+
+// export const FailtureFees: Story = () => {
+//   const props: SendFormETHProps = {
+//     ...defaultProps,
+//     fees: RD.failure(Error('Could not load fee and rates for any reason'))
+//   }
+//   return <SendFormETH {...props} />
+// }
 
 const meta: Meta = {
   component: SendFormETH,
