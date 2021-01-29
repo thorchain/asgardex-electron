@@ -8,7 +8,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import { TxHashRD, TxHashLD, ErrorId } from '../../wallet/types'
 import { XChainClient$ } from '../types'
 
-export const createTransferService = <Client extends XChainClient<T>, T = void>(client$: XChainClient$<T>) => {
+export const createTransferService = <Client extends XChainClient>(client$: XChainClient$) => {
   /**
    * State of a tx send by `subscribeTx`
    *

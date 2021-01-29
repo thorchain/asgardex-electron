@@ -18,7 +18,7 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
     case 'BTC':
       return BTC.client$
     case 'ETH':
-      return <XChainClient$>ETH.client$
+      return ETH.client$
     case 'THOR':
       return THOR.client$
     default:

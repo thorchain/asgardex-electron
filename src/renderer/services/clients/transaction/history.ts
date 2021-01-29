@@ -13,14 +13,14 @@ import { XChainClient$, TxsPageLD, TxsParams } from '../types'
 /**
  * Observable to load txs
  */
-const loadTxs$ = <T = void>({
+const loadTxs$ = ({
   client,
   asset: oAsset,
   limit,
   offset,
   walletAddress
 }: {
-  client: XChainClient<T>
+  client: XChainClient
 } & TxsParams): TxsPageLD => {
   const txAsset = FP.pipe(
     oAsset,
@@ -52,7 +52,7 @@ const loadTxs$ = <T = void>({
  * `Txs` state by given client
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const txsByClient$: <T = void>(client$: XChainClient$<T>) => (params: TxsParams) => TxsPageLD = (client$) => ({
+export const txsByClient$: (client$: XChainClient$) => (params: TxsParams) => TxsPageLD = (client$) => ({
   asset,
   limit,
   offset,
@@ -80,7 +80,7 @@ export const txsByClient$: <T = void>(client$: XChainClient$<T>) => (params: Txs
 /**
  * Observable to load data of a `Tx`
  */
-const loadTx$ = <T = void>(client: XChainClient<T>, txHash: TxHash): TxLD =>
+const loadTx$ = (client: XChainClient, txHash: TxHash): TxLD =>
   Rx.from(client.getTransactionData(txHash)).pipe(
     RxOp.map(RD.success),
     RxOp.catchError((error) =>
@@ -95,7 +95,7 @@ const loadTx$ = <T = void>(client: XChainClient<T>, txHash: TxHash): TxLD =>
  * Gets data of a `Tx` by given client
  * If a client is not available, it returns an `initial` state
  */
-export const txByClient$: <T = void>(client$: XChainClient$<T>) => (txHash: TxHash) => TxLD = (client$) => (txHash) =>
+export const txByClient$: (client$: XChainClient$) => (txHash: TxHash) => TxLD = (client$) => (txHash) =>
   client$.pipe(
     RxOp.switchMap((oClient) =>
       FP.pipe(
