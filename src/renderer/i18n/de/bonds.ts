@@ -1,18 +1,18 @@
 import { BondsMessages } from '../types'
 
 const bonds: BondsMessages = {
-  'bonds.node': 'Node - DE',
-  'bonds.bond': 'Bond - DE',
-  'bonds.award': 'Award - DE',
-  'bonds.info': 'Info - DE',
-  'bonds.status': 'Status - DE',
-  'bonds.status.active': 'Active - DE',
-  'bonds.status.standby': 'Standby - DE',
-  'bonds.status.disabled': 'Disabled - DE',
-  'bonds.node.add': 'Add node - DE',
-  'bonds.node.enterMessage': 'Enter node to monitor - DE',
-  'bonds.validations.nodeAlreadyAdded': 'Node is already added - DE',
-  'bonds.node.removeMessage': 'Are you sure yoy want to delete {node} node? - DE'
+  'bonds.node': 'Node',
+  'bonds.bond': 'Anleihe',
+  'bonds.award': 'Prämie',
+  'bonds.info': 'Info',
+  'bonds.status': 'Status',
+  'bonds.status.active': 'aktiv',
+  'bonds.status.standby': 'einsatzbereit',
+  'bonds.status.disabled': 'deaktiviert',
+  'bonds.node.add': 'Node hinzufügen',
+  'bonds.node.enterMessage': 'Node Addresse eingeben',
+  'bonds.validations.nodeAlreadyAdded': 'Node wurde bereits hinzugefügt',
+  'bonds.node.removeMessage': 'Bist Du sicher, dass Du die Node {node} entfernen möchtest?'
 }
 
 export default bonds

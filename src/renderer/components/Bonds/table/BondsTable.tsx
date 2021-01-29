@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
 
+import { Address } from '@xchainjs/xchain-client'
 import { ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
 
@@ -11,8 +12,8 @@ import * as H from './helpers'
 
 type Props = {
   nodes: Node[]
-  removeNode: (node: string) => void
-  goToNode: (node: string) => void
+  removeNode: (node: Address) => void
+  goToNode: (node: Address) => void
   network: Network
   className?: string
 }
@@ -71,7 +72,7 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
     [goToNode]
   )
 
-  const [nodeToRemove, setNodeToRemove] = useState<string | null>(null)
+  const [nodeToRemove, setNodeToRemove] = useState<Address | null>(null)
 
   const removeColumn: ColumnType<Node> = useMemo(
     () => ({

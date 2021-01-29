@@ -2,6 +2,7 @@ import React from 'react'
 
 import { StopOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { AssetRuneNative, baseToAsset, formatAssetAmountCurrency, THORChain } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import * as FP from 'fp-ts/function'
@@ -10,7 +11,7 @@ import { Network } from '../../../../shared/api/types'
 import { NodeDataRD } from '../types'
 import * as Styled from './BondsTable.styles'
 
-export const NodeAddress: React.FC<{ address: string; network: Network }> = ({ address, network }) => (
+export const NodeAddress: React.FC<{ address: Address; network: Network }> = ({ address, network }) => (
   <Col xs={18} lg={20} xl={24}>
     <Styled.AddressEllipsis address={address} chain={THORChain} network={network} />
   </Col>

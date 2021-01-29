@@ -3,6 +3,7 @@ import React from 'react'
 import { withKnobs, select } from '@storybook/addon-knobs'
 import { useCallback, useState } from '@storybook/addons'
 import { Meta, Story } from '@storybook/react'
+import { Address } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
 
 import { getMockRDValueFactory, RDStatus } from '../../../shared/mock/rdByStatus'
@@ -26,9 +27,9 @@ const getMockRDValue = getMockRDValueFactory<ApiError, NodeInfo>(
 const addressValidation: AddressValidation = (_) => true
 
 export const Default: Story = () => {
-  const [nodesList, setNodesList] = useState<string[]>([])
+  const [nodesList, setNodesList] = useState<Address[]>([])
 
-  const nodesSelect: Record<string, RDStatus> = nodesList
+  const nodesSelect: Record<Address, RDStatus> = nodesList
     .map((node) =>
       select(
         node,
@@ -44,7 +45,7 @@ export const Default: Story = () => {
     .reduce((acc, node, index) => ({ ...acc, [index]: node }), {})
 
   const removeNode = useCallback(
-    (node: string) => {
+    (node: Address) => {
       setNodesList(nodesList.filter((current) => current !== node))
     },
     [nodesList, setNodesList]

@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react'
 
 import { withKnobs, select } from '@storybook/addon-knobs'
 import { Meta, Story } from '@storybook/react'
+import { Address } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
 
 import { getMockRDValueFactory, RDStatus } from '../../../../shared/mock/rdByStatus'
@@ -55,19 +56,19 @@ export const Default: Story = () => {
     'success'
   )
 
-  const nodesSelect: Record<string, RDStatus> = {
+  const nodesSelect: Record<Address, RDStatus> = {
     thor1766mazrxs5asuscepa227r6ekr657234f8p7nf: firstNodeRdKnob,
     thor1766mazrxs5asuscepa227r6ekr657234f9asda: secondNodeRdKnob,
     thor1766mazrxs5asuscepa227r6ekr657234fkswjh: thirdNodeRdKnob
   }
-  const [nodesList, setNodesList] = useState<string[]>([
+  const [nodesList, setNodesList] = useState<Address[]>([
     'thor1766mazrxs5asuscepa227r6ekr657234f8p7nf',
     'thor1766mazrxs5asuscepa227r6ekr657234f9asda',
     'thor1766mazrxs5asuscepa227r6ekr657234fkswjh'
   ])
 
   const removeNode = useCallback(
-    (node: string) => {
+    (node: Address) => {
       setNodesList(nodesList.filter((current) => current !== node))
     },
     [nodesList, setNodesList]

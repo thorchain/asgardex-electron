@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react'
 
+import { Address } from '@xchainjs/xchain-client'
 import { Form } from 'antd'
 import { useIntl } from 'react-intl'
 
@@ -10,10 +11,10 @@ import { Node } from './types'
 
 type Props = {
   nodes: Node[]
-  removeNode: (node: string) => void
-  goToNode: (node: string) => void
+  removeNode: (node: Address) => void
+  goToNode: (node: Address) => void
   network: Network
-  addNode: (node: string) => void
+  addNode: (node: Address) => void
   addressValidation: AddressValidation
   className?: string
 }
