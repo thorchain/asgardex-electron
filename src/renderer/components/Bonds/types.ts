@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BaseAmount } from '@xchainjs/xchain-util'
 
-import { ApiError } from '../../../services/wallet/types'
+import { ApiError } from '../../services/wallet/types'
 
 export type NodeInfo = {
   bond: BaseAmount

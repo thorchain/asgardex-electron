@@ -18,5 +18,8 @@ export const getMockRDValueFactory = <L, T>(success: () => T, failure: () => L) 
     case 'success': {
       return RD.success(success())
     }
+    default: {
+      return RD.failure(failure())
+    }
   }
 }

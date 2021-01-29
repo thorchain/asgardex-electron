@@ -6,9 +6,9 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../shared/api/types'
 import { ValidatePasswordLD } from '../../../services/wallet/types'
 import { PasswordModal } from '../../modal/password'
+import { Node } from '../types'
 import * as Styled from './BondsTable.styles'
 import * as H from './helpers'
-import { Node } from './types'
 
 type Props = {
   nodes: Node[]
@@ -16,9 +16,10 @@ type Props = {
   validatePassword$: (_: string) => ValidatePasswordLD
   goToNode: (node: string) => void
   network: Network
+  className?: string
 }
 
-export const BondsTable: React.FC<Props> = ({ nodes, removeNode, validatePassword$, network, goToNode }) => {
+export const BondsTable: React.FC<Props> = ({ nodes, removeNode, validatePassword$, network, goToNode, className }) => {
   const intl = useIntl()
 
   const nodeColumn: ColumnType<Node> = useMemo(
@@ -87,6 +88,7 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, validatePasswor
   return (
     <>
       <Styled.Table
+        className={className}
         columns={[nodeColumn, bondColumn, awardColumn, statusColumn, infoColumn, removeColumn]}
         dataSource={nodes.map((node) => ({ ...node, key: node.nodeAddress }))}
       />

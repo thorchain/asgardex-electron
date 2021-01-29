@@ -150,6 +150,9 @@ type BondsMessageKey =
   | 'bonds.status.standby'
   | 'bonds.status.disabled'
   | 'bonds.info'
+  | 'bonds.node.add'
+  | 'bonds.node.enterMessage'
+  | 'bonds.validations.nodeAlreadyAdded'
 
 export type BondsMessages = { [key in BondsMessageKey]: string }
 
