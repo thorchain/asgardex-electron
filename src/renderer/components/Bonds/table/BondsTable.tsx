@@ -4,8 +4,7 @@ import { ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
-import { ValidatePasswordLD } from '../../../services/wallet/types'
-import { PasswordModal } from '../../modal/password'
+import { ConfirmationModal } from '../../modal/confirmation'
 import { Node } from '../types'
 import * as Styled from './BondsTable.styles'
 import * as H from './helpers'
@@ -13,13 +12,12 @@ import * as H from './helpers'
 type Props = {
   nodes: Node[]
   removeNode: (node: string) => void
-  validatePassword$: (_: string) => ValidatePasswordLD
   goToNode: (node: string) => void
   network: Network
   className?: string
 }
 
-export const BondsTable: React.FC<Props> = ({ nodes, removeNode, validatePassword$, network, goToNode, className }) => {
+export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNode, className }) => {
   const intl = useIntl()
 
   const nodeColumn: ColumnType<Node> = useMemo(
@@ -93,13 +91,12 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, validatePasswor
         dataSource={nodes.map((node) => ({ ...node, key: node.nodeAddress }))}
       />
       {nodeToRemove && (
-        <PasswordModal
+        <ConfirmationModal
           onClose={() => setNodeToRemove(null)}
           onSuccess={() => {
             removeNode(nodeToRemove)
-            setNodeToRemove(null)
           }}
-          validatePassword$={validatePassword$}
+          message={intl.formatMessage({ id: 'bonds.node.removeMessage' }, { node: nodeToRemove })}
         />
       )}
     </>

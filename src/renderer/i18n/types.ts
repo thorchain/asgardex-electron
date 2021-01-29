@@ -52,6 +52,7 @@ type CommonMessageKey =
   | 'common.tx.sending'
   | 'common.tx.sendingAsset'
   | 'common.tx.checkResult'
+  | 'common.modal.confirmTitle'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -152,6 +153,7 @@ type BondsMessageKey =
   | 'bonds.info'
   | 'bonds.node.add'
   | 'bonds.node.enterMessage'
+  | 'bonds.node.removeMessage'
   | 'bonds.validations.nodeAlreadyAdded'
 
 export type BondsMessages = { [key in BondsMessageKey]: string }

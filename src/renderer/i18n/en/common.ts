@@ -53,7 +53,8 @@ const common: CommonMessages = {
   'common.tx.healthCheck': 'Health check',
   'common.tx.sending': 'Send transaction',
   'common.tx.sendingAsset': 'Send {assetSymbol} transaction',
-  'common.tx.checkResult': 'Check result'
+  'common.tx.checkResult': 'Check result',
+  'common.modal.confirmTitle': 'Confirm action'
 }
 
 export default common

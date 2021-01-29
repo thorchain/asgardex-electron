@@ -11,7 +11,8 @@ const bonds: BondsMessages = {
   'bonds.status.disabled': 'Disabled - DE',
   'bonds.node.add': 'Add node - DE',
   'bonds.node.enterMessage': 'Enter node to monitor - DE',
-  'bonds.validations.nodeAlreadyAdded': 'Node is already added - DE'
+  'bonds.validations.nodeAlreadyAdded': 'Node is already added - DE',
+  'bonds.node.removeMessage': 'Are you sure yoy want to delete {node} node? - DE'
 }
 
 export default bonds

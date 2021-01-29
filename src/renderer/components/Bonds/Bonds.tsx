@@ -5,14 +5,12 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
 import { AddressValidation } from '../../services/thorchain/types'
-import { ValidatePasswordLD } from '../../services/wallet/types'
 import * as Styled from './Bonds.styles'
 import { Node } from './types'
 
 type Props = {
   nodes: Node[]
   removeNode: (node: string) => void
-  validatePassword$: (_: string) => ValidatePasswordLD
   goToNode: (node: string) => void
   network: Network
   addNode: (node: string) => void
@@ -24,7 +22,6 @@ export const Bonds: React.FC<Props> = ({
   addressValidation,
   nodes,
   removeNode,
-  validatePassword$,
   goToNode,
   network,
   addNode,
@@ -58,13 +55,7 @@ export const Bonds: React.FC<Props> = ({
   )
   return (
     <Styled.Container className={className}>
-      <Styled.BondsTable
-        nodes={nodes}
-        removeNode={removeNode}
-        validatePassword$={validatePassword$}
-        goToNode={goToNode}
-        network={network}
-      />
+      <Styled.BondsTable nodes={nodes} removeNode={removeNode} goToNode={goToNode} network={network} />
       <Styled.Form onFinish={onSubmit}>
         <Styled.InputContainer>
           <Styled.InputLabel>{intl.formatMessage({ id: 'bonds.node.enterMessage' })}</Styled.InputLabel>

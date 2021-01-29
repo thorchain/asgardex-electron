@@ -15,7 +15,7 @@ StoryValidating.storyName = 'validating'
 
 const meta: Meta = {
   component: PrivateModal,
-  title: 'Components/Private Modal',
+  title: 'Components/Modal/Private',
   decorators: [
     (S: Story) => (
       <div

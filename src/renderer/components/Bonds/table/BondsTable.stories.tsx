@@ -5,7 +5,6 @@ import { Meta, Story } from '@storybook/react'
 import { baseAmount } from '@xchainjs/xchain-util'
 
 import { getMockRDValueFactory, RDStatus } from '../../../../shared/mock/rdByStatus'
-import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { ApiError, ErrorId } from '../../../services/wallet/types'
 import { NodeInfo } from '../types'
 import { BondsTable } from './BondsTable'
@@ -77,7 +76,6 @@ export const Default: Story = () => {
   return (
     <BondsTable
       network={'testnet'}
-      validatePassword$={mockValidatePassword$}
       removeNode={removeNode}
       goToNode={(node) => console.log('go to ', node)}
       nodes={nodesList
