@@ -41,16 +41,14 @@ export const createFeesService = <Client extends XChainClient>({
   chain: Chain
 }) => {
   /**
-   * According to the Client's interface
-   * first argument type of Client.getFees method
-   * is an object of TxParams.
-   * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-client/src/types.ts#L96
+   * According to the XChainClient's interface
+   * `Client.getFees` accept an object of `FeeParams`, which might be overriden by clients.
+   * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-client/src/types.ts
    *
-   *  In common-client case
-   * this parameters might be extended so we need this generic type
+   * In common-client case, this parameter might be extended amd we need a generic type
    * to have an access to params "real" type value for specific chain
-   * @example ETH client has extended FeesParams interface
-   * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-bitcoin/src/client.ts#L396
+   * @example ETH client has extended `FeesParams` interface
+   * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-ethereum/src/types/client-types.ts
    */
   type FeesParams = Parameters<Client['getFees']>[0]
 
@@ -62,7 +60,6 @@ export const createFeesService = <Client extends XChainClient>({
       RxOp.switchMap(([_, oClient]) =>
         FP.pipe(
           oClient,
-          // O.fold<XChainClient, Rx.Observable<XChainClient>>(
           O.fold(
             () => Rx.EMPTY,
             (client) => Rx.from(client.getFees(params))
@@ -74,9 +71,6 @@ export const createFeesService = <Client extends XChainClient>({
       RxOp.startWith(RD.pending),
       RxOp.shareReplay(1)
     )
-
-  //
-  // RxOp.catchError((e) => Rx.of(RD.failure(e))),
 
   return {
     fees$,

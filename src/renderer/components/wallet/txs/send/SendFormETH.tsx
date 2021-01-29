@@ -65,15 +65,8 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
 
   const prevFeesWithGasPricesAndLimitsRef = useRef<O.Option<FeesWithGasPricesAndLimits>>(O.none)
 
-  const [feesWithGasPricesAndLimitsRD] = useObservableState(
-    () => Rx.of(RD.failure('not implementend')),
-    // fees$({
-    //   asset: balance.asset,
-    //   amount: form.getFieldValue('amount'),
-    //   recipient: form.getFieldValue('recipient')
-    // }),
-    RD.initial
-  )
+  // TODO (@Veado) Fixme: Handle states of tx in parent view
+  const [feesWithGasPricesAndLimitsRD] = useObservableState(() => Rx.of(RD.failure('not implementend')), RD.initial)
 
   const oFeesWithGasPricesAndLimits: O.Option<FeesWithGasPricesAndLimits> = useMemo(
     () => FP.pipe(feesWithGasPricesAndLimitsRD, RD.toOption),
