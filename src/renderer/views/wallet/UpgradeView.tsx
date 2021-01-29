@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { assetFromString, assetToString, BNBChain, THORChain } from '@xchainjs/xchain-util'
@@ -20,26 +20,22 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneBnbAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
-import { UpgradeBnbRuneParams } from '../../routes/wallet'
+import { AssetDetailsParams } from '../../routes/wallet'
 import * as walletRoutes from '../../routes/wallet'
-import { INITIAL_UPGRADE_RUNE_STATE } from '../../services/chain/const'
 import { getPoolAddressByChain } from '../../services/midgard/utils'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 type Props = {}
 
-type ErrorViewData = { invalidAsset: boolean; missingRuneAddress: boolean; missingExplorerUrl: boolean }
-
 export const UpgradeView: React.FC<Props> = (): JSX.Element => {
-  const { runeAsset: runeAssetString, walletAddress } = useParams<UpgradeBnbRuneParams>()
+  const { asset, walletAddress } = useParams<AssetDetailsParams>()
 
   const intl = useIntl()
 
   // accept BNB.Rune only
-  const oRuneBnbAsset = useMemo(
-    () => FP.pipe(assetFromString(runeAssetString), O.fromNullable, O.filter(isRuneBnbAsset)),
-    [runeAssetString]
-  )
+  const oRuneBnbAsset = useMemo(() => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isRuneBnbAsset)), [
+    asset
+  ])
 
   const {
     balancesState$,
@@ -52,7 +48,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const oGetExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
   const { fees$: bnbFees$, reloadFees: reloadBnbFees } = useBinanceContext()
-  const { addressByChain$ } = useChainContext()
+  const { addressByChain$, upgradeBnbRune$ } = useChainContext()
 
   const {
     service: {
@@ -114,42 +110,36 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     RD.initial
   )
 
-  const renderDataError = useCallback(
-    ({ invalidAsset, missingRuneAddress, missingExplorerUrl }: ErrorViewData) => (
-      <>
-        <BackLink />
-        <ErrorView
-          title={intl.formatMessage(
-            { id: 'routes.invalid.asset' },
-            {
-              runeAssetString
-            }
-          )}
-          // TODO (@Veado) Add i18n
-          subTitle={JSON.stringify({ invalidAsset, missingRuneAddress, missingExplorerUrl })}
-        />
-      </>
-    ),
-    [runeAssetString, intl]
+  const renderAssetError = useMemo(
+    () =>
+      O.isNone(oRuneBnbAsset) ? (
+        <>
+          <BackLink />
+          <ErrorView
+            title={intl.formatMessage(
+              { id: 'routes.invalid.asset' },
+              {
+                asset
+              }
+            )}
+          />
+        </>
+      ) : (
+        <></>
+      ),
+    [asset, intl, oRuneBnbAsset]
   )
 
   return FP.pipe(
-    // All of following values should be available immediately
-    // by entering the `UpgradeView`, because we already have an unlocked wallet.
-    // If not (for any reason), we will show an error
+    // Show an error by invalid or missing asset in route only
+    // All other values should be immediately available by entering the `UpgradeView`
     sequenceTOption(oRuneBnbAsset, oRuneNativeAddress, oGetExplorerTxUrl),
     O.fold(
-      () =>
-        renderDataError({
-          invalidAsset: O.isNone(oRuneBnbAsset),
-          missingRuneAddress: O.isNone(oRuneNativeAddress),
-          missingExplorerUrl: O.isNone(oGetExplorerTxUrl)
-        }),
+      () => renderAssetError,
       ([runeBnbAsset, runeNativeAddress, getExplorerTxUrl]) => {
-        const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
-          getExplorerTxUrl,
-          window.apiUrl.openExternal
-        )
+        const successActionHandler = (txHash: string): Promise<void> =>
+          FP.pipe(txHash, getExplorerTxUrl, window.apiUrl.openExternal)
+
         return (
           <>
             <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(runeBnbAsset), walletAddress })} />
@@ -158,8 +148,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
               runeNativeAddress={runeNativeAddress}
               bnbPoolAddressRD={bnbPoolAddressRD}
               validatePassword$={validatePassword$}
-              // TODO (@Veado) [Upgrade] Refactor business logic #798
-              upgrade$={(_) => Rx.of(INITIAL_UPGRADE_RUNE_STATE)}
+              upgrade$={upgradeBnbRune$}
               reloadFeeHandler={reloadBnbFees}
               fee={upgradeFeeRD}
               balances={oBalances}

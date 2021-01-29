@@ -112,12 +112,11 @@ export const send: Route<SendParams> = {
   }
 }
 
-export type UpgradeBnbRuneParams = { runeAsset: string; walletAddress: string }
-export const upgradeBnbRune: Route<UpgradeBnbRuneParams> = {
+export const upgradeBnbRune: Route<AssetDetailsParams> = {
   template: `${assetDetail.template}/upgrade`,
-  path: ({ runeAsset: runeAssetString, walletAddress }) => {
+  path: ({ asset: assetString, walletAddress }) => {
     // Validate asset string to accept BNB.Rune only
-    const oAsset = FP.pipe(assetFromString(runeAssetString), O.fromNullable, O.filter(isRuneBnbAsset))
+    const oAsset = FP.pipe(assetFromString(assetString), O.fromNullable, O.filter(isRuneBnbAsset))
     // Simple validation of address
     const oWalletAddress = FP.pipe(
       walletAddress,

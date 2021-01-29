@@ -4,7 +4,7 @@ import { Label as UILabel } from '../label'
 import { Button as UIButton } from './Button'
 
 export const Label = styled(UILabel).attrs({
-  size: 'normal',
+  size: 'big',
   color: 'primary'
 })`
   font-family: 'MainFontRegular';

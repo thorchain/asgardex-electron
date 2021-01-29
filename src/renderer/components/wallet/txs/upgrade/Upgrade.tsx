@@ -12,7 +12,7 @@ import {
   baseToAsset,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
-import { Row, Form } from 'antd'
+import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -24,16 +24,15 @@ import { getChainAsset } from '../../../../helpers/chainHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { emptyString } from '../../../../helpers/stringHelper'
 import { getBnbAmountFromBalances, getRuneBnBAmountFromBalances } from '../../../../helpers/walletHelper'
-import { SendTxParams } from '../../../../services/binance/types'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
-import { UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
+import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
 import { FeeRD } from '../../../../services/chain/types'
 import { PoolAddressRD } from '../../../../services/midgard/types'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
-import { Fees, UIFeesRD } from '../../../uielements/fees'
+import { UIFeesRD } from '../../../uielements/fees'
 import { InputBigNumber } from '../../../uielements/input/InputBigNumber'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
@@ -46,7 +45,7 @@ export type Props = {
   bnbPoolAddressRD: PoolAddressRD
   validatePassword$: ValidatePasswordHandler
   fee: FeeRD
-  upgrade$: (_: SendTxParams) => UpgradeRuneTxState$
+  upgrade$: (_: UpgradeRuneParams) => UpgradeRuneTxState$
   balances: O.Option<NonEmptyWalletBalances>
   reloadFeeHandler: FP.Lazy<void>
   successActionHandler: (txHash: string) => Promise<void>
@@ -180,22 +179,17 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const onSubmit = useCallback(() => setShowConfirmUpgradeModal(true), [])
 
   const upgrade = useCallback(() => {
-    FP.pipe(
-      RD.toOption(bnbPoolAddressRD),
-      O.map((bnbPoolAddress) => {
-        const memo = getSwitchMemo(runeNativeAddress)
-        const subscription = upgrade$({
-          recipient: bnbPoolAddress,
-          amount: amountToUpgrade,
-          asset: runeAsset,
-          memo
-        }).subscribe(setUpgradeTxState)
+    const memo = getSwitchMemo(runeNativeAddress)
+    const poolAddress = RD.toOption(bnbPoolAddressRD)
+    const subscription = upgrade$({
+      poolAddress,
+      amount: amountToUpgrade,
+      asset: runeAsset,
+      memo
+    }).subscribe(setUpgradeTxState)
 
-        // store subscription
-        setUpgradeTxSub(O.some(subscription))
-        return true
-      })
-    )
+    // store subscription
+    setUpgradeTxSub(O.some(subscription))
   }, [amountToUpgrade, bnbPoolAddressRD, runeAsset, runeNativeAddress, upgrade$, setUpgradeTxSub])
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
@@ -282,14 +276,17 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderSuccessExtra = useCallback(
-    (txHash: string) => (
-      <Styled.SuccessExtraContainer>
-        <Styled.SuccessExtraButton onClick={onFinishHandler}>
-          {intl.formatMessage({ id: 'common.back' })}
-        </Styled.SuccessExtraButton>
-        <ViewTxButton txHash={O.some(txHash)} onClick={async () => successActionHandler} />
-      </Styled.SuccessExtraContainer>
-    ),
+    (txHash: string) => {
+      const onClickHandler = () => successActionHandler(txHash)
+      return (
+        <Styled.SuccessExtraContainer>
+          <Styled.SuccessExtraButton onClick={onFinishHandler}>
+            {intl.formatMessage({ id: 'common.back' })}
+          </Styled.SuccessExtraButton>
+          <ViewTxButton txHash={O.some(txHash)} onClick={onClickHandler} />
+        </Styled.SuccessExtraContainer>
+      )
+    },
     [intl, onFinishHandler, successActionHandler]
   )
 
@@ -329,9 +326,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
               </Styled.FormItem>
               <MaxBalanceButton balance={{ amount: maxAmount, asset: runeAsset }} onClick={addMaxAmountHandler} />
 
-              <Row>
-                <Fees fees={uiFeesRD} reloadFees={reloadFeeHandler} />
-              </Row>
+              <CStyled.Fees fees={uiFeesRD} reloadFees={reloadFeeHandler} />
               {renderFeeError}
             </Styled.SubForm>
             <Styled.SubmitContainer>
@@ -412,8 +407,9 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       {renderConfirmUpgradeModal}
       {FP.pipe(
         bnbPoolAddressRD,
-        RD.toOption,
-        O.fold(
+        RD.fold(
+          () => renderUpgradeStatus,
+          () => renderUpgradeStatus,
           () => (
             <CStyled.ErrorView
               // TODO (@Veado) Add i18n
