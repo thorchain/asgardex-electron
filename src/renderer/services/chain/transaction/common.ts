@@ -10,6 +10,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
+import * as ETH from '../../ethereum'
 import * as THOR from '../../thorchain'
 import { ErrorId, TxHashLD, TxLD } from '../../wallet/types'
 import { SendTxParams } from '../types'
@@ -39,8 +40,7 @@ const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }: SendT
       )
 
     case ETHChain:
-      // not available yet
-      return txFailure$(`Tx stuff has not been implemented for ETH yet`)
+      return ETH.sendTx({ asset, recipient, amount, memo, feeOptionKey })
 
     case THORChain: {
       if (txType === TxTypes.SWAP || txType === TxTypes.DEPOSIT) {
@@ -75,7 +75,7 @@ const getTxByChain$ = (txHash: TxHash, chain: Chain) => {
     case BTCChain:
       return BTC.tx$(txHash)
     case ETHChain:
-      return failure$(`tx$ has not been implemented for ETH`)
+      return ETH.tx$(txHash)
     case THORChain:
       return THOR.tx$(txHash)
     case CosmosChain:

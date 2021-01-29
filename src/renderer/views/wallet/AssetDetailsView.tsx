@@ -101,7 +101,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
           () => Rx.EMPTY,
           (_) =>
             FP.pipe(
-              fees$,
+              fees$(),
               liveData.map((fees) => fees.fast)
             )
         )

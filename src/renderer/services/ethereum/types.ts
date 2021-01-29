@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { FeeOptionKey } from '@xchainjs/xchain-client'
 import { Address, Client, FeesParams, FeesWithGasPricesAndLimits } from '@xchainjs/xchain-ethereum'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import { BigNumber } from 'ethers'
@@ -19,12 +20,11 @@ export type SendTxParams = {
   recipient: Address
   amount: BaseAmount
   memo?: string
-  gasPrice?: BaseAmount
+  feeOptionKey?: FeeOptionKey
   gasLimit?: BigNumber
+  gasPrice?: BaseAmount
 }
 
 export type TransactionService = C.TransactionService<SendTxParams>
-export type FeesService = {
-  fees$: (params: FeesParams) => FeesWithGasPricesAndLimitsLD
-  reloadFees: () => void
-}
+
+export type FeesService = C.FeesService<FeesParams>

@@ -12,10 +12,7 @@ export type Client$ = C.Client$<Client>
 export type ClientState = C.ClientState<Client>
 export type ClientState$ = C.ClientState$<Client>
 
-export type FeesService = {
-  fees$: C.FeesLD
-  reloadFees: () => void
-}
+export type FeesService = C.FeesService<undefined>
 
 export type SendTxParams = {
   recipient: string

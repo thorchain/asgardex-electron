@@ -79,7 +79,7 @@ const reloadDepositFeesEffect$: Rx.Observable<boolean> = Rx.combineLatest([
 const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
   switch (chain) {
     case 'BNB':
-      return BNB.fees$.pipe(liveData.map(({ fast }) => fast))
+      return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
     case 'BTC':
       // deposit fee for BTC txs based on a memo,
       // and memo depends on deposit type
@@ -95,7 +95,7 @@ const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
         )
       )
     case 'THOR':
-      return THOR.fees$.pipe(liveData.map(({ fast }) => fast))
+      return THOR.fees$().pipe(liveData.map(({ fast }) => fast))
     case 'ETH':
       return Rx.of(RD.failure(Error('Deposit fee for ETH has not been implemented')))
     case 'GAIA':

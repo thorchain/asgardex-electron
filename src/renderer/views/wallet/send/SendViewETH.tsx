@@ -35,7 +35,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
     selectedAsset
   ])
 
-  const { fees$, txRD$, resetTx, subscribeTx } = useEthereumContext()
+  const { txRD$, resetTx, subscribeTx } = useEthereumContext()
 
   const txRD = useObservableState<TxHashRD>(txRD$, RD.initial)
 
@@ -53,10 +53,9 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
         )}
         isLoading={RD.isPending(txRD)}
         reloadFeesHandler={reloadFeesHandler}
-        fees$={fees$}
       />
     ),
-    [subscribeTx, oWalletBalances, txRD, reloadFeesHandler, fees$]
+    [subscribeTx, oWalletBalances, txRD, reloadFeesHandler]
   )
 
   return FP.pipe(

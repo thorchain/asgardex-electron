@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOptionKey } from '@xchainjs/xchain-client'
-import { Address, FeesParams, FeesWithGasPricesAndLimits, validateAddress } from '@xchainjs/xchain-ethereum'
+import { Address, FeesWithGasPricesAndLimits, validateAddress } from '@xchainjs/xchain-ethereum'
 import {
   formatAssetAmountCurrency,
   assetAmount,
@@ -22,13 +22,14 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
 
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
 import { isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
 import { WalletBalances } from '../../../../services/clients'
-import { FeesWithGasPricesAndLimitsLD, SendTxParams } from '../../../../services/ethereum/types'
+import { SendTxParams } from '../../../../services/ethereum/types'
 import { WalletBalance } from '../../../../types/wallet'
 import * as StyledR from '../../../shared/form/Radio.style'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -49,12 +50,11 @@ export type Props = {
   balance: WalletBalance
   onSubmit: ({ recipient, amount, asset, memo, gasPrice }: SendTxParams) => void
   isLoading?: boolean
-  fees$: (params: FeesParams) => FeesWithGasPricesAndLimitsLD
   reloadFeesHandler: () => void
 }
 
 export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit, balances, balance, isLoading = false, fees$, reloadFeesHandler } = props
+  const { onSubmit, balances, balance, isLoading = false, reloadFeesHandler } = props
   const intl = useIntl()
 
   const changeAssetHandler = useChangeAssetHandler()
@@ -66,12 +66,12 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   const prevFeesWithGasPricesAndLimitsRef = useRef<O.Option<FeesWithGasPricesAndLimits>>(O.none)
 
   const [feesWithGasPricesAndLimitsRD] = useObservableState(
-    () =>
-      fees$({
-        asset: balance.asset,
-        amount: form.getFieldValue('amount'),
-        recipient: form.getFieldValue('recipient')
-      }),
+    () => Rx.of(RD.failure('not implementend')),
+    // fees$({
+    //   asset: balance.asset,
+    //   amount: form.getFieldValue('amount'),
+    //   recipient: form.getFieldValue('recipient')
+    // }),
     RD.initial
   )
 
@@ -159,7 +159,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               ),
               O.getOrElse(() => '...')
             ),
-          (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
+          (error) => `${intl.formatMessage({ id: 'common.error' })} ${error || ''}`,
           ({ fees }) =>
             formatAssetAmountCurrency({
               amount: baseToAsset(fees[selectedFeeOptionKey]),

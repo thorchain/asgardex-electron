@@ -20,7 +20,7 @@ const { stream$: reloadWithdrawFees$, trigger: reloadWithdrawFees } = triggerStr
 const withdrawFeeByChain$ = (chain: Chain): FeeLD => {
   switch (chain) {
     case 'BNB':
-      return BNB.fees$.pipe(liveData.map(({ fast }) => fast))
+      return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
     case 'BTC':
       // withdraw fee for BTC txs based on withdraw memo
       return getWithdrawMemo$.pipe(
@@ -35,7 +35,7 @@ const withdrawFeeByChain$ = (chain: Chain): FeeLD => {
         )
       )
     case 'THOR':
-      return THOR.fees$.pipe(liveData.map(({ fast }) => fast))
+      return THOR.fees$().pipe(liveData.map(({ fast }) => fast))
     case 'ETH':
       return Rx.of(RD.failure(Error(`Deposit fee for ETH has not been implemented`)))
     case 'GAIA':

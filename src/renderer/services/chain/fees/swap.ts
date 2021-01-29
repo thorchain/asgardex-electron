@@ -32,10 +32,10 @@ const reloadSwapFees = () => {
 const feesByChain$ = (chain: Chain, memo?: Memo): FeesLD => {
   switch (chain) {
     case BNBChain:
-      return BNB.fees$
+      return BNB.fees$()
 
     case THORChain:
-      return THOR.fees$
+      return THOR.fees$()
 
     case BTCChain:
       return FP.pipe(
