@@ -44,7 +44,7 @@ StoryCheck.storyName = 'check'
 
 const meta: Meta = {
   component: PasswordModal,
-  title: 'Components/Password Modal',
+  title: 'Components/Modal/Password',
   decorators: [
     (S: Story) => (
       <div

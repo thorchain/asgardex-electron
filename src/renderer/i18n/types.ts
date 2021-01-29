@@ -52,6 +52,7 @@ type CommonMessageKey =
   | 'common.tx.sending'
   | 'common.tx.sendingAsset'
   | 'common.tx.checkResult'
+  | 'common.modal.confirmTitle'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -140,6 +141,22 @@ type WalletMessageKey =
   | 'wallet.validations.shouldNotBeEmpty'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
+
+type BondsMessageKey =
+  | 'bonds.node'
+  | 'bonds.bond'
+  | 'bonds.award'
+  | 'bonds.status'
+  | 'bonds.status.active'
+  | 'bonds.status.standby'
+  | 'bonds.status.disabled'
+  | 'bonds.info'
+  | 'bonds.node.add'
+  | 'bonds.node.enterMessage'
+  | 'bonds.node.removeMessage'
+  | 'bonds.validations.nodeAlreadyAdded'
+
+export type BondsMessages = { [key in BondsMessageKey]: string }
 
 type LedgerMessageKey =
   | 'ledger.add.device.error.title'
@@ -243,7 +260,8 @@ export type Messages = CommonMessages &
   SettingMessages &
   SwapMessages &
   DepositMessages &
-  LedgerMessages
+  LedgerMessages &
+  BondsMessages
 
 export enum Locale {
   EN = 'en',
