@@ -7,8 +7,8 @@ import { Col } from 'antd'
 import * as FP from 'fp-ts/function'
 
 import { Network } from '../../../../shared/api/types'
+import { NodeDataRD } from '../types'
 import * as Styled from './BondsTable.styles'
-import { NodeDataRD } from './types'
 
 export const NodeAddress: React.FC<{ address: string; network: Network }> = ({ address, network }) => (
   <Col xs={18} lg={20} xl={24}>
