@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOptionKey } from '@xchainjs/xchain-client'
-import { Address, FeesWithGasPricesAndLimits, validateAddress } from '@xchainjs/xchain-ethereum'
+import { FeeOptionKey, Fees } from '@xchainjs/xchain-client'
+import { Address, FeesParams, validateAddress } from '@xchainjs/xchain-ethereum'
 import {
   formatAssetAmountCurrency,
   assetAmount,
@@ -12,23 +12,21 @@ import {
   baseToAsset,
   AssetETH,
   assetToBase,
-  BaseAmount
+  BaseAmount,
+  formatBaseAmount
 } from '@xchainjs/xchain-util'
 import { Row, Form, Col } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import BigNumber from 'bignumber.js'
-import { ethers } from 'ethers'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
 import { isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
-import { WalletBalances } from '../../../../services/clients'
+import { FeesRD, WalletBalances } from '../../../../services/clients'
 import { SendTxParams } from '../../../../services/ethereum/types'
 import { WalletBalance } from '../../../../types/wallet'
 import * as StyledR from '../../../shared/form/Radio.style'
@@ -48,69 +46,47 @@ export type FormValues = {
 export type Props = {
   balances: WalletBalances
   balance: WalletBalance
-  onSubmit: ({ recipient, amount, asset, memo, gasPrice }: SendTxParams) => void
+  onSubmit: ({ recipient, amount, asset, memo, feeOptionKey }: SendTxParams) => void
   isLoading?: boolean
-  reloadFeesHandler: () => void
+  fees: FeesRD
+  reloadFeesHandler: (params: FeesParams) => void
 }
 
 export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit, balances, balance, isLoading = false, reloadFeesHandler } = props
+  const { onSubmit, balances, balance, isLoading = false, fees: feesRD, reloadFeesHandler } = props
   const intl = useIntl()
 
   const changeAssetHandler = useChangeAssetHandler()
 
-  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>('fastest')
+  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>('fast')
+
+  const [sendAmount, setSendAmount] = useState<O.Option<BaseAmount>>(O.none)
+  const [sendAddress, setSendAddress] = useState<O.Option<Address>>(O.none)
 
   const [form] = Form.useForm<FormValues>()
 
-  const prevFeesWithGasPricesAndLimitsRef = useRef<O.Option<FeesWithGasPricesAndLimits>>(O.none)
+  const prevFeesRef = useRef<O.Option<Fees>>(O.none)
 
-  // TODO (@Veado) Fixme: Handle states of tx in parent view
-  const [feesWithGasPricesAndLimitsRD] = useObservableState(() => Rx.of(RD.failure('not implementend')), RD.initial)
+  const oFees: O.Option<Fees> = useMemo(() => FP.pipe(feesRD, RD.toOption), [feesRD])
 
-  const oFeesWithGasPricesAndLimits: O.Option<FeesWithGasPricesAndLimits> = useMemo(
-    () => FP.pipe(feesWithGasPricesAndLimitsRD, RD.toOption),
-    [feesWithGasPricesAndLimitsRD]
-  )
-
-  const feesAvailable = useMemo(() => O.isSome(oFeesWithGasPricesAndLimits), [oFeesWithGasPricesAndLimits])
+  const feesAvailable = useMemo(() => O.isSome(oFees), [oFees])
 
   // Store latest fees as `ref`
   // needed to display previous fee while reloading
   useEffect(() => {
     FP.pipe(
-      oFeesWithGasPricesAndLimits,
-      O.map(
-        (feesWithGasPricesAndLimits) => (prevFeesWithGasPricesAndLimitsRef.current = O.some(feesWithGasPricesAndLimits))
-      )
+      oFees,
+      O.map((fees) => (prevFeesRef.current = O.some(fees)))
     )
-  }, [oFeesWithGasPricesAndLimits])
+  }, [oFees])
 
   const selectedFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        oFeesWithGasPricesAndLimits,
-        O.map(({ fees }) => fees[selectedFeeOptionKey])
+        oFees,
+        O.map((fees) => fees[selectedFeeOptionKey])
       ),
-    [oFeesWithGasPricesAndLimits, selectedFeeOptionKey]
-  )
-
-  const selectedGasPrice: O.Option<BaseAmount> = useMemo(
-    () =>
-      FP.pipe(
-        oFeesWithGasPricesAndLimits,
-        O.map(({ gasPrices }) => gasPrices[selectedFeeOptionKey])
-      ),
-    [oFeesWithGasPricesAndLimits, selectedFeeOptionKey]
-  )
-
-  const selectedGasLimit: O.Option<ethers.BigNumber> = useMemo(
-    () =>
-      FP.pipe(
-        oFeesWithGasPricesAndLimits,
-        O.map(({ gasLimits }) => gasLimits[selectedFeeOptionKey])
-      ),
-    [oFeesWithGasPricesAndLimits, selectedFeeOptionKey]
+    [oFees, selectedFeeOptionKey]
   )
 
   const oEthAmount: O.Option<AssetAmount> = useMemo(() => {
@@ -136,14 +112,14 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   const selectedFeeLabel = useMemo(
     () =>
       FP.pipe(
-        feesWithGasPricesAndLimitsRD,
+        feesRD,
         RD.fold(
           () => '...',
           () =>
             // show previous fees while re-loading
             FP.pipe(
-              prevFeesWithGasPricesAndLimitsRef.current,
-              O.map(({ fees }) =>
+              prevFeesRef.current,
+              O.map((fees) =>
                 formatAssetAmountCurrency({
                   amount: baseToAsset(fees[selectedFeeOptionKey]),
                   asset: AssetETH,
@@ -153,7 +129,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               O.getOrElse(() => '...')
             ),
           (error) => `${intl.formatMessage({ id: 'common.error' })} ${error || ''}`,
-          ({ fees }) =>
+          (fees) =>
             formatAssetAmountCurrency({
               amount: baseToAsset(fees[selectedFeeOptionKey]),
               asset: AssetETH,
@@ -161,7 +137,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
             })
         )
       ),
-    [feesWithGasPricesAndLimitsRD, intl, selectedFeeOptionKey]
+    [feesRD, intl, selectedFeeOptionKey]
   )
 
   const renderFeeError = useMemo(() => {
@@ -221,19 +197,19 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   const renderFeeOptions = useMemo(
     () =>
       FP.pipe(
-        oFeesWithGasPricesAndLimits,
+        oFees,
         O.fold(
           () =>
             // render radio group while reloading fees
             FP.pipe(
-              prevFeesWithGasPricesAndLimitsRef.current,
+              prevFeesRef.current,
               O.map(renderFeeOptionsRadioGroup),
               O.getOrElse(() => <></>)
             ),
           renderFeeOptionsRadioGroup
         )
       ),
-    [prevFeesWithGasPricesAndLimitsRef, oFeesWithGasPricesAndLimits, renderFeeOptionsRadioGroup]
+    [prevFeesRef, oFees, renderFeeOptionsRadioGroup]
   )
 
   const addressValidator = useCallback(
@@ -280,23 +256,60 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   )
 
   const onFinishHandler = useCallback(
-    ({ amount, recipient, memo }: FormValues) =>
+    ({ memo }: FormValues) =>
       FP.pipe(
-        sequenceTOption(selectedGasPrice, selectedGasLimit),
-        O.map(([gasPrice, gasLimit]) => {
+        sequenceTOption(sendAmount, sendAddress),
+        O.map(([amount, recipient]) => {
           onSubmit({
             recipient,
-            amount: assetToBase(assetAmount(amount)),
+            amount,
             asset: balance.asset,
-            memo,
-            gasPrice,
-            gasLimit
+            feeOptionKey: selectedFeeOptionKey,
+            memo
           })
           return true
         })
       ),
-    [balance.asset, onSubmit, selectedGasLimit, selectedGasPrice]
+    [balance.asset, onSubmit, selectedFeeOptionKey, sendAddress, sendAmount]
   )
+
+  const onChangeAmount = useCallback(
+    async (value: BigNumber) => {
+      // we have to validate input before storing into the state
+      amountValidator(undefined, value)
+        .then(() => {
+          setSendAmount(O.some(assetToBase(assetAmount(value))))
+        })
+        .catch(() => setSendAmount(O.none))
+    },
+    [amountValidator, setSendAmount]
+  )
+
+  const onChangeAddress = useCallback(
+    async ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+      const address = target.value
+      // we have to validate input before storing into the state
+      addressValidator(undefined, address)
+        .then(() => {
+          setSendAddress(O.some(address))
+        })
+        .catch(() => setSendAddress(O.none))
+    },
+    [setSendAddress, addressValidator]
+  )
+
+  const reloadFees = useCallback(() => {
+    console.log('reloadFees')
+    FP.pipe(
+      sequenceTOption(sendAmount, sendAddress),
+      O.map(([amount, recipient]) => {
+        console.log('reloadFees', formatBaseAmount(amount), recipient)
+        return reloadFeesHandler({ asset: balance.asset, amount, recipient })
+      })
+    )
+
+    return false
+  }, [balance.asset, reloadFeesHandler, sendAddress, sendAmount])
 
   return (
     <Row>
@@ -315,11 +328,18 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
             <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-              <Input color="primary" size="large" disabled={isLoading} />
+              <Input color="primary" size="large" disabled={isLoading} onBlur={reloadFees} onChange={onChangeAddress} />
             </Form.Item>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
             <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              <InputBigNumber min={0} size="large" disabled={isLoading} decimal={8} />
+              <InputBigNumber
+                min={0}
+                size="large"
+                disabled={isLoading}
+                decimal={balance.amount.decimal}
+                onBlur={reloadFees}
+                onChange={onChangeAmount}
+              />
             </Styled.FormItem>
             <Styled.Label size="big" style={{ marginBottom: 0, paddingBottom: 0 }}>
               {intl.formatMessage({ id: 'common.max' })}:{' '}
@@ -333,14 +353,14 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               <Col>
                 <StyledForm.FeeLabel
                   size="big"
-                  color={RD.isFailure(feesWithGasPricesAndLimitsRD) ? 'error' : 'primary'}
+                  color={RD.isFailure(feesRD) ? 'error' : 'primary'}
                   style={{ paddingTop: 0 }}
-                  disabled={RD.isPending(feesWithGasPricesAndLimitsRD)}>
+                  disabled={RD.isPending(feesRD)}>
                   {intl.formatMessage({ id: 'common.fees' })}: {selectedFeeLabel}
                 </StyledForm.FeeLabel>
               </Col>
               <Col>
-                <StyledForm.FeeButton onClick={reloadFeesHandler} disabled={RD.isPending(feesWithGasPricesAndLimitsRD)}>
+                <StyledForm.FeeButton onClick={reloadFees} disabled={RD.isPending(feesRD)}>
                   <SyncOutlined />
                 </StyledForm.FeeButton>
               </Col>

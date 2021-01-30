@@ -70,6 +70,6 @@ export type TransactionService<T> = {
 }
 
 export type FeesService<T> = {
-  reloadFees: () => void
+  reloadFees: (_?: T) => void
   fees$: (_?: T) => FeesLD
 }

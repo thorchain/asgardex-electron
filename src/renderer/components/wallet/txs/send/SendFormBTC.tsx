@@ -66,7 +66,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
-  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>('fastest')
+  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>('fast')
 
   const [form] = Form.useForm<FormValues>()
 

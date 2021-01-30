@@ -6,13 +6,22 @@ import * as Cosmos from '@xchainjs/xchain-cosmos'
 import * as ETH from '@xchainjs/xchain-ethereum'
 import * as Polkadot from '@xchainjs/xchain-polkadot'
 import * as THOR from '@xchainjs/xchain-thorchain'
-import { BNBChain, BTCChain, Chain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
+import {
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  ETHChain,
+  formatBaseAmount,
+  PolkadotChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { triggerStream } from '../../helpers/stateHelper'
+import { observableState } from '../../helpers/stateHelper'
 import { FeesLD, XChainClient$ } from './types'
 
 const getDefaultFeesByChain = (chain: Chain) => {
@@ -52,20 +61,23 @@ export const createFeesService = <Client extends XChainClient>({
    */
   type FeesParams = Parameters<Client['getFees']>[0]
 
-  // `TriggerStream` to reload `Fees`
-  const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
+  // state for reloading fees
+  const { get$: reloadFees$, set: reloadFees } = observableState<FeesParams | undefined>(undefined)
 
   const fees$ = (params?: FeesParams): FeesLD =>
     Rx.combineLatest([reloadFees$, client$]).pipe(
-      RxOp.switchMap(([_, oClient]) =>
+      RxOp.switchMap(([reloadFeesParams, oClient]) =>
         FP.pipe(
           oClient,
           O.fold(
             () => Rx.EMPTY,
-            (client) => Rx.from(client.getFees(params))
+            (client) => Rx.from(client.getFees(reloadFeesParams || params))
           )
         )
       ),
+      RxOp.tap((v) => console.log('createFeesService -> fees$ average', formatBaseAmount(v.average))),
+      RxOp.tap((v) => console.log('createFeesService -> fees$ fast', formatBaseAmount(v.fast))),
+      RxOp.tap((v) => console.log('createFeesService -> fees$ fastes', formatBaseAmount(v.fastest))),
       RxOp.map(RD.success),
       RxOp.catchError((_) => Rx.of(RD.success(getDefaultFeesByChain(chain)))),
       RxOp.startWith(RD.pending),
