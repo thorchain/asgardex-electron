@@ -38,7 +38,6 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
     // Whenever an user enters valid values into input fields,
     // `reloadFees` will be called and with it, `feesRD` will be updated with fees
     () => {
-      console.log('xxx loadFees:')
       return fees$({
         asset: selectedAsset,
         amount: baseAmount(1),

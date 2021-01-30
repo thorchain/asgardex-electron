@@ -80,8 +80,7 @@ export const createFeesService = <Client extends XChainClient>({
       RxOp.tap((v) => console.log('createFeesService -> fees$ fastes', formatBaseAmount(v.fastest))),
       RxOp.map(RD.success),
       RxOp.catchError((_) => Rx.of(RD.success(getDefaultFeesByChain(chain)))),
-      RxOp.startWith(RD.pending),
-      RxOp.shareReplay(1)
+      RxOp.startWith(RD.pending)
     )
 
   return {

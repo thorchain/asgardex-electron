@@ -12,8 +12,7 @@ import {
   baseToAsset,
   AssetETH,
   assetToBase,
-  BaseAmount,
-  formatBaseAmount
+  BaseAmount
 } from '@xchainjs/xchain-util'
 import { Row, Form, Col } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
@@ -34,6 +33,7 @@ import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
 import { validateTxAmountInput } from '../TxForm.util'
+import { DEFAULT_FEE_OPTION_KEY } from './Send.const'
 import { useChangeAssetHandler } from './Send.hooks'
 import * as StyledForm from './SendForm.style'
 
@@ -58,7 +58,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
 
   const changeAssetHandler = useChangeAssetHandler()
 
-  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>('fast')
+  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>(DEFAULT_FEE_OPTION_KEY)
 
   const [sendAmount, setSendAmount] = useState<O.Option<BaseAmount>>(O.none)
   const [sendAddress, setSendAddress] = useState<O.Option<Address>>(O.none)
@@ -176,41 +176,24 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     [intl]
   )
 
-  const renderFeeOptionsRadioGroup = useCallback(() => {
+  const renderFeeOptions = useMemo(() => {
     const onChangeHandler = (e: RadioChangeEvent) => setSelectedFeeOptionKey(e.target.value)
+    const disabled = !feesAvailable || isLoading
 
     return (
-      <StyledR.Radio.Group onChange={onChangeHandler} value={selectedFeeOptionKey} disabled={isLoading}>
+      <StyledR.Radio.Group onChange={onChangeHandler} value={selectedFeeOptionKey} disabled={disabled}>
         <StyledR.Radio value="fastest" key="fastest">
-          <StyledR.RadioLabel>{feeOptionsLabel['fastest']}</StyledR.RadioLabel>
+          <StyledR.RadioLabel disabled={disabled}>{feeOptionsLabel['fastest']}</StyledR.RadioLabel>
         </StyledR.Radio>
         <StyledR.Radio value="fast" key="fast">
-          <StyledR.RadioLabel>{feeOptionsLabel['fast']}</StyledR.RadioLabel>
+          <StyledR.RadioLabel disabled={disabled}>{feeOptionsLabel['fast']}</StyledR.RadioLabel>
         </StyledR.Radio>
         <StyledR.Radio value="average" key="average">
-          <StyledR.RadioLabel>{feeOptionsLabel['average']}</StyledR.RadioLabel>
+          <StyledR.RadioLabel disabled={disabled}>{feeOptionsLabel['average']}</StyledR.RadioLabel>
         </StyledR.Radio>
       </StyledR.Radio.Group>
     )
-  }, [feeOptionsLabel, isLoading, selectedFeeOptionKey])
-
-  const renderFeeOptions = useMemo(
-    () =>
-      FP.pipe(
-        oFees,
-        O.fold(
-          () =>
-            // render radio group while reloading fees
-            FP.pipe(
-              prevFeesRef.current,
-              O.map(renderFeeOptionsRadioGroup),
-              O.getOrElse(() => <></>)
-            ),
-          renderFeeOptionsRadioGroup
-        )
-      ),
-    [prevFeesRef, oFees, renderFeeOptionsRadioGroup]
-  )
+  }, [feeOptionsLabel, feesAvailable, isLoading, selectedFeeOptionKey])
 
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
@@ -232,7 +215,8 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
         // Set maxAmount to zero if we dont know anything about eth and fee amounts
         () => ZERO_BN,
         ([fee, ethAmount]) => {
-          return ethAmount.amount().minus(baseToAsset(fee).amount())
+          const max = ethAmount.amount().minus(baseToAsset(fee).amount())
+          return max.isGreaterThan(0) ? max : ZERO_BN
         }
       ),
       assetAmount
@@ -299,11 +283,9 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   )
 
   const reloadFees = useCallback(() => {
-    console.log('reloadFees')
     FP.pipe(
       sequenceTOption(sendAmount, sendAddress),
       O.map(([amount, recipient]) => {
-        console.log('reloadFees', formatBaseAmount(amount), recipient)
         return reloadFeesHandler({ asset: balance.asset, amount, recipient })
       })
     )
@@ -321,7 +303,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
             // default value for BigNumberInput
             amount: bn(0),
             // Default value for RadioGroup of feeOptions
-            fee: 'fastest'
+            fee: DEFAULT_FEE_OPTION_KEY
           }}
           onFinish={onFinishHandler}
           labelCol={{ span: 24 }}>
