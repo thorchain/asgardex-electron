@@ -6,16 +6,7 @@ import * as Cosmos from '@xchainjs/xchain-cosmos'
 import * as ETH from '@xchainjs/xchain-ethereum'
 import * as Polkadot from '@xchainjs/xchain-polkadot'
 import * as THOR from '@xchainjs/xchain-thorchain'
-import {
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  ETHChain,
-  formatBaseAmount,
-  PolkadotChain,
-  THORChain
-} from '@xchainjs/xchain-util'
+import { BNBChain, BTCChain, Chain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
@@ -75,9 +66,6 @@ export const createFeesService = <Client extends XChainClient>({
           )
         )
       ),
-      RxOp.tap((v) => console.log('createFeesService -> fees$ average', formatBaseAmount(v.average))),
-      RxOp.tap((v) => console.log('createFeesService -> fees$ fast', formatBaseAmount(v.fast))),
-      RxOp.tap((v) => console.log('createFeesService -> fees$ fastes', formatBaseAmount(v.fastest))),
       RxOp.map(RD.success),
       RxOp.catchError((_) => Rx.of(RD.success(getDefaultFeesByChain(chain)))),
       RxOp.startWith(RD.pending)
