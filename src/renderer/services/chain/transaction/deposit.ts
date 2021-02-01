@@ -24,7 +24,7 @@ import {
   SymDepositState$,
   SymDepositValidationResult
 } from '../types'
-import { sendTx$, txStatus$ } from './common'
+import { txStatusByChain$, sendTx$ } from './common'
 
 const { pools: midgardPoolsService, validateNode$ } = midgardService
 
@@ -103,7 +103,7 @@ export const asymDeposit$ = ({
               deposit: RD.progress({ loaded: 75, total })
             })
             // 3. check tx finality by polling its tx data
-            return txStatus$(txHash, asset.chain)
+            return txStatusByChain$(txHash, asset.chain)
           }),
           // Update state
           liveData.map((_) => setState({ ...getState(), deposit: RD.success(true) })),
@@ -271,8 +271,8 @@ export const symDeposit$ = ({
                 // 4. check tx finality
                 ({ runeTxHash, assetTxHash }) =>
                   liveData.sequenceS({
-                    asset: txStatus$(assetTxHash, asset.chain),
-                    rune: txStatus$(runeTxHash, THORChain)
+                    asset: txStatusByChain$(assetTxHash, asset.chain),
+                    rune: txStatusByChain$(runeTxHash, THORChain)
                   })
               )
             )

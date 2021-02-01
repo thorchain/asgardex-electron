@@ -12,7 +12,7 @@ import { service as midgardService } from '../../midgard/service'
 import { ErrorId } from '../../wallet/types'
 import { INITIAL_SWAP_STATE } from '../const'
 import { SwapParams, SwapState, SwapState$ } from '../types'
-import { sendTx$, txStatus$ } from './common'
+import { sendTx$, txStatusByChain$ } from './common'
 
 const { pools: midgardPoolsService, validateNode$ } = midgardService
 
@@ -80,7 +80,7 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
             // Update state
             setState({ ...getState(), step: 3, swapTx: RD.success(txHash), swap: RD.progress({ loaded: 75, total }) })
             // 3. check tx finality by polling its tx data
-            return txStatus$(txHash, asset.chain)
+            return txStatusByChain$(txHash, asset.chain)
           }),
           // Update state
           liveData.map((_) => setState({ ...getState(), swap: RD.success(true) })),

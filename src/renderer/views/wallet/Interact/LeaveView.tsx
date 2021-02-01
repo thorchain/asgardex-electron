@@ -9,7 +9,6 @@ import * as Rx from 'rxjs'
 
 import { Leave } from '../../../components/interact/forms/Leave'
 import { Button } from '../../../components/uielements/button'
-import { useChainContext } from '../../../contexts/ChainContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
@@ -21,8 +20,7 @@ type Props = {
 
 export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
   const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
-  const { interactService$ } = useThorchainContext()
-  const { txStatus$ } = useChainContext()
+  const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
   const oSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
@@ -34,7 +32,6 @@ export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
     )
   }, [])
 
-  const interact$ = useMemo(() => interactService$(txStatus$), [interactService$, txStatus$])
   const leaveTx = useCallback(
     ({ memo }: { memo: string }) => {
       unsubscribeSub()
