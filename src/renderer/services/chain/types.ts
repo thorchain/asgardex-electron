@@ -69,6 +69,9 @@ export type WithdrawFees = { thorMemo: BaseAmount; thorOut: BaseAmount; assetOut
 export type WithdrawFeesRD = RD.RemoteData<Error, WithdrawFees>
 export type WithdrawFeesLD = LiveData<Error, WithdrawFees>
 
+export type SymWithdrawMemo = { rune: Memo; asset: Memo }
+export type SymWithdrawMemoRx = Rx.Observable<O.Option<SymWithdrawMemo>>
+
 export type LedgerAddressParams = { chain: Chain; network: Network }
 
 /**
@@ -149,6 +152,34 @@ export type SymDepositParams = {
 }
 
 export type SymDepositStateHandler = (p: SymDepositParams) => SymDepositState$
+
+export type SymWithdrawValidationResult = { pool: boolean; node: boolean }
+export type SymWithdrawTxs = { rune: TxHashRD; asset: TxHashRD }
+export type SymWithdrawFinalityResult = { rune: Tx; asset: Tx }
+/**
+ * State to reflect status of a sym. deposit by doing different requests
+ */
+export type SymWithdrawState = {
+  // Number of current step
+  readonly step: number
+  // Constant total amount of steps
+  readonly stepsTotal: 4
+  // deposit transactions
+  readonly withdrawTxs: SymWithdrawTxs
+  // RD for all needed steps
+  readonly withdraw: RD.RemoteData<ApiError, boolean>
+}
+
+export type SymWithdrawState$ = Rx.Observable<SymWithdrawState>
+
+export type SymWithdrawParams = {
+  readonly poolAddress: O.Option<string>
+  readonly asset: Asset
+  readonly amounts: { rune: BaseAmount; asset: BaseAmount }
+  readonly memos: SymWithdrawMemo
+}
+
+export type SymWithdrawStateHandler = (p: SymWithdrawParams) => SymWithdrawState$
 
 export type UpgradeRuneParams = {
   readonly poolAddress: O.Option<string>

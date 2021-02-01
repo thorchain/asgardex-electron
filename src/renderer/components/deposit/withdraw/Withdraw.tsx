@@ -22,7 +22,7 @@ import { ZERO_ASSET_AMOUNT } from '../../../const'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { WithdrawFees, WithdrawFeesRD } from '../../../services/chain/types'
+import { SymWithdrawStateHandler, WithdrawFees, WithdrawFeesRD } from '../../../services/chain/types'
 import { WithdrawType } from '../../../types/asgardex'
 import { formatFee } from '../../uielements/fees/Fees.helper'
 import { Label } from '../../uielements/label'
@@ -59,6 +59,7 @@ type Props = {
   disabled?: boolean
   /** Fees needed to withdraw */
   fees: WithdrawFeesRD
+  withdraw$: SymWithdrawStateHandler
 }
 
 export const Withdraw: React.FC<Props> = ({
@@ -293,7 +294,7 @@ export const Withdraw: React.FC<Props> = ({
         key={'asset amount slider'}
         value={withdrawPercent}
         onChange={setWithdrawPercent}
-        disabled={disabledForm}
+        disabled={false}
       />
       <Label weight={'bold'} textTransform={'uppercase'}>
         {intl.formatMessage({ id: 'deposit.withdraw.receiveText' })}
