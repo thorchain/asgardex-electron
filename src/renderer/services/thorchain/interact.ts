@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { DepositParam } from '@xchainjs/xchain-thorchain'
-import { AssetRuneNative, Chain } from '@xchainjs/xchain-util'
+import { AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -23,8 +23,9 @@ import { InteractParams, InteractState, InteractState$ } from './types'
  * @returns InteractState$ - Observable state to reflect loading status. It provides all data we do need to display
  *
  */
-export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<ApiError, string>) => (
-  getTxStatus: (txHash: string, chain: Chain) => TxLD
+export const createInteractService$ = (
+  sendTx$: (_: DepositParam) => LiveData<ApiError, string>,
+  getTxStatus: (txHash: string) => TxLD
 ) => ({ amount, memo }: InteractParams): InteractState$ => {
   // total of progress
   const total = O.some(100)
@@ -48,8 +49,8 @@ export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<Ap
     liveData.chain((txHash) => {
       // Update state
       setState({ ...getState(), step: 2, txRD: RD.progress({ loaded: 66, total }) })
-      // 2. check tx finality via midgard (not implemented yet)
-      return getTxStatus(txHash, AssetRuneNative.chain)
+      // 2. check tx finality
+      return getTxStatus(txHash)
     }),
     // Update state
     liveData.map(({ hash: txHash }) => setState({ ...getState(), txRD: RD.success(txHash) })),
