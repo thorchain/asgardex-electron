@@ -53,7 +53,7 @@ export const createFeesService = <Client extends XChainClient>({
   type FeesParams = Parameters<Client['getFees']>[0]
 
   // state for reloading fees
-  const { get$: reloadFees$, set: reloadFees } = observableState<FeesParams | undefined>(undefined)
+  const { get$: reloadFees$, set: reloadFees } = observableState<FeesParams>(undefined)
 
   const fees$ = (params?: FeesParams): FeesLD =>
     Rx.combineLatest([reloadFees$, client$]).pipe(

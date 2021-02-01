@@ -4674,6 +4674,13 @@
   dependencies:
     "@xchainjs/xchain-util" "^0.2.0"
 
+"@xchainjs/xchain-client@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.4.0.tgz#f698cc355d8dc7e063ea7aabc1212b53616549e9"
+  integrity sha512-oF7ZLZnFtwmYxjoQxRvxIHJIwr5+G6hiO8gRmVpCvdS6wQ4lxwNjAY0C3BXohkKRs7G5SOPyVT8PzLvRfroIRA==
+  dependencies:
+    "@xchainjs/xchain-util" "^0.2.0"
+
 "@xchainjs/xchain-cosmos@^0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.7.0.tgz#9a0549bd80f8c15465ffd08a6ae44edee7bf0d31"
@@ -4697,10 +4704,10 @@
     hdkey "^2.0.1"
     uuid "^8.1.0"
 
-"@xchainjs/xchain-ethereum@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.8.0.tgz#7a60372414048a45390547597d39271d25ae68f4"
-  integrity sha512-pKRMwy6jBLbmkn0PbqjxjfYRZVuwNmNdSMaswc0VqAbCr+MHkzA9aJ9rey7JWDHk/Zihbva0d8n1FN0pHP5FUQ==
+"@xchainjs/xchain-ethereum@^0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.9.1.tgz#34a24dfc95c510a3c649889d63595d92dc94592c"
+  integrity sha512-BWzxpAYs3zNHai12h5FZPBFg4+9Mwt/GZQocNoc3rqhiKXayev9D0V+P+6SncRXRXWDGCCO50PMjX4UQnguw7w==
   dependencies:
     "@xchainjs/xchain-client" "^0.3.0"
     "@xchainjs/xchain-crypto" "^0.2.2"
