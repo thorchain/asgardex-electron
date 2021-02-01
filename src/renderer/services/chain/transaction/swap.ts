@@ -23,7 +23,7 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * 2. Send swap transaction
  * 3. Check status of swap transaction
  *
- * @returns SwapTxState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
+ * @returns SwapState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
  *
  */
 export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapParams): SwapState$ => {
@@ -99,36 +99,37 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
     )
   )
 
-  // Just a timer used to update loaded state (in pending state only)
-  const timer$ = Rx.timer(1500).pipe(RxOp.filter(() => RD.isPending(getState().swap)))
-
   // We do need to fake progress in last step
-  // That's we combine streams `getState$` (state updates) and `timer$` (counter)
-  // Note: `requests$` has to be added to subscribe it once only (it won't do anything otherwise)
-  return Rx.combineLatest([getState$, timer$, requests$]).pipe(
-    RxOp.switchMap(([state]) =>
-      Rx.of(
-        FP.pipe(
-          state.swap,
-          RD.fold(
-            // ignore initial state + return same state (no changes)
-            () => state,
-            // For `pending` we fake progress state in last third
-            (oProgress) =>
-              FP.pipe(
-                oProgress,
-                O.map(({ loaded }) => {
-                  // From 75 to 97 we count progress with small steps, but stop it at 98
-                  const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
-                  return { ...state, txRD: RD.progress({ loaded: updatedLoaded, total }) }
-                }),
-                O.getOrElse(() => state)
-              ),
-            // ignore `failure` state + return same state (no changes)
-            () => state,
-            // ignore `success` state + return same state (no changes)
-            () => state
-          )
+  // Note: `requests$` has to be added to subscribe it once (it won't do anything otherwise)
+  return Rx.combineLatest([getState$, requests$]).pipe(
+    RxOp.switchMap(([state, _]) =>
+      FP.pipe(
+        // check swap state to update its `pending` state (if needed)
+        state.swap,
+        RD.fold(
+          // ignore initial state + return same state (no changes)
+          () => Rx.of(state),
+          // For `pending` state we fake progress state in last third
+          (oProgress) =>
+            FP.pipe(
+              // Just a timer used to update loaded state (in pending state only)
+              Rx.interval(1500),
+              RxOp.map(() =>
+                FP.pipe(
+                  oProgress,
+                  O.map(({ loaded }) => {
+                    // From 75 to 97 we count progress with small steps, but stop it at 98
+                    const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
+                    return { ...state, swap: RD.progress({ loaded: updatedLoaded, total }) }
+                  }),
+                  O.getOrElse(() => state)
+                )
+              )
+            ),
+          // ignore `failure` state + return same state (no changes)
+          () => Rx.of(state),
+          // ignore `success` state + return same state (no changes)
+          () => Rx.of(state)
         )
       )
     ),

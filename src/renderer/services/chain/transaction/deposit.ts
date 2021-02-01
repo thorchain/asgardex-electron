@@ -121,35 +121,39 @@ export const asymDeposit$ = ({
         )
     )
   )
-
-  // Just a timer used to update loaded state (in pending state only)
-  const timer$ = Rx.timer(1500).pipe(RxOp.filter(() => RD.isPending(getState().deposit)))
-
   // We do need to fake progress in last step
-  // That's we combine streams `getState$` (state updates) and `timer$` (counter)
-  // Note: `requests$` has to be added to subscribe it once only (it won't do anything otherwise)
-  return Rx.combineLatest([getState$, timer$, requests$]).pipe(
-    RxOp.map(([state]) =>
+  // Note: `requests$` has to be added to subscribe it once (it won't do anything otherwise)
+  return Rx.combineLatest([getState$, requests$]).pipe(
+    RxOp.switchMap(([state, _]) =>
       FP.pipe(
+        // check deposit state to update its `pending` state (if needed)
         state.deposit,
         RD.fold(
           // ignore initial state + return same state (no changes)
-          () => state,
-          // For `pending` we fake progress state in last third
+          () => Rx.of(state),
+          // For `pending` state we fake progress state in last third
           (oProgress) =>
             FP.pipe(
-              oProgress,
-              O.map(({ loaded }) => {
-                // From 75 to 97 we count progress with small steps, but stop it at 98
-                const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
-                return { ...state, txRD: RD.progress({ loaded: updatedLoaded, total }) }
-              }),
-              O.getOrElse(() => state)
+              // Just a timer used to update loaded state (in pending state only)
+              Rx.interval(1500),
+              RxOp.map(() =>
+                FP.pipe(
+                  oProgress,
+                  O.map(
+                    ({ loaded }): AsymDepositState => {
+                      // From 75 to 97 we count progress with small steps, but stop it at 98
+                      const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
+                      return { ...state, deposit: RD.progress({ loaded: updatedLoaded, total }) }
+                    }
+                  ),
+                  O.getOrElse(() => state)
+                )
+              )
             ),
           // ignore `failure` state + return same state (no changes)
-          () => state,
+          () => Rx.of(state),
           // ignore `success` state + return same state (no changes)
-          () => state
+          () => Rx.of(state)
         )
       )
     ),
@@ -296,34 +300,39 @@ export const symDeposit$ = ({
     )
   )
 
-  // Just a timer used to update loaded state (in pending state only)
-  const timer$ = Rx.timer(1500).pipe(RxOp.filter(() => RD.isPending(getState().deposit)))
-
   // We do need to fake progress in last step
-  // That's we combine streams `getState$` (state updates) and `timer$` (counter)
-  // Note: `requests$` has to be added to subscribe it once only (it won't do anything otherwise)
-  return Rx.combineLatest([getState$, timer$, requests$]).pipe(
-    RxOp.map(([state]) =>
+  // Note: `requests$` has to be added to subscribe it once (it won't do anything otherwise)
+  return Rx.combineLatest([getState$, requests$]).pipe(
+    RxOp.switchMap(([state, _]) =>
       FP.pipe(
+        // check deposit state to update its `pending` state (if needed)
         state.deposit,
         RD.fold(
           // ignore initial state + return same state (no changes)
-          () => state,
-          // For `pending` we fake progress state in last third
+          () => Rx.of(state),
+          // For `pending` state we fake progress state in last third
           (oProgress) =>
             FP.pipe(
-              oProgress,
-              O.map(({ loaded }) => {
-                // From 80 to 97 we count progress with small steps, but stop it at 98
-                const updatedLoaded = loaded >= 80 && loaded <= 97 ? loaded++ : loaded
-                return { ...state, txRD: RD.progress({ loaded: updatedLoaded, total }) }
-              }),
-              O.getOrElse(() => state)
+              // Just a timer used to update loaded state (in pending state only)
+              Rx.interval(1500),
+              RxOp.map(() =>
+                FP.pipe(
+                  oProgress,
+                  O.map(
+                    ({ loaded }): SymDepositState => {
+                      // From 80 to 97 we count progress with small steps, but stop it at 98
+                      const updatedLoaded = loaded >= 80 && loaded <= 97 ? loaded++ : loaded
+                      return { ...state, deposit: RD.progress({ loaded: updatedLoaded, total }) }
+                    }
+                  ),
+                  O.getOrElse(() => state)
+                )
+              )
             ),
           // ignore `failure` state + return same state (no changes)
-          () => state,
+          () => Rx.of(state),
           // ignore `success` state + return same state (no changes)
-          () => state
+          () => Rx.of(state)
         )
       )
     ),
