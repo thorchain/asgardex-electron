@@ -76,9 +76,12 @@ export const Fees: React.FC<Props> = ({ fees, reloadFees, className }) => {
             e.preventDefault()
             reloadFees()
           }}
+          disabled={RD.isPending(fees)}
         />
       )}
-      {feesFormattedValue}
+      <Styled.FeeLabel isError={RD.isFailure(fees)} isLoading={RD.isPending(fees)}>
+        {feesFormattedValue}
+      </Styled.FeeLabel>
     </Styled.Container>
   )
 }
