@@ -12,7 +12,9 @@ const swap: SwapMessages = {
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
   'swap.errors.amount.outputShouldCoverChainFee':
-    'Auszahlungsgebühr in Höhe von {fee} ist nicht über den zu erwartenen Auszahlungsbetrag (momentan {amount}) gedeckt'
+    'Auszahlungsgebühr in Höhe von {fee} ist nicht über den zu erwartenen Auszahlungsbetrag (momentan {amount}) gedeckt',
+  'swap.note.lockedWallet': 'You need to unlock your wallet to swap - DE',
+  'swap.note.nowallet': 'Create / import a wallet to swap - DE'
 }
 
 export default swap
