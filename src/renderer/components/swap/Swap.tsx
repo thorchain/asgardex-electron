@@ -41,7 +41,6 @@ import { SwapAssets } from '../modal/tx/extra'
 import { AssetSelect } from '../uielements/assets/assetSelect'
 import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
-import { Label } from '../uielements/label'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
 import { getSwapData, assetWithPriceToAsset, pickAssetWithPrice } from './Swap.utils'
@@ -737,12 +736,12 @@ export const Swap = ({
             )
           )
         )}
-        <Label color="gray" align="center">
+        <Styled.NoteLabel align="center">
           {!hasImportedKeystore(keystore)
             ? intl.formatMessage({ id: 'swap.note.nowallet' })
             : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
           {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFees} />}
-        </Label>
+        </Styled.NoteLabel>
         {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFees} />}
         {targetChainFeeErrorLabel}
       </Styled.SubmitContainer>
