@@ -139,11 +139,13 @@ export const asymDeposit$ = ({
               RxOp.map(() =>
                 FP.pipe(
                   oProgress,
-                  O.map(({ loaded }) => {
-                    // From 75 to 97 we count progress with small steps, but stop it at 98
-                    const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
-                    return { ...state, deposit: RD.progress({ loaded: updatedLoaded, total }) }
-                  }),
+                  O.map(
+                    ({ loaded }): AsymDepositState => {
+                      // From 75 to 97 we count progress with small steps, but stop it at 98
+                      const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
+                      return { ...state, deposit: RD.progress({ loaded: updatedLoaded, total }) }
+                    }
+                  ),
                   O.getOrElse(() => state)
                 )
               )
@@ -316,11 +318,13 @@ export const symDeposit$ = ({
               RxOp.map(() =>
                 FP.pipe(
                   oProgress,
-                  O.map(({ loaded }) => {
-                    // From 80 to 97 we count progress with small steps, but stop it at 98
-                    const updatedLoaded = loaded >= 80 && loaded <= 97 ? loaded++ : loaded
-                    return { ...state, deposit: RD.progress({ loaded: updatedLoaded, total }) }
-                  }),
+                  O.map(
+                    ({ loaded }): SymDepositState => {
+                      // From 80 to 97 we count progress with small steps, but stop it at 98
+                      const updatedLoaded = loaded >= 80 && loaded <= 97 ? loaded++ : loaded
+                      return { ...state, deposit: RD.progress({ loaded: updatedLoaded, total }) }
+                    }
+                  ),
                   O.getOrElse(() => state)
                 )
               )
