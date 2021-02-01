@@ -45,10 +45,7 @@ export type TransferFees = {
   multi: AssetAmount
 }
 
-export type FeesService = {
-  fees$: C.FeesLD
-  reloadFees: () => void
-}
+export type FeesService = C.FeesService<undefined>
 
 export type LoadTxsProps = {
   limit: number

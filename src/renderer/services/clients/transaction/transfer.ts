@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { XChainClient } from '@xchainjs/xchain-client'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -8,7 +9,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import { TxHashRD, TxHashLD, ErrorId } from '../../wallet/types'
 import { XChainClient$ } from '../types'
 
-export const createTransferService = <Client extends XChainClient, T extends XChainClient$<Client>>(client$: T) => {
+export const createTransferService = <Client extends XChainClient>(client$: XChainClient$) => {
   /**
    * State of a tx send by `subscribeTx`
    *
@@ -33,7 +34,7 @@ export const createTransferService = <Client extends XChainClient, T extends XCh
 
   const tx$ = (params: TransferParams): TxHashLD =>
     client$.pipe(
-      RxOp.switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
+      RxOp.switchMap(FP.flow(O.fold<XChainClient, Rx.Observable<XChainClient>>(() => Rx.EMPTY, Rx.of))),
       RxOp.switchMap((client) => Rx.from(client.transfer(params))),
       RxOp.map(RD.success),
       RxOp.catchError(

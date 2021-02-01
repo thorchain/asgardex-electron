@@ -3,18 +3,17 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { Fees } from '@xchainjs/xchain-client'
+import { FeesParams } from '@xchainjs/xchain-ethereum'
 import {
   assetAmount,
   AssetETH,
+  AssetRuneNative,
   assetToBase,
   assetToString,
-  baseAmount,
   baseToAsset,
   formatAssetAmount
 } from '@xchainjs/xchain-util'
 
-import { ZERO_BASE_AMOUNT } from '../../../../const'
-import { WalletBalances } from '../../../../services/clients'
 import { SendTxParams } from '../../../../services/ethereum/types'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormETH } from './index'
@@ -26,58 +25,64 @@ const ethAsset: WalletBalance = {
   walletAddress: 'AssetETH wallet address'
 }
 
-const balances: WalletBalances = [ethAsset]
+const runeAsset: WalletBalance = {
+  asset: AssetRuneNative,
+  amount: assetToBase(assetAmount(2)),
+  walletAddress: 'rune wallet address'
+}
 
 const fees: Fees = {
-  type: 'base',
-  fastest: baseAmount(3000),
-  fast: baseAmount(2000),
-  average: baseAmount(1000)
+  type: 'byte',
+  fastest: assetToBase(assetAmount(0.002499)),
+  fast: assetToBase(assetAmount(0.002079)),
+  average: assetToBase(assetAmount(0.001848))
 }
 
-const feesRD = RD.success(fees)
-
-const estimateFee = () => Promise.resolve(ZERO_BASE_AMOUNT)
-
-const reloadFeesHandler = () => console.log('reload fees')
+const onSubmitHandler = ({ recipient, amount, asset, memo, feeOptionKey }: SendTxParams) =>
+  console.log(
+    `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${
+      asset && assetToString(asset)
+    }, memo: ${memo}, feeOptionKey: ${feeOptionKey}`
+  )
 
 const defaultProps: SendFormETHProps = {
-  balances,
+  balances: [ethAsset, runeAsset],
   balance: ethAsset,
-  onSubmit: ({ recipient, amount, asset, memo, gasPrice }: SendTxParams) =>
-    console.log(
-      `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
-        asset
-      )}, memo: ${memo}, fee: ${gasPrice}`
-    ),
-
+  onSubmit: onSubmitHandler,
   isLoading: false,
-  addressValidation: () => true,
-  fees: feesRD,
-  estimateFee,
-  reloadFeesHandler
+  fees: RD.success(fees),
+  reloadFeesHandler: (p: FeesParams) => console.log('reloadFeesHandler', p)
 }
 
-export const SendETH: Story = () => <SendFormETH {...defaultProps} />
-SendETH.storyName = 'success'
+export const Default: Story = () => <SendFormETH {...defaultProps} />
+Default.storyName = 'default'
 
 export const Pending: Story = () => {
   const props: SendFormETHProps = { ...defaultProps, isLoading: true }
   return <SendFormETH {...props} />
 }
+Pending.storyName = 'pending'
 
-export const LoadingFees: Story = () => {
+export const FeesInitial: Story = () => {
+  const props: SendFormETHProps = { ...defaultProps, fees: RD.initial }
+  return <SendFormETH {...props} />
+}
+FeesInitial.storyName = 'fees initial'
+
+export const FeesLoading: Story = () => {
   const props: SendFormETHProps = { ...defaultProps, fees: RD.pending }
   return <SendFormETH {...props} />
 }
+FeesLoading.storyName = 'fees loading'
 
-export const FailtureFees: Story = () => {
+export const FeesFailure: Story = () => {
   const props: SendFormETHProps = {
     ...defaultProps,
     fees: RD.failure(Error('Could not load fee and rates for any reason'))
   }
   return <SendFormETH {...props} />
 }
+FeesFailure.storyName = 'fees failure'
 
 const meta: Meta = {
   component: SendFormETH,

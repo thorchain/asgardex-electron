@@ -31,6 +31,7 @@ import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
 import { validateTxAmountInput } from '../TxForm.util'
+import { DEFAULT_FEE_OPTION_KEY } from './Send.const'
 import { useChangeAssetHandler } from './Send.hooks'
 import * as StyledForm from './SendForm.style'
 
@@ -66,7 +67,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
-  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>('fastest')
+  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>(DEFAULT_FEE_OPTION_KEY)
 
   const [form] = Form.useForm<FormValues>()
 
@@ -281,7 +282,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
             // default value for BigNumberInput
             amount: bn(0),
             // Default value for RadioGroup of feeOptions
-            feeRate: 'fastest'
+            feeRate: DEFAULT_FEE_OPTION_KEY
           }}
           onFinish={onFinishHandler}
           labelCol={{ span: 24 }}>

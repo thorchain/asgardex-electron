@@ -40,7 +40,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
   const [fee] = useObservableState<O.Option<AssetAmount>>(
     () =>
       FP.pipe(
-        fees$,
+        fees$(),
         liveData.map((fees) => baseToAsset(fees.fast)),
         RxOp.map(RD.toOption)
       ),

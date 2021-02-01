@@ -26,7 +26,7 @@ export const ClientStateM = getEitherM(option)
 
 export type ClientStateForViews = 'notready' | 'ready' | 'error'
 
-export type XChainClient$<T = XChainClient> = Rx.Observable<O.Option<T>>
+export type XChainClient$ = Rx.Observable<O.Option<XChainClient>>
 
 export type Client$<C> = Rx.Observable<O.Option<C>>
 
@@ -60,11 +60,16 @@ export type GetExplorerAddressUrl$ = Rx.Observable<O.Option<GetExplorerAddressUr
 
 export type Address$ = Rx.Observable<O.Option<Address>>
 
-export type TransactionService<SendTxParams> = {
+export type TransactionService<T> = {
   txRD$: TxHashLD
-  subscribeTx: (_: SendTxParams) => Rx.Subscription
-  sendTx: (_: SendTxParams) => TxHashLD
+  subscribeTx: (_: T) => Rx.Subscription
+  sendTx: (_: T) => TxHashLD
   resetTx: () => void
   txs$: (_: TxsParams) => TxsPageLD
   tx$: (txHash: TxHash) => TxLD
+}
+
+export type FeesService<T> = {
+  reloadFees: (_?: T) => void
+  fees$: (_?: T) => FeesLD
 }

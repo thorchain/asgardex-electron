@@ -10,7 +10,6 @@ import { useParams } from 'react-router'
 import { ErrorView } from '../../../components/shared/error/'
 import { BackLink } from '../../../components/uielements/backLink'
 import { useBitcoinContext } from '../../../contexts/BitcoinContext'
-import { useEthereumContext } from '../../../contexts/EthereumContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
@@ -30,7 +29,6 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
   const { reloadFees: reloadBTCFees } = useBitcoinContext()
-  const { reloadFees: reloadETHFees } = useEthereumContext()
 
   const renderAssetError = useMemo(
     () => (
@@ -64,14 +62,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             />
           )
         case 'ETH':
-          return (
-            <SendViewETH
-              selectedAsset={asset}
-              walletBalances={balances}
-              reloadFeesHandler={reloadETHFees}
-              getExplorerTxUrl={getExplorerTxUrl}
-            />
-          )
+          return <SendViewETH selectedAsset={asset} walletBalances={balances} getExplorerTxUrl={getExplorerTxUrl} />
         case 'THOR':
           return <SendViewTHOR thorAsset={asset} balances={balances} getExplorerTxUrl={getExplorerTxUrl} />
         default:
@@ -87,7 +78,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [balances, getExplorerTxUrl, intl, reloadBTCFees, reloadETHFees]
+    [balances, getExplorerTxUrl, intl, reloadBTCFees]
   )
 
   return FP.pipe(

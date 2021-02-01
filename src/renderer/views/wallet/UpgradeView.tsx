@@ -65,7 +65,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
           () => Rx.EMPTY,
           (_) =>
             FP.pipe(
-              bnbFees$,
+              bnbFees$(),
               liveData.map((fees) => fees.fast)
             )
         )
