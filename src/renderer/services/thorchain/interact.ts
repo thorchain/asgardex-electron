@@ -67,8 +67,7 @@ export const createInteractService$ = (
   )
 
   // We do need to fake progress in last step
-  // That's we combine streams `getState$` (state updates) and `timer$` (counter)
-  // Note: `requests$` has to be added to subscribe it once only (it won't do anything otherwise)
+  // Note: `requests$` has to be added to subscribe it once (it won't do anything otherwise)
   return Rx.combineLatest([getState$, requests$]).pipe(
     RxOp.switchMap(([state]) =>
       FP.pipe(
