@@ -14,7 +14,7 @@ const swap: SwapMessages = {
   'swap.errors.amount.outputShouldCoverChainFee':
     'Outbounding fee of {fee} needs to be covered by receiving amount (currently {amount}).',
   'swap.note.lockedWallet': 'You need to unlock your wallet to swap',
-  'swap.note.nowallet': 'Create / import a wallet to swap'
+  'swap.note.nowallet': 'Create or import a wallet to swap'
 }
 
 export default swap

@@ -14,7 +14,7 @@ const swap: SwapMessages = {
   'swap.errors.amount.outputShouldCoverChainFee':
     'Исходящая комиссия {fee} должна покрываться получаемым количеством (сейчас {amount}).',
   'swap.note.lockedWallet': 'You need to unlock your wallet to swap - RU',
-  'swap.note.nowallet': 'Create / import a wallet to swap - RU'
+  'swap.note.nowallet': 'Create or import a wallet to swap - RU'
 }
 
 export default swap
