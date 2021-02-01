@@ -19,9 +19,12 @@
     "lint": "eslint \"{src,e2e,}/**/*.{ts,tsx}\" --fix",
     "_test:e2e": "yarn build && yarn test:cafe",
     "test:cafe": "cross-env NODE_ENV=production testcafe electron:./ ./e2e/**/*.e2e.ts",
-    "generate:types": "yarn clean:types:midgard && yarn generate:types:midgard",
+    "generate:types": "yarn clean:types && yarn generate:types:midgard && yarn generate:types:thornode",
     "generate:types:midgard": "TS_POST_PROCESS_FILE=./node_modules/.bin/prettier openapi-generator-cli generate -i https://testnet.midgard.thorchain.info/v2/swagger.json -g typescript-rxjs -o ./src/renderer/types/generated/midgard --reserved-words-mappings in=in --enable-post-process-file",
+    "generate:types:thornode": "TS_POST_PROCESS_FILE=./node_modules/.bin/prettier openapi-generator-cli generate -i https://testnet.thornode.thorchain.info/thorchain/doc/swagger.json -g typescript-rxjs -o ./src/renderer/types/generated/thornode --reserved-words-mappings in=in --enable-post-process-file --skip-validate-spec",
     "clean:types:midgard": "rm -rf ./src/renderer/types/generated/midgard",
+    "clean:types:thornode": "rm -rf ./src/renderer/types/generated/thornode",
+    "clean:types": "yarn clean:types:midgard && yarn clean:types:thornode",
     "storybook": "start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public",
     "analyze": "source-map-explorer 'build/static/js/*.js'"
