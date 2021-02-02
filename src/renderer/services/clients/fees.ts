@@ -4,9 +4,20 @@ import * as BTC from '@xchainjs/xchain-bitcoin'
 import { XChainClient } from '@xchainjs/xchain-client'
 import * as Cosmos from '@xchainjs/xchain-cosmos'
 import * as ETH from '@xchainjs/xchain-ethereum'
+import * as Litecoin from '@xchainjs/xchain-litecoin'
 import * as Polkadot from '@xchainjs/xchain-polkadot'
 import * as THOR from '@xchainjs/xchain-thorchain'
-import { BNBChain, BTCChain, Chain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
+import {
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  ETHChain,
+  LTCChain,
+  PolkadotChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
@@ -30,6 +41,11 @@ const getDefaultFeesByChain = (chain: Chain) => {
     case PolkadotChain:
       // TODO @Veado: Handle network
       return Polkadot.getDefaultFees('testnet')
+    case BCHChain:
+      // @todo handle BCH fees
+      return THOR.getDefaultFees()
+    case LTCChain:
+      return Litecoin.getDefaultFees()
   }
 }
 
