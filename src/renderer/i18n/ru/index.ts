@@ -9,6 +9,7 @@ import deposit from './deposit'
 import ledger from './ledger'
 import midgard from './midgard'
 import pools from './pools'
+import poolShares from './poolshares'
 import routes from './routes'
 import settings from './settings'
 import swap from './swap'
@@ -25,5 +26,6 @@ export default {
   ...deposit,
   ...midgard,
   ...ledger,
-  ...bonds
+  ...bonds,
+  ...poolShares
 } as Messages
