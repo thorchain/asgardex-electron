@@ -6,7 +6,7 @@ import { Either } from 'fp-ts/lib/Either'
 
 import { Locale } from '../i18n/types'
 
-export type CommonStorage = Readonly<{ locale: Locale }>
+export type CommonStorage = Readonly<{ locale: Locale; userNodes: Address[] }>
 
 /**
  * Hash map of common store files
