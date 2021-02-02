@@ -42,6 +42,10 @@ const withdrawFeeByChain$ = (chain: Chain): FeeLD => {
       return Rx.of(RD.failure(Error(`Deposit fee for Cosmos has not been implemented`)))
     case 'POLKA':
       return Rx.of(RD.failure(Error(`Deposit fee for Polkadot has not been implemented`)))
+    case 'BCH':
+      return Rx.of(RD.failure(Error(`Deposit fee for Bitcoin Cash has not been implemented`)))
+    case 'LTC':
+      return Rx.of(RD.failure(Error(`Deposit fee for Litecoin has not been implemented`)))
   }
 }
 

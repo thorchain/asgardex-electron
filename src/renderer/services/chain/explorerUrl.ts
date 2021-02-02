@@ -1,4 +1,14 @@
-import { Asset, BNBChain, BTCChain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  CosmosChain,
+  ETHChain,
+  LTCChain,
+  PolkadotChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
@@ -37,6 +47,13 @@ const getExplorerUrlByAsset$ = (asset: Asset | null): GetExplorerTxUrl$ => {
     case PolkadotChain:
       // not available yet
       return explorerUrlFailure$
+
+    case BCHChain:
+      // not available yet
+      return explorerUrlFailure$
+    case LTCChain:
+      // not available yet
+      return explorerUrlFailure$
   }
 }
 
@@ -63,6 +80,13 @@ const getExplorerAddressByChain$ = (chain: string): GetExplorerAddressUrl$ => {
       return explorerUrlFailure$
 
     case PolkadotChain:
+      // not available yet
+      return explorerUrlFailure$
+
+    case BCHChain:
+      // not available yet
+      return explorerUrlFailure$
+    case LTCChain:
       // not available yet
       return explorerUrlFailure$
   }

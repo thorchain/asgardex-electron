@@ -4681,18 +4681,7 @@
   dependencies:
     "@xchainjs/xchain-util" "^0.2.0"
 
-"@xchainjs/xchain-cosmos@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.7.0.tgz#9a0549bd80f8c15465ffd08a6ae44edee7bf0d31"
-  integrity sha512-dju/R399v5Nwjfdo+PvtEqA6DEX0ZOeifvvVJdCw8SmV45iI9pXek1sWZz+VofGuQiVqND2/MeqEYWRnt8bOmg==
-  dependencies:
-    "@xchainjs/xchain-client" "^0.3.0"
-    "@xchainjs/xchain-crypto" "^0.2.1"
-    "@xchainjs/xchain-util" "^0.2.0"
-    axios "^0.21.0"
-    nock "^13.0.5"
-
-"@xchainjs/xchain-cosmos@^0.7.1":
+"@xchainjs/xchain-cosmos@^0.7.0", "@xchainjs/xchain-cosmos@^0.7.1":
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.7.1.tgz#6da652bfc21b4c7660a3ae6b18c7d237c5a08db0"
   integrity sha512-HCsQxjqcS/QKXAXvXqql7frnprqmTfnMSjpknH6nFscXXIZkNVbNNwJGqXwLsNLS1X8f0oj83KMMlinH0FU8TQ==
@@ -4703,10 +4692,22 @@
     axios "^0.21.0"
     nock "^13.0.5"
 
-"@xchainjs/xchain-crypto@^0.2.0", "@xchainjs/xchain-crypto@^0.2.1", "@xchainjs/xchain-crypto@^0.2.2":
+"@xchainjs/xchain-crypto@^0.2.0", "@xchainjs/xchain-crypto@^0.2.2":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-crypto/-/xchain-crypto-0.2.2.tgz#bb567a2525ab7bd8b28512af653360257ed6cca4"
   integrity sha512-hZmNsXRkoXyvS6Bo9Wm1Spj+dHUA1hKqMVReU6cGeyp2vxDGkgdGxWofOPMvugDWeWlI2LUgYRre9KaQe2JOtw==
+  dependencies:
+    bech32 "^1.1.4"
+    bip39 "^3.0.2"
+    crypto-js "^4.0.0"
+    foundry-primitives "^0.2.1"
+    hdkey "^2.0.1"
+    uuid "^8.1.0"
+
+"@xchainjs/xchain-crypto@^0.2.1":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-crypto/-/xchain-crypto-0.2.3.tgz#aa29d28cc41ec689d86e209ebf7ff4f644ac8e26"
+  integrity sha512-zKUDQJbbkRFVYsO91GIMfNIZMpNWpFjUTw0WJ5XGbLLJhJxrr2BH5dISsd8F/IfoNio9V1LdjuZyPh2pqNfzKg==
   dependencies:
     bech32 "^1.1.4"
     bip39 "^3.0.2"
@@ -4725,6 +4726,18 @@
     "@xchainjs/xchain-util" "^0.2.0"
     axios "^0.21.0"
 
+"@xchainjs/xchain-litecoin@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-litecoin/-/xchain-litecoin-0.0.2.tgz#fe2c48a657bd6e4c79027ce55ae494c94f36e795"
+  integrity sha512-JDMs+bu2bSEeD1wGZdElmpmQH0J8GiAGFcqXmizrEwmD8DMHG27Dd490n6B1sM9N/u0xa/2d2D3R3QXyzeE4CQ==
+  dependencies:
+    "@xchainjs/xchain-client" "^0.3.0"
+    "@xchainjs/xchain-crypto" "^0.2.1"
+    axios "^0.20.0"
+    bitcoinjs-lib "^5.2.0"
+    coininfo "^5.1.0"
+    wif "^2.0.6"
+
 "@xchainjs/xchain-polkadot@^0.4.0":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-polkadot/-/xchain-polkadot-0.4.0.tgz#4dc8a53985efbf1a147c44c76e3b3feb5dcafabf"
@@ -4737,9 +4750,9 @@
     nock "^13.0.4"
 
 "@xchainjs/xchain-thorchain@^0.9.2":
-  version "0.9.2"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.9.2.tgz#7e6badc68cd5d6a77e1d6d1a9f12c472d80feb4a"
-  integrity sha512-qaSSVIQFQF/CAjvGprbY6ZuMCE+L/BcyeNmwHZ0FELQZjiu1lvh/Zri2N5nzvhD336BZIJPMGSouDoIXrDjNOQ==
+  version "0.9.3"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.9.3.tgz#d1a6666931d91cfaee032b145bd588de1e1ff26d"
+  integrity sha512-8VhZPtQ4jcsdU02aDSnfFLBcKgzGa7AzWtE726d/NjqO9H/WNw/dX3l9CbipJtb+/qDgrGeamU3UsKUPu5Pbcg==
   dependencies:
     "@xchainjs/xchain-client" "^0.3.0"
     "@xchainjs/xchain-cosmos" "^0.7.0"
@@ -4747,15 +4760,10 @@
     axios "^0.21.0"
     nock "^13.0.5"
 
-"@xchainjs/xchain-util@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.2.0.tgz#9b29488632b23867bf01987f82a8d0357747a684"
-  integrity sha512-G85BsCB47xjbcBCC/CzZ2ken3PB4fcDI5htHjUKko9WxcANNcghx7tA7iBfGuk18NMuYouFDGl2r6Ds+3zqZiw==
-
-"@xchainjs/xchain-util@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.2.1.tgz#f1c4d8b5acb84207a4c60d65b489b1ae0668c8dd"
-  integrity sha512-+9s54QZUI2zriQNy4JlpQWy4VZ9FkmTGhYc1x1DYkPE6cIYup4ywxQ1FuWwzdBoUE2Zk+KZ3Qdi2Qeo/IyJb4g==
+"@xchainjs/xchain-util@^0.2.0", "@xchainjs/xchain-util@^0.2.1":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.2.2.tgz#c5f957a63afe2d441eb8c9751645375ad7ff7f76"
+  integrity sha512-JTvCI75DuEQmGCZca2Xsi0A6g3uW4h8qGkMYRtay6vP2a6MfnhHv5xGDlvIcgadn1U9xbmGqvrK1DfT6WhgsYg==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
@@ -6993,6 +7001,13 @@ coffeescript@^2.3.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/coffeescript/-/coffeescript-2.5.1.tgz#b2442a1f2c806139669534a54adc35010559d16a"
   integrity sha512-J2jRPX0eeFh5VKyVnoLrfVFgLZtnnmp96WQSLAS8OrLm2wtQLcnikYKe1gViJKDH7vucjuhHvBKKBP3rKcD1tQ==
+
+coininfo@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/coininfo/-/coininfo-5.1.0.tgz#512b850d867e49afe55f15322e891f34ab6b49bd"
+  integrity sha512-q1Bv+yYSca68VpXGvaMwO0xzEJl9Zxxk0g2YWfX8EUHld8t7e3xEnaRa473IqNVWBq9CAwiXzkYR9UCCtUZVrA==
+  dependencies:
+    safe-buffer "^5.1.1"
 
 collect-v8-coverage@^1.0.0:
   version "1.0.1"
@@ -9908,9 +9923,9 @@ follow-redirects@^1.0.0:
     debug "^3.0.0"
 
 follow-redirects@^1.10.0:
-  version "1.13.1"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.13.1.tgz#5f69b813376cee4fd0474a3aba835df04ab763b7"
-  integrity sha512-SSG5xmZh1mkPGyKzjZP8zLjltIfpW32Y5QpdNJyjcfGxK3qo3NDDkZOZSFiGn1A6SclQxY9GzEwAHQ3dmYRWpg==
+  version "1.13.2"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.13.2.tgz#dd73c8effc12728ba5cf4259d760ea5fb83e3147"
+  integrity sha512-6mPTgLxYm3r6Bkkg0vNM0HTjfGrOEtsfbhagQvbxDEsEkpNhw582upBaoRZylzen6krEmxXJgt9Ju6HiI4O7BA==
 
 for-in@^1.0.2:
   version "1.0.2"
@@ -13562,9 +13577,9 @@ no-case@^3.0.3:
     tslib "^1.10.0"
 
 nock@^13.0.4, nock@^13.0.5:
-  version "13.0.5"
-  resolved "https://registry.yarnpkg.com/nock/-/nock-13.0.5.tgz#a618c6f86372cb79fac04ca9a2d1e4baccdb2414"
-  integrity sha512-1ILZl0zfFm2G4TIeJFW0iHknxr2NyA+aGCMTjDVUsBY4CkMRispF1pfIYkTRdAR/3Bg+UzdEuK0B6HczMQZcCg==
+  version "13.0.7"
+  resolved "https://registry.yarnpkg.com/nock/-/nock-13.0.7.tgz#9bc718c66bd0862dfa14601a9ba678a406127910"
+  integrity sha512-WBz73VYIjdbO6BwmXODRQLtn7B5tldA9pNpWJe5QTtTEscQlY5KXU4srnGzBOK2fWakkXj69gfTnXGzmrsaRWw==
   dependencies:
     debug "^4.1.0"
     json-stringify-safe "^5.0.1"

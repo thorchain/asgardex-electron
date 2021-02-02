@@ -1,6 +1,16 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { BNBChain, BTCChain, Chain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
+import {
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  ETHChain,
+  LTCChain,
+  PolkadotChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 
@@ -54,6 +64,12 @@ export const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }
     case PolkadotChain:
       // not available yet
       return txFailure$(`Tx stuff has not been implemented for Polkadot yet`)
+    case BCHChain:
+      // not available yet
+      return txFailure$(`Tx stuff has not been implemented for Bitcoin Cash yet`)
+    case LTCChain:
+      // not available yet
+      return txFailure$(`Tx stuff has not been implemented for Litecoin yet`)
   }
 }
 
@@ -80,5 +96,9 @@ export const txStatusByChain$ = (txHash: TxHash, chain: Chain): TxLD => {
       return failure$(`txStatus$ has not been implemented for Cosmos`)
     case PolkadotChain:
       return failure$(`txStatus$ has not been implemented for Polkadot`)
+    case BCHChain:
+      return failure$(`txStatus$ has not been implemented for Bitcoin Cash`)
+    case LTCChain:
+      return failure$(`txStatus$ has not been implemented for Litecoin`)
   }
 }
