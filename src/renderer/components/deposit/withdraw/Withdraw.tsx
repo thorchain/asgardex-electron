@@ -23,16 +23,13 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { SymWithdrawStateHandler, WithdrawFees, WithdrawFeesRD } from '../../../services/chain/types'
-import { WithdrawType } from '../../../types/asgardex'
 import { formatFee } from '../../uielements/fees/Fees.helper'
 import { Label } from '../../uielements/label'
 import { ReloadButton } from '../../uielements/reloadButton'
 import { getWithdrawAmounts } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
-type Props = {
-  /** Type to withdraw (`sym` or `asym`) */
-  type: WithdrawType
+export type Props = {
   /** Asset to withdraw */
   asset: Asset
   /** Rune price */
@@ -51,10 +48,8 @@ type Props = {
   onWithdraw: (percent: number) => void
   /** Callback to reload fees */
   reloadFees: () => void
-  /** Share of Rune */
-  runeShare: BaseAmount
-  /** Share of selected Asset */
-  assetShare: BaseAmount
+  /** Share of Rune and of selected Asset */
+  shares: { rune: BaseAmount; asset: BaseAmount }
   /** Flag whether form has to be disabled or not */
   disabled?: boolean
   /** Fees needed to withdraw */
@@ -63,7 +58,6 @@ type Props = {
 }
 
 export const Withdraw: React.FC<Props> = ({
-  type,
   asset,
   assetPoolData,
   onWithdraw,
@@ -72,8 +66,7 @@ export const Withdraw: React.FC<Props> = ({
   chainAssetPoolData,
   runeBalance: oRuneBalance,
   selectedPriceAsset,
-  runeShare,
-  assetShare,
+  shares: { rune: runeShare, asset: assetShare },
   disabled,
   fees,
   reloadFees: updateFees
@@ -84,9 +77,7 @@ export const Withdraw: React.FC<Props> = ({
 
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
 
-  const _isAsym = useMemo(() => type === 'asym', [type])
-
-  const withdrawAmounts = getWithdrawAmounts(runeShare, assetShare, withdrawPercent)
+  const { rune: runeWithdraw, asset: assetWithdraw } = getWithdrawAmounts(runeShare, assetShare, withdrawPercent)
 
   const oFees: O.Option<WithdrawFees> = useMemo(() => FP.pipe(fees, RD.toOption), [fees])
 
@@ -167,10 +158,10 @@ export const Withdraw: React.FC<Props> = ({
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oFees),
-        (fee) => assetToBase(withdrawAmounts.assetWithdraw).amount().isLessThan(fee.amount())
+        (fee) => assetToBase(assetWithdraw).amount().isLessThan(fee.amount())
       )
     )
-  }, [oAssetChainFee, oFees, withdrawAmounts.assetWithdraw, withdrawPercent])
+  }, [oAssetChainFee, oFees, assetWithdraw, withdrawPercent])
 
   const renderAssetChainFeeError = useMemo(() => {
     if (!isAssetChainFeeError) return <></>
@@ -186,7 +177,7 @@ export const Withdraw: React.FC<Props> = ({
               asset,
               trimZeros: true
             }),
-            amount: formatAssetAmountCurrency({ amount: withdrawAmounts.assetWithdraw, asset, trimZeros: true })
+            amount: formatAssetAmountCurrency({ amount: assetWithdraw, asset, trimZeros: true })
           }
         )
         // `key`  has to be set for any reason to avoid "Missing "key" prop for element in iterator"
@@ -194,7 +185,7 @@ export const Withdraw: React.FC<Props> = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [isAssetChainFeeError, oAssetChainFee, intl, asset, withdrawAmounts.assetWithdraw])
+  }, [isAssetChainFeeError, oAssetChainFee, intl, asset, assetWithdraw])
 
   const isThorOutFeeError = useMemo(() => {
     if (withdrawPercent <= 0) return false
@@ -203,10 +194,10 @@ export const Withdraw: React.FC<Props> = ({
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oFees),
-        ({ thorOut }) => assetToBase(withdrawAmounts.runeWithdraw).amount().isLessThan(thorOut.amount())
+        ({ thorOut }) => assetToBase(runeWithdraw).amount().isLessThan(thorOut.amount())
       )
     )
-  }, [oFees, withdrawAmounts.runeWithdraw, withdrawPercent])
+  }, [oFees, runeWithdraw, withdrawPercent])
 
   const renderThorOutFeeError = useMemo(() => {
     if (!isThorOutFeeError) return <></>
@@ -223,7 +214,7 @@ export const Withdraw: React.FC<Props> = ({
               trimZeros: true
             }),
             amount: formatAssetAmountCurrency({
-              amount: withdrawAmounts.runeWithdraw,
+              amount: runeWithdraw,
               asset: AssetRuneNative,
               trimZeros: true
             })
@@ -234,7 +225,7 @@ export const Withdraw: React.FC<Props> = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [isThorOutFeeError, oFees, intl, withdrawAmounts.runeWithdraw])
+  }, [isThorOutFeeError, oFees, intl, runeWithdraw])
 
   const renderFee = useMemo(() => {
     const loading = <>...</>
@@ -304,14 +295,14 @@ export const Withdraw: React.FC<Props> = ({
         <Styled.AssetIcon asset={AssetRuneNative} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
-            amount: withdrawAmounts.runeWithdraw,
+            amount: runeWithdraw,
             asset: AssetRuneNative,
             trimZeros: true
           })}
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(AssetRuneNative, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: assetAmount(withdrawAmounts.runeWithdraw.amount().times(runePrice)),
+              amount: assetAmount(runeWithdraw.amount().times(runePrice)),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}
@@ -322,14 +313,14 @@ export const Withdraw: React.FC<Props> = ({
         <Styled.AssetIcon asset={asset} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
-            amount: withdrawAmounts.assetWithdraw,
+            amount: assetWithdraw,
             asset: asset,
             trimZeros: true
           })}
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(asset, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: assetAmount(withdrawAmounts.assetWithdraw.amount().times(assetPrice)),
+              amount: assetAmount(assetWithdraw.amount().times(assetPrice)),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}

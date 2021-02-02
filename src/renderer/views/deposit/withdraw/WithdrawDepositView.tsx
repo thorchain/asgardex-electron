@@ -104,8 +104,6 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
-        // currently we support sym withdraw only - asym will be added later
-        type={'sym'}
         fees={fees}
         assetPrice={ZERO_BN}
         assetPoolData={ZERO_POOL_DATA}
@@ -114,8 +112,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         runeBalance={runeBalance}
         selectedPriceAsset={AssetRuneNative}
         onWithdraw={FP.constVoid}
-        runeShare={ZERO_BASE_AMOUNT}
-        assetShare={ZERO_BASE_AMOUNT}
+        shares={{ rune: ZERO_BASE_AMOUNT, asset: ZERO_BASE_AMOUNT }}
         asset={asset}
         reloadFees={reloadWithdrawFees}
         disabled
@@ -135,8 +132,6 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       PoolData
     ]) => (
       <Withdraw
-        // currently we support sym withdraw only - asym will be added later
-        type={'sym'}
         assetPrice={assetPrice}
         assetPoolData={assetPoolData}
         runePrice={runePrice}
@@ -144,8 +139,10 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         runeBalance={runeBalance}
         selectedPriceAsset={selectedPriceAsset}
         onWithdraw={console.log}
-        runeShare={shareHelpers.getRuneShare(depositData, poolDetail)}
-        assetShare={shareHelpers.getAssetShare(depositData, poolDetail)}
+        shares={{
+          rune: shareHelpers.getRuneShare(depositData, poolDetail),
+          asset: shareHelpers.getAssetShare(depositData, poolDetail)
+        }}
         asset={asset}
         fees={fees}
         reloadFees={reloadWithdrawFees}
