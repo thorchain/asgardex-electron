@@ -26,8 +26,6 @@ export const Container = styled('div')`
   color: ${palette('text', 0)};
 `
 
-// export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
-//   border-color: ${({ hasError }) => (hasError ? palette('error', 0) : palette('primary', 0))};
 export const FeeLabel = styled(UILabel)<{ isError?: boolean; isLoading?: boolean }>`
   color: ${({ isError, isLoading }) =>
     isError ? palette('error', 0) : isLoading ? palette('gray', 2) : palette('text', 0)};
