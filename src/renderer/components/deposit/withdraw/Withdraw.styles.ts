@@ -70,14 +70,6 @@ export const FeeErrorRow = styled(Row).attrs({
 `}
 `
 
-export const FeeLabel = styled(UILabel).attrs({
-  size: 'normal',
-  textTransform: 'uppercase'
-})`
-  font-family: 'MainFontRegular';
-  padding: 0;
-`
-
 export const FeeErrorLabel = styled(UILabel).attrs({
   color: 'error',
   textTransform: 'uppercase'
@@ -85,4 +77,15 @@ export const FeeErrorLabel = styled(UILabel).attrs({
   font-family: 'MainFontRegular';
   padding: 0;
   margin-bottom: 10px;
+`
+
+export const ExtraContainer = styled('div')`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+`
+
+export const ViewTxButtonTop = styled(UIViewTxButton)`
+  padding-bottom: 20px;
 `

@@ -18,7 +18,13 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
-import { PoolDetailRD, StakersAssetData, StakersAssetDataRD, PoolDetail } from '../../../services/midgard/types'
+import {
+  PoolDetailRD,
+  StakersAssetData,
+  StakersAssetDataRD,
+  PoolDetail,
+  PoolAddress
+} from '../../../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 
@@ -30,23 +36,24 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const { asset } = props
   const {
     service: {
-      pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$, poolsState$ },
+      pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$, poolsState$, selectedPoolAddress$ },
       stake: { getStakes$ }
     }
   } = useMidgardContext()
 
-  const { withdrawFees$, reloadWithdrawFees, symWithdraw$ } = useChainContext()
+  const { withdrawFees$, reloadWithdrawFees, symWithdraw$, getExplorerUrlByAsset$ } = useChainContext()
 
   const fees = useObservableState(withdrawFees$, RD.initial)
 
   const runePrice = useObservableState(priceRatio$, bn(1))
 
   const poolsStateRD = useObservableState(poolsState$, RD.initial)
+
+  const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
   /**
    * We have to get a new stake-stream for every new asset
    * @description /src/renderer/services/midgard/stake.ts
    */
-
   const [depositData] = useObservableState<StakersAssetDataRD>(getStakes$, RD.initial)
 
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
@@ -80,7 +87,11 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
 
   const assetPoolDataRD: RD.RemoteData<Error, PoolData> = FP.pipe(poolDetailRD, RD.map(toPoolData))
 
-  const { balancesState$ } = useWalletContext()
+  const {
+    balancesState$,
+    keystoreService: { validatePassword$ },
+    reloadBalances
+  } = useWalletContext()
 
   const [balances] = useObservableState(
     () =>
@@ -101,6 +112,32 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     [balances]
   )
 
+  const getAssetExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(asset), [asset, getExplorerUrlByAsset$])
+  const assetExplorerUrl = useObservableState(getAssetExplorerUrl$, O.none)
+
+  const viewAssetTx = useCallback(
+    (txHash: string) => {
+      FP.pipe(
+        assetExplorerUrl,
+        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
+      )
+    },
+    [assetExplorerUrl]
+  )
+
+  const getRuneExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(AssetRuneNative), [getExplorerUrlByAsset$])
+  const runeExplorerUrl = useObservableState(getRuneExplorerUrl$, O.none)
+
+  const viewRuneTx = useCallback(
+    (txHash: string) => {
+      FP.pipe(
+        runeExplorerUrl,
+        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
+      )
+    },
+    [runeExplorerUrl]
+  )
+
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
@@ -116,10 +153,27 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         asset={asset}
         reloadFees={reloadWithdrawFees}
         disabled
+        poolAddress={O.none}
+        memo={O.none}
+        validatePassword$={validatePassword$}
+        viewRuneTx={viewRuneTx}
+        viewAssetTx={viewAssetTx}
+        reloadBalances={reloadBalances}
         withdraw$={symWithdraw$}
       />
     ),
-    [fees, runePrice, runeBalance, asset, reloadWithdrawFees, symWithdraw$]
+    [
+      fees,
+      runePrice,
+      runeBalance,
+      asset,
+      reloadWithdrawFees,
+      validatePassword$,
+      viewRuneTx,
+      viewAssetTx,
+      reloadBalances,
+      symWithdraw$
+    ]
   )
 
   const renderWithdrawReady = useCallback(
@@ -144,12 +198,30 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
           asset: shareHelpers.getAssetShare(depositData, poolDetail)
         }}
         asset={asset}
+        poolAddress={oPoolAddress}
+        memo={O.none}
         fees={fees}
         reloadFees={reloadWithdrawFees}
+        validatePassword$={validatePassword$}
+        viewRuneTx={viewRuneTx}
+        viewAssetTx={viewAssetTx}
+        reloadBalances={reloadBalances}
         withdraw$={symWithdraw$}
       />
     ),
-    [runePrice, runeBalance, asset, fees, reloadWithdrawFees, symWithdraw$]
+    [
+      runePrice,
+      runeBalance,
+      asset,
+      oPoolAddress,
+      fees,
+      reloadWithdrawFees,
+      validatePassword$,
+      viewRuneTx,
+      viewAssetTx,
+      reloadBalances,
+      symWithdraw$
+    ]
   )
 
   return FP.pipe(

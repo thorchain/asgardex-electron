@@ -1,31 +1,37 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
+import { PoolData } from '@thorchain/asgardex-util'
 import {
   Asset,
   assetAmount,
   AssetRuneNative,
-  assetToBase,
-  baseAmount,
   BaseAmount,
   baseToAsset,
+  Chain,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
-import { Col, Grid } from 'antd'
+import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
-import { ZERO_ASSET_AMOUNT } from '../../../const'
-import { getChainAsset } from '../../../helpers/chainHelper'
+import { Network } from '../../../../shared/api/types'
+import { ZERO_BASE_AMOUNT } from '../../../const'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
-import { SymWithdrawStateHandler, WithdrawFees, WithdrawFeesRD } from '../../../services/chain/types'
-import { formatFee } from '../../uielements/fees/Fees.helper'
+import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
+import { FeeLD, FeeRD, WithdrawState, WithdrawStateHandler } from '../../../services/chain/types'
+import { PoolAddress } from '../../../services/midgard/types'
+import { ValidatePasswordHandler } from '../../../services/wallet/types'
+import { PasswordModal } from '../../modal/password'
+import { TxModal } from '../../modal/tx'
+import { DepositAssets } from '../../modal/tx/extra'
 import { Label } from '../../uielements/label'
-import { ReloadButton } from '../../uielements/reloadButton'
 import { getWithdrawAmounts } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
@@ -52,9 +58,13 @@ export type Props = {
   shares: { rune: BaseAmount; asset: BaseAmount }
   /** Flag whether form has to be disabled or not */
   disabled?: boolean
-  /** Fees needed to withdraw */
-  fees: WithdrawFeesRD
-  withdraw$: SymWithdrawStateHandler
+  poolAddress: O.Option<PoolAddress>
+  viewTx: (txHash: string, chain: Chain) => void
+  validatePassword$: ValidatePasswordHandler
+  reloadBalances: FP.Lazy<void>
+  withdraw$: WithdrawStateHandler
+  fee$: (asset: Asset, percent: number) => FeeLD
+  network: Network
 }
 
 export const Withdraw: React.FC<Props> = ({
@@ -68,209 +78,261 @@ export const Withdraw: React.FC<Props> = ({
   selectedPriceAsset,
   shares: { rune: runeShare, asset: assetShare },
   disabled,
-  fees,
-  reloadFees: updateFees
+  poolAddress: oPoolAddress,
+  viewTx = (_) => {},
+  validatePassword$,
+  reloadBalances = FP.constVoid,
+  reloadFees,
+  withdraw$,
+  fee$,
+  network
 }) => {
   const intl = useIntl()
 
-  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
-
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
 
-  const { rune: runeWithdraw, asset: assetWithdraw } = getWithdrawAmounts(runeShare, assetShare, withdrawPercent)
-
-  const oFees: O.Option<WithdrawFees> = useMemo(() => FP.pipe(fees, RD.toOption), [fees])
-
-  const isThorMemoFeeError: boolean = useMemo(() => {
-    if (withdrawPercent <= 0) return false
-
-    return FP.pipe(
-      sequenceTOption(oFees, oRuneBalance),
-      O.fold(
-        // Missing (or loading) fees does not mean we can't sent something. No error then.
-        () => !O.isNone(oFees),
-        ([{ thorMemo }, balance]) => balance.amount().isLessThan(thorMemo.amount())
-      )
-    )
-  }, [oFees, oRuneBalance, withdrawPercent])
-
-  const renderThorMemoFeeError = useMemo(() => {
-    if (!isThorMemoFeeError) return <></>
-
-    const runeBalance = FP.pipe(
-      oRuneBalance,
-      O.map(baseToAsset),
-      O.getOrElse(() => ZERO_ASSET_AMOUNT)
-    )
-
-    return FP.pipe(
-      oFees,
-      O.map(({ thorMemo }) => {
-        const thorFeesAmount: BaseAmount = baseAmount(thorMemo.amount())
-        const msg = intl.formatMessage(
-          { id: 'deposit.withdraw.add.error.thorMemoFeeNotCovered' },
-          {
-            fee: formatAssetAmountCurrency({
-              amount: baseToAsset(thorFeesAmount),
-              asset: AssetRuneNative,
-              trimZeros: true
-            }),
-            balance: formatAssetAmountCurrency({ amount: runeBalance, asset: AssetRuneNative, trimZeros: true })
-          }
-        )
-        // `key`  has to be set for any reason to avoid "Missing "key" prop for element in iterator"
-        return <Styled.FeeErrorLabel key="memo2-fee-error">{msg}</Styled.FeeErrorLabel>
-      }),
-      O.getOrElse(() => <></>)
-    )
-  }, [isThorMemoFeeError, oRuneBalance, oFees, intl])
-
-  /**
-   * Helper to calculate chain fee
-   * Fee might be calculated into price of asset
-   */
-  const calculateAssetChainFee = useCallback(
-    (fee: BaseAmount): BaseAmount => {
-      // ignore price calculations for assets, which are chain assets
-      if (eqAsset.equals(asset, getChainAsset(asset.chain))) return fee
-      // calculate asset price of fee
-      return getValueOfAsset1InAsset2(fee, assetPoolData, chainAssetPoolData)
-    },
-    [asset, assetPoolData, chainAssetPoolData]
+  const { rune: runeAmountToWithdraw, asset: assetAmountToWithdraw } = getWithdrawAmounts(
+    runeShare,
+    assetShare,
+    withdrawPercent
   )
-  /**
-   * Asset chain fee
-   */
-  const oAssetChainFee: O.Option<BaseAmount> = useMemo(
+
+  // (Possible) subscription of `withdraw$`
+  // DON'T use `_setWithdrawSub` to update state (it's unsafe) - use `setWithdrawSub`!!
+  const [withdrawSub, _setWithdrawSub] = useState<O.Option<Rx.Subscription>>(O.none)
+
+  // unsubscribe withdraw$ subscription
+  const unsubscribeWithdrawSub = useCallback(() => {
+    FP.pipe(
+      withdrawSub,
+      O.map((sub) => sub.unsubscribe())
+    )
+  }, [withdrawSub])
+
+  const setWithdrawSub = useCallback(
+    (state) => {
+      unsubscribeWithdrawSub()
+      _setWithdrawSub(state)
+    },
+    [unsubscribeWithdrawSub]
+  )
+
+  useEffect(() => {
+    // Unsubscribe of (possible) previous subscription of `withdraw$`
+    return () => {
+      unsubscribeWithdrawSub()
+    }
+  }, [unsubscribeWithdrawSub])
+
+  // Currently we do sent WITHDRAW by using NativeRune only
+  // It will be changed as soon as we support asymmetrical withdraw
+  // and it should be always an asset with smallest amount to sent a non-zero tx
+  const txAsset: Asset = AssetRuneNative
+
+  const txAssetBalance: BaseAmount = useMemo(
     () =>
       FP.pipe(
-        oFees,
-        O.map(({ assetOut }) => calculateAssetChainFee(assetOut))
+        oRuneBalance,
+        O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
-    [calculateAssetChainFee, oFees]
+    [oRuneBalance]
   )
 
-  const isAssetChainFeeError = useMemo(() => {
+  const feeLD: FeeLD = useMemo(
+    () =>
+      Rx.of(withdrawPercent).pipe(
+        RxOp.debounceTime(1000),
+        // Currently we do sent WITHDRAW by using NativeRune only
+        // It might be changed as soon as we support asymmetrical withdraw
+        RxOp.switchMap((_) => fee$(txAsset, withdrawPercent))
+      ),
+    [txAsset, fee$, withdrawPercent]
+  )
+
+  const feeRD: FeeRD = useObservableState(feeLD, RD.initial)
+  const oFee: O.Option<BaseAmount> = useMemo(() => RD.toOption(feeRD), [feeRD])
+
+  // Deposit start time
+  const [depositStartTime, setDepositStartTime] = useState<number>(0)
+
+  // Withdraw state
+  const [withdrawState, setWithdrawState] = useState<WithdrawState>(INITIAL_WITHDRAW_STATE)
+
+  const isFeeError: boolean = useMemo(() => {
     if (withdrawPercent <= 0) return false
 
     return FP.pipe(
-      oAssetChainFee,
+      sequenceTOption(oFee, oRuneBalance),
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
-        () => !O.isNone(oFees),
-        (fee) => assetToBase(assetWithdraw).amount().isLessThan(fee.amount())
+        () => !O.isNone(oFee),
+        ([fee, balance]) => balance.amount().isLessThan(fee.amount())
       )
     )
-  }, [oAssetChainFee, oFees, assetWithdraw, withdrawPercent])
+  }, [oFee, oRuneBalance, withdrawPercent])
 
-  const renderAssetChainFeeError = useMemo(() => {
-    if (!isAssetChainFeeError) return <></>
+  const renderFeeError = useMemo(() => {
+    if (!isFeeError) return <></>
 
     return FP.pipe(
-      oAssetChainFee,
+      oFee,
       O.map((fee) => {
         const msg = intl.formatMessage(
-          { id: 'deposit.withdraw.add.error.outFeeNotCovered' },
+          { id: 'deposit.withdraw.error.feeNotCovered' },
           {
             fee: formatAssetAmountCurrency({
               amount: baseToAsset(fee),
-              asset,
+              asset: txAsset,
               trimZeros: true
             }),
-            amount: formatAssetAmountCurrency({ amount: assetWithdraw, asset, trimZeros: true })
+            balance: formatAssetAmountCurrency({ amount: baseToAsset(txAssetBalance), asset: txAsset, trimZeros: true })
           }
         )
-        // `key`  has to be set for any reason to avoid "Missing "key" prop for element in iterator"
-        return <Styled.FeeErrorLabel key="asset-fee-out-error">{msg}</Styled.FeeErrorLabel>
+        return <Styled.FeeErrorLabel key="fee-error">{msg}</Styled.FeeErrorLabel>
       }),
       O.getOrElse(() => <></>)
     )
-  }, [isAssetChainFeeError, oAssetChainFee, intl, asset, assetWithdraw])
+  }, [isFeeError, oFee, intl, txAsset, txAssetBalance])
 
-  const isThorOutFeeError = useMemo(() => {
-    if (withdrawPercent <= 0) return false
-    return FP.pipe(
-      oFees,
-      O.fold(
-        // Missing (or loading) fees does not mean we can't sent something. No error then.
-        () => !O.isNone(oFees),
-        ({ thorOut }) => assetToBase(runeWithdraw).amount().isLessThan(thorOut.amount())
-      )
-    )
-  }, [oFees, runeWithdraw, withdrawPercent])
-
-  const renderThorOutFeeError = useMemo(() => {
-    if (!isThorOutFeeError) return <></>
-
-    return FP.pipe(
-      oFees,
-      O.map(({ thorOut }) => {
-        const msg = intl.formatMessage(
-          { id: 'deposit.withdraw.add.error.outFeeNotCovered' },
-          {
-            fee: formatAssetAmountCurrency({
-              amount: baseToAsset(thorOut),
-              asset: AssetRuneNative,
-              trimZeros: true
-            }),
-            amount: formatAssetAmountCurrency({
-              amount: runeWithdraw,
-              asset: AssetRuneNative,
-              trimZeros: true
-            })
-          }
-        )
-        // `key`  has to be set for any reason to avoid "Missing "key" prop for element in iterator"
-        return <Styled.FeeErrorLabel key="thor-fee-out-error">{msg}</Styled.FeeErrorLabel>
-      }),
-      O.getOrElse(() => <></>)
-    )
-  }, [isThorOutFeeError, oFees, intl, runeWithdraw])
-
-  const renderFee = useMemo(() => {
-    const loading = <>...</>
-    return FP.pipe(
-      fees,
+  const txModalExtraContent = useMemo(() => {
+    const stepDescriptions = [
+      intl.formatMessage({ id: 'common.tx.healthCheck' }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: AssetRuneNative.symbol }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: asset.symbol }),
+      intl.formatMessage({ id: 'common.tx.checkResult' })
+    ]
+    const stepDescription = FP.pipe(
+      withdrawState.withdraw,
       RD.fold(
-        () => loading,
-        () => loading,
-        (error) => (
-          <>
-            {intl.formatMessage({ id: 'common.error' })} {error?.message ?? ''}
-          </>
-        ),
-        ({ thorMemo, thorOut, assetOut }) => {
-          const formattedThorMemoFee = formatFee({
-            amount: thorMemo,
-            asset: AssetRuneNative
-          })
-          const formattedAssetOutFee = formatFee({
-            amount: calculateAssetChainFee(assetOut),
-            asset
-          })
-          const formattedThorOutFee = formatFee({
-            amount: thorOut,
-            asset: AssetRuneNative
-          })
-
-          if (!isDesktopView) {
-            return `${intl.formatMessage({
-              id: 'common.fees'
-            })}: ${formattedThorMemoFee} + ${formattedThorOutFee} + ${formattedAssetOutFee}`
-          }
-
-          return (
-            <>
-              {intl.formatMessage(
-                { id: 'deposit.withdraw.fees' },
-                { thorMemo: formattedThorMemoFee, assetOut: formattedAssetOutFee, thorOut: formattedThorOutFee }
-              )}
-            </>
-          )
-        }
+        () => '',
+        () =>
+          `${intl.formatMessage(
+            { id: 'common.step' },
+            { current: withdrawState.step, total: withdrawState.stepsTotal }
+          )}: ${stepDescriptions[withdrawState.step - 1]}`,
+        () => '',
+        () => `${intl.formatMessage({ id: 'common.done' })}!`
       )
     )
-  }, [asset, calculateAssetChainFee, fees, intl, isDesktopView])
+
+    return (
+      <DepositAssets
+        target={{ asset, amount: assetAmountToWithdraw }}
+        source={O.some({ asset: AssetRuneNative, amount: runeAmountToWithdraw })}
+        stepDescription={stepDescription}
+      />
+    )
+  }, [intl, asset, withdrawState, assetAmountToWithdraw, runeAmountToWithdraw])
+
+  const onCloseTxModal = useCallback(() => {
+    // unsubscribe
+    unsubscribeWithdrawSub()
+    // reset withdraw$ subscription
+    setWithdrawSub(O.none)
+    // reset deposit state
+    setWithdrawState(INITIAL_WITHDRAW_STATE)
+  }, [setWithdrawSub, unsubscribeWithdrawSub])
+
+  const onFinishTxModal = useCallback(() => {
+    // Do same things as with closing
+    onCloseTxModal()
+    // but also refresh balances
+    reloadBalances()
+  }, [onCloseTxModal, reloadBalances])
+
+  const renderTxModal = useMemo(() => {
+    const { withdraw: withdrawRD, withdrawTx } = withdrawState
+
+    // don't render TxModal in initial state
+    if (RD.isInitial(withdrawRD)) return <></>
+
+    // Get timer value
+    const timerValue = FP.pipe(
+      withdrawRD,
+      RD.fold(
+        () => 0,
+        FP.flow(
+          O.map(({ loaded }) => loaded),
+          O.getOrElse(() => 0)
+        ),
+        () => 0,
+        () => 100
+      )
+    )
+
+    // title
+    const txModalTitle = FP.pipe(
+      withdrawRD,
+      RD.fold(
+        () => 'deposit.withdraw.pending',
+        () => 'deposit.withdraw.pending',
+        () => 'deposit.withdraw.error',
+        () => 'deposit.withdraw.success'
+      ),
+      (id) => intl.formatMessage({ id })
+    )
+
+    const extraResult = (
+      <Styled.ExtraContainer>
+        {FP.pipe(withdrawTx, RD.toOption, (oTxHash) => (
+          <Styled.ViewTxButtonTop
+            txHash={oTxHash}
+            onClick={viewTx}
+            label={intl.formatMessage({ id: 'common.tx.view' }, { assetSymbol: AssetRuneNative.symbol })}
+          />
+        ))}
+      </Styled.ExtraContainer>
+    )
+
+    return (
+      <TxModal
+        title={txModalTitle}
+        onClose={onCloseTxModal}
+        onFinish={onFinishTxModal}
+        startTime={depositStartTime}
+        txRD={withdrawRD}
+        timerValue={timerValue}
+        extraResult={extraResult}
+        extra={txModalExtraContent}
+      />
+    )
+  }, [withdrawState, txModalExtraContent, onCloseTxModal, onFinishTxModal, depositStartTime, intl])
+
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+
+  const closePasswordModal = useCallback(() => {
+    setShowPasswordModal(false)
+  }, [setShowPasswordModal])
+
+  const onClosePasswordModal = useCallback(() => {
+    // close password modal
+    closePasswordModal()
+  }, [closePasswordModal])
+
+  const onSucceedPasswordModal = useCallback(() => {
+    // close private modal
+    closePasswordModal()
+
+    // set start time
+    setDepositStartTime(Date.now())
+
+    FP.pipe(
+      oMemo,
+      O.map((memo) => {
+        const sub = withdraw$({
+          asset,
+          poolAddress: oPoolAddress,
+          network,
+          memo
+        }).subscribe(setWithdrawState)
+
+        // store subscription - needed to unsubscribe while unmounting
+        setWithdrawSub(O.some(sub))
+
+        return true
+      })
+    )
+  }, [closePasswordModal, withdraw$, asset, oPoolAddress, network, setWithdrawSub])
 
   const disabledForm = useMemo(() => withdrawPercent <= 0 || disabled, [withdrawPercent, disabled])
 
@@ -295,14 +357,14 @@ export const Withdraw: React.FC<Props> = ({
         <Styled.AssetIcon asset={AssetRuneNative} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
-            amount: runeWithdraw,
+            amount: baseToAsset(runeAmountToWithdraw),
             asset: AssetRuneNative,
             trimZeros: true
           })}
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(AssetRuneNative, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: assetAmount(runeWithdraw.amount().times(runePrice)),
+              amount: assetAmount(runeAmountToWithdraw.amount().times(runePrice)),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}
@@ -313,14 +375,14 @@ export const Withdraw: React.FC<Props> = ({
         <Styled.AssetIcon asset={asset} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
-            amount: assetWithdraw,
+            amount: baseToAsset(assetAmountToWithdraw),
             asset: asset,
             trimZeros: true
           })}
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(asset, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: assetAmount(assetWithdraw.amount().times(assetPrice)),
+              amount: assetAmount(assetAmountToWithdraw.amount().times(assetPrice)),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}
@@ -329,23 +391,10 @@ export const Withdraw: React.FC<Props> = ({
 
       <Styled.FeesRow gutter={{ lg: 32 }}>
         <Col>
-          <Styled.FeeRow>
-            <Col>
-              <ReloadButton onClick={updateFees} disabled={RD.isPending(fees)} />
-            </Col>
-            <Col>
-              <Styled.FeeLabel disabled={RD.isPending(fees)} color={RD.isFailure(fees) ? 'error' : 'normal'}>
-                {renderFee}
-              </Styled.FeeLabel>
-            </Col>
-          </Styled.FeeRow>
+          <Styled.FeeRow>{/* TODO (@Veado) Use Fees component */}</Styled.FeeRow>
           <Styled.FeeErrorRow>
             <Col>
-              <>
-                {renderThorMemoFeeError}
-                {renderThorOutFeeError}
-                {renderAssetChainFeeError}
-              </>
+              <>{renderFeeError}</>
             </Col>
           </Styled.FeeErrorRow>
         </Col>
@@ -356,6 +405,14 @@ export const Withdraw: React.FC<Props> = ({
         onConfirm={() => onWithdraw(withdrawPercent)}
         disabled={disabledForm}
       />
+      {showPasswordModal && (
+        <PasswordModal
+          onSuccess={onSucceedPasswordModal}
+          onClose={onClosePasswordModal}
+          validatePassword$={validatePassword$}
+        />
+      )}
+      {renderTxModal}
     </Styled.Container>
   )
 }

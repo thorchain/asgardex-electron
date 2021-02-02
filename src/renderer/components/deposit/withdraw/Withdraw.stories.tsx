@@ -7,8 +7,8 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { INITIAL_SYM_WITHDRAW_STATE } from '../../../services/chain/const'
-import { SymWithdrawState } from '../../../services/chain/types'
+import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
+import { WithdrawState } from '../../../services/chain/types'
 import { Withdraw, Props as WitdrawProps } from './Withdraw'
 
 const runeBalance = O.some(assetToBase(assetAmount(100)))
@@ -40,10 +40,10 @@ const defaultProps: WitdrawProps = {
     Rx.of(params).pipe(
       RxOp.tap((params) => console.log('deposit$ ', params)),
       RxOp.switchMap((_) =>
-        Rx.of<SymWithdrawState>({
-          ...INITIAL_SYM_WITHDRAW_STATE,
+        Rx.of<WithdrawState>({
+          ...INITIAL_WITHDRAW_STATE,
           step: 4,
-          withdrawTxs: { rune: RD.success('rune-tx-hash'), asset: RD.success('asset-tx-hash') },
+          withdrawTx: RD.success('rune-tx-hash'),
           withdraw: RD.success(true)
         })
       )

@@ -56,22 +56,6 @@ export type SendTxParams = {
   feeOptionKey: FeeOptionKey
 }
 
-/**
- * Withdraw fees
- *
- * To withdraw we do need three fees:
- *
- * memo: Fee to send memo transaction on Thorchain
- * thorOut: Outbound transaction fee an user is charged for each outbound (withdraw). It's 3 times of `fast` fee.
- * assetOut : Outbound transaction fee an user is charged for each outbound (withdraw). It's 3 times of `fast` fee.
- */
-export type WithdrawFees = { thorMemo: BaseAmount; thorOut: BaseAmount; assetOut: BaseAmount }
-export type WithdrawFeesRD = RD.RemoteData<Error, WithdrawFees>
-export type WithdrawFeesLD = LiveData<Error, WithdrawFees>
-
-export type SymWithdrawMemo = { rune: Memo; asset: Memo }
-export type SymWithdrawMemoRx = Rx.Observable<O.Option<SymWithdrawMemo>>
-
 export type LedgerAddressParams = { chain: Chain; network: Network }
 
 /**
@@ -153,33 +137,30 @@ export type SymDepositParams = {
 
 export type SymDepositStateHandler = (p: SymDepositParams) => SymDepositState$
 
-export type SymWithdrawValidationResult = { pool: boolean; node: boolean }
-export type SymWithdrawTxs = { rune: TxHashRD; asset: TxHashRD }
-export type SymWithdrawFinalityResult = { rune: Tx; asset: Tx }
 /**
  * State to reflect status of a sym. deposit by doing different requests
  */
-export type SymWithdrawState = {
+export type WithdrawState = {
   // Number of current step
   readonly step: number
   // Constant total amount of steps
-  readonly stepsTotal: 4
-  // deposit transactions
-  readonly withdrawTxs: SymWithdrawTxs
+  readonly stepsTotal: 3
+  // withdraw transactions
+  readonly withdrawTx: TxHashRD
   // RD for all needed steps
   readonly withdraw: RD.RemoteData<ApiError, boolean>
 }
 
-export type SymWithdrawState$ = Rx.Observable<SymWithdrawState>
+export type WithdrawState$ = Rx.Observable<WithdrawState>
 
-export type SymWithdrawParams = {
+export type WithdrawParams = {
   readonly poolAddress: O.Option<string>
   readonly asset: Asset
-  readonly amounts: { rune: BaseAmount; asset: BaseAmount }
-  readonly memos: SymWithdrawMemo
+  readonly memo: Memo
+  readonly network: Network
 }
 
-export type SymWithdrawStateHandler = (p: SymWithdrawParams) => SymWithdrawState$
+export type WithdrawStateHandler = (p: WithdrawParams) => WithdrawState$
 
 export type UpgradeRuneParams = {
   readonly poolAddress: O.Option<string>

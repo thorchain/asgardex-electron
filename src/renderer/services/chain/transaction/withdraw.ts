@@ -1,57 +1,45 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { TxHash } from '@xchainjs/xchain-client'
-import { AssetRuneNative, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { isRuneNativeAsset } from '../../../helpers/assetHelper'
-import { sequenceSOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { TxTypes } from '../../../types/asgardex'
 import { service as midgardService } from '../../midgard/service'
-import { ApiError, ErrorId } from '../../wallet/types'
-import { INITIAL_SYM_DEPOSIT_STATE } from '../const'
-import {
-  SymWithdrawValidationResult,
-  SymWithdrawParams,
-  SymWithdrawState,
-  SymWithdrawState$,
-  SymWithdrawFinalityResult
-} from '../types'
+import { ErrorId } from '../../wallet/types'
+import { INITIAL_WITHDRAW_STATE } from '../const'
+import { WithdrawParams, WithdrawState, WithdrawState$ } from '../types'
 import { txStatusByChain$, sendTx$ } from './common'
+import { smallestAmountToSent } from './transaction.helper'
 
 const { pools: midgardPoolsService, validateNode$ } = midgardService
 
 /**
- * Symetrical withdraw stream does 4 steps:
+ * Symetrical withdraw stream does 3 steps:
  *
  * 1. Validate pool address + node
- * 2. Send withdraw RUNE transaction
- * 3. Send withdraw ASSET transaction
- * 4. Check status of both transactions
+ * 2. Send withdraw transaction
+ * 3. Check status of both transactions
  *
- * @returns SymWithdrawState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
+ * @returns WithdrawState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
  *
  */
-export const symWithdraw$ = ({
-  poolAddress: oPoolAddress,
-  asset,
-  amounts,
-  memos
-}: SymWithdrawParams): SymWithdrawState$ => {
+export const withdraw$ = ({ poolAddress: oPoolAddress, asset, memo, network }: WithdrawParams): WithdrawState$ => {
   // total of progress
   const total = O.some(100)
 
   // Observable state of to reflect status of all needed steps
-  const { get$: getState$, get: getState, set: setState } = observableState<SymWithdrawState>({
-    ...INITIAL_SYM_DEPOSIT_STATE,
-    withdrawTxs: { rune: RD.pending, asset: RD.pending },
+  const { get$: getState$, get: getState, set: setState } = observableState<WithdrawState>({
+    ...INITIAL_WITHDRAW_STATE,
+    withdrawTx: RD.pending,
     // we start with  a small progress
-    withdraw: RD.progress({ loaded: 20, total })
+    withdraw: RD.progress({ loaded: 25, total })
   })
+
+  const isRune = isRuneNativeAsset(asset)
 
   // All requests will be done in a sequence
   // to update `SymWithdrawState` step by step
@@ -59,7 +47,7 @@ export const symWithdraw$ = ({
     oPoolAddress,
     // For RuneNative we send `MsgNativeTx` w/o need for a pool address address,
     // so we can leave it empty
-    O.alt(() => (isRuneNativeAsset(asset) ? O.some('') : O.none)),
+    O.alt(() => (isRune ? O.some('') : O.none)),
     O.fold(
       // invalid pool address will fail
       () => {
@@ -70,88 +58,42 @@ export const symWithdraw$ = ({
       // continue with a pool address (even an empty one for Thorchain)
       (poolAddress) =>
         Rx.of(poolAddress).pipe(
-          // 1. Validation pool address + node
+          // 1. validate pool address or node
           RxOp.switchMap((poolAddress) =>
-            liveData.sequenceS({
-              pool: midgardPoolsService.validatePool$(poolAddress, asset.chain),
-              node: validateNode$()
-            })
+            Rx.iif(
+              () => isRuneNativeAsset(asset),
+              // We don't have a RUNE pool, so we just validate current connected node
+              validateNode$(),
+              // in other case we have to validate pool address
+              midgardPoolsService.validatePool$(poolAddress, asset.chain)
+            )
           ),
           // 2. send RUNE witdraw txs
-          liveData.chain<ApiError, SymWithdrawValidationResult, TxHash>((_) => {
-            setState({ ...getState(), step: 2, withdraw: RD.progress({ loaded: 40, total }) })
+          liveData.chain((_) => {
+            setState({ ...getState(), step: 2, withdraw: RD.progress({ loaded: 50, total }) })
             return sendTx$({
-              asset: AssetRuneNative,
-              recipient: '',
-              amount: amounts.rune,
-              memo: memos.rune,
+              asset,
+              recipient: isRune ? '' : poolAddress,
+              amount: smallestAmountToSent(asset.chain, network),
+              memo,
               txType: TxTypes.WITHDRAW,
               feeOptionKey: 'fastest'
             })
           }),
-          // Add failures of RUNE withdraw tx to state
-          liveData.mapLeft<ApiError, ApiError, TxHash>((apiError) => {
-            const current = getState()
-            setState({ ...current, withdrawTxs: { ...current.withdrawTxs, rune: RD.failure(apiError) } })
-            return apiError
-          }),
-          // Add success of RUNE withdraw tx to state
-          liveData.map<TxHash, TxHash>((txHash) => {
-            const current = getState()
-            setState({ ...current, withdrawTxs: { ...current.withdrawTxs, rune: RD.success(txHash) } })
-            return txHash
-          }),
-          // 3. send asset withdraw txs
-          liveData.chain<ApiError, TxHash, TxHash>((_) => {
-            setState({ ...getState(), step: 3, withdraw: RD.progress({ loaded: 60, total }) })
-            return sendTx$({
-              asset,
-              recipient: poolAddress,
-              amount: amounts.asset,
-              memo: memos.asset,
-              txType: TxTypes.DEPOSIT,
-              feeOptionKey: 'fastest'
+          liveData.chain((txHash) => {
+            // Update state
+            setState({
+              ...getState(),
+              step: 3,
+              withdraw: RD.progress({ loaded: 75, total }),
+              withdrawTx: RD.success(txHash)
             })
+            // 3. check tx finality by polling its tx data
+            return txStatusByChain$(txHash, asset.chain)
           }),
-          // Add failures of asset withdraw tx to state
-          liveData.mapLeft<ApiError, ApiError, TxHash>((apiError) => {
-            const current = getState()
-            setState({ ...current, withdrawTxs: { ...current.withdrawTxs, asset: RD.failure(apiError) } })
-            return apiError
-          }),
-          // Add success of asset withdraw tx to state
-          liveData.map<TxHash, TxHash>((txHash) => {
-            const current = getState()
-            setState({ ...current, withdrawTxs: { ...current.withdrawTxs, asset: RD.success(txHash) } })
-            return txHash
-          }),
-          // check finality of both withdraw txs
-          liveData.chain<ApiError, TxHash, SymWithdrawFinalityResult>((_) => {
-            const currentState = getState()
-            // Update state
-            setState({ ...currentState, step: 4, withdraw: RD.progress({ loaded: 80, total }) })
-
-            const { rune: runeTxRD, asset: assetTxRD } = currentState.withdrawTxs
-            return FP.pipe(
-              sequenceSOption({ runeTxHash: RD.toOption(runeTxRD), assetTxHash: RD.toOption(assetTxRD) }),
-              O.fold(
-                () => Rx.of(RD.failure({ errorId: ErrorId.SEND_TX, msg: 'Something went wrong to send withdraw txs' })),
-                // 4. check tx finality
-                ({ runeTxHash, assetTxHash }) =>
-                  liveData.sequenceS({
-                    asset: txStatusByChain$(assetTxHash, asset.chain),
-                    rune: txStatusByChain$(runeTxHash, THORChain)
-                  })
-              )
-            )
-          }),
-          liveData.map<SymWithdrawFinalityResult, SymWithdrawFinalityResult>((finality) => {
-            // Update state
-            setState({ ...getState(), withdraw: RD.success(true) })
-            return finality
-          }),
+          liveData.map((_) => setState({ ...getState(), withdraw: RD.success(true) })),
           // Add failures to state
-          liveData.mapLeft<ApiError, ApiError, SymWithdrawValidationResult>((apiError) => {
+          liveData.mapLeft((apiError) => {
             setState({ ...getState(), withdraw: RD.failure(apiError) })
             return apiError
           }),
@@ -183,9 +125,9 @@ export const symWithdraw$ = ({
                 FP.pipe(
                   oProgress,
                   O.map(
-                    ({ loaded }): SymWithdrawState => {
-                      // From 80 to 97 we count progress with small steps, but stop it at 98
-                      const updatedLoaded = loaded >= 80 && loaded <= 97 ? loaded++ : loaded
+                    ({ loaded }): WithdrawState => {
+                      // From 75 to 97 we count progress with small steps, but stop it at 98
+                      const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
                       return { ...state, withdraw: RD.progress({ loaded: updatedLoaded, total }) }
                     }
                   ),

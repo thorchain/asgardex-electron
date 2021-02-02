@@ -1,39 +1,46 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Chain, baseAmount } from '@xchainjs/xchain-util'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import { getWithdrawMemo } from '@thorchain/asgardex-util'
+import { Chain, Asset } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
-import * as RxOp from 'rxjs/operators'
 
 import { liveData } from '../../../helpers/rx/liveData'
-import { triggerStream } from '../../../helpers/stateHelper'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
-import { selectedPoolChain$ } from '../../midgard/common'
 import * as THOR from '../../thorchain'
-import { getWithdrawMemo$ } from '../memo'
-import { FeeLD, WithdrawFeesLD } from '../types'
+import { FeeLD } from '../types'
 
-// `TriggerStream` to reload withdraw fees
-const { stream$: reloadWithdrawFees$, trigger: reloadWithdrawFees } = triggerStream()
+const reloadWithdrawFeeByChain = (chain: Chain) => {
+  switch (chain) {
+    case 'BNB':
+      BNB.reloadFees()
+      break
+    case 'BTC':
+      BTC.reloadFees()
+      break
+    case 'THOR':
+      THOR.reloadFees()
+      break
+    case 'ETH':
+      // not implemented yet
+      break
+    case 'GAIA':
+      // not implemented yet
+      break
+    case 'POLKA':
+      // not implemented yet
+      break
+  }
+}
 
-const withdrawFeeByChain$ = (chain: Chain): FeeLD => {
+const reloadWithdrawFee = ({ chain }: Asset) => reloadWithdrawFeeByChain(chain)
+
+const withdrawFeeByChain$ = (chain: Chain, memo: string): FeeLD => {
   switch (chain) {
     case 'BNB':
       return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
     case 'BTC':
       // withdraw fee for BTC txs based on withdraw memo
-      return getWithdrawMemo$.pipe(
-        RxOp.switchMap((oMemo) =>
-          FP.pipe(
-            oMemo,
-            O.fold(
-              () => Rx.of(RD.initial),
-              (memo) => BTC.memoFees$(memo).pipe(liveData.map(({ fees }) => fees.fast))
-            )
-          )
-        )
-      )
+      return BTC.memoFees$(memo).pipe(liveData.map(({ fees }) => fees.fast))
     case 'THOR':
       return THOR.fees$().pipe(liveData.map(({ fast }) => fast))
     case 'ETH':
@@ -45,23 +52,11 @@ const withdrawFeeByChain$ = (chain: Chain): FeeLD => {
   }
 }
 
-const withdrawFees$: WithdrawFeesLD = Rx.combineLatest([selectedPoolChain$, reloadWithdrawFees$]).pipe(
-  RxOp.switchMap(([oPoolChain, _]) =>
-    FP.pipe(
-      oPoolChain,
-      O.map((chain) =>
-        FP.pipe(
-          liveData.sequenceT(withdrawFeeByChain$(chain), withdrawFeeByChain$('THOR')),
-          liveData.map(([asset, thor]) => ({
-            thorMemo: thor,
-            thorOut: baseAmount(thor.amount().times(3)),
-            assetOut: baseAmount(asset.amount().times(3))
-          }))
-        )
-      ),
-      O.getOrElse((): WithdrawFeesLD => Rx.of(RD.initial))
-    )
-  )
-)
+const withdrawFee$ = (asset: Asset, percent: number): FeeLD => {
+  // percent needs to be mulitplied by 100  to transform into "points"
+  // ^ needed by `getWithdrawMemo`
+  const memo = getWithdrawMemo(asset, percent * 100)
+  return withdrawFeeByChain$(asset.chain, memo)
+}
 
-export { reloadWithdrawFees, withdrawFees$ }
+export { reloadWithdrawFee, withdrawFee$ }

@@ -107,7 +107,7 @@ export const ReloadFeeButton = styled(UIButton).attrs({
   margin-right: 10px;
 `
 
-export const AsymExtraContainer = styled('div')`
+export const ExtraContainer = styled('div')`
   display: flex;
   flex-direction: column;
   align-items: center;
