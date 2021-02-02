@@ -1,11 +1,9 @@
 import { PoolSharesMessage } from '../types'
 
 const poolShares: PoolSharesMessage = {
-  'poolshares.pool': 'Pool - DE',
-  'poolshares.ownership': 'Ownership - DE',
-  'poolshares.value': 'Value - DE',
-  'poolshares.stakeinfo': 'RuneStake.Info - DE',
-  'poolshares.datainfo': 'RuneData.Info - DE'
+  'poolshares.pool': 'Pool',
+  'poolshares.ownership': 'Anteil',
+  'poolshares.value': 'Wert'
 }
 
 export default poolShares

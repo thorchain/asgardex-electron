@@ -24,7 +24,7 @@ export const PoolShares: React.FC<Props> = ({ data, goToStakeInfo, goToDataInfo 
     () => ({
       key: 'icon',
       title: '',
-      width: 120,
+      width: 90,
       render: ({ asset }: PoolShare) => (
         <Row justify="center" align="middle">
           <AssetIcon asset={asset} size="normal" />
@@ -68,23 +68,23 @@ export const PoolShares: React.FC<Props> = ({ data, goToStakeInfo, goToDataInfo 
   const stakeInfoColumn: ColumnType<PoolShare> = useMemo(
     () => ({
       key: 'stakeInfo',
-      title: intl.formatMessage({ id: 'poolshares.stakeinfo' }),
+      title: 'RUNEStake.info',
       responsive: ['md'],
       align: 'left',
       render: ({ asset }: PoolShare) => <H.StakeInfo goToStakeInfo={() => goToStakeInfo(asset)} />
     }),
-    [goToStakeInfo, intl]
+    [goToStakeInfo]
   )
 
   const dataInfoColumn: ColumnType<PoolShare> = useMemo(
     () => ({
       key: 'dataInfo',
-      title: intl.formatMessage({ id: 'poolshares.datainfo' }),
+      title: 'RUNEData.info',
       responsive: ['md'],
       align: 'left',
       render: ({ asset }: PoolShare) => <H.DataInfo goToDataInfo={() => goToDataInfo(asset)} />
     }),
-    [goToDataInfo, intl]
+    [goToDataInfo]
   )
 
   return (
