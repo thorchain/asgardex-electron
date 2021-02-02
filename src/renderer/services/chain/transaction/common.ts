@@ -66,7 +66,7 @@ export const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }
       return txFailure$(`Tx stuff has not been implemented for Polkadot yet`)
     case BCHChain:
       // not available yet
-      return txFailure$(`Tx stuff has not been implemented for Bitcoincash yet`)
+      return txFailure$(`Tx stuff has not been implemented for Bitcoin Cash yet`)
     case LTCChain:
       // not available yet
       return txFailure$(`Tx stuff has not been implemented for Litecoin yet`)
@@ -97,7 +97,7 @@ export const txStatusByChain$ = (txHash: TxHash, chain: Chain): TxLD => {
     case PolkadotChain:
       return failure$(`txStatus$ has not been implemented for Polkadot`)
     case BCHChain:
-      return failure$(`txStatus$ has not been implemented for Bitcoincash`)
+      return failure$(`txStatus$ has not been implemented for Bitcoin Cash`)
     case LTCChain:
       return failure$(`txStatus$ has not been implemented for Litecoin`)
   }

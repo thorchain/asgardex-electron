@@ -1,6 +1,6 @@
 import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { AssetDOT } from '@xchainjs/xchain-polkadot'
-import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRuneNative, AssetLTC, Chain } from '@xchainjs/xchain-util'
+import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRuneNative, AssetLTC, Chain, BCHChain } from '@xchainjs/xchain-util'
 
 import { eqChain } from './fp/eq'
 
@@ -19,8 +19,12 @@ export const getChainAsset = (chain: Chain): Asset => {
     case 'POLKA':
       return AssetDOT
     case 'BCH': {
-      // @todo add BCH support
-      return AssetBTC
+      // @todo @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
+      return {
+        chain: BCHChain,
+        symbol: 'BCH',
+        ticker: 'BCH'
+      }
     }
     case 'LTC': {
       return AssetLTC
