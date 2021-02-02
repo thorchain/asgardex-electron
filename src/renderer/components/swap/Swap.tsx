@@ -32,7 +32,8 @@ import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { SwapFeesRD, SwapState, SwapStateHandler } from '../../services/chain/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
-import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../services/wallet/types'
+import { KeystoreState, NonEmptyWalletBalances, ValidatePasswordHandler } from '../../services/wallet/types'
+import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
@@ -47,6 +48,7 @@ import { getSwapData, assetWithPriceToAsset, pickAssetWithPrice } from './Swap.u
 export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string }
 
 export type SwapProps = {
+  keystore: KeystoreState
   availableAssets: AssetsWithPrice
   sourceAsset: O.Option<Asset>
   targetAsset: O.Option<Asset>
@@ -64,6 +66,7 @@ export type SwapProps = {
 }
 
 export const Swap = ({
+  keystore,
   availableAssets,
   sourceAsset: sourceAssetProp,
   targetAsset: targetAssetProp,
@@ -733,6 +736,12 @@ export const Swap = ({
             )
           )
         )}
+        <Styled.NoteLabel align="center">
+          {!hasImportedKeystore(keystore)
+            ? intl.formatMessage({ id: 'swap.note.nowallet' })
+            : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
+          {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFees} />}
+        </Styled.NoteLabel>
         {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFees} />}
         {targetChainFeeErrorLabel}
       </Styled.SubmitContainer>

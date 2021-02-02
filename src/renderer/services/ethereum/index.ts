@@ -5,7 +5,7 @@ import { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$, g
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
-const { txs$, tx$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
+const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService({ client$, chain: ETHChain })
 
 export {
@@ -19,6 +19,7 @@ export {
   balances$,
   txs$,
   tx$,
+  txStatus$,
   sendTx,
   subscribeTx,
   resetTx,

@@ -9,7 +9,7 @@ import { TxHashLD, ErrorId } from '../wallet/types'
 import { Client$ } from './types'
 import { TransactionService } from './types'
 
-export const createTransactionService: (client$: Client$) => TransactionService = C.transactionServiceFactory
+export const createTransactionService: (client$: Client$) => TransactionService = C.createTransactionService
 
 export const createDepositService = (client$: Client$) => {
   const tx$ = (params: DepositParam): TxHashLD =>

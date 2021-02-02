@@ -21,7 +21,6 @@ import {
   swap$,
   asymDeposit$,
   symDeposit$,
-  txStatus$,
   upgradeBnbRune$
 } from '../services/chain'
 
@@ -46,7 +45,6 @@ type ChainContextValue = {
   swap$: typeof swap$
   asymDeposit$: typeof asymDeposit$
   symDeposit$: typeof symDeposit$
-  txStatus$: typeof txStatus$
   upgradeBnbRune$: typeof upgradeBnbRune$
 }
 
@@ -71,7 +69,6 @@ const initialContext: ChainContextValue = {
   swap$,
   asymDeposit$,
   symDeposit$,
-  txStatus$,
   upgradeBnbRune$
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
