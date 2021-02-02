@@ -11,3 +11,11 @@ export const isEnv = (env: ENV | undefined): env is ENV => !!env
  * @param defaultValue {string} Default value
  */
 export const envOrDefault = (env: ENV | undefined, defaultValue: string) => (isEnv(env) ? env : defaultValue)
+
+/**
+ * Read enabled chains from a given ENV.
+ * @param env {string} ENV
+ */
+export const loadEnabledChains = (env: ENV | undefined) => {
+  return envOrDefault(env, 'THOR,BNB,BTC,ETH').split(',')
+}
