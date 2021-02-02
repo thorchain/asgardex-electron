@@ -15,6 +15,7 @@ import { Swap, SwapProps } from './Swap'
 
 /* Mock all (default) data needed by `Swap` commponent */
 const defaultProps: SwapProps = {
+  keystore: O.none,
   availableAssets: [
     { asset: AssetBTC, priceRune: bn('56851.67420275761') },
     { asset: AssetRuneNative, priceRune: ONE_BN }

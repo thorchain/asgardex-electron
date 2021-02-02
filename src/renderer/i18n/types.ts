@@ -199,6 +199,8 @@ type SwapMessageKey =
   | 'swap.state.error'
   | 'swap.errors.amount.balanceShouldCoverChainFee'
   | 'swap.errors.amount.outputShouldCoverChainFee'
+  | 'swap.note.lockedWallet'
+  | 'swap.note.nowallet'
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 

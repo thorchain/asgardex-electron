@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import * as BNB from '@xchainjs/xchain-binance'
 import * as BTC from '@xchainjs/xchain-bitcoin'
-import { XChainClient } from '@xchainjs/xchain-client'
+import { Fees, XChainClient } from '@xchainjs/xchain-client'
 import * as Cosmos from '@xchainjs/xchain-cosmos'
 import * as ETH from '@xchainjs/xchain-ethereum'
 import * as Litecoin from '@xchainjs/xchain-litecoin'
@@ -23,10 +23,11 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { ZERO_BASE_AMOUNT } from '../../const'
 import { observableState } from '../../helpers/stateHelper'
 import { FeesLD, XChainClient$ } from './types'
 
-const getDefaultFeesByChain = (chain: Chain) => {
+const getDefaultFeesByChain = (chain: Chain): Fees => {
   switch (chain) {
     case BNBChain:
       return BNB.getDefaultFees()
@@ -42,8 +43,13 @@ const getDefaultFeesByChain = (chain: Chain) => {
       // TODO @Veado: Handle network
       return Polkadot.getDefaultFees('testnet')
     case BCHChain:
-      // @todo handle BCH fees
-      return THOR.getDefaultFees()
+      // TODO @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
+      return {
+        type: 'byte',
+        fast: ZERO_BASE_AMOUNT,
+        fastest: ZERO_BASE_AMOUNT,
+        average: ZERO_BASE_AMOUNT
+      }
     case LTCChain:
       return Litecoin.getDefaultFees()
   }

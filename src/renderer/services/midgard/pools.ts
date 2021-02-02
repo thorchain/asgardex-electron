@@ -161,7 +161,7 @@ const createPoolsService = (
           /**
            * Use mocked zero date as midgard v2 does not provide this
            * info yet.
-           * @todo (@thatStrangeGuy) remove dateCreated from target type as we dont use it anywhere
+           * TODO (@thatStrangeGuy) remove dateCreated from target type as we dont use it anywhere
            */
           dateCreated: 0,
           priceRune: poolDetails.assetPrice

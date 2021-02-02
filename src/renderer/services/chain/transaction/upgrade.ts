@@ -12,7 +12,7 @@ import { INITIAL_UPGRADE_RUNE_STATE } from '../../chain/const'
 import { service as midgardService } from '../../midgard/service'
 import { ErrorId } from '../../wallet/types'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../types'
-import { sendTx$, txStatus$ } from './common'
+import { sendTx$, txStatusByChain$ } from './common'
 
 const { pools: midgardPoolsService } = midgardService
 
@@ -68,7 +68,7 @@ export const upgradeBnbRune$ = ({
               steps: { current: 3, total: 3 }
             })
             // 3. check tx finality by polling its tx data
-            return txStatus$(txHash, asset.chain)
+            return txStatusByChain$(txHash, asset.chain)
           }),
           // Update state
           liveData.map(({ hash }) => setState({ ...getState(), status: RD.success(hash) })),

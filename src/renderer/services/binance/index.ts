@@ -7,7 +7,7 @@ import { createLedgerService } from './ledger'
 import { createTransactionService } from './transaction'
 import { subscribeTransfers, miniTickers$ } from './ws'
 
-const { txs$, tx$, subscribeTx, resetTx, txRD$, sendTx } = createTransactionService(client$)
+const { txs$, tx$, txStatus$, subscribeTx, resetTx, txRD$, sendTx } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService({ client$, chain: BNBChain })
 const {
   ledgerAddress$,
@@ -31,6 +31,7 @@ export {
   balances$,
   txs$,
   tx$,
+  txStatus$,
   sendTx,
   subscribeTx,
   resetTx,

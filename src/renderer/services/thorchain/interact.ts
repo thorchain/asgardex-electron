@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { DepositParam } from '@xchainjs/xchain-thorchain'
-import { AssetRuneNative, Chain } from '@xchainjs/xchain-util'
+import { AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -23,8 +23,9 @@ import { InteractParams, InteractState, InteractState$ } from './types'
  * @returns InteractState$ - Observable state to reflect loading status. It provides all data we do need to display
  *
  */
-export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<ApiError, string>) => (
-  getTxStatus: (txHash: string, chain: Chain) => TxLD
+export const createInteractService$ = (
+  sendTx$: (_: DepositParam) => LiveData<ApiError, string>,
+  getTxStatus: (txHash: string) => TxLD
 ) => ({ amount, memo }: InteractParams): InteractState$ => {
   // total of progress
   const total = O.some(100)
@@ -48,8 +49,8 @@ export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<Ap
     liveData.chain((txHash) => {
       // Update state
       setState({ ...getState(), step: 2, txRD: RD.progress({ loaded: 66, total }) })
-      // 2. check tx finality via midgard (not implemented yet)
-      return getTxStatus(txHash, AssetRuneNative.chain)
+      // 2. check tx finality
+      return getTxStatus(txHash)
     }),
     // Update state
     liveData.map(({ hash: txHash }) => setState({ ...getState(), txRD: RD.success(txHash) })),
@@ -66,8 +67,7 @@ export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<Ap
   )
 
   // We do need to fake progress in last step
-  // That's we combine streams `getState$` (state updates) and `timer$` (counter)
-  // Note: `requests$` has to be added to subscribe it once only (it won't do anything otherwise)
+  // Note: `requests$` has to be added to subscribe it once (it won't do anything otherwise)
   return Rx.combineLatest([getState$, requests$]).pipe(
     RxOp.switchMap(([state]) =>
       FP.pipe(
@@ -80,17 +80,18 @@ export const createInteractService$ = (sendTx$: (_: DepositParam) => LiveData<Ap
             FP.pipe(
               // Just a timer used to update loaded state (in pending state only)
               Rx.interval(1500),
-              RxOp.map(
-                (): InteractState =>
-                  FP.pipe(
-                    oProgress,
-                    O.map(({ loaded }) => {
+              RxOp.map(() =>
+                FP.pipe(
+                  oProgress,
+                  O.map(
+                    ({ loaded }): InteractState => {
                       // From 66 to 97 we count progress with small steps, but stop it at 98
                       const updatedLoaded = loaded >= 66 && loaded <= 97 ? ++loaded : loaded
                       return { ...state, txRD: RD.progress({ loaded: updatedLoaded, total }) }
-                    }),
-                    O.getOrElse(() => state)
-                  )
+                    }
+                  ),
+                  O.getOrElse(() => state)
+                )
               )
             ),
           // ignore `failure` state + return same state (no changes)

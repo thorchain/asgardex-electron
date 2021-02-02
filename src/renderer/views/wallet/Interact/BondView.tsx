@@ -13,7 +13,6 @@ import * as RxOp from 'rxjs/operators'
 import { Bond } from '../../../components/interact/forms'
 import { Button } from '../../../components/uielements/button'
 import { ZERO_ASSET_AMOUNT } from '../../../const'
-import { useChainContext } from '../../../contexts/ChainContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqAsset } from '../../../helpers/fp/eq'
@@ -29,8 +28,7 @@ type Props = {
 export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) => {
   const { balancesState$ } = useWalletContext()
   const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
-  const { interactService$ } = useThorchainContext()
-  const { txStatus$ } = useChainContext()
+  const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
   const oSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
@@ -56,8 +54,6 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
       ),
     ZERO_ASSET_AMOUNT
   )
-
-  const interact$ = useMemo(() => interactService$(txStatus$), [interactService$, txStatus$])
 
   const unsubscribeSub = useCallback(() => {
     FP.pipe(
