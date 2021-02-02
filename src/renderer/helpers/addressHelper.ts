@@ -40,7 +40,7 @@ export const getAddressPrefixLength = (chain: Chain, network: string): number =>
     case LTCChain: {
       return getLitecoinPrefix(network).length
     }
-    // @todo @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
+    // TODO @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
     case BCHChain: {
       return 0
     }

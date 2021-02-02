@@ -19,7 +19,7 @@ export const getChainAsset = (chain: Chain): Asset => {
     case 'POLKA':
       return AssetDOT
     case 'BCH': {
-      // @todo @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
+      // TODO @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
       return {
         chain: BCHChain,
         symbol: 'BCH',

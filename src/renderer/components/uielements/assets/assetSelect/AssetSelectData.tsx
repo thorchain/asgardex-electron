@@ -30,7 +30,7 @@ export const AssetSelectData: React.FC<Props> = (props): JSX.Element => {
     showAssetName = true
   } = props
   const formattedPrice = formatBN(price)
-  // @TODO add valid formatters
+  // TODO add valid formatters
   const priceLabel = priceValid && Number(formattedPrice) !== 0 ? `$ ${formattedPrice}` : ''
 
   return (

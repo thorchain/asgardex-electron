@@ -43,7 +43,7 @@ const getDefaultFeesByChain = (chain: Chain): Fees => {
       // TODO @Veado: Handle network
       return Polkadot.getDefaultFees('testnet')
     case BCHChain:
-      // @todo @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
+      // TODO @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
       return {
         type: 'byte',
         fast: ZERO_BASE_AMOUNT,
