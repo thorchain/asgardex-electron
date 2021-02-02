@@ -43,8 +43,10 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const {
     balancesState$,
     reloadBalances,
-    keystoreService: { validatePassword$ }
+    keystoreService: { keystore$, validatePassword$ }
   } = useWalletContext()
+
+  const keystore = useObservableState(keystore$, O.none)
 
   const poolsState = useObservableState(poolsState$, initial)
 
@@ -143,6 +145,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
               return (
                 <Swap
+                  keystore={keystore}
                   validatePassword$={validatePassword$}
                   goToTransaction={goToTransaction}
                   sourceAsset={oSource}
