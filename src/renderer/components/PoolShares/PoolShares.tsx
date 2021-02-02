@@ -39,6 +39,7 @@ export const PoolShares: React.FC<Props> = ({ data, goToStakeInfo, goToDataInfo 
       key: 'pool',
       title: intl.formatMessage({ id: 'poolshares.pool' }),
       align: 'left',
+      responsive: ['md'],
       render: ({ asset }: PoolShare) => <Label>{asset.symbol}</Label>
     }),
     [intl]
