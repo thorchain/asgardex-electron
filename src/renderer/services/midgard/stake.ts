@@ -3,7 +3,6 @@ import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
@@ -29,19 +28,19 @@ const createStakeService = (
   const getStakes$ = (asset: Asset, address: Address): StakersAssetDataLD =>
     FP.pipe(
       api$.pipe(
-        RxOp.map(RD.toOption),
-        RxOp.switchMap(
-          O.fold(
-            () => Rx.EMPTY,
-            (api) =>
-              FP.pipe(
-                api.getMemberDetail({ address }),
-                RxOp.map(({ pools }) => pools),
-                RxOp.map(A.findFirst((poolDetails) => poolDetails.pool === assetToString(asset)))
+        liveData.chain((api) =>
+          FP.pipe(
+            api.getMemberDetail({ address }),
+            RxOp.map(RD.success),
+            liveData.map(({ pools }) => pools),
+            liveData.chain(
+              FP.flow(
+                A.findFirst((poolDetails) => poolDetails.pool === assetToString(asset)),
+                liveData.fromOption(() => Error(`No pool found for ${assetToString(asset)}`))
               )
+            )
           )
         ),
-        RxOp.map(O.fold(() => RD.initial, RD.success)),
         liveData.map((poolDetails) => ({
           asset: poolDetails.pool,
           assetStaked: poolDetails.assetAdded,
