@@ -3,6 +3,7 @@ import React, { useMemo } from 'react'
 import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
 
+import { StakersAssetDataRD } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AddWallet } from '../wallet/add'
@@ -18,15 +19,24 @@ type Tab = {
 
 export type Props = {
   asset: Asset
-  ShareContent: React.ComponentType<{ asset: Asset }>
+  depositData: StakersAssetDataRD
+  ShareContent: React.ComponentType<{ asset: Asset; depositData: StakersAssetDataRD }>
   AsymDepositContent: React.ComponentType<{ asset: Asset }>
   SymDepositContent: React.ComponentType<{ asset: Asset }>
-  WidthdrawContent: React.ComponentType<{ asset: Asset }>
+  WidthdrawContent: React.ComponentType<{ asset: Asset; depositData: StakersAssetDataRD }>
   keystoreState: KeystoreState
 }
 
 export const Deposit: React.FC<Props> = (props) => {
-  const { ShareContent, AsymDepositContent, SymDepositContent, WidthdrawContent, asset, keystoreState } = props
+  const {
+    ShareContent,
+    AsymDepositContent,
+    SymDepositContent,
+    WidthdrawContent,
+    asset,
+    keystoreState,
+    depositData
+  } = props
   const intl = useIntl()
 
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
@@ -47,10 +57,10 @@ export const Deposit: React.FC<Props> = (props) => {
       {
         key: 'withdraw',
         label: intl.formatMessage({ id: 'deposit.withdraw' }),
-        content: <WidthdrawContent asset={asset} />
+        content: <WidthdrawContent asset={asset} depositData={depositData} />
       }
     ],
-    [intl, asset, AsymDepositContent, SymDepositContent, WidthdrawContent]
+    [intl, asset, AsymDepositContent, SymDepositContent, WidthdrawContent, depositData]
   )
 
   return (
@@ -63,7 +73,7 @@ export const Deposit: React.FC<Props> = (props) => {
             </Styled.DepositContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper>
-                <ShareContent asset={asset} />
+                <ShareContent asset={asset} depositData={depositData} />
               </Styled.ShareContentWrapper>
             </Styled.ShareContentCol>
           </>
