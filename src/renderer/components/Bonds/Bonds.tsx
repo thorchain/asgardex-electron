@@ -29,6 +29,7 @@ export const Bonds: React.FC<Props> = ({
   className
 }) => {
   const intl = useIntl()
+  const [form] = Form.useForm()
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
       if (!value) {
@@ -51,13 +52,14 @@ export const Bonds: React.FC<Props> = ({
   const onSubmit = useCallback(
     ({ address }: { address: string }) => {
       addNode(address)
+      form.resetFields()
     },
-    [addNode]
+    [addNode, form]
   )
   return (
     <Styled.Container className={className}>
       <Styled.BondsTable nodes={nodes} removeNode={removeNode} goToNode={goToNode} network={network} />
-      <Styled.Form onFinish={onSubmit}>
+      <Styled.Form onFinish={onSubmit} form={form}>
         <Styled.InputContainer>
           <Styled.InputLabel>{intl.formatMessage({ id: 'bonds.node.enterMessage' })}</Styled.InputLabel>
           <Form.Item name={'address'} rules={[{ required: true, validator: addressValidator }]}>

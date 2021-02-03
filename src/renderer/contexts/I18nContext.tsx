@@ -10,7 +10,9 @@ import * as RxOp from 'rxjs/operators'
 import { STORE_FILES_DEFAULTS } from '../../shared/const'
 import { getMessagesByLocale } from '../i18n'
 import { Locale } from '../i18n/types'
-import { getStorageState$, modifyStorage } from '../services/storage'
+import { common } from '../services/storage'
+
+const { getStorageState$, modifyStorage } = common
 
 type I18nContextValue = {
   locale$: Rx.Observable<Locale>

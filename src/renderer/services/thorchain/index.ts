@@ -4,6 +4,7 @@ import { reloadBalances, balances$ } from './balances'
 import { client$, address$, getExplorerTxUrl$, getExplorerAddressUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
+import { getNodeInfo$ } from './thorNode'
 import { createDepositService, createTransactionService } from './transaction'
 
 const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
@@ -28,5 +29,6 @@ export {
   getExplorerTxUrl$,
   getExplorerAddressUrl$,
   sendDepositTx,
-  interact$
+  interact$,
+  getNodeInfo$
 }
