@@ -277,13 +277,11 @@ export const AsymDeposit: React.FC<Props> = (props) => {
   }, [intl, asset, depositState, assetAmountToDeposit])
 
   const onCloseTxModal = useCallback(() => {
-    // unsubscribe
-    unsubscribeDepositSub()
     // reset deposit$ subscription
     setDepositSub(O.none)
     // reset deposit states
     setDepositState(INITIAL_ASYM_DEPOSIT_STATE)
-  }, [setDepositSub, unsubscribeDepositSub])
+  }, [setDepositSub])
 
   const onFinishTxModal = useCallback(() => {
     // Do same things as with closing
@@ -340,18 +338,14 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     )
   }, [depositState, viewAssetTx, txModalExtraContent, onCloseTxModal, onFinishTxModal, depositStartTime, intl])
 
-  const closePasswordModal = useCallback(() => {
-    setShowPasswordModal(false)
-  }, [setShowPasswordModal])
-
   const onClosePasswordModal = useCallback(() => {
     // close password modal
-    closePasswordModal()
-  }, [closePasswordModal])
+    setShowPasswordModal(false)
+  }, [])
 
   const onSucceedPasswordModal = useCallback(() => {
     // close private modal
-    closePasswordModal()
+    setShowPasswordModal(false)
 
     // set start time
     setDepositStartTime(Date.now())
@@ -372,7 +366,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
         return true
       })
     )
-  }, [closePasswordModal, oMemo, deposit$, asset, oPoolAddress, assetAmountToDeposit, setDepositSub])
+  }, [oMemo, deposit$, asset, oPoolAddress, assetAmountToDeposit, setDepositSub])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>

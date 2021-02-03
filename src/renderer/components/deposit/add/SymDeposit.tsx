@@ -92,7 +92,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const [selectedInput, setSelectedInput] = useState<SelectedInput>('none')
 
   // (Possible) subscription of `xyzDeposit$`
-  // DON'T use `_setDepositSubUnsafe` to update state (it's unsafe) - use `setDepositSub`!!
+  // DON'T use `_setDepositSub` to update state (it's unsafe) - use `setDepositSub`!!
   const [depositSub, _setDepositSub] = useState<O.Option<Rx.Subscription>>(O.none)
 
   // unsubscribe deposit$ subscription
@@ -468,20 +468,22 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
 
     const extraResult = (
-      <Styled.AsymExtraContainer>
+      <Styled.ExtraContainer>
         {FP.pipe(symDepositTxs.rune, RD.toOption, (oTxHash) => (
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
             onClick={viewRuneTx}
-            // TODO (@Veado) Add i18n
-            label={`View ${AssetRuneNative.symbol} transaction`}
+            label={intl.formatMessage({ id: 'common.tx.view' }, { assetSymbol: AssetRuneNative.symbol })}
           />
         ))}
         {FP.pipe(symDepositTxs.asset, RD.toOption, (oTxHash) => (
-          // TODO (@Veado) Add i18n
-          <ViewTxButton txHash={oTxHash} onClick={viewAssetTx} label={`View ${asset.symbol} transaction`} />
+          <ViewTxButton
+            txHash={oTxHash}
+            onClick={viewAssetTx}
+            label={intl.formatMessage({ id: 'common.tx.view' }, { assetSymbol: asset.symbol })}
+          />
         ))}
-      </Styled.AsymExtraContainer>
+      </Styled.ExtraContainer>
     )
 
     return (

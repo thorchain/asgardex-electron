@@ -41,16 +41,17 @@ const deposit: DepositMessages = {
   'deposit.wallet.add': 'Wallet hinzufügen',
   'deposit.wallet.connect': 'Bitte verbinde Deine Wallet',
   'deposit.pool.noDeposit': 'Du hast keine Anteile in diesem Pool',
+  'deposit.withdraw.pending': 'Auszahlen',
+  'deposit.withdraw.success': 'Erfolgreich ausgezahlt',
+  'deposit.withdraw.error': 'Error beim Auszahlen',
   'deposit.withdraw.title': 'Auszahlung anpassen',
   'deposit.withdraw.choseText': 'Wähle einen Betrag zwischen 0 und 100% zum Auszahlen',
   'deposit.withdraw.receiveText': 'Du solltest erhalten',
   'deposit.withdraw.fees': 'Transaktionsgebühr: {thorMemo}, Auszahlungsgebühren: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Hinweis: {fee} werden für die Transaktionsgebühr in Deiner Wallet belassen',
   'deposit.withdraw.drag': 'Ziehen um Auszuzahlen',
-  'deposit.withdraw.add.error.thorMemoFeeNotCovered':
-    'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
-  'deposit.withdraw.add.error.outFeeNotCovered':
-    'Auszahlungsgebühr in Höhe von {fee} ist nicht über den zu erwartenen Auszahlungsbetrag (momentan {amount}) gedeckt'
+  'deposit.withdraw.error.feeNotCovered':
+    'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.'
 }
 
 export default deposit
