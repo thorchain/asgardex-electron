@@ -10,7 +10,6 @@ import { useParams } from 'react-router-dom'
 import { Deposit } from '../../components/deposit/Deposit'
 import { ErrorView } from '../../components/shared/error'
 import { BackLink } from '../../components/uielements/backLink'
-import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { DepositRouteParams } from '../../routes/deposit'
@@ -26,13 +25,9 @@ export const DepositView: React.FC<Props> = (_) => {
 
   const { asset } = useParams<DepositRouteParams>()
   const {
-    service: {
-      setSelectedPoolAsset,
-      stake: { setAddress }
-    }
+    service: { setSelectedPoolAsset }
   } = useMidgardContext()
   const { keystoreService } = useWalletContext()
-  const { address$ } = useBinanceContext()
 
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
 
@@ -48,12 +43,6 @@ export const DepositView: React.FC<Props> = (_) => {
   // and `AddWallet` would be rendered for the first time,
   // before a check of `keystoreState` can be done
   const keystoreState = useObservableState(keystoreService.keystore$, undefined)
-
-  const walletAddress = useObservableState(address$, O.none)
-
-  useEffect(() => {
-    setAddress(walletAddress)
-  }, [setAddress, walletAddress])
 
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)

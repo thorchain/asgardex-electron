@@ -207,6 +207,6 @@ export const service = {
   apiEndpoint$: byzantine$,
   reloadApiEndpoint: reloadByzantine,
   pools: createPoolsService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
-  stake: createStakeService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
+  stake: createStakeService(byzantine$, getMidgardDefaultApi),
   validateNode$
 }
