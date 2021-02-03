@@ -40,9 +40,9 @@ const deposit: DepositMessages = {
   'deposit.wallet.add': 'Добавить',
   'deposit.wallet.connect': 'Пожалуйсста добавьте свой кошелек',
   'deposit.pool.noDeposit': 'У вас нет доли в этом пуле',
-  'deposit.withdraw.pending': 'Withdraw - RU',
-  'deposit.withdraw.success': 'Successful withdraw - RU',
-  'deposit.withdraw.error': 'Withdraw error - RU',
+  'deposit.withdraw.pending': 'Изъять',
+  'deposit.withdraw.success': 'Успешно узъяли',
+  'deposit.withdraw.error': 'Ошибка при изъятии',
   'deposit.withdraw.title': 'Установить вывод',
   'deposit.withdraw.choseText': 'Выберите сколько вы хотите изять от 0% до 100%',
   'deposit.withdraw.receiveText': 'Вы полчучите',
@@ -50,7 +50,7 @@ const deposit: DepositMessages = {
   'deposit.withdraw.feeNote': 'Важно: {fee} BNB останется на вашем кошельке для покрытия комисий.',
   'deposit.withdraw.drag': 'Перетащите для изъявтия',
   'deposit.withdraw.error.feeNotCovered':
-    'Transaction fee of {fee} needs to be covered by your balance (currently {balance}) - RU'
+    'Комиссия транзакции {fee} должна покрываться вашим балансом (баланс: {balance})'
 }
 
 export default deposit

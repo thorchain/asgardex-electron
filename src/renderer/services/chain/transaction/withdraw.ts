@@ -24,7 +24,7 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * 2. Send withdraw transaction
  * 3. Check status of both transactions
  *
- * @returns WithdrawState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
+ * @returns WithdrawState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModal`
  *
  */
 export const withdraw$ = ({ poolAddress: oPoolAddress, asset, memo, network }: WithdrawParams): WithdrawState$ => {
