@@ -4,8 +4,8 @@ import * as RD from '@devexperts/remote-data-ts'
 import { getWithdrawMemo } from '@thorchain/asgardex-util'
 import {
   Asset,
-  assetAmount,
   AssetRuneNative,
+  baseAmount,
   BaseAmount,
   baseToAsset,
   Chain,
@@ -125,17 +125,17 @@ export const Withdraw: React.FC<Props> = ({
     }
   }, [unsubscribeWithdrawSub])
 
-  const feeLD: FeeLD = useMemo(
-    () =>
-      Rx.of(memo).pipe(
-        // Memo depends on changing `withdrawPercent`
-        // that's why we add a debounce to avoid many requests for fees
-        RxOp.debounceTime(500),
-        // Currently we send Rune txs only - it will be changed as soon as we support asym. withdraw
-        RxOp.switchMap((_) => fee$(AssetRuneNative.chain, memo))
-      ),
-    [fee$, memo]
-  )
+  // TODO (@Veado) Use following logic for asym. withdraw only (see https://github.com/thorchain/asgardex-electron/issues/827)
+  // For sym. withdraw we do need to get fees only once (THORChain tx fee does not depend on memo)
+  const feeLD: FeeLD = useMemo(() => {
+    return Rx.of(memo).pipe(
+      // Memo depends on changing `withdrawPercent`
+      // that's why we delay it to avoid many requests for fees
+      RxOp.delay(800),
+      // Currently we send Rune txs only - it will be changed as soon as we support asym. withdraw
+      RxOp.switchMap((_) => fee$(AssetRuneNative.chain, memo))
+    )
+  }, [fee$, memo])
 
   const feeRD: FeeRD = useObservableState(feeLD, RD.initial)
   const oFee: O.Option<BaseAmount> = useMemo(() => RD.toOption(feeRD), [feeRD])
@@ -195,7 +195,6 @@ export const Withdraw: React.FC<Props> = ({
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
       intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: AssetRuneNative.symbol }),
-      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: asset.symbol }),
       intl.formatMessage({ id: 'common.tx.checkResult' })
     ]
     const stepDescription = FP.pipe(
@@ -314,7 +313,8 @@ export const Withdraw: React.FC<Props> = ({
     setDepositStartTime(Date.now())
 
     const sub = withdraw$({
-      asset,
+      // TODO @veado Use asset for asym withdraw - see https://github.com/thorchain/asgardex-electron/issues/827
+      asset: AssetRuneNative,
       poolAddress: oPoolAddress,
       network,
       memo
@@ -322,7 +322,7 @@ export const Withdraw: React.FC<Props> = ({
 
     // store subscription - needed to unsubscribe while unmounting
     setWithdrawSub(O.some(sub))
-  }, [closePasswordModal, withdraw$, asset, oPoolAddress, network, memo, setWithdrawSub])
+  }, [closePasswordModal, withdraw$, oPoolAddress, network, memo, setWithdrawSub])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
@@ -339,6 +339,7 @@ export const Withdraw: React.FC<Props> = ({
 
   return (
     <Styled.Container>
+      <div>memo: {memo}</div>
       <Label weight="bold" textTransform="uppercase">
         {intl.formatMessage({ id: 'deposit.withdraw.title' })}
       </Label>
@@ -348,7 +349,7 @@ export const Withdraw: React.FC<Props> = ({
         key={'asset amount slider'}
         value={withdrawPercent}
         onChange={setWithdrawPercent}
-        disabled={false}
+        disabled={disabled}
       />
       <Label weight={'bold'} textTransform={'uppercase'}>
         {intl.formatMessage({ id: 'deposit.withdraw.receiveText' })}
@@ -365,7 +366,7 @@ export const Withdraw: React.FC<Props> = ({
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(AssetRuneNative, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: assetAmount(runeAmountToWithdraw.amount().times(runePrice)),
+              amount: baseToAsset(baseAmount(runeAmountToWithdraw.amount().times(runePrice))),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}
@@ -383,7 +384,7 @@ export const Withdraw: React.FC<Props> = ({
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(asset, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: assetAmount(assetAmountToWithdraw.amount().times(assetPrice)),
+              amount: baseToAsset(baseAmount(assetAmountToWithdraw.amount().times(assetPrice))),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}
