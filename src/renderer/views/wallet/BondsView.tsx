@@ -1,12 +1,12 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
+import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
@@ -18,7 +18,7 @@ import { AddressValidation } from '../../services/bitcoin/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 
 export const BondsView: React.FC = (): JSX.Element => {
-  const { client$ } = useThorchainContext()
+  const { client$, getNodeInfo$ } = useThorchainContext()
   const { userNodes$, addNodeAddress, removeNodeByAddress } = useUserNodesContext()
 
   const oClient = useObservableState<O.Option<ThorchainClient>>(client$, O.none)
@@ -46,26 +46,43 @@ export const BondsView: React.FC = (): JSX.Element => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const nodes$ = useMemo(
+  const userNodes = useObservableState(userNodes$, [])
+
+  const nodeInfoCacheRef = useRef<Record<Address, ReturnType<typeof getNodeInfo$>>>({})
+
+  const nodesInfo$ = useMemo(
     () =>
       FP.pipe(
-        userNodes$,
-        RxOp.map(
-          A.map((nodeAddress) => ({
-            nodeAddress,
-            data: RD.initial
-          }))
-        )
+        userNodes,
+        A.map((node) => {
+          // Store previously created stream to avoid re-creating it in case if userNodes was changed
+          if (!nodeInfoCacheRef.current[node]) {
+            nodeInfoCacheRef.current[node] = FP.pipe(
+              getNodeInfo$(node, network),
+              /**
+               * if `userNodes` changed here will be new stream created by combineLatest
+               * cache with shareReplay(1) allows to avoid re-requesting data
+               */
+              RxOp.shareReplay(1)
+            )
+          }
+          return FP.pipe(
+            nodeInfoCacheRef.current[node],
+            RxOp.map((data) => ({ data, nodeAddress: node }))
+          )
+        }),
+        // Combine resulted Array<Observable> to Observable<Array>
+        (nodesInfo) => Rx.combineLatest(nodesInfo)
       ),
-    [userNodes$]
+    [userNodes, getNodeInfo$, network]
   )
 
-  const nodes = useObservableState(nodes$, [])
+  const nodesInfo = useObservableState(nodesInfo$, [])
 
   return (
     <Bonds
       addressValidation={validateAddress}
-      nodes={nodes}
+      nodes={nodesInfo}
       removeNode={removeNodeByAddress}
       goToNode={goToNode}
       network={network}
