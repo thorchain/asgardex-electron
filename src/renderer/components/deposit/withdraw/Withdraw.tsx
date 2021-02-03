@@ -293,7 +293,7 @@ export const Withdraw: React.FC<Props> = ({
         key={'asset amount slider'}
         value={withdrawPercent}
         onChange={setWithdrawPercent}
-        disabled={disabledForm}
+        disabled={disabled}
       />
       <Label weight={'bold'} textTransform={'uppercase'}>
         {intl.formatMessage({ id: 'deposit.withdraw.receiveText' })}
