@@ -18,7 +18,7 @@ describe('poolShareHelpers', () => {
   })
 
   it('getPoolShare', () => {
-    expect(getPoolShare({ units: '3' }, {})).toEqual(ZERO_BN)
+    expect(getPoolShare({ units: '0' }, { units: '6' })).toEqual(ZERO_BN)
 
     expect(getPoolShare({ units: '3' }, { units: '6' })).toEqual(bn(50))
   })

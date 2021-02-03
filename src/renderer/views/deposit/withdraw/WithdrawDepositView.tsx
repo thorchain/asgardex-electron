@@ -156,25 +156,22 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       PoolData,
       PoolData
     ]) => (
-      <>
-        <div>depositData: {JSON.stringify(depositData)}</div>
-        <Withdraw
-          // currently we support sym withdraw only - asym will be added later
-          type={'sym'}
-          assetPrice={assetPrice}
-          assetPoolData={assetPoolData}
-          runePrice={runePrice}
-          chainAssetPoolData={chainAssetPoolData}
-          runeBalance={runeBalance}
-          selectedPriceAsset={selectedPriceAsset}
-          onWithdraw={console.log}
-          runeShare={shareHelpers.getRuneShare(depositData, poolDetail)}
-          assetShare={shareHelpers.getAssetShare(depositData, poolDetail)}
-          asset={asset}
-          fees={fees}
-          reloadFees={reloadWithdrawFees}
-        />
-      </>
+      <Withdraw
+        // currently we support sym withdraw only - asym will be added later
+        type={'sym'}
+        assetPrice={assetPrice}
+        assetPoolData={assetPoolData}
+        runePrice={runePrice}
+        chainAssetPoolData={chainAssetPoolData}
+        runeBalance={runeBalance}
+        selectedPriceAsset={selectedPriceAsset}
+        onWithdraw={console.log}
+        runeShare={shareHelpers.getRuneShare(depositData, poolDetail)}
+        assetShare={shareHelpers.getAssetShare(depositData, poolDetail)}
+        asset={asset}
+        fees={fees}
+        reloadFees={reloadWithdrawFees}
+      />
     ),
     [runePrice, runeBalance, asset, fees, reloadWithdrawFees]
   )

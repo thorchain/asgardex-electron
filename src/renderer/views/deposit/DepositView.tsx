@@ -1,18 +1,23 @@
 import React, { useEffect, useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { assetFromString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
+import * as Rx from 'rxjs'
 
 import { Deposit } from '../../components/deposit/Deposit'
 import { ErrorView } from '../../components/shared/error'
 import { BackLink } from '../../components/uielements/backLink'
+import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { DepositRouteParams } from '../../routes/deposit'
+import { StakersAssetDataLD, StakersAssetDataRD } from '../../services/midgard/types'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
 import { ShareView } from './share/ShareView'
@@ -25,7 +30,10 @@ export const DepositView: React.FC<Props> = (_) => {
 
   const { asset } = useParams<DepositRouteParams>()
   const {
-    service: { setSelectedPoolAsset }
+    service: {
+      setSelectedPoolAsset,
+      stake: { getStakes$ }
+    }
   } = useMidgardContext()
   const { keystoreService } = useWalletContext()
 
@@ -36,6 +44,39 @@ export const DepositView: React.FC<Props> = (_) => {
   useEffect(() => {
     setSelectedPoolAsset(oSelectedAsset)
   }, [oSelectedAsset, setSelectedPoolAsset])
+
+  const { addressByChain$ } = useChainContext()
+
+  const address$ = useMemo(
+    () =>
+      FP.pipe(
+        oSelectedAsset,
+        O.fold(
+          () => Rx.EMPTY,
+          ({ chain }) => addressByChain$(chain)
+        )
+      ),
+
+    [addressByChain$, oSelectedAsset]
+  )
+  const oAssetWalletAddress = useObservableState(address$, O.none)
+
+  /**
+   * We have to get a new stake-stream for every new asset
+   * @description /src/renderer/services/midgard/stake.ts
+   */
+  const depositData$: StakersAssetDataLD = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(oSelectedAsset, oAssetWalletAddress),
+        O.fold(
+          () => Rx.EMPTY,
+          ([asset, address]) => getStakes$(asset, address)
+        )
+      ),
+    [getStakes$, oAssetWalletAddress, oSelectedAsset]
+  )
+  const depositData = useObservableState<StakersAssetDataRD>(depositData$, RD.initial)
 
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`
@@ -69,6 +110,7 @@ export const DepositView: React.FC<Props> = (_) => {
           (selectedAsset) => (
             <Deposit
               asset={selectedAsset}
+              depositData={depositData}
               keystoreState={keystoreState}
               ShareContent={ShareView}
               SymDepositContent={SymDepositView}

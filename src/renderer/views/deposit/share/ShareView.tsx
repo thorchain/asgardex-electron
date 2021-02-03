@@ -8,53 +8,24 @@ import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 
 import { PoolShare } from '../../../components/uielements/poolShare'
-import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
-import {
-  PoolDetailRD,
-  StakersAssetData,
-  StakersAssetDataRD,
-  PoolDetail,
-  StakersAssetDataLD
-} from '../../../services/midgard/types'
+import { PoolDetailRD, StakersAssetData, PoolDetail, StakersAssetDataRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import * as Styled from './ShareView.styles'
 
-export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
+type Props = { asset: Asset; depositData: StakersAssetDataRD }
+
+export const ShareView: React.FC<Props> = ({ asset, depositData }) => {
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$ },
-    stake: { getStakes$ }
+    pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$ }
   } = midgardService
 
   const intl = useIntl()
-
-  const { addressByChain$ } = useChainContext()
-
-  const address$ = useMemo(() => addressByChain$(asset.chain), [addressByChain$, asset.chain])
-  const oAssetWalletAddress = useObservableState(address$, O.none)
-
-  /**
-   * We have to get a new stake-stream for every new asset
-   * @description /src/renderer/services/midgard/stake.ts
-   */
-  const depositData$: StakersAssetDataLD = useMemo(
-    () =>
-      FP.pipe(
-        oAssetWalletAddress,
-        O.fold(
-          () => Rx.EMPTY,
-          (address) => getStakes$(asset, address)
-        )
-      ),
-    [asset, getStakes$, oAssetWalletAddress]
-  )
-  const depositData = useObservableState<StakersAssetDataRD>(depositData$, RD.initial)
 
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
@@ -109,7 +80,7 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
         )
       ),
 
-    [poolDetailRD, renderPoolShareReady, depositData, renderNoShare]
+    [depositData, poolDetailRD, renderNoShare, renderPoolShareReady]
   )
 
   return renderPoolShare
