@@ -1,10 +1,11 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
 import {
   Asset,
+  AssetBNB,
   assetFromString,
   baseAmount,
   baseToAsset,
@@ -32,14 +33,19 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const {
     pools: { poolsState$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
     reloadNetworkInfo,
+    setSelectedPoolAsset,
     stake: { getStakes$ }
   } = midgardService
 
+  useEffect(() => {
+    setSelectedPoolAsset(O.of(AssetBNB))
+  }, [setSelectedPoolAsset])
+
+  const [stakeData] = useObservableState<StakersAssetDataRD>(getStakes$, RD.initial)
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
   const priceAsset = FP.pipe(oPriceAsset, O.toUndefined)
-  const [stakeData] = useObservableState<StakersAssetDataRD>(getStakes$, RD.initial)
 
   // store previous data of pools to render these while reloading
   const previousPoolShares = useRef<O.Option<PoolShare[]>>(O.none)
