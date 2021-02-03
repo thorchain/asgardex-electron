@@ -10,13 +10,13 @@ export const Default: Story = () => {
   const mockData: PoolShare[] = [
     {
       asset: AssetBNB,
-      ownership: 1.21,
-      value: 1245
+      ownership: '1.21',
+      value: '$1245'
     },
     {
       asset: AssetBTC,
-      ownership: 1.21,
-      value: 1245
+      ownership: '1.21',
+      value: '$1245'
     }
   ]
 
