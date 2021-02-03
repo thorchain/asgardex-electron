@@ -16,6 +16,7 @@ import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useUserNodesContext } from '../../contexts/UserNodesContext'
 import { AddressValidation } from '../../services/bitcoin/types'
 import { DEFAULT_NETWORK } from '../../services/const'
+import { NodeInfoLD } from '../../services/thorchain/types'
 
 export const BondsView: React.FC = (): JSX.Element => {
   const { client$, getNodeInfo$ } = useThorchainContext()
@@ -48,7 +49,7 @@ export const BondsView: React.FC = (): JSX.Element => {
 
   const userNodes = useObservableState(userNodes$, [])
 
-  const nodeInfoCacheRef = useRef<Record<Address, ReturnType<typeof getNodeInfo$>>>({})
+  const nodeInfoCacheRef = useRef<Record<Address, NodeInfoLD>>({})
 
   const nodesInfo$ = useMemo(
     () =>

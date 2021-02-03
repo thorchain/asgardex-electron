@@ -7,6 +7,7 @@ import * as RxAjax from 'rxjs/ajax'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { ErrorId } from '../wallet/types'
@@ -67,8 +68,8 @@ const getNodeInfo$ = (node: Address, network: Network): NodeInfoLD =>
       )
     ),
     liveData.map((nodeData: NodeInfoResponse) => ({
-      bond: baseAmount(nodeData.bond),
-      award: baseAmount(nodeData.current_award),
+      bond: baseAmount(nodeData.bond, THORCHAIN_DECIMAL),
+      award: baseAmount(nodeData.current_award, THORCHAIN_DECIMAL),
       status: getNodeStatusByString(nodeData.status)
     })),
     // As we dont have response validation yet just try to handle any issues occured

@@ -3,11 +3,12 @@ import * as A from 'fp-ts/Array'
 import { eqString } from 'fp-ts/Eq'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
+import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { getStorageState$, getStorageState, modifyStorage } from './storage'
 
-const userNodes$ = FP.pipe(
+const userNodes$: Rx.Observable<Address[]> = FP.pipe(
   getStorageState$,
   RxOp.map(
     FP.flow(
