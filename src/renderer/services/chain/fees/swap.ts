@@ -11,7 +11,9 @@ import {
   BaseAmount,
   ETHChain,
   CosmosChain,
-  PolkadotChain
+  PolkadotChain,
+  BCHChain,
+  LTCChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
@@ -55,6 +57,12 @@ const feesByChain$ = (chain: Chain, memo?: Memo): FeesLD => {
 
     case PolkadotChain:
       return Rx.of(RD.failure(Error('Polkadot fees is not implemented yet')))
+
+    case BCHChain:
+      return Rx.of(RD.failure(Error('Bitcoincash fees is not implemented yet')))
+
+    case LTCChain:
+      return Rx.of(RD.failure(Error('Litecoin fees is not implemented yet')))
   }
 }
 

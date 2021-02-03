@@ -161,3 +161,7 @@ export const ErrorLabel = styled(UILabel)`
 export const BalanceErrorLabel = styled(ErrorLabel)`
   text-align: left;
 `
+
+export const NoteLabel = styled(UILabel)`
+  color: ${palette('gray', 2)};
+`

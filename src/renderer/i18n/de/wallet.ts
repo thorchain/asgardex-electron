@@ -3,6 +3,7 @@ import { WalletMessages } from '../types'
 const wallet: WalletMessages = {
   'wallet.nav.deposits': 'Deposits',
   'wallet.nav.bonds': 'Bonds',
+  'wallet.nav.poolshares': 'Poolanteile',
   'wallet.column.name': 'Name',
   'wallet.column.ticker': 'Ticker',
   'wallet.column.balance': 'Saldo',

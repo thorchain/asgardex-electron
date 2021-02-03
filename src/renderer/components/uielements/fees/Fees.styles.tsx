@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { Button as UIButton } from '../button'
+import { Label as UILabel } from '../label'
 
 export const ReloadFeeButton = styled(UIButton).attrs({
   typevalue: 'outline',
@@ -23,4 +24,9 @@ export const Container = styled('div')`
   display: flex;
   align-items: center;
   color: ${palette('text', 0)};
+`
+
+export const FeeLabel = styled(UILabel)<{ isError?: boolean; isLoading?: boolean }>`
+  color: ${({ isError, isLoading }) =>
+    isError ? palette('error', 0) : isLoading ? palette('gray', 2) : palette('text', 0)};
 `

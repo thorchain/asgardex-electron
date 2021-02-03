@@ -78,6 +78,7 @@ export type PoolsMessages = { [key in PoolsMessageKey]: string }
 type WalletMessageKey =
   | 'wallet.nav.deposits'
   | 'wallet.nav.bonds'
+  | 'wallet.nav.poolshares'
   | 'wallet.column.name'
   | 'wallet.column.ticker'
   | 'wallet.column.balance'
@@ -159,6 +160,10 @@ type BondsMessageKey =
 
 export type BondsMessages = { [key in BondsMessageKey]: string }
 
+type PoolSharesMessageKey = 'poolshares.pool' | 'poolshares.ownership' | 'poolshares.value'
+
+export type PoolSharesMessage = { [key in PoolSharesMessageKey]: string }
+
 type LedgerMessageKey =
   | 'ledger.add.device.error.title'
   | 'ledger.errors.no.device'
@@ -200,6 +205,8 @@ type SwapMessageKey =
   | 'swap.state.error'
   | 'swap.errors.amount.balanceShouldCoverChainFee'
   | 'swap.errors.amount.outputShouldCoverChainFee'
+  | 'swap.note.lockedWallet'
+  | 'swap.note.nowallet'
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
@@ -264,7 +271,8 @@ export type Messages = CommonMessages &
   SwapMessages &
   DepositMessages &
   LedgerMessages &
-  BondsMessages
+  BondsMessages &
+  PoolSharesMessage
 
 export enum Locale {
   EN = 'en',

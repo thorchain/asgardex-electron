@@ -46,6 +46,10 @@ const withdrawFee$ = (chain: Chain, memo: Memo): FeeLD => {
       return Rx.of(RD.failure(Error(`Withdraw fee for Cosmos has not been implemented`)))
     case 'POLKA':
       return Rx.of(RD.failure(Error(`Withdraw fee for Polkadot has not been implemented`)))
+    case 'BCH':
+      return Rx.of(RD.failure(Error(`Withdraw fee for Bitcoin Cash has not been implemented`)))
+    case 'LTC':
+      return Rx.of(RD.failure(Error(`Withdraw fee for Litecoin has not been implemented`)))
   }
 }
 

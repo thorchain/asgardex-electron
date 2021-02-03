@@ -1,4 +1,14 @@
-import { BNBChain, BTCChain, Chain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
+import {
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  ETHChain,
+  PolkadotChain,
+  THORChain,
+  BCHChain,
+  LTCChain
+} from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
@@ -24,6 +34,10 @@ const addressByChain$ = (chain: Chain): Address$ => {
     case PolkadotChain:
       return Rx.of(O.none)
     case CosmosChain:
+      return Rx.of(O.none)
+    case BCHChain:
+      return Rx.of(O.none)
+    case LTCChain:
       return Rx.of(O.none)
   }
 }

@@ -51,6 +51,13 @@ export const assets: Route<void> = {
   }
 }
 
+export const poolShares: Route<void> = {
+  template: `${base.template}/poolshares`,
+  path() {
+    return this.template
+  }
+}
+
 export type DepositParams = { walletAddress: string }
 export const deposit: Route<DepositParams> = {
   template: `${base.template}/deposit/:walletAddress`,
