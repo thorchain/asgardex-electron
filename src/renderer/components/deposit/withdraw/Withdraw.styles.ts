@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { media } from '../../../helpers/styleHelper'
 import { AssetIcon as AssetIconBase } from '../../uielements/assets/assetIcon'
+import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
 import { Drag as BaseDrag } from '../../uielements/drag'
 import { Label as UILabel } from '../../uielements/label'
 import { Slider as BaseSlider } from '../../uielements/slider'

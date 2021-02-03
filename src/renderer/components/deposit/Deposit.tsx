@@ -16,7 +16,7 @@ type Tab = {
   content: JSX.Element
 }
 
-type Props = {
+export type Props = {
   asset: Asset
   ShareContent: React.ComponentType<{ asset: Asset }>
   AsymDepositContent: React.ComponentType<{ asset: Asset }>

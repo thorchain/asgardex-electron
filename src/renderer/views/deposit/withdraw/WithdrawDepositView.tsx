@@ -10,14 +10,17 @@ import { useObservableState } from 'observable-hooks'
 import { map } from 'rxjs/operators'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../../shared/api/types'
 import { Withdraw } from '../../../components/deposit/withdraw'
-import { ZERO_BASE_AMOUNT, ZERO_BN, ZERO_POOL_DATA } from '../../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
+import { DEFAULT_NETWORK } from '../../../services/const'
 import {
   PoolDetailRD,
   StakersAssetData,
@@ -41,9 +44,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { withdrawFees$, reloadWithdrawFees, symWithdraw$, getExplorerUrlByAsset$ } = useChainContext()
-
-  const fees = useObservableState(withdrawFees$, RD.initial)
+  const { withdrawFee$, reloadWithdrawFees, symWithdraw$, getExplorerUrlByAsset$ } = useChainContext()
 
   const runePrice = useObservableState(priceRatio$, bn(1))
 
@@ -112,19 +113,6 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     [balances]
   )
 
-  const getAssetExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(asset), [asset, getExplorerUrlByAsset$])
-  const assetExplorerUrl = useObservableState(getAssetExplorerUrl$, O.none)
-
-  const viewAssetTx = useCallback(
-    (txHash: string) => {
-      FP.pipe(
-        assetExplorerUrl,
-        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
-      )
-    },
-    [assetExplorerUrl]
-  )
-
   const getRuneExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(AssetRuneNative), [getExplorerUrlByAsset$])
   const runeExplorerUrl = useObservableState(getRuneExplorerUrl$, O.none)
 
@@ -138,46 +126,45 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     [runeExplorerUrl]
   )
 
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
-        fees={fees}
+        fee$={withdrawFee$}
         assetPrice={ZERO_BN}
-        assetPoolData={ZERO_POOL_DATA}
         runePrice={runePrice}
-        chainAssetPoolData={ZERO_POOL_DATA}
         runeBalance={runeBalance}
         selectedPriceAsset={AssetRuneNative}
-        onWithdraw={FP.constVoid}
         shares={{ rune: ZERO_BASE_AMOUNT, asset: ZERO_BASE_AMOUNT }}
         asset={asset}
         reloadFees={reloadWithdrawFees}
         disabled
         poolAddress={O.none}
-        memo={O.none}
         validatePassword$={validatePassword$}
         viewRuneTx={viewRuneTx}
-        viewAssetTx={viewAssetTx}
         reloadBalances={reloadBalances}
         withdraw$={symWithdraw$}
+        network={network}
       />
     ),
     [
-      fees,
+      withdrawFee$,
       runePrice,
       runeBalance,
       asset,
       reloadWithdrawFees,
       validatePassword$,
       viewRuneTx,
-      viewAssetTx,
       reloadBalances,
-      symWithdraw$
+      symWithdraw$,
+      network
     ]
   )
 
   const renderWithdrawReady = useCallback(
-    ([assetPrice, depositData, poolDetail, selectedPriceAsset, assetPoolData, chainAssetPoolData]: [
+    ([assetPrice, depositData, poolDetail, selectedPriceAsset]: [
       BigNumber,
       StakersAssetData,
       PoolDetail,
@@ -187,26 +174,22 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     ]) => (
       <Withdraw
         assetPrice={assetPrice}
-        assetPoolData={assetPoolData}
         runePrice={runePrice}
-        chainAssetPoolData={chainAssetPoolData}
         runeBalance={runeBalance}
         selectedPriceAsset={selectedPriceAsset}
-        onWithdraw={console.log}
         shares={{
           rune: shareHelpers.getRuneShare(depositData, poolDetail),
           asset: shareHelpers.getAssetShare(depositData, poolDetail)
         }}
         asset={asset}
         poolAddress={oPoolAddress}
-        memo={O.none}
-        fees={fees}
+        fee$={withdrawFee$}
         reloadFees={reloadWithdrawFees}
         validatePassword$={validatePassword$}
         viewRuneTx={viewRuneTx}
-        viewAssetTx={viewAssetTx}
         reloadBalances={reloadBalances}
         withdraw$={symWithdraw$}
+        network={network}
       />
     ),
     [
@@ -214,13 +197,13 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       runeBalance,
       asset,
       oPoolAddress,
-      fees,
+      withdrawFee$,
       reloadWithdrawFees,
       validatePassword$,
       viewRuneTx,
-      viewAssetTx,
       reloadBalances,
-      symWithdraw$
+      symWithdraw$,
+      network
     ]
   )
 

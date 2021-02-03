@@ -1,15 +1,14 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { getWithdrawMemo } from '@thorchain/asgardex-util'
-import { Chain, Asset } from '@xchainjs/xchain-util'
+import { Chain } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 
 import { liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as THOR from '../../thorchain'
-import { FeeLD } from '../types'
+import { FeeLD, Memo } from '../types'
 
-const reloadWithdrawFeeByChain = (chain: Chain) => {
+const reloadWithdrawFee = (chain: Chain) => {
   switch (chain) {
     case 'BNB':
       BNB.reloadFees()
@@ -32,9 +31,7 @@ const reloadWithdrawFeeByChain = (chain: Chain) => {
   }
 }
 
-const reloadWithdrawFee = ({ chain }: Asset) => reloadWithdrawFeeByChain(chain)
-
-const withdrawFeeByChain$ = (chain: Chain, memo: string): FeeLD => {
+const withdrawFee$ = (chain: Chain, memo: Memo): FeeLD => {
   switch (chain) {
     case 'BNB':
       return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
@@ -44,19 +41,12 @@ const withdrawFeeByChain$ = (chain: Chain, memo: string): FeeLD => {
     case 'THOR':
       return THOR.fees$().pipe(liveData.map(({ fast }) => fast))
     case 'ETH':
-      return Rx.of(RD.failure(Error(`Deposit fee for ETH has not been implemented`)))
+      return Rx.of(RD.failure(Error(`Withdraw fee for ETH has not been implemented`)))
     case 'GAIA':
-      return Rx.of(RD.failure(Error(`Deposit fee for Cosmos has not been implemented`)))
+      return Rx.of(RD.failure(Error(`Withdraw fee for Cosmos has not been implemented`)))
     case 'POLKA':
-      return Rx.of(RD.failure(Error(`Deposit fee for Polkadot has not been implemented`)))
+      return Rx.of(RD.failure(Error(`Withdraw fee for Polkadot has not been implemented`)))
   }
-}
-
-const withdrawFee$ = (asset: Asset, percent: number): FeeLD => {
-  // percent needs to be mulitplied by 100  to transform into "points"
-  // ^ needed by `getWithdrawMemo`
-  const memo = getWithdrawMemo(asset, percent * 100)
-  return withdrawFeeByChain$(asset.chain, memo)
 }
 
 export { reloadWithdrawFee, withdrawFee$ }
