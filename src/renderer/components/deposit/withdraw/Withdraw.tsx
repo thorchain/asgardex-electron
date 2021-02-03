@@ -339,7 +339,6 @@ export const Withdraw: React.FC<Props> = ({
 
   return (
     <Styled.Container>
-      <div>memo: {memo}</div>
       <Label weight="bold" textTransform="uppercase">
         {intl.formatMessage({ id: 'deposit.withdraw.title' })}
       </Label>
