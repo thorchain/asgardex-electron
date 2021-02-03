@@ -56,19 +56,6 @@ export type SendTxParams = {
   feeOptionKey: FeeOptionKey
 }
 
-/**
- * Withdraw fees
- *
- * To withdraw we do need three fees:
- *
- * memo: Fee to send memo transaction on Thorchain
- * thorOut: Outbound transaction fee an user is charged for each outbound (withdraw). It's 3 times of `fast` fee.
- * assetOut : Outbound transaction fee an user is charged for each outbound (withdraw). It's 3 times of `fast` fee.
- */
-export type WithdrawFees = { thorMemo: BaseAmount; thorOut: BaseAmount; assetOut: BaseAmount }
-export type WithdrawFeesRD = RD.RemoteData<Error, WithdrawFees>
-export type WithdrawFeesLD = LiveData<Error, WithdrawFees>
-
 export type LedgerAddressParams = { chain: Chain; network: Network }
 
 /**
@@ -149,6 +136,31 @@ export type SymDepositParams = {
 }
 
 export type SymDepositStateHandler = (p: SymDepositParams) => SymDepositState$
+
+/**
+ * State to reflect status of a sym. deposit by doing different requests
+ */
+export type WithdrawState = {
+  // Number of current step
+  readonly step: number
+  // Constant total amount of steps
+  readonly stepsTotal: 3
+  // withdraw transactions
+  readonly withdrawTx: TxHashRD
+  // RD for all needed steps
+  readonly withdraw: RD.RemoteData<ApiError, boolean>
+}
+
+export type WithdrawState$ = Rx.Observable<WithdrawState>
+
+export type WithdrawParams = {
+  readonly poolAddress: O.Option<string>
+  readonly asset: Asset
+  readonly memo: Memo
+  readonly network: Network
+}
+
+export type WithdrawStateHandler = (p: WithdrawParams) => WithdrawState$
 
 export type UpgradeRuneParams = {
   readonly poolAddress: O.Option<string>

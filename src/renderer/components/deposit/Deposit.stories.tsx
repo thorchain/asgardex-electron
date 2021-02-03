@@ -9,7 +9,7 @@ import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
 import { Default as AsymDeposit } from './add/AsymDeposit.stories'
 import { Default as SymDeposit } from './add/SymDeposit.stories'
 import { Deposit, Props as DepositProps } from './Deposit'
-import { WithdrawStory as Withdraw } from './withdraw/Withdraw.stories'
+import { Default as Withdraw } from './withdraw/Withdraw.stories'
 
 const defaultProps: DepositProps = {
   asset: AssetBNB,

@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 
-import { AsymDepositState, SwapState, SymDepositState, UpgradeRuneTxState } from './types'
+import { AsymDepositState, SwapState, SymDepositState, WithdrawState, UpgradeRuneTxState } from './types'
 
 export const MAX_SWAP_STEPS = 3
 
@@ -23,6 +23,13 @@ export const INITIAL_SYM_DEPOSIT_STATE: SymDepositState = {
   stepsTotal: 4,
   depositTxs: { rune: RD.initial, asset: RD.initial },
   deposit: RD.initial
+}
+
+export const INITIAL_WITHDRAW_STATE: WithdrawState = {
+  step: 1,
+  stepsTotal: 3,
+  withdrawTx: RD.initial,
+  withdraw: RD.initial
 }
 
 export const INITIAL_UPGRADE_RUNE_STATE: UpgradeRuneTxState = {

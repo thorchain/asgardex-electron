@@ -51,7 +51,7 @@ export const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }
       return ETH.sendTx({ asset, recipient, amount, memo, feeOptionKey })
 
     case THORChain: {
-      if (txType === TxTypes.SWAP || txType === TxTypes.DEPOSIT) {
+      if (txType === TxTypes.SWAP || txType === TxTypes.DEPOSIT || txType === TxTypes.WITHDRAW) {
         return THOR.sendDepositTx({ amount, asset, memo })
       }
       return THOR.sendTx({ amount, asset, memo, recipient })

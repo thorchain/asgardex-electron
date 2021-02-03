@@ -52,6 +52,7 @@ type CommonMessageKey =
   | 'common.tx.sending'
   | 'common.tx.sendingAsset'
   | 'common.tx.checkResult'
+  | 'common.tx.view'
   | 'common.modal.confirmTitle'
 
 export type CommonMessages = {
@@ -249,14 +250,16 @@ type DepositMessageKey =
   | 'deposit.pool.noDeposit'
   | 'deposit.wallet.add'
   | 'deposit.wallet.connect'
+  | 'deposit.withdraw.pending'
+  | 'deposit.withdraw.success'
+  | 'deposit.withdraw.error'
   | 'deposit.withdraw.title'
   | 'deposit.withdraw.choseText'
   | 'deposit.withdraw.receiveText'
   | 'deposit.withdraw.fees'
   | 'deposit.withdraw.feeNote'
   | 'deposit.withdraw.drag'
-  | 'deposit.withdraw.add.error.thorMemoFeeNotCovered'
-  | 'deposit.withdraw.add.error.outFeeNotCovered'
+  | 'deposit.withdraw.error.feeNotCovered'
 
 export type DepositMessages = { [key in DepositMessageKey]: string }
 

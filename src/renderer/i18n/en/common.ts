@@ -54,6 +54,7 @@ const common: CommonMessages = {
   'common.tx.sending': 'Send transaction',
   'common.tx.sendingAsset': 'Send {assetSymbol} transaction',
   'common.tx.checkResult': 'Check result',
+  'common.tx.view': 'View {assetSymbol} transaction',
   'common.modal.confirmTitle': 'Confirm action'
 }
 

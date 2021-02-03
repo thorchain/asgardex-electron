@@ -20,6 +20,7 @@ import { reloadDepositFeesByChain } from './fees.helper'
 export const reloadFees = () => {
   BNB.reloadFees()
   BTC.reloadFees()
+  THOR.reloadFees()
 }
 
 const reloadFeesByChain = (chain: Chain) => {
@@ -32,8 +33,7 @@ const reloadFeesByChain = (chain: Chain) => {
       // reload ETH balances - not available yet
       return () => {}
     case 'THOR':
-      // reload THOR fees - not available yet
-      return () => {}
+      return THOR.reloadFees
     default:
       return () => {}
   }

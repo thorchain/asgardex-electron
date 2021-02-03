@@ -4,15 +4,15 @@ import { getExplorerUrlByAsset$, getExplorerAddressByChain$ } from './explorerUr
 import {
   reloadDepositFees,
   depositFees$,
-  withdrawFees$,
-  reloadWithdrawFees,
+  withdrawFee$,
+  reloadWithdrawFee,
   reloadDepositFeesEffect$,
   reloadSwapFees,
   swapFees$
 } from './fees'
 import { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } from './ledger'
-import { asymDepositTxMemo$, symDepositTxMemo$ } from './memo'
-import { swap$, asymDeposit$, symDeposit$, upgradeBnbRune$ } from './transaction'
+import { asymDepositTxMemo$, symDepositTxMemo$, getWithdrawMemo$ } from './memo'
+import { swap$, asymDeposit$, symDeposit$, upgradeBnbRune$, withdraw$ } from './transaction'
 
 /**
  * Exports all functions and observables needed at UI level (provided by `ChainContext`)
@@ -22,11 +22,12 @@ export {
   clientByChain$,
   reloadDepositFees,
   depositFees$,
-  withdrawFees$,
-  reloadWithdrawFees,
+  withdrawFee$,
+  reloadWithdrawFee,
   reloadDepositFeesEffect$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
+  getWithdrawMemo$,
   retrieveLedgerAddress,
   removeLedgerAddress,
   removeAllLedgerAddress,
@@ -38,5 +39,6 @@ export {
   swap$,
   asymDeposit$,
   symDeposit$,
-  upgradeBnbRune$
+  upgradeBnbRune$,
+  withdraw$ as symWithdraw$
 }
