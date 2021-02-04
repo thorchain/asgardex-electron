@@ -9,6 +9,7 @@ import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
+import { filterEnabledChains } from '../../helpers/chainHelper'
 import { eqBalancesRD } from '../../helpers/fp/eq'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { network$ } from '../app/service'
@@ -134,13 +135,14 @@ const ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.address$, ETH.bala
 /**
  * List of `ChainBalances` for all available chains (order is important)
  */
-export const chainBalances$: ChainBalances$ = Rx.combineLatest([
-  thorChainBalance$,
-  btcChainBalance$,
-  btcLedgerChainBalance$,
-  ethChainBalance$,
-  bnbChainBalance$
-]).pipe(
+export const chainBalances$: ChainBalances$ = Rx.combineLatest(
+  filterEnabledChains({
+    THOR: [thorChainBalance$],
+    BTC: [btcChainBalance$, btcLedgerChainBalance$],
+    ETH: [ethChainBalance$],
+    BNB: [bnbChainBalance$]
+  })
+).pipe(
   // we ignore all `ChainBalances` with state of `initial` balances
   // (e.g. a not connected Ledger )
   RxOp.map(A.filter(({ balances }) => !RD.isInitial(balances)))
@@ -153,13 +155,14 @@ export const chainBalances$: ChainBalances$ = Rx.combineLatest([
  *
  * Note: Empty list of balances won't be included in `BalancesState`!!
  */
-export const balancesState$: Observable<BalancesState> = Rx.combineLatest([
-  THOR.balances$,
-  BNB.balances$,
-  btcLedgerBalance$,
-  BTC.balances$,
-  ETH.balances$
-]).pipe(
+export const balancesState$: Observable<BalancesState> = Rx.combineLatest(
+  filterEnabledChains({
+    THOR: [THOR.balances$],
+    BTC: [BTC.balances$, btcLedgerBalance$],
+    ETH: [ETH.balances$],
+    BNB: [BNB.balances$]
+  })
+).pipe(
   RxOp.map((balancesList) => ({
     balances: FP.pipe(
       balancesList,
