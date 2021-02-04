@@ -372,8 +372,7 @@ const createPoolsService = (
         RxOp.startWith(RD.pending),
         RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
-    }),
-    liveData.map((s) => s.current || [])
+    })
   )
 
   const selectedPoolAddress$: PoolAddressRx = combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
