@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, assetToString, BNBChain, THORChain } from '@xchainjs/xchain-util'
+import { assetFromString, assetToString, BNBChain, RUNE_TICKER, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -92,7 +92,14 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
         oRuneBnbAsset,
         O.fold(
           // No subscription of `poolAddresses$ ` needed for other assets than BNB.RUNE
-          () => Rx.of(RD.failure(Error('No BNB.RUNE asset'))),
+          () =>
+            Rx.of(
+              RD.failure(
+                Error(
+                  intl.formatMessage({ id: 'wallet.errors.asset.notExist' }, { asset: `${BNBChain}.${RUNE_TICKER}` })
+                )
+              )
+            ),
           (_) =>
             FP.pipe(
               poolAddresses$,
@@ -100,8 +107,11 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
               RxOp.map((rd) =>
                 FP.pipe(
                   rd,
-                  // TODO @(Veado) Add i18n
-                  RD.chain((oAddress) => RD.fromOption(oAddress, () => Error('Could not find pool address')))
+                  RD.chain((oAddress) =>
+                    RD.fromOption(oAddress, () =>
+                      Error(intl.formatMessage({ id: 'wallet.errors.address.couldNotFind' }, { pool: BNBChain }))
+                    )
+                  )
                 )
               )
             )

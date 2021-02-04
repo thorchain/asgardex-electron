@@ -14,7 +14,9 @@ const swap: SwapMessages = {
   'swap.errors.amount.outputShouldCoverChainFee':
     'Auszahlungsgebühr in Höhe von {fee} ist nicht über den zu erwartenen Auszahlungsbetrag (momentan {amount}) gedeckt',
   'swap.note.lockedWallet': 'Entsperre Deine Wallet um zu Tauschen',
-  'swap.note.nowallet': 'Erstelle oder importiere eine Wallet um zu Tauschen'
+  'swap.note.nowallet': 'Erstelle oder importiere eine Wallet um zu Tauschen',
+  'swap.errors.asset.wrongSourceAsset': 'Wrong source asset - DE',
+  'swap.errors.asset.wrongTargetAsset': 'Wrong target asset - DE'
 }
 
 export default swap

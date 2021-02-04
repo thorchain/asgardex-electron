@@ -10,6 +10,7 @@ import {
   assetToBase,
   BaseAmount,
   baseToAsset,
+  BNBChain,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Form } from 'antd'
@@ -412,8 +413,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
           () => renderUpgradeStatus,
           () => (
             <CStyled.ErrorView
-              // TODO (@Veado) Add i18n
-              title="BNB pool address could not be loaded"
+              title={intl.formatMessage({ id: 'wallet.upgrade.error.loadPoolAddress' }, { pool: BNBChain })}
               extra={renderErrorBtn}
             />
           ),
