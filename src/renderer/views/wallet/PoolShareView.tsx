@@ -1,30 +1,24 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
-import {
-  Asset,
-  AssetBNB,
-  assetFromString,
-  baseAmount,
-  baseToAsset,
-  formatAssetAmountCurrency,
-  formatBN
-} from '@xchainjs/xchain-util'
+import { Asset, AssetBNB, assetFromString } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
 
 import { PoolShares } from '../../components/PoolShares'
 import { PoolShare } from '../../components/PoolShares/types'
 import { ErrorView } from '../../components/shared/error'
 import { Button } from '../../components/uielements/button'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import * as shareHelpers from '../../helpers/poolShareHelper'
-import { PoolDetails, StakersAssetData, StakersAssetDataRD } from '../../services/midgard/types'
+import { PoolDetails, StakersAssetData, StakersAssetDataLD, StakersAssetDataRD } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
 
 export const PoolShareView: React.FC = (): JSX.Element => {
@@ -33,15 +27,28 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const {
     pools: { poolsState$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
     reloadNetworkInfo,
-    setSelectedPoolAsset,
     stake: { getStakes$ }
   } = midgardService
 
-  useEffect(() => {
-    setSelectedPoolAsset(O.of(AssetBNB))
-  }, [setSelectedPoolAsset])
+  const { address$ } = useThorchainContext()
+  const oAssetWalletAddress = useObservableState(address$, O.none)
+  /**
+   * We have to get a new stake-stream for every new asset
+   * @description /src/renderer/services/midgard/stake.ts
+   */
+  const stakeData$: StakersAssetDataLD = useMemo(
+    () =>
+      FP.pipe(
+        oAssetWalletAddress,
+        O.fold(
+          () => Rx.EMPTY,
+          (address) => getStakes$(AssetBNB, address)
+        )
+      ),
+    [getStakes$, oAssetWalletAddress]
+  )
+  const stakeData = useObservableState<StakersAssetDataRD>(stakeData$, RD.initial)
 
-  const [stakeData] = useObservableState<StakersAssetDataRD>(getStakes$, RD.initial)
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
@@ -50,13 +57,12 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   // store previous data of pools to render these while reloading
   const previousPoolShares = useRef<O.Option<PoolShare[]>>(O.none)
 
-  const goToStakeInfo = (asset: Asset) => {
-    console.log(asset)
-  }
-
-  const goToDataInfo = (asset: Asset) => {
-    console.log(asset)
-  }
+  const goToStakeInfo = useCallback(() => {
+    FP.pipe(
+      oAssetWalletAddress,
+      O.map((address) => window.apiUrl.openExternal(`https://runestake.info/home?address=${address}`))
+    )
+  }, [oAssetWalletAddress])
 
   const getPoolSharesData = useCallback(
     (stake: StakersAssetData, poolsData: PoolDetails) => {
@@ -70,25 +76,28 @@ export const PoolShareView: React.FC = (): JSX.Element => {
           const poolData = toPoolData(pool)
           const assetDepositPrice = getValueOfAsset1InAsset2(assetShare, poolData, pricePoolData)
           const runeDepositPrice = getValueOfRuneInAsset(runeShare, pricePoolData)
-          const totalPrice = baseAmount(runeDepositPrice.amount().plus(assetDepositPrice.amount()))
 
           data.push({
             asset,
-            ownership: formatBN(poolShare),
-            value: formatAssetAmountCurrency({ amount: baseToAsset(totalPrice), asset: priceAsset, decimal: 2 })
+            poolShare,
+            assetDepositPrice,
+            runeDepositPrice
           })
         }
       })
 
       return data
     },
-    [priceAsset, pricePoolData]
+    [pricePoolData]
   )
 
-  const renderPoolSharesTable = useCallback((data: PoolShare[]) => {
-    previousPoolShares.current = O.some(data)
-    return <PoolShares data={data} goToStakeInfo={goToStakeInfo} goToDataInfo={goToDataInfo} />
-  }, [])
+  const renderPoolSharesTable = useCallback(
+    (data: PoolShare[]) => {
+      previousPoolShares.current = O.some(data)
+      return <PoolShares data={data} priceAsset={priceAsset} goToStakeInfo={goToStakeInfo} />
+    },
+    [goToStakeInfo, priceAsset]
+  )
 
   const clickRefreshHandler = useCallback(() => {
     reloadPools()
