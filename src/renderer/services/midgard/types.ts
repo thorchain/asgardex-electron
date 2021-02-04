@@ -164,6 +164,9 @@ export type PoolsService = {
 export type StakersAssetDataRD = RD.RemoteData<Error, StakersAssetData>
 export type StakersAssetDataLD = LiveData<Error, StakersAssetData>
 
+export type StakersDataRD = RD.RemoteData<Error, StakersAssetData[]>
+export type StakersDataLD = LiveData<Error, StakersAssetData[]>
+
 export type ValidatePoolLD = LiveData<ApiError, boolean>
 
 export type ValidateNodeLD = LiveData<ApiError, boolean>

@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useRef } from 'react'
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
-import { Asset, AssetBNB, assetFromString } from '@xchainjs/xchain-util'
+import { Asset, assetFromString } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
@@ -18,7 +18,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import * as shareHelpers from '../../helpers/poolShareHelper'
-import { PoolDetails, StakersAssetData, StakersAssetDataLD, StakersAssetDataRD } from '../../services/midgard/types'
+import { PoolDetails, StakersAssetData, StakersDataLD, StakersDataRD } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
 
 export const PoolShareView: React.FC = (): JSX.Element => {
@@ -27,7 +27,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const {
     pools: { poolsState$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
     reloadNetworkInfo,
-    stake: { getStakes$ }
+    stake: { getAllStakes$ }
   } = midgardService
 
   const { address$ } = useThorchainContext()
@@ -36,18 +36,18 @@ export const PoolShareView: React.FC = (): JSX.Element => {
    * We have to get a new stake-stream for every new asset
    * @description /src/renderer/services/midgard/stake.ts
    */
-  const stakeData$: StakersAssetDataLD = useMemo(
+  const stakeData$: StakersDataLD = useMemo(
     () =>
       FP.pipe(
         oAssetWalletAddress,
         O.fold(
           () => Rx.EMPTY,
-          (address) => getStakes$(AssetBNB, address)
+          (address) => getAllStakes$(address)
         )
       ),
-    [getStakes$, oAssetWalletAddress]
+    [getAllStakes$, oAssetWalletAddress]
   )
-  const stakeData = useObservableState<StakersAssetDataRD>(stakeData$, RD.initial)
+  const stakeData = useObservableState<StakersDataRD>(stakeData$, RD.initial)
 
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
@@ -65,11 +65,12 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   }, [oAssetWalletAddress])
 
   const getPoolSharesData = useCallback(
-    (stake: StakersAssetData, poolsData: PoolDetails) => {
+    (stakes: StakersAssetData[], poolsData: PoolDetails) => {
       const data: PoolShare[] = []
       poolsData.forEach((pool) => {
+        const stake = stakes.find((stake) => stake.asset === pool.asset)
         const asset = assetFromString(pool.asset)
-        if (asset) {
+        if (asset && stake) {
           const runeShare = shareHelpers.getRuneShare(stake, pool)
           const assetShare = shareHelpers.getAssetShare(stake, pool)
           const poolShare = shareHelpers.getPoolShare(stake, pool)
@@ -132,8 +133,8 @@ export const PoolShareView: React.FC = (): JSX.Element => {
             return <ErrorView title={msg} extra={renderRefreshBtn} />
           },
           // success state
-          ([stake, pools]) => {
-            const data = getPoolSharesData(stake, pools.poolDetails)
+          ([stakes, pools]) => {
+            const data = getPoolSharesData(stakes, pools.poolDetails)
             previousPoolShares.current = O.some(data)
             return renderPoolSharesTable(data)
           }
