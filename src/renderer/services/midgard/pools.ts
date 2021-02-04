@@ -45,7 +45,6 @@ import {
   PoolsStateLD,
   SelectedPricePoolAsset,
   ThorchainEndpointsLD,
-  PoolDetails,
   ValidatePoolLD
 } from './types'
 import { getPoolAddressByChain, getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
@@ -139,17 +138,16 @@ const createPoolsService = (
   /**
    * Data of enabled `Pools` from Midgard
    */
-  const apiGetPoolsEnabled$: LiveData<Error, PoolDetails> = apiGetPools$({ status: GetPoolsStatusEnum.Available })
+  const apiGetPoolsEnabled$: PoolDetailsLD = apiGetPools$({ status: GetPoolsStatusEnum.Available })
 
   /**
    * Ddata of pending `Pools` from Midgard
    */
-  const apiGetPoolsPending$: LiveData<Error, PoolDetails> = apiGetPools$({ status: GetPoolsStatusEnum.Staged })
+  const apiGetPoolsPending$: PoolDetailsLD = apiGetPools$({ status: GetPoolsStatusEnum.Staged })
   /**
    * Data of all `Pools` or by given status
    */
-  const apiGetPoolsByStatus$: (status?: GetPoolsStatusEnum) => LiveData<Error, PoolDetails> = (status) =>
-    apiGetPools$({ status })
+  const apiGetPoolsByStatus$: (status?: GetPoolsStatusEnum) => PoolDetailsLD = (status) => apiGetPools$({ status })
 
   /**
    * Data of `AssetDetails` from Midgard
@@ -179,10 +177,10 @@ const createPoolsService = (
   /**
    * `PoolDetails` data from Midgard
    */
-  const apiGetPoolsData$: (
-    assetOrAssets: string | string[],
-    status?: GetPoolsStatusEnum
-  ) => LiveData<Error, PoolDetails> = (assetOrAssets, status) => {
+  const apiGetPoolsData$: (assetOrAssets: string | string[], status?: GetPoolsStatusEnum) => PoolDetailsLD = (
+    assetOrAssets,
+    status
+  ) => {
     const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
 
     return FP.pipe(
@@ -192,8 +190,8 @@ const createPoolsService = (
       liveData.chain(
         O.fold(
           // TODO (@thatStrangeGuy | @veado) Add i18n
-          (): LiveData<Error, PoolDetails> => Rx.of(RD.failure(new Error('No pools available'))),
-          (poolsDetails): LiveData<Error, PoolDetails> => Rx.of(RD.success(poolsDetails))
+          (): PoolDetailsLD => Rx.of(RD.failure(new Error('No pools available'))),
+          (poolsDetails): PoolDetailsLD => Rx.of(RD.success(poolsDetails))
         )
       ),
       RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
