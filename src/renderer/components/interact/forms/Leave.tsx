@@ -2,8 +2,12 @@ import React, { useCallback } from 'react'
 
 import { getLeaveMemo } from '@thorchain/asgardex-util'
 import { Form } from 'antd'
+import * as E from 'fp-ts/Either'
+import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
+import { validateAddress } from '../../../helpers/form/validation'
+import { AddressValidation } from '../../../services/thorchain/types'
 import { Input } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 
@@ -13,8 +17,14 @@ type Props = {
   onFinish: (leaveData: { memo: string }) => void
   isLoading?: boolean
   loadingProgress?: string
+  addressValidation: AddressValidation
 }
-export const Leave: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = false, loadingProgress }) => {
+export const Leave: React.FC<Props> = ({
+  onFinish: onFinishProp,
+  isLoading = false,
+  loadingProgress,
+  addressValidation
+}) => {
   const intl = useIntl()
   const [form] = Form.useForm<FormValues>()
 
@@ -27,6 +37,23 @@ export const Leave: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = fal
     [onFinishProp]
   )
 
+  const addressValidator = useCallback(
+    (_, value: string) =>
+      FP.pipe(
+        value,
+        validateAddress(
+          addressValidation,
+          intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' }),
+          intl.formatMessage({ id: 'wallet.errors.address.invalid' })
+        ),
+        E.fold(
+          (e) => Promise.reject(e),
+          () => Promise.resolve()
+        )
+      ),
+    [addressValidation, intl]
+  )
+
   return (
     <Styled.Form form={form} onFinish={onFinish} initialValues={{ thorAddress: '' }}>
       <div>
@@ -37,7 +64,7 @@ export const Leave: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = fal
             rules={[
               {
                 required: true,
-                message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' })
+                validator: addressValidator
               }
             ]}>
             <Input disabled={isLoading} size="large" />

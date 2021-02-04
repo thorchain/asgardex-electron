@@ -9,6 +9,7 @@ import { Network } from '../../../shared/api/types'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
+import { triggerStream } from '../../helpers/stateHelper'
 import { Configuration, InlineResponse2002, NodesApi } from '../../types/generated/thornode'
 import { ApiError, ErrorId } from '../wallet/types'
 import { NodeInfoLD, NodeStatus, ThorNodeApiUrlLD } from './types'
@@ -32,6 +33,8 @@ const getNodeStatusByString = (stringStatus = ''): NodeStatus => {
   }
 }
 
+const { stream$: reloadNodesInfo$, trigger: reloadNodesInfo } = triggerStream()
+
 const TESTNET_THORNODE_API = envOrDefault(process.env.REACT_APP_TESTNET_THORNODE_API, '')
 
 const thorNodeApiAddress$ = (network: Network): ThorNodeApiUrlLD => {
@@ -49,12 +52,15 @@ const getThorNodeApi$ = (network: Network) =>
 
 const getNodeInfo$ = (node: Address, network: Network): NodeInfoLD =>
   FP.pipe(
-    getThorNodeApi$(network),
+    reloadNodesInfo$,
+    RxOp.debounceTime(300),
+    RxOp.switchMap(() => getThorNodeApi$(network)),
     liveData.chain(
       (api): LiveData<ApiError, InlineResponse2002> =>
         FP.pipe(
           api.thorchainNodeNodeAddressGet({ nodeAddress: node }),
           RxOp.map(RD.success),
+          RxOp.startWith(RD.pending),
           RxOp.catchError(() =>
             Rx.of(
               RD.failure({
@@ -82,4 +88,4 @@ const getNodeInfo$ = (node: Address, network: Network): NodeInfoLD =>
     RxOp.startWith(RD.pending)
   )
 
-export { getNodeInfo$ }
+export { getNodeInfo$, reloadNodesInfo }

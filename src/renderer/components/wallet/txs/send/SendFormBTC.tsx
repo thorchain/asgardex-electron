@@ -269,6 +269,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
           return true
         })
       ),
+
     [onSubmit, selectedFeeRate]
   )
 

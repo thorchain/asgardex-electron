@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState, useSubscription } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
@@ -30,6 +31,7 @@ type Props = {
 
 export const SymDepositView: React.FC<Props> = ({ asset }) => {
   const history = useHistory()
+  const intl = useIntl()
 
   const onChangeAsset = useCallback(
     (asset: Asset) => {
@@ -148,8 +150,9 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
   const renderDisabledAddDeposit = useCallback(
     (error?: Error) => (
       <>
-        {/* TODO (@Veado) i18n */}
-        {error && <Alert type="error" message="Something went wrong" description={error.toString()} />}
+        {error && (
+          <Alert type="error" message={intl.formatMessage({ id: 'common.error' })} description={error.toString()} />
+        )}
         <SymDeposit
           validatePassword$={validatePassword$}
           viewRuneTx={viewRuneTx}
@@ -181,7 +184,8 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
       depositFees,
       selectedPricePoolAsset,
       reloadBalances,
-      symDeposit$
+      symDeposit$,
+      intl
     ]
   )
 

@@ -6,8 +6,10 @@ import { Address } from '@xchainjs/xchain-client'
 import { AssetRuneNative, baseToAsset, formatAssetAmountCurrency, THORChain } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import * as FP from 'fp-ts/function'
+import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
+import { NodeStatus } from '../../../services/thorchain/types'
 import { NodeDataRD } from '../types'
 import * as Styled from './BondsTable.styles'
 
@@ -51,23 +53,47 @@ export const AwardValue: React.FC<{ data: NodeDataRD }> = ({ data }) => (
   </Styled.AwardCol>
 )
 
-export const Status: React.FC<{ data: NodeDataRD }> = ({ data }) =>
-  FP.pipe(
+const getStatusMessageId = (status: NodeStatus) => {
+  switch (status) {
+    case 'active': {
+      return 'bonds.status.active'
+    }
+    case 'standby': {
+      return 'bonds.status.standby'
+    }
+    case 'disabled': {
+      return 'bonds.status.disabled'
+    }
+    default: {
+      return 'bonds.status.unknown'
+    }
+  }
+}
+
+export const Status: React.FC<{ data: NodeDataRD }> = ({ data }) => {
+  const intl = useIntl()
+  return FP.pipe(
     data,
     RD.map(({ status }) => status),
     RD.fold(
       () => <Styled.TextLabel>-</Styled.TextLabel>,
       () => <Styled.TextLabel loading={true} />,
       () => <Styled.TextLabel>-</Styled.TextLabel>,
-      (value) => <Styled.TextLabel>{value}</Styled.TextLabel>
+      (value) => {
+        return <Styled.TextLabel>{intl.formatMessage({ id: getStatusMessageId(value) })}</Styled.TextLabel>
+      }
     )
   )
+}
 
-export const Info: React.FC<{ goToNode: () => void }> = ({ goToNode }) => (
-  <Styled.InfoButton onClick={goToNode}>
-    <Styled.TextLabel>info</Styled.TextLabel> <Styled.InfoArrow />
-  </Styled.InfoButton>
-)
+export const Info: React.FC<{ goToNode: () => void }> = ({ goToNode }) => {
+  const intl = useIntl()
+  return (
+    <Styled.InfoButton onClick={goToNode}>
+      <Styled.TextLabel>{intl.formatMessage({ id: 'bonds.info' })}</Styled.TextLabel> <Styled.InfoArrow />
+    </Styled.InfoButton>
+  )
+}
 
 export const Delete: React.FC<{ deleteNode: () => void }> = ({ deleteNode }) => (
   <Styled.DeleteButton onClick={deleteNode}>

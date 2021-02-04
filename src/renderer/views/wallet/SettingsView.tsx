@@ -23,6 +23,7 @@ import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { filterEnabledChains } from '../../helpers/chainHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { OnlineStatus } from '../../services/app/types'
@@ -184,7 +185,14 @@ export const SettingsView: React.FC = (): JSX.Element => {
     () =>
       pipe(
         // combineLatest is for the future additional accounts
-        Rx.combineLatest([thorchainAddress$, binanceAddress$, ethAddress$, bitcoinAddress$]),
+        Rx.combineLatest(
+          filterEnabledChains({
+            THOR: [thorchainAddress$],
+            BNB: [binanceAddress$],
+            ETH: [ethAddress$],
+            BTC: [bitcoinAddress$]
+          })
+        ),
         RxOp.map(A.filter(O.isSome)),
         RxOp.map(sequenceTOptionFromArray)
       ),

@@ -48,16 +48,17 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
 
   const [validPhrase, setValidPhrase] = useState(false)
 
-  const phraseValidator = useCallback(async (_: Rule, value: string) => {
-    if (!value) {
-      // TODO(@Veado): i18n
-      return Promise.reject('Value for phrase required')
-    }
-    const valid = crypto.validatePhrase(value)
-    setValidPhrase(valid)
-    // TODO(@Veado): i18n
-    return valid ? Promise.resolve() : Promise.reject('Invalid mnemonic seed phrase')
-  }, [])
+  const phraseValidator = useCallback(
+    async (_: Rule, value: string) => {
+      if (!value) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.phrase.error.valueRequired' }))
+      }
+      const valid = crypto.validatePhrase(value)
+      setValidPhrase(valid)
+      return valid ? Promise.resolve() : Promise.reject(intl.formatMessage({ id: 'wallet.phrase.error.invalid' }))
+    },
+    [intl]
+  )
 
   const submitForm = useCallback(
     ({ phrase: newPhrase, password }: Store) => {
@@ -91,10 +92,13 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
     () =>
       O.fold(
         () => <></>,
-        // TODO(@Veado): i18n
-        (error: Error) => <Paragraph>Error while importing passphrase: {error.toString()}</Paragraph>
+        (error: Error) => (
+          <Paragraph>
+            {intl.formatMessage({ id: 'wallet.phrase.error.import' })}: {error.toString()}
+          </Paragraph>
+        )
       )(importError),
-    [importError]
+    [importError, intl]
   )
 
   return (

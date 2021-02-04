@@ -643,17 +643,15 @@ export const Swap = ({
         sequenceTRD(
           sourceChainFee,
           RD.success(targetChainFeeAmountInTargetAsset),
-          // TODO (@Veado) Add i18n
-          RD.fromOption(sourceAsset, () => Error('No source asset')),
-          // TODO (@Veado) Add i18n
-          RD.fromOption(targetAsset, () => Error('No target asset'))
+          RD.fromOption(sourceAsset, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingSourceAsset' }))),
+          RD.fromOption(targetAsset, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingTargetAsset' })))
         ),
         RD.map(([sourceFee, targetFee, sourceAsset, targetAsset]) => [
           { asset: getChainAsset(sourceAsset.chain), amount: sourceFee },
           { asset: targetAsset, amount: targetFee }
         ])
       ),
-    [sourceChainFee, targetChainFeeAmountInTargetAsset, sourceAsset, targetAsset]
+    [sourceChainFee, targetChainFeeAmountInTargetAsset, sourceAsset, targetAsset, intl]
   )
 
   const isSwapDisabled: boolean = useMemo(() => amountToSwap.amount().isZero() || FP.pipe(walletBalances, O.isNone), [

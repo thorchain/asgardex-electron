@@ -18,7 +18,8 @@ import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
 import { ZERO_BN } from '../../../const'
-import { greaterThan, lessThanOrEqualTo } from '../../../helpers/form/validation'
+import { validateAddress, greaterThan, lessThanOrEqualTo } from '../../../helpers/form/validation'
+import { AddressValidation } from '../../../services/thorchain/types'
 import { Input, InputBigNumber } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 
@@ -29,8 +30,15 @@ type Props = {
   max: AssetAmount
   isLoading?: boolean
   loadingProgress?: string
+  addressValidation: AddressValidation
 }
-export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading = false, loadingProgress }) => {
+export const Bond: React.FC<Props> = ({
+  onFinish: onFinishProp,
+  max,
+  isLoading = false,
+  loadingProgress,
+  addressValidation
+}) => {
   const intl = useIntl()
   const [form] = Form.useForm<FormValues>()
 
@@ -63,6 +71,23 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading =
     [max, intl]
   )
 
+  const addressValidator = useCallback(
+    (_, value: string) =>
+      FP.pipe(
+        value,
+        validateAddress(
+          addressValidation,
+          intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' }),
+          intl.formatMessage({ id: 'wallet.errors.address.invalid' })
+        ),
+        E.fold(
+          (e) => Promise.reject(e),
+          () => Promise.resolve()
+        )
+      ),
+    [addressValidation, intl]
+  )
+
   return (
     <Styled.Form form={form} onFinish={onFinish} initialValues={{ thorAddress: '' }}>
       <div>
@@ -73,7 +98,7 @@ export const Bond: React.FC<Props> = ({ onFinish: onFinishProp, max, isLoading =
             rules={[
               {
                 required: true,
-                message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' })
+                validator: addressValidator
               }
             ]}>
             <Input disabled={isLoading} size="large" />

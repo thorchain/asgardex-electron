@@ -9,6 +9,7 @@ const bonds: BondsMessages = {
   'bonds.status.active': 'Активен',
   'bonds.status.standby': 'В ожидании',
   'bonds.status.disabled': 'Отключен',
+  'bonds.status.unknown': 'Неизвестен',
   'bonds.node.add': 'Добавить узел',
   'bonds.node.enterMessage': 'Введите узел для отслеживания',
   'bonds.validations.nodeAlreadyAdded': 'Узел уже добавлен',
