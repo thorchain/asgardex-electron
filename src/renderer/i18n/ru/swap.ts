@@ -15,8 +15,8 @@ const swap: SwapMessages = {
     'Исходящая комиссия {fee} должна покрываться получаемым количеством (сейчас {amount}).',
   'swap.note.lockedWallet': 'Для обмена необходимо разблокировать кошелек',
   'swap.note.nowallet': 'Для обмена создайте или импортируйте кошелек',
-  'swap.errors.asset.wrongSourceAsset': 'Исходный ассет не поддерживается',
-  'swap.errors.asset.wrongTargetAsset': 'Конечный ассет не поддерживается'
+  'swap.errors.asset.missingSourceAsset': 'Исходный ассет не поддерживается',
+  'swap.errors.asset.missingTargetAsset': 'Конечный ассет не поддерживается'
 }
 
 export default swap

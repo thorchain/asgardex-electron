@@ -643,8 +643,8 @@ export const Swap = ({
         sequenceTRD(
           sourceChainFee,
           RD.success(targetChainFeeAmountInTargetAsset),
-          RD.fromOption(sourceAsset, () => Error(intl.formatMessage({ id: 'swap.errors.asset.wrongSourceAsset' }))),
-          RD.fromOption(targetAsset, () => Error(intl.formatMessage({ id: 'swap.errors.asset.wrongTargetAsset' })))
+          RD.fromOption(sourceAsset, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingSourceAsset' }))),
+          RD.fromOption(targetAsset, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingTargetAsset' })))
         ),
         RD.map(([sourceFee, targetFee, sourceAsset, targetAsset]) => [
           { asset: getChainAsset(sourceAsset.chain), amount: sourceFee },

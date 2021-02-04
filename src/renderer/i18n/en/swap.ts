@@ -15,8 +15,8 @@ const swap: SwapMessages = {
     'Outbounding fee of {fee} needs to be covered by receiving amount (currently {amount}).',
   'swap.note.lockedWallet': 'You need to unlock your wallet to swap',
   'swap.note.nowallet': 'Create or import a wallet to swap',
-  'swap.errors.asset.wrongSourceAsset': 'Wrong source asset',
-  'swap.errors.asset.wrongTargetAsset': 'Wrong target asset'
+  'swap.errors.asset.missingSourceAsset': 'Missing source asset',
+  'swap.errors.asset.missingTargetAsset': 'Missing target asset'
 }
 
 export default swap

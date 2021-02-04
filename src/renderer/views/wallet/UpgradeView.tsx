@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, assetToString, BNBChain, RUNE_TICKER, THORChain } from '@xchainjs/xchain-util'
+import { assetFromString, assetToString, BNBChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -92,14 +92,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
         oRuneBnbAsset,
         O.fold(
           // No subscription of `poolAddresses$ ` needed for other assets than BNB.RUNE
-          () =>
-            Rx.of(
-              RD.failure(
-                Error(
-                  intl.formatMessage({ id: 'wallet.errors.asset.notExist' }, { asset: `${BNBChain}.${RUNE_TICKER}` })
-                )
-              )
-            ),
+          () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'wallet.errors.asset.notExist' }, { asset })))),
           (_) =>
             FP.pipe(
               poolAddresses$,

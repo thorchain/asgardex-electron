@@ -9,6 +9,7 @@ const bonds: BondsMessages = {
   'bonds.status.active': 'Active',
   'bonds.status.standby': 'Standby',
   'bonds.status.disabled': 'Disabled',
+  'bonds.status.unknown': 'Unknown',
   'bonds.node.add': 'Add node',
   'bonds.node.enterMessage': 'Enter node to monitor',
   'bonds.validations.nodeAlreadyAdded': 'Node is already added',
