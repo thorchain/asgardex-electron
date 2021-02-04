@@ -22,7 +22,7 @@ export * from './Node';
 export * from './ObservedTx';
 export * from './Pool';
 export * from './Tx';
-export * from './Tx signers';
+export * from './TxSigners';
 export * from './Txoutitem';
 export * from './Vault';
 export * from './Version';

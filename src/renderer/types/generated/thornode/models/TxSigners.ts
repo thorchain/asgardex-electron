@@ -13,32 +13,32 @@
 
 /**
  * @export
- * @interface Tx signers
+ * @interface TxSigners
  */
-export interface Tx signers {
+export interface TxSigners {
     /**
      * @type {string}
-     * @memberof Tx signers
+     * @memberof TxSigners
      */
     tx_id?: string;
     /**
      * @type {string}
-     * @memberof Tx signers
+     * @memberof TxSigners
      */
     height?: string;
     /**
      * @type {Array<string>}
-     * @memberof Tx signers
+     * @memberof TxSigners
      */
     in_tx?: Array<string>;
     /**
      * @type {string}
-     * @memberof Tx signers
+     * @memberof TxSigners
      */
     action?: string;
     /**
      * @type {Array<string>}
-     * @memberof Tx signers
+     * @memberof TxSigners
      */
     out_txs?: Array<string>;
 }
