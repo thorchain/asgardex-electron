@@ -92,7 +92,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
         oRuneBnbAsset,
         O.fold(
           // No subscription of `poolAddresses$ ` needed for other assets than BNB.RUNE
-          () => Rx.of(RD.failure(Error('No BNB.RUNE asset'))),
+          () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'wallet.errors.asset.notExist' }, { asset })))),
           (_) =>
             FP.pipe(
               poolAddresses$,
@@ -100,8 +100,11 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
               RxOp.map((rd) =>
                 FP.pipe(
                   rd,
-                  // TODO @(Veado) Add i18n
-                  RD.chain((oAddress) => RD.fromOption(oAddress, () => Error('Could not find pool address')))
+                  RD.chain((oAddress) =>
+                    RD.fromOption(oAddress, () =>
+                      Error(intl.formatMessage({ id: 'wallet.errors.address.couldNotFind' }, { pool: BNBChain }))
+                    )
+                  )
                 )
               )
             )

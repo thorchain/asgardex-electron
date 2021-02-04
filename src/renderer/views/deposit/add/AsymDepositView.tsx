@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState, useSubscription } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
@@ -30,6 +31,7 @@ type Props = {
 
 export const AsymDepositView: React.FC<Props> = ({ asset }) => {
   const history = useHistory()
+  const intl = useIntl()
 
   const onChangeAsset = useCallback(
     (asset: Asset) => {
@@ -125,8 +127,9 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
   const renderDisabledAddDeposit = useCallback(
     (error?: Error) => (
       <>
-        {/* TODO (@Veado) i18n */}
-        {error && <Alert type="error" message="Something went wrong" description={error.toString()} />}
+        {error && (
+          <Alert type="error" message={intl.formatMessage({ id: 'common.error' })} description={error.toString()} />
+        )}
         <AsymDeposit
           validatePassword$={validatePassword$}
           viewAssetTx={viewAssetTx}
@@ -147,7 +150,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
         />
       </>
     ),
-    [validatePassword$, viewAssetTx, asset, depositFees, selectedPricePoolAsset, reloadBalances, asymDeposit$]
+    [validatePassword$, viewAssetTx, asset, depositFees, selectedPricePoolAsset, reloadBalances, asymDeposit$, intl]
   )
 
   return FP.pipe(

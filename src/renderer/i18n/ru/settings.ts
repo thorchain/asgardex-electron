@@ -11,7 +11,7 @@ const settings: SettingMessages = {
   'setting.midgard': 'Midgard',
   'setting.version': 'Версия',
   'setting.notconnected': 'Нет соединения',
-  'setting.add.device': 'ADD DEVICE'
+  'setting.add.device': 'Добавить устройство'
 }
 
 export default settings
