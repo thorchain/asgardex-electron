@@ -7,6 +7,7 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 
 import { RefreshButton } from '../../components/uielements/button/'
 import { AssetsNav } from '../../components/wallet/assets'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
@@ -28,6 +29,7 @@ import { UpgradeView } from './UpgradeView'
 
 export const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService, reloadBalances } = useWalletContext()
+  const { reloadNodesInfo } = useThorchainContext()
 
   // Important note:
   // DON'T set `INITIAL_KEYSTORE_STATE` as default value
@@ -76,7 +78,7 @@ export const WalletView: React.FC = (): JSX.Element => {
             <DepositsView />
           </Route>
           <Route path={walletRoutes.bonds.template} exact>
-            {reloadButton(reloadBalances)}
+            {reloadButton(reloadNodesInfo)}
             <AssetsNav />
             <BondsView />
           </Route>
@@ -95,7 +97,7 @@ export const WalletView: React.FC = (): JSX.Element => {
         </Switch>
       </>
     ),
-    [reloadBalances, reloadButton]
+    [reloadBalances, reloadButton, reloadNodesInfo]
   )
 
   const renderWalletRoute = useCallback(
