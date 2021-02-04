@@ -46,10 +46,10 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
         color: headerNetStatusColor({ url: midgardUrl, onlineStatus })
       },
       {
-        key: 'binance',
-        headline: 'Binance Chain',
-        subheadline: headerNetStatusSubheadline({ url: binanceUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: binanceUrl, onlineStatus })
+        key: 'thorchain',
+        headline: 'Thorchain',
+        subheadline: headerNetStatusSubheadline({ url: thorchainUrl, onlineStatus, notConnectedTxt }),
+        color: headerNetStatusColor({ url: thorchainUrl, onlineStatus })
       },
       {
         key: 'bitcoin',
@@ -58,10 +58,10 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
         color: headerNetStatusColor({ url: bitcoinUrl, onlineStatus })
       },
       {
-        key: 'thorchain',
-        headline: 'Thorchain',
-        subheadline: headerNetStatusSubheadline({ url: thorchainUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: thorchainUrl, onlineStatus })
+        key: 'binance',
+        headline: 'Binance Chain',
+        subheadline: headerNetStatusSubheadline({ url: binanceUrl, onlineStatus, notConnectedTxt }),
+        color: headerNetStatusColor({ url: binanceUrl, onlineStatus })
       }
     ]
   }, [binanceUrl, bitcoinUrl, intl, midgardUrl, onlineStatus, thorchainUrl])
