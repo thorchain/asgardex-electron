@@ -144,19 +144,38 @@ const createPoolsService = (
    * Ddata of pending `Pools` from Midgard
    */
   const apiGetPoolsPending$: PoolDetailsLD = apiGetPools$({ status: GetPoolsStatusEnum.Staged })
-  /**
-   * Data of all `Pools` or by given status
-   */
-  const apiGetPoolsByStatus$: (status?: GetPoolsStatusEnum) => PoolDetailsLD = (status) => apiGetPools$({ status })
 
+  /**
+   * Data of all `Pools`
+   */
+  const apiGetPoolsAll$: PoolDetailsLD = apiGetPools$({ status: undefined })
+
+  /**
+   * Helper to get (same) stream of `PoolDetailsLD` by given status
+   *
+   * If status is not set (or undefined), `PoolDetails` of all Pools will be loaded
+   */
+  const apiGetPoolsByStatus$ = (status?: GetPoolsStatusEnum) => {
+    switch (status) {
+      case GetPoolsStatusEnum.Available:
+        return apiGetPoolsEnabled$
+      case GetPoolsStatusEnum.Staged:
+        return apiGetPoolsPending$
+      default:
+        return apiGetPoolsAll$
+    }
+  }
   /**
    * Data of `AssetDetails` from Midgard
    */
-  const apiGetAssetInfo$: (assetOrAssets: string | string[]) => AssetDetailsLD = (assetOrAssets) => {
+  const apiGetAssetInfo$: (assetOrAssets: string | string[], status: GetPoolsStatusEnum) => AssetDetailsLD = (
+    assetOrAssets,
+    status
+  ) => {
     const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
 
     return FP.pipe(
-      apiGetPoolsEnabled$,
+      apiGetPoolsByStatus$(status),
       liveData.map(A.filter((pool) => assets.includes(pool.asset))),
       liveData.map(
         A.map((poolDetails) => ({
@@ -199,13 +218,21 @@ const createPoolsService = (
   }
 
   // Factory to create a stream to get data of `AssetDetails`
-  const getAssetDetails$: (poolAssets$: PoolAssetsLD) => AssetDetailsLD = (poolAssets$) =>
+  const getAssetDetails$: (poolAssets$: PoolAssetsLD, status: GetPoolsStatusEnum) => AssetDetailsLD = (
+    poolAssets$,
+    status
+  ) =>
     FP.pipe(
       poolAssets$,
       liveData.map(A.map(assetToString)),
       liveData.map(NEA.fromArray),
       // provide an empty list of `AssetDetails` in case of empty list of pools
-      liveData.chain(O.fold(() => liveData.of([]), apiGetAssetInfo$)),
+      liveData.chain(
+        O.fold(
+          () => liveData.of([]),
+          (assets) => apiGetAssetInfo$(assets, status)
+        )
+      ),
       RxOp.shareReplay(1)
     )
 
@@ -237,7 +264,7 @@ const createPoolsService = (
       // Filter out all unknown / invalid assets created from asset strings
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable)))
     )
-    const assetDetails$ = getAssetDetails$(poolAssets$)
+    const assetDetails$ = getAssetDetails$(poolAssets$, GetPoolsStatusEnum.Available)
     const poolDetails$ = getPoolDetails$(poolAssets$, GetPoolsStatusEnum.Available)
 
     const pricePools$: LiveData<Error, O.Option<PricePools>> = poolDetails$.pipe(
@@ -294,7 +321,7 @@ const createPoolsService = (
       // Filter out all unknown / invalid assets created from asset strings
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable)))
     )
-    const assetDetails$ = getAssetDetails$(poolAssets$)
+    const assetDetails$ = getAssetDetails$(poolAssets$, GetPoolsStatusEnum.Staged)
     const poolDetails$ = getPoolDetails$(poolAssets$, GetPoolsStatusEnum.Staged)
 
     return FP.pipe(
@@ -322,6 +349,9 @@ const createPoolsService = (
   /**
    * Stream of `PoolDetail` data based on selected pool asset
    * It's triggered by changes of selectedPoolAsset$`
+   *
+   * Note: It checks currenlty ALL (pending/available) pool details
+   * That's needed for Deposit pages, which have not the information about status of pool right now (might be improved if needed)
    */
   const poolDetail$: PoolDetailLD = selectedPoolAsset$.pipe(
     RxOp.filter(O.isSome),
@@ -330,7 +360,11 @@ const createPoolsService = (
         selectedPoolAsset,
         O.fold(
           () => Rx.of(RD.initial),
-          (asset) => apiGetPoolsData$(assetToString(asset))
+          (asset) =>
+            apiGetPoolsData$(
+              assetToString(asset),
+              undefined /* explicit set to `undefined` to remember we want data for all pools */
+            )
         )
       )
     ),
