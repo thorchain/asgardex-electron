@@ -13,7 +13,8 @@ import {
   resetTx,
   subscribeTx,
   interact$,
-  getNodeInfo$
+  getNodeInfo$,
+  explorerUrl$
 } from '../services/thorchain'
 
 export type ThorchainContextValue = {
@@ -30,6 +31,7 @@ export type ThorchainContextValue = {
   txRD$: typeof txRD$
   interact$: typeof interact$
   getNodeInfo$: typeof getNodeInfo$
+  explorerUrl$: typeof explorerUrl$
 }
 
 const initialContext: ThorchainContextValue = {
@@ -45,7 +47,8 @@ const initialContext: ThorchainContextValue = {
   reloadFees,
   fees$,
   interact$,
-  getNodeInfo$
+  getNodeInfo$,
+  explorerUrl$
 }
 
 const ThorchainContext = createContext<ThorchainContextValue | null>(null)
