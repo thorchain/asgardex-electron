@@ -1,7 +1,7 @@
 import { DepositMessages } from '../types'
 
 const deposit: DepositMessages = {
-  'deposit.interact.title': 'Deponieren',
+  'deposit.interact.title': 'Einzahlen',
   'deposit.interact.subtitle': 'Interagiere mit THORChain',
   'deposit.interact.actions.bond': 'Bond',
   'deposit.interact.actions.unbond': 'Unbond',
@@ -16,9 +16,8 @@ const deposit: DepositMessages = {
   'deposit.totalEarnings': 'Deine Gesamteinkommen vom Pool',
   'deposit.add.asym': '{asset} hinzufügen',
   'deposit.add.sym': '{assetA} + {assetB} hinzufügen',
-  'deposit.add.state.healthCheck': 'Health check - DE',
-  'deposit.add.state.sending': 'Send deposit transaction - DE',
-  'deposit.add.state.checkResults': 'Check deposit result - DE',
+  'deposit.add.state.sending': 'Sende Einzahlungs-Transaktion',
+  'deposit.add.state.checkResults': 'Überprüfe Resultat der Einzahlung',
   'deposit.add.state.pending': 'Einzahlen',
   'deposit.add.state.success': 'Erfolgreich eingezahlt',
   'deposit.add.state.error': 'Error beim Einzahlen',
@@ -27,9 +26,9 @@ const deposit: DepositMessages = {
   'deposit.add.error.nobalances': 'Kein Guthaben',
   'deposit.add.error.nobalance1': 'Du verfügst über kein Guthaben, um {asset} hinzuzufügen.',
   'deposit.add.error.nobalance2': 'Du verfügst über keine Guthaben, um {asset1} und {asset2} hinzuzufügen.',
-  'deposit.bond.state.error': 'Bond error - DE',
-  'deposit.unbond.state.error': 'Unbond error - DE',
-  'deposit.leave.state.error': 'Leave error - DE',
+  'deposit.bond.state.error': 'Bond Fehler',
+  'deposit.unbond.state.error': 'Unbond Fehler',
+  'deposit.leave.state.error': 'Fehler beim Verlassen',
   'deposit.withdraw': 'Abheben',
   'deposit.advancedMode': 'Expertenmodus',
   'deposit.drag': 'Ziehen um Einzuzahlen',

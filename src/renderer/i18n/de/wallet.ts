@@ -1,7 +1,7 @@
 import { WalletMessages } from '../types'
 
 const wallet: WalletMessages = {
-  'wallet.nav.deposits': 'Deposits',
+  'wallet.nav.deposits': 'Einzahlungen',
   'wallet.nav.bonds': 'Bonds',
   'wallet.nav.poolshares': 'Poolanteile',
   'wallet.column.name': 'Name',
@@ -16,7 +16,7 @@ const wallet: WalletMessages = {
   'wallet.action.import': 'Importieren',
   'wallet.action.create': 'Erstellen',
   'wallet.action.connect': 'Verbinden',
-  'wallet.action.deposit': 'Deposit - DE',
+  'wallet.action.deposit': 'Einzahlung',
   'wallet.connect.instruction': 'Bitte verbinde Deine Wallet',
   'wallet.unlock.title': 'Wallet entsperren',
   'wallet.unlock.instruction': 'Bitte entsperre Deine Wallet',
