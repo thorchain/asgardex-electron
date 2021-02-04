@@ -1,4 +1,4 @@
-import { BaseAmount, Asset } from '@xchainjs/xchain-util'
+import { BaseAmount, Asset, Chain } from '@xchainjs/xchain-util'
 import { Option } from 'fp-ts/lib/Option'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,4 +56,8 @@ export type TxStatus = {
    * Transaction hash - optional
    */
   readonly hash?: string
+}
+
+export type ChainValues<T> = {
+  [k in Chain]?: T[]
 }
