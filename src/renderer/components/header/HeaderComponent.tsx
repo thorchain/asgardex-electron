@@ -54,6 +54,8 @@ type Props = {
   changeLocale?: (locale: Locale) => void
   midgardUrl: O.Option<string>
   binanceUrl: O.Option<string>
+  bitcoinUrl: O.Option<string>
+  thorchainUrl: O.Option<string>
 }
 
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
@@ -66,7 +68,9 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     locale,
     changeLocale,
     midgardUrl,
-    binanceUrl
+    binanceUrl,
+    bitcoinUrl,
+    thorchainUrl
   } = props
 
   const intl = useIntl()
@@ -231,8 +235,16 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderHeaderNetStatus = useMemo(
-    () => <HeaderNetStatus isDesktopView={isDesktopView} midgardUrl={midgardUrl} binanceUrl={binanceUrl} />,
-    [binanceUrl, isDesktopView, midgardUrl]
+    () => (
+      <HeaderNetStatus
+        isDesktopView={isDesktopView}
+        midgardUrl={midgardUrl}
+        binanceUrl={binanceUrl}
+        bitcoinUrl={bitcoinUrl}
+        thorchainUrl={thorchainUrl}
+      />
+    ),
+    [binanceUrl, bitcoinUrl, isDesktopView, midgardUrl, thorchainUrl]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
