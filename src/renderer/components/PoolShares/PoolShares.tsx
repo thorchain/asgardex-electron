@@ -37,7 +37,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo })
   const poolColumn: ColumnType<PoolShare> = useMemo(
     () => ({
       key: 'pool',
-      title: intl.formatMessage({ id: 'poolshares.pool' }),
+      title: intl.formatMessage({ id: 'common.pool' }),
       align: 'left',
       responsive: ['md'],
       render: ({ asset }: PoolShare) => <Label>{asset.symbol}</Label>
@@ -58,7 +58,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo })
   const valueColumn: ColumnType<PoolShare> = useMemo(
     () => ({
       key: 'value',
-      title: intl.formatMessage({ id: 'poolshares.value' }),
+      title: intl.formatMessage({ id: 'common.value' }),
       align: 'left',
       render: ({ assetDepositPrice, runeDepositPrice }: PoolShare) => {
         const totalPrice = baseAmount(runeDepositPrice.amount().plus(assetDepositPrice.amount()))
@@ -73,7 +73,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo })
   const assetColumn: ColumnType<PoolShare> = useMemo(
     () => ({
       key: 'assetAmount',
-      title: intl.formatMessage({ id: 'poolshares.asset' }),
+      title: intl.formatMessage({ id: 'common.asset' }),
       align: 'left',
       render: ({ assetDepositPrice }: PoolShare) => (
         <Label>
@@ -91,7 +91,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo })
   const runeColumn: ColumnType<PoolShare> = useMemo(
     () => ({
       key: 'runeAmount',
-      title: intl.formatMessage({ id: 'poolshares.rune' }),
+      title: 'Rune',
       align: 'left',
       render: ({ runeDepositPrice }: PoolShare) => (
         <Label>
@@ -103,7 +103,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo })
         </Label>
       )
     }),
-    [intl, priceAsset]
+    [priceAsset]
   )
 
   return (
