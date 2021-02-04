@@ -11,18 +11,12 @@
  * Do not edit the class manually.
  */
 
-import {
-    InboundAddressesItem,
-} from './';
+import { InboundAddressesItem } from './'
 
 /**
  * @export
- * @interface InboundAddresses
+ * @interface InboundAddresses = {Array<InboundAddressesItem>}
+ * TODO manually re-written type until midgard has fully valid spec
+ * DO NOT OVERRIDE THIS UNTIL SWAGGER IS VALID
  */
-export interface InboundAddresses {
-    /**
-     * @type {Array<InboundAddressesItem>}
-     * @memberof InboundAddresses
-     */
-    current: Array<InboundAddressesItem>;
-}
+export interface InboundAddresses extends Array<InboundAddressesItem> {}

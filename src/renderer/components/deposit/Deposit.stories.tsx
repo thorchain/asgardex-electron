@@ -1,5 +1,6 @@
 import React from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import { AssetBNB } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
@@ -12,6 +13,7 @@ import { Default as Withdraw } from './withdraw/Withdraw.stories'
 
 const defaultProps: DepositProps = {
   asset: AssetBNB,
+  depositData: RD.success({ units: '3', runeDepth: '12', assetDepth: '12' }),
   ShareContent: DefaultPoolShare,
   SymDepositContent: SymDeposit,
   AsymDepositContent: AsymDeposit,

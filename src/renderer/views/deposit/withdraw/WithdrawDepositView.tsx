@@ -33,14 +33,14 @@ import { getBalanceByAsset } from '../../../services/wallet/util'
 
 type Props = {
   asset: Asset
+  depositData: StakersAssetDataRD
 }
 
 export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
-  const { asset } = props
+  const { asset, depositData } = props
   const {
     service: {
-      pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$, poolsState$, selectedPoolAddress$ },
-      stake: { getStakes$ }
+      pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$, poolsState$, selectedPoolAddress$ }
     }
   } = useMidgardContext()
 
@@ -51,11 +51,6 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const poolsStateRD = useObservableState(poolsState$, RD.initial)
 
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
-  /**
-   * We have to get a new stake-stream for every new asset
-   * @description /src/renderer/services/midgard/stake.ts
-   */
-  const [depositData] = useObservableState<StakersAssetDataRD>(getStakes$, RD.initial)
 
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
 
