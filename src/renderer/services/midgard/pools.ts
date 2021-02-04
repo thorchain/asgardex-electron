@@ -145,6 +145,11 @@ const createPoolsService = (
    * Ddata of pending `Pools` from Midgard
    */
   const apiGetPoolsPending$: LiveData<Error, PoolDetails> = apiGetPools$({ status: GetPoolsStatusEnum.Staged })
+  /**
+   * Data of all `Pools` or by given status
+   */
+  const apiGetPoolsByStatus$: (status?: GetPoolsStatusEnum) => LiveData<Error, PoolDetails> = (status) =>
+    apiGetPools$({ status })
 
   /**
    * Data of `AssetDetails` from Midgard
@@ -174,11 +179,14 @@ const createPoolsService = (
   /**
    * `PoolDetails` data from Midgard
    */
-  const apiGetPoolsData$: (assetOrAssets: string | string[]) => LiveData<Error, PoolDetails> = (assetOrAssets) => {
+  const apiGetPoolsData$: (
+    assetOrAssets: string | string[],
+    status?: GetPoolsStatusEnum
+  ) => LiveData<Error, PoolDetails> = (assetOrAssets, status) => {
     const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
 
     return FP.pipe(
-      apiGetPoolsEnabled$,
+      apiGetPoolsByStatus$(status),
       liveData.map(A.filter((poolDetail) => assets.includes(poolDetail.asset))),
       liveData.map(NEA.fromArray),
       liveData.chain(
@@ -204,13 +212,21 @@ const createPoolsService = (
     )
 
   // Factory to create a stream to get data of `PoolDetails`
-  const getPoolDetails$: (poolAssets$: PoolAssetsLD) => PoolDetailsLD = (poolAssets$) =>
+  const getPoolDetails$: (poolAssets$: PoolAssetsLD, status: GetPoolsStatusEnum) => PoolDetailsLD = (
+    poolAssets$,
+    status
+  ) =>
     FP.pipe(
       poolAssets$,
       liveData.map(A.map(assetToString)),
       liveData.map(NEA.fromArray),
       // provide an empty list of `PoolDetails` in case of empty list of pools
-      liveData.chain(O.fold(() => liveData.of([]), apiGetPoolsData$)),
+      liveData.chain(
+        O.fold(
+          () => liveData.of([]),
+          (assets) => apiGetPoolsData$(assets, status)
+        )
+      ),
       RxOp.shareReplay(1)
     )
 
@@ -224,7 +240,7 @@ const createPoolsService = (
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable)))
     )
     const assetDetails$ = getAssetDetails$(poolAssets$)
-    const poolDetails$ = getPoolDetails$(poolAssets$)
+    const poolDetails$ = getPoolDetails$(poolAssets$, GetPoolsStatusEnum.Available)
 
     const pricePools$: LiveData<Error, O.Option<PricePools>> = poolDetails$.pipe(
       RxOp.map((poolDetailsRD) =>
@@ -281,7 +297,7 @@ const createPoolsService = (
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable)))
     )
     const assetDetails$ = getAssetDetails$(poolAssets$)
-    const poolDetails$ = getPoolDetails$(poolAssets$)
+    const poolDetails$ = getPoolDetails$(poolAssets$, GetPoolsStatusEnum.Staged)
 
     return FP.pipe(
       liveData.sequenceS({

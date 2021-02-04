@@ -401,7 +401,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const renderBtnPendingPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <TableAction>
-        <Button round="true" onClick={() => clickDepositHandler(pool.target.symbol)} typevalue="outline">
+        <Button round="true" onClick={() => clickDepositHandler(assetToString(pool.target))} typevalue="outline">
           <PlusOutlined />
           liquidity
         </Button>
