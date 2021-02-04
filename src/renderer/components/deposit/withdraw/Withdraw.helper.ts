@@ -1,16 +1,16 @@
-import { AssetAmount, BaseAmount, baseAmount, baseToAsset, bn } from '@xchainjs/xchain-util'
+import { BaseAmount, baseAmount, bn } from '@xchainjs/xchain-util'
 
 export const getWithdrawAmounts = (
   runeShare: BaseAmount,
   assetShare: BaseAmount,
   percentAmount: number
-): { runeWithdraw: AssetAmount; assetWithdraw: AssetAmount } => {
+): { rune: BaseAmount; asset: BaseAmount } => {
   const percentBn = bn(percentAmount / 100)
-  const runeBaseAmount = baseAmount(percentBn.multipliedBy(runeShare.amount()))
-  const assetBaseAmount = baseAmount(percentBn.multipliedBy(assetShare.amount()))
+  const rune = baseAmount(percentBn.multipliedBy(runeShare.amount()))
+  const asset = baseAmount(percentBn.multipliedBy(assetShare.amount()))
 
   return {
-    runeWithdraw: baseToAsset(runeBaseAmount),
-    assetWithdraw: baseToAsset(assetBaseAmount)
+    rune,
+    asset
   }
 }

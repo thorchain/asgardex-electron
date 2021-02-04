@@ -7,10 +7,9 @@ import { Address } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
 
 import { getMockRDValueFactory, RDStatus } from '../../../shared/mock/rdByStatus'
-import { AddressValidation } from '../../services/thorchain/types'
+import { AddressValidation, NodeInfo } from '../../services/thorchain/types'
 import { ApiError, ErrorId } from '../../services/wallet/types'
 import { Bonds } from './Bonds'
-import { NodeInfo } from './types'
 
 const getMockRDValue = getMockRDValueFactory<ApiError, NodeInfo>(
   () => ({

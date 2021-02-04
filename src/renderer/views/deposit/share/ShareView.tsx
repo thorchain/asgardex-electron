@@ -13,24 +13,19 @@ import { PoolShare } from '../../../components/uielements/poolShare'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
-import { PoolDetailRD, StakersAssetData, StakersAssetDataRD, PoolDetail } from '../../../services/midgard/types'
+import { PoolDetailRD, StakersAssetData, PoolDetail, StakersAssetDataRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import * as Styled from './ShareView.styles'
 
-export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
+type Props = { asset: Asset; depositData: StakersAssetDataRD }
+
+export const ShareView: React.FC<Props> = ({ asset, depositData }) => {
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$ },
-    stake: { getStakes$ }
+    pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$ }
   } = midgardService
 
   const intl = useIntl()
-
-  /**
-   * We have to get a new stake-stream for every new asset
-   * @description /src/renderer/services/midgard/stake.ts
-   */
-  const [stakeData] = useObservableState<StakersAssetDataRD>(getStakes$, RD.initial)
 
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
@@ -68,19 +63,24 @@ export const ShareView: React.FC<{ asset: Asset }> = ({ asset }) => {
     [asset, oPriceAsset, pricePoolData]
   )
 
+  const renderNoShare = useMemo(
+    () => <Styled.EmptyData description={intl.formatMessage({ id: 'deposit.pool.noDeposit' })} />,
+    [intl]
+  )
+
   const renderPoolShare = useMemo(
     () =>
       FP.pipe(
-        RD.combine(stakeData, poolDetailRD),
+        RD.combine(depositData, poolDetailRD),
         RD.fold(
-          () => <Styled.EmptyData description={intl.formatMessage({ id: 'deposit.pool.noDeposit' })} />,
+          () => renderNoShare,
           () => <Spin />,
-          () => <Styled.EmptyData description={intl.formatMessage({ id: 'deposit.pool.noDeposit' })} />,
+          () => renderNoShare,
           ([stake, pool]) => renderPoolShareReady(stake, pool)
         )
       ),
 
-    [intl, poolDetailRD, renderPoolShareReady, stakeData]
+    [depositData, poolDetailRD, renderNoShare, renderPoolShareReady]
   )
 
   return renderPoolShare

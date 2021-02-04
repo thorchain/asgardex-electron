@@ -4,6 +4,7 @@ import { Client } from '@xchainjs/xchain-thorchain'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 
+import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
 import { ApiError } from '../wallet/types'
 
@@ -43,3 +44,15 @@ export type InteractState = {
 }
 
 export type InteractState$ = Rx.Observable<InteractState>
+
+export type NodeStatus = 'active' | 'standby' | 'disabled' | 'unknown'
+
+export type NodeInfo = {
+  bond: BaseAmount
+  award: BaseAmount
+  status: NodeStatus
+}
+
+export type NodeInfoLD = LiveData<ApiError, NodeInfo>
+
+export type ThorNodeApiUrlLD = LiveData<ApiError, string>

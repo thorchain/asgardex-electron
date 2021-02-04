@@ -71,7 +71,7 @@ export const asymDeposit$ = ({
       // valid pool address (even an empty one for Thorchain)
       (poolAddress) =>
         Rx.of(poolAddress).pipe(
-          // 1. validate pool address
+          // 1. validate pool address or node
           RxOp.switchMap((poolAddress) =>
             Rx.iif(
               () => isRuneNativeAsset(asset),

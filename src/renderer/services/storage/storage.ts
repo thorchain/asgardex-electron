@@ -5,7 +5,9 @@ import { observableState } from '../../helpers/stateHelper'
 import { INITIAL_STORAGE_STATE } from './const'
 import { StoragePartialStateState, StorageState } from './types'
 
-const { get$: getStorageState$, set: setStorageState } = observableState<StorageState>(INITIAL_STORAGE_STATE)
+const { get$: getStorageState$, get: getStorageState, set: setStorageState } = observableState<StorageState>(
+  INITIAL_STORAGE_STATE
+)
 
 export const removeStorage = async () => {
   await window.commonStorage.remove()
@@ -25,4 +27,4 @@ window.commonStorage.get().then(
   (_) => setStorageState(O.none /* any error while parsing JSON file*/)
 )
 
-export { getStorageState$, modifyStorage }
+export { getStorageState$, modifyStorage, getStorageState }

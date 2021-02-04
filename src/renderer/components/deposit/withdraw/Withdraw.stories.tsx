@@ -1,155 +1,65 @@
 import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { BaseStory } from '@storybook/addons'
-import {
-  Asset,
-  assetAmount,
-  AssetBNB,
-  AssetBTC,
-  AssetRuneNative,
-  assetToBase,
-  baseAmount,
-  bn
-} from '@xchainjs/xchain-util'
-import { constVoid } from 'fp-ts/lib/function'
+import { Story, Meta } from '@storybook/react'
+import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, baseAmount, bn, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
-import { ZERO_POOL_DATA } from '../../../const'
-import { Withdraw } from './Withdraw'
+import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
+import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
+import { Memo, WithdrawState$ } from '../../../services/chain/types'
+import { Withdraw, Props as WitdrawProps } from './Withdraw'
 
-const runeBalance = O.some(assetToBase(assetAmount(100)))
-
-const assetPoolData = {
-  assetBalance: baseAmount('1000'),
-  runeBalance: baseAmount('2000')
+const defaultProps: WitdrawProps = {
+  asset: AssetBNB,
+  runePrice: bn(1),
+  assetPrice: bn(60.972),
+  runeBalance: O.some(assetToBase(assetAmount(100))),
+  selectedPriceAsset: AssetRuneNative,
+  reloadFees: () => console.log('reload fees'),
+  shares: { rune: baseAmount('193011422'), asset: baseAmount('3202499') },
+  disabled: false,
+  poolAddress: O.some('pool-address'),
+  viewRuneTx: (txHash: string) => console.log('view tx ', txHash),
+  // mock password validation
+  // Password: "123"
+  validatePassword$: mockValidatePassword$,
+  reloadBalances: () => console.log('reload balances'),
+  // mock successfull result of withdraw$
+  withdraw$: (params) =>
+    Rx.of(params).pipe(
+      RxOp.tap((params) => console.log('deposit$ ', params)),
+      RxOp.switchMap(
+        (_): WithdrawState$ =>
+          Rx.of({
+            ...INITIAL_WITHDRAW_STATE,
+            step: 3,
+            withdrawTx: RD.success('rune-tx-hash'),
+            withdraw: RD.success(true)
+          })
+      )
+    ),
+  fee$: (_chain: Chain, _memo: Memo) => Rx.of(RD.success(baseAmount(1000))),
+  network: 'testnet'
 }
 
-const chainAssetPoolData = {
-  assetBalance: baseAmount('1000'),
-  runeBalance: baseAmount('2000')
+export const Default: Story = () => <Withdraw {...defaultProps} />
+Default.storyName = 'default'
+
+export const ErrorNoFee: Story = () => {
+  const props: WitdrawProps = {
+    ...defaultProps,
+    fee$: (_chain: Chain, _memo: Memo) => Rx.of(RD.failure(Error('no fees')))
+  }
+  return <Withdraw {...props} />
 }
+ErrorNoFee.storyName = 'error - no fee'
 
-export const WithdrawStory: BaseStory<{ asset?: Asset }, JSX.Element> = () => (
-  <Withdraw
-    type={'asym'}
-    fees={RD.success({ thorMemo: baseAmount(1000), thorOut: baseAmount(3000), assetOut: baseAmount(3000) })}
-    asset={AssetBNB}
-    assetPoolData={assetPoolData}
-    assetPrice={bn(60.972)}
-    chainAssetPoolData={chainAssetPoolData}
-    runePrice={bn(1)}
-    runeBalance={runeBalance}
-    selectedPriceAsset={AssetRuneNative}
-    onWithdraw={console.log}
-    runeShare={baseAmount('193011422')}
-    assetShare={baseAmount('3202499')}
-    reloadFees={constVoid}
-  />
-)
-WithdrawStory.storyName = 'asym'
-
-export const AsymErrorNoFeesStory: BaseStory<never, JSX.Element> = () => (
-  <Withdraw
-    type={'asym'}
-    fees={RD.failure(new Error('no fees'))}
-    asset={AssetBNB}
-    assetPoolData={ZERO_POOL_DATA}
-    assetPrice={bn(60.972)}
-    runePrice={bn(1)}
-    chainAssetPoolData={ZERO_POOL_DATA}
-    runeBalance={runeBalance}
-    selectedPriceAsset={AssetRuneNative}
-    onWithdraw={console.log}
-    runeShare={baseAmount('193011422')}
-    assetShare={baseAmount('3202499')}
-    reloadFees={constVoid}
-  />
-)
-AsymErrorNoFeesStory.storyName = 'asym - error: no fee'
-
-export const AsymErrorThorMemoFeeStory: BaseStory<never, JSX.Element> = () => (
-  <Withdraw
-    type={'asym'}
-    fees={RD.success({ thorMemo: baseAmount(1000), thorOut: baseAmount(3000), assetOut: baseAmount(3000) })}
-    asset={AssetBNB}
-    assetPoolData={ZERO_POOL_DATA}
-    assetPrice={bn(60.972)}
-    runePrice={bn(1)}
-    chainAssetPoolData={ZERO_POOL_DATA}
-    runeBalance={O.none}
-    selectedPriceAsset={AssetRuneNative}
-    onWithdraw={console.log}
-    runeShare={baseAmount('193011422')}
-    assetShare={baseAmount('3202499')}
-    reloadFees={constVoid}
-  />
-)
-AsymErrorThorMemoFeeStory.storyName = 'asym - error: thorMemo fee'
-
-export const AsymErrorThorOutFeeStory: BaseStory<never, JSX.Element> = () => (
-  <Withdraw
-    type={'asym'}
-    fees={RD.success({ thorMemo: baseAmount(1000), thorOut: baseAmount(6000000), assetOut: baseAmount(300) })}
-    asset={AssetBTC}
-    assetPoolData={assetPoolData}
-    assetPrice={bn(20)}
-    runePrice={bn(1)}
-    chainAssetPoolData={chainAssetPoolData}
-    runeBalance={O.some(baseAmount('100000000000'))}
-    selectedPriceAsset={AssetRuneNative}
-    onWithdraw={console.log}
-    runeShare={baseAmount('10000000')}
-    assetShare={baseAmount('300000000')}
-    reloadFees={constVoid}
-  />
-)
-AsymErrorThorOutFeeStory.storyName = 'asym - error: thorOut fee'
-
-export const AsymErrorAssetOutFeeStory: BaseStory<never, JSX.Element> = () => (
-  <Withdraw
-    type={'asym'}
-    fees={RD.success({ thorMemo: baseAmount(1000), thorOut: baseAmount(10000), assetOut: baseAmount(3000000) })}
-    asset={AssetBTC}
-    assetPoolData={{
-      assetBalance: assetToBase(assetAmount('100')),
-      runeBalance: assetToBase(assetAmount('200000'))
-    }}
-    assetPrice={bn(20)}
-    runePrice={bn(1)}
-    chainAssetPoolData={chainAssetPoolData}
-    runeBalance={O.some(baseAmount('100000000000'))}
-    selectedPriceAsset={AssetRuneNative}
-    onWithdraw={console.log}
-    runeShare={baseAmount('10000000')}
-    assetShare={baseAmount('3000000')}
-    reloadFees={constVoid}
-  />
-)
-AsymErrorAssetOutFeeStory.storyName = 'asym - error: assetOut fee'
-
-export const AsymErrorAllFeesStory: BaseStory<never, JSX.Element> = () => (
-  <Withdraw
-    type={'asym'}
-    fees={RD.success({ thorMemo: baseAmount(1000), thorOut: baseAmount(100000000), assetOut: baseAmount(3000000) })}
-    asset={AssetBTC}
-    assetPoolData={{
-      assetBalance: assetToBase(assetAmount('100')),
-      runeBalance: assetToBase(assetAmount('200000'))
-    }}
-    assetPrice={bn(20)}
-    runePrice={bn(1)}
-    chainAssetPoolData={chainAssetPoolData}
-    runeBalance={O.none}
-    selectedPriceAsset={AssetRuneNative}
-    onWithdraw={console.log}
-    runeShare={baseAmount('10000000')}
-    assetShare={baseAmount('3000000')}
-    reloadFees={constVoid}
-  />
-)
-AsymErrorAllFeesStory.storyName = 'asym - error: all fees'
-
-export default {
+const meta: Meta = {
+  component: Withdraw,
   title: 'Components/Deposit/Withdraw'
 }
+
+export default meta

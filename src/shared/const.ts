@@ -18,5 +18,5 @@ export enum ExternalUrl {
  * public api for it at src/main/preload.ts
  */
 export const STORE_FILES_DEFAULTS: StoreFilesContent = {
-  commonStorage: { locale: Locale.EN }
+  commonStorage: { locale: Locale.EN, userNodes: [] }
 }
