@@ -2,7 +2,7 @@ import { bn } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
-import { validateBN, lessThanOrEqualTo, greaterThan } from './validation'
+import { validateBN, lessThanOrEqualTo, greaterThan, validateAddress } from './validation'
 
 describe('helpers/form/validation', () => {
   describe('validateBN', () => {
@@ -38,6 +38,37 @@ describe('helpers/form/validation', () => {
       expect(result).toEqual(E.left('errorMsg'))
     })
   })
+
+  describe('validateAddress', () => {
+    it('is right', () => {
+      const value = '3'
+      const result = FP.pipe(
+        value,
+        validateAddress(() => true, 'errorMsg', 'errorMsg')
+      )
+      expect(result).toEqual(E.right(value))
+    })
+    it('is left because empty address', () => {
+      const value = ''
+      const result = FP.pipe(
+        value,
+        validateAddress(() => true, 'empty address error', 'errorMsg')
+      )
+
+      expect(result).toEqual(E.left('empty address error'))
+    })
+
+    it('is left because validator fails', () => {
+      const value = 'some'
+      const result = FP.pipe(
+        value,
+        validateAddress(() => false, 'errorMsg', 'invalid address error')
+      )
+
+      expect(result).toEqual(E.left('invalid address error'))
+    })
+  })
+
   describe('application of validations', () => {
     it('two validations are valid', () => {
       const value = bn('1')

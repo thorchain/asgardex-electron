@@ -4,6 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
@@ -11,7 +12,7 @@ import { Unbond } from '../../../components/interact/forms/Unbond'
 import { Button } from '../../../components/uielements/button'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
-import { InteractState } from '../../../services/thorchain/types'
+import { AddressValidation, InteractState } from '../../../services/thorchain/types'
 import * as Styled from './InteractView.styles'
 
 type Props = {
@@ -20,8 +21,20 @@ type Props = {
 
 export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
   const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
-  const { interact$ } = useThorchainContext()
+  const { interact$, client$ } = useThorchainContext()
   const intl = useIntl()
+
+  const oClient = useObservableState(client$, O.none)
+
+  const addressValidation = useMemo(
+    () =>
+      FP.pipe(
+        oClient,
+        O.map((c) => c.validateAddress),
+        O.getOrElse((): AddressValidation => (_: string) => true)
+      ),
+    [oClient]
+  )
 
   const oSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
 
@@ -71,8 +84,15 @@ export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
   return FP.pipe(
     interactState.txRD,
     RD.fold(
-      () => <Unbond onFinish={unbondTx} />,
-      () => <Unbond isLoading={true} onFinish={FP.identity} loadingProgress={stepLabel} />,
+      () => <Unbond addressValidation={addressValidation} onFinish={unbondTx} />,
+      () => (
+        <Unbond
+          addressValidation={addressValidation}
+          isLoading={true}
+          onFinish={FP.identity}
+          loadingProgress={stepLabel}
+        />
+      ),
       ({ msg }) => (
         <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.unbond.state.error' })} subTitle={msg}>
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>

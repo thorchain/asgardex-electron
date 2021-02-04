@@ -13,3 +13,17 @@ export const lessThanOrEqualTo = (max: BigNumber) => (errorMsg: string) => (
 
 export const greaterThan = (max: BigNumber) => (errorMsg: string) => (value: BigNumber): E.Either<string, BigNumber> =>
   FP.pipe(value, (valueBN) => (valueBN.isGreaterThan(max) ? E.right(value) : E.left(errorMsg)))
+
+export const validateAddress = <T extends (value: string) => boolean>(
+  validator: T,
+  emptyErrorMsg: string,
+  invalidAddressMsg: string
+) => (value: string): E.Either<string, string> => {
+  if (!value) {
+    return E.left(emptyErrorMsg)
+  }
+  if (!validator(value.toLowerCase())) {
+    return E.left(invalidAddressMsg)
+  }
+  return E.right(value)
+}

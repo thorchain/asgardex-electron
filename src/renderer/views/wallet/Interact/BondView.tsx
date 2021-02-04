@@ -17,6 +17,7 @@ import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
+import { AddressValidation } from '../../../services/thorchain/types'
 import { InteractState } from '../../../services/thorchain/types'
 import * as Styled from './InteractView.styles'
 
@@ -28,8 +29,20 @@ type Props = {
 export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) => {
   const { balancesState$ } = useWalletContext()
   const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
-  const { interact$ } = useThorchainContext()
+  const { interact$, client$ } = useThorchainContext()
   const intl = useIntl()
+
+  const oClient = useObservableState(client$, O.none)
+
+  const addressValidation = useMemo(
+    () =>
+      FP.pipe(
+        oClient,
+        O.map((c) => c.validateAddress),
+        O.getOrElse((): AddressValidation => (_: string) => true)
+      ),
+    [oClient]
+  )
 
   const oSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
 
@@ -96,8 +109,16 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
   return FP.pipe(
     interactState.txRD,
     RD.fold(
-      () => <Bond max={runeBalance} onFinish={bondTx} />,
-      () => <Bond isLoading={true} max={runeBalance} onFinish={FP.identity} loadingProgress={stepLabel} />,
+      () => <Bond addressValidation={addressValidation} max={runeBalance} onFinish={bondTx} />,
+      () => (
+        <Bond
+          addressValidation={addressValidation}
+          isLoading={true}
+          max={runeBalance}
+          onFinish={FP.identity}
+          loadingProgress={stepLabel}
+        />
+      ),
       ({ msg }) => (
         <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.bond.state.error' })} subTitle={msg}>
           <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
