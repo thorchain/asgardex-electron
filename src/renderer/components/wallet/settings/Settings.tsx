@@ -14,6 +14,7 @@ import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unloc
 import { truncateAddress } from '../../../helpers/addressHelper'
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
+import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { UserAccountType } from '../../../types/wallet'
 import { PhraseCopyModal } from '../phrase'
 import * as Styled from './Settings.style'
@@ -33,6 +34,7 @@ type Props = {
   removeAllLedgerAddress: () => void
   phrase?: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
+  validatePassword$: ValidatePasswordHandler
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -55,10 +57,11 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     removeAllLedgerAddress,
     changeNetwork,
     phrase: oPhrase = O.none,
-    clickAddressLinkHandler
+    clickAddressLinkHandler,
+    validatePassword$
   } = props
 
-  const [showPhrase, setShowPhrase] = useState(false)
+  const [showPhraseModal, setShowPhraseModal] = useState(false)
 
   const removeWallet = useCallback(() => {
     removeKeystore()
@@ -180,7 +183,16 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
-      <PhraseCopyModal phrase={phrase} visible={showPhrase} onClose={() => setShowPhrase(false)} />
+      {showPhraseModal && (
+        <PhraseCopyModal
+          validatePassword$={validatePassword$}
+          phrase={phrase}
+          visible={showPhraseModal}
+          onClose={() => {
+            setShowPhraseModal(false)
+          }}
+        />
+      )}
       <Row>
         <Col span={24}>
           <Styled.TitleWrapper>
@@ -218,7 +230,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                     color="primary"
                     typevalue="outline"
                     round="true"
-                    onClick={() => setShowPhrase(true)}
+                    onClick={() => setShowPhraseModal(true)}
                     disabled={O.isNone(oPhrase) ? true : false}>
                     {intl.formatMessage({ id: 'setting.view.phrase' })}
                   </Styled.Button>

@@ -34,7 +34,7 @@ import { UserAccountType } from '../../types/wallet'
 export const SettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const { keystoreService } = useWalletContext()
-  const { keystore$, lock, removeKeystore, exportKeystore } = keystoreService
+  const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
   const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
   const thorchainContext = useThorchainContext()
@@ -286,6 +286,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           removeAllLedgerAddress={removeAllLedgerAddress}
           phrase={phrase}
           clickAddressLinkHandler={clickAddressLinkHandler}
+          validatePassword$={validatePassword$}
         />
       </Col>
     </Row>

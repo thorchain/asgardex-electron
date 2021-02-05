@@ -33,8 +33,7 @@ export const PasswordModal: React.FC<Props> = ({ onSuccess, onClose, validatePas
 
   const onPasswordValidationSucceed = useCallback(() => {
     onSuccess()
-    closePrivateModal()
-  }, [onSuccess, closePrivateModal])
+  }, [onSuccess])
 
   const confirmProps = useMemo(() => {
     const props = { onCancel: closePrivateModal, visible: true }
