@@ -16,6 +16,7 @@ import { LedgerAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { UserAccountType } from '../../../types/wallet'
+import { PasswordModal } from '../../modal/password'
 import { PhraseCopyModal } from '../phrase'
 import * as Styled from './Settings.style'
 
@@ -62,6 +63,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const [showPhraseModal, setShowPhraseModal] = useState(false)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
 
   const removeWallet = useCallback(() => {
     removeKeystore()
@@ -181,11 +183,22 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     [changeNetworkHandler]
   )
 
+  const onSuccessPassword = useCallback(() => {
+    setShowPasswordModal(false)
+    setShowPhraseModal(true)
+  }, [setShowPasswordModal, setShowPhraseModal])
+
   return (
     <>
+      {showPasswordModal && (
+        <PasswordModal
+          validatePassword$={validatePassword$}
+          onSuccess={onSuccessPassword}
+          onClose={() => setShowPasswordModal(false)}
+        />
+      )}
       {showPhraseModal && (
         <PhraseCopyModal
-          validatePassword$={validatePassword$}
           phrase={phrase}
           visible={showPhraseModal}
           onClose={() => {
@@ -230,7 +243,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                     color="primary"
                     typevalue="outline"
                     round="true"
-                    onClick={() => setShowPhraseModal(true)}
+                    onClick={() => setShowPasswordModal(true)}
                     disabled={O.isNone(oPhrase) ? true : false}>
                     {intl.formatMessage({ id: 'setting.view.phrase' })}
                   </Styled.Button>

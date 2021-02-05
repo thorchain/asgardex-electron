@@ -1,33 +1,23 @@
-import React, { useCallback, useState } from 'react'
+import React from 'react'
 
 import { CheckOutlined, CopyOutlined } from '@ant-design/icons'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
-import { ValidatePasswordHandler } from '../../../services/wallet/types'
-import { PasswordModal } from '../../modal/password'
 import * as Styled from './PhraseCopyModal.style'
 
 type Props = {
   visible: boolean
   phrase: string
   onClose?: FP.Lazy<void>
-  validatePassword$: ValidatePasswordHandler
 }
 
 export const PhraseCopyModal: React.FC<Props> = (props): JSX.Element => {
-  const { visible, phrase, onClose = FP.constVoid, validatePassword$ } = props
-  const [showPasswordModal, setShowPasswordModal] = useState(true)
-
-  const onSucceedPasswordModal = useCallback(() => {
-    setShowPasswordModal(false)
-  }, [setShowPasswordModal])
+  const { visible, phrase, onClose = FP.constVoid } = props
 
   const intl = useIntl()
 
-  return showPasswordModal ? (
-    <PasswordModal onSuccess={onSucceedPasswordModal} onClose={onClose} validatePassword$={validatePassword$} />
-  ) : (
+  return (
     <Styled.Modal
       title={intl.formatMessage({ id: 'setting.view.phrase' })}
       visible={visible}
