@@ -4681,10 +4681,21 @@
   dependencies:
     "@xchainjs/xchain-util" "^0.2.0"
 
-"@xchainjs/xchain-cosmos@^0.7.0", "@xchainjs/xchain-cosmos@^0.7.1":
+"@xchainjs/xchain-cosmos@^0.7.1":
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.7.1.tgz#6da652bfc21b4c7660a3ae6b18c7d237c5a08db0"
   integrity sha512-HCsQxjqcS/QKXAXvXqql7frnprqmTfnMSjpknH6nFscXXIZkNVbNNwJGqXwLsNLS1X8f0oj83KMMlinH0FU8TQ==
+  dependencies:
+    "@xchainjs/xchain-client" "^0.3.0"
+    "@xchainjs/xchain-crypto" "^0.2.1"
+    "@xchainjs/xchain-util" "^0.2.0"
+    axios "^0.21.0"
+    nock "^13.0.5"
+
+"@xchainjs/xchain-cosmos@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.8.0.tgz#777ec7a53b2072a47b4d2d87c1cecba5719647b7"
+  integrity sha512-JwOLUH1MoghAdbSiu05afpnVs7s1ijbLmCmxzzmihEvB6ytB80QPHEzww7zneNVrROfwmbWO0AVvCLCmTadDGw==
   dependencies:
     "@xchainjs/xchain-client" "^0.3.0"
     "@xchainjs/xchain-crypto" "^0.2.1"
@@ -4749,13 +4760,13 @@
     axios "^0.19.2"
     nock "^13.0.4"
 
-"@xchainjs/xchain-thorchain@^0.9.2":
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.9.3.tgz#d1a6666931d91cfaee032b145bd588de1e1ff26d"
-  integrity sha512-8VhZPtQ4jcsdU02aDSnfFLBcKgzGa7AzWtE726d/NjqO9H/WNw/dX3l9CbipJtb+/qDgrGeamU3UsKUPu5Pbcg==
+"@xchainjs/xchain-thorchain@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.10.0.tgz#9d216a555d13d305fec53482c29b6f244fdaa2f0"
+  integrity sha512-be60SDfpDghJlrYz5Ic8s555M6bgdVFg5FrRrOEHRMwt+u8xMMMYil7RdDGA9HgsFe5xwLf4XpL0gIw6l2j8HQ==
   dependencies:
     "@xchainjs/xchain-client" "^0.3.0"
-    "@xchainjs/xchain-cosmos" "^0.7.0"
+    "@xchainjs/xchain-cosmos" "^0.8.0"
     "@xchainjs/xchain-crypto" "^0.2.1"
     axios "^0.21.0"
     nock "^13.0.5"
