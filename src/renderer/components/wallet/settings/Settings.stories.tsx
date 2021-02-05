@@ -7,12 +7,14 @@ import { some } from 'fp-ts/lib/Option'
 
 import { Network } from '../../../../shared/api/types'
 import { BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
+import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { Settings } from './index'
 
 storiesOf('Wallet/Settings', module).add('default', () => {
   return (
     <Settings
+      validatePassword$={mockValidatePassword$}
       selectedNetwork={'testnet'}
       changeNetwork={(n: Network) => console.log('change network ', n)}
       clientUrl={some(BNB_ADDRESS_TESTNET)}

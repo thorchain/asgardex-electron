@@ -245,8 +245,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
       const walletAddress = FP.pipe(
         oWalletAddress,
-        // TODO(@Veado) Add i18
-        O.getOrElse(() => 'Unknown address')
+        O.getOrElse(() => intl.formatMessage({ id: 'wallet.errors.address.invalid' }))
       )
 
       const header = (

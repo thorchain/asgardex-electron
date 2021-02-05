@@ -16,7 +16,6 @@ const deposit: DepositMessages = {
   'deposit.totalEarnings': 'Your total earnings from the pool',
   'deposit.add.asym': 'Add {asset}',
   'deposit.add.sym': 'Add {assetA} + {assetB}',
-  'deposit.add.state.healthCheck': 'Health check',
   'deposit.add.state.sending': 'Send deposit transaction',
   'deposit.add.state.checkResults': 'Check deposit result',
   'deposit.add.state.pending': 'Adding liquidity',

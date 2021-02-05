@@ -1,7 +1,7 @@
 import { PoolSharesMessage } from '../types'
 
 const poolShares: PoolSharesMessage = {
-  'poolshares.ownership': 'Ownership - RU'
+  'poolshares.ownership': 'Доля'
 }
 
 export default poolShares

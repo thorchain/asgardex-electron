@@ -5,8 +5,10 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useBitcoinContext } from '../../contexts/BitcoinContext'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { HeaderComponent } from './HeaderComponent'
 
@@ -21,8 +23,14 @@ export const Header: React.FC = (): JSX.Element => {
   } = midgardService
   const midgardUrl = useObservableState(apiEndpoint$, RD.initial)
 
-  const { explorerUrl$ } = useBinanceContext()
-  const explorerUrl = useObservableState(explorerUrl$, O.none)
+  const binanceUrl$ = useBinanceContext().explorerUrl$
+  const binanceUrl = useObservableState(binanceUrl$, O.none)
+
+  const bitcoinUrl$ = useBitcoinContext().explorerUrl$
+  const bitcoinUrl = useObservableState(bitcoinUrl$, O.none)
+
+  const thorchainUrl$ = useThorchainContext().explorerUrl$
+  const thorchainUrl = useObservableState(thorchainUrl$, O.none)
 
   const { changeLocale, locale$, initialLocale } = useI18nContext()
   const currentLocale = useObservableState(locale$, initialLocale)
@@ -36,7 +44,9 @@ export const Header: React.FC = (): JSX.Element => {
       selectedPricePoolAsset$={selectedPricePoolAsset$}
       locale={currentLocale}
       changeLocale={changeLocale}
-      binanceUrl={explorerUrl}
+      binanceUrl={binanceUrl}
+      bitcoinUrl={bitcoinUrl}
+      thorchainUrl={thorchainUrl}
       midgardUrl={RD.toOption(midgardUrl)}
     />
   )

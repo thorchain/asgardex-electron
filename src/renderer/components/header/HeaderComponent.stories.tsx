@@ -12,6 +12,8 @@ import { HeaderComponent } from './HeaderComponent'
 
 const binanceUrl = O.some('https://testnet-dex.binance.org/api/v1')
 const midgardUrl = O.some('https://54.0.0.27')
+const bitcoinUrl = O.some('https://blockstream.info')
+const thorchainUrl = O.some('https://thorchain.net')
 
 storiesOf('Components/Header', module).add('default', () => {
   return (
@@ -24,6 +26,8 @@ storiesOf('Components/Header', module).add('default', () => {
       locale={Locale.EN}
       binanceUrl={binanceUrl}
       midgardUrl={midgardUrl}
+      bitcoinUrl={bitcoinUrl}
+      thorchainUrl={thorchainUrl}
     />
   )
 })

@@ -9,7 +9,8 @@ import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
 import { ZERO_BN } from '../../../const'
-import { greaterThan } from '../../../helpers/form/validation'
+import { validateAddress, greaterThan } from '../../../helpers/form/validation'
+import { AddressValidation } from '../../../services/thorchain/types'
 import { Input, InputBigNumber } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 
@@ -19,8 +20,14 @@ type Props = {
   onFinish: (unboundData: { memo: string }) => void
   isLoading?: boolean
   loadingProgress?: string
+  addressValidation: AddressValidation
 }
-export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = false, loadingProgress }) => {
+export const Unbond: React.FC<Props> = ({
+  onFinish: onFinishProp,
+  isLoading = false,
+  loadingProgress,
+  addressValidation
+}) => {
   const intl = useIntl()
   const [form] = Form.useForm<FormValues>()
 
@@ -47,6 +54,23 @@ export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = fa
     [intl]
   )
 
+  const addressValidator = useCallback(
+    (_, value: string) =>
+      FP.pipe(
+        value,
+        validateAddress(
+          addressValidation,
+          intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' }),
+          intl.formatMessage({ id: 'wallet.errors.address.invalid' })
+        ),
+        E.fold(
+          (e) => Promise.reject(e),
+          () => Promise.resolve()
+        )
+      ),
+    [addressValidation, intl]
+  )
+
   return (
     <Styled.Form form={form} onFinish={onFinish} initialValues={{ memo: '' }}>
       <div>
@@ -57,7 +81,7 @@ export const Unbond: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = fa
             rules={[
               {
                 required: true,
-                message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' })
+                validator: addressValidator
               }
             ]}>
             <Input disabled={isLoading} size="large" />

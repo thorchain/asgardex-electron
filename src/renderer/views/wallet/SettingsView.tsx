@@ -23,6 +23,7 @@ import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { filterEnabledChains } from '../../helpers/chainHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { OnlineStatus } from '../../services/app/types'
@@ -33,7 +34,7 @@ import { UserAccountType } from '../../types/wallet'
 export const SettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const { keystoreService } = useWalletContext()
-  const { keystore$, lock, removeKeystore, exportKeystore } = keystoreService
+  const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
   const { network$, changeNetwork } = useAppContext()
   const binanceContext = useBinanceContext()
   const thorchainContext = useThorchainContext()
@@ -184,7 +185,14 @@ export const SettingsView: React.FC = (): JSX.Element => {
     () =>
       pipe(
         // combineLatest is for the future additional accounts
-        Rx.combineLatest([thorchainAddress$, binanceAddress$, ethAddress$, bitcoinAddress$]),
+        Rx.combineLatest(
+          filterEnabledChains({
+            THOR: [thorchainAddress$],
+            BNB: [binanceAddress$],
+            ETH: [ethAddress$],
+            BTC: [bitcoinAddress$]
+          })
+        ),
         RxOp.map(A.filter(O.isSome)),
         RxOp.map(sequenceTOptionFromArray)
       ),
@@ -278,6 +286,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           removeAllLedgerAddress={removeAllLedgerAddress}
           phrase={phrase}
           clickAddressLinkHandler={clickAddressLinkHandler}
+          validatePassword$={validatePassword$}
         />
       </Col>
     </Row>

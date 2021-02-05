@@ -1,10 +1,10 @@
 import { THORChain } from '@xchainjs/xchain-util'
 
 import { reloadBalances, balances$ } from './balances'
-import { client$, address$, getExplorerTxUrl$, getExplorerAddressUrl$ } from './common'
+import { client$, address$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
-import { getNodeInfo$ } from './thorNode'
+import { getNodeInfo$, reloadNodesInfo } from './thorNode'
 import { createDepositService, createTransactionService } from './transaction'
 
 const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
@@ -14,6 +14,7 @@ const interact$ = createInteractService$(sendDepositTx, txStatus$)
 
 export {
   address$,
+  explorerUrl$,
   client$,
   reloadBalances,
   balances$,
@@ -30,5 +31,6 @@ export {
   getExplorerAddressUrl$,
   sendDepositTx,
   interact$,
-  getNodeInfo$
+  getNodeInfo$,
+  reloadNodesInfo
 }
