@@ -10,7 +10,6 @@ import { StyledMenu } from './AssetsNav.style'
 enum MenuKey {
   ASSETS = 'assets',
   POOLSHARES = 'poolshares',
-  DEPOSITS = 'deposits',
   BONDS = 'bonds',
   UNKNOWN = 'unknown'
 }
@@ -38,11 +37,6 @@ export const AssetsNav: React.FC = (): JSX.Element => {
           path: walletRoutes.poolShares.path()
         },
         {
-          key: MenuKey.DEPOSITS,
-          label: intl.formatMessage({ id: 'wallet.nav.deposits' }),
-          path: walletRoutes.deposits.path()
-        },
-        {
           key: MenuKey.BONDS,
           label: intl.formatMessage({ id: 'wallet.nav.bonds' }),
           path: walletRoutes.bonds.path()
@@ -53,14 +47,11 @@ export const AssetsNav: React.FC = (): JSX.Element => {
 
   const assetsRoute = useRouteMatch(walletRoutes.assets.path())
   const poolSharesRoute = useRouteMatch(walletRoutes.poolShares.path())
-  const depositsRoute = useRouteMatch(walletRoutes.deposits.path())
   const bondsRoute = useRouteMatch(walletRoutes.bonds.path())
 
   const activeMenu: MenuKey = useMemo(() => {
     if (assetsRoute) {
       return MenuKey.ASSETS
-    } else if (depositsRoute) {
-      return MenuKey.DEPOSITS
     } else if (poolSharesRoute) {
       return MenuKey.POOLSHARES
     } else if (bondsRoute) {
@@ -68,7 +59,7 @@ export const AssetsNav: React.FC = (): JSX.Element => {
     } else {
       return MenuKey.UNKNOWN
     }
-  }, [assetsRoute, depositsRoute, poolSharesRoute, bondsRoute])
+  }, [assetsRoute, poolSharesRoute, bondsRoute])
 
   return (
     <StyledMenu mode="horizontal" selectedKeys={[activeMenu]}>
