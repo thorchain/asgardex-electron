@@ -738,7 +738,6 @@ export const Swap = ({
           {!hasImportedKeystore(keystore)
             ? intl.formatMessage({ id: 'swap.note.nowallet' })
             : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
-          {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFees} />}
         </Styled.NoteLabel>
         {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFees} />}
         {targetChainFeeErrorLabel}
