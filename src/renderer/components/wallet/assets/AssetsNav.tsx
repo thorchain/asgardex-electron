@@ -38,11 +38,6 @@ export const AssetsNav: React.FC = (): JSX.Element => {
           path: walletRoutes.poolShares.path()
         },
         {
-          key: MenuKey.DEPOSITS,
-          label: intl.formatMessage({ id: 'wallet.nav.deposits' }),
-          path: walletRoutes.deposits.path()
-        },
-        {
           key: MenuKey.BONDS,
           label: intl.formatMessage({ id: 'wallet.nav.bonds' }),
           path: walletRoutes.bonds.path()
