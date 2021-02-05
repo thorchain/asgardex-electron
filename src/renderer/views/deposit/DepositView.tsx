@@ -17,7 +17,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { DepositRouteParams } from '../../routes/deposit'
-import { StakersAssetDataLD, StakersAssetDataRD } from '../../services/midgard/types'
+import { PoolShareLD, PoolShareRD } from '../../services/midgard/types'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
 import { ShareView } from './share/ShareView'
@@ -32,7 +32,7 @@ export const DepositView: React.FC<Props> = (_) => {
   const {
     service: {
       setSelectedPoolAsset,
-      stake: { getStakes$ }
+      shares: { getStakes$ }
     }
   } = useMidgardContext()
   const { keystoreService } = useWalletContext()
@@ -65,7 +65,7 @@ export const DepositView: React.FC<Props> = (_) => {
    * We have to get a new stake-stream for every new asset
    * @description /src/renderer/services/midgard/stake.ts
    */
-  const depositData$: StakersAssetDataLD = useMemo(
+  const depositData$: PoolShareLD = useMemo(
     () =>
       FP.pipe(
         sequenceTOption(oSelectedAsset, oAssetWalletAddress),
@@ -76,7 +76,7 @@ export const DepositView: React.FC<Props> = (_) => {
       ),
     [getStakes$, oAssetWalletAddress, oSelectedAsset]
   )
-  const depositData = useObservableState<StakersAssetDataRD>(depositData$, RD.initial)
+  const depositData = useObservableState<PoolShareRD>(depositData$, RD.initial)
 
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`
@@ -110,7 +110,7 @@ export const DepositView: React.FC<Props> = (_) => {
           (selectedAsset) => (
             <Deposit
               asset={selectedAsset}
-              depositData={depositData}
+              symPoolShare={depositData}
               keystoreState={keystoreState}
               ShareContent={ShareView}
               SymDepositContent={SymDepositView}

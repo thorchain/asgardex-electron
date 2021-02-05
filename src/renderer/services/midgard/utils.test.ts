@@ -5,20 +5,20 @@ import {
   AssetETH,
   AssetRuneNative,
   assetToString,
+  bn,
   BNBChain,
   BTCChain,
   THORChain
 } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, AssetBUSDBAF } from '../../const'
 import { eqAsset, eqOString } from '../../helpers/fp/eq'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { InboundAddressesItem as ThorchainEndpoint } from '../../types/generated/midgard'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
-import { AssetDetail, PoolDetail, PoolsState, PoolsStateRD } from './types'
+import { AssetDetail, PoolDetail, PoolShares, PoolsState, PoolsStateRD } from './types'
 import {
-  getAssetDetailIndex,
   getAssetDetail,
   getPricePools,
   pricePoolSelector,
@@ -27,35 +27,12 @@ import {
   toPoolData,
   filterPoolAssets,
   getPoolDetailsHashMap,
-  getPoolAddressByChain
+  getPoolAddressByChain,
+  combineShares,
+  combineSharesByAsset
 } from './utils'
 
-type PoolDataMock = { asset?: string }
-
 describe('services/midgard/utils/', () => {
-  describe('getAssetDetailIndex', () => {
-    const emptyAsset = {}
-    const emptyAssetSymbol: PoolDataMock = { asset: 'AAA' }
-
-    it('should return non empty assetDataIndex ', () => {
-      const bnbData = { chain: 'BNB', address: '0xbnb' } as ThorchainEndpoint
-      const asset1: PoolDataMock = { asset: assetToString(AssetBNB) }
-      const asset2: PoolDataMock = { asset: assetToString(AssetBTC) }
-      const data = [bnbData, asset1, asset2, emptyAsset, emptyAssetSymbol] as Array<PoolDataMock>
-      const result = getAssetDetailIndex(data)
-      const expected = {
-        BNB: asset1,
-        BTC: asset2
-      }
-      expect(result).toEqual(expected)
-    })
-    it('should return an emtpy {} if no asset or symbols in list', () => {
-      const data = [emptyAsset, emptyAssetSymbol, emptyAssetSymbol, emptyAssetSymbol, emptyAsset] as Array<PoolDataMock>
-      const result = getAssetDetailIndex(data)
-      expect(result).toStrictEqual({})
-    })
-  })
-
   describe('getAssetDetail', () => {
     const runeDetail = { asset: assetToString(AssetRuneNative) } as AssetDetail
     const bnbDetail = { asset: assetToString(AssetBNB) } as AssetDetail
@@ -123,7 +100,7 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('pricePoolSelector', () => {
-    const poolData = toPoolData({})
+    const poolData = toPoolData({ assetDepth: '1', runeDepth: '1' })
     const eth: PricePool = { asset: AssetETH, poolData }
     const BUSDBAF: PricePool = { asset: AssetBUSDBAF, poolData }
     const btc: PricePool = { asset: AssetBTC, poolData }
@@ -151,7 +128,7 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('pricePoolSelectorFromRD', () => {
-    const poolData = toPoolData({})
+    const poolData = toPoolData({ assetDepth: '1', runeDepth: '1' })
     const eth: PricePool = { asset: AssetETH, poolData }
     const BUSDBAF: PricePool = { asset: AssetBUSDBAF, poolData }
     const btc: PricePool = { asset: AssetBTC, poolData }
@@ -247,11 +224,11 @@ describe('services/midgard/utils/', () => {
 
   describe('getPoolAddressByChain', () => {
     const bnbAddress = 'bnb pool address'
-    const endpointBNB: ThorchainEndpoint = { address: bnbAddress, chain: BNBChain }
+    const endpointBNB = { address: bnbAddress, chain: BNBChain }
     const thorAddress = 'thor pool address'
-    const endpointThor: ThorchainEndpoint = { address: thorAddress, chain: THORChain }
+    const endpointThor = { address: thorAddress, chain: THORChain }
     const btcAddress = 'btc pool address'
-    const endpointBTC: ThorchainEndpoint = { address: btcAddress, chain: BTCChain }
+    const endpointBTC = { address: btcAddress, chain: BTCChain }
     it('returns BNBChain if list of endpoints are empty', () => {
       const result = getPoolAddressByChain([endpointBNB, endpointThor, endpointBTC], BNBChain)
       expect(eqOString.equals(result, O.some(bnbAddress))).toBeTruthy()
@@ -263,6 +240,103 @@ describe('services/midgard/utils/', () => {
 
     it('returns none if chain is not in list of endpoints', () => {
       expect(getPoolAddressByChain([endpointBNB, endpointThor], BTCChain)).toBeNone()
+    })
+  })
+
+  describe.only('combineSharesByAsset', () => {
+    const shares: PoolShares = [
+      {
+        asset: AssetETH,
+        units: bn(0),
+        type: 'sym'
+      },
+      {
+        asset: AssetBNB,
+        units: bn(1),
+        type: 'sym'
+      },
+      {
+        asset: AssetBNB,
+        units: bn(2),
+        type: 'asym'
+      },
+      {
+        asset: AssetBTC,
+        units: bn(3),
+        type: 'asym'
+      }
+    ]
+    it('returns none for empty list', () => {
+      expect(combineSharesByAsset([], AssetBNB)).toBeNone()
+    })
+
+    it('returns none for non existing asset in list', () => {
+      expect(combineSharesByAsset([], AssetRuneNative)).toBeNone()
+    })
+
+    it('merges BNB pool shares', () => {
+      const result = combineSharesByAsset(shares, AssetBNB)
+      expect(FP.pipe(result, O.toNullable)).toEqual({
+        asset: AssetBNB,
+        units: bn(3),
+        type: 'all'
+      })
+    })
+    it('merges ETH pool shares', () => {
+      const result = combineSharesByAsset(shares, AssetETH)
+      expect(FP.pipe(result, O.toNullable)).toEqual({
+        asset: AssetETH,
+        units: bn(0),
+        type: 'all'
+      })
+    })
+  })
+
+  describe('combineShares', () => {
+    it('returns empty list', () => {
+      expect(combineShares([])).toEqual([])
+    })
+    it('merges pool shares', () => {
+      const shares: PoolShares = [
+        {
+          asset: AssetETH,
+          units: bn(1),
+          type: 'sym'
+        },
+        {
+          asset: AssetBNB,
+          units: bn(1),
+          type: 'sym'
+        },
+        {
+          asset: AssetBNB,
+          units: bn(2),
+          type: 'asym'
+        },
+        {
+          asset: AssetBTC,
+          units: bn(3),
+          type: 'asym'
+        }
+      ]
+      const result = combineShares(shares)
+      expect(result).toEqual([
+        {
+          asset: AssetETH,
+          units: bn(1),
+          type: 'all'
+        },
+        {
+          asset: AssetBNB,
+          units: bn(3),
+          type: 'all'
+        },
+        {
+          asset: AssetBTC,
+          units: bn(3),
+          type: 'all'
+        }
+      ])
     })
   })
 })

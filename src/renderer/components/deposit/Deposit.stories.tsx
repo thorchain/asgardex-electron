@@ -13,7 +13,7 @@ import { Default as Withdraw } from './withdraw/Withdraw.stories'
 
 const defaultProps: DepositProps = {
   asset: AssetBNB,
-  depositData: RD.success({ units: '3', runeDepth: '12', assetDepth: '12' }),
+  symPoolShare: RD.success({ units: '3', runeDepth: '12', assetDepth: '12' }),
   ShareContent: DefaultPoolShare,
   SymDepositContent: SymDeposit,
   AsymDepositContent: AsymDeposit,

@@ -21,19 +21,13 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { DEFAULT_NETWORK } from '../../../services/const'
-import {
-  PoolDetailRD,
-  StakersAssetData,
-  StakersAssetDataRD,
-  PoolDetail,
-  PoolAddress
-} from '../../../services/midgard/types'
+import { PoolDetailRD, StakersAssetData, PoolShareRD, PoolDetail, PoolAddress } from '../../../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 
 type Props = {
   asset: Asset
-  depositData: StakersAssetDataRD
+  depositData: PoolShareRD
 }
 
 export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {

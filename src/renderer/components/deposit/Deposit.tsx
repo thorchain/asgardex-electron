@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
 
-import { StakersAssetDataRD } from '../../services/midgard/types'
+import { PoolShareRD } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AddWallet } from '../wallet/add'
@@ -19,16 +19,25 @@ type Tab = {
 
 export type Props = {
   asset: Asset
-  depositData: StakersAssetDataRD
-  ShareContent: React.ComponentType<{ asset: Asset; depositData: StakersAssetDataRD }>
+  asymPoolShare: PoolShareRD
+  symPoolShare: PoolShareRD
+  ShareContent: React.ComponentType<{ asset: Asset; depositData: PoolShareRD }>
   AsymDepositContent: React.ComponentType<{ asset: Asset }>
   SymDepositContent: React.ComponentType<{ asset: Asset }>
-  WidthdrawContent: React.ComponentType<{ asset: Asset; depositData: StakersAssetDataRD }>
+  WidthdrawContent: React.ComponentType<{ asset: Asset; depositData: PoolShareRD }>
   keystoreState: KeystoreState
 }
 
 export const Deposit: React.FC<Props> = (props) => {
-  const { ShareContent, SymDepositContent, WidthdrawContent, asset, keystoreState, depositData } = props
+  const {
+    AsymDepositContent,
+    ShareContent,
+    SymDepositContent,
+    WidthdrawContent,
+    asset,
+    keystoreState,
+    symPoolShare
+  } = props
   const intl = useIntl()
 
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
@@ -38,11 +47,11 @@ export const Deposit: React.FC<Props> = (props) => {
     (): Tab[] => [
       // TODO enable with #827 https ://github.com/thorchain/asgardex-electron/issues/827
       // AsymDepositContent component should be received from props
-      // {
-      //   key: 'deposit-asym',
-      //   label: intl.formatMessage({ id: 'deposit.add.asym' }, { asset: asset.ticker }),
-      //   content: <AsymDepositContent asset={asset} />
-      // },
+      {
+        key: 'deposit-asym',
+        label: intl.formatMessage({ id: 'deposit.add.asym' }, { asset: asset.ticker }),
+        content: <AsymDepositContent asset={asset} />
+      },
       {
         key: 'deposit-sym',
         label: intl.formatMessage({ id: 'deposit.add.sym' }, { assetA: asset.ticker, assetB: AssetRuneNative.ticker }),
@@ -51,10 +60,10 @@ export const Deposit: React.FC<Props> = (props) => {
       {
         key: 'withdraw',
         label: intl.formatMessage({ id: 'deposit.withdraw' }),
-        content: <WidthdrawContent asset={asset} depositData={depositData} />
+        content: <WidthdrawContent asset={asset} depositData={symPoolShare} />
       }
     ],
-    [intl, asset, SymDepositContent, WidthdrawContent, depositData]
+    [intl, asset, AsymDepositContent, SymDepositContent, WidthdrawContent, symPoolShare]
   )
 
   return (
@@ -67,7 +76,7 @@ export const Deposit: React.FC<Props> = (props) => {
             </Styled.DepositContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper>
-                <ShareContent asset={asset} depositData={depositData} />
+                <ShareContent asset={asset} depositData={symPoolShare} />
               </Styled.ShareContentWrapper>
             </Styled.ShareContentCol>
           </>

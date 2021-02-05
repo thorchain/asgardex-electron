@@ -4,7 +4,6 @@ import {
   formatBN,
   BaseAmount,
   Asset,
-  formatBaseAsAssetAmount,
   formatAssetAmount,
   baseToAsset,
   formatAssetAmountCurrency,
@@ -28,7 +27,7 @@ type Props = {
   assetDepositShare: BaseAmount
   assetDepositPrice: BaseAmount
   poolShare: BigNumber
-  depositUnits: BaseAmount
+  depositUnits: BigNumber
 }
 
 export const PoolShare: React.FC<Props> = (props): JSX.Element => {
@@ -147,10 +146,7 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
             <Styled.LabelSecondary textTransform="uppercase">
               {intl.formatMessage({ id: 'deposit.share.units' })}
             </Styled.LabelSecondary>
-            <Styled.LabelPrimary loading={loading}>{`${formatBaseAsAssetAmount({
-              amount: depositUnits,
-              decimal: 2
-            })}`}</Styled.LabelPrimary>
+            <Styled.LabelPrimary loading={loading}>{`${formatBN(depositUnits, 2)}`}</Styled.LabelPrimary>
           </Col>
           <Col span={smallWidth ? 24 : 12}>
             <Styled.LabelSecondary textTransform="uppercase">

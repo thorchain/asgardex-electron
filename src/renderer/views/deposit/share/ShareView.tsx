@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
-import { Asset, AssetRuneNative, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
@@ -13,11 +13,11 @@ import { PoolShare } from '../../../components/uielements/poolShare'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
-import { PoolDetailRD, StakersAssetData, PoolDetail, StakersAssetDataRD } from '../../../services/midgard/types'
+import { PoolDetailRD, PoolDetail, PoolShareRD, PoolShare as TPoolShare } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import * as Styled from './ShareView.styles'
 
-type Props = { asset: Asset; depositData: StakersAssetDataRD }
+type Props = { asset: Asset; depositData: PoolShareRD }
 
 export const ShareView: React.FC<Props> = ({ asset, depositData }) => {
   const { service: midgardService } = useMidgardContext()
@@ -33,12 +33,10 @@ export const ShareView: React.FC<Props> = ({ asset, depositData }) => {
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const renderPoolShareReady = useCallback(
-    (stake: StakersAssetData, poolDetail: PoolDetail) => {
-      const runeShare = shareHelpers.getRuneShare(stake, poolDetail)
-      const assetShare = shareHelpers.getAssetShare(stake, poolDetail)
-      const poolShare = shareHelpers.getPoolShare(stake, poolDetail)
-      // stake units are RUNE based, provided as `BaseAmount`
-      const stakeUnits = baseAmount(bnOrZero(stake.units))
+    ({ units }: TPoolShare, poolDetail: PoolDetail) => {
+      const runeShare = shareHelpers.getRuneShare(units, poolDetail)
+      const assetShare = shareHelpers.getAssetShare(units, poolDetail)
+      const poolShare = shareHelpers.getPoolShare(units, poolDetail)
 
       const poolData = toPoolData(poolDetail)
 
@@ -50,7 +48,7 @@ export const ShareView: React.FC<Props> = ({ asset, depositData }) => {
           sourceAsset={AssetRuneNative}
           targetAsset={asset}
           poolShare={poolShare}
-          depositUnits={stakeUnits}
+          depositUnits={units}
           assetDepositShare={assetShare}
           priceAsset={FP.pipe(oPriceAsset, O.toUndefined)}
           loading={false}
