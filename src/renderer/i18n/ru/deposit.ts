@@ -16,7 +16,6 @@ const deposit: DepositMessages = {
   'deposit.totalEarnings': 'Ваш общий доход от пула',
   'deposit.add.asym': 'Добавить {asset}',
   'deposit.add.sym': 'Добавить {assetA} + {assetB}',
-  'deposit.add.state.healthCheck': 'Проверка сервера',
   'deposit.add.state.sending': 'Отправка транзакции для вклада',
   'deposit.add.state.checkResults': 'Проверка статуса вкалда',
   'deposit.add.state.pending': 'Добавление вклада',

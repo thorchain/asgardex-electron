@@ -235,7 +235,6 @@ type DepositMessageKey =
   | 'deposit.totalEarnings'
   | 'deposit.add.sym'
   | 'deposit.add.asym'
-  | 'deposit.add.state.healthCheck'
   | 'deposit.add.state.sending'
   | 'deposit.add.state.checkResults'
   | 'deposit.add.state.pending'
