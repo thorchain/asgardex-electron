@@ -28,15 +28,7 @@ export type Props = {
 }
 
 export const Deposit: React.FC<Props> = (props) => {
-  const {
-    ShareContent,
-    AsymDepositContent,
-    SymDepositContent,
-    WidthdrawContent,
-    asset,
-    keystoreState,
-    depositData
-  } = props
+  const { ShareContent, SymDepositContent, WidthdrawContent, asset, keystoreState, depositData } = props
   const intl = useIntl()
 
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
@@ -44,11 +36,13 @@ export const Deposit: React.FC<Props> = (props) => {
 
   const tabs = useMemo(
     (): Tab[] => [
-      {
-        key: 'deposit-asym',
-        label: intl.formatMessage({ id: 'deposit.add.asym' }, { asset: asset.ticker }),
-        content: <AsymDepositContent asset={asset} />
-      },
+      // TODO enable with #827 https ://github.com/thorchain/asgardex-electron/issues/827
+      // AsymDepositContent component should be received from props
+      // {
+      //   key: 'deposit-asym',
+      //   label: intl.formatMessage({ id: 'deposit.add.asym' }, { asset: asset.ticker }),
+      //   content: <AsymDepositContent asset={asset} />
+      // },
       {
         key: 'deposit-sym',
         label: intl.formatMessage({ id: 'deposit.add.sym' }, { assetA: asset.ticker, assetB: AssetRuneNative.ticker }),
@@ -60,7 +54,7 @@ export const Deposit: React.FC<Props> = (props) => {
         content: <WidthdrawContent asset={asset} depositData={depositData} />
       }
     ],
-    [intl, asset, AsymDepositContent, SymDepositContent, WidthdrawContent, depositData]
+    [intl, asset, SymDepositContent, WidthdrawContent, depositData]
   )
 
   return (
