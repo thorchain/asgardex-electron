@@ -23,6 +23,7 @@ export const sizes: Sizes = {
 
 export const IconWrapper = styled.div<IconProps>`
   width: ${({ size }) => `${sizes[size]}px`};
+  min-width: ${({ size }) => `${sizes[size]}px`};
   height: ${({ size }) => `${sizes[size]}px`};
   position: relative;
 `
