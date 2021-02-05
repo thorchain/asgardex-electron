@@ -10,7 +10,6 @@ import { StyledMenu } from './AssetsNav.style'
 enum MenuKey {
   ASSETS = 'assets',
   POOLSHARES = 'poolshares',
-  DEPOSITS = 'deposits',
   BONDS = 'bonds',
   UNKNOWN = 'unknown'
 }
