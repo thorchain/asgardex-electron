@@ -111,7 +111,7 @@ export const TitleLabel = styled(Label).attrs({
 })`
   width: 200px;
   font-size: 12px;
-  margin: 0 ${ICON_SIZE}; /* icon size */
+  margin: 0 0 0 ${ICON_SIZE}; /* icon size */
   text-transform: uppercase;
   color: ${palette('text', 2)};
 `
