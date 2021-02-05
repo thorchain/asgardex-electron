@@ -7,7 +7,6 @@ const wallet: WalletMessages = {
   'wallet.column.name': 'Имя',
   'wallet.column.ticker': 'Тикер',
   'wallet.column.balance': 'Баланс',
-  'wallet.column.value': 'Количество',
   'wallet.action.send': 'Отправить',
   'wallet.action.upgrade': 'Обновить',
   'wallet.action.receive': 'Получить',

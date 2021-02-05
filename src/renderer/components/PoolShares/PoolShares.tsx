@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, baseAmount, baseToAsset, formatAssetAmountCurrency, formatBN } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import { ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
@@ -13,11 +13,11 @@ import { PoolShare } from './types'
 
 type Props = {
   data: PoolShare[]
-  goToStakeInfo: (asset: Asset) => void
-  goToDataInfo: (asset: Asset) => void
+  priceAsset: Asset | undefined
+  goToStakeInfo: () => void
 }
 
-export const PoolShares: React.FC<Props> = ({ data, goToStakeInfo, goToDataInfo }) => {
+export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo }) => {
   const intl = useIntl()
 
   const iconColumn: ColumnType<PoolShare> = useMemo(
@@ -37,7 +37,7 @@ export const PoolShares: React.FC<Props> = ({ data, goToStakeInfo, goToDataInfo 
   const poolColumn: ColumnType<PoolShare> = useMemo(
     () => ({
       key: 'pool',
-      title: intl.formatMessage({ id: 'poolshares.pool' }),
+      title: intl.formatMessage({ id: 'common.pool' }),
       align: 'left',
       responsive: ['md'],
       render: ({ asset }: PoolShare) => <Label>{asset.symbol}</Label>
@@ -50,7 +50,7 @@ export const PoolShares: React.FC<Props> = ({ data, goToStakeInfo, goToDataInfo 
       key: 'ownership',
       title: intl.formatMessage({ id: 'poolshares.ownership' }),
       align: 'left',
-      render: ({ ownership }: PoolShare) => <Label>{ownership}%</Label>
+      render: ({ poolShare }: PoolShare) => <Label>{formatBN(poolShare)}%</Label>
     }),
     [intl]
   )
@@ -58,42 +58,62 @@ export const PoolShares: React.FC<Props> = ({ data, goToStakeInfo, goToDataInfo 
   const valueColumn: ColumnType<PoolShare> = useMemo(
     () => ({
       key: 'value',
-      title: intl.formatMessage({ id: 'poolshares.value' }),
+      title: intl.formatMessage({ id: 'common.value' }),
       align: 'left',
-      render: ({ value }: PoolShare) => <Label>${value}</Label>
+      render: ({ assetDepositPrice, runeDepositPrice }: PoolShare) => {
+        const totalPrice = baseAmount(runeDepositPrice.amount().plus(assetDepositPrice.amount()))
+        return (
+          <Label>{formatAssetAmountCurrency({ amount: baseToAsset(totalPrice), asset: priceAsset, decimal: 2 })}</Label>
+        )
+      }
     }),
-    [intl]
+    [intl, priceAsset]
   )
 
-  const stakeInfoColumn: ColumnType<PoolShare> = useMemo(
+  const assetColumn: ColumnType<PoolShare> = useMemo(
     () => ({
-      key: 'stakeInfo',
-      title: 'RUNEStake.info',
-      responsive: ['md'],
+      key: 'assetAmount',
+      title: intl.formatMessage({ id: 'common.asset' }),
       align: 'left',
-      render: ({ asset }: PoolShare) => <H.StakeInfo goToStakeInfo={() => goToStakeInfo(asset)} />
+      render: ({ assetDepositPrice }: PoolShare) => (
+        <Label>
+          {formatAssetAmountCurrency({
+            amount: baseToAsset(assetDepositPrice),
+            asset: priceAsset,
+            decimal: 2
+          })}
+        </Label>
+      )
     }),
-    [goToStakeInfo]
+    [intl, priceAsset]
   )
 
-  const dataInfoColumn: ColumnType<PoolShare> = useMemo(
+  const runeColumn: ColumnType<PoolShare> = useMemo(
     () => ({
-      key: 'dataInfo',
-      title: 'RUNEData.info',
-      responsive: ['md'],
+      key: 'runeAmount',
+      title: 'Rune',
       align: 'left',
-      render: ({ asset }: PoolShare) => <H.DataInfo goToDataInfo={() => goToDataInfo(asset)} />
+      render: ({ runeDepositPrice }: PoolShare) => (
+        <Label>
+          {formatAssetAmountCurrency({
+            amount: baseToAsset(runeDepositPrice),
+            asset: priceAsset,
+            decimal: 2
+          })}
+        </Label>
+      )
     }),
-    [goToDataInfo]
+    [priceAsset]
   )
 
   return (
     <Styled.Container>
       <Styled.Table
-        columns={[iconColumn, poolColumn, ownershipColumn, valueColumn, stakeInfoColumn, dataInfoColumn]}
+        columns={[iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn]}
         dataSource={data}
         rowKey={({ asset }) => asset.symbol}
       />
+      <H.StakeInfo goToStakeInfo={goToStakeInfo} />
     </Styled.Container>
   )
 }

@@ -55,7 +55,8 @@ const common: CommonMessages = {
   'common.tx.sendingAsset': 'Отправка транзакиции {assetSymbol}',
   'common.tx.checkResult': 'Проверка результата',
   'common.tx.view': 'Посмотреть {assetSymbol} танзакцию',
-  'common.modal.confirmTitle': 'Подтвердите действие'
+  'common.modal.confirmTitle': 'Подтвердите действие',
+  'common.value': 'Количество'
 }
 
 export default common

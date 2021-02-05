@@ -47,6 +47,8 @@ export const InfoButton = styled(UIButton).attrs({
     display: inline-flex;
     color: inherit;
   }
+  margin-top: 30px;
+  padding-left: 30px;
 `
 
 export const InfoArrow = styled(AIcons.ArrowUpOutlined)`
@@ -55,6 +57,14 @@ export const InfoArrow = styled(AIcons.ArrowUpOutlined)`
 `
 
 export const TextLabel = styled(UILabel).attrs({ textTransform: 'uppercase' })`
-  color: inherit;
-  line-height: 16px;
+  color: ${palette('text', 0)};
+  font-size: 16px;
+  line-height: 22px;
+`
+
+export const InfoDescription = styled.div`
+  padding-left: 30px;
+  font-size: 16px;
+  color: ${palette('gray', 2)};
+  margin-bottom: 20px;
 `

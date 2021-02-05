@@ -16,7 +16,8 @@ const EXTERNALS_WHITELIST = [
   'testnet-explorer.binance.org',
   'blockstream.info',
   'dex.binance.org',
-  'testnet-dex.binance.org'
+  'testnet-dex.binance.org',
+  'runestake.info'
 ]
 
 const openExternal = (target: string) => {

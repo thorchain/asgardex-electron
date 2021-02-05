@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Meta, Story } from '@storybook/react'
-import { AssetBNB, AssetBTC } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetBTC, assetToBase, bn } from '@xchainjs/xchain-util'
 
 import { PoolShares } from './PoolShares'
 import { PoolShare } from './types'
@@ -10,23 +10,19 @@ export const Default: Story = () => {
   const mockData: PoolShare[] = [
     {
       asset: AssetBNB,
-      ownership: 1.21,
-      value: 1245
+      poolShare: bn(100),
+      assetDepositPrice: assetToBase(assetAmount(500)),
+      runeDepositPrice: assetToBase(assetAmount(400))
     },
     {
       asset: AssetBTC,
-      ownership: 1.21,
-      value: 1245
+      poolShare: bn(100),
+      assetDepositPrice: assetToBase(assetAmount(500)),
+      runeDepositPrice: assetToBase(assetAmount(400))
     }
   ]
 
-  return (
-    <PoolShares
-      goToStakeInfo={(asset) => console.log('go to stake info: ', asset)}
-      goToDataInfo={(asset) => console.log('go to data info: ', asset)}
-      data={mockData}
-    />
-  )
+  return <PoolShares data={mockData} priceAsset={AssetBNB} goToStakeInfo={() => console.log('go to stake info')} />
 }
 Default.storyName = 'default'
 

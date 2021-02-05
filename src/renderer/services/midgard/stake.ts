@@ -8,7 +8,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { DefaultApi } from '../../types/generated/midgard/apis'
-import { StakersAssetDataLD } from './types'
+import { StakersAssetDataLD, StakersDataLD } from './types'
 
 const createStakeService = (
   byzantine$: LiveData<Error, string>,
@@ -71,8 +71,51 @@ const createStakeService = (
       )
     )
 
+  const getAllStakes$ = (address: Address): StakersDataLD =>
+    FP.pipe(
+      api$.pipe(
+        liveData.chain((api) =>
+          FP.pipe(
+            api.getMemberDetail({ address }),
+            RxOp.map(RD.success),
+            liveData.map(({ pools }) => pools),
+            liveData.mapLeft(() => Error('No pool found'))
+          )
+        ),
+        liveData.map(
+          A.map((poolDetails) => ({
+            asset: poolDetails.pool,
+            assetStaked: poolDetails.assetAdded,
+            assetWithdrawn: poolDetails.assetWithdrawn,
+            dateFirstStaked: Number(poolDetails.dateFirstAdded),
+            runeStaked: poolDetails.runeAdded,
+            runeWithdrawn: poolDetails.runeWithdrawn,
+            units: poolDetails.liquidityUnits
+          }))
+        ),
+        RxOp.catchError((e) => {
+          /**
+           * 404 response is returned in 2 cases:
+           * 1. Pool doesn't exist at all
+           * 2. User has no any stake units for the pool
+           * In both cases return initial state as `No Data` identifier
+           */
+          if ('status' in e && e.status === 404) {
+            return Rx.of(RD.initial)
+          }
+
+          /**
+           * In all other cases return error as is
+           */
+          return Rx.of(RD.failure(Error(e)))
+        }),
+        RxOp.startWith(RD.pending)
+      )
+    )
+
   return {
-    getStakes$
+    getStakes$,
+    getAllStakes$
   }
 }
 

@@ -54,6 +54,7 @@ type CommonMessageKey =
   | 'common.tx.checkResult'
   | 'common.tx.view'
   | 'common.modal.confirmTitle'
+  | 'common.value'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -82,7 +83,6 @@ type WalletMessageKey =
   | 'wallet.column.name'
   | 'wallet.column.ticker'
   | 'wallet.column.balance'
-  | 'wallet.column.value'
   | 'wallet.action.send'
   | 'wallet.action.upgrade'
   | 'wallet.action.receive'
@@ -167,7 +167,7 @@ type BondsMessageKey =
 
 export type BondsMessages = { [key in BondsMessageKey]: string }
 
-type PoolSharesMessageKey = 'poolshares.pool' | 'poolshares.ownership' | 'poolshares.value'
+type PoolSharesMessageKey = 'poolshares.ownership'
 
 export type PoolSharesMessage = { [key in PoolSharesMessageKey]: string }
 

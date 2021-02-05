@@ -1,9 +1,7 @@
 import { PoolSharesMessage } from '../types'
 
 const poolShares: PoolSharesMessage = {
-  'poolshares.pool': 'Pool',
-  'poolshares.ownership': 'Ownership',
-  'poolshares.value': 'Value'
+  'poolshares.ownership': 'Ownership'
 }
 
 export default poolShares
