@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useRef } from 'react'
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
-import { Asset, assetFromString, bn } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, bnOrZero } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
@@ -83,30 +83,18 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     )
   }, [oRuneAddress])
 
-  const getSum = (a?: string, b?: string) => {
-    if (a) {
-      if (b) {
-        return bn(a).plus(b).toString()
-      } else {
-        return a
-      }
-    } else {
-      return b
-    }
-  }
-
   const getPoolSharesData = useCallback(
     (stakes: StakersAssetData[], poolsData: PoolDetails) => {
       const data: PoolShare[] = []
       poolsData.forEach((pool) => {
         const stake = stakes
           .filter((stake) => stake.asset === pool.asset)
-          .reduce((a, b) => {
-            const units = getSum(a.units, b.units)
-            return {
-              units
-            }
-          }, {})
+          .reduce(
+            (a, b) => ({
+              units: bnOrZero(a.units).plus(bnOrZero(b.units)).toString()
+            }),
+            {}
+          )
         const asset = assetFromString(pool.asset)
         if (asset && stake.units) {
           const runeShare = shareHelpers.getRuneShare(stake, pool)
