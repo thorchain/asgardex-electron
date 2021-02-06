@@ -4,12 +4,12 @@ import {
   locked,
   settings,
   assets,
-  deposits,
   bonds,
   assetDetail,
   send,
   receive,
-  upgradeBnbRune
+  upgradeBnbRune,
+  poolShares
 } from './wallet'
 
 describe('Wallet routes', () => {
@@ -61,12 +61,12 @@ describe('Wallet routes', () => {
       expect(assets.path()).toEqual('/wallet/assets')
     })
   })
-  describe('deposits route', () => {
+  describe('poolShares route', () => {
     it('template', () => {
-      expect(deposits.template).toEqual('/wallet/deposits')
+      expect(poolShares.template).toEqual('/wallet/poolshares')
     })
     it('path ', () => {
-      expect(deposits.path()).toEqual('/wallet/deposits')
+      expect(poolShares.path()).toEqual('/wallet/poolshares')
     })
   })
   describe('bonds route', () => {
@@ -132,7 +132,7 @@ describe('Wallet routes', () => {
     })
   })
 
-  describe.only('upgrade route', () => {
+  describe('upgrade route', () => {
     it('template', () => {
       expect(upgradeBnbRune.template).toEqual('/wallet/assets/detail/:walletAddress/:asset/upgrade')
     })

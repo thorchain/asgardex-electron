@@ -1,9 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
 import {
+  assetAmount,
   AssetBNB,
   AssetBTC,
   AssetETH,
   AssetRuneNative,
+  assetToBase,
   assetToString,
   BNBChain,
   BTCChain,
@@ -283,7 +285,7 @@ describe('services/midgard/utils/', () => {
       const result = combineSharesByAsset(shares, AssetBNB)
       expect(FP.pipe(result, O.toNullable)).toEqual({
         asset: AssetBNB,
-        units: THREE_RUNE_BASE_AMOUNT,
+        units: assetToBase(assetAmount(5)),
         type: 'all'
       })
     })
