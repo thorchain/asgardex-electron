@@ -184,15 +184,15 @@ export const combineSharesByAsset = (shares: PoolShares, asset: Asset): O.Option
     A.reduce<PoolShare, O.Option<PoolShare>>(O.none, (oAcc, cur) => {
       return FP.pipe(
         oAcc,
-        O.fold(
-          () => O.some({ ...cur, type: 'all' }),
-          (acc) =>
-            O.some({
-              ...acc,
-              units: baseAmount(cur.units.amount().plus(acc.units.amount())),
-              type: 'all'
-            })
-        )
+        O.map(
+          (acc): PoolShare => ({
+            ...acc,
+            units: baseAmount(cur.units.amount().plus(acc.units.amount())),
+            type: 'all'
+          })
+        ),
+        O.getOrElse<PoolShare>(() => ({ ...cur, type: 'all' })),
+        O.some
       )
     })
   )
