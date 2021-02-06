@@ -1,6 +1,16 @@
 import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { AssetDOT } from '@xchainjs/xchain-polkadot'
-import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRuneNative, AssetLTC, Chain, BCHChain } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  AssetBNB,
+  AssetBTC,
+  AssetETH,
+  AssetRuneNative,
+  AssetLTC,
+  Chain,
+  BCHChain,
+  isChain
+} from '@xchainjs/xchain-util'
 
 import { ENABLED_CHAINS } from '../services/const'
 import { ChainValues } from '../types/asgardex'
@@ -39,12 +49,12 @@ export const getChainAsset = (chain: Chain): Asset => {
  */
 export const isBtcChain = (chain: Chain): boolean => eqChain.equals(chain, 'BTC')
 
-export const isEnabledChain = (chain: string) => ENABLED_CHAINS.includes(chain)
+export const isEnabledChain = (chain: Chain) => ENABLED_CHAINS.includes(chain)
 
 export const filterEnabledChains = <T>(values: ChainValues<T>): T[] => {
   const result: T[] = []
   Object.entries(values).forEach(([chain, value]) => {
-    if (isEnabledChain(chain) && value) result.push(...value)
+    if (isChain(chain) && isEnabledChain(chain) && value) result.push(...value)
   })
 
   return result
