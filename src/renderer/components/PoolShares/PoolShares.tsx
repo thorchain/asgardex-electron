@@ -18,13 +18,14 @@ import * as H from './helpers'
 import * as Styled from './PoolShares.styles'
 import { PoolShareTableRowData, PoolShareTableData } from './PoolShares.types'
 
-type Props = {
+export type Props = {
   data: PoolShareTableData
+  loading: boolean
   priceAsset: Asset | undefined
   goToStakeInfo: () => void
 }
 
-export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo }) => {
+export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, loading }) => {
   const intl = useIntl()
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -124,6 +125,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo })
   return (
     <Styled.Container>
       <Styled.Table
+        loading={loading}
         columns={isDesktopView ? desktopColumns : mobileColumns}
         dataSource={data}
         rowKey={({ asset }) => asset.symbol}

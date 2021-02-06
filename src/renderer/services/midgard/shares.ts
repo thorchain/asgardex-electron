@@ -10,6 +10,7 @@ import * as RxOp from 'rxjs/operators'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
+import { triggerStream } from '../../helpers/stateHelper'
 import { MemberPool } from '../../types/generated/midgard'
 import { DefaultApi } from '../../types/generated/midgard/apis'
 import { PoolShare, PoolShareLD, PoolSharesLD } from './types'
@@ -129,12 +130,34 @@ const createSharesService = (
   const combineSharesByAsset$ = (address: Address, asset: Asset): PoolShareLD =>
     shares$(address).pipe(liveData.map((shares) => combineSharesByAsset(shares, asset)))
 
+  // `TriggerStream` to reload `combineSharesByAddresses`
+  const { stream$: reloadCombineSharesByAddresses$, trigger: reloadCombineSharesByAddresses } = triggerStream()
+
+  // Loads and combines `PoolShare`' by given addresses
+  const loadCombineSharesByAddresses$ = (addresses: Address[]): PoolSharesLD =>
+    FP.pipe(addresses, A.map(combineShares$), liveData.sequenceArray, liveData.map(A.flatten))
+
+  /**
+   * Loads `PoolShare`'s of given `Address`es
+   * and combines 'asym` +  `sym` `Poolshare`'s into a single `Poolshare`
+   *
+   * Stream will be re-triggered by calling `reloadCombineSharesByAddresses`
+   */
+  const combineSharesByAddresses$ = (addresses: Address[]) =>
+    FP.pipe(
+      reloadCombineSharesByAddresses$,
+      RxOp.debounceTime(300),
+      RxOp.switchMap(() => loadCombineSharesByAddresses$(addresses))
+    )
+
   return {
     shares$,
     symShareByAsset$,
     asymShareByAsset$,
     combineShares$,
-    combineSharesByAsset$
+    combineSharesByAsset$,
+    combineSharesByAddresses$,
+    reloadCombineSharesByAddresses
   }
 }
 

@@ -17,6 +17,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
 import { getPoolShareTableData } from './PoolShareView.helper'
@@ -27,7 +28,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const {
     pools: { poolsState$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
     reloadNetworkInfo,
-    shares: { combineShares$ }
+    shares: { combineSharesByAddresses$ }
   } = midgardService
 
   const thorchainContext = useThorchainContext()
@@ -40,31 +41,15 @@ export const PoolShareView: React.FC = (): JSX.Element => {
    * We have to get a new stake-stream for every new asset
    * @description /src/renderer/services/midgard/shares.ts
    */
-  const bitcoinStakeData$: PoolSharesLD = useMemo(
+  const poolShares$: PoolSharesLD = useMemo(
     () =>
       FP.pipe(
-        oBitcoinAddress,
-        O.fold(
-          () => Rx.EMPTY,
-          (address) => combineShares$(address)
-        )
+        sequenceTOption(oBitcoinAddress, oBinanceAddress),
+        O.fold(() => Rx.EMPTY, combineSharesByAddresses$)
       ),
-    [combineShares$, oBitcoinAddress]
+    [combineSharesByAddresses$, oBitcoinAddress, oBinanceAddress]
   )
-  const bitcoinStakeData = useObservableState<PoolSharesRD>(bitcoinStakeData$, RD.initial)
-
-  const binanceStakeData$: PoolSharesLD = useMemo(
-    () =>
-      FP.pipe(
-        oBinanceAddress,
-        O.fold(
-          () => Rx.EMPTY,
-          (address) => combineShares$(address)
-        )
-      ),
-    [combineShares$, oBinanceAddress]
-  )
-  const binanceStakeData = useObservableState<PoolSharesRD>(binanceStakeData$, RD.initial)
+  const poolSharesRD = useObservableState<PoolSharesRD>(poolShares$, RD.initial)
 
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
@@ -82,9 +67,9 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   }, [oRuneAddress])
 
   const renderPoolSharesTable = useCallback(
-    (data: PoolShareTableRowData[]) => {
+    (data: PoolShareTableRowData[], loading: boolean) => {
       previousPoolShares.current = O.some(data)
-      return <PoolSharesTable data={data} priceAsset={priceAsset} goToStakeInfo={goToStakeInfo} />
+      return <PoolSharesTable loading={loading} data={data} priceAsset={priceAsset} goToStakeInfo={goToStakeInfo} />
     },
     [goToStakeInfo, priceAsset]
   )
@@ -107,14 +92,14 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const renderPoolShares = useMemo(
     () =>
       FP.pipe(
-        RD.combine(bitcoinStakeData, binanceStakeData, poolsRD),
+        RD.combine(poolSharesRD, poolsRD),
         RD.fold(
           // initial state
-          () => renderPoolSharesTable([]),
+          () => renderPoolSharesTable([], false),
           // loading state
           () => {
             const data = O.getOrElse(() => [] as PoolShareTableRowData[])(previousPoolShares.current)
-            return renderPoolSharesTable(data)
+            return renderPoolSharesTable(data, true)
           },
           // error state
           (error: Error) => {
@@ -122,14 +107,14 @@ export const PoolShareView: React.FC = (): JSX.Element => {
             return <ErrorView title={msg} extra={renderRefreshBtn} />
           },
           // success state
-          ([bitcoinStakes, binanceStakes, { poolDetails }]) => {
-            const data = getPoolShareTableData([...bitcoinStakes, ...binanceStakes], poolDetails, pricePoolData)
+          ([poolShares, { poolDetails }]) => {
+            const data = getPoolShareTableData(poolShares, poolDetails, pricePoolData)
             previousPoolShares.current = O.some(data)
-            return renderPoolSharesTable(data)
+            return renderPoolSharesTable(data, false)
           }
         )
       ),
-    [bitcoinStakeData, binanceStakeData, poolsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
+    [poolSharesRD, poolsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
   )
 
   return renderPoolShares
