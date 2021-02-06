@@ -3,11 +3,10 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetBTC, assetToBase, bn } from '@xchainjs/xchain-util'
 
-import { PoolShares } from './PoolShares'
-import { PoolShareTableData } from './PoolShares.types'
+import { PoolShares as Component, Props as ComponentProps } from './PoolShares'
 
-export const Default: Story = () => {
-  const mockData: PoolShareTableData = [
+const defaultProps: ComponentProps = {
+  data: [
     {
       asset: AssetBNB,
       sharePercent: bn(10),
@@ -24,14 +23,26 @@ export const Default: Story = () => {
       assetDepositPrice: assetToBase(assetAmount(1000)),
       runeDepositPrice: assetToBase(assetAmount(10))
     }
-  ]
-
-  return <PoolShares data={mockData} priceAsset={AssetBNB} goToStakeInfo={() => console.log('go to stake info')} />
+  ],
+  loading: false,
+  priceAsset: AssetBNB,
+  goToStakeInfo: () => console.log('go to stake info')
 }
+export const Default: Story = () => <Component {...defaultProps} />
 Default.storyName = 'default'
 
+export const Loading: Story = () => {
+  const props: ComponentProps = {
+    ...defaultProps,
+    data: [],
+    loading: true
+  }
+  return <Component {...props} />
+}
+Loading.storyName = 'loading'
+
 const meta: Meta = {
-  component: PoolShares,
+  component: Component,
   title: 'PoolShares'
 }
 
