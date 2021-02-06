@@ -64,7 +64,7 @@ export const Deposit: React.FC<Props> = (props) => {
         {walletIsImported && !walletIsLocked ? (
           <>
             <Styled.DepositContentCol xs={24} xl={15}>
-              <Styled.Tabs destroyInactiveTabPane tabs={tabs} centered={false} defaultTabIndex={1} />
+              <Styled.Tabs destroyInactiveTabPane tabs={tabs} centered={false} defaultActiveKey="deposit-sym" />
             </Styled.DepositContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper>
