@@ -8,7 +8,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/lib/Ord'
 
-import { ONE_ASSET_BASE_AMOUNT } from '../const'
+import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
 import { PoolDetail, PoolDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
@@ -29,7 +29,7 @@ const ordByDepth = Ord.ord.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRo
  */
 export const RUNE_PRICE_POOL: PricePool = {
   asset: AssetRuneNative,
-  poolData: { assetBalance: ONE_ASSET_BASE_AMOUNT, runeBalance: ONE_ASSET_BASE_AMOUNT }
+  poolData: { assetBalance: ONE_RUNE_BASE_AMOUNT, runeBalance: ONE_RUNE_BASE_AMOUNT }
 }
 
 export const getPoolTableRowsData = ({

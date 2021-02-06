@@ -32,7 +32,7 @@ export const DepositView: React.FC<Props> = (_) => {
   const {
     service: {
       setSelectedPoolAsset,
-      shares: { getStakes$ }
+      shares: { symShareByAsset$, asymShareByAsset$ }
     }
   } = useMidgardContext()
   const { keystoreService } = useWalletContext()
@@ -63,20 +63,37 @@ export const DepositView: React.FC<Props> = (_) => {
 
   /**
    * We have to get a new stake-stream for every new asset
-   * @description /src/renderer/services/midgard/stake.ts
+   * @description /src/renderer/services/midgard/shares.ts
    */
-  const depositData$: PoolShareLD = useMemo(
+  const symPoolShare$: PoolShareLD = useMemo(
     () =>
       FP.pipe(
         sequenceTOption(oSelectedAsset, oAssetWalletAddress),
         O.fold(
           () => Rx.EMPTY,
-          ([asset, address]) => getStakes$(asset, address)
+          ([asset, address]) => symShareByAsset$(address, asset)
         )
       ),
-    [getStakes$, oAssetWalletAddress, oSelectedAsset]
+    [symShareByAsset$, oAssetWalletAddress, oSelectedAsset]
   )
-  const depositData = useObservableState<PoolShareRD>(depositData$, RD.initial)
+  const symPoolShare = useObservableState<PoolShareRD>(symPoolShare$, RD.initial)
+
+  /**
+   * We have to get a new stake-stream for every new asset
+   * @description /src/renderer/services/midgard/shares.ts
+   */
+  const asymPoolShare$: PoolShareLD = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(oSelectedAsset, oAssetWalletAddress),
+        O.fold(
+          () => Rx.EMPTY,
+          ([asset, address]) => asymShareByAsset$(address, asset)
+        )
+      ),
+    [asymShareByAsset$, oAssetWalletAddress, oSelectedAsset]
+  )
+  const asymPoolShare = useObservableState<PoolShareRD>(asymPoolShare$, RD.initial)
 
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`
@@ -110,7 +127,8 @@ export const DepositView: React.FC<Props> = (_) => {
           (selectedAsset) => (
             <Deposit
               asset={selectedAsset}
-              symPoolShare={depositData}
+              symPoolShare={symPoolShare}
+              asymPoolShare={asymPoolShare}
               keystoreState={keystoreState}
               ShareContent={ShareView}
               SymDepositContent={SymDepositView}

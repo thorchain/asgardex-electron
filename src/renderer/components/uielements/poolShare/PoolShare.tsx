@@ -4,10 +4,10 @@ import {
   formatBN,
   BaseAmount,
   Asset,
-  formatAssetAmount,
   baseToAsset,
   formatAssetAmountCurrency,
-  baseAmount
+  baseAmount,
+  formatBaseAsAssetAmount
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -27,7 +27,7 @@ type Props = {
   assetDepositShare: BaseAmount
   assetDepositPrice: BaseAmount
   poolShare: BigNumber
-  depositUnits: BigNumber
+  depositUnits: BaseAmount
 }
 
 export const PoolShare: React.FC<Props> = (props): JSX.Element => {
@@ -58,10 +58,10 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
   const smallWidth = wrapperWidth <= 576 // sm
 
   const renderRedemptionCol = useCallback(
-    (amount: BaseAmount, price: BaseAmount) => (
+    (amount: BaseAmount, price: BaseAmount, asset: Asset) => (
       <Col span={smallWidth ? 24 : 12}>
         <Styled.LabelPrimary loading={loading}>
-          {formatAssetAmount({ amount: baseToAsset(amount), decimal: 2 })}
+          {formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 2 })}
         </Styled.LabelPrimary>
         <Styled.LabelSecondary loading={loading}>
           {formatAssetAmountCurrency({ amount: baseToAsset(price), asset: priceAsset, decimal: 2 })}
@@ -85,8 +85,8 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
           </Styled.CardRow>
         </Styled.RedemptionHeader>
         <Styled.CardRow>
-          {renderRedemptionCol(runeDepositShare, runeDepositPrice)}
-          {renderRedemptionCol(assetDepositShare, assetDepositPrice)}
+          {renderRedemptionCol(runeDepositShare, runeDepositPrice, sourceAsset)}
+          {renderRedemptionCol(assetDepositShare, assetDepositPrice, targetAsset)}
         </Styled.CardRow>
       </>
     ),
@@ -96,8 +96,8 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
       renderRedemptionCol,
       runeDepositPrice,
       runeDepositShare,
-      sourceAsset.ticker,
-      targetAsset.ticker
+      sourceAsset,
+      targetAsset
     ]
   )
 
@@ -111,7 +111,7 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
             </Col>
           </Styled.CardRow>
         </Styled.RedemptionHeader>
-        <Styled.CardRow>{renderRedemptionCol(runeDepositShare, runeDepositPrice)}</Styled.CardRow>
+        <Styled.CardRow>{renderRedemptionCol(runeDepositShare, runeDepositPrice, sourceAsset)}</Styled.CardRow>
         <Styled.RedemptionHeader>
           <Styled.CardRow>
             <Col span={24}>
@@ -119,7 +119,7 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
             </Col>
           </Styled.CardRow>
         </Styled.RedemptionHeader>
-        <Styled.CardRow>{renderRedemptionCol(assetDepositShare, assetDepositPrice)}</Styled.CardRow>
+        <Styled.CardRow>{renderRedemptionCol(assetDepositShare, assetDepositPrice, targetAsset)}</Styled.CardRow>
       </>
     ),
     [
@@ -128,8 +128,8 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
       renderRedemptionCol,
       runeDepositPrice,
       runeDepositShare,
-      sourceAsset.ticker,
-      targetAsset.ticker
+      sourceAsset,
+      targetAsset
     ]
   )
   const renderRedemption = useMemo(() => (smallWidth ? renderRedemptionSmall : renderRedemptionLarge), [
@@ -146,7 +146,10 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
             <Styled.LabelSecondary textTransform="uppercase">
               {intl.formatMessage({ id: 'deposit.share.units' })}
             </Styled.LabelSecondary>
-            <Styled.LabelPrimary loading={loading}>{`${formatBN(depositUnits, 2)}`}</Styled.LabelPrimary>
+            <Styled.LabelPrimary loading={loading}>{`${formatBaseAsAssetAmount({
+              amount: depositUnits,
+              decimal: 2
+            })}`}</Styled.LabelPrimary>
           </Col>
           <Col span={smallWidth ? 24 : 12}>
             <Styled.LabelSecondary textTransform="uppercase">

@@ -1,12 +1,13 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetFromString, bnOrZero } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { MemberPool } from '../../types/generated/midgard'
@@ -55,7 +56,8 @@ const createSharesService = (
                 O.map((asset) => ({
                   type: !!runeAddress && !!assetAddress ? 'sym' : 'asym',
                   asset,
-                  units: bnOrZero(liquidityUnits)
+                  // `liquidityUnits` are RUNE based, provided as `BaseAmount`
+                  units: baseAmount(bnOrZero(liquidityUnits), THORCHAIN_DECIMAL)
                 }))
               )
             )

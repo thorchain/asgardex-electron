@@ -21,17 +21,17 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { DEFAULT_NETWORK } from '../../../services/const'
-import { PoolDetailRD, StakersAssetData, PoolShareRD, PoolDetail, PoolAddress } from '../../../services/midgard/types'
+import { PoolDetailRD, PoolShareRD, PoolDetail, PoolAddress, PoolShare } from '../../../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 
 type Props = {
   asset: Asset
-  depositData: PoolShareRD
+  poolShare: PoolShareRD
 }
 
 export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
-  const { asset, depositData } = props
+  const { asset, poolShare: poolShareRD } = props
   const {
     service: {
       pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$, poolsState$, selectedPoolAddress$ }
@@ -65,7 +65,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     RD.map(getAssetPoolPrice(runePrice))
   )
 
-  const chainAssetPoolDataRD: RD.RemoteData<Error, PoolData> = FP.pipe(
+  const _chainAssetPoolDataRD: RD.RemoteData<Error, PoolData> = FP.pipe(
     poolsStateRD,
     // get `PoolDetail` of `asset.chain` asset
     RD.chain((poolsState) =>
@@ -75,7 +75,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     RD.map(toPoolData)
   )
 
-  const assetPoolDataRD: RD.RemoteData<Error, PoolData> = FP.pipe(poolDetailRD, RD.map(toPoolData))
+  const _assetPoolDataRD: RD.RemoteData<Error, PoolData> = FP.pipe(poolDetailRD, RD.map(toPoolData))
 
   const {
     balancesState$,
@@ -153,22 +153,25 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderWithdrawReady = useCallback(
-    ([assetPrice, depositData, poolDetail, selectedPriceAsset]: [
-      BigNumber,
-      StakersAssetData,
-      PoolDetail,
-      Asset,
-      PoolData,
-      PoolData
-    ]) => (
+    ({
+      assetPrice,
+      poolShare,
+      poolDetail,
+      selectedPriceAsset
+    }: {
+      assetPrice: BigNumber
+      poolShare: PoolShare
+      poolDetail: PoolDetail
+      selectedPriceAsset: Asset
+    }) => (
       <Withdraw
         assetPrice={assetPrice}
         runePrice={runePrice}
         runeBalance={runeBalance}
         selectedPriceAsset={selectedPriceAsset}
         shares={{
-          rune: shareHelpers.getRuneShare(depositData, poolDetail),
-          asset: shareHelpers.getAssetShare(depositData, poolDetail)
+          rune: shareHelpers.getRuneShare(poolShare.units, poolDetail),
+          asset: shareHelpers.getAssetShare(poolShare.units, poolDetail)
         }}
         asset={asset}
         poolAddress={oPoolAddress}
@@ -197,7 +200,19 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   )
 
   return FP.pipe(
-    RD.combine(assetPriceRD, depositData, poolDetailRD, selectedPriceAssetRD, assetPoolDataRD, chainAssetPoolDataRD),
-    RD.fold(renderEmptyForm, renderEmptyForm, renderEmptyForm, renderWithdrawReady)
+    RD.combine(assetPriceRD, poolShareRD, poolDetailRD, selectedPriceAssetRD),
+    RD.fold(
+      renderEmptyForm,
+      renderEmptyForm,
+      renderEmptyForm,
+      ([assetPrice, oPoolShare, poolDetail, selectedPriceAsset]) =>
+        FP.pipe(
+          oPoolShare,
+          O.fold(
+            () => renderEmptyForm(),
+            (poolShare) => renderWithdrawReady({ assetPrice, poolShare, poolDetail, selectedPriceAsset })
+          )
+        )
+    )
   )
 }

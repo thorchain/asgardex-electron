@@ -5,7 +5,6 @@ import {
   AssetETH,
   AssetRuneNative,
   assetToString,
-  bn,
   BNBChain,
   BTCChain,
   THORChain
@@ -13,7 +12,13 @@ import {
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, AssetBUSDBAF } from '../../const'
+import {
+  ONE_RUNE_BASE_AMOUNT,
+  TWO_RUNE_BASE_AMOUNT,
+  THREE_RUNE_BASE_AMOUNT,
+  FOUR_RUNE_BASE_AMOUNT
+} from '../../../shared/mock/amount'
+import { PRICE_POOLS_WHITELIST, AssetBUSDBAF } from '../../const'
 import { eqAsset, eqOString } from '../../helpers/fp/eq'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
@@ -60,8 +65,8 @@ describe('services/midgard/utils/', () => {
       // RUNE pool
       const pool0 = result[0]
       expect(pool0.asset).toEqual(AssetRuneNative)
-      expect(pool0.poolData.runeBalance.amount().toNumber()).toEqual(ONE_ASSET_BASE_AMOUNT.amount().toNumber())
-      expect(pool0.poolData.assetBalance.amount().toNumber()).toEqual(ONE_ASSET_BASE_AMOUNT.amount().toNumber())
+      expect(pool0.poolData.runeBalance.amount().toNumber()).toEqual(ONE_RUNE_BASE_AMOUNT.amount().toNumber())
+      expect(pool0.poolData.assetBalance.amount().toNumber()).toEqual(ONE_RUNE_BASE_AMOUNT.amount().toNumber())
       // BTC pool
       const btcPool = result[1]
       expect(btcPool.asset).toEqual(AssetBTC)
@@ -243,26 +248,26 @@ describe('services/midgard/utils/', () => {
     })
   })
 
-  describe.only('combineSharesByAsset', () => {
+  describe('combineSharesByAsset', () => {
     const shares: PoolShares = [
       {
         asset: AssetETH,
-        units: bn(0),
+        units: ONE_RUNE_BASE_AMOUNT,
         type: 'sym'
       },
       {
         asset: AssetBNB,
-        units: bn(1),
+        units: TWO_RUNE_BASE_AMOUNT,
         type: 'sym'
       },
       {
         asset: AssetBNB,
-        units: bn(2),
+        units: THREE_RUNE_BASE_AMOUNT,
         type: 'asym'
       },
       {
         asset: AssetBTC,
-        units: bn(3),
+        units: FOUR_RUNE_BASE_AMOUNT,
         type: 'asym'
       }
     ]
@@ -278,7 +283,7 @@ describe('services/midgard/utils/', () => {
       const result = combineSharesByAsset(shares, AssetBNB)
       expect(FP.pipe(result, O.toNullable)).toEqual({
         asset: AssetBNB,
-        units: bn(3),
+        units: THREE_RUNE_BASE_AMOUNT,
         type: 'all'
       })
     })
@@ -286,7 +291,7 @@ describe('services/midgard/utils/', () => {
       const result = combineSharesByAsset(shares, AssetETH)
       expect(FP.pipe(result, O.toNullable)).toEqual({
         asset: AssetETH,
-        units: bn(0),
+        units: ONE_RUNE_BASE_AMOUNT,
         type: 'all'
       })
     })
@@ -300,22 +305,22 @@ describe('services/midgard/utils/', () => {
       const shares: PoolShares = [
         {
           asset: AssetETH,
-          units: bn(1),
+          units: ONE_RUNE_BASE_AMOUNT,
           type: 'sym'
         },
         {
           asset: AssetBNB,
-          units: bn(1),
+          units: TWO_RUNE_BASE_AMOUNT,
           type: 'sym'
         },
         {
           asset: AssetBNB,
-          units: bn(2),
+          units: THREE_RUNE_BASE_AMOUNT,
           type: 'asym'
         },
         {
           asset: AssetBTC,
-          units: bn(3),
+          units: FOUR_RUNE_BASE_AMOUNT,
           type: 'asym'
         }
       ]
@@ -323,17 +328,17 @@ describe('services/midgard/utils/', () => {
       expect(result).toEqual([
         {
           asset: AssetETH,
-          units: bn(1),
+          units: TWO_RUNE_BASE_AMOUNT,
           type: 'all'
         },
         {
           asset: AssetBNB,
-          units: bn(3),
+          units: THREE_RUNE_BASE_AMOUNT,
           type: 'all'
         },
         {
           asset: AssetBTC,
-          units: bn(3),
+          units: FOUR_RUNE_BASE_AMOUNT,
           type: 'all'
         }
       ])

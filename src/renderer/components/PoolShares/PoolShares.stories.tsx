@@ -4,21 +4,25 @@ import { Meta, Story } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetBTC, assetToBase, bn } from '@xchainjs/xchain-util'
 
 import { PoolShares } from './PoolShares'
-import { PoolShare } from './types'
+import { PoolShareTableData } from './PoolShares.types'
 
 export const Default: Story = () => {
-  const mockData: PoolShare[] = [
+  const mockData: PoolShareTableData = [
     {
       asset: AssetBNB,
-      poolShare: bn(100),
-      assetDepositPrice: assetToBase(assetAmount(500)),
-      runeDepositPrice: assetToBase(assetAmount(400))
+      sharePercent: bn(10),
+      runeShare: assetToBase(assetAmount(10)),
+      assetShare: assetToBase(assetAmount(20)),
+      assetDepositPrice: assetToBase(assetAmount(100)),
+      runeDepositPrice: assetToBase(assetAmount(200))
     },
     {
       asset: AssetBTC,
-      poolShare: bn(100),
-      assetDepositPrice: assetToBase(assetAmount(500)),
-      runeDepositPrice: assetToBase(assetAmount(400))
+      sharePercent: bn(20),
+      runeShare: assetToBase(assetAmount(1)),
+      assetShare: assetToBase(assetAmount(100)),
+      assetDepositPrice: assetToBase(assetAmount(1000)),
+      runeDepositPrice: assetToBase(assetAmount(10))
     }
   ]
 

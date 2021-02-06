@@ -1,6 +1,5 @@
 import { PoolData } from '@thorchain/asgardex-util'
 import {
-  assetToBase,
   assetAmount,
   bn,
   AssetBTC,
@@ -29,12 +28,6 @@ export const CURRENCY_WHEIGHTS: PricePoolCurrencyWeights = {
   [assetToString(AssetBTC)]: 3,
   [assetToString(AssetRuneNative)]: 4
 }
-
-// One `AssetAmount` in `BaseAmount` as const, since we just need it at different places
-export const ONE_ASSET_BASE_AMOUNT = assetToBase(assetAmount(1))
-
-// One `AssetAmount` as const, since we just need it at different places
-export const ONE_ASSET_AMOUNT = assetAmount(1)
 
 // Whitelist of pools for pricing things
 export const PRICE_POOLS_WHITELIST: PricePoolAssets = [AssetBTC, AssetETH, AssetBUSDBAF, AssetBUSDBD1]

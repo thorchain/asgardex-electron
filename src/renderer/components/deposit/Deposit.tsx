@@ -21,10 +21,10 @@ export type Props = {
   asset: Asset
   asymPoolShare: PoolShareRD
   symPoolShare: PoolShareRD
-  ShareContent: React.ComponentType<{ asset: Asset; depositData: PoolShareRD }>
+  ShareContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD }>
   AsymDepositContent: React.ComponentType<{ asset: Asset }>
   SymDepositContent: React.ComponentType<{ asset: Asset }>
-  WidthdrawContent: React.ComponentType<{ asset: Asset; depositData: PoolShareRD }>
+  WidthdrawContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD }>
   keystoreState: KeystoreState
 }
 
@@ -60,7 +60,7 @@ export const Deposit: React.FC<Props> = (props) => {
       {
         key: 'withdraw',
         label: intl.formatMessage({ id: 'deposit.withdraw' }),
-        content: <WidthdrawContent asset={asset} depositData={symPoolShare} />
+        content: <WidthdrawContent asset={asset} poolShare={symPoolShare} />
       }
     ],
     [intl, asset, AsymDepositContent, SymDepositContent, WidthdrawContent, symPoolShare]
@@ -76,7 +76,7 @@ export const Deposit: React.FC<Props> = (props) => {
             </Styled.DepositContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper>
-                <ShareContent asset={asset} depositData={symPoolShare} />
+                <ShareContent asset={asset} poolShare={symPoolShare} />
               </Styled.ShareContentWrapper>
             </Styled.ShareContentCol>
           </>
