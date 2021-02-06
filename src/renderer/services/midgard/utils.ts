@@ -172,6 +172,9 @@ export const combineShares = (shares: PoolShares): PoolShares =>
     )
   )
 
+/**
+ * Combines 'asym` + `sym` `Poolshare`'s into a single `Poolshare` by given `Asset`
+ */
 export const combineSharesByAsset = (shares: PoolShares, asset: Asset): O.Option<PoolShare> =>
   FP.pipe(
     shares,
@@ -192,4 +195,22 @@ export const combineSharesByAsset = (shares: PoolShares, asset: Asset): O.Option
         )
       )
     })
+  )
+
+/**
+ * Filters 'asym` or `sym` `Poolshare`'s by given `Asset`
+ */
+export const getSharesByAssetAndType = ({
+  shares,
+  asset,
+  type
+}: {
+  shares: PoolShares
+  asset: Asset
+  type: 'sym' | 'asym'
+}): O.Option<PoolShare> =>
+  FP.pipe(
+    shares,
+    A.filter(({ asset: sharesAsset, type: sharesType }) => eqAsset.equals(asset, sharesAsset) && type === sharesType),
+    A.head
   )

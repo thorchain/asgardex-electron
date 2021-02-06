@@ -8,13 +8,12 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
-import { eqAsset } from '../../helpers/fp/eq'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { MemberPool } from '../../types/generated/midgard'
 import { DefaultApi } from '../../types/generated/midgard/apis'
 import { PoolShare, PoolShareLD, PoolSharesLD } from './types'
-import { combineShares, combineSharesByAsset } from './utils'
+import { combineShares, combineSharesByAsset, getSharesByAssetAndType } from './utils'
 
 const createSharesService = (
   byzantine$: LiveData<Error, string>,
@@ -81,6 +80,7 @@ const createSharesService = (
           return Rx.of(RD.failure(Error(e)))
         }),
         RxOp.startWith(RD.pending)
+        // RxOp.shareReplay(1)
       )
     )
 
@@ -91,15 +91,7 @@ const createSharesService = (
    * @param asset
    */
   const symShareByAsset$ = (address: Address, asset: Asset): PoolShareLD =>
-    shares$(address).pipe(
-      liveData.map((shares) =>
-        FP.pipe(
-          shares,
-          A.filter(({ asset: shareAsset, type }) => eqAsset.equals(asset, shareAsset) && type === 'sym'),
-          A.head
-        )
-      )
-    )
+    shares$(address).pipe(liveData.map((shares) => getSharesByAssetAndType({ shares, asset, type: 'sym' })))
 
   /**
    * `sym` `Poolshare` of an `Asset`
@@ -108,15 +100,7 @@ const createSharesService = (
    * @param asset
    */
   const asymShareByAsset$ = (address: Address, asset: Asset): PoolShareLD =>
-    shares$(address).pipe(
-      liveData.map((shares) =>
-        FP.pipe(
-          shares,
-          A.filter(({ asset: shareAsset, type }) => eqAsset.equals(asset, shareAsset) && type === 'asym'),
-          A.head
-        )
-      )
-    )
+    shares$(address).pipe(liveData.map((shares) => getSharesByAssetAndType({ shares, asset, type: 'asym' })))
 
   /**
    * Combines 'asym` +  `sym` `Poolshare`'s into a single `Poolshare`

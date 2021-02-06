@@ -24,7 +24,7 @@ import { PRICE_POOLS_WHITELIST, AssetBUSDBAF } from '../../const'
 import { eqAsset, eqOString, eqPoolShare, eqPoolShares } from '../../helpers/fp/eq'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
-import { AssetDetail, PoolDetail, PoolShares, PoolsState, PoolsStateRD } from './types'
+import { AssetDetail, PoolDetail, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
 import {
   getAssetDetail,
   getPricePools,
@@ -36,7 +36,8 @@ import {
   getPoolDetailsHashMap,
   getPoolAddressByChain,
   combineShares,
-  combineSharesByAsset
+  combineSharesByAsset,
+  getSharesByAssetAndType
 } from './utils'
 
 describe('services/midgard/utils/', () => {
@@ -250,111 +251,120 @@ describe('services/midgard/utils/', () => {
     })
   })
 
-  describe('combineSharesByAsset', () => {
-    const shares: PoolShares = [
-      {
-        asset: AssetETH,
-        units: ONE_RUNE_BASE_AMOUNT,
-        type: 'sym'
-      },
-      {
-        asset: AssetBNB,
-        units: TWO_RUNE_BASE_AMOUNT,
-        type: 'sym'
-      },
-      {
-        asset: AssetBNB,
-        units: THREE_RUNE_BASE_AMOUNT,
-        type: 'asym'
-      },
-      {
-        asset: AssetBTC,
-        units: FOUR_RUNE_BASE_AMOUNT,
-        type: 'asym'
-      }
-    ]
-    it('returns none for empty list', () => {
-      expect(combineSharesByAsset([], AssetBNB)).toBeNone()
-    })
+  describe('pool share helpers', () => {
+    const ethShares: PoolShare = {
+      asset: AssetETH,
+      units: ONE_RUNE_BASE_AMOUNT,
+      type: 'sym'
+    }
+    const bnbShares1: PoolShare = {
+      asset: AssetBNB,
+      units: TWO_RUNE_BASE_AMOUNT,
+      type: 'sym'
+    }
+    const bnbShares2: PoolShare = {
+      asset: AssetBNB,
+      units: THREE_RUNE_BASE_AMOUNT,
+      type: 'asym'
+    }
+    const btcShares: PoolShare = {
+      asset: AssetBTC,
+      units: FOUR_RUNE_BASE_AMOUNT,
+      type: 'asym'
+    }
+    const shares: PoolShares = [ethShares, bnbShares1, bnbShares2, btcShares]
 
-    it('returns none for non existing asset in list', () => {
-      expect(combineSharesByAsset([], AssetRuneNative)).toBeNone()
-    })
+    describe('combineSharesByAsset', () => {
+      it('returns none for empty list', () => {
+        expect(combineSharesByAsset([], AssetBNB)).toBeNone()
+      })
 
-    it('merges BNB pool shares', () => {
-      const oResult = combineSharesByAsset(shares, AssetBNB)
+      it('returns none for non existing asset in list', () => {
+        expect(combineSharesByAsset([], AssetRuneNative)).toBeNone()
+      })
 
-      expect(
-        FP.pipe(
-          oResult,
-          O.map((share) =>
-            eqPoolShare.equals(share, {
-              asset: AssetBNB,
-              units: assetToBase(assetAmount(5)),
-              type: 'all'
-            })
-          ),
-          O.getOrElse(() => false)
-        )
-      ).toBeTruthy()
-    })
-    it('merges ETH pool shares', () => {
-      const result = combineSharesByAsset(shares, AssetETH)
-      expect(FP.pipe(result, O.toNullable)).toEqual({
-        asset: AssetETH,
-        units: ONE_RUNE_BASE_AMOUNT,
-        type: 'all'
+      it('merges BNB pool shares', () => {
+        const oResult = combineSharesByAsset(shares, AssetBNB)
+
+        expect(
+          FP.pipe(
+            oResult,
+            O.map((share) =>
+              eqPoolShare.equals(share, {
+                asset: AssetBNB,
+                units: assetToBase(assetAmount(5)),
+                type: 'all'
+              })
+            ),
+            O.getOrElse(() => false)
+          )
+        ).toBeTruthy()
+      })
+      it('merges ETH pool shares', () => {
+        const result = combineSharesByAsset(shares, AssetETH)
+        expect(FP.pipe(result, O.toNullable)).toEqual({
+          asset: AssetETH,
+          units: ONE_RUNE_BASE_AMOUNT,
+          type: 'all'
+        })
       })
     })
-  })
 
-  describe('combineShares', () => {
-    it('returns empty list', () => {
-      expect(combineShares([])).toEqual([])
+    describe('combineShares', () => {
+      it('returns empty list', () => {
+        expect(combineShares([])).toEqual([])
+      })
+      it('merges pool shares', () => {
+        const expected: PoolShares = [
+          {
+            asset: AssetETH,
+            units: ONE_RUNE_BASE_AMOUNT,
+            type: 'all'
+          },
+          {
+            asset: AssetBNB,
+            units: assetToBase(assetAmount(5)),
+            type: 'all'
+          },
+          {
+            asset: AssetBTC,
+            units: FOUR_RUNE_BASE_AMOUNT,
+            type: 'all'
+          }
+        ]
+        const result = combineShares(shares)
+
+        expect(eqPoolShares.equals(result, expected)).toBeTruthy()
+      })
     })
-    it('merges pool shares', () => {
-      const shares: PoolShares = [
-        {
-          asset: AssetETH,
-          units: ONE_RUNE_BASE_AMOUNT,
-          type: 'sym'
-        },
-        {
-          asset: AssetBNB,
-          units: TWO_RUNE_BASE_AMOUNT,
-          type: 'sym'
-        },
-        {
-          asset: AssetBNB,
-          units: THREE_RUNE_BASE_AMOUNT,
-          type: 'asym'
-        },
-        {
-          asset: AssetBTC,
-          units: FOUR_RUNE_BASE_AMOUNT,
-          type: 'asym'
-        }
-      ]
-      const expected: PoolShares = [
-        {
-          asset: AssetETH,
-          units: ONE_RUNE_BASE_AMOUNT,
-          type: 'all'
-        },
-        {
-          asset: AssetBNB,
-          units: assetToBase(assetAmount(5)),
-          type: 'all'
-        },
-        {
-          asset: AssetBTC,
-          units: FOUR_RUNE_BASE_AMOUNT,
-          type: 'all'
-        }
-      ]
-      const result = combineShares(shares)
 
-      expect(eqPoolShares.equals(result, expected)).toBeTruthy()
+    describe('getSharesByAssetAndType', () => {
+      it('returns none for empty list', () => {
+        expect(getSharesByAssetAndType({ shares: [], asset: AssetBNB, type: 'sym' })).toBeNone()
+      })
+      it('returns none for non existing shares', () => {
+        expect(getSharesByAssetAndType({ shares, asset: AssetBTC, type: 'sym' })).toBeNone()
+      })
+      it('gets sym. shares of BNB pools', () => {
+        const oResult = getSharesByAssetAndType({ shares, asset: AssetBNB, type: 'sym' })
+        expect(
+          FP.pipe(
+            oResult,
+            O.map((result) => eqPoolShare.equals(result, bnbShares1)),
+            O.getOrElse(() => false)
+          )
+        ).toBeTruthy()
+      })
+      it('gets asym. shares of BNB pools', () => {
+        const oResult = getSharesByAssetAndType({ shares, asset: AssetBNB, type: 'asym' })
+        expect(
+          FP.pipe(
+            oResult,
+            O.map((result) => eqPoolShare.equals(result, bnbShares2)),
+            O.getOrElse(() => false)
+          )
+        ).toBeTruthy()
+      })
     })
   })
 })
