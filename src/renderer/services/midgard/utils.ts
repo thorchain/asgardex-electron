@@ -151,7 +151,9 @@ export const getPoolAddressByChain = (
   )
 
 /**
- * Combines 'asym` + `sym` `Poolshare`'s into a single `Poolshare`
+ * Combines 'asym` + `sym` `Poolshare`'s of an `Asset` into a single `Poolshare` for this `Asset`
+ *
+ * @returns `PoolShares` List of combined `PoolShare` items for each `Asset`
  */
 export const combineShares = (shares: PoolShares): PoolShares =>
   FP.pipe(
@@ -173,7 +175,9 @@ export const combineShares = (shares: PoolShares): PoolShares =>
   )
 
 /**
- * Combines 'asym` + `sym` `Poolshare`'s into a single `Poolshare` by given `Asset`
+ * Combines 'asym` + `sym` `Poolshare`'s into a single `Poolshare` by given `Asset` only
+ *
+ * @returns `O.Option<PoolShare>`  If `Poolshare`'s for given `Asset` exists, it combinens its `PoolShare`. If not, it returns `O.none`
  */
 export const combineSharesByAsset = (shares: PoolShares, asset: Asset): O.Option<PoolShare> =>
   FP.pipe(
