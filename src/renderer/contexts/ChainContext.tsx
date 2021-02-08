@@ -10,7 +10,6 @@ import {
   getWithdrawMemo$,
   withdrawFee$,
   reloadWithdrawFee,
-  reloadDepositFeesEffect$,
   retrieveLedgerAddress,
   removeLedgerAddress,
   removeAllLedgerAddress,
@@ -33,7 +32,6 @@ type ChainContextValue = {
   reloadDepositFees: typeof reloadDepositFees
   withdrawFee$: typeof withdrawFee$
   reloadWithdrawFees: typeof reloadWithdrawFee
-  reloadDepositFeesEffect$: typeof reloadDepositFeesEffect$
   symDepositTxMemo$: typeof symDepositTxMemo$
   asymDepositTxMemo$: typeof asymDepositTxMemo$
   getWithdrawMemo$: typeof getWithdrawMemo$
@@ -59,7 +57,6 @@ const initialContext: ChainContextValue = {
   reloadDepositFees,
   withdrawFee$,
   reloadWithdrawFees: reloadWithdrawFee,
-  reloadDepositFeesEffect$,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   getWithdrawMemo$,
