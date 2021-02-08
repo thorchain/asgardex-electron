@@ -8,7 +8,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
-import { isEnv } from '../../helpers/envHelper'
+import { envOrDefault } from '../../helpers/envHelper'
 import { fromPromise$ } from '../../helpers/rx/fromPromise'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
@@ -30,7 +30,10 @@ import {
   ValidateNodeLD
 } from './types'
 
-const MIDGARD_TESTNET_URL = process.env.REACT_APP_MIDGARD_TESTNET_URL
+const MIDGARD_TESTNET_URL = envOrDefault(
+  process.env.REACT_APP_MIDGARD_TESTNET_URL,
+  'https://testnet.midgard.thorchain.info'
+)
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
@@ -42,8 +45,8 @@ const { stream$: reloadByzantine$, trigger: reloadByzantine } = triggerStream()
 
 const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
   (network: Network) => {
-    // option to set Midgard url (for development only)
-    if (network === 'testnet' && isEnv(MIDGARD_TESTNET_URL)) return Promise.resolve(RD.success(MIDGARD_TESTNET_URL))
+    // option to set Midgard url (for testnet + development only)
+    if (network === 'testnet') return Promise.resolve(RD.success(MIDGARD_TESTNET_URL))
     else return midgard(network, true).then(RD.success)
   },
   RD.pending,
