@@ -34,13 +34,12 @@ export const createFeesService = (oClient$: Client$): FeesService => {
    * Transaction fees (no memo included)
    */
   const fees$: FeesWithRatesLD = Rx.combineLatest([oClient$, reloadFees$]).pipe(
-    RxOp.mergeMap(([oClient, _]) =>
+    RxOp.switchMap(([oClient, _]) =>
       FP.pipe(
         oClient,
-        O.fold(() => Rx.of<FeesWithRatesRD>(RD.initial), loadFees$)
+        O.fold(() => Rx.of<FeesWithRatesRD>(RD.initial), FP.flow(loadFees$, RxOp.shareReplay(1)))
       )
-    ),
-    RxOp.shareReplay(1)
+    )
   )
 
   /**
@@ -53,11 +52,10 @@ export const createFeesService = (oClient$: Client$): FeesService => {
           oClient,
           O.fold(
             () => Rx.of<FeesWithRatesRD>(RD.initial),
-            (client) => loadFees$(client, memo)
+            (client) => FP.pipe(loadFees$(client, memo), RxOp.shareReplay(1))
           )
         )
-      ),
-      RxOp.shareReplay(1)
+      )
     )
 
   return {

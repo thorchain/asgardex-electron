@@ -15,7 +15,6 @@ import { selectedPoolChain$ } from '../../midgard/common'
 import * as THOR from '../../thorchain'
 import { symDepositAssetTxMemo$, asymDepositTxMemo$ } from '../memo'
 import { FeeLD, LoadFeesHandler, DepositFeesLD } from '../types'
-import { reloadDepositFeesByChain } from './fees.helper'
 
 export const reloadFees = () => {
   BNB.reloadFees()
@@ -45,36 +44,6 @@ export const reloadFees$: Rx.Observable<O.Option<LoadFeesHandler>> = selectedPoo
 
 // State to reload deposit fees
 const { get$: reloadDepositFees$, set: reloadDepositFees } = observableState<DepositType>('asym')
-
-/**
- * Reload fees
- *
- * Has to be used ONLY on an appropriate view
- * @example
- * useSubscription(reloadDepositFeesEffect$)
- */
-// Rx.Observable<boolean>
-const reloadDepositFeesEffect$: Rx.Observable<boolean> = Rx.combineLatest([
-  selectedPoolChain$,
-  reloadDepositFees$
-]).pipe(
-  RxOp.map(([oChain, type]) =>
-    FP.pipe(
-      oChain,
-      O.map((chain) => {
-        // asset chain fees
-        reloadDepositFeesByChain(chain)
-        // thorchain fees are needed for sym deposits only
-        if (type === 'sym') {
-          reloadDepositFeesByChain('THOR')
-        }
-
-        return true
-      }),
-      O.getOrElse<boolean>(() => false)
-    )
-  )
-)
 
 const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
   switch (chain) {
@@ -110,8 +79,9 @@ const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
 }
 
 const depositFees$ = (type: DepositType): DepositFeesLD =>
-  selectedPoolChain$.pipe(
-    RxOp.switchMap((oPoolChain) =>
+  FP.pipe(
+    Rx.combineLatest([selectedPoolChain$, reloadDepositFees$]),
+    RxOp.switchMap(([oPoolChain]) =>
       FP.pipe(
         oPoolChain,
         O.map((chain) =>
@@ -135,4 +105,4 @@ const depositFees$ = (type: DepositType): DepositFeesLD =>
     )
   )
 
-export { depositFees$, reloadDepositFees, depositFeeByChain$, reloadDepositFeesEffect$ }
+export { depositFees$, reloadDepositFees, depositFeeByChain$ }

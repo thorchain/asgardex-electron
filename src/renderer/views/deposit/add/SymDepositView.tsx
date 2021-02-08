@@ -5,7 +5,7 @@ import { Asset, AssetRuneNative, assetToString, BaseAmount, bn } from '@xchainjs
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
-import { useObservableState, useSubscription } from 'observable-hooks'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
@@ -46,17 +46,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
     }
   } = useMidgardContext()
 
-  const {
-    depositFees$,
-    symDeposit$,
-    reloadDepositFees,
-    symDepositTxMemo$,
-    reloadDepositFeesEffect$,
-    getExplorerUrlByAsset$
-  } = useChainContext()
-
-  // subscribe to
-  useSubscription(reloadDepositFeesEffect$)
+  const { depositFees$, symDeposit$, reloadDepositFees, symDepositTxMemo$, getExplorerUrlByAsset$ } = useChainContext()
 
   const [depositFees] = useObservableState(() => depositFees$('sym'), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
