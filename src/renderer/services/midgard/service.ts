@@ -18,7 +18,7 @@ import { MIDGARD_MAX_RETRY } from '../const'
 import { ErrorId } from '../wallet/types'
 import { selectedPoolAsset$, setSelectedPoolAsset } from './common'
 import { createPoolsService } from './pools'
-import { createStakeService } from './stake'
+import { createSharesService } from './shares'
 import {
   NetworkInfoRD,
   NetworkInfoLD,
@@ -207,6 +207,6 @@ export const service = {
   apiEndpoint$: byzantine$,
   reloadApiEndpoint: reloadByzantine,
   pools: createPoolsService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
-  stake: createStakeService(byzantine$, getMidgardDefaultApi),
+  shares: createSharesService(byzantine$, getMidgardDefaultApi),
   validateNode$
 }

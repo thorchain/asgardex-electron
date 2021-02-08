@@ -5,6 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
+import { DepositType } from '../../types/asgardex'
 import {
   Network as NetworkInfo,
   Constants as ThorchainConstants,
@@ -28,47 +29,6 @@ export type AssetDetail = {
   asset: string
   dateCreated: number
   priceRune: string
-}
-
-export interface StakersAssetData {
-  /**
-   * Asset
-   * @type {string}
-   */
-  asset?: string
-  /**
-   * Total of assets staked
-   * @type {string}
-   */
-  assetStaked?: string
-  /**
-   * Total of assets withdrawn
-   * @type {string}
-   */
-  assetWithdrawn?: string
-  /**
-   * @type {number}
-   */
-  dateFirstStaked?: number
-  /**
-   * @type {number}
-   */
-  heightLastStaked?: number
-  /**
-   * Total of rune staked
-   * @type {string}
-   */
-  runeStaked?: string
-  /**
-   * Total of rune withdrawn
-   * @type {string}
-   */
-  runeWithdrawn?: string
-  /**
-   * Represents ownership of a pool.
-   * @type {string}
-   */
-  units?: string
 }
 
 export type AssetDetails = AssetDetail[]
@@ -161,11 +121,24 @@ export type PoolsService = {
   validatePool$: (poolAddress: string, chain: Chain) => ValidatePoolLD
 }
 
-export type StakersAssetDataRD = RD.RemoteData<Error, StakersAssetData>
-export type StakersAssetDataLD = LiveData<Error, StakersAssetData>
+export type PoolShareType = DepositType | 'all'
 
-export type StakersDataRD = RD.RemoteData<Error, StakersAssetData[]>
-export type StakersDataLD = LiveData<Error, StakersAssetData[]>
+export type PoolShare = {
+  /**
+   * Share units, which are RUNE based, provided as `BaseAmount`
+   **/
+  units: BaseAmount
+  asset: Asset
+  type: PoolShareType
+}
+
+export type PoolShareRD = RD.RemoteData<Error, O.Option<PoolShare>>
+export type PoolShareLD = LiveData<Error, O.Option<PoolShare>>
+
+export type PoolShares = PoolShare[]
+
+export type PoolSharesRD = RD.RemoteData<Error, PoolShares>
+export type PoolSharesLD = LiveData<Error, PoolShares>
 
 export type ValidatePoolLD = LiveData<ApiError, boolean>
 

@@ -1,9 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { ThorchainEndpoint } from '@thorchain/asgardex-midgard/lib/byzantine'
 import { PoolData } from '@thorchain/asgardex-util'
 import { assetFromString, bnOrZero, baseAmount, Asset, assetToString, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
-import { head } from 'fp-ts/lib/NonEmptyArray'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
 import { CURRENCY_WHEIGHTS } from '../../const'
@@ -14,30 +15,15 @@ import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import {
   AssetDetails,
-  AssetDetailMap,
   PoolDetails,
   PoolsStateRD,
   SelectedPricePoolAsset,
   PoolAddress,
-  ThorchainEndpoints,
   AssetDetail,
-  PoolDetail
+  PoolDetail,
+  PoolShares,
+  PoolShare
 } from './types'
-
-export const getAssetDetailIndex = (assets: AssetDetails): AssetDetailMap | {} => {
-  let assetDataIndex = {}
-
-  assets.forEach((assetInfo) => {
-    const { asset = '' } = assetInfo
-    const symbol = assetFromString(asset)?.symbol
-
-    if (symbol) {
-      assetDataIndex = { ...assetDataIndex, [symbol]: assetInfo }
-    }
-  })
-
-  return assetDataIndex
-}
 
 export const getAssetDetail = (assets: AssetDetails, ticker: string): O.Option<AssetDetail> =>
   FP.pipe(
@@ -85,7 +71,7 @@ export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolA
     // (2) If (1) fails, check if BUSDB pool is available in `PricePools`
     O.fold(() => O.fromNullable(pools.find((pool) => isBUSDAsset(pool.asset))), O.some),
     // (3) If (2) failes, return RUNE pool, which is always first entry in pools list
-    O.getOrElse(() => head(pools))
+    O.getOrElse(() => NEA.head(pools))
   )
 
 /**
@@ -141,7 +127,7 @@ export const getPoolDetailsHashMap = (poolDetails: PoolDetails, runeAsset: Asset
 /**
  * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)
  */
-export const toPoolData = (detail: PoolDetail): PoolData => ({
+export const toPoolData = (detail: Pick<PoolDetail, 'assetDepth' | 'runeDepth'>): PoolData => ({
   assetBalance: baseAmount(bnOrZero(detail.assetDepth)),
   runeBalance: baseAmount(bnOrZero(detail.runeDepth))
 })
@@ -153,10 +139,82 @@ export const filterPoolAssets = (poolAssets: string[]) => {
   return poolAssets.filter((poolAsset) => !isMiniToken(assetFromString(poolAsset) || { symbol: '' }))
 }
 
-export const getPoolAddressByChain = (endpoints: ThorchainEndpoints, chain: Chain): O.Option<PoolAddress> =>
+export const getPoolAddressByChain = (
+  endpoints: Pick<ThorchainEndpoint, 'chain' | 'address'>[],
+  chain: Chain
+): O.Option<PoolAddress> =>
   FP.pipe(
     endpoints,
     A.findFirst((endpoint) => endpoint.chain === chain),
     O.map(({ address }) => address),
     O.chain(O.fromNullable)
+  )
+
+/**
+ * Combines 'asym` + `sym` `Poolshare`'s of an `Asset` into a single `Poolshare` for this `Asset`
+ *
+ * @returns `PoolShares` List of combined `PoolShare` items for each `Asset`
+ */
+export const combineShares = (shares: PoolShares): PoolShares =>
+  FP.pipe(
+    shares,
+    A.reduce<PoolShare, PoolShares>([], (acc, cur) =>
+      FP.pipe(
+        acc,
+        A.findFirst(({ asset }) => eqAsset.equals(asset, cur.asset)),
+        O.fold(
+          () => [...acc, { ...cur, type: 'all' }],
+          (value) => {
+            value.units = baseAmount(cur.units.amount().plus(value.units.amount()))
+            value.type = 'all'
+            return acc
+          }
+        )
+      )
+    )
+  )
+
+/**
+ * Combines 'asym` + `sym` `Poolshare`'s into a single `Poolshare` by given `Asset` only
+ *
+ * @returns `O.Option<PoolShare>`  If `Poolshare`'s for given `Asset` exists, it combinens its `PoolShare`. If not, it returns `O.none`
+ */
+export const combineSharesByAsset = (shares: PoolShares, asset: Asset): O.Option<PoolShare> =>
+  FP.pipe(
+    shares,
+    // filter shares for given asset
+    A.filter(({ asset: poolAsset }) => eqAsset.equals(asset, poolAsset)),
+    // merge shares
+    A.reduce<PoolShare, O.Option<PoolShare>>(O.none, (oAcc, cur) => {
+      return FP.pipe(
+        oAcc,
+        O.map(
+          (acc): PoolShare => ({
+            ...acc,
+            units: baseAmount(cur.units.amount().plus(acc.units.amount())),
+            type: 'all'
+          })
+        ),
+        O.getOrElse<PoolShare>(() => ({ ...cur, type: 'all' })),
+        O.some
+      )
+    })
+  )
+
+/**
+ * Filters 'asym` or `sym` `Poolshare`'s by given `Asset`
+ */
+export const getSharesByAssetAndType = ({
+  shares,
+  asset,
+  type
+}: {
+  shares: PoolShares
+  asset: Asset
+  type: 'sym' | 'asym'
+}): O.Option<PoolShare> =>
+  FP.pipe(
+    shares,
+    A.filter(({ asset: sharesAsset, type: sharesType }) => eqAsset.equals(asset, sharesAsset) && type === sharesType),
+    A.head
   )

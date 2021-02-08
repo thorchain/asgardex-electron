@@ -1,31 +1,40 @@
 import React, { useMemo } from 'react'
 
-import { Asset, baseAmount, baseToAsset, formatAssetAmountCurrency, formatBN } from '@xchainjs/xchain-util'
-import { Row } from 'antd'
-import { ColumnType } from 'antd/lib/table'
+import {
+  Asset,
+  AssetRuneNative,
+  baseAmount,
+  baseToAsset,
+  formatAssetAmountCurrency,
+  formatBN
+} from '@xchainjs/xchain-util'
+import { Grid, Row } from 'antd'
+import { ColumnsType, ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
 
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { Label } from '../uielements/label'
 import * as H from './helpers'
 import * as Styled from './PoolShares.styles'
-import { PoolShare } from './types'
+import { PoolShareTableRowData, PoolShareTableData } from './PoolShares.types'
 
-type Props = {
-  data: PoolShare[]
+export type Props = {
+  data: PoolShareTableData
+  loading: boolean
   priceAsset: Asset | undefined
   goToStakeInfo: () => void
 }
 
-export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo }) => {
+export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, loading }) => {
   const intl = useIntl()
 
-  const iconColumn: ColumnType<PoolShare> = useMemo(
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+
+  const iconColumn: ColumnType<PoolShareTableRowData> = useMemo(
     () => ({
-      key: 'icon',
       title: '',
       width: 90,
-      render: ({ asset }: PoolShare) => (
+      render: ({ asset }: PoolShareTableRowData) => (
         <Row justify="center" align="middle">
           <AssetIcon asset={asset} size="normal" />
         </Row>
@@ -34,82 +43,90 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo })
     []
   )
 
-  const poolColumn: ColumnType<PoolShare> = useMemo(
+  const poolColumn: ColumnType<PoolShareTableRowData> = useMemo(
     () => ({
-      key: 'pool',
       title: intl.formatMessage({ id: 'common.pool' }),
-      align: 'left',
+      align: 'center',
       responsive: ['md'],
-      render: ({ asset }: PoolShare) => <Label>{asset.symbol}</Label>
+      render: ({ asset }: PoolShareTableRowData) => <Label align="center">{asset.symbol}</Label>
     }),
     [intl]
   )
 
-  const ownershipColumn: ColumnType<PoolShare> = useMemo(
+  const ownershipColumn: ColumnType<PoolShareTableRowData> = useMemo(
     () => ({
-      key: 'ownership',
       title: intl.formatMessage({ id: 'poolshares.ownership' }),
-      align: 'left',
-      render: ({ poolShare }: PoolShare) => <Label>{formatBN(poolShare)}%</Label>
+      align: 'center',
+      render: ({ sharePercent }: PoolShareTableRowData) => <Label align="center">{formatBN(sharePercent, 2)}%</Label>
     }),
     [intl]
   )
 
-  const valueColumn: ColumnType<PoolShare> = useMemo(
+  const valueColumn: ColumnType<PoolShareTableRowData> = useMemo(
     () => ({
-      key: 'value',
       title: intl.formatMessage({ id: 'common.value' }),
-      align: 'left',
-      render: ({ assetDepositPrice, runeDepositPrice }: PoolShare) => {
+      align: isDesktopView ? 'right' : 'center',
+      render: ({ assetDepositPrice, runeDepositPrice }: PoolShareTableRowData) => {
         const totalPrice = baseAmount(runeDepositPrice.amount().plus(assetDepositPrice.amount()))
         return (
-          <Label>{formatAssetAmountCurrency({ amount: baseToAsset(totalPrice), asset: priceAsset, decimal: 2 })}</Label>
+          <Label align={isDesktopView ? 'right' : 'center'}>
+            {formatAssetAmountCurrency({ amount: baseToAsset(totalPrice), asset: priceAsset, decimal: 2 })}
+          </Label>
         )
       }
     }),
-    [intl, priceAsset]
+    [intl, priceAsset, isDesktopView]
   )
 
-  const assetColumn: ColumnType<PoolShare> = useMemo(
+  const assetColumn: ColumnType<PoolShareTableRowData> = useMemo(
     () => ({
-      key: 'assetAmount',
       title: intl.formatMessage({ id: 'common.asset' }),
-      align: 'left',
-      render: ({ assetDepositPrice }: PoolShare) => (
-        <Label>
+      align: 'right',
+      render: ({ asset, assetShare }: PoolShareTableRowData) => (
+        <Label align="right">
           {formatAssetAmountCurrency({
-            amount: baseToAsset(assetDepositPrice),
-            asset: priceAsset,
+            amount: baseToAsset(assetShare),
+            asset,
             decimal: 2
           })}
         </Label>
       )
     }),
-    [intl, priceAsset]
+    [intl]
   )
 
-  const runeColumn: ColumnType<PoolShare> = useMemo(
+  const runeColumn: ColumnType<PoolShareTableRowData> = useMemo(
     () => ({
-      key: 'runeAmount',
-      title: 'Rune',
-      align: 'left',
-      render: ({ runeDepositPrice }: PoolShare) => (
-        <Label>
+      title: AssetRuneNative.symbol,
+      align: 'right',
+      render: ({ runeShare }: PoolShareTableRowData) => (
+        <Label align="right">
           {formatAssetAmountCurrency({
-            amount: baseToAsset(runeDepositPrice),
-            asset: priceAsset,
+            amount: baseToAsset(runeShare),
+            asset: AssetRuneNative,
             decimal: 2
           })}
         </Label>
       )
     }),
-    [priceAsset]
+    []
   )
+
+  const desktopColumns: ColumnsType<PoolShareTableRowData> = useMemo(
+    () => [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn],
+    [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn]
+  )
+
+  const mobileColumns: ColumnsType<PoolShareTableRowData> = useMemo(() => [iconColumn, valueColumn], [
+    iconColumn,
+    valueColumn
+  ])
 
   return (
     <Styled.Container>
       <Styled.Table
-        columns={[iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn]}
+        loading={loading}
+        columns={isDesktopView ? desktopColumns : mobileColumns}
         dataSource={data}
         rowKey={({ asset }) => asset.symbol}
       />

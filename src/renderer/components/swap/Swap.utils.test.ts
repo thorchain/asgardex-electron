@@ -11,7 +11,7 @@ import {
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
-import { ONE_ASSET_BASE_AMOUNT, ZERO_BASE_AMOUNT } from '../../const'
+import { ZERO_BASE_AMOUNT } from '../../const'
 import { eqBaseAmount } from '../../helpers/fp/eq'
 import { DEFAULT_SWAP_DATA, isRuneSwap, getSlip, getSwapResult, getSwapData, pickAssetWithPrice } from './Swap.utils'
 
@@ -116,9 +116,9 @@ describe('components/swap/utils', () => {
 
   describe('getSwapData', () => {
     it('should return default value', () => {
-      expect(getSwapData(ONE_ASSET_BASE_AMOUNT, O.none, O.none, {})).toEqual(DEFAULT_SWAP_DATA)
-      expect(getSwapData(ONE_ASSET_BASE_AMOUNT, O.some(ASSETS_TESTNET.FTM), O.none, {})).toEqual(DEFAULT_SWAP_DATA)
-      expect(getSwapData(ONE_ASSET_BASE_AMOUNT, O.none, O.some(ASSETS_TESTNET.FTM), {})).toEqual(DEFAULT_SWAP_DATA)
+      expect(getSwapData(baseAmount(123), O.none, O.none, {})).toEqual(DEFAULT_SWAP_DATA)
+      expect(getSwapData(baseAmount(123), O.some(ASSETS_TESTNET.FTM), O.none, {})).toEqual(DEFAULT_SWAP_DATA)
+      expect(getSwapData(baseAmount(123), O.none, O.some(ASSETS_TESTNET.FTM), {})).toEqual(DEFAULT_SWAP_DATA)
     })
 
     it('should calculate swap data', () => {

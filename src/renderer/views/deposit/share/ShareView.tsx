@@ -2,24 +2,24 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
-import { Asset, AssetRuneNative, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import { PoolShare } from '../../../components/uielements/poolShare'
+import { PoolShare as PoolShareUI } from '../../../components/uielements/poolShare'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
-import { PoolDetailRD, StakersAssetData, PoolDetail, StakersAssetDataRD } from '../../../services/midgard/types'
+import { PoolDetailRD, PoolDetail, PoolShareRD, PoolShare } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import * as Styled from './ShareView.styles'
 
-type Props = { asset: Asset; depositData: StakersAssetDataRD }
+type Props = { asset: Asset; poolShare: PoolShareRD }
 
-export const ShareView: React.FC<Props> = ({ asset, depositData }) => {
+export const ShareView: React.FC<Props> = ({ asset, poolShare: poolShareRD }) => {
   const { service: midgardService } = useMidgardContext()
   const {
     pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$ }
@@ -33,12 +33,10 @@ export const ShareView: React.FC<Props> = ({ asset, depositData }) => {
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const renderPoolShareReady = useCallback(
-    (stake: StakersAssetData, poolDetail: PoolDetail) => {
-      const runeShare = shareHelpers.getRuneShare(stake, poolDetail)
-      const assetShare = shareHelpers.getAssetShare(stake, poolDetail)
-      const poolShare = shareHelpers.getPoolShare(stake, poolDetail)
-      // stake units are RUNE based, provided as `BaseAmount`
-      const stakeUnits = baseAmount(bnOrZero(stake.units))
+    ({ units }: PoolShare, poolDetail: PoolDetail) => {
+      const runeShare = shareHelpers.getRuneShare(units, poolDetail)
+      const assetShare = shareHelpers.getAssetShare(units, poolDetail)
+      const poolShare = shareHelpers.getPoolShare(units, poolDetail)
 
       const poolData = toPoolData(poolDetail)
 
@@ -46,11 +44,11 @@ export const ShareView: React.FC<Props> = ({ asset, depositData }) => {
       const runeDepositPrice = getValueOfRuneInAsset(runeShare, pricePoolData)
 
       return (
-        <PoolShare
+        <PoolShareUI
           sourceAsset={AssetRuneNative}
           targetAsset={asset}
           poolShare={poolShare}
-          depositUnits={stakeUnits}
+          depositUnits={units}
           assetDepositShare={assetShare}
           priceAsset={FP.pipe(oPriceAsset, O.toUndefined)}
           loading={false}
@@ -71,16 +69,23 @@ export const ShareView: React.FC<Props> = ({ asset, depositData }) => {
   const renderPoolShare = useMemo(
     () =>
       FP.pipe(
-        RD.combine(depositData, poolDetailRD),
+        RD.combine(poolShareRD, poolDetailRD),
         RD.fold(
           () => renderNoShare,
           () => <Spin />,
           () => renderNoShare,
-          ([stake, pool]) => renderPoolShareReady(stake, pool)
+          ([oPoolShare, pool]) =>
+            FP.pipe(
+              oPoolShare,
+              O.fold(
+                () => renderNoShare,
+                (poolShare) => renderPoolShareReady(poolShare, pool)
+              )
+            )
         )
       ),
 
-    [depositData, poolDetailRD, renderNoShare, renderPoolShareReady]
+    [poolShareRD, poolDetailRD, renderNoShare, renderPoolShareReady]
   )
 
   return renderPoolShare

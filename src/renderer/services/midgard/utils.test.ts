@@ -1,24 +1,31 @@
 import * as RD from '@devexperts/remote-data-ts'
 import {
+  assetAmount,
   AssetBNB,
   AssetBTC,
   AssetETH,
   AssetRuneNative,
+  assetToBase,
   assetToString,
   BNBChain,
   BTCChain,
   THORChain
 } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { PRICE_POOLS_WHITELIST, ONE_ASSET_BASE_AMOUNT, AssetBUSDBAF } from '../../const'
-import { eqAsset, eqOString } from '../../helpers/fp/eq'
-import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { InboundAddressesItem as ThorchainEndpoint } from '../../types/generated/midgard'
-import { PricePool, PricePools } from '../../views/pools/Pools.types'
-import { AssetDetail, PoolDetail, PoolsState, PoolsStateRD } from './types'
 import {
-  getAssetDetailIndex,
+  ONE_RUNE_BASE_AMOUNT,
+  TWO_RUNE_BASE_AMOUNT,
+  THREE_RUNE_BASE_AMOUNT,
+  FOUR_RUNE_BASE_AMOUNT
+} from '../../../shared/mock/amount'
+import { PRICE_POOLS_WHITELIST, AssetBUSDBAF } from '../../const'
+import { eqAsset, eqOString, eqPoolShare, eqPoolShares } from '../../helpers/fp/eq'
+import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { PricePool, PricePools } from '../../views/pools/Pools.types'
+import { AssetDetail, PoolDetail, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
+import {
   getAssetDetail,
   getPricePools,
   pricePoolSelector,
@@ -27,35 +34,13 @@ import {
   toPoolData,
   filterPoolAssets,
   getPoolDetailsHashMap,
-  getPoolAddressByChain
+  getPoolAddressByChain,
+  combineShares,
+  combineSharesByAsset,
+  getSharesByAssetAndType
 } from './utils'
 
-type PoolDataMock = { asset?: string }
-
 describe('services/midgard/utils/', () => {
-  describe('getAssetDetailIndex', () => {
-    const emptyAsset = {}
-    const emptyAssetSymbol: PoolDataMock = { asset: 'AAA' }
-
-    it('should return non empty assetDataIndex ', () => {
-      const bnbData = { chain: 'BNB', address: '0xbnb' } as ThorchainEndpoint
-      const asset1: PoolDataMock = { asset: assetToString(AssetBNB) }
-      const asset2: PoolDataMock = { asset: assetToString(AssetBTC) }
-      const data = [bnbData, asset1, asset2, emptyAsset, emptyAssetSymbol] as Array<PoolDataMock>
-      const result = getAssetDetailIndex(data)
-      const expected = {
-        BNB: asset1,
-        BTC: asset2
-      }
-      expect(result).toEqual(expected)
-    })
-    it('should return an emtpy {} if no asset or symbols in list', () => {
-      const data = [emptyAsset, emptyAssetSymbol, emptyAssetSymbol, emptyAssetSymbol, emptyAsset] as Array<PoolDataMock>
-      const result = getAssetDetailIndex(data)
-      expect(result).toStrictEqual({})
-    })
-  })
-
   describe('getAssetDetail', () => {
     const runeDetail = { asset: assetToString(AssetRuneNative) } as AssetDetail
     const bnbDetail = { asset: assetToString(AssetBNB) } as AssetDetail
@@ -83,8 +68,8 @@ describe('services/midgard/utils/', () => {
       // RUNE pool
       const pool0 = result[0]
       expect(pool0.asset).toEqual(AssetRuneNative)
-      expect(pool0.poolData.runeBalance.amount().toNumber()).toEqual(ONE_ASSET_BASE_AMOUNT.amount().toNumber())
-      expect(pool0.poolData.assetBalance.amount().toNumber()).toEqual(ONE_ASSET_BASE_AMOUNT.amount().toNumber())
+      expect(pool0.poolData.runeBalance.amount().toNumber()).toEqual(ONE_RUNE_BASE_AMOUNT.amount().toNumber())
+      expect(pool0.poolData.assetBalance.amount().toNumber()).toEqual(ONE_RUNE_BASE_AMOUNT.amount().toNumber())
       // BTC pool
       const btcPool = result[1]
       expect(btcPool.asset).toEqual(AssetBTC)
@@ -123,7 +108,7 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('pricePoolSelector', () => {
-    const poolData = toPoolData({})
+    const poolData = toPoolData({ assetDepth: '1', runeDepth: '1' })
     const eth: PricePool = { asset: AssetETH, poolData }
     const BUSDBAF: PricePool = { asset: AssetBUSDBAF, poolData }
     const btc: PricePool = { asset: AssetBTC, poolData }
@@ -151,7 +136,7 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('pricePoolSelectorFromRD', () => {
-    const poolData = toPoolData({})
+    const poolData = toPoolData({ assetDepth: '1', runeDepth: '1' })
     const eth: PricePool = { asset: AssetETH, poolData }
     const BUSDBAF: PricePool = { asset: AssetBUSDBAF, poolData }
     const btc: PricePool = { asset: AssetBTC, poolData }
@@ -247,11 +232,11 @@ describe('services/midgard/utils/', () => {
 
   describe('getPoolAddressByChain', () => {
     const bnbAddress = 'bnb pool address'
-    const endpointBNB: ThorchainEndpoint = { address: bnbAddress, chain: BNBChain }
+    const endpointBNB = { address: bnbAddress, chain: BNBChain }
     const thorAddress = 'thor pool address'
-    const endpointThor: ThorchainEndpoint = { address: thorAddress, chain: THORChain }
+    const endpointThor = { address: thorAddress, chain: THORChain }
     const btcAddress = 'btc pool address'
-    const endpointBTC: ThorchainEndpoint = { address: btcAddress, chain: BTCChain }
+    const endpointBTC = { address: btcAddress, chain: BTCChain }
     it('returns BNBChain if list of endpoints are empty', () => {
       const result = getPoolAddressByChain([endpointBNB, endpointThor, endpointBTC], BNBChain)
       expect(eqOString.equals(result, O.some(bnbAddress))).toBeTruthy()
@@ -263,6 +248,123 @@ describe('services/midgard/utils/', () => {
 
     it('returns none if chain is not in list of endpoints', () => {
       expect(getPoolAddressByChain([endpointBNB, endpointThor], BTCChain)).toBeNone()
+    })
+  })
+
+  describe('pool share helpers', () => {
+    const ethShares: PoolShare = {
+      asset: AssetETH,
+      units: ONE_RUNE_BASE_AMOUNT,
+      type: 'sym'
+    }
+    const bnbShares1: PoolShare = {
+      asset: AssetBNB,
+      units: TWO_RUNE_BASE_AMOUNT,
+      type: 'sym'
+    }
+    const bnbShares2: PoolShare = {
+      asset: AssetBNB,
+      units: THREE_RUNE_BASE_AMOUNT,
+      type: 'asym'
+    }
+    const btcShares: PoolShare = {
+      asset: AssetBTC,
+      units: FOUR_RUNE_BASE_AMOUNT,
+      type: 'asym'
+    }
+    const shares: PoolShares = [ethShares, bnbShares1, bnbShares2, btcShares]
+
+    describe('combineSharesByAsset', () => {
+      it('returns none for empty list', () => {
+        expect(combineSharesByAsset([], AssetBNB)).toBeNone()
+      })
+
+      it('returns none for non existing asset in list', () => {
+        expect(combineSharesByAsset([], AssetRuneNative)).toBeNone()
+      })
+
+      it('merges BNB pool shares', () => {
+        const oResult = combineSharesByAsset(shares, AssetBNB)
+
+        expect(
+          FP.pipe(
+            oResult,
+            O.map((share) =>
+              eqPoolShare.equals(share, {
+                asset: AssetBNB,
+                units: assetToBase(assetAmount(5)),
+                type: 'all'
+              })
+            ),
+            O.getOrElse(() => false)
+          )
+        ).toBeTruthy()
+      })
+      it('merges ETH pool shares', () => {
+        const result = combineSharesByAsset(shares, AssetETH)
+        expect(FP.pipe(result, O.toNullable)).toEqual({
+          asset: AssetETH,
+          units: ONE_RUNE_BASE_AMOUNT,
+          type: 'all'
+        })
+      })
+    })
+
+    describe('combineShares', () => {
+      it('returns empty list', () => {
+        expect(combineShares([])).toEqual([])
+      })
+      it('merges pool shares', () => {
+        const expected: PoolShares = [
+          {
+            asset: AssetETH,
+            units: ONE_RUNE_BASE_AMOUNT,
+            type: 'all'
+          },
+          {
+            asset: AssetBNB,
+            units: assetToBase(assetAmount(5)),
+            type: 'all'
+          },
+          {
+            asset: AssetBTC,
+            units: FOUR_RUNE_BASE_AMOUNT,
+            type: 'all'
+          }
+        ]
+        const result = combineShares(shares)
+
+        expect(eqPoolShares.equals(result, expected)).toBeTruthy()
+      })
+    })
+
+    describe('getSharesByAssetAndType', () => {
+      it('returns none for empty list', () => {
+        expect(getSharesByAssetAndType({ shares: [], asset: AssetBNB, type: 'sym' })).toBeNone()
+      })
+      it('returns none for non existing shares', () => {
+        expect(getSharesByAssetAndType({ shares, asset: AssetBTC, type: 'sym' })).toBeNone()
+      })
+      it('gets sym. shares of BNB pools', () => {
+        const oResult = getSharesByAssetAndType({ shares, asset: AssetBNB, type: 'sym' })
+        expect(
+          FP.pipe(
+            oResult,
+            O.map((result) => eqPoolShare.equals(result, bnbShares1)),
+            O.getOrElse(() => false)
+          )
+        ).toBeTruthy()
+      })
+      it('gets asym. shares of BNB pools', () => {
+        const oResult = getSharesByAssetAndType({ shares, asset: AssetBNB, type: 'asym' })
+        expect(
+          FP.pipe(
+            oResult,
+            O.map((result) => eqPoolShare.equals(result, bnbShares2)),
+            O.getOrElse(() => false)
+          )
+        ).toBeTruthy()
+      })
     })
   })
 })

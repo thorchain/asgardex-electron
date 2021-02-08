@@ -1,8 +1,9 @@
 import { Balance } from '@xchainjs/xchain-client'
-import { AssetBNB, AssetRuneNative, baseAmount, bn, Chain } from '@xchainjs/xchain-util'
+import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount, bn, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { PoolShare } from '../../services/midgard/types'
 import { ApiError, ErrorId } from '../../services/wallet/types'
 import {
   eqAsset,
@@ -13,7 +14,9 @@ import {
   egBigNumber,
   eqOAsset,
   eqChain,
-  eqOChain
+  eqOChain,
+  eqPoolShares,
+  eqPoolShare
 } from './eq'
 
 describe('helpers/fp/eq', () => {
@@ -165,11 +168,68 @@ describe('helpers/fp/eq', () => {
     it('is equal', () => {
       expect(eqBalances.equals([a, b], [a, b])).toBeTruthy()
     })
-    it('is not equal wit different elements', () => {
+    it('is not equal with different elements', () => {
       expect(eqBalances.equals([a, b], [b, c])).toBeFalsy()
     })
     it('is not equal if elements has been flipped', () => {
       expect(eqBalances.equals([a, b], [b, a])).toBeFalsy()
+    })
+  })
+
+  describe('eqPoolShare', () => {
+    it('is equal', () => {
+      const a: PoolShare = {
+        type: 'asym',
+        units: baseAmount(1),
+        asset: AssetRuneNative
+      }
+      expect(eqPoolShare.equals(a, a)).toBeTruthy()
+    })
+    it('is not equal', () => {
+      const a: PoolShare = {
+        type: 'asym',
+        units: baseAmount(1),
+        asset: AssetRuneNative
+      }
+      // b = same as a, but another units
+      const b: PoolShare = {
+        ...a,
+        units: baseAmount(2)
+      }
+      // c = same as a, but another asset
+      const c: PoolShare = {
+        ...a,
+        asset: AssetBNB
+      }
+      expect(eqPoolShare.equals(a, b)).toBeFalsy()
+      expect(eqPoolShare.equals(a, c)).toBeFalsy()
+    })
+  })
+
+  describe('eqPoolShares', () => {
+    const a: PoolShare = {
+      type: 'asym',
+      units: baseAmount(1),
+      asset: AssetRuneNative
+    }
+    const b: PoolShare = {
+      type: 'sym',
+      units: baseAmount(1),
+      asset: AssetBNB
+    }
+    const c: PoolShare = {
+      type: 'all',
+      units: baseAmount(1),
+      asset: AssetBTC
+    }
+    it('is equal', () => {
+      expect(eqPoolShares.equals([a, b], [a, b])).toBeTruthy()
+    })
+    it('is not equal witn different elements', () => {
+      expect(eqPoolShares.equals([a, b], [b, c])).toBeFalsy()
+    })
+    it('is not equal if elements has been flipped', () => {
+      expect(eqPoolShares.equals([a, b], [b, a])).toBeFalsy()
     })
   })
 })

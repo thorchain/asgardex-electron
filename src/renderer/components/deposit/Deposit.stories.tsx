@@ -2,9 +2,10 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import { AssetBNB } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, assetToBase } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
 import { Default as AsymDeposit } from './add/AsymDeposit.stories'
 import { Default as SymDeposit } from './add/SymDeposit.stories'
@@ -13,7 +14,12 @@ import { Default as Withdraw } from './withdraw/Withdraw.stories'
 
 const defaultProps: DepositProps = {
   asset: AssetBNB,
-  depositData: RD.success({ units: '3', runeDepth: '12', assetDepth: '12' }),
+  symPoolShare: RD.success(
+    O.some({ units: assetToBase(assetAmount(3, THORCHAIN_DECIMAL)), asset: AssetBNB, type: 'sym' })
+  ),
+  asymPoolShare: RD.success(
+    O.some({ units: assetToBase(assetAmount(1, THORCHAIN_DECIMAL)), asset: AssetBNB, type: 'sym' })
+  ),
   ShareContent: DefaultPoolShare,
   SymDepositContent: SymDeposit,
   AsymDepositContent: AsymDeposit,

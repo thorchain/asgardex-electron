@@ -7,6 +7,7 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 
 import { RefreshButton } from '../../components/uielements/button/'
 import { AssetsNav } from '../../components/wallet/assets'
+import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
@@ -28,6 +29,11 @@ import { UpgradeView } from './UpgradeView'
 
 export const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService, reloadBalances } = useWalletContext()
+  const {
+    service: {
+      shares: { reloadCombineSharesByAddresses }
+    }
+  } = useMidgardContext()
   const { reloadNodesInfo } = useThorchainContext()
 
   // Important note:
@@ -64,7 +70,7 @@ export const WalletView: React.FC = (): JSX.Element => {
             <AssetsView />
           </Route>
           <Route path={walletRoutes.poolShares.template} exact>
-            {reloadButton(reloadBalances)}
+            {reloadButton(reloadCombineSharesByAddresses)}
             <AssetsNav />
             <PoolShareView />
           </Route>
@@ -91,7 +97,7 @@ export const WalletView: React.FC = (): JSX.Element => {
         </Switch>
       </>
     ),
-    [reloadBalances, reloadButton, reloadNodesInfo]
+    [reloadBalances, reloadButton, reloadCombineSharesByAddresses, reloadNodesInfo]
   )
 
   const renderWalletRoute = useCallback(

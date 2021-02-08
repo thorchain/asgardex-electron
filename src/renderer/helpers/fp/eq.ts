@@ -6,6 +6,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
 import * as O from 'fp-ts/lib/Option'
 
+import { PoolShare } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { WalletBalance } from '../../types/wallet'
 
@@ -56,3 +57,10 @@ export const eqWalletBalance: Eq.Eq<WalletBalance> = {
 }
 export const eqOWalletBalance = O.getEq(eqWalletBalance)
 export const eqWalletBalances = A.getEq(eqWalletBalance)
+
+export const eqPoolShare = Eq.getStructEq<PoolShare>({
+  asset: eqAsset,
+  units: eqBaseAmount,
+  type: Eq.eqString
+})
+export const eqPoolShares = A.getEq(eqPoolShare)

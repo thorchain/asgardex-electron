@@ -15,9 +15,9 @@ import { BackLink } from '../../components/uielements/backLink'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { sequenceTOption } from '../../helpers/fpHelpers'
 import { DepositRouteParams } from '../../routes/deposit'
-import { StakersAssetDataLD, StakersAssetDataRD } from '../../services/midgard/types'
+import { PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
+import { getSharesByAssetAndType } from '../../services/midgard/utils'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
 import { ShareView } from './share/ShareView'
@@ -32,7 +32,7 @@ export const DepositView: React.FC<Props> = (_) => {
   const {
     service: {
       setSelectedPoolAsset,
-      stake: { getStakes$ }
+      shares: { shares$ }
     }
   } = useMidgardContext()
   const { keystoreService } = useWalletContext()
@@ -62,21 +62,19 @@ export const DepositView: React.FC<Props> = (_) => {
   const oAssetWalletAddress = useObservableState(address$, O.none)
 
   /**
-   * We have to get a new stake-stream for every new asset
-   * @description /src/renderer/services/midgard/stake.ts
+   * We have to get a new shares$ stream for every new address
+   * @description /src/renderer/services/midgard/shares.ts
    */
-  const depositData$: StakersAssetDataLD = useMemo(
+  const poolShares$: PoolSharesLD = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oSelectedAsset, oAssetWalletAddress),
-        O.fold(
-          () => Rx.EMPTY,
-          ([asset, address]) => getStakes$(asset, address)
-        )
+        oAssetWalletAddress,
+        O.fold(() => Rx.EMPTY, shares$)
       ),
-    [getStakes$, oAssetWalletAddress, oSelectedAsset]
+    [oAssetWalletAddress, shares$]
   )
-  const depositData = useObservableState<StakersAssetDataRD>(depositData$, RD.initial)
+
+  const poolSharesRD = useObservableState<PoolSharesRD>(poolShares$, RD.initial)
 
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`
@@ -110,7 +108,14 @@ export const DepositView: React.FC<Props> = (_) => {
           (selectedAsset) => (
             <Deposit
               asset={selectedAsset}
-              depositData={depositData}
+              symPoolShare={FP.pipe(
+                poolSharesRD,
+                RD.map((shares) => getSharesByAssetAndType({ shares, asset: selectedAsset, type: 'sym' }))
+              )}
+              asymPoolShare={FP.pipe(
+                poolSharesRD,
+                RD.map((shares) => getSharesByAssetAndType({ shares, asset: selectedAsset, type: 'asym' }))
+              )}
               keystoreState={keystoreState}
               ShareContent={ShareView}
               SymDepositContent={SymDepositView}

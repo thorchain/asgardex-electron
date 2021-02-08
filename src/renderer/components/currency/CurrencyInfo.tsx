@@ -5,7 +5,6 @@ import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 
-import { ONE_ASSET_AMOUNT } from '../../const'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { AssetWithPrice } from '../../services/binance/types'
 import * as Styled from './CurrencyInfo.styles'
@@ -25,7 +24,7 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: Curre
           <div>
             {formatAssetAmountCurrency({
               asset: from.asset,
-              amount: ONE_ASSET_AMOUNT,
+              amount: assetAmount(1),
               trimZeros: true
             })}{' '}
             ={' '}
@@ -38,7 +37,7 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: Curre
           <div>
             {formatAssetAmountCurrency({
               asset: to.asset,
-              amount: ONE_ASSET_AMOUNT,
+              amount: assetAmount(1),
               trimZeros: true
             })}{' '}
             ={' '}

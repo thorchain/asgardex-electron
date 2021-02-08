@@ -4,7 +4,8 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
-import { ONE_ASSET_BASE_AMOUNT, ZERO_BASE_AMOUNT } from '../../const'
+import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
+import { ZERO_BASE_AMOUNT } from '../../const'
 import { PoolDetail } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
 import { GetPoolsStatusEnum, Constants as ThorchainConstants, LastblockItem } from '../../types/generated/midgard'
@@ -41,7 +42,7 @@ export const getPoolTableRowData = ({
 
       const poolData = toPoolData(poolDetail)
 
-      const poolPrice = getValueOfAsset1InAsset2(ONE_ASSET_BASE_AMOUNT, poolData, pricePoolData)
+      const poolPrice = getValueOfAsset1InAsset2(ONE_RUNE_BASE_AMOUNT, poolData, pricePoolData)
 
       const depthAmount = baseAmount(bnOrZero(poolDetail?.runeDepth))
       const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
@@ -61,7 +62,6 @@ export const getPoolTableRowData = ({
       const status = stringToGetPoolsStatus(poolDetail?.status)
 
       const pool: Pool = {
-        // As long as we don't have Native RUNE, its an RUNE asset of BNB chain
         asset: AssetRuneNative,
         target: poolDetailAsset
       }

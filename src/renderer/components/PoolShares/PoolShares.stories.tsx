@@ -3,31 +3,46 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetBTC, assetToBase, bn } from '@xchainjs/xchain-util'
 
-import { PoolShares } from './PoolShares'
-import { PoolShare } from './types'
+import { PoolShares as Component, Props as ComponentProps } from './PoolShares'
 
-export const Default: Story = () => {
-  const mockData: PoolShare[] = [
+const defaultProps: ComponentProps = {
+  data: [
     {
       asset: AssetBNB,
-      poolShare: bn(100),
-      assetDepositPrice: assetToBase(assetAmount(500)),
-      runeDepositPrice: assetToBase(assetAmount(400))
+      sharePercent: bn(10),
+      runeShare: assetToBase(assetAmount(10)),
+      assetShare: assetToBase(assetAmount(20)),
+      assetDepositPrice: assetToBase(assetAmount(100)),
+      runeDepositPrice: assetToBase(assetAmount(200))
     },
     {
       asset: AssetBTC,
-      poolShare: bn(100),
-      assetDepositPrice: assetToBase(assetAmount(500)),
-      runeDepositPrice: assetToBase(assetAmount(400))
+      sharePercent: bn(20),
+      runeShare: assetToBase(assetAmount(1)),
+      assetShare: assetToBase(assetAmount(100)),
+      assetDepositPrice: assetToBase(assetAmount(1000)),
+      runeDepositPrice: assetToBase(assetAmount(10))
     }
-  ]
-
-  return <PoolShares data={mockData} priceAsset={AssetBNB} goToStakeInfo={() => console.log('go to stake info')} />
+  ],
+  loading: false,
+  priceAsset: AssetBNB,
+  goToStakeInfo: () => console.log('go to stake info')
 }
+export const Default: Story = () => <Component {...defaultProps} />
 Default.storyName = 'default'
 
+export const Loading: Story = () => {
+  const props: ComponentProps = {
+    ...defaultProps,
+    data: [],
+    loading: true
+  }
+  return <Component {...props} />
+}
+Loading.storyName = 'loading'
+
 const meta: Meta = {
-  component: PoolShares,
+  component: Component,
   title: 'PoolShares'
 }
 
