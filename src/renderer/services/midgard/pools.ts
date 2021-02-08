@@ -20,6 +20,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { isPricePoolAsset } from '../../helpers/assetHelper'
+import { isEnabledChain } from '../../helpers/chainHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
@@ -76,6 +77,21 @@ const createPoolsService = (
         FP.pipe(
           api.getPools(request),
           RxOp.map(RD.success),
+          // Filter `PoolDetails`by using enabled chains only (defined via ENV)
+          liveData.map(
+            A.filter(({ asset }) =>
+              FP.pipe(
+                asset,
+                assetFromString,
+                O.fromNullable,
+                O.fold(
+                  () => false,
+                  ({ chain }) => isEnabledChain(chain)
+                )
+              )
+            )
+          ),
+          // filter out
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -262,7 +278,9 @@ const createPoolsService = (
     const poolAssets$: PoolAssetsLD = FP.pipe(
       apiGetPoolsEnabled$,
       // Filter out all unknown / invalid assets created from asset strings
-      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable)))
+      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
+      // Filter pools by using enabled chains only (defined via ENV)
+      liveData.map(A.filter(({ chain }) => isEnabledChain(chain)))
     )
     const assetDetails$ = getAssetDetails$(poolAssets$, GetPoolsStatusEnum.Available)
     const poolDetails$ = getPoolDetails$(poolAssets$, GetPoolsStatusEnum.Available)
@@ -319,7 +337,9 @@ const createPoolsService = (
     const poolAssets$: PoolAssetsLD = FP.pipe(
       apiGetPoolsPending$,
       // Filter out all unknown / invalid assets created from asset strings
-      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable)))
+      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
+      // Filter pools by using enabled chains only (defined via ENV)
+      liveData.map(A.filter(({ chain }) => isEnabledChain(chain)))
     )
     const assetDetails$ = getAssetDetails$(poolAssets$, GetPoolsStatusEnum.Staged)
     const poolDetails$ = getPoolDetails$(poolAssets$, GetPoolsStatusEnum.Staged)
