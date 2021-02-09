@@ -4760,10 +4760,10 @@
     axios "^0.21.0"
     nock "^13.0.5"
 
-"@xchainjs/xchain-util@^0.2.0", "@xchainjs/xchain-util@^0.2.1", "@xchainjs/xchain-util@^0.2.2":
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.2.2.tgz#c5f957a63afe2d441eb8c9751645375ad7ff7f76"
-  integrity sha512-JTvCI75DuEQmGCZca2Xsi0A6g3uW4h8qGkMYRtay6vP2a6MfnhHv5xGDlvIcgadn1U9xbmGqvrK1DfT6WhgsYg==
+"@xchainjs/xchain-util@^0.2.0", "@xchainjs/xchain-util@^0.2.2", "@xchainjs/xchain-util@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.2.3.tgz#f2f1d502148ef63d6511af85d75a9ed5f4cc5112"
+  integrity sha512-3iqSteOjbd9boC+DvlDENNJjSMgV91+mcYhPB7G/3YlgeGz5exZnJrS1ktafyZeGSk81R39KiLaRi132C98gWA==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
