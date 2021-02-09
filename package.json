@@ -72,7 +72,7 @@
     "@xchainjs/xchain-litecoin": "^0.0.2",
     "@xchainjs/xchain-polkadot": "^0.4.0",
     "@xchainjs/xchain-thorchain": "^0.10.1",
-    "@xchainjs/xchain-util": "^0.2.1",
+    "@xchainjs/xchain-util": "^0.2.3",
     "antd": "^4.10.2",
     "bignumber.js": "^9.0.1",
     "cosmos-client": "^0.39.2",

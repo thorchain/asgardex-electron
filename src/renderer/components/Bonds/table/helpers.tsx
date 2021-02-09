@@ -24,7 +24,7 @@ export const BondValue: React.FC<{ data: NodeDataRD }> = ({ data }) => (
     {FP.pipe(
       data,
       RD.map(({ bond }) =>
-        formatAssetAmountCurrency({ asset: AssetRuneNative, amount: baseToAsset(bond), trimZeros: true })
+        formatAssetAmountCurrency({ asset: AssetRuneNative, amount: baseToAsset(bond), trimZeros: true, decimal: 0 })
       ),
       RD.fold(
         () => <Styled.TextLabel>-</Styled.TextLabel>,
@@ -41,13 +41,13 @@ export const AwardValue: React.FC<{ data: NodeDataRD }> = ({ data }) => (
     {FP.pipe(
       data,
       RD.map(({ award }) =>
-        formatAssetAmountCurrency({ asset: AssetRuneNative, amount: baseToAsset(award), trimZeros: true })
+        formatAssetAmountCurrency({ asset: AssetRuneNative, amount: baseToAsset(award), trimZeros: true, decimal: 0 })
       ),
       RD.fold(
         () => <Styled.TextLabel>-</Styled.TextLabel>,
         () => <Styled.TextLabel loading={true} />,
         () => <Styled.TextLabel>-</Styled.TextLabel>,
-        (value) => <Styled.TextLabel>{value}</Styled.TextLabel>
+        (value) => <Styled.TextLabel nowrap>{value}</Styled.TextLabel>
       )
     )}
   </Styled.AwardCol>
