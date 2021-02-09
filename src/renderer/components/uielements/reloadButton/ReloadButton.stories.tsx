@@ -6,8 +6,4 @@ import { ReloadButton } from './'
 
 storiesOf('Components/ReloadButton', module)
   .add('default', () => <ReloadButton />)
-  .add('withh children', () => (
-    <ReloadButton>
-      <>Reaload child text here</>
-    </ReloadButton>
-  ))
+  .add('with children', () => <ReloadButton>Reload child text here</ReloadButton>)

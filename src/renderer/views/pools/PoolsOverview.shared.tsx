@@ -1,12 +1,16 @@
 import { Asset, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import { ColumnType } from 'antd/lib/table'
+import * as FP from 'fp-ts/lib/function'
 
+import { ErrorView } from '../../components/shared/error'
 import { AssetIcon } from '../../components/uielements/assets/assetIcon'
 import { Label } from '../../components/uielements/label'
+import { ReloadButton } from '../../components/uielements/reloadButton'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { sortByDepth } from '../../helpers/poolHelper'
 import { PoolTableRowData } from './Pools.types'
+import { ActionColumn } from './PoolsOverview.style'
 
 const renderAssetColumn = ({ pool }: PoolTableRowData) => <Label align="center">{pool.target.ticker}</Label>
 
@@ -88,3 +92,16 @@ export const depthColumn = (title: string, pricePoolAsset: Asset): ColumnType<Po
   // Note: `defaultSortOrder` has no effect here, that's we do a default sort in `getPoolTableRowsData`
   defaultSortOrder: 'descend'
 })
+
+export const renderRefreshBtnColTitle = (title: string, clickHandler: FP.Lazy<void>) => (
+  <ActionColumn>
+    <ReloadButton onClick={clickHandler}>{title}</ReloadButton>
+  </ActionColumn>
+)
+
+export const renderTableError = (reloadBtnLabel: string, reloadBtnAction: FP.Lazy<void>) => (error: Error) => (
+  <ErrorView
+    title={error?.toString() ?? ''}
+    extra={<ReloadButton onClick={reloadBtnAction}>{reloadBtnLabel}</ReloadButton>}
+  />
+)

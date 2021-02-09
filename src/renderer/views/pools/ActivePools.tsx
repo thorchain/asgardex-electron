@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useRef } from 'react'
 
-import { SyncOutlined, SwapOutlined, PlusOutlined } from '@ant-design/icons'
+import { SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { assetToString, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
@@ -11,7 +11,6 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { ErrorView } from '../../components/shared/error'
 import { Button } from '../../components/uielements/button'
 import { Label } from '../../components/uielements/label'
 import { Table } from '../../components/uielements/table'
@@ -26,17 +25,17 @@ import { SwapRouteParams } from '../../routes/swap'
 import { PoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import * as Shared from './PoolsOverview.shared'
-import { ActionColumn, TableAction } from './PoolsOverview.style'
+import { TableAction } from './PoolsOverview.style'
+import * as SharedT from './PoolsOverview.types'
 
-export const ActivePools: React.FC = (): JSX.Element => {
+export const ActivePools: React.FC<SharedT.Props> = ({ refreshHandler }): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, pendingPoolsState$, selectedPricePool$, reloadPools },
-    reloadThorchainLastblock,
-    reloadNetworkInfo
+    pools: { poolsState$, pendingPoolsState$, selectedPricePool$ },
+    reloadThorchainLastblock
   } = midgardService
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const pendingPoolsRD = useObservableState(pendingPoolsState$, RD.pending)
@@ -77,23 +76,6 @@ export const ActivePools: React.FC = (): JSX.Element => {
     [history, getDepositPath]
   )
 
-  const clickRefreshHandler = useCallback(() => {
-    reloadPools()
-    reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPools])
-
-  const renderRefreshBtn = useMemo(
-    () => (
-      <Button onClick={clickRefreshHandler} typevalue="outline">
-        <SyncOutlined />
-        {intl.formatMessage({ id: 'common.refresh' })}
-      </Button>
-    ),
-    [clickRefreshHandler, intl]
-  )
-
-  const renderBtnColTitle = useMemo(() => <ActionColumn>{renderRefreshBtn}</ActionColumn>, [renderRefreshBtn])
-
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <TableAction>
@@ -116,11 +98,11 @@ export const ActivePools: React.FC = (): JSX.Element => {
   const btnPoolsColumn = useMemo(
     () => ({
       key: 'btn',
-      title: renderBtnColTitle,
+      title: Shared.renderRefreshBtnColTitle(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
       width: 280,
       render: renderBtnPoolsColumn
     }),
-    [renderBtnColTitle, renderBtnPoolsColumn]
+    [refreshHandler, intl, renderBtnPoolsColumn]
   )
 
   const renderVolumeColumn = useCallback(
@@ -247,11 +229,8 @@ export const ActivePools: React.FC = (): JSX.Element => {
           const pools = O.getOrElse(() => [] as PoolTableRowsData)(previousPools.current)
           return renderPoolsTable(pools, true)
         },
-        // error state
-        (error: Error) => {
-          const msg = error?.toString() ?? ''
-          return <ErrorView title={msg} extra={renderRefreshBtn} />
-        },
+        // render error state
+        Shared.renderTableError(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
         // success state
         ({ poolDetails }: PoolsState): JSX.Element => {
           const poolViewData = getPoolTableRowsData({

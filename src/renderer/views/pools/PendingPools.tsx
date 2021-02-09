@@ -22,8 +22,9 @@ import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
 import { TableAction, BlockLeftLabel } from './PoolsOverview.style'
+import * as SharedT from './PoolsOverview.types'
 
-export const PendingPools: React.FC = (): JSX.Element => {
+export const PendingPools: React.FC<SharedT.Props> = ({ refreshHandler }): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -82,11 +83,11 @@ export const PendingPools: React.FC = (): JSX.Element => {
   const btnPendingPoolsColumn = useMemo(
     () => ({
       key: 'btn',
-      title: '',
+      title: Shared.renderRefreshBtnColTitle(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
       width: 200,
       render: renderBtnPendingPoolsColumn
     }),
-    [renderBtnPendingPoolsColumn]
+    [refreshHandler, intl, renderBtnPendingPoolsColumn]
   )
 
   const lastblock = useMemo(() => RD.toNullable(thorchainLastblockRD), [thorchainLastblockRD])
@@ -153,8 +154,8 @@ export const PendingPools: React.FC = (): JSX.Element => {
           const pools = O.getOrElse(() => [] as PoolTableRowsData)(previousPendingPools.current)
           return renderPendingPoolsTable(pools, true)
         },
-        // error state - we just show an empty table, an error will be shown on pools table
-        (_: Error) => renderPendingPoolsTable([]),
+        // render error state
+        Shared.renderTableError(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
         // success state
         ({ poolDetails }: PendingPoolsState): JSX.Element => {
           const poolViewData = getPoolTableRowsData({
