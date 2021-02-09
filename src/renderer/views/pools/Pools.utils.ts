@@ -2,7 +2,6 @@ import { PoolData, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thor
 import { bnOrZero, baseAmount, assetFromString, Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { none, Option, some } from 'fp-ts/lib/Option'
 
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ZERO_BASE_AMOUNT } from '../../const'
@@ -85,13 +84,13 @@ export const getBlocksLeftForPendingPool = (
   constants: ThorchainConstants,
   lastblocks: LastblockItem[],
   asset: Asset
-): Option<number> => {
+): O.Option<number> => {
   const newPoolCycle = constants?.int_64_values?.NewPoolCycle
   const lastHeight = Number(lastblocks.find((blockInfo) => blockInfo.chain === asset?.chain)?.thorchain)
 
-  if (!newPoolCycle || !lastHeight) return none
+  if (!newPoolCycle || !lastHeight) return O.none
 
-  return some(newPoolCycle - (lastHeight % newPoolCycle))
+  return O.some(newPoolCycle - (lastHeight % newPoolCycle))
 }
 
 export const getBlocksLeftForPendingPoolAsString = (
