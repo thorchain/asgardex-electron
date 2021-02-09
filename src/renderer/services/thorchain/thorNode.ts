@@ -43,9 +43,13 @@ const getNodeStatusByString = (stringStatus: string): NodeStatus => {
 
 const { stream$: reloadNodesInfo$, trigger: reloadNodesInfo } = triggerStream()
 
-const TESTNET_THORNODE_API = envOrDefault(process.env.REACT_APP_TESTNET_THORNODE_API, '')
+const TESTNET_THORNODE_API = envOrDefault(
+  process.env.REACT_APP_TESTNET_THORNODE_API,
+  'https://testnet.thornode.thorchain.info/thorchain'
+)
 
 const thorNodeApiAddress$ = (network: Network): ThorNodeApiUrlLD => {
+  // option to set THORNode api url (for testnet + development only)
   if (!!TESTNET_THORNODE_API && network === 'testnet') {
     return Rx.of(RD.success(TESTNET_THORNODE_API))
   }
