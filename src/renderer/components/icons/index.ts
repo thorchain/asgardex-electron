@@ -5,6 +5,7 @@ import arrowGreenIcon from '../../assets/svg/asset-arrow-green.svg'
 import greyArrowIcon from '../../assets/svg/asset-arrow-grey.svg'
 import arrowTwoIcon from '../../assets/svg/asset-arrow-twoway.svg'
 import arrowYellowIcon from '../../assets/svg/asset-arrow-yello.svg'
+import bnbRuneIcon from '../../assets/svg/asset-bnb-rune.svg'
 import bnbIcon from '../../assets/svg/asset-bnb.svg'
 import btcIcon from '../../assets/svg/asset-btc.svg'
 import dropdownIcon from '../../assets/svg/asset-dropdown.svg'
@@ -23,6 +24,7 @@ export {
   btcIcon,
   ethIcon,
   runeIcon,
+  bnbRuneIcon,
   CurrencyIcon,
   userAvatarIcon,
   arrowYellowIcon,

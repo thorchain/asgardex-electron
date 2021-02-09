@@ -7,7 +7,7 @@ import { Asset } from '@xchainjs/xchain-util'
 import { isBnbAsset, isBtcAsset, isEthAsset, isRuneBnbAsset, isRuneNativeAsset } from '../../../../helpers/assetHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
-import { bnbIcon, btcIcon, ethIcon, runeIcon } from '../../../icons'
+import { bnbIcon, btcIcon, ethIcon, runeIcon, bnbRuneIcon } from '../../../icons'
 import * as Styled from './AssetIcon.style'
 import { Size } from './AssetIcon.types'
 
@@ -29,8 +29,12 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
       return ethIcon
     }
     // RUNE
-    if (isRuneBnbAsset(asset) || isRuneNativeAsset(asset)) {
+    if (isRuneNativeAsset(asset)) {
       return runeIcon
+    }
+    // BNB RUNE
+    if (isRuneBnbAsset(asset)) {
+      return bnbRuneIcon
     }
     // BNB
     if (isBnbAsset(asset)) {
