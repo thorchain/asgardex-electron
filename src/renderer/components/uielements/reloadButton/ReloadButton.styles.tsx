@@ -3,14 +3,14 @@ import React from 'react'
 import { SyncOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 
-import { Button as UIButton } from '../../uielements/button'
+import { Button as UIButton, ButtonProps as UIButtonProps } from '../../uielements/button'
 
-export const ReloadButton = styled(UIButton).attrs((props) => ({
+export const ReloadButton = styled(UIButton).attrs<UIButtonProps>(({ children }) => ({
   typevalue: 'outline',
   children: (
     <>
       <SyncOutlined />
-      {props.children && <span>{props.children}</span>}
+      {children && <span>{children}</span>}
     </>
   )
 }))`
