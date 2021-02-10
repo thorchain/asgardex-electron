@@ -18,7 +18,10 @@ export const Tabs = styled(A.Tabs)`
 
 export const TabButtonsContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  ${media.sm`
+    flex-direction: row;
+  `}
   margin-bottom: 10px;
 `
 
@@ -31,7 +34,6 @@ const TabButtonWrapper: React.FC<TabButtonProps> = ({ children, ...otherProps })
 
 export const TabButton = styled(TabButtonWrapper).attrs<TabButtonProps>(({ selected }) => ({
   typevalue: 'transparent',
-  // sizevalue: 'xnormal',
   weight: selected ? 'bold' : 'normal'
 }))`
   font-size: 16px !important;
