@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { useIntl } from 'react-intl'
 
-import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ActivePools } from './ActivePools'
 import { PendingPools } from './PendingPools'
 import * as Styled from './PoolsOverview.style'
@@ -17,17 +16,6 @@ type Tab = {
 
 export const PoolsOverview: React.FC = (): JSX.Element => {
   const intl = useIntl()
-  const { service: midgardService } = useMidgardContext()
-  const {
-    pools: { reloadPools },
-
-    reloadNetworkInfo
-  } = midgardService
-
-  const refreshHandler = useCallback(() => {
-    reloadPools()
-    reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPools])
 
   const [activeTabKey, setActiveTabKey] = useState('active')
 
@@ -36,15 +24,15 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
       {
         key: 'active',
         label: intl.formatMessage({ id: 'pools.available' }),
-        content: <ActivePools refreshHandler={refreshHandler} />
+        content: <ActivePools />
       },
       {
         key: 'pending',
         label: intl.formatMessage({ id: 'pools.pending' }),
-        content: <PendingPools refreshHandler={refreshHandler} />
+        content: <PendingPools />
       }
     ],
-    [intl, refreshHandler]
+    [intl]
   )
 
   const renderTabBar = useCallback(
@@ -60,14 +48,10 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
     [activeTabKey, tabs]
   )
 
-  useEffect(() => {
-    refreshHandler()
-  }, [activeTabKey, refreshHandler])
-
   return (
     <>
       <Styled.TabButtonsContainer>
-        <Styled.Tabs renderTabBar={renderTabBar} activeKey={activeTabKey} destroyInactiveTabPane>
+        <Styled.Tabs renderTabBar={renderTabBar} activeKey={activeTabKey}>
           {tabs.map(({ key, label, content }) => (
             <Styled.TabPane tab={label} key={key}>
               {content}

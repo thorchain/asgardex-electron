@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
@@ -111,7 +112,9 @@ export type PoolsService = {
   selectedPricePoolAsset$: Rx.Observable<SelectedPricePoolAsset>
   selectedPricePool$: Rx.Observable<SelectedPricePool>
   selectedPricePoolAssetSymbol$: Rx.Observable<O.Option<string>>
-  reloadPools: () => void
+  reloadPools: FP.Lazy<void>
+  reloadPendingPools: FP.Lazy<void>
+  reloadAllPools: FP.Lazy<void>
   poolAddresses$: ThorchainEndpointsLD
   selectedPoolAddress$: PoolAddressRx
   poolAddressByAsset$: (asset: Asset) => PoolAddressRx

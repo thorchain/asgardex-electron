@@ -6,7 +6,6 @@ import { assetToString, baseToAsset, formatAssetAmountCurrency } from '@xchainjs
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as O from 'fp-ts/lib/Option'
-import { Option, none, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
@@ -18,7 +17,6 @@ import { Trend } from '../../components/uielements/trend'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as depositRoutes from '../../routes/deposit'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
@@ -26,36 +24,25 @@ import { PoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import * as Shared from './PoolsOverview.shared'
 import { TableAction } from './PoolsOverview.style'
-import * as SharedT from './PoolsOverview.types'
 
-export const ActivePools: React.FC<SharedT.Props> = ({ refreshHandler }): JSX.Element => {
+export const ActivePools: React.FC = (): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, pendingPoolsState$, selectedPricePool$ },
-    reloadThorchainLastblock
+    pools: { poolsState$, reloadPools, selectedPricePool$ }
   } = midgardService
   const poolsRD = useObservableState(poolsState$, RD.pending)
-  const pendingPoolsRD = useObservableState(pendingPoolsState$, RD.pending)
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   // store previous data of pools to render these while reloading
-  const previousPools = useRef<Option<PoolTableRowsData>>(none)
+  const previousPools = useRef<O.Option<PoolTableRowsData>>(O.none)
 
-  const pendingCountdownHandler = useCallback(() => {
-    reloadThorchainLastblock()
-  }, [reloadThorchainLastblock])
-
-  const pendingCountdownInterval = useMemo(() => {
-    const pendingPools = RD.toNullable(pendingPoolsRD)
-    // start countdown if we do have pending pools available only
-    return pendingPools && pendingPools.poolDetails.length > 0 ? 5000 : INACTIVE_INTERVAL
-  }, [pendingPoolsRD])
-
-  useInterval(pendingCountdownHandler, pendingCountdownInterval)
+  const refreshHandler = useCallback(() => {
+    reloadPools()
+  }, [reloadPools])
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
@@ -237,7 +224,7 @@ export const ActivePools: React.FC<SharedT.Props> = ({ refreshHandler }): JSX.El
             poolDetails,
             pricePoolData: selectedPricePool.poolData
           })
-          previousPools.current = some(poolViewData)
+          previousPools.current = O.some(poolViewData)
           return renderPoolsTable(poolViewData)
         }
       )(poolsRD)}

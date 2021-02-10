@@ -22,9 +22,8 @@ import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
 import { TableAction, BlockLeftLabel } from './PoolsOverview.style'
-import * as SharedT from './PoolsOverview.types'
 
-export const PendingPools: React.FC<SharedT.Props> = ({ refreshHandler }): JSX.Element => {
+export const PendingPools: React.FC = (): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -32,28 +31,34 @@ export const PendingPools: React.FC<SharedT.Props> = ({ refreshHandler }): JSX.E
   const {
     thorchainLastblockState$,
     thorchainConstantsState$,
-    pools: { pendingPoolsState$, selectedPricePool$ },
+    pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$ },
+    reloadNetworkInfo,
     reloadThorchainLastblock
   } = midgardService
 
-  const pendingPoolsRD = useObservableState(pendingPoolsState$, RD.pending)
+  const poolsRD = useObservableState(pendingPoolsState$, RD.pending)
   const thorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(thorchainConstantsState$, RD.pending)
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   // store previous data of pending pools to render these while reloading
-  const previousPendingPools = useRef<Option<PoolTableRowsData>>(none)
+  const previousPools = useRef<Option<PoolTableRowsData>>(none)
+
+  const refreshHandler = useCallback(() => {
+    reloadPendingPools()
+    reloadNetworkInfo()
+  }, [reloadNetworkInfo, reloadPendingPools])
 
   const pendingCountdownHandler = useCallback(() => {
     reloadThorchainLastblock()
   }, [reloadThorchainLastblock])
 
   const pendingCountdownInterval = useMemo(() => {
-    const pendingPools = RD.toNullable(pendingPoolsRD)
+    const pendingPools = RD.toNullable(poolsRD)
     // start countdown if we do have pending pools available only
     return pendingPools && pendingPools.poolDetails.length > 0 ? 5000 : INACTIVE_INTERVAL
-  }, [pendingPoolsRD])
+  }, [poolsRD])
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
 
@@ -68,7 +73,7 @@ export const PendingPools: React.FC<SharedT.Props> = ({ refreshHandler }): JSX.E
     [history, getDepositPath]
   )
 
-  const renderBtnPendingPoolsColumn = useCallback(
+  const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <TableAction>
         <Button round="true" onClick={() => clickDepositHandler(assetToString(pool.target))} typevalue="outline">
@@ -85,9 +90,9 @@ export const PendingPools: React.FC<SharedT.Props> = ({ refreshHandler }): JSX.E
       key: 'btn',
       title: Shared.renderRefreshBtnColTitle(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
       width: 200,
-      render: renderBtnPendingPoolsColumn
+      render: renderBtnPoolsColumn
     }),
-    [refreshHandler, intl, renderBtnPendingPoolsColumn]
+    [refreshHandler, intl, renderBtnPoolsColumn]
   )
 
   const lastblock = useMemo(() => RD.toNullable(thorchainLastblockRD), [thorchainLastblockRD])
@@ -119,7 +124,7 @@ export const PendingPools: React.FC<SharedT.Props> = ({ refreshHandler }): JSX.E
     [renderBlockLeftColumn, intl]
   )
 
-  const desktopPendingPoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
+  const desktopPoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
     () => [
       Shared.poolColumn(intl.formatMessage({ id: 'common.pool' })),
       Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
@@ -131,28 +136,28 @@ export const PendingPools: React.FC<SharedT.Props> = ({ refreshHandler }): JSX.E
     [intl, selectedPricePool.asset, blockLeftColumn, btnPendingPoolsColumn]
   )
 
-  const mobilePendingPoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
+  const mobilePoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
     () => [Shared.poolColumnMobile(intl.formatMessage({ id: 'common.pool' })), btnPendingPoolsColumn],
     [btnPendingPoolsColumn, intl]
   )
 
-  const renderPendingPoolsTable = useCallback(
+  const renderPoolsTable = useCallback(
     (tableData: PoolTableRowData[], loading = false) => {
-      const columns = isDesktopView ? desktopPendingPoolsColumns : mobilePendingPoolsColumns
+      const columns = isDesktopView ? desktopPoolsColumns : mobilePoolsColumns
       return <Table columns={columns} dataSource={tableData} loading={loading} rowKey="key" />
     },
-    [isDesktopView, desktopPendingPoolsColumns, mobilePendingPoolsColumns]
+    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns]
   )
 
   return (
     <>
       {RD.fold(
         // initial state
-        () => renderPendingPoolsTable([], true),
+        () => renderPoolsTable([], true),
         // loading state
         () => {
-          const pools = O.getOrElse(() => [] as PoolTableRowsData)(previousPendingPools.current)
-          return renderPendingPoolsTable(pools, true)
+          const pools = O.getOrElse(() => [] as PoolTableRowsData)(previousPools.current)
+          return renderPoolsTable(pools, true)
         },
         // render error state
         Shared.renderTableError(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
@@ -162,10 +167,10 @@ export const PendingPools: React.FC<SharedT.Props> = ({ refreshHandler }): JSX.E
             poolDetails,
             pricePoolData: selectedPricePool.poolData
           })
-          previousPendingPools.current = some(poolViewData)
-          return renderPendingPoolsTable(poolViewData)
+          previousPools.current = some(poolViewData)
+          return renderPoolsTable(poolViewData)
         }
-      )(pendingPoolsRD)}
+      )(poolsRD)}
     </>
   )
 }
