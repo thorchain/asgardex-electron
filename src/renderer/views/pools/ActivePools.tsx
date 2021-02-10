@@ -136,7 +136,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
     (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.transactionPrice, b.transactionPrice),
     []
   )
-  const transactionColumn: ColumnType<PoolTableRowData> = useMemo(
+  const _transactionColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
       key: 'transaction',
       align: 'right',
@@ -154,7 +154,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
     []
   )
 
-  const slipColumn: ColumnType<PoolTableRowData> = useMemo(
+  const _slipColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
       key: 'slip',
       align: 'center',
@@ -166,7 +166,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
     [intl, renderSlipColumn, sortSlipColumn]
   )
 
-  const tradeColumn: ColumnType<PoolTableRowData> = useMemo(
+  const _tradeColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
       key: 'trade',
       align: 'center',
@@ -185,12 +185,12 @@ export const ActivePools: React.FC = (): JSX.Element => {
       Shared.priceColumn(intl.formatMessage({ id: 'common.price' }), selectedPricePool.asset),
       Shared.depthColumn(intl.formatMessage({ id: 'pools.depth' }), selectedPricePool.asset),
       volumeColumn,
-      transactionColumn,
-      slipColumn,
-      tradeColumn,
+      // transactionColumn,
+      // slipColumn,
+      // tradeColumn,
       btnPoolsColumn
     ],
-    [intl, selectedPricePool.asset, volumeColumn, transactionColumn, slipColumn, tradeColumn, btnPoolsColumn]
+    [intl, selectedPricePool.asset, volumeColumn, btnPoolsColumn]
   )
 
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
