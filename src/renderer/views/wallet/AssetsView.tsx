@@ -16,7 +16,7 @@ import { ChainBalances } from '../../services/wallet/types'
 
 export const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
-  const { chainBalances$ } = useWalletContext()
+  const { chainBalances$, setSelectedAsset } = useWalletContext()
 
   // accept balances > 0 only
   const [chainBalances] = useObservableState(
@@ -59,6 +59,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
       pricePool={selectedPricePool}
       poolDetails={poolDetails}
       selectAssetHandler={selectAssetHandler}
+      setSelectedAsset={setSelectedAsset}
     />
   )
 }

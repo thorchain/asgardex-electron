@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, assetToString, BNBChain, THORChain } from '@xchainjs/xchain-util'
+import { assetFromString, BNBChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -21,14 +21,13 @@ import { isRuneBnbAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
-import * as walletRoutes from '../../routes/wallet'
 import { getPoolAddressByChain } from '../../services/midgard/utils'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 type Props = {}
 
 export const UpgradeView: React.FC<Props> = (): JSX.Element => {
-  const { asset, walletAddress } = useParams<AssetDetailsParams>()
+  const { asset } = useParams<AssetDetailsParams>()
 
   const intl = useIntl()
 
@@ -145,7 +144,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
         return (
           <>
-            <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(runeBnbAsset), walletAddress })} />
+            <BackLink />
             <Upgrade
               runeAsset={runeBnbAsset}
               runeNativeAddress={runeNativeAddress}

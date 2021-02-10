@@ -32,10 +32,17 @@ type Props = {
   pricePool: PricePool
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: Asset, walletAddress: string) => void
+  setSelectedAsset?: (oAsset: O.Option<Asset>) => void
 }
 
 export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
-  const { chainBalances = [], pricePool, poolDetails, selectAssetHandler = (_) => {} } = props
+  const {
+    chainBalances = [],
+    pricePool,
+    poolDetails,
+    selectAssetHandler = (_) => {},
+    setSelectedAsset = () => {}
+  } = props
 
   const intl = useIntl()
   const history = useHistory()
@@ -102,6 +109,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
+                setSelectedAsset(O.some(asset))
                 history.push(walletRoutes.upgradeBnbRune.path({ asset: assetToString(asset), walletAddress }))
               }}>
               {intl.formatMessage({ id: 'wallet.action.upgrade' })}
@@ -110,7 +118,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         </Styled.BnbRuneTickerWrapper>
       )
     }),
-    [intl, history]
+    [intl, history, setSelectedAsset]
   )
 
   const renderBalanceColumn = ({ asset, amount }: Balance) => {
