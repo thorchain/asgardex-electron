@@ -27,15 +27,10 @@ export const TabButtonsContainer = styled.div`
 
 type TabButtonProps = UIButtonProps & { selected: boolean }
 
-// A wrapper around `UIButton` to provide custom props - needed for custom styles
-const TabButtonWrapper: React.FC<TabButtonProps> = ({ children, ...otherProps }) => (
-  <UIButton {...otherProps}>{children}</UIButton>
-)
-
-export const TabButton = styled(TabButtonWrapper).attrs<TabButtonProps>(({ selected }) => ({
+export const TabButton = styled(UIButton).attrs<TabButtonProps>(({ selected }) => ({
   typevalue: 'transparent',
   weight: selected ? 'bold' : 'normal'
-}))`
+}))<TabButtonProps>`
   font-size: 16px !important;
   color: ${({ selected }) => palette('text', selected ? 1 : 0)} !important;
 `
