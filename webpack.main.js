@@ -22,6 +22,10 @@ const common = (_ /* env */, argv) => ({
   node: {
     __dirname: false,
     __filename: false
+  },
+  externals: {
+    'node-hid': 'commonjs node-hid',
+    usb: 'commonjs usb'
   }
 })
 
