@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, Balance, Balances } from '@xchainjs/xchain-client'
-import { Asset, baseToAsset, chainToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { Asset, assetToString, baseToAsset, chainToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
 import { ColumnType } from 'antd/lib/table'
@@ -10,11 +10,15 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router-dom'
 
+import { isRuneBnbAsset } from '../../../helpers/assetHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
+import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
 import { ApiError, ChainBalance, ChainBalances } from '../../../services/wallet/types'
+import { WalletBalance } from '../../../types/wallet'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
@@ -28,12 +32,20 @@ type Props = {
   pricePool: PricePool
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: Asset, walletAddress: string) => void
+  setSelectedAsset?: (oAsset: O.Option<Asset>) => void
 }
 
 export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
-  const { chainBalances = [], pricePool, poolDetails, selectAssetHandler = (_) => {} } = props
+  const {
+    chainBalances = [],
+    pricePool,
+    poolDetails,
+    selectAssetHandler = (_) => {},
+    setSelectedAsset = () => {}
+  } = props
 
   const intl = useIntl()
+  const history = useHistory()
   const screenMap: ScreenMap = Grid.useBreakpoint()
 
   // State to store open panel keys
@@ -86,12 +98,27 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     []
   )
 
-  const tickerColumn: ColumnType<Balance> = useMemo(
+  const tickerColumn: ColumnType<WalletBalance> = useMemo(
     () => ({
       width: 80,
-      render: ({ asset }: Balance) => <Label nowrap>{asset.ticker}</Label>
+      render: ({ asset, walletAddress }: WalletBalance) => (
+        <Styled.BnbRuneTickerWrapper>
+          <Label nowrap>{asset.ticker}</Label>
+          {isRuneBnbAsset(asset) && (
+            <Styled.UpgradeButton
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setSelectedAsset(O.some(asset))
+                history.push(walletRoutes.upgradeBnbRune.path({ asset: assetToString(asset), walletAddress }))
+              }}>
+              {intl.formatMessage({ id: 'wallet.action.upgrade' })}
+            </Styled.UpgradeButton>
+          )}
+        </Styled.BnbRuneTickerWrapper>
+      )
     }),
-    []
+    [intl, history, setSelectedAsset]
   )
 
   const renderBalanceColumn = ({ asset, amount }: Balance) => {

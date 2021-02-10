@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { Label as UILabel } from '../../../components/uielements/label'
+import { Button as UIButton } from '../../uielements/button'
 import { Table as UITable } from '../../uielements/table'
 
 export const Table = styled(UITable)`
@@ -83,5 +84,22 @@ export const CopyLabel = styled(A.Typography.Text)`
   color: ${palette('primary', 0)};
   svg {
     color: ${palette('primary', 0)};
+  }
+`
+
+export const BnbRuneTickerWrapper = styled('div')`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+export const UpgradeButton = styled(UIButton).attrs({
+  type: 'primary',
+  round: 'true',
+  color: 'warning'
+})`
+  &.ant-btn {
+    min-width: auto;
+    margin-left: 10px;
   }
 `
