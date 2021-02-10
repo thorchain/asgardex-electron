@@ -63,11 +63,11 @@ const renderPriceColumn = (pricePoolAsset: Asset) => ({ poolPrice }: PoolTableRo
 
 const sortPriceColumn = (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.poolPrice, b.poolPrice)
 
-export const priceColumn = (title: string): ColumnType<PoolTableRowData> => ({
+export const priceColumn = (title: string, pricePoolAsset: Asset): ColumnType<PoolTableRowData> => ({
   key: 'poolprice',
   align: 'right',
   title,
-  render: renderPriceColumn,
+  render: renderPriceColumn(pricePoolAsset),
   sorter: sortPriceColumn,
   sortDirections: ['descend', 'ascend']
 })
