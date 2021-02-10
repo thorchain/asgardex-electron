@@ -207,10 +207,13 @@ export const Swap = ({
               { ...maxAmount }
             : baseAmount(targetAmount.amount(), maxAmount.decimal)
         ),
+        // Provide alt value ONLY in case there is no unlocked wallet
+        // In other case missing oAssetWB means user does not have appropriate balance
+        O.alt(() => (isLocked(keystore) ? O.some(targetAmount) : O.none)),
         O.map(setAmountToSwapInternal)
       )
     },
-    [setAmountToSwapInternal, oAssetWB]
+    [setAmountToSwapInternal, oAssetWB, keystore]
   )
 
   const setAmountToSwapFromPercentValue = useCallback(
