@@ -36,6 +36,7 @@ export const Header: React.FC = (): JSX.Element => {
   const currentLocale = useObservableState(locale$, initialLocale)
 
   useEffect(() => {
+    // Required to update the electron native menu according to the selected locale
     window.apiLang.update(currentLocale)
   }, [currentLocale])
 
