@@ -68,7 +68,7 @@ type PoolsMessageKey =
   | 'pools.depth'
   | 'pools.24hvol'
   | 'pools.avgsize'
-  | 'pools.avgslip'
+  | 'pools.avgfee'
   | 'pools.blocksleft'
   | 'pools.trades'
   | 'pools.pending'

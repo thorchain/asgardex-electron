@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef } from 'react'
 
 import { SwapOutlined, PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { assetToString, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { assetToString, baseToAsset, formatAssetAmountCurrency, formatBN } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as O from 'fp-ts/lib/Option'
@@ -13,7 +13,6 @@ import { useHistory } from 'react-router-dom'
 import { Button } from '../../components/uielements/button'
 import { Label } from '../../components/uielements/label'
 import { Table } from '../../components/uielements/table'
-import { Trend } from '../../components/uielements/trend'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
@@ -148,25 +147,24 @@ export const ActivePools: React.FC = (): JSX.Element => {
     [intl, renderTransactionColumn, sortTransactionColumn]
   )
 
-  const renderSlipColumn = useCallback(({ slip }: PoolTableRowData) => <Trend amount={slip} />, [])
-  const sortSlipColumn = useCallback(
+  const sortFeeColumn = useCallback(
     (a: PoolTableRowData, b: PoolTableRowData) => ordBigNumber.compare(a.slip, b.slip),
     []
   )
 
-  const _slipColumn: ColumnType<PoolTableRowData> = useMemo(
+  const feeColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
-      key: 'slip',
+      key: 'fee',
       align: 'center',
-      title: intl.formatMessage({ id: 'pools.avgslip' }),
-      render: renderSlipColumn,
-      sorter: sortSlipColumn,
+      title: intl.formatMessage({ id: 'pools.avgfee' }),
+      render: ({ slip }: PoolTableRowData) => <Label align="center">{formatBN(slip)}%</Label>,
+      sorter: sortFeeColumn,
       sortDirections: ['descend', 'ascend']
     }),
-    [intl, renderSlipColumn, sortSlipColumn]
+    [intl, sortFeeColumn]
   )
 
-  const _tradeColumn: ColumnType<PoolTableRowData> = useMemo(
+  const tradeColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
       key: 'trade',
       align: 'center',
@@ -186,11 +184,11 @@ export const ActivePools: React.FC = (): JSX.Element => {
       Shared.depthColumn(intl.formatMessage({ id: 'pools.depth' }), selectedPricePool.asset),
       volumeColumn,
       // transactionColumn,
-      // slipColumn,
-      // tradeColumn,
+      feeColumn,
+      tradeColumn,
       btnPoolsColumn
     ],
-    [intl, selectedPricePool.asset, volumeColumn, btnPoolsColumn]
+    [intl, selectedPricePool.asset, volumeColumn, feeColumn, tradeColumn, btnPoolsColumn]
   )
 
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
