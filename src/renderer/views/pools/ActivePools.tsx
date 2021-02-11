@@ -154,7 +154,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
     []
   )
 
-  const _slipColumn: ColumnType<PoolTableRowData> = useMemo(
+  const slipColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
       key: 'slip',
       align: 'center',
@@ -166,7 +166,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
     [intl, renderSlipColumn, sortSlipColumn]
   )
 
-  const _tradeColumn: ColumnType<PoolTableRowData> = useMemo(
+  const tradeColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
       key: 'trade',
       align: 'center',
@@ -186,11 +186,11 @@ export const ActivePools: React.FC = (): JSX.Element => {
       Shared.depthColumn(intl.formatMessage({ id: 'pools.depth' }), selectedPricePool.asset),
       volumeColumn,
       // transactionColumn,
-      // slipColumn,
-      // tradeColumn,
+      slipColumn,
+      tradeColumn,
       btnPoolsColumn
     ],
-    [intl, selectedPricePool.asset, volumeColumn, btnPoolsColumn]
+    [intl, selectedPricePool.asset, volumeColumn, slipColumn, tradeColumn, btnPoolsColumn]
   )
 
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
