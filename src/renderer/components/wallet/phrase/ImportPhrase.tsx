@@ -116,10 +116,10 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
             validateTrigger={['onSubmit', 'onChange']}>
             <InputTextArea
               color="primary"
-              size="middle"
               typevalue="normal"
               placeholder={intl.formatMessage({ id: 'wallet.imports.enterphrase' }).toUpperCase()}
               rows={5}
+              style={{ fontSize: 16 }}
             />
           </Form.Item>
           <Styled.PasswordContainer>
