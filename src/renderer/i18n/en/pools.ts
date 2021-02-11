@@ -4,7 +4,7 @@ const pools: PoolsMessages = {
   'pools.depth': 'Depth',
   'pools.24hvol': '24h volume',
   'pools.avgsize': 'avg size',
-  'pools.avgslip': 'avg slip',
+  'pools.avgfee': 'avg fee',
   'pools.blocksleft': 'blocks left',
   'pools.trades': 'Trades',
   'pools.pending': 'Pending pools',
