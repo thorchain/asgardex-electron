@@ -14,3 +14,9 @@ export const getWithdrawAmounts = (
     asset
   }
 }
+
+// TODO (@Veado) Add test
+export const getAsymWithdrawAmount = (share: BaseAmount, percentAmount: number): BaseAmount => {
+  const percentBn = bn(percentAmount / 100)
+  return baseAmount(percentBn.multipliedBy(share.amount()))
+}
