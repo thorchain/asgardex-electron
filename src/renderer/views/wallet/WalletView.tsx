@@ -21,7 +21,6 @@ import { ImportsView } from './importsView'
 import { InteractView } from './Interact'
 import { NoWalletView } from './NoWalletView'
 import { PoolShareView } from './PoolShareView'
-import { ReceiveView } from './ReceiveView'
 import { SendView } from './send'
 import { SettingsView } from './SettingsView'
 import { UnlockView } from './UnlockView'
@@ -81,9 +80,6 @@ export const WalletView: React.FC = (): JSX.Element => {
             {reloadButton(reloadNodesInfo)}
             <AssetsNav />
             <BondsView />
-          </Route>
-          <Route path={walletRoutes.receive.template} exact>
-            <ReceiveView />
           </Route>
           <Route path={walletRoutes.send.template} exact>
             <SendView />

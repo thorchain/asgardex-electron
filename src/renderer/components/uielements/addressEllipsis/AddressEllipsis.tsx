@@ -17,10 +17,11 @@ type Props = {
   chain: Chain
   network: Network
   className?: string
+  enableCopy?: boolean
 }
 
 export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
-  const { address, chain, network, className } = props
+  const { address, chain, network, className, enableCopy = false } = props
   const prepEllipse = useCallback(
     (node: HTMLElement, txtToEllipse: HTMLElement, copyIcon: HTMLElement) => {
       const parent = node.parentElement
@@ -31,12 +32,14 @@ export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
           }
 
           if (
-            !ellipse({
-              parentNode: node.offsetWidth > parent.offsetWidth ? parent : node,
-              txtNode: txtToEllipse,
-              chain,
-              network
-            }) &&
+            !(
+              ellipse({
+                parentNode: node.offsetWidth > parent.offsetWidth ? parent : node,
+                txtNode: txtToEllipse,
+                chain,
+                network
+              }) || enableCopy
+            ) &&
             copyIcon
           ) {
             copyIcon.hidden = true
@@ -46,7 +49,7 @@ export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
         }
       }
     },
-    [chain, network]
+    [chain, network, enableCopy]
   )
 
   const prepareEllipse = () => {}
