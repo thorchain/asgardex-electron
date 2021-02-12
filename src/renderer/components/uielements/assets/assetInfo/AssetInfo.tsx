@@ -104,7 +104,7 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         oAsset,
-        O.map(assetToString),
+        O.map(({ ticker }) => ticker),
         O.getOrElse(() => '')
       ),
     [oAsset]
