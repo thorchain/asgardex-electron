@@ -15,6 +15,11 @@ export const Address = styled.span``
 export const CopyLabel = styled(A.Typography.Text)`
   text-transform: uppercase;
   color: ${palette('primary', 0)};
+
+  & .ant-typography-copy {
+    display: flex !important;
+  }
+
   svg {
     color: ${palette('primary', 0)};
   }

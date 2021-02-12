@@ -61,15 +61,27 @@ export const AddressContainer = styled('div')`
   flex-grow: 1;
 `
 
+const ICON_SIZE = 20
+
 export const AddressEllipsis = styled(UIAddressEllipsis)`
   margin-right: 5px;
   max-width: 100%;
   overflow: hidden;
+
+  & svg {
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
 `
 
 export const QrcodeOutlined = styled(AQrcodeOutlined)`
   cursor: pointer;
   color: ${palette('primary', 0)};
+
+  & svg {
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
 `
 
 export const CoinPrice = styled.p`
