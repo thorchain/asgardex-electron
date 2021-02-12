@@ -100,13 +100,23 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
     setShowQrModal
   ])
 
+  const assetString = useMemo(
+    () =>
+      FP.pipe(
+        oAsset,
+        O.map(assetToString),
+        O.getOrElse(() => '')
+      ),
+    [oAsset]
+  )
+
   const closeQrModal = useCallback(() => setShowQrModal(false), [setShowQrModal])
 
   return (
     <Styled.Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
       {showQrModal && (
         <Modal
-          title={intl.formatMessage({ id: 'wallet.action.receive' })}
+          title={intl.formatMessage({ id: 'wallet.action.receive' }, { asset: assetString })}
           visible
           onCancel={closeQrModal}
           onOk={closeQrModal}>
