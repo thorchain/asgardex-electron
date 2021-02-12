@@ -147,6 +147,18 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const chain = O.isSome(oAsset) ? oAsset.value.chain : ''
 
+  const walletInfo = useMemo(
+    () =>
+      FP.pipe(
+        oWalletAddress,
+        O.map((address) => ({
+          address,
+          network
+        }))
+      ),
+    [oWalletAddress, network]
+  )
+
   return (
     <>
       <Row justify="space-between">
@@ -159,7 +171,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          <AssetInfo asset={oAsset} assetsWB={oBalances} />
+          <AssetInfo walletInfo={walletInfo} asset={oAsset} assetsWB={oBalances} />
         </Col>
 
         <Styled.Divider />
