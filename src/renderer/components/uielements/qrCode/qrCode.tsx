@@ -25,13 +25,19 @@ export const QrCode: React.FC<Props> = ({ text, qrError }) => {
   useEffect(() => {
     setCanvasRd(RD.pending)
 
-    QRCode.toCanvas(text, { errorCorrectionLevel: 'H', scale: 6 }, (err, canvas) => {
-      if (err) {
-        setCanvasRd(RD.failure(qrError))
-      } else {
-        setCanvasRd(RD.success(canvas))
-      }
-    })
+    const timeout = setTimeout(() => {
+      QRCode.toCanvas(text, { errorCorrectionLevel: 'H', scale: 6 }, (err, canvas) => {
+        if (err) {
+          setCanvasRd(RD.failure(qrError))
+        } else {
+          setCanvasRd(RD.success(canvas))
+        }
+      })
+    }, 500)
+
+    return () => {
+      clearTimeout(timeout)
+    }
   }, [intl, text, setCanvasRd, qrError])
 
   useEffect(() => {
