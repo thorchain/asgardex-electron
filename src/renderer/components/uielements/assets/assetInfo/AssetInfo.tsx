@@ -80,20 +80,25 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
     [oAsset, assetsWB]
   )
 
-  const renderAddress = useMemo(
-    () =>
+  const renderAddress = useCallback(
+    (additionalContent: JSX.Element | null = null) =>
       FP.pipe(
         sequenceSOption({ walletInfo, oAsset }),
         O.map(({ walletInfo: { address, network }, oAsset: asset }) => (
           <Styled.AddressContainer key={'addres info'}>
             <Styled.AddressEllipsis enableCopy network={network} chain={asset.chain} address={address} />
-            <Styled.QrcodeOutlined onClick={() => setShowQrModal(true)} />
+            {additionalContent}
           </Styled.AddressContainer>
         )),
         O.getOrElse(() => <></>)
       ),
-    [walletInfo, setShowQrModal, oAsset]
+    [walletInfo, oAsset]
   )
+
+  const addressControls = useMemo(() => renderAddress(<Styled.QrcodeOutlined onClick={() => setShowQrModal(true)} />), [
+    renderAddress,
+    setShowQrModal
+  ])
 
   const closeQrModal = useCallback(() => setShowQrModal(false), [setShowQrModal])
 
@@ -113,6 +118,7 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
             noDataError={intl.formatMessage({ id: 'wallet.receive.address.error' })}
             qrError={intl.formatMessage({ id: 'wallet.receive.address.errorQR' })}
           />
+          {renderAddress()}
         </Modal>
       )}
       {renderAssetIcon}
@@ -133,14 +139,14 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
         </Styled.CoinSubtitle>
         {!isDesktopView && (
           <Styled.InfoContainer>
-            {renderAddress}
+            {addressControls}
             <Styled.CoinPrice>{renderBalance}</Styled.CoinPrice>
           </Styled.InfoContainer>
         )}
       </Styled.CoinInfoWrapper>
       {isDesktopView && (
         <Styled.InfoContainer>
-          {renderAddress}
+          {addressControls}
           <Styled.CoinPrice>{renderBalance}</Styled.CoinPrice>
         </Styled.InfoContainer>
       )}

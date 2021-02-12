@@ -68,6 +68,10 @@ export const AddressEllipsis = styled(UIAddressEllipsis)`
   max-width: 100%;
   overflow: hidden;
 
+  &:only-child {
+    margin: auto;
+  }
+
   & svg {
     height: ${ICON_SIZE}px;
     width: ${ICON_SIZE}px;
