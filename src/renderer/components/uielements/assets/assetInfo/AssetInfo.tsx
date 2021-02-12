@@ -112,25 +112,29 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
 
   const closeQrModal = useCallback(() => setShowQrModal(false), [setShowQrModal])
 
+  const qrCodeModal = useMemo(
+    () =>
+      FP.pipe(
+        walletInfo,
+        O.map(({ address }) => (
+          <Modal
+            key="qr code modal"
+            title={intl.formatMessage({ id: 'wallet.action.receive' }, { asset: assetString })}
+            visible={showQrModal}
+            onCancel={closeQrModal}
+            onOk={closeQrModal}>
+            <QrCode text={address} qrError={intl.formatMessage({ id: 'wallet.receive.address.errorQR' })} />
+            {renderAddress()}
+          </Modal>
+        )),
+        O.getOrElse(() => <></>)
+      ),
+    [showQrModal, closeQrModal, walletInfo, assetString, intl, renderAddress]
+  )
+
   return (
     <Styled.Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
-      {showQrModal && (
-        <Modal
-          title={intl.formatMessage({ id: 'wallet.action.receive' }, { asset: assetString })}
-          visible
-          onCancel={closeQrModal}
-          onOk={closeQrModal}>
-          <QrCode
-            text={FP.pipe(
-              walletInfo,
-              O.map(({ address }) => address)
-            )}
-            noDataError={intl.formatMessage({ id: 'wallet.receive.address.error' })}
-            qrError={intl.formatMessage({ id: 'wallet.receive.address.errorQR' })}
-          />
-          {renderAddress()}
-        </Modal>
-      )}
+      {qrCodeModal}
       {renderAssetIcon}
       <Styled.CoinInfoWrapper>
         <Styled.CoinTitle>

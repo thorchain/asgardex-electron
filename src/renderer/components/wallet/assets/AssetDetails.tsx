@@ -122,7 +122,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [oRuneBnbBalance]
   )
 
-  const actionColSpanDesktop = isRuneBnbAsset || isRuneNativeAsset ? 12 : 12
+  const actionColSpanDesktop = 12
   const actionColSpanMobile = 24
 
   const runeUpgradeDisabled: boolean = useMemo(

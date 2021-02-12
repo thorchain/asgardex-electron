@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { delay } from '@xchainjs/xchain-util'
 import { Grid, Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -12,11 +11,10 @@ import { useIntl } from 'react-intl'
 import * as Styled from './qrCode.styles'
 
 type Props = {
-  text: O.Option<string>
-  noDataError: string
+  text: string
   qrError: string
 }
-export const QrCode: React.FC<Props> = ({ text, noDataError, qrError }) => {
+export const QrCode: React.FC<Props> = ({ text, qrError }) => {
   const canvasContainer = useRef<HTMLDivElement>(null)
   const intl = useIntl()
 
@@ -26,26 +24,15 @@ export const QrCode: React.FC<Props> = ({ text, noDataError, qrError }) => {
 
   useEffect(() => {
     setCanvasRd(RD.pending)
-    FP.pipe(
-      text,
-      O.fold(
-        () => {
-          setCanvasRd(RD.failure(noDataError))
-        },
-        async (address) => {
-          // Delay to render everything
-          await delay(500)
-          QRCode.toCanvas(address, { errorCorrectionLevel: 'H', scale: 6 }, (err, canvas) => {
-            if (err) {
-              setCanvasRd(RD.failure(qrError))
-            } else {
-              setCanvasRd(RD.success(canvas))
-            }
-          })
-        }
-      )
-    )
-  }, [intl, text, setCanvasRd, noDataError, qrError])
+
+    QRCode.toCanvas(text, { errorCorrectionLevel: 'H', scale: 6 }, (err, canvas) => {
+      if (err) {
+        setCanvasRd(RD.failure(qrError))
+      } else {
+        setCanvasRd(RD.success(canvas))
+      }
+    })
+  }, [intl, text, setCanvasRd, qrError])
 
   useEffect(() => {
     FP.pipe(

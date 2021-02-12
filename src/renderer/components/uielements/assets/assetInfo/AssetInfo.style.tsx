@@ -43,7 +43,7 @@ export const CoinSubtitle = styled.p`
   text-transform: uppercase;
 `
 
-export const InfoContainer = styled('div')`
+export const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -54,7 +54,7 @@ export const InfoContainer = styled('div')`
   `}
 `
 
-export const AddressContainer = styled('div')`
+export const AddressContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
