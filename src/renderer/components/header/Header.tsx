@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import * as O from 'fp-ts/lib/Option'
@@ -34,6 +34,11 @@ export const Header: React.FC = (): JSX.Element => {
 
   const { changeLocale, locale$, initialLocale } = useI18nContext()
   const currentLocale = useObservableState(locale$, initialLocale)
+
+  useEffect(() => {
+    // Required to update the electron native menu according to the selected locale
+    window.apiLang.update(currentLocale)
+  }, [currentLocale])
 
   return (
     <HeaderComponent

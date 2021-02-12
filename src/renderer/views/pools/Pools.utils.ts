@@ -56,7 +56,7 @@ export const getPoolTableRowData = ({
       const transaction = ZERO_BASE_AMOUNT
       const transactionPrice = getValueOfRuneInAsset(transaction, pricePoolData)
 
-      const slip = bnOrZero(poolDetail?.poolSlipAverage).multipliedBy(100)
+      const slip = bnOrZero(poolDetail?.poolSlipAverage).dividedBy(100)
       const trades = bnOrZero(poolDetail?.swappingTxCount)
       const status = stringToGetPoolsStatus(poolDetail?.status)
 

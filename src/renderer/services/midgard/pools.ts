@@ -24,12 +24,7 @@ import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
-import {
-  DefaultApi,
-  GetPoolsRequest,
-  GetPoolsStatusEnum,
-  GetSwapHistoryIntervalEnum
-} from '../../types/generated/midgard/apis'
+import { DefaultApi, GetPoolsRequest, GetPoolsStatusEnum } from '../../types/generated/midgard/apis'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
 import { ErrorId } from '../wallet/types'
 import {
@@ -104,13 +99,9 @@ const createPoolsService = (
                 FP.pipe(
                   // As midgard v2 is missing poolSlipAverage and swappingTxCount
                   // field we have to get them from getSwapHistory
+                  // Emulate ALL period of a pool life
                   api.getSwapHistory({
-                    pool: asset,
-                    interval: GetSwapHistoryIntervalEnum.Year,
-                    // Emulate ALL period of a pool life
-                    // And get data for last 10 years
-                    from: Date.now() - 360 * 3600 * 24 * 10,
-                    to: Date.now()
+                    pool: asset
                   }),
                   RxOp.map(RD.success),
                   liveData.map(({ meta }) => meta),

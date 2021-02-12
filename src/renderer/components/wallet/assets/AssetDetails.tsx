@@ -63,15 +63,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     history.push(walletRoutes.send.path(routeParams))
   }, [oAsset, history, oWalletAddress])
 
-  const walletActionReceiveClick = useCallback(() => {
-    const routeParams = FP.pipe(
-      sequenceTOption(oWalletAddress, oAsset),
-      O.map(([walletAddress, asset]) => ({ asset: assetToString(asset), walletAddress })),
-      O.getOrElse(() => ({ asset: '', walletAddress: '' }))
-    )
-    history.push(walletRoutes.receive.path(routeParams))
-  }, [oAsset, history, oWalletAddress])
-
   const walletActionDepositClick = useCallback(() => {
     FP.pipe(
       oWalletAddress,
@@ -131,7 +122,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [oRuneBnbBalance]
   )
 
-  const actionColSpanDesktop = isRuneBnbAsset || isRuneNativeAsset ? 8 : 12
+  const actionColSpanDesktop = 12
   const actionColSpanMobile = 24
 
   const runeUpgradeDisabled: boolean = useMemo(
@@ -147,6 +138,18 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const chain = O.isSome(oAsset) ? oAsset.value.chain : ''
 
+  const walletInfo = useMemo(
+    () =>
+      FP.pipe(
+        oWalletAddress,
+        O.map((address) => ({
+          address,
+          network
+        }))
+      ),
+    [oWalletAddress, network]
+  )
+
   return (
     <>
       <Row justify="space-between">
@@ -159,7 +162,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          <AssetInfo asset={oAsset} assetsWB={oBalances} />
+          <AssetInfo walletInfo={walletInfo} asset={oAsset} assetsWB={oBalances} />
         </Col>
 
         <Styled.Divider />
@@ -191,15 +194,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               </Styled.ActionWrapper>
             </Styled.ActionCol>
           )}
-          <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
-            <Styled.ActionWrapper>
-              <Row justify="center">
-                <Button typevalue="outline" round="true" sizevalue="xnormal" onClick={walletActionReceiveClick}>
-                  {intl.formatMessage({ id: 'wallet.action.receive' })}
-                </Button>
-              </Row>
-            </Styled.ActionWrapper>
-          </Styled.ActionCol>
           {isRuneNativeAsset && (
             <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
               <Styled.ActionWrapper>

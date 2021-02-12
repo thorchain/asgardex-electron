@@ -18,7 +18,7 @@ describe('views/pools/utils', () => {
       runeDepth: '10000000000',
       volume24h: '10000000000',
       // poolTxAverage: '10000000000',
-      poolSlipAverage: '0.0011',
+      poolSlipAverage: '11',
       swappingTxCount: '123',
       status: GetPoolsStatusEnum.Staged
     } as PoolDetail
