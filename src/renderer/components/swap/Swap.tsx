@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, PoolData, getSwapMemo } from '@thorchain/asgardex-util'
@@ -20,16 +20,18 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import { getChainAsset } from '../../helpers/chainHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
-import { swap } from '../../routes/swap'
+import { useManualSubscription } from '../../hooks/useManualSubscription'
+import { swap as swapRoutes } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice } from '../../services/binance/types'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
-import { SwapFeesRD, SwapState, SwapStateHandler } from '../../services/chain/types'
+import { SwapFeesRD, SwapState, SwapState$, SwapStateHandler } from '../../services/chain/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { KeystoreState, NonEmptyWalletBalances, ValidatePasswordHandler } from '../../services/wallet/types'
@@ -71,7 +73,7 @@ export const Swap = ({
   sourceAsset: sourceAssetProp,
   targetAsset: targetAssetProp,
   sourcePoolAddress: oSourcePoolAddress,
-  swap$,
+  swap$: getSwap$,
   poolDetails,
   walletBalances,
   goToTransaction = (_) => {},
@@ -103,27 +105,6 @@ export const Swap = ({
     [sourceAsset, targetAsset]
   )
 
-  // (Possible) subscription of swap$
-  const [swapSub, setSwapSub] = useState<O.Option<Rx.Subscription>>(O.none)
-
-  // unsubscribe swap$ subscription
-  const unsubScribeSwapSub = useCallback(() => {
-    FP.pipe(
-      swapSub,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [swapSub])
-
-  useEffect(() => {
-    // Unsubscribe of (possible) previous subscription of `swap$`
-    return () => {
-      unsubScribeSwapSub()
-    }
-  }, [unsubScribeSwapSub])
-
-  // Swap state
-  const [swapState, setSwapState] = useState<SwapState>(INITIAL_SWAP_STATE)
-
   // Swap start time
   const [swapStartTime, setSwapStartTime] = useState<number>(0)
 
@@ -133,7 +114,7 @@ export const Swap = ({
         targetAsset,
         O.map((targetAsset) =>
           onChangePath(
-            swap.path({
+            swapRoutes.path({
               source: assetToString(asset),
               target: assetToString(targetAsset)
             })
@@ -150,7 +131,7 @@ export const Swap = ({
         sourceAsset,
         O.map((sourceAsset) =>
           onChangePath(
-            swap.path({
+            swapRoutes.path({
               source: assetToString(sourceAsset),
               target: assetToString(asset)
             })
@@ -230,6 +211,31 @@ export const Swap = ({
     [oAssetWB, amountToSwapDecimal, setAmountToSwap]
   )
 
+  const swap$: SwapState$ = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(assetsToSwap, targetWalletAddress),
+      O.map(([{ source, target }, address]) => {
+        const memo = getSwapMemo({ asset: target, address })
+        return FP.pipe(
+          getSwap$({
+            poolAddress: oSourcePoolAddress,
+            asset: source,
+            amount: amountToSwap,
+            memo
+          }),
+          // set start time
+          RxOp.tap(() => setSwapStartTime(Date.now()))
+        )
+      }),
+      O.getOrElse((): SwapState$ => Rx.EMPTY)
+    )
+  }, [assetsToSwap, targetWalletAddress, setSwapStartTime, getSwap$, amountToSwap, oSourcePoolAddress])
+
+  const { data: swapState, subscribe: swap, setData: setSwapState } = useManualSubscription<SwapState>(
+    swap$,
+    INITIAL_SWAP_STATE
+  )
+
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
 
   const assetSymbolsInWallet: O.Option<string[]> = useMemo(
@@ -295,7 +301,7 @@ export const Swap = ({
       assetsToSwap,
       O.map(({ source, target }) =>
         onChangePath(
-          swap.path({
+          swapRoutes.path({
             target: assetToString(source),
             source: assetToString(target)
           })
@@ -403,13 +409,8 @@ export const Swap = ({
   ])
 
   const onCloseTxModal = useCallback(() => {
-    // unsubscribe
-    unsubScribeSwapSub()
-    // reset swap$ subscription
-    setSwapSub(O.none)
-    // reset swap state
     setSwapState(INITIAL_SWAP_STATE)
-  }, [unsubScribeSwapSub])
+  }, [setSwapState])
 
   const onFinishTxModal = useCallback(() => {
     // Do same things as with closing
@@ -476,28 +477,8 @@ export const Swap = ({
   const onSucceedPasswordModal = useCallback(() => {
     // close private modal
     closePasswordModal()
-
-    FP.pipe(
-      sequenceTOption(assetsToSwap, targetWalletAddress),
-      O.map(([{ source, target }, address]) => {
-        const memo = getSwapMemo({ asset: target, address })
-        // set start time
-        setSwapStartTime(Date.now())
-        // subscribe to swap$
-        const sub = swap$({
-          poolAddress: oSourcePoolAddress,
-          asset: source,
-          amount: amountToSwap,
-          memo
-        }).subscribe(setSwapState)
-
-        // store subscription - needed to unsubscribe while unmounting
-        setSwapSub(O.some(sub))
-
-        return true
-      })
-    )
-  }, [assetsToSwap, amountToSwap, closePasswordModal, oSourcePoolAddress, swap$, targetWalletAddress])
+    swap()
+  }, [closePasswordModal, swap])
 
   const sourceChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
     () =>
