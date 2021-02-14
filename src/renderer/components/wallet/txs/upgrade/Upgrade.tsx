@@ -18,13 +18,13 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { getChainAsset } from '../../../../helpers/chainHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { emptyString } from '../../../../helpers/stringHelper'
 import { getBnbAmountFromBalances, getRuneBnBAmountFromBalances } from '../../../../helpers/walletHelper'
+import { useManualSubscription } from '../../../../hooks/useManualSubscription'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
 import { FeeRD } from '../../../../services/chain/types'
@@ -66,7 +66,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     bnbPoolAddressRD,
     validatePassword$,
     fee: feeRD,
-    upgrade$,
+    upgrade$: getUpgrade$,
     balances: oBalances,
     successActionHandler,
     reloadFeeHandler,
@@ -79,46 +79,34 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   // State for visibility of Modal to confirm upgrade
   const [showConfirmUpgradeModal, setShowConfirmUpgradeModal] = useState(false)
-  // (Possible) subscription of upgrade tx
-  const [upgradeTxSub, _setUpgradeTxSub] = useState<O.Option<Rx.Subscription>>(O.none)
 
-  // unsubscribe upgrade$ subscription
-  const unsubscribeUpgradeTxSub = useCallback(() => {
-    FP.pipe(
-      upgradeTxSub,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [upgradeTxSub])
+  const [amountToUpgrade, setAmountToUpgrade] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 
-  const setUpgradeTxSub = useCallback(
-    (state) => {
-      unsubscribeUpgradeTxSub()
-      _setUpgradeTxSub(state)
-    },
-    [unsubscribeUpgradeTxSub]
-  )
+  const upgrade$ = useMemo(() => {
+    const memo = getSwitchMemo(runeNativeAddress)
+    const poolAddress = RD.toOption(bnbPoolAddressRD)
+    return getUpgrade$({
+      poolAddress,
+      amount: amountToUpgrade,
+      asset: runeAsset,
+      memo
+    })
+  }, [runeNativeAddress, bnbPoolAddressRD, getUpgrade$, amountToUpgrade, runeAsset])
 
-  useEffect(() => {
-    // Unsubscribe of (possible) previous subscription of `deposit$`
-    return () => {
-      unsubscribeUpgradeTxSub()
-    }
-  }, [unsubscribeUpgradeTxSub])
-
-  // State of upgrade tx
-  const [upgradeTxState, setUpgradeTxState] = useState<UpgradeRuneTxState>(INITIAL_UPGRADE_RUNE_STATE)
+  const {
+    data: upgradeTxState,
+    setData: setUpgradeTxState,
+    subscribe: upgrade
+  } = useManualSubscription<UpgradeRuneTxState>(upgrade$, INITIAL_UPGRADE_RUNE_STATE)
 
   const resetTxState = useCallback(() => {
     setUpgradeTxState(INITIAL_UPGRADE_RUNE_STATE)
-    setUpgradeTxSub(O.none)
-  }, [setUpgradeTxSub])
+  }, [setUpgradeTxState])
 
   const onFinishHandler = useCallback(() => {
     reloadBalancesHandler()
     resetTxState()
   }, [reloadBalancesHandler, resetTxState])
-
-  const [amountToUpgrade, setAmountToUpgrade] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 
   const oRuneBnbAmount: O.Option<BaseAmount> = useMemo(
     () => FP.pipe(oBalances, O.chain(FP.flow(getRuneBnBAmountFromBalances, O.map(assetToBase)))),
@@ -178,20 +166,6 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   )
 
   const onSubmit = useCallback(() => setShowConfirmUpgradeModal(true), [])
-
-  const upgrade = useCallback(() => {
-    const memo = getSwitchMemo(runeNativeAddress)
-    const poolAddress = RD.toOption(bnbPoolAddressRD)
-    const subscription = upgrade$({
-      poolAddress,
-      amount: amountToUpgrade,
-      asset: runeAsset,
-      memo
-    }).subscribe(setUpgradeTxState)
-
-    // store subscription
-    setUpgradeTxSub(O.some(subscription))
-  }, [amountToUpgrade, bnbPoolAddressRD, runeAsset, runeNativeAddress, upgrade$, setUpgradeTxSub])
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
 
