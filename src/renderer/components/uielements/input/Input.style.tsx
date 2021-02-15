@@ -58,9 +58,13 @@ const inputStyle = css<InputProps>`
     background: transparent;
   }
 
-  .ant-input {
+  &.ant-input {
     color: ${palette('text', 0)};
     background-color: ${palette('background', 0)};
+
+    &[disabled] {
+      color: ${palette('gray', 1)};
+    }
   }
 
   &:hover,
