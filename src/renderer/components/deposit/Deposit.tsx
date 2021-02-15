@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 
 import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
+import { Grid } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { PoolShareRD } from '../../services/midgard/types'
@@ -21,7 +22,7 @@ export type Props = {
   asset: Asset
   asymPoolShare: PoolShareRD
   symPoolShare: PoolShareRD
-  ShareContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD }>
+  ShareContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD; smallWidth?: boolean }>
   AsymDepositContent: React.ComponentType<{ asset: Asset }>
   SymDepositContent: React.ComponentType<{ asset: Asset }>
   WidthdrawContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD }>
@@ -34,6 +35,8 @@ export const Deposit: React.FC<Props> = (props) => {
 
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
   const walletIsLocked = useMemo(() => isLocked(keystoreState), [keystoreState])
+
+  const isDesktopView = Grid.useBreakpoint()?.md ?? false
 
   const tabs = useMemo(
     (): Tab[] => [
@@ -68,7 +71,7 @@ export const Deposit: React.FC<Props> = (props) => {
             </Styled.DepositContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper>
-                <ShareContent asset={asset} poolShare={symPoolShare} />
+                <ShareContent smallWidth={!isDesktopView} asset={asset} poolShare={symPoolShare} />
               </Styled.ShareContentWrapper>
             </Styled.ShareContentCol>
           </>
