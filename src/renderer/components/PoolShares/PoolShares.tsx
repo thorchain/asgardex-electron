@@ -3,6 +3,7 @@ import React, { useMemo } from 'react'
 import {
   Asset,
   AssetRuneNative,
+  assetToString,
   baseAmount,
   baseToAsset,
   formatAssetAmountCurrency,
@@ -11,7 +12,9 @@ import {
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router'
 
+import * as depositRoutes from '../../routes/deposit'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { Label } from '../uielements/label'
 import * as H from './helpers'
@@ -27,6 +30,7 @@ export type Props = {
 
 export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, loading }) => {
   const intl = useIntl()
+  const history = useHistory()
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -112,14 +116,31 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
     []
   )
 
-  const desktopColumns: ColumnsType<PoolShareTableRowData> = useMemo(
-    () => [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn],
-    [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn]
+  const manageColumn: ColumnType<PoolShareTableRowData> = useMemo(
+    () => ({
+      title: '',
+      align: 'right',
+      render: ({ asset }: PoolShareTableRowData) => (
+        <Styled.ManageButton
+          onClick={() => {
+            history.push(depositRoutes.deposit.path({ asset: assetToString(asset) }))
+          }}>
+          {intl.formatMessage({ id: 'common.manage' })}
+        </Styled.ManageButton>
+      )
+    }),
+    [history, intl]
   )
 
-  const mobileColumns: ColumnsType<PoolShareTableRowData> = useMemo(() => [iconColumn, valueColumn], [
+  const desktopColumns: ColumnsType<PoolShareTableRowData> = useMemo(
+    () => [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn, manageColumn],
+    [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn, manageColumn]
+  )
+
+  const mobileColumns: ColumnsType<PoolShareTableRowData> = useMemo(() => [iconColumn, valueColumn, manageColumn], [
     iconColumn,
-    valueColumn
+    valueColumn,
+    manageColumn
   ])
 
   return (

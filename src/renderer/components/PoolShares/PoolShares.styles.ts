@@ -51,6 +51,15 @@ export const InfoButton = styled(UIButton).attrs({
   padding-left: 30px;
 `
 
+export const ManageButton = styled(UIButton).attrs({
+  typevalue: 'outline',
+  round: 'true'
+})`
+  &.ant-btn {
+    display: inherit;
+  }
+`
+
 export const InfoArrow = styled(AIcons.ArrowUpOutlined)`
   transform: rotateZ(45deg);
   color: ${palette('primary', 0)};
