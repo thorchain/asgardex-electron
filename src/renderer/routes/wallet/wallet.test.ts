@@ -1,16 +1,4 @@
-import {
-  base,
-  imports,
-  locked,
-  settings,
-  assets,
-  bonds,
-  assetDetail,
-  send,
-  receive,
-  upgradeBnbRune,
-  poolShares
-} from './wallet'
+import { base, imports, locked, settings, assets, bonds, assetDetail, send, upgradeBnbRune, poolShares } from './wallet'
 
 describe('Wallet routes', () => {
   describe('base routes', () => {
@@ -93,24 +81,6 @@ describe('Wallet routes', () => {
 
     it('redirects to base path if address is empty', () => {
       expect(assetDetail.path({ asset: 'some asset', walletAddress: '' })).toEqual(assets.path())
-    })
-  })
-
-  describe('receive route', () => {
-    it('template', () => {
-      expect(receive.template).toEqual('/wallet/assets/detail/:walletAddress/:asset/receive')
-    })
-    it('path ', () => {
-      expect(receive.path({ asset: 'BNB.BNB', walletAddress: 'walletAddress' })).toEqual(
-        '/wallet/assets/detail/walletAddress/BNB.BNB/receive'
-      )
-    })
-    it('redirects to base path if asset is empty', () => {
-      expect(receive.path({ asset: '', walletAddress: 'some wallet' })).toEqual(assets.path())
-    })
-
-    it('redirects to base path if address is empty', () => {
-      expect(receive.path({ asset: 'some asset', walletAddress: '' })).toEqual(assets.path())
     })
   })
 

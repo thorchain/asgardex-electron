@@ -86,19 +86,6 @@ export const assetDetail: Route<AssetDetailsParams> = {
   }
 }
 
-export type ReceiveParams = { asset: string; walletAddress: string }
-export const receive: Route<ReceiveParams> = {
-  template: `${assetDetail.template}/receive`,
-  path: ({ asset, walletAddress }) => {
-    if (asset && !!walletAddress) {
-      return `${assetDetail.path({ asset, walletAddress })}/receive`
-    } else {
-      // Redirect to assets route if passed param is empty
-      return assets.path()
-    }
-  }
-}
-
 export type SendParams = { asset: string; walletAddress: string }
 export const send: Route<SendParams> = {
   template: `${assetDetail.template}/send`,
