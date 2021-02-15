@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 
+import { PlusOutlined } from '@ant-design/icons'
 import {
   Asset,
   AssetRuneNative,
@@ -125,6 +126,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
           onClick={() => {
             history.push(depositRoutes.deposit.path({ asset: assetToString(asset) }))
           }}>
+          <PlusOutlined />
           {intl.formatMessage({ id: 'common.manage' })}
         </Styled.ManageButton>
       )

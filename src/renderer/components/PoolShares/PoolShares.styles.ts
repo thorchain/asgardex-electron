@@ -56,7 +56,7 @@ export const ManageButton = styled(UIButton).attrs({
   round: 'true'
 })`
   &.ant-btn {
-    display: inherit;
+    display: inline-flex;
   }
 `
 
