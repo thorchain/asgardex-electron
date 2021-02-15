@@ -1,10 +1,8 @@
 import React, { useMemo } from 'react'
 
-import { PlusOutlined } from '@ant-design/icons'
 import {
   Asset,
   AssetRuneNative,
-  assetToString,
   baseAmount,
   baseToAsset,
   formatAssetAmountCurrency,
@@ -13,9 +11,7 @@ import {
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
 
-import * as depositRoutes from '../../routes/deposit'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { Label } from '../uielements/label'
 import * as H from './helpers'
@@ -31,7 +27,6 @@ export type Props = {
 
 export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, loading }) => {
   const intl = useIntl()
-  const history = useHistory()
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -121,17 +116,9 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
     () => ({
       title: '',
       align: 'right',
-      render: ({ asset }: PoolShareTableRowData) => (
-        <Styled.ManageButton
-          onClick={() => {
-            history.push(depositRoutes.deposit.path({ asset: assetToString(asset) }))
-          }}>
-          <PlusOutlined />
-          {intl.formatMessage({ id: 'common.manage' })}
-        </Styled.ManageButton>
-      )
+      render: ({ asset }: PoolShareTableRowData) => <Styled.ManageButton asset={asset} />
     }),
-    [history, intl]
+    []
   )
 
   const desktopColumns: ColumnsType<PoolShareTableRowData> = useMemo(
