@@ -26,6 +26,7 @@ export const ConfirmationModal: React.FC<Props> = ({ onSuccess: onSuccessProp, o
       maskClosable={false}
       closable={false}
       okText={intl.formatMessage({ id: 'common.confirm' })}
+      okButtonProps={{ autoFocus: true }}
       cancelText={intl.formatMessage({ id: 'common.cancel' })}>
       {message}
     </Styled.Modal>
