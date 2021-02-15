@@ -7,7 +7,7 @@ import { Tabs as TabsBase } from '../tabs/Tabs'
 import { Button } from '../uielements/button'
 
 export const Container = styled('div')`
-  min-height: 100%;
+  flex: 1;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -36,7 +36,7 @@ export const ShareContentWrapper = styled.div`
   min-height: 300px;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: baseline;
   ${media.xl`
       min-height: 100%;
   `};

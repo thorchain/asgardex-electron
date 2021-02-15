@@ -578,9 +578,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   return (
     <Styled.Container>
-      <Styled.BalanceErrorRow>
-        <Col xs={24}>{showBalanceError && renderBalanceError}</Col>
-      </Styled.BalanceErrorRow>
+      {showBalanceError && (
+        <Styled.BalanceErrorRow>
+          <Col xs={24}>{showBalanceError && renderBalanceError}</Col>
+        </Styled.BalanceErrorRow>
+      )}
       <Styled.CardsRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.AssetCard

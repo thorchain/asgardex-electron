@@ -13,7 +13,6 @@ import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
-import { useElementWidth } from '../../../hooks/useContainerWidth'
 import * as Styled from './PoolShare.style'
 import { PoolShareCard } from './PoolShareCard'
 
@@ -28,6 +27,7 @@ type Props = {
   assetDepositPrice: BaseAmount
   poolShare: BigNumber
   depositUnits: BaseAmount
+  smallWidth?: boolean
 }
 
 export const PoolShare: React.FC<Props> = (props): JSX.Element => {
@@ -41,7 +41,8 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
     assetDepositShare,
     assetDepositPrice,
     poolShare,
-    depositUnits
+    depositUnits,
+    smallWidth
   } = props
 
   const intl = useIntl()
@@ -52,10 +53,6 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
   ])
 
   const ref: RefObject<HTMLDivElement> = useRef(null)
-
-  const wrapperWidth = useElementWidth(ref)
-
-  const smallWidth = wrapperWidth <= 576 // sm
 
   const renderRedemptionCol = useCallback(
     (amount: BaseAmount, price: BaseAmount, asset: Asset) => (
