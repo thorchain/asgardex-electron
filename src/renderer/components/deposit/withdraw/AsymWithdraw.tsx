@@ -55,11 +55,10 @@ export type Props = {
 }
 
 /**
- * Withdraw component
+ * AsymWithdraw component
  *
- * Note: It currently supports sym. withdraw only
- *
- * */
+ * Note: It currently supports asym deposits for paired asset only (but not for RUNE)
+ */
 export const AsymWithdraw: React.FC<Props> = ({
   asset,
   assetPrice,
@@ -168,8 +167,8 @@ export const AsymWithdraw: React.FC<Props> = ({
     )
   }, [isFeeError, oChainAssetBalance, oFee, intl, asset])
 
-  // Deposit start time
-  const [depositStartTime, setDepositStartTime] = useState<number>(0)
+  // Withdraw start time
+  const [withdrawStartTime, setWithdrawStartTime] = useState<number>(0)
 
   // Withdraw state
   const [withdrawState, setWithdrawState] = useState<WithdrawState>(INITIAL_WITHDRAW_STATE)
@@ -206,7 +205,7 @@ export const AsymWithdraw: React.FC<Props> = ({
   const onCloseTxModal = useCallback(() => {
     // reset withdraw$ subscription
     setWithdrawSub(O.none)
-    // reset deposit state
+    // reset withdraw state
     setWithdrawState(INITIAL_WITHDRAW_STATE)
   }, [setWithdrawSub])
 
@@ -266,7 +265,7 @@ export const AsymWithdraw: React.FC<Props> = ({
         title={txModalTitle}
         onClose={onCloseTxModal}
         onFinish={onFinishTxModal}
-        startTime={depositStartTime}
+        startTime={withdrawStartTime}
         txRD={withdrawRD}
         timerValue={timerValue}
         extraResult={extraResult}
@@ -277,7 +276,7 @@ export const AsymWithdraw: React.FC<Props> = ({
     withdrawState,
     onCloseTxModal,
     onFinishTxModal,
-    depositStartTime,
+    withdrawStartTime,
     txModalExtraContent,
     intl,
     viewRuneTx,
@@ -300,10 +299,9 @@ export const AsymWithdraw: React.FC<Props> = ({
     closePasswordModal()
 
     // set start time
-    setDepositStartTime(Date.now())
+    setWithdrawStartTime(Date.now())
 
     const sub = withdraw$({
-      // TODO @veado Use asset for asym withdraw - see https://github.com/thorchain/asgardex-electron/issues/827
       asset,
       poolAddress: oPoolAddress,
       network,
@@ -330,7 +328,7 @@ export const AsymWithdraw: React.FC<Props> = ({
   return (
     <Styled.Container>
       <Label weight="bold" textTransform="uppercase">
-        {intl.formatMessage({ id: 'deposit.withdraw.title' })}
+        {intl.formatMessage({ id: 'deposit.withdraw.asym.title' })}
       </Label>
       <Label>{intl.formatMessage({ id: 'deposit.withdraw.choseText' })}</Label>
 

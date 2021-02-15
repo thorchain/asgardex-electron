@@ -15,11 +15,12 @@ import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { PoolDetailRD, PoolDetail, PoolShareRD, PoolShare } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
+import { DepositType } from '../../../types/asgardex'
 import * as Styled from './ShareView.styles'
 
-type Props = { asset: Asset; poolShare: PoolShareRD }
+type Props = { asset: Asset; poolShare: PoolShareRD; type: DepositType }
 
-export const ShareView: React.FC<Props> = ({ asset, poolShare: poolShareRD }) => {
+export const ShareView: React.FC<Props> = ({ asset, poolShare: poolShareRD, type }) => {
   const { service: midgardService } = useMidgardContext()
   const {
     pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$ }
@@ -45,6 +46,7 @@ export const ShareView: React.FC<Props> = ({ asset, poolShare: poolShareRD }) =>
 
       return (
         <PoolShareUI
+          type={type}
           sourceAsset={AssetRuneNative}
           targetAsset={asset}
           poolShare={poolShare}
@@ -58,12 +60,18 @@ export const ShareView: React.FC<Props> = ({ asset, poolShare: poolShareRD }) =>
         />
       )
     },
-    [asset, oPriceAsset, pricePoolData]
+    [asset, oPriceAsset, pricePoolData, type]
   )
 
   const renderNoShare = useMemo(
-    () => <Styled.EmptyData description={intl.formatMessage({ id: 'deposit.pool.noDeposit' })} />,
-    [intl]
+    () => (
+      <Styled.EmptyData
+        description={intl.formatMessage({
+          id: type === 'asym' ? 'deposit.pool.noShares.asym' : 'deposit.pool.noShares.sym'
+        })}
+      />
+    ),
+    [intl, type]
   )
 
   const renderPoolShare = useMemo(

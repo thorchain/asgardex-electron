@@ -10,19 +10,23 @@ type Props = TabsProps & {
   tabs: { label: React.ReactNode; key: string; content: React.ReactNode }[]
   centerContent?: boolean
   activeTabKey?: string
+  onChange?: (tabKey: string) => void
 }
 
 export const Tabs: React.FC<Props> = ({
   tabs,
   defaultTabIndex,
+  defaultActiveKey,
   centerContent,
   activeTabKey: activeTabKeyProp,
   centered = true,
   className,
   tabBarExtraContent,
-  destroyInactiveTabPane
+  destroyInactiveTabPane,
+  onChange = (_: string) => {}
 }): JSX.Element => {
-  const [activeTabKey, setActiveTabKey] = useState(tabs[defaultTabIndex || 0].key)
+  const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || tabs[defaultTabIndex || 0].key)
+
   const content = useMemo(
     () =>
       tabs.map(({ label, key, content }) => (
@@ -39,6 +43,7 @@ export const Tabs: React.FC<Props> = ({
       tabBarExtraContent={tabBarExtraContent}
       className={className}
       centered={centered}
+      onChange={onChange}
       activeKey={activeTabKeyProp || activeTabKey}>
       {content}
     </Styled.Tabs>

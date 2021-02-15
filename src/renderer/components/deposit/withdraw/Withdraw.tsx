@@ -18,7 +18,6 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
-import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
@@ -125,17 +124,11 @@ export const Withdraw: React.FC<Props> = ({
     }
   }, [unsubscribeWithdrawSub])
 
-  // TODO (@Veado) Use following logic for asym. withdraw only (see https://github.com/thorchain/asgardex-electron/issues/827)
-  // For sym. withdraw we do need to get fees only once (THORChain tx fee does not depend on memo)
-  const feeLD: FeeLD = useMemo(() => {
-    return Rx.of(memo).pipe(
-      // Memo depends on changing `withdrawPercent`
-      // that's why we delay it to avoid many requests for fees
-      RxOp.delay(800),
-      // Currently we send Rune txs only - it will be changed as soon as we support asym. withdraw
-      RxOp.switchMap((_) => fee$(AssetRuneNative.chain, memo))
-    )
-  }, [fee$, memo])
+  const feeLD: FeeLD = useMemo(
+    () => fee$(AssetRuneNative.chain, memo),
+
+    [fee$, memo]
+  )
 
   const feeRD: FeeRD = useObservableState(feeLD, RD.initial)
   const oFee: O.Option<BaseAmount> = useMemo(() => RD.toOption(feeRD), [feeRD])
@@ -185,8 +178,8 @@ export const Withdraw: React.FC<Props> = ({
     )
   }, [isFeeError, oRuneBalance, oFee, intl])
 
-  // Deposit start time
-  const [depositStartTime, setDepositStartTime] = useState<number>(0)
+  // Withdraw start time
+  const [withdrawStartTime, setWithdrawStartTime] = useState<number>(0)
 
   // Withdraw state
   const [withdrawState, setWithdrawState] = useState<WithdrawState>(INITIAL_WITHDRAW_STATE)
@@ -223,7 +216,7 @@ export const Withdraw: React.FC<Props> = ({
   const onCloseTxModal = useCallback(() => {
     // reset withdraw$ subscription
     setWithdrawSub(O.none)
-    // reset deposit state
+    // reset withdraw state
     setWithdrawState(INITIAL_WITHDRAW_STATE)
   }, [setWithdrawSub])
 
@@ -283,14 +276,14 @@ export const Withdraw: React.FC<Props> = ({
         title={txModalTitle}
         onClose={onCloseTxModal}
         onFinish={onFinishTxModal}
-        startTime={depositStartTime}
+        startTime={withdrawStartTime}
         txRD={withdrawRD}
         timerValue={timerValue}
         extraResult={extraResult}
         extra={txModalExtraContent}
       />
     )
-  }, [withdrawState, onCloseTxModal, onFinishTxModal, depositStartTime, txModalExtraContent, intl, viewRuneTx])
+  }, [withdrawState, onCloseTxModal, onFinishTxModal, withdrawStartTime, txModalExtraContent, intl, viewRuneTx])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
@@ -308,10 +301,9 @@ export const Withdraw: React.FC<Props> = ({
     closePasswordModal()
 
     // set start time
-    setDepositStartTime(Date.now())
+    setWithdrawStartTime(Date.now())
 
     const sub = withdraw$({
-      // TODO @veado Use asset for asym withdraw - see https://github.com/thorchain/asgardex-electron/issues/827
       asset: AssetRuneNative,
       poolAddress: oPoolAddress,
       network,
@@ -338,7 +330,7 @@ export const Withdraw: React.FC<Props> = ({
   return (
     <Styled.Container>
       <Label weight="bold" textTransform="uppercase">
-        {intl.formatMessage({ id: 'deposit.withdraw.title' })}
+        {intl.formatMessage({ id: 'deposit.withdraw.sym.title' })}
       </Label>
       <Label>{intl.formatMessage({ id: 'deposit.withdraw.choseText' })}</Label>
 
