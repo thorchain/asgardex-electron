@@ -67,7 +67,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
       <TableAction>
         <Button round="true" onClick={() => clickDepositHandler(assetToString(pool.target))} typevalue="outline">
           <PlusOutlined />
-          {intl.formatMessage({ id: 'common.liquidity' })}
+          {intl.formatMessage({ id: 'common.manage' })}
         </Button>
         <Button
           round="true"

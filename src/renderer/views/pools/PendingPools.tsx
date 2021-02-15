@@ -78,11 +78,11 @@ export const PendingPools: React.FC = (): JSX.Element => {
       <TableAction>
         <Button round="true" onClick={() => clickDepositHandler(assetToString(pool.target))} typevalue="outline">
           <PlusOutlined />
-          liquidity
+          {intl.formatMessage({ id: 'common.manage' })}
         </Button>
       </TableAction>
     ),
-    [clickDepositHandler]
+    [clickDepositHandler, intl]
   )
 
   const btnPendingPoolsColumn = useMemo(
