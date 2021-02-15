@@ -7,7 +7,7 @@ import * as Styled from './Tabs.styles'
 
 type Props = TabsProps & {
   defaultTabIndex?: number
-  tabs: { label: React.ReactNode; key: string; content: React.ReactNode }[]
+  tabs: { label: React.ReactNode; key: string; content: React.ReactNode; disabled?: boolean }[]
   centerContent?: boolean
   activeTabKey?: string
   onChange?: (tabKey: string) => void
@@ -29,8 +29,15 @@ export const Tabs: React.FC<Props> = ({
 
   const content = useMemo(
     () =>
-      tabs.map(({ label, key, content }) => (
-        <ATabs.TabPane tab={<Styled.TabLabel onClick={() => setActiveTabKey(key)}>{label}</Styled.TabLabel>} key={key}>
+      tabs.map(({ label, key, content, disabled = false }) => (
+        <ATabs.TabPane
+          tab={
+            <Styled.TabLabel onClick={!disabled ? () => setActiveTabKey(key) : undefined} disabled={disabled}>
+              {label}
+            </Styled.TabLabel>
+          }
+          key={key}
+          disabled={disabled}>
           <Styled.ContentWrapper centerContent={centerContent}>{content}</Styled.ContentWrapper>
         </ATabs.TabPane>
       )),

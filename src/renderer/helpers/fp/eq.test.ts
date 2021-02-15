@@ -210,17 +210,20 @@ describe('helpers/fp/eq', () => {
     const a: PoolShare = {
       type: 'asym',
       units: baseAmount(1),
-      asset: AssetRuneNative
+      asset: AssetRuneNative,
+      assetAddedAmount: baseAmount(1)
     }
     const b: PoolShare = {
       type: 'sym',
       units: baseAmount(1),
-      asset: AssetBNB
+      asset: AssetBNB,
+      assetAddedAmount: baseAmount(0.5)
     }
     const c: PoolShare = {
       type: 'all',
       units: baseAmount(1),
-      asset: AssetBTC
+      asset: AssetBTC,
+      assetAddedAmount: baseAmount(1)
     }
     it('is equal', () => {
       expect(eqPoolShares.equals([a, b], [a, b])).toBeTruthy()

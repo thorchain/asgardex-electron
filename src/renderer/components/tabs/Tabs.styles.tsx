@@ -36,6 +36,7 @@ export const TabLabel = styled(Label)`
   line-height: 19px;
   text-transform: uppercase;
   white-space: nowrap;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 `
 
 export const ContentWrapper = styled('div')<{ centerContent?: boolean }>`

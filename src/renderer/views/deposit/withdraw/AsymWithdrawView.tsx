@@ -18,9 +18,8 @@ import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
-import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { DEFAULT_NETWORK } from '../../../services/const'
-import { PoolDetailRD, PoolShareRD, PoolDetail, PoolAddress, PoolShare } from '../../../services/midgard/types'
+import { PoolDetailRD, PoolShareRD, PoolAddress, PoolShare } from '../../../services/midgard/types'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 
 type Props = {
@@ -139,12 +138,10 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
     ({
       assetPrice,
       poolShare,
-      poolDetail,
       selectedPriceAsset
     }: {
       assetPrice: BigNumber
       poolShare: PoolShare
-      poolDetail: PoolDetail
       selectedPriceAsset: Asset
     }) => (
       <AsymWithdraw
@@ -152,7 +149,7 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
         runePrice={runePrice}
         chainAssetBalance={chainAssetBalance}
         selectedPriceAsset={selectedPriceAsset}
-        share={shareHelpers.getAssetShare(poolShare.units, poolDetail)}
+        share={poolShare.assetAddedAmount}
         asset={asset}
         poolAddress={oPoolAddress}
         fee$={withdrawFee$}
@@ -180,19 +177,15 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
   )
 
   return FP.pipe(
-    RD.combine(assetPriceRD, poolShareRD, poolDetailRD, selectedPriceAssetRD),
-    RD.fold(
-      renderEmptyForm,
-      renderEmptyForm,
-      renderEmptyForm,
-      ([assetPrice, oPoolShare, poolDetail, selectedPriceAsset]) =>
-        FP.pipe(
-          oPoolShare,
-          O.fold(
-            () => renderEmptyForm(),
-            (poolShare) => renderWithdrawReady({ assetPrice, poolShare, poolDetail, selectedPriceAsset })
-          )
+    RD.combine(assetPriceRD, poolShareRD, selectedPriceAssetRD),
+    RD.fold(renderEmptyForm, renderEmptyForm, renderEmptyForm, ([assetPrice, oPoolShare, selectedPriceAsset]) =>
+      FP.pipe(
+        oPoolShare,
+        O.fold(
+          () => renderEmptyForm(),
+          (poolShare) => renderWithdrawReady({ assetPrice, poolShare, selectedPriceAsset })
         )
+      )
     )
   )
 }

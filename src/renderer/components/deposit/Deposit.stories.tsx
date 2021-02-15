@@ -16,9 +16,24 @@ import { Default as Withdraw } from './withdraw/Withdraw.stories'
 const defaultProps: DepositProps = {
   asset: AssetBNB,
   shares: RD.success([
-    { units: assetToBase(assetAmount(3, THORCHAIN_DECIMAL)), asset: AssetBNB, type: 'sym' },
-    { units: assetToBase(assetAmount(1, THORCHAIN_DECIMAL)), asset: AssetBNB, type: 'asym' },
-    { units: assetToBase(assetAmount(2, THORCHAIN_DECIMAL)), asset: AssetRuneNative, type: 'asym' }
+    {
+      units: assetToBase(assetAmount(3, THORCHAIN_DECIMAL)),
+      asset: AssetBNB,
+      type: 'sym',
+      assetAddedAmount: assetToBase(assetAmount(1.5, THORCHAIN_DECIMAL))
+    },
+    {
+      units: assetToBase(assetAmount(1, THORCHAIN_DECIMAL)),
+      asset: AssetBNB,
+      type: 'asym',
+      assetAddedAmount: assetToBase(assetAmount(1, THORCHAIN_DECIMAL))
+    },
+    {
+      units: assetToBase(assetAmount(2, THORCHAIN_DECIMAL)),
+      asset: AssetRuneNative,
+      type: 'asym',
+      assetAddedAmount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL))
+    }
   ]),
   ShareContent: DefaultPoolShare,
   SymDepositContent: SymDeposit,

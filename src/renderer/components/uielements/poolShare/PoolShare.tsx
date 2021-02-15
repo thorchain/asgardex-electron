@@ -14,12 +14,10 @@ import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { useElementWidth } from '../../../hooks/useContainerWidth'
-import { DepositType } from '../../../types/asgardex'
 import * as Styled from './PoolShare.style'
 import { PoolShareCard } from './PoolShareCard'
 
 type Props = {
-  type: DepositType
   sourceAsset: Asset
   targetAsset: Asset
   runeDepositShare: BaseAmount
@@ -34,7 +32,6 @@ type Props = {
 
 export const PoolShare: React.FC<Props> = (props): JSX.Element => {
   const {
-    type,
     sourceAsset,
     runeDepositShare,
     runeDepositPrice,
@@ -143,8 +140,7 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.PoolShareWrapper ref={ref}>
-      <PoolShareCard
-        title={intl.formatMessage({ id: type === 'sym' ? 'deposit.share.sym.title' : 'deposit.share.asym.title' })}>
+      <PoolShareCard title={intl.formatMessage({ id: 'deposit.share.title' })}>
         <Styled.CardRow>
           <Col span={smallWidth ? 24 : 12} style={{ paddingBottom: smallWidth ? '20px' : '0' }}>
             <Styled.LabelSecondary textTransform="uppercase">

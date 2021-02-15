@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
@@ -7,10 +7,9 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { PoolShareRD, PoolSharesRD } from '../../services/midgard/types'
-import { getSharesByAssetAndType } from '../../services/midgard/utils'
+import { getSharesByAssetAndType, combineSharesByAsset } from '../../services/midgard/utils'
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import { DepositType } from '../../types/asgardex'
 import { AddWallet } from '../wallet/add'
 import * as Styled from './Deposit.styles'
 
@@ -26,7 +25,7 @@ type Tab = {
 export type Props = {
   asset: Asset
   shares: PoolSharesRD
-  ShareContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD; type: DepositType }>
+  ShareContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD }>
   AsymDepositContent: React.ComponentType<{ asset: Asset }>
   SymDepositContent: React.ComponentType<{ asset: Asset }>
   WidthdrawContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD }>
@@ -68,6 +67,15 @@ export const Deposit: React.FC<Props> = (props) => {
     [asset, poolSharesRD]
   )
 
+  const combinedPoolShare = useMemo(
+    () =>
+      FP.pipe(
+        poolSharesRD,
+        RD.map((shares) => combineSharesByAsset(shares, asset))
+      ),
+    [asset, poolSharesRD]
+  )
+
   const hasPoolShare = (poolShare: PoolShareRD): boolean => FP.pipe(poolShare, RD.toOption, O.flatten, O.isSome)
   const hasSymPoolShare: boolean = useMemo(() => hasPoolShare(symPoolShare), [symPoolShare])
   const hasAsymPoolShareAsset: boolean = useMemo(() => hasPoolShare(asymPoolShareAsset), [asymPoolShareAsset])
@@ -93,7 +101,7 @@ export const Deposit: React.FC<Props> = (props) => {
           { id: 'deposit.withdraw.sym' },
           { asset1: asset.ticker, asset2: AssetRuneNative.ticker }
         ),
-        content: <WidthdrawContent asset={asset} poolShare={symPoolShare} />
+        content: <WidthdrawContent asset={asset} poolShare={combinedPoolShare} />
       },
       {
         key: 'withdraw-asym-asset',
@@ -109,25 +117,12 @@ export const Deposit: React.FC<Props> = (props) => {
       SymDepositContent,
       hasSymPoolShare,
       WidthdrawContent,
-      symPoolShare,
+      combinedPoolShare,
       hasAsymPoolShareAsset,
       AsymWidthdrawContent,
       asymPoolShareAsset
     ]
   )
-
-  const [activeTabKey, setActiveTabKey] = useState<TabKey>('deposit-sym')
-
-  const handleAsymShare: boolean = useMemo(
-    () => activeTabKey === 'deposit-asym' || activeTabKey === 'withdraw-asym-asset',
-    [activeTabKey]
-  )
-
-  const poolShare: PoolShareRD = useMemo(() => (handleAsymShare ? asymPoolShareAsset : symPoolShare), [
-    handleAsymShare,
-    asymPoolShareAsset,
-    symPoolShare
-  ])
 
   return (
     <Styled.Container>
@@ -135,17 +130,11 @@ export const Deposit: React.FC<Props> = (props) => {
         {walletIsImported && !walletIsLocked ? (
           <>
             <Styled.DepositContentCol xs={24} xl={15}>
-              <Styled.Tabs
-                destroyInactiveTabPane
-                tabs={tabs}
-                centered={false}
-                defaultActiveKey="deposit-sym"
-                onChange={(key) => setActiveTabKey(key as TabKey)}
-              />
+              <Styled.Tabs destroyInactiveTabPane tabs={tabs} centered={false} defaultActiveKey="deposit-sym" />
             </Styled.DepositContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper>
-                <ShareContent asset={asset} poolShare={poolShare} type={handleAsymShare ? 'asym' : 'sym'} />
+                <ShareContent asset={asset} poolShare={combinedPoolShare} />
               </Styled.ShareContentWrapper>
             </Styled.ShareContentCol>
           </>

@@ -81,8 +81,6 @@ export const AsymWithdraw: React.FC<Props> = ({
 
   const memo = useMemo(() => getWithdrawMemo(asset, withdrawPercent), [asset, withdrawPercent])
 
-  const assetAmountToWithdraw = getAsymWithdrawAmount(share, withdrawPercent)
-
   // (Possible) subscription of `withdraw$`
   // DON'T use `_setWithdrawSub` to update state (it's unsafe) - use `setWithdrawSub`!!
   const [withdrawSub, _setWithdrawSub] = useState<O.Option<Rx.Subscription>>(O.none)
@@ -166,6 +164,8 @@ export const AsymWithdraw: React.FC<Props> = ({
       O.getOrElse(() => <></>)
     )
   }, [isFeeError, oChainAssetBalance, oFee, intl, asset])
+
+  const assetAmountToWithdraw = getAsymWithdrawAmount({ share, percent: withdrawPercent, fee: oFee })
 
   // Withdraw start time
   const [withdrawStartTime, setWithdrawStartTime] = useState<number>(0)

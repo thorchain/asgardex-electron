@@ -8,7 +8,6 @@ import { PoolShare } from './PoolShare'
 
 export const DefaultPoolShare = () => (
   <PoolShare
-    type="sym"
     sourceAsset={AssetRuneNative}
     targetAsset={AssetBNB}
     assetDepositPrice={assetToBase(assetAmount(120.1))}
@@ -34,7 +33,6 @@ storiesOf('Components/PoolShare', module)
     return (
       <div style={{ padding: '20px' }}>
         <PoolShare
-          type="sym"
           sourceAsset={AssetRuneNative}
           targetAsset={AssetBNB}
           assetDepositPrice={baseAmount(0)}
