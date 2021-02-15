@@ -64,7 +64,9 @@ export const AddressContainer = styled.div`
 
 const ICON_SIZE = 20
 
-export const QrCodeModal = styled(UIModal)`
+export const QrCodeModal = styled(UIModal).attrs({
+  okButtonProps: { autoFocus: true }
+})`
   text-transform: none;
 `
 
