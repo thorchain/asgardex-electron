@@ -9,11 +9,11 @@ interface Props extends ModalProps {
   children?: React.ReactNode
 }
 
-export const Modal: React.FC<Props> = ({ className = '', children, ...rest }): JSX.Element => {
+export const Modal: React.FC<Props> = ({ className = '', children, okButtonProps, ...rest }): JSX.Element => {
   return (
     <ModalWrapper
       className={`modal-wrapper ${className}`}
-      okButtonProps={{ className: 'ok-ant-btn' }}
+      okButtonProps={{ ...okButtonProps, className: 'ok-ant-btn' }}
       cancelButtonProps={{ className: 'cancel-ant-btn' }}
       {...rest}>
       {children}

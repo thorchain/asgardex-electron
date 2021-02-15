@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Form } from 'antd'
 import * as FP from 'fp-ts/lib/function'
@@ -53,11 +53,13 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
     onConfirm(password)
   }, [onConfirm, password])
 
+  const onOkCb = useMemo(() => (!validatingPassword ? onConfirmCb : undefined), [validatingPassword, onConfirmCb])
+
   return (
     <Styled.Modal
       title={intl.formatMessage({ id: 'wallet.password.confirmation' })}
       visible={visible}
-      onOk={!validatingPassword ? onConfirmCb : undefined}
+      onOk={onOkCb}
       onCancel={onCancel}
       maskClosable={false}
       closable={false}
@@ -75,6 +77,8 @@ export const PrivateModal: React.FC<Props> = (props): JSX.Element => {
             onChange={onChangePasswordHandler}
             prefix={<Styled.LockOutlined />}
             autoComplete="off"
+            autoFocus
+            onPressEnter={onOkCb}
           />
           {invalidPassword && (
             <Label color="error" textTransform="uppercase">

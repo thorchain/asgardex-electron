@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
+import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -25,7 +26,7 @@ type Tab = {
 export type Props = {
   asset: Asset
   shares: PoolSharesRD
-  ShareContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD }>
+  ShareContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD; smallWidth?: boolean }>
   AsymDepositContent: React.ComponentType<{ asset: Asset }>
   SymDepositContent: React.ComponentType<{ asset: Asset }>
   WidthdrawContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD }>
@@ -45,6 +46,8 @@ export const Deposit: React.FC<Props> = (props) => {
     shares: poolSharesRD
   } = props
   const intl = useIntl()
+
+  const isDesktopView = Grid.useBreakpoint()?.md ?? false
 
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
   const walletIsLocked = useMemo(() => isLocked(keystoreState), [keystoreState])
@@ -134,7 +137,7 @@ export const Deposit: React.FC<Props> = (props) => {
             </Styled.DepositContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper>
-                <ShareContent asset={asset} poolShare={combinedPoolShare} />
+                <ShareContent asset={asset} poolShare={combinedPoolShare} smallWidth={!isDesktopView} />
               </Styled.ShareContentWrapper>
             </Styled.ShareContentCol>
           </>
