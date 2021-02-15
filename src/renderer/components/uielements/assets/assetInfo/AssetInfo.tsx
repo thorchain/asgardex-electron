@@ -12,7 +12,6 @@ import { sequenceSOption, sequenceTOption } from '../../../../helpers/fpHelpers'
 import { loadingString, emptyString } from '../../../../helpers/stringHelper'
 import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
 import { NonEmptyWalletBalances } from '../../../../services/wallet/types'
-import { Modal } from '../../modal'
 import { QrCode } from '../../qrCode'
 import { AssetIcon } from '../assetIcon'
 import * as Styled from './AssetInfo.style'
@@ -117,7 +116,7 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         walletInfo,
         O.map(({ address }) => (
-          <Modal
+          <Styled.QrCodeModal
             key="qr code modal"
             title={intl.formatMessage({ id: 'wallet.action.receive' }, { asset: assetString })}
             visible={showQrModal}
@@ -125,7 +124,7 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
             onOk={closeQrModal}>
             <QrCode text={address} qrError={intl.formatMessage({ id: 'wallet.receive.address.errorQR' })} />
             {renderAddress()}
-          </Modal>
+          </Styled.QrCodeModal>
         )),
         O.getOrElse(() => <></>)
       ),
