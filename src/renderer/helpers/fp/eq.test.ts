@@ -181,7 +181,8 @@ describe('helpers/fp/eq', () => {
       const a: PoolShare = {
         type: 'asym',
         units: baseAmount(1),
-        asset: AssetRuneNative
+        asset: AssetRuneNative,
+        assetAddedAmount: baseAmount(1)
       }
       expect(eqPoolShare.equals(a, a)).toBeTruthy()
     })
@@ -189,7 +190,8 @@ describe('helpers/fp/eq', () => {
       const a: PoolShare = {
         type: 'asym',
         units: baseAmount(1),
-        asset: AssetRuneNative
+        asset: AssetRuneNative,
+        assetAddedAmount: baseAmount(1)
       }
       // b = same as a, but another units
       const b: PoolShare = {
