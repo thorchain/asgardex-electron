@@ -35,6 +35,7 @@ export const Table = styled(UITable)`
 export const AddressEllipsis = styled(UIAddressEllipsis)`
   font-weight: 300;
   color: ${palette('text', 1)};
+  text-transform: none;
 `
 
 export const BondCol = styled(ACol)`
@@ -74,4 +75,8 @@ export const DeleteButton = styled(UIButton).attrs({ typevalue: 'transparent' })
       color: ${palette('error', 1)};
     }
   }
+`
+
+export const ConfirmationModalWalletText = styled.span`
+  text-transform: none;
 `
