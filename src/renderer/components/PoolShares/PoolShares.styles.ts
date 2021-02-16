@@ -2,6 +2,7 @@ import * as AIcons from '@ant-design/icons/lib'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { ManageButton as ManageButtonUI } from '../manageButton'
 import { Button as UIButton } from '../uielements/button'
 import { Label as UILabel } from '../uielements/label'
 import { Table as UITable } from '../uielements/table'
@@ -49,6 +50,12 @@ export const InfoButton = styled(UIButton).attrs({
   }
   margin-top: 30px;
   padding-left: 30px;
+`
+
+export const ManageButton = styled(ManageButtonUI)`
+  &.ant-btn {
+    display: inline-flex;
+  }
 `
 
 export const InfoArrow = styled(AIcons.ArrowUpOutlined)`

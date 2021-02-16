@@ -112,14 +112,24 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
     []
   )
 
-  const desktopColumns: ColumnsType<PoolShareTableRowData> = useMemo(
-    () => [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn],
-    [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn]
+  const manageColumn: ColumnType<PoolShareTableRowData> = useMemo(
+    () => ({
+      title: '',
+      align: 'right',
+      render: ({ asset }: PoolShareTableRowData) => <Styled.ManageButton asset={asset} />
+    }),
+    []
   )
 
-  const mobileColumns: ColumnsType<PoolShareTableRowData> = useMemo(() => [iconColumn, valueColumn], [
+  const desktopColumns: ColumnsType<PoolShareTableRowData> = useMemo(
+    () => [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn, manageColumn],
+    [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn, manageColumn]
+  )
+
+  const mobileColumns: ColumnsType<PoolShareTableRowData> = useMemo(() => [iconColumn, valueColumn, manageColumn], [
     iconColumn,
-    valueColumn
+    valueColumn,
+    manageColumn
   ])
 
   return (

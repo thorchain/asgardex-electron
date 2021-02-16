@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useRef } from 'react'
 
-import { SwapOutlined, PlusOutlined } from '@ant-design/icons'
+import { SwapOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { assetToString, baseToAsset, formatAssetAmountCurrency, formatBN } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
@@ -10,13 +10,13 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import { ManageButton } from '../../components/manageButton'
 import { Button } from '../../components/uielements/button'
 import { Label } from '../../components/uielements/label'
 import { Table } from '../../components/uielements/table'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import * as depositRoutes from '../../routes/deposit'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { PoolsState } from '../../services/midgard/types'
@@ -53,22 +53,10 @@ export const ActivePools: React.FC = (): JSX.Element => {
     [getSwapPath, history]
   )
 
-  const getDepositPath = depositRoutes.deposit.path
-
-  const clickDepositHandler = useCallback(
-    (asset: string) => {
-      history.push(getDepositPath({ asset }))
-    },
-    [history, getDepositPath]
-  )
-
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <TableAction>
-        <Button round="true" onClick={() => clickDepositHandler(assetToString(pool.target))} typevalue="outline">
-          <PlusOutlined />
-          {intl.formatMessage({ id: 'common.liquidity' })}
-        </Button>
+        <ManageButton asset={pool.target} />
         <Button
           round="true"
           onClick={() => clickSwapHandler({ source: assetToString(pool.asset), target: assetToString(pool.target) })}>
@@ -78,7 +66,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
       </TableAction>
     ),
 
-    [clickDepositHandler, clickSwapHandler, intl]
+    [clickSwapHandler, intl]
   )
 
   const btnPoolsColumn = useMemo(

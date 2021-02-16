@@ -1,22 +1,18 @@
 import React, { useCallback, useMemo, useRef } from 'react'
 
-import { PlusOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { assetToString } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import * as O from 'fp-ts/lib/Option'
 import { Option, none, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
 
-import { Button } from '../../components/uielements/button'
+import { ManageButton } from '../../components/manageButton'
 import { Table } from '../../components/uielements/table'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
-import * as depositRoutes from '../../routes/deposit'
 import { PendingPoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
@@ -24,7 +20,6 @@ import * as Shared from './PoolsOverview.shared'
 import { TableAction, BlockLeftLabel } from './PoolsOverview.style'
 
 export const PendingPools: React.FC = (): JSX.Element => {
-  const history = useHistory()
   const intl = useIntl()
 
   const { service: midgardService } = useMidgardContext()
@@ -64,25 +59,13 @@ export const PendingPools: React.FC = (): JSX.Element => {
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
-  const getDepositPath = depositRoutes.deposit.path
-
-  const clickDepositHandler = useCallback(
-    (asset: string) => {
-      history.push(getDepositPath({ asset }))
-    },
-    [history, getDepositPath]
-  )
-
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <TableAction>
-        <Button round="true" onClick={() => clickDepositHandler(assetToString(pool.target))} typevalue="outline">
-          <PlusOutlined />
-          liquidity
-        </Button>
+        <ManageButton asset={pool.target} />
       </TableAction>
     ),
-    [clickDepositHandler]
+    []
   )
 
   const btnPendingPoolsColumn = useMemo(
