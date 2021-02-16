@@ -55,4 +55,6 @@ export type NodeInfo = {
 
 export type NodeInfoLD = LiveData<ApiError, NodeInfo>
 
+export type NodeDataRD = RD.RemoteData<ApiError, NodeInfo>
+
 export type ThorNodeApiUrlLD = LiveData<ApiError, string>

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
 import { ColumnType } from 'antd/lib/table'
-import { useIntl } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { ConfirmationModal } from '../../modal/confirmation'
@@ -97,7 +97,15 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
           onSuccess={() => {
             removeNode(nodeToRemove)
           }}
-          message={intl.formatMessage({ id: 'bonds.node.removeMessage' }, { node: nodeToRemove })}
+          message={
+            <FormattedMessage
+              id="bonds.node.removeMessage"
+              defaultMessage="Are you sure you want to delete {node} node?"
+              values={{
+                node: <Styled.ConfirmationModalWalletText>{nodeToRemove}</Styled.ConfirmationModalWalletText>
+              }}
+            />
+          }
         />
       )}
     </>
