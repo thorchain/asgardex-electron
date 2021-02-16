@@ -1,7 +1,7 @@
 {
   "name": "asgardex",
   "productName": "ASGARDEX",
-  "version": "0.0.5",
+  "version": "0.0.5-alpha.1",
   "description": "WALLET AND EXCHANGE CLIENT FOR THORCHAIN",
   "main": "public/electron.js",
   "scripts": {
@@ -148,6 +148,7 @@
     "ts-loader": "^8.0.14",
     "ts-node": "^9.1.1",
     "wait-on": "^5.2.1",
-    "webpack-cli": "^4.3.1"
+    "webpack-cli": "^4.3.1",
+    "webpack-node-externals": "^2.5.2"
   }
 }
