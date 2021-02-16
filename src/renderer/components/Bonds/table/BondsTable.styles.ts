@@ -3,7 +3,6 @@ import { Col as ACol } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { ConfirmationModal as ConfirmationModalUI } from '../../modal/confirmation'
 import { AddressEllipsis as UIAddressEllipsis } from '../../uielements/addressEllipsis'
 import { Button as UIButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
@@ -78,6 +77,6 @@ export const DeleteButton = styled(UIButton).attrs({ typevalue: 'transparent' })
   }
 `
 
-export const ConfirmationModal = styled(ConfirmationModalUI)`
+export const ConfirmationModalWalletText = styled.span`
   text-transform: none;
 `

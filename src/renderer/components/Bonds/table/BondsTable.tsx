@@ -2,9 +2,10 @@ import React, { useMemo, useState } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
 import { ColumnType } from 'antd/lib/table'
-import { useIntl } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
+import { ConfirmationModal } from '../../modal/confirmation'
 import { Node } from '../types'
 import * as Styled from './BondsTable.styles'
 import * as H from './helpers'
@@ -91,21 +92,20 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
         dataSource={nodes.map((node) => ({ ...node, key: node.nodeAddress }))}
       />
       {nodeToRemove && (
-        <Styled.ConfirmationModal
+        <ConfirmationModal
           onClose={() => setNodeToRemove(null)}
           onSuccess={() => {
             removeNode(nodeToRemove)
           }}
-          message={intl
-            .formatMessage({ id: 'bonds.node.removeMessage' }, { node: nodeToRemove })
-            .toUpperCase()
-            /**
-             * Style resulted string directly with JS-runtime by replacing
-             * uppercased nodeAddress with initial nodeToRemove value as
-             * we can not pass React.Node value for formatMessage 'values' parameter so we
-             * can not style node address with css separately of intl.formatMessage results.
-             */
-            .replace(nodeToRemove.toUpperCase(), nodeToRemove)}
+          message={
+            <FormattedMessage
+              id="bonds.node.removeMessage"
+              defaultMessage="Are you sure you want to delete {node} node?"
+              values={{
+                node: <Styled.ConfirmationModalWalletText>{nodeToRemove}</Styled.ConfirmationModalWalletText>
+              }}
+            />
+          }
         />
       )}
     </>

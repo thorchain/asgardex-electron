@@ -8,7 +8,7 @@ import * as Styled from './ConfirmationModal.styles'
 type Props = {
   onSuccess: FP.Lazy<void>
   onClose: FP.Lazy<void>
-  message: string
+  message: React.ReactNode
   className?: string
 }
 
