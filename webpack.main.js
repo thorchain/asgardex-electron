@@ -1,5 +1,7 @@
 const path = require('path')
 
+const nodeExternals = require('webpack-node-externals')
+
 const common = (_ /* env */, argv) => ({
   output: {
     path: path.resolve(__dirname, 'public'),
@@ -23,10 +25,7 @@ const common = (_ /* env */, argv) => ({
     __dirname: false,
     __filename: false
   },
-  externals: {
-    'node-hid': 'commonjs node-hid',
-    usb: 'commonjs usb'
-  }
+  externals: [nodeExternals()]
 })
 
 const main = (env, arg) => {
