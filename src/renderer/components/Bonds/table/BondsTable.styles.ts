@@ -3,6 +3,7 @@ import { Col as ACol } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { ConfirmationModal as ConfirmationModalUI } from '../../modal/confirmation'
 import { AddressEllipsis as UIAddressEllipsis } from '../../uielements/addressEllipsis'
 import { Button as UIButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
@@ -35,6 +36,7 @@ export const Table = styled(UITable)`
 export const AddressEllipsis = styled(UIAddressEllipsis)`
   font-weight: 300;
   color: ${palette('text', 1)};
+  text-transform: none;
 `
 
 export const BondCol = styled(ACol)`
@@ -74,4 +76,8 @@ export const DeleteButton = styled(UIButton).attrs({ typevalue: 'transparent' })
       color: ${palette('error', 1)};
     }
   }
+`
+
+export const ConfirmationModal = styled(ConfirmationModalUI)`
+  text-transform: none;
 `

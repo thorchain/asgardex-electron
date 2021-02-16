@@ -5,7 +5,6 @@ import { ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
-import { ConfirmationModal } from '../../modal/confirmation'
 import { Node } from '../types'
 import * as Styled from './BondsTable.styles'
 import * as H from './helpers'
@@ -92,12 +91,21 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
         dataSource={nodes.map((node) => ({ ...node, key: node.nodeAddress }))}
       />
       {nodeToRemove && (
-        <ConfirmationModal
+        <Styled.ConfirmationModal
           onClose={() => setNodeToRemove(null)}
           onSuccess={() => {
             removeNode(nodeToRemove)
           }}
-          message={intl.formatMessage({ id: 'bonds.node.removeMessage' }, { node: nodeToRemove })}
+          message={intl
+            .formatMessage({ id: 'bonds.node.removeMessage' }, { node: nodeToRemove })
+            .toUpperCase()
+            /**
+             * Style resulted string directly with JS-runtime by replacing
+             * uppercased nodeAddress with initial nodeToRemove value as
+             * we can not pass React.Node value for formatMessage 'values' parameter so we
+             * can not style node address with css separately of intl.formatMessage results.
+             */
+            .replace(nodeToRemove.toUpperCase(), nodeToRemove)}
         />
       )}
     </>
