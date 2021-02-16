@@ -3,7 +3,7 @@ name: Electron build
 on:
   push:
     branches:
-      - master
+      - fix/sign-issue-temporary
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@v2
         with:
-          ref: master
+          ref: fix/sign-issue-temporary
 
       - name: Install missing dependencies on Linux
         run: sudo apt-get update && sudo apt-get install libudev-dev libusb-1.0-0-dev
