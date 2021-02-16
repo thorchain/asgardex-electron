@@ -9,8 +9,7 @@ import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
-import { NodeStatus } from '../../../services/thorchain/types'
-import { NodeDataRD } from '../types'
+import { NodeStatus, NodeDataRD } from '../../../services/thorchain/types'
 import * as Styled from './BondsTable.styles'
 
 export const NodeAddress: React.FC<{ address: Address; network: Network }> = ({ address, network }) => (
