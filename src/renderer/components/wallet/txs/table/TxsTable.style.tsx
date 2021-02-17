@@ -8,7 +8,7 @@ import { Table as UITable } from '../../../uielements/table'
 
 export const Table = styled(UITable)`
   .ant-table-thead > tr > th {
-    font-size: 16px;
+    font-size: 14px;
     font-family: 'MainFontRegular';
     border: none;
     color: ${palette('gray', 2)};

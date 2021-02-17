@@ -5,14 +5,15 @@ import * as FP from 'fp-ts/lib/function'
 
 import { ErrorView } from '../../components/shared/error'
 import { AssetIcon } from '../../components/uielements/assets/assetIcon'
-import { Label } from '../../components/uielements/label'
 import { ReloadButton } from '../../components/uielements/reloadButton'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { sortByDepth } from '../../helpers/poolHelper'
 import { PoolTableRowData } from './Pools.types'
-import { ActionColumn } from './PoolsOverview.style'
+import * as Styled from './PoolsOverview.style'
 
-const renderAssetColumn = ({ pool }: PoolTableRowData) => <Label align="center">{pool.target.ticker}</Label>
+const renderAssetColumn = ({ pool }: PoolTableRowData) => (
+  <Styled.Label align="center">{pool.target.ticker}</Styled.Label>
+)
 
 const sortAssetColumn = ({ pool: poolA }: PoolTableRowData, { pool: poolB }: PoolTableRowData) =>
   poolA.target.symbol.localeCompare(poolB.target.symbol)
@@ -52,13 +53,13 @@ export const poolColumnMobile = (title: string): ColumnType<PoolTableRowData> =>
 })
 
 const renderPriceColumn = (pricePoolAsset: Asset) => ({ poolPrice }: PoolTableRowData) => (
-  <Label align="right" nowrap>
+  <Styled.Label align="right" nowrap>
     {formatAssetAmountCurrency({
       amount: baseToAsset(poolPrice),
       asset: pricePoolAsset,
       decimal: 3
     })}
-  </Label>
+  </Styled.Label>
 )
 
 const sortPriceColumn = (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.poolPrice, b.poolPrice)
@@ -73,13 +74,13 @@ export const priceColumn = (title: string, pricePoolAsset: Asset): ColumnType<Po
 })
 
 const renderDepthColumn = (pricePoolAsset: Asset) => ({ depthPrice }: PoolTableRowData) => (
-  <Label align="right" nowrap>
+  <Styled.Label align="right" nowrap>
     {formatAssetAmountCurrency({
       amount: baseToAsset(depthPrice),
       asset: pricePoolAsset,
       decimal: 2
     })}
-  </Label>
+  </Styled.Label>
 )
 
 export const depthColumn = (title: string, pricePoolAsset: Asset): ColumnType<PoolTableRowData> => ({
@@ -94,9 +95,9 @@ export const depthColumn = (title: string, pricePoolAsset: Asset): ColumnType<Po
 })
 
 export const renderRefreshBtnColTitle = (title: string, clickHandler: FP.Lazy<void>) => (
-  <ActionColumn>
+  <Styled.ActionColumn>
     <ReloadButton onClick={clickHandler}>{title}</ReloadButton>
-  </ActionColumn>
+  </Styled.ActionColumn>
 )
 
 export const renderTableError = (reloadBtnLabel: string, reloadBtnAction: FP.Lazy<void>) => (error: Error) => (
