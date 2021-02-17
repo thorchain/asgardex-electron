@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { Button as UIButton, ButtonProps as UIButtonProps } from '../../components/uielements/button'
-import { Label } from '../../components/uielements/label'
+import { Label as UILabel } from '../../components/uielements/label'
 import { media } from '../../helpers/styleHelper'
 
 export const Tabs = styled(A.Tabs)`
@@ -51,7 +51,12 @@ export const ActionColumn = styled.div`
   justify-content: center;
 `
 
-export const BlockLeftLabel = styled(Label)`
+export const BlockLeftLabel = styled(UILabel)`
   display: inline-block;
   width: 100px;
+  font-size: 16px;
+`
+
+export const Label = styled(UILabel)`
+  font-size: 16px;
 `

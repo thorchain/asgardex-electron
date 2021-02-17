@@ -15,7 +15,7 @@ export const Table = styled(UITable)`
   .ant-table-thead > tr {
     background: ${palette('gray', 0)};
     & > th {
-      font-size: 16px;
+      font-size: 14px;
       border: none;
       padding-top: 2px;
       padding-bottom: 2px;
