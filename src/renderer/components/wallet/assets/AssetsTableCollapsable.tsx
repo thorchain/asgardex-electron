@@ -22,7 +22,6 @@ import { WalletBalance } from '../../../types/wallet'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
-import { Label } from '../../uielements/label'
 import * as Styled from './AssetsTableCollapsable.style'
 
 const { Panel } = Collapse
@@ -93,7 +92,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const nameColumn: ColumnType<Balance> = useMemo(
     () => ({
       width: 140,
-      render: ({ asset }: Balance) => <Label>{asset.symbol}</Label>
+      render: ({ asset }: Balance) => <Styled.Label>{asset.symbol}</Styled.Label>
     }),
     []
   )
@@ -103,7 +102,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       width: 80,
       render: ({ asset, walletAddress }: WalletBalance) => (
         <Styled.BnbRuneTickerWrapper>
-          <Label nowrap>{asset.ticker}</Label>
+          <Styled.Label nowrap>{asset.ticker}</Styled.Label>
           {isRuneBnbAsset(asset) && (
             <Styled.UpgradeButton
               onClick={(e) => {
@@ -124,9 +123,9 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const renderBalanceColumn = ({ asset, amount }: Balance) => {
     const balance = formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 3 })
     return (
-      <Label nowrap align="right">
+      <Styled.Label nowrap align="right">
         {balance}
-      </Label>
+      </Styled.Label>
     )
   }
 
@@ -147,9 +146,9 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         O.getOrElse(() => '--')
       )
       return (
-        <Label nowrap align="right">
+        <Styled.Label nowrap align="right">
           {label}
-        </Label>
+        </Styled.Label>
       )
     },
     [poolDetails, pricePool.asset, pricePool.poolData]

@@ -1,5 +1,4 @@
 import * as AIcons from '@ant-design/icons/lib'
-import { Col as ACol } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -12,7 +11,7 @@ export const Table = styled(UITable)`
   .ant-table-thead > tr {
     background: ${palette('gray', 0)};
     & > th {
-      font-size: 16px;
+      font-size: 14px;
       border: none;
       padding-top: 2px;
       padding-bottom: 2px;
@@ -34,16 +33,9 @@ export const Table = styled(UITable)`
 
 export const AddressEllipsis = styled(UIAddressEllipsis)`
   font-weight: 300;
+  font-size: 16px;
   color: ${palette('text', 1)};
   text-transform: none;
-`
-
-export const BondCol = styled(ACol)`
-  width: 100px;
-`
-
-export const AwardCol = styled(ACol)`
-  width: 80px;
 `
 
 export const InfoButton = styled(UIButton).attrs({
@@ -62,7 +54,7 @@ export const InfoArrow = styled(AIcons.ArrowUpOutlined)`
 
 export const TextLabel = styled(UILabel).attrs({ textTransform: 'uppercase' })`
   color: inherit;
-  line-height: 16px;
+  font-size: 16px;
 `
 
 export const DeleteButton = styled(UIButton).attrs({ typevalue: 'transparent' })`
