@@ -12,7 +12,6 @@ import { sequenceSOption, sequenceTOption } from '../../../../helpers/fpHelpers'
 import { loadingString, emptyString } from '../../../../helpers/stringHelper'
 import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
 import { NonEmptyWalletBalances } from '../../../../services/wallet/types'
-import { Modal } from '../../modal'
 import { QrCode } from '../../qrCode'
 import { AssetIcon } from '../assetIcon'
 import * as Styled from './AssetInfo.style'
@@ -116,17 +115,21 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         walletInfo,
-        O.map(({ address }) => (
-          <Modal
-            key="qr code modal"
-            title={intl.formatMessage({ id: 'wallet.action.receive' }, { asset: assetString })}
-            visible={showQrModal}
-            onCancel={closeQrModal}
-            onOk={closeQrModal}>
-            <QrCode text={address} qrError={intl.formatMessage({ id: 'wallet.receive.address.errorQR' })} />
-            {renderAddress()}
-          </Modal>
-        )),
+        O.map(({ address }) =>
+          !showQrModal ? (
+            <></>
+          ) : (
+            <Styled.QrCodeModal
+              key="qr code modal"
+              title={intl.formatMessage({ id: 'wallet.action.receive' }, { asset: assetString })}
+              visible={showQrModal}
+              onCancel={closeQrModal}
+              onOk={closeQrModal}>
+              <QrCode text={address} qrError={intl.formatMessage({ id: 'wallet.receive.address.errorQR' })} />
+              {renderAddress()}
+            </Styled.QrCodeModal>
+          )
+        ),
         O.getOrElse(() => <></>)
       ),
     [showQrModal, closeQrModal, walletInfo, assetString, intl, renderAddress]

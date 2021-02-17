@@ -4,6 +4,7 @@ import { Address } from '@xchainjs/xchain-client'
 import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
+import * as NEA from 'fp-ts/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
@@ -16,11 +17,16 @@ import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useUserNodesContext } from '../../contexts/UserNodesContext'
 import { AddressValidation } from '../../services/bitcoin/types'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { NodeInfoLD } from '../../services/thorchain/types'
+import { NodeInfoLD, NodeDataRD } from '../../services/thorchain/types'
+
+type Node = {
+  nodeAddress: Address
+  data: NodeDataRD
+}
 
 export const BondsView: React.FC = (): JSX.Element => {
   const { client$, getNodeInfo$ } = useThorchainContext()
-  const { userNodes$, addNodeAddress, removeNodeByAddress } = useUserNodesContext()
+  const { userNodes$, addNodeAddress, removeNodeByAddress: removeNodeByAddressService } = useUserNodesContext()
 
   const oClient = useObservableState<O.Option<ThorchainClient>>(client$, O.none)
 
@@ -51,7 +57,7 @@ export const BondsView: React.FC = (): JSX.Element => {
 
   const nodeInfoCacheRef = useRef<Record<Address, NodeInfoLD>>({})
 
-  const nodesInfo$ = useMemo(
+  const nodesInfo$: Rx.Observable<Node[]> = useMemo(
     () =>
       FP.pipe(
         userNodes,
@@ -72,13 +78,33 @@ export const BondsView: React.FC = (): JSX.Element => {
             RxOp.map((data) => ({ data, nodeAddress: node }))
           )
         }),
-        // Combine resulted Array<Observable> to Observable<Array>
-        (nodesInfo) => Rx.combineLatest(nodesInfo)
+        NEA.fromArray,
+        O.fold(
+          /* If there is no userNodes return Rx.of([]) to trigger re-render:
+           * returning Rx.EMPTY will not trigger any subscriptions when unwrapping
+           * nodesInfo$ with useObservableState and nodesInfo will store previous value
+           * with the last single result inside
+           * */
+          (): Rx.Observable<Node[]> => Rx.of([]),
+          // Combine resulted Array<Observable> to Observable<Array>
+          (nodesInfo) => Rx.combineLatest(nodesInfo)
+        )
       ),
     [userNodes, getNodeInfo$, network]
   )
 
   const nodesInfo = useObservableState(nodesInfo$, [])
+
+  const removeNodeByAddress = useCallback(
+    (node: Address) => {
+      if (nodeInfoCacheRef.current[node]) {
+        // Also remove from cached results
+        delete nodeInfoCacheRef.current[node]
+      }
+      removeNodeByAddressService(node)
+    },
+    [removeNodeByAddressService]
+  )
 
   return (
     <Bonds

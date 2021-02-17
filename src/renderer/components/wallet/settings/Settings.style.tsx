@@ -130,7 +130,7 @@ export const AccountCard = styled(A.Card)`
 `
 
 export const ListItem = styled(A.List.Item)`
-  padding: 20px 20px;
+  padding: 10px 20px;
   flex-direction: column;
   align-items: start;
   border: none;
@@ -152,7 +152,6 @@ export const ChainName = styled(UILabel)`
 
 export const ChainContent = styled.div`
   margin-left: 30px;
-  margin-top: 10px;
   width: 100%;
 `
 

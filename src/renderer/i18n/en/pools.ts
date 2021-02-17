@@ -7,8 +7,8 @@ const pools: PoolsMessages = {
   'pools.avgfee': 'avg fee',
   'pools.blocksleft': 'blocks left',
   'pools.trades': 'Trades',
-  'pools.pending': 'Pending pools',
-  'pools.available': 'Available pools'
+  'pools.pending': 'Pending',
+  'pools.available': 'Available'
 }
 
 export default pools

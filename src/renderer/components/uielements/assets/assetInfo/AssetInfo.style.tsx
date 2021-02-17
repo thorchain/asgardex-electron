@@ -5,6 +5,7 @@ import { palette } from 'styled-theme'
 
 import { media } from '../../../../helpers/styleHelper'
 import { AddressEllipsis as UIAddressEllipsis } from '../../addressEllipsis'
+import { Modal as UIModal } from '../../modal'
 
 export const Card = styled(A.Card)`
   .ant-card-body {
@@ -63,10 +64,17 @@ export const AddressContainer = styled.div`
 
 const ICON_SIZE = 20
 
+export const QrCodeModal = styled(UIModal).attrs({
+  okButtonProps: { autoFocus: true }
+})`
+  text-transform: none;
+`
+
 export const AddressEllipsis = styled(UIAddressEllipsis)`
   margin-right: 5px;
   max-width: 100%;
   overflow: hidden;
+  font-size: 1rem;
 
   &:only-child {
     margin: auto;
