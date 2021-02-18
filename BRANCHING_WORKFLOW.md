@@ -6,9 +6,9 @@ For development ASGARDEX we follow [OneFlow approach](https://www.endoflineblog.
 
 - Based on [OneFlow (Variation – develop + master)](https://www.endoflineblog.com/oneflow-a-git-branching-model-and-workflow#variation-develop-master)
 - `develop` branch for development
-- `release/{version}` branches are created from `develop`. It will be finalized by creating a new tag (semver based). (Possible) changes are merged back into `develop`.
-- `hotfix/{version}` branches are created from `develop`. It will be finalized by creating a new tag (semver based). Changes are merged back into `develop`.
-- `master` includes always latest stable production build by fast-forwarding to tag of latest release or latest hotfix.
+- `master` includes always latest stable production build by fast-forwarding to tags of latest release or latest hotfix.
+- `release/{version}` branches are created from `develop`. It will be finalized by creating a new tag (semver based). (Possible) changes are merged back into `develop`. `master` will be fast-forwarded to this tag.
+- `hotfix/{version}` branches are created from `master` or from latest tag. It will be finalized by creating a new tag (semver based). Changes are merged back into `develop`. `master` will be fast-forwarded to this tag.
 - Naming conventions for branches (`release/{version}` or `hotfix/{version}`) are important! These are needed to trigger actions for Electron builds (defined in `.github/workflows/build.yml`).
 
 ## Development
