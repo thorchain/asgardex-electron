@@ -24,7 +24,12 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
   const intl = useIntl()
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
-  const { balancesState$, getExplorerTxUrl$ } = useWalletContext()
+  const {
+    balancesState$,
+    getExplorerTxUrl$,
+    keystoreService: { validatePassword$ },
+    reloadBalances
+  } = useWalletContext()
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
@@ -62,7 +67,15 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             />
           )
         case 'ETH':
-          return <SendViewETH selectedAsset={asset} walletBalances={balances} getExplorerTxUrl={getExplorerTxUrl} />
+          return (
+            <SendViewETH
+              selectedAsset={asset}
+              walletBalances={balances}
+              getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
+              reloadBalancesHandler={reloadBalances}
+            />
+          )
         case 'THOR':
           return <SendViewTHOR thorAsset={asset} balances={balances} getExplorerTxUrl={getExplorerTxUrl} />
         default:
@@ -78,7 +91,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [balances, getExplorerTxUrl, intl, reloadBTCFees]
+    [balances, getExplorerTxUrl, intl, reloadBTCFees, reloadBalances, validatePassword$]
   )
 
   return FP.pipe(

@@ -20,15 +20,25 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
 
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
 import { isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
+import { emptyString } from '../../../../helpers/stringHelper'
 import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
+import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
+import { SendTxState, SendTxState$ } from '../../../../services/chain/types'
 import { FeesRD, WalletBalances } from '../../../../services/clients'
+// import { SendTxParams } from '../../../../services/ethereum/types'
 import { SendTxParams } from '../../../../services/ethereum/types'
+import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../types/wallet'
+import { PasswordModal } from '../../../modal/password'
+import { ErrorView } from '../../../shared/error'
 import * as StyledR from '../../../shared/form/Radio.style'
+import { SuccessView } from '../../../shared/success'
+import { ViewTxButton } from '../../../uielements/button'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
@@ -46,15 +56,66 @@ export type FormValues = {
 export type Props = {
   balances: WalletBalances
   balance: WalletBalance
-  onSubmit: ({ recipient, amount, asset, memo, feeOptionKey }: SendTxParams) => void
+  // onSubmit: ({ recipient, amount, asset, memo, feeOptionKey }: SendTxParams) => void
   isLoading?: boolean
   fees: FeesRD
   reloadFeesHandler: (params: FeesParams) => void
+  reloadBalancesHandler: FP.Lazy<void>
+  validatePassword$: ValidatePasswordHandler
+  send$: (_: SendTxParams) => SendTxState$
+  successActionHandler: (txHash: string) => Promise<void>
 }
 
 export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit, balances, balance, isLoading = false, fees: feesRD, reloadFeesHandler } = props
+  const {
+    balances,
+    balance,
+    isLoading = false,
+    fees: feesRD,
+    reloadFeesHandler,
+    reloadBalancesHandler,
+    validatePassword$,
+    send$,
+    successActionHandler
+  } = props
   const intl = useIntl()
+
+  // State for visibility of Modal to confirm upgrade
+  const [showConfirmSendModal, setShowConfirmSendModal] = useState(false)
+
+  // (Possible) subscription of upgrade tx
+  const [sendTxSub, _setSendTxSub] = useState<O.Option<Rx.Subscription>>(O.none)
+
+  // unsubscribe upgrade$ subscription
+  const unsubscribeSendTxSub = useCallback(() => {
+    FP.pipe(
+      sendTxSub,
+      O.map((sub) => sub.unsubscribe())
+    )
+  }, [sendTxSub])
+
+  const setSendTxSub = useCallback(
+    (state) => {
+      unsubscribeSendTxSub()
+      _setSendTxSub(state)
+    },
+    [unsubscribeSendTxSub]
+  )
+
+  useEffect(() => {
+    // Unsubscribe of (possible) previous subscription of `send$`
+    return () => {
+      unsubscribeSendTxSub()
+    }
+  }, [unsubscribeSendTxSub])
+
+  // State of upgrade tx
+  const [sendTxState, setSendTxState] = useState<SendTxState>(INITIAL_SEND_STATE)
+
+  const resetTxState = useCallback(() => {
+    setSendTxState(INITIAL_SEND_STATE)
+    setSendTxSub(O.none)
+  }, [setSendTxSub])
 
   const changeAssetHandler = useChangeAssetHandler()
 
@@ -239,23 +300,48 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     [balance, intl, maxAmount]
   )
 
-  const onFinishHandler = useCallback(
-    ({ memo }: FormValues) =>
-      FP.pipe(
-        sequenceTOption(sendAmount, sendAddress),
-        O.map(([amount, recipient]) => {
-          onSubmit({
-            recipient,
-            amount,
-            asset: balance.asset,
-            feeOptionKey: selectedFeeOptionKey,
-            memo
-          })
-          return true
-        })
-      ),
-    [balance.asset, onSubmit, selectedFeeOptionKey, sendAddress, sendAmount]
-  )
+  // const onFinishHandler = useCallback(
+  //   ({ memo }: FormValues) =>
+  //     FP.pipe(
+  //       sequenceTOption(sendAmount, sendAddress),
+  //       O.map(([amount, recipient]) => {
+  //         onSubmit({
+  //           recipient,
+  //           amount,
+  //           asset: balance.asset,
+  //           feeOptionKey: selectedFeeOptionKey,
+  //           memo
+  //         })
+  //         return true
+  //       })
+  //     ),
+  //   [balance.asset, onSubmit, selectedFeeOptionKey, sendAddress, sendAmount]
+  // )
+
+  const onSubmit = useCallback(() => setShowConfirmSendModal(true), [])
+
+  const send = useCallback(() => {
+    FP.pipe(
+      sequenceTOption(sendAmount, sendAddress),
+      O.map(([amount, recipient]) => {
+        const subscription = send$({
+          recipient,
+          amount,
+          asset: balance.asset,
+          feeOptionKey: selectedFeeOptionKey,
+          memo: form.getFieldValue('memo')
+        }).subscribe(setSendTxState)
+
+        // store subscription
+        return setSendTxSub(O.some(subscription))
+      })
+    )
+  }, [balance.asset, form, selectedFeeOptionKey, send$, sendAddress, sendAmount, setSendTxSub])
+
+  const onFinishHandler = useCallback(() => {
+    reloadBalancesHandler()
+    resetTxState()
+  }, [reloadBalancesHandler, resetTxState])
 
   const onChangeAmount = useCallback(
     async (value: BigNumber) => {
@@ -293,74 +379,205 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     return false
   }, [balance.asset, reloadFeesHandler, sendAddress, sendAmount])
 
+  const txStatusMsg = useMemo(() => {
+    const stepDescriptions = [
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: balance.asset.symbol }),
+      intl.formatMessage({ id: 'common.tx.checkResult' })
+    ]
+    const { steps, status } = sendTxState
+
+    return FP.pipe(
+      status,
+      RD.fold(
+        () => emptyString,
+        () =>
+          `${stepDescriptions[steps.current - 1]} (${intl.formatMessage(
+            { id: 'common.step' },
+            { current: steps.current, total: steps.total }
+          )})`,
+        () => emptyString,
+        () => emptyString
+      )
+    )
+  }, [balance.asset.symbol, intl, sendTxState])
+
+  const renderSendForm = useMemo(
+    () => (
+      <Row>
+        <Styled.Col span={24}>
+          <AccountSelector onChange={changeAssetHandler} selectedAsset={balance.asset} walletBalances={balances} />
+          <Styled.Form
+            form={form}
+            initialValues={{
+              // default value for BigNumberInput
+              amount: bn(0),
+              // Default value for RadioGroup of feeOptions
+              fee: DEFAULT_FEE_OPTION_KEY
+            }}
+            onFinish={onSubmit}
+            labelCol={{ span: 24 }}>
+            <Styled.SubForm>
+              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
+              <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
+                <Input
+                  color="primary"
+                  size="large"
+                  disabled={isLoading}
+                  onBlur={reloadFees}
+                  onChange={onChangeAddress}
+                />
+              </Form.Item>
+              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
+              <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
+                <InputBigNumber
+                  min={0}
+                  size="large"
+                  disabled={isLoading}
+                  decimal={balance.amount.decimal}
+                  onBlur={reloadFees}
+                  onChange={onChangeAmount}
+                />
+              </Styled.FormItem>
+              <Styled.Label size="big" style={{ marginBottom: 0, paddingBottom: 0 }}>
+                {intl.formatMessage({ id: 'common.max' })}:{' '}
+                {formatAssetAmountCurrency({
+                  amount: maxAmount,
+                  asset: balance.asset,
+                  trimZeros: true
+                })}
+              </Styled.Label>
+              <Row align="middle">
+                <Col>
+                  <StyledForm.FeeLabel
+                    size="big"
+                    color={RD.isFailure(feesRD) ? 'error' : 'primary'}
+                    style={{ paddingTop: 0 }}
+                    disabled={RD.isPending(feesRD)}>
+                    {intl.formatMessage({ id: 'common.fees' })}: {selectedFeeLabel}
+                  </StyledForm.FeeLabel>
+                </Col>
+                <Col>
+                  <StyledForm.FeeButton onClick={reloadFees} disabled={RD.isPending(feesRD)}>
+                    <SyncOutlined />
+                  </StyledForm.FeeButton>
+                </Col>
+              </Row>
+              {renderFeeError}
+              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
+              <Form.Item name="memo">
+                <Input size="large" disabled={isLoading} />
+              </Form.Item>
+              <Form.Item name="fee">{renderFeeOptions}</Form.Item>
+            </Styled.SubForm>
+            <Styled.SubmitContainer>
+              <Styled.SubmitStatus>{txStatusMsg}</Styled.SubmitStatus>
+              <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
+                {intl.formatMessage({ id: 'wallet.action.send' })}
+              </Styled.Button>
+            </Styled.SubmitContainer>
+          </Styled.Form>
+        </Styled.Col>
+      </Row>
+    ),
+    [
+      addressValidator,
+      amountValidator,
+      balance.amount.decimal,
+      balance.asset,
+      balances,
+      changeAssetHandler,
+      feesAvailable,
+      feesRD,
+      form,
+      intl,
+      isLoading,
+      maxAmount,
+      onChangeAddress,
+      onChangeAmount,
+      onSubmit,
+      reloadFees,
+      renderFeeError,
+      renderFeeOptions,
+      selectedFeeLabel,
+      txStatusMsg
+    ]
+  )
+
+  const renderErrorBtn = useMemo(
+    () => <Styled.Button onClick={resetTxState}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,
+    [intl, resetTxState]
+  )
+
+  const renderSuccessExtra = useCallback(
+    (txHash: string) => {
+      const onClickHandler = () => successActionHandler(txHash)
+      return (
+        <Styled.SuccessExtraContainer>
+          <Styled.SuccessExtraButton onClick={onFinishHandler}>
+            {intl.formatMessage({ id: 'common.back' })}
+          </Styled.SuccessExtraButton>
+          <ViewTxButton txHash={O.some(txHash)} onClick={onClickHandler} />
+        </Styled.SuccessExtraContainer>
+      )
+    },
+    [intl, onFinishHandler, successActionHandler]
+  )
+
+  const sendConfirmationHandler = useCallback(() => {
+    // close confirmation modal
+    setShowConfirmSendModal(false)
+    send()
+  }, [send])
+
+  const renderConfirmSendModal = useMemo(
+    () =>
+      showConfirmSendModal ? (
+        <PasswordModal
+          onSuccess={sendConfirmationHandler}
+          onClose={() => setShowConfirmSendModal(false)}
+          validatePassword$={validatePassword$}
+        />
+      ) : (
+        <></>
+      ),
+    [sendConfirmationHandler, showConfirmSendModal, validatePassword$]
+  )
+
+  const renderSendStatus = useMemo(
+    () =>
+      FP.pipe(
+        sendTxState.status,
+        RD.fold(
+          () => renderSendForm,
+          () => renderSendForm,
+          (error) => (
+            <ErrorView
+              title={intl.formatMessage({ id: 'wallet.send.error' })}
+              subTitle={error.msg}
+              extra={renderErrorBtn}
+            />
+          ),
+          (hash) => (
+            <SuccessView title={intl.formatMessage({ id: 'common.success' })} extra={renderSuccessExtra(hash)} />
+          )
+        )
+      ),
+    [intl, renderErrorBtn, renderSendForm, renderSuccessExtra, sendTxState.status]
+  )
+
   return (
-    <Row>
-      <Styled.Col span={24}>
-        <AccountSelector onChange={changeAssetHandler} selectedAsset={balance.asset} walletBalances={balances} />
-        <Styled.Form
-          form={form}
-          initialValues={{
-            // default value for BigNumberInput
-            amount: bn(0),
-            // Default value for RadioGroup of feeOptions
-            fee: DEFAULT_FEE_OPTION_KEY
-          }}
-          onFinish={onFinishHandler}
-          labelCol={{ span: 24 }}>
-          <Styled.SubForm>
-            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
-            <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-              <Input color="primary" size="large" disabled={isLoading} onBlur={reloadFees} onChange={onChangeAddress} />
-            </Form.Item>
-            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
-            <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              <InputBigNumber
-                min={0}
-                size="large"
-                disabled={isLoading}
-                decimal={balance.amount.decimal}
-                onBlur={reloadFees}
-                onChange={onChangeAmount}
-              />
-            </Styled.FormItem>
-            <Styled.Label size="big" style={{ marginBottom: 0, paddingBottom: 0 }}>
-              {intl.formatMessage({ id: 'common.max' })}:{' '}
-              {formatAssetAmountCurrency({
-                amount: maxAmount,
-                asset: balance.asset,
-                trimZeros: true
-              })}
-            </Styled.Label>
-            <Row align="middle">
-              <Col>
-                <StyledForm.FeeLabel
-                  size="big"
-                  color={RD.isFailure(feesRD) ? 'error' : 'primary'}
-                  style={{ paddingTop: 0 }}
-                  disabled={RD.isPending(feesRD)}>
-                  {intl.formatMessage({ id: 'common.fees' })}: {selectedFeeLabel}
-                </StyledForm.FeeLabel>
-              </Col>
-              <Col>
-                <StyledForm.FeeButton onClick={reloadFees} disabled={RD.isPending(feesRD)}>
-                  <SyncOutlined />
-                </StyledForm.FeeButton>
-              </Col>
-            </Row>
-            {renderFeeError}
-            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
-            <Form.Item name="memo">
-              <Input size="large" disabled={isLoading} />
-            </Form.Item>
-            <Form.Item name="fee">{renderFeeOptions}</Form.Item>
-          </Styled.SubForm>
-          <Styled.SubmitItem>
-            <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
-              {intl.formatMessage({ id: 'wallet.action.send' })}
-            </Styled.Button>
-          </Styled.SubmitItem>
-        </Styled.Form>
-      </Styled.Col>
-    </Row>
+    <>
+      {renderConfirmSendModal}
+      {renderSendStatus}
+      {/* {FP.pipe(
+        txRD,
+        RD.fold(
+          () => renderSendStatus,
+          () => renderSendStatus,
+          (error) => <ErrorView title={error.msg} extra={renderErrorBtn} />,
+          () => renderSendStatus
+        )
+      )} */}
+    </>
   )
 }
