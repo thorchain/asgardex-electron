@@ -28,7 +28,7 @@ const deposit: DepositMessages = {
   'deposit.bond.state.error': 'Erreur lors de Lier',
   'deposit.unbond.state.error': 'Erreur lors de Délier',
   'deposit.leave.state.error': 'Erreur lors de Quitter',
-  'deposit.withdraw': 'Retirer',
+  'deposit.withdraw': 'Récupérer',
   'deposit.advancedMode': 'Mode avancé',
   'deposit.drag': 'Glisser pour déposer',
   'deposit.poolDetails.depth': 'Profondeur',
