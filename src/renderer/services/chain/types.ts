@@ -186,3 +186,20 @@ export type UpgradeRuneTxState = {
 }
 
 export type UpgradeRuneTxState$ = Rx.Observable<UpgradeRuneTxState>
+
+/**
+ * State to reflect status for sending
+ *
+ * Three steps are needed:
+ * 1. Send tx
+ * 2. Check status of tx
+ *
+ */
+export type SendTxState = {
+  // State of steps (current step + total number of steps)
+  readonly steps: { current: number; readonly total: 2 }
+  // RD of all steps
+  readonly status: RD.RemoteData<ApiError, TxHash>
+}
+
+export type SendTxState$ = Rx.Observable<SendTxState>
