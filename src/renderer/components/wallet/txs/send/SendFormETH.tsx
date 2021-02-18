@@ -23,16 +23,15 @@ import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
-import { isEthAsset } from '../../../../helpers/assetHelper'
+import { ETH_DECIMAL, isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { emptyString } from '../../../../helpers/stringHelper'
 import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
 import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
-import { SendTxState, SendTxState$ } from '../../../../services/chain/types'
+import { SendTxParams, SendTxState, SendTxState$ } from '../../../../services/chain/types'
 import { FeesRD, WalletBalances } from '../../../../services/clients'
-// import { SendTxParams } from '../../../../services/ethereum/types'
-import { SendTxParams } from '../../../../services/ethereum/types'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
+import { TxTypes } from '../../../../types/asgardex'
 import { WalletBalance } from '../../../../types/wallet'
 import { PasswordModal } from '../../../modal/password'
 import { ErrorView } from '../../../shared/error'
@@ -56,13 +55,11 @@ export type FormValues = {
 export type Props = {
   balances: WalletBalances
   balance: WalletBalance
-  // onSubmit: ({ recipient, amount, asset, memo, feeOptionKey }: SendTxParams) => void
-  isLoading?: boolean
   fees: FeesRD
   reloadFeesHandler: (params: FeesParams) => void
   reloadBalancesHandler: FP.Lazy<void>
   validatePassword$: ValidatePasswordHandler
-  send$: (_: SendTxParams) => SendTxState$
+  transfer$: (_: SendTxParams) => SendTxState$
   successActionHandler: (txHash: string) => Promise<void>
 }
 
@@ -70,12 +67,11 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   const {
     balances,
     balance,
-    isLoading = false,
     fees: feesRD,
     reloadFeesHandler,
     reloadBalancesHandler,
     validatePassword$,
-    send$,
+    transfer$,
     successActionHandler
   } = props
   const intl = useIntl()
@@ -121,7 +117,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
 
   const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>(DEFAULT_FEE_OPTION_KEY)
 
-  const [sendAmount, setSendAmount] = useState<O.Option<BaseAmount>>(O.none)
+  const [sendAmount, setSendAmount] = useState<O.Option<AssetAmount>>(O.none)
   const [sendAddress, setSendAddress] = useState<O.Option<Address>>(O.none)
 
   const [form] = Form.useForm<FormValues>()
@@ -237,6 +233,8 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     [intl]
   )
 
+  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
+
   const renderFeeOptions = useMemo(() => {
     const onChangeHandler = (e: RadioChangeEvent) => setSelectedFeeOptionKey(e.target.value)
     const disabled = !feesAvailable || isLoading
@@ -300,43 +298,26 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     [balance, intl, maxAmount]
   )
 
-  // const onFinishHandler = useCallback(
-  //   ({ memo }: FormValues) =>
-  //     FP.pipe(
-  //       sequenceTOption(sendAmount, sendAddress),
-  //       O.map(([amount, recipient]) => {
-  //         onSubmit({
-  //           recipient,
-  //           amount,
-  //           asset: balance.asset,
-  //           feeOptionKey: selectedFeeOptionKey,
-  //           memo
-  //         })
-  //         return true
-  //       })
-  //     ),
-  //   [balance.asset, onSubmit, selectedFeeOptionKey, sendAddress, sendAmount]
-  // )
-
   const onSubmit = useCallback(() => setShowConfirmSendModal(true), [])
 
   const send = useCallback(() => {
     FP.pipe(
       sequenceTOption(sendAmount, sendAddress),
       O.map(([amount, recipient]) => {
-        const subscription = send$({
+        const subscription = transfer$({
           recipient,
-          amount,
+          amount: assetToBase(amount),
           asset: balance.asset,
           feeOptionKey: selectedFeeOptionKey,
-          memo: form.getFieldValue('memo')
+          memo: form.getFieldValue('memo'),
+          txType: TxTypes.CREATE
         }).subscribe(setSendTxState)
 
         // store subscription
         return setSendTxSub(O.some(subscription))
       })
     )
-  }, [balance.asset, form, selectedFeeOptionKey, send$, sendAddress, sendAmount, setSendTxSub])
+  }, [balance.asset, form, selectedFeeOptionKey, transfer$, sendAddress, sendAmount, setSendTxSub])
 
   const onFinishHandler = useCallback(() => {
     reloadBalancesHandler()
@@ -348,7 +329,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setSendAmount(O.some(assetToBase(assetAmount(value))))
+          setSendAmount(O.some(assetAmount(value, ETH_DECIMAL)))
         })
         .catch(() => setSendAmount(O.none))
     },
@@ -372,7 +353,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     FP.pipe(
       sequenceTOption(sendAmount, sendAddress),
       O.map(([amount, recipient]) => {
-        return reloadFeesHandler({ asset: balance.asset, amount, recipient })
+        return reloadFeesHandler({ asset: balance.asset, amount: assetToBase(amount), recipient })
       })
     )
 
@@ -569,15 +550,6 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     <>
       {renderConfirmSendModal}
       {renderSendStatus}
-      {/* {FP.pipe(
-        txRD,
-        RD.fold(
-          () => renderSendStatus,
-          () => renderSendStatus,
-          (error) => <ErrorView title={error.msg} extra={renderErrorBtn} />,
-          () => renderSendStatus
-        )
-      )} */}
     </>
   )
 }
