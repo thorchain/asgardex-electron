@@ -29,6 +29,7 @@ export const reloadBalances: FP.Lazy<void> = () => {
   BNB.reloadBalances()
   ETH.reloadBalances()
   THOR.reloadBalances()
+  LTC.reloadBalances()
 }
 
 const reloadBalancesByChain: (chain: Chain) => FP.Lazy<void> = (chain) => {
