@@ -1,6 +1,7 @@
 import { getPrefix as getBinancePrefix } from '@xchainjs/xchain-binance'
 import { getPrefix as getBitcoinPrefix } from '@xchainjs/xchain-bitcoin'
 import { getPrefix as getBCHPrefix } from '@xchainjs/xchain-bitcoincash'
+import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import { getPrefix as getCosmosPrefix } from '@xchainjs/xchain-cosmos'
 import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
 import { getPrefix as getLitecoinPrefix } from '@xchainjs/xchain-litecoin'
@@ -18,18 +19,21 @@ import {
   BCHChain
 } from '@xchainjs/xchain-util'
 
-export const truncateAddress = (addr: string, chain: Chain, network: string): string => {
+import { Network } from '../../shared/api/types'
+
+export const truncateAddress = (addr: string, chain: Chain, network: Network): string => {
   const first = addr.substr(0, Math.max(getAddressPrefixLength(chain, network) + 3, 6))
   const last = addr.substr(addr.length - 3, 3)
   return `${first}...${last}`
 }
 
-export const getAddressPrefixLength = (chain: Chain, network: string): number => {
+export const getAddressPrefixLength = (chain: Chain, network: Network): number => {
+  const clientNetwork: ClientNetwork = network === 'testnet' ? 'testnet' : 'mainnet'
   switch (chain) {
     case BNBChain:
       return getBinancePrefix(network).length
     case BTCChain:
-      return getBitcoinPrefix(network).length
+      return getBitcoinPrefix(clientNetwork).length
     case CosmosChain:
       return getCosmosPrefix().length
     case ETHChain:
@@ -39,7 +43,7 @@ export const getAddressPrefixLength = (chain: Chain, network: string): number =>
     case THORChain:
       return getThorchainPrefix(network).length
     case LTCChain: {
-      return getLitecoinPrefix(network).length
+      return getLitecoinPrefix(clientNetwork).length
     }
     // TODO @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
     case BCHChain: {
