@@ -10,10 +10,10 @@ const bonds: BondsMessages = {
   'bonds.status.standby': 'En attente',
   'bonds.status.disabled': 'Hors service',
   'bonds.status.unknown': 'Inconnu',
-  'bonds.node.add': 'Add node',
-  'bonds.node.enterMessage': 'Enter node to monitor',
-  'bonds.validations.nodeAlreadyAdded': 'Node is already added',
-  'bonds.node.removeMessage': 'Are you sure you want to delete {node} node?'
+  'bonds.node.add': 'Ajouter un nœud',
+  'bonds.node.enterMessage': 'Entrez le nœud à surveiller',
+  'bonds.validations.nodeAlreadyAdded': 'Le nœud est déjà ajouté',
+  'bonds.node.removeMessage': 'Êtes-vous sûr de vouloir supprimer le nœud {node} ?'
 }
 
 export default bonds
