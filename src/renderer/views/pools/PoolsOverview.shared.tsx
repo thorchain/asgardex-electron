@@ -27,9 +27,9 @@ export const assetColumn = (title: string): ColumnType<PoolTableRowData> => ({
   defaultSortOrder: 'descend'
 })
 
-const renderPoolColumn = ({ pool }: PoolTableRowData) => (
+const renderPoolColumn = ({ pool, network }: PoolTableRowData) => (
   <Row justify="center" align="middle">
-    <AssetIcon asset={pool.target} />
+    <AssetIcon asset={pool.target} network={network} />
   </Row>
 )
 
@@ -41,9 +41,9 @@ export const poolColumn = (title: string): ColumnType<PoolTableRowData> => ({
   render: renderPoolColumn
 })
 
-const renderPoolColumnMobile = ({ pool }: PoolTableRowData) => (
+const renderPoolColumnMobile = ({ pool, network }: PoolTableRowData) => (
   <Row justify="center" align="middle" style={{ width: '100%' }}>
-    <AssetIcon asset={pool.target} />
+    <AssetIcon asset={pool.target} network={network} />
   </Row>
 )
 export const poolColumnMobile = (title: string): ColumnType<PoolTableRowData> => ({

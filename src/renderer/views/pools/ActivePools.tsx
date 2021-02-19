@@ -10,14 +10,17 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
 import { Button } from '../../components/uielements/button'
 import { Table } from '../../components/uielements/table'
+import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import * as Shared from './PoolsOverview.shared'
@@ -26,6 +29,9 @@ import * as Styled from './PoolsOverview.style'
 export const ActivePools: React.FC = (): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const { service: midgardService } = useMidgardContext()
   const {
@@ -207,7 +213,8 @@ export const ActivePools: React.FC = (): JSX.Element => {
         ({ poolDetails }: PoolsState): JSX.Element => {
           const poolViewData = getPoolTableRowsData({
             poolDetails,
-            pricePoolData: selectedPricePool.poolData
+            pricePoolData: selectedPricePool.poolData,
+            network
           })
           previousPools.current = O.some(poolViewData)
           return renderPoolsTable(poolViewData)

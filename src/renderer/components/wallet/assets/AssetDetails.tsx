@@ -162,7 +162,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          <AssetInfo walletInfo={walletInfo} asset={oAsset} assetsWB={oBalances} />
+          <AssetInfo walletInfo={walletInfo} asset={oAsset} assetsWB={oBalances} network={network} />
         </Col>
 
         <Styled.Divider />

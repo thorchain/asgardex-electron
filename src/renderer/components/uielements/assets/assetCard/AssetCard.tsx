@@ -15,6 +15,7 @@ import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 
+import { Network } from '../../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { BTC_DECIMAL, isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
@@ -44,6 +45,7 @@ type Props = {
   onChangeAsset?: (asset: Asset) => void
   onChangePercent?: (percent: number) => void
   disabled?: boolean
+  network: Network
 }
 
 export const AssetCard: React.FC<Props> = (props): JSX.Element => {
@@ -66,7 +68,8 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     children = null,
     selectedAmount,
     maxAmount,
-    disabled
+    disabled,
+    network
   } = props
 
   const [openDropdown, setOpenDropdown] = useState(false)
@@ -100,9 +103,10 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
         withSearch={withSearch}
         searchDisable={searchDisable}
         onSelect={handleChangeAsset}
+        network={network}
       />
     )
-  }, [assets, asset, priceIndex, withSearch, searchDisable, handleChangeAsset])
+  }, [assets, asset, priceIndex, withSearch, searchDisable, network, handleChangeAsset])
 
   const withPercentSlider = useMemo(() => !isNaN(percentValue), [percentValue])
 
@@ -148,7 +152,8 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
               showAssetName={false}
               assets={assets}
               asset={asset}
-              onSelect={handleChangeAsset}>
+              onSelect={handleChangeAsset}
+              network={network}>
               <Styled.AssetData>
                 <Styled.InputBigNumber
                   disabled={disabled}

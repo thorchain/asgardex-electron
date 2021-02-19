@@ -16,3 +16,15 @@ export const ASSETS_MAINNET: AssetsMainnet = {
   TOMO: { chain: 'BNB', symbol: 'TOMOB-4BC', ticker: 'TOMOB' },
   BOLT: { chain: 'BNB', symbol: 'BOLT-4C6', ticker: 'BOLT' }
 }
+
+type ERCAssets = 'USDT' | 'RUNE'
+
+export const ERC20_MAINNET: Record<ERCAssets, Asset> = {
+  USDT: { chain: 'ETH', symbol: 'USDT-0xdac17f958d2ee523a2206206994597c13d831ec7', ticker: 'USDT' },
+  RUNE: { chain: 'ETH', symbol: 'RUNE-0xd601c6a3a36721320573885a8d8420746da3d7a0', ticker: 'RUNE' }
+}
+
+export const ERC20_TESTNET: Record<ERCAssets, Asset> = {
+  USDT: { chain: 'ETH', symbol: 'USDT-0xdb99328b43b86037f80b43c3dbd203f00f056b75', ticker: 'USDT' },
+  RUNE: { chain: 'ETH', symbol: 'RUNE-0x3155ba85d5f96b2d030a4966af206230e46849cb', ticker: 'RUNE' }
+}

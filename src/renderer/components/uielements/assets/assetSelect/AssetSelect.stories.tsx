@@ -18,6 +18,7 @@ storiesOf('Components/Assets/AssetSelect', module).add('default', () => {
         }}
         onSelect={() => {}}
         withSearch
+        network="testnet"
       />
     </div>
   )

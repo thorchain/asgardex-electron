@@ -12,6 +12,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import { Network } from '../../../../shared/api/types'
 import { isRuneBnbAsset } from '../../../helpers/assetHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
@@ -32,6 +33,7 @@ type Props = {
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: Asset, walletAddress: string) => void
   setSelectedAsset?: (oAsset: O.Option<Asset>) => void
+  network: Network
 }
 
 export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
@@ -40,7 +42,8 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     pricePool,
     poolDetails,
     selectAssetHandler = (_) => {},
-    setSelectedAsset = () => {}
+    setSelectedAsset = () => {},
+    network
   } = props
 
   const intl = useIntl()
@@ -83,11 +86,11 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       width: 120,
       render: ({ asset }: Balance) => (
         <Row justify="center" align="middle">
-          <AssetIcon asset={asset} size="normal" />
+          <AssetIcon asset={asset} size="normal" network={network} />
         </Row>
       )
     }),
-    []
+    [network]
   )
 
   const nameColumn: ColumnType<Balance> = useMemo(

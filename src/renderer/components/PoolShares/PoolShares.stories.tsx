@@ -26,7 +26,8 @@ const defaultProps: ComponentProps = {
   ],
   loading: false,
   priceAsset: AssetBNB,
-  goToStakeInfo: () => console.log('go to stake info')
+  goToStakeInfo: () => console.log('go to stake info'),
+  network: 'testnet'
 }
 export const Default: Story = () => <Component {...defaultProps} />
 Default.storyName = 'default'

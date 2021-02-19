@@ -3,6 +3,7 @@ import { bnOrZero, baseAmount, assetFromString, Asset, AssetRuneNative } from '@
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
+import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import { PoolDetail } from '../../services/midgard/types'
@@ -26,10 +27,12 @@ const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {
 
 export const getPoolTableRowData = ({
   poolDetail,
-  pricePoolData
+  pricePoolData,
+  network
 }: {
   poolDetail: PoolDetail
   pricePoolData: PoolData
+  network: Network
 }): O.Option<PoolTableRowData> => {
   const assetString = poolDetail?.asset ?? ''
   const oPoolDetailAsset = O.fromNullable(assetFromString(assetString))
@@ -74,7 +77,8 @@ export const getPoolTableRowData = ({
         slip,
         trades,
         status,
-        key: ticker
+        key: ticker,
+        network
       }
     })
   )

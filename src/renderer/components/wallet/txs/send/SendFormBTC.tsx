@@ -21,6 +21,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../../../shared/api/types'
 import { ZERO_BN } from '../../../../const'
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation, FeesWithRatesRD, SendTxParams } from '../../../../services/bitcoin/types'
@@ -50,6 +51,7 @@ type Props = {
   addressValidation: AddressValidation
   feesWithRates: FeesWithRatesRD
   reloadFeesHandler: () => void
+  network: Network
 }
 
 export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
@@ -60,7 +62,8 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     addressValidation,
     isLoading,
     feesWithRates: feesWithRatesRD,
-    reloadFeesHandler
+    reloadFeesHandler,
+    network
   } = props
 
   const changeAssetHandler = useChangeAssetHandler()
@@ -276,7 +279,12 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeAssetHandler} selectedAsset={walletBalance.asset} walletBalances={balances} />
+        <AccountSelector
+          onChange={changeAssetHandler}
+          selectedAsset={walletBalance.asset}
+          walletBalances={balances}
+          network={network}
+        />
         <Styled.Form
           form={form}
           initialValues={{
