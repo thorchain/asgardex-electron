@@ -97,8 +97,8 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     [oPhrase]
   )
 
-  const renderAddressWithBreak = useMemo(
-    () => (chain: Chain, address: Address, linkIcon: React.ReactElement) => (
+  const renderAddressWithBreak = useCallback(
+    (chain: Chain, address: Address, linkIcon: React.ReactElement) => (
       <Styled.Text>
         <AddressEllipsis
           className="setting-address"
