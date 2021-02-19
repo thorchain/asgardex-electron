@@ -1,22 +1,22 @@
 import { SwapMessages } from '../types'
 
 const swap: SwapMessages = {
-  'swap.state.pending': 'Swapping',
-  'swap.state.success': 'Successful swap',
-  'swap.state.error': 'Swap error',
-  'swap.input': 'Input',
-  'swap.balance': 'Balance',
-  'swap.output': 'Output',
-  'swap.drag': 'Drag to swap',
-  'swap.searchAsset': 'Search Asset',
+  'swap.state.pending': 'Swap en cours',
+  'swap.state.success': 'Swap réussi',
+  'swap.state.error': 'Erreur lors du swap',
+  'swap.input': 'Entrée',
+  'swap.balance': 'Solde',
+  'swap.output': 'Sortie',
+  'swap.drag': 'Glisser pour swapper',
+  'swap.searchAsset': 'Rechercher un actif',
   'swap.errors.amount.balanceShouldCoverChainFee':
-    'Transaction fee {fee} needs to be covered by your balance (currently {balance}).',
+    'Les frais de transaction de {fee} doivent être couverts par votre solde (actuellement {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
-    'Outbounding fee of {fee} needs to be covered by receiving amount (currently {amount}).',
-  'swap.note.lockedWallet': 'You need to unlock your wallet to swap',
-  'swap.note.nowallet': 'Create or import a wallet to swap',
-  'swap.errors.asset.missingSourceAsset': 'Missing source asset',
-  'swap.errors.asset.missingTargetAsset': 'Missing target asset'
+    'Les frais de sortie de {fee} doivent être couverts par la réception du montant (actuellement {amount}).',
+  'swap.note.lockedWallet': 'Vous devez déverrouiller votre wallet pour swapper',
+  'swap.note.nowallet': 'Créer ou importer un wallet pour swapper',
+  'swap.errors.asset.missingSourceAsset': 'Actif source manquant',
+  'swap.errors.asset.missingTargetAsset': 'Actif cible manquant'
 }
 
 export default swap
