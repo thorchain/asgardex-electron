@@ -1,5 +1,4 @@
 import { Keystore } from '@xchainjs/xchain-crypto'
-import { PubKeyEd25519 } from '@xchainjs/xchain-crypto/'
 import * as E from 'fp-ts/Either'
 
 import { ApiLang, ApiKeystore, ApiUrl, ApiHDWallet } from '../api/types'
@@ -13,7 +12,7 @@ export const apiKeystore: ApiKeystore = {
     Promise.resolve({
       address: '',
       publickeys: {
-        ed25519: new PubKeyEd25519(Buffer.from('empty')),
+        ed25519: null,
         secp256k1: null
       },
       crypto: {
@@ -41,7 +40,7 @@ export const apiKeystore: ApiKeystore = {
     Promise.resolve({
       address: '',
       publickeys: {
-        ed25519: new PubKeyEd25519(Buffer.from('empty')),
+        ed25519: null,
         secp256k1: null
       },
       crypto: {
