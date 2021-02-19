@@ -8,6 +8,7 @@ import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../../shared/api/types'
 import { Send, SendFormTHOR } from '../../../components/wallet/txs/send/'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
@@ -22,10 +23,11 @@ type Props = {
   thorAsset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
+  network: Network
 }
 
 export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
-  const { thorAsset: selectedAsset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
+  const { thorAsset: selectedAsset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none, network } = props
 
   const selectedAssetBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(selectedAsset)), [
     oBalances,
@@ -72,9 +74,10 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
         fee={fee}
+        network={network}
       />
     ),
-    [subscribeTx, oBalances, txRD, addressValidation, fee]
+    [subscribeTx, oBalances, txRD, addressValidation, fee, network]
   )
 
   return FP.pipe(

@@ -12,6 +12,7 @@ import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../shared/api/types'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { Label } from '../uielements/label'
 import * as H from './helpers'
@@ -22,10 +23,11 @@ export type Props = {
   data: PoolShareTableData
   loading: boolean
   priceAsset: Asset | undefined
+  network: Network
   goToStakeInfo: () => void
 }
 
-export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, loading }) => {
+export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, loading, network }) => {
   const intl = useIntl()
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -36,11 +38,11 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
       width: 90,
       render: ({ asset }: PoolShareTableRowData) => (
         <Row justify="center" align="middle">
-          <AssetIcon asset={asset} size="normal" />
+          <AssetIcon asset={asset} size="normal" network={network} />
         </Row>
       )
     }),
-    []
+    [network]
   )
 
   const poolColumn: ColumnType<PoolShareTableRowData> = useMemo(

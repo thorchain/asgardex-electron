@@ -11,10 +11,12 @@ import { useIntl } from 'react-intl'
 import { useHistory, useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
 import { BackLink } from '../../components/uielements/backLink'
 import { Button } from '../../components/uielements/button'
+import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -22,6 +24,7 @@ import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
 import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolAddressRx } from '../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import * as Styled from './SwapView.styles'
@@ -32,6 +35,9 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { source, target } = useParams<SwapRouteParams>()
   const intl = useIntl()
   const history = useHistory()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const { service: midgardService } = useMidgardContext()
   const {
@@ -160,6 +166,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   swap$={swap$}
                   reloadBalances={reloadBalances}
                   onChangePath={onChangePath}
+                  network={network}
                 />
               )
             }

@@ -2,6 +2,7 @@ import React, { useMemo, useCallback } from 'react'
 
 import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
 
+import { Network } from '../../../../../shared/api/types'
 import { eqAsset } from '../../../../helpers/fp/eq'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { FilterMenu } from '../../filterMenu'
@@ -21,6 +22,7 @@ type Props = {
   onSelect: (value: string) => void
   closeMenu?: () => void
   searchPlaceholder?: string
+  network: Network
 }
 
 export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
@@ -32,7 +34,8 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
     withSearch,
     searchDisable = [],
     onSelect = () => {},
-    closeMenu
+    closeMenu,
+    network
   } = props
 
   const filteredData = useMemo((): Asset[] => assets.filter((a: Asset) => !eqAsset.equals(a, asset)), [asset, assets])
@@ -40,11 +43,11 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
   const cellRenderer = useCallback(
     (asset: Asset) => {
       const price = baseAmount(priceIndex[asset.ticker])
-      const node = <AssetData asset={asset} price={price} />
+      const node = <AssetData asset={asset} price={price} network={network} />
       const key = assetToString(asset)
       return { key, node }
     },
-    [priceIndex]
+    [priceIndex, network]
   )
 
   const disableItemFilterHandler = useCallback((asset: Asset) => searchDisable.indexOf(asset.ticker) > -1, [

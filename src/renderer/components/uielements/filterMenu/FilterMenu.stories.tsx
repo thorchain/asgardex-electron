@@ -17,7 +17,7 @@ storiesOf('Components/FilterMenu', module).add('coins example', () => {
 
   const cellRenderer = (data: AssetWithAmount) => {
     const { asset, amount } = data
-    const node = <AssetData asset={asset} price={amount} />
+    const node = <AssetData asset={asset} price={amount} network="testnet" />
     return { key: asset?.symbol ?? '', node }
   }
 
