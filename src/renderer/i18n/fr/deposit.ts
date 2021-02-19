@@ -18,7 +18,7 @@ const deposit: DepositMessages = {
   'deposit.add.sym': 'Ajouter {assetA} + {assetB}',
   'deposit.add.state.sending': 'Envoi de la transaction de dépôt',
   'deposit.add.state.checkResults': 'Vérification du résultat du dépôt',
-  'deposit.add.state.pending': 'Ajout de la liquidité',
+  'deposit.add.state.pending': 'Ajout de liquidité',
   'deposit.add.state.success': 'Dépôt réussi',
   'deposit.add.state.error': 'Erreur lors du dépôt',
   'deposit.add.error.chainFeeNotCovered': 'Les frais nécessaires de {fee} ne sont pas couvert par votre solde : {balance}',
