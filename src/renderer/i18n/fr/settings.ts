@@ -1,17 +1,17 @@
 import { SettingMessages } from '../types'
 
 const settings: SettingMessages = {
-  'setting.title': 'Settings',
-  'setting.wallet.management': 'Wallet Management',
+  'setting.title': 'Réglages',
+  'setting.wallet.management': 'Gestion du Wallet',
   'setting.client': 'Client',
-  'setting.account.management': 'Account Management',
-  'setting.export': 'Export Keystore',
-  'setting.lock': 'Lock',
-  'setting.view.phrase': 'View Phrase',
+  'setting.account.management': 'Gestion du compte',
+  'setting.export': 'Exporter la clé privée',
+  'setting.lock': 'Verrouiller',
+  'setting.view.phrase': 'Voir la phrase',
   'setting.midgard': 'Midgard',
   'setting.version': 'Version',
-  'setting.notconnected': 'Not connected',
-  'setting.add.device': 'ADD DEVICE'
+  'setting.notconnected': 'Déconnecté',
+  'setting.add.device': 'AJOUTER UN PÉRIPHÉRIQUE'
 }
 
 export default settings
