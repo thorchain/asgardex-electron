@@ -447,7 +447,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
                   </StyledForm.FeeLabel>
                 </Col>
                 <Col>
-                  <StyledForm.FeeButton onClick={reloadFees} disabled={RD.isPending(feesRD)}>
+                  <StyledForm.FeeButton onClick={reloadFees} disabled={RD.isPending(feesRD) || isLoading}>
                     <SyncOutlined />
                   </StyledForm.FeeButton>
                 </Col>
