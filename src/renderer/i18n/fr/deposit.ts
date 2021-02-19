@@ -38,7 +38,7 @@ const deposit: DepositMessages = {
   'deposit.poolDetails.totalUsers': 'Total des utilisateurs',
   'deposit.wallet.add': 'Ajouter un wallet',
   'deposit.wallet.connect': 'Veuillez connecter votre wallet',
-  'deposit.pool.noDeposit': "Vous n'avez aucune part dans cette pool",
+  'deposit.pool.noDeposit': "Vous ne possédez aucune part dans cette pool",
   'deposit.withdraw.pending': 'Retirer',
   'deposit.withdraw.success': 'Retrait réussi',
   'deposit.withdraw.error': 'Erreur de retrait',
