@@ -180,7 +180,7 @@ export const AccountAddress = styled(UILabel)`
   font-size: 16px;
   text-overflow: ellipsis;
 
-  label:nth-child(1) {
+  /* label:nth-child(1) {
     display: none;
     ${media.sm`
       display: block;
@@ -203,7 +203,7 @@ export const AccountAddress = styled(UILabel)`
     ${media.xl`
       display: none;
     `}
-  }
+  } */
 `
 
 export const DeviceText = styled(UILabel)`
@@ -274,5 +274,16 @@ export const AddressLinkIcon = styled(SelectOutlined)`
     width: 16px;
     transform: scale(-1, 1) translateX(5px);
     color: ${palette('text', 1)};
+  }
+`
+
+export const Text = styled(A.Typography.Text)`
+  font-size: 16px;
+  text-transform: lowercase;
+  font-family: 'MainFontRegular';
+  color: ${palette('text', 1)};
+
+  .setting-address > div {
+    margin-right: 60px;
   }
 `
