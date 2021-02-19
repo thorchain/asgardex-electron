@@ -28,7 +28,9 @@ export const truncateAddress = (addr: string, chain: Chain, network: Network): s
 }
 
 export const getAddressPrefixLength = (chain: Chain, network: Network): number => {
+  // TODO (@Veado) Extract it into a helper - we might need it at other places, too
   const clientNetwork: ClientNetwork = network === 'testnet' ? 'testnet' : 'mainnet'
+
   switch (chain) {
     case BNBChain:
       return getBinancePrefix(network).length
