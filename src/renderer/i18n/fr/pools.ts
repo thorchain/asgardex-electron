@@ -1,14 +1,14 @@
 import { PoolsMessages } from '../types'
 
 const pools: PoolsMessages = {
-  'pools.depth': 'Depth',
-  'pools.24hvol': '24h volume',
-  'pools.avgsize': 'avg size',
-  'pools.avgfee': 'avg fee',
-  'pools.blocksleft': 'blocks left',
-  'pools.trades': 'Trades',
-  'pools.pending': 'Pending',
-  'pools.available': 'Available'
+  'pools.depth': 'Profondeur',
+  'pools.24hvol': 'volume sur 24h',
+  'pools.avgsize': 'taille moy.',
+  'pools.avgfee': 'frais moy.',
+  'pools.blocksleft': 'blocs restants',
+  'pools.trades': 'Transactions',
+  'pools.pending': 'En attente',
+  'pools.available': 'Disponible'
 }
 
 export default pools
