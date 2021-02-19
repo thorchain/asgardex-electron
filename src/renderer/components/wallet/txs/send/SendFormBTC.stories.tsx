@@ -67,6 +67,7 @@ storiesOf('Wallet/SendFormBTC', module)
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
       feesWithRates={feesWithRatesRD}
+      network="testnet"
     />
   ))
   .add('pending', () => (
@@ -78,6 +79,7 @@ storiesOf('Wallet/SendFormBTC', module)
       feesWithRates={feesWithRatesRD}
       reloadFeesHandler={reloadFeesHandler}
       isLoading={true}
+      network="testnet"
     />
   ))
   .add('loading fees', () => (
@@ -88,6 +90,7 @@ storiesOf('Wallet/SendFormBTC', module)
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
       feesWithRates={RD.pending}
+      network="testnet"
     />
   ))
   .add('failure fees', () => (
@@ -98,6 +101,7 @@ storiesOf('Wallet/SendFormBTC', module)
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
       feesWithRates={RD.failure(Error('Could not load fee and rates for any reason'))}
+      network="testnet"
     />
   ))
   .add('amount < fees', () => (
@@ -108,5 +112,6 @@ storiesOf('Wallet/SendFormBTC', module)
       reloadFeesHandler={reloadFeesHandler}
       addressValidation={addressValidation}
       feesWithRates={feesWithRatesRD}
+      network="testnet"
     />
   ))

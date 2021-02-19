@@ -5,6 +5,7 @@ import { Asset, formatAssetAmountCurrency, baseToAsset } from '@xchainjs/xchain-
 import { Menu, Dropdown, Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../../shared/api/types'
 import { WalletBalances } from '../../../services/clients'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
 import { Size as IconSize } from '../../uielements/assets/assetIcon/AssetIcon.types'
@@ -15,10 +16,11 @@ type Props = {
   walletBalances: WalletBalances
   onChange?: (asset: Asset, walletAddress: Address) => void
   size?: IconSize
+  network: Network
 }
 
 export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, walletBalances, onChange = (_) => {}, size = 'normal' } = props
+  const { selectedAsset, walletBalances, onChange = (_) => {}, size = 'normal', network } = props
 
   const intl = useIntl()
 
@@ -37,7 +39,7 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
             <Menu.Item key={i} onClick={() => onChange(asset, walletAddress)}>
               <Row align={'middle'} gutter={[8, 0]}>
                 <Col>
-                  <AssetIcon asset={asset} size={'small'} />
+                  <AssetIcon asset={asset} size={'small'} network={network} />
                 </Col>
                 <Col>{asset.symbol} </Col>
                 <Col>{formatAssetAmountCurrency({ amount: baseToAsset(amount), asset })}</Col>
@@ -47,14 +49,14 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
         })}
       </Menu>
     ),
-    [filteredWalletBalances, onChange]
+    [filteredWalletBalances, onChange, network]
   )
 
   return (
     <Styled.Card bordered={false}>
       <Styled.AssetWrapper>
         <div>
-          <AssetIcon asset={selectedAsset} size={size} />
+          <AssetIcon asset={selectedAsset} size={size} network={network} />
         </div>
         <Styled.AssetInfoWrapper>
           <Styled.AssetTitle>{selectedAsset.symbol}</Styled.AssetTitle>

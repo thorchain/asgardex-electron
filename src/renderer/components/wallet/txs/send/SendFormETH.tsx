@@ -22,6 +22,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../../../shared/api/types'
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
 import { ETH_DECIMAL, isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
@@ -61,6 +62,7 @@ export type Props = {
   validatePassword$: ValidatePasswordHandler
   transfer$: (_: SendTxParams) => SendTxState$
   successActionHandler: (txHash: string) => Promise<void>
+  network: Network
 }
 
 export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
@@ -72,8 +74,10 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     reloadBalancesHandler,
     validatePassword$,
     transfer$,
-    successActionHandler
+    successActionHandler,
+    network
   } = props
+
   const intl = useIntl()
 
   // State for visibility of Modal to confirm upgrade
@@ -386,7 +390,12 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     () => (
       <Row>
         <Styled.Col span={24}>
-          <AccountSelector onChange={changeAssetHandler} selectedAsset={balance.asset} walletBalances={balances} />
+          <AccountSelector
+            onChange={changeAssetHandler}
+            selectedAsset={balance.asset}
+            walletBalances={balances}
+            network={network}
+          />
           <Styled.Form
             form={form}
             initialValues={{
@@ -473,6 +482,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       intl,
       isLoading,
       maxAmount,
+      network,
       onChangeAddress,
       onChangeAmount,
       onSubmit,

@@ -64,7 +64,8 @@ const defaultProps: SendFormETHProps = {
     console.log('success handler ' + txHash)
     return Promise.resolve(undefined)
   },
-  reloadBalancesHandler: () => console.log('reload balances')
+  reloadBalancesHandler: () => console.log('reload balances'),
+  network: 'testnet'
 }
 
 export const Default: Story = () => <SendFormETH {...defaultProps} />

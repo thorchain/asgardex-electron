@@ -21,6 +21,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import { getChainAsset } from '../../helpers/chainHelper'
 import { eqAsset } from '../../helpers/fp/eq'
@@ -63,6 +64,7 @@ export type SwapProps = {
   fees: SwapFeesRD
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
+  network: Network
 }
 
 export const Swap = ({
@@ -80,7 +82,8 @@ export const Swap = ({
   reloadBalances = FP.constVoid,
   fees: feesProp = RD.initial,
   targetWalletAddress,
-  onChangePath
+  onChangePath,
+  network
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -385,6 +388,7 @@ export const Swap = ({
             target={{ asset: targetAsset, amount: swapData.swapResult }}
             stepDescription={stepLabel}
             slip={swapData.slip}
+            network={network}
           />
         )
       }),
@@ -399,7 +403,8 @@ export const Swap = ({
     swapState.swap,
     swapState.step,
     swapState.stepsTotal,
-    intl
+    intl,
+    network
   ])
 
   const onCloseTxModal = useCallback(() => {
@@ -693,7 +698,9 @@ export const Swap = ({
               sourceAsset,
               O.fold(
                 () => <></>,
-                (asset) => <AssetSelect onSelect={setSourceAsset} asset={asset} assets={assetsToSwapFrom} />
+                (asset) => (
+                  <AssetSelect onSelect={setSourceAsset} asset={asset} assets={assetsToSwapFrom} network={network} />
+                )
               )
             )}
           </Styled.ValueItemContainer>
@@ -714,7 +721,9 @@ export const Swap = ({
               targetAsset,
               O.fold(
                 () => <></>,
-                (asset) => <AssetSelect onSelect={setTargetAsset} asset={asset} assets={assetsToSwapTo} />
+                (asset) => (
+                  <AssetSelect onSelect={setTargetAsset} asset={asset} assets={assetsToSwapTo} network={network} />
+                )
               )
             )}
           </Styled.ValueItemContainer>
@@ -733,6 +742,7 @@ export const Swap = ({
                 title={intl.formatMessage({ id: 'swap.drag' })}
                 source={source}
                 target={target}
+                network={network}
               />
             )
           )

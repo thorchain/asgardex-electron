@@ -7,16 +7,22 @@ import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { AssetsTableCollapsable } from '../../components/wallet/assets/AssetsTableCollapsable'
+import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import * as walletRoutes from '../../routes/wallet'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { ChainBalances } from '../../services/wallet/types'
 
 export const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
   const { chainBalances$, setSelectedAsset } = useWalletContext()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   // accept balances > 0 only
   const [chainBalances] = useObservableState(
@@ -60,6 +66,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
       poolDetails={poolDetails}
       selectAssetHandler={selectAssetHandler}
       setSelectedAsset={setSelectedAsset}
+      network={network}
     />
   )
 }

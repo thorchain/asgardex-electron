@@ -7,6 +7,7 @@ import { useObservableState } from 'observable-hooks'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
 import { useI18nContext } from '../../contexts/I18nContext'
+import { useLitecoinContext } from '../../contexts/LitecoinContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -32,6 +33,9 @@ export const Header: React.FC = (): JSX.Element => {
   const thorchainUrl$ = useThorchainContext().explorerUrl$
   const thorchainUrl = useObservableState(thorchainUrl$, O.none)
 
+  const litecoinUrl$ = useLitecoinContext().explorerUrl$
+  const litecoinUrl = useObservableState(litecoinUrl$, O.none)
+
   const { changeLocale, locale$, initialLocale } = useI18nContext()
   const currentLocale = useObservableState(locale$, initialLocale)
 
@@ -51,6 +55,7 @@ export const Header: React.FC = (): JSX.Element => {
       changeLocale={changeLocale}
       binanceUrl={binanceUrl}
       bitcoinUrl={bitcoinUrl}
+      litecoinUrl={litecoinUrl}
       thorchainUrl={thorchainUrl}
       midgardUrl={RD.toOption(midgardUrl)}
     />

@@ -7,6 +7,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
+import { Network } from '../../../../shared/api/types'
 import { SendFormETH } from '../../../components/wallet/txs/send/'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
@@ -21,6 +22,7 @@ type Props = {
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
   validatePassword$: ValidatePasswordHandler
   reloadBalancesHandler: FP.Lazy<void>
+  network: Network
 }
 
 export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
@@ -29,7 +31,8 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
     walletBalances: oWalletBalances,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
     validatePassword$,
-    reloadBalancesHandler
+    reloadBalancesHandler,
+    network
   } = props
 
   const oSelectedWalletBalance = useMemo(() => getWalletBalanceByAsset(oWalletBalances, O.some(selectedAsset)), [
@@ -78,6 +81,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
             validatePassword$={validatePassword$}
             successActionHandler={successActionHandler}
             transfer$={transfer$}
+            network={network}
           />
         )
       }

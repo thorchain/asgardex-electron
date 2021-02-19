@@ -2,16 +2,18 @@ import React, { useMemo, useState } from 'react'
 
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../shared/api/types'
 import * as Styled from './Interact.styles'
 
 type Props = {
+  network: Network
   bondContent: JSX.Element
   unbondContent: JSX.Element
   leaveContent: JSX.Element
   customContent: JSX.Element
 }
 
-export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveContent, customContent }) => {
+export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveContent, customContent, network }) => {
   const intl = useIntl()
 
   const tabs = useMemo(
@@ -61,7 +63,7 @@ export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveCon
   return (
     <Styled.Container>
       <Styled.Header>
-        <Styled.AssetIcon />
+        <Styled.AssetIcon network={network} />
         <div>
           <Styled.HeaderTitle>{intl.formatMessage({ id: 'deposit.interact.title' })}</Styled.HeaderTitle>
           <Styled.HeaderSubtitle>{intl.formatMessage({ id: 'deposit.interact.subtitle' })}</Styled.HeaderSubtitle>

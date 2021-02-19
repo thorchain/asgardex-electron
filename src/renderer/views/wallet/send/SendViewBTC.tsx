@@ -7,6 +7,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 
+import { Network } from '../../../../shared/api/types'
 import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormBTC } from '../../../components/wallet/txs/send/'
 import { useBitcoinContext } from '../../../contexts/BitcoinContext'
@@ -22,6 +23,7 @@ type Props = {
   balances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
   reloadFeesHandler: () => void
+  network: Network
 }
 
 export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
@@ -29,7 +31,8 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     btcAsset: selectedAsset,
     balances: oBalances,
     reloadFeesHandler,
-    getExplorerTxUrl: oGetExplorerTxUrl = O.none
+    getExplorerTxUrl: oGetExplorerTxUrl = O.none,
+    network
   } = props
 
   const oBtcAssetWB = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(selectedAsset)), [
@@ -70,9 +73,10 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
         addressValidation={addressValidation}
         reloadFeesHandler={reloadFeesHandler}
         feesWithRates={fees}
+        network={network}
       />
     ),
-    [subscribeTx, oBalances, txRD, addressValidation, reloadFeesHandler, fees]
+    [subscribeTx, oBalances, txRD, addressValidation, reloadFeesHandler, fees, network]
   )
 
   return FP.pipe(

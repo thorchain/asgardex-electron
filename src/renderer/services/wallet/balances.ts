@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetBNB, BNBChain, BTCChain, Chain, ETHChain, THORChain } from '@xchainjs/xchain-util'
+import { AssetBNB, BNBChain, BTCChain, Chain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -17,6 +17,7 @@ import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import { WalletBalancesRD } from '../clients'
 import * as ETH from '../ethereum'
+import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
 import { selectedAsset$ } from './common'
 import { INITIAL_BALANCES_STATE } from './const'
@@ -28,6 +29,7 @@ export const reloadBalances: FP.Lazy<void> = () => {
   BNB.reloadBalances()
   ETH.reloadBalances()
   THOR.reloadBalances()
+  LTC.reloadBalances()
 }
 
 const reloadBalancesByChain: (chain: Chain) => FP.Lazy<void> = (chain) => {
@@ -40,6 +42,8 @@ const reloadBalancesByChain: (chain: Chain) => FP.Lazy<void> = (chain) => {
       return ETH.reloadBalances
     case 'THOR':
       return THOR.reloadBalances
+    case 'LTC':
+      return LTC.reloadBalances
     default:
       return () => {}
   }
@@ -56,6 +60,18 @@ const thorChainBalance$: ChainBalance$ = Rx.combineLatest([THOR.address$, THOR.b
   RxOp.map(([walletAddress, balances]) => ({
     walletType: 'keystore',
     chain: THORChain,
+    walletAddress,
+    balances
+  }))
+)
+
+/**
+ * Transforms LTC balances into `ChainBalances`
+ */
+const litecoinBalance$: ChainBalance$ = Rx.combineLatest([LTC.address$, LTC.balances$]).pipe(
+  RxOp.map(([walletAddress, balances]) => ({
+    walletType: 'keystore',
+    chain: LTCChain,
     walletAddress,
     balances
   }))
@@ -140,7 +156,8 @@ export const chainBalances$: ChainBalances$ = Rx.combineLatest(
     THOR: [thorChainBalance$],
     BTC: [btcChainBalance$, btcLedgerChainBalance$],
     ETH: [ethChainBalance$],
-    BNB: [bnbChainBalance$]
+    BNB: [bnbChainBalance$],
+    LTC: [litecoinBalance$]
   })
 ).pipe(
   // we ignore all `ChainBalances` with state of `initial` balances
@@ -160,7 +177,8 @@ export const balancesState$: Observable<BalancesState> = Rx.combineLatest(
     THOR: [THOR.balances$],
     BTC: [BTC.balances$, btcLedgerBalance$],
     ETH: [ETH.balances$],
-    BNB: [BNB.balances$]
+    BNB: [BNB.balances$],
+    LTC: [LTC.balances$]
   })
 ).pipe(
   RxOp.map((balancesList) => ({

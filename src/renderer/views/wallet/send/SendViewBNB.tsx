@@ -8,6 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../../shared/api/types'
 import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormBNB } from '../../../components/wallet/txs/send/'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
@@ -23,10 +24,16 @@ type Props = {
   selectedAsset: Asset
   walletBalances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
+  network: Network
 }
 
 export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, walletBalances: oWalletBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
+  const {
+    selectedAsset,
+    walletBalances: oWalletBalances,
+    getExplorerTxUrl: oGetExplorerTxUrl = O.none,
+    network
+  } = props
 
   const oSelectedWalletBalance = useMemo(() => getWalletBalanceByAsset(oWalletBalances, O.some(selectedAsset)), [
     oWalletBalances,
@@ -75,9 +82,10 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
         fee={fee}
+        network={network}
       />
     ),
-    [subscribeTx, oWalletBalances, txRD, addressValidation, fee]
+    [subscribeTx, oWalletBalances, txRD, addressValidation, fee, network]
   )
 
   return FP.pipe(

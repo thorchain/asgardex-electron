@@ -20,6 +20,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { getChainAsset } from '../../../../helpers/chainHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
@@ -51,6 +52,7 @@ export type Props = {
   reloadFeeHandler: FP.Lazy<void>
   successActionHandler: (txHash: string) => Promise<void>
   reloadBalancesHandler: FP.Lazy<void>
+  network: Network
 }
 
 type FormValues = {
@@ -70,7 +72,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     balances: oBalances,
     successActionHandler,
     reloadFeeHandler,
-    reloadBalancesHandler
+    reloadBalancesHandler,
+    network
   } = props
 
   const intl = useIntl()
@@ -310,7 +313,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     () => (
       <CStyled.FormWrapper>
         <CStyled.FormContainer>
-          <AccountSelector selectedAsset={runeAsset} walletBalances={[]} />
+          <AccountSelector selectedAsset={runeAsset} walletBalances={[]} network={network} />
           <Styled.Form form={form} initialValues={INITIAL_FORM_VALUES} onFinish={onSubmit} labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
@@ -354,7 +357,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       renderFeeError,
       runeAsset,
       txStatusMsg,
-      uiFeesRD
+      uiFeesRD,
+      network
     ]
   )
 
