@@ -21,7 +21,7 @@ const deposit: DepositMessages = {
   'deposit.add.state.pending': 'Ajout de liquidité',
   'deposit.add.state.success': 'Dépôt réussi',
   'deposit.add.state.error': 'Erreur lors du dépôt',
-  'deposit.add.error.chainFeeNotCovered': 'Les frais nécessaires de {fee} ne sont pas couvert par votre solde : {balance}',
+  'deposit.add.error.chainFeeNotCovered': 'Les frais nécessaires de {fee} ne sont pas couverts par votre solde : {balance}',
   'deposit.add.error.nobalances': 'Aucun solde',
   'deposit.add.error.nobalance1': "Vous n'avez pas de {asset} à déposer dans votre wallet.",
   'deposit.add.error.nobalance2': "Vous n'avez pas de {asset1} et de {asset2} à déposer dans votre wallet.",
