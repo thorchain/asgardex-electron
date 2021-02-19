@@ -1,7 +1,7 @@
 import { RoutesMessages } from '../types'
 
 const messages: RoutesMessages = {
-  'routes.invalid.asset': 'Invalid asset in route: {asset}'
+  'routes.invalid.asset': 'Actif non valide durant la liaison : {asset}'
 }
 
 export default messages
