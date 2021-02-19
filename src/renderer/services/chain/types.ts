@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOptionKey, Fees, Tx, TxHash } from '@xchainjs/xchain-client'
+import { Address, FeeOptionKey, Fees, Tx } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -75,7 +75,7 @@ export type SwapState = {
 export type SwapState$ = Rx.Observable<SwapState>
 
 export type SwapParams = {
-  readonly poolAddress: O.Option<string>
+  readonly poolAddress: O.Option<Address>
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
@@ -100,7 +100,7 @@ export type AsymDepositState = {
 export type AsymDepositState$ = Rx.Observable<AsymDepositState>
 
 export type AsymDepositParams = {
-  readonly poolAddress: O.Option<string>
+  readonly poolAddress: O.Option<Address>
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
@@ -182,7 +182,7 @@ export type UpgradeRuneTxState = {
   // State of steps (current step + total number of steps)
   readonly steps: { current: number; readonly total: 3 }
   // RD of all steps
-  readonly status: RD.RemoteData<ApiError, TxHash>
+  readonly status: TxHashRD
 }
 
 export type UpgradeRuneTxState$ = Rx.Observable<UpgradeRuneTxState>
@@ -199,7 +199,9 @@ export type SendTxState = {
   // State of steps (current step + total number of steps)
   readonly steps: { current: number; readonly total: 2 }
   // RD of all steps
-  readonly status: RD.RemoteData<ApiError, TxHash>
+  readonly status: TxHashRD
 }
 
 export type SendTxState$ = Rx.Observable<SendTxState>
+
+export type SendTxStateHandler = (p: SendTxParams) => SendTxState$

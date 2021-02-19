@@ -19,7 +19,8 @@ export enum TxTypes {
   SWAP = 'swap',
   WITHDRAW = 'withdraw',
   CREATE = 'create',
-  UPGRADE = 'upgrade'
+  UPGRADE = 'upgrade',
+  TRANSFER = 'transfer'
 }
 
 export type DepositType = 'sym' | 'asym'

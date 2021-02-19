@@ -28,8 +28,7 @@ import { ETH_DECIMAL, isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { emptyString } from '../../../../helpers/stringHelper'
 import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
-import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
-import { SendTxParams, SendTxState, SendTxState$ } from '../../../../services/chain/types'
+import { SendTxParams, SendTxState$ } from '../../../../services/chain/types'
 import { FeesRD, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { TxTypes } from '../../../../types/asgardex'
@@ -79,43 +78,6 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const intl = useIntl()
-
-  // State for visibility of Modal to confirm upgrade
-  const [showConfirmSendModal, setShowConfirmSendModal] = useState(false)
-
-  // (Possible) subscription of upgrade tx
-  const [sendTxSub, _setSendTxSub] = useState<O.Option<Rx.Subscription>>(O.none)
-
-  // unsubscribe upgrade$ subscription
-  const unsubscribeSendTxSub = useCallback(() => {
-    FP.pipe(
-      sendTxSub,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [sendTxSub])
-
-  const setSendTxSub = useCallback(
-    (state) => {
-      unsubscribeSendTxSub()
-      _setSendTxSub(state)
-    },
-    [unsubscribeSendTxSub]
-  )
-
-  useEffect(() => {
-    // Unsubscribe of (possible) previous subscription of `send$`
-    return () => {
-      unsubscribeSendTxSub()
-    }
-  }, [unsubscribeSendTxSub])
-
-  // State of upgrade tx
-  const [sendTxState, setSendTxState] = useState<SendTxState>(INITIAL_SEND_STATE)
-
-  const resetTxState = useCallback(() => {
-    setSendTxState(INITIAL_SEND_STATE)
-    setSendTxSub(O.none)
-  }, [setSendTxSub])
 
   const changeAssetHandler = useChangeAssetHandler()
 
@@ -314,7 +276,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
           asset: balance.asset,
           feeOptionKey: selectedFeeOptionKey,
           memo: form.getFieldValue('memo'),
-          txType: TxTypes.CREATE
+          txType: TxTypes.TRANSFER
         }).subscribe(setSendTxState)
 
         // store subscription

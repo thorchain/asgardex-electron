@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
@@ -6,47 +6,90 @@ import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
+import * as Rx from 'rxjs'
 
 import { Network } from '../../../../shared/api/types'
 import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormBTC } from '../../../components/wallet/txs/send/'
 import { useBitcoinContext } from '../../../contexts/BitcoinContext'
+import { useChainContext } from '../../../contexts/ChainContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { AddressValidation } from '../../../services/bitcoin/types'
+import { INITIAL_SEND_STATE } from '../../../services/chain/const'
+import { SendTxState, SendTxParams } from '../../../services/chain/types'
 import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, TxHashRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 
 type Props = {
-  btcAsset: Asset
+  asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
-  reloadFeesHandler: () => void
+  validatePassword$: ValidatePasswordHandler
   network: Network
 }
 
 export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
-  const {
-    btcAsset: selectedAsset,
-    balances: oBalances,
-    reloadFeesHandler,
-    getExplorerTxUrl: oGetExplorerTxUrl = O.none,
-    network
-  } = props
+  const { asset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none, validatePassword$, network } = props
 
-  const oBtcAssetWB = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(selectedAsset)), [
-    oBalances,
-    selectedAsset
-  ])
+  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(asset)), [oBalances, asset])
 
-  const { fees$, subscribeTx, txRD$, client$, resetTx } = useBitcoinContext()
+  const { transfer$ } = useChainContext()
 
-  const txRD = useObservableState<TxHashRD>(txRD$, RD.initial)
-  const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
+  // TODO (@Veado)
+  // Extract boilerplate for manual Rx.Subscription
+  // see https://github.com/thorchain/asgardex-electron/issues/898
+
+  // (Possible) subscription of transfer tx
+  const [sendTxSub, _setSendTxSub] = useState<O.Option<Rx.Subscription>>(O.none)
+
+  // unsubscribe transfer$ subscription
+  const unsubscribeSendTxSub = useCallback(() => {
+    FP.pipe(
+      sendTxSub,
+      O.map((sub) => sub.unsubscribe())
+    )
+  }, [sendTxSub])
+
+  const setSendTxSub = useCallback(
+    (state) => {
+      unsubscribeSendTxSub()
+      _setSendTxSub(state)
+    },
+    [unsubscribeSendTxSub]
+  )
+
+  useEffect(() => {
+    // Unsubscribe of (possible) previous subscription of `send$`
+    return () => {
+      unsubscribeSendTxSub()
+    }
+  }, [unsubscribeSendTxSub])
+
+  // State of send tx
+  const [sendTxState, setSendTxState] = useState<SendTxState>(INITIAL_SEND_STATE)
+
+  const resetTxState = useCallback(() => {
+    setSendTxState(INITIAL_SEND_STATE)
+    setSendTxSub(O.none)
+  }, [setSendTxSub])
+
+  // --- END TODO
+
+  const onSend = useCallback(
+    (params: SendTxParams) => {
+      const subscription = transfer$(params).subscribe(setSendTxState)
+      // store subscription
+      return setSendTxSub(O.some(subscription))
+    },
+    [setSendTxSub, transfer$]
+  )
+
+  const { fees$, client$, reloadFees } = useBitcoinContext()
 
   const fees = useObservableState(fees$, RD.initial)
-
+  const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
   const addressValidation = useMemo(
     () =>
       FP.pipe(
@@ -57,33 +100,36 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     [oClient]
   )
 
+  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
+
   /**
    * Custom send form used by BNB chain only
    */
   const sendForm = useCallback(
-    (assetWB: WalletBalance) => (
+    (walletBalance: WalletBalance) => (
       <SendFormBTC
-        walletBalance={assetWB}
-        onSubmit={subscribeTx}
         balances={FP.pipe(
           oBalances,
           O.getOrElse(() => [] as WalletBalances)
         )}
-        isLoading={RD.isPending(txRD)}
+        walletBalance={walletBalance}
+        isLoading={isLoading}
+        onSubmit={onSend}
         addressValidation={addressValidation}
-        reloadFeesHandler={reloadFeesHandler}
         feesWithRates={fees}
+        reloadFeesHandler={reloadFees}
+        validatePassword$={validatePassword$}
         network={network}
       />
     ),
-    [subscribeTx, oBalances, txRD, addressValidation, reloadFeesHandler, fees, network]
+    [onSend, oBalances, isLoading, addressValidation, reloadFees, fees, validatePassword$, network]
   )
 
   return FP.pipe(
-    sequenceTOption(oGetExplorerTxUrl, oBtcAssetWB),
+    sequenceTOption(oGetExplorerTxUrl, oWalletBalance),
     O.fold(
       () => <></>,
-      ([getExplorerTxUrl, btcAssetWB]) => {
+      ([getExplorerTxUrl, walletBalance]) => {
         const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
           getExplorerTxUrl,
           window.apiUrl.openExternal
@@ -91,11 +137,11 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
         return (
           <>
             <Send
-              txRD={txRD}
+              txRD={sendTxState.status}
               successActionHandler={successActionHandler}
-              inititalActionHandler={resetTx}
-              errorActionHandler={resetTx}
-              sendForm={sendForm(btcAssetWB)}
+              inititalActionHandler={resetTxState}
+              errorActionHandler={resetTxState}
+              sendForm={sendForm(walletBalance)}
             />
           </>
         )

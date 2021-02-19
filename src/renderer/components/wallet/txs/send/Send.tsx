@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import * as FP from 'fp-ts/lib/pipeable'
+import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
 import { TxHashRD } from '../../../../services/wallet/types'
@@ -22,18 +22,18 @@ import * as Styled from '../TxForm.style'
 export type Props = {
   txRD: TxHashRD
   sendForm: JSX.Element
-  inititalActionHandler?: () => void
+  inititalActionHandler?: FP.Lazy<void>
   successActionHandler?: (txHash: string) => Promise<void>
-  errorActionHandler?: () => void
+  errorActionHandler?: FP.Lazy<void>
 }
 
 export const Send: React.FC<Props> = (props): JSX.Element => {
   const {
     txRD,
-    inititalActionHandler = () => {},
+    inititalActionHandler = FP.constVoid,
     successActionHandler = async () => Promise.resolve(),
     sendForm,
-    errorActionHandler = () => {}
+    errorActionHandler = FP.constVoid
   } = props
   const intl = useIntl()
 

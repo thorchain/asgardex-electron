@@ -13,9 +13,10 @@ import {
   formatBaseAmount
 } from '@xchainjs/xchain-util'
 
+import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation } from '../../../../services/binance/types'
-import { SendTxParams } from '../../../../services/bitcoin/types'
+import { SendTxParams } from '../../../../services/chain/types'
 import { WalletBalances } from '../../../../services/clients'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormBTC } from './index'
@@ -51,10 +52,8 @@ const feesWithRatesRD = RD.success({ fees, rates })
 
 const addressValidation: AddressValidation = (_) => true
 
-const onSubmitHandler = ({ recipient, amount, feeRate, memo }: SendTxParams) =>
-  console.log(
-    `to: ${recipient}, amount ${formatBaseAmount(amount)}, feeRate: ${JSON.stringify(feeRate)}, memo: ${memo}`
-  )
+const onSubmitHandler = ({ recipient, amount, feeOptionKey, memo }: SendTxParams) =>
+  console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOptionKey}, memo: ${memo}`)
 
 const reloadFeesHandler = () => console.log('reload fees')
 
@@ -67,6 +66,7 @@ storiesOf('Wallet/SendFormBTC', module)
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
       feesWithRates={feesWithRatesRD}
+      validatePassword$={mockValidatePassword$}
       network="testnet"
     />
   ))
@@ -79,6 +79,7 @@ storiesOf('Wallet/SendFormBTC', module)
       feesWithRates={feesWithRatesRD}
       reloadFeesHandler={reloadFeesHandler}
       isLoading={true}
+      validatePassword$={mockValidatePassword$}
       network="testnet"
     />
   ))
@@ -90,6 +91,7 @@ storiesOf('Wallet/SendFormBTC', module)
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
       feesWithRates={RD.pending}
+      validatePassword$={mockValidatePassword$}
       network="testnet"
     />
   ))
@@ -101,6 +103,7 @@ storiesOf('Wallet/SendFormBTC', module)
       addressValidation={addressValidation}
       reloadFeesHandler={reloadFeesHandler}
       feesWithRates={RD.failure(Error('Could not load fee and rates for any reason'))}
+      validatePassword$={mockValidatePassword$}
       network="testnet"
     />
   ))
@@ -112,6 +115,7 @@ storiesOf('Wallet/SendFormBTC', module)
       reloadFeesHandler={reloadFeesHandler}
       addressValidation={addressValidation}
       feesWithRates={feesWithRatesRD}
+      validatePassword$={mockValidatePassword$}
       network="testnet"
     />
   ))
