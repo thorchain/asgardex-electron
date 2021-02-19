@@ -36,6 +36,7 @@ storiesOf('Components/Assets/AssetCard', module).add('default', () => {
         }}
         percentValue={percent}
         maxAmount={assetToBase(assetAmount(10))}
+        network="testnet"
       />
     </div>
   )

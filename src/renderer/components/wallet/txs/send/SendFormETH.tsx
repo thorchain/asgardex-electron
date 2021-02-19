@@ -21,6 +21,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../../../shared/api/types'
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
 import { isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
@@ -50,10 +51,11 @@ export type Props = {
   isLoading?: boolean
   fees: FeesRD
   reloadFeesHandler: (params: FeesParams) => void
+  network: Network
 }
 
 export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit, balances, balance, isLoading = false, fees: feesRD, reloadFeesHandler } = props
+  const { onSubmit, balances, balance, isLoading = false, fees: feesRD, reloadFeesHandler, network } = props
   const intl = useIntl()
 
   const changeAssetHandler = useChangeAssetHandler()
@@ -296,7 +298,12 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeAssetHandler} selectedAsset={balance.asset} walletBalances={balances} />
+        <AccountSelector
+          onChange={changeAssetHandler}
+          selectedAsset={balance.asset}
+          walletBalances={balances}
+          network={network}
+        />
         <Styled.Form
           form={form}
           initialValues={{

@@ -44,7 +44,8 @@ const defaultProps: SendFormBNBProps = {
 
   isLoading: false,
   addressValidation: (_) => true,
-  fee: O.some(BNB_TRANSFER_FEES.single)
+  fee: O.some(BNB_TRANSFER_FEES.single),
+  network: 'testnet'
 }
 
 export const SendBnb: Story = () => <SendFormBNB {...defaultProps} />

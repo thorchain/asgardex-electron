@@ -7,10 +7,13 @@ import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router'
 
+import { Network } from '../../../../shared/api/types'
 import { Interact } from '../../../components/interact'
 import { BackLink } from '../../../components/uielements/backLink'
+import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import * as walletRoutes from '../../../routes/wallet'
+import { DEFAULT_NETWORK } from '../../../services/const'
 import { BondView } from './BondView'
 import { CustomView } from './CustomView'
 import * as Styled from './InteractView.styles'
@@ -19,6 +22,9 @@ import { UnbondView } from './UnbondView'
 
 export const InteractView: React.FC = () => {
   const { walletAddress } = useParams<walletRoutes.DepositParams>()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const { getExplorerUrlByAsset$ } = useChainContext()
 
@@ -47,6 +53,7 @@ export const InteractView: React.FC = () => {
           leaveContent={<LeaveView goToTransaction={goToTransaction} />}
           unbondContent={<UnbondView goToTransaction={goToTransaction} />}
           customContent={<CustomView goToTransaction={goToTransaction} />}
+          network={network}
         />
       </Styled.ContentContainer>
     </>

@@ -51,7 +51,8 @@ const defaultProps: SendFormETHProps = {
   onSubmit: onSubmitHandler,
   isLoading: false,
   fees: RD.success(fees),
-  reloadFeesHandler: (p: FeesParams) => console.log('reloadFeesHandler', p)
+  reloadFeesHandler: (p: FeesParams) => console.log('reloadFeesHandler', p),
+  network: 'testnet'
 }
 
 export const Default: Story = () => <SendFormETH {...defaultProps} />

@@ -17,6 +17,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { isChainAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
@@ -52,6 +53,7 @@ export type Props = {
   disabled?: boolean
   poolData: PoolData
   deposit$: AsymDepositStateHandler
+  network: Network
 }
 
 export const AsymDeposit: React.FC<Props> = (props) => {
@@ -71,7 +73,8 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     fees,
     onChangeAsset,
     disabled = false,
-    deposit$
+    deposit$,
+    network
   } = props
 
   const intl = useIntl()
@@ -272,9 +275,10 @@ export const AsymDeposit: React.FC<Props> = (props) => {
         target={{ asset, amount: assetAmountToDeposit }}
         source={O.none}
         stepDescription={stepDescription}
+        network={network}
       />
     )
-  }, [intl, asset, depositState, assetAmountToDeposit])
+  }, [intl, asset, depositState, assetAmountToDeposit, network])
 
   const onCloseTxModal = useCallback(() => {
     // reset deposit$ subscription
@@ -398,6 +402,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
             onChangePercent={changePercentHandler}
             onChangeAsset={onChangeAsset}
             priceAsset={priceAsset}
+            network={network}
           />
         </Col>
         <Col xs={24} xl={12}></Col>
@@ -426,6 +431,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
           title={intl.formatMessage({ id: 'deposit.drag' })}
           onConfirm={confirmDepositHandler}
           disabled={disabledForm}
+          network={network}
         />
       </Styled.DragWrapper>
       {showPasswordModal && (

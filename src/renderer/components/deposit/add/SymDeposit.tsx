@@ -18,6 +18,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { isChainAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
@@ -57,6 +58,7 @@ export type Props = {
   disabled?: boolean
   poolData: PoolData
   deposit$: SymDepositStateHandler
+  network: Network
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -82,7 +84,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     onChangeAsset,
     disabled = false,
     poolData,
-    deposit$
+    deposit$,
+    network
   } = props
 
   const intl = useIntl()
@@ -415,9 +418,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
         target={{ asset, amount: assetAmountToDeposit }}
         source={O.some({ asset: AssetRuneNative, amount: runeAmountToDeposit })}
         stepDescription={stepDescription}
+        network={network}
       />
     )
-  }, [intl, asset, depositState, assetAmountToDeposit, runeAmountToDeposit])
+  }, [intl, asset, depositState, assetAmountToDeposit, runeAmountToDeposit, network])
 
   const onCloseTxModal = useCallback(() => {
     // unsubscribe
@@ -599,6 +603,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             onChangePercent={changePercentHandler}
             onChangeAsset={onChangeAsset}
             priceAsset={priceAsset}
+            network={network}
           />
         </Col>
 
@@ -613,6 +618,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             inputOnBlurHandler={() => setSelectedInput('none')}
             price={runePrice}
             priceAsset={priceAsset}
+            network={network}
           />
         </Col>
       </Styled.CardsRow>
@@ -644,6 +650,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           title={intl.formatMessage({ id: 'deposit.drag' })}
           onConfirm={confirmDepositHandler}
           disabled={disabledForm || runeAmountToDeposit.amount().isZero()}
+          network={network}
         />
       </Styled.DragWrapper>
       {showPasswordModal && (

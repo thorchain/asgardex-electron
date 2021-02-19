@@ -9,7 +9,8 @@ import { DepositAssets, Props as DepositAssetsProps } from './DepositAssets'
 const defaultProps: DepositAssetsProps = {
   stepDescription: 'step 1',
   source: O.some({ asset: AssetRuneNative, amount: assetToBase(assetAmount(30)) }),
-  target: { asset: AssetBNB, amount: assetToBase(assetAmount(1)) }
+  target: { asset: AssetBNB, amount: assetToBase(assetAmount(1)) },
+  network: 'testnet'
 }
 
 export const Sym: Story = () => <DepositAssets {...defaultProps} />
