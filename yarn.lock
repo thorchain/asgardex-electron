@@ -4716,15 +4716,10 @@
     hdkey "^2.0.1"
     uuid "^8.1.0"
 
-"@xchainjs/xchain-ethereum@^0.10.3":
-  version "0.10.3"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.10.3.tgz#18dd6a667fa6ac51dfdeffca4bf136e7010f820a"
-  integrity sha512-szve/xnK/zJnGJJCgIrMxxguRTmuVo2aSVcMKWTpGPDuSXtR1PyzDUN+ql+cLNCEIoh/MlLRjkJoAZNiq6vgpQ==
-  dependencies:
-    "@xchainjs/xchain-client" "^0.4.0"
-    "@xchainjs/xchain-crypto" "^0.2.3"
-    "@xchainjs/xchain-util" "^0.2.2"
-    axios "^0.21.0"
+"@xchainjs/xchain-ethereum@^0.10.4":
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.10.4.tgz#1904cf38a32d080eba4063766a957d3e58ca971b"
+  integrity sha512-U5BERBtCGjXHGnF77eqHSz3zGMv60inAMfJl9OymOGpEC81rVzeOPvlaKCsCYvIWYawTZZG54oMt84NV2DdWaQ==
 
 "@xchainjs/xchain-litecoin@^0.0.2":
   version "0.0.2"
