@@ -3,7 +3,9 @@ name: Electron build
 on:
   push:
     branches:
-      - master
+      # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestbranchestags
+      - 'release/**'
+      - 'hotfix/**'
 
 jobs:
   build:
@@ -16,8 +18,6 @@ jobs:
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v2
-        with:
-          ref: master
 
       - name: Install missing dependencies on Linux
         run: sudo apt-get update && sudo apt-get install libudev-dev libusb-1.0-0-dev
