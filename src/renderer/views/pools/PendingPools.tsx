@@ -8,11 +8,14 @@ import { Option, none, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
 import { Table } from '../../components/uielements/table'
+import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { PendingPoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
@@ -21,6 +24,9 @@ import { TableAction, BlockLeftLabel } from './PoolsOverview.style'
 
 export const PendingPools: React.FC = (): JSX.Element => {
   const intl = useIntl()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const { service: midgardService } = useMidgardContext()
   const {
@@ -148,7 +154,8 @@ export const PendingPools: React.FC = (): JSX.Element => {
         ({ poolDetails }: PendingPoolsState): JSX.Element => {
           const poolViewData = getPoolTableRowsData({
             poolDetails,
-            pricePoolData: selectedPricePool.poolData
+            pricePoolData: selectedPricePool.poolData,
+            network
           })
           previousPools.current = some(poolViewData)
           return renderPoolsTable(poolViewData)

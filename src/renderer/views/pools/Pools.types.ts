@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 
 // import { PoolDetailStatusEnum } from '../../types/generated/midgard'
+import { Network } from '../../../shared/api/types'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 
 export type Pool = {
@@ -35,6 +36,7 @@ export type PoolTableRowData = {
   status: GetPoolsStatusEnum
   deepest?: boolean
   key: string
+  network: Network
 }
 
 export type PoolTableRowsData = PoolTableRowData[]

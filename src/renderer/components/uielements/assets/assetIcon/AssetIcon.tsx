@@ -4,7 +4,16 @@ import { LoadingOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset } from '@xchainjs/xchain-util'
 
-import { isBnbAsset, isBtcAsset, isEthAsset, isRuneBnbAsset, isRuneNativeAsset } from '../../../../helpers/assetHelper'
+import { Network } from '../../../../../shared/api/types'
+import {
+  getEthTokenAddress,
+  isBnbAsset,
+  isBtcAsset,
+  isEthAsset,
+  isRuneBnbAsset,
+  isRuneNativeAsset
+} from '../../../../helpers/assetHelper'
+import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
 import { bnbIcon, btcIcon, ethIcon, runeIcon, bnbRuneIcon } from '../../../icons'
@@ -14,11 +23,18 @@ import { Size } from './AssetIcon.types'
 type ComponentProps = {
   size?: Size
   asset: Asset
+  network: Network
 }
 
 type Props = ComponentProps & React.HTMLAttributes<HTMLDivElement>
 
-export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className = '', ...rest }): JSX.Element => {
+export const AssetIcon: React.FC<Props> = ({
+  asset,
+  size = 'normal',
+  className = '',
+  network,
+  ...rest
+}): JSX.Element => {
   const imgUrl = useMemo(() => {
     // BTC
     if (isBtcAsset(asset)) {
@@ -43,11 +59,19 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
       return bnbIcon
     }
 
-    // Currently all other assets are based on Binance chain
-    // TODO (@veado) Change it by introducing ERC20 tokens
-    // Note: Trustwallet supports asset names for mainnet only. For testnet we will use the `IconFallback` component
-    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${asset.symbol}/logo.png`
-  }, [asset])
+    if (network === 'mainnet') {
+      if (isBnbChain(asset.chain)) {
+        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${asset.symbol}/logo.png`
+      }
+
+      if (isEthChain(asset.chain)) {
+        const tokenAddress = getEthTokenAddress(asset)
+        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
+      }
+    }
+
+    return ''
+  }, [asset, network])
 
   const remoteIconImage = useRemoteImage(imgUrl)
 

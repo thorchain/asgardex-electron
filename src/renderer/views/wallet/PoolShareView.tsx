@@ -9,21 +9,28 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../shared/api/types'
 import { PoolShares as PoolSharesTable } from '../../components/PoolShares'
 import { PoolShareTableRowData } from '../../components/PoolShares/PoolShares.types'
 import { ErrorView } from '../../components/shared/error'
 import { Button } from '../../components/uielements/button'
+import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
 import { getPoolShareTableData } from './PoolShareView.helper'
 
 export const PoolShareView: React.FC = (): JSX.Element => {
   const intl = useIntl()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+
   const { service: midgardService } = useMidgardContext()
   const {
     pools: { poolsState$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
@@ -69,9 +76,17 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const renderPoolSharesTable = useCallback(
     (data: PoolShareTableRowData[], loading: boolean) => {
       previousPoolShares.current = O.some(data)
-      return <PoolSharesTable loading={loading} data={data} priceAsset={priceAsset} goToStakeInfo={goToStakeInfo} />
+      return (
+        <PoolSharesTable
+          loading={loading}
+          data={data}
+          priceAsset={priceAsset}
+          goToStakeInfo={goToStakeInfo}
+          network={network}
+        />
+      )
     },
-    [goToStakeInfo, priceAsset]
+    [goToStakeInfo, priceAsset, network]
   )
 
   const clickRefreshHandler = useCallback(() => {

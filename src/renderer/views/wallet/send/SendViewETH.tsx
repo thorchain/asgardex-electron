@@ -7,6 +7,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
+import { Network } from '../../../../shared/api/types'
 import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormETH } from '../../../components/wallet/txs/send/'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
@@ -20,10 +21,16 @@ type Props = {
   selectedAsset: Asset
   walletBalances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
+  network: Network
 }
 
 export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, walletBalances: oWalletBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
+  const {
+    selectedAsset,
+    walletBalances: oWalletBalances,
+    getExplorerTxUrl: oGetExplorerTxUrl = O.none,
+    network
+  } = props
 
   const oSelectedWalletBalance = useMemo(() => getWalletBalanceByAsset(oWalletBalances, O.some(selectedAsset)), [
     oWalletBalances,
@@ -63,9 +70,10 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
         fees={feesRD}
         isLoading={RD.isPending(txRD)}
         reloadFeesHandler={reloadFees}
+        network={network}
       />
     ),
-    [subscribeTx, oWalletBalances, feesRD, txRD, reloadFees]
+    [subscribeTx, oWalletBalances, feesRD, txRD, reloadFees, network]
   )
 
   return FP.pipe(

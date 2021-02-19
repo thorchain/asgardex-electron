@@ -44,6 +44,7 @@ storiesOf('Wallet/SendFormTHOR', module)
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       fee={fee}
+      network="testnet"
     />
   ))
   .add('pending', () => (
@@ -54,6 +55,7 @@ storiesOf('Wallet/SendFormTHOR', module)
       addressValidation={addressValidation}
       fee={fee}
       isLoading={true}
+      network="testnet"
     />
   ))
   .add('no fees', () => (
@@ -63,5 +65,6 @@ storiesOf('Wallet/SendFormTHOR', module)
       onSubmit={onSubmitHandler}
       addressValidation={addressValidation}
       fee={O.none}
+      network="testnet"
     />
   ))
