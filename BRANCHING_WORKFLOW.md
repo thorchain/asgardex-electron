@@ -1,6 +1,15 @@
 # Git branching workflow
 
-For development ASGARDEX we follow [OneFlow approach](https://www.endoflineblog.com/oneflow-a-git-branching-model-and-workflow#finishing-a-release-branch), which based on [GitFlow considered harmful](https://www.endoflineblog.com/gitflow-considered-harmful) article by [Adam Ruka](https://www.endoflineblog.com).
+For development ASGARDEX we follow [OneFlow approach](https://www.endoflineblog.com/oneflow-a-git-branching-model-and-workflow), which based on [GitFlow considered harmful](https://www.endoflineblog.com/gitflow-considered-harmful) article by [Adam Ruka](https://www.endoflineblog.com).
+
+## TL;DR
+
+- Based on [OneFlow (Variation – develop + master)](https://www.endoflineblog.com/oneflow-a-git-branching-model-and-workflow#variation-develop-master)
+- `develop` branch for development
+- `master` includes always latest stable production build by fast-forwarding to tags of latest release or latest hotfix.
+- `release/{version}` branches are created from `develop`. It will be finalized by creating a new tag (semver based). (Possible) changes are merged back into `develop`. `master` will be fast-forwarded to this tag.
+- `hotfix/{version}` branches are created from `master` or from latest tag. It will be finalized by creating a new tag (semver based). Changes are merged back into `develop`. `master` will be fast-forwarded to this tag.
+- Naming conventions for branches (`release/{version}` or `hotfix/{version}`) are important! These are needed to trigger actions for Electron builds (defined in `.github/workflows/build.yml`).
 
 ## Development
 
@@ -82,7 +91,7 @@ git push
 
 ### Create `hotfix` branch
 
-Checkout master, which always based on latest tag.
+To create a hotfix branch (name it `hotfix/{version}`, checkout master (which always based on latest tag).
 
 Example:
 
