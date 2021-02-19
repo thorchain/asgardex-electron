@@ -37,7 +37,7 @@ const deposit: DepositMessages = {
   'deposit.poolDetails.totalSwaps': 'Total des échanges',
   'deposit.poolDetails.totalUsers': 'Total des utilisateurs',
   'deposit.wallet.add': 'Ajouter un wallet',
-  'deposit.wallet.connect': 'Veuillez connecter votre wallet SVP',
+  'deposit.wallet.connect': 'Veuillez connecter votre wallet',
   'deposit.pool.noDeposit': "Vous n'avez aucune part dans cette pool",
   'deposit.withdraw.pending': 'Retirer',
   'deposit.withdraw.success': 'Retrait réussi',
