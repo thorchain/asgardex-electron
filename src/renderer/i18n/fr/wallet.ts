@@ -49,7 +49,7 @@ const wallet: WalletMessages = {
   'wallet.send.average': 'Normal',
   'wallet.errors.balancesFailed': 'Échec lors du chargement des soldes. {errorMsg} (API Id: {apiId})',
   'wallet.errors.asset.notExist': 'Aucun {asset}',
-  'wallet.errors.address.empty': "L'adresse ne peut pas être vide",
+  'wallet.errors.address.empty': "L'adresse ne peut être vide",
   'wallet.errors.address.invalid': "L'adresse est incorrecte",
   'wallet.errors.address.couldNotFind': "Impossible de trouver l'adresse de la pool {pool}",
   'wallet.errors.amount.shouldBeNumber': 'Le montant doit être un nombre',
