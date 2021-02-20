@@ -20,7 +20,7 @@ const common: CommonMessages = {
   'common.remove': 'Supprimer',
   'common.keystore': 'Clé privée',
   'common.phrase': 'Phrase',
-  'common.submit': 'Soumettre',
+  'common.submit': 'Valider',
   'common.confirm': 'Confirmer',
   'common.cancel': 'Annuler',
   'common.next': 'Suivant',
