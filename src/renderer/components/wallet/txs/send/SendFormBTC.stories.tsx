@@ -1,7 +1,7 @@
 import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { storiesOf } from '@storybook/react'
+import { Meta, Story } from '@storybook/react'
 import { FeeRates } from '@xchainjs/xchain-bitcoin'
 import { Fees } from '@xchainjs/xchain-client'
 import {
@@ -15,25 +15,21 @@ import {
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
-import { AddressValidation } from '../../../../services/binance/types'
 import { SendTxParams } from '../../../../services/chain/types'
-import { WalletBalances } from '../../../../services/clients'
 import { WalletBalance } from '../../../../types/wallet'
-import { SendFormBTC } from './index'
+import { SendFormBTC as Component, Props as ComponentProps } from './SendFormBTC'
 
-const bnbAsset: WalletBalance = {
+const btcBalance: WalletBalance = {
   asset: AssetBTC,
   amount: assetToBase(assetAmount(1.23, BTC_DECIMAL)),
   walletAddress: 'btc wallet address'
 }
 
-const runeAsset: WalletBalance = {
+const runeBalance: WalletBalance = {
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2, BTC_DECIMAL)),
   walletAddress: 'rune wallet address'
 }
-
-const balances: WalletBalances = [bnbAsset, runeAsset]
 
 const fees: Fees = {
   type: 'base',
@@ -48,74 +44,64 @@ const rates: FeeRates = {
   average: 2
 }
 
-const feesWithRatesRD = RD.success({ fees, rates })
+const defaultProps: ComponentProps = {
+  balances: [btcBalance, runeBalance],
+  walletBalance: btcBalance,
+  onSubmit: ({ recipient, amount, feeOptionKey, memo }: SendTxParams) =>
+    console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOptionKey}, memo: ${memo}`),
+  isLoading: false,
+  addressValidation: (_) => true,
+  feesWithRates: RD.success({ fees, rates }),
+  reloadFeesHandler: () => console.log('reload fees'),
+  validatePassword$: mockValidatePassword$,
+  network: 'testnet'
+}
 
-const addressValidation: AddressValidation = (_) => true
+export const Default: Story = () => <Component {...defaultProps} />
+Default.storyName = 'default'
 
-const onSubmitHandler = ({ recipient, amount, feeOptionKey, memo }: SendTxParams) =>
-  console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOptionKey}, memo: ${memo}`)
+export const Pending: Story = () => {
+  const props: ComponentProps = {
+    ...defaultProps,
+    isLoading: true
+  }
+  return <Component {...props} />
+}
+Pending.storyName = 'pending'
 
-const reloadFeesHandler = () => console.log('reload fees')
+export const FeesInitial: Story = () => {
+  const props: ComponentProps = { ...defaultProps, feesWithRates: RD.initial }
+  return <Component {...props} />
+}
+FeesInitial.storyName = 'fees initial'
 
-storiesOf('Wallet/SendFormBTC', module)
-  .add('send', () => (
-    <SendFormBTC
-      walletBalance={bnbAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      reloadFeesHandler={reloadFeesHandler}
-      feesWithRates={feesWithRatesRD}
-      validatePassword$={mockValidatePassword$}
-      network="testnet"
-    />
-  ))
-  .add('pending', () => (
-    <SendFormBTC
-      walletBalance={bnbAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      feesWithRates={feesWithRatesRD}
-      reloadFeesHandler={reloadFeesHandler}
-      isLoading={true}
-      validatePassword$={mockValidatePassword$}
-      network="testnet"
-    />
-  ))
-  .add('loading fees', () => (
-    <SendFormBTC
-      walletBalance={bnbAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      reloadFeesHandler={reloadFeesHandler}
-      feesWithRates={RD.pending}
-      validatePassword$={mockValidatePassword$}
-      network="testnet"
-    />
-  ))
-  .add('failure fees', () => (
-    <SendFormBTC
-      walletBalance={bnbAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      addressValidation={addressValidation}
-      reloadFeesHandler={reloadFeesHandler}
-      feesWithRates={RD.failure(Error('Could not load fee and rates for any reason'))}
-      validatePassword$={mockValidatePassword$}
-      network="testnet"
-    />
-  ))
-  .add('amount < fees', () => (
-    <SendFormBTC
-      walletBalance={bnbAsset}
-      balances={balances}
-      onSubmit={onSubmitHandler}
-      reloadFeesHandler={reloadFeesHandler}
-      addressValidation={addressValidation}
-      feesWithRates={feesWithRatesRD}
-      validatePassword$={mockValidatePassword$}
-      network="testnet"
-    />
-  ))
+export const FeesLoading: Story = () => {
+  const props: ComponentProps = { ...defaultProps, feesWithRates: RD.pending }
+  return <Component {...props} />
+}
+FeesLoading.storyName = 'fees loading'
+
+export const FeesFailure: Story = () => {
+  const props: ComponentProps = {
+    ...defaultProps,
+    feesWithRates: RD.failure(Error('Could not load fees and rates for any reason'))
+  }
+  return <Component {...props} />
+}
+FeesFailure.storyName = 'fees failure'
+
+export const FeesNotCovered: Story = () => {
+  const props: ComponentProps = {
+    ...defaultProps,
+    walletBalance: { ...btcBalance, amount: baseAmount(1, BTC_DECIMAL) }
+  }
+  return <Component {...props} />
+}
+FeesNotCovered.storyName = 'fees not covered'
+
+const meta: Meta = {
+  component: Component,
+  title: 'Wallet/SendFormBTC'
+}
+
+export default meta

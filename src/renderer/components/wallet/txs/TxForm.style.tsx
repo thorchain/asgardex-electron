@@ -83,7 +83,7 @@ export const SuccessExtraContainer = styled.div`
 
 export const SuccessExtraButton = styled(UIButton).attrs({
   round: 'true',
-  sizevalue: 'normal'
+  sizevalue: 'xnormal'
 })`
   margin-bottom: 10px;
 `

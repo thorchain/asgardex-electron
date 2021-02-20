@@ -5,32 +5,20 @@ import { Meta, Story } from '@storybook/react'
 import { Fees } from '@xchainjs/xchain-client'
 import { FeesParams } from '@xchainjs/xchain-ethereum'
 import { assetAmount, AssetETH, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
-import * as Rx from 'rxjs'
-import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
-import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
-import { SendTxState, SendTxState$ } from '../../../../services/chain/types'
 import { SendTxParams } from '../../../../services/ethereum/types'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormETH } from './index'
 import { Props as SendFormETHProps } from './SendFormETH'
 
-const mockTxState$ = (states: SendTxState[]): SendTxState$ =>
-  Rx.interval(1000).pipe(
-    // stop interval stream if we don't have state in states anymore
-    RxOp.takeWhile((value) => !!states[value]),
-    RxOp.map((value) => states[value]),
-    RxOp.startWith(INITIAL_SEND_STATE)
-  )
-
-const ethAsset: WalletBalance = {
+const ethBalance: WalletBalance = {
   asset: AssetETH,
   amount: assetToBase(assetAmount(1.23)),
   walletAddress: 'AssetETH wallet address'
 }
 
-const runeAsset: WalletBalance = {
+const runeBalance: WalletBalance = {
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2)),
   walletAddress: 'rune wallet address'
@@ -43,28 +31,17 @@ const fees: Fees = {
   average: assetToBase(assetAmount(0.001848))
 }
 
-// total steps
-const total = 2
-
 const defaultProps: SendFormETHProps = {
-  balances: [ethAsset, runeAsset],
-  balance: ethAsset,
+  balances: [ethBalance, runeBalance],
+  balance: ethBalance,
   fees: RD.success(fees),
   reloadFeesHandler: (p: FeesParams) => console.log('reloadFeesHandler', p),
   validatePassword$: mockValidatePassword$,
-  transfer$: (p: SendTxParams): SendTxState$ => {
+  onSubmit: (p: SendTxParams) => {
     console.log('transfer$:', p)
-    return mockTxState$([
-      { steps: { current: 1, total }, status: RD.pending },
-      { steps: { current: 2, total }, status: RD.pending },
-      { steps: { current: 2, total }, status: RD.success('tx-hash') }
-    ])
   },
-  successActionHandler: (txHash) => {
-    console.log('success handler ' + txHash)
-    return Promise.resolve(undefined)
-  },
-  reloadBalancesHandler: () => console.log('reload balances'),
+  isLoading: false,
+  sendTxStatusMsg: '',
   network: 'testnet'
 }
 
@@ -74,13 +51,8 @@ Default.storyName = 'default'
 export const Pending: Story = () => {
   const props: SendFormETHProps = {
     ...defaultProps,
-    transfer$: (_: SendTxParams): SendTxState$ =>
-      mockTxState$([
-        {
-          steps: { current: 1, total },
-          status: RD.pending
-        }
-      ])
+    isLoading: true,
+    sendTxStatusMsg: 'step 1 / 2'
   }
   return <SendFormETH {...props} />
 }
@@ -101,7 +73,7 @@ FeesLoading.storyName = 'fees loading'
 export const FeesFailure: Story = () => {
   const props: SendFormETHProps = {
     ...defaultProps,
-    fees: RD.failure(Error('Could not load fee and rates for any reason'))
+    fees: RD.failure(Error('Could not load fees for any reason'))
   }
   return <SendFormETH {...props} />
 }

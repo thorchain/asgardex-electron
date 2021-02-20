@@ -47,11 +47,12 @@ export type FormValues = {
   feeRate?: number
 }
 
-type Props = {
+export type Props = {
   balances: WalletBalances
   walletBalance: WalletBalance
   onSubmit: (p: SendTxParams) => void
-  isLoading?: boolean
+  isLoading: boolean
+  sendTxStatusMsg: string
   addressValidation: AddressValidation
   feesWithRates: FeesWithRatesRD
   reloadFeesHandler: FP.Lazy<void>
@@ -61,11 +62,12 @@ type Props = {
 
 export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   const {
-    onSubmit,
     balances,
     walletBalance,
-    addressValidation,
+    onSubmit,
     isLoading,
+    sendTxStatusMsg,
+    addressValidation,
     feesWithRates: feesWithRatesRD,
     reloadFeesHandler,
     validatePassword$,
@@ -264,7 +266,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   const [showPwModal, setShowPwModal] = useState(false)
 
   const sendHandler = useCallback(() => {
-    // close confirmation modal
+    // close PW modal
     setShowPwModal(false)
 
     onSubmit({
@@ -352,6 +354,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
               <Form.Item name="feeRate">{renderFeeOptions}</Form.Item>
             </Styled.SubForm>
             <Styled.SubmitItem>
+              <Styled.SubmitStatus>{sendTxStatusMsg}</Styled.SubmitStatus>
               <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
                 {intl.formatMessage({ id: 'wallet.action.send' })}
               </Styled.Button>

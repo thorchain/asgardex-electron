@@ -74,6 +74,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewBTC
               asset={asset}
               balances={balances}
+              reloadBalances={reloadBalances}
               getExplorerTxUrl={getExplorerTxUrl}
               validatePassword$={validatePassword$}
               network={network}
@@ -84,6 +85,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewETH
               asset={asset}
               balances={balances}
+              reloadBalances={reloadBalances}
               getExplorerTxUrl={getExplorerTxUrl}
               validatePassword$={validatePassword$}
               network={network}
@@ -106,7 +108,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [balances, getExplorerTxUrl, intl, reloadBalances, validatePassword$, network]
+    [balances, getExplorerTxUrl, network, reloadBalances, validatePassword$, intl]
   )
 
   return FP.pipe(

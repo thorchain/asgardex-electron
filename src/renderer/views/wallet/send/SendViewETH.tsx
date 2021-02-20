@@ -6,6 +6,7 @@ import { Asset, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
 import { Network } from '../../../../shared/api/types'
@@ -19,23 +20,34 @@ import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { FeesRD, GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
+import * as Helper from './SendView.helper'
 
 type Props = {
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
+  reloadBalances: FP.Lazy<void>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
   network: Network
   validatePassword$: ValidatePasswordHandler
 }
 
 export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
-  const { asset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none, validatePassword$, network } = props
+  const {
+    asset,
+    balances: oBalances,
+    reloadBalances,
+    getExplorerTxUrl: oGetExplorerTxUrl = O.none,
+    validatePassword$,
+    network
+  } = props
+
+  const intl = useIntl()
 
   const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(asset)), [oBalances, asset])
 
   const { transfer$ } = useChainContext()
 
-  // TODO (@Veado)
+  // TODO (@asgdx-team)
   // Extract boilerplate for manual Rx.Subscription
   // see https://github.com/thorchain/asgardex-electron/issues/898
 
@@ -102,8 +114,14 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
 
   const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 
+  const sendTxStatusMsg = useMemo(() => Helper.sendTxStatusMsg({ sendTxState, asset, intl }), [
+    asset,
+    intl,
+    sendTxState
+  ])
+
   /**
-   * Custom send form used by BNB chain only
+   * Custom send form used by ETH chain only
    */
   const sendForm = useCallback(
     (walletBalance: WalletBalance) => (
@@ -116,14 +134,19 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
         fees={feesRD}
         isLoading={isLoading}
         onSubmit={onSend}
-        reloadBalancesHandler={FP.constVoid}
+        sendTxStatusMsg={sendTxStatusMsg}
         reloadFeesHandler={reloadFees}
         validatePassword$={validatePassword$}
         network={network}
       />
     ),
-    [oBalances, feesRD, isLoading, onSend, reloadFees, validatePassword$, network]
+    [oBalances, feesRD, isLoading, onSend, sendTxStatusMsg, reloadFees, validatePassword$, network]
   )
+
+  const finishActionHandler = useCallback(() => {
+    reloadBalances()
+    resetTxState()
+  }, [reloadBalances, resetTxState])
 
   return FP.pipe(
     sequenceTOption(oWalletBalance, oGetExplorerTxUrl),
@@ -138,8 +161,9 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
           <>
             <Send
               txRD={sendTxState.status}
-              successActionHandler={successActionHandler}
+              viewTxHandler={successActionHandler}
               inititalActionHandler={resetTxState}
+              finishActionHandler={finishActionHandler}
               errorActionHandler={resetTxState}
               sendForm={sendForm(walletBalance)}
             />

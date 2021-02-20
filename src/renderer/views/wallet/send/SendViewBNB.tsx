@@ -95,7 +95,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         return (
           <Send
             txRD={txRD}
-            successActionHandler={successActionHandler}
+            viewTxHandler={successActionHandler}
             inititalActionHandler={resetTx}
             errorActionHandler={resetTx}
             sendForm={sendForm(selectedWalletBalance)}

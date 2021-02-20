@@ -20,24 +20,19 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 
 import { Network } from '../../../../../shared/api/types'
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
 import { ETH_DECIMAL, isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
-import { emptyString } from '../../../../helpers/stringHelper'
 import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
-import { SendTxParams, SendTxState$ } from '../../../../services/chain/types'
+import { SendTxParams } from '../../../../services/chain/types'
 import { FeesRD, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { TxTypes } from '../../../../types/asgardex'
 import { WalletBalance } from '../../../../types/wallet'
 import { PasswordModal } from '../../../modal/password'
-import { ErrorView } from '../../../shared/error'
 import * as StyledR from '../../../shared/form/Radio.style'
-import { SuccessView } from '../../../shared/success'
-import { ViewTxButton } from '../../../uielements/button'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
@@ -55,12 +50,12 @@ export type FormValues = {
 export type Props = {
   balances: WalletBalances
   balance: WalletBalance
+  onSubmit: (p: SendTxParams) => void
+  isLoading: boolean
+  sendTxStatusMsg: string
   fees: FeesRD
   reloadFeesHandler: (params: FeesParams) => void
-  reloadBalancesHandler: FP.Lazy<void>
   validatePassword$: ValidatePasswordHandler
-  transfer$: (_: SendTxParams) => SendTxState$
-  successActionHandler: (txHash: string) => Promise<void>
   network: Network
 }
 
@@ -68,12 +63,12 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   const {
     balances,
     balance,
+    onSubmit,
+    isLoading,
+    sendTxStatusMsg,
     fees: feesRD,
     reloadFeesHandler,
-    reloadBalancesHandler,
     validatePassword$,
-    transfer$,
-    successActionHandler,
     network
   } = props
 
@@ -199,8 +194,6 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     [intl]
   )
 
-  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
-
   const renderFeeOptions = useMemo(() => {
     const onChangeHandler = (e: RadioChangeEvent) => setSelectedFeeOptionKey(e.target.value)
     const disabled = !feesAvailable || isLoading
@@ -264,32 +257,6 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     [balance, intl, maxAmount]
   )
 
-  const onSubmit = useCallback(() => setShowConfirmSendModal(true), [])
-
-  const send = useCallback(() => {
-    FP.pipe(
-      sequenceTOption(sendAmount, sendAddress),
-      O.map(([amount, recipient]) => {
-        const subscription = transfer$({
-          recipient,
-          amount: assetToBase(amount),
-          asset: balance.asset,
-          feeOptionKey: selectedFeeOptionKey,
-          memo: form.getFieldValue('memo'),
-          txType: TxTypes.TRANSFER
-        }).subscribe(setSendTxState)
-
-        // store subscription
-        return setSendTxSub(O.some(subscription))
-      })
-    )
-  }, [balance.asset, form, selectedFeeOptionKey, transfer$, sendAddress, sendAmount, setSendTxSub])
-
-  const onFinishHandler = useCallback(() => {
-    reloadBalancesHandler()
-    resetTxState()
-  }, [reloadBalancesHandler, resetTxState])
-
   const onChangeAmount = useCallback(
     async (value: BigNumber) => {
       // we have to validate input before storing into the state
@@ -326,30 +293,45 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     return false
   }, [balance.asset, reloadFeesHandler, sendAddress, sendAmount])
 
-  const txStatusMsg = useMemo(() => {
-    const stepDescriptions = [
-      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: balance.asset.symbol }),
-      intl.formatMessage({ id: 'common.tx.checkResult' })
-    ]
-    const { steps, status } = sendTxState
+  // State for visibility of Modal to confirm tx
+  const [showPwModal, setShowPwModal] = useState(false)
 
-    return FP.pipe(
-      status,
-      RD.fold(
-        () => emptyString,
-        () =>
-          `${stepDescriptions[steps.current - 1]} (${intl.formatMessage(
-            { id: 'common.step' },
-            { current: steps.current, total: steps.total }
-          )})`,
-        () => emptyString,
-        () => emptyString
-      )
+  const sendHandler = useCallback(() => {
+    // close PW modal
+    setShowPwModal(false)
+
+    FP.pipe(
+      sequenceTOption(sendAmount, sendAddress),
+      O.map(([amount, recipient]) => {
+        onSubmit({
+          recipient,
+          asset: balance.asset,
+          amount: assetToBase(amount),
+          feeOptionKey: selectedFeeOptionKey,
+          memo: form.getFieldValue('memo'),
+          txType: TxTypes.TRANSFER
+        })
+        return true
+      })
     )
-  }, [balance.asset.symbol, intl, sendTxState])
+  }, [balance.asset, form, onSubmit, selectedFeeOptionKey, sendAddress, sendAmount])
 
-  const renderSendForm = useMemo(
-    () => (
+  const renderPwModal = useMemo(
+    () =>
+      showPwModal ? (
+        <PasswordModal
+          onSuccess={sendHandler}
+          onClose={() => setShowPwModal(false)}
+          validatePassword$={validatePassword$}
+        />
+      ) : (
+        <></>
+      ),
+    [sendHandler, showPwModal, validatePassword$]
+  )
+
+  return (
+    <>
       <Row>
         <Styled.Col span={24}>
           <AccountSelector
@@ -366,7 +348,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               // Default value for RadioGroup of feeOptions
               fee: DEFAULT_FEE_OPTION_KEY
             }}
-            onFinish={onSubmit}
+            onFinish={() => setShowPwModal(true)}
             labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
@@ -422,7 +404,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               <Form.Item name="fee">{renderFeeOptions}</Form.Item>
             </Styled.SubForm>
             <Styled.SubmitContainer>
-              <Styled.SubmitStatus>{txStatusMsg}</Styled.SubmitStatus>
+              <Styled.SubmitStatus>{sendTxStatusMsg}</Styled.SubmitStatus>
               <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
                 {intl.formatMessage({ id: 'wallet.action.send' })}
               </Styled.Button>
@@ -430,98 +412,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
           </Styled.Form>
         </Styled.Col>
       </Row>
-    ),
-    [
-      addressValidator,
-      amountValidator,
-      balance.amount.decimal,
-      balance.asset,
-      balances,
-      changeAssetHandler,
-      feesAvailable,
-      feesRD,
-      form,
-      intl,
-      isLoading,
-      maxAmount,
-      network,
-      onChangeAddress,
-      onChangeAmount,
-      onSubmit,
-      reloadFees,
-      renderFeeError,
-      renderFeeOptions,
-      selectedFeeLabel,
-      txStatusMsg
-    ]
-  )
-
-  const renderErrorBtn = useMemo(
-    () => <Styled.Button onClick={resetTxState}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,
-    [intl, resetTxState]
-  )
-
-  const renderSuccessExtra = useCallback(
-    (txHash: string) => {
-      const onClickHandler = () => successActionHandler(txHash)
-      return (
-        <Styled.SuccessExtraContainer>
-          <Styled.SuccessExtraButton onClick={onFinishHandler}>
-            {intl.formatMessage({ id: 'common.back' })}
-          </Styled.SuccessExtraButton>
-          <ViewTxButton txHash={O.some(txHash)} onClick={onClickHandler} />
-        </Styled.SuccessExtraContainer>
-      )
-    },
-    [intl, onFinishHandler, successActionHandler]
-  )
-
-  const sendConfirmationHandler = useCallback(() => {
-    // close confirmation modal
-    setShowConfirmSendModal(false)
-    send()
-  }, [send])
-
-  const renderConfirmSendModal = useMemo(
-    () =>
-      showConfirmSendModal ? (
-        <PasswordModal
-          onSuccess={sendConfirmationHandler}
-          onClose={() => setShowConfirmSendModal(false)}
-          validatePassword$={validatePassword$}
-        />
-      ) : (
-        <></>
-      ),
-    [sendConfirmationHandler, showConfirmSendModal, validatePassword$]
-  )
-
-  const renderSendStatus = useMemo(
-    () =>
-      FP.pipe(
-        sendTxState.status,
-        RD.fold(
-          () => renderSendForm,
-          () => renderSendForm,
-          (error) => (
-            <ErrorView
-              title={intl.formatMessage({ id: 'wallet.send.error' })}
-              subTitle={error.msg}
-              extra={renderErrorBtn}
-            />
-          ),
-          (hash) => (
-            <SuccessView title={intl.formatMessage({ id: 'common.success' })} extra={renderSuccessExtra(hash)} />
-          )
-        )
-      ),
-    [intl, renderErrorBtn, renderSendForm, renderSuccessExtra, sendTxState.status]
-  )
-
-  return (
-    <>
-      {renderConfirmSendModal}
-      {renderSendStatus}
+      {renderPwModal}
     </>
   )
 }

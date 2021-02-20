@@ -11,8 +11,9 @@ const defaultProps: SendProps = {
   txRD: RD.initial,
   sendForm: <h1>Send Form</h1>,
   inititalActionHandler: () => console.log('initial action'),
-  successActionHandler: (txHash: string) => {
-    console.log(`success action: ${txHash}`)
+  finishActionHandler: () => console.log('finish action'),
+  viewTxHandler: (txHash: string) => {
+    console.log(`view tx handler: ${txHash}`)
     return Promise.resolve()
   },
   errorActionHandler: () => console.log('error action')
