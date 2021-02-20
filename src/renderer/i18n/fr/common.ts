@@ -1,9 +1,9 @@
 import { CommonMessages } from '../types'
 
 const common: CommonMessages = {
-  'common.stats': 'Stats',
+  'common.stats': 'Statistiques',
   'common.network': 'Réseau',
-  'common.faqs': 'FAQs',
+  'common.faqs': 'FAQ',
   'common.greeting': 'Hello {name}',
   'common.copyright': '©',
   'common.type': 'Taper',
