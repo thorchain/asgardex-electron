@@ -13,7 +13,7 @@ const common: CommonMessages = {
   'common.amount': 'Montant',
   'common.coin': 'Coin',
   'common.password': 'Mot de passe',
-  'common.memo': 'Memo',
+  'common.memo': 'Mémo',
   'common.date': 'Date',
   'common.refresh': 'Rafraîchir',
   'common.back': 'Retour',
