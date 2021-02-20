@@ -8,7 +8,7 @@ const bonds: BondsMessages = {
   'bonds.status': 'Statut',
   'bonds.status.active': 'Actif',
   'bonds.status.standby': 'En attente',
-  'bonds.status.disabled': 'Hors service',
+  'bonds.status.disabled': 'Désactivé',
   'bonds.status.unknown': 'Inconnu',
   'bonds.node.add': 'Ajouter un nœud',
   'bonds.node.enterMessage': 'Entrez le nœud à surveiller',
