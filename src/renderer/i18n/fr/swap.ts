@@ -12,7 +12,7 @@ const swap: SwapMessages = {
   'swap.errors.amount.balanceShouldCoverChainFee':
     '{fee} de frais de transaction doivent être couverts par votre solde (actuellement {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
-    'Les frais de sortie de {fee} doivent être couverts par la réception du montant (actuellement {amount}).',
+    '{fee} de frais de sortie doivent être couverts par la réception du montant (actuellement {amount}).',
   'swap.note.lockedWallet': 'Vous devez déverrouiller votre wallet pour swapper',
   'swap.note.nowallet': 'Créer ou importer un wallet pour swapper',
   'swap.errors.asset.missingSourceAsset': 'Actif source manquant',
