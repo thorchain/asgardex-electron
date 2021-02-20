@@ -29,7 +29,7 @@ const common: CommonMessages = {
   'common.loading': 'Chargement...',
   'common.error': 'Erreur',
   'common.success': 'Succès',
-  'common.change': 'Changer',
+  'common.change': 'Modifier',
   'common.wallet': 'Wallet',
   'common.assets': 'Actifs',
   'common.asset': 'Actif',
