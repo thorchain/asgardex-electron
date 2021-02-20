@@ -40,7 +40,7 @@ const common: CommonMessages = {
   'common.viewTransaction': 'Afficher la transaction',
   'common.fee': 'Frais',
   'common.fees': 'Frais',
-  'common.max': 'Max',
+  'common.max': 'Maximum',
   'common.search': 'Rechercher',
   'common.retry': 'Réessayer',
   'common.reload': 'Recharger',
