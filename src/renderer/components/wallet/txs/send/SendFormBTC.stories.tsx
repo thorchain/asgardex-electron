@@ -54,6 +54,7 @@ const defaultProps: ComponentProps = {
   feesWithRates: RD.success({ fees, rates }),
   reloadFeesHandler: () => console.log('reload fees'),
   validatePassword$: mockValidatePassword$,
+  sendTxStatusMsg: '',
   network: 'testnet'
 }
 
@@ -63,7 +64,8 @@ Default.storyName = 'default'
 export const Pending: Story = () => {
   const props: ComponentProps = {
     ...defaultProps,
-    isLoading: true
+    isLoading: true,
+    sendTxStatusMsg: 'step 1 / 2'
   }
   return <Component {...props} />
 }
