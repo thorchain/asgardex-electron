@@ -10,7 +10,7 @@ const swap: SwapMessages = {
   'swap.drag': 'Glisser pour swapper',
   'swap.searchAsset': 'Rechercher un actif',
   'swap.errors.amount.balanceShouldCoverChainFee':
-    'Les frais de transaction de {fee} doivent être couverts par votre solde (actuellement {balance}).',
+    '{fee} de frais de transaction doivent être couverts par votre solde (actuellement {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
     'Les frais de sortie de {fee} doivent être couverts par la réception du montant (actuellement {amount}).',
   'swap.note.lockedWallet': 'Vous devez déverrouiller votre wallet pour swapper',
