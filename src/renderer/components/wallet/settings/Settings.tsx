@@ -11,12 +11,12 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../shared/api/types'
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
-import { truncateAddress } from '../../../helpers/addressHelper'
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { UserAccountType } from '../../../types/wallet'
 import { PasswordModal } from '../../modal/password'
+import { AddressEllipsis } from '../../uielements/addressEllipsis'
 import { PhraseCopyModal } from '../phrase'
 import * as Styled from './Settings.style'
 
@@ -97,6 +97,22 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     [oPhrase]
   )
 
+  const renderAddressWithBreak = useCallback(
+    (chain: Chain, address: Address, linkIcon: React.ReactElement) => (
+      <Styled.Text>
+        <AddressEllipsis
+          className="setting-address"
+          address={address}
+          chain={chain}
+          network={selectedNetwork}
+          enableCopy={true}
+          linkIcon={linkIcon}
+        />
+      </Styled.Text>
+    ),
+    [selectedNetwork]
+  )
+
   const accounts = useMemo(
     () =>
       pipe(
@@ -116,19 +132,13 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                         <Styled.AccountContent>
                           <Styled.AccountAddress>
                             <label>
-                              {acc.address}
-                              <Styled.AddressLinkIcon
-                                onClick={() => clickAddressLinkHandler(item.chainName, acc.address)}
-                              />
-                            </label>
-                            <label>
-                              <Styled.Tooltip title={acc.address}>
-                                {truncateAddress(acc.address, item.chainName, selectedNetwork)}
-                              </Styled.Tooltip>
-                              <Styled.AddressLinkIcon
-                                onClick={() => clickAddressLinkHandler(item.chainName, acc.address)}
-                              />
-                              <Styled.CopyLabel copyable={{ text: acc.address }} />
+                              {renderAddressWithBreak(
+                                item.chainName,
+                                acc.address,
+                                <Styled.AddressLinkIcon
+                                  onClick={() => clickAddressLinkHandler(item.chainName, acc.address)}
+                                />
+                              )}
                             </label>
                           </Styled.AccountAddress>
                           {/* Hide `removeDevice` for all chains temporarily
@@ -158,7 +168,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [clickAddressLinkHandler, intl, selectedNetwork, userAccounts]
+    [clickAddressLinkHandler, renderAddressWithBreak, intl, userAccounts]
   )
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(
