@@ -17,10 +17,6 @@ export const createFeesService: ({ client$, chain }: { client$: Client$; chain: 
 }) => {
   const baseClient = C.createFeesService({ client$, chain })
 
-  /**
-   * Observable to load transaction fees
-   * If a client is not available, it returns an `initial` state
-   */
   const loadFees$ = (client: LTCClient, memo?: string): FeesWithRatesLD =>
     Rx.from(client.getFeesWithRates(memo)).pipe(
       RxOp.map(RD.success),
