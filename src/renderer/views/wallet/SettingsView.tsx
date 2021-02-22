@@ -2,7 +2,16 @@ import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { BNBChain, BTCChain, Chain, CosmosChain, ETHChain, PolkadotChain, THORChain } from '@xchainjs/xchain-util'
+import {
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  ETHChain,
+  LTCChain,
+  PolkadotChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import { Col, notification, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -20,6 +29,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
+import { useLitecoinContext } from '../../contexts/LitecoinContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -41,6 +51,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const ethContext = useEthereumContext()
   const bitcoinContext = useBitcoinContext()
   const thorchaincontext = useThorchainContext()
+  const litecoinContext = useLitecoinContext()
   const chainContext = useChainContext()
   const {
     retrieveLedgerAddress,
@@ -162,6 +173,29 @@ export const SettingsView: React.FC = (): JSX.Element => {
     [thorchainContext.address$]
   )
 
+  const litecoinAddress$ = useMemo(
+    () =>
+      pipe(
+        litecoinContext.address$,
+        RxOp.map(
+          O.map(
+            (address) =>
+              ({
+                chainName: LTCChain,
+                accounts: [
+                  {
+                    name: 'Main',
+                    address,
+                    type: 'internal'
+                  }
+                ].filter(({ address }) => !!address)
+              } as UserAccountType)
+          )
+        )
+      ),
+    [litecoinContext.address$]
+  )
+
   const { service: midgardService } = useMidgardContext()
 
   const { onlineStatus$ } = useAppContext()
@@ -190,13 +224,14 @@ export const SettingsView: React.FC = (): JSX.Element => {
             THOR: [thorchainAddress$],
             BNB: [binanceAddress$],
             ETH: [ethAddress$],
-            BTC: [bitcoinAddress$]
+            BTC: [bitcoinAddress$],
+            LTC: [litecoinAddress$]
           })
         ),
         RxOp.map(A.filter(O.isSome)),
         RxOp.map(sequenceTOptionFromArray)
       ),
-    [thorchainAddress$, binanceAddress$, bitcoinAddress$, ethAddress$]
+    [thorchainAddress$, binanceAddress$, bitcoinAddress$, ethAddress$, litecoinAddress$]
   )
   const userAccounts = useObservableState(userAccounts$, O.none)
 
@@ -206,6 +241,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const getBTCExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(BTCChain), O.none)
   const getETHExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(ETHChain), O.none)
   const getTHORExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(THORChain), O.none)
+  const getLTCExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(LTCChain), O.none)
   const getCosmosExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(CosmosChain), O.none)
   const getPolkadotExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(PolkadotChain), O.none)
 
@@ -225,6 +261,9 @@ export const SettingsView: React.FC = (): JSX.Element => {
         break
       case CosmosChain:
         FP.pipe(getCosmosExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case LTCChain:
+        FP.pipe(getLTCExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
         break
       case PolkadotChain:
         FP.pipe(getPolkadotExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))

@@ -4,6 +4,7 @@ import { delay, Asset, assetToString } from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../../../shared/api/types'
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetMenu } from '../assetMenu'
@@ -40,6 +41,7 @@ type Props = {
   className?: string
   minWidth?: number
   showAssetName?: boolean
+  network: Network
 }
 
 export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
@@ -53,7 +55,8 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
     children,
     className,
     minWidth,
-    showAssetName
+    showAssetName,
+    network
   } = props
 
   const [openDropdown, setOpenDropdown] = useState<boolean>(false)
@@ -96,10 +99,11 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
           withSearch={withSearch}
           searchDisable={searchDisable}
           onSelect={handleChangeAsset}
+          network={network}
         />
       </AssetSelectMenuWrapper>
     )
-  }, [assets, intl, asset, closeMenu, handleChangeAsset, priceIndex, searchDisable, withSearch, minWidth])
+  }, [assets, intl, asset, closeMenu, handleChangeAsset, priceIndex, searchDisable, withSearch, minWidth, network])
 
   const renderDropDownButton = () => {
     const disabled = assets.length === 0
@@ -115,7 +119,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <>
           {children && children}
-          <AssetSelectData showAssetName={showAssetName} asset={asset} />
+          <AssetSelectData showAssetName={showAssetName} asset={asset} network={network} />
           {renderDropDownButton()}
         </>
       </Dropdown>

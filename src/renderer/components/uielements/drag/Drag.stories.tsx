@@ -10,12 +10,18 @@ storiesOf('Components/Drag', module)
   .add('default', () => {
     return (
       <div style={{ padding: '20px' }}>
-        <Drag source={AssetBNB} target={AssetRuneNative} title="Drag to swap" onConfirm={() => alert('Confirmed!')} />
+        <Drag
+          source={AssetBNB}
+          target={AssetRuneNative}
+          title="Drag to swap"
+          onConfirm={() => alert('Confirmed!')}
+          network="testnet"
+        />
       </div>
     )
   })
   .add('Empty assets', () => (
     <div style={{ padding: '20px' }}>
-      <Drag title="Drag to swap" onConfirm={() => alert('Confirmed!')} />
+      <Drag title="Drag to swap" onConfirm={() => alert('Confirmed!')} network="testnet" />
     </div>
   ))

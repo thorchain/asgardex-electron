@@ -7,7 +7,6 @@ import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
-import { envOrDefault } from '../../helpers/envHelper'
 import { network$ } from '../app/service'
 import * as C from '../clients'
 import { GetExplorerAddressUrl$ } from '../clients'
@@ -27,10 +26,6 @@ const bitcoinNetwork$: Observable<ClientNetwork> = network$.pipe(
   })
 )
 
-const BLOCKCHAIR_API_KEY = envOrDefault(process.env.REACT_APP_BLOCKCHAIR_API_KEY, '')
-const BLOCKCHAIR_TESTNET = 'https://api.blockchair.com/bitcoin/testnet'
-const BLOCKCHAIR_MAINNET = 'https://api.blockchair.com/bitcoin'
-
 /**
  * Stream to create an observable BitcoinClient depending on existing phrase in keystore
  *
@@ -46,11 +41,8 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
-              const blockchairUrl = bitcoinNetwork === 'testnet' ? BLOCKCHAIR_TESTNET : BLOCKCHAIR_MAINNET
               const client = new BitcoinClient({
                 network: bitcoinNetwork,
-                nodeUrl: blockchairUrl,
-                nodeApiKey: BLOCKCHAIR_API_KEY,
                 phrase
               })
               return O.some(right(client))

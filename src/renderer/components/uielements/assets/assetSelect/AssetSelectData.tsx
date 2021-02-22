@@ -3,6 +3,7 @@ import React from 'react'
 import { bn, formatBN, Asset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
+import { Network } from '../../../../../shared/api/types'
 import { Label } from '../../label'
 import { AssetIcon } from '../assetIcon'
 import { AssetSelectDataWrapper, AssetSelectDataWrapperType, AssetSelectDataWrapperSize } from './AssetSelectData.style'
@@ -16,6 +17,7 @@ type Props = {
   className?: string
   type?: AssetSelectDataWrapperType
   showAssetName?: boolean
+  network: Network
 }
 
 export const AssetSelectData: React.FC<Props> = (props): JSX.Element => {
@@ -27,7 +29,8 @@ export const AssetSelectData: React.FC<Props> = (props): JSX.Element => {
     size = 'small',
     className = '',
     type = 'normal',
-    showAssetName = true
+    showAssetName = true,
+    network
   } = props
   const formattedPrice = formatBN(price)
   // TODO add valid formatters
@@ -39,7 +42,7 @@ export const AssetSelectData: React.FC<Props> = (props): JSX.Element => {
       hasTarget={target !== undefined}
       type={type}
       className={`coinData-wrapper ${className}`}>
-      {asset && <AssetIcon asset={asset} size={size} />}
+      {asset && <AssetIcon asset={asset} size={size} network={network} />}
       {showAssetName && (
         <div className="assetSelectData-asset-info">
           <Label className="assetSelectData-asset-label" weight="600">

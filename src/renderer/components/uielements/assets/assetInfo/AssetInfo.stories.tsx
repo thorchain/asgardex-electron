@@ -26,6 +26,7 @@ export const AssetInfoStory: Story<{
           walletAddress: ''
         }
       ])}
+      network="testnet"
     />
   )
 }

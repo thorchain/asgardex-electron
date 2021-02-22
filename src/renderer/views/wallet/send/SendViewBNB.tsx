@@ -8,6 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../../shared/api/types'
 import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormBNB } from '../../../components/wallet/txs/send/'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
@@ -21,15 +22,16 @@ import { WalletBalance } from '../../../types/wallet'
 
 type Props = {
   selectedAsset: Asset
-  walletBalances: O.Option<NonEmptyWalletBalances>
+  balances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
+  network: Network
 }
 
 export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, walletBalances: oWalletBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
+  const { selectedAsset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none, network } = props
 
-  const oSelectedWalletBalance = useMemo(() => getWalletBalanceByAsset(oWalletBalances, O.some(selectedAsset)), [
-    oWalletBalances,
+  const oSelectedWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(selectedAsset)), [
+    oBalances,
     selectedAsset
   ])
 
@@ -69,15 +71,16 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         balance={selectedAssetWalletBalance}
         onSubmit={subscribeTx}
         balances={FP.pipe(
-          oWalletBalances,
+          oBalances,
           O.getOrElse(() => [] as WalletBalances)
         )}
         isLoading={RD.isPending(txRD)}
         addressValidation={addressValidation}
         fee={fee}
+        network={network}
       />
     ),
-    [subscribeTx, oWalletBalances, txRD, addressValidation, fee]
+    [subscribeTx, oBalances, txRD, addressValidation, fee, network]
   )
 
   return FP.pipe(
@@ -92,7 +95,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         return (
           <Send
             txRD={txRD}
-            successActionHandler={successActionHandler}
+            viewTxHandler={successActionHandler}
             inititalActionHandler={resetTx}
             errorActionHandler={resetTx}
             sendForm={sendForm(selectedWalletBalance)}

@@ -8,6 +8,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/lib/Ord'
 
+import { Network } from '../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
 import { PoolDetail, PoolDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
@@ -34,10 +35,12 @@ export const RUNE_PRICE_POOL: PricePool = {
 
 export const getPoolTableRowsData = ({
   poolDetails,
-  pricePoolData
+  pricePoolData,
+  network
 }: {
   poolDetails: PoolDetails
   pricePoolData: PoolData
+  network: Network
 }): PoolTableRowsData => {
   // get symbol of deepest pool
   const oDeepestPoolSymbol: O.Option<string> = FP.pipe(
@@ -67,7 +70,7 @@ export const getPoolTableRowsData = ({
       )
 
       return FP.pipe(
-        getPoolTableRowData({ poolDetail, pricePoolData }),
+        getPoolTableRowData({ poolDetail, pricePoolData, network }),
         O.map(
           (poolTableRowData) =>
             ({

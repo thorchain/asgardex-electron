@@ -15,6 +15,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../../../shared/api/types'
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
 import { isRuneNativeAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
@@ -41,10 +42,11 @@ type Props = {
   isLoading?: boolean
   addressValidation: AddressValidation
   fee: O.Option<AssetAmount>
+  network: Network
 }
 
 export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit, balances, balance, isLoading = false, addressValidation, fee: oFee } = props
+  const { onSubmit, balances, balance, isLoading = false, addressValidation, fee: oFee, network } = props
   const intl = useIntl()
 
   const changeAssetHandler = useChangeAssetHandler()
@@ -157,7 +159,12 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
   return (
     <Row>
       <Styled.Col span={24}>
-        <AccountSelector onChange={changeAssetHandler} selectedAsset={balance.asset} walletBalances={balances} />
+        <AccountSelector
+          onChange={changeAssetHandler}
+          selectedAsset={balance.asset}
+          walletBalances={balances}
+          network={network}
+        />
         <Styled.Form form={form} initialValues={{ amount: bn(0) }} onFinish={onFinishHandler} labelCol={{ span: 24 }}>
           <Styled.SubForm>
             <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>

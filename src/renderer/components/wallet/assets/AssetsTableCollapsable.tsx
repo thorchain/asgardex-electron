@@ -12,6 +12,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import { Network } from '../../../../shared/api/types'
 import { isRuneBnbAsset } from '../../../helpers/assetHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
@@ -32,6 +33,7 @@ type Props = {
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: Asset, walletAddress: string) => void
   setSelectedAsset?: (oAsset: O.Option<Asset>) => void
+  network: Network
 }
 
 export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
@@ -40,7 +42,8 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     pricePool,
     poolDetails,
     selectAssetHandler = (_) => {},
-    setSelectedAsset = () => {}
+    setSelectedAsset = () => {},
+    network
   } = props
 
   const intl = useIntl()
@@ -71,10 +74,11 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     [selectAssetHandler]
   )
 
-  const hideAssetHandler = useCallback((_asset: Asset) => {
-    // TODO (@Veado) Add logic as part of
-    // https://github.com/thorchain/asgardex-electron/issues/476
-  }, [])
+  // Hide column of "show/hide" icon temporary
+  // const hideAssetHandler = useCallback((_asset: Asset) => {
+  //   // TODO (@Veado) Add logic as part of
+  //   // https://github.com/thorchain/asgardex-electron/issues/476
+  // }, [])
 
   const iconColumn: ColumnType<Balance> = useMemo(
     () => ({
@@ -82,11 +86,11 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       width: 120,
       render: ({ asset }: Balance) => (
         <Row justify="center" align="middle">
-          <AssetIcon asset={asset} size="normal" />
+          <AssetIcon asset={asset} size="normal" network={network} />
         </Row>
       )
     }),
-    []
+    [network]
   )
 
   const nameColumn: ColumnType<Balance> = useMemo(
@@ -162,41 +166,42 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     [renderPriceColumn]
   )
 
-  const hideColumn: ColumnType<Balance> = useMemo(
-    () => ({
-      width: 20,
-      render: ({ asset }: Balance) => (
-        <Row
-          justify="center"
-          align="middle"
-          onClick={(event) => {
-            event.preventDefault()
-            event.stopPropagation()
-            hideAssetHandler(asset)
-          }}>
-          <Styled.HideIcon />
-        </Row>
-      )
-    }),
-    [hideAssetHandler]
-  )
+  // Hide column of "show/hide" icon temporary
+  // const hideColumn: ColumnType<Balance> = useMemo(
+  //   () => ({
+  //     width: 20,
+  //     render: ({ asset }: Balance) => (
+  //       <Row
+  //         justify="center"
+  //         align="middle"
+  //         onClick={(event) => {
+  //           event.preventDefault()
+  //           event.stopPropagation()
+  //           hideAssetHandler(asset)
+  //         }}>
+  //         <Styled.HideIcon />
+  //       </Row>
+  //     )
+  //   }),
+  //   [hideAssetHandler]
+  // )
 
   const columns = useMemo(() => {
     // desktop
     if (screenMap?.lg) {
-      return [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn, hideColumn]
+      return [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn]
     }
     // tablet
     if (screenMap?.md) {
-      return [iconColumn, tickerColumn, balanceColumn, hideColumn]
+      return [iconColumn, tickerColumn, balanceColumn]
     }
     // mobile
     if (screenMap?.xs) {
-      return [iconColumn, balanceColumn, hideColumn]
+      return [iconColumn, balanceColumn]
     }
 
     return []
-  }, [balanceColumn, hideColumn, iconColumn, nameColumn, priceColumn, screenMap, tickerColumn])
+  }, [balanceColumn, iconColumn, nameColumn, priceColumn, screenMap, tickerColumn])
 
   const renderAssetsTable = useCallback(
     (tableData: Balances, oWalletAddress: O.Option<Address>, loading = false) => {

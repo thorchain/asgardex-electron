@@ -111,12 +111,27 @@ storiesOf('Wallet/AssetsTableCollapsable', module).add('initial', () => {
       poolDetails={[]}
       selectAssetHandler={selectAssetHandler}
       pricePool={pricePool}
+      network="testnet"
     />
   )
 })
 storiesOf('Wallet/AssetsTableCollapsable', module).add('loading', () => {
-  return <AssetsTableCollapsable chainBalances={chainBalancesLoading} poolDetails={[]} pricePool={pricePool} />
+  return (
+    <AssetsTableCollapsable
+      chainBalances={chainBalancesLoading}
+      poolDetails={[]}
+      pricePool={pricePool}
+      network="testnet"
+    />
+  )
 })
 storiesOf('Wallet/AssetsTableCollapsable', module).add('error', () => {
-  return <AssetsTableCollapsable chainBalances={chainBalancesError} poolDetails={[]} pricePool={pricePool} />
+  return (
+    <AssetsTableCollapsable
+      chainBalances={chainBalancesError}
+      poolDetails={[]}
+      pricePool={pricePool}
+      network="testnet"
+    />
+  )
 })

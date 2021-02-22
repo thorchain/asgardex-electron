@@ -81,7 +81,8 @@ const defaultProps: SwapProps = {
   reloadBalances: () => console.log('reloadBalances'),
   fees: RD.success({ source: baseAmount(10000000), target: baseAmount(3000) }),
   targetWalletAddress: O.some('wallet-address'),
-  onChangePath: (path) => console.log('change path', path)
+  onChangePath: (path) => console.log('change path', path),
+  network: 'testnet'
 }
 
 export const StoryDefault: Story = () => <Swap {...defaultProps} />
