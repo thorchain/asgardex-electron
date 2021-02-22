@@ -30,6 +30,7 @@ const reloadSwapFees = () => {
   BNB.reloadFees()
   BTC.reloadFees()
   THOR.reloadFees()
+  LTC.reloadFees()
 }
 
 const feesByChain$ = (chain: Chain, memo?: Memo): FeesLD => {
