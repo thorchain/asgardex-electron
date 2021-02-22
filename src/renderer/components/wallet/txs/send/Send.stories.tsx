@@ -6,6 +6,8 @@ import { Story, Meta } from '@storybook/react'
 import { ApiError, ErrorId } from '../../../../services/wallet/types'
 import { Send, Props as SendProps } from './Send'
 import { SendBnb, Pending as SendBnbPending } from './SendFormBNB.stories'
+import { Pending as SendBtcPending } from './SendFormBTC.stories'
+import { Pending as SendEthPending } from './SendFormETH.stories'
 
 const defaultProps: SendProps = {
   txRD: RD.initial,
@@ -30,6 +32,18 @@ export const Pending: Story = () => {
   return <Send {...props} />
 }
 Pending.storyName = 'pending - send bnb'
+
+export const PendingBTC: Story = () => {
+  const props: SendProps = { ...defaultProps, txRD: RD.pending, sendForm: <SendBtcPending /> }
+  return <Send {...props} />
+}
+PendingBTC.storyName = 'pending - send btc'
+
+export const PendingETH: Story = () => {
+  const props: SendProps = { ...defaultProps, txRD: RD.pending, sendForm: <SendEthPending /> }
+  return <Send {...props} />
+}
+PendingETH.storyName = 'pending - send eth'
 
 export const Error: Story = () => {
   const props: SendProps = {

@@ -353,12 +353,12 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
               </Form.Item>
               <Form.Item name="feeRate">{renderFeeOptions}</Form.Item>
             </Styled.SubForm>
-            <Styled.SubmitItem>
+            <Styled.SubmitContainer>
               <Styled.SubmitStatus>{sendTxStatusMsg}</Styled.SubmitStatus>
               <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
                 {intl.formatMessage({ id: 'wallet.action.send' })}
               </Styled.Button>
-            </Styled.SubmitItem>
+            </Styled.SubmitContainer>
           </Styled.Form>
         </Styled.Col>
       </Row>
