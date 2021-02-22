@@ -7,6 +7,7 @@ import * as BNC from '../binance'
 import * as BTC from '../bitcoin'
 import { XChainClient$ } from '../clients'
 import * as ETH from '../ethereum'
+import * as LTC from '../litecoin'
 import { selectedPoolChain$ } from '../midgard/common'
 import * as THOR from '../thorchain'
 import { Chain$ } from './types'
@@ -21,6 +22,8 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
       return ETH.client$
     case 'THOR':
       return THOR.client$
+    case 'LTC':
+      return LTC.client$
     default:
       return Rx.of(O.none)
   }

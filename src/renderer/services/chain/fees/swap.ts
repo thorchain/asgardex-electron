@@ -22,6 +22,7 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { LiveData, liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
+import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
 import { FeesLD, Memo, SwapFeesLD } from '../types'
 
@@ -62,7 +63,10 @@ const feesByChain$ = (chain: Chain, memo?: Memo): FeesLD => {
       return Rx.of(RD.failure(Error('Bitcoincash fees is not implemented yet')))
 
     case LTCChain:
-      return Rx.of(RD.failure(Error('Litecoin fees is not implemented yet')))
+      return FP.pipe(
+        LTC.feesWithRates$(memo),
+        liveData.map(({ fees }) => fees)
+      )
   }
 }
 
