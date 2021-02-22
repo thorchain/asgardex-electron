@@ -63,9 +63,9 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
   }, [sendTxSub])
 
   const setSendTxSub = useCallback(
-    (state) => {
+    (subscription) => {
       unsubscribeSendTxSub()
-      _setSendTxSub(state)
+      _setSendTxSub(subscription)
     },
     [unsubscribeSendTxSub]
   )
@@ -91,7 +91,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
     (params: SendTxParams) => {
       const subscription = transfer$(params).subscribe(setSendTxState)
       // store subscription
-      return setSendTxSub(O.some(subscription))
+      setSendTxSub(O.some(subscription))
     },
     [setSendTxSub, transfer$]
   )
@@ -162,7 +162,6 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
             <Send
               txRD={sendTxState.status}
               viewTxHandler={successActionHandler}
-              inititalActionHandler={resetTxState}
               finishActionHandler={finishActionHandler}
               errorActionHandler={resetTxState}
               sendForm={sendForm(walletBalance)}

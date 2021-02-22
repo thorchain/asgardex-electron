@@ -159,7 +159,6 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
             <Send
               txRD={sendTxState.status}
               viewTxHandler={viewTxHandler}
-              inititalActionHandler={resetTxState}
               finishActionHandler={finishActionHandler}
               errorActionHandler={resetTxState}
               sendForm={sendForm(walletBalance)}
