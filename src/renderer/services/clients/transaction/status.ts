@@ -40,6 +40,7 @@ const txStatusByClient$ = (client: XChainClient, txHash: string): TxLD => {
     RxOp.tap(() => setCount(getCount() + 1)),
     RxOp.switchMap((_) => loadTx$(client, txHash)),
     liveData.map((result) => {
+      console.log('hasResult: ', result)
       // update state to stop polling
       setHasResult(true)
       return result

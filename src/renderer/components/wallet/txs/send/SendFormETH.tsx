@@ -23,12 +23,15 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
-import { isEthAsset } from '../../../../helpers/assetHelper'
+import { ETH_DECIMAL, isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
+import { SendTxParams } from '../../../../services/chain/types'
 import { FeesRD, WalletBalances } from '../../../../services/clients'
-import { SendTxParams } from '../../../../services/ethereum/types'
+import { ValidatePasswordHandler } from '../../../../services/wallet/types'
+import { TxTypes } from '../../../../types/asgardex'
 import { WalletBalance } from '../../../../types/wallet'
+import { PasswordModal } from '../../../modal/password'
 import * as StyledR from '../../../shared/form/Radio.style'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
@@ -47,22 +50,35 @@ export type FormValues = {
 export type Props = {
   balances: WalletBalances
   balance: WalletBalance
-  onSubmit: ({ recipient, amount, asset, memo, feeOptionKey }: SendTxParams) => void
-  isLoading?: boolean
+  onSubmit: (p: SendTxParams) => void
+  isLoading: boolean
+  sendTxStatusMsg: string
   fees: FeesRD
   reloadFeesHandler: (params: FeesParams) => void
+  validatePassword$: ValidatePasswordHandler
   network: Network
 }
 
 export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
-  const { onSubmit, balances, balance, isLoading = false, fees: feesRD, reloadFeesHandler, network } = props
+  const {
+    balances,
+    balance,
+    onSubmit,
+    isLoading,
+    sendTxStatusMsg,
+    fees: feesRD,
+    reloadFeesHandler,
+    validatePassword$,
+    network
+  } = props
+
   const intl = useIntl()
 
   const changeAssetHandler = useChangeAssetHandler()
 
   const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>(DEFAULT_FEE_OPTION_KEY)
 
-  const [sendAmount, setSendAmount] = useState<O.Option<BaseAmount>>(O.none)
+  const [sendAmount, setSendAmount] = useState<O.Option<AssetAmount>>(O.none)
   const [sendAddress, setSendAddress] = useState<O.Option<Address>>(O.none)
 
   const [form] = Form.useForm<FormValues>()
@@ -241,30 +257,12 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     [balance, intl, maxAmount]
   )
 
-  const onFinishHandler = useCallback(
-    ({ memo }: FormValues) =>
-      FP.pipe(
-        sequenceTOption(sendAmount, sendAddress),
-        O.map(([amount, recipient]) => {
-          onSubmit({
-            recipient,
-            amount,
-            asset: balance.asset,
-            feeOptionKey: selectedFeeOptionKey,
-            memo
-          })
-          return true
-        })
-      ),
-    [balance.asset, onSubmit, selectedFeeOptionKey, sendAddress, sendAmount]
-  )
-
   const onChangeAmount = useCallback(
     async (value: BigNumber) => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setSendAmount(O.some(assetToBase(assetAmount(value))))
+          setSendAmount(O.some(assetAmount(value, ETH_DECIMAL)))
         })
         .catch(() => setSendAmount(O.none))
     },
@@ -288,86 +286,133 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     FP.pipe(
       sequenceTOption(sendAmount, sendAddress),
       O.map(([amount, recipient]) => {
-        return reloadFeesHandler({ asset: balance.asset, amount, recipient })
+        return reloadFeesHandler({ asset: balance.asset, amount: assetToBase(amount), recipient })
       })
     )
 
     return false
   }, [balance.asset, reloadFeesHandler, sendAddress, sendAmount])
 
-  return (
-    <Row>
-      <Styled.Col span={24}>
-        <AccountSelector
-          onChange={changeAssetHandler}
-          selectedAsset={balance.asset}
-          walletBalances={balances}
-          network={network}
+  // State for visibility of Modal to confirm tx
+  const [showPwModal, setShowPwModal] = useState(false)
+
+  const sendHandler = useCallback(() => {
+    // close PW modal
+    setShowPwModal(false)
+
+    FP.pipe(
+      sequenceTOption(sendAmount, sendAddress),
+      O.map(([amount, recipient]) => {
+        onSubmit({
+          recipient,
+          asset: balance.asset,
+          amount: assetToBase(amount),
+          feeOptionKey: selectedFeeOptionKey,
+          memo: form.getFieldValue('memo'),
+          txType: TxTypes.TRANSFER
+        })
+        return true
+      })
+    )
+  }, [balance.asset, form, onSubmit, selectedFeeOptionKey, sendAddress, sendAmount])
+
+  const renderPwModal = useMemo(
+    () =>
+      showPwModal ? (
+        <PasswordModal
+          onSuccess={sendHandler}
+          onClose={() => setShowPwModal(false)}
+          validatePassword$={validatePassword$}
         />
-        <Styled.Form
-          form={form}
-          initialValues={{
-            // default value for BigNumberInput
-            amount: bn(0),
-            // Default value for RadioGroup of feeOptions
-            fee: DEFAULT_FEE_OPTION_KEY
-          }}
-          onFinish={onFinishHandler}
-          labelCol={{ span: 24 }}>
-          <Styled.SubForm>
-            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
-            <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-              <Input color="primary" size="large" disabled={isLoading} onBlur={reloadFees} onChange={onChangeAddress} />
-            </Form.Item>
-            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
-            <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-              <InputBigNumber
-                min={0}
-                size="large"
-                disabled={isLoading}
-                decimal={balance.amount.decimal}
-                onBlur={reloadFees}
-                onChange={onChangeAmount}
-              />
-            </Styled.FormItem>
-            <Styled.Label size="big" style={{ marginBottom: 0, paddingBottom: 0 }}>
-              {intl.formatMessage({ id: 'common.max' })}:{' '}
-              {formatAssetAmountCurrency({
-                amount: maxAmount,
-                asset: balance.asset,
-                trimZeros: true
-              })}
-            </Styled.Label>
-            <Row align="middle">
-              <Col>
-                <StyledForm.FeeLabel
-                  size="big"
-                  color={RD.isFailure(feesRD) ? 'error' : 'primary'}
-                  style={{ paddingTop: 0 }}
-                  disabled={RD.isPending(feesRD)}>
-                  {intl.formatMessage({ id: 'common.fees' })}: {selectedFeeLabel}
-                </StyledForm.FeeLabel>
-              </Col>
-              <Col>
-                <StyledForm.FeeButton onClick={reloadFees} disabled={RD.isPending(feesRD)}>
-                  <SyncOutlined />
-                </StyledForm.FeeButton>
-              </Col>
-            </Row>
-            {renderFeeError}
-            <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
-            <Form.Item name="memo">
-              <Input size="large" disabled={isLoading} />
-            </Form.Item>
-            <Form.Item name="fee">{renderFeeOptions}</Form.Item>
-          </Styled.SubForm>
-          <Styled.SubmitItem>
-            <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
-              {intl.formatMessage({ id: 'wallet.action.send' })}
-            </Styled.Button>
-          </Styled.SubmitItem>
-        </Styled.Form>
-      </Styled.Col>
-    </Row>
+      ) : (
+        <></>
+      ),
+    [sendHandler, showPwModal, validatePassword$]
+  )
+
+  return (
+    <>
+      <Row>
+        <Styled.Col span={24}>
+          <AccountSelector
+            onChange={changeAssetHandler}
+            selectedAsset={balance.asset}
+            walletBalances={balances}
+            network={network}
+          />
+          <Styled.Form
+            form={form}
+            initialValues={{
+              // default value for BigNumberInput
+              amount: bn(0),
+              // Default value for RadioGroup of feeOptions
+              fee: DEFAULT_FEE_OPTION_KEY
+            }}
+            onFinish={() => setShowPwModal(true)}
+            labelCol={{ span: 24 }}>
+            <Styled.SubForm>
+              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
+              <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
+                <Input
+                  color="primary"
+                  size="large"
+                  disabled={isLoading}
+                  onBlur={reloadFees}
+                  onChange={onChangeAddress}
+                />
+              </Form.Item>
+              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
+              <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
+                <InputBigNumber
+                  min={0}
+                  size="large"
+                  disabled={isLoading}
+                  decimal={balance.amount.decimal}
+                  onBlur={reloadFees}
+                  onChange={onChangeAmount}
+                />
+              </Styled.FormItem>
+              <Styled.Label size="big" style={{ marginBottom: 0, paddingBottom: 0 }}>
+                {intl.formatMessage({ id: 'common.max' })}:{' '}
+                {formatAssetAmountCurrency({
+                  amount: maxAmount,
+                  asset: balance.asset,
+                  trimZeros: true
+                })}
+              </Styled.Label>
+              <Row align="middle">
+                <Col>
+                  <StyledForm.FeeLabel
+                    size="big"
+                    color={RD.isFailure(feesRD) ? 'error' : 'primary'}
+                    style={{ paddingTop: 0 }}
+                    disabled={RD.isPending(feesRD)}>
+                    {intl.formatMessage({ id: 'common.fees' })}: {selectedFeeLabel}
+                  </StyledForm.FeeLabel>
+                </Col>
+                <Col>
+                  <StyledForm.FeeButton onClick={reloadFees} disabled={RD.isPending(feesRD) || isLoading}>
+                    <SyncOutlined />
+                  </StyledForm.FeeButton>
+                </Col>
+              </Row>
+              {renderFeeError}
+              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
+              <Form.Item name="memo">
+                <Input size="large" disabled={isLoading} />
+              </Form.Item>
+              <Form.Item name="fee">{renderFeeOptions}</Form.Item>
+            </Styled.SubForm>
+            <Styled.SubmitContainer>
+              <Styled.SubmitStatus>{sendTxStatusMsg}</Styled.SubmitStatus>
+              <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
+                {intl.formatMessage({ id: 'wallet.action.send' })}
+              </Styled.Button>
+            </Styled.SubmitContainer>
+          </Styled.Form>
+        </Styled.Col>
+      </Row>
+      {renderPwModal}
+    </>
   )
 }

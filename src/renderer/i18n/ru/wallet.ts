@@ -64,6 +64,7 @@ const wallet: WalletMessages = {
   'wallet.password.confirmation.error': 'Неверный пароль',
   'wallet.password.repeat': 'Повторите парроль',
   'wallet.password.mismatch': 'Пароли не совпадают',
+  'wallet.send.error': 'Ошибка при отправке',
   'wallet.upgrade.pending': 'Обновление',
   'wallet.upgrade.success': 'Успещно обновили',
   'wallet.upgrade.error.loadPoolAddress': 'Не смогли закгрзить адрес для {pool} пула',

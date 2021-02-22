@@ -4,28 +4,21 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { Fees } from '@xchainjs/xchain-client'
 import { FeesParams } from '@xchainjs/xchain-ethereum'
-import {
-  assetAmount,
-  AssetETH,
-  AssetRuneNative,
-  assetToBase,
-  assetToString,
-  baseToAsset,
-  formatAssetAmount
-} from '@xchainjs/xchain-util'
+import { assetAmount, AssetETH, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
+import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { SendTxParams } from '../../../../services/ethereum/types'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormETH } from './index'
 import { Props as SendFormETHProps } from './SendFormETH'
 
-const ethAsset: WalletBalance = {
+const ethBalance: WalletBalance = {
   asset: AssetETH,
   amount: assetToBase(assetAmount(1.23)),
   walletAddress: 'AssetETH wallet address'
 }
 
-const runeAsset: WalletBalance = {
+const runeBalance: WalletBalance = {
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2)),
   walletAddress: 'rune wallet address'
@@ -38,20 +31,17 @@ const fees: Fees = {
   average: assetToBase(assetAmount(0.001848))
 }
 
-const onSubmitHandler = ({ recipient, amount, asset, memo, feeOptionKey }: SendTxParams) =>
-  console.log(
-    `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${
-      asset && assetToString(asset)
-    }, memo: ${memo}, feeOptionKey: ${feeOptionKey}`
-  )
-
 const defaultProps: SendFormETHProps = {
-  balances: [ethAsset, runeAsset],
-  balance: ethAsset,
-  onSubmit: onSubmitHandler,
-  isLoading: false,
+  balances: [ethBalance, runeBalance],
+  balance: ethBalance,
   fees: RD.success(fees),
   reloadFeesHandler: (p: FeesParams) => console.log('reloadFeesHandler', p),
+  validatePassword$: mockValidatePassword$,
+  onSubmit: (p: SendTxParams) => {
+    console.log('transfer$:', p)
+  },
+  isLoading: false,
+  sendTxStatusMsg: '',
   network: 'testnet'
 }
 
@@ -59,7 +49,11 @@ export const Default: Story = () => <SendFormETH {...defaultProps} />
 Default.storyName = 'default'
 
 export const Pending: Story = () => {
-  const props: SendFormETHProps = { ...defaultProps, isLoading: true }
+  const props: SendFormETHProps = {
+    ...defaultProps,
+    isLoading: true,
+    sendTxStatusMsg: 'step 1 / 2'
+  }
   return <SendFormETH {...props} />
 }
 Pending.storyName = 'pending'
@@ -79,7 +73,7 @@ FeesLoading.storyName = 'fees loading'
 export const FeesFailure: Story = () => {
   const props: SendFormETHProps = {
     ...defaultProps,
-    fees: RD.failure(Error('Could not load fee and rates for any reason'))
+    fees: RD.failure(Error('Could not load fees for any reason'))
   }
   return <SendFormETH {...props} />
 }

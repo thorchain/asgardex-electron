@@ -11,7 +11,6 @@ import { Network } from '../../../../shared/api/types'
 import { ErrorView } from '../../../components/shared/error/'
 import { BackLink } from '../../../components/uielements/backLink'
 import { useAppContext } from '../../../contexts/AppContext'
-import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
@@ -31,11 +30,15 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
 
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
-  const { balancesState$, getExplorerTxUrl$ } = useWalletContext()
+  const {
+    balancesState$,
+    getExplorerTxUrl$,
+    keystoreService: { validatePassword$ },
+    reloadBalances
+  } = useWalletContext()
+
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
-
-  const { reloadFees: reloadBTCFees } = useBitcoinContext()
 
   const renderAssetError = useMemo(
     () => (
@@ -61,7 +64,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           return (
             <SendViewBNB
               selectedAsset={asset}
-              walletBalances={balances}
+              balances={balances}
               getExplorerTxUrl={getExplorerTxUrl}
               network={network}
             />
@@ -69,19 +72,22 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
         case 'BTC':
           return (
             <SendViewBTC
-              btcAsset={asset}
+              asset={asset}
               balances={balances}
-              reloadFeesHandler={reloadBTCFees}
+              reloadBalances={reloadBalances}
               getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
               network={network}
             />
           )
         case 'ETH':
           return (
             <SendViewETH
-              selectedAsset={asset}
-              walletBalances={balances}
+              asset={asset}
+              balances={balances}
+              reloadBalances={reloadBalances}
               getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
               network={network}
             />
           )
@@ -102,7 +108,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [balances, getExplorerTxUrl, intl, reloadBTCFees, network]
+    [balances, getExplorerTxUrl, network, reloadBalances, validatePassword$, intl]
   )
 
   return FP.pipe(
