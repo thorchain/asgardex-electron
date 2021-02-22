@@ -23,8 +23,9 @@ import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { getMockRDValueFactory, RDStatus } from '../../../../shared/mock/rdByStatus'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
-import { WalletBalancesRD } from '../../../services/clients'
+import { WalletBalances } from '../../../services/clients'
 import { ApiError, ChainBalances, ErrorId, WalletType } from '../../../services/wallet/types'
 import { AssetsTableCollapsable } from './index'
 
@@ -126,31 +127,22 @@ export default {
   title: 'Wallet/AssetsTableCollapsable',
   argTypes
 }
-type Status = 'initial' | 'pending' | 'error' | 'success'
 
-const getBalance = (chain: Chain, status: Status | undefined, walletType: WalletType) => {
-  switch (status) {
-    case 'initial':
-      return RD.initial
-    case 'pending':
-      return RD.pending
-    case 'error':
-      return RD.failure({ ...apiError, msg: `${chain} error` })
-    case 'success':
-      return FP.pipe(
+const getBalance = (chain: Chain, status: RDStatus | undefined, walletType: WalletType) =>
+  getMockRDValueFactory(
+    () =>
+      FP.pipe(
         balances[chain],
         O.fromNullable,
         O.chain(A.findFirst((chainBalance) => chainBalance.walletType === walletType)),
         O.map(({ balances }) => balances),
-        O.getOrElse((): WalletBalancesRD => RD.failure({ ...apiError, msg: `${chain} error` }))
-      )
+        O.chain(RD.toOption),
+        O.getOrElse((): WalletBalances => [])
+      ),
+    () => ({ ...apiError, msg: `${chain} error` })
+  )(status)
 
-    default:
-      return RD.initial
-  }
-}
-
-export const Default: Story<Partial<Record<Chain, Status>>> = (args) => {
+export const Default: Story<Partial<Record<Chain, RDStatus>>> = (args) => {
   return (
     <AssetsTableCollapsable
       selectAssetHandler={selectAssetHandler}
