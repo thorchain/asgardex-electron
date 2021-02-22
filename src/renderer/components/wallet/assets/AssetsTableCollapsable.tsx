@@ -19,7 +19,7 @@ import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
 import { ApiError, ChainBalance, ChainBalances } from '../../../services/wallet/types'
-import { WalletBalance } from '../../../types/wallet'
+import { WalletBalance, WalletBalances } from '../../../types/wallet'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
@@ -319,7 +319,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       const keys = FP.pipe(
         chainBalances,
         A.map(({ balances }) => balances),
-        A.filterMap(RD.toOption),
+        A.map(RD.getOrElse((): WalletBalances => [])),
         A.filterMapWithIndex((i, balances) => (balances.length > 0 ? O.some(i.toString()) : O.none))
       )
       setOpenPanelKeys(keys)
