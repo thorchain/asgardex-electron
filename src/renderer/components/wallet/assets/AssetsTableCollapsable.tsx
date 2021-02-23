@@ -13,13 +13,13 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
-import { isRuneBnbAsset } from '../../../helpers/assetHelper'
+import { ETH_DECIMAL, isEthAsset, isRuneBnbAsset } from '../../../helpers/assetHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
 import { ApiError, ChainBalance, ChainBalances } from '../../../services/wallet/types'
-import { WalletBalance } from '../../../types/wallet'
+import { WalletBalance, WalletBalances } from '../../../types/wallet'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
@@ -145,7 +145,12 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
       const label = FP.pipe(
         oPrice,
-        O.map((price) => formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })),
+        O.map((price) => {
+          if (isEthAsset(balance.asset)) {
+            price.decimal = ETH_DECIMAL
+          }
+          return formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })
+        }),
         // "empty" label if we don't get a price value
         O.getOrElse(() => '--')
       )
@@ -319,7 +324,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       const keys = FP.pipe(
         chainBalances,
         A.map(({ balances }) => balances),
-        A.filterMap(RD.toOption),
+        A.map(RD.getOrElse((): WalletBalances => [])),
         A.filterMapWithIndex((i, balances) => (balances.length > 0 ? O.some(i.toString()) : O.none))
       )
       setOpenPanelKeys(keys)
