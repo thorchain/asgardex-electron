@@ -148,10 +148,6 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     return isRuneNativeAsset(balance.asset) ? maxRuneAmount : balance.amount
   }, [oFee, oRuneNativeAmount, balance.asset, balance.amount])
 
-  // useEffect(() => {
-  //   setAmountToSend(maxAmount)
-  // }, [maxAmount])
-
   useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
     form.setFieldsValue({
