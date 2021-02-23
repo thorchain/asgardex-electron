@@ -17,7 +17,6 @@ import {
   baseToAsset,
   formatAssetAmount
 } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/Option'
 
 import { Network } from '../../../../../shared/api/types'
 import { BNB_TRANSFER_FEES } from '../../../../../shared/mock/fees'
@@ -131,7 +130,7 @@ const defaultComponentProps = {
 
   isLoading: false,
   addressValidation: (_: unknown) => true,
-  fee: O.some(BNB_TRANSFER_FEES.single),
+  fee: RD.success(assetToBase(BNB_TRANSFER_FEES.single)),
   network: 'testnet' as Network,
 
   fees: RD.success(fees),
