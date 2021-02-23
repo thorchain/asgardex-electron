@@ -130,7 +130,7 @@ const defaultComponentProps = {
     ),
 
   isLoading: false,
-  addressValidation: (_) => true,
+  addressValidation: (_: unknown) => true,
   fee: O.some(BNB_TRANSFER_FEES.single),
   network: 'testnet' as Network,
 
@@ -139,19 +139,19 @@ const defaultComponentProps = {
   validatePassword$: mockValidatePassword$
 }
 
-const get = getMockRDValueFactory(
+const getTxRdFromStatus = getMockRDValueFactory(
   () => '0xabc123',
   () => ({ errorId: ErrorId.SEND_TX, msg: 'Sending tx failed' })
 )
 
-export const Default: Story<{ txRDStatus: SendForm; sendStatus: RDStatus; sendTxStatusMsg: string }> = ({
+export const Default: Story<{ sendForm: SendForm; txRDStatus: RDStatus; sendTxStatusMsg: string }> = ({
+  sendForm,
   txRDStatus,
-  sendStatus,
   sendTxStatusMsg
 }) => {
-  const Component = useMemo(() => getSendForm(txRDStatus), [txRDStatus])
-  const balance = useMemo(() => getSendBalance(txRDStatus), [txRDStatus])
-  const txRD: TxHashRD = useMemo(() => get(sendStatus), [sendStatus])
+  const Component = useMemo(() => getSendForm(sendForm), [sendForm])
+  const balance = useMemo(() => getSendBalance(sendForm), [sendForm])
+  const txRD: TxHashRD = useMemo(() => getTxRdFromStatus(txRDStatus), [txRDStatus])
   const isLoading = useMemo(
     () =>
       RD.fold(
@@ -179,19 +179,19 @@ export const Default: Story<{ txRDStatus: SendForm; sendStatus: RDStatus; sendTx
 }
 
 const argTypes = {
-  txRDStatus: {
+  sendForm: {
     control: {
       type: 'select',
       options: Object.keys(SendFormsComponents)
     }
   },
-  sendStatus: { control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] } },
+  txRDStatus: { control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] } },
   sendTxStatusMsg: {
     control: {}
   }
 }
 
-Default.args = { txRDStatus: 'SendFormBNB', sendStatus: 'initial', sendTxStatusMsg: '' }
+Default.args = { sendForm: 'SendFormBNB', txRDStatus: 'initial', sendTxStatusMsg: '' }
 
 const meta: Meta = {
   component: Send,
