@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
-import { isRuneBnbAsset } from '../../../helpers/assetHelper'
+import { ETH_DECIMAL, isEthAsset, isRuneBnbAsset } from '../../../helpers/assetHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
@@ -145,7 +145,12 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
       const label = FP.pipe(
         oPrice,
-        O.map((price) => formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })),
+        O.map((price) => {
+          if (isEthAsset(balance.asset)) {
+            price.decimal = ETH_DECIMAL
+          }
+          return formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })
+        }),
         // "empty" label if we don't get a price value
         O.getOrElse(() => '--')
       )
