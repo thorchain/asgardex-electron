@@ -229,10 +229,6 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   )
 
   useEffect(() => {
-    setAmountToSend(maxAmount)
-  }, [maxAmount])
-
-  useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
     form.setFieldsValue({
       amount: baseToAsset(amountToSend).amount()
