@@ -63,6 +63,7 @@ const wallet: WalletMessages = {
   'wallet.password.confirmation.error': 'Password is wrong',
   'wallet.password.repeat': 'Repeat password',
   'wallet.password.mismatch': 'Password mismatch',
+  'wallet.send.error': 'Send error',
   'wallet.upgrade.pending': 'Upgrading',
   'wallet.upgrade.success': 'Successful upgrade',
   'wallet.upgrade.error': 'Upgrade error',

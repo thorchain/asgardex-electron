@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { ETHAddress } from '@xchainjs/xchain-ethereum'
@@ -6,93 +6,167 @@ import { Asset, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
 
 import { Network } from '../../../../shared/api/types'
-import { Send } from '../../../components/wallet/txs/send/'
-import { SendFormETH } from '../../../components/wallet/txs/send/'
+import { Send, SendFormETH } from '../../../components/wallet/txs/send/'
+import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
+import { INITIAL_SEND_STATE } from '../../../services/chain/const'
+import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { FeesRD, GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, TxHashRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
+import * as Helper from './SendView.helper'
 
 type Props = {
-  selectedAsset: Asset
-  walletBalances: O.Option<NonEmptyWalletBalances>
+  asset: Asset
+  balances: O.Option<NonEmptyWalletBalances>
+  reloadBalances: FP.Lazy<void>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
   network: Network
+  validatePassword$: ValidatePasswordHandler
 }
 
 export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
   const {
-    selectedAsset,
-    walletBalances: oWalletBalances,
+    asset,
+    balances: oBalances,
+    reloadBalances,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
+    validatePassword$,
     network
   } = props
 
-  const oSelectedWalletBalance = useMemo(() => getWalletBalanceByAsset(oWalletBalances, O.some(selectedAsset)), [
-    oWalletBalances,
-    selectedAsset
-  ])
+  const intl = useIntl()
 
-  const { txRD$, resetTx, subscribeTx, fees$, reloadFees } = useEthereumContext()
+  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(asset)), [oBalances, asset])
 
-  const txRD = useObservableState<TxHashRD>(txRD$, RD.initial)
+  const { transfer$ } = useChainContext()
+
+  // TODO (@asgdx-team)
+  // Extract boilerplate for manual Rx.Subscription
+  // see https://github.com/thorchain/asgardex-electron/issues/898
+
+  // (Possible) subscription of transfer tx
+  const [sendTxSub, _setSendTxSub] = useState<O.Option<Rx.Subscription>>(O.none)
+
+  // unsubscribe transfer$ subscription
+  const unsubscribeSendTxSub = useCallback(() => {
+    FP.pipe(
+      sendTxSub,
+      O.map((sub) => sub.unsubscribe())
+    )
+  }, [sendTxSub])
+
+  const setSendTxSub = useCallback(
+    (subscription) => {
+      unsubscribeSendTxSub()
+      _setSendTxSub(subscription)
+    },
+    [unsubscribeSendTxSub]
+  )
+
+  useEffect(() => {
+    // Unsubscribe of (possible) previous subscription of `send$`
+    return () => {
+      unsubscribeSendTxSub()
+    }
+  }, [unsubscribeSendTxSub])
+
+  // State of send tx
+  const [sendTxState, setSendTxState] = useState<SendTxState>(INITIAL_SEND_STATE)
+
+  const resetTxState = useCallback(() => {
+    setSendTxState(INITIAL_SEND_STATE)
+    setSendTxSub(O.none)
+  }, [setSendTxSub])
+
+  // --- END TODO
+
+  const onSend = useCallback(
+    (params: SendTxParams) => {
+      const subscription = transfer$(params).subscribe(setSendTxState)
+      // store subscription
+      setSendTxSub(O.some(subscription))
+    },
+    [setSendTxSub, transfer$]
+  )
+
+  const { fees$, reloadFees } = useEthereumContext()
+
   const [feesRD] = useObservableState<FeesRD>(
     // First fees are based on "default" values
     // Whenever an user enters valid values into input fields,
     // `reloadFees` will be called and with it, `feesRD` will be updated with fees
     () => {
       return fees$({
-        asset: selectedAsset,
+        asset,
         amount: baseAmount(1),
         recipient: ETHAddress
       })
     },
-
     RD.initial
   )
+
+  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
+
+  const sendTxStatusMsg = useMemo(() => Helper.sendTxStatusMsg({ sendTxState, asset, intl }), [
+    asset,
+    intl,
+    sendTxState
+  ])
 
   /**
    * Custom send form used by ETH chain only
    */
   const sendForm = useCallback(
-    (selectedAssetWalletBalance: WalletBalance) => (
+    (walletBalance: WalletBalance) => (
       <SendFormETH
-        balance={selectedAssetWalletBalance}
-        onSubmit={subscribeTx}
+        balance={walletBalance}
         balances={FP.pipe(
-          oWalletBalances,
+          oBalances,
           O.getOrElse(() => [] as WalletBalances)
         )}
         fees={feesRD}
-        isLoading={RD.isPending(txRD)}
+        isLoading={isLoading}
+        onSubmit={onSend}
+        sendTxStatusMsg={sendTxStatusMsg}
         reloadFeesHandler={reloadFees}
+        validatePassword$={validatePassword$}
         network={network}
       />
     ),
-    [subscribeTx, oWalletBalances, feesRD, txRD, reloadFees, network]
+    [oBalances, feesRD, isLoading, onSend, sendTxStatusMsg, reloadFees, validatePassword$, network]
   )
 
+  const finishActionHandler = useCallback(() => {
+    reloadBalances()
+    resetTxState()
+  }, [reloadBalances, resetTxState])
+
   return FP.pipe(
-    sequenceTOption(oSelectedWalletBalance, oGetExplorerTxUrl),
+    sequenceTOption(oWalletBalance, oGetExplorerTxUrl),
     O.fold(
       () => <></>,
-      ([selectedWalletBalance, getExplorerTxUrl]) => {
+      ([walletBalance, getExplorerTxUrl]) => {
         const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
           getExplorerTxUrl,
           window.apiUrl.openExternal
         )
         return (
-          <Send
-            txRD={txRD}
-            successActionHandler={successActionHandler}
-            inititalActionHandler={resetTx}
-            errorActionHandler={resetTx}
-            sendForm={sendForm(selectedWalletBalance)}
-          />
+          <>
+            <Send
+              txRD={sendTxState.status}
+              viewTxHandler={successActionHandler}
+              finishActionHandler={finishActionHandler}
+              errorActionHandler={resetTxState}
+              sendForm={sendForm(walletBalance)}
+            />
+          </>
         )
       }
     )

@@ -5,13 +5,13 @@ import * as RxOp from 'rxjs/operators'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { INITIAL_SEND_STATE } from '../const'
-import { SendTxParams, SendTxState, SendTxState$ } from '../types'
+import { SendTxStateHandler, SendTxState } from '../types'
 import { sendTx$, txStatusByChain$ } from './common'
 
 /**
  * Send TX
  */
-export const transfer$ = (params: SendTxParams): SendTxState$ => {
+export const transfer$: SendTxStateHandler = (params) => {
   // Observable state of `SendTxState`
   const { get$: getState$, get: getState, set: setState } = observableState<SendTxState>({
     ...INITIAL_SEND_STATE,

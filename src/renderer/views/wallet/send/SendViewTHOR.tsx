@@ -93,7 +93,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
           <>
             <Send
               txRD={txRD}
-              successActionHandler={successActionHandler}
+              viewTxHandler={successActionHandler}
               inititalActionHandler={resetTx}
               errorActionHandler={resetTx}
               sendForm={sendForm(selectedAssetBalance)}

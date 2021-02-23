@@ -7,7 +7,6 @@ import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
-import { envOrDefault } from '../../helpers/envHelper'
 import { network$ } from '../app/service'
 import * as C from '../clients'
 import { GetExplorerAddressUrl$ } from '../clients'
@@ -27,8 +26,6 @@ const bitcoinNetwork$: Observable<ClientNetwork> = network$.pipe(
   })
 )
 
-const SOCHAIN_URL = envOrDefault(process.env.REACT_APP_SOCHAIN_URL, 'https://sochain.com/api/v2')
-
 /**
  * Stream to create an observable BitcoinClient depending on existing phrase in keystore
  *
@@ -46,7 +43,6 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork
             try {
               const client = new BitcoinClient({
                 network: bitcoinNetwork,
-                nodeUrl: SOCHAIN_URL,
                 phrase
               })
               return O.some(right(client))
