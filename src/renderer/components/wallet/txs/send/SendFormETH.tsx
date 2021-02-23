@@ -211,10 +211,6 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   }, [selectedFee, oEthAmount, balance])
 
   useEffect(() => {
-    setAmountToSend(O.some(maxAmount))
-  }, [maxAmount])
-
-  useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
     FP.pipe(
       amountToSend,
