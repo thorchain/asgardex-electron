@@ -1,137 +1,169 @@
 import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { storiesOf } from '@storybook/react'
+import { Story } from '@storybook/react'
 import { THORChain } from '@xchainjs/xchain-thorchain'
 import {
   Asset,
   AssetBNB,
   AssetBTC,
+  AssetLTC,
+  AssetRune67C,
   AssetETH,
   AssetRuneNative,
   assetToString,
   baseAmount,
   BNBChain,
-  BTCChain
+  BTCChain,
+  Chain,
+  ETHChain,
+  LTCChain
 } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/Array'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 
+import { getMockRDValueFactory, RDStatus } from '../../../../shared/mock/rdByStatus'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
-import { ApiError, ChainBalance, ChainBalances, ErrorId } from '../../../services/wallet/types'
+import { WalletBalances } from '../../../services/clients'
+import { ApiError, ChainBalances, ErrorId, WalletType } from '../../../services/wallet/types'
 import { AssetsTableCollapsable } from './index'
 
-const runeBalance: ChainBalance = {
-  walletType: 'keystore',
-  walletAddress: O.some('thor1766mazrxs5asuscepa227r6ekr657234f8p7nf'),
-  chain: THORChain,
-  balances: RD.initial
-}
-
-const bnbBalance: ChainBalance = {
-  walletType: 'keystore',
-  walletAddress: O.some('bnb1zzapwywxrxa2wyyrp93ls5l0a6ftxju5phmhu9'),
-  chain: BNBChain,
-  balances: RD.initial
-}
-
-const btcBalance: ChainBalance = {
-  walletType: 'ledger',
-  walletAddress: O.some('bc11766mazrxs5asuscepa227r6ekr657234f8p7nf'),
-  chain: BTCChain,
-  balances: RD.initial
-}
-
-const chainBalances: ChainBalances = [
-  {
-    ...runeBalance,
-    balances: RD.success([
-      {
-        amount: baseAmount('12200000000'),
-        asset: AssetRuneNative,
-        walletAddress: 'Rune wallet address'
-      }
-    ])
-  },
-  {
-    ...btcBalance,
-    balances: RD.success([
-      {
-        amount: baseAmount('1230000'),
-        asset: AssetBTC,
-        walletAddress: 'BTC wallet address'
-      }
-    ])
-  },
-  {
-    ...bnbBalance,
-    balances: RD.success([
-      {
-        amount: baseAmount('1000000'),
-        asset: AssetBNB,
-        walletAddress: 'BNB wallet address'
-      },
-      {
-        amount: baseAmount('300000000'),
-        asset: AssetETH,
-        walletAddress: 'ETH wallet address'
-      }
-    ])
-  }
-]
-
-const chainBalancesLoading: ChainBalances = [
-  {
-    ...runeBalance,
-    balances: RD.pending
-  },
-  {
-    ...btcBalance,
-    balances: RD.pending
-  }
-]
 const apiError: ApiError = { errorId: ErrorId.GET_BALANCES, msg: 'error message' }
-const chainBalancesError: ChainBalances = [
-  {
-    ...runeBalance,
-    balances: RD.failure({ ...apiError, msg: 'RUNE error' })
-  },
-  {
-    ...btcBalance,
-    balances: RD.failure({ ...apiError, msg: 'BTC error' })
-  }
-]
 
 const selectAssetHandler = (asset: Asset) => console.log('asset selected ', assetToString(asset))
-const pricePool = RUNE_PRICE_POOL
 
-storiesOf('Wallet/AssetsTableCollapsable', module).add('initial', () => {
+const balances: Partial<Record<Chain, ChainBalances>> = {
+  [BNBChain]: [
+    {
+      walletType: 'keystore',
+      walletAddress: O.some('bnb keystore'),
+      chain: BNBChain,
+      balances: RD.success([
+        {
+          amount: baseAmount('1000000'),
+          asset: AssetBNB,
+          walletAddress: 'BNB wallet address'
+        },
+        {
+          amount: baseAmount('300000000'),
+          asset: AssetRune67C,
+          walletAddress: 'BNB wallet address'
+        }
+      ])
+    }
+  ],
+  [BTCChain]: [
+    {
+      walletType: 'keystore',
+      walletAddress: O.some('btc keystore'),
+      chain: BTCChain,
+      balances: RD.success([
+        {
+          amount: baseAmount('1000000'),
+          asset: AssetBTC,
+          walletAddress: 'BNB wallet address'
+        }
+      ])
+    }
+  ],
+  [ETHChain]: [
+    {
+      walletType: 'keystore',
+      walletAddress: O.some('eth keystore'),
+      chain: ETHChain,
+      balances: RD.success([
+        {
+          amount: baseAmount('300000000'),
+          asset: AssetETH,
+          walletAddress: 'ETH wallet address'
+        }
+      ])
+    }
+  ],
+  [THORChain]: [
+    {
+      walletType: 'keystore',
+      walletAddress: O.some('thor keystore'),
+      chain: THORChain,
+      balances: RD.success([
+        {
+          amount: baseAmount('1000000'),
+          asset: AssetRuneNative,
+          walletAddress: 'BNB wallet address'
+        }
+      ])
+    }
+  ],
+  // [CosmosChain]: [],
+  // [PolkadotChain]: [],
+  // [BCHChain]: [],
+  [LTCChain]: [
+    {
+      walletType: 'keystore',
+      walletAddress: O.some('ltc keystore'),
+      chain: LTCChain,
+      balances: RD.success([
+        {
+          amount: baseAmount('1000000'),
+          asset: AssetLTC,
+          walletAddress: 'LTC wallet address'
+        }
+      ])
+    }
+  ]
+}
+
+const argTypes = Object.keys(balances).reduce(
+  (acc, chain) => ({
+    ...acc,
+    [chain]: { control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] } }
+  }),
+  {}
+)
+
+export default {
+  component: AssetsTableCollapsable,
+  title: 'Wallet/AssetsTableCollapsable',
+  argTypes
+}
+
+const getBalance = (chain: Chain, status: RDStatus | undefined, walletType: WalletType) =>
+  getMockRDValueFactory(
+    () =>
+      FP.pipe(
+        balances[chain],
+        O.fromNullable,
+        O.chain(A.findFirst((chainBalance) => chainBalance.walletType === walletType)),
+        O.map(({ balances }) => balances),
+        O.chain(RD.toOption),
+        O.getOrElse((): WalletBalances => [])
+      ),
+    () => ({ ...apiError, msg: `${chain} error` })
+  )(status)
+
+export const Default: Story<Partial<Record<Chain, RDStatus>>> = (args) => {
   return (
     <AssetsTableCollapsable
-      chainBalances={chainBalances}
-      poolDetails={[]}
       selectAssetHandler={selectAssetHandler}
-      pricePool={pricePool}
-      network="testnet"
-    />
-  )
-})
-storiesOf('Wallet/AssetsTableCollapsable', module).add('loading', () => {
-  return (
-    <AssetsTableCollapsable
-      chainBalances={chainBalancesLoading}
+      chainBalances={FP.pipe(
+        Object.entries(balances),
+        A.map(([chain, chainBalances]) =>
+          FP.pipe(
+            chainBalances || [],
+            A.map((chainBalance) => ({
+              ...chainBalance,
+              balances: getBalance(chain as Chain, args[chain as Chain], chainBalance.walletType)
+            }))
+          )
+        ),
+        A.flatten
+      )}
       poolDetails={[]}
-      pricePool={pricePool}
+      pricePool={RUNE_PRICE_POOL}
       network="testnet"
     />
   )
-})
-storiesOf('Wallet/AssetsTableCollapsable', module).add('error', () => {
-  return (
-    <AssetsTableCollapsable
-      chainBalances={chainBalancesError}
-      poolDetails={[]}
-      pricePool={pricePool}
-      network="testnet"
-    />
-  )
-})
+}
+
+Default.args = argTypes
