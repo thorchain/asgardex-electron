@@ -63,9 +63,11 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
         case 'BNB':
           return (
             <SendViewBNB
-              selectedAsset={asset}
+              asset={asset}
               balances={balances}
+              reloadBalances={reloadBalances}
               getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
               network={network}
             />
           )

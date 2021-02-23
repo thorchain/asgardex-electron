@@ -1,5 +1,6 @@
 import React from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import {
   assetAmount,
@@ -7,34 +8,32 @@ import {
   AssetRune67C,
   assetToBase,
   assetToString,
+  baseAmount,
   baseToAsset,
   formatAssetAmount
 } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/lib/Option'
 
-import { BNB_TRANSFER_FEES } from '../../../../../shared/mock/fees'
+import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { SendTxParams } from '../../../../services/binance/types'
-import { WalletBalances } from '../../../../services/clients'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormBNB, Props as SendFormBNBProps } from './SendFormBNB'
 
-const bnbAsset: WalletBalance = {
+const bnbBalance: WalletBalance = {
   asset: AssetBNB,
-  amount: assetToBase(assetAmount(1.23)),
+  amount: assetToBase(assetAmount(123)),
   walletAddress: 'AssetBNB wallet address'
 }
 
-const runeAsset: WalletBalance = {
+const runeBalance: WalletBalance = {
   asset: AssetRune67C,
-  amount: assetToBase(assetAmount(2)),
+  amount: assetToBase(assetAmount(234)),
   walletAddress: 'AssetRune67C wallet address'
 }
 
-const balances: WalletBalances = [bnbAsset, runeAsset]
-
 const defaultProps: SendFormBNBProps = {
-  balances,
-  balance: bnbAsset,
+  asset: AssetBNB,
+  balances: [bnbBalance, runeBalance],
+  balance: bnbBalance,
   onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) =>
     console.log(
       `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
@@ -44,29 +43,32 @@ const defaultProps: SendFormBNBProps = {
 
   isLoading: false,
   addressValidation: (_) => true,
-  fee: O.some(BNB_TRANSFER_FEES.single),
+  fee: RD.success(baseAmount(37500)),
+  reloadFeesHandler: () => console.log('reload fees'),
+  validatePassword$: mockValidatePassword$,
+  sendTxStatusMsg: '',
   network: 'testnet'
 }
 
 export const SendBnb: Story = () => <SendFormBNB {...defaultProps} />
 
 export const SendRune: Story = () => {
-  const props: SendFormBNBProps = { ...defaultProps, balance: runeAsset }
+  const props: SendFormBNBProps = { ...defaultProps, balance: runeBalance }
   return <SendFormBNB {...props} />
 }
 
 export const Pending: Story = () => {
-  const props: SendFormBNBProps = { ...defaultProps, isLoading: true }
+  const props: SendFormBNBProps = { ...defaultProps, isLoading: true, sendTxStatusMsg: 'Step 1/2' }
   return <SendFormBNB {...props} />
 }
 
 export const NoFees: Story = () => {
-  const props: SendFormBNBProps = { ...defaultProps, fee: O.none }
+  const props: SendFormBNBProps = { ...defaultProps, fee: RD.failure(Error('no fees')) }
   return <SendFormBNB {...props} />
 }
 
 export const FeeNotCovered: Story = () => {
-  const props: SendFormBNBProps = { ...defaultProps, fee: O.some(assetAmount(1.234)) }
+  const props: SendFormBNBProps = { ...defaultProps, balances: [{ ...bnbBalance, amount: baseAmount(30) }] }
   return <SendFormBNB {...props} />
 }
 

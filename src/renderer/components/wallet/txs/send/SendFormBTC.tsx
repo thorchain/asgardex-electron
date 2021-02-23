@@ -49,7 +49,7 @@ export type FormValues = {
 
 export type Props = {
   balances: WalletBalances
-  walletBalance: WalletBalance
+  balance: WalletBalance
   onSubmit: (p: SendTxParams) => void
   isLoading: boolean
   sendTxStatusMsg: string
@@ -63,7 +63,7 @@ export type Props = {
 export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   const {
     balances,
-    walletBalance,
+    balance,
     onSubmit,
     isLoading,
     sendTxStatusMsg,
@@ -123,10 +123,10 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => false,
-        (fee) => walletBalance.amount.amount().isLessThan(fee.amount())
+        (fee) => balance.amount.amount().isLessThan(fee.amount())
       )
     )
-  }, [walletBalance.amount, oFeeBaseAmount])
+  }, [balance.amount, oFeeBaseAmount])
 
   const selectedFeeLabel = useMemo(
     () =>
@@ -166,7 +166,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
       { id: 'wallet.errors.fee.notCovered' },
       {
         balance: formatAssetAmountCurrency({
-          amount: baseToAsset(walletBalance.amount),
+          amount: baseToAsset(balance.amount),
           asset: AssetBTC,
           trimZeros: true
         })
@@ -178,7 +178,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
         {msg}
       </Styled.Label>
     )
-  }, [walletBalance.amount, intl, isFeeError])
+  }, [balance.amount, intl, isFeeError])
 
   const feeOptionsLabel: Record<FeeOptionKey, string> = useMemo(
     () => ({
@@ -240,13 +240,13 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         selectedFee,
-        O.map((fee) => walletBalance.amount.amount().minus(fee.amount())),
+        O.map((fee) => balance.amount.amount().minus(fee.amount())),
         // Set maxAmount to zero as long as we dont have a feeRate
         O.getOrElse(() => ZERO_BN),
         baseAmount,
         baseToAsset
       ),
-    [walletBalance.amount, selectedFee]
+    [balance.amount, selectedFee]
   )
 
   const amountValidator = useCallback(
@@ -271,13 +271,13 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
 
     onSubmit({
       recipient: form.getFieldValue('recipient'),
-      asset: walletBalance.asset,
+      asset: balance.asset,
       amount: assetToBase(assetAmount(form.getFieldValue('amount'))),
       feeOptionKey: selectedFeeOptionKey,
       memo: form.getFieldValue('memo'),
       txType: TxTypes.TRANSFER
     })
-  }, [selectedFeeOptionKey, onSubmit, form, walletBalance])
+  }, [selectedFeeOptionKey, onSubmit, form, balance])
 
   const renderPwModal = useMemo(
     () =>
@@ -299,7 +299,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
         <Styled.Col span={24}>
           <AccountSelector
             onChange={changeAssetHandler}
-            selectedAsset={walletBalance.asset}
+            selectedAsset={balance.asset}
             walletBalances={balances}
             network={network}
           />
@@ -326,7 +326,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
                 {intl.formatMessage({ id: 'common.max' })}:{' '}
                 {formatAssetAmountCurrency({
                   amount: maxAmount,
-                  asset: walletBalance.asset,
+                  asset: balance.asset,
                   trimZeros: true
                 })}
               </Styled.Label>

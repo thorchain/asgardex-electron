@@ -14,6 +14,7 @@ import {
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 
+import { DEFAULT_FEE_OPTION_KEY } from '../../../components/wallet/txs/send/Send.const'
 import { liveData } from '../../../helpers/rx/liveData'
 import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
@@ -23,7 +24,14 @@ import * as THOR from '../../thorchain'
 import { ErrorId, TxHashLD, TxLD } from '../../wallet/types'
 import { SendTxParams } from '../types'
 
-export const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }: SendTxParams): TxHashLD => {
+export const sendTx$ = ({
+  asset,
+  recipient,
+  amount,
+  memo,
+  txType,
+  feeOptionKey = DEFAULT_FEE_OPTION_KEY
+}: SendTxParams): TxHashLD => {
   // helper to create `RemoteData<ApiError, never>` observable
   const txFailure$ = (msg: string) =>
     Rx.of(
