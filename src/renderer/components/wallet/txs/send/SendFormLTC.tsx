@@ -1,20 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOptionKey } from '@xchainjs/xchain-client'
 import { FeesWithRates } from '@xchainjs/xchain-litecoin/lib/types/client-types'
-import {
-  assetAmount,
-  AssetLTC,
-  assetToBase,
-  BaseAmount,
-  baseAmount,
-  baseToAsset,
-  bn,
-  formatAssetAmountCurrency
-} from '@xchainjs/xchain-util'
-import { Row, Form, Col } from 'antd'
+import { AssetLTC, BaseAmount, baseAmount, baseToAsset, bn, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { Row, Form } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
@@ -22,7 +12,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
-import { ZERO_BN } from '../../../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { LTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { SendTxParams } from '../../../../services/chain/types'
 import { WalletBalances } from '../../../../services/clients'
@@ -32,17 +22,18 @@ import { TxTypes } from '../../../../types/asgardex'
 import { WalletBalance } from '../../../../types/wallet'
 import { PasswordModal } from '../../../modal/password'
 import * as StyledR from '../../../shared/form/Radio.style'
+import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
+import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
 import { validateTxAmountInput } from '../TxForm.util'
 import { DEFAULT_FEE_OPTION_KEY } from './Send.const'
 import { useChangeAssetHandler } from './Send.hooks'
-import * as StyledForm from './SendForm.style'
 
 export type FormValues = {
   recipient: string
-  amount: string
+  amount: BigNumber
   memo?: string
   feeRate?: number
 }
@@ -88,6 +79,8 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
     feesWithRatesRD
   ])
 
+  const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+
   const feesAvailable = useMemo(() => O.isSome(oFeesWithRates), [oFeesWithRates])
 
   // Store latest fees as `ref`
@@ -127,37 +120,6 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
       )
     )
   }, [balance.amount, oFeeBaseAmount])
-
-  const selectedFeeLabel = useMemo(
-    () =>
-      FP.pipe(
-        feesWithRatesRD,
-        RD.fold(
-          () => '...',
-          () =>
-            // show previous fees while re-loading
-            FP.pipe(
-              prevFeesWithRatesRef.current,
-              O.map(({ fees }) =>
-                formatAssetAmountCurrency({
-                  amount: baseToAsset(fees[selectedFeeOptionKey]),
-                  asset: AssetLTC,
-                  trimZeros: true
-                })
-              ),
-              O.getOrElse(() => '...')
-            ),
-          (error) => `${intl.formatMessage({ id: 'common.error' })} ${error?.message ?? ''}`,
-          ({ fees }) =>
-            formatAssetAmountCurrency({
-              amount: baseToAsset(fees[selectedFeeOptionKey]),
-              asset: AssetLTC,
-              trimZeros: true
-            })
-        )
-      ),
-    [feesWithRatesRD, intl, selectedFeeOptionKey]
-  )
 
   const renderFeeError = useMemo(() => {
     if (!isFeeError) return <></>
@@ -236,15 +198,14 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
     [addressValidation, intl]
   )
 
-  const maxAmount = useMemo(
+  const maxAmount: BaseAmount = useMemo(
     () =>
       FP.pipe(
         selectedFee,
         O.map((fee) => balance.amount.amount().minus(fee.amount())),
         // Set maxAmount to zero as long as we dont have a feeRate
         O.getOrElse(() => ZERO_BN),
-        baseAmount,
-        baseToAsset
+        baseAmount
       ),
     [balance.amount, selectedFee]
   )
@@ -257,7 +218,7 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
         msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
         msg3: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalanceAndFee' })
       }
-      return validateTxAmountInput({ input: value, maxAmount, errors })
+      return validateTxAmountInput({ input: value, maxAmount: baseToAsset(maxAmount), errors })
     },
     [intl, maxAmount]
   )
@@ -272,12 +233,12 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
     onSubmit({
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
-      amount: assetToBase(assetAmount(form.getFieldValue('amount'))),
+      amount: amountToSend,
       feeOptionKey: selectedFeeOptionKey,
       memo: form.getFieldValue('memo'),
       txType: TxTypes.TRANSFER
     })
-  }, [selectedFeeOptionKey, onSubmit, form, balance])
+  }, [selectedFeeOptionKey, onSubmit, form, balance, amountToSend])
 
   const renderPwModal = useMemo(
     () =>
@@ -292,6 +253,29 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
       ),
     [sendHandler, showPwModal, validatePassword$]
   )
+
+  const uiFeesRD: UIFeesRD = useMemo(
+    () =>
+      FP.pipe(
+        feesWithRatesRD,
+        RD.map((fees) => [{ asset: AssetLTC, amount: fees.fees[selectedFeeOptionKey] }])
+      ),
+
+    [feesWithRatesRD, selectedFeeOptionKey]
+  )
+
+  const addMaxAmountHandler = useCallback(() => setAmountToSend(maxAmount), [maxAmount])
+
+  useEffect(() => {
+    setAmountToSend(maxAmount)
+  }, [maxAmount])
+
+  useEffect(() => {
+    // Whenever `amountToSend` has been updated, we put it back into input field
+    form.setFieldsValue({
+      amount: baseToAsset(amountToSend).amount()
+    })
+  }, [amountToSend, form])
 
   return (
     <>
@@ -322,30 +306,12 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
               <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
                 <InputBigNumber min={0} size="large" disabled={isLoading} decimal={LTC_DECIMAL} />
               </Styled.FormItem>
-              <Styled.Label size="big" style={{ marginBottom: 0, paddingBottom: 0 }}>
-                {intl.formatMessage({ id: 'common.max' })}:{' '}
-                {formatAssetAmountCurrency({
-                  amount: maxAmount,
-                  asset: balance.asset,
-                  trimZeros: true
-                })}
-              </Styled.Label>
-              <Row align="middle">
-                <Col>
-                  <StyledForm.FeeLabel
-                    size="big"
-                    color={RD.isFailure(feesWithRatesRD) ? 'error' : 'primary'}
-                    style={{ paddingTop: 0 }}
-                    disabled={RD.isPending(feesWithRatesRD)}>
-                    {intl.formatMessage({ id: 'common.fees' })}: {selectedFeeLabel}
-                  </StyledForm.FeeLabel>
-                </Col>
-                <Col>
-                  <StyledForm.FeeButton onClick={reloadFeesHandler} disabled={RD.isPending(feesWithRatesRD)}>
-                    <SyncOutlined />
-                  </StyledForm.FeeButton>
-                </Col>
-              </Row>
+              <MaxBalanceButton
+                balance={{ amount: maxAmount, asset: AssetLTC }}
+                onClick={addMaxAmountHandler}
+                disabled={isLoading}
+              />
+              <Styled.Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={isLoading} />
               {renderFeeError}
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
               <Form.Item name="memo">
