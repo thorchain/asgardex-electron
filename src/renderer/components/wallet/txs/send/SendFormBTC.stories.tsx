@@ -46,7 +46,7 @@ const rates: FeeRates = {
 
 const defaultProps: ComponentProps = {
   balances: [btcBalance, runeBalance],
-  walletBalance: btcBalance,
+  balance: btcBalance,
   onSubmit: ({ recipient, amount, feeOptionKey, memo }: SendTxParams) =>
     console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOptionKey}, memo: ${memo}`),
   isLoading: false,
@@ -95,7 +95,7 @@ FeesFailure.storyName = 'fees failure'
 export const FeesNotCovered: Story = () => {
   const props: ComponentProps = {
     ...defaultProps,
-    walletBalance: { ...btcBalance, amount: baseAmount(1, BTC_DECIMAL) }
+    balance: { ...btcBalance, amount: baseAmount(1, BTC_DECIMAL) }
   }
   return <Component {...props} />
 }
