@@ -1,17 +1,40 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
+import { FeeRates } from '@xchainjs/xchain-bitcoin'
+import { Fees } from '@xchainjs/xchain-client'
+import {
+  assetAmount,
+  AssetBNB,
+  AssetBTC,
+  AssetETH,
+  AssetLTC,
+  AssetRune67C,
+  assetToBase,
+  assetToString,
+  baseAmount,
+  baseToAsset,
+  formatAssetAmount
+} from '@xchainjs/xchain-util'
 
-import { ApiError, ErrorId } from '../../../../services/wallet/types'
-import { Send, Props as SendProps } from './Send'
-import { SendBnb, Pending as SendBnbPending } from './SendFormBNB.stories'
-import { Pending as SendBtcPending } from './SendFormBTC.stories'
-import { Pending as SendEthPending } from './SendFormETH.stories'
+import { Network } from '../../../../../shared/api/types'
+import { BNB_TRANSFER_FEES } from '../../../../../shared/mock/fees'
+import { RDStatus, getMockRDValueFactory } from '../../../../../shared/mock/rdByStatus'
+import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
+import { SendTxParams } from '../../../../services/binance/types'
+import { WalletBalances } from '../../../../services/clients'
+import { ErrorId, TxHashRD } from '../../../../services/wallet/types'
+import { WalletBalance } from '../../../../types/wallet'
+import { Send } from './Send'
+import { SendFormBNB } from './SendFormBNB'
+import { SendFormBTC } from './SendFormBTC'
+import { SendFormETH } from './SendFormETH'
+import { SendFormLTC } from './SendFormLTC'
 
-const defaultProps: SendProps = {
+const defaultProps = {
   txRD: RD.initial,
-  sendForm: <h1>Send Form</h1>,
   inititalActionHandler: () => console.log('initial action'),
   finishActionHandler: () => console.log('finish action'),
   viewTxHandler: (txHash: string) => {
@@ -21,53 +44,158 @@ const defaultProps: SendProps = {
   errorActionHandler: () => console.log('error action')
 }
 
-export const Default: Story = () => {
-  const props: SendProps = { ...defaultProps, sendForm: <SendBnb /> }
-  return <Send {...props} />
+const bnbAsset: WalletBalance = {
+  asset: AssetBNB,
+  amount: assetToBase(assetAmount(12.3)),
+  walletAddress: 'AssetBNB wallet address'
 }
-Default.storyName = 'default - send bnb'
 
-export const Pending: Story = () => {
-  const props: SendProps = { ...defaultProps, txRD: RD.pending, sendForm: <SendBnbPending /> }
-  return <Send {...props} />
+const btcBalance: WalletBalance = {
+  asset: AssetBTC,
+  amount: assetToBase(assetAmount(23.45, BTC_DECIMAL)),
+  walletAddress: 'btc wallet address'
 }
-Pending.storyName = 'pending - send bnb'
 
-export const PendingBTC: Story = () => {
-  const props: SendProps = { ...defaultProps, txRD: RD.pending, sendForm: <SendBtcPending /> }
-  return <Send {...props} />
+const runeAsset: WalletBalance = {
+  asset: AssetRune67C,
+  amount: assetToBase(assetAmount(34.56)),
+  walletAddress: 'AssetRune67C wallet address'
 }
-PendingBTC.storyName = 'pending - send btc'
 
-export const PendingETH: Story = () => {
-  const props: SendProps = { ...defaultProps, txRD: RD.pending, sendForm: <SendEthPending /> }
-  return <Send {...props} />
+const ethBalance: WalletBalance = {
+  asset: AssetETH,
+  amount: assetToBase(assetAmount(45.67)),
+  walletAddress: 'AssetETH wallet address'
 }
-PendingETH.storyName = 'pending - send eth'
 
-export const Error: Story = () => {
-  const props: SendProps = {
-    ...defaultProps,
-    txRD: RD.failure<ApiError>({ errorId: ErrorId.SEND_TX, msg: 'Sending tx failed' }),
-    sendForm: <SendBnb />
+const ltcBalance: WalletBalance = {
+  asset: AssetLTC,
+  amount: assetToBase(assetAmount(56.78)),
+  walletAddress: 'AssetLTC wallet address'
+}
+
+const SendFormsComponents = {
+  SendFormBNB: {
+    component: SendFormBNB,
+    balance: bnbAsset
+  },
+  SendFormBTC: {
+    component: SendFormBTC,
+    balance: btcBalance
+  },
+  SendFormETH: {
+    component: SendFormETH,
+    balance: ethBalance
+  },
+  SendFormLTC: {
+    component: SendFormLTC,
+    balance: ltcBalance
   }
-  return <Send {...props} />
 }
-Error.storyName = 'error'
+const getSendForm = (component: SendForm) => {
+  return SendFormsComponents[component].component
+}
 
-export const Success: Story = () => {
-  const props: SendProps = {
-    ...defaultProps,
-    txRD: RD.success('0xabc123'),
-    sendForm: <SendBnb />
-  }
-  return <Send {...props} />
+const getSendBalance = (component: SendForm) => {
+  return SendFormsComponents[component].balance
 }
-Success.storyName = 'success'
+
+type SendForm = keyof typeof SendFormsComponents
+
+const balances: WalletBalances = [bnbAsset, runeAsset, btcBalance, ethBalance]
+
+const fees: Fees = {
+  type: 'base',
+  fastest: baseAmount(3000),
+  fast: baseAmount(2000),
+  average: baseAmount(1000)
+}
+
+const rates: FeeRates = {
+  fastest: 5,
+  fast: 3,
+  average: 2
+}
+
+const defaultComponentProps = {
+  balances,
+  balance: bnbAsset,
+  feesWithRates: RD.success({ fees, rates }),
+  onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) =>
+    console.log(
+      `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
+        asset
+      )}, memo: ${memo}`
+    ),
+
+  isLoading: false,
+  addressValidation: (_: unknown) => true,
+  fee: RD.success(assetToBase(BNB_TRANSFER_FEES.single)),
+  network: 'testnet' as Network,
+
+  fees: RD.success(fees),
+  reloadFeesHandler: () => console.log('reloadFeesHandler'),
+  validatePassword$: mockValidatePassword$
+}
+
+const getTxRdFromStatus = getMockRDValueFactory(
+  () => '0xabc123',
+  () => ({ errorId: ErrorId.SEND_TX, msg: 'Sending tx failed' })
+)
+
+export const Default: Story<{ sendForm: SendForm; txRDStatus: RDStatus; sendTxStatusMsg: string }> = ({
+  sendForm,
+  txRDStatus,
+  sendTxStatusMsg
+}) => {
+  const Component = useMemo(() => getSendForm(sendForm), [sendForm])
+  const balance = useMemo(() => getSendBalance(sendForm), [sendForm])
+  const txRD: TxHashRD = useMemo(() => getTxRdFromStatus(txRDStatus), [txRDStatus])
+  const isLoading = useMemo(
+    () =>
+      RD.fold(
+        () => false,
+        () => true,
+        () => false,
+        () => false
+      )(txRD),
+    [txRD]
+  )
+  return (
+    <Send
+      {...defaultProps}
+      txRD={txRD}
+      sendForm={
+        <Component
+          {...defaultComponentProps}
+          sendTxStatusMsg={sendTxStatusMsg}
+          balance={balance}
+          isLoading={isLoading}
+        />
+      }
+    />
+  )
+}
+
+const argTypes = {
+  sendForm: {
+    control: {
+      type: 'select',
+      options: Object.keys(SendFormsComponents)
+    }
+  },
+  txRDStatus: { control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] } },
+  sendTxStatusMsg: {
+    control: {}
+  }
+}
+
+Default.args = { sendForm: 'SendFormBNB', txRDStatus: 'initial', sendTxStatusMsg: '' }
 
 const meta: Meta = {
   component: Send,
-  title: 'Wallet/Send'
+  title: 'Wallet/Send',
+  argTypes: argTypes
 }
 
 export default meta
