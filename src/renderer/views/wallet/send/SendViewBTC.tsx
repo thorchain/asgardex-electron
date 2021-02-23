@@ -129,7 +129,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
           oBalances,
           O.getOrElse(() => [] as WalletBalances)
         )}
-        walletBalance={walletBalance}
+        balance={walletBalance}
         isLoading={isLoading}
         onSubmit={onSend}
         addressValidation={addressValidation}
