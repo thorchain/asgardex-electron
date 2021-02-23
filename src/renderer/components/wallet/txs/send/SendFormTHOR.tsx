@@ -142,7 +142,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         // Set maxAmount to zero if we dont know anything about RuneNative and fee amounts
         () => ZERO_BASE_AMOUNT,
-        ([fee, runeAmount]) => baseAmount(runeAmount.amount().minus(fee.amount()))
+        ([fee, runeAmount]) => baseAmount(runeAmount.amount().minus(fee.amount()), THORCHAIN_DECIMAL)
       )
     )
     return isRuneNativeAsset(balance.asset) ? maxRuneAmount : balance.amount
@@ -215,7 +215,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToSend(assetToBase(assetAmount(value)))
+          setAmountToSend(assetToBase(assetAmount(value, THORCHAIN_DECIMAL)))
         })
         .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
     },
