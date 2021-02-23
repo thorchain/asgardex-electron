@@ -10,8 +10,7 @@ import {
   AssetBNB,
   assetToBase,
   BaseAmount,
-  baseAmount,
-  Asset
+  baseAmount
 } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -46,7 +45,6 @@ export type FormValues = {
 }
 
 export type Props = {
-  asset?: Asset
   balances: WalletBalances
   balance: WalletBalance
   onSubmit: (p: SendTxParams) => void
@@ -61,7 +59,6 @@ export type Props = {
 
 export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
   const {
-    asset = AssetBNB,
     balances,
     balance,
     onSubmit,
@@ -152,10 +149,6 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
   }, [oFee, oBnbAmount, balance])
 
   useEffect(() => {
-    setAmountToSend(maxAmount)
-  }, [maxAmount])
-
-  useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
     form.setFieldsValue({
       amount: baseToAsset(amountToSend).amount()
@@ -188,8 +181,6 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
       amount: amountToSend,
-      // `feeOptionKey' has no effect for BNB transactions
-      feeOptionKey: 'average',
       memo: form.getFieldValue('memo'),
       txType: TxTypes.TRANSFER
     })
@@ -258,7 +249,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
                 <InputBigNumber min={0} size="large" disabled={isLoading} decimal={8} onChange={onChangeInput} />
               </Styled.FormItem>
               <MaxBalanceButton
-                balance={{ amount: maxAmount, asset }}
+                balance={{ amount: maxAmount, asset: balance.asset }}
                 onClick={addMaxAmountHandler}
                 disabled={isLoading}
               />
