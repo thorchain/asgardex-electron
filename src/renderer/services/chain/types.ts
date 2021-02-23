@@ -53,7 +53,7 @@ export type SendTxParams = {
   amount: BaseAmount
   memo: Memo
   txType: TxTypes
-  feeOptionKey: FeeOptionKey
+  feeOptionKey?: FeeOptionKey
 }
 
 export type LedgerAddressParams = { chain: Chain; network: Network }

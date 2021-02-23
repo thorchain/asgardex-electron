@@ -10,13 +10,14 @@ import { formatFee } from './Fees.helper'
 import * as Styled from './Fees.styles'
 import { UIFeesRD } from './Fees.types'
 
-type Props = {
+export type Props = {
   fees: UIFeesRD
   reloadFees?: () => void
+  disabled?: boolean
   className?: string
 }
 
-export const Fees: React.FC<Props> = ({ fees, reloadFees, className }) => {
+export const Fees: React.FC<Props> = ({ fees, reloadFees, disabled = false, className }) => {
   const intl = useIntl()
 
   const prevFeesRef = useRef<O.Option<string>>(O.none)
@@ -76,10 +77,10 @@ export const Fees: React.FC<Props> = ({ fees, reloadFees, className }) => {
             e.preventDefault()
             reloadFees()
           }}
-          disabled={RD.isPending(fees)}
+          disabled={RD.isPending(fees) || disabled}
         />
       )}
-      <Styled.FeeLabel isError={RD.isFailure(fees)} isLoading={RD.isPending(fees)}>
+      <Styled.FeeLabel isError={RD.isFailure(fees)} isLoading={RD.isPending(fees)} disabled={disabled}>
         {feesFormattedValue}
       </Styled.FeeLabel>
     </Styled.Container>
