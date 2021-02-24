@@ -257,9 +257,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
   }, [intl, asset, depositState, assetAmountToDeposit, network])
 
   const onFinishTxModal = useCallback(() => {
-    // Do same things as with closing
     resetDepositState()
-    // but also refresh balances
     reloadBalances()
   }, [resetDepositState, reloadBalances])
 
