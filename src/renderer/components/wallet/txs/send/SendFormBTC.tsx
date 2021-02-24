@@ -305,6 +305,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
+      <div>amountToSend: {amountToSend.amount().toString()}</div>
       <Row>
         <Styled.Col span={24}>
           <AccountSelector
