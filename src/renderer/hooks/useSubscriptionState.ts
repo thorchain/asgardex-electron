@@ -30,15 +30,6 @@ export const useSubscriptionState = <T>(initialState: T) => {
     subRef.current = O.none
   }, [subRef])
 
-  // Store subscription by unsubscribing previous subscription
-  const setSub = useCallback(
-    (subscription) => {
-      unsubscribeSub()
-      subRef.current = O.some(subscription)
-    },
-    [unsubscribeSub]
-  )
-
   // Reset subscription and state
   const reset = useCallback(() => {
     unsubscribeSub()
@@ -47,8 +38,9 @@ export const useSubscriptionState = <T>(initialState: T) => {
 
   // Subscribe to an Observable
   const subscribe = (stream$: Rx.Observable<T>) => {
+    unsubscribeSub()
     const subscription = stream$.subscribe(setState)
-    setSub(subscription)
+    subRef.current = O.some(subscription)
   }
 
   /** Clean up */
@@ -58,5 +50,5 @@ export const useSubscriptionState = <T>(initialState: T) => {
     }
   }, [unsubscribeSub])
 
-  return { state, setState, subscribe, reset }
+  return { state, subscribe, reset }
 }
