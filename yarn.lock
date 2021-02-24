@@ -4731,10 +4731,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-polkadot/-/xchain-polkadot-0.5.0.tgz#8c3e2cfe71d43465b045ed8ce96b06787fb20cb8"
   integrity sha512-/Oxy/xPc9yeXJ6wIcrvVUT/Y24iU66popH9SiQqtFgYeKfuPR1LDn7YWhbJyzOZyAB18czvhdH6hi7P3B0J28g==
 
-"@xchainjs/xchain-thorchain@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.11.0.tgz#7febd06c3cc9bad1440ba15239f1e21bf140048c"
-  integrity sha512-DamD9acMJHCATh+rtj5O9gpevo4r6lLQacw6K5IHk3ZKMUNRqqreLOHpslG2IJNz/Y3k3yO7NmjkEdqaS+Fg2Q==
+"@xchainjs/xchain-thorchain@^0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.11.1.tgz#676e2af00535572f9c9b5bf1b04a951a5718f60f"
+  integrity sha512-qat9srkl/FmtnZjiOrps2TgAXR0ESQa4xup2WvILjNc7SsiizofdUGfPiC1ZwRpOYYHjXWfwufADov9EvsbMbQ==
 
 "@xchainjs/xchain-util@^0.2.3":
   version "0.2.3"
