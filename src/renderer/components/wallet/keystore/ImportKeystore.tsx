@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 import { CheckCircleTwoTone, UploadOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
@@ -7,13 +7,12 @@ import { Form, Spin } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
 import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
-import * as Rx from 'rxjs'
 
 import { useBinanceContext } from '../../../contexts/BinanceContext'
+import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import * as walletRoutes from '../../../routes/wallet'
 import { ImportKeystoreLD, LoadKeystoreLD } from '../../../services/wallet/types'
 import { Button } from '../../uielements/button'
@@ -35,54 +34,36 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
 
   const { clientViewState$ } = useBinanceContext()
   const clientViewState = useObservableState(clientViewState$, 'notready')
-  const [loadKeystoreState, setLoadKeystoreState] = useState<RD.RemoteData<Error, Keystore>>(RD.initial)
-  const [importKeystoreState, setImportKeystoreState] = useState<RD.RemoteData<Error, void>>(RD.initial)
 
-  // (Possible) subscription of loadKeystore$ or importKeystore$
-  const [keystoreSub, setKeystoreSub] = useState<O.Option<Rx.Subscription>>(O.none)
+  const { state: loadKeystoreState, subscribe: subscribeLoadKeystoreState } = useSubscriptionState<
+    RD.RemoteData<Error, Keystore>
+  >(RD.initial)
 
-  // unsubscribe loadKeystore$ or importKeystore$ subscriptions
-  const unsubScribeKeystoreSub = useCallback(() => {
-    FP.pipe(
-      keystoreSub,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [keystoreSub])
+  const { state: importKeystoreState, subscribe: subscribeImportKeystoreState } = useSubscriptionState<
+    RD.RemoteData<Error, void>
+  >(RD.initial)
 
   useEffect(() => {
     if (clientViewState === 'ready') {
-      unsubScribeKeystoreSub()
       history.push(walletRoutes.assets.template)
     }
-  }, [clientViewState, history, intl, unsubScribeKeystoreSub])
-
-  // clean up subscription
-  useEffect(() => {
-    return () => {
-      unsubScribeKeystoreSub()
-    }
-  }, [unsubScribeKeystoreSub])
+  }, [clientViewState, history, intl])
 
   const submitForm = useCallback(
     ({ password }: Store) => {
       FP.pipe(
         loadKeystoreState,
         RD.map((state) => {
-          unsubScribeKeystoreSub()
-          const sub = importKeystore$(state, password).subscribe(setImportKeystoreState)
-          setKeystoreSub(O.some(sub))
+          subscribeImportKeystoreState(importKeystore$(state, password))
           return true
         })
       )
     },
-    [importKeystore$, loadKeystoreState, unsubScribeKeystoreSub]
+    [importKeystore$, loadKeystoreState, subscribeImportKeystoreState]
   )
 
   const uploadKeystore = () => {
-    unsubScribeKeystoreSub()
-    setImportKeystoreState(RD.initial)
-    const sub = loadKeystore$().subscribe(setLoadKeystoreState)
-    setKeystoreSub(O.some(sub))
+    subscribeLoadKeystoreState(loadKeystore$())
   }
 
   const renderError = useCallback((msg: string) => <Paragraph style={{ color: 'red' }}>{msg}</Paragraph>, [])
