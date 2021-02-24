@@ -139,7 +139,6 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
   const sendForm = useCallback(
     (walletBalance: WalletBalance) => (
       <SendFormBNB
-        asset={asset}
         balances={FP.pipe(
           oBalances,
           O.getOrElse(() => [] as WalletBalances)
@@ -155,18 +154,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         network={network}
       />
     ),
-    [
-      asset,
-      oBalances,
-      isLoading,
-      onSend,
-      addressValidation,
-      feeRD,
-      reloadFees,
-      validatePassword$,
-      sendTxStatusMsg,
-      network
-    ]
+    [oBalances, isLoading, onSend, addressValidation, feeRD, reloadFees, validatePassword$, sendTxStatusMsg, network]
   )
 
   const finishActionHandler = useCallback(() => {

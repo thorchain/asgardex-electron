@@ -95,7 +95,14 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
         case 'THOR':
           return (
-            <SendViewTHOR thorAsset={asset} balances={balances} getExplorerTxUrl={getExplorerTxUrl} network={network} />
+            <SendViewTHOR
+              asset={asset}
+              balances={balances}
+              reloadBalances={reloadBalances}
+              getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
+              network={network}
+            />
           )
         default:
           return (
