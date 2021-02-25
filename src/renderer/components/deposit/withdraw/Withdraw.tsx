@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getWithdrawMemo } from '@thorchain/asgardex-util'
@@ -24,6 +24,7 @@ import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
 import { FeeLD, FeeRD, Memo, WithdrawState, WithdrawStateHandler } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
@@ -89,6 +90,12 @@ export const Withdraw: React.FC<Props> = ({
 
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
 
+  const {
+    state: withdrawState,
+    reset: resetWithdrawState,
+    subscribe: subscribeWithdrawState
+  } = useSubscriptionState<WithdrawState>(INITIAL_WITHDRAW_STATE)
+
   // For a WITHDRAW memo percent needs to be multiplied by 100 to transform it into "points" (needed by `getWithdrawMemo`)
   const memo = useMemo(() => getWithdrawMemo(asset, withdrawPercent * 100), [asset, withdrawPercent])
 
@@ -97,33 +104,6 @@ export const Withdraw: React.FC<Props> = ({
     assetShare,
     withdrawPercent
   )
-
-  // (Possible) subscription of `withdraw$`
-  // DON'T use `_setWithdrawSub` to update state (it's unsafe) - use `setWithdrawSub`!!
-  const [withdrawSub, _setWithdrawSub] = useState<O.Option<Rx.Subscription>>(O.none)
-
-  // unsubscribe withdraw$ subscription
-  const unsubscribeWithdrawSub = useCallback(() => {
-    FP.pipe(
-      withdrawSub,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [withdrawSub])
-
-  const setWithdrawSub = useCallback(
-    (state) => {
-      unsubscribeWithdrawSub()
-      _setWithdrawSub(state)
-    },
-    [unsubscribeWithdrawSub]
-  )
-
-  useEffect(() => {
-    // Unsubscribe of (possible) previous subscription of `withdraw$`
-    return () => {
-      unsubscribeWithdrawSub()
-    }
-  }, [unsubscribeWithdrawSub])
 
   // TODO (@Veado) Use following logic for asym. withdraw only (see https://github.com/thorchain/asgardex-electron/issues/827)
   // For sym. withdraw we do need to get fees only once (THORChain tx fee does not depend on memo)
@@ -188,9 +168,6 @@ export const Withdraw: React.FC<Props> = ({
   // Deposit start time
   const [depositStartTime, setDepositStartTime] = useState<number>(0)
 
-  // Withdraw state
-  const [withdrawState, setWithdrawState] = useState<WithdrawState>(INITIAL_WITHDRAW_STATE)
-
   const txModalExtraContent = useMemo(() => {
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
@@ -221,21 +198,10 @@ export const Withdraw: React.FC<Props> = ({
     )
   }, [intl, asset, withdrawState, assetAmountToWithdraw, runeAmountToWithdraw, network])
 
-  const onCloseTxModal = useCallback(() => {
-    // unsubscribe
-    unsubscribeWithdrawSub()
-    // reset withdraw$ subscription
-    setWithdrawSub(O.none)
-    // reset deposit state
-    setWithdrawState(INITIAL_WITHDRAW_STATE)
-  }, [setWithdrawSub, unsubscribeWithdrawSub])
-
   const onFinishTxModal = useCallback(() => {
-    // Do same things as with closing
-    onCloseTxModal()
-    // but also refresh balances
+    resetWithdrawState()
     reloadBalances()
-  }, [onCloseTxModal, reloadBalances])
+  }, [reloadBalances, resetWithdrawState])
 
   const renderTxModal = useMemo(() => {
     const { withdraw: withdrawRD, withdrawTx } = withdrawState
@@ -284,7 +250,7 @@ export const Withdraw: React.FC<Props> = ({
     return (
       <TxModal
         title={txModalTitle}
-        onClose={onCloseTxModal}
+        onClose={resetWithdrawState}
         onFinish={onFinishTxModal}
         startTime={depositStartTime}
         txRD={withdrawRD}
@@ -293,7 +259,7 @@ export const Withdraw: React.FC<Props> = ({
         extra={txModalExtraContent}
       />
     )
-  }, [withdrawState, onCloseTxModal, onFinishTxModal, depositStartTime, txModalExtraContent, intl, viewRuneTx])
+  }, [withdrawState, resetWithdrawState, onFinishTxModal, depositStartTime, txModalExtraContent, intl, viewRuneTx])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
@@ -313,17 +279,16 @@ export const Withdraw: React.FC<Props> = ({
     // set start time
     setDepositStartTime(Date.now())
 
-    const sub = withdraw$({
-      // TODO @veado Use asset for asym withdraw - see https://github.com/thorchain/asgardex-electron/issues/827
-      asset: AssetRuneNative,
-      poolAddress: oPoolAddress,
-      network,
-      memo
-    }).subscribe(setWithdrawState)
-
-    // store subscription - needed to unsubscribe while unmounting
-    setWithdrawSub(O.some(sub))
-  }, [closePasswordModal, withdraw$, oPoolAddress, network, memo, setWithdrawSub])
+    subscribeWithdrawState(
+      withdraw$({
+        // TODO @veado Use asset for asym withdraw - see https://github.com/thorchain/asgardex-electron/issues/827
+        asset: AssetRuneNative,
+        poolAddress: oPoolAddress,
+        network,
+        memo
+      })
+    )
+  }, [closePasswordModal, subscribeWithdrawState, withdraw$, oPoolAddress, network, memo])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>

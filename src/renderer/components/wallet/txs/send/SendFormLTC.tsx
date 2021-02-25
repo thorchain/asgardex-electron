@@ -1,46 +1,41 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import {
-  formatAssetAmountCurrency,
-  assetAmount,
-  bn,
-  AssetRuneNative,
-  assetToBase,
-  baseAmount,
-  BaseAmount,
-  baseToAsset
-} from '@xchainjs/xchain-util'
+import { FeeOptionKey } from '@xchainjs/xchain-client'
+import { FeesWithRates } from '@xchainjs/xchain-litecoin/lib/types/client-types'
+import { AssetLTC, BaseAmount, baseAmount, baseToAsset, bn, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
+import { RadioChangeEvent } from 'antd/lib/radio'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
-import { ZERO_BASE_AMOUNT } from '../../../../const'
-import { isRuneNativeAsset, THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
-import { sequenceTOption } from '../../../../helpers/fpHelpers'
-import { getRuneNativeAmountFromBalances } from '../../../../helpers/walletHelper'
-import { FeeRD, SendTxParams } from '../../../../services/chain/types'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
+import { LTC_DECIMAL } from '../../../../helpers/assetHelper'
+import { SendTxParams } from '../../../../services/chain/types'
 import { WalletBalances } from '../../../../services/clients'
-import { AddressValidation } from '../../../../services/thorchain/types'
+import { AddressValidation, FeesWithRatesRD } from '../../../../services/litecoin/types'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { TxTypes } from '../../../../types/asgardex'
 import { WalletBalance } from '../../../../types/wallet'
 import { PasswordModal } from '../../../modal/password'
+import * as StyledR from '../../../shared/form/Radio.style'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
 import { validateTxAmountInput } from '../TxForm.util'
+import { DEFAULT_FEE_OPTION_KEY } from './Send.const'
 import { useChangeAssetHandler } from './Send.hooks'
 
 export type FormValues = {
   recipient: string
   amount: BigNumber
   memo?: string
+  feeRate?: number
 }
 
 export type Props = {
@@ -50,13 +45,13 @@ export type Props = {
   isLoading: boolean
   sendTxStatusMsg: string
   addressValidation: AddressValidation
-  fee: FeeRD
+  feesWithRates: FeesWithRatesRD
   reloadFeesHandler: FP.Lazy<void>
   validatePassword$: ValidatePasswordHandler
   network: Network
 }
 
-export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
+export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
   const {
     balances,
     balance,
@@ -64,55 +59,79 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     isLoading,
     sendTxStatusMsg,
     addressValidation,
-    fee: feeRD,
+    feesWithRates: feesWithRatesRD,
     reloadFeesHandler,
     validatePassword$,
     network
   } = props
 
-  const intl = useIntl()
-
   const changeAssetHandler = useChangeAssetHandler()
 
-  const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+  const intl = useIntl()
+
+  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>(DEFAULT_FEE_OPTION_KEY)
 
   const [form] = Form.useForm<FormValues>()
 
-  const oRuneNativeAmount: O.Option<BaseAmount> = useMemo(() => {
-    // return balance of current asset (if RuneNative)
-    if (isRuneNativeAsset(balance.asset)) {
-      return O.some(balance.amount)
-    }
-    // or check list of other assets to get RuneNative balance
-    return FP.pipe(balances, getRuneNativeAmountFromBalances, O.map(assetToBase))
-  }, [balance, balances])
+  const prevFeesWithRatesRef = useRef<O.Option<FeesWithRates>>(O.none)
 
-  const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
+  const oFeesWithRates: O.Option<FeesWithRates> = useMemo(() => FP.pipe(feesWithRatesRD, RD.toOption), [
+    feesWithRatesRD
+  ])
+
+  const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+
+  const feesAvailable = useMemo(() => O.isSome(oFeesWithRates), [oFeesWithRates])
+
+  // Store latest fees as `ref`
+  // needed to display previous fee while reloading
+  useEffect(() => {
+    FP.pipe(
+      oFeesWithRates,
+      O.map((feesWithRates) => (prevFeesWithRatesRef.current = O.some(feesWithRates)))
+    )
+  }, [oFeesWithRates])
+
+  const selectedFee: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        oFeesWithRates,
+        O.map(({ fees }) => fees[selectedFeeOptionKey])
+      ),
+    [oFeesWithRates, selectedFeeOptionKey]
+  )
+
+  const oFeeBaseAmount: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        oFeesWithRates,
+        O.map(({ fees }) => fees[selectedFeeOptionKey])
+      ),
+    [oFeesWithRates, selectedFeeOptionKey]
+  )
 
   const isFeeError = useMemo(() => {
     return FP.pipe(
-      sequenceTOption(oFee, oRuneNativeAmount),
+      oFeeBaseAmount,
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
-        () => !O.isNone(oFee),
-        ([fee, runeAmount]) => runeAmount.amount().isLessThan(fee.amount())
+        () => false,
+        (fee) => balance.amount.amount().isLessThan(fee.amount())
       )
     )
-  }, [oRuneNativeAmount, oFee])
+  }, [balance.amount, oFeeBaseAmount])
 
   const renderFeeError = useMemo(() => {
     if (!isFeeError) return <></>
 
-    const amount = FP.pipe(
-      oRuneNativeAmount,
-      // no RuneNative asset == zero amount
-      O.getOrElse(() => ZERO_BASE_AMOUNT)
-    )
-
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
       {
-        balance: formatAssetAmountCurrency({ amount: baseToAsset(amount), asset: AssetRuneNative, trimZeros: true })
+        balance: formatAssetAmountCurrency({
+          amount: baseToAsset(balance.amount),
+          asset: AssetLTC,
+          trimZeros: true
+        })
       }
     )
 
@@ -121,7 +140,51 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
         {msg}
       </Styled.Label>
     )
-  }, [oRuneNativeAmount, intl, isFeeError])
+  }, [balance.amount, intl, isFeeError])
+
+  const feeOptionsLabel: Record<FeeOptionKey, string> = useMemo(
+    () => ({
+      fast: intl.formatMessage({ id: 'wallet.send.fast' }),
+      fastest: intl.formatMessage({ id: 'wallet.send.fastest' }),
+      average: intl.formatMessage({ id: 'wallet.send.average' })
+    }),
+    [intl]
+  )
+
+  const renderFeeOptionsRadioGroup = useCallback(
+    ({ rates }: FeesWithRates) => {
+      const onChangeHandler = (e: RadioChangeEvent) => setSelectedFeeOptionKey(e.target.value)
+      return (
+        <StyledR.Radio.Group onChange={onChangeHandler} value={selectedFeeOptionKey} disabled={isLoading}>
+          {Object.keys(rates).map((key) => (
+            <StyledR.Radio value={key as FeeOptionKey} key={key}>
+              <StyledR.RadioLabel>{feeOptionsLabel[key as FeeOptionKey]}</StyledR.RadioLabel>
+            </StyledR.Radio>
+          ))}
+        </StyledR.Radio.Group>
+      )
+    },
+
+    [feeOptionsLabel, isLoading, selectedFeeOptionKey]
+  )
+
+  const renderFeeOptions = useMemo(
+    () =>
+      FP.pipe(
+        oFeesWithRates,
+        O.fold(
+          () =>
+            // render radio group while reloading fees
+            FP.pipe(
+              prevFeesWithRatesRef.current,
+              O.map(renderFeeOptionsRadioGroup),
+              O.getOrElse(() => <></>)
+            ),
+          renderFeeOptionsRadioGroup
+        )
+      ),
+    [prevFeesWithRatesRef, oFeesWithRates, renderFeeOptionsRadioGroup]
+  )
 
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
@@ -135,25 +198,17 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     [addressValidation, intl]
   )
 
-  // max amount for RuneNative
-  const maxAmount: BaseAmount = useMemo(() => {
-    const maxRuneAmount = FP.pipe(
-      sequenceTOption(oFee, oRuneNativeAmount),
-      O.fold(
-        // Set maxAmount to zero if we dont know anything about RuneNative and fee amounts
-        () => ZERO_BASE_AMOUNT,
-        ([fee, runeAmount]) => baseAmount(runeAmount.amount().minus(fee.amount()), THORCHAIN_DECIMAL)
-      )
-    )
-    return isRuneNativeAsset(balance.asset) ? maxRuneAmount : balance.amount
-  }, [oFee, oRuneNativeAmount, balance.asset, balance.amount])
-
-  useEffect(() => {
-    // Whenever `amountToSend` has been updated, we put it back into input field
-    form.setFieldsValue({
-      amount: baseToAsset(amountToSend).amount()
-    })
-  }, [amountToSend, form])
+  const maxAmount: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        selectedFee,
+        O.map((fee) => balance.amount.amount().minus(fee.amount())),
+        // Set maxAmount to zero as long as we dont have a feeRate
+        O.getOrElse(() => ZERO_BN),
+        baseAmount
+      ),
+    [balance.amount, selectedFee]
+  )
 
   const amountValidator = useCallback(
     async (_: unknown, value: BigNumber) => {
@@ -161,13 +216,11 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
       const errors = {
         msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
         msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
-        msg3: isRuneNativeAsset(balance.asset)
-          ? intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalanceAndFee' })
-          : intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
+        msg3: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalanceAndFee' })
       }
       return validateTxAmountInput({ input: value, maxAmount: baseToAsset(maxAmount), errors })
     },
-    [balance, intl, maxAmount]
+    [intl, maxAmount]
   )
 
   // State for visibility of Modal to confirm tx
@@ -181,10 +234,11 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
       amount: amountToSend,
+      feeOptionKey: selectedFeeOptionKey,
       memo: form.getFieldValue('memo'),
       txType: TxTypes.TRANSFER
     })
-  }, [onSubmit, form, balance.asset, amountToSend])
+  }, [selectedFeeOptionKey, onSubmit, form, balance, amountToSend])
 
   const renderPwModal = useMemo(
     () =>
@@ -203,26 +257,25 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
-        feeRD,
-        RD.map((fee) => [{ asset: AssetRuneNative, amount: fee }])
+        feesWithRatesRD,
+        RD.map((fees) => [{ asset: AssetLTC, amount: fees.fees[selectedFeeOptionKey] }])
       ),
 
-    [feeRD]
-  )
-
-  const onChangeInput = useCallback(
-    async (value: BigNumber) => {
-      // we have to validate input before storing into the state
-      amountValidator(undefined, value)
-        .then(() => {
-          setAmountToSend(assetToBase(assetAmount(value, THORCHAIN_DECIMAL)))
-        })
-        .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
-    },
-    [amountValidator]
+    [feesWithRatesRD, selectedFeeOptionKey]
   )
 
   const addMaxAmountHandler = useCallback(() => setAmountToSend(maxAmount), [maxAmount])
+
+  useEffect(() => {
+    setAmountToSend(maxAmount)
+  }, [maxAmount])
+
+  useEffect(() => {
+    // Whenever `amountToSend` has been updated, we put it back into input field
+    form.setFieldsValue({
+      amount: baseToAsset(amountToSend).amount()
+    })
+  }, [amountToSend, form])
 
   return (
     <>
@@ -236,7 +289,12 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
           />
           <Styled.Form
             form={form}
-            initialValues={{ amount: bn(0) }}
+            initialValues={{
+              // default value for BigNumberInput
+              amount: bn(0),
+              // Default value for RadioGroup of feeOptions
+              feeRate: DEFAULT_FEE_OPTION_KEY
+            }}
             onFinish={() => setShowPwModal(true)}
             labelCol={{ span: 24 }}>
             <Styled.SubForm>
@@ -246,16 +304,10 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
               </Form.Item>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
               <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-                <InputBigNumber
-                  min={0}
-                  size="large"
-                  disabled={isLoading}
-                  decimal={THORCHAIN_DECIMAL}
-                  onChange={onChangeInput}
-                />
+                <InputBigNumber min={0} size="large" disabled={isLoading} decimal={LTC_DECIMAL} />
               </Styled.FormItem>
               <MaxBalanceButton
-                balance={{ amount: maxAmount, asset: balance.asset }}
+                balance={{ amount: maxAmount, asset: AssetLTC }}
                 onClick={addMaxAmountHandler}
                 disabled={isLoading}
               />
@@ -265,10 +317,11 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
               <Form.Item name="memo">
                 <Input size="large" disabled={isLoading} />
               </Form.Item>
+              <Form.Item name="feeRate">{renderFeeOptions}</Form.Item>
             </Styled.SubForm>
             <Styled.SubmitContainer>
               <Styled.SubmitStatus>{sendTxStatusMsg}</Styled.SubmitStatus>
-              <Styled.Button loading={isLoading} disabled={isFeeError} htmlType="submit">
+              <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
                 {intl.formatMessage({ id: 'wallet.action.send' })}
               </Styled.Button>
             </Styled.SubmitContainer>

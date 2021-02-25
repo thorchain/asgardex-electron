@@ -1,5 +1,14 @@
 import { getTokenAddress } from '@xchainjs/xchain-ethereum'
-import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  AssetBNB,
+  AssetBTC,
+  AssetETH,
+  AssetLTC,
+  AssetRune67C,
+  AssetRuneB1A,
+  AssetRuneNative
+} from '@xchainjs/xchain-util'
 import * as ethers from 'ethers'
 
 import { Network } from '../../shared/api/types'
@@ -55,6 +64,11 @@ export const getBnbRuneAsset = (network: Network = 'testnet'): Asset => {
 
 export const isRuneBnbAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetRune67C) || eqAsset.equals(asset, AssetRuneB1A)
+
+/**
+ * Check whether an asset is a LTC asset
+ */
+export const isLtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetLTC)
 
 /**
  * Check whether an asset is a BNB asset

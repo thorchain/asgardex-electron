@@ -33,8 +33,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
   const {
     balancesState$,
     getExplorerTxUrl$,
-    keystoreService: { validatePassword$ },
-    reloadBalances
+    keystoreService: { validatePassword$ }
   } = useWalletContext()
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
@@ -63,9 +62,10 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
         case 'BNB':
           return (
             <SendViewBNB
-              selectedAsset={asset}
+              asset={asset}
               balances={balances}
               getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
               network={network}
             />
           )
@@ -74,7 +74,6 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewBTC
               asset={asset}
               balances={balances}
-              reloadBalances={reloadBalances}
               getExplorerTxUrl={getExplorerTxUrl}
               validatePassword$={validatePassword$}
               network={network}
@@ -85,7 +84,6 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewETH
               asset={asset}
               balances={balances}
-              reloadBalances={reloadBalances}
               getExplorerTxUrl={getExplorerTxUrl}
               validatePassword$={validatePassword$}
               network={network}
@@ -93,7 +91,13 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
         case 'THOR':
           return (
-            <SendViewTHOR thorAsset={asset} balances={balances} getExplorerTxUrl={getExplorerTxUrl} network={network} />
+            <SendViewTHOR
+              asset={asset}
+              balances={balances}
+              getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
+              network={network}
+            />
           )
         default:
           return (
@@ -108,7 +112,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [balances, getExplorerTxUrl, network, reloadBalances, validatePassword$, intl]
+    [balances, getExplorerTxUrl, network, validatePassword$, intl]
   )
 
   return FP.pipe(

@@ -5,6 +5,7 @@ import { palette } from 'styled-theme'
 
 import { InnerForm } from '../../shared/form/Form.style'
 import { Button as UIButton } from '../../uielements/button/Button'
+import { Fees as UIFees } from '../../uielements/fees'
 import { Label as UILabel } from '../../uielements/label'
 
 export const Col = styled(A.Col)`
@@ -35,6 +36,10 @@ export const Label = styled(UILabel)`
   font-family: 'MainFontRegular';
   text-transform: uppercase;
   color: ${({ color }) => (color === 'error' ? palette('error', 0) : palette('primary', 0))};
+`
+
+export const Fees = styled(UIFees)`
+  padding: 0 0 20px 0;
 `
 
 export const SubmitItem = styled(A.Form.Item)`

@@ -3,10 +3,11 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { Fees } from '@xchainjs/xchain-client'
-import { FeesParams } from '@xchainjs/xchain-ethereum'
+import { ETH_DECIMAL, FeesParams } from '@xchainjs/xchain-ethereum'
 import { assetAmount, AssetETH, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { SendTxParams } from '../../../../services/ethereum/types'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormETH } from './index'
@@ -14,21 +15,21 @@ import { Props as SendFormETHProps } from './SendFormETH'
 
 const ethBalance: WalletBalance = {
   asset: AssetETH,
-  amount: assetToBase(assetAmount(1.23)),
+  amount: assetToBase(assetAmount(1.23, ETH_DECIMAL)),
   walletAddress: 'AssetETH wallet address'
 }
 
 const runeBalance: WalletBalance = {
   asset: AssetRuneNative,
-  amount: assetToBase(assetAmount(2)),
+  amount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL)),
   walletAddress: 'rune wallet address'
 }
 
 const fees: Fees = {
   type: 'byte',
-  fastest: assetToBase(assetAmount(0.002499)),
-  fast: assetToBase(assetAmount(0.002079)),
-  average: assetToBase(assetAmount(0.001848))
+  fastest: assetToBase(assetAmount(0.002499, ETH_DECIMAL)),
+  fast: assetToBase(assetAmount(0.002079, ETH_DECIMAL)),
+  average: assetToBase(assetAmount(0.001848, ETH_DECIMAL))
 }
 
 const defaultProps: SendFormETHProps = {

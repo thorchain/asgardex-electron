@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, XChainClient } from '@xchainjs/xchain-client'
+import { Asset } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -24,11 +25,13 @@ import { WalletBalancesLD, XChainClient$ } from './types'
 const loadBalances$ = ({
   client,
   address,
-  walletType = 'keystore'
+  walletType = 'keystore',
+  assets
 }: {
   client: XChainClient
   walletType?: WalletType
   address?: Address
+  assets?: Asset[]
 }): WalletBalancesLD =>
   FP.pipe(
     address,
@@ -42,7 +45,7 @@ const loadBalances$ = ({
           RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: 'Could not get address' })
         ),
       (walletAddress) =>
-        Rx.from(client.getBalance(walletAddress)).pipe(
+        Rx.from(client.getBalance(walletAddress, assets)).pipe(
           map(RD.success),
           liveData.map(
             A.map((balance) => ({
@@ -70,7 +73,11 @@ const loadBalances$ = ({
  *
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const balances$: (client$: XChainClient$, trigger$: TriggerStream$) => WalletBalancesLD = (client$, trigger$) =>
+export const balances$: (client$: XChainClient$, trigger$: TriggerStream$, assets?: Asset[]) => WalletBalancesLD = (
+  client$,
+  trigger$,
+  assets
+) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.mergeMap(([_, oClient]) => {
       return FP.pipe(
@@ -81,7 +88,8 @@ export const balances$: (client$: XChainClient$, trigger$: TriggerStream$) => Wa
           // or start request and return state
           (client) =>
             loadBalances$({
-              client
+              client,
+              assets
             })
         )
       )
@@ -92,8 +100,12 @@ export const balances$: (client$: XChainClient$, trigger$: TriggerStream$) => Wa
 
 export const balancesByAddress$: (
   client$: XChainClient$,
-  trigger$: TriggerStream$
-) => (address: string, walletType: WalletType) => WalletBalancesLD = (client$, trigger$) => (address, walletType) =>
+  trigger$: TriggerStream$,
+  assets?: Asset[]
+) => (address: string, walletType: WalletType) => WalletBalancesLD = (client$, trigger$, assets) => (
+  address,
+  walletType
+) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.mergeMap(([_, oClient]) => {
       return FP.pipe(
@@ -102,7 +114,7 @@ export const balancesByAddress$: (
           // if a client is not available, "reset" state to "initial"
           () => Rx.of(RD.initial),
           // or start request and return state
-          (client) => loadBalances$({ client, address, walletType })
+          (client) => loadBalances$({ client, address, walletType, assets })
         )
       )
     }),

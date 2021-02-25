@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { AssetRuneNative, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
@@ -7,7 +7,6 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Bond } from '../../../components/interact/forms'
@@ -16,6 +15,7 @@ import { ZERO_ASSET_AMOUNT } from '../../../const'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqAsset } from '../../../helpers/fp/eq'
+import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { AddressValidation } from '../../../services/thorchain/types'
 import { InteractState } from '../../../services/thorchain/types'
@@ -28,7 +28,13 @@ type Props = {
 
 export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) => {
   const { balancesState$ } = useWalletContext()
-  const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
+
+  const {
+    state: interactState,
+    reset: resetInteractState,
+    subscribe: subscribeInteractState
+  } = useSubscriptionState<InteractState>(INITIAL_INTERACT_STATE)
+
   const { interact$, client$ } = useThorchainContext()
   const intl = useIntl()
 
@@ -43,8 +49,6 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
       ),
     [oClient]
   )
-
-  const oSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
 
   const [runeBalance] = useObservableState(
     () =>
@@ -68,23 +72,12 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
     ZERO_ASSET_AMOUNT
   )
 
-  const unsubscribeSub = useCallback(() => {
-    FP.pipe(
-      oSubRef.current,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [])
-
   const bondTx = useCallback(
     ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
-      unsubscribeSub()
-      oSubRef.current = O.some(interact$({ amount, memo }).subscribe(setInteractState))
+      subscribeInteractState(interact$({ amount, memo }))
     },
-    [interact$, setInteractState, unsubscribeSub]
+    [interact$, subscribeInteractState]
   )
-  const resetResults = useCallback(() => {
-    setInteractState(INITIAL_INTERACT_STATE)
-  }, [setInteractState])
 
   const stepLabels = useMemo(
     () => [intl.formatMessage({ id: 'common.tx.sending' }), intl.formatMessage({ id: 'common.tx.checkResult' })],
@@ -98,13 +91,6 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
       )}: ${stepLabels[interactState.step - 1]}...`,
     [interactState, stepLabels, intl]
   )
-
-  useEffect(() => {
-    // Unsubscribe from possible subscription when unmount
-    return () => {
-      unsubscribeSub()
-    }
-  }, [unsubscribeSub])
 
   return FP.pipe(
     interactState.txRD,
@@ -121,13 +107,13 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
       ),
       ({ msg }) => (
         <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.bond.state.error' })} subTitle={msg}>
-          <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
+          <Button onClick={resetInteractState}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.ErrorView>
       ),
       (txHash) => (
         <Styled.SuccessView title={intl.formatMessage({ id: 'common.success' })}>
           <Styled.ViewTxButton txHash={O.some(txHash)} onClick={goToTransaction} />
-          <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
+          <Button onClick={resetInteractState}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>
       )
     )

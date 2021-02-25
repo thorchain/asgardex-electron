@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
-import { isRuneBnbAsset } from '../../../helpers/assetHelper'
+import { isEthAsset, isRuneBnbAsset } from '../../../helpers/assetHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
@@ -93,14 +93,6 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     [network]
   )
 
-  const nameColumn: ColumnType<Balance> = useMemo(
-    () => ({
-      width: 140,
-      render: ({ asset }: Balance) => <Styled.Label>{asset.symbol}</Styled.Label>
-    }),
-    []
-  )
-
   const tickerColumn: ColumnType<WalletBalance> = useMemo(
     () => ({
       width: 80,
@@ -145,7 +137,12 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
       const label = FP.pipe(
         oPrice,
-        O.map((price) => formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })),
+        O.map((price) => {
+          if (isEthAsset(balance.asset)) {
+            price.decimal = balance.amount.decimal
+          }
+          return formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })
+        }),
         // "empty" label if we don't get a price value
         O.getOrElse(() => '--')
       )
@@ -189,7 +186,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const columns = useMemo(() => {
     // desktop
     if (screenMap?.lg) {
-      return [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn]
+      return [iconColumn, tickerColumn, balanceColumn, priceColumn]
     }
     // tablet
     if (screenMap?.md) {
@@ -201,7 +198,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     }
 
     return []
-  }, [balanceColumn, iconColumn, nameColumn, priceColumn, screenMap, tickerColumn])
+  }, [balanceColumn, iconColumn, priceColumn, screenMap, tickerColumn])
 
   const renderAssetsTable = useCallback(
     (tableData: Balances, oWalletAddress: O.Option<Address>, loading = false) => {
