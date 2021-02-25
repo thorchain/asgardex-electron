@@ -4679,30 +4679,30 @@
     text-table "^0.2.0"
     webpack-log "^1.1.2"
 
-"@xchainjs/xchain-binance@^4.5.0":
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-4.5.0.tgz#017e0e19a96325e60ae64e3afa6bdb5570bc7a6e"
-  integrity sha512-0fdr3RHeKOVavyaMuxQuqmMW/q7XzIGheKhLXoKuVhFXGEo5d52CXwKqui0eMKLWCfB+Izx+cYzsS6jpaJuB7w==
+"@xchainjs/xchain-binance@^4.6.0":
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-4.6.0.tgz#6ffe15da831df8b0b266735c61c06ae31a42eaf7"
+  integrity sha512-bfzsfmHqnDVxC2/sYt1QWYw7SCwG5flxDmc/HG5WgqTilQamH1QcW0hCf4WhUg2pa7UTUsf1vmLl2JkCOFknRg==
 
-"@xchainjs/xchain-bitcoin@^0.10.1":
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.10.1.tgz#703825a220749f80830d49c02bd2ac0e4770830d"
-  integrity sha512-9axIIZhEhSYSLmlt9ZyOZPNSdUdDw4XVZt/e+/+X6ILN4m6956UOxAj0dDN6Tz5MR5eZBdZVsLchY7oZ6g4p9Q==
+"@xchainjs/xchain-bitcoin@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.11.0.tgz#9aea85f7024f6b78ea3d841b8d152a8bf2ae2123"
+  integrity sha512-/yP7P4cazrejThyEY8x32UAZ6b47LF/1++d6QvJYrUziENSZ1LVF71jbfw7d17YWKtgxSZ0yXoVnstC6D6YNtA==
 
-"@xchainjs/xchain-bitcoincash@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoincash/-/xchain-bitcoincash-0.4.0.tgz#25c5e7a99735c8aabec91e9a04b83d4206eae6ca"
-  integrity sha512-vlek12EenXDc65AIX9xU/O4Byhi8gTGq+9ZumiAiq4nx9gbNLpULMBAWzZ+j6AVfd2dzBDggy6XqUrIyp1rjLQ==
-
-"@xchainjs/xchain-client@^0.5.0":
+"@xchainjs/xchain-bitcoincash@^0.5.0":
   version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.5.0.tgz#dc2eb8daff7eab45001ae8a5e793966168dbed90"
-  integrity sha512-IaS15OF3kTbyBxkBdCEna6evykAyY80xJaCKP0MHyrlhrvDFxbU1lu0zxvu7raU/p5K1Qdi3jJsD8LtBy3awoQ==
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoincash/-/xchain-bitcoincash-0.5.0.tgz#5850e2cba3c7d5ecd64a3fcc550c0ff3e2442aab"
+  integrity sha512-5mMVA7VuK/Gp++VZh6ywKqvyXJYivUF52CWXP/otijzTQlKp+aV07B99dqWiVMQ2vGsZC/PaqxMcXuTbPVa09A==
 
-"@xchainjs/xchain-cosmos@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.9.0.tgz#5384ad45fab9ef4dd3cca4d1d7a73a6ca64a97b3"
-  integrity sha512-+pCyjo9w/AeJgpD0CAYkquyUhRw5HGYBMPZdwEW1JQQv5GqftQYpDZIv29St8WgbN7yc33O4EuBoLwiM65TE8w==
+"@xchainjs/xchain-client@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.6.0.tgz#86a44985683b1910de2f29134d53ce4fcb7ada83"
+  integrity sha512-g3UJ3E2n9HBQuuvuOFqSTPEPymvqN+dubzIPNegiCG6/ZfmMGcFEh391BE8TSf7Kfcg3klfsR/ay6EySbKtysg==
+
+"@xchainjs/xchain-cosmos@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.10.0.tgz#64e8650a3fa1ec05d5f7417f7b8125e2f28ed4df"
+  integrity sha512-U0O3s+MZqnnGeOYf5qfA9H+3EGV+RlA8KPytSSjNQ6jYaBjwnRvT/iBno0xCIx9ke8jNN5MVpS1WC1zta4x8Ig==
 
 "@xchainjs/xchain-crypto@^0.2.3":
   version "0.2.3"
@@ -4716,25 +4716,25 @@
     hdkey "^2.0.1"
     uuid "^8.1.0"
 
-"@xchainjs/xchain-ethereum@^0.11.1":
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.11.1.tgz#9ab052616bfc22e64fd80245e8ae9fc0b8e98f41"
-  integrity sha512-KnhKHarNHAYO1nY42ma7eGaJAZlRpYlPky4kA/7enR8r1x6JWKqcAeLnaMclnA/PvcQjigT+w7f5sLaYZrt/Rw==
+"@xchainjs/xchain-ethereum@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.12.0.tgz#9462e62d420d57af15632fcf377e616641bf8dbe"
+  integrity sha512-2AEKA6foQbKZ4C3hM+jxBpgtVi855auSwSnAQBEVQnA97hcFX+rERxW/GG/QOklmijNOF2+os3l8W7oAc7ntCA==
 
-"@xchainjs/xchain-litecoin@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-litecoin/-/xchain-litecoin-0.1.0.tgz#7df553c1cf2ecbe0c32cb2b23e6947900746e692"
-  integrity sha512-bomGpkGNV187hs8HM4FAQv47DdXoVg0PDCaARmL1up+MKnepxBX8wnkKnC0qGwslvLxpUbvHWUf4nPO0fVniUg==
+"@xchainjs/xchain-litecoin@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-litecoin/-/xchain-litecoin-0.2.0.tgz#0c5fa33120ca5903135db6b0f59ef57901ed4686"
+  integrity sha512-N/8tZSYMjcdPAAootZbCS3TB5E05fBxnpsXKHITXhq7rx/oQ9o73C4oF0T4haAwAGo+oMCytHGn4YLwTpN/hKw==
 
-"@xchainjs/xchain-polkadot@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-polkadot/-/xchain-polkadot-0.5.0.tgz#8c3e2cfe71d43465b045ed8ce96b06787fb20cb8"
-  integrity sha512-/Oxy/xPc9yeXJ6wIcrvVUT/Y24iU66popH9SiQqtFgYeKfuPR1LDn7YWhbJyzOZyAB18czvhdH6hi7P3B0J28g==
+"@xchainjs/xchain-polkadot@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-polkadot/-/xchain-polkadot-0.6.0.tgz#f00231f51a20a2405a8c17b673e1f9706e67ad43"
+  integrity sha512-8bmHB8ZPTg90440h9xuJG2UWLHpRdPeB9Nmxdfg6yszgolnfrr+jt3G78pKDKaGesm+OkNovZTLS3PCDjDWLDA==
 
-"@xchainjs/xchain-thorchain@^0.11.1":
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.11.1.tgz#676e2af00535572f9c9b5bf1b04a951a5718f60f"
-  integrity sha512-qat9srkl/FmtnZjiOrps2TgAXR0ESQa4xup2WvILjNc7SsiizofdUGfPiC1ZwRpOYYHjXWfwufADov9EvsbMbQ==
+"@xchainjs/xchain-thorchain@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.12.0.tgz#2f0c169296dd1e3e1fdf0ab783db43d4e0005993"
+  integrity sha512-W6sLSUXpC6DR2ONwIhMPDhypvCTqlwgnn7JrYamyf6RcoTK/SmMqCPi1PY/A7EwrfO5hrddfJ1tdHhpUXRSN7g==
 
 "@xchainjs/xchain-util@^0.2.3":
   version "0.2.3"
