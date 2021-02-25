@@ -18,7 +18,6 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 
 import { Network } from '../../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
@@ -26,6 +25,7 @@ import { getChainAsset } from '../../../../helpers/chainHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { emptyString } from '../../../../helpers/stringHelper'
 import { getBnbAmountFromBalances, getRuneBnBAmountFromBalances } from '../../../../helpers/walletHelper'
+import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
 import { FeeRD } from '../../../../services/chain/types'
@@ -80,48 +80,27 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   const [form] = Form.useForm<FormValues>()
 
+  const [amountToUpgrade, setAmountToUpgrade] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+
   // State for visibility of Modal to confirm upgrade
   const [showConfirmUpgradeModal, setShowConfirmUpgradeModal] = useState(false)
-  // (Possible) subscription of upgrade tx
-  const [upgradeTxSub, _setUpgradeTxSub] = useState<O.Option<Rx.Subscription>>(O.none)
 
-  // unsubscribe upgrade$ subscription
-  const unsubscribeUpgradeTxSub = useCallback(() => {
-    FP.pipe(
-      upgradeTxSub,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [upgradeTxSub])
-
-  const setUpgradeTxSub = useCallback(
-    (state) => {
-      unsubscribeUpgradeTxSub()
-      _setUpgradeTxSub(state)
-    },
-    [unsubscribeUpgradeTxSub]
-  )
-
-  useEffect(() => {
-    // Unsubscribe of (possible) previous subscription of `deposit$`
-    return () => {
-      unsubscribeUpgradeTxSub()
-    }
-  }, [unsubscribeUpgradeTxSub])
-
-  // State of upgrade tx
-  const [upgradeTxState, setUpgradeTxState] = useState<UpgradeRuneTxState>(INITIAL_UPGRADE_RUNE_STATE)
-
-  const resetTxState = useCallback(() => {
-    setUpgradeTxState(INITIAL_UPGRADE_RUNE_STATE)
-    setUpgradeTxSub(O.none)
-  }, [setUpgradeTxSub])
+  const {
+    state: upgradeTxState,
+    reset: resetUpgradeTxState,
+    subscribe: subscribeUpgradeTxState
+  } = useSubscriptionState<UpgradeRuneTxState>(INITIAL_UPGRADE_RUNE_STATE)
 
   const onFinishHandler = useCallback(() => {
     reloadBalancesHandler()
-    resetTxState()
-  }, [reloadBalancesHandler, resetTxState])
+    resetUpgradeTxState()
+    setAmountToUpgrade(ZERO_BASE_AMOUNT)
+  }, [reloadBalancesHandler, resetUpgradeTxState])
 
-  const [amountToUpgrade, setAmountToUpgrade] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+  const onErrorHandler = useCallback(() => {
+    resetUpgradeTxState()
+    setAmountToUpgrade(ZERO_BASE_AMOUNT)
+  }, [resetUpgradeTxState])
 
   const oRuneBnbAmount: O.Option<BaseAmount> = useMemo(
     () => FP.pipe(oBalances, O.chain(FP.flow(getRuneBnBAmountFromBalances, O.map(assetToBase)))),
@@ -141,10 +120,6 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       ),
     [oRuneBnbAmount]
   )
-
-  useEffect(() => {
-    setAmountToUpgrade(maxAmount)
-  }, [maxAmount])
 
   useEffect(() => {
     // Whenever `amountToUpgrade` has been updated, we put it back into input field
@@ -170,6 +145,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   const onChangeInput = useCallback(
     async (value: BigNumber) => {
+      console.log('onChangeInput:', value.toString())
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
@@ -185,16 +161,15 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const upgrade = useCallback(() => {
     const memo = getSwitchMemo(runeNativeAddress)
     const poolAddress = RD.toOption(bnbPoolAddressRD)
-    const subscription = upgrade$({
-      poolAddress,
-      amount: amountToUpgrade,
-      asset: runeAsset,
-      memo
-    }).subscribe(setUpgradeTxState)
-
-    // store subscription
-    setUpgradeTxSub(O.some(subscription))
-  }, [amountToUpgrade, bnbPoolAddressRD, runeAsset, runeNativeAddress, upgrade$, setUpgradeTxSub])
+    subscribeUpgradeTxState(
+      upgrade$({
+        poolAddress,
+        amount: amountToUpgrade,
+        asset: runeAsset,
+        memo
+      })
+    )
+  }, [runeNativeAddress, bnbPoolAddressRD, upgrade$, amountToUpgrade, runeAsset, subscribeUpgradeTxState])
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
 
@@ -275,8 +250,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   }, [intl, runeAsset.symbol, upgradeTxState])
 
   const renderErrorBtn = useMemo(
-    () => <Styled.Button onClick={resetTxState}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,
-    [intl, resetTxState]
+    () => <Styled.Button onClick={onErrorHandler}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,
+    [intl, onErrorHandler]
   )
 
   const renderSuccessExtra = useCallback(
@@ -328,9 +303,13 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
                 validateTrigger={['onSubmit', 'onChange', 'onBlur']}>
                 <InputBigNumber size="large" disabled={isLoading} decimal={8} onChange={onChangeInput} />
               </Styled.FormItem>
-              <MaxBalanceButton balance={{ amount: maxAmount, asset: runeAsset }} onClick={addMaxAmountHandler} />
+              <MaxBalanceButton
+                balance={{ amount: maxAmount, asset: runeAsset }}
+                onClick={addMaxAmountHandler}
+                disabled={isLoading}
+              />
 
-              <CStyled.Fees fees={uiFeesRD} reloadFees={reloadFeeHandler} />
+              <CStyled.Fees fees={uiFeesRD} reloadFees={reloadFeeHandler} disabled={isLoading} />
               {renderFeeError}
             </Styled.SubForm>
             <Styled.SubmitContainer>

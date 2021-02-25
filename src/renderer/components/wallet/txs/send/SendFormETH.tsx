@@ -1,20 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOptionKey, Fees } from '@xchainjs/xchain-client'
 import { Address, FeesParams, validateAddress } from '@xchainjs/xchain-ethereum'
 import {
   formatAssetAmountCurrency,
-  assetAmount,
-  AssetAmount,
   bn,
   baseToAsset,
   AssetETH,
+  BaseAmount,
+  baseAmount,
   assetToBase,
-  BaseAmount
+  assetAmount
 } from '@xchainjs/xchain-util'
-import { Row, Form, Col } from 'antd'
+import { Row, Form } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
@@ -22,7 +21,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
-import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { ETH_DECIMAL, isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
@@ -33,17 +32,18 @@ import { TxTypes } from '../../../../types/asgardex'
 import { WalletBalance } from '../../../../types/wallet'
 import { PasswordModal } from '../../../modal/password'
 import * as StyledR from '../../../shared/form/Radio.style'
+import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
+import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
 import { validateTxAmountInput } from '../TxForm.util'
 import { DEFAULT_FEE_OPTION_KEY } from './Send.const'
 import { useChangeAssetHandler } from './Send.hooks'
-import * as StyledForm from './SendForm.style'
 
 export type FormValues = {
   recipient: Address
-  amount: string
+  amount: BigNumber
   memo?: string
 }
 
@@ -78,7 +78,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
 
   const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>(DEFAULT_FEE_OPTION_KEY)
 
-  const [sendAmount, setSendAmount] = useState<O.Option<AssetAmount>>(O.none)
+  const [amountToSend, setAmountToSend] = useState<O.Option<BaseAmount>>(O.none)
   const [sendAddress, setSendAddress] = useState<O.Option<Address>>(O.none)
 
   const [form] = Form.useForm<FormValues>()
@@ -107,13 +107,13 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     [oFees, selectedFeeOptionKey]
   )
 
-  const oEthAmount: O.Option<AssetAmount> = useMemo(() => {
+  const oEthAmount: O.Option<BaseAmount> = useMemo(() => {
     // return balance of current asset (if ETH)
     if (isEthAsset(balance.asset)) {
-      return O.some(baseToAsset(balance.amount))
+      return O.some(balance.amount)
     }
     // or check list of other assets to get eth balance
-    return FP.pipe(balances, getEthAmountFromBalances)
+    return FP.pipe(balances, getEthAmountFromBalances, O.map(assetToBase))
   }, [balance, balances])
 
   const isFeeError = useMemo(() => {
@@ -127,51 +127,20 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     )
   }, [oEthAmount, selectedFee])
 
-  const selectedFeeLabel = useMemo(
-    () =>
-      FP.pipe(
-        feesRD,
-        RD.fold(
-          () => '...',
-          () =>
-            // show previous fees while re-loading
-            FP.pipe(
-              prevFeesRef.current,
-              O.map((fees) =>
-                formatAssetAmountCurrency({
-                  amount: baseToAsset(fees[selectedFeeOptionKey]),
-                  asset: AssetETH,
-                  trimZeros: true
-                })
-              ),
-              O.getOrElse(() => '...')
-            ),
-          (error) => `${intl.formatMessage({ id: 'common.error' })} ${error || ''}`,
-          (fees) =>
-            formatAssetAmountCurrency({
-              amount: baseToAsset(fees[selectedFeeOptionKey]),
-              asset: AssetETH,
-              trimZeros: true
-            })
-        )
-      ),
-    [feesRD, intl, selectedFeeOptionKey]
-  )
-
   const renderFeeError = useMemo(() => {
     if (!isFeeError) return <></>
 
-    const amount = FP.pipe(
+    const amount: BaseAmount = FP.pipe(
       oEthAmount,
       // no eth asset == zero amount
-      O.getOrElse(() => ZERO_ASSET_AMOUNT)
+      O.getOrElse(() => ZERO_BASE_AMOUNT)
     )
 
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
       {
         balance: formatAssetAmountCurrency({
-          amount,
+          amount: baseToAsset(amount),
           asset: AssetETH,
           trimZeros: true
         })
@@ -226,21 +195,32 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   )
 
   // max amount for eth
-  const maxAmount = useMemo(() => {
-    const maxEthAmount = FP.pipe(
+  const maxAmount: BaseAmount = useMemo(() => {
+    const maxEthAmount: BigNumber = FP.pipe(
       sequenceTOption(selectedFee, oEthAmount),
       O.fold(
         // Set maxAmount to zero if we dont know anything about eth and fee amounts
         () => ZERO_BN,
         ([fee, ethAmount]) => {
-          const max = ethAmount.amount().minus(baseToAsset(fee).amount())
+          const max = ethAmount.amount().minus(fee.amount())
           return max.isGreaterThan(0) ? max : ZERO_BN
         }
-      ),
-      assetAmount
+      )
     )
-    return isEthAsset(balance.asset) ? maxEthAmount : baseToAsset(balance.amount)
+    return isEthAsset(balance.asset) ? baseAmount(maxEthAmount, ETH_DECIMAL) : balance.amount
   }, [selectedFee, oEthAmount, balance])
+
+  useEffect(() => {
+    // Whenever `amountToSend` has been updated, we put it back into input field
+    FP.pipe(
+      amountToSend,
+      O.map((amount) =>
+        form.setFieldsValue({
+          amount: baseToAsset(amount).amount()
+        })
+      )
+    )
+  }, [amountToSend, form])
 
   const amountValidator = useCallback(
     async (_: unknown, value: BigNumber) => {
@@ -252,21 +232,21 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
           ? intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalanceAndFee' })
           : intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
       }
-      return validateTxAmountInput({ input: value, maxAmount, errors })
+      return validateTxAmountInput({ input: value, maxAmount: baseToAsset(maxAmount), errors })
     },
     [balance, intl, maxAmount]
   )
 
-  const onChangeAmount = useCallback(
+  const onChangeInput = useCallback(
     async (value: BigNumber) => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setSendAmount(O.some(assetAmount(value, ETH_DECIMAL)))
+          setAmountToSend(O.some(assetToBase(assetAmount(value, ETH_DECIMAL))))
         })
-        .catch(() => setSendAmount(O.none))
+        .catch(() => setAmountToSend(O.none))
     },
-    [amountValidator, setSendAmount]
+    [amountValidator, setAmountToSend]
   )
 
   const onChangeAddress = useCallback(
@@ -284,14 +264,14 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
 
   const reloadFees = useCallback(() => {
     FP.pipe(
-      sequenceTOption(sendAmount, sendAddress),
+      sequenceTOption(amountToSend, sendAddress),
       O.map(([amount, recipient]) => {
-        return reloadFeesHandler({ asset: balance.asset, amount: assetToBase(amount), recipient })
+        return reloadFeesHandler({ asset: balance.asset, amount, recipient })
       })
     )
 
     return false
-  }, [balance.asset, reloadFeesHandler, sendAddress, sendAmount])
+  }, [balance.asset, reloadFeesHandler, sendAddress, amountToSend])
 
   // State for visibility of Modal to confirm tx
   const [showPwModal, setShowPwModal] = useState(false)
@@ -301,12 +281,12 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     setShowPwModal(false)
 
     FP.pipe(
-      sequenceTOption(sendAmount, sendAddress),
+      sequenceTOption(amountToSend, sendAddress),
       O.map(([amount, recipient]) => {
         onSubmit({
           recipient,
           asset: balance.asset,
-          amount: assetToBase(amount),
+          amount,
           feeOptionKey: selectedFeeOptionKey,
           memo: form.getFieldValue('memo'),
           txType: TxTypes.TRANSFER
@@ -314,7 +294,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
         return true
       })
     )
-  }, [balance.asset, form, onSubmit, selectedFeeOptionKey, sendAddress, sendAmount])
+  }, [balance.asset, form, onSubmit, selectedFeeOptionKey, sendAddress, amountToSend])
 
   const renderPwModal = useMemo(
     () =>
@@ -329,6 +309,17 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       ),
     [sendHandler, showPwModal, validatePassword$]
   )
+
+  const uiFeesRD: UIFeesRD = useMemo(
+    () =>
+      FP.pipe(
+        feesRD,
+        RD.map((fees) => [{ asset: AssetETH, amount: fees[selectedFeeOptionKey] }])
+      ),
+    [feesRD, selectedFeeOptionKey]
+  )
+
+  const addMaxAmountHandler = useCallback(() => setAmountToSend(O.some(maxAmount)), [maxAmount])
 
   return (
     <>
@@ -369,33 +360,15 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
                   disabled={isLoading}
                   decimal={balance.amount.decimal}
                   onBlur={reloadFees}
-                  onChange={onChangeAmount}
+                  onChange={onChangeInput}
                 />
               </Styled.FormItem>
-              <Styled.Label size="big" style={{ marginBottom: 0, paddingBottom: 0 }}>
-                {intl.formatMessage({ id: 'common.max' })}:{' '}
-                {formatAssetAmountCurrency({
-                  amount: maxAmount,
-                  asset: balance.asset,
-                  trimZeros: true
-                })}
-              </Styled.Label>
-              <Row align="middle">
-                <Col>
-                  <StyledForm.FeeLabel
-                    size="big"
-                    color={RD.isFailure(feesRD) ? 'error' : 'primary'}
-                    style={{ paddingTop: 0 }}
-                    disabled={RD.isPending(feesRD)}>
-                    {intl.formatMessage({ id: 'common.fees' })}: {selectedFeeLabel}
-                  </StyledForm.FeeLabel>
-                </Col>
-                <Col>
-                  <StyledForm.FeeButton onClick={reloadFees} disabled={RD.isPending(feesRD) || isLoading}>
-                    <SyncOutlined />
-                  </StyledForm.FeeButton>
-                </Col>
-              </Row>
+              <MaxBalanceButton
+                balance={{ amount: maxAmount, asset: balance.asset }}
+                onClick={addMaxAmountHandler}
+                disabled={isLoading}
+              />
+              <Styled.Fees fees={uiFeesRD} reloadFees={reloadFees} disabled={isLoading} />
               {renderFeeError}
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
               <Form.Item name="memo">
