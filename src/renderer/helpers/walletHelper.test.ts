@@ -1,11 +1,16 @@
-import { baseAmount, assetFromString, AssetRuneNative, AssetBNB } from '@xchainjs/xchain-util'
+import { baseAmount, assetFromString, AssetRuneNative, AssetBNB, AssetLTC } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { NonEmptyWalletBalances } from '../services/wallet/types'
-import { getAssetAmountByAsset, getBnbAmountFromBalances, getWalletBalanceByAsset } from './walletHelper'
+import {
+  getAssetAmountByAsset,
+  getBnbAmountFromBalances,
+  getLtcAmountFromBalances,
+  getWalletBalanceByAsset
+} from './walletHelper'
 
 describe('walletHelper', () => {
   const RUNE_WB = {
@@ -20,6 +25,8 @@ describe('walletHelper', () => {
     walletAddress: 'bolt wallet address'
   }
   const BNB_WB = { amount: baseAmount('45600000000'), asset: AssetBNB, walletAddress: 'bnb wallet address' }
+
+  const LTC_WB = { amount: baseAmount('45300000000'), asset: AssetLTC, walletAddress: 'ltc wallet address' }
 
   describe('amountByAsset', () => {
     it('returns amount of RUNE', () => {
@@ -75,6 +82,24 @@ describe('walletHelper', () => {
     })
     it('returns none if no BNB is available', () => {
       const result = getBnbAmountFromBalances([RUNE_WB, BOLT_WB])
+      expect(result).toBeNone()
+    })
+  })
+
+  describe('getLtcAmountFromBalances', () => {
+    it('returns amount of LTC', () => {
+      const result = getLtcAmountFromBalances([RUNE_WB, BOLT_WB, BNB_WB, LTC_WB])
+      expect(
+        FP.pipe(
+          result,
+          // Check transformation of `AssetAmount` to `BaseAmount`
+          O.map((a) => a.amount().isEqualTo('453')),
+          O.getOrElse(() => false)
+        )
+      ).toBeTruthy()
+    })
+    it('returns none if no LTC is available', () => {
+      const result = getLtcAmountFromBalances([RUNE_WB, BOLT_WB])
       expect(result).toBeNone()
     })
   })
