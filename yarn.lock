@@ -4721,10 +4721,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.11.0.tgz#b402c246659f8444a152394878f89c9849cdf77f"
   integrity sha512-mVnKgDrS8PbF5azW6KkHEpmhPTJdS+97YwJfdY5ScSqQR0vl4MDdKnVT5SYwCXjZhTcRxpN3KAlxTkq2dudLLg==
 
-"@xchainjs/xchain-litecoin@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-litecoin/-/xchain-litecoin-0.1.0.tgz#7df553c1cf2ecbe0c32cb2b23e6947900746e692"
-  integrity sha512-bomGpkGNV187hs8HM4FAQv47DdXoVg0PDCaARmL1up+MKnepxBX8wnkKnC0qGwslvLxpUbvHWUf4nPO0fVniUg==
+"@xchainjs/xchain-litecoin@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-litecoin/-/xchain-litecoin-0.3.0.tgz#bbf91006f08356e1d64f483e978ea2b6eef237a6"
+  integrity sha512-8UroVi1OWCOb2aepRghNCsZlCxdIxIWeH7subRUc56JCcLykKCD/x2z7uinNn3yMljRDq5pDdeAH/XKr3Um+1Q==
 
 "@xchainjs/xchain-polkadot@^0.5.0":
   version "0.5.0"
