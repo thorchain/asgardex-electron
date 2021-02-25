@@ -7,7 +7,7 @@ const settings: SettingMessages = {
   'setting.account.management': 'Gestion du compte',
   'setting.export': 'Exporter la clé privée',
   'setting.lock': 'Verrouiller',
-  'setting.view.phrase': 'Voir la phrase',
+  'setting.view.phrase': 'Afficher la phrase de récupération',
   'setting.midgard': 'Midgard',
   'setting.version': 'Version',
   'setting.notconnected': 'Déconnecté',
