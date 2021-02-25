@@ -69,7 +69,7 @@ export const Deposit: React.FC<Props> = (props) => {
       FP.pipe(
         symPoolShare,
         RD.toOption,
-        O.chain(FP.identity),
+        O.flatten,
         O.fold(
           () => false,
           () => true
