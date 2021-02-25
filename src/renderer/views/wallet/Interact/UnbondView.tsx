@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { baseAmount } from '@xchainjs/xchain-util'
@@ -6,11 +6,11 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 
 import { Unbond } from '../../../components/interact/forms/Unbond'
 import { Button } from '../../../components/uielements/button'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
+import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { AddressValidation, InteractState } from '../../../services/thorchain/types'
 import * as Styled from './InteractView.styles'
@@ -20,7 +20,12 @@ type Props = {
 }
 
 export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
-  const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
+  const {
+    state: interactState,
+    reset: resetInteractState,
+    subscribe: subscribeInteractState
+  } = useSubscriptionState<InteractState>(INITIAL_INTERACT_STATE)
+
   const { interact$, client$ } = useThorchainContext()
   const intl = useIntl()
 
@@ -36,30 +41,18 @@ export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
     [oClient]
   )
 
-  const oSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
-
-  const unsubscribeSub = useCallback(() => {
-    FP.pipe(
-      oSubRef.current,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [])
-
   const unbondTx = useCallback(
     ({ memo }: { memo: string }) => {
-      unsubscribeSub()
-      /**
-       * it does not matter which amount to send
-       * @docs https://docs.thorchain.org/thornodes/leaving#unbonding
-       */
-      oSubRef.current = O.some(interact$({ amount: baseAmount(1), memo }).subscribe(setInteractState))
+      subscribeInteractState(
+        /**
+         * it does not matter which amount to send
+         * @docs https://docs.thorchain.org/thornodes/leaving#unbonding
+         */
+        interact$({ amount: baseAmount(1), memo })
+      )
     },
-    [interact$, setInteractState, unsubscribeSub]
+    [interact$, subscribeInteractState]
   )
-
-  const resetResults = useCallback(() => {
-    setInteractState(INITIAL_INTERACT_STATE)
-  }, [setInteractState])
 
   const stepLabels = useMemo(
     () => [intl.formatMessage({ id: 'common.tx.sending' }), intl.formatMessage({ id: 'common.tx.checkResult' })],
@@ -73,13 +66,6 @@ export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
       )}: ${stepLabels[interactState.step - 1]}...`,
     [interactState, stepLabels, intl]
   )
-
-  useEffect(() => {
-    // Unsubscribe from possible subscription when unmount
-    return () => {
-      unsubscribeSub()
-    }
-  }, [unsubscribeSub])
 
   return FP.pipe(
     interactState.txRD,
@@ -95,13 +81,13 @@ export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
       ),
       ({ msg }) => (
         <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.unbond.state.error' })} subTitle={msg}>
-          <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
+          <Button onClick={resetInteractState}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.ErrorView>
       ),
       (txHash) => (
         <Styled.SuccessView title={intl.formatMessage({ id: 'common.success' })}>
           <Styled.ViewTxButton txHash={O.some(txHash)} onClick={goToTransaction} />
-          <Button onClick={resetResults}>{intl.formatMessage({ id: 'common.back' })}</Button>
+          <Button onClick={resetInteractState}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>
       )
     )
