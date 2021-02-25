@@ -1,7 +1,7 @@
 import { BondsMessages } from '../types'
 
 const bonds: BondsMessages = {
-  'bonds.node': 'Nœud',
+  'bonds.node': 'Node',
   'bonds.bond': 'Caution',
   'bonds.award': 'Récompense',
   'bonds.info': 'Info',
@@ -10,10 +10,10 @@ const bonds: BondsMessages = {
   'bonds.status.standby': 'En attente',
   'bonds.status.disabled': 'Désactivé',
   'bonds.status.unknown': 'Inconnu',
-  'bonds.node.add': 'Ajouter un nœud',
-  'bonds.node.enterMessage': 'Entrez le nœud à surveiller',
-  'bonds.validations.nodeAlreadyAdded': 'Le nœud est déjà ajouté',
-  'bonds.node.removeMessage': 'Êtes-vous sûr de vouloir supprimer le nœud {node} ?'
+  'bonds.node.add': 'Ajouter un node',
+  'bonds.node.enterMessage': 'Entrez le node à surveiller',
+  'bonds.validations.nodeAlreadyAdded': 'Le node est déjà ajouté',
+  'bonds.node.removeMessage': 'Êtes-vous sûr de vouloir supprimer le node {node} ?'
 }
 
 export default bonds
