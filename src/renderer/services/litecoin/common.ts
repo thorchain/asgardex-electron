@@ -1,13 +1,15 @@
 import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import { Client } from '@xchainjs/xchain-litecoin'
+import * as FP from 'fp-ts/function'
 import { right, left } from 'fp-ts/lib/Either'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
 import { envOrDefault } from '../../helpers/envHelper'
+import { optionFromNullableString } from '../../helpers/fp/from'
+import { sequenceSOption } from '../../helpers/fpHelpers'
 import { network$ } from '../app/service'
 import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
@@ -26,7 +28,12 @@ const litecoinNetwork$: Observable<ClientNetwork> = network$.pipe(
   })
 )
 
-const SOCHAIN_URL = envOrDefault(process.env.REACT_APP_SOCHAIN_URL, 'https://sochain.com/api/v2')
+const LTC_NODE_TESTNET_URL = envOrDefault(process.env.REACT_APP_LTC_NODE_TESTNET_URL, '')
+const LTC_NODE_MAINNET_URL = envOrDefault(process.env.REACT_APP_LTC_NODE_MAINNET_URL, '')
+const oLTCNodePassword = optionFromNullableString(envOrDefault(process.env.REACT_APP_LTC_NODE_PASSWORD, ''))
+const oLTCNodeUsername = optionFromNullableString(envOrDefault(process.env.REACT_APP_LTC_NODE_USERNAME, ''))
+
+const ltcAuth = FP.pipe(sequenceSOption({ username: oLTCNodeUsername, password: oLTCNodePassword }), O.toUndefined)
 
 /**
  * Stream to create an observable LitecoinClient depending on existing phrase in keystore
@@ -43,10 +50,12 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, litecoinNetwor
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
+              const nodeUrl = network === 'mainnet' ? LTC_NODE_MAINNET_URL : LTC_NODE_TESTNET_URL
               const client = new Client({
                 network: network,
                 phrase,
-                nodeUrl: SOCHAIN_URL
+                nodeUrl,
+                nodeAuth: ltcAuth
               })
               return O.some(right(client)) as ClientState
             } catch (error) {
