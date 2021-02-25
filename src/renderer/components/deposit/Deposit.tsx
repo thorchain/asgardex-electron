@@ -3,8 +3,8 @@ import React, { useMemo } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { PoolShareRD, PoolSharesRD } from '../../services/midgard/types'
@@ -127,6 +127,20 @@ export const Deposit: React.FC<Props> = (props) => {
     ]
   )
 
+  const alignTopShareContent: boolean = useMemo(
+    () =>
+      FP.pipe(
+        symPoolShare,
+        RD.toOption,
+        O.flatten,
+        O.fold(
+          () => false,
+          () => true
+        )
+      ),
+    [symPoolShare]
+  )
+
   return (
     <Styled.Container>
       <Styled.ContentContainer>
@@ -136,8 +150,8 @@ export const Deposit: React.FC<Props> = (props) => {
               <Styled.Tabs destroyInactiveTabPane tabs={tabs} centered={false} defaultActiveKey="deposit-sym" />
             </Styled.DepositContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
-              <Styled.ShareContentWrapper>
-                <ShareContent asset={asset} poolShare={combinedPoolShare} smallWidth={!isDesktopView} />
+              <Styled.ShareContentWrapper alignTop={alignTopShareContent}>
+                <ShareContent smallWidth={!isDesktopView} asset={asset} poolShare={combinedPoolShare} />
               </Styled.ShareContentWrapper>
             </Styled.ShareContentCol>
           </>

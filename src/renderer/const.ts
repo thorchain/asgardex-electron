@@ -41,3 +41,31 @@ export const ZERO_ASSET_AMOUNT = assetAmount(ZERO_BN)
 export const ZERO_BASE_AMOUNT = baseAmount(ZERO_BN)
 
 export const ZERO_POOL_DATA: PoolData = { runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }
+
+export const AssetUSDTERC20: Asset = {
+  chain: 'ETH',
+  symbol: 'USDT-0x62e273709da575835c7f6aef4a31140ca5b1d190',
+  ticker: 'USDT'
+}
+
+export const AssetRuneEthERC20: Asset = {
+  chain: 'ETH',
+  symbol: 'RUNE-0xd601c6A3a36721320573885A8d8420746dA3d7A0',
+  ticker: 'RUNE'
+}
+
+export const AssetTKN8ERC20: Asset = {
+  chain: 'ETH',
+  symbol: 'TKN8-0x242aD49dAcd38aC23caF2ccc118482714206beD4',
+  ticker: 'TKN8'
+}
+
+export const AssetTKN18ERC20: Asset = {
+  chain: 'ETH',
+  symbol: 'TKN18-0x8E3f9E9b5B26AAaE9d31364d2a8e8a9dd2BE3B82',
+  ticker: 'TKN18'
+}
+
+// This hardcode list is for testnet only
+export const ERC20Assets = [AssetUSDTERC20, AssetRuneEthERC20, AssetTKN8ERC20, AssetTKN18ERC20]
+export const ETHAssets = [AssetETH, ...ERC20Assets]

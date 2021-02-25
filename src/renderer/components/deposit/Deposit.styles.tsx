@@ -30,13 +30,13 @@ export const ShareContentCol = styled(Col).attrs({})`
   `};
 `
 
-export const ShareContentWrapper = styled.div`
+export const ShareContentWrapper = styled.div<{ alignTop: boolean }>`
   background: ${palette('background', 0)};
   /* min-height for spin loader + empty data icons  */
   min-height: 300px;
   display: flex;
   justify-content: center;
-  align-items: baseline;
+  align-items: ${({ alignTop }) => (alignTop ? 'baseline' : 'center')};
   ${media.xl`
       min-height: 100%;
   `};
