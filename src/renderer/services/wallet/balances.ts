@@ -8,6 +8,7 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { ERC20Assets } from '../../const'
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { filterEnabledChains } from '../../helpers/chainHelper'
 import { eqBalancesRD } from '../../helpers/fp/eq'
@@ -139,7 +140,7 @@ const btcLedgerBalance$ = FP.pipe(
 /**
  * Transforms ETH data (address + `WalletBalance`) into `ChainBalance`
  */
-const ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.address$, ETH.balances$]).pipe(
+const ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.address$, ETH.balances$(ERC20Assets)]).pipe(
   RxOp.map(([walletAddress, balances]) => ({
     walletType: 'keystore',
     chain: ETHChain,
@@ -176,7 +177,7 @@ export const balancesState$: Observable<BalancesState> = Rx.combineLatest(
   filterEnabledChains({
     THOR: [THOR.balances$],
     BTC: [BTC.balances$, btcLedgerBalance$],
-    ETH: [ETH.balances$],
+    ETH: [ETH.balances$(ERC20Assets)],
     BNB: [BNB.balances$],
     LTC: [LTC.balances$]
   })

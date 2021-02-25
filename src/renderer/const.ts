@@ -41,3 +41,11 @@ export const ZERO_ASSET_AMOUNT = assetAmount(ZERO_BN)
 export const ZERO_BASE_AMOUNT = baseAmount(ZERO_BN)
 
 export const ZERO_POOL_DATA: PoolData = { runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }
+
+export const AssetUSDT: Asset = {
+  chain: 'ETH',
+  symbol: 'USDT-0x62e273709da575835c7f6aef4a31140ca5b1d190',
+  ticker: 'USDT'
+}
+
+export const ERC20Assets = [AssetETH, AssetUSDT]

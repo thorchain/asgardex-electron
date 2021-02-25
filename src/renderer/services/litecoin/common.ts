@@ -46,7 +46,7 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, litecoinNetwor
               const client = new Client({
                 network: network,
                 phrase,
-                nodeUrl: SOCHAIN_URL
+                sochainUrl: SOCHAIN_URL
               })
               return O.some(right(client)) as ClientState
             } catch (error) {
