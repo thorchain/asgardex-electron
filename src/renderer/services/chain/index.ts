@@ -4,7 +4,7 @@ import { getExplorerUrlByAsset$, getExplorerAddressByChain$ } from './explorerUr
 import { reloadDepositFees, depositFees$, withdrawFee$, reloadWithdrawFee, reloadSwapFees, swapFees$ } from './fees'
 import { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } from './ledger'
 import { asymDepositTxMemo$, symDepositTxMemo$, getWithdrawMemo$ } from './memo'
-import { swap$, asymDeposit$, symDeposit$, upgradeBnbRune$, withdraw$ } from './transaction'
+import { swap$, asymDeposit$, symDeposit$, upgradeBnbRune$, withdraw$, transfer$ } from './transaction'
 
 /**
  * Exports all functions and observables needed at UI level (provided by `ChainContext`)
@@ -31,5 +31,6 @@ export {
   asymDeposit$,
   symDeposit$,
   upgradeBnbRune$,
-  withdraw$ as symWithdraw$
+  withdraw$ as symWithdraw$,
+  transfer$
 }

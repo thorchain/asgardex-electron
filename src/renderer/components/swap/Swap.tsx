@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, PoolData, getSwapMemo } from '@thorchain/asgardex-util'
@@ -19,13 +19,14 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 
+import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import { getChainAsset } from '../../helpers/chainHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
+import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice } from '../../services/binance/types'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
@@ -63,6 +64,7 @@ export type SwapProps = {
   fees: SwapFeesRD
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
+  network: Network
 }
 
 export const Swap = ({
@@ -80,7 +82,8 @@ export const Swap = ({
   reloadBalances = FP.constVoid,
   fees: feesProp = RD.initial,
   targetWalletAddress,
-  onChangePath
+  onChangePath,
+  network
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -103,26 +106,9 @@ export const Swap = ({
     [sourceAsset, targetAsset]
   )
 
-  // (Possible) subscription of swap$
-  const [swapSub, setSwapSub] = useState<O.Option<Rx.Subscription>>(O.none)
-
-  // unsubscribe swap$ subscription
-  const unsubScribeSwapSub = useCallback(() => {
-    FP.pipe(
-      swapSub,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [swapSub])
-
-  useEffect(() => {
-    // Unsubscribe of (possible) previous subscription of `swap$`
-    return () => {
-      unsubScribeSwapSub()
-    }
-  }, [unsubScribeSwapSub])
-
-  // Swap state
-  const [swapState, setSwapState] = useState<SwapState>(INITIAL_SWAP_STATE)
+  const { state: swapState, reset: resetSwapState, subscribe: subscribeSwapState } = useSubscriptionState<SwapState>(
+    INITIAL_SWAP_STATE
+  )
 
   // Swap start time
   const [swapStartTime, setSwapStartTime] = useState<number>(0)
@@ -385,6 +371,7 @@ export const Swap = ({
             target={{ asset: targetAsset, amount: swapData.swapResult }}
             stepDescription={stepLabel}
             slip={swapData.slip}
+            network={network}
           />
         )
       }),
@@ -399,24 +386,14 @@ export const Swap = ({
     swapState.swap,
     swapState.step,
     swapState.stepsTotal,
-    intl
+    intl,
+    network
   ])
 
-  const onCloseTxModal = useCallback(() => {
-    // unsubscribe
-    unsubScribeSwapSub()
-    // reset swap$ subscription
-    setSwapSub(O.none)
-    // reset swap state
-    setSwapState(INITIAL_SWAP_STATE)
-  }, [unsubScribeSwapSub])
-
   const onFinishTxModal = useCallback(() => {
-    // Do same things as with closing
-    onCloseTxModal()
-    // but also refresh balances
+    resetSwapState()
     reloadBalances()
-  }, [onCloseTxModal, reloadBalances])
+  }, [resetSwapState, reloadBalances])
 
   const renderTxModal = useMemo(() => {
     const { swapTx, swap } = swapState
@@ -453,7 +430,7 @@ export const Swap = ({
     return (
       <TxModal
         title={txModalTitle}
-        onClose={onCloseTxModal}
+        onClose={resetSwapState}
         onFinish={onFinishTxModal}
         startTime={swapStartTime}
         txRD={swap}
@@ -462,7 +439,7 @@ export const Swap = ({
         extra={extraTxModalContent}
       />
     )
-  }, [extraTxModalContent, goToTransaction, intl, onCloseTxModal, onFinishTxModal, swapStartTime, swapState])
+  }, [extraTxModalContent, goToTransaction, intl, onFinishTxModal, resetSwapState, swapStartTime, swapState])
 
   const closePasswordModal = useCallback(() => {
     setShowPasswordModal(false)
@@ -484,20 +461,27 @@ export const Swap = ({
         // set start time
         setSwapStartTime(Date.now())
         // subscribe to swap$
-        const sub = swap$({
-          poolAddress: oSourcePoolAddress,
-          asset: source,
-          amount: amountToSwap,
-          memo
-        }).subscribe(setSwapState)
-
-        // store subscription - needed to unsubscribe while unmounting
-        setSwapSub(O.some(sub))
+        subscribeSwapState(
+          swap$({
+            poolAddress: oSourcePoolAddress,
+            asset: source,
+            amount: amountToSwap,
+            memo
+          })
+        )
 
         return true
       })
     )
-  }, [assetsToSwap, amountToSwap, closePasswordModal, oSourcePoolAddress, swap$, targetWalletAddress])
+  }, [
+    closePasswordModal,
+    assetsToSwap,
+    targetWalletAddress,
+    subscribeSwapState,
+    swap$,
+    oSourcePoolAddress,
+    amountToSwap
+  ])
 
   const sourceChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
     () =>
@@ -693,7 +677,9 @@ export const Swap = ({
               sourceAsset,
               O.fold(
                 () => <></>,
-                (asset) => <AssetSelect onSelect={setSourceAsset} asset={asset} assets={assetsToSwapFrom} />
+                (asset) => (
+                  <AssetSelect onSelect={setSourceAsset} asset={asset} assets={assetsToSwapFrom} network={network} />
+                )
               )
             )}
           </Styled.ValueItemContainer>
@@ -714,7 +700,9 @@ export const Swap = ({
               targetAsset,
               O.fold(
                 () => <></>,
-                (asset) => <AssetSelect onSelect={setTargetAsset} asset={asset} assets={assetsToSwapTo} />
+                (asset) => (
+                  <AssetSelect onSelect={setTargetAsset} asset={asset} assets={assetsToSwapTo} network={network} />
+                )
               )
             )}
           </Styled.ValueItemContainer>
@@ -733,6 +721,7 @@ export const Swap = ({
                 title={intl.formatMessage({ id: 'swap.drag' })}
                 source={source}
                 target={target}
+                network={network}
               />
             )
           )

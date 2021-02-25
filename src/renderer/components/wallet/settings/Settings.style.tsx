@@ -3,7 +3,6 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { media } from '../../../helpers/styleHelper'
 import { Button as UIButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
 
@@ -179,31 +178,6 @@ export const AccountAddress = styled(UILabel)`
   font-family: 'MainFontRegular';
   font-size: 16px;
   text-overflow: ellipsis;
-
-  label:nth-child(1) {
-    display: none;
-    ${media.sm`
-      display: block;
-    `}
-    ${media.md`
-      display: none;
-    `}
-    ${media.xl`
-      display: block;
-    `}
-  }
-  label:nth-child(2) {
-    display: block;
-    ${media.sm`
-      display: none;
-    `}
-    ${media.md`
-      display: block;
-    `}
-    ${media.xl`
-      display: none;
-    `}
-  }
 `
 
 export const DeviceText = styled(UILabel)`
@@ -274,5 +248,16 @@ export const AddressLinkIcon = styled(SelectOutlined)`
     width: 16px;
     transform: scale(-1, 1) translateX(5px);
     color: ${palette('text', 1)};
+  }
+`
+
+export const Text = styled(A.Typography.Text)`
+  font-size: 16px;
+  text-transform: lowercase;
+  font-family: 'MainFontRegular';
+  color: ${palette('text', 1)};
+
+  .setting-address > div {
+    margin-right: 60px;
   }
 `

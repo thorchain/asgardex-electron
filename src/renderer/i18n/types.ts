@@ -140,6 +140,7 @@ type WalletMessageKey =
   | 'wallet.errors.amount.shouldBeLessThanBalanceAndFee'
   | 'wallet.errors.fee.notCovered'
   | 'wallet.errors.invalidChain'
+  | 'wallet.send.error'
   | 'wallet.upgrade.pending'
   | 'wallet.upgrade.success'
   | 'wallet.upgrade.error'

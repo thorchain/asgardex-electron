@@ -61,7 +61,8 @@ const defaultProps: AsymDepositProps = {
           deposit: RD.success(true)
         })
       )
-    )
+    ),
+  network: 'testnet'
 }
 
 export const Default: Story = () => <AsymDeposit {...defaultProps} />

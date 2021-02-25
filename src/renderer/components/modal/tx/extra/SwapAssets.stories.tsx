@@ -9,7 +9,8 @@ const defaultProps: Props = {
   stepDescription: 'step 1',
   slip: bn(1),
   source: { asset: AssetRuneNative, amount: assetToBase(assetAmount(30)) },
-  target: { asset: AssetBNB, amount: assetToBase(assetAmount(1)) }
+  target: { asset: AssetBNB, amount: assetToBase(assetAmount(1)) },
+  network: 'testnet'
 }
 export const Default: Story = () => <SwapAssets {...defaultProps} />
 Default.storyName = 'default'

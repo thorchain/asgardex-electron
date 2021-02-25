@@ -40,6 +40,10 @@ export const HeaderAddress = styled(UILabel).attrs({
   padding: 0;
 `
 
+export const Label = styled(UILabel)`
+  font-size: 16px;
+`
+
 export const Collapse = styled(A.Collapse)`
   &.ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header {
     background-color: ${palette('background', 2)};

@@ -22,6 +22,7 @@ storiesOf('Components/Assets/AssetMenu', module).add('with search', () => {
         priceIndex={priceIndex}
         searchDisable={[]}
         onSelect={(key) => console.log(key)}
+        network="testnet"
       />
     </div>
   )
@@ -37,6 +38,7 @@ storiesOf('Components/Assets/AssetMenu', module).add('without search', () => {
         withSearch={false}
         searchDisable={[]}
         onSelect={(key) => console.log(key)}
+        network="testnet"
       />
     </div>
   )

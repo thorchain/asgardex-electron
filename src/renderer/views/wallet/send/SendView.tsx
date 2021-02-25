@@ -7,12 +7,14 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 
+import { Network } from '../../../../shared/api/types'
 import { ErrorView } from '../../../components/shared/error/'
 import { BackLink } from '../../../components/uielements/backLink'
-import { useBitcoinContext } from '../../../contexts/BitcoinContext'
+import { useAppContext } from '../../../contexts/AppContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
+import { DEFAULT_NETWORK } from '../../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { SendViewBNB, SendViewBTC, SendViewETH } from './index'
 import { SendViewTHOR } from './SendViewTHOR'
@@ -22,13 +24,20 @@ type Props = {}
 export const SendView: React.FC<Props> = (): JSX.Element => {
   const { asset, walletAddress } = useParams<SendParams>()
   const intl = useIntl()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
-  const { balancesState$, getExplorerTxUrl$ } = useWalletContext()
+  const {
+    balancesState$,
+    getExplorerTxUrl$,
+    keystoreService: { validatePassword$ }
+  } = useWalletContext()
+
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
-
-  const { reloadFees: reloadBTCFees } = useBitcoinContext()
 
   const renderAssetError = useMemo(
     () => (
@@ -51,20 +60,45 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
     (asset: Asset) => {
       switch (asset.chain) {
         case 'BNB':
-          return <SendViewBNB selectedAsset={asset} walletBalances={balances} getExplorerTxUrl={getExplorerTxUrl} />
+          return (
+            <SendViewBNB
+              asset={asset}
+              balances={balances}
+              getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
+              network={network}
+            />
+          )
         case 'BTC':
           return (
             <SendViewBTC
-              btcAsset={asset}
+              asset={asset}
               balances={balances}
-              reloadFeesHandler={reloadBTCFees}
               getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
+              network={network}
             />
           )
         case 'ETH':
-          return <SendViewETH selectedAsset={asset} walletBalances={balances} getExplorerTxUrl={getExplorerTxUrl} />
+          return (
+            <SendViewETH
+              asset={asset}
+              balances={balances}
+              getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
+              network={network}
+            />
+          )
         case 'THOR':
-          return <SendViewTHOR thorAsset={asset} balances={balances} getExplorerTxUrl={getExplorerTxUrl} />
+          return (
+            <SendViewTHOR
+              asset={asset}
+              balances={balances}
+              getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
+              network={network}
+            />
+          )
         default:
           return (
             <h1>
@@ -78,7 +112,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [balances, getExplorerTxUrl, intl, reloadBTCFees]
+    [balances, getExplorerTxUrl, network, validatePassword$, intl]
   )
 
   return FP.pipe(

@@ -204,6 +204,10 @@ By creating a new wallet or importing an existing one, ASGARDEX is saving wallet
 
 `keystore.json` can be removed in ASGARDEX by clicking "Remove wallet" in `Wallet -> Settings` or by removing it manually.
 
+## Git branching workflow
+
+See [BRANCHING_WORKLFOW.md](./BRANCHING_WORKLFOW.md)
+
 ## Releasing
 
 See [RELEASE.md](./RELEASE.md)

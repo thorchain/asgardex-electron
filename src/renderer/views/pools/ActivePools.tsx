@@ -10,23 +10,28 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
 import { Button } from '../../components/uielements/button'
-import { Label } from '../../components/uielements/label'
 import { Table } from '../../components/uielements/table'
+import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import * as Shared from './PoolsOverview.shared'
-import { TableAction } from './PoolsOverview.style'
+import * as Styled from './PoolsOverview.style'
 
 export const ActivePools: React.FC = (): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const { service: midgardService } = useMidgardContext()
   const {
@@ -55,7 +60,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
 
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
-      <TableAction>
+      <Styled.TableAction>
         <ManageButton asset={pool.target} />
         <Button
           round="true"
@@ -63,7 +68,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
           <SwapOutlined />
           {intl.formatMessage({ id: 'common.swap' })}
         </Button>
-      </TableAction>
+      </Styled.TableAction>
     ),
 
     [clickSwapHandler, intl]
@@ -81,13 +86,13 @@ export const ActivePools: React.FC = (): JSX.Element => {
 
   const renderVolumeColumn = useCallback(
     ({ volumePrice }: PoolTableRowData) => (
-      <Label align="right" nowrap>
+      <Styled.Label align="right" nowrap>
         {formatAssetAmountCurrency({
           amount: baseToAsset(volumePrice),
           asset: selectedPricePool.asset,
           decimal: 2
         })}
-      </Label>
+      </Styled.Label>
     ),
     [selectedPricePool.asset]
   )
@@ -109,13 +114,13 @@ export const ActivePools: React.FC = (): JSX.Element => {
 
   const renderTransactionColumn = useCallback(
     ({ transactionPrice }: PoolTableRowData) => (
-      <Label align="right" nowrap>
+      <Styled.Label align="right" nowrap>
         {formatAssetAmountCurrency({
           amount: baseToAsset(transactionPrice),
           asset: selectedPricePool.asset,
           decimal: 2
         })}
-      </Label>
+      </Styled.Label>
     ),
     [selectedPricePool.asset]
   )
@@ -145,7 +150,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
       key: 'fee',
       align: 'center',
       title: intl.formatMessage({ id: 'pools.avgfee' }),
-      render: ({ slip }: PoolTableRowData) => <Label align="center">{formatBN(slip)}%</Label>,
+      render: ({ slip }: PoolTableRowData) => <Styled.Label align="center">{formatBN(slip)}%</Styled.Label>,
       sorter: sortFeeColumn,
       sortDirections: ['descend', 'ascend']
     }),
@@ -157,7 +162,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
       key: 'trade',
       align: 'center',
       title: intl.formatMessage({ id: 'pools.trades' }),
-      render: ({ trades }: PoolTableRowData) => <Label align="center">{trades.toString()}</Label>,
+      render: ({ trades }: PoolTableRowData) => <Styled.Label align="center">{trades.toString()}</Styled.Label>,
       sorter: (a: PoolTableRowData, b: PoolTableRowData) => ordBigNumber.compare(a.trades, b.trades),
       sortDirections: ['descend', 'ascend']
     }),
@@ -208,7 +213,8 @@ export const ActivePools: React.FC = (): JSX.Element => {
         ({ poolDetails }: PoolsState): JSX.Element => {
           const poolViewData = getPoolTableRowsData({
             poolDetails,
-            pricePoolData: selectedPricePool.poolData
+            pricePoolData: selectedPricePool.poolData,
+            network
           })
           previousPools.current = O.some(poolViewData)
           return renderPoolsTable(poolViewData)

@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import * as FP from 'fp-ts/lib/pipeable'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { TxHashRD } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error/'
 import { SuccessView } from '../../../shared/success/'
-import { Button } from '../../../uielements/button'
+import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
 import * as Styled from '../TxForm.style'
 
 /**
@@ -22,18 +23,20 @@ import * as Styled from '../TxForm.style'
 export type Props = {
   txRD: TxHashRD
   sendForm: JSX.Element
-  inititalActionHandler?: () => void
-  successActionHandler?: (txHash: string) => Promise<void>
-  errorActionHandler?: () => void
+  inititalActionHandler?: FP.Lazy<void>
+  viewTxHandler?: (txHash: string) => Promise<void>
+  finishActionHandler?: FP.Lazy<void>
+  errorActionHandler?: FP.Lazy<void>
 }
 
 export const Send: React.FC<Props> = (props): JSX.Element => {
   const {
     txRD,
-    inititalActionHandler = () => {},
-    successActionHandler = async () => Promise.resolve(),
+    inititalActionHandler = FP.constVoid,
+    viewTxHandler = async () => Promise.resolve(),
+    finishActionHandler = FP.constVoid,
     sendForm,
-    errorActionHandler = () => {}
+    errorActionHandler = FP.constVoid
   } = props
   const intl = useIntl()
 
@@ -48,14 +51,19 @@ export const Send: React.FC<Props> = (props): JSX.Element => {
     [errorActionHandler, intl]
   )
 
-  const renderSuccessBtn = useCallback(
-    (txHash: string) => (
-      <Button round="true" onClick={() => successActionHandler(txHash)} sizevalue="normal">
-        <Styled.ButtonLinkIcon />
-        {intl.formatMessage({ id: 'common.transaction' })}
-      </Button>
-    ),
-    [intl, successActionHandler]
+  const renderSuccessExtra = useCallback(
+    (txHash: string) => {
+      const onClickHandler = () => viewTxHandler(txHash)
+      return (
+        <Styled.SuccessExtraContainer>
+          <Styled.SuccessExtraButton onClick={finishActionHandler}>
+            {intl.formatMessage({ id: 'common.back' })}
+          </Styled.SuccessExtraButton>
+          <ViewTxButton txHash={O.some(txHash)} onClick={onClickHandler} />
+        </Styled.SuccessExtraContainer>
+      )
+    },
+    [intl, finishActionHandler, viewTxHandler]
   )
 
   return (
@@ -66,7 +74,9 @@ export const Send: React.FC<Props> = (props): JSX.Element => {
           () => sendForm,
           () => sendForm,
           (error) => <ErrorView title={error.msg} extra={renderErrorBtn} />,
-          (hash) => <SuccessView title={intl.formatMessage({ id: 'common.success' })} extra={renderSuccessBtn(hash)} />
+          (hash) => (
+            <SuccessView title={intl.formatMessage({ id: 'common.success' })} extra={renderSuccessExtra(hash)} />
+          )
         )
       )}
     </>

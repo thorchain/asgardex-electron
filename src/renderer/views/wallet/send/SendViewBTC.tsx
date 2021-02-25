@@ -6,44 +6,60 @@ import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router-dom'
 
+import { Network } from '../../../../shared/api/types'
 import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormBTC } from '../../../components/wallet/txs/send/'
 import { useBitcoinContext } from '../../../contexts/BitcoinContext'
+import { useChainContext } from '../../../contexts/ChainContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
+import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { AddressValidation } from '../../../services/bitcoin/types'
+import { INITIAL_SEND_STATE } from '../../../services/chain/const'
+import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, TxHashRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
+import * as Helper from './SendView.helper'
 
 type Props = {
-  btcAsset: Asset
+  asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
-  reloadFeesHandler: () => void
+  validatePassword$: ValidatePasswordHandler
+  network: Network
 }
 
 export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
+  const { asset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none, validatePassword$, network } = props
+
+  const intl = useIntl()
+  const history = useHistory()
+
+  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(asset)), [oBalances, asset])
+
+  const { transfer$ } = useChainContext()
+
   const {
-    btcAsset: selectedAsset,
-    balances: oBalances,
-    reloadFeesHandler,
-    getExplorerTxUrl: oGetExplorerTxUrl = O.none
-  } = props
+    state: sendTxState,
+    reset: resetSendTxState,
+    subscribe: subscribeSendTxState
+  } = useSubscriptionState<SendTxState>(INITIAL_SEND_STATE)
 
-  const oBtcAssetWB = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(selectedAsset)), [
-    oBalances,
-    selectedAsset
-  ])
+  const onSend = useCallback(
+    (params: SendTxParams) => {
+      subscribeSendTxState(transfer$(params))
+    },
+    [subscribeSendTxState, transfer$]
+  )
 
-  const { fees$, subscribeTx, txRD$, client$, resetTx } = useBitcoinContext()
-
-  const txRD = useObservableState<TxHashRD>(txRD$, RD.initial)
-  const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
+  const { fees$, client$, reloadFees } = useBitcoinContext()
 
   const fees = useObservableState(fees$, RD.initial)
-
+  const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
   const addressValidation = useMemo(
     () =>
       FP.pipe(
@@ -54,44 +70,56 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     [oClient]
   )
 
+  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
+
+  const sendTxStatusMsg = useMemo(() => Helper.sendTxStatusMsg({ sendTxState, asset, intl }), [
+    asset,
+    intl,
+    sendTxState
+  ])
   /**
-   * Custom send form used by BNB chain only
+   * Custom send form used by BTC only
    */
   const sendForm = useCallback(
-    (assetWB: WalletBalance) => (
+    (walletBalance: WalletBalance) => (
       <SendFormBTC
-        walletBalance={assetWB}
-        onSubmit={subscribeTx}
         balances={FP.pipe(
           oBalances,
           O.getOrElse(() => [] as WalletBalances)
         )}
-        isLoading={RD.isPending(txRD)}
+        balance={walletBalance}
+        isLoading={isLoading}
+        onSubmit={onSend}
         addressValidation={addressValidation}
-        reloadFeesHandler={reloadFeesHandler}
         feesWithRates={fees}
+        reloadFeesHandler={reloadFees}
+        validatePassword$={validatePassword$}
+        sendTxStatusMsg={sendTxStatusMsg}
+        network={network}
       />
     ),
-    [subscribeTx, oBalances, txRD, addressValidation, reloadFeesHandler, fees]
+    [oBalances, isLoading, onSend, addressValidation, fees, reloadFees, validatePassword$, sendTxStatusMsg, network]
   )
 
+  const finishActionHandler = useCallback(() => {
+    resetSendTxState()
+    history.goBack()
+  }, [history, resetSendTxState])
+
   return FP.pipe(
-    sequenceTOption(oGetExplorerTxUrl, oBtcAssetWB),
+    sequenceTOption(oGetExplorerTxUrl, oWalletBalance),
     O.fold(
       () => <></>,
-      ([getExplorerTxUrl, btcAssetWB]) => {
-        const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
-          getExplorerTxUrl,
-          window.apiUrl.openExternal
-        )
+      ([getExplorerTxUrl, walletBalance]) => {
+        const viewTxHandler: (txHash: string) => Promise<void> = FP.flow(getExplorerTxUrl, window.apiUrl.openExternal)
         return (
           <>
             <Send
-              txRD={txRD}
-              successActionHandler={successActionHandler}
-              inititalActionHandler={resetTx}
-              errorActionHandler={resetTx}
-              sendForm={sendForm(btcAssetWB)}
+              txRD={sendTxState.status}
+              viewTxHandler={viewTxHandler}
+              finishActionHandler={finishActionHandler}
+              errorActionHandler={resetSendTxState}
+              sendForm={sendForm(walletBalance)}
             />
           </>
         )

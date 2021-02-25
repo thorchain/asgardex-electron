@@ -3,7 +3,7 @@ import React from 'react'
 import { StopOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { AssetRuneNative, baseToAsset, formatAssetAmountCurrency, THORChain } from '@xchainjs/xchain-util'
+import { AssetRuneNative, baseToAsset, formatAssetAmountCurrency, THORChain, baseAmount } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
@@ -19,37 +19,51 @@ export const NodeAddress: React.FC<{ address: Address; network: Network }> = ({ 
 )
 
 export const BondValue: React.FC<{ data: NodeDataRD }> = ({ data }) => (
-  <Styled.BondCol>
+  <Col>
     {FP.pipe(
       data,
-      RD.map(({ bond }) =>
-        formatAssetAmountCurrency({ asset: AssetRuneNative, amount: baseToAsset(bond), trimZeros: true, decimal: 0 })
+      RD.map((_) =>
+        // formatAssetAmountCurrency({ asset: AssetRuneNative, amount: baseToAsset(bond), trimZeros: true, decimal: 0 })
+        formatAssetAmountCurrency({
+          asset: AssetRuneNative,
+          amount: baseToAsset(baseAmount('3239515100001')),
+          trimZeros: true,
+          decimal: 0
+        })
       ),
       RD.fold(
-        () => <Styled.TextLabel>-</Styled.TextLabel>,
-        () => <Styled.TextLabel loading={true} />,
-        () => <Styled.TextLabel>-</Styled.TextLabel>,
-        (value) => <Styled.TextLabel>{value}</Styled.TextLabel>
+        () => <Styled.TextLabel align="right">-</Styled.TextLabel>,
+        () => <Styled.TextLabel align="right" loading={true} />,
+        () => <Styled.TextLabel align="right">-</Styled.TextLabel>,
+        (value) => (
+          <Styled.TextLabel align="right" nowrap>
+            {value}
+          </Styled.TextLabel>
+        )
       )
     )}
-  </Styled.BondCol>
+  </Col>
 )
 
 export const AwardValue: React.FC<{ data: NodeDataRD }> = ({ data }) => (
-  <Styled.AwardCol>
+  <Col>
     {FP.pipe(
       data,
       RD.map(({ award }) =>
         formatAssetAmountCurrency({ asset: AssetRuneNative, amount: baseToAsset(award), trimZeros: true, decimal: 0 })
       ),
       RD.fold(
-        () => <Styled.TextLabel>-</Styled.TextLabel>,
-        () => <Styled.TextLabel loading={true} />,
-        () => <Styled.TextLabel>-</Styled.TextLabel>,
-        (value) => <Styled.TextLabel nowrap>{value}</Styled.TextLabel>
+        () => <Styled.TextLabel align="right">-</Styled.TextLabel>,
+        () => <Styled.TextLabel align="right" loading={true} />,
+        () => <Styled.TextLabel align="right">-</Styled.TextLabel>,
+        (value) => (
+          <Styled.TextLabel align="right" nowrap>
+            {value}
+          </Styled.TextLabel>
+        )
       )
     )}
-  </Styled.AwardCol>
+  </Col>
 )
 
 const getStatusMessageId = (status: NodeStatus) => {
@@ -75,11 +89,13 @@ export const Status: React.FC<{ data: NodeDataRD }> = ({ data }) => {
     data,
     RD.map(({ status }) => status),
     RD.fold(
-      () => <Styled.TextLabel>-</Styled.TextLabel>,
-      () => <Styled.TextLabel loading={true} />,
-      () => <Styled.TextLabel>-</Styled.TextLabel>,
+      () => <Styled.TextLabel align="center">-</Styled.TextLabel>,
+      () => <Styled.TextLabel align="center" loading={true} />,
+      () => <Styled.TextLabel align="center">-</Styled.TextLabel>,
       (value) => {
-        return <Styled.TextLabel>{intl.formatMessage({ id: getStatusMessageId(value) })}</Styled.TextLabel>
+        return (
+          <Styled.TextLabel align="center">{intl.formatMessage({ id: getStatusMessageId(value) })}</Styled.TextLabel>
+        )
       }
     )
   )

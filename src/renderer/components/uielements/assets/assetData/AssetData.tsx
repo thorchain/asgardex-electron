@@ -3,6 +3,7 @@ import React from 'react'
 import { BaseAmount, formatAssetAmountCurrency, baseToAsset, baseAmount, Asset } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 
+import { Network } from '../../../../../shared/api/types'
 import { PricePoolAsset } from '../../../../views/pools/Pools.types'
 import * as Styled from './AssetData.style'
 
@@ -24,6 +25,7 @@ export type Props = {
   size?: Styled.AssetDataSize
   // `className` is needed by `styled components`
   className?: string
+  network: Network
 }
 
 export const AssetData: React.FC<Props> = (props): JSX.Element => {
@@ -34,7 +36,8 @@ export const AssetData: React.FC<Props> = (props): JSX.Element => {
     price = baseAmount(0),
     priceAsset,
     size = 'small',
-    className
+    className,
+    network
   } = props
 
   const priceLabel = priceAsset
@@ -44,7 +47,7 @@ export const AssetData: React.FC<Props> = (props): JSX.Element => {
   return (
     <Styled.Wrapper className={className}>
       <Col>
-        <Styled.AssetIcon asset={asset} size={size} />
+        <Styled.AssetIcon asset={asset} size={size} network={network} />
       </Col>
       {!noTicker && (
         <Col>

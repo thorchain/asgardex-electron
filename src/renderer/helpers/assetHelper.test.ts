@@ -1,4 +1,12 @@
-import { AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@xchainjs/xchain-util'
+import {
+  AssetBNB,
+  AssetBTC,
+  AssetETH,
+  AssetLTC,
+  AssetRune67C,
+  AssetRuneB1A,
+  AssetRuneNative
+} from '@xchainjs/xchain-util'
 
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
 import {
@@ -6,6 +14,7 @@ import {
   isBtcAsset,
   isChainAsset,
   isEthAsset,
+  isLtcAsset,
   isPricePoolAsset,
   isRuneBnbAsset,
   isRuneNativeAsset
@@ -43,6 +52,16 @@ describe('helpers/assetHelper', () => {
 
     it('returns false for any other asset than BNB', () => {
       expect(isBnbAsset(AssetRuneB1A)).toBeFalsy()
+    })
+  })
+
+  describe('isLtcAsset', () => {
+    it('checks LTC asset', () => {
+      expect(isLtcAsset(AssetLTC)).toBeTruthy()
+    })
+
+    it('returns false for any other asset than LTC', () => {
+      expect(isLtcAsset(AssetBNB)).toBeFalsy()
     })
   })
 

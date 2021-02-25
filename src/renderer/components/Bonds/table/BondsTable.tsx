@@ -24,6 +24,7 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
   const nodeColumn: ColumnType<Node> = useMemo(
     () => ({
       key: 'node',
+      width: 200,
       render: (_, { nodeAddress }) => <H.NodeAddress network={network} address={nodeAddress} />,
       title: intl.formatMessage({ id: 'bonds.node' }),
       align: 'left'
@@ -36,8 +37,7 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
       key: 'bond',
       title: intl.formatMessage({ id: 'bonds.bond' }),
       render: (_, { data }) => <H.BondValue data={data} />,
-      width: 140,
-      align: 'left'
+      align: 'right'
     }),
     [intl]
   )
@@ -46,24 +46,26 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
     () => ({
       key: 'award',
       title: intl.formatMessage({ id: 'bonds.award' }),
-      align: 'left',
+      align: 'right',
       render: (_, { data }) => <H.AwardValue data={data} />
     }),
     [intl]
   )
   const statusColumn: ColumnType<Node> = useMemo(
     () => ({
-      key: 'Status',
+      key: 'status',
+      width: 150,
       title: intl.formatMessage({ id: 'bonds.status' }),
       render: (_, { data }) => <H.Status data={data} />,
       responsive: ['sm'],
-      align: 'left'
+      align: 'center'
     }),
     [intl]
   )
   const infoColumn: ColumnType<Node> = useMemo(
     () => ({
       key: 'info',
+      width: 200,
       title: 'THORChain.net',
       render: (_, { nodeAddress }) => <H.Info goToNode={() => goToNode(nodeAddress)} />,
       responsive: ['md'],
@@ -77,6 +79,7 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
   const removeColumn: ColumnType<Node> = useMemo(
     () => ({
       key: 'remove',
+      width: 40,
       title: '',
       render: (_, { nodeAddress }) => <H.Delete deleteNode={() => setNodeToRemove(nodeAddress)} />,
       align: 'right'

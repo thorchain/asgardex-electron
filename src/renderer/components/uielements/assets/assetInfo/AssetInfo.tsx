@@ -26,10 +26,11 @@ type Props = {
     address: Address
     network: Network
   }>
+  network: Network
 }
 
 export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
-  const { assetsWB = O.none, asset: oAsset, walletInfo = O.none } = props
+  const { assetsWB = O.none, asset: oAsset, walletInfo = O.none, network } = props
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -43,10 +44,10 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         oAsset,
-        O.map((asset) => <AssetIcon asset={asset} size="large" key={assetToString(asset)} />),
+        O.map((asset) => <AssetIcon asset={asset} size="large" key={assetToString(asset)} network={network} />),
         O.getOrElse(() => <></>)
       ),
-    [oAsset]
+    [oAsset, network]
   )
 
   const renderBalance = useMemo(

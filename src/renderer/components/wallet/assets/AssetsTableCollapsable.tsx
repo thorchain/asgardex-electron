@@ -12,17 +12,17 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { isRuneBnbAsset } from '../../../helpers/assetHelper'
+import { Network } from '../../../../shared/api/types'
+import { ETH_DECIMAL, isEthAsset, isRuneBnbAsset } from '../../../helpers/assetHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
 import { ApiError, ChainBalance, ChainBalances } from '../../../services/wallet/types'
-import { WalletBalance } from '../../../types/wallet'
+import { WalletBalance, WalletBalances } from '../../../types/wallet'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
-import { Label } from '../../uielements/label'
 import * as Styled from './AssetsTableCollapsable.style'
 
 const { Panel } = Collapse
@@ -33,6 +33,7 @@ type Props = {
   poolDetails: PoolDetails
   selectAssetHandler?: (asset: Asset, walletAddress: string) => void
   setSelectedAsset?: (oAsset: O.Option<Asset>) => void
+  network: Network
 }
 
 export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
@@ -41,7 +42,8 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     pricePool,
     poolDetails,
     selectAssetHandler = (_) => {},
-    setSelectedAsset = () => {}
+    setSelectedAsset = () => {},
+    network
   } = props
 
   const intl = useIntl()
@@ -72,10 +74,11 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     [selectAssetHandler]
   )
 
-  const hideAssetHandler = useCallback((_asset: Asset) => {
-    // TODO (@Veado) Add logic as part of
-    // https://github.com/thorchain/asgardex-electron/issues/476
-  }, [])
+  // Hide column of "show/hide" icon temporary
+  // const hideAssetHandler = useCallback((_asset: Asset) => {
+  //   // TODO (@Veado) Add logic as part of
+  //   // https://github.com/thorchain/asgardex-electron/issues/476
+  // }, [])
 
   const iconColumn: ColumnType<Balance> = useMemo(
     () => ({
@@ -83,17 +86,17 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       width: 120,
       render: ({ asset }: Balance) => (
         <Row justify="center" align="middle">
-          <AssetIcon asset={asset} size="normal" />
+          <AssetIcon asset={asset} size="normal" network={network} />
         </Row>
       )
     }),
-    []
+    [network]
   )
 
   const nameColumn: ColumnType<Balance> = useMemo(
     () => ({
       width: 140,
-      render: ({ asset }: Balance) => <Label>{asset.symbol}</Label>
+      render: ({ asset }: Balance) => <Styled.Label>{asset.symbol}</Styled.Label>
     }),
     []
   )
@@ -103,7 +106,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       width: 80,
       render: ({ asset, walletAddress }: WalletBalance) => (
         <Styled.BnbRuneTickerWrapper>
-          <Label nowrap>{asset.ticker}</Label>
+          <Styled.Label nowrap>{asset.ticker}</Styled.Label>
           {isRuneBnbAsset(asset) && (
             <Styled.UpgradeButton
               onClick={(e) => {
@@ -124,9 +127,9 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const renderBalanceColumn = ({ asset, amount }: Balance) => {
     const balance = formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 3 })
     return (
-      <Label nowrap align="right">
+      <Styled.Label nowrap align="right">
         {balance}
-      </Label>
+      </Styled.Label>
     )
   }
 
@@ -142,14 +145,19 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
       const label = FP.pipe(
         oPrice,
-        O.map((price) => formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })),
+        O.map((price) => {
+          if (isEthAsset(balance.asset)) {
+            price.decimal = ETH_DECIMAL
+          }
+          return formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })
+        }),
         // "empty" label if we don't get a price value
         O.getOrElse(() => '--')
       )
       return (
-        <Label nowrap align="right">
+        <Styled.Label nowrap align="right">
           {label}
-        </Label>
+        </Styled.Label>
       )
     },
     [poolDetails, pricePool.asset, pricePool.poolData]
@@ -163,41 +171,42 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     [renderPriceColumn]
   )
 
-  const hideColumn: ColumnType<Balance> = useMemo(
-    () => ({
-      width: 20,
-      render: ({ asset }: Balance) => (
-        <Row
-          justify="center"
-          align="middle"
-          onClick={(event) => {
-            event.preventDefault()
-            event.stopPropagation()
-            hideAssetHandler(asset)
-          }}>
-          <Styled.HideIcon />
-        </Row>
-      )
-    }),
-    [hideAssetHandler]
-  )
+  // Hide column of "show/hide" icon temporary
+  // const hideColumn: ColumnType<Balance> = useMemo(
+  //   () => ({
+  //     width: 20,
+  //     render: ({ asset }: Balance) => (
+  //       <Row
+  //         justify="center"
+  //         align="middle"
+  //         onClick={(event) => {
+  //           event.preventDefault()
+  //           event.stopPropagation()
+  //           hideAssetHandler(asset)
+  //         }}>
+  //         <Styled.HideIcon />
+  //       </Row>
+  //     )
+  //   }),
+  //   [hideAssetHandler]
+  // )
 
   const columns = useMemo(() => {
     // desktop
     if (screenMap?.lg) {
-      return [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn, hideColumn]
+      return [iconColumn, nameColumn, tickerColumn, balanceColumn, priceColumn]
     }
     // tablet
     if (screenMap?.md) {
-      return [iconColumn, tickerColumn, balanceColumn, hideColumn]
+      return [iconColumn, tickerColumn, balanceColumn]
     }
     // mobile
     if (screenMap?.xs) {
-      return [iconColumn, balanceColumn, hideColumn]
+      return [iconColumn, balanceColumn]
     }
 
     return []
-  }, [balanceColumn, hideColumn, iconColumn, nameColumn, priceColumn, screenMap, tickerColumn])
+  }, [balanceColumn, iconColumn, nameColumn, priceColumn, screenMap, tickerColumn])
 
   const renderAssetsTable = useCallback(
     (tableData: Balances, oWalletAddress: O.Option<Address>, loading = false) => {
@@ -315,7 +324,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       const keys = FP.pipe(
         chainBalances,
         A.map(({ balances }) => balances),
-        A.filterMap(RD.toOption),
+        A.map(RD.getOrElse((): WalletBalances => [])),
         A.filterMapWithIndex((i, balances) => (balances.length > 0 ? O.some(i.toString()) : O.none))
       )
       setOpenPanelKeys(keys)

@@ -49,6 +49,16 @@ export const getChainAsset = (chain: Chain): Asset => {
  */
 export const isBtcChain = (chain: Chain): boolean => eqChain.equals(chain, 'BTC')
 
+/**
+ * Check whether chain is BNB chain
+ */
+export const isBnbChain = (chain: Chain): boolean => eqChain.equals(chain, 'BNB')
+
+/**
+ * Check whether chain is ETH chain
+ */
+export const isEthChain = (chain: Chain): boolean => eqChain.equals(chain, 'ETH')
+
 export const isEnabledChain = (chain: Chain) => ENABLED_CHAINS.includes(chain)
 
 export const filterEnabledChains = <T>(values: ChainValues<T>): T[] => {

@@ -66,7 +66,8 @@ const defaultProps: SymDepositProps = {
           deposit: RD.success(true)
         })
       )
-    )
+    ),
+  network: 'testnet'
 }
 
 export const Default: Story = () => <SymDeposit {...defaultProps} />

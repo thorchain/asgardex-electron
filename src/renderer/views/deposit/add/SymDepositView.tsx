@@ -10,9 +10,11 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../../shared/api/types'
 import { SymDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
 import { ZERO_BN, ZERO_POOL_DATA } from '../../../const'
+import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
@@ -21,6 +23,7 @@ import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as depositRoutes from '../../../routes/deposit'
 import { SymDepositMemo } from '../../../services/chain/types'
+import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
@@ -32,6 +35,9 @@ type Props = {
 export const SymDepositView: React.FC<Props> = ({ asset }) => {
   const history = useHistory()
   const intl = useIntl()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const onChangeAsset = useCallback(
     (asset: Asset) => {
@@ -163,6 +169,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
           reloadBalances={reloadBalances}
           poolData={ZERO_POOL_DATA}
           deposit$={symDeposit$}
+          network={network}
         />
       </>
     ),
@@ -175,7 +182,8 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
       selectedPricePoolAsset,
       reloadBalances,
       symDeposit$,
-      intl
+      intl,
+      network
     ]
   )
 
@@ -208,6 +216,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
               reloadBalances={reloadBalances}
               assets={poolAssets}
               deposit$={symDeposit$}
+              network={network}
             />
           </>
         )

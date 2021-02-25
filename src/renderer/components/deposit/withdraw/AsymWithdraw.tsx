@@ -198,9 +198,18 @@ export const AsymWithdraw: React.FC<Props> = ({
         target={{ asset, amount: assetAmountToWithdraw }}
         source={O.none}
         stepDescription={stepDescription}
+        network={network}
       />
     )
-  }, [intl, asset, withdrawState, assetAmountToWithdraw])
+  }, [
+    intl,
+    asset,
+    withdrawState.withdraw,
+    withdrawState.step,
+    withdrawState.stepsTotal,
+    assetAmountToWithdraw,
+    network
+  ])
 
   const onCloseTxModal = useCallback(() => {
     // reset withdraw$ subscription
@@ -343,7 +352,7 @@ export const AsymWithdraw: React.FC<Props> = ({
       </Label>
 
       <Styled.AssetContainer>
-        <Styled.AssetIcon asset={asset} />
+        <Styled.AssetIcon asset={asset} network={network} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
             amount: baseToAsset(assetAmountToWithdraw),
@@ -377,6 +386,7 @@ export const AsymWithdraw: React.FC<Props> = ({
         title={intl.formatMessage({ id: 'deposit.withdraw.drag' })}
         onConfirm={() => setShowPasswordModal(true)}
         disabled={disabledForm}
+        network={network}
       />
       {showPasswordModal && (
         <PasswordModal

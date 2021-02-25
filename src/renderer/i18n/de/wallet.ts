@@ -64,6 +64,7 @@ const wallet: WalletMessages = {
   'wallet.password.confirmation.error': 'Passwort ist falsch',
   'wallet.password.repeat': 'Passwort wiederholen',
   'wallet.password.mismatch': 'Passwort stimmt nicht überein',
+  'wallet.send.error': 'Error beim Versenden',
   'wallet.upgrade.pending': 'Upgraden',
   'wallet.upgrade.success': 'Updgrade erfolgreich',
   'wallet.upgrade.error.loadPoolAddress': 'Addresse vom {pool} Pool konnte nicht geladen werden',
