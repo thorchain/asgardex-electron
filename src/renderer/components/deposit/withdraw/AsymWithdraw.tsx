@@ -86,7 +86,7 @@ export const AsymWithdraw: React.FC<Props> = ({
 
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
 
-  const memo = useMemo(() => getWithdrawMemo(asset, withdrawPercent), [asset, withdrawPercent])
+  const memo = useMemo(() => getWithdrawMemo({ asset, percent: withdrawPercent }), [asset, withdrawPercent])
 
   const feeLD: FeeLD = useMemo(() => {
     return Rx.of(memo).pipe(

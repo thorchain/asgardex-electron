@@ -44,8 +44,7 @@ const getWithdrawMemo$: MemoRx = Rx.combineLatest([selectedPoolAsset$, withdrawP
   RxOp.map(([oPoolAsset, withdrawPercent]) =>
     FP.pipe(
       oPoolAsset,
-      /** getWithdrawMemo gets percents between 0 and 10000 */
-      O.map((poolAsset) => getWithdrawMemo(poolAsset, withdrawPercent * 100))
+      O.map((poolAsset) => getWithdrawMemo({ asset: poolAsset, percent: withdrawPercent }))
     )
   )
 )

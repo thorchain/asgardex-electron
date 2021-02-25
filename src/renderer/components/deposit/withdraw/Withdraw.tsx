@@ -94,8 +94,7 @@ export const Withdraw: React.FC<Props> = ({
     subscribe: subscribeWithdrawState
   } = useSubscriptionState<WithdrawState>(INITIAL_WITHDRAW_STATE)
 
-  // For a WITHDRAW memo percent needs to be multiplied by 100 to transform it into "points" (needed by `getWithdrawMemo`)
-  const memo = useMemo(() => getWithdrawMemo(asset, withdrawPercent * 100), [asset, withdrawPercent])
+  const memo = useMemo(() => getWithdrawMemo({ asset, percent: withdrawPercent }), [asset, withdrawPercent])
 
   const { rune: runeAmountToWithdraw, asset: assetAmountToWithdraw } = getWithdrawAmounts(
     runeShare,
