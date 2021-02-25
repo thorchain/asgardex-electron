@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getWithdrawMemo } from '@thorchain/asgardex-util'
@@ -16,6 +16,7 @@ import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
 import { FeeLD, FeeRD, Memo, WithdrawState, WithdrawStateHandler } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
@@ -77,36 +78,15 @@ export const AsymWithdraw: React.FC<Props> = ({
 }) => {
   const intl = useIntl()
 
+  const {
+    state: withdrawState,
+    reset: resetWithdrawState,
+    subscribe: subscribeWithdrawState
+  } = useSubscriptionState<WithdrawState>(INITIAL_WITHDRAW_STATE)
+
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
 
   const memo = useMemo(() => getWithdrawMemo(asset, withdrawPercent), [asset, withdrawPercent])
-
-  // (Possible) subscription of `withdraw$`
-  // DON'T use `_setWithdrawSub` to update state (it's unsafe) - use `setWithdrawSub`!!
-  const [withdrawSub, _setWithdrawSub] = useState<O.Option<Rx.Subscription>>(O.none)
-
-  // unsubscribe withdraw$ subscription
-  const unsubscribeWithdrawSub = useCallback(() => {
-    FP.pipe(
-      withdrawSub,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [withdrawSub])
-
-  const setWithdrawSub = useCallback(
-    (state) => {
-      unsubscribeWithdrawSub()
-      _setWithdrawSub(state)
-    },
-    [unsubscribeWithdrawSub]
-  )
-
-  useEffect(() => {
-    // Unsubscribe of (possible) previous subscription of `withdraw$`
-    return () => {
-      unsubscribeWithdrawSub()
-    }
-  }, [unsubscribeWithdrawSub])
 
   const feeLD: FeeLD = useMemo(() => {
     return Rx.of(memo).pipe(
@@ -170,9 +150,6 @@ export const AsymWithdraw: React.FC<Props> = ({
   // Withdraw start time
   const [withdrawStartTime, setWithdrawStartTime] = useState<number>(0)
 
-  // Withdraw state
-  const [withdrawState, setWithdrawState] = useState<WithdrawState>(INITIAL_WITHDRAW_STATE)
-
   const txModalExtraContent = useMemo(() => {
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
@@ -211,19 +188,10 @@ export const AsymWithdraw: React.FC<Props> = ({
     network
   ])
 
-  const onCloseTxModal = useCallback(() => {
-    // reset withdraw$ subscription
-    setWithdrawSub(O.none)
-    // reset withdraw state
-    setWithdrawState(INITIAL_WITHDRAW_STATE)
-  }, [setWithdrawSub])
-
   const onFinishTxModal = useCallback(() => {
-    // Do same things as with closing
-    onCloseTxModal()
-    // but also refresh balances
+    resetWithdrawState()
     reloadBalances()
-  }, [onCloseTxModal, reloadBalances])
+  }, [reloadBalances, resetWithdrawState])
 
   const renderTxModal = useMemo(() => {
     const { withdraw: withdrawRD, withdrawTx } = withdrawState
@@ -272,7 +240,7 @@ export const AsymWithdraw: React.FC<Props> = ({
     return (
       <TxModal
         title={txModalTitle}
-        onClose={onCloseTxModal}
+        onClose={resetWithdrawState}
         onFinish={onFinishTxModal}
         startTime={withdrawStartTime}
         txRD={withdrawRD}
@@ -283,7 +251,7 @@ export const AsymWithdraw: React.FC<Props> = ({
     )
   }, [
     withdrawState,
-    onCloseTxModal,
+    resetWithdrawState,
     onFinishTxModal,
     withdrawStartTime,
     txModalExtraContent,
@@ -310,16 +278,15 @@ export const AsymWithdraw: React.FC<Props> = ({
     // set start time
     setWithdrawStartTime(Date.now())
 
-    const sub = withdraw$({
-      asset,
-      poolAddress: oPoolAddress,
-      network,
-      memo
-    }).subscribe(setWithdrawState)
-
-    // store subscription - needed to unsubscribe while unmounting
-    setWithdrawSub(O.some(sub))
-  }, [closePasswordModal, withdraw$, asset, oPoolAddress, network, memo, setWithdrawSub])
+    subscribeWithdrawState(
+      withdraw$({
+        asset,
+        poolAddress: oPoolAddress,
+        network,
+        memo
+      })
+    )
+  }, [closePasswordModal, subscribeWithdrawState, withdraw$, asset, oPoolAddress, network, memo])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>

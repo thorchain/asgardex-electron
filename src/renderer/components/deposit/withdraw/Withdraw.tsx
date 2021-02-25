@@ -273,7 +273,6 @@ export const Withdraw: React.FC<Props> = ({
 
     subscribeWithdrawState(
       withdraw$({
-        // TODO @veado Use asset for asym withdraw - see https://github.com/thorchain/asgardex-electron/issues/827
         asset: AssetRuneNative,
         poolAddress: oPoolAddress,
         network,
