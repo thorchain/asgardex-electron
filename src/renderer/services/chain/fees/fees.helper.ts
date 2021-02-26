@@ -1,7 +1,8 @@
-import { Chain } from '@xchainjs/xchain-util'
+import { BNBChain, BTCChain, Chain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
+import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
 
 /**
@@ -15,17 +16,20 @@ import * as THOR from '../../thorchain'
  */
 export const reloadDepositFeesByChain = (chain: Chain) => {
   switch (chain) {
-    case 'BNB':
+    case BNBChain:
       BNB.reloadFees()
       break
-    case 'BTC':
+    case BTCChain:
       BTC.reloadFees()
       break
-    case 'ETH':
+    case ETHChain:
       // not available yet
       break
-    case 'THOR':
+    case THORChain:
       THOR.reloadFees()
+      break
+    case LTCChain:
+      LTC.reloadFees()
       break
     default:
   }

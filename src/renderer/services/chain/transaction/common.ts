@@ -20,6 +20,7 @@ import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as ETH from '../../ethereum'
+import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
 import { ErrorId, TxHashLD, TxLD } from '../../wallet/types'
 import { SendTxParams } from '../types'
@@ -76,8 +77,16 @@ export const sendTx$ = ({
       // not available yet
       return txFailure$(`Tx stuff has not been implemented for Bitcoin Cash yet`)
     case LTCChain:
-      // not available yet
-      return txFailure$(`Tx stuff has not been implemented for Litecoin yet`)
+      return FP.pipe(
+        LTC.feesWithRates$(memo),
+        liveData.mapLeft((error) => ({
+          errorId: ErrorId.GET_FEES,
+          msg: error?.message ?? error.toString()
+        })),
+        liveData.chain(({ rates }) => {
+          return LTC.sendTx({ recipient, amount, asset, memo, feeRate: rates[feeOptionKey] })
+        })
+      )
   }
 }
 
@@ -107,6 +116,6 @@ export const txStatusByChain$ = (txHash: TxHash, chain: Chain): TxLD => {
     case BCHChain:
       return failure$(`txStatus$ has not been implemented for Bitcoin Cash`)
     case LTCChain:
-      return failure$(`txStatus$ has not been implemented for Litecoin`)
+      return LTC.txStatus$(txHash)
   }
 }
