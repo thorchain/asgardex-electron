@@ -151,7 +151,7 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
         <Styled.CoinSubtitle>
           {FP.pipe(
             oAsset,
-            O.map(assetToString),
+            O.map((asset) => asset.chain),
             O.getOrElse(() => loadingString)
           )}
         </Styled.CoinSubtitle>
