@@ -1,8 +1,8 @@
 import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import { Client } from '@xchainjs/xchain-litecoin'
+import * as FP from 'fp-ts/function'
 import { right, left } from 'fp-ts/lib/Either'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
@@ -26,7 +26,16 @@ const litecoinNetwork$: Observable<ClientNetwork> = network$.pipe(
   })
 )
 
-const SOCHAIN_URL = envOrDefault(process.env.REACT_APP_SOCHAIN_URL, 'https://sochain.com/api/v2')
+const LTC_NODE_TESTNET_URL = envOrDefault(
+  process.env.REACT_APP_LTC_NODE_TESTNET_URL,
+  'https://testnet.ltc.thorchain.info'
+)
+const LTC_NODE_MAINNET_URL = envOrDefault(
+  process.env.REACT_APP_LTC_NODE_MAINNET_URL,
+  'https://mainnet.ltc.thorchain.info'
+)
+const LTCNodePassword = envOrDefault(process.env.REACT_APP_LTC_NODE_PASSWORD, 'password')
+const LTCNodeUsername = envOrDefault(process.env.REACT_APP_LTC_NODE_USERNAME, 'thorchain')
 
 /**
  * Stream to create an observable LitecoinClient depending on existing phrase in keystore
@@ -43,10 +52,15 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, litecoinNetwor
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
+              const nodeUrl = network === 'mainnet' ? LTC_NODE_MAINNET_URL : LTC_NODE_TESTNET_URL
               const client = new Client({
                 network: network,
                 phrase,
-                sochainUrl: SOCHAIN_URL
+                nodeUrl,
+                nodeAuth: {
+                  username: LTCNodeUsername,
+                  password: LTCNodePassword
+                }
               })
               return O.some(right(client)) as ClientState
             } catch (error) {
