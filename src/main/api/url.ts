@@ -17,7 +17,10 @@ const EXTERNALS_WHITELIST = [
   'blockstream.info',
   'dex.binance.org',
   'testnet-dex.binance.org',
-  'runestake.info'
+  'runestake.info',
+  'etherscan.io',
+  'ropsten.etherscan.io',
+  'tltc.bitaps.com'
 ]
 
 const openExternal = (target: string) => {

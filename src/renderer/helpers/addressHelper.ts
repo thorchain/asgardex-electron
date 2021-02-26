@@ -1,7 +1,7 @@
 import { getPrefix as getBinancePrefix } from '@xchainjs/xchain-binance'
 import { getPrefix as getBitcoinPrefix } from '@xchainjs/xchain-bitcoin'
 import { getPrefix as getBCHPrefix } from '@xchainjs/xchain-bitcoincash'
-import { Network as ClientNetwork } from '@xchainjs/xchain-client'
+import * as Client from '@xchainjs/xchain-client'
 import { getPrefix as getCosmosPrefix } from '@xchainjs/xchain-cosmos'
 import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
 import { getPrefix as getLitecoinPrefix } from '@xchainjs/xchain-litecoin'
@@ -27,10 +27,9 @@ export const truncateAddress = (addr: string, chain: Chain, network: Network): s
   return `${first}...${last}`
 }
 
-export const getAddressPrefixLength = (chain: Chain, network: Network): number => {
+export const getAddressPrefixLength = (chain: Chain, network: string): number => {
   // TODO (@Veado) Extract it into a helper - we might need it at other places, too
-  const clientNetwork: ClientNetwork = network === 'testnet' ? 'testnet' : 'mainnet'
-
+  const clientNetwork: Client.Network = network === 'testnet' ? 'testnet' : 'mainnet'
   switch (chain) {
     case BNBChain:
       return getBinancePrefix(network).length
@@ -47,10 +46,8 @@ export const getAddressPrefixLength = (chain: Chain, network: Network): number =
     case LTCChain: {
       return getLitecoinPrefix(clientNetwork).length
     }
-    // TODO @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
     case BCHChain: {
       return getBCHPrefix(network).length
-      // return 0
     }
   }
 }

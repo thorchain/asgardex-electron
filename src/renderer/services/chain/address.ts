@@ -14,9 +14,9 @@ import * as Rx from 'rxjs'
 
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
-import { address$ } from '../clients'
-import { Address$ } from '../clients/types'
+import { address$, Address$ } from '../clients'
 import * as ETH from '../ethereum'
+import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
 import { client$ } from './client'
 
@@ -38,7 +38,7 @@ const addressByChain$ = (chain: Chain): Address$ => {
     case BCHChain:
       return Rx.of(O.none)
     case LTCChain:
-      return Rx.of(O.none)
+      return LTC.address$
   }
 }
 

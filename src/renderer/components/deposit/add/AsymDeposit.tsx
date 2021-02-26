@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
@@ -15,11 +15,12 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 
+import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { isChainAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { Memo, DepositFeesRD, AsymDepositState, AsymDepositStateHandler } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
@@ -52,8 +53,14 @@ export type Props = {
   disabled?: boolean
   poolData: PoolData
   deposit$: AsymDepositStateHandler
+  network: Network
 }
 
+/**
+ * AsymDeposit component
+ *
+ * Note: It currently supports asym deposits for paired asset only (but not for RUNE)
+ */
 export const AsymDeposit: React.FC<Props> = (props) => {
   const {
     asset,
@@ -71,42 +78,19 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     fees,
     onChangeAsset,
     disabled = false,
-    deposit$
+    deposit$,
+    network
   } = props
 
   const intl = useIntl()
   const [assetAmountToDeposit, setAssetAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [percentValueToDeposit, setPercentValueToDeposit] = useState(0)
 
-  // (Possible) subscription of `xyzDeposit$`
-  // DON'T use `_setDepositSubUnsafe` to update state (it's unsafe) - use `setDepositSub`!!
-  const [depositSub, _setDepositSub] = useState<O.Option<Rx.Subscription>>(O.none)
-
-  // unsubscribe deposit$ subscription
-  const unsubscribeDepositSub = useCallback(() => {
-    FP.pipe(
-      depositSub,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [depositSub])
-
-  const setDepositSub = useCallback(
-    (state) => {
-      unsubscribeDepositSub()
-      _setDepositSub(state)
-    },
-    [unsubscribeDepositSub]
-  )
-
-  useEffect(() => {
-    // Unsubscribe of (possible) previous subscription of `deposit$`
-    return () => {
-      unsubscribeDepositSub()
-    }
-  }, [unsubscribeDepositSub])
-
-  // Deposit state
-  const [depositState, setDepositState] = useState<AsymDepositState>(INITIAL_ASYM_DEPOSIT_STATE)
+  const {
+    state: depositState,
+    reset: resetDepositState,
+    subscribe: subscribeDepositState
+  } = useSubscriptionState<AsymDepositState>(INITIAL_ASYM_DEPOSIT_STATE)
 
   // Deposit start time
   const [depositStartTime, setDepositStartTime] = useState<number>(0)
@@ -272,23 +256,15 @@ export const AsymDeposit: React.FC<Props> = (props) => {
         target={{ asset, amount: assetAmountToDeposit }}
         source={O.none}
         stepDescription={stepDescription}
+        network={network}
       />
     )
-  }, [intl, asset, depositState, assetAmountToDeposit])
-
-  const onCloseTxModal = useCallback(() => {
-    // reset deposit$ subscription
-    setDepositSub(O.none)
-    // reset deposit states
-    setDepositState(INITIAL_ASYM_DEPOSIT_STATE)
-  }, [setDepositSub])
+  }, [intl, asset, depositState, assetAmountToDeposit, network])
 
   const onFinishTxModal = useCallback(() => {
-    // Do same things as with closing
-    onCloseTxModal()
-    // but also refresh balances
+    resetDepositState()
     reloadBalances()
-  }, [onCloseTxModal, reloadBalances])
+  }, [resetDepositState, reloadBalances])
 
   const renderTxModal = useMemo(() => {
     const { deposit: depositRD, depositTx: asymDepositTx } = depositState
@@ -327,7 +303,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     return (
       <TxModal
         title={txModalTitle}
-        onClose={onCloseTxModal}
+        onClose={resetDepositState}
         onFinish={onFinishTxModal}
         startTime={depositStartTime}
         txRD={depositRD}
@@ -336,7 +312,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
         extra={txModalExtraContent}
       />
     )
-  }, [depositState, viewAssetTx, txModalExtraContent, onCloseTxModal, onFinishTxModal, depositStartTime, intl])
+  }, [depositState, viewAssetTx, resetDepositState, onFinishTxModal, depositStartTime, txModalExtraContent, intl])
 
   const onClosePasswordModal = useCallback(() => {
     // close password modal
@@ -353,20 +329,19 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     FP.pipe(
       oMemo,
       O.map((memo) => {
-        const sub = deposit$({
-          asset,
-          poolAddress: oPoolAddress,
-          amount: assetAmountToDeposit,
-          memo
-        }).subscribe(setDepositState)
-
-        // store subscription - needed to unsubscribe while unmounting
-        setDepositSub(O.some(sub))
+        subscribeDepositState(
+          deposit$({
+            asset,
+            poolAddress: oPoolAddress,
+            amount: assetAmountToDeposit,
+            memo
+          })
+        )
 
         return true
       })
     )
-  }, [oMemo, deposit$, asset, oPoolAddress, assetAmountToDeposit, setDepositSub])
+  }, [oMemo, subscribeDepositState, deposit$, asset, oPoolAddress, assetAmountToDeposit])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
@@ -398,6 +373,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
             onChangePercent={changePercentHandler}
             onChangeAsset={onChangeAsset}
             priceAsset={priceAsset}
+            network={network}
           />
         </Col>
         <Col xs={24} xl={12}></Col>
@@ -426,6 +402,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
           title={intl.formatMessage({ id: 'deposit.drag' })}
           onConfirm={confirmDepositHandler}
           disabled={disabledForm}
+          network={network}
         />
       </Styled.DragWrapper>
       {showPasswordModal && (

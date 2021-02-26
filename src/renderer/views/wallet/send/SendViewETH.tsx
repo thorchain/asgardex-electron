@@ -6,85 +6,122 @@ import { Asset, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router-dom'
 
-import { Send } from '../../../components/wallet/txs/send/'
-import { SendFormETH } from '../../../components/wallet/txs/send/'
+import { Network } from '../../../../shared/api/types'
+import { Send, SendFormETH } from '../../../components/wallet/txs/send/'
+import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
+import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
+import { INITIAL_SEND_STATE } from '../../../services/chain/const'
+import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { FeesRD, GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, TxHashRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
+import * as Helper from './SendView.helper'
 
 type Props = {
-  selectedAsset: Asset
-  walletBalances: O.Option<NonEmptyWalletBalances>
+  asset: Asset
+  balances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
+  network: Network
+  validatePassword$: ValidatePasswordHandler
 }
 
 export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, walletBalances: oWalletBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
+  const { asset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none, validatePassword$, network } = props
 
-  const oSelectedWalletBalance = useMemo(() => getWalletBalanceByAsset(oWalletBalances, O.some(selectedAsset)), [
-    oWalletBalances,
-    selectedAsset
-  ])
+  const intl = useIntl()
+  const history = useHistory()
 
-  const { txRD$, resetTx, subscribeTx, fees$, reloadFees } = useEthereumContext()
+  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(asset)), [oBalances, asset])
 
-  const txRD = useObservableState<TxHashRD>(txRD$, RD.initial)
+  const { transfer$ } = useChainContext()
+
+  const {
+    state: sendTxState,
+    reset: resetSendTxState,
+    subscribe: subscribeSendTxState
+  } = useSubscriptionState<SendTxState>(INITIAL_SEND_STATE)
+
+  const onSend = useCallback(
+    (params: SendTxParams) => {
+      subscribeSendTxState(transfer$(params))
+    },
+    [subscribeSendTxState, transfer$]
+  )
+
+  const { fees$, reloadFees } = useEthereumContext()
+
   const [feesRD] = useObservableState<FeesRD>(
     // First fees are based on "default" values
     // Whenever an user enters valid values into input fields,
     // `reloadFees` will be called and with it, `feesRD` will be updated with fees
     () => {
       return fees$({
-        asset: selectedAsset,
+        asset,
         amount: baseAmount(1),
         recipient: ETHAddress
       })
     },
-
     RD.initial
   )
+
+  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
+
+  const sendTxStatusMsg = useMemo(() => Helper.sendTxStatusMsg({ sendTxState, asset, intl }), [
+    asset,
+    intl,
+    sendTxState
+  ])
 
   /**
    * Custom send form used by ETH chain only
    */
   const sendForm = useCallback(
-    (selectedAssetWalletBalance: WalletBalance) => (
+    (walletBalance: WalletBalance) => (
       <SendFormETH
-        balance={selectedAssetWalletBalance}
-        onSubmit={subscribeTx}
+        balance={walletBalance}
         balances={FP.pipe(
-          oWalletBalances,
+          oBalances,
           O.getOrElse(() => [] as WalletBalances)
         )}
         fees={feesRD}
-        isLoading={RD.isPending(txRD)}
+        isLoading={isLoading}
+        onSubmit={onSend}
+        sendTxStatusMsg={sendTxStatusMsg}
         reloadFeesHandler={reloadFees}
+        validatePassword$={validatePassword$}
+        network={network}
       />
     ),
-    [subscribeTx, oWalletBalances, feesRD, txRD, reloadFees]
+    [oBalances, feesRD, isLoading, onSend, sendTxStatusMsg, reloadFees, validatePassword$, network]
   )
 
+  const finishActionHandler = useCallback(() => {
+    resetSendTxState()
+    history.goBack()
+  }, [history, resetSendTxState])
+
   return FP.pipe(
-    sequenceTOption(oSelectedWalletBalance, oGetExplorerTxUrl),
+    sequenceTOption(oWalletBalance, oGetExplorerTxUrl),
     O.fold(
       () => <></>,
-      ([selectedWalletBalance, getExplorerTxUrl]) => {
-        const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
-          getExplorerTxUrl,
-          window.apiUrl.openExternal
-        )
+      ([walletBalance, getExplorerTxUrl]) => {
+        const viewTxHandler: (txHash: string) => Promise<void> = FP.flow(getExplorerTxUrl, window.apiUrl.openExternal)
         return (
-          <Send
-            txRD={txRD}
-            successActionHandler={successActionHandler}
-            inititalActionHandler={resetTx}
-            errorActionHandler={resetTx}
-            sendForm={sendForm(selectedWalletBalance)}
-          />
+          <>
+            <Send
+              txRD={sendTxState.status}
+              viewTxHandler={viewTxHandler}
+              finishActionHandler={finishActionHandler}
+              errorActionHandler={finishActionHandler}
+              sendForm={sendForm(walletBalance)}
+            />
+          </>
         )
       }
     )

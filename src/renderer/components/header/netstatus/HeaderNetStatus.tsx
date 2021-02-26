@@ -27,10 +27,11 @@ type Props = {
   binanceUrl: O.Option<string>
   bitcoinUrl: O.Option<string>
   thorchainUrl: O.Option<string>
+  litecoinUrl: O.Option<string>
 }
 
 export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
-  const { isDesktopView, midgardUrl, binanceUrl, bitcoinUrl, thorchainUrl } = props
+  const { isDesktopView, midgardUrl, binanceUrl, bitcoinUrl, thorchainUrl, litecoinUrl } = props
   const { onlineStatus$ } = useAppContext()
   const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
   const intl = useIntl()
@@ -62,9 +63,15 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
         headline: 'Binance Chain',
         subheadline: headerNetStatusSubheadline({ url: binanceUrl, onlineStatus, notConnectedTxt }),
         color: headerNetStatusColor({ url: binanceUrl, onlineStatus })
+      },
+      {
+        key: 'litecoin',
+        headline: 'Litecoin Chain',
+        subheadline: headerNetStatusSubheadline({ url: litecoinUrl, onlineStatus, notConnectedTxt }),
+        color: headerNetStatusColor({ url: litecoinUrl, onlineStatus })
       }
     ]
-  }, [binanceUrl, bitcoinUrl, intl, midgardUrl, onlineStatus, thorchainUrl])
+  }, [binanceUrl, bitcoinUrl, intl, midgardUrl, onlineStatus, thorchainUrl, litecoinUrl])
 
   const desktopMenu = useMemo(() => {
     return (

@@ -9,6 +9,7 @@ import { BitcoinProvider } from './contexts/BitcoinContext'
 import { ChainProvider } from './contexts/ChainContext'
 import { EthereumProvider } from './contexts/EthereumContext'
 import { I18nProvider } from './contexts/I18nContext'
+import { LitecoinProvider } from './contexts/LitecoinContext'
 import { MidgardProvider } from './contexts/MidgardContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { ThorchainProvider } from './contexts/ThorchainContext'
@@ -24,21 +25,23 @@ export const App: React.FC = (): JSX.Element => {
           <ThorchainProvider>
             <BinanceProvider>
               <BitcoinProvider>
-                <BitcoinCashProvider>
-                  <EthereumProvider>
-                    <MidgardProvider>
-                      <UserNodesProvider>
-                        <I18nProvider>
-                          <Router>
-                            <ThemeProvider>
-                              <AppView />
-                            </ThemeProvider>
-                          </Router>
-                        </I18nProvider>
-                      </UserNodesProvider>
-                    </MidgardProvider>
-                  </EthereumProvider>
-                </BitcoinCashProvider>
+                <LitecoinProvider>
+                  <BitcoinCashProvider>
+                    <EthereumProvider>
+                      <MidgardProvider>
+                        <UserNodesProvider>
+                          <I18nProvider>
+                            <Router>
+                              <ThemeProvider>
+                                <AppView />
+                              </ThemeProvider>
+                            </Router>
+                          </I18nProvider>
+                        </UserNodesProvider>
+                      </MidgardProvider>
+                    </EthereumProvider>
+                  </BitcoinCashProvider>
+                </LitecoinProvider>
               </BitcoinProvider>
             </BinanceProvider>
           </ThorchainProvider>

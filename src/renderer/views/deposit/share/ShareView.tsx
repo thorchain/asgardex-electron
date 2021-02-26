@@ -63,7 +63,13 @@ export const ShareView: React.FC<Props> = ({ asset, poolShare: poolShareRD, smal
   )
 
   const renderNoShare = useMemo(
-    () => <Styled.EmptyData description={intl.formatMessage({ id: 'deposit.pool.noDeposit' })} />,
+    () => (
+      <Styled.EmptyData
+        description={intl.formatMessage({
+          id: 'deposit.pool.noShares'
+        })}
+      />
+    ),
     [intl]
   )
 

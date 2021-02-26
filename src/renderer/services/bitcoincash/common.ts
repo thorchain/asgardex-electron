@@ -7,6 +7,8 @@ import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
+import { NodeAuth } from '../../../../../xchainjs-lib/packages/xchain-bitcoincash/lib'
+import { envOrDefault } from '../../helpers/envHelper'
 import { network$ } from '../app/service'
 import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
@@ -26,8 +28,18 @@ const bitcoinCashNetwork$: Observable<ClientNetwork> = network$.pipe(
 )
 
 const HASKOIN_API_URL: ClientUrl = {
-  testnet: 'https://api.haskoin.com/bchtest',
-  mainnet: 'https://api.haskoin.com/bch'
+  testnet: envOrDefault(process.env.REACT_APP_HASKOIN_TESTNET_URL, 'https://api.haskoin.com/bchtest'),
+  mainnet: envOrDefault(process.env.REACT_APP_HASKOIN_MAINNET_URL, 'https://api.haskoin.com/bch')
+}
+
+const NODE_URL: ClientUrl = {
+  testnet: envOrDefault(process.env.REACT_APP_BCH_NODE_TESTNET_URL, 'https://testnet.ltc.thorchain.info'),
+  mainnet: envOrDefault(process.env.REACT_APP_BCH_NODE_MAINNET_URL, 'https://mainnet.ltc.thorchain.info')
+}
+
+const NODE_AUTH: NodeAuth = {
+  password: envOrDefault(process.env.REACT_APP_BCH_NODE_PASSWORD, 'password'),
+  username: envOrDefault(process.env.REACT_APP_BCH_NODE_USERNAME, 'thorchain')
 }
 
 /**
@@ -47,7 +59,9 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinCashNet
             try {
               const client = new BitcoinCashClient({
                 network: bitcoinCashNetwork,
-                clientUrl: HASKOIN_API_URL,
+                haskoinUrl: HASKOIN_API_URL,
+                nodeUrl: NODE_URL,
+                nodeAuth: NODE_AUTH,
                 phrase
               })
               return O.some(right(client))

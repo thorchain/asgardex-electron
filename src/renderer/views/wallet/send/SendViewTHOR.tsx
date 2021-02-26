@@ -2,49 +2,70 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain'
-import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
-import * as RxOp from 'rxjs/operators'
+import { useIntl } from 'react-intl'
+import { useHistory } from 'react-router-dom'
 
+import { Network } from '../../../../shared/api/types'
 import { Send, SendFormTHOR } from '../../../components/wallet/txs/send/'
+import { useChainContext } from '../../../contexts/ChainContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
+import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
+import { INITIAL_SEND_STATE } from '../../../services/chain/const'
+import { FeeRD, SendTxParams, SendTxState } from '../../../services/chain/types'
 import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { AddressValidation } from '../../../services/thorchain/types'
-import { NonEmptyWalletBalances, TxHashRD } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
+import * as Helper from './SendView.helper'
 
 type Props = {
-  thorAsset: Asset
+  asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   getExplorerTxUrl: O.Option<GetExplorerTxUrl>
+  validatePassword$: ValidatePasswordHandler
+  network: Network
 }
 
 export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
-  const { thorAsset: selectedAsset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none } = props
+  const { asset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none, validatePassword$, network } = props
 
-  const selectedAssetBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(selectedAsset)), [
-    oBalances,
-    selectedAsset
-  ])
+  const intl = useIntl()
+  const history = useHistory()
 
-  const { fees$, subscribeTx, txRD$, client$, resetTx } = useThorchainContext()
+  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(asset)), [oBalances, asset])
 
-  const txRD = useObservableState<TxHashRD>(txRD$, RD.initial)
+  const { transfer$ } = useChainContext()
+  const {
+    state: sendTxState,
+    reset: resetSendTxState,
+    subscribe: subscribeSendTxState
+  } = useSubscriptionState<SendTxState>(INITIAL_SEND_STATE)
+
+  const onSend = useCallback(
+    (params: SendTxParams) => {
+      subscribeSendTxState(transfer$(params))
+    },
+    [subscribeSendTxState, transfer$]
+  )
+
+  const { fees$, client$, reloadFees } = useThorchainContext()
+
   const oClient = useObservableState<O.Option<ThorchainClient>>(client$, O.none)
 
-  const [fee] = useObservableState<O.Option<AssetAmount>>(
+  const [feeRD] = useObservableState<FeeRD>(
     () =>
       FP.pipe(
         fees$(),
-        liveData.map((fees) => baseToAsset(fees.fast)),
-        RxOp.map(RD.toOption)
+        liveData.map((fees) => fees.fast)
       ),
-    O.none
+    RD.initial
   )
 
   const addressValidation = useMemo(
@@ -57,43 +78,56 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
     [oClient]
   )
 
+  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
+
+  const sendTxStatusMsg = useMemo(() => Helper.sendTxStatusMsg({ sendTxState, asset, intl }), [
+    asset,
+    intl,
+    sendTxState
+  ])
+
   /**
    * Custom send form used by THOR chain only
    */
   const sendForm = useCallback(
     (balance: WalletBalance) => (
       <SendFormTHOR
-        balance={balance}
-        onSubmit={subscribeTx}
         balances={FP.pipe(
           oBalances,
           O.getOrElse(() => [] as WalletBalances)
         )}
-        isLoading={RD.isPending(txRD)}
+        balance={balance}
+        isLoading={isLoading}
+        onSubmit={onSend}
         addressValidation={addressValidation}
-        fee={fee}
+        fee={feeRD}
+        reloadFeesHandler={reloadFees}
+        validatePassword$={validatePassword$}
+        sendTxStatusMsg={sendTxStatusMsg}
+        network={network}
       />
     ),
-    [subscribeTx, oBalances, txRD, addressValidation, fee]
+    [oBalances, isLoading, onSend, addressValidation, feeRD, reloadFees, validatePassword$, sendTxStatusMsg, network]
   )
+  const finishActionHandler = useCallback(() => {
+    resetSendTxState()
+    history.goBack()
+  }, [history, resetSendTxState])
 
   return FP.pipe(
-    sequenceTOption(oGetExplorerTxUrl, selectedAssetBalance),
+    sequenceTOption(oGetExplorerTxUrl, oWalletBalance),
     O.fold(
       () => <></>,
-      ([getExplorerTxUrl, selectedAssetBalance]) => {
-        const successActionHandler: (txHash: string) => Promise<void> = FP.flow(
-          getExplorerTxUrl,
-          window.apiUrl.openExternal
-        )
+      ([getExplorerTxUrl, walletBalance]) => {
+        const viewTxHandler: (txHash: string) => Promise<void> = FP.flow(getExplorerTxUrl, window.apiUrl.openExternal)
         return (
           <>
             <Send
-              txRD={txRD}
-              successActionHandler={successActionHandler}
-              inititalActionHandler={resetTx}
-              errorActionHandler={resetTx}
-              sendForm={sendForm(selectedAssetBalance)}
+              txRD={sendTxState.status}
+              viewTxHandler={viewTxHandler}
+              finishActionHandler={finishActionHandler}
+              errorActionHandler={finishActionHandler}
+              sendForm={sendForm(walletBalance)}
             />
           </>
         )

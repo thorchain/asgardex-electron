@@ -10,9 +10,11 @@ import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error'
 import { BackLink } from '../../components/uielements/backLink'
 import { Upgrade } from '../../components/wallet/txs/upgrade'
+import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -21,6 +23,7 @@ import { isRuneBnbAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { getPoolAddressByChain } from '../../services/midgard/utils'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
@@ -30,6 +33,9 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const { asset } = useParams<AssetDetailsParams>()
 
   const intl = useIntl()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   // accept BNB.Rune only
   const oRuneBnbAsset = useMemo(() => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isRuneBnbAsset)), [
@@ -156,6 +162,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
               balances={oBalances}
               successActionHandler={successActionHandler}
               reloadBalancesHandler={reloadBalances}
+              network={network}
             />
           </>
         )

@@ -25,10 +25,10 @@ storiesOf('Components/assets/AssetPairOverlapped', module)
     return (
       <div>
         <div style={{ display: 'flex' }}>
-          <AssetPairOverlapped asset={AssetBNB} target={ASSETS_MAINNET.BOLT} size={size} />
-          <AssetPairOverlapped asset={AssetBNB} target={AssetRuneNative} size={size} />
-          <AssetPairOverlapped asset={AssetBNB} target={ASSETS_MAINNET.FTM} size={size} />
-          <AssetPairOverlapped asset={AssetBNB} target={ASSETS_MAINNET.TOMO} size={size} />
+          <AssetPairOverlapped asset={AssetBNB} target={ASSETS_MAINNET.BOLT} size={size} network="testnet" />
+          <AssetPairOverlapped asset={AssetBNB} target={AssetRuneNative} size={size} network="testnet" />
+          <AssetPairOverlapped asset={AssetBNB} target={ASSETS_MAINNET.FTM} size={size} network="testnet" />
+          <AssetPairOverlapped asset={AssetBNB} target={ASSETS_MAINNET.TOMO} size={size} network="testnet" />
         </div>
       </div>
     )

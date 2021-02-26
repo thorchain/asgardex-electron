@@ -1,4 +1,15 @@
-import { Asset, AssetBNB, AssetBTC, AssetETH, AssetRune67C, AssetRuneB1A, AssetRuneNative } from '@xchainjs/xchain-util'
+import { getTokenAddress } from '@xchainjs/xchain-ethereum'
+import {
+  Asset,
+  AssetBNB,
+  AssetBTC,
+  AssetETH,
+  AssetLTC,
+  AssetRune67C,
+  AssetRuneB1A,
+  AssetRuneNative
+} from '@xchainjs/xchain-util'
+import * as ethers from 'ethers'
 
 import { Network } from '../../shared/api/types'
 import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
@@ -55,6 +66,11 @@ export const isRuneBnbAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetRune67C) || eqAsset.equals(asset, AssetRuneB1A)
 
 /**
+ * Check whether an asset is a LTC asset
+ */
+export const isLtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetLTC)
+
+/**
  * Check whether an asset is a BNB asset
  */
 export const isBnbAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBNB)
@@ -86,3 +102,11 @@ export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
   PRICE_ASSETS.includes(asset)
 
 export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, getChainAsset(asset.chain))
+
+/**
+ * Get ethereum token address from a given asset
+ */
+export const getEthTokenAddress = (asset: Asset): string => {
+  const tokenAddress = getTokenAddress(asset)
+  return tokenAddress ? ethers.utils.getAddress(tokenAddress) : ''
+}

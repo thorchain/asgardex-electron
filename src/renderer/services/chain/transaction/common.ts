@@ -14,16 +14,25 @@ import {
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 
+import { DEFAULT_FEE_OPTION_KEY } from '../../../components/wallet/txs/send/Send.const'
 import { liveData } from '../../../helpers/rx/liveData'
 import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as ETH from '../../ethereum'
+import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
 import { ErrorId, TxHashLD, TxLD } from '../../wallet/types'
 import { SendTxParams } from '../types'
 
-export const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }: SendTxParams): TxHashLD => {
+export const sendTx$ = ({
+  asset,
+  recipient,
+  amount,
+  memo,
+  txType,
+  feeOptionKey = DEFAULT_FEE_OPTION_KEY
+}: SendTxParams): TxHashLD => {
   // helper to create `RemoteData<ApiError, never>` observable
   const txFailure$ = (msg: string) =>
     Rx.of(
@@ -68,8 +77,16 @@ export const sendTx$ = ({ asset, recipient, amount, memo, txType, feeOptionKey }
       // not available yet
       return txFailure$(`Tx stuff has not been implemented for Bitcoin Cash yet`)
     case LTCChain:
-      // not available yet
-      return txFailure$(`Tx stuff has not been implemented for Litecoin yet`)
+      return FP.pipe(
+        LTC.feesWithRates$(memo),
+        liveData.mapLeft((error) => ({
+          errorId: ErrorId.GET_FEES,
+          msg: error?.message ?? error.toString()
+        })),
+        liveData.chain(({ rates }) => {
+          return LTC.sendTx({ recipient, amount, asset, memo, feeRate: rates[feeOptionKey] })
+        })
+      )
   }
 }
 
@@ -99,6 +116,6 @@ export const txStatusByChain$ = (txHash: TxHash, chain: Chain): TxLD => {
     case BCHChain:
       return failure$(`txStatus$ has not been implemented for Bitcoin Cash`)
     case LTCChain:
-      return failure$(`txStatus$ has not been implemented for Litecoin`)
+      return LTC.txStatus$(txHash)
   }
 }

@@ -16,9 +16,10 @@ storiesOf('Wallet/AccountSelector', module)
           amount: assetToBase(assetAmount(1)),
           walletAddress: `${assetToString(asset)} wallet`
         }))}
+        network="testnet"
       />
     )
   })
   .add('w/o dropdown', () => {
-    return <AccountSelector selectedAsset={ASSETS_MAINNET.BOLT} walletBalances={[]} />
+    return <AccountSelector selectedAsset={ASSETS_MAINNET.BOLT} walletBalances={[]} network="testnet" />
   })

@@ -16,6 +16,7 @@ import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import { GetExplorerAddressUrl$, GetExplorerTxUrl$ } from '../clients'
 import * as ETH from '../ethereum'
+import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
 
 const explorerUrlFailure$ = Rx.of(O.none)
@@ -52,8 +53,7 @@ const getExplorerUrlByAsset$ = (asset: Asset | null): GetExplorerTxUrl$ => {
       // not available yet
       return explorerUrlFailure$
     case LTCChain:
-      // not available yet
-      return explorerUrlFailure$
+      return LTC.getExplorerTxUrl$
   }
 }
 
@@ -87,8 +87,7 @@ const getExplorerAddressByChain$ = (chain: string): GetExplorerAddressUrl$ => {
       // not available yet
       return explorerUrlFailure$
     case LTCChain:
-      // not available yet
-      return explorerUrlFailure$
+      return LTC.getExplorerAddressUrl$
   }
 
   return explorerUrlFailure$

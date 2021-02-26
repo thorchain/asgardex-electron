@@ -3,10 +3,12 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Asset } from '@xchainjs/xchain-util'
 import Draggable, { ControlPosition, DraggableBounds, DraggableEvent, DraggableEventHandler } from 'react-draggable'
 
+import { Network } from '../../../../shared/api/types'
 import { AssetIcon } from '../assets/assetIcon'
 import * as Styled from './Drag.style'
 
 type Props = {
+  network: Network
   className?: string
   reset?: boolean
   source?: Asset
@@ -26,6 +28,7 @@ export const Drag: React.FC<Props> = ({
   onConfirm = () => {},
   onDrag = () => {},
   disabled: disabledProp = false,
+  network,
   ...rest
 }: Props): JSX.Element => {
   const [overlap, setOverlap] = useState<boolean>(false)
@@ -116,14 +119,19 @@ export const Drag: React.FC<Props> = ({
   }
 
   const sourceIcon = useMemo(
-    () => (source ? <Styled.AssetIcon asset={source} size="small" /> : <Styled.BlueIconPlaceholder />),
-    [source]
+    () =>
+      source ? <Styled.AssetIcon asset={source} size="small" network={network} /> : <Styled.BlueIconPlaceholder />,
+    [source, network]
   )
 
   const targetIcon = useMemo(
     () =>
-      target ? <AssetIcon className="target-asset" asset={target} size="small" /> : <Styled.ConfirmIconPlaceholder />,
-    [target]
+      target ? (
+        <AssetIcon className="target-asset" asset={target} size="small" network={network} />
+      ) : (
+        <Styled.ConfirmIconPlaceholder />
+      ),
+    [target, network]
   )
 
   return (

@@ -30,7 +30,7 @@ const defaultProps: WitdrawProps = {
   // mock successfull result of withdraw$
   withdraw$: (params) =>
     Rx.of(params).pipe(
-      RxOp.tap((params) => console.log('deposit$ ', params)),
+      RxOp.tap((params) => console.log('withdraw$ ', params)),
       RxOp.switchMap(
         (_): WithdrawState$ =>
           Rx.of({
