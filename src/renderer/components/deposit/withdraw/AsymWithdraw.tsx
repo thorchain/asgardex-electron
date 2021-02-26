@@ -2,21 +2,15 @@ import React, { useState, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getWithdrawMemo } from '@thorchain/asgardex-util'
-import {
-  Asset,
-  AssetRuneNative,
-  baseAmount,
-  BaseAmount,
-  baseToAsset,
-  Chain,
-  formatAssetAmountCurrency
-} from '@xchainjs/xchain-util'
+import { Asset, baseAmount, BaseAmount, baseToAsset, Chain, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
@@ -32,7 +26,7 @@ import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import { Label } from '../../uielements/label'
-import { getWithdrawAmounts } from './Withdraw.helper'
+import { getAsymWithdrawAmount } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
 export type Props = {
@@ -42,14 +36,14 @@ export type Props = {
   runePrice: BigNumber
   /** Asset price (base amount) */
   assetPrice: BigNumber
-  /** Wallet balance of Rune */
-  runeBalance: O.Option<BaseAmount>
+  /** Wallet balance of chain asset */
+  chainAssetBalance: O.Option<BaseAmount>
   /** Selected price asset */
   selectedPriceAsset: Asset
   /** Callback to reload fees */
   reloadFees: (chain: Chain) => void
-  /** Share of Rune and of selected Asset */
-  shares: { rune: BaseAmount; asset: BaseAmount }
+  /** Share of Asset */
+  share: BaseAmount
   /** Flag whether form has to be disabled or not */
   disabled?: boolean
   poolAddress: O.Option<PoolAddress>
@@ -62,18 +56,16 @@ export type Props = {
 }
 
 /**
- * Withdraw component
+ * AsymWithdraw component
  *
- * Note: It currently supports sym. withdraw only
- *
- * */
-export const Withdraw: React.FC<Props> = ({
+ * Note: It currently supports asym deposits for paired asset only (but not for RUNE)
+ */
+export const AsymWithdraw: React.FC<Props> = ({
   asset,
-  runePrice,
   assetPrice,
-  runeBalance: oRuneBalance,
+  chainAssetBalance: oChainAssetBalance,
   selectedPriceAsset,
-  shares: { rune: runeShare, asset: assetShare },
+  share,
   disabled,
   poolAddress: oPoolAddress,
   viewRuneTx = (_) => {},
@@ -86,27 +78,24 @@ export const Withdraw: React.FC<Props> = ({
 }) => {
   const intl = useIntl()
 
-  const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
-
   const {
     state: withdrawState,
     reset: resetWithdrawState,
     subscribe: subscribeWithdrawState
   } = useSubscriptionState<WithdrawState>(INITIAL_WITHDRAW_STATE)
 
+  const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
+
   const memo = useMemo(() => getWithdrawMemo({ asset, percent: withdrawPercent }), [asset, withdrawPercent])
 
-  const { rune: runeAmountToWithdraw, asset: assetAmountToWithdraw } = getWithdrawAmounts(
-    runeShare,
-    assetShare,
-    withdrawPercent
-  )
-
-  const feeLD: FeeLD = useMemo(
-    () => fee$(AssetRuneNative.chain, memo),
-
-    [fee$, memo]
-  )
+  const feeLD: FeeLD = useMemo(() => {
+    return Rx.of(memo).pipe(
+      // Memo depends on changing `withdrawPercent`
+      // that's why we delay it to avoid many requests for fees
+      RxOp.delay(800),
+      RxOp.switchMap((_) => fee$(asset.chain, memo))
+    )
+  }, [asset, fee$, memo])
 
   const feeRD: FeeRD = useObservableState(feeLD, RD.initial)
   const oFee: O.Option<BaseAmount> = useMemo(() => RD.toOption(feeRD), [feeRD])
@@ -115,20 +104,20 @@ export const Withdraw: React.FC<Props> = ({
     if (withdrawPercent <= 0) return false
 
     return FP.pipe(
-      sequenceTOption(oFee, oRuneBalance),
+      sequenceTOption(oFee, oChainAssetBalance),
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oFee),
         ([fee, balance]) => balance.amount().isLessThan(fee.amount())
       )
     )
-  }, [oFee, oRuneBalance, withdrawPercent])
+  }, [oFee, oChainAssetBalance, withdrawPercent])
 
   const renderFeeError = useMemo(() => {
     if (!isFeeError) return <></>
 
-    const runeBalance = FP.pipe(
-      oRuneBalance,
+    const chainAssetBalance = FP.pipe(
+      oChainAssetBalance,
       O.getOrElse(() => ZERO_BASE_AMOUNT)
     )
 
@@ -140,12 +129,12 @@ export const Withdraw: React.FC<Props> = ({
           {
             fee: formatAssetAmountCurrency({
               amount: baseToAsset(fee),
-              asset: AssetRuneNative,
+              asset: asset,
               trimZeros: true
             }),
             balance: formatAssetAmountCurrency({
-              amount: baseToAsset(runeBalance),
-              asset: AssetRuneNative,
+              amount: baseToAsset(chainAssetBalance),
+              asset: asset,
               trimZeros: true
             })
           }
@@ -154,7 +143,9 @@ export const Withdraw: React.FC<Props> = ({
       }),
       O.getOrElse(() => <></>)
     )
-  }, [isFeeError, oRuneBalance, oFee, intl])
+  }, [isFeeError, oChainAssetBalance, oFee, intl, asset])
+
+  const assetAmountToWithdraw = getAsymWithdrawAmount({ share, percent: withdrawPercent, fee: oFee })
 
   // Withdraw start time
   const [withdrawStartTime, setWithdrawStartTime] = useState<number>(0)
@@ -162,7 +153,7 @@ export const Withdraw: React.FC<Props> = ({
   const txModalExtraContent = useMemo(() => {
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
-      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: AssetRuneNative.symbol }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: asset.symbol }),
       intl.formatMessage({ id: 'common.tx.checkResult' })
     ]
     const stepDescription = FP.pipe(
@@ -182,12 +173,20 @@ export const Withdraw: React.FC<Props> = ({
     return (
       <DepositAssets
         target={{ asset, amount: assetAmountToWithdraw }}
-        source={O.some({ asset: AssetRuneNative, amount: runeAmountToWithdraw })}
+        source={O.none}
         stepDescription={stepDescription}
         network={network}
       />
     )
-  }, [intl, asset, withdrawState, assetAmountToWithdraw, runeAmountToWithdraw, network])
+  }, [
+    intl,
+    asset,
+    withdrawState.withdraw,
+    withdrawState.step,
+    withdrawState.stepsTotal,
+    assetAmountToWithdraw,
+    network
+  ])
 
   const onFinishTxModal = useCallback(() => {
     resetWithdrawState()
@@ -232,7 +231,7 @@ export const Withdraw: React.FC<Props> = ({
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
             onClick={viewRuneTx}
-            label={intl.formatMessage({ id: 'common.tx.view' }, { assetSymbol: AssetRuneNative.symbol })}
+            label={intl.formatMessage({ id: 'common.tx.view' }, { assetSymbol: asset.symbol })}
           />
         ))}
       </Styled.ExtraContainer>
@@ -250,7 +249,16 @@ export const Withdraw: React.FC<Props> = ({
         extra={txModalExtraContent}
       />
     )
-  }, [withdrawState, resetWithdrawState, onFinishTxModal, withdrawStartTime, txModalExtraContent, intl, viewRuneTx])
+  }, [
+    withdrawState,
+    resetWithdrawState,
+    onFinishTxModal,
+    withdrawStartTime,
+    txModalExtraContent,
+    intl,
+    viewRuneTx,
+    asset.symbol
+  ])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
@@ -272,31 +280,31 @@ export const Withdraw: React.FC<Props> = ({
 
     subscribeWithdrawState(
       withdraw$({
-        asset: AssetRuneNative,
+        asset,
         poolAddress: oPoolAddress,
         network,
         memo
       })
     )
-  }, [closePasswordModal, subscribeWithdrawState, withdraw$, oPoolAddress, network, memo])
+  }, [closePasswordModal, subscribeWithdrawState, withdraw$, asset, oPoolAddress, network, memo])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
         feeRD,
-        RD.map((fee) => [{ asset: AssetRuneNative, amount: fee }])
+        RD.map((fee) => [{ asset, amount: fee }])
       ),
-    [feeRD]
+    [asset, feeRD]
   )
 
-  const reloadFeesHandler = useCallback(() => reloadFees(AssetRuneNative.chain), [reloadFees])
+  const reloadFeesHandler = useCallback(() => reloadFees(asset.chain), [asset, reloadFees])
 
   const disabledForm = useMemo(() => withdrawPercent <= 0 || disabled, [withdrawPercent, disabled])
 
   return (
     <Styled.Container>
       <Label weight="bold" textTransform="uppercase">
-        {intl.formatMessage({ id: 'deposit.withdraw.sym.title' })}
+        {intl.formatMessage({ id: 'deposit.withdraw.asym.title' })}
       </Label>
       <Label>{intl.formatMessage({ id: 'deposit.withdraw.choseText' })}</Label>
 
@@ -309,24 +317,6 @@ export const Withdraw: React.FC<Props> = ({
       <Label weight={'bold'} textTransform={'uppercase'}>
         {intl.formatMessage({ id: 'deposit.withdraw.receiveText' })}
       </Label>
-
-      <Styled.AssetContainer>
-        <Styled.AssetIcon asset={AssetRuneNative} network={network} />
-        <Styled.OutputLabel weight={'bold'}>
-          {formatAssetAmountCurrency({
-            amount: baseToAsset(runeAmountToWithdraw),
-            asset: AssetRuneNative,
-            trimZeros: true
-          })}
-          {/* show pricing if price asset is different only */}
-          {!eqAsset.equals(AssetRuneNative, selectedPriceAsset) &&
-            ` (${formatAssetAmountCurrency({
-              amount: baseToAsset(baseAmount(runeAmountToWithdraw.amount().times(runePrice))),
-              asset: selectedPriceAsset,
-              trimZeros: true
-            })})`}
-        </Styled.OutputLabel>
-      </Styled.AssetContainer>
 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={asset} network={network} />

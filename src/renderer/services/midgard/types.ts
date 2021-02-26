@@ -132,6 +132,7 @@ export type PoolShare = {
    **/
   units: BaseAmount
   asset: Asset
+  assetAddedAmount: BaseAmount
   type: PoolShareType
 }
 

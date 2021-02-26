@@ -56,6 +56,11 @@ export type Props = {
   network: Network
 }
 
+/**
+ * AsymDeposit component
+ *
+ * Note: It currently supports asym deposits for paired asset only (but not for RUNE)
+ */
 export const AsymDeposit: React.FC<Props> = (props) => {
   const {
     asset,

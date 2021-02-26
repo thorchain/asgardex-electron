@@ -62,7 +62,7 @@
     "@polkadot/util": "^5.6.3",
     "@thorchain/asgardex-midgard": "^1.1.0",
     "@thorchain/asgardex-theme": "^0.1.1",
-    "@thorchain/asgardex-util": "^0.8.1",
+    "@thorchain/asgardex-util": "^0.9.0",
     "@types/electron-devtools-installer": "^2.2.0",
     "@xchainjs/xchain-binance": "^4.6.0",
     "@xchainjs/xchain-bitcoin": "^0.11.0",
