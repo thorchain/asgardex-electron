@@ -1,4 +1,4 @@
-import { Client as BitcoinCashClient, ClientUrl } from '@xchainjs/xchain-bitcoincash'
+import { Client as BitcoinCashClient, ClientUrl, NodeAuth } from '@xchainjs/xchain-bitcoincash'
 import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
@@ -7,7 +7,6 @@ import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
-import { NodeAuth } from '../../../../../xchainjs-lib/packages/xchain-bitcoincash/lib'
 import { envOrDefault } from '../../helpers/envHelper'
 import { network$ } from '../app/service'
 import * as C from '../clients'
