@@ -110,11 +110,17 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     )
   }, [oFeesWithRates])
 
+  const prevSelectedFeeRef = useRef<O.Option<BaseAmount>>(O.none)
+
   const selectedFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
         oFeesWithRates,
-        O.map(({ fees }) => fees[selectedFeeOptionKey])
+        O.map(({ fees }) => {
+          const fee = fees[selectedFeeOptionKey]
+          prevSelectedFeeRef.current = O.some(fee)
+          return fee
+        })
       ),
     [oFeesWithRates, selectedFeeOptionKey]
   )
@@ -220,6 +226,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         selectedFee,
+        O.alt(() => prevSelectedFeeRef.current),
         O.map((fee) => balance.amount.amount().minus(fee.amount())),
         // Set maxAmount to zero as long as we dont have a feeRate
         O.getOrElse(() => ZERO_BN),
@@ -303,6 +310,19 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
 
   const addMaxAmountHandler = useCallback(() => setAmountToSend(maxAmount), [maxAmount])
 
+  const isMaxButtonDisabled = useMemo(
+    () =>
+      isLoading ||
+      FP.pipe(
+        selectedFee,
+        O.fold(
+          () => true,
+          () => false
+        )
+      ),
+    [isLoading, selectedFee]
+  )
+
   return (
     <>
       <Row>
@@ -341,7 +361,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
               <MaxBalanceButton
                 balance={{ amount: maxAmount, asset: AssetBTC }}
                 onClick={addMaxAmountHandler}
-                disabled={isLoading}
+                disabled={isMaxButtonDisabled}
               />
               <Styled.Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={isLoading} />
               {renderFeeError}

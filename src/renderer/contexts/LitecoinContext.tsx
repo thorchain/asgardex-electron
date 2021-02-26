@@ -8,6 +8,7 @@ import {
   txs$,
   reloadFees,
   fees$,
+  feesWithRates$,
   txRD$,
   sendTx,
   resetTx,
@@ -23,6 +24,7 @@ export type LitecoinContextValue = {
   txs$: typeof txs$
   reloadFees: typeof reloadFees
   fees$: typeof fees$
+  feesWithRates$: typeof feesWithRates$
   subscribeTx: typeof subscribeTx
   resetTx: typeof resetTx
   sendTx: typeof sendTx
@@ -42,6 +44,7 @@ const initialContext: LitecoinContextValue = {
   txRD$,
   reloadFees,
   fees$,
+  feesWithRates$,
   explorerUrl$
 }
 

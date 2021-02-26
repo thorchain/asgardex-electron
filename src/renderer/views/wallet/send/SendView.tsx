@@ -1,6 +1,15 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { Asset, assetFromString, assetToString } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  assetFromString,
+  assetToString,
+  BNBChain,
+  BTCChain,
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -17,6 +26,7 @@ import * as walletRoutes from '../../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { SendViewBNB, SendViewBTC, SendViewETH } from './index'
+import { SendViewLTC } from './SendViewLTC'
 import { SendViewTHOR } from './SendViewTHOR'
 
 type Props = {}
@@ -59,7 +69,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
   const renderSendView = useCallback(
     (asset: Asset) => {
       switch (asset.chain) {
-        case 'BNB':
+        case BNBChain:
           return (
             <SendViewBNB
               asset={asset}
@@ -69,7 +79,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
               network={network}
             />
           )
-        case 'BTC':
+        case BTCChain:
           return (
             <SendViewBTC
               asset={asset}
@@ -79,7 +89,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
               network={network}
             />
           )
-        case 'ETH':
+        case ETHChain:
           return (
             <SendViewETH
               asset={asset}
@@ -89,9 +99,19 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
               network={network}
             />
           )
-        case 'THOR':
+        case THORChain:
           return (
             <SendViewTHOR
+              asset={asset}
+              balances={balances}
+              getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
+              network={network}
+            />
+          )
+        case LTCChain:
+          return (
+            <SendViewLTC
               asset={asset}
               balances={balances}
               getExplorerTxUrl={getExplorerTxUrl}
