@@ -39,7 +39,7 @@ export const CoinSubtitle = styled.p`
   margin-bottom: 0px;
   font-size: 24px;
   font-family: 'MainFontRegular';
-  color: ${palette('text', 0)};
+  color: ${palette('text', 2)};
   line-height: 29px;
   text-transform: uppercase;
 `
