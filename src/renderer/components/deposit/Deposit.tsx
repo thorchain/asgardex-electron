@@ -37,10 +37,12 @@ export type Props = {
 export const Deposit: React.FC<Props> = (props) => {
   const {
     ShareContent,
-    AsymDepositContent,
+    // TODO (@Veado) Temporary disabled #827
+    // AsymDepositContent,
     SymDepositContent,
     WidthdrawContent,
-    AsymWidthdrawContent,
+    // TODO (@Veado) Temporary disabled #827
+    // AsymWidthdrawContent,
     asset,
     keystoreState,
     shares: poolSharesRD
@@ -61,7 +63,8 @@ export const Deposit: React.FC<Props> = (props) => {
     [asset, poolSharesRD]
   )
 
-  const asymPoolShareAsset = useMemo(
+  // TODO (@Veado) Temporary disabled #827
+  const _asymPoolShareAsset = useMemo(
     () =>
       FP.pipe(
         poolSharesRD,
@@ -81,16 +84,17 @@ export const Deposit: React.FC<Props> = (props) => {
 
   const hasPoolShare = (poolShare: PoolShareRD): boolean => FP.pipe(poolShare, RD.toOption, O.flatten, O.isSome)
   const hasSymPoolShare: boolean = useMemo(() => hasPoolShare(symPoolShare), [symPoolShare])
-  const hasAsymPoolShareAsset: boolean = useMemo(() => hasPoolShare(asymPoolShareAsset), [asymPoolShareAsset])
+  // TODO (@Veado) Temporary disabled #827
+  // const hasAsymPoolShareAsset: boolean = useMemo(() => hasPoolShare(asymPoolShareAsset), [asymPoolShareAsset])
 
   const tabs = useMemo(
     (): Tab[] => [
-      {
-        key: 'deposit-asym',
-        disabled: false,
-        label: intl.formatMessage({ id: 'deposit.add.asym' }, { asset: asset.ticker }),
-        content: <AsymDepositContent asset={asset} />
-      },
+      // {
+      //   key: 'deposit-asym',
+      //   disabled: false,
+      //   label: intl.formatMessage({ id: 'deposit.add.asym' }, { asset: asset.ticker }),
+      //   content: <AsymDepositContent asset={asset} />
+      // },
       {
         key: 'deposit-sym',
         disabled: false,
@@ -105,26 +109,15 @@ export const Deposit: React.FC<Props> = (props) => {
           { asset1: asset.ticker, asset2: AssetRuneNative.ticker }
         ),
         content: <WidthdrawContent asset={asset} poolShare={combinedPoolShare} />
-      },
-      {
-        key: 'withdraw-asym-asset',
-        disabled: !hasAsymPoolShareAsset,
-        label: intl.formatMessage({ id: 'deposit.withdraw.asym' }, { asset: asset.ticker }),
-        content: <AsymWidthdrawContent asset={asset} poolShare={asymPoolShareAsset} />
       }
+      // {
+      //   key: 'withdraw-asym-asset',
+      //   disabled: !hasAsymPoolShareAsset,
+      //   label: intl.formatMessage({ id: 'deposit.withdraw.asym' }, { asset: asset.ticker }),
+      //   content: <AsymWidthdrawContent asset={asset} poolShare={asymPoolShareAsset} />
+      // }
     ],
-    [
-      intl,
-      asset,
-      AsymDepositContent,
-      SymDepositContent,
-      hasSymPoolShare,
-      WidthdrawContent,
-      combinedPoolShare,
-      hasAsymPoolShareAsset,
-      AsymWidthdrawContent,
-      asymPoolShareAsset
-    ]
+    [intl, asset, SymDepositContent, hasSymPoolShare, WidthdrawContent, combinedPoolShare]
   )
 
   const alignTopShareContent: boolean = useMemo(
