@@ -95,6 +95,7 @@ export const createFeesService = <Client extends XChainClient>({
 
   return {
     fees$,
-    reloadFees
+    reloadFees,
+    reloadFeesTrigger$: reloadFees$
   }
 }
