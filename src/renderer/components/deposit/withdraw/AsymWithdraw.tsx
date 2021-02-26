@@ -32,9 +32,9 @@ import * as Styled from './Withdraw.styles'
 export type Props = {
   /** Asset to withdraw */
   asset: Asset
-  /** Rune price */
+  /** Rune price (base amount) */
   runePrice: BigNumber
-  /** Asset price */
+  /** Asset price (base amount) */
   assetPrice: BigNumber
   /** Wallet balance of chain asset */
   chainAssetBalance: O.Option<BaseAmount>
