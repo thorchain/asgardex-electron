@@ -47,7 +47,7 @@ const createSharesService = (
         liveData.map((poolDetails) =>
           FP.pipe(
             poolDetails,
-            A.filterMap<MemberPool, PoolShare>(({ pool, liquidityUnits, runeAddress, assetAddress }) =>
+            A.filterMap<MemberPool, PoolShare>(({ pool, liquidityUnits, runeAddress, assetAddress, assetAdded }) =>
               // ignore all invalid pool strings
               FP.pipe(
                 pool,
@@ -57,7 +57,9 @@ const createSharesService = (
                   type: !!runeAddress && !!assetAddress ? 'sym' : 'asym',
                   asset,
                   // `liquidityUnits` are RUNE based, provided as `BaseAmount`
-                  units: baseAmount(bnOrZero(liquidityUnits), THORCHAIN_DECIMAL)
+                  units: baseAmount(bnOrZero(liquidityUnits), THORCHAIN_DECIMAL),
+                  // BaseAmount of added asset - Note: Thorchain treats all assets as 1e8 decimal based
+                  assetAddedAmount: baseAmount(bnOrZero(assetAdded), THORCHAIN_DECIMAL)
                 }))
               )
             )

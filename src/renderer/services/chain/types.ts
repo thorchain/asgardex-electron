@@ -145,7 +145,7 @@ export type WithdrawState = {
   readonly step: number
   // Constant total amount of steps
   readonly stepsTotal: 3
-  // withdraw transactions
+  // withdraw transaction
   readonly withdrawTx: TxHashRD
   // RD for all needed steps
   readonly withdraw: RD.RemoteData<ApiError, boolean>

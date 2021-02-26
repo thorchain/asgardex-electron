@@ -60,6 +60,7 @@ export const eqWalletBalances = A.getEq(eqWalletBalance)
 
 export const eqPoolShare = Eq.getStructEq<PoolShare>({
   asset: eqAsset,
+  assetAddedAmount: eqBaseAmount,
   units: eqBaseAmount,
   type: Eq.eqString
 })
