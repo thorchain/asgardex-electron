@@ -11,6 +11,7 @@ import { NodeAuth } from '../../../../../xchainjs-lib/packages/xchain-bitcoincas
 import { envOrDefault } from '../../helpers/envHelper'
 import { network$ } from '../app/service'
 import * as C from '../clients'
+import { GetExplorerAddressUrl$ } from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState } from './types'
@@ -88,4 +89,19 @@ const clientViewState$: Observable<C.ClientStateForViews> = clientState$.pipe(ma
  */
 const address$: C.Address$ = C.address$(client$)
 
-export { address$, client$, clientViewState$ }
+/**
+ * Explorer url
+ */
+const explorerUrl$: C.ExplorerUrl$ = C.explorerUrl$(client$)
+
+/**
+ * Explorer tx url
+ */
+const getExplorerTxUrl$: C.GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
+
+/**
+ * Explorer address url
+ */
+const getExplorerAddressUrl$: GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
+
+export { address$, client$, clientViewState$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ }
