@@ -3,7 +3,16 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOptionKey } from '@xchainjs/xchain-client'
 import { FeesWithRates } from '@xchainjs/xchain-litecoin/lib/types/client-types'
-import { AssetLTC, BaseAmount, baseAmount, baseToAsset, bn, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import {
+  assetAmount,
+  AssetLTC,
+  assetToBase,
+  BaseAmount,
+  baseAmount,
+  baseToAsset,
+  bn,
+  formatAssetAmountCurrency
+} from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import BigNumber from 'bignumber.js'
@@ -266,9 +275,17 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
 
   const addMaxAmountHandler = useCallback(() => setAmountToSend(maxAmount), [maxAmount])
 
-  useEffect(() => {
-    setAmountToSend(maxAmount)
-  }, [maxAmount])
+  const onChangeInput = useCallback(
+    async (value: BigNumber) => {
+      // we have to validate input before storing into the state
+      amountValidator(undefined, value)
+        .then(() => {
+          setAmountToSend(assetToBase(assetAmount(value)))
+        })
+        .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
+    },
+    [amountValidator]
+  )
 
   useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
@@ -304,7 +321,13 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
               </Form.Item>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
               <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-                <InputBigNumber min={0} size="large" disabled={isLoading} decimal={LTC_DECIMAL} />
+                <InputBigNumber
+                  min={0}
+                  size="large"
+                  disabled={isLoading}
+                  decimal={LTC_DECIMAL}
+                  onChange={onChangeInput}
+                />
               </Styled.FormItem>
               <MaxBalanceButton
                 balance={{ amount: maxAmount, asset: AssetLTC }}
