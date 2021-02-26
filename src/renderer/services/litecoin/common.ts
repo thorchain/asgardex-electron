@@ -8,8 +8,6 @@ import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
 import { envOrDefault } from '../../helpers/envHelper'
-import { optionFromNullableString } from '../../helpers/fp/from'
-import { sequenceSOption } from '../../helpers/fpHelpers'
 import { network$ } from '../app/service'
 import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
@@ -28,12 +26,16 @@ const litecoinNetwork$: Observable<ClientNetwork> = network$.pipe(
   })
 )
 
-const LTC_NODE_TESTNET_URL = envOrDefault(process.env.REACT_APP_LTC_NODE_TESTNET_URL, '')
-const LTC_NODE_MAINNET_URL = envOrDefault(process.env.REACT_APP_LTC_NODE_MAINNET_URL, '')
-const oLTCNodePassword = optionFromNullableString(envOrDefault(process.env.REACT_APP_LTC_NODE_PASSWORD, ''))
-const oLTCNodeUsername = optionFromNullableString(envOrDefault(process.env.REACT_APP_LTC_NODE_USERNAME, ''))
-
-const ltcAuth = FP.pipe(sequenceSOption({ username: oLTCNodeUsername, password: oLTCNodePassword }), O.toUndefined)
+const LTC_NODE_TESTNET_URL = envOrDefault(
+  process.env.REACT_APP_LTC_NODE_TESTNET_URL,
+  'https://testnet.ltc.thorchain.info'
+)
+const LTC_NODE_MAINNET_URL = envOrDefault(
+  process.env.REACT_APP_LTC_NODE_MAINNET_URL,
+  'https://mainnet.ltc.thorchain.info'
+)
+const LTCNodePassword = envOrDefault(process.env.REACT_APP_LTC_NODE_PASSWORD, 'password')
+const LTCNodeUsername = envOrDefault(process.env.REACT_APP_LTC_NODE_USERNAME, 'thorchain')
 
 /**
  * Stream to create an observable LitecoinClient depending on existing phrase in keystore
@@ -55,7 +57,10 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, litecoinNetwor
                 network: network,
                 phrase,
                 nodeUrl,
-                nodeAuth: ltcAuth
+                nodeAuth: {
+                  username: LTCNodeUsername,
+                  password: LTCNodePassword
+                }
               })
               return O.some(right(client)) as ClientState
             } catch (error) {
