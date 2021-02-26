@@ -254,21 +254,25 @@ describe('services/midgard/utils/', () => {
   describe('pool share helpers', () => {
     const ethShares: PoolShare = {
       asset: AssetETH,
+      assetAddedAmount: ONE_RUNE_BASE_AMOUNT,
       units: ONE_RUNE_BASE_AMOUNT,
       type: 'sym'
     }
     const bnbShares1: PoolShare = {
       asset: AssetBNB,
+      assetAddedAmount: TWO_RUNE_BASE_AMOUNT,
       units: TWO_RUNE_BASE_AMOUNT,
       type: 'sym'
     }
     const bnbShares2: PoolShare = {
       asset: AssetBNB,
+      assetAddedAmount: THREE_RUNE_BASE_AMOUNT,
       units: THREE_RUNE_BASE_AMOUNT,
       type: 'asym'
     }
     const btcShares: PoolShare = {
       asset: AssetBTC,
+      assetAddedAmount: FOUR_RUNE_BASE_AMOUNT,
       units: FOUR_RUNE_BASE_AMOUNT,
       type: 'asym'
     }
@@ -292,6 +296,7 @@ describe('services/midgard/utils/', () => {
             O.map((share) =>
               eqPoolShare.equals(share, {
                 asset: AssetBNB,
+                assetAddedAmount: assetToBase(assetAmount(5)),
                 units: assetToBase(assetAmount(5)),
                 type: 'all'
               })
@@ -305,6 +310,7 @@ describe('services/midgard/utils/', () => {
         expect(FP.pipe(result, O.toNullable)).toEqual({
           asset: AssetETH,
           units: ONE_RUNE_BASE_AMOUNT,
+          assetAddedAmount: ONE_RUNE_BASE_AMOUNT,
           type: 'all'
         })
       })
@@ -318,22 +324,24 @@ describe('services/midgard/utils/', () => {
         const expected: PoolShares = [
           {
             asset: AssetETH,
+            assetAddedAmount: ONE_RUNE_BASE_AMOUNT,
             units: ONE_RUNE_BASE_AMOUNT,
             type: 'all'
           },
           {
             asset: AssetBNB,
+            assetAddedAmount: assetToBase(assetAmount(5)),
             units: assetToBase(assetAmount(5)),
             type: 'all'
           },
           {
             asset: AssetBTC,
+            assetAddedAmount: FOUR_RUNE_BASE_AMOUNT,
             units: FOUR_RUNE_BASE_AMOUNT,
             type: 'all'
           }
         ]
         const result = combineShares(shares)
-
         expect(eqPoolShares.equals(result, expected)).toBeTruthy()
       })
     })

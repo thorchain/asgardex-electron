@@ -10,16 +10,16 @@ import * as RxOp from 'rxjs/operators'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
 import { Memo, WithdrawState$ } from '../../../services/chain/types'
-import { Withdraw, Props as WitdrawProps } from './Withdraw'
+import { AsymWithdraw, Props as AsymWitdrawProps } from './AsymWithdraw'
 
-const defaultProps: WitdrawProps = {
+const defaultProps: AsymWitdrawProps = {
   asset: AssetBNB,
   runePrice: bn(1),
   assetPrice: bn(60.972),
-  runeBalance: O.some(assetToBase(assetAmount(100))),
+  chainAssetBalance: O.some(assetToBase(assetAmount(100))),
   selectedPriceAsset: AssetRuneNative,
   reloadFees: () => console.log('reload fees'),
-  shares: { rune: baseAmount('193011422'), asset: baseAmount('3202499') },
+  share: baseAmount('193011422'),
   disabled: false,
   poolAddress: O.some('pool-address'),
   viewRuneTx: (txHash: string) => console.log('view tx ', txHash),
@@ -45,21 +45,21 @@ const defaultProps: WitdrawProps = {
   network: 'testnet'
 }
 
-export const Default: Story = () => <Withdraw {...defaultProps} />
+export const Default: Story = () => <AsymWithdraw {...defaultProps} />
 Default.storyName = 'default'
 
 export const ErrorNoFee: Story = () => {
-  const props: WitdrawProps = {
+  const props: AsymWitdrawProps = {
     ...defaultProps,
     fee$: (_chain: Chain, _memo: Memo) => Rx.of(RD.failure(Error('no fees')))
   }
-  return <Withdraw {...props} />
+  return <AsymWithdraw {...props} />
 }
 ErrorNoFee.storyName = 'error - no fee'
 
 const meta: Meta = {
-  component: Withdraw,
-  title: 'Components/Deposit/Withdraw'
+  component: AsymWithdraw,
+  title: 'Components/Deposit/AsymWithdraw'
 }
 
 export default meta

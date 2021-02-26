@@ -166,6 +166,7 @@ export const combineShares = (shares: PoolShares): PoolShares =>
           () => [...acc, { ...cur, type: 'all' }],
           (value) => {
             value.units = baseAmount(cur.units.amount().plus(value.units.amount()))
+            value.assetAddedAmount = baseAmount(cur.assetAddedAmount.amount().plus(value.assetAddedAmount.amount()))
             value.type = 'all'
             return acc
           }
@@ -192,6 +193,7 @@ export const combineSharesByAsset = (shares: PoolShares, asset: Asset): O.Option
           (acc): PoolShare => ({
             ...acc,
             units: baseAmount(cur.units.amount().plus(acc.units.amount())),
+            assetAddedAmount: baseAmount(cur.assetAddedAmount.amount().plus(acc.assetAddedAmount.amount())),
             type: 'all'
           })
         ),

@@ -17,10 +17,11 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { DepositRouteParams } from '../../routes/deposit'
 import { PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
-import { getSharesByAssetAndType } from '../../services/midgard/utils'
+import {} from '../../services/midgard/utils'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
 import { ShareView } from './share/ShareView'
+import { AsymWithdrawView } from './withdraw/AsymWithdrawView'
 import { WithdrawDepositView } from './withdraw/WithdrawDepositView'
 
 type Props = {}
@@ -108,19 +109,13 @@ export const DepositView: React.FC<Props> = (_) => {
           (selectedAsset) => (
             <Deposit
               asset={selectedAsset}
-              symPoolShare={FP.pipe(
-                poolSharesRD,
-                RD.map((shares) => getSharesByAssetAndType({ shares, asset: selectedAsset, type: 'sym' }))
-              )}
-              asymPoolShare={FP.pipe(
-                poolSharesRD,
-                RD.map((shares) => getSharesByAssetAndType({ shares, asset: selectedAsset, type: 'asym' }))
-              )}
+              shares={poolSharesRD}
               keystoreState={keystoreState}
               ShareContent={ShareView}
               SymDepositContent={SymDepositView}
               AsymDepositContent={AsymDepositView}
               WidthdrawContent={WithdrawDepositView}
+              AsymWidthdrawContent={AsymWithdrawView}
             />
           )
         )
