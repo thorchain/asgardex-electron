@@ -20,7 +20,7 @@ type Props = {
 }
 
 export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, walletBalances, onChange = (_) => {}, size = 'normal', network } = props
+  const { selectedAsset, walletBalances, onChange = (_) => {}, size = 'large', network } = props
 
   const intl = useIntl()
 
@@ -59,7 +59,8 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
           <AssetIcon asset={selectedAsset} size={size} network={network} />
         </div>
         <Styled.AssetInfoWrapper>
-          <Styled.AssetTitle>{selectedAsset.symbol}</Styled.AssetTitle>
+          <Styled.AssetTitle>{selectedAsset.ticker}</Styled.AssetTitle>
+          <Styled.AssetSubTitle>{selectedAsset.chain}</Styled.AssetSubTitle>
 
           {enableDropdown && (
             <Dropdown overlay={menu} trigger={['click']}>
