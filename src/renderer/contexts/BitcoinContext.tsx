@@ -8,6 +8,7 @@ import {
   balances$,
   txRD$,
   fees$,
+  feesWithRates$,
   subscribeTx,
   resetTx,
   ledgerAddress$,
@@ -23,6 +24,7 @@ export type BitcoinContextValue = {
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
   fees$: typeof fees$
+  feesWithRates$: typeof feesWithRates$
   txRD$: typeof txRD$
   subscribeTx: typeof subscribeTx
   reloadFees: typeof reloadFees
@@ -40,6 +42,7 @@ const initialContext: BitcoinContextValue = {
   reloadBalances,
   balances$,
   fees$,
+  feesWithRates$,
   txRD$,
   subscribeTx,
   reloadFees,

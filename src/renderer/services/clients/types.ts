@@ -70,7 +70,22 @@ export type TransactionService<T> = {
   txStatus$: (txHash: TxHash) => TxLD
 }
 
+/**
+ *
+ * FeesService<FeeParams>
+ *
+ * According to the XChainClient's interface
+ * `Client.getFees` accept an object of `FeeParams`, which might be overriden by clients.
+ * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-client/src/types.ts
+ *
+ * In common-client case, this parameter might be extended amd we need a generic type
+ * to have an access to params "real" type value for specific chain
+ * @example ETH client has extended `FeesParams` interface
+ * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-ethereum/src/types/client-types.ts
+ */
+
 export type FeesService<T> = {
   reloadFees: (_?: T) => void
   fees$: (_?: T) => FeesLD
+  reloadFees$: Rx.Observable<T | undefined>
 }
