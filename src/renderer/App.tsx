@@ -4,6 +4,7 @@ import { HashRouter as Router } from 'react-router-dom'
 
 import { AppProvider } from './contexts/AppContext'
 import { BinanceProvider } from './contexts/BinanceContext'
+import { BitcoinCashProvider } from './contexts/BitcoinCashContext'
 import { BitcoinProvider } from './contexts/BitcoinContext'
 import { ChainProvider } from './contexts/ChainContext'
 import { EthereumProvider } from './contexts/EthereumContext'
@@ -24,21 +25,23 @@ export const App: React.FC = (): JSX.Element => {
           <ThorchainProvider>
             <BinanceProvider>
               <BitcoinProvider>
-                <EthereumProvider>
-                  <LitecoinProvider>
-                    <MidgardProvider>
-                      <UserNodesProvider>
-                        <I18nProvider>
-                          <Router>
-                            <ThemeProvider>
-                              <AppView />
-                            </ThemeProvider>
-                          </Router>
-                        </I18nProvider>
-                      </UserNodesProvider>
-                    </MidgardProvider>
-                  </LitecoinProvider>
-                </EthereumProvider>
+                <LitecoinProvider>
+                  <BitcoinCashProvider>
+                    <EthereumProvider>
+                      <MidgardProvider>
+                        <UserNodesProvider>
+                          <I18nProvider>
+                            <Router>
+                              <ThemeProvider>
+                                <AppView />
+                              </ThemeProvider>
+                            </Router>
+                          </I18nProvider>
+                        </UserNodesProvider>
+                      </MidgardProvider>
+                    </EthereumProvider>
+                  </BitcoinCashProvider>
+                </LitecoinProvider>
               </BitcoinProvider>
             </BinanceProvider>
           </ThorchainProvider>
