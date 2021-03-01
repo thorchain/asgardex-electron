@@ -20,6 +20,7 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
+import { isThorChain } from '../../helpers/chainHelper'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { DEFAULT_NETWORK, ENABLED_CHAINS } from '../../services/const'
 import { PoolSharesRD } from '../../services/midgard/types'
@@ -46,6 +47,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     () =>
       FP.pipe(
         ENABLED_CHAINS,
+        A.filter(FP.not(isThorChain)),
         A.map(addressByChain$),
         (addresses) => Rx.combineLatest(addresses),
         RxOp.switchMap(
