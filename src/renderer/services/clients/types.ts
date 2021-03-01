@@ -73,4 +73,5 @@ export type TransactionService<T> = {
 export type FeesService<T> = {
   reloadFees: (_?: T) => void
   fees$: (_?: T) => FeesLD
+  reloadFees$: Rx.Observable<T | undefined>
 }

@@ -47,7 +47,7 @@ const feesByChain$ = (chain: Chain, memo?: Memo): FeesLD => {
          * SWAP memo includes only target asset info so
          * there will not be any memo in case BTC is a targetAsset
          */
-        memo ? BTC.memoFees$(memo) : BTC.fees$,
+        BTC.feesWithRates$(memo),
         liveData.map((btcFees) => btcFees.fees)
       )
 

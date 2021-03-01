@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
+import { Client as BitcoinCashClient } from '@xchainjs/xchain-bitcoincash'
 import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -10,9 +10,9 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
-import { Send } from '../../../components/wallet/txs/send/'
-import { SendFormBTC } from '../../../components/wallet/txs/send/'
-import { useBitcoinContext } from '../../../contexts/BitcoinContext'
+import { Send } from '../../../components/wallet/txs/send'
+import { SendFormBCH } from '../../../components/wallet/txs/send'
+import { useBitcoinCashContext } from '../../../contexts/BitcoinCashContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
@@ -56,10 +56,10 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     [subscribeSendTxState, transfer$]
   )
 
-  const { feesWithRates$, client$, reloadFees } = useBitcoinContext()
+  const { feesWithRates$, client$, reloadFees } = useBitcoinCashContext()
 
   const feesWithRates = useObservableState(feesWithRates$(), RD.initial)
-  const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
+  const oClient = useObservableState<O.Option<BitcoinCashClient>>(client$, O.none)
   const addressValidation = useMemo(
     () =>
       FP.pipe(
@@ -82,7 +82,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
    */
   const sendForm = useCallback(
     (walletBalance: WalletBalance) => (
-      <SendFormBTC
+      <SendFormBCH
         balances={FP.pipe(
           oBalances,
           O.getOrElse(() => [] as WalletBalances)

@@ -51,7 +51,7 @@ const withdrawFee$ = (chain: Chain, memo: Memo): FeeLD => {
       return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
     case BTCChain:
       // withdraw fee for BTC txs based on withdraw memo
-      return BTC.memoFees$(memo).pipe(liveData.map(({ fees }) => fees.fast))
+      return BTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
     case THORChain:
       return THOR.fees$().pipe(liveData.map(({ fast }) => fast))
     case ETHChain:
