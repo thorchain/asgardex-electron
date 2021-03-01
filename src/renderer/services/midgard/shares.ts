@@ -8,6 +8,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { eqPoolShare } from '../../helpers/fp/eq'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { MemberPool } from '../../types/generated/midgard'
@@ -121,7 +122,12 @@ const createSharesService = (
 
   // Loads and combines `PoolShare`'s by given addresses
   const loadCombineSharesByAddresses$ = (addresses: Address[]): PoolSharesLD =>
-    FP.pipe(addresses, A.map(combineShares$), liveData.sequenceArray, liveData.map(A.flatten))
+    FP.pipe(
+      addresses,
+      A.map(combineShares$),
+      liveData.sequenceArray,
+      liveData.map(FP.flow(A.flatten, A.uniq(eqPoolShare)))
+    )
 
   /**
    * Loads `PoolShare`'s by given `Address`es
