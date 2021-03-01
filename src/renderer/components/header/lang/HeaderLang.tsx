@@ -3,9 +3,9 @@ import React, { useMemo, useCallback } from 'react'
 import { Row, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 
+import { Locale } from '../../../../shared/i18n/types'
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { LOCALES } from '../../../i18n'
-import { Locale } from '../../../i18n/types'
 import { Menu } from '../../shared/menu/Menu'
 import {
   HeaderDropdownWrapper,

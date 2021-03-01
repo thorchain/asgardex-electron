@@ -1,3 +1,5 @@
+import { Locale } from '../../shared/i18n/types'
+
 type CommonMessageKey =
   | 'common.greeting'
   | 'common.copyright'
@@ -285,12 +287,6 @@ export type Messages = CommonMessages &
   LedgerMessages &
   BondsMessages &
   PoolSharesMessage
-
-export enum Locale {
-  EN = 'en',
-  DE = 'de',
-  RU = 'ru'
-}
 
 export type Translation = {
   locale: Locale
