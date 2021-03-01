@@ -59,6 +59,6 @@ export const TableWrapper = styled(Table)`
   .ant-table-tbody > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td,
   .ant-table-thead > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td,
   .ant-table-tbody > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td {
-    background: ${palette('background', 2)};
+    background: ${palette('background', 5)};
   }
 `

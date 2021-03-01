@@ -1,27 +1,42 @@
 import React, { createContext, useContext } from 'react'
 
-import themes, { ThemeType, Theme } from '@thorchain/asgardex-theme'
+import t, { ThemeType, Theme } from '@thorchain/asgardex-theme'
 import { useObservableState } from 'observable-hooks'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import * as SC from 'styled-components'
 
 import 'antd/dist/antd.dark.css'
 import 'antd/dist/antd.css'
+import { observableState } from '../helpers/stateHelper'
 
 const THEME_TYPE = 'asgdx-theme'
 
-const initialTheme = (): ThemeType => (localStorage.getItem(THEME_TYPE) as ThemeType) || ThemeType.LIGHT
-
-const selectedTheme$$ = new BehaviorSubject(initialTheme())
-const toggleTheme = () => {
-  const currentTheme = selectedTheme$$.getValue()
-  const nextTheme = currentTheme === ThemeType.DARK ? ThemeType.LIGHT : ThemeType.DARK
-  localStorage.setItem(THEME_TYPE, nextTheme)
-  selectedTheme$$.next(nextTheme)
+const themes: typeof t = {
+  ...t,
+  dark: {
+    ...t.dark,
+    // extend background colors - needed for bg of table rows
+    palette: { ...t.dark.palette, background: [...t.dark.palette.background, '#252c33'] }
+  },
+  light: {
+    ...t.light,
+    // extend background colors - needed for bg of table rows
+    palette: { ...t.light.palette, background: [...t.light.palette.background, '#ededed'] }
+  }
 }
 
-const theme$ = selectedTheme$$.pipe(
+const initialTheme = (): ThemeType => (localStorage.getItem(THEME_TYPE) as ThemeType) || ThemeType.LIGHT
+
+const { get: themeType, get$: themeType$, set: setThemeType } = observableState<ThemeType>(initialTheme())
+
+const toggleTheme = () => {
+  const nextTheme = themeType() === ThemeType.DARK ? ThemeType.LIGHT : ThemeType.DARK
+  localStorage.setItem(THEME_TYPE, nextTheme)
+  setThemeType(nextTheme)
+}
+
+const theme$: Observable<Theme> = themeType$.pipe(
   map((type) => {
     if (type === ThemeType.LIGHT) return themes.light
     else return themes.dark
@@ -36,7 +51,7 @@ type ThemeContextValue = {
 
 export const initialContext: ThemeContextValue = {
   theme$,
-  themeType$: selectedTheme$$.asObservable(),
+  themeType$,
   toggleTheme
 }
 
