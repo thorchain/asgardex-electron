@@ -26,9 +26,6 @@ const themes: typeof t = {
   }
 }
 
-console.log('t:', t)
-console.log('themes:', themes)
-
 const initialTheme = (): ThemeType => (localStorage.getItem(THEME_TYPE) as ThemeType) || ThemeType.LIGHT
 
 const { get: themeType, get$: themeType$, set: setThemeType } = observableState<ThemeType>(initialTheme())
