@@ -14,6 +14,7 @@ import * as Rx from 'rxjs'
 
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
+import * as BCH from '../bitcoincash'
 import { GetExplorerAddressUrl$, GetExplorerTxUrl$ } from '../clients'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
@@ -31,24 +32,18 @@ const getExplorerUrlByAsset$ = (asset: Asset | null): GetExplorerTxUrl$ => {
   switch (asset.chain) {
     case BNBChain:
       return BNB.getExplorerTxUrl$
-
     case BTCChain:
       return BTC.getExplorerTxUrl$
-
     case ETHChain:
       return ETH.getExplorerTxUrl$
-
     case THORChain:
       return THOR.getExplorerTxUrl$
-
     case CosmosChain:
       // not available yet
       return explorerUrlFailure$
-
     case PolkadotChain:
       // not available yet
       return explorerUrlFailure$
-
     case BCHChain:
       // not available yet
       return explorerUrlFailure$
@@ -84,8 +79,7 @@ const getExplorerAddressByChain$ = (chain: string): GetExplorerAddressUrl$ => {
       return explorerUrlFailure$
 
     case BCHChain:
-      // not available yet
-      return explorerUrlFailure$
+      return BCH.getExplorerAddressUrl$
     case LTCChain:
       return LTC.getExplorerAddressUrl$
   }
