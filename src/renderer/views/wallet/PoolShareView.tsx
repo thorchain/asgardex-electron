@@ -52,6 +52,14 @@ export const PoolShareView: React.FC = (): JSX.Element => {
         (addresses) => Rx.combineLatest(addresses),
         RxOp.switchMap(
           FP.flow(
+            /**
+             *
+             * At previous step we have Array<O.Option<Address>>.
+             * During the development not every chain address is O.some('stringAddress') but there
+             * might be O.none which so we can not use sequencing here as whole sequence might fail
+             * which is unacceptable. With filterMap(FP.identity) we filter up O.none values and
+             * unwrap values to the plain Array<Address> at a single place
+             */
             A.filterMap(FP.identity),
             /**
              * We have to get a new stake-stream for every new asset
