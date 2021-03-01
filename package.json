@@ -46,7 +46,17 @@
   "bugs": {
     "url": "https://github.com/thorchain/asgardex/issues"
   },
-  "keywords": ["thorchain", "asgardex", "bepswap", "thornode", "bitcoin", "ethereum", "binance chain"],
+  "keywords": [
+    "thorchain",
+    "asgardex",
+    "bepswap",
+    "thornode",
+    "bitcoin",
+    "bitcoin cash",
+    "litecoin",
+    "ethereum",
+    "binance chain"
+  ],
   "homepage": "https://thorchain.org",
   "dependencies": {
     "@ant-design/icons": "^4.3.0",
@@ -75,7 +85,7 @@
     "@xchainjs/xchain-litecoin": "^0.3.0",
     "@xchainjs/xchain-polkadot": "^0.6.0",
     "@xchainjs/xchain-thorchain": "^0.12.0",
-    "@xchainjs/xchain-util": "^0.2.3",
+    "@xchainjs/xchain-util": "^0.2.4",
     "antd": "^4.10.2",
     "axios": "^0.21.0",
     "bchaddrjs": "^0.5.2",
