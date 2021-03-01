@@ -62,18 +62,6 @@ export const createFeesService = <FeesParams>({
   client$: XChainClient$
   chain: Chain
 }): FeesService<FeesParams> => {
-  /**
-   * According to the XChainClient's interface
-   * `Client.getFees` accept an object of `FeeParams`, which might be overriden by clients.
-   * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-client/src/types.ts
-   *
-   * In common-client case, this parameter might be extended amd we need a generic type
-   * to have an access to params "real" type value for specific chain
-   * @example ETH client has extended `FeesParams` interface
-   * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-ethereum/src/types/client-types.ts
-   */
-  // type FeesParams = Parameters<Client['getFees']>[0]
-
   // state for reloading fees
   const { get$: reloadFees$, set: reloadFees } = observableState<FeesParams | undefined>(undefined)
 
