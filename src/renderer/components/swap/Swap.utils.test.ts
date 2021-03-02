@@ -147,8 +147,7 @@ describe('components/swap/utils', () => {
 
   describe('pickAssetWithPrice', () => {
     it('should be none', () => {
-      expect(pickAssetWithPrice([], O.none)).toBeNone()
-      expect(pickAssetWithPrice([], O.some(ASSETS_TESTNET.FTM))).toBeNone()
+      expect(pickAssetWithPrice([], ASSETS_TESTNET.FTM)).toBeNone()
     })
     it('should return first element if nothing found', () => {
       expect(
@@ -157,7 +156,7 @@ describe('components/swap/utils', () => {
             { asset: AssetRuneNative, priceRune: bn(0) },
             { asset: ASSETS_TESTNET.BOLT, priceRune: bn(0) }
           ],
-          O.some(ASSETS_TESTNET.FTM)
+          ASSETS_TESTNET.FTM
         )
       ).toEqual(O.some({ asset: AssetRuneNative, priceRune: bn(0) }))
     })
@@ -170,7 +169,7 @@ describe('components/swap/utils', () => {
             { asset: ASSETS_TESTNET.BOLT, priceRune: bn(0) },
             { asset: ASSETS_TESTNET.FTM, priceRune: bn(0) }
           ],
-          O.some(ASSETS_TESTNET.FTM)
+          ASSETS_TESTNET.FTM
         )
       ).toEqual(O.some({ asset: ASSETS_TESTNET.FTM, priceRune: bn(0) }))
     })
