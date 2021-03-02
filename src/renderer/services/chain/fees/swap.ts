@@ -1,7 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { getSwapMemo } from '@thorchain/asgardex-util'
 import { Address, Fees } from '@xchainjs/xchain-client'
-import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
   Asset,
   BNBChain,
@@ -16,28 +14,33 @@ import {
   LTCChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { getChainAsset } from '../../../helpers/chainHelper'
+import { sequenceSOption } from '../../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../../helpers/rx/liveData'
+import { observableState } from '../../../helpers/stateHelper'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
+import { FeesRD } from '../../clients'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
-import { FeeLD, FeesLD, Memo } from '../types'
+import { FeesLD, Memo, SwapFeeHandler, SwapFeeParams } from '../types'
 
-const reloadSwapFees = ({ asset, amount, recipient }: { asset?: Asset; amount?: BaseAmount; recipient?: Address }) => {
-  const memo = asset ? getSwapMemo({ asset }) : ''
-  // TODO: Don't call all handlers, just for source + target asset
-  BNB.reloadFees()
-  BTC.reloadFeesWithRates(memo)
-  ETH.reloadFees({ asset, memo, amount: amount || baseAmount(1), recipient: recipient || ETHAddress })
-  THOR.reloadFees()
-  LTC.reloadFeesWithRates(memo)
-}
-
-const feesByChain$ = (asset: Asset, memo?: Memo, amount?: BaseAmount, recipient?: string): FeesLD => {
+const feesByChain$ = ({
+  asset,
+  memo,
+  amount,
+  recipient
+}: {
+  asset: Asset
+  memo?: Memo
+  amount?: BaseAmount
+  recipient?: Address
+}): FeesLD => {
   const chain = getChainAsset(asset.chain).chain
   switch (chain) {
     case BNBChain:
@@ -54,14 +57,19 @@ const feesByChain$ = (asset: Asset, memo?: Memo, amount?: BaseAmount, recipient?
 
     case ETHChain:
       return FP.pipe(
-        // TODO Check why we do need default values
-        ETH.fees$({
-          asset,
-          amount: amount || baseAmount(1),
-          recipient: recipient || ETHAddress,
-          memo
-        }),
-        liveData.map((fees) => fees)
+        sequenceSOption({ amount: O.fromNullable(amount), recipient: O.fromNullable(recipient) }),
+        O.map(({ amount, recipient }) =>
+          FP.pipe(
+            ETH.fees$({
+              asset,
+              amount,
+              recipient,
+              memo
+            }),
+            liveData.map((fees) => fees)
+          )
+        ),
+        O.getOrElse(() => Rx.of<FeesRD>(RD.failure(Error('Missing amount or recipient'))))
       )
 
     case CosmosChain:
@@ -81,14 +89,27 @@ const feesByChain$ = (asset: Asset, memo?: Memo, amount?: BaseAmount, recipient?
   }
 }
 
-const swapFee$ = ({ asset, amount, recipient }: { asset: Asset; amount?: BaseAmount; recipient?: Address }): FeeLD => {
-  const memo = getSwapMemo({ asset })
-  const feesLD: LiveData<Error, Fees> = feesByChain$(asset, memo, amount, recipient)
+// state for reloading swap fees
+const { get$: reloadSwapFees$, set: reloadSwapFees } = observableState<SwapFeeParams | undefined>(undefined)
 
-  return FP.pipe(
-    feesLD,
-    liveData.map((fees) => fees.fastest),
-    liveData.map((fee) => baseAmount(fee.amount(), fee.decimal))
+const swapFee$: SwapFeeHandler = (params) => {
+  return reloadSwapFees$.pipe(
+    RxOp.debounceTime(300),
+    RxOp.switchMap((reloadParams) => {
+      const { asset, amount, memo, recipient: oRecipient } = reloadParams || params
+      const feesLD: LiveData<Error, Fees> = feesByChain$({
+        asset,
+        amount,
+        memo,
+        recipient: FP.pipe(oRecipient, O.toUndefined)
+      })
+
+      return FP.pipe(
+        feesLD,
+        liveData.map((fees) => fees.fastest),
+        liveData.map((fee) => baseAmount(fee.amount(), fee.decimal))
+      )
+    })
   )
 }
 

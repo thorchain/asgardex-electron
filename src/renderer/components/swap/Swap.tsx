@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData, getSwapMemo } from '@thorchain/asgardex-util'
@@ -20,6 +20,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { ZERO_BN } from '../../const'
@@ -31,7 +32,16 @@ import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice } from '../../services/binance/types'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
-import { FeeLD, FeeRD, SwapState, SwapStateHandler } from '../../services/chain/types'
+import {
+  FeeRD,
+  LoadSwapFeeHandler,
+  SwapState,
+  SwapParams,
+  SwapFeeParams,
+  SwapStateHandler,
+  SwapFeeHandler,
+  FeeLD
+} from '../../services/chain/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { KeystoreState, NonEmptyWalletBalances, ValidatePasswordHandler } from '../../services/wallet/types'
@@ -60,9 +70,9 @@ export type SwapProps = {
   walletBalances: O.Option<NonEmptyWalletBalances>
   goToTransaction: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
-  reloadFees: ({ asset, amount, receipient }: { asset?: Asset; amount?: BaseAmount; receipient?: Address }) => void
+  reloadFees: LoadSwapFeeHandler
   reloadBalances: FP.Lazy<void>
-  fees$: ({ asset, amount, receipient }: { asset: Asset; amount: BaseAmount; receipient: Address }) => FeeLD
+  fees$: SwapFeeHandler
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
   network: Network
@@ -79,7 +89,7 @@ export const Swap = ({
   walletBalances,
   goToTransaction = (_) => {},
   validatePassword$,
-  reloadFees = FP.constVoid,
+  reloadFees,
   reloadBalances = FP.constVoid,
   fees$,
   targetWalletAddress,
@@ -451,54 +461,43 @@ export const Swap = ({
     closePasswordModal()
   }, [closePasswordModal])
 
-  const onSucceedPasswordModal = useCallback(() => {
-    // close private modal
-    closePasswordModal()
-
-    FP.pipe(
-      sequenceTOption(assetsToSwap, targetWalletAddress),
-      O.map(([{ source, target }, address]) => {
-        const memo = getSwapMemo({ asset: target, address })
-        // set start time
-        setSwapStartTime(Date.now())
-        // subscribe to swap$
-        subscribeSwapState(
-          swap$({
-            poolAddress: oSourcePoolAddress,
-            asset: source,
-            amount: amountToSwap,
-            memo
-          })
-        )
-
-        return true
-      })
-    )
-  }, [
-    closePasswordModal,
-    assetsToSwap,
-    targetWalletAddress,
-    subscribeSwapState,
-    swap$,
-    oSourcePoolAddress,
-    amountToSwap
-  ])
-
-  const sourceChainFee$: FeeLD = useMemo(
+  const oSwapParams: O.Option<SwapParams> = useMemo(
     () =>
-      fees$({
-        asset: sourceAssetProp,
-        amount: amountToSwap,
-        receipient: FP.pipe(
-          oSourcePoolAddress,
-          // For RUNE fees we don't need to have a pool address
-          // TODO: Move this logic into `fees$` (similar to `swap$`)
-          O.getOrElse(() => '')
-        )
-      }),
-    [amountToSwap, fees$, oSourcePoolAddress, sourceAssetProp]
+      FP.pipe(
+        sequenceTOption(assetsToSwap, targetWalletAddress),
+        O.map(([{ source, target }, address]) => ({
+          poolAddress: oSourcePoolAddress,
+          asset: source,
+          amount: amountToSwap,
+          memo: getSwapMemo({ asset: target, address })
+        }))
+      ),
+    [amountToSwap, assetsToSwap, oSourcePoolAddress, targetWalletAddress]
   )
-  const sourceChainFee: FeeRD = useObservableState(sourceChainFee$, RD.initial)
+
+  const oSwapFeeParams: O.Option<SwapFeeParams> = useMemo(
+    () =>
+      FP.pipe(
+        oSwapParams,
+        O.map((params) => ({
+          ...params,
+          recipient: params.poolAddress
+        }))
+      ),
+    [oSwapParams]
+  )
+
+  const sourceChainFee$ = useMemo(() => fees$, [fees$])
+
+  const [sourceChainFee] = useObservableState<FeeRD>(
+    () =>
+      FP.pipe(
+        oSwapFeeParams,
+        O.map((p) => sourceChainFee$(p)),
+        O.getOrElse<FeeLD>(() => Rx.of(RD.initial))
+      ),
+    RD.initial
+  )
 
   const sourceChainBalanceError: boolean = useMemo(
     () =>
@@ -555,6 +554,23 @@ export const Swap = ({
     )
   }, [sourceChainBalanceError, intl, oAssetWB, sourceChainFee])
 
+  const onSucceedPasswordModal = useCallback(() => {
+    // close private modal
+    closePasswordModal()
+
+    FP.pipe(
+      oSwapParams,
+      O.map((swapParams) => {
+        // set start time
+        setSwapStartTime(Date.now())
+        // subscribe to swap$
+        subscribeSwapState(swap$(swapParams))
+
+        return true
+      })
+    )
+  }, [closePasswordModal, oSwapParams, subscribeSwapState, swap$])
+
   const swapResultLabel = useMemo(
     () =>
       FP.pipe(
@@ -582,17 +598,13 @@ export const Swap = ({
   ])
 
   const reloadFeesHandler = useCallback(() => {
-    reloadFees({
-      asset: sourceAssetProp,
-      amount: amountToSwap,
-      receipient: FP.pipe(
-        oSourcePoolAddress,
-        // For RUNE fees we don't need to have a pool address
-        // TODO: Move this logic into `fees$` (similar to `swap$`)
-        O.getOrElse(() => '')
-      )
-    })
-  }, [amountToSwap, oSourcePoolAddress, reloadFees, sourceAssetProp])
+    FP.pipe(oSwapFeeParams, O.map(reloadFees))
+  }, [oSwapFeeParams, reloadFees])
+
+  // reload fees whenever params have been changed
+  useEffect(() => {
+    FP.pipe(oSwapFeeParams, O.map(reloadFees))
+  }, [oSwapFeeParams, reloadFees])
 
   return (
     <Styled.Container>
