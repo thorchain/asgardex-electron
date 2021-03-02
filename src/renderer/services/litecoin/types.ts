@@ -4,6 +4,7 @@ import { Client } from '@xchainjs/xchain-litecoin'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 
 import { LiveData } from '../../helpers/rx/liveData'
+import { Memo } from '../chain/types'
 import * as C from '../clients'
 
 export type Client$ = C.Client$<Client>
@@ -16,6 +17,7 @@ export type FeesWithRatesLD = LiveData<Error, FeesWithRates>
 
 export type FeesService = C.FeesService<undefined> & {
   feesWithRates$: (memo?: string) => FeesWithRatesLD
+  reloadFeesWithRates: (memo?: Memo) => void
 }
 
 export type SendTxParams = {

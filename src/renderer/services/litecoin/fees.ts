@@ -6,6 +6,7 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { observableState } from '../../helpers/stateHelper'
 import { FeesWithRatesRD } from '../bitcoin/types'
 import { Memo } from '../chain/types'
 import * as C from '../clients'
@@ -13,6 +14,9 @@ import { Client$, FeesService, FeesWithRatesLD } from './types'
 
 export const createFeesService: (client$: Client$) => FeesService = (client$) => {
   const baseFeesService = C.createFeesService<undefined>({ client$, chain: LTCChain })
+
+  // state for reloading fees+rates
+  const { get$: reloadFeesWithRates$, set: reloadFeesWithRates } = observableState<Memo | undefined>(undefined)
 
   const loadFees$ = (client: LTCClient, memo?: string): FeesWithRatesLD =>
     Rx.from(client.getFeesWithRates(memo)).pipe(
@@ -25,13 +29,13 @@ export const createFeesService: (client$: Client$) => FeesService = (client$) =>
    * Transaction fees
    */
   const feesWithRates$ = (memo?: Memo): FeesWithRatesLD =>
-    Rx.combineLatest([client$, baseFeesService.reloadFees$]).pipe(
-      RxOp.switchMap(([oClient]) =>
+    Rx.combineLatest([client$, reloadFeesWithRates$]).pipe(
+      RxOp.switchMap(([oClient, reloadMemo]) =>
         FP.pipe(
           oClient,
           O.fold(
             () => Rx.of<FeesWithRatesRD>(RD.initial),
-            (client) => FP.pipe(loadFees$(client, memo), RxOp.shareReplay(1))
+            (client) => FP.pipe(loadFees$(client, reloadMemo || memo), RxOp.shareReplay(1))
           )
         )
       )
@@ -39,6 +43,7 @@ export const createFeesService: (client$: Client$) => FeesService = (client$) =>
 
   return {
     ...baseFeesService,
+    reloadFeesWithRates,
     feesWithRates$
   }
 }
