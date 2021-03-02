@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import * as BNB from '@xchainjs/xchain-binance'
 import * as BTC from '@xchainjs/xchain-bitcoin'
-import { Fees, XChainClient } from '@xchainjs/xchain-client'
+import { Fees } from '@xchainjs/xchain-client'
 import * as Cosmos from '@xchainjs/xchain-cosmos'
 import * as ETH from '@xchainjs/xchain-ethereum'
 import * as Litecoin from '@xchainjs/xchain-litecoin'
@@ -25,7 +25,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { ZERO_BASE_AMOUNT } from '../../const'
 import { observableState } from '../../helpers/stateHelper'
-import { FeesLD, XChainClient$ } from './types'
+import { FeesLD, XChainClient$, FeesService } from './types'
 
 const getDefaultFeesByChain = (chain: Chain): Fees => {
   switch (chain) {
@@ -55,27 +55,15 @@ const getDefaultFeesByChain = (chain: Chain): Fees => {
   }
 }
 
-export const createFeesService = <Client extends XChainClient>({
+export const createFeesService = <FeesParams>({
   client$,
   chain
 }: {
   client$: XChainClient$
   chain: Chain
-}) => {
-  /**
-   * According to the XChainClient's interface
-   * `Client.getFees` accept an object of `FeeParams`, which might be overriden by clients.
-   * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-client/src/types.ts
-   *
-   * In common-client case, this parameter might be extended amd we need a generic type
-   * to have an access to params "real" type value for specific chain
-   * @example ETH client has extended `FeesParams` interface
-   * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-ethereum/src/types/client-types.ts
-   */
-  type FeesParams = Parameters<Client['getFees']>[0]
-
+}): FeesService<FeesParams> => {
   // state for reloading fees
-  const { get$: reloadFees$, set: reloadFees } = observableState<FeesParams>(undefined)
+  const { get$: reloadFees$, set: reloadFees } = observableState<FeesParams | undefined>(undefined)
 
   const fees$ = (params?: FeesParams): FeesLD =>
     Rx.combineLatest([reloadFees$, client$]).pipe(
@@ -96,6 +84,6 @@ export const createFeesService = <Client extends XChainClient>({
   return {
     fees$,
     reloadFees,
-    reloadFeesTrigger$: reloadFees$
+    reloadFees$
   }
 }

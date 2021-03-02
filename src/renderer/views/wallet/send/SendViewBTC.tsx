@@ -56,9 +56,9 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     [subscribeSendTxState, transfer$]
   )
 
-  const { fees$, client$, reloadFees } = useBitcoinContext()
+  const { feesWithRates$, client$, reloadFees } = useBitcoinContext()
 
-  const fees = useObservableState(fees$, RD.initial)
+  const feesWithRates = useObservableState(feesWithRates$(), RD.initial)
   const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
   const addressValidation = useMemo(
     () =>
@@ -91,14 +91,24 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
         isLoading={isLoading}
         onSubmit={onSend}
         addressValidation={addressValidation}
-        feesWithRates={fees}
+        feesWithRates={feesWithRates}
         reloadFeesHandler={reloadFees}
         validatePassword$={validatePassword$}
         sendTxStatusMsg={sendTxStatusMsg}
         network={network}
       />
     ),
-    [oBalances, isLoading, onSend, addressValidation, fees, reloadFees, validatePassword$, sendTxStatusMsg, network]
+    [
+      oBalances,
+      isLoading,
+      onSend,
+      addressValidation,
+      feesWithRates,
+      reloadFees,
+      validatePassword$,
+      sendTxStatusMsg,
+      network
+    ]
   )
 
   const finishActionHandler = useCallback(() => {

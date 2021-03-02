@@ -1,9 +1,11 @@
+import { Locale } from '../../shared/i18n/types'
 import de from './de'
 import en from './en'
+import fr from './fr'
 import ru from './ru'
-import { Locale, Messages } from './types'
+import { Messages } from './types'
 
-export const LOCALES = [Locale.EN, Locale.DE, Locale.RU]
+export const LOCALES = [Locale.EN, Locale.DE, Locale.FR, Locale.RU]
 
 export const getLocaleFromString = (s: string): Locale => {
   switch (s) {
@@ -11,6 +13,8 @@ export const getLocaleFromString = (s: string): Locale => {
       return Locale.EN
     case 'de':
       return Locale.DE
+    case 'fr':
+      return Locale.FR
     case 'ru':
       return Locale.RU
     default:
@@ -24,6 +28,8 @@ export const getMessagesByLocale = (l: Locale): Messages => {
       return en
     case Locale.DE:
       return de
+    case Locale.FR:
+      return fr
     case Locale.RU:
       return ru
     default:

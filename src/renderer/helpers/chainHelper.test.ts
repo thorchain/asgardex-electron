@@ -1,6 +1,6 @@
 import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
 
-import { getChainAsset, isBtcChain } from './chainHelper'
+import { getChainAsset, isBtcChain, isThorChain } from './chainHelper'
 
 describe('helpers/chainHelper', () => {
   describe('getChainAsset', () => {
@@ -24,6 +24,15 @@ describe('helpers/chainHelper', () => {
     })
     it('false for other chains (e.g. ETH)', () => {
       expect(isBtcChain('ETH')).toBeFalsy()
+    })
+  })
+
+  describe('isThorChain', () => {
+    it('true for THOR chain', () => {
+      expect(isThorChain('THOR')).toBeTruthy()
+    })
+    it('false for other chains (e.g. ETH)', () => {
+      expect(isThorChain('ETH')).toBeFalsy()
     })
   })
 })

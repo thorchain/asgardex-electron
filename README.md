@@ -206,7 +206,7 @@ By creating a new wallet or importing an existing one, ASGARDEX is saving wallet
 
 ## Git branching workflow
 
-See [BRANCHING_WORKLFOW.md](./BRANCHING_WORKLFOW.md)
+See [BRANCHING_WORKFLOW.md](./BRANCHING_WORKFLOW.md)
 
 ## Releasing
 

@@ -8,8 +8,8 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { STORE_FILES_DEFAULTS } from '../../shared/const'
+import { Locale } from '../../shared/i18n/types'
 import { getMessagesByLocale } from '../i18n'
-import { Locale } from '../i18n/types'
 import { common } from '../services/storage'
 
 const { getStorageState$, modifyStorage } = common

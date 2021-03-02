@@ -3,6 +3,7 @@ import React, { useEffect, useMemo } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import {
+  BCHChain,
   BNBChain,
   BTCChain,
   Chain,
@@ -26,6 +27,7 @@ import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { Settings } from '../../components/wallet/settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
@@ -46,28 +48,28 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
   const { network$, changeNetwork } = useAppContext()
-  const binanceContext = useBinanceContext()
-  const thorchainContext = useThorchainContext()
+  const bnbContext = useBinanceContext()
+  const thorContext = useThorchainContext()
   const ethContext = useEthereumContext()
-  const bitcoinContext = useBitcoinContext()
-  const thorchaincontext = useThorchainContext()
-  const litecoinContext = useLitecoinContext()
-  const chainContext = useChainContext()
+  const btcContext = useBitcoinContext()
+  const ltcContext = useLitecoinContext()
+  const bchContext = useBitcoinCashContext()
+
   const {
     retrieveLedgerAddress,
     removeLedgerAddress,
     removeAllLedgerAddress,
     getExplorerAddressByChain$
-  } = chainContext
+  } = useChainContext()
 
   const phrase$ = useMemo(() => pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
   const phrase = useObservableState(phrase$, O.none)
 
-  const binanceLedgerAddress = useObservableState(binanceContext.ledgerAddress$, RD.initial)
-  const binanceAddress$ = useMemo(
+  const bnbLedgerAddress = useObservableState(bnbContext.ledgerAddress$, RD.initial)
+  const bnbAccount$ = useMemo(
     () =>
       pipe(
-        binanceContext.address$,
+        bnbContext.address$,
         RxOp.map(
           O.map(
             (address) =>
@@ -81,7 +83,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
                   },
                   {
                     name: 'Ledger',
-                    address: RD.getOrElse(() => '')(binanceLedgerAddress),
+                    address: RD.getOrElse(() => '')(bnbLedgerAddress),
                     type: 'external'
                   }
                 ].filter(({ address }) => !!address)
@@ -89,10 +91,10 @@ export const SettingsView: React.FC = (): JSX.Element => {
           )
         )
       ),
-    [binanceContext.address$, binanceLedgerAddress]
+    [bnbContext.address$, bnbLedgerAddress]
   )
 
-  const ethAddress$ = useMemo(
+  const ethAccount$ = useMemo(
     () =>
       pipe(
         ethContext.address$,
@@ -115,11 +117,11 @@ export const SettingsView: React.FC = (): JSX.Element => {
     [ethContext.address$]
   )
 
-  const bitcoinLedgerAddress = useObservableState(bitcoinContext.ledgerAddress$, RD.initial)
-  const bitcoinAddress$ = useMemo(
+  const btcLedgerAddress = useObservableState(btcContext.ledgerAddress$, RD.initial)
+  const btcAccount$ = useMemo(
     () =>
       pipe(
-        bitcoinContext.address$,
+        btcContext.address$,
         RxOp.map(
           O.map(
             (address) =>
@@ -133,7 +135,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
                   },
                   {
                     name: 'Ledger',
-                    address: RD.getOrElse(() => '')(bitcoinLedgerAddress),
+                    address: RD.getOrElse(() => '')(btcLedgerAddress),
                     type: 'external'
                   }
                 ].filter(({ address }) => !!address)
@@ -141,19 +143,19 @@ export const SettingsView: React.FC = (): JSX.Element => {
           )
         )
       ),
-    [bitcoinContext.address$, bitcoinLedgerAddress]
+    [btcContext.address$, btcLedgerAddress]
   )
 
-  const oRuneNativeAddress = useObservableState(thorchaincontext.address$, O.none)
+  const oRuneNativeAddress = useObservableState(thorContext.address$, O.none)
   const runeNativeAddress = pipe(
     oRuneNativeAddress,
     O.getOrElse(() => '')
   )
 
-  const thorchainAddress$ = useMemo(
+  const thorAccount$ = useMemo(
     () =>
       pipe(
-        thorchainContext.address$,
+        thorContext.address$,
         RxOp.map(
           O.map(
             (address) =>
@@ -170,13 +172,13 @@ export const SettingsView: React.FC = (): JSX.Element => {
           )
         )
       ),
-    [thorchainContext.address$]
+    [thorContext.address$]
   )
 
-  const litecoinAddress$ = useMemo(
+  const ltcAddress$ = useMemo(
     () =>
       pipe(
-        litecoinContext.address$,
+        ltcContext.address$,
         RxOp.map(
           O.map(
             (address) =>
@@ -193,7 +195,30 @@ export const SettingsView: React.FC = (): JSX.Element => {
           )
         )
       ),
-    [litecoinContext.address$]
+    [ltcContext.address$]
+  )
+
+  const bchAccount$ = useMemo(
+    () =>
+      pipe(
+        bchContext.address$,
+        RxOp.map(
+          O.map(
+            (address) =>
+              ({
+                chainName: BCHChain,
+                accounts: [
+                  {
+                    name: 'Main',
+                    address,
+                    type: 'internal'
+                  }
+                ].filter(({ address }) => !!address)
+              } as UserAccountType)
+          )
+        )
+      ),
+    [bchContext.address$]
   )
 
   const { service: midgardService } = useMidgardContext()
@@ -221,17 +246,18 @@ export const SettingsView: React.FC = (): JSX.Element => {
         // combineLatest is for the future additional accounts
         Rx.combineLatest(
           filterEnabledChains({
-            THOR: [thorchainAddress$],
-            BNB: [binanceAddress$],
-            ETH: [ethAddress$],
-            BTC: [bitcoinAddress$],
-            LTC: [litecoinAddress$]
+            THOR: [thorAccount$],
+            BTC: [btcAccount$],
+            ETH: [ethAccount$],
+            BNB: [bnbAccount$],
+            BCH: [bchAccount$],
+            LTC: [ltcAddress$]
           })
         ),
         RxOp.map(A.filter(O.isSome)),
         RxOp.map(sequenceTOptionFromArray)
       ),
-    [thorchainAddress$, binanceAddress$, bitcoinAddress$, ethAddress$, litecoinAddress$]
+    [thorAccount$, bnbAccount$, ethAccount$, btcAccount$, bchAccount$, ltcAddress$]
   )
   const userAccounts = useObservableState(userAccounts$, O.none)
 
@@ -239,6 +265,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
 
   const getBNBExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(BNBChain), O.none)
   const getBTCExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(BTCChain), O.none)
+  const getBCHExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(BCHChain), O.none)
   const getETHExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(ETHChain), O.none)
   const getTHORExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(THORChain), O.none)
   const getLTCExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(LTCChain), O.none)
@@ -252,6 +279,9 @@ export const SettingsView: React.FC = (): JSX.Element => {
         break
       case BTCChain:
         FP.pipe(getBTCExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        break
+      case BCHChain:
+        FP.pipe(getBCHExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
         break
       case ETHChain:
         FP.pipe(getETHExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
@@ -303,9 +333,9 @@ export const SettingsView: React.FC = (): JSX.Element => {
       }
     }
 
-    getLedgerErrorDescription(binanceLedgerAddress, 'BNB')
-    getLedgerErrorDescription(bitcoinLedgerAddress, 'BTC')
-  }, [binanceLedgerAddress, bitcoinLedgerAddress, intl, removeLedgerAddress])
+    getLedgerErrorDescription(bnbLedgerAddress, 'BNB')
+    getLedgerErrorDescription(btcLedgerAddress, 'BTC')
+  }, [bnbLedgerAddress, btcLedgerAddress, intl, removeLedgerAddress])
 
   return (
     <Row>

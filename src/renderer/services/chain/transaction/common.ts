@@ -48,7 +48,7 @@ export const sendTx$ = ({
 
     case BTCChain:
       return FP.pipe(
-        BTC.memoFees$(memo),
+        BTC.feesWithRates$(memo),
         liveData.mapLeft((error) => ({
           errorId: ErrorId.GET_FEES,
           msg: error?.message ?? error.toString()

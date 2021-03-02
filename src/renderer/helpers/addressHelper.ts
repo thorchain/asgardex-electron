@@ -1,5 +1,6 @@
 import { getPrefix as getBinancePrefix } from '@xchainjs/xchain-binance'
 import { getPrefix as getBitcoinPrefix } from '@xchainjs/xchain-bitcoin'
+import { getPrefix as getBCHPrefix } from '@xchainjs/xchain-bitcoincash'
 import * as Client from '@xchainjs/xchain-client'
 import { getPrefix as getCosmosPrefix } from '@xchainjs/xchain-cosmos'
 import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
@@ -45,9 +46,8 @@ export const getAddressPrefixLength = (chain: Chain, network: string): number =>
     case LTCChain: {
       return getLitecoinPrefix(clientNetwork).length
     }
-    // TODO @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
     case BCHChain: {
-      return 0
+      return getBCHPrefix(network).length
     }
   }
 }

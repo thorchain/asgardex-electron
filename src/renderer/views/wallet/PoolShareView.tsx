@@ -3,11 +3,13 @@ import React, { useCallback, useMemo, useRef } from 'react'
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/lib/Option'
-import * as FP from 'fp-ts/pipeable'
+import * as A from 'fp-ts/Array'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { PoolShares as PoolSharesTable } from '../../components/PoolShares'
@@ -15,14 +17,13 @@ import { PoolShareTableRowData } from '../../components/PoolShares/PoolShares.ty
 import { ErrorView } from '../../components/shared/error'
 import { Button } from '../../components/uielements/button'
 import { useAppContext } from '../../contexts/AppContext'
-import { useBinanceContext } from '../../contexts/BinanceContext'
-import { useBitcoinContext } from '../../contexts/BitcoinContext'
+import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
-import { sequenceTOption } from '../../helpers/fpHelpers'
+import { isThorChain } from '../../helpers/chainHelper'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
+import { DEFAULT_NETWORK, ENABLED_CHAINS } from '../../services/const'
+import { PoolSharesRD } from '../../services/midgard/types'
 import { getPoolShareTableData } from './PoolShareView.helper'
 
 export const PoolShareView: React.FC = (): JSX.Element => {
@@ -40,23 +41,36 @@ export const PoolShareView: React.FC = (): JSX.Element => {
 
   const thorchainContext = useThorchainContext()
   const oRuneAddress = useObservableState(thorchainContext.address$, O.none)
-  const bitcoinContext = useBitcoinContext()
-  const oBitcoinAddress = useObservableState(bitcoinContext.address$, O.none)
-  const binanceContext = useBinanceContext()
-  const oBinanceAddress = useObservableState(binanceContext.address$, O.none)
-  /**
-   * We have to get a new stake-stream for every new asset
-   * @description /src/renderer/services/midgard/shares.ts
-   */
-  const poolShares$: PoolSharesLD = useMemo(
+  const { addressByChain$ } = useChainContext()
+
+  const [poolSharesRD]: [PoolSharesRD, unknown] = useObservableState(
     () =>
       FP.pipe(
-        sequenceTOption(oBitcoinAddress, oBinanceAddress),
-        O.fold(() => Rx.EMPTY, combineSharesByAddresses$)
+        ENABLED_CHAINS,
+        A.filter(FP.not(isThorChain)),
+        A.map(addressByChain$),
+        (addresses) => Rx.combineLatest(addresses),
+        RxOp.switchMap(
+          FP.flow(
+            /**
+             *
+             * At previous step we have Array<O.Option<Address>>.
+             * During the development not every chain address is O.some('stringAddress') but there
+             * might be O.none which so we can not use sequencing here as whole sequence might fail
+             * which is unacceptable. With filterMap(FP.identity) we filter up O.none values and
+             * unwrap values to the plain Array<Address> at a single place
+             */
+            A.filterMap(FP.identity),
+            /**
+             * We have to get a new stake-stream for every new asset
+             * @description /src/renderer/services/midgard/shares.ts
+             */
+            combineSharesByAddresses$
+          )
+        )
       ),
-    [combineSharesByAddresses$, oBitcoinAddress, oBinanceAddress]
+    RD.initial
   )
-  const poolSharesRD = useObservableState<PoolSharesRD>(poolShares$, RD.initial)
 
   const poolsRD = useObservableState(poolsState$, RD.pending)
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
@@ -104,7 +118,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     [clickRefreshHandler, intl]
   )
 
-  const renderPoolShares = useMemo(
+  return useMemo(
     () =>
       FP.pipe(
         RD.combine(poolSharesRD, poolsRD),
@@ -131,6 +145,4 @@ export const PoolShareView: React.FC = (): JSX.Element => {
       ),
     [poolSharesRD, poolsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
   )
-
-  return renderPoolShares
 }
