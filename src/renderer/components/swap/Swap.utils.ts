@@ -109,14 +109,11 @@ export const getSwapData = (
     O.getOrElse(() => DEFAULT_SWAP_DATA)
   )
 
-export const pickAssetWithPrice = (availableAssets: AssetWithPrice[], asset: O.Option<Asset>) =>
+export const pickAssetWithPrice = (availableAssets: AssetWithPrice[], asset: Asset) =>
   pipe(
-    asset,
-    O.chain((sourceAsset) =>
-      pipe(
-        availableAssets,
-        A.findFirst((asset) => sourceAsset.symbol === asset.asset.symbol)
-      )
+    pipe(
+      availableAssets,
+      A.findFirst((availableAsset) => asset.symbol === availableAsset.asset.symbol)
     ),
     O.alt(() => pipe(availableAssets, A.head))
   )

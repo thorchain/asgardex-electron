@@ -14,7 +14,7 @@ import {
   removeLedgerAddress,
   removeAllLedgerAddress,
   reloadSwapFees,
-  swapFees$,
+  swapFee$,
   getExplorerUrlByAsset$,
   getExplorerAddressByChain$,
   assetAddress$,
@@ -40,7 +40,7 @@ type ChainContextValue = {
   removeLedgerAddress: typeof removeLedgerAddress
   removeAllLedgerAddress: typeof removeAllLedgerAddress
   reloadSwapFees: typeof reloadSwapFees
-  swapFees$: typeof swapFees$
+  swapFee$: typeof swapFee$
   getExplorerUrlByAsset$: typeof getExplorerUrlByAsset$
   getExplorerAddressByChain$: typeof getExplorerAddressByChain$
   assetAddress$: typeof assetAddress$
@@ -66,7 +66,7 @@ const initialContext: ChainContextValue = {
   removeLedgerAddress,
   removeAllLedgerAddress,
   reloadSwapFees: reloadSwapFees,
-  swapFees$,
+  swapFee$,
   getExplorerUrlByAsset$,
   getExplorerAddressByChain$,
   assetAddress$,

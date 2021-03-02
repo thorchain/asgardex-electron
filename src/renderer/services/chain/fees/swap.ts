@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { getSwapMemo } from '@thorchain/asgardex-util'
-import { Fees } from '@xchainjs/xchain-client'
+import { Address, Fees } from '@xchainjs/xchain-client'
+import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
   Asset,
   BNBChain,
@@ -24,14 +25,16 @@ import * as BTC from '../../bitcoin'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
-import { FeesLD, Memo, SwapFeesLD } from '../types'
+import { FeeLD, FeesLD, Memo } from '../types'
 
-const reloadSwapFees = () => {
+const reloadSwapFees = ({ asset, amount, recipient }: { asset?: Asset; amount?: BaseAmount; recipient?: Address }) => {
+  const memo = asset ? getSwapMemo({ asset }) : ''
+  // TODO: Don't call all handlers, just for source + target asset
   BNB.reloadFees()
-  BTC.reloadFees()
-  ETH.reloadFees()
+  BTC.reloadFeesWithRates(memo)
+  ETH.reloadFees({ asset, memo, amount: amount || baseAmount(1), recipient: recipient || ETHAddress })
   THOR.reloadFees()
-  LTC.reloadFees()
+  LTC.reloadFeesWithRates(memo)
 }
 
 const feesByChain$ = (asset: Asset, memo?: Memo, amount?: BaseAmount, recipient?: string): FeesLD => {
@@ -50,19 +53,16 @@ const feesByChain$ = (asset: Asset, memo?: Memo, amount?: BaseAmount, recipient?
       )
 
     case ETHChain:
-      if (amount && recipient) {
-        return FP.pipe(
-          ETH.fees$({
-            asset,
-            amount,
-            recipient,
-            memo
-          }),
-          liveData.map((fees) => fees)
-        )
-      }
-
-      return Rx.of(RD.failure(Error('Amount and recipient are required fields')))
+      return FP.pipe(
+        // TODO Check why we do need default values
+        ETH.fees$({
+          asset,
+          amount: amount || baseAmount(1),
+          recipient: recipient || ETHAddress,
+          memo
+        }),
+        liveData.map((fees) => fees)
+      )
 
     case CosmosChain:
       return Rx.of(RD.failure(Error('Cosmos fees is not implemented yet')))
@@ -81,31 +81,15 @@ const feesByChain$ = (asset: Asset, memo?: Memo, amount?: BaseAmount, recipient?
   }
 }
 
-type SwapFeeType = 'source' | 'target'
-
-const swapFee$ = (
-  asset: Asset,
-  type: SwapFeeType,
-  memo?: Memo,
-  amount?: BaseAmount,
-  recipient?: string
-): LiveData<Error, BaseAmount> => {
-  const feeByChain$: LiveData<Error, Fees> = feesByChain$(asset, memo, amount, recipient)
-
-  const multiplier = type === 'source' ? 1 : 3
+const swapFee$ = ({ asset, amount, recipient }: { asset: Asset; amount?: BaseAmount; recipient?: Address }): FeeLD => {
+  const memo = getSwapMemo({ asset })
+  const feesLD: LiveData<Error, Fees> = feesByChain$(asset, memo, amount, recipient)
 
   return FP.pipe(
-    feeByChain$,
+    feesLD,
     liveData.map((fees) => fees.fastest),
-    liveData.map((fee) => baseAmount(fee.amount().times(multiplier), fee.decimal))
+    liveData.map((fee) => baseAmount(fee.amount(), fee.decimal))
   )
 }
 
-const swapFees$ = (sourceAsset: Asset, targetAsset: Asset, amount?: BaseAmount, recipient?: string): SwapFeesLD => {
-  return liveData.sequenceS({
-    source: swapFee$(sourceAsset, 'source', getSwapMemo({ asset: sourceAsset }), amount, recipient),
-    target: swapFee$(targetAsset, 'target')
-  })
-}
-
-export { reloadSwapFees, swapFees$ }
+export { reloadSwapFees, swapFee$ }

@@ -21,9 +21,8 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
-import { sequenceTOption } from '../../helpers/fpHelpers'
+import { sequenceTRD } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
-import { SwapFeesLD, SwapFeesRD } from '../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolAddressRx } from '../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
@@ -44,7 +43,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     pools: { poolsState$, reloadPools, poolAddressByAsset$ },
     setSelectedPoolAsset
   } = midgardService
-  const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, assetAddress$, swap$ } = useChainContext()
+  const { reloadSwapFees, swapFee$, getExplorerUrlByAsset$, assetAddress$, swap$ } = useChainContext()
 
   const {
     balancesState$,
@@ -110,18 +109,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     [intl, reloadPools]
   )
 
-  const swapFeesLD: SwapFeesLD = useMemo(
-    () =>
-      FP.pipe(
-        sequenceTOption(oSource, oTarget),
-        O.map(([sourceAsset, targetAsset]) => swapFees$(sourceAsset, targetAsset)),
-        O.getOrElse((): SwapFeesLD => Rx.EMPTY)
-      ),
-    [oSource, oTarget, swapFees$]
-  )
-
-  const swapFeesRD: SwapFeesRD = useObservableState(swapFeesLD, RD.initial)
-
   const onChangePath = useCallback(
     (path) => {
       history.replace(path)
@@ -133,12 +120,18 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       <BackLink />
       <Styled.ContentContainer>
         {FP.pipe(
-          poolsState,
+          sequenceTRD(
+            poolsState,
+            // TODO Add i18n
+            RD.fromOption(oSource, () => Error('no source asset')),
+            // TODO Add i18n
+            RD.fromOption(oTarget, () => Error('no target asset'))
+          ),
           fold(
             () => <></>,
             () => <Spin size="large" />,
             renderError,
-            (state) => {
+            ([state, sourceAsset, targetAsset]) => {
               const availableAssets = state.assetDetails
                 .filter((a) => a.asset !== undefined && !!a.asset)
                 .map((a) => ({ asset: assetFromString(a.asset as string) as Asset, priceRune: bnOrZero(a.priceRune) }))
@@ -154,14 +147,14 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   keystore={keystore}
                   validatePassword$={validatePassword$}
                   goToTransaction={goToTransaction}
-                  sourceAsset={oSource}
-                  targetAsset={oTarget}
+                  sourceAsset={sourceAsset}
+                  targetAsset={targetAsset}
                   sourcePoolAddress={sourcePoolAddress}
                   availableAssets={availableAssets}
                   poolDetails={state.poolDetails}
                   walletBalances={balances}
                   reloadFees={reloadSwapFees}
-                  fees={swapFeesRD}
+                  fees$={swapFee$}
                   targetWalletAddress={targetWalletAddress}
                   swap$={swap$}
                   reloadBalances={reloadBalances}

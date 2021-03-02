@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { getValueOfAsset1InAsset2, PoolData, getSwapMemo } from '@thorchain/asgardex-util'
+import { PoolData, getSwapMemo } from '@thorchain/asgardex-util'
 import { Address, Balance } from '@xchainjs/xchain-client'
 import {
   Asset,
@@ -18,19 +18,20 @@ import { eqString } from 'fp-ts/Eq'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
+import { ZERO_BN } from '../../const'
 import { getChainAsset } from '../../helpers/chainHelper'
 import { eqAsset } from '../../helpers/fp/eq'
-import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/swap'
 import { AssetsWithPrice, AssetWithPrice } from '../../services/binance/types'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
-import { SwapFeesRD, SwapState, SwapStateHandler } from '../../services/chain/types'
+import { FeeLD, FeeRD, SwapState, SwapStateHandler } from '../../services/chain/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import { KeystoreState, NonEmptyWalletBalances, ValidatePasswordHandler } from '../../services/wallet/types'
@@ -51,17 +52,17 @@ export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string
 export type SwapProps = {
   keystore: KeystoreState
   availableAssets: AssetsWithPrice
-  sourceAsset: O.Option<Asset>
-  targetAsset: O.Option<Asset>
+  sourceAsset: Asset
+  targetAsset: Asset
   sourcePoolAddress: O.Option<string>
   swap$: SwapStateHandler
   poolDetails: PoolDetails
   walletBalances: O.Option<NonEmptyWalletBalances>
   goToTransaction: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
-  reloadFees: FP.Lazy<void>
+  reloadFees: ({ asset, amount, receipient }: { asset?: Asset; amount?: BaseAmount; receipient?: Address }) => void
   reloadBalances: FP.Lazy<void>
-  fees: SwapFeesRD
+  fees$: ({ asset, amount, receipient }: { asset: Asset; amount: BaseAmount; receipient: Address }) => FeeLD
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
   network: Network
@@ -80,7 +81,7 @@ export const Swap = ({
   validatePassword$,
   reloadFees = FP.constVoid,
   reloadBalances = FP.constVoid,
-  fees: feesProp = RD.initial,
+  fees$,
   targetWalletAddress,
   onChangePath,
   network
@@ -483,23 +484,21 @@ export const Swap = ({
     amountToSwap
   ])
 
-  const sourceChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
+  const sourceChainFee$: FeeLD = useMemo(
     () =>
-      FP.pipe(
-        feesProp,
-        RD.map(({ source }) => source)
-      ),
-    [feesProp]
+      fees$({
+        asset: sourceAssetProp,
+        amount: amountToSwap,
+        receipient: FP.pipe(
+          oSourcePoolAddress,
+          // For RUNE fees we don't need to have a pool address
+          // TODO: Move this logic into `fees$` (similar to `swap$`)
+          O.getOrElse(() => '')
+        )
+      }),
+    [amountToSwap, fees$, oSourcePoolAddress, sourceAssetProp]
   )
-
-  const targetChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
-    () =>
-      FP.pipe(
-        feesProp,
-        RD.map(({ target }) => target)
-      ),
-    [feesProp]
-  )
+  const sourceChainFee: FeeRD = useObservableState(sourceChainFee$, RD.initial)
 
   const sourceChainBalanceError: boolean = useMemo(
     () =>
@@ -556,38 +555,6 @@ export const Swap = ({
     )
   }, [sourceChainBalanceError, intl, oAssetWB, sourceChainFee])
 
-  const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
-    const chainFee = FP.pipe(
-      targetChainFee,
-      RD.getOrElse(() => ZERO_BASE_AMOUNT)
-    )
-
-    return FP.pipe(
-      targetAsset,
-      O.map((asset) => {
-        const chainAsset = getChainAsset(asset.chain)
-        const chainAssetPoolData: PoolData | undefined = poolData[assetToString(chainAsset)]
-        const assetPoolData: PoolData | undefined = poolData[assetToString(asset)]
-        if (!chainAssetPoolData || !assetPoolData) {
-          return ZERO_BASE_AMOUNT
-        }
-
-        return eqAsset.equals(chainAsset, asset)
-          ? chainFee
-          : getValueOfAsset1InAsset2(chainFee, chainAssetPoolData, assetPoolData)
-      }),
-      O.getOrElse(() => ZERO_BASE_AMOUNT)
-    )
-  }, [targetChainFee, targetAsset, poolData])
-
-  const targetChainFeeError = useMemo((): boolean => {
-    if (amountToSwap.amount().isZero()) {
-      return false
-    }
-    const targetFee = FP.pipe(targetChainFeeAmountInTargetAsset, baseToAsset, (assetAmount) => assetAmount.amount())
-    return swapData.swapResult.amount().minus(targetFee).isNegative()
-  }, [targetChainFeeAmountInTargetAsset, swapData, amountToSwap])
-
   const swapResultLabel = useMemo(
     () =>
       FP.pipe(
@@ -600,51 +567,32 @@ export const Swap = ({
     [targetAsset, swapData]
   )
 
-  const targetChainFeeErrorLabel = useMemo(() => {
-    if (!targetChainFeeError) {
-      return null
-    }
-
-    const feeAssetAmount = baseToAsset(targetChainFeeAmountInTargetAsset)
-
-    return FP.pipe(
-      targetAsset,
-      O.map((asset) => (
-        <Styled.ErrorLabel key="targetChainFeeErrorLabel">
-          {intl.formatMessage(
-            { id: 'swap.errors.amount.outputShouldCoverChainFee' },
-            {
-              fee: formatAssetAmountCurrency({ amount: feeAssetAmount, asset, trimZeros: true }),
-              amount: swapResultLabel
-            }
-          )}
-        </Styled.ErrorLabel>
-      )),
-      O.getOrElse(() => <></>)
-    )
-  }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset, swapResultLabel])
-
   const fees: UIFeesRD = useMemo(
     () =>
       FP.pipe(
-        sequenceTRD(
-          sourceChainFee,
-          RD.success(targetChainFeeAmountInTargetAsset),
-          RD.fromOption(sourceAsset, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingSourceAsset' }))),
-          RD.fromOption(targetAsset, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingTargetAsset' })))
-        ),
-        RD.map(([sourceFee, targetFee, sourceAsset, targetAsset]) => [
-          { asset: getChainAsset(sourceAsset.chain), amount: sourceFee },
-          { asset: targetAsset, amount: targetFee }
-        ])
+        sourceChainFee,
+        RD.map((sourceFee) => [{ asset: getChainAsset(sourceAssetProp.chain), amount: sourceFee }])
       ),
-    [sourceChainFee, targetChainFeeAmountInTargetAsset, sourceAsset, targetAsset, intl]
+    [sourceChainFee, sourceAssetProp]
   )
 
   const isSwapDisabled: boolean = useMemo(() => amountToSwap.amount().isZero() || FP.pipe(walletBalances, O.isNone), [
     walletBalances,
     amountToSwap
   ])
+
+  const reloadFeesHandler = useCallback(() => {
+    reloadFees({
+      asset: sourceAssetProp,
+      amount: amountToSwap,
+      receipient: FP.pipe(
+        oSourcePoolAddress,
+        // For RUNE fees we don't need to have a pool address
+        // TODO: Move this logic into `fees$` (similar to `swap$`)
+        O.getOrElse(() => '')
+      )
+    })
+  }, [amountToSwap, oSourcePoolAddress, reloadFees, sourceAssetProp])
 
   return (
     <Styled.Container>
@@ -671,7 +619,7 @@ export const Swap = ({
               label={balanceLabel}
               onChange={setAmountToSwap}
               amount={amountToSwap}
-              hasError={sourceChainBalanceError || targetChainFeeError}
+              hasError={sourceChainBalanceError}
             />
             {FP.pipe(
               sourceAsset,
@@ -731,8 +679,7 @@ export const Swap = ({
             ? intl.formatMessage({ id: 'swap.note.nowallet' })
             : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
         </Styled.NoteLabel>
-        {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFees} />}
-        {targetChainFeeErrorLabel}
+        {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFeesHandler} />}
       </Styled.SubmitContainer>
       {showPasswordModal && (
         <PasswordModal
