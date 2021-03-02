@@ -21,6 +21,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import { DepositType } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
+import * as BCH from '../../bitcoincash'
 import * as LTC from '../../litecoin'
 import { selectedPoolChain$ } from '../../midgard/common'
 import * as THOR from '../../thorchain'
@@ -31,6 +32,7 @@ export const reloadFees = () => {
   BNB.reloadFees()
   BTC.reloadFees()
   THOR.reloadFees()
+  BCH.reloadFees()
 }
 
 const reloadFeesByChain = (chain: Chain) => {
@@ -39,6 +41,8 @@ const reloadFeesByChain = (chain: Chain) => {
       return BNB.reloadFees
     case BTCChain:
       return BTC.reloadFees
+    case BCHChain:
+      return BCH.reloadFees
     case ETHChain:
       // reload ETH balances - not available yet
       return () => {}
@@ -85,7 +89,7 @@ const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
     case PolkadotChain:
       return Rx.of(RD.failure(Error('Deposit fee for Polkadot has not been implemented')))
     case BCHChain:
-      return Rx.of(RD.failure(Error('Deposit fee for Bitcoin Cash has not been implemented')))
+      return BCH.fees$().pipe(liveData.map(({ fast }) => fast))
     case LTCChain:
       return LTC.fees$().pipe(liveData.map(({ fast }) => fast))
   }
