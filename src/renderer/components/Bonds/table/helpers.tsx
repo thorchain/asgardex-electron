@@ -3,7 +3,7 @@ import React from 'react'
 import { StopOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { AssetRuneNative, baseToAsset, formatAssetAmountCurrency, THORChain, baseAmount } from '@xchainjs/xchain-util'
+import { AssetRuneNative, baseToAsset, formatAssetAmountCurrency, THORChain } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
@@ -22,14 +22,8 @@ export const BondValue: React.FC<{ data: NodeDataRD }> = ({ data }) => (
   <Col>
     {FP.pipe(
       data,
-      RD.map((_) =>
-        // formatAssetAmountCurrency({ asset: AssetRuneNative, amount: baseToAsset(bond), trimZeros: true, decimal: 0 })
-        formatAssetAmountCurrency({
-          asset: AssetRuneNative,
-          amount: baseToAsset(baseAmount('3239515100001')),
-          trimZeros: true,
-          decimal: 0
-        })
+      RD.map(({ bond }) =>
+        formatAssetAmountCurrency({ asset: AssetRuneNative, amount: baseToAsset(bond), trimZeros: true, decimal: 0 })
       ),
       RD.fold(
         () => <Styled.TextLabel align="right">-</Styled.TextLabel>,
