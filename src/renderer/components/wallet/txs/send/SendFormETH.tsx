@@ -22,7 +22,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
-import { ETH_DECIMAL, isEthAsset } from '../../../../helpers/assetHelper'
+import { isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
 import { SendTxParams } from '../../../../services/chain/types'
@@ -207,7 +207,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
         }
       )
     )
-    return isEthAsset(balance.asset) ? baseAmount(maxEthAmount, ETH_DECIMAL) : balance.amount
+    return isEthAsset(balance.asset) ? baseAmount(maxEthAmount, balance.amount.decimal) : balance.amount
   }, [selectedFee, oEthAmount, balance])
 
   useEffect(() => {
@@ -242,11 +242,11 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToSend(O.some(assetToBase(assetAmount(value, ETH_DECIMAL))))
+          setAmountToSend(O.some(assetToBase(assetAmount(value, balance.amount.decimal))))
         })
         .catch(() => setAmountToSend(O.none))
     },
-    [amountValidator, setAmountToSend]
+    [amountValidator, balance.amount.decimal]
   )
 
   const onChangeAddress = useCallback(

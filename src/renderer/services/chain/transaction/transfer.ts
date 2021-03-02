@@ -1,7 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { getTokenAddress } from '@xchainjs/xchain-ethereum'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { isEthAsset } from '../../../helpers/assetHelper'
+import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { INITIAL_SEND_STATE } from '../const'
@@ -29,7 +32,12 @@ export const transfer$: SendTxStateHandler = (params) => {
         steps: { current: 2, total: 2 }
       })
       // 2. check tx finality by polling its tx data
-      return txStatusByChain$(txHash, params.asset.chain)
+      const assetAddress = isEthChain(params.asset.chain)
+        ? isEthAsset(params.asset)
+          ? undefined
+          : getTokenAddress(params.asset) || undefined
+        : undefined
+      return txStatusByChain$(txHash, params.asset.chain, assetAddress)
     }),
     // Update state
     liveData.map(({ hash }) => setState({ ...getState(), status: RD.success(hash) })),

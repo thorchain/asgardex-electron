@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { TxHash, XChainClient } from '@xchainjs/xchain-client'
+import { Address, TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { getTokenAddress } from '@xchainjs/xchain-ethereum'
 import { ETHChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
@@ -51,8 +51,8 @@ export const loadTxs$ = ({
 /**
  * Observable to load data of a `Tx`
  */
-export const loadTx$ = (client: XChainClient, txHash: TxHash): TxLD =>
-  Rx.from(client.getTransactionData(txHash)).pipe(
+export const loadTx$ = (client: XChainClient, txHash: TxHash, assetAddress?: Address): TxLD =>
+  Rx.from(client.getTransactionData(txHash, assetAddress)).pipe(
     RxOp.map(RD.success),
     RxOp.catchError((error) =>
       Rx.of(

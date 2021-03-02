@@ -229,7 +229,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const txStatusMsg = useMemo(() => {
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
-      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: runeAsset.symbol }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetTicker: runeAsset.ticker }),
       intl.formatMessage({ id: 'common.tx.checkResult' })
     ]
     const { steps, status } = upgradeTxState
@@ -247,7 +247,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
         () => emptyString
       )
     )
-  }, [intl, runeAsset.symbol, upgradeTxState])
+  }, [intl, runeAsset.ticker, upgradeTxState])
 
   const renderErrorBtn = useMemo(
     () => <Styled.Button onClick={onErrorHandler}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,

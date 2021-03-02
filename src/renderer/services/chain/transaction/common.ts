@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { TxHash } from '@xchainjs/xchain-client'
+import { Address, TxHash } from '@xchainjs/xchain-client'
 import {
   BCHChain,
   BNBChain,
@@ -90,7 +90,7 @@ export const sendTx$ = ({
   }
 }
 
-export const txStatusByChain$ = (txHash: TxHash, chain: Chain): TxLD => {
+export const txStatusByChain$ = (txHash: TxHash, chain: Chain, assetAddress?: Address): TxLD => {
   // helper to create `RemoteData<ApiError, never>` observable
   const failure$ = (msg: string) =>
     Rx.of(
@@ -106,7 +106,7 @@ export const txStatusByChain$ = (txHash: TxHash, chain: Chain): TxLD => {
     case BTCChain:
       return BTC.txStatus$(txHash)
     case ETHChain:
-      return ETH.txStatus$(txHash)
+      return ETH.txStatus$(txHash, assetAddress)
     case THORChain:
       return THOR.txStatus$(txHash)
     case CosmosChain:
