@@ -4,7 +4,7 @@ import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
 const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
-const { reloadFees, fees$, feesWithRates$ } = createFeesService(client$)
+const { reloadFees, fees$, feesWithRates$, reloadFeesWithRates } = createFeesService(client$)
 
 export {
   address$,
@@ -17,6 +17,7 @@ export {
   txStatus$,
   reloadFees,
   fees$,
+  reloadFeesWithRates,
   feesWithRates$,
   subscribeTx,
   resetTx,

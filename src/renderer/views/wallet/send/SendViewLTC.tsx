@@ -20,7 +20,7 @@ import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { AddressValidation } from '../../../services/litecoin/types'
+import { AddressValidation, FeesWithRatesLD } from '../../../services/litecoin/types'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 import * as Helper from './SendView.helper'
@@ -56,11 +56,10 @@ export const SendViewLTC: React.FC<Props> = (props): JSX.Element => {
     [subscribeSendTxState, transfer$]
   )
 
-  const { feesWithRates$, client$, reloadFees } = useLitecoinContext()
+  const { feesWithRates$, client$, reloadFeesWithRates } = useLitecoinContext()
 
-  const fees$ = useMemo(() => feesWithRates$(), [feesWithRates$])
-
-  const fees = useObservableState(fees$, RD.initial)
+  const feesWithRatesLD: FeesWithRatesLD = useMemo(() => feesWithRates$(), [feesWithRates$])
+  const feesWithRatesRD = useObservableState(feesWithRatesLD, RD.initial)
 
   const oClient = useObservableState<O.Option<LitecoinClient>>(client$, O.none)
   const addressValidation = useMemo(
@@ -94,14 +93,24 @@ export const SendViewLTC: React.FC<Props> = (props): JSX.Element => {
         isLoading={isLoading}
         onSubmit={onSend}
         addressValidation={addressValidation}
-        feesWithRates={fees}
-        reloadFeesHandler={reloadFees}
+        feesWithRates={feesWithRatesRD}
+        reloadFeesHandler={reloadFeesWithRates}
         validatePassword$={validatePassword$}
         sendTxStatusMsg={sendTxStatusMsg}
         network={network}
       />
     ),
-    [oBalances, isLoading, onSend, addressValidation, fees, reloadFees, validatePassword$, sendTxStatusMsg, network]
+    [
+      oBalances,
+      isLoading,
+      onSend,
+      addressValidation,
+      feesWithRatesRD,
+      reloadFeesWithRates,
+      validatePassword$,
+      sendTxStatusMsg,
+      network
+    ]
   )
 
   const finishActionHandler = useCallback(() => {
