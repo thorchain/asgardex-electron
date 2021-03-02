@@ -708,7 +708,7 @@ export const Swap = ({
           </Styled.ValueItemContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
-
+      {targetChainFeeErrorLabel}
       <Styled.SubmitContainer>
         {FP.pipe(
           sequenceTOption(sourceAsset, targetAsset),
@@ -732,7 +732,7 @@ export const Swap = ({
             : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
         </Styled.NoteLabel>
         {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFees} />}
-        {targetChainFeeErrorLabel}
+        {/* {targetChainFeeErrorLabel} */}
       </Styled.SubmitContainer>
       {showPasswordModal && (
         <PasswordModal

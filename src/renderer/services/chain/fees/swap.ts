@@ -2,7 +2,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import { getSwapMemo } from '@thorchain/asgardex-util'
 import { Fees } from '@xchainjs/xchain-client'
 import {
-  Chain,
   Asset,
   BNBChain,
   THORChain,
@@ -22,6 +21,7 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { LiveData, liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
+import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
 import { FeesLD, Memo, SwapFeesLD } from '../types'
@@ -29,11 +29,13 @@ import { FeesLD, Memo, SwapFeesLD } from '../types'
 const reloadSwapFees = () => {
   BNB.reloadFees()
   BTC.reloadFees()
+  ETH.reloadFees()
   THOR.reloadFees()
   LTC.reloadFees()
 }
 
-const feesByChain$ = (chain: Chain, memo?: Memo): FeesLD => {
+const feesByChain$ = (asset: Asset, memo?: Memo, amount?: BaseAmount, recipient?: string): FeesLD => {
+  const chain = getChainAsset(asset.chain).chain
   switch (chain) {
     case BNBChain:
       return BNB.fees$()
@@ -48,7 +50,19 @@ const feesByChain$ = (chain: Chain, memo?: Memo): FeesLD => {
       )
 
     case ETHChain:
-      return Rx.of(RD.failure(Error('ETH fees is not implemented yet')))
+      if (amount && recipient) {
+        return FP.pipe(
+          ETH.fees$({
+            asset,
+            amount,
+            recipient,
+            memo
+          }),
+          liveData.map((fees) => fees)
+        )
+      }
+
+      return Rx.of(RD.failure(Error('Amount and recipient are required fields')))
 
     case CosmosChain:
       return Rx.of(RD.failure(Error('Cosmos fees is not implemented yet')))
@@ -69,8 +83,14 @@ const feesByChain$ = (chain: Chain, memo?: Memo): FeesLD => {
 
 type SwapFeeType = 'source' | 'target'
 
-const swapFee$ = (asset: Asset, type: SwapFeeType, memo?: Memo): LiveData<Error, BaseAmount> => {
-  const feeByChain$: LiveData<Error, Fees> = feesByChain$(getChainAsset(asset.chain).chain, memo)
+const swapFee$ = (
+  asset: Asset,
+  type: SwapFeeType,
+  memo?: Memo,
+  amount?: BaseAmount,
+  recipient?: string
+): LiveData<Error, BaseAmount> => {
+  const feeByChain$: LiveData<Error, Fees> = feesByChain$(asset, memo, amount, recipient)
 
   const multiplier = type === 'source' ? 1 : 3
 
@@ -81,9 +101,9 @@ const swapFee$ = (asset: Asset, type: SwapFeeType, memo?: Memo): LiveData<Error,
   )
 }
 
-const swapFees$ = (sourceAsset: Asset, targetAsset: Asset): SwapFeesLD => {
+const swapFees$ = (sourceAsset: Asset, targetAsset: Asset, amount?: BaseAmount, recipient?: string): SwapFeesLD => {
   return liveData.sequenceS({
-    source: swapFee$(sourceAsset, 'source', getSwapMemo({ asset: sourceAsset })),
+    source: swapFee$(sourceAsset, 'source', getSwapMemo({ asset: sourceAsset }), amount, recipient),
     target: swapFee$(targetAsset, 'target')
   })
 }
