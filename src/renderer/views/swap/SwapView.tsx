@@ -122,10 +122,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
         {FP.pipe(
           sequenceTRD(
             poolsState,
-            // TODO Add i18n
-            RD.fromOption(oSource, () => Error('no source asset')),
-            // TODO Add i18n
-            RD.fromOption(oTarget, () => Error('no target asset'))
+            RD.fromOption(oSource, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingSourceAsset' }))),
+            RD.fromOption(oTarget, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingTargetAsset' })))
           ),
           fold(
             () => <></>,
