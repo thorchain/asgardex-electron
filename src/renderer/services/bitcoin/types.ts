@@ -31,8 +31,10 @@ export type SendTxParams = {
 }
 
 export type TransactionService = C.TransactionService<SendTxParams>
-export type FeesService<T> = C.FeesService<T> & {
+
+export type FeesService = C.FeesService<undefined> & {
   feesWithRates$: (memo?: Memo) => FeesWithRatesLD
+  reloadFeesWithRates: (memo?: Memo) => void
 }
 
 export type LedgerService = {

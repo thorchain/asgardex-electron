@@ -6,18 +6,17 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { observableState } from '../../helpers/stateHelper'
 import { Memo } from '../chain/types'
 import * as C from '../clients'
 import { Client$, FeesWithRatesRD } from './types'
 import { FeesService, FeesWithRatesLD } from './types'
 
-/**
- * The only thing we export from this module is this factory
- * and it's called by `./context.ts` only once
- * ^ That's needed to "inject" same reference of `client$` used by other modules into this module
- */
-export const createFeesService = (client$: Client$): FeesService<undefined> => {
+export const createFeesService = (client$: Client$): FeesService => {
   const baseFeesService = C.createFeesService<undefined>({ client$, chain: BTCChain })
+
+  // state for reloading fees+rates
+  const { get$: reloadFeesWithRates$, set: reloadFeesWithRates } = observableState<Memo | undefined>(undefined)
 
   /**
    * Observable to load transaction fees
@@ -33,13 +32,13 @@ export const createFeesService = (client$: Client$): FeesService<undefined> => {
    * Transaction fees (memo optional)
    */
   const feesWithRates$ = (memo?: Memo): FeesWithRatesLD =>
-    Rx.combineLatest([client$, baseFeesService.reloadFees$]).pipe(
-      RxOp.switchMap(([oClient]) =>
+    Rx.combineLatest([client$, reloadFeesWithRates$]).pipe(
+      RxOp.switchMap(([oClient, reloadMemo]) =>
         FP.pipe(
           oClient,
           O.fold(
             () => Rx.of<FeesWithRatesRD>(RD.initial),
-            (client) => FP.pipe(loadFees$(client, memo), RxOp.shareReplay(1))
+            (client) => FP.pipe(loadFees$(client, reloadMemo || memo), RxOp.shareReplay(1))
           )
         )
       )
@@ -47,6 +46,7 @@ export const createFeesService = (client$: Client$): FeesService<undefined> => {
 
   return {
     ...baseFeesService,
+    reloadFeesWithRates,
     feesWithRates$
   }
 }

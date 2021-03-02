@@ -24,7 +24,7 @@ import { Network } from '../../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { AddressValidation, FeesWithRatesRD } from '../../../../services/bitcoin/types'
-import { FeeRD, SendTxParams } from '../../../../services/chain/types'
+import { FeeRD, Memo, SendTxParams } from '../../../../services/chain/types'
 import { WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { TxTypes } from '../../../../types/asgardex'
@@ -55,7 +55,7 @@ export type Props = {
   sendTxStatusMsg: string
   addressValidation: AddressValidation
   feesWithRates: FeesWithRatesRD
-  reloadFeesHandler: FP.Lazy<void>
+  reloadFeesHandler: (memo?: Memo) => void
   validatePassword$: ValidatePasswordHandler
   network: Network
 }
@@ -296,6 +296,10 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     [feeRD]
   )
 
+  const reloadFees = useCallback(() => {
+    reloadFeesHandler(form.getFieldValue('memo'))
+  }, [form, reloadFeesHandler])
+
   const onChangeInput = useCallback(
     async (value: BigNumber) => {
       // we have to validate input before storing into the state
@@ -363,7 +367,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
                 onClick={addMaxAmountHandler}
                 disabled={isMaxButtonDisabled}
               />
-              <Styled.Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={isLoading} />
+              <Styled.Fees fees={uiFeesRD} reloadFees={reloadFees} disabled={isLoading} />
               {renderFeeError}
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
               <Form.Item name="memo">
