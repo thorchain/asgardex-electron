@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { getValueOfAsset1InAsset2, PoolData, getSwapMemo } from '@thorchain/asgardex-util'
+import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import { Address, Balance } from '@xchainjs/xchain-client'
 import {
   Asset,
@@ -25,6 +25,7 @@ import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import { getChainAsset } from '../../helpers/chainHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { getSwapMemo } from '../../helpers/memoHelper'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/swap'
@@ -457,7 +458,8 @@ export const Swap = ({
     FP.pipe(
       sequenceTOption(assetsToSwap, targetWalletAddress),
       O.map(([{ source, target }, address]) => {
-        const memo = getSwapMemo({ asset: target, address })
+        const memo = getSwapMemo(target, network, address)
+
         // set start time
         setSwapStartTime(Date.now())
         // subscribe to swap$
@@ -480,7 +482,8 @@ export const Swap = ({
     subscribeSwapState,
     swap$,
     oSourcePoolAddress,
-    amountToSwap
+    amountToSwap,
+    network
   ])
 
   const sourceChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(
