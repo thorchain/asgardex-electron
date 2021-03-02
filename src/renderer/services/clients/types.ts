@@ -67,7 +67,7 @@ export type TransactionService<T> = {
   resetTx: () => void
   txs$: (_: TxsParams) => TxsPageLD
   tx$: (txHash: TxHash) => TxLD
-  txStatus$: (txHash: TxHash) => TxLD
+  txStatus$: (txHash: TxHash, assetAddress?: Address) => TxLD
 }
 
 /**

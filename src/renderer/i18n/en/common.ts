@@ -52,7 +52,7 @@ const common: CommonMessages = {
   'common.thorAddress': 'THORAddress',
   'common.tx.healthCheck': 'Health check',
   'common.tx.sending': 'Send transaction',
-  'common.tx.sendingAsset': 'Send {assetSymbol} transaction',
+  'common.tx.sendingAsset': 'Send {assetTicker} transaction',
   'common.tx.checkResult': 'Check result',
   'common.tx.view': 'View {assetSymbol} transaction',
   'common.modal.confirmTitle': 'Confirm action',
