@@ -33,8 +33,8 @@ const HASKOIN_API_URL: ClientUrl = {
 }
 
 const NODE_URL: ClientUrl = {
-  testnet: envOrDefault(process.env.REACT_APP_BCH_NODE_TESTNET_URL, 'https://testnet.ltc.thorchain.info'),
-  mainnet: envOrDefault(process.env.REACT_APP_BCH_NODE_MAINNET_URL, 'https://mainnet.ltc.thorchain.info')
+  testnet: envOrDefault(process.env.REACT_APP_BCH_NODE_TESTNET_URL, 'https://testnet.bch.thorchain.info'),
+  mainnet: envOrDefault(process.env.REACT_APP_BCH_NODE_MAINNET_URL, 'https://mainnet.bch.thorchain.info')
 }
 
 const NODE_AUTH: NodeAuth = {

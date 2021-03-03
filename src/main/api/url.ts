@@ -1,5 +1,3 @@
-import url from 'url'
-
 import { shell } from 'electron'
 
 import { ApiUrl } from '../../shared/api/types'
@@ -20,12 +18,14 @@ const EXTERNALS_WHITELIST = [
   'runestake.info',
   'etherscan.io',
   'ropsten.etherscan.io',
-  'tltc.bitaps.com'
+  'tltc.bitaps.com',
+  'ltc.bitaps.com',
+  'www.blockchain.com'
 ]
 
 const openExternal = (target: string) => {
   try {
-    const hostname = url.parse(target)?.hostname ?? ''
+    const hostname = new URL(target)?.hostname ?? ''
     if (EXTERNALS_WHITELIST.includes(hostname)) {
       return shell.openExternal(target)
     }
