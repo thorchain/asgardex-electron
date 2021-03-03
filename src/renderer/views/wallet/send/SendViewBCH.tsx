@@ -18,6 +18,7 @@ import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { AddressValidation } from '../../../services/bitcoin/types'
+import { FeesWithRatesLD } from '../../../services/bitcoincash/types'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
@@ -56,9 +57,10 @@ export const SendViewBCH: React.FC<Props> = (props): JSX.Element => {
     [subscribeSendTxState, transfer$]
   )
 
-  const { feesWithRates$, client$, reloadFees } = useBitcoinCashContext()
+  const { feesWithRates$, client$, reloadFeesWithRates } = useBitcoinCashContext()
 
-  const feesWithRates = useObservableState(feesWithRates$(), RD.initial)
+  const feesWithRatesLD: FeesWithRatesLD = useMemo(() => feesWithRates$(), [feesWithRates$])
+  const feesWithRatesRD = useObservableState(feesWithRatesLD, RD.initial)
   const oClient = useObservableState<O.Option<BitcoinCashClient>>(client$, O.none)
   const addressValidation = useMemo(
     () =>
@@ -91,8 +93,8 @@ export const SendViewBCH: React.FC<Props> = (props): JSX.Element => {
         isLoading={isLoading}
         onSubmit={onSend}
         addressValidation={addressValidation}
-        feesWithRates={feesWithRates}
-        reloadFeesHandler={reloadFees}
+        feesWithRates={feesWithRatesRD}
+        reloadFeesHandler={reloadFeesWithRates}
         validatePassword$={validatePassword$}
         sendTxStatusMsg={sendTxStatusMsg}
         network={network}
@@ -103,8 +105,8 @@ export const SendViewBCH: React.FC<Props> = (props): JSX.Element => {
       isLoading,
       onSend,
       addressValidation,
-      feesWithRates,
-      reloadFees,
+      feesWithRatesRD,
+      reloadFeesWithRates,
       validatePassword$,
       sendTxStatusMsg,
       network
