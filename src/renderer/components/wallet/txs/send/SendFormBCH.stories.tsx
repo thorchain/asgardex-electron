@@ -19,7 +19,7 @@ import { SendTxParams } from '../../../../services/chain/types'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormBCH as Component, Props as ComponentProps } from './SendFormBCH'
 
-const btcBalance: WalletBalance = {
+const bchBalance: WalletBalance = {
   asset: AssetBCH,
   amount: assetToBase(assetAmount(1.23, BCH_DECIMAL)),
   walletAddress: 'btc wallet address'
@@ -45,8 +45,8 @@ const rates: FeeRates = {
 }
 
 const defaultProps: ComponentProps = {
-  balances: [btcBalance, runeBalance],
-  balance: btcBalance,
+  balances: [bchBalance, runeBalance],
+  balance: bchBalance,
   onSubmit: ({ recipient, amount, feeOptionKey, memo }: SendTxParams) =>
     console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOptionKey}, memo: ${memo}`),
   isLoading: false,
@@ -95,7 +95,7 @@ FeesFailure.storyName = 'fees failure'
 export const FeesNotCovered: Story = () => {
   const props: ComponentProps = {
     ...defaultProps,
-    balance: { ...btcBalance, amount: baseAmount(1, BCH_DECIMAL) }
+    balance: { ...bchBalance, amount: baseAmount(1, BCH_DECIMAL) }
   }
   return <Component {...props} />
 }

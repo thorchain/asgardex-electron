@@ -5,7 +5,7 @@ import { FeesWithRates } from '@xchainjs/xchain-bitcoincash/lib/types/client-typ
 import { FeeOptionKey } from '@xchainjs/xchain-client'
 import {
   assetAmount,
-  AssetBTC,
+  AssetBCH,
   assetToBase,
   BaseAmount,
   baseAmount,
@@ -153,7 +153,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
       {
         balance: formatAssetAmountCurrency({
           amount: baseToAsset(balance.amount),
-          asset: AssetBTC,
+          asset: AssetBCH,
           trimZeros: true
         })
       }
@@ -290,7 +290,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         feeRD,
-        RD.map((fee) => [{ asset: AssetBTC, amount: fee }])
+        RD.map((fee) => [{ asset: AssetBCH, amount: fee }])
       ),
 
     [feeRD]
@@ -363,7 +363,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
                 />
               </Styled.FormItem>
               <MaxBalanceButton
-                balance={{ amount: maxAmount, asset: AssetBTC }}
+                balance={{ amount: maxAmount, asset: AssetBCH }}
                 onClick={addMaxAmountHandler}
                 disabled={isMaxButtonDisabled}
               />

@@ -19,7 +19,7 @@ import { SendTxParams } from '../../../../services/chain/types'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormLTC as Component, Props as ComponentProps } from './SendFormLTC'
 
-const btcBalance: WalletBalance = {
+const ltcBalance: WalletBalance = {
   asset: AssetLTC,
   amount: assetToBase(assetAmount(1.23, LTC_DECIMAL)),
   walletAddress: 'btc wallet address'
@@ -45,8 +45,8 @@ const rates: FeeRates = {
 }
 
 const defaultProps: ComponentProps = {
-  balances: [btcBalance, runeBalance],
-  balance: btcBalance,
+  balances: [ltcBalance, runeBalance],
+  balance: ltcBalance,
   onSubmit: ({ recipient, amount, feeOptionKey, memo }: SendTxParams) =>
     console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOptionKey}, memo: ${memo}`),
   isLoading: false,
@@ -95,7 +95,7 @@ FeesFailure.storyName = 'fees failure'
 export const FeesNotCovered: Story = () => {
   const props: ComponentProps = {
     ...defaultProps,
-    balance: { ...btcBalance, amount: baseAmount(1, LTC_DECIMAL) }
+    balance: { ...ltcBalance, amount: baseAmount(1, LTC_DECIMAL) }
   }
   return <Component {...props} />
 }
