@@ -92,6 +92,9 @@ const SendFormsComponents = {
     balance: ltcBalance
   }
 }
+
+type SendForm = keyof typeof SendFormsComponents
+
 const getSendForm = (component: SendForm) => {
   return SendFormsComponents[component].component
 }
@@ -99,8 +102,6 @@ const getSendForm = (component: SendForm) => {
 const getSendBalance = (component: SendForm) => {
   return SendFormsComponents[component].balance
 }
-
-type SendForm = keyof typeof SendFormsComponents
 
 const balances: WalletBalances = [bnbAsset, runeAsset, btcBalance, ethBalance]
 
@@ -134,7 +135,7 @@ const defaultComponentProps = {
   network: 'testnet' as Network,
 
   fees: RD.success(fees),
-  reloadFeesHandler: () => console.log('reloadFeesHandler'),
+  reloadFeesHandler: () => console.log('reloadFees'),
   validatePassword$: mockValidatePassword$
 }
 

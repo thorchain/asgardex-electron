@@ -16,7 +16,7 @@ export const sendTxStatusMsg = ({
   intl: IntlShape
 }) => {
   const stepDescriptions = [
-    intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: asset.symbol }),
+    intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetTicker: asset.ticker }),
     intl.formatMessage({ id: 'common.tx.checkResult' })
   ]
   const { steps, status } = sendTxState

@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { TxHash, XChainClient } from '@xchainjs/xchain-client'
+import { Address, TxHash, XChainClient } from '@xchainjs/xchain-client'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -20,7 +20,7 @@ import { loadTx$ } from './common'
  * @param txHash Transaction hash
  * @param chain Chain
  */
-const txStatusByClient$ = (client: XChainClient, txHash: string): TxLD => {
+const txStatusByClient$ = (client: XChainClient, txHash: string, assetAddress?: Address): TxLD => {
   // max. number of requests
   const MAX = 50
   // Status to do another poll or not
@@ -38,7 +38,7 @@ const txStatusByClient$ = (client: XChainClient, txHash: string): TxLD => {
     RxOp.takeUntil(stopInterval$),
     // count requests
     RxOp.tap(() => setCount(getCount() + 1)),
-    RxOp.switchMap((_) => loadTx$(client, txHash)),
+    RxOp.switchMap((_) => loadTx$(client, txHash, assetAddress)),
     liveData.map((result) => {
       // update state to stop polling
       setHasResult(true)
@@ -60,14 +60,17 @@ const txStatusByClient$ = (client: XChainClient, txHash: string): TxLD => {
  * @param txHash Transaction hash
  * @param chain Chain
  */
-export const txStatus$: (client$: XChainClient$) => (txHash: TxHash) => TxLD = (client$) => (txHash) =>
+export const txStatus$: (client$: XChainClient$) => (txHash: TxHash, assetAddress?: Address) => TxLD = (client$) => (
+  txHash,
+  assetAddress
+) =>
   client$.pipe(
     RxOp.switchMap((oClient) =>
       FP.pipe(
         oClient,
         O.fold(
           () => Rx.of(RD.initial),
-          (client) => txStatusByClient$(client, txHash)
+          (client) => txStatusByClient$(client, txHash, assetAddress)
         )
       )
     )

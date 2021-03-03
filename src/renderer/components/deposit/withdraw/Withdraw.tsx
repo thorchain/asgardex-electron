@@ -162,7 +162,7 @@ export const Withdraw: React.FC<Props> = ({
   const txModalExtraContent = useMemo(() => {
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
-      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetSymbol: AssetRuneNative.symbol }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetTicker: AssetRuneNative.ticker }),
       intl.formatMessage({ id: 'common.tx.checkResult' })
     ]
     const stepDescription = FP.pipe(

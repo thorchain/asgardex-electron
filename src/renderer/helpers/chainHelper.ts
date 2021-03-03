@@ -50,6 +50,11 @@ export const getChainAsset = (chain: Chain): Asset => {
 export const isBtcChain = (chain: Chain): boolean => eqChain.equals(chain, 'BTC')
 
 /**
+ * Check whether chain is THOR chain
+ */
+export const isThorChain = (chain: Chain): boolean => eqChain.equals(chain, 'THOR')
+
+/**
  * Check whether chain is BNB chain
  */
 export const isBnbChain = (chain: Chain): boolean => eqChain.equals(chain, 'BNB')

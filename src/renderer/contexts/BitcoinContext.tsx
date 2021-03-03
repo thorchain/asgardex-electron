@@ -4,11 +4,12 @@ import {
   client$,
   address$,
   reloadBalances,
-  reloadFees,
   balances$,
   txRD$,
+  reloadFees,
   fees$,
   feesWithRates$,
+  reloadFeesWithRates,
   subscribeTx,
   resetTx,
   ledgerAddress$,
@@ -23,11 +24,12 @@ export type BitcoinContextValue = {
   address$: typeof address$
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
+  reloadFees: typeof reloadFees
   fees$: typeof fees$
+  reloadFeesWithRates: typeof reloadFeesWithRates
   feesWithRates$: typeof feesWithRates$
   txRD$: typeof txRD$
   subscribeTx: typeof subscribeTx
-  reloadFees: typeof reloadFees
   resetTx: typeof resetTx
   ledgerAddress$: typeof ledgerAddress$
   ledgerTxRD$: typeof ledgerTxRD$
@@ -41,11 +43,12 @@ const initialContext: BitcoinContextValue = {
   address$,
   reloadBalances,
   balances$,
+  reloadFees,
   fees$,
+  reloadFeesWithRates,
   feesWithRates$,
   txRD$,
   subscribeTx,
-  reloadFees,
   resetTx,
   ledgerAddress$,
   ledgerTxRD$,
