@@ -650,15 +650,6 @@ export const Swap = ({
     )
   }, [targetChainFeeError, targetChainFeeAmountInTargetAsset, intl, targetAsset, swapResultLabel])
 
-  // const fees: UIFeesRD = useMemo(
-  //   () =>
-  //     FP.pipe(
-  //       sourceChainFee,
-  //       RD.map((sourceFee) => [{ asset: getChainAsset(sourceAssetProp.chain), amount: sourceFee }])
-  //     ),
-  //   [sourceChainFee, sourceAssetProp]
-  // )
-
   const fees: UIFeesRD = useMemo(
     () =>
       FP.pipe(
