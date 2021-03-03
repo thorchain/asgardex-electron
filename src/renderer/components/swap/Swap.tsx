@@ -458,7 +458,7 @@ export const Swap = ({
     FP.pipe(
       sequenceTOption(assetsToSwap, targetWalletAddress),
       O.map(([{ source, target }, address]) => {
-        const memo = getSwapMemo(target, network, address)
+        const memo = getSwapMemo(target, address)
 
         // set start time
         setSwapStartTime(Date.now())
@@ -482,8 +482,7 @@ export const Swap = ({
     subscribeSwapState,
     swap$,
     oSourcePoolAddress,
-    amountToSwap,
-    network
+    amountToSwap
   ])
 
   const sourceChainFee: RD.RemoteData<Error, BaseAmount> = useMemo(

@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { getSwapMemo } from '@thorchain/asgardex-util'
 import { Fees } from '@xchainjs/xchain-client'
 import {
   Chain,
@@ -19,6 +18,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 
 import { getChainAsset } from '../../../helpers/chainHelper'
+import { getSwapMemo } from '../../../helpers/memoHelper'
 import { LiveData, liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
@@ -88,7 +88,7 @@ const swapFee$ = (asset: Asset, type: SwapFeeType, memo?: Memo): LiveData<Error,
 
 const swapFees$ = (sourceAsset: Asset, targetAsset: Asset): SwapFeesLD => {
   return liveData.sequenceS({
-    source: swapFee$(sourceAsset, 'source', getSwapMemo({ asset: sourceAsset })),
+    source: swapFee$(sourceAsset, 'source', getSwapMemo(sourceAsset)),
     target: swapFee$(targetAsset, 'target')
   })
 }

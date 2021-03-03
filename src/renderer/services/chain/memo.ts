@@ -1,10 +1,11 @@
-import { getDepositMemo, getWithdrawMemo } from '@thorchain/asgardex-util'
+import { getWithdrawMemo } from '@thorchain/asgardex-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { getDepositMemo } from '../../helpers/memoHelper'
 import { observableState } from '../../helpers/stateHelper'
 import { selectedPoolAsset$ } from '../midgard/common'
 import * as THOR from '../thorchain'

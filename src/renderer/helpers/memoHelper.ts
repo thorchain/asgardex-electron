@@ -1,16 +1,24 @@
-import { getSwapMemo as asgardexGetSwapMemo } from '@thorchain/asgardex-util'
+import { getSwapMemo as asgardexGetSwapMemo, getDepositMemo as asgardexGetDepositMemo } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, BCHChain } from '@xchainjs/xchain-util'
 
-import { Network } from '../../shared/api/types'
-import { getAddressPrefixLength } from './addressHelper'
+export const getSwapMemo = (asset: Asset, address?: Address): string => {
+  if (asset.chain === BCHChain && address) {
+    const prefixIndex = address.indexOf(':') + 1
 
-export const getSwapMemo = (asset: Asset, network: Network, address: Address): string => {
-  if (asset.chain === BCHChain) {
     return asgardexGetSwapMemo({
       asset,
-      address: address.substr(getAddressPrefixLength(asset.chain, network))
+      address: address.substr(prefixIndex > 0 ? prefixIndex : 0)
     })
   }
   return asgardexGetSwapMemo({ asset, address })
+}
+
+export const getDepositMemo = (asset: Asset, address?: Address): string => {
+  if (asset.chain === BCHChain && address) {
+    const prefixIndex = address.indexOf(':') + 1
+
+    return asgardexGetDepositMemo(asset, address.substr(prefixIndex > 0 ? prefixIndex : 0))
+  }
+  return asgardexGetDepositMemo(asset, address)
 }
