@@ -1,6 +1,7 @@
 import { getTokenAddress } from '@xchainjs/xchain-ethereum'
 import {
   Asset,
+  AssetBCH,
   AssetBNB,
   AssetBTC,
   AssetETH,
@@ -50,9 +51,9 @@ export const BTC_DECIMAL = 8
 // see https://github.com/xchainjs/xchainjs-lib/issues/210
 export const ETH_DECIMAL = 18
 
-// TODO (@asgdx-devs) Use constant `LTC_DECIMAL` from `xchain-util` if available
+// TODO (@asgdx-devs) Use constant `BCH_DECIMAL` from `xchain-util` if available
 // see https://github.com/xchainjs/xchainjs-lib/issues/208
-export const BTH_DECIMAL = 8
+export const BCH_DECIMAL = 8
 
 // TODO (@asgdx-devs) Use constant `LTC_DECIMAL` from `xchain-util` if available
 // see https://github.com/xchainjs/xchainjs-lib/issues/209
@@ -69,6 +70,11 @@ export const isRuneBnbAsset = (asset: Asset): boolean =>
  * Check whether an asset is a LTC asset
  */
 export const isLtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetLTC)
+
+/**
+ * Check whether an asset is a BCH asset
+ */
+export const isBchAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBCH)
 
 /**
  * Check whether an asset is a BNB asset

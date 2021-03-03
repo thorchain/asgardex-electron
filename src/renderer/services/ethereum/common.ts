@@ -75,6 +75,11 @@ const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(map(
 const address$: Address$ = C.address$(client$)
 
 /**
+ * Current `Address` depending on selected network
+ */
+const addressUI$: Address$ = C.addressUI$(client$)
+
+/**
  * Explorer url depending on selected network
  */
 const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
@@ -89,4 +94,13 @@ const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
  */
 const getExplorerAddressUrl$: GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
 
-export { client$, clientState$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ }
+export {
+  client$,
+  clientState$,
+  clientViewState$,
+  address$,
+  addressUI$,
+  explorerUrl$,
+  getExplorerTxUrl$,
+  getExplorerAddressUrl$
+}

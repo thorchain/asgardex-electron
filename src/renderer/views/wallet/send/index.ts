@@ -1,4 +1,5 @@
 export { SendView } from './SendView'
 export { SendViewBNB } from './SendViewBNB'
 export { SendViewBTC } from './SendViewBTC'
+export { SendViewBCH } from './SendViewBCH'
 export { SendViewETH } from './SendViewETH'

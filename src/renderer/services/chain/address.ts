@@ -14,6 +14,7 @@ import * as Rx from 'rxjs'
 
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
+import * as BCH from '../bitcoincash'
 import { address$, Address$ } from '../clients'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
@@ -36,7 +37,7 @@ const addressByChain$ = (chain: Chain): Address$ => {
     case CosmosChain:
       return Rx.of(O.none)
     case BCHChain:
-      return Rx.of(O.none)
+      return BCH.address$
     case LTCChain:
       return LTC.address$
   }

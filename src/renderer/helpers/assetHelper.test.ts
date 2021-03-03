@@ -1,4 +1,5 @@
 import {
+  AssetBCH,
   AssetBNB,
   AssetBTC,
   AssetETH,
@@ -10,6 +11,7 @@ import {
 
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
 import {
+  isBchAsset,
   isBnbAsset,
   isBtcAsset,
   isChainAsset,
@@ -62,6 +64,16 @@ describe('helpers/assetHelper', () => {
 
     it('returns false for any other asset than LTC', () => {
       expect(isLtcAsset(AssetBNB)).toBeFalsy()
+    })
+  })
+
+  describe('isBchAsset', () => {
+    it('checks BCH asset', () => {
+      expect(isBchAsset(AssetBCH)).toBeTruthy()
+    })
+
+    it('returns false for any other asset than BCH', () => {
+      expect(isBchAsset(AssetBNB)).toBeFalsy()
     })
   })
 

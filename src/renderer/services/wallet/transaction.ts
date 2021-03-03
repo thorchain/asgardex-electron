@@ -7,6 +7,7 @@ import * as RxOp from 'rxjs/operators'
 import { observableState } from '../../helpers/stateHelper'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
+import * as BCH from '../bitcoincash'
 import * as C from '../clients'
 import { ExplorerUrl$, GetExplorerTxUrl$, TxsPageLD, LoadTxsParams } from '../clients'
 import * as ETH from '../ethereum'
@@ -53,6 +54,8 @@ export const getTxs$: (walletAddress: O.Option<string>) => TxsPageLD = (walletAd
                 return THOR.txs$({ asset: O.none, limit, offset, walletAddress })
               case 'LTC':
                 return LTC.txs$({ asset: O.none, limit, offset, walletAddress })
+              case 'BCH':
+                return BCH.txs$({ asset: O.none, limit, offset, walletAddress })
               default:
                 return Rx.of(
                   RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` })

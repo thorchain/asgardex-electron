@@ -19,6 +19,7 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
+import * as BCH from '../../bitcoincash'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
@@ -74,8 +75,14 @@ export const sendTx$ = ({
       // not available yet
       return txFailure$(`Tx stuff has not been implemented for Polkadot yet`)
     case BCHChain:
-      // not available yet
-      return txFailure$(`Tx stuff has not been implemented for Bitcoin Cash yet`)
+      return FP.pipe(
+        BCH.feesWithRates$(memo),
+        liveData.mapLeft((error) => ({
+          errorId: ErrorId.GET_FEES,
+          msg: error?.message ?? error.toString()
+        })),
+        liveData.chain(({ rates }) => BCH.sendTx({ recipient, amount, feeRate: rates[feeOptionKey], memo }))
+      )
     case LTCChain:
       return FP.pipe(
         LTC.feesWithRates$(memo),
@@ -114,7 +121,7 @@ export const txStatusByChain$ = (txHash: TxHash, chain: Chain, assetAddress?: Ad
     case PolkadotChain:
       return failure$(`txStatus$ has not been implemented for Polkadot`)
     case BCHChain:
-      return failure$(`txStatus$ has not been implemented for Bitcoin Cash`)
+      return BCH.txStatus$(txHash)
     case LTCChain:
       return LTC.txStatus$(txHash)
   }

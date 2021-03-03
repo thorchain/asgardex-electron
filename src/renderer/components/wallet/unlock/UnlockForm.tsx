@@ -132,7 +132,11 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
               name="password"
               rules={[{ required: true, validator: passwordValidator }]}
               validateTrigger={['onSubmit', 'onChange']}>
-              <InputPassword placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()} size="large" />
+              <InputPassword
+                placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
+                size="large"
+                autoFocus
+              />
             </Styled.PasswordInput>
           </div>
           {renderError}

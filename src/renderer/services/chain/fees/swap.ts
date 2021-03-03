@@ -25,6 +25,7 @@ import { LiveData, liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
+import * as BCH from '../../bitcoincash'
 import { FeesRD } from '../../clients'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
@@ -80,7 +81,10 @@ const feesByChain$ = ({
       return Rx.of(RD.failure(Error('Polkadot fees is not implemented yet')))
 
     case BCHChain:
-      return Rx.of(RD.failure(Error('Bitcoincash fees is not implemented yet')))
+      return FP.pipe(
+        BCH.feesWithRates$(memo),
+        liveData.map(({ fees }) => fees)
+      )
 
     case LTCChain:
       return FP.pipe(

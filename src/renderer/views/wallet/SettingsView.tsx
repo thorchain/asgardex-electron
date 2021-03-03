@@ -69,7 +69,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const bnbAccount$ = useMemo(
     () =>
       pipe(
-        bnbContext.address$,
+        bnbContext.addressUI$,
         RxOp.map(
           O.map(
             (address) =>
@@ -91,13 +91,13 @@ export const SettingsView: React.FC = (): JSX.Element => {
           )
         )
       ),
-    [bnbContext.address$, bnbLedgerAddress]
+    [bnbContext.addressUI$, bnbLedgerAddress]
   )
 
   const ethAccount$ = useMemo(
     () =>
       pipe(
-        ethContext.address$,
+        ethContext.addressUI$,
         RxOp.map(
           O.map(
             (address) =>
@@ -114,14 +114,14 @@ export const SettingsView: React.FC = (): JSX.Element => {
           )
         )
       ),
-    [ethContext.address$]
+    [ethContext.addressUI$]
   )
 
   const btcLedgerAddress = useObservableState(btcContext.ledgerAddress$, RD.initial)
   const btcAccount$ = useMemo(
     () =>
       pipe(
-        btcContext.address$,
+        btcContext.addressUI$,
         RxOp.map(
           O.map(
             (address) =>
@@ -143,7 +143,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           )
         )
       ),
-    [btcContext.address$, btcLedgerAddress]
+    [btcContext.addressUI$, btcLedgerAddress]
   )
 
   const oRuneNativeAddress = useObservableState(thorContext.address$, O.none)
@@ -155,7 +155,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const thorAccount$ = useMemo(
     () =>
       pipe(
-        thorContext.address$,
+        thorContext.addressUI$,
         RxOp.map(
           O.map(
             (address) =>
@@ -172,13 +172,13 @@ export const SettingsView: React.FC = (): JSX.Element => {
           )
         )
       ),
-    [thorContext.address$]
+    [thorContext.addressUI$]
   )
 
   const ltcAddress$ = useMemo(
     () =>
       pipe(
-        ltcContext.address$,
+        ltcContext.addressUI$,
         RxOp.map(
           O.map(
             (address) =>
@@ -195,13 +195,13 @@ export const SettingsView: React.FC = (): JSX.Element => {
           )
         )
       ),
-    [ltcContext.address$]
+    [ltcContext.addressUI$]
   )
 
   const bchAccount$ = useMemo(
     () =>
       pipe(
-        bchContext.address$,
+        bchContext.addressUI$,
         RxOp.map(
           O.map(
             (address) =>
@@ -218,7 +218,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           )
         )
       ),
-    [bchContext.address$]
+    [bchContext.addressUI$]
   )
 
   const { service: midgardService } = useMidgardContext()
