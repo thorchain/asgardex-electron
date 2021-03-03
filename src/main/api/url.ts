@@ -20,7 +20,9 @@ const EXTERNALS_WHITELIST = [
   'runestake.info',
   'etherscan.io',
   'ropsten.etherscan.io',
-  'tltc.bitaps.com'
+  'tltc.bitaps.com',
+  'ltc.bitaps.com',
+  'blockchain.com'
 ]
 
 const openExternal = (target: string) => {

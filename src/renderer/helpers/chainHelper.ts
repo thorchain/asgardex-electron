@@ -8,8 +8,8 @@ import {
   AssetRuneNative,
   AssetLTC,
   Chain,
-  BCHChain,
-  isChain
+  isChain,
+  AssetBCH
 } from '@xchainjs/xchain-util'
 
 import { ENABLED_CHAINS } from '../services/const'
@@ -30,17 +30,10 @@ export const getChainAsset = (chain: Chain): Asset => {
       return AssetAtom
     case 'POLKA':
       return AssetDOT
-    case 'BCH': {
-      // TODO @asgdx-team support when https://github.com/thorchain/asgardex-electron/issues/821 in work
-      return {
-        chain: BCHChain,
-        symbol: 'BCH',
-        ticker: 'BCH'
-      }
-    }
-    case 'LTC': {
+    case 'BCH':
+      return AssetBCH
+    case 'LTC':
       return AssetLTC
-    }
   }
 }
 

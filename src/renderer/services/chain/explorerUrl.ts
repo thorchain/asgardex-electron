@@ -45,7 +45,7 @@ const getExplorerUrlByAsset$ = (asset: Asset | null): GetExplorerTxUrl$ => {
       // not available yet
       return explorerUrlFailure$
     case BCHChain:
-      return explorerUrlFailure$
+      return BCH.getExplorerTxUrl$
     case LTCChain:
       return LTC.getExplorerTxUrl$
   }
