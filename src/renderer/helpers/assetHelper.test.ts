@@ -11,6 +11,7 @@ import {
 
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
 import {
+  isBchAsset,
   isBnbAsset,
   isBtcAsset,
   isChainAsset,
