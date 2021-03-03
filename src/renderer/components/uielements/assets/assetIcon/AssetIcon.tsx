@@ -7,9 +7,11 @@ import { Asset } from '@xchainjs/xchain-util'
 import { Network } from '../../../../../shared/api/types'
 import {
   getEthTokenAddress,
+  isBchAsset,
   isBnbAsset,
   isBtcAsset,
   isEthAsset,
+  isLtcAsset,
   isRuneBnbAsset,
   isRuneNativeAsset
 } from '../../../../helpers/assetHelper'
@@ -55,8 +57,16 @@ export const AssetIcon: React.FC<Props> = ({
     // BNB
     if (isBnbAsset(asset)) {
       // Since BNB is blacklisted at TrustWallet's asset, we have to use "our" own BNB icon
-      // (see https://github.com/trustwallet/assets/blob/master/blockchains/binance/blacklist.json)
+      // (see https://github.com/trustwallet/assets/blob/master/blockchains/binance/denylist.json
       return bnbIcon
+    }
+    // LTC
+    if (isLtcAsset(asset)) {
+      return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png`
+    }
+    // BCH
+    if (isBchAsset(asset)) {
+      return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png`
     }
 
     if (network === 'mainnet') {
