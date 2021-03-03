@@ -1,5 +1,5 @@
 import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip, PoolData } from '@thorchain/asgardex-util'
-import { Asset, assetToString, bn, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, bn, BaseAmount, baseToAsset, assetAmount, assetToBase } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -90,6 +90,8 @@ export const DEFAULT_SWAP_DATA: SwapData = {
   swapResult: ZERO_BASE_AMOUNT
 }
 
+export const convertToBase8 = (amount: BaseAmount) => assetToBase(assetAmount(baseToAsset(amount).amount(), 8))
+
 export const getSwapData = (
   swapAmount: BaseAmount,
   sourceAsset: O.Option<Asset>,
@@ -99,6 +101,7 @@ export const getSwapData = (
   pipe(
     sequenceTOption(sourceAsset, targetAsset),
     O.map(([sourceAsset, targetAsset]) => {
+      swapAmount = convertToBase8(swapAmount)
       const slip = getSlip(sourceAsset, targetAsset, swapAmount, pools)
       const swapResult = getSwapResult(sourceAsset, targetAsset, swapAmount, pools)
       return {
@@ -109,14 +112,11 @@ export const getSwapData = (
     O.getOrElse(() => DEFAULT_SWAP_DATA)
   )
 
-export const pickAssetWithPrice = (availableAssets: AssetWithPrice[], asset: O.Option<Asset>) =>
+export const pickAssetWithPrice = (availableAssets: AssetWithPrice[], asset: Asset) =>
   pipe(
-    asset,
-    O.chain((sourceAsset) =>
-      pipe(
-        availableAssets,
-        A.findFirst((asset) => sourceAsset.symbol === asset.asset.symbol)
-      )
+    pipe(
+      availableAssets,
+      A.findFirst((availableAsset) => asset.symbol === availableAsset.asset.symbol)
     ),
     O.alt(() => pipe(availableAssets, A.head))
   )

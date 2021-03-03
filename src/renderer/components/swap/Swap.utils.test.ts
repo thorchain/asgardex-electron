@@ -2,6 +2,7 @@ import { PoolData } from '@thorchain/asgardex-util'
 import {
   assetAmount,
   AssetBNB,
+  AssetETH,
   AssetRuneNative,
   assetToBase,
   assetToString,
@@ -147,17 +148,16 @@ describe('components/swap/utils', () => {
 
   describe('pickAssetWithPrice', () => {
     it('should be none', () => {
-      expect(pickAssetWithPrice([], O.none)).toBeNone()
-      expect(pickAssetWithPrice([], O.some(ASSETS_TESTNET.FTM))).toBeNone()
+      expect(pickAssetWithPrice([], AssetBNB)).toBeNone()
     })
     it('should return first element if nothing found', () => {
       expect(
         pickAssetWithPrice(
           [
             { asset: AssetRuneNative, priceRune: bn(0) },
-            { asset: ASSETS_TESTNET.BOLT, priceRune: bn(0) }
+            { asset: AssetBNB, priceRune: bn(1) }
           ],
-          O.some(ASSETS_TESTNET.FTM)
+          ASSETS_TESTNET.FTM
         )
       ).toEqual(O.some({ asset: AssetRuneNative, priceRune: bn(0) }))
     })
@@ -167,12 +167,12 @@ describe('components/swap/utils', () => {
         pickAssetWithPrice(
           [
             { asset: AssetRuneNative, priceRune: bn(0) },
-            { asset: ASSETS_TESTNET.BOLT, priceRune: bn(0) },
-            { asset: ASSETS_TESTNET.FTM, priceRune: bn(0) }
+            { asset: AssetBNB, priceRune: bn(1) },
+            { asset: AssetETH, priceRune: bn(2) }
           ],
-          O.some(ASSETS_TESTNET.FTM)
+          AssetETH
         )
-      ).toEqual(O.some({ asset: ASSETS_TESTNET.FTM, priceRune: bn(0) }))
+      ).toEqual(O.some({ asset: AssetETH, priceRune: bn(2) }))
     })
   })
 })
