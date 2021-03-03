@@ -89,6 +89,11 @@ const clientViewState$: Observable<C.ClientStateForViews> = clientState$.pipe(ma
 const address$: C.Address$ = C.address$(client$)
 
 /**
+ * BCH `Address`
+ */
+const addressUI$: C.Address$ = C.addressUI$(client$)
+
+/**
  * Explorer url
  */
 const explorerUrl$: C.ExplorerUrl$ = C.explorerUrl$(client$)
@@ -103,4 +108,4 @@ const getExplorerTxUrl$: C.GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
  */
 const getExplorerAddressUrl$: GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
 
-export { address$, client$, clientViewState$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ }
+export { address$, addressUI$, client$, clientViewState$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ }

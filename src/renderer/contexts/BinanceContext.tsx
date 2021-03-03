@@ -11,6 +11,7 @@ import {
   sendTx,
   txRD$,
   address$,
+  addressUI$,
   explorerUrl$,
   getExplorerTxUrl$,
   fees$,
@@ -32,6 +33,7 @@ export type BinanceContextValue = {
   sendTx: typeof sendTx
   txRD$: typeof txRD$
   address$: typeof address$
+  addressUI$: typeof addressUI$
   explorerUrl$: typeof explorerUrl$
   getExplorerTxUrl$: typeof getExplorerTxUrl$
   fees$: typeof fees$
@@ -53,6 +55,7 @@ const initialContext: BinanceContextValue = {
   sendTx,
   txRD$,
   address$,
+  addressUI$,
   explorerUrl$,
   getExplorerTxUrl$,
   fees$,

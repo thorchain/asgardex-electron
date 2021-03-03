@@ -15,6 +15,7 @@ import * as Rx from 'rxjs'
 import { liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
+import * as BCH from '../../bitcoincash'
 import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
 import { FeeLD, Memo } from '../types'
@@ -61,7 +62,7 @@ const withdrawFee$ = (chain: Chain, memo: Memo): FeeLD => {
     case PolkadotChain:
       return Rx.of(RD.failure(Error(`Withdraw fee for Polkadot has not been implemented`)))
     case BCHChain:
-      return Rx.of(RD.failure(Error(`Withdraw fee for Bitcoin Cash has not been implemented`)))
+      return BCH.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
     case LTCChain:
       return LTC.feesWithRates$(memo).pipe(liveData.map(({ fees: { fast } }) => fast))
   }

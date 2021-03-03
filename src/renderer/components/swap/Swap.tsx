@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { getValueOfAsset1InAsset2, PoolData, getSwapMemo } from '@thorchain/asgardex-util'
+import { getSwapMemo, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import { Address, Balance } from '@xchainjs/xchain-client'
 import {
   Asset,
@@ -458,6 +458,7 @@ export const Swap = ({
       sequenceTOption(assetsToSwap, targetWalletAddress),
       O.map(([{ source, target }, address]) => {
         const memo = getSwapMemo({ asset: target, address })
+
         // set start time
         setSwapStartTime(Date.now())
         // subscribe to swap$
