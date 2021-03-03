@@ -89,9 +89,33 @@ const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
     case PolkadotChain:
       return Rx.of(RD.failure(Error('Deposit fee for Polkadot has not been implemented')))
     case BCHChain:
-      return BCH.fees$().pipe(liveData.map(({ fast }) => fast))
+      // deposit fee for BCH txs based on a memo,
+      // and memo depends on deposit type
+      return Rx.iif(() => type === 'asym', asymDepositTxMemo$, symDepositAssetTxMemo$).pipe(
+        RxOp.switchMap((oMemo) =>
+          FP.pipe(
+            oMemo,
+            O.fold(
+              () => Rx.of(RD.initial),
+              (memo) => BCH.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
+            )
+          )
+        )
+      )
     case LTCChain:
-      return LTC.fees$().pipe(liveData.map(({ fast }) => fast))
+      // deposit fee for LTC txs based on a memo,
+      // and memo depends on deposit type
+      return Rx.iif(() => type === 'asym', asymDepositTxMemo$, symDepositAssetTxMemo$).pipe(
+        RxOp.switchMap((oMemo) =>
+          FP.pipe(
+            oMemo,
+            O.fold(
+              () => Rx.of(RD.initial),
+              (memo) => LTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
+            )
+          )
+        )
+      )
   }
 }
 
