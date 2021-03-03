@@ -1,6 +1,7 @@
 import { getTokenAddress } from '@xchainjs/xchain-ethereum'
 import {
   Asset,
+  AssetBCH,
   AssetBNB,
   AssetBTC,
   AssetETH,
@@ -69,6 +70,11 @@ export const isRuneBnbAsset = (asset: Asset): boolean =>
  * Check whether an asset is a LTC asset
  */
 export const isLtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetLTC)
+
+/**
+ * Check whether an asset is a BCH asset
+ */
+export const isBchAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBCH)
 
 /**
  * Check whether an asset is a BNB asset
