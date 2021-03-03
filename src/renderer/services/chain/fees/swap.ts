@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { getSwapMemo } from '@thorchain/asgardex-util'
 import { Address, Fees } from '@xchainjs/xchain-client'
 import {
   Asset,
@@ -28,7 +29,7 @@ import { FeesRD } from '../../clients'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
-import { FeesLD, Memo, SwapFeeHandler, SwapFeeParams } from '../types'
+import { FeesLD, Memo, SwapFeeParams, SwapFeesHandler, SwapFeesParams } from '../types'
 
 const feesByChain$ = ({
   asset,
@@ -89,28 +90,47 @@ const feesByChain$ = ({
   }
 }
 
-// state for reloading swap fees
-const { get$: reloadSwapFees$, set: reloadSwapFees } = observableState<SwapFeeParams | undefined>(undefined)
+type SwapFeeType = 'source' | 'target'
 
-const swapFee$: SwapFeeHandler = (params) => {
+const swapFee$ = ({
+  asset,
+  amount,
+  memo,
+  type,
+  recipient: oRecipient
+}: SwapFeeParams & {
+  type: SwapFeeType
+}) => {
+  const feesLD: LiveData<Error, Fees> = feesByChain$({
+    asset,
+    amount,
+    memo,
+    recipient: FP.pipe(oRecipient, O.toUndefined)
+  })
+
+  const multiplier = type === 'source' ? 1 : 3
+
+  return FP.pipe(
+    feesLD,
+    liveData.map((fees) => fees.fastest),
+    liveData.map((fee) => baseAmount(fee.amount().times(multiplier), fee.decimal))
+  )
+}
+
+// state for reloading swap fees
+const { get$: reloadSwapFees$, set: reloadSwapFees } = observableState<SwapFeesParams | undefined>(undefined)
+
+const swapFees$: SwapFeesHandler = (params) => {
   return reloadSwapFees$.pipe(
     RxOp.debounceTime(300),
     RxOp.switchMap((reloadParams) => {
-      const { asset, amount, memo, recipient: oRecipient } = reloadParams || params
-      const feesLD: LiveData<Error, Fees> = feesByChain$({
-        asset,
-        amount,
-        memo,
-        recipient: FP.pipe(oRecipient, O.toUndefined)
+      const { source, target } = reloadParams || params
+      return liveData.sequenceS({
+        source: swapFee$({ ...source, type: 'source', memo: getSwapMemo({ asset: params.source.asset }) }),
+        target: swapFee$({ ...target, type: 'target' })
       })
-
-      return FP.pipe(
-        feesLD,
-        liveData.map((fees) => fees.fastest),
-        liveData.map((fee) => baseAmount(fee.amount(), fee.decimal))
-      )
     })
   )
 }
 
-export { reloadSwapFees, swapFee$ }
+export { reloadSwapFees, swapFees$ }

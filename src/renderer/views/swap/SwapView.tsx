@@ -43,7 +43,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     pools: { poolsState$, reloadPools, poolAddressByAsset$ },
     setSelectedPoolAsset
   } = midgardService
-  const { reloadSwapFees, swapFee$, getExplorerUrlByAsset$, assetAddress$, swap$ } = useChainContext()
+  const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, assetAddress$, swap$ } = useChainContext()
 
   const {
     balancesState$,
@@ -152,7 +152,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   poolDetails={state.poolDetails}
                   walletBalances={balances}
                   reloadFees={reloadSwapFees}
-                  fees$={swapFee$}
+                  fees$={swapFees$}
                   targetWalletAddress={targetWalletAddress}
                   swap$={swap$}
                   reloadBalances={reloadBalances}

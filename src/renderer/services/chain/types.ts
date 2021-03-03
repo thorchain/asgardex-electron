@@ -87,12 +87,17 @@ export type SwapFeeParams = {
   readonly recipient: O.Option<Address>
   readonly asset: Asset
   readonly amount: BaseAmount
-  readonly memo: string
+  readonly memo?: string
 }
 
-export type SwapFeeHandler = (p: SwapFeeParams) => FeeLD
+export type SwapFeesParams = {
+  readonly source: SwapFeeParams
+  readonly target: SwapFeeParams
+}
 
-export type LoadSwapFeeHandler = (p: SwapFeeParams) => void
+export type SwapFeesHandler = (p: SwapFeesParams) => SwapFeesLD
+
+export type LoadSwapFeesHandler = (p: SwapFeesParams) => void
 
 /**
  * State to reflect status of an asym. deposit by doing different requests

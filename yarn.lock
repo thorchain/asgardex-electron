@@ -5011,10 +5011,10 @@
     hdkey "^2.0.1"
     uuid "^8.1.0"
 
-"@xchainjs/xchain-ethereum@^0.13.1":
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.13.1.tgz#126afa7cc5b6339ad1eda3bc773d47cf1cc77530"
-  integrity sha512-+QpvyYVOF96FvzPUhZ5+HSNoOC8cP2aB7bBOf4aF9nnNuBEMdRSG4keSbcOhFGnSGJUDBVoXa78kj3iaAb8vjg==
+"@xchainjs/xchain-ethereum@^0.13.2":
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.13.2.tgz#83f11b9005d0feb4874054de6ca3a3620ead5ae6"
+  integrity sha512-QNOsGRYONz2cOdKzBTXLkJSEs+ZrGEWG5UdBjWQU7Dggfq1BA42FLQ+q2aFBRBFeqgCJ/bJzn8QsiXZqKPPwxQ==
 
 "@xchainjs/xchain-litecoin@^0.4.0":
   version "0.4.0"
