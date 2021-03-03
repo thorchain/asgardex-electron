@@ -68,7 +68,7 @@ describe('helpers/assetHelper', () => {
   })
 
   describe('isBchAsset', () => {
-    it('checks BTH asset', () => {
+    it('checks BCH asset', () => {
       expect(isBchAsset(AssetBCH)).toBeTruthy()
     })
 
