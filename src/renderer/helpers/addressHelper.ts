@@ -29,7 +29,7 @@ export const truncateAddress = (addr: Address, chain: Chain, network: Network): 
 }
 
 export const getAddressPrefixLength = (chain: Chain, network: string): number => {
-  // TODO (@Veado) Extract it into a helper - we might need it at other places, too
+  // TODO (@asgdx-team) Extract it into a helper - we might need it at other places, too
   const clientNetwork: Client.Network = network === 'testnet' ? 'testnet' : 'mainnet'
   switch (chain) {
     case BNBChain:
@@ -44,12 +44,10 @@ export const getAddressPrefixLength = (chain: Chain, network: string): number =>
       return getPolkadotPrefix(network).length
     case THORChain:
       return getThorchainPrefix(network).length
-    case LTCChain: {
+    case LTCChain:
       return getLitecoinPrefix(clientNetwork).length
-    }
-    case BCHChain: {
+    case BCHChain:
       return getBCHPrefix(network).length
-    }
   }
 }
 
