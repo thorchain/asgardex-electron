@@ -1,7 +1,15 @@
 import { ETHChain } from '@xchainjs/xchain-util'
 
 import { reloadBalances, balances$ } from './balances'
-import { client$, clientViewState$, address$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ } from './common'
+import {
+  client$,
+  clientViewState$,
+  address$,
+  addressUI$,
+  explorerUrl$,
+  getExplorerTxUrl$,
+  getExplorerAddressUrl$
+} from './common'
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
@@ -12,6 +20,7 @@ export {
   client$,
   clientViewState$,
   address$,
+  addressUI$,
   reloadBalances,
   explorerUrl$,
   getExplorerTxUrl$,

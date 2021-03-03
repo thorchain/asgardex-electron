@@ -4,7 +4,7 @@ import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../shared/api/types'
-import { formatAddressShow, truncateAddress } from '../../../helpers/addressHelper'
+import { truncateAddress } from '../../../helpers/addressHelper'
 import * as Styled from './AddressEllipsis.style'
 
 /**
@@ -73,9 +73,9 @@ export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
   return (
     <Styled.Container className={className}>
       <Styled.AddressContainer ref={measuredParent}>
-        <Styled.Address className={className}>{formatAddressShow(chain, network, address)}</Styled.Address>
+        <Styled.Address className={className}>{address}</Styled.Address>
         {linkIcon}
-        <Styled.CopyLabel copyable={{ text: formatAddressShow(chain, network, address) }} />
+        <Styled.CopyLabel copyable={{ text: address }} />
       </Styled.AddressContainer>
     </Styled.Container>
   )

@@ -8,7 +8,6 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
-import { formatAddressShow } from '../../../../helpers/addressHelper'
 import { sequenceSOption, sequenceTOption } from '../../../../helpers/fpHelpers'
 import { loadingString, emptyString } from '../../../../helpers/stringHelper'
 import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
@@ -116,8 +115,8 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
   const qrCodeModal = useMemo(
     () =>
       FP.pipe(
-        sequenceSOption({ walletInfo, oAsset }),
-        O.map(({ walletInfo: { address, network }, oAsset: asset }) =>
+        walletInfo,
+        O.map(({ address }) =>
           !showQrModal ? (
             <></>
           ) : (
@@ -127,17 +126,14 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
               visible={showQrModal}
               onCancel={closeQrModal}
               onOk={closeQrModal}>
-              <QrCode
-                text={formatAddressShow(asset.chain, network, address)}
-                qrError={intl.formatMessage({ id: 'wallet.receive.address.errorQR' })}
-              />
+              <QrCode text={address} qrError={intl.formatMessage({ id: 'wallet.receive.address.errorQR' })} />
               {renderAddress()}
             </Styled.QrCodeModal>
           )
         ),
         O.getOrElse(() => <></>)
       ),
-    [showQrModal, closeQrModal, walletInfo, assetString, intl, renderAddress, oAsset]
+    [showQrModal, closeQrModal, walletInfo, assetString, intl, renderAddress]
   )
 
   return (

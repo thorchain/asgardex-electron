@@ -57,10 +57,3 @@ export const removeAddressPrefix = (address: Address): Address => {
   const prefixIndex = address.indexOf(':') + 1
   return address.substr(prefixIndex > 0 ? prefixIndex : 0)
 }
-
-export const formatAddressShow = (chain: Chain, network: Network, address: Address): Address => {
-  if (chain === BCHChain) {
-    return getBCHPrefix(network) + address
-  }
-  return address
-}
