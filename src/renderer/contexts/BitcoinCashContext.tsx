@@ -7,6 +7,7 @@ import {
   reloadBalances,
   reloadFees,
   fees$,
+  reloadFeesWithRates,
   feesWithRates$
 } from '../services/bitcoincash'
 
@@ -16,6 +17,7 @@ export type BitcoinCashContextValue = {
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
   fees$: typeof fees$
+  reloadFeesWithRates: typeof reloadFeesWithRates
   feesWithRates$: typeof feesWithRates$
   reloadFees: typeof reloadFees
 }
@@ -26,6 +28,7 @@ const initialContext: BitcoinCashContextValue = {
   reloadBalances,
   balances$,
   fees$,
+  reloadFeesWithRates,
   feesWithRates$,
   reloadFees
 }

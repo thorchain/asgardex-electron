@@ -4,6 +4,7 @@ import {
   Asset,
   assetFromString,
   assetToString,
+  BCHChain,
   BNBChain,
   BTCChain,
   ETHChain,
@@ -25,7 +26,7 @@ import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
-import { SendViewBNB, SendViewBTC, SendViewETH } from './index'
+import { SendViewBNB, SendViewBCH, SendViewBTC, SendViewETH } from './index'
 import { SendViewLTC } from './SendViewLTC'
 import { SendViewTHOR } from './SendViewTHOR'
 
@@ -72,6 +73,16 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
         case BNBChain:
           return (
             <SendViewBNB
+              asset={asset}
+              balances={balances}
+              getExplorerTxUrl={getExplorerTxUrl}
+              validatePassword$={validatePassword$}
+              network={network}
+            />
+          )
+        case BCHChain:
+          return (
+            <SendViewBCH
               asset={asset}
               balances={balances}
               getExplorerTxUrl={getExplorerTxUrl}

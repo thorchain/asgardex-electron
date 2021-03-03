@@ -50,9 +50,9 @@ export const BTC_DECIMAL = 8
 // see https://github.com/xchainjs/xchainjs-lib/issues/210
 export const ETH_DECIMAL = 18
 
-// TODO (@asgdx-devs) Use constant `LTC_DECIMAL` from `xchain-util` if available
+// TODO (@asgdx-devs) Use constant `BCH_DECIMAL` from `xchain-util` if available
 // see https://github.com/xchainjs/xchainjs-lib/issues/208
-export const BTH_DECIMAL = 8
+export const BCH_DECIMAL = 8
 
 // TODO (@asgdx-devs) Use constant `LTC_DECIMAL` from `xchain-util` if available
 // see https://github.com/xchainjs/xchainjs-lib/issues/209
