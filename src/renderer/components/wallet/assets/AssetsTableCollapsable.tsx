@@ -13,6 +13,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
+import { formatAddressShow } from '../../../helpers/addressHelper'
 import { isEthAsset, isRuneBnbAsset } from '../../../helpers/assetHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
@@ -283,13 +284,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           </Col>
           <Col xs={0} md={12} lg={10}>
             <Styled.HeaderAddress>
-              {walletAddress}
+              {formatAddressShow(chain, network, walletAddress)}
               <Styled.CopyLabelContainer
                 onClick={(event) => {
                   event.preventDefault()
                   event.stopPropagation()
                 }}>
-                <Styled.CopyLabel copyable={{ text: walletAddress }} />
+                <Styled.CopyLabel copyable={{ text: formatAddressShow(chain, network, walletAddress) }} />
               </Styled.CopyLabelContainer>
             </Styled.HeaderAddress>
           </Col>
@@ -305,7 +306,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         </Panel>
       )
     },
-    [intl, renderBalances]
+    [intl, renderBalances, network]
   )
 
   // open all panels by default
