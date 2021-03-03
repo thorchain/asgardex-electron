@@ -20,8 +20,8 @@ const defaultProps: SwapProps = {
     { asset: AssetBTC, priceRune: bn('56851.67420275761') },
     { asset: AssetRuneNative, priceRune: ONE_BN }
   ],
-  sourceAsset: O.some(AssetRuneNative),
-  targetAsset: O.some(AssetBTC),
+  sourceAsset: AssetRuneNative,
+  targetAsset: AssetBTC,
   sourcePoolAddress: O.some('pool-address'),
   // mock successfull result of swap$
   swap$: (params) =>
@@ -79,7 +79,7 @@ const defaultProps: SwapProps = {
   validatePassword$: mockValidatePassword$,
   reloadFees: () => console.log('reloadFees'),
   reloadBalances: () => console.log('reloadBalances'),
-  fees: RD.success({ source: baseAmount(10000000), target: baseAmount(3000) }),
+  fees$: () => Rx.of(RD.success({ source: baseAmount(10000000), target: baseAmount(1000000) })),
   targetWalletAddress: O.some('wallet-address'),
   onChangePath: (path) => console.log('change path', path),
   network: 'testnet'

@@ -64,7 +64,7 @@ const getExplorerAddressByChain$ = (chain: string): GetExplorerAddressUrl$ => {
 
     case ETHChain:
       // not available yet
-      return explorerUrlFailure$
+      return ETH.getExplorerAddressUrl$
 
     case THORChain:
       return THOR.getExplorerAddressUrl$
