@@ -517,7 +517,7 @@ export const Swap = ({
     () =>
       FP.pipe(
         oSwapFeesParams,
-        O.map((p) => chainFee$(p)),
+        O.map(chainFee$),
         O.getOrElse<SwapFeesLD>(() => Rx.of(RD.initial))
       ),
     RD.initial
