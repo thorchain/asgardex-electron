@@ -54,7 +54,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
 
   const { depositFees$, symDeposit$, reloadDepositFees, symDepositTxMemo$, getExplorerUrlByAsset$ } = useChainContext()
 
-  const [depositFees] = useObservableState(() => depositFees$('sym'), RD.initial)
+  const [depositFees] = useObservableState(() => depositFees$({ type: 'sym' }), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
   const {

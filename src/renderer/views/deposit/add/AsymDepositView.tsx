@@ -60,7 +60,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
     getExplorerUrlByAsset$
   } = useChainContext()
 
-  const [depositFees] = useObservableState(() => depositFees$('asym'), RD.initial)
+  const [depositFees] = useObservableState(() => depositFees$({ type: 'asym' }), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
   const {

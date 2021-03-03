@@ -1,5 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import {
+  BaseAmount,
   BCHChain,
   BNBChain,
   BTCChain,
@@ -22,6 +24,7 @@ import { DepositType } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as BCH from '../../bitcoincash'
+import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import { selectedPoolChain$ } from '../../midgard/common'
 import * as THOR from '../../thorchain'
@@ -62,7 +65,17 @@ export const reloadFees$: Rx.Observable<O.Option<LoadFeesHandler>> = selectedPoo
 // State to reload deposit fees
 const { get$: reloadDepositFees$, set: reloadDepositFees } = observableState<DepositType>('asym')
 
-const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
+const depositFeeByChain$ = ({
+  chain,
+  type,
+  recipient,
+  amount
+}: {
+  chain: Chain
+  type: DepositType
+  recipient?: Address
+  amount?: BaseAmount
+}): FeeLD => {
   switch (chain) {
     case BNBChain:
       return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
@@ -82,8 +95,12 @@ const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
       )
     case THORChain:
       return THOR.fees$().pipe(liveData.map(({ fast }) => fast))
-    case ETHChain:
+    case ETHChain: {
+      if (recipient && amount) {
+        ETH.fees$({ recipient, amount, memo: undefined })
+      }
       return Rx.of(RD.failure(Error('Deposit fee for ETH has not been implemented')))
+    }
     case CosmosChain:
       return Rx.of(RD.failure(Error('Deposit fee for Cosmos has not been implemented')))
     case PolkadotChain:
@@ -119,7 +136,7 @@ const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
   }
 }
 
-const depositFees$ = (type: DepositType): DepositFeesLD =>
+const depositFees$ = ({ type }: { type: DepositType }): DepositFeesLD =>
   FP.pipe(
     Rx.combineLatest([selectedPoolChain$, reloadDepositFees$]),
     RxOp.switchMap(([oPoolChain]) =>
@@ -130,9 +147,9 @@ const depositFees$ = (type: DepositType): DepositFeesLD =>
             Rx.combineLatest(
               type === 'asym'
                 ? // for asym deposits, one tx needed at asset chain only == one fee)
-                  [depositFeeByChain$(chain, type)]
+                  [depositFeeByChain$({ chain, type })]
                 : // for sym deposits, two txs at thorchain an asset chain needed == 2 fees,
-                  [depositFeeByChain$(chain, type), depositFeeByChain$('THOR', type)]
+                  [depositFeeByChain$({ chain, type }), depositFeeByChain$({ chain: 'THOR', type })]
             ),
             RxOp.map(sequenceTRDFromArray),
             liveData.map(([asset, thor]) => ({
