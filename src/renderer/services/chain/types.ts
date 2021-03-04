@@ -1,12 +1,13 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, FeeOptionKey, Fees, Tx } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { TxTypes } from '../../types/asgardex'
+import { DepositType, TxTypes } from '../../types/asgardex'
 import { ApiError, TxHashRD } from '../wallet/types'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
@@ -44,6 +45,19 @@ export type SymDepositMemoRx = Rx.Observable<O.Option<SymDepositMemo>>
 export type DepositFees = { thor: O.Option<BaseAmount>; asset: BaseAmount }
 export type DepositFeesRD = RD.RemoteData<Error, DepositFees>
 export type DepositFeesLD = LiveData<Error, DepositFees>
+export type SymDepositAmounts = { rune: BaseAmount; asset: BaseAmount }
+
+export type DepositFeesParams = {
+  readonly asset: Asset
+  readonly amount?: O.Option<BaseAmount>
+  readonly memo: O.Option<Memo>
+  readonly recipient?: O.Option<Address>
+  readonly type: DepositType
+}
+
+export type DepositFeesHandler = (p: DepositFeesParams) => DepositFeesLD
+
+export type LoadDepositFeesHandler = FP.Lazy<void>
 
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
@@ -87,7 +101,7 @@ export type SwapFeeParams = {
   readonly recipient: O.Option<Address>
   readonly asset: Asset
   readonly amount: BaseAmount
-  readonly memo?: string
+  readonly memo?: Memo
 }
 
 export type SwapFeesParams = {
@@ -147,7 +161,7 @@ export type SymDepositState$ = Rx.Observable<SymDepositState>
 export type SymDepositParams = {
   readonly poolAddress: O.Option<string>
   readonly asset: Asset
-  readonly amounts: { rune: BaseAmount; asset: BaseAmount }
+  readonly amounts: SymDepositAmounts
   readonly memos: SymDepositMemo
 }
 

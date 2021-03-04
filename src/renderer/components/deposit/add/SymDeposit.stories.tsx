@@ -32,10 +32,13 @@ const defaultProps: SymDepositProps = {
   chainAssetBalance: O.some(assetToBase(assetAmount(55))),
   onChangeAsset: (a: Asset) => console.log('change asset', a),
   reloadFees: () => console.log('reload fees'),
-  fees: RD.success({
-    thor: O.some(baseAmount(100)),
-    asset: baseAmount(12300)
-  }),
+  fees$: () =>
+    Rx.of(
+      RD.success({
+        thor: O.some(baseAmount(100)),
+        asset: baseAmount(12300)
+      })
+    ),
   poolData: {
     assetBalance: baseAmount('1000'),
     runeBalance: baseAmount('2000')

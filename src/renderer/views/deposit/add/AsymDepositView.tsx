@@ -60,7 +60,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
     getExplorerUrlByAsset$
   } = useChainContext()
 
-  const [depositFees] = useObservableState(() => depositFees$({ type: 'asym' }), RD.initial)
+  // const [depositFees] = useObservableState(() => depositFees$({ type: 'asym' }), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
   const {
@@ -140,7 +140,9 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
           assetPrice={ZERO_BN}
           assetBalance={O.none}
           chainAssetBalance={O.none}
-          fees={depositFees}
+          // eslint-disable-next-line
+          // @ts-ignore
+          fees$={depositFees$}
           reloadFees={FP.constVoid}
           priceAsset={selectedPricePoolAsset}
           disabled={true}
@@ -157,7 +159,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
       validatePassword$,
       viewAssetTx,
       asset,
-      depositFees,
+      depositFees$,
       selectedPricePoolAsset,
       reloadBalances,
       asymDeposit$,
@@ -186,7 +188,9 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
               chainAssetBalance={chainAssetBalance}
               poolAddress={oPoolAddress}
               memo={memo}
-              fees={depositFees}
+              // eslint-disable-next-line
+              // @ts-ignore
+              fees$={depositFees$}
               reloadFees={reloadDepositFees}
               priceAsset={selectedPricePoolAsset}
               reloadBalances={reloadBalances}
