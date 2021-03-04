@@ -12,7 +12,8 @@ import {
   AssetRuneNative,
   baseAmount,
   formatAssetAmount,
-  formatAssetAmountCurrency
+  formatAssetAmountCurrency,
+  delay
 } from '@xchainjs/xchain-util'
 import { eqString } from 'fp-ts/Eq'
 import * as A from 'fp-ts/lib/Array'
@@ -204,17 +205,23 @@ export const Swap = ({
     [oSwapParams, swapData.swapResult, targetAssetProp, targetWalletAddress]
   )
 
-  const chainFee$ = useMemo(() => fees$, [fees$])
+  const chainFees$ = useMemo(() => fees$, [fees$])
 
   const [chainFeesRD] = useObservableState<SwapFeesRD>(
     () =>
       FP.pipe(
         oSwapFeesParams,
-        O.map(chainFee$),
+        O.map(chainFees$),
         O.getOrElse<SwapFeesLD>(() => Rx.of(RD.initial))
       ),
     RD.initial
   )
+
+  // reset `pendingSwitchAssets`
+  // whenever chain fees will be succeeded or failed
+  useEffect(() => {
+    if (RD.success(chainFeesRD) || RD.isFailure(chainFeesRD)) setPendingSwitchAssets(false)
+  }, [chainFeesRD])
 
   const reloadFeesHandler = useCallback(() => {
     FP.pipe(oSwapFeesParams, O.map(reloadFees))
@@ -224,7 +231,13 @@ export const Swap = ({
   const [swapStartTime, setSwapStartTime] = useState<number>(0)
 
   const setSourceAsset = useCallback(
-    (asset: Asset) => {
+    async (asset: Asset) => {
+      // update `pendingSwitchAssets` state
+      setPendingSwitchAssets(true)
+
+      // delay to avoid render issues while switching
+      await delay(100)
+
       FP.pipe(
         targetAsset,
         O.map((targetAsset) =>
@@ -241,7 +254,13 @@ export const Swap = ({
   )
 
   const setTargetAsset = useCallback(
-    (asset: Asset) => {
+    async (asset: Asset) => {
+      // update `pendingSwitchAssets` state
+      setPendingSwitchAssets(true)
+
+      // delay to avoid render issues while switching
+      await delay(100)
+
       FP.pipe(
         sourceAsset,
         O.map((sourceAsset) =>
@@ -350,35 +369,6 @@ export const Swap = ({
       O.getOrElse(() => allAssets)
     )
   }, [allAssets, assetsToSwap])
-
-  const canSwitchAssets = useMemo(
-    () =>
-      FP.pipe(
-        walletBalances,
-        O.map(A.map(({ asset }) => asset.symbol)),
-        (oAssetSymbols) => sequenceTOption(oAssetSymbols, targetAsset),
-        O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqString)(targetAsset.symbol))),
-        O.getOrElse(() => true)
-      ),
-    [walletBalances, targetAsset]
-  )
-
-  const onSwitchAssets = useCallback(() => {
-    if (!canSwitchAssets) {
-      return
-    }
-    FP.pipe(
-      assetsToSwap,
-      O.map(({ source, target }) =>
-        onChangePath(
-          swap.path({
-            target: assetToString(source),
-            source: assetToString(target)
-          })
-        )
-      )
-    )
-  }, [assetsToSwap, onChangePath, canSwitchAssets])
 
   const balanceLabel = useMemo(
     () => `${intl.formatMessage({ id: 'swap.balance' })}: ${formatBN(baseToAsset(sourceAssetAmount).amount())}`,
@@ -544,15 +534,21 @@ export const Swap = ({
     )
   }, [closePasswordModal, oSwapParams, subscribeSwapState, swap$])
 
-  const sourceChainError: boolean = useMemo(
-    () =>
-      FP.pipe(
-        chainFeesRD,
-        RD.getOrElse(() => ({ source: ZERO_BASE_AMOUNT, target: ZERO_BASE_AMOUNT })),
-        ({ source }) => sourceChainAssetAmount.amount().minus(source.amount()).isNegative()
-      ),
-    [chainFeesRD, sourceChainAssetAmount]
-  )
+  // Flag for pending assets state
+  // needed to avoid race condition of fee errors and balances
+  // while switching assets and reloading fees
+  const [pendingSwitchAssets, setPendingSwitchAssets] = useState(false)
+
+  const sourceChainError: boolean = useMemo(() => {
+    // never error while switching assets
+    if (pendingSwitchAssets) return false
+
+    return FP.pipe(
+      chainFeesRD,
+      RD.getOrElse(() => ({ source: ZERO_BASE_AMOUNT, target: ZERO_BASE_AMOUNT })),
+      ({ source }) => sourceChainAssetAmount.amount().minus(source.amount()).isNegative()
+    )
+  }, [chainFeesRD, pendingSwitchAssets, sourceChainAssetAmount])
 
   const sourceChainErrorLabel: JSX.Element = useMemo(() => {
     if (!sourceChainError) {
@@ -609,12 +605,12 @@ export const Swap = ({
   }, [chainFeesRD, targetAsset, poolData])
 
   const targetChainFeeError = useMemo((): boolean => {
-    if (amountToSwap.amount().isZero()) {
-      return false
-    }
+    // check zero swap amounts and status of `pending assets`
+    if (amountToSwap.amount().isZero() || pendingSwitchAssets) return false
+
     const targetFee = FP.pipe(targetChainFeeAmountInTargetAsset, baseToAsset, (assetAmount) => assetAmount.amount())
     return swapData.swapResult.amount().minus(targetFee).isNegative()
-  }, [targetChainFeeAmountInTargetAsset, swapData, amountToSwap])
+  }, [amountToSwap, pendingSwitchAssets, targetChainFeeAmountInTargetAsset, swapData.swapResult])
 
   const swapResultLabel = useMemo(
     () =>
@@ -688,6 +684,42 @@ export const Swap = ({
     }
   }, [reset, setAmountToSwap, sourceAssetProp, targetAssetProp])
 
+  const canSwitchAssets = useMemo(() => {
+    const hasBalances = FP.pipe(
+      walletBalances,
+      O.map(A.map(({ asset }) => asset.symbol)),
+      (oAssetSymbols) => sequenceTOption(oAssetSymbols, targetAsset),
+      O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqString)(targetAsset.symbol))),
+      O.getOrElse(() => true)
+    )
+
+    // no switch if no balances or while switching assets
+    return hasBalances && !pendingSwitchAssets
+  }, [walletBalances, pendingSwitchAssets, targetAsset])
+
+  const onSwitchAssets = useCallback(async () => {
+    if (!canSwitchAssets) {
+      return
+    }
+
+    // update `pendingSwitchAsset` state
+    setPendingSwitchAssets(true)
+    // delay to avoid render issues while switching
+    await delay(100)
+
+    FP.pipe(
+      assetsToSwap,
+      O.map(({ source, target }) =>
+        onChangePath(
+          swap.path({
+            target: assetToString(source),
+            source: assetToString(target)
+          })
+        )
+      )
+    )
+  }, [canSwitchAssets, assetsToSwap, onChangePath])
+
   return (
     <Styled.Container>
       <Styled.ContentContainer>
@@ -721,7 +753,13 @@ export const Swap = ({
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <AssetSelect onSelect={setSourceAsset} asset={asset} assets={assetsToSwapFrom} network={network} />
+                  <AssetSelect
+                    onSelect={setSourceAsset}
+                    asset={asset}
+                    assets={assetsToSwapFrom}
+                    disabled={!canSwitchAssets}
+                    network={network}
+                  />
                 )
               )
             )}
@@ -744,7 +782,13 @@ export const Swap = ({
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <AssetSelect onSelect={setTargetAsset} asset={asset} assets={assetsToSwapTo} network={network} />
+                  <AssetSelect
+                    onSelect={setTargetAsset}
+                    asset={asset}
+                    assets={assetsToSwapTo}
+                    disabled={!canSwitchAssets}
+                    network={network}
+                  />
                 )
               )
             )}
