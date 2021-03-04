@@ -22,6 +22,7 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { isChainAsset } from '../../../helpers/assetHelper'
+import { eqBaseAmount } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
@@ -149,10 +150,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
           return (
             oldParams.asset.chain === newParams.asset.chain &&
             // Check for the first enter to the page when chain or amount was not changed
-            !(O.isNone(oldParams.memos) && O.isSome(newParams.memos))
+            !(O.isNone(oldParams.memos) && O.isSome(newParams.memos)) &&
+            // Check if entered amount was changed
+            eqBaseAmount.equals(oldParams.amount, newParams.amount)
           )
         }),
-        RxOp.switchMap(chainFees$)
+        RxOp.switchMap((params) => chainFees$({ ...params, amount: params.amount }))
       ),
     RD.initial
   )
@@ -165,7 +168,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
      */
     setDepositFees({
       asset,
-      amount: O.some(assetAmountToDeposit),
+      amount: assetAmountToDeposit,
       memos: oMemo,
       recipient: oPoolAddress,
       type: 'sym'

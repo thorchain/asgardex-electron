@@ -145,7 +145,7 @@ const depositFees$ = (params: DepositFeesParams): DepositFeesLD =>
             ? // for asym deposits, one tx needed at asset chain only == one fee)
               [
                 depositFeeByChain$({
-                  amount: params.amount,
+                  amount: O.some(params.amount),
                   memo: params.memo,
                   asset: params.asset,
                   recipient: params.recipient
@@ -154,7 +154,7 @@ const depositFees$ = (params: DepositFeesParams): DepositFeesLD =>
             : // for sym deposits, two txs at thorchain an asset chain needed == 2 fees,
               [
                 depositFeeByChain$({
-                  amount: params.amount,
+                  amount: O.some(params.amount),
                   memo: FP.pipe(
                     params.memos,
                     O.map(({ asset }) => asset)

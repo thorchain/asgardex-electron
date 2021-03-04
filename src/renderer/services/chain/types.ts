@@ -49,7 +49,7 @@ export type SymDepositAmounts = { rune: BaseAmount; asset: BaseAmount }
 
 export type AsymDepositFeesParams = {
   readonly asset: Asset
-  readonly amount?: O.Option<BaseAmount>
+  readonly amount: BaseAmount
   readonly memo: O.Option<Memo>
   readonly recipient?: O.Option<Address>
   readonly type: 'asym'
@@ -57,7 +57,7 @@ export type AsymDepositFeesParams = {
 
 export type SymDepositFeesParams = {
   readonly asset: Asset
-  readonly amount?: O.Option<BaseAmount>
+  readonly amount: BaseAmount
   readonly memos: O.Option<SymDepositMemo>
   readonly recipient?: O.Option<Address>
   readonly type: 'sym'
