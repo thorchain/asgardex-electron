@@ -10,7 +10,7 @@ import { AssetData } from '../assetData/AssetData'
 
 const filterFunction = (asset: Asset, searchTerm: string) => {
   const { ticker } = asset
-  return ticker?.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0
+  return ticker?.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
 }
 
 type Props = {

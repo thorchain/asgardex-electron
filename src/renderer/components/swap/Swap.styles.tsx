@@ -130,6 +130,7 @@ export const InValueLabel = styled(UILabel).attrs({
   color: 'normal'
 })`
   padding-bottom: 0;
+  font-size: 24px;
 `
 
 export const SubmitContainer = styled('div')`
