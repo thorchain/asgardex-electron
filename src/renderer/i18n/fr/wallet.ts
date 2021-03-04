@@ -21,7 +21,7 @@ const wallet: WalletMessages = {
   'wallet.unlock.instruction': 'Veuillez déverrouiller votre portefeuille',
   'wallet.unlock.phrase': 'Entrez votre phrase de récupération',
   'wallet.unlock.error': 'Impossible de déverrouiller le portefeuille. Veuillez vérifier votre mot de passe et réessayez',
-  'wallet.imports.keystore.select': 'sélectionner le fichier keystore',
+  'wallet.imports.keystore.select': 'Sélectionner le fichier keystore',
   'wallet.imports.keystore.upload': 'Choisir le fichier à uploader',
   'wallet.imports.phrase': 'Phrase',
   'wallet.imports.wallet': 'Importer un portefeuille existant',
