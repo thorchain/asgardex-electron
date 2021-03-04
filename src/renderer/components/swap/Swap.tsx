@@ -144,7 +144,7 @@ export const Swap = ({
   const sourceChainAsset = useMemo(() => getChainAsset(sourceAssetProp.chain), [sourceAssetProp])
 
   // User balance for source chain asset
-  const sourceChainAssetBalance: BaseAmount = useMemo(
+  const sourceChainAssetAmount: BaseAmount = useMemo(
     () =>
       FP.pipe(
         getWalletBalanceByAsset(walletBalances, O.some(sourceChainAsset)),
@@ -265,16 +265,16 @@ export const Swap = ({
       RD.toOption(chainFeesRD),
       O.fold(
         // Ingnore fees and use balance of source chain asset for max.
-        () => sourceChainAssetBalance,
+        () => sourceChainAssetAmount,
         ({ source: sourceFee }) => {
-          let max = sourceChainAssetBalance.amount().minus(sourceFee.amount())
+          let max = sourceChainAssetAmount.amount().minus(sourceFee.amount())
           max = max.isGreaterThan(0) ? max : ZERO_BN
-          return baseAmount(max, sourceChainAssetBalance.decimal)
+          return baseAmount(max, sourceChainAssetAmount.decimal)
         }
       )
     )
     return eqAsset.equals(sourceChainAsset, sourceAssetProp) ? maxChainAssetAmount : sourceAssetAmount
-  }, [sourceAssetAmount, chainFeesRD, sourceAssetProp, sourceChainAsset, sourceChainAssetBalance])
+  }, [sourceAssetAmount, chainFeesRD, sourceAssetProp, sourceChainAsset, sourceChainAssetAmount])
 
   const setAmountToSwap = useCallback(
     (targetAmount: BaseAmount) => {
@@ -543,18 +543,18 @@ export const Swap = ({
     )
   }, [closePasswordModal, oSwapParams, subscribeSwapState, swap$])
 
-  const sourceChainBalanceError: boolean = useMemo(
+  const sourceChainError: boolean = useMemo(
     () =>
       FP.pipe(
         chainFeesRD,
         RD.getOrElse(() => ({ source: ZERO_BASE_AMOUNT, target: ZERO_BASE_AMOUNT })),
-        ({ source }) => sourceChainAssetBalance.amount().minus(source.amount()).isNegative()
+        ({ source }) => sourceChainAssetAmount.amount().minus(source.amount()).isNegative()
       ),
-    [chainFeesRD, sourceChainAssetBalance]
+    [chainFeesRD, sourceChainAssetAmount]
   )
 
   const sourceChainErrorLabel: JSX.Element = useMemo(() => {
-    if (!sourceChainBalanceError) {
+    if (!sourceChainError) {
       return <></>
     }
 
@@ -581,7 +581,7 @@ export const Swap = ({
       )),
       O.getOrElse(() => <></>)
     )
-  }, [sourceChainBalanceError, chainFeesRD, intl, sourceAssetProp, sourceAssetAmount, sourceChainAsset])
+  }, [sourceChainError, chainFeesRD, intl, sourceAssetProp, sourceAssetAmount, sourceChainAsset])
 
   const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
     const fees = FP.pipe(
@@ -716,7 +716,7 @@ export const Swap = ({
               onChange={setAmountToSwap}
               onBlur={reloadFeesHandler}
               amount={amountToSwap}
-              hasError={sourceChainBalanceError || targetChainFeeError}
+              hasError={sourceChainError || targetChainFeeError}
             />
             {FP.pipe(
               sourceAsset,
