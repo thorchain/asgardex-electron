@@ -266,12 +266,13 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     FP.pipe(
       sequenceTOption(amountToSend, sendAddress),
       O.map(([amount, recipient]) => {
-        return reloadFeesHandler({ asset: balance.asset, amount, recipient })
+        reloadFeesHandler({ asset: balance.asset, amount, recipient, memo: form.getFieldValue('memo') })
+        return true
       })
     )
 
     return false
-  }, [balance.asset, reloadFeesHandler, sendAddress, amountToSend])
+  }, [amountToSend, sendAddress, reloadFeesHandler, balance.asset, form])
 
   // State for visibility of Modal to confirm tx
   const [showPwModal, setShowPwModal] = useState(false)
@@ -372,7 +373,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               {renderFeeError}
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
               <Form.Item name="memo">
-                <Input size="large" disabled={isLoading} />
+                <Input size="large" disabled={isLoading} onBlur={reloadFees} />
               </Form.Item>
               <Form.Item name="fee">{renderFeeOptions}</Form.Item>
             </Styled.SubForm>
