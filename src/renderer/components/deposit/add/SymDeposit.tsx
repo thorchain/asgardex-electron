@@ -132,8 +132,34 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const chainFees$ = useMemo(() => fees$, [fees$])
 
-  const depositFeesParams: DepositFeesParams = useMemo(
-    () => ({
+  const [depositFeesRD, setDepositFees] = useObservableState<DepositFeesRD, DepositFeesParams>(
+    (params$) =>
+      FP.pipe(
+        params$,
+        /**
+         * To debounce changes when amount is changed
+         */
+        RxOp.debounceTime(500),
+        RxOp.distinctUntilChanged((oldParams, newParams) => {
+          /**
+           * Pass values only in cases when:
+           * 1 - chain was changed
+           * 2 - Amount to deposit was changed. Some chains' fess depends on amount too (e.g. ETH)
+           */
+          return oldParams.asset.chain === newParams.asset.chain
+        }),
+        RxOp.switchMap(chainFees$)
+      ),
+    RD.initial
+  )
+
+  useEffect(() => {
+    /**
+     * Update stream's data manually as useObservableState(() => stream$)'s
+     * init function called only once and the only way to interact with stream$
+     * is passing new values to the parameters
+     */
+    setDepositFees({
       asset,
       amount: O.some(assetAmountToDeposit),
       memo: FP.pipe(
@@ -142,27 +168,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       ),
       recipient: oPoolAddress,
       type: 'sym'
-    }),
-    [asset, assetAmountToDeposit, oMemo, oPoolAddress]
-  )
-
-  const [depositFeesRD, setDepositFees] = useObservableState<DepositFeesRD, DepositFeesParams>(
-    (params$) =>
-      FP.pipe(
-        params$,
-        RxOp.debounceTime(500),
-        RxOp.distinctUntilChanged((oldParams, newParams) => {
-          return oldParams.asset.chain === newParams.asset.chain
-        }),
-        // RxOp.tap((params) => console.log('params - ', params)),
-        RxOp.switchMap(chainFees$)
-      ),
-    RD.initial
-  )
-
-  useEffect(() => {
-    setDepositFees(depositFeesParams)
-  }, [setDepositFees, depositFeesParams])
+    })
+  }, [setDepositFees, asset, assetAmountToDeposit, oMemo, oPoolAddress])
 
   const oThorchainFee: O.Option<BaseAmount> = useMemo(
     () =>
