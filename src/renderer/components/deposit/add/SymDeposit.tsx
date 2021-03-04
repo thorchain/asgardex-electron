@@ -32,7 +32,7 @@ import {
   LoadDepositFeesHandler,
   DepositFeesHandler,
   DepositFeesRD,
-  DepositFeesParams
+  SymDepositFeesParams
 } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
@@ -132,7 +132,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const chainFees$ = useMemo(() => fees$, [fees$])
 
-  const [depositFeesRD, setDepositFees] = useObservableState<DepositFeesRD, DepositFeesParams>(
+  const [depositFeesRD, setDepositFees] = useObservableState<DepositFeesRD, SymDepositFeesParams>(
     (params$) =>
       FP.pipe(
         params$,
@@ -146,7 +146,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
            * 1 - chain was changed
            * 2 - Amount to deposit was changed. Some chains' fess depends on amount too (e.g. ETH)
            */
-          return oldParams.asset.chain === newParams.asset.chain
+          return (
+            oldParams.asset.chain === newParams.asset.chain &&
+            // Check for the first enter to the page when chain or amount was not changed
+            !(O.isNone(oldParams.memos) && O.isSome(newParams.memos))
+          )
         }),
         RxOp.switchMap(chainFees$)
       ),
@@ -162,10 +166,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     setDepositFees({
       asset,
       amount: O.some(assetAmountToDeposit),
-      memo: FP.pipe(
-        oMemo,
-        O.map(({ asset }) => asset)
-      ),
+      memos: oMemo,
       recipient: oPoolAddress,
       type: 'sym'
     })

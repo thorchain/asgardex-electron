@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { DepositType, TxTypes } from '../../types/asgardex'
+import { TxTypes } from '../../types/asgardex'
 import { ApiError, TxHashRD } from '../wallet/types'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
@@ -47,13 +47,23 @@ export type DepositFeesRD = RD.RemoteData<Error, DepositFees>
 export type DepositFeesLD = LiveData<Error, DepositFees>
 export type SymDepositAmounts = { rune: BaseAmount; asset: BaseAmount }
 
-export type DepositFeesParams = {
+export type AsymDepositFeesParams = {
   readonly asset: Asset
   readonly amount?: O.Option<BaseAmount>
   readonly memo: O.Option<Memo>
   readonly recipient?: O.Option<Address>
-  readonly type: DepositType
+  readonly type: 'asym'
 }
+
+export type SymDepositFeesParams = {
+  readonly asset: Asset
+  readonly amount?: O.Option<BaseAmount>
+  readonly memos: O.Option<SymDepositMemo>
+  readonly recipient?: O.Option<Address>
+  readonly type: 'sym'
+}
+
+export type DepositFeesParams = AsymDepositFeesParams | SymDepositFeesParams
 
 export type DepositFeesHandler = (p: DepositFeesParams) => DepositFeesLD
 

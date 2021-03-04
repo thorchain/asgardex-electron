@@ -1,6 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import {
+  Asset,
   AssetRuneNative,
+  BaseAmount,
   BCHChain,
   BNBChain,
   BTCChain,
@@ -26,8 +29,7 @@ import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import { selectedPoolChain$ } from '../../midgard/common'
 import * as THOR from '../../thorchain'
-import { symDepositAssetTxMemo$, asymDepositTxMemo$ } from '../memo'
-import { FeeLD, LoadFeesHandler, DepositFeesParams, DepositFeesLD } from '../types'
+import { FeeLD, LoadFeesHandler, DepositFeesParams, DepositFeesLD, Memo } from '../types'
 
 export const reloadFees = () => {
   BNB.reloadFees()
@@ -63,43 +65,44 @@ export const reloadFees$: Rx.Observable<O.Option<LoadFeesHandler>> = selectedPoo
 // Trigger stream to reload deposit fees
 const { stream$: reloadDepositFees$, trigger: reloadDepositFees } = triggerStream()
 
+type DepositByChainParams = {
+  asset: Asset
+  recipient?: O.Option<Address>
+  amount?: O.Option<BaseAmount>
+  memo?: O.Option<Memo>
+}
+
 const depositFeeByChain$ = ({
   asset: { chain },
-  type,
   recipient = O.none,
-  amount = O.none
-}: DepositFeesParams): FeeLD => {
+  amount = O.none,
+  memo = O.none
+}: DepositByChainParams): FeeLD => {
   switch (chain) {
     case BNBChain:
       return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
-    case BTCChain:
+    case BTCChain: {
       // deposit fee for BTC txs based on a memo,
       // and memo depends on deposit type
-      return Rx.iif(() => type === 'asym', asymDepositTxMemo$, symDepositAssetTxMemo$).pipe(
-        RxOp.switchMap((oMemo) =>
-          FP.pipe(
-            oMemo,
-            O.fold(
-              () => Rx.of(RD.initial),
-              (memo) => BTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
-            )
-          )
+      return FP.pipe(
+        memo,
+        O.fold(
+          () => Rx.of(RD.initial),
+          (memo) => BTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
         )
       )
-    case THORChain:
+    }
+
+    case THORChain: {
       return THOR.fees$().pipe(liveData.map(({ fast }) => fast))
+    }
     case ETHChain: {
-      return Rx.iif(() => type === 'asym', asymDepositTxMemo$, symDepositAssetTxMemo$).pipe(
-        RxOp.switchMap((oMemo) =>
-          FP.pipe(
-            oMemo,
-            O.chain((memo) => sequenceSOption({ recipient, amount, memo: O.some(memo) })),
-            O.fold(
-              () => Rx.of(RD.initial),
-              ({ recipient, amount, memo }) =>
-                ETH.fees$({ recipient, amount, memo }).pipe(liveData.map((fees) => fees.fast))
-            )
-          )
+      return FP.pipe(
+        sequenceSOption({ recipient, amount, memo }),
+        O.fold(
+          () => Rx.of(RD.initial),
+          ({ recipient, amount, memo }) =>
+            ETH.fees$({ recipient, amount, memo }).pipe(liveData.map((fees) => fees.fast))
         )
       )
     }
@@ -107,34 +110,28 @@ const depositFeeByChain$ = ({
       return Rx.of(RD.failure(Error('Deposit fee for Cosmos has not been implemented')))
     case PolkadotChain:
       return Rx.of(RD.failure(Error('Deposit fee for Polkadot has not been implemented')))
-    case BCHChain:
+    case BCHChain: {
       // deposit fee for BCH txs based on a memo,
       // and memo depends on deposit type
-      return Rx.iif(() => type === 'asym', asymDepositTxMemo$, symDepositAssetTxMemo$).pipe(
-        RxOp.switchMap((oMemo) =>
-          FP.pipe(
-            oMemo,
-            O.fold(
-              () => Rx.of(RD.initial),
-              (memo) => BCH.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
-            )
-          )
+      return FP.pipe(
+        memo,
+        O.fold(
+          () => Rx.of(RD.initial),
+          (memo) => BCH.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
         )
       )
-    case LTCChain:
+    }
+    case LTCChain: {
       // deposit fee for LTC txs based on a memo,
       // and memo depends on deposit type
-      return Rx.iif(() => type === 'asym', asymDepositTxMemo$, symDepositAssetTxMemo$).pipe(
-        RxOp.switchMap((oMemo) =>
-          FP.pipe(
-            oMemo,
-            O.fold(
-              () => Rx.of(RD.initial),
-              (memo) => LTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
-            )
-          )
+      return FP.pipe(
+        memo,
+        O.fold(
+          () => Rx.of(RD.initial),
+          (memo) => LTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
         )
       )
+    }
   }
 }
 
@@ -146,14 +143,31 @@ const depositFees$ = (params: DepositFeesParams): DepositFeesLD =>
         Rx.combineLatest(
           params.type === 'asym'
             ? // for asym deposits, one tx needed at asset chain only == one fee)
-              [depositFeeByChain$(params)]
+              [
+                depositFeeByChain$({
+                  amount: params.amount,
+                  memo: params.memo,
+                  asset: params.asset,
+                  recipient: params.recipient
+                })
+              ]
             : // for sym deposits, two txs at thorchain an asset chain needed == 2 fees,
               [
-                depositFeeByChain$(params),
+                depositFeeByChain$({
+                  amount: params.amount,
+                  memo: FP.pipe(
+                    params.memos,
+                    O.map(({ asset }) => asset)
+                  ),
+                  asset: params.asset,
+                  recipient: params.recipient
+                }),
                 depositFeeByChain$({
                   asset: AssetRuneNative,
-                  type: params.type,
-                  memo: O.none
+                  memo: FP.pipe(
+                    params.memos,
+                    O.map(({ rune }) => rune)
+                  )
                 })
               ]
         ),

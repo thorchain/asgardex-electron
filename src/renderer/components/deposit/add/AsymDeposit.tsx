@@ -30,7 +30,7 @@ import {
   AsymDepositStateHandler,
   LoadDepositFeesHandler,
   DepositFeesHandler,
-  DepositFeesParams,
+  AsymDepositFeesParams,
   DepositFeesRD
 } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
@@ -115,7 +115,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
 
   const chainFees$ = useMemo(() => fees$, [fees$])
 
-  const [depositFeesRD, setDepositFees] = useObservableState<DepositFeesRD, DepositFeesParams>(
+  const [depositFeesRD, setDepositFees] = useObservableState<DepositFeesRD, AsymDepositFeesParams>(
     (params$) =>
       FP.pipe(
         params$,
@@ -129,7 +129,11 @@ export const AsymDeposit: React.FC<Props> = (props) => {
            * 1 - chain was changed
            * 2 - Amount to deposit was changed. Some chains' fess depends on amount too (e.g. ETH)
            */
-          return oldParams.asset.chain === newParams.asset.chain
+          return (
+            oldParams.asset.chain === newParams.asset.chain &&
+            // Check for the first enter to the page when chain or amount was not changed
+            !(O.isNone(oldParams.memo) && O.isSome(newParams.memo))
+          )
         }),
         RxOp.switchMap(chainFees$)
       ),
