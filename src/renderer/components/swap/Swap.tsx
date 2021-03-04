@@ -9,9 +9,10 @@ import {
   formatBN,
   baseToAsset,
   BaseAmount,
-  formatAssetAmountCurrency,
   AssetRuneNative,
-  baseAmount
+  baseAmount,
+  formatAssetAmount,
+  formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { eqString } from 'fp-ts/Eq'
 import * as A from 'fp-ts/lib/Array'
@@ -618,13 +619,10 @@ export const Swap = ({
   const swapResultLabel = useMemo(
     () =>
       FP.pipe(
-        targetAsset,
-        O.map((asset) =>
-          formatAssetAmountCurrency({ amount: baseToAsset(swapData.swapResult), asset, trimZeros: true })
-        ),
+        O.some(formatAssetAmount({ amount: baseToAsset(swapData.swapResult), trimZeros: true })),
         O.getOrElse(() => formatBN(ZERO_BN))
       ),
-    [targetAsset, swapData]
+    [swapData]
   )
 
   const targetChainFeeErrorLabel = useMemo(() => {
