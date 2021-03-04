@@ -13,7 +13,9 @@ import {
   baseAmount,
   formatAssetAmount,
   formatAssetAmountCurrency,
-  delay
+  delay,
+  assetAmount,
+  assetToBase
 } from '@xchainjs/xchain-util'
 import { eqString } from 'fp-ts/Eq'
 import * as A from 'fp-ts/lib/Array'
@@ -205,6 +207,20 @@ export const Swap = ({
     [oSwapParams, swapData.swapResult, targetAssetProp, targetWalletAddress]
   )
 
+  // Flag for pending assets state
+  // needed to avoid race condition of fee errors and balances
+  // while switching assets and reloading fees
+  const [pendingSwitchAssets, _setPendingSwitchAssets] = useState(false)
+
+  const setPendingSwitchAssets = useCallback(
+    (value: boolean) => {
+      if (!isLocked(keystore)) {
+        _setPendingSwitchAssets(value)
+      }
+    },
+    [keystore]
+  )
+
   const chainFees$ = useMemo(() => fees$, [fees$])
 
   const [chainFeesRD] = useObservableState<SwapFeesRD>(
@@ -221,7 +237,7 @@ export const Swap = ({
   // whenever chain fees will be succeeded or failed
   useEffect(() => {
     if (RD.success(chainFeesRD) || RD.isFailure(chainFeesRD)) setPendingSwitchAssets(false)
-  }, [chainFeesRD])
+  }, [chainFeesRD, setPendingSwitchAssets])
 
   const reloadFeesHandler = useCallback(() => {
     FP.pipe(oSwapFeesParams, O.map(reloadFees))
@@ -250,7 +266,7 @@ export const Swap = ({
         )
       )
     },
-    [onChangePath, targetAsset]
+    [onChangePath, setPendingSwitchAssets, targetAsset]
   )
 
   const setTargetAsset = useCallback(
@@ -273,13 +289,16 @@ export const Swap = ({
         )
       )
     },
-    [onChangePath, sourceAsset]
+    [onChangePath, setPendingSwitchAssets, sourceAsset]
   )
 
   // Max amount to swap
   // depends on users balances of source asset
   // and of fees to pay for source chain txs
   const maxAmountToSwap: BaseAmount = useMemo(() => {
+    // make sure not logged in user can play around with swap
+    if (isLocked(keystore) || !hasImportedKeystore(keystore)) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER))
+
     // max amount for sourc chain asset
     const maxChainAssetAmount: BaseAmount = FP.pipe(
       RD.toOption(chainFeesRD),
@@ -294,7 +313,7 @@ export const Swap = ({
       )
     )
     return eqAsset.equals(sourceChainAsset, sourceAssetProp) ? maxChainAssetAmount : sourceAssetAmount
-  }, [sourceAssetAmount, chainFeesRD, sourceAssetProp, sourceChainAsset, sourceChainAssetAmount])
+  }, [keystore, chainFeesRD, sourceChainAsset, sourceAssetProp, sourceAssetAmount, sourceChainAssetAmount])
 
   const setAmountToSwap = useCallback(
     (targetAmount: BaseAmount) => {
@@ -534,11 +553,6 @@ export const Swap = ({
     )
   }, [closePasswordModal, oSwapParams, subscribeSwapState, swap$])
 
-  // Flag for pending assets state
-  // needed to avoid race condition of fee errors and balances
-  // while switching assets and reloading fees
-  const [pendingSwitchAssets, setPendingSwitchAssets] = useState(false)
-
   const sourceChainError: boolean = useMemo(() => {
     // never error while switching assets
     if (pendingSwitchAssets) return false
@@ -718,7 +732,7 @@ export const Swap = ({
         )
       )
     )
-  }, [canSwitchAssets, assetsToSwap, onChangePath])
+  }, [canSwitchAssets, setPendingSwitchAssets, assetsToSwap, onChangePath])
 
   return (
     <Styled.Container>
