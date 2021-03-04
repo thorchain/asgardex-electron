@@ -22,6 +22,7 @@ export const AssetSelectMenuWrapper = styled.div<{ minWidth?: number }>`
 `
 
 export const DropdownIcon = styled(CaretDownOutlined)`
+  cursor: ${({ disabled = false }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: transform 0.2s ease-in-out;
   ${({ open }) => (open ? 'transform: rotate(180deg);' : 'transform: rotate(0);')}
   font-size: 18px;
@@ -29,6 +30,7 @@ export const DropdownIcon = styled(CaretDownOutlined)`
   svg {
     font-size: 22px;
     color: ${palette('primary', 0)};
+    opacity: ${({ disabled = false }) => (disabled ? 0.5 : 1)};
   }
 `
 
@@ -38,13 +40,13 @@ export const DropdownIconHolder = styled.div`
 `
 
 export const AssetDropdownButton = styled.button`
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   ${({ disabled }) => css`
     display: flex;
     flex-direction: row;
     align-items: center;
     background: transparent;
     border: none;
-    cursor: pointer;
     padding: 0;
     &:focus {
       outline: none;

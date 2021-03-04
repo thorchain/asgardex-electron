@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react'
 
 import { delay, Asset, assetToString } from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
+import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
@@ -19,14 +20,15 @@ import { AssetSelectData } from './AssetSelectData'
 
 type DropdownCarretProps = {
   open: boolean
-  onClick?: () => void
+  onClick?: FP.Lazy<void>
+  disabled?: boolean
 }
 
 const DropdownCarret: React.FC<DropdownCarretProps> = (props: DropdownCarretProps): JSX.Element => {
-  const { open, onClick = () => {} } = props
+  const { open, onClick = FP.constVoid, disabled = false } = props
   return (
     <DropdownIconHolder>
-      <DropdownIcon open={open} onClick={onClick} />
+      <DropdownIcon open={open} onClick={onClick} disabled={disabled} />
     </DropdownIconHolder>
   )
 }
@@ -41,6 +43,7 @@ type Props = {
   className?: string
   minWidth?: number
   showAssetName?: boolean
+  disabled?: boolean
   network: Network
 }
 
@@ -56,6 +59,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
     className,
     minWidth,
     showAssetName,
+    disabled = false,
     network
   } = props
 
@@ -106,10 +110,10 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   }, [assets, intl, asset, closeMenu, handleChangeAsset, priceIndex, searchDisable, withSearch, minWidth, network])
 
   const renderDropDownButton = () => {
-    const disabled = assets.length === 0
+    const hideButton = assets.length === 0
     return (
-      <AssetDropdownButton disabled={disabled} onClick={handleDropdownButtonClicked}>
-        {!disabled ? <DropdownCarret open={openDropdown} /> : null}
+      <AssetDropdownButton disabled={hideButton || disabled} onClick={handleDropdownButtonClicked}>
+        {!hideButton ? <DropdownCarret open={openDropdown} disabled={disabled} /> : null}
       </AssetDropdownButton>
     )
   }
