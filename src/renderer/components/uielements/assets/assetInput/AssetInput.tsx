@@ -2,6 +2,7 @@ import React, { useRef, useCallback } from 'react'
 
 import { assetAmount, assetToBase, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/lib/function'
 
 import { FixmeType } from '../../../../types/asgardex'
 import { InputBigNumber } from '../../input'
@@ -15,6 +16,7 @@ type Props = {
   label: string
   inputProps?: AssetInputProps
   onChange: (value: BaseAmount) => void
+  onBlur?: FP.Lazy<void>
   className?: string
 }
 
@@ -27,7 +29,17 @@ type Props = {
  * Decimal of `InputBigNumber` depends on `decimal` of given `amount`.
  */
 export const AssetInput: React.FC<Props> = (props): JSX.Element => {
-  const { title, amount, status, label, inputProps = {}, className = '', onChange, ...otherProps } = props
+  const {
+    title,
+    amount,
+    status,
+    label,
+    inputProps = {},
+    className = '',
+    onChange,
+    onBlur: onBlurHandler = FP.constVoid,
+    ...otherProps
+  } = props
 
   const inputRef = useRef<FixmeType>()
 
@@ -53,6 +65,7 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
         <InputBigNumber
           value={baseToAsset(amount).amount()}
           onChange={onChangeHandler}
+          onBlur={onBlurHandler}
           size={'large'}
           {...inputProps}
           decimal={amount.decimal}
