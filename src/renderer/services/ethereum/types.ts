@@ -28,3 +28,9 @@ export type SendTxParams = {
 export type TransactionService = C.TransactionService<SendTxParams>
 
 export type FeesService = C.FeesService<FeesParams>
+
+export type ApproveParams = {
+  spender: Address
+  sender: Address
+  amount?: BaseAmount
+}
