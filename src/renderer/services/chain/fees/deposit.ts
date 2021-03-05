@@ -19,7 +19,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { eqBaseAmount, eqChain } from '../../../helpers/fp/eq'
+import { eqDepositFeesParams } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTRDFromArray } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
@@ -140,12 +140,7 @@ const depositFees$ = (initialParams: DepositFeesParams): DepositFeesLD =>
          * 1 - chain was changed
          * 2 - Amount to deposit was changed. Some chains' fess depends on amount too (e.g. ETH)
          */
-        return (
-          // Check if entered chain was changed
-          eqChain.equals(prev.asset.chain, next.asset.chain) &&
-          // Check if entered amount was changed
-          eqBaseAmount.equals(prev.amount, next.amount)
-        )
+        return eqDepositFeesParams.equals(prev, next)
       }
       return false
     }),

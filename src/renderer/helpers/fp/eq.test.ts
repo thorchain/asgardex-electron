@@ -3,6 +3,7 @@ import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount, bn, Chain } from '@xch
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { SymDepositFeesParams } from '../../services/chain/types'
 import { PoolShare } from '../../services/midgard/types'
 import { ApiError, ErrorId } from '../../services/wallet/types'
 import {
@@ -144,6 +145,40 @@ describe('helpers/fp/eq', () => {
       }
       // c = same as a, but another asset
       const c: Balance = {
+        ...a,
+        asset: AssetRuneNative
+      }
+      expect(eqBalance.equals(a, b)).toBeFalsy()
+      expect(eqBalance.equals(a, c)).toBeFalsy()
+    })
+  })
+
+  describe('eqDepositFeesParams', () => {
+    it('is equal', () => {
+      const a: SymDepositFeesParams = {
+        memos: O.none,
+        recipient: O.none,
+        type: 'sym',
+        amount: baseAmount('1'),
+        asset: AssetBNB
+      }
+      expect(eqBalance.equals(a, a)).toBeTruthy()
+    })
+    it('is not equal', () => {
+      const a: SymDepositFeesParams = {
+        memos: O.none,
+        recipient: O.none,
+        type: 'sym',
+        amount: baseAmount('1'),
+        asset: AssetBNB
+      }
+      // b = same as a, but another amount
+      const b: SymDepositFeesParams = {
+        ...a,
+        amount: baseAmount('2')
+      }
+      // c = same as a, but another asset
+      const c: SymDepositFeesParams = {
         ...a,
         asset: AssetRuneNative
       }
