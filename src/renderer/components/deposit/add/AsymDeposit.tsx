@@ -16,12 +16,10 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { isChainAsset } from '../../../helpers/assetHelper'
-import { eqBaseAmount } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
@@ -116,47 +114,23 @@ export const AsymDeposit: React.FC<Props> = (props) => {
 
   const chainFees$ = useMemo(() => fees$, [fees$])
 
-  const [depositFeesRD, setDepositFees] = useObservableState<DepositFeesRD, AsymDepositFeesParams>(
-    (params$) =>
-      FP.pipe(
-        params$,
-        /**
-         * To debounce changes when amount is changed
-         */
-        RxOp.debounceTime(500),
-        RxOp.distinctUntilChanged((oldParams, newParams) => {
-          /**
-           * Pass values only in cases when:
-           * 1 - chain was changed
-           * 2 - Amount to deposit was changed. Some chains' fess depends on amount too (e.g. ETH)
-           */
-          return (
-            oldParams.asset.chain === newParams.asset.chain &&
-            // Check for the first enter to the page when chain or amount was not changed
-            !(O.isNone(oldParams.memo) && O.isSome(newParams.memo)) &&
-            // Check if entered amount was changed
-            eqBaseAmount.equals(oldParams.amount, newParams.amount)
-          )
-        }),
-        RxOp.switchMap(chainFees$)
-      ),
-    RD.initial
-  )
-
-  useEffect(() => {
-    /**
-     * Update stream's data manually as useObservableState(() => stream$)'s
-     * init function called only once and the only way to interact with stream$
-     * is passing new values to the parameters
-     */
-    setDepositFees({
+  const depositFeesParams: AsymDepositFeesParams = useMemo(
+    () => ({
       asset,
       amount: assetAmountToDeposit,
       memo: oMemo,
       recipient: oPoolAddress,
       type: 'asym'
-    })
-  }, [setDepositFees, asset, assetAmountToDeposit, oMemo, oPoolAddress])
+    }),
+    [asset, assetAmountToDeposit, oMemo, oPoolAddress]
+  )
+
+  const [depositFeesRD] = useObservableState<DepositFeesRD>(() => chainFees$(depositFeesParams), RD.initial)
+
+  // reload fees whenever params have been changed
+  useEffect(() => {
+    reloadFees(depositFeesParams)
+  }, [depositFeesParams, reloadFees])
 
   const oAssetChainFee: O.Option<BaseAmount> = useMemo(
     () =>
@@ -406,6 +380,10 @@ export const AsymDeposit: React.FC<Props> = (props) => {
 
   const disabledForm = useMemo(() => isBalanceError || disabled, [disabled, isBalanceError])
 
+  const reloadFeesHadler = useCallback(() => {
+    reloadFees(depositFeesParams)
+  }, [depositFeesParams, reloadFees])
+
   return (
     <Styled.Container>
       <Styled.BalanceErrorRow>
@@ -434,7 +412,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
       <Styled.FeesRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.FeeRow>
-            <Fees fees={uiFeesRD} reloadFees={reloadFees} />
+            <Fees fees={uiFeesRD} reloadFees={reloadFeesHadler} />
           </Styled.FeeRow>
           <Styled.FeeErrorRow>
             <Col>

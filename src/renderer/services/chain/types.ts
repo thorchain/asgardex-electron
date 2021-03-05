@@ -1,7 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, FeeOptionKey, Fees, Tx } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
-import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
@@ -67,7 +66,7 @@ export type DepositFeesParams = AsymDepositFeesParams | SymDepositFeesParams
 
 export type DepositFeesHandler = (p: DepositFeesParams) => DepositFeesLD
 
-export type LoadDepositFeesHandler = FP.Lazy<void>
+export type LoadDepositFeesHandler = (p: DepositFeesParams) => void
 
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
