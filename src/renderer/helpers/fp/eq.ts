@@ -6,6 +6,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
 import * as O from 'fp-ts/lib/Option'
 
+import { DepositFeesParams } from '../../services/chain/types'
 import { PoolShare } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { WalletBalance } from '../../types/wallet'
@@ -36,6 +37,14 @@ export const eqOptionBaseAmount = O.getEq(eqBaseAmount)
 
 export const eqBalance: Eq.Eq<Balance> = {
   equals: (x, y) => eqAsset.equals(x.asset, y.asset) && eqBaseAmount.equals(x.amount, y.amount)
+}
+
+export const eqDepositFeesParams: Eq.Eq<DepositFeesParams> = {
+  equals: (x, y) =>
+    // Check if entered chain was changed
+    eqChain.equals(x.asset.chain, y.asset.chain) &&
+    // Check if entered amount was changed
+    eqBaseAmount.equals(x.amount, y.amount)
 }
 
 export const eqErrorId = Eq.eqString

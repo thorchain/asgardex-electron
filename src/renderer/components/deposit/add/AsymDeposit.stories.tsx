@@ -30,10 +30,13 @@ const defaultProps: AsymDepositProps = {
   chainAssetBalance: O.some(assetToBase(assetAmount(55))),
   onChangeAsset: (a: Asset) => console.log('change asset', a),
   reloadFees: () => console.log('reload fees'),
-  fees: RD.success({
-    thor: O.none,
-    asset: baseAmount(123)
-  }),
+  fees$: () =>
+    Rx.of(
+      RD.success({
+        thor: O.none,
+        asset: baseAmount(123)
+      })
+    ),
   poolData: {
     assetBalance: baseAmount('1000'),
     runeBalance: baseAmount('2000')
@@ -80,10 +83,13 @@ BalanceError.storyName = 'balance error'
 export const FeeError: Story = () => {
   const props: AsymDepositProps = {
     ...defaultProps,
-    fees: RD.success({
-      thor: O.some(baseAmount(2)),
-      asset: baseAmount(123)
-    }),
+    fees$: () =>
+      Rx.of(
+        RD.success({
+          thor: O.some(baseAmount(2)),
+          asset: baseAmount(123)
+        })
+      ),
     assetBalance: O.some(baseAmount(1)),
     chainAssetBalance: O.some(baseAmount(1))
   }
