@@ -1,5 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import {
+  Asset,
+  AssetRuneNative,
+  BaseAmount,
   BCHChain,
   BNBChain,
   BTCChain,
@@ -15,25 +19,18 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { sequenceTRDFromArray } from '../../../helpers/fpHelpers'
+import { eqDepositFeesParams } from '../../../helpers/fp/eq'
+import { sequenceSOption, sequenceTRDFromArray } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
-import { DepositType } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as BCH from '../../bitcoincash'
+import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import { selectedPoolChain$ } from '../../midgard/common'
 import * as THOR from '../../thorchain'
-import { symDepositAssetTxMemo$, asymDepositTxMemo$ } from '../memo'
-import { FeeLD, LoadFeesHandler, DepositFeesLD } from '../types'
-
-export const reloadFees = () => {
-  BNB.reloadFees()
-  BTC.reloadFees()
-  THOR.reloadFees()
-  BCH.reloadFees()
-}
+import { FeeLD, LoadFeesHandler, DepositFeesParams, DepositFeesLD, Memo } from '../types'
 
 const reloadFeesByChain = (chain: Chain) => {
   switch (chain) {
@@ -60,64 +57,131 @@ export const reloadFees$: Rx.Observable<O.Option<LoadFeesHandler>> = selectedPoo
 )
 
 // State to reload deposit fees
-const { get$: reloadDepositFees$, set: reloadDepositFees } = observableState<DepositType>('asym')
+const { get$: reloadDepositFees$, set: reloadDepositFees } = observableState<DepositFeesParams | undefined>(undefined)
 
-const depositFeeByChain$ = (chain: Chain, type: DepositType): FeeLD => {
+type DepositByChainParams = {
+  asset: Asset
+  recipient?: O.Option<Address>
+  amount?: O.Option<BaseAmount>
+  memo?: O.Option<Memo>
+}
+
+const depositFeeByChain$ = ({
+  asset: { chain },
+  recipient = O.none,
+  amount = O.none,
+  memo = O.none
+}: DepositByChainParams): FeeLD => {
   switch (chain) {
     case BNBChain:
       return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
-    case BTCChain:
+    case BTCChain: {
       // deposit fee for BTC txs based on a memo,
       // and memo depends on deposit type
-      return Rx.iif(() => type === 'asym', asymDepositTxMemo$, symDepositAssetTxMemo$).pipe(
-        RxOp.switchMap((oMemo) =>
-          FP.pipe(
-            oMemo,
-            O.fold(
-              () => Rx.of(RD.initial),
-              (memo) => BTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
-            )
-          )
+      return FP.pipe(
+        memo,
+        O.fold(
+          () => Rx.of(RD.initial),
+          (memo) => BTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
         )
       )
-    case THORChain:
+    }
+
+    case THORChain: {
       return THOR.fees$().pipe(liveData.map(({ fast }) => fast))
-    case ETHChain:
-      return Rx.of(RD.failure(Error('Deposit fee for ETH has not been implemented')))
+    }
+    case ETHChain: {
+      return FP.pipe(
+        sequenceSOption({ recipient, amount, memo }),
+        O.fold(
+          () => Rx.of(RD.initial),
+          ({ recipient, amount, memo }) =>
+            ETH.fees$({ recipient, amount, memo }).pipe(liveData.map((fees) => fees.fast))
+        )
+      )
+    }
     case CosmosChain:
       return Rx.of(RD.failure(Error('Deposit fee for Cosmos has not been implemented')))
     case PolkadotChain:
       return Rx.of(RD.failure(Error('Deposit fee for Polkadot has not been implemented')))
-    case BCHChain:
-      return BCH.fees$().pipe(liveData.map(({ fast }) => fast))
-    case LTCChain:
-      return LTC.fees$().pipe(liveData.map(({ fast }) => fast))
+    case BCHChain: {
+      // deposit fee for BCH txs based on a memo,
+      // and memo depends on deposit type
+      return FP.pipe(
+        memo,
+        O.fold(
+          () => Rx.of(RD.initial),
+          (memo) => BCH.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
+        )
+      )
+    }
+    case LTCChain: {
+      // deposit fee for LTC txs based on a memo,
+      // and memo depends on deposit type
+      return FP.pipe(
+        memo,
+        O.fold(
+          () => Rx.of(RD.initial),
+          (memo) => LTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
+        )
+      )
+    }
   }
 }
 
-const depositFees$ = (type: DepositType): DepositFeesLD =>
+const depositFees$ = (initialParams: DepositFeesParams): DepositFeesLD =>
   FP.pipe(
-    Rx.combineLatest([selectedPoolChain$, reloadDepositFees$]),
-    RxOp.switchMap(([oPoolChain]) =>
+    reloadDepositFees$,
+    RxOp.debounceTime(300),
+    RxOp.distinctUntilChanged((prev, next) => {
+      if (prev && next) {
+        /**
+         * Pass values only in cases when:
+         * 1 - chain was changed
+         * 2 - Amount to deposit was changed. Some chains' fess depends on amount too (e.g. ETH)
+         */
+        return eqDepositFeesParams.equals(prev, next)
+      }
+      return false
+    }),
+    RxOp.switchMap((params = initialParams) =>
       FP.pipe(
-        oPoolChain,
-        O.map((chain) =>
-          FP.pipe(
-            Rx.combineLatest(
-              type === 'asym'
-                ? // for asym deposits, one tx needed at asset chain only == one fee)
-                  [depositFeeByChain$(chain, type)]
-                : // for sym deposits, two txs at thorchain an asset chain needed == 2 fees,
-                  [depositFeeByChain$(chain, type), depositFeeByChain$('THOR', type)]
-            ),
-            RxOp.map(sequenceTRDFromArray),
-            liveData.map(([asset, thor]) => ({
-              asset,
-              thor: O.fromNullable(thor)
-            }))
-          )
+        Rx.combineLatest(
+          params.type === 'asym'
+            ? // for asym deposits, one tx needed at asset chain only == one fee)
+              [
+                depositFeeByChain$({
+                  amount: O.some(params.amount),
+                  memo: params.memo,
+                  asset: params.asset,
+                  recipient: params.recipient
+                })
+              ]
+            : // for sym deposits, two txs at thorchain an asset chain needed == 2 fees,
+              [
+                depositFeeByChain$({
+                  amount: O.some(params.amount),
+                  memo: FP.pipe(
+                    params.memos,
+                    O.map(({ asset }) => asset)
+                  ),
+                  asset: params.asset,
+                  recipient: params.recipient
+                }),
+                depositFeeByChain$({
+                  asset: AssetRuneNative,
+                  memo: FP.pipe(
+                    params.memos,
+                    O.map(({ rune }) => rune)
+                  )
+                })
+              ]
         ),
-        O.getOrElse((): DepositFeesLD => Rx.of(RD.initial))
+        RxOp.map(sequenceTRDFromArray),
+        liveData.map(([asset, thor]) => ({
+          asset,
+          thor: O.fromNullable(thor)
+        }))
       )
     )
   )

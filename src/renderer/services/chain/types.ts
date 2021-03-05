@@ -44,6 +44,29 @@ export type SymDepositMemoRx = Rx.Observable<O.Option<SymDepositMemo>>
 export type DepositFees = { thor: O.Option<BaseAmount>; asset: BaseAmount }
 export type DepositFeesRD = RD.RemoteData<Error, DepositFees>
 export type DepositFeesLD = LiveData<Error, DepositFees>
+export type SymDepositAmounts = { rune: BaseAmount; asset: BaseAmount }
+
+export type AsymDepositFeesParams = {
+  readonly asset: Asset
+  readonly amount: BaseAmount
+  readonly memo: O.Option<Memo>
+  readonly recipient?: O.Option<Address>
+  readonly type: 'asym'
+}
+
+export type SymDepositFeesParams = {
+  readonly asset: Asset
+  readonly amount: BaseAmount
+  readonly memos: O.Option<SymDepositMemo>
+  readonly recipient?: O.Option<Address>
+  readonly type: 'sym'
+}
+
+export type DepositFeesParams = AsymDepositFeesParams | SymDepositFeesParams
+
+export type DepositFeesHandler = (p: DepositFeesParams) => DepositFeesLD
+
+export type LoadDepositFeesHandler = (p: DepositFeesParams) => void
 
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
@@ -87,7 +110,7 @@ export type SwapFeeParams = {
   readonly recipient: O.Option<Address>
   readonly asset: Asset
   readonly amount: BaseAmount
-  readonly memo?: string
+  readonly memo?: Memo
 }
 
 export type SwapFeesParams = {
@@ -147,7 +170,7 @@ export type SymDepositState$ = Rx.Observable<SymDepositState>
 export type SymDepositParams = {
   readonly poolAddress: O.Option<string>
   readonly asset: Asset
-  readonly amounts: { rune: BaseAmount; asset: BaseAmount }
+  readonly amounts: SymDepositAmounts
   readonly memos: SymDepositMemo
 }
 

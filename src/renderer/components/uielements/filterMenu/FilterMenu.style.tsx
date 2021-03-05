@@ -25,4 +25,9 @@ export const Menu = styled(AntdMenu)`
   .ant-menu-item {
     height: auto;
   }
+
+  .ant-input-affix-wrapper {
+    height: 100%;
+    box-shadow: none !important;
+  }
 `

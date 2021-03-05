@@ -14,6 +14,7 @@ import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
@@ -22,10 +23,17 @@ import { isChainAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
-import { Memo, DepositFeesRD, AsymDepositState, AsymDepositStateHandler } from '../../../services/chain/types'
+import {
+  Memo,
+  AsymDepositState,
+  AsymDepositStateHandler,
+  LoadDepositFeesHandler,
+  DepositFeesHandler,
+  AsymDepositFeesParams,
+  DepositFeesRD
+} from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
-import { DepositType } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
@@ -43,8 +51,8 @@ export type Props = {
   poolAddress: O.Option<PoolAddress>
   memo: O.Option<Memo>
   priceAsset?: Asset
-  fees: DepositFeesRD
-  reloadFees: (type: DepositType) => void
+  reloadFees: LoadDepositFeesHandler
+  fees$: DepositFeesHandler
   reloadBalances: FP.Lazy<void>
   viewAssetTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
@@ -75,7 +83,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     priceAsset,
     reloadFees,
     reloadBalances = FP.constVoid,
-    fees,
+    fees$,
     onChangeAsset,
     disabled = false,
     deposit$,
@@ -104,14 +112,29 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     [oAssetBalance]
   )
 
+  const chainFees$ = useMemo(() => fees$, [fees$])
+
+  const depositFeesParams: AsymDepositFeesParams = useMemo(
+    () => ({
+      asset,
+      amount: assetAmountToDeposit,
+      memo: oMemo,
+      recipient: oPoolAddress,
+      type: 'asym'
+    }),
+    [asset, assetAmountToDeposit, oMemo, oPoolAddress]
+  )
+
+  const [depositFeesRD] = useObservableState<DepositFeesRD>(() => chainFees$(depositFeesParams), RD.initial)
+
   const oAssetChainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        fees,
+        depositFeesRD,
         RD.toOption,
         O.map(({ asset }) => asset)
       ),
-    [fees]
+    [depositFeesRD]
   )
 
   const maxAssetAmountToDeposit: BaseAmount = useMemo(() => {
@@ -229,8 +252,6 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     )
   }, [oChainAssetBalance, oAssetChainFee, renderFeeError, asset])
 
-  const reloadFeesHandler = useCallback(() => reloadFees('asym'), [reloadFees])
-
   const txModalExtraContent = useMemo(() => {
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
@@ -346,13 +367,17 @@ export const AsymDeposit: React.FC<Props> = (props) => {
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
-        fees,
+        depositFeesRD,
         RD.map(({ asset: assetFeeAmount }) => [{ asset, amount: assetFeeAmount }])
       ),
-    [asset, fees]
+    [asset, depositFeesRD]
   )
 
   const disabledForm = useMemo(() => isBalanceError || disabled, [disabled, isBalanceError])
+
+  const reloadFeesHandler = useCallback(() => {
+    reloadFees(depositFeesParams)
+  }, [depositFeesParams, reloadFees])
 
   return (
     <Styled.Container>
@@ -372,8 +397,10 @@ export const AsymDeposit: React.FC<Props> = (props) => {
             percentValue={percentValueToDeposit}
             onChangePercent={changePercentHandler}
             onChangeAsset={onChangeAsset}
+            inputOnBlurHandler={reloadFeesHandler}
             priceAsset={priceAsset}
             network={network}
+            onAfterSliderChange={reloadFeesHandler}
           />
         </Col>
         <Col xs={24} xl={12}></Col>

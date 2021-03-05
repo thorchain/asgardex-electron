@@ -25,7 +25,7 @@ export const AssetSelectDataWrapper = styled.div<AssetSelectDataWrapperProps>`
   }
 
   .assetSelectData-asset-info {
-    margin-left: ${({ hasTarget }) => (hasTarget ? '0px' : '4px')} !important;
+    margin-left: ${({ hasTarget }) => (hasTarget ? '0px' : '8px')} !important;
   }
 
   .assetSelectData-asset-info,
