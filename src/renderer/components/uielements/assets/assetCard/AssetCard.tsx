@@ -46,6 +46,7 @@ type Props = {
   onChangePercent?: (percent: number) => void
   disabled?: boolean
   network: Network
+  onAfterSliderChange?: (value: number) => void
 }
 
 export const AssetCard: React.FC<Props> = (props): JSX.Element => {
@@ -69,7 +70,8 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     selectedAmount,
     maxAmount,
     disabled,
-    network
+    network,
+    onAfterSliderChange
   } = props
 
   const [openDropdown, setOpenDropdown] = useState(false)
@@ -178,6 +180,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
       {withPercentSlider && (
         <Styled.SliderWrapper>
           <Slider
+            onAfterChange={onAfterSliderChange}
             disabled={disabled}
             value={percentValue}
             onChange={onChangePercent}

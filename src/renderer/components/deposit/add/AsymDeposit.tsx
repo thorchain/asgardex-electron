@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
@@ -126,11 +126,6 @@ export const AsymDeposit: React.FC<Props> = (props) => {
   )
 
   const [depositFeesRD] = useObservableState<DepositFeesRD>(() => chainFees$(depositFeesParams), RD.initial)
-
-  // reload fees whenever params have been changed
-  useEffect(() => {
-    reloadFees(depositFeesParams)
-  }, [depositFeesParams, reloadFees])
 
   const oAssetChainFee: O.Option<BaseAmount> = useMemo(
     () =>
@@ -380,7 +375,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
 
   const disabledForm = useMemo(() => isBalanceError || disabled, [disabled, isBalanceError])
 
-  const reloadFeesHadler = useCallback(() => {
+  const reloadFeesHandler = useCallback(() => {
     reloadFees(depositFeesParams)
   }, [depositFeesParams, reloadFees])
 
@@ -402,8 +397,10 @@ export const AsymDeposit: React.FC<Props> = (props) => {
             percentValue={percentValueToDeposit}
             onChangePercent={changePercentHandler}
             onChangeAsset={onChangeAsset}
+            inputOnBlurHandler={reloadFeesHandler}
             priceAsset={priceAsset}
             network={network}
+            onAfterSliderChange={reloadFeesHandler}
           />
         </Col>
         <Col xs={24} xl={12}></Col>
@@ -412,7 +409,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
       <Styled.FeesRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.FeeRow>
-            <Fees fees={uiFeesRD} reloadFees={reloadFeesHadler} />
+            <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} />
           </Styled.FeeRow>
           <Styled.FeeErrorRow>
             <Col>
