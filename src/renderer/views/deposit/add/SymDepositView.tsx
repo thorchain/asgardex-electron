@@ -54,7 +54,6 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
 
   const { depositFees$, symDeposit$, reloadDepositFees, symDepositTxMemo$, getExplorerUrlByAsset$ } = useChainContext()
 
-  const [depositFees] = useObservableState(() => depositFees$('sym'), RD.initial)
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
   const {
@@ -160,7 +159,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
           assetBalance={O.none}
           runeBalance={O.none}
           chainAssetBalance={O.none}
-          fees={depositFees}
+          fees$={depositFees$}
           reloadFees={FP.constVoid}
           priceAsset={selectedPricePoolAsset}
           disabled={true}
@@ -178,7 +177,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
       viewRuneTx,
       viewAssetTx,
       asset,
-      depositFees,
+      depositFees$,
       selectedPricePoolAsset,
       reloadBalances,
       symDeposit$,
@@ -210,7 +209,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
               chainAssetBalance={chainAssetBalance}
               poolAddress={oPoolAddress}
               memo={depositTxMemo}
-              fees={depositFees}
+              fees$={depositFees$}
               reloadFees={reloadDepositFees}
               priceAsset={selectedPricePoolAsset}
               reloadBalances={reloadBalances}

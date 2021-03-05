@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState, useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
@@ -15,6 +15,7 @@ import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
@@ -23,10 +24,17 @@ import { isChainAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
-import { SymDepositMemo, DepositFeesRD, SymDepositState, SymDepositStateHandler } from '../../../services/chain/types'
+import {
+  SymDepositMemo,
+  SymDepositState,
+  SymDepositStateHandler,
+  LoadDepositFeesHandler,
+  DepositFeesHandler,
+  DepositFeesRD,
+  SymDepositFeesParams
+} from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
-import { DepositType } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
@@ -47,8 +55,8 @@ export type Props = {
   poolAddress: O.Option<PoolAddress>
   memo: O.Option<SymDepositMemo>
   priceAsset?: Asset
-  fees: DepositFeesRD
-  reloadFees: (type: DepositType) => void
+  reloadFees: LoadDepositFeesHandler
+  fees$: DepositFeesHandler
   reloadBalances: FP.Lazy<void>
   viewAssetTx: (txHash: string) => void
   viewRuneTx: (txHash: string) => void
@@ -80,7 +88,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     priceAsset,
     reloadFees,
     reloadBalances = FP.constVoid,
-    fees,
+    fees$,
     onChangeAsset,
     disabled = false,
     poolData,
@@ -121,14 +129,38 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oRuneBalance]
   )
 
+  const chainFees$ = useMemo(() => fees$, [fees$])
+
+  const depositFeesParams: SymDepositFeesParams = useMemo(
+    () => ({
+      asset,
+      amount: assetAmountToDeposit,
+      memos: oMemo,
+      recipient: oPoolAddress,
+      type: 'sym'
+    }),
+    [asset, assetAmountToDeposit, oMemo, oPoolAddress]
+  )
+
+  const [depositFeesRD] = useObservableState<DepositFeesRD>(() => chainFees$(depositFeesParams), RD.initial)
+
+  const reloadFeesHadler = useCallback(() => {
+    reloadFees(depositFeesParams)
+  }, [depositFeesParams, reloadFees])
+
+  // reload fees whenever params have been changed
+  useEffect(() => {
+    reloadFees(depositFeesParams)
+  }, [depositFeesParams, reloadFees])
+
   const oThorchainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        fees,
-        RD.toOption,
-        O.chain(({ thor }) => thor)
+        depositFeesRD,
+        RD.map(({ thor }) => thor),
+        FP.flow(RD.toOption, O.flatten)
       ),
-    [fees]
+    [depositFeesRD]
   )
 
   const maxRuneAmountToDeposit = useMemo((): BaseAmount => {
@@ -150,11 +182,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const oAssetChainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        fees,
-        RD.toOption,
-        O.map(({ asset }) => asset)
+        depositFeesRD,
+        RD.map(({ asset }) => asset),
+        RD.toOption
       ),
-    [fees]
+    [depositFeesRD]
   )
 
   const maxAssetAmountToDeposit = useMemo((): BaseAmount => {
@@ -295,6 +327,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [maxAssetAmountToDeposit, maxRuneAmountToDeposit]
   )
 
+  const onChangeAssetHandler = useCallback(
+    (asset: Asset) => {
+      onChangeAsset(asset)
+      changePercentHandler(0)
+    },
+    [changePercentHandler, onChangeAsset]
+  )
+
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
   const confirmDepositHandler = useCallback(() => {
@@ -366,8 +406,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [oChainAssetBalance, oAssetChainFee, renderFeeError, asset])
 
-  const reloadFeesHandler = useCallback(() => reloadFees('sym'), [reloadFees])
-
   const txModalExtraContent = useMemo(() => {
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
@@ -402,7 +440,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const onFinishTxModal = useCallback(() => {
     resetDepositState()
     reloadBalances()
-  }, [reloadBalances, resetDepositState])
+    changePercentHandler(0)
+  }, [reloadBalances, resetDepositState, changePercentHandler])
 
   const renderTxModal = useMemo(() => {
     const { deposit: depositRD, depositTxs: symDepositTxs } = depositState
@@ -526,22 +565,24 @@ export const SymDeposit: React.FC<Props> = (props) => {
     isBalanceError,
     isThorchainFeeError
   ])
-
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
-        fees,
-        RD.map(({ asset: assetFeeAmount, thor: oThorFeeAmount }) => {
-          const fees = [{ asset, amount: assetFeeAmount }]
-
-          return FP.pipe(
-            oThorFeeAmount,
-            O.map((thorFeeAmount) => [...fees, { asset: AssetRuneNative, amount: thorFeeAmount }]),
-            O.getOrElse(() => fees)
+        depositFeesRD,
+        RD.map(({ asset: assetFeeAmount, thor }) =>
+          FP.pipe(
+            thor,
+            O.fold(
+              () => [{ asset, amount: assetFeeAmount }],
+              (thorAmount) => [
+                { asset, amount: assetFeeAmount },
+                { asset: AssetRuneNative, amount: thorAmount }
+              ]
+            )
           )
-        })
+        )
       ),
-    [asset, fees]
+    [depositFeesRD, asset]
   )
 
   return (
@@ -565,7 +606,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             assets={assets}
             percentValue={percentValueToDeposit}
             onChangePercent={changePercentHandler}
-            onChangeAsset={onChangeAsset}
+            onChangeAsset={onChangeAssetHandler}
             priceAsset={priceAsset}
             network={network}
           />
@@ -590,7 +631,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       <Styled.FeesRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.FeeRow>
-            <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} />
+            <Fees fees={uiFeesRD} reloadFees={reloadFeesHadler} />
           </Styled.FeeRow>
           <Styled.FeeErrorRow>
             <Col>
