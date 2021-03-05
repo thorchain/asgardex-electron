@@ -327,6 +327,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [maxAssetAmountToDeposit, maxRuneAmountToDeposit]
   )
 
+  const onChangeAssetHandler = useCallback(
+    (asset: Asset) => {
+      onChangeAsset(asset)
+      changePercentHandler(0)
+    },
+    [changePercentHandler, onChangeAsset]
+  )
+
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
   const confirmDepositHandler = useCallback(() => {
@@ -432,7 +440,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const onFinishTxModal = useCallback(() => {
     resetDepositState()
     reloadBalances()
-  }, [reloadBalances, resetDepositState])
+    changePercentHandler(0)
+  }, [reloadBalances, resetDepositState, changePercentHandler])
 
   const renderTxModal = useMemo(() => {
     const { deposit: depositRD, depositTxs: symDepositTxs } = depositState
@@ -597,7 +606,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             assets={assets}
             percentValue={percentValueToDeposit}
             onChangePercent={changePercentHandler}
-            onChangeAsset={onChangeAsset}
+            onChangeAsset={onChangeAssetHandler}
             priceAsset={priceAsset}
             network={network}
           />
