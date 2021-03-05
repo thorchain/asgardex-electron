@@ -58,7 +58,7 @@ import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
-import { getSwapData, assetWithPriceToAsset, pickAssetWithPrice } from './Swap.utils'
+import { getSwapData, assetWithPriceToAsset, pickAssetWithPrice, convertToBase8 } from './Swap.utils'
 
 export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string }
 
@@ -347,7 +347,7 @@ export const Swap = ({
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
 
   const assetSymbolsInWallet: O.Option<string[]> = useMemo(
-    () => FP.pipe(walletBalances, O.map(A.map(({ asset }) => asset.symbol))),
+    () => FP.pipe(walletBalances, O.map(A.map(({ asset }) => asset.symbol.toUpperCase()))),
     [walletBalances]
   )
 
@@ -612,7 +612,7 @@ export const Swap = ({
 
         return eqAsset.equals(chainAsset, asset)
           ? fees.target
-          : getValueOfAsset1InAsset2(fees.target, chainAssetPoolData, assetPoolData)
+          : getValueOfAsset1InAsset2(convertToBase8(fees.target), chainAssetPoolData, assetPoolData)
       }),
       O.getOrElse(() => ZERO_BASE_AMOUNT)
     )
