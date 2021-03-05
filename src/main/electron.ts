@@ -47,9 +47,7 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = `${IS_DEV}`
 log.debug(`Starting Electron main process`)
 
 // Enable keyboard shortcuts and optionally activate DevTools on each created `BrowserWindow`.
-// electronDebug({ isEnabled: IS_DEV })
-// TODO (@asgdx-team) Disable it for mainnet
-electronDebug({ isEnabled: true })
+electronDebug({ isEnabled: IS_DEV })
 
 let mainWindow: BrowserWindow | null = null
 
