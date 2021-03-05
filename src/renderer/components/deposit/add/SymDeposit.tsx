@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useEffect } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
@@ -144,12 +144,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const [depositFeesRD] = useObservableState<DepositFeesRD>(() => chainFees$(depositFeesParams), RD.initial)
 
-  const reloadFeesHadler = useCallback(() => {
-    reloadFees(depositFeesParams)
-  }, [depositFeesParams, reloadFees])
-
-  // reload fees whenever params have been changed
-  useEffect(() => {
+  const reloadFeesHandler = useCallback(() => {
     reloadFees(depositFeesParams)
   }, [depositFeesParams, reloadFees])
 
@@ -331,8 +326,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     (asset: Asset) => {
       onChangeAsset(asset)
       changePercentHandler(0)
+      reloadFeesHandler()
     },
-    [changePercentHandler, onChangeAsset]
+    [changePercentHandler, onChangeAsset, reloadFeesHandler]
   )
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -585,6 +581,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [depositFeesRD, asset]
   )
 
+  const inputOnBlur = useCallback(() => {
+    reloadFeesHandler()
+    setSelectedInput('none')
+  }, [reloadFeesHandler, setSelectedInput])
+
   return (
     <Styled.Container>
       {showBalanceError && (
@@ -601,7 +602,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             maxAmount={maxAssetAmountToDeposit}
             onChangeAssetAmount={assetAmountChangeHandler}
             inputOnFocusHandler={() => setSelectedInput('asset')}
-            inputOnBlurHandler={() => setSelectedInput('none')}
+            inputOnBlurHandler={inputOnBlur}
             price={assetPrice}
             assets={assets}
             percentValue={percentValueToDeposit}
@@ -609,6 +610,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             onChangeAsset={onChangeAssetHandler}
             priceAsset={priceAsset}
             network={network}
+            onAfterSliderChange={reloadFeesHandler}
           />
         </Col>
 
@@ -620,7 +622,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             maxAmount={maxRuneAmountToDeposit}
             onChangeAssetAmount={runeAmountChangeHandler}
             inputOnFocusHandler={() => setSelectedInput('rune')}
-            inputOnBlurHandler={() => setSelectedInput('none')}
+            inputOnBlurHandler={inputOnBlur}
             price={runePrice}
             priceAsset={priceAsset}
             network={network}
@@ -631,7 +633,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       <Styled.FeesRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.FeeRow>
-            <Fees fees={uiFeesRD} reloadFees={reloadFeesHadler} />
+            <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} />
           </Styled.FeeRow>
           <Styled.FeeErrorRow>
             <Col>
