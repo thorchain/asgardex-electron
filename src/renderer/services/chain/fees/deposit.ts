@@ -32,13 +32,6 @@ import { selectedPoolChain$ } from '../../midgard/common'
 import * as THOR from '../../thorchain'
 import { FeeLD, LoadFeesHandler, DepositFeesParams, DepositFeesLD, Memo } from '../types'
 
-export const reloadFees = () => {
-  BNB.reloadFees()
-  BTC.reloadFees()
-  THOR.reloadFees()
-  BCH.reloadFees()
-}
-
 const reloadFeesByChain = (chain: Chain) => {
   switch (chain) {
     case BNBChain:
