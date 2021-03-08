@@ -168,8 +168,11 @@ export const NoteLabel = styled(UILabel)`
   color: ${palette('gray', 2)};
 `
 
-export const Button = styled(UIButton).attrs({
+export const ApproveButton = styled(UIButton).attrs({
   type: 'primary',
   round: 'true',
+  color: 'warning',
   sizevalue: 'xnormal'
-})``
+})`
+  margin-bottom: 50px;
+`

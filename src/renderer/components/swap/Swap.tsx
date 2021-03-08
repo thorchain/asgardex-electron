@@ -852,7 +852,7 @@ SwapProps) => {
           </Styled.ValueItemContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
-      {isApproved ? (
+      {!isApproved ? (
         <Styled.SubmitContainer>
           {FP.pipe(
             sequenceTOption(sourceAsset, targetAsset),
@@ -880,7 +880,7 @@ SwapProps) => {
         </Styled.SubmitContainer>
       ) : (
         <Styled.SubmitContainer>
-          <Styled.Button>{intl.formatMessage({ id: 'swap.approve' })}</Styled.Button>
+          <Styled.ApproveButton>{intl.formatMessage({ id: 'swap.approve' })}</Styled.ApproveButton>
         </Styled.SubmitContainer>
       )}
       {showPasswordModal && (
