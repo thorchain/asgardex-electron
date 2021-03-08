@@ -2,7 +2,7 @@ import { SettingMessages } from '../types'
 
 const settings: SettingMessages = {
   'setting.title': 'Réglages',
-  'setting.wallet.management': 'Gestion du Wallet',
+  'setting.wallet.management': 'Gestion du portefeuille',
   'setting.client': 'Client',
   'setting.account.management': 'Gestion du compte',
   'setting.export': 'Exporter la clé privée',

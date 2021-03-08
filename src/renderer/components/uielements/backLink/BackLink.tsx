@@ -10,9 +10,10 @@ type Props = {
   label?: string
   style?: React.CSSProperties
   path?: string
+  className?: string
 }
 
-export const BackLink: React.FC<Props> = ({ label, style, path }): JSX.Element => {
+export const BackLink: React.FC<Props> = ({ label, style, path, className }): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -24,7 +25,7 @@ export const BackLink: React.FC<Props> = ({ label, style, path }): JSX.Element =
     }
   }
   return (
-    <BackLinkWrapper onClick={clickHandler} style={style}>
+    <BackLinkWrapper onClick={clickHandler} style={style} className={className}>
       <LeftOutlined />
       <ButtonText>{label || intl.formatMessage({ id: 'common.back' })}</ButtonText>
     </BackLinkWrapper>
