@@ -15,7 +15,10 @@ export const MAX_ITEMS_PER_PAGE = 10
 
 export const MIDGARD_MAX_RETRY = 3
 
-// https://ropsten.etherscan.io/address/0x9d496De78837f5a2bA64Cb40E62c19FBcB67f55a#code
+/**
+ * ABI of ETH router contract
+ * https://ropsten.etherscan.io/address/0x9d496De78837f5a2bA64Cb40E62c19FBcB67f55a#code
+ */
 export const routerABI = [
   { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
   {
