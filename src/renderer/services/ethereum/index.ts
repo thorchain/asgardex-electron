@@ -11,10 +11,19 @@ import {
   getExplorerAddressUrl$
 } from './common'
 import { createFeesService } from './fees'
-import { createApproveService, createTransactionService } from './transaction'
+import { createTransactionService } from './transaction'
 
-const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
-const { approveERC20Token, isApprovedERC20Token } = createApproveService(client$)
+const {
+  txs$,
+  tx$,
+  txStatus$,
+  subscribeTx,
+  resetTx,
+  sendTx,
+  txRD$,
+  approveERC20Token$,
+  isApprovedERC20Token$
+} = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService({ client$, chain: ETHChain })
 
 export {
@@ -36,6 +45,6 @@ export {
   txRD$,
   reloadFees,
   fees$,
-  approveERC20Token,
-  isApprovedERC20Token
+  approveERC20Token$,
+  isApprovedERC20Token$
 }
