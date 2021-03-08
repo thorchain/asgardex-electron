@@ -111,9 +111,9 @@ export const Swap = ({
   onChangePath,
   network,
   sourcePoolRouter,
-  isApprovedERC20Token$
-}: // approveERC20Token,
-SwapProps) => {
+  isApprovedERC20Token$,
+  approveERC20Token$
+}: SwapProps) => {
   const intl = useIntl()
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
@@ -777,6 +777,26 @@ SwapProps) => {
       )
     : true
 
+  const [isApproveLoading, setApproveLoading] = useState(false)
+  const [approveError, setApproveError] = useState('')
+
+  const onApprove = () => {
+    FP.pipe(
+      sourcePoolRouter,
+      O.map((router) =>
+        approveERC20Token$({
+          spender: router,
+          sender: getEthTokenAddress(ERC20Assets.filter((asset) => eqAsset.equals(asset, sourceAssetProp))[0])
+        }).subscribe((val) => {
+          setApproveLoading(RD.isPending(val))
+          if (RD.isFailure(val)) {
+            setApproveError(val.error.msg)
+          }
+        })
+      )
+    )
+  }
+
   return (
     <Styled.Container>
       <Styled.ContentContainer>
@@ -852,7 +872,7 @@ SwapProps) => {
           </Styled.ValueItemContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
-      {!isApproved ? (
+      {isApproved ? (
         <Styled.SubmitContainer>
           {FP.pipe(
             sequenceTOption(sourceAsset, targetAsset),
@@ -880,7 +900,10 @@ SwapProps) => {
         </Styled.SubmitContainer>
       ) : (
         <Styled.SubmitContainer>
-          <Styled.ApproveButton>{intl.formatMessage({ id: 'swap.approve' })}</Styled.ApproveButton>
+          <Styled.ApproveButton onClick={onApprove} loading={isApproveLoading}>
+            {intl.formatMessage({ id: 'swap.approve' })}
+          </Styled.ApproveButton>
+          {approveError && <Styled.ErrorLabel key="approveErrorLabel">{approveError}</Styled.ErrorLabel>}
         </Styled.SubmitContainer>
       )}
       {showPasswordModal && (
