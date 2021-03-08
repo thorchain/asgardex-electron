@@ -26,6 +26,7 @@ export type Props = {
   // `className` is needed by `styled components`
   className?: string
   network: Network
+  noIcon?: boolean
 }
 
 export const AssetData: React.FC<Props> = (props): JSX.Element => {
@@ -37,7 +38,8 @@ export const AssetData: React.FC<Props> = (props): JSX.Element => {
     priceAsset,
     size = 'small',
     className,
-    network
+    network,
+    noIcon
   } = props
 
   const priceLabel = priceAsset
@@ -46,12 +48,16 @@ export const AssetData: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.Wrapper className={className}>
-      <Col>
-        <Styled.AssetIcon asset={asset} size={size} network={network} />
-      </Col>
+      {!noIcon && (
+        <Col>
+          <Styled.AssetIcon asset={asset} size={size} network={network} />
+        </Col>
+      )}
       {!noTicker && (
         <Col>
-          <Styled.TickerLabel size={size}>{asset.ticker}</Styled.TickerLabel>
+          <Styled.TickerLabel className="ticker" size={size}>
+            {asset.ticker}
+          </Styled.TickerLabel>
           <Styled.TickerLabel className="small" size={size}>
             {asset.chain}
           </Styled.TickerLabel>
