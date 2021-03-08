@@ -19,7 +19,7 @@ export const MIDGARD_MAX_RETRY = 3
  * ABI of ETH router contract
  * https://ropsten.etherscan.io/address/0x9d496De78837f5a2bA64Cb40E62c19FBcB67f55a#code
  */
-export const routerABI = [
+export const ethRouterABI = [
   { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
   {
     anonymous: false,
