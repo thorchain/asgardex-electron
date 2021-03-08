@@ -13,7 +13,7 @@ import {
 import * as ethers from 'ethers'
 
 import { Network } from '../../shared/api/types'
-import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
+import { AssetBUSDBAF, AssetBUSDBD1, ERC20Assets, PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getChainAsset } from './chainHelper'
 import { eqAsset } from './fp/eq'
@@ -90,6 +90,12 @@ export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
  * Check whether an asset is an ETH asset
  */
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
+
+/**
+ * Check whether an asset is an ERC20 asset
+ */
+export const isERC20Asset = (asset: Asset): boolean =>
+  ERC20Assets.filter((erc20Asset) => eqAsset.equals(asset, erc20Asset)).length > 0
 
 /**
  * Check whether an asset is an RuneNative asset

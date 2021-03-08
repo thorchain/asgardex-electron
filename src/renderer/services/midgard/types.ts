@@ -97,6 +97,11 @@ export type PoolAddressRx = Rx.Observable<O.Option<PoolAddress>>
 export type PoolAddressRD = RD.RemoteData<Error, PoolAddress>
 export type PoolAddressLD = LiveData<Error, PoolAddress>
 
+export type PoolRouter = string
+export type PoolRouterRx = Rx.Observable<O.Option<PoolRouter>>
+export type PoolRouterRD = RD.RemoteData<Error, PoolRouter>
+export type PoolRouterLD = LiveData<Error, PoolRouter>
+
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 
@@ -118,6 +123,7 @@ export type PoolsService = {
   poolAddresses$: ThorchainEndpointsLD
   selectedPoolAddress$: PoolAddressRx
   poolAddressByAsset$: (asset: Asset) => PoolAddressRx
+  poolRouterByAsset$: (asset: Asset) => PoolRouterRx
   poolDetail$: PoolDetailLD
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD

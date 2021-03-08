@@ -39,9 +39,16 @@ import {
   PoolsStateLD,
   SelectedPricePoolAsset,
   ThorchainEndpointsLD,
-  ValidatePoolLD
+  ValidatePoolLD,
+  PoolRouterRx
 } from './types'
-import { getPoolAddressByChain, getPricePools, pricePoolSelector, pricePoolSelectorFromRD } from './utils'
+import {
+  getPoolAddressByChain,
+  getPoolRouterByChain,
+  getPricePools,
+  pricePoolSelector,
+  pricePoolSelectorFromRD
+} from './utils'
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
 
@@ -471,6 +478,15 @@ const createPoolsService = (
 
   const poolAddressByAsset$ = ({ chain }: Asset): PoolAddressRx => oPoolAddressByChain$(chain)
 
+  const oPoolRouterByChain$ = (chain: Chain): PoolRouterRx =>
+    FP.pipe(
+      poolAddresses$,
+      liveData.toOptionMap$((addresses) => getPoolRouterByChain(addresses, chain)),
+      RxOp.map(O.flatten)
+    )
+
+  const poolRouterByAsset$ = ({ chain }: Asset): PoolRouterRx => oPoolRouterByChain$(chain)
+
   /**
    * Use this to convert asset's price to selected price asset by multiplying to the priceRation inner value
    */
@@ -541,7 +557,8 @@ const createPoolsService = (
     priceRatio$,
     availableAssets$,
     poolAddressByAsset$,
-    validatePool$
+    validatePool$,
+    poolRouterByAsset$
   }
 }
 
