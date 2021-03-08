@@ -45,7 +45,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
     )
 
   const runIsApprovedERC20Token$ = (client: EthClient, params: ApproveParams): LiveData<ApiError, boolean> =>
-    Rx.from(client.isApproved(params.spender, params.sender, params.amount || baseAmount(0))).pipe(
+    Rx.from(client.isApproved(params.spender, params.sender, params.amount || baseAmount('1'))).pipe(
       RxOp.map(RD.success),
       RxOp.catchError(
         (error): LiveData<ApiError, boolean> =>

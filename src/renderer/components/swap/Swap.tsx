@@ -251,7 +251,7 @@ export const Swap = ({
   // reset `pendingSwitchAssets`
   // whenever chain fees will be succeeded or failed
   useEffect(() => {
-    if (RD.success(chainFeesRD) || RD.isFailure(chainFeesRD)) setPendingSwitchAssets(false)
+    if (RD.isSuccess(chainFeesRD) || RD.isFailure(chainFeesRD)) setPendingSwitchAssets(false)
   }, [chainFeesRD, setPendingSwitchAssets])
 
   const reloadFeesHandler = useCallback(() => {
@@ -763,19 +763,20 @@ export const Swap = ({
             return Rx.of(RD.success(true))
           }
         }),
-        O.getOrElse<LiveData<ApiError, boolean>>(() => Rx.of(RD.initial))
+        O.getOrElse<LiveData<ApiError, boolean>>(() => Rx.of(RD.success(true)))
       ),
     RD.initial
   )
-  const isApproved = isERC20Asset(sourceAssetProp)
-    ? FP.pipe(
-        RD.toOption(isApprovedRD),
-        O.fold(
-          () => true,
-          (status) => status
-        )
-      )
-    : true
+
+  const [isApproved, setApproved] = useState(true)
+
+  useEffect(() => {
+    if (RD.isSuccess(isApprovedRD)) {
+      setApproved(isApprovedRD.value)
+    } else {
+      setApproved(true)
+    }
+  }, [chainFeesRD, isApprovedRD])
 
   const [isApproveLoading, setApproveLoading] = useState(false)
   const [approveError, setApproveError] = useState('')
@@ -791,6 +792,8 @@ export const Swap = ({
           setApproveLoading(RD.isPending(val))
           if (RD.isFailure(val)) {
             setApproveError(val.error.msg)
+          } else if (RD.isSuccess(val)) {
+            setApproved(true)
           }
         })
       )
