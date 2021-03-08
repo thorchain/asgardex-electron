@@ -6,7 +6,7 @@ const pools: PoolsMessages = {
   'pools.avgsize': 'Taille moyenne',
   'pools.avgfee': 'Intérêts',
   'pools.blocksleft': 'Blocs restants',
-  'pools.trades': 'Trades',
+  'pools.trades': 'Transactions',
   'pools.pending': 'En attente',
   'pools.available': 'Disponible'
 }

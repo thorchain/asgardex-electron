@@ -1,4 +1,6 @@
-import antdData from 'antd/lib/locale-provider/en_GB'
+// French
+// Antd Internationalization https://2x.ant.design/docs/react/i18n
+import antdData from 'antd/lib/locale-provider/fr_FR'
 
 import { Messages } from '../types'
 import bonds from './bonds'

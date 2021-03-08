@@ -1,5 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Client as EthClient } from '@xchainjs/xchain-ethereum'
 import { baseAmount } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -9,15 +11,13 @@ import * as C from '../clients'
 import { ApiError, ErrorId, TxHashLD } from '../wallet/types'
 import { ApproveParams, Client$, TransactionService } from './types'
 
-export const createTransactionService: (client$: Client$) => TransactionService = C.createTransactionService
+export const createTransactionService = (client$: Client$): TransactionService => {
+  const common = C.createTransactionService(client$)
 
-export const createApproveService = (client$: Client$) => {
-  const approve$ = (params: ApproveParams): TxHashLD =>
-    client$.pipe(
-      RxOp.switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
-      RxOp.switchMap((client) => Rx.from(client.approve(params.spender, params.sender, params.amount))),
+  const runApproveERC20Token$ = (client: EthClient, params: ApproveParams): TxHashLD =>
+    Rx.from(client.approve(params.spender, params.sender, params.amount)).pipe(
       RxOp.switchMap((txResult) => Rx.from(txResult.wait(1))),
-      RxOp.switchMap((txReceipt) => txReceipt.transactionHash),
+      RxOp.map((txReceipt) => txReceipt.transactionHash),
       RxOp.map(RD.success),
       RxOp.catchError(
         (e): TxHashLD =>
@@ -31,18 +31,27 @@ export const createApproveService = (client$: Client$) => {
       RxOp.startWith(RD.pending)
     )
 
-  const isApproved$ = (params: ApproveParams): LiveData<ApiError, boolean> =>
+  const approveERC20Token$ = (params: ApproveParams): TxHashLD =>
     client$.pipe(
-      RxOp.switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
-      RxOp.switchMap((client) =>
-        Rx.from(client.isApproved(params.spender, params.sender, params.amount || baseAmount(0)))
-      ),
+      RxOp.switchMap((oClient) =>
+        FP.pipe(
+          oClient,
+          O.fold(
+            () => Rx.of(RD.initial),
+            (client) => runApproveERC20Token$(client, params)
+          )
+        )
+      )
+    )
+
+  const runIsApprovedERC20Token$ = (client: EthClient, params: ApproveParams): LiveData<ApiError, boolean> =>
+    Rx.from(client.isApproved(params.spender, params.sender, params.amount || baseAmount(0))).pipe(
       RxOp.map(RD.success),
       RxOp.catchError(
-        (e): LiveData<ApiError, boolean> =>
+        (error): LiveData<ApiError, boolean> =>
           Rx.of(
             RD.failure({
-              msg: e.toString(),
+              msg: error?.message ?? error.toString(),
               errorId: ErrorId.APPROVE_TX
             })
           )
@@ -50,11 +59,22 @@ export const createApproveService = (client$: Client$) => {
       RxOp.startWith(RD.pending)
     )
 
-  const approveERC20Token = (params: ApproveParams): TxHashLD => approve$(params)
-  const isApprovedERC20Token = (params: ApproveParams): LiveData<ApiError, boolean> => isApproved$(params)
+  const isApprovedERC20Token$ = (params: ApproveParams): LiveData<ApiError, boolean> =>
+    client$.pipe(
+      RxOp.switchMap((oClient) =>
+        FP.pipe(
+          oClient,
+          O.fold(
+            () => Rx.of(RD.initial),
+            (client) => runIsApprovedERC20Token$(client, params)
+          )
+        )
+      )
+    )
 
   return {
-    approveERC20Token,
-    isApprovedERC20Token
+    ...common,
+    approveERC20Token$,
+    isApprovedERC20Token$
   }
 }

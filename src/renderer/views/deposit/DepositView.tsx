@@ -11,15 +11,16 @@ import * as Rx from 'rxjs'
 
 import { Deposit } from '../../components/deposit/Deposit'
 import { ErrorView } from '../../components/shared/error'
-import { BackLink } from '../../components/uielements/backLink'
+import { RefreshButton } from '../../components/uielements/button'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { DepositRouteParams } from '../../routes/deposit'
 import { PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
-import {} from '../../services/midgard/utils'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
+import * as Styled from './DepositView.styles'
 import { ShareView } from './share/ShareView'
 import { AsymWithdrawView } from './withdraw/AsymWithdrawView'
 import { WithdrawDepositView } from './withdraw/WithdrawDepositView'
@@ -33,7 +34,7 @@ export const DepositView: React.FC<Props> = (_) => {
   const {
     service: {
       setSelectedPoolAsset,
-      shares: { shares$ }
+      shares: { shares$, reloadShares }
     }
   } = useMidgardContext()
   const { keystoreService } = useWalletContext()
@@ -77,6 +78,11 @@ export const DepositView: React.FC<Props> = (_) => {
 
   const poolSharesRD = useObservableState<PoolSharesRD>(poolShares$, RD.initial)
 
+  const refreshButtonDisabled = useMemo(
+    () => FP.pipe(poolSharesRD, RD.toOption, (oPoolShares) => sequenceTOption(oPoolShares, oSelectedAsset), O.isNone),
+    [poolSharesRD, oSelectedAsset]
+  )
+
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`
   // Because `useObservableState` will set its state NOT before first rendering loop,
@@ -92,7 +98,10 @@ export const DepositView: React.FC<Props> = (_) => {
 
   return (
     <>
-      <BackLink />
+      <Styled.TopControlsContainer>
+        <Styled.BackLink />
+        <RefreshButton disabled={refreshButtonDisabled} clickHandler={reloadShares} />
+      </Styled.TopControlsContainer>
       {FP.pipe(
         oSelectedAsset,
         O.fold(
