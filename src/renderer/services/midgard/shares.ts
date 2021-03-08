@@ -21,6 +21,8 @@ const createSharesService = (
 ) => {
   const api$ = byzantine$.pipe(RxOp.map(RD.map(getMidgardDefaultApi)))
 
+  const { stream$: reloadShares$, trigger: reloadShares } = triggerStream()
+
   /**
    * Returns `PoolShares` by given member address
    *
@@ -35,55 +37,55 @@ const createSharesService = (
    */
   const shares$ = (address: Address): PoolSharesLD =>
     FP.pipe(
-      api$.pipe(
-        liveData.chain((api) =>
-          FP.pipe(
-            api.getMemberDetail({ address }),
-            RxOp.map(RD.success),
-            liveData.map(({ pools }) => pools),
-            liveData.mapLeft(() => Error('No pool found'))
-          )
-        ),
-        liveData.map((poolDetails) =>
-          FP.pipe(
-            poolDetails,
-            A.filterMap<MemberPool, PoolShare>(({ pool, liquidityUnits, runeAddress, assetAddress, assetAdded }) =>
-              // ignore all invalid pool strings
-              FP.pipe(
-                pool,
-                assetFromString,
-                O.fromNullable,
-                O.map((asset) => ({
-                  type: !!runeAddress && !!assetAddress ? 'sym' : 'asym',
-                  asset,
-                  // `liquidityUnits` are RUNE based, provided as `BaseAmount`
-                  units: baseAmount(bnOrZero(liquidityUnits), THORCHAIN_DECIMAL),
-                  // BaseAmount of added asset - Note: Thorchain treats all assets as 1e8 decimal based
-                  assetAddedAmount: baseAmount(bnOrZero(assetAdded), THORCHAIN_DECIMAL)
-                }))
-              )
+      Rx.combineLatest([api$, reloadShares$]),
+      RxOp.map(([api]) => api),
+      liveData.chain((api) =>
+        FP.pipe(
+          api.getMemberDetail({ address }),
+          RxOp.map(RD.success),
+          liveData.map(({ pools }) => pools),
+          liveData.mapLeft(() => Error('No pool found')),
+          RxOp.startWith(RD.pending)
+        )
+      ),
+      liveData.map((poolDetails) =>
+        FP.pipe(
+          poolDetails,
+          A.filterMap<MemberPool, PoolShare>(({ pool, liquidityUnits, runeAddress, assetAddress, assetAdded }) =>
+            // ignore all invalid pool strings
+            FP.pipe(
+              pool,
+              assetFromString,
+              O.fromNullable,
+              O.map((asset) => ({
+                type: !!runeAddress && !!assetAddress ? 'sym' : 'asym',
+                asset,
+                // `liquidityUnits` are RUNE based, provided as `BaseAmount`
+                units: baseAmount(bnOrZero(liquidityUnits), THORCHAIN_DECIMAL),
+                // BaseAmount of added asset - Note: Thorchain treats all assets as 1e8 decimal based
+                assetAddedAmount: baseAmount(bnOrZero(assetAdded), THORCHAIN_DECIMAL)
+              }))
             )
           )
-        ),
-        RxOp.catchError((e) => {
-          /**
-           * 404 response is returned in 2 cases:
-           * 1. Pool doesn't exist at all
-           * 2. User has no any stake units for the pool
-           * In both cases return empty array as `No Data` identifier
-           */
-          if ('status' in e && e.status === 404) {
-            return Rx.of(RD.success([]))
-          }
+        )
+      ),
+      RxOp.catchError((e) => {
+        /**
+         * 404 response is returned in 2 cases:
+         * 1. Pool doesn't exist at all
+         * 2. User has no any stake units for the pool
+         * In both cases return empty array as `No Data` identifier
+         */
+        if ('status' in e && e.status === 404) {
+          return Rx.of(RD.success([]))
+        }
 
-          /**
-           * In all other cases return error as is
-           */
-          return Rx.of(RD.failure(Error(e)))
-        }),
-        RxOp.startWith(RD.pending)
-        // RxOp.shareReplay(1)
-      )
+        /**
+         * In all other cases return error as is
+         */
+        return Rx.of(RD.failure(Error(e)))
+      })
+      // RxOp.shareReplay(1)
     )
 
   /**
@@ -138,6 +140,7 @@ const createSharesService = (
 
   return {
     shares$,
+    reloadShares,
     symShareByAsset$,
     asymShareByAsset$,
     combineShares$,
