@@ -90,8 +90,8 @@ export type SwapProps = {
   onChangePath: (path: string) => void
   network: Network
   sourcePoolRouter: O.Option<string>
-  approveERC20Token: (params: ApproveParams) => TxHashLD
-  isApprovedERC20Token: (params: ApproveParams) => LiveData<ApiError, boolean>
+  approveERC20Token$: (params: ApproveParams) => TxHashLD
+  isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
 }
 
 export const Swap = ({
@@ -112,7 +112,7 @@ export const Swap = ({
   onChangePath,
   network,
   sourcePoolRouter,
-  isApprovedERC20Token
+  isApprovedERC20Token$
 }: // approveERC20Token,
 SwapProps) => {
   const intl = useIntl()
@@ -755,7 +755,7 @@ SwapProps) => {
       // FP.pipe(
       //   sourcePoolRouter,
       //   O.map((router) =>
-      isApprovedERC20Token({
+      isApprovedERC20Token$({
         spender: '0x9d496De78837f5a2bA64Cb40E62c19FBcB67f55a',
         sender: '0x62e273709da575835c7f6aef4a31140ca5b1d190'
       }),
