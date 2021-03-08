@@ -16,7 +16,8 @@ const swap: SwapMessages = {
   'swap.note.lockedWallet': 'Vous devez déverrouiller votre portefeuille pour échanger',
   'swap.note.nowallet': 'Créez ou importez un portefeuille pour échanger',
   'swap.errors.asset.missingSourceAsset': 'Actif source manquant',
-  'swap.errors.asset.missingTargetAsset': 'Actif cible manquant'
+  'swap.errors.asset.missingTargetAsset': 'Actif cible manquant',
+  'swap.approve': 'Approuver'
 }
 
 export default swap

@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData, getSwapMemo, getValueOfAsset1InAsset2 } from '@thorchain/asgardex-util'
 import { Address, Balance } from '@xchainjs/xchain-client'
-// import { ETHAddress, getTokenAddress } from '@xchainjs/xchain-ethereum'
 import {
   Asset,
   assetToString,
@@ -27,8 +26,8 @@ import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { isERC20Asset } from '../../helpers/assetHelper'
+import { ERC20Assets, ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
+import { getEthTokenAddress, isERC20Asset } from '../../helpers/assetHelper'
 import { getChainAsset } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
@@ -749,22 +748,25 @@ SwapProps) => {
       )
     )
   }, [canSwitchAssets, setPendingSwitchAssets, assetsToSwap, onChangePath])
-  console.log(123, sourcePoolRouter)
+
   const [isApprovedRD] = useObservableState<RD.RemoteData<ApiError, boolean>>(
     () =>
-      // FP.pipe(
-      //   sourcePoolRouter,
-      //   O.map((router) =>
-      isApprovedERC20Token$({
-        spender: '0x9d496De78837f5a2bA64Cb40E62c19FBcB67f55a',
-        sender: '0x62e273709da575835c7f6aef4a31140ca5b1d190'
-      }),
-    // ),
-    // O.getOrElse<LiveData<ApiError, boolean>>(() => Rx.of(RD.initial))
-    // ),
+      FP.pipe(
+        sourcePoolRouter,
+        O.map((router) => {
+          if (isERC20Asset(sourceAssetProp)) {
+            return isApprovedERC20Token$({
+              spender: router,
+              sender: getEthTokenAddress(ERC20Assets.filter((asset) => eqAsset.equals(asset, sourceAssetProp))[0])
+            })
+          } else {
+            return Rx.of(RD.success(true))
+          }
+        }),
+        O.getOrElse<LiveData<ApiError, boolean>>(() => Rx.of(RD.initial))
+      ),
     RD.initial
   )
-  console.log(222, isApprovedRD)
   const isApproved = isERC20Asset(sourceAssetProp)
     ? FP.pipe(
         RD.toOption(isApprovedRD),
@@ -878,7 +880,7 @@ SwapProps) => {
         </Styled.SubmitContainer>
       ) : (
         <Styled.SubmitContainer>
-          <Styled.Button>{intl.formatMessage({ id: 'wallet.action.send' })}</Styled.Button>
+          <Styled.Button>{intl.formatMessage({ id: 'swap.approve' })}</Styled.Button>
         </Styled.SubmitContainer>
       )}
       {showPasswordModal && (
