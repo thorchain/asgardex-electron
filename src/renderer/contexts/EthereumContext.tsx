@@ -13,7 +13,9 @@ import {
   explorerUrl$,
   getExplorerTxUrl$,
   fees$,
-  reloadFees
+  reloadFees,
+  approveERC20Token$,
+  isApprovedERC20Token$
 } from '../services/ethereum'
 
 export type EthereumContextValue = {
@@ -30,6 +32,8 @@ export type EthereumContextValue = {
   getExplorerTxUrl$: typeof getExplorerTxUrl$
   fees$: typeof fees$
   reloadFees: typeof reloadFees
+  approveERC20Token$: typeof approveERC20Token$
+  isApprovedERC20Token$: typeof isApprovedERC20Token$
 }
 
 const initialContext: EthereumContextValue = {
@@ -45,7 +49,9 @@ const initialContext: EthereumContextValue = {
   explorerUrl$,
   getExplorerTxUrl$,
   fees$,
-  reloadFees
+  reloadFees,
+  approveERC20Token$,
+  isApprovedERC20Token$
 }
 
 const EthereumContext = createContext<EthereumContextValue | null>(null)

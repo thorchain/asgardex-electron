@@ -13,7 +13,17 @@ import {
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
-const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
+const {
+  txs$,
+  tx$,
+  txStatus$,
+  subscribeTx,
+  resetTx,
+  sendTx,
+  txRD$,
+  approveERC20Token$,
+  isApprovedERC20Token$
+} = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService({ client$, chain: ETHChain })
 
 export {
@@ -34,5 +44,7 @@ export {
   resetTx,
   txRD$,
   reloadFees,
-  fees$
+  fees$,
+  approveERC20Token$,
+  isApprovedERC20Token$
 }

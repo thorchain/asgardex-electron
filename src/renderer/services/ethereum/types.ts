@@ -6,6 +6,7 @@ import { BigNumber } from 'ethers'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
+import { ApiError, TxHashLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -25,6 +26,15 @@ export type SendTxParams = {
   gasPrice?: BaseAmount
 }
 
-export type TransactionService = C.TransactionService<SendTxParams>
+export type ApproveParams = {
+  spender: Address
+  sender: Address
+  amount?: BaseAmount
+}
+
+export type TransactionService = {
+  approveERC20Token$: (p: ApproveParams) => TxHashLD
+  isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
+} & C.TransactionService<SendTxParams>
 
 export type FeesService = C.FeesService<FeesParams>
