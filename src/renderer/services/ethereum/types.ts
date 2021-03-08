@@ -32,8 +32,14 @@ export type ApproveParams = {
   amount?: BaseAmount
 }
 
+export type CallRouterParams = {
+  address: Address
+  params: Array<string>
+}
+
 export type TransactionService = {
-  approveERC20Token$: (p: ApproveParams) => TxHashLD
+  sendDepositTx: (params: CallRouterParams) => TxHashLD
+  approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
 } & C.TransactionService<SendTxParams>
 
