@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { StopOutlined } from '@ant-design/icons/lib'
 import { Asset, Chain } from '@xchainjs/xchain-util'
@@ -16,6 +16,7 @@ import * as Styled from './AssetsFilter.styles'
 type Props = {
   assets?: Asset[]
   onFilterChanged: (filteredAssets: Asset[]) => void
+  className?: string
 }
 
 const BASE_FILTER = 'base'
@@ -23,8 +24,8 @@ type Filter = Chain | typeof BASE_FILTER
 
 type Filters = Filter[]
 
-export const AssetsFilter: React.FC<Props> = ({ assets = [], onFilterChanged }) => {
-  const [activeFilter, setActiveFilter] = useState<O.Option<Filter>>(O.none)
+export const AssetsFilter: React.FC<Props> = ({ assets = [], onFilterChanged, className }) => {
+  const [activeFilter, setActiveFilterState] = useState<O.Option<Filter>>(O.none)
   const intl = useIntl()
 
   const filterNames: Partial<Record<Filter, string>> = useMemo(
@@ -35,34 +36,36 @@ export const AssetsFilter: React.FC<Props> = ({ assets = [], onFilterChanged }) 
     }),
     [intl]
   )
-
-  // Call `onFilterChanged` everytime activeFilter was changed
-  useEffect(() => {
-    FP.pipe(
-      activeFilter,
-      O.map((filter) =>
-        FP.pipe(
-          assets,
-          A.filterMap((asset) => {
-            if (filter === BASE_FILTER) {
-              // For 'base' filter we get ONLY chain assets
-              if (isChainAsset(asset)) {
-                return O.some(asset)
+  const setActiveFilter = useCallback(
+    (oFilter: O.Option<Filter>) => {
+      setActiveFilterState(oFilter)
+      FP.pipe(
+        oFilter,
+        O.map((filter) =>
+          FP.pipe(
+            assets,
+            A.filterMap((asset) => {
+              if (filter === BASE_FILTER) {
+                // For 'base' filter we get ONLY chain assets
+                if (isChainAsset(asset)) {
+                  return O.some(asset)
+                }
+                // In all other cases filter it out
+                return O.none
               }
-              // In all other cases filter it out
-              return O.none
-            }
 
-            // For non-'base' activeFilter filter assets by chain according to the activeFilter
-            return eqChain.equals(filter, asset.chain) ? O.some(asset) : O.none
-          })
-        )
-      ),
-      // In case there is no activeFilter setup return all available assets
-      O.getOrElse(() => assets),
-      onFilterChanged
-    )
-  }, [activeFilter, assets, onFilterChanged])
+              // For non-'base' activeFilter filter assets by chain according to the activeFilter
+              return eqChain.equals(filter, asset.chain) ? O.some(asset) : O.none
+            })
+          )
+        ),
+        // In case there is no activeFilter setup return all available assets
+        O.getOrElse(() => assets),
+        onFilterChanged
+      )
+    },
+    [setActiveFilterState, assets, onFilterChanged]
+  )
 
   // Enable chain filter ONLY in case assets-prop includes at least one asset of this chain
   const availableFilters: O.Option<Filters> = useMemo(
@@ -99,7 +102,7 @@ export const AssetsFilter: React.FC<Props> = ({ assets = [], onFilterChanged }) 
         )),
         O.toNullable
       ),
-    [activeFilter]
+    [activeFilter, setActiveFilter]
   )
 
   const checkIfActive = useCallback(
@@ -119,7 +122,7 @@ export const AssetsFilter: React.FC<Props> = ({ assets = [], onFilterChanged }) 
         const isActive = checkIfActive(filter)
         return (
           <Styled.FilterButton
-            active={isActive}
+            active={isActive ? 'true' : 'false'}
             weight={isActive ? 'bold' : 'normal'}
             onClick={() => setActiveFilter(O.some(filter))}
             key={filter}>
@@ -129,7 +132,7 @@ export const AssetsFilter: React.FC<Props> = ({ assets = [], onFilterChanged }) 
       })
     ),
     O.map((filters) => (
-      <Styled.Container key="container">
+      <Styled.Container key="container" className={className}>
         {filters}
         {resetButton}
       </Styled.Container>

@@ -58,7 +58,7 @@ const common: CommonMessages = {
   'common.modal.confirmTitle': "Confirmer l'action",
   'common.value': 'Valeur',
   'common.manage': 'Gérer',
-  'common.asset.base': 'Base - FR'
+  'common.asset.base': 'Base'
 }
 
 export default common

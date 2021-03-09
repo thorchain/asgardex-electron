@@ -2,6 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { AssetsFilter as AssetsFilterUI } from '../../components/AssetsFilter'
 import { Button as UIButton, ButtonProps as UIButtonProps } from '../../components/uielements/button'
 import { Label as UILabel } from '../../components/uielements/label'
 import { media } from '../../helpers/styleHelper'
@@ -59,4 +60,7 @@ export const BlockLeftLabel = styled(UILabel)`
 
 export const Label = styled(UILabel)`
   font-size: 16px;
+`
+export const AssetsFilter = styled(AssetsFilterUI)`
+  margin-bottom: 20px;
 `

@@ -7,7 +7,7 @@ export const Container = styled.div`
   display: flex;
 `
 
-export const FilterButton = styled(ButtonUI)<ButtonProps & { active?: boolean }>`
+export const FilterButton = styled(ButtonUI)<ButtonProps & { active?: 'true' | 'false' }>`
   margin-right: 10px;
   &:last-child {
     margin: 0;
@@ -18,7 +18,7 @@ export const FilterButton = styled(ButtonUI)<ButtonProps & { active?: boolean }>
     min-width: 0;
     border-radius: 15px;
     background: ${palette('gray', 1)};
-    color: ${({ active }) => (active ? palette('text', 0) : palette('text', 2))};
+    color: ${({ active }) => (active === 'true' ? palette('text', 0) : palette('text', 2))};
     border: none;
 
     &.focused,

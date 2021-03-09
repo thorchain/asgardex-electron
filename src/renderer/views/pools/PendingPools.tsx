@@ -1,8 +1,10 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Grid } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
+import * as A from 'fp-ts/Array'
+import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { Option, none, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
@@ -16,11 +18,13 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PendingPoolsState } from '../../services/midgard/types'
+import { PendingPoolsState, PoolAssets } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
+import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
 import { TableAction, BlockLeftLabel } from './PoolsOverview.style'
+import * as Styled from './PoolsOverview.style'
 
 export const PendingPools: React.FC = (): JSX.Element => {
   const intl = useIntl()
@@ -84,6 +88,8 @@ export const PendingPools: React.FC = (): JSX.Element => {
     [refreshHandler, intl, renderBtnPoolsColumn]
   )
 
+  const [filteredPoolAssets, setFilteredPoolAssets] = useState<PoolAssets>()
+
   const lastblock = useMemo(() => RD.toNullable(thorchainLastblockRD), [thorchainLastblockRD])
   const constants = useMemo(() => RD.toNullable(thorchainConstantsRD), [thorchainConstantsRD])
 
@@ -133,9 +139,25 @@ export const PendingPools: React.FC = (): JSX.Element => {
   const renderPoolsTable = useCallback(
     (tableData: PoolTableRowData[], loading = false) => {
       const columns = isDesktopView ? desktopPoolsColumns : mobilePoolsColumns
-      return <Table columns={columns} dataSource={tableData} loading={loading} rowKey="key" />
+      return (
+        <>
+          <Styled.AssetsFilter
+            onFilterChanged={setFilteredPoolAssets}
+            assets={FP.pipe(
+              tableData,
+              A.map(({ pool }) => pool.target)
+            )}
+          />
+          <Table
+            columns={columns}
+            dataSource={FP.pipe(tableData, filterTableData(filteredPoolAssets))}
+            loading={loading}
+            rowKey="key"
+          />
+        </>
+      )
     },
-    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns]
+    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, filteredPoolAssets]
   )
 
   return (
