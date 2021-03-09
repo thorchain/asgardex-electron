@@ -8,6 +8,7 @@ const common: CommonMessages = {
   'common.copyright': '©',
   'common.type': 'Type',
   'common.address': 'Address',
+  'common.address.self': 'Self',
   'common.to': 'To',
   'common.from': 'From',
   'common.amount': 'Amount',
