@@ -1,3 +1,4 @@
+import { Address } from '@xchainjs/xchain-client'
 import { getTokenAddress } from '@xchainjs/xchain-ethereum'
 import {
   Asset,
@@ -10,11 +11,12 @@ import {
   AssetRuneB1A,
   AssetRuneNative
 } from '@xchainjs/xchain-util'
-import * as ethers from 'ethers'
+import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
 import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
+import { getEthChecksumAddress } from './addressHelper'
 import { getChainAsset } from './chainHelper'
 import { eqAsset } from './fp/eq'
 
@@ -112,7 +114,7 @@ export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, get
 /**
  * Get ethereum token address from a given asset
  */
-export const getEthTokenAddress = (asset: Asset): string => {
+export const getEthTokenAddress = (asset: Asset): O.Option<Address> => {
   const tokenAddress = getTokenAddress(asset)
-  return tokenAddress ? ethers.utils.getAddress(tokenAddress) : ''
+  return tokenAddress ? getEthChecksumAddress(tokenAddress) : O.none
 }
