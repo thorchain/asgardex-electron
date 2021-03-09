@@ -1,16 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { StopOutlined } from '@ant-design/icons/lib'
-import { Asset, Chain } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
-import * as NEA from 'fp-ts/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
-import { isChainAsset } from '../../helpers/assetHelper'
-import { eqChain } from '../../helpers/fp/eq'
-import { ENABLED_CHAINS } from '../../services/const'
+import * as H from './AssetsFilter.helper'
 import * as Styled from './AssetsFilter.styles'
 
 type Props = {
@@ -19,16 +16,11 @@ type Props = {
   className?: string
 }
 
-const BASE_FILTER = 'base'
-type Filter = Chain | typeof BASE_FILTER
-
-type Filters = Filter[]
-
 export const AssetsFilter: React.FC<Props> = ({ assets = [], onFilterChanged, className }) => {
-  const [activeFilter, setActiveFilterState] = useState<O.Option<Filter>>(O.none)
+  const [activeFilter, setActiveFilterState] = useState<O.Option<H.Filter>>(O.none)
   const intl = useIntl()
 
-  const filterNames: Partial<Record<Filter, string>> = useMemo(
+  const filterNames: Partial<Record<H.Filter, string>> = useMemo(
     () => ({
       base: intl.formatMessage({ id: 'common.asset.base' }),
       ETH: 'erc20',
@@ -37,59 +29,15 @@ export const AssetsFilter: React.FC<Props> = ({ assets = [], onFilterChanged, cl
     [intl]
   )
   const setActiveFilter = useCallback(
-    (oFilter: O.Option<Filter>) => {
+    (oFilter: O.Option<H.Filter>) => {
       setActiveFilterState(oFilter)
-      FP.pipe(
-        oFilter,
-        O.map((filter) =>
-          FP.pipe(
-            assets,
-            A.filterMap((asset) => {
-              if (filter === BASE_FILTER) {
-                // For 'base' filter we get ONLY chain assets
-                if (isChainAsset(asset)) {
-                  return O.some(asset)
-                }
-                // In all other cases filter it out
-                return O.none
-              }
-
-              // For non-'base' activeFilter filter assets by chain according to the activeFilter
-              return eqChain.equals(filter, asset.chain) ? O.some(asset) : O.none
-            })
-          )
-        ),
-        // In case there is no activeFilter setup return all available assets
-        O.getOrElse(() => assets),
-        onFilterChanged
-      )
+      FP.pipe(oFilter, H.filterAssets(assets), onFilterChanged)
     },
     [setActiveFilterState, assets, onFilterChanged]
   )
 
   // Enable chain filter ONLY in case assets-prop includes at least one asset of this chain
-  const availableFilters: O.Option<Filters> = useMemo(
-    () =>
-      FP.pipe(
-        NEA.fromArray(assets),
-        O.chain((assets) =>
-          NEA.fromArray(
-            FP.pipe(
-              ENABLED_CHAINS,
-              A.filterMap((chain) =>
-                FP.pipe(
-                  assets,
-                  A.findFirstMap(({ chain: assetChain }) => (chain === assetChain ? O.some(chain) : O.none))
-                )
-              )
-            )
-          )
-        ),
-        // In case there is at least one Filter available add Base filter
-        O.map((chainFilters) => [BASE_FILTER, ...chainFilters])
-      ),
-    [assets]
-  )
+  const availableFilters: O.Option<H.Filters> = useMemo(() => H.getAvailableChains(assets), [assets])
 
   const resetButton = useMemo(
     () =>
@@ -106,7 +54,7 @@ export const AssetsFilter: React.FC<Props> = ({ assets = [], onFilterChanged, cl
   )
 
   const checkIfActive = useCallback(
-    (filter: Filter) =>
+    (filter: H.Filter) =>
       FP.pipe(
         activeFilter,
         O.map((active) => active === filter),
