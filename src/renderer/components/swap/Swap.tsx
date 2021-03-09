@@ -27,7 +27,7 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { getEthTokenAddress, isEthAsset, isEthTokenAsset } from '../../helpers/assetHelper'
+import { getEthTokenAddress, isEthAsset, isEthTokenAsset, isRuneNativeAsset } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
@@ -183,19 +183,19 @@ export const Swap = ({
     _setAmountToSwap /* private - never set it directly, use setAmountToSwap() instead */
   ] = useState(baseAmount(0, sourceAssetAmount.decimal))
 
-  const oSwapParams: O.Option<SwapParams> = useMemo(
-    () =>
-      FP.pipe(
-        sequenceTOption(assetsToSwap, targetWalletAddress),
-        O.map(([{ source, target }, address]) => ({
-          poolAddress: oSourcePoolAddress,
-          asset: source,
-          amount: amountToSwap,
-          memo: getSwapMemo({ asset: target, address })
-        }))
-      ),
-    [amountToSwap, assetsToSwap, oSourcePoolAddress, targetWalletAddress]
-  )
+  const oSwapParams: O.Option<SwapParams> = useMemo(() => {
+    // For RuneNative a `MsgNativeTx` is sent w/o the need for a pool address
+    const oPoolAddress = isRuneNativeAsset(sourceAssetProp) ? O.some('') : oSourcePoolAddress
+    return FP.pipe(
+      sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
+      O.map(([{ source, target }, poolAddress, address]) => ({
+        poolAddress,
+        asset: source,
+        amount: amountToSwap,
+        memo: getSwapMemo({ asset: target, address })
+      }))
+    )
+  }, [amountToSwap, assetsToSwap, oSourcePoolAddress, sourceAssetProp, targetWalletAddress])
 
   const swapData = useMemo(() => getSwapData(amountToSwap, sourceAsset, targetAsset, poolData), [
     amountToSwap,
@@ -207,8 +207,8 @@ export const Swap = ({
   const oSwapFeesParams: O.Option<SwapFeesParams> = useMemo(
     () =>
       FP.pipe(
-        oSwapParams,
-        O.map((params) => ({
+        sequenceTOption(oSwapParams, targetWalletAddress),
+        O.map(([params, targetRecipient]) => ({
           source: {
             ...params,
             recipient: params.poolAddress
@@ -216,7 +216,7 @@ export const Swap = ({
           target: {
             asset: targetAssetProp,
             amount: swapData.swapResult,
-            recipient: targetWalletAddress
+            recipient: targetRecipient
           }
         }))
       ),
@@ -252,10 +252,20 @@ export const Swap = ({
   // reset `pendingSwitchAssets`
   // whenever chain fees will be succeeded or failed
   useEffect(() => {
-    if (RD.isSuccess(chainFeesRD) || RD.isFailure(chainFeesRD)) setPendingSwitchAssets(false)
+    FP.pipe(
+      chainFeesRD,
+      RD.fold(
+        () => false,
+        () => true,
+        () => false,
+        () => false
+      ),
+      setPendingSwitchAssets
+    )
   }, [chainFeesRD, setPendingSwitchAssets])
 
   const reloadFeesHandler = useCallback(() => {
+    console.log('reloadFeesHandler:', JSON.stringify(oSwapFeesParams))
     FP.pipe(oSwapFeesParams, O.map(reloadFees))
   }, [oSwapFeesParams, reloadFees])
 
@@ -778,21 +788,13 @@ export const Swap = ({
     resetApproveState()
     // reset isApproved state
     resetIsApprovedState()
-    // reload fees
-    FP.pipe(oSwapFeesParams, O.map(reloadFees))
     // zero amount to swap
     setAmountToSwap(ZERO_BASE_AMOUNT)
+    // reload fees
+    reloadFeesHandler()
     // check approved status
     checkApprovedStatus()
-  }, [
-    checkApprovedStatus,
-    oSwapFeesParams,
-    reloadFees,
-    resetApproveState,
-    resetIsApprovedState,
-    resetSwapState,
-    setAmountToSwap
-  ])
+  }, [checkApprovedStatus, reloadFeesHandler, resetApproveState, resetIsApprovedState, resetSwapState, setAmountToSwap])
 
   useEffect(() => {
     // reset data whenever
@@ -806,6 +808,11 @@ export const Swap = ({
       reset()
     }
   }, [reset, setAmountToSwap, sourceAssetProp, targetAssetProp])
+
+  // Reload fees whenever swap params has been changed
+  useEffect(() => {
+    FP.pipe(oSwapFeesParams, O.map(reloadFees))
+  }, [oSwapFeesParams, reloadFees])
 
   const canSwitchAssets = useMemo(() => {
     const hasBalances = FP.pipe(
