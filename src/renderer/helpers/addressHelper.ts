@@ -19,7 +19,7 @@ import {
   LTCChain,
   BCHChain
 } from '@xchainjs/xchain-util'
-import Web3 from 'web3'
+import { ethers } from 'ethers'
 
 import { Network } from '../../shared/api/types'
 
@@ -57,4 +57,4 @@ export const removeAddressPrefix = (address: Address): Address => {
   return address.substr(prefixIndex > 0 ? prefixIndex : 0)
 }
 
-export const getETHChecksumAddress = (address: Address) => Web3.utils.toChecksumAddress(address)
+export const getETHChecksumAddress = (address: Address) => ethers.utils.getAddress(address.toLowerCase())

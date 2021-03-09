@@ -10,11 +10,11 @@ import {
   AssetRuneB1A,
   AssetRuneNative
 } from '@xchainjs/xchain-util'
-import * as ethers from 'ethers'
 
 import { Network } from '../../shared/api/types'
 import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
+import { getETHChecksumAddress } from './addressHelper'
 import { getChainAsset } from './chainHelper'
 import { eqAsset } from './fp/eq'
 
@@ -114,5 +114,5 @@ export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, get
  */
 export const getEthTokenAddress = (asset: Asset): string => {
   const tokenAddress = getTokenAddress(asset)
-  return tokenAddress ? ethers.utils.getAddress(tokenAddress) : ''
+  return tokenAddress ? getETHChecksumAddress(tokenAddress) : ''
 }
