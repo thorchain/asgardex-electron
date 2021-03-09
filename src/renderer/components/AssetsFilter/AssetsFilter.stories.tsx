@@ -1,35 +1,18 @@
 import { useMemo, useState } from 'react'
 
 import { Story } from '@storybook/react'
-import {
-  AssetRuneNative,
-  AssetLTC,
-  AssetBNB,
-  AssetETH,
-  assetToString,
-  assetFromString,
-  BNBChain,
-  ETHChain,
-  Asset
-} from '@xchainjs/xchain-util'
+import { AssetRuneNative, AssetLTC, AssetBNB, AssetETH, assetToString, assetFromString } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
 import { AssetsFilter } from './AssetsFilter'
 
 export const Default: Story<{ assets: string[] }> = ({ assets: stringAssets }) => {
-  const assets = useMemo(
-    () =>
-      FP.pipe(
-        stringAssets || [],
-        A.filterMap((asset) => {
-          const res = assetFromString(asset)
-          return res ? O.some(res) : O.none
-        })
-      ),
-    [stringAssets]
-  )
+  const assets = useMemo(() => FP.pipe(stringAssets || [], A.filterMap(FP.flow(assetFromString, O.fromNullable))), [
+    stringAssets
+  ])
 
   const [filteredAssets, setFilteredAssets] = useState(assets)
   return (
@@ -51,10 +34,10 @@ const argTypes = {
         AssetRuneNative,
         AssetLTC,
         AssetBNB,
-        { chain: BNBChain, ticker: 'BUSD', symbol: 'BUSD' } as Asset,
-        { chain: BNBChain, ticker: 'USDT', symbol: 'USDT' } as Asset,
+        ASSETS_TESTNET.BUSD,
+        ASSETS_TESTNET.USDT,
         AssetETH,
-        { chain: ETHChain, ticker: 'USDT', symbol: 'USDT' } as Asset
+        ERC20_TESTNET.USDT
       ].map(assetToString)
     }
   }

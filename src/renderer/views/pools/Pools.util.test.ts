@@ -1,9 +1,20 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import { bn, assetAmount, assetToBase, BNBChain, AssetBNB, AssetRuneNative, AssetETH } from '@xchainjs/xchain-util'
+import {
+  bn,
+  assetAmount,
+  assetToBase,
+  BNBChain,
+  AssetBNB,
+  AssetRuneNative,
+  AssetETH,
+  AssetLTC,
+  AssetBTC,
+  AssetBCH
+} from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
 import { ThorchainLastblock, PoolDetail } from '../../services/midgard/types'
 import { Constants as ThorchainConstants } from '../../types/generated/midgard'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
@@ -139,56 +150,56 @@ describe('filterTableData', () => {
   const tableData = [
     {
       pool: {
-        asset: { chain: 'THOR', symbol: 'RUNE', ticker: 'RUNE' },
-        target: { chain: 'BNB', symbol: 'BNB', ticker: 'BNB' }
+        asset: AssetRuneNative,
+        target: AssetBNB
       }
     },
     {
       pool: {
-        asset: { chain: 'THOR', symbol: 'RUNE', ticker: 'RUNE' },
-        target: { chain: 'LTC', symbol: 'LTC', ticker: 'LTC' }
+        asset: AssetRuneNative,
+        target: AssetLTC
       }
     },
     {
       pool: {
-        asset: { chain: 'THOR', symbol: 'RUNE', ticker: 'RUNE' },
-        target: { chain: 'BTC', symbol: 'BTC', ticker: 'BTC' }
+        asset: AssetRuneNative,
+        target: AssetBTC
       }
     },
     {
       pool: {
-        asset: { chain: 'THOR', symbol: 'RUNE', ticker: 'RUNE' },
-        target: { chain: 'BCH', symbol: 'BCH', ticker: 'BCH' }
+        asset: AssetRuneNative,
+        target: AssetBCH
       }
     },
     {
       pool: {
-        asset: { chain: 'THOR', symbol: 'RUNE', ticker: 'RUNE' },
-        target: { chain: 'BNB', symbol: 'BUSD-BAF', ticker: 'BUSD' }
+        asset: AssetRuneNative,
+        target: ASSETS_TESTNET.BUSD
       }
     },
     {
       pool: {
-        asset: { chain: 'THOR', symbol: 'RUNE', ticker: 'RUNE' },
-        target: { chain: 'BNB', symbol: 'USDT-DC8', ticker: 'USDT' }
+        asset: AssetRuneNative,
+        target: ERC20_TESTNET.USDT
       }
     },
     {
       pool: {
-        asset: { chain: 'THOR', symbol: 'RUNE', ticker: 'RUNE' },
-        target: { chain: 'ETH', symbol: 'THOR-0XA0B515C058F127A15DD3326F490EBF47D215588E', ticker: 'THOR' }
+        asset: AssetRuneNative,
+        target: ERC20_TESTNET.RUNE
       }
     },
     {
       pool: {
-        asset: { chain: 'THOR', symbol: 'RUNE', ticker: 'RUNE' },
-        target: { chain: 'ETH', symbol: 'USDT-0X62E273709DA575835C7F6AEF4A31140CA5B1D190', ticker: 'USDT' }
+        asset: AssetRuneNative,
+        target: ERC20_TESTNET.USDT
       }
     },
     {
       pool: {
-        asset: { chain: 'THOR', symbol: 'RUNE', ticker: 'RUNE' },
-        target: { chain: 'ETH', symbol: 'ETH', ticker: 'ETH' }
+        asset: AssetRuneNative,
+        target: AssetETH
       }
     }
   ] as PoolTableRowData[]
