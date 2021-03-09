@@ -19,6 +19,8 @@ import {
   LTCChain,
   BCHChain
 } from '@xchainjs/xchain-util'
+import { ethers } from 'ethers'
+import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
 
@@ -55,3 +57,12 @@ export const removeAddressPrefix = (address: Address): Address => {
   const prefixIndex = address.indexOf(':') + 1
   return address.substr(prefixIndex > 0 ? prefixIndex : 0)
 }
+
+/**
+ * Helper to get ETH address as a checksum address
+ * ERC20 addresses start with 0X rather than 0x in Asgardex
+ * Due to that, address.toLowerCase() is needed
+ * If not, ethers getAddress function recognize the address as invalid one
+ */
+export const getEthChecksumAddress = (address: Address): O.Option<Address> =>
+  O.tryCatch(() => ethers.utils.getAddress(address.toLowerCase()))
