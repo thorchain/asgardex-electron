@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { getSwapMemo } from '@thorchain/asgardex-util'
 import { FeeOptionKey } from '@xchainjs/xchain-client'
+import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
   BNBChain,
   THORChain,
@@ -12,10 +13,13 @@ import {
   BCHChain,
   LTCChain
 } from '@xchainjs/xchain-util'
+import { ethers } from 'ethers'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { getEthTokenAddress, isEthAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { eqChain } from '../../../helpers/fp/eq'
 import { liveData } from '../../../helpers/rx/liveData'
@@ -23,12 +27,21 @@ import { observableState } from '../../../helpers/stateHelper'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as BCH from '../../bitcoincash'
+import { ethRouterABI } from '../../const'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
 import { FeeLD, SwapFeeParams, SwapFeesHandler, SwapFeesParams } from '../types'
 
-const swapFeeByChain$ = ({ asset, memo, amount, recipient }: SwapFeeParams): FeeLD => {
+const swapFeeByChain$ = ({
+  asset,
+  memo,
+  amount,
+  recipient,
+  routerAddress,
+  type
+}: SwapFeeParams & { type: 'source' | 'target' }): FeeLD => {
+  const router = type === 'source' ? FP.pipe(routerAddress, O.toUndefined) : undefined
   const chain = getChainAsset(asset.chain).chain
   const FEE_OPTION_KEY: FeeOptionKey = 'fast'
 
@@ -53,15 +66,36 @@ const swapFeeByChain$ = ({ asset, memo, amount, recipient }: SwapFeeParams): Fee
 
     case ETHChain:
       return FP.pipe(
-        ETH.fees$({
-          asset,
-          amount,
-          recipient,
-          memo
-        }),
+        router
+          ? ETH.customFees$(
+              router,
+              ethRouterABI,
+              'deposit',
+              isEthAsset(asset)
+                ? [
+                    ethers.utils.getAddress(recipient.toLowerCase()),
+                    getEthTokenAddress(asset) || ETHAddress,
+                    0,
+                    memo,
+                    {
+                      value: amount.amount().toFixed()
+                    }
+                  ]
+                : [
+                    ethers.utils.getAddress(recipient.toLowerCase()),
+                    getEthTokenAddress(asset) || ETHAddress,
+                    amount.amount().toFixed(),
+                    memo
+                  ]
+            )
+          : ETH.fees$({
+              asset,
+              amount,
+              recipient,
+              memo
+            }),
         liveData.map((fees) => fees[FEE_OPTION_KEY])
       )
-
     case CosmosChain:
       return Rx.of(RD.failure(Error('Cosmos fees is not implemented yet')))
 
@@ -91,9 +125,11 @@ const swapFees$: SwapFeesHandler = (params) => {
     RxOp.switchMap((reloadParams) => {
       const { source, target } = reloadParams || params
       // source fees
-      const sourceSwapFee$ = swapFeeByChain$({ ...source, memo: getSwapMemo({ asset: params.source.asset }) }).pipe(
-        RxOp.shareReplay(1)
-      )
+      const sourceSwapFee$ = swapFeeByChain$({
+        ...source,
+        type: 'source',
+        memo: getSwapMemo({ asset: params.source.asset })
+      }).pipe(RxOp.shareReplay(1))
       // target fees
       const targetSwapFee$ = Rx.iif(
         // If chains of source and target are the same
@@ -101,7 +137,7 @@ const swapFees$: SwapFeesHandler = (params) => {
         // and use same `sourceSwapFee$` stream to get target fees
         () => eqChain.equals(source.asset.chain, target.asset.chain),
         sourceSwapFee$,
-        swapFeeByChain$({ ...target })
+        swapFeeByChain$({ ...target, type: 'target' })
       ) // Result needs to be 3 times as "normal" fee
         .pipe(liveData.map((fee) => baseAmount(fee.amount().times(3), fee.decimal)))
 

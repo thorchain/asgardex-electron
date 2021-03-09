@@ -191,12 +191,13 @@ export const Swap = ({
       sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
       O.map(([{ source, target }, poolAddress, address]) => ({
         poolAddress,
+        routerAddress: sourcePoolRouter,
         asset: source,
         amount: amountToSwap,
         memo: getSwapMemo({ asset: target, address })
       }))
     )
-  }, [amountToSwap, assetsToSwap, oSourcePoolAddress, sourceAssetProp, targetWalletAddress])
+  }, [amountToSwap, assetsToSwap, oSourcePoolAddress, sourcePoolRouter, sourceAssetProp, targetWalletAddress])
 
   const swapData = useMemo(() => getSwapData(amountToSwap, sourceAsset, targetAsset, poolData), [
     amountToSwap,
@@ -217,7 +218,8 @@ export const Swap = ({
           target: {
             asset: targetAssetProp,
             amount: swapData.swapResult,
-            recipient: targetRecipient
+            recipient: targetRecipient,
+            routerAddress: O.some('')
           }
         }))
       ),
