@@ -27,8 +27,8 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { getEthTokenAddress, isEthTokenAsset } from '../../helpers/assetHelper'
-import { getChainAsset } from '../../helpers/chainHelper'
+import { getEthTokenAddress, isEthAsset, isEthTokenAsset } from '../../helpers/assetHelper'
+import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { LiveData } from '../../helpers/rx/liveData'
@@ -47,7 +47,7 @@ import {
   SwapFeesParams,
   SwapFeesLD
 } from '../../services/chain/types'
-import { ApproveParams } from '../../services/ethereum/types'
+import { ApproveParams, IsApprovedRD } from '../../services/ethereum/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import {
@@ -55,6 +55,7 @@ import {
   KeystoreState,
   NonEmptyWalletBalances,
   TxHashLD,
+  TxHashRD,
   ValidatePasswordHandler
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
@@ -691,14 +692,107 @@ export const Swap = ({
     amountToSwap
   ])
 
+  const {
+    state: approveState,
+    reset: resetApproveState,
+    subscribe: subscribeApproveState
+  } = useSubscriptionState<TxHashRD>(RD.initial)
+
+  const onApprove = () => {
+    FP.pipe(
+      sequenceTOption(sourcePoolRouter, getEthTokenAddress(sourceAssetProp)),
+      O.map(([router, tokenAddress]) =>
+        subscribeApproveState(
+          approveERC20Token$({
+            spender: router,
+            sender: tokenAddress
+          })
+        )
+      )
+    )
+  }
+
+  const renderApproveError = useMemo(
+    () =>
+      FP.pipe(
+        approveState,
+        RD.fold(
+          () => <></>,
+          () => <></>,
+          (error) => <Styled.ErrorLabel key="approveErrorLabel">{error.msg}</Styled.ErrorLabel>,
+          () => <></>
+        )
+      ),
+    [approveState]
+  )
+
+  // State for values of `isApprovedERC20Token$`
+  const {
+    state: isApprovedState,
+    reset: resetIsApprovedState,
+    subscribe: subscribeIsApprovedState
+  } = useSubscriptionState<IsApprovedRD>(RD.success(true))
+
+  const needApprovement = useMemo(() => {
+    // Other chains than ETH do not need an approvement
+    if (!isEthChain(sourceChainAsset.chain)) return false
+    // ETH does not need to be approved
+    if (isEthAsset(sourceAssetProp)) return false
+    // ERC20 token does need approvement only
+    return isEthTokenAsset(sourceAssetProp)
+  }, [sourceAssetProp, sourceChainAsset.chain])
+
+  const isApproved = useMemo(
+    () =>
+      !needApprovement ||
+      FP.pipe(
+        isApprovedState,
+        RD.getOrElse(() => false)
+      ),
+    [isApprovedState, needApprovement]
+  )
+
+  const checkApprovedStatus = useCallback(() => {
+    // check approve status
+    FP.pipe(
+      sequenceTOption(
+        O.fromPredicate((v) => !!v)(needApprovement), // `None` if needApprovement is `false`, no request then
+        sourcePoolRouter,
+        getEthTokenAddress(sourceAssetProp)
+      ),
+      O.map(([_, router, tokenAddress]) =>
+        subscribeIsApprovedState(
+          isApprovedERC20Token$({
+            spender: router,
+            sender: tokenAddress
+          })
+        )
+      )
+    )
+  }, [isApprovedERC20Token$, needApprovement, sourceAssetProp, sourcePoolRouter, subscribeIsApprovedState])
+
   const reset = useCallback(() => {
     // reset swap state
     resetSwapState()
+    // reset approve state
+    resetApproveState()
+    // reset isApproved state
+    resetIsApprovedState()
     // reload fees
     FP.pipe(oSwapFeesParams, O.map(reloadFees))
     // zero amount to swap
     setAmountToSwap(ZERO_BASE_AMOUNT)
-  }, [oSwapFeesParams, reloadFees, resetSwapState, setAmountToSwap])
+    // check approved status
+    checkApprovedStatus()
+  }, [
+    checkApprovedStatus,
+    oSwapFeesParams,
+    reloadFees,
+    resetApproveState,
+    resetIsApprovedState,
+    resetSwapState,
+    setAmountToSwap
+  ])
 
   useEffect(() => {
     // reset data whenever
@@ -748,57 +842,6 @@ export const Swap = ({
       )
     )
   }, [canSwitchAssets, setPendingSwitchAssets, assetsToSwap, onChangePath])
-
-  const [isApprovedRD] = useObservableState<RD.RemoteData<ApiError, boolean>>(
-    () =>
-      FP.pipe(
-        sequenceTOption(sourcePoolRouter, getEthTokenAddress(sourceAssetProp)),
-        O.map(([router, tokenAddress]) => {
-          if (isEthTokenAsset(sourceAssetProp)) {
-            return isApprovedERC20Token$({
-              spender: router,
-              sender: tokenAddress
-            })
-          } else {
-            return Rx.of(RD.success(true))
-          }
-        }),
-        O.getOrElse<LiveData<ApiError, boolean>>(() => Rx.of(RD.success(true)))
-      ),
-    RD.initial
-  )
-
-  const [isApproved, setApproved] = useState(true)
-
-  useEffect(() => {
-    if (RD.isSuccess(isApprovedRD)) {
-      setApproved(isApprovedRD.value)
-    } else {
-      setApproved(true)
-    }
-  }, [chainFeesRD, isApprovedRD])
-
-  const [isApproveLoading, setApproveLoading] = useState(false)
-  const [approveError, setApproveError] = useState('')
-
-  const onApprove = () => {
-    FP.pipe(
-      sequenceTOption(sourcePoolRouter, getEthTokenAddress(sourceAssetProp)),
-      O.map(([router, tokenAddress]) =>
-        approveERC20Token$({
-          spender: router,
-          sender: tokenAddress
-        }).subscribe((val) => {
-          setApproveLoading(RD.isPending(val))
-          if (RD.isFailure(val)) {
-            setApproveError(val.error.msg)
-          } else if (RD.isSuccess(val)) {
-            setApproved(true)
-          }
-        })
-      )
-    )
-  }
 
   return (
     <Styled.Container>
@@ -903,10 +946,10 @@ export const Swap = ({
         </Styled.SubmitContainer>
       ) : (
         <Styled.SubmitContainer>
-          <Styled.ApproveButton onClick={onApprove} loading={isApproveLoading}>
+          <Styled.ApproveButton onClick={onApprove} loading={RD.isPending(approveState)}>
             {intl.formatMessage({ id: 'swap.approve' })}
           </Styled.ApproveButton>
-          {approveError && <Styled.ErrorLabel key="approveErrorLabel">{approveError}</Styled.ErrorLabel>}
+          {renderApproveError}
         </Styled.SubmitContainer>
       )}
       {showPasswordModal && (
