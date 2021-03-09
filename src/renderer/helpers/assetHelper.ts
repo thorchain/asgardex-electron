@@ -97,10 +97,11 @@ export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
 /**
  * Get ethereum token address from a given asset
  */
-export const getEthTokenAddress = (asset: Asset): O.Option<Address> => {
-  const tokenAddress = getTokenAddress(asset)
-  return tokenAddress ? getEthChecksumAddress(tokenAddress) : O.none
-}
+export const getEthTokenAddress: (asset: Asset) => O.Option<Address> = FP.flow(
+  getTokenAddress,
+  O.fromNullable,
+  O.chain(getEthChecksumAddress)
+)
 
 /**
  * Check whether an asset is an ERC20 asset
