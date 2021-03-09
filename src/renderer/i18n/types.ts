@@ -58,6 +58,7 @@ type CommonMessageKey =
   | 'common.modal.confirmTitle'
   | 'common.value'
   | 'common.manage'
+  | 'common.asset.base'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

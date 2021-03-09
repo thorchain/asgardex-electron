@@ -57,7 +57,8 @@ const common: CommonMessages = {
   'common.tx.view': 'View {assetSymbol} transaction',
   'common.modal.confirmTitle': 'Confirm action',
   'common.value': 'Value',
-  'common.manage': 'Manage'
+  'common.manage': 'Manage',
+  'common.asset.base': 'Base'
 }
 
 export default common
