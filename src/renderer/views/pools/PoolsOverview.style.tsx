@@ -34,6 +34,9 @@ export const TabButton = styled(UIButton).attrs<TabButtonProps>(({ selected }) =
 }))<TabButtonProps>`
   font-size: 16px !important;
   color: ${({ selected }) => palette('text', selected ? 1 : 0)} !important;
+  &:first-child {
+    padding-left: 0;
+  }
 `
 export const TabPane = styled(A.Tabs.TabPane)``
 
