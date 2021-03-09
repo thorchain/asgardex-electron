@@ -10,6 +10,7 @@ import {
   AssetRuneB1A,
   AssetRuneNative
 } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
 import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
@@ -112,7 +113,7 @@ export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, get
 /**
  * Get ethereum token address from a given asset
  */
-export const getEthTokenAddress = (asset: Asset): string => {
+export const getEthTokenAddress = (asset: Asset): O.Option<string> => {
   const tokenAddress = getTokenAddress(asset)
-  return tokenAddress ? getEthChecksumAddress(tokenAddress) : ''
+  return tokenAddress ? getEthChecksumAddress(tokenAddress) : O.none
 }

@@ -3,6 +3,8 @@ import React, { useMemo, useCallback } from 'react'
 import { LoadingOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../../../shared/api/types'
 import {
@@ -75,8 +77,14 @@ export const AssetIcon: React.FC<Props> = ({
       }
 
       if (isEthChain(asset.chain)) {
-        const tokenAddress = getEthTokenAddress(asset)
-        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
+        return FP.pipe(
+          getEthTokenAddress(asset),
+          O.map(
+            (tokenAddress) =>
+              `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
+          ),
+          O.getOrElse(() => '')
+        )
       }
     }
 
