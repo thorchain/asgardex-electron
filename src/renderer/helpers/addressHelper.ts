@@ -57,4 +57,10 @@ export const removeAddressPrefix = (address: Address): Address => {
   return address.substr(prefixIndex > 0 ? prefixIndex : 0)
 }
 
-export const getETHChecksumAddress = (address: Address) => ethers.utils.getAddress(address.toLowerCase())
+/**
+ * Helper to get ETH address as a checksum address
+ * ERC20 addresses start with 0X rather than 0x in Asgardex
+ * Due to that, address.toLowerCase() is needed
+ * If not, ethers getAddress function recognize the address as invalid one
+ */
+export const getEthChecksumAddress = (address: Address) => ethers.utils.getAddress(address.toLowerCase())
