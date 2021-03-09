@@ -3,9 +3,8 @@ import React, { useCallback, useMemo } from 'react'
 import { useObservableState } from 'observable-hooks'
 import { palette } from 'styled-theme'
 
-import { ReactComponent as ThemeIcon } from '../../../assets/svg/icon-theme-switch.svg'
 import { useThemeContext } from '../../../contexts/ThemeContext'
-import { HeaderThemeWrapper } from './HeaderTheme.style'
+import * as Styled from './HeaderTheme.style'
 
 type Props = {
   onPress?: () => void
@@ -25,9 +24,9 @@ export const HeaderTheme: React.FC<Props> = (props): JSX.Element => {
   }, [toggleTheme, onPress])
 
   return (
-    <HeaderThemeWrapper onClick={() => clickSwitchThemeHandler()}>
+    <Styled.HeaderThemeWrapper onClick={() => clickSwitchThemeHandler()}>
       {!isDesktopView && (palette('background', 0)({ theme }) === '#fff' ? 'DAY MODE' : 'NIGHT MODE')}
-      <ThemeIcon style={{ color, ...iconStyle }} />
-    </HeaderThemeWrapper>
+      <Styled.ThemeIcon style={{ color, ...iconStyle }} />
+    </Styled.HeaderThemeWrapper>
   )
 }
