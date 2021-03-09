@@ -118,5 +118,15 @@ describe('helpers/addressHelper', () => {
       const result = getEthChecksumAddress('0x0089d53f703f7e0843953d48133f74ce247184c2')
       expect(result).toEqual(O.some('0x0089d53F703f7E0843953D48133f74cE247184c2'))
     })
+
+    it('wrong address', () => {
+      const result = getEthChecksumAddress('0x089d53f703f7e48133f74ce247184c2')
+      expect(result).toEqual(O.none)
+    })
+
+    it('empty address', () => {
+      const result = getEthChecksumAddress('')
+      expect(result).toEqual(O.none)
+    })
   })
 })

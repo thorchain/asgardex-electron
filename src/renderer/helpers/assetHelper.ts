@@ -1,3 +1,4 @@
+import { Address } from '@xchainjs/xchain-client'
 import { getTokenAddress } from '@xchainjs/xchain-ethereum'
 import {
   Asset,
@@ -113,7 +114,7 @@ export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, get
 /**
  * Get ethereum token address from a given asset
  */
-export const getEthTokenAddress = (asset: Asset): O.Option<string> => {
+export const getEthTokenAddress = (asset: Asset): O.Option<Address> => {
   const tokenAddress = getTokenAddress(asset)
   return tokenAddress ? getEthChecksumAddress(tokenAddress) : O.none
 }

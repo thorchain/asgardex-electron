@@ -64,5 +64,5 @@ export const removeAddressPrefix = (address: Address): Address => {
  * Due to that, address.toLowerCase() is needed
  * If not, ethers getAddress function recognize the address as invalid one
  */
-export const getEthChecksumAddress = (address: Address) =>
+export const getEthChecksumAddress = (address: Address): O.Option<Address> =>
   O.tryCatch(() => ethers.utils.getAddress(address.toLowerCase()))
