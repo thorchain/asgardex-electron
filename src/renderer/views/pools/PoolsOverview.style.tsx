@@ -2,6 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { AssetsFilter as AssetsFilterUI } from '../../components/AssetsFilter'
 import { AssetData as AssetDataUI } from '../../components/uielements/assets/assetData'
 import { Button as UIButton, ButtonProps as UIButtonProps } from '../../components/uielements/button'
 import { Label as UILabel } from '../../components/uielements/label'
@@ -34,6 +35,9 @@ export const TabButton = styled(UIButton).attrs<TabButtonProps>(({ selected }) =
 }))<TabButtonProps>`
   font-size: 16px !important;
   color: ${({ selected }) => palette('text', selected ? 1 : 0)} !important;
+  &:first-child {
+    padding-left: 0;
+  }
 `
 export const TabPane = styled(A.Tabs.TabPane)``
 
@@ -60,6 +64,9 @@ export const BlockLeftLabel = styled(UILabel)`
 
 export const Label = styled(UILabel)`
   font-size: 16px;
+`
+export const AssetsFilter = styled(AssetsFilterUI)`
+  margin-bottom: 20px;
 `
 export const AssetData = styled(AssetDataUI)`
   & .ticker {
