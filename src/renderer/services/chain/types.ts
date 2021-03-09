@@ -71,6 +71,7 @@ export type LoadDepositFeesHandler = (p: DepositFeesParams) => void
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
 export type SendTxParams = {
+  router?: string
   asset: Asset
   recipient: string
   amount: BaseAmount
@@ -98,6 +99,7 @@ export type SwapState = {
 export type SwapState$ = Rx.Observable<SwapState>
 
 export type SwapParams = {
+  readonly routerAddress: O.Option<Address>
   readonly poolAddress: O.Option<Address>
   readonly asset: Asset
   readonly amount: BaseAmount

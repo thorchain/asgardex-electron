@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, TxHash } from '@xchainjs/xchain-client'
+import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
   BCHChain,
   BNBChain,
@@ -12,9 +13,11 @@ import {
   THORChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 
 import { DEFAULT_FEE_OPTION_KEY } from '../../../components/wallet/txs/send/Send.const'
+import { getEthTokenAddress, isEthAsset } from '../../../helpers/assetHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
@@ -27,6 +30,7 @@ import { ErrorId, TxHashLD, TxLD } from '../../wallet/types'
 import { SendTxParams } from '../types'
 
 export const sendTx$ = ({
+  router = '',
   asset,
   recipient,
   amount,
@@ -58,7 +62,24 @@ export const sendTx$ = ({
       )
 
     case ETHChain:
-      return ETH.sendTx({ asset, recipient, amount, memo, feeOptionKey })
+      if (txType === TxTypes.SWAP) {
+        const assetAddress = isEthAsset(asset)
+          ? ETHAddress
+          : FP.pipe(
+              getEthTokenAddress(asset),
+              O.map((address) => address),
+              O.getOrElse(() => '')
+            )
+        return ETH.sendDepositTx({
+          router: router,
+          vault: recipient,
+          assetAddress,
+          amount,
+          memo
+        })
+      } else {
+        return ETH.sendTx({ asset, recipient, amount, memo, feeOptionKey })
+      }
 
     case THORChain: {
       if (txType === TxTypes.SWAP || txType === TxTypes.DEPOSIT || txType === TxTypes.WITHDRAW) {

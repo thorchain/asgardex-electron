@@ -172,6 +172,7 @@ export const Swap = ({
       FP.pipe(
         sequenceTOption(assetsToSwap, targetWalletAddress),
         O.map(([{ source, target }, address]) => ({
+          routerAddress: O.some('0x9d496De78837f5a2bA64Cb40E62c19FBcB67f55a'),
           poolAddress: oSourcePoolAddress,
           asset: source,
           amount: amountToSwap,

@@ -33,8 +33,11 @@ export type ApproveParams = {
 }
 
 export type CallRouterParams = {
-  address: Address
-  params: Array<string>
+  router: Address
+  vault: Address
+  assetAddress: Address
+  amount: BaseAmount
+  memo: string
 }
 
 export type TransactionService = {

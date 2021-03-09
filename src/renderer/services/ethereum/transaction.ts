@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { Client as EthClient } from '@xchainjs/xchain-ethereum'
+import { Client as EthClient, ETHAddress } from '@xchainjs/xchain-ethereum'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -17,7 +17,23 @@ export const createTransactionService = (client$: Client$): TransactionService =
   const common = C.createTransactionService(client$)
 
   const runCallRouterDeposit$ = (client: EthClient, params: CallRouterParams): TxHashLD =>
-    Rx.from(client.call<{ hash: TxHash }>(params.address, ethRouterABI, 'deposit', params.params)).pipe(
+    FP.pipe(
+      Rx.from(client.estimateGasPrices()),
+      RxOp.switchMap((gasPrices) => {
+        const amount = params.assetAddress === ETHAddress ? baseAmount(0) : params.amount
+        return client.call<{ hash: TxHash }>(params.router, ethRouterABI, 'deposit', [
+          params.vault,
+          params.assetAddress,
+          amount,
+          params.memo,
+          params.assetAddress === ETHAddress
+            ? {
+                value: params.amount,
+                gasPrice: gasPrices.fastest
+              }
+            : { gasPrice: gasPrices.fastest }
+        ])
+      }),
       RxOp.map((txResult) => txResult.hash),
       RxOp.map(RD.success),
       RxOp.catchError(

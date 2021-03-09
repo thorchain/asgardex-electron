@@ -5,6 +5,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { TxTypes } from '../../../types/asgardex'
@@ -26,7 +27,13 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * @returns SwapState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
  *
  */
-export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapParams): SwapState$ => {
+export const swap$ = ({
+  routerAddress: oRouterAddress,
+  poolAddress: oPoolAddress,
+  asset,
+  amount,
+  memo
+}: SwapParams): SwapState$ => {
   // total of progress
   const total = O.some(100)
 
@@ -40,10 +47,10 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
   // All requests will be done in a sequence
   // and `SwapState` will be updated step by step
   const requests$ = FP.pipe(
-    oPoolAddress,
+    sequenceTOption(oRouterAddress, oPoolAddress),
     // For RuneNative we send `MsgNativeTx` w/o need for a pool address address,
     // so we can leave it empty
-    O.alt(() => (isRuneNativeAsset(asset) ? O.some('') : O.none)),
+    O.alt(() => (isRuneNativeAsset(asset) ? O.some(['', '']) : O.none)),
 
     O.fold(
       // invalid pool address will fail
@@ -52,7 +59,7 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
         return Rx.EMPTY
       },
       // valid pool address (even an empty one for Thorchain)
-      (poolAddress) =>
+      ([routerAddress, poolAddress]) =>
         Rx.of(poolAddress).pipe(
           // 1. validate pool address or node (for `RuneNative` only)
           RxOp.switchMap((poolAddress) =>
@@ -68,6 +75,7 @@ export const swap$ = ({ poolAddress: oPoolAddress, asset, amount, memo }: SwapPa
             setState({ ...getState(), step: 2, swapTx: RD.pending, swap: RD.progress({ loaded: 50, total }) })
             // 2. send swap tx
             return sendTx$({
+              router: routerAddress,
               asset,
               recipient: poolAddress,
               amount,
