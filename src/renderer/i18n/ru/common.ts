@@ -11,6 +11,7 @@ const common: CommonMessages = {
   'common.to': 'Получатель',
   'common.from': 'Отправтель',
   'common.amount': 'Колчиество',
+  'common.address.self': 'Свой',
   'common.coin': 'Коин',
   'common.password': 'Пароль',
   'common.memo': 'Memo',
