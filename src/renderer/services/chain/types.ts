@@ -98,7 +98,7 @@ export type SwapState = {
 export type SwapState$ = Rx.Observable<SwapState>
 
 export type SwapParams = {
-  readonly poolAddress: O.Option<Address>
+  readonly poolAddress: Address
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
@@ -107,7 +107,7 @@ export type SwapParams = {
 export type SwapStateHandler = (p: SwapParams) => SwapState$
 
 export type SwapFeeParams = {
-  readonly recipient: O.Option<Address>
+  readonly recipient: Address
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo?: Memo

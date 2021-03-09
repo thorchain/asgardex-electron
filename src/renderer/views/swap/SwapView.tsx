@@ -77,7 +77,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       FP.pipe(
         oSource,
         O.map(poolAddressByAsset$),
-        O.getOrElse((): PoolAddressRx => Rx.EMPTY)
+        O.getOrElse((): PoolAddressRx => Rx.of(O.none))
       ),
     [oSource, poolAddressByAsset$]
   )
