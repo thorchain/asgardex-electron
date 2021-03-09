@@ -19,11 +19,10 @@ type Props = {
   className?: string
   enableCopy?: boolean
   linkIcon?: React.ReactElement
-  displayText?: string | React.ReactElement
 }
 
 export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
-  const { address, chain, network, className, enableCopy = false, linkIcon, displayText } = props
+  const { address, chain, network, className, enableCopy = false, linkIcon } = props
   const prepEllipse = useCallback(
     (node: HTMLElement, txtToEllipse: HTMLElement, copyIcon: HTMLElement) => {
       const parent = node.parentElement
@@ -74,7 +73,7 @@ export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
   return (
     <Styled.Container className={className}>
       <Styled.AddressContainer ref={measuredParent}>
-        <Styled.Address className={className}>{displayText || address}</Styled.Address>
+        <Styled.Address className={className}>{address}</Styled.Address>
         {linkIcon}
         <Styled.CopyLabel copyable={{ text: address }} />
       </Styled.AddressContainer>

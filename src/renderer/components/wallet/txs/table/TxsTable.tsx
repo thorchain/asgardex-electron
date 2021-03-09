@@ -60,21 +60,21 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
 
   const renderAddressWithBreak = useCallback(
     (address: Address, key: string) => {
-      const displayText = FP.pipe(
+      const selfAddress = FP.pipe(
         oWalletAddres,
-        O.map((walletAddress) =>
-          walletAddress === address ? (
-            <Styled.OwnText>{intl.formatMessage({ id: 'common.address.self' })}</Styled.OwnText>
-          ) : (
-            address
-          )
-        ),
-        O.toUndefined
+        O.chain((walletAddress) =>
+          walletAddress === address
+            ? O.some(<Styled.OwnText>{intl.formatMessage({ id: 'common.address.self' })}</Styled.OwnText>)
+            : O.none
+        )
       )
-      return (
-        <Styled.Text key={key}>
-          <AddressEllipsis address={address} chain={chain} network={network} displayText={displayText} />
-        </Styled.Text>
+      return FP.pipe(
+        selfAddress,
+        O.getOrElse(() => (
+          <Styled.Text key={key}>
+            <AddressEllipsis address={address} chain={chain} network={network} />
+          </Styled.Text>
+        ))
       )
     },
     [chain, network, oWalletAddres, intl]

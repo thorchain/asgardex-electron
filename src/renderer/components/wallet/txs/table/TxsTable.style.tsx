@@ -33,7 +33,7 @@ export const TransferIcon = styled(SwapOutlined)`
   }
 `
 
-export const OwnText = styled(Typography.Text)`
+export const OwnText = styled.div`
   text-transform: uppercase;
   color: inherit;
 `
