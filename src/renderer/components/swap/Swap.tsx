@@ -26,8 +26,8 @@ import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
-import { ERC20Assets, ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { getEthTokenAddress, isERC20Asset } from '../../helpers/assetHelper'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
+import { getEthTokenAddress, isEthTokenAsset } from '../../helpers/assetHelper'
 import { getChainAsset } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
@@ -752,12 +752,12 @@ export const Swap = ({
   const [isApprovedRD] = useObservableState<RD.RemoteData<ApiError, boolean>>(
     () =>
       FP.pipe(
-        sourcePoolRouter,
-        O.map((router) => {
-          if (isERC20Asset(sourceAssetProp)) {
+        sequenceTOption(sourcePoolRouter, getEthTokenAddress(sourceAssetProp)),
+        O.map(([router, tokenAddress]) => {
+          if (isEthTokenAsset(sourceAssetProp)) {
             return isApprovedERC20Token$({
               spender: router,
-              sender: getEthTokenAddress(ERC20Assets.filter((asset) => eqAsset.equals(asset, sourceAssetProp))[0])
+              sender: tokenAddress
             })
           } else {
             return Rx.of(RD.success(true))
@@ -783,11 +783,11 @@ export const Swap = ({
 
   const onApprove = () => {
     FP.pipe(
-      sourcePoolRouter,
-      O.map((router) =>
+      sequenceTOption(sourcePoolRouter, getEthTokenAddress(sourceAssetProp)),
+      O.map(([router, tokenAddress]) =>
         approveERC20Token$({
           spender: router,
-          sender: getEthTokenAddress(ERC20Assets.filter((asset) => eqAsset.equals(asset, sourceAssetProp))[0])
+          sender: tokenAddress
         }).subscribe((val) => {
           setApproveLoading(RD.isPending(val))
           if (RD.isFailure(val)) {

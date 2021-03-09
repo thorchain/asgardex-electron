@@ -11,10 +11,11 @@ import {
   AssetRuneB1A,
   AssetRuneNative
 } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
-import { AssetBUSDBAF, AssetBUSDBD1, ERC20Assets, PRICE_ASSETS } from '../const'
+import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
 import { getChainAsset } from './chainHelper'
@@ -94,10 +95,17 @@ export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
 
 /**
+ * Get ethereum token address from a given asset
+ */
+export const getEthTokenAddress = (asset: Asset): O.Option<Address> => {
+  const tokenAddress = getTokenAddress(asset)
+  return tokenAddress ? getEthChecksumAddress(tokenAddress) : O.none
+}
+
+/**
  * Check whether an asset is an ERC20 asset
  */
-export const isERC20Asset = (asset: Asset): boolean =>
-  ERC20Assets.filter((erc20Asset) => eqAsset.equals(asset, erc20Asset)).length > 0
+export const isEthTokenAsset: (asset: Asset) => boolean = FP.flow(getEthTokenAddress, O.isSome)
 
 /**
  * Check whether an asset is an RuneNative asset
@@ -116,11 +124,3 @@ export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
   PRICE_ASSETS.includes(asset)
 
 export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, getChainAsset(asset.chain))
-
-/**
- * Get ethereum token address from a given asset
- */
-export const getEthTokenAddress = (asset: Asset): O.Option<Address> => {
-  const tokenAddress = getTokenAddress(asset)
-  return tokenAddress ? getEthChecksumAddress(tokenAddress) : O.none
-}
