@@ -1,6 +1,7 @@
 import { BCHChain, BNBChain, BTCChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
-import { removeAddressPrefix, truncateAddress } from './addressHelper'
+import { getEthChecksumAddress, removeAddressPrefix, truncateAddress } from './addressHelper'
 
 describe('helpers/addressHelper', () => {
   describe('truncateAddress', () => {
@@ -104,6 +105,28 @@ describe('helpers/addressHelper', () => {
     it('litecoin mainnet', () => {
       const result = removeAddressPrefix('ltc1qtephp596jhpwrawlp67junuk347zl2cwpucctk')
       expect(result).toEqual('ltc1qtephp596jhpwrawlp67junuk347zl2cwpucctk')
+    })
+  })
+
+  describe('getETHChecksumAddress', () => {
+    it('ethereum uppercase address', () => {
+      const result = getEthChecksumAddress('0x0089D53F703F7E0843953D48133F74CE247184C2')
+      expect(result).toEqual(O.some('0x0089d53F703f7E0843953D48133f74cE247184c2'))
+    })
+
+    it('ethereum lowercase address', () => {
+      const result = getEthChecksumAddress('0x0089d53f703f7e0843953d48133f74ce247184c2')
+      expect(result).toEqual(O.some('0x0089d53F703f7E0843953D48133f74cE247184c2'))
+    })
+
+    it('wrong address', () => {
+      const result = getEthChecksumAddress('0x089d53f703f7e48133f74ce247184c2')
+      expect(result).toEqual(O.none)
+    })
+
+    it('empty address', () => {
+      const result = getEthChecksumAddress('')
+      expect(result).toEqual(O.none)
     })
   })
 })
