@@ -41,7 +41,7 @@ export const ResetButton = styled(ButtonUI).attrs({ typevalue: 'transparent' })`
     &:hover,
     &:active,
     &:focus {
-      color: ${palette('gray', 2)} !important;
+      color: ${palette('error', 0)} !important;
     }
   }
 `
