@@ -67,9 +67,11 @@ export const sendTx$ = ({
           ? ETHAddress
           : FP.pipe(
               getEthTokenAddress(asset),
-              O.map((address) => address),
               O.getOrElse(() => '')
             )
+        if (!assetAddress) {
+          return txFailure$(`Invalid Token Address`)
+        }
         return ETH.sendDepositTx({
           router: router,
           vault: recipient,

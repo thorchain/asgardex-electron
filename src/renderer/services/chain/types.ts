@@ -71,9 +71,9 @@ export type LoadDepositFeesHandler = (p: DepositFeesParams) => void
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
 export type SendTxParams = {
-  router?: string
+  router?: Address
   asset: Asset
-  recipient: string
+  recipient: Address
   amount: BaseAmount
   memo: Memo
   txType: TxTypes

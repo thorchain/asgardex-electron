@@ -37,10 +37,10 @@ export const createTransactionService = (client$: Client$): TransactionService =
       RxOp.map((txResult) => txResult.hash),
       RxOp.map(RD.success),
       RxOp.catchError(
-        (e): TxHashLD =>
+        (error): TxHashLD =>
           Rx.of(
             RD.failure({
-              msg: e.toString(),
+              msg: error?.message ?? error.toString(),
               errorId: ErrorId.APPROVE_TX
             })
           )
@@ -67,10 +67,10 @@ export const createTransactionService = (client$: Client$): TransactionService =
       RxOp.map((txReceipt) => txReceipt.transactionHash),
       RxOp.map(RD.success),
       RxOp.catchError(
-        (e): TxHashLD =>
+        (error): TxHashLD =>
           Rx.of(
             RD.failure({
-              msg: e.toString(),
+              msg: error?.message ?? error.toString(),
               errorId: ErrorId.APPROVE_TX
             })
           )
