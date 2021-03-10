@@ -53,7 +53,6 @@ import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
-import { AssetSelect } from '../uielements/assets/assetSelect'
 import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
@@ -767,7 +766,7 @@ export const Swap = ({
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <AssetSelect
+                  <Styled.AssetSelect
                     onSelect={setSourceAsset}
                     asset={asset}
                     assets={assetsToSwapFrom}
@@ -796,7 +795,7 @@ export const Swap = ({
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <AssetSelect
+                  <Styled.AssetSelect
                     onSelect={setTargetAsset}
                     asset={asset}
                     assets={assetsToSwapTo}

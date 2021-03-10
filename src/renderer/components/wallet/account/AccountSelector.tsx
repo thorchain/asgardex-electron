@@ -55,9 +55,7 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
   return (
     <Styled.Card bordered={false}>
       <Styled.AssetWrapper>
-        <div>
-          <AssetIcon asset={selectedAsset} size={size} network={network} />
-        </div>
+        <AssetIcon asset={selectedAsset} size={size} network={network} />
         <Styled.AssetInfoWrapper>
           <Styled.AssetTitle>{selectedAsset.ticker}</Styled.AssetTitle>
           <Styled.AssetSubTitle>{selectedAsset.chain}</Styled.AssetSubTitle>

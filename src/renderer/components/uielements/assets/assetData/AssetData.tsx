@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { BaseAmount, formatAssetAmountCurrency, baseToAsset, baseAmount, Asset } from '@xchainjs/xchain-util'
-import { Col } from 'antd'
 
 import { Network } from '../../../../../shared/api/types'
 import { PricePoolAsset } from '../../../../views/pools/Pools.types'
@@ -49,32 +48,32 @@ export const AssetData: React.FC<Props> = (props): JSX.Element => {
   return (
     <Styled.Wrapper className={className}>
       {!noIcon && (
-        <Col>
+        <Styled.Col>
           <Styled.AssetIcon asset={asset} size={size} network={network} />
-        </Col>
+        </Styled.Col>
       )}
       {!noTicker && (
-        <Col>
+        <Styled.Col>
           <Styled.TickerLabel className="ticker" size={size}>
             {asset.ticker}
           </Styled.TickerLabel>
           <Styled.TickerLabel className="small" size={size}>
             {asset.chain}
           </Styled.TickerLabel>
-        </Col>
+        </Styled.Col>
       )}
       {assetAmount && (
-        <Col>
+        <Styled.Col>
           <Styled.AmountLabel size={size}>
             {formatAssetAmountCurrency({ amount: baseToAsset(assetAmount), asset, trimZeros: true })}
           </Styled.AmountLabel>
-        </Col>
+        </Styled.Col>
       )}
 
       {!!priceLabel && (
-        <Col>
+        <Styled.Col>
           <Styled.PriceLabel size={size}>{priceLabel}</Styled.PriceLabel>
-        </Col>
+        </Styled.Col>
       )}
     </Styled.Wrapper>
   )
