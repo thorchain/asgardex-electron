@@ -826,9 +826,9 @@ export const Swap = ({
   const canSwitchAssets = useMemo(() => {
     const hasBalances = FP.pipe(
       walletBalances,
-      O.map(A.map(({ asset }) => asset.symbol)),
+      O.map(A.map(({ asset }) => asset.symbol.toLowerCase())),
       (oAssetSymbols) => sequenceTOption(oAssetSymbols, targetAsset),
-      O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqString)(targetAsset.symbol))),
+      O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqString)(targetAsset.symbol.toLowerCase()))),
       O.getOrElse(() => true)
     )
 

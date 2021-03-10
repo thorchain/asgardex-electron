@@ -1,7 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { getSwapMemo } from '@thorchain/asgardex-util'
 import { FeeOptionKey } from '@xchainjs/xchain-client'
-import { ETHAddress } from '@xchainjs/xchain-ethereum'
+import { ETHAddress, validateAddress } from '@xchainjs/xchain-ethereum'
 import {
   BNBChain,
   THORChain,
@@ -44,7 +43,14 @@ const swapFeeByChain$ = ({
   const router = type === 'source' ? FP.pipe(routerAddress, O.toUndefined) : undefined
   const chain = getChainAsset(asset.chain).chain
   const FEE_OPTION_KEY: FeeOptionKey = 'fast'
-
+  console.log({
+    asset,
+    memo,
+    amount,
+    recipient,
+    routerAddress,
+    type
+  })
   switch (chain) {
     case BNBChain:
       return FP.pipe(
@@ -64,9 +70,26 @@ const swapFeeByChain$ = ({
         liveData.map((btcFees) => btcFees.fees[FEE_OPTION_KEY])
       )
 
-    case ETHChain:
+    case ETHChain: {
+      // deposit fee estimation requires recipient/router address and amount
+      let isValid = false
+
+      if (!recipient || !validateAddress(recipient)) {
+        isValid = true
+      }
+      if (!amount || amount.amount().eq(0)) {
+        isValid = true
+      }
+      if (type === 'source' && (!router || !validateAddress(router))) {
+        isValid = true
+      }
+
+      if (isValid) {
+        return Rx.of(RD.failure(Error('Missing amount or recipient')))
+      }
+
       return FP.pipe(
-        router
+        type === 'source' && router
           ? ETH.customFees$(
               router,
               ethRouterABI,
@@ -74,7 +97,7 @@ const swapFeeByChain$ = ({
               isEthAsset(asset)
                 ? [
                     ethers.utils.getAddress(recipient.toLowerCase()),
-                    getEthTokenAddress(asset) || ETHAddress,
+                    ETHAddress,
                     0,
                     memo,
                     {
@@ -83,7 +106,7 @@ const swapFeeByChain$ = ({
                   ]
                 : [
                     ethers.utils.getAddress(recipient.toLowerCase()),
-                    getEthTokenAddress(asset) || ETHAddress,
+                    FP.pipe(getEthTokenAddress(asset), O.toUndefined),
                     amount.amount().toFixed(),
                     memo
                   ]
@@ -96,6 +119,7 @@ const swapFeeByChain$ = ({
             }),
         liveData.map((fees) => fees[FEE_OPTION_KEY])
       )
+    }
     case CosmosChain:
       return Rx.of(RD.failure(Error('Cosmos fees is not implemented yet')))
 
@@ -127,8 +151,7 @@ const swapFees$: SwapFeesHandler = (params) => {
       // source fees
       const sourceSwapFee$ = swapFeeByChain$({
         ...source,
-        type: 'source',
-        memo: getSwapMemo({ asset: params.source.asset })
+        type: 'source'
       }).pipe(RxOp.shareReplay(1))
       // target fees
       const targetSwapFee$ = Rx.iif(
