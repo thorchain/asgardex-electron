@@ -30,4 +30,11 @@ export const Menu = styled(AntdMenu)`
     height: 100%;
     box-shadow: none !important;
   }
+
+  .ant-menu-item {
+    &,
+    &:hover {
+      color: ${palette('text', 0)};
+    }
+  }
 `

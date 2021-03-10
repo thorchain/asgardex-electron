@@ -8,7 +8,6 @@ const swap: SwapMessages = {
   'swap.balance': 'Баланс',
   'swap.output': 'Получаете',
   'swap.drag': 'Перетащите для обмена',
-  'swap.searchAsset': 'Поиск Ассета',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Комиссия транзакции {fee} дожна покрываться вашим балансом (сейчас {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':

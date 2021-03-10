@@ -4,6 +4,7 @@ import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
+import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
 import { Button as UIButton } from '../uielements/button'
 import { Drag as UIDrag } from '../uielements/drag'
 import { Label as UILabel } from '../uielements/label'
@@ -166,6 +167,10 @@ export const BalanceErrorLabel = styled(ErrorLabel)`
 
 export const NoteLabel = styled(UILabel)`
   color: ${palette('gray', 2)};
+`
+
+export const AssetSelect = styled(AssetSelectUI)`
+  justify-content: space-between;
 `
 
 export const ApproveButton = styled(UIButton).attrs({
