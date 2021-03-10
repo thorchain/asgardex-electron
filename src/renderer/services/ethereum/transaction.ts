@@ -21,18 +21,20 @@ export const createTransactionService = (client$: Client$): TransactionService =
       Rx.from(client.estimateGasPrices()),
       RxOp.switchMap((gasPrices) => {
         const amount = params.assetAddress === ETHAddress ? baseAmount(0) : params.amount
-        return client.call<{ hash: TxHash }>(params.router, ethRouterABI, 'deposit', [
-          params.vault,
-          params.assetAddress,
-          amount,
-          params.memo,
-          params.assetAddress === ETHAddress
-            ? {
-                value: params.amount,
-                gasPrice: gasPrices.fastest
-              }
-            : { gasPrice: gasPrices.fastest }
-        ])
+        return Rx.from(
+          client.call<{ hash: TxHash }>(params.router, ethRouterABI, 'deposit', [
+            params.vault,
+            params.assetAddress,
+            amount.amount().toFixed(),
+            params.memo,
+            params.assetAddress === ETHAddress
+              ? {
+                  value: params.amount.amount().toFixed(),
+                  gasPrice: gasPrices.fastest.amount().toFixed()
+                }
+              : { gasPrice: gasPrices.fastest.amount().toFixed() }
+          ])
+        )
       }),
       RxOp.map((txResult) => txResult.hash),
       RxOp.map(RD.success),

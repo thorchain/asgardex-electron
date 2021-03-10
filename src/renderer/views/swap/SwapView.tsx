@@ -94,8 +94,11 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       ),
     [oSource, poolRouterByAsset$]
   )
-
-  const sourcePoolRouter = useObservableState(sourcePoolRouter$, O.none)
+  const oSourcePoolRouter = useObservableState(sourcePoolRouter$, O.none)
+  const sourcePoolRouter = FP.pipe(
+    oSourcePoolRouter,
+    O.getOrElse(() => '')
+  )
 
   const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [
     source,

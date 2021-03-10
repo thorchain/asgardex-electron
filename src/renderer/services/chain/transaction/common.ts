@@ -73,7 +73,7 @@ export const sendTx$ = ({
           return txFailure$(`Invalid Token Address`)
         }
         return ETH.sendDepositTx({
-          router: router,
+          router,
           vault: recipient,
           assetAddress,
           amount,

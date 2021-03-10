@@ -89,7 +89,7 @@ export type SwapProps = {
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
   network: Network
-  sourcePoolRouter: O.Option<string>
+  sourcePoolRouter: string
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
 }
@@ -119,7 +119,7 @@ export const Swap = ({
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
-  const prevSourcePoolRouter = useRef<O.Option<string>>(O.none)
+  const prevSourcePoolRouter = useRef<string>('')
 
   // convert to hash map here instead of using getPoolDetail
   const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [
@@ -188,9 +188,9 @@ export const Swap = ({
     // For RuneNative a `MsgNativeTx` is sent w/o the need for a pool address
     const oPoolAddress = isRuneNativeAsset(sourceAssetProp) ? O.some('') : oSourcePoolAddress
     return FP.pipe(
-      sequenceTOption(assetsToSwap, sourcePoolRouter, oPoolAddress, targetWalletAddress),
-      O.map(([{ source, target }, routerAddress, poolAddress, address]) => ({
-        routerAddress,
+      sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
+      O.map(([{ source, target }, poolAddress, address]) => ({
+        routerAddress: sourcePoolRouter,
         poolAddress,
         asset: source,
         amount: amountToSwap,
@@ -711,11 +711,11 @@ export const Swap = ({
 
   const onApprove = () => {
     FP.pipe(
-      sequenceTOption(sourcePoolRouter, getEthTokenAddress(sourceAssetProp)),
-      O.map(([router, tokenAddress]) =>
+      getEthTokenAddress(sourceAssetProp),
+      O.map((tokenAddress) =>
         subscribeApproveState(
           approveERC20Token$({
-            spender: router,
+            spender: sourcePoolRouter,
             sender: tokenAddress
           })
         )
@@ -771,13 +771,12 @@ export const Swap = ({
     FP.pipe(
       sequenceTOption(
         O.fromPredicate((v) => !!v)(needApprovement), // `None` if needApprovement is `false`, no request then
-        sourcePoolRouter,
         getEthTokenAddress(sourceAssetProp)
       ),
-      O.map(([_, router, tokenAddress]) =>
+      O.map(([_, tokenAddress]) =>
         subscribeIsApprovedState(
           isApprovedERC20Token$({
-            spender: router,
+            spender: sourcePoolRouter,
             sender: tokenAddress
           })
         )

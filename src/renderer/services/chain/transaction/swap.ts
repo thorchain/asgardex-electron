@@ -1,10 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { getEthTokenAddress, isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { TxTypes } from '../../../types/asgardex'
@@ -63,10 +65,19 @@ export const swap$ = ({ routerAddress, poolAddress, asset, amount, memo }: SwapP
       })
     }),
     liveData.chain((txHash) => {
+      let assetAddress = undefined
+      if (isEthChain(asset.chain)) {
+        assetAddress = isEthAsset(asset)
+          ? ETHAddress
+          : FP.pipe(
+              getEthTokenAddress(asset),
+              O.getOrElse(() => '')
+            )
+      }
       // Update state
       setState({ ...getState(), step: 3, swapTx: RD.success(txHash), swap: RD.progress({ loaded: 75, total }) })
       // 3. check tx finality by polling its tx data
-      return txStatusByChain$(txHash, asset.chain)
+      return txStatusByChain$(txHash, asset.chain, assetAddress)
     }),
     // Update state
     liveData.map((_) => setState({ ...getState(), swap: RD.success(true) })),
