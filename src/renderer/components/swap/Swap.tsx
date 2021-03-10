@@ -190,12 +190,13 @@ export const Swap = ({
       sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
       O.map(([{ source, target }, poolAddress, address]) => ({
         poolAddress,
+        routerAddress: sourcePoolRouter,
         asset: source,
         amount: amountToSwap,
         memo: getSwapMemo({ asset: target, address })
       }))
     )
-  }, [amountToSwap, assetsToSwap, oSourcePoolAddress, sourceAssetProp, targetWalletAddress])
+  }, [amountToSwap, assetsToSwap, oSourcePoolAddress, sourcePoolRouter, sourceAssetProp, targetWalletAddress])
 
   const swapData = useMemo(() => getSwapData(amountToSwap, sourceAsset, targetAsset, poolData), [
     amountToSwap,
@@ -216,7 +217,8 @@ export const Swap = ({
           target: {
             asset: targetAssetProp,
             amount: swapData.swapResult,
-            recipient: targetRecipient
+            recipient: targetRecipient,
+            routerAddress: O.some('')
           }
         }))
       ),
@@ -823,9 +825,9 @@ export const Swap = ({
   const canSwitchAssets = useMemo(() => {
     const hasBalances = FP.pipe(
       walletBalances,
-      O.map(A.map(({ asset }) => asset.symbol)),
+      O.map(A.map(({ asset }) => asset.symbol.toLowerCase())),
       (oAssetSymbols) => sequenceTOption(oAssetSymbols, targetAsset),
-      O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqString)(targetAsset.symbol))),
+      O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqString)(targetAsset.symbol.toLowerCase()))),
       O.getOrElse(() => true)
     )
 

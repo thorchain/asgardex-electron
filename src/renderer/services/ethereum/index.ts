@@ -10,7 +10,7 @@ import {
   getExplorerTxUrl$,
   getExplorerAddressUrl$
 } from './common'
-import { createFeesService } from './fees'
+import { createFeesService, callFees$ } from './fees'
 import { createTransactionService } from './transaction'
 
 const {
@@ -45,6 +45,7 @@ export {
   txRD$,
   reloadFees,
   fees$,
+  callFees$,
   approveERC20Token$,
   isApprovedERC20Token$
 }
