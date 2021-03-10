@@ -47,4 +47,5 @@ export const Label = styled(UILabel).attrs({
   size: 'big'
 })`
   padding: 0;
+  cursor: pointer;
 `
