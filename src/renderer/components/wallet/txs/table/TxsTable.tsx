@@ -64,7 +64,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
         oWalletAddres,
         O.chain((walletAddress) =>
           walletAddress === address
-            ? O.some(<Styled.OwnText>{intl.formatMessage({ id: 'common.address.self' })}</Styled.OwnText>)
+            ? O.some(<Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.address.self' })}</Styled.OwnText>)
             : O.none
         )
       )
