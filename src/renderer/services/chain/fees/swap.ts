@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOptionKey } from '@xchainjs/xchain-client'
-import { ETHAddress, validateAddress } from '@xchainjs/xchain-ethereum'
+import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
   BNBChain,
   THORChain,
@@ -71,23 +71,6 @@ const swapFeeByChain$ = ({
       )
 
     case ETHChain: {
-      // deposit fee estimation requires recipient/router address and amount
-      let isValid = false
-
-      if (!recipient || !validateAddress(recipient)) {
-        isValid = true
-      }
-      if (!amount || amount.amount().eq(0)) {
-        isValid = true
-      }
-      if (type === 'source' && (!router || !validateAddress(router))) {
-        isValid = true
-      }
-
-      if (isValid) {
-        return Rx.of(RD.failure(Error('Missing amount or recipient')))
-      }
-
       return FP.pipe(
         type === 'source' && router
           ? ETH.customFees$(
