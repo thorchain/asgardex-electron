@@ -67,6 +67,7 @@ export const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
         {searchEnabled && (
           <Menu.Item disabled key="_search">
             <Input
+              autoFocus
               value={searchTerm}
               onChange={handleSearchChanged}
               placeholder={placeholder || intl.formatMessage({ id: 'common.search' })}

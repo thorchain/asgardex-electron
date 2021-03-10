@@ -1,4 +1,4 @@
-import { Row } from 'antd'
+import { Row, Col as ACol } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -11,6 +11,11 @@ export const Wrapper = styled(Row).attrs({
   align: 'middle'
 })`
   padding: 5px 0px;
+  margin-right: 8px;
+
+  &:last-child {
+    margin: 0;
+  }
 `
 
 export const AssetIcon = styled(UIAssetIcon)``
@@ -20,7 +25,7 @@ export const TickerLabel = styled(UILabel).attrs({
   weight: '600'
 })`
   height: 18px;
-  padding: 0px 16px;
+  padding: 0px 16px 0px 11px;
   font-size: 14px;
   line-height: 18px;
   &.small {
@@ -43,4 +48,12 @@ export const PriceLabel = styled(UILabel).attrs({
   color: 'light'
 })`
   padding-left: 10px;
+`
+
+export const Col = styled(ACol)`
+  margin-right: 8px;
+
+  &:last-child {
+    margin: 0;
+  }
 `

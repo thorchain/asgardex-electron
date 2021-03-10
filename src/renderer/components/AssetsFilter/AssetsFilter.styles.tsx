@@ -17,15 +17,17 @@ export const FilterButton = styled(ButtonUI)<ButtonProps & { active?: 'true' | '
     padding: 0 12px;
     min-width: 0;
     border-radius: 15px;
-    background: ${palette('gray', 1)};
-    color: ${({ active }) => (active === 'true' ? palette('text', 0) : palette('text', 2))};
+    border: solid 1px ${palette('gray', 1)} !important;
+    background: ${palette('gray', 0)};
+    color: ${({ active }) => (active === 'true' ? palette('text', 1) : palette('text', 2))};
     border: none;
 
     &.focused,
     &:hover,
     &:active,
     &:focus {
-      background: ${palette('gray', 1)} !important;
+      border-color: ${palette('gray', 1)} !important;
+      background: ${palette('background', 0)} !important;
       color: ${palette('text', 1)} !important;
     }
   }

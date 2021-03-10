@@ -13,6 +13,7 @@ export const Card = styled(A.Card)`
 
 export const AssetWrapper = styled.div`
   display: flex;
+  align-items: center;
 `
 
 export const AssetInfoWrapper = styled.div`
@@ -20,7 +21,6 @@ export const AssetInfoWrapper = styled.div`
   flex-direction: column;
   justify-content: space-between;
   margin-left: 16px;
-  margin-top: 10px;
 `
 
 export const AssetTitle = styled.p`
@@ -46,5 +46,6 @@ export const Label = styled(UILabel).attrs({
   color: 'primary',
   size: 'big'
 })`
-  padding-top: 0;
+  padding: 0;
+  cursor: pointer;
 `

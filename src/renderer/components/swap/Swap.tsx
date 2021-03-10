@@ -63,7 +63,6 @@ import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
-import { AssetSelect } from '../uielements/assets/assetSelect'
 import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
@@ -197,7 +196,7 @@ export const Swap = ({
         memo: getSwapMemo({ asset: target, address })
       }))
     )
-  }, [amountToSwap, assetsToSwap, oSourcePoolAddress, sourceAssetProp, sourcePoolRouter, targetWalletAddress])
+  }, [amountToSwap, assetsToSwap, oSourcePoolAddress, sourcePoolRouter, sourceAssetProp, targetWalletAddress])
 
   const swapData = useMemo(() => getSwapData(amountToSwap, sourceAsset, targetAsset, poolData), [
     amountToSwap,
@@ -218,7 +217,8 @@ export const Swap = ({
           target: {
             asset: targetAssetProp,
             amount: swapData.swapResult,
-            recipient: targetRecipient
+            recipient: targetRecipient,
+            routerAddress: ''
           }
         }))
       ),
@@ -824,9 +824,9 @@ export const Swap = ({
   const canSwitchAssets = useMemo(() => {
     const hasBalances = FP.pipe(
       walletBalances,
-      O.map(A.map(({ asset }) => asset.symbol)),
+      O.map(A.map(({ asset }) => asset.symbol.toLowerCase())),
       (oAssetSymbols) => sequenceTOption(oAssetSymbols, targetAsset),
-      O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqString)(targetAsset.symbol))),
+      O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqString)(targetAsset.symbol.toLowerCase()))),
       O.getOrElse(() => true)
     )
 
@@ -890,7 +890,7 @@ export const Swap = ({
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <AssetSelect
+                  <Styled.AssetSelect
                     onSelect={setSourceAsset}
                     asset={asset}
                     assets={assetsToSwapFrom}
@@ -919,7 +919,7 @@ export const Swap = ({
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <AssetSelect
+                  <Styled.AssetSelect
                     onSelect={setTargetAsset}
                     asset={asset}
                     assets={assetsToSwapTo}
