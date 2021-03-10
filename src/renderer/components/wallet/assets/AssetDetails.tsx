@@ -222,6 +222,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               changePaginationHandler={onChangePagination}
               chain={chain}
               network={network}
+              walletAddress={oWalletAddress}
             />
           )}
         </Col>

@@ -1,6 +1,6 @@
 import { Asset } from '@xchainjs/xchain-util'
 
-type Assets = 'FTM' | 'TOMO' | 'BOLT'
+type Assets = 'FTM' | 'TOMO' | 'BOLT' | 'USDT' | 'BUSD'
 
 type AssetsTestnet = Record<Assets, Asset>
 type AssetsMainnet = Record<Assets, Asset>
@@ -8,13 +8,17 @@ type AssetsMainnet = Record<Assets, Asset>
 export const ASSETS_TESTNET: AssetsTestnet = {
   FTM: { chain: 'BNB', symbol: 'FTM-585', ticker: 'FTM' },
   TOMO: { chain: 'BNB', symbol: 'TOMOB-1E1', ticker: 'TOMOB' },
-  BOLT: { chain: 'BNB', symbol: 'BOLT-E42', ticker: 'BOLT' }
+  BOLT: { chain: 'BNB', symbol: 'BOLT-E42', ticker: 'BOLT' },
+  USDT: { chain: 'BNB', symbol: 'USDT-DC8', ticker: 'USDT' },
+  BUSD: { chain: 'BNB', symbol: 'BUSD-BAF', ticker: 'USDT' }
 }
 
 export const ASSETS_MAINNET: AssetsMainnet = {
   FTM: { chain: 'BNB', symbol: 'FTM-A64', ticker: 'FTM' },
   TOMO: { chain: 'BNB', symbol: 'TOMOB-4BC', ticker: 'TOMOB' },
-  BOLT: { chain: 'BNB', symbol: 'BOLT-4C6', ticker: 'BOLT' }
+  BOLT: { chain: 'BNB', symbol: 'BOLT-4C6', ticker: 'BOLT' },
+  USDT: { chain: 'BNB', symbol: 'USDT-6D8', ticker: 'USDT' },
+  BUSD: { chain: 'BNB', symbol: 'BUSD-BD1', ticker: 'USDT' }
 }
 
 type ERCAssets = 'USDT' | 'RUNE'

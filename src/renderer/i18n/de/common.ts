@@ -8,6 +8,7 @@ const common: CommonMessages = {
   'common.copyright': '©',
   'common.type': 'Typ',
   'common.address': 'Addresse',
+  'common.address.self': 'Selbst',
   'common.to': 'Zu',
   'common.from': 'Von',
   'common.amount': 'Betrag',
@@ -57,7 +58,8 @@ const common: CommonMessages = {
   'common.tx.view': 'Zeige {assetSymbol} Transaktion',
   'common.value': 'Wert',
   'common.modal.confirmTitle': 'Bestätige die Aktion',
-  'common.manage': 'Manage'
+  'common.manage': 'Manage',
+  'common.asset.base': 'Base'
 }
 
 export default common

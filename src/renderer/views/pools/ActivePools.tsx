@@ -1,11 +1,13 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 
 import { SwapOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { assetToString, baseToAsset, formatAssetAmountCurrency, formatBN } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
-import * as O from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/Array'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
@@ -21,8 +23,9 @@ import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolsState } from '../../services/midgard/types'
+import { PoolAssets, PoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
+import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
 import * as Styled from './PoolsOverview.style'
 
@@ -43,6 +46,8 @@ export const ActivePools: React.FC = (): JSX.Element => {
 
   // store previous data of pools to render these while reloading
   const previousPools = useRef<O.Option<PoolTableRowsData>>(O.none)
+
+  const [filteredPoolAssets, setFilteredPoolAssets] = useState<PoolAssets>()
 
   const refreshHandler = useCallback(() => {
     reloadPools()
@@ -192,9 +197,26 @@ export const ActivePools: React.FC = (): JSX.Element => {
   const renderPoolsTable = useCallback(
     (tableData: PoolTableRowData[], loading = false) => {
       const columns = isDesktopView ? desktopPoolsColumns : mobilePoolsColumns
-      return <Table columns={columns} dataSource={tableData} loading={loading} rowKey="key" />
+
+      return (
+        <>
+          <Styled.AssetsFilter
+            onFilterChanged={setFilteredPoolAssets}
+            assets={FP.pipe(
+              tableData,
+              A.map(({ pool }) => pool.target)
+            )}
+          />
+          <Table
+            columns={columns}
+            dataSource={FP.pipe(tableData, filterTableData(filteredPoolAssets))}
+            loading={loading}
+            rowKey="key"
+          />
+        </>
+      )
     },
-    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns]
+    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, filteredPoolAssets]
   )
 
   return (

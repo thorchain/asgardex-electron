@@ -61,7 +61,7 @@ export const DeleteButton = styled(UIButton).attrs({ typevalue: 'transparent' })
   &.ant-btn {
     min-width: auto;
     padding: 0;
-    color: ${palette('error', 0)};
+    color: ${palette('gray', 1)};
 
     &:hover {
       color: ${palette('error', 1)};

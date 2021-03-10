@@ -11,6 +11,7 @@ const common: CommonMessages = {
   'common.to': 'Получатель',
   'common.from': 'Отправтель',
   'common.amount': 'Колчиество',
+  'common.address.self': 'Свой',
   'common.coin': 'Коин',
   'common.password': 'Пароль',
   'common.memo': 'Memo',
@@ -57,7 +58,8 @@ const common: CommonMessages = {
   'common.tx.view': 'Посмотреть {assetSymbol} танзакцию',
   'common.modal.confirmTitle': 'Подтвердите действие',
   'common.value': 'Количество',
-  'common.manage': 'Управлять'
+  'common.manage': 'Управлять',
+  'common.asset.base': 'Базовый'
 }
 
 export default common

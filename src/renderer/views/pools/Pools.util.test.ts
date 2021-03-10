@@ -1,14 +1,30 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import { bn, assetAmount, assetToBase, BNBChain, AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
+import {
+  bn,
+  assetAmount,
+  assetToBase,
+  BNBChain,
+  AssetBNB,
+  AssetRuneNative,
+  AssetETH,
+  AssetLTC,
+  AssetBTC,
+  AssetBCH
+} from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
 import { ThorchainLastblock, PoolDetail } from '../../services/midgard/types'
 import { Constants as ThorchainConstants } from '../../types/generated/midgard'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolTableRowData } from './Pools.types'
-import { getPoolTableRowData, getBlocksLeftForPendingPool, getBlocksLeftForPendingPoolAsString } from './Pools.utils'
+import {
+  getPoolTableRowData,
+  getBlocksLeftForPendingPool,
+  getBlocksLeftForPendingPoolAsString,
+  filterTableData
+} from './Pools.utils'
 
 describe('views/pools/utils', () => {
   describe('getPoolTableRowData', () => {
@@ -42,12 +58,14 @@ describe('views/pools/utils', () => {
         trades: bn(123),
         status: GetPoolsStatusEnum.Available,
         deepest: false,
-        key: 'hi'
+        key: 'hi',
+        network: 'testnet'
       }
 
       const result = getPoolTableRowData({
         poolDetail: lokPoolDetail,
-        pricePoolData: pricePoolData
+        pricePoolData: pricePoolData,
+        network: 'testnet'
       })
 
       expect(O.isSome(result)).toBeTruthy()
@@ -125,5 +143,78 @@ describe('views/pools/utils', () => {
       const result = getBlocksLeftForPendingPoolAsString(constants, lastblock2, AssetBNB)
       expect(result).toEqual('')
     })
+  })
+})
+
+describe('filterTableData', () => {
+  const tableData = [
+    {
+      pool: {
+        asset: AssetRuneNative,
+        target: AssetBNB
+      }
+    },
+    {
+      pool: {
+        asset: AssetRuneNative,
+        target: AssetLTC
+      }
+    },
+    {
+      pool: {
+        asset: AssetRuneNative,
+        target: AssetBTC
+      }
+    },
+    {
+      pool: {
+        asset: AssetRuneNative,
+        target: AssetBCH
+      }
+    },
+    {
+      pool: {
+        asset: AssetRuneNative,
+        target: ASSETS_TESTNET.BUSD
+      }
+    },
+    {
+      pool: {
+        asset: AssetRuneNative,
+        target: ERC20_TESTNET.USDT
+      }
+    },
+    {
+      pool: {
+        asset: AssetRuneNative,
+        target: ERC20_TESTNET.RUNE
+      }
+    },
+    {
+      pool: {
+        asset: AssetRuneNative,
+        target: ERC20_TESTNET.USDT
+      }
+    },
+    {
+      pool: {
+        asset: AssetRuneNative,
+        target: AssetETH
+      }
+    }
+  ] as PoolTableRowData[]
+
+  it('should filter BNB and ETH assets', () => {
+    expect(filterTableData([AssetBNB, AssetETH])(tableData)).toEqual([
+      { pool: { asset: AssetRuneNative, target: AssetBNB } },
+      { pool: { asset: AssetRuneNative, target: AssetETH } }
+    ])
+  })
+
+  it('should not filter base array', () => {
+    expect(filterTableData()(tableData)).toEqual(tableData)
+  })
+  it('should filter out everything as there is no any intersection between arrays', () => {
+    expect(filterTableData([])(tableData)).toEqual([])
   })
 })
