@@ -49,6 +49,7 @@ type CommonMessageKey =
   | 'common.liquidity'
   | 'common.step'
   | 'common.done'
+  | 'common.address.self'
   | 'common.thorAddress'
   | 'common.tx.healthCheck'
   | 'common.tx.sending'
@@ -58,6 +59,7 @@ type CommonMessageKey =
   | 'common.modal.confirmTitle'
   | 'common.value'
   | 'common.manage'
+  | 'common.asset.base'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

@@ -1,11 +1,13 @@
 import { PoolData, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
 import { bnOrZero, baseAmount, assetFromString, Asset, AssetRuneNative } from '@xchainjs/xchain-util'
+import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ZERO_BASE_AMOUNT } from '../../const'
+import { eqAsset } from '../../helpers/fp/eq'
 import { PoolDetail } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
 import { GetPoolsStatusEnum, Constants as ThorchainConstants, LastblockItem } from '../../types/generated/midgard'
@@ -109,4 +111,24 @@ export const getBlocksLeftForPendingPoolAsString = (
       (blocksLeft) => blocksLeft.toString()
     )
   )
+}
+
+export const filterTableData = (targetAssets?: Asset[]) => (tableData: PoolTableRowData[]): PoolTableRowData[] => {
+  return !targetAssets
+    ? tableData
+    : (FP.pipe(
+        tableData,
+        /**
+         * A.intersection can not accept arrays of different types so we need to set
+         * array-item type manually as PoolTableRowData | Asset to compare 2 arrays here
+         */
+        A.intersection<PoolTableRowData | Asset>({
+          equals: (a, b) => {
+            // Use discriminated union types to get exact type from PoolTableRowData | Asset
+            const aAsset = 'pool' in a ? a.pool.target : a
+            const bAsset = 'pool' in b ? b.pool.target : b
+            return eqAsset.equals(aAsset, bAsset)
+          }
+        })(targetAssets)
+      ) as PoolTableRowData[])
 }
