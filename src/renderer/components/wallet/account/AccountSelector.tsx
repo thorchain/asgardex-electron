@@ -60,13 +60,14 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
   const menu = useMemo(
     () => (
       <FilterMenu
+        placeholder={intl.formatMessage({ id: 'common.searchAsset' })}
         searchEnabled
         data={filteredWalletBalances}
         cellRenderer={cellRenderer}
         filterFunction={filterFunction}
       />
     ),
-    [filteredWalletBalances, cellRenderer]
+    [filteredWalletBalances, cellRenderer, intl]
   )
 
   return (

@@ -89,7 +89,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
     return (
       <Styled.AssetSelectMenuWrapper minWidth={minWidth}>
         <AssetMenu
-          searchPlaceholder={intl.formatMessage({ id: 'swap.searchAsset' })}
+          searchPlaceholder={intl.formatMessage({ id: 'common.searchAsset' })}
           closeMenu={closeMenu}
           assets={sortedAssetData}
           asset={asset}

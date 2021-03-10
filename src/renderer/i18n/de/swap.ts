@@ -8,7 +8,6 @@ const swap: SwapMessages = {
   'swap.balance': 'Guthaben',
   'swap.output': 'Ausgabe',
   'swap.drag': 'Ziehen um zu Tauschen',
-  'swap.searchAsset': 'Suche Asset',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
   'swap.errors.amount.outputShouldCoverChainFee':

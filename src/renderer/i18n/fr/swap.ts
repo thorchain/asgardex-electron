@@ -8,7 +8,6 @@ const swap: SwapMessages = {
   'swap.balance': 'Solde',
   'swap.output': 'Sortie',
   'swap.drag': 'Glisser pour échanger',
-  'swap.searchAsset': 'Rechercher un actif',
   'swap.errors.amount.balanceShouldCoverChainFee':
     '{fee} de frais de transaction doivent être couverts par votre solde (actuellement {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
