@@ -8,6 +8,7 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../shared/api/types'
 import { WalletBalances } from '../../../services/clients'
 import { WalletBalance } from '../../../types/wallet'
+import { AssetData } from '../../uielements/assets/assetData'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
 import { Size as IconSize } from '../../uielements/assets/assetIcon/AssetIcon.types'
 import { FilterMenu } from '../../uielements/filterMenu'
@@ -45,9 +46,8 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
       const node = (
         <Row align={'middle'} gutter={[8, 0]} onClick={() => onChange(asset, walletAddress)}>
           <Col>
-            <AssetIcon asset={asset} size={'small'} network={network} />
+            <AssetData asset={asset} network={network} />
           </Col>
-          <Col>{asset.symbol} </Col>
           <Col>{formatAssetAmountCurrency({ amount: baseToAsset(amount), asset })}</Col>
         </Row>
       )
