@@ -11,6 +11,7 @@ import {
   AssetRuneB1A,
   AssetRuneNative
 } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
@@ -94,6 +95,20 @@ export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
 
 /**
+ * Get ethereum token address from a given asset
+ */
+export const getEthTokenAddress: (asset: Asset) => O.Option<Address> = FP.flow(
+  getTokenAddress,
+  O.fromNullable,
+  O.chain(getEthChecksumAddress)
+)
+
+/**
+ * Check whether an asset is an ERC20 asset
+ */
+export const isEthTokenAsset: (asset: Asset) => boolean = FP.flow(getEthTokenAddress, O.isSome)
+
+/**
  * Check whether an asset is an RuneNative asset
  */
 export const isRuneNativeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetRuneNative)
@@ -110,11 +125,3 @@ export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
   PRICE_ASSETS.includes(asset)
 
 export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, getChainAsset(asset.chain))
-
-/**
- * Get ethereum token address from a given asset
- */
-export const getEthTokenAddress = (asset: Asset): O.Option<Address> => {
-  const tokenAddress = getTokenAddress(asset)
-  return tokenAddress ? getEthChecksumAddress(tokenAddress) : O.none
-}

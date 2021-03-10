@@ -222,6 +222,7 @@ type SwapMessageKey =
   | 'swap.errors.amount.outputShouldCoverChainFee'
   | 'swap.note.lockedWallet'
   | 'swap.note.nowallet'
+  | 'swap.approve'
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 

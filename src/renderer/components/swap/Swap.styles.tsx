@@ -5,6 +5,7 @@ import { palette } from 'styled-theme'
 import { media } from '../../helpers/styleHelper'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
+import { Button as UIButton } from '../uielements/button'
 import { Drag as UIDrag } from '../uielements/drag'
 import { Label as UILabel } from '../uielements/label'
 
@@ -170,4 +171,13 @@ export const NoteLabel = styled(UILabel)`
 
 export const AssetSelect = styled(AssetSelectUI)`
   justify-content: space-between;
+`
+
+export const ApproveButton = styled(UIButton).attrs({
+  type: 'primary',
+  round: 'true',
+  color: 'warning',
+  sizevalue: 'xnormal'
+})`
+  margin-bottom: 50px;
 `

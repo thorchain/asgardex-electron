@@ -9,7 +9,7 @@ import * as RxOp from 'rxjs/operators'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
 import { ApiError, ErrorId, TxHashLD } from '../wallet/types'
-import { ApproveParams, Client$, TransactionService } from './types'
+import { ApproveParams, Client$, IsApprovedLD, TransactionService } from './types'
 
 export const createTransactionService = (client$: Client$): TransactionService => {
   const common = C.createTransactionService(client$)
@@ -45,7 +45,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
     )
 
   const runIsApprovedERC20Token$ = (client: EthClient, params: ApproveParams): LiveData<ApiError, boolean> =>
-    Rx.from(client.isApproved(params.spender, params.sender, params.amount || baseAmount(0))).pipe(
+    Rx.from(client.isApproved(params.spender, params.sender, params.amount || baseAmount('1'))).pipe(
       RxOp.map(RD.success),
       RxOp.catchError(
         (error): LiveData<ApiError, boolean> =>
@@ -59,7 +59,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
       RxOp.startWith(RD.pending)
     )
 
-  const isApprovedERC20Token$ = (params: ApproveParams): LiveData<ApiError, boolean> =>
+  const isApprovedERC20Token$ = (params: ApproveParams): IsApprovedLD =>
     client$.pipe(
       RxOp.switchMap((oClient) =>
         FP.pipe(
