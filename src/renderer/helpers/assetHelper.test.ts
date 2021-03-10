@@ -9,12 +9,14 @@ import {
   AssetRuneNative
 } from '@xchainjs/xchain-util'
 
+import { ERC20_TESTNET } from '../../shared/mock/assets'
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
 import {
   isBchAsset,
   isBnbAsset,
   isBtcAsset,
   isChainAsset,
+  isEthTokenAsset,
   isEthAsset,
   isLtcAsset,
   isPricePoolAsset,
@@ -94,6 +96,18 @@ describe('helpers/assetHelper', () => {
 
     it('returns false for any other asset than ETH', () => {
       expect(isBnbAsset(AssetRuneB1A)).toBeFalsy()
+    })
+  })
+
+  describe('isEthTokenAsset', () => {
+    it('is false for ETH', () => {
+      expect(isEthTokenAsset(AssetETH)).toBeFalsy()
+    })
+    it('is true for ETH.USDT ', () => {
+      expect(isEthTokenAsset(ERC20_TESTNET.USDT)).toBeTruthy()
+    })
+    it('is false for ETH.RUNE', () => {
+      expect(isEthTokenAsset(ERC20_TESTNET.RUNE)).toBeTruthy()
     })
   })
 

@@ -37,4 +37,9 @@ export interface InboundAddressesItem {
      * @memberof InboundAddressesItem
      */
     pub_key: string;
+    /**
+     * @type {string}
+     * @memberof InboundAddressesItem
+     */
+    router: string;
 }

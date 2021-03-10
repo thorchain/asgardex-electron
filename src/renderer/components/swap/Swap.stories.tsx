@@ -82,7 +82,10 @@ const defaultProps: SwapProps = {
   fees$: () => Rx.of(RD.success({ source: baseAmount(10000000), target: baseAmount(1000000) })),
   targetWalletAddress: O.some('wallet-address'),
   onChangePath: (path) => console.log('change path', path),
-  network: 'testnet'
+  network: 'testnet',
+  sourcePoolRouter: O.some('router-address'),
+  approveERC20Token$: () => Rx.of(RD.success('txHash')),
+  isApprovedERC20Token$: () => Rx.of(RD.success(true))
 }
 
 export const StoryDefault: Story = () => <Swap {...defaultProps} />

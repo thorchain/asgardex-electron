@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
@@ -92,10 +93,15 @@ export type NativeFeeLD = LiveData<Error, NativeFee>
 export type ThorchainEndpoints = ThorchainEndpoint[]
 export type ThorchainEndpointsLD = LiveData<Error, ThorchainEndpoints>
 
-export type PoolAddress = string
+export type PoolAddress = Address
 export type PoolAddressRx = Rx.Observable<O.Option<PoolAddress>>
 export type PoolAddressRD = RD.RemoteData<Error, PoolAddress>
 export type PoolAddressLD = LiveData<Error, PoolAddress>
+
+export type PoolRouter = Address
+export type PoolRouterRx = Rx.Observable<O.Option<PoolRouter>>
+export type PoolRouterRD = RD.RemoteData<Error, PoolRouter>
+export type PoolRouterLD = LiveData<Error, PoolRouter>
 
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
@@ -118,10 +124,11 @@ export type PoolsService = {
   poolAddresses$: ThorchainEndpointsLD
   selectedPoolAddress$: PoolAddressRx
   poolAddressByAsset$: (asset: Asset) => PoolAddressRx
+  poolRouterByAsset$: (asset: Asset) => PoolRouterRx
   poolDetail$: PoolDetailLD
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
-  validatePool$: (poolAddress: string, chain: Chain) => ValidatePoolLD
+  validatePool$: (poolAddress: Address, chain: Chain) => ValidatePoolLD
 }
 
 export type PoolShareType = DepositType | 'all'

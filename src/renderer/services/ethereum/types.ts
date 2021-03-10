@@ -32,6 +32,9 @@ export type ApproveParams = {
   amount?: BaseAmount
 }
 
+export type IsApprovedRD = RD.RemoteData<ApiError, boolean>
+export type IsApprovedLD = LiveData<ApiError, boolean>
+
 export type TransactionService = {
   approveERC20Token$: (p: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>

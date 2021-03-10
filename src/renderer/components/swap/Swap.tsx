@@ -27,9 +27,11 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { getChainAsset } from '../../helpers/chainHelper'
+import { getEthTokenAddress, isEthAsset, isEthTokenAsset, isRuneNativeAsset } from '../../helpers/assetHelper'
+import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { LiveData } from '../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/swap'
@@ -45,9 +47,17 @@ import {
   SwapFeesParams,
   SwapFeesLD
 } from '../../services/chain/types'
+import { ApproveParams, IsApprovedRD } from '../../services/ethereum/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
-import { KeystoreState, NonEmptyWalletBalances, ValidatePasswordHandler } from '../../services/wallet/types'
+import {
+  ApiError,
+  KeystoreState,
+  NonEmptyWalletBalances,
+  TxHashLD,
+  TxHashRD,
+  ValidatePasswordHandler
+} from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
@@ -79,6 +89,9 @@ export type SwapProps = {
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
   network: Network
+  sourcePoolRouter: O.Option<string>
+  approveERC20Token$: (params: ApproveParams) => TxHashLD
+  isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
 }
 
 export const Swap = ({
@@ -97,12 +110,16 @@ export const Swap = ({
   fees$,
   targetWalletAddress,
   onChangePath,
-  network
+  network,
+  sourcePoolRouter,
+  isApprovedERC20Token$,
+  approveERC20Token$
 }: SwapProps) => {
   const intl = useIntl()
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
+  const prevSourcePoolRouter = useRef<O.Option<string>>(O.none)
 
   // convert to hash map here instead of using getPoolDetail
   const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [
@@ -167,19 +184,19 @@ export const Swap = ({
     _setAmountToSwap /* private - never set it directly, use setAmountToSwap() instead */
   ] = useState(baseAmount(0, sourceAssetAmount.decimal))
 
-  const oSwapParams: O.Option<SwapParams> = useMemo(
-    () =>
-      FP.pipe(
-        sequenceTOption(assetsToSwap, targetWalletAddress),
-        O.map(([{ source, target }, address]) => ({
-          poolAddress: oSourcePoolAddress,
-          asset: source,
-          amount: amountToSwap,
-          memo: getSwapMemo({ asset: target, address })
-        }))
-      ),
-    [amountToSwap, assetsToSwap, oSourcePoolAddress, targetWalletAddress]
-  )
+  const oSwapParams: O.Option<SwapParams> = useMemo(() => {
+    // For RuneNative a `MsgNativeTx` is sent w/o the need for a pool address
+    const oPoolAddress = isRuneNativeAsset(sourceAssetProp) ? O.some('') : oSourcePoolAddress
+    return FP.pipe(
+      sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
+      O.map(([{ source, target }, poolAddress, address]) => ({
+        poolAddress,
+        asset: source,
+        amount: amountToSwap,
+        memo: getSwapMemo({ asset: target, address })
+      }))
+    )
+  }, [amountToSwap, assetsToSwap, oSourcePoolAddress, sourceAssetProp, targetWalletAddress])
 
   const swapData = useMemo(() => getSwapData(amountToSwap, sourceAsset, targetAsset, poolData), [
     amountToSwap,
@@ -191,8 +208,8 @@ export const Swap = ({
   const oSwapFeesParams: O.Option<SwapFeesParams> = useMemo(
     () =>
       FP.pipe(
-        oSwapParams,
-        O.map((params) => ({
+        sequenceTOption(oSwapParams, targetWalletAddress),
+        O.map(([params, targetRecipient]) => ({
           source: {
             ...params,
             recipient: params.poolAddress
@@ -200,7 +217,7 @@ export const Swap = ({
           target: {
             asset: targetAssetProp,
             amount: swapData.swapResult,
-            recipient: targetWalletAddress
+            recipient: targetRecipient
           }
         }))
       ),
@@ -236,7 +253,16 @@ export const Swap = ({
   // reset `pendingSwitchAssets`
   // whenever chain fees will be succeeded or failed
   useEffect(() => {
-    if (RD.success(chainFeesRD) || RD.isFailure(chainFeesRD)) setPendingSwitchAssets(false)
+    FP.pipe(
+      chainFeesRD,
+      RD.fold(
+        () => false,
+        () => true,
+        () => false,
+        () => false
+      ),
+      setPendingSwitchAssets
+    )
   }, [chainFeesRD, setPendingSwitchAssets])
 
   const reloadFeesHandler = useCallback(() => {
@@ -400,7 +426,7 @@ export const Swap = ({
     setShowPasswordModal(true)
   }, [setShowPasswordModal])
 
-  const slider = useMemo(
+  const renderSlider = useMemo(
     () =>
       FP.pipe(
         oSourceAssetWB,
@@ -676,14 +702,102 @@ export const Swap = ({
     amountToSwap
   ])
 
+  const {
+    state: approveState,
+    reset: resetApproveState,
+    subscribe: subscribeApproveState
+  } = useSubscriptionState<TxHashRD>(RD.initial)
+
+  const onApprove = () => {
+    FP.pipe(
+      sequenceTOption(sourcePoolRouter, getEthTokenAddress(sourceAssetProp)),
+      O.map(([router, tokenAddress]) =>
+        subscribeApproveState(
+          approveERC20Token$({
+            spender: router,
+            sender: tokenAddress
+          })
+        )
+      )
+    )
+  }
+
+  const renderApproveError = useMemo(
+    () =>
+      FP.pipe(
+        approveState,
+        RD.fold(
+          () => <></>,
+          () => <></>,
+          (error) => <Styled.ErrorLabel key="approveErrorLabel">{error.msg}</Styled.ErrorLabel>,
+          () => <></>
+        )
+      ),
+    [approveState]
+  )
+
+  // State for values of `isApprovedERC20Token$`
+  const {
+    state: isApprovedState,
+    reset: resetIsApprovedState,
+    subscribe: subscribeIsApprovedState
+  } = useSubscriptionState<IsApprovedRD>(RD.success(true))
+
+  const needApprovement = useMemo(() => {
+    // not needed for users with locked or not imported wallets
+    if (!hasImportedKeystore(keystore) || isLocked(keystore)) return false
+    // Other chains than ETH do not need an approvement
+    if (!isEthChain(sourceChainAsset.chain)) return false
+    // ETH does not need to be approved
+    if (isEthAsset(sourceAssetProp)) return false
+    // ERC20 token does need approvement only
+    return isEthTokenAsset(sourceAssetProp)
+  }, [keystore, sourceAssetProp, sourceChainAsset.chain])
+
+  const isApproved = useMemo(
+    () =>
+      !needApprovement ||
+      RD.isSuccess(approveState) ||
+      FP.pipe(
+        isApprovedState,
+        RD.getOrElse(() => false)
+      ),
+    [approveState, isApprovedState, needApprovement]
+  )
+
+  const checkApprovedStatus = useCallback(() => {
+    // check approve status
+    FP.pipe(
+      sequenceTOption(
+        O.fromPredicate((v) => !!v)(needApprovement), // `None` if needApprovement is `false`, no request then
+        sourcePoolRouter,
+        getEthTokenAddress(sourceAssetProp)
+      ),
+      O.map(([_, router, tokenAddress]) =>
+        subscribeIsApprovedState(
+          isApprovedERC20Token$({
+            spender: router,
+            sender: tokenAddress
+          })
+        )
+      )
+    )
+  }, [isApprovedERC20Token$, needApprovement, sourceAssetProp, sourcePoolRouter, subscribeIsApprovedState])
+
   const reset = useCallback(() => {
     // reset swap state
     resetSwapState()
-    // reload fees
-    FP.pipe(oSwapFeesParams, O.map(reloadFees))
+    // reset approve state
+    resetApproveState()
+    // reset isApproved state
+    resetIsApprovedState()
     // zero amount to swap
     setAmountToSwap(ZERO_BASE_AMOUNT)
-  }, [oSwapFeesParams, reloadFees, resetSwapState, setAmountToSwap])
+    // reload fees
+    reloadFeesHandler()
+    // check approved status
+    checkApprovedStatus()
+  }, [checkApprovedStatus, reloadFeesHandler, resetApproveState, resetIsApprovedState, resetSwapState, setAmountToSwap])
 
   useEffect(() => {
     // reset data whenever
@@ -696,7 +810,16 @@ export const Swap = ({
       prevTargetAsset.current = O.some(targetAssetProp)
       reset()
     }
-  }, [reset, setAmountToSwap, sourceAssetProp, targetAssetProp])
+    if (prevSourcePoolRouter.current !== sourcePoolRouter) {
+      prevSourcePoolRouter.current = sourcePoolRouter
+      checkApprovedStatus()
+    }
+  }, [checkApprovedStatus, reset, setAmountToSwap, sourceAssetProp, sourcePoolRouter, targetAssetProp])
+
+  // Reload fees whenever swap params has been changed
+  useEffect(() => {
+    FP.pipe(oSwapFeesParams, O.map(reloadFees))
+  }, [oSwapFeesParams, reloadFees])
 
   const canSwitchAssets = useMemo(() => {
     const hasBalances = FP.pipe(
@@ -781,7 +904,7 @@ export const Swap = ({
 
           <Styled.ValueItemContainer className={'valueItemContainer-percent'}>
             <Styled.SliderContainer>
-              {slider}
+              {renderSlider}
               {sourceChainErrorLabel}
             </Styled.SliderContainer>
             <Styled.SwapOutlined disabled={!canSwitchAssets} onClick={onSwitchAssets} />
@@ -809,32 +932,40 @@ export const Swap = ({
           </Styled.ValueItemContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
-
-      <Styled.SubmitContainer>
-        {FP.pipe(
-          sequenceTOption(sourceAsset, targetAsset),
-          O.fold(
-            () => <></>,
-            ([source, target]) => (
-              <Styled.Drag
-                disabled={isSwapDisabled}
-                onConfirm={onSwapConfirmed}
-                title={intl.formatMessage({ id: 'swap.drag' })}
-                source={source}
-                target={target}
-                network={network}
-              />
+      {isApproved ? (
+        <Styled.SubmitContainer>
+          {FP.pipe(
+            sequenceTOption(sourceAsset, targetAsset),
+            O.fold(
+              () => <></>,
+              ([source, target]) => (
+                <Styled.Drag
+                  disabled={isSwapDisabled}
+                  onConfirm={onSwapConfirmed}
+                  title={intl.formatMessage({ id: 'swap.drag' })}
+                  source={source}
+                  target={target}
+                  network={network}
+                />
+              )
             )
-          )
-        )}
-        <Styled.NoteLabel align="center">
-          {!hasImportedKeystore(keystore)
-            ? intl.formatMessage({ id: 'swap.note.nowallet' })
-            : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
-        </Styled.NoteLabel>
-        {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFeesHandler} />}
-        {targetChainFeeErrorLabel}
-      </Styled.SubmitContainer>
+          )}
+          <Styled.NoteLabel align="center">
+            {!hasImportedKeystore(keystore)
+              ? intl.formatMessage({ id: 'swap.note.nowallet' })
+              : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
+          </Styled.NoteLabel>
+          {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFeesHandler} />}
+          {targetChainFeeErrorLabel}
+        </Styled.SubmitContainer>
+      ) : (
+        <Styled.SubmitContainer>
+          <Styled.ApproveButton onClick={onApprove} loading={RD.isPending(approveState)}>
+            {intl.formatMessage({ id: 'swap.approve' })}
+          </Styled.ApproveButton>
+          {renderApproveError}
+        </Styled.SubmitContainer>
+      )}
       {showPasswordModal && (
         <PasswordModal
           onSuccess={onSucceedPasswordModal}

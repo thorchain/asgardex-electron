@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { ThorchainEndpoint } from '@thorchain/asgardex-midgard/lib/byzantine'
 import { PoolData } from '@thorchain/asgardex-util'
 import { assetFromString, bnOrZero, baseAmount, Asset, assetToString, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
@@ -12,6 +11,7 @@ import { isBUSDAsset } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { InboundAddressesItem as ThorchainEndpoint } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import {
   AssetDetails,
@@ -22,7 +22,8 @@ import {
   AssetDetail,
   PoolDetail,
   PoolShares,
-  PoolShare
+  PoolShare,
+  PoolRouter
 } from './types'
 
 export const getAssetDetail = (assets: AssetDetails, ticker: string): O.Option<AssetDetail> =>
@@ -147,6 +148,17 @@ export const getPoolAddressByChain = (
     endpoints,
     A.findFirst((endpoint) => endpoint.chain === chain),
     O.map(({ address }) => address),
+    O.chain(O.fromNullable)
+  )
+
+export const getPoolRouterByChain = (
+  endpoints: Pick<ThorchainEndpoint, 'chain' | 'router'>[],
+  chain: Chain
+): O.Option<PoolRouter> =>
+  FP.pipe(
+    endpoints,
+    A.findFirst((endpoint) => endpoint.chain === chain),
+    O.map(({ router }) => router),
     O.chain(O.fromNullable)
   )
 
