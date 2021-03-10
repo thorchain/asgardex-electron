@@ -15,7 +15,7 @@ import { FeesService, Client$ } from './types'
 export const createFeesService: ({ client$, chain }: { client$: Client$; chain: Chain }) => FeesService =
   C.createFeesService
 
-export const customFees$ = (
+export const callFees$ = (
   address: Address,
   abi: ethers.ContractInterface,
   func: string,

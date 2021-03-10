@@ -73,7 +73,7 @@ const swapFeeByChain$ = ({
     case ETHChain: {
       return FP.pipe(
         type === 'source' && router
-          ? ETH.customFees$(
+          ? ETH.callFees$(
               router,
               ethRouterABI,
               'deposit',
