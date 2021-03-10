@@ -90,7 +90,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       FP.pipe(
         oSource,
         O.map(poolRouterByAsset$),
-        O.getOrElse((): PoolRouterRx => Rx.EMPTY)
+        O.getOrElse((): PoolRouterRx => Rx.of(O.none))
       ),
     [oSource, poolRouterByAsset$]
   )

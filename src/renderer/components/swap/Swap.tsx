@@ -119,6 +119,7 @@ export const Swap = ({
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
+  const prevSourcePoolRouter = useRef<O.Option<string>>(O.none)
 
   // convert to hash map here instead of using getPoolDetail
   const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [
@@ -265,7 +266,6 @@ export const Swap = ({
   }, [chainFeesRD, setPendingSwitchAssets])
 
   const reloadFeesHandler = useCallback(() => {
-    console.log('reloadFeesHandler:', JSON.stringify(oSwapFeesParams))
     FP.pipe(oSwapFeesParams, O.map(reloadFees))
   }, [oSwapFeesParams, reloadFees])
 
@@ -755,11 +755,12 @@ export const Swap = ({
   const isApproved = useMemo(
     () =>
       !needApprovement ||
+      RD.isSuccess(approveState) ||
       FP.pipe(
         isApprovedState,
         RD.getOrElse(() => false)
       ),
-    [isApprovedState, needApprovement]
+    [approveState, isApprovedState, needApprovement]
   )
 
   const checkApprovedStatus = useCallback(() => {
@@ -807,7 +808,11 @@ export const Swap = ({
       prevTargetAsset.current = O.some(targetAssetProp)
       reset()
     }
-  }, [reset, setAmountToSwap, sourceAssetProp, targetAssetProp])
+    if (prevSourcePoolRouter.current !== sourcePoolRouter) {
+      prevSourcePoolRouter.current = sourcePoolRouter
+      checkApprovedStatus()
+    }
+  }, [checkApprovedStatus, reset, setAmountToSwap, sourceAssetProp, sourcePoolRouter, targetAssetProp])
 
   // Reload fees whenever swap params has been changed
   useEffect(() => {

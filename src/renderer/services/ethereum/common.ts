@@ -29,6 +29,7 @@ const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(
 )
 
 const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
+const INFURA_PROJECT_ID = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_ID, '')
 
 /**
  * Stream to create an observable EthereumClient depending on existing phrase in keystore
@@ -45,10 +46,18 @@ const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, 
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
+              const infuraCreds = INFURA_PROJECT_ID
+                ? {
+                    infuraCreds: {
+                      projectId: INFURA_PROJECT_ID
+                    }
+                  }
+                : {}
               const client = new Client({
                 network,
                 etherscanApiKey: ETHERSCAN_API_KEY,
-                phrase
+                phrase,
+                ...infuraCreds
               })
               return O.some(right(client)) as ClientState
             } catch (error) {
