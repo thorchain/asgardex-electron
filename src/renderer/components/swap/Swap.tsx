@@ -426,7 +426,7 @@ export const Swap = ({
     setShowPasswordModal(true)
   }, [setShowPasswordModal])
 
-  const slider = useMemo(
+  const renderSlider = useMemo(
     () =>
       FP.pipe(
         oSourceAssetWB,
@@ -744,13 +744,15 @@ export const Swap = ({
   } = useSubscriptionState<IsApprovedRD>(RD.success(true))
 
   const needApprovement = useMemo(() => {
+    // not needed for users with locked or not imported wallets
+    if (!hasImportedKeystore(keystore) || isLocked(keystore)) return false
     // Other chains than ETH do not need an approvement
     if (!isEthChain(sourceChainAsset.chain)) return false
     // ETH does not need to be approved
     if (isEthAsset(sourceAssetProp)) return false
     // ERC20 token does need approvement only
     return isEthTokenAsset(sourceAssetProp)
-  }, [sourceAssetProp, sourceChainAsset.chain])
+  }, [keystore, sourceAssetProp, sourceChainAsset.chain])
 
   const isApproved = useMemo(
     () =>
@@ -902,7 +904,7 @@ export const Swap = ({
 
           <Styled.ValueItemContainer className={'valueItemContainer-percent'}>
             <Styled.SliderContainer>
-              {slider}
+              {renderSlider}
               {sourceChainErrorLabel}
             </Styled.SliderContainer>
             <Styled.SwapOutlined disabled={!canSwitchAssets} onClick={onSwitchAssets} />
