@@ -8,15 +8,9 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { PriceDataIndex } from '../../../../services/midgard/types'
+import { AssetData } from '../assetData'
 import { AssetMenu } from '../assetMenu'
-import {
-  AssetSelectWrapper,
-  AssetDropdownButton,
-  AssetSelectMenuWrapper,
-  DropdownIconHolder,
-  DropdownIcon
-} from './AssetSelect.style'
-import { AssetSelectData } from './AssetSelectData'
+import * as Styled from './AssetSelect.style'
 
 type DropdownCarretProps = {
   open: boolean
@@ -27,9 +21,9 @@ type DropdownCarretProps = {
 const DropdownCarret: React.FC<DropdownCarretProps> = (props: DropdownCarretProps): JSX.Element => {
   const { open, onClick = FP.constVoid, disabled = false } = props
   return (
-    <DropdownIconHolder>
-      <DropdownIcon open={open} onClick={onClick} disabled={disabled} />
-    </DropdownIconHolder>
+    <Styled.DropdownIconHolder>
+      <Styled.DropdownIcon open={open} onClick={onClick} disabled={disabled} />
+    </Styled.DropdownIconHolder>
   )
 }
 
@@ -58,7 +52,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
     children,
     className,
     minWidth,
-    showAssetName,
+    showAssetName = true,
     disabled = false,
     network
   } = props
@@ -93,9 +87,9 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   const renderMenu = useCallback(() => {
     const sortedAssetData = assets.sort(ordAsset.compare)
     return (
-      <AssetSelectMenuWrapper minWidth={minWidth}>
+      <Styled.AssetSelectMenuWrapper minWidth={minWidth}>
         <AssetMenu
-          searchPlaceholder={intl.formatMessage({ id: 'swap.searchAsset' })}
+          searchPlaceholder={intl.formatMessage({ id: 'common.searchAsset' })}
           closeMenu={closeMenu}
           assets={sortedAssetData}
           asset={asset}
@@ -105,28 +99,28 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
           onSelect={handleChangeAsset}
           network={network}
         />
-      </AssetSelectMenuWrapper>
+      </Styled.AssetSelectMenuWrapper>
     )
   }, [assets, intl, asset, closeMenu, handleChangeAsset, priceIndex, searchDisable, withSearch, minWidth, network])
 
   const renderDropDownButton = () => {
     const hideButton = assets.length === 0
     return (
-      <AssetDropdownButton disabled={hideButton || disabled} onClick={handleDropdownButtonClicked}>
+      <Styled.AssetDropdownButton disabled={hideButton || disabled} onClick={handleDropdownButtonClicked}>
         {!hideButton ? <DropdownCarret open={openDropdown} disabled={disabled} /> : null}
-      </AssetDropdownButton>
+      </Styled.AssetDropdownButton>
     )
   }
 
   return (
-    <AssetSelectWrapper className={className}>
+    <Styled.AssetSelectWrapper className={className}>
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <>
           {children && children}
-          <AssetSelectData showAssetName={showAssetName} asset={asset} network={network} />
+          <AssetData noTicker={!showAssetName} className={'asset-data'} asset={asset} network={network} />
           {renderDropDownButton()}
         </>
       </Dropdown>
-    </AssetSelectWrapper>
+    </Styled.AssetSelectWrapper>
   )
 }

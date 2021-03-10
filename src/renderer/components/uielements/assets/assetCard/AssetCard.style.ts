@@ -68,7 +68,7 @@ export const AssetData = styled.div.attrs({ className: 'asset-data' })`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  margin-right: 5px;
+  margin-right: 13px;
 `
 
 export const FooterLabel = styled(Label).attrs({
