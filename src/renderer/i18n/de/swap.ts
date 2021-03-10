@@ -16,7 +16,8 @@ const swap: SwapMessages = {
   'swap.note.lockedWallet': 'Entsperre Deine Wallet um zu Tauschen',
   'swap.note.nowallet': 'Erstelle oder importiere eine Wallet um zu Tauschen',
   'swap.errors.asset.missingSourceAsset': 'Ursprungs-Asset nicht vorhanden',
-  'swap.errors.asset.missingTargetAsset': 'Ziel-Asset nicht vorhanden'
+  'swap.errors.asset.missingTargetAsset': 'Ziel-Asset nicht vorhanden',
+  'swap.approve': 'bewilligen'
 }
 
 export default swap

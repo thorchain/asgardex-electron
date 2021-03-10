@@ -18,13 +18,14 @@ import { BackLink } from '../../components/uielements/backLink'
 import { Button } from '../../components/uielements/button'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
+import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTRD } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolAddressRx } from '../../services/midgard/types'
+import { PoolAddressRx, PoolRouterRx } from '../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import * as Styled from './SwapView.styles'
 
@@ -40,7 +41,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, reloadPools, poolAddressByAsset$ },
+    pools: { poolsState$, reloadPools, poolAddressByAsset$, poolRouterByAsset$ },
     setSelectedPoolAsset
   } = midgardService
   const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, assetAddress$, swap$ } = useChainContext()
@@ -50,6 +51,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     reloadBalances,
     keystoreService: { keystore$, validatePassword$ }
   } = useWalletContext()
+
+  const { approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
 
   const keystore = useObservableState(keystore$, O.none)
 
@@ -74,13 +77,25 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       FP.pipe(
         oSource,
         O.map(poolAddressByAsset$),
-        O.getOrElse((): PoolAddressRx => Rx.EMPTY)
+        O.getOrElse((): PoolAddressRx => Rx.of(O.none))
       ),
     [oSource, poolAddressByAsset$]
   )
 
   const sourcePoolAddress = useObservableState(sourcePoolAddress$, O.none)
   const targetWalletAddress = useObservableState(assetAddress$, O.none)
+
+  const sourcePoolRouter$ = useMemo(
+    () =>
+      FP.pipe(
+        oSource,
+        O.map(poolRouterByAsset$),
+        O.getOrElse((): PoolRouterRx => Rx.of(O.none))
+      ),
+    [oSource, poolRouterByAsset$]
+  )
+
+  const sourcePoolRouter = useObservableState(sourcePoolRouter$, O.none)
 
   const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [
     source,
@@ -158,6 +173,9 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   reloadBalances={reloadBalances}
                   onChangePath={onChangePath}
                   network={network}
+                  sourcePoolRouter={sourcePoolRouter}
+                  approveERC20Token$={approveERC20Token$}
+                  isApprovedERC20Token$={isApprovedERC20Token$}
                 />
               )
             }

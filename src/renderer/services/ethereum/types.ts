@@ -40,6 +40,9 @@ export type CallRouterParams = {
   memo: string
 }
 
+export type IsApprovedRD = RD.RemoteData<ApiError, boolean>
+export type IsApprovedLD = LiveData<ApiError, boolean>
+
 export type TransactionService = {
   sendDepositTx: (params: CallRouterParams) => TxHashLD
   approveERC20Token$: (params: ApproveParams) => TxHashLD
