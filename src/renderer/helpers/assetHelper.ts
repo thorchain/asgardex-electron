@@ -95,7 +95,7 @@ export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
 
 /**
- * Get ethereum token address from a given asset
+ * Get ethereum token address (as check sum address) from a given asset
  */
 export const getEthTokenAddress: (asset: Asset) => O.Option<Address> = FP.flow(
   getTokenAddress,
@@ -103,6 +103,9 @@ export const getEthTokenAddress: (asset: Asset) => O.Option<Address> = FP.flow(
   O.chain(getEthChecksumAddress)
 )
 
+/**
+ * Get address (as check sum address) from an ETH or ETH token asset
+ */
 export const getEthAssetAddress = (asset: Asset): O.Option<Address> =>
   isEthAsset(asset) ? O.some(ETHAddress) : getEthTokenAddress(asset)
 

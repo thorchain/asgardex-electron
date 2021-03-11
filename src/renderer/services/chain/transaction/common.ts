@@ -12,11 +12,9 @@ import {
   THORChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 
 import { DEFAULT_FEE_OPTION_KEY } from '../../../components/wallet/txs/send/Send.const'
-import { getEthAssetAddress } from '../../../helpers/assetHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
@@ -62,17 +60,10 @@ export const sendTx$ = ({
 
     case ETHChain:
       if (txType === TxTypes.SWAP) {
-        const assetAddress = FP.pipe(
-          getEthAssetAddress(asset),
-          O.getOrElse(() => '')
-        )
-        if (!assetAddress) {
-          return txFailure$(`Invalid Token Address`)
-        }
-        return ETH.sendDepositTx({
+        return ETH.sendDepositTx$({
           router,
-          vault: recipient,
-          assetAddress,
+          poolAddress: recipient,
+          asset,
           amount,
           memo
         })

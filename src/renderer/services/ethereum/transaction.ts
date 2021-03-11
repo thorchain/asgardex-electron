@@ -7,58 +7,73 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { getEthAssetAddress } from '../../helpers/assetHelper'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
 import { ethRouterABI } from '../const'
 import { ApiError, ErrorId, TxHashLD } from '../wallet/types'
-import { ApproveParams, CallRouterParams, Client$, TransactionService, IsApprovedLD } from './types'
+import { ApproveParams, DepositParams, Client$, TransactionService, IsApprovedLD } from './types'
 
 export const createTransactionService = (client$: Client$): TransactionService => {
   const common = C.createTransactionService(client$)
 
-  const runCallRouterDeposit$ = (client: EthClient, params: CallRouterParams): TxHashLD =>
-    FP.pipe(
-      Rx.from(client.estimateGasPrices()),
-      RxOp.switchMap((gasPrices) => {
-        const amount = params.assetAddress === ETHAddress ? baseAmount(0) : params.amount
-        return Rx.from(
-          client.call<{ hash: TxHash }>(params.router, ethRouterABI, 'deposit', [
-            params.vault,
-            params.assetAddress,
-            amount.amount().toFixed(),
-            params.memo,
-            params.assetAddress === ETHAddress
-              ? {
-                  // Need to use toFixed to convert BaseAmount to Bignumber since value and gasPrice type is Bignumber
-                  value: params.amount.amount().toFixed(),
-                  gasPrice: gasPrices.fast.amount().toFixed()
-                }
-              : { gasPrice: gasPrices.fast.amount().toFixed() }
-          ])
-        )
-      }),
-      RxOp.map((txResult) => txResult.hash),
-      RxOp.map(RD.success),
-      RxOp.catchError(
-        (error): TxHashLD =>
-          Rx.of(
-            RD.failure({
-              msg: error?.message ?? error.toString(),
-              errorId: ErrorId.APPROVE_TX
-            })
-          )
-      ),
-      RxOp.startWith(RD.pending)
-    )
+  const runSendDepositTx$ = (client: EthClient, params: DepositParams): TxHashLD => {
+    // helper for failures
+    const failure$ = (msg: string) =>
+      Rx.of(
+        RD.failure({
+          errorId: ErrorId.DEPOSIT_TX,
+          msg
+        })
+      )
 
-  const callRouterDeposit$ = (params: CallRouterParams): TxHashLD =>
+    return FP.pipe(
+      getEthAssetAddress(params.asset),
+      O.fold(
+        () => failure$('Invalid ETH or ERC20 token address'),
+        (address) =>
+          FP.pipe(
+            Rx.from(client.estimateGasPrices()),
+            RxOp.switchMap((gasPrices) => {
+              const isETHAddress = address === ETHAddress
+              const amount = isETHAddress ? baseAmount(0) : params.amount
+              const gasPrice = gasPrices.fast.amount().toFixed()
+              return Rx.from(
+                // Call deposit function of Router contract
+                // Note:
+                // Amounts need to use `toFixed` to convert `BaseAmount` to `Bignumber`
+                // since `value` and `gasPrice` type is `Bignumber`
+                client.call<{ hash: TxHash }>(params.router, ethRouterABI, 'deposit', [
+                  params.poolAddress,
+                  address,
+                  amount.amount().toFixed(),
+                  params.memo,
+                  isETHAddress
+                    ? {
+                        value: params.amount.amount().toFixed(),
+                        gasPrice
+                      }
+                    : { gasPrice }
+                ])
+              )
+            }),
+            RxOp.map((txResult) => txResult.hash),
+            RxOp.map(RD.success),
+            RxOp.catchError((error): TxHashLD => failure$(error?.message ?? error.toString())),
+            RxOp.startWith(RD.pending)
+          )
+      )
+    )
+  }
+
+  const sendDepositTx$ = (params: DepositParams): TxHashLD =>
     client$.pipe(
       RxOp.switchMap((oClient) =>
         FP.pipe(
           oClient,
           O.fold(
             () => Rx.of(RD.initial),
-            (client) => runCallRouterDeposit$(client, params)
+            (client) => runSendDepositTx$(client, params)
           )
         )
       )
@@ -122,11 +137,9 @@ export const createTransactionService = (client$: Client$): TransactionService =
       )
     )
 
-  const sendDepositTx = (params: CallRouterParams): TxHashLD => callRouterDeposit$(params)
-
   return {
     ...common,
-    sendDepositTx,
+    sendDepositTx$,
     approveERC20Token$,
     isApprovedERC20Token$
   }

@@ -34,10 +34,10 @@ export type ApproveParams = {
   amount?: BaseAmount
 }
 
-export type CallRouterParams = {
+export type DepositParams = {
   router: Address
-  vault: PoolAddress
-  assetAddress: Address
+  poolAddress: PoolAddress
+  asset: Asset
   amount: BaseAmount
   memo: Memo
 }
@@ -46,7 +46,7 @@ export type IsApprovedRD = RD.RemoteData<ApiError, boolean>
 export type IsApprovedLD = LiveData<ApiError, boolean>
 
 export type TransactionService = {
-  sendDepositTx: (params: CallRouterParams) => TxHashLD
+  sendDepositTx$: (params: DepositParams) => TxHashLD
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
 } & C.TransactionService<SendTxParams>

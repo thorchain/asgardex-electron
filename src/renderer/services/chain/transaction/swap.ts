@@ -65,13 +65,7 @@ export const swap$ = ({ routerAddress, poolAddress, asset, amount, memo }: SwapP
       })
     }),
     liveData.chain((txHash) => {
-      let assetAddress = undefined
-      if (isEthChain(asset.chain)) {
-        assetAddress = FP.pipe(
-          getEthAssetAddress(asset),
-          O.getOrElse(() => '')
-        )
-      }
+      const assetAddress = isEthChain(asset.chain) ? FP.pipe(getEthAssetAddress(asset), O.toUndefined) : undefined
       // Update state
       setState({ ...getState(), step: 3, swapTx: RD.success(txHash), swap: RD.progress({ loaded: 75, total }) })
       // 3. check tx finality by polling its tx data
