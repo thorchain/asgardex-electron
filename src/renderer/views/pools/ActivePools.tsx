@@ -66,10 +66,11 @@ export const ActivePools: React.FC = (): JSX.Element => {
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <Styled.TableAction>
-        <ManageButton asset={pool.target} sizevalue="small" isTextView={isDesktopView} />
+        <ManageButton asset={pool.target} sizevalue={isDesktopView ? 'normal' : 'small'} isTextView={isDesktopView} />
         <Button
           round="true"
-          sizevalue="small"
+          sizevalue={isDesktopView ? 'normal' : 'small'}
+          style={{ height: 30 }}
           onClick={() => clickSwapHandler({ source: assetToString(pool.asset), target: assetToString(pool.target) })}>
           <SwapOutlined />
           {isDesktopView && intl.formatMessage({ id: 'common.swap' })}

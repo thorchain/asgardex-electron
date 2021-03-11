@@ -14,7 +14,7 @@ type Props = {
   sizevalue?: ButtonSize
   isTextView: boolean
 }
-export const ManageButton: React.FC<Props> = ({ className, asset, sizevalue, isTextView }) => {
+export const ManageButton: React.FC<Props> = ({ className, asset, sizevalue = 'normal', isTextView }) => {
   const intl = useIntl()
   const history = useHistory()
 
@@ -24,7 +24,13 @@ export const ManageButton: React.FC<Props> = ({ className, asset, sizevalue, isT
   ])
 
   return (
-    <Button round="true" typevalue="outline" sizevalue={sizevalue} className={className} onClick={onClick}>
+    <Button
+      round="true"
+      typevalue="outline"
+      sizevalue={sizevalue}
+      className={className}
+      onClick={onClick}
+      style={{ height: 30 }}>
       <PlusOutlined />
       {isTextView && intl.formatMessage({ id: 'common.manage' })}
     </Button>
