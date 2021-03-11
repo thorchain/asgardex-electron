@@ -1,5 +1,5 @@
 import { Address } from '@xchainjs/xchain-client'
-import { getTokenAddress } from '@xchainjs/xchain-ethereum'
+import { ETHAddress, getTokenAddress } from '@xchainjs/xchain-ethereum'
 import {
   Asset,
   AssetBCH,
@@ -95,13 +95,19 @@ export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
 
 /**
- * Get ethereum token address from a given asset
+ * Get ethereum token address (as check sum address) from a given asset
  */
 export const getEthTokenAddress: (asset: Asset) => O.Option<Address> = FP.flow(
   getTokenAddress,
   O.fromNullable,
   O.chain(getEthChecksumAddress)
 )
+
+/**
+ * Get address (as check sum address) from an ETH or ETH token asset
+ */
+export const getEthAssetAddress = (asset: Asset): O.Option<Address> =>
+  isEthAsset(asset) ? O.some(ETHAddress) : getEthTokenAddress(asset)
 
 /**
  * Check whether an asset is an ERC20 asset

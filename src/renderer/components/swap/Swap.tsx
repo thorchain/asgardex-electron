@@ -88,7 +88,7 @@ export type SwapProps = {
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
   network: Network
-  sourcePoolRouter: O.Option<string>
+  sourcePoolRouter: O.Option<Address>
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
 }
@@ -118,7 +118,7 @@ export const Swap = ({
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
-  const prevSourcePoolRouter = useRef<O.Option<string>>(O.none)
+  const prevSourcePoolRouter = useRef<O.Option<Address>>(O.none)
 
   // convert to hash map here instead of using getPoolDetail
   const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [
@@ -189,8 +189,8 @@ export const Swap = ({
     return FP.pipe(
       sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
       O.map(([{ source, target }, poolAddress, address]) => ({
-        poolAddress,
         routerAddress: sourcePoolRouter,
+        poolAddress,
         asset: source,
         amount: amountToSwap,
         memo: getSwapMemo({ asset: target, address })
@@ -712,10 +712,10 @@ export const Swap = ({
   const onApprove = () => {
     FP.pipe(
       sequenceTOption(sourcePoolRouter, getEthTokenAddress(sourceAssetProp)),
-      O.map(([router, tokenAddress]) =>
+      O.map(([routerAddress, tokenAddress]) =>
         subscribeApproveState(
           approveERC20Token$({
-            spender: router,
+            spender: routerAddress,
             sender: tokenAddress
           })
         )
@@ -774,10 +774,10 @@ export const Swap = ({
         sourcePoolRouter,
         getEthTokenAddress(sourceAssetProp)
       ),
-      O.map(([_, router, tokenAddress]) =>
+      O.map(([_, routerAddress, tokenAddress]) =>
         subscribeIsApprovedState(
           isApprovedERC20Token$({
-            spender: router,
+            spender: routerAddress,
             sender: tokenAddress
           })
         )

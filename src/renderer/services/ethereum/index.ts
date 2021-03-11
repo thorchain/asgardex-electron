@@ -21,6 +21,7 @@ const {
   resetTx,
   sendTx,
   txRD$,
+  sendDepositTx$,
   approveERC20Token$,
   isApprovedERC20Token$
 } = createTransactionService(client$)
@@ -45,6 +46,7 @@ export {
   txRD$,
   reloadFees,
   fees$,
+  sendDepositTx$,
   callFees$,
   approveERC20Token$,
   isApprovedERC20Token$

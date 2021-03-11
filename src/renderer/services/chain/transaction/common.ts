@@ -27,6 +27,7 @@ import { ErrorId, TxHashLD, TxLD } from '../../wallet/types'
 import { SendTxParams } from '../types'
 
 export const sendTx$ = ({
+  router = '',
   asset,
   recipient,
   amount,
@@ -58,7 +59,17 @@ export const sendTx$ = ({
       )
 
     case ETHChain:
-      return ETH.sendTx({ asset, recipient, amount, memo, feeOptionKey })
+      if (txType === TxTypes.SWAP) {
+        return ETH.sendDepositTx$({
+          router,
+          poolAddress: recipient,
+          asset,
+          amount,
+          memo
+        })
+      } else {
+        return ETH.sendTx({ asset, recipient, amount, memo, feeOptionKey })
+      }
 
     case THORChain: {
       if (txType === TxTypes.SWAP || txType === TxTypes.DEPOSIT || txType === TxTypes.WITHDRAW) {

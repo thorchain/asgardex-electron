@@ -28,9 +28,8 @@ export const callFees$ = (
         oClient,
         O.fold(
           () => Rx.EMPTY,
-          (client) => {
-            console.log(address, abi, func, params)
-            return Rx.combineLatest([client.estimateCall(address, abi, func, params), client.estimateGasPrices()]).pipe(
+          (client) =>
+            Rx.combineLatest([client.estimateCall(address, abi, func, params), client.estimateGasPrices()]).pipe(
               RxOp.map(
                 ([gasLimit, gasPrices]) =>
                   ({
@@ -41,7 +40,6 @@ export const callFees$ = (
                   } as Fees)
               )
             )
-          }
         )
       )
     ),

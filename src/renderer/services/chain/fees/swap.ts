@@ -43,14 +43,6 @@ const swapFeeByChain$ = ({
   const router = type === 'source' ? FP.pipe(routerAddress, O.toUndefined) : undefined
   const chain = getChainAsset(asset.chain).chain
   const FEE_OPTION_KEY: FeeOptionKey = 'fast'
-  console.log({
-    asset,
-    memo,
-    amount,
-    recipient,
-    routerAddress,
-    type
-  })
   switch (chain) {
     case BNBChain:
       return FP.pipe(

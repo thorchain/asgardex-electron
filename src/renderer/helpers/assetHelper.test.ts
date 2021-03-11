@@ -1,3 +1,4 @@
+import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
   AssetBCH,
   AssetBNB,
@@ -8,6 +9,7 @@ import {
   AssetRuneB1A,
   AssetRuneNative
 } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { ERC20_TESTNET } from '../../shared/mock/assets'
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
@@ -21,7 +23,8 @@ import {
   isLtcAsset,
   isPricePoolAsset,
   isRuneBnbAsset,
-  isRuneNativeAsset
+  isRuneNativeAsset,
+  getEthAssetAddress
 } from './assetHelper'
 
 describe('helpers/assetHelper', () => {
@@ -108,6 +111,18 @@ describe('helpers/assetHelper', () => {
     })
     it('is false for ETH.RUNE', () => {
       expect(isEthTokenAsset(ERC20_TESTNET.RUNE)).toBeTruthy()
+    })
+  })
+
+  describe('getEthAssetAddress', () => {
+    it('returns ETH address', () => {
+      expect(getEthAssetAddress(AssetETH)).toEqual(O.some(ETHAddress))
+    })
+    it('returns ETH.USDT', () => {
+      expect(getEthAssetAddress(ERC20_TESTNET.USDT)).toEqual(O.some('0xDB99328b43B86037f80B43c3DbD203F00F056B75'))
+    })
+    it('is returns None for non ETH assets', () => {
+      expect(getEthAssetAddress(AssetRuneNative)).toBeNone()
     })
   })
 

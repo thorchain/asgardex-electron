@@ -4,7 +4,8 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { getEthAssetAddress, isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { TxTypes } from '../../../types/asgardex'
@@ -25,7 +26,7 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * @returns SwapState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
  *
  */
-export const swap$ = ({ poolAddress, asset, amount, memo }: SwapParams): SwapState$ => {
+export const swap$ = ({ routerAddress, poolAddress, asset, amount, memo }: SwapParams): SwapState$ => {
   // total of progress
   const total = O.some(100)
 
@@ -52,7 +53,9 @@ export const swap$ = ({ poolAddress, asset, amount, memo }: SwapParams): SwapSta
     liveData.chain((_) => {
       setState({ ...getState(), step: 2, swapTx: RD.pending, swap: RD.progress({ loaded: 50, total }) })
       // 2. send swap tx
+      const router = FP.pipe(routerAddress, O.toUndefined)
       return sendTx$({
+        router,
         asset,
         recipient: poolAddress, // emtpy string for Native
         amount,
@@ -62,10 +65,11 @@ export const swap$ = ({ poolAddress, asset, amount, memo }: SwapParams): SwapSta
       })
     }),
     liveData.chain((txHash) => {
+      const assetAddress = isEthChain(asset.chain) ? FP.pipe(getEthAssetAddress(asset), O.toUndefined) : undefined
       // Update state
       setState({ ...getState(), step: 3, swapTx: RD.success(txHash), swap: RD.progress({ loaded: 75, total }) })
       // 3. check tx finality by polling its tx data
-      return txStatusByChain$(txHash, asset.chain)
+      return txStatusByChain$(txHash, asset.chain, assetAddress)
     }),
     // Update state
     liveData.map((_) => setState({ ...getState(), swap: RD.success(true) })),
