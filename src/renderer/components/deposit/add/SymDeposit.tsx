@@ -147,9 +147,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
       amount: assetAmountToDeposit,
       memos: oMemo,
       recipient: oPoolAddress,
+      router: oPoolRouter,
       type: 'sym'
     }),
-    [asset, assetAmountToDeposit, oMemo, oPoolAddress]
+    [asset, assetAmountToDeposit, oMemo, oPoolRouter, oPoolAddress]
   )
 
   const [depositFeesRD] = useObservableState<DepositFeesRD>(() => chainFees$(depositFeesParams), RD.initial)
