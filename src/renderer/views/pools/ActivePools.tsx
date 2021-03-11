@@ -66,17 +66,19 @@ export const ActivePools: React.FC = (): JSX.Element => {
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <Styled.TableAction>
-        <ManageButton asset={pool.target} />
+        <ManageButton asset={pool.target} sizevalue={isDesktopView ? 'normal' : 'small'} isTextView={isDesktopView} />
         <Button
           round="true"
+          sizevalue={isDesktopView ? 'normal' : 'small'}
+          style={{ height: 30 }}
           onClick={() => clickSwapHandler({ source: assetToString(pool.asset), target: assetToString(pool.target) })}>
           <SwapOutlined />
-          {intl.formatMessage({ id: 'common.swap' })}
+          {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
         </Button>
       </Styled.TableAction>
     ),
 
-    [clickSwapHandler, intl]
+    [clickSwapHandler, intl, isDesktopView]
   )
 
   const btnPoolsColumn = useMemo(
@@ -190,7 +192,11 @@ export const ActivePools: React.FC = (): JSX.Element => {
   )
 
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
-    () => [Shared.poolColumnMobile(intl.formatMessage({ id: 'common.pool' })), btnPoolsColumn],
+    () => [
+      Shared.poolColumnMobile(intl.formatMessage({ id: 'common.pool' })),
+      Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
+      btnPoolsColumn
+    ],
     [btnPoolsColumn, intl]
   )
 

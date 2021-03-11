@@ -72,10 +72,10 @@ export const PendingPools: React.FC = (): JSX.Element => {
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <TableAction>
-        <ManageButton asset={pool.target} />
+        <ManageButton asset={pool.target} isTextView={isDesktopView} />
       </TableAction>
     ),
-    []
+    [isDesktopView]
   )
 
   const btnPendingPoolsColumn = useMemo(
@@ -132,7 +132,11 @@ export const PendingPools: React.FC = (): JSX.Element => {
   )
 
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
-    () => [Shared.poolColumnMobile(intl.formatMessage({ id: 'common.pool' })), btnPendingPoolsColumn],
+    () => [
+      Shared.poolColumnMobile(intl.formatMessage({ id: 'common.pool' })),
+      Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
+      btnPendingPoolsColumn
+    ],
     [btnPendingPoolsColumn, intl]
   )
 
