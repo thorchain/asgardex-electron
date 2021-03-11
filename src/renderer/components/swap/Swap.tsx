@@ -758,6 +758,7 @@ export const Swap = ({
   const isApproved = useMemo(
     () =>
       !needApprovement ||
+      RD.isInitial(approveState) ||
       RD.isSuccess(approveState) ||
       FP.pipe(
         isApprovedState,
