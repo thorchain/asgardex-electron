@@ -16,6 +16,7 @@ import { Alert } from '../../../components/uielements/alert'
 import { ZERO_BN, ZERO_POOL_DATA } from '../../../const'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
+import { useEthereumContext } from '../../../contexts/EthereumContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getChainAsset } from '../../../helpers/chainHelper'
@@ -24,7 +25,7 @@ import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as depositRoutes from '../../../routes/deposit'
 import { SymDepositMemo } from '../../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../../services/const'
-import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
+import { PoolAddress, PoolAssetsRD, PoolDetailRD, PoolRouter } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 
@@ -48,19 +49,29 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
 
   const {
     service: {
-      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, selectedPoolAddress$ }
+      pools: {
+        availableAssets$,
+        priceRatio$,
+        selectedPricePoolAsset$,
+        poolDetail$,
+        selectedPoolAddress$,
+        selectedPoolRouter$
+      }
     }
   } = useMidgardContext()
 
   const { depositFees$, symDeposit$, reloadDepositFees, symDepositTxMemo$, getExplorerUrlByAsset$ } = useChainContext()
 
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
+  const oPoolRouter: O.Option<PoolRouter> = useObservableState(selectedPoolRouter$, O.none)
 
   const {
     balancesState$,
     reloadBalances,
     keystoreService: { validatePassword$ }
   } = useWalletContext()
+
+  const { approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
 
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
@@ -164,15 +175,19 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
           priceAsset={selectedPricePoolAsset}
           disabled={true}
           poolAddress={O.none}
+          poolRouter={O.none}
           memo={O.none}
           reloadBalances={reloadBalances}
           poolData={ZERO_POOL_DATA}
           deposit$={symDeposit$}
           network={network}
+          approveERC20Token$={approveERC20Token$}
+          isApprovedERC20Token$={isApprovedERC20Token$}
         />
       </>
     ),
     [
+      intl,
       validatePassword$,
       viewRuneTx,
       viewAssetTx,
@@ -181,8 +196,9 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
       selectedPricePoolAsset,
       reloadBalances,
       symDeposit$,
-      intl,
-      network
+      network,
+      approveERC20Token$,
+      isApprovedERC20Token$
     ]
   )
 
@@ -208,6 +224,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
               runeBalance={runeBalance}
               chainAssetBalance={chainAssetBalance}
               poolAddress={oPoolAddress}
+              poolRouter={oPoolRouter}
               memo={depositTxMemo}
               fees$={depositFees$}
               reloadFees={reloadDepositFees}
@@ -216,6 +233,8 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
               assets={poolAssets}
               deposit$={symDeposit$}
               network={network}
+              approveERC20Token$={approveERC20Token$}
+              isApprovedERC20Token$={isApprovedERC20Token$}
             />
           </>
         )
