@@ -1,5 +1,6 @@
 import { Row } from 'antd'
 import styled from 'styled-components'
+import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
 import { Alert as UIAlert } from '../../uielements/alert'
@@ -116,4 +117,28 @@ export const ExtraContainer = styled('div')`
 
 export const ViewTxButtonTop = styled(UIViewTxButton)`
   padding-bottom: 20px;
+`
+
+export const ErrorLabel = styled(UILabel)`
+  margin-bottom: 14px;
+  font-family: 'MainFontRegular';
+  text-transform: uppercase;
+  color: ${palette('error', 0)};
+  text-align: center;
+`
+
+export const SubmitContainer = styled('div')`
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
+
+export const ApproveButton = styled(UIButton).attrs({
+  type: 'primary',
+  round: 'true',
+  color: 'warning',
+  sizevalue: 'xnormal'
+})`
+  margin-bottom: 50px;
 `

@@ -46,6 +46,7 @@ const defaultProps: SymDepositProps = {
   priceAsset: AssetRuneNative,
   assets: [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO],
   poolAddress: O.none,
+  poolRouter: O.none,
   memo: O.some({ rune: 'rune-memo', asset: 'asset-memo' }),
   reloadBalances: () => console.log('reloadBalances'),
   viewAssetTx: (txHash) => {
@@ -70,7 +71,9 @@ const defaultProps: SymDepositProps = {
         })
       )
     ),
-  network: 'testnet'
+  network: 'testnet',
+  approveERC20Token$: () => Rx.of(RD.success('txHash')),
+  isApprovedERC20Token$: () => Rx.of(RD.success(true))
 }
 
 export const Default: Story = () => <SymDeposit {...defaultProps} />
