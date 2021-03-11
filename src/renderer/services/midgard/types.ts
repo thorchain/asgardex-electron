@@ -123,6 +123,7 @@ export type PoolsService = {
   reloadAllPools: FP.Lazy<void>
   poolAddresses$: ThorchainEndpointsLD
   selectedPoolAddress$: PoolAddressRx
+  selectedPoolRouter$: PoolRouterRx
   poolAddressByAsset$: (asset: Asset) => PoolAddressRx
   poolRouterByAsset$: (asset: Asset) => PoolRouterRx
   poolDetail$: PoolDetailLD

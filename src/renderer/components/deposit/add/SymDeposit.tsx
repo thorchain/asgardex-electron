@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
@@ -20,8 +20,10 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
-import { isChainAsset } from '../../../helpers/assetHelper'
+import { getEthTokenAddress, isChainAsset, isEthAsset, isEthTokenAsset } from '../../../helpers/assetHelper'
+import { isEthChain } from '../../../helpers/chainHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { LiveData } from '../../../helpers/rx/liveData'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import {
@@ -33,8 +35,9 @@ import {
   DepositFeesRD,
   SymDepositFeesParams
 } from '../../../services/chain/types'
-import { PoolAddress } from '../../../services/midgard/types'
-import { ValidatePasswordHandler } from '../../../services/wallet/types'
+import { ApproveParams, IsApprovedRD } from '../../../services/ethereum/types'
+import { PoolAddress, PoolRouter } from '../../../services/midgard/types'
+import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
@@ -53,6 +56,7 @@ export type Props = {
   runeBalance: O.Option<BaseAmount>
   chainAssetBalance: O.Option<BaseAmount>
   poolAddress: O.Option<PoolAddress>
+  poolRouter: O.Option<PoolRouter>
   memo: O.Option<SymDepositMemo>
   priceAsset?: Asset
   reloadFees: LoadDepositFeesHandler
@@ -67,6 +71,8 @@ export type Props = {
   poolData: PoolData
   deposit$: SymDepositStateHandler
   network: Network
+  approveERC20Token$: (params: ApproveParams) => TxHashLD
+  isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -81,6 +87,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     chainAssetBalance: oChainAssetBalance,
     memo: oMemo,
     poolAddress: oPoolAddress,
+    poolRouter: oPoolRouter,
     viewAssetTx = (_) => {},
     viewRuneTx = (_) => {},
     validatePassword$,
@@ -93,8 +100,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
     disabled = false,
     poolData,
     deposit$,
-    network
+    network,
+    isApprovedERC20Token$,
+    approveERC20Token$
   } = props
+  const prevPoolRouter = useRef<O.Option<PoolRouter>>(O.none)
 
   const intl = useIntl()
   const [runeAmountToDeposit, setRuneAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
@@ -437,7 +447,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     resetDepositState()
     reloadBalances()
     changePercentHandler(0)
-  }, [reloadBalances, resetDepositState, changePercentHandler])
+  }, [resetDepositState, reloadBalances, changePercentHandler])
 
   const renderTxModal = useMemo(() => {
     const { deposit: depositRD, depositTxs: symDepositTxs } = depositState
@@ -586,6 +596,98 @@ export const SymDeposit: React.FC<Props> = (props) => {
     setSelectedInput('none')
   }, [reloadFeesHandler, setSelectedInput])
 
+  const {
+    state: approveState,
+    reset: resetApproveState,
+    subscribe: subscribeApproveState
+  } = useSubscriptionState<TxHashRD>(RD.initial)
+
+  const onApprove = () => {
+    FP.pipe(
+      sequenceTOption(oPoolRouter, getEthTokenAddress(asset)),
+      O.map(([routerAddress, tokenAddress]) =>
+        subscribeApproveState(
+          approveERC20Token$({
+            spender: routerAddress,
+            sender: tokenAddress
+          })
+        )
+      )
+    )
+  }
+
+  const renderApproveError = useMemo(
+    () =>
+      FP.pipe(
+        approveState,
+        RD.fold(
+          () => <></>,
+          () => <></>,
+          (error) => <Styled.ErrorLabel key="approveErrorLabel">{error.msg}</Styled.ErrorLabel>,
+          () => <></>
+        )
+      ),
+    [approveState]
+  )
+
+  // State for values of `isApprovedERC20Token$`
+  const {
+    state: isApprovedState,
+    reset: resetIsApprovedState,
+    subscribe: subscribeIsApprovedState
+  } = useSubscriptionState<IsApprovedRD>(RD.success(true))
+
+  const needApprovement = useMemo(() => {
+    // Other chains than ETH do not need an approvement
+    if (!isEthChain(asset.chain)) return false
+    // ETH does not need to be approved
+    if (isEthAsset(asset)) return false
+    // ERC20 token does need approvement only
+    return isEthTokenAsset(asset)
+  }, [asset])
+
+  const isApproved = useMemo(
+    () =>
+      !needApprovement ||
+      RD.isSuccess(approveState) ||
+      FP.pipe(
+        isApprovedState,
+        RD.getOrElse(() => false)
+      ),
+    [approveState, isApprovedState, needApprovement]
+  )
+
+  const checkApprovedStatus = useCallback(() => {
+    // check approve status
+    FP.pipe(
+      sequenceTOption(
+        O.fromPredicate((v) => !!v)(needApprovement), // `None` if needApprovement is `false`, no request then
+        oPoolRouter,
+        getEthTokenAddress(asset)
+      ),
+      O.map(([_, routerAddress, tokenAddress]) =>
+        subscribeIsApprovedState(
+          isApprovedERC20Token$({
+            spender: routerAddress,
+            sender: tokenAddress
+          })
+        )
+      )
+    )
+  }, [asset, isApprovedERC20Token$, needApprovement, oPoolRouter, subscribeIsApprovedState])
+
+  useEffect(() => {
+    if (prevPoolRouter.current !== oPoolRouter) {
+      prevPoolRouter.current = oPoolRouter
+      // reset approve state
+      resetApproveState()
+      // reset isApproved state
+      resetIsApprovedState()
+      // check approved status
+      checkApprovedStatus()
+    }
+  }, [checkApprovedStatus, oPoolRouter, resetApproveState, resetIsApprovedState])
+
   return (
     <Styled.Container>
       {showBalanceError && (
@@ -630,36 +732,47 @@ export const SymDeposit: React.FC<Props> = (props) => {
         </Col>
       </Styled.CardsRow>
 
-      <Styled.FeesRow gutter={{ lg: 32 }}>
-        <Col xs={24} xl={12}>
-          <Styled.FeeRow>
-            <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} />
-          </Styled.FeeRow>
-          <Styled.FeeErrorRow>
-            <Col>
-              <>
-                {
-                  // Don't show thorchain fee error if we already display a error of balances
-                  !isBalanceError && isThorchainFeeError && renderThorchainFeeError
-                }
-                {
-                  // Don't show asset chain fee error if we already display a error of balances
-                  !isBalanceError && isAssetChainFeeError && renderAssetChainFeeError
-                }
-              </>
+      {isApproved ? (
+        <>
+          <Styled.FeesRow gutter={{ lg: 32 }}>
+            <Col xs={24} xl={12}>
+              <Styled.FeeRow>
+                <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} />
+              </Styled.FeeRow>
+              <Styled.FeeErrorRow>
+                <Col>
+                  <>
+                    {
+                      // Don't show thorchain fee error if we already display a error of balances
+                      !isBalanceError && isThorchainFeeError && renderThorchainFeeError
+                    }
+                    {
+                      // Don't show asset chain fee error if we already display a error of balances
+                      !isBalanceError && isAssetChainFeeError && renderAssetChainFeeError
+                    }
+                  </>
+                </Col>
+              </Styled.FeeErrorRow>
             </Col>
-          </Styled.FeeErrorRow>
-        </Col>
-      </Styled.FeesRow>
+          </Styled.FeesRow>
 
-      <Styled.DragWrapper>
-        <Drag
-          title={intl.formatMessage({ id: 'deposit.drag' })}
-          onConfirm={confirmDepositHandler}
-          disabled={disabledForm || runeAmountToDeposit.amount().isZero()}
-          network={network}
-        />
-      </Styled.DragWrapper>
+          <Styled.DragWrapper>
+            <Drag
+              title={intl.formatMessage({ id: 'deposit.drag' })}
+              onConfirm={confirmDepositHandler}
+              disabled={disabledForm || runeAmountToDeposit.amount().isZero()}
+              network={network}
+            />
+          </Styled.DragWrapper>
+        </>
+      ) : (
+        <Styled.SubmitContainer>
+          <Styled.ApproveButton onClick={onApprove} loading={RD.isPending(approveState)}>
+            {intl.formatMessage({ id: 'swap.approve' })}
+          </Styled.ApproveButton>
+          {renderApproveError}
+        </Styled.SubmitContainer>
+      )}
       {showPasswordModal && (
         <PasswordModal
           onSuccess={onSucceedPasswordModal}

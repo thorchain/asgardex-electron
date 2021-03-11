@@ -456,6 +456,17 @@ const createPoolsService = (
     })
   )
 
+  const selectedPoolRouter$: PoolRouterRx = Rx.combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
+    RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
+      return FP.pipe(
+        poolAddresses,
+        RD.toOption,
+        (oPoolAddresses) => sequenceTOption(oPoolAddresses, oSelectedPoolAsset),
+        O.chain(([poolAddresses, selectedPoolAsset]) => getPoolRouterByChain(poolAddresses, selectedPoolAsset.chain))
+      )
+    })
+  )
+
   const oPoolAddressByChain$ = (chain: Chain): PoolAddressRx =>
     FP.pipe(
       poolAddresses$,
@@ -553,6 +564,7 @@ const createPoolsService = (
     reloadAllPools,
     poolAddresses$,
     selectedPoolAddress$,
+    selectedPoolRouter$,
     poolDetail$,
     priceRatio$,
     availableAssets$,
