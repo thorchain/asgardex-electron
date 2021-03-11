@@ -22,6 +22,7 @@ import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { getEthTokenAddress, isChainAsset, isEthAsset, isEthTokenAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
+import { eqOAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { LiveData } from '../../../helpers/rx/liveData'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
@@ -105,6 +106,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     approveERC20Token$
   } = props
   const prevPoolRouter = useRef<O.Option<PoolRouter>>(O.none)
+  const prevAsset = useRef<O.Option<Asset>>(O.none)
 
   const intl = useIntl()
   const [runeAmountToDeposit, setRuneAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
@@ -139,8 +141,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oRuneBalance]
   )
 
-  const chainFees$ = useMemo(() => fees$, [fees$])
-
   const depositFeesParams: SymDepositFeesParams = useMemo(
     () => ({
       asset,
@@ -152,6 +152,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     }),
     [asset, assetAmountToDeposit, oMemo, oPoolRouter, oPoolAddress]
   )
+
+  const chainFees$ = useMemo(() => fees$, [fees$])
 
   const [depositFeesRD] = useObservableState<DepositFeesRD>(() => chainFees$(depositFeesParams), RD.initial)
 
@@ -337,9 +339,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     (asset: Asset) => {
       onChangeAsset(asset)
       changePercentHandler(0)
-      reloadFeesHandler()
     },
-    [changePercentHandler, onChangeAsset, reloadFeesHandler]
+    [changePercentHandler, onChangeAsset]
   )
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -687,7 +688,20 @@ export const SymDeposit: React.FC<Props> = (props) => {
       // check approved status
       checkApprovedStatus()
     }
-  }, [checkApprovedStatus, oPoolRouter, resetApproveState, resetIsApprovedState])
+
+    if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {
+      if (asset.chain === 'ETH') {
+        const router = FP.pipe(oPoolRouter, O.toUndefined)
+        if (router) {
+          prevAsset.current = O.some(asset)
+          reloadFeesHandler()
+        }
+      } else {
+        prevAsset.current = O.some(asset)
+        reloadFeesHandler()
+      }
+    }
+  }, [asset, checkApprovedStatus, oPoolRouter, reloadFeesHandler, resetApproveState, resetIsApprovedState])
 
   return (
     <Styled.Container>

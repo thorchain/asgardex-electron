@@ -40,12 +40,22 @@ export const eqBalance: Eq.Eq<Balance> = {
   equals: (x, y) => eqAsset.equals(x.asset, y.asset) && eqBaseAmount.equals(x.amount, y.amount)
 }
 
+export const eqONullableString: Eq.Eq<O.Option<string> | undefined> = {
+  equals: (x, y) => {
+    if (x && y) {
+      return eqOString.equals(x, y)
+    }
+    return x === y
+  }
+}
+
 export const eqDepositFeesParams: Eq.Eq<DepositFeesParams> = {
   equals: (x, y) =>
     // Check if entered chain was changed
     eqChain.equals(x.asset.chain, y.asset.chain) &&
     // Check if entered amount was changed
-    eqBaseAmount.equals(x.amount, y.amount)
+    eqBaseAmount.equals(x.amount, y.amount) &&
+    eqONullableString.equals(x.router, y.router)
 }
 
 export const eqErrorId = Eq.eqString
