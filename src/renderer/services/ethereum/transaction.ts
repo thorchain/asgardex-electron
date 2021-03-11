@@ -81,7 +81,6 @@ export const createTransactionService = (client$: Client$): TransactionService =
 
   const runApproveERC20Token$ = (client: EthClient, params: ApproveParams): TxHashLD =>
     Rx.from(client.approve(params.spender, params.sender, params.amount)).pipe(
-      // Rx.from(client.approve(params.spender, params.sender, baseAmount(0))).pipe(
       RxOp.switchMap((txResult) => Rx.from(txResult.wait(1))),
       RxOp.map((txReceipt) => txReceipt.transactionHash),
       RxOp.map(RD.success),
