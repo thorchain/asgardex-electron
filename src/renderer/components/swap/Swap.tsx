@@ -88,7 +88,7 @@ export type SwapProps = {
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
   network: Network
-  sourcePoolRouter: string
+  sourcePoolRouter: O.Option<Address>
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
 }
@@ -118,7 +118,7 @@ export const Swap = ({
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
-  const prevSourcePoolRouter = useRef<string>('')
+  const prevSourcePoolRouter = useRef<O.Option<Address>>(O.none)
 
   // convert to hash map here instead of using getPoolDetail
   const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [
@@ -218,7 +218,7 @@ export const Swap = ({
             asset: targetAssetProp,
             amount: swapData.swapResult,
             recipient: targetRecipient,
-            routerAddress: ''
+            routerAddress: O.some('')
           }
         }))
       ),
@@ -711,11 +711,11 @@ export const Swap = ({
 
   const onApprove = () => {
     FP.pipe(
-      getEthTokenAddress(sourceAssetProp),
-      O.map((tokenAddress) =>
+      sequenceTOption(sourcePoolRouter, getEthTokenAddress(sourceAssetProp)),
+      O.map(([routerAddress, tokenAddress]) =>
         subscribeApproveState(
           approveERC20Token$({
-            spender: sourcePoolRouter,
+            spender: routerAddress,
             sender: tokenAddress
           })
         )
@@ -771,12 +771,13 @@ export const Swap = ({
     FP.pipe(
       sequenceTOption(
         O.fromPredicate((v) => !!v)(needApprovement), // `None` if needApprovement is `false`, no request then
+        sourcePoolRouter,
         getEthTokenAddress(sourceAssetProp)
       ),
-      O.map(([_, tokenAddress]) =>
+      O.map(([_, routerAddress, tokenAddress]) =>
         subscribeIsApprovedState(
           isApprovedERC20Token$({
-            spender: sourcePoolRouter,
+            spender: routerAddress,
             sender: tokenAddress
           })
         )

@@ -1,11 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getEthTokenAddress, isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { getEthAssetAddress, isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
@@ -54,8 +53,9 @@ export const swap$ = ({ routerAddress, poolAddress, asset, amount, memo }: SwapP
     liveData.chain((_) => {
       setState({ ...getState(), step: 2, swapTx: RD.pending, swap: RD.progress({ loaded: 50, total }) })
       // 2. send swap tx
+      const router = FP.pipe(routerAddress, O.toUndefined)
       return sendTx$({
-        router: routerAddress,
+        router,
         asset,
         recipient: poolAddress, // emtpy string for Native
         amount,
@@ -67,12 +67,10 @@ export const swap$ = ({ routerAddress, poolAddress, asset, amount, memo }: SwapP
     liveData.chain((txHash) => {
       let assetAddress = undefined
       if (isEthChain(asset.chain)) {
-        assetAddress = isEthAsset(asset)
-          ? ETHAddress
-          : FP.pipe(
-              getEthTokenAddress(asset),
-              O.getOrElse(() => '')
-            )
+        assetAddress = FP.pipe(
+          getEthAssetAddress(asset),
+          O.getOrElse(() => '')
+        )
       }
       // Update state
       setState({ ...getState(), step: 3, swapTx: RD.success(txHash), swap: RD.progress({ loaded: 75, total }) })

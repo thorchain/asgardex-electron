@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, TxHash } from '@xchainjs/xchain-client'
-import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
   BCHChain,
   BNBChain,
@@ -17,7 +16,7 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 
 import { DEFAULT_FEE_OPTION_KEY } from '../../../components/wallet/txs/send/Send.const'
-import { getEthTokenAddress, isEthAsset } from '../../../helpers/assetHelper'
+import { getEthAssetAddress } from '../../../helpers/assetHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
@@ -63,12 +62,10 @@ export const sendTx$ = ({
 
     case ETHChain:
       if (txType === TxTypes.SWAP) {
-        const assetAddress = isEthAsset(asset)
-          ? ETHAddress
-          : FP.pipe(
-              getEthTokenAddress(asset),
-              O.getOrElse(() => '')
-            )
+        const assetAddress = FP.pipe(
+          getEthAssetAddress(asset),
+          O.getOrElse(() => '')
+        )
         if (!assetAddress) {
           return txFailure$(`Invalid Token Address`)
         }

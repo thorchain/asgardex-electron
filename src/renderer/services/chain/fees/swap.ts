@@ -40,6 +40,7 @@ const swapFeeByChain$ = ({
   routerAddress,
   type
 }: SwapFeeParams & { type: 'source' | 'target' }): FeeLD => {
+  const router = type === 'source' ? FP.pipe(routerAddress, O.toUndefined) : undefined
   const chain = getChainAsset(asset.chain).chain
   const FEE_OPTION_KEY: FeeOptionKey = 'fast'
   switch (chain) {
@@ -63,9 +64,9 @@ const swapFeeByChain$ = ({
 
     case ETHChain: {
       return FP.pipe(
-        type === 'source' && routerAddress
+        type === 'source' && router
           ? ETH.callFees$(
-              routerAddress,
+              router,
               ethRouterABI,
               'deposit',
               isEthAsset(asset)

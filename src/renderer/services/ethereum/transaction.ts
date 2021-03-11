@@ -29,10 +29,11 @@ export const createTransactionService = (client$: Client$): TransactionService =
             params.memo,
             params.assetAddress === ETHAddress
               ? {
+                  // Need to use toFixed to convert BaseAmount to Bignumber since value and gasPrice type is Bignumber
                   value: params.amount.amount().toFixed(),
-                  gasPrice: gasPrices.fastest.amount().toFixed()
+                  gasPrice: gasPrices.fast.amount().toFixed()
                 }
-              : { gasPrice: gasPrices.fastest.amount().toFixed() }
+              : { gasPrice: gasPrices.fast.amount().toFixed() }
           ])
         )
       }),

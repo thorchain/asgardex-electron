@@ -1,5 +1,5 @@
 import { Address } from '@xchainjs/xchain-client'
-import { getTokenAddress } from '@xchainjs/xchain-ethereum'
+import { ETHAddress, getTokenAddress } from '@xchainjs/xchain-ethereum'
 import {
   Asset,
   AssetBCH,
@@ -102,6 +102,9 @@ export const getEthTokenAddress: (asset: Asset) => O.Option<Address> = FP.flow(
   O.fromNullable,
   O.chain(getEthChecksumAddress)
 )
+
+export const getEthAssetAddress = (asset: Asset): O.Option<Address> =>
+  isEthAsset(asset) ? O.some(ETHAddress) : getEthTokenAddress(asset)
 
 /**
  * Check whether an asset is an ERC20 asset

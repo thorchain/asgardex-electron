@@ -5,7 +5,9 @@ import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import { BigNumber } from 'ethers'
 
 import { LiveData } from '../../helpers/rx/liveData'
+import { Memo } from '../chain/types'
 import * as C from '../clients'
+import { PoolAddress } from '../midgard/types'
 import { ApiError, TxHashLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
@@ -34,10 +36,10 @@ export type ApproveParams = {
 
 export type CallRouterParams = {
   router: Address
-  vault: Address
+  vault: PoolAddress
   assetAddress: Address
   amount: BaseAmount
-  memo: string
+  memo: Memo
 }
 
 export type IsApprovedRD = RD.RemoteData<ApiError, boolean>
