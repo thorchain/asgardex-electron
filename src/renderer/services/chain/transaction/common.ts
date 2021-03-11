@@ -59,7 +59,7 @@ export const sendTx$ = ({
       )
 
     case ETHChain:
-      if (txType === TxTypes.SWAP) {
+      if (txType === TxTypes.SWAP || txType === TxTypes.DEPOSIT || txType === TxTypes.WITHDRAW) {
         return ETH.sendDepositTx$({
           router,
           poolAddress: recipient,
