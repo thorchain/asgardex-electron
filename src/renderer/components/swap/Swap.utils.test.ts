@@ -14,7 +14,15 @@ import * as O from 'fp-ts/lib/Option'
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import { eqBaseAmount } from '../../helpers/fp/eq'
-import { DEFAULT_SWAP_DATA, isRuneSwap, getSlip, getSwapResult, getSwapData, pickAssetWithPrice } from './Swap.utils'
+import {
+  DEFAULT_SWAP_DATA,
+  isRuneSwap,
+  getSlip,
+  getSwapResult,
+  getSwapData,
+  pickPoolAsset,
+  poolAssetDetailToAsset
+} from './Swap.utils'
 
 describe('components/swap/utils', () => {
   describe('isRuneSwap', () => {
@@ -146,33 +154,44 @@ describe('components/swap/utils', () => {
     })
   })
 
-  describe('pickAssetWithPrice', () => {
+  describe('pickPoolAsset', () => {
     it('should be none', () => {
-      expect(pickAssetWithPrice([], AssetBNB)).toBeNone()
+      expect(pickPoolAsset([], AssetBNB)).toBeNone()
     })
     it('should return first element if nothing found', () => {
       expect(
-        pickAssetWithPrice(
+        pickPoolAsset(
           [
-            { asset: AssetRuneNative, priceRune: bn(0) },
-            { asset: AssetBNB, priceRune: bn(1) }
+            { asset: AssetRuneNative, assetPrice: bn(0) },
+            { asset: AssetBNB, assetPrice: bn(1) }
           ],
           ASSETS_TESTNET.FTM
         )
-      ).toEqual(O.some({ asset: AssetRuneNative, priceRune: bn(0) }))
+      ).toEqual(O.some({ asset: AssetRuneNative, assetPrice: bn(0) }))
     })
 
     it('should pick asset', () => {
       expect(
-        pickAssetWithPrice(
+        pickPoolAsset(
           [
-            { asset: AssetRuneNative, priceRune: bn(0) },
-            { asset: AssetBNB, priceRune: bn(1) },
-            { asset: AssetETH, priceRune: bn(2) }
+            { asset: AssetRuneNative, assetPrice: bn(0) },
+            { asset: AssetBNB, assetPrice: bn(1) },
+            { asset: AssetETH, assetPrice: bn(2) }
           ],
           AssetETH
         )
-      ).toEqual(O.some({ asset: AssetETH, priceRune: bn(2) }))
+      ).toEqual(O.some({ asset: AssetETH, assetPrice: bn(2) }))
+    })
+  })
+
+  describe('poolAssetToAsset', () => {
+    it('returns none', () => {
+      expect(poolAssetDetailToAsset(O.none)).toBeNone()
+    })
+    it('returns AssetRuneNative', () => {
+      expect(poolAssetDetailToAsset(O.some({ asset: AssetRuneNative, assetPrice: bn(0) }))).toEqual(
+        O.some(AssetRuneNative)
+      )
     })
   })
 })

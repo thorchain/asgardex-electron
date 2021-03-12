@@ -2,7 +2,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Transfer, Client } from '@xchainjs/xchain-binance'
 import { Address } from '@xchainjs/xchain-binance'
 import { Asset, AssetAmount, BaseAmount } from '@xchainjs/xchain-util'
-import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
@@ -15,13 +14,6 @@ export type Client$ = C.Client$<Client>
 
 export type ClientState = C.ClientState<Client>
 export type ClientState$ = C.ClientState$<Client>
-
-export type AssetWithPrice = {
-  asset: Asset
-  priceRune: BigNumber
-}
-
-export type AssetsWithPrice = AssetWithPrice[]
 
 export type TransferRD = RD.RemoteData<Error, Transfer>
 

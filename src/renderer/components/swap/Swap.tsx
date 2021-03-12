@@ -35,7 +35,6 @@ import { LiveData } from '../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/swap'
-import { AssetsWithPrice, AssetWithPrice } from '../../services/binance/types'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import {
   SwapState,
@@ -48,6 +47,7 @@ import {
   SwapFeesLD
 } from '../../services/chain/types'
 import { ApproveParams, IsApprovedRD } from '../../services/ethereum/types'
+import { PoolAssetDetail, PoolAssetDetails } from '../../services/midgard/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import {
@@ -67,13 +67,13 @@ import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
-import { getSwapData, assetWithPriceToAsset, pickAssetWithPrice, convertToBase8 } from './Swap.utils'
+import { getSwapData, poolAssetDetailToAsset, pickPoolAsset, convertToBase8 } from './Swap.utils'
 
 export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string }
 
 export type SwapProps = {
   keystore: KeystoreState
-  availableAssets: AssetsWithPrice
+  availableAssets: PoolAssetDetails
   sourceAsset: Asset
   targetAsset: Asset
   sourcePoolAddress: O.Option<string>
@@ -125,18 +125,18 @@ export const Swap = ({
     poolDetails
   ])
 
-  const oSourceAssetWP: O.Option<AssetWithPrice> = useMemo(() => pickAssetWithPrice(availableAssets, sourceAssetProp), [
+  const oSourcePoolAsset: O.Option<PoolAssetDetail> = useMemo(() => pickPoolAsset(availableAssets, sourceAssetProp), [
     availableAssets,
     sourceAssetProp
   ])
 
-  const oTargetAssetWP: O.Option<AssetWithPrice> = useMemo(() => pickAssetWithPrice(availableAssets, targetAssetProp), [
+  const oTargetPoolAsset: O.Option<PoolAssetDetail> = useMemo(() => pickPoolAsset(availableAssets, targetAssetProp), [
     availableAssets,
     targetAssetProp
   ])
 
-  const sourceAsset: O.Option<Asset> = useMemo(() => assetWithPriceToAsset(oSourceAssetWP), [oSourceAssetWP])
-  const targetAsset: O.Option<Asset> = useMemo(() => assetWithPriceToAsset(oTargetAssetWP), [oTargetAssetWP])
+  const sourceAsset: O.Option<Asset> = useMemo(() => poolAssetDetailToAsset(oSourcePoolAsset), [oSourcePoolAsset])
+  const targetAsset: O.Option<Asset> = useMemo(() => poolAssetDetailToAsset(oTargetPoolAsset), [oTargetPoolAsset])
 
   const assetsToSwap: O.Option<{ source: Asset; target: Asset }> = useMemo(
     () => sequenceSOption({ source: sourceAsset, target: targetAsset }),
@@ -452,7 +452,7 @@ export const Swap = ({
 
   const extraTxModalContent = useMemo(() => {
     return FP.pipe(
-      sequenceTOption(oSourceAssetWP, oTargetAssetWP),
+      sequenceTOption(oSourcePoolAsset, oTargetPoolAsset),
       O.map(([sourceAssetWP, targetAssetWP]) => {
         const targetAsset = targetAssetWP.asset
         const sourceAsset = sourceAssetWP.asset
@@ -490,8 +490,8 @@ export const Swap = ({
       O.getOrElse(() => <></>)
     )
   }, [
-    oSourceAssetWP,
-    oTargetAssetWP,
+    oSourcePoolAsset,
+    oTargetPoolAsset,
     swapData.swapResult,
     swapData.slip,
     amountToSwap,
@@ -873,7 +873,7 @@ export const Swap = ({
 
         <Styled.FormContainer>
           <Styled.CurrencyInfoContainer>
-            <CurrencyInfo slip={swapData.slip} from={oSourceAssetWP} to={oTargetAssetWP} />
+            <CurrencyInfo slip={swapData.slip} from={oSourcePoolAsset} to={oTargetPoolAsset} />
           </Styled.CurrencyInfoContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-out'}>

@@ -7,6 +7,7 @@ import {
   AssetRuneNative,
   assetToBase,
   assetToString,
+  bn,
   BNBChain,
   BTCChain,
   THORChain
@@ -20,11 +21,11 @@ import {
   THREE_RUNE_BASE_AMOUNT,
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
-import { PRICE_POOLS_WHITELIST, AssetBUSDBAF } from '../../const'
+import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, ZERO_BN } from '../../const'
 import { eqAsset, eqOString, eqPoolShare, eqPoolShares } from '../../helpers/fp/eq'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
-import { AssetDetail, PoolDetail, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
+import { PoolAssetDetail, PoolDetail, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
 import {
   getAssetDetail,
   getPricePools,
@@ -37,13 +38,15 @@ import {
   getPoolAddressByChain,
   combineShares,
   combineSharesByAsset,
-  getSharesByAssetAndType
+  getSharesByAssetAndType,
+  getPoolAssetDetail,
+  getPoolAssetsDetail
 } from './utils'
 
 describe('services/midgard/utils/', () => {
   describe('getAssetDetail', () => {
-    const runeDetail = { asset: assetToString(AssetRuneNative) } as AssetDetail
-    const bnbDetail = { asset: assetToString(AssetBNB) } as AssetDetail
+    const runeDetail: PoolAssetDetail = { asset: AssetRuneNative, assetPrice: ZERO_BN }
+    const bnbDetail: PoolAssetDetail = { asset: AssetBNB, assetPrice: ZERO_BN }
 
     it('returns details of RUNE', () => {
       const result = getAssetDetail([runeDetail, bnbDetail], AssetRuneNative.ticker)
@@ -350,9 +353,11 @@ describe('services/midgard/utils/', () => {
       it('returns none for empty list', () => {
         expect(getSharesByAssetAndType({ shares: [], asset: AssetBNB, type: 'sym' })).toBeNone()
       })
+
       it('returns none for non existing shares', () => {
         expect(getSharesByAssetAndType({ shares, asset: AssetBTC, type: 'sym' })).toBeNone()
       })
+
       it('gets sym. shares of BNB pools', () => {
         const oResult = getSharesByAssetAndType({ shares, asset: AssetBNB, type: 'sym' })
         expect(
@@ -363,6 +368,7 @@ describe('services/midgard/utils/', () => {
           )
         ).toBeTruthy()
       })
+
       it('gets asym. shares of BNB pools', () => {
         const oResult = getSharesByAssetAndType({ shares, asset: AssetBNB, type: 'asym' })
         expect(
@@ -372,6 +378,34 @@ describe('services/midgard/utils/', () => {
             O.getOrElse(() => false)
           )
         ).toBeTruthy()
+      })
+    })
+
+    describe('getPoolAssetDetail', () => {
+      it('returns none for empty list', () => {
+        expect(getPoolAssetDetail({ assetPrice: '1', asset: 'BNB.BNB' })).toEqual(
+          O.some({ assetPrice: bn(1), asset: AssetBNB })
+        )
+      })
+      it('returns none for empty data of asset', () => {
+        expect(getPoolAssetDetail({ assetPrice: '1', asset: '' })).toBeNone()
+      })
+    })
+
+    describe('getPoolAssetsDetail', () => {
+      it('returns a list of `PoolAssetDetail`s', () => {
+        expect(
+          getPoolAssetsDetail([
+            { assetPrice: '1', asset: 'BNB.BNB' },
+            { assetPrice: '2', asset: 'THOR.RUNE' }
+          ])
+        ).toEqual([
+          { assetPrice: bn(1), asset: AssetBNB },
+          { assetPrice: bn(2), asset: AssetRuneNative }
+        ])
+      })
+      it('returns empty list in case of invalid data', () => {
+        expect(getPoolAssetsDetail([{ assetPrice: '1', asset: '' }])).toEqual([])
       })
     })
   })
