@@ -10,6 +10,7 @@ import { DepositFeesParams } from '../../services/chain/types'
 import { PoolShare } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { WalletBalance } from '../../types/wallet'
+import { isEthChain } from '../chainHelper'
 
 export const eqOString = O.getEq(Eq.eqString)
 
@@ -50,12 +51,15 @@ export const eqONullableString: Eq.Eq<O.Option<string> | undefined> = {
 }
 
 export const eqDepositFeesParams: Eq.Eq<DepositFeesParams> = {
-  equals: (x, y) =>
+  equals: (x, y) => {
     // Check if entered chain was changed
-    eqAsset.equals(x.asset, y.asset) &&
-    // Check if entered amount was changed
-    eqBaseAmount.equals(x.amount, y.amount) &&
-    eqONullableString.equals(x.router, y.router)
+    return (
+      eqChain.equals(x.asset.chain, y.asset.chain) &&
+      (!isEthChain(x.asset.chain) || eqAsset.equals(x.asset, y.asset)) &&
+      eqBaseAmount.equals(x.amount, y.amount) &&
+      eqONullableString.equals(x.router, y.router)
+    )
+  }
 }
 
 export const eqErrorId = Eq.eqString

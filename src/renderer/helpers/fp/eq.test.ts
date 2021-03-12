@@ -1,5 +1,14 @@
 import { Balance } from '@xchainjs/xchain-client'
-import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount, bn, Chain } from '@xchainjs/xchain-util'
+import {
+  AssetBNB,
+  AssetBTC,
+  AssetETH,
+  AssetRuneERC20,
+  AssetRuneNative,
+  baseAmount,
+  bn,
+  Chain
+} from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -180,6 +189,27 @@ describe('helpers/fp/eq', () => {
         asset: AssetBNB
       }
       expect(eqBalance.equals(a, a)).toBeTruthy()
+    })
+    it('is not equal', () => {
+      const a: SymDepositFeesParams = {
+        memos: O.none,
+        recipient: O.none,
+        type: 'sym',
+        amount: baseAmount('1'),
+        asset: AssetETH
+      }
+      // b = same as a, but another amount
+      const b: SymDepositFeesParams = {
+        ...a,
+        asset: AssetRuneERC20
+      }
+      // c = same as a, but another asset
+      const c: SymDepositFeesParams = {
+        ...a,
+        asset: AssetRuneNative
+      }
+      expect(eqBalance.equals(a, b)).toBeFalsy()
+      expect(eqBalance.equals(a, c)).toBeFalsy()
     })
     it('is not equal', () => {
       const a: SymDepositFeesParams = {

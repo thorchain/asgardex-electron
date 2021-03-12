@@ -678,27 +678,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [asset, isApprovedERC20Token$, needApprovement, oPoolRouter, subscribeIsApprovedState])
 
-  const reloadFeesCheck = useCallback(() => {
-    if (!isEthChain(asset.chain)) {
-      prevAsset.current = O.some(asset)
-      reloadFeesHandler()
-    } else {
-      FP.pipe(
-        oPoolRouter,
-        O.map((router) => {
-          // ETH requires router to be set
-          if (router) {
-            prevAsset.current = O.some(asset)
-            reloadFeesHandler()
-            return true
-          }
-          return false
-        })
-      )
-    }
-  }, [asset, oPoolRouter, reloadFeesHandler])
-
   useEffect(() => {
+    if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {
+      prevAsset.current = O.some(asset)
+      // Note: ETH/ERC20 fees won't be reloaded if router is None
+      // that's why we have another check for prevPoolRouter in next guard
+      reloadFeesHandler()
+    }
+
     if (prevPoolRouter.current !== oPoolRouter) {
       prevPoolRouter.current = oPoolRouter
       // reset approve state
@@ -707,20 +694,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
       resetIsApprovedState()
       // check approved status
       checkApprovedStatus()
+      // for ETH/ETH20
+      if (O.isSome(oPoolRouter)) reloadFeesHandler()
     }
-
-    if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {
-      reloadFeesCheck()
-    }
-  }, [
-    asset,
-    checkApprovedStatus,
-    oPoolRouter,
-    reloadFeesCheck,
-    reloadFeesHandler,
-    resetApproveState,
-    resetIsApprovedState
-  ])
+  }, [asset, checkApprovedStatus, oPoolRouter, reloadFeesHandler, resetApproveState, resetIsApprovedState])
 
   return (
     <Styled.Container>
