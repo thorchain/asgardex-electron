@@ -9,6 +9,7 @@ import {
   baseAmount,
   AssetRuneNative
 } from '@xchainjs/xchain-util'
+import { BigNumber } from 'ethers'
 
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
 
@@ -41,6 +42,9 @@ export const ZERO_ASSET_AMOUNT = assetAmount(ZERO_BN)
 export const ZERO_BASE_AMOUNT = baseAmount(ZERO_BN)
 
 export const ZERO_POOL_DATA: PoolData = { runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }
+
+export const ETH_OUT_TX_GAS_LIMIT = BigNumber.from('35609')
+export const ERC20_OUT_TX_GAS_LIMIT = BigNumber.from('49610')
 
 export const AssetUSDTERC20: Asset = {
   chain: 'ETH',

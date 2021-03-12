@@ -86,12 +86,7 @@ const swapFeeByChain$ = ({
                     memo
                   ]
             )
-          : ETH.fees$({
-              asset,
-              amount,
-              recipient,
-              memo
-            }),
+          : ETH.outTxFee$(asset),
         liveData.map((fees) => fees[FEE_OPTION_KEY])
       )
     }
