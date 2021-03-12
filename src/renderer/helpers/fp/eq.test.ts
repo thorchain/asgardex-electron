@@ -157,6 +157,8 @@ describe('helpers/fp/eq', () => {
   describe('eqONullableString', () => {
     it('is equal', () => {
       expect(eqONullableString.equals(O.some('MEMO'), O.some('MEMO'))).toBeTruthy()
+      expect(eqONullableString.equals(O.none, O.none)).toBeTruthy()
+      expect(eqONullableString.equals(undefined, undefined)).toBeTruthy()
     })
     it('is not equal', () => {
       expect(eqONullableString.equals(O.none, O.some('MEMO'))).toBeFalsy()

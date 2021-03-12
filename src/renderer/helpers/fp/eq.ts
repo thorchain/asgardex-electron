@@ -52,7 +52,7 @@ export const eqONullableString: Eq.Eq<O.Option<string> | undefined> = {
 export const eqDepositFeesParams: Eq.Eq<DepositFeesParams> = {
   equals: (x, y) =>
     // Check if entered chain was changed
-    eqChain.equals(x.asset.chain, y.asset.chain) &&
+    eqAsset.equals(x.asset, y.asset) &&
     // Check if entered amount was changed
     eqBaseAmount.equals(x.amount, y.amount) &&
     eqONullableString.equals(x.router, y.router)

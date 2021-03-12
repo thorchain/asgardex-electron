@@ -680,6 +680,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const reloadFeesCheck = useCallback(() => {
     if (!isEthChain(asset.chain)) {
+      prevAsset.current = O.some(asset)
       reloadFeesHandler()
     } else {
       FP.pipe(
