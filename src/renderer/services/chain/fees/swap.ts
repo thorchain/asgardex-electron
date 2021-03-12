@@ -65,11 +65,11 @@ const swapFeeByChain$ = ({
     case ETHChain: {
       return FP.pipe(
         type === 'source' && router
-          ? ETH.callFees$(
-              router,
-              ethRouterABI,
-              'deposit',
-              isEthAsset(asset)
+          ? ETH.callFees$({
+              address: router,
+              abi: ethRouterABI,
+              func: 'deposit',
+              params: isEthAsset(asset)
                 ? [
                     ethers.utils.getAddress(recipient.toLowerCase()),
                     ETHAddress,
@@ -85,7 +85,7 @@ const swapFeeByChain$ = ({
                     amount.amount().toFixed(),
                     memo
                   ]
-            )
+            })
           : ETH.outTxFee$(asset),
         liveData.map((fees) => fees[FEE_OPTION_KEY])
       )
