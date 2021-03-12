@@ -14,26 +14,22 @@ import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { InboundAddressesItem as ThorchainEndpoint } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import {
-  AssetDetails,
+  PoolAssetDetails as PoolAssetsDetail,
   PoolDetails,
   PoolsStateRD,
   SelectedPricePoolAsset,
   PoolAddress,
-  AssetDetail,
+  PoolAssetDetail,
   PoolDetail,
   PoolShares,
   PoolShare,
   PoolRouter
 } from './types'
 
-export const getAssetDetail = (assets: AssetDetails, ticker: string): O.Option<AssetDetail> =>
+export const getAssetDetail = (assets: PoolAssetsDetail, ticker: string): O.Option<PoolAssetDetail> =>
   FP.pipe(
-    assets.find((detail: AssetDetail) => {
-      const { asset = '' } = detail
-      const detailTicker = assetFromString(asset)?.ticker
-      return detailTicker && detailTicker === ticker
-    }),
-    O.fromNullable
+    assets,
+    A.findFirst(({ asset }: PoolAssetDetail) => asset.ticker === ticker)
   )
 
 export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): PricePools => {
@@ -232,3 +228,21 @@ export const getSharesByAssetAndType = ({
     A.filter(({ asset: sharesAsset, type: sharesType }) => eqAsset.equals(asset, sharesAsset) && type === sharesType),
     A.head
   )
+
+export const getPoolAssetDetail = ({
+  asset: assetString,
+  assetPrice
+}: Pick<PoolDetail, 'assetPrice' | 'asset'>): O.Option<PoolAssetDetail> =>
+  FP.pipe(
+    assetString,
+    assetFromString,
+    O.fromNullable,
+    O.map((asset) => ({
+      asset,
+      assetPrice: bnOrZero(assetPrice)
+    }))
+  )
+
+export const getPoolAssetsDetail: (_: Array<Pick<PoolDetail, 'assetPrice' | 'asset'>>) => PoolAssetsDetail = (
+  poolDetails
+) => FP.pipe(poolDetails, A.filterMap(getPoolAssetDetail))

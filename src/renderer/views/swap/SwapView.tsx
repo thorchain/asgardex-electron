@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { fold, initial } from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, AssetRuneNative, bnOrZero } from '@xchainjs/xchain-util'
+import { assetFromString, AssetRuneNative, bnOrZero } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -56,7 +55,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const keystore = useObservableState(keystore$, O.none)
 
-  const poolsState = useObservableState(poolsState$, initial)
+  const poolsState = useObservableState(poolsState$, RD.initial)
 
   const oSource = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
   const oTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
@@ -139,19 +138,15 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
             RD.fromOption(oSource, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingSourceAsset' }))),
             RD.fromOption(oTarget, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingTargetAsset' })))
           ),
-          fold(
+          RD.fold(
             () => <></>,
             () => <Spin size="large" />,
             renderError,
-            ([state, sourceAsset, targetAsset]) => {
-              const availableAssets = state.assetDetails
-                .filter((a) => a.asset !== undefined && !!a.asset)
-                .map((a) => ({ asset: assetFromString(a.asset as string) as Asset, priceRune: bnOrZero(a.priceRune) }))
-
+            ([{ assetDetails: availableAssets, poolDetails }, sourceAsset, targetAsset]) => {
               const hasRuneAsset = Boolean(availableAssets.find(({ asset }) => isRuneNativeAsset(asset)))
 
               if (!hasRuneAsset) {
-                availableAssets.unshift({ asset: AssetRuneNative, priceRune: bnOrZero(1) })
+                availableAssets.unshift({ asset: AssetRuneNative, assetPrice: bnOrZero(1) })
               }
 
               return (
@@ -163,7 +158,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   targetAsset={targetAsset}
                   sourcePoolAddress={sourcePoolAddress}
                   availableAssets={availableAssets}
-                  poolDetails={state.poolDetails}
+                  poolDetails={poolDetails}
                   walletBalances={balances}
                   reloadFees={reloadSwapFees}
                   fees$={swapFees$}

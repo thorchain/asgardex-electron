@@ -6,12 +6,12 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { AssetWithPrice } from '../../services/binance/types'
+import { PoolAssetDetail } from '../../services/midgard/types'
 import * as Styled from './CurrencyInfo.styles'
 
 type CurrencyInfoProps = {
-  from?: O.Option<AssetWithPrice>
-  to?: O.Option<AssetWithPrice>
+  from?: O.Option<PoolAssetDetail>
+  to?: O.Option<PoolAssetDetail>
   slip?: BigNumber
 }
 
@@ -30,7 +30,7 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: Curre
             ={' '}
             {formatAssetAmountCurrency({
               asset: to.asset,
-              amount: assetAmount(from.priceRune.dividedBy(to.priceRune)),
+              amount: assetAmount(from.assetPrice.dividedBy(to.assetPrice)),
               trimZeros: true
             })}
           </div>
@@ -43,7 +43,7 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: Curre
             ={' '}
             {formatAssetAmountCurrency({
               asset: from.asset,
-              amount: assetAmount(to.priceRune.dividedBy(from.priceRune)),
+              amount: assetAmount(to.assetPrice.dividedBy(from.assetPrice)),
               trimZeros: true
             })}
           </div>
