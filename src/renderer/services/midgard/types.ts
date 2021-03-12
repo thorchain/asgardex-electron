@@ -7,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { DepositType } from '../../types/asgardex'
+import { DepositType, HistoryActions } from '../../types/asgardex'
 import {
   Network as NetworkInfo,
   Constants as ThorchainConstants,
@@ -154,3 +154,12 @@ export type PoolSharesLD = LiveData<Error, PoolShares>
 export type ValidatePoolLD = LiveData<ApiError, boolean>
 
 export type ValidateNodeLD = LiveData<ApiError, boolean>
+
+export type HistoryActionsPage = {
+  total: number
+  actions: HistoryActions
+}
+
+export type HistoryActionsPageRD = RD.RemoteData<ApiError, HistoryActionsPage>
+
+export type HistoryActionsPageLD = LiveData<ApiError, HistoryActionsPage>

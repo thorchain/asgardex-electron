@@ -1,28 +1,31 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Balance } from '@xchainjs/xchain-client'
 import { baseToAsset, assetToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 
+import { AssetWithAmount, TxTypes } from '../../../types/asgardex'
 import { Fees } from '../fees'
 import * as Styled from './TxDetail.styles'
 
 type Props = {
-  incomes: Balance[]
-  outgos: Balance[]
-  fees: Balance[]
+  incomes: AssetWithAmount[]
+  outgos: AssetWithAmount[]
+  fees?: AssetWithAmount[]
   /**
    * Possible transaction slip in percents
    */
   slip?: number
   className?: string
+  date: Date
+  type: TxTypes
+  renderDate: (date: Date) => React.ReactElement
 }
 
-export const TxDetail: React.FC<Props> = ({ className, outgos, incomes, fees, slip }) => {
+export const TxDetail: React.FC<Props> = ({ className, outgos, incomes, fees = [], slip, date, renderDate, type }) => {
   const incomeFormatted = useMemo(
     () =>
       FP.pipe(
@@ -67,21 +70,26 @@ export const TxDetail: React.FC<Props> = ({ className, outgos, incomes, fees, sl
 
   return (
     <Styled.Container className={className}>
-      <Styled.ValuesContainer>
-        <Styled.InOutValeContainer>
-          <Styled.InOutText>in</Styled.InOutText>
-          {incomeFormatted}
-        </Styled.InOutValeContainer>
-        <Styled.InOutValeContainer>
-          {outgoFormatted}
-          <Styled.InOutText>out</Styled.InOutText>
-        </Styled.InOutValeContainer>
-      </Styled.ValuesContainer>
+      <Styled.TxType type={type} />
 
-      <Styled.AdditionalInfoContainer>
-        {feesComponent}
-        {slip && <Styled.ContainerWithDelimeter>slip: {slip}%</Styled.ContainerWithDelimeter>}
-      </Styled.AdditionalInfoContainer>
+      <Styled.ContentContainer>
+        <Styled.ValuesContainer>
+          <Styled.InOutValeContainer>
+            <Styled.InOutText>in</Styled.InOutText>
+            {incomeFormatted}
+          </Styled.InOutValeContainer>
+          <Styled.InOutValeContainer>
+            {outgoFormatted}
+            <Styled.InOutText>out</Styled.InOutText>
+          </Styled.InOutValeContainer>
+        </Styled.ValuesContainer>
+
+        <Styled.AdditionalInfoContainer>
+          {feesComponent}
+          {slip && <Styled.ContainerWithDelimeter>slip: {slip}%</Styled.ContainerWithDelimeter>}
+          <Styled.DateContainer>{renderDate(date)}</Styled.DateContainer>
+        </Styled.AdditionalInfoContainer>
+      </Styled.ContentContainer>
     </Styled.Container>
   )
 }

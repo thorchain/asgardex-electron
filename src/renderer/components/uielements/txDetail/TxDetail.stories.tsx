@@ -13,6 +13,7 @@ import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { argTypes as txTypeArgs, InputType as TxInputType, mapType } from '../txType/TxType.stories'
 import { TxDetail } from './TxDetail'
 
 const getValues = (firstAsset: string, secondAsset: string, firstValue: number, secondValue: number) => {
@@ -29,6 +30,7 @@ const getValues = (firstAsset: string, secondAsset: string, firstValue: number, 
 }
 
 export const Default: Story<{
+  txType: TxInputType
   firstInValue: number
   secondInValue: number
   firstOutValue: number
@@ -45,10 +47,14 @@ export const Default: Story<{
   firstInAsset,
   secondInAsset,
   firstOutAsset,
-  secondOutAsset
+  secondOutAsset,
+  txType
 }) => {
   return (
     <TxDetail
+      type={mapType(txType)}
+      renderDate={(date) => <>{date.toLocaleString()}</>}
+      date={new Date(Date.now())}
       incomes={getValues(firstInAsset, secondInAsset, firstInValue, secondInValue)}
       outgos={getValues(firstOutAsset, secondOutAsset, firstOutValue, secondOutValue)}
       slip={1.23}
@@ -68,6 +74,7 @@ stringAssetsOrNone.unshift('none')
 const numberControlConfig = { type: 'number', min: 0, step: 0.0001 }
 
 const argTypes = {
+  txType: txTypeArgs.type,
   firstInAsset: {
     control: {
       type: 'select',
@@ -109,6 +116,7 @@ const argTypes = {
 }
 
 Default.args = {
+  txType: txTypeArgs.type.control.options[0],
   firstInValue: 1.23,
   secondInValue: 0,
   firstOutValue: 23.34,

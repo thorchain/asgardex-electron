@@ -1,11 +1,32 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { media } from '../../../helpers/styleHelper'
+import { TxType as TxTypeUIU } from '../txType'
+
 const SIDE_MARGIN = '10px'
 
 export const Container = styled.div`
   display: flex;
   align-items: center;
+  flex-direction: column;
+
+  & > * {
+    margin-bottom: 5px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ${media.lg`
+    align-items: center;
+    flex-direction: row;
+    
+    & >* {
+      margin-bottom: none; 
+    }
+  `}
 `
 
 export const ContainerWithDelimeter = styled.div`
@@ -26,7 +47,7 @@ export const ContainerWithDelimeter = styled.div`
     margin-left: 0;
   }
 
-  &:last-child {
+  &:last-of-type {
     margin-right: 0;
     &:after {
       content: none;
@@ -36,7 +57,11 @@ export const ContainerWithDelimeter = styled.div`
 `
 
 export const ValuesContainer = styled.span`
-  margin-right: 15px;
+  margin: 0 0 10px 0;
+
+  ${media.md`
+    margin: 0 15px 0 0;
+  `}
 
   &:last-child {
     margin: 0;
@@ -50,6 +75,11 @@ export const InOutValeContainer = styled(ContainerWithDelimeter)`
   font-size: 16px;
   line-height: 1.375rem;
   padding: 10px 20px;
+  margin-bottom: 5px;
+
+  ${media.md`
+    margin-bottom: 0;
+  `}
 
   &:first-child {
     border-top-left-radius: 1.7rem;
@@ -59,6 +89,7 @@ export const InOutValeContainer = styled(ContainerWithDelimeter)`
   &:last-child {
     border-top-right-radius: 1.7rem;
     border-bottom-right-radius: 1.7rem;
+    margin-bottom: 0;
   }
 `
 
@@ -80,10 +111,49 @@ export const InOutText = styled.span`
 `
 
 export const AdditionalInfoContainer = styled.span`
+  margin-right: 10px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
   &,
   & .label-wrapper {
     padding: 0;
     color: ${palette('gray', 2)};
     font-size: 0.875rem;
   }
+`
+
+export const DateContainer = styled.span`
+  margin-left: 20px;
+  color: ${palette('text', 0)};
+
+  ${media.md`
+    display: block;
+    text-align: right;
+    margin: 0;
+  `}
+
+  ${media.lg`
+    display: none
+   `}
+`
+
+export const TxType = styled(TxTypeUIU)`
+  align-self: flex-start;
+  font-weight: bold;
+  ${media.lg`
+    display: none
+   `}
+`
+
+export const ContentContainer = styled.span`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  ${media.md`
+    display: inline;
+  `}
 `
