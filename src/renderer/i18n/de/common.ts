@@ -60,7 +60,11 @@ const common: CommonMessages = {
   'common.value': 'Wert',
   'common.modal.confirmTitle': 'Bestätige die Aktion',
   'common.manage': 'Manage',
-  'common.asset.base': 'Base'
+  'common.asset.base': 'Base',
+  'common.tx.type.swap': 'Swap - DE',
+  'common.tx.type.doubleSwap': 'Double swap - DE',
+  'common.tx.type.deposit': 'Deposit - DE',
+  'common.tx.type.withdraw': 'Withdraw - DE'
 }
 
 export default common

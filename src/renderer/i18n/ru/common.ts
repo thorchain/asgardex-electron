@@ -60,7 +60,11 @@ const common: CommonMessages = {
   'common.modal.confirmTitle': 'Подтвердите действие',
   'common.value': 'Количество',
   'common.manage': 'Управлять',
-  'common.asset.base': 'Базовый'
+  'common.asset.base': 'Базовый',
+  'common.tx.type.swap': 'Обмен',
+  'common.tx.type.doubleSwap': 'Двойной обмен',
+  'common.tx.type.deposit': 'Вклад',
+  'common.tx.type.withdraw': 'Изъятие'
 }
 
 export default common

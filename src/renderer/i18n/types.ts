@@ -1,6 +1,6 @@
 import { Locale } from '../../shared/i18n/types'
 
-type CommonMessageKey =
+export type CommonMessageKey =
   | 'common.greeting'
   | 'common.copyright'
   | 'common.stats'
@@ -61,6 +61,10 @@ type CommonMessageKey =
   | 'common.value'
   | 'common.manage'
   | 'common.asset.base'
+  | 'common.tx.type.swap'
+  | 'common.tx.type.doubleSwap'
+  | 'common.tx.type.deposit'
+  | 'common.tx.type.withdraw'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

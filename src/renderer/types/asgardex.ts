@@ -17,6 +17,7 @@ export type AssetWithAmount = {
 export enum TxTypes {
   DEPOSIT = 'deposit',
   SWAP = 'swap',
+  DOUBLE_SWAP = 'double swap',
   WITHDRAW = 'withdraw',
   CREATE = 'create',
   UPGRADE = 'upgrade',
@@ -62,3 +63,28 @@ export type TxStatus = {
 export type ChainValues<T> = {
   [k in Chain]?: T[]
 }
+
+export type Tx = {
+  // Sender address
+  address: string
+  values: AssetWithAmount[]
+  memo: string
+  /**
+   * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
+   */
+  txID: string
+}
+
+export type HistoryAction = {
+  date: Date
+  /**
+   * Inbound transactions related to the action
+   */
+  in: Tx[]
+  out: Tx[]
+  type: TxTypes
+  fees?: AssetWithAmount[]
+  slip?: number
+}
+
+export type HistoryActions = HistoryAction[]
