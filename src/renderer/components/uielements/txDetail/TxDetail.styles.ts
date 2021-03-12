@@ -73,11 +73,13 @@ export const InOutValeContainer = styled(ContainerWithDelimeter)`
   color: ${palette('text', 0)};
   text-transform: uppercase;
   font-size: 16px;
+  padding: 5px 10px;
   line-height: 1.375rem;
-  padding: 10px 20px;
+
   margin-bottom: 5px;
 
   ${media.md`
+  padding: 10px 20px;
     margin-bottom: 0;
   `}
 
@@ -128,12 +130,6 @@ export const AdditionalInfoContainer = styled.span`
 export const DateContainer = styled.span`
   margin-left: 20px;
   color: ${palette('text', 0)};
-
-  ${media.md`
-    display: block;
-    text-align: right;
-    margin: 0;
-  `}
 
   ${media.lg`
     display: none
