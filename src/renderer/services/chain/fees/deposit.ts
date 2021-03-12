@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
+import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
   Asset,
   AssetRuneNative,
@@ -19,6 +20,8 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { getEthChecksumAddress } from '../../../helpers/addressHelper'
+import { getEthTokenAddress, isEthAsset } from '../../../helpers/assetHelper'
 import { eqDepositFeesParams } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTRDFromArray } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
@@ -26,6 +29,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as BCH from '../../bitcoincash'
+import { ethRouterABI } from '../../const'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import { selectedPoolChain$ } from '../../midgard/common'
@@ -62,17 +66,19 @@ const { get$: reloadDepositFees$, set: reloadDepositFees } = observableState<Dep
 type DepositByChainParams = {
   asset: Asset
   recipient?: O.Option<Address>
+  router?: O.Option<Address>
   amount?: O.Option<BaseAmount>
   memo?: O.Option<Memo>
 }
 
 const depositFeeByChain$ = ({
-  asset: { chain },
+  asset,
   recipient = O.none,
   amount = O.none,
-  memo = O.none
+  memo = O.none,
+  router = O.none
 }: DepositByChainParams): FeeLD => {
-  switch (chain) {
+  switch (asset.chain) {
     case BNBChain:
       return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
     case BTCChain: {
@@ -92,11 +98,31 @@ const depositFeeByChain$ = ({
     }
     case ETHChain: {
       return FP.pipe(
-        sequenceSOption({ recipient, amount, memo }),
+        sequenceSOption({ recipient, router, amount, memo }),
         O.fold(
           () => Rx.of(RD.initial),
-          ({ recipient, amount, memo }) =>
-            ETH.fees$({ recipient, amount, memo }).pipe(liveData.map((fees) => fees.fast))
+          ({ recipient, router, amount, memo }) =>
+            ETH.callFees$(
+              router,
+              ethRouterABI,
+              'deposit',
+              isEthAsset(asset)
+                ? [
+                    FP.pipe(getEthChecksumAddress(recipient), O.toUndefined),
+                    ETHAddress,
+                    0,
+                    memo,
+                    {
+                      value: amount.amount().toFixed()
+                    }
+                  ]
+                : [
+                    FP.pipe(getEthChecksumAddress(recipient), O.toUndefined),
+                    FP.pipe(getEthTokenAddress(asset), O.toUndefined),
+                    amount.amount().toFixed(),
+                    memo
+                  ]
+            ).pipe(liveData.map((fees) => fees.fast))
         )
       )
     }
@@ -154,7 +180,8 @@ const depositFees$ = (initialParams: DepositFeesParams): DepositFeesLD =>
                   amount: O.some(params.amount),
                   memo: params.memo,
                   asset: params.asset,
-                  recipient: params.recipient
+                  recipient: params.recipient,
+                  router: params.router
                 })
               ]
             : // for sym deposits, two txs at thorchain an asset chain needed == 2 fees,
@@ -166,7 +193,8 @@ const depositFees$ = (initialParams: DepositFeesParams): DepositFeesLD =>
                     O.map(({ asset }) => asset)
                   ),
                   asset: params.asset,
-                  recipient: params.recipient
+                  recipient: params.recipient,
+                  router: params.router
                 }),
                 depositFeeByChain$({
                   asset: AssetRuneNative,
