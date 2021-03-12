@@ -6,6 +6,7 @@ import {
   AssetBNB,
   AssetBTC,
   AssetETH,
+  assetFromString,
   AssetLTC,
   AssetRune67C,
   AssetRuneB1A,
@@ -18,7 +19,7 @@ import { Network } from '../../shared/api/types'
 import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
-import { getChainAsset } from './chainHelper'
+import { getChainAsset, isEthChain } from './chainHelper'
 import { eqAsset } from './fp/eq'
 
 /**
@@ -131,3 +132,20 @@ export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
   PRICE_ASSETS.includes(asset)
 
 export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, getChainAsset(asset.chain))
+
+// Following helper was created to use midgard ERC20 assets properly
+// ERC20 assets from midgard are starting with 0X for their addresses rather than 0x
+// And 0X isn't recognized as valid address in ethers lib
+export const midgardAssetFromString = (s: string): Asset | null => {
+  const asset = assetFromString(s)
+  if (asset && isEthChain(asset.chain) && isEthTokenAsset(asset)) {
+    const data: string[] = asset.symbol.split('-')
+    const checksumAddress = FP.pipe(getEthChecksumAddress(data[1]), O.toUndefined)
+    if (!checksumAddress) return null
+    return {
+      ...asset,
+      symbol: `${data[0]}-${checksumAddress}`
+    }
+  }
+  return asset
+}
