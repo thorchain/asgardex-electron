@@ -27,19 +27,13 @@ export type PoolAssets = Asset[]
 export type PoolAssetsRD = RD.RemoteData<Error, PoolAssets>
 export type PoolAssetsLD = LiveData<Error, PoolAssets>
 
-export type AssetDetail = {
-  asset: string
-  dateCreated: number
-  priceRune: string
+export type PoolAssetDetail = {
+  asset: Asset
+  assetPrice: BigNumber
 }
 
-export type AssetDetails = AssetDetail[]
-export type AssetDetailsRD = RD.RemoteData<Error, AssetDetails>
-export type AssetDetailsLD = LiveData<Error, AssetDetails>
-
-export type AssetDetailMap = {
-  [key in Chain]: AssetDetail
-}
+export type PoolAssetDetails = PoolAssetDetail[]
+export type PoolAssetDetailsLD = LiveData<Error, PoolAssetDetails>
 
 export type PoolDetail = MidgardPoolDetail & {
   poolSlipAverage: string
@@ -57,7 +51,7 @@ export type PriceDataIndex = {
 }
 
 export type PoolsState = {
-  assetDetails: AssetDetails
+  assetDetails: PoolAssetDetails
   poolAssets: PoolAssets
   poolDetails: PoolDetails
   pricePools: O.Option<PricePools>
@@ -66,7 +60,7 @@ export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
 export type PoolsStateLD = LiveData<Error, PoolsState>
 
 export type PendingPoolsState = {
-  assetDetails: AssetDetails
+  assetDetails: PoolAssetDetails
   poolAssets: PoolAssets
   poolDetails: PoolDetails
 }

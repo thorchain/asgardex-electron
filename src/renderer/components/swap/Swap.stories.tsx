@@ -17,8 +17,8 @@ import { Swap, SwapProps } from './Swap'
 const defaultProps: SwapProps = {
   keystore: O.none,
   availableAssets: [
-    { asset: AssetBTC, priceRune: bn('56851.67420275761') },
-    { asset: AssetRuneNative, priceRune: ONE_BN }
+    { asset: AssetBTC, assetPrice: bn('56851.67420275761') },
+    { asset: AssetRuneNative, assetPrice: ONE_BN }
   ],
   sourceAsset: AssetRuneNative,
   targetAsset: AssetBTC,

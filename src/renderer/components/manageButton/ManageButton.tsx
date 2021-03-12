@@ -6,13 +6,15 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 
 import * as depositRoutes from '../../routes/deposit'
-import * as Styled from './ManageButton.styles'
+import { Button, ButtonSize } from '../uielements/button'
 
 type Props = {
   className?: string
   asset: Asset
+  sizevalue?: ButtonSize
+  isTextView: boolean
 }
-export const ManageButton: React.FC<Props> = ({ className, asset }) => {
+export const ManageButton: React.FC<Props> = ({ className, asset, sizevalue = 'normal', isTextView }) => {
   const intl = useIntl()
   const history = useHistory()
 
@@ -22,9 +24,15 @@ export const ManageButton: React.FC<Props> = ({ className, asset }) => {
   ])
 
   return (
-    <Styled.ManageButton className={className} onClick={onClick}>
+    <Button
+      round="true"
+      typevalue="outline"
+      sizevalue={sizevalue}
+      className={className}
+      onClick={onClick}
+      style={{ height: 30 }}>
       <PlusOutlined />
-      {intl.formatMessage({ id: 'common.manage' })}
-    </Styled.ManageButton>
+      {isTextView && intl.formatMessage({ id: 'common.manage' })}
+    </Button>
   )
 }
