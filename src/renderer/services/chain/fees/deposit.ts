@@ -15,7 +15,6 @@ import {
   PolkadotChain,
   THORChain
 } from '@xchainjs/xchain-util'
-import { ethers } from 'ethers'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -79,15 +78,6 @@ const depositFeeByChain$ = ({
   memo = O.none,
   router = O.none
 }: DepositByChainParams): FeeLD => {
-  console.log(
-    JSON.stringify({
-      asset,
-      recipient,
-      amount,
-      memo,
-      router
-    })
-  )
   switch (asset.chain) {
     case BNBChain:
       return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
@@ -127,7 +117,7 @@ const depositFeeByChain$ = ({
                     }
                   ]
                 : [
-                    ethers.utils.getAddress(recipient.toLowerCase()),
+                    FP.pipe(getEthChecksumAddress(recipient), O.toUndefined),
                     FP.pipe(getEthTokenAddress(asset), O.toUndefined),
                     amount.amount().toFixed(),
                     memo

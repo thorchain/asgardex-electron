@@ -17,7 +17,8 @@ import {
   eqChain,
   eqOChain,
   eqPoolShares,
-  eqPoolShare
+  eqPoolShare,
+  eqONullableString
 } from './eq'
 
 describe('helpers/fp/eq', () => {
@@ -150,6 +151,20 @@ describe('helpers/fp/eq', () => {
       }
       expect(eqBalance.equals(a, b)).toBeFalsy()
       expect(eqBalance.equals(a, c)).toBeFalsy()
+    })
+  })
+
+  describe('eqONullableString', () => {
+    it('is equal', () => {
+      expect(eqONullableString.equals(O.some('MEMO'), O.some('MEMO'))).toBeTruthy()
+    })
+    it('is not equal', () => {
+      expect(eqONullableString.equals(O.none, O.some('MEMO'))).toBeFalsy()
+      expect(eqONullableString.equals(O.some('MEMO'), O.none)).toBeFalsy()
+      expect(eqONullableString.equals(O.some('MEMO'), undefined)).toBeFalsy()
+      expect(eqONullableString.equals(undefined, O.some('MEMO'))).toBeFalsy()
+      expect(eqONullableString.equals(undefined, O.none)).toBeFalsy()
+      expect(eqONullableString.equals(O.none, undefined)).toBeFalsy()
     })
   })
 
