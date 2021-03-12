@@ -10,7 +10,7 @@ import {
   getExplorerTxUrl$,
   getExplorerAddressUrl$
 } from './common'
-import { createFeesService, callFees$ } from './fees'
+import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
 const {
@@ -25,7 +25,7 @@ const {
   approveERC20Token$,
   isApprovedERC20Token$
 } = createTransactionService(client$)
-const { reloadFees, fees$ } = createFeesService({ client$, chain: ETHChain })
+const { reloadFees, fees$, callFees$, outTxFee$ } = createFeesService({ client$, chain: ETHChain })
 
 export {
   client$,
@@ -48,6 +48,7 @@ export {
   fees$,
   sendDepositTx$,
   callFees$,
+  outTxFee$,
   approveERC20Token$,
   isApprovedERC20Token$
 }
