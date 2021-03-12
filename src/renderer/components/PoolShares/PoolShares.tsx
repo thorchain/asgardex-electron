@@ -118,9 +118,9 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
     () => ({
       title: '',
       align: 'right',
-      render: ({ asset }: PoolShareTableRowData) => <Styled.ManageButton asset={asset} />
+      render: ({ asset }: PoolShareTableRowData) => <Styled.ManageButton asset={asset} isTextView={isDesktopView} />
     }),
-    []
+    [isDesktopView]
   )
 
   const desktopColumns: ColumnsType<PoolShareTableRowData> = useMemo(
