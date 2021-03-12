@@ -2,14 +2,13 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
-import { TxType as TxTypeUIU } from '../txType'
 
 const SIDE_MARGIN = '10px'
 
 export const Container = styled.div`
   display: flex;
-  align-items: center;
   flex-direction: column;
+  align-items: flex-start;
 
   & > * {
     margin-bottom: 5px;
@@ -57,8 +56,6 @@ export const ContainerWithDelimeter = styled.div`
 `
 
 export const ValuesContainer = styled.span`
-  margin: 0 0 10px 0;
-
   ${media.md`
     margin: 0 15px 0 0;
   `}
@@ -79,8 +76,7 @@ export const InOutValeContainer = styled(ContainerWithDelimeter)`
   margin-bottom: 5px;
 
   ${media.md`
-  padding: 10px 20px;
-    margin-bottom: 0;
+    padding: 10px 20px;
   `}
 
   &:first-child {
@@ -128,28 +124,9 @@ export const AdditionalInfoContainer = styled.span`
 `
 
 export const DateContainer = styled.span`
-  margin-left: 20px;
   color: ${palette('text', 0)};
 
   ${media.lg`
     display: none
    `}
-`
-
-export const TxType = styled(TxTypeUIU)`
-  align-self: flex-start;
-  font-weight: bold;
-  ${media.lg`
-    display: none
-   `}
-`
-
-export const ContentContainer = styled.span`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  ${media.md`
-    display: inline;
-  `}
 `

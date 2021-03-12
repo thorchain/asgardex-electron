@@ -5,9 +5,9 @@ import { TxType } from './TxType'
 
 const types = ['Swap', 'Deposit', 'Double swap', 'Withdraw'] as const
 
-export type InputType = typeof types[number]
+type InputType = typeof types[number]
 
-export const mapType = (type: InputType) => {
+const mapType = (type: InputType) => {
   switch (type) {
     case types[0]: {
       return TxTypes.SWAP
@@ -28,7 +28,7 @@ export const Default: Story<{ type: InputType }> = ({ type }) => {
   return <TxType type={mapType(type)} />
 }
 
-export const argTypes = {
+const argTypes = {
   type: {
     control: {
       type: 'select',
