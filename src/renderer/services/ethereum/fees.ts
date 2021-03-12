@@ -24,7 +24,7 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
         FP.pipe(
           oClient,
           O.fold(
-            () => Rx.EMPTY,
+            () => Rx.of(RD.initial),
             (client) =>
               Rx.combineLatest([client.estimateCall(address, abi, func, params), client.estimateGasPrices()]).pipe(
                 RxOp.map(
@@ -35,14 +35,14 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
                       fast: getFee({ gasPrice: gasPrices.fast, gasLimit }),
                       fastest: getFee({ gasPrice: gasPrices.fastest, gasLimit })
                     } as Fees)
-                )
+                ),
+                RxOp.map(RD.success),
+                RxOp.catchError((_) => Rx.of(RD.success(getDefaultFees()))),
+                RxOp.startWith(RD.pending)
               )
           )
         )
-      ),
-      RxOp.map(RD.success),
-      RxOp.catchError((_) => Rx.of(RD.success(getDefaultFees()))),
-      RxOp.startWith(RD.pending)
+      )
     )
 
   const outTxFee$ = (asset: Asset): C.FeesLD =>
@@ -51,7 +51,7 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
         FP.pipe(
           oClient,
           O.fold(
-            () => Rx.EMPTY,
+            () => Rx.of(RD.initial),
             (client) => {
               const gasLimit = isEthAsset(asset) ? ETH_OUT_TX_GAS_LIMIT : ERC20_OUT_TX_GAS_LIMIT
               return Rx.from(client.estimateGasPrices()).pipe(
@@ -63,15 +63,15 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
                       fast: getFee({ gasPrice: gasPrices.fast, gasLimit }),
                       fastest: getFee({ gasPrice: gasPrices.fastest, gasLimit })
                     } as Fees)
-                )
+                ),
+                RxOp.map(RD.success),
+                RxOp.catchError((_) => Rx.of(RD.success(getDefaultFees()))),
+                RxOp.startWith(RD.pending)
               )
             }
           )
         )
-      ),
-      RxOp.map(RD.success),
-      RxOp.catchError((_) => Rx.of(RD.success(getDefaultFees()))),
-      RxOp.startWith(RD.pending)
+      )
     )
 
   return {
