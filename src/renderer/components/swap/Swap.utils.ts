@@ -2,13 +2,14 @@ import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip, Poo
 import { Asset, assetToString, bn, BaseAmount, baseToAsset, assetAmount, assetToBase } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { pipe } from 'fp-ts/pipeable'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
+import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { AssetWithPrice } from '../../services/binance/types'
+import { PoolAssetDetail, PoolAssetDetails } from '../../services/midgard/types'
 
 /**
  * @returns none - neither sourceAsset neither targetAsset is RUNE
@@ -33,16 +34,16 @@ export const getSlip = (
   changeAmount: BaseAmount,
   pools: Record<string, PoolData>
 ) =>
-  pipe(
+  FP.pipe(
     isRuneSwap(sourceAsset, targetAsset),
     O.chain((toRune) =>
-      pipe(
+      FP.pipe(
         O.fromNullable(pools[assetToString(targetAsset)]),
         O.map((targetPoolData) => getSwapSlip(changeAmount, targetPoolData, toRune))
       )
     ),
     O.alt(() =>
-      pipe(
+      FP.pipe(
         sequenceTOption(
           O.fromNullable(pools[assetToString(sourceAsset)]),
           O.fromNullable(pools[assetToString(targetAsset)])
@@ -59,17 +60,17 @@ export const getSwapResult = (
   changeAmount: BaseAmount,
   pools: Record<string, PoolData>
 ): BaseAmount =>
-  pipe(
+  FP.pipe(
     isRuneSwap(sourceAsset, targetAsset),
     O.chain((toRune) => {
       const assetSymbol = assetToString(toRune ? sourceAsset : targetAsset)
-      return pipe(
+      return FP.pipe(
         O.fromNullable(pools[assetSymbol]),
         O.map((poolData) => getSwapOutput(changeAmount, poolData, toRune))
       )
     }),
     O.alt(() =>
-      pipe(
+      FP.pipe(
         sequenceTOption(
           O.fromNullable(pools[assetToString(sourceAsset)]),
           O.fromNullable(pools[assetToString(targetAsset)])
@@ -98,7 +99,7 @@ export const getSwapData = (
   targetAsset: O.Option<Asset>,
   pools: Record<string, PoolData>
 ): SwapData =>
-  pipe(
+  FP.pipe(
     sequenceTOption(sourceAsset, targetAsset),
     O.map(([sourceAsset, targetAsset]) => {
       swapAmount = convertToBase8(swapAmount)
@@ -112,17 +113,15 @@ export const getSwapData = (
     O.getOrElse(() => DEFAULT_SWAP_DATA)
   )
 
-export const pickAssetWithPrice = (availableAssets: AssetWithPrice[], asset: Asset) =>
-  pipe(
-    pipe(
-      availableAssets,
-      A.findFirst((availableAsset) => asset.symbol === availableAsset.asset.symbol)
-    ),
-    O.alt(() => pipe(availableAssets, A.head))
+export const pickPoolAsset = (assets: PoolAssetDetails, asset: Asset): O.Option<PoolAssetDetail> =>
+  FP.pipe(
+    assets,
+    A.findFirst(({ asset: availableAsset }) => eqAsset.equals(availableAsset, asset)),
+    O.alt(() => FP.pipe(assets, A.head))
   )
 
-export const assetWithPriceToAsset = (oAssetWP: O.Option<AssetWithPrice>) =>
-  pipe(
-    oAssetWP,
-    O.map((assetWP) => assetWP.asset)
+export const poolAssetDetailToAsset = (oAsset: O.Option<PoolAssetDetail>): O.Option<Asset> =>
+  FP.pipe(
+    oAsset,
+    O.map(({ asset }) => asset)
   )

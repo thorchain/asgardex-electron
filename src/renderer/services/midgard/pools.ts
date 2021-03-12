@@ -1,13 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import {
-  Asset,
-  assetFromString,
-  assetToString,
-  bn,
-  Chain,
-  currencySymbolByAsset,
-  isValidAsset
-} from '@xchainjs/xchain-util'
+import { Asset, assetFromString, assetToString, bn, Chain, currencySymbolByAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -28,7 +20,7 @@ import { DefaultApi, GetPoolsRequest, GetPoolsStatusEnum } from '../../types/gen
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
 import { ErrorId } from '../wallet/types'
 import {
-  AssetDetailsLD,
+  PoolAssetDetailsLD,
   PendingPoolsStateLD,
   PoolAddressRx,
   PoolAddressLD,
@@ -44,6 +36,7 @@ import {
 } from './types'
 import {
   getPoolAddressByChain,
+  getPoolAssetDetail,
   getPoolRouterByChain,
   getPricePools,
   pricePoolSelector,
@@ -186,7 +179,7 @@ const createPoolsService = (
   /**
    * Data of `AssetDetails` from Midgard
    */
-  const apiGetAssetInfo$: (assetOrAssets: string | string[], status: GetPoolsStatusEnum) => AssetDetailsLD = (
+  const apiGetAssetInfo$: (assetOrAssets: string | string[], status: GetPoolsStatusEnum) => PoolAssetDetailsLD = (
     assetOrAssets,
     status
   ) => {
@@ -195,18 +188,7 @@ const createPoolsService = (
     return FP.pipe(
       apiGetPoolsByStatus$(status),
       liveData.map(A.filter((pool) => assets.includes(pool.asset))),
-      liveData.map(
-        A.map((poolDetails) => ({
-          asset: poolDetails.asset,
-          /**
-           * Use mocked zero date as midgard v2 does not provide this
-           * info yet.
-           * TODO (@thatStrangeGuy) remove dateCreated from target type as we dont use it anywhere
-           */
-          dateCreated: 0,
-          priceRune: poolDetails.assetPrice
-        }))
-      ),
+      liveData.map(A.filterMap(getPoolAssetDetail)),
       RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
     )
   }
@@ -236,7 +218,7 @@ const createPoolsService = (
   }
 
   // Factory to create a stream to get data of `AssetDetails`
-  const getAssetDetails$: (poolAssets$: PoolAssetsLD, status: GetPoolsStatusEnum) => AssetDetailsLD = (
+  const getAssetDetails$: (poolAssets$: PoolAssetsLD, status: GetPoolsStatusEnum) => PoolAssetDetailsLD = (
     poolAssets$,
     status
   ) =>
@@ -508,17 +490,11 @@ const createPoolsService = (
       O.chain(([pools, selectedAsset]) =>
         FP.pipe(
           pools.assetDetails,
-          A.findFirst((assetDetail) => {
-            const asset = assetFromString(assetDetail?.asset || '')
-            if (!asset || !isValidAsset(asset)) {
-              return false
-            }
-            return eqAsset.equals(asset, selectedAsset)
-          })
+          A.findFirst(({ asset }) => eqAsset.equals(asset, selectedAsset))
         )
       )
     ),
-    RxOp.map(O.map((detail) => ONE_BN.dividedBy(bn(detail.priceRune || 1)))),
+    RxOp.map(O.map((detail) => ONE_BN.dividedBy(bn(detail.assetPrice || 1)))),
     RxOp.map(O.getOrElse(() => ONE_BN))
   )
 
