@@ -71,7 +71,7 @@ export const InOutValeContainer = styled(ContainerWithDelimeter)`
   text-transform: uppercase;
   font-size: 16px;
   padding: 5px 10px;
-  line-height: 1.375rem;
+  line-height: 22px;
 
   margin-bottom: 5px;
 
@@ -94,7 +94,7 @@ export const InOutValeContainer = styled(ContainerWithDelimeter)`
 export const InOutValue = styled(ContainerWithDelimeter)``
 
 export const InOutText = styled.span`
-  font-size: 0.75rem;
+  font-size: 12px;
   color: ${palette('text', 2)};
 
   &:first-child {
@@ -119,7 +119,7 @@ export const AdditionalInfoContainer = styled.span`
   & .label-wrapper {
     padding: 0;
     color: ${palette('gray', 2)};
-    font-size: 0.875rem;
+    font-size: 14px;
   }
 `
 
