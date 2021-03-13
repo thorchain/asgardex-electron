@@ -6,7 +6,7 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { TxTypes } from '../../types/asgardex'
+import { PoolAddresses } from '../midgard/types'
 import { ApiError, TxHashRD } from '../wallet/types'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
@@ -71,13 +71,15 @@ export type LoadDepositFeesHandler = (p: DepositFeesParams) => void
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
 export type SendTxParams = {
-  router?: Address
   asset: Asset
   recipient: Address
   amount: BaseAmount
   memo: Memo
-  txType: TxTypes
   feeOptionKey?: FeeOptionKey
+}
+
+export type SendPoolTxParams = SendTxParams & {
+  router: O.Option<Address>
 }
 
 export type LedgerAddressParams = { chain: Chain; network: Network }
@@ -99,8 +101,7 @@ export type SwapState = {
 export type SwapState$ = Rx.Observable<SwapState>
 
 export type SwapParams = {
-  readonly routerAddress: O.Option<Address>
-  readonly poolAddress: Address
+  readonly poolAddresses: PoolAddresses
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
@@ -142,7 +143,7 @@ export type AsymDepositState = {
 export type AsymDepositState$ = Rx.Observable<AsymDepositState>
 
 export type AsymDepositParams = {
-  readonly poolAddress: O.Option<Address>
+  readonly poolAddresses: PoolAddresses
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
@@ -171,7 +172,7 @@ export type SymDepositState = {
 export type SymDepositState$ = Rx.Observable<SymDepositState>
 
 export type SymDepositParams = {
-  readonly poolAddress: O.Option<string>
+  readonly poolAddresses: PoolAddresses
   readonly asset: Asset
   readonly amounts: SymDepositAmounts
   readonly memos: SymDepositMemo
@@ -196,7 +197,7 @@ export type WithdrawState = {
 export type WithdrawState$ = Rx.Observable<WithdrawState>
 
 export type WithdrawParams = {
-  readonly poolAddress: O.Option<string>
+  readonly poolAddresses: PoolAddresses
   readonly asset: Asset
   readonly memo: Memo
   readonly network: Network
@@ -205,7 +206,7 @@ export type WithdrawParams = {
 export type WithdrawStateHandler = (p: WithdrawParams) => WithdrawState$
 
 export type UpgradeRuneParams = {
-  readonly poolAddress: O.Option<string>
+  readonly poolAddresses: PoolAddresses
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string

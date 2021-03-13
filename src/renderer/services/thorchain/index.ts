@@ -5,11 +5,10 @@ import { client$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$, getExpl
 import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
 import { getNodeInfo$, reloadNodesInfo } from './thorNode'
-import { createDepositService, createTransactionService } from './transaction'
+import { createTransactionService } from './transaction'
 
-const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
+const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$, sendDepositTx } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService({ client$, chain: THORChain })
-const { sendTx: sendDepositTx } = createDepositService(client$)
 const interact$ = createInteractService$(sendDepositTx, txStatus$)
 
 export {

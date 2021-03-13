@@ -9,10 +9,12 @@ import { TxHashLD, ErrorId } from '../wallet/types'
 import { Client$ } from './types'
 import { TransactionService } from './types'
 
-export const createTransactionService: (client$: Client$) => TransactionService = C.createTransactionService
-
-export const createDepositService = (client$: Client$) => {
-  const tx$ = (params: DepositParam): TxHashLD =>
+export const createTransactionService = (client$: Client$): TransactionService => {
+  const common = C.createTransactionService(client$)
+  /**
+   * Sends a deposit request by given `DepositParam`
+   */
+  const sendDepositTx = (params: DepositParam): TxHashLD =>
     client$.pipe(
       RxOp.switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
       RxOp.switchMap((client) => Rx.from(client.deposit(params))),
@@ -29,12 +31,8 @@ export const createDepositService = (client$: Client$) => {
       RxOp.startWith(RD.pending)
     )
 
-  /**
-   * Sends a deposit request by given `DepositParam`
-   */
-  const sendTx = (params: DepositParam): TxHashLD => tx$(params)
-
   return {
-    sendTx
+    ...common,
+    sendDepositTx
   }
 }

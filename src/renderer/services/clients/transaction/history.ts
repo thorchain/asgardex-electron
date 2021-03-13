@@ -48,7 +48,7 @@ export const txByClient$: (client$: XChainClient$) => (txHash: TxHash) => TxLD =
         oClient,
         O.fold(
           () => Rx.of(RD.initial),
-          (client) => loadTx$(client, txHash)
+          (client) => loadTx$({ client, txHash, assetAddress: O.none })
         )
       )
     )

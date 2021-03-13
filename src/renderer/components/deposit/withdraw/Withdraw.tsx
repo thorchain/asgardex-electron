@@ -25,7 +25,7 @@ import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
 import { FeeLD, FeeRD, Memo, WithdrawState, WithdrawStateHandler } from '../../../services/chain/types'
-import { PoolAddress } from '../../../services/midgard/types'
+import { PoolAddresses } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
@@ -52,7 +52,7 @@ export type Props = {
   shares: { rune: BaseAmount; asset: BaseAmount }
   /** Flag whether form has to be disabled or not */
   disabled?: boolean
-  poolAddress: O.Option<PoolAddress>
+  poolAddresses: O.Option<PoolAddresses>
   viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
   reloadBalances: FP.Lazy<void>
@@ -75,7 +75,7 @@ export const Withdraw: React.FC<Props> = ({
   selectedPriceAsset,
   shares: { rune: runeShare, asset: assetShare },
   disabled,
-  poolAddress: oPoolAddress,
+  poolAddresses: oPoolAddresses,
   viewRuneTx = (_) => {},
   validatePassword$,
   reloadBalances = FP.constVoid,
@@ -267,18 +267,25 @@ export const Withdraw: React.FC<Props> = ({
     // close private modal
     closePasswordModal()
 
-    // set start time
-    setWithdrawStartTime(Date.now())
+    FP.pipe(
+      oPoolAddresses,
+      O.map((poolAddresses) => {
+        // set start time
+        setWithdrawStartTime(Date.now())
 
-    subscribeWithdrawState(
-      withdraw$({
-        asset: AssetRuneNative,
-        poolAddress: oPoolAddress,
-        network,
-        memo
+        subscribeWithdrawState(
+          withdraw$({
+            asset: AssetRuneNative,
+            poolAddresses,
+            network,
+            memo
+          })
+        )
+
+        return true
       })
     )
-  }, [closePasswordModal, subscribeWithdrawState, withdraw$, oPoolAddress, network, memo])
+  }, [closePasswordModal, subscribeWithdrawState, withdraw$, oPoolAddresses, network, memo])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>

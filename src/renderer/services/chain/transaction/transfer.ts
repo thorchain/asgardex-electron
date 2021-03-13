@@ -10,7 +10,7 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { INITIAL_SEND_STATE } from '../const'
 import { SendTxStateHandler, SendTxState } from '../types'
-import { sendTx$, txStatusByChain$ } from './common'
+import { poolTxStatusByChain$, sendTx$ } from './common'
 
 /**
  * Send TX
@@ -37,10 +37,9 @@ export const transfer$: SendTxStateHandler = (params) => {
         params.asset,
         O.fromPredicate(({ chain }) => isEthChain(chain)),
         O.map(getTokenAddress),
-        O.chain(O.fromNullable),
-        O.toUndefined
+        O.chain(O.fromNullable)
       )
-      return txStatusByChain$(txHash, params.asset.chain, erc20Address)
+      return poolTxStatusByChain$({ txHash, chain: params.asset.chain, assetAddress: erc20Address })
     }),
     // Update state
     liveData.map(({ hash }) => setState({ ...getState(), status: RD.success(hash) })),

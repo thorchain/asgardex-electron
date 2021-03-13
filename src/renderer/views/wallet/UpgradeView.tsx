@@ -24,7 +24,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { getPoolAddressByChain } from '../../services/midgard/utils'
+import { getPoolAddressesByChain } from '../../services/midgard/utils'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 type Props = {}
@@ -101,7 +101,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
           (_) =>
             FP.pipe(
               poolAddresses$,
-              liveData.map((endpoints) => getPoolAddressByChain(endpoints, BNBChain)),
+              liveData.map((endpoints) => getPoolAddressesByChain(endpoints, BNBChain)),
               RxOp.map((rd) =>
                 FP.pipe(
                   rd,

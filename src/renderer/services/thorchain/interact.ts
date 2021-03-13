@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { DepositParam } from '@xchainjs/xchain-thorchain'
 import { AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -25,7 +26,7 @@ import { InteractParams, InteractState, InteractState$ } from './types'
  */
 export const createInteractService$ = (
   sendTx$: (_: DepositParam) => LiveData<ApiError, string>,
-  getTxStatus: (txHash: string) => TxLD
+  getTxStatus: (txHash: string, assetAddress: O.Option<Address>) => TxLD
 ) => ({ amount, memo }: InteractParams): InteractState$ => {
   // total of progress
   const total = O.some(100)
@@ -50,7 +51,7 @@ export const createInteractService$ = (
       // Update state
       setState({ ...getState(), step: 2, txRD: RD.progress({ loaded: 66, total }) })
       // 2. check tx finality
-      return getTxStatus(txHash)
+      return getTxStatus(txHash, O.none)
     }),
     // Update state
     liveData.map(({ hash: txHash }) => setState({ ...getState(), txRD: RD.success(txHash) })),

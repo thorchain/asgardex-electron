@@ -12,7 +12,7 @@ import * as RxOp from 'rxjs/operators'
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { isPricePoolAsset } from '../../helpers/assetHelper'
 import { isEnabledChain } from '../../helpers/chainHelper'
-import { eqAsset } from '../../helpers/fp/eq'
+import { eqAsset, eqPoolAddresses } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
@@ -22,8 +22,6 @@ import { ErrorId } from '../wallet/types'
 import {
   PoolAssetDetailsLD,
   PendingPoolsStateLD,
-  PoolAddressRx,
-  PoolAddressLD,
   PoolAssetsLD,
   PoolDetailLD,
   PoolDetailsLD,
@@ -32,12 +30,13 @@ import {
   SelectedPricePoolAsset,
   ThorchainEndpointsLD,
   ValidatePoolLD,
-  PoolRouterRx
+  PoolAddresses$,
+  PoolAddressesLD,
+  PoolAddresses
 } from './types'
 import {
-  getPoolAddressByChain,
+  getPoolAddressesByChain,
   getPoolAssetDetail,
-  getPoolRouterByChain,
   getPricePools,
   pricePoolSelector,
   pricePoolSelectorFromRD
@@ -427,39 +426,23 @@ const createPoolsService = (
     })
   )
 
-  const selectedPoolAddress$: PoolAddressRx = Rx.combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
+  const selectedPoolAddresses$: PoolAddresses$ = Rx.combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
     RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
       return FP.pipe(
         poolAddresses,
         RD.toOption,
+        // TODO (@Veado) Will we ingore router for some cases (e.g. by withdrawing something from ETH vault not using router)=
         (oPoolAddresses) => sequenceTOption(oPoolAddresses, oSelectedPoolAsset),
-        O.chain(([poolAddresses, selectedPoolAsset]) => getPoolAddressByChain(poolAddresses, selectedPoolAsset.chain))
+        O.chain(([addresses, { chain }]) => getPoolAddressesByChain(addresses, chain))
       )
     })
   )
 
-  const selectedPoolRouter$: PoolRouterRx = Rx.combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
-    RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
-      return FP.pipe(
-        poolAddresses,
-        RD.toOption,
-        (oPoolAddresses) => sequenceTOption(oPoolAddresses, oSelectedPoolAsset),
-        O.chain(([poolAddresses, selectedPoolAsset]) => getPoolRouterByChain(poolAddresses, selectedPoolAsset.chain))
-      )
-    })
-  )
-
-  const oPoolAddressByChain$ = (chain: Chain): PoolAddressRx =>
+  const poolAddressByChain$ = (chain: Chain): PoolAddressesLD =>
     FP.pipe(
       poolAddresses$,
-      liveData.toOptionMap$((addresses) => getPoolAddressByChain(addresses, chain)),
-      RxOp.map(O.flatten)
-    )
-
-  const poolAddressByChain$ = (chain: Chain): PoolAddressLD =>
-    FP.pipe(
-      poolAddresses$,
-      liveData.map((endpoints) => getPoolAddressByChain(endpoints, chain)),
+      // TODO (@Veado) Will we ingore router for some cases (e.g. by withdrawing something from ETH vault not using router)=
+      liveData.map((addresses) => getPoolAddressesByChain(addresses, chain)),
       RxOp.map((rd) =>
         FP.pipe(
           rd,
@@ -468,17 +451,6 @@ const createPoolsService = (
         )
       )
     )
-
-  const poolAddressByAsset$ = ({ chain }: Asset): PoolAddressRx => oPoolAddressByChain$(chain)
-
-  const oPoolRouterByChain$ = (chain: Chain): PoolRouterRx =>
-    FP.pipe(
-      poolAddresses$,
-      liveData.toOptionMap$((addresses) => getPoolRouterByChain(addresses, chain)),
-      RxOp.map(O.flatten)
-    )
-
-  const poolRouterByAsset$ = ({ chain }: Asset): PoolRouterRx => oPoolRouterByChain$(chain)
 
   /**
    * Use this to convert asset's price to selected price asset by multiplying to the priceRation inner value
@@ -501,16 +473,16 @@ const createPoolsService = (
   /**
    * Validates pool address
    *
-   * @param poolAddress Pool address to validate
+   * @param poolAddresses Pool address to validate
    * @param chain Chain of pool to validate
    */
-  const validatePool$ = (poolAddress: string, chain: Chain): ValidatePoolLD => {
+  const validatePool$ = (poolAddresses: PoolAddresses, chain: Chain): ValidatePoolLD => {
     return poolAddressByChain$(chain).pipe(
-      liveData.chain((address) =>
-        address === poolAddress
+      liveData.chain((addresses) =>
+        eqPoolAddresses.equals(addresses, poolAddresses)
           ? Rx.of(RD.success(true))
           : // TODO (@veado) Add i18n
-            Rx.of(RD.failure(Error(`Pool with address ${poolAddress} is not available`)))
+            Rx.of(RD.failure(Error(`Pool with address ${poolAddresses} is not available`)))
       ),
       liveData.mapLeft((error) => ({
         errorId: ErrorId.VALIDATE_POOL,
@@ -539,14 +511,11 @@ const createPoolsService = (
     reloadPendingPools,
     reloadAllPools,
     poolAddresses$,
-    selectedPoolAddress$,
-    selectedPoolRouter$,
+    selectedPoolAddresses$,
     poolDetail$,
     priceRatio$,
     availableAssets$,
-    poolAddressByAsset$,
-    validatePool$,
-    poolRouterByAsset$
+    validatePool$
   }
 }
 

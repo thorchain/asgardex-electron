@@ -87,15 +87,24 @@ export type NativeFeeLD = LiveData<Error, NativeFee>
 export type ThorchainEndpoints = ThorchainEndpoint[]
 export type ThorchainEndpointsLD = LiveData<Error, ThorchainEndpoints>
 
-export type PoolAddress = Address
-export type PoolAddressRx = Rx.Observable<O.Option<PoolAddress>>
-export type PoolAddressRD = RD.RemoteData<Error, PoolAddress>
-export type PoolAddressLD = LiveData<Error, PoolAddress>
+/**
+ * Type for addresses of a pool
+ * A pool has a vault address
+ * and in some cases a router address (currently ETH only)
+ **/
+export type PoolAddresses = {
+  /** vault address */
+  address: Address
+  /** router address (optional) */
+  router: O.Option<Address>
+}
+export type PoolAddresses$ = Rx.Observable<O.Option<PoolAddresses>>
+export type PoolAddressesRD = RD.RemoteData<Error, PoolAddresses>
+export type PoolAddressesLD = LiveData<Error, PoolAddresses>
 
-export type PoolRouter = Address
-export type PoolRouterRx = Rx.Observable<O.Option<PoolRouter>>
-export type PoolRouterRD = RD.RemoteData<Error, PoolRouter>
-export type PoolRouterLD = LiveData<Error, PoolRouter>
+// export type PoolAddress$ = Rx.Observable<O.Option<Address>>
+// export type PoolAddressRD = RD.RemoteData<Error, Address>
+// export type PoolAddressLD = LiveData<Error, Address>
 
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
@@ -116,14 +125,11 @@ export type PoolsService = {
   reloadPendingPools: FP.Lazy<void>
   reloadAllPools: FP.Lazy<void>
   poolAddresses$: ThorchainEndpointsLD
-  selectedPoolAddress$: PoolAddressRx
-  selectedPoolRouter$: PoolRouterRx
-  poolAddressByAsset$: (asset: Asset) => PoolAddressRx
-  poolRouterByAsset$: (asset: Asset) => PoolRouterRx
+  selectedPoolAddresses$: PoolAddresses$
   poolDetail$: PoolDetailLD
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
-  validatePool$: (poolAddress: Address, chain: Chain) => ValidatePoolLD
+  validatePool$: (poolAddresses: PoolAddresses, chain: Chain) => ValidatePoolLD
 }
 
 export type PoolShareType = DepositType | 'all'

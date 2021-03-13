@@ -43,7 +43,7 @@ const defaultProps: AsymDepositProps = {
   },
   priceAsset: AssetRuneNative,
   assets: [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO],
-  poolAddress: O.none,
+  poolAddresses: O.none,
   memo: O.some('asym-memo'),
   reloadBalances: () => console.log('reloadBalances'),
   viewAssetTx: (txHash) => {

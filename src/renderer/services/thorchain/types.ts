@@ -1,12 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { Client } from '@xchainjs/xchain-thorchain'
+import { Client, DepositParam } from '@xchainjs/xchain-thorchain'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
-import { ApiError } from '../wallet/types'
+import { ApiError, TxHashLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -24,7 +24,9 @@ export type SendTxParams = {
 
 export type AddressValidation = Client['validateAddress']
 
-export type TransactionService = C.TransactionService<SendTxParams>
+export type TransactionService = {
+  sendDepositTx: (params: DepositParam) => TxHashLD
+} & C.TransactionService<SendTxParams>
 
 export type InteractParams = {
   readonly amount: BaseAmount

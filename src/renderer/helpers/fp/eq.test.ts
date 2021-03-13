@@ -4,7 +4,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { SymDepositFeesParams } from '../../services/chain/types'
-import { PoolShare } from '../../services/midgard/types'
+import { PoolAddresses, PoolShare } from '../../services/midgard/types'
 import { ApiError, ErrorId } from '../../services/wallet/types'
 import {
   eqAsset,
@@ -17,7 +17,8 @@ import {
   eqChain,
   eqOChain,
   eqPoolShares,
-  eqPoolShare
+  eqPoolShare,
+  eqPoolAddresses
 } from './eq'
 
 describe('helpers/fp/eq', () => {
@@ -265,11 +266,29 @@ describe('helpers/fp/eq', () => {
     it('is equal', () => {
       expect(eqPoolShares.equals([a, b], [a, b])).toBeTruthy()
     })
-    it('is not equal witn different elements', () => {
+    it('is not equal with different elements', () => {
       expect(eqPoolShares.equals([a, b], [b, c])).toBeFalsy()
     })
     it('is not equal if elements has been flipped', () => {
       expect(eqPoolShares.equals([a, b], [b, a])).toBeFalsy()
+    })
+  })
+  describe('eqPoolAddresses', () => {
+    const a: PoolAddresses = {
+      address: 'addressA',
+      router: O.none
+    }
+    const b: PoolAddresses = {
+      address: 'addressB',
+      router: O.some('routerB')
+    }
+    it('is equal', () => {
+      expect(eqPoolAddresses.equals(a, a)).toBeTruthy()
+      expect(eqPoolAddresses.equals(b, b)).toBeTruthy()
+    })
+    it('is not equal', () => {
+      expect(eqPoolAddresses.equals(a, b)).toBeFalsy()
+      expect(eqPoolAddresses.equals(b, a)).toBeFalsy()
     })
   })
 })

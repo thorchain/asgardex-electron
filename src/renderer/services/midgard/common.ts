@@ -6,11 +6,19 @@ import { eqOAsset } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
 import { SelectedPoolAsset, SelectedPoolChain } from './types'
 
-/** Selected pool asset */
-const { get$: getSelectedPoolAsset$, set: setSelectedPoolAsset } = observableState<SelectedPoolAsset>(O.none)
+/** State of selected pool asset */
+const {
+  /* private getter, to access its value use `selectedPoolAsset$` only */
+  get$: _selectedPoolAsset$,
+  set: setSelectedPoolAsset
+} = observableState<SelectedPoolAsset>(O.none)
 
-// "dirty check" to trigger "real" changes of an asset only
-const selectedPoolAsset$: Observable<SelectedPoolAsset> = getSelectedPoolAsset$.pipe(
+/**
+ * Current selected pool asset to interact with
+ * It's `None` if no pool is selected
+ **/
+const selectedPoolAsset$: Observable<SelectedPoolAsset> = _selectedPoolAsset$.pipe(
+  // "dirty check" to trigger "real" changes of an asset only
   RxOp.distinctUntilChanged(eqOAsset.equals),
   RxOp.shareReplay(1)
 )

@@ -14,14 +14,14 @@ export type AssetWithAmount = {
   amount: BaseAmount
 }
 
-export enum TxTypes {
-  DEPOSIT = 'deposit',
-  SWAP = 'swap',
-  WITHDRAW = 'withdraw',
-  CREATE = 'create',
-  UPGRADE = 'upgrade',
-  TRANSFER = 'transfer'
-}
+// export enum TxTypes {
+//   DEPOSIT = 'deposit',
+//   SWAP = 'swap',
+//   WITHDRAW = 'withdraw',
+//   CREATE = 'create',
+//   UPGRADE = 'upgrade',
+//   TRANSFER = 'transfer'
+// }
 
 export type DepositType = 'sym' | 'asym'
 export type WithdrawType = 'sym' | 'asym'
@@ -29,10 +29,6 @@ export type WithdrawType = 'sym' | 'asym'
 export const MAX_VALUE = 100
 
 export type TxStatus = {
-  /**
-   * Type of tx's - optional
-   */
-  readonly type?: TxTypes
   /**
    *  Modal state
    * true -> `opened` modal

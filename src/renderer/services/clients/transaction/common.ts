@@ -51,8 +51,16 @@ export const loadTxs$ = ({
 /**
  * Observable to load data of a `Tx`
  */
-export const loadTx$ = (client: XChainClient, txHash: TxHash, assetAddress?: Address): TxLD =>
-  Rx.from(client.getTransactionData(txHash, assetAddress)).pipe(
+export const loadTx$ = ({
+  client,
+  txHash,
+  assetAddress
+}: {
+  client: XChainClient
+  txHash: TxHash
+  assetAddress: O.Option<Address>
+}): TxLD =>
+  Rx.from(client.getTransactionData(txHash, O.toUndefined(assetAddress))).pipe(
     RxOp.map(RD.success),
     RxOp.catchError((error) =>
       Rx.of(
