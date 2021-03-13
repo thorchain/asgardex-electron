@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { useIntl } from 'react-intl'
 
@@ -22,12 +22,13 @@ const getIcon = (type: TxTypes) => {
       return <WithdrawIcon />
     case TxTypes.SWAP:
     case TxTypes.DOUBLE_SWAP:
-    default:
       return <SwapIcon />
+    default:
+      return <></>
   }
 }
 
-const getTypeI18nKey = (type: TxTypes): CommonMessageKey => {
+const getTypeI18nKey = (type: TxTypes): CommonMessageKey | undefined => {
   switch (type) {
     case TxTypes.DEPOSIT:
       return 'common.tx.type.deposit'
@@ -37,16 +38,16 @@ const getTypeI18nKey = (type: TxTypes): CommonMessageKey => {
       return 'common.tx.type.swap'
     case TxTypes.DOUBLE_SWAP:
       return 'common.tx.type.doubleSwap'
-    default:
-      return 'common.tx.type.swap'
   }
 }
 export const TxType: React.FC<Props> = ({ type, className }) => {
   const intl = useIntl()
 
+  const typeKey = useMemo(() => getTypeI18nKey(type), [type])
+
   return (
     <Styled.Container className={className}>
-      <Styled.Label>{intl.formatMessage({ id: getTypeI18nKey(type) })}</Styled.Label>
+      <Styled.Label>{typeKey ? intl.formatMessage({ id: typeKey }) : type}</Styled.Label>
       {getIcon(type)}
     </Styled.Container>
   )

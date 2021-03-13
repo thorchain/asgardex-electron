@@ -9,6 +9,7 @@ import {
   assetToBase,
   assetToString
 } from '@xchainjs/xchain-util'
+import { Grid } from 'antd'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -47,8 +48,10 @@ export const Default: Story<{
   firstOutAsset,
   secondOutAsset
 }) => {
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   return (
     <TxDetail
+      isDesktopView={isDesktopView}
       renderDate={(date) => <>{date.toLocaleString()}</>}
       date={new Date(Date.now())}
       incomes={getValues(firstInAsset, secondInAsset, firstInValue, secondInValue)}

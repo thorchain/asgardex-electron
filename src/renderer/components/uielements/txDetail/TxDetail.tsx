@@ -2,7 +2,6 @@ import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { baseToAsset, assetToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
-import { Grid } from 'antd'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/NonEmptyArray'
@@ -23,10 +22,19 @@ type Props = {
   className?: string
   date: Date
   renderDate: (date: Date) => React.ReactElement
+  isDesktopView?: boolean
 }
 
-export const TxDetail: React.FC<Props> = ({ className, outgos, incomes, fees = [], slip, date, renderDate }) => {
-  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+export const TxDetail: React.FC<Props> = ({
+  className,
+  outgos,
+  incomes,
+  fees = [],
+  slip,
+  date,
+  renderDate,
+  isDesktopView = true
+}) => {
   const incomeFormatted = useMemo(
     () =>
       FP.pipe(
