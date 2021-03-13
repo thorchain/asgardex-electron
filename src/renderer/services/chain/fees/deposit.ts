@@ -102,11 +102,11 @@ const depositFeeByChain$ = ({
         O.fold(
           () => Rx.of(RD.initial),
           ({ recipient, router, amount, memo }) =>
-            ETH.callFees$(
-              router,
-              ethRouterABI,
-              'deposit',
-              isEthAsset(asset)
+            ETH.callFees$({
+              address: router,
+              abi: ethRouterABI,
+              func: 'deposit',
+              params: isEthAsset(asset)
                 ? [
                     FP.pipe(getEthChecksumAddress(recipient), O.toUndefined),
                     ETHAddress,
@@ -122,7 +122,7 @@ const depositFeeByChain$ = ({
                     amount.amount().toFixed(),
                     memo
                   ]
-            ).pipe(liveData.map((fees) => fees.fast))
+            }).pipe(liveData.map((fees) => fees.fast))
         )
       )
     }
