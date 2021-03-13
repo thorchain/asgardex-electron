@@ -24,6 +24,7 @@ import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { getEthTokenAddress, isChainAsset, isEthAsset, isEthTokenAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
 import { eqOPoolAddresses } from '../../../helpers/fp/eq'
+import { eqOAsset } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import { LiveData } from '../../../helpers/rx/liveData'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
@@ -106,6 +107,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     approveERC20Token$
   } = props
 
+  const prevAsset = useRef<O.Option<Asset>>(O.none)
+
   const intl = useIntl()
 
   const prevPoolAddresses = useRef<O.Option<PoolAddresses>>(O.none)
@@ -145,7 +148,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const chainFees$ = useMemo(() => fees$, [fees$])
 
   const depositFeesParams: SymDepositFeesParams = useMemo(() => {
-    // TODO(@Veado) Handle ETH/ERC20 for using router address
+    // TODO(@asdgx-team/@Veado) Handle ETH/ERC20 for using router address
     const recipient: O.Option<Address> = FP.pipe(
       oPoolAddresses,
       O.map(({ address }) => address)
@@ -344,9 +347,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     (asset: Asset) => {
       onChangeAsset(asset)
       changePercentHandler(0)
-      reloadFeesHandler()
     },
-    [changePercentHandler, onChangeAsset, reloadFeesHandler]
+    [changePercentHandler, onChangeAsset]
   )
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -695,7 +697,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   // TODO (@Veado) Do we still need following dirty check?
   useEffect(() => {
-    // dirty check for pool address
+    if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {
+      prevAsset.current = O.some(asset)
+      // Note: ETH/ERC20 fees won't be reloaded if router is None
+      // that's why we have another check for prevPoolRouter in next guard
+      reloadFeesHandler()
+    }
+
     if (!eqOPoolAddresses.equals(prevPoolAddresses.current, oPoolAddresses)) {
       prevPoolAddresses.current = oPoolAddresses
       // reset approve state
@@ -704,8 +712,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
       resetIsApprovedState()
       // check approved status
       checkApprovedStatus()
+      // for ETH/ETH20
+      if (O.isSome(oPoolAddresses)) reloadFeesHandler()
     }
-  }, [checkApprovedStatus, oPoolAddresses, resetApproveState, resetIsApprovedState])
+  }, [asset, checkApprovedStatus, oPoolAddresses, reloadFeesHandler, resetApproveState, resetIsApprovedState])
 
   return (
     <Styled.Container>
