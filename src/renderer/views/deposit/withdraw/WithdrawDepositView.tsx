@@ -19,7 +19,7 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as shareHelpers from '../../../helpers/poolShareHelper'
 import { DEFAULT_NETWORK } from '../../../services/const'
-import { PoolDetailRD, PoolShareRD, PoolDetail, PoolAddresses, PoolShare } from '../../../services/midgard/types'
+import { PoolDetailRD, PoolShareRD, PoolDetail, PoolAddress, PoolShare } from '../../../services/midgard/types'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 
 type Props = {
@@ -31,7 +31,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const { asset, poolShare: poolShareRD } = props
   const {
     service: {
-      pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$, selectedPoolAddresses$: selectedPoolAddress$ }
+      pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$, selectedPoolAddress$ }
     }
   } = useMidgardContext()
 
@@ -39,7 +39,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
 
   const runePrice = useObservableState(priceRatio$, bn(1))
 
-  const oPoolAddress: O.Option<PoolAddresses> = useObservableState(selectedPoolAddress$, O.none)
+  const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
 

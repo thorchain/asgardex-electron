@@ -39,7 +39,7 @@ import {
   SymDepositFeesParams
 } from '../../../services/chain/types'
 import { ApproveParams, IsApprovedRD } from '../../../services/ethereum/types'
-import { PoolAddresses } from '../../../services/midgard/types'
+import { PoolAddress } from '../../../services/midgard/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
@@ -58,7 +58,7 @@ export type Props = {
   assetBalance: O.Option<BaseAmount>
   runeBalance: O.Option<BaseAmount>
   chainAssetBalance: O.Option<BaseAmount>
-  poolAddresses: O.Option<PoolAddresses>
+  poolAddress: O.Option<PoolAddress>
   memo: O.Option<SymDepositMemo>
   priceAsset?: Asset
   reloadFees: LoadDepositFeesHandler
@@ -88,7 +88,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     runeBalance: oRuneBalance,
     chainAssetBalance: oChainAssetBalance,
     memo: oMemo,
-    poolAddresses: oPoolAddresses,
+    poolAddress: oPoolAddress,
     viewAssetTx = (_) => {},
     viewRuneTx = (_) => {},
     validatePassword$,
@@ -110,7 +110,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const intl = useIntl()
 
-  const prevPoolAddresses = useRef<O.Option<PoolAddresses>>(O.none)
+  const prevPoolAddresses = useRef<O.Option<PoolAddress>>(O.none)
 
   const [runeAmountToDeposit, setRuneAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [assetAmountToDeposit, setAssetAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
@@ -149,7 +149,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const depositFeesParams: SymDepositFeesParams = useMemo(() => {
     // TODO(@asdgx-team/@Veado) Handle ETH/ERC20 for using router address
     const recipient: O.Option<Address> = FP.pipe(
-      oPoolAddresses,
+      oPoolAddress,
       O.map(({ address }) => address)
     )
 
@@ -160,7 +160,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       recipient,
       type: 'sym'
     }
-  }, [asset, assetAmountToDeposit, oMemo, oPoolAddresses])
+  }, [asset, assetAmountToDeposit, oMemo, oPoolAddress])
 
   const [depositFeesRD] = useObservableState<DepositFeesRD>(() => chainFees$(depositFeesParams), RD.initial)
 
@@ -547,7 +547,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     closePasswordModal()
 
     FP.pipe(
-      sequenceSOption({ memos: oMemo, poolAddresses: oPoolAddresses }),
+      sequenceSOption({ memos: oMemo, poolAddresses: oPoolAddress }),
       O.map(({ memos, poolAddresses }) => {
         // set start time
         setDepositStartTime(Date.now())
@@ -555,7 +555,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         subscribeDepositState(
           deposit$({
             asset,
-            poolAddresses,
+            poolAddress: poolAddresses,
             amounts: { rune: runeAmountToDeposit, asset: assetAmountToDeposit },
             memos
           })
@@ -570,7 +570,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     subscribeDepositState,
     deposit$,
     asset,
-    oPoolAddresses,
+    oPoolAddress,
     runeAmountToDeposit,
     assetAmountToDeposit
   ])
@@ -613,7 +613,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const onApprove = () => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
-      oPoolAddresses,
+      oPoolAddress,
       O.chain(({ router }) => router)
     )
 
@@ -673,7 +673,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const checkApprovedStatus = useCallback(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
-      oPoolAddresses,
+      oPoolAddress,
       O.chain(({ router }) => router)
     )
     // check approve status
@@ -692,7 +692,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         )
       )
     )
-  }, [asset, isApprovedERC20Token$, needApprovement, oPoolAddresses, subscribeIsApprovedState])
+  }, [asset, isApprovedERC20Token$, needApprovement, oPoolAddress, subscribeIsApprovedState])
 
   // TODO (@Veado) Do we still need following dirty check?
   useEffect(() => {
@@ -703,8 +703,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       reloadFeesHandler()
     }
 
-    if (!eqOPoolAddresses.equals(prevPoolAddresses.current, oPoolAddresses)) {
-      prevPoolAddresses.current = oPoolAddresses
+    if (!eqOPoolAddresses.equals(prevPoolAddresses.current, oPoolAddress)) {
+      prevPoolAddresses.current = oPoolAddress
       // reset approve state
       resetApproveState()
       // reset isApproved state
@@ -712,9 +712,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
       // check approved status
       checkApprovedStatus()
       // for ETH/ETH20
-      if (O.isSome(oPoolAddresses)) reloadFeesHandler()
+      if (O.isSome(oPoolAddress)) reloadFeesHandler()
     }
-  }, [asset, checkApprovedStatus, oPoolAddresses, reloadFeesHandler, resetApproveState, resetIsApprovedState])
+  }, [asset, checkApprovedStatus, oPoolAddress, reloadFeesHandler, resetApproveState, resetIsApprovedState])
 
   return (
     <Styled.Container>

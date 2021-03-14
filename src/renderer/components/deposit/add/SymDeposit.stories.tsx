@@ -45,7 +45,7 @@ const defaultProps: SymDepositProps = {
   },
   priceAsset: AssetRuneNative,
   assets: [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO],
-  poolAddresses: O.none,
+  poolAddress: O.none,
   memo: O.some({ rune: 'rune-memo', asset: 'asset-memo' }),
   reloadBalances: () => console.log('reloadBalances'),
   viewAssetTx: (txHash) => {

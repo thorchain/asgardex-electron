@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, AssetRuneNative, bnOrZero } from '@xchainjs/xchain-util'
+import { assetFromString, AssetRuneNative, assetToString, bnOrZero } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -39,7 +39,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, reloadPools, selectedPoolAddresses$: selectedPoolAddress$ },
+    pools: { poolsState$, reloadPools, selectedPoolAddress$ },
     setSelectedPoolAsset,
     selectedPoolAsset$
   } = midgardService
@@ -89,7 +89,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
-  const sourcePoolAddress = useObservableState(selectedPoolAddress$, O.none)
+  const selectedPoolAddress = useObservableState(selectedPoolAddress$, O.none)
   const targetWalletAddress = useObservableState(assetAddress$, O.none)
 
   const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [
@@ -142,6 +142,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                 availableAssets.unshift({ asset: AssetRuneNative, assetPrice: bnOrZero(1) })
               }
 
+              console.log('SWAP render', assetToString(sourceAsset), assetToString(targetAsset))
+
               return (
                 <Swap
                   keystore={keystore}
@@ -149,7 +151,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   goToTransaction={goToTransaction}
                   sourceAsset={sourceAsset}
                   targetAsset={targetAsset}
-                  poolAddresses={sourcePoolAddress}
+                  poolAddress={selectedPoolAddress}
                   availableAssets={availableAssets}
                   poolDetails={poolDetails}
                   walletBalances={balances}

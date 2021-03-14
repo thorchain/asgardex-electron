@@ -7,7 +7,7 @@ import * as Eq from 'fp-ts/lib/Eq'
 import * as O from 'fp-ts/lib/Option'
 
 import { DepositFeesParams } from '../../services/chain/types'
-import { PoolAddresses, PoolShare } from '../../services/midgard/types'
+import { PoolAddress, PoolShare } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { WalletBalance } from '../../types/wallet'
 import { isEthChain } from '../chainHelper'
@@ -94,7 +94,8 @@ export const eqPoolShare = Eq.getStructEq<PoolShare>({
 
 export const eqPoolShares = A.getEq(eqPoolShare)
 
-export const eqPoolAddresses = Eq.getStructEq<PoolAddresses>({
+export const eqPoolAddresses = Eq.getStructEq<PoolAddress>({
+  chain: eqChain,
   address: Eq.eqString,
   router: eqOString
 })

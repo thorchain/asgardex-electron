@@ -13,7 +13,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { SymDepositFeesParams } from '../../services/chain/types'
-import { PoolAddresses, PoolShare } from '../../services/midgard/types'
+import { PoolAddress, PoolShare } from '../../services/midgard/types'
 import { ApiError, ErrorId } from '../../services/wallet/types'
 import {
   eqAsset,
@@ -321,11 +321,13 @@ describe('helpers/fp/eq', () => {
     })
   })
   describe('eqPoolAddresses', () => {
-    const a: PoolAddresses = {
+    const a: PoolAddress = {
+      chain: 'BCH',
       address: 'addressA',
       router: O.none
     }
-    const b: PoolAddresses = {
+    const b: PoolAddress = {
+      chain: 'BNB',
       address: 'addressB',
       router: O.some('routerB')
     }

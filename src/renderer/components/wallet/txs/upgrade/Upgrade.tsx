@@ -29,7 +29,7 @@ import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
 import { FeeRD } from '../../../../services/chain/types'
-import { PoolAddressesRD } from '../../../../services/midgard/types'
+import { PoolAddressRD } from '../../../../services/midgard/types'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
@@ -44,7 +44,7 @@ import * as CStyled from './Upgrade.styles'
 export type Props = {
   runeAsset: Asset
   runeNativeAddress: Address
-  bnbPoolAddressRD: PoolAddressesRD
+  bnbPoolAddressRD: PoolAddressRD
   validatePassword$: ValidatePasswordHandler
   fee: FeeRD
   upgrade$: (_: UpgradeRuneParams) => UpgradeRuneTxState$

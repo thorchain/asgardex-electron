@@ -6,7 +6,7 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { PoolAddresses } from '../midgard/types'
+import { PoolAddress } from '../midgard/types'
 import { ApiError, TxHashRD } from '../wallet/types'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
@@ -103,7 +103,7 @@ export type SwapState = {
 export type SwapState$ = Rx.Observable<SwapState>
 
 export type SwapParams = {
-  readonly poolAddresses: PoolAddresses
+  readonly poolAddresses: PoolAddress
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
@@ -145,7 +145,7 @@ export type AsymDepositState = {
 export type AsymDepositState$ = Rx.Observable<AsymDepositState>
 
 export type AsymDepositParams = {
-  readonly poolAddresses: PoolAddresses
+  readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
@@ -174,7 +174,7 @@ export type SymDepositState = {
 export type SymDepositState$ = Rx.Observable<SymDepositState>
 
 export type SymDepositParams = {
-  readonly poolAddresses: PoolAddresses
+  readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly amounts: SymDepositAmounts
   readonly memos: SymDepositMemo
@@ -199,7 +199,7 @@ export type WithdrawState = {
 export type WithdrawState$ = Rx.Observable<WithdrawState>
 
 export type WithdrawParams = {
-  readonly poolAddresses: PoolAddresses
+  readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly memo: Memo
   readonly network: Network
@@ -208,7 +208,7 @@ export type WithdrawParams = {
 export type WithdrawStateHandler = (p: WithdrawParams) => WithdrawState$
 
 export type UpgradeRuneParams = {
-  readonly poolAddresses: PoolAddresses
+  readonly poolAddresses: PoolAddress
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string

@@ -39,7 +39,7 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * @returns AsymDepositState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
  *
  */
-export const asymDeposit$ = ({ poolAddresses, asset, amount, memo }: AsymDepositParams): AsymDepositState$ => {
+export const asymDeposit$ = ({ poolAddress, asset, amount, memo }: AsymDepositParams): AsymDepositState$ => {
   // total of progress
   const total = O.some(100)
 
@@ -52,7 +52,7 @@ export const asymDeposit$ = ({ poolAddresses, asset, amount, memo }: AsymDeposit
 
   // All requests will be done in a sequence
   // and `AsymDepositState` will be updated step by step
-  const requests$ = Rx.of(poolAddresses).pipe(
+  const requests$ = Rx.of(poolAddress).pipe(
     // 1. validate pool address or node
     RxOp.switchMap((poolAddresses) =>
       Rx.iif(
@@ -68,9 +68,9 @@ export const asymDeposit$ = ({ poolAddresses, asset, amount, memo }: AsymDeposit
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 50, total }) })
       // 2. send deposit tx
       return sendPoolTx$({
-        router: poolAddresses.router,
+        router: poolAddress.router,
         asset,
-        recipient: poolAddresses.address,
+        recipient: poolAddress.address,
         amount,
         memo,
         feeOptionKey: FeeOptionKeys.DEPOSIT
@@ -153,7 +153,12 @@ export const asymDeposit$ = ({ poolAddresses, asset, amount, memo }: AsymDeposit
  * @returns SymDepositState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
  *
  */
-export const symDeposit$ = ({ poolAddresses, asset, amounts, memos }: SymDepositParams): SymDepositState$ => {
+export const symDeposit$ = ({
+  poolAddress: poolAddresses,
+  asset,
+  amounts,
+  memos
+}: SymDepositParams): SymDepositState$ => {
   // total of progress
   const total = O.some(100)
 

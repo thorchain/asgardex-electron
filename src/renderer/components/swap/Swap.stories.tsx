@@ -22,7 +22,7 @@ const defaultProps: SwapProps = {
   ],
   sourceAsset: AssetRuneNative,
   targetAsset: AssetBTC,
-  poolAddresses: O.some({ address: 'vault-address', router: O.some('router-address') }),
+  poolAddress: O.some({ chain: 'BNB', address: 'vault-address', router: O.some('router-address') }),
   // mock successfull result of swap$
   swap$: (params) =>
     Rx.of(params).pipe(

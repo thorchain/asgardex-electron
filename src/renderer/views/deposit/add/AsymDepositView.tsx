@@ -24,7 +24,7 @@ import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as depositRoutes from '../../../routes/deposit'
 import { Memo } from '../../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../../services/const'
-import { PoolAddresses, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
+import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 
@@ -48,7 +48,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
 
   const {
     service: {
-      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, selectedPoolAddresses$ }
+      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, selectedPoolAddress$ }
     }
   } = useMidgardContext()
 
@@ -60,7 +60,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
     getExplorerUrlByAsset$
   } = useChainContext()
 
-  const oPoolAddresses: O.Option<PoolAddresses> = useObservableState(selectedPoolAddresses$, O.none)
+  const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
   const {
     balancesState$,
@@ -143,7 +143,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
           reloadFees={FP.constVoid}
           priceAsset={selectedPricePoolAsset}
           disabled={true}
-          poolAddresses={O.none}
+          poolAddress={O.none}
           memo={O.none}
           reloadBalances={reloadBalances}
           poolData={ZERO_POOL_DATA}
@@ -183,7 +183,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
               assetPrice={assetPrice}
               assetBalance={assetBalance}
               chainAssetBalance={chainAssetBalance}
-              poolAddresses={oPoolAddresses}
+              poolAddress={oPoolAddress}
               memo={memo}
               fees$={depositFees$}
               reloadFees={reloadDepositFees}

@@ -27,7 +27,7 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * @returns WithdrawState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModal`
  *
  */
-export const withdraw$ = ({ poolAddresses, asset, memo, network }: WithdrawParams): WithdrawState$ => {
+export const withdraw$ = ({ poolAddress, asset, memo, network }: WithdrawParams): WithdrawState$ => {
   // total of progress
   const total = O.some(100)
 
@@ -43,7 +43,7 @@ export const withdraw$ = ({ poolAddresses, asset, memo, network }: WithdrawParam
 
   // All requests will be done in a sequence
   // to update `SymWithdrawState` step by step
-  const requests$ = Rx.of(poolAddresses).pipe(
+  const requests$ = Rx.of(poolAddress).pipe(
     // 1. validate pool address or node
     RxOp.switchMap((poolAddresses) =>
       Rx.iif(
@@ -59,7 +59,7 @@ export const withdraw$ = ({ poolAddresses, asset, memo, network }: WithdrawParam
       setState({ ...getState(), step: 2, withdraw: RD.progress({ loaded: 50, total }) })
       return sendTx$({
         asset,
-        recipient: isRune ? '' : poolAddresses.address,
+        recipient: isRune ? '' : poolAddress.address,
         amount: smallestAmountToSent(asset.chain, network),
         memo,
         feeOptionKey: FeeOptionKeys.WITHDRAW

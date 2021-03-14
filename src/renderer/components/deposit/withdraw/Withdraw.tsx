@@ -25,7 +25,7 @@ import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
 import { FeeLD, FeeRD, Memo, WithdrawState, WithdrawStateHandler } from '../../../services/chain/types'
-import { PoolAddresses } from '../../../services/midgard/types'
+import { PoolAddress } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
@@ -52,7 +52,7 @@ export type Props = {
   shares: { rune: BaseAmount; asset: BaseAmount }
   /** Flag whether form has to be disabled or not */
   disabled?: boolean
-  poolAddresses: O.Option<PoolAddresses>
+  poolAddresses: O.Option<PoolAddress>
   viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
   reloadBalances: FP.Lazy<void>
@@ -276,7 +276,7 @@ export const Withdraw: React.FC<Props> = ({
         subscribeWithdrawState(
           withdraw$({
             asset: AssetRuneNative,
-            poolAddresses,
+            poolAddress: poolAddresses,
             network,
             memo
           })

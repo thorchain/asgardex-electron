@@ -28,18 +28,19 @@ import {
   PoolsService,
   PoolsStateLD,
   SelectedPricePoolAsset,
-  InboundAddressesLD,
-  ValidatePoolLD,
-  PoolAddresses$,
   PoolAddressesLD,
-  PoolAddresses
+  ValidatePoolLD,
+  PoolAddress$,
+  PoolAddressLD,
+  PoolAddress
 } from './types'
 import {
   getPoolAddressesByChain,
   getPoolAssetDetail,
   getPricePools,
   pricePoolSelector,
-  pricePoolSelectorFromRD
+  pricePoolSelectorFromRD,
+  toPoolAddresses
 } from './utils'
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
@@ -414,12 +415,13 @@ const createPoolsService = (
     RxOp.map(([poolsState, selectedPricePoolAsset]) => pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset))
   )
 
-  const loadInboundAddresses$ = (): InboundAddressesLD =>
+  const loadInboundAddresses$ = (): PoolAddressesLD =>
     FP.pipe(
       midgardDefaultApi$,
       liveData.chain((api) => {
         return FP.pipe(
           api.getProxiedInboundAddresses(),
+          RxOp.map(toPoolAddresses),
           RxOp.map(RD.success),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
@@ -430,7 +432,7 @@ const createPoolsService = (
   // Shared stream to avoid reloading same data by subscribing
   const inboundAddressesShared$ = loadInboundAddresses$().pipe(RxOp.shareReplay(1))
 
-  const selectedPoolAddresses$: PoolAddresses$ = Rx.combineLatest([inboundAddressesShared$, selectedPoolAsset$]).pipe(
+  const selectedPoolAddresses$: PoolAddress$ = Rx.combineLatest([inboundAddressesShared$, selectedPoolAsset$]).pipe(
     RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
       return FP.pipe(
         poolAddresses,
@@ -442,7 +444,7 @@ const createPoolsService = (
     })
   )
 
-  const poolAddressesByChain$ = (chain: Chain): PoolAddressesLD =>
+  const poolAddressesByChain$ = (chain: Chain): PoolAddressLD =>
     FP.pipe(
       inboundAddressesShared$,
       liveData.map((addresses) => getPoolAddressesByChain(addresses, chain)),
@@ -479,7 +481,7 @@ const createPoolsService = (
    * @param poolAddresses Pool address to validate
    * @param chain Chain of pool to validate
    */
-  const validatePool$ = (poolAddresses: PoolAddresses, chain: Chain): ValidatePoolLD =>
+  const validatePool$ = (poolAddresses: PoolAddress, chain: Chain): ValidatePoolLD =>
     FP.pipe(
       loadInboundAddresses$(),
       liveData.map((addresses) => getPoolAddressesByChain(addresses, chain)),
@@ -513,7 +515,7 @@ const createPoolsService = (
     reloadPools,
     reloadPendingPools,
     reloadAllPools,
-    selectedPoolAddresses$,
+    selectedPoolAddress$: selectedPoolAddresses$,
     poolAddressesByChain$,
     poolDetail$,
     priceRatio$,

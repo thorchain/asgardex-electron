@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { assetFromString, bnOrZero, baseAmount, Asset, assetToString, Chain } from '@xchainjs/xchain-util'
+import { assetFromString, bnOrZero, baseAmount, Asset, assetToString, Chain, isChain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -9,7 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { CURRENCY_WHEIGHTS } from '../../const'
 import { isBUSDAsset } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
-import { eqAsset } from '../../helpers/fp/eq'
+import { eqAsset, eqChain } from '../../helpers/fp/eq'
 import { optionFromNullableString } from '../../helpers/fp/from'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { InboundAddressesItem } from '../../types/generated/midgard'
@@ -23,6 +23,7 @@ import {
   PoolDetail,
   PoolShares,
   PoolShare,
+  PoolAddress,
   PoolAddresses
 } from './types'
 
@@ -136,14 +137,27 @@ export const filterPoolAssets = (poolAssets: string[]) => {
   return poolAssets.filter((poolAsset) => !isMiniToken(assetFromString(poolAsset) || { symbol: '' }))
 }
 
-export const getPoolAddressesByChain = (
-  addresses: Pick<InboundAddressesItem, 'chain' | 'address' | 'router'>[],
-  chain: Chain
-): O.Option<PoolAddresses> =>
+export const getPoolAddressesByChain = (addresses: PoolAddresses, chain: Chain): O.Option<PoolAddress> =>
   FP.pipe(
     addresses,
-    A.findFirst((endpoint) => endpoint.chain === chain),
-    O.map(({ address, router }) => ({ address, router: optionFromNullableString(router) }))
+    A.findFirst((address) => eqChain.equals(address.chain, chain))
+  )
+
+export const toPoolAddresses = (
+  addresses: Pick<InboundAddressesItem, 'chain' | 'address' | 'router'>[]
+): PoolAddresses =>
+  FP.pipe(
+    addresses,
+    A.filterMap(({ address, router, chain }) =>
+      // filter out invalid chains
+      isChain(chain)
+        ? O.some({
+            chain,
+            address,
+            router: optionFromNullableString(router)
+          })
+        : O.none
+    )
   )
 
 /**
