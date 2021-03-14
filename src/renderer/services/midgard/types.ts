@@ -7,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { DepositType } from '../../types/asgardex'
+import { AssetWithAmount, DepositType, TxTypes } from '../../types/asgardex'
 import {
   Network as NetworkInfo,
   Constants as ThorchainConstants,
@@ -149,3 +149,40 @@ export type PoolSharesLD = LiveData<Error, PoolShares>
 export type ValidatePoolLD = LiveData<ApiError, boolean>
 
 export type ValidateNodeLD = LiveData<ApiError, boolean>
+
+export type Tx = {
+  // Sender address
+  address: string
+  values: AssetWithAmount[]
+  memo: string
+  /**
+   * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
+   */
+  txID: string
+}
+
+export type HistoryAction = {
+  date: Date
+  /**
+   * Inbound transactions related to the action
+   */
+  in: Tx[]
+  /**
+   * Outbound transactions related to the action
+   */
+  out: Tx[]
+  type: TxTypes
+  fees?: AssetWithAmount[]
+  slip?: number
+}
+
+export type HistoryActions = HistoryAction[]
+
+export type HistoryActionsPage = {
+  total: number
+  actions: HistoryActions
+}
+
+export type HistoryActionsPageRD = RD.RemoteData<ApiError, HistoryActionsPage>
+
+export type HistoryActionsPageLD = LiveData<ApiError, HistoryActionsPage>
