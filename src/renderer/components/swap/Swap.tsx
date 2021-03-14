@@ -29,7 +29,7 @@ import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import { getEthTokenAddress, isEthAsset, isEthTokenAsset } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
-import { eqAsset, eqBaseAmount, eqOAsset, eqOPoolAddresses } from '../../helpers/fp/eq'
+import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { LiveData } from '../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
@@ -116,7 +116,6 @@ export const Swap = ({
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
-  const prevPoolAddresses = useRef<O.Option<PoolAddress>>(O.none)
 
   // convert to hash map here instead of using getPoolDetail
   const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [
@@ -257,7 +256,6 @@ export const Swap = ({
   }, [chainFeesRD, setPendingSwitchAssets])
 
   const reloadFeesHandler = useCallback(() => {
-    console.log('reloadFeesHandler:', oSwapFeesParams)
     FP.pipe(oSwapFeesParams, O.map(reloadFees))
   }, [oSwapFeesParams, reloadFees])
 
@@ -750,16 +748,19 @@ export const Swap = ({
     return isEthTokenAsset(sourceAssetProp)
   }, [keystore, sourceAssetProp, sourceChainAsset.chain])
 
-  const isApproved = useMemo(
-    () =>
-      !needApprovement ||
+  const isApproved = useMemo(() => {
+    if (!needApprovement) return true
+    // ignore initial + loading states for `isApprovedState`
+    if (RD.isInitial(isApprovedState) || RD.isPending(isApprovedState)) return true
+
+    return (
       RD.isSuccess(approveState) ||
       FP.pipe(
         isApprovedState,
         RD.getOrElse(() => false)
-      ),
-    [approveState, isApprovedState, needApprovement]
-  )
+      )
+    )
+  }, [approveState, isApprovedState, needApprovement])
 
   const checkApprovedStatus = useCallback(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
@@ -800,23 +801,15 @@ export const Swap = ({
   }, [checkApprovedStatus, reloadFeesHandler, resetApproveState, resetIsApprovedState, resetSwapState, setAmountToSwap])
 
   useEffect(() => {
-    console.log('SWAP useEffect')
     // reset data whenever source asset has been changed
     if (!eqOAsset.equals(prevSourceAsset.current, O.some(sourceAssetProp))) {
-      console.log('sourceAssetProp:', assetToString(sourceAssetProp))
       prevSourceAsset.current = O.some(sourceAssetProp)
       reset()
     }
     // reset data whenever target asset has been changed
     if (!eqOAsset.equals(prevTargetAsset.current, O.some(targetAssetProp))) {
-      console.log('targetAssetProp:', assetToString(targetAssetProp))
       prevTargetAsset.current = O.some(targetAssetProp)
       reset()
-    }
-    // TODO (@Veado) Do we still need to check approve status
-    if (!eqOPoolAddresses.equals(prevPoolAddresses.current, oPoolAddress)) {
-      prevPoolAddresses.current = oPoolAddress
-      checkApprovedStatus()
     }
   }, [checkApprovedStatus, oPoolAddress, reset, setAmountToSwap, sourceAssetProp, targetAssetProp])
 
@@ -863,7 +856,6 @@ export const Swap = ({
 
   return (
     <Styled.Container>
-      <div>oSourcePoolAddress: {JSON.stringify(oPoolAddress)}</div>
       <Styled.ContentContainer>
         <Styled.Header>
           {FP.pipe(
