@@ -14,7 +14,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import { sendPoolTx$ } from '../../ethereum'
 import { service as midgardService } from '../../midgard/service'
 import { ApiError, ErrorId } from '../../wallet/types'
-import { INITIAL_ASYM_DEPOSIT_STATE, INITIAL_SYM_DEPOSIT_STATE } from '../const'
+import { FeeOptionKeys, INITIAL_ASYM_DEPOSIT_STATE, INITIAL_SYM_DEPOSIT_STATE } from '../const'
 import {
   AsymDepositParams,
   AsymDepositState,
@@ -73,7 +73,7 @@ export const asymDeposit$ = ({ poolAddresses, asset, amount, memo }: AsymDeposit
         recipient: poolAddresses.address,
         amount,
         memo,
-        feeOptionKey: 'fastest'
+        feeOptionKey: FeeOptionKeys.DEPOSIT
       })
     }),
     liveData.chain((txHash) => {
@@ -183,7 +183,7 @@ export const symDeposit$ = ({ poolAddresses, asset, amounts, memos }: SymDeposit
         recipient: '',
         amount: amounts.rune,
         memo: memos.rune,
-        feeOptionKey: 'fastest'
+        feeOptionKey: FeeOptionKeys.DEPOSIT
       })
     }),
     // Add failures of RUNE deposit tx to state
@@ -207,7 +207,7 @@ export const symDeposit$ = ({ poolAddresses, asset, amounts, memos }: SymDeposit
         recipient: poolAddresses.address,
         amount: amounts.asset,
         memo: memos.asset,
-        feeOptionKey: 'fastest'
+        feeOptionKey: FeeOptionKeys.DEPOSIT
       })
     }),
     // Add failures of asset deposit tx to state

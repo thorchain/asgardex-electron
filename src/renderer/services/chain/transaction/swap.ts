@@ -10,7 +10,7 @@ import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
-import { INITIAL_SWAP_STATE } from '../const'
+import { INITIAL_SWAP_STATE, FeeOptionKeys } from '../const'
 import { SwapParams, SwapState, SwapState$ } from '../types'
 import { sendPoolTx$, poolTxStatusByChain$ } from './common'
 
@@ -59,7 +59,7 @@ export const swap$ = ({ poolAddresses, asset, amount, memo }: SwapParams): SwapS
         recipient: poolAddresses.address, // emtpy string for Native
         amount,
         memo,
-        feeOptionKey: 'fastest'
+        feeOptionKey: FeeOptionKeys.SWAP
       })
     }),
     liveData.chain((txHash) => {

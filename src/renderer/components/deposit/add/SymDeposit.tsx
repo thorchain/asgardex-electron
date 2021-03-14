@@ -58,7 +58,6 @@ export type Props = {
   assetBalance: O.Option<BaseAmount>
   runeBalance: O.Option<BaseAmount>
   chainAssetBalance: O.Option<BaseAmount>
-  /** Vault or router address of a pool */
   poolAddresses: O.Option<PoolAddresses>
   memo: O.Option<SymDepositMemo>
   priceAsset?: Asset

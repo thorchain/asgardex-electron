@@ -10,7 +10,7 @@ import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
-import { INITIAL_WITHDRAW_STATE } from '../const'
+import { INITIAL_WITHDRAW_STATE, FeeOptionKeys } from '../const'
 import { WithdrawParams, WithdrawState, WithdrawState$ } from '../types'
 import { sendTx$, poolTxStatusByChain$ } from './common'
 import { smallestAmountToSent } from './transaction.helper'
@@ -62,7 +62,7 @@ export const withdraw$ = ({ poolAddresses, asset, memo, network }: WithdrawParam
         recipient: isRune ? '' : poolAddresses.address,
         amount: smallestAmountToSent(asset.chain, network),
         memo,
-        feeOptionKey: 'fastest'
+        feeOptionKey: FeeOptionKeys.WITHDRAW
       })
     }),
     liveData.chain((txHash) => {

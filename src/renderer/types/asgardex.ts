@@ -14,15 +14,6 @@ export type AssetWithAmount = {
   amount: BaseAmount
 }
 
-// export enum TxTypes {
-//   DEPOSIT = 'deposit',
-//   SWAP = 'swap',
-//   WITHDRAW = 'withdraw',
-//   CREATE = 'create',
-//   UPGRADE = 'upgrade',
-//   TRANSFER = 'transfer'
-// }
-
 export type DepositType = 'sym' | 'asym'
 export type WithdrawType = 'sym' | 'asym'
 

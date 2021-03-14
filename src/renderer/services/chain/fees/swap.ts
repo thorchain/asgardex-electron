@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOptionKey } from '@xchainjs/xchain-client'
 import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
   BNBChain,
@@ -30,6 +29,7 @@ import { ethRouterABI } from '../../const'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
+import { FeeOptionKeys } from '../const'
 import { FeeLD, SwapFeeParams, SwapFeesHandler, SwapFeesParams } from '../types'
 
 const swapFeeByChain$ = ({
@@ -42,24 +42,23 @@ const swapFeeByChain$ = ({
 }: SwapFeeParams & { type: 'source' | 'target' }): FeeLD => {
   const router = type === 'source' ? FP.pipe(routerAddress, O.toUndefined) : undefined
   const chain = getChainAsset(asset.chain).chain
-  const FEE_OPTION_KEY: FeeOptionKey = 'fast'
   switch (chain) {
     case BNBChain:
       return FP.pipe(
         BNB.fees$(),
-        liveData.map((fees) => fees[FEE_OPTION_KEY])
+        liveData.map((fees) => fees[FeeOptionKeys.SWAP])
       )
 
     case THORChain:
       return FP.pipe(
         THOR.fees$(),
-        liveData.map((fees) => fees[FEE_OPTION_KEY])
+        liveData.map((fees) => fees[FeeOptionKeys.SWAP])
       )
 
     case BTCChain:
       return FP.pipe(
         BTC.feesWithRates$(memo),
-        liveData.map((btcFees) => btcFees.fees[FEE_OPTION_KEY])
+        liveData.map((btcFees) => btcFees.fees[FeeOptionKeys.SWAP])
       )
 
     case ETHChain: {
@@ -87,7 +86,7 @@ const swapFeeByChain$ = ({
                   ]
             })
           : ETH.outTxFee$(asset),
-        liveData.map((fees) => fees[FEE_OPTION_KEY])
+        liveData.map((fees) => fees[FeeOptionKeys.SWAP])
       )
     }
     case CosmosChain:
@@ -99,13 +98,13 @@ const swapFeeByChain$ = ({
     case BCHChain:
       return FP.pipe(
         BCH.feesWithRates$(memo),
-        liveData.map(({ fees }) => fees[FEE_OPTION_KEY])
+        liveData.map(({ fees }) => fees[FeeOptionKeys.SWAP])
       )
 
     case LTCChain:
       return FP.pipe(
         LTC.feesWithRates$(memo),
-        liveData.map(({ fees }) => fees[FEE_OPTION_KEY])
+        liveData.map(({ fees }) => fees[FeeOptionKeys.SWAP])
       )
   }
 }
