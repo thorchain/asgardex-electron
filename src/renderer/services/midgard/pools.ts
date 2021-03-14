@@ -28,7 +28,7 @@ import {
   PoolsService,
   PoolsStateLD,
   SelectedPricePoolAsset,
-  ThorchainEndpointsLD,
+  InboundAddressesLD,
   ValidatePoolLD,
   PoolAddresses$,
   PoolAddressesLD,
@@ -414,7 +414,7 @@ const createPoolsService = (
     RxOp.map(([poolsState, selectedPricePoolAsset]) => pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset))
   )
 
-  const poolAddresses$: ThorchainEndpointsLD = FP.pipe(
+  const inboundAddresses$: InboundAddressesLD = FP.pipe(
     midgardDefaultApi$,
     liveData.chain((api) => {
       return FP.pipe(
@@ -426,7 +426,7 @@ const createPoolsService = (
     })
   )
 
-  const selectedPoolAddresses$: PoolAddresses$ = Rx.combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
+  const selectedPoolAddresses$: PoolAddresses$ = Rx.combineLatest([inboundAddresses$, selectedPoolAsset$]).pipe(
     RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
       return FP.pipe(
         poolAddresses,
@@ -438,9 +438,9 @@ const createPoolsService = (
     })
   )
 
-  const poolAddressByChain$ = (chain: Chain): PoolAddressesLD =>
+  const poolAddressesByChain$ = (chain: Chain): PoolAddressesLD =>
     FP.pipe(
-      poolAddresses$,
+      inboundAddresses$,
       // TODO (@Veado) Will we ingore router for some cases (e.g. by withdrawing something from ETH vault not using router)=
       liveData.map((addresses) => getPoolAddressesByChain(addresses, chain)),
       RxOp.map((rd) =>
@@ -477,7 +477,7 @@ const createPoolsService = (
    * @param chain Chain of pool to validate
    */
   const validatePool$ = (poolAddresses: PoolAddresses, chain: Chain): ValidatePoolLD => {
-    return poolAddressByChain$(chain).pipe(
+    return poolAddressesByChain$(chain).pipe(
       liveData.chain((addresses) =>
         eqPoolAddresses.equals(addresses, poolAddresses)
           ? Rx.of(RD.success(true))
@@ -510,8 +510,9 @@ const createPoolsService = (
     reloadPools,
     reloadPendingPools,
     reloadAllPools,
-    poolAddresses$,
+    inboundAddresses$,
     selectedPoolAddresses$,
+    poolAddressesByChain$,
     poolDetail$,
     priceRatio$,
     availableAssets$,
