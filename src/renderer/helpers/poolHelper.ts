@@ -39,7 +39,7 @@ export const RUNE_PRICE_POOL: PricePool = {
  * Note: We don't have a "RUNE" pool in THORChain,
  * but do need such thing for handling pool txs
  */
-export const RUNE_POOL_ADDRESSES: PoolAddress = {
+export const RUNE_POOL_ADDRESS: PoolAddress = {
   chain: 'THOR',
   // For RuneNative a `MsgNativeTx` is used for pool txs,
   // no need for a pool address, just keep it empty

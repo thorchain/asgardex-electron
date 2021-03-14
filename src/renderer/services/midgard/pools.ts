@@ -14,6 +14,7 @@ import { isPricePoolAsset } from '../../helpers/assetHelper'
 import { isEnabledChain } from '../../helpers/chainHelper'
 import { eqAsset, eqOPoolAddresses } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { RUNE_POOL_ADDRESS } from '../../helpers/poolHelper'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
 import { DefaultApi, GetPoolsRequest, GetPoolsStatusEnum } from '../../types/generated/midgard/apis'
@@ -422,6 +423,8 @@ const createPoolsService = (
         return FP.pipe(
           api.getProxiedInboundAddresses(),
           RxOp.map(toPoolAddresses),
+          // Add "empty" rune "pool address" - we never had such pool, but do need it to calculate tx
+          RxOp.map(FP.flow(A.cons(RUNE_POOL_ADDRESS))),
           RxOp.map(RD.success),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
@@ -430,7 +433,7 @@ const createPoolsService = (
     )
 
   // Shared stream to avoid reloading same data by subscribing
-  const inboundAddressesShared$ = loadInboundAddresses$().pipe(RxOp.shareReplay(1))
+  const inboundAddressesShared$: PoolAddressesLD = loadInboundAddresses$().pipe(RxOp.shareReplay(1))
 
   const selectedPoolAddresses$: PoolAddress$ = Rx.combineLatest([inboundAddressesShared$, selectedPoolAsset$]).pipe(
     RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
