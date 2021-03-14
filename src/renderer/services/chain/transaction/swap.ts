@@ -11,7 +11,7 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
 import { INITIAL_SWAP_STATE, FeeOptionKeys } from '../const'
-import { SwapParams, SwapState, SwapState$ } from '../types'
+import { SwapTxParams, SwapState, SwapState$ } from '../types'
 import { sendPoolTx$, poolTxStatusByChain$ } from './common'
 
 const { pools: midgardPoolsService, validateNode$ } = midgardService
@@ -26,7 +26,7 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * @returns SwapState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
  *
  */
-export const swap$ = ({ poolAddresses, asset, amount, memo }: SwapParams): SwapState$ => {
+export const swap$ = ({ poolAddress: poolAddresses, asset, amount, memo }: SwapTxParams): SwapState$ => {
   // total of progress
   const total = O.some(100)
 

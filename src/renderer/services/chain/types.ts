@@ -20,8 +20,8 @@ export type FeesRD = RD.RemoteData<Error, Fees>
 export type FeesLD = LiveData<Error, Fees>
 
 type SwapFees = {
-  source: BaseAmount
-  target: BaseAmount
+  inTx: BaseAmount
+  outTx: BaseAmount
 }
 
 export type SwapFeesRD = RD.RemoteData<Error, SwapFees>
@@ -102,26 +102,36 @@ export type SwapState = {
 
 export type SwapState$ = Rx.Observable<SwapState>
 
-export type SwapParams = {
-  readonly poolAddresses: PoolAddress
+/**
+ * Parameters to send swap tx into (IN) a pool
+ */
+export type SwapTxParams = {
+  readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
 }
 
-export type SwapStateHandler = (p: SwapParams) => SwapState$
+export type SwapStateHandler = (p: SwapTxParams) => SwapState$
 
-export type SwapFeeParams = {
-  readonly recipient: Address
-  readonly routerAddress: O.Option<Address>
+/**
+ * Types of swap txs
+ **/
+
+export type SwapTxType = 'in' | ' out'
+
+export type SwapOutTx = {
   readonly asset: Asset
-  readonly amount: BaseAmount
-  readonly memo?: Memo
+  readonly memo: Memo
 }
-
+/**
+ * Fees to swap txs (IN/OUT)
+ */
 export type SwapFeesParams = {
-  readonly source: SwapFeeParams
-  readonly target: SwapFeeParams
+  /** Fee for pool tx sent into (IN) a pool */
+  readonly inTx: SwapTxParams
+  /** Fee for pool tx to sent OUT from a pool */
+  readonly outTx: SwapOutTx
 }
 
 export type SwapFeesHandler = (p: SwapFeesParams) => SwapFeesLD

@@ -10,7 +10,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { isEthAsset } from '../../helpers/assetHelper'
 import * as C from '../clients'
-import { FeesService, Client$, CallFeeParams } from './types'
+import { FeesService, Client$, PollInTxFeeParams } from './types'
 
 export const ETH_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('35609')
 export const ERC20_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('49610')
@@ -21,7 +21,7 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
   /**
    * Fees for sending txs into pool on Ethereum
    **/
-  const poolInTxFees$ = ({ address, abi, func, params }: CallFeeParams): C.FeesLD =>
+  const poolInTxFees$ = ({ address, abi, func, params }: PollInTxFeeParams): C.FeesLD =>
     client$.pipe(
       RxOp.switchMap((oClient) =>
         FP.pipe(

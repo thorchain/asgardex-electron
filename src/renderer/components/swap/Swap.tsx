@@ -38,7 +38,7 @@ import { swap } from '../../routes/swap'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import {
   SwapState,
-  SwapParams,
+  SwapTxParams,
   SwapStateHandler,
   SwapFeesHandler,
   LoadSwapFeesHandler,
@@ -181,11 +181,11 @@ export const Swap = ({
     _setAmountToSwap /* private - never set it directly, use setAmountToSwap() instead */
   ] = useState(baseAmount(0, sourceAssetAmount.decimal))
 
-  const oSwapParams: O.Option<SwapParams> = useMemo(() => {
+  const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
     return FP.pipe(
       sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
-      O.map(([{ source, target }, poolAddresses, address]) => ({
-        poolAddresses,
+      O.map(([{ source, target }, poolAddress, address]) => ({
+        poolAddress,
         asset: source,
         amount: amountToSwap,
         memo: getSwapMemo({ asset: target, address })
@@ -203,24 +203,16 @@ export const Swap = ({
   const oSwapFeesParams: O.Option<SwapFeesParams> = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oSwapParams, targetWalletAddress),
-        O.map(([params, targetRecipient]) => ({
-          source: {
-            memo: params.memo,
-            asset: sourceAssetProp,
-            amount: params.amount,
-            recipient: params.poolAddresses.address,
-            routerAddress: params.poolAddresses.router
-          },
-          target: {
+        sequenceTOption(oSwapParams),
+        O.map(([swapParams]) => ({
+          inTx: swapParams,
+          outTx: {
             asset: targetAssetProp,
-            amount: swapData.swapResult,
-            recipient: targetRecipient,
-            routerAddress: O.none
+            memo: swapParams.memo
           }
         }))
       ),
-    [oSwapParams, sourceAssetProp, swapData.swapResult, targetAssetProp, targetWalletAddress]
+    [oSwapParams, targetAssetProp]
   )
 
   // Flag for pending assets state
@@ -331,8 +323,8 @@ export const Swap = ({
       O.fold(
         // Ingnore fees and use balance of source chain asset for max.
         () => sourceChainAssetAmount,
-        ({ source: sourceFee }) => {
-          let max = sourceChainAssetAmount.amount().minus(sourceFee.amount())
+        ({ inTx }) => {
+          let max = sourceChainAssetAmount.amount().minus(inTx.amount())
           max = max.isGreaterThan(0) ? max : ZERO_BN
           return baseAmount(max, sourceChainAssetAmount.decimal)
         }
@@ -585,8 +577,8 @@ export const Swap = ({
 
     return FP.pipe(
       chainFeesRD,
-      RD.getOrElse(() => ({ source: ZERO_BASE_AMOUNT, target: ZERO_BASE_AMOUNT })),
-      ({ source }) => sourceChainAssetAmount.amount().minus(source.amount()).isNegative()
+      RD.getOrElse(() => ({ inTx: ZERO_BASE_AMOUNT, outTx: ZERO_BASE_AMOUNT })),
+      ({ inTx }) => sourceChainAssetAmount.amount().minus(inTx.amount()).isNegative()
     )
   }, [chainFeesRD, pendingSwitchAssets, sourceChainAssetAmount])
 
@@ -610,7 +602,7 @@ export const Swap = ({
               fee: formatAssetAmountCurrency({
                 asset: sourceChainAsset,
                 trimZeros: true,
-                amount: baseToAsset(fees.source)
+                amount: baseToAsset(fees.inTx)
               })
             }
           )}
@@ -623,7 +615,7 @@ export const Swap = ({
   const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
     const fees = FP.pipe(
       chainFeesRD,
-      RD.getOrElse(() => ({ source: ZERO_BASE_AMOUNT, target: ZERO_BASE_AMOUNT }))
+      RD.getOrElse(() => ({ inTx: ZERO_BASE_AMOUNT, outTx: ZERO_BASE_AMOUNT }))
     )
 
     return FP.pipe(
@@ -637,8 +629,8 @@ export const Swap = ({
         }
 
         return eqAsset.equals(chainAsset, asset)
-          ? fees.target
-          : getValueOfAsset1InAsset2(convertToBase8(fees.target), chainAssetPoolData, assetPoolData)
+          ? fees.outTx
+          : getValueOfAsset1InAsset2(convertToBase8(fees.outTx), chainAssetPoolData, assetPoolData)
       }),
       O.getOrElse(() => ZERO_BASE_AMOUNT)
     )
@@ -690,7 +682,7 @@ export const Swap = ({
       FP.pipe(
         sequenceTRD(chainFeesRD, RD.success(targetChainFeeAmountInTargetAsset)),
         RD.map(([chainFee, targetFee]) => [
-          { asset: getChainAsset(sourceAssetProp.chain), amount: chainFee.source },
+          { asset: getChainAsset(sourceAssetProp.chain), amount: chainFee.inTx },
           { asset: targetAssetProp, amount: targetFee }
         ])
       ),
