@@ -51,6 +51,6 @@ export type TransactionService = {
 } & C.TransactionService<SendTxParams>
 
 export type FeesService = {
-  callFees$: (params: CallFeeParams) => C.FeesLD
-  outTxFee$: (asset: Asset) => C.FeesLD
+  poolInTxFees$: (params: CallFeeParams) => C.FeesLD
+  poolOutTxFee$: (asset: Asset) => C.FeesLD
 } & C.FeesService<FeesParams>

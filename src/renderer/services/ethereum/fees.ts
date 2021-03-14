@@ -18,7 +18,10 @@ export const ERC20_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('49610')
 export const createFeesService = ({ client$, chain }: { client$: Client$; chain: Chain }): FeesService => {
   const common = C.createFeesService<FeesParams>({ client$, chain })
 
-  const callFees$ = ({ address, abi, func, params }: CallFeeParams): C.FeesLD =>
+  /**
+   * Fees for sending txs into pool on Ethereum
+   **/
+  const poolInTxFees$ = ({ address, abi, func, params }: CallFeeParams): C.FeesLD =>
     client$.pipe(
       RxOp.switchMap((oClient) =>
         FP.pipe(
@@ -45,7 +48,10 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
       )
     )
 
-  const outTxFee$ = (asset: Asset): C.FeesLD =>
+  /**
+   * Fees for sending txs out of a pool on Ethereum
+   **/
+  const poolOutTxFee$ = (asset: Asset): C.FeesLD =>
     client$.pipe(
       RxOp.switchMap((oClient) =>
         FP.pipe(
@@ -76,7 +82,7 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
 
   return {
     ...common,
-    callFees$,
-    outTxFee$
+    poolInTxFees$,
+    poolOutTxFee$
   }
 }

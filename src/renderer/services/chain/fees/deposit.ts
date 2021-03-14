@@ -103,7 +103,7 @@ const depositFeeByChain$ = ({
         O.fold(
           () => Rx.of(RD.initial),
           ({ recipient, router, amount, memo }) =>
-            ETH.callFees$({
+            ETH.poolInTxFees$({
               address: router,
               abi: ethRouterABI,
               func: 'deposit',
