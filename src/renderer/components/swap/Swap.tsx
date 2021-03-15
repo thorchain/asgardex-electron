@@ -233,10 +233,6 @@ export const Swap = ({
     () =>
       FP.pipe(
         oSwapFeesParams,
-        (x) => {
-          console.log('chainFeesRD', x)
-          return x
-        },
         O.map(chainFees$),
         O.getOrElse<SwapFeesLD>(() => Rx.of(RD.initial))
       ),
