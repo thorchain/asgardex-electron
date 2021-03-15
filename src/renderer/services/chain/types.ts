@@ -9,6 +9,8 @@ import { LiveData } from '../../helpers/rx/liveData'
 import { PoolAddress } from '../midgard/types'
 import { ApiError, TxHashRD } from '../wallet/types'
 
+export type TxTypes = 'DEPOSIT' | 'SWAP' | 'WITHDRAW' | 'UPGRADE'
+
 export type Chain$ = Rx.Observable<O.Option<Chain>>
 
 export type LoadFeesHandler = () => void

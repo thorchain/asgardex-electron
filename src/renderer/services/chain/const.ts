@@ -1,11 +1,17 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOptionKey } from '@xchainjs/xchain-client'
 
-import { AsymDepositState, SwapState, SymDepositState, WithdrawState, UpgradeRuneTxState, SendTxState } from './types'
+import {
+  AsymDepositState,
+  SwapState,
+  SymDepositState,
+  WithdrawState,
+  UpgradeRuneTxState,
+  SendTxState,
+  TxTypes
+} from './types'
 
 export const MAX_SWAP_STEPS = 3
-
-export type TxTypes = 'DEPOSIT' | 'SWAP' | 'WITHDRAW' | 'UPGRADE'
 
 /**
  * Default `FeeOptionKey`s for chain txs

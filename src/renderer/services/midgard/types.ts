@@ -7,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { AssetWithAmount, DepositType, TxTypes } from '../../types/asgardex'
+import { AssetWithAmount, DepositType } from '../../types/asgardex'
 import {
   Network as NetworkInfo,
   Constants as ThorchainConstants,
@@ -16,6 +16,7 @@ import {
   Health
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
+import { TxTypes } from '../chain/types'
 import { ApiError } from '../wallet/types'
 
 export type ThorchainLastblock = LastblockItem[]
