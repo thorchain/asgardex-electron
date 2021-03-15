@@ -1,5 +1,14 @@
 import { Balance } from '@xchainjs/xchain-client'
-import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount, bn, Chain } from '@xchainjs/xchain-util'
+import {
+  AssetBNB,
+  AssetBTC,
+  AssetETH,
+  AssetRuneERC20,
+  AssetRuneNative,
+  baseAmount,
+  bn,
+  Chain
+} from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -17,7 +26,8 @@ import {
   eqChain,
   eqOChain,
   eqPoolShares,
-  eqPoolShare
+  eqPoolShare,
+  eqONullableString
 } from './eq'
 
 describe('helpers/fp/eq', () => {
@@ -153,6 +163,22 @@ describe('helpers/fp/eq', () => {
     })
   })
 
+  describe('eqONullableString', () => {
+    it('is equal', () => {
+      expect(eqONullableString.equals(O.some('MEMO'), O.some('MEMO'))).toBeTruthy()
+      expect(eqONullableString.equals(O.none, O.none)).toBeTruthy()
+      expect(eqONullableString.equals(undefined, undefined)).toBeTruthy()
+    })
+    it('is not equal', () => {
+      expect(eqONullableString.equals(O.none, O.some('MEMO'))).toBeFalsy()
+      expect(eqONullableString.equals(O.some('MEMO'), O.none)).toBeFalsy()
+      expect(eqONullableString.equals(O.some('MEMO'), undefined)).toBeFalsy()
+      expect(eqONullableString.equals(undefined, O.some('MEMO'))).toBeFalsy()
+      expect(eqONullableString.equals(undefined, O.none)).toBeFalsy()
+      expect(eqONullableString.equals(O.none, undefined)).toBeFalsy()
+    })
+  })
+
   describe('eqDepositFeesParams', () => {
     it('is equal', () => {
       const a: SymDepositFeesParams = {
@@ -163,6 +189,27 @@ describe('helpers/fp/eq', () => {
         asset: AssetBNB
       }
       expect(eqBalance.equals(a, a)).toBeTruthy()
+    })
+    it('is not equal', () => {
+      const a: SymDepositFeesParams = {
+        memos: O.none,
+        recipient: O.none,
+        type: 'sym',
+        amount: baseAmount('1'),
+        asset: AssetETH
+      }
+      // b = same as a, but another amount
+      const b: SymDepositFeesParams = {
+        ...a,
+        asset: AssetRuneERC20
+      }
+      // c = same as a, but another asset
+      const c: SymDepositFeesParams = {
+        ...a,
+        asset: AssetRuneNative
+      }
+      expect(eqBalance.equals(a, b)).toBeFalsy()
+      expect(eqBalance.equals(a, c)).toBeFalsy()
     })
     it('is not equal', () => {
       const a: SymDepositFeesParams = {

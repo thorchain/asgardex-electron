@@ -22,6 +22,7 @@ import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { getEthTokenAddress, isChainAsset, isEthAsset, isEthTokenAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
+import { eqOAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { LiveData } from '../../../helpers/rx/liveData'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
@@ -105,6 +106,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     approveERC20Token$
   } = props
   const prevPoolRouter = useRef<O.Option<PoolRouter>>(O.none)
+  const prevAsset = useRef<O.Option<Asset>>(O.none)
 
   const intl = useIntl()
   const [runeAmountToDeposit, setRuneAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
@@ -139,18 +141,19 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oRuneBalance]
   )
 
-  const chainFees$ = useMemo(() => fees$, [fees$])
-
   const depositFeesParams: SymDepositFeesParams = useMemo(
     () => ({
       asset,
       amount: assetAmountToDeposit,
       memos: oMemo,
       recipient: oPoolAddress,
+      router: oPoolRouter,
       type: 'sym'
     }),
-    [asset, assetAmountToDeposit, oMemo, oPoolAddress]
+    [asset, assetAmountToDeposit, oMemo, oPoolRouter, oPoolAddress]
   )
+
+  const chainFees$ = useMemo(() => fees$, [fees$])
 
   const [depositFeesRD] = useObservableState<DepositFeesRD>(() => chainFees$(depositFeesParams), RD.initial)
 
@@ -336,9 +339,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     (asset: Asset) => {
       onChangeAsset(asset)
       changePercentHandler(0)
-      reloadFeesHandler()
     },
-    [changePercentHandler, onChangeAsset, reloadFeesHandler]
+    [changePercentHandler, onChangeAsset]
   )
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -677,6 +679,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [asset, isApprovedERC20Token$, needApprovement, oPoolRouter, subscribeIsApprovedState])
 
   useEffect(() => {
+    if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {
+      prevAsset.current = O.some(asset)
+      // Note: ETH/ERC20 fees won't be reloaded if router is None
+      // that's why we have another check for prevPoolRouter in next guard
+      reloadFeesHandler()
+    }
+
     if (prevPoolRouter.current !== oPoolRouter) {
       prevPoolRouter.current = oPoolRouter
       // reset approve state
@@ -685,8 +694,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
       resetIsApprovedState()
       // check approved status
       checkApprovedStatus()
+      // for ETH/ETH20
+      if (O.isSome(oPoolRouter)) reloadFeesHandler()
     }
-  }, [checkApprovedStatus, oPoolRouter, resetApproveState, resetIsApprovedState])
+  }, [asset, checkApprovedStatus, oPoolRouter, reloadFeesHandler, resetApproveState, resetIsApprovedState])
 
   return (
     <Styled.Container>

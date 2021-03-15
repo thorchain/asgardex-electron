@@ -7,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { DepositType } from '../../types/asgardex'
+import { AssetWithAmount, DepositType, TxTypes } from '../../types/asgardex'
 import {
   Network as NetworkInfo,
   Constants as ThorchainConstants,
@@ -27,19 +27,13 @@ export type PoolAssets = Asset[]
 export type PoolAssetsRD = RD.RemoteData<Error, PoolAssets>
 export type PoolAssetsLD = LiveData<Error, PoolAssets>
 
-export type AssetDetail = {
-  asset: string
-  dateCreated: number
-  priceRune: string
+export type PoolAssetDetail = {
+  asset: Asset
+  assetPrice: BigNumber
 }
 
-export type AssetDetails = AssetDetail[]
-export type AssetDetailsRD = RD.RemoteData<Error, AssetDetails>
-export type AssetDetailsLD = LiveData<Error, AssetDetails>
-
-export type AssetDetailMap = {
-  [key in Chain]: AssetDetail
-}
+export type PoolAssetDetails = PoolAssetDetail[]
+export type PoolAssetDetailsLD = LiveData<Error, PoolAssetDetails>
 
 export type PoolDetail = MidgardPoolDetail & {
   poolSlipAverage: string
@@ -57,7 +51,7 @@ export type PriceDataIndex = {
 }
 
 export type PoolsState = {
-  assetDetails: AssetDetails
+  assetDetails: PoolAssetDetails
   poolAssets: PoolAssets
   poolDetails: PoolDetails
   pricePools: O.Option<PricePools>
@@ -66,7 +60,7 @@ export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
 export type PoolsStateLD = LiveData<Error, PoolsState>
 
 export type PendingPoolsState = {
-  assetDetails: AssetDetails
+  assetDetails: PoolAssetDetails
   poolAssets: PoolAssets
   poolDetails: PoolDetails
 }
@@ -155,3 +149,40 @@ export type PoolSharesLD = LiveData<Error, PoolShares>
 export type ValidatePoolLD = LiveData<ApiError, boolean>
 
 export type ValidateNodeLD = LiveData<ApiError, boolean>
+
+export type Tx = {
+  // Sender address
+  address: string
+  values: AssetWithAmount[]
+  memo: string
+  /**
+   * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
+   */
+  txID: string
+}
+
+export type HistoryAction = {
+  date: Date
+  /**
+   * Inbound transactions related to the action
+   */
+  in: Tx[]
+  /**
+   * Outbound transactions related to the action
+   */
+  out: Tx[]
+  type: TxTypes
+  fees?: AssetWithAmount[]
+  slip?: number
+}
+
+export type HistoryActions = HistoryAction[]
+
+export type HistoryActionsPage = {
+  total: number
+  actions: HistoryActions
+}
+
+export type HistoryActionsPageRD = RD.RemoteData<ApiError, HistoryActionsPage>
+
+export type HistoryActionsPageLD = LiveData<ApiError, HistoryActionsPage>

@@ -51,6 +51,7 @@ export type AsymDepositFeesParams = {
   readonly amount: BaseAmount
   readonly memo: O.Option<Memo>
   readonly recipient?: O.Option<Address>
+  readonly router?: O.Option<Address>
   readonly type: 'asym'
 }
 
@@ -59,6 +60,7 @@ export type SymDepositFeesParams = {
   readonly amount: BaseAmount
   readonly memos: O.Option<SymDepositMemo>
   readonly recipient?: O.Option<Address>
+  readonly router?: O.Option<Address>
   readonly type: 'sym'
 }
 
