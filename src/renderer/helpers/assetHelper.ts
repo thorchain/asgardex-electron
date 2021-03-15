@@ -133,21 +133,33 @@ export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
 
 export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, getChainAsset(asset.chain))
 
-// Following helper was created to use midgard ERC20 assets properly
-// ERC20 assets from midgard are starting with 0X for their addresses rather than 0x
-// And 0X isn't recognized as valid address in ethers lib
-export const midgardAssetFromString = (s: string): O.Option<Asset> => {
-  const asset = assetFromString(s)
-  if (asset && isEthChain(asset.chain)) {
-    if (!isEthAsset(asset)) {
-      if (!isEthTokenAsset(asset)) return O.none
-      const tokenAddress = getTokenAddress(asset) || ''
-      const checksumAddress = FP.pipe(getEthChecksumAddress(tokenAddress), O.toUndefined)
-      return O.some({
-        ...asset,
-        symbol: `${asset.ticker}-${checksumAddress}`
-      })
-    }
-  }
-  return asset ? O.some(asset) : O.none
-}
+/**
+ * Update ETH token (ERC20) addresses to be based on checksum addresses
+ * Other assets then ETH tokens (ERC20) won't be updated and will be returned w/o any changes
+ */
+export const updateEthChecksumAddress = (asset: Asset): Asset =>
+  FP.pipe(
+    asset,
+    // ETH chain only
+    O.fromPredicate(({ chain }) => isEthChain(chain)),
+    // ETH asset only
+    O.chain(O.fromPredicate(FP.not(isEthAsset))),
+    // Get token address as checksum address
+    O.chain(FP.flow(getTokenAddress, O.fromNullable)),
+    // Update asset for using a checksum address
+    O.map((address) => ({ ...asset, symbol: `${asset.ticker}-${address}` })),
+    // Return same asset in case of no updates
+    O.getOrElse(() => asset)
+  )
+
+/**
+ * Helper to get Midgard assets properly
+ */
+export const midgardAssetFromString: (assetString: string) => O.Option<Asset> = FP.flow(
+  assetFromString,
+  O.fromNullable,
+  // FOR ETH tokens we need to update its addresses to have a valid check sum address
+  // Because ERC20 assets from Midgard might start with 0X rather than 0x
+  // And 0X isn't recognized as valid address in ethers lib
+  O.map(updateEthChecksumAddress)
+)

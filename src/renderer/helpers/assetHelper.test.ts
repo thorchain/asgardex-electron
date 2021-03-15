@@ -25,8 +25,10 @@ import {
   isRuneBnbAsset,
   isRuneNativeAsset,
   getEthAssetAddress,
-  midgardAssetFromString
+  midgardAssetFromString,
+  updateEthChecksumAddress
 } from './assetHelper'
+import { eqAsset } from './fp/eq'
 
 describe('helpers/assetHelper', () => {
   describe('isRuneBnbAsset', () => {
@@ -161,9 +163,23 @@ describe('helpers/assetHelper', () => {
       const asset = midgardAssetFromString('ETH.USDT-0x62e273709da575835c7f6aef4a31140ca5b1d190')
       expect(asset).toEqual(O.some({ ...AssetUSDTERC20, symbol: 'USDT-0x62e273709Da575835C7f6aEf4A31140Ca5b1D190' }))
     })
-    it('returns O.none for invalid asset', () => {
-      const asset = midgardAssetFromString('ETH.USDT-0x0x62e273709Da575835')
+    it('returns O.none for invalid asset strings', () => {
+      const asset = midgardAssetFromString('invalid')
       expect(asset).toEqual(O.none)
+    })
+  })
+
+  describe('updateEthChecksumAddress', () => {
+    it('does not update AssetETH ', () => {
+      const asset = updateEthChecksumAddress(AssetETH)
+      expect(eqAsset.equals(asset, AssetETH)).toBeTruthy()
+    })
+    it('updates invalid ERC20 USDT ', () => {
+      const asset = updateEthChecksumAddress({
+        ...AssetUSDTERC20,
+        symbol: 'USDT-0X62e273709da575835c7f6aef4a31140ca5b1d190'
+      })
+      expect(eqAsset.equals(asset, AssetUSDTERC20)).toBeTruthy()
     })
   })
 })
