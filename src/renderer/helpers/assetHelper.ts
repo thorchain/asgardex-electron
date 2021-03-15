@@ -136,16 +136,16 @@ export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, get
 // Following helper was created to use midgard ERC20 assets properly
 // ERC20 assets from midgard are starting with 0X for their addresses rather than 0x
 // And 0X isn't recognized as valid address in ethers lib
-export const midgardAssetFromString = (s: string): Asset | null => {
+export const midgardAssetFromString = (s: string): O.Option<Asset> => {
   const asset = assetFromString(s)
   if (asset && isEthChain(asset.chain) && isEthTokenAsset(asset)) {
-    const data: string[] = asset.symbol.split('-')
-    const checksumAddress = FP.pipe(getEthChecksumAddress(data[1]), O.toUndefined)
-    if (!checksumAddress) return null
-    return {
+    const tokenAddress = getTokenAddress(asset) || ''
+    const checksumAddress = FP.pipe(getEthChecksumAddress(tokenAddress), O.toUndefined)
+    if (!checksumAddress) return O.none
+    return O.some({
       ...asset,
-      symbol: `${data[0]}-${checksumAddress}`
-    }
+      symbol: `${asset.chain}.${asset.ticker}-${checksumAddress}`
+    })
   }
-  return asset
+  return asset ? O.some(asset) : O.none
 }

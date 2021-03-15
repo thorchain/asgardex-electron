@@ -83,7 +83,6 @@ const createPoolsService = (
               FP.pipe(
                 asset,
                 midgardAssetFromString,
-                O.fromNullable,
                 O.fold(
                   () => false,
                   ({ chain }) => isEnabledChain(chain)

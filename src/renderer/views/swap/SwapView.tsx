@@ -21,7 +21,7 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { isRuneNativeAsset, midgardAssetFromString } from '../../helpers/assetHelper'
+import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTRD } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
 import { DEFAULT_NETWORK } from '../../services/const'
@@ -58,8 +58,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const poolsState = useObservableState(poolsState$, initial)
 
-  const oSource = useMemo(() => O.fromNullable(midgardAssetFromString(source.toUpperCase())), [source])
-  const oTarget = useMemo(() => O.fromNullable(midgardAssetFromString(target.toUpperCase())), [target])
+  const oSource = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
+  const oTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
 
   useEffect(() => {
     setSelectedPoolAsset(oTarget)
@@ -147,7 +147,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
               const availableAssets = state.assetDetails
                 .filter((a) => a.asset !== undefined && !!a.asset)
                 .map((a) => ({
-                  asset: midgardAssetFromString(a.asset as string) as Asset,
+                  asset: assetFromString(a.asset as string) as Asset,
                   priceRune: bnOrZero(a.priceRune)
                 }))
 
