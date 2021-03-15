@@ -696,7 +696,7 @@ export const Swap = ({
     reset: resetApproveState,
     subscribe: subscribeApproveState
   } = useSubscriptionState<TxHashRD>(RD.initial)
-
+  console.log(111, oPoolAddress)
   const onApprove = () => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
       oPoolAddress,
