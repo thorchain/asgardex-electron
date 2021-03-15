@@ -53,9 +53,9 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
   } = useMidgardContext()
 
   const {
-    depositFees$,
+    asymDepositFee$,
     asymDeposit$,
-    reloadDepositFees,
+    reloadAsymDepositFee,
     asymDepositTxMemo$,
     getExplorerUrlByAsset$
   } = useChainContext()
@@ -139,7 +139,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
           assetPrice={ZERO_BN}
           assetBalance={O.none}
           chainAssetBalance={O.none}
-          fees$={depositFees$}
+          fees$={asymDepositFee$}
           reloadFees={FP.constVoid}
           priceAsset={selectedPricePoolAsset}
           disabled={true}
@@ -153,14 +153,14 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
       </>
     ),
     [
+      intl,
       validatePassword$,
       viewAssetTx,
       asset,
-      depositFees$,
+      asymDepositFee$,
       selectedPricePoolAsset,
       reloadBalances,
       asymDeposit$,
-      intl,
       network
     ]
   )
@@ -185,8 +185,8 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
               chainAssetBalance={chainAssetBalance}
               poolAddress={oPoolAddress}
               memo={memo}
-              fees$={depositFees$}
-              reloadFees={reloadDepositFees}
+              fees$={asymDepositFee$}
+              reloadFees={reloadAsymDepositFee}
               priceAsset={selectedPricePoolAsset}
               reloadBalances={reloadBalances}
               assets={poolAssets}

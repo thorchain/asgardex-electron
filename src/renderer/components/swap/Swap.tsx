@@ -201,8 +201,8 @@ export const Swap = ({
   const oSwapFeesParams: O.Option<SwapFeesParams> = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oSwapParams),
-        O.map(([swapParams]) => ({
+        oSwapParams,
+        O.map((swapParams) => ({
           inTx: swapParams,
           outTx: {
             asset: targetAssetProp,
@@ -233,6 +233,10 @@ export const Swap = ({
     () =>
       FP.pipe(
         oSwapFeesParams,
+        (x) => {
+          console.log('chainFeesRD', x)
+          return x
+        },
         O.map(chainFees$),
         O.getOrElse<SwapFeesLD>(() => Rx.of(RD.initial))
       ),

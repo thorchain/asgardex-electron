@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
   AssetAmount,
@@ -17,6 +16,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
 
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
@@ -28,10 +28,9 @@ import {
   Memo,
   AsymDepositState,
   AsymDepositStateHandler,
-  LoadDepositFeesHandler,
-  DepositFeesHandler,
-  AsymDepositFeesParams,
-  DepositFeesRD
+  DepositFeesRD,
+  DepositFeesLD,
+  AsymDepositParams
 } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
@@ -52,8 +51,8 @@ export type Props = {
   poolAddress: O.Option<PoolAddress>
   memo: O.Option<Memo>
   priceAsset?: Asset
-  reloadFees: LoadDepositFeesHandler
-  fees$: DepositFeesHandler
+  reloadFees: (p: AsymDepositParams) => void
+  fees$: (p: AsymDepositParams) => DepositFeesLD
   reloadBalances: FP.Lazy<void>
   viewAssetTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
@@ -68,7 +67,7 @@ export type Props = {
 /**
  * AsymDeposit component
  *
- * Note: It currently supports asym deposits for paired asset only (but not for RUNE)
+ * Note: This component is still under developlment - it won't work !!!
  */
 export const AsymDeposit: React.FC<Props> = (props) => {
   const {
@@ -113,26 +112,20 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     [oAssetBalance]
   )
 
+  // TODO: Implement it
+  const oDepositParams: O.Option<AsymDepositParams> = useMemo(() => O.none, [])
+
   const chainFees$ = useMemo(() => fees$, [fees$])
 
-  const depositFeesParams: AsymDepositFeesParams = useMemo(() => {
-    // TODO(@asgdx-team / @Veado) Handle ETH/ERC20 for using router address
-    const recipient: O.Option<Address> = FP.pipe(
-      oPoolAddress,
-      O.map(({ address }) => address)
-    )
-
-    return {
-      asset,
-      amount: assetAmountToDeposit,
-      memo: oMemo,
-      recipient,
-      type: 'asym'
-    }
-  }, [asset, assetAmountToDeposit, oMemo, oPoolAddress])
-
-  const [depositFeesRD] = useObservableState<DepositFeesRD>(() => chainFees$(depositFeesParams), RD.initial)
-
+  const [depositFeesRD] = useObservableState<DepositFeesRD>(
+    () =>
+      FP.pipe(
+        oDepositParams,
+        O.map(chainFees$),
+        O.getOrElse<DepositFeesLD>(() => Rx.of(RD.initial))
+      ),
+    RD.initial
+  )
   const oAssetChainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
@@ -382,8 +375,8 @@ export const AsymDeposit: React.FC<Props> = (props) => {
   const disabledForm = useMemo(() => isBalanceError || disabled, [disabled, isBalanceError])
 
   const reloadFeesHandler = useCallback(() => {
-    reloadFees(depositFeesParams)
-  }, [depositFeesParams, reloadFees])
+    FP.pipe(oDepositParams, O.map(reloadFees))
+  }, [oDepositParams, reloadFees])
 
   return (
     <Styled.Container>
