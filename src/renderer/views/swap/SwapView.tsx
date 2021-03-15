@@ -8,6 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory, useParams } from 'react-router-dom'
+import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
@@ -43,7 +44,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     setSelectedPoolAsset,
     selectedPoolAsset$
   } = midgardService
-  const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, assetAddress$, swap$ } = useChainContext()
+  const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, addressByChain$, swap$ } = useChainContext()
 
   const {
     balancesState$,
@@ -90,7 +91,20 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
   const selectedPoolAddress = useObservableState(selectedPoolAddress$, O.none)
-  const targetWalletAddress = useObservableState(assetAddress$, O.none)
+
+  const address$ = useMemo(
+    () =>
+      FP.pipe(
+        oTarget,
+        O.fold(
+          () => Rx.EMPTY,
+          ({ chain }) => addressByChain$(chain)
+        )
+      ),
+
+    [addressByChain$, oTarget]
+  )
+  const targetWalletAddress = useObservableState(address$, O.none)
 
   const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [
     source,
