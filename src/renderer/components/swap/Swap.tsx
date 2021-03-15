@@ -373,7 +373,7 @@ export const Swap = ({
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
 
   const assetSymbolsInWallet: O.Option<string[]> = useMemo(
-    () => FP.pipe(walletBalances, O.map(A.map(({ asset }) => asset.symbol))),
+    () => FP.pipe(walletBalances, O.map(A.map(({ asset }) => asset.symbol.toUpperCase()))),
     [walletBalances]
   )
 

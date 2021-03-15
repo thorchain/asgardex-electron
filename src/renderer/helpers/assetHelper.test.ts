@@ -12,7 +12,7 @@ import {
 import * as O from 'fp-ts/lib/Option'
 
 import { ERC20_TESTNET } from '../../shared/mock/assets'
-import { AssetBUSDBAF, AssetBUSDBD1 } from '../const'
+import { AssetBUSDBAF, AssetBUSDBD1, AssetUSDTERC20 } from '../const'
 import {
   isBchAsset,
   isBnbAsset,
@@ -24,7 +24,8 @@ import {
   isPricePoolAsset,
   isRuneBnbAsset,
   isRuneNativeAsset,
-  getEthAssetAddress
+  getEthAssetAddress,
+  midgardAssetFromString
 } from './assetHelper'
 
 describe('helpers/assetHelper', () => {
@@ -148,6 +149,21 @@ describe('helpers/assetHelper', () => {
     })
     it('returns false for BUSDB', () => {
       expect(isChainAsset(AssetBUSDBAF)).toBeFalsy()
+    })
+  })
+
+  describe('midgardAssetFromString', () => {
+    it('returns AssetETH for ETH asset string', () => {
+      const asset = midgardAssetFromString('ETH.ETH')
+      expect(asset).toEqual(O.some(AssetETH))
+    })
+    it('returns AssetUSDTERC20 for ERC20 USDT asset string ', () => {
+      const asset = midgardAssetFromString('ETH.USDT-0x62e273709da575835c7f6aef4a31140ca5b1d190')
+      expect(asset).toEqual(O.some({ ...AssetUSDTERC20, symbol: 'USDT-0x62e273709Da575835C7f6aEf4A31140Ca5b1D190' }))
+    })
+    it('returns O.none for invalid asset', () => {
+      const asset = midgardAssetFromString('ETH.USDT-0x0x62e273709Da575835')
+      expect(asset).toEqual(O.none)
     })
   })
 })

@@ -138,13 +138,13 @@ export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, get
 // And 0X isn't recognized as valid address in ethers lib
 export const midgardAssetFromString = (s: string): O.Option<Asset> => {
   const asset = assetFromString(s)
-  if (asset && isEthChain(asset.chain) && isEthTokenAsset(asset)) {
+  if (asset && isEthChain(asset.chain)) {
+    if (!isEthAsset(asset) && !isEthTokenAsset(asset)) return O.none
     const tokenAddress = getTokenAddress(asset) || ''
     const checksumAddress = FP.pipe(getEthChecksumAddress(tokenAddress), O.toUndefined)
-    if (!checksumAddress) return O.none
     return O.some({
       ...asset,
-      symbol: `${asset.chain}.${asset.ticker}-${checksumAddress}`
+      symbol: `${asset.ticker}-${checksumAddress}`
     })
   }
   return asset ? O.some(asset) : O.none
