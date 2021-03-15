@@ -10,13 +10,14 @@ import * as Ord from 'fp-ts/lib/Ord'
 
 import { Network } from '../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
-import { PoolDetail, PoolDetails } from '../services/midgard/types'
+import { PoolAddress, PoolDetail, PoolDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
 import { isRuneNativeAsset } from './assetHelper'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
+import { emptyString } from './stringHelper'
 
 export const sortByDepth = (a: PoolTableRowData, b: PoolTableRowData) =>
   ordBaseAmount.compare(a.depthPrice, b.depthPrice)
@@ -24,13 +25,26 @@ export const sortByDepth = (a: PoolTableRowData, b: PoolTableRowData) =>
 const ordByDepth = Ord.ord.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRowData) => depthPrice)
 
 /**
- * Helper to create a RUNE based `PricePool`
- *
- * Note: We don't have a "RUNE" pool in THORChain, but do need such thing for pricing
+ * RUNE based `PricePool`
+ * Note: We don't have a "RUNE" pool in THORChain,
+ * but do need such thing for pricing
  */
 export const RUNE_PRICE_POOL: PricePool = {
   asset: AssetRuneNative,
   poolData: { assetBalance: ONE_RUNE_BASE_AMOUNT, runeBalance: ONE_RUNE_BASE_AMOUNT }
+}
+
+/**
+ * RUNE based `PoolAddresses`
+ * Note: We don't have a "RUNE" pool in THORChain,
+ * but do need such thing for handling pool txs
+ */
+export const RUNE_POOL_ADDRESS: PoolAddress = {
+  chain: 'THOR',
+  // For RuneNative a `MsgNativeTx` is used for pool txs,
+  // no need for a pool address, just keep it empty
+  address: emptyString,
+  router: O.none
 }
 
 export const getPoolTableRowsData = ({

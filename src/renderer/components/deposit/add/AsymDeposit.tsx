@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
+import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
   AssetAmount,
@@ -20,7 +21,7 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { isChainAsset } from '../../../helpers/assetHelper'
-import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import {
@@ -114,16 +115,21 @@ export const AsymDeposit: React.FC<Props> = (props) => {
 
   const chainFees$ = useMemo(() => fees$, [fees$])
 
-  const depositFeesParams: AsymDepositFeesParams = useMemo(
-    () => ({
+  const depositFeesParams: AsymDepositFeesParams = useMemo(() => {
+    // TODO(@asgdx-team / @Veado) Handle ETH/ERC20 for using router address
+    const recipient: O.Option<Address> = FP.pipe(
+      oPoolAddress,
+      O.map(({ address }) => address)
+    )
+
+    return {
       asset,
       amount: assetAmountToDeposit,
       memo: oMemo,
-      recipient: oPoolAddress,
+      recipient,
       type: 'asym'
-    }),
-    [asset, assetAmountToDeposit, oMemo, oPoolAddress]
-  )
+    }
+  }, [asset, assetAmountToDeposit, oMemo, oPoolAddress])
 
   const [depositFeesRD] = useObservableState<DepositFeesRD>(() => chainFees$(depositFeesParams), RD.initial)
 
@@ -344,16 +350,16 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     // close private modal
     setShowPasswordModal(false)
 
-    // set start time
-    setDepositStartTime(Date.now())
-
     FP.pipe(
-      oMemo,
-      O.map((memo) => {
+      sequenceSOption({ memo: oMemo, poolAddress: oPoolAddress }),
+      O.map(({ memo, poolAddress }) => {
+        // set start time
+        setDepositStartTime(Date.now())
+
         subscribeDepositState(
           deposit$({
             asset,
-            poolAddress: oPoolAddress,
+            poolAddress,
             amount: assetAmountToDeposit,
             memo
           })

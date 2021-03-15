@@ -26,7 +26,7 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { getEthTokenAddress, isEthAsset, isEthTokenAsset, isRuneNativeAsset } from '../../helpers/assetHelper'
+import { getEthTokenAddress, isEthAsset, isEthTokenAsset } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
@@ -37,7 +37,7 @@ import { swap } from '../../routes/swap'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import {
   SwapState,
-  SwapParams,
+  SwapTxParams,
   SwapStateHandler,
   SwapFeesHandler,
   LoadSwapFeesHandler,
@@ -46,7 +46,7 @@ import {
   SwapFeesLD
 } from '../../services/chain/types'
 import { ApproveParams, IsApprovedRD } from '../../services/ethereum/types'
-import { PoolAssetDetail, PoolAssetDetails } from '../../services/midgard/types'
+import { PoolAssetDetail, PoolAssetDetails, PoolAddress } from '../../services/midgard/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import {
@@ -75,7 +75,7 @@ export type SwapProps = {
   availableAssets: PoolAssetDetails
   sourceAsset: Asset
   targetAsset: Asset
-  sourcePoolAddress: O.Option<string>
+  poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
   poolDetails: PoolDetails
   walletBalances: O.Option<NonEmptyWalletBalances>
@@ -87,7 +87,6 @@ export type SwapProps = {
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
   network: Network
-  sourcePoolRouter: O.Option<Address>
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
 }
@@ -97,7 +96,7 @@ export const Swap = ({
   availableAssets,
   sourceAsset: sourceAssetProp,
   targetAsset: targetAssetProp,
-  sourcePoolAddress: oSourcePoolAddress,
+  poolAddress: oPoolAddress,
   swap$,
   poolDetails,
   walletBalances,
@@ -109,7 +108,6 @@ export const Swap = ({
   targetWalletAddress,
   onChangePath,
   network,
-  sourcePoolRouter,
   isApprovedERC20Token$,
   approveERC20Token$
 }: SwapProps) => {
@@ -117,7 +115,6 @@ export const Swap = ({
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
-  const prevSourcePoolRouter = useRef<O.Option<Address>>(O.none)
 
   // convert to hash map here instead of using getPoolDetail
   const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [
@@ -182,20 +179,17 @@ export const Swap = ({
     _setAmountToSwap /* private - never set it directly, use setAmountToSwap() instead */
   ] = useState(baseAmount(0, sourceAssetAmount.decimal))
 
-  const oSwapParams: O.Option<SwapParams> = useMemo(() => {
-    // For RuneNative a `MsgNativeTx` is sent w/o the need for a pool address
-    const oPoolAddress = isRuneNativeAsset(sourceAssetProp) ? O.some('') : oSourcePoolAddress
+  const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
     return FP.pipe(
       sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
       O.map(([{ source, target }, poolAddress, address]) => ({
-        routerAddress: sourcePoolRouter,
         poolAddress,
         asset: source,
         amount: amountToSwap,
         memo: getSwapMemo({ asset: target, address })
       }))
     )
-  }, [amountToSwap, assetsToSwap, oSourcePoolAddress, sourcePoolRouter, sourceAssetProp, targetWalletAddress])
+  }, [amountToSwap, assetsToSwap, oPoolAddress, targetWalletAddress])
 
   const swapData = useMemo(() => getSwapData(amountToSwap, sourceAsset, targetAsset, poolData), [
     amountToSwap,
@@ -207,21 +201,16 @@ export const Swap = ({
   const oSwapFeesParams: O.Option<SwapFeesParams> = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oSwapParams, targetWalletAddress),
-        O.map(([params, targetRecipient]) => ({
-          source: {
-            ...params,
-            recipient: params.poolAddress
-          },
-          target: {
+        sequenceTOption(oSwapParams),
+        O.map(([swapParams]) => ({
+          inTx: swapParams,
+          outTx: {
             asset: targetAssetProp,
-            amount: swapData.swapResult,
-            recipient: targetRecipient,
-            routerAddress: O.some('')
+            memo: swapParams.memo
           }
         }))
       ),
-    [oSwapParams, swapData.swapResult, targetAssetProp, targetWalletAddress]
+    [oSwapParams, targetAssetProp]
   )
 
   // Flag for pending assets state
@@ -331,8 +320,8 @@ export const Swap = ({
       O.fold(
         // Ingnore fees and use balance of source chain asset for max.
         () => sourceChainAssetAmount,
-        ({ source: sourceFee }) => {
-          let max = sourceChainAssetAmount.amount().minus(sourceFee.amount())
+        ({ inTx }) => {
+          let max = sourceChainAssetAmount.amount().minus(inTx.amount())
           max = max.isGreaterThan(0) ? max : ZERO_BN
           return baseAmount(max, sourceChainAssetAmount.decimal)
         }
@@ -585,8 +574,8 @@ export const Swap = ({
 
     return FP.pipe(
       chainFeesRD,
-      RD.getOrElse(() => ({ source: ZERO_BASE_AMOUNT, target: ZERO_BASE_AMOUNT })),
-      ({ source }) => sourceChainAssetAmount.amount().minus(source.amount()).isNegative()
+      RD.getOrElse(() => ({ inTx: ZERO_BASE_AMOUNT, outTx: ZERO_BASE_AMOUNT })),
+      ({ inTx }) => sourceChainAssetAmount.amount().minus(inTx.amount()).isNegative()
     )
   }, [chainFeesRD, pendingSwitchAssets, sourceChainAssetAmount])
 
@@ -610,7 +599,7 @@ export const Swap = ({
               fee: formatAssetAmountCurrency({
                 asset: sourceChainAsset,
                 trimZeros: true,
-                amount: baseToAsset(fees.source)
+                amount: baseToAsset(fees.inTx)
               })
             }
           )}
@@ -623,7 +612,7 @@ export const Swap = ({
   const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
     const fees = FP.pipe(
       chainFeesRD,
-      RD.getOrElse(() => ({ source: ZERO_BASE_AMOUNT, target: ZERO_BASE_AMOUNT }))
+      RD.getOrElse(() => ({ inTx: ZERO_BASE_AMOUNT, outTx: ZERO_BASE_AMOUNT }))
     )
 
     return FP.pipe(
@@ -637,8 +626,8 @@ export const Swap = ({
         }
 
         return eqAsset.equals(chainAsset, asset)
-          ? fees.target
-          : getValueOfAsset1InAsset2(convertToBase8(fees.target), chainAssetPoolData, assetPoolData)
+          ? fees.outTx
+          : getValueOfAsset1InAsset2(convertToBase8(fees.outTx), chainAssetPoolData, assetPoolData)
       }),
       O.getOrElse(() => ZERO_BASE_AMOUNT)
     )
@@ -690,7 +679,7 @@ export const Swap = ({
       FP.pipe(
         sequenceTRD(chainFeesRD, RD.success(targetChainFeeAmountInTargetAsset)),
         RD.map(([chainFee, targetFee]) => [
-          { asset: getChainAsset(sourceAssetProp.chain), amount: chainFee.source },
+          { asset: getChainAsset(sourceAssetProp.chain), amount: chainFee.inTx },
           { asset: targetAssetProp, amount: targetFee }
         ])
       ),
@@ -709,8 +698,12 @@ export const Swap = ({
   } = useSubscriptionState<TxHashRD>(RD.initial)
 
   const onApprove = () => {
+    const oRouterAddress: O.Option<Address> = FP.pipe(
+      oPoolAddress,
+      O.chain(({ router }) => router)
+    )
     FP.pipe(
-      sequenceTOption(sourcePoolRouter, getEthTokenAddress(sourceAssetProp)),
+      sequenceTOption(oRouterAddress, getEthTokenAddress(sourceAssetProp)),
       O.map(([routerAddress, tokenAddress]) =>
         subscribeApproveState(
           approveERC20Token$({
@@ -754,23 +747,30 @@ export const Swap = ({
     return isEthTokenAsset(sourceAssetProp)
   }, [keystore, sourceAssetProp, sourceChainAsset.chain])
 
-  const isApproved = useMemo(
-    () =>
-      !needApprovement ||
+  const isApproved = useMemo(() => {
+    if (!needApprovement) return true
+    // ignore initial + loading states for `isApprovedState`
+    if (RD.isInitial(isApprovedState) || RD.isPending(isApprovedState)) return true
+
+    return (
       RD.isSuccess(approveState) ||
       FP.pipe(
         isApprovedState,
         RD.getOrElse(() => false)
-      ),
-    [approveState, isApprovedState, needApprovement]
-  )
+      )
+    )
+  }, [approveState, isApprovedState, needApprovement])
 
   const checkApprovedStatus = useCallback(() => {
+    const oRouterAddress: O.Option<Address> = FP.pipe(
+      oPoolAddress,
+      O.chain(({ router }) => router)
+    )
     // check approve status
     FP.pipe(
       sequenceTOption(
         O.fromPredicate((v) => !!v)(needApprovement), // `None` if needApprovement is `false`, no request then
-        sourcePoolRouter,
+        oRouterAddress,
         getEthTokenAddress(sourceAssetProp)
       ),
       O.map(([_, routerAddress, tokenAddress]) =>
@@ -782,7 +782,7 @@ export const Swap = ({
         )
       )
     )
-  }, [isApprovedERC20Token$, needApprovement, sourceAssetProp, sourcePoolRouter, subscribeIsApprovedState])
+  }, [isApprovedERC20Token$, needApprovement, oPoolAddress, sourceAssetProp, subscribeIsApprovedState])
 
   const reset = useCallback(() => {
     // reset swap state
@@ -800,21 +800,17 @@ export const Swap = ({
   }, [checkApprovedStatus, reloadFeesHandler, resetApproveState, resetIsApprovedState, resetSwapState, setAmountToSwap])
 
   useEffect(() => {
-    // reset data whenever
+    // reset data whenever source asset has been changed
     if (!eqOAsset.equals(prevSourceAsset.current, O.some(sourceAssetProp))) {
       prevSourceAsset.current = O.some(sourceAssetProp)
       reset()
     }
-    // reset data whenever
+    // reset data whenever target asset has been changed
     if (!eqOAsset.equals(prevTargetAsset.current, O.some(targetAssetProp))) {
       prevTargetAsset.current = O.some(targetAssetProp)
       reset()
     }
-    if (prevSourcePoolRouter.current !== sourcePoolRouter) {
-      prevSourcePoolRouter.current = sourcePoolRouter
-      checkApprovedStatus()
-    }
-  }, [checkApprovedStatus, reset, setAmountToSwap, sourceAssetProp, sourcePoolRouter, targetAssetProp])
+  }, [checkApprovedStatus, oPoolAddress, reset, setAmountToSwap, sourceAssetProp, targetAssetProp])
 
   // Reload fees whenever swap params has been changed
   useEffect(() => {

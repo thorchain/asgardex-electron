@@ -34,6 +34,7 @@ import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import { selectedPoolChain$ } from '../../midgard/common'
 import * as THOR from '../../thorchain'
+import { FeeOptionKeys } from '../const'
 import { FeeLD, LoadFeesHandler, DepositFeesParams, DepositFeesLD, Memo } from '../types'
 
 const reloadFeesByChain = (chain: Chain) => {
@@ -88,13 +89,13 @@ const depositFeeByChain$ = ({
         memo,
         O.fold(
           () => Rx.of(RD.initial),
-          (memo) => BTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
+          (memo) => BTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees[FeeOptionKeys.DEPOSIT]))
         )
       )
     }
 
     case THORChain: {
-      return THOR.fees$().pipe(liveData.map(({ fast }) => fast))
+      return THOR.fees$().pipe(liveData.map((fees) => fees[FeeOptionKeys.DEPOSIT]))
     }
     case ETHChain: {
       return FP.pipe(
@@ -102,7 +103,7 @@ const depositFeeByChain$ = ({
         O.fold(
           () => Rx.of(RD.initial),
           ({ recipient, router, amount, memo }) =>
-            ETH.callFees$({
+            ETH.poolInTxFees$({
               address: router,
               abi: ethRouterABI,
               func: 'deposit',
@@ -122,7 +123,7 @@ const depositFeeByChain$ = ({
                     amount.amount().toFixed(),
                     memo
                   ]
-            }).pipe(liveData.map((fees) => fees.fast))
+            }).pipe(liveData.map((fees) => fees[FeeOptionKeys.DEPOSIT]))
         )
       )
     }
@@ -137,7 +138,7 @@ const depositFeeByChain$ = ({
         memo,
         O.fold(
           () => Rx.of(RD.initial),
-          (memo) => BCH.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
+          (memo) => BCH.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees[FeeOptionKeys.DEPOSIT]))
         )
       )
     }
@@ -148,7 +149,7 @@ const depositFeeByChain$ = ({
         memo,
         O.fold(
           () => Rx.of(RD.initial),
-          (memo) => LTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
+          (memo) => LTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees[FeeOptionKeys.DEPOSIT]))
         )
       )
     }

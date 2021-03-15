@@ -1,18 +1,18 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { getEthAssetAddress, isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
-import { TxTypes } from '../../../types/asgardex'
 import { service as midgardService } from '../../midgard/service'
-import { ErrorId } from '../../wallet/types'
-import { INITIAL_WITHDRAW_STATE } from '../const'
+import { INITIAL_WITHDRAW_STATE, FeeOptionKeys } from '../const'
 import { WithdrawParams, WithdrawState, WithdrawState$ } from '../types'
-import { txStatusByChain$, sendTx$ } from './common'
+import { sendTx$, poolTxStatusByChain$ } from './common'
 import { smallestAmountToSent } from './transaction.helper'
 
 const { pools: midgardPoolsService, validateNode$ } = midgardService
@@ -27,7 +27,7 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * @returns WithdrawState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModal`
  *
  */
-export const withdraw$ = ({ poolAddress: oPoolAddress, asset, memo, network }: WithdrawParams): WithdrawState$ => {
+export const withdraw$ = ({ poolAddress, asset, memo, network }: WithdrawParams): WithdrawState$ => {
   // total of progress
   const total = O.some(100)
 
@@ -43,67 +43,51 @@ export const withdraw$ = ({ poolAddress: oPoolAddress, asset, memo, network }: W
 
   // All requests will be done in a sequence
   // to update `SymWithdrawState` step by step
-  const requests$ = FP.pipe(
-    oPoolAddress,
-    // For RuneNative we send `MsgNativeTx` w/o need for a pool address address,
-    // so we can leave it empty
-    O.alt(() => (isRune ? O.some('') : O.none)),
-    O.fold(
-      // invalid pool address will fail
-      () => {
-        // TODO(@Veado) Add i18n
-        setState({ ...getState(), withdraw: RD.failure({ errorId: ErrorId.SEND_TX, msg: 'invalid pool address' }) })
-        return Rx.EMPTY
-      },
-      // continue with a pool address (even an empty one for Thorchain)
-      (poolAddress) =>
-        Rx.of(poolAddress).pipe(
-          // 1. validate pool address or node
-          RxOp.switchMap((poolAddress) =>
-            Rx.iif(
-              () => isRuneNativeAsset(asset),
-              // We don't have a RUNE pool, so we just validate current connected node
-              validateNode$(),
-              // in other case we have to validate pool address
-              midgardPoolsService.validatePool$(poolAddress, asset.chain)
-            )
-          ),
-          // 2. send RUNE witdraw txs
-          liveData.chain((_) => {
-            setState({ ...getState(), step: 2, withdraw: RD.progress({ loaded: 50, total }) })
-            return sendTx$({
-              asset,
-              recipient: isRune ? '' : poolAddress,
-              amount: smallestAmountToSent(asset.chain, network),
-              memo,
-              txType: TxTypes.WITHDRAW,
-              feeOptionKey: 'fastest'
-            })
-          }),
-          liveData.chain((txHash) => {
-            // Update state
-            setState({
-              ...getState(),
-              step: 3,
-              withdraw: RD.progress({ loaded: 75, total }),
-              withdrawTx: RD.success(txHash)
-            })
-            // 3. check tx finality by polling its tx data
-            return txStatusByChain$(txHash, asset.chain)
-          }),
-          liveData.map((_) => setState({ ...getState(), withdraw: RD.success(true) })),
-          // Add failures to state
-          liveData.mapLeft((apiError) => {
-            setState({ ...getState(), withdraw: RD.failure(apiError) })
-            return apiError
-          }),
-          // handle errors
-          RxOp.catchError((error) => {
-            setState({ ...getState(), withdraw: RD.failure(error) })
-            return Rx.EMPTY
-          })
-        )
-    )
+  const requests$ = Rx.of(poolAddress).pipe(
+    // 1. validate pool address or node
+    RxOp.switchMap((poolAddresses) =>
+      Rx.iif(
+        () => isRuneNativeAsset(asset),
+        // We don't have a RUNE pool, so we just validate current connected node
+        validateNode$(),
+        // in other case we have to validate pool address
+        midgardPoolsService.validatePool$(poolAddresses, asset.chain)
+      )
+    ),
+    // 2. send RUNE withdraw txs
+    liveData.chain((_) => {
+      setState({ ...getState(), step: 2, withdraw: RD.progress({ loaded: 50, total }) })
+      return sendTx$({
+        asset,
+        recipient: isRune ? '' : poolAddress.address,
+        amount: smallestAmountToSent(asset.chain, network),
+        memo,
+        feeOptionKey: FeeOptionKeys.WITHDRAW
+      })
+    }),
+    liveData.chain((txHash) => {
+      // Update state
+      setState({
+        ...getState(),
+        step: 3,
+        withdraw: RD.progress({ loaded: 75, total }),
+        withdrawTx: RD.success(txHash)
+      })
+      // 3. check tx finality by polling its tx data
+      const assetAddress: O.Option<Address> = isEthChain(asset.chain) ? getEthAssetAddress(asset) : O.none
+      return poolTxStatusByChain$({ txHash, chain: asset.chain, assetAddress })
+    }),
+    liveData.map((_) => setState({ ...getState(), withdraw: RD.success(true) })),
+    // Add failures to state
+    liveData.mapLeft((apiError) => {
+      setState({ ...getState(), withdraw: RD.failure(apiError) })
+      return apiError
+    }),
+    // handle errors
+    RxOp.catchError((error) => {
+      setState({ ...getState(), withdraw: RD.failure(error) })
+      return Rx.EMPTY
+    })
   )
 
   // We do need to fake progress in last step

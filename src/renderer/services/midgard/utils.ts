@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { assetFromString, bnOrZero, baseAmount, Asset, assetToString, Chain } from '@xchainjs/xchain-util'
+import { assetFromString, bnOrZero, baseAmount, Asset, assetToString, Chain, isChain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -9,21 +9,22 @@ import * as O from 'fp-ts/lib/Option'
 import { CURRENCY_WHEIGHTS } from '../../const'
 import { isBUSDAsset } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
-import { eqAsset } from '../../helpers/fp/eq'
+import { eqAsset, eqChain } from '../../helpers/fp/eq'
+import { optionFromNullableString } from '../../helpers/fp/from'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { InboundAddressesItem as ThorchainEndpoint } from '../../types/generated/midgard'
+import { InboundAddressesItem } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import {
   PoolAssetDetails as PoolAssetsDetail,
   PoolDetails,
   PoolsStateRD,
   SelectedPricePoolAsset,
-  PoolAddress,
   PoolAssetDetail,
   PoolDetail,
   PoolShares,
   PoolShare,
-  PoolRouter
+  PoolAddress,
+  PoolAddresses
 } from './types'
 
 export const getAssetDetail = (assets: PoolAssetsDetail, ticker: string): O.Option<PoolAssetDetail> =>
@@ -136,26 +137,27 @@ export const filterPoolAssets = (poolAssets: string[]) => {
   return poolAssets.filter((poolAsset) => !isMiniToken(assetFromString(poolAsset) || { symbol: '' }))
 }
 
-export const getPoolAddressByChain = (
-  endpoints: Pick<ThorchainEndpoint, 'chain' | 'address'>[],
-  chain: Chain
-): O.Option<PoolAddress> =>
+export const getPoolAddressesByChain = (addresses: PoolAddresses, chain: Chain): O.Option<PoolAddress> =>
   FP.pipe(
-    endpoints,
-    A.findFirst((endpoint) => endpoint.chain === chain),
-    O.map(({ address }) => address),
-    O.chain(O.fromNullable)
+    addresses,
+    A.findFirst((address) => eqChain.equals(address.chain, chain))
   )
 
-export const getPoolRouterByChain = (
-  endpoints: Pick<ThorchainEndpoint, 'chain' | 'router'>[],
-  chain: Chain
-): O.Option<PoolRouter> =>
+export const toPoolAddresses = (
+  addresses: Pick<InboundAddressesItem, 'chain' | 'address' | 'router'>[]
+): PoolAddresses =>
   FP.pipe(
-    endpoints,
-    A.findFirst((endpoint) => endpoint.chain === chain),
-    O.map(({ router }) => router),
-    O.chain(O.fromNullable)
+    addresses,
+    A.filterMap(({ address, router, chain }) =>
+      // filter out invalid chains
+      isChain(chain)
+        ? O.some({
+            chain,
+            address,
+            router: optionFromNullableString(router)
+          })
+        : O.none
+    )
   )
 
 /**

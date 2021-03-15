@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -8,11 +9,10 @@ import { getEthAssetAddress, isRuneNativeAsset } from '../../../helpers/assetHel
 import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
-import { TxTypes } from '../../../types/asgardex'
 import { service as midgardService } from '../../midgard/service'
-import { INITIAL_SWAP_STATE } from '../const'
-import { SwapParams, SwapState, SwapState$ } from '../types'
-import { sendTx$, txStatusByChain$ } from './common'
+import { INITIAL_SWAP_STATE, FeeOptionKeys } from '../const'
+import { SwapTxParams, SwapState, SwapState$ } from '../types'
+import { sendPoolTx$, poolTxStatusByChain$ } from './common'
 
 const { pools: midgardPoolsService, validateNode$ } = midgardService
 
@@ -26,7 +26,7 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * @returns SwapState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
  *
  */
-export const swap$ = ({ routerAddress, poolAddress, asset, amount, memo }: SwapParams): SwapState$ => {
+export const swap$ = ({ poolAddress: poolAddresses, asset, amount, memo }: SwapTxParams): SwapState$ => {
   // total of progress
   const total = O.some(100)
 
@@ -39,37 +39,35 @@ export const swap$ = ({ routerAddress, poolAddress, asset, amount, memo }: SwapP
 
   // All requests will be done in a sequence
   // and `SwapState` will be updated step by step
-  const requests$ = Rx.of(poolAddress).pipe(
+  const requests$ = Rx.of(poolAddresses).pipe(
     // 1. validate pool address or node (for `RuneNative` only)
-    RxOp.switchMap((poolAddress) =>
+    RxOp.switchMap((poolAddresses) =>
       Rx.iif(
         () => isRuneNativeAsset(asset),
         // We don't have a RUNE pool, so we just validate current connected node
         validateNode$(),
         // in other case we have to validate pool address
-        midgardPoolsService.validatePool$(poolAddress, asset.chain)
+        midgardPoolsService.validatePool$(poolAddresses, asset.chain)
       )
     ),
     liveData.chain((_) => {
       setState({ ...getState(), step: 2, swapTx: RD.pending, swap: RD.progress({ loaded: 50, total }) })
       // 2. send swap tx
-      const router = FP.pipe(routerAddress, O.toUndefined)
-      return sendTx$({
-        router,
+      return sendPoolTx$({
+        router: poolAddresses.router,
         asset,
-        recipient: poolAddress, // emtpy string for Native
+        recipient: poolAddresses.address, // emtpy string for Native
         amount,
         memo,
-        txType: TxTypes.SWAP,
-        feeOptionKey: 'fastest'
+        feeOptionKey: FeeOptionKeys.SWAP
       })
     }),
     liveData.chain((txHash) => {
-      const assetAddress = isEthChain(asset.chain) ? FP.pipe(getEthAssetAddress(asset), O.toUndefined) : undefined
       // Update state
       setState({ ...getState(), step: 3, swapTx: RD.success(txHash), swap: RD.progress({ loaded: 75, total }) })
       // 3. check tx finality by polling its tx data
-      return txStatusByChain$(txHash, asset.chain, assetAddress)
+      const assetAddress: O.Option<Address> = isEthChain(asset.chain) ? getEthAssetAddress(asset) : O.none
+      return poolTxStatusByChain$({ txHash, chain: asset.chain, assetAddress })
     }),
     // Update state
     liveData.map((_) => setState({ ...getState(), swap: RD.success(true) })),

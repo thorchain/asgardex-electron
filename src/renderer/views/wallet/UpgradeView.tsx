@@ -8,7 +8,6 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
-import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error'
@@ -24,7 +23,6 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { getPoolAddressByChain } from '../../services/midgard/utils'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 type Props = {}
@@ -57,7 +55,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   const {
     service: {
-      pools: { poolAddresses$ }
+      pools: { poolAddressesByChain$ }
     }
   } = useMidgardContext()
 
@@ -98,21 +96,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
         O.fold(
           // No subscription of `poolAddresses$ ` needed for other assets than BNB.RUNE
           () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'wallet.errors.asset.notExist' }, { asset })))),
-          (_) =>
-            FP.pipe(
-              poolAddresses$,
-              liveData.map((endpoints) => getPoolAddressByChain(endpoints, BNBChain)),
-              RxOp.map((rd) =>
-                FP.pipe(
-                  rd,
-                  RD.chain((oAddress) =>
-                    RD.fromOption(oAddress, () =>
-                      Error(intl.formatMessage({ id: 'wallet.errors.address.couldNotFind' }, { pool: BNBChain }))
-                    )
-                  )
-                )
-              )
-            )
+          (_) => poolAddressesByChain$(BNBChain)
         )
       ),
     RD.initial

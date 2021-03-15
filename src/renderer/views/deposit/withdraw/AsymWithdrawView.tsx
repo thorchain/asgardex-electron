@@ -113,7 +113,7 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
         asset={asset}
         reloadFees={reloadWithdrawFees}
         disabled
-        poolAddress={O.none}
+        poolAddresses={O.none}
         validatePassword$={validatePassword$}
         viewRuneTx={viewRuneTx}
         reloadBalances={reloadBalances}
@@ -151,7 +151,7 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
         selectedPriceAsset={selectedPriceAsset}
         share={poolShare.assetAddedAmount}
         asset={asset}
-        poolAddress={oPoolAddress}
+        poolAddresses={oPoolAddress}
         fee$={withdrawFee$}
         reloadFees={reloadWithdrawFees}
         validatePassword$={validatePassword$}

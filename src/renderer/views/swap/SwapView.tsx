@@ -8,7 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory, useParams } from 'react-router-dom'
-import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error/'
@@ -24,7 +24,6 @@ import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTRD } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolAddressRx, PoolRouterRx } from '../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import * as Styled from './SwapView.styles'
 
@@ -40,8 +39,9 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, reloadPools, poolAddressByAsset$, poolRouterByAsset$ },
-    setSelectedPoolAsset
+    pools: { poolsState$, reloadPools, selectedPoolAddress$ },
+    setSelectedPoolAsset,
+    selectedPoolAsset$
   } = midgardService
   const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, assetAddress$, swap$ } = useChainContext()
 
@@ -61,39 +61,36 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const oTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
 
   useEffect(() => {
-    setSelectedPoolAsset(oTarget)
+    // Source asset is the asset of the pool we need to interact with
+    // Store it in global state, all depending streams will be updated then
+    setSelectedPoolAsset(oSource)
 
-    // Reset selectedPoolAsset on view's unmount to avoid effects
+    // Reset selectedPoolAsset on view's unmount to avoid effects with depending streams
     return () => {
       setSelectedPoolAsset(O.none)
     }
-  }, [oTarget, setSelectedPoolAsset])
+  }, [oSource, setSelectedPoolAsset])
+
+  const [selectedPoolAssetRD] = useObservableState(
+    () =>
+      selectedPoolAsset$.pipe(
+        RxOp.map((selectedPoolAsset) =>
+          RD.fromOption(selectedPoolAsset, () =>
+            Error(intl.formatMessage({ id: 'swap.errors.asset.missingSourceAsset' }))
+          )
+        )
+      ),
+    RD.initial
+  )
+
+  const targetAssetRD = RD.fromOption(oTarget, () =>
+    Error(intl.formatMessage({ id: 'swap.errors.asset.missingTargetAsset' }))
+  )
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
-  const sourcePoolAddress$ = useMemo(
-    () =>
-      FP.pipe(
-        oSource,
-        O.map(poolAddressByAsset$),
-        O.getOrElse((): PoolAddressRx => Rx.of(O.none))
-      ),
-    [oSource, poolAddressByAsset$]
-  )
-
-  const sourcePoolAddress = useObservableState(sourcePoolAddress$, O.none)
+  const selectedPoolAddress = useObservableState(selectedPoolAddress$, O.none)
   const targetWalletAddress = useObservableState(assetAddress$, O.none)
-
-  const sourcePoolRouter$ = useMemo(
-    () =>
-      FP.pipe(
-        oSource,
-        O.map(poolRouterByAsset$),
-        O.getOrElse((): PoolRouterRx => Rx.of(O.none))
-      ),
-    [oSource, poolRouterByAsset$]
-  )
-  const sourcePoolRouter = useObservableState(sourcePoolRouter$, O.none)
 
   const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [
     source,
@@ -133,11 +130,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       <BackLink />
       <Styled.ContentContainer>
         {FP.pipe(
-          sequenceTRD(
-            poolsState,
-            RD.fromOption(oSource, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingSourceAsset' }))),
-            RD.fromOption(oTarget, () => Error(intl.formatMessage({ id: 'swap.errors.asset.missingTargetAsset' })))
-          ),
+          sequenceTRD(poolsState, selectedPoolAssetRD, targetAssetRD),
           RD.fold(
             () => <></>,
             () => <Spin size="large" />,
@@ -156,7 +149,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   goToTransaction={goToTransaction}
                   sourceAsset={sourceAsset}
                   targetAsset={targetAsset}
-                  sourcePoolAddress={sourcePoolAddress}
+                  poolAddress={selectedPoolAddress}
                   availableAssets={availableAssets}
                   poolDetails={poolDetails}
                   walletBalances={balances}
@@ -167,7 +160,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   reloadBalances={reloadBalances}
                   onChangePath={onChangePath}
                   network={network}
-                  sourcePoolRouter={sourcePoolRouter}
                   approveERC20Token$={approveERC20Token$}
                   isApprovedERC20Token$={isApprovedERC20Token$}
                 />

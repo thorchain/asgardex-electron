@@ -21,11 +21,14 @@ const {
   resetTx,
   sendTx,
   txRD$,
-  sendDepositTx$,
+  sendPoolTx$,
   approveERC20Token$,
   isApprovedERC20Token$
 } = createTransactionService(client$)
-const { reloadFees, fees$, callFees$, outTxFee$ } = createFeesService({ client$, chain: ETHChain })
+const { reloadFees, fees$, poolInTxFees$, poolOutTxFee$ } = createFeesService({
+  client$,
+  chain: ETHChain
+})
 
 export {
   client$,
@@ -46,9 +49,9 @@ export {
   txRD$,
   reloadFees,
   fees$,
-  sendDepositTx$,
-  callFees$,
-  outTxFee$,
+  sendPoolTx$,
+  poolInTxFees$,
+  poolOutTxFee$,
   approveERC20Token$,
   isApprovedERC20Token$
 }

@@ -22,7 +22,7 @@ const defaultProps: SwapProps = {
   ],
   sourceAsset: AssetRuneNative,
   targetAsset: AssetBTC,
-  sourcePoolAddress: O.some('pool-address'),
+  poolAddress: O.some({ chain: 'BNB', address: 'vault-address', router: O.some('router-address') }),
   // mock successfull result of swap$
   swap$: (params) =>
     Rx.of(params).pipe(
@@ -79,11 +79,10 @@ const defaultProps: SwapProps = {
   validatePassword$: mockValidatePassword$,
   reloadFees: () => console.log('reloadFees'),
   reloadBalances: () => console.log('reloadBalances'),
-  fees$: () => Rx.of(RD.success({ source: baseAmount(10000000), target: baseAmount(1000000) })),
+  fees$: () => Rx.of(RD.success({ inTx: baseAmount(10000000), outTx: baseAmount(1000000) })),
   targetWalletAddress: O.some('wallet-address'),
   onChangePath: (path) => console.log('change path', path),
   network: 'testnet',
-  sourcePoolRouter: O.some('router-address'),
   approveERC20Token$: () => Rx.of(RD.success('txHash')),
   isApprovedERC20Token$: () => Rx.of(RD.success(true))
 }

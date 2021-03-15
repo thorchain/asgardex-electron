@@ -28,7 +28,6 @@ import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
 import { SendTxParams } from '../../../../services/chain/types'
 import { FeesRD, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
-import { TxTypes } from '../../../../types/asgardex'
 import { WalletBalance } from '../../../../types/wallet'
 import { PasswordModal } from '../../../modal/password'
 import * as StyledR from '../../../shared/form/Radio.style'
@@ -289,8 +288,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
           asset: balance.asset,
           amount,
           feeOptionKey: selectedFeeOptionKey,
-          memo: form.getFieldValue('memo'),
-          txType: TxTypes.TRANSFER
+          memo: form.getFieldValue('memo')
         })
         return true
       })

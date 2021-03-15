@@ -158,18 +158,26 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   const onSubmit = useCallback(() => setShowConfirmUpgradeModal(true), [])
 
-  const upgrade = useCallback(() => {
-    const memo = getSwitchMemo(runeNativeAddress)
-    const poolAddress = RD.toOption(bnbPoolAddressRD)
-    subscribeUpgradeTxState(
-      upgrade$({
-        poolAddress,
-        amount: amountToUpgrade,
-        asset: runeAsset,
-        memo
-      })
-    )
-  }, [runeNativeAddress, bnbPoolAddressRD, upgrade$, amountToUpgrade, runeAsset, subscribeUpgradeTxState])
+  const upgrade = useCallback(
+    () =>
+      FP.pipe(
+        bnbPoolAddressRD,
+        RD.toOption,
+        O.map((poolAddresses) => {
+          subscribeUpgradeTxState(
+            upgrade$({
+              poolAddresses,
+              amount: amountToUpgrade,
+              asset: runeAsset,
+              memo: getSwitchMemo(runeNativeAddress)
+            })
+          )
+          return true
+        })
+      ),
+
+    [runeNativeAddress, bnbPoolAddressRD, upgrade$, amountToUpgrade, runeAsset, subscribeUpgradeTxState]
+  )
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
 

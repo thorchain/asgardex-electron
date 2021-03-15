@@ -21,7 +21,7 @@ const defaultProps: WitdrawProps = {
   reloadFees: () => console.log('reload fees'),
   shares: { rune: baseAmount('193011422'), asset: baseAmount('3202499') },
   disabled: false,
-  poolAddress: O.some('pool-address'),
+  poolAddresses: O.some({ chain: 'BNB', address: 'vault-address', router: O.some('pool-address') }),
   viewRuneTx: (txHash: string) => console.log('view tx ', txHash),
   // mock password validation
   // Password: "123"

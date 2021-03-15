@@ -12,8 +12,9 @@ import * as RxOp from 'rxjs/operators'
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHelper'
 import { isEnabledChain } from '../../helpers/chainHelper'
-import { eqAsset } from '../../helpers/fp/eq'
+import { eqAsset, eqOPoolAddresses } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { RUNE_POOL_ADDRESS } from '../../helpers/poolHelper'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
 import { DefaultApi, GetPoolsRequest, GetPoolsStatusEnum } from '../../types/generated/midgard/apis'
@@ -22,25 +23,25 @@ import { ErrorId } from '../wallet/types'
 import {
   PoolAssetDetailsLD,
   PendingPoolsStateLD,
-  PoolAddressRx,
-  PoolAddressLD,
   PoolAssetsLD,
   PoolDetailLD,
   PoolDetailsLD,
   PoolsService,
   PoolsStateLD,
   SelectedPricePoolAsset,
-  ThorchainEndpointsLD,
+  PoolAddressesLD,
   ValidatePoolLD,
-  PoolRouterRx
+  PoolAddress$,
+  PoolAddressLD,
+  PoolAddress
 } from './types'
 import {
-  getPoolAddressByChain,
+  getPoolAddressesByChain,
   getPoolAssetDetail,
-  getPoolRouterByChain,
   getPricePools,
   pricePoolSelector,
-  pricePoolSelectorFromRD
+  pricePoolSelectorFromRD,
+  toPoolAddresses
 } from './utils'
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
@@ -414,51 +415,41 @@ const createPoolsService = (
     RxOp.map(([poolsState, selectedPricePoolAsset]) => pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset))
   )
 
-  const poolAddresses$: ThorchainEndpointsLD = FP.pipe(
-    midgardDefaultApi$,
-    liveData.chain((api) => {
-      return FP.pipe(
-        api.getProxiedInboundAddresses(),
-        RxOp.map(RD.success),
-        RxOp.startWith(RD.pending),
-        RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
-      )
-    })
-  )
-
-  const selectedPoolAddress$: PoolAddressRx = Rx.combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
-    RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
-      return FP.pipe(
-        poolAddresses,
-        RD.toOption,
-        (oPoolAddresses) => sequenceTOption(oPoolAddresses, oSelectedPoolAsset),
-        O.chain(([poolAddresses, selectedPoolAsset]) => getPoolAddressByChain(poolAddresses, selectedPoolAsset.chain))
-      )
-    })
-  )
-
-  const selectedPoolRouter$: PoolRouterRx = Rx.combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
-    RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
-      return FP.pipe(
-        poolAddresses,
-        RD.toOption,
-        (oPoolAddresses) => sequenceTOption(oPoolAddresses, oSelectedPoolAsset),
-        O.chain(([poolAddresses, selectedPoolAsset]) => getPoolRouterByChain(poolAddresses, selectedPoolAsset.chain))
-      )
-    })
-  )
-
-  const oPoolAddressByChain$ = (chain: Chain): PoolAddressRx =>
+  const loadInboundAddresses$ = (): PoolAddressesLD =>
     FP.pipe(
-      poolAddresses$,
-      liveData.toOptionMap$((addresses) => getPoolAddressByChain(addresses, chain)),
-      RxOp.map(O.flatten)
+      midgardDefaultApi$,
+      liveData.chain((api) => {
+        return FP.pipe(
+          api.getProxiedInboundAddresses(),
+          RxOp.map(toPoolAddresses),
+          // Add "empty" rune "pool address" - we never had such pool, but do need it to calculate tx
+          RxOp.map(FP.flow(A.cons(RUNE_POOL_ADDRESS))),
+          RxOp.map(RD.success),
+          RxOp.startWith(RD.pending),
+          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+        )
+      })
     )
 
-  const poolAddressByChain$ = (chain: Chain): PoolAddressLD =>
+  // Shared stream to avoid reloading same data by subscribing
+  const inboundAddressesShared$: PoolAddressesLD = loadInboundAddresses$().pipe(RxOp.shareReplay(1))
+
+  const selectedPoolAddresses$: PoolAddress$ = Rx.combineLatest([inboundAddressesShared$, selectedPoolAsset$]).pipe(
+    RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
+      return FP.pipe(
+        poolAddresses,
+        RD.toOption,
+        // TODO (@Veado) Will we ingore router for some cases (e.g. by withdrawing something from ETH vault not using router)=
+        (oPoolAddresses) => sequenceTOption(oPoolAddresses, oSelectedPoolAsset),
+        O.chain(([addresses, { chain }]) => getPoolAddressesByChain(addresses, chain))
+      )
+    })
+  )
+
+  const poolAddressesByChain$ = (chain: Chain): PoolAddressLD =>
     FP.pipe(
-      poolAddresses$,
-      liveData.map((endpoints) => getPoolAddressByChain(endpoints, chain)),
+      inboundAddressesShared$,
+      liveData.map((addresses) => getPoolAddressesByChain(addresses, chain)),
       RxOp.map((rd) =>
         FP.pipe(
           rd,
@@ -467,17 +458,6 @@ const createPoolsService = (
         )
       )
     )
-
-  const poolAddressByAsset$ = ({ chain }: Asset): PoolAddressRx => oPoolAddressByChain$(chain)
-
-  const oPoolRouterByChain$ = (chain: Chain): PoolRouterRx =>
-    FP.pipe(
-      poolAddresses$,
-      liveData.toOptionMap$((addresses) => getPoolRouterByChain(addresses, chain)),
-      RxOp.map(O.flatten)
-    )
-
-  const poolRouterByAsset$ = ({ chain }: Asset): PoolRouterRx => oPoolRouterByChain$(chain)
 
   /**
    * Use this to convert asset's price to selected price asset by multiplying to the priceRation inner value
@@ -500,22 +480,23 @@ const createPoolsService = (
   /**
    * Validates pool address
    *
-   * @param poolAddress Pool address to validate
+   * @param poolAddresses Pool address to validate
    * @param chain Chain of pool to validate
    */
-  const validatePool$ = (poolAddress: string, chain: Chain): ValidatePoolLD => {
-    return poolAddressByChain$(chain).pipe(
-      liveData.chain((address) =>
-        address === poolAddress
+  const validatePool$ = (poolAddresses: PoolAddress, chain: Chain): ValidatePoolLD =>
+    FP.pipe(
+      loadInboundAddresses$(),
+      liveData.map((addresses) => getPoolAddressesByChain(addresses, chain)),
+      liveData.chain((oAddresses) =>
+        eqOPoolAddresses.equals(oAddresses, O.some(poolAddresses))
           ? Rx.of(RD.success(true))
           : // TODO (@veado) Add i18n
-            Rx.of(RD.failure(Error(`Pool with address ${poolAddress} is not available`)))
+            Rx.of(RD.failure(Error(`Pool with address ${poolAddresses} is not available`)))
       ),
       liveData.mapLeft((error) => ({
         errorId: ErrorId.VALIDATE_POOL,
         msg: error?.message ?? error.toString()
       })),
-      // RxOp.startWith(RD.pending),
       RxOp.catchError((error: Error) =>
         Rx.of(
           RD.failure({
@@ -525,7 +506,6 @@ const createPoolsService = (
         )
       )
     )
-  }
 
   return {
     poolsState$,
@@ -537,15 +517,12 @@ const createPoolsService = (
     reloadPools,
     reloadPendingPools,
     reloadAllPools,
-    poolAddresses$,
-    selectedPoolAddress$,
-    selectedPoolRouter$,
+    selectedPoolAddress$: selectedPoolAddresses$,
+    poolAddressesByChain$,
     poolDetail$,
     priceRatio$,
     availableAssets$,
-    poolAddressByAsset$,
-    validatePool$,
-    poolRouterByAsset$
+    validatePool$
   }
 }
 

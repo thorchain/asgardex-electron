@@ -46,7 +46,7 @@ export type Props = {
   share: BaseAmount
   /** Flag whether form has to be disabled or not */
   disabled?: boolean
-  poolAddress: O.Option<PoolAddress>
+  poolAddresses: O.Option<PoolAddress>
   viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
   reloadBalances: FP.Lazy<void>
@@ -67,7 +67,7 @@ export const AsymWithdraw: React.FC<Props> = ({
   selectedPriceAsset,
   share,
   disabled,
-  poolAddress: oPoolAddress,
+  poolAddresses: oPoolAddresses,
   viewRuneTx = (_) => {},
   validatePassword$,
   reloadBalances = FP.constVoid,
@@ -275,18 +275,25 @@ export const AsymWithdraw: React.FC<Props> = ({
     // close private modal
     closePasswordModal()
 
-    // set start time
-    setWithdrawStartTime(Date.now())
+    FP.pipe(
+      oPoolAddresses,
+      O.map((poolAddresses) => {
+        // set start time
+        setWithdrawStartTime(Date.now())
 
-    subscribeWithdrawState(
-      withdraw$({
-        asset,
-        poolAddress: oPoolAddress,
-        network,
-        memo
+        subscribeWithdrawState(
+          withdraw$({
+            asset,
+            poolAddress: poolAddresses,
+            network,
+            memo
+          })
+        )
+
+        return true
       })
     )
-  }, [closePasswordModal, subscribeWithdrawState, withdraw$, asset, oPoolAddress, network, memo])
+  }, [closePasswordModal, oPoolAddresses, subscribeWithdrawState, withdraw$, asset, network, memo])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>

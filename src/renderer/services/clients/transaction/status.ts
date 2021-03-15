@@ -20,7 +20,15 @@ import { loadTx$ } from './common'
  * @param txHash Transaction hash
  * @param chain Chain
  */
-const txStatusByClient$ = (client: XChainClient, txHash: string, assetAddress?: Address): TxLD => {
+export const txStatusByClient$ = ({
+  client,
+  txHash,
+  assetAddress
+}: {
+  client: XChainClient
+  txHash: string
+  assetAddress: O.Option<Address>
+}): TxLD => {
   // max. number of requests
   const MAX = 50
   // Status to do another poll or not
@@ -38,7 +46,7 @@ const txStatusByClient$ = (client: XChainClient, txHash: string, assetAddress?: 
     RxOp.takeUntil(stopInterval$),
     // count requests
     RxOp.tap(() => setCount(getCount() + 1)),
-    RxOp.switchMap((_) => loadTx$(client, txHash, assetAddress)),
+    RxOp.switchMap((_) => loadTx$({ client, txHash, assetAddress })),
     liveData.map((result) => {
       // update state to stop polling
       setHasResult(true)
@@ -60,17 +68,16 @@ const txStatusByClient$ = (client: XChainClient, txHash: string, assetAddress?: 
  * @param txHash Transaction hash
  * @param chain Chain
  */
-export const txStatus$: (client$: XChainClient$) => (txHash: TxHash, assetAddress?: Address) => TxLD = (client$) => (
-  txHash,
-  assetAddress
-) =>
+export const txStatus$: (client$: XChainClient$) => (txHash: TxHash, assetAddres: O.Option<Address>) => TxLD = (
+  client$
+) => (txHash, assetAddress) =>
   client$.pipe(
     RxOp.switchMap((oClient) =>
       FP.pipe(
         oClient,
         O.fold(
           () => Rx.of(RD.initial),
-          (client) => txStatusByClient$(client, txHash, assetAddress)
+          (client) => txStatusByClient$({ client, txHash, assetAddress })
         )
       )
     )

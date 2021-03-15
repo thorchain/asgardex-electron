@@ -113,7 +113,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         asset={asset}
         reloadFees={reloadWithdrawFees}
         disabled
-        poolAddress={O.none}
+        poolAddresses={O.none}
         validatePassword$={validatePassword$}
         viewRuneTx={viewRuneTx}
         reloadBalances={reloadBalances}
@@ -157,7 +157,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
           asset: shareHelpers.getAssetShare(poolShare.units, poolDetail)
         }}
         asset={asset}
-        poolAddress={oPoolAddress}
+        poolAddresses={oPoolAddress}
         fee$={withdrawFee$}
         reloadFees={reloadWithdrawFees}
         validatePassword$={validatePassword$}

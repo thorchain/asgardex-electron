@@ -1,25 +1,25 @@
 import { Story } from '@storybook/react'
 
-import { TxTypes } from '../../../types/asgardex'
 import { TxType } from './TxType'
+import { UITxType } from './TxType.types'
 
 const types = ['Swap', 'Deposit', 'Double swap', 'Withdraw'] as const
 
 type InputType = typeof types[number]
 
-const mapType = (type: InputType) => {
+const mapType = (type: InputType): UITxType => {
   switch (type) {
     case types[0]: {
-      return TxTypes.SWAP
+      return 'SWAP'
     }
     case types[1]: {
-      return TxTypes.DEPOSIT
+      return 'DEPOSIT'
     }
     case types[2]: {
-      return TxTypes.DOUBLE_SWAP
+      return 'DOUBLE_SWAP'
     }
     case types[3]: {
-      return TxTypes.WITHDRAW
+      return 'WITHDRAW'
     }
   }
 }

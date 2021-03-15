@@ -6,8 +6,10 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { TxTypes } from '../../types/asgardex'
+import { PoolAddress } from '../midgard/types'
 import { ApiError, TxHashRD } from '../wallet/types'
+
+export type TxTypes = 'DEPOSIT' | 'SWAP' | 'WITHDRAW' | 'UPGRADE'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
 
@@ -20,8 +22,8 @@ export type FeesRD = RD.RemoteData<Error, Fees>
 export type FeesLD = LiveData<Error, Fees>
 
 type SwapFees = {
-  source: BaseAmount
-  target: BaseAmount
+  inTx: BaseAmount
+  outTx: BaseAmount
 }
 
 export type SwapFeesRD = RD.RemoteData<Error, SwapFees>
@@ -73,13 +75,15 @@ export type LoadDepositFeesHandler = (p: DepositFeesParams) => void
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
 export type SendTxParams = {
-  router?: Address
   asset: Asset
   recipient: Address
   amount: BaseAmount
   memo: Memo
-  txType: TxTypes
   feeOptionKey?: FeeOptionKey
+}
+
+export type SendPoolTxParams = SendTxParams & {
+  router: O.Option<Address>
 }
 
 export type LedgerAddressParams = { chain: Chain; network: Network }
@@ -100,27 +104,36 @@ export type SwapState = {
 
 export type SwapState$ = Rx.Observable<SwapState>
 
-export type SwapParams = {
-  readonly routerAddress: O.Option<Address>
-  readonly poolAddress: Address
+/**
+ * Parameters to send swap tx into (IN) a pool
+ */
+export type SwapTxParams = {
+  readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
 }
 
-export type SwapStateHandler = (p: SwapParams) => SwapState$
+export type SwapStateHandler = (p: SwapTxParams) => SwapState$
 
-export type SwapFeeParams = {
-  readonly recipient: Address
-  readonly routerAddress: O.Option<Address>
+/**
+ * Types of swap txs
+ **/
+
+export type SwapTxType = 'in' | ' out'
+
+export type SwapOutTx = {
   readonly asset: Asset
-  readonly amount: BaseAmount
-  readonly memo?: Memo
+  readonly memo: Memo
 }
-
+/**
+ * Fees to swap txs (IN/OUT)
+ */
 export type SwapFeesParams = {
-  readonly source: SwapFeeParams
-  readonly target: SwapFeeParams
+  /** Fee for pool tx sent into (IN) a pool */
+  readonly inTx: SwapTxParams
+  /** Fee for pool tx to sent OUT from a pool */
+  readonly outTx: SwapOutTx
 }
 
 export type SwapFeesHandler = (p: SwapFeesParams) => SwapFeesLD
@@ -144,7 +157,7 @@ export type AsymDepositState = {
 export type AsymDepositState$ = Rx.Observable<AsymDepositState>
 
 export type AsymDepositParams = {
-  readonly poolAddress: O.Option<Address>
+  readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
@@ -173,7 +186,7 @@ export type SymDepositState = {
 export type SymDepositState$ = Rx.Observable<SymDepositState>
 
 export type SymDepositParams = {
-  readonly poolAddress: O.Option<string>
+  readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly amounts: SymDepositAmounts
   readonly memos: SymDepositMemo
@@ -198,7 +211,7 @@ export type WithdrawState = {
 export type WithdrawState$ = Rx.Observable<WithdrawState>
 
 export type WithdrawParams = {
-  readonly poolAddress: O.Option<string>
+  readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly memo: Memo
   readonly network: Network
@@ -207,7 +220,7 @@ export type WithdrawParams = {
 export type WithdrawStateHandler = (p: WithdrawParams) => WithdrawState$
 
 export type UpgradeRuneParams = {
-  readonly poolAddress: O.Option<string>
+  readonly poolAddresses: PoolAddress
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string

@@ -26,7 +26,6 @@ import { FeeRD, SendTxParams } from '../../../../services/chain/types'
 import { WalletBalances } from '../../../../services/clients'
 import { AddressValidation } from '../../../../services/thorchain/types'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
-import { TxTypes } from '../../../../types/asgardex'
 import { WalletBalance } from '../../../../types/wallet'
 import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
@@ -181,8 +180,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
       amount: amountToSend,
-      memo: form.getFieldValue('memo'),
-      txType: TxTypes.TRANSFER
+      memo: form.getFieldValue('memo')
     })
   }, [onSubmit, form, balance.asset, amountToSend])
 

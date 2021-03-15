@@ -21,7 +21,7 @@ const defaultProps: AsymWitdrawProps = {
   reloadFees: () => console.log('reload fees'),
   share: baseAmount('193011422'),
   disabled: false,
-  poolAddress: O.some('pool-address'),
+  poolAddresses: O.some({ chain: 'BNB', address: 'vault-address', router: O.some('pool-address') }),
   viewRuneTx: (txHash: string) => console.log('view tx ', txHash),
   // mock password validation
   // Password: "123"

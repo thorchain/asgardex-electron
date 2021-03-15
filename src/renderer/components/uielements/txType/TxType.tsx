@@ -6,37 +6,37 @@ import { ReactComponent as DepositIcon } from '../../../assets/svg/tx-stake.svg'
 import { ReactComponent as SwapIcon } from '../../../assets/svg/tx-swap.svg'
 import { ReactComponent as WithdrawIcon } from '../../../assets/svg/tx-withdraw.svg'
 import { CommonMessageKey } from '../../../i18n/types'
-import { TxTypes } from '../../../types/asgardex'
 import * as Styled from './TxType.styles'
+import { UITxType } from './TxType.types'
 
 type Props = {
-  type: TxTypes
+  type: UITxType
   className?: string
 }
 
-const getIcon = (type: TxTypes) => {
+const getIcon = (type: UITxType) => {
   switch (type) {
-    case TxTypes.DEPOSIT:
+    case 'DEPOSIT':
       return <DepositIcon />
-    case TxTypes.WITHDRAW:
+    case 'WITHDRAW':
       return <WithdrawIcon />
-    case TxTypes.SWAP:
-    case TxTypes.DOUBLE_SWAP:
+    case 'SWAP':
+    case 'DOUBLE_SWAP':
       return <SwapIcon />
     default:
       return <></>
   }
 }
 
-const getTypeI18nKey = (type: TxTypes): CommonMessageKey | undefined => {
+const getTypeI18nKey = (type: UITxType): CommonMessageKey | undefined => {
   switch (type) {
-    case TxTypes.DEPOSIT:
+    case 'DEPOSIT':
       return 'common.tx.type.deposit'
-    case TxTypes.WITHDRAW:
+    case 'WITHDRAW':
       return 'common.tx.type.withdraw'
-    case TxTypes.SWAP:
+    case 'SWAP':
       return 'common.tx.type.swap'
-    case TxTypes.DOUBLE_SWAP:
+    case 'DOUBLE_SWAP':
       return 'common.tx.type.doubleSwap'
   }
 }

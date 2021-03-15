@@ -12,11 +12,11 @@ import {
   THORChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { DEFAULT_FEE_OPTION_KEY } from '../../../components/wallet/txs/send/Send.const'
 import { liveData } from '../../../helpers/rx/liveData'
-import { TxTypes } from '../../../types/asgardex'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as BCH from '../../bitcoincash'
@@ -24,26 +24,24 @@ import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
 import { ErrorId, TxHashLD, TxLD } from '../../wallet/types'
-import { SendTxParams } from '../types'
+import { SendPoolTxParams, SendTxParams } from '../types'
+
+// helper to create `RemoteData<ApiError, never>` observable
+const txFailure$ = (msg: string) =>
+  Rx.of(
+    RD.failure({
+      errorId: ErrorId.SEND_TX,
+      msg
+    })
+  )
 
 export const sendTx$ = ({
-  router = '',
   asset,
   recipient,
   amount,
   memo,
-  txType,
   feeOptionKey = DEFAULT_FEE_OPTION_KEY
 }: SendTxParams): TxHashLD => {
-  // helper to create `RemoteData<ApiError, never>` observable
-  const txFailure$ = (msg: string) =>
-    Rx.of(
-      RD.failure({
-        errorId: ErrorId.SEND_TX,
-        msg
-      })
-    )
-
   switch (asset.chain) {
     case BNBChain:
       return BNB.sendTx({ recipient, amount, asset, memo })
@@ -59,22 +57,9 @@ export const sendTx$ = ({
       )
 
     case ETHChain:
-      if (txType === TxTypes.SWAP || txType === TxTypes.DEPOSIT || txType === TxTypes.WITHDRAW) {
-        return ETH.sendDepositTx$({
-          router,
-          poolAddress: recipient,
-          asset,
-          amount,
-          memo
-        })
-      } else {
-        return ETH.sendTx({ asset, recipient, amount, memo, feeOptionKey })
-      }
+      return ETH.sendTx({ asset, recipient, amount, memo, feeOptionKey })
 
     case THORChain: {
-      if (txType === TxTypes.SWAP || txType === TxTypes.DEPOSIT || txType === TxTypes.WITHDRAW) {
-        return THOR.sendDepositTx({ amount, asset, memo })
-      }
       return THOR.sendTx({ amount, asset, memo, recipient })
     }
 
@@ -108,32 +93,75 @@ export const sendTx$ = ({
   }
 }
 
-export const txStatusByChain$ = (txHash: TxHash, chain: Chain, assetAddress?: Address): TxLD => {
-  // helper to create `RemoteData<ApiError, never>` observable
-  const failure$ = (msg: string) =>
-    Rx.of(
-      RD.failure({
-        errorId: ErrorId.GET_TX,
-        msg
+export const sendPoolTx$ = ({
+  router,
+  asset,
+  recipient,
+  amount,
+  memo,
+  feeOptionKey = DEFAULT_FEE_OPTION_KEY
+}: SendPoolTxParams): TxHashLD => {
+  switch (asset.chain) {
+    case ETHChain:
+      return ETH.sendPoolTx$({
+        router,
+        recipient,
+        asset,
+        amount,
+        memo
       })
-    )
 
+    case THORChain:
+      return THOR.sendDepositTx({ amount, asset, memo })
+
+    default:
+      return sendTx$({ asset, recipient, amount, memo, feeOptionKey })
+  }
+}
+
+// helper to create `RemoteData<ApiError, never>` observable
+const txStatusFailure$ = (msg: string) =>
+  Rx.of(
+    RD.failure({
+      errorId: ErrorId.GET_TX,
+      msg
+    })
+  )
+
+export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Chain }): TxLD => {
   switch (chain) {
     case BNBChain:
-      return BNB.txStatus$(txHash)
+      return BNB.txStatus$(txHash, O.none)
     case BTCChain:
-      return BTC.txStatus$(txHash)
+      return BTC.txStatus$(txHash, O.none)
     case ETHChain:
-      return ETH.txStatus$(txHash, assetAddress)
+      return ETH.txStatus$(txHash, O.none)
     case THORChain:
-      return THOR.txStatus$(txHash)
+      return THOR.txStatus$(txHash, O.none)
     case CosmosChain:
-      return failure$(`txStatus$ has not been implemented for Cosmos`)
+      return txStatusFailure$(`txStatusByChain$ has not been implemented for Cosmos`)
     case PolkadotChain:
-      return failure$(`txStatus$ has not been implemented for Polkadot`)
+      return txStatusFailure$(`txStatusByChain$ has not been implemented for Polkadot`)
     case BCHChain:
-      return BCH.txStatus$(txHash)
+      return BCH.txStatus$(txHash, O.none)
     case LTCChain:
-      return LTC.txStatus$(txHash)
+      return LTC.txStatus$(txHash, O.none)
+  }
+}
+
+export const poolTxStatusByChain$ = ({
+  txHash,
+  chain,
+  assetAddress: oAssetAddress
+}: {
+  txHash: TxHash
+  chain: Chain
+  assetAddress: O.Option<Address>
+}): TxLD => {
+  switch (chain) {
+    case ETHChain:
+      return ETH.txStatus$(txHash, oAssetAddress)
+    default:
+      return txStatusByChain$({ txHash, chain })
   }
 }

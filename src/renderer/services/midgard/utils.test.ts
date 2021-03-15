@@ -10,6 +10,7 @@ import {
   bn,
   BNBChain,
   BTCChain,
+  ETHChain,
   THORChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -22,10 +23,10 @@ import {
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
 import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, ZERO_BN } from '../../const'
-import { eqAsset, eqOString, eqPoolShare, eqPoolShares } from '../../helpers/fp/eq'
+import { eqAsset, eqPoolShare, eqPoolShares } from '../../helpers/fp/eq'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
-import { PoolAssetDetail, PoolDetail, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
+import { PoolAddress, PoolAssetDetail, PoolDetail, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
 import {
   getAssetDetail,
   getPricePools,
@@ -35,12 +36,13 @@ import {
   toPoolData,
   filterPoolAssets,
   getPoolDetailsHashMap,
-  getPoolAddressByChain,
+  getPoolAddressesByChain,
   combineShares,
   combineSharesByAsset,
   getSharesByAssetAndType,
   getPoolAssetDetail,
-  getPoolAssetsDetail
+  getPoolAssetsDetail,
+  toPoolAddresses
 } from './utils'
 
 describe('services/midgard/utils/', () => {
@@ -233,24 +235,35 @@ describe('services/midgard/utils/', () => {
     })
   })
 
-  describe('getPoolAddressByChain', () => {
-    const bnbAddress = 'bnb pool address'
-    const endpointBNB = { address: bnbAddress, chain: BNBChain }
-    const thorAddress = 'thor pool address'
-    const endpointThor = { address: thorAddress, chain: THORChain }
-    const btcAddress = 'btc pool address'
-    const endpointBTC = { address: btcAddress, chain: BTCChain }
-    it('returns BNBChain if list of endpoints are empty', () => {
-      const result = getPoolAddressByChain([endpointBNB, endpointThor, endpointBTC], BNBChain)
-      expect(eqOString.equals(result, O.some(bnbAddress))).toBeTruthy()
+  describe('toPoolAddresses', () => {
+    it('returns empty list', () => {
+      expect(toPoolAddresses([])).toEqual([])
+    })
+  })
+
+  describe('getPoolAddressesByChain', () => {
+    const bnbAddress: PoolAddress = { address: 'bnb pool address', chain: BNBChain, router: O.none }
+    const thorAddress: PoolAddress = { address: 'thor pool address', chain: THORChain, router: O.none }
+    const btcAddress: PoolAddress = { address: 'btc pool address', chain: BTCChain, router: O.none }
+    const ethAddress: PoolAddress = { address: '0xaddress', chain: ETHChain, router: O.some('0xrouter') }
+    const addresses = [bnbAddress, thorAddress, btcAddress, ethAddress]
+
+    it('returns BNB pool address ', () => {
+      const result = getPoolAddressesByChain(addresses, BNBChain)
+      expect(result).toEqual(O.some(bnbAddress))
+    })
+
+    it('returns ETHs pool address', () => {
+      const result = getPoolAddressesByChain(addresses, ETHChain)
+      expect(result).toEqual(O.some(ethAddress))
     })
 
     it('returns none if list of endpoints are empty', () => {
-      expect(getPoolAddressByChain([], BNBChain)).toBeNone()
+      expect(getPoolAddressesByChain([], BNBChain)).toBeNone()
     })
 
     it('returns none if chain is not in list of endpoints', () => {
-      expect(getPoolAddressByChain([endpointBNB, endpointThor], BTCChain)).toBeNone()
+      expect(getPoolAddressesByChain([bnbAddress, thorAddress], BTCChain)).toBeNone()
     })
   })
 
