@@ -332,6 +332,9 @@ export const Swap = ({
 
   const setAmountToSwap = useCallback(
     (targetAmount: BaseAmount) => {
+      // make sure the target amount decimal is the same as source asset decimal.
+      targetAmount.decimal = sourceAssetAmount.decimal
+
       if (eqBaseAmount.equals(targetAmount, amountToSwap)) return {}
 
       const newAmountToSwap = targetAmount.amount().isGreaterThan(maxAmountToSwap.amount())
@@ -348,7 +351,7 @@ export const Swap = ({
        */
       _setAmountToSwap({ ...newAmountToSwap })
     },
-    [maxAmountToSwap, amountToSwap]
+    [amountToSwap, maxAmountToSwap, sourceAssetAmount.decimal]
   )
 
   const setAmountToSwapFromPercentValue = useCallback(
