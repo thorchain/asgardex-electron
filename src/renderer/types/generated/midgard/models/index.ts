@@ -12,7 +12,6 @@ export * from './EarningsHistory';
 export * from './EarningsHistoryItem';
 export * from './EarningsHistoryItemPool';
 export * from './Health';
-export * from './InboundAddresses';
 export * from './InboundAddressesItem';
 export * from './InlineResponse200';
 export * from './Int64Constants';
