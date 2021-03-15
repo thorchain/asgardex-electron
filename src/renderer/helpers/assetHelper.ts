@@ -139,13 +139,15 @@ export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, get
 export const midgardAssetFromString = (s: string): O.Option<Asset> => {
   const asset = assetFromString(s)
   if (asset && isEthChain(asset.chain)) {
-    if (!isEthAsset(asset) && !isEthTokenAsset(asset)) return O.none
-    const tokenAddress = getTokenAddress(asset) || ''
-    const checksumAddress = FP.pipe(getEthChecksumAddress(tokenAddress), O.toUndefined)
-    return O.some({
-      ...asset,
-      symbol: `${asset.ticker}-${checksumAddress}`
-    })
+    if (!isEthAsset(asset)) {
+      if (!isEthTokenAsset(asset)) return O.none
+      const tokenAddress = getTokenAddress(asset) || ''
+      const checksumAddress = FP.pipe(getEthChecksumAddress(tokenAddress), O.toUndefined)
+      return O.some({
+        ...asset,
+        symbol: `${asset.ticker}-${checksumAddress}`
+      })
+    }
   }
   return asset ? O.some(asset) : O.none
 }
