@@ -10,7 +10,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
-import { isPricePoolAsset } from '../../helpers/assetHelper'
+import { isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHelper'
 import { isEnabledChain } from '../../helpers/chainHelper'
 import { eqAsset, eqOPoolAddresses } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
@@ -76,8 +76,7 @@ const createPoolsService = (
             A.filter(({ asset }) =>
               FP.pipe(
                 asset,
-                assetFromString,
-                O.fromNullable,
+                midgardAssetFromString,
                 O.fold(
                   () => false,
                   ({ chain }) => isEnabledChain(chain)

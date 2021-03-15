@@ -6,6 +6,7 @@ import {
   AssetBNB,
   AssetBTC,
   AssetETH,
+  assetFromString,
   AssetLTC,
   AssetRune67C,
   AssetRuneB1A,
@@ -18,7 +19,7 @@ import { Network } from '../../shared/api/types'
 import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
-import { getChainAsset } from './chainHelper'
+import { getChainAsset, isEthChain } from './chainHelper'
 import { eqAsset } from './fp/eq'
 
 /**
@@ -131,3 +132,34 @@ export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
   PRICE_ASSETS.includes(asset)
 
 export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, getChainAsset(asset.chain))
+
+/**
+ * Update ETH token (ERC20) addresses to be based on checksum addresses
+ * Other assets then ETH tokens (ERC20) won't be updated and will be returned w/o any changes
+ */
+export const updateEthChecksumAddress = (asset: Asset): Asset =>
+  FP.pipe(
+    asset,
+    // ETH chain only
+    O.fromPredicate(({ chain }) => isEthChain(chain)),
+    // ETH asset only
+    O.chain(O.fromPredicate(FP.not(isEthAsset))),
+    // Get token address as checksum address
+    O.chain(FP.flow(getTokenAddress, O.fromNullable)),
+    // Update asset for using a checksum address
+    O.map((address) => ({ ...asset, symbol: `${asset.ticker}-${address}` })),
+    // Return same asset in case of no updates
+    O.getOrElse(() => asset)
+  )
+
+/**
+ * Helper to get Midgard assets properly
+ */
+export const midgardAssetFromString: (assetString: string) => O.Option<Asset> = FP.flow(
+  assetFromString,
+  O.fromNullable,
+  // FOR ETH tokens we need to update its addresses to have a valid check sum address
+  // Because ERC20 assets from Midgard might start with 0X rather than 0x
+  // And 0X isn't recognized as valid address in ethers lib
+  O.map(updateEthChecksumAddress)
+)
