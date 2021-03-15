@@ -5,6 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { isEthAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
@@ -35,7 +36,10 @@ export const transfer$: SendTxStateHandler = (params) => {
       // 2. check tx finality by polling its tx data
       const erc20Address = FP.pipe(
         params.asset,
+        // ETH chain only
         O.fromPredicate(({ chain }) => isEthChain(chain)),
+        // ignore ETH asset
+        O.chain(O.fromPredicate(FP.not(isEthAsset))),
         O.map(getTokenAddress),
         O.chain(O.fromNullable),
         O.toUndefined

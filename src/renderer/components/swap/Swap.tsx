@@ -17,7 +17,6 @@ import {
   assetAmount,
   assetToBase
 } from '@xchainjs/xchain-util'
-import { eqString } from 'fp-ts/Eq'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -825,9 +824,9 @@ export const Swap = ({
   const canSwitchAssets = useMemo(() => {
     const hasBalances = FP.pipe(
       walletBalances,
-      O.map(A.map(({ asset }) => asset.symbol.toLowerCase())),
+      O.map(A.map(({ asset }) => asset)),
       (oAssetSymbols) => sequenceTOption(oAssetSymbols, targetAsset),
-      O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqString)(targetAsset.symbol.toLowerCase()))),
+      O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqAsset)(targetAsset))),
       O.getOrElse(() => true)
     )
 

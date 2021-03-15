@@ -71,7 +71,7 @@ const swapFeeByChain$ = ({
               func: 'deposit',
               params: isEthAsset(asset)
                 ? [
-                    ethers.utils.getAddress(recipient.toLowerCase()),
+                    ethers.utils.getAddress(recipient),
                     ETHAddress,
                     0,
                     memo,
@@ -80,7 +80,7 @@ const swapFeeByChain$ = ({
                     }
                   ]
                 : [
-                    ethers.utils.getAddress(recipient.toLowerCase()),
+                    ethers.utils.getAddress(recipient),
                     FP.pipe(getEthTokenAddress(asset), O.toUndefined),
                     amount.amount().toFixed(),
                     memo
