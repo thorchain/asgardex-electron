@@ -11,7 +11,6 @@ import { isEthChain } from '../../../helpers/chainHelper'
 import { sequenceSOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
-import { sendPoolTx$ } from '../../ethereum'
 import { service as midgardService } from '../../midgard/service'
 import { ApiError, ErrorId } from '../../wallet/types'
 import { FeeOptionKeys, INITIAL_ASYM_DEPOSIT_STATE, INITIAL_SYM_DEPOSIT_STATE } from '../const'
@@ -25,7 +24,7 @@ import {
   SymDepositState$,
   SymDepositValidationResult
 } from '../types'
-import { sendTx$, poolTxStatusByChain$ } from './common'
+import { sendPoolTx$, poolTxStatusByChain$ } from './common'
 
 const { pools: midgardPoolsService, validateNode$ } = midgardService
 
@@ -174,16 +173,18 @@ export const symDeposit$ = ({
   // to update `SymDepositState` step by step
   const requests$ = Rx.of(poolAddresses).pipe(
     // 1. Validation pool address + node
-    RxOp.switchMap((poolAddresses) =>
-      liveData.sequenceS({
+    RxOp.switchMap((poolAddresses) => {
+      console.log(poolAddresses)
+      return liveData.sequenceS({
         pool: midgardPoolsService.validatePool$(poolAddresses, asset.chain),
         node: validateNode$()
       })
-    ),
+    }),
     // 2. send RUNE deposit txs
     liveData.chain<ApiError, SymDepositValidationResult, TxHash>((_) => {
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 40, total }) })
-      return sendTx$({
+      return sendPoolTx$({
+        router: poolAddresses.router,
         asset: AssetRuneNative,
         recipient: '',
         amount: amounts.rune,
