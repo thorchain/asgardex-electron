@@ -12,7 +12,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
 import { INITIAL_WITHDRAW_STATE, FeeOptionKeys } from '../const'
 import { WithdrawParams, WithdrawState, WithdrawState$ } from '../types'
-import { sendTx$, poolTxStatusByChain$ } from './common'
+import { sendPoolTx$, poolTxStatusByChain$ } from './common'
 import { smallestAmountToSent } from './transaction.helper'
 
 const { pools: midgardPoolsService, validateNode$ } = midgardService
@@ -57,7 +57,8 @@ export const withdraw$ = ({ poolAddress, asset, memo, network }: WithdrawParams)
     // 2. send RUNE withdraw txs
     liveData.chain((_) => {
       setState({ ...getState(), step: 2, withdraw: RD.progress({ loaded: 50, total }) })
-      return sendTx$({
+      return sendPoolTx$({
+        router: poolAddress.router,
         asset,
         recipient: isRune ? '' : poolAddress.address,
         amount: smallestAmountToSent(asset.chain, network),
