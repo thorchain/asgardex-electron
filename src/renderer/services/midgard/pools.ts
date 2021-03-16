@@ -491,7 +491,16 @@ const createPoolsService = (
         eqOPoolAddresses.equals(oAddresses, O.some(poolAddresses))
           ? Rx.of(RD.success(true))
           : // TODO (@veado) Add i18n
-            Rx.of(RD.failure(Error(`Pool with address ${poolAddresses} is not available`)))
+            Rx.of(
+              RD.failure(
+                Error(
+                  `Pool address ${poolAddresses.address} and/or router address ${FP.pipe(
+                    poolAddresses.router,
+                    O.getOrElse(() => '')
+                  )} ) are not available`
+                )
+              )
+            )
       ),
       liveData.mapLeft((error) => ({
         errorId: ErrorId.VALIDATE_POOL,

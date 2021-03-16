@@ -37,8 +37,8 @@ export type SymDepositMemoRx = Rx.Observable<O.Option<SymDepositMemo>>
 
 /**
  * Deposit fees
- *
- * For deposits we do need one fee (asymmetrical deposit) or two fees (symmetrical deposit):
+
+ * One fee (asymmetrical deposit) or two fees (symmetrical deposit):
  *
  * thor: Fee for transaction on Thorchain. Needed for sym deposit txs. It's `O.none` for asym deposit txs
  * asset: Fee for transaction on asset chain
@@ -46,31 +46,22 @@ export type SymDepositMemoRx = Rx.Observable<O.Option<SymDepositMemo>>
 export type DepositFees = { thor: O.Option<BaseAmount>; asset: BaseAmount }
 export type DepositFeesRD = RD.RemoteData<Error, DepositFees>
 export type DepositFeesLD = LiveData<Error, DepositFees>
+
+export type AsymDepositParams = {
+  readonly poolAddress: PoolAddress
+  readonly asset: Asset
+  readonly amount: BaseAmount
+  readonly memo: string
+}
+
 export type SymDepositAmounts = { rune: BaseAmount; asset: BaseAmount }
 
-export type AsymDepositFeesParams = {
+export type SymDepositParams = {
+  readonly poolAddress: PoolAddress
   readonly asset: Asset
-  readonly amount: BaseAmount
-  readonly memo: O.Option<Memo>
-  readonly recipient?: O.Option<Address>
-  readonly router?: O.Option<Address>
-  readonly type: 'asym'
+  readonly amounts: SymDepositAmounts
+  readonly memos: SymDepositMemo
 }
-
-export type SymDepositFeesParams = {
-  readonly asset: Asset
-  readonly amount: BaseAmount
-  readonly memos: O.Option<SymDepositMemo>
-  readonly recipient?: O.Option<Address>
-  readonly router?: O.Option<Address>
-  readonly type: 'sym'
-}
-
-export type DepositFeesParams = AsymDepositFeesParams | SymDepositFeesParams
-
-export type DepositFeesHandler = (p: DepositFeesParams) => DepositFeesLD
-
-export type LoadDepositFeesHandler = (p: DepositFeesParams) => void
 
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
@@ -156,13 +147,6 @@ export type AsymDepositState = {
 
 export type AsymDepositState$ = Rx.Observable<AsymDepositState>
 
-export type AsymDepositParams = {
-  readonly poolAddress: PoolAddress
-  readonly asset: Asset
-  readonly amount: BaseAmount
-  readonly memo: string
-}
-
 export type AsymDepositStateHandler = (p: AsymDepositParams) => AsymDepositState$
 
 export type SymDepositValidationResult = { pool: boolean; node: boolean }
@@ -184,13 +168,6 @@ export type SymDepositState = {
 }
 
 export type SymDepositState$ = Rx.Observable<SymDepositState>
-
-export type SymDepositParams = {
-  readonly poolAddress: PoolAddress
-  readonly asset: Asset
-  readonly amounts: SymDepositAmounts
-  readonly memos: SymDepositMemo
-}
 
 export type SymDepositStateHandler = (p: SymDepositParams) => SymDepositState$
 

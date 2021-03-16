@@ -1,7 +1,16 @@
 import { addressByChain$, assetAddress$ } from './address'
 import { clientByChain$ } from './client'
 import { getExplorerUrlByAsset$, getExplorerAddressByChain$ } from './explorerUrl'
-import { reloadDepositFees, depositFees$, withdrawFee$, reloadWithdrawFee, reloadSwapFees, swapFees$ } from './fees'
+import {
+  reloadSymDepositFees,
+  symDepositFees$,
+  reloadAsymDepositFee,
+  asymDepositFee$,
+  withdrawFee$,
+  reloadWithdrawFee,
+  reloadSwapFees,
+  swapFees$
+} from './fees'
 import { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } from './ledger'
 import { asymDepositTxMemo$, symDepositTxMemo$, getWithdrawMemo$ } from './memo'
 import { swap$, asymDeposit$, symDeposit$, upgradeBnbRune$, withdraw$, transfer$ } from './transaction'
@@ -12,8 +21,10 @@ import { swap$, asymDeposit$, symDeposit$, upgradeBnbRune$, withdraw$, transfer$
 export {
   addressByChain$,
   clientByChain$,
-  reloadDepositFees,
-  depositFees$,
+  reloadSymDepositFees,
+  symDepositFees$,
+  reloadAsymDepositFee,
+  asymDepositFee$,
   withdrawFee$,
   reloadWithdrawFee,
   symDepositTxMemo$,

@@ -28,20 +28,20 @@ describe('deposit/Deposit.helper', () => {
       const runeBalance = baseAmount(50)
       const assetBalance = baseAmount(100)
       const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance })
+
       expect(eqBaseAmount.equals(result, baseAmount(50))).toBeTruthy()
     })
   })
 
   describe('maxAssetAmountToDeposit', () => {
-    it('is 50', () => {
+    it('is 200', () => {
       const result = maxAssetAmountToDeposit({ poolData, assetBalance, runeBalance })
-      expect(eqBaseAmount.equals(result, baseAmount(50))).toBeTruthy()
+      expect(eqBaseAmount.equals(result, baseAmount(200))).toBeTruthy()
     })
     it('is 100', () => {
       const runeBalance = baseAmount(200)
       const assetBalance = baseAmount(100)
       const result = maxAssetAmountToDeposit({ poolData, assetBalance, runeBalance })
-
       expect(eqBaseAmount.equals(result, baseAmount(100))).toBeTruthy()
     })
   })

@@ -11,7 +11,6 @@ import { isEthChain } from '../../../helpers/chainHelper'
 import { sequenceSOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
-import { sendPoolTx$ } from '../../ethereum'
 import { service as midgardService } from '../../midgard/service'
 import { ApiError, ErrorId } from '../../wallet/types'
 import { FeeOptionKeys, INITIAL_ASYM_DEPOSIT_STATE, INITIAL_SYM_DEPOSIT_STATE } from '../const'
@@ -25,7 +24,7 @@ import {
   SymDepositState$,
   SymDepositValidationResult
 } from '../types'
-import { sendTx$, poolTxStatusByChain$ } from './common'
+import { sendPoolTx$, poolTxStatusByChain$ } from './common'
 
 const { pools: midgardPoolsService, validateNode$ } = midgardService
 
@@ -183,9 +182,10 @@ export const symDeposit$ = ({
     // 2. send RUNE deposit txs
     liveData.chain<ApiError, SymDepositValidationResult, TxHash>((_) => {
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 40, total }) })
-      return sendTx$({
+      return sendPoolTx$({
+        router: O.none, // no router for RUNE
         asset: AssetRuneNative,
-        recipient: '',
+        recipient: '', // no recipient for RUNE needed
         amount: amounts.rune,
         memo: memos.rune,
         feeOptionKey: FeeOptionKeys.DEPOSIT

@@ -7,9 +7,9 @@ import { createInteractService$ } from './interact'
 import { getNodeInfo$, reloadNodesInfo } from './thorNode'
 import { createTransactionService } from './transaction'
 
-const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$, sendDepositTx } = createTransactionService(client$)
+const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$, sendPoolTx$ } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService({ client$, chain: THORChain })
-const interact$ = createInteractService$(sendDepositTx, txStatus$)
+const interact$ = createInteractService$(sendPoolTx$, txStatus$)
 
 export {
   address$,
@@ -29,7 +29,7 @@ export {
   txRD$,
   getExplorerTxUrl$,
   getExplorerAddressUrl$,
-  sendDepositTx,
+  sendPoolTx$,
   interact$,
   getNodeInfo$,
   reloadNodesInfo

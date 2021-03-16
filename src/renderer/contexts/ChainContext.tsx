@@ -3,8 +3,10 @@ import React, { createContext, useContext } from 'react'
 import {
   addressByChain$,
   clientByChain$,
-  depositFees$,
-  reloadDepositFees,
+  symDepositFees$,
+  reloadSymDepositFees,
+  asymDepositFee$,
+  reloadAsymDepositFee,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   getWithdrawMemo$,
@@ -29,8 +31,10 @@ import {
 type ChainContextValue = {
   addressByChain$: typeof addressByChain$
   clientByChain$: typeof clientByChain$
-  depositFees$: typeof depositFees$
-  reloadDepositFees: typeof reloadDepositFees
+  symDepositFees$: typeof symDepositFees$
+  reloadSymDepositFees: typeof reloadSymDepositFees
+  asymDepositFee$: typeof asymDepositFee$
+  reloadAsymDepositFee: typeof reloadAsymDepositFee
   withdrawFee$: typeof withdrawFee$
   reloadWithdrawFees: typeof reloadWithdrawFee
   symDepositTxMemo$: typeof symDepositTxMemo$
@@ -55,8 +59,10 @@ type ChainContextValue = {
 const initialContext: ChainContextValue = {
   addressByChain$,
   clientByChain$,
-  depositFees$,
-  reloadDepositFees,
+  symDepositFees$,
+  reloadSymDepositFees,
+  asymDepositFee$,
+  reloadAsymDepositFee,
   withdrawFee$,
   reloadWithdrawFees: reloadWithdrawFee,
   symDepositTxMemo$,

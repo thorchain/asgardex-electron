@@ -25,7 +25,7 @@ export type SendTxParams = {
 export type AddressValidation = Client['validateAddress']
 
 export type TransactionService = {
-  sendDepositTx: (params: DepositParam) => TxHashLD
+  sendPoolTx$: (params: DepositParam) => TxHashLD
 } & C.TransactionService<SendTxParams>
 
 export type InteractParams = {

@@ -201,8 +201,8 @@ export const Swap = ({
   const oSwapFeesParams: O.Option<SwapFeesParams> = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oSwapParams),
-        O.map(([swapParams]) => ({
+        oSwapParams,
+        O.map((swapParams) => ({
           inTx: swapParams,
           outTx: {
             asset: targetAssetProp,

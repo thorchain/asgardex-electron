@@ -31,11 +31,14 @@ export const maxAssetAmountToDeposit = ({
   assetBalance: BaseAmount
 }): BaseAmount => {
   const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
-  const maxAssetAmount: BigNumber = poolAssetBalance
+  const maxAssetAmountBN: BigNumber = poolAssetBalance
     .amount()
     .dividedBy(poolRuneBalance.amount())
     .multipliedBy(runeBalance.amount())
-  return maxAssetAmount.isGreaterThan(assetBalance.amount()) ? assetBalance : baseAmount(maxAssetAmount)
+
+  return assetBalance.amount().isGreaterThanOrEqualTo(maxAssetAmountBN)
+    ? assetBalance
+    : baseAmount(maxAssetAmountBN, assetBalance.decimal)
 }
 
 export const getRuneAmountToDeposit = (
@@ -55,5 +58,5 @@ export const getAssetAmountToDeposit = (
   baseAmount(
     // formula: runeAmount * poolRuneBalance / poolAssetBalance
     runeAmount.amount().times(poolAssetBalance.amount().dividedBy(poolRuneBalance.amount())),
-    THORCHAIN_DECIMAL
+    poolAssetBalance.decimal
   )
