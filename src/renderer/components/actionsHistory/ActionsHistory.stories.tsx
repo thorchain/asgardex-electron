@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
 import { Story } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
 import { HistoryActions } from '../../services/midgard/types'
@@ -32,7 +32,7 @@ const actions: HistoryActions = [
       {
         address: 'string',
         values: [
-          { asset: AssetBNB, amount: assetToBase(assetAmount(101.2412)) },
+          { asset: AssetBTC, amount: assetToBase(assetAmount(101.2412)) },
           { asset: AssetBNB, amount: assetToBase(assetAmount(120.232)) }
         ],
         memo: 'string',
@@ -47,7 +47,7 @@ const actions: HistoryActions = [
     fees: [{ asset: AssetRuneNative, amount: assetToBase(assetAmount(1.234)) }]
   },
   {
-    date: new Date(Date.now()),
+    date: new Date(Date.now() + 1),
     /**
      * Inbound transactions related to the action
      */
@@ -76,7 +76,7 @@ const actions: HistoryActions = [
     type: 'DOUBLE_SWAP'
   },
   {
-    date: new Date(Date.now()),
+    date: new Date(Date.now() + 2),
     /**
      * Inbound transactions related to the action
      */
@@ -95,7 +95,7 @@ const actions: HistoryActions = [
     type: 'SWAP'
   },
   {
-    date: new Date(Date.now()),
+    date: new Date(Date.now() + 1000),
     /**
      * Inbound transactions related to the action
      */

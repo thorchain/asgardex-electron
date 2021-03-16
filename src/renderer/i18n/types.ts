@@ -60,6 +60,7 @@ export type CommonMessageKey =
   | 'common.modal.confirmTitle'
   | 'common.value'
   | 'common.manage'
+  | 'common.detail'
   | 'common.asset.base'
   | 'common.tx.type.swap'
   | 'common.tx.type.doubleSwap'

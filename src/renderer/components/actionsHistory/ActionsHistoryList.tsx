@@ -79,7 +79,7 @@ export const ActionsHistoryList: React.FC<Props> = ({
         )
         return renderList(data, true)
       },
-      ({ msg }) => <ErrorView title={msg} />,
+      ({ msg }) => <ErrorView key="error view" title={msg} />,
       renderList
     )
   )

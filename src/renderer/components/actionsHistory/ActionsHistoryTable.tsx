@@ -45,7 +45,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
     () => ({
       key: 'timeStamp',
       title: intl.formatMessage({ id: 'common.date' }),
-      align: 'left',
+      align: 'center',
       width: 150,
       render: renderDateColumn
     }),
@@ -94,11 +94,11 @@ export const ActionsHistoryTable: React.FC<Props> = ({
   const detailColumn: ColumnType<HistoryAction> = useMemo(
     () => ({
       key: 'txDetail',
-      title: 'detail',
+      title: intl.formatMessage({ id: 'common.detail' }),
       align: 'left',
       render: renderDetailColumn
     }),
-    [renderDetailColumn]
+    [renderDetailColumn, intl]
   )
 
   const columns: ColumnsType<HistoryAction> = useMemo(() => [actionTypeColumn, detailColumn, dateColumn, linkColumn], [
