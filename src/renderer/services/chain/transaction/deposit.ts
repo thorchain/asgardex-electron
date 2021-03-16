@@ -173,20 +173,19 @@ export const symDeposit$ = ({
   // to update `SymDepositState` step by step
   const requests$ = Rx.of(poolAddresses).pipe(
     // 1. Validation pool address + node
-    RxOp.switchMap((poolAddresses) => {
-      console.log(poolAddresses)
-      return liveData.sequenceS({
+    RxOp.switchMap((poolAddresses) =>
+      liveData.sequenceS({
         pool: midgardPoolsService.validatePool$(poolAddresses, asset.chain),
         node: validateNode$()
       })
-    }),
+    ),
     // 2. send RUNE deposit txs
     liveData.chain<ApiError, SymDepositValidationResult, TxHash>((_) => {
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 40, total }) })
       return sendPoolTx$({
-        router: poolAddresses.router,
+        router: O.none, // no router for RUNE
         asset: AssetRuneNative,
-        recipient: '',
+        recipient: '', // no recipient for RUNE needed
         amount: amounts.rune,
         memo: memos.rune,
         feeOptionKey: FeeOptionKeys.DEPOSIT
