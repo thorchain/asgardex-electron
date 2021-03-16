@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { Story } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
@@ -137,11 +137,13 @@ const getResults = getMockRDValueFactory(
 
 export const Table: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   const res = useMemo(() => getResults(dataStatus), [dataStatus])
+  const [currentPage, setCurrentPage] = useState(1)
   return (
     <ActionsHistory
       goToTx={console.log}
       actionsPageRD={res}
-      changePaginationHandler={console.log}
+      changePaginationHandler={setCurrentPage}
+      currentPage={currentPage}
       clickTxLinkHandler={console.log}
     />
   )

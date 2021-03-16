@@ -22,7 +22,8 @@ export const ActionsHistoryTable: React.FC<Props> = ({
   clickTxLinkHandler,
   changePaginationHandler,
   actionsPageRD,
-  prevActionsPageRD = O.none
+  prevActionsPageRD = O.none,
+  currentPage
 }) => {
   const intl = useIntl()
 
@@ -115,7 +116,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
           <Styled.Table columns={columns} dataSource={actions} loading={loading} rowKey="txHash" />
           {total > 0 && (
             <Pagination
-              defaultCurrent={1}
+              current={currentPage}
               total={total}
               defaultPageSize={MAX_ITEMS_PER_PAGE}
               showSizeChanger={false}
@@ -125,7 +126,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
         </>
       )
     },
-    [columns, changePaginationHandler]
+    [columns, changePaginationHandler, currentPage]
   )
 
   return useMemo(

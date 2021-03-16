@@ -45,7 +45,8 @@ export const ActionsHistoryList: React.FC<Props> = ({
   changePaginationHandler,
   actionsPageRD,
   prevActionsPageRD = O.none,
-  goToTx
+  goToTx,
+  currentPage
 }) => {
   const renderListItem = useMemo(() => renderItem(goToTx), [goToTx])
   const renderList = useCallback(
@@ -55,7 +56,7 @@ export const ActionsHistoryList: React.FC<Props> = ({
           <Styled.List loading={loading} itemLayout="vertical" dataSource={actions} renderItem={renderListItem} />
           {total > 0 && (
             <Pagination
-              defaultCurrent={1}
+              current={currentPage}
               total={total}
               defaultPageSize={MAX_ITEMS_PER_PAGE}
               showSizeChanger={false}
@@ -65,7 +66,7 @@ export const ActionsHistoryList: React.FC<Props> = ({
         </>
       )
     },
-    [changePaginationHandler, renderListItem]
+    [changePaginationHandler, renderListItem, currentPage]
   )
 
   return FP.pipe(

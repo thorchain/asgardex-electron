@@ -3,6 +3,7 @@ import * as O from 'fp-ts/Option'
 import { HistoryActionsPage, HistoryActionsPageRD } from '../../services/midgard/types'
 
 export type Props = {
+  currentPage: number
   actionsPageRD: HistoryActionsPageRD
   prevActionsPageRD?: O.Option<HistoryActionsPage>
   goToTx: (txHash: string) => void
