@@ -10,8 +10,10 @@ import {
   AssetLTC,
   AssetRune67C,
   AssetRuneB1A,
-  AssetRuneNative
+  AssetRuneNative,
+  bn
 } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -163,3 +165,17 @@ export const midgardAssetFromString: (assetString: string) => O.Option<Asset> = 
   // And 0X isn't recognized as valid address in ethers lib
   O.map(updateEthChecksumAddress)
 )
+
+/**
+ * Helper to convert asset amounts from Midgard/THORChain based on 1e8 decimal
+ * into any 1e(n) decimal based amount
+ *
+ * For example:
+ * ETH.ETH: Midgard 1e8 vs. ETH 1e18
+ * @param amount Asset amount to convert
+ * @param decimal Asset decimal
+ */
+export const convertDecimalFromMidgard = (amount: BigNumber, decimal: number): BigNumber => {
+  const decimalDiff = decimal - THORCHAIN_DECIMAL
+  return decimalDiff < 0 ? amount.dividedBy(bn(`1e+${decimalDiff * -1}`)) : amount.multipliedBy(bn(`1e+${decimalDiff}`))
+}

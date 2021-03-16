@@ -2,7 +2,7 @@ import { PoolData } from '@thorchain/asgardex-util'
 import { baseAmount, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
-import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
+import { convertDecimalFromMidgard, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 
 export const maxRuneAmountToDeposit = ({
   poolData,
@@ -14,11 +14,13 @@ export const maxRuneAmountToDeposit = ({
   assetBalance: BaseAmount
 }): BaseAmount => {
   const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
-  const maxRuneAmount = poolRuneBalance
+  const maxRuneAmountBN = poolRuneBalance
     .amount()
     .dividedBy(poolAssetBalance.amount())
     .multipliedBy(assetBalance.amount())
-  return maxRuneAmount.isGreaterThan(runeBalance.amount()) ? runeBalance : baseAmount(maxRuneAmount)
+  return maxRuneAmountBN.isGreaterThan(runeBalance.amount())
+    ? runeBalance
+    : baseAmount(maxRuneAmountBN, THORCHAIN_DECIMAL)
 }
 
 export const maxAssetAmountToDeposit = ({
@@ -31,12 +33,16 @@ export const maxAssetAmountToDeposit = ({
   assetBalance: BaseAmount
 }): BaseAmount => {
   const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
-  const maxAssetAmountBN: BigNumber = poolAssetBalance
+
+  const _maxAssetAmountBN: BigNumber = poolAssetBalance
     .amount()
     .dividedBy(poolRuneBalance.amount())
     .multipliedBy(runeBalance.amount())
 
-  return assetBalance.amount().isGreaterThanOrEqualTo(maxAssetAmountBN)
+  // update decimal for pool asset
+  const maxAssetAmountBN = convertDecimalFromMidgard(_maxAssetAmountBN, assetBalance.decimal)
+
+  return maxAssetAmountBN.isGreaterThan(assetBalance.amount())
     ? assetBalance
     : baseAmount(maxAssetAmountBN, assetBalance.decimal)
 }
