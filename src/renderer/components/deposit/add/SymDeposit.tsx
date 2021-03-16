@@ -16,7 +16,10 @@ import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
@@ -156,24 +159,25 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oPoolAddress, oMemos, asset, runeAmountToDeposit, assetAmountToDeposit]
   )
 
-  const depositFees$ = useMemo(() => fees$, [fees$])
-  // State of results of `chainFees
-  // Note: useObservableState won't work,
-  // because we do need to make sure all data needed for `DepositParams` are provided,
-  // which failed by using useObservableState<DepositFeesRD>
-  const { state: depositFeesRD, subscribe: subscribeDepositFeesRD } = useSubscriptionState<DepositFeesRD>(RD.initial)
+  // Input: `oDepositParams` via depositParamsUpdated
+  // Output: `DepositFeesRD
+  const [depositFeesRD, depositParamsUpdated] = useObservableState<DepositFeesRD, O.Option<SymDepositParams>>(
+    (oDepositParams$) => oDepositParams$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), fees$)))),
+    RD.initial
+  )
+
+  // whenever `oDepositParams` has been updated, `depositParamsUpdated` needs to be called to update `depositFeesRD`
+  useEffect(() => depositParamsUpdated(oDepositParams), [depositParamsUpdated, oDepositParams])
 
   const reloadFeesHandler = useCallback(() => {
     FP.pipe(
       oDepositParams,
       O.map((params) => {
-        subscribeDepositFeesRD(depositFees$(params))
         reloadFees(params)
         return true
       })
     )
-    // FP.pipe(oDepositParams, O.map(reloadFees))
-  }, [depositFees$, oDepositParams, reloadFees, subscribeDepositFeesRD])
+  }, [oDepositParams, reloadFees])
 
   const oThorchainFee: O.Option<BaseAmount> = useMemo(
     () =>
