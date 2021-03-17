@@ -16,7 +16,6 @@ import {
   Health
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
-import { TxTypes } from '../chain/types'
 import { ApiError } from '../wallet/types'
 
 export type ThorchainLastblock = LastblockItem[]
@@ -165,6 +164,8 @@ export type Tx = {
   txID: string
 }
 
+export type TxType = 'DEPOSIT' | 'SWAP' | 'DOUBLE_SWAP' | 'WITHDRAW' | 'UPGRADE'
+
 export type HistoryAction = {
   date: Date
   /**
@@ -175,7 +176,7 @@ export type HistoryAction = {
    * Outbound transactions related to the action
    */
   out: Tx[]
-  type: TxTypes
+  type: TxType
   fees?: AssetWithAmount[]
   slip?: number
 }

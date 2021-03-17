@@ -1,7 +1,7 @@
 import React from 'react'
 
+import { TxType } from '../../../services/midgard/types'
 import { AssetWithAmount } from '../../../types/asgardex'
-import { UITxType } from '../txType/TxType.types'
 
 export type ActionProps = {
   incomes: AssetWithAmount[]
@@ -13,5 +13,5 @@ export type ActionProps = {
   slip?: number
   className?: string
   date: React.ReactElement
-  type: UITxType
+  type: TxType
 }
