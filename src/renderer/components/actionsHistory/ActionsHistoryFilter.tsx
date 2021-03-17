@@ -13,11 +13,12 @@ type Props = {
   className?: string
   currentFilter: Filter
   onFilterChanged: (targetFilter: Filter) => void
+  disabled?: boolean
 }
 
 const FILTER_ITEMS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'DOUBLE_SWAP', 'WITHDRAW']
 
-export const ActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFilterChanged, className }) => {
+export const ActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFilterChanged, className, disabled }) => {
   const intl = useIntl()
   const activeFilterIndex = useMemo(() => {
     const index = FILTER_ITEMS.indexOf(currentFilter)
@@ -52,7 +53,7 @@ export const ActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFilterC
   }, [activeFilterIndex, onFilterChanged, allItemContent])
 
   return (
-    <Dropdown overlay={menu} trigger={['click']}>
+    <Dropdown overlay={menu} trigger={['click']} disabled={disabled}>
       <Styled.FilterButton className={className}>
         {intl.formatMessage({ id: 'common.filter' })} <CaretDownOutlined />{' '}
       </Styled.FilterButton>

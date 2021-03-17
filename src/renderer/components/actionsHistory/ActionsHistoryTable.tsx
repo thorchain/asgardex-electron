@@ -13,6 +13,7 @@ import { ApiError } from '../../services/wallet/types'
 import { ErrorView } from '../shared/error'
 import * as CommonStyled from '../uielements/common/Common.style'
 import { Pagination } from '../uielements/pagination'
+import { ReloadButton } from '../uielements/reloadButton'
 import { TxDetail } from '../uielements/txDetail'
 import * as H from './ActionsHistory.helper'
 import * as Styled from './ActionsHistoryTable.styles'
@@ -25,7 +26,8 @@ export const ActionsHistoryTable: React.FC<Props> = ({
   prevActionsPageRD = O.none,
   currentPage,
   currentFilter,
-  setFilter
+  setFilter,
+  reload
 }) => {
   const intl = useIntl()
 
@@ -72,7 +74,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
   const linkColumn: ColumnType<HistoryAction> = useMemo(
     () => ({
       key: 'txHash',
-      title: '',
+      title: <ReloadButton onClick={reload} />,
       align: 'center',
       width: 60,
       render: renderLinkColumn

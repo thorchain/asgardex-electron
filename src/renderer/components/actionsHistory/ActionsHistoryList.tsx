@@ -8,6 +8,7 @@ import { MAX_ITEMS_PER_PAGE } from '../../services/const'
 import { HistoryAction, HistoryActionsPage } from '../../services/midgard/types'
 import { ErrorView } from '../shared/error'
 import { Pagination } from '../uielements/pagination'
+import { ReloadButton } from '../uielements/reloadButton'
 import { TxDetail } from '../uielements/txDetail'
 import * as H from './ActionsHistory.helper'
 import * as Styled from './ActionsHistoryList.styles'
@@ -48,7 +49,9 @@ export const ActionsHistoryList: React.FC<Props> = ({
   goToTx,
   currentPage,
   currentFilter,
-  setFilter
+  setFilter,
+  reload,
+  className
 }) => {
   const renderListItem = useMemo(() => renderItem(goToTx), [goToTx])
   const renderList = useCallback(
@@ -71,14 +74,18 @@ export const ActionsHistoryList: React.FC<Props> = ({
     [changePaginationHandler, renderListItem, currentPage]
   )
 
-  const showFilter: boolean = useMemo(() => O.isSome(prevActionsPageRD) && RD.isSuccess(actionsPageRD), [
-    actionsPageRD,
-    prevActionsPageRD
-  ])
-
   return (
-    <Styled.Container>
-      {showFilter && <Styled.ActionsFilter currentFilter={currentFilter} onFilterChanged={setFilter} />}
+    <div className={className}>
+      <Styled.ControlsContainer>
+        {
+          <Styled.ActionsFilter
+            currentFilter={currentFilter}
+            onFilterChanged={setFilter}
+            disabled={!RD.isSuccess(actionsPageRD)}
+          />
+        }
+        <ReloadButton onClick={reload} disabled={!(RD.isSuccess(actionsPageRD) || RD.isFailure(actionsPageRD))} />
+      </Styled.ControlsContainer>
       {FP.pipe(
         actionsPageRD,
         RD.fold(
@@ -94,6 +101,6 @@ export const ActionsHistoryList: React.FC<Props> = ({
           renderList
         )
       )}
-    </Styled.Container>
+    </div>
   )
 }

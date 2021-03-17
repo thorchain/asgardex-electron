@@ -142,6 +142,7 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   const [filter, setFilter] = useState<Filter>('ALL')
   return (
     <ActionsHistory
+      reload={() => console.log('reload')}
       currentFilter={filter}
       setFilter={setFilter}
       goToTx={console.log}

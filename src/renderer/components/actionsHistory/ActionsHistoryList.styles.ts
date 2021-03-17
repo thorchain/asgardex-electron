@@ -10,14 +10,17 @@ import { Button as UIButton } from '../uielements/button'
 import { TxType as TxTypeUI } from '../uielements/txType'
 import { ActionsHistoryFilter } from './ActionsHistoryFilter'
 
-export const Container = styled.div`
+export const ControlsContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-bottom: 10px;
 `
 
 export const ActionsFilter = styled(ActionsHistoryFilter)`
   align-self: flex-end;
-  margin-bottom: 10px;
+  margin-right: 20px;
 `
 
 export const List = styled(A.List)`
