@@ -61,6 +61,8 @@ export type CommonMessageKey =
   | 'common.value'
   | 'common.manage'
   | 'common.detail'
+  | 'common.filter'
+  | 'common.all'
   | 'common.asset.base'
   | 'common.tx.type.swap'
   | 'common.tx.type.doubleSwap'

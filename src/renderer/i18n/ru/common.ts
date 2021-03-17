@@ -65,7 +65,9 @@ const common: CommonMessages = {
   'common.tx.type.doubleSwap': 'Двойной обмен',
   'common.tx.type.deposit': 'Вклад',
   'common.tx.type.withdraw': 'Изъятие',
-  'common.detail': 'Детали'
+  'common.detail': 'Детали',
+  'common.filter': 'Фильтр',
+  'common.all': 'Все'
 }
 
 export default common

@@ -65,7 +65,9 @@ const common: CommonMessages = {
   'common.tx.type.doubleSwap': 'Double swap',
   'common.tx.type.deposit': 'Deposit',
   'common.tx.type.withdraw': 'Withdraw',
-  'common.detail': 'Detail'
+  'common.detail': 'Detail',
+  'common.filter': 'Filter',
+  'common.all': 'All'
 }
 
 export default common
