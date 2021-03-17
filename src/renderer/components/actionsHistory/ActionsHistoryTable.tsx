@@ -15,6 +15,7 @@ import * as CommonStyled from '../uielements/common/Common.style'
 import { Pagination } from '../uielements/pagination'
 import { TxDetail } from '../uielements/txDetail'
 import * as H from './ActionsHistory.helper'
+import { ActionsHistoryFilter } from './ActionsHistoryFilter'
 import * as Styled from './ActionsHistoryTable.styles'
 import { Props } from './types'
 
@@ -23,7 +24,9 @@ export const ActionsHistoryTable: React.FC<Props> = ({
   changePaginationHandler,
   actionsPageRD,
   prevActionsPageRD = O.none,
-  currentPage
+  currentPage,
+  currentFilter,
+  setFilter
 }) => {
   const intl = useIntl()
 
@@ -32,12 +35,12 @@ export const ActionsHistoryTable: React.FC<Props> = ({
   const actionTypeColumn: ColumnType<HistoryAction> = useMemo(
     () => ({
       key: 'txType',
-      title: '',
+      title: <ActionsHistoryFilter currentFilter={currentFilter} onFilterChanged={setFilter} />,
       align: 'right',
       width: 170,
       render: renderActionTypeColumn
     }),
-    [renderActionTypeColumn]
+    [renderActionTypeColumn, setFilter, currentFilter]
   )
 
   const renderDateColumn = useCallback((_, { date }: HistoryAction) => H.renderDate(date), [])

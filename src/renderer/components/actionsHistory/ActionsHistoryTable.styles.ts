@@ -17,6 +17,12 @@ export const Table = styled(UITable)`
   .ant-table-tbody > tr > td {
     border: none;
   }
+
+  // .ant-table-row:hover {
+  //   & .ant-table-cell {
+  //     background: ${palette('gray', 1)} !important;
+  //   }
+  // }
 `
 
 export const Text = styled(Typography.Text)`

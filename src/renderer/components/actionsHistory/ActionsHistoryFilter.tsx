@@ -10,20 +10,21 @@ import * as Styled from './ActionsHistoryFilter.styles'
 import { Filter } from './types'
 
 type Props = {
+  className?: string
   currentFilter: Filter
   onFilterChanged: (targetFilter: Filter) => void
 }
 
 const FILTER_ITEMS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'DOUBLE_SWAP', 'WITHDRAW']
 
-export const ActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFilterChanged }) => {
+export const ActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFilterChanged, className }) => {
   const activeFilterIndex = useMemo(() => {
     const index = FILTER_ITEMS.indexOf(currentFilter)
     return index > -1 ? index : 0
   }, [currentFilter])
   const menu = useMemo(() => {
     return (
-      <Styled.Menu selectedKeys={[FILTER_ITEMS[activeFilterIndex]]} onSelect={console.log}>
+      <Styled.Menu selectedKeys={[FILTER_ITEMS[activeFilterIndex]]}>
         {FP.pipe(
           FILTER_ITEMS,
           A.map((filter) => {
@@ -41,7 +42,7 @@ export const ActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFilterC
 
   return (
     <Dropdown overlay={menu} trigger={['click']}>
-      <Styled.FilterButton>
+      <Styled.FilterButton className={className}>
         filter <CaretDownOutlined />{' '}
       </Styled.FilterButton>
     </Dropdown>

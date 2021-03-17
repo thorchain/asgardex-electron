@@ -46,7 +46,9 @@ export const ActionsHistoryList: React.FC<Props> = ({
   actionsPageRD,
   prevActionsPageRD = O.none,
   goToTx,
-  currentPage
+  currentPage,
+  currentFilter,
+  setFilter
 }) => {
   const renderListItem = useMemo(() => renderItem(goToTx), [goToTx])
   const renderList = useCallback(
@@ -69,19 +71,29 @@ export const ActionsHistoryList: React.FC<Props> = ({
     [changePaginationHandler, renderListItem, currentPage]
   )
 
-  return FP.pipe(
+  const showFilter: boolean = useMemo(() => O.isSome(prevActionsPageRD) && RD.isSuccess(actionsPageRD), [
     actionsPageRD,
-    RD.fold(
-      () => renderList(H.emptyData, true),
-      () => {
-        const data = FP.pipe(
-          prevActionsPageRD,
-          O.getOrElse(() => H.emptyData)
+    prevActionsPageRD
+  ])
+
+  return (
+    <Styled.Container>
+      {showFilter && <Styled.ActionsFilter currentFilter={currentFilter} onFilterChanged={setFilter} />}
+      {FP.pipe(
+        actionsPageRD,
+        RD.fold(
+          () => renderList(H.emptyData, true),
+          () => {
+            const data = FP.pipe(
+              prevActionsPageRD,
+              O.getOrElse(() => H.emptyData)
+            )
+            return renderList(data, true)
+          },
+          ({ msg }) => <ErrorView key="error view" title={msg} />,
+          renderList
         )
-        return renderList(data, true)
-      },
-      ({ msg }) => <ErrorView key="error view" title={msg} />,
-      renderList
-    )
+      )}
+    </Styled.Container>
   )
 }

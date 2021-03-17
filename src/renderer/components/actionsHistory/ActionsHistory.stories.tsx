@@ -7,6 +7,7 @@ import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../share
 import { HistoryActions } from '../../services/midgard/types'
 import { ErrorId } from '../../services/wallet/types'
 import { ActionsHistory } from './ActionsHistory'
+import { Filter } from './types'
 
 const actions: HistoryActions = [
   {
@@ -135,11 +136,14 @@ const getResults = getMockRDValueFactory(
   () => ({ errorId: ErrorId.GET_ACTIONS, msg: 'some error here' })
 )
 
-export const Table: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
+export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   const res = useMemo(() => getResults(dataStatus), [dataStatus])
   const [currentPage, setCurrentPage] = useState(1)
+  const [filter, setFilter] = useState<Filter>('ALL')
   return (
     <ActionsHistory
+      currentFilter={filter}
+      setFilter={setFilter}
       goToTx={console.log}
       actionsPageRD={res}
       changePaginationHandler={setCurrentPage}
@@ -149,7 +153,7 @@ export const Table: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   )
 }
 
-Table.args = {
+History.args = {
   dataStatus: argTypes.dataStatus.control.options[0]
 }
 

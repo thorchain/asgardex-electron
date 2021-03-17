@@ -8,6 +8,17 @@ import { media } from '../../helpers/styleHelper'
 import { HistoryAction } from '../../services/midgard/types'
 import { Button as UIButton } from '../uielements/button'
 import { TxType as TxTypeUI } from '../uielements/txType'
+import { ActionsHistoryFilter } from './ActionsHistoryFilter'
+
+export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+export const ActionsFilter = styled(ActionsHistoryFilter)`
+  align-self: flex-end;
+  margin-bottom: 10px;
+`
 
 export const List = styled(A.List)`
   background: ${palette('background', 0)};
