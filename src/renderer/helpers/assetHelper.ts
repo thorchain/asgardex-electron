@@ -11,9 +11,10 @@ import {
   AssetRune67C,
   AssetRuneB1A,
   AssetRuneNative,
+  baseAmount,
+  BaseAmount,
   bn
 } from '@xchainjs/xchain-util'
-import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -167,15 +168,23 @@ export const midgardAssetFromString: (assetString: string) => O.Option<Asset> = 
 )
 
 /**
- * Helper to convert asset amounts from Midgard/THORChain based on 1e8 decimal
- * into any 1e(n) decimal based amount
+ * Helper to convert decimal of asset amounts
  *
- * For example:
- * ETH.ETH: Midgard 1e8 vs. ETH 1e18
- * @param amount Asset amount to convert
- * @param decimal Asset decimal
+ * It can be used to convert Midgard/THORChain amounts,
+ * which are always based on 1e8 decimal into any 1e(n) decimal
+ *
+ * Examples:
+ * ETH.ETH: 1e8 -> 1e18
+ * ETH.USDT: 1e8 -> 1e6
+ *
+ * @param amount BaseAmount to convert
+ * @param decimal Target decimal
  */
-export const convertDecimalFromMidgard = (amount: BigNumber, decimal: number): BigNumber => {
-  const decimalDiff = decimal - THORCHAIN_DECIMAL
-  return decimalDiff < 0 ? amount.dividedBy(bn(`1e+${decimalDiff * -1}`)) : amount.multipliedBy(bn(`1e+${decimalDiff}`))
+export const convertBaseAmountDecimal = (amount: BaseAmount, decimal: number): BaseAmount => {
+  const decimalDiff = decimal - amount.decimal
+  const amountBN =
+    decimalDiff < 0
+      ? amount.amount().dividedBy(bn(Math.pow(10, decimalDiff * -1)))
+      : amount.amount().multipliedBy(bn(Math.pow(10, decimalDiff)))
+  return baseAmount(amountBN, decimal)
 }
