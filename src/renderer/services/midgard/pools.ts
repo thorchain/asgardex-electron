@@ -237,7 +237,7 @@ const createPoolsService = (
     )
 
   // Factory to create a stream to get data of `PoolDetails`
-  const getPoolDetails$: (poolAssets$: PoolAssetsLD, status: GetPoolsStatusEnum) => PoolDetailsLD = (
+  const getPoolDetails$: (poolAssets$: PoolAssetsLD, status?: GetPoolsStatusEnum) => PoolDetailsLD = (
     poolAssets$,
     status
   ) =>
@@ -254,6 +254,36 @@ const createPoolsService = (
       ),
       RxOp.shareReplay(1)
     )
+
+  /**
+   * Loading queue to get `PoolDetails` of all pools
+   */
+  const loadAllPoolsDetails$ = (): PoolDetailsLD => {
+    const poolAssets$: PoolAssetsLD = FP.pipe(
+      apiGetPoolsAll$,
+      // Filter out all unknown / invalid assets created from asset strings
+      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
+      // Filter pools by using enabled chains only (defined via ENV)
+      liveData.map(A.filter(({ chain }) => isEnabledChain(chain))),
+      RxOp.shareReplay(1)
+    )
+
+    return FP.pipe(
+      getPoolDetails$(poolAssets$),
+      RxOp.startWith(RD.pending),
+      RxOp.catchError((error: Error) => Rx.of(RD.failure(error)))
+    )
+  }
+
+  /**
+   * `PoolDetails` of all pools
+   */
+  const allPoolDetails$: PoolDetailsLD = reloadPools$.pipe(
+    // start loading queue
+    RxOp.switchMap(loadAllPoolsDetails$),
+    // cache it to avoid reloading data by every subscription
+    RxOp.shareReplay(1)
+  )
 
   /**
    * Loading queue to get all needed data for `PoolsState`
@@ -305,7 +335,7 @@ const createPoolsService = (
   }
 
   /**
-   * State of all pool data
+   * State of data of available pools
    */
   const poolsState$: PoolsStateLD = reloadPools$.pipe(
     // start loading queue
@@ -519,6 +549,7 @@ const createPoolsService = (
   return {
     poolsState$,
     pendingPoolsState$,
+    allPoolDetails$,
     setSelectedPricePoolAsset,
     selectedPricePoolAsset$,
     selectedPricePool$,

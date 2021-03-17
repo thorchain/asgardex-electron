@@ -24,8 +24,7 @@ import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
-import { FeeLD, FeeRD, Memo, WithdrawState, WithdrawStateHandler } from '../../../services/chain/types'
-import { PoolAddress } from '../../../services/midgard/types'
+import { FeeLD, FeeRD, Memo, WithdrawState, SymWithdrawStateHandler } from '../../../services/chain/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
@@ -52,11 +51,10 @@ export type Props = {
   shares: { rune: BaseAmount; asset: BaseAmount }
   /** Flag whether form has to be disabled or not */
   disabled?: boolean
-  poolAddresses: O.Option<PoolAddress>
   viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
   reloadBalances: FP.Lazy<void>
-  withdraw$: WithdrawStateHandler
+  withdraw$: SymWithdrawStateHandler
   fee$: (chain: Chain, memo: Memo) => FeeLD
   network: Network
 }
@@ -64,7 +62,7 @@ export type Props = {
 /**
  * Withdraw component
  *
- * Note: It currently supports sym. withdraw only
+ * Note: It supports sym. withdraw only
  *
  * */
 export const Withdraw: React.FC<Props> = ({
@@ -75,7 +73,6 @@ export const Withdraw: React.FC<Props> = ({
   selectedPriceAsset,
   shares: { rune: runeShare, asset: assetShare },
   disabled,
-  poolAddresses: oPoolAddresses,
   viewRuneTx = (_) => {},
   validatePassword$,
   reloadBalances = FP.constVoid,
@@ -267,25 +264,16 @@ export const Withdraw: React.FC<Props> = ({
     // close private modal
     closePasswordModal()
 
-    FP.pipe(
-      oPoolAddresses,
-      O.map((poolAddresses) => {
-        // set start time
-        setWithdrawStartTime(Date.now())
+    // set start time
+    setWithdrawStartTime(Date.now())
 
-        subscribeWithdrawState(
-          withdraw$({
-            asset: AssetRuneNative,
-            poolAddress: poolAddresses,
-            network,
-            memo
-          })
-        )
-
-        return true
+    subscribeWithdrawState(
+      withdraw$({
+        network,
+        memo
       })
     )
-  }, [closePasswordModal, subscribeWithdrawState, withdraw$, oPoolAddresses, network, memo])
+  }, [closePasswordModal, subscribeWithdrawState, withdraw$, network, memo])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>

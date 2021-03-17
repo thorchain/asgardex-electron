@@ -18,7 +18,7 @@ import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
-import { FeeLD, FeeRD, Memo, WithdrawState, WithdrawStateHandler } from '../../../services/chain/types'
+import { FeeLD, FeeRD, Memo, WithdrawState, AsymWithdrawStateHandler } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { PasswordModal } from '../../modal/password'
@@ -50,7 +50,7 @@ export type Props = {
   viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
   reloadBalances: FP.Lazy<void>
-  withdraw$: WithdrawStateHandler
+  withdraw$: AsymWithdrawStateHandler
   fee$: (chain: Chain, memo: Memo) => FeeLD
   network: Network
 }
