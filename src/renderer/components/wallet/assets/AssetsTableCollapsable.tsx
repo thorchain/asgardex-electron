@@ -98,7 +98,10 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       width: 80,
       render: ({ asset, walletAddress }: WalletBalance) => (
         <Styled.BnbRuneTickerWrapper>
-          <Styled.Label nowrap>{asset.ticker}</Styled.Label>
+          <Styled.Label nowrap>
+            <Styled.TickerLabel className="ticker">{asset.ticker}</Styled.TickerLabel>
+            <Styled.TickerLabel className="small">{asset.chain}</Styled.TickerLabel>
+          </Styled.Label>
           {isRuneBnbAsset(asset) && (
             <Styled.UpgradeButton
               onClick={(e) => {
