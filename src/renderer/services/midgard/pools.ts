@@ -33,8 +33,7 @@ import {
   ValidatePoolLD,
   PoolAddress$,
   PoolAddressLD,
-  PoolAddress,
-  AllPoolsStateLD
+  PoolAddress
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -180,7 +179,7 @@ const createPoolsService = (
   /**
    * Data of `AssetDetails` from Midgard
    */
-  const apiGetAssetInfo$: (assetOrAssets: string | string[], status?: GetPoolsStatusEnum) => PoolAssetDetailsLD = (
+  const apiGetAssetInfo$: (assetOrAssets: string | string[], status: GetPoolsStatusEnum) => PoolAssetDetailsLD = (
     assetOrAssets,
     status
   ) => {
@@ -219,7 +218,7 @@ const createPoolsService = (
   }
 
   // Factory to create a stream to get data of `AssetDetails`
-  const getAssetDetails$: (poolAssets$: PoolAssetsLD, status?: GetPoolsStatusEnum) => PoolAssetDetailsLD = (
+  const getAssetDetails$: (poolAssets$: PoolAssetsLD, status: GetPoolsStatusEnum) => PoolAssetDetailsLD = (
     poolAssets$,
     status
   ) =>
@@ -257,9 +256,9 @@ const createPoolsService = (
     )
 
   /**
-   * Loading queue to get all needed data for `AllPoolsState`
+   * Loading queue to get `PoolDetails` of all pools
    */
-  const loadAllPoolsStateData$ = (): AllPoolsStateLD => {
+  const loadAllPoolsDetails$ = (): PoolDetailsLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
       apiGetPoolsAll$,
       // Filter out all unknown / invalid assets created from asset strings
@@ -268,23 +267,20 @@ const createPoolsService = (
       liveData.map(A.filter(({ chain }) => isEnabledChain(chain))),
       RxOp.shareReplay(1)
     )
-    const poolDetails$ = getPoolDetails$(poolAssets$)
 
     return FP.pipe(
-      liveData.sequenceS({
-        poolDetails: poolDetails$
-      }),
+      getPoolDetails$(poolAssets$),
       RxOp.startWith(RD.pending),
       RxOp.catchError((error: Error) => Rx.of(RD.failure(error)))
     )
   }
 
   /**
-   * State of all pool data
+   * `PoolDetails` of all pools
    */
-  const allPoolsState$: AllPoolsStateLD = reloadPools$.pipe(
+  const allPoolDetails$: PoolDetailsLD = reloadPools$.pipe(
     // start loading queue
-    RxOp.switchMap(loadAllPoolsStateData$),
+    RxOp.switchMap(loadAllPoolsDetails$),
     // cache it to avoid reloading data by every subscription
     RxOp.shareReplay(1)
   )
@@ -553,7 +549,7 @@ const createPoolsService = (
   return {
     poolsState$,
     pendingPoolsState$,
-    allPoolsState$,
+    allPoolDetails$,
     setSelectedPricePoolAsset,
     selectedPricePoolAsset$,
     selectedPricePool$,
