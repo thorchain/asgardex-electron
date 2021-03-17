@@ -24,7 +24,8 @@ import {
   PoolShares,
   PoolShare,
   PoolAddress,
-  PoolAddresses
+  PoolAddresses,
+  PoolsDataMap
 } from './types'
 
 export const getAssetDetail = (assets: PoolAssetsDetail, ticker: string): O.Option<PoolAssetDetail> =>
@@ -104,14 +105,14 @@ export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<Pool
  * Converts PoolDetails to the appropriate HashMap
  * Keys of the end HasMap is PoolDetails[i].asset
  */
-export const getPoolDetailsHashMap = (poolDetails: PoolDetails, runeAsset: Asset): Record<string, PoolData> => {
-  const res = poolDetails.reduce((acc, cur) => {
+export const getPoolDetailsHashMap = (poolDetails: PoolDetails, runeAsset: Asset): PoolsDataMap => {
+  const res = poolDetails.reduce<PoolsDataMap>((acc, cur) => {
     if (!cur.asset) {
       return acc
     }
 
     return { ...acc, [cur.asset]: toPoolData(cur) }
-  }, {} as Record<string, PoolData>)
+  }, {})
 
   const runePricePool = RUNE_PRICE_POOL
 
