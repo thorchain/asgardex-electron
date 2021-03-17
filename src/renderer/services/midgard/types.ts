@@ -67,6 +67,12 @@ export type PendingPoolsState = {
 export type PendingPoolsStateRD = RD.RemoteData<Error, PendingPoolsState>
 export type PendingPoolsStateLD = LiveData<Error, PendingPoolsState>
 
+export type AllPoolsState = {
+  poolDetails: PoolDetails
+}
+export type AllPoolsStateRD = RD.RemoteData<Error, AllPoolsState>
+export type AllPoolsStateLD = LiveData<Error, AllPoolsState>
+
 export type SelectedPoolAsset = O.Option<Asset>
 export type SelectedPoolChain = O.Option<Chain>
 
@@ -115,6 +121,7 @@ export type HealthLD = LiveData<Error, Health>
 export type PoolsService = {
   poolsState$: LiveData<Error, PoolsState>
   pendingPoolsState$: LiveData<Error, PendingPoolsState>
+  allPoolsState$: LiveData<Error, AllPoolsState>
   setSelectedPricePoolAsset: (asset: PricePoolAsset) => void
   selectedPricePoolAsset$: Rx.Observable<SelectedPricePoolAsset>
   selectedPricePool$: Rx.Observable<SelectedPricePool>

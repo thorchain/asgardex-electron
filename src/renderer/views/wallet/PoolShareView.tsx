@@ -34,7 +34,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
+    pools: { allPoolsState$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
     reloadNetworkInfo,
     shares: { combineSharesByAddresses$ }
   } = midgardService
@@ -72,7 +72,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     RD.initial
   )
 
-  const poolsRD = useObservableState(poolsState$, RD.pending)
+  const poolsRD = useObservableState(allPoolsState$, RD.pending)
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
   const priceAsset = FP.pipe(oPriceAsset, O.toUndefined)
