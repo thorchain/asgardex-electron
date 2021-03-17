@@ -34,7 +34,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
+    pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
     reloadNetworkInfo,
     shares: { combineSharesByAddresses$ }
   } = midgardService
@@ -72,7 +72,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     RD.initial
   )
 
-  const poolsRD = useObservableState(poolsState$, RD.pending)
+  const poolDetailsRD = useObservableState(allPoolDetails$, RD.pending)
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
   const priceAsset = FP.pipe(oPriceAsset, O.toUndefined)
@@ -121,7 +121,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   return useMemo(
     () =>
       FP.pipe(
-        RD.combine(poolSharesRD, poolsRD),
+        RD.combine(poolSharesRD, poolDetailsRD),
         RD.fold(
           // initial state
           () => renderPoolSharesTable([], false),
@@ -136,13 +136,13 @@ export const PoolShareView: React.FC = (): JSX.Element => {
             return <ErrorView title={msg} extra={renderRefreshBtn} />
           },
           // success state
-          ([poolShares, { poolDetails }]) => {
+          ([poolShares, poolDetails]) => {
             const data = getPoolShareTableData(poolShares, poolDetails, pricePoolData)
             previousPoolShares.current = O.some(data)
             return renderPoolSharesTable(data, false)
           }
         )
       ),
-    [poolSharesRD, poolsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
+    [poolSharesRD, poolDetailsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
   )
 }
