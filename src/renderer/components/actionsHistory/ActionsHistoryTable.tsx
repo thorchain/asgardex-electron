@@ -79,7 +79,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
       width: 60,
       render: renderLinkColumn
     }),
-    [renderLinkColumn]
+    [renderLinkColumn, reload]
   )
 
   const renderDetailColumn = useCallback(
