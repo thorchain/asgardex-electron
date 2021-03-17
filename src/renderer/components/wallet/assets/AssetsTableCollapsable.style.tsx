@@ -44,6 +44,20 @@ export const Label = styled(UILabel)`
   font-size: 16px;
 `
 
+export const TickerLabel = styled(UILabel).attrs({
+  textTransform: 'uppercase',
+  weight: '600'
+})`
+  padding: 0px;
+  font-size: 16px;
+  line-height: 18px;
+  &.small {
+    color: ${palette('gray', 2)};
+    font-size: 10px;
+    font-weight: 500;
+  }
+`
+
 export const Collapse = styled(A.Collapse)`
   &.ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header {
     background-color: ${palette('background', 2)};
