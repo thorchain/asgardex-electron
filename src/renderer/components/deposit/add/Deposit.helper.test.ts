@@ -34,9 +34,9 @@ describe('deposit/Deposit.helper', () => {
   })
 
   describe('maxAssetAmountToDeposit', () => {
-    it('is 200', () => {
+    it('is 50', () => {
       const result = maxAssetAmountToDeposit({ poolData, assetBalance, runeBalance })
-      expect(eqBaseAmount.equals(result, baseAmount(200))).toBeTruthy()
+      expect(eqBaseAmount.equals(result, baseAmount(50))).toBeTruthy()
     })
     it('is 100', () => {
       const runeBalance = baseAmount(200)
