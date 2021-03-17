@@ -35,8 +35,9 @@ export const maxAssetAmountToDeposit = ({
     .amount()
     .dividedBy(poolRuneBalance.amount())
     .multipliedBy(runeBalance.amount())
-
-  return assetBalance.amount().isGreaterThanOrEqualTo(maxAssetAmountBN)
+    .multipliedBy(Math.pow(10, assetBalance.decimal - 8))
+  // console.log(111, maxAssetAmountBN.)
+  return maxAssetAmountBN.isGreaterThanOrEqualTo(assetBalance.amount())
     ? assetBalance
     : baseAmount(maxAssetAmountBN, assetBalance.decimal)
 }
