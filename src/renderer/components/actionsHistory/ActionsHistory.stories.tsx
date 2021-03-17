@@ -26,7 +26,7 @@ const actions: HistoryActions = [
         /**
          * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
          */
-        txID: 'txid'
+        txID: 'in id'
       }
     ],
     out: [
@@ -40,7 +40,7 @@ const actions: HistoryActions = [
         /**
          * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
          */
-        txID: 'txid'
+        txID: 'out id'
       }
     ],
     type: 'DEPOSIT',
@@ -60,7 +60,7 @@ const actions: HistoryActions = [
         /**
          * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
          */
-        txID: 'txid'
+        txID: 'in id'
       }
     ],
     out: [
@@ -71,7 +71,7 @@ const actions: HistoryActions = [
         /**
          * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
          */
-        txID: 'txid'
+        txID: 'out id'
       }
     ],
     type: 'DOUBLE_SWAP'
@@ -90,7 +90,7 @@ const actions: HistoryActions = [
         /**
          * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
          */
-        txID: 'txid'
+        txID: 'out id'
       }
     ],
     type: 'SWAP'
@@ -112,7 +112,7 @@ const actions: HistoryActions = [
         /**
          * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
          */
-        txID: 'txid'
+        txID: 'out id'
       }
     ],
     type: 'SWAP'

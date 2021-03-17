@@ -12,5 +12,5 @@ export const Label = styled(LabelUI)`
   padding: 0;
   width: auto;
   text-transform: uppercase;
-  font-weight: inherit;
+  font-weight: 600;
 `

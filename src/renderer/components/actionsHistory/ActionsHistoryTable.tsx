@@ -15,7 +15,6 @@ import * as CommonStyled from '../uielements/common/Common.style'
 import { Pagination } from '../uielements/pagination'
 import { TxDetail } from '../uielements/txDetail'
 import * as H from './ActionsHistory.helper'
-import { ActionsHistoryFilter } from './ActionsHistoryFilter'
 import * as Styled from './ActionsHistoryTable.styles'
 import { Props } from './types'
 
@@ -35,7 +34,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
   const actionTypeColumn: ColumnType<HistoryAction> = useMemo(
     () => ({
       key: 'txType',
-      title: <ActionsHistoryFilter currentFilter={currentFilter} onFilterChanged={setFilter} />,
+      title: <Styled.ActionsFilter currentFilter={currentFilter} onFilterChanged={setFilter} />,
       align: 'right',
       width: 170,
       render: renderActionTypeColumn
