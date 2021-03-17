@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getEthAssetAddress, isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { getEthAssetAddress, isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
@@ -175,7 +175,8 @@ export const asymWithdraw$ = ({ poolAddress, asset, memo, network }: AsymWithdra
         withdrawTx: RD.success(txHash)
       })
       // 3. check tx finality by polling its tx data
-      const assetAddress: O.Option<Address> = isEthChain(asset.chain) ? getEthAssetAddress(asset) : O.none
+      const assetAddress: O.Option<Address> =
+        isEthChain(asset.chain) && !isEthAsset(asset) ? getEthAssetAddress(asset) : O.none
       return poolTxStatusByChain$({ txHash, chain: asset.chain, assetAddress })
     }),
     liveData.map((_) => setState({ ...getState(), withdraw: RD.success(true) })),
