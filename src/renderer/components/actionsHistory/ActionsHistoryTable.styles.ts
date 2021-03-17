@@ -35,7 +35,6 @@ export const TxType = styled(TxTypeUI)`
   }
 
   ${media.lg`
-    justify-content: flex-end;
     & .label-wrapper {
       display: initial;
     }

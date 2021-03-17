@@ -47,8 +47,8 @@ export const TxType: React.FC<Props> = ({ type, className }) => {
 
   return (
     <Styled.Container className={className}>
-      <Styled.Label>{typeKey ? intl.formatMessage({ id: typeKey }) : type}</Styled.Label>
       {getIcon(type)}
+      <Styled.Label>{typeKey ? intl.formatMessage({ id: typeKey }) : type}</Styled.Label>
     </Styled.Container>
   )
 }

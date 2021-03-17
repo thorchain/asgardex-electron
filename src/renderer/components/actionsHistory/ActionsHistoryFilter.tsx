@@ -6,6 +6,7 @@ import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
+import { TxType } from '../uielements/txType'
 import * as Styled from './ActionsHistoryFilter.styles'
 import { Filter } from './types'
 
@@ -40,7 +41,7 @@ export const ActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFilterC
         {FP.pipe(
           FILTER_ITEMS,
           A.map((filter) => {
-            const content = filter === 'ALL' ? allItemContent : <Styled.TxType type={filter} />
+            const content = filter === 'ALL' ? allItemContent : <TxType type={filter} />
             return (
               <Menu.Item key={filter} onClick={() => onFilterChanged(filter)}>
                 <Styled.FilterItem>{content}</Styled.FilterItem>

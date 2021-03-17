@@ -37,7 +37,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
     () => ({
       key: 'txType',
       title: <Styled.ActionsFilter currentFilter={currentFilter} onFilterChanged={setFilter} />,
-      align: 'right',
+      align: 'left',
       width: 180,
       render: renderActionTypeColumn
     }),

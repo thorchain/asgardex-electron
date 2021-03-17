@@ -8,7 +8,7 @@ export const Container = styled.div`
 `
 
 export const Label = styled(LabelUI)`
-  margin-right: 10px;
+  margin-left: 10px;
   padding: 0;
   width: auto;
   text-transform: uppercase;

@@ -4,7 +4,6 @@ import { palette } from 'styled-theme'
 
 import { ReactComponent as AllIconUI } from '../../assets/svg/filter-all.svg'
 import { Button } from '../uielements/button'
-import { TxType as TxTypeUI } from '../uielements/txType'
 
 export const Menu = styled(A.Menu)`
   background: ${palette('background', 0)};
@@ -54,19 +53,6 @@ export const FilterItem = styled(Button).attrs({ typevalue: 'transparent' })`
     transition: none;
     color: ${palette('text', 0)} !important;
     display: inline-block;
-  }
-`
-
-export const TxType = styled(TxTypeUI)`
-  flex-direction: row-reverse;
-  justify-content: flex-end;
-
-  > * {
-    margin: 0;
-
-    &:last-child {
-      margin-right: 10px;
-    }
   }
 `
 
