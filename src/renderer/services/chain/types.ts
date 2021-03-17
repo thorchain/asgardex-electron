@@ -187,14 +187,21 @@ export type WithdrawState = {
 
 export type WithdrawState$ = Rx.Observable<WithdrawState>
 
-export type WithdrawParams = {
+export type SymWithdrawParams = {
+  readonly memo: Memo
+  readonly network: Network
+}
+
+export type SymWithdrawStateHandler = (p: SymWithdrawParams) => WithdrawState$
+
+export type AsymWithdrawParams = {
   readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly memo: Memo
   readonly network: Network
 }
 
-export type WithdrawStateHandler = (p: WithdrawParams) => WithdrawState$
+export type AsymWithdrawStateHandler = (p: AsymWithdrawParams) => WithdrawState$
 
 export type UpgradeRuneParams = {
   readonly poolAddresses: PoolAddress
