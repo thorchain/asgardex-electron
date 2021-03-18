@@ -31,7 +31,8 @@ import {
   getEthTokenAddress,
   isEthAsset,
   isEthTokenAsset,
-  THORCHAIN_DECIMAL
+  THORCHAIN_DECIMAL,
+  baseAmountForThorchain
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
@@ -179,10 +180,16 @@ export const Swap = ({
     INITIAL_SWAP_STATE
   )
 
+  const sourceAssetAmountForThorchain = useMemo(() => baseAmountForThorchain(sourceAssetAmount), [sourceAssetAmount])
+
+  const initialAmountToSwap = useMemo(() => baseAmount(0, sourceAssetAmountForThorchain.decimal), [
+    sourceAssetAmountForThorchain.decimal
+  ])
+
   const [
     amountToSwap,
     _setAmountToSwap /* private - never set it directly, use setAmountToSwap() instead */
-  ] = useState(baseAmount(0, sourceAssetAmount.decimal))
+  ] = useState(initialAmountToSwap)
 
   const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
     return FP.pipe(
@@ -332,19 +339,17 @@ export const Swap = ({
         }
       )
     )
-    return eqAsset.equals(sourceChainAsset, sourceAssetProp) ? maxChainAssetAmount : sourceAssetAmount
-  }, [keystore, chainFeesRD, sourceChainAsset, sourceAssetProp, sourceAssetAmount, sourceChainAssetAmount])
+    return eqAsset.equals(sourceChainAsset, sourceAssetProp)
+      ? baseAmountForThorchain(maxChainAssetAmount)
+      : sourceAssetAmountForThorchain
+  }, [keystore, chainFeesRD, sourceChainAsset, sourceAssetProp, sourceAssetAmountForThorchain, sourceChainAssetAmount])
 
   const setAmountToSwap = useCallback(
-    (targetAmount: BaseAmount) => {
-      // make sure the target amount decimal is the same as source asset decimal.
-      targetAmount.decimal = sourceAssetAmount.decimal
+    (newAmount: BaseAmount) => {
+      // dirty check - do nothing if prev. and next amounts are equal
+      if (eqBaseAmount.equals(newAmount, amountToSwap)) return {}
 
-      if (eqBaseAmount.equals(targetAmount, amountToSwap)) return {}
-
-      const newAmountToSwap = targetAmount.amount().isGreaterThan(maxAmountToSwap.amount())
-        ? maxAmountToSwap
-        : targetAmount
+      const newAmountToSwap = newAmount.amount().isGreaterThan(maxAmountToSwap.amount()) ? maxAmountToSwap : newAmount
 
       /**
        * New object instance of `amountToSwap` is needed to make
@@ -356,15 +361,15 @@ export const Swap = ({
        */
       _setAmountToSwap({ ...newAmountToSwap })
     },
-    [amountToSwap, maxAmountToSwap, sourceAssetAmount.decimal]
+    [amountToSwap, maxAmountToSwap]
   )
 
   const setAmountToSwapFromPercentValue = useCallback(
     (percents) => {
       const amountFromPercentage = maxAmountToSwap.amount().multipliedBy(Number(percents) / 100)
-      return setAmountToSwap(baseAmount(amountFromPercentage, sourceAssetAmount.decimal))
+      return setAmountToSwap(baseAmount(amountFromPercentage, sourceAssetAmountForThorchain.decimal))
     },
-    [maxAmountToSwap, setAmountToSwap, sourceAssetAmount.decimal]
+    [maxAmountToSwap, setAmountToSwap, sourceAssetAmountForThorchain.decimal]
   )
 
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
@@ -413,8 +418,9 @@ export const Swap = ({
   }, [allAssets, assetsToSwap])
 
   const balanceLabel = useMemo(
-    () => `${intl.formatMessage({ id: 'swap.balance' })}: ${formatBN(baseToAsset(sourceAssetAmount).amount())}`,
-    [sourceAssetAmount, intl]
+    () =>
+      `${intl.formatMessage({ id: 'swap.balance' })}: ${formatBN(baseToAsset(sourceAssetAmountForThorchain).amount())}`,
+    [intl, sourceAssetAmountForThorchain]
   )
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -423,28 +429,24 @@ export const Swap = ({
     setShowPasswordModal(true)
   }, [setShowPasswordModal])
 
-  const renderSlider = useMemo(
-    () =>
-      FP.pipe(
-        oSourceAssetWB,
-        O.map((assetWB) => {
-          const percentage = amountToSwap.amount().dividedBy(assetWB.amount.amount()).multipliedBy(100).toNumber()
-          return (
-            <Slider
-              key={'swap percentage slider'}
-              value={percentage}
-              onChange={setAmountToSwapFromPercentValue}
-              onAfterChange={reloadFeesHandler}
-              tooltipVisible={true}
-              withLabel={true}
-              tooltipPlacement={'top'}
-            />
-          )
-        }),
-        O.toNullable
-      ),
-    [oSourceAssetWB, amountToSwap, setAmountToSwapFromPercentValue, reloadFeesHandler]
-  )
+  const renderSlider = useMemo(() => {
+    const percentage = amountToSwap
+      .amount()
+      .dividedBy(sourceAssetAmountForThorchain.amount())
+      .multipliedBy(100)
+      .toNumber()
+    return (
+      <Slider
+        key={'swap percentage slider'}
+        value={percentage}
+        onChange={setAmountToSwapFromPercentValue}
+        onAfterChange={reloadFeesHandler}
+        tooltipVisible={true}
+        withLabel={true}
+        tooltipPlacement={'top'}
+      />
+    )
+  }, [amountToSwap, sourceAssetAmountForThorchain, setAmountToSwapFromPercentValue, reloadFeesHandler])
 
   const extraTxModalContent = useMemo(() => {
     return FP.pipe(
@@ -501,8 +503,8 @@ export const Swap = ({
   const onFinishTxModal = useCallback(() => {
     resetSwapState()
     reloadBalances()
-    setAmountToSwap(ZERO_BASE_AMOUNT)
-  }, [resetSwapState, reloadBalances, setAmountToSwap])
+    setAmountToSwap(initialAmountToSwap)
+  }, [resetSwapState, reloadBalances, setAmountToSwap, initialAmountToSwap])
 
   const renderTxModal = useMemo(() => {
     const { swapTx, swap } = swapState
@@ -810,12 +812,20 @@ export const Swap = ({
     // reset isApproved state
     resetIsApprovedState()
     // zero amount to swap
-    setAmountToSwap(ZERO_BASE_AMOUNT)
+    setAmountToSwap(initialAmountToSwap)
     // reload fees
     reloadFeesHandler()
     // check approved status
     checkApprovedStatus()
-  }, [checkApprovedStatus, reloadFeesHandler, resetApproveState, resetIsApprovedState, resetSwapState, setAmountToSwap])
+  }, [
+    checkApprovedStatus,
+    initialAmountToSwap,
+    reloadFeesHandler,
+    resetApproveState,
+    resetIsApprovedState,
+    resetSwapState,
+    setAmountToSwap
+  ])
 
   useEffect(() => {
     // reset data whenever source asset has been changed
