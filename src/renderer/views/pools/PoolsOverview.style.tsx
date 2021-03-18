@@ -68,8 +68,4 @@ export const Label = styled(UILabel)`
 export const AssetsFilter = styled(AssetsFilterUI)`
   margin-bottom: 20px;
 `
-export const AssetData = styled(AssetDataUI)`
-  & .ticker {
-    font-size: 16px;
-  }
-`
+export const AssetData = styled(AssetDataUI)``

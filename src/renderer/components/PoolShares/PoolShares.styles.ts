@@ -78,11 +78,7 @@ export const InfoDescription = styled.div`
   margin-bottom: 20px;
 `
 
-export const AssetData = styled(AssetDataUI)`
-  & .ticker {
-    font-size: 16px;
-  }
-`
+export const AssetData = styled(AssetDataUI)``
 
 export const OwnershipLabel = styled(UILabel)`
   padding-left: 30px;
