@@ -5031,10 +5031,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.13.1.tgz#757ac3371ef8db40a0f270388975f04f1306a250"
   integrity sha512-KPiPg8UUmd3g3ugKhNpfHT+vcevcLwsjnP2OgSCEsv+2M9ZxY8yagoAZjbn4FWaZFmVVRrFCQsZln+U33onztg==
 
-"@xchainjs/xchain-util@^0.2.5":
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.2.5.tgz#cf7c2c99db209da86ad7fafc4a81317d39d803b5"
-  integrity sha512-6aMXV5/4b390mHDkq5Dj4CT9GzZ7Luh4ZfNMbQj0eK2jnR1Ou4jhU0zG9i9wNG2wBTjW28S+hiVxdgQBxYSLGg==
+"@xchainjs/xchain-util@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.2.6.tgz#f5f74e849ee7fcc9be671b74ffc03917a6743711"
+  integrity sha512-h/6AoCVaqJDgmwDEQb13JqzYEneBHjagVIqvWqSsAoGb/biacCv1IHgJ0uaHBzMHY0w6VyTQuHwZXhud/PIxxA==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
