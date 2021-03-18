@@ -13,8 +13,8 @@ import { ColumnsType, ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
-import { AssetData } from '../uielements/assets/assetData'
 import { AssetIcon } from '../uielements/assets/assetIcon'
+import { AssetLabel } from '../uielements/assets/assetLabel'
 import { Label } from '../uielements/label'
 import * as H from './helpers'
 import * as Styled from './PoolShares.styles'
@@ -51,9 +51,9 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
       title: intl.formatMessage({ id: 'common.pool' }),
       align: 'left',
       responsive: ['md'],
-      render: ({ asset }: PoolShareTableRowData) => <AssetData noIcon asset={asset} network={network} />
+      render: ({ asset }: PoolShareTableRowData) => <AssetLabel asset={asset} />
     }),
-    [intl, network]
+    [intl]
   )
 
   const ownershipColumn: ColumnType<PoolShareTableRowData> = useMemo(

@@ -3,7 +3,7 @@ import { palette } from 'styled-theme'
 
 import { InputBigNumber as BaseInputBigNumber } from '../../input'
 import { Label } from '../../label'
-import { AssetData as AssetDataUI } from '../assetData'
+import { AssetLabel as AssetLabelUI } from '../assetLabel'
 import { AssetSelect as BaseAssetSelect } from '../assetSelect'
 
 const CONTAINER_SIDE_PADDING = 16
@@ -100,7 +100,7 @@ export const SliderWrapper = styled.div`
   padding: 0 5px 20px 10px;
 `
 
-export const AssetInfo = styled(AssetDataUI)`
+export const AssetLabel = styled(AssetLabelUI)`
   padding-top: 10px;
   border-bottom: 1px solid ${palette('gray', 0)};
 `

@@ -2,7 +2,7 @@ import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
-import { AssetData as AssetDataUI } from '../assets/assetData'
+import { AssetLabel as AssetLabelUI } from '../assets/assetLabel'
 import { Label as UILabel } from '../label'
 
 export const PoolShareWrapper = styled.div`
@@ -26,7 +26,7 @@ export const RedemptionHeader = styled.div`
   }
 `
 
-export const RedemptionAsset = styled(AssetDataUI)`
+export const RedemptionAsset = styled(AssetLabelUI)`
   display: flex;
   justify-content: center;
 `

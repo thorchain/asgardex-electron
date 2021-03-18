@@ -327,6 +327,7 @@ export const AsymWithdraw: React.FC<Props> = ({
 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={asset} network={network} />
+        <Styled.AssetLabel asset={asset} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
             amount: baseToAsset(assetAmountToWithdraw),

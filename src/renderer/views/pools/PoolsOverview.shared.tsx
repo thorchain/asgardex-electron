@@ -4,17 +4,15 @@ import { ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/function'
 
 import { ErrorView } from '../../components/shared/error'
-import { AssetData } from '../../components/uielements/assets/assetData'
 import { AssetIcon } from '../../components/uielements/assets/assetIcon'
+import { AssetLabel } from '../../components/uielements/assets/assetLabel'
 import { ReloadButton } from '../../components/uielements/reloadButton'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { sortByDepth } from '../../helpers/poolHelper'
 import { PoolTableRowData } from './Pools.types'
 import * as Styled from './PoolsOverview.style'
 
-const renderAssetColumn = ({ pool, network }: PoolTableRowData) => (
-  <AssetData noIcon asset={pool.target} network={network} />
-)
+const renderAssetColumn = ({ pool }: PoolTableRowData) => <AssetLabel asset={pool.target} />
 
 const sortAssetColumn = ({ pool: poolA }: PoolTableRowData, { pool: poolB }: PoolTableRowData) =>
   poolA.target.symbol.localeCompare(poolB.target.symbol)
