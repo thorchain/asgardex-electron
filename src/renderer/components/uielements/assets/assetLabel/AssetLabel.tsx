@@ -5,7 +5,7 @@ import { Asset } from '@xchainjs/xchain-util'
 import * as Styled from './AssetLabel.style'
 
 /**
- * AssetData - Component to show data of an asset:
+ * AssetLabel - Component to show data of an asset:
  *
  * |--------|
  * | ticker |
@@ -16,23 +16,18 @@ import * as Styled from './AssetLabel.style'
 
 export type Props = {
   asset: Asset
-  size?: Styled.AssetLabelSize
   // `className` is needed by `styled components`
   className?: string
 }
 
 export const AssetLabel: React.FC<Props> = (props): JSX.Element => {
-  const { asset, size = 'small', className } = props
+  const { asset, className } = props
 
   return (
     <Styled.Wrapper className={className}>
       <Styled.Col>
-        <Styled.TickerLabel className="ticker" size={size}>
-          {asset.ticker}
-        </Styled.TickerLabel>
-        <Styled.TickerLabel className="small" size={size}>
-          {asset.chain}
-        </Styled.TickerLabel>
+        <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
+        <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>
       </Styled.Col>
     </Styled.Wrapper>
   )
