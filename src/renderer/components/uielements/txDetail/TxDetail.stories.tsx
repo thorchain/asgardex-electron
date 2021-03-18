@@ -9,7 +9,6 @@ import {
   assetToBase,
   assetToString
 } from '@xchainjs/xchain-util'
-import { Grid } from 'antd'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -29,7 +28,7 @@ const getValues = (firstAsset: string, secondAsset: string, firstValue: number, 
   return FP.pipe([first, second], A.filterMap(FP.identity))
 }
 
-export const Default: Story<{
+export const Desktop: Story<{
   firstInValue: number
   secondInValue: number
   firstOutValue: number
@@ -48,12 +47,10 @@ export const Default: Story<{
   firstOutAsset,
   secondOutAsset
 }) => {
-  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   return (
     <TxDetail
-      isDesktopView={isDesktopView}
-      renderDate={(date) => <>{date.toLocaleString()}</>}
-      date={new Date(Date.now())}
+      type={'SWAP'}
+      date={<>12-12-3 1231</>}
       incomes={getValues(firstInAsset, secondInAsset, firstInValue, secondInValue)}
       outgos={getValues(firstOutAsset, secondOutAsset, firstOutValue, secondOutValue)}
       slip={1.23}
@@ -113,7 +110,7 @@ const argTypes = {
   }
 }
 
-Default.args = {
+Desktop.args = {
   firstInValue: 1.23,
   secondInValue: 0,
   firstOutValue: 23.34,

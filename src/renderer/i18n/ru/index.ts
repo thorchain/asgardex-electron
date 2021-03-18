@@ -1,7 +1,3 @@
-// English (Global)
-// Antd Internationalization https://2x.ant.design/docs/react/i18n
-import antdData from 'antd/lib/locale-provider/en_GB'
-
 import { Messages } from '../types'
 import bonds from './bonds'
 import common from './common'
@@ -16,7 +12,6 @@ import swap from './swap'
 import wallet from './wallet'
 
 export default {
-  ...antdData,
   ...common,
   ...pools,
   ...routes,
