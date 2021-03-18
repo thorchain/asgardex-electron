@@ -2,6 +2,8 @@ import * as RD from '@devexperts/remote-data-ts'
 
 export type RDStatus = 'initial' | 'pending' | 'error' | 'success'
 
+export const rdStatusOptions: RDStatus[] = ['initial', 'pending', 'error', 'success']
+
 export const getMockRDValueFactory = <L, T>(success: () => T, failure: () => L) => (
   status?: RDStatus
 ): RD.RemoteData<L, T> => {

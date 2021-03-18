@@ -7,34 +7,12 @@ import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 
-import { AssetWithAmount } from '../../../types/asgardex'
+import { ContainerWithDelimeter } from '../containerWithDelimeter'
 import { Fees } from '../fees'
 import * as Styled from './TxDetail.styles'
+import { ActionProps } from './types'
 
-type Props = {
-  incomes: AssetWithAmount[]
-  outgos: AssetWithAmount[]
-  fees?: AssetWithAmount[]
-  /**
-   * Possible transaction slip in percents
-   */
-  slip?: number
-  className?: string
-  date: Date
-  renderDate: (date: Date) => React.ReactElement
-  isDesktopView?: boolean
-}
-
-export const TxDetail: React.FC<Props> = ({
-  className,
-  outgos,
-  incomes,
-  fees = [],
-  slip,
-  date,
-  renderDate,
-  isDesktopView = true
-}) => {
+export const TxDetail: React.FC<ActionProps> = ({ className, outgos, incomes, fees = [], slip }) => {
   const incomeFormatted = useMemo(
     () =>
       FP.pipe(
@@ -68,9 +46,9 @@ export const TxDetail: React.FC<Props> = ({
         NEA.fromArray,
         O.map(RD.success),
         O.map((fees) => (
-          <Styled.ContainerWithDelimeter key="fees">
+          <ContainerWithDelimeter key="fees">
             <Fees fees={fees} />
-          </Styled.ContainerWithDelimeter>
+          </ContainerWithDelimeter>
         )),
         O.getOrElse(() => <></>)
       ),
@@ -90,13 +68,10 @@ export const TxDetail: React.FC<Props> = ({
         </Styled.InOutValeContainer>
       </Styled.ValuesContainer>
 
-      {isDesktopView && (
-        <Styled.AdditionalInfoContainer>
-          {feesComponent}
-          {slip && <Styled.ContainerWithDelimeter>slip: {slip}%</Styled.ContainerWithDelimeter>}
-        </Styled.AdditionalInfoContainer>
-      )}
-      <Styled.DateContainer>{renderDate(date)}</Styled.DateContainer>
+      <Styled.AdditionalInfoContainer>
+        {feesComponent}
+        {slip && <ContainerWithDelimeter>slip: {slip}%</ContainerWithDelimeter>}
+      </Styled.AdditionalInfoContainer>
     </Styled.Container>
   )
 }
