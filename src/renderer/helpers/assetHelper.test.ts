@@ -7,7 +7,8 @@ import {
   AssetLTC,
   AssetRune67C,
   AssetRuneB1A,
-  AssetRuneNative
+  AssetRuneNative,
+  baseAmount
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
@@ -26,9 +27,10 @@ import {
   isRuneNativeAsset,
   getEthAssetAddress,
   midgardAssetFromString,
-  updateEthChecksumAddress
+  updateEthChecksumAddress,
+  convertBaseAmountDecimal
 } from './assetHelper'
-import { eqAsset } from './fp/eq'
+import { eqAsset, eqBaseAmount } from './fp/eq'
 
 describe('helpers/assetHelper', () => {
   describe('isRuneBnbAsset', () => {
@@ -180,6 +182,26 @@ describe('helpers/assetHelper', () => {
         symbol: 'USDT-0X62e273709da575835c7f6aef4a31140ca5b1d190'
       })
       expect(eqAsset.equals(asset, AssetUSDTERC20)).toBeTruthy()
+    })
+  })
+
+  describe('convertBaseAmountDecimal', () => {
+    it('converts 1e8 decimal to 1e12', () => {
+      const result = convertBaseAmountDecimal(baseAmount('12345678', 8), 12)
+      expect(eqBaseAmount.equals(result, baseAmount('123456780000', 12))).toBeTruthy()
+    })
+    it('converts 1e8 decimal to 1e6 ', () => {
+      const result = convertBaseAmountDecimal(baseAmount('12345678', 8), 6)
+      expect(eqBaseAmount.equals(result, baseAmount('123457', 6))).toBeTruthy()
+    })
+    it('converts 1e18 decimal to 1e8', () => {
+      const result = convertBaseAmountDecimal(baseAmount('123456789012345678', 18), 8)
+      expect(eqBaseAmount.equals(result, baseAmount('12345679', 8))).toBeTruthy()
+    })
+    it('does not convert anything by using same decimals', () => {
+      const amount = baseAmount('123456', 6)
+      const result = convertBaseAmountDecimal(amount, 6)
+      expect(eqBaseAmount.equals(result, amount)).toBeTruthy()
     })
   })
 })

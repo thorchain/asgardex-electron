@@ -26,7 +26,13 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { getEthTokenAddress, isEthAsset, isEthTokenAsset } from '../../helpers/assetHelper'
+import {
+  convertBaseAmountDecimal,
+  getEthTokenAddress,
+  isEthAsset,
+  isEthTokenAsset,
+  THORCHAIN_DECIMAL
+} from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
@@ -43,10 +49,11 @@ import {
   LoadSwapFeesHandler,
   SwapFeesRD,
   SwapFeesParams,
-  SwapFeesLD
+  SwapFeesLD,
+  SwapFees
 } from '../../services/chain/types'
 import { ApproveParams, IsApprovedRD } from '../../services/ethereum/types'
-import { PoolAssetDetail, PoolAssetDetails, PoolAddress } from '../../services/midgard/types'
+import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import {
@@ -66,7 +73,7 @@ import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
-import { getSwapData, poolAssetDetailToAsset, pickPoolAsset, convertToBase8 } from './Swap.utils'
+import { getSwapData, poolAssetDetailToAsset, pickPoolAsset } from './Swap.utils'
 
 export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string }
 
@@ -117,9 +124,7 @@ export const Swap = ({
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
 
   // convert to hash map here instead of using getPoolDetail
-  const poolData: Record<string, PoolData> = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [
-    poolDetails
-  ])
+  const poolsData: PoolsDataMap = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [poolDetails])
 
   const oSourcePoolAsset: O.Option<PoolAssetDetail> = useMemo(() => pickPoolAsset(availableAssets, sourceAssetProp), [
     availableAssets,
@@ -191,11 +196,11 @@ export const Swap = ({
     )
   }, [amountToSwap, assetsToSwap, oPoolAddress, targetWalletAddress])
 
-  const swapData = useMemo(() => getSwapData(amountToSwap, sourceAsset, targetAsset, poolData), [
+  const swapData = useMemo(() => getSwapData({ amountToSwap, sourceAsset, targetAsset, poolsData }), [
     amountToSwap,
     sourceAsset,
     targetAsset,
-    poolData
+    poolsData
   ])
 
   const oSwapFeesParams: O.Option<SwapFeesParams> = useMemo(
@@ -613,7 +618,7 @@ export const Swap = ({
   }, [sourceChainError, chainFeesRD, intl, sourceAssetProp, sourceAssetAmount, sourceChainAsset])
 
   const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
-    const fees = FP.pipe(
+    const fees: SwapFees = FP.pipe(
       chainFeesRD,
       RD.getOrElse(() => ({ inTx: ZERO_BASE_AMOUNT, outTx: ZERO_BASE_AMOUNT }))
     )
@@ -621,20 +626,30 @@ export const Swap = ({
     return FP.pipe(
       targetAsset,
       O.map((asset) => {
-        const chainAsset = getChainAsset(asset.chain)
-        const chainAssetPoolData: PoolData | undefined = poolData[assetToString(chainAsset)]
-        const assetPoolData: PoolData | undefined = poolData[assetToString(asset)]
-        if (!chainAssetPoolData || !assetPoolData) {
-          return ZERO_BASE_AMOUNT
-        }
+        const chainAsset: Asset = getChainAsset(asset.chain)
+        const oChainAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(chainAsset)])
+        const oAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(asset)])
 
-        return eqAsset.equals(chainAsset, asset)
-          ? fees.outTx
-          : getValueOfAsset1InAsset2(convertToBase8(fees.outTx), chainAssetPoolData, assetPoolData)
+        return FP.pipe(
+          sequenceTOption(oChainAssetPoolData, oAssetPoolData),
+          O.fold(
+            () => ZERO_BASE_AMOUNT,
+            ([chainAssetPoolData, assetPoolData]) =>
+              eqAsset.equals(chainAsset, asset)
+                ? fees.outTx
+                : // pool data are always 1e8 decimal based
+                  // and we have to convert fees to 1e8, too
+                  getValueOfAsset1InAsset2(
+                    convertBaseAmountDecimal(fees.outTx, THORCHAIN_DECIMAL),
+                    chainAssetPoolData,
+                    assetPoolData
+                  )
+          )
+        )
       }),
       O.getOrElse(() => ZERO_BASE_AMOUNT)
     )
-  }, [chainFeesRD, targetAsset, poolData])
+  }, [chainFeesRD, targetAsset, poolsData])
 
   const targetChainFeeError = useMemo((): boolean => {
     // check zero swap amounts and status of `pending assets`

@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { PoolData } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -44,6 +45,11 @@ export type PoolDetailLD = LiveData<Error, PoolDetail>
 
 export type PoolDetails = PoolDetail[]
 export type PoolDetailsLD = LiveData<Error, PoolDetails>
+
+/**
+ * Hash map for storing `PoolData` (key: string of asset)
+ */
+export type PoolsDataMap = Record<string /* asset as string */, PoolData>
 
 export type PriceDataIndex = {
   [symbol: string]: BigNumber
