@@ -26,8 +26,8 @@ export const ActionsHistory: React.FC<Props> = (props) => {
   }, [props])
 
   return isDesktopView ? (
-    <ActionsHistoryTable prevActionsPageRD={previousTxs.current} {...props} />
+    <ActionsHistoryTable prevActionsPage={previousTxs.current} {...props} />
   ) : (
-    <ActionsHistoryList prevActionsPageRD={previousTxs.current} {...props} />
+    <ActionsHistoryList prevActionsPage={previousTxs.current} {...props} />
   )
 }
