@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -98,16 +98,13 @@ export const Deposit: React.FC<Props> = (props) => {
       {
         key: 'deposit-sym',
         disabled: false,
-        label: intl.formatMessage({ id: 'deposit.add.sym' }, { asset1: asset.ticker, asset2: AssetRuneNative.ticker }),
+        label: intl.formatMessage({ id: 'deposit.add.sym' }),
         content: <SymDepositContent asset={asset} />
       },
       {
         key: 'withdraw-sym',
         disabled: !hasSymPoolShare,
-        label: intl.formatMessage(
-          { id: 'deposit.withdraw.sym' },
-          { asset1: asset.ticker, asset2: AssetRuneNative.ticker }
-        ),
+        label: intl.formatMessage({ id: 'deposit.withdraw.sym' }),
         content: <WidthdrawContent asset={asset} poolShare={combinedPoolShare} />
       }
       // {
