@@ -49,7 +49,8 @@ import {
   LoadSwapFeesHandler,
   SwapFeesRD,
   SwapFeesParams,
-  SwapFeesLD
+  SwapFeesLD,
+  SwapFees
 } from '../../services/chain/types'
 import { ApproveParams, IsApprovedRD } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
@@ -617,7 +618,7 @@ export const Swap = ({
   }, [sourceChainError, chainFeesRD, intl, sourceAssetProp, sourceAssetAmount, sourceChainAsset])
 
   const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
-    const fees = FP.pipe(
+    const fees: SwapFees = FP.pipe(
       chainFeesRD,
       RD.getOrElse(() => ({ inTx: ZERO_BASE_AMOUNT, outTx: ZERO_BASE_AMOUNT }))
     )
@@ -625,22 +626,26 @@ export const Swap = ({
     return FP.pipe(
       targetAsset,
       O.map((asset) => {
-        const chainAsset = getChainAsset(asset.chain)
-        const chainAssetPoolData: PoolData | undefined = poolsData[assetToString(chainAsset)]
-        const assetPoolData: PoolData | undefined = poolsData[assetToString(asset)]
-        if (!chainAssetPoolData || !assetPoolData) {
-          return ZERO_BASE_AMOUNT
-        }
+        const chainAsset: Asset = getChainAsset(asset.chain)
+        const oChainAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(chainAsset)])
+        const oAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(asset)])
 
-        return eqAsset.equals(chainAsset, asset)
-          ? fees.outTx
-          : // pool data are always 1e8 decimal based
-            // and we have to convert fees to 1e8, too
-            getValueOfAsset1InAsset2(
-              convertBaseAmountDecimal(fees.outTx, THORCHAIN_DECIMAL),
-              chainAssetPoolData,
-              assetPoolData
-            )
+        return FP.pipe(
+          sequenceTOption(oChainAssetPoolData, oAssetPoolData),
+          O.fold(
+            () => ZERO_BASE_AMOUNT,
+            ([chainAssetPoolData, assetPoolData]) =>
+              eqAsset.equals(chainAsset, asset)
+                ? fees.outTx
+                : // pool data are always 1e8 decimal based
+                  // and we have to convert fees to 1e8, too
+                  getValueOfAsset1InAsset2(
+                    convertBaseAmountDecimal(fees.outTx, THORCHAIN_DECIMAL),
+                    chainAssetPoolData,
+                    assetPoolData
+                  )
+          )
+        )
       }),
       O.getOrElse(() => ZERO_BASE_AMOUNT)
     )
