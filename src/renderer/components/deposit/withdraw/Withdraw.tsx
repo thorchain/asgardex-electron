@@ -307,6 +307,10 @@ export const Withdraw: React.FC<Props> = ({
 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={AssetRuneNative} network={network} />
+        <Styled.Label nowrap>
+          <Styled.TickerLabel>{AssetRuneNative.ticker}</Styled.TickerLabel>
+          <Styled.ChainLabel>{AssetRuneNative.chain}</Styled.ChainLabel>
+        </Styled.Label>
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
             amount: baseToAsset(runeAmountToWithdraw),
@@ -325,6 +329,10 @@ export const Withdraw: React.FC<Props> = ({
 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={asset} network={network} />
+        <Styled.Label nowrap>
+          <Styled.TickerLabel>{AssetRuneNative.ticker}</Styled.TickerLabel>
+          <Styled.ChainLabel>{AssetRuneNative.chain}</Styled.ChainLabel>
+        </Styled.Label>
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
             amount: baseToAsset(assetAmountToWithdraw),

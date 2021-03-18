@@ -1,5 +1,6 @@
 import { Row } from 'antd'
 import styled from 'styled-components'
+import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
 import { AssetIcon as AssetIconBase } from '../../uielements/assets/assetIcon'
@@ -23,6 +24,10 @@ export const AssetContainer = styled('div')`
   &:last-child {
     margin: 0;
   }
+
+  > div:first-child {
+    margin-right: 10px;
+  }
 `
 
 export const AssetIcon = styled(AssetIconBase).attrs({ size: 'small' })`
@@ -44,7 +49,7 @@ export const Drag = styled(BaseDrag)`
 export const OutputLabel = styled(UILabel).attrs({
   weight: 'bold'
 })`
-  padding-left: 10px;
+  padding: 8px 0px 8px 10px;
 `
 export const FeesRow = styled(Row)`
   width: 100%;
@@ -89,4 +94,29 @@ export const ExtraContainer = styled('div')`
 
 export const ViewTxButtonTop = styled(UIViewTxButton)`
   padding-bottom: 20px;
+`
+
+export const Label = styled(UILabel)`
+  padding: 0px;
+  width: fit-content;
+  margin-right: 10px;
+`
+
+export const TickerLabel = styled(UILabel).attrs({
+  textTransform: 'uppercase',
+  weight: '600'
+})`
+  padding: 0px;
+  font-size: 14px;
+  line-height: 18px;
+`
+
+export const ChainLabel = styled(UILabel).attrs({
+  textTransform: 'uppercase',
+  weight: '500'
+})`
+  padding: 0px;
+  color: ${palette('gray', 2)};
+  font-size: 10px;
+  line-height: 14px;
 `
