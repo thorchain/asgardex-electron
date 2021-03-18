@@ -20,6 +20,7 @@ export const Table = styled(UITable)`
       border: none;
       padding-top: 2px;
       padding-bottom: 2px;
+      padding-left: 30px;
       height: auto;
       background: none !important;
       color: ${palette('gray', 2)};
@@ -81,6 +82,9 @@ export const AssetData = styled(AssetDataUI)`
   & .ticker {
     font-size: 16px;
   }
-  display: flex;
-  justify-content: center;
+`
+
+export const OwnershipLabel = styled(UILabel)`
+  padding-left: 30px;
+  padding-right: 16px;
 `
