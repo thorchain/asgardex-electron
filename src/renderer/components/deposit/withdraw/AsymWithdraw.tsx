@@ -257,7 +257,7 @@ export const AsymWithdraw: React.FC<Props> = ({
     txModalExtraContent,
     intl,
     viewRuneTx,
-    asset.symbol
+    asset.ticker
   ])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)

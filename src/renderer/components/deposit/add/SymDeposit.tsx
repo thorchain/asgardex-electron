@@ -542,7 +542,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     intl,
     viewRuneTx,
     viewAssetTx,
-    asset.symbol
+    asset.ticker
   ])
 
   const closePasswordModal = useCallback(() => {
