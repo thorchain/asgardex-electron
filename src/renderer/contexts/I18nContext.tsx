@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useMemo } from 'react'
 
+import { ConfigProvider } from 'antd'
+import deDE from 'antd/lib/locale/de_DE'
+import enUS from 'antd/lib/locale/en_US'
+import frFR from 'antd/lib/locale/fr_FR'
+import ruRU from 'antd/lib/locale/ru_RU'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -45,13 +50,27 @@ export const initialContext: I18nContextValue = {
 
 const I18nContext = createContext<I18nContextValue | null>(null)
 
+const getAntdLocale = (locale: Locale) => {
+  switch (locale) {
+    case Locale.DE:
+      return deDE
+    case Locale.FR:
+      return frFR
+    case Locale.RU:
+      return ruRU
+    default:
+      return enUS
+  }
+}
+
 export const I18nProvider: React.FC = ({ children }): JSX.Element => {
   const locale = useObservableState(locale$, initialLocale)
   const messages = useMemo(() => getMessagesByLocale(locale), [locale])
+  const antdLocale = getAntdLocale(locale)
   return (
     <I18nContext.Provider value={initialContext}>
       <IntlProvider locale={locale} messages={messages} defaultLocale={Locale.EN}>
-        {children}
+        <ConfigProvider locale={antdLocale}>{children}</ConfigProvider>
       </IntlProvider>
     </I18nContext.Provider>
   )
