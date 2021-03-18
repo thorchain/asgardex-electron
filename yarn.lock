@@ -5026,15 +5026,15 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-polkadot/-/xchain-polkadot-0.7.0.tgz#24e94bdc74d42de29d225ad7ffbedd2a8e4dbb87"
   integrity sha512-VLWzegWHbBZWx4cd0nDwOhqpjXTuiYM8RSth2TRwRCSzs4X5i3HKO0y+ox+zxfge+j2Uj6vpPxkI0FNps0K0rg==
 
-"@xchainjs/xchain-thorchain@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.13.0.tgz#660762c2a0b22610c372a4d9dec4e627cd49b281"
-  integrity sha512-loGNxXVygg05m+G7MeW+rlpBByso94G8zd5ppgkaR9WcupPi5rxPxhncEsLFLlrb1ZnE7S2ZDisoyi2aQVu/nw==
+"@xchainjs/xchain-thorchain@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.13.1.tgz#757ac3371ef8db40a0f270388975f04f1306a250"
+  integrity sha512-KPiPg8UUmd3g3ugKhNpfHT+vcevcLwsjnP2OgSCEsv+2M9ZxY8yagoAZjbn4FWaZFmVVRrFCQsZln+U33onztg==
 
-"@xchainjs/xchain-util@^0.2.5":
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.2.5.tgz#cf7c2c99db209da86ad7fafc4a81317d39d803b5"
-  integrity sha512-6aMXV5/4b390mHDkq5Dj4CT9GzZ7Luh4ZfNMbQj0eK2jnR1Ou4jhU0zG9i9wNG2wBTjW28S+hiVxdgQBxYSLGg==
+"@xchainjs/xchain-util@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.2.6.tgz#f5f74e849ee7fcc9be671b74ffc03917a6743711"
+  integrity sha512-h/6AoCVaqJDgmwDEQb13JqzYEneBHjagVIqvWqSsAoGb/biacCv1IHgJ0uaHBzMHY0w6VyTQuHwZXhud/PIxxA==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
