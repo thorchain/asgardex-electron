@@ -308,8 +308,8 @@ export const Withdraw: React.FC<Props> = ({
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={AssetRuneNative} network={network} />
         <Styled.Label nowrap>
-          <Styled.TickerLabel className="ticker">{AssetRuneNative.ticker}</Styled.TickerLabel>
-          <Styled.TickerLabel className="small">{AssetRuneNative.chain}</Styled.TickerLabel>
+          <Styled.TickerLabel>{AssetRuneNative.ticker}</Styled.TickerLabel>
+          <Styled.ChainLabel>{AssetRuneNative.chain}</Styled.ChainLabel>
         </Styled.Label>
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
@@ -330,8 +330,8 @@ export const Withdraw: React.FC<Props> = ({
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={asset} network={network} />
         <Styled.Label nowrap>
-          <Styled.TickerLabel className="ticker">{asset.ticker}</Styled.TickerLabel>
-          <Styled.TickerLabel className="small">{asset.chain}</Styled.TickerLabel>
+          <Styled.TickerLabel>{AssetRuneNative.ticker}</Styled.TickerLabel>
+          <Styled.ChainLabel>{AssetRuneNative.chain}</Styled.ChainLabel>
         </Styled.Label>
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
