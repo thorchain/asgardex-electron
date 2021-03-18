@@ -101,6 +101,7 @@ export const SliderWrapper = styled.div`
 `
 
 export const AssetInfo = styled(AssetDataUI)`
+  padding-top: 10px;
   & .ticker {
     font-size: 16px;
   }
