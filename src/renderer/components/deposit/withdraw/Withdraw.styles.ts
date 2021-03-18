@@ -111,12 +111,8 @@ export const TickerLabel = styled(UILabel).attrs({
   line-height: 18px;
 `
 
-export const ChainLabel = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  weight: '500'
-})`
-  padding: 0px;
+export const ChainLabel = styled(TickerLabel)`
   color: ${palette('gray', 2)};
   font-size: 10px;
-  line-height: 14px;
+  font-weight: 500;
 `

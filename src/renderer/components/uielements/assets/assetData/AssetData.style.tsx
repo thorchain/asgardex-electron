@@ -26,13 +26,14 @@ export const TickerLabel = styled(UILabel).attrs({
 })`
   height: 18px;
   padding: 0px 16px 0px 11px;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 18px;
-  &.small {
-    color: ${palette('gray', 2)};
-    font-size: 10px;
-    font-weight: 500;
-  }
+`
+
+export const ChainLabel = styled(TickerLabel)`
+  color: ${palette('gray', 2)};
+  font-size: 10px;
+  font-weight: 500;
 `
 
 export const AmountLabel = styled(UILabel).attrs({

@@ -54,12 +54,8 @@ export const AssetData: React.FC<Props> = (props): JSX.Element => {
       )}
       {!noTicker && (
         <Styled.Col>
-          <Styled.TickerLabel className="ticker" size={size}>
-            {asset.ticker}
-          </Styled.TickerLabel>
-          <Styled.TickerLabel className="small" size={size}>
-            {asset.chain}
-          </Styled.TickerLabel>
+          <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
+          <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>
         </Styled.Col>
       )}
       {assetAmount && (
