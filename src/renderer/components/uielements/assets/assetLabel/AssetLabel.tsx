@@ -7,9 +7,10 @@ import * as Styled from './AssetLabel.style'
 /**
  * AssetData - Component to show data of an asset:
  *
- * |------|-------------------|-------------------|------------------|
- * | icon | ticker (optional) | amount (optional) | price (optional) |
- * |------|-------------------|-------------------|------------------|
+ * |--------|
+ * | ticker |
+ * | chain  |
+ * |--------|
  *
  */
 
