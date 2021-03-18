@@ -147,7 +147,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
 
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <Styled.CardBorderWrapper>
-          <Styled.AssetNameLabel>{asset?.ticker ?? 'unknown'}</Styled.AssetNameLabel>
+          <Styled.AssetInfo noIcon asset={asset} network={network} />
           <Styled.CardTopRow>
             <Styled.AssetSelect
               minWidth={wrapperWidth}

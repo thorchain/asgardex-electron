@@ -3,6 +3,7 @@ import { palette } from 'styled-theme'
 
 import { InputBigNumber as BaseInputBigNumber } from '../../input'
 import { Label } from '../../label'
+import { AssetData as AssetDataUI } from '../assetData'
 import { AssetSelect as BaseAssetSelect } from '../assetSelect'
 
 const CONTAINER_SIDE_PADDING = 16
@@ -52,18 +53,6 @@ export const AssetCardFooter = styled.div`
   align-items: center;
 `
 
-export const AssetNameLabel = styled(Label).attrs({
-  size: 'normal',
-  weight: 'bold'
-})`
-  font-size: 16px;
-  letter-spacing: 0.75px;
-  transition: transform 0.2s ease-in-out;
-  text-transform: uppercase;
-  border-bottom: 1px solid ${palette('gray', 0)};
-  padding: 9px ${CONTAINER_SIDE_PADDING}px;
-`
-
 export const AssetData = styled.div.attrs({ className: 'asset-data' })`
   display: flex;
   flex-direction: column;
@@ -109,4 +98,12 @@ export const InputBigNumber = styled(BaseInputBigNumber).attrs({
 
 export const SliderWrapper = styled.div`
   padding: 0 5px 20px 10px;
+`
+
+export const AssetInfo = styled(AssetDataUI)`
+  padding-top: 10px;
+  & .ticker {
+    font-size: 16px;
+  }
+  border-bottom: 1px solid ${palette('gray', 0)};
 `
