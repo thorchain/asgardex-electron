@@ -2,7 +2,7 @@ import React, { createContext, useContext, useMemo } from 'react'
 
 import { ConfigProvider } from 'antd'
 import deDE from 'antd/lib/locale/de_DE'
-import enUS from 'antd/lib/locale/en_GB'
+import enUS from 'antd/lib/locale/en_US'
 import frFR from 'antd/lib/locale/fr_FR'
 import ruRU from 'antd/lib/locale/ru_RU'
 import * as FP from 'fp-ts/function'
