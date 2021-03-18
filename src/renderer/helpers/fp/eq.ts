@@ -9,6 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { DepositFeesParams } from '../../services/chain/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
+import { AssetWithAmount } from '../../types/asgardex'
 import { WalletBalance } from '../../types/wallet'
 import { isEthChain } from '../chainHelper'
 
@@ -38,6 +39,10 @@ export const eqBaseAmount: Eq.Eq<BaseAmount> = {
 export const eqOptionBaseAmount = O.getEq(eqBaseAmount)
 
 export const eqBalance: Eq.Eq<Balance> = {
+  equals: (x, y) => eqAsset.equals(x.asset, y.asset) && eqBaseAmount.equals(x.amount, y.amount)
+}
+
+export const eqAssetWithAmount: Eq.Eq<AssetWithAmount> = {
   equals: (x, y) => eqAsset.equals(x.asset, y.asset) && eqBaseAmount.equals(x.amount, y.amount)
 }
 
@@ -73,6 +78,7 @@ export const eqApiError = Eq.getStructEq<ApiError>({
 })
 
 export const eqBalances = A.getEq(eqBalance)
+export const eqAssetsWithAmount = A.getEq(eqAssetWithAmount)
 
 export const eqBalanceRD = RD.getEq<ApiError, Balance>(eqApiError, eqBalance)
 export const eqBalancesRD = RD.getEq<ApiError, Balances>(eqApiError, eqBalances)
