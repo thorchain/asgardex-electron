@@ -13,6 +13,7 @@ import { ColumnsType, ColumnType } from 'antd/lib/table'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
+import { AssetData } from '../uielements/assets/assetData'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { Label } from '../uielements/label'
 import * as H from './helpers'
@@ -50,7 +51,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
       title: intl.formatMessage({ id: 'common.pool' }),
       align: 'left',
       responsive: ['md'],
-      render: ({ asset }: PoolShareTableRowData) => <Styled.AssetData noIcon asset={asset} network={network} />
+      render: ({ asset }: PoolShareTableRowData) => <AssetData noIcon asset={asset} network={network} />
     }),
     [intl, network]
   )
