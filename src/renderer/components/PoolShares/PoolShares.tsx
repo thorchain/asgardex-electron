@@ -48,18 +48,20 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
   const poolColumn: ColumnType<PoolShareTableRowData> = useMemo(
     () => ({
       title: intl.formatMessage({ id: 'common.pool' }),
-      align: 'center',
+      align: 'left',
       responsive: ['md'],
-      render: ({ asset }: PoolShareTableRowData) => <Label align="center">{asset.symbol}</Label>
+      render: ({ asset }: PoolShareTableRowData) => <Styled.AssetData noIcon asset={asset} network={network} />
     }),
-    [intl]
+    [intl, network]
   )
 
   const ownershipColumn: ColumnType<PoolShareTableRowData> = useMemo(
     () => ({
       title: intl.formatMessage({ id: 'poolshares.ownership' }),
       align: 'center',
-      render: ({ sharePercent }: PoolShareTableRowData) => <Label align="center">{formatBN(sharePercent, 2)}%</Label>
+      render: ({ sharePercent }: PoolShareTableRowData) => (
+        <Styled.OwnershipLabel align="center">{formatBN(sharePercent, 2)}%</Styled.OwnershipLabel>
+      )
     }),
     [intl]
   )
