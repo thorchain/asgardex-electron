@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { ManageButton as ManageButtonUI } from '../manageButton'
+import { AssetData as AssetDataUI } from '../uielements/assets/assetData'
 import { Button as UIButton } from '../uielements/button'
 import { Label as UILabel } from '../uielements/label'
 import { Table as UITable } from '../uielements/table'
@@ -74,4 +75,12 @@ export const InfoDescription = styled.div`
   font-size: 16px;
   color: ${palette('gray', 2)};
   margin-bottom: 20px;
+`
+
+export const AssetData = styled(AssetDataUI)`
+  & .ticker {
+    font-size: 16px;
+  }
+  display: flex;
+  justify-content: center;
 `
