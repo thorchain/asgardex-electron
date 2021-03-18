@@ -27,9 +27,6 @@ export const RedemptionHeader = styled.div`
 `
 
 export const RedemptionAsset = styled(AssetDataUI)`
-  & .ticker {
-    font-size: 16px;
-  }
   display: flex;
   justify-content: center;
 `
