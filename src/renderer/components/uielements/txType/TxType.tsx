@@ -6,15 +6,15 @@ import { ReactComponent as DepositIcon } from '../../../assets/svg/tx-stake.svg'
 import { ReactComponent as SwapIcon } from '../../../assets/svg/tx-swap.svg'
 import { ReactComponent as WithdrawIcon } from '../../../assets/svg/tx-withdraw.svg'
 import { CommonMessageKey } from '../../../i18n/types'
+import { TxType as MidgardTxType } from '../../../services/midgard/types'
 import * as Styled from './TxType.styles'
-import { UITxType } from './TxType.types'
 
 type Props = {
-  type: UITxType
+  type: MidgardTxType
   className?: string
 }
 
-const getIcon = (type: UITxType) => {
+const getIcon = (type: MidgardTxType) => {
   switch (type) {
     case 'DEPOSIT':
       return <DepositIcon />
@@ -28,7 +28,7 @@ const getIcon = (type: UITxType) => {
   }
 }
 
-const getTypeI18nKey = (type: UITxType): CommonMessageKey | undefined => {
+const getTypeI18nKey = (type: MidgardTxType): CommonMessageKey | undefined => {
   switch (type) {
     case 'DEPOSIT':
       return 'common.tx.type.deposit'
@@ -47,8 +47,8 @@ export const TxType: React.FC<Props> = ({ type, className }) => {
 
   return (
     <Styled.Container className={className}>
-      <Styled.Label>{typeKey ? intl.formatMessage({ id: typeKey }) : type}</Styled.Label>
       {getIcon(type)}
+      <Styled.Label>{typeKey ? intl.formatMessage({ id: typeKey }) : type}</Styled.Label>
     </Styled.Container>
   )
 }

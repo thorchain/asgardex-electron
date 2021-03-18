@@ -1,11 +1,10 @@
 import React from 'react'
-import themes from '@thorchain/asgardex-theme'
 import { addDecorator } from '@storybook/react/dist/client/preview'
 import { withThemes } from '@react-theming/storybook-addon'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 
 import { AppProvider } from '../src/renderer/contexts/AppContext'
-import { ThemeProvider } from '../src/renderer/contexts/ThemeContext'
+import { ThemeProvider, themes } from '../src/renderer/contexts/ThemeContext'
 import * as Styled from '../src/renderer/views/app/AppView.style'
 import { Locale } from '../src/shared/i18n/types'
 import { IntlProvider } from 'react-intl'
@@ -16,8 +15,8 @@ import * as mockApi from '../src/shared/mock/api'
 // Mock api provided by main renderer
 window.apiHDWallet = { ...mockApi.apiHDWallet }
 window.apiKeystore = { ...mockApi.apiKeystore }
-window.apiLang = {...mockApi.apiLang }
-window.apiUrl = {...mockApi.apiUrl }
+window.apiLang = { ...mockApi.apiLang }
+window.apiUrl = { ...mockApi.apiUrl }
 
 const lightTheme = { name: 'Light', ...themes.light }
 const darkTheme = { name: 'Dark', ...themes.dark }

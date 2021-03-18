@@ -5,11 +5,14 @@ import * as O from 'fp-ts/lib/Option'
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
 import { ApiError, ErrorId } from '../../services/wallet/types'
+import { AssetWithAmount } from '../../types/asgardex'
 import {
   eqAsset,
   eqBaseAmount,
   eqBalance,
   eqBalances,
+  eqAssetsWithAmount,
+  eqAssetWithAmount,
   eqApiError,
   egBigNumber,
   eqOAsset,
@@ -154,6 +157,34 @@ describe('helpers/fp/eq', () => {
     })
   })
 
+  describe('eqAssetWithAmount', () => {
+    it('is equal', () => {
+      const a: AssetWithAmount = {
+        amount: baseAmount('1'),
+        asset: AssetBNB
+      }
+      expect(eqAssetWithAmount.equals(a, a)).toBeTruthy()
+    })
+    it('is not equal', () => {
+      const a: AssetWithAmount = {
+        amount: baseAmount('1'),
+        asset: AssetBNB
+      }
+      // b = same as a, but another amount
+      const b: AssetWithAmount = {
+        ...a,
+        amount: baseAmount('2')
+      }
+      // c = same as a, but another asset
+      const c: AssetWithAmount = {
+        ...a,
+        asset: AssetRuneNative
+      }
+      expect(eqAssetWithAmount.equals(a, b)).toBeFalsy()
+      expect(eqAssetWithAmount.equals(a, c)).toBeFalsy()
+    })
+  })
+
   describe('eqONullableString', () => {
     it('is equal', () => {
       expect(eqONullableString.equals(O.some('MEMO'), O.some('MEMO'))).toBeTruthy()
@@ -170,7 +201,7 @@ describe('helpers/fp/eq', () => {
     })
   })
 
-  describe('eqAssetsWithBalance', () => {
+  describe('eqBalances', () => {
     const a: Balance = {
       amount: baseAmount('1'),
       asset: AssetRuneNative
@@ -191,6 +222,30 @@ describe('helpers/fp/eq', () => {
     })
     it('is not equal if elements has been flipped', () => {
       expect(eqBalances.equals([a, b], [b, a])).toBeFalsy()
+    })
+  })
+
+  describe('eqAssetsWithAmount', () => {
+    const a: AssetWithAmount = {
+      amount: baseAmount('1'),
+      asset: AssetRuneNative
+    }
+    const b: AssetWithAmount = {
+      ...a,
+      asset: AssetBNB
+    }
+    const c: AssetWithAmount = {
+      ...a,
+      asset: ASSETS_TESTNET.BOLT
+    }
+    it('is equal', () => {
+      expect(eqAssetsWithAmount.equals([a, b], [a, b])).toBeTruthy()
+    })
+    it('is not equal with different elements', () => {
+      expect(eqAssetsWithAmount.equals([a, b], [b, c])).toBeFalsy()
+    })
+    it('is not equal if elements has been flipped', () => {
+      expect(eqAssetsWithAmount.equals([a, b], [b, a])).toBeFalsy()
     })
   })
 
