@@ -45,7 +45,7 @@ const renderItem = (goToTx: (txId: string) => void) => (action: HistoryAction) =
 export const ActionsHistoryList: React.FC<Props> = ({
   changePaginationHandler,
   actionsPageRD,
-  prevActionsPageRD = O.none,
+  prevActionsPage = O.none,
   goToTx,
   currentPage,
   currentFilter,
@@ -92,7 +92,7 @@ export const ActionsHistoryList: React.FC<Props> = ({
           () => renderList(H.emptyData, true),
           () => {
             const data = FP.pipe(
-              prevActionsPageRD,
+              prevActionsPage,
               O.getOrElse(() => H.emptyData)
             )
             return renderList(data, true)

@@ -23,7 +23,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
   clickTxLinkHandler,
   changePaginationHandler,
   actionsPageRD,
-  prevActionsPageRD = O.none,
+  prevActionsPage = O.none,
   currentPage,
   currentFilter,
   setFilter,
@@ -140,7 +140,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
           () => renderTable(H.emptyData, true),
           () => {
             const data = FP.pipe(
-              prevActionsPageRD,
+              prevActionsPage,
               O.getOrElse(() => H.emptyData)
             )
             return renderTable(data, true)
@@ -150,6 +150,6 @@ export const ActionsHistoryTable: React.FC<Props> = ({
         )(actionsPageRD)}
       </>
     ),
-    [actionsPageRD, renderTable, prevActionsPageRD]
+    [actionsPageRD, renderTable, prevActionsPage]
   )
 }

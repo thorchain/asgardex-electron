@@ -7,7 +7,7 @@ export type Filter = TxType | 'ALL'
 export type Props = {
   currentPage: number
   actionsPageRD: HistoryActionsPageRD
-  prevActionsPageRD?: O.Option<HistoryActionsPage>
+  prevActionsPage?: O.Option<HistoryActionsPage>
   goToTx: (txHash: string) => void
   changePaginationHandler: (page: number) => void
   clickTxLinkHandler: (txHash: string) => void
