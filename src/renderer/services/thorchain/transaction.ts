@@ -14,7 +14,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
   /**
    * Sends a deposit request by given `DepositParam`
    */
-  const sendDepositTx = (params: DepositParam): TxHashLD =>
+  const sendPoolTx = (params: DepositParam): TxHashLD =>
     client$.pipe(
       RxOp.switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
       RxOp.switchMap((client) => Rx.from(client.deposit(params))),
@@ -33,6 +33,6 @@ export const createTransactionService = (client$: Client$): TransactionService =
 
   return {
     ...common,
-    sendDepositTx
+    sendPoolTx$: sendPoolTx
   }
 }

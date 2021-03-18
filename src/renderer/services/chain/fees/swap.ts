@@ -35,7 +35,7 @@ import { FeeLD, SwapFeesHandler, SwapFeesParams, SwapOutTx, SwapTxParams } from 
  * Fees for swap txs into a pool
  */
 const txInFee$ = ({ asset, poolAddress, memo, amount }: SwapTxParams): FeeLD => {
-  switch (poolAddress.chain) {
+  switch (asset.chain) {
     case BNBChain:
       return FP.pipe(
         BNB.fees$(),
@@ -166,7 +166,7 @@ const swapFees$: SwapFeesHandler = (params) => {
         // In case chains of source and target are the same, but no ETH
         // then we don't need to do another request
         // and can use same fee provided by `in$` stream to fees for OUT tx
-        () => eqChain.equals(inTx.poolAddress.chain, outTx.asset.chain) && !isEthChain(inTx.poolAddress.chain),
+        () => eqChain.equals(inTx.asset.chain, outTx.asset.chain) && !isEthChain(inTx.poolAddress.chain),
         in$,
         txOutFee$(outTx)
       ) // Result needs to be 3 times as "normal" fee

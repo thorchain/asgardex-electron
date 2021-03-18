@@ -6,12 +6,11 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getEthAssetAddress, isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { getEthAssetAddress, isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
 import { sequenceSOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
-import { sendPoolTx$ } from '../../ethereum'
 import { service as midgardService } from '../../midgard/service'
 import { ApiError, ErrorId } from '../../wallet/types'
 import { FeeOptionKeys, INITIAL_ASYM_DEPOSIT_STATE, INITIAL_SYM_DEPOSIT_STATE } from '../const'
@@ -25,7 +24,7 @@ import {
   SymDepositState$,
   SymDepositValidationResult
 } from '../types'
-import { sendTx$, poolTxStatusByChain$ } from './common'
+import { sendPoolTx$, poolTxStatusByChain$ } from './common'
 
 const { pools: midgardPoolsService, validateNode$ } = midgardService
 
@@ -85,7 +84,8 @@ export const asymDeposit$ = ({ poolAddress, asset, amount, memo }: AsymDepositPa
         deposit: RD.progress({ loaded: 75, total })
       })
       // 3. check tx finality by polling its tx data
-      const assetAddress: O.Option<Address> = isEthChain(asset.chain) ? getEthAssetAddress(asset) : O.none
+      const assetAddress: O.Option<Address> =
+        isEthChain(asset.chain) && !isEthAsset(asset) ? getEthAssetAddress(asset) : O.none
       return poolTxStatusByChain$({ txHash, chain: asset.chain, assetAddress })
     }),
     // Update state
@@ -183,9 +183,10 @@ export const symDeposit$ = ({
     // 2. send RUNE deposit txs
     liveData.chain<ApiError, SymDepositValidationResult, TxHash>((_) => {
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 40, total }) })
-      return sendTx$({
+      return sendPoolTx$({
+        router: O.none, // no router for RUNE
         asset: AssetRuneNative,
-        recipient: '',
+        recipient: '', // no recipient for RUNE needed
         amount: amounts.rune,
         memo: memos.rune,
         feeOptionKey: FeeOptionKeys.DEPOSIT
@@ -240,7 +241,8 @@ export const symDeposit$ = ({
           () => Rx.of(RD.failure({ errorId: ErrorId.SEND_TX, msg: 'Something went wrong to send deposit txs' })),
           // 4. check tx finality
           ({ runeTxHash, assetTxHash }) => {
-            const assetAddress: O.Option<Address> = isEthChain(asset.chain) ? getEthAssetAddress(asset) : O.none
+            const assetAddress: O.Option<Address> =
+              isEthChain(asset.chain) && !isEthAsset(asset) ? getEthAssetAddress(asset) : O.none
 
             return liveData.sequenceS({
               asset: poolTxStatusByChain$({ txHash: assetTxHash, chain: asset.chain, assetAddress }),

@@ -28,6 +28,7 @@ describe('deposit/Deposit.helper', () => {
       const runeBalance = baseAmount(50)
       const assetBalance = baseAmount(100)
       const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance })
+
       expect(eqBaseAmount.equals(result, baseAmount(50))).toBeTruthy()
     })
   })
@@ -41,7 +42,6 @@ describe('deposit/Deposit.helper', () => {
       const runeBalance = baseAmount(200)
       const assetBalance = baseAmount(100)
       const result = maxAssetAmountToDeposit({ poolData, assetBalance, runeBalance })
-
       expect(eqBaseAmount.equals(result, baseAmount(100))).toBeTruthy()
     })
   })

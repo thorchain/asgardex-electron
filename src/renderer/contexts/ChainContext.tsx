@@ -3,8 +3,10 @@ import React, { createContext, useContext } from 'react'
 import {
   addressByChain$,
   clientByChain$,
-  depositFees$,
-  reloadDepositFees,
+  symDepositFees$,
+  reloadSymDepositFees,
+  asymDepositFee$,
+  reloadAsymDepositFee,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   getWithdrawMemo$,
@@ -23,14 +25,17 @@ import {
   symDeposit$,
   upgradeBnbRune$,
   symWithdraw$,
+  asymWithdraw$,
   transfer$
 } from '../services/chain'
 
 type ChainContextValue = {
   addressByChain$: typeof addressByChain$
   clientByChain$: typeof clientByChain$
-  depositFees$: typeof depositFees$
-  reloadDepositFees: typeof reloadDepositFees
+  symDepositFees$: typeof symDepositFees$
+  reloadSymDepositFees: typeof reloadSymDepositFees
+  asymDepositFee$: typeof asymDepositFee$
+  reloadAsymDepositFee: typeof reloadAsymDepositFee
   withdrawFee$: typeof withdrawFee$
   reloadWithdrawFees: typeof reloadWithdrawFee
   symDepositTxMemo$: typeof symDepositTxMemo$
@@ -49,14 +54,17 @@ type ChainContextValue = {
   symDeposit$: typeof symDeposit$
   upgradeBnbRune$: typeof upgradeBnbRune$
   symWithdraw$: typeof symWithdraw$
+  asymWithdraw$: typeof asymWithdraw$
   transfer$: typeof transfer$
 }
 
 const initialContext: ChainContextValue = {
   addressByChain$,
   clientByChain$,
-  depositFees$,
-  reloadDepositFees,
+  symDepositFees$,
+  reloadSymDepositFees,
+  asymDepositFee$,
+  reloadAsymDepositFee,
   withdrawFee$,
   reloadWithdrawFees: reloadWithdrawFee,
   symDepositTxMemo$,
@@ -75,6 +83,7 @@ const initialContext: ChainContextValue = {
   symDeposit$,
   upgradeBnbRune$,
   symWithdraw$,
+  asymWithdraw$,
   transfer$
 }
 const ChainContext = createContext<ChainContextValue | null>(null)

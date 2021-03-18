@@ -6,12 +6,10 @@ import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
 import * as O from 'fp-ts/lib/Option'
 
-import { DepositFeesParams } from '../../services/chain/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { WalletBalance } from '../../types/wallet'
-import { isEthChain } from '../chainHelper'
 
 export const eqOString = O.getEq(Eq.eqString)
 
@@ -52,21 +50,6 @@ export const eqONullableString: Eq.Eq<O.Option<string> | undefined> = {
       return eqOString.equals(x, y)
     }
     return x === y
-  }
-}
-
-export const eqDepositFeesParams: Eq.Eq<DepositFeesParams> = {
-  equals: (x, y) => {
-    // Check if entered chain was changed
-    // Check if entered amount was changed
-    // Check if router was changed
-    // For ETH chain, need to check if asset was changed (ETH assets have different fees)
-    return (
-      eqChain.equals(x.asset.chain, y.asset.chain) &&
-      (!isEthChain(x.asset.chain) || eqAsset.equals(x.asset, y.asset)) &&
-      eqBaseAmount.equals(x.amount, y.amount) &&
-      eqONullableString.equals(x.router, y.router)
-    )
   }
 }
 
