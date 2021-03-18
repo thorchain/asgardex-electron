@@ -11,12 +11,8 @@ import {
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
-import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import { Network } from '../../../../shared/api/types'
-import { useAppContext } from '../../../contexts/AppContext'
-import { DEFAULT_NETWORK } from '../../../services/const'
 import * as Styled from './PoolShare.style'
 import { PoolShareCard } from './PoolShareCard'
 
@@ -51,9 +47,6 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
-  const { network$ } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
-
   const totalDepositPrice = useMemo(() => baseAmount(runeDepositPrice.amount().plus(assetDepositPrice.amount())), [
     assetDepositPrice,
     runeDepositPrice
@@ -81,10 +74,10 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
         <Styled.RedemptionHeader>
           <Styled.CardRow>
             <Col span={12}>
-              <Styled.RedemptionAsset noIcon asset={sourceAsset} network={network} />
+              <Styled.RedemptionAsset asset={sourceAsset} />
             </Col>
             <Col span={12}>
-              <Styled.RedemptionAsset noIcon asset={targetAsset} network={network} />
+              <Styled.RedemptionAsset asset={targetAsset} />
             </Col>
           </Styled.CardRow>
         </Styled.RedemptionHeader>
@@ -97,7 +90,6 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
     [
       assetDepositPrice,
       assetDepositShare,
-      network,
       renderRedemptionCol,
       runeDepositPrice,
       runeDepositShare,
@@ -112,7 +104,7 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
         <Styled.RedemptionHeader>
           <Styled.CardRow>
             <Col span={24}>
-              <Styled.RedemptionAsset noIcon asset={sourceAsset} network={network} />
+              <Styled.RedemptionAsset asset={sourceAsset} />
             </Col>
           </Styled.CardRow>
         </Styled.RedemptionHeader>
@@ -120,7 +112,7 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
         <Styled.RedemptionHeader>
           <Styled.CardRow>
             <Col span={24}>
-              <Styled.RedemptionAsset noIcon asset={targetAsset} network={network} />
+              <Styled.RedemptionAsset asset={targetAsset} />
             </Col>
           </Styled.CardRow>
         </Styled.RedemptionHeader>
@@ -130,7 +122,6 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
     [
       assetDepositPrice,
       assetDepositShare,
-      network,
       renderRedemptionCol,
       runeDepositPrice,
       runeDepositShare,

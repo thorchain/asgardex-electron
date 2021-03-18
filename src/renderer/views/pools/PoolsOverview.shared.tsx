@@ -11,9 +11,7 @@ import { sortByDepth } from '../../helpers/poolHelper'
 import { PoolTableRowData } from './Pools.types'
 import * as Styled from './PoolsOverview.style'
 
-const renderAssetColumn = ({ pool, network }: PoolTableRowData) => (
-  <Styled.AssetData noIcon asset={pool.target} network={network} />
-)
+const renderAssetColumn = ({ pool }: PoolTableRowData) => <Styled.AssetLabel asset={pool.target} />
 
 const sortAssetColumn = ({ pool: poolA }: PoolTableRowData, { pool: poolB }: PoolTableRowData) =>
   poolA.target.symbol.localeCompare(poolB.target.symbol)

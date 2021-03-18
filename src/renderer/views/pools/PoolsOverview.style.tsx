@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { AssetsFilter as AssetsFilterUI } from '../../components/AssetsFilter'
-import { AssetData as AssetDataUI } from '../../components/uielements/assets/assetData'
+import { AssetLabel as AssetLabelUI } from '../../components/uielements/assets/assetLabel'
 import { Button as UIButton, ButtonProps as UIButtonProps } from '../../components/uielements/button'
 import { Label as UILabel } from '../../components/uielements/label'
 import { media } from '../../helpers/styleHelper'
@@ -68,7 +68,7 @@ export const Label = styled(UILabel)`
 export const AssetsFilter = styled(AssetsFilterUI)`
   margin-bottom: 20px;
 `
-export const AssetData = styled(AssetDataUI)`
+export const AssetLabel = styled(AssetLabelUI)`
   & .ticker {
     font-size: 16px;
   }

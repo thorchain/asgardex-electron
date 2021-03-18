@@ -50,9 +50,9 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
       title: intl.formatMessage({ id: 'common.pool' }),
       align: 'left',
       responsive: ['md'],
-      render: ({ asset }: PoolShareTableRowData) => <Styled.AssetData noIcon asset={asset} network={network} />
+      render: ({ asset }: PoolShareTableRowData) => <Styled.AssetLabel asset={asset} />
     }),
-    [intl, network]
+    [intl]
   )
 
   const ownershipColumn: ColumnType<PoolShareTableRowData> = useMemo(

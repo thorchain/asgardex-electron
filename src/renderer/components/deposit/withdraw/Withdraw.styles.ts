@@ -1,9 +1,9 @@
 import { Row } from 'antd'
 import styled from 'styled-components'
-import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
 import { AssetIcon as AssetIconBase } from '../../uielements/assets/assetIcon'
+import { AssetLabel as AssetLabelUI } from '../../uielements/assets/assetLabel'
 import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
 import { Drag as BaseDrag } from '../../uielements/drag'
 import { Label as UILabel } from '../../uielements/label'
@@ -96,27 +96,9 @@ export const ViewTxButtonTop = styled(UIViewTxButton)`
   padding-bottom: 20px;
 `
 
-export const Label = styled(UILabel)`
+export const AssetLabel = styled(AssetLabelUI)`
+  & .ticker {
+    font-size: 16px;
+  }
   padding: 0px;
-  width: fit-content;
-  margin-right: 10px;
-`
-
-export const TickerLabel = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  weight: '600'
-})`
-  padding: 0px;
-  font-size: 14px;
-  line-height: 18px;
-`
-
-export const ChainLabel = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  weight: '500'
-})`
-  padding: 0px;
-  color: ${palette('gray', 2)};
-  font-size: 10px;
-  line-height: 14px;
 `
