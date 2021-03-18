@@ -12,7 +12,7 @@ import { observableState } from '../helpers/stateHelper'
 
 const THEME_TYPE = 'asgdx-theme'
 
-const themes: typeof t = {
+export const themes: typeof t = {
   ...t,
   dark: {
     ...t.dark,
