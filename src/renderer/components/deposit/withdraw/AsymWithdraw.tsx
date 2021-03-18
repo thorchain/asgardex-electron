@@ -231,7 +231,7 @@ export const AsymWithdraw: React.FC<Props> = ({
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
             onClick={viewRuneTx}
-            label={intl.formatMessage({ id: 'common.tx.view' }, { assetSymbol: asset.symbol })}
+            label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: asset.ticker })}
           />
         ))}
       </Styled.ExtraContainer>
