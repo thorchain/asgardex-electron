@@ -51,11 +51,12 @@ export const TickerLabel = styled(UILabel).attrs({
   padding: 0px;
   font-size: 16px;
   line-height: 18px;
-  &.small {
-    color: ${palette('gray', 2)};
-    font-size: 10px;
-    font-weight: 500;
-  }
+`
+
+export const ChainLabel = styled(TickerLabel)`
+  color: ${palette('gray', 2)};
+  font-size: 10px;
+  font-weight: 500;
 `
 
 export const Collapse = styled(A.Collapse)`

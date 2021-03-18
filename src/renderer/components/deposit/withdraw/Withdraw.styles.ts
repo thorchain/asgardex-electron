@@ -97,8 +97,5 @@ export const ViewTxButtonTop = styled(UIViewTxButton)`
 `
 
 export const AssetLabel = styled(AssetLabelUI)`
-  & .ticker {
-    font-size: 16px;
-  }
   padding: 0px;
 `

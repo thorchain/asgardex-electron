@@ -14,6 +14,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
 import { AssetIcon } from '../uielements/assets/assetIcon'
+import { AssetLabel } from '../uielements/assets/assetLabel'
 import { Label } from '../uielements/label'
 import * as H from './helpers'
 import * as Styled from './PoolShares.styles'
@@ -50,7 +51,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
       title: intl.formatMessage({ id: 'common.pool' }),
       align: 'left',
       responsive: ['md'],
-      render: ({ asset }: PoolShareTableRowData) => <Styled.AssetLabel asset={asset} />
+      render: ({ asset }: PoolShareTableRowData) => <AssetLabel asset={asset} />
     }),
     [intl]
   )
