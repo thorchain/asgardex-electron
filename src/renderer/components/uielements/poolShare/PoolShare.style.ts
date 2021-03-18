@@ -2,6 +2,7 @@ import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
+import { AssetData as AssetDataUI } from '../assets/assetData'
 import { Label as UILabel } from '../label'
 
 export const PoolShareWrapper = styled.div`
@@ -25,14 +26,12 @@ export const RedemptionHeader = styled.div`
   }
 `
 
-export const RedemptionAsset = styled(UILabel).attrs({
-  align: 'center',
-  color: 'dark'
-})`
-  padding: 0;
-  font-size: 16px;
-  font-weight: 'bold';
-  font-family: 'MainFontBold';
+export const RedemptionAsset = styled(AssetDataUI)`
+  & .ticker {
+    font-size: 16px;
+  }
+  display: flex;
+  justify-content: center;
 `
 
 export const LabelPrimary = styled(UILabel).attrs({
