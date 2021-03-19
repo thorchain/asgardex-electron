@@ -159,10 +159,20 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oPoolAddress, oMemos, asset, runeAmountToDeposit, assetAmountToDeposit]
   )
 
+  const prevDepositFeesRD = useRef<DepositFeesRD>(RD.initial)
+
   // Input: `oDepositParams` via depositParamsUpdated
   // Output: `DepositFeesRD
   const [depositFeesRD, depositParamsUpdated] = useObservableState<DepositFeesRD, O.Option<SymDepositParams>>(
-    (oDepositParams$) => oDepositParams$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), fees$)))),
+    (oDepositParams$) =>
+      oDepositParams$.pipe(
+        RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), fees$))),
+        RxOp.tap((feesRD) => {
+          if (RD.isSuccess(feesRD)) {
+            prevDepositFeesRD.current = feesRD
+          }
+        })
+      ),
     RD.initial
   )
 
@@ -183,8 +193,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
     () =>
       FP.pipe(
         depositFeesRD,
-        RD.map(({ thor }) => thor),
-        FP.flow(RD.toOption, O.flatten)
+        Helper.getThorchainFees,
+        // Set previously loaded fees to have that values when fees are reloading
+        // in other case changing amount while reloading fees will set max amount to zero value
+        O.alt((): O.Option<BaseAmount> => Helper.getThorchainFees(prevDepositFeesRD.current))
       ),
     [depositFeesRD]
   )
@@ -209,8 +221,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
     () =>
       FP.pipe(
         depositFeesRD,
-        RD.map(({ asset }) => asset),
-        RD.toOption
+        Helper.getAssetChainFee,
+        // Set previously loaded fees to have that values when fees are reloading
+        // in other case changing amount while reloading fees will set max amount to zero value
+        O.alt((): O.Option<BaseAmount> => Helper.getAssetChainFee(prevDepositFeesRD.current))
       ),
     [depositFeesRD]
   )
