@@ -28,7 +28,8 @@ import {
   getEthAssetAddress,
   midgardAssetFromString,
   updateEthChecksumAddress,
-  convertBaseAmountDecimal
+  convertBaseAmountDecimal,
+  baseAmountForThorchain
 } from './assetHelper'
 import { eqAsset, eqBaseAmount } from './fp/eq'
 
@@ -192,16 +193,27 @@ describe('helpers/assetHelper', () => {
     })
     it('converts 1e8 decimal to 1e6 ', () => {
       const result = convertBaseAmountDecimal(baseAmount('12345678', 8), 6)
-      expect(eqBaseAmount.equals(result, baseAmount('123457', 6))).toBeTruthy()
+      expect(eqBaseAmount.equals(result, baseAmount('123456', 6))).toBeTruthy()
     })
     it('converts 1e18 decimal to 1e8', () => {
       const result = convertBaseAmountDecimal(baseAmount('123456789012345678', 18), 8)
-      expect(eqBaseAmount.equals(result, baseAmount('12345679', 8))).toBeTruthy()
+      expect(eqBaseAmount.equals(result, baseAmount('12345678', 8))).toBeTruthy()
     })
     it('does not convert anything by using same decimals', () => {
       const amount = baseAmount('123456', 6)
       const result = convertBaseAmountDecimal(amount, 6)
       expect(eqBaseAmount.equals(result, amount)).toBeTruthy()
+    })
+  })
+
+  describe('baseAmountForThorchain', () => {
+    it('converts 1e12 to 1e8', () => {
+      const result = baseAmountForThorchain(baseAmount('123456789012', 12))
+      expect(eqBaseAmount.equals(result, baseAmount('12345678', 8))).toBeTruthy()
+    })
+    it('keeps 1e6 unchanged', () => {
+      const result = baseAmountForThorchain(baseAmount('123456', 6))
+      expect(eqBaseAmount.equals(result, baseAmount('123456', 6))).toBeTruthy()
     })
   })
 })
