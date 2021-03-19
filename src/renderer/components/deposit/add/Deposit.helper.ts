@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
-import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
+import { convertBaseAmountDecimal, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { DepositFeesRD } from '../../../services/chain/types'
 
 export const maxRuneAmountToDeposit = ({
@@ -18,11 +18,13 @@ export const maxRuneAmountToDeposit = ({
   assetBalance: BaseAmount
 }): BaseAmount => {
   const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
-  const maxRuneAmount = poolRuneBalance
+  const maxRuneAmountBN = poolRuneBalance
     .amount()
     .dividedBy(poolAssetBalance.amount())
     .multipliedBy(assetBalance.amount())
-  return maxRuneAmount.isGreaterThan(runeBalance.amount()) ? runeBalance : baseAmount(maxRuneAmount)
+  return maxRuneAmountBN.isGreaterThan(runeBalance.amount())
+    ? runeBalance
+    : baseAmount(maxRuneAmountBN, THORCHAIN_DECIMAL)
 }
 
 export const maxAssetAmountToDeposit = ({
@@ -35,14 +37,16 @@ export const maxAssetAmountToDeposit = ({
   assetBalance: BaseAmount
 }): BaseAmount => {
   const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
+
   const maxAssetAmountBN: BigNumber = poolAssetBalance
     .amount()
     .dividedBy(poolRuneBalance.amount())
     .multipliedBy(runeBalance.amount())
-    .multipliedBy(Math.pow(10, assetBalance.decimal - 8))
-  return maxAssetAmountBN.isGreaterThanOrEqualTo(assetBalance.amount())
-    ? assetBalance
-    : baseAmount(maxAssetAmountBN, assetBalance.decimal)
+
+  // update decimal for pool asset
+  const maxAssetAmount = convertBaseAmountDecimal(baseAmount(maxAssetAmountBN, THORCHAIN_DECIMAL), assetBalance.decimal)
+
+  return maxAssetAmount.amount().isGreaterThan(assetBalance.amount()) ? assetBalance : maxAssetAmount
 }
 
 export const getRuneAmountToDeposit = (

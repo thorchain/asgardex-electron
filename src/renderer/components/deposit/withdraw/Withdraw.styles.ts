@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { media } from '../../../helpers/styleHelper'
 import { AssetIcon as AssetIconBase } from '../../uielements/assets/assetIcon'
+import { AssetLabel as AssetLabelUI } from '../../uielements/assets/assetLabel'
 import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
 import { Drag as BaseDrag } from '../../uielements/drag'
 import { Label as UILabel } from '../../uielements/label'
@@ -22,6 +23,10 @@ export const AssetContainer = styled('div')`
 
   &:last-child {
     margin: 0;
+  }
+
+  > div:first-child {
+    margin-right: 10px;
   }
 `
 
@@ -44,7 +49,7 @@ export const Drag = styled(BaseDrag)`
 export const OutputLabel = styled(UILabel).attrs({
   weight: 'bold'
 })`
-  padding-left: 10px;
+  padding: 8px 0px 8px 10px;
 `
 export const FeesRow = styled(Row)`
   width: 100%;
@@ -89,4 +94,8 @@ export const ExtraContainer = styled('div')`
 
 export const ViewTxButtonTop = styled(UIViewTxButton)`
   padding-bottom: 20px;
+`
+
+export const AssetLabel = styled(AssetLabelUI)`
+  padding: 0px;
 `

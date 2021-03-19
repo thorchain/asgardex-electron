@@ -229,7 +229,7 @@ export const Withdraw: React.FC<Props> = ({
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
             onClick={viewRuneTx}
-            label={intl.formatMessage({ id: 'common.tx.view' }, { assetSymbol: AssetRuneNative.symbol })}
+            label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
           />
         ))}
       </Styled.ExtraContainer>
@@ -307,6 +307,7 @@ export const Withdraw: React.FC<Props> = ({
 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={AssetRuneNative} network={network} />
+        <Styled.AssetLabel asset={AssetRuneNative} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
             amount: baseToAsset(runeAmountToWithdraw),
@@ -325,6 +326,7 @@ export const Withdraw: React.FC<Props> = ({
 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={asset} network={network} />
+        <Styled.AssetLabel asset={asset} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
             amount: baseToAsset(assetAmountToWithdraw),

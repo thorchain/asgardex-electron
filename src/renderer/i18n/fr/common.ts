@@ -56,18 +56,18 @@ const common: CommonMessages = {
   'common.tx.sending': 'Envoi de la transaction',
   'common.tx.sendingAsset': 'Envoi de la transaction {assetTicker}',
   'common.tx.checkResult': 'Vérifier le résultat',
-  'common.tx.view': 'Voir la transaction {assetSymbol}',
+  'common.tx.view': 'Voir la transaction {assetTicker}',
   'common.modal.confirmTitle': "Confirmer l'action",
   'common.value': 'Valeur',
   'common.manage': 'Gérer',
   'common.asset.base': 'Base',
-  'common.tx.type.swap': 'Swap - FR',
-  'common.tx.type.doubleSwap': 'Double swap - FR',
-  'common.tx.type.deposit': 'Deposit - FR',
-  'common.tx.type.withdraw': 'Withdraw - FR',
-  'common.detail': 'Detail - FR',
-  'common.filter': 'Filter - FR',
-  'common.all': 'All - FR'
+  'common.tx.type.swap': 'Échange',
+  'common.tx.type.doubleSwap': 'Double échange',
+  'common.tx.type.deposit': 'Dépôt',
+  'common.tx.type.withdraw': 'Retrait',
+  'common.detail': 'Détail',
+  'common.filter': 'Filtre',
+  'common.all': 'Tous'
 }
 
 export default common

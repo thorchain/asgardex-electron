@@ -1,4 +1,3 @@
-import { PoolData } from '@thorchain/asgardex-util'
 import {
   assetAmount,
   AssetBNB,
@@ -14,6 +13,7 @@ import * as O from 'fp-ts/lib/Option'
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import { eqBaseAmount } from '../../helpers/fp/eq'
+import { PoolsDataMap } from '../../services/midgard/types'
 import {
   DEFAULT_SWAP_DATA,
   isRuneSwap,
@@ -40,7 +40,7 @@ describe('components/swap/utils', () => {
   })
 
   describe('getSlip', () => {
-    const poolsData: Record<string, PoolData> = {
+    const poolsData: PoolsDataMap = {
       [assetToString(AssetBNB)]: {
         assetBalance: baseAmount(1),
         runeBalance: baseAmount(2)
@@ -56,39 +56,112 @@ describe('components/swap/utils', () => {
     }
 
     it('should return zero result if no poolData', () => {
-      expect(getSlip(AssetBNB, ASSETS_TESTNET.BOLT, baseAmount(bn(123)), {})).toEqual(bn(0))
-      expect(getSlip(AssetRuneNative, ASSETS_TESTNET.BOLT, baseAmount(bn(123)), {})).toEqual(bn(0))
-      expect(getSlip(AssetBNB, AssetRuneNative, baseAmount(bn(123)), {})).toEqual(bn(0))
+      expect(
+        getSlip({
+          sourceAsset: AssetBNB,
+          targetAsset: ASSETS_TESTNET.BOLT,
+          amountToSwap: baseAmount(bn(123)),
+          poolsData: {}
+        })
+      ).toEqual(bn(0))
+      expect(
+        getSlip({
+          sourceAsset: AssetRuneNative,
+          targetAsset: ASSETS_TESTNET.BOLT,
+          amountToSwap: baseAmount(bn(123)),
+          poolsData: {}
+        })
+      ).toEqual(bn(0))
+      expect(
+        getSlip({
+          sourceAsset: AssetBNB,
+          targetAsset: AssetRuneNative,
+          amountToSwap: baseAmount(bn(123)),
+          poolsData: {}
+        })
+      ).toEqual(bn(0))
     })
 
     it('should calculate slip when data enabled', () => {
-      expect(getSlip(AssetBNB, ASSETS_TESTNET.BOLT, baseAmount(bn(1)), poolsData)).toEqual(bn('0.64285714285714285714'))
+      expect(
+        getSlip({
+          sourceAsset: AssetBNB,
+          targetAsset: ASSETS_TESTNET.BOLT,
+          amountToSwap: baseAmount(bn(1)),
+          poolsData
+        })
+      ).toEqual(bn('0.64285714285714285714'))
 
-      expect(getSlip(ASSETS_TESTNET.BOLT, AssetBNB, baseAmount(bn(1)), poolsData)).toEqual(bn('0.5'))
+      expect(
+        getSlip({
+          sourceAsset: ASSETS_TESTNET.BOLT,
+          targetAsset: AssetBNB,
+          amountToSwap: baseAmount(bn(1)),
+          poolsData
+        })
+      ).toEqual(bn('0.5'))
 
-      expect(getSlip(AssetRuneNative, AssetBNB, baseAmount(bn(1)), poolsData)).toEqual(bn('0.33333333333333333333'))
+      expect(
+        getSlip({
+          sourceAsset: AssetRuneNative,
+          targetAsset: AssetBNB,
+          amountToSwap: baseAmount(bn(1)),
+          poolsData
+        })
+      ).toEqual(bn('0.33333333333333333333'))
 
-      expect(getSlip(AssetBNB, AssetRuneNative, baseAmount(bn(1)), poolsData)).toEqual(bn('0.25'))
+      expect(
+        getSlip({
+          sourceAsset: AssetBNB,
+          targetAsset: AssetRuneNative,
+          amountToSwap: baseAmount(bn(1)),
+          poolsData
+        })
+      ).toEqual(bn('0.25'))
     })
   })
 
   describe('getSwapResult', () => {
     it('should return zero result if no poolData', () => {
       expect(
-        eqBaseAmount.equals(getSwapResult(AssetBNB, ASSETS_TESTNET.BOLT, baseAmount(123), {}), ZERO_BASE_AMOUNT)
+        eqBaseAmount.equals(
+          getSwapResult({
+            sourceAsset: AssetBNB,
+            targetAsset: ASSETS_TESTNET.BOLT,
+            amountToSwap: baseAmount(123),
+            poolsData: {}
+          }),
+          ZERO_BASE_AMOUNT
+        )
       ).toBeTruthy()
 
       expect(
-        eqBaseAmount.equals(getSwapResult(AssetRuneNative, ASSETS_TESTNET.BOLT, baseAmount(123), {}), ZERO_BASE_AMOUNT)
+        eqBaseAmount.equals(
+          getSwapResult({
+            sourceAsset: AssetRuneNative,
+            targetAsset: ASSETS_TESTNET.BOLT,
+            amountToSwap: baseAmount(123),
+            poolsData: {}
+          }),
+          ZERO_BASE_AMOUNT
+        )
       ).toBeTruthy()
 
       expect(
-        eqBaseAmount.equals(getSwapResult(AssetBNB, AssetRuneNative, baseAmount(123), {}), ZERO_BASE_AMOUNT)
+        eqBaseAmount.equals(
+          getSwapResult({
+            sourceAsset: AssetBNB,
+            targetAsset: AssetRuneNative,
+            amountToSwap: baseAmount(123),
+            poolsData: {}
+          }),
+          ZERO_BASE_AMOUNT
+        )
       ).toBeTruthy()
     })
 
     it('should calculate swap output when data enabled', () => {
-      const poolsData: Record<string, PoolData> = {
+      const poolsData: PoolsDataMap = {
         [assetToString(AssetBNB)]: {
           assetBalance: baseAmount(1),
           runeBalance: baseAmount(2)
@@ -109,14 +182,24 @@ describe('components/swap/utils', () => {
 
       expect(
         eqBaseAmount.equals(
-          getSwapResult(AssetBNB, ASSETS_TESTNET.BOLT, baseAmount(1), poolsData),
+          getSwapResult({
+            sourceAsset: AssetBNB,
+            targetAsset: ASSETS_TESTNET.BOLT,
+            amountToSwap: baseAmount(1),
+            poolsData
+          }),
           assetToBase(assetAmount('0.125'))
         )
       ).toBeTruthy()
 
       expect(
         eqBaseAmount.equals(
-          getSwapResult(ASSETS_TESTNET.FTM, AssetRuneNative, baseAmount(1), poolsData),
+          getSwapResult({
+            sourceAsset: ASSETS_TESTNET.FTM,
+            targetAsset: AssetRuneNative,
+            amountToSwap: baseAmount(1),
+            poolsData
+          }),
           assetToBase(assetAmount('1.33332444'))
         )
       ).toBeTruthy()
@@ -125,13 +208,29 @@ describe('components/swap/utils', () => {
 
   describe('getSwapData', () => {
     it('should return default value', () => {
-      expect(getSwapData(baseAmount(123), O.none, O.none, {})).toEqual(DEFAULT_SWAP_DATA)
-      expect(getSwapData(baseAmount(123), O.some(ASSETS_TESTNET.FTM), O.none, {})).toEqual(DEFAULT_SWAP_DATA)
-      expect(getSwapData(baseAmount(123), O.none, O.some(ASSETS_TESTNET.FTM), {})).toEqual(DEFAULT_SWAP_DATA)
+      expect(
+        getSwapData({ amountToSwap: baseAmount(123), sourceAsset: O.none, targetAsset: O.none, poolsData: {} })
+      ).toEqual(DEFAULT_SWAP_DATA)
+      expect(
+        getSwapData({
+          amountToSwap: baseAmount(123),
+          sourceAsset: O.some(ASSETS_TESTNET.FTM),
+          targetAsset: O.none,
+          poolsData: {}
+        })
+      ).toEqual(DEFAULT_SWAP_DATA)
+      expect(
+        getSwapData({
+          amountToSwap: baseAmount(123),
+          sourceAsset: O.none,
+          targetAsset: O.some(ASSETS_TESTNET.FTM),
+          poolsData: {}
+        })
+      ).toEqual(DEFAULT_SWAP_DATA)
     })
 
     it('should calculate swap data', () => {
-      const poolsData: Record<string, PoolData> = {
+      const poolsData: PoolsDataMap = {
         [assetToString(AssetBNB)]: {
           assetBalance: baseAmount(3000000),
           runeBalance: baseAmount(4000000)
@@ -142,12 +241,12 @@ describe('components/swap/utils', () => {
         }
       }
 
-      const { slip, swapResult } = getSwapData(
-        assetToBase(assetAmount(0.0001)),
-        O.some(AssetBNB),
-        O.some(AssetRuneNative),
+      const { slip, swapResult } = getSwapData({
+        amountToSwap: assetToBase(assetAmount(0.0001)),
+        sourceAsset: O.some(AssetBNB),
+        targetAsset: O.some(AssetRuneNative),
         poolsData
-      )
+      })
 
       expect(slip.isEqualTo(bn('0.00332225913621262458'))).toBeTruthy()
       expect(eqBaseAmount.equals(swapResult, baseAmount('13245'))).toBeTruthy()

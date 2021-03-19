@@ -10,8 +10,12 @@ import {
   AssetLTC,
   AssetRune67C,
   AssetRuneB1A,
-  AssetRuneNative
+  AssetRuneNative,
+  baseAmount,
+  BaseAmount,
+  bn
 } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -163,3 +167,41 @@ export const midgardAssetFromString: (assetString: string) => O.Option<Asset> = 
   // And 0X isn't recognized as valid address in ethers lib
   O.map(updateEthChecksumAddress)
 )
+
+/**
+ * Helper to convert decimal of asset amounts
+ *
+ * It can be used to convert Midgard/THORChain amounts,
+ * which are always based on 1e8 decimal into any 1e(n) decimal
+ *
+ * Examples:
+ * ETH.ETH: 1e8 -> 1e18
+ * ETH.USDT: 1e8 -> 1e6
+ *
+ * @param amount BaseAmount to convert
+ * @param decimal Target decimal
+ */
+export const convertBaseAmountDecimal = (amount: BaseAmount, decimal: number): BaseAmount => {
+  const decimalDiff = decimal - amount.decimal
+
+  const amountBN =
+    decimalDiff < 0
+      ? bn(
+          amount
+            .amount()
+            .dividedBy(bn(Math.pow(10, decimalDiff * -1)))
+            // round down is needed to make sure amount of currency is still available
+            // without that, `dividedBy` might round up and provide an currency amount which does not exist
+            .toFixed(0, BigNumber.ROUND_DOWN)
+        )
+      : amount.amount().multipliedBy(bn(Math.pow(10, decimalDiff)))
+  return baseAmount(amountBN, decimal)
+}
+
+/**
+ * Helper to convert any `BaseAmount`
+ * into a <= 1e8 decimal based `BaseAmount`
+ * to support THORChain
+ */
+export const baseAmountForThorchain = (amount: BaseAmount): BaseAmount =>
+  amount.decimal <= THORCHAIN_DECIMAL ? amount : convertBaseAmountDecimal(amount, THORCHAIN_DECIMAL)

@@ -1,15 +1,15 @@
-import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip, PoolData } from '@thorchain/asgardex-util'
-import { Asset, assetToString, bn, BaseAmount, baseToAsset, assetAmount, assetToBase } from '@xchainjs/xchain-util'
+import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip } from '@thorchain/asgardex-util'
+import { Asset, assetToString, bn, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { isRuneNativeAsset } from '../../helpers/assetHelper'
+import { convertBaseAmountDecimal, isRuneNativeAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { PoolAssetDetail, PoolAssetDetails } from '../../services/midgard/types'
+import { PoolAssetDetail, PoolAssetDetails, PoolsDataMap } from '../../services/midgard/types'
 
 /**
  * @returns none - neither sourceAsset neither targetAsset is RUNE
@@ -28,58 +28,76 @@ export const isRuneSwap = (sourceAsset: Asset, targetAsset: Asset) => {
   return O.none
 }
 
-export const getSlip = (
-  sourceAsset: Asset,
-  targetAsset: Asset,
-  changeAmount: BaseAmount,
-  pools: Record<string, PoolData>
-) =>
-  FP.pipe(
+export const getSlip = ({
+  sourceAsset,
+  targetAsset,
+  amountToSwap,
+  poolsData
+}: {
+  sourceAsset: Asset
+  targetAsset: Asset
+  amountToSwap: BaseAmount
+  poolsData: PoolsDataMap
+}): BigNumber => {
+  // pool data provided by Midgard are always 1e8 decimal based
+  // that's why we have to convert `amountToSwap into 1e8 as well
+  const inputAmount = convertBaseAmountDecimal(amountToSwap, THORCHAIN_DECIMAL)
+  return FP.pipe(
     isRuneSwap(sourceAsset, targetAsset),
     O.chain((toRune) =>
       FP.pipe(
-        O.fromNullable(pools[assetToString(targetAsset)]),
-        O.map((targetPoolData) => getSwapSlip(changeAmount, targetPoolData, toRune))
+        O.fromNullable(poolsData[assetToString(targetAsset)]),
+        O.map((targetPoolData) => getSwapSlip(inputAmount, targetPoolData, toRune))
       )
     ),
     O.alt(() =>
       FP.pipe(
         sequenceTOption(
-          O.fromNullable(pools[assetToString(sourceAsset)]),
-          O.fromNullable(pools[assetToString(targetAsset)])
+          O.fromNullable(poolsData[assetToString(sourceAsset)]),
+          O.fromNullable(poolsData[assetToString(targetAsset)])
         ),
-        O.map(([source, target]) => getDoubleSwapSlip(changeAmount, source, target))
+        O.map(([source, target]) => getDoubleSwapSlip(inputAmount, source, target))
       )
     ),
     O.getOrElse(() => bn(0))
   )
+}
 
-export const getSwapResult = (
-  sourceAsset: Asset,
-  targetAsset: Asset,
-  changeAmount: BaseAmount,
-  pools: Record<string, PoolData>
-): BaseAmount =>
-  FP.pipe(
+export const getSwapResult = ({
+  sourceAsset,
+  targetAsset,
+  amountToSwap,
+  poolsData
+}: {
+  sourceAsset: Asset
+  targetAsset: Asset
+  amountToSwap: BaseAmount
+  poolsData: PoolsDataMap
+}): BaseAmount => {
+  // pool data provided by Midgard are always 1e8 decimal based,
+  // that's why we have to convert `amountToSwap into 1e8 as well
+  const inputAmount = convertBaseAmountDecimal(amountToSwap, THORCHAIN_DECIMAL)
+  return FP.pipe(
     isRuneSwap(sourceAsset, targetAsset),
     O.chain((toRune) => {
       const assetSymbol = assetToString(toRune ? sourceAsset : targetAsset)
       return FP.pipe(
-        O.fromNullable(pools[assetSymbol]),
-        O.map((poolData) => getSwapOutput(changeAmount, poolData, toRune))
+        O.fromNullable(poolsData[assetSymbol]),
+        O.map((poolData) => getSwapOutput(inputAmount, poolData, toRune))
       )
     }),
     O.alt(() =>
       FP.pipe(
         sequenceTOption(
-          O.fromNullable(pools[assetToString(sourceAsset)]),
-          O.fromNullable(pools[assetToString(targetAsset)])
+          O.fromNullable(poolsData[assetToString(sourceAsset)]),
+          O.fromNullable(poolsData[assetToString(targetAsset)])
         ),
-        O.map(([source, target]) => getDoubleSwapOutput(changeAmount, source, target))
+        O.map(([source, target]) => getDoubleSwapOutput(inputAmount, source, target))
       )
     ),
     O.getOrElse(() => ZERO_BASE_AMOUNT)
   )
+}
 
 export type SwapData = {
   readonly slip: BigNumber
@@ -91,20 +109,22 @@ export const DEFAULT_SWAP_DATA: SwapData = {
   swapResult: ZERO_BASE_AMOUNT
 }
 
-export const convertToBase8 = (amount: BaseAmount) => assetToBase(assetAmount(baseToAsset(amount).amount(), 8))
-
-export const getSwapData = (
-  swapAmount: BaseAmount,
-  sourceAsset: O.Option<Asset>,
-  targetAsset: O.Option<Asset>,
-  pools: Record<string, PoolData>
-): SwapData =>
+export const getSwapData = ({
+  amountToSwap,
+  sourceAsset,
+  targetAsset,
+  poolsData
+}: {
+  amountToSwap: BaseAmount
+  sourceAsset: O.Option<Asset>
+  targetAsset: O.Option<Asset>
+  poolsData: PoolsDataMap
+}): SwapData =>
   FP.pipe(
     sequenceTOption(sourceAsset, targetAsset),
     O.map(([sourceAsset, targetAsset]) => {
-      swapAmount = convertToBase8(swapAmount)
-      const slip = getSlip(sourceAsset, targetAsset, swapAmount, pools)
-      const swapResult = getSwapResult(sourceAsset, targetAsset, swapAmount, pools)
+      const slip = getSlip({ sourceAsset, targetAsset, amountToSwap, poolsData })
+      const swapResult = getSwapResult({ sourceAsset, targetAsset, amountToSwap, poolsData })
       return {
         slip,
         swapResult
