@@ -45,6 +45,22 @@ const createSharesService = (
           RxOp.map(RD.success),
           liveData.map(({ pools }) => pools),
           liveData.mapLeft(() => Error('No pool found')),
+          RxOp.catchError((e) => {
+            /**
+             * 404 response is returned in 2 cases:
+             * 1. Pool doesn't exist at all
+             * 2. User has no any stake units for the pool
+             * In both cases return empty array as `No Data` identifier
+             */
+            if ('status' in e && e.status === 404) {
+              return Rx.of(RD.success([]))
+            }
+
+            /**
+             * In all other cases return error as is
+             */
+            return Rx.of(RD.failure(Error(e)))
+          }),
           RxOp.startWith(RD.pending)
         )
       ),
@@ -68,24 +84,7 @@ const createSharesService = (
             )
           )
         )
-      ),
-      RxOp.catchError((e) => {
-        /**
-         * 404 response is returned in 2 cases:
-         * 1. Pool doesn't exist at all
-         * 2. User has no any stake units for the pool
-         * In both cases return empty array as `No Data` identifier
-         */
-        if ('status' in e && e.status === 404) {
-          return Rx.of(RD.success([]))
-        }
-
-        /**
-         * In all other cases return error as is
-         */
-        return Rx.of(RD.failure(Error(e)))
-      })
-      // RxOp.shareReplay(1)
+      )
     )
 
   /**
