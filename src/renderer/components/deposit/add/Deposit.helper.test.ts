@@ -62,13 +62,15 @@ describe('deposit/Deposit.helper', () => {
   describe('getAssetAmountToDeposit', () => {
     it('is 50', () => {
       const runeAmount = baseAmount(100)
-      const result = getAssetAmountToDeposit(runeAmount, poolData)
-      expect(eqBaseAmount.equals(result, baseAmount(50))).toBeTruthy()
+      const assetDecimal = 6
+      const result = getAssetAmountToDeposit({ runeAmount, poolData, assetDecimal })
+      expect(eqBaseAmount.equals(result, baseAmount(50, assetDecimal))).toBeTruthy()
     })
     it('is 25', () => {
       const runeAmount = baseAmount(50)
-      const result = getAssetAmountToDeposit(runeAmount, poolData)
-      expect(eqBaseAmount.equals(result, baseAmount(25))).toBeTruthy()
+      const assetDecimal = 12
+      const result = getAssetAmountToDeposit({ runeAmount, poolData, assetDecimal })
+      expect(eqBaseAmount.equals(result, baseAmount(25, assetDecimal))).toBeTruthy()
     })
   })
 })
