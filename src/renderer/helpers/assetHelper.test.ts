@@ -197,7 +197,6 @@ describe('helpers/assetHelper', () => {
     })
     it('converts 1e18 decimal to 1e8', () => {
       const result = convertBaseAmountDecimal(baseAmount('123456789012345678', 18), 8)
-      console.log('result:', result.amount().toString())
       expect(eqBaseAmount.equals(result, baseAmount('12345678', 8))).toBeTruthy()
     })
     it('does not convert anything by using same decimals', () => {
@@ -210,12 +209,10 @@ describe('helpers/assetHelper', () => {
   describe('baseAmountForThorchain', () => {
     it('converts 1e12 to 1e8', () => {
       const result = baseAmountForThorchain(baseAmount('123456789012', 12))
-      console.log('result:', result.amount().toString())
       expect(eqBaseAmount.equals(result, baseAmount('12345678', 8))).toBeTruthy()
     })
     it('keeps 1e6 unchanged', () => {
       const result = baseAmountForThorchain(baseAmount('123456', 6))
-      console.log('result:', result.amount().toString())
       expect(eqBaseAmount.equals(result, baseAmount('123456', 6))).toBeTruthy()
     })
   })
