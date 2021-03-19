@@ -49,7 +49,8 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
 
   const {
     service: {
-      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, selectedPoolAddress$ }
+      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, selectedPoolAddress$ },
+      shares: { reloadShares }
     }
   } = useMidgardContext()
 
@@ -151,6 +152,11 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
     [runeExplorerUrl]
   )
 
+  const reloadBalancesAndShares = useCallback(() => {
+    reloadBalances()
+    reloadShares(5000)
+  }, [reloadBalances, reloadShares])
+
   const renderDisabledAddDeposit = useCallback(
     (error?: Error) => (
       <>
@@ -174,7 +180,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
           disabled={true}
           poolAddress={O.none}
           memos={O.none}
-          reloadBalances={reloadBalances}
+          reloadBalances={reloadBalancesAndShares}
           poolData={ZERO_POOL_DATA}
           deposit$={symDeposit$}
           network={network}
@@ -191,7 +197,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
       asset,
       symDepositFees$,
       selectedPricePoolAsset,
-      reloadBalances,
+      reloadBalancesAndShares,
       symDeposit$,
       network,
       approveERC20Token$,
@@ -225,7 +231,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
               fees$={symDepositFees$}
               reloadFees={reloadSymDepositFees}
               priceAsset={selectedPricePoolAsset}
-              reloadBalances={reloadBalances}
+              reloadBalances={reloadBalancesAndShares}
               assets={poolAssets}
               deposit$={symDeposit$}
               network={network}

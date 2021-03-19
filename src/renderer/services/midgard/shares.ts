@@ -9,7 +9,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
-import { triggerStream } from '../../helpers/stateHelper'
+import { triggerStream, observableState } from '../../helpers/stateHelper'
 import { MemberPool } from '../../types/generated/midgard'
 import { DefaultApi } from '../../types/generated/midgard/apis'
 import { PoolShare, PoolShareLD, PoolSharesLD } from './types'
@@ -21,7 +21,13 @@ const createSharesService = (
 ) => {
   const api$ = byzantine$.pipe(RxOp.map(RD.map(getMidgardDefaultApi)))
 
-  const { stream$: reloadShares$, trigger: reloadShares } = triggerStream()
+  /**
+   * We need a possibility to reload shares info with delay for this
+   * purpose we need to use observableState instead of plain triggerStream here
+   * @example after sending deposit tx there is no sense to reload shares info
+   *          right after deposit-tx was succeed
+   */
+  const { get$: reloadSharesWithTimer$, set: reloadSharesWithTimer } = observableState<number | undefined>(0)
 
   /**
    * Returns `PoolShares` by given member address
@@ -37,8 +43,14 @@ const createSharesService = (
    */
   const shares$ = (address: Address): PoolSharesLD =>
     FP.pipe(
-      Rx.combineLatest([api$, reloadShares$]),
-      RxOp.map(([api]) => api),
+      Rx.combineLatest([api$, reloadSharesWithTimer$]),
+      RxOp.switchMap(([api, delayTime]) =>
+        FP.pipe(
+          Rx.timer(delayTime),
+          RxOp.switchMap(() => Rx.of(api)),
+          RxOp.startWith(RD.pending as RD.RemoteData<Error, DefaultApi>)
+        )
+      ),
       liveData.chain((api) =>
         FP.pipe(
           api.getMemberDetail({ address }),
@@ -139,7 +151,7 @@ const createSharesService = (
 
   return {
     shares$,
-    reloadShares,
+    reloadShares: (delayTime?: number) => reloadSharesWithTimer(delayTime),
     symShareByAsset$,
     asymShareByAsset$,
     combineShares$,
