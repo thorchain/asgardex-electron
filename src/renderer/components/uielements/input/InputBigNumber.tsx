@@ -22,6 +22,7 @@ export const InputBigNumber = forwardRef<Input, Props>(
       decimal = 2,
       value = ZERO_BN,
       onChange = () => {},
+      onFocus = FP.constVoid,
       ...otherProps /* any props of `InputNumberProps` */
     } = props
 
@@ -53,15 +54,16 @@ export const InputBigNumber = forwardRef<Input, Props>(
     }, [decimal, value])
 
     const onFocusHandler = useCallback(
-      async (event: React.ChangeEvent<HTMLInputElement>) => {
+      async (event: React.FocusEvent<HTMLInputElement>) => {
         const { target } = event
+        onFocus(event)
         setFocus(true)
         // short delay is needed before selecting to keep its reference
         // (it will be lost in other cases due React rendering)
         await delay(1)
         target.select()
       },
-      [setFocus]
+      [onFocus]
     )
 
     const onBlurHandler = useCallback(() => {
