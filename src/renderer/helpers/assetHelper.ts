@@ -199,9 +199,24 @@ export const convertBaseAmountDecimal = (amount: BaseAmount, decimal: number): B
 }
 
 /**
- * Helper to convert any `BaseAmount`
- * into a <= 1e8 decimal based `BaseAmount`
- * to support THORChain
+ * Helper to convert a `BaseAmount`
+ * into a `BaseAmount` with max. decimal of `1e8`.
+ *
+ * If decimal of `BaseAmount` is less than `1e8`, it will be unchanged.
+ *
+ * Examples:
+ *
+ * 1e12 -> 1e8
+ * upTo1e8BaseAmount(baseAmount(123456789012, 12)) // baseAmount(12345678, 8)
+ *
+ * 1e6 -> 1e6
+ * upTo1e8BaseAmount(baseAmount(123456, 6)) // baseAmount(123456, 6)
  */
-export const baseAmountForThorchain = (amount: BaseAmount): BaseAmount =>
+export const max1e8BaseAmount = (amount: BaseAmount): BaseAmount =>
   amount.decimal <= THORCHAIN_DECIMAL ? amount : convertBaseAmountDecimal(amount, THORCHAIN_DECIMAL)
+
+/**
+ * Helper to convert a `BaseAmount`
+ * into `1e8` decimal based `BaseAmount`
+ */
+export const to1e8BaseAmount = (amount: BaseAmount): BaseAmount => convertBaseAmountDecimal(amount, THORCHAIN_DECIMAL)
