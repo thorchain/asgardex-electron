@@ -184,6 +184,9 @@ export const midgardAssetFromString: (assetString: string) => O.Option<Asset> = 
 export const convertBaseAmountDecimal = (amount: BaseAmount, decimal: number): BaseAmount => {
   const decimalDiff = decimal - amount.decimal
 
+  const world = 'world'
+  console.log('hello ', world)
+
   const amountBN =
     decimalDiff < 0
       ? bn(
