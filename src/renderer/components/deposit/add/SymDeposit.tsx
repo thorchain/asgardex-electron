@@ -193,6 +193,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   useEffect(() => depositParamsUpdated(oDepositParams), [depositParamsUpdated, oDepositParams])
 
   const reloadFeesHandler = useCallback(() => {
+    console.log('reloadFeesHandler:')
     FP.pipe(
       oDepositParams,
       O.map((params) => {
@@ -796,7 +797,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             onChangeAsset={onChangeAssetHandler}
             priceAsset={priceAsset}
             network={network}
-            onAfterSliderChange={reloadFeesHandler}
+            onAfterSliderChange={() => (selectedInput === 'none' ? reloadFeesHandler() : FP.constVoid)}
           />
         </Col>
 
