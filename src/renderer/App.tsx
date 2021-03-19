@@ -17,6 +17,9 @@ import { UserNodesProvider } from './contexts/UserNodesContext'
 import { WalletProvider } from './contexts/WalletContext'
 import { AppView } from './views/app/AppView'
 
+console.log('any change')
+
+
 export const App: React.FC = (): JSX.Element => {
   return (
     <AppProvider>
