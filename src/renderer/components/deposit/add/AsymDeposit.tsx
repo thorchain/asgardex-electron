@@ -281,10 +281,15 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     )
   }, [intl, asset, depositState, assetAmountToDeposit, network])
 
-  const onFinishTxModal = useCallback(() => {
+  const onCloseTxModal = useCallback(() => {
     resetDepositState()
+    setPercentValueToDeposit(0)
+  }, [resetDepositState, setPercentValueToDeposit])
+
+  const onFinishTxModal = useCallback(() => {
+    onCloseTxModal()
     reloadBalances()
-  }, [resetDepositState, reloadBalances])
+  }, [onCloseTxModal, reloadBalances])
 
   const renderTxModal = useMemo(() => {
     const { deposit: depositRD, depositTx: asymDepositTx } = depositState
@@ -323,7 +328,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     return (
       <TxModal
         title={txModalTitle}
-        onClose={resetDepositState}
+        onClose={onCloseTxModal}
         onFinish={onFinishTxModal}
         startTime={depositStartTime}
         txRD={depositRD}
@@ -332,7 +337,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
         extra={txModalExtraContent}
       />
     )
-  }, [depositState, viewAssetTx, resetDepositState, onFinishTxModal, depositStartTime, txModalExtraContent, intl])
+  }, [depositState, viewAssetTx, onCloseTxModal, onFinishTxModal, depositStartTime, txModalExtraContent, intl])
 
   const onClosePasswordModal = useCallback(() => {
     // close password modal

@@ -464,11 +464,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [intl, asset, depositState, assetAmountToDeposit, runeAmountToDeposit, network])
 
-  const onFinishTxModal = useCallback(() => {
+  const onCloseTxModal = useCallback(() => {
     resetDepositState()
-    reloadBalances()
     changePercentHandler(0)
-  }, [resetDepositState, reloadBalances, changePercentHandler])
+  }, [resetDepositState, changePercentHandler])
+
+  const onFinishTxModal = useCallback(() => {
+    onCloseTxModal()
+    reloadBalances()
+  }, [reloadBalances, onCloseTxModal])
 
   const renderTxModal = useMemo(() => {
     const { deposit: depositRD, depositTxs: symDepositTxs } = depositState
@@ -524,7 +528,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     return (
       <TxModal
         title={txModalTitle}
-        onClose={resetDepositState}
+        onClose={onCloseTxModal}
         onFinish={onFinishTxModal}
         startTime={depositStartTime}
         txRD={depositRD}
@@ -535,7 +539,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [
     depositState,
-    resetDepositState,
+    onCloseTxModal,
     onFinishTxModal,
     depositStartTime,
     txModalExtraContent,
