@@ -27,12 +27,12 @@ import * as Rx from 'rxjs'
 import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import {
-  convertBaseAmountDecimal,
   getEthTokenAddress,
   isEthAsset,
   isEthTokenAsset,
   THORCHAIN_DECIMAL,
-  baseAmountForThorchain
+  max1e8BaseAmount,
+  to1e8BaseAmount
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
@@ -157,7 +157,8 @@ export const Swap = ({
       FP.pipe(
         oSourceAssetWB,
         O.map(({ amount }) => amount),
-        O.getOrElse(() => ZERO_BASE_AMOUNT)
+        // Default zero value based on 1e8
+        O.getOrElse(() => baseAmount(0, THORCHAIN_DECIMAL))
       ),
     [oSourceAssetWB]
   )
@@ -180,7 +181,7 @@ export const Swap = ({
     INITIAL_SWAP_STATE
   )
 
-  const sourceAssetAmountForThorchain = useMemo(() => baseAmountForThorchain(sourceAssetAmount), [sourceAssetAmount])
+  const sourceAssetAmountForThorchain = useMemo(() => max1e8BaseAmount(sourceAssetAmount), [sourceAssetAmount])
 
   const initialAmountToSwap = useMemo(() => baseAmount(0, sourceAssetAmountForThorchain.decimal), [
     sourceAssetAmountForThorchain.decimal
@@ -322,6 +323,7 @@ export const Swap = ({
   // Max amount to swap
   // depends on users balances of source asset
   // and of fees to pay for source chain txs
+  // Decimal always <= 1e8 based
   const maxAmountToSwap: BaseAmount = useMemo(() => {
     // make sure not logged in user can play around with swap
     if (isLocked(keystore) || !hasImportedKeystore(keystore)) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER))
@@ -340,7 +342,7 @@ export const Swap = ({
       )
     )
     return eqAsset.equals(sourceChainAsset, sourceAssetProp)
-      ? baseAmountForThorchain(maxChainAssetAmount)
+      ? max1e8BaseAmount(maxChainAssetAmount)
       : sourceAssetAmountForThorchain
   }, [keystore, chainFeesRD, sourceChainAsset, sourceAssetProp, sourceAssetAmountForThorchain, sourceChainAssetAmount])
 
@@ -641,11 +643,7 @@ export const Swap = ({
                 ? fees.outTx
                 : // pool data are always 1e8 decimal based
                   // and we have to convert fees to 1e8, too
-                  getValueOfAsset1InAsset2(
-                    convertBaseAmountDecimal(fees.outTx, THORCHAIN_DECIMAL),
-                    chainAssetPoolData,
-                    assetPoolData
-                  )
+                  getValueOfAsset1InAsset2(to1e8BaseAmount(fees.outTx), chainAssetPoolData, assetPoolData)
           )
         )
       }),
