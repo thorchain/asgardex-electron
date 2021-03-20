@@ -188,8 +188,9 @@ export const Withdraw: React.FC<Props> = ({
 
   const onFinishTxModal = useCallback(() => {
     resetWithdrawState()
+    setWithdrawPercent(0)
     reloadBalances()
-  }, [reloadBalances, resetWithdrawState])
+  }, [reloadBalances, resetWithdrawState, setWithdrawPercent])
 
   const renderTxModal = useMemo(() => {
     const { withdraw: withdrawRD, withdrawTx } = withdrawState

@@ -1,12 +1,17 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import { baseAmount } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/Option'
 
-import { eqBaseAmount } from '../../../helpers/fp/eq'
+import { eqBaseAmount, eqOptionBaseAmount } from '../../../helpers/fp/eq'
+import { DepositFeesRD } from '../../../services/chain/types'
 import {
   getAssetAmountToDeposit,
   getRuneAmountToDeposit,
   maxAssetAmountToDeposit,
-  maxRuneAmountToDeposit
+  maxRuneAmountToDeposit,
+  getAssetChainFee,
+  getThorchainFees
 } from './Deposit.helper'
 
 describe('deposit/Deposit.helper', () => {
@@ -69,6 +74,30 @@ describe('deposit/Deposit.helper', () => {
       const runeAmount = baseAmount(50)
       const result = getAssetAmountToDeposit(runeAmount, poolData)
       expect(eqBaseAmount.equals(result, baseAmount(25))).toBeTruthy()
+    })
+  })
+
+  describe('fees getters', () => {
+    const depositFeesRD: DepositFeesRD = RD.success({
+      thor: O.some(baseAmount(100)),
+      asset: baseAmount(123)
+    })
+
+    it('should return chain fees', () => {
+      expect(eqOptionBaseAmount.equals(getAssetChainFee(depositFeesRD), O.some(baseAmount(123)))).toBeTruthy()
+    })
+
+    it('should return ThorChain fees', () => {
+      expect(eqOptionBaseAmount.equals(getThorchainFees(depositFeesRD), O.some(baseAmount(100)))).toBeTruthy()
+
+      expect(
+        getThorchainFees(
+          RD.success({
+            thor: O.none,
+            asset: baseAmount(123)
+          })
+        )
+      ).toBeNone()
     })
   })
 })

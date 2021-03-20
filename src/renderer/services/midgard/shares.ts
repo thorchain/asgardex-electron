@@ -9,7 +9,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
-import { triggerStream } from '../../helpers/stateHelper'
+import { triggerStream, observableState } from '../../helpers/stateHelper'
 import { MemberPool } from '../../types/generated/midgard'
 import { DefaultApi } from '../../types/generated/midgard/apis'
 import { PoolShare, PoolShareLD, PoolSharesLD } from './types'
@@ -21,7 +21,13 @@ const createSharesService = (
 ) => {
   const api$ = byzantine$.pipe(RxOp.map(RD.map(getMidgardDefaultApi)))
 
-  const { stream$: reloadShares$, trigger: reloadShares } = triggerStream()
+  /**
+   * We need a possibility to reload shares info with delay for this
+   * purpose we need to use observableState instead of plain triggerStream here
+   * @example after sending deposit tx there is no sense to reload shares info
+   *          right after deposit-tx was succeed
+   */
+  const { get$: reloadSharesWithTimer$, set: reloadSharesWithTimer } = observableState<number>(0)
 
   /**
    * Returns `PoolShares` by given member address
@@ -37,14 +43,36 @@ const createSharesService = (
    */
   const shares$ = (address: Address): PoolSharesLD =>
     FP.pipe(
-      Rx.combineLatest([api$, reloadShares$]),
-      RxOp.map(([api]) => api),
+      Rx.combineLatest([api$, reloadSharesWithTimer$]),
+      RxOp.switchMap(([api, delayTime]) =>
+        FP.pipe(
+          Rx.timer(delayTime),
+          RxOp.switchMap(() => Rx.of(api)),
+          RxOp.startWith(RD.pending as RD.RemoteData<Error, DefaultApi>)
+        )
+      ),
       liveData.chain((api) =>
         FP.pipe(
           api.getMemberDetail({ address }),
           RxOp.map(RD.success),
           liveData.map(({ pools }) => pools),
           liveData.mapLeft(() => Error('No pool found')),
+          RxOp.catchError((e) => {
+            /**
+             * 404 response is returned in 2 cases:
+             * 1. Pool doesn't exist at all
+             * 2. User has no any stake units for the pool
+             * In both cases return empty array as `No Data` identifier
+             */
+            if ('status' in e && e.status === 404) {
+              return Rx.of(RD.success([]))
+            }
+
+            /**
+             * In all other cases return error as is
+             */
+            return Rx.of(RD.failure(Error(e)))
+          }),
           RxOp.startWith(RD.pending)
         )
       ),
@@ -68,24 +96,7 @@ const createSharesService = (
             )
           )
         )
-      ),
-      RxOp.catchError((e) => {
-        /**
-         * 404 response is returned in 2 cases:
-         * 1. Pool doesn't exist at all
-         * 2. User has no any stake units for the pool
-         * In both cases return empty array as `No Data` identifier
-         */
-        if ('status' in e && e.status === 404) {
-          return Rx.of(RD.success([]))
-        }
-
-        /**
-         * In all other cases return error as is
-         */
-        return Rx.of(RD.failure(Error(e)))
-      })
-      // RxOp.shareReplay(1)
+      )
     )
 
   /**
@@ -140,7 +151,7 @@ const createSharesService = (
 
   return {
     shares$,
-    reloadShares,
+    reloadShares: (delayTime = 0) => reloadSharesWithTimer(delayTime),
     symShareByAsset$,
     asymShareByAsset$,
     combineShares$,

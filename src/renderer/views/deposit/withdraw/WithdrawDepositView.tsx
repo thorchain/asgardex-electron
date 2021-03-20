@@ -31,7 +31,8 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const { asset, poolShare: poolShareRD } = props
   const {
     service: {
-      pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$ }
+      pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$ },
+      shares: { reloadShares }
     }
   } = useMidgardContext()
 
@@ -99,6 +100,11 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
+  const reloadBalancesAndShares = useCallback(() => {
+    reloadBalances()
+    reloadShares(5000)
+  }, [reloadBalances, reloadShares])
+
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
@@ -113,7 +119,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         disabled
         validatePassword$={validatePassword$}
         viewRuneTx={viewRuneTx}
-        reloadBalances={reloadBalances}
+        reloadBalances={reloadBalancesAndShares}
         withdraw$={symWithdraw$}
         network={network}
       />
@@ -126,7 +132,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       reloadWithdrawFees,
       validatePassword$,
       viewRuneTx,
-      reloadBalances,
+      reloadBalancesAndShares,
       symWithdraw$,
       network
     ]
@@ -158,7 +164,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         reloadFees={reloadWithdrawFees}
         validatePassword$={validatePassword$}
         viewRuneTx={viewRuneTx}
-        reloadBalances={reloadBalances}
+        reloadBalances={reloadBalancesAndShares}
         withdraw$={symWithdraw$}
         network={network}
       />
@@ -171,7 +177,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       reloadWithdrawFees,
       validatePassword$,
       viewRuneTx,
-      reloadBalances,
+      reloadBalancesAndShares,
       symWithdraw$,
       network
     ]

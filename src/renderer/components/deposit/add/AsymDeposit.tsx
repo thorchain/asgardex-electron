@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
@@ -17,6 +17,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
@@ -41,6 +42,7 @@ import { ViewTxButton } from '../../uielements/button'
 import { Drag } from '../../uielements/drag'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import { formatFee } from '../../uielements/fees/Fees.helper'
+import * as Helper from './Deposit.helper'
 import * as Styled from './Deposit.style'
 
 export type Props = {
@@ -117,12 +119,18 @@ export const AsymDeposit: React.FC<Props> = (props) => {
 
   const chainFees$ = useMemo(() => fees$, [fees$])
 
+  const prevDepositFeesRD = useRef<DepositFeesRD>(RD.initial)
   const [depositFeesRD] = useObservableState<DepositFeesRD>(
     () =>
       FP.pipe(
         oDepositParams,
         O.map(chainFees$),
-        O.getOrElse<DepositFeesLD>(() => Rx.of(RD.initial))
+        O.getOrElse<DepositFeesLD>(() => Rx.of(RD.initial)),
+        RxOp.tap((feesRD) => {
+          if (RD.isSuccess(feesRD)) {
+            prevDepositFeesRD.current = feesRD
+          }
+        })
       ),
     RD.initial
   )
@@ -130,8 +138,10 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     () =>
       FP.pipe(
         depositFeesRD,
-        RD.toOption,
-        O.map(({ asset }) => asset)
+        Helper.getAssetChainFee,
+        // Set previously loaded fees to have that values when fees are reloading
+        // in other case changing amount while reloading fees will set max amount to zero value
+        O.alt(() => Helper.getAssetChainFee(prevDepositFeesRD.current))
       ),
     [depositFeesRD]
   )
@@ -281,10 +291,15 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     )
   }, [intl, asset, depositState, assetAmountToDeposit, network])
 
-  const onFinishTxModal = useCallback(() => {
+  const onCloseTxModal = useCallback(() => {
     resetDepositState()
+    setPercentValueToDeposit(0)
+  }, [resetDepositState, setPercentValueToDeposit])
+
+  const onFinishTxModal = useCallback(() => {
+    onCloseTxModal()
     reloadBalances()
-  }, [resetDepositState, reloadBalances])
+  }, [onCloseTxModal, reloadBalances])
 
   const renderTxModal = useMemo(() => {
     const { deposit: depositRD, depositTx: asymDepositTx } = depositState
@@ -323,7 +338,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     return (
       <TxModal
         title={txModalTitle}
-        onClose={resetDepositState}
+        onClose={onCloseTxModal}
         onFinish={onFinishTxModal}
         startTime={depositStartTime}
         txRD={depositRD}
@@ -332,7 +347,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
         extra={txModalExtraContent}
       />
     )
-  }, [depositState, viewAssetTx, resetDepositState, onFinishTxModal, depositStartTime, txModalExtraContent, intl])
+  }, [depositState, viewAssetTx, onCloseTxModal, onFinishTxModal, depositStartTime, txModalExtraContent, intl])
 
   const onClosePasswordModal = useCallback(() => {
     // close password modal
