@@ -88,7 +88,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     memos: oMemos,
     assetBalance: oAssetBalance,
     runeBalance: oRuneBalance,
-    chainAssetBalance: oChainAssetBalance,
+    chainAssetBalance,
     poolAddress: oPoolAddress,
     viewAssetTx = (_) => {},
     viewRuneTx = (_) => {},
@@ -113,6 +113,20 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const prevPoolAddresses = useRef<O.Option<PoolAddress>>(O.none)
 
+  const prevChainBalance = useRef<O.Option<BaseAmount>>(O.none)
+  const oChainAssetBalance = useMemo(
+    () =>
+      FP.pipe(
+        chainAssetBalance,
+        O.map((balance) => {
+          prevChainBalance.current = O.some(balance)
+          return balance
+        }),
+        O.alt(() => prevChainBalance.current)
+      ),
+    [chainAssetBalance]
+  )
+
   const [runeAmountToDeposit, setRuneAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [assetAmountToDeposit, setAssetAmountToDeposit] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [percentValueToDeposit, setPercentValueToDeposit] = useState(0)
@@ -127,19 +141,31 @@ export const SymDeposit: React.FC<Props> = (props) => {
   // Deposit start time
   const [depositStartTime, setDepositStartTime] = useState<number>(0)
 
+  const prevAssetBalance = useRef<O.Option<BaseAmount>>(O.none)
   const assetBalance: BaseAmount = useMemo(
     () =>
       FP.pipe(
         oAssetBalance,
+        O.map((balance) => {
+          prevAssetBalance.current = O.some(balance)
+          return balance
+        }),
+        O.alt(() => prevAssetBalance.current),
         O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
     [oAssetBalance]
   )
 
+  const prevRuneBalance = useRef<O.Option<BaseAmount>>(O.none)
   const runeBalance: BaseAmount = useMemo(
     () =>
       FP.pipe(
         oRuneBalance,
+        O.map((balance) => {
+          prevRuneBalance.current = O.some(balance)
+          return balance
+        }),
+        O.alt(() => prevRuneBalance.current),
         O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
     [oRuneBalance]
@@ -399,7 +425,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const isThorchainFeeError = useMemo(() => {
     return FP.pipe(
-      sequenceTOption(oThorchainFee, oRuneBalance),
+      sequenceTOption(
+        oThorchainFee,
+        FP.pipe(
+          oRuneBalance,
+          O.alt(() => prevRuneBalance.current)
+        )
+      ),
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oThorchainFee),
@@ -424,7 +456,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const isAssetChainFeeError = useMemo(() => {
     return FP.pipe(
-      sequenceTOption(oAssetChainFee, oChainAssetBalance),
+      sequenceTOption(oAssetChainFee, FP.pipe(oChainAssetBalance)),
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oAssetChainFee),
