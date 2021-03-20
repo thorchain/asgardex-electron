@@ -27,7 +27,7 @@ const createSharesService = (
    * @example after sending deposit tx there is no sense to reload shares info
    *          right after deposit-tx was succeed
    */
-  const { get$: reloadSharesWithTimer$, set: reloadSharesWithTimer } = observableState<number | undefined>(0)
+  const { get$: reloadSharesWithTimer$, set: reloadSharesWithTimer } = observableState<number>(0)
 
   /**
    * Returns `PoolShares` by given member address
@@ -151,7 +151,7 @@ const createSharesService = (
 
   return {
     shares$,
-    reloadShares: (delayTime?: number) => reloadSharesWithTimer(delayTime),
+    reloadShares: (delayTime = 0) => reloadSharesWithTimer(delayTime),
     symShareByAsset$,
     asymShareByAsset$,
     combineShares$,
