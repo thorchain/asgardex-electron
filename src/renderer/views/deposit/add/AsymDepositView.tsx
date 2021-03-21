@@ -48,7 +48,8 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
 
   const {
     service: {
-      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, selectedPoolAddress$ }
+      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, selectedPoolAddress$ },
+      shares: { reloadShares }
     }
   } = useMidgardContext()
 
@@ -79,6 +80,11 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
       ),
     O.none
   )
+
+  const reloadBalancesAndShares = useCallback(() => {
+    reloadBalances()
+    reloadShares(5000)
+  }, [reloadBalances, reloadShares])
 
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
 
@@ -145,7 +151,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
           disabled={true}
           poolAddress={O.none}
           memo={O.none}
-          reloadBalances={reloadBalances}
+          reloadBalances={reloadBalancesAndShares}
           poolData={ZERO_POOL_DATA}
           deposit$={asymDeposit$}
           network={network}
@@ -159,7 +165,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
       asset,
       asymDepositFee$,
       selectedPricePoolAsset,
-      reloadBalances,
+      reloadBalancesAndShares,
       asymDeposit$,
       network
     ]
@@ -188,7 +194,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
               fees$={asymDepositFee$}
               reloadFees={reloadAsymDepositFee}
               priceAsset={selectedPricePoolAsset}
-              reloadBalances={reloadBalances}
+              reloadBalances={reloadBalancesAndShares}
               assets={poolAssets}
               deposit$={asymDeposit$}
               network={network}
