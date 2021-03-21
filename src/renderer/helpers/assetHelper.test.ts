@@ -192,6 +192,14 @@ describe('helpers/assetHelper', () => {
       const result = convertBaseAmountDecimal(baseAmount('12345678', 8), 12)
       expect(eqBaseAmount.equals(result, baseAmount('123456780000', 12))).toBeTruthy()
     })
+    it('converts 1e8 decimal to 1e18 (part 1)', () => {
+      const result = convertBaseAmountDecimal(baseAmount('739', 8), 18)
+      expect(eqBaseAmount.equals(result, baseAmount('7390000000000', 18))).toBeTruthy()
+    })
+    it('converts 1e8 decimal to 1e18 (part 2)', () => {
+      const result = convertBaseAmountDecimal(baseAmount('7481127', 8), 18)
+      expect(eqBaseAmount.equals(result, baseAmount('74811270000000000', 18))).toBeTruthy()
+    })
     it('converts 1e8 decimal to 1e6 ', () => {
       const result = convertBaseAmountDecimal(baseAmount('12345678', 8), 6)
       expect(eqBaseAmount.equals(result, baseAmount('123456', 6))).toBeTruthy()

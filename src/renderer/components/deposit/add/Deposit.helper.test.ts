@@ -66,10 +66,6 @@ describe('deposit/Deposit.helper', () => {
 
   describe('getAssetAmountToDeposit', () => {
     it('is 5000', () => {
-      // const poolData: PoolData = {
-      //   runeBalance: baseAmount(2000), //  1 RUNE == 0.5 ASSET
-      //   assetBalance: baseAmount(1000, 6) //  1 ASSET == 2 RUNE
-      // }
       const runeAmount = baseAmount(10000)
       const assetDecimal = 6
       const result = getAssetAmountToDeposit({ runeAmount, poolData, assetDecimal })

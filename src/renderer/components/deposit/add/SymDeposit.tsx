@@ -24,6 +24,7 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import {
+  convertBaseAmountDecimal,
   getEthTokenAddress,
   isChainAsset,
   isEthAsset,
@@ -32,7 +33,7 @@ import {
   THORCHAIN_DECIMAL
 } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
-import { eqOPoolAddresses } from '../../../helpers/fp/eq'
+import { eqBaseAmount, eqOPoolAddresses } from '../../../helpers/fp/eq'
 import { eqOAsset } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import { LiveData } from '../../../helpers/rx/liveData'
@@ -162,11 +163,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     _setAssetAmountToDeposit /* private, never set it directly, use `setAssetAmountToDeposit` instead */
   ] = useState<BaseAmount>(initialAssetAmountToDeposit)
 
-  const setAssetAmountToDeposit = useCallback((amountToDeposit: BaseAmount) => {
-    // max. 1e8 decimal
-    _setAssetAmountToDeposit(max1e8BaseAmount(amountToDeposit))
-  }, [])
-
   const [percentValueToDeposit, setPercentValueToDeposit] = useState(0)
 
   const [selectedInput, setSelectedInput] = useState<SelectedInput>('none')
@@ -230,7 +226,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
   useEffect(() => depositParamsUpdated(oDepositParams), [depositParamsUpdated, oDepositParams])
 
   const reloadFeesHandler = useCallback(() => {
-    console.log('reloadFeesHandler:')
     FP.pipe(
       oDepositParams,
       O.map((params) => {
@@ -268,6 +263,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [assetBalance, oThorchainFee, poolData, runeBalance])
 
+  // Update `runeAmountToDeposit` if `maxRuneAmountToDeposit` has been updated
+  useEffect(() => {
+    if (maxRuneAmountToDeposit.amount().isLessThan(runeAmountToDeposit.amount())) {
+      setRuneAmountToDeposit(maxRuneAmountToDeposit)
+    }
+  }, [maxRuneAmountToDeposit, runeAmountToDeposit])
+
   const oAssetChainFee: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
@@ -285,14 +287,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
    * Note: It's max. 1e8 decimal based
    */
   const maxAssetAmountToDeposit = useMemo((): BaseAmount => {
-    // max amount in max. 1e8 decimal
     const maxAmount = Helper.maxAssetAmountToDeposit({ poolData, runeBalance, assetBalance })
     // substract fees only if asset is as same as chain asset
     if (isChainAsset(asset)) {
       return FP.pipe(
         oAssetChainFee,
-        // convert fee to have max 1e8 decimal
-        O.map(max1e8BaseAmount),
         // Check: maxAmount > fee
         O.filter((fee) => maxAmount.amount().isGreaterThan(fee.amount())),
         // Substract fee from maxAmount
@@ -300,11 +299,34 @@ export const SymDeposit: React.FC<Props> = (props) => {
         // Set maxAmount to zero as long as we dont have a feeRate
         O.getOrElse(() => ZERO_BN),
         // make sure we still use same decimal
-        (amount) => baseAmount(amount, maxAmount.decimal)
+        (amount) => baseAmount(amount, maxAmount.decimal),
+        max1e8BaseAmount
       )
     }
-    return maxAmount
+    return max1e8BaseAmount(maxAmount)
   }, [asset, assetBalance, oAssetChainFee, poolData, runeBalance])
+
+  const setAssetAmountToDeposit = useCallback(
+    (amountToDeposit: BaseAmount) => {
+      const newAmount = baseAmount(amountToDeposit.amount(), assetBalanceForThorchain.decimal)
+      // dirty check - do nothing if prev. and next amounts are equal
+      if (eqBaseAmount.equals(newAmount, assetAmountToDeposit)) return {}
+
+      const newAmountToDeposit = newAmount.amount().isGreaterThan(maxAssetAmountToDeposit.amount())
+        ? maxAssetAmountToDeposit
+        : newAmount
+
+      _setAssetAmountToDeposit({ ...newAmountToDeposit })
+    },
+    [assetAmountToDeposit, assetBalanceForThorchain.decimal, maxAssetAmountToDeposit]
+  )
+
+  // Update `assetAmountToDeposit` if `maxAssetAmountToDeposit` has been updated
+  useEffect(() => {
+    if (maxAssetAmountToDeposit.amount().isLessThan(assetAmountToDeposit.amount())) {
+      setAssetAmountToDeposit(maxAssetAmountToDeposit)
+    }
+  }, [assetAmountToDeposit, maxAssetAmountToDeposit, setAssetAmountToDeposit])
 
   const hasAssetBalance = useMemo(() => assetBalance.amount().isGreaterThan(0), [assetBalance])
   const hasRuneBalance = useMemo(() => runeBalance.amount().isGreaterThan(0), [runeBalance])
@@ -401,16 +423,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const assetAmountChangeHandler = useCallback(
     (assetInput: BaseAmount) => {
-      console.log('assetInput', assetInput.amount().toString())
+      // make sure we use correct decimal based on assetBalanceForThorchain
+      // (input's decimal might not be updated yet)
+      const newAmount = convertBaseAmountDecimal(assetInput, assetBalanceForThorchain.decimal)
       // Do nothing if we don't entered input for asset
       if (selectedInput !== 'asset') return
 
-      console.log('assetInput', assetInput.decimal)
-      console.log('maxAssetAmountToDeposit', maxAssetAmountToDeposit.decimal)
-      console.log('assetAmountToDeposit', assetAmountToDeposit.decimal)
-      let assetAmount = assetInput.amount().isGreaterThan(maxAssetAmountToDeposit.amount())
+      let assetAmount = newAmount.amount().isGreaterThan(maxAssetAmountToDeposit.amount())
         ? { ...maxAssetAmountToDeposit } // Use copy to avoid missmatch with values in input fields
-        : { ...assetInput }
+        : { ...newAmount }
       const runeAmount = Helper.getRuneAmountToDeposit(assetAmount, poolData)
 
       if (runeAmount.amount().isGreaterThan(maxRuneAmountToDeposit.amount())) {
@@ -433,8 +454,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       }
     },
     [
-      assetAmountToDeposit.decimal,
       assetBalance.decimal,
+      assetBalanceForThorchain.decimal,
       maxAssetAmountToDeposit,
       maxRuneAmountToDeposit,
       poolData,
@@ -449,18 +470,19 @@ export const SymDeposit: React.FC<Props> = (props) => {
       const assetAmountBN = maxAssetAmountToDeposit.amount().dividedBy(100).multipliedBy(percent)
 
       setRuneAmountToDeposit(baseAmount(runeAmountBN, maxRuneAmountToDeposit.decimal))
-      setAssetAmountToDeposit(baseAmount(assetAmountBN, maxAssetAmountToDeposit.decimal))
+      setAssetAmountToDeposit(baseAmount(assetAmountBN, assetBalanceForThorchain.decimal))
       setPercentValueToDeposit(percent)
     },
-    [maxAssetAmountToDeposit, maxRuneAmountToDeposit, setAssetAmountToDeposit]
+    [assetBalanceForThorchain.decimal, maxAssetAmountToDeposit, maxRuneAmountToDeposit, setAssetAmountToDeposit]
   )
 
   const onChangeAssetHandler = useCallback(
     (asset: Asset) => {
-      onChangeAsset(asset)
+      resetDepositState()
       changePercentHandler(0)
+      onChangeAsset(asset)
     },
-    [changePercentHandler, onChangeAsset]
+    [changePercentHandler, onChangeAsset, resetDepositState]
   )
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -808,6 +830,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       // Note: ETH/ERC20 fees won't be reloaded if router is None
       // that's why we have another check for prevPoolRouter in next guard
       reloadFeesHandler()
+      reloadBalances()
     }
 
     if (!eqOPoolAddresses.equals(prevPoolAddresses.current, oPoolAddress)) {
@@ -822,7 +845,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
       // for ETH/ETH20
       if (O.isSome(oPoolAddress)) reloadFeesHandler()
     }
-  }, [asset, checkApprovedStatus, oPoolAddress, reloadFeesHandler, resetApproveState, resetIsApprovedState])
+  }, [
+    asset,
+    checkApprovedStatus,
+    oPoolAddress,
+    reloadBalances,
+    reloadFeesHandler,
+    resetApproveState,
+    resetIsApprovedState
+  ])
 
   return (
     <Styled.Container>
