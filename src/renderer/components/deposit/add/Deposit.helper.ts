@@ -1,6 +1,9 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import { baseAmount, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 
 import {
   convertBaseAmountDecimal,
@@ -8,6 +11,7 @@ import {
   THORCHAIN_DECIMAL,
   to1e8BaseAmount
 } from '../../../helpers/assetHelper'
+import { DepositFeesRD } from '../../../services/chain/types'
 
 /**
  * Calculates max. value of RUNE to deposit
@@ -110,3 +114,17 @@ export const getAssetAmountToDeposit = ({
   // (3) convert it again to have max. 1e8 (it might be greater by using assetDecimal before)
   return max1e8BaseAmount(assetAmountToDeposit)
 }
+
+export const getAssetChainFee = (feesRD: DepositFeesRD): O.Option<BaseAmount> =>
+  FP.pipe(
+    feesRD,
+    RD.map(({ asset }) => asset),
+    RD.toOption
+  )
+
+export const getThorchainFees = (feesRD: DepositFeesRD): O.Option<BaseAmount> =>
+  FP.pipe(
+    feesRD,
+    RD.map(({ thor }) => thor),
+    FP.flow(RD.toOption, O.flatten)
+  )
