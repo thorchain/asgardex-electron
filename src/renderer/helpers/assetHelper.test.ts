@@ -28,7 +28,8 @@ import {
   getEthAssetAddress,
   midgardAssetFromString,
   updateEthChecksumAddress,
-  convertBaseAmountDecimal
+  convertBaseAmountDecimal,
+  isUSDAsset
 } from './assetHelper'
 import { eqAsset, eqBaseAmount } from './fp/eq'
 
@@ -153,6 +154,18 @@ describe('helpers/assetHelper', () => {
     })
     it('returns false for BUSDB', () => {
       expect(isChainAsset(AssetBUSDBAF)).toBeFalsy()
+    })
+  })
+
+  describe('isUSDAsset', () => {
+    it('returns true for BUSD', () => {
+      expect(isUSDAsset(AssetBUSDBAF)).toBeTruthy()
+    })
+    it('returns true for ERC20 USDT', () => {
+      expect(isUSDAsset(AssetUSDTERC20)).toBeTruthy()
+    })
+    it('returns false for RUNE Native', () => {
+      expect(isUSDAsset(AssetRuneNative)).toBeFalsy()
     })
   })
 

@@ -12,7 +12,7 @@ import {
 import * as O from 'fp-ts/Option'
 
 import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
-import { filterAssets, getAvailableChains, BASE_FILTER } from './AssetsFilter.helper'
+import { filterAssets, getAvailableChains, BASE_FILTER, USD_FILTER } from './AssetsFilter.helper'
 
 describe('getAvailableChains', () => {
   it('should return O.none', () => {
@@ -22,13 +22,13 @@ describe('getAvailableChains', () => {
   })
 
   it('should return O.some and starts with BASE_FILTER', () => {
-    expect(getAvailableChains([AssetBNB], [BNBChain])).toEqual(O.some([BASE_FILTER, BNBChain]))
+    expect(getAvailableChains([AssetBNB], [BNBChain])).toEqual(O.some([BASE_FILTER, USD_FILTER, BNBChain]))
     expect(
       getAvailableChains([AssetBNB, ASSETS_TESTNET.USDT, AssetBCH, AssetBTC], [BNBChain, BTCChain, BCHChain])
-    ).toEqual(O.some([BASE_FILTER, BNBChain, BTCChain, BCHChain]))
+    ).toEqual(O.some([BASE_FILTER, USD_FILTER, BNBChain, BTCChain, BCHChain]))
 
     expect(getAvailableChains([AssetBNB, AssetBCH, AssetBTC], [BNBChain, BTCChain])).toEqual(
-      O.some([BASE_FILTER, BNBChain, BTCChain])
+      O.some([BASE_FILTER, USD_FILTER, BNBChain, BTCChain])
     )
   })
 })

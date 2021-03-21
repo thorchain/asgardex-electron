@@ -23,6 +23,7 @@ export const AssetsFilter: React.FC<Props> = ({ assets = [], onFilterChanged, cl
   const filterNames: Partial<Record<H.Filter, string>> = useMemo(
     () => ({
       base: intl.formatMessage({ id: 'common.asset.base' }),
+      USD: 'usd',
       ETH: 'erc20',
       BNB: 'bep2'
     }),

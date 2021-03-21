@@ -4,12 +4,13 @@ import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 
-import { isChainAsset } from '../../helpers/assetHelper'
+import { isChainAsset, isUSDAsset } from '../../helpers/assetHelper'
 import { eqChain } from '../../helpers/fp/eq'
 import { ENABLED_CHAINS } from '../../services/const'
 
 export const BASE_FILTER = 'base'
-export type Filter = Chain | typeof BASE_FILTER
+export const USD_FILTER = 'usd'
+export type Filter = Chain | typeof BASE_FILTER | typeof USD_FILTER
 
 export type Filters = Filter[]
 
@@ -37,7 +38,7 @@ export const getAvailableChains = (assets: Asset[], availableChains: Chain[] = E
       )
     ),
     // In case there is at least one Filter available add Base filter
-    O.map((chainFilters) => [BASE_FILTER, ...chainFilters])
+    O.map((chainFilters) => [BASE_FILTER, USD_FILTER, ...chainFilters])
   )
 
 /**
@@ -54,6 +55,15 @@ export const filterAssets = (assets: Asset[]) => (oFilter: O.Option<Filter>): As
           if (filter === BASE_FILTER) {
             // For 'base' filter we get ONLY chain assets
             if (isChainAsset(asset)) {
+              return O.some(asset)
+            }
+            // In all other cases filter it out
+            return O.none
+          }
+
+          if (filter === USD_FILTER) {
+            // For 'usd' filter we get ONLY usd assets
+            if (isUSDAsset(asset)) {
               return O.some(asset)
             }
             // In all other cases filter it out
