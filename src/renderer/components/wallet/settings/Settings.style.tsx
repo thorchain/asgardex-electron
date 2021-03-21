@@ -21,7 +21,7 @@ export const Title = styled(UILabel)`
   text-transform: uppercase;
   font-family: 'MainFontRegular';
   font-weight: 600;
-  font-size: 18px;
+  font-size: 22px;
   line-height: 22px;
 `
 
