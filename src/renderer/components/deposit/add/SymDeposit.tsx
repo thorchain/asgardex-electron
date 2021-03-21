@@ -32,7 +32,7 @@ import {
   max1e8BaseAmount,
   THORCHAIN_DECIMAL
 } from '../../../helpers/assetHelper'
-import { isEthChain } from '../../../helpers/chainHelper'
+import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
 import { eqBaseAmount, eqOPoolAddresses } from '../../../helpers/fp/eq'
 import { eqOAsset } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
@@ -478,11 +478,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const onChangeAssetHandler = useCallback(
     (asset: Asset) => {
+      depositParamsUpdated(O.none)
       resetDepositState()
       changePercentHandler(0)
       onChangeAsset(asset)
     },
-    [changePercentHandler, onChangeAsset, resetDepositState]
+    [changePercentHandler, depositParamsUpdated, onChangeAsset, resetDepositState]
   )
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -719,7 +720,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             O.fold(
               () => [{ asset, amount: assetFeeAmount }],
               (thorAmount) => [
-                { asset, amount: assetFeeAmount },
+                { asset: getChainAsset(asset.chain), amount: assetFeeAmount },
                 { asset: AssetRuneNative, amount: thorAmount }
               ]
             )
