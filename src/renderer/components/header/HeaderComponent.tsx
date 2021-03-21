@@ -263,6 +263,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                 <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
                   <AsgardexLogo />
                   {renderHeaderNetStatus}
+                  <HeaderTheme isDesktopView={isDesktopView} />
                 </Row>
               </Col>
               <Col span="auto">
@@ -274,7 +275,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                 <Row align="middle">
                   {renderHeaderLang}
                   {renderHeaderCurrency}
-                  <HeaderTheme isDesktopView={isDesktopView} />
                   {renderHeaderLock}
                   {renderHeaderSettings}
                 </Row>
