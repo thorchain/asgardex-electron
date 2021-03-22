@@ -198,11 +198,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
         O.map(({ poolAddress, memos }) => ({
           asset,
           poolAddress,
-          amounts: { rune: runeAmountToDeposit, asset: assetAmountToDeposit },
+          amounts: {
+            rune: runeAmountToDeposit,
+            // Decimal needs to be converted back for using orginal decimal of this asset (provided by `assetBalance`)
+            asset: convertBaseAmountDecimal(assetAmountToDeposit, assetBalance.decimal)
+          },
           memos
         }))
       ),
-    [oPoolAddress, oMemos, asset, runeAmountToDeposit, assetAmountToDeposit]
+    [oPoolAddress, oMemos, assetAmountToDeposit, asset, runeAmountToDeposit, assetBalance.decimal]
   )
 
   const prevDepositFeesRD = useRef<DepositFeesRD>(RD.initial)
