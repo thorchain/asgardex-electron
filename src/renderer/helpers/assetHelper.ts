@@ -137,6 +137,8 @@ export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
 
 export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, getChainAsset(asset.chain))
 
+export const isUSDAsset = (asset: Asset): boolean => asset.ticker.includes('USD')
+
 /**
  * Update ETH token (ERC20) addresses to be based on checksum addresses
  * Other assets then ETH tokens (ERC20) won't be updated and will be returned w/o any changes
