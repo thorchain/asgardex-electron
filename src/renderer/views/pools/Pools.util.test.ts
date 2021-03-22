@@ -232,4 +232,8 @@ describe('filterTableData', () => {
       tableData[8]
     ])
   })
+
+  it('should return USD assets', () => {
+    expect(filterTableData(O.some('usd'))(tableData)).toEqual([tableData[4], tableData[5], tableData[7]])
+  })
 })
