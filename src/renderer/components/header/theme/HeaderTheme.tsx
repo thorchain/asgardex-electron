@@ -1,7 +1,6 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import { useObservableState } from 'observable-hooks'
-import { Moon, Sun } from 'react-feather'
 import { palette } from 'styled-theme'
 
 import { useThemeContext } from '../../../contexts/ThemeContext'
@@ -16,6 +15,8 @@ export const HeaderTheme: React.FC<Props> = (props): JSX.Element => {
   const { onPress = () => {}, isDesktopView } = props
   const { toggleTheme, theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
+  const color = useMemo(() => palette('text', 0)({ theme }), [theme])
+  const iconStyle = { fontSize: '1.5em' }
   const isDay = palette('background', 0)({ theme }) === '#fff'
 
   const clickSwitchThemeHandler = useCallback(() => {
@@ -26,7 +27,11 @@ export const HeaderTheme: React.FC<Props> = (props): JSX.Element => {
   return (
     <Styled.HeaderThemeWrapper onClick={() => clickSwitchThemeHandler()}>
       {!isDesktopView && (isDay ? 'DAY MODE' : 'NIGHT MODE')}
-      {isDay ? <Sun /> : <Moon color="white" />}
+      {isDay ? (
+        <Styled.DayThemeIcon style={{ color, ...iconStyle }} />
+      ) : (
+        <Styled.NightThemeIcon style={{ color, ...iconStyle }} />
+      )}
     </Styled.HeaderThemeWrapper>
   )
 }
