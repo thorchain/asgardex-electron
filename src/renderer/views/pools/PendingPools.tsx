@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Grid } from 'antd'
@@ -9,6 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Option, none, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
@@ -18,13 +19,15 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PendingPoolsState, PoolAssets } from '../../services/midgard/types'
+import { PendingPoolsState, PoolFilter } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
 import { TableAction, BlockLeftLabel } from './PoolsOverview.style'
 import * as Styled from './PoolsOverview.style'
+
+const POOLS_KEY = 'pending'
 
 export const PendingPools: React.FC = (): JSX.Element => {
   const intl = useIntl()
@@ -36,7 +39,7 @@ export const PendingPools: React.FC = (): JSX.Element => {
   const {
     thorchainLastblockState$,
     thorchainConstantsState$,
-    pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$ },
+    pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$, poolsFilters$, setPoolsFilter },
     reloadNetworkInfo,
     reloadThorchainLastblock
   } = midgardService
@@ -88,7 +91,16 @@ export const PendingPools: React.FC = (): JSX.Element => {
     [refreshHandler, intl, renderBtnPoolsColumn]
   )
 
-  const [filteredPoolAssets, setFilteredPoolAssets] = useState<PoolAssets>()
+  const [poolFilter] = useObservableState<O.Option<PoolFilter>>(
+    () =>
+      FP.pipe(
+        poolsFilters$,
+        RxOp.map((filters) => FP.pipe(O.fromNullable(filters[POOLS_KEY]), O.flatten))
+      ),
+    O.none
+  )
+
+  const setFilter = useCallback((oFilter: O.Option<PoolFilter>) => setPoolsFilter(POOLS_KEY, oFilter), [setPoolsFilter])
 
   const lastblock = useMemo(() => RD.toNullable(thorchainLastblockRD), [thorchainLastblockRD])
   const constants = useMemo(() => RD.toNullable(thorchainConstantsRD), [thorchainConstantsRD])
@@ -146,7 +158,8 @@ export const PendingPools: React.FC = (): JSX.Element => {
       return (
         <>
           <Styled.AssetsFilter
-            onFilterChanged={setFilteredPoolAssets}
+            setFilter={setFilter}
+            activeFilter={poolFilter}
             assets={FP.pipe(
               tableData,
               A.map(({ pool }) => pool.target)
@@ -154,14 +167,14 @@ export const PendingPools: React.FC = (): JSX.Element => {
           />
           <Table
             columns={columns}
-            dataSource={FP.pipe(tableData, filterTableData(filteredPoolAssets))}
+            dataSource={FP.pipe(tableData, filterTableData(poolFilter))}
             loading={loading}
             rowKey="key"
           />
         </>
       )
     },
-    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, filteredPoolAssets]
+    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, setFilter, poolFilter]
   )
 
   return (

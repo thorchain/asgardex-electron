@@ -134,6 +134,8 @@ export type PoolsService = {
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD
+  poolsFilters$: Rx.Observable<Record<string, O.Option<PoolFilter>>>
+  setPoolsFilter: (poolKey: string, filter: O.Option<PoolFilter>) => void
 }
 
 export type PoolShareType = DepositType | 'all'
@@ -198,3 +200,7 @@ export type HistoryActionsPage = {
 export type HistoryActionsPageRD = RD.RemoteData<ApiError, HistoryActionsPage>
 
 export type HistoryActionsPageLD = LiveData<ApiError, HistoryActionsPage>
+
+export type PoolFilter = Chain | 'base' | 'usd'
+
+export type PoolFilters = PoolFilter[]

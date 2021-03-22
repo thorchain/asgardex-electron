@@ -7,6 +7,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
+import { PoolFilter } from '../../services/midgard/types'
 import { AssetsFilter } from './AssetsFilter'
 
 export const Default: Story<{ assets: string[] }> = ({ assets: stringAssets }) => {
@@ -14,16 +15,9 @@ export const Default: Story<{ assets: string[] }> = ({ assets: stringAssets }) =
     stringAssets
   ])
 
-  const [filteredAssets, setFilteredAssets] = useState(assets)
-  return (
-    <>
-      <AssetsFilter assets={assets} onFilterChanged={setFilteredAssets} />
-      <div>Results</div>
-      {filteredAssets.map((asset) => (
-        <div key={assetToString(asset)}>{assetToString(asset)}</div>
-      ))}
-    </>
-  )
+  const [filter, setFilter] = useState<O.Option<PoolFilter>>(O.none)
+
+  return <AssetsFilter setFilter={setFilter} activeFilter={filter} assets={assets} />
 }
 
 const argTypes = {

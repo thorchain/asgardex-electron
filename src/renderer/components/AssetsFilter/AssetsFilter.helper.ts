@@ -4,15 +4,8 @@ import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 
-import { isChainAsset, isUSDAsset } from '../../helpers/assetHelper'
-import { eqChain } from '../../helpers/fp/eq'
 import { ENABLED_CHAINS } from '../../services/const'
-
-export const BASE_FILTER = 'base'
-export const USD_FILTER = 'usd'
-export type Filter = Chain | typeof BASE_FILTER | typeof USD_FILTER
-
-export type Filters = Filter[]
+import { PoolFilters } from '../../services/midgard/types'
 
 /**
  * Filters availableChains array by passed assets array.
@@ -21,7 +14,7 @@ export type Filters = Filter[]
  *
  * in case there is no any asset matched to availableChains by chain will return O.none
  */
-export const getAvailableChains = (assets: Asset[], availableChains: Chain[] = ENABLED_CHAINS): O.Option<Filters> =>
+export const getAvailableChains = (assets: Asset[], availableChains: Chain[] = ENABLED_CHAINS): O.Option<PoolFilters> =>
   FP.pipe(
     NEA.fromArray(assets),
     O.chain((assets) =>
@@ -38,43 +31,5 @@ export const getAvailableChains = (assets: Asset[], availableChains: Chain[] = E
       )
     ),
     // In case there is at least one Filter available add Base filter
-    O.map((chainFilters) => [BASE_FILTER, USD_FILTER, ...chainFilters])
-  )
-
-/**
- * Filters assets array by passed active chain-filter.
- * If oFilter is O.none will return assets array without any changes
- */
-export const filterAssets = (assets: Asset[]) => (oFilter: O.Option<Filter>): Asset[] =>
-  FP.pipe(
-    oFilter,
-    O.map((filter) =>
-      FP.pipe(
-        assets,
-        A.filterMap((asset) => {
-          if (filter === BASE_FILTER) {
-            // For 'base' filter we get ONLY chain assets
-            if (isChainAsset(asset)) {
-              return O.some(asset)
-            }
-            // In all other cases filter it out
-            return O.none
-          }
-
-          if (filter === USD_FILTER) {
-            // For 'usd' filter we get ONLY usd assets
-            if (isUSDAsset(asset)) {
-              return O.some(asset)
-            }
-            // In all other cases filter it out
-            return O.none
-          }
-
-          // For non-'base' activeFilter filter assets by chain according to the activeFilter
-          return eqChain.equals(filter, asset.chain) ? O.some(asset) : O.none
-        })
-      )
-    ),
-    // In case there is no activeFilter setup return all available assets
-    O.getOrElse(() => assets)
+    O.map((chainFilters) => ['base', 'usd', ...chainFilters])
   )
