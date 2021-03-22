@@ -1,5 +1,5 @@
 import { PoolData, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
-import { bnOrZero, baseAmount, assetFromString, Asset, AssetRuneNative } from '@xchainjs/xchain-util'
+import { bnOrZero, baseAmount, assetFromString, Asset, AssetRuneNative, assetToString } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -7,8 +7,9 @@ import * as O from 'fp-ts/lib/Option'
 import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ZERO_BASE_AMOUNT } from '../../const'
-import { eqAsset } from '../../helpers/fp/eq'
+import { isChainAsset, isUSDAsset } from '../../helpers/assetHelper'
 import { PoolDetail } from '../../services/midgard/types'
+import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
 import { GetPoolsStatusEnum, Constants as ThorchainConstants, LastblockItem } from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './Pools.types'
@@ -113,22 +114,30 @@ export const getBlocksLeftForPendingPoolAsString = (
   )
 }
 
-export const filterTableData = (targetAssets?: Asset[]) => (tableData: PoolTableRowData[]): PoolTableRowData[] => {
-  return !targetAssets
-    ? tableData
-    : (FP.pipe(
+/**
+ * Filters tableData array by passed active filter.
+ * If oFilter is O.none will return tableData array without any changes
+ */
+export const filterTableData = (oFilter: O.Option<PoolFilter> = O.none) => (
+  tableData: PoolTableRowData[]
+): PoolTableRowData[] => {
+  return FP.pipe(
+    oFilter,
+    O.map((filter) =>
+      FP.pipe(
         tableData,
-        /**
-         * A.intersection can not accept arrays of different types so we need to set
-         * array-item type manually as PoolTableRowData | Asset to compare 2 arrays here
-         */
-        A.intersection<PoolTableRowData | Asset>({
-          equals: (a, b) => {
-            // Use discriminated union types to get exact type from PoolTableRowData | Asset
-            const aAsset = 'pool' in a ? a.pool.target : a
-            const bAsset = 'pool' in b ? b.pool.target : b
-            return eqAsset.equals(aAsset, bAsset)
+        A.filterMap((tableRow) => {
+          if (filter === 'base') {
+            return isChainAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
           }
-        })(targetAssets)
-      ) as PoolTableRowData[])
+          if (filter === 'usd') {
+            return isUSDAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
+          }
+          const stringAsset = assetToString(tableRow.pool.target)
+          return stringAsset.includes(filter) ? O.some(tableRow) : O.none
+        })
+      )
+    ),
+    O.getOrElse(() => tableData)
+  )
 }

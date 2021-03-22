@@ -9,7 +9,8 @@ import {
   AssetETH,
   AssetLTC,
   AssetBTC,
-  AssetBCH
+  AssetBCH,
+  ETHChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -204,17 +205,35 @@ describe('filterTableData', () => {
     }
   ] as PoolTableRowData[]
 
-  it('should filter BNB and ETH assets', () => {
-    expect(filterTableData([AssetBNB, AssetETH])(tableData)).toEqual([
-      { pool: { asset: AssetRuneNative, target: AssetBNB } },
-      { pool: { asset: AssetRuneNative, target: AssetETH } }
+  it('should not filter anything', () => {
+    expect(filterTableData()(tableData)).toEqual(tableData)
+    expect(filterTableData(O.none)(tableData)).toEqual(tableData)
+  })
+
+  it('should return only chain-based pools', () => {
+    expect(filterTableData(O.some('base'))(tableData)).toEqual([
+      tableData[0],
+      tableData[1],
+      tableData[2],
+      tableData[3],
+      tableData[8]
     ])
   })
 
-  it('should not filter base array', () => {
-    expect(filterTableData()(tableData)).toEqual(tableData)
+  it('should return BNB assets', () => {
+    expect(filterTableData(O.some(BNBChain))(tableData)).toEqual([tableData[0], tableData[4]])
   })
-  it('should filter out everything as there is no any intersection between arrays', () => {
-    expect(filterTableData([])(tableData)).toEqual([])
+
+  it('should return ETH assets', () => {
+    expect(filterTableData(O.some(ETHChain))(tableData)).toEqual([
+      tableData[5],
+      tableData[6],
+      tableData[7],
+      tableData[8]
+    ])
+  })
+
+  it('should return USD assets', () => {
+    expect(filterTableData(O.some('usd'))(tableData)).toEqual([tableData[4], tableData[5], tableData[7]])
   })
 })
