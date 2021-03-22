@@ -88,8 +88,7 @@ const createSharesService = (
               O.map((asset) => ({
                 type: !!runeAddress && !!assetAddress ? 'sym' : 'asym',
                 asset,
-                // `liquidityUnits` are RUNE based, provided as `BaseAmount`
-                units: baseAmount(bnOrZero(liquidityUnits), THORCHAIN_DECIMAL),
+                units: bnOrZero(liquidityUnits),
                 // BaseAmount of added asset - Note: Thorchain treats all assets as 1e8 decimal based
                 assetAddedAmount: baseAmount(bnOrZero(assetAdded), THORCHAIN_DECIMAL)
               }))

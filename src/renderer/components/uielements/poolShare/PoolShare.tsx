@@ -1,14 +1,6 @@
 import React, { RefObject, useCallback, useMemo, useRef } from 'react'
 
-import {
-  formatBN,
-  BaseAmount,
-  Asset,
-  baseToAsset,
-  formatAssetAmountCurrency,
-  baseAmount,
-  formatBaseAsAssetAmount
-} from '@xchainjs/xchain-util'
+import { formatBN, BaseAmount, Asset, baseToAsset, formatAssetAmountCurrency, baseAmount } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
@@ -26,7 +18,7 @@ type Props = {
   assetDepositShare: BaseAmount
   assetDepositPrice: BaseAmount
   poolShare: BigNumber
-  depositUnits: BaseAmount
+  depositUnits: BigNumber
   smallWidth?: boolean
 }
 
@@ -143,10 +135,7 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
             <Styled.LabelSecondary textTransform="uppercase">
               {intl.formatMessage({ id: 'deposit.share.units' })}
             </Styled.LabelSecondary>
-            <Styled.LabelPrimary loading={loading}>{`${formatBaseAsAssetAmount({
-              amount: depositUnits,
-              decimal: 2
-            })}`}</Styled.LabelPrimary>
+            <Styled.LabelPrimary loading={loading}>{`${formatBN(depositUnits, 2)}`}</Styled.LabelPrimary>
           </Col>
           <Col span={smallWidth ? 24 : 12}>
             <Styled.LabelSecondary textTransform="uppercase">

@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, bn } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
@@ -17,19 +17,19 @@ const defaultProps: DepositProps = {
   asset: AssetBNB,
   shares: RD.success([
     {
-      units: assetToBase(assetAmount(3, THORCHAIN_DECIMAL)),
+      units: bn('300000000'),
       asset: AssetBNB,
       type: 'sym',
       assetAddedAmount: assetToBase(assetAmount(1.5, THORCHAIN_DECIMAL))
     },
     {
-      units: assetToBase(assetAmount(1, THORCHAIN_DECIMAL)),
+      units: bn('100000000'),
       asset: AssetBNB,
       type: 'asym',
       assetAddedAmount: assetToBase(assetAmount(1, THORCHAIN_DECIMAL))
     },
     {
-      units: assetToBase(assetAmount(2, THORCHAIN_DECIMAL)),
+      units: bn('200000000'),
       asset: AssetRuneNative,
       type: 'asym',
       assetAddedAmount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL))
