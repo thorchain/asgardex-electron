@@ -96,6 +96,9 @@ export const DepositView: React.FC<Props> = (_) => {
     return <></>
   }
 
+  // TODO (@Veado) Use service to get decimal
+  const assetDecimal = NaN
+
   return (
     <>
       <Styled.TopControlsContainer>
@@ -118,6 +121,7 @@ export const DepositView: React.FC<Props> = (_) => {
           (selectedAsset) => (
             <Deposit
               asset={selectedAsset}
+              assetDecimal={assetDecimal}
               shares={poolSharesRD}
               keystoreState={keystoreState}
               ShareContent={ShareView}

@@ -14,6 +14,11 @@ export type AssetWithAmount = {
   amount: BaseAmount
 }
 
+export type AssetWithDecimal = {
+  asset: Asset
+  decimal: number
+}
+
 export type DepositType = 'sym' | 'asym'
 export type WithdrawType = 'sym' | 'asym'
 

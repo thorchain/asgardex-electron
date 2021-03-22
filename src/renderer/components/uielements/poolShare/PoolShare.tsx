@@ -17,6 +17,7 @@ type Props = {
   priceAsset?: Asset
   assetDepositShare: BaseAmount
   assetDepositPrice: BaseAmount
+  assetDecimal: number
   poolShare: BigNumber
   depositUnits: BigNumber
   smallWidth?: boolean

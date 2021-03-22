@@ -17,7 +17,7 @@ import { PoolDetailRD, PoolDetail, PoolShareRD, PoolShare } from '../../../servi
 import { toPoolData } from '../../../services/midgard/utils'
 import * as Styled from './ShareView.styles'
 
-type Props = { asset: Asset; poolShare: PoolShareRD; smallWidth?: boolean }
+type Props = { asset: Asset; poolShare: PoolShareRD; assetDecimal: number; smallWidth?: boolean }
 
 export const ShareView: React.FC<Props> = ({ asset, poolShare: poolShareRD, smallWidth }) => {
   const { service: midgardService } = useMidgardContext()
@@ -51,6 +51,7 @@ export const ShareView: React.FC<Props> = ({ asset, poolShare: poolShareRD, smal
           poolShare={poolShare}
           depositUnits={units}
           assetDepositShare={assetShare}
+          assetDecimal={assetDecimal}
           priceAsset={FP.pipe(oPriceAsset, O.toUndefined)}
           loading={false}
           assetDepositPrice={assetDepositPrice}

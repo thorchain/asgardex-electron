@@ -31,6 +31,7 @@ import { getBalanceByAsset } from '../../../services/wallet/util'
 
 type Props = {
   asset: Asset
+  assetDecimal: number
 }
 
 export const SymDepositView: React.FC<Props> = ({ asset }) => {

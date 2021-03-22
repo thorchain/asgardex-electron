@@ -37,6 +37,7 @@ import * as Styled from './Withdraw.styles'
 export type Props = {
   /** Asset to withdraw */
   asset: Asset
+  assetDecimal: number
   /** Rune price (base amount) */
   runePrice: BigNumber
   /** Asset price (base amount) */

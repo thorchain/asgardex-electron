@@ -25,11 +25,17 @@ type Tab = {
 
 export type Props = {
   asset: Asset
+  assetDecimal: number
   shares: PoolSharesRD
-  ShareContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD; smallWidth?: boolean }>
+  ShareContent: React.ComponentType<{
+    asset: Asset
+    poolShare: PoolShareRD
+    assetDecimal: number
+    smallWidth?: boolean
+  }>
   AsymDepositContent: React.ComponentType<{ asset: Asset }>
-  SymDepositContent: React.ComponentType<{ asset: Asset }>
-  WidthdrawContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD }>
+  SymDepositContent: React.ComponentType<{ asset: Asset; assetDecimal: number }>
+  WidthdrawContent: React.ComponentType<{ asset: Asset; assetDecimal: number; poolShare: PoolShareRD }>
   AsymWidthdrawContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD }>
   keystoreState: KeystoreState
 }
