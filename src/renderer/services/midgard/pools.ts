@@ -524,10 +524,11 @@ const createPoolsService = (
             Rx.of(
               RD.failure(
                 Error(
-                  `Pool address ${poolAddresses.address} and/or router address ${FP.pipe(
+                  `Pool address ${poolAddresses.address} ${FP.pipe(
                     poolAddresses.router,
-                    O.getOrElse(() => '')
-                  )} ) are not available`
+                    O.map((poolAddress) => `and/or router address ${poolAddress} are not available`),
+                    O.getOrElse(() => 'is not available')
+                  )} ) `
                 )
               )
             )
