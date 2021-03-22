@@ -29,7 +29,8 @@ import {
   midgardAssetFromString,
   updateEthChecksumAddress,
   convertBaseAmountDecimal,
-  baseAmountForThorchain
+  max1e8BaseAmount,
+  to1e8BaseAmount
 } from './assetHelper'
 import { eqAsset, eqBaseAmount } from './fp/eq'
 
@@ -191,6 +192,14 @@ describe('helpers/assetHelper', () => {
       const result = convertBaseAmountDecimal(baseAmount('12345678', 8), 12)
       expect(eqBaseAmount.equals(result, baseAmount('123456780000', 12))).toBeTruthy()
     })
+    it('converts 1e8 decimal to 1e18 (part 1)', () => {
+      const result = convertBaseAmountDecimal(baseAmount('739', 8), 18)
+      expect(eqBaseAmount.equals(result, baseAmount('7390000000000', 18))).toBeTruthy()
+    })
+    it('converts 1e8 decimal to 1e18 (part 2)', () => {
+      const result = convertBaseAmountDecimal(baseAmount('7481127', 8), 18)
+      expect(eqBaseAmount.equals(result, baseAmount('74811270000000000', 18))).toBeTruthy()
+    })
     it('converts 1e8 decimal to 1e6 ', () => {
       const result = convertBaseAmountDecimal(baseAmount('12345678', 8), 6)
       expect(eqBaseAmount.equals(result, baseAmount('123456', 6))).toBeTruthy()
@@ -206,14 +215,29 @@ describe('helpers/assetHelper', () => {
     })
   })
 
-  describe('baseAmountForThorchain', () => {
+  describe('max1e8BaseAmount', () => {
     it('converts 1e12 to 1e8', () => {
-      const result = baseAmountForThorchain(baseAmount('123456789012', 12))
+      const result = max1e8BaseAmount(baseAmount('123456789012', 12))
       expect(eqBaseAmount.equals(result, baseAmount('12345678', 8))).toBeTruthy()
     })
     it('keeps 1e6 unchanged', () => {
-      const result = baseAmountForThorchain(baseAmount('123456', 6))
+      const result = max1e8BaseAmount(baseAmount('123456', 6))
       expect(eqBaseAmount.equals(result, baseAmount('123456', 6))).toBeTruthy()
+    })
+  })
+
+  describe('to1e8BaseAmount', () => {
+    it('converts 1e12 to 1e8', () => {
+      const result = to1e8BaseAmount(baseAmount('123456789012', 12))
+      expect(eqBaseAmount.equals(result, baseAmount('12345678', 8))).toBeTruthy()
+    })
+    it('converts 1e6 to 1e8', () => {
+      const result = to1e8BaseAmount(baseAmount('123456', 6))
+      expect(eqBaseAmount.equals(result, baseAmount('12345600', 8))).toBeTruthy()
+    })
+    it('keeps 1e8 unchanged', () => {
+      const result = to1e8BaseAmount(baseAmount('12345678', 8))
+      expect(eqBaseAmount.equals(result, baseAmount('12345678', 8))).toBeTruthy()
     })
   })
 })

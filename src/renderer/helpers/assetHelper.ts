@@ -186,22 +186,37 @@ export const convertBaseAmountDecimal = (amount: BaseAmount, decimal: number): B
 
   const amountBN =
     decimalDiff < 0
-      ? bn(
-          amount
-            .amount()
-            .dividedBy(bn(Math.pow(10, decimalDiff * -1)))
-            // round down is needed to make sure amount of currency is still available
-            // without that, `dividedBy` might round up and provide an currency amount which does not exist
-            .toFixed(0, BigNumber.ROUND_DOWN)
-        )
-      : amount.amount().multipliedBy(bn(Math.pow(10, decimalDiff)))
+      ? amount
+          .amount()
+          .dividedBy(bn(10 ** (decimalDiff * -1)))
+          // Never use `BigNumber`s with decimal within `BaseAmount`
+          // that's why we need to set `decimalPlaces` to `0`
+          // round down is needed to make sure amount of currency is still available
+          // without that, `dividedBy` might round up and provide an currency amount which does not exist
+          .decimalPlaces(0, BigNumber.ROUND_DOWN)
+      : amount.amount().multipliedBy(bn(10 ** decimalDiff))
   return baseAmount(amountBN, decimal)
 }
 
 /**
- * Helper to convert any `BaseAmount`
- * into a <= 1e8 decimal based `BaseAmount`
- * to support THORChain
+ * Helper to convert a `BaseAmount`
+ * into a `BaseAmount` with max. decimal of `1e8`.
+ *
+ * If decimal of `BaseAmount` is less than `1e8`, it will be unchanged.
+ *
+ * Examples:
+ *
+ * 1e12 -> 1e8
+ * upTo1e8BaseAmount(baseAmount(123456789012, 12)) // baseAmount(12345678, 8)
+ *
+ * 1e6 -> 1e6
+ * upTo1e8BaseAmount(baseAmount(123456, 6)) // baseAmount(123456, 6)
  */
-export const baseAmountForThorchain = (amount: BaseAmount): BaseAmount =>
+export const max1e8BaseAmount = (amount: BaseAmount): BaseAmount =>
   amount.decimal <= THORCHAIN_DECIMAL ? amount : convertBaseAmountDecimal(amount, THORCHAIN_DECIMAL)
+
+/**
+ * Helper to convert a `BaseAmount`
+ * into `1e8` decimal based `BaseAmount`
+ */
+export const to1e8BaseAmount = (amount: BaseAmount): BaseAmount => convertBaseAmountDecimal(amount, THORCHAIN_DECIMAL)

@@ -25,7 +25,8 @@ export const formatValue = (value: string, maxDecimal = 2) => {
   // '' -> '0'
   if (value === '') return VALUE_ZERO
   // '.'  -> '0.'
-  if (maxDecimal > 0 && value === '.') return VALUE_ZERO_DECIMAL
+  // '0.'  -> '0.'
+  if (maxDecimal > 0 && (value === '.' || value === '0.')) return VALUE_ZERO_DECIMAL
 
   const valueBN = bn(value)
   // invalid BN  -> '0'

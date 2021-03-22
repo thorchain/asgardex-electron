@@ -11,6 +11,7 @@ import {
   BCHChain,
   LTCChain
 } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -72,10 +73,17 @@ const txInFee$ = ({ asset, poolAddress, memo, amount }: SwapTxParams): FeeLD => 
                     0,
                     memo,
                     {
-                      value: amount.amount().toFixed()
+                      // Send `BaseAmount` w/o decimal and always round down for currencies
+                      value: amount.amount().toFixed(0, BigNumber.ROUND_DOWN)
                     }
                   ]
-                : [routerAddress, FP.pipe(getEthTokenAddress(asset), O.toUndefined), amount.amount().toFixed(), memo]
+                : [
+                    routerAddress,
+                    FP.pipe(getEthTokenAddress(asset), O.toUndefined),
+                    // Send `BaseAmount` w/o decimal and always round down for currencies
+                    amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
+                    memo
+                  ]
             })
           }
         ),
