@@ -21,8 +21,8 @@ describe('deposit/Deposit.helper', () => {
     assetBalance: baseAmount(100000) //  1 ASSET == 2 RUNE
   }
   // user balances
-  const runeBalance = baseAmount(10000) // 100 RUNE = 50 ASSET
-  const assetBalance = baseAmount(20000) // 200 ASSET = 100 RUNE
+  const runeBalance = baseAmount(10000)
+  const assetBalance = baseAmount(20000)
 
   describe('maxRuneAmountToDeposit', () => {
     it('is 10000', () => {
