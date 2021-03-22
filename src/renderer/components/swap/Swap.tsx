@@ -17,6 +17,7 @@ import {
   assetAmount,
   assetToBase
 } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -436,6 +437,8 @@ export const Swap = ({
       .amount()
       .dividedBy(sourceAssetAmountForThorchain.amount())
       .multipliedBy(100)
+      // Remove decimal of `BigNumber`s used within `BaseAmount` and always round down for currencies
+      .decimalPlaces(0, BigNumber.ROUND_DOWN)
       .toNumber()
     return (
       <Slider

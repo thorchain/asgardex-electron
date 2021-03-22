@@ -466,8 +466,16 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const changePercentHandler = useCallback(
     (percent: number) => {
-      const runeAmountBN = maxRuneAmountToDeposit.amount().dividedBy(100).multipliedBy(percent)
-      const assetAmountBN = maxAssetAmountToDeposit.amount().dividedBy(100).multipliedBy(percent)
+      const runeAmountBN = maxRuneAmountToDeposit
+        .amount()
+        .dividedBy(100)
+        .multipliedBy(percent)
+        .decimalPlaces(0, BigNumber.ROUND_DOWN)
+      const assetAmountBN = maxAssetAmountToDeposit
+        .amount()
+        .dividedBy(100)
+        .multipliedBy(percent)
+        .decimalPlaces(0, BigNumber.ROUND_DOWN)
 
       setRuneAmountToDeposit(baseAmount(runeAmountBN, maxRuneAmountToDeposit.decimal))
       setAssetAmountToDeposit(baseAmount(assetAmountBN, assetBalanceForThorchain.decimal))

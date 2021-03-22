@@ -2,6 +2,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
 import { Client as EthClient, ETHAddress } from '@xchainjs/xchain-ethereum'
 import { baseAmount } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
@@ -39,7 +40,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
             RxOp.switchMap((gasPrices) => {
               const isETHAddress = address === ETHAddress
               const amount = isETHAddress ? baseAmount(0) : params.amount
-              const gasPrice = gasPrices.fast.amount().toFixed()
+              const gasPrice = gasPrices.fast.amount().toFixed(0) // no round down needed
               return Rx.from(
                 // Call deposit function of Router contract
                 // Note:
@@ -48,11 +49,13 @@ export const createTransactionService = (client$: Client$): TransactionService =
                 client.call<{ hash: TxHash }>(router, ethRouterABI, 'deposit', [
                   params.recipient,
                   address,
-                  amount.amount().toFixed(),
+                  // Send `BaseAmount` w/o decimal and always round down for currencies
+                  amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
                   params.memo,
                   isETHAddress
                     ? {
-                        value: params.amount.amount().toFixed(),
+                        // Send `BaseAmount` w/o decimal and always round down for currencies
+                        value: params.amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
                         gasPrice
                       }
                     : { gasPrice }

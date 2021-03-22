@@ -186,15 +186,15 @@ export const convertBaseAmountDecimal = (amount: BaseAmount, decimal: number): B
 
   const amountBN =
     decimalDiff < 0
-      ? bn(
-          amount
-            .amount()
-            .dividedBy(bn(Math.pow(10, decimalDiff * -1)))
-            // round down is needed to make sure amount of currency is still available
-            // without that, `dividedBy` might round up and provide an currency amount which does not exist
-            .toFixed(0, BigNumber.ROUND_DOWN)
-        )
-      : amount.amount().multipliedBy(bn(Math.pow(10, decimalDiff)))
+      ? amount
+          .amount()
+          .dividedBy(bn(10 ** decimalDiff * -1))
+          // Never use `BigNumber`s with decimal within `BaseAmount`
+          // that's why we need to set `decimalPlaces` to `0`
+          // round down is needed to make sure amount of currency is still available
+          // without that, `dividedBy` might round up and provide an currency amount which does not exist
+          .decimalPlaces(0, BigNumber.ROUND_DOWN)
+      : amount.amount().multipliedBy(bn(10 ** decimalDiff))
   return baseAmount(amountBN, decimal)
 }
 
