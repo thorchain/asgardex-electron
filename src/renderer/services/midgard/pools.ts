@@ -63,13 +63,13 @@ const createPoolsService = (
 ): PoolsService => {
   const midgardDefaultApi$ = FP.pipe(byzantine$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
 
-  const { get$: poolsFilters$, set: internalSetPoolsFilter, get: internalGetPoolsFilter } = observableState<
+  const { get$: poolsFilters$, set: _setPoolsFilter, get: internalGetPoolsFilter } = observableState<
     Record<string, O.Option<PoolFilter>>
   >({})
 
   const setPoolsFilter = (poolKey: string, filterValue: O.Option<PoolFilter>) => {
     const currentState = internalGetPoolsFilter()
-    internalSetPoolsFilter({ ...currentState, [poolKey]: filterValue })
+    _setPoolsFilter({ ...currentState, [poolKey]: filterValue })
   }
 
   // Factory to get `Pools` from Midgard
