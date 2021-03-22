@@ -14,6 +14,9 @@ describe('components/BigNumberInput/util', () => {
     it('formats "." to 0.', () => {
       expect(formatValue('.')).toEqual('0.')
     })
+    it('keeps format for "0." (no change)', () => {
+      expect(formatValue('0.')).toEqual('0.')
+    })
     it('formats "." to "0" for non (zero) decimal values', () => {
       expect(formatValue('.', 0)).toEqual('0')
     })

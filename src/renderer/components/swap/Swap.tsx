@@ -17,6 +17,7 @@ import {
   assetAmount,
   assetToBase
 } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -27,12 +28,13 @@ import * as Rx from 'rxjs'
 import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import {
-  convertBaseAmountDecimal,
   getEthTokenAddress,
   isEthAsset,
   isEthTokenAsset,
   THORCHAIN_DECIMAL,
-  baseAmountForThorchain
+  max1e8BaseAmount,
+  to1e8BaseAmount,
+  convertBaseAmountDecimal
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
@@ -157,7 +159,8 @@ export const Swap = ({
       FP.pipe(
         oSourceAssetWB,
         O.map(({ amount }) => amount),
-        O.getOrElse(() => ZERO_BASE_AMOUNT)
+        // Default zero value based on 1e8
+        O.getOrElse(() => baseAmount(0, THORCHAIN_DECIMAL))
       ),
     [oSourceAssetWB]
   )
@@ -180,13 +183,14 @@ export const Swap = ({
     INITIAL_SWAP_STATE
   )
 
-  const sourceAssetAmountForThorchain = useMemo(() => baseAmountForThorchain(sourceAssetAmount), [sourceAssetAmount])
+  const sourceAssetAmountForThorchain = useMemo(() => max1e8BaseAmount(sourceAssetAmount), [sourceAssetAmount])
 
   const initialAmountToSwap = useMemo(() => baseAmount(0, sourceAssetAmountForThorchain.decimal), [
     sourceAssetAmountForThorchain.decimal
   ])
 
   const [
+    /* max. 1e8 decimal */
     amountToSwap,
     _setAmountToSwap /* private - never set it directly, use setAmountToSwap() instead */
   ] = useState(initialAmountToSwap)
@@ -197,11 +201,12 @@ export const Swap = ({
       O.map(([{ source, target }, poolAddress, address]) => ({
         poolAddress,
         asset: source,
-        amount: amountToSwap,
+        // Decimal needs to be converted back for using orginal decimal of source asset (provided by `assetBalance`)
+        amount: convertBaseAmountDecimal(amountToSwap, sourceAssetAmount.decimal),
         memo: getSwapMemo({ asset: target, address })
       }))
     )
-  }, [amountToSwap, assetsToSwap, oPoolAddress, targetWalletAddress])
+  }, [amountToSwap, assetsToSwap, oPoolAddress, sourceAssetAmount.decimal, targetWalletAddress])
 
   const swapData = useMemo(() => getSwapData({ amountToSwap, sourceAsset, targetAsset, poolsData }), [
     amountToSwap,
@@ -322,6 +327,7 @@ export const Swap = ({
   // Max amount to swap
   // depends on users balances of source asset
   // and of fees to pay for source chain txs
+  // Decimal always <= 1e8 based
   const maxAmountToSwap: BaseAmount = useMemo(() => {
     // make sure not logged in user can play around with swap
     if (isLocked(keystore) || !hasImportedKeystore(keystore)) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER))
@@ -340,7 +346,7 @@ export const Swap = ({
       )
     )
     return eqAsset.equals(sourceChainAsset, sourceAssetProp)
-      ? baseAmountForThorchain(maxChainAssetAmount)
+      ? max1e8BaseAmount(maxChainAssetAmount)
       : sourceAssetAmountForThorchain
   }, [keystore, chainFeesRD, sourceChainAsset, sourceAssetProp, sourceAssetAmountForThorchain, sourceChainAssetAmount])
 
@@ -434,6 +440,8 @@ export const Swap = ({
       .amount()
       .dividedBy(sourceAssetAmountForThorchain.amount())
       .multipliedBy(100)
+      // Remove decimal of `BigNumber`s used within `BaseAmount` and always round down for currencies
+      .decimalPlaces(0, BigNumber.ROUND_DOWN)
       .toNumber()
     return (
       <Slider
@@ -641,11 +649,7 @@ export const Swap = ({
                 ? fees.outTx
                 : // pool data are always 1e8 decimal based
                   // and we have to convert fees to 1e8, too
-                  getValueOfAsset1InAsset2(
-                    convertBaseAmountDecimal(fees.outTx, THORCHAIN_DECIMAL),
-                    chainAssetPoolData,
-                    assetPoolData
-                  )
+                  getValueOfAsset1InAsset2(to1e8BaseAmount(fees.outTx), chainAssetPoolData, assetPoolData)
           )
         )
       }),

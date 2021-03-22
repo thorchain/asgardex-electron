@@ -6,7 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { convertBaseAmountDecimal, isRuneNativeAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { isRuneNativeAsset, to1e8BaseAmount } from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { PoolAssetDetail, PoolAssetDetails, PoolsDataMap } from '../../services/midgard/types'
@@ -40,8 +40,8 @@ export const getSlip = ({
   poolsData: PoolsDataMap
 }): BigNumber => {
   // pool data provided by Midgard are always 1e8 decimal based
-  // that's why we have to convert `amountToSwap into 1e8 as well
-  const inputAmount = convertBaseAmountDecimal(amountToSwap, THORCHAIN_DECIMAL)
+  // that's why we have to convert `amountToSwap into `1e8` decimal as well
+  const inputAmount = to1e8BaseAmount(amountToSwap)
   return FP.pipe(
     isRuneSwap(sourceAsset, targetAsset),
     O.chain((toRune) =>
@@ -75,8 +75,8 @@ export const getSwapResult = ({
   poolsData: PoolsDataMap
 }): BaseAmount => {
   // pool data provided by Midgard are always 1e8 decimal based,
-  // that's why we have to convert `amountToSwap into 1e8 as well
-  const inputAmount = convertBaseAmountDecimal(amountToSwap, THORCHAIN_DECIMAL)
+  // that's why we have to convert `amountToSwap into `1e8` as well
+  const inputAmount = to1e8BaseAmount(amountToSwap)
   return FP.pipe(
     isRuneSwap(sourceAsset, targetAsset),
     O.chain((toRune) => {

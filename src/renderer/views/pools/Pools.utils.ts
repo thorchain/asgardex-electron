@@ -7,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ZERO_BASE_AMOUNT } from '../../const'
-import { isChainAsset } from '../../helpers/assetHelper'
+import { isChainAsset, isUSDAsset } from '../../helpers/assetHelper'
 import { PoolDetail } from '../../services/midgard/types'
 import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
@@ -126,13 +126,12 @@ export const filterTableData = (oFilter: O.Option<PoolFilter> = O.none) => (
     O.map((filter) =>
       FP.pipe(
         tableData,
-        /**
-         * A.intersection can not accept arrays of different types so we need to set
-         * array-item type manually as PoolTableRowData | Asset to compare 2 arrays here
-         */
         A.filterMap((tableRow) => {
           if (filter === 'base') {
             return isChainAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
+          }
+          if (filter === 'usd') {
+            return isUSDAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
           }
           const stringAsset = assetToString(tableRow.pool.target)
           return stringAsset.includes(filter) ? O.some(tableRow) : O.none

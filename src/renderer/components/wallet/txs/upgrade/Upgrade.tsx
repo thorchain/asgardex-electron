@@ -145,7 +145,6 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   const onChangeInput = useCallback(
     async (value: BigNumber) => {
-      console.log('onChangeInput:', value.toString())
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {

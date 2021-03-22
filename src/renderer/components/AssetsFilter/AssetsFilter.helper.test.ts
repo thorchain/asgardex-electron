@@ -12,13 +12,13 @@ describe('getAvailableChains', () => {
   })
 
   it('should return O.some and starts with BASE_FILTER', () => {
-    expect(getAvailableChains([AssetBNB], [BNBChain])).toEqual(O.some(['base', BNBChain]))
+    expect(getAvailableChains([AssetBNB], [BNBChain])).toEqual(O.some(['base', 'usd', BNBChain]))
     expect(
       getAvailableChains([AssetBNB, ASSETS_TESTNET.USDT, AssetBCH, AssetBTC], [BNBChain, BTCChain, BCHChain])
-    ).toEqual(O.some(['base', BNBChain, BTCChain, BCHChain]))
+    ).toEqual(O.some(['base', 'usd', BNBChain, BTCChain, BCHChain]))
 
     expect(getAvailableChains([AssetBNB, AssetBCH, AssetBTC], [BNBChain, BTCChain])).toEqual(
-      O.some(['base', BNBChain, BTCChain])
+      O.some(['base', 'usd', BNBChain, BTCChain])
     )
   })
 })

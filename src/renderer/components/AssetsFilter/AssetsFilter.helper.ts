@@ -31,5 +31,5 @@ export const getAvailableChains = (assets: Asset[], availableChains: Chain[] = E
       )
     ),
     // In case there is at least one Filter available add Base filter
-    O.map((chainFilters) => ['base', ...chainFilters])
+    O.map((chainFilters) => ['base', 'usd', ...chainFilters])
   )

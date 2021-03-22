@@ -1,19 +1,17 @@
 import styled from 'styled-components'
-import { palette } from 'styled-theme'
 
-import { ReactComponent as ThemeIconUI } from '../../../assets/svg/icon-theme-switch.svg'
+import { ReactComponent as DayThemeIconUI } from '../../../assets/svg/icon-theme-day.svg'
+import { ReactComponent as NightThemeIconUI } from '../../../assets/svg/icon-theme-night.svg'
 import { HeaderIconWrapper } from '../HeaderIcon.style'
 
 export const HeaderThemeWrapper = styled(HeaderIconWrapper)`
-  #theme_switch_icon {
-    & > * {
-      fill: ${palette('text', 1)};
-    }
-  }
+  margin-bottom: 5px;
 `
 
-export const ThemeIcon = styled(ThemeIconUI)`
+export const DayThemeIcon = styled(DayThemeIconUI)`
   & path {
     fill: currentColor;
   }
 `
+
+export const NightThemeIcon = styled(NightThemeIconUI)``

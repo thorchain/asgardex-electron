@@ -201,6 +201,6 @@ export type HistoryActionsPageRD = RD.RemoteData<ApiError, HistoryActionsPage>
 
 export type HistoryActionsPageLD = LiveData<ApiError, HistoryActionsPage>
 
-export type PoolFilter = Chain | 'base'
+export type PoolFilter = Chain | 'base' | 'usd'
 
 export type PoolFilters = PoolFilter[]
