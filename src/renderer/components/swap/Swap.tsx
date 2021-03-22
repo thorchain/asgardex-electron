@@ -33,7 +33,8 @@ import {
   isEthTokenAsset,
   THORCHAIN_DECIMAL,
   max1e8BaseAmount,
-  to1e8BaseAmount
+  to1e8BaseAmount,
+  convertBaseAmountDecimal
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
@@ -189,6 +190,7 @@ export const Swap = ({
   ])
 
   const [
+    /* max. 1e8 decimal */
     amountToSwap,
     _setAmountToSwap /* private - never set it directly, use setAmountToSwap() instead */
   ] = useState(initialAmountToSwap)
@@ -199,11 +201,12 @@ export const Swap = ({
       O.map(([{ source, target }, poolAddress, address]) => ({
         poolAddress,
         asset: source,
-        amount: amountToSwap,
+        // Decimal needs to be converted back for using orginal decimal of source asset (provided by `assetBalance`)
+        amount: convertBaseAmountDecimal(amountToSwap, sourceAssetAmount.decimal),
         memo: getSwapMemo({ asset: target, address })
       }))
     )
-  }, [amountToSwap, assetsToSwap, oPoolAddress, targetWalletAddress])
+  }, [amountToSwap, assetsToSwap, oPoolAddress, sourceAssetAmount.decimal, targetWalletAddress])
 
   const swapData = useMemo(() => getSwapData({ amountToSwap, sourceAsset, targetAsset, poolsData }), [
     amountToSwap,
