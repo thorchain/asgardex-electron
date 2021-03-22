@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 
 import { SwapOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
@@ -11,6 +11,7 @@ import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
@@ -23,11 +24,13 @@ import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import * as swapRoutes from '../../routes/swap'
 import { SwapRouteParams } from '../../routes/swap'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolAssets, PoolsState } from '../../services/midgard/types'
+import { PoolFilter, PoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
 import * as Styled from './PoolsOverview.style'
+
+const POOLS_KEY = 'active'
 
 export const ActivePools: React.FC = (): JSX.Element => {
   const history = useHistory()
@@ -38,7 +41,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, reloadPools, selectedPricePool$ }
+    pools: { poolsState$, reloadPools, selectedPricePool$, poolsFilters$, setPoolsFilter }
   } = midgardService
   const poolsRD = useObservableState(poolsState$, RD.pending)
 
@@ -47,7 +50,16 @@ export const ActivePools: React.FC = (): JSX.Element => {
   // store previous data of pools to render these while reloading
   const previousPools = useRef<O.Option<PoolTableRowsData>>(O.none)
 
-  const [filteredPoolAssets, setFilteredPoolAssets] = useState<PoolAssets>()
+  const [poolFilter] = useObservableState<O.Option<PoolFilter>>(
+    () =>
+      FP.pipe(
+        poolsFilters$,
+        RxOp.map((filters) => FP.pipe(O.fromNullable(filters[POOLS_KEY]), O.flatten))
+      ),
+    O.none
+  )
+
+  const setFilter = useCallback((oFilter: O.Option<PoolFilter>) => setPoolsFilter(POOLS_KEY, oFilter), [setPoolsFilter])
 
   const refreshHandler = useCallback(() => {
     reloadPools()
@@ -207,7 +219,8 @@ export const ActivePools: React.FC = (): JSX.Element => {
       return (
         <>
           <Styled.AssetsFilter
-            onFilterChanged={setFilteredPoolAssets}
+            activeFilter={poolFilter}
+            setFilter={setFilter}
             assets={FP.pipe(
               tableData,
               A.map(({ pool }) => pool.target)
@@ -215,14 +228,14 @@ export const ActivePools: React.FC = (): JSX.Element => {
           />
           <Table
             columns={columns}
-            dataSource={FP.pipe(tableData, filterTableData(filteredPoolAssets))}
+            dataSource={FP.pipe(tableData, filterTableData(poolFilter))}
             loading={loading}
             rowKey="key"
           />
         </>
       )
     },
-    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, filteredPoolAssets]
+    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, poolFilter, setFilter]
   )
 
   return (

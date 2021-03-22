@@ -33,7 +33,8 @@ import {
   ValidatePoolLD,
   PoolAddress$,
   PoolAddressLD,
-  PoolAddress
+  PoolAddress,
+  PoolFilter
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -61,6 +62,15 @@ const createPoolsService = (
   selectedPoolAsset$: Rx.Observable<O.Option<Asset>>
 ): PoolsService => {
   const midgardDefaultApi$ = FP.pipe(byzantine$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
+
+  const { get$: poolsFilters$, set: internalSetPoolsFilter, get: internalGetPoolsFilter } = observableState<
+    Record<string, O.Option<PoolFilter>>
+  >({})
+
+  const setPoolsFilter = (poolKey: string, filterValue: O.Option<PoolFilter>) => {
+    const currentState = internalGetPoolsFilter()
+    internalSetPoolsFilter({ ...currentState, [poolKey]: filterValue })
+  }
 
   // Factory to get `Pools` from Midgard
   const apiGetPools$ = (request: GetPoolsRequest, reload$: TriggerStream$) =>
@@ -562,7 +572,9 @@ const createPoolsService = (
     poolDetail$,
     priceRatio$,
     availableAssets$,
-    validatePool$
+    validatePool$,
+    poolsFilters$,
+    setPoolsFilter
   }
 }
 
