@@ -17,18 +17,22 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
-import * as shareHelpers from '../../../helpers/poolShareHelper'
+import * as ShareHelpers from '../../../helpers/poolShareHelper'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolDetailRD, PoolShareRD, PoolDetail, PoolShare } from '../../../services/midgard/types'
 import { getBalanceByAsset } from '../../../services/wallet/util'
+import { AssetWithDecimal } from '../../../types/asgardex'
 
 type Props = {
-  asset: Asset
+  asset: AssetWithDecimal
   poolShare: PoolShareRD
 }
 
 export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
-  const { asset, poolShare: poolShareRD } = props
+  const {
+    asset: { asset, decimal: assetDecimal },
+    poolShare: poolShareRD
+  } = props
   const {
     service: {
       pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$ },
@@ -141,7 +145,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const renderWithdrawReady = useCallback(
     ({
       assetPrice,
-      poolShare,
+      poolShare: { units: liquidityUnits },
       poolDetail,
       selectedPriceAsset
     }: {
@@ -156,8 +160,8 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         runeBalance={runeBalance}
         selectedPriceAsset={selectedPriceAsset}
         shares={{
-          rune: shareHelpers.getRuneShare(poolShare.units, poolDetail),
-          asset: shareHelpers.getAssetShare(poolShare.units, poolDetail)
+          rune: ShareHelpers.getRuneShare(liquidityUnits, poolDetail),
+          asset: ShareHelpers.getAssetShare({ liquidityUnits, detail: poolDetail, assetDecimal })
         }}
         asset={asset}
         fee$={withdrawFee$}
@@ -172,6 +176,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     [
       runePrice,
       runeBalance,
+      assetDecimal,
       asset,
       withdrawFee$,
       reloadWithdrawFees,

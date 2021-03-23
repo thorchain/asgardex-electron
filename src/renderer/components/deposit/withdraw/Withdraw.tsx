@@ -35,9 +35,7 @@ import { getWithdrawAmounts } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
 export type Props = {
-  /** Asset to withdraw */
   asset: Asset
-  assetDecimal: number
   /** Rune price (base amount) */
   runePrice: BigNumber
   /** Asset price (base amount) */
@@ -48,7 +46,9 @@ export type Props = {
   selectedPriceAsset: Asset
   /** Callback to reload fees */
   reloadFees: (chain: Chain) => void
-  /** Share of Rune and of selected Asset */
+  /** Shares of Rune and selected Asset.
+   * Note: Decimal should based on original asset decimals
+   **/
   shares: { rune: BaseAmount; asset: BaseAmount }
   /** Flag whether form has to be disabled or not */
   disabled?: boolean

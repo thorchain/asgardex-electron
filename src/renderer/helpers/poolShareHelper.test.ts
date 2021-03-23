@@ -12,7 +12,11 @@ describe('poolShareHelpers', () => {
   })
 
   it('getAssetShare', () => {
-    const result = getAssetShare(bn('300000000'), { assetDepth: '12', units: '2' })
+    const result = getAssetShare({
+      liquidityUnits: bn('300000000'),
+      detail: { assetDepth: '12', units: '2' },
+      assetDecimal: 8
+    })
     const expected = assetToBase(assetAmount(18))
     expect(eqBaseAmount.equals(result, expected)).toBeTruthy()
   })

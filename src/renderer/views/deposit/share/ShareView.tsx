@@ -12,14 +12,19 @@ import { useIntl } from 'react-intl'
 import { PoolShare as PoolShareUI } from '../../../components/uielements/poolShare'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
-import * as shareHelpers from '../../../helpers/poolShareHelper'
+import * as ShareHelpers from '../../../helpers/poolShareHelper'
 import { PoolDetailRD, PoolDetail, PoolShareRD, PoolShare } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
+import { AssetWithDecimal } from '../../../types/asgardex'
 import * as Styled from './ShareView.styles'
 
-type Props = { asset: Asset; poolShare: PoolShareRD; assetDecimal: number; smallWidth?: boolean }
+type Props = {
+  asset: AssetWithDecimal
+  poolShare: PoolShareRD
+  smallWidth?: boolean
+}
 
-export const ShareView: React.FC<Props> = ({ asset, poolShare: poolShareRD, smallWidth }) => {
+export const ShareView: React.FC<Props> = ({ asset: assetWD, poolShare: poolShareRD, smallWidth }) => {
   const { service: midgardService } = useMidgardContext()
   const {
     pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$ }
@@ -34,9 +39,13 @@ export const ShareView: React.FC<Props> = ({ asset, poolShare: poolShareRD, smal
 
   const renderPoolShareReady = useCallback(
     ({ units }: PoolShare, poolDetail: PoolDetail) => {
-      const runeShare = shareHelpers.getRuneShare(units, poolDetail)
-      const assetShare = shareHelpers.getAssetShare(units, poolDetail)
-      const poolShare = shareHelpers.getPoolShare(units, poolDetail)
+      const runeShare = ShareHelpers.getRuneShare(units, poolDetail)
+      const assetShare = ShareHelpers.getAssetShare({
+        liquidityUnits: units,
+        detail: poolDetail,
+        assetDecimal: assetWD.decimal
+      })
+      const poolShare = ShareHelpers.getPoolShare(units, poolDetail)
 
       const poolData = toPoolData(poolDetail)
 
@@ -45,22 +54,21 @@ export const ShareView: React.FC<Props> = ({ asset, poolShare: poolShareRD, smal
 
       return (
         <PoolShareUI
-          smallWidth={smallWidth}
           sourceAsset={AssetRuneNative}
-          targetAsset={asset}
+          targetAsset={assetWD.asset}
           poolShare={poolShare}
           depositUnits={units}
           assetDepositShare={assetShare}
-          assetDecimal={assetDecimal}
           priceAsset={FP.pipe(oPriceAsset, O.toUndefined)}
           loading={false}
           assetDepositPrice={assetDepositPrice}
           runeDepositPrice={runeDepositPrice}
           runeDepositShare={runeShare}
+          smallWidth={smallWidth}
         />
       )
     },
-    [asset, oPriceAsset, pricePoolData, smallWidth]
+    [assetWD.asset, assetWD.decimal, oPriceAsset, pricePoolData, smallWidth]
   )
 
   const renderNoShare = useMemo(

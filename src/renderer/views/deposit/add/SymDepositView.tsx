@@ -28,13 +28,15 @@ import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
+import { AssetWithDecimal } from '../../../types/asgardex'
 
 type Props = {
-  asset: Asset
-  assetDecimal: number
+  asset: AssetWithDecimal
 }
 
-export const SymDepositView: React.FC<Props> = ({ asset }) => {
+export const SymDepositView: React.FC<Props> = (props) => {
+  const { asset: assetWD } = props
+  const { asset } = assetWD
   const history = useHistory()
   const intl = useIntl()
 
@@ -169,7 +171,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
           viewRuneTx={viewRuneTx}
           viewAssetTx={viewAssetTx}
           onChangeAsset={FP.constVoid}
-          asset={asset}
+          asset={assetWD}
           assetPrice={ZERO_BN}
           runePrice={ZERO_BN}
           assetBalance={O.none}
@@ -195,7 +197,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
       validatePassword$,
       viewRuneTx,
       viewAssetTx,
-      asset,
+      assetWD,
       symDepositFees$,
       selectedPricePoolAsset,
       reloadBalancesAndShares,
@@ -221,7 +223,7 @@ export const SymDepositView: React.FC<Props> = ({ asset }) => {
               viewAssetTx={viewAssetTx}
               poolData={toPoolData(poolDetail)}
               onChangeAsset={onChangeAsset}
-              asset={asset}
+              asset={assetWD}
               assetPrice={assetPrice}
               runePrice={runPrice}
               assetBalance={assetBalance}

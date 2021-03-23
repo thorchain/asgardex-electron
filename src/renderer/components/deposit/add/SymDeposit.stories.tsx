@@ -24,7 +24,7 @@ import { SymDepositState } from '../../../services/chain/types'
 import { SymDeposit, Props as SymDepositProps } from './SymDeposit'
 
 const defaultProps: SymDepositProps = {
-  asset: AssetBNB,
+  asset: { asset: AssetBNB, decimal: 8 },
   assetPrice: bn(2),
   runePrice: bn(1),
   assetBalance: O.some(assetToBase(assetAmount(200))),

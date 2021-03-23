@@ -14,7 +14,7 @@ import { Default as AsymWidthdraw } from './withdraw/AsymWithdraw.stories'
 import { Default as Withdraw } from './withdraw/Withdraw.stories'
 
 const defaultProps: DepositProps = {
-  asset: AssetBNB,
+  asset: { asset: AssetBNB, decimal: 8 },
   shares: RD.success([
     {
       units: bn('300000000'),

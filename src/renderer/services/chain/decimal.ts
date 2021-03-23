@@ -18,30 +18,46 @@ import {
   BTCChain
 } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { BNB_DECIMAL, isEthAsset, isEthTokenAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { LiveData } from '../../helpers/rx/liveData'
+import { AssetWithDecimal } from '../../types/asgardex'
 
-export const decimal$ = (asset: Asset, network: Network): LiveData<Error, number> => {
+const getDecimal = (asset: Asset, network: Network): Promise<number> => {
   switch (asset.chain) {
     case BNBChain:
-      return Rx.of(RD.success(BNB_DECIMAL))
+      return Promise.resolve(BNB_DECIMAL)
     case BTCChain:
-      return Rx.of(RD.success(BTC_DECIMAL))
+      return Promise.resolve(BTC_DECIMAL)
     case ETHChain:
-      if (isEthAsset(asset)) return Rx.of(RD.success(ETH_DECIMAL))
-      if (isEthTokenAsset(asset)) return Rx.of(RD.failure(Error('Decimals for ERC20 has not been implemented yet')))
-      return Rx.of(RD.failure(Error(`Unknown asset: ${assetToString(asset)}`)))
+      // ETH
+      if (isEthAsset(asset)) return Promise.resolve(ETH_DECIMAL)
+      // ERC20
+      if (isEthTokenAsset(asset)) return Promise.reject(Error('Decimals for ERC20 has not been implemented yet'))
+      // unknown
+      return Promise.reject(Error(`Unknown asset: ${assetToString(asset)}`))
     case THORChain:
-      return Rx.of(RD.success(THORCHAIN_DECIMAL))
+      return Promise.resolve(THORCHAIN_DECIMAL)
     case PolkadotChain:
-      return Rx.of(RD.success(getDecimalDot(network === 'mainnet' ? 'mainnet' : 'testnet')))
+      return Promise.resolve(getDecimalDot(network === 'mainnet' ? 'mainnet' : 'testnet'))
     case CosmosChain:
-      return Rx.of(RD.success(COSMOS_DECIMAL))
+      return Promise.resolve(COSMOS_DECIMAL)
     case BCHChain:
-      return Rx.of(RD.success(BCH_DECIMAL))
+      return Promise.resolve(BCH_DECIMAL)
     case LTCChain:
-      return Rx.of(RD.success(LTC_DECIMAL))
+      return Promise.resolve(LTC_DECIMAL)
   }
 }
+
+export const decimal$ = (asset: Asset, network: Network): LiveData<Error, AssetWithDecimal> =>
+  Rx.from(getDecimal(asset, network)).pipe(
+    RxOp.map((decimal) =>
+      RD.success({
+        asset,
+        decimal
+      })
+    ),
+    RxOp.catchError((error) => Rx.of(RD.failure(error?.msg ?? error.toString())))
+  )
