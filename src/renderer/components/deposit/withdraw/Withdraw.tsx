@@ -20,12 +20,14 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
+import { THORCHAIN_DECIMAL, to1e8BaseAmount } from '../../../helpers/assetHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
 import { FeeLD, FeeRD, Memo, WithdrawState, SymWithdrawStateHandler } from '../../../services/chain/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
+import { AssetWithDecimal } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
@@ -35,7 +37,7 @@ import { getWithdrawAmounts } from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
 export type Props = {
-  asset: Asset
+  asset: AssetWithDecimal
   /** Rune price (base amount) */
   runePrice: BigNumber
   /** Asset price (base amount) */
@@ -48,7 +50,7 @@ export type Props = {
   reloadFees: (chain: Chain) => void
   /**
    * Shares of Rune and selected Asset.
-   * Note: Decimal should based on original asset decimals
+   * Note: Decimal needs to be based on **original asset decimals**
    **/
   shares: { rune: BaseAmount; asset: BaseAmount }
   /** Flag whether form has to be disabled or not */
@@ -68,7 +70,7 @@ export type Props = {
  *
  * */
 export const Withdraw: React.FC<Props> = ({
-  asset,
+  asset: assetWD,
   runePrice,
   assetPrice,
   runeBalance: oRuneBalance,
@@ -85,6 +87,8 @@ export const Withdraw: React.FC<Props> = ({
 }) => {
   const intl = useIntl()
 
+  const { asset, decimal: assetDecimal } = assetWD
+
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
 
   const {
@@ -100,6 +104,14 @@ export const Withdraw: React.FC<Props> = ({
     assetShare,
     withdrawPercent
   )
+
+  const assetPriceToWithdraw1e8 = useMemo(() => {
+    // Prices are always `1e8` based,
+    // that's why we have to convert `assetAmountToWithdraw` to `1e8` as well
+    const assetAmountToWithdraw1e8 = to1e8BaseAmount(assetAmountToWithdraw)
+    const priceBN = assetAmountToWithdraw1e8.amount().times(assetPrice)
+    return baseAmount(priceBN, 8)
+  }, [assetAmountToWithdraw, assetPrice])
 
   const feeLD: FeeLD = useMemo(
     () => fee$(AssetRuneNative.chain, memo),
@@ -315,6 +327,7 @@ export const Withdraw: React.FC<Props> = ({
           {formatAssetAmountCurrency({
             amount: baseToAsset(runeAmountToWithdraw),
             asset: AssetRuneNative,
+            decimal: THORCHAIN_DECIMAL,
             trimZeros: true
           })}
           {/* show pricing if price asset is different only */}
@@ -333,13 +346,14 @@ export const Withdraw: React.FC<Props> = ({
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
             amount: baseToAsset(assetAmountToWithdraw),
-            asset: asset,
+            asset,
+            decimal: assetDecimal,
             trimZeros: true
           })}
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(asset, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: baseToAsset(baseAmount(assetAmountToWithdraw.amount().times(assetPrice))),
+              amount: baseToAsset(assetPriceToWithdraw1e8),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}

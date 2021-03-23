@@ -29,10 +29,8 @@ type Props = {
 }
 
 export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
-  const {
-    asset: { asset, decimal: assetDecimal },
-    poolShare: poolShareRD
-  } = props
+  const { asset: assetWD, poolShare: poolShareRD } = props
+  const { decimal: assetDecimal } = assetWD
   const {
     service: {
       pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$ },
@@ -118,7 +116,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         runeBalance={runeBalance}
         selectedPriceAsset={AssetRuneNative}
         shares={{ rune: ZERO_BASE_AMOUNT, asset: ZERO_BASE_AMOUNT }}
-        asset={asset}
+        asset={assetWD}
         reloadFees={reloadWithdrawFees}
         disabled
         validatePassword$={validatePassword$}
@@ -132,7 +130,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       withdrawFee$,
       runePrice,
       runeBalance,
-      asset,
+      assetWD,
       reloadWithdrawFees,
       validatePassword$,
       viewRuneTx,
@@ -163,7 +161,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
           rune: ShareHelpers.getRuneShare(liquidityUnits, poolDetail),
           asset: ShareHelpers.getAssetShare({ liquidityUnits, detail: poolDetail, assetDecimal })
         }}
-        asset={asset}
+        asset={assetWD}
         fee$={withdrawFee$}
         reloadFees={reloadWithdrawFees}
         validatePassword$={validatePassword$}
@@ -177,7 +175,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       runePrice,
       runeBalance,
       assetDecimal,
-      asset,
+      assetWD,
       withdrawFee$,
       reloadWithdrawFees,
       validatePassword$,

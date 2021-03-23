@@ -5,7 +5,7 @@ import { Story, Meta } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, bn } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
 import { Default as AsymDeposit } from './add/AsymDeposit.stories'
 import { Default as SymDeposit } from './add/SymDeposit.stories'
@@ -14,7 +14,7 @@ import { Default as AsymWidthdraw } from './withdraw/AsymWithdraw.stories'
 import { Default as Withdraw } from './withdraw/Withdraw.stories'
 
 const defaultProps: DepositProps = {
-  asset: { asset: AssetBNB, decimal: 8 },
+  asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   shares: RD.success([
     {
       units: bn('300000000'),
