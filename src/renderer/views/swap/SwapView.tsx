@@ -169,29 +169,26 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
               }
 
               return (
-                <>
-                  <div>DECIMAL: {sourceAsset.decimal}</div>
-                  <Swap
-                    keystore={keystore}
-                    validatePassword$={validatePassword$}
-                    goToTransaction={goToTransaction}
-                    sourceAsset={sourceAsset}
-                    targetAsset={targetAsset}
-                    poolAddress={selectedPoolAddress}
-                    availableAssets={availableAssets}
-                    poolDetails={poolDetails}
-                    walletBalances={balances}
-                    reloadFees={reloadSwapFees}
-                    fees$={swapFees$}
-                    targetWalletAddress={targetWalletAddress}
-                    swap$={swap$}
-                    reloadBalances={reloadBalances}
-                    onChangePath={onChangePath}
-                    network={network}
-                    approveERC20Token$={approveERC20Token$}
-                    isApprovedERC20Token$={isApprovedERC20Token$}
-                  />
-                </>
+                <Swap
+                  keystore={keystore}
+                  validatePassword$={validatePassword$}
+                  goToTransaction={goToTransaction}
+                  sourceAsset={sourceAsset}
+                  targetAsset={targetAsset}
+                  poolAddress={selectedPoolAddress}
+                  availableAssets={availableAssets}
+                  poolDetails={poolDetails}
+                  walletBalances={balances}
+                  reloadFees={reloadSwapFees}
+                  fees$={swapFees$}
+                  targetWalletAddress={targetWalletAddress}
+                  swap$={swap$}
+                  reloadBalances={reloadBalances}
+                  onChangePath={onChangePath}
+                  network={network}
+                  approveERC20Token$={approveERC20Token$}
+                  isApprovedERC20Token$={isApprovedERC20Token$}
+                />
               )
             }
           )

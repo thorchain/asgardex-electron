@@ -1,8 +1,7 @@
-import { Contract } from '@ethersproject/contracts'
 import { EtherscanProvider } from '@ethersproject/providers'
-import { Address, Network as ClientNetwork } from '@xchainjs/xchain-client'
-import { Client } from '@xchainjs/xchain-ethereum'
-import { ethers, BigNumberish } from 'ethers'
+import { Network as ClientNetwork } from '@xchainjs/xchain-client'
+import * as ETH from '@xchainjs/xchain-ethereum'
+import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -22,6 +21,7 @@ import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$, Client$ } from './types'
 
 export const toEthNetwork = (network: Network) => {
+  // In case of 'chaosnet' + 'mainnet` we stick on `mainnet`
   if (network === 'chaosnet') return 'mainnet'
   return network
 }
@@ -56,7 +56,7 @@ const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, 
                     }
                   }
                 : {}
-              const client = new Client({
+              const client = new ETH.Client({
                 network,
                 etherscanApiKey: ETHERSCAN_API_KEY,
                 phrase,
@@ -107,23 +107,35 @@ const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
 const getExplorerAddressUrl$: GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
 
 /**
- * Helper to get decimals for ERC20
+ * Map to store decimal in memory
  *
- * Similar helper function will be provided by xchain-eth soon
- * TODO(@Veado) Remove it in this case ^
+ * to avoid unessary request for same data
+ * */
+const decimalMap: Map<string, number> = new Map()
+/**
+ * Helper to get decimals for ERC20
  */
-const getERC20Decimal = async (address: Address, network: Network): Promise<number> => {
-  const abi = ['function decimals() view returns (uint8)']
-  const ethNetwork = toEthNetwork(network)
-  const provider = new EtherscanProvider(ethNetwork, ETHERSCAN_API_KEY)
-  const erc20 = new Contract(address, abi, provider)
-
-  try {
-    const result: BigNumberish = await erc20.decimals()
-    return ethers.BigNumber.from(result).toNumber()
-  } catch (error: unknown) {
-    return Promise.reject(error)
-  }
+const getDecimal = async (asset: Asset, network: Network): Promise<number> => {
+  const assetString = assetToString(asset)
+  return FP.pipe(
+    decimalMap.get(assetString),
+    O.fromNullable,
+    O.fold(
+      async () => {
+        const ethNetwork = toEthNetwork(network)
+        const provider = new EtherscanProvider(ethNetwork, ETHERSCAN_API_KEY)
+        try {
+          const decimal = await ETH.getDecimal(asset, provider)
+          // store result in memory
+          decimalMap.set(assetString, decimal)
+          return Promise.resolve(decimal)
+        } catch (e) {
+          return Promise.reject(e)
+        }
+      },
+      async (decimal) => Promise.resolve(decimal)
+    )
+  )
 }
 
 export {
@@ -135,5 +147,5 @@ export {
   explorerUrl$,
   getExplorerTxUrl$,
   getExplorerAddressUrl$,
-  getERC20Decimal
+  getDecimal as getERC20Decimal
 }
