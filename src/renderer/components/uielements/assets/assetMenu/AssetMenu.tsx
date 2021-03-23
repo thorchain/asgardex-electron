@@ -54,7 +54,7 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
           <Col>
             <AssetData asset={asset} price={price} network={network} />
           </Col>
-          <Col>{formatAssetAmountCurrency({ amount: baseToAsset(amount), asset })}</Col>
+          <Col>{formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 3 })}</Col>
         </Row>
       )
       return { key, node }
