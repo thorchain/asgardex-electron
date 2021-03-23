@@ -46,7 +46,8 @@ export type Props = {
   selectedPriceAsset: Asset
   /** Callback to reload fees */
   reloadFees: (chain: Chain) => void
-  /** Shares of Rune and selected Asset.
+  /**
+   * Shares of Rune and selected Asset.
    * Note: Decimal should based on original asset decimals
    **/
   shares: { rune: BaseAmount; asset: BaseAmount }

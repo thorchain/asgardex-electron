@@ -6,12 +6,16 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
+import { AssetWithDecimal } from '../../types/asgardex'
 import { PoolAddress } from '../midgard/types'
 import { ApiError, TxHashRD } from '../wallet/types'
 
 export type TxTypes = 'DEPOSIT' | 'SWAP' | 'WITHDRAW' | 'UPGRADE'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
+
+export type AssetWithDecimalLD = LiveData<Error, AssetWithDecimal>
+export type AssetWithDecimalRD = RD.RemoteData<Error, AssetWithDecimal>
 
 export type LoadFeesHandler = () => void
 

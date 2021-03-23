@@ -21,9 +21,9 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { DepositRouteParams } from '../../routes/deposit'
+import { AssetWithDecimalRD } from '../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
-import { AssetWithDecimal } from '../../types/asgardex'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
 import * as Styled from './DepositView.styles'
@@ -50,7 +50,7 @@ export const DepositView: React.FC<Props> = () => {
 
   const { keystoreService } = useWalletContext()
 
-  const { addressByChain$, decimal$ } = useChainContext()
+  const { addressByChain$, assetWithDecimal$ } = useChainContext()
 
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
 
@@ -64,7 +64,7 @@ export const DepositView: React.FC<Props> = () => {
     }
   }, [oSelectedAsset, setSelectedPoolAsset])
 
-  const [assetRD] = useObservableState<RD.RemoteData<Error, AssetWithDecimal>>(
+  const [assetRD] = useObservableState<AssetWithDecimalRD>(
     () =>
       selectedPoolAsset$.pipe(
         RxOp.switchMap((oAsset) =>
@@ -72,7 +72,7 @@ export const DepositView: React.FC<Props> = () => {
             oAsset,
             O.fold(
               () => Rx.of(RD.initial),
-              (asset) => decimal$(asset, network)
+              (asset) => assetWithDecimal$(asset, network)
             )
           )
         )

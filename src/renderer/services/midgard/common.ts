@@ -23,18 +23,6 @@ const selectedPoolAsset$: Observable<SelectedPoolAsset> = _selectedPoolAsset$.pi
   RxOp.shareReplay(1)
 )
 
-// const selectedPoolAssetWD$: LiveData<Error, AssetWithDecimal> = selectedPoolAsset$.pipe(
-//   RxOp.map((oAsset) =>
-//     FP.pipe(
-//       oAsset,
-//       O.fold(
-//         () => RD.initial
-//         (asset) => decimal
-//       )
-//     )
-//   )
-// )
-
 const selectedPoolChain$: Observable<SelectedPoolChain> = selectedPoolAsset$.pipe(RxOp.map(O.map(({ chain }) => chain)))
 
 export { selectedPoolAsset$, setSelectedPoolAsset, selectedPoolChain$ }

@@ -27,7 +27,7 @@ import {
   symWithdraw$,
   asymWithdraw$,
   transfer$,
-  decimal$
+  assetWithDecimal$
 } from '../services/chain'
 
 type ChainContextValue = {
@@ -57,7 +57,7 @@ type ChainContextValue = {
   symWithdraw$: typeof symWithdraw$
   asymWithdraw$: typeof asymWithdraw$
   transfer$: typeof transfer$
-  decimal$: typeof decimal$
+  assetWithDecimal$: typeof assetWithDecimal$
 }
 
 const initialContext: ChainContextValue = {
@@ -87,7 +87,7 @@ const initialContext: ChainContextValue = {
   symWithdraw$,
   asymWithdraw$,
   transfer$,
-  decimal$
+  assetWithDecimal$
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 

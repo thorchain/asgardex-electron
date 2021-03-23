@@ -22,8 +22,8 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { BNB_DECIMAL, isEthAsset, isEthTokenAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
-import { LiveData } from '../../helpers/rx/liveData'
-import { AssetWithDecimal } from '../../types/asgardex'
+import { eqAsset } from '../../helpers/fp/eq'
+import { AssetWithDecimalLD } from './types'
 
 const getDecimal = (asset: Asset, network: Network): Promise<number> => {
   switch (asset.chain) {
@@ -34,8 +34,21 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
     case ETHChain:
       // ETH
       if (isEthAsset(asset)) return Promise.resolve(ETH_DECIMAL)
+      // ETH.USDT is hardcoded for now
+      // will be fixed after https://github.com/xchainjs/xchainjs-lib/issues/284 is done
+      if (
+        eqAsset.equals(asset, {
+          chain: 'ETH',
+          symbol: 'USDT-0X62E273709DA575835C7F6AEF4A31140CA5B1D190',
+          ticker: 'USDT'
+        })
+      )
+        return Promise.resolve(6)
       // ERC20
-      if (isEthTokenAsset(asset)) return Promise.reject(Error('Decimals for ERC20 has not been implemented yet'))
+      // Needs to be done with `xchain-js` first
+      // see https://github.com/xchainjs/xchainjs-lib/issues/284
+      if (isEthTokenAsset(asset))
+        return Promise.reject(Error(`Decimals for ${assetToString(asset)} (ERC20) has not been implemented yet`))
       // unknown
       return Promise.reject(Error(`Unknown asset: ${assetToString(asset)}`))
     case THORChain:
@@ -51,7 +64,7 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
   }
 }
 
-export const decimal$ = (asset: Asset, network: Network): LiveData<Error, AssetWithDecimal> =>
+export const assetWithDecimal$ = (asset: Asset, network: Network): AssetWithDecimalLD =>
   Rx.from(getDecimal(asset, network)).pipe(
     RxOp.map((decimal) =>
       RD.success({
