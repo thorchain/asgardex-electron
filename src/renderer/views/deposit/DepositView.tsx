@@ -145,19 +145,16 @@ export const DepositView: React.FC<Props> = () => {
             />
           ),
           (asset) => (
-            <>
-              <div>DECIMAL: {asset.decimal}</div>
-              <Deposit
-                asset={asset}
-                shares={poolSharesRD}
-                keystoreState={keystoreState}
-                ShareContent={ShareView}
-                SymDepositContent={SymDepositView}
-                AsymDepositContent={AsymDepositView}
-                WidthdrawContent={WithdrawDepositView}
-                AsymWidthdrawContent={AsymWithdrawView}
-              />
-            </>
+            <Deposit
+              asset={asset}
+              shares={poolSharesRD}
+              keystoreState={keystoreState}
+              ShareContent={ShareView}
+              SymDepositContent={SymDepositView}
+              AsymDepositContent={AsymDepositView}
+              WidthdrawContent={WithdrawDepositView}
+              AsymWidthdrawContent={AsymWithdrawView}
+            />
           )
         )
       )}
