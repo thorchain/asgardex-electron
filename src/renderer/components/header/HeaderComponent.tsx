@@ -17,6 +17,7 @@ import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
 import { useThemeContext } from '../../contexts/ThemeContext'
+import * as historyRoutes from '../../routes/history'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { PoolsStateRD, SelectedPricePoolAsset } from '../../services/midgard/types'
@@ -34,6 +35,7 @@ import { HeaderTheme } from './theme'
 enum TabKey {
   POOLS = 'pools',
   WALLET = 'wallet',
+  HISTORY = 'history',
   UNKNOWN = 'unknown'
 }
 
@@ -117,33 +119,42 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const matchPoolsRoute = useRouteMatch(poolsRoutes.base.path())
   const matchWalletRoute = useRouteMatch(walletRoutes.base.path())
+  const matchHistoryRoute = useRouteMatch(historyRoutes.base.path())
 
   const activeKey: TabKey = useMemo(() => {
     if (matchPoolsRoute) {
       return TabKey.POOLS
     } else if (matchWalletRoute) {
       return TabKey.WALLET
+    } else if (matchHistoryRoute) {
+      return TabKey.HISTORY
     } else {
       return TabKey.UNKNOWN
     }
   }, [matchPoolsRoute, matchWalletRoute])
 
-  const items = useMemo(
-    () =>
-      [
-        {
-          key: TabKey.POOLS,
-          label: intl.formatMessage({ id: 'common.pools' }),
-          path: poolsRoutes.base.path(),
-          icon: SwapIcon
-        },
-        {
-          key: TabKey.WALLET,
-          label: intl.formatMessage({ id: 'common.wallet' }),
-          path: walletRoutes.base.path(),
-          icon: WalletIcon
-        }
-      ] as Tab[],
+  const items: Tab[] = useMemo(
+    () => [
+      {
+        key: TabKey.POOLS,
+        label: intl.formatMessage({ id: 'common.pools' }),
+        path: poolsRoutes.base.path(),
+        icon: SwapIcon
+      },
+      {
+        key: TabKey.WALLET,
+        label: intl.formatMessage({ id: 'common.wallet' }),
+        path: walletRoutes.base.path(),
+        icon: WalletIcon
+      },
+      {
+        key: TabKey.HISTORY,
+        // label: intl.formatMessage({ id: 'common.wallet' }),
+        label: 'history',
+        path: historyRoutes.base.path(),
+        icon: WalletIcon
+      }
+    ],
     [intl]
   )
 

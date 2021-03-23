@@ -166,14 +166,14 @@ export type Tx = {
   // Sender address
   address: string
   values: AssetWithAmount[]
-  memo: string
+  memo?: string
   /**
    * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
    */
   txID: string
 }
 
-export type TxType = 'DEPOSIT' | 'SWAP' | 'DOUBLE_SWAP' | 'WITHDRAW' | 'UPGRADE'
+export type TxType = 'DEPOSIT' | 'SWAP' | 'DOUBLE_SWAP' | 'WITHDRAW' | 'UPGRADE' | 'UNKNOWN' | 'REFUND'
 
 export type HistoryAction = {
   date: Date

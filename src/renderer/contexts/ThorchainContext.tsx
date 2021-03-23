@@ -16,7 +16,8 @@ import {
   interact$,
   getNodeInfo$,
   reloadNodesInfo,
-  explorerUrl$
+  explorerUrl$,
+  getExplorerTxUrl$
 } from '../services/thorchain'
 
 export type ThorchainContextValue = {
@@ -35,6 +36,7 @@ export type ThorchainContextValue = {
   interact$: typeof interact$
   getNodeInfo$: typeof getNodeInfo$
   explorerUrl$: typeof explorerUrl$
+  getExplorerTxUrl$: typeof getExplorerTxUrl$
   reloadNodesInfo: typeof reloadNodesInfo
 }
 
@@ -54,7 +56,8 @@ const initialContext: ThorchainContextValue = {
   interact$,
   getNodeInfo$,
   explorerUrl$,
-  reloadNodesInfo
+  reloadNodesInfo,
+  getExplorerTxUrl$
 }
 
 const ThorchainContext = createContext<ThorchainContextValue | null>(null)

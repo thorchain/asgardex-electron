@@ -18,7 +18,7 @@ export const TxDetail: React.FC<ActionProps> = ({ className, outgos, incomes, fe
       FP.pipe(
         incomes,
         A.map(({ asset, amount }) => (
-          <Styled.InOutValue key={assetToString(asset)}>
+          <Styled.InOutValue key={assetToString(asset) + amount.amount().toString()}>
             {formatAssetAmountCurrency({ trimZeros: true, amount: baseToAsset(amount), asset })}
           </Styled.InOutValue>
         ))
@@ -31,7 +31,7 @@ export const TxDetail: React.FC<ActionProps> = ({ className, outgos, incomes, fe
       FP.pipe(
         outgos,
         A.map(({ asset, amount }) => (
-          <Styled.InOutValue key={assetToString(asset)}>
+          <Styled.InOutValue key={assetToString(asset) + amount.amount().toString()}>
             {formatAssetAmountCurrency({ trimZeros: true, amount: baseToAsset(amount), asset })}
           </Styled.InOutValue>
         ))
