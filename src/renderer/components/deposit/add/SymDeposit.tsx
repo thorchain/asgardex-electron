@@ -50,6 +50,7 @@ import {
 import { ApproveParams, IsApprovedRD } from '../../../services/ethereum/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler } from '../../../services/wallet/types'
+import { AssetWithDecimal } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
@@ -61,7 +62,7 @@ import * as Helper from './Deposit.helper'
 import * as Styled from './Deposit.style'
 
 export type Props = {
-  asset: Asset
+  asset: AssetWithDecimal
   assetPrice: BigNumber
   runePrice: BigNumber
   assetBalance: O.Option<BaseAmount>
@@ -90,7 +91,9 @@ type SelectedInput = 'asset' | 'rune' | 'none'
 
 export const SymDeposit: React.FC<Props> = (props) => {
   const {
-    asset,
+    // TODO (@Veado) Use `assetDecimal` instead of getting decimal from balances
+    // see https://github.com/thorchain/asgardex-electron/issues/1162
+    asset: { asset, decimal: _assetDecimal },
     assetPrice,
     runePrice,
     memos: oMemos,

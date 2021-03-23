@@ -126,7 +126,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     (e: Error) => (
       <ErrorView
         title={intl.formatMessage({ id: 'common.error' })}
-        subTitle={e.message}
+        subTitle={e?.message ?? e.toString()}
         extra={<Button onClick={reloadPools}>{intl.formatMessage({ id: 'common.retry' })}</Button>}
       />
     ),

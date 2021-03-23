@@ -1,10 +1,14 @@
+import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
+import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
 import { DECIMAL as COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
+import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
+import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import { getDecimal as getDecimalDot } from '@xchainjs/xchain-polkadot'
 import { DECIMAL as THOR_DECIMAL } from '@xchainjs/xchain-thorchain'
 import { BaseAmount, baseAmount, Chain } from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../shared/api/types'
-import { BNB_DECIMAL, BTC_DECIMAL, BCH_DECIMAL, ETH_DECIMAL, LTC_DECIMAL } from '../../../helpers/assetHelper'
+import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 
 /**
  * Helper to get minimal amount to send depending on chain

@@ -14,7 +14,7 @@ import {
   eqAssetsWithAmount,
   eqAssetWithAmount,
   eqApiError,
-  egBigNumber,
+  eqBigNumber,
   eqOAsset,
   eqChain,
   eqOChain,
@@ -25,12 +25,12 @@ import {
 } from './eq'
 
 describe('helpers/fp/eq', () => {
-  describe('egBigNumber', () => {
+  describe('eqBigNumber', () => {
     it('is equal', () => {
-      expect(egBigNumber.equals(bn(1.01), bn(1.01))).toBeTruthy()
+      expect(eqBigNumber.equals(bn(1.01), bn(1.01))).toBeTruthy()
     })
     it('is not equal', () => {
-      expect(egBigNumber.equals(bn(1), bn(1.01))).toBeFalsy()
+      expect(eqBigNumber.equals(bn(1), bn(1.01))).toBeFalsy()
     })
   })
 
@@ -253,7 +253,7 @@ describe('helpers/fp/eq', () => {
     it('is equal', () => {
       const a: PoolShare = {
         type: 'asym',
-        units: baseAmount(1),
+        units: bn(1),
         asset: AssetRuneNative,
         assetAddedAmount: baseAmount(1)
       }
@@ -262,14 +262,14 @@ describe('helpers/fp/eq', () => {
     it('is not equal', () => {
       const a: PoolShare = {
         type: 'asym',
-        units: baseAmount(1),
+        units: bn(1),
         asset: AssetRuneNative,
         assetAddedAmount: baseAmount(1)
       }
       // b = same as a, but another units
       const b: PoolShare = {
         ...a,
-        units: baseAmount(2)
+        units: bn(2)
       }
       // c = same as a, but another asset
       const c: PoolShare = {
@@ -284,19 +284,19 @@ describe('helpers/fp/eq', () => {
   describe('eqPoolShares', () => {
     const a: PoolShare = {
       type: 'asym',
-      units: baseAmount(1),
+      units: bn(1),
       asset: AssetRuneNative,
       assetAddedAmount: baseAmount(1)
     }
     const b: PoolShare = {
       type: 'sym',
-      units: baseAmount(1),
+      units: bn(1),
       asset: AssetBNB,
       assetAddedAmount: baseAmount(0.5)
     }
     const c: PoolShare = {
       type: 'all',
-      units: baseAmount(1),
+      units: bn(1),
       asset: AssetBTC,
       assetAddedAmount: baseAmount(1)
     }

@@ -271,25 +271,25 @@ describe('services/midgard/utils/', () => {
     const ethShares: PoolShare = {
       asset: AssetETH,
       assetAddedAmount: ONE_RUNE_BASE_AMOUNT,
-      units: ONE_RUNE_BASE_AMOUNT,
+      units: bn('100000000'),
       type: 'sym'
     }
     const bnbShares1: PoolShare = {
       asset: AssetBNB,
       assetAddedAmount: TWO_RUNE_BASE_AMOUNT,
-      units: TWO_RUNE_BASE_AMOUNT,
+      units: bn('200000000'),
       type: 'sym'
     }
     const bnbShares2: PoolShare = {
       asset: AssetBNB,
       assetAddedAmount: THREE_RUNE_BASE_AMOUNT,
-      units: THREE_RUNE_BASE_AMOUNT,
+      units: bn('300000000'),
       type: 'asym'
     }
     const btcShares: PoolShare = {
       asset: AssetBTC,
       assetAddedAmount: FOUR_RUNE_BASE_AMOUNT,
-      units: FOUR_RUNE_BASE_AMOUNT,
+      units: bn('400000000'),
       type: 'asym'
     }
     const shares: PoolShares = [ethShares, bnbShares1, bnbShares2, btcShares]
@@ -313,7 +313,7 @@ describe('services/midgard/utils/', () => {
               eqPoolShare.equals(share, {
                 asset: AssetBNB,
                 assetAddedAmount: assetToBase(assetAmount(5)),
-                units: assetToBase(assetAmount(5)),
+                units: bn('500000000'),
                 type: 'all'
               })
             ),
@@ -325,7 +325,7 @@ describe('services/midgard/utils/', () => {
         const result = combineSharesByAsset(shares, AssetETH)
         expect(FP.pipe(result, O.toNullable)).toEqual({
           asset: AssetETH,
-          units: ONE_RUNE_BASE_AMOUNT,
+          units: bn('100000000'),
           assetAddedAmount: ONE_RUNE_BASE_AMOUNT,
           type: 'all'
         })
@@ -341,19 +341,19 @@ describe('services/midgard/utils/', () => {
           {
             asset: AssetETH,
             assetAddedAmount: ONE_RUNE_BASE_AMOUNT,
-            units: ONE_RUNE_BASE_AMOUNT,
+            units: bn('100000000'),
             type: 'all'
           },
           {
             asset: AssetBNB,
             assetAddedAmount: assetToBase(assetAmount(5)),
-            units: assetToBase(assetAmount(5)),
+            units: bn('500000000'),
             type: 'all'
           },
           {
             asset: AssetBTC,
             assetAddedAmount: FOUR_RUNE_BASE_AMOUNT,
-            units: FOUR_RUNE_BASE_AMOUNT,
+            units: bn('400000000'),
             type: 'all'
           }
         ]
