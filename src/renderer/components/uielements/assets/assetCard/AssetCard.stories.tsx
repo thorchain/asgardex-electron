@@ -1,43 +1,62 @@
-import React, { useCallback, useState } from 'react'
+import React from 'react'
 
-import { storiesOf } from '@storybook/react'
-import { bn, BaseAmount, AssetBNB, AssetBTC, assetAmount, assetToBase, AssetRuneNative } from '@xchainjs/xchain-util'
+import { Meta, Story } from '@storybook/react'
+import { bn, AssetBNB, assetAmount, assetToBase, baseAmount, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
-import { AssetCard } from './AssetCard'
+import { WalletBalance } from '../../../../types/wallet'
+import { AssetCard, Props as AssetCardProps } from './AssetCard'
 
-storiesOf('Components/Assets/AssetCard', module).add('default', () => {
-  const [selectedAmount, setSelectedAmount] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
-  const [percent, setPercent] = useState(0)
+const balanceBNB: WalletBalance = {
+  amount: baseAmount('1'),
+  asset: AssetBNB,
+  walletAddress: ''
+}
 
-  const onChangeAssetAmount = useCallback((value) => setSelectedAmount(value), [])
-  const inputOnBlurHandler = () => console.log('onBlur')
-  const inputOnFocusHandler = () => console.log('onFocus')
+const balanceBTC: WalletBalance = {
+  ...balanceBNB,
+  asset: AssetBTC
+}
 
-  const onChangePercent = useCallback((percent) => {
-    console.log('percent', percent)
-    setPercent(percent)
-  }, [])
+const balanceRuneNative: WalletBalance = {
+  ...balanceBNB,
+  asset: AssetRuneNative
+}
 
-  return (
-    <div style={{ display: 'flex', padding: '20px' }}>
-      <AssetCard
-        title="Title here"
-        asset={AssetBNB}
-        assets={[AssetBNB, AssetBTC, AssetRuneNative]}
-        selectedAmount={selectedAmount}
-        onChangeAssetAmount={onChangeAssetAmount}
-        inputOnFocusHandler={inputOnFocusHandler}
-        inputOnBlurHandler={inputOnBlurHandler}
-        onChangePercent={onChangePercent}
-        price={bn(600)}
-        priceIndex={{
-          RUNE: bn(1)
-        }}
-        percentValue={percent}
-        maxAmount={assetToBase(assetAmount(10))}
-        network="testnet"
-      />
-    </div>
-  )
-})
+const balances = [balanceBNB, balanceBTC, balanceRuneNative]
+
+const defaultProps: AssetCardProps = {
+  title: 'Title here',
+  asset: AssetBNB,
+  balances,
+  selectedAmount: ZERO_BASE_AMOUNT,
+  onChangeAssetAmount: (value) => console.log('assetAmount', value),
+  inputOnFocusHandler: () => console.log('onFocus'),
+  inputOnBlurHandler: () => console.log('onBlur'),
+  onChangePercent: (percent) => console.log('percent', percent),
+  price: bn(600),
+  priceIndex: {
+    RUNE: bn(1)
+  },
+  percentValue: 55,
+  maxAmount: assetToBase(assetAmount(10)),
+  network: 'testnet'
+}
+
+export const Default: Story = () => <AssetCard {...defaultProps} />
+
+Default.storyName = 'default'
+
+const meta: Meta = {
+  component: AssetCard,
+  title: 'Components/Assets/AssetCard',
+  decorators: [
+    (S: Story) => (
+      <div style={{ display: 'flex', padding: '20px' }}>
+        <S />
+      </div>
+    )
+  ]
+}
+
+export default meta

@@ -21,7 +21,24 @@ import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { INITIAL_ASYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { AsymDepositState } from '../../../services/chain/types'
+import { WalletBalance } from '../../../types/wallet'
 import { AsymDeposit, Props as AsymDepositProps } from './AsymDeposit'
+
+const balanceBNB: WalletBalance = {
+  amount: baseAmount('1'),
+  asset: AssetBNB,
+  walletAddress: ''
+}
+
+const balanceBTC: WalletBalance = {
+  ...balanceBNB,
+  asset: AssetBTC
+}
+
+const balanceTOMO: WalletBalance = {
+  ...balanceBNB,
+  asset: ASSETS_MAINNET.TOMO
+}
 
 const defaultProps: AsymDepositProps = {
   asset: AssetBNB,
@@ -42,7 +59,7 @@ const defaultProps: AsymDepositProps = {
     runeBalance: baseAmount('2000')
   },
   priceAsset: AssetRuneNative,
-  assets: [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO],
+  balances: [balanceBNB, balanceBTC, balanceTOMO],
   poolAddress: O.none,
   memo: O.some('asym-memo'),
   reloadBalances: () => console.log('reloadBalances'),
