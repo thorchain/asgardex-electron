@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
-import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
+import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
@@ -11,6 +11,7 @@ import { useIntl } from 'react-intl'
 
 import { PoolShare as PoolShareUI } from '../../../components/uielements/poolShare'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
+import { to1e8BaseAmount } from '../../../helpers/assetHelper'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import * as ShareHelpers from '../../../helpers/poolShareHelper'
 import { PoolDetailRD, PoolDetail, PoolShareRD, PoolShare } from '../../../services/midgard/types'
@@ -39,8 +40,8 @@ export const ShareView: React.FC<Props> = ({ asset: assetWD, poolShare: poolShar
 
   const renderPoolShareReady = useCallback(
     ({ units }: PoolShare, poolDetail: PoolDetail) => {
-      const runeShare = ShareHelpers.getRuneShare(units, poolDetail)
-      const assetShare = ShareHelpers.getAssetShare({
+      const runeShare: BaseAmount = ShareHelpers.getRuneShare(units, poolDetail)
+      const assetShare: BaseAmount = ShareHelpers.getAssetShare({
         liquidityUnits: units,
         detail: poolDetail,
         assetDecimal: assetWD.decimal
@@ -49,26 +50,30 @@ export const ShareView: React.FC<Props> = ({ asset: assetWD, poolShare: poolShar
 
       const poolData = toPoolData(poolDetail)
 
-      const assetDepositPrice = getValueOfAsset1InAsset2(assetShare, poolData, pricePoolData)
-      const runeDepositPrice = getValueOfRuneInAsset(runeShare, pricePoolData)
+      const assetPrice: BaseAmount = getValueOfAsset1InAsset2(
+        // Note: `assetShare` needs to be converted to 1e8,
+        // since it based on asset decimal, which might be different
+        to1e8BaseAmount(assetShare),
+        poolData,
+        pricePoolData
+      )
+      const runePrice: BaseAmount = getValueOfRuneInAsset(runeShare, pricePoolData)
 
       return (
         <PoolShareUI
-          sourceAsset={AssetRuneNative}
-          targetAsset={assetWD.asset}
+          asset={assetWD}
           poolShare={poolShare}
           depositUnits={units}
-          assetDepositShare={assetShare}
+          shares={{ rune: runeShare, asset: assetShare }}
           priceAsset={FP.pipe(oPriceAsset, O.toUndefined)}
           loading={false}
-          assetDepositPrice={assetDepositPrice}
-          runeDepositPrice={runeDepositPrice}
-          runeDepositShare={runeShare}
+          assetPrice={assetPrice}
+          runePrice={runePrice}
           smallWidth={smallWidth}
         />
       )
     },
-    [assetWD.asset, assetWD.decimal, oPriceAsset, pricePoolData, smallWidth]
+    [assetWD, oPriceAsset, pricePoolData, smallWidth]
   )
 
   const renderNoShare = useMemo(
