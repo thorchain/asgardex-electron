@@ -13,7 +13,7 @@ import { WalletBalance } from '../../types/wallet'
 
 export const eqOString = O.getEq(Eq.eqString)
 
-export const egBigNumber: Eq.Eq<BigNumber> = {
+export const eqBigNumber: Eq.Eq<BigNumber> = {
   equals: (x, y) => x.isEqualTo(y)
 }
 
@@ -31,7 +31,7 @@ export const eqChain: Eq.Eq<Chain> = {
 export const eqOChain = O.getEq(eqChain)
 
 export const eqBaseAmount: Eq.Eq<BaseAmount> = {
-  equals: (x, y) => egBigNumber.equals(x.amount(), y.amount()) && x.decimal === y.decimal
+  equals: (x, y) => eqBigNumber.equals(x.amount(), y.amount()) && x.decimal === y.decimal
 }
 
 export const eqOptionBaseAmount = O.getEq(eqBaseAmount)
@@ -77,7 +77,7 @@ export const eqWalletBalances = A.getEq(eqWalletBalance)
 export const eqPoolShare = Eq.getStructEq<PoolShare>({
   asset: eqAsset,
   assetAddedAmount: eqBaseAmount,
-  units: eqBaseAmount,
+  units: eqBigNumber,
   type: Eq.eqString
 })
 

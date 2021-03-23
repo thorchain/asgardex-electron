@@ -19,6 +19,7 @@ import * as RxOp from 'rxjs/operators'
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { ZERO_BASE_AMOUNT } from '../../../const'
+import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { SymDepositState } from '../../../services/chain/types'
 import { WalletBalance } from '../../../types/wallet'
@@ -41,7 +42,7 @@ const balanceTOMO: WalletBalance = {
 }
 
 const defaultProps: SymDepositProps = {
-  asset: AssetBNB,
+  asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   assetPrice: bn(2),
   runePrice: bn(1),
   assetBalance: O.some(assetToBase(assetAmount(200))),

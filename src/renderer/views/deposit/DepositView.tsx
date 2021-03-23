@@ -2,21 +2,27 @@ import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { assetFromString } from '@xchainjs/xchain-util'
+import { Spin } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { Deposit } from '../../components/deposit/Deposit'
 import { ErrorView } from '../../components/shared/error'
 import { RefreshButton } from '../../components/uielements/button'
+import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { DepositRouteParams } from '../../routes/deposit'
+import { AssetWithDecimalRD } from '../../services/chain/types'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
@@ -27,17 +33,24 @@ import { WithdrawDepositView } from './withdraw/WithdrawDepositView'
 
 type Props = {}
 
-export const DepositView: React.FC<Props> = (_) => {
+export const DepositView: React.FC<Props> = () => {
   const intl = useIntl()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const { asset } = useParams<DepositRouteParams>()
   const {
     service: {
       setSelectedPoolAsset,
+      selectedPoolAsset$,
       shares: { shares$, reloadShares }
     }
   } = useMidgardContext()
+
   const { keystoreService } = useWalletContext()
+
+  const { addressByChain$, assetWithDecimal$ } = useChainContext()
 
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
 
@@ -45,9 +58,27 @@ export const DepositView: React.FC<Props> = (_) => {
   // Needed to get all data for this pool (pool details etc.)
   useEffect(() => {
     setSelectedPoolAsset(oSelectedAsset)
+    // Reset selectedPoolAsset on view's unmount to avoid effects with depending streams
+    return () => {
+      setSelectedPoolAsset(O.none)
+    }
   }, [oSelectedAsset, setSelectedPoolAsset])
 
-  const { addressByChain$ } = useChainContext()
+  const [assetRD] = useObservableState<AssetWithDecimalRD>(
+    () =>
+      selectedPoolAsset$.pipe(
+        RxOp.switchMap((oAsset) =>
+          FP.pipe(
+            oAsset,
+            O.fold(
+              () => Rx.of(RD.initial),
+              (asset) => assetWithDecimal$(asset, network)
+            )
+          )
+        )
+      ),
+    RD.initial
+  )
 
   const address$ = useMemo(
     () =>
@@ -103,21 +134,19 @@ export const DepositView: React.FC<Props> = (_) => {
         <RefreshButton disabled={refreshButtonDisabled} clickHandler={reloadShares} />
       </Styled.TopControlsContainer>
       {FP.pipe(
-        oSelectedAsset,
-        O.fold(
-          () => (
+        assetRD,
+        RD.fold(
+          () => <></>,
+          () => <Spin size="large" />,
+          (error) => (
             <ErrorView
-              title={intl.formatMessage(
-                { id: 'routes.invalid.asset' },
-                {
-                  asset
-                }
-              )}
+              title={intl.formatMessage({ id: 'common.error' })}
+              subTitle={error?.message ?? error.toString()}
             />
           ),
-          (selectedAsset) => (
+          (asset) => (
             <Deposit
-              asset={selectedAsset}
+              asset={asset}
               shares={poolSharesRD}
               keystoreState={keystoreState}
               ShareContent={ShareView}

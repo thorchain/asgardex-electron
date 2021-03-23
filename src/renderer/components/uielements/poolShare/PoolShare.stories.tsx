@@ -1,23 +1,21 @@
 import React from 'react'
 
 import { storiesOf } from '@storybook/react'
-import { bn, assetToBase, assetAmount, AssetBNB, baseAmount, AssetRuneNative } from '@xchainjs/xchain-util'
+import { bn, assetToBase, assetAmount, AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
 
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { ZERO_BN, ZERO_BASE_AMOUNT } from '../../../const'
+import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 import { PoolShare } from './PoolShare'
 
 export const DefaultPoolShare = () => (
   <PoolShare
-    sourceAsset={AssetRuneNative}
-    targetAsset={AssetBNB}
-    assetDepositPrice={assetToBase(assetAmount(120.1))}
-    assetDepositShare={assetToBase(assetAmount(500))}
+    asset={{ asset: AssetBNB, decimal: BNB_DECIMAL }}
+    assetPrice={assetToBase(assetAmount(120.1))}
+    shares={{ rune: assetToBase(assetAmount(500)), asset: assetToBase(assetAmount(500)) }}
     priceAsset={AssetRuneNative}
-    loading={false}
-    runeDepositPrice={assetToBase(assetAmount(400))}
-    runeDepositShare={assetToBase(assetAmount(500))}
+    runePrice={assetToBase(assetAmount(400))}
     poolShare={bn(100)}
-    depositUnits={assetToBase(assetAmount(2.01))}
+    depositUnits={bn(20100000)}
   />
 )
 
@@ -29,21 +27,17 @@ storiesOf('Components/PoolShare', module)
       </div>
     )
   })
-  .add('loading', () => {
-    return (
-      <div style={{ padding: '20px' }}>
-        <PoolShare
-          sourceAsset={AssetRuneNative}
-          targetAsset={AssetBNB}
-          assetDepositPrice={baseAmount(0)}
-          assetDepositShare={baseAmount(0)}
-          priceAsset={AssetRuneNative}
-          loading={true}
-          runeDepositPrice={baseAmount(0)}
-          runeDepositShare={baseAmount(0)}
-          poolShare={ZERO_BN}
-          depositUnits={ZERO_BASE_AMOUNT}
-        />
-      </div>
-    )
-  })
+  .add('loading', () => (
+    <div style={{ padding: '20px' }}>
+      <PoolShare
+        asset={{ asset: AssetBNB, decimal: BNB_DECIMAL }}
+        assetPrice={ZERO_BASE_AMOUNT}
+        shares={{ rune: ZERO_BASE_AMOUNT, asset: ZERO_BASE_AMOUNT }}
+        priceAsset={AssetRuneNative}
+        loading={true}
+        runePrice={ZERO_BASE_AMOUNT}
+        poolShare={ZERO_BN}
+        depositUnits={ZERO_BN}
+      />
+    </div>
+  ))

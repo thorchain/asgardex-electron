@@ -4,7 +4,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { PoolShareTableData } from '../../components/PoolShares/PoolShares.types'
-import * as shareHelpers from '../../helpers/poolShareHelper'
+import * as ShareHelpers from '../../helpers/poolShareHelper'
 import { PoolDetails, PoolShares } from '../../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../../services/midgard/utils'
 
@@ -19,9 +19,15 @@ export const getPoolShareTableData = (
       FP.pipe(
         getPoolDetail(poolDetails, asset),
         O.map((poolDetail) => {
-          const runeShare = shareHelpers.getRuneShare(units, poolDetail)
-          const assetShare = shareHelpers.getAssetShare(units, poolDetail)
-          const sharePercent = shareHelpers.getPoolShare(units, poolDetail)
+          const runeShare = ShareHelpers.getRuneShare(units, poolDetail)
+          // FIXME: (@Veado) Fix decimal
+          // https://github.com/thorchain/asgardex-electron/issues/1163
+          const assetShare = ShareHelpers.getAssetShare({
+            liquidityUnits: units,
+            detail: poolDetail,
+            assetDecimal: 8 /* FIXME: see previous comment ^ */
+          })
+          const sharePercent = ShareHelpers.getPoolShare(units, poolDetail)
           const poolData = toPoolData(poolDetail)
           const assetDepositPrice = getValueOfAsset1InAsset2(assetShare, poolData, pricePoolData)
           const runeDepositPrice = getValueOfRuneInAsset(runeShare, pricePoolData)

@@ -140,11 +140,13 @@ export type PoolsService = {
 
 export type PoolShareType = DepositType | 'all'
 
+/**
+ * Shares of a pool
+ *
+ * Note: `BaseAmount`s of `PoolShare` are always `1e8`
+ **/
 export type PoolShare = {
-  /**
-   * Share units, which are RUNE based, provided as `BaseAmount`
-   **/
-  units: BaseAmount
+  units: BigNumber
   asset: Asset
   assetAddedAmount: BaseAmount
   type: PoolShareType

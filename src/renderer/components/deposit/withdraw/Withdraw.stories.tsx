@@ -8,12 +8,13 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
+import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
 import { Memo, WithdrawState$ } from '../../../services/chain/types'
 import { Withdraw, Props as WitdrawProps } from './Withdraw'
 
 const defaultProps: WitdrawProps = {
-  asset: AssetBNB,
+  asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   runePrice: bn(1),
   assetPrice: bn(60.972),
   runeBalance: O.some(assetToBase(assetAmount(100))),

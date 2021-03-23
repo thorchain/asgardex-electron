@@ -3,10 +3,10 @@ import BigNumber from 'bignumber.js'
 import * as Ord from 'fp-ts/lib/Ord'
 
 import { WalletBalance } from '../../types/wallet'
-import { eqBaseAmount, egBigNumber, eqAsset } from './eq'
+import { eqBaseAmount, eqBigNumber, eqAsset } from './eq'
 
 export const ordBigNumber: Ord.Ord<BigNumber> = {
-  equals: egBigNumber.equals,
+  equals: eqBigNumber.equals,
   compare: (x, y) => (x.isLessThan(y) ? -1 : x.isGreaterThan(y) ? 1 : 0)
 }
 

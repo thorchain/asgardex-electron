@@ -7,39 +7,40 @@ import {
   baseToAsset,
   formatAssetAmountCurrency,
   baseAmount,
-  formatBaseAsAssetAmount
+  AssetRuneNative
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
+import { AssetWithDecimal } from '../../../types/asgardex'
 import * as Styled from './PoolShare.style'
 import { PoolShareCard } from './PoolShareCard'
 
 type Props = {
-  sourceAsset: Asset
-  targetAsset: Asset
-  runeDepositShare: BaseAmount
-  runeDepositPrice: BaseAmount
-  loading?: boolean
+  asset: AssetWithDecimal
+  runePrice: BaseAmount
   priceAsset?: Asset
-  assetDepositShare: BaseAmount
-  assetDepositPrice: BaseAmount
+  /**
+   * Shares of Rune and selected Asset.
+   * Note: Decimal needs to be based on **original asset decimals**
+   **/
+  shares: { rune: BaseAmount; asset: BaseAmount }
+  assetPrice: BaseAmount
   poolShare: BigNumber
-  depositUnits: BaseAmount
+  depositUnits: BigNumber
   smallWidth?: boolean
+  loading?: boolean
 }
 
 export const PoolShare: React.FC<Props> = (props): JSX.Element => {
   const {
-    sourceAsset,
-    runeDepositShare,
-    runeDepositPrice,
+    asset: assetWD,
+    runePrice,
     loading,
     priceAsset,
-    targetAsset,
-    assetDepositShare,
-    assetDepositPrice,
+    shares: { rune: runeShare, asset: assetShare },
+    assetPrice,
     poolShare,
     depositUnits,
     smallWidth
@@ -47,9 +48,11 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
-  const totalDepositPrice = useMemo(() => baseAmount(runeDepositPrice.amount().plus(assetDepositPrice.amount())), [
-    assetDepositPrice,
-    runeDepositPrice
+  const { asset } = assetWD
+
+  const totalDepositPrice = useMemo(() => baseAmount(runePrice.amount().plus(assetPrice.amount())), [
+    assetPrice,
+    runePrice
   ])
 
   const ref: RefObject<HTMLDivElement> = useRef(null)
@@ -74,28 +77,20 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
         <Styled.RedemptionHeader>
           <Styled.CardRow>
             <Col span={12}>
-              <Styled.RedemptionAsset asset={sourceAsset} />
+              <Styled.RedemptionAsset asset={AssetRuneNative} />
             </Col>
             <Col span={12}>
-              <Styled.RedemptionAsset asset={targetAsset} />
+              <Styled.RedemptionAsset asset={asset} />
             </Col>
           </Styled.CardRow>
         </Styled.RedemptionHeader>
         <Styled.CardRow>
-          {renderRedemptionCol(runeDepositShare, runeDepositPrice, sourceAsset)}
-          {renderRedemptionCol(assetDepositShare, assetDepositPrice, targetAsset)}
+          {renderRedemptionCol(runeShare, runePrice, AssetRuneNative)}
+          {renderRedemptionCol(assetShare, assetPrice, asset)}
         </Styled.CardRow>
       </>
     ),
-    [
-      assetDepositPrice,
-      assetDepositShare,
-      renderRedemptionCol,
-      runeDepositPrice,
-      runeDepositShare,
-      sourceAsset,
-      targetAsset
-    ]
+    [asset, renderRedemptionCol, runeShare, runePrice, assetShare, assetPrice]
   )
 
   const renderRedemptionSmall = useMemo(
@@ -104,30 +99,22 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
         <Styled.RedemptionHeader>
           <Styled.CardRow>
             <Col span={24}>
-              <Styled.RedemptionAsset asset={sourceAsset} />
+              <Styled.RedemptionAsset asset={AssetRuneNative} />
             </Col>
           </Styled.CardRow>
         </Styled.RedemptionHeader>
-        <Styled.CardRow>{renderRedemptionCol(runeDepositShare, runeDepositPrice, sourceAsset)}</Styled.CardRow>
+        <Styled.CardRow>{renderRedemptionCol(runeShare, runePrice, AssetRuneNative)}</Styled.CardRow>
         <Styled.RedemptionHeader>
           <Styled.CardRow>
             <Col span={24}>
-              <Styled.RedemptionAsset asset={targetAsset} />
+              <Styled.RedemptionAsset asset={asset} />
             </Col>
           </Styled.CardRow>
         </Styled.RedemptionHeader>
-        <Styled.CardRow>{renderRedemptionCol(assetDepositShare, assetDepositPrice, targetAsset)}</Styled.CardRow>
+        <Styled.CardRow>{renderRedemptionCol(assetShare, assetPrice, asset)}</Styled.CardRow>
       </>
     ),
-    [
-      assetDepositPrice,
-      assetDepositShare,
-      renderRedemptionCol,
-      runeDepositPrice,
-      runeDepositShare,
-      sourceAsset,
-      targetAsset
-    ]
+    [renderRedemptionCol, runeShare, runePrice, asset, assetShare, assetPrice]
   )
   const renderRedemption = useMemo(() => (smallWidth ? renderRedemptionSmall : renderRedemptionLarge), [
     renderRedemptionLarge,
@@ -143,16 +130,13 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
             <Styled.LabelSecondary textTransform="uppercase">
               {intl.formatMessage({ id: 'deposit.share.units' })}
             </Styled.LabelSecondary>
-            <Styled.LabelPrimary loading={loading}>{`${formatBaseAsAssetAmount({
-              amount: depositUnits,
-              decimal: 2
-            })}`}</Styled.LabelPrimary>
+            <Styled.LabelPrimary loading={loading}>{`${formatBN(depositUnits, 0)}`}</Styled.LabelPrimary>
           </Col>
           <Col span={smallWidth ? 24 : 12}>
             <Styled.LabelSecondary textTransform="uppercase">
               {intl.formatMessage({ id: 'deposit.share.poolshare' })}
             </Styled.LabelSecondary>
-            <Styled.LabelPrimary loading={loading}>{`${formatBN(poolShare)}%`}</Styled.LabelPrimary>
+            <Styled.LabelPrimary loading={loading}>{`${formatBN(poolShare, 2)}%`}</Styled.LabelPrimary>
           </Col>
         </Styled.CardRow>
       </PoolShareCard>
