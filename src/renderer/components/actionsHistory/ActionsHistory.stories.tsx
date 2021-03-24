@@ -74,7 +74,7 @@ const actions: HistoryActions = [
         txID: 'out id'
       }
     ],
-    type: 'DOUBLE_SWAP'
+    type: 'SWAP'
   },
   {
     date: new Date(Date.now() + 2),

@@ -17,7 +17,7 @@ type Props = {
   disabled?: boolean
 }
 
-const FILTER_ITEMS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'DOUBLE_SWAP', 'WITHDRAW']
+const FILTER_ITEMS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
 export const ActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFilterChanged, className, disabled }) => {
   const intl = useIntl()

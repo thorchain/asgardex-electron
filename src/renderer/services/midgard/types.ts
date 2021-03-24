@@ -173,7 +173,15 @@ export type Tx = {
   txID: string
 }
 
-export type TxType = 'DEPOSIT' | 'SWAP' | 'DOUBLE_SWAP' | 'WITHDRAW' | 'UPGRADE' | 'UNKNOWN' | 'REFUND'
+export type TxType =
+  | 'DEPOSIT'
+  | 'SWAP'
+  | 'WITHDRAW'
+  | 'DONATE'
+  | 'REFUND'
+  // in case asgardex does not know about any other action type we will display
+  // 'unknown' tx type to avoid filtering out any tx
+  | 'UNKNOWN'
 
 export type HistoryAction = {
   date: Date

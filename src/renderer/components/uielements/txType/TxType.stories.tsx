@@ -3,7 +3,7 @@ import { Story } from '@storybook/react'
 import { TxType as MidgardTxType } from '../../../services/midgard/types'
 import { TxType } from './TxType'
 
-const types = ['Swap', 'Deposit', 'Double swap', 'Withdraw'] as const
+const types = ['Swap', 'Deposit', 'Withdraw', 'Donate', 'Refund'] as const
 
 type InputType = typeof types[number]
 
@@ -16,10 +16,13 @@ const mapType = (type: InputType): MidgardTxType => {
       return 'DEPOSIT'
     }
     case types[2]: {
-      return 'DOUBLE_SWAP'
+      return 'WITHDRAW'
     }
     case types[3]: {
-      return 'WITHDRAW'
+      return 'DONATE'
+    }
+    case types[4]: {
+      return 'REFUND'
     }
   }
 }

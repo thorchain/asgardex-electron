@@ -2,6 +2,8 @@ import React, { useMemo } from 'react'
 
 import { useIntl } from 'react-intl'
 
+import { ReactComponent as DonateIcon } from '../../../assets/svg/tx-donate.svg'
+import { ReactComponent as RefundIcon } from '../../../assets/svg/tx-refund.svg'
 import { ReactComponent as DepositIcon } from '../../../assets/svg/tx-stake.svg'
 import { ReactComponent as SwapIcon } from '../../../assets/svg/tx-swap.svg'
 import { ReactComponent as WithdrawIcon } from '../../../assets/svg/tx-withdraw.svg'
@@ -21,8 +23,11 @@ const getIcon = (type: MidgardTxType) => {
     case 'WITHDRAW':
       return <WithdrawIcon />
     case 'SWAP':
-    case 'DOUBLE_SWAP':
       return <SwapIcon />
+    case 'DONATE':
+      return <DonateIcon />
+    case 'REFUND':
+      return <RefundIcon />
     default:
       return <></>
   }
@@ -36,8 +41,10 @@ const getTypeI18nKey = (type: MidgardTxType): CommonMessageKey | undefined => {
       return 'common.tx.type.withdraw'
     case 'SWAP':
       return 'common.tx.type.swap'
-    case 'DOUBLE_SWAP':
-      return 'common.tx.type.doubleSwap'
+    case 'DONATE':
+      return 'common.tx.type.donate'
+    case 'REFUND':
+      return 'common.tx.type.refund'
   }
 }
 export const TxType: React.FC<Props> = ({ type, className }) => {
@@ -47,7 +54,7 @@ export const TxType: React.FC<Props> = ({ type, className }) => {
 
   return (
     <Styled.Container className={className}>
-      {getIcon(type)}
+      <Styled.IconContainer>{getIcon(type)}</Styled.IconContainer>
       <Styled.Label>{typeKey ? intl.formatMessage({ id: typeKey }) : type}</Styled.Label>
     </Styled.Container>
   )

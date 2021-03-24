@@ -12,6 +12,7 @@ import { palette, size } from 'styled-theme'
 
 import { Locale } from '../../../shared/i18n/types'
 import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
+import { ReactComponent as HistoryIcon } from '../../assets/svg/icon-history.svg'
 import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
@@ -131,7 +132,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     } else {
       return TabKey.UNKNOWN
     }
-  }, [matchPoolsRoute, matchWalletRoute])
+  }, [matchPoolsRoute, matchWalletRoute, matchHistoryRoute])
 
   const items: Tab[] = useMemo(
     () => [
@@ -149,10 +150,9 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
       },
       {
         key: TabKey.HISTORY,
-        // label: intl.formatMessage({ id: 'common.wallet' }),
-        label: 'history',
+        label: intl.formatMessage({ id: 'common.history' }),
         path: historyRoutes.base.path(),
-        icon: WalletIcon
+        icon: HistoryIcon
       }
     ],
     [intl]
