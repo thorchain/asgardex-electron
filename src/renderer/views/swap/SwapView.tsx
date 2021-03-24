@@ -24,6 +24,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTRD } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
+import { AssetWithDecimalRD } from '../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import * as Styled from './SwapView.styles'
@@ -44,7 +45,14 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     setSelectedPoolAsset,
     selectedPoolAsset$
   } = midgardService
-  const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, addressByChain$, swap$ } = useChainContext()
+  const {
+    reloadSwapFees,
+    swapFees$,
+    getExplorerUrlByAsset$,
+    addressByChain$,
+    swap$,
+    assetWithDecimal$
+  } = useChainContext()
 
   const {
     balancesState$,
@@ -58,33 +66,37 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const poolsState = useObservableState(poolsState$, RD.initial)
 
-  const oSource = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
-  const oTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
+  const oRouteSource = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
+  const oRouteTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
 
   useEffect(() => {
     // Source asset is the asset of the pool we need to interact with
     // Store it in global state, all depending streams will be updated then
-    setSelectedPoolAsset(oSource)
+    setSelectedPoolAsset(oRouteSource)
 
     // Reset selectedPoolAsset on view's unmount to avoid effects with depending streams
     return () => {
       setSelectedPoolAsset(O.none)
     }
-  }, [oSource, setSelectedPoolAsset])
+  }, [oRouteSource, setSelectedPoolAsset])
 
-  const [selectedPoolAssetRD] = useObservableState(
+  const [selectedPoolAssetRD] = useObservableState<AssetWithDecimalRD>(
     () =>
       selectedPoolAsset$.pipe(
-        RxOp.map((selectedPoolAsset) =>
-          RD.fromOption(selectedPoolAsset, () =>
-            Error(intl.formatMessage({ id: 'swap.errors.asset.missingSourceAsset' }))
+        RxOp.switchMap((oAsset) =>
+          FP.pipe(
+            oAsset,
+            O.fold(
+              () => Rx.of(RD.initial),
+              (asset) => assetWithDecimal$(asset, network)
+            )
           )
         )
       ),
     RD.initial
   )
 
-  const targetAssetRD = RD.fromOption(oTarget, () =>
+  const targetAssetRD = RD.fromOption(oRouteTarget, () =>
     Error(intl.formatMessage({ id: 'swap.errors.asset.missingTargetAsset' }))
   )
 
@@ -95,14 +107,14 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const address$ = useMemo(
     () =>
       FP.pipe(
-        oTarget,
+        oRouteTarget,
         O.fold(
           () => Rx.EMPTY,
           ({ chain }) => addressByChain$(chain)
         )
       ),
 
-    [addressByChain$, oTarget]
+    [addressByChain$, oRouteTarget]
   )
   const targetWalletAddress = useObservableState(address$, O.none)
 

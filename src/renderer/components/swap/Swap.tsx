@@ -68,6 +68,7 @@ import {
   ValidatePasswordHandler
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
+import { AssetWithDecimal } from '../../types/asgardex'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
@@ -83,7 +84,7 @@ export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string
 export type SwapProps = {
   keystore: KeystoreState
   availableAssets: PoolAssetDetails
-  sourceAsset: Asset
+  sourceAsset: AssetWithDecimal
   targetAsset: Asset
   poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
@@ -104,7 +105,7 @@ export type SwapProps = {
 export const Swap = ({
   keystore,
   availableAssets,
-  sourceAsset: sourceAssetProp,
+  sourceAsset: sourceAssetWD,
   targetAsset: targetAssetProp,
   poolAddress: oPoolAddress,
   swap$,
@@ -123,6 +124,7 @@ export const Swap = ({
 }: SwapProps) => {
   const intl = useIntl()
 
+  const { asset: sourceAssetProp, decimal: sourceAssetDecimal } = sourceAssetWD
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
 
@@ -165,6 +167,14 @@ export const Swap = ({
     [oSourceAssetWB]
   )
 
+  /** Decimal of source asset converted to <= 1e8 */
+  const sourceAssetDecimalMax1e8 = useMemo(
+    () => (sourceAssetDecimal > THORCHAIN_DECIMAL ? THORCHAIN_DECIMAL : sourceAssetDecimal),
+    [sourceAssetDecimal]
+  )
+  /** Balance of source asset converted to <= 1e8 */
+  const sourceAssetAmountMax1e8 = useMemo(() => max1e8BaseAmount(sourceAssetAmount), [sourceAssetAmount])
+
   // source chain asset
   const sourceChainAsset = useMemo(() => getChainAsset(sourceAssetProp.chain), [sourceAssetProp])
 
@@ -183,11 +193,7 @@ export const Swap = ({
     INITIAL_SWAP_STATE
   )
 
-  const sourceAssetAmountForThorchain = useMemo(() => max1e8BaseAmount(sourceAssetAmount), [sourceAssetAmount])
-
-  const initialAmountToSwap = useMemo(() => baseAmount(0, sourceAssetAmountForThorchain.decimal), [
-    sourceAssetAmountForThorchain.decimal
-  ])
+  const initialAmountToSwap = useMemo(() => baseAmount(0, sourceAssetDecimalMax1e8), [sourceAssetDecimalMax1e8])
 
   const [
     /* max. 1e8 decimal */
@@ -201,12 +207,12 @@ export const Swap = ({
       O.map(([{ source, target }, poolAddress, address]) => ({
         poolAddress,
         asset: source,
-        // Decimal needs to be converted back for using orginal decimal of source asset (provided by `assetBalance`)
-        amount: convertBaseAmountDecimal(amountToSwap, sourceAssetAmount.decimal),
+        // Decimal needs to be converted back for using orginal decimal of source asset
+        amount: convertBaseAmountDecimal(amountToSwap, sourceAssetDecimal),
         memo: getSwapMemo({ asset: target, address })
       }))
     )
-  }, [amountToSwap, assetsToSwap, oPoolAddress, sourceAssetAmount.decimal, targetWalletAddress])
+  }, [amountToSwap, assetsToSwap, oPoolAddress, sourceAssetDecimal, targetWalletAddress])
 
   const swapData = useMemo(() => getSwapData({ amountToSwap, sourceAsset, targetAsset, poolsData }), [
     amountToSwap,
@@ -347,8 +353,8 @@ export const Swap = ({
     )
     return eqAsset.equals(sourceChainAsset, sourceAssetProp)
       ? max1e8BaseAmount(maxChainAssetAmount)
-      : sourceAssetAmountForThorchain
-  }, [keystore, chainFeesRD, sourceChainAsset, sourceAssetProp, sourceAssetAmountForThorchain, sourceChainAssetAmount])
+      : sourceAssetAmountMax1e8
+  }, [keystore, chainFeesRD, sourceChainAsset, sourceAssetProp, sourceAssetAmountMax1e8, sourceChainAssetAmount])
 
   const setAmountToSwap = useCallback(
     (newAmount: BaseAmount) => {
@@ -373,9 +379,9 @@ export const Swap = ({
   const setAmountToSwapFromPercentValue = useCallback(
     (percents) => {
       const amountFromPercentage = maxAmountToSwap.amount().multipliedBy(Number(percents) / 100)
-      return setAmountToSwap(baseAmount(amountFromPercentage, sourceAssetAmountForThorchain.decimal))
+      return setAmountToSwap(baseAmount(amountFromPercentage, sourceAssetDecimalMax1e8))
     },
-    [maxAmountToSwap, setAmountToSwap, sourceAssetAmountForThorchain.decimal]
+    [maxAmountToSwap, setAmountToSwap, sourceAssetDecimalMax1e8]
   )
 
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
@@ -424,9 +430,8 @@ export const Swap = ({
   }, [allAssets, assetsToSwap])
 
   const balanceLabel = useMemo(
-    () =>
-      `${intl.formatMessage({ id: 'swap.balance' })}: ${formatBN(baseToAsset(sourceAssetAmountForThorchain).amount())}`,
-    [intl, sourceAssetAmountForThorchain]
+    () => `${intl.formatMessage({ id: 'swap.balance' })}: ${formatBN(baseToAsset(sourceAssetAmountMax1e8).amount())}`,
+    [intl, sourceAssetAmountMax1e8]
   )
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -438,7 +443,7 @@ export const Swap = ({
   const renderSlider = useMemo(() => {
     const percentage = amountToSwap
       .amount()
-      .dividedBy(sourceAssetAmountForThorchain.amount())
+      .dividedBy(sourceAssetAmountMax1e8.amount())
       .multipliedBy(100)
       // Remove decimal of `BigNumber`s used within `BaseAmount` and always round down for currencies
       .decimalPlaces(0, BigNumber.ROUND_DOWN)
@@ -454,7 +459,7 @@ export const Swap = ({
         tooltipPlacement={'top'}
       />
     )
-  }, [amountToSwap, sourceAssetAmountForThorchain, setAmountToSwapFromPercentValue, reloadFeesHandler])
+  }, [amountToSwap, sourceAssetAmountMax1e8, setAmountToSwapFromPercentValue, reloadFeesHandler])
 
   const extraTxModalContent = useMemo(() => {
     return FP.pipe(

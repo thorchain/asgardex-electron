@@ -1,12 +1,15 @@
+import { EtherscanProvider } from '@ethersproject/providers'
 import { Network as ClientNetwork } from '@xchainjs/xchain-client'
-import { Client } from '@xchainjs/xchain-ethereum'
+import * as ETH from '@xchainjs/xchain-ethereum'
+import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, shareReplay } from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { envOrDefault } from '../../helpers/envHelper'
 import { network$ } from '../app/service'
 import * as C from '../clients'
@@ -17,16 +20,16 @@ import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$, Client$ } from './types'
 
+export const toEthNetwork = (network: Network) => {
+  // In case of 'chaosnet' + 'mainnet` we stick on `mainnet`
+  if (network === 'chaosnet') return 'mainnet'
+  return network
+}
+
 /**
  * Ethereum network depending on `Network`
  */
-const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(
-  map((network) => {
-    if (network === 'chaosnet') return 'mainnet'
-
-    return network
-  })
-)
+const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(RxOp.map(toEthNetwork))
 
 const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
 const INFURA_PROJECT_ID = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_ID, '')
@@ -39,7 +42,7 @@ const INFURA_PROJECT_ID = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_ID, 
  * A EthereumClient will never be created as long as no phrase is available
  */
 const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, ethereumNetwork$]).pipe(
-  mergeMap(
+  RxOp.mergeMap(
     ([keystore, network]) =>
       new Observable((observer: Observer<ClientState>) => {
         const client: ClientState = FP.pipe(
@@ -53,7 +56,7 @@ const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, 
                     }
                   }
                 : {}
-              const client = new Client({
+              const client = new ETH.Client({
                 network,
                 etherscanApiKey: ETHERSCAN_API_KEY,
                 phrase,
@@ -70,13 +73,13 @@ const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, 
   )
 )
 
-const client$: Client$ = clientState$.pipe(map(getClient), shareReplay(1))
+const client$: Client$ = clientState$.pipe(RxOp.map(getClient), RxOp.shareReplay(1))
 
 /**
  * Helper stream to provide "ready-to-go" state of latest `EthereumClient`, but w/o exposing the client
  * It's needed by views only.
  */
-const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(map(getClientStateForViews))
+const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(RxOp.map(getClientStateForViews))
 
 /**
  * Current `Address` depending on selected network
@@ -103,6 +106,38 @@ const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
  */
 const getExplorerAddressUrl$: GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
 
+/**
+ * Map to store decimal in memory
+ *
+ * to avoid unessary request for same data
+ * */
+const decimalMap: Map<string, number> = new Map()
+/**
+ * Helper to get decimals for ERC20
+ */
+const getDecimal = async (asset: Asset, network: Network): Promise<number> => {
+  const assetString = assetToString(asset)
+  return FP.pipe(
+    decimalMap.get(assetString),
+    O.fromNullable,
+    O.fold(
+      async () => {
+        const ethNetwork = toEthNetwork(network)
+        const provider = new EtherscanProvider(ethNetwork, ETHERSCAN_API_KEY)
+        try {
+          const decimal = await ETH.getDecimal(asset, provider)
+          // store result in memory
+          decimalMap.set(assetString, decimal)
+          return Promise.resolve(decimal)
+        } catch (e) {
+          return Promise.reject(e)
+        }
+      },
+      async (decimal) => Promise.resolve(decimal)
+    )
+  )
+}
+
 export {
   client$,
   clientState$,
@@ -111,5 +146,6 @@ export {
   addressUI$,
   explorerUrl$,
   getExplorerTxUrl$,
-  getExplorerAddressUrl$
+  getExplorerAddressUrl$,
+  getDecimal as getERC20Decimal
 }

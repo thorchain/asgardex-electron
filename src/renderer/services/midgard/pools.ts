@@ -474,7 +474,7 @@ const createPoolsService = (
   // Shared stream to avoid reloading same data by subscribing
   const inboundAddressesShared$: PoolAddressesLD = loadInboundAddresses$().pipe(RxOp.shareReplay(1))
 
-  const selectedPoolAddresses$: PoolAddress$ = Rx.combineLatest([inboundAddressesShared$, selectedPoolAsset$]).pipe(
+  const selectedPoolAddress$: PoolAddress$ = Rx.combineLatest([inboundAddressesShared$, selectedPoolAsset$]).pipe(
     RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
       return FP.pipe(
         poolAddresses,
@@ -568,7 +568,7 @@ const createPoolsService = (
     reloadPools,
     reloadPendingPools,
     reloadAllPools,
-    selectedPoolAddress$: selectedPoolAddresses$,
+    selectedPoolAddress$,
     poolAddressesByChain$,
     poolDetail$,
     priceRatio$,
