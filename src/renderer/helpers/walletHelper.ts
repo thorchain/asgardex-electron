@@ -61,3 +61,7 @@ export const getRuneNativeAmountFromBalances = (balances: WalletBalances): O.Opt
 
 export const getRuneBnBAmountFromBalances = (balances: WalletBalances): O.Option<AssetAmount> =>
   getAssetAmountFromBalances(balances, isRuneBnbAsset)
+
+export const filterWalletBalancesByAssets = (balances: NonEmptyWalletBalances, assets: Asset[]): WalletBalances => {
+  return balances.filter((balance) => assets.findIndex((asset) => eqAsset.equals(asset, balance.asset)) >= 0)
+}
