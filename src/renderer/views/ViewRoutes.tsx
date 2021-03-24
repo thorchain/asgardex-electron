@@ -7,9 +7,9 @@ import * as historyRoutes from '../routes/history'
 import * as playgroundRoutes from '../routes/playground'
 import * as poolsRoutes from '../routes/pools'
 import * as walletRoutes from '../routes/wallet'
-import { HistoryView } from './History/HistoryView'
 import { NoContentView } from './NoContentView'
 import { PlaygroundView } from './playground/PlaygroundView'
+import { PoolActionsHistoryView } from './PoolActionsHistory/PoolActionsHistoryView'
 import { PoolsView } from './pools/PoolsView'
 import { WalletView } from './wallet/WalletView'
 
@@ -29,7 +29,7 @@ export const ViewRoutes: React.FC<{}> = (): JSX.Element => {
         <PlaygroundView />
       </Route>
       <Route path={historyRoutes.base.template}>
-        <HistoryView />
+        <PoolActionsHistoryView />
       </Route>
       <Route path="*">
         <NoContentView />

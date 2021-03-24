@@ -13,9 +13,9 @@ import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { liveData } from '../../helpers/rx/liveData'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../services/midgard/types'
-import * as Styled from './HistoryView.styles'
+import * as Styled from './PoolActionsHistoryView.styles'
 
-export const HistoryView: React.FC = () => {
+export const PoolActionsHistoryView: React.FC = () => {
   const {
     service: { poolActionsHistory }
   } = useMidgardContext()
