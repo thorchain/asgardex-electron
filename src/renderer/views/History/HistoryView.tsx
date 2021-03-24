@@ -6,27 +6,27 @@ import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
-import { ActionsHistory } from '../../components/actionsHistory'
-import { Filter } from '../../components/actionsHistory/types'
+import { PoolActionsHistory } from '../../components/poolActionsHistory'
+import { Filter } from '../../components/poolActionsHistory/types'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { liveData } from '../../helpers/rx/liveData'
-import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../services/midgard/actionsHistory'
-import { HistoryActionsPage, HistoryActionsPageRD } from '../../services/midgard/types'
+import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../services/midgard/poolActionsHistory'
+import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../services/midgard/types'
 import * as Styled from './HistoryView.styles'
 
 export const HistoryView: React.FC = () => {
   const {
-    service: { historyActions }
+    service: { poolActionsHistory }
   } = useMidgardContext()
 
   const { getExplorerTxUrl$ } = useThorchainContext()
 
-  const prevActionsPage = useRef<O.Option<HistoryActionsPage>>(O.none)
+  const prevActionsPage = useRef<O.Option<PoolActionsHistoryPage>>(O.none)
 
   const requestParams = useRef(DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS)
 
-  const [historyPage, setHistoryPageParams] = useObservableState<HistoryActionsPageRD, Partial<LoadActionsParams>>(
+  const [historyPage, setHistoryPageParams] = useObservableState<PoolActionsHistoryPageRD, Partial<LoadActionsParams>>(
     (params$) =>
       FP.pipe(
         params$,
@@ -36,7 +36,7 @@ export const HistoryView: React.FC = () => {
           requestParams.current = res
           return res
         }),
-        RxOp.switchMap(historyActions.actions$),
+        RxOp.switchMap(poolActionsHistory.actions$),
         liveData.map((page) => {
           prevActionsPage.current = O.some(page)
           return page
@@ -83,7 +83,7 @@ export const HistoryView: React.FC = () => {
   return (
     <>
       <Styled.BackLink />
-      <ActionsHistory
+      <PoolActionsHistory
         currentPage={requestParams.current.page + 1}
         actionsPageRD={historyPage}
         prevActionsPage={prevActionsPage.current}
@@ -92,7 +92,7 @@ export const HistoryView: React.FC = () => {
         clickTxLinkHandler={goToTx}
         currentFilter={requestParams.current.type || 'ALL'}
         setFilter={setFilter}
-        reload={historyActions.reloadActionsHistory}
+        reload={poolActionsHistory.reloadActionsHistory}
       />
     </>
   )

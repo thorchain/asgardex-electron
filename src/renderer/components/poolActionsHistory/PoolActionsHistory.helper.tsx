@@ -1,15 +1,16 @@
 import React from 'react'
 
+import { TxHash } from '@xchainjs/xchain-client'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { FormattedDate, FormattedTime } from 'react-intl'
 
-import { HistoryAction, HistoryActions, HistoryActionsPage, Tx } from '../../services/midgard/types'
+import { PoolAction, PoolActions, PoolActionsHistoryPage, Tx } from '../../services/midgard/types'
 import { AssetWithAmount } from '../../types/asgardex'
-import * as Styled from './ActionsHistory.styles'
+import * as Styled from './PoolActionsHistory.styles'
 
-export const getTxId = (action: HistoryAction): O.Option<string> => {
+export const getTxId = (action: PoolAction): O.Option<TxHash> => {
   return FP.pipe(
     action.in,
     A.head,
@@ -33,4 +34,4 @@ export const renderDate = (date: Date) => (
   </Styled.DateContainer>
 )
 
-export const emptyData: HistoryActionsPage = { total: 0, actions: [] as HistoryActions }
+export const emptyData: PoolActionsHistoryPage = { total: 0, actions: [] as PoolActions }

@@ -5,16 +5,16 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { MAX_ITEMS_PER_PAGE } from '../../services/const'
-import { HistoryAction, HistoryActionsPage } from '../../services/midgard/types'
+import { PoolAction, PoolActionsHistoryPage } from '../../services/midgard/types'
 import { ErrorView } from '../shared/error'
 import { Pagination } from '../uielements/pagination'
 import { ReloadButton } from '../uielements/reloadButton'
 import { TxDetail } from '../uielements/txDetail'
-import * as H from './ActionsHistory.helper'
-import * as Styled from './ActionsHistoryList.styles'
+import * as H from './PoolActionsHistory.helper'
+import * as Styled from './PoolActionsHistoryList.styles'
 import { Props } from './types'
 
-const renderItem = (goToTx: (txId: string) => void) => (action: HistoryAction) => {
+const renderItem = (goToTx: (txId: string) => void) => (action: PoolAction) => {
   const date = H.renderDate(action.date)
 
   const oTxId = H.getTxId(action)
@@ -42,7 +42,7 @@ const renderItem = (goToTx: (txId: string) => void) => (action: HistoryAction) =
   )
 }
 
-export const ActionsHistoryList: React.FC<Props> = ({
+export const PoolActionsHistoryList: React.FC<Props> = ({
   changePaginationHandler,
   actionsPageRD,
   prevActionsPage = O.none,
@@ -55,7 +55,7 @@ export const ActionsHistoryList: React.FC<Props> = ({
 }) => {
   const renderListItem = useMemo(() => renderItem(goToTx), [goToTx])
   const renderList = useCallback(
-    ({ total, actions }: HistoryActionsPage, loading = false) => {
+    ({ total, actions }: PoolActionsHistoryPage, loading = false) => {
       return (
         <>
           <Styled.List loading={loading} itemLayout="vertical" dataSource={actions} renderItem={renderListItem} />

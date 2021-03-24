@@ -11,8 +11,8 @@ import { DefaultApi } from '../../types/generated/midgard/apis'
 import { InlineResponse200 } from '../../types/generated/midgard/models'
 import { MAX_ITEMS_PER_PAGE } from '../const'
 import { ErrorId } from '../wallet/types'
-import { getRequestType, mapAction } from './actionsHistory.utils'
-import { HistoryActionsPageLD, TxType } from './types'
+import { getRequestType, mapAction } from './poolActionsHistory.utils'
+import { PoolActionsHistoryPageLD, TxType } from './types'
 
 export type LoadActionsParams = {
   page: number
@@ -26,7 +26,7 @@ export const DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS: LoadActionsParams = {
   page: 0
 }
 
-export const createActionsHistoryService = (
+export const createPoolActionsHistoryService = (
   byzantine$: LiveData<Error, string>,
   getMidgardDefaultApi: (basePath: string) => DefaultApi
 ) => {
@@ -34,7 +34,7 @@ export const createActionsHistoryService = (
 
   const { stream$: reloadActionsHistory$, trigger: reloadActionsHistory } = triggerStream()
 
-  const actions$ = ({ page, type, ...params }: LoadActionsParams): HistoryActionsPageLD =>
+  const actions$ = ({ page, type, ...params }: LoadActionsParams): PoolActionsHistoryPageLD =>
     FP.pipe(
       Rx.combineLatest([midgardDefaultApi$, reloadActionsHistory$]),
       RxOp.map(([api]) => api),

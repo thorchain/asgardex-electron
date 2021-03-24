@@ -8,18 +8,18 @@ import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { MAX_ITEMS_PER_PAGE } from '../../services/const'
-import { HistoryActionsPage, HistoryAction } from '../../services/midgard/types'
+import { PoolActionsHistoryPage, PoolAction } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { ErrorView } from '../shared/error'
 import * as CommonStyled from '../uielements/common/Common.style'
 import { Pagination } from '../uielements/pagination'
 import { ReloadButton } from '../uielements/reloadButton'
 import { TxDetail } from '../uielements/txDetail'
-import * as H from './ActionsHistory.helper'
-import * as Styled from './ActionsHistoryTable.styles'
+import * as H from './PoolActionsHistory.helper'
+import * as Styled from './PoolActionsHistoryTable.styles'
 import { Props } from './types'
 
-export const ActionsHistoryTable: React.FC<Props> = ({
+export const PoolActionsHistoryTable: React.FC<Props> = ({
   clickTxLinkHandler,
   changePaginationHandler,
   actionsPageRD,
@@ -31,9 +31,9 @@ export const ActionsHistoryTable: React.FC<Props> = ({
 }) => {
   const intl = useIntl()
 
-  const renderActionTypeColumn = useCallback((_, { type }: HistoryAction) => <Styled.TxType type={type} />, [])
+  const renderActionTypeColumn = useCallback((_, { type }: PoolAction) => <Styled.TxType type={type} />, [])
 
-  const actionTypeColumn: ColumnType<HistoryAction> = useMemo(
+  const actionTypeColumn: ColumnType<PoolAction> = useMemo(
     () => ({
       key: 'txType',
       title: <Styled.ActionsFilter currentFilter={currentFilter} onFilterChanged={setFilter} />,
@@ -44,9 +44,9 @@ export const ActionsHistoryTable: React.FC<Props> = ({
     [renderActionTypeColumn, setFilter, currentFilter]
   )
 
-  const renderDateColumn = useCallback((_, { date }: HistoryAction) => H.renderDate(date), [])
+  const renderDateColumn = useCallback((_, { date }: PoolAction) => H.renderDate(date), [])
 
-  const dateColumn: ColumnType<HistoryAction> = useMemo(
+  const dateColumn: ColumnType<PoolAction> = useMemo(
     () => ({
       key: 'timeStamp',
       title: intl.formatMessage({ id: 'common.date' }),
@@ -58,7 +58,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
   )
 
   const renderLinkColumn = useCallback(
-    (action: HistoryAction) =>
+    (action: PoolAction) =>
       FP.pipe(
         action.in,
         A.head,
@@ -71,7 +71,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
     [clickTxLinkHandler]
   )
 
-  const linkColumn: ColumnType<HistoryAction> = useMemo(
+  const linkColumn: ColumnType<PoolAction> = useMemo(
     () => ({
       key: 'txHash',
       title: <ReloadButton onClick={reload} />,
@@ -83,7 +83,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
   )
 
   const renderDetailColumn = useCallback(
-    (action: HistoryAction) => (
+    (action: PoolAction) => (
       <TxDetail
         type={action.type}
         date={H.renderDate(action.date)}
@@ -96,7 +96,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
     []
   )
 
-  const detailColumn: ColumnType<HistoryAction> = useMemo(
+  const detailColumn: ColumnType<PoolAction> = useMemo(
     () => ({
       key: 'txDetail',
       title: intl.formatMessage({ id: 'common.detail' }),
@@ -106,7 +106,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
     [renderDetailColumn, intl]
   )
 
-  const columns: ColumnsType<HistoryAction> = useMemo(() => [actionTypeColumn, detailColumn, dateColumn, linkColumn], [
+  const columns: ColumnsType<PoolAction> = useMemo(() => [actionTypeColumn, detailColumn, dateColumn, linkColumn], [
     actionTypeColumn,
     detailColumn,
     dateColumn,
@@ -114,7 +114,7 @@ export const ActionsHistoryTable: React.FC<Props> = ({
   ])
 
   const renderTable = useCallback(
-    ({ total, actions }: HistoryActionsPage, loading = false) => {
+    ({ total, actions }: PoolActionsHistoryPage, loading = false) => {
       return (
         <>
           <Styled.Table columns={columns} dataSource={actions} loading={loading} rowKey="txHash" />

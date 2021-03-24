@@ -184,7 +184,7 @@ export type TxType =
   // 'unknown' tx type to avoid filtering out any tx
   | 'UNKNOWN'
 
-export type HistoryAction = {
+export type PoolAction = {
   date: Date
   /**
    * Inbound transactions related to the action
@@ -199,16 +199,16 @@ export type HistoryAction = {
   slip?: number
 }
 
-export type HistoryActions = HistoryAction[]
+export type PoolActions = PoolAction[]
 
-export type HistoryActionsPage = {
+export type PoolActionsHistoryPage = {
   total: number
-  actions: HistoryActions
+  actions: PoolActions
 }
 
-export type HistoryActionsPageRD = RD.RemoteData<ApiError, HistoryActionsPage>
+export type PoolActionsHistoryPageRD = RD.RemoteData<ApiError, PoolActionsHistoryPage>
 
-export type HistoryActionsPageLD = LiveData<ApiError, HistoryActionsPage>
+export type PoolActionsHistoryPageLD = LiveData<ApiError, PoolActionsHistoryPage>
 
 export type PoolFilter = Chain | 'base' | 'usd'
 

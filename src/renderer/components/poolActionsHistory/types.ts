@@ -1,13 +1,13 @@
 import * as O from 'fp-ts/Option'
 
-import { HistoryActionsPage, HistoryActionsPageRD, TxType } from '../../services/midgard/types'
+import { PoolActionsHistoryPage, PoolActionsHistoryPageRD, TxType } from '../../services/midgard/types'
 
 export type Filter = TxType | 'ALL'
 
 export type Props = {
   currentPage: number
-  actionsPageRD: HistoryActionsPageRD
-  prevActionsPage?: O.Option<HistoryActionsPage>
+  actionsPageRD: PoolActionsHistoryPageRD
+  prevActionsPage?: O.Option<PoolActionsHistoryPage>
   goToTx: (txHash: string) => void
   changePaginationHandler: (page: number) => void
   clickTxLinkHandler: (txHash: string) => void

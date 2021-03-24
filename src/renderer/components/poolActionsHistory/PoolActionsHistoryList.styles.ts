@@ -4,10 +4,10 @@ import { ListProps } from 'antd/lib/list'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { HistoryAction } from '../../services/midgard/types'
+import { PoolAction } from '../../services/midgard/types'
 import { Button as UIButton } from '../uielements/button'
 import { TxType as TxTypeUI } from '../uielements/txType'
-import { ActionsHistoryFilter } from './ActionsHistoryFilter'
+import { PoolActionsHistoryFilter } from './PoolActionsHistoryFilter'
 
 export const ControlsContainer = styled.div`
   display: flex;
@@ -17,7 +17,7 @@ export const ControlsContainer = styled.div`
   margin-bottom: 10px;
 `
 
-export const ActionsFilter = styled(ActionsHistoryFilter)`
+export const ActionsFilter = styled(PoolActionsHistoryFilter)`
   align-self: flex-end;
   margin-right: 20px;
 `
@@ -25,7 +25,7 @@ export const ActionsFilter = styled(ActionsHistoryFilter)`
 export const List = styled(A.List)`
   background: ${palette('background', 0)};
   color: ${palette('text', 0)};
-` as React.FC<ListProps<HistoryAction>>
+` as React.FC<ListProps<PoolAction>>
 
 export const ListItem = styled(A.List.Item)`
   &:last-item {

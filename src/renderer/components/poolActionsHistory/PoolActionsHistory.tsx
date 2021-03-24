@@ -5,15 +5,15 @@ import { Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
-import { HistoryActionsPage } from '../../services/midgard/types'
-import { ActionsHistoryList } from './ActionsHistoryList'
-import { ActionsHistoryTable } from './ActionsHistoryTable'
+import { PoolActionsHistoryPage } from '../../services/midgard/types'
+import { PoolActionsHistoryList } from './PoolActionsHistoryList'
+import { PoolActionsHistoryTable } from './PoolActionsHistoryTable'
 import { Props } from './types'
 
-export const ActionsHistory: React.FC<Props> = (props) => {
+export const PoolActionsHistory: React.FC<Props> = (props) => {
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   // store previous data of Txs to render these while reloading
-  const previousTxs = useRef<O.Option<HistoryActionsPage>>(O.none)
+  const previousTxs = useRef<O.Option<PoolActionsHistoryPage>>(O.none)
 
   useEffect(() => {
     FP.pipe(
@@ -26,8 +26,8 @@ export const ActionsHistory: React.FC<Props> = (props) => {
   }, [props])
 
   return isDesktopView ? (
-    <ActionsHistoryTable prevActionsPage={previousTxs.current} {...props} />
+    <PoolActionsHistoryTable prevActionsPage={previousTxs.current} {...props} />
   ) : (
-    <ActionsHistoryList prevActionsPage={previousTxs.current} {...props} />
+    <PoolActionsHistoryList prevActionsPage={previousTxs.current} {...props} />
   )
 }
