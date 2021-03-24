@@ -14,7 +14,10 @@ import {
   Constants as ThorchainConstants,
   LastblockItem,
   PoolDetail as MidgardPoolDetail,
-  Health
+  Health,
+  PoolStatsDetail,
+  GetPoolStatsPeriodEnum,
+  PoolLegacyDetail
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { ApiError } from '../wallet/types'
@@ -109,6 +112,12 @@ export type PoolAddressLD = LiveData<Error, PoolAddress>
 export type PoolAddresses = PoolAddress[]
 export type PoolAddressesLD = LiveData<Error, PoolAddresses>
 
+export type PoolStatsDetailRD = RD.RemoteData<Error, PoolStatsDetail>
+export type PoolStatsDetailLD = LiveData<Error, PoolStatsDetail>
+
+export type PoolLegacyDetailRD = RD.RemoteData<Error, PoolLegacyDetail>
+export type PoolLegacyDetailLD = LiveData<Error, PoolLegacyDetail>
+
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 
@@ -131,6 +140,9 @@ export type PoolsService = {
   selectedPoolAddress$: PoolAddress$
   poolAddressesByChain$: (chain: Chain) => PoolAddressLD
   poolDetail$: PoolDetailLD
+  reloadPool: FP.Lazy<void>
+  poolStatsDetail$: (period?: GetPoolStatsPeriodEnum) => PoolStatsDetailLD
+  poolLegacyDetail$: PoolLegacyDetailLD
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD
