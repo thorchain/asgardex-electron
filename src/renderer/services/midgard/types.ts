@@ -17,7 +17,9 @@ import {
   Health,
   PoolStatsDetail,
   GetPoolStatsPeriodEnum,
-  PoolLegacyDetail
+  PoolLegacyDetail,
+  LiquidityHistory,
+  GetLiquidityHistoryIntervalEnum
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { ApiError } from '../wallet/types'
@@ -118,6 +120,16 @@ export type PoolStatsDetailLD = LiveData<Error, PoolStatsDetail>
 export type PoolLegacyDetailRD = RD.RemoteData<Error, PoolLegacyDetail>
 export type PoolLegacyDetailLD = LiveData<Error, PoolLegacyDetail>
 
+export type PoolLiquidityHistoryParams = {
+  interval?: GetLiquidityHistoryIntervalEnum
+  count?: number
+  to?: number
+  from?: number
+}
+
+export type PoolLiquidityHistoryRD = RD.RemoteData<Error, LiquidityHistory>
+export type PoolLiquidityHistoryLD = LiveData<Error, LiquidityHistory>
+
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 
@@ -143,6 +155,7 @@ export type PoolsService = {
   reloadPool: FP.Lazy<void>
   poolStatsDetail$: (period?: GetPoolStatsPeriodEnum) => PoolStatsDetailLD
   poolLegacyDetail$: PoolLegacyDetailLD
+  poolLiquidityHistory$: (parmas: PoolLiquidityHistoryParams) => PoolLiquidityHistoryLD
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD

@@ -19,6 +19,7 @@ import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
 import {
   DefaultApi,
+  GetLiquidityHistoryRequest,
   GetPoolsRequest,
   GetPoolsStatusEnum,
   GetPoolStatsLegacyRequest,
@@ -43,7 +44,9 @@ import {
   PoolAddress,
   PoolFilter,
   PoolStatsDetailLD,
-  PoolLegacyDetailLD
+  PoolLegacyDetailLD,
+  PoolLiquidityHistoryLD,
+  PoolLiquidityHistoryParams
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -577,7 +580,6 @@ const createPoolsService = (
         FP.pipe(
           api.getPoolStats(request),
           RxOp.map(RD.success),
-          // filter out
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -614,7 +616,6 @@ const createPoolsService = (
         FP.pipe(
           api.getPoolStatsLegacy(request),
           RxOp.map(RD.success),
-          // filter out
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -640,6 +641,42 @@ const createPoolsService = (
     RxOp.shareReplay(1)
   )
 
+  // Factory to get pool liquidity history from Midgard
+  const apiGetPoolLiquidityHistory$ = (request: GetLiquidityHistoryRequest): PoolLiquidityHistoryLD =>
+    FP.pipe(
+      Rx.combineLatest([midgardDefaultApi$, reloadPool$]),
+      RxOp.map(([api]) => api),
+      liveData.chain((api) =>
+        FP.pipe(
+          api.getLiquidityHistory(request),
+          RxOp.map(RD.success),
+          RxOp.startWith(RD.pending),
+          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+        )
+      ),
+      RxOp.shareReplay(1)
+    )
+
+  const poolLiquidityHistory$ = (params: PoolLiquidityHistoryParams): PoolLiquidityHistoryLD =>
+    selectedPoolAsset$.pipe(
+      RxOp.filter(O.isSome),
+      RxOp.switchMap((selectedPoolAsset) =>
+        FP.pipe(
+          selectedPoolAsset,
+          O.fold(
+            () => Rx.of(RD.initial),
+            (asset) =>
+              apiGetPoolLiquidityHistory$({
+                pool: assetToString(asset),
+                ...params
+              })
+          )
+        )
+      ),
+      RxOp.startWith(RD.pending),
+      RxOp.shareReplay(1)
+    )
+
   return {
     poolsState$,
     pendingPoolsState$,
@@ -657,6 +694,7 @@ const createPoolsService = (
     reloadPool,
     poolStatsDetail$,
     poolLegacyDetail$,
+    poolLiquidityHistory$,
     priceRatio$,
     availableAssets$,
     validatePool$,
