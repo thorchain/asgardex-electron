@@ -4,6 +4,8 @@ import * as RD from '@devexperts/remote-data-ts'
 import { getWithdrawMemo } from '@thorchain/asgardex-util'
 import {
   Asset,
+  AssetAmount,
+  assetAmount,
   AssetRuneNative,
   baseAmount,
   BaseAmount,
@@ -303,6 +305,12 @@ export const Withdraw: React.FC<Props> = ({
 
   const disabledForm = useMemo(() => withdrawPercent <= 0 || disabled, [withdrawPercent, disabled])
 
+  const getTwoSigfigAssetAmount = (amount: AssetAmount) => {
+    const amountIntegerValue = amount.amount().integerValue()
+    const precisionCount = amountIntegerValue.gt(0) ? amountIntegerValue.toString().length + 2 : 2
+    return assetAmount(amount.amount().toPrecision(precisionCount))
+  }
+
   return (
     <Styled.Container>
       <Label weight="bold" textTransform="uppercase">
@@ -325,7 +333,7 @@ export const Withdraw: React.FC<Props> = ({
         <Styled.AssetLabel asset={AssetRuneNative} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
-            amount: baseToAsset(runeAmountToWithdraw),
+            amount: getTwoSigfigAssetAmount(baseToAsset(runeAmountToWithdraw)),
             asset: AssetRuneNative,
             decimal: THORCHAIN_DECIMAL,
             trimZeros: true
@@ -333,7 +341,7 @@ export const Withdraw: React.FC<Props> = ({
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(AssetRuneNative, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: baseToAsset(baseAmount(runeAmountToWithdraw.amount().times(runePrice))),
+              amount: getTwoSigfigAssetAmount(baseToAsset(baseAmount(runeAmountToWithdraw.amount().times(runePrice)))),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}
@@ -345,7 +353,7 @@ export const Withdraw: React.FC<Props> = ({
         <Styled.AssetLabel asset={asset} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
-            amount: baseToAsset(assetAmountToWithdraw),
+            amount: getTwoSigfigAssetAmount(baseToAsset(assetAmountToWithdraw)),
             asset,
             decimal: assetDecimal,
             trimZeros: true
@@ -353,7 +361,7 @@ export const Withdraw: React.FC<Props> = ({
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(asset, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: baseToAsset(assetPriceToWithdraw1e8),
+              amount: getTwoSigfigAssetAmount(baseToAsset(assetPriceToWithdraw1e8)),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}
