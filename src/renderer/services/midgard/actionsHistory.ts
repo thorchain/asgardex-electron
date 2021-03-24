@@ -23,7 +23,7 @@ export type LoadActionsParams = {
 }
 
 export const DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS: LoadActionsParams = {
-  page: 1
+  page: 0
 }
 
 export const createActionsHistoryService = (
@@ -48,8 +48,7 @@ export const createActionsHistoryService = (
             ...params,
             type: getRequestType(type),
             limit: MAX_ITEMS_PER_PAGE,
-            // UI pages starts with 1 but backend's with 0
-            offset: MAX_ITEMS_PER_PAGE * (page - 1)
+            offset: MAX_ITEMS_PER_PAGE * page
           }),
           RxOp.catchError((): Rx.Observable<InlineResponse200> => Rx.of({ actions: [], count: '0' })),
           RxOp.map(RD.success),

@@ -47,7 +47,7 @@ export const HistoryView: React.FC = () => {
 
   const setCurrentPage = useCallback(
     (page: number) => {
-      setHistoryPageParams({ page })
+      setHistoryPageParams({ page: page - 1 })
     },
     [setHistoryPageParams]
   )
@@ -84,7 +84,7 @@ export const HistoryView: React.FC = () => {
     <>
       <Styled.BackLink />
       <ActionsHistory
-        currentPage={requestParams.current.page}
+        currentPage={requestParams.current.page + 1}
         actionsPageRD={historyPage}
         prevActionsPage={prevActionsPage.current}
         goToTx={goToTx}
