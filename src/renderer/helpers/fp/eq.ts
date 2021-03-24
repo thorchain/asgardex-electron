@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Balance, Balances } from '@xchainjs/xchain-client'
-import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
@@ -31,6 +31,10 @@ export const eqChain: Eq.Eq<Chain> = {
 export const eqOChain = O.getEq(eqChain)
 
 export const eqBaseAmount: Eq.Eq<BaseAmount> = {
+  equals: (x, y) => eqBigNumber.equals(x.amount(), y.amount()) && x.decimal === y.decimal
+}
+
+export const eqAssetAmount: Eq.Eq<AssetAmount> = {
   equals: (x, y) => eqBigNumber.equals(x.amount(), y.amount()) && x.decimal === y.decimal
 }
 

@@ -2,6 +2,8 @@ import { Address } from '@xchainjs/xchain-client'
 import { ETHAddress, getTokenAddress } from '@xchainjs/xchain-ethereum'
 import {
   Asset,
+  assetAmount,
+  AssetAmount,
   AssetBCH,
   AssetBNB,
   AssetBTC,
@@ -222,3 +224,13 @@ export const max1e8BaseAmount = (amount: BaseAmount): BaseAmount =>
  * into `1e8` decimal based `BaseAmount`
  */
 export const to1e8BaseAmount = (amount: BaseAmount): BaseAmount => convertBaseAmountDecimal(amount, THORCHAIN_DECIMAL)
+
+/**
+ * Helper to convert a `AssetAmount`
+ * into two sigfig `AssetAmount`
+ */
+export const getTwoSigfigAssetAmount = (amount: AssetAmount) => {
+  const amountIntegerValue = amount.amount().integerValue(BigNumber.ROUND_DOWN)
+  const precisionCount = amountIntegerValue.gt(0) ? amountIntegerValue.toString().length + 2 : 2
+  return assetAmount(amount.amount().toPrecision(precisionCount))
+}

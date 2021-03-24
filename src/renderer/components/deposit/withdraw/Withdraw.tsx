@@ -20,7 +20,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
-import { THORCHAIN_DECIMAL, to1e8BaseAmount } from '../../../helpers/assetHelper'
+import { getTwoSigfigAssetAmount, THORCHAIN_DECIMAL, to1e8BaseAmount } from '../../../helpers/assetHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
@@ -325,7 +325,7 @@ export const Withdraw: React.FC<Props> = ({
         <Styled.AssetLabel asset={AssetRuneNative} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
-            amount: baseToAsset(runeAmountToWithdraw),
+            amount: getTwoSigfigAssetAmount(baseToAsset(runeAmountToWithdraw)),
             asset: AssetRuneNative,
             decimal: THORCHAIN_DECIMAL,
             trimZeros: true
@@ -333,7 +333,9 @@ export const Withdraw: React.FC<Props> = ({
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(AssetRuneNative, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: baseToAsset(baseAmount(runeAmountToWithdraw.amount().times(runePrice))),
+              amount: getTwoSigfigAssetAmount(
+                baseToAsset(baseAmount(runeAmountToWithdraw.amount().times(runePrice), THORCHAIN_DECIMAL))
+              ),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}
@@ -345,7 +347,7 @@ export const Withdraw: React.FC<Props> = ({
         <Styled.AssetLabel asset={asset} />
         <Styled.OutputLabel weight={'bold'}>
           {formatAssetAmountCurrency({
-            amount: baseToAsset(assetAmountToWithdraw),
+            amount: getTwoSigfigAssetAmount(baseToAsset(assetAmountToWithdraw)),
             asset,
             decimal: assetDecimal,
             trimZeros: true
@@ -353,7 +355,7 @@ export const Withdraw: React.FC<Props> = ({
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(asset, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: baseToAsset(assetPriceToWithdraw1e8),
+              amount: getTwoSigfigAssetAmount(baseToAsset(assetPriceToWithdraw1e8)),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}

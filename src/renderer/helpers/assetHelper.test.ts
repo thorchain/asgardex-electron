@@ -1,5 +1,6 @@
 import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
+  assetAmount,
   AssetBCH,
   AssetBNB,
   AssetBTC,
@@ -31,9 +32,10 @@ import {
   convertBaseAmountDecimal,
   isUSDAsset,
   max1e8BaseAmount,
-  to1e8BaseAmount
+  to1e8BaseAmount,
+  getTwoSigfigAssetAmount
 } from './assetHelper'
-import { eqAsset, eqBaseAmount } from './fp/eq'
+import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
 
 describe('helpers/assetHelper', () => {
   describe('isRuneBnbAsset', () => {
@@ -251,6 +253,17 @@ describe('helpers/assetHelper', () => {
     it('keeps 1e8 unchanged', () => {
       const result = to1e8BaseAmount(baseAmount('12345678', 8))
       expect(eqBaseAmount.equals(result, baseAmount('12345678', 8))).toBeTruthy()
+    })
+  })
+
+  describe('getTwoSigfigAssetAmount', () => {
+    it('returns two decimal amount in case the value is bigger than 1', () => {
+      const result = getTwoSigfigAssetAmount(assetAmount('12.234'))
+      expect(eqAssetAmount.equals(result, assetAmount('12.23'))).toBeTruthy()
+    })
+    it('returns two sigfig amount in case the value is less than 1', () => {
+      const result = getTwoSigfigAssetAmount(assetAmount('0.0123'))
+      expect(eqAssetAmount.equals(result, assetAmount('0.012'))).toBeTruthy()
     })
   })
 })
