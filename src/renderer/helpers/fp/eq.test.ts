@@ -1,5 +1,5 @@
 import { Balance } from '@xchainjs/xchain-client'
-import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount, bn, Chain } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, baseAmount, bn, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -21,7 +21,8 @@ import {
   eqPoolShares,
   eqPoolShare,
   eqPoolAddresses,
-  eqONullableString
+  eqONullableString,
+  eqAssetAmount
 } from './eq'
 
 describe('helpers/fp/eq', () => {
@@ -102,6 +103,18 @@ describe('helpers/fp/eq', () => {
       const a = baseAmount(100, 18)
       const b = baseAmount(222, 18)
       expect(eqBaseAmount.equals(a, b)).toBeFalsy()
+    })
+  })
+
+  describe('eqAssetAmount', () => {
+    it('is equal', () => {
+      const a = assetAmount(100, 18)
+      expect(eqAssetAmount.equals(a, a)).toBeTruthy()
+    })
+    it('is not equal', () => {
+      const a = assetAmount(100, 18)
+      const b = assetAmount(222, 18)
+      expect(eqAssetAmount.equals(a, b)).toBeFalsy()
     })
   })
 

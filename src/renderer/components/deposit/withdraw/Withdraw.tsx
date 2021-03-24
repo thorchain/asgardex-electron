@@ -4,8 +4,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import { getWithdrawMemo } from '@thorchain/asgardex-util'
 import {
   Asset,
-  AssetAmount,
-  assetAmount,
   AssetRuneNative,
   baseAmount,
   BaseAmount,
@@ -22,7 +20,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
-import { THORCHAIN_DECIMAL, to1e8BaseAmount } from '../../../helpers/assetHelper'
+import { getTwoSigfigAssetAmount, THORCHAIN_DECIMAL, to1e8BaseAmount } from '../../../helpers/assetHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
@@ -305,12 +303,6 @@ export const Withdraw: React.FC<Props> = ({
 
   const disabledForm = useMemo(() => withdrawPercent <= 0 || disabled, [withdrawPercent, disabled])
 
-  const getTwoSigfigAssetAmount = (amount: AssetAmount) => {
-    const amountIntegerValue = amount.amount().integerValue(BigNumber.ROUND_DOWN)
-    const precisionCount = amountIntegerValue.gt(0) ? amountIntegerValue.toString().length + 2 : 2
-    return assetAmount(amount.amount().toPrecision(precisionCount))
-  }
-
   return (
     <Styled.Container>
       <Label weight="bold" textTransform="uppercase">
@@ -341,7 +333,9 @@ export const Withdraw: React.FC<Props> = ({
           {/* show pricing if price asset is different only */}
           {!eqAsset.equals(AssetRuneNative, selectedPriceAsset) &&
             ` (${formatAssetAmountCurrency({
-              amount: getTwoSigfigAssetAmount(baseToAsset(baseAmount(runeAmountToWithdraw.amount().times(runePrice)))),
+              amount: getTwoSigfigAssetAmount(
+                baseToAsset(baseAmount(runeAmountToWithdraw.amount().times(runePrice), THORCHAIN_DECIMAL))
+              ),
               asset: selectedPriceAsset,
               trimZeros: true
             })})`}
