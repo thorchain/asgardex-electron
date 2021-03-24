@@ -3,7 +3,7 @@ import * as O from 'fp-ts/Option'
 
 import { eqAssetsWithAmount, eqOAssetWithAmount } from '../../helpers/fp/eq'
 import { Coin, Transaction } from '../../types/generated/midgard/models'
-import { getRequestType, getTxType, mapCoinDTO, mapTransactionDTO } from './actionsHistory.utils'
+import { getRequestType, getTxType, mapCoin, mapTransaction } from './actionsHistory.utils'
 
 describe('actionsHistory.utils', () => {
   const invalidCoin: Coin = {
@@ -52,21 +52,21 @@ describe('actionsHistory.utils', () => {
     })
   })
 
-  describe('mapCoinDTO', () => {
+  describe('mapCoin', () => {
     it('should return O.none in case if invalid coin', () => {
-      expect(mapCoinDTO(invalidCoin)).toBeNone()
-      expect(mapCoinDTO({ ...invalidCoin, amount: '1231' })).toBeNone()
+      expect(mapCoin(invalidCoin)).toBeNone()
+      expect(mapCoin({ ...invalidCoin, amount: '1231' })).toBeNone()
     })
     it('should return O.some for valid coin value', () => {
       expect(
-        eqOAssetWithAmount.equals(mapCoinDTO(validCoin), O.some({ asset: AssetRuneNative, amount: baseAmount(123) }))
+        eqOAssetWithAmount.equals(mapCoin(validCoin), O.some({ asset: AssetRuneNative, amount: baseAmount(123) }))
       ).toBeTruthy()
     })
   })
 
-  describe('mapTransactionDTO', () => {
+  describe('mapTransaction', () => {
     it('should map DTO correctly', () => {
-      const res = mapTransactionDTO({ ...initialTxInfo, coins: [invalidCoin, validCoin] })
+      const res = mapTransaction({ ...initialTxInfo, coins: [invalidCoin, validCoin] })
       expect(eqAssetsWithAmount.equals(res.values, [{ asset: AssetRuneNative, amount: baseAmount(123) }])).toBeTruthy()
       expect(res.txID === initialTxInfo.txID && res.address === initialTxInfo.address).toBeTruthy()
     })

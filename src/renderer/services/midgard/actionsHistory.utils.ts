@@ -39,21 +39,21 @@ export const getRequestType = (type?: TxType | 'ALL'): string | undefined => {
   return
 }
 
-export const mapCoinDTO = (coin: Coin): O.Option<AssetWithAmount> => {
+export const mapCoin = (coin: Coin): O.Option<AssetWithAmount> => {
   const asset = assetFromString(coin.asset)
   return asset ? O.some({ asset, amount: baseAmount(coin.amount) }) : O.none
 }
 
-export const mapTransactionDTO = (tx: Transaction): Tx => ({
+export const mapTransaction = (tx: Transaction): Tx => ({
   ...tx,
-  values: FP.pipe(tx.coins, A.filterMap(mapCoinDTO))
+  values: FP.pipe(tx.coins, A.filterMap(mapCoin))
 })
 
-export const mapActionDTO = (action: Action): HistoryAction => ({
+export const mapAction = (action: Action): HistoryAction => ({
   ...action,
   type: getTxType(action.type),
   // backend provides date in nanoseconds so we need to divide it by 1 000 000
   date: new Date(Number(action.date) / 1000 / 1000),
-  in: FP.pipe(action.in, A.map(mapTransactionDTO)),
-  out: FP.pipe(action.out, A.map(mapTransactionDTO))
+  in: FP.pipe(action.in, A.map(mapTransaction)),
+  out: FP.pipe(action.out, A.map(mapTransaction))
 })

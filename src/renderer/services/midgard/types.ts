@@ -17,6 +17,7 @@ import {
   Health
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
+import { Memo } from '../chain/types'
 import { ApiError } from '../wallet/types'
 
 export type ThorchainLastblock = LastblockItem[]
@@ -166,7 +167,7 @@ export type Tx = {
   // Sender address
   address: string
   values: AssetWithAmount[]
-  memo?: string
+  memo?: Memo
   /**
    * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
    */

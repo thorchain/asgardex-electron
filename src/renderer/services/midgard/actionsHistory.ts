@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Address, TxHash } from '@xchainjs/xchain-client'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as Rx from 'rxjs'
@@ -10,13 +11,13 @@ import { DefaultApi } from '../../types/generated/midgard/apis'
 import { InlineResponse200 } from '../../types/generated/midgard/models'
 import { MAX_ITEMS_PER_PAGE } from '../const'
 import { ErrorId } from '../wallet/types'
-import { getRequestType, mapActionDTO } from './actionsHistory.utils'
+import { getRequestType, mapAction } from './actionsHistory.utils'
 import { HistoryActionsPageLD, TxType } from './types'
 
 export type LoadActionsParams = {
   page: number
-  address?: string
-  txid?: string
+  address?: Address
+  txid?: TxHash
   asset?: string
   type?: TxType | 'ALL'
 }
@@ -53,7 +54,7 @@ export const createActionsHistoryService = (
           RxOp.catchError((): Rx.Observable<InlineResponse200> => Rx.of({ actions: [], count: '0' })),
           RxOp.map(RD.success),
           liveData.map(({ actions, count }) => ({
-            actions: FP.pipe(actions, A.map(mapActionDTO)),
+            actions: FP.pipe(actions, A.map(mapAction)),
             total: parseInt(count, 10)
           })),
           liveData.mapLeft(() => ({
