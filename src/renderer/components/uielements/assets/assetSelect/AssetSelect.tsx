@@ -6,7 +6,8 @@ import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
-import { ordAsset } from '../../../../helpers/fp/ord'
+import { ordWalletBalanceByAsset } from '../../../../helpers/fp/ord'
+import { WalletBalances } from '../../../../services/clients'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetData } from '../assetData'
 import { AssetMenu } from '../assetMenu'
@@ -27,8 +28,8 @@ const DropdownCarret: React.FC<DropdownCarretProps> = (props: DropdownCarretProp
   )
 }
 
-type Props = {
-  assets: Asset[]
+export type Props = {
+  balances: WalletBalances
   asset: Asset
   priceIndex?: PriceDataIndex
   withSearch?: boolean
@@ -44,7 +45,7 @@ type Props = {
 export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
-    assets = [],
+    balances = [],
     priceIndex,
     withSearch = true,
     searchDisable = [],
@@ -76,22 +77,22 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
 
       // Wait for the dropdown to close
       await delay(500)
-      const changedAsset = assets.find((asset) => assetToString(asset) === assetId)
+      const changedAsset = balances.find((balance) => assetToString(balance.asset) === assetId)
       if (changedAsset) {
-        onSelect(changedAsset)
+        onSelect(changedAsset.asset)
       }
     },
-    [assets, onSelect]
+    [balances, onSelect]
   )
 
   const renderMenu = useCallback(() => {
-    const sortedAssetData = assets.sort(ordAsset.compare)
+    const sortedBalanceData = balances.sort(ordWalletBalanceByAsset.compare)
     return (
       <Styled.AssetSelectMenuWrapper minWidth={minWidth}>
         <AssetMenu
           searchPlaceholder={intl.formatMessage({ id: 'common.searchAsset' })}
           closeMenu={closeMenu}
-          assets={sortedAssetData}
+          balances={sortedBalanceData}
           asset={asset}
           priceIndex={priceIndex}
           withSearch={withSearch}
@@ -101,10 +102,10 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
         />
       </Styled.AssetSelectMenuWrapper>
     )
-  }, [assets, intl, asset, closeMenu, handleChangeAsset, priceIndex, searchDisable, withSearch, minWidth, network])
+  }, [balances, minWidth, intl, closeMenu, asset, priceIndex, withSearch, searchDisable, handleChangeAsset, network])
 
   const renderDropDownButton = () => {
-    const hideButton = assets.length === 0
+    const hideButton = balances.length === 0
     return (
       <Styled.AssetDropdownButton disabled={hideButton || disabled} onClick={handleDropdownButtonClicked}>
         {!hideButton ? <DropdownCarret open={openDropdown} disabled={disabled} /> : null}

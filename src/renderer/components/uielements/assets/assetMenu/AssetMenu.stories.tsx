@@ -1,45 +1,69 @@
 import React from 'react'
 
-import { storiesOf } from '@storybook/react'
-import { AssetBNB, AssetBTC, AssetRuneNative, bn } from '@xchainjs/xchain-util'
+import { Meta, Story } from '@storybook/react'
+import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount, bn } from '@xchainjs/xchain-util'
 
-import { AssetMenu } from './AssetMenu'
+import { WalletBalance } from '../../../../types/wallet'
+import { AssetMenu, Props as AssetMenuProps } from './AssetMenu'
 
-const assets = [AssetBNB, AssetBTC, AssetRuneNative]
 const priceIndex = {
   RUNE: bn(1),
   BNB: bn(2),
   BTC: bn(3)
 }
 
-storiesOf('Components/Assets/AssetMenu', module).add('with search', () => {
-  return (
-    <div style={{ display: 'flex', padding: '20px' }}>
-      <AssetMenu
-        withSearch={true}
-        asset={AssetBNB}
-        assets={assets}
-        priceIndex={priceIndex}
-        searchDisable={[]}
-        onSelect={(key) => console.log(key)}
-        network="testnet"
-      />
-    </div>
-  )
-})
+const balanceBNB: WalletBalance = {
+  amount: baseAmount('1'),
+  asset: AssetBNB,
+  walletAddress: ''
+}
 
-storiesOf('Components/Assets/AssetMenu', module).add('without search', () => {
-  return (
-    <div style={{ display: 'flex', padding: '20px' }}>
-      <AssetMenu
-        asset={AssetBNB}
-        assets={assets}
-        priceIndex={priceIndex}
-        withSearch={false}
-        searchDisable={[]}
-        onSelect={(key) => console.log(key)}
-        network="testnet"
-      />
-    </div>
-  )
-})
+const balanceBTC: WalletBalance = {
+  ...balanceBNB,
+  asset: AssetBTC
+}
+
+const balanceRuneNative: WalletBalance = {
+  ...balanceBNB,
+  asset: AssetRuneNative
+}
+
+const balances = [balanceBNB, balanceBTC, balanceRuneNative]
+
+const defaultProps: AssetMenuProps = {
+  withSearch: true,
+  asset: AssetBNB,
+  balances,
+  priceIndex,
+  searchDisable: [],
+  onSelect: (key) => console.log(key),
+  network: 'testnet'
+}
+
+export const StoryWithSearch: Story = () => <AssetMenu {...defaultProps} />
+
+StoryWithSearch.storyName = 'with search'
+
+export const StoryWithoutSearch: Story = () => {
+  const props = {
+    ...defaultProps,
+    withSearch: false
+  }
+  return <AssetMenu {...props} />
+}
+
+StoryWithoutSearch.storyName = 'without search'
+
+const meta: Meta = {
+  component: AssetMenu,
+  title: 'Components/Assets/AssetMenu',
+  decorators: [
+    (S: Story) => (
+      <div style={{ display: 'flex', padding: '20px' }}>
+        <S />
+      </div>
+    )
+  ]
+}
+
+export default meta

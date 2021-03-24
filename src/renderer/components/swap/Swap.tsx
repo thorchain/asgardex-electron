@@ -69,6 +69,7 @@ import {
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetWithDecimal } from '../../types/asgardex'
+import { WalletBalances } from '../../types/wallet'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
@@ -391,43 +392,51 @@ export const Swap = ({
     [walletBalances]
   )
 
-  const assetsToSwapFrom = useMemo((): Asset[] => {
-    const filteredAssets: Asset[] = FP.pipe(
-      allAssets,
-      A.filter((asset) =>
+  const allBalances = FP.pipe(
+    walletBalances,
+    O.map((balances) =>
+      balances.filter((balance) => allAssets.findIndex((asset) => eqAsset.equals(asset, balance.asset)) >= 0)
+    ),
+    O.getOrElse(() => [] as WalletBalances)
+  )
+
+  const balancesToSwapFrom = useMemo((): WalletBalances => {
+    const filteredBalances: WalletBalances = FP.pipe(
+      allBalances,
+      A.filter((balance) =>
         FP.pipe(
           assetSymbolsInWallet,
-          O.map((symbols) => symbols.includes(asset.symbol)),
+          O.map((symbols) => symbols.includes(balance.asset.symbol)),
           O.getOrElse((): boolean => false)
         )
       ),
-      (assets) => (assets.length ? assets : allAssets)
+      (balances) => (balances.length ? balances : allBalances)
     )
 
     return FP.pipe(
       assetsToSwap,
       O.map(({ source, target }) =>
         FP.pipe(
-          filteredAssets,
-          A.filter((asset) => asset.symbol !== source.symbol && asset.symbol !== target.symbol)
+          filteredBalances,
+          A.filter((balance) => balance.asset.symbol !== source.symbol && balance.asset.symbol !== target.symbol)
         )
       ),
-      O.getOrElse(() => allAssets)
+      O.getOrElse(() => allBalances)
     )
-  }, [allAssets, assetsToSwap, assetSymbolsInWallet])
+  }, [assetsToSwap, assetSymbolsInWallet, allBalances])
 
-  const assetsToSwapTo = useMemo((): Asset[] => {
+  const balancesToSwapTo = useMemo((): WalletBalances => {
     return FP.pipe(
       assetsToSwap,
       O.map(({ source, target }) =>
         FP.pipe(
-          allAssets,
-          A.filter((asset) => asset.symbol !== source.symbol && asset.symbol !== target.symbol)
+          allBalances,
+          A.filter((balance) => balance.asset.symbol !== source.symbol && balance.asset.symbol !== target.symbol)
         )
       ),
-      O.getOrElse(() => allAssets)
+      O.getOrElse(() => allBalances)
     )
-  }, [allAssets, assetsToSwap])
+  }, [assetsToSwap, allBalances])
 
   const balanceLabel = useMemo(
     () => `${intl.formatMessage({ id: 'swap.balance' })}: ${formatBN(baseToAsset(sourceAssetAmountMax1e8).amount())}`,
@@ -926,7 +935,7 @@ export const Swap = ({
                   <Styled.AssetSelect
                     onSelect={setSourceAsset}
                     asset={asset}
-                    assets={assetsToSwapFrom}
+                    balances={balancesToSwapFrom}
                     disabled={!canSwitchAssets}
                     network={network}
                   />
@@ -955,7 +964,7 @@ export const Swap = ({
                   <Styled.AssetSelect
                     onSelect={setTargetAsset}
                     asset={asset}
-                    assets={assetsToSwapTo}
+                    balances={balancesToSwapTo}
                     disabled={!canSwitchAssets}
                     network={network}
                   />

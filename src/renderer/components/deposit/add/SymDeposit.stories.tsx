@@ -22,7 +22,24 @@ import { ZERO_BASE_AMOUNT } from '../../../const'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { SymDepositState } from '../../../services/chain/types'
+import { WalletBalance } from '../../../types/wallet'
 import { SymDeposit, Props as SymDepositProps } from './SymDeposit'
+
+const balanceBNB: WalletBalance = {
+  amount: baseAmount('1'),
+  asset: AssetBNB,
+  walletAddress: ''
+}
+
+const balanceBTC: WalletBalance = {
+  ...balanceBNB,
+  asset: AssetBTC
+}
+
+const balanceTOMO: WalletBalance = {
+  ...balanceBNB,
+  asset: ASSETS_MAINNET.TOMO
+}
 
 const defaultProps: SymDepositProps = {
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
@@ -45,7 +62,7 @@ const defaultProps: SymDepositProps = {
     runeBalance: baseAmount('2000')
   },
   priceAsset: AssetRuneNative,
-  assets: [AssetBNB, AssetBTC, ASSETS_MAINNET.TOMO],
+  balances: [balanceBNB, balanceBTC, balanceTOMO],
   poolAddress: O.none,
   memos: O.some({ rune: 'rune-memo', asset: 'asset-memo' }),
   reloadBalances: () => console.log('reloadBalances'),

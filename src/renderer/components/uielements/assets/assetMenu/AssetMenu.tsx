@@ -1,21 +1,23 @@
 import React, { useMemo, useCallback } from 'react'
 
-import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, baseAmount, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { Col, Row } from 'antd'
 
 import { Network } from '../../../../../shared/api/types'
 import { eqAsset } from '../../../../helpers/fp/eq'
 import { PriceDataIndex } from '../../../../services/midgard/types'
+import { WalletBalance, WalletBalances } from '../../../../types/wallet'
 import { FilterMenu } from '../../filterMenu'
 import { AssetData } from '../assetData/AssetData'
 
-const filterFunction = (asset: Asset, searchTerm: string) => {
+const filterFunction = ({ asset }: WalletBalance, searchTerm: string) => {
   const { ticker } = asset
   return ticker?.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
 }
 
-type Props = {
+export type Props = {
   asset: Asset
-  assets: Asset[]
+  balances: WalletBalances
   priceIndex?: PriceDataIndex
   searchDisable: string[]
   withSearch: boolean
@@ -28,7 +30,7 @@ type Props = {
 export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
   const {
     searchPlaceholder,
-    assets,
+    balances,
     asset,
     priceIndex = {},
     withSearch,
@@ -38,19 +40,29 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
     network
   } = props
 
-  const filteredData = useMemo((): Asset[] => assets.filter((a: Asset) => !eqAsset.equals(a, asset)), [asset, assets])
-
-  const cellRenderer = useCallback(
-    (asset: Asset) => {
-      const price = baseAmount(priceIndex[asset.ticker])
-      const node = <AssetData asset={asset} price={price} network={network} />
-      const key = assetToString(asset)
-      return { key, node }
-    },
-    [priceIndex, network]
+  const filteredData = useMemo(
+    (): WalletBalances => balances.filter((balance: WalletBalance) => !eqAsset.equals(balance.asset, asset)),
+    [asset, balances]
   )
 
-  const disableItemFilterHandler = useCallback((asset: Asset) => searchDisable.indexOf(asset.ticker) > -1, [
+  const cellRenderer = useCallback(
+    ({ asset, amount }: WalletBalance) => {
+      const price = baseAmount(priceIndex[asset.ticker])
+      const key = assetToString(asset)
+      const node = (
+        <Row align={'middle'} gutter={[8, 0]} onClick={() => onSelect(key)}>
+          <Col>
+            <AssetData asset={asset} price={price} network={network} />
+          </Col>
+          <Col>{formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 3 })}</Col>
+        </Row>
+      )
+      return { key, node }
+    },
+    [network, onSelect, priceIndex]
+  )
+
+  const disableItemFilterHandler = useCallback(({ asset }: WalletBalance) => searchDisable.indexOf(asset.ticker) > -1, [
     searchDisable
   ])
 
@@ -61,8 +73,7 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
       searchEnabled={withSearch}
       filterFunction={filterFunction}
       cellRenderer={cellRenderer}
-      disableItemFilter={(a: Asset) => disableItemFilterHandler(a)}
-      onSelect={onSelect}
+      disableItemFilter={(balance: WalletBalance) => disableItemFilterHandler(balance)}
       data={filteredData}
     />
   )

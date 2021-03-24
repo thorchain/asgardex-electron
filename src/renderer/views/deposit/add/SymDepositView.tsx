@@ -20,6 +20,7 @@ import { useEthereumContext } from '../../../contexts/EthereumContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getChainAsset } from '../../../helpers/chainHelper'
+import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as depositRoutes from '../../../routes/deposit'
@@ -29,6 +30,7 @@ import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midga
 import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 import { AssetWithDecimal } from '../../../types/asgardex'
+import { WalletBalances } from '../../../types/wallet'
 
 type Props = {
   asset: AssetWithDecimal
@@ -78,7 +80,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
 
-  const [balances] = useObservableState(
+  const [walletBalances] = useObservableState(
     () =>
       FP.pipe(
         balancesState$,
@@ -92,31 +94,31 @@ export const SymDepositView: React.FC<Props> = (props) => {
   const assetBalance: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        balances,
+        walletBalances,
         O.chain(getBalanceByAsset(asset)),
         O.map(({ amount }) => amount)
       ),
-    [asset, balances]
+    [asset, walletBalances]
   )
 
   const runeBalance: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        balances,
+        walletBalances,
         O.chain(getBalanceByAsset(AssetRuneNative)),
         O.map(({ amount }) => amount)
       ),
-    [balances]
+    [walletBalances]
   )
 
   const chainAssetBalance: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        balances,
+        walletBalances,
         O.chain(getBalanceByAsset(getChainAsset(asset.chain))),
         O.map(({ amount }) => amount)
       ),
-    [asset, balances]
+    [asset, walletBalances]
   )
 
   const depositTxMemo: O.Option<SymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
@@ -189,6 +191,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           network={network}
           approveERC20Token$={approveERC20Token$}
           isApprovedERC20Token$={isApprovedERC20Token$}
+          balances={[]}
         />
       </>
     ),
@@ -215,6 +218,13 @@ export const SymDepositView: React.FC<Props> = (props) => {
       (_) => renderDisabledAddDeposit(),
       (error) => renderDisabledAddDeposit(error),
       ([assetPrice, poolAssets, poolDetail]) => {
+        const filteredBalances = FP.pipe(
+          walletBalances,
+          O.map((balances) =>
+            balances.filter((balance) => poolAssets.findIndex((asset) => eqAsset.equals(asset, balance.asset)) >= 0)
+          ),
+          O.getOrElse(() => [] as WalletBalances)
+        )
         return (
           <>
             <SymDeposit
@@ -235,7 +245,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
               reloadFees={reloadSymDepositFees}
               priceAsset={selectedPricePoolAsset}
               reloadBalances={reloadBalancesAndShares}
-              assets={poolAssets}
+              balances={filteredBalances}
               deposit$={symDeposit$}
               network={network}
               approveERC20Token$={approveERC20Token$}

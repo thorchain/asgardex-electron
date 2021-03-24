@@ -19,6 +19,7 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getChainAsset } from '../../../helpers/chainHelper'
+import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as depositRoutes from '../../../routes/deposit'
@@ -27,6 +28,7 @@ import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { getBalanceByAsset } from '../../../services/wallet/util'
+import { WalletBalances } from '../../../types/wallet'
 
 type Props = {
   asset: Asset
@@ -72,7 +74,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
 
-  const [balances] = useObservableState(
+  const [walletBalances] = useObservableState(
     () =>
       FP.pipe(
         balancesState$,
@@ -91,21 +93,21 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
   const assetBalance: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        balances,
+        walletBalances,
         O.chain(getBalanceByAsset(asset)),
         O.map(({ amount }) => amount)
       ),
-    [asset, balances]
+    [asset, walletBalances]
   )
 
   const chainAssetBalance: O.Option<BaseAmount> = useMemo(
     () =>
       FP.pipe(
-        balances,
+        walletBalances,
         O.chain(getBalanceByAsset(getChainAsset(asset.chain))),
         O.map(({ amount }) => amount)
       ),
-    [asset, balances]
+    [asset, walletBalances]
   )
 
   const memo: O.Option<Memo> = useObservableState(asymDepositTxMemo$, O.none)
@@ -155,6 +157,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
           poolData={ZERO_POOL_DATA}
           deposit$={asymDeposit$}
           network={network}
+          balances={[]}
         />
       </>
     ),
@@ -178,6 +181,13 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
       (_) => renderDisabledAddDeposit(),
       (error) => renderDisabledAddDeposit(error),
       ([assetPrice, poolAssets, poolDetail]) => {
+        const filteredBalances = FP.pipe(
+          walletBalances,
+          O.map((balances) =>
+            balances.filter((balance) => poolAssets.findIndex((asset) => eqAsset.equals(asset, balance.asset)) >= 0)
+          ),
+          O.getOrElse(() => [] as WalletBalances)
+        )
         return (
           <>
             <AsymDeposit
@@ -195,7 +205,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
               reloadFees={reloadAsymDepositFee}
               priceAsset={selectedPricePoolAsset}
               reloadBalances={reloadBalancesAndShares}
-              assets={poolAssets}
+              balances={filteredBalances}
               deposit$={asymDeposit$}
               network={network}
             />

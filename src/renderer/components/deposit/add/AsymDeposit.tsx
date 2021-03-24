@@ -35,6 +35,7 @@ import {
 } from '../../../services/chain/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
+import { WalletBalances } from '../../../types/wallet'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
@@ -58,7 +59,7 @@ export type Props = {
   reloadBalances: FP.Lazy<void>
   viewAssetTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
-  assets?: Asset[]
+  balances: WalletBalances
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
@@ -81,7 +82,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
     poolAddress: oPoolAddress,
     viewAssetTx = (_) => {},
     validatePassword$,
-    assets,
+    balances,
     priceAsset,
     reloadFees,
     reloadBalances = FP.constVoid,
@@ -407,7 +408,7 @@ export const AsymDeposit: React.FC<Props> = (props) => {
             maxAmount={maxAssetAmountToDeposit}
             onChangeAssetAmount={assetAmountChangeHandler}
             price={assetPrice}
-            assets={assets}
+            balances={balances}
             percentValue={percentValueToDeposit}
             onChangePercent={changePercentHandler}
             onChangeAsset={onChangeAsset}

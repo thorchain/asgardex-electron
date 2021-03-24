@@ -51,6 +51,7 @@ import { ApproveParams, IsApprovedRD } from '../../../services/ethereum/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
+import { WalletBalances } from '../../../types/wallet'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
@@ -77,7 +78,7 @@ export type Props = {
   viewAssetTx: (txHash: string) => void
   viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
-  assets?: Asset[]
+  balances: WalletBalances
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
@@ -104,7 +105,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     viewAssetTx = (_) => {},
     viewRuneTx = (_) => {},
     validatePassword$,
-    assets,
+    balances,
     priceAsset,
     reloadFees,
     reloadBalances = FP.constVoid,
@@ -889,7 +890,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             inputOnFocusHandler={() => setSelectedInput('asset')}
             inputOnBlurHandler={inputOnBlur}
             price={assetPrice}
-            assets={assets}
+            balances={balances}
             percentValue={percentValueToDeposit}
             onChangePercent={changePercentHandler}
             onChangeAsset={onChangeAssetHandler}
@@ -911,6 +912,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             price={runePrice}
             priceAsset={priceAsset}
             network={network}
+            balances={[]}
           />
         </Col>
       </Styled.CardsRow>

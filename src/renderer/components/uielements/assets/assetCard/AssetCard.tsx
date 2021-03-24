@@ -18,17 +18,18 @@ import * as FP from 'fp-ts/lib/function'
 import { Network } from '../../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { BTC_DECIMAL, isBtcAsset } from '../../../../helpers/assetHelper'
-import { ordAsset } from '../../../../helpers/fp/ord'
+import { ordWalletBalanceByAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
+import { WalletBalances } from '../../../../types/wallet'
 import { Label } from '../../label'
 import { Slider } from '../../slider'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.style'
 
-type Props = {
+export type Props = {
   asset: Asset
-  assets?: Asset[]
+  balances: WalletBalances
   selectedAmount: BaseAmount
   maxAmount: BaseAmount
   price: BigNumber
@@ -52,7 +53,7 @@ type Props = {
 export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
-    assets = [],
+    balances = [],
     price = bn(0),
     priceIndex,
     slip,
@@ -95,11 +96,11 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderMenu = useCallback(() => {
-    const sortedAssetData = assets.sort(ordAsset.compare)
+    const sortedBalanceData = balances.sort(ordWalletBalanceByAsset.compare)
 
     return (
       <AssetMenu
-        assets={sortedAssetData}
+        balances={sortedBalanceData}
         asset={asset}
         priceIndex={priceIndex}
         withSearch={withSearch}
@@ -108,7 +109,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
         network={network}
       />
     )
-  }, [assets, asset, priceIndex, withSearch, searchDisable, network, handleChangeAsset])
+  }, [balances, asset, priceIndex, withSearch, searchDisable, handleChangeAsset, network])
 
   const withPercentSlider = useMemo(() => !isNaN(percentValue), [percentValue])
 
@@ -152,7 +153,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
             <Styled.AssetSelect
               minWidth={wrapperWidth}
               showAssetName={false}
-              assets={assets}
+              balances={balances}
               asset={asset}
               onSelect={handleChangeAsset}
               network={network}>
