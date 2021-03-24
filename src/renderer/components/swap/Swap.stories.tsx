@@ -9,6 +9,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../shared/mock/wallet'
 import { ONE_BN } from '../../const'
+import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { SwapState } from '../../services/chain/types'
 import { Swap, SwapProps } from './Swap'
@@ -20,7 +21,7 @@ const defaultProps: SwapProps = {
     { asset: AssetBTC, assetPrice: bn('56851.67420275761') },
     { asset: AssetRuneNative, assetPrice: ONE_BN }
   ],
-  sourceAsset: AssetRuneNative,
+  sourceAsset: { asset: AssetRuneNative, decimal: THORCHAIN_DECIMAL },
   targetAsset: AssetBTC,
   poolAddress: O.some({ chain: 'BNB', address: 'vault-address', router: O.some('router-address') }),
   // mock successfull result of swap$

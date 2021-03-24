@@ -52,17 +52,17 @@ export const DepositView: React.FC<Props> = () => {
 
   const { addressByChain$, assetWithDecimal$ } = useChainContext()
 
-  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
+  const oRouteAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
 
   // Set selected pool asset whenever an asset in route has been changed
   // Needed to get all data for this pool (pool details etc.)
   useEffect(() => {
-    setSelectedPoolAsset(oSelectedAsset)
+    setSelectedPoolAsset(oRouteAsset)
     // Reset selectedPoolAsset on view's unmount to avoid effects with depending streams
     return () => {
       setSelectedPoolAsset(O.none)
     }
-  }, [oSelectedAsset, setSelectedPoolAsset])
+  }, [oRouteAsset, setSelectedPoolAsset])
 
   const [assetRD] = useObservableState<AssetWithDecimalRD>(
     () =>
@@ -80,13 +80,15 @@ export const DepositView: React.FC<Props> = () => {
     RD.initial
   )
 
+  const oSelectedAsset = useMemo(() => RD.toOption(assetRD), [assetRD])
+
   const address$ = useMemo(
     () =>
       FP.pipe(
         oSelectedAsset,
         O.fold(
           () => Rx.EMPTY,
-          ({ chain }) => addressByChain$(chain)
+          ({ asset }) => addressByChain$(asset.chain)
         )
       ),
 

@@ -7,6 +7,7 @@ import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { network$ } from '../app/service'
 import * as C from '../clients'
 import { getClient } from '../clients/utils'
@@ -14,17 +15,16 @@ import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { Client$, ClientState } from './types'
 
+const toThorNetwork = (network: Network) => {
+  // In case of 'chaosnet' + 'mainnet` we stick on `mainnet`
+  if (network === 'chaosnet') return 'mainnet'
+  return network
+}
+
 /**
  * Thorchain network depending on selected `Network`
  */
-const thorchainNetwork$: Observable<ClientNetwork> = network$.pipe(
-  map((network) => {
-    // In case of 'chaosnet' + 'mainnet` we stick on `mainnet`
-    if (network === 'chaosnet') return 'mainnet'
-
-    return network
-  })
-)
+const thorchainNetwork$: Observable<ClientNetwork> = network$.pipe(map(toThorNetwork))
 
 /**
  * Stream to create an observable ThorchainClient depending on existing phrase in keystore
@@ -83,4 +83,13 @@ const getExplorerTxUrl$: C.GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
  */
 const getExplorerAddressUrl$: C.GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
 
-export { client$, clientState$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ }
+export {
+  toThorNetwork,
+  client$,
+  clientState$,
+  address$,
+  addressUI$,
+  explorerUrl$,
+  getExplorerTxUrl$,
+  getExplorerAddressUrl$
+}
