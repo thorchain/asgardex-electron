@@ -40,7 +40,7 @@ import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { LiveData } from '../../helpers/rx/liveData'
-import { getWalletBalanceByAsset } from '../../helpers/walletHelper'
+import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/swap'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
@@ -394,9 +394,7 @@ export const Swap = ({
 
   const allBalances = FP.pipe(
     walletBalances,
-    O.map((balances) =>
-      balances.filter((balance) => allAssets.findIndex((asset) => eqAsset.equals(asset, balance.asset)) >= 0)
-    ),
+    O.map((balances) => filterWalletBalancesByAssets(balances, allAssets)),
     O.getOrElse(() => [] as WalletBalances)
   )
 

@@ -5,7 +5,9 @@ import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { NonEmptyWalletBalances } from '../services/wallet/types'
+import { eqWalletBalances } from './fp/eq'
 import {
+  filterWalletBalancesByAssets,
   getAssetAmountByAsset,
   getBnbAmountFromBalances,
   getLtcAmountFromBalances,
@@ -101,6 +103,17 @@ describe('walletHelper', () => {
     it('returns none if no LTC is available', () => {
       const result = getLtcAmountFromBalances([RUNE_WB, BOLT_WB])
       expect(result).toBeNone()
+    })
+  })
+
+  describe('filterWalletBalancesByAssets', () => {
+    it('returns filted wallet balances by assets', () => {
+      const result = filterWalletBalancesByAssets([RUNE_WB, BOLT_WB, BNB_WB, LTC_WB], [AssetBNB, AssetLTC])
+      expect(eqWalletBalances.equals(result, [BNB_WB, LTC_WB])).toBeTruthy()
+    })
+    it('returns empty array if no asset is available', () => {
+      const result = filterWalletBalancesByAssets([RUNE_WB, BOLT_WB], [AssetLTC])
+      expect(eqWalletBalances.equals(result, [])).toBeTruthy()
     })
   })
 })

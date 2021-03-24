@@ -19,9 +19,9 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getChainAsset } from '../../../helpers/chainHelper'
-import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
+import { filterWalletBalancesByAssets } from '../../../helpers/walletHelper'
 import * as depositRoutes from '../../../routes/deposit'
 import { Memo } from '../../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../../services/const'
@@ -183,9 +183,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
       ([assetPrice, poolAssets, poolDetail]) => {
         const filteredBalances = FP.pipe(
           walletBalances,
-          O.map((balances) =>
-            balances.filter((balance) => poolAssets.findIndex((asset) => eqAsset.equals(asset, balance.asset)) >= 0)
-          ),
+          O.map((balances) => filterWalletBalancesByAssets(balances, poolAssets)),
           O.getOrElse(() => [] as WalletBalances)
         )
         return (
