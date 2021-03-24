@@ -166,7 +166,7 @@ export const BalanceErrorLabel = styled(ErrorLabel)`
 `
 
 export const NoteLabel = styled(UILabel)`
-  color: ${palette('gray', 2)};
+  color: ${palette('text', 2)};
 `
 
 export const AssetSelect = styled(AssetSelectUI)`

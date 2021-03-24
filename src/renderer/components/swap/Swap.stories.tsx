@@ -2,6 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
+import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { assetAmount, AssetBTC, AssetRuneNative, assetToBase, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -22,7 +23,7 @@ const defaultProps: SwapProps = {
     { asset: AssetRuneNative, assetPrice: ONE_BN }
   ],
   sourceAsset: { asset: AssetRuneNative, decimal: THORCHAIN_DECIMAL },
-  targetAsset: AssetBTC,
+  targetAsset: { asset: AssetBTC, decimal: BTC_DECIMAL },
   poolAddress: O.some({ chain: 'BNB', address: 'vault-address', router: O.some('router-address') }),
   // mock successfull result of swap$
   swap$: (params) =>
