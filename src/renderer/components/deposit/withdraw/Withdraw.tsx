@@ -306,7 +306,7 @@ export const Withdraw: React.FC<Props> = ({
   const disabledForm = useMemo(() => withdrawPercent <= 0 || disabled, [withdrawPercent, disabled])
 
   const getTwoSigfigAssetAmount = (amount: AssetAmount) => {
-    const amountIntegerValue = amount.amount().integerValue()
+    const amountIntegerValue = amount.amount().integerValue(BigNumber.ROUND_DOWN)
     const precisionCount = amountIntegerValue.gt(0) ? amountIntegerValue.toString().length + 2 : 2
     return assetAmount(amount.amount().toPrecision(precisionCount))
   }
