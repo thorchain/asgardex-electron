@@ -25,7 +25,7 @@ export const ordAsset: Ord.Ord<Asset> = {
 }
 
 /**
- * Comparing Assets
+ * Compare WalletBalances by its Asset
  **/
 export const ordWalletBalanceByAsset: Ord.Ord<WalletBalance> = {
   equals: (x, y) => eqAsset.equals(x.asset, y.asset),
