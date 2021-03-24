@@ -92,9 +92,7 @@ type SelectedInput = 'asset' | 'rune' | 'none'
 
 export const SymDeposit: React.FC<Props> = (props) => {
   const {
-    // TODO (@Veado) Use `assetDecimal` instead of getting decimal from balances
-    // see https://github.com/thorchain/asgardex-electron/issues/1162
-    asset: { asset, decimal: _assetDecimal },
+    asset: { asset, decimal: assetDecimal },
     assetPrice,
     runePrice,
     memos: oMemos,
@@ -139,7 +137,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [chainAssetBalance]
   )
 
+  /** Prev. asset balance based on original decimal */
   const prevAssetBalance = useRef<O.Option<BaseAmount>>(O.none)
+  /** Asset balance based on original decimal */
   const assetBalance: BaseAmount = useMemo(
     () =>
       FP.pipe(
@@ -149,23 +149,23 @@ export const SymDeposit: React.FC<Props> = (props) => {
           return balance
         }),
         O.alt(() => prevAssetBalance.current),
-        O.getOrElse(() => baseAmount(0, THORCHAIN_DECIMAL))
+        O.getOrElse(() => baseAmount(0, assetDecimal))
       ),
-    [oAssetBalance]
+    [assetDecimal, oAssetBalance]
   )
 
-  const assetBalanceForThorchain: BaseAmount = useMemo(() => max1e8BaseAmount(assetBalance), [assetBalance])
+  const assetBalanceMax1e8: BaseAmount = useMemo(() => max1e8BaseAmount(assetBalance), [assetBalance])
 
   const [runeAmountToDeposit, setRuneAmountToDeposit] = useState<BaseAmount>(baseAmount(0, THORCHAIN_DECIMAL))
 
-  const initialAssetAmountToDeposit = useMemo(() => baseAmount(0, assetBalanceForThorchain.decimal), [
-    assetBalanceForThorchain.decimal
+  const initialAssetAmountToDepositMax1e8 = useMemo(() => baseAmount(0, assetBalanceMax1e8.decimal), [
+    assetBalanceMax1e8.decimal
   ])
   const [
     /* max. 1e8 decimal */
-    assetAmountToDeposit,
-    _setAssetAmountToDeposit /* private, never set it directly, use `setAssetAmountToDeposit` instead */
-  ] = useState<BaseAmount>(initialAssetAmountToDeposit)
+    assetAmountToDepositMax1e8,
+    _setAssetAmountToDepositMax1e8 /* private, never set it directly, use `setAssetAmountToDeposit` instead */
+  ] = useState<BaseAmount>(initialAssetAmountToDepositMax1e8)
 
   const [percentValueToDeposit, setPercentValueToDeposit] = useState(0)
 
@@ -205,12 +205,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
           amounts: {
             rune: runeAmountToDeposit,
             // Decimal needs to be converted back for using orginal decimal of this asset (provided by `assetBalance`)
-            asset: convertBaseAmountDecimal(assetAmountToDeposit, assetBalance.decimal)
+            asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetBalance.decimal)
           },
           memos
         }))
       ),
-    [oPoolAddress, oMemos, assetAmountToDeposit, asset, runeAmountToDeposit, assetBalance.decimal]
+    [oPoolAddress, oMemos, assetAmountToDepositMax1e8, asset, runeAmountToDeposit, assetBalance.decimal]
   )
 
   const prevDepositFeesRD = useRef<DepositFeesRD>(RD.initial)
@@ -294,7 +294,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
    * Max asset amount to deposit
    * Note: It's max. 1e8 decimal based
    */
-  const maxAssetAmountToDeposit = useMemo((): BaseAmount => {
+  const maxAssetAmountToDepositMax1e8 = useMemo((): BaseAmount => {
     const maxAmount = Helper.maxAssetAmountToDeposit({ poolData, runeBalance, assetBalance })
     // substract fees only if asset is as same as chain asset
     if (isChainAsset(asset)) {
@@ -314,27 +314,27 @@ export const SymDeposit: React.FC<Props> = (props) => {
     return max1e8BaseAmount(maxAmount)
   }, [asset, assetBalance, oAssetChainFee, poolData, runeBalance])
 
-  const setAssetAmountToDeposit = useCallback(
+  const setAssetAmountToDepositMax1e8 = useCallback(
     (amountToDeposit: BaseAmount) => {
-      const newAmount = baseAmount(amountToDeposit.amount(), assetBalanceForThorchain.decimal)
+      const newAmount = baseAmount(amountToDeposit.amount(), assetBalanceMax1e8.decimal)
       // dirty check - do nothing if prev. and next amounts are equal
-      if (eqBaseAmount.equals(newAmount, assetAmountToDeposit)) return {}
+      if (eqBaseAmount.equals(newAmount, assetAmountToDepositMax1e8)) return {}
 
-      const newAmountToDeposit = newAmount.amount().isGreaterThan(maxAssetAmountToDeposit.amount())
-        ? maxAssetAmountToDeposit
+      const newAmountToDepositMax1e8 = newAmount.amount().isGreaterThan(maxAssetAmountToDepositMax1e8.amount())
+        ? maxAssetAmountToDepositMax1e8
         : newAmount
 
-      _setAssetAmountToDeposit({ ...newAmountToDeposit })
+      _setAssetAmountToDepositMax1e8({ ...newAmountToDepositMax1e8 })
     },
-    [assetAmountToDeposit, assetBalanceForThorchain.decimal, maxAssetAmountToDeposit]
+    [assetAmountToDepositMax1e8, assetBalanceMax1e8.decimal, maxAssetAmountToDepositMax1e8]
   )
 
   // Update `assetAmountToDeposit` if `maxAssetAmountToDeposit` has been updated
   useEffect(() => {
-    if (maxAssetAmountToDeposit.amount().isLessThan(assetAmountToDeposit.amount())) {
-      setAssetAmountToDeposit(maxAssetAmountToDeposit)
+    if (maxAssetAmountToDepositMax1e8.amount().isLessThan(assetAmountToDepositMax1e8.amount())) {
+      setAssetAmountToDepositMax1e8(maxAssetAmountToDepositMax1e8)
     }
-  }, [assetAmountToDeposit, maxAssetAmountToDeposit, setAssetAmountToDeposit])
+  }, [assetAmountToDepositMax1e8, maxAssetAmountToDepositMax1e8, setAssetAmountToDepositMax1e8])
 
   const hasAssetBalance = useMemo(() => assetBalance.amount().isGreaterThan(0), [assetBalance])
   const hasRuneBalance = useMemo(() => runeBalance.amount().isGreaterThan(0), [runeBalance])
@@ -398,20 +398,20 @@ export const SymDeposit: React.FC<Props> = (props) => {
         ? { ...maxRuneAmountToDeposit } // Use copy to avoid missmatch with values in input fields
         : runeInput
       // assetAmount max. 1e8 decimal
-      const assetAmount = Helper.getAssetAmountToDeposit({
+      const assetAmountMax1e8 = Helper.getAssetAmountToDeposit({
         runeAmount: runeAmount,
         poolData,
         assetDecimal: assetBalance.decimal
       })
 
-      if (assetAmount.amount().isGreaterThan(maxAssetAmountToDeposit.amount())) {
-        runeAmount = Helper.getRuneAmountToDeposit(maxAssetAmountToDeposit, poolData)
+      if (assetAmountMax1e8.amount().isGreaterThan(maxAssetAmountToDepositMax1e8.amount())) {
+        runeAmount = Helper.getRuneAmountToDeposit(maxAssetAmountToDepositMax1e8, poolData)
         setRuneAmountToDeposit(runeAmount)
-        setAssetAmountToDeposit(maxAssetAmountToDeposit)
+        setAssetAmountToDepositMax1e8(maxAssetAmountToDepositMax1e8)
         setPercentValueToDeposit(100)
       } else {
         setRuneAmountToDeposit(runeAmount)
-        setAssetAmountToDeposit(assetAmount)
+        setAssetAmountToDepositMax1e8(assetAmountMax1e8)
         // formula: runeQuantity * 100 / maxRuneAmountToDeposit
         const percentToDeposit = maxRuneAmountToDeposit.amount().isGreaterThan(0)
           ? runeAmount.amount().multipliedBy(100).dividedBy(maxRuneAmountToDeposit.amount()).toNumber()
@@ -421,11 +421,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
     },
     [
       assetBalance.decimal,
-      maxAssetAmountToDeposit,
+      maxAssetAmountToDepositMax1e8,
       maxRuneAmountToDeposit,
       poolData,
       selectedInput,
-      setAssetAmountToDeposit
+      setAssetAmountToDepositMax1e8
     ]
   )
 
@@ -433,42 +433,42 @@ export const SymDeposit: React.FC<Props> = (props) => {
     (assetInput: BaseAmount) => {
       // make sure we use correct decimal based on assetBalanceForThorchain
       // (input's decimal might not be updated yet)
-      const newAmount = convertBaseAmountDecimal(assetInput, assetBalanceForThorchain.decimal)
+      const newAmountMax1e8 = convertBaseAmountDecimal(assetInput, assetBalanceMax1e8.decimal)
       // Do nothing if we don't entered input for asset
       if (selectedInput !== 'asset') return
 
-      let assetAmount = newAmount.amount().isGreaterThan(maxAssetAmountToDeposit.amount())
-        ? { ...maxAssetAmountToDeposit } // Use copy to avoid missmatch with values in input fields
-        : { ...newAmount }
-      const runeAmount = Helper.getRuneAmountToDeposit(assetAmount, poolData)
+      let assetAmountMax1e8 = newAmountMax1e8.amount().isGreaterThan(maxAssetAmountToDepositMax1e8.amount())
+        ? { ...maxAssetAmountToDepositMax1e8 } // Use copy to avoid missmatch with values in input fields
+        : { ...newAmountMax1e8 }
+      const runeAmount = Helper.getRuneAmountToDeposit(assetAmountMax1e8, poolData)
 
       if (runeAmount.amount().isGreaterThan(maxRuneAmountToDeposit.amount())) {
-        assetAmount = Helper.getAssetAmountToDeposit({
+        assetAmountMax1e8 = Helper.getAssetAmountToDeposit({
           runeAmount,
           poolData,
           assetDecimal: assetBalance.decimal
         })
         setRuneAmountToDeposit(maxRuneAmountToDeposit)
-        setAssetAmountToDeposit(assetAmount)
+        setAssetAmountToDepositMax1e8(assetAmountMax1e8)
         setPercentValueToDeposit(100)
       } else {
         setRuneAmountToDeposit(runeAmount)
-        setAssetAmountToDeposit(assetAmount)
+        setAssetAmountToDepositMax1e8(assetAmountMax1e8)
         // assetQuantity * 100 / maxAssetAmountToDeposit
-        const percentToDeposit = maxAssetAmountToDeposit.amount().isGreaterThan(0)
-          ? assetAmount.amount().multipliedBy(100).dividedBy(maxAssetAmountToDeposit.amount()).toNumber()
+        const percentToDeposit = maxAssetAmountToDepositMax1e8.amount().isGreaterThan(0)
+          ? assetAmountMax1e8.amount().multipliedBy(100).dividedBy(maxAssetAmountToDepositMax1e8.amount()).toNumber()
           : 0
         setPercentValueToDeposit(percentToDeposit)
       }
     },
     [
       assetBalance.decimal,
-      assetBalanceForThorchain.decimal,
-      maxAssetAmountToDeposit,
+      assetBalanceMax1e8.decimal,
+      maxAssetAmountToDepositMax1e8,
       maxRuneAmountToDeposit,
       poolData,
       selectedInput,
-      setAssetAmountToDeposit
+      setAssetAmountToDepositMax1e8
     ]
   )
 
@@ -479,17 +479,17 @@ export const SymDeposit: React.FC<Props> = (props) => {
         .dividedBy(100)
         .multipliedBy(percent)
         .decimalPlaces(0, BigNumber.ROUND_DOWN)
-      const assetAmountBN = maxAssetAmountToDeposit
+      const assetAmountMax1e8BN = maxAssetAmountToDepositMax1e8
         .amount()
         .dividedBy(100)
         .multipliedBy(percent)
         .decimalPlaces(0, BigNumber.ROUND_DOWN)
 
       setRuneAmountToDeposit(baseAmount(runeAmountBN, maxRuneAmountToDeposit.decimal))
-      setAssetAmountToDeposit(baseAmount(assetAmountBN, assetBalanceForThorchain.decimal))
+      setAssetAmountToDepositMax1e8(baseAmount(assetAmountMax1e8BN, assetBalanceMax1e8.decimal))
       setPercentValueToDeposit(percent)
     },
-    [assetBalanceForThorchain.decimal, maxAssetAmountToDeposit, maxRuneAmountToDeposit, setAssetAmountToDeposit]
+    [assetBalanceMax1e8.decimal, maxAssetAmountToDepositMax1e8, maxRuneAmountToDeposit, setAssetAmountToDepositMax1e8]
   )
 
   const onChangeAssetHandler = useCallback(
@@ -602,13 +602,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     return (
       <DepositAssets
-        target={{ asset, amount: assetAmountToDeposit }}
+        target={{ asset, amount: assetAmountToDepositMax1e8 }}
         source={O.some({ asset: AssetRuneNative, amount: runeAmountToDeposit })}
         stepDescription={stepDescription}
         network={network}
       />
     )
-  }, [intl, asset, depositState, assetAmountToDeposit, runeAmountToDeposit, network])
+  }, [intl, asset, depositState, assetAmountToDepositMax1e8, runeAmountToDeposit, network])
 
   const onCloseTxModal = useCallback(() => {
     resetDepositState()
@@ -884,8 +884,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <Styled.AssetCard
             disabled={disabledForm}
             asset={asset}
-            selectedAmount={assetAmountToDeposit}
-            maxAmount={maxAssetAmountToDeposit}
+            selectedAmount={assetAmountToDepositMax1e8}
+            maxAmount={maxAssetAmountToDepositMax1e8}
             onChangeAssetAmount={assetAmountChangeHandler}
             inputOnFocusHandler={() => setSelectedInput('asset')}
             inputOnBlurHandler={inputOnBlur}
