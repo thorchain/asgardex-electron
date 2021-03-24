@@ -2,10 +2,10 @@ import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount } from '@xchainjs/xchai
 import * as O from 'fp-ts/Option'
 
 import { eqAssetsWithAmount } from '../../helpers/fp/eq'
-import { HistoryAction, Tx } from '../../services/midgard/types'
-import { getTxId, getValues } from './ActionsHistory.helper'
+import { PoolAction, Tx } from '../../services/midgard/types'
+import { getTxId, getValues } from './PoolActionsHistory.helper'
 
-const defaultAction: HistoryAction = {
+const defaultPoolAction: PoolAction = {
   date: new Date(0),
   in: [],
   out: [],
@@ -19,17 +19,17 @@ const defaultTx: Tx = {
   txID: ''
 }
 
-describe('ActionsHistory.helper', () => {
+describe('PoolActionsHistory.helper', () => {
   describe('getTxId', () => {
     it('should return O.none in case there is no info about tx at all', () => {
-      expect(getTxId(defaultAction)).toBeNone()
+      expect(getTxId(defaultPoolAction)).toBeNone()
     })
 
     it('should return the first inbound tx id', () => {
       const firstInTxId = 'first inbound tx id'
       expect(
         getTxId({
-          ...defaultAction,
+          ...defaultPoolAction,
           in: [
             {
               ...defaultTx,
@@ -41,7 +41,7 @@ describe('ActionsHistory.helper', () => {
 
       expect(
         getTxId({
-          ...defaultAction,
+          ...defaultPoolAction,
           in: [
             {
               ...defaultTx,
@@ -59,7 +59,7 @@ describe('ActionsHistory.helper', () => {
 
       expect(
         getTxId({
-          ...defaultAction,
+          ...defaultPoolAction,
           in: [
             {
               ...defaultTx,
@@ -84,14 +84,14 @@ describe('ActionsHistory.helper', () => {
       const firstOutTxId = 'first inbound tx id'
       expect(
         getTxId({
-          ...defaultAction,
+          ...defaultPoolAction,
           out: [{ ...defaultTx, txID: firstOutTxId }]
         })
       ).toEqual(O.some(firstOutTxId))
 
       expect(
         getTxId({
-          ...defaultAction,
+          ...defaultPoolAction,
           out: [
             { ...defaultTx, txID: firstOutTxId },
             { ...defaultTx, txID: 'another' }

@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { palette } from 'styled-theme'
 
 import { Label as LabelUI } from '../label'
 
@@ -13,4 +14,16 @@ export const Label = styled(LabelUI)`
   width: auto;
   text-transform: uppercase;
   font-weight: 600;
+`
+
+export const IconContainer = styled.span`
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+
+  > svg {
+    stroke: ${palette('primary', 0)};
+  }
 `

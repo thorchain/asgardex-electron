@@ -31,6 +31,7 @@ export type CommonMessageKey =
   | 'common.success'
   | 'common.change'
   | 'common.wallet'
+  | 'common.history'
   | 'common.pool'
   | 'common.pools'
   | 'common.asset'
@@ -65,7 +66,8 @@ export type CommonMessageKey =
   | 'common.all'
   | 'common.asset.base'
   | 'common.tx.type.swap'
-  | 'common.tx.type.doubleSwap'
+  | 'common.tx.type.refund'
+  | 'common.tx.type.donate'
   | 'common.tx.type.deposit'
   | 'common.tx.type.withdraw'
 

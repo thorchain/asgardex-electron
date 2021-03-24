@@ -22,6 +22,7 @@ import {
   GetLiquidityHistoryIntervalEnum
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
+import { Memo } from '../chain/types'
 import { ApiError } from '../wallet/types'
 
 export type ThorchainLastblock = LastblockItem[]
@@ -193,16 +194,24 @@ export type Tx = {
   // Sender address
   address: string
   values: AssetWithAmount[]
-  memo: string
+  memo?: Memo
   /**
    * Transaction id hash. Some transactions (such as outbound transactions made in the native asset) may have a zero value.
    */
   txID: string
 }
 
-export type TxType = 'DEPOSIT' | 'SWAP' | 'DOUBLE_SWAP' | 'WITHDRAW' | 'UPGRADE'
+export type TxType =
+  | 'DEPOSIT'
+  | 'SWAP'
+  | 'WITHDRAW'
+  | 'DONATE'
+  | 'REFUND'
+  // in case asgardex does not know about any other action type we will display
+  // 'unknown' tx type to avoid filtering out any tx
+  | 'UNKNOWN'
 
-export type HistoryAction = {
+export type PoolAction = {
   date: Date
   /**
    * Inbound transactions related to the action
@@ -217,16 +226,16 @@ export type HistoryAction = {
   slip?: number
 }
 
-export type HistoryActions = HistoryAction[]
+export type PoolActions = PoolAction[]
 
-export type HistoryActionsPage = {
+export type PoolActionsHistoryPage = {
   total: number
-  actions: HistoryActions
+  actions: PoolActions
 }
 
-export type HistoryActionsPageRD = RD.RemoteData<ApiError, HistoryActionsPage>
+export type PoolActionsHistoryPageRD = RD.RemoteData<ApiError, PoolActionsHistoryPage>
 
-export type HistoryActionsPageLD = LiveData<ApiError, HistoryActionsPage>
+export type PoolActionsHistoryPageLD = LiveData<ApiError, PoolActionsHistoryPage>
 
 export type PoolFilter = Chain | 'base' | 'usd'
 

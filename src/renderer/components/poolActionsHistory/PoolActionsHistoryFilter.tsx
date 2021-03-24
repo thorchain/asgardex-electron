@@ -7,7 +7,7 @@ import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
 import { TxType } from '../uielements/txType'
-import * as Styled from './ActionsHistoryFilter.styles'
+import * as Styled from './PoolActionsHistoryFilter.styles'
 import { Filter } from './types'
 
 type Props = {
@@ -17,9 +17,9 @@ type Props = {
   disabled?: boolean
 }
 
-const FILTER_ITEMS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'DOUBLE_SWAP', 'WITHDRAW']
+const FILTER_ITEMS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
-export const ActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFilterChanged, className, disabled }) => {
+export const PoolActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFilterChanged, className, disabled }) => {
   const intl = useIntl()
   const activeFilterIndex = useMemo(() => {
     const index = FILTER_ITEMS.indexOf(currentFilter)

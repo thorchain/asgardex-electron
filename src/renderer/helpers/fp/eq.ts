@@ -48,6 +48,8 @@ export const eqAssetWithAmount: Eq.Eq<AssetWithAmount> = {
   equals: (x, y) => eqAsset.equals(x.asset, y.asset) && eqBaseAmount.equals(x.amount, y.amount)
 }
 
+export const eqOAssetWithAmount = O.getEq(eqAssetWithAmount)
+
 export const eqONullableString: Eq.Eq<O.Option<string> | undefined> = {
   equals: (x, y) => {
     if (x && y) {

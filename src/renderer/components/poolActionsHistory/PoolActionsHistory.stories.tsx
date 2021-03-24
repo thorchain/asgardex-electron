@@ -4,12 +4,12 @@ import { Story } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
-import { HistoryActions } from '../../services/midgard/types'
+import { PoolActions } from '../../services/midgard/types'
 import { ErrorId } from '../../services/wallet/types'
-import { ActionsHistory } from './ActionsHistory'
+import { PoolActionsHistory } from './PoolActionsHistory'
 import { Filter } from './types'
 
-const actions: HistoryActions = [
+const actions: PoolActions = [
   {
     date: new Date(Date.now()),
     /**
@@ -74,7 +74,7 @@ const actions: HistoryActions = [
         txID: 'out id'
       }
     ],
-    type: 'DOUBLE_SWAP'
+    type: 'SWAP'
   },
   {
     date: new Date(Date.now() + 2),
@@ -141,7 +141,7 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [filter, setFilter] = useState<Filter>('ALL')
   return (
-    <ActionsHistory
+    <PoolActionsHistory
       reload={() => console.log('reload')}
       currentFilter={filter}
       setFilter={setFilter}
@@ -159,7 +159,7 @@ History.args = {
 }
 
 export default {
-  component: ActionsHistory,
-  title: 'ActionsHistory',
+  component: PoolActionsHistory,
+  title: 'PoolActionsHistory',
   argTypes
 }
