@@ -2,7 +2,7 @@ import { bn, baseAmount, AssetBTC, AssetRuneNative, AssetBNB } from '@xchainjs/x
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { WalletBalance } from '../../types/wallet'
-import { ordBigNumber, ordBaseAmount, ordAsset, ordBalance } from './ord'
+import { ordBigNumber, ordBaseAmount, ordAsset, ordWalletBalanceByAsset } from './ord'
 
 describe('helpers/fp/ord', () => {
   describe('ordBigNumber', () => {
@@ -35,7 +35,7 @@ describe('helpers/fp/ord', () => {
       expect(ordAsset.compare(AssetBTC, AssetBTC)).toEqual(0)
     })
   })
-  describe('ordBalance', () => {
+  describe('ordWalletBalanceByAsset', () => {
     const a: WalletBalance = {
       amount: baseAmount('1'),
       asset: AssetRuneNative,
@@ -50,13 +50,13 @@ describe('helpers/fp/ord', () => {
       asset: ASSETS_TESTNET.BOLT
     }
     it('is less', () => {
-      expect(ordBalance.compare(a, b)).toEqual(1)
+      expect(ordWalletBalanceByAsset.compare(a, b)).toEqual(1)
     })
     it('is greater', () => {
-      expect(ordBalance.compare(b, c)).toEqual(-1)
+      expect(ordWalletBalanceByAsset.compare(b, c)).toEqual(-1)
     })
     it('is equal', () => {
-      expect(ordBalance.compare(a, a)).toEqual(0)
+      expect(ordWalletBalanceByAsset.compare(a, a)).toEqual(0)
     })
   })
 })

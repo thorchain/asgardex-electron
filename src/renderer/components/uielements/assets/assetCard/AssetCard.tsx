@@ -18,7 +18,7 @@ import * as FP from 'fp-ts/lib/function'
 import { Network } from '../../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { BTC_DECIMAL, isBtcAsset } from '../../../../helpers/assetHelper'
-import { ordBalance } from '../../../../helpers/fp/ord'
+import { ordWalletBalanceByAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { WalletBalances } from '../../../../types/wallet'
@@ -96,7 +96,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderMenu = useCallback(() => {
-    const sortedBalanceData = balances.sort(ordBalance.compare)
+    const sortedBalanceData = balances.sort(ordWalletBalanceByAsset.compare)
 
     return (
       <AssetMenu

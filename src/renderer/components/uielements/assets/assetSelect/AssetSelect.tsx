@@ -6,7 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
-import { ordBalance } from '../../../../helpers/fp/ord'
+import { ordWalletBalanceByAsset } from '../../../../helpers/fp/ord'
 import { WalletBalances } from '../../../../services/clients'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetData } from '../assetData'
@@ -86,7 +86,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderMenu = useCallback(() => {
-    const sortedBalanceData = balances.sort(ordBalance.compare)
+    const sortedBalanceData = balances.sort(ordWalletBalanceByAsset.compare)
     return (
       <Styled.AssetSelectMenuWrapper minWidth={minWidth}>
         <AssetMenu

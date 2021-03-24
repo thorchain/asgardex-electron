@@ -27,7 +27,7 @@ export const ordAsset: Ord.Ord<Asset> = {
 /**
  * Comparing Assets
  **/
-export const ordBalance: Ord.Ord<WalletBalance> = {
+export const ordWalletBalanceByAsset: Ord.Ord<WalletBalance> = {
   equals: (x, y) => eqAsset.equals(x.asset, y.asset),
   // comparing by using`assetToString`
   compare: (x, y) => Ord.ordString.compare(assetToString(x.asset), assetToString(y.asset))
