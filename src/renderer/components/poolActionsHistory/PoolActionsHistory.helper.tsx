@@ -7,7 +7,7 @@ import * as O from 'fp-ts/Option'
 import { FormattedDate, FormattedTime } from 'react-intl'
 
 import { PoolAction, PoolActions, PoolActionsHistoryPage, Tx } from '../../services/midgard/types'
-import { AssetAmountAddress } from '../../types/asgardex'
+import { AssetWithAmount } from '../../types/asgardex'
 import * as Styled from './PoolActionsHistory.styles'
 
 export const getTxId = (action: PoolAction): O.Option<TxHash> => {
@@ -19,10 +19,10 @@ export const getTxId = (action: PoolAction): O.Option<TxHash> => {
   )
 }
 
-export const getValues = (txs: Tx[]): AssetAmountAddress[] =>
+export const getValues = (txs: Tx[]): AssetWithAmount[] =>
   FP.pipe(
     txs,
-    A.map(({ address, values }) => values.map((value) => ({ ...value, address }))),
+    A.map(({ values }) => values),
     A.flatten
   )
 
