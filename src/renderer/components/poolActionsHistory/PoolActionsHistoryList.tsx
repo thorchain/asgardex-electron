@@ -36,8 +36,8 @@ const renderItem = (goToTx: (txId: string) => void) => (action: PoolAction) => {
 
   const rowKey = FP.pipe(
     oTxId,
-    O.map((id) => id),
-    O.getOrElse(() => action.date.toString())
+    O.map(FP.identity),
+    O.getOrElse(() => `${action.date.toString()}-${Math.random()}`)
   )
 
   return (

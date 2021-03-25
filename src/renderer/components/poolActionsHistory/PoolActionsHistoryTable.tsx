@@ -116,8 +116,8 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
   const renderRowKey = (action: PoolAction) =>
     FP.pipe(
       H.getTxId(action),
-      O.map((id) => id),
-      O.getOrElse(() => action.date.toString())
+      O.map(FP.identity),
+      O.getOrElse(() => `${action.date.toString()}-${Math.random()}`)
     )
 
   const renderTable = useCallback(
