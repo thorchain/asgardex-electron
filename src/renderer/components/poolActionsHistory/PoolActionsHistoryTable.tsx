@@ -113,7 +113,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     linkColumn
   ])
 
-  const renderRowKey = (action: PoolAction) =>
+  const rowKey = (action: PoolAction) =>
     FP.pipe(
       H.getTxId(action),
       O.map(FP.identity),
@@ -124,7 +124,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     ({ total, actions }: PoolActionsHistoryPage, loading = false) => {
       return (
         <>
-          <Styled.Table columns={columns} dataSource={actions} loading={loading} rowKey={renderRowKey} />
+          <Styled.Table columns={columns} dataSource={actions} loading={loading} rowKey={rowKey} />
           {total > 0 && (
             <Pagination
               current={currentPage}
