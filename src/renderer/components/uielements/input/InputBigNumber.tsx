@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState, useEffect, forwardRef } from 'react'
+import React, { useMemo, useCallback, useRef, useState, useEffect, forwardRef } from 'react'
 
 import { delay, bn, fixedBN, trimZeros } from '@xchainjs/xchain-util'
 import { Input } from 'antd'
@@ -29,6 +29,7 @@ export const InputBigNumber = forwardRef<Input, Props>(
     // value as string (unformatted) - it supports empty string for an empty input
     const [enteredValue, setEnteredValue] = useState<O.Option<string>>(O.none)
     const [focus, setFocus] = useState(false)
+    const broadcastValue = useRef<BigNumber>(ZERO_BN)
 
     const inputValue = useMemo(
       () =>
@@ -88,12 +89,28 @@ export const InputBigNumber = forwardRef<Input, Props>(
     const onChangeHandler = useCallback(
       ({ target }: React.ChangeEvent<HTMLInputElement>) => {
         const { value: newValue } = target
+        const { max } = otherProps
+        // console.log('IBN value:', newValue)
+        // console.log('IBN max:', max)
+        // console.log('IBN validInputValue:', validInputValue(newValue))
+        // console.log('IBN bn:', bn(newValue).toString())
+        // console.log('IBN fixedBN:', fixedBN(newValue, decimal).toString())
         if (validInputValue(newValue)) {
           // some checks needed whether to broadcast changes or not
           FP.pipe(
             O.some(newValue),
             // ignore empty input
             O.filter((v) => v !== ''),
+            // check max. values
+            O.map((v) => {
+              // return value if `max` is not set
+              if (!max) return v
+              // compare entered `value` with `max`
+              // if `value` > `max`, use `max`
+              const enteredValueBN = bn(v)
+              const maxBN = bn(max)
+              return enteredValueBN.isLessThanOrEqualTo(maxBN) ? v : maxBN.toFixed()
+            }),
             O.alt(() => O.some('0')),
             O.map((v) => {
               // store entered value in state
@@ -101,16 +118,25 @@ export const InputBigNumber = forwardRef<Input, Props>(
               return v
             }),
             // format value
-            O.map((v) =>
-              onChange(
-                /* format value before triggering changes */
-                fixedBN(v, decimal)
-              )
-            )
+            O.map((v) => fixedBN(v, decimal)),
+            O.map((v) => {
+              console.log('yyyy :', v.toString())
+              return v
+            }),
+            // Dirty check, but ignore `0` (zero) values to trigger changes
+            // Because it's default value of `broadcastValue`
+            O.filter((v) => !broadcastValue.current.isEqualTo(v) || v.isZero()),
+            O.map((v) => {
+              // store broadcast value
+              broadcastValue.current = v
+              // trigger `onChange` handler
+              onChange(v)
+              return v
+            })
           )
         }
       },
-      [decimal, onChange]
+      [decimal, onChange, otherProps]
     )
 
     return (
