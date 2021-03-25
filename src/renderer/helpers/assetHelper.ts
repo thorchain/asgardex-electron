@@ -22,7 +22,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
-import { AssetBUSDBAF, AssetBUSDBD1, PRICE_ASSETS } from '../const'
+import { AssetBUSDBAF, AssetBUSDBD1, AssetBUSD74E, PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
 import { getChainAsset, isEthChain } from './chainHelper'
@@ -130,7 +130,7 @@ export const isRuneNativeAsset = (asset: Asset): boolean => eqAsset.equals(asset
  * Check whether an asset is a BUSD asset
  */
 export const isBUSDAsset = (asset: Asset): boolean =>
-  eqAsset.equals(asset, AssetBUSDBAF) || eqAsset.equals(asset, AssetBUSDBD1)
+  eqAsset.equals(asset, AssetBUSDBAF) || eqAsset.equals(asset, AssetBUSDBD1) || eqAsset.equals(asset, AssetBUSD74E)
 
 // Type guard for `PricePoolAsset`
 export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>

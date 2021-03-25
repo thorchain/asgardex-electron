@@ -14,23 +14,32 @@ import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.t
 
 // BUSD testnet (neded for pricing)
 export const AssetBUSDBAF: Asset = { chain: 'BNB', symbol: 'BUSD-BAF', ticker: 'BUSD' }
+export const AssetBUSD74E: Asset = { chain: 'BNB', symbol: 'BUSD-74E', ticker: 'BUSD' }
 // BUSD mainnet (neded for pricing)
 export const AssetBUSDBD1: Asset = { chain: 'BNB', symbol: 'BUSD-BD1', ticker: 'BUSD' }
 
-export const PRICE_ASSETS: PricePoolAssets = [AssetRuneNative, AssetETH, AssetBTC, AssetBUSDBAF, AssetBUSDBD1]
+export const PRICE_ASSETS: PricePoolAssets = [
+  AssetRuneNative,
+  AssetETH,
+  AssetBTC,
+  AssetBUSDBAF,
+  AssetBUSDBD1,
+  AssetBUSD74E
+]
 
 // Weight of currencies needed for pricing
 // The higher the value the higher the weight
 export const CURRENCY_WHEIGHTS: PricePoolCurrencyWeights = {
   [assetToString(AssetBUSDBAF)]: 0,
   [assetToString(AssetBUSDBD1)]: 1,
-  [assetToString(AssetETH)]: 2,
-  [assetToString(AssetBTC)]: 3,
-  [assetToString(AssetRuneNative)]: 4
+  [assetToString(AssetBUSD74E)]: 2,
+  [assetToString(AssetETH)]: 3,
+  [assetToString(AssetBTC)]: 4,
+  [assetToString(AssetRuneNative)]: 5
 }
 
 // Whitelist of pools for pricing things
-export const PRICE_POOLS_WHITELIST: PricePoolAssets = [AssetBTC, AssetETH, AssetBUSDBAF, AssetBUSDBD1]
+export const PRICE_POOLS_WHITELIST: PricePoolAssets = [AssetBTC, AssetETH, AssetBUSDBAF, AssetBUSDBD1, AssetBUSD74E]
 
 export const ZERO_BN = bn(0)
 
