@@ -28,6 +28,7 @@ import { SymDepositMemo } from '../../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
+import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { WalletBalances } from '../../../types/wallet'
@@ -80,14 +81,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
 
-  const [walletBalances] = useObservableState(
-    () =>
-      FP.pipe(
-        balancesState$,
-        RxOp.map((state) => state.balances)
-      ),
-    O.none
-  )
+  const { balances: walletBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
   const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
 
@@ -157,11 +151,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [runeExplorerUrl]
   )
 
-  const reloadBalancesAndShares = useCallback(() => {
-    reloadBalances()
-    reloadShares(5000)
-  }, [reloadBalances, reloadShares])
-
   const renderDisabledAddDeposit = useCallback(
     (error?: Error) => (
       <>
@@ -185,7 +174,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
           disabled={true}
           poolAddress={O.none}
           memos={O.none}
-          reloadBalances={reloadBalancesAndShares}
+          reloadBalances={reloadBalances}
+          reloadShares={reloadShares}
           poolData={ZERO_POOL_DATA}
           deposit$={symDeposit$}
           network={network}
@@ -203,7 +193,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
       assetWD,
       symDepositFees$,
       selectedPricePoolAsset,
-      reloadBalancesAndShares,
+      reloadBalances,
+      reloadShares,
       symDeposit$,
       network,
       approveERC20Token$,
@@ -242,7 +233,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
               fees$={symDepositFees$}
               reloadFees={reloadSymDepositFees}
               priceAsset={selectedPricePoolAsset}
-              reloadBalances={reloadBalancesAndShares}
+              reloadBalances={reloadBalances}
+              reloadShares={reloadShares}
               balances={filteredBalances}
               deposit$={symDeposit$}
               network={network}
