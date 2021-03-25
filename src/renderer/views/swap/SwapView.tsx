@@ -109,7 +109,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   )
 
   const targetAssetRD: AssetWithDecimalRD = useObservableState(targetAssetDecimal$, RD.initial)
-  // const targetAssetRD: AssetWithDecimalRD = RD.success({ asset, decimal: 18 })
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
