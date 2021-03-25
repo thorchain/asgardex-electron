@@ -90,11 +90,6 @@ export const InputBigNumber = forwardRef<Input, Props>(
       ({ target }: React.ChangeEvent<HTMLInputElement>) => {
         const { value: newValue } = target
         const { max } = otherProps
-        // console.log('IBN value:', newValue)
-        // console.log('IBN max:', max)
-        // console.log('IBN validInputValue:', validInputValue(newValue))
-        // console.log('IBN bn:', bn(newValue).toString())
-        // console.log('IBN fixedBN:', fixedBN(newValue, decimal).toString())
         if (validInputValue(newValue)) {
           // some checks needed whether to broadcast changes or not
           FP.pipe(
@@ -119,10 +114,6 @@ export const InputBigNumber = forwardRef<Input, Props>(
             }),
             // format value
             O.map((v) => fixedBN(v, decimal)),
-            O.map((v) => {
-              console.log('yyyy :', v.toString())
-              return v
-            }),
             // Dirty check, but ignore `0` (zero) values to trigger changes
             // Because it's default value of `broadcastValue`
             O.filter((v) => !broadcastValue.current.isEqualTo(v) || v.isZero()),
