@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { assetFromString } from '@xchainjs/xchain-util'
@@ -48,7 +48,7 @@ export const DepositView: React.FC<Props> = () => {
     }
   } = useMidgardContext()
 
-  const { keystoreService } = useWalletContext()
+  const { keystoreService, reloadBalances } = useWalletContext()
 
   const { addressByChain$, assetWithDecimal$ } = useChainContext()
 
@@ -116,6 +116,11 @@ export const DepositView: React.FC<Props> = () => {
     [poolSharesRD, oSelectedAsset]
   )
 
+  const reloadHandler = useCallback(() => {
+    reloadBalances()
+    reloadShares()
+  }, [reloadBalances, reloadShares])
+
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`
   // Because `useObservableState` will set its state NOT before first rendering loop,
@@ -133,7 +138,7 @@ export const DepositView: React.FC<Props> = () => {
     <>
       <Styled.TopControlsContainer>
         <Styled.BackLink />
-        <RefreshButton disabled={refreshButtonDisabled} clickHandler={reloadShares} />
+        <RefreshButton disabled={refreshButtonDisabled} clickHandler={reloadHandler} />
       </Styled.TopControlsContainer>
       {FP.pipe(
         assetRD,

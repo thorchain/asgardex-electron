@@ -75,6 +75,7 @@ export type Props = {
   reloadFees: (p: SymDepositParams) => void
   fees$: (p: SymDepositParams) => DepositFeesLD
   reloadBalances: FP.Lazy<void>
+  reloadShares: (delay?: number) => void
   viewAssetTx: (txHash: string) => void
   viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
@@ -106,7 +107,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     balances,
     priceAsset,
     reloadFees,
-    reloadBalances = FP.constVoid,
+    reloadBalances,
+    reloadShares,
     fees$,
     onChangeAsset,
     disabled = false,
@@ -618,7 +620,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const onFinishTxModal = useCallback(() => {
     onCloseTxModal()
     reloadBalances()
-  }, [reloadBalances, onCloseTxModal])
+    reloadShares(5000)
+  }, [onCloseTxModal, reloadBalances, reloadShares])
 
   const renderTxModal = useMemo(() => {
     const { deposit: depositRD, depositTxs: symDepositTxs } = depositState
@@ -847,7 +850,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       // Note: ETH/ERC20 fees won't be reloaded if router is None
       // that's why we have another check for prevPoolRouter in next guard
       reloadFeesHandler()
-      reloadBalances()
+      // reload shares
+      reloadShares()
     }
 
     if (!eqOPoolAddresses.equals(prevPoolAddresses.current, oPoolAddress)) {
@@ -866,7 +870,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     asset,
     checkApprovedStatus,
     oPoolAddress,
-    reloadBalances,
+    reloadShares,
     reloadFeesHandler,
     resetApproveState,
     resetIsApprovedState
