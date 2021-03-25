@@ -35,7 +35,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
 
   const actionTypeColumn: ColumnType<PoolAction> = useMemo(
     () => ({
-      key: 'txHash',
+      key: 'txType',
       title: <Styled.ActionsFilter currentFilter={currentFilter} onFilterChanged={setFilter} />,
       align: 'left',
       width: 180,
