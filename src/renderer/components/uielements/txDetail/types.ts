@@ -1,11 +1,11 @@
 import React from 'react'
 
 import { TxType } from '../../../services/midgard/types'
-import { AssetWithAmount } from '../../../types/asgardex'
+import { AssetAmountAddress, AssetWithAmount } from '../../../types/asgardex'
 
 export type ActionProps = {
-  incomes: AssetWithAmount[]
-  outgos: AssetWithAmount[]
+  incomes: AssetAmountAddress[]
+  outgos: AssetAmountAddress[]
   fees?: AssetWithAmount[]
   /**
    * Possible transaction slip in percents

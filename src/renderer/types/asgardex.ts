@@ -14,6 +14,8 @@ export type AssetWithAmount = {
   amount: BaseAmount
 }
 
+export type AssetAmountAddress = AssetWithAmount & { address: string }
+
 export type AssetWithDecimal = {
   asset: Asset
   decimal: number

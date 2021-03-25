@@ -18,11 +18,11 @@ import { TxDetail } from './TxDetail'
 const getValues = (firstAsset: string, secondAsset: string, firstValue: number, secondValue: number) => {
   const first = FP.pipe(
     O.fromNullable(assetFromString(firstAsset)),
-    O.map((asset) => ({ asset, amount: assetToBase(assetAmount(firstValue)) }))
+    O.map((asset) => ({ asset, amount: assetToBase(assetAmount(firstValue)), address: 'address' }))
   )
   const second = FP.pipe(
     O.fromNullable(assetFromString(secondAsset)),
-    O.map((asset) => ({ asset, amount: assetToBase(assetAmount(secondValue)) }))
+    O.map((asset) => ({ asset, amount: assetToBase(assetAmount(secondValue)), address: 'address' }))
   )
 
   return FP.pipe([first, second], A.filterMap(FP.identity))
