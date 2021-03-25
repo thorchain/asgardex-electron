@@ -76,7 +76,7 @@ export type Props = {
   fees$: (p: SymDepositParams) => DepositFeesLD
   reloadBalances: FP.Lazy<void>
   reloadShares: (delay?: number) => void
-  reloadPools: () => void
+  reloadPool: () => void
   viewAssetTx: (txHash: string) => void
   viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
@@ -110,7 +110,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     reloadFees,
     reloadBalances,
     reloadShares,
-    reloadPools,
+    reloadPool,
     fees$,
     onChangeAsset,
     disabled = false,
@@ -623,8 +623,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     onCloseTxModal()
     reloadBalances()
     reloadShares(5000)
-    reloadPools()
-  }, [onCloseTxModal, reloadBalances, reloadShares, reloadPools])
+    reloadPool()
+  }, [onCloseTxModal, reloadBalances, reloadShares, reloadPool])
 
   const renderTxModal = useMemo(() => {
     const { deposit: depositRD, depositTxs: symDepositTxs } = depositState
@@ -855,7 +855,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       reloadFeesHandler()
       // reload shares
       reloadShares()
-      // reloadPools()
+      false && reloadPool()
     }
 
     if (!eqOPoolAddresses.equals(prevPoolAddresses.current, oPoolAddress)) {
@@ -875,7 +875,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     checkApprovedStatus,
     oPoolAddress,
     reloadShares,
-    // reloadPools,
+    reloadPool,
     reloadFeesHandler,
     resetApproveState,
     resetIsApprovedState

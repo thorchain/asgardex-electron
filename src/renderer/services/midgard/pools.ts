@@ -85,9 +85,9 @@ const createPoolsService = (
   }
 
   // Factory to get `Pools` from Midgard
-  const apiGetPools$ = (request: GetPoolsRequest, reload$: TriggerStream$) =>
+  const apiGetPools$ = (request: GetPoolsRequest, _reload$: TriggerStream$, pools?: string[]) =>
     FP.pipe(
-      Rx.combineLatest([midgardDefaultApi$, reload$]),
+      Rx.combineLatest([midgardDefaultApi$]),
       RxOp.map(([api]) => api),
       liveData.chain((api) =>
         FP.pipe(
@@ -114,6 +114,15 @@ const createPoolsService = (
       liveData.chain((details) =>
         FP.pipe(
           details,
+          (details) => {
+            if (pools) {
+              return FP.pipe(
+                details,
+                A.filter(({ asset }) => pools.includes(asset))
+              )
+            }
+            return details
+          },
           A.map(({ asset }) =>
             FP.pipe(
               midgardDefaultApi$,
@@ -167,7 +176,8 @@ const createPoolsService = (
   /**
    * Data of enabled `Pools` from Midgard
    */
-  const apiGetPoolsEnabled$: PoolDetailsLD = apiGetPools$({ status: GetPoolsStatusEnum.Available }, reloadPools$)
+  const apiGetPoolsEnabled$: (pools?: string[]) => PoolDetailsLD = (pools) =>
+    apiGetPools$({ status: GetPoolsStatusEnum.Available }, reloadPools$, pools)
 
   // `TriggerStream` to reload data of pending pools
   const { stream$: reloadPendingPools$, trigger: reloadPendingPools } = triggerStream()
@@ -175,7 +185,8 @@ const createPoolsService = (
   /**
    * Data of pending `Pools` from Midgard
    */
-  const apiGetPoolsPending$: PoolDetailsLD = apiGetPools$({ status: GetPoolsStatusEnum.Staged }, reloadPendingPools$)
+  const apiGetPoolsPending$: (pools?: string[]) => PoolDetailsLD = (pools) =>
+    apiGetPools$({ status: GetPoolsStatusEnum.Staged }, reloadPendingPools$, pools)
 
   // `TriggerStream` to reload data of all pools
   const { stream$: reloadAllPools$, trigger: reloadAllPools } = triggerStream()
@@ -183,21 +194,22 @@ const createPoolsService = (
   /**
    * Data of all `Pools`
    */
-  const apiGetPoolsAll$: PoolDetailsLD = apiGetPools$({ status: undefined }, reloadAllPools$)
+  const apiGetPoolsAll$: (pools?: string[]) => PoolDetailsLD = (pools) =>
+    apiGetPools$({ status: undefined }, reloadAllPools$, pools)
 
   /**
    * Helper to get (same) stream of `PoolDetailsLD` by given status
    *
    * If status is not set (or undefined), `PoolDetails` of all Pools will be loaded
    */
-  const apiGetPoolsByStatus$ = (status?: GetPoolsStatusEnum) => {
+  const apiGetPoolsByStatus$ = (status?: GetPoolsStatusEnum, pools?: string[]) => {
     switch (status) {
       case GetPoolsStatusEnum.Available:
-        return apiGetPoolsEnabled$
+        return apiGetPoolsEnabled$(pools)
       case GetPoolsStatusEnum.Staged:
-        return apiGetPoolsPending$
+        return apiGetPoolsPending$(pools)
       default:
-        return apiGetPoolsAll$
+        return apiGetPoolsAll$(pools)
     }
   }
   /**
@@ -220,15 +232,16 @@ const createPoolsService = (
   /**
    * `PoolDetails` data from Midgard
    */
-  const apiGetPoolsData$: (assetOrAssets: string | string[], status?: GetPoolsStatusEnum) => PoolDetailsLD = (
-    assetOrAssets,
-    status
-  ) => {
+  const apiGetPoolsData$: (
+    assetOrAssets: string | string[],
+    status?: GetPoolsStatusEnum
+    // pools?: string[]
+  ) => PoolDetailsLD = (assetOrAssets, status) => {
     const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
 
     return FP.pipe(
-      apiGetPoolsByStatus$(status),
-      liveData.map(A.filter((poolDetail) => assets.includes(poolDetail.asset))),
+      apiGetPoolsByStatus$(status, assets),
+      // liveData.map(A.filter((poolDetail) => assets.includes(poolDetail.asset))),
       liveData.map(NEA.fromArray),
       liveData.chain(
         O.fold(
@@ -284,7 +297,7 @@ const createPoolsService = (
    */
   const loadAllPoolsDetails$ = (): PoolDetailsLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
-      apiGetPoolsAll$,
+      apiGetPoolsAll$(),
       // Filter out all unknown / invalid assets created from asset strings
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
       // Filter pools by using enabled chains only (defined via ENV)
@@ -314,7 +327,7 @@ const createPoolsService = (
    */
   const loadPoolsStateData$ = (): PoolsStateLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
-      apiGetPoolsEnabled$,
+      apiGetPoolsEnabled$(),
       // Filter out all unknown / invalid assets created from asset strings
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
       // Filter pools by using enabled chains only (defined via ENV)
@@ -373,7 +386,7 @@ const createPoolsService = (
    */
   const loadPendingPoolsStateData$ = (): PendingPoolsStateLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
-      apiGetPoolsPending$,
+      apiGetPoolsPending$(),
       // Filter out all unknown / invalid assets created from asset strings
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
       // Filter pools by using enabled chains only (defined via ENV)
@@ -404,6 +417,8 @@ const createPoolsService = (
     RxOp.shareReplay(1)
   )
 
+  const { stream$: reloadPool$, trigger: reloadPool } = triggerStream()
+
   /**
    * Stream of `PoolDetail` data based on selected pool asset
    * It's triggered by changes of selectedPoolAsset$`
@@ -411,7 +426,8 @@ const createPoolsService = (
    * Note: It checks currenlty ALL (pending/available) pool details
    * That's needed for Deposit pages, which have not the information about status of pool right now (might be improved if needed)
    */
-  const poolDetail$: PoolDetailLD = selectedPoolAsset$.pipe(
+  const poolDetail$: PoolDetailLD = FP.pipe(
+    selectedPoolAsset$,
     RxOp.filter(O.isSome),
     RxOp.switchMap((selectedPoolAsset) =>
       FP.pipe(
@@ -419,13 +435,20 @@ const createPoolsService = (
         O.fold(
           () => Rx.of(RD.initial),
           (asset) =>
-            apiGetPoolsData$(
-              assetToString(asset),
-              undefined /* explicit set to `undefined` to remember we want data for all pools */
+            FP.pipe(
+              reloadPool$,
+              RxOp.switchMap(() => {
+                console.log('load')
+                return apiGetPoolsData$(
+                  assetToString(asset),
+                  undefined /* explicit set to `undefined` to remember we want data for all pools */
+                )
+              })
             )
         )
       )
     ),
+    RxOp.shareReplay(1),
     liveData.chain(
       FP.flow(
         A.head,
@@ -571,8 +594,6 @@ const createPoolsService = (
       )
     )
 
-  const { stream$: reloadPool$, trigger: reloadPool } = triggerStream()
-
   // Factory to get pool stats detail from Midgard
   const apiGetPoolStatsDetail$ = (request: GetPoolStatsRequest): PoolStatsDetailLD =>
     FP.pipe(
@@ -693,7 +714,10 @@ const createPoolsService = (
     selectedPoolAddress$,
     poolAddressesByChain$,
     poolDetail$,
-    reloadPool,
+    reloadPool: () => {
+      console.log('reload')
+      reloadPool()
+    },
     poolStatsDetail$,
     poolLegacyDetail$,
     poolLiquidityHistory$,
