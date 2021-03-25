@@ -35,7 +35,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
 
   const actionTypeColumn: ColumnType<PoolAction> = useMemo(
     () => ({
-      key: 'txType',
+      key: 'txHash',
       title: <Styled.ActionsFilter currentFilter={currentFilter} onFilterChanged={setFilter} />,
       align: 'left',
       width: 180,
@@ -113,11 +113,18 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     linkColumn
   ])
 
+  const renderRowKey = (action: PoolAction) =>
+    FP.pipe(
+      H.getTxId(action),
+      O.map((id) => id),
+      O.getOrElse(() => action.date.toString())
+    )
+
   const renderTable = useCallback(
     ({ total, actions }: PoolActionsHistoryPage, loading = false) => {
       return (
         <>
-          <Styled.Table columns={columns} dataSource={actions} loading={loading} rowKey="txHash" />
+          <Styled.Table columns={columns} dataSource={actions} loading={loading} rowKey={renderRowKey} />
           {total > 0 && (
             <Pagination
               current={currentPage}
