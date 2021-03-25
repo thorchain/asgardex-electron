@@ -22,7 +22,7 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import { filterWalletBalancesByAssets } from '../../../helpers/walletHelper'
-import * as depositRoutes from '../../../routes/deposit'
+import * as poolsRoutes from '../../../routes/pools'
 import { Memo } from '../../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
@@ -43,7 +43,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
 
   const onChangeAsset = useCallback(
     (asset: Asset) => {
-      history.replace(depositRoutes.deposit.path({ asset: assetToString(asset) }))
+      history.replace(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
     },
     [history]
   )
