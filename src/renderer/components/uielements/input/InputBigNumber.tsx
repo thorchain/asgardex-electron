@@ -101,7 +101,12 @@ export const InputBigNumber = forwardRef<Input, Props>(
               return v
             }),
             // format value
-            O.map((v) => onChange(fixedBN(v, decimal)))
+            O.map((v) =>
+              onChange(
+                /* format value before triggering changes */
+                fixedBN(v, decimal)
+              )
+            )
           )
         }
       },
