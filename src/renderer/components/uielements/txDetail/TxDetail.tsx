@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { baseToAsset, assetToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/NonEmptyArray'
@@ -17,8 +17,8 @@ export const TxDetail: React.FC<ActionProps> = ({ className, outgos, incomes, fe
     () =>
       FP.pipe(
         incomes,
-        A.map(({ asset, amount }) => (
-          <Styled.InOutValue key={assetToString(asset) + amount.amount().toString()}>
+        A.mapWithIndex((index, { asset, amount }) => (
+          <Styled.InOutValue key={`in-${index}`}>
             {formatAssetAmountCurrency({ trimZeros: true, amount: baseToAsset(amount), asset })}
           </Styled.InOutValue>
         ))
@@ -30,8 +30,8 @@ export const TxDetail: React.FC<ActionProps> = ({ className, outgos, incomes, fe
     () =>
       FP.pipe(
         outgos,
-        A.map(({ asset, amount }) => (
-          <Styled.InOutValue key={assetToString(asset) + amount.amount().toString()}>
+        A.mapWithIndex((index, { asset, amount }) => (
+          <Styled.InOutValue key={`out-${index}`}>
             {formatAssetAmountCurrency({ trimZeros: true, amount: baseToAsset(amount), asset })}
           </Styled.InOutValue>
         ))

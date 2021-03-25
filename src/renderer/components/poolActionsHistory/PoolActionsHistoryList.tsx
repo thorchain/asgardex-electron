@@ -33,8 +33,15 @@ const renderItem = (goToTx: (txId: string) => void) => (action: PoolAction) => {
       )}
     </>
   )
+
+  const rowKey = FP.pipe(
+    oTxId,
+    O.map(FP.identity),
+    O.getOrElse(() => `${action.date.toString()}-${Math.random()}`)
+  )
+
   return (
-    <Styled.ListItem key={action.type + action.date.toTimeString()}>
+    <Styled.ListItem key={rowKey}>
       <Styled.Card title={<Styled.TxType type={action.type} />} extra={titleExtra}>
         <TxDetail type={action.type} date={date} incomes={H.getValues(action.in)} outgos={H.getValues(action.out)} />
       </Styled.Card>

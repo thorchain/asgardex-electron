@@ -113,11 +113,18 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     linkColumn
   ])
 
+  const rowKey = (action: PoolAction) =>
+    FP.pipe(
+      H.getTxId(action),
+      O.map(FP.identity),
+      O.getOrElse(() => `${action.date.toString()}-${Math.random()}`)
+    )
+
   const renderTable = useCallback(
     ({ total, actions }: PoolActionsHistoryPage, loading = false) => {
       return (
         <>
-          <Styled.Table columns={columns} dataSource={actions} loading={loading} rowKey="txHash" />
+          <Styled.Table columns={columns} dataSource={actions} loading={loading} rowKey={rowKey} />
           {total > 0 && (
             <Pagination
               current={currentPage}
