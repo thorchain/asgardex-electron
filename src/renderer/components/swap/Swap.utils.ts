@@ -63,6 +63,11 @@ export const getSlip = ({
   )
 }
 
+/**
+ * Result of swap
+ *
+ * Note: Returned `amountToSwap` is `1e8` decimal based
+ */
 export const getSwapResult = ({
   sourceAsset,
   targetAsset,
@@ -109,6 +114,11 @@ export const DEFAULT_SWAP_DATA: SwapData = {
   swapResult: ZERO_BASE_AMOUNT
 }
 
+/**
+ * Returns `SwapData`
+ *
+ * Note: `amountToSwap` of `swapResult` is `1e8` decimal based
+ */
 export const getSwapData = ({
   amountToSwap,
   sourceAsset,

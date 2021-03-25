@@ -24,7 +24,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTRD } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/swap'
-import { AssetWithDecimalRD } from '../../services/chain/types'
+import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import * as Styled from './SwapView.styles'
@@ -96,9 +96,19 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     RD.initial
   )
 
-  const targetAssetRD = RD.fromOption(oRouteTarget, () =>
-    Error(intl.formatMessage({ id: 'swap.errors.asset.missingTargetAsset' }))
+  const targetAssetDecimal$: AssetWithDecimalLD = useMemo(
+    () =>
+      FP.pipe(
+        oRouteTarget,
+        O.fold(
+          () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'swap.errors.asset.missingTargetAsset' })))),
+          (asset) => assetWithDecimal$(asset, network)
+        )
+      ),
+    [assetWithDecimal$, intl, network, oRouteTarget]
   )
+
+  const targetAssetRD: AssetWithDecimalRD = useObservableState(targetAssetDecimal$, RD.initial)
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
