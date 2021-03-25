@@ -64,13 +64,16 @@ export const AssetsFilter: React.FC<Props> = ({ assets = [], className, activeFi
       A.map((filter) => {
         const isActive = checkIfActive(filter)
         return (
-          <Styled.FilterButton
-            active={isActive ? 'true' : 'false'}
-            weight={isActive ? 'bold' : 'normal'}
-            onClick={() => setFilter(O.some(filter))}
-            key={filter}>
-            {filterNames[filter] || filter}
-          </Styled.FilterButton>
+          filterNames[filter] && (
+            <Styled.FilterButton
+              focused={isActive}
+              active={isActive ? 'true' : 'false'}
+              weight={isActive ? 'bold' : 'normal'}
+              onClick={() => setFilter(O.some(filter))}
+              key={filter}>
+              {filterNames[filter]}
+            </Styled.FilterButton>
+          )
         )
       })
     ),
