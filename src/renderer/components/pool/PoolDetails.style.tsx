@@ -13,9 +13,7 @@ export const Container = styled(A.Row)`
 `
 
 export const Col = styled(A.Col).attrs({
-  xs: 12,
-  sm: 8,
-  lg: 4
+  span: 12
 })`
   // Need to use paddings instead of margins 'cause
   // of Ant.Col width-value calculation strategy
