@@ -36,7 +36,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const {
     pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
     reloadNetworkInfo,
-    shares: { combineSharesByAddresses$ }
+    shares: { combineSharesByAddresses$, reloadCombineSharesByAddresses }
   } = midgardService
 
   const thorchainContext = useThorchainContext()
@@ -50,6 +50,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
         A.filter(FP.not(isThorChain)),
         A.map(addressByChain$),
         (addresses) => Rx.combineLatest(addresses),
+        RxOp.tap(reloadPools),
         RxOp.switchMap(
           FP.flow(
             /**
@@ -106,7 +107,8 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const clickRefreshHandler = useCallback(() => {
     reloadPools()
     reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPools])
+    reloadCombineSharesByAddresses()
+  }, [reloadNetworkInfo, reloadPools, reloadCombineSharesByAddresses])
 
   const renderRefreshBtn = useMemo(
     () => (

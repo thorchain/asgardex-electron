@@ -160,7 +160,9 @@ const createPoolsService = (
     )
 
   // `TriggerStream` to reload data of pools
-  const { stream$: reloadPools$, trigger: reloadPools } = triggerStream()
+  const { stream$: _reloadPools$, trigger: reloadPools } = triggerStream()
+
+  const reloadPools$ = FP.pipe(_reloadPools$, RxOp.debounceTime(300))
 
   /**
    * Data of enabled `Pools` from Midgard
