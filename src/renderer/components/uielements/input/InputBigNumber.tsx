@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState, useRef, useEffect, forwardRef } from 'react'
+import React, { useMemo, useCallback, useState, useEffect, forwardRef } from 'react'
 
 import { delay, bn, fixedBN, trimZeros } from '@xchainjs/xchain-util'
 import { Input } from 'antd'
@@ -29,7 +29,6 @@ export const InputBigNumber = forwardRef<Input, Props>(
     // value as string (unformatted) - it supports empty string for an empty input
     const [enteredValue, setEnteredValue] = useState<O.Option<string>>(O.none)
     const [focus, setFocus] = useState(false)
-    const broadcastValue = useRef<BigNumber>(bn(0))
 
     const inputValue = useMemo(
       () =>
@@ -102,20 +101,16 @@ export const InputBigNumber = forwardRef<Input, Props>(
               return v
             }),
             // format value
-            O.map((v) => fixedBN(v, decimal)),
-            // different value as before?
-            O.filter((v) => !broadcastValue.current.isEqualTo(v)),
-            O.map((v) => {
-              // store broadcast value
-              broadcastValue.current = v
-              // trigger `onChange` handler
-              onChange(v)
-              return v
-            })
+            O.map((v) =>
+              onChange(
+                /* format value before triggering changes */
+                fixedBN(v, decimal)
+              )
+            )
           )
         }
       },
-      [broadcastValue, decimal, onChange]
+      [decimal, onChange]
     )
 
     return (
