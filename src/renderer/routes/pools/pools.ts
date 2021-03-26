@@ -1,14 +1,9 @@
-import { Route } from '../types'
+import * as baseRoutes from './base'
 import * as depositRoutes from './deposit'
 import * as poolDetailRoutes from './detail'
 import * as swapRoutes from './swap'
 
-export const base: Route<void> = {
-  template: `/pools`,
-  path() {
-    return this.template
-  }
-}
+export const base = baseRoutes.base
 
 export const deposit = depositRoutes.deposit
 

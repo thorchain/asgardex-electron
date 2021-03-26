@@ -15,7 +15,7 @@ export const poolDetail: Route<PoolDetailRouteParams> = {
     if (symbol) {
       return `${base.template}/${symbol}`
     }
-    // Redirect to base route if passed params are empty
-    return base.path()
+    // Redirect to pools base route if passed params are empty
+    return poolsBase.path()
   }
 }

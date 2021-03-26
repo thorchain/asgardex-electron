@@ -44,8 +44,8 @@ describe('Pools routes', () => {
     it('returns path by given symbol parameter', () => {
       expect(detail.path({ symbol: 'BNB' })).toEqual('/pools/detail/BNB')
     })
-    it('redirects to base path if symbol is empty', () => {
-      expect(detail.path({ symbol: '' })).toEqual('/pools/detail')
+    it('redirects to pools base path if symbol is empty', () => {
+      expect(detail.path({ symbol: '' })).toEqual('/pools')
     })
   })
 })
