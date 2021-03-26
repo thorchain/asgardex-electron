@@ -9,7 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Option, none, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+// import { useHistory } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
@@ -19,7 +19,7 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
-import * as poolsRoutes from '../../routes/pools'
+// import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PendingPoolsState, PoolFilter } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
@@ -32,7 +32,7 @@ import * as Styled from './PoolsOverview.style'
 const POOLS_KEY = 'pending'
 
 export const PendingPools: React.FC = (): JSX.Element => {
-  const history = useHistory()
+  // const history = useHistory()
   const intl = useIntl()
 
   const { network$ } = useAppContext()
@@ -173,18 +173,19 @@ export const PendingPools: React.FC = (): JSX.Element => {
             dataSource={FP.pipe(tableData, filterTableData(poolFilter))}
             loading={loading}
             rowKey="key"
-            onRow={({ pool }: PoolTableRowData) => {
-              return {
-                onClick: () => {
-                  history.push(poolsRoutes.detail.path({ symbol: pool.target.symbol }))
-                }
-              }
-            }}
+            // TODO(@asgdx-team): Uncomment when pool detail is ready
+            // onRow={({ pool }: PoolTableRowData) => {
+            //   return {
+            //     onClick: () => {
+            //       history.push(poolsRoutes.detail.path({ symbol: pool.target.symbol }))
+            //     }
+            //   }
+            // }}
           />
         </>
       )
     },
-    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, setFilter, poolFilter, history]
+    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, setFilter, poolFilter]
   )
 
   return (
