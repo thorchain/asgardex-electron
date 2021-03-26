@@ -83,7 +83,11 @@ export const ActivePools: React.FC = (): JSX.Element => {
           round="true"
           sizevalue={isDesktopView ? 'normal' : 'small'}
           style={{ height: 30 }}
-          onClick={() => clickSwapHandler({ source: assetToString(pool.asset), target: assetToString(pool.target) })}>
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            clickSwapHandler({ source: assetToString(pool.asset), target: assetToString(pool.target) })
+          }}>
           <SwapOutlined />
           {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
         </Button>
@@ -234,7 +238,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
             onRow={({ pool }: PoolTableRowData) => {
               return {
                 onClick: () => {
-                  history.push(poolsRoutes.poolDetail.path({ symbol: pool.target.symbol }))
+                  history.push(poolsRoutes.detail.path({ symbol: pool.target.symbol }))
                 }
               }
             }}

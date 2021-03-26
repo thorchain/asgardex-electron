@@ -1,6 +1,6 @@
 import { Route } from '../types'
 import * as depositRoutes from './deposit'
-import * as poolDetailRoutes from './poolDetail'
+import * as poolDetailRoutes from './detail'
 import * as swapRoutes from './swap'
 
 export const base: Route<void> = {
@@ -14,4 +14,4 @@ export const deposit = depositRoutes.deposit
 
 export const swap = swapRoutes.swap
 
-export const poolDetail = poolDetailRoutes.poolDetail
+export const detail = poolDetailRoutes.poolDetail

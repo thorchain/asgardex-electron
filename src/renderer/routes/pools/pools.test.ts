@@ -1,4 +1,4 @@
-import { base, deposit, swap, poolDetail } from './pools'
+import { base, deposit, swap, detail } from './pools'
 
 describe('Pools routes', () => {
   describe('base route', () => {
@@ -39,14 +39,13 @@ describe('Pools routes', () => {
 
   describe('PoolDetail routes', () => {
     it('template', () => {
-      expect(poolDetail.template).toEqual('/pools/detail/:symbol')
+      expect(detail.template).toEqual('/pools/detail/:symbol')
     })
     it('returns path by given symbol parameter', () => {
-      expect(poolDetail.path({ symbol: 'BNB' })).toEqual('/pools/detail/BNB')
+      expect(detail.path({ symbol: 'BNB' })).toEqual('/pools/detail/BNB')
     })
     it('redirects to base path if symbol is empty', () => {
-      console.log(123, poolDetail.path({ symbol: '' }))
-      expect(poolDetail.path({ symbol: '' })).toEqual('/pools/detail')
+      expect(detail.path({ symbol: '' })).toEqual('/pools/detail')
     })
   })
 })

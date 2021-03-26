@@ -20,7 +20,7 @@ export const PoolsView: React.FC = (): JSX.Element => {
       <Route path={poolsRoutes.deposit.template} exact>
         <DepositView />
       </Route>
-      <Route path={poolsRoutes.poolDetail.template} exact>
+      <Route path={poolsRoutes.detail.template} exact>
         <PoolDetailsView />
       </Route>
     </Switch>

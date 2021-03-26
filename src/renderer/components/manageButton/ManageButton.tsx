@@ -18,10 +18,14 @@ export const ManageButton: React.FC<Props> = ({ className, asset, sizevalue = 'n
   const intl = useIntl()
   const history = useHistory()
 
-  const onClick = useCallback(() => history.push(poolsRoutes.deposit.path({ asset: assetToString(asset) })), [
-    asset,
-    history
-  ])
+  const onClick = useCallback(
+    (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      history.push(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
+    },
+    [asset, history]
+  )
 
   return (
     <Button

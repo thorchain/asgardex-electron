@@ -1,7 +1,8 @@
 import { Route } from '../types'
+import { base as poolsBase } from './base'
 
 export const base: Route<void> = {
-  template: `/pools/detail`,
+  template: `${poolsBase.template}/detail`,
   path() {
     return this.template
   }

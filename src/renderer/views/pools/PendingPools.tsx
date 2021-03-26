@@ -176,7 +176,7 @@ export const PendingPools: React.FC = (): JSX.Element => {
             onRow={({ pool }: PoolTableRowData) => {
               return {
                 onClick: () => {
-                  history.push(poolsRoutes.poolDetail.path({ symbol: pool.target.symbol }))
+                  history.push(poolsRoutes.detail.path({ symbol: pool.target.symbol }))
                 }
               }
             }}
