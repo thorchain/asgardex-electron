@@ -244,8 +244,6 @@ const createPoolsService = (
   ) => {
     const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
 
-    console.log('xxx apiGetPoolsData:', assetOrAssets, status)
-
     return FP.pipe(
       apiGetPoolsByStatus$(status),
       liveData.map(A.filter((poolDetail) => assets.includes(poolDetail.asset))),
