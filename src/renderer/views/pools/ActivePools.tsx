@@ -21,8 +21,8 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordBigNumber } from '../../helpers/fp/ord'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import * as swapRoutes from '../../routes/swap'
-import { SwapRouteParams } from '../../routes/swap'
+import * as poolsRoutes from '../../routes/pools'
+import { SwapRouteParams } from '../../routes/pools/swap'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolFilter, PoolsState } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
@@ -67,7 +67,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
-  const getSwapPath = swapRoutes.swap.path
+  const getSwapPath = poolsRoutes.swap.path
   const clickSwapHandler = useCallback(
     (p: SwapRouteParams) => {
       history.push(getSwapPath(p))
@@ -83,7 +83,11 @@ export const ActivePools: React.FC = (): JSX.Element => {
           round="true"
           sizevalue={isDesktopView ? 'normal' : 'small'}
           style={{ height: 30 }}
-          onClick={() => clickSwapHandler({ source: assetToString(pool.asset), target: assetToString(pool.target) })}>
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            clickSwapHandler({ source: assetToString(pool.asset), target: assetToString(pool.target) })
+          }}>
           <SwapOutlined />
           {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
         </Button>
@@ -231,11 +235,18 @@ export const ActivePools: React.FC = (): JSX.Element => {
             dataSource={FP.pipe(tableData, filterTableData(poolFilter))}
             loading={loading}
             rowKey="key"
+            onRow={({ pool }: PoolTableRowData) => {
+              return {
+                onClick: () => {
+                  history.push(poolsRoutes.detail.path({ symbol: pool.target.symbol }))
+                }
+              }
+            }}
           />
         </>
       )
     },
-    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, poolFilter, setFilter]
+    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, poolFilter, setFilter, history]
   )
 
   return (

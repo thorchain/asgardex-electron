@@ -41,7 +41,7 @@ import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpH
 import { LiveData } from '../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
-import { swap } from '../../routes/swap'
+import { swap } from '../../routes/pools'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import {
   SwapState,

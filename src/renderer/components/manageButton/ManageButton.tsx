@@ -5,7 +5,7 @@ import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 
-import * as depositRoutes from '../../routes/deposit'
+import * as poolsRoutes from '../../routes/pools'
 import { Button, ButtonSize } from '../uielements/button'
 
 type Props = {
@@ -18,10 +18,14 @@ export const ManageButton: React.FC<Props> = ({ className, asset, sizevalue = 'n
   const intl = useIntl()
   const history = useHistory()
 
-  const onClick = useCallback(() => history.push(depositRoutes.deposit.path({ asset: assetToString(asset) })), [
-    asset,
-    history
-  ])
+  const onClick = useCallback(
+    (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      history.push(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
+    },
+    [asset, history]
+  )
 
   return (
     <Button
