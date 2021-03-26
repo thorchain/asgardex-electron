@@ -17,6 +17,7 @@ storiesOf('Components/input/InputBigNumber', module)
   .add('default', () => {
     const [value, setValue] = React.useState<BigNumber>(bn('0.000001'))
     const handleChange = useCallback((v) => {
+      console.log('onChange:', v.toString())
       setValue(v)
     }, [])
     return (

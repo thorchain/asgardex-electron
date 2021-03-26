@@ -233,7 +233,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   // whenever `oDepositParams` has been updated, `depositParamsUpdated` needs to be called to update `depositFeesRD`
-  useEffect(() => depositParamsUpdated(oDepositParams), [depositParamsUpdated, oDepositParams])
+  useEffect(() => {
+    // Trigger changes only for users while NOT typing into input fields (to avoid too many requests)
+    if (selectedInput === 'none') depositParamsUpdated(oDepositParams)
+  }, [depositParamsUpdated, oDepositParams, selectedInput])
 
   const reloadFeesHandler = useCallback(() => {
     FP.pipe(
@@ -504,6 +507,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [changePercentHandler, depositParamsUpdated, onChangeAsset, resetDepositState]
   )
 
+  const onAfterSliderChangeHandler = useCallback(() => {
+    if (selectedInput === 'none') {
+      reloadFeesHandler()
+    }
+  }, [reloadFeesHandler, selectedInput])
+
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
   const confirmDepositHandler = useCallback(() => {
@@ -750,9 +759,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const inputOnBlur = useCallback(() => {
-    reloadFeesHandler()
     setSelectedInput('none')
-  }, [reloadFeesHandler, setSelectedInput])
+    reloadFeesHandler()
+  }, [reloadFeesHandler])
 
   const {
     state: approveState,
@@ -900,7 +909,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             onChangeAsset={onChangeAssetHandler}
             priceAsset={priceAsset}
             network={network}
-            onAfterSliderChange={() => (selectedInput === 'none' ? reloadFeesHandler() : FP.constVoid)}
+            onAfterSliderChange={onAfterSliderChangeHandler}
           />
         </Col>
 
