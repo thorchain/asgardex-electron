@@ -44,6 +44,7 @@ export const DepositView: React.FC<Props> = () => {
     service: {
       setSelectedPoolAsset,
       selectedPoolAsset$,
+      pools: { reloadSelectedPoolDetail },
       shares: { shares$, reloadShares }
     }
   } = useMidgardContext()
@@ -119,7 +120,8 @@ export const DepositView: React.FC<Props> = () => {
   const reloadHandler = useCallback(() => {
     reloadBalances()
     reloadShares()
-  }, [reloadBalances, reloadShares])
+    reloadSelectedPoolDetail()
+  }, [reloadBalances, reloadSelectedPoolDetail, reloadShares])
 
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`

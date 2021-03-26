@@ -30,7 +30,8 @@ export const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService, reloadBalances } = useWalletContext()
   const {
     service: {
-      shares: { reloadCombineSharesByAddresses }
+      shares: { reloadCombineSharesByAddresses },
+      pools: { reloadAllPools }
     }
   } = useMidgardContext()
   const { reloadNodesInfo } = useThorchainContext()
@@ -69,7 +70,10 @@ export const WalletView: React.FC = (): JSX.Element => {
             <AssetsView />
           </Route>
           <Route path={walletRoutes.poolShares.template} exact>
-            {reloadButton(reloadCombineSharesByAddresses)}
+            {reloadButton(() => {
+              reloadCombineSharesByAddresses()
+              reloadAllPools()
+            })}
             <AssetsNav />
             <PoolShareView />
           </Route>
@@ -93,7 +97,7 @@ export const WalletView: React.FC = (): JSX.Element => {
         </Switch>
       </>
     ),
-    [reloadBalances, reloadButton, reloadCombineSharesByAddresses, reloadNodesInfo]
+    [reloadAllPools, reloadBalances, reloadButton, reloadCombineSharesByAddresses, reloadNodesInfo]
   )
 
   const renderWalletRoute = useCallback(

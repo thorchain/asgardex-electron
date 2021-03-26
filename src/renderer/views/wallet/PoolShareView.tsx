@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useMemo, useRef, useEffect } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
@@ -34,7 +34,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
+    pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadAllPools },
     reloadNetworkInfo,
     shares: { combineSharesByAddresses$ }
   } = midgardService
@@ -42,6 +42,11 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const thorchainContext = useThorchainContext()
   const oRuneAddress = useObservableState(thorchainContext.address$, O.none)
   const { addressByChain$ } = useChainContext()
+
+  useEffect(() => {
+    reloadAllPools()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const [poolSharesRD]: [PoolSharesRD, unknown] = useObservableState(
     () =>
@@ -104,9 +109,9 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   )
 
   const clickRefreshHandler = useCallback(() => {
-    reloadPools()
+    reloadAllPools()
     reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPools])
+  }, [reloadNetworkInfo, reloadAllPools])
 
   const renderRefreshBtn = useMemo(
     () => (

@@ -55,7 +55,14 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const {
     service: {
-      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, selectedPoolAddress$ },
+      pools: {
+        availableAssets$,
+        priceRatio$,
+        selectedPricePoolAsset$,
+        selectedPoolDetail$,
+        reloadSelectedPoolDetail,
+        selectedPoolAddress$
+      },
       shares: { reloadShares }
     }
   } = useMidgardContext()
@@ -83,7 +90,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const { balances: walletBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
-  const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
+  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
   const assetBalance: O.Option<BaseAmount> = useMemo(
     () =>
@@ -176,6 +183,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           memos={O.none}
           reloadBalances={reloadBalances}
           reloadShares={reloadShares}
+          reloadSelectedPoolDetail={reloadSelectedPoolDetail}
           poolData={ZERO_POOL_DATA}
           deposit$={symDeposit$}
           network={network}
@@ -195,6 +203,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
       selectedPricePoolAsset,
       reloadBalances,
       reloadShares,
+      reloadSelectedPoolDetail,
       symDeposit$,
       network,
       approveERC20Token$,
@@ -235,6 +244,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
               priceAsset={selectedPricePoolAsset}
               reloadBalances={reloadBalances}
               reloadShares={reloadShares}
+              reloadSelectedPoolDetail={reloadSelectedPoolDetail}
               balances={filteredBalances}
               deposit$={symDeposit$}
               network={network}

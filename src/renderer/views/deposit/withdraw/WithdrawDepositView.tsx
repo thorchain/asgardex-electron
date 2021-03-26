@@ -33,7 +33,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const { decimal: assetDecimal } = assetWD
   const {
     service: {
-      pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$ },
+      pools: { selectedPoolDetail$, selectedPricePoolAsset$, priceRatio$ },
       shares: { reloadShares }
     }
   } = useMidgardContext()
@@ -42,7 +42,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
 
   const runePrice = useObservableState(priceRatio$, bn(1))
 
-  const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
+  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
   const [selectedPriceAssetRD]: [RD.RemoteData<Error, Asset>, unknown] = useObservableState(
     () =>

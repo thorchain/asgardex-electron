@@ -50,7 +50,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
 
   const {
     service: {
-      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, poolDetail$, selectedPoolAddress$ },
+      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, selectedPoolDetail$, selectedPoolAddress$ },
       shares: { reloadShares }
     }
   } = useMidgardContext()
@@ -88,7 +88,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
     reloadShares(5000)
   }, [reloadBalances, reloadShares])
 
-  const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
+  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
   const assetBalance: O.Option<BaseAmount> = useMemo(
     () =>
