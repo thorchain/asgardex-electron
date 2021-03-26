@@ -28,12 +28,12 @@ type Props = {
 export const ShareView: React.FC<Props> = ({ asset: assetWD, poolShare: poolShareRD, smallWidth }) => {
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolDetail$, selectedPricePoolAsset$, selectedPricePool$ }
+    pools: { selectedPoolDetail$, selectedPricePoolAsset$, selectedPricePool$ }
   } = midgardService
 
   const intl = useIntl()
 
-  const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
+  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
 
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)

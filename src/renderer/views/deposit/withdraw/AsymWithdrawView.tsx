@@ -31,7 +31,7 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
   const { asset, poolShare: poolShareRD } = props
   const {
     service: {
-      pools: { poolDetail$, selectedPricePoolAsset$, priceRatio$, selectedPoolAddress$ }
+      pools: { selectedPoolDetail$, selectedPricePoolAsset$, priceRatio$, selectedPoolAddress$ }
     }
   } = useMidgardContext()
 
@@ -41,7 +41,7 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
 
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
-  const poolDetailRD = useObservableState<PoolDetailRD>(poolDetail$, RD.initial)
+  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
   const [selectedPriceAssetRD]: [RD.RemoteData<Error, Asset>, unknown] = useObservableState(
     () =>

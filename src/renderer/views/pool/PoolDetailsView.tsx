@@ -41,7 +41,7 @@ const renderInitialView = () => <PoolDetails {...defaultDetailsProps} />
 export const PoolDetailsView: React.FC = () => {
   const {
     service: {
-      pools: { poolDetail$, priceRatio$, selectedPricePoolAssetSymbol$ }
+      pools: { selectedPoolDetail$, priceRatio$, selectedPricePoolAssetSymbol$ }
     }
   } = useMidgardContext()
 
@@ -51,7 +51,7 @@ export const PoolDetailsView: React.FC = () => {
 
   const priceRatio = useObservableState(priceRatio$, ONE_BN)
 
-  const poolDetailRD = useObservableState(poolDetail$, RD.initial)
+  const poolDetailRD = useObservableState(selectedPoolDetail$, RD.initial)
 
   return FP.pipe(
     poolDetailRD,

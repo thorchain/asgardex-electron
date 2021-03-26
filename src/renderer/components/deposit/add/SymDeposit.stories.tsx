@@ -67,6 +67,7 @@ const defaultProps: SymDepositProps = {
   memos: O.some({ rune: 'rune-memo', asset: 'asset-memo' }),
   reloadBalances: () => console.log('reloadBalances'),
   reloadShares: (delay = 0) => console.log('reloadShares ', delay),
+  reloadSelectedPoolDetail: (delay = 0) => console.log('reloadSelectedPoolDetail ', delay),
   viewAssetTx: (txHash) => {
     console.log(txHash)
   },
