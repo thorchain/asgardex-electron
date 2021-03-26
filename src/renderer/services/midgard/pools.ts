@@ -85,7 +85,7 @@ const createPoolsService = (
   }
 
   // Factory to get `Pools` from Midgard
-  const apiGetPools$ = (request: GetPoolsRequest, reload$: TriggerStream$, pools?: string[]) =>
+  const apiGetPools$ = (request: GetPoolsRequest, reload$: TriggerStream$) =>
     FP.pipe(
       Rx.combineLatest([midgardDefaultApi$, reload$]),
       RxOp.map(([api]) => api),
@@ -114,15 +114,6 @@ const createPoolsService = (
       liveData.chain((details) =>
         FP.pipe(
           details,
-          (details) => {
-            if (pools) {
-              return FP.pipe(
-                details,
-                A.filter(({ asset }) => pools.includes(asset))
-              )
-            }
-            return details
-          },
           A.map(({ asset }) =>
             FP.pipe(
               midgardDefaultApi$,
@@ -199,7 +190,7 @@ const createPoolsService = (
    *
    * If status is not set (or undefined), `PoolDetails` of all Pools will be loaded
    */
-  const apiGetPoolsByStatus$ = (status?: GetPoolsStatusEnum, _pools?: string[]) => {
+  const apiGetPoolsByStatus$ = (status?: GetPoolsStatusEnum) => {
     switch (status) {
       case GetPoolsStatusEnum.Available:
         return apiGetPoolsEnabled$
@@ -236,8 +227,8 @@ const createPoolsService = (
     const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
 
     return FP.pipe(
-      apiGetPoolsByStatus$(status, assets),
-      // liveData.map(A.filter((poolDetail) => assets.includes(poolDetail.asset))),
+      apiGetPoolsByStatus$(status),
+      liveData.map(A.filter((poolDetail) => assets.includes(poolDetail.asset))),
       liveData.map(NEA.fromArray),
       liveData.chain(
         O.fold(
@@ -431,14 +422,9 @@ const createPoolsService = (
         O.fold(
           () => Rx.of(RD.initial),
           (asset) =>
-            FP.pipe(
-              reloadPool$,
-              RxOp.switchMap(() =>
-                apiGetPoolsData$(
-                  assetToString(asset),
-                  undefined /* explicit set to `undefined` to remember we want data for all pools */
-                )
-              )
+            apiGetPoolsData$(
+              assetToString(asset),
+              undefined /* explicit set to `undefined` to remember we want data for all pools */
             )
         )
       )

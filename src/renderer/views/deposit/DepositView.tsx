@@ -46,7 +46,7 @@ export const DepositView: React.FC<Props> = () => {
       setSelectedPoolAsset,
       selectedPoolAsset$,
       shares: { shares$, reloadShares },
-      pools: { reloadPools: reloadPool }
+      pools: { reloadPools }
     }
   } = useMidgardContext()
 
@@ -109,11 +109,11 @@ export const DepositView: React.FC<Props> = () => {
         O.fold(() => Rx.EMPTY, shares$),
         liveData.map((sahres) => {
           // reload pools only for successfully loaded shares
-          reloadPool()
+          reloadPools()
           return sahres
         })
       ),
-    [oAssetWalletAddress, shares$, reloadPool]
+    [oAssetWalletAddress, shares$, reloadPools]
   )
 
   const poolSharesRD = useObservableState<PoolSharesRD>(poolShares$, RD.initial)
