@@ -34,7 +34,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadPools },
+    pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadAllPools },
     reloadNetworkInfo,
     shares: { combineSharesByAddresses$ }
   } = midgardService
@@ -104,9 +104,9 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   )
 
   const clickRefreshHandler = useCallback(() => {
-    reloadPools()
+    reloadAllPools()
     reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPools])
+  }, [reloadNetworkInfo, reloadAllPools])
 
   const renderRefreshBtn = useMemo(
     () => (
