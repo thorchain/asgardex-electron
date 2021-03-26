@@ -45,7 +45,7 @@ export const DepositView: React.FC<Props> = () => {
       setSelectedPoolAsset,
       selectedPoolAsset$,
       shares: { shares$, reloadShares },
-      pools: { reloadPool }
+      pools: { reloadPools: reloadPool }
     }
   } = useMidgardContext()
 
@@ -105,9 +105,10 @@ export const DepositView: React.FC<Props> = () => {
     () =>
       FP.pipe(
         oAssetWalletAddress,
-        O.fold(() => Rx.EMPTY, shares$)
+        O.fold(() => Rx.EMPTY, shares$),
+        RxOp.tap(reloadPool)
       ),
-    [oAssetWalletAddress, shares$]
+    [oAssetWalletAddress, shares$, reloadPool]
   )
 
   const poolSharesRD = useObservableState<PoolSharesRD>(poolShares$, RD.initial)
@@ -120,8 +121,8 @@ export const DepositView: React.FC<Props> = () => {
   const reloadHandler = useCallback(() => {
     reloadBalances()
     reloadShares()
-    reloadPool()
-  }, [reloadBalances, reloadShares, reloadPool])
+    // reloadPool()
+  }, [reloadBalances, reloadShares])
 
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`

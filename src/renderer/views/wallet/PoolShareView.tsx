@@ -50,7 +50,6 @@ export const PoolShareView: React.FC = (): JSX.Element => {
         A.filter(FP.not(isThorChain)),
         A.map(addressByChain$),
         (addresses) => Rx.combineLatest(addresses),
-        RxOp.tap(reloadPools),
         RxOp.switchMap(
           FP.flow(
             /**
@@ -68,12 +67,13 @@ export const PoolShareView: React.FC = (): JSX.Element => {
              */
             combineSharesByAddresses$
           )
-        )
+        ),
+        RxOp.tap(reloadPools)
       ),
     RD.initial
   )
 
-  const poolDetailsRD = useObservableState(allPoolDetails$, RD.pending)
+  const [poolDetailsRD] = useObservableState(() => allPoolDetails$, RD.pending)
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
   const priceAsset = FP.pipe(oPriceAsset, O.toUndefined)

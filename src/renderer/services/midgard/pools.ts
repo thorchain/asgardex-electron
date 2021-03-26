@@ -85,9 +85,9 @@ const createPoolsService = (
   }
 
   // Factory to get `Pools` from Midgard
-  const apiGetPools$ = (request: GetPoolsRequest, _reload$: TriggerStream$, pools?: string[]) =>
+  const apiGetPools$ = (request: GetPoolsRequest, reload$: TriggerStream$, pools?: string[]) =>
     FP.pipe(
-      Rx.combineLatest([midgardDefaultApi$]),
+      Rx.combineLatest([midgardDefaultApi$, reload$]),
       RxOp.map(([api]) => api),
       liveData.chain((api) =>
         FP.pipe(
@@ -176,8 +176,7 @@ const createPoolsService = (
   /**
    * Data of enabled `Pools` from Midgard
    */
-  const apiGetPoolsEnabled$: (pools?: string[]) => PoolDetailsLD = (pools) =>
-    apiGetPools$({ status: GetPoolsStatusEnum.Available }, reloadPools$, pools)
+  const apiGetPoolsEnabled$: PoolDetailsLD = apiGetPools$({ status: GetPoolsStatusEnum.Available }, reloadPools$)
 
   // `TriggerStream` to reload data of pending pools
   const { stream$: reloadPendingPools$, trigger: reloadPendingPools } = triggerStream()
@@ -185,8 +184,7 @@ const createPoolsService = (
   /**
    * Data of pending `Pools` from Midgard
    */
-  const apiGetPoolsPending$: (pools?: string[]) => PoolDetailsLD = (pools) =>
-    apiGetPools$({ status: GetPoolsStatusEnum.Staged }, reloadPendingPools$, pools)
+  const apiGetPoolsPending$: PoolDetailsLD = apiGetPools$({ status: GetPoolsStatusEnum.Staged }, reloadPendingPools$)
 
   // `TriggerStream` to reload data of all pools
   const { stream$: reloadAllPools$, trigger: reloadAllPools } = triggerStream()
@@ -194,22 +192,21 @@ const createPoolsService = (
   /**
    * Data of all `Pools`
    */
-  const apiGetPoolsAll$: (pools?: string[]) => PoolDetailsLD = (pools) =>
-    apiGetPools$({ status: undefined }, reloadAllPools$, pools)
+  const apiGetPoolsAll$: PoolDetailsLD = apiGetPools$({ status: undefined }, reloadAllPools$)
 
   /**
    * Helper to get (same) stream of `PoolDetailsLD` by given status
    *
    * If status is not set (or undefined), `PoolDetails` of all Pools will be loaded
    */
-  const apiGetPoolsByStatus$ = (status?: GetPoolsStatusEnum, pools?: string[]) => {
+  const apiGetPoolsByStatus$ = (status?: GetPoolsStatusEnum, _pools?: string[]) => {
     switch (status) {
       case GetPoolsStatusEnum.Available:
-        return apiGetPoolsEnabled$(pools)
+        return apiGetPoolsEnabled$
       case GetPoolsStatusEnum.Staged:
-        return apiGetPoolsPending$(pools)
+        return apiGetPoolsPending$
       default:
-        return apiGetPoolsAll$(pools)
+        return apiGetPoolsAll$
     }
   }
   /**
@@ -297,7 +294,7 @@ const createPoolsService = (
    */
   const loadAllPoolsDetails$ = (): PoolDetailsLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
-      apiGetPoolsAll$(),
+      apiGetPoolsAll$,
       // Filter out all unknown / invalid assets created from asset strings
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
       // Filter pools by using enabled chains only (defined via ENV)
@@ -327,7 +324,7 @@ const createPoolsService = (
    */
   const loadPoolsStateData$ = (): PoolsStateLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
-      apiGetPoolsEnabled$(),
+      apiGetPoolsEnabled$,
       // Filter out all unknown / invalid assets created from asset strings
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
       // Filter pools by using enabled chains only (defined via ENV)
@@ -386,7 +383,7 @@ const createPoolsService = (
    */
   const loadPendingPoolsStateData$ = (): PendingPoolsStateLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
-      apiGetPoolsPending$(),
+      apiGetPoolsPending$,
       // Filter out all unknown / invalid assets created from asset strings
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
       // Filter pools by using enabled chains only (defined via ENV)
@@ -448,7 +445,7 @@ const createPoolsService = (
         )
       )
     ),
-    RxOp.shareReplay(1),
+    // RxOp.shareReplay(1),
     liveData.chain(
       FP.flow(
         A.head,
