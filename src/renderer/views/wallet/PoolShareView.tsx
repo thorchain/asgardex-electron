@@ -22,8 +22,9 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { isThorChain } from '../../helpers/chainHelper'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { liveData } from '../../helpers/rx/liveData'
 import { DEFAULT_NETWORK, ENABLED_CHAINS } from '../../services/const'
-import { PoolSharesRD } from '../../services/midgard/types'
+import { PoolDetailsRD, PoolSharesRD } from '../../services/midgard/types'
 import { getPoolShareTableData } from './PoolShareView.helper'
 
 export const PoolShareView: React.FC = (): JSX.Element => {
@@ -68,12 +69,15 @@ export const PoolShareView: React.FC = (): JSX.Element => {
             combineSharesByAddresses$
           )
         ),
-        RxOp.tap(reloadPools)
+        liveData.map((shares) => {
+          // reload pools only for successfully loaded shares
+          reloadPools()
+          return shares
+        })
       ),
     RD.initial
   )
-
-  const [poolDetailsRD] = useObservableState(() => allPoolDetails$, RD.pending)
+  const poolDetailsRD: PoolDetailsRD = useObservableState(allPoolDetails$, RD.pending)
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
   const priceAsset = FP.pipe(oPriceAsset, O.toUndefined)

@@ -20,6 +20,7 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { liveData } from '../../helpers/rx/liveData'
 import { DepositRouteParams } from '../../routes/deposit'
 import { AssetWithDecimalRD } from '../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../services/const'
@@ -106,7 +107,11 @@ export const DepositView: React.FC<Props> = () => {
       FP.pipe(
         oAssetWalletAddress,
         O.fold(() => Rx.EMPTY, shares$),
-        RxOp.tap(reloadPool)
+        liveData.map((sahres) => {
+          // reload pools only for successfully loaded shares
+          reloadPool()
+          return sahres
+        })
       ),
     [oAssetWalletAddress, shares$, reloadPool]
   )
@@ -121,7 +126,6 @@ export const DepositView: React.FC<Props> = () => {
   const reloadHandler = useCallback(() => {
     reloadBalances()
     reloadShares()
-    // reloadPool()
   }, [reloadBalances, reloadShares])
 
   // Important note:

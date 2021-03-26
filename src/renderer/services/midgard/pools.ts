@@ -229,11 +229,10 @@ const createPoolsService = (
   /**
    * `PoolDetails` data from Midgard
    */
-  const apiGetPoolsData$: (
-    assetOrAssets: string | string[],
-    status?: GetPoolsStatusEnum
-    // pools?: string[]
-  ) => PoolDetailsLD = (assetOrAssets, status) => {
+  const apiGetPoolsData$: (assetOrAssets: string | string[], status?: GetPoolsStatusEnum) => PoolDetailsLD = (
+    assetOrAssets,
+    status
+  ) => {
     const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
 
     return FP.pipe(
@@ -434,13 +433,12 @@ const createPoolsService = (
           (asset) =>
             FP.pipe(
               reloadPool$,
-              RxOp.switchMap(() => {
-                console.log('load')
-                return apiGetPoolsData$(
+              RxOp.switchMap(() =>
+                apiGetPoolsData$(
                   assetToString(asset),
                   undefined /* explicit set to `undefined` to remember we want data for all pools */
                 )
-              })
+              )
             )
         )
       )

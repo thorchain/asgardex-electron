@@ -76,7 +76,6 @@ export type Props = {
   fees$: (p: SymDepositParams) => DepositFeesLD
   reloadBalances: FP.Lazy<void>
   reloadShares: (delay?: number) => void
-  // reloadPool: () => void
   viewAssetTx: (txHash: string) => void
   viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
@@ -110,7 +109,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     reloadFees,
     reloadBalances,
     reloadShares,
-    // reloadPool,
     fees$,
     onChangeAsset,
     disabled = false,

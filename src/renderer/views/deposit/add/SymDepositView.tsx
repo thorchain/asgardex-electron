@@ -176,7 +176,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
           memos={O.none}
           reloadBalances={reloadBalances}
           reloadShares={reloadShares}
-          // reloadPool={reloadPool}
           poolData={ZERO_POOL_DATA}
           deposit$={symDeposit$}
           network={network}
@@ -196,7 +195,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
       selectedPricePoolAsset,
       reloadBalances,
       reloadShares,
-      // reloadPool,
       symDeposit$,
       network,
       approveERC20Token$,
@@ -237,7 +235,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
               priceAsset={selectedPricePoolAsset}
               reloadBalances={reloadBalances}
               reloadShares={reloadShares}
-              // reloadPool={reloadPool}
               balances={filteredBalances}
               deposit$={symDeposit$}
               network={network}

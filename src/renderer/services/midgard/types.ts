@@ -50,6 +50,7 @@ export type PoolDetailRD = RD.RemoteData<Error, PoolDetail>
 export type PoolDetailLD = LiveData<Error, PoolDetail>
 
 export type PoolDetails = PoolDetail[]
+export type PoolDetailsRD = RD.RemoteData<Error, PoolDetails>
 export type PoolDetailsLD = LiveData<Error, PoolDetails>
 
 /**
