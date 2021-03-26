@@ -42,7 +42,15 @@ export type PoolAssetDetails = PoolAssetDetail[]
 export type PoolAssetDetailsLD = LiveData<Error, PoolAssetDetails>
 
 export type PoolDetail = MidgardPoolDetail & {
+  /**
+   * Swap history of average slip
+   * Needed for pools overview only
+   */
   poolSlipAverage: string
+  /**
+   * Swap history of swap txs count
+   * Needed for pools overview only
+   */
   swappingTxCount: string
 }
 

@@ -224,9 +224,10 @@ const createPoolsService = (
       liveData.chain((api) => {
         return FP.pipe(
           api.getPool({ asset: assetToString(asset) }),
-          // Setting empty values, since we don't need those in pool detail atm
+          // Setting zero for `poolSlipAverage` + `swappingTxCount`
+          // since we don't need those in pool detail atm
           // TODO (@asdgdx-team: Do we still need `poolSlipAverage` + `swappingTxCount` in PoolDetail ??
-          RxOp.map((poolDetail) => ({ poolSlipAverage: '', swappingTxCount: '', ...poolDetail })),
+          RxOp.map((poolDetail) => ({ poolSlipAverage: '0', swappingTxCount: '0', ...poolDetail })),
           RxOp.map(RD.success),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
