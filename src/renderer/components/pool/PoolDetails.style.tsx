@@ -11,17 +11,3 @@ export const Container = styled(A.Row)`
     padding: 0;
   `}
 `
-
-export const Col = styled(A.Col).attrs({
-  span: 12
-})`
-  // Need to use paddings instead of margins 'cause
-  // of Ant.Col width-value calculation strategy
-  padding: 0 ${ITEM_GAP} ${ITEM_GAP} 0;
-
-  ${media.lg`
-    &:last-child {
-      padding-right: 0;
-    }
-  `}
-`

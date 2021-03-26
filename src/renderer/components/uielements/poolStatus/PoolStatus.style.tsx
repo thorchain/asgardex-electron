@@ -45,6 +45,7 @@ export const Value = styled(Label).attrs({
   white-space: nowrap;
   text-overflow: ellipsis;
 `
+
 export const Tooltip = styled(A.Tooltip).attrs({
   placement: 'bottom',
   overlayStyle: {

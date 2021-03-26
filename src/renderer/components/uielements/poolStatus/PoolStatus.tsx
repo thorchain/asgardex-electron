@@ -4,7 +4,6 @@ import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 
 import { useCbOnResize } from '../../../hooks/useCbOnResize'
-import { Label } from '../label'
 import { Trend } from '../trend'
 import * as Styled from './PoolStatus.style'
 
@@ -58,9 +57,9 @@ export const PoolStatus: React.FC<Props> = (props): JSX.Element => {
           </Styled.Value>
           {trend && <Trend amount={trend} />}
         </Row>
-        <Label textTransform="uppercase" color="light">
+        <Styled.Value textTransform="uppercase" color="light">
           {label}
-        </Label>
+        </Styled.Value>
       </TooltipContainer>
     </Styled.PoolStatusWrapper>
   )
