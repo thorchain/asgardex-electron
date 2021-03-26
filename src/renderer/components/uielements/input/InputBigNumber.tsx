@@ -23,13 +23,14 @@ export const InputBigNumber = forwardRef<Input, Props>(
       value = ZERO_BN,
       onChange = () => {},
       onFocus = FP.constVoid,
+      onBlur = FP.constVoid,
       ...otherProps /* any props of `InputNumberProps` */
     } = props
 
     // value as string (unformatted) - it supports empty string for an empty input
     const [enteredValue, setEnteredValue] = useState<O.Option<string>>(O.none)
     const [focus, setFocus] = useState(false)
-    const broadcastValue = useRef<BigNumber>(ZERO_BN)
+    const broadcastValue = useRef<O.Option<BigNumber>>(O.none)
 
     const inputValue = useMemo(
       () =>
@@ -66,7 +67,7 @@ export const InputBigNumber = forwardRef<Input, Props>(
       [onFocus]
     )
 
-    const onBlurHandler = useCallback(() => {
+    const _onBlurHandler = useCallback(() => {
       setFocus(false)
       // Clean up value - it can't be done in onChangeHandler due race conditions!!
       setEnteredValue((v) =>
@@ -74,17 +75,23 @@ export const InputBigNumber = forwardRef<Input, Props>(
           v,
           // convert empty string to '0'
           O.map((v) => (v === '' ? VALUE_ZERO : v)),
-          // format value based on supported decimals
-          O.map((v) => bn(v).toFixed(decimal)),
           // remove uneeded zeros
           O.map(trimZeros)
         )
       )
-    }, [decimal])
+    }, [])
+
+    const onBlurHandler = useCallback(
+      (event: React.FocusEvent<HTMLInputElement>) => {
+        _onBlurHandler()
+        onBlur(event)
+      },
+      [_onBlurHandler, onBlur]
+    )
 
     const onPressEnterHandler = useCallback(() => {
-      onBlurHandler()
-    }, [onBlurHandler])
+      _onBlurHandler()
+    }, [_onBlurHandler])
 
     const onChangeHandler = useCallback(
       ({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,34 +102,50 @@ export const InputBigNumber = forwardRef<Input, Props>(
           FP.pipe(
             O.some(newValue),
             // ignore empty input
-            O.filter((v) => v !== ''),
-            // check max. values
-            O.map((v) => {
-              // return value if `max` is not set
-              if (!max) return v
-              // compare entered `value` with `max`
-              // if `value` > `max`, use `max`
-              const enteredValueBN = bn(v)
+            O.filter((value) => value !== ''),
+            // Limit to `max` value if needed
+            O.map((value) => {
+              if (!max) return value
+
               const maxBN = bn(max)
-              return enteredValueBN.isLessThanOrEqualTo(maxBN) ? v : maxBN.toFixed()
+              const valueBN = bn(value)
+              // if `value` > `max`, use `max`
+              return valueBN.isLessThanOrEqualTo(maxBN) ? value : max.toString()
             }),
+            // Limit decimal places of entered value
+            O.map((value) => {
+              const valueBN = bn(value)
+              const valueDecimal = bn(value).decimalPlaces()
+              // For only zero decimals (e.g`0.000000`) trim value to a single ZERO if its decimal places > `decimal`
+              const newValue = valueBN.isZero() && value.length > decimal + 2 /* 2 == offset for "0." */ ? '0' : value
+              // convert it back to a string
+              return valueDecimal > decimal ? valueBN.toFixed(decimal) : newValue
+            }),
+
             O.alt(() => O.some('0')),
-            O.map((v) => {
+            O.map((value) => {
               // store entered value in state
-              setEnteredValue(O.some(v))
-              return v
+              setEnteredValue(O.some(value))
+              return value
             }),
             // format value
-            O.map((v) => fixedBN(v, decimal)),
-            // Dirty check, but ignore `0` (zero) values to trigger changes
-            // Because it's default value of `broadcastValue`
-            O.filter((v) => !broadcastValue.current.isEqualTo(v) || v.isZero()),
-            O.map((v) => {
+            O.map((value) => fixedBN(value, decimal)),
+            // Dirty check
+            O.filter((valueBN) =>
+              FP.pipe(
+                broadcastValue.current,
+                O.map((current) => !current.isEqualTo(valueBN)),
+                // always accept first (default) of `broadcastValue.current`,
+                // which is `none` by default
+                O.getOrElse<boolean>(() => true)
+              )
+            ),
+            O.map((valueBN) => {
               // store broadcast value
-              broadcastValue.current = v
-              // trigger `onChange` handler
-              onChange(v)
-              return v
+              broadcastValue.current = O.some(valueBN)
+              // Inform outside world about changes
+              onChange(valueBN)
+              return valueBN
             })
           )
         }
