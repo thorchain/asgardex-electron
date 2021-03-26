@@ -443,7 +443,6 @@ const createPoolsService = (
         )
       )
     ),
-    // RxOp.shareReplay(1),
     liveData.chain(
       FP.flow(
         A.head,
@@ -709,10 +708,7 @@ const createPoolsService = (
     selectedPoolAddress$,
     poolAddressesByChain$,
     poolDetail$,
-    reloadPool: () => {
-      console.log('reload')
-      reloadPool()
-    },
+    reloadPool,
     poolStatsDetail$,
     poolLegacyDetail$,
     poolLiquidityHistory$,

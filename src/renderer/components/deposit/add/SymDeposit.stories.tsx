@@ -49,7 +49,6 @@ const defaultProps: SymDepositProps = {
   runeBalance: O.some(assetToBase(assetAmount(100))),
   chainAssetBalance: O.some(assetToBase(assetAmount(55))),
   onChangeAsset: (a: Asset) => console.log('change asset', a),
-  // reloadPool: () => console.log('reload pool'),
   reloadFees: () => console.log('reload fees'),
   fees$: () =>
     Rx.of(

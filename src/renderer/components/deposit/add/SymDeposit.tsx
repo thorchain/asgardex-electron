@@ -621,7 +621,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     onCloseTxModal()
     reloadBalances()
     reloadShares(5000)
-    // reloadPool()
   }, [onCloseTxModal, reloadBalances, reloadShares])
 
   const renderTxModal = useMemo(() => {
@@ -851,9 +850,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
       // Note: ETH/ERC20 fees won't be reloaded if router is None
       // that's why we have another check for prevPoolRouter in next guard
       reloadFeesHandler()
-      // reload shares
-      // reloadShares()
-      // false && reloadPool()
     }
 
     if (!eqOPoolAddresses.equals(prevPoolAddresses.current, oPoolAddress)) {
@@ -868,16 +864,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       // for ETH/ETH20
       if (O.isSome(oPoolAddress)) reloadFeesHandler()
     }
-  }, [
-    asset,
-    checkApprovedStatus,
-    oPoolAddress,
-    reloadShares,
-    // reloadPool,
-    reloadFeesHandler,
-    resetApproveState,
-    resetIsApprovedState
-  ])
+  }, [asset, checkApprovedStatus, oPoolAddress, reloadFeesHandler, resetApproveState, resetIsApprovedState])
 
   return (
     <Styled.Container>
