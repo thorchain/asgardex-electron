@@ -36,7 +36,8 @@ export const InputBigNumber = forwardRef<Input, Props>(
       () =>
         FP.pipe(
           enteredValue,
-          O.getOrElse(() => value.toFixed(decimal)),
+          // always round down for currencies
+          O.getOrElse(() => value.toFixed(decimal, BigNumber.ROUND_DOWN)),
           (v) => (focus ? v : formatValue(v, decimal))
         ),
       [enteredValue, focus, decimal, value]
@@ -44,8 +45,8 @@ export const InputBigNumber = forwardRef<Input, Props>(
 
     useEffect(() => {
       FP.pipe(
-        // fix to decimal
-        value.toFixed(decimal),
+        // fix to decimal + always round down for currencies
+        value.toFixed(decimal, BigNumber.ROUND_DOWN),
         // trim zeros
         trimZeros,
         O.some,
@@ -103,6 +104,8 @@ export const InputBigNumber = forwardRef<Input, Props>(
             O.some(newValue),
             // ignore empty input
             O.filter((value) => value !== ''),
+            // format '.' to '.0'
+            O.map((value) => (value === '.' ? '0.' : value)),
             // Limit to `max` value if needed
             O.map((value) => {
               if (!max) return value
@@ -118,8 +121,8 @@ export const InputBigNumber = forwardRef<Input, Props>(
               const valueDecimal = bn(value).decimalPlaces()
               // For only zero decimals (e.g`0.000000`) trim value to a single ZERO if its decimal places > `decimal`
               const newValue = valueBN.isZero() && value.length > decimal + 2 /* 2 == offset for "0." */ ? '0' : value
-              // convert it back to a string
-              return valueDecimal > decimal ? valueBN.toFixed(decimal) : newValue
+              // convert it back to a string (for fixed values always round down for currencies)
+              return valueDecimal > decimal ? valueBN.toFixed(decimal, BigNumber.ROUND_DOWN) : newValue
             }),
 
             O.alt(() => O.some('0')),
