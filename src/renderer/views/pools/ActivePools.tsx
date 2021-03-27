@@ -235,18 +235,19 @@ export const ActivePools: React.FC = (): JSX.Element => {
             dataSource={FP.pipe(tableData, filterTableData(poolFilter))}
             loading={loading}
             rowKey="key"
-            onRow={({ pool }: PoolTableRowData) => {
-              return {
-                onClick: () => {
-                  history.push(poolsRoutes.detail.path({ symbol: pool.target.symbol }))
-                }
-              }
-            }}
+            // TODO(@asgdx-team): Uncomment when pool detail is ready
+            // onRow={({ pool }: PoolTableRowData) => {
+            //   return {
+            //     onClick: () => {
+            //       history.push(poolsRoutes.detail.path({ symbol: pool.target.symbol }))
+            //     }
+            //   }
+            // }}
           />
         </>
       )
     },
-    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, poolFilter, setFilter, history]
+    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, poolFilter, setFilter]
   )
 
   return (
