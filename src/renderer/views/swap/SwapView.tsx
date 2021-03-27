@@ -68,33 +68,34 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const oRouteTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
 
   useEffect(() => {
-    // Target asset is the asset of the pool we need to interact with
+    // Source asset is the asset of the pool we need to interact with
     // Store it in global state, all depending streams will be updated then
-    setSelectedPoolAsset(oRouteTarget)
+    setSelectedPoolAsset(oRouteSource)
 
     // Reset selectedPoolAsset on view's unmount to avoid effects with depending streams
     return () => {
       setSelectedPoolAsset(O.none)
     }
-  }, [oRouteSource, oRouteTarget, setSelectedPoolAsset])
+  }, [oRouteSource, setSelectedPoolAsset])
 
   // reload inbound addresses at `onMount` to get always latest `pool address`
   useEffect(() => {
     reloadPoolAddresses()
   }, [reloadPoolAddresses])
 
-  const [sourceAssetRD] = useObservableState<AssetWithDecimalRD>(
+  const sourceAssetDecimal$: AssetWithDecimalLD = useMemo(
     () =>
       FP.pipe(
         oRouteSource,
         O.fold(
-          () => Rx.of(RD.initial),
+          () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'swap.errors.asset.missingSourceAsset' })))),
           (asset) => assetWithDecimal$(asset, network)
         )
       ),
-
-    RD.initial
+    [assetWithDecimal$, intl, network, oRouteSource]
   )
+
+  const sourceAssetRD: AssetWithDecimalRD = useObservableState(sourceAssetDecimal$, RD.initial)
 
   const targetAssetDecimal$: AssetWithDecimalLD = useMemo(
     () =>
