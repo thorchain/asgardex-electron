@@ -1,12 +1,14 @@
 import React from 'react'
 
-import { AssetAmount, formatAssetAmount } from '@xchainjs/xchain-util'
+import { AssetAmount } from '@xchainjs/xchain-util'
+import * as A from 'antd'
 import BigNumber from 'bignumber.js'
-import { useIntl } from 'react-intl'
 
-import { abbreviateNumber } from '../../helpers/numberHelper'
-import { PoolStatus } from '../uielements/poolStatus'
+import { PoolCards } from './PoolCards'
+import { PoolChart } from './PoolChart'
 import * as Styled from './PoolDetails.style'
+import { PoolHistory } from './PoolHistory'
+import { PoolTitle } from './PoolTitle'
 
 export type Props = {
   depth: AssetAmount
@@ -38,58 +40,33 @@ export const PoolDetails: React.FC<Props> = ({
   totalStakersTrend,
   isLoading
 }) => {
-  const intl = useIntl()
-
   return (
     <Styled.Container>
-      <Styled.Col>
-        <PoolStatus
+      <A.Col span={24}>
+        <PoolTitle isLoading={isLoading} />
+      </A.Col>
+      <A.Col xs={24} md={8}>
+        <PoolCards
+          depth={depth}
+          volume24hr={volume24hr}
+          allTimeVolume={allTimeVolume}
+          totalStakers={totalStakers}
+          totalSwaps={totalSwaps}
+          priceSymbol={priceSymbol}
+          depthTrend={depthTrend}
+          volume24hrTrend={volume24hrTrend}
+          allTimeVolumeTrend={allTimeVolumeTrend}
+          totalSwapsTrend={totalSwapsTrend}
+          totalStakersTrend={totalStakersTrend}
           isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: depth, trimZeros: true })}`}
-          trend={depthTrend}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.depth' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(depth.amount().toNumber(), 2)}`}
         />
-      </Styled.Col>
-
-      <Styled.Col>
-        <PoolStatus
-          isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: volume24hr, trimZeros: true })}`}
-          trend={volume24hrTrend}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.24hvol' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(volume24hr.amount().toNumber(), 2)}`}
-        />
-      </Styled.Col>
-
-      <Styled.Col>
-        <PoolStatus
-          isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: allTimeVolume, trimZeros: true })}`}
-          trend={allTimeVolumeTrend}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.allTimeVal' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(allTimeVolume.amount().toNumber(), 2)}`}
-        />
-      </Styled.Col>
-
-      <Styled.Col>
-        <PoolStatus
-          isLoading={isLoading}
-          fullValue={`${totalSwaps}`}
-          trend={totalSwapsTrend}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.totalSwaps' })}
-          displayValue={abbreviateNumber(totalSwaps)}
-        />
-      </Styled.Col>
-
-      <Styled.Col>
-        <PoolStatus
-          isLoading={isLoading}
-          trend={totalStakersTrend}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.totalUsers' })}
-          displayValue={abbreviateNumber(totalStakers)}
-        />
-      </Styled.Col>
+      </A.Col>
+      <A.Col xs={24} md={16}>
+        <PoolChart isLoading={isLoading} />
+      </A.Col>
+      <A.Col span={24}>
+        <PoolHistory isLoading={isLoading} />
+      </A.Col>
     </Styled.Container>
   )
 }

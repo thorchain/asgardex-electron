@@ -1,13 +1,12 @@
 import * as A from 'antd'
 import styled from 'styled-components'
 
-import { media } from '../../helpers/styleHelper'
-
 const ITEM_GAP = '8px'
 
 export const Container = styled(A.Row)`
-  padding-left: ${ITEM_GAP};
-  ${media.lg`
-    padding: 0;
-  `}
+  height: 200px;
+  margin-top: ${ITEM_GAP};
+  background: rgb(48, 57, 66);
+  justify-content: center;
+  align-items: center;
 `
