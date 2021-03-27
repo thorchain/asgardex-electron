@@ -499,8 +499,7 @@ const createPoolsService = (
   // Trigger to reload pool addresses (`inbound_addresses`)
   const { stream$: reloadPoolAddresses$, trigger: reloadPoolAddresses } = triggerStream()
 
-  // const poolAddressesInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 60 * 1000 /* delay of 5 min  */)
-  const poolAddressesInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 1000 /* delay of 5 min  */)
+  const poolAddressesInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 60 * 1000 /* delay of 5 min  */)
   const poolAddresses$: PoolAddressesLD = Rx.combineLatest([reloadPoolAddresses$, poolAddressesInterval$]).pipe(
     RxOp.switchMap((_) => loadInboundAddresses$())
   )
