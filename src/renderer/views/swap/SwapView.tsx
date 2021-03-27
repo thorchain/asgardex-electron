@@ -9,7 +9,6 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory, useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
-import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error/'
@@ -41,9 +40,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, reloadPools, selectedPoolAddress$ },
-    setSelectedPoolAsset,
-    selectedPoolAsset$
+    pools: { poolsState$, reloadPools, selectedPoolAddress$, reloadPoolAddresses },
+    setSelectedPoolAsset
   } = midgardService
   const {
     reloadSwapFees,
@@ -70,29 +68,31 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const oRouteTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
 
   useEffect(() => {
-    // Source asset is the asset of the pool we need to interact with
+    // Target asset is the asset of the pool we need to interact with
     // Store it in global state, all depending streams will be updated then
-    setSelectedPoolAsset(oRouteSource)
+    setSelectedPoolAsset(oRouteTarget)
 
     // Reset selectedPoolAsset on view's unmount to avoid effects with depending streams
     return () => {
       setSelectedPoolAsset(O.none)
     }
-  }, [oRouteSource, setSelectedPoolAsset])
+  }, [oRouteSource, oRouteTarget, setSelectedPoolAsset])
 
-  const [selectedPoolAssetRD] = useObservableState<AssetWithDecimalRD>(
+  // reload inbound addresses at `onMount` to get always latest `pool address`
+  useEffect(() => {
+    reloadPoolAddresses()
+  }, [reloadPoolAddresses])
+
+  const [sourceAssetRD] = useObservableState<AssetWithDecimalRD>(
     () =>
-      selectedPoolAsset$.pipe(
-        RxOp.switchMap((oAsset) =>
-          FP.pipe(
-            oAsset,
-            O.fold(
-              () => Rx.of(RD.initial),
-              (asset) => assetWithDecimal$(asset, network)
-            )
-          )
+      FP.pipe(
+        oRouteSource,
+        O.fold(
+          () => Rx.of(RD.initial),
+          (asset) => assetWithDecimal$(asset, network)
         )
       ),
+
     RD.initial
   )
 
@@ -166,7 +166,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       <BackLink />
       <Styled.ContentContainer>
         {FP.pipe(
-          sequenceTRD(poolsState, selectedPoolAssetRD, targetAssetRD),
+          sequenceTRD(poolsState, sourceAssetRD, targetAssetRD),
           RD.fold(
             () => <></>,
             () => <Spin size="large" />,

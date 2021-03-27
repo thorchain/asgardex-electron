@@ -496,13 +496,16 @@ const createPoolsService = (
       })
     )
 
-  // Inbound addresses are reloading every 5 min.
-  const nboundAddressesDelay = 5 * 60 * 1000 // 5 min
-  const inboundAddresses$: PoolAddressesLD = Rx.interval(nboundAddressesDelay).pipe(
+  // Trigger to reload pool addresses (`inbound_addresses`)
+  const { stream$: reloadPoolAddresses$, trigger: reloadPoolAddresses } = triggerStream()
+
+  // const poolAddressesInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 60 * 1000 /* delay of 5 min  */)
+  const poolAddressesInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 1000 /* delay of 5 min  */)
+  const poolAddresses$: PoolAddressesLD = Rx.combineLatest([reloadPoolAddresses$, poolAddressesInterval$]).pipe(
     RxOp.switchMap((_) => loadInboundAddresses$())
   )
 
-  const selectedPoolAddress$: PoolAddress$ = Rx.combineLatest([inboundAddresses$, selectedPoolAsset$]).pipe(
+  const selectedPoolAddress$: PoolAddress$ = Rx.combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
     RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
       return FP.pipe(
         poolAddresses,
@@ -516,7 +519,7 @@ const createPoolsService = (
 
   const poolAddressesByChain$ = (chain: Chain): PoolAddressLD =>
     FP.pipe(
-      inboundAddresses$,
+      poolAddresses$,
       liveData.map((addresses) => getPoolAddressesByChain(addresses, chain)),
       RxOp.map((rd) =>
         FP.pipe(
@@ -706,6 +709,7 @@ const createPoolsService = (
     reloadAllPools,
     selectedPoolAddress$,
     poolAddressesByChain$,
+    reloadPoolAddresses,
     selectedPoolDetail$,
     reloadSelectedPoolDetail: (delayTime = 0) => _reloadSelectedPoolDetail(delayTime),
     reloadPoolStatsDetail,

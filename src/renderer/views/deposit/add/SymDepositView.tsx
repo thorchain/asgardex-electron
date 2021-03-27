@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetRuneNative, assetToString, BaseAmount, bn } from '@xchainjs/xchain-util'
@@ -61,7 +61,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
         selectedPricePoolAsset$,
         selectedPoolDetail$,
         reloadSelectedPoolDetail,
-        selectedPoolAddress$
+        selectedPoolAddress$,
+        reloadPoolAddresses
       },
       shares: { reloadShares }
     }
@@ -84,6 +85,11 @@ export const SymDepositView: React.FC<Props> = (props) => {
   } = useWalletContext()
 
   const { approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
+
+  // reload inbound addresses at `onMount` to get always latest `pool address`
+  useEffect(() => {
+    reloadPoolAddresses()
+  }, [reloadPoolAddresses])
 
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
