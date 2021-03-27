@@ -9,7 +9,6 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory, useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
-import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error/'
@@ -41,9 +40,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, reloadPools, selectedPoolAddress$ },
-    setSelectedPoolAsset,
-    selectedPoolAsset$
+    pools: { poolsState$, reloadPools, selectedPoolAddress$, reloadPoolAddresses },
+    setSelectedPoolAsset
   } = midgardService
   const {
     reloadSwapFees,
@@ -80,21 +78,24 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     }
   }, [oRouteSource, setSelectedPoolAsset])
 
-  const [selectedPoolAssetRD] = useObservableState<AssetWithDecimalRD>(
+  // reload inbound addresses at `onMount` to get always latest `pool address`
+  useEffect(() => {
+    reloadPoolAddresses()
+  }, [reloadPoolAddresses])
+
+  const sourceAssetDecimal$: AssetWithDecimalLD = useMemo(
     () =>
-      selectedPoolAsset$.pipe(
-        RxOp.switchMap((oAsset) =>
-          FP.pipe(
-            oAsset,
-            O.fold(
-              () => Rx.of(RD.initial),
-              (asset) => assetWithDecimal$(asset, network)
-            )
-          )
+      FP.pipe(
+        oRouteSource,
+        O.fold(
+          () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'swap.errors.asset.missingSourceAsset' })))),
+          (asset) => assetWithDecimal$(asset, network)
         )
       ),
-    RD.initial
+    [assetWithDecimal$, intl, network, oRouteSource]
   )
+
+  const sourceAssetRD: AssetWithDecimalRD = useObservableState(sourceAssetDecimal$, RD.initial)
 
   const targetAssetDecimal$: AssetWithDecimalLD = useMemo(
     () =>
@@ -166,7 +167,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       <BackLink />
       <Styled.ContentContainer>
         {FP.pipe(
-          sequenceTRD(poolsState, selectedPoolAssetRD, targetAssetRD),
+          sequenceTRD(poolsState, sourceAssetRD, targetAssetRD),
           RD.fold(
             () => <></>,
             () => <Spin size="large" />,

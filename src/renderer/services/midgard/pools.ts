@@ -496,10 +496,15 @@ const createPoolsService = (
       })
     )
 
-  // Shared stream to avoid reloading same data by subscribing
-  const inboundAddressesShared$: PoolAddressesLD = loadInboundAddresses$().pipe(RxOp.shareReplay(1))
+  // Trigger to reload pool addresses (`inbound_addresses`)
+  const { stream$: reloadPoolAddresses$, trigger: reloadPoolAddresses } = triggerStream()
 
-  const selectedPoolAddress$: PoolAddress$ = Rx.combineLatest([inboundAddressesShared$, selectedPoolAsset$]).pipe(
+  const poolAddressesInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 60 * 1000 /* delay of 5 min  */)
+  const poolAddresses$: PoolAddressesLD = Rx.combineLatest([reloadPoolAddresses$, poolAddressesInterval$]).pipe(
+    RxOp.switchMap((_) => loadInboundAddresses$())
+  )
+
+  const selectedPoolAddress$: PoolAddress$ = Rx.combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
     RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
       return FP.pipe(
         poolAddresses,
@@ -513,7 +518,7 @@ const createPoolsService = (
 
   const poolAddressesByChain$ = (chain: Chain): PoolAddressLD =>
     FP.pipe(
-      inboundAddressesShared$,
+      poolAddresses$,
       liveData.map((addresses) => getPoolAddressesByChain(addresses, chain)),
       RxOp.map((rd) =>
         FP.pipe(
@@ -563,7 +568,7 @@ const createPoolsService = (
                     poolAddresses.router,
                     O.map((poolAddress) => `and/or router address ${poolAddress} are not available`),
                     O.getOrElse(() => 'is not available')
-                  )} ) `
+                  )}`
                 )
               )
             )
@@ -703,6 +708,7 @@ const createPoolsService = (
     reloadAllPools,
     selectedPoolAddress$,
     poolAddressesByChain$,
+    reloadPoolAddresses,
     selectedPoolDetail$,
     reloadSelectedPoolDetail: (delayTime = 0) => _reloadSelectedPoolDetail(delayTime),
     reloadPoolStatsDetail,

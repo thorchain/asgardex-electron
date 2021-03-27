@@ -160,6 +160,7 @@ export type PoolsService = {
   reloadAllPools: FP.Lazy<void>
   selectedPoolAddress$: PoolAddress$
   poolAddressesByChain$: (chain: Chain) => PoolAddressLD
+  reloadPoolAddresses: FP.Lazy<void>
   selectedPoolDetail$: PoolDetailLD
   reloadSelectedPoolDetail: (delay?: number) => void
   reloadPoolStatsDetail: FP.Lazy<void>

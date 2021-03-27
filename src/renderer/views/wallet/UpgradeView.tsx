@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { assetFromString, BNBChain, THORChain } from '@xchainjs/xchain-util'
@@ -55,9 +55,14 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   const {
     service: {
-      pools: { poolAddressesByChain$ }
+      pools: { poolAddressesByChain$, reloadPoolAddresses }
     }
   } = useMidgardContext()
+
+  // reload inbound addresses at `onMount` to get always latest `pool address`
+  useEffect(() => {
+    reloadPoolAddresses()
+  }, [reloadPoolAddresses])
 
   const [upgradeFeeRD] = useObservableState(
     () =>
