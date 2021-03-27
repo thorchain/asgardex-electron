@@ -13,7 +13,7 @@ import {
   Network as NetworkInfo,
   Constants as ThorchainConstants,
   LastblockItem,
-  PoolDetail as MidgardPoolDetail,
+  PoolDetail,
   Health,
   PoolStatsDetail,
   GetPoolStatsPeriodEnum,
@@ -41,16 +41,19 @@ export type PoolAssetDetail = {
 export type PoolAssetDetails = PoolAssetDetail[]
 export type PoolAssetDetailsLD = LiveData<Error, PoolAssetDetails>
 
-export type PoolDetail = MidgardPoolDetail & {
+export type PoolDetailRD = RD.RemoteData<Error, PoolDetail>
+export type PoolDetailLD = LiveData<Error, PoolDetail>
+
+export type PoolOverviewDetail = PoolDetail & {
   poolSlipAverage: string
   swappingTxCount: string
 }
 
-export type PoolDetailRD = RD.RemoteData<Error, PoolDetail>
-export type PoolDetailLD = LiveData<Error, PoolDetail>
+export type PoolOverviewDetailRD = RD.RemoteData<Error, PoolOverviewDetail>
+export type PoolOverviewDetailLD = LiveData<Error, PoolOverviewDetail>
 
-export type PoolDetails = PoolDetail[]
-export type PoolDetailsLD = LiveData<Error, PoolDetails>
+export type PoolOverviewDetails = PoolOverviewDetail[]
+export type PoolOverviewDetailsLD = LiveData<Error, PoolOverviewDetails>
 
 /**
  * Hash map for storing `PoolData` (key: string of asset)
@@ -64,7 +67,7 @@ export type PriceDataIndex = {
 export type PoolsState = {
   assetDetails: PoolAssetDetails
   poolAssets: PoolAssets
-  poolDetails: PoolDetails
+  poolDetails: PoolOverviewDetails
   pricePools: O.Option<PricePools>
 }
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
@@ -73,7 +76,7 @@ export type PoolsStateLD = LiveData<Error, PoolsState>
 export type PendingPoolsState = {
   assetDetails: PoolAssetDetails
   poolAssets: PoolAssets
-  poolDetails: PoolDetails
+  poolDetails: PoolOverviewDetails
 }
 export type PendingPoolsStateRD = RD.RemoteData<Error, PendingPoolsState>
 export type PendingPoolsStateLD = LiveData<Error, PendingPoolsState>
@@ -142,7 +145,7 @@ export type HealthLD = LiveData<Error, Health>
 export type PoolsService = {
   poolsState$: LiveData<Error, PoolsState>
   pendingPoolsState$: LiveData<Error, PendingPoolsState>
-  allPoolDetails$: LiveData<Error, PoolDetails>
+  allPoolOverviewDetails$: LiveData<Error, PoolOverviewDetails>
   setSelectedPricePoolAsset: (asset: PricePoolAsset) => void
   selectedPricePoolAsset$: Rx.Observable<SelectedPricePoolAsset>
   selectedPricePool$: Rx.Observable<SelectedPricePool>

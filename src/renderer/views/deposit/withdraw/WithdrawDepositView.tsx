@@ -19,9 +19,10 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as ShareHelpers from '../../../helpers/poolShareHelper'
 import { DEFAULT_NETWORK } from '../../../services/const'
-import { PoolDetailRD, PoolShareRD, PoolDetail, PoolShare } from '../../../services/midgard/types'
+import { PoolDetailRD, PoolShareRD, PoolShare } from '../../../services/midgard/types'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 import { AssetWithDecimal } from '../../../types/asgardex'
+import { PoolDetail } from '../../../types/generated/midgard'
 
 type Props = {
   asset: AssetWithDecimal

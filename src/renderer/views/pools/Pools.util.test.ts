@@ -16,7 +16,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
-import { ThorchainLastblock, PoolDetail } from '../../services/midgard/types'
+import { ThorchainLastblock, PoolOverviewDetail } from '../../services/midgard/types'
 import { Constants as ThorchainConstants } from '../../types/generated/midgard'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolTableRowData } from './Pools.types'
@@ -38,7 +38,7 @@ describe('views/pools/utils', () => {
       poolSlipAverage: '11',
       swappingTxCount: '123',
       status: GetPoolsStatusEnum.Staged
-    } as PoolDetail
+    } as PoolOverviewDetail
 
     const pricePoolData: PoolData = {
       runeBalance: assetToBase(assetAmount(10)),

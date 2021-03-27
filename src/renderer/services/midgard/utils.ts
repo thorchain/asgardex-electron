@@ -16,11 +16,11 @@ import { InboundAddressesItem } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import {
   PoolAssetDetails as PoolAssetsDetail,
-  PoolDetails,
+  PoolOverviewDetails,
   PoolsStateRD,
   SelectedPricePoolAsset,
   PoolAssetDetail,
-  PoolDetail,
+  PoolOverviewDetail,
   PoolShares,
   PoolShare,
   PoolAddress,
@@ -34,13 +34,13 @@ export const getAssetDetail = (assets: PoolAssetsDetail, ticker: string): O.Opti
     A.findFirst(({ asset }: PoolAssetDetail) => asset.ticker === ticker)
   )
 
-export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): PricePools => {
+export const getPricePools = (pools: PoolOverviewDetails, whitelist?: PricePoolAssets): PricePools => {
   const poolDetails = !whitelist
     ? pools
     : pools.filter((detail) => whitelist.find((asset) => detail?.asset === assetToString(asset)))
 
   const pricePools = poolDetails
-    .map((detail: PoolDetail) => {
+    .map((detail: PoolOverviewDetail) => {
       // Since we have filtered pools based on whitelist before ^,
       // we can type asset as `PricePoolAsset` now
       const asset = assetFromString(detail?.asset ?? '') as PricePoolAsset
@@ -91,9 +91,9 @@ export const pricePoolSelectorFromRD = (
  * Gets a `PoolDetail by given Asset
  * It returns `None` if no `PoolDetail` has been found
  */
-export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<PoolDetail> =>
+export const getPoolDetail = (details: PoolOverviewDetails, asset: Asset): O.Option<PoolOverviewDetail> =>
   FP.pipe(
-    details.find((detail: PoolDetail) => {
+    details.find((detail: PoolOverviewDetail) => {
       const { asset: detailAsset = '' } = detail
       const detailTicker = assetFromString(detailAsset)
       return detailTicker && eqAsset.equals(detailTicker, asset)
@@ -105,7 +105,7 @@ export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<Pool
  * Converts PoolDetails to the appropriate HashMap
  * Keys of the end HasMap is PoolDetails[i].asset
  */
-export const getPoolDetailsHashMap = (poolDetails: PoolDetails, runeAsset: Asset): PoolsDataMap => {
+export const getPoolDetailsHashMap = (poolDetails: PoolOverviewDetails, runeAsset: Asset): PoolsDataMap => {
   const res = poolDetails.reduce<PoolsDataMap>((acc, cur) => {
     if (!cur.asset) {
       return acc
@@ -126,7 +126,7 @@ export const getPoolDetailsHashMap = (poolDetails: PoolDetails, runeAsset: Asset
 /**
  * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)
  */
-export const toPoolData = (detail: Pick<PoolDetail, 'assetDepth' | 'runeDepth'>): PoolData => ({
+export const toPoolData = (detail: Pick<PoolOverviewDetail, 'assetDepth' | 'runeDepth'>): PoolData => ({
   assetBalance: baseAmount(bnOrZero(detail.assetDepth)),
   runeBalance: baseAmount(bnOrZero(detail.runeDepth))
 })
@@ -235,7 +235,7 @@ export const getSharesByAssetAndType = ({
 export const getPoolAssetDetail = ({
   asset: assetString,
   assetPrice
-}: Pick<PoolDetail, 'assetPrice' | 'asset'>): O.Option<PoolAssetDetail> =>
+}: Pick<PoolOverviewDetail, 'assetPrice' | 'asset'>): O.Option<PoolAssetDetail> =>
   FP.pipe(
     assetString,
     assetFromString,
@@ -246,6 +246,6 @@ export const getPoolAssetDetail = ({
     }))
   )
 
-export const getPoolAssetsDetail: (_: Array<Pick<PoolDetail, 'assetPrice' | 'asset'>>) => PoolAssetsDetail = (
+export const getPoolAssetsDetail: (_: Array<Pick<PoolOverviewDetail, 'assetPrice' | 'asset'>>) => PoolAssetsDetail = (
   poolDetails
 ) => FP.pipe(poolDetails, A.filterMap(getPoolAssetDetail))

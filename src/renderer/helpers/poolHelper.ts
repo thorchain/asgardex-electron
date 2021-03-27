@@ -10,8 +10,9 @@ import * as Ord from 'fp-ts/lib/Ord'
 
 import { Network } from '../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
-import { PoolAddress, PoolDetail, PoolDetails } from '../services/midgard/types'
+import { PoolAddress, PoolOverviewDetail, PoolOverviewDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
+import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
 import { isRuneNativeAsset } from './assetHelper'
@@ -52,7 +53,7 @@ export const getPoolTableRowsData = ({
   pricePoolData,
   network
 }: {
-  poolDetails: PoolDetails
+  poolDetails: PoolOverviewDetails
   pricePoolData: PoolData
   network: Network
 }): PoolTableRowsData => {
@@ -68,7 +69,7 @@ export const getPoolTableRowsData = ({
   // Transform `PoolDetails` -> PoolRowType
   return FP.pipe(
     poolDetails,
-    A.mapWithIndex<PoolDetail, O.Option<PoolTableRowData>>((index, poolDetail) => {
+    A.mapWithIndex<PoolOverviewDetail, O.Option<PoolTableRowData>>((index, poolDetail) => {
       // get symbol of PoolDetail
       const oPoolDetailSymbol: O.Option<string> = FP.pipe(
         O.fromNullable(assetFromString(poolDetail.asset ?? '')),
@@ -108,8 +109,8 @@ export const getPoolTableRowsData = ({
 /**
  * Filters a pool out with hightest value of run
  */
-export const getDeepestPool = (pools: PoolDetails): O.Option<PoolDetail> =>
-  pools.reduce((acc: O.Option<PoolDetail>, pool: PoolDetail) => {
+export const getDeepestPool = (pools: PoolOverviewDetails): O.Option<PoolOverviewDetail> =>
+  pools.reduce((acc: O.Option<PoolOverviewDetail>, pool: PoolOverviewDetail) => {
     const runeDepth = bnOrZero(pool.runeDepth)
     const prev = O.toNullable(acc)
     return runeDepth.isGreaterThanOrEqualTo(bnOrZero(prev?.runeDepth)) ? O.some(pool) : acc
@@ -118,7 +119,7 @@ export const getDeepestPool = (pools: PoolDetails): O.Option<PoolDetail> =>
 /**
  * Converts Asset's pool price according to runePrice in selectedPriceAsset
  */
-export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: PoolDetail) =>
+export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: Pick<PoolDetail, 'assetPrice'>) =>
   bnOrZero(poolDetail.assetPrice).multipliedBy(runePrice)
 
 /**
@@ -126,7 +127,7 @@ export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: PoolDeta
  */
 export const getPoolPriceValue = (
   { asset, amount }: Balance,
-  poolDetails: PoolDetails,
+  poolDetails: PoolOverviewDetails,
   selectedPricePoolData: PoolData
 ): O.Option<BaseAmount> => {
   return FP.pipe(

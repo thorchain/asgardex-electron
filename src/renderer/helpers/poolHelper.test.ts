@@ -5,16 +5,16 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
-import { PoolDetails, PoolDetail } from '../services/midgard/types'
+import { PoolOverviewDetails, PoolOverviewDetail } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
 import { GetPoolsStatusEnum } from '../types/generated/midgard'
 import { getDeepestPool, getPoolPriceValue, getPoolTableRowsData } from './poolHelper'
 
 describe('helpers/poolHelper/', () => {
-  const pool1 = { status: GetPoolsStatusEnum.Staged, runeDepth: '1000' } as PoolDetail
-  const pool2 = { status: GetPoolsStatusEnum.Available, runeDepth: '2000' } as PoolDetail
-  const pool3 = { status: GetPoolsStatusEnum.Suspended, runeDepth: '0' } as PoolDetail
-  const pool4 = { status: GetPoolsStatusEnum.Staged, runeDepth: '4000' } as PoolDetail
+  const pool1 = { status: GetPoolsStatusEnum.Staged, runeDepth: '1000' } as PoolOverviewDetail
+  const pool2 = { status: GetPoolsStatusEnum.Available, runeDepth: '2000' } as PoolOverviewDetail
+  const pool3 = { status: GetPoolsStatusEnum.Suspended, runeDepth: '0' } as PoolOverviewDetail
+  const pool4 = { status: GetPoolsStatusEnum.Staged, runeDepth: '4000' } as PoolOverviewDetail
 
   describe('getDeepestPool', () => {
     it('returns deepest pool', () => {
@@ -24,7 +24,7 @@ describe('helpers/poolHelper/', () => {
     })
 
     it('does not return a deepest pool by given an empty list of pools', () => {
-      const pools: PoolDetails = []
+      const pools: PoolOverviewDetails = []
       const result = getDeepestPool(pools)
       expect(result).toBeNone()
     })
@@ -40,7 +40,7 @@ describe('helpers/poolHelper/', () => {
         asset: assetToString(ASSETS_TESTNET.FTM),
         status: GetPoolsStatusEnum.Available
       }
-    ] as PoolDetails
+    ] as PoolOverviewDetails
     const pendingPoolDetails = [
       {
         asset: assetToString(ASSETS_TESTNET.BOLT),
@@ -50,7 +50,7 @@ describe('helpers/poolHelper/', () => {
         asset: assetToString(ASSETS_TESTNET.FTM),
         status: GetPoolsStatusEnum.Staged
       }
-    ] as PoolDetails
+    ] as PoolOverviewDetails
 
     const pricePoolData: PoolData = {
       runeBalance: assetToBase(assetAmount(110)),
@@ -88,7 +88,7 @@ describe('helpers/poolHelper/', () => {
     const poolDetail = {
       assetDepth: '11000000000',
       runeDepth: '10000000000'
-    } as PoolDetail
+    } as PoolOverviewDetail
 
     it('transforms `PoolData', () => {
       const result = toPoolData(poolDetail)
@@ -98,7 +98,7 @@ describe('helpers/poolHelper/', () => {
   })
 
   describe('getPoolPriceValue', () => {
-    const poolDetails: PoolDetails = [
+    const poolDetails: PoolOverviewDetails = [
       {
         asset: assetToString(AssetBNB),
         assetDepth: '1000000000',
