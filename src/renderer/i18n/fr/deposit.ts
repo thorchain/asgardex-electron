@@ -39,7 +39,7 @@ const deposit: DepositMessages = {
   'deposit.wallet.add': 'Ajouter un portefeuille',
   'deposit.wallet.connect': 'Veuillez connecter votre portefeuille',
   'deposit.pool.noShares': 'Vous ne possédez aucune part dans cette pool',
-  'deposit.withdraw.sym': 'Retrait',
+  'deposit.withdraw.sym': 'Retirer',
   'deposit.withdraw.asym': 'Retrait {asset}',
   'deposit.withdraw.sym.title': 'Ajustez le retrait (symétrique)',
   'deposit.withdraw.asym.title': 'Ajustez le retrait (asymétrique)',
