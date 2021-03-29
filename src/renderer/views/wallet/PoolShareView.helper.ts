@@ -5,12 +5,12 @@ import * as O from 'fp-ts/lib/Option'
 
 import { PoolShareTableData } from '../../components/PoolShares/PoolShares.types'
 import * as ShareHelpers from '../../helpers/poolShareHelper'
-import { PoolOverviewDetails, PoolShares } from '../../services/midgard/types'
+import { PoolDetails, PoolShares } from '../../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../../services/midgard/utils'
 
 export const getPoolShareTableData = (
   shares: PoolShares,
-  poolDetails: PoolOverviewDetails,
+  poolDetails: PoolDetails,
   pricePoolData: PoolData
 ): PoolShareTableData =>
   FP.pipe(

@@ -5,16 +5,27 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
-import { PoolOverviewDetails, PoolOverviewDetail } from '../services/midgard/types'
+import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
-import { GetPoolsStatusEnum } from '../types/generated/midgard'
+import { GetPoolsStatusEnum, PoolDetail } from '../types/generated/midgard'
 import { getDeepestPool, getPoolPriceValue, getPoolTableRowsData } from './poolHelper'
 
 describe('helpers/poolHelper/', () => {
-  const pool1 = { status: GetPoolsStatusEnum.Staged, runeDepth: '1000' } as PoolOverviewDetail
-  const pool2 = { status: GetPoolsStatusEnum.Available, runeDepth: '2000' } as PoolOverviewDetail
-  const pool3 = { status: GetPoolsStatusEnum.Suspended, runeDepth: '0' } as PoolOverviewDetail
-  const pool4 = { status: GetPoolsStatusEnum.Staged, runeDepth: '4000' } as PoolOverviewDetail
+  const mockPoolDetail: PoolDetail = {
+    asset: assetToString(AssetBNB),
+    assetDepth: '0',
+    assetPrice: '0',
+    assetPriceUSD: '0',
+    poolAPY: '0',
+    runeDepth: '0',
+    status: GetPoolsStatusEnum.Staged,
+    units: '0',
+    volume24h: '0'
+  }
+  const pool1: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Staged, runeDepth: '1000' }
+  const pool2: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Available, runeDepth: '2000' }
+  const pool3: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Suspended, runeDepth: '0' }
+  const pool4: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Staged, runeDepth: '4000' }
 
   describe('getDeepestPool', () => {
     it('returns deepest pool', () => {
@@ -24,33 +35,21 @@ describe('helpers/poolHelper/', () => {
     })
 
     it('does not return a deepest pool by given an empty list of pools', () => {
-      const pools: PoolOverviewDetails = []
+      const pools: PoolDetails = []
       const result = getDeepestPool(pools)
       expect(result).toBeNone()
     })
   })
 
   describe('getPoolTableRowsData', () => {
-    const poolDetails = [
-      {
-        asset: assetToString(ASSETS_TESTNET.TOMO),
-        status: GetPoolsStatusEnum.Available
-      },
-      {
-        asset: assetToString(ASSETS_TESTNET.FTM),
-        status: GetPoolsStatusEnum.Available
-      }
-    ] as PoolOverviewDetails
-    const pendingPoolDetails = [
-      {
-        asset: assetToString(ASSETS_TESTNET.BOLT),
-        status: GetPoolsStatusEnum.Staged
-      },
-      {
-        asset: assetToString(ASSETS_TESTNET.FTM),
-        status: GetPoolsStatusEnum.Staged
-      }
-    ] as PoolOverviewDetails
+    const poolDetails: PoolDetails = [
+      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.TOMO), status: GetPoolsStatusEnum.Available },
+      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.FTM), status: GetPoolsStatusEnum.Available }
+    ]
+    const pendingPoolDetails: PoolDetails = [
+      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.BOLT), status: GetPoolsStatusEnum.Staged },
+      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.FTM), status: GetPoolsStatusEnum.Staged }
+    ]
 
     const pricePoolData: PoolData = {
       runeBalance: assetToBase(assetAmount(110)),
@@ -60,7 +59,8 @@ describe('helpers/poolHelper/', () => {
     it('returns data for pending pools', () => {
       const result = getPoolTableRowsData({
         poolDetails: pendingPoolDetails,
-        pricePoolData
+        pricePoolData,
+        network: 'testnet'
       })
       expect(result.length).toEqual(2)
       // Note: `getPoolTableRowsData` reverses the order of given `poolDetails`
@@ -73,7 +73,8 @@ describe('helpers/poolHelper/', () => {
     it('returns data for available pools', () => {
       const result = getPoolTableRowsData({
         poolDetails,
-        pricePoolData
+        pricePoolData,
+        network: 'testnet'
       })
       expect(result.length).toEqual(2)
       // Note: `getPoolTableRowsData` reverses the order of given `poolDetails`
@@ -85,10 +86,11 @@ describe('helpers/poolHelper/', () => {
   })
 
   describe('toPoolData', () => {
-    const poolDetail = {
+    const poolDetail: PoolDetail = {
+      ...mockPoolDetail,
       assetDepth: '11000000000',
       runeDepth: '10000000000'
-    } as PoolOverviewDetail
+    }
 
     it('transforms `PoolData', () => {
       const result = toPoolData(poolDetail)
@@ -98,8 +100,9 @@ describe('helpers/poolHelper/', () => {
   })
 
   describe('getPoolPriceValue', () => {
-    const poolDetails: PoolOverviewDetails = [
+    const poolDetails: PoolDetails = [
       {
+        ...mockPoolDetail,
         asset: assetToString(AssetBNB),
         assetDepth: '1000000000',
         runeDepth: '10000000000'

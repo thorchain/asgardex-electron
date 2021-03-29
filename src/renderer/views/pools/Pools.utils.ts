@@ -8,10 +8,14 @@ import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import { isChainAsset, isUSDAsset } from '../../helpers/assetHelper'
-import { PoolOverviewDetail } from '../../services/midgard/types'
 import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
-import { GetPoolsStatusEnum, Constants as ThorchainConstants, LastblockItem } from '../../types/generated/midgard'
+import {
+  GetPoolsStatusEnum,
+  Constants as ThorchainConstants,
+  LastblockItem,
+  PoolDetail
+} from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './Pools.types'
 
 const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {
@@ -33,12 +37,11 @@ export const getPoolTableRowData = ({
   pricePoolData,
   network
 }: {
-  poolDetail: PoolOverviewDetail
+  poolDetail: PoolDetail
   pricePoolData: PoolData
   network: Network
 }): O.Option<PoolTableRowData> => {
-  const assetString = poolDetail?.asset ?? ''
-  const oPoolDetailAsset = O.fromNullable(assetFromString(assetString))
+  const oPoolDetailAsset = O.fromNullable(assetFromString(poolDetail.asset))
 
   return FP.pipe(
     oPoolDetailAsset,
@@ -62,8 +65,6 @@ export const getPoolTableRowData = ({
       const transaction = ZERO_BASE_AMOUNT
       const transactionPrice = getValueOfRuneInAsset(transaction, pricePoolData)
 
-      const slip = bnOrZero(poolDetail?.poolSlipAverage).dividedBy(100)
-      const trades = bnOrZero(poolDetail?.swappingTxCount)
       const status = stringToGetPoolsStatus(poolDetail?.status)
 
       const pool: Pool = {
@@ -77,8 +78,6 @@ export const getPoolTableRowData = ({
         depthPrice,
         volumePrice,
         transactionPrice,
-        slip,
-        trades,
         status,
         key: ticker,
         network
