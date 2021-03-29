@@ -1,5 +1,4 @@
 import { AssetAtom } from '@xchainjs/xchain-cosmos'
-import { AssetDOT } from '@xchainjs/xchain-polkadot'
 import {
   Asset,
   AssetBNB,
@@ -28,12 +27,12 @@ export const getChainAsset = (chain: Chain): Asset => {
       return AssetRuneNative
     case 'GAIA':
       return AssetAtom
-    case 'POLKA':
-      return AssetDOT
     case 'BCH':
       return AssetBCH
     case 'LTC':
       return AssetLTC
+    case 'POLKA':
+      throw Error('Polkadot is not supported yet')
   }
 }
 

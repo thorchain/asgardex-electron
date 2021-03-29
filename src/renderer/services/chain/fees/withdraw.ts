@@ -35,7 +35,8 @@ const reloadWithdrawFee = (chain: Chain) => {
       LTC.reloadFees()
       break
     case ETHChain:
-      // not implemented yet
+      // TODO (@asgdx-team) Implemented it for asym. withdraw (not needed for sym withdraw, since txs are RUNE based)
+      // see https://github.com/thorchain/asgardex-electron/issues/1071
       break
     case CosmosChain:
       // not implemented yet
