@@ -6,7 +6,6 @@ import { Address } from '@xchainjs/xchain-client'
 import { getPrefix as getCosmosPrefix } from '@xchainjs/xchain-cosmos'
 import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
 import { getPrefix as getLitecoinPrefix } from '@xchainjs/xchain-litecoin'
-import { getPrefix as getPolkadotPrefix } from '@xchainjs/xchain-polkadot'
 import { getPrefix as getThorchainPrefix } from '@xchainjs/xchain-thorchain'
 import {
   Chain,
@@ -43,7 +42,9 @@ export const getAddressPrefixLength = (chain: Chain, network: string): number =>
     case ETHChain:
       return getEthereumPrefix().length
     case PolkadotChain:
-      return getPolkadotPrefix(network).length
+      // not supported yet
+      // return getPolkadotPrefix(network).length
+      throw Error('Polkadot is not supported yet')
     case THORChain:
       return getThorchainPrefix(network).length
     case LTCChain:
