@@ -1,36 +1,36 @@
 import { EditMenuMessages, HelpMenuMessages, ViewMenuMessages, AppMenuMessages } from '../types'
 
 const appMenu: AppMenuMessages = {
-  'menu.app.about': 'About {name} - FR',
-  'menu.app.hideApp': 'Hide {name} - FR',
-  'menu.app.hideOthers': 'Hide Others - FR',
-  'menu.app.unhide': 'Show All - FR',
-  'menu.app.quit': 'Quit {name} - FR'
+  'menu.app.about': 'À propos de {name}',
+  'menu.app.hideApp': 'Masquer {name}',
+  'menu.app.hideOthers': 'Masquer les autres',
+  'menu.app.unhide': 'Montrer tout',
+  'menu.app.quit': 'Quitter {name}'
 }
 
 const editMenu: EditMenuMessages = {
-  'menu.edit.title': 'Edit - FR',
-  'menu.edit.undo': 'Undo - FR',
-  'menu.edit.redo': 'Redo - FR',
-  'menu.edit.cut': 'Cut - FR',
-  'menu.edit.copy': 'Copy - FR',
-  'menu.edit.paste': 'Paste - FR',
-  'menu.edit.selectAll': 'Select all - FR'
+  'menu.edit.title': 'Edition',
+  'menu.edit.undo': 'Annuler',
+  'menu.edit.redo': 'Rétablir',
+  'menu.edit.cut': 'Couper',
+  'menu.edit.copy': 'Copier',
+  'menu.edit.paste': 'Coller',
+  'menu.edit.selectAll': 'Sélectionner tout'
 }
 
 const helpMenu: HelpMenuMessages = {
-  'menu.help.title': 'Help - FR',
-  'menu.help.learn': 'Learn more ... - FR',
-  'menu.help.docs': 'Documentation - FR',
-  'menu.help.telegram': 'Telegram - FR',
-  'menu.help.issues': 'Report issues - FR'
+  'menu.help.title': 'Aide',
+  'menu.help.learn': 'En apprendre davantage...',
+  'menu.help.docs': 'Documentation',
+  'menu.help.telegram': 'Telegram',
+  'menu.help.issues': 'Signaler les problèmes'
 }
 
 const viewMenu: ViewMenuMessages = {
-  'menu.view.title': 'View - FR',
-  'menu.view.reload': 'Reload - FR',
-  'menu.view.toggleFullscreen': 'Toggle Fullscreen - FR',
-  'menu.view.toggleDevTools': 'Toggle Dev Tools - FR'
+  'menu.view.title': 'Affichage',
+  'menu.view.reload': 'Recharger',
+  'menu.view.toggleFullscreen': 'Basculer en plein écran',
+  'menu.view.toggleDevTools': 'Basculer en outils de dev.'
 }
 
 export default { ...appMenu, ...editMenu, ...viewMenu, ...helpMenu }
