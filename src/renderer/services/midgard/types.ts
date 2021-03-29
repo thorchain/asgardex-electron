@@ -19,7 +19,9 @@ import {
   GetPoolStatsPeriodEnum,
   PoolLegacyDetail,
   LiquidityHistory,
-  GetLiquidityHistoryIntervalEnum
+  GetLiquidityHistoryIntervalEnum,
+  SwapHistory,
+  GetSwapHistoryRequest
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { Memo } from '../chain/types'
@@ -126,6 +128,11 @@ export type PoolLiquidityHistoryParams = {
 export type PoolLiquidityHistoryRD = RD.RemoteData<Error, LiquidityHistory>
 export type PoolLiquidityHistoryLD = LiveData<Error, LiquidityHistory>
 
+export type ApiGetSwapHistoryParams = { poolAsset: Asset } & Omit<GetSwapHistoryRequest, 'pool'>
+export type GetSwapHistoryParams = Omit<ApiGetSwapHistoryParams, 'poolAsset'>
+export type SwapHistoryRD = RD.RemoteData<Error, SwapHistory>
+export type SwapHistoryLD = LiveData<Error, SwapHistory>
+
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 
@@ -154,6 +161,8 @@ export type PoolsService = {
   poolStatsDetail$: (period?: GetPoolStatsPeriodEnum) => PoolStatsDetailLD
   poolLegacyDetail$: PoolLegacyDetailLD
   poolLiquidityHistory$: (parmas: PoolLiquidityHistoryParams) => PoolLiquidityHistoryLD
+  getSwapHistory$: (params: GetSwapHistoryParams) => SwapHistoryLD
+  reloadSwapHistory: FP.Lazy<void>
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD

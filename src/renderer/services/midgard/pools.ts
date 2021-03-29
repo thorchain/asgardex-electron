@@ -46,7 +46,10 @@ import {
   PoolLegacyDetailLD,
   PoolLiquidityHistoryLD,
   PoolLiquidityHistoryParams,
-  PoolDetailLD
+  PoolDetailLD,
+  SwapHistoryLD,
+  ApiGetSwapHistoryParams,
+  GetSwapHistoryParams
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -645,6 +648,47 @@ const createPoolsService = (
       RxOp.shareReplay(1)
     )
 
+  // Factory to get swap history from Midgard
+  const apiGetSwapHistory$ = (params: ApiGetSwapHistoryParams): SwapHistoryLD => {
+    const { poolAsset, ...otherParams } = params
+    return FP.pipe(
+      midgardDefaultApi$,
+      liveData.chain((api) =>
+        FP.pipe(
+          api.getSwapHistory({ pool: assetToString(poolAsset), ...otherParams }),
+          RxOp.map(RD.success),
+          RxOp.startWith(RD.pending),
+          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+        )
+      ),
+      RxOp.shareReplay(1)
+    )
+  }
+
+  const { stream$: reloadSwapHistory$, trigger: reloadSwapHistory } = triggerStream()
+
+  const getSwapHistory$ = (params: GetSwapHistoryParams): SwapHistoryLD =>
+    FP.pipe(
+      Rx.combineLatest([selectedPoolAsset$, reloadSwapHistory$]),
+      RxOp.filter(([oSelectedPoolAsset, _]) => O.isSome(oSelectedPoolAsset)),
+
+      RxOp.switchMap(([oSelectedPoolAsset]) =>
+        FP.pipe(
+          oSelectedPoolAsset,
+          O.fold(
+            () => Rx.of(RD.initial),
+            (selectedPoolAsset) =>
+              apiGetSwapHistory$({
+                poolAsset: selectedPoolAsset,
+                ...params
+              })
+          )
+        )
+      ),
+      RxOp.startWith(RD.initial),
+      RxOp.shareReplay(1)
+    )
+
   return {
     poolsState$,
     pendingPoolsState$,
@@ -665,6 +709,8 @@ const createPoolsService = (
     poolStatsDetail$,
     poolLegacyDetail$,
     poolLiquidityHistory$,
+    getSwapHistory$,
+    reloadSwapHistory,
     priceRatio$,
     availableAssets$,
     validatePool$,
