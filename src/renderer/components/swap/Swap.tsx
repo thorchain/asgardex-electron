@@ -24,6 +24,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
@@ -51,7 +52,6 @@ import {
   LoadSwapFeesHandler,
   SwapFeesRD,
   SwapFeesParams,
-  SwapFeesLD,
   SwapFees
 } from '../../services/chain/types'
 import { ApproveParams, IsApprovedRD } from '../../services/ethereum/types'
@@ -258,15 +258,18 @@ export const Swap = ({
 
   const chainFees$ = useMemo(() => fees$, [fees$])
 
-  const [chainFeesRD] = useObservableState<SwapFeesRD>(
-    () =>
-      FP.pipe(
-        oSwapFeesParams,
-        O.map(chainFees$),
-        O.getOrElse<SwapFeesLD>(() => Rx.of(RD.initial))
-      ),
+  const [chainFeesRD, swapFeesParamsUpdated] = useObservableState<SwapFeesRD, O.Option<SwapFeesParams>>(
+    (oSwapFeesParams$) => {
+      return oSwapFeesParams$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), chainFees$))))
+    },
     RD.initial
   )
+
+  // whenever `oSwapFeesParams` has been updated,
+  // `swapFeesParamsUpdated` needs to be called to update `chainFeesRD`
+  useEffect(() => {
+    swapFeesParamsUpdated(oSwapFeesParams)
+  }, [swapFeesParamsUpdated, oSwapFeesParams])
 
   // reset `pendingSwitchAssets`
   // whenever chain fees will be succeeded or failed

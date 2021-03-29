@@ -45,7 +45,15 @@ export type PoolDetailRD = RD.RemoteData<Error, PoolDetail>
 export type PoolDetailLD = LiveData<Error, PoolDetail>
 
 export type PoolOverviewDetail = PoolDetail & {
+  /**
+   * Swap history of average slip
+   * Needed for pools overview only
+   */
   poolSlipAverage: string
+  /**
+   * Swap history of swap txs count
+   * Needed for pools overview only
+   */
   swappingTxCount: string
 }
 
@@ -155,6 +163,7 @@ export type PoolsService = {
   reloadAllPools: FP.Lazy<void>
   selectedPoolAddress$: PoolAddress$
   poolAddressesByChain$: (chain: Chain) => PoolAddressLD
+  reloadPoolAddresses: FP.Lazy<void>
   selectedPoolDetail$: PoolDetailLD
   reloadSelectedPoolDetail: (delay?: number) => void
   reloadPoolStatsDetail: FP.Lazy<void>
