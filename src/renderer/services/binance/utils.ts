@@ -7,7 +7,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { BNB_DECIMAL, isRuneNativeAsset } from '../../helpers/assetHelper'
-import { PoolOverviewDetails } from '../midgard/types'
+import { PoolDetails } from '../midgard/types'
 import { getPoolDetail, toPoolData } from '../midgard/utils'
 
 /**
@@ -15,7 +15,7 @@ import { getPoolDetail, toPoolData } from '../midgard/utils'
  */
 export const getPoolPriceValue = (
   { asset, amount }: Balance,
-  poolDetails: PoolOverviewDetails,
+  poolDetails: PoolDetails,
   selectedPricePoolData: PoolData
 ): O.Option<BaseAmount> => {
   return FP.pipe(

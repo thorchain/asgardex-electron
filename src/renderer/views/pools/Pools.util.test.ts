@@ -1,6 +1,5 @@
 import { PoolData } from '@thorchain/asgardex-util'
 import {
-  bn,
   assetAmount,
   assetToBase,
   BNBChain,
@@ -16,8 +15,8 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
-import { ThorchainLastblock, PoolOverviewDetail } from '../../services/midgard/types'
-import { Constants as ThorchainConstants } from '../../types/generated/midgard'
+import { ThorchainLastblock } from '../../services/midgard/types'
+import { Constants as ThorchainConstants, PoolDetail } from '../../types/generated/midgard'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolTableRowData } from './Pools.types'
 import {
@@ -34,11 +33,8 @@ describe('views/pools/utils', () => {
       assetDepth: '11000000000',
       runeDepth: '10000000000',
       volume24h: '10000000000',
-      // poolTxAverage: '10000000000',
-      poolSlipAverage: '11',
-      swappingTxCount: '123',
       status: GetPoolsStatusEnum.Staged
-    } as PoolOverviewDetail
+    } as PoolDetail
 
     const pricePoolData: PoolData = {
       runeBalance: assetToBase(assetAmount(10)),
@@ -55,8 +51,6 @@ describe('views/pools/utils', () => {
         depthPrice: assetToBase(assetAmount(1000)),
         volumePrice: assetToBase(assetAmount(1000)),
         transactionPrice: assetToBase(assetAmount(1000)),
-        slip: bn('0.11'),
-        trades: bn(123),
         status: GetPoolsStatusEnum.Available,
         deepest: false,
         key: 'hi',
@@ -77,13 +71,7 @@ describe('views/pools/utils', () => {
           expect(data.pool).toEqual(expected.pool)
           expect(data.depthPrice.amount().toNumber()).toEqual(expected.depthPrice.amount().toNumber())
           expect(data.volumePrice.amount().toNumber()).toEqual(expected.volumePrice.amount().toNumber())
-          /**
-           * Mock it with fixed 0 as midgard v2 does not have data for poolDetail?.poolTxAverage
-           * target result: expected.transactionPrice.amount().toNumber()
-           */
           expect(data.transactionPrice.amount().toNumber()).toEqual(0)
-          expect(data.slip.toNumber()).toEqual(expected.slip.toNumber())
-          expect(data.trades.toNumber()).toEqual(expected.trades.toNumber())
           return true
         })
       )

@@ -10,7 +10,7 @@ import * as Ord from 'fp-ts/lib/Ord'
 
 import { Network } from '../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
-import { PoolAddress, PoolOverviewDetail, PoolOverviewDetails } from '../services/midgard/types'
+import { PoolAddress, PoolDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
 import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
@@ -53,7 +53,7 @@ export const getPoolTableRowsData = ({
   pricePoolData,
   network
 }: {
-  poolDetails: PoolOverviewDetails
+  poolDetails: PoolDetails
   pricePoolData: PoolData
   network: Network
 }): PoolTableRowsData => {
@@ -69,7 +69,7 @@ export const getPoolTableRowsData = ({
   // Transform `PoolDetails` -> PoolRowType
   return FP.pipe(
     poolDetails,
-    A.mapWithIndex<PoolOverviewDetail, O.Option<PoolTableRowData>>((index, poolDetail) => {
+    A.mapWithIndex<PoolDetail, O.Option<PoolTableRowData>>((index, poolDetail) => {
       // get symbol of PoolDetail
       const oPoolDetailSymbol: O.Option<string> = FP.pipe(
         O.fromNullable(assetFromString(poolDetail.asset ?? '')),
@@ -107,10 +107,10 @@ export const getPoolTableRowsData = ({
 }
 
 /**
- * Filters a pool out with hightest value of run
+ * Filters a pool out with hightest value of RUNE
  */
-export const getDeepestPool = (pools: PoolOverviewDetails): O.Option<PoolOverviewDetail> =>
-  pools.reduce((acc: O.Option<PoolOverviewDetail>, pool: PoolOverviewDetail) => {
+export const getDeepestPool = (pools: PoolDetails): O.Option<PoolDetail> =>
+  pools.reduce((acc: O.Option<PoolDetail>, pool: PoolDetail) => {
     const runeDepth = bnOrZero(pool.runeDepth)
     const prev = O.toNullable(acc)
     return runeDepth.isGreaterThanOrEqualTo(bnOrZero(prev?.runeDepth)) ? O.some(pool) : acc
@@ -127,7 +127,7 @@ export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: Pick<Poo
  */
 export const getPoolPriceValue = (
   { asset, amount }: Balance,
-  poolDetails: PoolOverviewDetails,
+  poolDetails: PoolDetails,
   selectedPricePoolData: PoolData
 ): O.Option<BaseAmount> => {
   return FP.pipe(

@@ -44,24 +44,8 @@ export type PoolAssetDetailsLD = LiveData<Error, PoolAssetDetails>
 export type PoolDetailRD = RD.RemoteData<Error, PoolDetail>
 export type PoolDetailLD = LiveData<Error, PoolDetail>
 
-export type PoolOverviewDetail = PoolDetail & {
-  /**
-   * Swap history of average slip
-   * Needed for pools overview only
-   */
-  poolSlipAverage: string
-  /**
-   * Swap history of swap txs count
-   * Needed for pools overview only
-   */
-  swappingTxCount: string
-}
-
-export type PoolOverviewDetailRD = RD.RemoteData<Error, PoolOverviewDetail>
-export type PoolOverviewDetailLD = LiveData<Error, PoolOverviewDetail>
-
-export type PoolOverviewDetails = PoolOverviewDetail[]
-export type PoolOverviewDetailsLD = LiveData<Error, PoolOverviewDetails>
+export type PoolDetails = PoolDetail[]
+export type PoolDetailsLD = LiveData<Error, PoolDetails>
 
 /**
  * Hash map for storing `PoolData` (key: string of asset)
@@ -75,7 +59,7 @@ export type PriceDataIndex = {
 export type PoolsState = {
   assetDetails: PoolAssetDetails
   poolAssets: PoolAssets
-  poolDetails: PoolOverviewDetails
+  poolDetails: PoolDetails
   pricePools: O.Option<PricePools>
 }
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
@@ -84,7 +68,7 @@ export type PoolsStateLD = LiveData<Error, PoolsState>
 export type PendingPoolsState = {
   assetDetails: PoolAssetDetails
   poolAssets: PoolAssets
-  poolDetails: PoolOverviewDetails
+  poolDetails: PoolDetails
 }
 export type PendingPoolsStateRD = RD.RemoteData<Error, PendingPoolsState>
 export type PendingPoolsStateLD = LiveData<Error, PendingPoolsState>
@@ -153,7 +137,7 @@ export type HealthLD = LiveData<Error, Health>
 export type PoolsService = {
   poolsState$: LiveData<Error, PoolsState>
   pendingPoolsState$: LiveData<Error, PendingPoolsState>
-  allPoolOverviewDetails$: LiveData<Error, PoolOverviewDetails>
+  allPoolDetails$: LiveData<Error, PoolDetails>
   setSelectedPricePoolAsset: (asset: PricePoolAsset) => void
   selectedPricePoolAsset$: Rx.Observable<SelectedPricePoolAsset>
   selectedPricePool$: Rx.Observable<SelectedPricePool>

@@ -40,10 +40,8 @@ const defaultProps: SwapProps = {
       assetPrice: '25.249547241877167',
       assetPriceUSD: '272.13',
       poolAPY: '0',
-      poolSlipAverage: '0',
       runeDepth: '85937446314',
       status: 'available',
-      swappingTxCount: '0',
       units: '200000000000',
       volume24h: '0'
     },
@@ -53,10 +51,8 @@ const defaultProps: SwapProps = {
       assetPrice: '56851.67420275761',
       assetPriceUSD: '59543.12',
       poolAPY: '0',
-      poolSlipAverage: '0',
       runeDepth: '1021648065165',
       status: 'available',
-      swappingTxCount: '0',
       units: '700389963172',
       volume24h: '0'
     }

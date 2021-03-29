@@ -56,7 +56,7 @@ import {
 } from '../../services/chain/types'
 import { ApproveParams, IsApprovedRD } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
-import { PoolOverviewDetails } from '../../services/midgard/types'
+import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import {
   ApiError,
@@ -88,7 +88,7 @@ export type SwapProps = {
   targetAsset: AssetWithDecimal
   poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
-  poolDetails: PoolOverviewDetails
+  poolDetails: PoolDetails
   walletBalances: O.Option<NonEmptyWalletBalances>
   goToTransaction: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
