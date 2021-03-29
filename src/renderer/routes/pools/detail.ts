@@ -8,12 +8,12 @@ export const base: Route<void> = {
   }
 }
 
-export type PoolDetailRouteParams = { symbol: string }
+export type PoolDetailRouteParams = { asset: string }
 export const poolDetail: Route<PoolDetailRouteParams> = {
-  template: `${base.template}/:symbol`,
-  path: ({ symbol }) => {
-    if (symbol) {
-      return `${base.template}/${symbol}`
+  template: `${base.template}/:asset`,
+  path: ({ asset }) => {
+    if (asset) {
+      return `${base.template}/${asset}`
     }
     // Redirect to pools base route if passed params are empty
     return poolsBase.path()
