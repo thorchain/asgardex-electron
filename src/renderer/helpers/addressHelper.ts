@@ -44,7 +44,7 @@ export const getAddressPrefixLength = (chain: Chain, network: string): number =>
     case PolkadotChain:
       // not supported yet
       // return getPolkadotPrefix(network).length
-      return 0
+      throw Error('Polkadot is not supported yet')
     case THORChain:
       return getThorchainPrefix(network).length
     case LTCChain:
