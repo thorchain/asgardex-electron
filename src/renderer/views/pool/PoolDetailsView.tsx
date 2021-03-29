@@ -12,20 +12,23 @@ import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/Poo
 import { PoolStatus } from '../../components/uielements/poolStatus'
 import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { PoolDetail } from '../../services/midgard/types'
+import { PoolDetailRD } from '../../services/midgard/types'
+import { PoolDetail, SwapHistory } from '../../types/generated/midgard'
 
-const getDepth = (data: PoolDetail, priceRatio: BigNumber = bn(1)) =>
+// TODO (@asgdx-team) Extract follwing helpers into PoolDetailsView.helper + add tests
+
+const getDepth = (data: Pick<PoolDetail, 'runeDepth'>, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(priceRatio)))
 
-const get24hrVolume = (data: PoolDetail, priceRatio: BigNumber = bn(1)) =>
+const get24hrVolume = (data: Pick<PoolDetail, 'volume24h'>, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.volume24h).multipliedBy(priceRatio)))
 
-const getAllTimeVolume = (data: PoolDetail, priceRatio: BigNumber = bn(1)) =>
+const getAllTimeVolume = (data: Pick<PoolDetail, 'poolAPY'>, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(/*data.poolVolume*/ 0).multipliedBy(priceRatio)))
 
-const getTotalSwaps = (data: PoolDetail) => Number(data.swappingTxCount)
+const _getTotalSwaps = ({ meta }: SwapHistory) => Number(meta.totalCount)
 
-const getTotalStakers = (_data: PoolDetail) => Number(/*data.stakersCount ||*/ 0)
+const _getTotalStakers = (/* _data: ??? */) => 0
 
 const defaultDetailsProps: PoolDetailProps = {
   depth: ZERO_ASSET_AMOUNT,
@@ -51,7 +54,7 @@ export const PoolDetailsView: React.FC = () => {
 
   const priceRatio = useObservableState(priceRatio$, ONE_BN)
 
-  const poolDetailRD = useObservableState(selectedPoolDetail$, RD.initial)
+  const poolDetailRD: PoolDetailRD = useObservableState(selectedPoolDetail$, RD.initial)
 
   return FP.pipe(
     poolDetailRD,
@@ -61,14 +64,14 @@ export const PoolDetailsView: React.FC = () => {
       (e: Error) => {
         return <PoolStatus label={intl.formatMessage({ id: 'common.error' })} displayValue={e.message} />
       },
-      (data) => {
+      (poolDetail) => {
         return (
           <PoolDetails
-            depth={getDepth(data, priceRatio)}
-            volume24hr={get24hrVolume(data, priceRatio)}
-            allTimeVolume={getAllTimeVolume(data, priceRatio)}
-            totalSwaps={getTotalSwaps(data)}
-            totalStakers={getTotalStakers(data)}
+            depth={getDepth(poolDetail, priceRatio)}
+            volume24hr={get24hrVolume(poolDetail, priceRatio)}
+            allTimeVolume={getAllTimeVolume(poolDetail, priceRatio)}
+            totalSwaps={0 /* getTotalSwaps(history) */}
+            totalStakers={0 /* getTotalStakers(poolDetail) */}
             priceSymbol={O.toUndefined(priceSymbol)}
           />
         )

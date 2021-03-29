@@ -17,7 +17,7 @@ import { isRuneBnbAsset } from '../../../helpers/assetHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
-import { PoolDetails } from '../../../services/midgard/types'
+import { PoolOverviewDetails } from '../../../services/midgard/types'
 import { ApiError, ChainBalance, ChainBalances } from '../../../services/wallet/types'
 import { WalletBalance, WalletBalances } from '../../../types/wallet'
 import { PricePool } from '../../../views/pools/Pools.types'
@@ -30,7 +30,7 @@ const { Panel } = Collapse
 type Props = {
   chainBalances: ChainBalances
   pricePool: PricePool
-  poolDetails: PoolDetails
+  poolDetails: PoolOverviewDetails
   selectAssetHandler?: (asset: Asset, walletAddress: string) => void
   setSelectedAsset?: (oAsset: O.Option<Asset>) => void
   network: Network

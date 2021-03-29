@@ -8,7 +8,7 @@ import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import { isChainAsset, isUSDAsset } from '../../helpers/assetHelper'
-import { PoolDetail } from '../../services/midgard/types'
+import { PoolOverviewDetail } from '../../services/midgard/types'
 import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
 import { GetPoolsStatusEnum, Constants as ThorchainConstants, LastblockItem } from '../../types/generated/midgard'
@@ -33,7 +33,7 @@ export const getPoolTableRowData = ({
   pricePoolData,
   network
 }: {
-  poolDetail: PoolDetail
+  poolDetail: PoolOverviewDetail
   pricePoolData: PoolData
   network: Network
 }): O.Option<PoolTableRowData> => {

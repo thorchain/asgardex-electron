@@ -32,8 +32,7 @@ import {
   PoolAssetDetailsLD,
   PendingPoolsStateLD,
   PoolAssetsLD,
-  PoolDetailLD,
-  PoolDetailsLD,
+  PoolOverviewDetailsLD,
   PoolsService,
   PoolsStateLD,
   SelectedPricePoolAsset,
@@ -46,7 +45,8 @@ import {
   PoolStatsDetailLD,
   PoolLegacyDetailLD,
   PoolLiquidityHistoryLD,
-  PoolLiquidityHistoryParams
+  PoolLiquidityHistoryParams,
+  PoolDetailLD
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -165,7 +165,10 @@ const createPoolsService = (
   /**
    * Data of enabled `Pools` from Midgard
    */
-  const apiGetPoolsEnabled$: PoolDetailsLD = apiGetPools$({ status: GetPoolsStatusEnum.Available }, reloadPools$)
+  const apiGetPoolsEnabled$: PoolOverviewDetailsLD = apiGetPools$(
+    { status: GetPoolsStatusEnum.Available },
+    reloadPools$
+  )
 
   // `TriggerStream` to reload data of pending pools
   const { stream$: reloadPendingPools$, trigger: reloadPendingPools } = triggerStream()
@@ -173,7 +176,10 @@ const createPoolsService = (
   /**
    * Data of pending `Pools` from Midgard
    */
-  const apiGetPoolsPending$: PoolDetailsLD = apiGetPools$({ status: GetPoolsStatusEnum.Staged }, reloadPendingPools$)
+  const apiGetPoolsPending$: PoolOverviewDetailsLD = apiGetPools$(
+    { status: GetPoolsStatusEnum.Staged },
+    reloadPendingPools$
+  )
 
   // `TriggerStream` to reload data of all pools
   const { stream$: reloadAllPools$, trigger: reloadAllPools } = triggerStream()
@@ -181,7 +187,7 @@ const createPoolsService = (
   /**
    * Data of all `Pools`
    */
-  const apiGetPoolsAll$: PoolDetailsLD = apiGetPools$({ status: undefined }, reloadAllPools$)
+  const apiGetPoolsAll$: PoolOverviewDetailsLD = apiGetPools$({ status: undefined }, reloadAllPools$)
 
   /**
    * Helper to get (same) stream of `PoolDetailsLD` by given status
@@ -224,10 +230,6 @@ const createPoolsService = (
       liveData.chain((api) => {
         return FP.pipe(
           api.getPool({ asset: assetToString(asset) }),
-          // Setting zero for `poolSlipAverage` + `swappingTxCount`
-          // since we don't need those in pool detail atm
-          // TODO (@asdgdx-team: Do we still need `poolSlipAverage` + `swappingTxCount` in PoolDetail ??
-          RxOp.map((poolDetail) => ({ poolSlipAverage: '0', swappingTxCount: '0', ...poolDetail })),
           RxOp.map(RD.success),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
@@ -239,10 +241,10 @@ const createPoolsService = (
   /**
    * `PoolDetails` data from Midgard
    */
-  const apiGetPoolsData$: (assetOrAssets: string | string[], status?: GetPoolsStatusEnum) => PoolDetailsLD = (
-    assetOrAssets,
-    status
-  ) => {
+  const apiGetPoolOverviewDetails$: (
+    assetOrAssets: string | string[],
+    status?: GetPoolsStatusEnum
+  ) => PoolOverviewDetailsLD = (assetOrAssets, status) => {
     const assets = Array.isArray(assetOrAssets) ? assetOrAssets : [assetOrAssets]
 
     return FP.pipe(
@@ -252,8 +254,8 @@ const createPoolsService = (
       liveData.chain(
         O.fold(
           // TODO (@thatStrangeGuy | @veado) Add i18n
-          (): PoolDetailsLD => Rx.of(RD.failure(new Error('No pools available'))),
-          (poolsDetails): PoolDetailsLD => Rx.of(RD.success(poolsDetails))
+          (): PoolOverviewDetailsLD => Rx.of(RD.failure(new Error('No pools available'))),
+          (poolsDetails): PoolOverviewDetailsLD => Rx.of(RD.success(poolsDetails))
         )
       ),
       RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
@@ -280,7 +282,7 @@ const createPoolsService = (
     )
 
   // Factory to create a stream to get data of `PoolDetails`
-  const getPoolDetails$: (poolAssets$: PoolAssetsLD, status?: GetPoolsStatusEnum) => PoolDetailsLD = (
+  const getPoolOverviewDetails$: (poolAssets$: PoolAssetsLD, status?: GetPoolsStatusEnum) => PoolOverviewDetailsLD = (
     poolAssets$,
     status
   ) =>
@@ -292,7 +294,7 @@ const createPoolsService = (
       liveData.chain(
         O.fold(
           () => liveData.of([]),
-          (assets) => apiGetPoolsData$(assets, status)
+          (assets) => apiGetPoolOverviewDetails$(assets, status)
         )
       ),
       RxOp.shareReplay(1)
@@ -301,7 +303,7 @@ const createPoolsService = (
   /**
    * Loading queue to get `PoolDetails` of all pools
    */
-  const loadAllPoolsDetails$ = (): PoolDetailsLD => {
+  const loadAllPoolOverviewDetails$ = (): PoolOverviewDetailsLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
       apiGetPoolsAll$,
       // Filter out all unknown / invalid assets created from asset strings
@@ -312,7 +314,7 @@ const createPoolsService = (
     )
 
     return FP.pipe(
-      getPoolDetails$(poolAssets$),
+      getPoolOverviewDetails$(poolAssets$),
       RxOp.startWith(RD.pending),
       RxOp.catchError((error: Error) => Rx.of(RD.failure(error)))
     )
@@ -321,9 +323,9 @@ const createPoolsService = (
   /**
    * `PoolDetails` of all pools
    */
-  const allPoolDetails$: PoolDetailsLD = reloadPools$.pipe(
+  const allPoolOverviewDetails$: PoolOverviewDetailsLD = reloadPools$.pipe(
     // start loading queue
-    RxOp.switchMap(loadAllPoolsDetails$),
+    RxOp.switchMap(loadAllPoolOverviewDetails$),
     // cache it to avoid reloading data by every subscription
     RxOp.shareReplay(1)
   )
@@ -341,7 +343,7 @@ const createPoolsService = (
       RxOp.shareReplay(1)
     )
     const assetDetails$ = getAssetDetails$(poolAssets$, GetPoolsStatusEnum.Available)
-    const poolDetails$ = getPoolDetails$(poolAssets$, GetPoolsStatusEnum.Available)
+    const poolDetails$ = getPoolOverviewDetails$(poolAssets$, GetPoolsStatusEnum.Available)
 
     const pricePools$: LiveData<Error, O.Option<PricePools>> = poolDetails$.pipe(
       RxOp.map((poolDetailsRD) =>
@@ -400,7 +402,7 @@ const createPoolsService = (
       RxOp.shareReplay(1)
     )
     const assetDetails$ = getAssetDetails$(poolAssets$, GetPoolsStatusEnum.Staged)
-    const poolDetails$ = getPoolDetails$(poolAssets$, GetPoolsStatusEnum.Staged)
+    const poolDetails$ = getPoolOverviewDetails$(poolAssets$, GetPoolsStatusEnum.Staged)
 
     return FP.pipe(
       liveData.sequenceS({
@@ -698,7 +700,7 @@ const createPoolsService = (
   return {
     poolsState$,
     pendingPoolsState$,
-    allPoolDetails$,
+    allPoolOverviewDetails$,
     setSelectedPricePoolAsset,
     selectedPricePoolAsset$,
     selectedPricePool$,
