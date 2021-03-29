@@ -685,6 +685,7 @@ const createPoolsService = (
           )
         )
       ),
+      RxOp.startWith(RD.initial),
       RxOp.shareReplay(1)
     )
 
