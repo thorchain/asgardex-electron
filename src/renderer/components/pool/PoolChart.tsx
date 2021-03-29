@@ -1,7 +1,6 @@
 import React from 'react'
 
-import * as A from 'antd'
-
+import Chart from '../uielements/chart'
 import * as Styled from './PoolChart.style'
 
 export type Props = {
@@ -11,7 +10,12 @@ export type Props = {
 export const PoolChart: React.FC<Props> = () => {
   return (
     <Styled.Container>
-      <A.Spin />
+      <Chart
+        chartIndexes={['Liquidity', 'Volume']}
+        chartData={chartData}
+        selectedIndex={selectedChart}
+        selectChart={setSelectedChart}
+      />
     </Styled.Container>
   )
 }

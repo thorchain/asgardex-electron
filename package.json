@@ -105,6 +105,7 @@
     "observable-hooks": "^3.1.2",
     "qrcode": "^1.4.4",
     "react": "^17.0.1",
+    "react-chartjs-2": "^2.11.1",
     "react-circular-progressbar": "^2.0.3",
     "react-dom": "^17.0.1",
     "react-draggable": "^4.4.3",
