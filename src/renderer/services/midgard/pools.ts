@@ -189,7 +189,7 @@ const createPoolsService = (
   /**
    * `PoolDetails` data from Midgard
    */
-  const apiGetPoolOverviewDetails$: (assetOrAssets: string | string[], status?: GetPoolsStatusEnum) => PoolDetailsLD = (
+  const apiGetPoolDetails$: (assetOrAssets: string | string[], status?: GetPoolsStatusEnum) => PoolDetailsLD = (
     assetOrAssets,
     status
   ) => {
@@ -242,7 +242,7 @@ const createPoolsService = (
       liveData.chain(
         O.fold(
           () => liveData.of([]),
-          (assets) => apiGetPoolOverviewDetails$(assets, status)
+          (assets) => apiGetPoolDetails$(assets, status)
         )
       ),
       RxOp.shareReplay(1)
