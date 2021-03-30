@@ -60,7 +60,7 @@
   ],
   "homepage": "https://thorchain.org",
   "dependencies": {
-    "@ant-design/icons": "^4.3.0",
+    "@ant-design/icons": "^4.6.2",
     "@binance-chain/javascript-sdk": "^4.1.1",
     "@craco/craco": "^6.1.1",
     "@devexperts/remote-data-ts": "^2.0.4",
@@ -84,7 +84,7 @@
     "@xchainjs/xchain-litecoin": "^0.4.0",
     "@xchainjs/xchain-thorchain": "^0.13.1",
     "@xchainjs/xchain-util": "^0.2.6",
-    "antd": "^4.10.2",
+    "antd": "^4.15.0",
     "axios": "^0.21.0",
     "bchaddrjs": "^0.5.2",
     "bignumber.js": "^9.0.1",
