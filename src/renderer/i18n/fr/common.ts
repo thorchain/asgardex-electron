@@ -63,10 +63,10 @@ const common: CommonMessages = {
   'common.manage': 'Gérer',
   'common.asset.base': 'Base',
   'common.tx.type.swap': 'Échange',
-  'common.tx.type.donate': 'Donner',
-  'common.tx.type.refund': 'Rembourser',
+  'common.tx.type.donate': 'Don',
+  'common.tx.type.refund': 'Remboursement',
   'common.tx.type.deposit': 'Dépôt',
-  'common.tx.type.withdraw': 'Retrait',
+  'common.tx.type.withdraw': 'Retirer',
   'common.detail': 'Détail',
   'common.filter': 'Filtre',
   'common.all': 'Tous'
