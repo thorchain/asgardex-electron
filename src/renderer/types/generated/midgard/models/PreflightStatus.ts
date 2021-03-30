@@ -13,22 +13,22 @@
 
 /**
  * @export
- * @interface Queue
+ * @interface PreflightStatus
  */
-export interface Queue {
+export interface PreflightStatus {
     /**
      * @type {number}
-     * @memberof Queue
+     * @memberof PreflightStatus
      */
-    internal: number;
+    code: number;
     /**
-     * @type {number}
-     * @memberof Queue
+     * @type {string}
+     * @memberof PreflightStatus
      */
-    outbound: number;
+    reason: string;
     /**
-     * @type {number}
-     * @memberof Queue
+     * @type {string}
+     * @memberof PreflightStatus
      */
-    swap: number;
+    status: string;
 }

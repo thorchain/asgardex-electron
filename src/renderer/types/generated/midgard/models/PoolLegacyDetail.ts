@@ -118,7 +118,7 @@ export interface PoolLegacyDetail {
      */
     poolUnits: string;
     /**
-     * Int64, same as buyVolume + sellVolume
+     * Int64(e8), same as buyVolume + sellVolume
      * @type {string}
      * @memberof PoolLegacyDetail
      */
@@ -214,7 +214,7 @@ export interface PoolLegacyDetail {
      */
     swappingTxCount: string;
     /**
-     * Int64, same as swapVolume pool/stats?period=24h
+     * Int64(e8), same as swapVolume pool/stats?period=24h
      * @type {string}
      * @memberof PoolLegacyDetail
      */

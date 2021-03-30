@@ -59,7 +59,7 @@ export interface StatsData {
      */
     swapCount: string;
     /**
-     * Int64, number of swaps in the last 24h.
+     * Int64(e8), number of swaps in the last 24h.
      * @type {string}
      * @memberof StatsData
      */
@@ -71,7 +71,7 @@ export interface StatsData {
      */
     swapCount30d: string;
     /**
-     * Int64, total volume of swaps denoted in Rune since beginning.
+     * Int64(e8), total volume of swaps denoted in Rune since beginning.
      * @type {string}
      * @memberof StatsData
      */

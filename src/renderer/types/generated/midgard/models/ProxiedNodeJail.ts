@@ -13,22 +13,12 @@
 
 /**
  * @export
- * @interface Queue
+ * @interface ProxiedNodeJail
  */
-export interface Queue {
+export interface ProxiedNodeJail {
     /**
-     * @type {number}
-     * @memberof Queue
+     * @type {string}
+     * @memberof ProxiedNodeJail
      */
-    internal: number;
-    /**
-     * @type {number}
-     * @memberof Queue
-     */
-    outbound: number;
-    /**
-     * @type {number}
-     * @memberof Queue
-     */
-    swap: number;
+    node_address?: string;
 }

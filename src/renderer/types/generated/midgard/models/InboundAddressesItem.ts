@@ -27,6 +27,11 @@ export interface InboundAddressesItem {
      */
     chain: string;
     /**
+     * @type {string}
+     * @memberof InboundAddressesItem
+     */
+    gas_rate?: string;
+    /**
      * indicate whether this chain has halted
      * @type {boolean}
      * @memberof InboundAddressesItem

@@ -17,7 +17,7 @@
  */
 export interface DepthHistoryItem {
     /**
-     * Int64, the amount of Asset in the pool at the end of the interval
+     * Int64(e8), the amount of Asset in the pool at the end of the interval
      * @type {string}
      * @memberof DepthHistoryItem
      */
@@ -47,7 +47,7 @@ export interface DepthHistoryItem {
      */
     liquidityUnits: string;
     /**
-     * Int64, the amount of Rune in the pool at the end of the interval
+     * Int64(e8), the amount of Rune in the pool at the end of the interval
      * @type {string}
      * @memberof DepthHistoryItem
      */
