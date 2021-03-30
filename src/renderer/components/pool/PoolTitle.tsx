@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 
 import { SwapOutlined } from '@ant-design/icons'
 import { AssetRune } from '@xchainjs/xchain-thorchain'
-import { Asset, assetAmount, assetToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -10,29 +10,20 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import * as poolsRoutes from '../../routes/pools'
-import { SwapRouteParams } from '../../routes/pools/swap'
 import { ManageButton } from '../manageButton'
 import { Button } from '../uielements/button'
 import * as Styled from './PoolTitle.style'
 
 export type Props = {
   asset: O.Option<Asset>
-  priceUSD: O.Option<string>
+  priceUSD: AssetAmount
   isLoading?: boolean
 }
 
-export const PoolTitle: React.FC<Props> = ({ asset: oAsset, priceUSD: oPriceUSD }) => {
+export const PoolTitle: React.FC<Props> = ({ asset: oAsset, priceUSD }) => {
   const history = useHistory()
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.md ?? false
-
-  const getSwapPath = poolsRoutes.swap.path
-  const clickSwapHandler = useCallback(
-    (p: SwapRouteParams) => {
-      history.push(getSwapPath(p))
-    },
-    [getSwapPath, history]
-  )
 
   const title = useMemo(
     () =>
@@ -49,17 +40,17 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, priceUSD: oPriceUSD 
   const price = useMemo(
     () =>
       FP.pipe(
-        oPriceUSD,
+        oAsset,
         O.fold(
           () => '',
-          (priceUSD) =>
+          () =>
             formatAssetAmountCurrency({
-              amount: assetAmount(priceUSD),
+              amount: priceUSD,
               decimal: 3
             })
         )
       ),
-    [oPriceUSD]
+    [oAsset, priceUSD]
   )
 
   const buttons = useMemo(
@@ -79,7 +70,9 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, priceUSD: oPriceUSD 
                   onClick={(event) => {
                     event.preventDefault()
                     event.stopPropagation()
-                    clickSwapHandler({ source: assetToString(asset), target: assetToString(AssetRune) })
+                    history.push(
+                      poolsRoutes.swap.path({ source: assetToString(asset), target: assetToString(AssetRune) })
+                    )
                   }}>
                   <SwapOutlined />
                   {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
@@ -89,7 +82,7 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, priceUSD: oPriceUSD 
           }
         )
       ),
-    [clickSwapHandler, intl, isDesktopView, oAsset]
+    [history, intl, isDesktopView, oAsset]
   )
 
   return (

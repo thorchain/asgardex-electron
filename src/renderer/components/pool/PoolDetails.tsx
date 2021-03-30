@@ -24,7 +24,7 @@ export type Props = {
   totalStakers: number
   totalStakersTrend?: BigNumber
   // decimal value in percents
-  priceUSD: O.Option<string>
+  priceUSD: AssetAmount
   priceSymbol?: string
   isLoading?: boolean
 }

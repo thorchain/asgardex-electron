@@ -16,7 +16,7 @@ export const PoolDetailsStory = () => {
       allTimeVolume={assetAmount(12000)}
       totalSwaps={7042}
       totalStakers={307}
-      priceUSD={O.some('1')}
+      priceUSD={assetAmount(1)}
       priceSymbol={'R'}
       asset={O.some(AssetETH)}
     />

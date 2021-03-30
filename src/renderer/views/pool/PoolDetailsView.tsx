@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, baseAmount, baseToAsset, bn, bnOrZero } from '@xchainjs/xchain-util'
+import { assetAmount, assetFromString, baseAmount, baseToAsset, bn, bnOrZero } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import * as FP from 'fp-ts/pipeable'
@@ -28,6 +28,9 @@ const get24hrVolume = (data: Pick<PoolDetail, 'volume24h'>, priceRatio: BigNumbe
 const getAllTimeVolume = (data: Pick<PoolDetail, 'poolAPY'>, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(/*data.poolVolume*/ 0).multipliedBy(priceRatio)))
 
+const getPriceUSD = (data: Pick<PoolDetail, 'assetPrice'>, priceRatio: BigNumber = bn(1)) =>
+  assetAmount(bnOrZero(data.assetPrice).multipliedBy(priceRatio))
+
 const _getTotalSwaps = ({ meta }: SwapHistory) => Number(meta.totalCount)
 
 const _getTotalStakers = (/* _data: ??? */) => 0
@@ -39,7 +42,7 @@ const defaultDetailsProps: PoolDetailProps = {
   allTimeVolume: ZERO_ASSET_AMOUNT,
   totalSwaps: 0,
   totalStakers: 0,
-  priceUSD: O.none
+  priceUSD: ZERO_ASSET_AMOUNT
 }
 
 const renderPendingView = () => <PoolDetails {...defaultDetailsProps} isLoading={true} />
@@ -69,6 +72,10 @@ export const PoolDetailsView: React.FC = () => {
     }
   }, [oRouteAsset, setSelectedPoolAsset])
 
+  const routeAssetRD = RD.fromOption(oRouteAsset, () =>
+    Error(intl.formatMessage({ id: 'routes.invalid.asset' }, { asset }))
+  )
+
   const priceSymbol = useObservableState(selectedPricePoolAssetSymbol$, O.none)
 
   const priceRatio = useObservableState(priceRatio$, ONE_BN)
@@ -76,23 +83,23 @@ export const PoolDetailsView: React.FC = () => {
   const poolDetailRD: PoolDetailRD = useObservableState(selectedPoolDetail$, RD.initial)
 
   return FP.pipe(
-    poolDetailRD,
+    RD.combine(routeAssetRD, poolDetailRD),
     RD.fold(
       renderInitialView,
       renderPendingView,
       (e: Error) => {
         return <PoolStatus label={intl.formatMessage({ id: 'common.error' })} displayValue={e.message} />
       },
-      (poolDetail) => {
+      ([asset, poolDetail]) => {
         return (
           <PoolDetails
-            asset={oRouteAsset}
+            asset={O.some(asset)}
             depth={getDepth(poolDetail, priceRatio)}
             volume24hr={get24hrVolume(poolDetail, priceRatio)}
             allTimeVolume={getAllTimeVolume(poolDetail, priceRatio)}
             totalSwaps={0 /* getTotalSwaps(history) */}
             totalStakers={0 /* getTotalStakers(poolDetail) */}
-            priceUSD={O.some(poolDetail.assetPriceUSD)}
+            priceUSD={getPriceUSD(poolDetail, priceRatio)}
             priceSymbol={O.toUndefined(priceSymbol)}
           />
         )
