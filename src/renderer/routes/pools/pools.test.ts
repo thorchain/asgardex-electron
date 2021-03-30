@@ -39,13 +39,13 @@ describe('Pools routes', () => {
 
   describe('PoolDetail routes', () => {
     it('template', () => {
-      expect(detail.template).toEqual('/pools/detail/:symbol')
+      expect(detail.template).toEqual('/pools/detail/:asset')
     })
-    it('returns path by given symbol parameter', () => {
-      expect(detail.path({ symbol: 'BNB' })).toEqual('/pools/detail/BNB')
+    it('returns path by given asset parameter', () => {
+      expect(detail.path({ asset: 'BNB.BNB' })).toEqual('/pools/detail/BNB.BNB')
     })
     it('redirects to pools base path if symbol is empty', () => {
-      expect(detail.path({ symbol: '' })).toEqual('/pools')
+      expect(detail.path({ asset: '' })).toEqual('/pools')
     })
   })
 })

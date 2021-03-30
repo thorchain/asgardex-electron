@@ -1,8 +1,9 @@
 import React from 'react'
 
-import { AssetAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount } from '@xchainjs/xchain-util'
 import * as A from 'antd'
 import BigNumber from 'bignumber.js'
+import * as O from 'fp-ts/lib/Option'
 
 import { PoolCards } from './PoolCards'
 import { PoolChart } from './PoolChart'
@@ -11,6 +12,7 @@ import { PoolHistory } from './PoolHistory'
 import { PoolTitle } from './PoolTitle'
 
 export type Props = {
+  asset: O.Option<Asset>
   depth: AssetAmount
   depthTrend?: BigNumber
   volume24hr: AssetAmount
@@ -22,16 +24,19 @@ export type Props = {
   totalStakers: number
   totalStakersTrend?: BigNumber
   // decimal value in percents
+  priceUSD: AssetAmount
   priceSymbol?: string
   isLoading?: boolean
 }
 
 export const PoolDetails: React.FC<Props> = ({
+  asset,
   depth,
   volume24hr,
   allTimeVolume,
   totalStakers,
   totalSwaps,
+  priceUSD,
   priceSymbol = '',
   depthTrend,
   volume24hrTrend,
@@ -43,7 +48,7 @@ export const PoolDetails: React.FC<Props> = ({
   return (
     <Styled.Container>
       <A.Col span={24}>
-        <PoolTitle isLoading={isLoading} />
+        <PoolTitle asset={asset} priceUSD={priceUSD} isLoading={isLoading} />
       </A.Col>
       <A.Col xs={24} md={8}>
         <PoolCards

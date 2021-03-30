@@ -179,7 +179,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
             // onRow={({ pool }: PoolTableRowData) => {
             //   return {
             //     onClick: () => {
-            //       history.push(poolsRoutes.detail.path({ symbol: pool.target.symbol }))
+            //       history.push(poolsRoutes.detail.path({ asset: assetToString(pool.target) }))
             //     }
             //   }
             // }}
