@@ -38,7 +38,7 @@ import {
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
-import { sequenceSOption, sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData } from '../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
@@ -696,10 +696,10 @@ export const Swap = ({
   const fees: UIFeesRD = useMemo(
     () =>
       FP.pipe(
-        sequenceTRD(chainFeesRD, RD.success(targetChainFeeAmountInTargetAsset)),
-        RD.map(([chainFee, targetFee]) => [
+        chainFeesRD,
+        RD.map((chainFee) => [
           { asset: getChainAsset(sourceAssetProp.chain), amount: chainFee.inTx },
-          { asset: targetAssetProp, amount: targetFee }
+          { asset: targetAssetProp, amount: targetChainFeeAmountInTargetAsset }
         ])
       ),
     [chainFeesRD, targetChainFeeAmountInTargetAsset, sourceAssetProp.chain, targetAssetProp]
