@@ -23,14 +23,14 @@ const helpMenu: HelpMenuMessages = {
   'menu.help.learn': 'En apprendre davantage...',
   'menu.help.docs': 'Documentation',
   'menu.help.telegram': 'Telegram',
-  'menu.help.issues': 'Signaler les problèmes'
+  'menu.help.issues': 'Signaler un problème'
 }
 
 const viewMenu: ViewMenuMessages = {
   'menu.view.title': 'Affichage',
   'menu.view.reload': 'Recharger',
   'menu.view.toggleFullscreen': 'Basculer en plein écran',
-  'menu.view.toggleDevTools': 'Basculer en outils de dev.'
+  'menu.view.toggleDevTools': 'Basculer en outils de développement'
 }
 
 export default { ...appMenu, ...editMenu, ...viewMenu, ...helpMenu }
