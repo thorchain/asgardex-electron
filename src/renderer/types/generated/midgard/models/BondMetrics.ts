@@ -17,61 +17,61 @@
  */
 export interface BondMetrics {
     /**
-     * Int64, Average bond of active nodes
+     * Int64(e8), Average bond of active nodes
      * @type {string}
      * @memberof BondMetrics
      */
     averageActiveBond: string;
     /**
-     * Int64, Average bond of standby nodes
+     * Int64(e8), Average bond of standby nodes
      * @type {string}
      * @memberof BondMetrics
      */
     averageStandbyBond: string;
     /**
-     * Int64, Maxinum bond of active nodes
+     * Int64(e8), Maxinum bond of active nodes
      * @type {string}
      * @memberof BondMetrics
      */
     maximumActiveBond: string;
     /**
-     * Int64, Maximum bond of standby nodes
+     * Int64(e8), Maximum bond of standby nodes
      * @type {string}
      * @memberof BondMetrics
      */
     maximumStandbyBond: string;
     /**
-     * Int64, Median bond of active nodes
+     * Int64(e8), Median bond of active nodes
      * @type {string}
      * @memberof BondMetrics
      */
     medianActiveBond: string;
     /**
-     * Int64, Median bond of standby nodes
+     * Int64(e8), Median bond of standby nodes
      * @type {string}
      * @memberof BondMetrics
      */
     medianStandbyBond: string;
     /**
-     * Int64, Minumum bond of active nodes
+     * Int64(e8), Minumum bond of active nodes
      * @type {string}
      * @memberof BondMetrics
      */
     minimumActiveBond: string;
     /**
-     * Int64, Minumum bond of standby nodes
+     * Int64(e8), Minumum bond of standby nodes
      * @type {string}
      * @memberof BondMetrics
      */
     minimumStandbyBond: string;
     /**
-     * Int64, Total bond of active nodes
+     * Int64(e8), Total bond of active nodes
      * @type {string}
      * @memberof BondMetrics
      */
     totalActiveBond: string;
     /**
-     * Int64, Total bond of standby nodes
+     * Int64(e8), Total bond of standby nodes
      * @type {string}
      * @memberof BondMetrics
      */

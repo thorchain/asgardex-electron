@@ -27,19 +27,19 @@ export interface EarningsHistoryItem {
      */
     avgNodeCount: string;
     /**
-     * Int64, Total block rewards emitted during the time interval
+     * Int64(e8), Total block rewards emitted during the time interval
      * @type {string}
      * @memberof EarningsHistoryItem
      */
     blockRewards: string;
     /**
-     * Int64, Share of earnings sent to nodes during the time interval
+     * Int64(e8), Share of earnings sent to nodes during the time interval
      * @type {string}
      * @memberof EarningsHistoryItem
      */
     bondingEarnings: string;
     /**
-     * Int64, System income generated during the time interval. It is the sum of liquidity fees and block rewards
+     * Int64(e8), System income generated during the time interval. It is the sum of liquidity fees and block rewards
      * @type {string}
      * @memberof EarningsHistoryItem
      */
@@ -51,13 +51,13 @@ export interface EarningsHistoryItem {
      */
     endTime: string;
     /**
-     * Int64, Share of earnings sent to pools during the time interval
+     * Int64(e8), Share of earnings sent to pools during the time interval
      * @type {string}
      * @memberof EarningsHistoryItem
      */
     liquidityEarnings: string;
     /**
-     * Int64, Total liquidity fees, converted to RUNE, collected during the time interval
+     * Int64(e8), Total liquidity fees, converted to RUNE, collected during the time interval
      * @type {string}
      * @memberof EarningsHistoryItem
      */

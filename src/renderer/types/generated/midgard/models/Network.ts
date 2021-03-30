@@ -84,13 +84,13 @@ export interface Network {
      */
     standbyNodeCount: string;
     /**
-     * Int64, Total Rune pooled in all pools
+     * Int64(e8), Total Rune pooled in all pools
      * @type {string}
      * @memberof Network
      */
     totalPooledRune: string;
     /**
-     * Int64, Total left in Reserve
+     * Int64(e8), Total left in Reserve
      * @type {string}
      * @memberof Network
      */

@@ -13,22 +13,17 @@
 
 /**
  * @export
- * @interface Queue
+ * @interface ObservedChain
  */
-export interface Queue {
+export interface ObservedChain {
+    /**
+     * @type {string}
+     * @memberof ObservedChain
+     */
+    chain: string;
     /**
      * @type {number}
-     * @memberof Queue
+     * @memberof ObservedChain
      */
-    internal: number;
-    /**
-     * @type {number}
-     * @memberof Queue
-     */
-    outbound: number;
-    /**
-     * @type {number}
-     * @memberof Queue
-     */
-    swap: number;
+    height: number;
 }

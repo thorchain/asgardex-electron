@@ -36,7 +36,7 @@ export interface EarningsHistoryItemPool {
      */
     pool: string;
     /**
-     * Int64 (10^8), RUNE amount sent to (positive) or taken from (negative) the pool as a result of balancing it\'s share of system income each block  
+     * Int64 (10^8), RUNE amount sent to (positive) or taken from (negative) the pool as a result of balancing it\'s share of system income each block 
      * @type {string}
      * @memberof EarningsHistoryItemPool
      */

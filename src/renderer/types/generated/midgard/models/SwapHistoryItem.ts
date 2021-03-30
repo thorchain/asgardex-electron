@@ -47,13 +47,13 @@ export interface SwapHistoryItem {
      */
     toAssetCount: string;
     /**
-     * Int64, the fees collected from swaps to asset denoted in rune
+     * Int64(e8), the fees collected from swaps to asset denoted in rune
      * @type {string}
      * @memberof SwapHistoryItem
      */
     toAssetFees: string;
     /**
-     * Int64, volume of swaps from rune to asset denoted in rune
+     * Int64(e8), volume of swaps from rune to asset denoted in rune
      * @type {string}
      * @memberof SwapHistoryItem
      */
@@ -71,13 +71,13 @@ export interface SwapHistoryItem {
      */
     toRuneCount: string;
     /**
-     * Int64, the fees collected from swaps to rune
+     * Int64(e8), the fees collected from swaps to rune
      * @type {string}
      * @memberof SwapHistoryItem
      */
     toRuneFees: string;
     /**
-     * Int64, volume of swaps from asset to rune denoted in rune
+     * Int64(e8), volume of swaps from asset to rune denoted in rune
      * @type {string}
      * @memberof SwapHistoryItem
      */
@@ -89,13 +89,13 @@ export interface SwapHistoryItem {
      */
     totalCount: string;
     /**
-     * Int64, the sum of all fees collected denoted in rune
+     * Int64(e8), the sum of all fees collected denoted in rune
      * @type {string}
      * @memberof SwapHistoryItem
      */
     totalFees: string;
     /**
-     * Int64, toAssetVolume + toRuneVolume (denoted in rune)
+     * Int64(e8), toAssetVolume + toRuneVolume (denoted in rune)
      * @type {string}
      * @memberof SwapHistoryItem
      */

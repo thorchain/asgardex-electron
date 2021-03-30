@@ -13,22 +13,17 @@
 
 /**
  * @export
- * @interface Queue
+ * @interface ProxiedNodePubKeySet
  */
-export interface Queue {
+export interface ProxiedNodePubKeySet {
     /**
-     * @type {number}
-     * @memberof Queue
+     * @type {string}
+     * @memberof ProxiedNodePubKeySet
      */
-    internal: number;
+    ed25519: string;
     /**
-     * @type {number}
-     * @memberof Queue
+     * @type {string}
+     * @memberof ProxiedNodePubKeySet
      */
-    outbound: number;
-    /**
-     * @type {number}
-     * @memberof Queue
-     */
-    swap: number;
+    secp256k1: string;
 }

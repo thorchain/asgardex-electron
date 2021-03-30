@@ -17,7 +17,7 @@
  */
 export interface PoolStatsDetail {
     /**
-     * Int64, same as history/liquidity_changes:addAssetLiquidityVolume
+     * Int64(e8), same as history/liquidity_changes:addAssetLiquidityVolume
      * @type {string}
      * @memberof PoolStatsDetail
      */
@@ -29,13 +29,13 @@ export interface PoolStatsDetail {
      */
     addLiquidityCount: string;
     /**
-     * Int64, same as history/liquidity_changes:addLiquidityVolume
+     * Int64(e8), same as history/liquidity_changes:addLiquidityVolume
      * @type {string}
      * @memberof PoolStatsDetail
      */
     addLiquidityVolume: string;
     /**
-     * Int64, same as history/liquidity_changes:addRuneLiquidityVolume
+     * Int64(e8), same as history/liquidity_changes:addRuneLiquidityVolume
      * @type {string}
      * @memberof PoolStatsDetail
      */
@@ -46,7 +46,7 @@ export interface PoolStatsDetail {
      */
     asset: string;
     /**
-     * Int64, the amount of Asset in the pool
+     * Int64(e8), the amount of Asset in the pool
      * @type {string}
      * @memberof PoolStatsDetail
      */
@@ -76,7 +76,7 @@ export interface PoolStatsDetail {
      */
     poolAPY: string;
     /**
-     * Int64, the amount of Rune in the pool
+     * Int64(e8), the amount of Rune in the pool
      * @type {string}
      * @memberof PoolStatsDetail
      */
@@ -94,7 +94,7 @@ export interface PoolStatsDetail {
      */
     swapCount: string;
     /**
-     * Int64, same as history/swaps:totalVolume
+     * Int64(e8), same as history/swaps:totalVolume
      * @type {string}
      * @memberof PoolStatsDetail
      */
@@ -112,13 +112,13 @@ export interface PoolStatsDetail {
      */
     toAssetCount: string;
     /**
-     * Int64, same as history/swaps:toAssetFees
+     * Int64(e8), same as history/swaps:toAssetFees
      * @type {string}
      * @memberof PoolStatsDetail
      */
     toAssetFees: string;
     /**
-     * Int64, same as history/swaps:toAssetVolume
+     * Int64(e8), same as history/swaps:toAssetVolume
      * @type {string}
      * @memberof PoolStatsDetail
      */
@@ -136,19 +136,19 @@ export interface PoolStatsDetail {
      */
     toRuneCount: string;
     /**
-     * Int64, same as history/swaps:toRuneFees
+     * Int64(e8), same as history/swaps:toRuneFees
      * @type {string}
      * @memberof PoolStatsDetail
      */
     toRuneFees: string;
     /**
-     * Int64, same as history/swaps:toRuneVolume
+     * Int64(e8), same as history/swaps:toRuneVolume
      * @type {string}
      * @memberof PoolStatsDetail
      */
     toRuneVolume: string;
     /**
-     * Int64, same as history/swaps:totalFees
+     * Int64(e8), same as history/swaps:totalFees
      * @type {string}
      * @memberof PoolStatsDetail
      */
@@ -172,7 +172,7 @@ export interface PoolStatsDetail {
      */
     units: string;
     /**
-     * Int64, same as history/liquidity_changes:withdrawAssetVolume
+     * Int64(e8), same as history/liquidity_changes:withdrawAssetVolume
      * @type {string}
      * @memberof PoolStatsDetail
      */
@@ -184,13 +184,13 @@ export interface PoolStatsDetail {
      */
     withdrawCount: string;
     /**
-     * Int64, same as history/liquidity_changes:withdrawRuneVolume
+     * Int64(e8), same as history/liquidity_changes:withdrawRuneVolume
      * @type {string}
      * @memberof PoolStatsDetail
      */
     withdrawRuneVolume: string;
     /**
-     * Int64, same as history/liquidity_changes:withdrawVolume
+     * Int64(e8), same as history/liquidity_changes:withdrawVolume
      * @type {string}
      * @memberof PoolStatsDetail
      */

@@ -17,7 +17,7 @@
  */
 export interface MemberPool {
     /**
-     * Int64, total asset added to the pool by member
+     * Int64(e8), total asset added to the pool by member
      * @type {string}
      * @memberof MemberPool
      */
@@ -29,7 +29,7 @@ export interface MemberPool {
      */
     assetAddress: string;
     /**
-     * Int64, total asset withdrawn from the pool by member
+     * Int64(e8), total asset withdrawn from the pool by member
      * @type {string}
      * @memberof MemberPool
      */
@@ -59,7 +59,7 @@ export interface MemberPool {
      */
     pool: string;
     /**
-     * Int64, total RUNE added to the pool by member
+     * Int64(e8), total RUNE added to the pool by member
      * @type {string}
      * @memberof MemberPool
      */
@@ -71,7 +71,7 @@ export interface MemberPool {
      */
     runeAddress: string;
     /**
-     * Int64, total RUNE withdrawn from the pool by member
+     * Int64(e8), total RUNE withdrawn from the pool by member
      * @type {string}
      * @memberof MemberPool
      */
