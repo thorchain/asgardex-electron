@@ -1,15 +1,19 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
+import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as H from 'history'
 import { useObservableState } from 'observable-hooks'
 import { Redirect, Route } from 'react-router'
+import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { PoolActionsHistory } from '../../components/poolActionsHistory'
 import { Filter } from '../../components/poolActionsHistory/types'
+import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -17,6 +21,7 @@ import { liveData } from '../../helpers/rx/liveData'
 import * as historyRoutes from '../../routes/history'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
+import { ENABLED_CHAINS } from '../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../services/midgard/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
@@ -27,9 +32,22 @@ export const PoolActionsHistoryView: React.FC = () => {
     service: { poolActionsHistory }
   } = useMidgardContext()
 
+  const { addressByChain$ } = useChainContext()
+
   const { keystoreService } = useWalletContext()
 
   const { getExplorerTxUrl$ } = useThorchainContext()
+
+  const addresses$ = useMemo<Rx.Observable<Address[]>>(
+    () =>
+      FP.pipe(
+        ENABLED_CHAINS,
+        A.map(addressByChain$),
+        (addresses) => Rx.combineLatest(addresses),
+        RxOp.map(A.filterMap(FP.identity))
+      ),
+    [addressByChain$]
+  )
 
   const prevActionsPage = useRef<O.Option<PoolActionsHistoryPage>>(O.none)
 
@@ -47,6 +65,12 @@ export const PoolActionsHistoryView: React.FC = () => {
       FP.pipe(
         params$,
         RxOp.startWith(DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS),
+        RxOp.switchMap((params) =>
+          FP.pipe(
+            addresses$,
+            RxOp.map((addresses) => ({ ...params, addresses }))
+          )
+        ),
         RxOp.map((params) => {
           const res = { ...DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, ...params }
           requestParams.current = res
