@@ -229,6 +229,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           O.map((balances) => filterWalletBalancesByAssets(balances, poolAssets)),
           O.getOrElse(() => [] as WalletBalances)
         )
+
         return (
           <>
             <SymDeposit

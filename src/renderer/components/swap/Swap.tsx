@@ -265,6 +265,13 @@ export const Swap = ({
     RD.initial
   )
 
+  // Reload balances at `onmount`
+  useEffect(() => {
+    console.log('onMount')
+    reloadBalances()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // whenever `oSwapFeesParams` has been updated,
   // `swapFeesParamsUpdated` needs to be called to update `chainFeesRD`
   useEffect(() => {
