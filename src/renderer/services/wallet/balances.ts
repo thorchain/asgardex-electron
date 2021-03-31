@@ -21,7 +21,6 @@ import { WalletBalancesRD } from '../clients'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
-// import { selectedAsset$ } from './common'
 import { INITIAL_BALANCES_STATE } from './const'
 import { BalancesState, ChainBalances$, ChainBalance$, ChainBalance } from './types'
 import { sortBalances } from './util'
@@ -36,7 +35,6 @@ export const reloadBalances: FP.Lazy<void> = () => {
 }
 
 export const reloadBalancesByChain: (chain: Chain) => FP.Lazy<void> = (chain) => {
-  console.log('reloadBalancesByChain:', chain)
   switch (chain) {
     case 'BNB':
       return BNB.reloadBalances
@@ -54,10 +52,6 @@ export const reloadBalancesByChain: (chain: Chain) => FP.Lazy<void> = (chain) =>
       return () => {}
   }
 }
-
-// export const reloadBalances$: Rx.Observable<O.Option<LoadBalancesHandler>> = selectedAsset$.pipe(
-//   RxOp.map(O.map(({ chain }) => reloadBalancesByChain(chain)))
-// )
 
 /**
  * Transforms THOR balances into `ChainBalances`
