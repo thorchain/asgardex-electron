@@ -13,6 +13,7 @@ export const PoolStatusWrapper = styled.div`
   background: ${palette('background', 1)};
   box-shadow: 0px 1px 3px ${palette('gray', 0)};
   border-radius: 3px;
+  height: 70px;
 
   &:before {
     content: '';
@@ -26,24 +27,30 @@ export const PoolStatusWrapper = styled.div`
     background: ${palette('gradient', 2)};
   }
 
-  .amount {
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
-  }
-
   .label-wrapper {
     padding: 0;
   }
 `
 
-export const Value = styled(Label).attrs({
-  weight: 'bold',
+export const Title = styled(Label).attrs({
   size: 'big'
 })`
   text-transform: uppercase;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+`
+
+export const Value = styled(Label).attrs({
+  weight: 'bold',
+  size: 'big'
+})`
+  margin-top: 8px;
+  text-transform: uppercase;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
 `
 
 export const Tooltip = styled(A.Tooltip).attrs({

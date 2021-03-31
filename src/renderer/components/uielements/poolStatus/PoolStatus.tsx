@@ -1,10 +1,8 @@
 import React, { useCallback, useRef, useState } from 'react'
 
-import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 
 import { useCbOnResize } from '../../../hooks/useCbOnResize'
-import { Trend } from '../trend'
 import * as Styled from './PoolStatus.style'
 
 type Props = {
@@ -16,7 +14,7 @@ type Props = {
 }
 
 export const PoolStatus: React.FC<Props> = (props): JSX.Element => {
-  const { label, trend, displayValue, fullValue, isLoading } = props
+  const { label, displayValue, fullValue, isLoading } = props
   const [showTooltip, setShowTooltip] = useState(false)
   const amountRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -51,14 +49,11 @@ export const PoolStatus: React.FC<Props> = (props): JSX.Element => {
   return (
     <Styled.PoolStatusWrapper ref={containerRef} {...props}>
       <TooltipContainer>
-        <Row style={{ justifyContent: 'space-between', flexFlow: 'row' }}>
-          <Styled.Value loading={isLoading} ref={amountRef} className="amount">
-            {displayValue}
-          </Styled.Value>
-          {trend && <Trend amount={trend} />}
-        </Row>
-        <Styled.Value textTransform="uppercase" color="light">
+        <Styled.Title textTransform="uppercase" color="light">
           {label}
+        </Styled.Title>
+        <Styled.Value loading={isLoading} ref={amountRef} className="amount">
+          {displayValue}
         </Styled.Value>
       </TooltipContainer>
     </Styled.PoolStatusWrapper>
