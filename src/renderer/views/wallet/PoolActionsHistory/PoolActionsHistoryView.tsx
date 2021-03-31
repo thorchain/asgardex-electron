@@ -19,7 +19,7 @@ import { ENABLED_CHAINS } from '../../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../../services/midgard/types'
 
-export const PoolActionsHistoryView: React.FC = () => {
+export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ className }) => {
   const {
     service: { poolActionsHistory }
   } = useMidgardContext()
@@ -105,6 +105,7 @@ export const PoolActionsHistoryView: React.FC = () => {
 
   return (
     <PoolActionsHistory
+      className={className}
       currentPage={requestParams.current.page + 1}
       actionsPageRD={historyPage}
       prevActionsPage={prevActionsPage.current}
@@ -113,7 +114,6 @@ export const PoolActionsHistoryView: React.FC = () => {
       clickTxLinkHandler={goToTx}
       currentFilter={requestParams.current.type || 'ALL'}
       setFilter={setFilter}
-      reload={poolActionsHistory.reloadActionsHistory}
     />
   )
 }
