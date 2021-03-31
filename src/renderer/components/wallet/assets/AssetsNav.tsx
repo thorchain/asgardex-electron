@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl'
 import { useRouteMatch, Link } from 'react-router-dom'
 
 import * as walletRoutes from '../../../routes/wallet'
-import { StyledMenu } from './AssetsNav.style'
+import * as Styled from './AssetsNav.style'
 
 enum MenuKey {
   ASSETS = 'assets',
@@ -71,12 +71,15 @@ export const AssetsNav: React.FC = (): JSX.Element => {
   }, [assetsRoute, poolSharesRoute, bondsRoute, matchHistoryRoute])
 
   return (
-    <StyledMenu mode="horizontal" selectedKeys={[activeMenu]}>
-      {menuItems.map(({ key, label, path }) => (
-        <Menu.Item key={key}>
-          <Link to={path}>{label}</Link>
-        </Menu.Item>
-      ))}
-    </StyledMenu>
+    <>
+      <Styled.MenuDropdownGlobalStyles />
+      <Styled.Menu mode="horizontal" selectedKeys={[activeMenu]} triggerSubMenuAction={'click'}>
+        {menuItems.map(({ key, label, path }) => (
+          <Menu.Item key={key}>
+            <Link to={path}>{label}</Link>
+          </Menu.Item>
+        ))}
+      </Styled.Menu>
+    </>
   )
 }
