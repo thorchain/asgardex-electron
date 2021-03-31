@@ -7,6 +7,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_BN } from '../../../const'
+import { eqBigNumber } from '../../../helpers/fp/eq'
 import * as Styled from './Input.style'
 import { VALUE_ZERO, formatValue, validInputValue } from './Input.util'
 
@@ -51,9 +52,22 @@ export const InputBigNumber = forwardRef<Input, Props>(
         trimZeros,
         O.some,
         // save value into state
-        setEnteredValue
+        (value) => {
+          // immediately set entered value in case there is nothing to compare with
+          if (O.isNone(enteredValue)) {
+            setEnteredValue(value)
+          } else {
+            FP.pipe(
+              value,
+              O.map(bn),
+              // Filter out every repeated BN values to avoid missing untrimmed zeros
+              O.filter((value) => !eqBigNumber.equals(value, bn(enteredValue.value))),
+              O.map(() => setEnteredValue(value))
+            )
+          }
+        }
       )
-    }, [decimal, value])
+    }, [decimal, value, enteredValue])
 
     const onFocusHandler = useCallback(
       async (event: React.FocusEvent<HTMLInputElement>) => {
