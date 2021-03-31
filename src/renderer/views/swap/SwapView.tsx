@@ -21,7 +21,8 @@ import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
-import { sequenceTRD } from '../../helpers/fpHelpers'
+import { eqChain } from '../../helpers/fp/eq'
+import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/pools/swap'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../services/const'
@@ -54,7 +55,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const {
     balancesState$,
-    reloadBalances,
+    reloadBalancesByChain,
     keystoreService: { keystore$, validatePassword$ }
   } = useWalletContext()
 
@@ -155,6 +156,26 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     ),
     [intl, reloadPools]
   )
+
+  const reloadBalances = useCallback(() => {
+    FP.pipe(
+      sequenceTOption(oRouteSource, oRouteTarget),
+      O.map(([{ chain: sourceChain }, { chain: targetChain }]) => {
+        if (eqChain.equals(sourceChain, targetChain)) {
+          reloadBalancesByChain(sourceChain)()
+        } else {
+          reloadBalancesByChain(sourceChain)()
+          reloadBalancesByChain(targetChain)()
+        }
+        return true
+      })
+    )
+  }, [oRouteSource, oRouteTarget, reloadBalancesByChain])
+
+  useEffect(() => {
+    // reload balances, whenever sourceAsset and targetAsset have been changed (both are properties of `reloadBalances` )
+    reloadBalances()
+  }, [reloadBalances])
 
   const onChangePath = useCallback(
     (path) => {
