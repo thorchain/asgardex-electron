@@ -7,10 +7,12 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
-import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { ErrorView } from '../../components/shared/error'
+import { BackLink } from '../../components/uielements/backLink'
 import { AssetDetails } from '../../components/wallet/assets'
 import { useAppContext } from '../../contexts/AppContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -20,8 +22,11 @@ import { DEFAULT_NETWORK } from '../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
-  const { asset, walletAddress } = useParams<AssetDetailsParams>()
-  const oSelectedAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
+  const intl = useIntl()
+
+  const { asset: routeAsset, walletAddress } = useParams<AssetDetailsParams>()
+
+  const oRouteAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(routeAsset)), [routeAsset])
   const oWalletAddress = useMemo(
     () =>
       FP.pipe(
@@ -34,13 +39,13 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   // Set selected asset once
   // Needed to get all data for this asset (transactions etc.)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setSelectedAsset(oSelectedAsset), [])
+  useEffect(() => setSelectedAsset(oRouteAsset), [])
 
   const {
     getTxs$,
     balancesState$,
     loadTxs,
-    reloadBalances$,
+    reloadBalancesByChain,
     setSelectedAsset,
     getExplorerTxUrl$,
     resetTxsPage
@@ -49,7 +54,6 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
-  const [reloadBalances] = useObservableState(() => reloadBalances$.pipe(RxOp.map(O.toUndefined)))
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
   useEffect(() => {
@@ -77,18 +81,43 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
+  const renderAssetError = useMemo(
+    () => (
+      <>
+        <BackLink />
+        <ErrorView
+          title={intl.formatMessage(
+            { id: 'routes.invalid.asset' },
+            {
+              routeAsset
+            }
+          )}
+        />
+      </>
+    ),
+    [routeAsset, intl]
+  )
+
   return (
     <>
-      <AssetDetails
-        txsPageRD={txsRD}
-        balances={walletBalances}
-        asset={oSelectedAsset}
-        loadTxsHandler={loadTxs}
-        reloadBalancesHandler={reloadBalances}
-        getExplorerTxUrl={getExplorerTxUrl}
-        walletAddress={oWalletAddress}
-        network={network}
-      />
+      {FP.pipe(
+        oRouteAsset,
+        O.fold(
+          () => renderAssetError,
+          (asset) => (
+            <AssetDetails
+              txsPageRD={txsRD}
+              balances={walletBalances}
+              asset={asset}
+              loadTxsHandler={loadTxs}
+              reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
+              getExplorerTxUrl={getExplorerTxUrl}
+              walletAddress={oWalletAddress}
+              network={network}
+            />
+          )
+        )
+      )}
     </>
   )
 }

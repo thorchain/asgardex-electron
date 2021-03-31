@@ -7,7 +7,7 @@ import {
   reloadBalances,
   balancesState$,
   chainBalances$,
-  reloadBalances$,
+  reloadBalancesByChain,
   keystoreService,
   selectedAsset$,
   loadTxs,
@@ -23,7 +23,7 @@ type WalletContextValue = {
   balancesState$: typeof balancesState$
   chainBalances$: typeof chainBalances$
   loadTxs: typeof loadTxs
-  reloadBalances$: typeof reloadBalances$
+  reloadBalancesByChain: typeof reloadBalancesByChain
   getExplorerTxUrl$: typeof getExplorerTxUrl$
   selectedAsset$: typeof selectedAsset$
   getTxs$: typeof getTxs$
@@ -34,7 +34,7 @@ type WalletContextValue = {
 const initialContext: WalletContextValue = {
   keystoreService,
   reloadBalances,
-  reloadBalances$,
+  reloadBalancesByChain,
   loadTxs,
   balancesState$,
   chainBalances$,
