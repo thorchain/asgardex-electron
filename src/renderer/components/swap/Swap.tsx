@@ -265,9 +265,8 @@ export const Swap = ({
     RD.initial
   )
 
-  // Reload balances at `onmount`
+  // Reload balances at `onMount`
   useEffect(() => {
-    console.log('onMount')
     reloadBalances()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

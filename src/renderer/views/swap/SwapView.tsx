@@ -173,6 +173,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   }, [oRouteSource, oRouteTarget, reloadBalancesByChain])
 
   useEffect(() => {
+    // reload balances, whenever sourceAsset and targetAsset have been changed (both are properties of `reloadBalances` )
     reloadBalances()
   }, [reloadBalances])
 
