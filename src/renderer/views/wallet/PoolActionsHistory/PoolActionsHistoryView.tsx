@@ -114,7 +114,6 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
       clickTxLinkHandler={goToTx}
       currentFilter={requestParams.current.type || 'ALL'}
       setFilter={setFilter}
-      reload={poolActionsHistory.reloadActionsHistory}
     />
   )
 }
