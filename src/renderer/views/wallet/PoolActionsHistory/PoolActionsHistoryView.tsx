@@ -18,7 +18,6 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { ENABLED_CHAINS } from '../../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../../services/midgard/types'
-import * as Styled from './PoolActionsHistoryView.styles'
 
 export const PoolActionsHistoryView: React.FC = () => {
   const {
@@ -105,19 +104,16 @@ export const PoolActionsHistoryView: React.FC = () => {
   )
 
   return (
-    <>
-      <Styled.BackLink />
-      <PoolActionsHistory
-        currentPage={requestParams.current.page + 1}
-        actionsPageRD={historyPage}
-        prevActionsPage={prevActionsPage.current}
-        goToTx={goToTx}
-        changePaginationHandler={setCurrentPage}
-        clickTxLinkHandler={goToTx}
-        currentFilter={requestParams.current.type || 'ALL'}
-        setFilter={setFilter}
-        reload={poolActionsHistory.reloadActionsHistory}
-      />
-    </>
+    <PoolActionsHistory
+      currentPage={requestParams.current.page + 1}
+      actionsPageRD={historyPage}
+      prevActionsPage={prevActionsPage.current}
+      goToTx={goToTx}
+      changePaginationHandler={setCurrentPage}
+      clickTxLinkHandler={goToTx}
+      currentFilter={requestParams.current.type || 'ALL'}
+      setFilter={setFilter}
+      reload={poolActionsHistory.reloadActionsHistory}
+    />
   )
 }
