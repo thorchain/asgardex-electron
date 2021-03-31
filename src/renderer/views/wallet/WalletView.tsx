@@ -20,6 +20,7 @@ import { CreateView } from './CreateView'
 import { ImportsView } from './importsView'
 import { InteractView } from './Interact'
 import { NoWalletView } from './NoWalletView'
+import { PoolActionsHistoryView } from './PoolActionsHistory'
 import { PoolShareView } from './PoolShareView'
 import { SendView } from './send'
 import { SettingsView } from './SettingsView'
@@ -93,6 +94,9 @@ export const WalletView: React.FC = (): JSX.Element => {
           </Route>
           <Route path={walletRoutes.assetDetail.template} exact>
             <AssetDetailsView />
+          </Route>
+          <Route path={walletRoutes.history.template}>
+            <PoolActionsHistoryView />
           </Route>
         </Switch>
       </>
