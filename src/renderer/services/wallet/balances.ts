@@ -225,10 +225,3 @@ export const balancesState$: Observable<BalancesState> = Rx.combineLatest(
   })),
   RxOp.startWith(INITIAL_BALANCES_STATE)
 )
-
-THOR.balances$.subscribe((v) => console.log('THOR.balances$', v))
-BNB.balances$.subscribe((v) => console.log('BNB.balances$', v))
-BTC.balances$.subscribe((v) => console.log('BTC.balances$', v))
-LTC.balances$.subscribe((v) => console.log('LTC.balances$', v))
-BCH.balances$.subscribe((v) => console.log('BCH.balances$', v))
-ETH.balances$(ETHAssets).subscribe((v) => console.log('ETH.balances$', v))
