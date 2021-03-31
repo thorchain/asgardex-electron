@@ -9,17 +9,10 @@ import { Button as UIButton } from '../uielements/button'
 import { TxType as TxTypeUI } from '../uielements/txType'
 import { PoolActionsHistoryFilter } from './PoolActionsHistoryFilter'
 
-export const ControlsContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: flex-end;
-  margin-bottom: 10px;
-`
-
 export const ActionsFilter = styled(PoolActionsHistoryFilter)`
   align-self: flex-end;
   margin-right: 20px;
+  margin-bottom: 10px;
 `
 
 export const List = styled(A.List)`

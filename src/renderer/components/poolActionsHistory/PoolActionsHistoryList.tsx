@@ -81,15 +81,11 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
 
   return (
     <div className={className}>
-      <Styled.ControlsContainer>
-        {
-          <Styled.ActionsFilter
-            currentFilter={currentFilter}
-            onFilterChanged={setFilter}
-            disabled={!RD.isSuccess(actionsPageRD)}
-          />
-        }
-      </Styled.ControlsContainer>
+      <Styled.ActionsFilter
+        currentFilter={currentFilter}
+        onFilterChanged={setFilter}
+        disabled={!RD.isSuccess(actionsPageRD)}
+      />
       {FP.pipe(
         actionsPageRD,
         RD.fold(
