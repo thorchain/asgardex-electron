@@ -124,10 +124,10 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const activeKey: TabKey = useMemo(() => {
     if (matchPoolsRoute) {
       return TabKey.POOLS
-    } else if (matchWalletRoute) {
-      return TabKey.WALLET
     } else if (matchHistoryRoute) {
       return TabKey.HISTORY
+    } else if (matchWalletRoute) {
+      return TabKey.WALLET
     } else {
       return TabKey.UNKNOWN
     }
