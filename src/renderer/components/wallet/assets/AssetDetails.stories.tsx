@@ -4,7 +4,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import { BaseStory } from '@storybook/addons'
 import { assetAmount, AssetBNB, AssetRune67C, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
-import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { WalletBalance, WalletBalances } from '../../../types/wallet'
@@ -34,17 +33,17 @@ const getBalances = (balances: WalletBalances) => NEA.fromArray<WalletBalance>(b
 const balances = getBalances([bnbBalance, runeBnbBalance, runeNativeBalance])
 
 export const StoryBNB: BaseStory<never, JSX.Element> = () => (
-  <AssetDetails txsPageRD={RD.initial} balances={balances} asset={O.some(AssetBNB)} network="testnet" />
+  <AssetDetails txsPageRD={RD.initial} balances={balances} asset={AssetBNB} network="testnet" />
 )
 StoryBNB.storyName = 'BNB'
 
 export const StoryRuneTxSuccess: BaseStory<never, JSX.Element> = () => (
-  <AssetDetails txsPageRD={RD.initial} balances={balances} asset={O.some(AssetRune67C)} network="testnet" />
+  <AssetDetails txsPageRD={RD.initial} balances={balances} asset={AssetRune67C} network="testnet" />
 )
 StoryRuneTxSuccess.storyName = 'RUNE - tx success'
 
 export const StoryRuneTxError: BaseStory<never, JSX.Element> = () => (
-  <AssetDetails txsPageRD={RD.initial} balances={balances} asset={O.some(AssetRune67C)} network="testnet" />
+  <AssetDetails txsPageRD={RD.initial} balances={balances} asset={AssetRune67C} network="testnet" />
 )
 StoryRuneTxError.storyName = 'RUNE - tx error'
 
@@ -52,7 +51,7 @@ export const StoryRuneNoBalances: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     txsPageRD={RD.initial}
     balances={getBalances([runeBalanceEmpty, bnbBalance])}
-    asset={O.some(AssetRune67C)}
+    asset={AssetRune67C}
     network="testnet"
   />
 )
@@ -62,7 +61,7 @@ export const StoryRuneFeeNotCovered: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     txsPageRD={RD.initial}
     balances={getBalances([runeBnbBalance, bnbBalanceEmpty])}
-    asset={O.some(AssetRune67C)}
+    asset={AssetRune67C}
     network="mainnet"
   />
 )
