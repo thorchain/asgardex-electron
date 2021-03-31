@@ -18,7 +18,6 @@ import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
 import { useThemeContext } from '../../contexts/ThemeContext'
-import * as historyRoutes from '../../routes/history'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { PoolsStateRD, SelectedPricePoolAsset } from '../../services/midgard/types'
@@ -120,15 +119,15 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const matchPoolsRoute = useRouteMatch(poolsRoutes.base.path())
   const matchWalletRoute = useRouteMatch(walletRoutes.base.path())
-  const matchHistoryRoute = useRouteMatch(historyRoutes.base.path())
+  const matchHistoryRoute = useRouteMatch(walletRoutes.history.path())
 
   const activeKey: TabKey = useMemo(() => {
     if (matchPoolsRoute) {
       return TabKey.POOLS
-    } else if (matchWalletRoute) {
-      return TabKey.WALLET
     } else if (matchHistoryRoute) {
       return TabKey.HISTORY
+    } else if (matchWalletRoute) {
+      return TabKey.WALLET
     } else {
       return TabKey.UNKNOWN
     }
@@ -151,7 +150,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
       {
         key: TabKey.HISTORY,
         label: intl.formatMessage({ id: 'common.history' }),
-        path: historyRoutes.base.path(),
+        path: walletRoutes.history.path(),
         icon: HistoryIcon
       }
     ],
