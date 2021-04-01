@@ -36,6 +36,11 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
 
   const requestParams = useRef(DEFAULT_REQUEST_PARAMS)
 
+  /**
+   * setHistoryPageParams receives Partial parameters to have an opportunity to
+   * change request parameters only by small parts (not all in one). e.g setCurrentPage.
+   * To store previously chosen request parameters that should not be changed `requestParams` ref is used.
+   */
   const [historyPage, setHistoryPageParams] = useObservableState<PoolActionsHistoryPageRD, Partial<LoadActionsParams>>(
     (params$) =>
       FP.pipe(
@@ -43,6 +48,7 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
         RxOp.startWith(DEFAULT_REQUEST_PARAMS),
         RxOp.map((params) => {
           const res = {
+            // Merge previously saved request parameters with a new Partial parameters
             ...requestParams.current,
             asset: assetToString(poolAsset),
             ...params
@@ -69,6 +75,7 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
   const setFilter = useCallback(
     (filter: Filter) => {
       setHistoryPageParams({
+        // For every new filter reset all parameters to default and pass a filter
         ...DEFAULT_REQUEST_PARAMS,
         type: filter
       })
