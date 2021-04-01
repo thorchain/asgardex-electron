@@ -2,6 +2,7 @@ import React from 'react'
 
 import { storiesOf } from '@storybook/react'
 import { assetAmount, AssetETH, bn } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/Option'
 
 import { PoolDetails } from './PoolDetails'
 
@@ -17,7 +18,7 @@ export const PoolDetailsStory = () => {
       totalStakers={307}
       priceUSD={assetAmount(1)}
       priceSymbol={'R'}
-      asset={AssetETH}
+      asset={O.some(AssetETH)}
       HistoryView={() => <>Actions History Here</>}
     />
   )

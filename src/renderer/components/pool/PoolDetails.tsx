@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { Asset, AssetAmount } from '@xchainjs/xchain-util'
 import * as A from 'antd'
 import BigNumber from 'bignumber.js'
-import * as O from 'fp-ts/lib/Option'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 
 import { PoolCards } from './PoolCards'
 import { PoolChart } from './PoolChart'
@@ -11,7 +12,7 @@ import * as Styled from './PoolDetails.style'
 import { PoolTitle } from './PoolTitle'
 
 export type Props = {
-  asset: Asset
+  asset: O.Option<Asset>
   depth: AssetAmount
   depthTrend?: BigNumber
   volume24hr: AssetAmount
@@ -46,10 +47,21 @@ export const PoolDetails: React.FC<Props> = ({
   isLoading,
   HistoryView
 }) => {
+  const renderHistoryView = useMemo(
+    () =>
+      FP.pipe(
+        asset,
+        O.fold(
+          () => <></>,
+          (asset) => <HistoryView poolAsset={asset} />
+        )
+      ),
+    [asset, HistoryView]
+  )
   return (
     <Styled.Container>
       <A.Col span={24}>
-        <PoolTitle asset={O.some(asset)} priceUSD={priceUSD} isLoading={isLoading} />
+        <PoolTitle asset={asset} priceUSD={priceUSD} isLoading={isLoading} />
       </A.Col>
       <A.Col xs={24} md={8}>
         <PoolCards
@@ -70,9 +82,7 @@ export const PoolDetails: React.FC<Props> = ({
       <A.Col xs={24} md={16}>
         <PoolChart isLoading={isLoading} />
       </A.Col>
-      <A.Col span={24}>
-        <HistoryView poolAsset={asset} />
-      </A.Col>
+      <A.Col span={24}>{renderHistoryView}</A.Col>
     </Styled.Container>
   )
 }
