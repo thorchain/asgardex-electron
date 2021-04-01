@@ -44,7 +44,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     balancesState$,
     getExplorerTxUrl$,
     keystoreService: { validatePassword$ },
-    reloadBalances
+    reloadBalancesByChain
   } = useWalletContext()
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
@@ -150,7 +150,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
               fee={upgradeFeeRD}
               balances={oBalances}
               successActionHandler={successActionHandler}
-              reloadBalancesHandler={reloadBalances}
+              reloadBalancesHandler={reloadBalancesByChain(runeBnbAsset.chain)}
               network={network}
             />
           </>

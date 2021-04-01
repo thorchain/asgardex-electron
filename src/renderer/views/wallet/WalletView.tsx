@@ -20,19 +20,20 @@ import { CreateView } from './CreateView'
 import { ImportsView } from './importsView'
 import { InteractView } from './Interact'
 import { NoWalletView } from './NoWalletView'
-import { PoolActionsHistoryView } from './PoolActionsHistory'
 import { PoolShareView } from './PoolShareView'
 import { SendView } from './send'
 import { SettingsView } from './SettingsView'
 import { UnlockView } from './UnlockView'
 import { UpgradeView } from './UpgradeView'
+import * as Styled from './WalletView.styles'
 
 export const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService, reloadBalances } = useWalletContext()
   const {
     service: {
       shares: { reloadCombineSharesByAddresses },
-      pools: { reloadAllPools }
+      pools: { reloadAllPools },
+      poolActionsHistory
     }
   } = useMidgardContext()
   const { reloadNodesInfo } = useThorchainContext()
@@ -96,12 +97,21 @@ export const WalletView: React.FC = (): JSX.Element => {
             <AssetDetailsView />
           </Route>
           <Route path={walletRoutes.history.template}>
-            <PoolActionsHistoryView />
+            {reloadButton(poolActionsHistory.reloadActionsHistory)}
+            <AssetsNav />
+            <Styled.PoolActionsHistory />
           </Route>
         </Switch>
       </>
     ),
-    [reloadAllPools, reloadBalances, reloadButton, reloadCombineSharesByAddresses, reloadNodesInfo]
+    [
+      reloadAllPools,
+      reloadBalances,
+      reloadButton,
+      reloadCombineSharesByAddresses,
+      reloadNodesInfo,
+      poolActionsHistory.reloadActionsHistory
+    ]
   )
 
   const renderWalletRoute = useCallback(

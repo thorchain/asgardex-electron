@@ -142,14 +142,12 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   const [filter, setFilter] = useState<Filter>('ALL')
   return (
     <PoolActionsHistory
-      reload={() => console.log('reload')}
       currentFilter={filter}
       setFilter={setFilter}
       goToTx={console.log}
       actionsPageRD={res}
       changePaginationHandler={setCurrentPage}
       currentPage={currentPage}
-      clickTxLinkHandler={console.log}
     />
   )
 }

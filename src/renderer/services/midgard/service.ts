@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import midgard from '@thorchain/asgardex-midgard'
+// Byzantine module is disabled temporary
+// import midgard from '@thorchain/asgardex-midgard'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -36,6 +37,8 @@ const MIDGARD_TESTNET_URL = envOrDefault(
   'https://testnet.midgard.thorchain.info'
 )
 
+const MIDGARD_MAINNET_URL = envOrDefault(process.env.REACT_APP_MIDGARD_MAINNET_URL, 'https://midgard.thorchain.info')
+
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
  */
@@ -48,7 +51,9 @@ const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.
   (network: Network) => {
     // option to set Midgard url (for testnet + development only)
     if (network === 'testnet') return Promise.resolve(RD.success(MIDGARD_TESTNET_URL))
-    else return midgard(network, true).then(RD.success)
+    // Byzantine module is disabled temporary
+    // return midgard(network, true).then(RD.success)
+    return Promise.resolve(RD.success(MIDGARD_MAINNET_URL))
   },
   RD.pending,
   RD.failure

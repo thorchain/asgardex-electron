@@ -51,6 +51,9 @@ import {
   SwapHistoryLD,
   ApiGetSwapHistoryParams,
   GetSwapHistoryParams,
+  GetDepthHistoryParams,
+  DepthHistoryLD,
+  ApiGetDepthHistoryParams,
   EarningsHistoryLD,
   PoolEarningHistoryLD
 } from './types'
@@ -392,7 +395,6 @@ const createPoolsService = (
         RxOp.switchMap(() => Rx.of(oSelectedPoolAsset))
       )
     ),
-    RxOp.filter(O.isSome),
     RxOp.switchMap((selectedPoolAsset) => {
       return FP.pipe(
         selectedPoolAsset,
@@ -595,13 +597,7 @@ const createPoolsService = (
     )
 
   const poolLegacyDetail$: PoolLegacyDetailLD = Rx.combineLatest([selectedPoolAsset$, reloadSelectedPoolDetail$]).pipe(
-    RxOp.switchMap(([oSelectedPoolAsset, delay]) =>
-      FP.pipe(
-        Rx.timer(delay),
-        RxOp.switchMap(() => Rx.of(oSelectedPoolAsset))
-      )
-    ),
-    RxOp.filter(O.isSome),
+    RxOp.map(([oSelectedPoolAsset]) => oSelectedPoolAsset),
     RxOp.switchMap((selectedPoolAsset) => {
       return FP.pipe(
         selectedPoolAsset,
@@ -741,6 +737,45 @@ const createPoolsService = (
       RxOp.shareReplay(1)
     )
 
+  // Factory to get depth history from Midgard
+  const apiGetDepthHistory$ = (params: ApiGetDepthHistoryParams): DepthHistoryLD => {
+    const { poolAsset, ...otherParams } = params
+    return FP.pipe(
+      midgardDefaultApi$,
+      liveData.chain((api) =>
+        FP.pipe(
+          api.getDepthHistory({ pool: assetToString(poolAsset), ...otherParams }),
+          RxOp.map(RD.success),
+          RxOp.startWith(RD.pending),
+          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+        )
+      ),
+      RxOp.shareReplay(1)
+    )
+  }
+
+  const { stream$: reloadDepthHistory$, trigger: reloadDepthHistory } = triggerStream()
+
+  const getDepthHistory$ = (params: GetDepthHistoryParams): DepthHistoryLD =>
+    FP.pipe(
+      Rx.combineLatest([selectedPoolAsset$, reloadDepthHistory$]),
+      RxOp.switchMap(([oSelectedPoolAsset]) =>
+        FP.pipe(
+          oSelectedPoolAsset,
+          O.fold(
+            () => Rx.of(RD.initial),
+            (selectedPoolAsset) =>
+              apiGetDepthHistory$({
+                poolAsset: selectedPoolAsset,
+                ...params
+              })
+          )
+        )
+      ),
+      RxOp.startWith(RD.initial),
+      RxOp.shareReplay(1)
+    )
+
   return {
     poolsState$,
     pendingPoolsState$,
@@ -764,6 +799,8 @@ const createPoolsService = (
     poolLiquidityHistory$,
     getSwapHistory$,
     reloadSwapHistory,
+    getDepthHistory$,
+    reloadDepthHistory,
     priceRatio$,
     availableAssets$,
     validatePool$,

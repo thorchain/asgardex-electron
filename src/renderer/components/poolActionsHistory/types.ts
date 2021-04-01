@@ -10,9 +10,7 @@ export type Props = {
   prevActionsPage?: O.Option<PoolActionsHistoryPage>
   goToTx: (txHash: string) => void
   changePaginationHandler: (page: number) => void
-  clickTxLinkHandler: (txHash: string) => void
   currentFilter: Filter
   setFilter: (filter: Filter) => void
-  reload: () => void
   className?: string
 }

@@ -12,7 +12,6 @@ import { palette, size } from 'styled-theme'
 
 import { Locale } from '../../../shared/i18n/types'
 import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
-import { ReactComponent as HistoryIcon } from '../../assets/svg/icon-history.svg'
 import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
@@ -35,7 +34,6 @@ import { HeaderTheme } from './theme'
 enum TabKey {
   POOLS = 'pools',
   WALLET = 'wallet',
-  HISTORY = 'history',
   UNKNOWN = 'unknown'
 }
 
@@ -119,19 +117,16 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const matchPoolsRoute = useRouteMatch(poolsRoutes.base.path())
   const matchWalletRoute = useRouteMatch(walletRoutes.base.path())
-  const matchHistoryRoute = useRouteMatch(walletRoutes.history.path())
 
   const activeKey: TabKey = useMemo(() => {
     if (matchPoolsRoute) {
       return TabKey.POOLS
-    } else if (matchHistoryRoute) {
-      return TabKey.HISTORY
     } else if (matchWalletRoute) {
       return TabKey.WALLET
     } else {
       return TabKey.UNKNOWN
     }
-  }, [matchPoolsRoute, matchWalletRoute, matchHistoryRoute])
+  }, [matchPoolsRoute, matchWalletRoute])
 
   const items: Tab[] = useMemo(
     () => [
@@ -146,12 +141,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
         label: intl.formatMessage({ id: 'common.wallet' }),
         path: walletRoutes.base.path(),
         icon: WalletIcon
-      },
-      {
-        key: TabKey.HISTORY,
-        label: intl.formatMessage({ id: 'common.history' }),
-        path: walletRoutes.history.path(),
-        icon: HistoryIcon
       }
     ],
     [intl]

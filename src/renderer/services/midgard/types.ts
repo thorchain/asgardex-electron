@@ -22,7 +22,9 @@ import {
   SwapHistory,
   GetSwapHistoryRequest,
   EarningsHistory,
-  EarningsHistoryItemPool
+  EarningsHistoryItemPool,
+  GetDepthHistoryRequest,
+  DepthHistory
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { Memo } from '../chain/types'
@@ -140,6 +142,11 @@ export type GetSwapHistoryParams = Omit<ApiGetSwapHistoryParams, 'poolAsset'>
 export type SwapHistoryRD = RD.RemoteData<Error, SwapHistory>
 export type SwapHistoryLD = LiveData<Error, SwapHistory>
 
+export type ApiGetDepthHistoryParams = { poolAsset: Asset } & Omit<GetDepthHistoryRequest, 'pool'>
+export type GetDepthHistoryParams = Omit<ApiGetDepthHistoryParams, 'poolAsset'>
+export type DepthHistoryRD = RD.RemoteData<Error, DepthHistory>
+export type DepthHistoryLD = LiveData<Error, DepthHistory>
+
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 
@@ -171,6 +178,8 @@ export type PoolsService = {
   poolLiquidityHistory$: (parmas: PoolLiquidityHistoryParams) => PoolLiquidityHistoryLD
   getSwapHistory$: (params: GetSwapHistoryParams) => SwapHistoryLD
   reloadSwapHistory: FP.Lazy<void>
+  getDepthHistory$: (params: GetDepthHistoryParams) => DepthHistoryLD
+  reloadDepthHistory: FP.Lazy<void>
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD

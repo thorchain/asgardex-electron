@@ -80,9 +80,9 @@ export type BalancesState = {
 }
 
 export type LoadTxsHandler = (props: LoadTxsParams) => void
-export type ResetTxsPageHandler = () => void
+export type ResetTxsPageHandler = FP.Lazy<void>
 
-export type LoadBalancesHandler = () => void
+export type LoadBalancesHandler = FP.Lazy<void>
 
 export enum ErrorId {
   GET_BALANCES = 'GET_BALANCES',

@@ -1,21 +1,24 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { assetAmount, assetFromString, baseAmount, baseToAsset, bn, bnOrZero } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
-import * as O from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/Option'
 import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
 import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
-import { PoolStatus } from '../../components/uielements/poolStatus'
+import { ErrorView } from '../../components/shared/error'
+import { RefreshButton } from '../../components/uielements/button'
 import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
 import { PoolDetailRD, PoolEarningHistoryRD, PoolStatsDetailRD } from '../../services/midgard/types'
 import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard'
+import * as Styled from './PoolDetailsView.styles'
+import { PoolHistory } from './PoolHistoryView'
 
 // TODO (@asgdx-team) Extract follwing helpers into PoolDetailsView.helper + add tests
 
@@ -48,8 +51,9 @@ const getFees = (data: Pick<PoolStatsDetail, 'totalFees'>, priceRatio: BigNumber
 
 const getAPY = (data: Pick<PoolDetail, 'poolAPY'>) => bn(data.poolAPY).plus(1).multipliedBy(100)
 
-const defaultDetailsProps: PoolDetailProps = {
-  asset: O.none,
+type TargetPoolDetailProps = Omit<PoolDetailProps, 'asset'>
+
+const defaultDetailsProps: TargetPoolDetailProps = {
   liquidity: ZERO_ASSET_AMOUNT,
   volumn: ZERO_ASSET_AMOUNT,
   earnings: ZERO_ASSET_AMOUNT,
@@ -58,16 +62,22 @@ const defaultDetailsProps: PoolDetailProps = {
   totalSwaps: bn(0),
   members: bn(0),
   apy: bn(0),
-  price: ZERO_ASSET_AMOUNT
+  price: ZERO_ASSET_AMOUNT,
+  HistoryView: PoolHistory
 }
-
-const renderPendingView = () => <PoolDetails {...defaultDetailsProps} isLoading={true} />
-const renderInitialView = () => <PoolDetails {...defaultDetailsProps} />
 
 export const PoolDetailsView: React.FC = () => {
   const {
     service: {
-      pools: { selectedPoolDetail$, priceRatio$, selectedPricePoolAssetSymbol$, poolStatsDetail$, poolEarningHistory$ },
+      pools: {
+        selectedPoolDetail$,
+        priceRatio$,
+        selectedPricePoolAssetSymbol$,
+        poolStatsDetail$,
+        poolEarningHistory$,
+        reloadSelectedPoolDetail
+      },
+      poolActionsHistory: { reloadActionsHistory, isHistoryLoading$ },
       setSelectedPoolAsset
     }
   } = useMidgardContext()
@@ -88,44 +98,68 @@ export const PoolDetailsView: React.FC = () => {
     }
   }, [oRouteAsset, setSelectedPoolAsset])
 
-  const routeAssetRD = RD.fromOption(oRouteAsset, () =>
-    Error(intl.formatMessage({ id: 'routes.invalid.asset' }, { asset }))
-  )
-
   const priceSymbol = useObservableState(selectedPricePoolAssetSymbol$, O.none)
 
   const priceRatio = useObservableState(priceRatio$, ONE_BN)
+
+  const isHistoryLoading = useObservableState(isHistoryLoading$, false)
 
   const poolDetailRD: PoolDetailRD = useObservableState(selectedPoolDetail$, RD.initial)
 
   const poolStatsDetailRD: PoolStatsDetailRD = useObservableState(poolStatsDetail$, RD.initial)
   const poolEarningHistoryRD: PoolEarningHistoryRD = useObservableState(poolEarningHistory$, RD.initial)
 
-  return FP.pipe(
-    RD.combine(routeAssetRD, poolDetailRD, poolStatsDetailRD, poolEarningHistoryRD),
-    RD.fold(
-      renderInitialView,
-      renderPendingView,
-      (e: Error) => {
-        return <PoolStatus label={intl.formatMessage({ id: 'common.error' })} displayValue={e.message} />
-      },
-      ([asset, poolDetail, poolStatsDetail, poolEarningHistory]) => {
-        return (
-          <PoolDetails
-            asset={O.some(asset)}
-            liquidity={getDepth(poolDetail, priceRatio)}
-            volumn={getVolume(poolDetail, priceRatio)}
-            earnings={getEarnings(poolEarningHistory, priceRatio)}
-            fees={getFees(poolStatsDetail, priceRatio)}
-            totalTx={getTotalTx(poolStatsDetail)}
-            totalSwaps={getTotalSwaps(poolStatsDetail)}
-            members={getMembers(poolStatsDetail)}
-            apy={getAPY(poolDetail)}
-            price={getPrice(poolDetail, priceRatio)}
-            priceSymbol={O.toUndefined(priceSymbol)}
-          />
+  const onRefreshData = useCallback(() => {
+    reloadSelectedPoolDetail()
+    reloadActionsHistory()
+  }, [reloadSelectedPoolDetail, reloadActionsHistory])
+
+  const refreshButtonDisabled = useMemo(() => {
+    return isHistoryLoading || FP.pipe(poolDetailRD, RD.isPending)
+  }, [isHistoryLoading, poolDetailRD])
+
+  const prevProps = useRef<TargetPoolDetailProps>(defaultDetailsProps)
+
+  return (
+    <>
+      <Styled.ControlsContainer>
+        <Styled.BackLink />
+        <RefreshButton clickHandler={onRefreshData} disabled={refreshButtonDisabled} />
+      </Styled.ControlsContainer>
+      {FP.pipe(
+        oRouteAsset,
+        O.fold(
+          () => <ErrorView title={intl.formatMessage({ id: 'routes.invalid.asset' }, { asset })} />,
+          (asset) =>
+            FP.pipe(
+              RD.combine(poolDetailRD, poolStatsDetailRD, poolEarningHistoryRD),
+              RD.fold(
+                () => <PoolDetails asset={asset} {...defaultDetailsProps} />,
+                () => <PoolDetails asset={asset} {...prevProps.current} isLoading />,
+                ({ message }: Error) => {
+                  return <ErrorView title={message} />
+                },
+                ([poolDetail, poolStatsDetail, poolEarningHistory]) => {
+                  prevProps.current = {
+                    liquidity: getDepth(poolDetail, priceRatio),
+                    volumn: getVolume(poolDetail, priceRatio),
+                    earnings: getEarnings(poolEarningHistory, priceRatio),
+                    fees: getFees(poolStatsDetail, priceRatio),
+                    totalTx: getTotalTx(poolStatsDetail),
+                    totalSwaps: getTotalSwaps(poolStatsDetail),
+                    members: getMembers(poolStatsDetail),
+                    apy: getAPY(poolDetail),
+                    price: getPrice(poolDetail, priceRatio),
+                    priceSymbol: O.toUndefined(priceSymbol),
+                    HistoryView: PoolHistory
+                  }
+
+                  return <PoolDetails asset={asset} {...prevProps.current} />
+                }
+              )
+            )
         )
-      }
-    )
+      )}
+    </>
   )
 }
