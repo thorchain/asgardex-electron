@@ -148,7 +148,6 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
       actionsPageRD={res}
       changePaginationHandler={setCurrentPage}
       currentPage={currentPage}
-      clickTxLinkHandler={console.log}
     />
   )
 }

@@ -111,7 +111,6 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
       prevActionsPage={prevActionsPage.current}
       goToTx={goToTx}
       changePaginationHandler={setCurrentPage}
-      clickTxLinkHandler={goToTx}
       currentFilter={requestParams.current.type || 'ALL'}
       setFilter={setFilter}
     />
