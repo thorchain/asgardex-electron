@@ -657,13 +657,11 @@ const createPoolsService = (
           () => Rx.of(RD.initial),
           (asset) =>
             FP.pipe(
-              FP.pipe(
-                apiGetEarningHistory$({}),
-                liveData.map((history) =>
-                  history.meta.pools.find((pool) => eqOAsset.equals(midgardAssetFromString(pool.pool), O.some(asset)))
-                ),
-                liveData.map((pool) => O.fromNullable(pool))
-              )
+              apiGetEarningHistory$({}),
+              liveData.map((history) =>
+                history.meta.pools.find((pool) => eqOAsset.equals(midgardAssetFromString(pool.pool), O.some(asset)))
+              ),
+              liveData.map((pool) => O.fromNullable(pool))
             )
         )
       )
