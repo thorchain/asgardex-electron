@@ -42,7 +42,7 @@ export const PoolCards: React.FC<Props> = ({
         <PoolStatus
           isLoading={isLoading}
           fullValue={`${priceSymbol} ${formatAssetAmount({ amount: liquidity, trimZeros: true })}`}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.liquidity' })}
+          label={intl.formatMessage({ id: 'common.liquidity' })}
           displayValue={`${priceSymbol} ${abbreviateNumber(liquidity.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
@@ -51,7 +51,7 @@ export const PoolCards: React.FC<Props> = ({
         <PoolStatus
           isLoading={isLoading}
           fullValue={`${priceSymbol} ${formatAssetAmount({ amount: volumn, trimZeros: true })}`}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.volumn' })}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.volume' })}
           displayValue={`${priceSymbol} ${abbreviateNumber(volumn.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
@@ -69,7 +69,7 @@ export const PoolCards: React.FC<Props> = ({
         <PoolStatus
           isLoading={isLoading}
           fullValue={`${priceSymbol} ${formatAssetAmount({ amount: fees, trimZeros: true })}`}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.fees' })}
+          label={intl.formatMessage({ id: 'common.fees' })}
           displayValue={`${priceSymbol} ${abbreviateNumber(fees.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
