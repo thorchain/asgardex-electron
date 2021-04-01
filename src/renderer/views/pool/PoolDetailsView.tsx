@@ -49,7 +49,6 @@ const defaultDetailsProps: PoolDetailProps = {
   HistoryView: PoolHistory
 }
 
-const renderPendingView = () => <PoolDetails {...defaultDetailsProps} isLoading={true} />
 const renderInitialView = () => <PoolDetails {...defaultDetailsProps} />
 
 export const PoolDetailsView: React.FC = () => {
@@ -99,7 +98,7 @@ export const PoolDetailsView: React.FC = () => {
     return isHistoryLoading || FP.pipe(poolDetailRD, RD.isPending)
   }, [isHistoryLoading, poolDetailRD])
 
-  const prev = useRef<React.ReactElement>()
+  const prevProps = useRef<PoolDetailProps>(defaultDetailsProps)
 
   return (
     <>
@@ -111,24 +110,24 @@ export const PoolDetailsView: React.FC = () => {
         RD.combine(routeAssetRD, poolDetailRD),
         RD.fold(
           renderInitialView,
-          () => prev.current || renderPendingView(),
+          () => <PoolDetails {...prevProps.current} isLoading />,
           (e: Error) => {
             return <PoolStatus label={intl.formatMessage({ id: 'common.error' })} displayValue={e.message} />
           },
           ([asset, poolDetail]) => {
-            return (prev.current = (
-              <PoolDetails
-                asset={O.some(asset)}
-                depth={getDepth(poolDetail, priceRatio)}
-                volume24hr={get24hrVolume(poolDetail, priceRatio)}
-                allTimeVolume={getAllTimeVolume(poolDetail, priceRatio)}
-                totalSwaps={0 /* getTotalSwaps(history) */}
-                totalStakers={0 /* getTotalStakers(poolDetail) */}
-                priceUSD={getPriceUSD(poolDetail, priceRatio)}
-                priceSymbol={O.toUndefined(priceSymbol)}
-                HistoryView={PoolHistory}
-              />
-            ))
+            prevProps.current = {
+              asset: O.some(asset),
+              depth: getDepth(poolDetail, priceRatio),
+              volume24hr: get24hrVolume(poolDetail, priceRatio),
+              allTimeVolume: getAllTimeVolume(poolDetail, priceRatio),
+              totalSwaps: 0 /* getTotalSwaps(history) */,
+              totalStakers: 0 /* getTotalStakers(poolDetail) */,
+              priceUSD: getPriceUSD(poolDetail, priceRatio),
+              priceSymbol: O.toUndefined(priceSymbol),
+              HistoryView: PoolHistory
+            }
+
+            return <PoolDetails {...prevProps.current} />
           }
         )
       )}
