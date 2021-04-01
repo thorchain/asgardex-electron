@@ -38,8 +38,9 @@ const _getTotalSwaps = ({ meta }: SwapHistory) => Number(meta.totalCount)
 
 const _getTotalStakers = (/* _data: ??? */) => 0
 
-const defaultDetailsProps: PoolDetailProps = {
-  asset: O.none,
+type TargetPoolDetailProps = Omit<PoolDetailProps, 'asset'>
+
+const defaultDetailsProps: TargetPoolDetailProps = {
   depth: ZERO_ASSET_AMOUNT,
   volume24hr: ZERO_ASSET_AMOUNT,
   allTimeVolume: ZERO_ASSET_AMOUNT,
@@ -48,8 +49,6 @@ const defaultDetailsProps: PoolDetailProps = {
   priceUSD: ZERO_ASSET_AMOUNT,
   HistoryView: PoolHistory
 }
-
-const renderInitialView = () => <PoolDetails {...defaultDetailsProps} />
 
 export const PoolDetailsView: React.FC = () => {
   const {
@@ -76,11 +75,6 @@ export const PoolDetailsView: React.FC = () => {
     }
   }, [oRouteAsset, setSelectedPoolAsset])
 
-  const routeAssetRD = useMemo(
-    () => RD.fromOption(oRouteAsset, () => Error(intl.formatMessage({ id: 'routes.invalid.asset' }, { asset }))),
-    [oRouteAsset, asset, intl]
-  )
-
   const priceSymbol = useObservableState(selectedPricePoolAssetSymbol$, O.none)
 
   const priceRatio = useObservableState(priceRatio$, ONE_BN)
@@ -98,7 +92,7 @@ export const PoolDetailsView: React.FC = () => {
     return isHistoryLoading || FP.pipe(poolDetailRD, RD.isPending)
   }, [isHistoryLoading, poolDetailRD])
 
-  const prevProps = useRef<PoolDetailProps>(defaultDetailsProps)
+  const prevProps = useRef<TargetPoolDetailProps>(defaultDetailsProps)
 
   return (
     <>
@@ -107,28 +101,39 @@ export const PoolDetailsView: React.FC = () => {
         <RefreshButton clickHandler={onRefreshData} disabled={refreshButtonDisabled} />
       </Styled.ControlsContainer>
       {FP.pipe(
-        RD.combine(routeAssetRD, poolDetailRD),
-        RD.fold(
-          renderInitialView,
-          () => <PoolDetails {...prevProps.current} isLoading />,
-          (e: Error) => {
-            return <PoolStatus label={intl.formatMessage({ id: 'common.error' })} displayValue={e.message} />
-          },
-          ([asset, poolDetail]) => {
-            prevProps.current = {
-              asset: O.some(asset),
-              depth: getDepth(poolDetail, priceRatio),
-              volume24hr: get24hrVolume(poolDetail, priceRatio),
-              allTimeVolume: getAllTimeVolume(poolDetail, priceRatio),
-              totalSwaps: 0 /* getTotalSwaps(history) */,
-              totalStakers: 0 /* getTotalStakers(poolDetail) */,
-              priceUSD: getPriceUSD(poolDetail, priceRatio),
-              priceSymbol: O.toUndefined(priceSymbol),
-              HistoryView: PoolHistory
-            }
+        oRouteAsset,
+        O.fold(
+          () => (
+            <PoolStatus
+              label={intl.formatMessage({ id: 'common.error' })}
+              displayValue={intl.formatMessage({ id: 'routes.invalid.asset' }, { asset })}
+            />
+          ),
+          (asset) =>
+            FP.pipe(
+              poolDetailRD,
+              RD.fold(
+                () => <PoolDetails asset={asset} {...defaultDetailsProps} />,
+                () => <PoolDetails asset={asset} {...prevProps.current} isLoading />,
+                (e: Error) => {
+                  return <PoolStatus label={intl.formatMessage({ id: 'common.error' })} displayValue={e.message} />
+                },
+                (poolDetail) => {
+                  prevProps.current = {
+                    depth: getDepth(poolDetail, priceRatio),
+                    volume24hr: get24hrVolume(poolDetail, priceRatio),
+                    allTimeVolume: getAllTimeVolume(poolDetail, priceRatio),
+                    totalSwaps: 0 /* getTotalSwaps(history) */,
+                    totalStakers: 0 /* getTotalStakers(poolDetail) */,
+                    priceUSD: getPriceUSD(poolDetail, priceRatio),
+                    priceSymbol: O.toUndefined(priceSymbol),
+                    HistoryView: PoolHistory
+                  }
 
-            return <PoolDetails {...prevProps.current} />
-          }
+                  return <PoolDetails asset={asset} {...prevProps.current} />
+                }
+              )
+            )
         )
       )}
     </>
