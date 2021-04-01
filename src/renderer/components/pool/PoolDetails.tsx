@@ -12,37 +12,32 @@ import { PoolTitle } from './PoolTitle'
 
 export type Props = {
   asset: Asset
-  depth: AssetAmount
-  depthTrend?: BigNumber
-  volume24hr: AssetAmount
-  volume24hrTrend?: BigNumber
-  allTimeVolume: AssetAmount
-  allTimeVolumeTrend?: BigNumber
-  totalSwaps: number
-  totalSwapsTrend?: BigNumber
-  totalStakers: number
-  totalStakersTrend?: BigNumber
-  // decimal value in percents
-  priceUSD: AssetAmount
+  price: AssetAmount
   priceSymbol?: string
+  liquidity: AssetAmount
+  volumn: AssetAmount
+  earnings: AssetAmount
+  fees: AssetAmount
+  totalTx: BigNumber
+  totalSwaps: BigNumber
+  members: BigNumber
+  apy: BigNumber
   isLoading?: boolean
   HistoryView: React.ComponentType<{ poolAsset: Asset }>
 }
 
 export const PoolDetails: React.FC<Props> = ({
   asset,
-  depth,
-  volume24hr,
-  allTimeVolume,
-  totalStakers,
-  totalSwaps,
-  priceUSD,
+  price,
   priceSymbol = '',
-  depthTrend,
-  volume24hrTrend,
-  allTimeVolumeTrend,
-  totalSwapsTrend,
-  totalStakersTrend,
+  liquidity,
+  volumn,
+  earnings,
+  fees,
+  totalTx,
+  totalSwaps,
+  members,
+  apy,
   isLoading,
   HistoryView
 }) => {
@@ -50,21 +45,19 @@ export const PoolDetails: React.FC<Props> = ({
     <Styled.Container>
       <Styled.TopContainer>
         <A.Col span={24}>
-          <PoolTitle asset={O.some(asset)} priceUSD={priceUSD} isLoading={isLoading} />
+          <PoolTitle asset={O.some(asset)} price={price} priceSymbol={priceSymbol} isLoading={isLoading} />
         </A.Col>
         <A.Col xs={24} md={8}>
           <PoolCards
-            depth={depth}
-            volume24hr={volume24hr}
-            allTimeVolume={allTimeVolume}
-            totalStakers={totalStakers}
+            liquidity={liquidity}
+            volumn={volumn}
+            earnings={earnings}
+            fees={fees}
+            totalTx={totalTx}
             totalSwaps={totalSwaps}
+            members={members}
+            apy={apy}
             priceSymbol={priceSymbol}
-            depthTrend={depthTrend}
-            volume24hrTrend={volume24hrTrend}
-            allTimeVolumeTrend={allTimeVolumeTrend}
-            totalSwapsTrend={totalSwapsTrend}
-            totalStakersTrend={totalStakersTrend}
             isLoading={isLoading}
           />
         </A.Col>

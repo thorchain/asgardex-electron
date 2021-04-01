@@ -36,6 +36,12 @@ const deposit: DepositMessages = {
   'deposit.poolDetails.allTimeVal': 'Volume historique',
   'deposit.poolDetails.totalSwaps': 'Total des échanges',
   'deposit.poolDetails.totalUsers': 'Total des utilisateurs',
+  // Todo: i18n FR
+  'deposit.poolDetails.volume': 'Volumn - FR',
+  'deposit.poolDetails.earnings': 'Earnings - FR',
+  'deposit.poolDetails.totalTx': 'Total Tx - FR',
+  'deposit.poolDetails.members': 'Members - FR',
+  'deposit.poolDetails.apy': 'APY - FR',
   'deposit.wallet.add': 'Ajouter un portefeuille',
   'deposit.wallet.connect': 'Veuillez connecter votre portefeuille',
   'deposit.pool.noShares': 'Vous ne possédez aucune part dans cette pool',

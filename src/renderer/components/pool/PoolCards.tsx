@@ -9,33 +9,29 @@ import { PoolStatus } from '../uielements/poolStatus'
 import * as Styled from './PoolCards.style'
 
 export type Props = {
-  depth: AssetAmount
-  depthTrend?: BigNumber
-  volume24hr: AssetAmount
-  volume24hrTrend?: BigNumber
-  allTimeVolume: AssetAmount
-  allTimeVolumeTrend?: BigNumber
-  totalSwaps: number
-  totalSwapsTrend?: BigNumber
-  totalStakers: number
-  totalStakersTrend?: BigNumber
+  liquidity: AssetAmount
+  volumn: AssetAmount
+  earnings: AssetAmount
+  fees: AssetAmount
+  totalTx: BigNumber
+  totalSwaps: BigNumber
+  members: BigNumber
+  apy: BigNumber
   // decimal value in percents
   priceSymbol?: string
   isLoading?: boolean
 }
 
 export const PoolCards: React.FC<Props> = ({
-  depth,
-  volume24hr,
-  allTimeVolume,
-  totalStakers,
+  liquidity,
+  volumn,
+  earnings,
+  fees,
+  totalTx,
   totalSwaps,
+  members,
+  apy,
   priceSymbol = '',
-  depthTrend,
-  volume24hrTrend,
-  allTimeVolumeTrend,
-  totalSwapsTrend,
-  totalStakersTrend,
   isLoading
 }) => {
   const intl = useIntl()
@@ -45,49 +41,68 @@ export const PoolCards: React.FC<Props> = ({
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: depth, trimZeros: true })}`}
-          trend={depthTrend}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.depth' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(depth.amount().toNumber(), 2)}`}
+          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: liquidity, trimZeros: true })}`}
+          label={intl.formatMessage({ id: 'common.liquidity' })}
+          displayValue={`${priceSymbol} ${abbreviateNumber(liquidity.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
 
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: volume24hr, trimZeros: true })}`}
-          trend={volume24hrTrend}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.24hvol' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(volume24hr.amount().toNumber(), 2)}`}
+          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: volumn, trimZeros: true })}`}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.volume' })}
+          displayValue={`${priceSymbol} ${abbreviateNumber(volumn.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
 
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: allTimeVolume, trimZeros: true })}`}
-          trend={allTimeVolumeTrend}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.allTimeVal' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(allTimeVolume.amount().toNumber(), 2)}`}
+          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: earnings, trimZeros: true })}`}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.earnings' })}
+          displayValue={`${priceSymbol} ${abbreviateNumber(earnings.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
 
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          fullValue={`${totalSwaps}`}
-          trend={totalSwapsTrend}
+          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: fees, trimZeros: true })}`}
+          label={intl.formatMessage({ id: 'common.fees' })}
+          displayValue={`${priceSymbol} ${abbreviateNumber(fees.amount().toNumber(), 2)}`}
+        />
+      </Styled.Col>
+
+      <Styled.Col>
+        <PoolStatus
+          isLoading={isLoading}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.totalTx' })}
+          displayValue={abbreviateNumber(totalTx.toNumber())}
+        />
+      </Styled.Col>
+
+      <Styled.Col>
+        <PoolStatus
+          isLoading={isLoading}
           label={intl.formatMessage({ id: 'deposit.poolDetails.totalSwaps' })}
-          displayValue={abbreviateNumber(totalSwaps)}
+          displayValue={abbreviateNumber(totalSwaps.toNumber())}
         />
       </Styled.Col>
 
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          trend={totalStakersTrend}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.totalUsers' })}
-          displayValue={abbreviateNumber(totalStakers)}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.members' })}
+          displayValue={abbreviateNumber(members.toNumber())}
+        />
+      </Styled.Col>
+
+      <Styled.Col>
+        <PoolStatus
+          isLoading={isLoading}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.apy' })}
+          displayValue={`${abbreviateNumber(apy.toNumber())} %`}
         />
       </Styled.Col>
     </Styled.Container>

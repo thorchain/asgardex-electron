@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 
 import { SwapOutlined } from '@ant-design/icons'
 import { AssetRune } from '@xchainjs/xchain-thorchain'
-import { Asset, AssetAmount, assetToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetToString } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -16,11 +16,12 @@ import * as Styled from './PoolTitle.style'
 
 export type Props = {
   asset: O.Option<Asset>
-  priceUSD: AssetAmount
+  price: AssetAmount
+  priceSymbol?: string
   isLoading?: boolean
 }
 
-export const PoolTitle: React.FC<Props> = ({ asset: oAsset, priceUSD }) => {
+export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol }) => {
   const history = useHistory()
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.md ?? false
@@ -37,20 +38,16 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, priceUSD }) => {
     [oAsset]
   )
 
-  const price = useMemo(
+  const priceStr = useMemo(
     () =>
       FP.pipe(
         oAsset,
         O.fold(
           () => '',
-          () =>
-            formatAssetAmountCurrency({
-              amount: priceUSD,
-              decimal: 3
-            })
+          () => `${priceSymbol} ${price.amount().toFormat(3)}`
         )
       ),
-    [oAsset, priceUSD]
+    [oAsset, price, priceSymbol]
   )
 
   const buttons = useMemo(
@@ -89,7 +86,7 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, priceUSD }) => {
     <Styled.Container>
       <Styled.RowItem>
         <Styled.Title>{title}</Styled.Title>
-        <Styled.Price>{price}</Styled.Price>
+        <Styled.Price>{priceStr}</Styled.Price>
       </Styled.RowItem>
       <Styled.RowItem>{buttons}</Styled.RowItem>
     </Styled.Container>

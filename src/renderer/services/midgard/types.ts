@@ -16,12 +16,13 @@ import {
   PoolDetail,
   Health,
   PoolStatsDetail,
-  GetPoolStatsPeriodEnum,
   PoolLegacyDetail,
   LiquidityHistory,
   GetLiquidityHistoryIntervalEnum,
   SwapHistory,
   GetSwapHistoryRequest,
+  EarningsHistory,
+  EarningsHistoryItemPool,
   GetDepthHistoryRequest,
   DepthHistory
 } from '../../types/generated/midgard'
@@ -120,6 +121,12 @@ export type PoolStatsDetailLD = LiveData<Error, PoolStatsDetail>
 export type PoolLegacyDetailRD = RD.RemoteData<Error, PoolLegacyDetail>
 export type PoolLegacyDetailLD = LiveData<Error, PoolLegacyDetail>
 
+export type EarningsHistoryRD = RD.RemoteData<Error, EarningsHistory>
+export type EarningsHistoryLD = LiveData<Error, EarningsHistory>
+
+export type PoolEarningHistoryRD = RD.RemoteData<Error, O.Option<EarningsHistoryItemPool>>
+export type PoolEarningHistoryLD = LiveData<Error, O.Option<EarningsHistoryItemPool>>
+
 export type PoolLiquidityHistoryParams = {
   interval?: GetLiquidityHistoryIntervalEnum
   count?: number
@@ -165,8 +172,9 @@ export type PoolsService = {
   selectedPoolDetail$: PoolDetailLD
   reloadSelectedPoolDetail: (delay?: number) => void
   reloadPoolStatsDetail: FP.Lazy<void>
-  poolStatsDetail$: (period?: GetPoolStatsPeriodEnum) => PoolStatsDetailLD
+  poolStatsDetail$: PoolStatsDetailLD
   poolLegacyDetail$: PoolLegacyDetailLD
+  poolEarningHistory$: PoolEarningHistoryLD
   poolLiquidityHistory$: (parmas: PoolLiquidityHistoryParams) => PoolLiquidityHistoryLD
   getSwapHistory$: (params: GetSwapHistoryParams) => SwapHistoryLD
   reloadSwapHistory: FP.Lazy<void>
