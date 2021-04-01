@@ -6,13 +6,13 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { LiveData, liveData } from '../../helpers/rx/liveData'
-import { triggerStream } from '../../helpers/stateHelper'
+import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { DefaultApi } from '../../types/generated/midgard/apis'
 import { InlineResponse200 } from '../../types/generated/midgard/models'
 import { MAX_ITEMS_PER_PAGE } from '../const'
 import { ErrorId } from '../wallet/types'
 import { getRequestType, mapAction } from './poolActionsHistory.utils'
-import { PoolActionsHistoryPageLD, TxType } from './types'
+import { PoolActionsHistoryPageLD, PoolActionsHistoryPageRD, TxType } from './types'
 
 export type LoadActionsParams = {
   page: number
@@ -34,6 +34,8 @@ export const createPoolActionsHistoryService = (
   const midgardDefaultApi$ = FP.pipe(byzantine$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
 
   const { stream$: reloadActionsHistory$, trigger: reloadActionsHistory } = triggerStream()
+
+  const { get$: isHistoryLoading$, set: setIsHistoryLoading } = observableState(false)
 
   const actions$ = ({
     itemsPerPage,
@@ -69,7 +71,7 @@ export const createPoolActionsHistoryService = (
             msg: 'Error while getting a history'
           })),
           RxOp.startWith(RD.pending),
-          RxOp.catchError((e) =>
+          RxOp.catchError<PoolActionsHistoryPageRD, PoolActionsHistoryPageLD>((e) =>
             Rx.of(
               RD.failure({
                 errorId: ErrorId.GET_ACTIONS,
@@ -78,11 +80,19 @@ export const createPoolActionsHistoryService = (
             )
           )
         )
-      )
+      ),
+      RxOp.tap((value) => {
+        if (RD.isPending(value)) {
+          setIsHistoryLoading(true)
+        } else {
+          setIsHistoryLoading(false)
+        }
+      })
     )
 
   return {
     actions$,
+    isHistoryLoading$,
     reloadActionsHistory
   }
 }

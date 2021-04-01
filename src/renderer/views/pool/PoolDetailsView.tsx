@@ -56,7 +56,7 @@ export const PoolDetailsView: React.FC = () => {
   const {
     service: {
       pools: { selectedPoolDetail$, priceRatio$, selectedPricePoolAssetSymbol$, reloadSelectedPoolDetail },
-      poolActionsHistory: { reloadActionsHistory },
+      poolActionsHistory: { reloadActionsHistory, isHistoryLoading$ },
       setSelectedPoolAsset
     }
   } = useMidgardContext()
@@ -86,6 +86,8 @@ export const PoolDetailsView: React.FC = () => {
 
   const priceRatio = useObservableState(priceRatio$, ONE_BN)
 
+  const isHistoryLoading = useObservableState(isHistoryLoading$, false)
+
   const poolDetailRD: PoolDetailRD = useObservableState(selectedPoolDetail$, RD.initial)
 
   const onRefreshData = useCallback(() => {
@@ -93,13 +95,17 @@ export const PoolDetailsView: React.FC = () => {
     reloadActionsHistory()
   }, [reloadSelectedPoolDetail, reloadActionsHistory])
 
+  const refreshButtonDisabled = useMemo(() => {
+    return isHistoryLoading || FP.pipe(poolDetailRD, RD.isPending)
+  }, [isHistoryLoading, poolDetailRD])
+
   const prev = useRef<React.ReactElement>()
 
   return (
     <>
       <Styled.ControlsContainer>
         <Styled.BackLink />
-        <RefreshButton clickHandler={onRefreshData} />
+        <RefreshButton clickHandler={onRefreshData} disabled={refreshButtonDisabled} />
       </Styled.ControlsContainer>
       {FP.pipe(
         RD.combine(routeAssetRD, poolDetailRD),
