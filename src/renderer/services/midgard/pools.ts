@@ -561,13 +561,7 @@ const createPoolsService = (
     )
 
   const poolStatsDetail$: PoolStatsDetailLD = Rx.combineLatest([selectedPoolAsset$, reloadSelectedPoolDetail$]).pipe(
-    RxOp.switchMap(([oSelectedPoolAsset, delay]) =>
-      FP.pipe(
-        Rx.timer(delay),
-        RxOp.switchMap(() => Rx.of(oSelectedPoolAsset))
-      )
-    ),
-    RxOp.filter(O.isSome),
+    RxOp.map(([oSelectedPoolAsset]) => oSelectedPoolAsset),
     RxOp.switchMap((selectedPoolAsset) => {
       return FP.pipe(
         selectedPoolAsset,
