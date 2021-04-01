@@ -1,9 +1,14 @@
 import { transparentize } from 'polished'
 import { Line, Bar } from 'react-chartjs-2'
+import * as Chart from 'react-chartjs-2'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
+
+// https://www.chartjs.org/docs/latest/general/fonts.html#missing-fonts
+Chart.defaults.global.defaultFontSize = 14
+Chart.defaults.global.defaultFontStyle = 'normal'
 
 type HeaderToggleProps = {
   primary?: boolean

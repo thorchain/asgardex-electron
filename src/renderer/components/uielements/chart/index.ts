@@ -1,3 +1,3 @@
-import Chart from './chart'
+import Chart from './PoolDetailsChart'
 
 export default Chart
