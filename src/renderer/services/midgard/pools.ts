@@ -714,8 +714,6 @@ const createPoolsService = (
   const getDepthHistory$ = (params: GetDepthHistoryParams): DepthHistoryLD =>
     FP.pipe(
       Rx.combineLatest([selectedPoolAsset$, reloadDepthHistory$]),
-      RxOp.filter(([oSelectedPoolAsset, _]) => O.isSome(oSelectedPoolAsset)),
-
       RxOp.switchMap(([oSelectedPoolAsset]) =>
         FP.pipe(
           oSelectedPoolAsset,
