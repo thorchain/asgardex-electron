@@ -11,11 +11,9 @@
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
-    "plugin:prettier/recommended",
     "plugin:@typescript-eslint/recommended",
     "react-app",
-    "prettier/@typescript-eslint",
-    "prettier"
+    "plugin:prettier/recommended"
   ],
   "globals": {
     "$COMMIT_HASH": true,

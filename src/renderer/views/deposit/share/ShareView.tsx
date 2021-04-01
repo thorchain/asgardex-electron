@@ -14,9 +14,10 @@ import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { to1e8BaseAmount } from '../../../helpers/assetHelper'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import * as ShareHelpers from '../../../helpers/poolShareHelper'
-import { PoolDetailRD, PoolDetail, PoolShareRD, PoolShare } from '../../../services/midgard/types'
+import { PoolDetailRD, PoolShareRD, PoolShare } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { AssetWithDecimal } from '../../../types/asgardex'
+import { PoolDetail } from '../../../types/generated/midgard'
 import * as Styled from './ShareView.styles'
 
 type Props = {

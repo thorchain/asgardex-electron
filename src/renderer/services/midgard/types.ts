@@ -13,13 +13,15 @@ import {
   Network as NetworkInfo,
   Constants as ThorchainConstants,
   LastblockItem,
-  PoolDetail as MidgardPoolDetail,
+  PoolDetail,
   Health,
   PoolStatsDetail,
   GetPoolStatsPeriodEnum,
   PoolLegacyDetail,
   LiquidityHistory,
-  GetLiquidityHistoryIntervalEnum
+  GetLiquidityHistoryIntervalEnum,
+  SwapHistory,
+  GetSwapHistoryRequest
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { Memo } from '../chain/types'
@@ -40,19 +42,6 @@ export type PoolAssetDetail = {
 
 export type PoolAssetDetails = PoolAssetDetail[]
 export type PoolAssetDetailsLD = LiveData<Error, PoolAssetDetails>
-
-export type PoolDetail = MidgardPoolDetail & {
-  /**
-   * Swap history of average slip
-   * Needed for pools overview only
-   */
-  poolSlipAverage: string
-  /**
-   * Swap history of swap txs count
-   * Needed for pools overview only
-   */
-  swappingTxCount: string
-}
 
 export type PoolDetailRD = RD.RemoteData<Error, PoolDetail>
 export type PoolDetailLD = LiveData<Error, PoolDetail>
@@ -139,6 +128,11 @@ export type PoolLiquidityHistoryParams = {
 export type PoolLiquidityHistoryRD = RD.RemoteData<Error, LiquidityHistory>
 export type PoolLiquidityHistoryLD = LiveData<Error, LiquidityHistory>
 
+export type ApiGetSwapHistoryParams = { poolAsset: Asset } & Omit<GetSwapHistoryRequest, 'pool'>
+export type GetSwapHistoryParams = Omit<ApiGetSwapHistoryParams, 'poolAsset'>
+export type SwapHistoryRD = RD.RemoteData<Error, SwapHistory>
+export type SwapHistoryLD = LiveData<Error, SwapHistory>
+
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 
@@ -167,6 +161,8 @@ export type PoolsService = {
   poolStatsDetail$: (period?: GetPoolStatsPeriodEnum) => PoolStatsDetailLD
   poolLegacyDetail$: PoolLegacyDetailLD
   poolLiquidityHistory$: (parmas: PoolLiquidityHistoryParams) => PoolLiquidityHistoryLD
+  getSwapHistory$: (params: GetSwapHistoryParams) => SwapHistoryLD
+  reloadSwapHistory: FP.Lazy<void>
   priceRatio$: Rx.Observable<BigNumber>
   availableAssets$: PoolAssetsLD
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD

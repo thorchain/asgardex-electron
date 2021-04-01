@@ -119,3 +119,10 @@ export const upgradeBnbRune: Route<AssetDetailsParams> = {
     )
   }
 }
+
+export const history: Route<void> = {
+  template: `${base.template}/history`,
+  path() {
+    return this.template
+  }
+}

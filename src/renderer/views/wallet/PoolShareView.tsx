@@ -34,6 +34,8 @@ export const PoolShareView: React.FC = (): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
+    // TODO (@asgardex-team) Improve loading of pool details - no need to load all data
+    // @see https://github.com/thorchain/asgardex-electron/issues/1205
     pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadAllPools },
     reloadNetworkInfo,
     shares: { combineSharesByAddresses$ }

@@ -95,9 +95,6 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
       ])
     }
   ],
-  // [CosmosChain]: [],
-  // [PolkadotChain]: [],
-  // [BCHChain]: [],
   [LTCChain]: [
     {
       walletType: 'keystore',

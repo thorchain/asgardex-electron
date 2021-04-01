@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, assetToString, BaseAmount, bn } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, assetToString, BaseAmount, bn, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -80,8 +80,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const {
     balancesState$,
-    reloadBalances,
-    keystoreService: { validatePassword$ }
+    keystoreService: { validatePassword$ },
+    reloadBalancesByChain
   } = useWalletContext()
 
   const { approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
@@ -127,6 +127,16 @@ export const SymDepositView: React.FC<Props> = (props) => {
       ),
     [asset, walletBalances]
   )
+
+  const reloadBalances = useCallback(() => {
+    reloadBalancesByChain(assetWD.asset.chain)()
+    reloadBalancesByChain(THORChain)()
+  }, [assetWD.asset.chain, reloadBalancesByChain])
+
+  useEffect(() => {
+    // reload balances, whenever sourceAsset and targetAsset have been changed (both are properties of `reloadBalances` )
+    reloadBalances()
+  }, [reloadBalances])
 
   const depositTxMemo: O.Option<SymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
 
@@ -229,6 +239,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           O.map((balances) => filterWalletBalancesByAssets(balances, poolAssets)),
           O.getOrElse(() => [] as WalletBalances)
         )
+
         return (
           <>
             <SymDeposit

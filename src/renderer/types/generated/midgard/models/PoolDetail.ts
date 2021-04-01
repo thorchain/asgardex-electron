@@ -22,7 +22,7 @@ export interface PoolDetail {
      */
     asset: string;
     /**
-     * Int64, the amount of Asset in the pool.
+     * Int64(e8), the amount of Asset in the pool.
      * @type {string}
      * @memberof PoolDetail
      */
@@ -46,7 +46,7 @@ export interface PoolDetail {
      */
     poolAPY: string;
     /**
-     * Int64, the amount of Rune in the pool.
+     * Int64(e8), the amount of Rune in the pool.
      * @type {string}
      * @memberof PoolDetail
      */
@@ -64,7 +64,7 @@ export interface PoolDetail {
      */
     units: string;
     /**
-     * Int64, the total volume of swaps in the last 24h to and from Rune denoted in Rune.
+     * Int64(e8), the total volume of swaps in the last 24h to and from Rune denoted in Rune.
      * @type {string}
      * @memberof PoolDetail
      */

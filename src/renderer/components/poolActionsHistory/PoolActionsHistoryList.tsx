@@ -8,7 +8,6 @@ import { MAX_ITEMS_PER_PAGE } from '../../services/const'
 import { PoolAction, PoolActionsHistoryPage } from '../../services/midgard/types'
 import { ErrorView } from '../shared/error'
 import { Pagination } from '../uielements/pagination'
-import { ReloadButton } from '../uielements/reloadButton'
 import { TxDetail } from '../uielements/txDetail'
 import * as H from './PoolActionsHistory.helper'
 import * as Styled from './PoolActionsHistoryList.styles'
@@ -57,7 +56,6 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
   currentPage,
   currentFilter,
   setFilter,
-  reload,
   className
 }) => {
   const renderListItem = useMemo(() => renderItem(goToTx), [goToTx])
@@ -83,16 +81,11 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
 
   return (
     <div className={className}>
-      <Styled.ControlsContainer>
-        {
-          <Styled.ActionsFilter
-            currentFilter={currentFilter}
-            onFilterChanged={setFilter}
-            disabled={!RD.isSuccess(actionsPageRD)}
-          />
-        }
-        <ReloadButton onClick={reload} disabled={!(RD.isSuccess(actionsPageRD) || RD.isFailure(actionsPageRD))} />
-      </Styled.ControlsContainer>
+      <Styled.ActionsFilter
+        currentFilter={currentFilter}
+        onFilterChanged={setFilter}
+        disabled={!RD.isSuccess(actionsPageRD)}
+      />
       {FP.pipe(
         actionsPageRD,
         RD.fold(

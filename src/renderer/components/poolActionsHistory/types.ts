@@ -13,6 +13,5 @@ export type Props = {
   clickTxLinkHandler: (txHash: string) => void
   currentFilter: Filter
   setFilter: (filter: Filter) => void
-  reload: () => void
   className?: string
 }

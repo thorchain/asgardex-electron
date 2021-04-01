@@ -17,7 +17,7 @@
  */
 export interface LiquidityHistoryItem {
     /**
-     * Int64 (10^8), total assets deposited during the time interval. Denoted in Rune using the price at deposit time. 
+     * Int64(e8), total assets deposited during the time interval. Denoted in Rune using the price at deposit time. 
      * @type {string}
      * @memberof LiquidityHistoryItem
      */
@@ -29,13 +29,13 @@ export interface LiquidityHistoryItem {
      */
     addLiquidityCount: string;
     /**
-     * Int64 (10^8), total of rune and asset deposits. Denoted in Rune (using the price at deposit time). 
+     * Int64(e8), total of rune and asset deposits. Denoted in Rune (using the price at deposit time). 
      * @type {string}
      * @memberof LiquidityHistoryItem
      */
     addLiquidityVolume: string;
     /**
-     * Int64 (10^8), total Rune deposited during the time interval. 
+     * Int64(e8), total Rune deposited during the time interval. 
      * @type {string}
      * @memberof LiquidityHistoryItem
      */
@@ -47,7 +47,7 @@ export interface LiquidityHistoryItem {
      */
     endTime: string;
     /**
-     * Int64, net liquidity changes (withdrawals - deposits) during the time interval
+     * Int64(e8), net liquidity changes (withdrawals - deposits) during the time interval
      * @type {string}
      * @memberof LiquidityHistoryItem
      */

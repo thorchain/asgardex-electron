@@ -16,7 +16,7 @@ import { PoolActionsHistoryPageLD, TxType } from './types'
 
 export type LoadActionsParams = {
   page: number
-  address?: Address
+  addresses?: Address[]
   txid?: TxHash
   asset?: string
   type?: TxType | 'ALL'
@@ -34,7 +34,7 @@ export const createPoolActionsHistoryService = (
 
   const { stream$: reloadActionsHistory$, trigger: reloadActionsHistory } = triggerStream()
 
-  const actions$ = ({ page, type, ...params }: LoadActionsParams): PoolActionsHistoryPageLD =>
+  const actions$ = ({ page, type, addresses = [], ...params }: LoadActionsParams): PoolActionsHistoryPageLD =>
     FP.pipe(
       Rx.combineLatest([midgardDefaultApi$, reloadActionsHistory$]),
       RxOp.map(([api]) => api),
@@ -46,6 +46,7 @@ export const createPoolActionsHistoryService = (
         FP.pipe(
           api.getActions({
             ...params,
+            address: addresses.join(','),
             type: getRequestType(type),
             limit: MAX_ITEMS_PER_PAGE,
             offset: MAX_ITEMS_PER_PAGE * page

@@ -33,8 +33,10 @@ const addressByChain$ = (chain: Chain): Address$ => {
     case THORChain:
       return THOR.address$
     case PolkadotChain:
+      // not supported yet
       return Rx.of(O.none)
     case CosmosChain:
+      // not supported yet
       return Rx.of(O.none)
     case BCHChain:
       return BCH.address$

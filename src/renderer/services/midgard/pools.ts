@@ -32,7 +32,6 @@ import {
   PoolAssetDetailsLD,
   PendingPoolsStateLD,
   PoolAssetsLD,
-  PoolDetailLD,
   PoolDetailsLD,
   PoolsService,
   PoolsStateLD,
@@ -46,7 +45,11 @@ import {
   PoolStatsDetailLD,
   PoolLegacyDetailLD,
   PoolLiquidityHistoryLD,
-  PoolLiquidityHistoryParams
+  PoolLiquidityHistoryParams,
+  PoolDetailLD,
+  SwapHistoryLD,
+  ApiGetSwapHistoryParams,
+  GetSwapHistoryParams
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -85,7 +88,7 @@ const createPoolsService = (
   }
 
   // Factory to get `Pools` from Midgard
-  const apiGetPools$ = (request: GetPoolsRequest, reload$: TriggerStream$) =>
+  const apiGetPools$ = (request: GetPoolsRequest, reload$: TriggerStream$): PoolDetailsLD =>
     FP.pipe(
       Rx.combineLatest([midgardDefaultApi$, reload$]),
       RxOp.map(([api]) => api),
@@ -106,54 +109,8 @@ const createPoolsService = (
               )
             )
           ),
-          // filter out
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
-        )
-      ),
-      liveData.chain((details) =>
-        FP.pipe(
-          details,
-          A.map(({ asset }) =>
-            FP.pipe(
-              midgardDefaultApi$,
-              liveData.chain((api) =>
-                FP.pipe(
-                  // As midgard v2 is missing poolSlipAverage and swappingTxCount
-                  // field we have to get them from getSwapHistory
-                  // Emulate ALL period of a pool life
-                  api.getSwapHistory({
-                    pool: asset
-                  }),
-                  RxOp.map(RD.success),
-                  liveData.map(({ meta }) => meta),
-                  RxOp.catchError(() => Rx.of(RD.failure(Error('Failed to load swaps history')))),
-                  RxOp.startWith(RD.pending)
-                )
-              ),
-              liveData.map(({ averageSlip, totalCount }) => ({
-                poolSlipAverage: averageSlip,
-                swappingTxCount: totalCount
-              })),
-              /**
-               * Set default value for all failed items to avoid falling into
-               * the error branch on the next step by liveData.sequenceArray
-               */
-              liveData.altOnError((): { poolSlipAverage: string; swappingTxCount: string } => ({
-                poolSlipAverage: '0',
-                swappingTxCount: '0'
-              }))
-            )
-          ),
-          liveData.sequenceArray,
-          liveData.map(
-            A.mapWithIndex((index, swapData) => ({
-              ...swapData,
-              // Here we can be sure in indexing 'cuz we have the same order
-              // as details 'cuz we build this array based on details themselves
-              ...details[index]
-            }))
-          )
         )
       ),
       RxOp.shareReplay(1)
@@ -224,10 +181,6 @@ const createPoolsService = (
       liveData.chain((api) => {
         return FP.pipe(
           api.getPool({ asset: assetToString(asset) }),
-          // Setting zero for `poolSlipAverage` + `swappingTxCount`
-          // since we don't need those in pool detail atm
-          // TODO (@asdgdx-team: Do we still need `poolSlipAverage` + `swappingTxCount` in PoolDetail ??
-          RxOp.map((poolDetail) => ({ poolSlipAverage: '0', swappingTxCount: '0', ...poolDetail })),
           RxOp.map(RD.success),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
@@ -239,7 +192,7 @@ const createPoolsService = (
   /**
    * `PoolDetails` data from Midgard
    */
-  const apiGetPoolsData$: (assetOrAssets: string | string[], status?: GetPoolsStatusEnum) => PoolDetailsLD = (
+  const apiGetPoolDetails$: (assetOrAssets: string | string[], status?: GetPoolsStatusEnum) => PoolDetailsLD = (
     assetOrAssets,
     status
   ) => {
@@ -292,7 +245,7 @@ const createPoolsService = (
       liveData.chain(
         O.fold(
           () => liveData.of([]),
-          (assets) => apiGetPoolsData$(assets, status)
+          (assets) => apiGetPoolDetails$(assets, status)
         )
       ),
       RxOp.shareReplay(1)
@@ -301,7 +254,7 @@ const createPoolsService = (
   /**
    * Loading queue to get `PoolDetails` of all pools
    */
-  const loadAllPoolsDetails$ = (): PoolDetailsLD => {
+  const loadAllPoolDetails$ = (): PoolDetailsLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
       apiGetPoolsAll$,
       // Filter out all unknown / invalid assets created from asset strings
@@ -323,7 +276,7 @@ const createPoolsService = (
    */
   const allPoolDetails$: PoolDetailsLD = reloadPools$.pipe(
     // start loading queue
-    RxOp.switchMap(loadAllPoolsDetails$),
+    RxOp.switchMap(loadAllPoolDetails$),
     // cache it to avoid reloading data by every subscription
     RxOp.shareReplay(1)
   )
@@ -695,10 +648,51 @@ const createPoolsService = (
       RxOp.shareReplay(1)
     )
 
+  // Factory to get swap history from Midgard
+  const apiGetSwapHistory$ = (params: ApiGetSwapHistoryParams): SwapHistoryLD => {
+    const { poolAsset, ...otherParams } = params
+    return FP.pipe(
+      midgardDefaultApi$,
+      liveData.chain((api) =>
+        FP.pipe(
+          api.getSwapHistory({ pool: assetToString(poolAsset), ...otherParams }),
+          RxOp.map(RD.success),
+          RxOp.startWith(RD.pending),
+          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+        )
+      ),
+      RxOp.shareReplay(1)
+    )
+  }
+
+  const { stream$: reloadSwapHistory$, trigger: reloadSwapHistory } = triggerStream()
+
+  const getSwapHistory$ = (params: GetSwapHistoryParams): SwapHistoryLD =>
+    FP.pipe(
+      Rx.combineLatest([selectedPoolAsset$, reloadSwapHistory$]),
+      RxOp.filter(([oSelectedPoolAsset, _]) => O.isSome(oSelectedPoolAsset)),
+
+      RxOp.switchMap(([oSelectedPoolAsset]) =>
+        FP.pipe(
+          oSelectedPoolAsset,
+          O.fold(
+            () => Rx.of(RD.initial),
+            (selectedPoolAsset) =>
+              apiGetSwapHistory$({
+                poolAsset: selectedPoolAsset,
+                ...params
+              })
+          )
+        )
+      ),
+      RxOp.startWith(RD.initial),
+      RxOp.shareReplay(1)
+    )
+
   return {
     poolsState$,
     pendingPoolsState$,
-    allPoolDetails$,
+    allPoolDetails$: allPoolDetails$,
     setSelectedPricePoolAsset,
     selectedPricePoolAsset$,
     selectedPricePool$,
@@ -715,6 +709,8 @@ const createPoolsService = (
     poolStatsDetail$,
     poolLegacyDetail$,
     poolLiquidityHistory$,
+    getSwapHistory$,
+    reloadSwapHistory,
     priceRatio$,
     availableAssets$,
     validatePool$,

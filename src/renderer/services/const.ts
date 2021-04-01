@@ -5,7 +5,7 @@ import { envOrDefault } from '../helpers/envHelper'
 
 export const DEFAULT_NETWORK: Network = 'testnet'
 export const AVAILABLE_NETWORKS: Network[] = ['testnet', 'chaosnet', 'mainnet']
-export const ENABLED_CHAINS: Chain[] = envOrDefault(process.env.REACT_APP_CHAINS_ENABLED, 'THOR,BNB,BTC,LTC,BCH')
+export const ENABLED_CHAINS: Chain[] = envOrDefault(process.env.REACT_APP_CHAINS_ENABLED, 'THOR,BNB,BTC,LTC,BCH,ETH')
   .replace(/\s/g, '')
   .split(',')
   .filter(isChain)

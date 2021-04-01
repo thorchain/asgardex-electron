@@ -6,7 +6,6 @@ import { Fees } from '@xchainjs/xchain-client'
 import * as Cosmos from '@xchainjs/xchain-cosmos'
 import * as ETH from '@xchainjs/xchain-ethereum'
 import * as Litecoin from '@xchainjs/xchain-litecoin'
-import * as Polkadot from '@xchainjs/xchain-polkadot'
 import * as THOR from '@xchainjs/xchain-thorchain'
 import {
   BCHChain,
@@ -41,7 +40,8 @@ const getDefaultFeesByChain = (chain: Chain): Fees => {
       return Cosmos.getDefaultFees()
     case PolkadotChain:
       // TODO @asgdx-team: Handle network
-      return Polkadot.getDefaultFees('testnet')
+      // return Polkadot.getDefaultFees('testnet')
+      throw Error('Polkadot is not supported yet')
     case BCHChain:
       return BCH.getDefaultFees()
     case LTCChain:

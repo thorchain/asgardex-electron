@@ -10,8 +10,7 @@ import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import * as AssetHelper from '../../../helpers/assetHelper'
-import { eqOAsset } from '../../../helpers/fp/eq'
-import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { eqAsset } from '../../../helpers/fp/eq'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
@@ -28,7 +27,7 @@ import * as Styled from './AssetDetails.style'
 type Props = {
   txsPageRD: TxsPageRD
   balances: O.Option<NonEmptyWalletBalances>
-  asset: O.Option<Asset>
+  asset: Asset
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
   reloadBalancesHandler?: FP.Lazy<void>
   loadTxsHandler?: LoadTxsHandler
@@ -40,7 +39,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
     txsPageRD,
     balances: oBalances,
-    asset: oAsset,
+    asset,
     reloadBalancesHandler = FP.constVoid,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
@@ -56,12 +55,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const walletActionSendClick = useCallback(() => {
     const routeParams = FP.pipe(
-      sequenceTOption(oWalletAddress, oAsset),
-      O.map(([walletAddress, asset]) => ({ asset: assetToString(asset), walletAddress })),
-      O.getOrElse(() => ({ asset: '', walletAddress: '' }))
+      oWalletAddress,
+      O.map((walletAddress) => ({ asset: assetToString(asset), walletAddress })),
+      O.getOrElse(() => ({ asset: assetToString(asset), walletAddress: '' }))
     )
     history.push(walletRoutes.send.path(routeParams))
-  }, [oAsset, history, oWalletAddress])
+  }, [asset, history, oWalletAddress])
 
   const walletActionDepositClick = useCallback(() => {
     FP.pipe(
@@ -73,14 +72,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const walletActionUpgradeRuneBnbClick = useCallback(() => {
     FP.pipe(
-      sequenceTOption(oWalletAddress, oAsset),
-      O.filter(([_, asset]) => AssetHelper.isRuneBnbAsset(asset)),
-      O.map(([walletAddress, asset]) =>
-        walletRoutes.upgradeBnbRune.path({ asset: assetToString(asset), walletAddress })
-      ),
+      oWalletAddress,
+      O.filter((_) => AssetHelper.isRuneBnbAsset(asset)),
+      O.map((walletAddress) => walletRoutes.upgradeBnbRune.path({ asset: assetToString(asset), walletAddress })),
       O.map(history.push)
     )
-  }, [oWalletAddress, history, oAsset])
+  }, [oWalletAddress, history, asset])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
@@ -102,11 +99,13 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [loadTxsHandler]
   )
 
-  const oRuneBnbAsset: O.Option<Asset> = useMemo(() => FP.pipe(oAsset, O.filter(AssetHelper.isRuneBnbAsset)), [oAsset])
+  const oRuneBnbAsset: O.Option<Asset> = useMemo(() => FP.pipe(asset, O.fromPredicate(AssetHelper.isRuneBnbAsset)), [
+    asset
+  ])
 
-  const isRuneBnbAsset: boolean = useMemo(() => FP.pipe(oRuneBnbAsset, O.isSome), [oRuneBnbAsset])
+  const isRuneBnbAsset: boolean = useMemo(() => AssetHelper.isRuneBnbAsset(asset), [asset])
 
-  const isRuneNativeAsset: boolean = useMemo(() => eqOAsset.equals(oAsset, O.some(AssetRuneNative)), [oAsset])
+  const isRuneNativeAsset: boolean = useMemo(() => eqAsset.equals(asset, AssetRuneNative), [asset])
 
   const oRuneBnbBalance: O.Option<WalletBalance> = useMemo(() => getWalletBalanceByAsset(oBalances, oRuneBnbAsset), [
     oRuneBnbAsset,
@@ -136,8 +135,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [isRuneBnbAsset, oRuneBnbAmount]
   )
 
-  const chain = O.isSome(oAsset) ? oAsset.value.chain : ''
-
   const walletInfo = useMemo(
     () =>
       FP.pipe(
@@ -162,7 +159,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          <AssetInfo walletInfo={walletInfo} asset={oAsset} assetsWB={oBalances} network={network} />
+          <AssetInfo walletInfo={walletInfo} asset={O.some(asset)} assetsWB={oBalances} network={network} />
         </Col>
 
         <Styled.Divider />
@@ -215,16 +212,14 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           </Styled.TableHeadline>
         </Col>
         <Col span={24}>
-          {chain && (
-            <TxsTable
-              txsPageRD={txsPageRD}
-              clickTxLinkHandler={clickTxLinkHandler}
-              changePaginationHandler={onChangePagination}
-              chain={chain}
-              network={network}
-              walletAddress={oWalletAddress}
-            />
-          )}
+          <TxsTable
+            txsPageRD={txsPageRD}
+            clickTxLinkHandler={clickTxLinkHandler}
+            changePaginationHandler={onChangePagination}
+            chain={asset.chain}
+            network={network}
+            walletAddress={oWalletAddress}
+          />
         </Col>
       </Row>
     </>

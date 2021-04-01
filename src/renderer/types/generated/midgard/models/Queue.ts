@@ -17,13 +17,18 @@
  */
 export interface Queue {
     /**
-     * @type {string}
+     * @type {number}
      * @memberof Queue
      */
-    outbound: string;
+    internal: number;
     /**
-     * @type {string}
+     * @type {number}
      * @memberof Queue
      */
-    swap: string;
+    outbound: number;
+    /**
+     * @type {number}
+     * @memberof Queue
+     */
+    swap: number;
 }

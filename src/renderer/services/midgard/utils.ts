@@ -12,7 +12,7 @@ import { isMiniToken } from '../../helpers/binanceHelper'
 import { eqAsset, eqChain } from '../../helpers/fp/eq'
 import { optionFromNullableString } from '../../helpers/fp/from'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { InboundAddressesItem } from '../../types/generated/midgard'
+import { InboundAddressesItem, PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import {
   PoolAssetDetails as PoolAssetsDetail,
@@ -20,7 +20,6 @@ import {
   PoolsStateRD,
   SelectedPricePoolAsset,
   PoolAssetDetail,
-  PoolDetail,
   PoolShares,
   PoolShare,
   PoolAddress,

@@ -1,6 +1,5 @@
 import { PoolData } from '@thorchain/asgardex-util'
 import { BaseAmount, Asset } from '@xchainjs/xchain-util'
-import BigNumber from 'bignumber.js'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 
 // import { PoolDetailStatusEnum } from '../../types/generated/midgard'
@@ -31,8 +30,6 @@ export type PoolTableRowData = {
   volumePrice: BaseAmount
   transactionPrice: BaseAmount
   poolPrice: BaseAmount
-  slip: BigNumber
-  trades: BigNumber
   status: GetPoolsStatusEnum
   deepest?: boolean
   key: string
