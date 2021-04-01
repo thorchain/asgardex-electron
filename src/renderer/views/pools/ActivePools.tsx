@@ -175,7 +175,6 @@ export const ActivePools: React.FC = (): JSX.Element => {
             dataSource={FP.pipe(tableData, filterTableData(poolFilter))}
             loading={loading}
             rowKey="key"
-            // TODO(@asgdx-team): Uncomment when pool detail is ready
             onRow={({ pool }: PoolTableRowData) => {
               return {
                 onClick: () => {
