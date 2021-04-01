@@ -5,6 +5,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
+import moment from 'moment'
 
 import { CURRENCY_WHEIGHTS } from '../../const'
 import { isBUSDAsset } from '../../helpers/assetHelper'
@@ -248,3 +249,26 @@ export const getPoolAssetDetail = ({
 export const getPoolAssetsDetail: (_: Array<Pick<PoolDetail, 'assetPrice' | 'asset'>>) => PoolAssetsDetail = (
   poolDetails
 ) => FP.pipe(poolDetails, A.filterMap(getPoolAssetDetail))
+
+export const getEoDTime = () => {
+  return moment()
+    .set({
+      hour: 23,
+      minute: 59,
+      second: 59,
+      millisecond: 999
+    })
+    .unix()
+}
+
+export const getWeekAgoTime = () => {
+  return moment()
+    .subtract(7, 'days')
+    .set({
+      hour: 23,
+      minute: 59,
+      second: 59,
+      millisecond: 999
+    })
+    .unix()
+}

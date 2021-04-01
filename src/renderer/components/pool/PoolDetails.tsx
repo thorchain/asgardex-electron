@@ -1,10 +1,13 @@
 import React from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetAmount } from '@xchainjs/xchain-util'
 import * as A from 'antd'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
+import { DepthHistoryRD, SwapHistoryRD } from '../../services/midgard/types'
 import { PoolCards } from './PoolCards'
 import { PoolChart } from './PoolChart'
 import * as Styled from './PoolDetails.style'
@@ -27,6 +30,11 @@ export type Props = {
   priceUSD: AssetAmount
   priceSymbol?: string
   isLoading?: boolean
+  swapAllHistoryRD: SwapHistoryRD
+  swapWeekHistoryRD: SwapHistoryRD
+  priceRatio: BigNumber
+  depthAllHistoryRD: DepthHistoryRD
+  depthWeekHistoryRD: DepthHistoryRD
 }
 
 export const PoolDetails: React.FC<Props> = ({
@@ -43,8 +51,55 @@ export const PoolDetails: React.FC<Props> = ({
   allTimeVolumeTrend,
   totalSwapsTrend,
   totalStakersTrend,
-  isLoading
+  isLoading,
+  swapAllHistoryRD,
+  swapWeekHistoryRD,
+  depthAllHistoryRD,
+  depthWeekHistoryRD,
+  priceRatio
 }) => {
+  const volumeAllTimeData = FP.pipe(
+    swapAllHistoryRD,
+    RD.toOption,
+    O.map((history) =>
+      history.intervals.map((interval) => ({
+        time: Number(interval.startTime),
+        poolVolume: interval.totalVolume
+      }))
+    )
+  )
+  const volumeWeekData = FP.pipe(
+    swapWeekHistoryRD,
+    RD.toOption,
+    O.map((history) =>
+      history.intervals.map((interval) => ({
+        time: Number(interval.startTime),
+        poolVolume: interval.totalVolume
+      }))
+    )
+  )
+
+  const liquidityAllTimeData = FP.pipe(
+    depthAllHistoryRD,
+    RD.toOption,
+    O.map((history) =>
+      history.intervals.map((interval) => ({
+        time: Number(interval.startTime),
+        runeDepth: interval.runeDepth
+      }))
+    )
+  )
+  const liquidityWeekData = FP.pipe(
+    depthWeekHistoryRD,
+    RD.toOption,
+    O.map((history) =>
+      history.intervals.map((interval) => ({
+        time: Number(interval.startTime),
+        runeDepth: interval.runeDepth
+      }))
+    )
+  )
+
   return (
     <Styled.Container>
       <A.Col span={24}>
@@ -67,7 +122,14 @@ export const PoolDetails: React.FC<Props> = ({
         />
       </A.Col>
       <A.Col xs={24} md={16}>
-        <PoolChart isLoading={isLoading} />
+        <PoolChart
+          isLoading={isLoading}
+          volumeAllTimeData={volumeAllTimeData}
+          volumeWeekData={volumeWeekData}
+          liquidityAllTimeData={liquidityAllTimeData}
+          liquidityWeekData={liquidityWeekData}
+          priceRatio={priceRatio}
+        />
       </A.Col>
       <A.Col span={24}>
         <PoolHistory isLoading={isLoading} />

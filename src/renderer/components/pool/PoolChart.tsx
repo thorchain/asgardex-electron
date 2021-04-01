@@ -1,17 +1,32 @@
 import React, { useMemo, useState } from 'react'
 
-import { LiquidityHistoryItem } from '../../types/generated/midgard'
+import { baseAmount, baseToAsset, bnOrZero } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
+
 import Chart from '../uielements/chart'
 import { ChartData, ChartDetail, ChartValues } from '../uielements/chart/types'
 import * as Styled from './PoolChart.style'
+import { LiquidityData, VolumeData } from './types'
 
 export type Props = {
   isLoading?: boolean
-  allTimeData: LiquidityHistoryItem[]
-  weekData: LiquidityHistoryItem[]
+  volumeAllTimeData: O.Option<VolumeData[]>
+  volumeWeekData: O.Option<VolumeData[]>
+  liquidityAllTimeData: O.Option<LiquidityData[]>
+  liquidityWeekData: O.Option<LiquidityData[]>
+  priceRatio: BigNumber
 }
 
-export const PoolChart: React.FC<Props> = ({ isLoading, allTimeData, weekData }) => {
+export const PoolChart: React.FC<Props> = ({
+  isLoading,
+  volumeAllTimeData: oVolumeAllTimeData,
+  volumeWeekData: oVolumeWeekData,
+  liquidityAllTimeData: oLiquidityAllTimeData,
+  liquidityWeekData: oLiquidityWeekData,
+  priceRatio
+}) => {
   const [selectedChart, setSelectedChart] = useState('Volume')
   const chartData: ChartData = useMemo(() => {
     const defaultChartValues: ChartValues = {
@@ -30,40 +45,76 @@ export const PoolChart: React.FC<Props> = ({ isLoading, allTimeData, weekData })
         }
       }
     }
+    console.log(111, priceRatio.toFixed())
+    const volumeAllTimeData = FP.pipe(
+      oVolumeAllTimeData,
+      O.getOrElse(() => [] as VolumeData[])
+    )
+
+    const liquidityAllTimeData = FP.pipe(
+      oLiquidityAllTimeData,
+      O.getOrElse(() => [] as LiquidityData[])
+    )
+
+    const volumeWeekData = FP.pipe(
+      oVolumeWeekData,
+      O.getOrElse(() => [] as VolumeData[])
+    )
+
+    const liquidityWeekData = FP.pipe(
+      oLiquidityWeekData,
+      O.getOrElse(() => [] as LiquidityData[])
+    )
 
     const volumeSeriesDataAT: ChartDetail[] = []
     const liquiditySeriesDataAT: ChartDetail[] = []
 
-    allTimeData.forEach((data) => {
-      const time = data.endTime
+    volumeAllTimeData.forEach((data) => {
+      const time = data.time
       const volumeData = {
         time,
-        value: getUSDPrice(bnOrZero(data.poolVolume))
+        value: baseToAsset(baseAmount(bnOrZero(data.poolVolume).multipliedBy(priceRatio)))
+          .amount()
+          .toFixed(3)
       }
+      volumeSeriesDataAT.push(volumeData)
+    })
+
+    liquidityAllTimeData.forEach((data) => {
+      const time = data.time
       const liquidityData = {
         time,
-        value: getUSDPrice(bnOrZero(data?.runeDepth).multipliedBy(2))
+        value: baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(2).multipliedBy(priceRatio)))
+          .amount()
+          .toFixed(3)
       }
-
-      volumeSeriesDataAT.push(volumeData)
       liquiditySeriesDataAT.push(liquidityData)
     })
 
     const volumeSeriesDataWeek: ChartDetail[] = []
     const liquiditySeriesDataWeek: ChartDetail[] = []
 
-    weekData.forEach((data) => {
-      const time = data?.time ?? 0
+    volumeWeekData.forEach((data) => {
+      // const time = data?.time ?? 0
+      const time = data.time
       const volumeData = {
         time,
-        value: getUSDPrice(bnOrZero(data?.poolVolume))
+        value: baseToAsset(baseAmount(bnOrZero(data.poolVolume).multipliedBy(priceRatio)))
+          .amount()
+          .toFixed(3)
       }
+      volumeSeriesDataWeek.push(volumeData)
+    })
+
+    liquidityWeekData.forEach((data) => {
+      // const time = data?.time ?? 0
+      const time = data.time
       const liquidityData = {
         time,
-        value: getUSDPrice(bnOrZero(data?.runeDepth).multipliedBy(2))
+        value: baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(2).multipliedBy(priceRatio)))
+          .amount()
+          .toFixed(3)
       }
-
-      volumeSeriesDataWeek.push(volumeData)
       liquiditySeriesDataWeek.push(liquidityData)
     })
 
@@ -87,7 +138,7 @@ export const PoolChart: React.FC<Props> = ({ isLoading, allTimeData, weekData })
         unit: '$'
       }
     }
-  }, [isLoading, allTimeData, weekData])
+  }, [isLoading, oLiquidityAllTimeData, oLiquidityWeekData, oVolumeAllTimeData, oVolumeWeekData, priceRatio])
 
   return (
     <Styled.Container>

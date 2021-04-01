@@ -15,7 +15,13 @@ import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
 import { PoolDetailRD } from '../../services/midgard/types'
-import { PoolDetail, SwapHistory } from '../../types/generated/midgard'
+import { getEoDTime, getWeekAgoTime } from '../../services/midgard/utils'
+import {
+  GetDepthHistoryIntervalEnum,
+  GetSwapHistoryIntervalEnum,
+  PoolDetail,
+  SwapHistory
+} from '../../types/generated/midgard'
 
 // TODO (@asgdx-team) Extract follwing helpers into PoolDetailsView.helper + add tests
 
@@ -42,7 +48,12 @@ const defaultDetailsProps: PoolDetailProps = {
   allTimeVolume: ZERO_ASSET_AMOUNT,
   totalSwaps: 0,
   totalStakers: 0,
-  priceUSD: ZERO_ASSET_AMOUNT
+  priceUSD: ZERO_ASSET_AMOUNT,
+  swapAllHistoryRD: RD.initial,
+  swapWeekHistoryRD: RD.initial,
+  depthAllHistoryRD: RD.initial,
+  depthWeekHistoryRD: RD.initial,
+  priceRatio: ONE_BN
 }
 
 const renderPendingView = () => <PoolDetails {...defaultDetailsProps} isLoading={true} />
@@ -51,7 +62,7 @@ const renderInitialView = () => <PoolDetails {...defaultDetailsProps} />
 export const PoolDetailsView: React.FC = () => {
   const {
     service: {
-      pools: { selectedPoolDetail$, priceRatio$, selectedPricePoolAssetSymbol$ },
+      pools: { selectedPoolDetail$, priceRatio$, selectedPricePoolAssetSymbol$, getSwapHistory$, getDepthHistory$ },
       setSelectedPoolAsset
     }
   } = useMidgardContext()
@@ -62,15 +73,55 @@ export const PoolDetailsView: React.FC = () => {
 
   const oRouteAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
 
-  // Set selected pool asset whenever an asset in route has been changed
-  // Needed to get all data for this pool (pool details etc.)
   useEffect(() => {
+    // Source asset is the asset of the pool we need to interact with
+    // Store it in global state, all depending streams will be updated then
     setSelectedPoolAsset(oRouteAsset)
+
     // Reset selectedPoolAsset on view's unmount to avoid effects with depending streams
     return () => {
       setSelectedPoolAsset(O.none)
     }
   }, [oRouteAsset, setSelectedPoolAsset])
+
+  const curTime = getEoDTime()
+  const weekAgoTime = getWeekAgoTime()
+
+  const [swapAllHistoryRD] = useObservableState(
+    () =>
+      getSwapHistory$({
+        interval: GetSwapHistoryIntervalEnum.Day
+      }),
+    RD.initial
+  )
+
+  const [swapWeekHistoryRD] = useObservableState(
+    () =>
+      getSwapHistory$({
+        interval: GetSwapHistoryIntervalEnum.Day,
+        from: weekAgoTime,
+        to: curTime
+      }),
+    RD.initial
+  )
+
+  const [depthAllHistoryRD] = useObservableState(
+    () =>
+      getDepthHistory$({
+        interval: GetDepthHistoryIntervalEnum.Day
+      }),
+    RD.initial
+  )
+
+  const [depthWeekHistoryRD] = useObservableState(
+    () =>
+      getDepthHistory$({
+        interval: GetDepthHistoryIntervalEnum.Day,
+        from: weekAgoTime,
+        to: curTime
+      }),
+    RD.initial
+  )
 
   const routeAssetRD = RD.fromOption(oRouteAsset, () =>
     Error(intl.formatMessage({ id: 'routes.invalid.asset' }, { asset }))
@@ -80,7 +131,7 @@ export const PoolDetailsView: React.FC = () => {
 
   const priceRatio = useObservableState(priceRatio$, ONE_BN)
 
-  const poolDetailRD: PoolDetailRD = useObservableState(selectedPoolDetail$, RD.initial)
+  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
   return FP.pipe(
     RD.combine(routeAssetRD, poolDetailRD),
@@ -101,6 +152,11 @@ export const PoolDetailsView: React.FC = () => {
             totalStakers={0 /* getTotalStakers(poolDetail) */}
             priceUSD={getPriceUSD(poolDetail, priceRatio)}
             priceSymbol={O.toUndefined(priceSymbol)}
+            priceRatio={priceRatio}
+            swapAllHistoryRD={swapAllHistoryRD}
+            swapWeekHistoryRD={swapWeekHistoryRD}
+            depthAllHistoryRD={depthAllHistoryRD}
+            depthWeekHistoryRD={depthWeekHistoryRD}
           />
         )
       }
