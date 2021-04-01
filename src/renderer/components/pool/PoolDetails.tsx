@@ -60,28 +60,30 @@ export const PoolDetails: React.FC<Props> = ({
   )
   return (
     <Styled.Container>
-      <A.Col span={24}>
-        <PoolTitle asset={asset} priceUSD={priceUSD} isLoading={isLoading} />
-      </A.Col>
-      <A.Col xs={24} md={8}>
-        <PoolCards
-          depth={depth}
-          volume24hr={volume24hr}
-          allTimeVolume={allTimeVolume}
-          totalStakers={totalStakers}
-          totalSwaps={totalSwaps}
-          priceSymbol={priceSymbol}
-          depthTrend={depthTrend}
-          volume24hrTrend={volume24hrTrend}
-          allTimeVolumeTrend={allTimeVolumeTrend}
-          totalSwapsTrend={totalSwapsTrend}
-          totalStakersTrend={totalStakersTrend}
-          isLoading={isLoading}
-        />
-      </A.Col>
-      <A.Col xs={24} md={16}>
-        <PoolChart isLoading={isLoading} />
-      </A.Col>
+      <Styled.TopContainer>
+        <A.Col span={24}>
+          <PoolTitle asset={asset} priceUSD={priceUSD} isLoading={isLoading} />
+        </A.Col>
+        <A.Col xs={24} md={8}>
+          <PoolCards
+            depth={depth}
+            volume24hr={volume24hr}
+            allTimeVolume={allTimeVolume}
+            totalStakers={totalStakers}
+            totalSwaps={totalSwaps}
+            priceSymbol={priceSymbol}
+            depthTrend={depthTrend}
+            volume24hrTrend={volume24hrTrend}
+            allTimeVolumeTrend={allTimeVolumeTrend}
+            totalSwapsTrend={totalSwapsTrend}
+            totalStakersTrend={totalStakersTrend}
+            isLoading={isLoading}
+          />
+        </A.Col>
+        <A.Col xs={24} md={16}>
+          <PoolChart isLoading={isLoading} />
+        </A.Col>
+      </Styled.TopContainer>
       <A.Col span={24}>{renderHistoryView}</A.Col>
     </Styled.Container>
   )

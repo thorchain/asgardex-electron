@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { assetAmount, assetFromString, baseAmount, baseToAsset, bn, bnOrZero } from '@xchainjs/xchain-util'
@@ -10,13 +10,14 @@ import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
 import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
-import { BackLink } from '../../components/uielements/backLink'
+import { RefreshButton } from '../../components/uielements/button'
 import { PoolStatus } from '../../components/uielements/poolStatus'
 import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
 import { PoolDetailRD } from '../../services/midgard/types'
 import { PoolDetail, SwapHistory } from '../../types/generated/midgard'
+import * as Styled from './PoolDetailsView.styles'
 import { PoolHistory } from './PoolHistoryView'
 
 // TODO (@asgdx-team) Extract follwing helpers into PoolDetailsView.helper + add tests
@@ -54,7 +55,8 @@ const renderInitialView = () => <PoolDetails {...defaultDetailsProps} />
 export const PoolDetailsView: React.FC = () => {
   const {
     service: {
-      pools: { selectedPoolDetail$, priceRatio$, selectedPricePoolAssetSymbol$ },
+      pools: { selectedPoolDetail$, priceRatio$, selectedPricePoolAssetSymbol$, reloadSelectedPoolDetail },
+      poolActionsHistory: { reloadActionsHistory },
       setSelectedPoolAsset
     }
   } = useMidgardContext()
@@ -86,32 +88,44 @@ export const PoolDetailsView: React.FC = () => {
 
   const poolDetailRD: PoolDetailRD = useObservableState(selectedPoolDetail$, RD.initial)
 
-  return FP.pipe(
-    RD.combine(routeAssetRD, poolDetailRD),
-    RD.fold(
-      renderInitialView,
-      renderPendingView,
-      (e: Error) => {
-        return <PoolStatus label={intl.formatMessage({ id: 'common.error' })} displayValue={e.message} />
-      },
-      ([asset, poolDetail]) => {
-        return (
-          <>
-            <BackLink />
-            <PoolDetails
-              asset={O.some(asset)}
-              depth={getDepth(poolDetail, priceRatio)}
-              volume24hr={get24hrVolume(poolDetail, priceRatio)}
-              allTimeVolume={getAllTimeVolume(poolDetail, priceRatio)}
-              totalSwaps={0 /* getTotalSwaps(history) */}
-              totalStakers={0 /* getTotalStakers(poolDetail) */}
-              priceUSD={getPriceUSD(poolDetail, priceRatio)}
-              priceSymbol={O.toUndefined(priceSymbol)}
-              HistoryView={PoolHistory}
-            />
-          </>
+  const onRefreshData = useCallback(() => {
+    reloadSelectedPoolDetail()
+    reloadActionsHistory()
+  }, [reloadSelectedPoolDetail, reloadActionsHistory])
+
+  const prev = useRef<React.ReactElement>()
+
+  return (
+    <>
+      <Styled.ControlsContainer>
+        <Styled.BackLink />
+        <RefreshButton clickHandler={onRefreshData} />
+      </Styled.ControlsContainer>
+      {FP.pipe(
+        RD.combine(routeAssetRD, poolDetailRD),
+        RD.fold(
+          renderInitialView,
+          () => prev.current || renderPendingView(),
+          (e: Error) => {
+            return <PoolStatus label={intl.formatMessage({ id: 'common.error' })} displayValue={e.message} />
+          },
+          ([asset, poolDetail]) => {
+            return (prev.current = (
+              <PoolDetails
+                asset={O.some(asset)}
+                depth={getDepth(poolDetail, priceRatio)}
+                volume24hr={get24hrVolume(poolDetail, priceRatio)}
+                allTimeVolume={getAllTimeVolume(poolDetail, priceRatio)}
+                totalSwaps={0 /* getTotalSwaps(history) */}
+                totalStakers={0 /* getTotalStakers(poolDetail) */}
+                priceUSD={getPriceUSD(poolDetail, priceRatio)}
+                priceSymbol={O.toUndefined(priceSymbol)}
+                HistoryView={PoolHistory}
+              />
+            ))
+          }
         )
-      }
-    )
+      )}
+    </>
   )
 }

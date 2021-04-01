@@ -11,3 +11,7 @@ export const Container = styled(A.Row)`
     padding: 0;
   `}
 `
+
+export const TopContainer = styled(A.Row)`
+  margin-bottom: 10px;
+`
