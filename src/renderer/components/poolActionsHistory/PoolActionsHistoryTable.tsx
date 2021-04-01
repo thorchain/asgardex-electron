@@ -19,7 +19,7 @@ import * as Styled from './PoolActionsHistoryTable.styles'
 import { Props } from './types'
 
 export const PoolActionsHistoryTable: React.FC<Props> = ({
-  clickTxLinkHandler,
+  goToTx,
   changePaginationHandler,
   actionsPageRD,
   prevActionsPage = O.none,
@@ -61,12 +61,10 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
         action.in,
         A.head,
         O.alt(() => A.head(action.out)),
-        O.map(({ txID }) => (
-          <CommonStyled.ExternalLinkIcon key="external link" onClick={() => clickTxLinkHandler(txID)} />
-        )),
+        O.map(({ txID }) => <CommonStyled.ExternalLinkIcon key="external link" onClick={() => goToTx(txID)} />),
         O.getOrElse(() => <></>)
       ),
-    [clickTxLinkHandler]
+    [goToTx]
   )
 
   const linkColumn: ColumnType<PoolAction> = useMemo(

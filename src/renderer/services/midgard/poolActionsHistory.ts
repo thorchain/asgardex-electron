@@ -6,13 +6,13 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { LiveData, liveData } from '../../helpers/rx/liveData'
-import { triggerStream } from '../../helpers/stateHelper'
+import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { DefaultApi } from '../../types/generated/midgard/apis'
 import { InlineResponse200 } from '../../types/generated/midgard/models'
 import { MAX_ITEMS_PER_PAGE } from '../const'
 import { ErrorId } from '../wallet/types'
 import { getRequestType, mapAction } from './poolActionsHistory.utils'
-import { PoolActionsHistoryPageLD, TxType } from './types'
+import { PoolActionsHistoryPageLD, PoolActionsHistoryPageRD, TxType } from './types'
 
 export type LoadActionsParams = {
   page: number
@@ -20,6 +20,7 @@ export type LoadActionsParams = {
   txid?: TxHash
   asset?: string
   type?: TxType | 'ALL'
+  itemsPerPage?: number
 }
 
 export const DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS: LoadActionsParams = {
@@ -34,7 +35,15 @@ export const createPoolActionsHistoryService = (
 
   const { stream$: reloadActionsHistory$, trigger: reloadActionsHistory } = triggerStream()
 
-  const actions$ = ({ page, type, addresses = [], ...params }: LoadActionsParams): PoolActionsHistoryPageLD =>
+  const { get$: isHistoryLoading$, set: setIsHistoryLoading } = observableState(false)
+
+  const actions$ = ({
+    itemsPerPage,
+    page,
+    type,
+    addresses = [],
+    ...params
+  }: LoadActionsParams): PoolActionsHistoryPageLD =>
     FP.pipe(
       Rx.combineLatest([midgardDefaultApi$, reloadActionsHistory$]),
       RxOp.map(([api]) => api),
@@ -46,10 +55,10 @@ export const createPoolActionsHistoryService = (
         FP.pipe(
           api.getActions({
             ...params,
-            address: addresses.join(','),
+            address: addresses ? addresses.join(',') : undefined,
             type: getRequestType(type),
-            limit: MAX_ITEMS_PER_PAGE,
-            offset: MAX_ITEMS_PER_PAGE * page
+            limit: itemsPerPage || MAX_ITEMS_PER_PAGE,
+            offset: (itemsPerPage || MAX_ITEMS_PER_PAGE) * page
           }),
           RxOp.catchError((): Rx.Observable<InlineResponse200> => Rx.of({ actions: [], count: '0' })),
           RxOp.map(RD.success),
@@ -62,7 +71,7 @@ export const createPoolActionsHistoryService = (
             msg: 'Error while getting a history'
           })),
           RxOp.startWith(RD.pending),
-          RxOp.catchError((e) =>
+          RxOp.catchError<PoolActionsHistoryPageRD, PoolActionsHistoryPageLD>((e) =>
             Rx.of(
               RD.failure({
                 errorId: ErrorId.GET_ACTIONS,
@@ -71,11 +80,19 @@ export const createPoolActionsHistoryService = (
             )
           )
         )
-      )
+      ),
+      RxOp.tap((value) => {
+        if (RD.isPending(value)) {
+          setIsHistoryLoading(true)
+        } else {
+          setIsHistoryLoading(false)
+        }
+      })
     )
 
   return {
     actions$,
+    isHistoryLoading$,
     reloadActionsHistory
   }
 }

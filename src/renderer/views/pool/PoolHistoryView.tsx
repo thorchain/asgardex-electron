@@ -1,61 +1,58 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
-import * as A from 'fp-ts/Array'
+import { Asset, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
-import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { PoolActionsHistory } from '../../../components/poolActionsHistory'
-import { Filter } from '../../../components/poolActionsHistory/types'
-import { useChainContext } from '../../../contexts/ChainContext'
-import { useMidgardContext } from '../../../contexts/MidgardContext'
-import { useThorchainContext } from '../../../contexts/ThorchainContext'
-import { liveData } from '../../../helpers/rx/liveData'
-import { ENABLED_CHAINS } from '../../../services/const'
-import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../../services/midgard/poolActionsHistory'
-import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../../services/midgard/types'
+import { PoolActionsHistory } from '../../components/poolActionsHistory'
+import { Filter } from '../../components/poolActionsHistory/types'
+import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
+import { liveData } from '../../helpers/rx/liveData'
+import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../services/midgard/poolActionsHistory'
+import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../services/midgard/types'
 
-export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ className }) => {
+type Props = {
+  poolAsset: Asset
+  className?: string
+}
+
+const DEFAULT_REQUEST_PARAMS = {
+  ...DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS,
+  itemsPerPage: 5
+}
+
+export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
   const {
     service: { poolActionsHistory }
   } = useMidgardContext()
 
-  const { addressByChain$ } = useChainContext()
-
   const { getExplorerTxUrl$ } = useThorchainContext()
-
-  const addresses$ = useMemo<Rx.Observable<Address[]>>(
-    () =>
-      FP.pipe(
-        ENABLED_CHAINS,
-        A.map(addressByChain$),
-        (addresses) => Rx.combineLatest(addresses),
-        RxOp.map(A.filterMap(FP.identity))
-      ),
-    [addressByChain$]
-  )
 
   const prevActionsPage = useRef<O.Option<PoolActionsHistoryPage>>(O.none)
 
-  const requestParams = useRef(DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS)
+  const requestParams = useRef(DEFAULT_REQUEST_PARAMS)
 
+  /**
+   * setHistoryPageParams receives Partial parameters to have an opportunity to
+   * change request parameters only by small parts (not all in one). e.g setCurrentPage.
+   * To store previously chosen request parameters that should not be changed `requestParams` ref is used.
+   */
   const [historyPage, setHistoryPageParams] = useObservableState<PoolActionsHistoryPageRD, Partial<LoadActionsParams>>(
     (params$) =>
       FP.pipe(
         params$,
-        RxOp.startWith(DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS),
-        RxOp.switchMap((params) =>
-          FP.pipe(
-            addresses$,
-            RxOp.map((addresses) => ({ ...params, addresses }))
-          )
-        ),
+        RxOp.startWith(DEFAULT_REQUEST_PARAMS),
         RxOp.map((params) => {
-          const res = { ...DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, ...params }
+          const res = {
+            // Merge previously saved request parameters with a new Partial parameters
+            ...requestParams.current,
+            asset: assetToString(poolAsset),
+            ...params
+          }
           requestParams.current = res
           return res
         }),
@@ -78,7 +75,8 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
   const setFilter = useCallback(
     (filter: Filter) => {
       setHistoryPageParams({
-        ...DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS,
+        // For every new filter reset all parameters to default and pass a filter
+        ...DEFAULT_REQUEST_PARAMS,
         type: filter
       })
     },

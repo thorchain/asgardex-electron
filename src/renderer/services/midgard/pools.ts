@@ -392,7 +392,6 @@ const createPoolsService = (
         RxOp.switchMap(() => Rx.of(oSelectedPoolAsset))
       )
     ),
-    RxOp.filter(O.isSome),
     RxOp.switchMap((selectedPoolAsset) => {
       return FP.pipe(
         selectedPoolAsset,
