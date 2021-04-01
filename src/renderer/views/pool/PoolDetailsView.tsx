@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
 import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
+import { BackLink } from '../../components/uielements/backLink'
 import { PoolStatus } from '../../components/uielements/poolStatus'
 import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -92,16 +93,19 @@ export const PoolDetailsView: React.FC = () => {
       },
       ([asset, poolDetail]) => {
         return (
-          <PoolDetails
-            asset={O.some(asset)}
-            depth={getDepth(poolDetail, priceRatio)}
-            volume24hr={get24hrVolume(poolDetail, priceRatio)}
-            allTimeVolume={getAllTimeVolume(poolDetail, priceRatio)}
-            totalSwaps={0 /* getTotalSwaps(history) */}
-            totalStakers={0 /* getTotalStakers(poolDetail) */}
-            priceUSD={getPriceUSD(poolDetail, priceRatio)}
-            priceSymbol={O.toUndefined(priceSymbol)}
-          />
+          <>
+            <BackLink />
+            <PoolDetails
+              asset={O.some(asset)}
+              depth={getDepth(poolDetail, priceRatio)}
+              volume24hr={get24hrVolume(poolDetail, priceRatio)}
+              allTimeVolume={getAllTimeVolume(poolDetail, priceRatio)}
+              totalSwaps={0 /* getTotalSwaps(history) */}
+              totalStakers={0 /* getTotalStakers(poolDetail) */}
+              priceUSD={getPriceUSD(poolDetail, priceRatio)}
+              priceSymbol={O.toUndefined(priceSymbol)}
+            />
+          </>
         )
       }
     )
