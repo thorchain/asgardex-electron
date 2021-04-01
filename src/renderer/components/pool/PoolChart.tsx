@@ -45,7 +45,7 @@ export const PoolChart: React.FC<Props> = ({
         }
       }
     }
-    console.log(111, priceRatio.toFixed())
+
     const volumeAllTimeData = FP.pipe(
       oVolumeAllTimeData,
       O.getOrElse(() => [] as VolumeData[])
