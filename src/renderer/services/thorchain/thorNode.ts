@@ -48,12 +48,17 @@ const TESTNET_THORNODE_API = envOrDefault(
   'https://testnet.thornode.thorchain.info/thorchain'
 )
 
+const MAINNET_THORNODE_API = envOrDefault(
+  process.env.REACT_APP_MAINNET_THORNODE_API,
+  'https://thornode.thorchain.info/thorchain'
+)
+
 const thorNodeApiAddress$ = (network: Network): ThorNodeApiUrlLD => {
   // option to set THORNode api url (for testnet + development only)
-  if (!!TESTNET_THORNODE_API && network === 'testnet') {
+  if (network === 'testnet') {
     return Rx.of(RD.success(TESTNET_THORNODE_API))
   }
-  return Rx.of(RD.failure({ errorId: ErrorId.GET_THORNODE_API, msg: 'Not implemented yet' }))
+  return Rx.of(RD.success(MAINNET_THORNODE_API))
 }
 
 const getNodeInfo$ = (node: Address, network: Network): NodeInfoLD =>

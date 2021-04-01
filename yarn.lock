@@ -4676,10 +4676,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-litecoin/-/xchain-litecoin-0.4.0.tgz#b05d3bff62fcda4ac6c5b392ac0e2cd9807bd87e"
   integrity sha512-/YkvJKcLNIkfiNe4OSJDlhMg84lRb8QVDjRGoDqbOpUj3Y5b4JHOe4/8q+7YRTjWWHLDjDJ3XZZJMqcXrTpZsw==
 
-"@xchainjs/xchain-thorchain@^0.13.1":
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.13.1.tgz#757ac3371ef8db40a0f270388975f04f1306a250"
-  integrity sha512-KPiPg8UUmd3g3ugKhNpfHT+vcevcLwsjnP2OgSCEsv+2M9ZxY8yagoAZjbn4FWaZFmVVRrFCQsZln+U33onztg==
+"@xchainjs/xchain-thorchain@^0.13.2":
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.13.2.tgz#0a35b7a6d83c1f3306f8d7c428fe5b29a3ddd424"
+  integrity sha512-AqdkWV5fn0ZGZOyPi/+PtdGu2nvkeGGg9JZMoMQpGtC5RVgcdXh+iCRo2wyKZaZwsyOwHD6APWCJOz5/IHQ2wg==
 
 "@xchainjs/xchain-util@^0.2.6":
   version "0.2.6"
@@ -13563,7 +13563,7 @@ no-case@^3.0.3:
     lower-case "^2.0.1"
     tslib "^1.10.0"
 
-node-abi@^2.18.0, node-abi@^2.7.0, node-abi@^2.21.0:
+node-abi@^2.18.0, node-abi@^2.21.0, node-abi@^2.7.0:
   version "2.21.0"
   resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.21.0.tgz#c2dc9ebad6f4f53d6ea9b531e7b8faad81041d48"
   integrity sha512-smhrivuPqEM3H5LmnY3KU6HfYv0u4QklgAxfFyRNujKUzbUcYZ+Jc2EhukB9SRcD2VpqhxM7n/MIcp1Ua1/JMg==
