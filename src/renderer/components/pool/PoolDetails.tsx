@@ -8,11 +8,10 @@ import * as O from 'fp-ts/lib/Option'
 import { PoolCards } from './PoolCards'
 import { PoolChart } from './PoolChart'
 import * as Styled from './PoolDetails.style'
-import { PoolHistory } from './PoolHistory'
 import { PoolTitle } from './PoolTitle'
 
 export type Props = {
-  asset: O.Option<Asset>
+  asset: Asset
   depth: AssetAmount
   depthTrend?: BigNumber
   volume24hr: AssetAmount
@@ -27,6 +26,7 @@ export type Props = {
   priceUSD: AssetAmount
   priceSymbol?: string
   isLoading?: boolean
+  HistoryView: React.ComponentType<{ poolAsset: Asset }>
 }
 
 export const PoolDetails: React.FC<Props> = ({
@@ -43,12 +43,13 @@ export const PoolDetails: React.FC<Props> = ({
   allTimeVolumeTrend,
   totalSwapsTrend,
   totalStakersTrend,
-  isLoading
+  isLoading,
+  HistoryView
 }) => {
   return (
     <Styled.Container>
       <A.Col span={24}>
-        <PoolTitle asset={asset} priceUSD={priceUSD} isLoading={isLoading} />
+        <PoolTitle asset={O.some(asset)} priceUSD={priceUSD} isLoading={isLoading} />
       </A.Col>
       <A.Col xs={24} md={8}>
         <PoolCards
@@ -70,7 +71,7 @@ export const PoolDetails: React.FC<Props> = ({
         <PoolChart isLoading={isLoading} />
       </A.Col>
       <A.Col span={24}>
-        <PoolHistory isLoading={isLoading} />
+        <HistoryView poolAsset={asset} />
       </A.Col>
     </Styled.Container>
   )
