@@ -10,8 +10,8 @@ import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
 import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
+import { ErrorView } from '../../components/shared/error'
 import { RefreshButton } from '../../components/uielements/button'
-import { PoolStatus } from '../../components/uielements/poolStatus'
 import { ZERO_ASSET_AMOUNT, ONE_BN } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
@@ -103,20 +103,15 @@ export const PoolDetailsView: React.FC = () => {
       {FP.pipe(
         oRouteAsset,
         O.fold(
-          () => (
-            <PoolStatus
-              label={intl.formatMessage({ id: 'common.error' })}
-              displayValue={intl.formatMessage({ id: 'routes.invalid.asset' }, { asset })}
-            />
-          ),
+          () => <ErrorView title={intl.formatMessage({ id: 'routes.invalid.asset' }, { asset })} />,
           (asset) =>
             FP.pipe(
               poolDetailRD,
               RD.fold(
                 () => <PoolDetails asset={asset} {...defaultDetailsProps} />,
                 () => <PoolDetails asset={asset} {...prevProps.current} isLoading />,
-                (e: Error) => {
-                  return <PoolStatus label={intl.formatMessage({ id: 'common.error' })} displayValue={e.message} />
+                ({ message }: Error) => {
+                  return <ErrorView title={message} />
                 },
                 (poolDetail) => {
                   prevProps.current = {
