@@ -8,6 +8,7 @@ import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
+import * as RxOp from 'rxjs/operators'
 
 import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
 import { ErrorView } from '../../components/shared/error'
@@ -77,7 +78,7 @@ export const PoolDetailsView: React.FC = () => {
         poolEarningHistory$,
         reloadSelectedPoolDetail
       },
-      poolActionsHistory: { reloadActionsHistory, isHistoryLoading$ },
+      poolActionsHistory: { reloadActionsHistory, actions$ },
       setSelectedPoolAsset
     }
   } = useMidgardContext()
@@ -102,7 +103,7 @@ export const PoolDetailsView: React.FC = () => {
 
   const priceRatio = useObservableState(priceRatio$, ONE_BN)
 
-  const isHistoryLoading = useObservableState(isHistoryLoading$, false)
+  const [isHistoryLoading] = useObservableState(() => FP.pipe(actions$, RxOp.map(RD.isPending)), false)
 
   const poolDetailRD: PoolDetailRD = useObservableState(selectedPoolDetail$, RD.initial)
 
