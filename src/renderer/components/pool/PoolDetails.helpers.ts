@@ -12,22 +12,25 @@ export const getDepth = (data: Pick<PoolDetail, 'runeDepth'>, priceRatio: BigNum
 export const getVolume = (data: Pick<PoolDetail, 'volume24h'>, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.volume24h).multipliedBy(priceRatio)))
 
-export const getAPY = (data: Pick<PoolDetail, 'poolAPY'>) => bn(data.poolAPY).plus(1).multipliedBy(100)
+export const getAPY = (data: Pick<PoolDetail, 'poolAPY'>) => bnOrZero(data.poolAPY).multipliedBy(100)
 
 export const getPrice = (data: Pick<PoolDetail, 'assetPrice'>, priceRatio: BigNumber = bn(1)) =>
   assetAmount(bnOrZero(data.assetPrice).multipliedBy(priceRatio))
 
-export const getTotalSwaps = (data: Pick<PoolStatsDetail, 'swapCount'>) => bn(data.swapCount)
+export const getTotalSwaps = (data: Pick<PoolStatsDetail, 'swapCount'>) => bnOrZero(data.swapCount)
 
-export const getTotalTx = (data: PoolStatsDetail) =>
-  bn(data.swapCount).plus(data.addLiquidityCount).plus(data.withdrawCount)
+export const getTotalTx = (data: Pick<PoolStatsDetail, 'swapCount' | 'addLiquidityCount' | 'withdrawCount'>) =>
+  bnOrZero(data.swapCount).plus(bnOrZero(data.addLiquidityCount)).plus(bnOrZero(data.withdrawCount))
 
-export const getMembers = (data: Pick<PoolStatsDetail, 'uniqueMemberCount'>) => bn(data.uniqueMemberCount)
+export const getMembers = (data: Pick<PoolStatsDetail, 'uniqueMemberCount'>) => bnOrZero(data.uniqueMemberCount)
 
 export const getFees = (data: Pick<PoolStatsDetail, 'totalFees'>, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.totalFees).multipliedBy(priceRatio)))
 
-export const getEarnings = (oData: O.Option<EarningsHistoryItemPool>, priceRatio: BigNumber = bn(1)) =>
+export const getEarnings = (
+  oData: O.Option<Pick<EarningsHistoryItemPool, 'earnings'>>,
+  priceRatio: BigNumber = bn(1)
+) =>
   FP.pipe(
     oData,
     O.fold(
