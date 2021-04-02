@@ -1,40 +1,50 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
-import { AssetAmount, formatAssetAmount } from '@xchainjs/xchain-util'
+import { AssetAmount, baseAmount, baseToAsset, bn, bnOrZero, formatAssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
 import { abbreviateNumber } from '../../helpers/numberHelper'
+import { PoolDetail } from '../../types/generated/midgard/models'
 import { PoolStatus } from '../uielements/poolStatus'
 import * as Styled from './PoolCards.style'
 
 export type Props = {
-  liquidity: AssetAmount
-  volumn: AssetAmount
+  poolDetail: PoolDetail
   earnings: AssetAmount
   fees: AssetAmount
   totalTx: BigNumber
   totalSwaps: BigNumber
   members: BigNumber
-  apy: BigNumber
-  // decimal value in percents
   priceSymbol?: string
   isLoading?: boolean
+  priceRatio: BigNumber
 }
 
+const getDepth = (data: Pick<PoolDetail, 'runeDepth'>, priceRatio: BigNumber = bn(1)) =>
+  baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(priceRatio)))
+
+const getVolume = (data: Pick<PoolDetail, 'volume24h'>, priceRatio: BigNumber = bn(1)) =>
+  baseToAsset(baseAmount(bnOrZero(data.volume24h).multipliedBy(priceRatio)))
+
+const getAPY = (data: Pick<PoolDetail, 'poolAPY'>) => bn(data.poolAPY).plus(1).multipliedBy(100)
+
 export const PoolCards: React.FC<Props> = ({
-  liquidity,
-  volumn,
   earnings,
   fees,
   totalTx,
   totalSwaps,
   members,
-  apy,
   priceSymbol = '',
+  poolDetail,
+  priceRatio,
   isLoading
 }) => {
   const intl = useIntl()
+
+  const liquidity = useMemo(() => getDepth(poolDetail, priceRatio), [poolDetail, priceRatio])
+  const volume = useMemo(() => getVolume(poolDetail, priceRatio), [poolDetail, priceRatio])
+  const apy = useMemo(() => getAPY(poolDetail), [poolDetail])
 
   return (
     <Styled.Container>
@@ -50,9 +60,9 @@ export const PoolCards: React.FC<Props> = ({
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: volumn, trimZeros: true })}`}
+          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: volume, trimZeros: true })}`}
           label={intl.formatMessage({ id: 'deposit.poolDetails.volume' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(volumn.amount().toNumber(), 2)}`}
+          displayValue={`${priceSymbol} ${abbreviateNumber(volume.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
 
