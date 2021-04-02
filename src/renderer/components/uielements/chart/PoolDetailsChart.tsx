@@ -1,11 +1,10 @@
 import React, { useMemo } from 'react'
 
 import themes, { ThemeType } from '@thorchain/asgardex-theme'
-import { Grid } from 'antd'
+import { Grid, Spin } from 'antd'
 import { useObservableState } from 'observable-hooks'
 
 import { useThemeContext } from '../../../contexts/ThemeContext'
-import { LoadingView } from '../../shared/loading'
 import { getChartColors, getChartData, getChartOptions, getDisplayData } from './PoolDetailsChart.helpers'
 import {
   ChartContainer,
@@ -51,7 +50,7 @@ const DefaultChart: React.FC<Props> = React.memo(
 
     const renderChart = () => {
       if (isChartLoading) {
-        return <LoadingView />
+        return <Spin />
       }
 
       if (selectedChartType === 'bar') {

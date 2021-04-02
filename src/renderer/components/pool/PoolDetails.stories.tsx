@@ -3,6 +3,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { assetAmount, AssetETH, bn } from '@xchainjs/xchain-util'
 
+import { ONE_BN } from '../../const'
 import { PoolDetails } from './PoolDetails'
 
 export const PoolDetailsStory = () => {
@@ -19,7 +20,9 @@ export const PoolDetailsStory = () => {
       price={assetAmount(1)}
       priceSymbol={'R'}
       asset={AssetETH}
+      priceRatio={ONE_BN}
       HistoryView={() => <>Actions History Here</>}
+      ChartView={() => <>Pool Chart Here</>}
     />
   )
 }

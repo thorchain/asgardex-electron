@@ -17,6 +17,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
 import { PoolDetailRD, PoolEarningHistoryRD, PoolStatsDetailRD } from '../../services/midgard/types'
 import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard'
+import { PoolChartView } from './PoolChartView'
 import * as Styled from './PoolDetailsView.styles'
 import { PoolHistory } from './PoolHistoryView'
 
@@ -63,7 +64,9 @@ const defaultDetailsProps: TargetPoolDetailProps = {
   members: bn(0),
   apy: bn(0),
   price: ZERO_ASSET_AMOUNT,
-  HistoryView: PoolHistory
+  priceRatio: ONE_BN,
+  HistoryView: PoolHistory,
+  ChartView: PoolChartView
 }
 
 export const PoolDetailsView: React.FC = () => {
@@ -151,7 +154,9 @@ export const PoolDetailsView: React.FC = () => {
                     apy: getAPY(poolDetail),
                     price: getPrice(poolDetail, priceRatio),
                     priceSymbol: O.toUndefined(priceSymbol),
-                    HistoryView: PoolHistory
+                    priceRatio,
+                    HistoryView: PoolHistory,
+                    ChartView: PoolChartView
                   }
 
                   return <PoolDetails asset={asset} {...prevProps.current} />

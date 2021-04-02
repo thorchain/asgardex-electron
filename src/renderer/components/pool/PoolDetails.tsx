@@ -6,7 +6,6 @@ import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/Option'
 
 import { PoolCards } from './PoolCards'
-import { PoolChart } from './PoolChart'
 import * as Styled from './PoolDetails.style'
 import { PoolTitle } from './PoolTitle'
 
@@ -23,7 +22,9 @@ export type Props = {
   members: BigNumber
   apy: BigNumber
   isLoading?: boolean
+  priceRatio: BigNumber
   HistoryView: React.ComponentType<{ poolAsset: Asset }>
+  ChartView: React.ComponentType<{ isLoading?: boolean; priceRatio: BigNumber }>
 }
 
 export const PoolDetails: React.FC<Props> = ({
@@ -39,7 +40,9 @@ export const PoolDetails: React.FC<Props> = ({
   members,
   apy,
   isLoading,
-  HistoryView
+  priceRatio,
+  HistoryView,
+  ChartView
 }) => {
   return (
     <Styled.Container>
@@ -62,7 +65,7 @@ export const PoolDetails: React.FC<Props> = ({
           />
         </A.Col>
         <A.Col xs={24} md={16}>
-          <PoolChart isLoading={isLoading} />
+          <ChartView isLoading={isLoading} priceRatio={priceRatio} />
         </A.Col>
       </Styled.TopContainer>
       <A.Col span={24}>
