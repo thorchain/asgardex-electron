@@ -1,29 +1,24 @@
 import React, { useMemo } from 'react'
 
-import { Asset, assetAmount, AssetAmount, bn, bnOrZero } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import * as A from 'antd'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/Option'
 
-import { PoolDetail } from '../../types/generated/midgard/models'
+import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
 import { PoolCards } from './PoolCards'
 import { PoolChart } from './PoolChart'
+import * as H from './PoolDetails.helpers'
 import * as Styled from './PoolDetails.style'
 import { PoolTitle } from './PoolTitle'
 
-const getPrice = (data: Pick<PoolDetail, 'assetPrice'>, priceRatio: BigNumber = bn(1)) =>
-  assetAmount(bnOrZero(data.assetPrice).multipliedBy(priceRatio))
-
 export type Props = {
   asset: Asset
+  poolStatsDetail: PoolStatsDetail
   poolDetail: PoolDetail
   priceRatio: BigNumber
   priceSymbol?: string
-  earnings: AssetAmount
-  fees: AssetAmount
-  totalTx: BigNumber
-  totalSwaps: BigNumber
-  members: BigNumber
+  earningsHistory: O.Option<EarningsHistoryItemPool>
   isLoading?: boolean
   HistoryView: React.ComponentType<{ poolAsset: Asset }>
 }
@@ -31,18 +26,14 @@ export type Props = {
 export const PoolDetails: React.FC<Props> = ({
   asset,
   priceSymbol = '',
-  earnings,
-  fees,
-  totalTx,
-  totalSwaps,
-  members,
+  earningsHistory,
   priceRatio,
   poolDetail,
+  poolStatsDetail,
   isLoading,
   HistoryView
 }) => {
-  const price = useMemo(() => getPrice(poolDetail, priceRatio), [poolDetail, priceRatio])
-
+  const price = useMemo(() => H.getPrice(poolDetail, priceRatio), [poolDetail, priceRatio])
   return (
     <Styled.Container>
       <Styled.TopContainer>
@@ -51,13 +42,10 @@ export const PoolDetails: React.FC<Props> = ({
         </A.Col>
         <A.Col xs={24} md={8}>
           <PoolCards
+            poolStatsDetail={poolStatsDetail}
             priceRatio={priceRatio}
             poolDetail={poolDetail}
-            earnings={earnings}
-            fees={fees}
-            totalTx={totalTx}
-            totalSwaps={totalSwaps}
-            members={members}
+            earningsHistory={earningsHistory}
             priceSymbol={priceSymbol}
             isLoading={isLoading}
           />

@@ -1,50 +1,45 @@
 import React, { useMemo } from 'react'
 
-import { AssetAmount, baseAmount, baseToAsset, bn, bnOrZero, formatAssetAmount } from '@xchainjs/xchain-util'
+import { formatAssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
+import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { abbreviateNumber } from '../../helpers/numberHelper'
-import { PoolDetail } from '../../types/generated/midgard/models'
+import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
 import { PoolStatus } from '../uielements/poolStatus'
 import * as Styled from './PoolCards.style'
+import * as H from './PoolDetails.helpers'
 
 export type Props = {
   poolDetail: PoolDetail
-  earnings: AssetAmount
-  fees: AssetAmount
-  totalTx: BigNumber
-  totalSwaps: BigNumber
-  members: BigNumber
+  poolStatsDetail: PoolStatsDetail
+  earningsHistory: O.Option<EarningsHistoryItemPool>
   priceSymbol?: string
   isLoading?: boolean
   priceRatio: BigNumber
 }
 
-const getDepth = (data: Pick<PoolDetail, 'runeDepth'>, priceRatio: BigNumber = bn(1)) =>
-  baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(priceRatio)))
-
-const getVolume = (data: Pick<PoolDetail, 'volume24h'>, priceRatio: BigNumber = bn(1)) =>
-  baseToAsset(baseAmount(bnOrZero(data.volume24h).multipliedBy(priceRatio)))
-
-const getAPY = (data: Pick<PoolDetail, 'poolAPY'>) => bn(data.poolAPY).plus(1).multipliedBy(100)
-
 export const PoolCards: React.FC<Props> = ({
-  earnings,
-  fees,
-  totalTx,
-  totalSwaps,
-  members,
+  poolStatsDetail,
   priceSymbol = '',
   poolDetail,
+  earningsHistory,
   priceRatio,
   isLoading
 }) => {
   const intl = useIntl()
 
-  const liquidity = useMemo(() => getDepth(poolDetail, priceRatio), [poolDetail, priceRatio])
-  const volume = useMemo(() => getVolume(poolDetail, priceRatio), [poolDetail, priceRatio])
-  const apy = useMemo(() => getAPY(poolDetail), [poolDetail])
+  const liquidity = useMemo(() => H.getDepth(poolDetail, priceRatio), [poolDetail, priceRatio])
+  const volume = useMemo(() => H.getVolume(poolDetail, priceRatio), [poolDetail, priceRatio])
+  const apy = useMemo(() => H.getAPY(poolDetail), [poolDetail])
+
+  const fees = useMemo(() => H.getFees(poolStatsDetail, priceRatio), [poolStatsDetail, priceRatio])
+  const totalTx = useMemo(() => H.getTotalTx(poolStatsDetail), [poolStatsDetail])
+  const totalSwaps = useMemo(() => H.getTotalSwaps(poolStatsDetail), [poolStatsDetail])
+  const members = useMemo(() => H.getMembers(poolStatsDetail), [poolStatsDetail])
+
+  const earnings = useMemo(() => H.getEarnings(earningsHistory), [earningsHistory])
 
   return (
     <Styled.Container>

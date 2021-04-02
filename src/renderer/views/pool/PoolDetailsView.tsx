@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, baseAmount, baseToAsset, bn, bnOrZero } from '@xchainjs/xchain-util'
-import BigNumber from 'bignumber.js'
+import { assetFromString } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
@@ -10,56 +9,24 @@ import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
+import { poolDetailMock, poolStatsDetailMock } from '../../../shared/mock/pool'
 import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
 import { ErrorView } from '../../components/shared/error'
 import { RefreshButton } from '../../components/uielements/button'
-import { ZERO_ASSET_AMOUNT, ONE_BN, ZERO_BN } from '../../const'
+import { ONE_BN, ZERO_BN } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
 import { PoolDetailRD, PoolEarningHistoryRD, PoolStatsDetailRD } from '../../services/midgard/types'
-import { EarningsHistoryItemPool, PoolStatsDetail } from '../../types/generated/midgard'
 import * as Styled from './PoolDetailsView.styles'
 import { PoolHistory } from './PoolHistoryView'
-
-const getEarnings = (oData: O.Option<EarningsHistoryItemPool>, priceRatio: BigNumber = bn(1)) =>
-  FP.pipe(
-    oData,
-    O.fold(
-      () => ZERO_ASSET_AMOUNT,
-      (data) => baseToAsset(baseAmount(bnOrZero(data.earnings).multipliedBy(priceRatio)))
-    )
-  )
-
-const getTotalSwaps = (data: Pick<PoolStatsDetail, 'swapCount'>) => bn(data.swapCount)
-
-const getTotalTx = (data: PoolStatsDetail) => bn(data.swapCount).plus(data.addLiquidityCount).plus(data.withdrawCount)
-
-const getMembers = (data: Pick<PoolStatsDetail, 'uniqueMemberCount'>) => bn(data.uniqueMemberCount)
-
-const getFees = (data: Pick<PoolStatsDetail, 'totalFees'>, priceRatio: BigNumber = bn(1)) =>
-  baseToAsset(baseAmount(bnOrZero(data.totalFees).multipliedBy(priceRatio)))
 
 type TargetPoolDetailProps = Omit<PoolDetailProps, 'asset'>
 
 const defaultDetailsProps: TargetPoolDetailProps = {
-  poolDetail: {
-    asset: 'asset',
-    assetDepth: '0',
-    assetPrice: '0',
-    assetPriceUSD: '0',
-    poolAPY: '0',
-    runeDepth: '0',
-    status: '',
-
-    units: '0',
-    volume24h: ''
-  },
+  poolDetail: poolDetailMock,
+  poolStatsDetail: poolStatsDetailMock,
   priceRatio: ZERO_BN,
-  earnings: ZERO_ASSET_AMOUNT,
-  fees: ZERO_ASSET_AMOUNT,
-  totalTx: bn(0),
-  totalSwaps: bn(0),
-  members: bn(0),
+  earningsHistory: O.none,
   HistoryView: PoolHistory
 }
 
@@ -139,12 +106,9 @@ export const PoolDetailsView: React.FC = () => {
                 ([poolDetail, poolStatsDetail, poolEarningHistory]) => {
                   prevProps.current = {
                     priceRatio,
-                    poolDetail: poolDetail,
-                    earnings: getEarnings(poolEarningHistory, priceRatio),
-                    fees: getFees(poolStatsDetail, priceRatio),
-                    totalTx: getTotalTx(poolStatsDetail),
-                    totalSwaps: getTotalSwaps(poolStatsDetail),
-                    members: getMembers(poolStatsDetail),
+                    poolDetail,
+                    poolStatsDetail,
+                    earningsHistory: poolEarningHistory,
                     priceSymbol: O.toUndefined(priceSymbol),
                     HistoryView: PoolHistory
                   }
