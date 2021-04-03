@@ -17,7 +17,7 @@ import { network$ } from '../app/service'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
-import { WalletBalancesRD } from '../clients'
+import { WalletBalancesLD, WalletBalancesRD } from '../clients'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
@@ -148,9 +148,38 @@ const btcLedgerBalance$ = FP.pipe(
   RxOp.map((ledgerBalances) => ledgerBalances.balances)
 )
 
+// store reference to stream of ETH balances (testnet)
+let ethBalancesTestnet$: WalletBalancesLD
+/**
+ * Setter to return cached stream for ETH balances (testnet)
+ * to use one (and same) stream created by `ETH.balances$` factory only
+ */
+const getEthBalancesTestnet$ = () => {
+  // create stream if not available
+  if (!ethBalancesTestnet$) {
+    ethBalancesTestnet$ = ETH.balances$(ETHAssets).pipe(RxOp.shareReplay(1))
+  }
+  return ethBalancesTestnet$
+}
+
+// store reference to stream of ETH balances (mainnet)
+let ethBalancesMainnet$: WalletBalancesLD
+
+/**
+ * Setter to return cached stream for ETH balances (mainnet)
+ * to use one (and same) stream created by `ETH.balances$` factory only
+ */
+const getEthBalancesMainnet$ = () => {
+  if (!ethBalancesMainnet$) {
+    ethBalancesMainnet$ = ETH.balances$().pipe(RxOp.shareReplay(1))
+  }
+  return ethBalancesMainnet$
+}
+
 // Call of `ETH.balances$` depends on network
 const ethBalances$ = network$.pipe(
-  RxOp.switchMap((network) => ETH.balances$(network === 'testnet' ? ETHAssets : undefined))
+  RxOp.switchMap((network) => Rx.iif(() => network === 'testnet', getEthBalancesTestnet$(), getEthBalancesMainnet$())),
+  RxOp.shareReplay(1)
 )
 /**
  * Transforms ETH data (address + `WalletBalance`) into `ChainBalance`
