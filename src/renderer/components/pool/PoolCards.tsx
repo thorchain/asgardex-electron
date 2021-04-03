@@ -1,40 +1,45 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
-import { AssetAmount, formatAssetAmount } from '@xchainjs/xchain-util'
+import { formatAssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
+import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { abbreviateNumber } from '../../helpers/numberHelper'
+import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
 import { PoolStatus } from '../uielements/poolStatus'
 import * as Styled from './PoolCards.style'
+import * as H from './PoolDetails.helpers'
 
 export type Props = {
-  liquidity: AssetAmount
-  volumn: AssetAmount
-  earnings: AssetAmount
-  fees: AssetAmount
-  totalTx: BigNumber
-  totalSwaps: BigNumber
-  members: BigNumber
-  apy: BigNumber
-  // decimal value in percents
+  poolDetail: PoolDetail
+  poolStatsDetail: PoolStatsDetail
+  earningsHistory: O.Option<EarningsHistoryItemPool>
   priceSymbol?: string
   isLoading?: boolean
+  priceRatio: BigNumber
 }
 
 export const PoolCards: React.FC<Props> = ({
-  liquidity,
-  volumn,
-  earnings,
-  fees,
-  totalTx,
-  totalSwaps,
-  members,
-  apy,
+  poolStatsDetail,
   priceSymbol = '',
+  poolDetail,
+  earningsHistory,
+  priceRatio,
   isLoading
 }) => {
   const intl = useIntl()
+
+  const liquidity = useMemo(() => H.getDepth(poolDetail, priceRatio), [poolDetail, priceRatio])
+  const volume = useMemo(() => H.getVolume(poolDetail, priceRatio), [poolDetail, priceRatio])
+  const apy = useMemo(() => H.getAPY(poolDetail), [poolDetail])
+
+  const fees = useMemo(() => H.getFees(poolStatsDetail, priceRatio), [poolStatsDetail, priceRatio])
+  const totalTx = useMemo(() => H.getTotalTx(poolStatsDetail), [poolStatsDetail])
+  const totalSwaps = useMemo(() => H.getTotalSwaps(poolStatsDetail), [poolStatsDetail])
+  const members = useMemo(() => H.getMembers(poolStatsDetail), [poolStatsDetail])
+
+  const earnings = useMemo(() => H.getEarnings(earningsHistory), [earningsHistory])
 
   return (
     <Styled.Container>
@@ -50,9 +55,9 @@ export const PoolCards: React.FC<Props> = ({
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: volumn, trimZeros: true })}`}
+          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: volume, trimZeros: true })}`}
           label={intl.formatMessage({ id: 'deposit.poolDetails.volume' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(volumn.amount().toNumber(), 2)}`}
+          displayValue={`${priceSymbol} ${abbreviateNumber(volume.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
 
