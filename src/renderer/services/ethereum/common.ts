@@ -34,6 +34,9 @@ const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(RxOp.map(toEth
 const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
 const INFURA_PROJECT_ID = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_ID, '')
 
+const ETHPLORER_API_KEY = envOrDefault(process.env.REACT_APP_ETHPLORER_API_KEY, 'freekey')
+const ETHPLORER_API_URL = envOrDefault(process.env.REACT_APP_ETHPLORER_API_URL, 'https://api.ethplorer.io')
+
 /**
  * Stream to create an observable EthereumClient depending on existing phrase in keystore
  *
@@ -59,6 +62,8 @@ const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, 
               const client = new ETH.Client({
                 network,
                 etherscanApiKey: ETHERSCAN_API_KEY,
+                ethplorerApiKey: ETHPLORER_API_KEY,
+                ethplorerUrl: ETHPLORER_API_URL,
                 phrase,
                 ...infuraCreds
               })

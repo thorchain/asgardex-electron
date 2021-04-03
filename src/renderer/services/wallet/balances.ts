@@ -148,15 +148,14 @@ const btcLedgerBalance$ = FP.pipe(
   RxOp.map((ledgerBalances) => ledgerBalances.balances)
 )
 
+// Call of `ETH.balances$` depends on network
+const ethBalances$ = network$.pipe(
+  RxOp.switchMap((network) => ETH.balances$(network === 'testnet' ? ETHAssets : undefined))
+)
 /**
  * Transforms ETH data (address + `WalletBalance`) into `ChainBalance`
- * ETHAssets list is for testnet only
  */
-const ethChainBalance$: ChainBalance$ = Rx.combineLatest([
-  ETH.addressUI$,
-  // ETHAssets list is for testnet only
-  ETH.balances$(ETHAssets)
-]).pipe(
+const ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.addressUI$, ethBalances$]).pipe(
   RxOp.map(([walletAddress, balances]) => ({
     walletType: 'keystore',
     chain: ETHChain,
@@ -195,8 +194,7 @@ export const balancesState$: Observable<BalancesState> = Rx.combineLatest(
     THOR: [THOR.balances$],
     BTC: [BTC.balances$, btcLedgerBalance$],
     BCH: [BCH.balances$],
-    // ETHAssets list is for testnet only
-    ETH: [ETH.balances$(ETHAssets)],
+    ETH: [ethBalances$],
     BNB: [BNB.balances$],
     LTC: [LTC.balances$]
   })
