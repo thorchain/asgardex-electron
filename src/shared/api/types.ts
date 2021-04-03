@@ -6,7 +6,10 @@ import { Either } from 'fp-ts/lib/Either'
 
 import { Locale } from '../i18n/types'
 
-export type CommonStorage = Readonly<{ locale: Locale; userNodes: Address[] }>
+// A version number starting from `1` to avoid to load deprecated files
+export type StorageVersion = { version: string }
+export type UserNodesStorage = Record<Network, Address[]> & StorageVersion
+export type CommonStorage = Readonly<{ locale: Locale }> & StorageVersion
 
 /**
  * Hash map of common store files
@@ -15,7 +18,8 @@ export type CommonStorage = Readonly<{ locale: Locale; userNodes: Address[] }>
  * @see StoreFileName
  */
 export type StoreFilesContent = Readonly<{
-  commonStorage: CommonStorage
+  common: CommonStorage
+  userNodes: UserNodesStorage
 }>
 
 export type StoreFileName = keyof StoreFilesContent
@@ -88,6 +92,7 @@ declare global {
     apiLang: ApiLang
     apiUrl: ApiUrl
     apiHDWallet: ApiHDWallet
-    commonStorage: ApiFileStoreService<StoreFileData<'commonStorage'>>
+    apiCommonStorage: ApiFileStoreService<StoreFileData<'common'>>
+    apiUserNodesStorage: ApiFileStoreService<StoreFileData<'userNodes'>>
   }
 }

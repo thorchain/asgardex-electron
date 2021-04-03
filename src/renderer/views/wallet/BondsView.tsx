@@ -101,9 +101,9 @@ export const BondsView: React.FC = (): JSX.Element => {
         // Also remove from cached results
         delete nodeInfoCacheRef.current[node]
       }
-      removeNodeByAddressService(node)
+      removeNodeByAddressService(node, network)
     },
-    [removeNodeByAddressService]
+    [removeNodeByAddressService, network]
   )
 
   return (

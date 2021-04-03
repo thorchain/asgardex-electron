@@ -14,7 +14,7 @@ type Props = {
   removeNode: (node: Address) => void
   goToNode: (node: Address) => void
   network: Network
-  addNode: (node: Address) => void
+  addNode: (node: Address, network: Network) => void
   addressValidation: AddressValidation
   className?: string
 }
@@ -51,10 +51,10 @@ export const Bonds: React.FC<Props> = ({
 
   const onSubmit = useCallback(
     ({ address }: { address: string }) => {
-      addNode(address)
+      addNode(address, network)
       form.resetFields()
     },
-    [addNode, form]
+    [addNode, form, network]
   )
   return (
     <Styled.Container className={className}>
