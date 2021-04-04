@@ -3,23 +3,13 @@ export type ChartDetail = {
   time: number
 }
 
-export type ChartValues = {
-  allTime: ChartDetail[]
-  week: ChartDetail[]
-}
-
 export type ChartView = 'line' | 'bar'
 
 export type ChartObject = {
-  values?: ChartValues
+  values?: ChartDetail[]
   loading?: boolean
-  comingSoon?: boolean
   type?: ChartView
   unit?: string
-}
-
-export type ChartData = {
-  [key: string]: ChartObject
 }
 
 export type ChartTimeFrame = 'allTime' | 'week'
@@ -37,12 +27,6 @@ export type DisplayDataParams = {
   labels: string[]
   values: number[]
   colors: DisplayDataColor
-}
-
-export type ChartDataParams = {
-  chartData: ChartData
-  selectedIndex: string
-  chartTimeframe: ChartTimeFrame
 }
 
 export type PoolDetailsChartData = {

@@ -16,19 +16,20 @@ import {
   BarChart,
   LineChart
 } from './PoolDetailsChart.styles'
-import { ChartData, ChartTimeFrame } from './types'
+import { ChartObject, ChartTimeFrame } from './types'
 
 type Props = {
-  chartData: ChartData
-  chartIndexes: string[]
-  selectedIndex: string
-  selectChart: (value: string) => void
+  chartData: ChartObject
+  dataTypes: string[]
+  selectedDataType: string
+  setDataType: (dataType: string) => void
+  selectedTimeFrame: ChartTimeFrame
+  setTimeFrame: (timeFrame: ChartTimeFrame) => void
 }
 
 const DefaultChart: React.FC<Props> = React.memo(
   (props: Props): JSX.Element => {
-    const { chartIndexes = [], chartData, selectedIndex, selectChart } = props
-    const [chartTimeframe, setChartTimeframe] = React.useState<ChartTimeFrame>('allTime')
+    const { chartData, dataTypes, selectedDataType, selectedTimeFrame, setDataType, setTimeFrame } = props
 
     const isDesktopView = Grid.useBreakpoint()?.md ?? false
 
@@ -38,11 +39,7 @@ const DefaultChart: React.FC<Props> = React.memo(
     const theme = isLight ? themes.light : themes.dark
     const colors = useMemo(() => getChartColors(theme, isLight), [theme, isLight])
 
-    const { labels, values, unit, isChartLoading, selectedChartType } = getChartData({
-      chartData,
-      selectedIndex,
-      chartTimeframe
-    })
+    const { labels, values, unit, isChartLoading, selectedChartType } = getChartData(chartData)
 
     const getData = useMemo(() => getDisplayData({ labels, values, colors }), [labels, values, colors])
 
@@ -64,20 +61,20 @@ const DefaultChart: React.FC<Props> = React.memo(
       return (
         <HeaderContainer>
           <TypeContainer>
-            {chartIndexes.map((chartIndex) => (
+            {dataTypes.map((dataType) => (
               <HeaderToggle
-                primary={selectedIndex === chartIndex}
-                key={`headerToggle${chartIndex}`}
-                onClick={() => selectChart(chartIndex)}>
-                {chartIndex}
+                primary={selectedDataType === dataType}
+                key={`headerToggle${dataType}`}
+                onClick={() => setDataType(dataType)}>
+                {dataType}
               </HeaderToggle>
             ))}
           </TypeContainer>
           <TimeContainer>
-            <HeaderToggle primary={chartTimeframe === 'week'} onClick={() => setChartTimeframe('week')}>
+            <HeaderToggle primary={selectedTimeFrame === 'week'} onClick={() => setTimeFrame('week')}>
               Week
             </HeaderToggle>
-            <HeaderToggle primary={chartTimeframe === 'allTime'} onClick={() => setChartTimeframe('allTime')}>
+            <HeaderToggle primary={selectedTimeFrame === 'allTime'} onClick={() => setTimeFrame('allTime')}>
               All
             </HeaderToggle>
           </TimeContainer>

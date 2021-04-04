@@ -1,15 +1,23 @@
-import React from 'react'
+import React, { useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { baseAmount, baseToAsset, bnOrZero, currencySymbolByAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
+import * as RxOp from 'rxjs/operators'
 
-import { PoolChart } from '../../components/pool/PoolChart'
+import Chart from '../../components/uielements/chart'
+import { ChartDetail, ChartTimeFrame } from '../../components/uielements/chart/types'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { SelectedPricePoolAsset } from '../../services/midgard/types'
-import { GetDepthHistoryIntervalEnum, GetSwapHistoryIntervalEnum } from '../../types/generated/midgard'
+import {
+  DepthHistoryItem,
+  GetDepthHistoryIntervalEnum,
+  GetSwapHistoryIntervalEnum,
+  SwapHistoryItem
+} from '../../types/generated/midgard'
 import { getEoDTime, getWeekAgoTime } from './PoolChartView.helper'
 
 type Props = {
@@ -25,95 +33,96 @@ export const PoolChartView: React.FC<Props> = ({ isLoading, priceRatio }) => {
   } = useMidgardContext()
 
   const selectedPricePoolAsset = useObservableState<SelectedPricePoolAsset>(selectedPricePoolAsset$, O.none)
+  const unit = FP.pipe(
+    selectedPricePoolAsset,
+    O.fold(() => '', currencySymbolByAsset)
+  )
+
+  type DataRequestParams = { timeFrame: ChartTimeFrame; dataType: string }
+  const savedParams = useRef<DataRequestParams>({
+    timeFrame: 'allTime',
+    dataType: 'Liquidity'
+  })
 
   const curTime = getEoDTime()
   const weekAgoTime = getWeekAgoTime()
-
-  const [swapAllHistoryRD] = useObservableState(
-    () =>
-      getSwapHistory$({
-        interval: GetSwapHistoryIntervalEnum.Day
-      }),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [chartDataRD, updateChartData] = useObservableState<RD.RemoteData<any, any>, Partial<DataRequestParams>>(
+    (params$) =>
+      FP.pipe(
+        params$,
+        RxOp.map((params) => (savedParams.current = { ...savedParams.current, ...params })),
+        RxOp.switchMap((params) => {
+          const requestParams = params.timeFrame === 'week' ? { from: weekAgoTime, to: curTime } : {}
+          return params.dataType === 'Liquidity'
+            ? getDepthHistory$({
+                ...requestParams,
+                interval: GetDepthHistoryIntervalEnum.Day
+              })
+            : getSwapHistory$({
+                ...requestParams,
+                interval: GetSwapHistoryIntervalEnum.Day
+              })
+        })
+      ),
     RD.initial
   )
-  const volumeAllTimeData = FP.pipe(
-    swapAllHistoryRD,
-    RD.toOption,
-    O.map((history) =>
-      history.intervals.map((interval) => ({
-        time: Number(interval.startTime),
-        poolVolume: interval.totalVolume
-      }))
+
+  const chartValues = FP.pipe(
+    chartDataRD,
+    RD.fold(
+      () => [] as ChartDetail[],
+      () => [] as ChartDetail[],
+      () => [] as ChartDetail[],
+      (history) => {
+        if (savedParams.current.dataType === 'Liquidity') {
+          const intervals = history.intervals as DepthHistoryItem[]
+          return intervals.map((interval) => ({
+            time: Number(interval.startTime),
+            value: baseToAsset(baseAmount(bnOrZero(interval.runeDepth).multipliedBy(2).multipliedBy(priceRatio)))
+              .amount()
+              .toFixed(3)
+          }))
+        } else {
+          const intervals = history.intervals as SwapHistoryItem[]
+          return intervals.map((interval) => ({
+            time: Number(interval.startTime),
+            value: baseToAsset(baseAmount(bnOrZero(interval.totalVolume).multipliedBy(priceRatio)))
+              .amount()
+              .toFixed(3)
+          }))
+        }
+      }
     )
   )
 
-  const [swapWeekHistoryRD] = useObservableState(
-    () =>
-      getSwapHistory$({
-        interval: GetSwapHistoryIntervalEnum.Day,
-        from: weekAgoTime,
-        to: curTime
-      }),
-    RD.initial
-  )
-  const volumeWeekData = FP.pipe(
-    swapWeekHistoryRD,
-    RD.toOption,
-    O.map((history) =>
-      history.intervals.map((interval) => ({
-        time: Number(interval.startTime),
-        poolVolume: interval.totalVolume
-      }))
-    )
+  const setTimeFrameCallback = useCallback(
+    (timeFrame: ChartTimeFrame) => {
+      updateChartData({ timeFrame })
+    },
+    [updateChartData]
   )
 
-  const [depthAllHistoryRD] = useObservableState(
-    () =>
-      getDepthHistory$({
-        interval: GetDepthHistoryIntervalEnum.Day
-      }),
-    RD.initial
-  )
-  const liquidityAllTimeData = FP.pipe(
-    depthAllHistoryRD,
-    RD.toOption,
-    O.map((history) =>
-      history.intervals.map((interval) => ({
-        time: Number(interval.startTime),
-        runeDepth: interval.runeDepth
-      }))
-    )
-  )
-
-  const [depthWeekHistoryRD] = useObservableState(
-    () =>
-      getDepthHistory$({
-        interval: GetDepthHistoryIntervalEnum.Day,
-        from: weekAgoTime,
-        to: curTime
-      }),
-    RD.initial
-  )
-  const liquidityWeekData = FP.pipe(
-    depthWeekHistoryRD,
-    RD.toOption,
-    O.map((history) =>
-      history.intervals.map((interval) => ({
-        time: Number(interval.startTime),
-        runeDepth: interval.runeDepth
-      }))
-    )
+  const setDataTypeCallback = useCallback(
+    (dataType: string) => {
+      updateChartData({ dataType })
+    },
+    [updateChartData]
   )
 
   return (
-    <PoolChart
-      selectedPricePoolAsset={selectedPricePoolAsset}
-      isLoading={isLoading}
-      volumeAllTimeData={volumeAllTimeData}
-      volumeWeekData={volumeWeekData}
-      liquidityAllTimeData={liquidityAllTimeData}
-      liquidityWeekData={liquidityWeekData}
-      priceRatio={priceRatio}
+    <Chart
+      dataTypes={['Liquidity', 'Volume']}
+      selectedDataType={savedParams.current.dataType}
+      setDataType={setDataTypeCallback}
+      chartData={{
+        values: chartValues,
+        loading: isLoading,
+        type: savedParams.current.dataType === 'Liquidity' ? 'line' : 'bar',
+        unit
+      }}
+      selectedTimeFrame={savedParams.current.timeFrame}
+      setTimeFrame={setTimeFrameCallback}
     />
   )
 }
