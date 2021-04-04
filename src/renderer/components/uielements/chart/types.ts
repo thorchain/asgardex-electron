@@ -5,13 +5,6 @@ export type ChartDetail = {
 
 export type ChartView = 'line' | 'bar'
 
-export type ChartObject = {
-  values?: ChartDetail[]
-  loading?: boolean
-  type?: ChartView
-  unit?: string
-}
-
 export type ChartTimeFrame = 'allTime' | 'week'
 
 export type DisplayDataColor = {
@@ -32,9 +25,6 @@ export type DisplayDataParams = {
 export type PoolDetailsChartData = {
   labels: Array<string>
   values: Array<number>
-  unit: string
-  isChartLoading: boolean
-  selectedChartType: ChartView
 }
 
 export type ChartOptionsParams = {

@@ -50,6 +50,7 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
     (params$) =>
       FP.pipe(
         params$,
+        RxOp.startWith(savedParams),
         RxOp.map((params) => (savedParams.current = { ...savedParams.current, ...params })),
         RxOp.switchMap((params) => {
           const requestParams = params.timeFrame === 'week' ? { from: weekAgoTime, to: curTime } : {}
@@ -114,12 +115,10 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
       dataTypes={['Liquidity', 'Volume']}
       selectedDataType={savedParams.current.dataType}
       setDataType={setDataTypeCallback}
-      chartData={{
-        values: chartValues,
-        loading: RD.isPending(chartDataRD),
-        type: savedParams.current.dataType === 'Liquidity' ? 'line' : 'bar',
-        unit
-      }}
+      chartValues={chartValues}
+      isLoading={RD.isPending(chartDataRD)}
+      chartType={savedParams.current.dataType === 'Liquidity' ? 'line' : 'bar'}
+      unit={unit}
       selectedTimeFrame={savedParams.current.timeFrame}
       setTimeFrame={setTimeFrameCallback}
     />

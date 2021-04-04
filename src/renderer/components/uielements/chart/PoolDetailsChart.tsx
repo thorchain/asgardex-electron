@@ -16,10 +16,13 @@ import {
   BarChart,
   LineChart
 } from './PoolDetailsChart.styles'
-import { ChartObject, ChartTimeFrame } from './types'
+import { ChartDetail, ChartTimeFrame, ChartView } from './types'
 
 type Props = {
-  chartData: ChartObject
+  chartValues: ChartDetail[]
+  isLoading: boolean
+  chartType: ChartView
+  unit: string
   dataTypes: string[]
   selectedDataType: string
   setDataType: (dataType: string) => void
@@ -29,7 +32,17 @@ type Props = {
 
 const DefaultChart: React.FC<Props> = React.memo(
   (props: Props): JSX.Element => {
-    const { chartData, dataTypes, selectedDataType, selectedTimeFrame, setDataType, setTimeFrame } = props
+    const {
+      chartValues,
+      isLoading,
+      chartType,
+      unit,
+      dataTypes,
+      selectedDataType,
+      selectedTimeFrame,
+      setDataType,
+      setTimeFrame
+    } = props
 
     const isDesktopView = Grid.useBreakpoint()?.md ?? false
 
@@ -39,18 +52,18 @@ const DefaultChart: React.FC<Props> = React.memo(
     const theme = isLight ? themes.light : themes.dark
     const colors = useMemo(() => getChartColors(theme, isLight), [theme, isLight])
 
-    const { labels, values, unit, isChartLoading, selectedChartType } = getChartData(chartData)
+    const { labels, values } = getChartData(chartValues)
 
     const getData = useMemo(() => getDisplayData({ labels, values, colors }), [labels, values, colors])
 
     const options = useMemo(() => getChartOptions({ unit, colors, isDesktopView }), [unit, colors, isDesktopView])
 
     const renderChart = () => {
-      if (isChartLoading) {
+      if (isLoading) {
         return <Spin />
       }
 
-      if (selectedChartType === 'bar') {
+      if (chartType === 'bar') {
         return <BarChart data={getData} options={options} />
       }
 
