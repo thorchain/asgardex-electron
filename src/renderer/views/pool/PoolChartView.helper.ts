@@ -1,5 +1,6 @@
 import moment from 'moment'
 
+// Get end of date time
 export const getEoDTime = () => {
   return moment()
     .set({
@@ -11,6 +12,7 @@ export const getEoDTime = () => {
     .unix()
 }
 
+// Get a week ago time
 export const getWeekAgoTime = () => {
   return moment()
     .subtract(7, 'days')

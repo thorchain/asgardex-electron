@@ -13,11 +13,10 @@ import { GetDepthHistoryIntervalEnum, GetSwapHistoryIntervalEnum } from '../../t
 import { getEoDTime, getWeekAgoTime } from './PoolChartView.helper'
 
 type Props = {
-  isLoading?: boolean
   priceRatio: BigNumber
 }
 
-export const PoolChartView: React.FC<Props> = ({ isLoading, priceRatio }) => {
+export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
   const {
     service: {
       pools: { selectedPricePoolAsset$, getSwapHistory$, getDepthHistory$ }
@@ -108,7 +107,12 @@ export const PoolChartView: React.FC<Props> = ({ isLoading, priceRatio }) => {
   return (
     <PoolChart
       selectedPricePoolAsset={selectedPricePoolAsset}
-      isLoading={isLoading}
+      isLoading={
+        RD.isPending(swapAllHistoryRD) ||
+        RD.isPending(swapWeekHistoryRD) ||
+        RD.isPending(depthAllHistoryRD) ||
+        RD.isPending(depthWeekHistoryRD)
+      }
       volumeAllTimeData={volumeAllTimeData}
       volumeWeekData={volumeWeekData}
       liquidityAllTimeData={liquidityAllTimeData}
