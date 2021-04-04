@@ -21,11 +21,10 @@ import {
 import { getEoDTime, getWeekAgoTime } from './PoolChartView.helper'
 
 type Props = {
-  isLoading?: boolean
   priceRatio: BigNumber
 }
 
-export const PoolChartView: React.FC<Props> = ({ isLoading, priceRatio }) => {
+export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
   const {
     service: {
       pools: { selectedPricePoolAsset$, getSwapHistory$, getDepthHistory$ }
@@ -117,7 +116,7 @@ export const PoolChartView: React.FC<Props> = ({ isLoading, priceRatio }) => {
       setDataType={setDataTypeCallback}
       chartData={{
         values: chartValues,
-        loading: isLoading,
+        loading: RD.isPending(chartDataRD),
         type: savedParams.current.dataType === 'Liquidity' ? 'line' : 'bar',
         unit
       }}

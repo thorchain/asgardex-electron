@@ -1,5 +1,6 @@
 import moment from 'moment'
 
+// Get end of date time
 export const getEoDTime = () => {
   return moment()
     .set({

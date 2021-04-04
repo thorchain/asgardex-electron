@@ -1,49 +1,40 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
-import { Asset, AssetAmount } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import * as A from 'antd'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/Option'
 
+import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
 import { PoolCards } from './PoolCards'
+import * as H from './PoolDetails.helpers'
 import * as Styled from './PoolDetails.style'
 import { PoolTitle } from './PoolTitle'
 
 export type Props = {
   asset: Asset
-  price: AssetAmount
-  priceSymbol?: string
-  liquidity: AssetAmount
-  volumn: AssetAmount
-  earnings: AssetAmount
-  fees: AssetAmount
-  totalTx: BigNumber
-  totalSwaps: BigNumber
-  members: BigNumber
-  apy: BigNumber
-  isLoading?: boolean
+  poolStatsDetail: PoolStatsDetail
+  poolDetail: PoolDetail
   priceRatio: BigNumber
+  priceSymbol?: string
+  earningsHistory: O.Option<EarningsHistoryItemPool>
+  isLoading?: boolean
   HistoryView: React.ComponentType<{ poolAsset: Asset }>
   ChartView: React.ComponentType<{ isLoading?: boolean; priceRatio: BigNumber }>
 }
 
 export const PoolDetails: React.FC<Props> = ({
   asset,
-  price,
   priceSymbol = '',
-  liquidity,
-  volumn,
-  earnings,
-  fees,
-  totalTx,
-  totalSwaps,
-  members,
-  apy,
-  isLoading,
+  earningsHistory,
   priceRatio,
+  poolDetail,
+  poolStatsDetail,
+  isLoading,
   HistoryView,
   ChartView
 }) => {
+  const price = useMemo(() => H.getPrice(poolDetail, priceRatio), [poolDetail, priceRatio])
   return (
     <Styled.Container>
       <Styled.TopContainer>
@@ -52,20 +43,16 @@ export const PoolDetails: React.FC<Props> = ({
         </A.Col>
         <A.Col xs={24} md={8}>
           <PoolCards
-            liquidity={liquidity}
-            volumn={volumn}
-            earnings={earnings}
-            fees={fees}
-            totalTx={totalTx}
-            totalSwaps={totalSwaps}
-            members={members}
-            apy={apy}
+            poolStatsDetail={poolStatsDetail}
+            priceRatio={priceRatio}
+            poolDetail={poolDetail}
+            earningsHistory={earningsHistory}
             priceSymbol={priceSymbol}
             isLoading={isLoading}
           />
         </A.Col>
         <A.Col xs={24} md={16}>
-          <ChartView isLoading={isLoading} priceRatio={priceRatio} />
+          <ChartView priceRatio={priceRatio} />
         </A.Col>
       </Styled.TopContainer>
       <A.Col span={24}>

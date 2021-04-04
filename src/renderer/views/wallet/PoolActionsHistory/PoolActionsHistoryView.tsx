@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
@@ -16,12 +16,14 @@ import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { liveData } from '../../../helpers/rx/liveData'
 import { ENABLED_CHAINS } from '../../../services/const'
-import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../../services/midgard/poolActionsHistory'
-import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../../services/midgard/types'
+import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS } from '../../../services/midgard/poolActionsHistory'
+import { PoolActionsHistoryPage } from '../../../services/midgard/types'
 
 export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ className }) => {
   const {
-    service: { poolActionsHistory }
+    service: {
+      poolActionsHistory: { resetActionsData, requestParam$, loadActionsHistory, actions$ }
+    }
   } = useMidgardContext()
 
   const { addressByChain$ } = useChainContext()
@@ -39,27 +41,29 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
     [addressByChain$]
   )
 
+  useEffect(() => {
+    return () => {
+      resetActionsData()
+    }
+    // Call reset callback only on component unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const prevActionsPage = useRef<O.Option<PoolActionsHistoryPage>>(O.none)
 
-  const requestParams = useRef(DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS)
+  const requestParams = useObservableState(
+    FP.pipe(requestParam$, RxOp.map(O.getOrElse(() => DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS))),
+    DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS
+  )
 
-  const [historyPage, setHistoryPageParams] = useObservableState<PoolActionsHistoryPageRD, Partial<LoadActionsParams>>(
-    (params$) =>
+  const [historyPage] = useObservableState(
+    () =>
       FP.pipe(
-        params$,
-        RxOp.startWith(DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS),
-        RxOp.switchMap((params) =>
-          FP.pipe(
-            addresses$,
-            RxOp.map((addresses) => ({ ...params, addresses }))
-          )
-        ),
-        RxOp.map((params) => {
-          const res = { ...DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, ...params }
-          requestParams.current = res
-          return res
+        addresses$,
+        RxOp.switchMap((addresses) => {
+          loadActionsHistory({ ...DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, addresses })
+          return actions$
         }),
-        RxOp.switchMap(poolActionsHistory.actions$),
         liveData.map((page) => {
           prevActionsPage.current = O.some(page)
           return page
@@ -70,19 +74,20 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
 
   const setCurrentPage = useCallback(
     (page: number) => {
-      setHistoryPageParams({ page: page - 1 })
+      loadActionsHistory({ page: page - 1 })
     },
-    [setHistoryPageParams]
+    [loadActionsHistory]
   )
 
   const setFilter = useCallback(
     (filter: Filter) => {
-      setHistoryPageParams({
+      loadActionsHistory({
+        // For every new filter reset all parameters to defaults and with a custom filter
         ...DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS,
         type: filter
       })
     },
-    [setHistoryPageParams]
+    [loadActionsHistory]
   )
 
   const oExplorerUrl = useObservableState(getExplorerTxUrl$, O.none)
@@ -106,12 +111,12 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
   return (
     <PoolActionsHistory
       className={className}
-      currentPage={requestParams.current.page + 1}
+      currentPage={requestParams.page + 1}
       actionsPageRD={historyPage}
       prevActionsPage={prevActionsPage.current}
       goToTx={goToTx}
       changePaginationHandler={setCurrentPage}
-      currentFilter={requestParams.current.type || 'ALL'}
+      currentFilter={requestParams.type || 'ALL'}
       setFilter={setFilter}
     />
   )
