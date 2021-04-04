@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
@@ -27,36 +27,30 @@ const DEFAULT_REQUEST_PARAMS = {
 
 export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
   const {
-    service: { poolActionsHistory }
+    service: {
+      poolActionsHistory: { actions$, loadActionsHistory, requestParam$, resetActionsData }
+    }
   } = useMidgardContext()
 
   const { getExplorerTxUrl$ } = useThorchainContext()
 
   const prevActionsPage = useRef<O.Option<PoolActionsHistoryPage>>(O.none)
 
-  const requestParams = useRef(DEFAULT_REQUEST_PARAMS)
+  const requestParams = useObservableState(
+    FP.pipe(requestParam$, RxOp.map(O.getOrElse((): LoadActionsParams => DEFAULT_REQUEST_PARAMS))),
+    DEFAULT_REQUEST_PARAMS
+  )
 
-  /**
-   * setHistoryPageParams receives Partial parameters to have an opportunity to
-   * change request parameters only by small parts (not all in one). e.g setCurrentPage.
-   * To store previously chosen request parameters that should not be changed `requestParams` ref is used.
-   */
-  const [historyPage, setHistoryPageParams] = useObservableState<PoolActionsHistoryPageRD, Partial<LoadActionsParams>>(
-    (params$) =>
+  const stringAsset = useMemo(() => assetToString(poolAsset), [poolAsset])
+
+  useEffect(() => {
+    loadActionsHistory({ ...DEFAULT_REQUEST_PARAMS, asset: stringAsset })
+  }, [loadActionsHistory, stringAsset])
+
+  const [historyPage] = useObservableState<PoolActionsHistoryPageRD>(
+    () =>
       FP.pipe(
-        params$,
-        RxOp.startWith(DEFAULT_REQUEST_PARAMS),
-        RxOp.map((params) => {
-          const res = {
-            // Merge previously saved request parameters with a new Partial parameters
-            ...requestParams.current,
-            asset: assetToString(poolAsset),
-            ...params
-          }
-          requestParams.current = res
-          return res
-        }),
-        RxOp.switchMap(poolActionsHistory.actions$),
+        actions$,
         liveData.map((page) => {
           prevActionsPage.current = O.some(page)
           return page
@@ -65,22 +59,30 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
     RD.initial
   )
 
+  useEffect(() => {
+    return () => {
+      resetActionsData()
+    }
+    // Call reset callback only on component unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const setCurrentPage = useCallback(
     (page: number) => {
-      setHistoryPageParams({ page: page - 1 })
+      loadActionsHistory({ page: page - 1 })
     },
-    [setHistoryPageParams]
+    [loadActionsHistory]
   )
 
   const setFilter = useCallback(
     (filter: Filter) => {
-      setHistoryPageParams({
-        // For every new filter reset all parameters to default and pass a filter
+      loadActionsHistory({
+        // For every new filter reset all parameters to defaults and with a custom filter
         ...DEFAULT_REQUEST_PARAMS,
         type: filter
       })
     },
-    [setHistoryPageParams]
+    [loadActionsHistory]
   )
 
   const oExplorerUrl = useObservableState(getExplorerTxUrl$, O.none)
@@ -104,12 +106,12 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
   return (
     <PoolActionsHistory
       className={className}
-      currentPage={requestParams.current.page + 1}
+      currentPage={requestParams.page + 1}
       actionsPageRD={historyPage}
       prevActionsPage={prevActionsPage.current}
       goToTx={goToTx}
       changePaginationHandler={setCurrentPage}
-      currentFilter={requestParams.current.type || 'ALL'}
+      currentFilter={requestParams.type || 'ALL'}
       setFilter={setFilter}
     />
   )

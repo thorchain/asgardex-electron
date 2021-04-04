@@ -2,6 +2,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Address, TxHash } from '@xchainjs/xchain-client'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
@@ -12,7 +13,7 @@ import { InlineResponse200 } from '../../types/generated/midgard/models'
 import { MAX_ITEMS_PER_PAGE } from '../const'
 import { ErrorId } from '../wallet/types'
 import { getRequestType, mapAction } from './poolActionsHistory.utils'
-import { PoolActionsHistoryPageLD, PoolActionsHistoryPageRD, TxType } from './types'
+import { PoolActionsHistoryPageLD, TxType } from './types'
 
 export type LoadActionsParams = {
   page: number
@@ -35,9 +36,11 @@ export const createPoolActionsHistoryService = (
 
   const { stream$: reloadActionsHistory$, trigger: reloadActionsHistory } = triggerStream()
 
-  const { get$: isHistoryLoading$, set: setIsHistoryLoading } = observableState(false)
+  const { get$: requestParam$, set: setRequestParams, get: getCurrentRequestParams } = observableState<
+    O.Option<LoadActionsParams>
+  >(O.none)
 
-  const actions$ = ({
+  const getActions$ = ({
     itemsPerPage,
     page,
     type,
@@ -45,8 +48,7 @@ export const createPoolActionsHistoryService = (
     ...params
   }: LoadActionsParams): PoolActionsHistoryPageLD =>
     FP.pipe(
-      Rx.combineLatest([midgardDefaultApi$, reloadActionsHistory$]),
-      RxOp.map(([api]) => api),
+      midgardDefaultApi$,
       liveData.mapLeft(() => ({
         errorId: ErrorId.GET_ACTIONS,
         msg: 'API is not available'
@@ -71,7 +73,7 @@ export const createPoolActionsHistoryService = (
             msg: 'Error while getting a history'
           })),
           RxOp.startWith(RD.pending),
-          RxOp.catchError<PoolActionsHistoryPageRD, PoolActionsHistoryPageLD>((e) =>
+          RxOp.catchError((e) =>
             Rx.of(
               RD.failure({
                 errorId: ErrorId.GET_ACTIONS,
@@ -80,19 +82,52 @@ export const createPoolActionsHistoryService = (
             )
           )
         )
-      ),
-      RxOp.tap((value) => {
-        if (RD.isPending(value)) {
-          setIsHistoryLoading(true)
-        } else {
-          setIsHistoryLoading(false)
-        }
-      })
+      )
     )
+
+  const resetActionsData = () => {
+    setRequestParams(O.none)
+  }
+  const loadActionsHistory = (parameters: Partial<LoadActionsParams>) => {
+    const newParams = FP.pipe(
+      getCurrentRequestParams(),
+      O.alt(() => O.some(DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS)),
+      /**
+       * Merge new parameters with a previous ones to have an opportunity
+       * of partial updates of parameters
+       */
+      O.map((previousParams) => ({ ...previousParams, ...parameters }))
+    )
+    setRequestParams(newParams)
+  }
+
+  /**
+   * !!! NOTE !!!
+   * When using actions$ at any View do not forget
+   * to reset parameters with resetActionsData on View
+   * unmount to avoid any unwanted caching of requestParam$
+   * values as it's a hot stream and will not be completed
+   * after any unsubscription
+   */
+  const actions$: PoolActionsHistoryPageLD = FP.pipe(
+    Rx.combineLatest([requestParam$, reloadActionsHistory$]),
+    RxOp.switchMap(([parameters]) =>
+      FP.pipe(
+        parameters,
+        O.fold(
+          (): PoolActionsHistoryPageLD => Rx.of(RD.initial),
+          (params) => getActions$(params)
+        )
+      )
+    ),
+    RxOp.shareReplay(1)
+  )
 
   return {
     actions$,
-    isHistoryLoading$,
-    reloadActionsHistory
+    requestParam$,
+    reloadActionsHistory,
+    resetActionsData,
+    loadActionsHistory
   }
 }
