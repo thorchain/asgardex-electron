@@ -1,10 +1,15 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import themes, { ThemeType } from '@thorchain/asgardex-theme'
 import { Grid, Spin } from 'antd'
+import * as A from 'fp-ts/lib/Array'
+import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 
 import { useThemeContext } from '../../../contexts/ThemeContext'
+import { ErrorView } from '../../shared/error'
 import { getChartColors, getChartData, getChartOptions, getDisplayData } from './PoolDetailsChart.helpers'
 import {
   ChartContainer,
@@ -16,12 +21,11 @@ import {
   BarChart,
   LineChart
 } from './PoolDetailsChart.styles'
-import { ChartDetail, ChartTimeFrame, ChartView } from './types'
+import { ChartDetails, ChartDetailsRD, ChartTimeFrame, ChartType, PoolDetailsChartData } from './types'
 
 type Props = {
-  chartValues: ChartDetail[]
-  isLoading: boolean
-  chartType: ChartView
+  chartDetails: ChartDetailsRD
+  chartType: ChartType
   unit: string
   dataTypes: string[]
   selectedDataType: string
@@ -30,11 +34,10 @@ type Props = {
   setTimeFrame: (timeFrame: ChartTimeFrame) => void
 }
 
-const DefaultChart: React.FC<Props> = React.memo(
+export const PoolDetailsChart: React.FC<Props> = React.memo(
   (props: Props): JSX.Element => {
     const {
-      chartValues,
-      isLoading,
+      chartDetails: chartDetailsRD,
       chartType,
       unit,
       dataTypes,
@@ -46,32 +49,45 @@ const DefaultChart: React.FC<Props> = React.memo(
 
     const isDesktopView = Grid.useBreakpoint()?.md ?? false
 
+    const intl = useIntl()
+
     const { themeType$ } = useThemeContext()
     const themeType = useObservableState(themeType$, ThemeType.LIGHT)
     const isLight = themeType === ThemeType.LIGHT
     const theme = isLight ? themes.light : themes.dark
     const colors = useMemo(() => getChartColors(theme, isLight), [theme, isLight])
 
-    const { labels, values } = getChartData(chartValues)
+    const getChart = useCallback(
+      (chartDetails: ChartDetails) => {
+        const { labels, values }: PoolDetailsChartData = getChartData(chartDetails)
+        const data = getDisplayData({ labels, values, colors })
+        const options = getChartOptions({ unit, colors, isDesktopView })
 
-    const getData = useMemo(() => getDisplayData({ labels, values, colors }), [labels, values, colors])
+        return chartType === 'bar' ? (
+          <BarChart data={data} options={options} />
+        ) : (
+          <LineChart data={data} options={options} />
+        )
+      },
+      [chartType, colors, isDesktopView, unit]
+    )
 
-    const options = useMemo(() => getChartOptions({ unit, colors, isDesktopView }), [unit, colors, isDesktopView])
+    const renderChart = useMemo(
+      () =>
+        FP.pipe(
+          chartDetailsRD,
+          RD.fold(
+            () => getChart(A.empty),
+            () => <Spin />,
+            (_) => <ErrorView title={intl.formatMessage({ id: 'common.error' })} />,
+            (chartDetails) => getChart(chartDetails)
+          )
+        ),
+      [chartDetailsRD, getChart, intl]
+    )
 
-    const renderChart = () => {
-      if (isLoading) {
-        return <Spin />
-      }
-
-      if (chartType === 'bar') {
-        return <BarChart data={getData} options={options} />
-      }
-
-      return <LineChart data={getData} options={options} />
-    }
-
-    const renderHeader = () => {
-      return (
+    const renderHeader = useMemo(
+      () => (
         <HeaderContainer>
           <TypeContainer>
             {dataTypes.map((dataType) => (
@@ -85,23 +101,22 @@ const DefaultChart: React.FC<Props> = React.memo(
           </TypeContainer>
           <TimeContainer>
             <HeaderToggle primary={selectedTimeFrame === 'week'} onClick={() => setTimeFrame('week')}>
-              Week
+              {intl.formatMessage({ id: 'common.time.week' })}
             </HeaderToggle>
             <HeaderToggle primary={selectedTimeFrame === 'allTime'} onClick={() => setTimeFrame('allTime')}>
-              All
+              {intl.formatMessage({ id: 'common.time.all' })}
             </HeaderToggle>
           </TimeContainer>
         </HeaderContainer>
-      )
-    }
+      ),
+      [dataTypes, intl, selectedDataType, selectedTimeFrame, setDataType, setTimeFrame]
+    )
 
     return (
       <ChartContainer gradientStart={colors.backgroundGradientStart} gradientStop={colors.backgroundGradientStop}>
-        {renderHeader()}
-        <ChartWrapper>{renderChart()}</ChartWrapper>
+        {renderHeader}
+        <ChartWrapper>{renderChart}</ChartWrapper>
       </ChartContainer>
     )
   }
 )
-
-export default DefaultChart

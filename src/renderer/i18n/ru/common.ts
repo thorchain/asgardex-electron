@@ -69,7 +69,9 @@ const common: CommonMessages = {
   'common.tx.type.withdraw': 'Изъятие',
   'common.detail': 'Детали',
   'common.filter': 'Фильтр',
-  'common.all': 'Все'
+  'common.all': 'Все',
+  'common.time.week': 'Неделя',
+  'common.time.all': 'all'
 }
 
 export default common

@@ -1,9 +1,14 @@
+import * as RD from '@devexperts/remote-data-ts'
+
 export type ChartDetail = {
   value: string
   time: number
 }
 
-export type ChartView = 'line' | 'bar'
+export type ChartDetails = ChartDetail[]
+export type ChartDetailsRD = RD.RemoteData<Error, ChartDetails>
+
+export type ChartType = 'line' | 'bar'
 
 export type ChartTimeFrame = 'allTime' | 'week'
 
