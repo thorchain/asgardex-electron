@@ -94,24 +94,11 @@ export const getBlocksLeftForPendingPool = (
     A.findFirst((blockInfo) => eqString.equals(blockInfo.chain, asset.chain)),
     O.map(({ thorchain }) => Number(thorchain))
   )
-  // Number(
-  //   lastblocks.find((blockInfo) => {
-  //     console.log('blockInfo:', blockInfo)
-  //     console.log('asset', asset)
-  //     return blockInfo.chain === asset.chain ? blockInfo.thorchain : NaN
-  //   })
 
-  const result = FP.pipe(
+  return FP.pipe(
     sequenceTOption(oNewPoolCycle, oLastHeight),
     O.map(([newPoolCycle, lastHeight]) => newPoolCycle - (lastHeight % newPoolCycle))
   )
-
-  console.log('newPoolCycle:', oNewPoolCycle)
-  console.log('lastHeight:', oLastHeight)
-  console.log('result:', result)
-  // if (!newPoolCycle || !lastHeight) return O.none
-
-  return result
 }
 
 export const getBlocksLeftForPendingPoolAsString = (

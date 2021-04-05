@@ -112,16 +112,11 @@ export const PendingPools: React.FC = (): JSX.Element => {
       const oLastblockItems = RD.toOption(thorchainLastblockRD)
       const oConstants = RD.toOption(thorchainConstantsRD)
 
-      console.log('lastblock:', thorchainLastblockRD)
-      console.log('constants:', oConstants)
-
       const blocksLeft = FP.pipe(
         sequenceTOption(oLastblockItems, oConstants),
-        O.map(([lastblockItems, constants]) => {
-          console.log('xxx lastblockItems:', lastblockItems)
-          console.log('xxx constants:', constants)
-          return getBlocksLeftForPendingPoolAsString(constants, lastblockItems, pool.target)
-        }),
+        O.map(([lastblockItems, constants]) =>
+          getBlocksLeftForPendingPoolAsString(constants, lastblockItems, pool.target)
+        ),
         O.getOrElse(() => '')
       )
 
