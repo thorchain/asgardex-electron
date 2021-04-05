@@ -70,6 +70,8 @@ export type CommonMessageKey =
   | 'common.tx.type.donate'
   | 'common.tx.type.deposit'
   | 'common.tx.type.withdraw'
+  | 'common.time.week'
+  | 'common.time.all'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

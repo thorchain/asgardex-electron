@@ -7,7 +7,6 @@ import * as O from 'fp-ts/Option'
 
 import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
 import { PoolCards } from './PoolCards'
-import { PoolChart } from './PoolChart'
 import * as H from './PoolDetails.helpers'
 import * as Styled from './PoolDetails.style'
 import { PoolTitle } from './PoolTitle'
@@ -21,6 +20,7 @@ export type Props = {
   earningsHistory: O.Option<EarningsHistoryItemPool>
   isLoading?: boolean
   HistoryView: React.ComponentType<{ poolAsset: Asset }>
+  ChartView: React.ComponentType<{ isLoading?: boolean; priceRatio: BigNumber }>
 }
 
 export const PoolDetails: React.FC<Props> = ({
@@ -31,7 +31,8 @@ export const PoolDetails: React.FC<Props> = ({
   poolDetail,
   poolStatsDetail,
   isLoading,
-  HistoryView
+  HistoryView,
+  ChartView
 }) => {
   const price = useMemo(() => H.getPrice(poolDetail, priceRatio), [poolDetail, priceRatio])
   return (
@@ -51,7 +52,7 @@ export const PoolDetails: React.FC<Props> = ({
           />
         </A.Col>
         <A.Col xs={24} md={16}>
-          <PoolChart isLoading={isLoading} />
+          <ChartView priceRatio={priceRatio} />
         </A.Col>
       </Styled.TopContainer>
       <A.Col span={24}>

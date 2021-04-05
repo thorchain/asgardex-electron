@@ -2,7 +2,7 @@ import { Theme } from '@thorchain/asgardex-theme'
 import moment from 'moment'
 
 import { abbreviateNumber } from '../../../helpers/numberHelper'
-import { ChartDataParams, ChartOptionsParams, DisplayDataColor, DisplayDataParams, PoolDetailsChartData } from './types'
+import { ChartDetails, ChartOptionsParams, DisplayDataColor, DisplayDataParams, PoolDetailsChartData } from './types'
 
 export const getChartColors = (theme: Theme, isLight: boolean): DisplayDataColor => ({
   text: theme.palette.text[0],
@@ -76,24 +76,15 @@ export const getDisplayData = ({ labels, values, colors }: DisplayDataParams) =>
   }
 }
 
-export const getChartData = ({ chartData, selectedIndex, chartTimeframe }: ChartDataParams): PoolDetailsChartData => {
-  const selectedChartData = chartData?.[selectedIndex]
-  const isChartLoading = selectedChartData?.loading ?? false
-  const selectedChartType = selectedChartData?.type ?? 'bar'
-  const selectedChartValues = selectedChartData?.values
-  const unit = selectedChartData?.unit ?? ''
-  const filteredByTime = selectedChartValues?.[chartTimeframe] ?? []
+export const getChartData = (chartValues: ChartDetails): PoolDetailsChartData => {
+  const labels: Array<string> =
+    chartValues.map((data) => {
+      return moment.unix(data.time).format('MMM DD')
+    }) || []
 
-  const labels: Array<string> = filteredByTime.map((data) => {
-    return moment.unix(data.time).format('MMM DD')
-  })
-
-  const values: Array<number> = filteredByTime.map((data) => Number(data.value.split(',').join('')))
+  const values: Array<number> = chartValues.map((data) => Number(data.value.split(',').join(''))) || []
 
   return {
-    isChartLoading,
-    selectedChartType,
-    unit,
     labels,
     values
   }

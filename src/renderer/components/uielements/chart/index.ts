@@ -1,3 +1,1 @@
-import Chart from './PoolDetailsChart'
-
-export default Chart
+export { PoolDetailsChart } from './PoolDetailsChart'

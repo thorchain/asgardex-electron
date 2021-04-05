@@ -24,7 +24,9 @@ import {
   EarningsHistory,
   EarningsHistoryItemPool,
   GetDepthHistoryRequest,
-  DepthHistory
+  DepthHistory,
+  DepthHistoryItem,
+  SwapHistoryItem
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { Memo } from '../chain/types'
@@ -141,11 +143,13 @@ export type ApiGetSwapHistoryParams = { poolAsset: Asset } & Omit<GetSwapHistory
 export type GetSwapHistoryParams = Omit<ApiGetSwapHistoryParams, 'poolAsset'>
 export type SwapHistoryRD = RD.RemoteData<Error, SwapHistory>
 export type SwapHistoryLD = LiveData<Error, SwapHistory>
+export type SwapHistoryItems = SwapHistoryItem[]
 
 export type ApiGetDepthHistoryParams = { poolAsset: Asset } & Omit<GetDepthHistoryRequest, 'pool'>
 export type GetDepthHistoryParams = Omit<ApiGetDepthHistoryParams, 'poolAsset'>
 export type DepthHistoryRD = RD.RemoteData<Error, DepthHistory>
 export type DepthHistoryLD = LiveData<Error, DepthHistory>
+export type DepthHistoryItems = DepthHistoryItem[]
 
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>

@@ -13,21 +13,23 @@ import { poolDetailMock, poolStatsDetailMock } from '../../../shared/mock/pool'
 import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
 import { ErrorView } from '../../components/shared/error'
 import { RefreshButton } from '../../components/uielements/button'
-import { ONE_BN, ZERO_BN } from '../../const'
+import { ONE_BN } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
 import { PoolDetailRD, PoolEarningHistoryRD, PoolStatsDetailRD } from '../../services/midgard/types'
+import { PoolChartView } from './PoolChartView'
 import * as Styled from './PoolDetailsView.styles'
 import { PoolHistory } from './PoolHistoryView'
 
 type TargetPoolDetailProps = Omit<PoolDetailProps, 'asset'>
 
 const defaultDetailsProps: TargetPoolDetailProps = {
+  priceRatio: ONE_BN,
+  HistoryView: PoolHistory,
+  ChartView: PoolChartView,
   poolDetail: poolDetailMock,
   poolStatsDetail: poolStatsDetailMock,
-  priceRatio: ZERO_BN,
-  earningsHistory: O.none,
-  HistoryView: PoolHistory
+  earningsHistory: O.none
 }
 
 export const PoolDetailsView: React.FC = () => {
@@ -110,7 +112,8 @@ export const PoolDetailsView: React.FC = () => {
                     poolStatsDetail,
                     earningsHistory: poolEarningHistory,
                     priceSymbol: O.toUndefined(priceSymbol),
-                    HistoryView: PoolHistory
+                    HistoryView: PoolHistory,
+                    ChartView: PoolChartView
                   }
 
                   return <PoolDetails asset={asset} {...prevProps.current} />

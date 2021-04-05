@@ -1,26 +1,14 @@
+import * as RD from '@devexperts/remote-data-ts'
+
 export type ChartDetail = {
   value: string
   time: number
 }
 
-export type ChartValues = {
-  allTime: ChartDetail[]
-  week: ChartDetail[]
-}
+export type ChartDetails = ChartDetail[]
+export type ChartDetailsRD = RD.RemoteData<Error, ChartDetails>
 
-export type ChartView = 'line' | 'bar'
-
-export type ChartObject = {
-  values?: ChartValues
-  loading?: boolean
-  comingSoon?: boolean
-  type?: ChartView
-  unit?: string
-}
-
-export type ChartData = {
-  [key: string]: ChartObject
-}
+export type ChartType = 'line' | 'bar'
 
 export type ChartTimeFrame = 'allTime' | 'week'
 
@@ -39,18 +27,9 @@ export type DisplayDataParams = {
   colors: DisplayDataColor
 }
 
-export type ChartDataParams = {
-  chartData: ChartData
-  selectedIndex: string
-  chartTimeframe: ChartTimeFrame
-}
-
 export type PoolDetailsChartData = {
   labels: Array<string>
   values: Array<number>
-  unit: string
-  isChartLoading: boolean
-  selectedChartType: ChartView
 }
 
 export type ChartOptionsParams = {

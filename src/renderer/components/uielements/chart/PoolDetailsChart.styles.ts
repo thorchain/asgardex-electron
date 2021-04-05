@@ -28,7 +28,7 @@ export const ChartContainer = styled.div`
   height: 100%;
   ${media.sm`
     padding: 10px 20px;
-    height: 288px;
+    height: 312px;
   `}
   background-image: ${(props: ChartContainerProps) =>
     `linear-gradient(to bottom, ${transparentize(0.7, props.gradientStart)}, ${transparentize(
@@ -94,6 +94,7 @@ export const ChartWrapper = styled.div`
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  align-items: center;
 `
 
 export const LineChart = styled(Line)`
