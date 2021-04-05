@@ -71,7 +71,7 @@ export const AssetIcon: React.FC<Props> = ({
       return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png`
     }
 
-    if (network === 'mainnet') {
+    if (network !== 'testnet') {
       if (isBnbChain(asset.chain)) {
         return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${asset.symbol}/logo.png`
       }
