@@ -45,9 +45,10 @@ const ETHPLORER_API_URL = envOrDefault(process.env.REACT_APP_ETHPLORER_API_URL, 
  * A EthereumClient will never be created as long as no phrase is available
  */
 const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, ethereumNetwork$]).pipe(
-  RxOp.mergeMap(
+  RxOp.switchMap(
     ([keystore, network]) =>
       new Observable((observer: Observer<ClientState>) => {
+        console.log('create eth client')
         const client: ClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {

@@ -1,6 +1,6 @@
 import { ETHChain } from '@xchainjs/xchain-util'
 
-import { reloadBalances, balances$ } from './balances'
+import { reloadBalances, balances$, reloadBalances$ } from './balances'
 import {
   client$,
   clientViewState$,
@@ -40,6 +40,7 @@ export {
   getExplorerTxUrl$,
   getExplorerAddressUrl$,
   balances$,
+  reloadBalances$,
   txs$,
   tx$,
   txStatus$,

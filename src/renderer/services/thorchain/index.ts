@@ -1,6 +1,6 @@
 import { THORChain } from '@xchainjs/xchain-util'
 
-import { reloadBalances, balances$ } from './balances'
+import { reloadBalances, balances$, reloadBalances$ } from './balances'
 import { client$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
@@ -17,6 +17,7 @@ export {
   explorerUrl$,
   client$,
   reloadBalances,
+  reloadBalances$,
   balances$,
   txs$,
   tx$,

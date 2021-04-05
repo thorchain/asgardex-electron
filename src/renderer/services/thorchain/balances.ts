@@ -1,14 +1,20 @@
 import { AssetRuneNative } from '@xchainjs/xchain-util'
 
-import { triggerStream } from '../../helpers/stateHelper'
+import { observableState /*, triggerStream*/ } from '../../helpers/stateHelper'
 import * as C from '../clients'
 import { client$ } from './common'
 
+const { get$: reloadBalances$, set: setReload } = observableState<'trigger' | ''>('')
+
 // `TriggerStream` to reload `Balances`
-const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
+// const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
+
+const reloadBalances = (state: 'trigger' | '' = 'trigger') => {
+  setReload(state)
+}
 
 // State of balances loaded by Client
 // Currently in ASGDX `AssetRuneNative` is supported only. Remove asset list if we want to get balances of all assets at THORChain.
 const balances$: C.WalletBalancesLD = C.balances$(client$, reloadBalances$, [AssetRuneNative])
 
-export { balances$, reloadBalances }
+export { balances$, reloadBalances, reloadBalances$ }
