@@ -1,8 +1,9 @@
 import * as O from 'fp-ts/Option'
 
-import { STORE_FILES_DEFAULTS } from '../../../shared/const'
+import { DEFAULT_STORAGES } from '../../../shared/const'
 
-export type StorageData = typeof STORE_FILES_DEFAULTS['commonStorage']
+export type CommonStorageData = typeof DEFAULT_STORAGES['common']
+export type NodesStorageData = typeof DEFAULT_STORAGES['userNodes']
 
-export type StorageState = O.Option<StorageData>
-export type StoragePartialStateState = O.Option<Partial<StorageData>>
+export type StorageState<T> = O.Option<T>
+export type StoragePartialState<T> = O.Option<Partial<T>>

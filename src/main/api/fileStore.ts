@@ -3,7 +3,7 @@ import path from 'path'
 import { ipcRenderer, ipcMain } from 'electron'
 import * as fs from 'fs-extra'
 
-import { ApiFileStoreService, StoreFileData, StoreFileName } from '../../shared/api/types'
+import { ApiFileStoreService, StorageVersion, StoreFileData, StoreFileName } from '../../shared/api/types'
 import { getStoreFilesIPCMessages } from '../../shared/ipc/fileStore'
 import { STORAGE_DIR } from './const'
 
@@ -50,9 +50,9 @@ const saveToFile = async <T>(fullFilePathname: string, data: Partial<T>, default
   return fs.writeJSON(fullFilePathname, targetData).then(() => targetData)
 }
 
-export const getFileStoreService = <T extends object>(fileStoreName: StoreFileName, defaultValue: T) => {
-  // full file path to save
-  const fullFilePathname = path.join(STORAGE_DIR, `${fileStoreName}.json`)
+export const getFileStoreService = <T extends StorageVersion>(fileStoreName: StoreFileName, defaultValue: T) => {
+  // full file path to save - it includes a version number, so we can ignore deprecated config files (if needed)
+  const fullFilePathname = path.join(STORAGE_DIR, `${fileStoreName}-${defaultValue.version}.json`)
 
   const ipcMessages = getStoreFilesIPCMessages(fileStoreName)
 

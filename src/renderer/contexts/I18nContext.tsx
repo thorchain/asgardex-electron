@@ -12,7 +12,7 @@ import { IntlProvider } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { STORE_FILES_DEFAULTS } from '../../shared/const'
+import { DEFAULT_STORAGES } from '../../shared/const'
 import { Locale } from '../../shared/i18n/types'
 import { getMessagesByLocale } from '../i18n'
 import { common } from '../services/storage'
@@ -25,7 +25,7 @@ type I18nContextValue = {
   initialLocale: () => Locale
 }
 
-export const initialLocale = (): Locale => STORE_FILES_DEFAULTS.commonStorage.locale
+export const initialLocale = (): Locale => DEFAULT_STORAGES.common.locale
 
 export const locale$ = FP.pipe(
   getStorageState$,

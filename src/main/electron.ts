@@ -10,7 +10,7 @@ import log from 'electron-log'
 import { warn } from 'electron-log'
 
 import { LedgerTxInfo, Network, StoreFileName } from '../shared/api/types'
-import { STORE_FILES_DEFAULTS } from '../shared/const'
+import { DEFAULT_STORAGES } from '../shared/const'
 import { Locale } from '../shared/i18n/types'
 import { getFileStoreService } from './api/fileStore'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist, exportKeystore, loadKeystore } from './api/keystore'
@@ -135,7 +135,7 @@ const initIPC = () => {
   )
 
   // Register all file-stored data services
-  Object.entries(STORE_FILES_DEFAULTS).forEach(([name, defaultValue]) => {
+  Object.entries(DEFAULT_STORAGES).forEach(([name, defaultValue]) => {
     getFileStoreService(name as StoreFileName, defaultValue).registerIpcHandlersMain()
   })
 }
