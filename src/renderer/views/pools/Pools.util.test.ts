@@ -15,7 +15,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
-import { ThorchainLastblock } from '../../services/midgard/types'
+import { LastblockItems } from '../../services/midgard/types'
 import { Constants as ThorchainConstants, PoolDetail } from '../../types/generated/midgard'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolTableRowData } from './Pools.types'
@@ -80,14 +80,14 @@ describe('views/pools/utils', () => {
 
   describe('getBlocksLeftForPendingPool', () => {
     const constants = {
-      int_64_values: { NewPoolCycle: 3001 }
+      int_64_values: { PoolCycle: 3001 }
     } as ThorchainConstants
     const lastblock = [
       {
         thorchain: '2000',
         chain: BNBChain
       }
-    ] as ThorchainLastblock
+    ] as LastblockItems
     it('returns number of blocks left', () => {
       const result = O.toNullable(getBlocksLeftForPendingPool(constants, lastblock, AssetBNB))
       expect(result).toEqual(1001)
@@ -100,7 +100,7 @@ describe('views/pools/utils', () => {
       expect(result).toBeNone()
     })
     it('returns NOne if lastblock (thorchain) is not available', () => {
-      const lastblock2: ThorchainLastblock = []
+      const lastblock2: LastblockItems = []
       const result = getBlocksLeftForPendingPool(constants, lastblock2, AssetBNB)
       expect(result).toBeNone()
     })
@@ -108,14 +108,14 @@ describe('views/pools/utils', () => {
 
   describe('getBlocksLeftForPendingPoolAsString', () => {
     const constants = {
-      int_64_values: { NewPoolCycle: 1234 }
+      int_64_values: { PoolCycle: 1234 }
     } as ThorchainConstants
     const lastblock = [
       {
         thorchain: '1000',
         chain: BNBChain
       }
-    ] as ThorchainLastblock
+    ] as LastblockItems
     it('returns number of blocks left', () => {
       const result = getBlocksLeftForPendingPoolAsString(constants, lastblock, AssetBNB)
       expect(result).toEqual('234')
@@ -128,7 +128,7 @@ describe('views/pools/utils', () => {
       expect(result).toEqual('')
     })
     it('returns empty string if lastblock (thorchain) is not available', () => {
-      const lastblock2: ThorchainLastblock = []
+      const lastblock2: LastblockItems = []
       const result = getBlocksLeftForPendingPoolAsString(constants, lastblock2, AssetBNB)
       expect(result).toEqual('')
     })
