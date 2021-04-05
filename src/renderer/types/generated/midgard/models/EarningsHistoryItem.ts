@@ -69,6 +69,12 @@ export interface EarningsHistoryItem {
      */
     pools: Array<EarningsHistoryItemPool>;
     /**
+     * Float, the price of Rune based on the deepest USD pool at the end of the interval. 
+     * @type {string}
+     * @memberof EarningsHistoryItem
+     */
+    runePriceUSD: string;
+    /**
      * Int64, The beginning time of interval in unix timestamp
      * @type {string}
      * @memberof EarningsHistoryItem

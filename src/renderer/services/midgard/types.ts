@@ -32,8 +32,6 @@ import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.t
 import { Memo } from '../chain/types'
 import { ApiError } from '../wallet/types'
 
-export type ThorchainLastblock = LastblockItem[]
-
 export type PoolAsset = string
 
 export type PoolAssets = Asset[]
@@ -87,8 +85,9 @@ export type SelectedPricePoolAsset = O.Option<PricePoolAsset>
 
 export type SelectedPricePool = PricePool
 
-export type ThorchainLastblockRD = RD.RemoteData<Error, ThorchainLastblock>
-export type ThorchainLastblockLD = LiveData<Error, ThorchainLastblock>
+export type LastblockItems = LastblockItem[]
+export type ThorchainLastblockRD = RD.RemoteData<Error, LastblockItems>
+export type ThorchainLastblockLD = LiveData<Error, LastblockItems>
 
 export type ThorchainConstantsRD = RD.RemoteData<Error, ThorchainConstants>
 export type ThorchainConstantsLD = LiveData<Error, ThorchainConstants>

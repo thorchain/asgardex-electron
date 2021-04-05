@@ -23,13 +23,13 @@ import {
  */
 export interface Action {
     /**
-     * Int64, Unix timestamp for when the action was registered
+     * Int64, nano timestamp of the block at which the action was registered
      * @type {string}
      * @memberof Action
      */
     date: string;
     /**
-     * Int64, block height at which the action was registered
+     * Int64, height of the block at which the action was registered
      * @type {string}
      * @memberof Action
      */

@@ -18,13 +18,13 @@
  */
 export interface EarningsHistoryItemPool {
     /**
-     * Int64 (10^8), liquidity fees collected in the pool\'s asset
+     * Int64(e8), liquidity fees collected in the pool\'s asset
      * @type {string}
      * @memberof EarningsHistoryItemPool
      */
     assetLiquidityFees: string;
     /**
-     * Int64 (10^8), total earnings in RUNE (totalLiquidityFees + rewards)
+     * Int64(e8), total earnings in RUNE (totalLiquidityFees + rewards)
      * @type {string}
      * @memberof EarningsHistoryItemPool
      */
@@ -36,19 +36,19 @@ export interface EarningsHistoryItemPool {
      */
     pool: string;
     /**
-     * Int64 (10^8), RUNE amount sent to (positive) or taken from (negative) the pool as a result of balancing it\'s share of system income each block 
+     * Int64(e8), RUNE amount sent to (positive) or taken from (negative) the pool as a result of balancing it\'s share of system income each block 
      * @type {string}
      * @memberof EarningsHistoryItemPool
      */
     rewards: string;
     /**
-     * Int64 (10^8), liquidity fees collected in RUNE
+     * Int64(e8), liquidity fees collected in RUNE
      * @type {string}
      * @memberof EarningsHistoryItemPool
      */
     runeLiquidityFees: string;
     /**
-     * Int64 (10^8), total liquidity fees (assetFees + runeFees) collected, shown in RUNE
+     * Int64(e8), total liquidity fees (assetFees + runeFees) collected, shown in RUNE
      * @type {string}
      * @memberof EarningsHistoryItemPool
      */

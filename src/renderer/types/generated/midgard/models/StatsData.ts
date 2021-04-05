@@ -23,7 +23,7 @@ export interface StatsData {
      */
     addLiquidityCount: string;
     /**
-     * Int64 (10^8), total of deposits since beginning. 
+     * Int64(e8), total of deposits since beginning. 
      * @type {string}
      * @memberof StatsData
      */
@@ -41,7 +41,7 @@ export interface StatsData {
      */
     monthlyActiveUsers: string;
     /**
-     * Int64 (10^8), current total Rune in the pools.
+     * Int64(e8), current total Rune in the pools.
      * @type {string}
      * @memberof StatsData
      */
@@ -101,7 +101,7 @@ export interface StatsData {
      */
     withdrawCount: string;
     /**
-     * Int64 (10^8), total of withdraws since beginning. 
+     * Int64(e8), total of withdraws since beginning. 
      * @type {string}
      * @memberof StatsData
      */
