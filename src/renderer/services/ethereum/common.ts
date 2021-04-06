@@ -48,7 +48,6 @@ const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, 
   RxOp.switchMap(
     ([keystore, network]) =>
       new Observable((observer: Observer<ClientState>) => {
-        console.log('create eth client')
         const client: ClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {

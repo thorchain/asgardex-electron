@@ -1,4 +1,4 @@
-import { balances$, reloadBalances, getBalanceByAddress$, reloadBalances$ } from './balances'
+import { balances$, reloadBalances, getBalanceByAddress$, reloadBalances$, resetReload } from './balances'
 import {
   client$,
   clientViewState$,
@@ -33,6 +33,7 @@ export {
   addressUI$,
   reloadBalances,
   reloadBalances$,
+  resetReload,
   balances$,
   getBalanceByAddress$,
   reloadFees,

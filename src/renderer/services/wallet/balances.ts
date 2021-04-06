@@ -35,23 +35,29 @@ export const reloadBalances: FP.Lazy<void> = () => {
   BCH.reloadBalances()
 }
 
-export const reloadBalancesByChain: (chain: Chain) => (state?: 'trigger' | '') => void = (chain) => {
+const getServiceByChain = (chain: Chain) => {
   switch (chain) {
     case 'BNB':
-      return (state) => BNB.reloadBalances(state)
+      return BNB
     case 'BTC':
-      return (state) => BTC.reloadBalances(state)
+      return BTC
     case 'BCH':
-      return (state) => BCH.reloadBalances(state)
+      return BCH
     case 'ETH':
-      return (state) => ETH.reloadBalances(state)
+      return ETH
     case 'THOR':
-      return (state) => THOR.reloadBalances(state)
+      return THOR
     case 'LTC':
-      return (state) => LTC.reloadBalances(state)
-    default:
-      return () => {}
+      return LTC
   }
+}
+
+export const reloadBalancesByChain: (chain: Chain) => FP.Lazy<void> = (chain) => {
+  return getServiceByChain(chain)?.reloadBalances || (() => {})
+}
+
+const resetReloadByChain: (chain: Chain) => void = (chain) => {
+  return getServiceByChain(chain)?.resetReload()
 }
 
 let balanceRecord: Partial<Record<Chain, WalletBalancesRD>> = {}
@@ -61,44 +67,17 @@ export const clearSavedBalances = () => {
 }
 
 const getChainBalanceData$: (chain: Chain) => WalletBalancesLD = (chain) => {
-  switch (chain) {
-    case 'BNB':
-      return BNB.balances$
-    case 'BTC':
-      return BTC.balances$
-    case 'BCH':
-      return BCH.balances$
-    case 'ETH':
-      return FP.pipe(
-        network$,
-        RxOp.switchMap((network) => ETH.balances$(network === 'testnet' ? ETHAssets : undefined))
-      )
-    case 'THOR':
-      return THOR.balances$
-    case 'LTC':
-      return LTC.balances$
-    default:
-      return Rx.of(RD.initial)
+  if (chain === 'ETH') {
+    return FP.pipe(
+      network$,
+      RxOp.switchMap((network) => ETH.balances$(network === 'testnet' ? ETHAssets : undefined))
+    )
   }
+  return (getServiceByChain(chain)?.balances$ || Rx.of(RD.initial)) as WalletBalancesLD
 }
 
 const getChainBalanceReload$ = (chain: Chain) => {
-  switch (chain) {
-    case 'BNB':
-      return BNB.reloadBalances$
-    case 'BTC':
-      return BTC.reloadBalances$
-    case 'BCH':
-      return BCH.reloadBalances$
-    case 'ETH':
-      return ETH.reloadBalances$
-    case 'THOR':
-      return THOR.reloadBalances$
-    case 'LTC':
-      return LTC.reloadBalances$
-    default:
-      return Rx.EMPTY
-  }
+  return getServiceByChain(chain)?.reloadBalances$ || Rx.EMPTY
 }
 
 const getChainBalance$ = (chain: Chain): WalletBalancesLD => {
@@ -107,7 +86,7 @@ const getChainBalance$ = (chain: Chain): WalletBalancesLD => {
     RxOp.finalize(() => {
       // on finish a stream reset reload-trigger
       // unsubscribe will be initiated on any View unmount
-      reloadBalancesByChain(chain)('')
+      resetReloadByChain(chain)
     })
   )
 

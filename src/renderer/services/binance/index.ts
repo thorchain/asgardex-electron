@@ -1,6 +1,6 @@
 import { BNBChain } from '@xchainjs/xchain-util'
 
-import { balances$, reloadBalances, reloadBalances$ } from './balances'
+import { balances$, reloadBalances, reloadBalances$, resetReload } from './balances'
 import {
   client$,
   clientViewState$,
@@ -33,6 +33,7 @@ export {
   addressUI$,
   reloadBalances,
   reloadBalances$,
+  resetReload,
   explorerUrl$,
   getExplorerTxUrl$,
   getExplorerAddressUrl$,

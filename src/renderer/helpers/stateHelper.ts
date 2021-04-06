@@ -43,6 +43,7 @@ export type TriggerStream$ = Observable<string>
 export type TriggerStream = {
   stream$: TriggerStream$
   trigger: FP.Lazy<void>
+  reset: FP.Lazy<void>
 }
 
 /**
@@ -54,6 +55,9 @@ export const triggerStream = (): TriggerStream => {
   const subject$$ = new BehaviorSubject('')
   return {
     stream$: subject$$.asObservable(),
-    trigger: () => subject$$.next('trigger')
+    trigger: () => subject$$.next('trigger'),
+    reset: () => {
+      subject$$.next('')
+    }
   }
 }
