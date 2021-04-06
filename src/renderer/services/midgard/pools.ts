@@ -401,8 +401,7 @@ const createPoolsService = (
         O.fold(() => Rx.of(RD.initial), apiGetPoolDetail$)
       )
     }),
-    RxOp.startWith(RD.pending),
-    RxOp.shareReplay(1)
+    RxOp.startWith(RD.pending)
   )
 
   const availableAssets$: PoolAssetsLD = FP.pipe(
@@ -577,8 +576,7 @@ const createPoolsService = (
         )
       )
     }),
-    RxOp.startWith(RD.pending),
-    RxOp.shareReplay(1)
+    RxOp.startWith(RD.pending)
   )
 
   // Factory to get pool legacy detail from Midgard
@@ -656,8 +654,7 @@ const createPoolsService = (
         )
       )
     }),
-    RxOp.startWith(RD.pending),
-    RxOp.shareReplay(1)
+    RxOp.startWith(RD.pending)
   )
 
   // Factory to get pool liquidity history from Midgard
@@ -733,8 +730,7 @@ const createPoolsService = (
           )
         )
       ),
-      RxOp.startWith(RD.initial),
-      RxOp.shareReplay(1)
+      RxOp.startWith(RD.initial)
     )
 
   // Factory to get depth history from Midgard
@@ -772,8 +768,7 @@ const createPoolsService = (
           )
         )
       ),
-      RxOp.startWith(RD.initial),
-      RxOp.shareReplay(1)
+      RxOp.startWith(RD.initial)
     )
 
   return {
