@@ -738,7 +738,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       isBalanceError ||
       isThorchainFeeError ||
       disabled ||
-      balances.filter((balance) => eqAsset.equals(balance.asset, asset) && !balance.amount.amount().eq(0)).length === 0
+      balances.filter((balance) => eqAsset.equals(balance.asset, asset) && !balance.amount.amount().isZero()).length ===
+        0
     )
   }, [asset, balances, disabled, isBalanceError, isThorchainFeeError])
   const uiFeesRD: UIFeesRD = useMemo(
