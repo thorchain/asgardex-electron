@@ -75,7 +75,6 @@ const apiGetThorchainLastblock$ = byzantine$.pipe(
     FP.pipe(
       getMidgardDefaultApi(endpoint).getProxiedLastblock(),
       RxOp.map(RD.success),
-      liveData.map(({ current }) => current),
       RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
     )
   )

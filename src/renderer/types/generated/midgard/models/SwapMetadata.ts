@@ -21,7 +21,7 @@ import {
  */
 export interface SwapMetadata {
     /**
-     * Int64 (10^8), RUNE amount charged as swap liquidity fee
+     * Int64(e8), RUNE amount charged as swap liquidity fee
      * @type {string}
      * @memberof SwapMetadata
      */
@@ -33,15 +33,15 @@ export interface SwapMetadata {
      */
     networkFees: Array<Coin>;
     /**
-     * Int64 (Basis points, 0-10000, where 10000=100%), trade slip percentage
+     * Int64 (Basis points, 0-10000, where 10000=100%), swap slip percentage
      * @type {string}
      * @memberof SwapMetadata
      */
-    tradeSlip: string;
+    swapSlip: string;
     /**
-     * Int64 (10^8), minimum output amount specified for the swap
+     * Int64(e8), minimum output amount specified for the swap
      * @type {string}
      * @memberof SwapMetadata
      */
-    tradeTarget: string;
+    swapTarget: string;
 }

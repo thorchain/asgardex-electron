@@ -29,6 +29,12 @@ export interface SwapHistoryItem {
      */
     endTime: string;
     /**
+     * Float, the price of Rune based on the deepest USD pool at the end of the interval. 
+     * @type {string}
+     * @memberof SwapHistoryItem
+     */
+    runePriceUSD: string;
+    /**
      * Int64, The beginning time of bucket in unix timestamp
      * @type {string}
      * @memberof SwapHistoryItem

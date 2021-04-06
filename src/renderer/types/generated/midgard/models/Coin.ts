@@ -18,7 +18,7 @@
  */
 export interface Coin {
     /**
-     * Int64 (10^8), asset Amount.
+     * Int64(e8), asset Amount.
      * @type {string}
      * @memberof Coin
      */

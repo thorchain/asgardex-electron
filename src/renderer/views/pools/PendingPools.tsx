@@ -17,10 +17,11 @@ import { ManageButton } from '../../components/manageButton'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { sequenceTRD } from '../../helpers/fpHelpers'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PendingPoolsState, PoolFilter } from '../../services/midgard/types'
+import { PendingPoolsState, PoolFilter, ThorchainLastblockRD } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
 import { filterTableData } from './Pools.utils'
@@ -47,7 +48,7 @@ export const PendingPools: React.FC = (): JSX.Element => {
   } = midgardService
 
   const poolsRD = useObservableState(pendingPoolsState$, RD.pending)
-  const thorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
+  const thorchainLastblockRD: ThorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(thorchainConstantsState$, RD.pending)
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -104,23 +105,25 @@ export const PendingPools: React.FC = (): JSX.Element => {
 
   const setFilter = useCallback((oFilter: O.Option<PoolFilter>) => setPoolsFilter(POOLS_KEY, oFilter), [setPoolsFilter])
 
-  const lastblock = useMemo(() => RD.toNullable(thorchainLastblockRD), [thorchainLastblockRD])
-  const constants = useMemo(() => RD.toNullable(thorchainConstantsRD), [thorchainConstantsRD])
-
   const renderBlockLeftColumn = useCallback(
     (_: string, record: PoolTableRowData) => {
       const { deepest, pool } = record
 
-      const blocksLeft =
-        lastblock && constants ? getBlocksLeftForPendingPoolAsString(constants, lastblock, pool.asset) : ''
+      const blocksLeft: string = FP.pipe(
+        sequenceTRD(thorchainLastblockRD, thorchainConstantsRD),
+        RD.map(([lastblockItems, constants]) =>
+          getBlocksLeftForPendingPoolAsString(constants, lastblockItems, pool.target)
+        ),
+        RD.getOrElse(() => '--')
+      )
 
       return (
         <TableAction>
-          <BlockLeftLabel>{deepest ? blocksLeft.toString() : ''}</BlockLeftLabel>
+          <BlockLeftLabel>{deepest ? blocksLeft : '--'}</BlockLeftLabel>
         </TableAction>
       )
     },
-    [lastblock, constants]
+    [thorchainLastblockRD, thorchainConstantsRD]
   )
 
   const blockLeftColumn = useMemo(

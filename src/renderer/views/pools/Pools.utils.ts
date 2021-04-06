@@ -1,6 +1,7 @@
 import { PoolData, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
 import { bnOrZero, baseAmount, assetFromString, Asset, AssetRuneNative, assetToString } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
+import { eqString } from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -8,14 +9,10 @@ import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import { isChainAsset, isUSDAsset } from '../../helpers/assetHelper'
-import { PoolFilter } from '../../services/midgard/types'
+import { sequenceTOption } from '../../helpers/fpHelpers'
+import { LastblockItems, PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
-import {
-  GetPoolsStatusEnum,
-  Constants as ThorchainConstants,
-  LastblockItem,
-  PoolDetail
-} from '../../types/generated/midgard'
+import { GetPoolsStatusEnum, Constants as ThorchainConstants, PoolDetail } from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './Pools.types'
 
 const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {
@@ -88,24 +85,29 @@ export const getPoolTableRowData = ({
 
 export const getBlocksLeftForPendingPool = (
   constants: ThorchainConstants,
-  lastblocks: LastblockItem[],
+  lastblocks: LastblockItems,
   asset: Asset
 ): O.Option<number> => {
-  const newPoolCycle = constants?.int_64_values?.NewPoolCycle
-  const lastHeight = Number(lastblocks.find((blockInfo) => blockInfo.chain === asset?.chain)?.thorchain)
+  const oNewPoolCycle: O.Option<number> = O.fromNullable(constants.int_64_values.PoolCycle)
+  const oLastHeight = FP.pipe(
+    lastblocks,
+    A.findFirst((blockInfo) => eqString.equals(blockInfo.chain, asset.chain)),
+    O.map(({ thorchain }) => Number(thorchain))
+  )
 
-  if (!newPoolCycle || !lastHeight) return O.none
-
-  return O.some(newPoolCycle - (lastHeight % newPoolCycle))
+  return FP.pipe(
+    sequenceTOption(oNewPoolCycle, oLastHeight),
+    O.map(([newPoolCycle, lastHeight]) => newPoolCycle - (lastHeight % newPoolCycle))
+  )
 }
 
 export const getBlocksLeftForPendingPoolAsString = (
   constants: ThorchainConstants,
-  lastblocks: LastblockItem[],
-  stringAsset: Asset
+  lastblocks: LastblockItems,
+  asset: Asset
 ): string => {
   return FP.pipe(
-    getBlocksLeftForPendingPool(constants, lastblocks, stringAsset),
+    getBlocksLeftForPendingPool(constants, lastblocks, asset),
     O.fold(
       () => '',
       (blocksLeft) => blocksLeft.toString()

@@ -120,7 +120,7 @@ export interface Int64Constants {
      * @type {number}
      * @memberof Int64Constants
      */
-    NewPoolCycle: number;
+    PoolCycle: number;
     /**
      * @type {number}
      * @memberof Int64Constants

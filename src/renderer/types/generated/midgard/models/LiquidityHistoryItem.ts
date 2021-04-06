@@ -53,13 +53,19 @@ export interface LiquidityHistoryItem {
      */
     net: string;
     /**
+     * Float, the price of Rune based on the deepest USD pool at the end of the interval. 
+     * @type {string}
+     * @memberof LiquidityHistoryItem
+     */
+    runePriceUSD: string;
+    /**
      * Int64, The beginning time of bucket in unix timestamp
      * @type {string}
      * @memberof LiquidityHistoryItem
      */
     startTime: string;
     /**
-     * Int64 (10^8), total assets withdrawn during the time interval. Denoted in Rune using the price at withdraw time. 
+     * Int64(e8), total assets withdrawn during the time interval. Denoted in Rune using the price at withdraw time. 
      * @type {string}
      * @memberof LiquidityHistoryItem
      */
@@ -71,13 +77,13 @@ export interface LiquidityHistoryItem {
      */
     withdrawCount: string;
     /**
-     * Int64 (10^8), total Rune withdrawn during the time interval. 
+     * Int64(e8), total Rune withdrawn during the time interval. 
      * @type {string}
      * @memberof LiquidityHistoryItem
      */
     withdrawRuneVolume: string;
     /**
-     * Int64 (10^8), total of rune and asset withdrawals. Denoted in Rune (using the price at withdraw time). 
+     * Int64(e8), total of rune and asset withdrawals. Denoted in Rune (using the price at withdraw time). 
      * @type {string}
      * @memberof LiquidityHistoryItem
      */
