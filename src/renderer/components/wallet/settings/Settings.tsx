@@ -290,7 +290,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                 <Styled.ClientLabel>v{apiVersion}</Styled.ClientLabel>
                 <Styled.Placeholder>{intl.formatMessage({ id: 'common.network' })}</Styled.Placeholder>
                 {/* TODO (@asgdx-team) Disable mainnet for next pre-release */}
-                <Dropdown overlay={networkMenu} trigger={['click']}>
+                <Dropdown overlay={networkMenu} trigger={['click']} disabled>
                   <Row align="middle" style={{ display: 'inline-flex' }} onClick={(e) => e.preventDefault()}>
                     <Styled.NetworkTitle>{selectedNetwork}</Styled.NetworkTitle>
                     <DownIcon />
