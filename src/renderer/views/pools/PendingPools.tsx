@@ -17,7 +17,7 @@ import { ManageButton } from '../../components/manageButton'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { sequenceTOption } from '../../helpers/fpHelpers'
+import { sequenceTRD } from '../../helpers/fpHelpers'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import { DEFAULT_NETWORK } from '../../services/const'
@@ -109,20 +109,17 @@ export const PendingPools: React.FC = (): JSX.Element => {
     (_: string, record: PoolTableRowData) => {
       const { deepest, pool } = record
 
-      const oLastblockItems = RD.toOption(thorchainLastblockRD)
-      const oConstants = RD.toOption(thorchainConstantsRD)
-
-      const blocksLeft = FP.pipe(
-        sequenceTOption(oLastblockItems, oConstants),
-        O.map(([lastblockItems, constants]) =>
+      const blocksLeft: string = FP.pipe(
+        sequenceTRD(thorchainLastblockRD, thorchainConstantsRD),
+        RD.map(([lastblockItems, constants]) =>
           getBlocksLeftForPendingPoolAsString(constants, lastblockItems, pool.target)
         ),
-        O.getOrElse(() => '')
+        RD.getOrElse(() => '')
       )
 
       return (
         <TableAction>
-          <BlockLeftLabel>{deepest ? blocksLeft.toString() : ''}</BlockLeftLabel>
+          <BlockLeftLabel>{deepest ? blocksLeft : ''}</BlockLeftLabel>
         </TableAction>
       )
     },
