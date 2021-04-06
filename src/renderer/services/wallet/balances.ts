@@ -60,8 +60,15 @@ const resetReloadByChain: (chain: Chain) => void = (chain) => {
   return getServiceByChain(chain)?.resetReload()
 }
 
+/**
+ * Store previously successfully loaded results at the runtime-memory
+ */
 let balanceRecord: Partial<Record<Chain, WalletBalancesRD>> = {}
 
+/**
+ * Method to force reset current cache at all for all chains
+ * e.g. switch network needs such operation
+ */
 export const clearSavedBalances = () => {
   balanceRecord = {}
 }
@@ -94,13 +101,19 @@ const getChainBalance$ = (chain: Chain): WalletBalancesLD => {
     reload$,
     RxOp.switchMap((reloadTrigger) => {
       const savedResult = balanceRecord[chain]
+      // For every new simple subscription return cached results if they exist
       if (reloadTrigger === '' && savedResult) {
         if (savedResult) {
           return Rx.of(savedResult)
         }
       }
+      // If there is no cached data for appropriate chain request for it
+      // Re-request data ONLY for manual calling update trigger with `trigger`
+      // value inside of trigger$ stream
       return FP.pipe(
         getChainBalanceData$(chain),
+        // For every sucessfull load save results to the memory-based cache
+        // to avoid unwanted data re-requesting.
         liveData.map((balances) => {
           balanceRecord[chain] = RD.success(balances)
           return balances

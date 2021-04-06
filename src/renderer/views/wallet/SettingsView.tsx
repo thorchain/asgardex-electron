@@ -339,6 +339,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
 
   const setNetwork = useCallback(
     (network: Network) => {
+      // For every network changes we have to clear cached values of balances
       clearSavedBalances()
       changeNetwork(network)
     },
