@@ -13,7 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macOS-latest, ubuntu-latest]
+        # os: [windows-latest, macOS-latest, ubuntu-latest]
+        os: [macOS-latest]
         node_version: [14]
     steps:
       - name: Checkout git repo
@@ -50,6 +51,7 @@ jobs:
           REACT_APP_BLOCKCHAIR_API_KEY: ${{ secrets.REACT_APP_BLOCKCHAIR_API_KEY }}
           REACT_APP_ETHPLORER_API_KEY: ${{ secrets.REACT_APP_ETHPLORER_API_KEY }}
           REACT_APP_ETHERSCAN_API_KEY: ${{ secrets.REACT_APP_ETHERSCAN_API_KEY }}
+          REACT_APP_INFURA_PROJECT_ID: ${{ secrets.REACT_APP_INFURA_PROJECT_ID }}
 
       - name: Publish macOS binaries
         if: runner.os == 'macOS'
@@ -64,6 +66,7 @@ jobs:
           REACT_APP_BLOCKCHAIR_API_KEY: ${{ secrets.REACT_APP_BLOCKCHAIR_API_KEY }}
           REACT_APP_ETHPLORER_API_KEY: ${{ secrets.REACT_APP_ETHPLORER_API_KEY }}
           REACT_APP_ETHERSCAN_API_KEY: ${{ secrets.REACT_APP_ETHERSCAN_API_KEY }}
+          REACT_APP_INFURA_PROJECT_ID: ${{ secrets.REACT_APP_INFURA_PROJECT_ID }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2

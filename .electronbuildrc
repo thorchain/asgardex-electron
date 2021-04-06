@@ -10,7 +10,11 @@
     "output": "release"
   },
   "mac": {
-    "target": ["dmg"],
+    // "target": ["dmg"],
+    "target": {
+      "target": "default",
+      "arch": ["x64", "arm64"]
+    },
     "category": "public.app-category.finance",
     "hardenedRuntime": true,
     "gatekeeperAssess": false,
