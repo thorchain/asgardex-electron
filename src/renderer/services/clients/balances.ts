@@ -79,7 +79,7 @@ export const balances$: (client$: XChainClient$, trigger$: TriggerStream$, asset
   assets
 ) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
-    RxOp.mergeMap(([_, oClient]) => {
+    RxOp.switchMap(([_, oClient]) => {
       return FP.pipe(
         oClient,
         O.fold(

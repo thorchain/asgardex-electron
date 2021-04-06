@@ -8,13 +8,12 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
 import { ETHAssets } from '../../const'
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { filterEnabledChains } from '../../helpers/chainHelper'
 import { eqBalancesRD } from '../../helpers/fp/eq'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
-// import { observableState } from '../../helpers/stateHelper'
+import { liveData } from '../../helpers/rx/liveData'
 import { network$ } from '../app/service'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
@@ -27,12 +26,7 @@ import { INITIAL_BALANCES_STATE } from './const'
 import { BalancesState, ChainBalances$, ChainBalance$, ChainBalance } from './types'
 import { sortBalances } from './util'
 
-// const { get$: reloadChainBalance$, set: reloadChainBalance } = observableState('')
-
 export const reloadBalances: FP.Lazy<void> = () => {
-  // console.log('reload all balances')
-  // reloadChainBalance('trigger')
-  // setTimeout(() => reloadChainBalance(''), 0)
   BTC.reloadBalances()
   BNB.reloadBalances()
   ETH.reloadBalances()
@@ -41,27 +35,30 @@ export const reloadBalances: FP.Lazy<void> = () => {
   BCH.reloadBalances()
 }
 
-export const reloadBalancesByChain: (chain: Chain, state?: 'trigger' | '') => FP.Lazy<void> = (chain, state) => {
-  console.log('reload ', chain)
+export const reloadBalancesByChain: (chain: Chain) => (state?: 'trigger' | '') => void = (chain) => {
   switch (chain) {
     case 'BNB':
-      return () => BNB.reloadBalances(state)
+      return (state) => BNB.reloadBalances(state)
     case 'BTC':
-      return () => BTC.reloadBalances(state)
+      return (state) => BTC.reloadBalances(state)
     case 'BCH':
-      return () => BCH.reloadBalances(state)
+      return (state) => BCH.reloadBalances(state)
     case 'ETH':
-      return () => ETH.reloadBalances(state)
+      return (state) => ETH.reloadBalances(state)
     case 'THOR':
-      return () => THOR.reloadBalances(state)
+      return (state) => THOR.reloadBalances(state)
     case 'LTC':
-      return () => LTC.reloadBalances(state)
+      return (state) => LTC.reloadBalances(state)
     default:
       return () => {}
   }
 }
 
-const balanceRecord: Partial<Record<Network, Partial<Record<Chain, WalletBalancesRD>>>> = {}
+let balanceRecord: Partial<Record<Chain, WalletBalancesRD>> = {}
+
+export const clearSavedBalances = () => {
+  balanceRecord = {}
+}
 
 const getChainBalanceData$: (chain: Chain) => WalletBalancesLD = (chain) => {
   switch (chain) {
@@ -104,84 +101,34 @@ const getChainBalanceReload$ = (chain: Chain) => {
   }
 }
 
-// eslint-disable-next-line
-// @ts-ignore
-window.asd = reloadBalancesByChain
-
-//
 const getChainBalance$ = (chain: Chain): WalletBalancesLD => {
-  // let isCompleted = false
   const reload$ = FP.pipe(
-    new Rx.Observable((obs$) => {
-      getChainBalanceReload$(chain).subscribe(
-        (v) => {
-          // console.log('update trigger', chain, !!v)
-          obs$.next(v)
-        },
-        () => {},
-        () => {}
-      )
-    }),
+    getChainBalanceReload$(chain),
     RxOp.finalize(() => {
-      console.log(`reset ${chain} reload state`)
-      // reloadChainBalance('')
-      reloadBalancesByChain(chain, '')
-      // isCompleted = true
+      // on finish a stream reset reload-trigger
+      // unsubscribe will be initiated on any View unmount
+      reloadBalancesByChain(chain)('')
     })
   )
-  // FP.pipe(
-  //   reloadChainBalance$,
-  //   RxOp.switchMap((value) => {
-  //     const res =
-  //     return res
-  //   })
-  // )
+
   return FP.pipe(
-    Rx.combineLatest([network$, reload$]),
-    // RxOp.takeWhile(() => !isCompleted),
-    RxOp.switchMap(([network, reloadTrigger]) => {
-      if (balanceRecord[network] === undefined) {
-        balanceRecord[network] = {}
-      }
-      const savedResult = balanceRecord[network]?.[chain]
-      const rStream$ = getChainBalanceData$(chain)
-      if (reloadTrigger === '') {
+    reload$,
+    RxOp.switchMap((reloadTrigger) => {
+      const savedResult = balanceRecord[chain]
+      if (reloadTrigger === '' && savedResult) {
         if (savedResult) {
           return Rx.of(savedResult)
         }
-        return FP.pipe(
-          rStream$,
-          RxOp.map((balances) => {
-            // eslint-disable-next-line
-            // @ts-ignore
-            balanceRecord[network][chain] = balances
-            return balances
-          })
-        )
-      }
-      if (savedResult) {
-        return FP.pipe(
-          rStream$,
-          RxOp.map((balances) => {
-            // eslint-disable-next-line
-            // @ts-ignore
-            balanceRecord[network][chain] = balances
-            return balances
-          }),
-          RxOp.startWith(savedResult)
-        )
       }
       return FP.pipe(
-        rStream$,
-        RxOp.map((balances) => {
-          // eslint-disable-next-line
-          // @ts-ignore
-          balanceRecord[network][chain] = balances
+        getChainBalanceData$(chain),
+        liveData.map((balances) => {
+          balanceRecord[chain] = RD.success(balances)
           return balances
-        })
+        }),
+        RxOp.startWith(savedResult || RD.initial)
       )
-    }),
-    RxOp.shareReplay(1)
+    })
   )
 }
 
@@ -280,39 +227,7 @@ const btcLedgerBalance$ = FP.pipe(
   RxOp.map((ledgerBalances) => ledgerBalances.balances)
 )
 
-// store reference to stream of ETH balances (testnet)
-// let ethBalancesTestnet$: WalletBalancesLD
-/**
- * Setter to return cached stream for ETH balances (testnet)
- * to use one (and same) stream created by `ETH.balances$` factory only
- */
-const getEthBalancesTestnet$ = () => {
-  // create stream if not available
-  // if (!ethBalancesTestnet$) {
-  //   ethBalancesTestnet$ = ETH.balances$(ETHAssets).pipe(RxOp.shareReplay(1))
-  // }
-  return getChainBalance$('ETH')
-}
-
-// store reference to stream of ETH balances (mainnet)
-// let ethBalancesMainnet$: WalletBalancesLD
-
-/**
- * Setter to return cached stream for ETH balances (mainnet)
- * to use one (and same) stream created by `ETH.balances$` factory only
- */
-const getEthBalancesMainnet$ = () => {
-  // if (!ethBalancesMainnet$) {
-  //   ethBalancesMainnet$ = ETH.balances$().pipe(RxOp.shareReplay(1))
-  // }
-  return getChainBalance$('ETH')
-}
-
-// Call of `ETH.balances$` depends on network
-const ethBalances$ = network$.pipe(
-  RxOp.switchMap((network) => Rx.iif(() => network === 'testnet', getEthBalancesTestnet$(), getEthBalancesMainnet$()))
-  // RxOp.shareReplay(1)
-)
+const ethBalances$ = getChainBalance$('ETH')
 /**
  * Transforms ETH data (address + `WalletBalance`) into `ChainBalance`
  */

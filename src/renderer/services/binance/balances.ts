@@ -4,9 +4,6 @@ import { client$ } from './common'
 
 const { get$: reloadBalances$, set: setReload } = observableState<'trigger' | ''>('')
 
-// `TriggerStream` to reload `Balances`
-// const { stream$: reloadBalances$, trigger: reloadBalances } = triggerStream()
-
 const reloadBalances = (state: 'trigger' | '' = 'trigger') => {
   setReload(state)
 }
