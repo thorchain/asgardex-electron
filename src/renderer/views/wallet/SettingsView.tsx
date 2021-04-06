@@ -45,7 +45,7 @@ import { UserAccountType } from '../../types/wallet'
 
 export const SettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
-  const { keystoreService, clearSavedBalances } = useWalletContext()
+  const { keystoreService, resetWalletBalancesState } = useWalletContext()
   const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
   const { network$, changeNetwork } = useAppContext()
   const bnbContext = useBinanceContext()
@@ -340,10 +340,10 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const setNetwork = useCallback(
     (network: Network) => {
       // For every network changes we have to clear cached values of balances
-      clearSavedBalances()
+      resetWalletBalancesState()
       changeNetwork(network)
     },
-    [changeNetwork, clearSavedBalances]
+    [changeNetwork, resetWalletBalancesState]
   )
 
   return (
