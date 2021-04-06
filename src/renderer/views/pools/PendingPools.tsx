@@ -114,12 +114,12 @@ export const PendingPools: React.FC = (): JSX.Element => {
         RD.map(([lastblockItems, constants]) =>
           getBlocksLeftForPendingPoolAsString(constants, lastblockItems, pool.target)
         ),
-        RD.getOrElse(() => '')
+        RD.getOrElse(() => '--')
       )
 
       return (
         <TableAction>
-          <BlockLeftLabel>{deepest ? blocksLeft : ''}</BlockLeftLabel>
+          <BlockLeftLabel>{deepest ? blocksLeft : '--'}</BlockLeftLabel>
         </TableAction>
       )
     },

@@ -104,10 +104,10 @@ export const getBlocksLeftForPendingPool = (
 export const getBlocksLeftForPendingPoolAsString = (
   constants: ThorchainConstants,
   lastblocks: LastblockItems,
-  stringAsset: Asset
+  asset: Asset
 ): string => {
   return FP.pipe(
-    getBlocksLeftForPendingPool(constants, lastblocks, stringAsset),
+    getBlocksLeftForPendingPool(constants, lastblocks, asset),
     O.fold(
       () => '',
       (blocksLeft) => blocksLeft.toString()
