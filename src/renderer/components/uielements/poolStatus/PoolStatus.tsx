@@ -48,14 +48,12 @@ export const PoolStatus: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.PoolStatusWrapper ref={containerRef} {...props}>
-      <TooltipContainer>
-        <Styled.Title textTransform="uppercase" color="light">
-          {label}
-        </Styled.Title>
-        <Styled.Value loading={isLoading} ref={amountRef} className="amount">
-          {displayValue}
-        </Styled.Value>
-      </TooltipContainer>
+      <Styled.Title textTransform="uppercase" color="light">
+        {label}
+      </Styled.Title>
+      <Styled.Value loading={isLoading} ref={amountRef} className="amount">
+        <TooltipContainer>{displayValue}</TooltipContainer>
+      </Styled.Value>
     </Styled.PoolStatusWrapper>
   )
 }
