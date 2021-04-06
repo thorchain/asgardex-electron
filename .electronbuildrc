@@ -2,7 +2,7 @@
   "appId": "org.thorchain.asgardex",
   "productName": "ASGARDEX",
   "copyright": "Copyright © 2021 ${author}",
-  "artifactName": "${productName}-${version}-${os}.${ext}",
+  "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
   "afterSign": "./scripts/notarize.js",
   "files": ["resources/icon.png", "src/renderer/assets/svg/coin-*.svg"],
   "directories": {
