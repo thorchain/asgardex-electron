@@ -1,4 +1,4 @@
-import { reloadBalances, balances$, reloadBalances$, resetReload } from './balances'
+import { reloadBalances, balances$, reloadBalances$, resetReloadBalances } from './balances'
 import { client$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
@@ -14,7 +14,7 @@ export {
   reloadBalances,
   balances$,
   reloadBalances$,
-  resetReload,
+  resetReloadBalances,
   txs$,
   tx$,
   txStatus$,

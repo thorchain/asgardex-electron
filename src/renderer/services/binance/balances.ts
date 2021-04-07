@@ -9,7 +9,7 @@ import { client$ } from './common'
  */
 const { get$: reloadBalances$, set: setReloadBalances } = observableState<boolean>(false)
 
-const resetReload = () => {
+const resetReloadBalances = () => {
   setReloadBalances(false)
 }
 
@@ -20,4 +20,4 @@ const reloadBalances = () => {
 // State of balances loaded by Client
 const balances$: C.WalletBalancesLD = C.balances$(client$, reloadBalances$)
 
-export { balances$, reloadBalances, reloadBalances$, resetReload }
+export { balances$, reloadBalances, reloadBalances$, resetReloadBalances }

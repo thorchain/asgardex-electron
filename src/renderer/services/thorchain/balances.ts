@@ -11,7 +11,7 @@ import { client$ } from './common'
  */
 const { get$: reloadBalances$, set: setReloadBalances } = observableState<boolean>(false)
 
-const resetReload = () => {
+const resetReloadBalances = () => {
   setReloadBalances(false)
 }
 
@@ -23,4 +23,4 @@ const reloadBalances = () => {
 // Currently in ASGDX `AssetRuneNative` is supported only. Remove asset list if we want to get balances of all assets at THORChain.
 const balances$: C.WalletBalancesLD = C.balances$(client$, reloadBalances$, [AssetRuneNative])
 
-export { balances$, reloadBalances, reloadBalances$, resetReload }
+export { balances$, reloadBalances, reloadBalances$, resetReloadBalances }

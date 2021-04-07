@@ -47,28 +47,28 @@ const getServiceByChain = (chain: Chain): ChainService => {
     case BNBChain:
       return {
         reloadBalances: BNB.reloadBalances,
-        resetReloadBalances: BNB.resetReload,
+        resetReloadBalances: BNB.resetReloadBalances,
         balances$: BNB.balances$,
         reloadBalances$: BNB.reloadBalances$
       }
     case BTCChain:
       return {
         reloadBalances: BTC.reloadBalances,
-        resetReloadBalances: BTC.resetReload,
+        resetReloadBalances: BTC.resetReloadBalances,
         balances$: BTC.balances$,
         reloadBalances$: BTC.reloadBalances$
       }
     case BCHChain:
       return {
         reloadBalances: BCH.reloadBalances,
-        resetReloadBalances: BCH.resetReload,
+        resetReloadBalances: BCH.resetReloadBalances,
         balances$: BCH.balances$,
         reloadBalances$: BCH.reloadBalances$
       }
     case ETHChain:
       return {
         reloadBalances: ETH.reloadBalances,
-        resetReloadBalances: ETH.resetReload,
+        resetReloadBalances: ETH.resetReloadBalances,
         balances$: FP.pipe(
           network$,
           RxOp.switchMap((network) => ETH.balances$(network === 'testnet' ? ETHAssets : undefined))
@@ -78,14 +78,14 @@ const getServiceByChain = (chain: Chain): ChainService => {
     case THORChain:
       return {
         reloadBalances: THOR.reloadBalances,
-        resetReloadBalances: THOR.resetReload,
+        resetReloadBalances: THOR.resetReloadBalances,
         balances$: THOR.balances$,
         reloadBalances$: THOR.reloadBalances$
       }
     case LTCChain:
       return {
         reloadBalances: LTC.reloadBalances,
-        resetReloadBalances: LTC.resetReload,
+        resetReloadBalances: LTC.resetReloadBalances,
         balances$: LTC.balances$,
         reloadBalances$: LTC.reloadBalances$
       }
