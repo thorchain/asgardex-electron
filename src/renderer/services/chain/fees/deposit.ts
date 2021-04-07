@@ -88,6 +88,8 @@ const depositFee$ = ({
             })
           }
         ),
+        // Actual gas fee changes time to time so in many cases, actual fast gas fee is bigger than estimated fast fee
+        // To avoid low gas fee error, we apply fastest fee for ETH only
         liveData.map((fees) => fees['fastest'])
       )
     }
