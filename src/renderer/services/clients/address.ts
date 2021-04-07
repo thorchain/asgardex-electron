@@ -10,8 +10,8 @@ import { Address$, XChainClient$ } from '../clients/types'
 export const addressUI$: (client$: XChainClient$) => Address$ = (client$) =>
   client$.pipe(
     RxOp.map(O.chain((client) => O.tryCatch(() => client.getAddress()))),
-    RxOp.distinctUntilChanged(eqOString.equals)
-    // RxOp.shareReplay(1)
+    RxOp.distinctUntilChanged(eqOString.equals),
+    RxOp.shareReplay(1)
   )
 
 export const address$: (client$: XChainClient$) => Address$ = (client$) =>

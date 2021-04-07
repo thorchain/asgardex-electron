@@ -94,8 +94,6 @@ export const balances$: (client$: XChainClient$, trigger$: TriggerStream$, asset
         )
       )
     })
-    // cache it to avoid reloading data by every subscription
-    // shareReplay(1)
   )
 
 export const balancesByAddress$: (
