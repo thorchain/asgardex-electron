@@ -22,24 +22,17 @@ type Props = {
   isDesktopView: boolean
   selectedNetwork: Network
   changeNetwork: (network: Network) => void
-  removeAllLedgerAddress: () => void
 }
 
-export const HeaderNetwork: React.FC<Props> = ({
-  isDesktopView,
-  changeNetwork = FP.constVoid,
-  selectedNetwork,
-  removeAllLedgerAddress
-}) => {
+export const HeaderNetwork: React.FC<Props> = ({ isDesktopView, changeNetwork = FP.constVoid, selectedNetwork }) => {
   const intl = useIntl()
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(
     (param) => {
       const asset = param.key as Network
       changeNetwork(asset)
-      removeAllLedgerAddress()
     },
-    [changeNetwork, removeAllLedgerAddress]
+    [changeNetwork]
   )
 
   const menu = useMemo(

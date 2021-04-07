@@ -7,16 +7,8 @@ export const Default: Story<{
   network: Network
   isDesktopView: boolean
   changeNetwork: () => void
-  removeAllLedgerAddress: () => void
-}> = ({ network, isDesktopView, changeNetwork, removeAllLedgerAddress }) => {
-  return (
-    <HeaderNetwork
-      selectedNetwork={network}
-      changeNetwork={changeNetwork}
-      isDesktopView={isDesktopView}
-      removeAllLedgerAddress={removeAllLedgerAddress}
-    />
-  )
+}> = ({ network, isDesktopView, changeNetwork }) => {
+  return <HeaderNetwork selectedNetwork={network} changeNetwork={changeNetwork} isDesktopView={isDesktopView} />
 }
 
 Default.args = { network: 'mainnet', isDesktopView: false }
@@ -35,9 +27,6 @@ const argTypes = {
   },
   changeNetwork: {
     action: 'changeNetwork'
-  },
-  removeAllLedgerAddress: {
-    action: 'removeAllLedgerAddress'
   }
 }
 

@@ -57,7 +57,6 @@ type Props = {
   changeLocale?: (locale: Locale) => void
   selectedNetwork: Network
   changeNetwork: (network: Network) => void
-  removeAllLedgerAddress: FP.Lazy<void>
   midgardUrl: O.Option<string>
   binanceUrl: O.Option<string>
   bitcoinUrl: O.Option<string>
@@ -80,8 +79,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     thorchainUrl,
     litecoinUrl,
     selectedNetwork,
-    changeNetwork,
-    removeAllLedgerAddress
+    changeNetwork
   } = props
 
   const intl = useIntl()
@@ -248,14 +246,9 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const renderHeaderNetwork = useMemo(
     () => (
-      <HeaderNetwork
-        removeAllLedgerAddress={removeAllLedgerAddress}
-        isDesktopView={isDesktopView}
-        selectedNetwork={selectedNetwork}
-        changeNetwork={changeNetwork}
-      />
+      <HeaderNetwork isDesktopView={isDesktopView} selectedNetwork={selectedNetwork} changeNetwork={changeNetwork} />
     ),
-    [selectedNetwork, changeNetwork, isDesktopView, removeAllLedgerAddress]
+    [selectedNetwork, changeNetwork, isDesktopView]
   )
 
   const renderHeaderNetStatus = useMemo(

@@ -8,7 +8,6 @@ import { Network } from '../../../shared/api/types'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
-import { useChainContext } from '../../contexts/ChainContext'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { useLitecoinContext } from '../../contexts/LitecoinContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -28,8 +27,6 @@ export const Header: React.FC = (): JSX.Element => {
   } = midgardService
 
   const { network$, changeNetwork } = useAppContext()
-
-  const { removeAllLedgerAddress } = useChainContext()
 
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
@@ -57,7 +54,6 @@ export const Header: React.FC = (): JSX.Element => {
 
   return (
     <HeaderComponent
-      removeAllLedgerAddress={removeAllLedgerAddress}
       selectedNetwork={network}
       changeNetwork={changeNetwork}
       keystore={keystore}
