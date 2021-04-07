@@ -33,7 +33,7 @@ import {
   THORCHAIN_DECIMAL
 } from '../../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
-import { eqBaseAmount, eqOPoolAddresses } from '../../../helpers/fp/eq'
+import { eqAsset, eqBaseAmount, eqOPoolAddresses } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import { LiveData } from '../../../helpers/rx/liveData'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
@@ -733,11 +733,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [closePasswordModal, oDepositParams, subscribeDepositState, deposit$])
 
-  const disabledForm = useMemo(() => isBalanceError || isThorchainFeeError || disabled, [
-    disabled,
-    isBalanceError,
-    isThorchainFeeError
-  ])
+  const disabledForm = useMemo(() => {
+    return (
+      isBalanceError ||
+      isThorchainFeeError ||
+      disabled ||
+      balances.filter((balance) => eqAsset.equals(balance.asset, asset) && !balance.amount.amount().isZero()).length ===
+        0
+    )
+  }, [asset, balances, disabled, isBalanceError, isThorchainFeeError])
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
