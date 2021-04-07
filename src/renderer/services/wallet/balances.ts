@@ -37,7 +37,7 @@ export const reloadBalances: FP.Lazy<void> = () => {
 
 type ChainService = {
   reloadBalances: FP.Lazy<void>
-  resetReload: FP.Lazy<void>
+  resetReloadBalances: FP.Lazy<void>
   reloadBalances$: Rx.Observable<boolean>
   balances$: WalletBalancesLD
 }
@@ -47,28 +47,28 @@ const getServiceByChain = (chain: Chain): ChainService => {
     case BNBChain:
       return {
         reloadBalances: BNB.reloadBalances,
-        resetReload: BNB.resetReload,
+        resetReloadBalances: BNB.resetReload,
         balances$: BNB.balances$,
         reloadBalances$: BNB.reloadBalances$
       }
     case BTCChain:
       return {
         reloadBalances: BTC.reloadBalances,
-        resetReload: BTC.resetReload,
+        resetReloadBalances: BTC.resetReload,
         balances$: BTC.balances$,
         reloadBalances$: BTC.reloadBalances$
       }
     case BCHChain:
       return {
         reloadBalances: BCH.reloadBalances,
-        resetReload: BCH.resetReload,
+        resetReloadBalances: BCH.resetReload,
         balances$: BCH.balances$,
         reloadBalances$: BCH.reloadBalances$
       }
     case ETHChain:
       return {
         reloadBalances: ETH.reloadBalances,
-        resetReload: ETH.resetReload,
+        resetReloadBalances: ETH.resetReload,
         balances$: FP.pipe(
           network$,
           RxOp.switchMap((network) => ETH.balances$(network === 'testnet' ? ETHAssets : undefined))
@@ -78,21 +78,21 @@ const getServiceByChain = (chain: Chain): ChainService => {
     case THORChain:
       return {
         reloadBalances: THOR.reloadBalances,
-        resetReload: THOR.resetReload,
+        resetReloadBalances: THOR.resetReload,
         balances$: THOR.balances$,
         reloadBalances$: THOR.reloadBalances$
       }
     case LTCChain:
       return {
         reloadBalances: LTC.reloadBalances,
-        resetReload: LTC.resetReload,
+        resetReloadBalances: LTC.resetReload,
         balances$: LTC.balances$,
         reloadBalances$: LTC.reloadBalances$
       }
     default:
       return {
         reloadBalances: FP.constVoid,
-        resetReload: FP.constVoid,
+        resetReloadBalances: FP.constVoid,
         balances$: Rx.EMPTY,
         reloadBalances$: Rx.EMPTY
       }
@@ -122,7 +122,7 @@ const getChainBalance$ = (chain: Chain): WalletBalancesLD => {
     RxOp.finalize(() => {
       // on finish a stream reset reload-trigger
       // unsubscribe will be initiated on any View unmount
-      chainService.resetReload()
+      chainService.resetReloadBalances()
     })
   )
 
