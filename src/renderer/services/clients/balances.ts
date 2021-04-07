@@ -9,7 +9,6 @@ import * as RxOp from 'rxjs/operators'
 import { catchError, startWith, map, shareReplay, debounceTime } from 'rxjs/operators'
 
 import { liveData } from '../../helpers/rx/liveData'
-import { TriggerStream$ } from '../../helpers/stateHelper'
 import { ApiError, ErrorId, WalletType } from '../wallet/types'
 import { WalletBalancesLD, XChainClient$ } from './types'
 
@@ -73,11 +72,11 @@ const loadBalances$ = ({
  *
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const balances$: (client$: XChainClient$, trigger$: TriggerStream$, assets?: Asset[]) => WalletBalancesLD = (
-  client$,
-  trigger$,
-  assets
-) =>
+export const balances$: (
+  client$: XChainClient$,
+  trigger$: Rx.Observable<boolean>,
+  assets?: Asset[]
+) => WalletBalancesLD = (client$, trigger$, assets) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.switchMap(([_, oClient]) => {
       return FP.pipe(
@@ -98,7 +97,7 @@ export const balances$: (client$: XChainClient$, trigger$: TriggerStream$, asset
 
 export const balancesByAddress$: (
   client$: XChainClient$,
-  trigger$: TriggerStream$,
+  trigger$: Rx.Observable<boolean>,
   assets?: Asset[]
 ) => (address: string, walletType: WalletType) => WalletBalancesLD = (client$, trigger$, assets) => (
   address,
