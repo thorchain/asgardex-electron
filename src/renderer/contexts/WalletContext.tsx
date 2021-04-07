@@ -14,8 +14,7 @@ import {
   getExplorerTxUrl$,
   getTxs$,
   setSelectedAsset,
-  resetTxsPage,
-  resetWalletBalancesState
+  resetTxsPage
 } from '../services/wallet'
 
 type WalletContextValue = {
@@ -30,7 +29,6 @@ type WalletContextValue = {
   getTxs$: typeof getTxs$
   setSelectedAsset: typeof setSelectedAsset
   resetTxsPage: typeof resetTxsPage
-  resetWalletBalancesState: typeof resetWalletBalancesState
 }
 
 const initialContext: WalletContextValue = {
@@ -44,8 +42,7 @@ const initialContext: WalletContextValue = {
   selectedAsset$,
   getTxs$,
   setSelectedAsset,
-  resetTxsPage,
-  resetWalletBalancesState: resetWalletBalancesState
+  resetTxsPage
 }
 const WalletContext = createContext<Option<WalletContextValue>>(none)
 

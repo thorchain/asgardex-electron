@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
@@ -45,7 +45,7 @@ import { UserAccountType } from '../../types/wallet'
 
 export const SettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
-  const { keystoreService, resetWalletBalancesState } = useWalletContext()
+  const { keystoreService } = useWalletContext()
   const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
   const { network$, changeNetwork } = useAppContext()
   const bnbContext = useBinanceContext()
@@ -337,22 +337,13 @@ export const SettingsView: React.FC = (): JSX.Element => {
     getLedgerErrorDescription(btcLedgerAddress, 'BTC')
   }, [bnbLedgerAddress, btcLedgerAddress, intl, removeLedgerAddress])
 
-  const setNetwork = useCallback(
-    (network: Network) => {
-      // For every network changes we have to clear cached values of balances
-      resetWalletBalancesState()
-      changeNetwork(network)
-    },
-    [changeNetwork, resetWalletBalancesState]
-  )
-
   return (
     <Row>
       <Col span={24}>
         <Settings
           apiVersion={apiVersion}
           selectedNetwork={network}
-          changeNetwork={setNetwork}
+          changeNetwork={changeNetwork}
           clientUrl={clientUrl}
           lockWallet={lock}
           removeKeystore={removeKeystore}

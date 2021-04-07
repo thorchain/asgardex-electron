@@ -1,10 +1,4 @@
-import {
-  reloadBalances,
-  reloadBalancesByChain,
-  balancesState$,
-  chainBalances$,
-  resetWalletBalancesState
-} from './balances'
+import { reloadBalances, reloadBalancesByChain, balancesState$, chainBalances$ } from './balances'
 import { setSelectedAsset, selectedAsset$ } from './common'
 import { keystoreService, removeKeystore } from './keystore'
 import { getTxs$, loadTxs, explorerUrl$, getExplorerTxUrl$, resetTxsPage } from './transaction'
@@ -13,7 +7,6 @@ import { getTxs$, loadTxs, explorerUrl$, getExplorerTxUrl$, resetTxsPage } from 
  * Exports all functions and observables needed at UI level (provided by `WalletContext`)
  */
 export {
-  resetWalletBalancesState,
   keystoreService,
   removeKeystore,
   setSelectedAsset,

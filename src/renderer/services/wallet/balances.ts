@@ -35,65 +35,94 @@ export const reloadBalances: FP.Lazy<void> = () => {
   BCH.reloadBalances()
 }
 
-const getServiceByChain = (chain: Chain) => {
+type ChainService = {
+  reloadBalances: FP.Lazy<void>
+  resetReload: FP.Lazy<void>
+  reloadBalances$: Rx.Observable<string>
+  balances$: WalletBalancesLD
+}
+
+const getServiceByChain = (chain: Chain): ChainService => {
   switch (chain) {
     case 'BNB':
-      return BNB
+      return {
+        reloadBalances: BNB.reloadBalances,
+        resetReload: BNB.resetReload,
+        balances$: BNB.balances$,
+        reloadBalances$: BNB.reloadBalances$
+      }
     case 'BTC':
-      return BTC
+      return {
+        reloadBalances: BTC.reloadBalances,
+        resetReload: BTC.resetReload,
+        balances$: BTC.balances$,
+        reloadBalances$: BTC.reloadBalances$
+      }
     case 'BCH':
-      return BCH
+      return {
+        reloadBalances: BCH.reloadBalances,
+        resetReload: BCH.resetReload,
+        balances$: BCH.balances$,
+        reloadBalances$: BCH.reloadBalances$
+      }
     case 'ETH':
-      return ETH
+      return {
+        reloadBalances: ETH.reloadBalances,
+        resetReload: ETH.resetReload,
+        balances$: FP.pipe(
+          network$,
+          RxOp.switchMap((network) => ETH.balances$(network === 'testnet' ? ETHAssets : undefined))
+        ),
+        reloadBalances$: ETH.reloadBalances$
+      }
     case 'THOR':
-      return THOR
+      return {
+        reloadBalances: THOR.reloadBalances,
+        resetReload: THOR.resetReload,
+        balances$: THOR.balances$,
+        reloadBalances$: THOR.reloadBalances$
+      }
     case 'LTC':
-      return LTC
+      return {
+        reloadBalances: LTC.reloadBalances,
+        resetReload: LTC.resetReload,
+        balances$: LTC.balances$,
+        reloadBalances$: LTC.reloadBalances$
+      }
+    default:
+      return {
+        reloadBalances: FP.constVoid,
+        resetReload: FP.constVoid,
+        balances$: Rx.EMPTY,
+        reloadBalances$: Rx.EMPTY
+      }
   }
 }
 
 export const reloadBalancesByChain: (chain: Chain) => FP.Lazy<void> = (chain) => {
-  return getServiceByChain(chain)?.reloadBalances || (() => {})
-}
-
-const resetReloadByChain: (chain: Chain) => void = (chain) => {
-  return getServiceByChain(chain)?.resetReload()
+  return getServiceByChain(chain).reloadBalances
 }
 
 /**
  * Store previously successfully loaded results at the runtime-memory
+ * to give to the user last balances he loaded without re-requesting
+ * balances data which might be very expensive.
  */
 let walletBalancesState: Partial<Record<Chain, WalletBalancesRD>> = {}
 
-/**
- * Method to force reset current cache at all for all chains
- * e.g. switch network needs such operation
- */
-export const resetWalletBalancesState = () => {
+// Whenever network is changed we have to reset stored cached values for all chains
+network$.subscribe(() => {
   walletBalancesState = {}
-}
-
-const getChainBalanceData$: (chain: Chain) => WalletBalancesLD = (chain) => {
-  if (chain === 'ETH') {
-    return FP.pipe(
-      network$,
-      RxOp.switchMap((network) => ETH.balances$(network === 'testnet' ? ETHAssets : undefined))
-    )
-  }
-  return (getServiceByChain(chain)?.balances$ || Rx.of(RD.initial)) as WalletBalancesLD
-}
-
-const getChainBalanceReload$ = (chain: Chain) => {
-  return getServiceByChain(chain)?.reloadBalances$ || Rx.EMPTY
-}
+})
 
 const getChainBalance$ = (chain: Chain): WalletBalancesLD => {
+  const chainService = getServiceByChain(chain)
   const reload$ = FP.pipe(
-    getChainBalanceReload$(chain),
+    chainService.reloadBalances$,
     RxOp.finalize(() => {
       // on finish a stream reset reload-trigger
       // unsubscribe will be initiated on any View unmount
-      resetReloadByChain(chain)
+      chainService.resetReload()
     })
   )
 
@@ -109,8 +138,8 @@ const getChainBalance$ = (chain: Chain): WalletBalancesLD => {
       // Re-request data ONLY for manual calling update trigger with `trigger`
       // value inside of trigger$ stream
       return FP.pipe(
-        getChainBalanceData$(chain),
-        // For every sucessfull load save results to the memory-based cache
+        chainService.balances$,
+        // For every successful load save results to the memory-based cache
         // to avoid unwanted data re-requesting.
         liveData.map((balances) => {
           walletBalancesState[chain] = RD.success(balances)
