@@ -192,35 +192,11 @@ export const DeviceText = styled(UILabel)`
   }
 `
 
-export const NetworkMenu = styled(A.Menu)`
-  background-color: ${palette('background', 1)};
-`
-
 export const ActionMenuItem = styled(A.Menu.Item)`
   background-color: ${palette('background', 1)};
   &:hover {
     background-color: ${palette('background', 2)};
   }
-`
-
-export const NetworkMenuItem = styled(A.Menu.Item)`
-  color: ${palette('text', 1)};
-
-  &:hover {
-    background-color: ${palette('background', 2)};
-  }
-`
-
-export const NetworkLabel = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  size: 'big'
-})`
-  cursor: pointer;
-`
-
-export const NetworkTitle = styled(NetworkLabel)`
-  padding-right: 10px;
-  width: auto;
 `
 
 export const CopyLabel = styled(A.Typography.Text)`

@@ -2,6 +2,7 @@ import React, { useMemo, useState, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid } from 'antd'
+import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -10,6 +11,7 @@ import { useHistory } from 'react-router-dom'
 import { Observable } from 'rxjs'
 import { palette, size } from 'styled-theme'
 
+import { Network } from '../../../shared/api/types'
 import { Locale } from '../../../shared/i18n/types'
 import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
 import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
@@ -27,6 +29,7 @@ import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Head
 import { HeaderLang } from './lang'
 import { HeaderLock } from './lock/'
 import { HeaderNetStatus } from './netstatus'
+import { HeaderNetwork } from './network'
 import { HeaderPriceSelector } from './price'
 import { HeaderSettings } from './settings'
 import { HeaderTheme } from './theme'
@@ -46,12 +49,14 @@ type Tab = {
 
 type Props = {
   keystore: KeystoreState
-  lockHandler: () => void
+  lockHandler: FP.Lazy<void>
   setSelectedPricePool: (asset: PricePoolAsset) => void
   poolsState$: Observable<PoolsStateRD>
   selectedPricePoolAsset$: Observable<SelectedPricePoolAsset>
   locale: Locale
   changeLocale?: (locale: Locale) => void
+  selectedNetwork: Network
+  changeNetwork: (network: Network) => void
   midgardUrl: O.Option<string>
   binanceUrl: O.Option<string>
   bitcoinUrl: O.Option<string>
@@ -72,7 +77,9 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     binanceUrl,
     bitcoinUrl,
     thorchainUrl,
-    litecoinUrl
+    litecoinUrl,
+    selectedNetwork,
+    changeNetwork
   } = props
 
   const intl = useIntl()
@@ -237,6 +244,13 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     [changeLocale, isDesktopView, locale]
   )
 
+  const renderHeaderNetwork = useMemo(
+    () => (
+      <HeaderNetwork isDesktopView={isDesktopView} selectedNetwork={selectedNetwork} changeNetwork={changeNetwork} />
+    ),
+    [selectedNetwork, changeNetwork, isDesktopView]
+  )
+
   const renderHeaderNetStatus = useMemo(
     () => (
       <HeaderNetStatus
@@ -277,6 +291,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                   {renderHeaderLang}
                   {renderHeaderCurrency}
                   {renderHeaderLock}
+                  {renderHeaderNetwork}
                   {renderHeaderSettings}
                 </Row>
               </Col>
@@ -319,6 +334,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
             {links}
             <HeaderDrawerItem>{renderHeaderLang}</HeaderDrawerItem>
             <HeaderDrawerItem>{renderHeaderCurrency}</HeaderDrawerItem>
+            <HeaderDrawerItem>{renderHeaderNetwork}</HeaderDrawerItem>
             <HeaderDrawerItem>
               <HeaderTheme isDesktopView={isDesktopView} />
             </HeaderDrawerItem>

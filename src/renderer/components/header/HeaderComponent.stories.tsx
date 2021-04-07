@@ -30,6 +30,8 @@ storiesOf('Components/Header', module).add('default', () => {
       bitcoinUrl={bitcoinUrl}
       thorchainUrl={thorchainUrl}
       litecoinUrl={litecoinUrl}
+      selectedNetwork={'mainnet'}
+      changeNetwork={(network) => console.log('set network to', network)}
     />
   )
 })
