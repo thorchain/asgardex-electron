@@ -39,6 +39,7 @@ export const Title = styled(Label).attrs({
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  cursor: default;
 `
 
 export const Value = styled(Label).attrs({
@@ -50,7 +51,8 @@ export const Value = styled(Label).attrs({
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  cursor: pointer;
+  cursor: default;
+  width: fit-content;
 `
 
 export const Tooltip = styled(A.Tooltip).attrs({
