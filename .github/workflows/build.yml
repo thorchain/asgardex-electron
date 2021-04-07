@@ -62,6 +62,7 @@ jobs:
         if: runner.os == 'macOS'
         run: yarn package:ci
         env:
+          ARCHFLAGS: -arch x86_64
           NODE_OPTIONS: --max-old-space-size=4096
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.MAC_CERTIFICATE }}
