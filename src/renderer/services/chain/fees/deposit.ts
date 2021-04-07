@@ -88,7 +88,7 @@ const depositFee$ = ({
             })
           }
         ),
-        liveData.map((fees) => fees[FeeOptionKeys.DEPOSIT])
+        liveData.map((fees) => fees['fastest'])
       )
     }
     case CosmosChain:

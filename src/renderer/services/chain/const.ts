@@ -18,7 +18,7 @@ export const MAX_SWAP_STEPS = 3
  */
 export const FeeOptionKeys: { [key in TxTypes]: FeeOptionKey } = {
   SWAP: 'fast',
-  DEPOSIT: 'fastest',
+  DEPOSIT: 'fast',
   WITHDRAW: 'fast',
   UPGRADE: 'fast'
 }
