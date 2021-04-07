@@ -22,6 +22,7 @@ import { WalletBalancesLD, WalletBalancesRD } from '../clients'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
+import { ReloadType } from '../types'
 import { INITIAL_BALANCES_STATE } from './const'
 import { BalancesState, ChainBalances$, ChainBalance$, ChainBalance } from './types'
 import { sortBalances } from './util'
@@ -38,7 +39,7 @@ export const reloadBalances: FP.Lazy<void> = () => {
 type ChainService = {
   reloadBalances: FP.Lazy<void>
   resetReload: FP.Lazy<void>
-  reloadBalances$: Rx.Observable<string>
+  reloadBalances$: Rx.Observable<ReloadType>
   balances$: WalletBalancesLD
 }
 
@@ -131,7 +132,7 @@ const getChainBalance$ = (chain: Chain): WalletBalancesLD => {
     RxOp.switchMap((reloadTrigger) => {
       const savedResult = walletBalancesState[chain]
       // For every new simple subscription return cached results if they exist
-      if (reloadTrigger === '' && savedResult) {
+      if (reloadTrigger === 'load' && savedResult) {
         return Rx.of(savedResult)
       }
       // If there is no cached data for appropriate chain request for it
