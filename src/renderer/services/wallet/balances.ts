@@ -45,28 +45,28 @@ type ChainService = {
 
 const getServiceByChain = (chain: Chain): ChainService => {
   switch (chain) {
-    case 'BNB':
+    case BNBChain:
       return {
         reloadBalances: BNB.reloadBalances,
         resetReload: BNB.resetReload,
         balances$: BNB.balances$,
         reloadBalances$: BNB.reloadBalances$
       }
-    case 'BTC':
+    case BTCChain:
       return {
         reloadBalances: BTC.reloadBalances,
         resetReload: BTC.resetReload,
         balances$: BTC.balances$,
         reloadBalances$: BTC.reloadBalances$
       }
-    case 'BCH':
+    case BCHChain:
       return {
         reloadBalances: BCH.reloadBalances,
         resetReload: BCH.resetReload,
         balances$: BCH.balances$,
         reloadBalances$: BCH.reloadBalances$
       }
-    case 'ETH':
+    case ETHChain:
       return {
         reloadBalances: ETH.reloadBalances,
         resetReload: ETH.resetReload,
@@ -76,14 +76,14 @@ const getServiceByChain = (chain: Chain): ChainService => {
         ),
         reloadBalances$: ETH.reloadBalances$
       }
-    case 'THOR':
+    case THORChain:
       return {
         reloadBalances: THOR.reloadBalances,
         resetReload: THOR.resetReload,
         balances$: THOR.balances$,
         reloadBalances$: THOR.reloadBalances$
       }
-    case 'LTC':
+    case LTCChain:
       return {
         reloadBalances: LTC.reloadBalances,
         resetReload: LTC.resetReload,
@@ -287,12 +287,12 @@ export const chainBalances$: ChainBalances$ = Rx.combineLatest(
  */
 export const balancesState$: Observable<BalancesState> = Rx.combineLatest(
   filterEnabledChains({
-    THOR: [getChainBalance$('THOR')],
-    BTC: [getChainBalance$('BTC'), btcLedgerBalance$],
-    BCH: [getChainBalance$('BCH')],
+    THOR: [getChainBalance$(THORChain)],
+    BTC: [getChainBalance$(BTCChain), btcLedgerBalance$],
+    BCH: [getChainBalance$(BCHChain)],
     ETH: [ethBalances$],
-    BNB: [getChainBalance$('BNB')],
-    LTC: [getChainBalance$('LTC')]
+    BNB: [getChainBalance$(BNBChain)],
+    LTC: [getChainBalance$(LTCChain)]
   })
 ).pipe(
   RxOp.map((balancesList) => ({
