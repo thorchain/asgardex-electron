@@ -27,14 +27,15 @@ import { PoolDetail } from '../../../types/generated/midgard'
 type Props = {
   asset: AssetWithDecimal
   poolShare: PoolShareRD
+  poolDetail: PoolDetailRD
 }
 
 export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
-  const { asset: assetWD, poolShare: poolShareRD } = props
+  const { asset: assetWD, poolShare: poolShareRD, poolDetail: poolDetailRD } = props
   const { decimal: assetDecimal } = assetWD
   const {
     service: {
-      pools: { selectedPoolDetail$, selectedPricePoolAsset$, priceRatio$ },
+      pools: { selectedPricePoolAsset$, priceRatio$ },
       shares: { reloadShares }
     }
   } = useMidgardContext()
@@ -42,8 +43,6 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const { withdrawFee$, reloadWithdrawFees, symWithdraw$, getExplorerUrlByAsset$ } = useChainContext()
 
   const runePrice = useObservableState(priceRatio$, bn(1))
-
-  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
   const [selectedPriceAssetRD]: [RD.RemoteData<Error, Asset>, unknown] = useObservableState(
     () =>

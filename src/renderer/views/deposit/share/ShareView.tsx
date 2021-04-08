@@ -23,18 +23,23 @@ import * as Styled from './ShareView.styles'
 type Props = {
   asset: AssetWithDecimal
   poolShare: PoolShareRD
+  poolDetail: PoolDetailRD
   smallWidth?: boolean
 }
 
-export const ShareView: React.FC<Props> = ({ asset: assetWD, poolShare: poolShareRD, smallWidth }) => {
+export const ShareView: React.FC<Props> = ({
+  asset: assetWD,
+  poolShare: poolShareRD,
+  smallWidth,
+  poolDetail: poolDetailRD
+}) => {
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { selectedPoolDetail$, selectedPricePoolAsset$, selectedPricePool$ }
+    pools: { selectedPricePoolAsset$, selectedPricePool$ }
   } = midgardService
 
   const intl = useIntl()
 
-  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
 
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)

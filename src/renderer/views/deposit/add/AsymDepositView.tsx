@@ -32,9 +32,10 @@ import { WalletBalances } from '../../../types/wallet'
 
 type Props = {
   asset: Asset
+  poolDetail: PoolDetailRD
 }
 
-export const AsymDepositView: React.FC<Props> = ({ asset }) => {
+export const AsymDepositView: React.FC<Props> = ({ asset, poolDetail: poolDetailRD }) => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -50,7 +51,7 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
 
   const {
     service: {
-      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, selectedPoolDetail$, selectedPoolAddress$ },
+      pools: { availableAssets$, priceRatio$, selectedPricePoolAsset$, selectedPoolAddress$ },
       shares: { reloadShares }
     }
   } = useMidgardContext()
@@ -87,8 +88,6 @@ export const AsymDepositView: React.FC<Props> = ({ asset }) => {
     reloadBalances()
     reloadShares(5000)
   }, [reloadBalances, reloadShares])
-
-  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
   const assetBalance: O.Option<BaseAmount> = useMemo(
     () =>

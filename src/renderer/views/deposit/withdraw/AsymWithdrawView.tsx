@@ -25,13 +25,14 @@ import { getBalanceByAsset } from '../../../services/wallet/util'
 type Props = {
   asset: Asset
   poolShare: PoolShareRD
+  poolDetail: PoolDetailRD
 }
 
 export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
-  const { asset, poolShare: poolShareRD } = props
+  const { asset, poolShare: poolShareRD, poolDetail: poolDetailRD } = props
   const {
     service: {
-      pools: { selectedPoolDetail$, selectedPricePoolAsset$, priceRatio$, selectedPoolAddress$ }
+      pools: { selectedPricePoolAsset$, priceRatio$, selectedPoolAddress$ }
     }
   } = useMidgardContext()
 
@@ -40,8 +41,6 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
   const runePrice = useObservableState(priceRatio$, bn(1))
 
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
-
-  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
   const [selectedPriceAssetRD]: [RD.RemoteData<Error, Asset>, unknown] = useObservableState(
     () =>
