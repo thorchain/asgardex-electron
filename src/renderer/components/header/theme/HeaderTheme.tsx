@@ -1,7 +1,8 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 
+import { ThemeType } from '@thorchain/asgardex-theme'
 import { useObservableState } from 'observable-hooks'
-import { palette } from 'styled-theme'
+import * as RxOp from 'rxjs/operators'
 
 import { useThemeContext } from '../../../contexts/ThemeContext'
 import * as Styled from './HeaderTheme.style'
@@ -13,11 +14,9 @@ type Props = {
 
 export const HeaderTheme: React.FC<Props> = (props): JSX.Element => {
   const { onPress = () => {}, isDesktopView } = props
-  const { toggleTheme, theme$ } = useThemeContext()
-  const theme = useObservableState(theme$)
-  const color = useMemo(() => palette('text', 0)({ theme }), [theme])
-  const iconStyle = { fontSize: '1.5em' }
-  const isDay = palette('background', 0)({ theme }) === '#fff'
+  const { toggleTheme, themeType$ } = useThemeContext()
+
+  const [isLightTheme] = useObservableState(() => themeType$.pipe(RxOp.map((type) => type === ThemeType.LIGHT)), false)
 
   const clickSwitchThemeHandler = useCallback(() => {
     toggleTheme()
@@ -26,12 +25,8 @@ export const HeaderTheme: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.HeaderThemeWrapper onClick={() => clickSwitchThemeHandler()}>
-      {!isDesktopView && (isDay ? 'DAY MODE' : 'NIGHT MODE')}
-      {isDay ? (
-        <Styled.DayThemeIcon style={{ color, ...iconStyle }} />
-      ) : (
-        <Styled.NightThemeIcon style={{ color, ...iconStyle }} />
-      )}
+      {!isDesktopView && (isLightTheme ? 'DAY MODE' : 'NIGHT MODE')}
+      {isLightTheme ? <Styled.DayThemeIcon /> : <Styled.NightThemeIcon />}
     </Styled.HeaderThemeWrapper>
   )
 }
