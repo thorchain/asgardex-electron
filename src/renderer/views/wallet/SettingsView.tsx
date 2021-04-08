@@ -47,7 +47,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const { keystoreService } = useWalletContext()
   const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
-  const { network$, changeNetwork } = useAppContext()
+  const { network$ } = useAppContext()
   const bnbContext = useBinanceContext()
   const thorContext = useThorchainContext()
   const ethContext = useEthereumContext()
@@ -55,12 +55,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const ltcContext = useLitecoinContext()
   const bchContext = useBitcoinCashContext()
 
-  const {
-    retrieveLedgerAddress,
-    removeLedgerAddress,
-    removeAllLedgerAddress,
-    getExplorerAddressByChain$
-  } = useChainContext()
+  const { retrieveLedgerAddress, removeLedgerAddress, getExplorerAddressByChain$ } = useChainContext()
 
   const phrase$ = useMemo(() => pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
   const phrase = useObservableState(phrase$, O.none)
@@ -343,7 +338,6 @@ export const SettingsView: React.FC = (): JSX.Element => {
         <Settings
           apiVersion={apiVersion}
           selectedNetwork={network}
-          changeNetwork={changeNetwork}
           clientUrl={clientUrl}
           lockWallet={lock}
           removeKeystore={removeKeystore}
@@ -352,7 +346,6 @@ export const SettingsView: React.FC = (): JSX.Element => {
           userAccounts={userAccounts}
           retrieveLedgerAddress={retrieveLedgerAddress}
           removeLedgerAddress={removeLedgerAddress}
-          removeAllLedgerAddress={removeAllLedgerAddress}
           phrase={phrase}
           clickAddressLinkHandler={clickAddressLinkHandler}
           validatePassword$={validatePassword$}

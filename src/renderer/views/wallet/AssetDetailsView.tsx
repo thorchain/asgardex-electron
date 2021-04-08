@@ -89,7 +89,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
           title={intl.formatMessage(
             { id: 'routes.invalid.asset' },
             {
-              routeAsset
+              asset: routeAsset
             }
           )}
         />

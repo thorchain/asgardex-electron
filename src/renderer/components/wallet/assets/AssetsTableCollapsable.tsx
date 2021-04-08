@@ -318,7 +318,11 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         chainBalances,
         A.map(({ balances }) => balances),
         A.map(RD.getOrElse((): WalletBalances => [])),
-        A.filterMapWithIndex((i, balances) => (balances.length > 0 ? O.some(i.toString()) : O.none))
+        A.filterMapWithIndex((i, balances) =>
+          balances.length > 0 || (previousAssetsTableData.current[i] && previousAssetsTableData.current[i].length !== 0)
+            ? O.some(i.toString())
+            : O.none
+        )
       )
       setOpenPanelKeys(keys)
     }

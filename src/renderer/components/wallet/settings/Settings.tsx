@@ -2,17 +2,14 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
-import { Row, Col, List, Dropdown } from 'antd'
-import { MenuProps } from 'antd/lib/menu'
+import { Row, Col, List } from 'antd'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
-import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
 import { LedgerAddressParams } from '../../../services/chain/types'
-import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { UserAccountType } from '../../../types/wallet'
 import { PasswordModal } from '../../modal/password'
@@ -23,7 +20,6 @@ import * as Styled from './Settings.style'
 type Props = {
   selectedNetwork: Network
   apiVersion?: string
-  changeNetwork: (network: Network) => void
   clientUrl: O.Option<string>
   userAccounts?: O.Option<UserAccountType[]>
   runeNativeAddress: string
@@ -32,7 +28,6 @@ type Props = {
   exportKeystore?: (runeNativeAddress: string, selectedNetwork: Network) => void
   retrieveLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
   removeLedgerAddress: (chain: Chain) => void
-  removeAllLedgerAddress: () => void
   phrase?: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
@@ -55,8 +50,6 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     /* Hide `removeDevice` for all chains temporarily
     removeLedgerAddress,
     */
-    removeAllLedgerAddress,
-    changeNetwork,
     phrase: oPhrase = O.none,
     clickAddressLinkHandler,
     validatePassword$
@@ -171,28 +164,6 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     [clickAddressLinkHandler, renderAddressWithBreak, intl, userAccounts]
   )
 
-  const changeNetworkHandler: MenuProps['onClick'] = useCallback(
-    (param) => {
-      const asset = param.key as Network
-      changeNetwork(asset)
-      removeAllLedgerAddress()
-    },
-    [changeNetwork, removeAllLedgerAddress]
-  )
-
-  const networkMenu = useMemo(
-    () => (
-      <Styled.NetworkMenu onClick={changeNetworkHandler}>
-        {AVAILABLE_NETWORKS.map((network) => (
-          <Styled.NetworkMenuItem key={network}>
-            <Styled.NetworkLabel>{network}</Styled.NetworkLabel>
-          </Styled.NetworkMenuItem>
-        ))}
-      </Styled.NetworkMenu>
-    ),
-    [changeNetworkHandler]
-  )
-
   const onSuccessPassword = useCallback(() => {
     setShowPasswordModal(false)
     setShowPhraseModal(true)
@@ -288,14 +259,6 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
                 <Styled.Placeholder>{intl.formatMessage({ id: 'setting.version' })}</Styled.Placeholder>
                 <Styled.ClientLabel>v{apiVersion}</Styled.ClientLabel>
-                <Styled.Placeholder>{intl.formatMessage({ id: 'common.network' })}</Styled.Placeholder>
-                {/* TODO (@asgdx-team) Disable mainnet for next pre-release */}
-                <Dropdown overlay={networkMenu} trigger={['click']} disabled>
-                  <Row align="middle" style={{ display: 'inline-flex' }} onClick={(e) => e.preventDefault()}>
-                    <Styled.NetworkTitle>{selectedNetwork}</Styled.NetworkTitle>
-                    <DownIcon />
-                  </Row>
-                </Dropdown>
               </Col>
             </Row>
           </Styled.Card>

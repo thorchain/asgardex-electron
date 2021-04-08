@@ -70,8 +70,8 @@ const common: CommonMessages = {
   'common.detail': 'Détail',
   'common.filter': 'Filtre',
   'common.all': 'Tous',
-  'common.time.week': 'week - FR',
-  'common.time.all': 'all - FR'
+  'common.time.week': 'Semaine',
+  'common.time.all': 'Tout'
 }
 
 export default common
