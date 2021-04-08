@@ -14,7 +14,7 @@ export const NetworkLabel = styled(LabelUI).attrs<LabelProps>(({ network }) => (
   padding: 0;
   line-height: 16px;
   // fix width as max of (mainnet | chaosnet | testnet) to avoid changing element's width
-  width: 74px;
+  width: 77px;
 
   color: ${({ network }) => {
     switch (network) {
