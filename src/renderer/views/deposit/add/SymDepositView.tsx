@@ -35,10 +35,11 @@ import { WalletBalances } from '../../../types/wallet'
 
 type Props = {
   asset: AssetWithDecimal
+  poolDetail: PoolDetailRD
 }
 
 export const SymDepositView: React.FC<Props> = (props) => {
-  const { asset: assetWD } = props
+  const { asset: assetWD, poolDetail: poolDetailRD } = props
   const { asset } = assetWD
   const history = useHistory()
   const intl = useIntl()
@@ -59,7 +60,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
         availableAssets$,
         priceRatio$,
         selectedPricePoolAsset$,
-        selectedPoolDetail$,
         reloadSelectedPoolDetail,
         selectedPoolAddress$,
         reloadPoolAddresses
@@ -95,8 +95,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
 
   const { balances: walletBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
-
-  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
   const assetBalance: O.Option<BaseAmount> = useMemo(
     () =>

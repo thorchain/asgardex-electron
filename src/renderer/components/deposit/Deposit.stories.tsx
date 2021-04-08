@@ -15,6 +15,7 @@ import { Default as Withdraw } from './withdraw/Withdraw.stories'
 
 const defaultProps: DepositProps = {
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
+  poolDetail: RD.initial,
   shares: RD.success([
     {
       units: bn('300000000'),

@@ -23,7 +23,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { DepositRouteParams } from '../../routes/pools/deposit'
 import { AssetWithDecimalRD } from '../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
+import { PoolDetailRD, PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
 import * as Styled from './DepositView.styles'
@@ -44,7 +44,7 @@ export const DepositView: React.FC<Props> = () => {
     service: {
       setSelectedPoolAsset,
       selectedPoolAsset$,
-      pools: { reloadSelectedPoolDetail },
+      pools: { reloadSelectedPoolDetail, selectedPoolDetail$ },
       shares: { shares$, reloadShares }
     }
   } = useMidgardContext()
@@ -141,6 +141,8 @@ export const DepositView: React.FC<Props> = () => {
   // before a check of `keystoreState` can be done
   const keystoreState = useObservableState(keystoreService.keystore$, undefined)
 
+  const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
+
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)
   if (keystoreState === undefined) {
@@ -166,6 +168,7 @@ export const DepositView: React.FC<Props> = () => {
           ),
           (asset) => (
             <Deposit
+              poolDetail={poolDetailRD}
               asset={asset}
               shares={poolSharesRD}
               keystoreState={keystoreState}

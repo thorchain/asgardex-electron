@@ -7,7 +7,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
-import { PoolShareRD, PoolSharesRD } from '../../services/midgard/types'
+import { PoolDetailRD, PoolShareRD, PoolSharesRD } from '../../services/midgard/types'
 import { getSharesByAssetAndType, combineSharesByAsset } from '../../services/midgard/utils'
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
@@ -27,15 +27,17 @@ type Tab = {
 export type Props = {
   asset: AssetWithDecimal
   shares: PoolSharesRD
+  poolDetail: PoolDetailRD
   ShareContent: React.ComponentType<{
     asset: AssetWithDecimal
     poolShare: PoolShareRD
     smallWidth?: boolean
+    poolDetail: PoolDetailRD
   }>
-  AsymDepositContent: React.ComponentType<{ asset: Asset }>
-  SymDepositContent: React.ComponentType<{ asset: AssetWithDecimal }>
-  WidthdrawContent: React.ComponentType<{ asset: AssetWithDecimal; poolShare: PoolShareRD }>
-  AsymWidthdrawContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD }>
+  AsymDepositContent: React.ComponentType<{ asset: Asset; poolDetail: PoolDetailRD }>
+  SymDepositContent: React.ComponentType<{ asset: AssetWithDecimal; poolDetail: PoolDetailRD }>
+  WidthdrawContent: React.ComponentType<{ asset: AssetWithDecimal; poolShare: PoolShareRD; poolDetail: PoolDetailRD }>
+  AsymWidthdrawContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD; poolDetail: PoolDetailRD }>
   keystoreState: KeystoreState
 }
 
@@ -50,7 +52,8 @@ export const Deposit: React.FC<Props> = (props) => {
     // TODO (@Veado) Temporary disabled #827
     // AsymWidthdrawContent,
     keystoreState,
-    shares: poolSharesRD
+    shares: poolSharesRD,
+    poolDetail: poolDetailRD
   } = props
 
   const { asset } = assetWD
@@ -106,13 +109,13 @@ export const Deposit: React.FC<Props> = (props) => {
         key: 'deposit-sym',
         disabled: false,
         label: intl.formatMessage({ id: 'deposit.add.sym' }),
-        content: <SymDepositContent asset={assetWD} />
+        content: <SymDepositContent poolDetail={poolDetailRD} asset={assetWD} />
       },
       {
         key: 'withdraw-sym',
         disabled: !hasSymPoolShare,
         label: intl.formatMessage({ id: 'deposit.withdraw.sym' }),
-        content: <WidthdrawContent asset={assetWD} poolShare={combinedPoolShare} />
+        content: <WidthdrawContent poolDetail={poolDetailRD} asset={assetWD} poolShare={combinedPoolShare} />
       }
       // {
       //   key: 'withdraw-asym-asset',
@@ -121,7 +124,7 @@ export const Deposit: React.FC<Props> = (props) => {
       //   content: <AsymWidthdrawContent asset={asset} poolShare={asymPoolShareAsset} />
       // }
     ],
-    [intl, assetWD, SymDepositContent, hasSymPoolShare, WidthdrawContent, combinedPoolShare]
+    [intl, assetWD, SymDepositContent, hasSymPoolShare, WidthdrawContent, combinedPoolShare, poolDetailRD]
   )
 
   const alignTopShareContent: boolean = useMemo(
@@ -148,7 +151,12 @@ export const Deposit: React.FC<Props> = (props) => {
             </Styled.DepositContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
               <Styled.ShareContentWrapper alignTop={alignTopShareContent}>
-                <ShareContent asset={assetWD} poolShare={combinedPoolShare} smallWidth={!isDesktopView} />
+                <ShareContent
+                  poolDetail={poolDetailRD}
+                  asset={assetWD}
+                  poolShare={combinedPoolShare}
+                  smallWidth={!isDesktopView}
+                />
               </Styled.ShareContentWrapper>
             </Styled.ShareContentCol>
           </>
