@@ -1,12 +1,9 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 
-import Text from 'antd/lib/typography/Text'
-import { useObservableState } from 'observable-hooks'
-import { palette } from 'styled-theme'
+import { useIntl } from 'react-intl'
 
-import { ReactComponent as SettingsIcon } from '../../../assets/svg/icon-settings.svg'
-import { useThemeContext } from '../../../contexts/ThemeContext'
 import { HeaderIconWrapper } from '../HeaderIcon.style'
+import * as Styled from './HeaderSettings.style'
 
 type Props = {
   onPress?: () => void
@@ -15,15 +12,12 @@ type Props = {
 
 export const HeaderSettings: React.FC<Props> = (props): JSX.Element => {
   const { onPress = () => {}, isDesktopView } = props
-  const { theme$ } = useThemeContext()
-  const theme = useObservableState(theme$)
-  const color = useMemo(() => palette('text', 0)({ theme }), [theme])
-  const iconStyle = useMemo(() => ({ fontSize: '1.5em' }), [])
+  const intl = useIntl()
 
   return (
     <HeaderIconWrapper onClick={onPress}>
-      {!isDesktopView && <Text style={{ color }}>SETTINGS</Text>}
-      <SettingsIcon style={{ color, ...iconStyle }} />
+      {!isDesktopView && <Styled.Label>{intl.formatMessage({ id: 'setting.title' })} </Styled.Label>}
+      <Styled.Icon />
     </HeaderIconWrapper>
   )
 }

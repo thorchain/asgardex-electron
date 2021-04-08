@@ -1,18 +1,17 @@
-import { Row } from 'antd'
+import Text from 'antd/lib/typography/Text'
 import styled from 'styled-components'
+import { palette } from 'styled-theme'
 
-import { media } from '../../../helpers/styleHelper'
+import { ReactComponent as SettingsIcon } from '../../../assets/svg/icon-settings.svg'
 
-export const HeaderSettingsWrapper = styled(Row)`
-  cursor: pointer;
-  justify-content: space-between;
-  width: 100vw;
-  padding: 0 15px;
-  height: 60px;
-  align-items: center;
+export const Label = styled(Text)`
+  color: ${palette('text', 0)};
+`
 
-  ${media.lg`
-    width: auto;
-    padding: 0;
-  `}
+export const Icon = styled(SettingsIcon)`
+  font-size: '1.5em';
+
+  & path {
+    fill: ${palette('text', 2)};
+  }
 `

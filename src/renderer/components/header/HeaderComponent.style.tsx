@@ -36,12 +36,6 @@ export const HeaderContainer = styled(Layout.Header)`
     cursor: pointer;
   }
 
-  #settings_icon {
-    & > * {
-      fill: ${palette('primary', 0)};
-    }
-  }
-
   .ant-tabs-nav {
     &::before {
       /* hide border */
