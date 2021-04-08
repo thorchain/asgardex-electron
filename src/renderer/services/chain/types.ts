@@ -7,6 +7,7 @@ import * as Rx from 'rxjs'
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithDecimal } from '../../types/asgardex'
+import { ApproveParams } from '../ethereum/types'
 import { PoolAddress } from '../midgard/types'
 import { ApiError, TxHashRD } from '../wallet/types'
 
@@ -134,6 +135,10 @@ export type SwapFeesParams = {
 export type SwapFeesHandler = (p: SwapFeesParams) => SwapFeesLD
 
 export type LoadSwapFeesHandler = (p: SwapFeesParams) => void
+
+export type ApproveFeeHandler = (p: ApproveParams) => FeeLD
+
+export type LoadApproveFeeHandler = (p: ApproveParams) => void
 
 /**
  * State to reflect status of an asym. deposit by doing different requests

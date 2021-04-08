@@ -5,7 +5,7 @@ import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import { BigNumber, ethers } from 'ethers'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { SendPoolTxParams } from '../chain/types'
+import { FeeLD, SendPoolTxParams } from '../chain/types'
 import * as C from '../clients'
 import { ApiError, TxHashLD } from '../wallet/types'
 
@@ -53,4 +53,5 @@ export type TransactionService = {
 export type FeesService = {
   poolInTxFees$: (params: PollInTxFeeParams) => C.FeesLD
   poolOutTxFee$: (asset: Asset) => C.FeesLD
+  approveTxFee$: (params: ApproveParams) => FeeLD
 } & C.FeesService<FeesParams>

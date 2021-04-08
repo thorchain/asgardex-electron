@@ -179,5 +179,5 @@ export const ApproveButton = styled(UIButton).attrs({
   color: 'warning',
   sizevalue: 'xnormal'
 })`
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 `

@@ -9,8 +9,9 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { isEthAsset } from '../../helpers/assetHelper'
+import { FeeLD } from '../chain/types'
 import * as C from '../clients'
-import { FeesService, Client$, PollInTxFeeParams } from './types'
+import { FeesService, Client$, PollInTxFeeParams, ApproveParams } from './types'
 
 export const ETH_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('35609')
 export const ERC20_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('49610')
@@ -80,9 +81,32 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
       )
     )
 
+  /**
+   * Fees for approve Tx
+   **/
+  const approveTxFee$ = ({ spender, sender, amount }: ApproveParams): FeeLD =>
+    client$.pipe(
+      RxOp.switchMap((oClient) =>
+        FP.pipe(
+          oClient,
+          O.fold(
+            () => Rx.of(RD.initial),
+            (client) =>
+              Rx.combineLatest([client.estimateApprove({ spender, sender, amount }), client.estimateGasPrices()]).pipe(
+                RxOp.map(([gasLimit, gasPrices]) => getFee({ gasPrice: gasPrices.fast, gasLimit })),
+                RxOp.map(RD.success),
+                RxOp.catchError((_) => Rx.of(RD.success(getDefaultFees().fast))),
+                RxOp.startWith(RD.pending)
+              )
+          )
+        )
+      )
+    )
+
   return {
     ...common,
     poolInTxFees$,
-    poolOutTxFee$
+    poolOutTxFee$,
+    approveTxFee$
   }
 }
