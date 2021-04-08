@@ -55,7 +55,7 @@ export const HeaderNetwork: React.FC<Props> = ({ isDesktopView, changeNetwork = 
   return (
     <HeaderDropdownWrapper>
       {/* TODO (@asgdx-team) Disable chaosnet for next testnet release */}
-      <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+      <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter" disabled>
         <HeaderDropdownContentWrapper>
           {!isDesktopView && <HeaderDropdownTitle>{intl.formatMessage({ id: 'common.network' })}</HeaderDropdownTitle>}
           <Styled.Row>
