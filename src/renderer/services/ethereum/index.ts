@@ -25,7 +25,11 @@ const {
   approveERC20Token$,
   isApprovedERC20Token$
 } = createTransactionService(client$)
+<<<<<<< HEAD
 const { reloadFees, fees$, poolInTxFees$, poolOutTxFee$, approveFee$, reloadApproveFee } = createFeesService({
+=======
+const { reloadFees, fees$, poolInTxFees$, poolOutTxFee$, approveTxFee$ } = createFeesService({
+>>>>>>> add approve fee handling for swap page
   client$,
   chain: ETHChain
 })
@@ -54,8 +58,12 @@ export {
   sendPoolTx$,
   poolInTxFees$,
   poolOutTxFee$,
+<<<<<<< HEAD
   approveFee$,
   reloadApproveFee,
+=======
+  approveTxFee$,
+>>>>>>> add approve fee handling for swap page
   approveERC20Token$,
   isApprovedERC20Token$
 }

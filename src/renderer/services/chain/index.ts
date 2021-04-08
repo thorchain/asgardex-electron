@@ -10,7 +10,9 @@ import {
   withdrawFee$,
   reloadWithdrawFee,
   reloadSwapFees,
-  swapFees$
+  swapFees$,
+  approveFee$,
+  reloadApproveFee
 } from './fees'
 import { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } from './ledger'
 import { asymDepositTxMemo$, symDepositTxMemo$, getWithdrawMemo$ } from './memo'
@@ -36,6 +38,8 @@ export {
   asymDepositFee$,
   withdrawFee$,
   reloadWithdrawFee,
+  approveFee$,
+  reloadApproveFee,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   getWithdrawMemo$,

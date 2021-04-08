@@ -57,6 +57,10 @@ export type TransactionService = {
 export type FeesService = {
   poolInTxFees$: (params: PollInTxFeeParams) => C.FeesLD
   poolOutTxFee$: (asset: Asset) => C.FeesLD
+<<<<<<< HEAD
   approveFee$: ApproveFeeHandler
   reloadApproveFee: LoadApproveFeeHandler
+=======
+  approveTxFee$: (params: ApproveParams) => FeeLD
+>>>>>>> add approve fee handling for swap page
 } & C.FeesService<FeesParams>

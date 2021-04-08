@@ -9,10 +9,16 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { isEthAsset } from '../../helpers/assetHelper'
+<<<<<<< HEAD
 import { observableState } from '../../helpers/stateHelper'
 import { FeeLD } from '../chain/types'
 import * as C from '../clients'
 import { FeesService, Client$, PollInTxFeeParams, ApproveParams, ApproveFeeHandler } from './types'
+=======
+import { FeeLD } from '../chain/types'
+import * as C from '../clients'
+import { FeesService, Client$, PollInTxFeeParams, ApproveParams } from './types'
+>>>>>>> add approve fee handling for swap page
 
 export const ETH_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('35609')
 export const ERC20_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('49610')
@@ -104,6 +110,7 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
       )
     )
 
+<<<<<<< HEAD
   // state for reloading approve fees
   const { get$: reloadApproveFee$, set: reloadApproveFee } = observableState<ApproveParams | undefined>(undefined)
 
@@ -121,11 +128,17 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
     )
   }
 
+=======
+>>>>>>> add approve fee handling for swap page
   return {
     ...common,
     poolInTxFees$,
     poolOutTxFee$,
+<<<<<<< HEAD
     approveFee$,
     reloadApproveFee
+=======
+    approveTxFee$
+>>>>>>> add approve fee handling for swap page
   }
 }

@@ -44,6 +44,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     setSelectedPoolAsset
   } = midgardService
   const {
+    reloadApproveFee,
+    approveFee$,
     reloadSwapFees,
     swapFees$,
     getExplorerUrlByAsset$,
