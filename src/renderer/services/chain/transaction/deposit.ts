@@ -182,7 +182,7 @@ export const symDeposit$ = ({
     ),
     // 2. send asset deposit txs
     liveData.chain<ApiError, SymDepositValidationResult, TxHash>((_) => {
-      setState({ ...getState(), step: 3, deposit: RD.progress({ loaded: 60, total }) })
+      setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 60, total }) })
       return sendPoolTx$({
         router: poolAddresses.router,
         asset,
@@ -206,7 +206,7 @@ export const symDeposit$ = ({
     }),
     // 3. send RUNE deposit txs
     liveData.chain<ApiError, TxHash, TxHash>((_) => {
-      setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 40, total }) })
+      setState({ ...getState(), step: 3, deposit: RD.progress({ loaded: 40, total }) })
       return sendPoolTx$({
         router: O.none, // no router for RUNE
         asset: AssetRuneNative,
