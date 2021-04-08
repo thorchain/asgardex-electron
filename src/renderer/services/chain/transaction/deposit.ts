@@ -180,8 +180,32 @@ export const symDeposit$ = ({
         node: validateNode$()
       })
     ),
-    // 2. send RUNE deposit txs
+    // 2. send asset deposit txs
     liveData.chain<ApiError, SymDepositValidationResult, TxHash>((_) => {
+      setState({ ...getState(), step: 3, deposit: RD.progress({ loaded: 60, total }) })
+      return sendPoolTx$({
+        router: poolAddresses.router,
+        asset,
+        recipient: poolAddresses.address,
+        amount: amounts.asset,
+        memo: memos.asset,
+        feeOptionKey: FeeOptionKeys.DEPOSIT
+      })
+    }),
+    // Add failures of asset deposit tx to state
+    liveData.mapLeft<ApiError, ApiError, TxHash>((apiError) => {
+      const current = getState()
+      setState({ ...current, depositTxs: { ...current.depositTxs, asset: RD.failure(apiError) } })
+      return apiError
+    }),
+    // Add success of asset deposit tx to state
+    liveData.map<TxHash, TxHash>((txHash) => {
+      const current = getState()
+      setState({ ...current, depositTxs: { ...current.depositTxs, asset: RD.success(txHash) } })
+      return txHash
+    }),
+    // 3. send RUNE deposit txs
+    liveData.chain<ApiError, TxHash, TxHash>((_) => {
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 40, total }) })
       return sendPoolTx$({
         router: O.none, // no router for RUNE
@@ -202,30 +226,6 @@ export const symDeposit$ = ({
     liveData.map<TxHash, TxHash>((txHash) => {
       const current = getState()
       setState({ ...current, depositTxs: { ...current.depositTxs, rune: RD.success(txHash) } })
-      return txHash
-    }),
-    liveData.chain<ApiError, TxHash, TxHash>((_) => {
-      setState({ ...getState(), step: 3, deposit: RD.progress({ loaded: 60, total }) })
-      // 3. send asset deposit txs
-      return sendPoolTx$({
-        router: poolAddresses.router,
-        asset,
-        recipient: poolAddresses.address,
-        amount: amounts.asset,
-        memo: memos.asset,
-        feeOptionKey: FeeOptionKeys.DEPOSIT
-      })
-    }),
-    // Add failures of asset deposit tx to state
-    liveData.mapLeft<ApiError, ApiError, TxHash>((apiError) => {
-      const current = getState()
-      setState({ ...current, depositTxs: { ...current.depositTxs, asset: RD.failure(apiError) } })
-      return apiError
-    }),
-    // Add success of asset deposit tx to state
-    liveData.map<TxHash, TxHash>((txHash) => {
-      const current = getState()
-      setState({ ...current, depositTxs: { ...current.depositTxs, asset: RD.success(txHash) } })
       return txHash
     }),
     // check finality of both deposit txs
