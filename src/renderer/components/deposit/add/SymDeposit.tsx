@@ -592,8 +592,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const txModalExtraContent = useMemo(() => {
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
-      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetTicker: AssetRuneNative.ticker }),
       intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetTicker: asset.ticker }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetTicker: AssetRuneNative.ticker }),
       intl.formatMessage({ id: 'common.tx.checkResult' })
     ]
     const stepDescription = FP.pipe(
@@ -612,8 +612,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     return (
       <DepositAssets
-        target={{ asset, amount: assetAmountToDepositMax1e8 }}
-        source={O.some({ asset: AssetRuneNative, amount: runeAmountToDeposit })}
+        target={{ asset: AssetRuneNative, amount: runeAmountToDeposit }}
+        source={O.some({ asset, amount: assetAmountToDepositMax1e8 })}
         stepDescription={stepDescription}
         network={network}
       />
@@ -666,18 +666,18 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     const extraResult = (
       <Styled.ExtraContainer>
-        {FP.pipe(symDepositTxs.rune, RD.toOption, (oTxHash) => (
-          <Styled.ViewTxButtonTop
-            txHash={oTxHash}
-            onClick={viewRuneTx}
-            label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
-          />
-        ))}
         {FP.pipe(symDepositTxs.asset, RD.toOption, (oTxHash) => (
-          <ViewTxButton
+          <Styled.ViewTxButtonTop
             txHash={oTxHash}
             onClick={viewAssetTx}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: asset.ticker })}
+          />
+        ))}
+        {FP.pipe(symDepositTxs.rune, RD.toOption, (oTxHash) => (
+          <ViewTxButton
+            txHash={oTxHash}
+            onClick={viewRuneTx}
+            label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
           />
         ))}
       </Styled.ExtraContainer>
