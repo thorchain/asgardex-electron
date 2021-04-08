@@ -13,8 +13,7 @@ import * as Rx from 'rxjs'
 import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
-import { BackLink } from '../../components/uielements/backLink'
-import { Button } from '../../components/uielements/button'
+import { Button, RefreshButton } from '../../components/uielements/button'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
@@ -177,6 +176,12 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     reloadBalances()
   }, [reloadBalances])
 
+  const reloadHandler = useCallback(() => {
+    reloadBalances()
+    reloadPools()
+    reloadPoolAddresses()
+  }, [reloadBalances, reloadPoolAddresses, reloadPools])
+
   const onChangePath = useCallback(
     (path) => {
       history.replace(path)
@@ -185,7 +190,10 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   )
   return (
     <>
-      <BackLink />
+      <Styled.TopControlsContainer>
+        <Styled.BackLink />
+        <RefreshButton clickHandler={reloadHandler} />
+      </Styled.TopControlsContainer>
       <Styled.ContentContainer>
         {FP.pipe(
           sequenceTRD(poolsState, sourceAssetRD, targetAssetRD),
