@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString } from '@xchainjs/xchain-util'
+import { assetFromString, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -49,7 +49,7 @@ export const DepositView: React.FC<Props> = () => {
     }
   } = useMidgardContext()
 
-  const { keystoreService, reloadBalances } = useWalletContext()
+  const { keystoreService, reloadBalancesByChain } = useWalletContext()
 
   const { addressByChain$, assetWithDecimal$ } = useChainContext()
 
@@ -117,11 +117,22 @@ export const DepositView: React.FC<Props> = () => {
     [poolSharesRD, oSelectedAsset]
   )
 
+  const reloadChainAndRuneBalances = useCallback(() => {
+    FP.pipe(
+      oSelectedAsset,
+      O.map(({ asset: { chain } }) => {
+        reloadBalancesByChain(chain)()
+        reloadBalancesByChain(THORChain)()
+        return true
+      })
+    )
+  }, [oSelectedAsset, reloadBalancesByChain])
+
   const reloadHandler = useCallback(() => {
-    reloadBalances()
+    reloadChainAndRuneBalances()
     reloadShares()
     reloadSelectedPoolDetail()
-  }, [reloadBalances, reloadSelectedPoolDetail, reloadShares])
+  }, [reloadChainAndRuneBalances, reloadSelectedPoolDetail, reloadShares])
 
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`
