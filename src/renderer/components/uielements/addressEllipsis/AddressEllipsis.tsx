@@ -94,7 +94,6 @@ const ellipse = ({
 }): boolean => {
   const containerWidth = parentNode.offsetWidth
   const txtWidth = txtNode.offsetWidth
-  console.log(123, containerWidth, txtWidth)
 
   if (txtWidth > containerWidth) {
     const str = txtNode.textContent
