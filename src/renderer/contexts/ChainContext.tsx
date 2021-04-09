@@ -75,7 +75,7 @@ const initialContext: ChainContextValue = {
   retrieveLedgerAddress,
   removeLedgerAddress,
   removeAllLedgerAddress,
-  reloadSwapFees: reloadSwapFees,
+  reloadSwapFees,
   swapFees$,
   getExplorerUrlByAsset$,
   getExplorerAddressByChain$,

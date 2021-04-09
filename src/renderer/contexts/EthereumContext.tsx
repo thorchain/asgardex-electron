@@ -16,7 +16,9 @@ import {
   reloadFees,
   sendPoolTx$,
   approveERC20Token$,
-  isApprovedERC20Token$
+  isApprovedERC20Token$,
+  approveFee$,
+  reloadApproveFee
 } from '../services/ethereum'
 
 export type EthereumContextValue = {
@@ -36,6 +38,8 @@ export type EthereumContextValue = {
   sendPoolTx$: typeof sendPoolTx$
   approveERC20Token$: typeof approveERC20Token$
   isApprovedERC20Token$: typeof isApprovedERC20Token$
+  approveFee$: typeof approveFee$
+  reloadApproveFee: typeof reloadApproveFee
 }
 
 const initialContext: EthereumContextValue = {
@@ -54,7 +58,9 @@ const initialContext: EthereumContextValue = {
   reloadFees,
   sendPoolTx$,
   approveERC20Token$,
-  isApprovedERC20Token$
+  isApprovedERC20Token$,
+  approveFee$,
+  reloadApproveFee
 }
 
 const EthereumContext = createContext<EthereumContextValue | null>(null)

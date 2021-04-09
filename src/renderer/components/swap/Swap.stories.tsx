@@ -78,8 +78,10 @@ const defaultProps: SwapProps = {
   // Password: "123"
   validatePassword$: mockValidatePassword$,
   reloadFees: () => console.log('reloadFees'),
+  reloadApproveFee: () => console.log('reloadFees'),
   reloadBalances: () => console.log('reloadBalances'),
   fees$: () => Rx.of(RD.success({ inTx: baseAmount(10000000), outTx: baseAmount(1000000) })),
+  approveFee$: () => Rx.of(RD.success(baseAmount(10000000))),
   targetWalletAddress: O.some('wallet-address'),
   onChangePath: (path) => console.log('change path', path),
   network: 'testnet',

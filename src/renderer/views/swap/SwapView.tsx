@@ -58,7 +58,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     keystoreService: { keystore$, validatePassword$ }
   } = useWalletContext()
 
-  const { approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
+  const { reloadApproveFee, approveFee$, approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
 
   const keystore = useObservableState(keystore$, O.none)
 
@@ -221,6 +221,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   walletBalances={balances}
                   reloadFees={reloadSwapFees}
                   fees$={swapFees$}
+                  reloadApproveFee={reloadApproveFee}
+                  approveFee$={approveFee$}
                   targetWalletAddress={targetWalletAddress}
                   swap$={swap$}
                   reloadBalances={reloadBalances}

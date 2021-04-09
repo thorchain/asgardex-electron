@@ -9,8 +9,10 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { isEthAsset } from '../../helpers/assetHelper'
+import { observableState } from '../../helpers/stateHelper'
+import { FeeLD } from '../chain/types'
 import * as C from '../clients'
-import { FeesService, Client$, PollInTxFeeParams } from './types'
+import { FeesService, Client$, PollInTxFeeParams, ApproveParams, ApproveFeeHandler } from './types'
 
 export const ETH_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('35609')
 export const ERC20_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('49610')
@@ -80,9 +82,50 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
       )
     )
 
+  /**
+   * Fees for approve Tx
+   **/
+  const approveTxFee$ = ({ spender, sender, amount }: ApproveParams): FeeLD =>
+    client$.pipe(
+      RxOp.switchMap((oClient) =>
+        FP.pipe(
+          oClient,
+          O.fold(
+            () => Rx.of(RD.initial),
+            (client) =>
+              Rx.combineLatest([client.estimateApprove({ spender, sender, amount }), client.estimateGasPrices()]).pipe(
+                RxOp.map(([gasLimit, gasPrices]) => getFee({ gasPrice: gasPrices.fast, gasLimit })),
+                RxOp.map(RD.success),
+                RxOp.catchError((_) => Rx.of(RD.success(getDefaultFees().fast))),
+                RxOp.startWith(RD.pending)
+              )
+          )
+        )
+      )
+    )
+
+  // state for reloading approve fees
+  const { get$: reloadApproveFee$, set: reloadApproveFee } = observableState<ApproveParams | undefined>(undefined)
+
+  const approveFee$: ApproveFeeHandler = (params) => {
+    return reloadApproveFee$.pipe(
+      RxOp.debounceTime(300),
+      RxOp.switchMap((approveParams) => {
+        return FP.pipe(
+          Rx.from(
+            // asset
+            approveTxFee$(approveParams || params)
+          )
+        )
+      })
+    )
+  }
+
   return {
     ...common,
     poolInTxFees$,
-    poolOutTxFee$
+    poolOutTxFee$,
+    approveFee$,
+    reloadApproveFee
   }
 }

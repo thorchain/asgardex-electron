@@ -52,9 +52,10 @@ import {
   LoadSwapFeesHandler,
   SwapFeesRD,
   SwapFeesParams,
-  SwapFees
+  SwapFees,
+  FeeRD
 } from '../../services/chain/types'
-import { ApproveParams, IsApprovedRD } from '../../services/ethereum/types'
+import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'
@@ -95,6 +96,8 @@ export type SwapProps = {
   reloadFees: LoadSwapFeesHandler
   reloadBalances: FP.Lazy<void>
   fees$: SwapFeesHandler
+  reloadApproveFee: LoadApproveFeeHandler
+  approveFee$: ApproveFeeHandler
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
   network: Network
@@ -120,7 +123,9 @@ export const Swap = ({
   onChangePath,
   network,
   isApprovedERC20Token$,
-  approveERC20Token$
+  approveERC20Token$,
+  reloadApproveFee,
+  approveFee$
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -242,6 +247,22 @@ export const Swap = ({
     [oSwapParams, targetAssetProp]
   )
 
+  const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(
+        getEthTokenAddress(sourceAssetProp),
+        FP.pipe(
+          oPoolAddress,
+          O.chain(({ router }) => router)
+        )
+      ),
+      O.map(([tokenAddress, routerAddress]) => ({
+        spender: routerAddress,
+        sender: tokenAddress
+      }))
+    )
+  }, [oPoolAddress, sourceAssetProp])
+
   // Flag for pending assets state
   // needed to avoid race condition of fee errors and balances
   // while switching assets and reloading fees
@@ -257,10 +278,18 @@ export const Swap = ({
   )
 
   const chainFees$ = useMemo(() => fees$, [fees$])
+  const approveFees$ = useMemo(() => approveFee$, [approveFee$])
 
   const [chainFeesRD, swapFeesParamsUpdated] = useObservableState<SwapFeesRD, O.Option<SwapFeesParams>>(
     (oSwapFeesParams$) => {
       return oSwapFeesParams$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), chainFees$))))
+    },
+    RD.initial
+  )
+
+  const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
+    (oApproveFeeParam$) => {
+      return oApproveFeeParam$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), approveFees$))))
     },
     RD.initial
   )
@@ -276,6 +305,10 @@ export const Swap = ({
   useEffect(() => {
     swapFeesParamsUpdated(oSwapFeesParams)
   }, [swapFeesParamsUpdated, oSwapFeesParams])
+
+  useEffect(() => {
+    approveFeesParamsUpdated(oApproveParams)
+  }, [approveFeesParamsUpdated, oApproveParams])
 
   // reset `pendingSwitchAssets`
   // whenever chain fees will be succeeded or failed
@@ -295,6 +328,10 @@ export const Swap = ({
   const reloadFeesHandler = useCallback(() => {
     FP.pipe(oSwapFeesParams, O.map(reloadFees))
   }, [oSwapFeesParams, reloadFees])
+
+  const reloadApproveFeesHandler = useCallback(() => {
+    FP.pipe(oApproveParams, O.map(reloadApproveFee))
+  }, [oApproveParams, reloadApproveFee])
 
   // Swap start time
   const [swapStartTime, setSwapStartTime] = useState<number>(0)
@@ -706,6 +743,15 @@ export const Swap = ({
     [chainFeesRD, targetChainFeeAmountInTargetAsset, sourceAssetProp.chain, targetAssetProp]
   )
 
+  const approveFees: UIFeesRD = useMemo(
+    () =>
+      FP.pipe(
+        approveFeesRD,
+        RD.map((approveFee) => [{ asset: getChainAsset(sourceAssetProp.chain), amount: approveFee }])
+      ),
+    [approveFeesRD, sourceAssetProp.chain]
+  )
+
   const isSwapDisabled: boolean = useMemo(
     () => unlockedWallet || amountToSwapMax1e8.amount().isZero() || FP.pipe(walletBalances, O.isNone),
     [unlockedWallet, amountToSwapMax1e8, walletBalances]
@@ -988,6 +1034,7 @@ export const Swap = ({
           <Styled.ApproveButton onClick={onApprove} loading={RD.isPending(approveState)}>
             {intl.formatMessage({ id: 'swap.approve' })}
           </Styled.ApproveButton>
+          {!RD.isInitial(approveFees) && <Fees fees={approveFees} reloadFees={reloadApproveFeesHandler} />}
           {renderApproveError}
         </Styled.SubmitContainer>
       )}
