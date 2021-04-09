@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Story, Meta } from '@storybook/react'
-import { assetAmount, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 
 import { AssetInput } from './AssetInput'
 
@@ -14,14 +14,21 @@ export const StoryDefault: Story = () => (
     title="swap amount"
     status="slip 2%"
     amount={baseAmount(1234500000)}
-    label="$usd 217.29"
+    maxAmount={baseAmount(1234600000)}
+    asset={AssetBNB}
     onChange={onChange}
   />
 )
 StoryDefault.storyName = 'default'
 
 export const StoryDecimal2: Story = () => (
-  <AssetInput title="amount" amount={assetToBase(assetAmount(123, 2))} label="$usd 217.29" onChange={onChange} />
+  <AssetInput
+    title="amount"
+    amount={assetToBase(assetAmount(123, 2))}
+    maxAmount={assetToBase(assetAmount(124, 2))}
+    asset={AssetBNB}
+    onChange={onChange}
+  />
 )
 StoryDecimal2.storyName = 'decimal 2'
 
