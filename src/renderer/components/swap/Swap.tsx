@@ -454,11 +454,6 @@ export const Swap = ({
     )
   }, [assetsToSwap, allBalances])
 
-  // const balanceLabel = useMemo(
-  //   () => `${intl.formatMessage({ id: 'swap.balance' })}: ${formatBN(baseToAsset(sourceAssetAmountMax1e8).amount())}`,
-  //   [intl, sourceAssetAmountMax1e8]
-  // )
-
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
   const onSwapConfirmed = useCallback(() => {
