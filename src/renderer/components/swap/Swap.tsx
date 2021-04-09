@@ -53,11 +53,9 @@ import {
   SwapFeesRD,
   SwapFeesParams,
   SwapFees,
-  ApproveFeeHandler,
-  LoadApproveFeeHandler,
   FeeRD
 } from '../../services/chain/types'
-import { ApproveParams, IsApprovedRD } from '../../services/ethereum/types'
+import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
 import { PoolDetails } from '../../services/midgard/types'
 import { getPoolDetailsHashMap } from '../../services/midgard/utils'

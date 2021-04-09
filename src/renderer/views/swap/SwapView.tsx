@@ -45,8 +45,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     setSelectedPoolAsset
   } = midgardService
   const {
-    reloadApproveFee,
-    approveFee$,
     reloadSwapFees,
     swapFees$,
     getExplorerUrlByAsset$,
@@ -61,7 +59,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     keystoreService: { keystore$, validatePassword$ }
   } = useWalletContext()
 
-  const { approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
+  const { reloadApproveFee, approveFee$, approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
 
   const keystore = useObservableState(keystore$, O.none)
 

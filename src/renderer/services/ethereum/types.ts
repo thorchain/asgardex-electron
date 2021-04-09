@@ -17,6 +17,10 @@ export type ClientState$ = C.ClientState$<Client>
 export type FeesWithGasPricesAndLimitsRD = RD.RemoteData<Error, FeesWithGasPricesAndLimits>
 export type FeesWithGasPricesAndLimitsLD = LiveData<Error, FeesWithGasPricesAndLimits>
 
+export type ApproveFeeHandler = (p: ApproveParams) => FeeLD
+
+export type LoadApproveFeeHandler = (p: ApproveParams) => void
+
 export type SendTxParams = {
   asset?: Asset
   recipient: Address
@@ -53,5 +57,6 @@ export type TransactionService = {
 export type FeesService = {
   poolInTxFees$: (params: PollInTxFeeParams) => C.FeesLD
   poolOutTxFee$: (asset: Asset) => C.FeesLD
-  approveTxFee$: (params: ApproveParams) => FeeLD
+  approveFee$: ApproveFeeHandler
+  reloadApproveFee: LoadApproveFeeHandler
 } & C.FeesService<FeesParams>

@@ -25,7 +25,7 @@ const {
   approveERC20Token$,
   isApprovedERC20Token$
 } = createTransactionService(client$)
-const { reloadFees, fees$, poolInTxFees$, poolOutTxFee$, approveTxFee$ } = createFeesService({
+const { reloadFees, fees$, poolInTxFees$, poolOutTxFee$, approveFee$, reloadApproveFee } = createFeesService({
   client$,
   chain: ETHChain
 })
@@ -54,7 +54,8 @@ export {
   sendPoolTx$,
   poolInTxFees$,
   poolOutTxFee$,
-  approveTxFee$,
+  approveFee$,
+  reloadApproveFee,
   approveERC20Token$,
   isApprovedERC20Token$
 }
