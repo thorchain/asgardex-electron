@@ -52,19 +52,18 @@ export const Header: React.FC = (): JSX.Element => {
 
   const history = useHistory()
 
-  // Pool sub routes needed to re-direct in case of network switch
+  // Pool sub-routes needed to re-direct in case of network switch
   const isPoolSubRoute = useRouteMatch([
     poolsRoutes.deposit.template,
     poolsRoutes.detail.template,
     poolsRoutes.swap.template
   ])
 
-  // Check wallet sub routes  needed to re-direct in case of network switch
+  // Wallet sub-routes  needed to re-direct in case of network switch
   const isWalletSubRoute = useRouteMatch([
     walletRoutes.send.template,
     walletRoutes.upgradeBnbRune.template,
     walletRoutes.assetDetail.template,
-    walletRoutes.bonds.template,
     walletRoutes.bonds.template,
     walletRoutes.deposit.template
   ])
@@ -77,26 +76,30 @@ export const Header: React.FC = (): JSX.Element => {
    * You might have following questions:
    *
    * (1) Why not handling this at service layer?
+   * --------------------------------------------
    * We can't handle this at service layer, because it's recommended by React Router to handle route states on view layer only.
    * Quote: "Our recommendation is not to keep your routes in your Redux store at all."
    * ^ @see https://reactrouter.com/web/guides/deep-redux-integration
    *
    * (2) Why don't  we handle re-directing in views, where we defined our routes (such as `PoolsView` or `WalletView`)?
+   * ------------------------------------------------------------------------------------------------------------------
    * Since we have to subscribe to `network$` to get changes by using `useSubscription` or something,
    * we get state of network after first rendering, but not before. With this, components are still trying to render data,
    * which might be deprecated based on network changes.
    *
    */
-
   const changeNetworkHandler = useCallback(
     (network: Network) => {
       changeNetwork(network)
-      // handle re-directs for pools
-      if (isPoolSubRoute) history.replace(poolsRoutes.base.path())
-      // handle re-directs for wallet
-      else if (isWalletSubRoute) history.replace(walletRoutes.base.path())
-      else {
-        /* do nothing */
+      // check pool sub-routes to re-direct
+      if (isPoolSubRoute) {
+        history.replace(poolsRoutes.base.path())
+      }
+      // check wallet sub-routes to re-direct
+      else if (isWalletSubRoute) {
+        history.replace(walletRoutes.base.path())
+      } else {
+        /* nothing to do */
       }
     },
     [changeNetwork, history, isPoolSubRoute, isWalletSubRoute]
