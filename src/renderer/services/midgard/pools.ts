@@ -191,8 +191,7 @@ const createPoolsService = (
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
-      }),
-      RxOp.shareReplay(1)
+      })
     )
 
   /**
@@ -557,8 +556,7 @@ const createPoolsService = (
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
-      ),
-      RxOp.shareReplay(1)
+      )
     )
 
   const poolStatsDetail$: PoolStatsDetailLD = Rx.combineLatest([selectedPoolAsset$, reloadSelectedPoolDetail$]).pipe(
@@ -590,8 +588,7 @@ const createPoolsService = (
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
-      ),
-      RxOp.shareReplay(1)
+      )
     )
 
   const poolLegacyDetail$: PoolLegacyDetailLD = Rx.combineLatest([selectedPoolAsset$, reloadSelectedPoolDetail$]).pipe(
@@ -608,8 +605,7 @@ const createPoolsService = (
         )
       )
     }),
-    RxOp.startWith(RD.pending),
-    RxOp.shareReplay(1)
+    RxOp.startWith(RD.pending)
   )
 
   // Factory to get earning history
@@ -623,8 +619,7 @@ const createPoolsService = (
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
-      ),
-      RxOp.shareReplay(1)
+      )
     )
 
   const poolEarningHistory$: PoolEarningHistoryLD = Rx.combineLatest([
@@ -637,7 +632,6 @@ const createPoolsService = (
         RxOp.switchMap(() => Rx.of(oSelectedPoolAsset))
       )
     ),
-    RxOp.filter(O.isSome),
     RxOp.switchMap((selectedPoolAsset) => {
       return FP.pipe(
         selectedPoolAsset,
@@ -669,13 +663,11 @@ const createPoolsService = (
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
-      ),
-      RxOp.shareReplay(1)
+      )
     )
 
   const poolLiquidityHistory$ = (params: PoolLiquidityHistoryParams): PoolLiquidityHistoryLD =>
     selectedPoolAsset$.pipe(
-      RxOp.filter(O.isSome),
       RxOp.switchMap((selectedPoolAsset) =>
         FP.pipe(
           selectedPoolAsset,
@@ -689,8 +681,7 @@ const createPoolsService = (
           )
         )
       ),
-      RxOp.startWith(RD.pending),
-      RxOp.shareReplay(1)
+      RxOp.startWith(RD.pending)
     )
 
   // Factory to get swap history from Midgard
@@ -705,8 +696,7 @@ const createPoolsService = (
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
-      ),
-      RxOp.shareReplay(1)
+      )
     )
   }
 
@@ -745,8 +735,7 @@ const createPoolsService = (
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
-      ),
-      RxOp.shareReplay(1)
+      )
     )
   }
 

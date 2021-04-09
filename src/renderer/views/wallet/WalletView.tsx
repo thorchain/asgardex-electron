@@ -2,12 +2,11 @@ import React, { useCallback, useMemo } from 'react'
 
 import { Row } from 'antd'
 import * as H from 'history'
-import { useObservableState, useSubscription } from 'observable-hooks'
-import { Switch, Route, Redirect, useHistory, useRouteMatch } from 'react-router-dom'
+import { useObservableState } from 'observable-hooks'
+import { Switch, Route, Redirect } from 'react-router-dom'
 
 import { RefreshButton } from '../../components/uielements/button/'
 import { AssetsNav } from '../../components/wallet/assets'
-import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -54,32 +53,6 @@ export const WalletView: React.FC = (): JSX.Element => {
     ),
     []
   )
-
-  const { network$ } = useAppContext()
-  const history = useHistory()
-
-  const isSendRoute = useRouteMatch(walletRoutes.send.template)
-  const isUpgradeBnbRuneRoute = useRouteMatch(walletRoutes.upgradeBnbRune.template)
-  const isAssetDetailRoute = useRouteMatch(walletRoutes.assetDetail.template)
-
-  const isPoolDependantRoute = useMemo(() => isSendRoute || isUpgradeBnbRuneRoute || isAssetDetailRoute, [
-    isSendRoute,
-    isUpgradeBnbRuneRoute,
-    isAssetDetailRoute
-  ])
-
-  /**
-   * After network was switched there might be
-   * a situation when there is no such pool
-   * as previously selected for previous network.
-   * For this reason for every poolDependent route and
-   * network change we redirect to the top-level route
-   */
-  useSubscription(network$, () => {
-    if (isPoolDependantRoute) {
-      history.replace(walletRoutes.base.path())
-    }
-  })
 
   // Following routes are accessable only,
   // if an user has a phrase imported and wallet has not been locked

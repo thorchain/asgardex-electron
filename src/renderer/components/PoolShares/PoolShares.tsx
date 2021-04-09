@@ -10,6 +10,7 @@ import {
 } from '@xchainjs/xchain-util'
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
+import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
@@ -25,7 +26,7 @@ export type Props = {
   loading: boolean
   priceAsset: Asset | undefined
   network: Network
-  goToStakeInfo: () => void
+  goToStakeInfo: FP.Lazy<void>
 }
 
 export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, loading, network }) => {

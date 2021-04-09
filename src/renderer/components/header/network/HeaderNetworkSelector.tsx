@@ -24,7 +24,11 @@ type Props = {
   changeNetwork: (network: Network) => void
 }
 
-export const HeaderNetwork: React.FC<Props> = ({ isDesktopView, changeNetwork = FP.constVoid, selectedNetwork }) => {
+export const HeaderNetworkSelector: React.FC<Props> = ({
+  isDesktopView,
+  changeNetwork = FP.constVoid,
+  selectedNetwork
+}) => {
   const intl = useIntl()
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(

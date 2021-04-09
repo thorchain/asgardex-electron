@@ -60,6 +60,7 @@ export const PoolDetailsView: React.FC = () => {
     setSelectedPoolAsset(oRouteAsset)
     // Reset selectedPoolAsset on view's unmount to avoid effects with depending streams
     return () => {
+      console.log('PoolDetailsView: onLeave')
       setSelectedPoolAsset(O.none)
     }
   }, [oRouteAsset, setSelectedPoolAsset])

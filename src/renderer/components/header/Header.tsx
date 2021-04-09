@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import { useHistory, useRouteMatch } from 'react-router'
 
 import { Network } from '../../../shared/api/types'
 import { useAppContext } from '../../contexts/AppContext'
@@ -13,6 +14,8 @@ import { useLitecoinContext } from '../../contexts/LitecoinContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import * as poolsRoutes from '../../routes/pools'
+import * as walletRoutes from '../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { HeaderComponent } from './HeaderComponent'
 
@@ -47,6 +50,58 @@ export const Header: React.FC = (): JSX.Element => {
   const { changeLocale, locale$, initialLocale } = useI18nContext()
   const currentLocale = useObservableState(locale$, initialLocale)
 
+  const history = useHistory()
+
+  // Pool sub routes needed to re-direct in case of network switch
+  const isPoolSubRoute = useRouteMatch([
+    poolsRoutes.deposit.template,
+    poolsRoutes.detail.template,
+    poolsRoutes.swap.template
+  ])
+
+  // Check wallet sub routes  needed to re-direct in case of network switch
+  const isWalletSubRoute = useRouteMatch([
+    walletRoutes.send.template,
+    walletRoutes.upgradeBnbRune.template,
+    walletRoutes.assetDetail.template,
+    walletRoutes.bonds.template,
+    walletRoutes.bonds.template,
+    walletRoutes.deposit.template
+  ])
+
+  /**
+   * By switching network, we have to re-direct to a top level routes in following cases:
+   * (1) Sub-routes of pools are redirected to the top-level route, since we don't have same pools on different networks
+   * (2) Some (not all) sub-routes
+   *
+   * You might have following questions:
+   *
+   * (1) Why not handling this at service layer?
+   * We can't handle this at service layer, because it's recommended by React Router to handle route states on view layer only.
+   * Quote: "Our recommendation is not to keep your routes in your Redux store at all."
+   * ^ @see https://reactrouter.com/web/guides/deep-redux-integration
+   *
+   * (2) Why don't  we handle re-directing in views, where we defined our routes (such as `PoolsView` or `WalletView`)?
+   * Since we have to subscribe to `network$` to get changes by using `useSubscription` or something,
+   * we get state of network after first rendering, but not before. With this, components are still trying to render data,
+   * which might be deprecated based on network changes.
+   *
+   */
+
+  const changeNetworkHandler = useCallback(
+    (network: Network) => {
+      changeNetwork(network)
+      // handle re-directs for pools
+      if (isPoolSubRoute) history.replace(poolsRoutes.base.path())
+      // handle re-directs for wallet
+      else if (isWalletSubRoute) history.replace(walletRoutes.base.path())
+      else {
+        /* do nothing */
+      }
+    },
+    [changeNetwork, history, isPoolSubRoute, isWalletSubRoute]
+  )
+
   useEffect(() => {
     // Required to update the electron native menu according to the selected locale
     window.apiLang.update(currentLocale)
@@ -55,7 +110,7 @@ export const Header: React.FC = (): JSX.Element => {
   return (
     <HeaderComponent
       selectedNetwork={network}
-      changeNetwork={changeNetwork}
+      changeNetwork={changeNetworkHandler}
       keystore={keystore}
       lockHandler={lock}
       poolsState$={poolsState$}

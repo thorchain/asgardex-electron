@@ -1,14 +1,14 @@
 import { Meta, Story } from '@storybook/react'
 import { Network } from '@xchainjs/xchain-client'
 
-import { HeaderNetwork } from './HeaderNetworkSelector'
+import { HeaderNetworkSelector } from './HeaderNetworkSelector'
 
 export const Default: Story<{
   network: Network
   isDesktopView: boolean
   changeNetwork: () => void
 }> = ({ network, isDesktopView, changeNetwork }) => {
-  return <HeaderNetwork selectedNetwork={network} changeNetwork={changeNetwork} isDesktopView={isDesktopView} />
+  return <HeaderNetworkSelector selectedNetwork={network} changeNetwork={changeNetwork} isDesktopView={isDesktopView} />
 }
 
 Default.args = { network: 'mainnet', isDesktopView: false }
