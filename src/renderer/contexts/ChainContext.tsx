@@ -12,8 +12,6 @@ import {
   getWithdrawMemo$,
   withdrawFee$,
   reloadWithdrawFee,
-  approveFee$,
-  reloadApproveFee,
   retrieveLedgerAddress,
   removeLedgerAddress,
   removeAllLedgerAddress,
@@ -49,8 +47,6 @@ type ChainContextValue = {
   removeAllLedgerAddress: typeof removeAllLedgerAddress
   reloadSwapFees: typeof reloadSwapFees
   swapFees$: typeof swapFees$
-  reloadApproveFee: typeof reloadApproveFee
-  approveFee$: typeof approveFee$
   getExplorerUrlByAsset$: typeof getExplorerUrlByAsset$
   getExplorerAddressByChain$: typeof getExplorerAddressByChain$
   assetAddress$: typeof assetAddress$
@@ -81,8 +77,6 @@ const initialContext: ChainContextValue = {
   removeAllLedgerAddress,
   reloadSwapFees,
   swapFees$,
-  approveFee$,
-  reloadApproveFee,
   getExplorerUrlByAsset$,
   getExplorerAddressByChain$,
   assetAddress$,
