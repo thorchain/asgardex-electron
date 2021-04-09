@@ -909,6 +909,7 @@ export const Swap = ({
               maxAmount={sourceAssetAmountMax1e8}
               hasError={sourceChainError}
               asset={sourceAssetProp}
+              disabled={unlockedWallet}
             />
             {FP.pipe(
               sourceAsset,

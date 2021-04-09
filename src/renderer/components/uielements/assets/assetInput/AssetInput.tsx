@@ -19,6 +19,7 @@ type Props = {
   inputProps?: AssetInputProps
   onChange: (value: BaseAmount) => void
   onBlur?: FP.Lazy<void>
+  disabled?: boolean
   className?: string
 }
 
@@ -37,6 +38,7 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
     maxAmount,
     asset,
     status,
+    disabled,
     inputProps = {},
     className = '',
     onChange,
@@ -62,7 +64,11 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
       <div className="asset-input-header">
         <p className="asset-input-title">{title}</p>
         {status && <p className="asset-input-header-label">{status}</p>}
-        <MaxBalanceButton balance={{ amount: maxAmount, asset }} onClick={() => onChangeHandler(maxAmount.amount())} />
+        <MaxBalanceButton
+          balance={{ amount: maxAmount, asset }}
+          onClick={() => onChangeHandler(maxAmount.amount())}
+          disabled={disabled}
+        />
       </div>
       <div className="asset-input-content" ref={inputRef}>
         <InputBigNumber
