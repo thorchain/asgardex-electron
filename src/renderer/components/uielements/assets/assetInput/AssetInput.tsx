@@ -1,10 +1,11 @@
 import React, { useRef, useCallback } from 'react'
 
-import { assetAmount, assetToBase, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
+import { Asset, assetAmount, assetToBase, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 
 import { FixmeType } from '../../../../types/asgardex'
+import { MaxBalanceButton } from '../../button/MaxBalanceButton'
 import { InputBigNumber } from '../../input'
 import { AssetInputWrapper } from './AssetInput.style'
 import { AssetInputProps } from './AssetInput.types'
@@ -13,7 +14,8 @@ type Props = {
   title: string
   status?: string
   amount: BaseAmount
-  label: string
+  maxAmount: BaseAmount
+  asset: Asset
   inputProps?: AssetInputProps
   onChange: (value: BaseAmount) => void
   onBlur?: FP.Lazy<void>
@@ -32,8 +34,9 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
   const {
     title,
     amount,
+    maxAmount,
+    asset,
     status,
-    label,
     inputProps = {},
     className = '',
     onChange,
@@ -59,7 +62,7 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
       <div className="asset-input-header">
         <p className="asset-input-title">{title}</p>
         {status && <p className="asset-input-header-label">{status}</p>}
-        <p className="asset-amount-label">{label}</p>
+        <MaxBalanceButton balance={{ amount: maxAmount, asset }} onClick={() => onChangeHandler(maxAmount.amount())} />
       </div>
       <div className="asset-input-content" ref={inputRef}>
         <InputBigNumber

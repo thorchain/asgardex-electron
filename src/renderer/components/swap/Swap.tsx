@@ -454,10 +454,10 @@ export const Swap = ({
     )
   }, [assetsToSwap, allBalances])
 
-  const balanceLabel = useMemo(
-    () => `${intl.formatMessage({ id: 'swap.balance' })}: ${formatBN(baseToAsset(sourceAssetAmountMax1e8).amount())}`,
-    [intl, sourceAssetAmountMax1e8]
-  )
+  // const balanceLabel = useMemo(
+  //   () => `${intl.formatMessage({ id: 'swap.balance' })}: ${formatBN(baseToAsset(sourceAssetAmountMax1e8).amount())}`,
+  //   [intl, sourceAssetAmountMax1e8]
+  // )
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
@@ -908,11 +908,12 @@ export const Swap = ({
             {/* Note: Input value is shown as AssetAmount */}
             <Styled.AssetInput
               title={intl.formatMessage({ id: 'swap.input' })}
-              label={balanceLabel}
               onChange={setAmountToSwapMax1e8}
               onBlur={reloadFeesHandler}
               amount={amountToSwapMax1e8}
+              maxAmount={sourceAssetAmountMax1e8}
               hasError={sourceChainError}
+              asset={sourceAssetProp}
             />
             {FP.pipe(
               sourceAsset,
