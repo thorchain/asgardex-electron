@@ -60,7 +60,7 @@ export const Header: React.FC = (): JSX.Element => {
     O.map((_) => poolsRoutes.base.path())
   )
 
-  // Check pool sub-routes and return url to re-direct in case of matching
+  // Check wallet sub-routes and return url to re-direct in case of matching
   const oWalletRedirectPath: O.Option<string> = FP.pipe(
     useRouteMatch([
       walletRoutes.send.template,
@@ -98,7 +98,7 @@ export const Header: React.FC = (): JSX.Element => {
       changeNetwork(network)
 
       const M = O.getFirstMonoid<string>()
-      // Handle first "some" value within a list of possible url to re-direct
+      // Handle first "some" value within a list of possible urls to re-direct
       FP.pipe(M.concat(oPoolRedirectPath, oWalletRedirectPath), O.map(history.replace))
     },
     [changeNetwork, history.replace, oPoolRedirectPath, oWalletRedirectPath]
