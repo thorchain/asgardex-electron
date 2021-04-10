@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useHistory, useRouteMatch } from 'react-router'
@@ -52,21 +53,25 @@ export const Header: React.FC = (): JSX.Element => {
 
   const history = useHistory()
 
-  // Pool sub-routes needed to re-direct in case of network switch
-  const isPoolSubRoute = useRouteMatch([
-    poolsRoutes.deposit.template,
-    poolsRoutes.detail.template,
-    poolsRoutes.swap.template
-  ])
+  // Check pool sub-routes and return url to re-direct in case of matching
+  const oPoolRedirectPath: O.Option<string> = FP.pipe(
+    useRouteMatch([poolsRoutes.deposit.template, poolsRoutes.detail.template, poolsRoutes.swap.template]),
+    O.fromNullable,
+    O.map((_) => poolsRoutes.base.path())
+  )
 
-  // Wallet sub-routes  needed to re-direct in case of network switch
-  const isWalletSubRoute = useRouteMatch([
-    walletRoutes.send.template,
-    walletRoutes.upgradeBnbRune.template,
-    walletRoutes.assetDetail.template,
-    walletRoutes.bonds.template,
-    walletRoutes.deposit.template
-  ])
+  // Check pool sub-routes and return url to re-direct in case of matching
+  const oWalletRedirectPath: O.Option<string> = FP.pipe(
+    useRouteMatch([
+      walletRoutes.send.template,
+      walletRoutes.upgradeBnbRune.template,
+      walletRoutes.assetDetail.template,
+      walletRoutes.bonds.template,
+      walletRoutes.deposit.template
+    ]),
+    O.fromNullable,
+    O.map((_) => walletRoutes.base.path())
+  )
 
   /**
    * By switching network, we have to re-direct to a top level routes in following cases:
@@ -91,18 +96,12 @@ export const Header: React.FC = (): JSX.Element => {
   const changeNetworkHandler = useCallback(
     (network: Network) => {
       changeNetwork(network)
-      // check pool sub-routes to re-direct
-      if (isPoolSubRoute) {
-        history.replace(poolsRoutes.base.path())
-      }
-      // check wallet sub-routes to re-direct
-      else if (isWalletSubRoute) {
-        history.replace(walletRoutes.base.path())
-      } else {
-        /* nothing to do */
-      }
+
+      const M = O.getFirstMonoid<string>()
+      // Handle first "some" value within a list of possible url to re-direct
+      FP.pipe(M.concat(oPoolRedirectPath, oWalletRedirectPath), O.map(history.replace))
     },
-    [changeNetwork, history, isPoolSubRoute, isWalletSubRoute]
+    [changeNetwork, history.replace, oPoolRedirectPath, oWalletRedirectPath]
   )
 
   useEffect(() => {
