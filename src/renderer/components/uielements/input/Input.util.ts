@@ -2,6 +2,7 @@ import { bn, formatBN, isValidBN, trimZeros } from '@xchainjs/xchain-util'
 
 const VALUE_ZERO_DECIMAL = '0.'
 export const VALUE_ZERO = '0'
+export const EMPTY_INPUT = ''
 
 /**
  * Formats given string of number
@@ -37,6 +38,9 @@ export const formatValue = (value: string, maxDecimal = 2) => {
   // and trim
   return trimZeros(formatted)
 }
+
+// Removes '.' at the end of the line + removes all ',' of string value
+export const unformatValue = (value: string) => value.replace(/((\.+$)|,)/g, '')
 
 export const validInputValue = (value: string) => {
   if (value === '' || value === '.' || value === VALUE_ZERO_DECIMAL) return true
