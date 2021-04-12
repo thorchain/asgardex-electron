@@ -84,7 +84,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     reloadBalancesByChain
   } = useWalletContext()
 
-  const { approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
+  const { approveERC20Token$, isApprovedERC20Token$, approveFee$, reloadApproveFee } = useEthereumContext()
 
   // reload inbound addresses at `onMount` to get always latest `pool address`
   useEffect(() => {
@@ -191,6 +191,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
           chainAssetBalance={O.none}
           fees$={symDepositFees$}
           reloadFees={FP.constVoid}
+          approveFee$={approveFee$}
+          reloadApproveFee={FP.constVoid}
           priceAsset={selectedPricePoolAsset}
           disabled={true}
           poolAddress={O.none}
@@ -214,6 +216,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
       viewAssetTx,
       assetWD,
       symDepositFees$,
+      approveFee$,
       selectedPricePoolAsset,
       reloadBalances,
       reloadShares,
@@ -256,6 +259,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
               memos={depositTxMemo}
               fees$={symDepositFees$}
               reloadFees={reloadSymDepositFees}
+              approveFee$={approveFee$}
+              reloadApproveFee={reloadApproveFee}
               priceAsset={selectedPricePoolAsset}
               reloadBalances={reloadBalances}
               reloadShares={reloadShares}

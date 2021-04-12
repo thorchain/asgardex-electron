@@ -44,9 +44,10 @@ import {
   SymDepositParams,
   SymDepositStateHandler,
   DepositFeesLD,
-  DepositFeesRD
+  DepositFeesRD,
+  FeeRD
 } from '../../../services/chain/types'
-import { ApproveParams, IsApprovedRD } from '../../../services/ethereum/types'
+import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
 import { PoolAddress } from '../../../services/midgard/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
@@ -73,6 +74,8 @@ export type Props = {
   priceAsset?: Asset
   reloadFees: (p: SymDepositParams) => void
   fees$: (p: SymDepositParams) => DepositFeesLD
+  reloadApproveFee: LoadApproveFeeHandler
+  approveFee$: ApproveFeeHandler
   reloadBalances: FP.Lazy<void>
   reloadShares: (delay?: number) => void
   reloadSelectedPoolDetail: (delay?: number) => void
@@ -117,7 +120,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     deposit$,
     network,
     isApprovedERC20Token$,
-    approveERC20Token$
+    approveERC20Token$,
+    reloadApproveFee,
+    approveFee$
   } = props
 
   const intl = useIntl()
@@ -214,6 +219,22 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oPoolAddress, oMemos, assetAmountToDepositMax1e8, asset, runeAmountToDeposit, assetBalance.decimal]
   )
 
+  const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(
+        getEthTokenAddress(asset),
+        FP.pipe(
+          oPoolAddress,
+          O.chain(({ router }) => router)
+        )
+      ),
+      O.map(([tokenAddress, routerAddress]) => ({
+        spender: routerAddress,
+        sender: tokenAddress
+      }))
+    )
+  }, [oPoolAddress, asset])
+
   const prevDepositFeesRD = useRef<DepositFeesRD>(RD.initial)
 
   // Input: `oDepositParams` via depositParamsUpdated
@@ -231,11 +252,24 @@ export const SymDeposit: React.FC<Props> = (props) => {
     RD.initial
   )
 
+  const approveFees$ = useMemo(() => approveFee$, [approveFee$])
+
+  const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
+    (oApproveFeeParam$) => {
+      return oApproveFeeParam$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), approveFees$))))
+    },
+    RD.initial
+  )
+
   // whenever `oDepositParams` has been updated, `depositParamsUpdated` needs to be called to update `depositFeesRD`
   useEffect(() => {
     // Trigger changes only for users while NOT typing into input fields (to avoid too many requests)
     if (selectedInput === 'none') depositParamsUpdated(oDepositParams)
   }, [depositParamsUpdated, oDepositParams, selectedInput])
+
+  useEffect(() => {
+    approveFeesParamsUpdated(oApproveParams)
+  }, [approveFeesParamsUpdated, oApproveParams])
 
   const reloadFeesHandler = useCallback(() => {
     FP.pipe(
@@ -246,6 +280,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
       })
     )
   }, [oDepositParams, reloadFees])
+
+  const reloadApproveFeesHandler = useCallback(() => {
+    FP.pipe(oApproveParams, O.map(reloadApproveFee))
+  }, [oApproveParams, reloadApproveFee])
 
   const oThorchainFee: O.Option<BaseAmount> = useMemo(
     () =>
@@ -742,6 +780,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         0
     )
   }, [asset, balances, disabled, isBalanceError, isThorchainFeeError])
+
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
@@ -760,6 +799,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
         )
       ),
     [depositFeesRD, asset]
+  )
+
+  const approveFees: UIFeesRD = useMemo(
+    () =>
+      FP.pipe(
+        approveFeesRD,
+        RD.map((approveFee) => [{ asset: getChainAsset(asset.chain), amount: approveFee }])
+      ),
+    [approveFeesRD, asset.chain]
   )
 
   const inputOnBlur = useCallback(() => {
@@ -963,6 +1011,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <Styled.ApproveButton onClick={onApprove} loading={RD.isPending(approveState)}>
             {intl.formatMessage({ id: 'swap.approve' })}
           </Styled.ApproveButton>
+          {!RD.isInitial(approveFees) && <Fees fees={approveFees} reloadFees={reloadApproveFeesHandler} />}
           {renderApproveError}
         </Styled.SubmitContainer>
       )}

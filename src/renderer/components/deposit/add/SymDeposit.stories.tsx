@@ -57,6 +57,8 @@ const defaultProps: SymDepositProps = {
         asset: baseAmount(12300)
       })
     ),
+  reloadApproveFee: () => console.log('reloadFees'),
+  approveFee$: () => Rx.of(RD.success(baseAmount(10000000))),
   poolData: {
     assetBalance: baseAmount('1000'),
     runeBalance: baseAmount('2000')
