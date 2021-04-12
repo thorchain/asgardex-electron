@@ -196,7 +196,7 @@ describe('helpers/assetHelper', () => {
     it('updates invalid ERC20 USDT ', () => {
       const asset = updateEthChecksumAddress({
         ...AssetUSDTERC20,
-        symbol: 'USDT-0X62e273709da575835c7f6aef4a31140ca5b1d190'
+        symbol: 'USDT-0xA3910454BF2CB59B8B3A401589A3BACC5CA42306'
       })
       expect(eqAsset.equals(asset, AssetUSDTERC20)).toBeTruthy()
     })
