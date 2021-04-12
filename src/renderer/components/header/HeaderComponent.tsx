@@ -29,7 +29,7 @@ import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './Head
 import { HeaderLang } from './lang'
 import { HeaderLock } from './lock/'
 import { HeaderNetStatus } from './netstatus'
-import { HeaderNetwork } from './network'
+import { HeaderNetworkSelector } from './network'
 import { HeaderPriceSelector } from './price'
 import { HeaderSettings } from './settings'
 import { HeaderTheme } from './theme'
@@ -246,7 +246,11 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const renderHeaderNetwork = useMemo(
     () => (
-      <HeaderNetwork isDesktopView={isDesktopView} selectedNetwork={selectedNetwork} changeNetwork={changeNetwork} />
+      <HeaderNetworkSelector
+        isDesktopView={isDesktopView}
+        selectedNetwork={selectedNetwork}
+        changeNetwork={changeNetwork}
+      />
     ),
     [selectedNetwork, changeNetwork, isDesktopView]
   )

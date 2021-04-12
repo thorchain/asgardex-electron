@@ -5,8 +5,10 @@ import * as O from 'fp-ts/lib/Option'
 import { isRuneBnbAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { Route } from '../types'
-import * as createRoutes from './create'
-import * as importRoutes from './imports'
+
+export * as imports from './imports'
+
+export * as create from './create'
 
 type RedirectUrl = string
 
@@ -24,8 +26,6 @@ export const noWallet: Route<void> = {
   }
 }
 
-export const imports = importRoutes
-
 export const REDIRECT_PARAMETER_NAME = 'redirectUrl'
 
 export const locked: Route<RedirectUrl | void> = {
@@ -34,8 +34,6 @@ export const locked: Route<RedirectUrl | void> = {
     return redirectUrl ? `${this.template}?${REDIRECT_PARAMETER_NAME}=${redirectUrl}` : this.template
   }
 }
-
-export const create = createRoutes
 
 export const settings: Route<void> = {
   template: `${base.template}/settings`,
