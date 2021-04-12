@@ -66,10 +66,10 @@ const common: CommonMessages = {
   'common.tx.type.donate': 'Don',
   'common.tx.type.refund': 'Remboursement',
   'common.tx.type.deposit': 'Dépôt',
-  'common.tx.type.withdraw': 'Retirer',
+  'common.tx.type.withdraw': 'Retrait',
   'common.detail': 'Détail',
   'common.filter': 'Filtre',
-  'common.all': 'Tous',
+  'common.all': 'Tout',
   'common.time.week': 'Semaine',
   'common.time.all': 'Tout'
 }
