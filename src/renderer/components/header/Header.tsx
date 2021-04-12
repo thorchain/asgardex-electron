@@ -15,6 +15,7 @@ import { useLitecoinContext } from '../../contexts/LitecoinContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { useFundsCap } from '../../hooks/useFundsCap'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../services/const'
@@ -36,14 +37,16 @@ export const Header: React.FC = (): JSX.Element => {
 
   const midgardUrl = useObservableState(apiEndpoint$, RD.initial)
 
-  const binanceUrl$ = useBinanceContext().explorerUrl$
+  const { explorerUrl$: binanceUrl$ } = useBinanceContext()
   const binanceUrl = useObservableState(binanceUrl$, O.none)
 
-  const bitcoinUrl$ = useBitcoinContext().explorerUrl$
+  const { explorerUrl$: bitcoinUrl$ } = useBitcoinContext()
   const bitcoinUrl = useObservableState(bitcoinUrl$, O.none)
 
-  const thorchainUrl$ = useThorchainContext().explorerUrl$
+  const { explorerUrl$: thorchainUrl$ } = useThorchainContext()
   const thorchainUrl = useObservableState(thorchainUrl$, O.none)
+
+  const { data: fundsCapRD, reload: reloadFundsCap } = useFundsCap()
 
   const litecoinUrl$ = useLitecoinContext().explorerUrl$
   const litecoinUrl = useObservableState(litecoinUrl$, O.none)
@@ -125,6 +128,8 @@ export const Header: React.FC = (): JSX.Element => {
       litecoinUrl={litecoinUrl}
       thorchainUrl={thorchainUrl}
       midgardUrl={RD.toOption(midgardUrl)}
+      fundsCap={fundsCapRD}
+      reloadFundsCap={reloadFundsCap}
     />
   )
 }

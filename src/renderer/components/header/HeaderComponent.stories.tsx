@@ -16,6 +16,7 @@ const bitcoinUrl = O.some('https://blockstream.info')
 const thorchainUrl = O.some('https://thorchain.net')
 const litecoinUrl = O.some('https://blockstream.info')
 
+// TODO (@Veado) Stories for pending / reached fundscap / non reached fundscap / error loading fundscap data
 storiesOf('Components/Header', module).add('default', () => {
   return (
     <HeaderComponent
@@ -32,6 +33,8 @@ storiesOf('Components/Header', module).add('default', () => {
       litecoinUrl={litecoinUrl}
       selectedNetwork={'mainnet'}
       changeNetwork={(network) => console.log('set network to', network)}
+      fundsCap={RD.pending}
+      reloadFundsCap={() => console.log('Reload funds cap')}
     />
   )
 })
