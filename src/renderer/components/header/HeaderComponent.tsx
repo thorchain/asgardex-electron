@@ -301,7 +301,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
-      <Row>
+      <Row hidden>
         <Col style={{ width: '100%', height: '15px', display: 'flex' }} onClick={reloadFundsCap}>
           {renderFundsCap}
         </Col>
