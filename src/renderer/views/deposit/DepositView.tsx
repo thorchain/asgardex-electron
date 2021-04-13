@@ -11,7 +11,6 @@ import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
 import { Deposit } from '../../components/deposit/Deposit'
 import { ErrorView } from '../../components/shared/error'
 import { RefreshButton } from '../../components/uielements/button'
@@ -22,7 +21,6 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { DepositRouteParams } from '../../routes/pools/deposit'
 import { AssetWithDecimalRD } from '../../services/chain/types'
-import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolDetailRD, PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
@@ -37,7 +35,6 @@ export const DepositView: React.FC<Props> = () => {
   const intl = useIntl()
 
   const { network$ } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const { asset } = useParams<DepositRouteParams>()
   const {
@@ -67,8 +64,9 @@ export const DepositView: React.FC<Props> = () => {
 
   const [assetRD] = useObservableState<AssetWithDecimalRD>(
     () =>
-      selectedPoolAsset$.pipe(
-        RxOp.switchMap((oAsset) =>
+      FP.pipe(
+        Rx.combineLatest([selectedPoolAsset$, network$]),
+        RxOp.switchMap(([oAsset, network]) =>
           FP.pipe(
             oAsset,
             O.fold(
