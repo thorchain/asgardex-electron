@@ -17,9 +17,10 @@ export const MAX_LIQUIDITY_RUNE_PERCENT = 0.9 // 90 %
 export type FundsCap = {
   reached: boolean
   pooledRuneAmount: BaseAmount
+  maxPooledRuneAmount: BaseAmount
 }
 
-export type FundsCapRD = RD.RemoteData<Error, FundsCap>
+export type FundsCapRD = RD.RemoteData<Error, O.Option<FundsCap>>
 
 /**
  * Hook to get Funds cap data
@@ -50,10 +51,10 @@ export const useFundsCap = (): { data: FundsCapRD; reload: FP.Lazy<void> } => {
 
               return {
                 reached,
-                pooledRuneAmount: baseAmount(reached ? maxLiquidityRuneBN : totalPooledRune, THORCHAIN_DECIMAL)
+                pooledRuneAmount: baseAmount(totalPooledRune, THORCHAIN_DECIMAL),
+                maxPooledRuneAmount: baseAmount(maxLiquidityRuneBN, THORCHAIN_DECIMAL)
               }
-            }),
-            O.getOrElse(() => ({ reached: false, pooledRuneAmount: baseAmount(totalPooledRune, THORCHAIN_DECIMAL) }))
+            })
           )
         ),
         RxOp.shareReplay(1)

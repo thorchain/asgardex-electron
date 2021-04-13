@@ -23,6 +23,7 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import { filterWalletBalancesByAssets } from '../../../helpers/walletHelper'
+import { FundsCap, useFundsCap } from '../../../hooks/useFundsCap'
 import * as poolsRoutes from '../../../routes/pools'
 import { SymDepositMemo } from '../../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../../services/const'
@@ -83,6 +84,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
     keystoreService: { validatePassword$ },
     reloadBalancesByChain
   } = useWalletContext()
+
+  const { data: fundsCapRD } = useFundsCap()
 
   const { approveERC20Token$, isApprovedERC20Token$, approveFee$, reloadApproveFee } = useEthereumContext()
 
@@ -172,6 +175,15 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [runeExplorerUrl]
   )
 
+  const fundsCap: O.Option<FundsCap> = useMemo(
+    () =>
+      FP.pipe(
+        fundsCapRD,
+        RD.getOrElse((): O.Option<FundsCap> => O.none)
+      ),
+    [fundsCapRD]
+  )
+
   const renderDisabledAddDeposit = useCallback(
     (error?: Error) => (
       <>
@@ -206,6 +218,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           approveERC20Token$={approveERC20Token$}
           isApprovedERC20Token$={isApprovedERC20Token$}
           balances={[]}
+          fundsCap={O.none}
         />
       </>
     ),
@@ -270,6 +283,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
               network={network}
               approveERC20Token$={approveERC20Token$}
               isApprovedERC20Token$={isApprovedERC20Token$}
+              fundsCap={fundsCap}
             />
           </>
         )

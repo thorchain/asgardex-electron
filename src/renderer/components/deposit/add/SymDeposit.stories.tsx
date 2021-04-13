@@ -94,7 +94,8 @@ const defaultProps: SymDepositProps = {
     ),
   network: 'testnet',
   approveERC20Token$: () => Rx.of(RD.success('txHash')),
-  isApprovedERC20Token$: () => Rx.of(RD.success(true))
+  isApprovedERC20Token$: () => Rx.of(RD.success(true)),
+  fundsCap: O.none
 }
 
 export const Default: Story = () => <SymDeposit {...defaultProps} />

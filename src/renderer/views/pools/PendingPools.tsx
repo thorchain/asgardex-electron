@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { assetToString } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import * as A from 'fp-ts/Array'
@@ -9,17 +10,20 @@ import * as O from 'fp-ts/lib/Option'
 import { Option, none, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-// import { useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
+import { FundsCap } from '../../components/pool'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { sequenceTRD } from '../../helpers/fpHelpers'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { useFundsCap } from '../../hooks/useFundsCap'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
+import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PendingPoolsState, PoolFilter, ThorchainLastblockRD } from '../../services/midgard/types'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
@@ -32,24 +36,26 @@ import * as Styled from './PoolsOverview.style'
 const POOLS_KEY = 'pending'
 
 export const PendingPools: React.FC = (): JSX.Element => {
-  // const history = useHistory()
+  const history = useHistory()
   const intl = useIntl()
 
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const { service: midgardService } = useMidgardContext()
+
   const {
     thorchainLastblockState$,
     thorchainConstantsState$,
     pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$, poolsFilters$, setPoolsFilter },
-    reloadNetworkInfo,
     reloadThorchainLastblock
   } = midgardService
 
   const poolsRD = useObservableState(pendingPoolsState$, RD.pending)
   const thorchainLastblockRD: ThorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
   const thorchainConstantsRD = useObservableState(thorchainConstantsState$, RD.pending)
+
+  const { reload: reloadFundsCap, data: fundsCapRD } = useFundsCap()
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -58,8 +64,8 @@ export const PendingPools: React.FC = (): JSX.Element => {
 
   const refreshHandler = useCallback(() => {
     reloadPendingPools()
-    reloadNetworkInfo()
-  }, [reloadNetworkInfo, reloadPendingPools])
+    reloadFundsCap()
+  }, [reloadFundsCap, reloadPendingPools])
 
   const pendingCountdownHandler = useCallback(() => {
     reloadThorchainLastblock()
@@ -170,24 +176,24 @@ export const PendingPools: React.FC = (): JSX.Element => {
               A.map(({ pool }) => pool.target)
             )}
           />
+          <FundsCap fundsCap={fundsCapRD} />
           <Table
             columns={columns}
             dataSource={FP.pipe(tableData, filterTableData(poolFilter))}
             loading={loading}
             rowKey="key"
-            // TODO(@asgdx-team): Uncomment when pool detail is ready
-            // onRow={({ pool }: PoolTableRowData) => {
-            //   return {
-            //     onClick: () => {
-            //       history.push(poolsRoutes.detail.path({ symbol: pool.target.symbol }))
-            //     }
-            //   }
-            // }}
+            onRow={({ pool }: PoolTableRowData) => {
+              return {
+                onClick: () => {
+                  history.push(poolsRoutes.detail.path({ asset: assetToString(pool.target) }))
+                }
+              }
+            }}
           />
         </>
       )
     },
-    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, setFilter, poolFilter]
+    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, setFilter, poolFilter, fundsCapRD, history]
   )
 
   return (
