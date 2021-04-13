@@ -57,18 +57,16 @@ export type NodeInfo = {
 }
 
 export type NodeInfoLD = LiveData<ApiError, NodeInfo>
-
 export type NodeDataRD = RD.RemoteData<ApiError, NodeInfo>
 
 export type ThorNodeApiUrlLD = LiveData<ApiError, string>
 
 // Note: Currently we are interested in `MAXLIQUIDITYRUNE` only
-export const Mimir = t.type({
+export const MimirIO = t.type({
   'mimir//MAXLIQUIDITYRUNE': t.union([t.number, t.undefined])
 })
 
-export type MimirType = t.TypeOf<typeof Mimir>
+export type Mimir = t.TypeOf<typeof MimirIO>
 
-export type MimirLD = LiveData<Error, MimirType>
-
-export type MimirRD = RD.RemoteData<Error, MimirType>
+export type MimirLD = LiveData<Error, Mimir>
+export type MimirRD = RD.RemoteData<Error, Mimir>

@@ -12,12 +12,12 @@ import { THORCHAIN_DECIMAL } from '../helpers/assetHelper'
 import { sequenceTRD } from '../helpers/fpHelpers'
 import { liveData } from '../helpers/rx/liveData'
 
+export const MAX_LIQUIDITY_RUNE_PERCENT = 0.9 // 90 %
+
 export type FundsCap = {
   reached: boolean
   pooledRuneAmount: BaseAmount
 }
-
-export const MAX_LIQUIDITY_RUNE_PERCENT = 0.9 // 90 %
 
 export type FundsCapRD = RD.RemoteData<Error, FundsCap>
 
@@ -42,7 +42,7 @@ export const useFundsCap = (): { data: FundsCapRD; reload: FP.Lazy<void> } => {
           FP.pipe(
             mimir['mimir//MAXLIQUIDITYRUNE'],
             O.fromNullable,
-            O.map((x) => bn(x)),
+            O.map(bn),
             O.map((maxLiquidityRuneBN) => {
               const reached = maxLiquidityRuneBN
                 .multipliedBy(MAX_LIQUIDITY_RUNE_PERCENT)

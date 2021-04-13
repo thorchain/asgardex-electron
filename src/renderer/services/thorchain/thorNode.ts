@@ -16,7 +16,7 @@ import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import { ErrorId } from '../wallet/types'
-import { Mimir, MimirType, MimirLD, NodeInfoLD, NodeStatus, ThorNodeApiUrlLD } from './types'
+import { MimirIO, Mimir, MimirLD, NodeInfoLD, NodeStatus, ThorNodeApiUrlLD } from './types'
 
 // Tmp type as ThorNodeApi does not provide valid swagger spec yet
 // TODO remove after https://github.com/thorchain/asgardex-electron/issues/763
@@ -112,8 +112,8 @@ const mimir$: MimirLD = FP.pipe(
   liveData.mapLeft(({ msg }) => Error(msg)),
   liveData.chain((thorApi) =>
     FP.pipe(
-      RxAjax.ajax.getJSON<MimirType>(`${thorApi}/mimir`),
-      RxOp.map((response) => Mimir.decode(response)),
+      RxAjax.ajax.getJSON<Mimir>(`${thorApi}/mimir`),
+      RxOp.map((response) => MimirIO.decode(response)),
       RxOp.map((result) =>
         // Errors -> Error
         E.mapLeft((_: Errors) => Error(`Failed loading mimir ${PathReporter.report(result)}`))(result)
