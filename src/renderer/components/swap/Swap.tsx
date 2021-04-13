@@ -280,7 +280,7 @@ export const Swap = ({
   const chainFees$ = useMemo(() => fees$, [fees$])
   const approveFees$ = useMemo(() => approveFee$, [approveFee$])
 
-  const chainFeesORef = useRef<O.Option<SwapFees>>(O.none)
+  const prevChainFees = useRef<O.Option<SwapFees>>(O.none)
 
   const [chainFeesRD, swapFeesParamsUpdated] = useObservableState<SwapFeesRD, O.Option<SwapFeesParams>>(
     (oSwapFeesParams$) => {
@@ -288,7 +288,7 @@ export const Swap = ({
         RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), chainFees$))),
         liveData.map((chainFees) => {
           // store every successfully loaded chainFees to the ref value
-          chainFeesORef.current = O.some(chainFees)
+          prevChainFees.current = O.some(chainFees)
           return chainFees
         })
       )
@@ -350,7 +350,7 @@ export const Swap = ({
       // update `pendingSwitchAssets` state
       setPendingSwitchAssets(true)
       // Reset previously stored fees
-      chainFeesORef.current = O.none
+      prevChainFees.current = O.none
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -403,7 +403,7 @@ export const Swap = ({
     // max amount for sourc chain asset
     const maxChainAssetAmount: BaseAmount = FP.pipe(
       RD.toOption(chainFeesRD),
-      O.alt(() => chainFeesORef.current),
+      O.alt(() => prevChainFees.current),
       O.fold(
         // Ingnore fees and use balance of source chain asset for max.
         () => sourceChainAssetAmount,
