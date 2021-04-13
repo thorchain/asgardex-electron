@@ -2,6 +2,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
 import { Client, DepositParam } from '@xchainjs/xchain-thorchain'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
+import * as t from 'io-ts'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
@@ -56,7 +57,16 @@ export type NodeInfo = {
 }
 
 export type NodeInfoLD = LiveData<ApiError, NodeInfo>
-
 export type NodeDataRD = RD.RemoteData<ApiError, NodeInfo>
 
 export type ThorNodeApiUrlLD = LiveData<ApiError, string>
+
+// Note: Currently we are interested in `MAXLIQUIDITYRUNE` only
+export const MimirIO = t.type({
+  'mimir//MAXLIQUIDITYRUNE': t.union([t.number, t.undefined])
+})
+
+export type Mimir = t.TypeOf<typeof MimirIO>
+
+export type MimirLD = LiveData<Error, Mimir>
+export type MimirRD = RD.RemoteData<Error, Mimir>

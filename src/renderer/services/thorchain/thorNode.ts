@@ -2,6 +2,9 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
+import * as E from 'fp-ts/lib/Either'
+import { Errors } from 'io-ts'
+import { PathReporter } from 'io-ts/lib/PathReporter'
 import * as Rx from 'rxjs'
 import * as RxAjax from 'rxjs/ajax'
 import * as RxOp from 'rxjs/operators'
@@ -11,8 +14,9 @@ import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
+import { network$ } from '../app/service'
 import { ErrorId } from '../wallet/types'
-import { NodeInfoLD, NodeStatus, ThorNodeApiUrlLD } from './types'
+import { MimirIO, Mimir, MimirLD, NodeInfoLD, NodeStatus, ThorNodeApiUrlLD } from './types'
 
 // Tmp type as ThorNodeApi does not provide valid swagger spec yet
 // TODO remove after https://github.com/thorchain/asgardex-electron/issues/763
@@ -99,4 +103,25 @@ const getNodeInfo$ = (node: Address, network: Network): NodeInfoLD =>
     RxOp.startWith(RD.pending)
   )
 
-export { getNodeInfo$, reloadNodesInfo }
+const { stream$: reloadMimir$, trigger: reloadMimir } = triggerStream()
+
+const mimir$: MimirLD = FP.pipe(
+  Rx.combineLatest([network$, reloadMimir$]),
+  RxOp.switchMap(([network, _]) => thorNodeApiAddress$(network)),
+  // ApiError -> Error
+  liveData.mapLeft(({ msg }) => Error(msg)),
+  liveData.chain((thorApi) =>
+    FP.pipe(
+      RxAjax.ajax.getJSON<Mimir>(`${thorApi}/mimir`),
+      RxOp.map((response) => MimirIO.decode(response)),
+      RxOp.map((result) =>
+        // Errors -> Error
+        E.mapLeft((_: Errors) => Error(`Failed loading mimir ${PathReporter.report(result)}`))(result)
+      ),
+      RxOp.map(RD.fromEither),
+      RxOp.startWith(RD.pending)
+    )
+  )
+)
+
+export { getNodeInfo$, reloadNodesInfo, mimir$, reloadMimir }
