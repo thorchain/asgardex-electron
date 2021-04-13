@@ -33,6 +33,7 @@ const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(RxOp.map(toEth
 
 const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
 const INFURA_PROJECT_ID = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_ID, '')
+const INFURA_PROJECT_SECRET = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_SECRET, '')
 
 const ETHPLORER_API_KEY = envOrDefault(process.env.REACT_APP_ETHPLORER_API_KEY, 'freekey')
 const ETHPLORER_API_URL = envOrDefault(process.env.REACT_APP_ETHPLORER_API_URL, 'https://api.ethplorer.io')
@@ -52,20 +53,19 @@ const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, 
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
-              const infuraCreds = INFURA_PROJECT_ID
+              const infuraCreds: ETH.InfuraCreds | undefined = INFURA_PROJECT_ID
                 ? {
-                    infuraCreds: {
-                      projectId: INFURA_PROJECT_ID
-                    }
+                    projectId: INFURA_PROJECT_ID,
+                    projectSecret: INFURA_PROJECT_SECRET
                   }
-                : {}
+                : undefined
               const client = new ETH.Client({
                 network,
                 etherscanApiKey: ETHERSCAN_API_KEY,
                 ethplorerApiKey: ETHPLORER_API_KEY,
                 ethplorerUrl: ETHPLORER_API_URL,
                 phrase,
-                ...infuraCreds
+                infuraCreds
               })
               return O.some(right(client)) as ClientState
             } catch (error) {
