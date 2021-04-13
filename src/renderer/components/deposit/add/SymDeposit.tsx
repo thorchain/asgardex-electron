@@ -36,6 +36,7 @@ import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOPoolAddresses } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import { LiveData } from '../../../helpers/rx/liveData'
+import { FundsCap } from '../../../hooks/useFundsCap'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import {
@@ -90,6 +91,7 @@ export type Props = {
   network: Network
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
+  fundsCap: O.Option<FundsCap>
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -122,7 +124,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     isApprovedERC20Token$,
     approveERC20Token$,
     reloadApproveFee,
-    approveFee$
+    approveFee$,
+    fundsCap: oFundsCap
   } = props
 
   const intl = useIntl()
@@ -771,15 +774,26 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [closePasswordModal, oDepositParams, subscribeDepositState, deposit$])
 
+  const fundsCapReached = useMemo(
+    () =>
+      FP.pipe(
+        oFundsCap,
+        O.map(({ reached }) => reached),
+        O.getOrElse(() => false)
+      ),
+    [oFundsCap]
+  )
+
   const disabledForm = useMemo(() => {
     return (
       isBalanceError ||
       isThorchainFeeError ||
+      fundsCapReached ||
       disabled ||
       balances.filter((balance) => eqAsset.equals(balance.asset, asset) && !balance.amount.amount().isZero()).length ===
         0
     )
-  }, [asset, balances, disabled, isBalanceError, isThorchainFeeError])
+  }, [asset, balances, disabled, fundsCapReached, isBalanceError, isThorchainFeeError])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>

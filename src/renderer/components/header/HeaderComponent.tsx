@@ -1,7 +1,6 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetRuneNative, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Row, Col, Tabs, Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -20,7 +19,6 @@ import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
 import { useThemeContext } from '../../contexts/ThemeContext'
-import { FundsCapRD } from '../../hooks/useFundsCap'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { PoolsStateRD, SelectedPricePoolAsset } from '../../services/midgard/types'
@@ -64,8 +62,6 @@ type Props = {
   bitcoinUrl: O.Option<string>
   thorchainUrl: O.Option<string>
   litecoinUrl: O.Option<string>
-  fundsCap: FundsCapRD
-  reloadFundsCap: FP.Lazy<void>
 }
 
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
@@ -83,9 +79,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     thorchainUrl,
     litecoinUrl,
     selectedNetwork,
-    changeNetwork,
-    fundsCap: fundsCapRD,
-    reloadFundsCap
+    changeNetwork
   } = props
 
   const intl = useIntl()
@@ -275,37 +269,11 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     [binanceUrl, bitcoinUrl, isDesktopView, midgardUrl, thorchainUrl, litecoinUrl]
   )
 
-  const renderFundsCap = useMemo(
-    () =>
-      // TODO(@Veado) Style it + add i18n
-      FP.pipe(
-        fundsCapRD,
-        RD.fold(
-          () => '...',
-          () => '...',
-          (_) => 'error',
-          ({ reached, pooledRuneAmount }) =>
-            `reached: ${reached} / amount: ${formatAssetAmountCurrency({
-              amount: baseToAsset(pooledRuneAmount),
-              asset: AssetRuneNative,
-              decimal: 2,
-              trimZeros: true
-            })}`
-        )
-      ),
-    [fundsCapRD]
-  )
-
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
   return (
     <>
-      <Row hidden>
-        <Col style={{ width: '100%', height: '15px', display: 'flex' }} onClick={reloadFundsCap}>
-          {renderFundsCap}
-        </Col>
-      </Row>
       <HeaderContainer>
         <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
           {isDesktopView && (

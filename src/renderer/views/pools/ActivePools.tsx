@@ -15,12 +15,14 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
+import { FundsCap } from '../../components/pool'
 import { Button } from '../../components/uielements/button'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { useFundsCap } from '../../hooks/useFundsCap'
 import * as poolsRoutes from '../../routes/pools'
 import { SwapRouteParams } from '../../routes/pools/swap'
 import { DEFAULT_NETWORK } from '../../services/const'
@@ -40,6 +42,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const { service: midgardService } = useMidgardContext()
+  const { reload: reloadFundsCap, data: fundsCapRD } = useFundsCap()
   const {
     pools: { poolsState$, reloadPools, selectedPricePool$, poolsFilters$, setPoolsFilter }
   } = midgardService
@@ -63,7 +66,8 @@ export const ActivePools: React.FC = (): JSX.Element => {
 
   const refreshHandler = useCallback(() => {
     reloadPools()
-  }, [reloadPools])
+    reloadFundsCap()
+  }, [reloadPools, reloadFundsCap])
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
@@ -170,6 +174,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
               A.map(({ pool }) => pool.target)
             )}
           />
+          <FundsCap fundsCap={fundsCapRD} />
           <Table
             columns={columns}
             dataSource={FP.pipe(tableData, filterTableData(poolFilter))}
@@ -186,7 +191,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
         </>
       )
     },
-    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, poolFilter, setFilter, history]
+    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, poolFilter, setFilter, fundsCapRD, history]
   )
 
   return (
