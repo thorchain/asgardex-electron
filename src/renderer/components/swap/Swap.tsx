@@ -39,7 +39,7 @@ import {
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
-import { LiveData } from '../../helpers/rx/liveData'
+import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
@@ -280,9 +280,18 @@ export const Swap = ({
   const chainFees$ = useMemo(() => fees$, [fees$])
   const approveFees$ = useMemo(() => approveFee$, [approveFee$])
 
+  const prevChainFees = useRef<O.Option<SwapFees>>(O.none)
+
   const [chainFeesRD, swapFeesParamsUpdated] = useObservableState<SwapFeesRD, O.Option<SwapFeesParams>>(
     (oSwapFeesParams$) => {
-      return oSwapFeesParams$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), chainFees$))))
+      return oSwapFeesParams$.pipe(
+        RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), chainFees$))),
+        liveData.map((chainFees) => {
+          // store every successfully loaded chainFees to the ref value
+          prevChainFees.current = O.some(chainFees)
+          return chainFees
+        })
+      )
     },
     RD.initial
   )
@@ -340,7 +349,8 @@ export const Swap = ({
     async (asset: Asset) => {
       // update `pendingSwitchAssets` state
       setPendingSwitchAssets(true)
-
+      // Reset previously stored fees
+      prevChainFees.current = O.none
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -393,6 +403,7 @@ export const Swap = ({
     // max amount for sourc chain asset
     const maxChainAssetAmount: BaseAmount = FP.pipe(
       RD.toOption(chainFeesRD),
+      O.alt(() => prevChainFees.current),
       O.fold(
         // Ingnore fees and use balance of source chain asset for max.
         () => sourceChainAssetAmount,
