@@ -25,6 +25,7 @@ export const InputBigNumber = forwardRef<Input, Props>(
       onChange = () => {},
       onFocus = FP.constVoid,
       onBlur = FP.constVoid,
+      max,
       ...otherProps /* any props of `InputNumberProps` */
     } = props
 
@@ -120,7 +121,6 @@ export const InputBigNumber = forwardRef<Input, Props>(
     const onChangeHandler = useCallback(
       ({ target }: React.ChangeEvent<HTMLInputElement>) => {
         const { value: newValue } = target
-        const { max } = otherProps
         if (validInputValue(unformatValue(newValue))) {
           // some checks needed whether to broadcast changes or not
           FP.pipe(
@@ -151,7 +151,7 @@ export const InputBigNumber = forwardRef<Input, Props>(
           )
         }
       },
-      [decimal, otherProps, setValues]
+      [decimal, max, setValues]
     )
 
     return (
@@ -165,6 +165,7 @@ export const InputBigNumber = forwardRef<Input, Props>(
         onFocus={onFocusHandler}
         onBlur={onBlurHandler}
         onPressEnter={onPressEnterHandler}
+        max={max}
         {...otherProps}
       />
     )
