@@ -1,4 +1,4 @@
-import { formatValue, validInputValue } from './Input.util'
+import { formatValue, validInputValue, unformatValue, truncateByDecimals } from './Input.util'
 
 describe('components/BigNumberInput/util', () => {
   describe('formatValue', () => {
@@ -53,6 +53,46 @@ describe('components/BigNumberInput/util', () => {
 
     it('returns false for numbers including invalid characters ', () => {
       expect(validInputValue('9hello')).toBeFalsy()
+    })
+  })
+
+  describe('unformatValue', () => {
+    it('should not change correct string', () => {
+      expect(unformatValue('123123')).toEqual('123123')
+      expect(unformatValue('123.123')).toEqual('123.123')
+      expect(unformatValue('0.123')).toEqual('0.123')
+    })
+    it('should remove `.` at the end of string', () => {
+      expect(unformatValue('123.')).toEqual('123')
+      expect(unformatValue('.')).toEqual('')
+    })
+    it('should remove all `,` from a string', () => {
+      expect(unformatValue(',123,')).toEqual('123')
+      expect(unformatValue('123,123,123,123,123')).toEqual('123123123123123')
+    })
+    it('should unformat formatted value correctly', () => {
+      expect(unformatValue('123,123,123,123,123.')).toEqual('123123123123123')
+      expect(unformatValue('123,123,123,123,123.123123')).toEqual('123123123123123.123123')
+    })
+  })
+
+  describe('truncateByDecimals', () => {
+    it('should not change value if there is no decimals', () => {
+      expect(truncateByDecimals(8)('123123')).toEqual('123123')
+    })
+    it('should not change value if decimal part less then decimals', () => {
+      expect(truncateByDecimals(8)('123123.123123')).toEqual('123123.123123')
+      expect(truncateByDecimals(8)('123123')).toEqual('123123')
+    })
+
+    it('should not truncate `.` symbol at the end of string', () => {
+      expect(truncateByDecimals(8)('123123.')).toEqual('123123.')
+    })
+
+    it('should truncate by decimals', () => {
+      expect(truncateByDecimals(0)('123123.123')).toEqual('123123')
+      expect(truncateByDecimals(2)('123123.123')).toEqual('123123.12')
+      expect(truncateByDecimals(8)('123123.12345678999')).toEqual('123123.12345678')
     })
   })
 })

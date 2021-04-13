@@ -1,6 +1,6 @@
-import React, { useMemo, useCallback, useRef, useState, useEffect, forwardRef } from 'react'
+import React, { useCallback, useState, useEffect, forwardRef } from 'react'
 
-import { delay, bn, fixedBN, trimZeros } from '@xchainjs/xchain-util'
+import { delay, bnOrZero } from '@xchainjs/xchain-util'
 import { Input } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
@@ -9,7 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { ZERO_BN } from '../../../const'
 import { eqBigNumber } from '../../../helpers/fp/eq'
 import * as Styled from './Input.style'
-import { VALUE_ZERO, formatValue, validInputValue } from './Input.util'
+import { formatValue, unformatValue, validInputValue, VALUE_ZERO, EMPTY_INPUT, truncateByDecimals } from './Input.util'
 
 type Props = Omit<Styled.InputProps, 'value' | 'onChange'> & {
   value?: BigNumber
@@ -25,76 +25,86 @@ export const InputBigNumber = forwardRef<Input, Props>(
       onChange = () => {},
       onFocus = FP.constVoid,
       onBlur = FP.constVoid,
+      max,
       ...otherProps /* any props of `InputNumberProps` */
     } = props
 
-    // value as string (unformatted) - it supports empty string for an empty input
-    const [enteredValue, setEnteredValue] = useState<O.Option<string>>(O.none)
-    const [focus, setFocus] = useState(false)
-    const broadcastValue = useRef<O.Option<BigNumber>>(O.none)
+    // value as string (formatted) - it supports empty string for an empty input
+    const [broadcastValue, setBroadcastValue] = useState<O.Option<string>>(O.some(VALUE_ZERO))
 
-    const inputValue = useMemo(
-      () =>
-        FP.pipe(
-          enteredValue,
-          // always round down for currencies
-          O.getOrElse(() => value.toFixed(decimal, BigNumber.ROUND_DOWN)),
-          (v) => (focus ? v : formatValue(v, decimal))
-        ),
-      [enteredValue, focus, decimal, value]
+    const setValues = useCallback(
+      (targetValue: string) => {
+        if (targetValue === EMPTY_INPUT) {
+          onChange(ZERO_BN)
+          setBroadcastValue(O.none)
+        } else {
+          // check for the '.' at the end of a `targetValue`
+          const formatted = formatValue(unformatValue(targetValue), decimal).replaceAll(',', '')
+          const bnValue = bnOrZero(formatted)
+          if (!eqBigNumber.equals(bnValue, value)) {
+            setBroadcastValue(O.some(formatted))
+            onChange(bnValue)
+          }
+
+          if (
+            targetValue !==
+            FP.pipe(
+              broadcastValue,
+              O.getOrElse(() => EMPTY_INPUT)
+            )
+          ) {
+            setBroadcastValue(O.some(targetValue))
+          }
+        }
+      },
+      [onChange, value, decimal, broadcastValue]
     )
 
     useEffect(() => {
       FP.pipe(
-        // fix to decimal + always round down for currencies
-        value.toFixed(decimal, BigNumber.ROUND_DOWN),
-        // trim zeros
-        trimZeros,
+        value,
         O.some,
-        // save value into state
-        (value) => {
-          // immediately set entered value in case there is nothing to compare with
-          if (O.isNone(enteredValue)) {
-            setEnteredValue(value)
-          } else {
-            FP.pipe(
-              value,
-              O.map(bn),
-              // Filter out every repeated BN values to avoid missing untrimmed zeros
-              O.filter((value) => !eqBigNumber.equals(value, bn(enteredValue.value))),
-              O.map(() => setEnteredValue(value))
-            )
-          }
-        }
+        // filter out all duplicated real values
+        O.filter((val) =>
+          FP.pipe(
+            broadcastValue,
+            O.map((prevValue) => !eqBigNumber.equals(val, bnOrZero(prevValue))),
+            O.getOrElse((): boolean => false)
+          )
+        ),
+        // fix to decimal + always round down for currencies
+        O.map((val) => val.toFixed(decimal, BigNumber.ROUND_DOWN)),
+        O.map((s) => formatValue(s, decimal)),
+        O.map(setValues)
       )
-    }, [decimal, value, enteredValue])
+    }, [decimal, value, setValues, broadcastValue])
 
     const onFocusHandler = useCallback(
       async (event: React.FocusEvent<HTMLInputElement>) => {
         const { target } = event
         onFocus(event)
-        setFocus(true)
+        FP.pipe(broadcastValue, O.map(unformatValue), O.map(setValues))
+        // setFocus(true)
         // short delay is needed before selecting to keep its reference
         // (it will be lost in other cases due React rendering)
         await delay(1)
         target.select()
       },
-      [onFocus]
+      [onFocus, broadcastValue, setValues]
     )
 
     const _onBlurHandler = useCallback(() => {
-      setFocus(false)
-      // Clean up value - it can't be done in onChangeHandler due race conditions!!
-      setEnteredValue((v) =>
-        FP.pipe(
-          v,
-          // convert empty string to '0'
-          O.map((v) => (v === '' ? VALUE_ZERO : v)),
-          // remove uneeded zeros
-          O.map(trimZeros)
-        )
+      FP.pipe(
+        broadcastValue,
+        // in case user entered an empty string there will be an O.none
+        // restore it to the empty string
+        O.alt(() => O.some(EMPTY_INPUT)),
+        O.map((v) => (v === EMPTY_INPUT ? VALUE_ZERO : v)),
+        // Pass ONLY meaningful value without formatting
+        O.map((v) => formatValue(unformatValue(v), decimal)),
+        O.map(setValues)
       )
-    }, [])
+    }, [setValues, broadcastValue, decimal])
 
     const onBlurHandler = useCallback(
       (event: React.FocusEvent<HTMLInputElement>) => {
@@ -111,73 +121,42 @@ export const InputBigNumber = forwardRef<Input, Props>(
     const onChangeHandler = useCallback(
       ({ target }: React.ChangeEvent<HTMLInputElement>) => {
         const { value: newValue } = target
-        const { max } = otherProps
-        if (validInputValue(newValue)) {
+        if (validInputValue(unformatValue(newValue))) {
           // some checks needed whether to broadcast changes or not
           FP.pipe(
             O.some(newValue),
-            // ignore empty input
-            O.filter((value) => value !== ''),
             // format '.' to '.0'
             O.map((value) => (value === '.' ? '0.' : value)),
             // Limit to `max` value if needed
             O.map((value) => {
               if (!max) return value
 
-              const maxBN = bn(max)
-              const valueBN = bn(value)
+              const maxBN = bnOrZero(max)
+              const valueBN = bnOrZero(value)
               // if `value` > `max`, use `max`
               return valueBN.isLessThanOrEqualTo(maxBN) ? value : max.toString()
             }),
             // Limit decimal places of entered value
-            O.map((value) => {
-              const valueBN = bn(value)
-              const valueDecimal = bn(value).decimalPlaces()
-              // For only zero decimals (e.g`0.000000`) trim value to a single ZERO if its decimal places > `decimal`
-              const newValue = valueBN.isZero() && value.length > decimal + 2 /* 2 == offset for "0." */ ? '0' : value
-              // convert it back to a string (for fixed values always round down for currencies)
-              return valueDecimal > decimal ? valueBN.toFixed(decimal, BigNumber.ROUND_DOWN) : newValue
-            }),
-
-            O.alt(() => O.some('0')),
-            O.map((value) => {
-              // store entered value in state
-              setEnteredValue(O.some(value))
-              return value
-            }),
-            // format value
-            O.map((value) => fixedBN(value, decimal)),
-            // Dirty check
-            O.filter((valueBN) =>
-              FP.pipe(
-                broadcastValue.current,
-                O.map((current) => !current.isEqualTo(valueBN)),
-                // always accept first (default) of `broadcastValue.current`,
-                // which is `none` by default
-                O.getOrElse<boolean>(() => true)
-              )
-            ),
-            O.map((valueBN) => {
-              // store broadcast value
-              broadcastValue.current = O.some(valueBN)
-              // Inform outside world about changes
-              onChange(valueBN)
-              return valueBN
-            })
+            O.map(truncateByDecimals(decimal)),
+            O.map(setValues)
           )
         }
       },
-      [decimal, onChange, otherProps]
+      [decimal, max, setValues]
     )
 
     return (
       <Styled.InputBigNumber
         ref={ref}
-        value={inputValue}
+        value={FP.pipe(
+          broadcastValue,
+          O.getOrElse(() => EMPTY_INPUT)
+        )}
         onChange={onChangeHandler}
         onFocus={onFocusHandler}
         onBlur={onBlurHandler}
         onPressEnter={onPressEnterHandler}
+        max={max}
         {...otherProps}
       />
     )

@@ -2,6 +2,7 @@ import { bn, formatBN, isValidBN, trimZeros } from '@xchainjs/xchain-util'
 
 const VALUE_ZERO_DECIMAL = '0.'
 export const VALUE_ZERO = '0'
+export const EMPTY_INPUT = ''
 
 /**
  * Formats given string of number
@@ -38,8 +39,29 @@ export const formatValue = (value: string, maxDecimal = 2) => {
   return trimZeros(formatted)
 }
 
+// Removes '.' at the end of the line + removes all ',' of string value
+export const unformatValue = (value: string) => value.replace(/((\.+$)|,)/g, '')
+
 export const validInputValue = (value: string) => {
   if (value === '' || value === '.' || value === VALUE_ZERO_DECIMAL) return true
 
   return isValidBN(bn(value))
+}
+
+export const truncateByDecimals = (decimal: number) => (value: string) => {
+  // Split to real and decimal parts
+  const [realPart, decimalPart] = value.split('.')
+
+  if (decimal === 0) {
+    return realPart
+  }
+
+  // truncate from decimals ONLY allowed amount of decimals
+  const decimalPartByDecimals = decimalPart?.substring(0, decimal)
+  return (
+    // Combine real part with allowed decimals part
+    realPart +
+    // can not just compare to boolean as it will be false in case of empty string
+    (decimalPartByDecimals !== undefined ? `.${decimalPartByDecimals}` : '')
+  )
 }
