@@ -47,3 +47,16 @@ export const validInputValue = (value: string) => {
 
   return isValidBN(bn(value))
 }
+
+export const truncateByDecimals = (decimal: number) => (value: string) => {
+  // Split to real and decimal parts
+  const [realPart, decimalPart] = value.split('.')
+  // truncate from decimals ONLY allowed amount of decimals
+  const decimalPartByDecimals = decimalPart?.substring(0, decimal)
+  return (
+    // Combine real part with allowed decimals part
+    realPart +
+    // can not just compare to boolean as it will be false in case of empty string
+    (decimalPartByDecimals !== undefined ? `.${decimalPartByDecimals}` : '')
+  )
+}

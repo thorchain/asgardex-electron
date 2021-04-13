@@ -9,7 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { ZERO_BN } from '../../../const'
 import { eqBigNumber } from '../../../helpers/fp/eq'
 import * as Styled from './Input.style'
-import { formatValue, unformatValue, validInputValue, VALUE_ZERO, EMPTY_INPUT } from './Input.util'
+import { formatValue, unformatValue, validInputValue, VALUE_ZERO, EMPTY_INPUT, truncateByDecimals } from './Input.util'
 
 type Props = Omit<Styled.InputProps, 'value' | 'onChange'> & {
   value?: BigNumber
@@ -137,16 +137,7 @@ export const InputBigNumber = forwardRef<Input, Props>(
               return valueBN.isLessThanOrEqualTo(maxBN) ? value : max.toString()
             }),
             // Limit decimal places of entered value
-            O.map((value) => {
-              const valueBN = bnOrZero(value)
-              const valueDecimal = bnOrZero(value).decimalPlaces()
-              // For only zero decimals (e.g`0.000000`) trim value to a single ZERO if its decimal places > `decimal`
-              const newValue = valueBN.isZero() && value.length > decimal + 2 /* 2 == offset for "0." */ ? '0' : value
-              // convert it back to a string (for fixed values always round down for currencies)
-              return valueDecimal > decimal
-                ? valueBN.toFixed(decimal, BigNumber.ROUND_DOWN)
-                : newValue.replaceAll(',', '')
-            }),
+            O.map(truncateByDecimals(decimal)),
             O.map(setValues)
           )
         }
