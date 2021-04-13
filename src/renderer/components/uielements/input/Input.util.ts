@@ -51,6 +51,11 @@ export const validInputValue = (value: string) => {
 export const truncateByDecimals = (decimal: number) => (value: string) => {
   // Split to real and decimal parts
   const [realPart, decimalPart] = value.split('.')
+
+  if (decimal === 0) {
+    return realPart
+  }
+
   // truncate from decimals ONLY allowed amount of decimals
   const decimalPartByDecimals = decimalPart?.substring(0, decimal)
   return (
