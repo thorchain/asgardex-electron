@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
-import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
@@ -25,7 +24,8 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
   prevActionsPage = O.none,
   currentPage,
   currentFilter,
-  setFilter
+  setFilter,
+  availableFilters
 }) => {
   const intl = useIntl()
 
@@ -34,12 +34,18 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
   const actionTypeColumn: ColumnType<PoolAction> = useMemo(
     () => ({
       key: 'txType',
-      title: <Styled.ActionsFilter currentFilter={currentFilter} onFilterChanged={setFilter} />,
+      title: (
+        <Styled.ActionsFilter
+          availableFilters={availableFilters}
+          currentFilter={currentFilter}
+          onFilterChanged={setFilter}
+        />
+      ),
       align: 'left',
       width: 180,
       render: renderActionTypeColumn
     }),
-    [renderActionTypeColumn, setFilter, currentFilter]
+    [renderActionTypeColumn, setFilter, currentFilter, availableFilters]
   )
 
   const renderDateColumn = useCallback((_, { date }: PoolAction) => H.renderDate(date), [])
@@ -58,10 +64,9 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
   const renderLinkColumn = useCallback(
     (action: PoolAction) =>
       FP.pipe(
-        action.in,
-        A.head,
-        O.alt(() => A.head(action.out)),
-        O.map(({ txID }) => <CommonStyled.ExternalLinkIcon key="external link" onClick={() => goToTx(txID)} />),
+        action,
+        H.getTxId,
+        O.map((txID) => <CommonStyled.ExternalLinkIcon key="external link" onClick={() => goToTx(txID)} />),
         O.getOrElse(() => <></>)
       ),
     [goToTx]
@@ -109,18 +114,11 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     linkColumn
   ])
 
-  const rowKey = (action: PoolAction) =>
-    FP.pipe(
-      H.getTxId(action),
-      O.map(FP.identity),
-      O.getOrElse(() => `${action.date.toString()}-${Math.random()}`)
-    )
-
   const renderTable = useCallback(
     ({ total, actions }: PoolActionsHistoryPage, loading = false) => {
       return (
         <>
-          <Styled.Table columns={columns} dataSource={actions} loading={loading} rowKey={rowKey} />
+          <Styled.Table columns={columns} dataSource={actions} loading={loading} rowKey={H.getRowKey} />
           {total > 0 && (
             <Pagination
               current={currentPage}

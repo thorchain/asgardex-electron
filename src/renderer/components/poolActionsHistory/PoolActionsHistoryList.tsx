@@ -16,13 +16,12 @@ import { Props } from './types'
 const renderItem = (goToTx: (txId: string) => void) => (action: PoolAction) => {
   const date = H.renderDate(action.date)
 
-  const oTxId = H.getTxId(action)
-
   const titleExtra = (
     <>
       {date}
       {FP.pipe(
-        oTxId,
+        action,
+        H.getTxId,
         O.map((id) => (
           <Styled.GoToButton key="go" onClick={() => goToTx(id)}>
             <Styled.InfoArrow />
@@ -33,14 +32,8 @@ const renderItem = (goToTx: (txId: string) => void) => (action: PoolAction) => {
     </>
   )
 
-  const rowKey = FP.pipe(
-    oTxId,
-    O.map(FP.identity),
-    O.getOrElse(() => `${action.date.toString()}-${Math.random()}`)
-  )
-
   return (
-    <Styled.ListItem key={rowKey}>
+    <Styled.ListItem key={H.getRowKey(action)}>
       <Styled.Card title={<Styled.TxType type={action.type} />} extra={titleExtra}>
         <TxDetail type={action.type} date={date} incomes={H.getValues(action.in)} outgos={H.getValues(action.out)} />
       </Styled.Card>
@@ -56,7 +49,8 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
   currentPage,
   currentFilter,
   setFilter,
-  className
+  className,
+  availableFilters
 }) => {
   const renderListItem = useMemo(() => renderItem(goToTx), [goToTx])
   const renderList = useCallback(
@@ -82,6 +76,7 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
   return (
     <div className={className}>
       <Styled.ActionsFilter
+        availableFilters={availableFilters}
         currentFilter={currentFilter}
         onFilterChanged={setFilter}
         disabled={!RD.isSuccess(actionsPageRD)}

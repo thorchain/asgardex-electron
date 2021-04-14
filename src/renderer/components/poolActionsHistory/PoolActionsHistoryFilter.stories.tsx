@@ -7,7 +7,13 @@ import { Filter as FilterType } from './types'
 
 export const Filter: Story = () => {
   const [filter, setFilter] = useState<FilterType>('ALL')
-  return <PoolActionsHistoryFilter currentFilter={filter} onFilterChanged={setFilter} />
+  return (
+    <PoolActionsHistoryFilter
+      currentFilter={filter}
+      onFilterChanged={setFilter}
+      availableFilters={['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']}
+    />
+  )
 }
 
 export default {

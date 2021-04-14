@@ -68,6 +68,7 @@ const common: CommonMessages = {
   'common.tx.type.deposit': 'Dépôt',
   'common.tx.type.withdraw': 'Retrait',
   'common.detail': 'Détail',
+  'common.tx.type.upgrade': 'Upgrade - FR',
   'common.filter': 'Filtre',
   'common.all': 'Tout',
   'common.time.week': 'Semaine',

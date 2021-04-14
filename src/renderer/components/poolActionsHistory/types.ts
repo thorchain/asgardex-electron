@@ -13,4 +13,5 @@ export type Props = {
   currentFilter: Filter
   setFilter: (filter: Filter) => void
   className?: string
+  availableFilters: Filter[]
 }

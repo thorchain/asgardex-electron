@@ -15,7 +15,9 @@ export const getTxId = (action: PoolAction): O.Option<TxHash> => {
     action.in,
     A.head,
     O.alt(() => FP.pipe(action.out, A.head)),
-    O.map(({ txID }) => txID)
+    O.map(({ txID }) => txID),
+    // Filter out empty strings
+    O.filter((id) => !!id)
   )
 }
 
@@ -33,5 +35,13 @@ export const renderDate = (date: Date) => (
     <FormattedTime hour="2-digit" minute="2-digit" hour12={false} value={date} />
   </Styled.DateContainer>
 )
+
+export const getRowKey = (action: PoolAction) =>
+  FP.pipe(
+    action,
+    getTxId,
+    O.map(FP.identity),
+    O.getOrElse(() => `${action.date.toString()}-${action.type}`)
+  )
 
 export const emptyData: PoolActionsHistoryPage = { total: 0, actions: [] as PoolActions }

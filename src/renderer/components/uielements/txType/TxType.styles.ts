@@ -1,3 +1,4 @@
+import { UpCircleOutlined } from '@ant-design/icons/lib'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -23,7 +24,15 @@ export const IconContainer = styled.span`
   width: 30px;
   height: 30px;
 
-  > svg {
+  svg {
     stroke: ${palette('primary', 0)};
+  }
+`
+
+export const UpgradeIcon = styled(UpCircleOutlined)`
+  svg {
+    width: 20px;
+    height: 20px;
+    fill: ${palette('primary', 0)};
   }
 `
