@@ -28,6 +28,8 @@ const getIcon = (type: MidgardTxType) => {
       return <DonateIcon />
     case 'REFUND':
       return <RefundIcon />
+    case 'SWITCH':
+      return <Styled.UpgradeIcon />
     default:
       return <></>
   }
