@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
+import * as Client from '@xchainjs/xchain-client'
 import { getDefaultExplorerTxUrl } from '@xchainjs/xchain-thorchain'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -10,7 +11,6 @@ import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../../shared/api/types'
 import { PoolActionsHistory } from '../../../components/poolActionsHistory'
 import { Filter } from '../../../components/poolActionsHistory/types'
 import { useAppContext } from '../../../contexts/AppContext'
@@ -18,8 +18,7 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { liveData } from '../../../helpers/rx/liveData'
-import { getClientNetwork } from '../../../services/clients'
-import { DEFAULT_NETWORK, ENABLED_CHAINS } from '../../../services/const'
+import { DEFAULT_CLIENT_NETWORK, ENABLED_CHAINS } from '../../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS } from '../../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage } from '../../../services/midgard/types'
 
@@ -34,8 +33,8 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
 
   const { getExplorerTxUrl$ } = useThorchainContext()
 
-  const { network$ } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+  const { clientNetwork$ } = useAppContext()
+  const clientNetwork = useObservableState<Client.Network>(clientNetwork$, DEFAULT_CLIENT_NETWORK)
 
   const addresses$ = useMemo<Rx.Observable<Address[]>>(
     () =>
@@ -103,17 +102,12 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
     (txId: string) => {
       FP.pipe(
         oExplorerUrl,
-        O.alt(() =>
-          O.some((txId: string) => {
-            const clientNetwork = getClientNetwork(network)
-            return getDefaultExplorerTxUrl(clientNetwork, txId)
-          })
-        ),
+        O.alt(() => O.some((txId: string) => getDefaultExplorerTxUrl(clientNetwork, txId))),
         O.ap(O.some(txId)),
         O.map(window.apiUrl.openExternal)
       )
     },
-    [network, oExplorerUrl]
+    [clientNetwork, oExplorerUrl]
   )
 
   return (
