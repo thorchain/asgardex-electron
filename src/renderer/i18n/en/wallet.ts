@@ -19,7 +19,7 @@ const wallet: WalletMessages = {
   'wallet.connect.instruction': 'Please connect your wallet',
   'wallet.unlock.title': 'Unlock your wallet',
   'wallet.unlock.instruction': 'Please unlock your wallet',
-  'wallet.unlock.phrase': 'Enter your your phrase',
+  'wallet.unlock.phrase': 'Enter your phrase',
   'wallet.unlock.error': 'Could not unlock the wallet. Please check you password and try it again',
   'wallet.imports.keystore.select': 'select keystore file',
   'wallet.imports.keystore.upload': 'Choose file to upload',
