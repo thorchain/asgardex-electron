@@ -7,11 +7,14 @@ import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { PoolActionsHistory } from '../../components/poolActionsHistory'
 import { Filter } from '../../components/poolActionsHistory/types'
+import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { liveData } from '../../helpers/rx/liveData'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../services/midgard/types'
 
@@ -33,6 +36,13 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
   } = useMidgardContext()
 
   const { getExplorerTxUrl$ } = useThorchainContext()
+
+  /**
+   * TODO @asgdxteam Remove `network` param
+   * after https://github.com/xchainjs/xchainjs-lib/issues/287 is resolved
+   */
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const prevActionsPage = useRef<O.Option<PoolActionsHistoryPage>>(O.none)
 
@@ -95,12 +105,14 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
          * todo @asgardexTeam use appropriate independent method from xchain-thorchain
          * after https://github.com/xchainjs/xchainjs-lib/issues/287 is resolved
          */
-        O.alt(() => O.some((txId: string) => `https://testnet.thorchain.net/#/txs/${txId}`)),
+        O.alt(() =>
+          O.some((txId: string) => `https://${network === 'testnet' ? 'testnet.' : ''}thorchain.net/#/txs/${txId}`)
+        ),
         O.ap(O.some(txId)),
         O.map(window.apiUrl.openExternal)
       )
     },
-    [oExplorerUrl]
+    [oExplorerUrl, network]
   )
 
   return (
