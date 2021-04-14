@@ -173,7 +173,8 @@ describe('PoolActionsHistory.helper', () => {
       ).toEqual('inId')
     })
 
-    it('should return default value in case there is no txId (`dateTimrStamp-action.type`)', () => {
+    it('should return default value in case there is no txId (`action.date-action.type`)', () => {
+      // Date(0) is a default date property value for defaultPoolAction
       expect(getRowKey(defaultPoolAction)).toEqual(`${new Date(0)}-SWAP`)
     })
   })
