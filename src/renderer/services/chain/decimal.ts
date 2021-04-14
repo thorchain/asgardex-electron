@@ -20,7 +20,6 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../shared/api/types'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { getERC20Decimal } from '../ethereum/common'
-import { toThorNetwork } from '../thorchain/common'
 import { AssetWithDecimalLD } from './types'
 
 const getDecimal = (asset: Asset, network: Network): Promise<number> => {
@@ -34,7 +33,6 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
     case THORChain:
       return Promise.resolve(THORCHAIN_DECIMAL)
     case PolkadotChain: {
-      const _thorNetwork = toThorNetwork(network)
       // return Promise.resolve(getDecimalDot(thorNetwork))
       return Promise.reject('Polkadot is not supported yet')
     }

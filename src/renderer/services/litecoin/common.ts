@@ -1,4 +1,3 @@
-import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import { Client, NodeAuth } from '@xchainjs/xchain-litecoin'
 import * as FP from 'fp-ts/function'
 import { right, left } from 'fp-ts/lib/Either'
@@ -8,23 +7,11 @@ import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
 import { envOrDefault } from '../../helpers/envHelper'
-import { network$ } from '../app/service'
+import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { Client$, ClientState } from './types'
-
-/**
- * Litecoin network depending on selected `Network`
- */
-const litecoinNetwork$: Observable<ClientNetwork> = network$.pipe(
-  map((network) => {
-    // In case of 'chaosnet' + 'mainnet` we stick on `mainnet`
-    if (network === 'chaosnet') return 'mainnet'
-
-    return network
-  })
-)
 
 const LTC_NODE_TESTNET_URL = envOrDefault(
   process.env.REACT_APP_LTC_NODE_TESTNET_URL,
@@ -43,7 +30,7 @@ const NODE_AUTH: NodeAuth = {
  * By the other hand: Whenever a phrase is removed, the client will be set to `none`
  * A LitecoinClient will never be created if a phrase is not available
  */
-const clientState$ = Rx.combineLatest([keystoreService.keystore$, litecoinNetwork$]).pipe(
+const clientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$]).pipe(
   mergeMap(
     ([keystore, network]) =>
       new Observable((observer: Observer<ClientState>) => {
@@ -53,7 +40,7 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, litecoinNetwor
             try {
               const nodeUrl = network === 'mainnet' ? LTC_NODE_MAINNET_URL : LTC_NODE_TESTNET_URL
               const client = new Client({
-                network: network,
+                network,
                 phrase,
                 nodeUrl,
                 nodeAuth: NODE_AUTH

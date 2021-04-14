@@ -1,5 +1,4 @@
 import { EtherscanProvider } from '@ethersproject/providers'
-import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import * as ETH from '@xchainjs/xchain-ethereum'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { right, left } from 'fp-ts/lib/Either'
@@ -11,25 +10,14 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { envOrDefault } from '../../helpers/envHelper'
-import { network$ } from '../app/service'
+import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { Address$, ExplorerUrl$, GetExplorerTxUrl$, GetExplorerAddressUrl$ } from '../clients/types'
 import { ClientStateForViews } from '../clients/types'
-import { getClient, getClientStateForViews } from '../clients/utils'
+import { getClient, getClientNetwork, getClientStateForViews } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$, Client$ } from './types'
-
-export const toEthNetwork = (network: Network) => {
-  // In case of 'chaosnet' + 'mainnet` we stick on `mainnet`
-  if (network === 'chaosnet') return 'mainnet'
-  return network
-}
-
-/**
- * Ethereum network depending on `Network`
- */
-const ethereumNetwork$: Observable<ClientNetwork> = network$.pipe(RxOp.map(toEthNetwork))
 
 const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
 const INFURA_PROJECT_ID = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_ID, '')
@@ -45,7 +33,7 @@ const ETHPLORER_API_URL = envOrDefault(process.env.REACT_APP_ETHPLORER_API_URL, 
  * By the other hand: Whenever a phrase has been removed, the client is set to `none`
  * A EthereumClient will never be created as long as no phrase is available
  */
-const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, ethereumNetwork$]).pipe(
+const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$]).pipe(
   RxOp.switchMap(
     ([keystore, network]) =>
       new Observable((observer: Observer<ClientState>) => {
@@ -127,7 +115,7 @@ const getDecimal = async (asset: Asset, network: Network): Promise<number> => {
     O.fromNullable,
     O.fold(
       async () => {
-        const ethNetwork = toEthNetwork(network)
+        const ethNetwork = getClientNetwork(network)
         const provider = new EtherscanProvider(ethNetwork, ETHERSCAN_API_KEY)
         try {
           const decimal = await ETH.getDecimal(asset, provider)

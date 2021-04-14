@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { getDefaultExplorerTxUrl } from '@xchainjs/xchain-thorchain'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -14,6 +15,7 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { liveData } from '../../helpers/rx/liveData'
+import { getClientNetwork } from '../../services/clients'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../services/midgard/types'
@@ -37,10 +39,6 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
 
   const { getExplorerTxUrl$ } = useThorchainContext()
 
-  /**
-   * TODO @asgdxteam Remove `network` param
-   * after https://github.com/xchainjs/xchainjs-lib/issues/287 is resolved
-   */
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
@@ -101,12 +99,11 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
     (txId: string) => {
       FP.pipe(
         oExplorerUrl,
-        /**
-         * todo @asgardexTeam use appropriate independent method from xchain-thorchain
-         * after https://github.com/xchainjs/xchainjs-lib/issues/287 is resolved
-         */
         O.alt(() =>
-          O.some((txId: string) => `https://${network === 'testnet' ? 'testnet.' : ''}thorchain.net/#/txs/${txId}`)
+          O.some((txId: string) => {
+            const clientNetwork = getClientNetwork(network)
+            return getDefaultExplorerTxUrl(clientNetwork, txId)
+          })
         ),
         O.ap(O.some(txId)),
         O.map(window.apiUrl.openExternal)

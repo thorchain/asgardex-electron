@@ -1,8 +1,10 @@
 import * as Rx from 'rxjs'
 import { startWith, mapTo, distinctUntilChanged } from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { observableState } from '../../helpers/stateHelper'
+import { getClientNetwork } from '../clients'
 import { DEFAULT_NETWORK } from '../const'
 import { OnlineStatus } from './types'
 
@@ -23,4 +25,6 @@ const { get$: getNetwork$, set: changeNetwork, get: getCurrentNetworkState } = o
 // So we do need a simple "dirty check" to provide "real" changes of selected network
 const network$ = getNetwork$.pipe(distinctUntilChanged())
 
-export { onlineStatus$, network$, changeNetwork, getCurrentNetworkState }
+const clientNetwork$ = network$.pipe(RxOp.map(getClientNetwork))
+
+export { onlineStatus$, network$, changeNetwork, getCurrentNetworkState, clientNetwork$ }

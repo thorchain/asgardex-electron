@@ -1,5 +1,4 @@
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
-import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -7,24 +6,12 @@ import * as Rx from 'rxjs'
 import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
-import { network$ } from '../app/service'
+import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { GetExplorerAddressUrl$ } from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState } from './types'
-
-/**
- * Bitcoin network depending on selected `Network`
- */
-const bitcoinNetwork$: Observable<ClientNetwork> = network$.pipe(
-  map((network) => {
-    // In case of 'chaosnet' + 'mainnet` we stick on `mainnet`
-    if (network === 'chaosnet') return 'mainnet'
-
-    return network
-  })
-)
 
 /**
  * Stream to create an observable BitcoinClient depending on existing phrase in keystore
@@ -33,16 +20,16 @@ const bitcoinNetwork$: Observable<ClientNetwork> = network$.pipe(
  * By the other hand: Whenever a phrase has been removed, the client is set to `none`
  * A BitcoinClient will never be created as long as no phrase is available
  */
-const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinNetwork$]).pipe(
+const clientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$]).pipe(
   mergeMap(
-    ([keystore, bitcoinNetwork]) =>
+    ([keystore, network]) =>
       new Observable((observer: Observer<ClientState>) => {
         const client: ClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
               const client = new BitcoinClient({
-                network: bitcoinNetwork,
+                network,
                 phrase
               })
               return O.some(right(client))

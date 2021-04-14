@@ -28,7 +28,7 @@ export const smallestAmountToSent = (chain: Chain, _network: Network): BaseAmoun
     case 'GAIA':
       return baseAmount(1, COSMOS_DECIMAL)
     case 'POLKA':
-      // return baseAmount(1, getDecimalDot(network === 'mainnet' ? 'mainnet' : 'testnet'))
+      // return baseAmount(1, getDecimalDot(getClientNetwork(network))
       throw Error('Polkadot is not supported yet')
     case 'BCH':
       // 1000 satoshi

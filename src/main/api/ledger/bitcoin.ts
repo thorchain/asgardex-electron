@@ -32,7 +32,7 @@
 //     const derive_path = getDerivePath(0)
 //     const { utxos, newTxHex } = await createTxInfo({
 //       ...txInfo,
-//       network: network === 'testnet' ? 'testnet' : 'mainnet'
+//       network: getClientNetwork(network)
 //     })
 //     const txs = utxos.map((utxo) => {
 //       return {

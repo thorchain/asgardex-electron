@@ -35,7 +35,7 @@
 // ): Promise<E.Either<LedgerErrorId, string>> => {
 //   try {
 //     const { sender, recipient, asset, amount, memo } = txInfo
-//     const client = new Client({ network: network === 'testnet' ? 'testnet' : 'mainnet' })
+//     const client = new Client({ network: getClientNetwork(network)})
 //     const app = new AppBNB(transport)
 //     const derive_path = getDerivePath(0)
 //     const hpr = network === 'testnet' ? 'tbnb' : 'bnb' // This will be replaced later with "const hpr = client.getPrefix()"
