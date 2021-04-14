@@ -75,7 +75,7 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
 
   const rules: Rule[] = useMemo(
     () => [
-      { required: true },
+      { required: true, message: intl.formatMessage({ id: 'wallet.validations.shouldNotBeEmpty' }) },
       ({ getFieldValue }) => ({
         validator(_, value) {
           if (!value || getFieldValue('password') === value) {
