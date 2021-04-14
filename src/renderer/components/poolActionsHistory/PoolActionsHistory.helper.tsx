@@ -15,7 +15,9 @@ export const getTxId = (action: PoolAction): O.Option<TxHash> => {
     action.in,
     A.head,
     O.alt(() => FP.pipe(action.out, A.head)),
-    O.map(({ txID }) => txID)
+    O.map(({ txID }) => txID),
+    // Filter out empty strings
+    O.filter((id) => !!id)
   )
 }
 

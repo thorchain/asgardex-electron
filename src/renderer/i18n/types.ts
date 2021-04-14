@@ -70,6 +70,7 @@ export type CommonMessageKey =
   | 'common.tx.type.donate'
   | 'common.tx.type.deposit'
   | 'common.tx.type.withdraw'
+  | 'common.tx.type.upgrade'
   | 'common.time.week'
   | 'common.time.all'
 

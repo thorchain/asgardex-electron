@@ -142,6 +142,7 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   const [filter, setFilter] = useState<Filter>('ALL')
   return (
     <PoolActionsHistory
+      availableFilters={['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']}
       currentFilter={filter}
       setFilter={setFilter}
       goToTx={console.log}

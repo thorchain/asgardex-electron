@@ -28,6 +28,8 @@ const DEFAULT_REQUEST_PARAMS = {
   itemsPerPage: 5
 }
 
+const HISTORY_FILTERS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
+
 export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
   const {
     service: {
@@ -124,6 +126,7 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
       goToTx={goToTx}
       changePaginationHandler={setCurrentPage}
       currentFilter={requestParams.type || 'ALL'}
+      availableFilters={HISTORY_FILTERS}
       setFilter={setFilter}
     />
   )

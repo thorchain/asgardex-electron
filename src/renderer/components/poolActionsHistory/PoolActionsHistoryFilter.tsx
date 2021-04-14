@@ -15,16 +15,21 @@ type Props = {
   currentFilter: Filter
   onFilterChanged: (targetFilter: Filter) => void
   disabled?: boolean
+  availableFilters: Filter[]
 }
 
-const FILTER_ITEMS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
-
-export const PoolActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFilterChanged, className, disabled }) => {
+export const PoolActionsHistoryFilter: React.FC<Props> = ({
+  currentFilter,
+  onFilterChanged,
+  className,
+  disabled,
+  availableFilters
+}) => {
   const intl = useIntl()
   const activeFilterIndex = useMemo(() => {
-    const index = FILTER_ITEMS.indexOf(currentFilter)
+    const index = availableFilters.indexOf(currentFilter)
     return index > -1 ? index : 0
-  }, [currentFilter])
+  }, [currentFilter, availableFilters])
 
   const allItemContent = useMemo(
     () => (
@@ -37,9 +42,9 @@ export const PoolActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFil
 
   const menu = useMemo(() => {
     return (
-      <Styled.Menu selectedKeys={[FILTER_ITEMS[activeFilterIndex]]}>
+      <Styled.Menu selectedKeys={[availableFilters[activeFilterIndex]]}>
         {FP.pipe(
-          FILTER_ITEMS,
+          availableFilters,
           A.map((filter) => {
             const content = filter === 'ALL' ? allItemContent : <TxType type={filter} />
             return (
@@ -51,7 +56,7 @@ export const PoolActionsHistoryFilter: React.FC<Props> = ({ currentFilter, onFil
         )}
       </Styled.Menu>
     )
-  }, [activeFilterIndex, onFilterChanged, allItemContent])
+  }, [activeFilterIndex, onFilterChanged, allItemContent, availableFilters])
 
   return (
     <Dropdown overlay={menu} trigger={['click']} disabled={disabled}>

@@ -19,6 +19,8 @@ import { ENABLED_CHAINS } from '../../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS } from '../../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage } from '../../../services/midgard/types'
 
+const HISTORY_FILTERS: Filter[] = ['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
+
 export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ className }) => {
   const {
     service: {
@@ -118,6 +120,7 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
       changePaginationHandler={setCurrentPage}
       currentFilter={requestParams.type || 'ALL'}
       setFilter={setFilter}
+      availableFilters={HISTORY_FILTERS}
     />
   )
 }

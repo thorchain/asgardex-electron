@@ -56,7 +56,8 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
   currentPage,
   currentFilter,
   setFilter,
-  className
+  className,
+  availableFilters
 }) => {
   const renderListItem = useMemo(() => renderItem(goToTx), [goToTx])
   const renderList = useCallback(
@@ -82,6 +83,7 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
   return (
     <div className={className}>
       <Styled.ActionsFilter
+        availableFilters={availableFilters}
         currentFilter={currentFilter}
         onFilterChanged={setFilter}
         disabled={!RD.isSuccess(actionsPageRD)}

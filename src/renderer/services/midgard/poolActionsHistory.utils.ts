@@ -15,6 +15,7 @@ export const getTxType = (apiString: string): TxType => {
     case 'WITHDRAW':
     case 'DONATE':
     case 'REFUND':
+    case 'SWITCH':
       return type
     case 'ADDLIQUIDITY':
       return 'DEPOSIT'
@@ -30,6 +31,7 @@ export const getRequestType = (type?: TxType | 'ALL'): string | undefined => {
     case 'DEPOSIT': {
       return 'addLiquidity'
     }
+    case 'SWITCH':
     case 'SWAP':
     case 'WITHDRAW':
     case 'DONATE':
