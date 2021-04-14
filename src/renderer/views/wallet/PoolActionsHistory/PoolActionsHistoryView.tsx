@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
+import * as Client from '@xchainjs/xchain-client'
+import { getDefaultExplorerTxUrl } from '@xchainjs/xchain-thorchain'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -11,11 +13,12 @@ import * as RxOp from 'rxjs/operators'
 
 import { PoolActionsHistory } from '../../../components/poolActionsHistory'
 import { Filter } from '../../../components/poolActionsHistory/types'
+import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { liveData } from '../../../helpers/rx/liveData'
-import { ENABLED_CHAINS } from '../../../services/const'
+import { DEFAULT_CLIENT_NETWORK, ENABLED_CHAINS } from '../../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS } from '../../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage } from '../../../services/midgard/types'
 
@@ -31,6 +34,9 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
   const { addressByChain$ } = useChainContext()
 
   const { getExplorerTxUrl$ } = useThorchainContext()
+
+  const { clientNetwork$ } = useAppContext()
+  const clientNetwork = useObservableState<Client.Network>(clientNetwork$, DEFAULT_CLIENT_NETWORK)
 
   const addresses$ = useMemo<Rx.Observable<Address[]>>(
     () =>
@@ -98,16 +104,12 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
     (txId: string) => {
       FP.pipe(
         oExplorerUrl,
-        /**
-         * todo @asgardexTeam use appropriate independent method from xchain-thorchain
-         * after https://github.com/xchainjs/xchainjs-lib/issues/287 is resolved
-         */
-        O.alt(() => O.some((txId: string) => `https://testnet.thorchain.net/#/txs/${txId}`)),
+        O.alt(() => O.some((txId: string) => getDefaultExplorerTxUrl(clientNetwork, txId))),
         O.ap(O.some(txId)),
         O.map(window.apiUrl.openExternal)
       )
     },
-    [oExplorerUrl]
+    [clientNetwork, oExplorerUrl]
   )
 
   return (

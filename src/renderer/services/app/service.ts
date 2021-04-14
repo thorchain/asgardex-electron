@@ -1,8 +1,11 @@
+import * as Client from '@xchainjs/xchain-client'
 import * as Rx from 'rxjs'
 import { startWith, mapTo, distinctUntilChanged } from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { observableState } from '../../helpers/stateHelper'
+import { getClientNetwork } from '../clients'
 import { DEFAULT_NETWORK } from '../const'
 import { OnlineStatus } from './types'
 
@@ -21,6 +24,8 @@ const { get$: getNetwork$, set: changeNetwork, get: getCurrentNetworkState } = o
 // Since `network$` based on `observableState` and it takes an initial value,
 // it might emit same values, we don't interested in.
 // So we do need a simple "dirty check" to provide "real" changes of selected network
-const network$ = getNetwork$.pipe(distinctUntilChanged())
+const network$: Rx.Observable<Network> = getNetwork$.pipe(distinctUntilChanged())
 
-export { onlineStatus$, network$, changeNetwork, getCurrentNetworkState }
+const clientNetwork$: Rx.Observable<Client.Network> = network$.pipe(RxOp.map(getClientNetwork))
+
+export { onlineStatus$, network$, changeNetwork, getCurrentNetworkState, clientNetwork$ }

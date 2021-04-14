@@ -1,5 +1,4 @@
 import { Client as BitcoinCashClient, ClientUrl, NodeAuth } from '@xchainjs/xchain-bitcoincash'
-import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -8,24 +7,12 @@ import { Observable, Observer } from 'rxjs'
 import { map, mergeMap, shareReplay } from 'rxjs/operators'
 
 import { envOrDefault } from '../../helpers/envHelper'
-import { network$ } from '../app/service'
+import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { GetExplorerAddressUrl$ } from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState } from './types'
-
-/**
- * Bitcoin Cash network depending on selected `Network`
- */
-const bitcoinCashNetwork$: Observable<ClientNetwork> = network$.pipe(
-  map((network) => {
-    // In case of 'chaosnet' + 'mainnet` we stick on `mainnet`
-    if (network === 'chaosnet') return 'mainnet'
-
-    return network
-  })
-)
 
 const HASKOIN_API_URL: ClientUrl = {
   testnet: envOrDefault(process.env.REACT_APP_HASKOIN_TESTNET_URL, 'https://api.haskoin.com/bchtest'),
@@ -49,16 +36,16 @@ const NODE_AUTH: NodeAuth = {
  * By the other hand: Whenever a phrase has been removed, the client is set to `none`
  * A BitcoinCashClient will never be created as long as no phrase is available
  */
-const clientState$ = Rx.combineLatest([keystoreService.keystore$, bitcoinCashNetwork$]).pipe(
+const clientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$]).pipe(
   mergeMap(
-    ([keystore, bitcoinCashNetwork]) =>
+    ([keystore, network]) =>
       new Observable((observer: Observer<ClientState>) => {
         const client: ClientState = FP.pipe(
           getPhrase(keystore),
           O.chain((phrase) => {
             try {
               const client = new BitcoinCashClient({
-                network: bitcoinCashNetwork,
+                network,
                 haskoinUrl: HASKOIN_API_URL,
                 nodeUrl: NODE_URL,
                 nodeAuth: NODE_AUTH,
