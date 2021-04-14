@@ -26,7 +26,6 @@ export const IconContainer = styled.span`
 
   svg {
     stroke: ${palette('primary', 0)};
-    fill: ${palette('primary', 0)};
   }
 `
 
@@ -34,5 +33,6 @@ export const UpgradeIcon = styled(UpCircleOutlined)`
   svg {
     width: 20px;
     height: 20px;
+    fill: ${palette('primary', 0)};
   }
 `
