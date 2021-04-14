@@ -36,4 +36,12 @@ export const renderDate = (date: Date) => (
   </Styled.DateContainer>
 )
 
+export const getRowKey = (action: PoolAction) =>
+  FP.pipe(
+    action,
+    getTxId,
+    O.map(FP.identity),
+    O.getOrElse(() => `${action.date.toString()}-${action.type}`)
+  )
+
 export const emptyData: PoolActionsHistoryPage = { total: 0, actions: [] as PoolActions }
