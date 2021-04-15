@@ -10,6 +10,7 @@ import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
 import { PoolActionsHistory } from '../../components/poolActionsHistory'
+import { DEFAULT_PAGE_SIZE } from '../../components/poolActionsHistory/PoolActionsHistory.const'
 import { Filter } from '../../components/poolActionsHistory/types'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -26,7 +27,7 @@ type Props = {
 
 const DEFAULT_REQUEST_PARAMS = {
   ...DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS,
-  itemsPerPage: 5
+  itemsPerPage: DEFAULT_PAGE_SIZE
 }
 
 const HISTORY_FILTERS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
@@ -78,7 +79,7 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
 
   const setCurrentPage = useCallback(
     (page: number) => {
-      loadActionsHistory({ page: page - 1 })
+      loadActionsHistory({ itemsPerPage: DEFAULT_PAGE_SIZE, page: page - 1 })
     },
     [loadActionsHistory]
   )

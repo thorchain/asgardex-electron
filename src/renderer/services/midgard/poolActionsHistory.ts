@@ -21,11 +21,12 @@ export type LoadActionsParams = {
   txid?: TxHash
   asset?: string
   type?: TxType | 'ALL'
-  itemsPerPage?: number
+  itemsPerPage: number
 }
 
 export const DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS: LoadActionsParams = {
-  page: 0
+  page: 0,
+  itemsPerPage: MAX_ITEMS_PER_PAGE
 }
 
 export const createPoolActionsHistoryService = (
@@ -59,8 +60,8 @@ export const createPoolActionsHistoryService = (
             ...params,
             address: addresses ? addresses.join(',') : undefined,
             type: getRequestType(type),
-            limit: itemsPerPage || MAX_ITEMS_PER_PAGE,
-            offset: (itemsPerPage || MAX_ITEMS_PER_PAGE) * page
+            limit: itemsPerPage,
+            offset: itemsPerPage * page
           }),
           RxOp.catchError((): Rx.Observable<InlineResponse200> => Rx.of({ actions: [], count: '0' })),
           RxOp.map(RD.success),
