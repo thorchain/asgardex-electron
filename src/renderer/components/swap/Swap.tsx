@@ -942,10 +942,15 @@ export const Swap = ({
   const canSwitchAssets = useMemo(() => {
     const hasBalances = FP.pipe(
       walletBalances,
-      O.map(A.map(({ asset }) => asset)),
       (oAssetSymbols) => sequenceTOption(oAssetSymbols, targetAsset),
-      O.map(([balances, targetAsset]) => FP.pipe(balances, A.elem(eqAsset)(targetAsset))),
-      O.getOrElse(() => true)
+      O.chain(([balances, targetAsset]) =>
+        FP.pipe(
+          balances,
+          A.findFirst(({ asset }) => eqAsset.equals(asset, targetAsset))
+        )
+      ),
+      O.map(({ amount }) => !eqBaseAmount.equals(amount, ZERO_BASE_AMOUNT)),
+      O.getOrElse(() => false)
     )
 
     // no switch if no balances or while switching assets
