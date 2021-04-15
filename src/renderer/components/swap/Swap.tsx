@@ -498,6 +498,13 @@ export const Swap = ({
 
     return FP.pipe(
       allAssets,
+      A.filter((asset) =>
+        FP.pipe(
+          assetsToSwap,
+          O.map(({ source, target }) => !eqAsset.equals(asset, source) && !eqAsset.equals(asset, target)),
+          O.getOrElse((): boolean => false)
+        )
+      ),
       A.filterMap((availableAsset) =>
         FP.pipe(
           allBalances,
@@ -530,7 +537,7 @@ export const Swap = ({
       ),
       A.flatten
     )
-  }, [walletBalances, allAssets])
+  }, [walletBalances, allAssets, assetsToSwap])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
