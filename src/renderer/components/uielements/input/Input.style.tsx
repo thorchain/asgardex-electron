@@ -77,6 +77,10 @@ const inputStyle = css<InputProps>`
   .ant-form-item-has-error {
     border-color: ${({ typevalue = 'normal' }) => (typevalue === 'ghost' ? 'transparent' : colors['error'])} !important;
   }
+
+  .ant-input {
+    background-color: inherit !important;
+  }
 `
 
 export const Input = styled(A.Input)<InputProps>`
