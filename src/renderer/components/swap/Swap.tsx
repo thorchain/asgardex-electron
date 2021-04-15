@@ -18,9 +18,10 @@ import {
   assetToBase
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
-import * as A from 'fp-ts/lib/Array'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/Array'
+import * as FP from 'fp-ts/function'
+import * as NEA from 'fp-ts/NonEmptyArray'
+import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
@@ -37,7 +38,7 @@ import {
   to1e8BaseAmount
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
-import { eqAsset, eqBaseAmount, eqOAsset } from '../../helpers/fp/eq'
+import { eqAsset, eqBaseAmount, eqChain, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
@@ -482,7 +483,7 @@ export const Swap = ({
       O.map(({ source, target }) =>
         FP.pipe(
           filteredBalances,
-          A.filter((balance) => balance.asset.symbol !== source.symbol && balance.asset.symbol !== target.symbol)
+          A.filter((balance) => !eqAsset.equals(balance.asset, source) && !eqAsset.equals(balance.asset, target))
         )
       ),
       O.getOrElse(() => allBalances)
@@ -490,17 +491,46 @@ export const Swap = ({
   }, [assetsToSwap, assetSymbolsInWallet, allBalances])
 
   const balancesToSwapTo = useMemo((): WalletBalances => {
+    const allBalances = FP.pipe(
+      walletBalances,
+      O.getOrElse((): WalletBalances => [])
+    )
+
     return FP.pipe(
-      assetsToSwap,
-      O.map(({ source, target }) =>
+      allAssets,
+      A.filterMap((availableAsset) =>
         FP.pipe(
           allBalances,
-          A.filter((balance) => balance.asset.symbol !== source.symbol && balance.asset.symbol !== target.symbol)
+          // Looking for asset's balances. Possible duplications of assets caused by different WalletTypes
+          A.filter(({ asset }) => eqAsset.equals(asset, availableAsset)),
+          NEA.fromArray,
+          O.alt(() =>
+            /*
+             * !!! IMPORTANT NOTE !!!
+             * Right now this peace of code will work incorrectly in case
+             * of adding another wallet types (e.g. Ledger).
+             * TODO (@asgardex-team) play around with a way to handle different wallet-types
+             * */
+            FP.pipe(
+              allBalances,
+              // If there was not found any WalletBalance get the first asset with the
+              // same chain and use its walletAddress as this is a single common wallet
+              A.findFirst(({ asset }) => eqChain.equals(asset.chain, availableAsset.chain)),
+              // And set available balance amount as Zero Value as user does not have any balances for this asset at all
+              O.map((balance) => [
+                {
+                  asset: availableAsset,
+                  walletAddress: balance.walletAddress,
+                  amount: ZERO_BASE_AMOUNT
+                }
+              ])
+            )
+          )
         )
       ),
-      O.getOrElse(() => allBalances)
+      A.flatten
     )
-  }, [assetsToSwap, allBalances])
+  }, [walletBalances, allAssets])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
