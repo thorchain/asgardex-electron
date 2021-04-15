@@ -6,13 +6,13 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
-import { MAX_ITEMS_PER_PAGE } from '../../services/const'
 import { PoolActionsHistoryPage, PoolAction } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { ErrorView } from '../shared/error'
 import * as CommonStyled from '../uielements/common/Common.style'
 import { Pagination } from '../uielements/pagination'
 import { TxDetail } from '../uielements/txDetail'
+import { DEFAULT_PAGE_SIZE } from './PoolActionsHistory.const'
 import * as H from './PoolActionsHistory.helper'
 import * as Styled from './PoolActionsHistoryTable.styles'
 import { Props } from './types'
@@ -123,7 +123,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
             <Pagination
               current={currentPage}
               total={total}
-              defaultPageSize={MAX_ITEMS_PER_PAGE}
+              defaultPageSize={DEFAULT_PAGE_SIZE}
               showSizeChanger={false}
               onChange={changePaginationHandler}
             />

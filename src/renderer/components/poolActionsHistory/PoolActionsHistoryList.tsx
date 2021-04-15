@@ -4,11 +4,11 @@ import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
-import { MAX_ITEMS_PER_PAGE } from '../../services/const'
 import { PoolAction, PoolActionsHistoryPage } from '../../services/midgard/types'
 import { ErrorView } from '../shared/error'
 import { Pagination } from '../uielements/pagination'
 import { TxDetail } from '../uielements/txDetail'
+import { DEFAULT_PAGE_SIZE } from './PoolActionsHistory.const'
 import * as H from './PoolActionsHistory.helper'
 import * as Styled from './PoolActionsHistoryList.styles'
 import { Props } from './types'
@@ -62,7 +62,7 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
             <Pagination
               current={currentPage}
               total={total}
-              defaultPageSize={MAX_ITEMS_PER_PAGE}
+              defaultPageSize={DEFAULT_PAGE_SIZE}
               showSizeChanger={false}
               onChange={changePaginationHandler}
             />
