@@ -1007,7 +1007,7 @@ export const Swap = ({
                     onSelect={setSourceAsset}
                     asset={asset}
                     balances={balancesToSwapFrom}
-                    disabled={!canSwitchAssets}
+                    disabled={pendingSwitchAssets}
                     network={network}
                   />
                 )
@@ -1036,7 +1036,7 @@ export const Swap = ({
                     onSelect={setTargetAsset}
                     asset={asset}
                     balances={balancesToSwapTo}
-                    disabled={!canSwitchAssets}
+                    disabled={pendingSwitchAssets}
                     network={network}
                   />
                 )
