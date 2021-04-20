@@ -16,6 +16,7 @@ const EXTERNALS_WHITELIST = [
   'dex.binance.org',
   'testnet-dex.binance.org',
   'runestake.info',
+  'runeyield.info',
   'etherscan.io',
   'ropsten.etherscan.io',
   'tltc.bitaps.com',

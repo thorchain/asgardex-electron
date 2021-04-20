@@ -64,6 +64,7 @@ export type CommonMessageKey =
   | 'common.detail'
   | 'common.filter'
   | 'common.all'
+  | 'common.analytics'
   | 'common.asset.base'
   | 'common.tx.type.swap'
   | 'common.tx.type.refund'

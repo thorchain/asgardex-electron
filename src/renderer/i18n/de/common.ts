@@ -61,6 +61,7 @@ const common: CommonMessages = {
   'common.value': 'Wert',
   'common.modal.confirmTitle': 'Bestätige die Aktion',
   'common.manage': 'Manage',
+  'common.analytics': 'Analyse',
   'common.asset.base': 'Base',
   'common.tx.type.swap': 'Swap',
   'common.tx.type.donate': 'Spenden',
