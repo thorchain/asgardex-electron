@@ -4,6 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { FeeRates } from '@xchainjs/xchain-bitcoin'
 import { Fees } from '@xchainjs/xchain-client'
+import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import {
   assetAmount,
   AssetLTC,
@@ -14,7 +15,6 @@ import {
 } from '@xchainjs/xchain-util'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
-import { LTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { SendTxParams } from '../../../../services/chain/types'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormLTC as Component, Props as ComponentProps } from './SendFormLTC'

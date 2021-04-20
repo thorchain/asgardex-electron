@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOptionKey } from '@xchainjs/xchain-client'
+import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import { FeesWithRates } from '@xchainjs/xchain-litecoin/lib/types/client-types'
 import {
   assetAmount,
@@ -22,7 +23,6 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
-import { LTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { Memo, SendTxParams } from '../../../../services/chain/types'
 import { WalletBalances } from '../../../../services/clients'
 import { AddressValidation, FeesWithRatesRD } from '../../../../services/litecoin/types'
