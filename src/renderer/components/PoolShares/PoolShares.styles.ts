@@ -71,6 +71,7 @@ export const TextLabel = styled(UILabel).attrs({ textTransform: 'uppercase' })`
 `
 
 export const InfoDescription = styled.div`
+  text-transform: uppercase;
   padding-left: 30px;
   font-size: 16px;
   color: ${palette('gray', 2)};

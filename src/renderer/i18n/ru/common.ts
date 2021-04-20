@@ -61,6 +61,7 @@ const common: CommonMessages = {
   'common.modal.confirmTitle': 'Подтвердите действие',
   'common.value': 'Количество',
   'common.manage': 'Управлять',
+  'common.analytics': 'Analytics - RU',
   'common.asset.base': 'Базовый',
   'common.tx.type.swap': 'Обмен',
   'common.tx.type.donate': 'Донат',

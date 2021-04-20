@@ -61,6 +61,7 @@ const common: CommonMessages = {
   'common.modal.confirmTitle': "Confirmer l'action",
   'common.value': 'Valeur',
   'common.manage': 'Gérer',
+  'common.analytics': 'Analytics - FR',
   'common.asset.base': 'Base',
   'common.tx.type.swap': 'Échange',
   'common.tx.type.donate': 'Don',

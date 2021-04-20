@@ -19,7 +19,6 @@ import { Button } from '../../components/uielements/button'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { isThorChain } from '../../helpers/chainHelper'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { DEFAULT_NETWORK, ENABLED_CHAINS } from '../../services/const'
@@ -41,8 +40,6 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     shares: { combineSharesByAddresses$ }
   } = midgardService
 
-  const thorchainContext = useThorchainContext()
-  const oRuneAddress = useObservableState(thorchainContext.address$, O.none)
   const { addressByChain$ } = useChainContext()
 
   useEffect(() => {
@@ -88,11 +85,8 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const previousPoolShares = useRef<O.Option<PoolShareTableRowData[]>>(O.none)
 
   const goToStakeInfo = useCallback(() => {
-    FP.pipe(
-      oRuneAddress,
-      O.map((address) => window.apiUrl.openExternal(`https://runestake.info/home?address=${address}`))
-    )
-  }, [oRuneAddress])
+    window.apiUrl.openExternal(`https://runeyield.info`)
+  }, [])
 
   const renderPoolSharesTable = useCallback(
     (data: PoolShareTableRowData[], loading: boolean) => {

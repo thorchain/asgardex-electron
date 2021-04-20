@@ -17,7 +17,6 @@ import { Network } from '../../../shared/api/types'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { AssetLabel } from '../uielements/assets/assetLabel'
 import { Label } from '../uielements/label'
-import * as H from './helpers'
 import * as Styled from './PoolShares.styles'
 import { PoolShareTableRowData, PoolShareTableData } from './PoolShares.types'
 
@@ -138,6 +137,19 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
     manageColumn
   ])
 
+  const renderAnalyticsInfo = useMemo(() => {
+    return network !== 'testnet' ? (
+      <>
+        <Styled.InfoButton onClick={goToStakeInfo}>
+          <Styled.TextLabel>{intl.formatMessage({ id: 'common.analytics' })}</Styled.TextLabel> <Styled.InfoArrow />
+        </Styled.InfoButton>
+        <Styled.InfoDescription>runeyield.info</Styled.InfoDescription>
+      </>
+    ) : (
+      <></>
+    )
+  }, [goToStakeInfo, intl, network])
+
   return (
     <Styled.Container>
       <Styled.Table
@@ -146,7 +158,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
         dataSource={data}
         rowKey={({ asset }) => asset.symbol}
       />
-      <H.StakeInfo goToStakeInfo={goToStakeInfo} />
+      {renderAnalyticsInfo}
     </Styled.Container>
   )
 }
