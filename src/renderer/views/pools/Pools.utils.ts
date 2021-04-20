@@ -1,5 +1,15 @@
 import { PoolData, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
-import { bnOrZero, baseAmount, assetFromString, Asset, AssetRuneNative, assetToString } from '@xchainjs/xchain-util'
+import {
+  bnOrZero,
+  baseAmount,
+  assetFromString,
+  Asset,
+  AssetRuneNative,
+  assetToString,
+  assetToBase,
+  assetAmount,
+  BaseAmount
+} from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import { eqString } from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
@@ -8,7 +18,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ZERO_BASE_AMOUNT } from '../../const'
-import { isChainAsset, isUSDAsset } from '../../helpers/assetHelper'
+import { isBtcAsset, isChainAsset, isEthAsset, isUSDAsset, isEthTokenAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LastblockItems, PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
@@ -141,4 +151,29 @@ export const filterTableData = (oFilter: O.Option<PoolFilter> = O.none) => (
     ),
     O.getOrElse(() => tableData)
   )
+}
+
+export const minPoolTxAmount = ({
+  asset,
+  decimal,
+  network
+}: {
+  asset: Asset
+  decimal: number
+  network: Network
+}): BaseAmount => {
+  let value = 0
+
+  // testnet: zero min. value
+  if (network === 'testnet') value = 0
+  // BTC $200
+  else if (isBtcAsset(asset)) value = 200
+  // ETH $50
+  else if (isEthAsset(asset)) value = 50
+  // ERC20 $100
+  else if (isEthTokenAsset(asset)) value = 100
+  // anything else $10
+  else value = 10
+
+  return assetToBase(assetAmount(value, decimal))
 }
