@@ -1,5 +1,6 @@
 import React, { useRef, useState, RefObject, useCallback, useMemo, useEffect } from 'react'
 
+import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import {
   bn,
   Asset,
@@ -17,7 +18,7 @@ import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
-import { BTC_DECIMAL, isBtcAsset } from '../../../../helpers/assetHelper'
+import { isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordWalletBalanceByAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'

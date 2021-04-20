@@ -47,28 +47,6 @@ export const THORCHAIN_DECIMAL = 8
  * */
 export const BNB_DECIMAL = 8
 
-/**
- * 1 BTC == 100,000,000 satoshi
- * 0.00000001 BTC == 1 satoshi
- * */
-export const BTC_DECIMAL = 8
-
-/**
- * 1 ether == 1,000,000,000,000,000,000 wei (1e18)
- * 0.000000000000000001 ether == 1 wei
- * */
-// TODO (@asgdx-devs) Use constant `ETH_DECIMAL` from `xchain-util` if available
-// see https://github.com/xchainjs/xchainjs-lib/issues/210
-export const ETH_DECIMAL = 18
-
-// TODO (@asgdx-devs) Use constant `BCH_DECIMAL` from `xchain-util` if available
-// see https://github.com/xchainjs/xchainjs-lib/issues/208
-export const BCH_DECIMAL = 8
-
-// TODO (@asgdx-devs) Use constant `LTC_DECIMAL` from `xchain-util` if available
-// see https://github.com/xchainjs/xchainjs-lib/issues/209
-export const LTC_DECIMAL = 8
-
 export const getBnbRuneAsset = (network: Network = 'testnet'): Asset => {
   return network === 'testnet' ? AssetRune67C : AssetRuneB1A
 }

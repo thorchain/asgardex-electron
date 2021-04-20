@@ -3,6 +3,7 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { FeeRates } from '@xchainjs/xchain-bitcoin'
+import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { Fees } from '@xchainjs/xchain-client'
 import {
   assetAmount,
@@ -14,7 +15,6 @@ import {
 } from '@xchainjs/xchain-util'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
-import { BTC_DECIMAL } from '../../../../helpers/assetHelper'
 import { SendTxParams } from '../../../../services/chain/types'
 import { WalletBalance } from '../../../../types/wallet'
 import { SendFormBTC as Component, Props as ComponentProps } from './SendFormBTC'
