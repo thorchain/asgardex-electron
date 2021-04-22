@@ -11,7 +11,7 @@ import * as Rx from 'rxjs'
 import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { WalletBalance } from '../../types/wallet'
-import { LoadTxsParams, WalletBalancesRD } from '../clients'
+import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
 
 export type WalletType = 'keystore' | 'ledger'
 
@@ -26,6 +26,7 @@ export type KeystoreContent = { phrase: Phrase }
  * (3) `Some<Some<KeystoreContent>>` -> UNLOCKED + IMPORTED STATUS (keystore file + phrase)
  */
 export type KeystoreState = O.Option<O.Option<KeystoreContent>>
+export type KeystoreState$ = Rx.Observable<KeystoreState>
 
 export type ValidatePasswordHandler = (password: string) => LiveData<Error, void>
 export type ValidatePasswordLD = LiveData<Error, void>
@@ -34,7 +35,7 @@ export type ImportKeystoreLD = LiveData<Error, void>
 export type LoadKeystoreLD = LiveData<Error, Keystore>
 
 export type KeystoreService = {
-  keystore$: Rx.Observable<KeystoreState>
+  keystore$: KeystoreState$
   addKeystore: (phrase: Phrase, password: string) => Promise<void>
   removeKeystore: () => Promise<void>
   importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
@@ -79,6 +80,8 @@ export type BalancesState = {
   loading: boolean
 }
 
+export type BalancesState$ = Rx.Observable<BalancesState>
+
 export type LoadTxsHandler = (props: LoadTxsParams) => void
 export type ResetTxsPageHandler = FP.Lazy<void>
 
@@ -100,6 +103,21 @@ export enum ErrorId {
   VALIDATE_NODE = 'VALIDATE_NODE',
   VALIDATE_RESULT = 'VALIDATE_RESULT',
   GET_ACTIONS = 'GET_ACTIONS'
+}
+
+export type ChainBalancesService = {
+  reloadBalances: FP.Lazy<void>
+  resetReloadBalances: FP.Lazy<void>
+  reloadBalances$: Rx.Observable<boolean>
+  balances$: WalletBalancesLD
+}
+
+export type BalancesService = {
+  reloadBalances: FP.Lazy<void>
+  reloadBalancesByChain: (chain: Chain) => FP.Lazy<void>
+  chainBalances$: ChainBalances$
+  balancesState$: BalancesState$
+  dispose: FP.Lazy<void>
 }
 
 // TODO(@Veado) Move type to clients/type

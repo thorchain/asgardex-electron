@@ -7,7 +7,7 @@ import { Network } from '../../../shared/api/types'
 import { observableState } from '../../helpers/stateHelper'
 import { getClientNetwork } from '../clients'
 import { DEFAULT_NETWORK } from '../const'
-import { OnlineStatus } from './types'
+import { Network$, OnlineStatus } from './types'
 
 // Check online status
 // https://www.electronjs.org/docs/tutorial/online-offline-events
@@ -24,7 +24,7 @@ const { get$: getNetwork$, set: changeNetwork, get: getCurrentNetworkState } = o
 // Since `network$` based on `observableState` and it takes an initial value,
 // it might emit same values, we don't interested in.
 // So we do need a simple "dirty check" to provide "real" changes of selected network
-const network$: Rx.Observable<Network> = getNetwork$.pipe(distinctUntilChanged())
+const network$: Network$ = getNetwork$.pipe(distinctUntilChanged())
 
 const clientNetwork$: Rx.Observable<Client.Network> = network$.pipe(RxOp.map(getClientNetwork))
 
