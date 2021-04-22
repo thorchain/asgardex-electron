@@ -86,7 +86,8 @@ const defaultProps: SwapProps = {
   onChangePath: (path) => console.log('change path', path),
   network: 'testnet',
   approveERC20Token$: () => Rx.of(RD.success('txHash')),
-  isApprovedERC20Token$: () => Rx.of(RD.success(true))
+  isApprovedERC20Token$: () => Rx.of(RD.success(true)),
+  importWalletHandler: () => console.log('import wallet')
 }
 
 export const StoryDefault: Story = () => <Swap {...defaultProps} />

@@ -73,7 +73,9 @@ const common: CommonMessages = {
   'common.filter': 'Фильтр',
   'common.all': 'Все',
   'common.time.week': 'Неделя',
-  'common.time.all': 'all'
+  'common.time.all': 'all',
+  'common.theme.light': 'Day mode - RU',
+  'common.theme.dark': 'Night mode - RU'
 }
 
 export default common

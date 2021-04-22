@@ -23,7 +23,7 @@ import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { PoolsStateRD, SelectedPricePoolAsset } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
-import { isLocked, hasImportedKeystore } from '../../services/wallet/util'
+import { isLocked } from '../../services/wallet/util'
 import { PricePoolAsset, PricePoolAssets } from '../../views/pools/Pools.types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './HeaderComponent.style'
 import { HeaderLang } from './lang'
@@ -223,14 +223,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderHeaderLock = useMemo(
-    () => (
-      <HeaderLock
-        isDesktopView={isDesktopView}
-        isLocked={isLocked(keystore)}
-        onPress={clickLockHandler}
-        disabled={!hasImportedKeystore(keystore)}
-      />
-    ),
+    () => <HeaderLock isDesktopView={isDesktopView} keystore={keystore} onPress={clickLockHandler} />,
     [isDesktopView, clickLockHandler, keystore]
   )
 

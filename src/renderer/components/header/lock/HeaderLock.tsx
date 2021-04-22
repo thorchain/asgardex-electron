@@ -1,59 +1,48 @@
 import React, { useCallback, useMemo } from 'react'
 
-import Text from 'antd/lib/typography/Text'
-import { useObservableState } from 'observable-hooks'
-import { palette } from 'styled-theme'
+import * as FP from 'fp-ts/lib/function'
+import { useIntl } from 'react-intl'
 
-import { ReactComponent as LockWarningIcon } from '../../../assets/svg/icon-lock-warning.svg'
-import { ReactComponent as UnlockWarningIcon } from '../../../assets/svg/icon-unlock-warning.svg'
-import { useThemeContext } from '../../../contexts/ThemeContext'
+import { KeystoreState } from '../../../services/wallet/types'
+import * as WU from '../../../services/wallet/util'
 import { HeaderIconWrapper } from '../HeaderIcon.style'
+import * as Styled from './HeaderLock.style'
 
 type Props = {
-  isLocked: boolean
-  onPress?: () => void
+  keystore: KeystoreState
+  onPress?: FP.Lazy<void>
   isDesktopView: boolean
   disabled?: boolean
 }
 
 export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
-  const { isLocked, onPress = () => {}, isDesktopView, disabled = false } = props
+  const { keystore, onPress = FP.constVoid, isDesktopView, disabled = false } = props
 
-  const { theme$ } = useThemeContext()
-  const theme = useObservableState(theme$)
+  const intl = useIntl()
 
-  const color = useMemo(() => palette('text', 0)({ theme }), [theme])
-
-  const iconStyle = useMemo(() => ({ fontSize: '1.5em', cursor: disabled ? 'not-allowed' : 'pointer' }), [disabled])
+  const isLocked = useMemo(() => WU.isLocked(keystore), [keystore])
 
   const clickHandler = useCallback((_: React.MouseEvent) => onPress(), [onPress])
 
-  // Desktop view displays current lock status
-  const desktopView = useMemo(
-    () => (
-      <>
-        {isLocked && <LockWarningIcon style={iconStyle} />}
-        {!isLocked && <UnlockWarningIcon style={iconStyle} />}
-      </>
-    ),
-    [iconStyle, isLocked]
-  )
+  const desktopView = useMemo(() => (isLocked ? <Styled.LockIcon /> : <Styled.UnlockIcon />), [isLocked])
 
   const mobileView = useMemo(() => {
-    const label = isLocked ? 'Unlock wallet' : 'Lock wallet'
+    const notImported = !WU.hasImportedKeystore(keystore)
+    const label = intl.formatMessage({
+      id: notImported ? 'wallet.imports.label' : isLocked ? 'wallet.unlock.label' : 'wallet.lock.label'
+    })
+
     return (
       <>
-        {!isDesktopView && <Text style={{ color, textTransform: 'uppercase' }}>{label}</Text>}
-        {!isLocked && <UnlockWarningIcon style={iconStyle} />}
-        {isLocked && <LockWarningIcon style={iconStyle} />}
+        <Styled.Label>{label}</Styled.Label>
+        {isLocked ? <Styled.LockIcon /> : <Styled.UnlockIcon />}
       </>
     )
-  }, [color, iconStyle, isDesktopView, isLocked])
+  }, [intl, isLocked, keystore])
 
   return (
     <HeaderIconWrapper onClick={clickHandler} disabled={disabled}>
-      {!isDesktopView && mobileView}
-      {isDesktopView && desktopView}
+      {isDesktopView ? desktopView : mobileView}
     </HeaderIconWrapper>
   )
 }

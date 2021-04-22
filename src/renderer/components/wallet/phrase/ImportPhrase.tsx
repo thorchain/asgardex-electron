@@ -14,7 +14,6 @@ import { useHistory } from 'react-router-dom'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import * as walletRoutes from '../../../routes/wallet'
-import { Button } from '../../uielements/button'
 import { InputPassword, InputTextArea } from '../../uielements/input'
 import * as Styled from './Phrase.styles'
 
@@ -144,15 +143,9 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
           </Styled.PasswordContainer>
         </Spin>
         <Form.Item style={{ display: 'grid', justifyContent: 'flex-end' }}>
-          <Button
-            size="large"
-            type="primary"
-            htmlType="submit"
-            round="true"
-            style={{ width: 150 }}
-            disabled={!validPhrase || importing}>
-            Import
-          </Button>
+          <Styled.ImportButton disabled={!validPhrase || importing}>
+            {intl.formatMessage({ id: 'wallet.action.import' })}
+          </Styled.ImportButton>
         </Form.Item>
       </Form>
     </>

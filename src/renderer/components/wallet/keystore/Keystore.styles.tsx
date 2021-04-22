@@ -4,6 +4,7 @@ import { palette } from 'styled-theme'
 
 import { Button } from '../../../components/uielements/button'
 import { InnerForm } from '../../shared/form/Form.style'
+import { Button as UIButton } from '../../uielements/button'
 
 export const Form = styled(InnerForm)`
   width: 100%;
@@ -35,4 +36,13 @@ export const PasswordContainer = styled(A.Row)`
 `
 export const PasswordItem = styled(A.Form.Item)`
   width: 100%;
+`
+export const ImportButton = styled(UIButton).attrs({
+  size: 'large',
+  type: 'primary',
+  htmlType: 'submit',
+  round: 'true'
+})`
+  min-width: 150px !important;
+  margin-top: 50px;
 `

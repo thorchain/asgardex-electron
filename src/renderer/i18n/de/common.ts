@@ -73,7 +73,9 @@ const common: CommonMessages = {
   'common.filter': 'Filter',
   'common.all': 'Alle',
   'common.time.week': 'Woche',
-  'common.time.all': 'Gesamt'
+  'common.time.all': 'Gesamt',
+  'common.theme.light': 'Tag modus',
+  'common.theme.dark': 'Nacht modus'
 }
 
 export default common

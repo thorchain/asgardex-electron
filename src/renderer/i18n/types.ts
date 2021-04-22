@@ -74,6 +74,8 @@ export type CommonMessageKey =
   | 'common.tx.type.upgrade'
   | 'common.time.week'
   | 'common.time.all'
+  | 'common.theme.light'
+  | 'common.theme.dark'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -113,9 +115,12 @@ type WalletMessageKey =
   | 'wallet.action.deposit'
   | 'wallet.connect.instruction'
   | 'wallet.unlock.instruction'
+  | 'wallet.lock.label'
+  | 'wallet.unlock.label'
   | 'wallet.unlock.title'
   | 'wallet.unlock.phrase'
   | 'wallet.unlock.error'
+  | 'wallet.imports.label'
   | 'wallet.imports.keystore.select'
   | 'wallet.imports.keystore.upload'
   | 'wallet.imports.phrase'
