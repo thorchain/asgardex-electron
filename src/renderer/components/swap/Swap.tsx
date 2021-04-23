@@ -266,20 +266,6 @@ export const Swap = ({
     )
   }, [oPoolAddress, sourceAssetProp])
 
-  // Flag for pending assets state
-  // needed to avoid race condition of fee errors and balances
-  // while switching assets and reloading fees
-  const [pendingSwitchAssets, _setPendingSwitchAssets] = useState(false)
-
-  const setPendingSwitchAssets = useCallback(
-    (value: boolean) => {
-      if (!isLocked(keystore)) {
-        _setPendingSwitchAssets(value)
-      }
-    },
-    [keystore]
-  )
-
   // Reload balances at `onMount`
   useEffect(() => {
     reloadBalances()
@@ -324,21 +310,6 @@ export const Swap = ({
     approveFeesParamsUpdated(oApproveParams)
   }, [approveFeesParamsUpdated, oApproveParams])
 
-  // reset `pendingSwitchAssets`
-  // whenever chain fees will be succeeded or failed
-  useEffect(() => {
-    FP.pipe(
-      chainFeesRD,
-      RD.fold(
-        () => false,
-        () => true,
-        () => false,
-        () => false
-      ),
-      setPendingSwitchAssets
-    )
-  }, [chainFeesRD, setPendingSwitchAssets])
-
   const reloadFeesHandler = useCallback(() => {
     FP.pipe(oSwapFeesParams, O.map(reloadFees))
   }, [oSwapFeesParams, reloadFees])
@@ -352,8 +323,6 @@ export const Swap = ({
 
   const setSourceAsset = useCallback(
     async (asset: Asset) => {
-      // update `pendingSwitchAssets` state
-      setPendingSwitchAssets(true)
       // Reset previously stored fees
       prevChainFees.current = O.none
       // delay to avoid render issues while switching
@@ -371,14 +340,11 @@ export const Swap = ({
         )
       )
     },
-    [onChangePath, setPendingSwitchAssets, targetAsset]
+    [onChangePath, targetAsset]
   )
 
   const setTargetAsset = useCallback(
     async (asset: Asset) => {
-      // update `pendingSwitchAssets` state
-      setPendingSwitchAssets(true)
-
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -394,7 +360,7 @@ export const Swap = ({
         )
       )
     },
-    [onChangePath, setPendingSwitchAssets, sourceAsset]
+    [onChangePath, sourceAsset]
   )
 
   // Max amount to swap
@@ -703,15 +669,12 @@ export const Swap = ({
   }, [closePasswordModal, oSwapParams, subscribeSwapState, swap$])
 
   const sourceChainFeeError: boolean = useMemo(() => {
-    // never error while switching assets
-    if (pendingSwitchAssets) return false
-
     return FP.pipe(
       chainFeesRD,
       RD.getOrElse(() => ZERO_SWAP_FEES),
       ({ inTx }) => sourceChainAssetAmount.amount().minus(inTx.amount()).isNegative()
     )
-  }, [chainFeesRD, pendingSwitchAssets, sourceChainAssetAmount])
+  }, [chainFeesRD, sourceChainAssetAmount])
 
   const sourceChainFeeErrorLabel: JSX.Element = useMemo(() => {
     if (!sourceChainFeeError) {
@@ -942,32 +905,7 @@ export const Swap = ({
     FP.pipe(oSwapFeesParams, O.map(reloadFees))
   }, [oSwapFeesParams, reloadFees])
 
-  // Assets can be switched only if balances has been fully loaded
-  const canSwitchAssets = useMemo(() => {
-    const hasBalances = FP.pipe(
-      walletBalances,
-      (oAssetSymbols) => sequenceTOption(oAssetSymbols, targetAsset),
-      O.chain(([balances, targetAsset]) =>
-        FP.pipe(
-          balances,
-          A.findFirst(({ asset }) => eqAsset.equals(asset, targetAsset))
-        )
-      ),
-      O.map(({ amount }) => !eqBaseAmount.equals(amount, ZERO_BASE_AMOUNT)),
-      O.getOrElse(() => false)
-    )
-
-    // no switch if no balances or while switching assets
-    return hasBalances && !pendingSwitchAssets
-  }, [walletBalances, pendingSwitchAssets, targetAsset])
-
   const onSwitchAssets = useCallback(async () => {
-    if (!canSwitchAssets) {
-      return
-    }
-
-    // update `pendingSwitchAsset` state
-    setPendingSwitchAssets(true)
     // delay to avoid render issues while switching
     await delay(100)
 
@@ -982,7 +920,7 @@ export const Swap = ({
         )
       )
     )
-  }, [canSwitchAssets, setPendingSwitchAssets, assetsToSwap, onChangePath])
+  }, [assetsToSwap, onChangePath])
 
   return (
     <Styled.Container>
@@ -1023,7 +961,6 @@ export const Swap = ({
                     onSelect={setSourceAsset}
                     asset={asset}
                     balances={balancesToSwapFrom}
-                    disabled={pendingSwitchAssets}
                     network={network}
                   />
                 )
@@ -1036,7 +973,7 @@ export const Swap = ({
               {renderSlider}
               {sourceChainFeeErrorLabel}
             </Styled.SliderContainer>
-            <Styled.SwapOutlined disabled={!canSwitchAssets} onClick={onSwitchAssets} />
+            <Styled.SwapOutlined onClick={onSwitchAssets} />
           </Styled.ValueItemContainer>
           <Styled.ValueItemContainer className={'valueItemContainer-in'}>
             <Styled.InValueContainer>
@@ -1052,7 +989,6 @@ export const Swap = ({
                     onSelect={setTargetAsset}
                     asset={asset}
                     balances={balancesToSwapTo}
-                    disabled={pendingSwitchAssets}
                     network={network}
                   />
                 )
