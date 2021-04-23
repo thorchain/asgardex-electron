@@ -135,6 +135,7 @@ export const SubmitButtonWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 20px 0;
 `
 
 export const SubmitButton = styled(UIButton).attrs({

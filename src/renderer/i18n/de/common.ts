@@ -51,7 +51,7 @@ const common: CommonMessages = {
   'common.swap': 'Swap',
   'common.liquidity': 'Liquidität',
   'common.withdraw': 'Auszahlen',
-  'common.approve': 'bewilligen',
+  'common.approve': 'Bewilligen',
   'common.step': 'Schritt {current}/{total}',
   'common.done': 'Fertig',
   'common.thorAddress': 'THOR Addresse',
