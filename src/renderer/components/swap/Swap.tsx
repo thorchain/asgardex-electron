@@ -83,6 +83,8 @@ import { getSwapData, poolAssetDetailToAsset, pickPoolAsset, SwapData } from './
 
 export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string }
 
+type SelectedInput = 'input' | 'slider' | 'none'
+
 export type SwapProps = {
   keystore: KeystoreState
   availableAssets: PoolAssetDetails
@@ -139,6 +141,8 @@ export const Swap = ({
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
+
+  const [selectedInput, setSelectedInput] = useState<SelectedInput>('none')
 
   // convert to hash map here instead of using getPoolDetail
   const poolsData: PoolsDataMap = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [poolDetails])
@@ -272,15 +276,12 @@ export const Swap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const chainFees$ = useMemo(() => fees$, [fees$])
-  const approveFees$ = useMemo(() => approveFee$, [approveFee$])
-
   const prevChainFees = useRef<O.Option<SwapFees>>(O.none)
 
   const [chainFeesRD, swapFeesParamsUpdated] = useObservableState<SwapFeesRD, O.Option<SwapFeesParams>>(
     (oSwapFeesParams$) => {
       return oSwapFeesParams$.pipe(
-        RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), chainFees$))),
+        RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), fees$))),
         liveData.map((chainFees) => {
           // store every successfully loaded chainFees to the ref value
           prevChainFees.current = O.some(chainFees)
@@ -294,12 +295,15 @@ export const Swap = ({
   // whenever `oSwapFeesParams` has been updated,
   // `swapFeesParamsUpdated` needs to be called to update `chainFeesRD`
   useEffect(() => {
-    swapFeesParamsUpdated(oSwapFeesParams)
-  }, [swapFeesParamsUpdated, oSwapFeesParams])
+    // Trigger changes only while users NOT typing into input field (to avoid too many requests)
+    if (selectedInput === 'none') {
+      swapFeesParamsUpdated(oSwapFeesParams)
+    }
+  }, [swapFeesParamsUpdated, oSwapFeesParams, selectedInput])
 
   const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
     (oApproveFeeParam$) => {
-      return oApproveFeeParam$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), approveFees$))))
+      return oApproveFeeParam$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), approveFee$))))
     },
     RD.initial
   )
@@ -310,6 +314,8 @@ export const Swap = ({
     approveFeesParamsUpdated(oApproveParams)
   }, [approveFeesParamsUpdated, oApproveParams])
 
+  // Be careful by using `reloadFeesHandler`!!!
+  // In most cases reloading fees are already called by `approveFeesParamsUpdated`
   const reloadFeesHandler = useCallback(() => {
     FP.pipe(oSwapFeesParams, O.map(reloadFees))
   }, [oSwapFeesParams, reloadFees])
@@ -371,24 +377,31 @@ export const Swap = ({
     // make sure not logged in user can play around with swap
     if (unlockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
 
-    // max amount for source chain asset
-    const maxChainAssetAmount: BaseAmount = FP.pipe(
-      RD.toOption(chainFeesRD),
-      O.alt(() => prevChainFees.current),
-      O.fold(
-        // Ingnore fees and use balance of source chain asset for max.
-        () => sourceChainAssetAmount,
-        ({ inTx }) => {
-          let max = sourceChainAssetAmount.amount().minus(inTx.amount())
-          max = max.isGreaterThan(0) ? max : ZERO_BN
-          return baseAmount(max, sourceChainAssetAmount.decimal)
-        }
-      )
-    )
-    return eqAsset.equals(sourceChainAsset, sourceAssetProp)
-      ? max1e8BaseAmount(maxChainAssetAmount)
-      : sourceAssetAmountMax1e8
-  }, [unlockedWallet, sourceAssetAmountMax1e8, chainFeesRD, sourceChainAsset, sourceAssetProp, sourceChainAssetAmount])
+    return sourceAssetAmountMax1e8
+  }, [unlockedWallet, sourceAssetAmountMax1e8])
+
+  // const maxAmountToSwapMax1e8: BaseAmount = useMemo(() => {
+  //   // make sure not logged in user can play around with swap
+  //   if (unlockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
+
+  //   // max amount for source chain asset
+  //   const maxChainAssetAmount: BaseAmount = FP.pipe(
+  //     RD.toOption(chainFeesRD),
+  //     O.alt(() => prevChainFees.current),
+  //     O.fold(
+  //       // Ingnore fees and use balance of source chain asset for max.
+  //       () => sourceChainAssetAmount,
+  //       ({ inTx }) => {
+  //         let max = sourceChainAssetAmount.amount().minus(inTx.amount())
+  //         max = max.isGreaterThan(0) ? max : ZERO_BN
+  //         return baseAmount(max, sourceChainAssetAmount.decimal)
+  //       }
+  //     )
+  //   )
+  //   return eqAsset.equals(sourceChainAsset, sourceAssetProp)
+  //     ? max1e8BaseAmount(maxChainAssetAmount)
+  //     : sourceAssetAmountMax1e8
+  // }, [unlockedWallet, sourceAssetAmountMax1e8, chainFeesRD, sourceChainAsset, sourceAssetProp, sourceChainAssetAmount])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
@@ -414,8 +427,8 @@ export const Swap = ({
   )
 
   const setAmountToSwapFromPercentValue = useCallback(
-    (percents) => {
-      const amountFromPercentage = maxAmountToSwapMax1e8.amount().multipliedBy(Number(percents) / 100)
+    (percents: number) => {
+      const amountFromPercentage = maxAmountToSwapMax1e8.amount().multipliedBy(percents / 100)
       return setAmountToSwapMax1e8(baseAmount(amountFromPercentage, sourceAssetAmountMax1e8.decimal))
     },
     [maxAmountToSwapMax1e8, setAmountToSwapMax1e8, sourceAssetAmountMax1e8.decimal]
@@ -514,6 +527,14 @@ export const Swap = ({
     setShowPasswordModal(true)
   }, [setShowPasswordModal])
 
+  const sliderOnChange = useCallback(
+    (percents: number) => {
+      setSelectedInput('slider')
+      setAmountToSwapFromPercentValue(percents)
+    },
+    [setAmountToSwapFromPercentValue]
+  )
+
   const renderSlider = useMemo(() => {
     const percentage = unlockedWallet
       ? 0
@@ -528,15 +549,15 @@ export const Swap = ({
       <Slider
         key={'swap percentage slider'}
         value={percentage}
-        onChange={setAmountToSwapFromPercentValue}
-        onAfterChange={reloadFeesHandler}
+        onChange={sliderOnChange}
+        onAfterChange={() => setSelectedInput('none')}
         tooltipVisible={true}
         withLabel={true}
         tooltipPlacement={'top'}
         disabled={unlockedWallet}
       />
     )
-  }, [unlockedWallet, amountToSwapMax1e8, sourceAssetAmountMax1e8, setAmountToSwapFromPercentValue, reloadFeesHandler])
+  }, [unlockedWallet, amountToSwapMax1e8, sourceAssetAmountMax1e8, sliderOnChange])
 
   const extraTxModalContent = useMemo(() => {
     return FP.pipe(
@@ -873,14 +894,11 @@ export const Swap = ({
     resetIsApprovedState()
     // zero amount to swap
     setAmountToSwapMax1e8(initialAmountToSwapMax1e8)
-    // reload fees
-    reloadFeesHandler()
     // check approved status
     checkApprovedStatus()
   }, [
     checkApprovedStatus,
     initialAmountToSwapMax1e8,
-    reloadFeesHandler,
     resetApproveState,
     resetIsApprovedState,
     resetSwapState,
@@ -900,11 +918,6 @@ export const Swap = ({
     }
   }, [checkApprovedStatus, oPoolAddress, reset, setAmountToSwapMax1e8, sourceAssetProp, targetAssetProp])
 
-  // Reload fees whenever swap params has been changed
-  useEffect(() => {
-    FP.pipe(oSwapFeesParams, O.map(reloadFees))
-  }, [oSwapFeesParams, reloadFees])
-
   const onSwitchAssets = useCallback(async () => {
     // delay to avoid render issues while switching
     await delay(100)
@@ -921,6 +934,11 @@ export const Swap = ({
       )
     )
   }, [assetsToSwap, onChangePath])
+
+  const inputOnBlur = useCallback(() => {
+    setSelectedInput('none')
+    reloadFeesHandler()
+  }, [reloadFeesHandler])
 
   return (
     <Styled.Container>
@@ -945,7 +963,8 @@ export const Swap = ({
             <Styled.AssetInput
               title={intl.formatMessage({ id: 'swap.input' })}
               onChange={setAmountToSwapMax1e8}
-              onBlur={reloadFeesHandler}
+              onBlur={inputOnBlur}
+              onFocus={() => setSelectedInput('input')}
               amount={amountToSwapMax1e8}
               maxAmount={maxAmountToSwapMax1e8}
               hasError={sourceChainFeeError}
@@ -1034,6 +1053,7 @@ export const Swap = ({
           </>
         )}
       </Styled.SubmitContainer>
+      <div>selectedInput: {selectedInput.toString()}</div>
       {showPasswordModal && (
         <PasswordModal
           onSuccess={onSucceedPasswordModal}
