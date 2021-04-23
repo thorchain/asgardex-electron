@@ -57,7 +57,6 @@ import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { ViewTxButton } from '../../uielements/button'
-import { Drag } from '../../uielements/drag'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import { formatFee } from '../../uielements/fees/Fees.helper'
 import * as Helper from './Deposit.helper'
@@ -1011,20 +1010,24 @@ export const SymDeposit: React.FC<Props> = (props) => {
             </Col>
           </Styled.FeesRow>
 
-          <Styled.DragWrapper>
-            <Drag
-              title={intl.formatMessage({ id: 'deposit.drag' })}
-              onConfirm={confirmDepositHandler}
-              disabled={disabledForm || runeAmountToDeposit.amount().isZero()}
-              network={network}
-            />
-          </Styled.DragWrapper>
+          <Styled.SubmitButtonWrapper>
+            <Styled.SubmitButton
+              sizevalue="big"
+              onClick={confirmDepositHandler}
+              disabled={disabledForm || runeAmountToDeposit.amount().isZero()}>
+              {intl.formatMessage({ id: 'common.add' })}
+            </Styled.SubmitButton>
+          </Styled.SubmitButtonWrapper>
         </>
       ) : (
         <Styled.SubmitContainer>
-          <Styled.ApproveButton onClick={onApprove} loading={RD.isPending(approveState)}>
+          <Styled.SubmitButton
+            sizevalue="xnormal"
+            onClick={onApprove}
+            loading={RD.isPending(approveState)}
+            color="warning">
             {intl.formatMessage({ id: 'swap.approve' })}
-          </Styled.ApproveButton>
+          </Styled.SubmitButton>
           {!RD.isInitial(approveFees) && <Fees fees={approveFees} reloadFees={reloadApproveFeesHandler} />}
           {renderApproveError}
         </Styled.SubmitContainer>

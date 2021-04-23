@@ -50,6 +50,8 @@ const common: CommonMessages = {
   'common.add': 'Ajouter',
   'common.swap': 'Échanger',
   'common.liquidity': 'Liquidité',
+  'common.withdraw': 'Retrait',
+  'common.approve': 'Approuver',
   'common.step': 'Étape {current}/{total}',
   'common.done': 'Terminé',
   'common.thorAddress': 'Adresse THOR',

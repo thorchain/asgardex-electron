@@ -174,7 +174,7 @@ export const AssetSelect = styled(AssetSelectUI)`
   justify-content: space-between;
 `
 
-export const Button = styled(UIButton).attrs({
+export const SubmitButton = styled(UIButton).attrs({
   type: 'primary',
   round: 'true'
 })`

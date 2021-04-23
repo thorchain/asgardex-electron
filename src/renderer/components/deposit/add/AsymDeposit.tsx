@@ -40,7 +40,6 @@ import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { ViewTxButton } from '../../uielements/button'
-import { Drag } from '../../uielements/drag'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import { formatFee } from '../../uielements/fees/Fees.helper'
 import * as Helper from './Deposit.helper'
@@ -439,14 +438,11 @@ export const AsymDeposit: React.FC<Props> = (props) => {
         </Col>
       </Styled.FeesRow>
 
-      <Styled.DragWrapper>
-        <Drag
-          title={intl.formatMessage({ id: 'deposit.drag' })}
-          onConfirm={confirmDepositHandler}
-          disabled={disabledForm}
-          network={network}
-        />
-      </Styled.DragWrapper>
+      <Styled.SubmitButtonWrapper>
+        <Styled.SubmitButton onClick={confirmDepositHandler} disabled={disabledForm}>
+          {intl.formatMessage({ id: 'common.add' })}
+        </Styled.SubmitButton>
+      </Styled.SubmitButtonWrapper>
       {showPasswordModal && (
         <PasswordModal
           onSuccess={onSucceedPasswordModal}

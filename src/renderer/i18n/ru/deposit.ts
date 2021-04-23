@@ -29,7 +29,6 @@ const deposit: DepositMessages = {
   'deposit.unbond.state.error': 'Ошибка при выводе',
   'deposit.leave.state.error': 'Ошибка при выходе',
   'deposit.advancedMode': 'Расширенный режим',
-  'deposit.drag': 'Потяните',
   'deposit.poolDetails.depth': 'Глубина',
   'deposit.poolDetails.24hvol': 'Количество за 24ч',
   'deposit.poolDetails.allTimeVal': 'Количество за все время',
@@ -54,7 +53,6 @@ const deposit: DepositMessages = {
   'deposit.withdraw.receiveText': 'Вы полчучите',
   'deposit.withdraw.fees': 'Комиссия транзакции: {thorMemo}, Исходящие комиссии: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Важно: {fee} BNB останется на вашем кошельке для покрытия комисий.',
-  'deposit.withdraw.drag': 'Перетащите для изъявтия',
   'deposit.withdraw.error.feeNotCovered':
     'Комиссия транзакции {fee} должна покрываться вашим балансом (баланс: {balance})'
 }

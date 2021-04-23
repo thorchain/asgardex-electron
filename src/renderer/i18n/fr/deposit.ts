@@ -30,7 +30,6 @@ const deposit: DepositMessages = {
   'deposit.unbond.state.error': 'Erreur de retrait',
   'deposit.leave.state.error': 'Erreur de sortie',
   'deposit.advancedMode': 'Mode avancé',
-  'deposit.drag': 'Glisser pour déposer',
   'deposit.poolDetails.depth': 'Profondeur',
   'deposit.poolDetails.24hvol': 'Volume sur 24h',
   'deposit.poolDetails.allTimeVal': 'Volume historique',
@@ -56,7 +55,6 @@ const deposit: DepositMessages = {
   'deposit.withdraw.fees': 'Frais de transaction : {thorMemo}, Frais de retrait : {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote':
     'Remarque: {fee} BNB seront laissés dans votre portefeuille pour les frais de transaction.',
-  'deposit.withdraw.drag': 'Glisser pour retirer',
   'deposit.withdraw.error.feeNotCovered':
     'Les frais de transaction {fee} doivent être couverts par votre solde (actuellement {balance}).'
 }

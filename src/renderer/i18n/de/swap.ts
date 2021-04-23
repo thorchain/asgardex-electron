@@ -7,7 +7,6 @@ const swap: SwapMessages = {
   'swap.input': 'Eingabe',
   'swap.balance': 'Guthaben',
   'swap.output': 'Ausgabe',
-  'swap.drag': 'Ziehen um zu Tauschen',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
   'swap.errors.amount.outputShouldCoverChainFee':
@@ -15,8 +14,7 @@ const swap: SwapMessages = {
   'swap.note.lockedWallet': 'Entsperre Deine Wallet, um zu tauschen',
   'swap.note.nowallet': 'Erstelle oder importiere eine Wallet um zu Tauschen',
   'swap.errors.asset.missingSourceAsset': 'Ursprungs-Asset nicht vorhanden',
-  'swap.errors.asset.missingTargetAsset': 'Ziel-Asset nicht vorhanden',
-  'swap.approve': 'bewilligen'
+  'swap.errors.asset.missingTargetAsset': 'Ziel-Asset nicht vorhanden'
 }
 
 export default swap

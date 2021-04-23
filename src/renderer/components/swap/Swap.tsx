@@ -1062,20 +1062,20 @@ export const Swap = ({
         {!isLocked(keystore) ? (
           isApproved ? (
             <>
-              <Styled.Button color="success" sizevalue="xnormal" onClick={onSwapConfirmed} disabled={isSwapDisabled}>
+              <Styled.SubmitButton color="success" sizevalue="big" onClick={onSwapConfirmed} disabled={isSwapDisabled}>
                 {intl.formatMessage({ id: 'common.swap' })}
-              </Styled.Button>
+              </Styled.SubmitButton>
               {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFeesHandler} />}
             </>
           ) : (
             <>
-              <Styled.Button
-                onClick={onApprove}
+              <Styled.SubmitButton
                 sizevalue="xnormal"
-                loading={RD.isPending(approveState)}
-                color="warning">
-                {intl.formatMessage({ id: 'swap.approve' })}
-              </Styled.Button>
+                color="warning"
+                onClick={onApprove}
+                loading={RD.isPending(approveState)}>
+                {intl.formatMessage({ id: 'common.approve' })}
+              </Styled.SubmitButton>
               {!RD.isInitial(approveFees) && <Fees fees={approveFees} reloadFees={reloadApproveFeesHandler} />}
               {renderApproveError}
             </>
@@ -1087,11 +1087,11 @@ export const Swap = ({
                 ? intl.formatMessage({ id: 'swap.note.nowallet' })
                 : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
             </Styled.NoteLabel>
-            <Styled.Button color="success" sizevalue="xnormal" onClick={importWalletHandler}>
+            <Styled.SubmitButton sizevalue="xnormal" color="success" onClick={importWalletHandler}>
               {!hasImportedKeystore(keystore)
                 ? intl.formatMessage({ id: 'wallet.imports.label' })
                 : isLocked(keystore) && intl.formatMessage({ id: 'wallet.unlock.label' })}
-            </Styled.Button>
+            </Styled.SubmitButton>
           </>
         )}
       </Styled.SubmitContainer>

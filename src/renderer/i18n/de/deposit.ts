@@ -30,7 +30,6 @@ const deposit: DepositMessages = {
   'deposit.unbond.state.error': 'Unbond Fehler',
   'deposit.leave.state.error': 'Fehler beim Verlassen',
   'deposit.advancedMode': 'Expertenmodus',
-  'deposit.drag': 'Ziehen um Einzuzahlen',
   'deposit.poolDetails.depth': 'Tiefe',
   'deposit.poolDetails.24hvol': '24h Volumen',
   'deposit.poolDetails.allTimeVal': 'Gesamtzeit Volumen',
@@ -55,7 +54,6 @@ const deposit: DepositMessages = {
   'deposit.withdraw.receiveText': 'Du solltest erhalten',
   'deposit.withdraw.fees': 'Transaktionsgebühr: {thorMemo}, Auszahlungsgebühren: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Hinweis: {fee} werden für die Transaktionsgebühr in Deiner Wallet belassen',
-  'deposit.withdraw.drag': 'Ziehen um Auszuzahlen',
   'deposit.withdraw.error.feeNotCovered':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.'
 }
