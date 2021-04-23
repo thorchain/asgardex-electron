@@ -213,6 +213,8 @@ export const Swap = ({
     _setAmountToSwapMax1e8 /* private - never set it directly, use setAmountToSwap() instead */
   ] = useState(initialAmountToSwapMax1e8)
 
+  const isZeroAmountToSwap = useMemo(() => amountToSwapMax1e8.amount().isZero(), [amountToSwapMax1e8])
+
   const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
     return FP.pipe(
       sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
@@ -301,6 +303,12 @@ export const Swap = ({
     }
   }, [swapFeesParamsUpdated, oSwapFeesParams, selectedInput])
 
+  // Be careful by using `reloadFeesHandler`!!!
+  // In most cases reloading fees are already called by `approveFeesParamsUpdated`
+  const reloadFeesHandler = useCallback(() => {
+    FP.pipe(oSwapFeesParams, O.map(reloadFees))
+  }, [oSwapFeesParams, reloadFees])
+
   const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
     (oApproveFeeParam$) => {
       return oApproveFeeParam$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), approveFee$))))
@@ -313,12 +321,6 @@ export const Swap = ({
   useEffect(() => {
     approveFeesParamsUpdated(oApproveParams)
   }, [approveFeesParamsUpdated, oApproveParams])
-
-  // Be careful by using `reloadFeesHandler`!!!
-  // In most cases reloading fees are already called by `approveFeesParamsUpdated`
-  const reloadFeesHandler = useCallback(() => {
-    FP.pipe(oSwapFeesParams, O.map(reloadFees))
-  }, [oSwapFeesParams, reloadFees])
 
   const reloadApproveFeesHandler = useCallback(() => {
     FP.pipe(oApproveParams, O.map(reloadApproveFee))
@@ -379,29 +381,6 @@ export const Swap = ({
 
     return sourceAssetAmountMax1e8
   }, [unlockedWallet, sourceAssetAmountMax1e8])
-
-  // const maxAmountToSwapMax1e8: BaseAmount = useMemo(() => {
-  //   // make sure not logged in user can play around with swap
-  //   if (unlockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
-
-  //   // max amount for source chain asset
-  //   const maxChainAssetAmount: BaseAmount = FP.pipe(
-  //     RD.toOption(chainFeesRD),
-  //     O.alt(() => prevChainFees.current),
-  //     O.fold(
-  //       // Ingnore fees and use balance of source chain asset for max.
-  //       () => sourceChainAssetAmount,
-  //       ({ inTx }) => {
-  //         let max = sourceChainAssetAmount.amount().minus(inTx.amount())
-  //         max = max.isGreaterThan(0) ? max : ZERO_BN
-  //         return baseAmount(max, sourceChainAssetAmount.decimal)
-  //       }
-  //     )
-  //   )
-  //   return eqAsset.equals(sourceChainAsset, sourceAssetProp)
-  //     ? max1e8BaseAmount(maxChainAssetAmount)
-  //     : sourceAssetAmountMax1e8
-  // }, [unlockedWallet, sourceAssetAmountMax1e8, chainFeesRD, sourceChainAsset, sourceAssetProp, sourceChainAssetAmount])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
@@ -690,12 +669,15 @@ export const Swap = ({
   }, [closePasswordModal, oSwapParams, subscribeSwapState, swap$])
 
   const sourceChainFeeError: boolean = useMemo(() => {
+    // ignore check for zero amounts
+    if (isZeroAmountToSwap) return false
+
     return FP.pipe(
       chainFeesRD,
       RD.getOrElse(() => ZERO_SWAP_FEES),
       ({ inTx }) => sourceChainAssetAmount.amount().minus(inTx.amount()).isNegative()
     )
-  }, [chainFeesRD, sourceChainAssetAmount])
+  }, [chainFeesRD, isZeroAmountToSwap, sourceChainAssetAmount])
 
   const sourceChainFeeErrorLabel: JSX.Element = useMemo(() => {
     if (!sourceChainFeeError) {
@@ -788,8 +770,8 @@ export const Swap = ({
   )
 
   const isSwapDisabled: boolean = useMemo(
-    () => unlockedWallet || amountToSwapMax1e8.amount().isZero() || FP.pipe(walletBalances, O.isNone),
-    [unlockedWallet, amountToSwapMax1e8, walletBalances]
+    () => unlockedWallet || isZeroAmountToSwap || FP.pipe(walletBalances, O.isNone),
+    [isZeroAmountToSwap, unlockedWallet, walletBalances]
   )
 
   const {
