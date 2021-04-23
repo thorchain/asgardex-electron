@@ -29,7 +29,7 @@ import { ethRouterABI } from '../../const'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
-import { FeeOptionKeys } from '../const'
+import { FeeOptionKeys, ZERO_SWAP_FEES } from '../const'
 import { FeeLD, SwapFeesHandler, SwapFeesParams, SwapOutTx, SwapTxParams } from '../types'
 
 /**
@@ -169,6 +169,10 @@ const swapFees$: SwapFeesHandler = (params) => {
     RxOp.debounceTime(300),
     RxOp.switchMap((reloadParams) => {
       const { inTx, outTx } = reloadParams || params
+
+      // in case of zero amount, return zero fees (no API request needed then)
+      if (inTx.amount.amount().isZero()) return Rx.of(RD.success(ZERO_SWAP_FEES))
+
       // fee for pool IN tx
       const in$ = txInFee$(inTx).pipe(RxOp.shareReplay(1))
       // fee for pool OUT tx

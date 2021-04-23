@@ -44,7 +44,7 @@ import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
-import { INITIAL_SWAP_STATE } from '../../services/chain/const'
+import { INITIAL_SWAP_STATE, ZERO_SWAP_FEES } from '../../services/chain/const'
 import {
   SwapState,
   SwapTxParams,
@@ -280,6 +280,12 @@ export const Swap = ({
     [keystore]
   )
 
+  // Reload balances at `onMount`
+  useEffect(() => {
+    reloadBalances()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const chainFees$ = useMemo(() => fees$, [fees$])
   const approveFees$ = useMemo(() => approveFee$, [approveFee$])
 
@@ -296,8 +302,14 @@ export const Swap = ({
         })
       )
     },
-    RD.initial
+    RD.success(ZERO_SWAP_FEES)
   )
+
+  // whenever `oSwapFeesParams` has been updated,
+  // `swapFeesParamsUpdated` needs to be called to update `chainFeesRD`
+  useEffect(() => {
+    swapFeesParamsUpdated(oSwapFeesParams)
+  }, [swapFeesParamsUpdated, oSwapFeesParams])
 
   const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
     (oApproveFeeParam$) => {
@@ -306,18 +318,8 @@ export const Swap = ({
     RD.initial
   )
 
-  // Reload balances at `onMount`
-  useEffect(() => {
-    reloadBalances()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // whenever `oSwapFeesParams` has been updated,
-  // `swapFeesParamsUpdated` needs to be called to update `chainFeesRD`
-  useEffect(() => {
-    swapFeesParamsUpdated(oSwapFeesParams)
-  }, [swapFeesParamsUpdated, oSwapFeesParams])
-
+  // whenever `oApproveParams` has been updated,
+  // `approveFeesParamsUpdated` needs to be called to update `approveFeesRD`
   useEffect(() => {
     approveFeesParamsUpdated(oApproveParams)
   }, [approveFeesParamsUpdated, oApproveParams])
@@ -403,7 +405,7 @@ export const Swap = ({
     // make sure not logged in user can play around with swap
     if (unlockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
 
-    // max amount for sourc chain asset
+    // max amount for source chain asset
     const maxChainAssetAmount: BaseAmount = FP.pipe(
       RD.toOption(chainFeesRD),
       O.alt(() => prevChainFees.current),
@@ -700,19 +702,19 @@ export const Swap = ({
     )
   }, [closePasswordModal, oSwapParams, subscribeSwapState, swap$])
 
-  const sourceChainError: boolean = useMemo(() => {
+  const sourceChainFeeError: boolean = useMemo(() => {
     // never error while switching assets
     if (pendingSwitchAssets) return false
 
     return FP.pipe(
       chainFeesRD,
-      RD.getOrElse(() => ({ inTx: ZERO_BASE_AMOUNT, outTx: ZERO_BASE_AMOUNT })),
+      RD.getOrElse(() => ZERO_SWAP_FEES),
       ({ inTx }) => sourceChainAssetAmount.amount().minus(inTx.amount()).isNegative()
     )
   }, [chainFeesRD, pendingSwitchAssets, sourceChainAssetAmount])
 
-  const sourceChainErrorLabel: JSX.Element = useMemo(() => {
-    if (!sourceChainError) {
+  const sourceChainFeeErrorLabel: JSX.Element = useMemo(() => {
+    if (!sourceChainFeeError) {
       return <></>
     }
 
@@ -739,7 +741,7 @@ export const Swap = ({
       )),
       O.getOrElse(() => <></>)
     )
-  }, [sourceChainError, chainFeesRD, intl, sourceAssetProp, sourceAssetAmount, sourceChainAsset])
+  }, [sourceChainFeeError, chainFeesRD, intl, sourceAssetProp, sourceAssetAmount, sourceChainAsset])
 
   const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
     const fees: SwapFees = FP.pipe(
@@ -940,6 +942,7 @@ export const Swap = ({
     FP.pipe(oSwapFeesParams, O.map(reloadFees))
   }, [oSwapFeesParams, reloadFees])
 
+  // Assets can be switched only if balances has been fully loaded
   const canSwitchAssets = useMemo(() => {
     const hasBalances = FP.pipe(
       walletBalances,
@@ -1007,7 +1010,7 @@ export const Swap = ({
               onBlur={reloadFeesHandler}
               amount={amountToSwapMax1e8}
               maxAmount={maxAmountToSwapMax1e8}
-              hasError={sourceChainError}
+              hasError={sourceChainFeeError}
               asset={sourceAssetProp}
               disabled={unlockedWallet}
             />
@@ -1031,7 +1034,7 @@ export const Swap = ({
           <Styled.ValueItemContainer className={'valueItemContainer-percent'}>
             <Styled.SliderContainer>
               {renderSlider}
-              {sourceChainErrorLabel}
+              {sourceChainFeeErrorLabel}
             </Styled.SliderContainer>
             <Styled.SwapOutlined disabled={!canSwitchAssets} onClick={onSwitchAssets} />
           </Styled.ValueItemContainer>
