@@ -50,6 +50,8 @@ const common: CommonMessages = {
   'common.add': 'Ajouter',
   'common.swap': 'Échanger',
   'common.liquidity': 'Liquidité',
+  'common.withdraw': 'Retrait',
+  'common.approve': 'Approuver',
   'common.step': 'Étape {current}/{total}',
   'common.done': 'Terminé',
   'common.thorAddress': 'Adresse THOR',
@@ -73,7 +75,9 @@ const common: CommonMessages = {
   'common.filter': 'Filtre',
   'common.all': 'Tout',
   'common.time.week': 'Semaine',
-  'common.time.all': 'Tout'
+  'common.time.all': 'Tout',
+  'common.theme.light': 'Day mode - FR',
+  'common.theme.dark': 'Night mode - FR'
 }
 
 export default common

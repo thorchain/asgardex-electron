@@ -138,6 +138,7 @@ export const InValueLabel = styled(UILabel).attrs({
 export const SubmitContainer = styled('div')`
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
 `
 
@@ -173,11 +174,12 @@ export const AssetSelect = styled(AssetSelectUI)`
   justify-content: space-between;
 `
 
-export const ApproveButton = styled(UIButton).attrs({
+export const SubmitButton = styled(UIButton).attrs({
   type: 'primary',
-  round: 'true',
-  color: 'warning',
-  sizevalue: 'xnormal'
+  round: 'true'
 })`
+  min-width: 200px !important;
   margin-bottom: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
 `

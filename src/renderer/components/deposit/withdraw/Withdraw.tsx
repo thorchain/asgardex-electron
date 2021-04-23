@@ -374,13 +374,11 @@ export const Withdraw: React.FC<Props> = ({
           </Styled.FeeErrorRow>
         </Col>
       </Styled.FeesRow>
-
-      <Styled.Drag
-        title={intl.formatMessage({ id: 'deposit.withdraw.drag' })}
-        onConfirm={() => setShowPasswordModal(true)}
-        disabled={disabledForm}
-        network={network}
-      />
+      <Styled.SubmitButtonWrapper>
+        <Styled.SubmitButton sizevalue="big" onClick={() => setShowPasswordModal(true)} disabled={disabledForm}>
+          {intl.formatMessage({ id: 'common.withdraw' })}
+        </Styled.SubmitButton>
+      </Styled.SubmitButtonWrapper>
       {showPasswordModal && (
         <PasswordModal
           onSuccess={onSucceedPasswordModal}

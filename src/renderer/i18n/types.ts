@@ -49,6 +49,8 @@ export type CommonMessageKey =
   | 'common.add'
   | 'common.swap'
   | 'common.liquidity'
+  | 'common.withdraw'
+  | 'common.approve'
   | 'common.step'
   | 'common.done'
   | 'common.address.self'
@@ -67,6 +69,7 @@ export type CommonMessageKey =
   | 'common.analytics'
   | 'common.asset.base'
   | 'common.tx.type.swap'
+  | 'common.tx.type.deposit'
   | 'common.tx.type.refund'
   | 'common.tx.type.donate'
   | 'common.tx.type.deposit'
@@ -74,6 +77,8 @@ export type CommonMessageKey =
   | 'common.tx.type.upgrade'
   | 'common.time.week'
   | 'common.time.all'
+  | 'common.theme.light'
+  | 'common.theme.dark'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -113,9 +118,12 @@ type WalletMessageKey =
   | 'wallet.action.deposit'
   | 'wallet.connect.instruction'
   | 'wallet.unlock.instruction'
+  | 'wallet.lock.label'
+  | 'wallet.unlock.label'
   | 'wallet.unlock.title'
   | 'wallet.unlock.phrase'
   | 'wallet.unlock.error'
+  | 'wallet.imports.label'
   | 'wallet.imports.keystore.select'
   | 'wallet.imports.keystore.upload'
   | 'wallet.imports.phrase'
@@ -225,7 +233,6 @@ type SwapMessageKey =
   | 'swap.input'
   | 'swap.balance'
   | 'swap.output'
-  | 'swap.drag'
   | 'swap.state.pending'
   | 'swap.state.success'
   | 'swap.state.error'
@@ -235,7 +242,6 @@ type SwapMessageKey =
   | 'swap.errors.amount.outputShouldCoverChainFee'
   | 'swap.note.lockedWallet'
   | 'swap.note.nowallet'
-  | 'swap.approve'
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
@@ -268,7 +274,6 @@ type DepositMessageKey =
   | 'deposit.unbond.state.error'
   | 'deposit.leave.state.error'
   | 'deposit.advancedMode'
-  | 'deposit.drag'
   | 'deposit.poolDetails.depth'
   | 'deposit.poolDetails.24hvol'
   | 'deposit.poolDetails.allTimeVal'
@@ -293,7 +298,6 @@ type DepositMessageKey =
   | 'deposit.withdraw.receiveText'
   | 'deposit.withdraw.fees'
   | 'deposit.withdraw.feeNote'
-  | 'deposit.withdraw.drag'
   | 'deposit.withdraw.error.feeNotCovered'
 
 export type DepositMessages = { [key in DepositMessageKey]: string }

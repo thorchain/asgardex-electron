@@ -15,7 +15,6 @@ import { useBinanceContext } from '../../../contexts/BinanceContext'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import * as walletRoutes from '../../../routes/wallet'
 import { ImportKeystoreLD, LoadKeystoreLD } from '../../../services/wallet/types'
-import { Button } from '../../uielements/button'
 import { InputPassword } from '../../uielements/input'
 import * as Styled from './Keystore.styles'
 
@@ -120,15 +119,9 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
           </Styled.PasswordContainer>
         </Spin>
         <Form.Item style={{ display: 'grid', justifyContent: 'flex-end' }}>
-          <Button
-            size="large"
-            type="primary"
-            htmlType="submit"
-            round="true"
-            style={{ width: 150, marginTop: 50 }}
-            disabled={!RD.isSuccess(loadKeystoreState) || RD.isPending(importKeystoreState)}>
-            {intl.formatMessage({ id: 'wallet.action.import' }).toUpperCase()}
-          </Button>
+          <Styled.ImportButton disabled={!RD.isSuccess(loadKeystoreState) || RD.isPending(importKeystoreState)}>
+            {intl.formatMessage({ id: 'wallet.action.import' })}
+          </Styled.ImportButton>
         </Form.Item>
       </Styled.Form>
     </>

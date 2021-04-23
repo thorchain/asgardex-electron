@@ -7,7 +7,6 @@ const swap: SwapMessages = {
   'swap.input': 'Input',
   'swap.balance': 'Balance',
   'swap.output': 'Output',
-  'swap.drag': 'Drag to swap',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaction fee {fee} needs to be covered by your balance (currently {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
@@ -15,8 +14,7 @@ const swap: SwapMessages = {
   'swap.note.lockedWallet': 'You need to unlock your wallet to swap',
   'swap.note.nowallet': 'Create or import a wallet to swap',
   'swap.errors.asset.missingSourceAsset': 'Missing source asset',
-  'swap.errors.asset.missingTargetAsset': 'Missing target asset',
-  'swap.approve': 'Approve'
+  'swap.errors.asset.missingTargetAsset': 'Missing target asset'
 }
 
 export default swap

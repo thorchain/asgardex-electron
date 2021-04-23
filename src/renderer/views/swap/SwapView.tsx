@@ -23,6 +23,7 @@ import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { SwapRouteParams } from '../../routes/pools/swap'
+import * as walletRoutes from '../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
@@ -188,6 +189,11 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     },
     [history]
   )
+
+  const importWalletHandler = useCallback(() => {
+    history.push(walletRoutes.base.path())
+  }, [history])
+
   return (
     <>
       <Styled.TopControlsContainer>
@@ -230,6 +236,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   network={network}
                   approveERC20Token$={approveERC20Token$}
                   isApprovedERC20Token$={isApprovedERC20Token$}
+                  importWalletHandler={importWalletHandler}
                 />
               )
             }

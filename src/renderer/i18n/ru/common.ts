@@ -50,6 +50,8 @@ const common: CommonMessages = {
   'common.add': 'Добавить',
   'common.swap': 'Обмен',
   'common.liquidity': 'Ликвиидиность',
+  'common.withdraw': 'Изъятие',
+  'common.approve': 'Подвердить',
   'common.step': 'Шаг {current}/{total}',
   'common.done': 'Готово',
   'common.thorAddress': 'THOR Адрес',
@@ -73,7 +75,9 @@ const common: CommonMessages = {
   'common.filter': 'Фильтр',
   'common.all': 'Все',
   'common.time.week': 'Неделя',
-  'common.time.all': 'all'
+  'common.time.all': 'all',
+  'common.theme.light': 'Day mode - RU',
+  'common.theme.dark': 'Night mode - RU'
 }
 
 export default common

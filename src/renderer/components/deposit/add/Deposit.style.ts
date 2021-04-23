@@ -55,9 +55,6 @@ export const AssetCard = styled(UIAssetCard)`
   width: 100%;
 `
 
-export const DragWrapper = styled('div')`
-  padding: 20px;
-`
 export const FeeRow = styled(Row).attrs({
   align: 'middle'
 })`
@@ -133,12 +130,19 @@ export const SubmitContainer = styled('div')`
   flex-direction: column;
   align-items: center;
 `
+export const SubmitButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+`
 
-export const ApproveButton = styled(UIButton).attrs({
+export const SubmitButton = styled(UIButton).attrs({
   type: 'primary',
-  round: 'true',
-  color: 'warning',
-  sizevalue: 'xnormal'
+  round: 'true'
 })`
-  margin-bottom: 30px;
+  min-width: 200px !important;
+  padding-left: 30px;
+  padding-right: 30px;
 `

@@ -7,7 +7,6 @@ const swap: SwapMessages = {
   'swap.input': 'Entrée',
   'swap.balance': 'Solde',
   'swap.output': 'Sortie',
-  'swap.drag': 'Glisser pour échanger',
   'swap.errors.amount.balanceShouldCoverChainFee':
     '{fee} de frais de transaction doivent être couverts par votre solde (actuellement {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
@@ -15,8 +14,7 @@ const swap: SwapMessages = {
   'swap.note.lockedWallet': 'Vous devez déverrouiller votre portefeuille pour échanger',
   'swap.note.nowallet': 'Créez ou importez un portefeuille pour échanger',
   'swap.errors.asset.missingSourceAsset': 'Actif source manquant',
-  'swap.errors.asset.missingTargetAsset': 'Actif cible manquant',
-  'swap.approve': 'Approuver'
+  'swap.errors.asset.missingTargetAsset': 'Actif cible manquant'
 }
 
 export default swap

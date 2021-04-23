@@ -2,6 +2,8 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { Button as UIButton } from '../../uielements/button'
+
 export const Card = styled(A.Card).attrs({
   bodyStyle: { padding: '6px', minHeight: '100px' }
 })`
@@ -45,4 +47,13 @@ export const PasswordContainer = styled(A.Row)`
 `
 export const PasswordItem = styled(A.Form.Item)`
   width: 100%;
+`
+
+export const ImportButton = styled(UIButton).attrs({
+  size: 'large',
+  type: 'primary',
+  htmlType: 'submit',
+  round: 'true'
+})`
+  min-width: 150px !important;
 `

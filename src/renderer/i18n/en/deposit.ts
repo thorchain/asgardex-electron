@@ -29,7 +29,6 @@ const deposit: DepositMessages = {
   'deposit.unbond.state.error': 'Unbond error',
   'deposit.leave.state.error': 'Leave error',
   'deposit.advancedMode': 'Advanced mode',
-  'deposit.drag': 'Drag to deposit',
   'deposit.poolDetails.depth': 'Depth',
   'deposit.poolDetails.24hvol': '24hr volume',
   'deposit.poolDetails.allTimeVal': 'All time volume',
@@ -54,7 +53,6 @@ const deposit: DepositMessages = {
   'deposit.withdraw.receiveText': 'You should receive.',
   'deposit.withdraw.fees': 'Transaction fee: {thorMemo}, Outbounding fees: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Note: {fee} BNB will be left in your wallet for the transaction fees.',
-  'deposit.withdraw.drag': 'Drag to withdraw',
   'deposit.withdraw.error.feeNotCovered':
     'Transaction fee {fee} needs to be covered by your balance (currently {balance}).'
 }

@@ -104,6 +104,7 @@ export type SwapProps = {
   network: Network
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
+  importWalletHandler: FP.Lazy<void>
 }
 
 export const Swap = ({
@@ -126,7 +127,8 @@ export const Swap = ({
   isApprovedERC20Token$,
   approveERC20Token$,
   reloadApproveFee,
-  approveFee$
+  approveFee$,
+  importWalletHandler
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -430,7 +432,6 @@ export const Swap = ({
       const newAmountToSwap = newAmount.amount().isGreaterThan(maxAmountToSwapMax1e8.amount())
         ? maxAmountToSwapMax1e8
         : newAmount
-
       /**
        * New object instance of `amountToSwap` is needed to make
        * AssetInput component react to the new value.
@@ -1057,40 +1058,43 @@ export const Swap = ({
           </Styled.ValueItemContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
-      {isApproved ? (
-        <Styled.SubmitContainer>
-          {FP.pipe(
-            sequenceTOption(sourceAsset, targetAsset),
-            O.fold(
-              () => <></>,
-              ([source, target]) => (
-                <Styled.Drag
-                  disabled={isSwapDisabled}
-                  onConfirm={onSwapConfirmed}
-                  title={intl.formatMessage({ id: 'swap.drag' })}
-                  source={source}
-                  target={target}
-                  network={network}
-                />
-              )
-            )
-          )}
-          <Styled.NoteLabel align="center">
-            {!hasImportedKeystore(keystore)
-              ? intl.formatMessage({ id: 'swap.note.nowallet' })
-              : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
-          </Styled.NoteLabel>
-          {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFeesHandler} />}
-        </Styled.SubmitContainer>
-      ) : (
-        <Styled.SubmitContainer>
-          <Styled.ApproveButton onClick={onApprove} loading={RD.isPending(approveState)}>
-            {intl.formatMessage({ id: 'swap.approve' })}
-          </Styled.ApproveButton>
-          {!RD.isInitial(approveFees) && <Fees fees={approveFees} reloadFees={reloadApproveFeesHandler} />}
-          {renderApproveError}
-        </Styled.SubmitContainer>
-      )}
+      <Styled.SubmitContainer>
+        {!isLocked(keystore) ? (
+          isApproved ? (
+            <>
+              <Styled.SubmitButton color="success" sizevalue="big" onClick={onSwapConfirmed} disabled={isSwapDisabled}>
+                {intl.formatMessage({ id: 'common.swap' })}
+              </Styled.SubmitButton>
+              {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFeesHandler} />}
+            </>
+          ) : (
+            <>
+              <Styled.SubmitButton
+                sizevalue="xnormal"
+                color="warning"
+                onClick={onApprove}
+                loading={RD.isPending(approveState)}>
+                {intl.formatMessage({ id: 'common.approve' })}
+              </Styled.SubmitButton>
+              {!RD.isInitial(approveFees) && <Fees fees={approveFees} reloadFees={reloadApproveFeesHandler} />}
+              {renderApproveError}
+            </>
+          )
+        ) : (
+          <>
+            <Styled.NoteLabel align="center">
+              {!hasImportedKeystore(keystore)
+                ? intl.formatMessage({ id: 'swap.note.nowallet' })
+                : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
+            </Styled.NoteLabel>
+            <Styled.SubmitButton sizevalue="xnormal" color="success" onClick={importWalletHandler}>
+              {!hasImportedKeystore(keystore)
+                ? intl.formatMessage({ id: 'wallet.imports.label' })
+                : isLocked(keystore) && intl.formatMessage({ id: 'wallet.unlock.label' })}
+            </Styled.SubmitButton>
+          </>
+        )}
+      </Styled.SubmitContainer>
       {showPasswordModal && (
         <PasswordModal
           onSuccess={onSucceedPasswordModal}

@@ -19,8 +19,8 @@ const fontSettings = {
     spacing: '2.5px'
   },
   big: {
-    size: key('sizes.font.large', '18px'),
-    spacing: '2.5px'
+    size: '21px',
+    spacing: '3.0px'
   }
 }
 
@@ -42,7 +42,7 @@ const sizes = {
   },
   big: {
     width: key('sizes.button.big.width', '300px'),
-    height: key('sizes.button.big.height', '70px'),
+    height: '55px',
     borderBottom: '4px'
   }
 }

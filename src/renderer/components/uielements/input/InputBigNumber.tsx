@@ -65,13 +65,13 @@ export const InputBigNumber = forwardRef<Input, Props>(
         value,
         O.some,
         // filter out all duplicated real values
-        O.filter((val) =>
-          FP.pipe(
+        O.filter((val) => {
+          return FP.pipe(
             broadcastValue,
-            O.map((prevValue) => !eqBigNumber.equals(val, bnOrZero(prevValue))),
+            O.map((prevValue) => !eqBigNumber.equals(val, bnOrZero(unformatValue(prevValue)))),
             O.getOrElse((): boolean => false)
           )
-        ),
+        }),
         // fix to decimal + always round down for currencies
         O.map((val) => val.toFixed(decimal, BigNumber.ROUND_DOWN)),
         O.map((s) => formatValue(s, decimal)),
@@ -121,6 +121,7 @@ export const InputBigNumber = forwardRef<Input, Props>(
     const onChangeHandler = useCallback(
       ({ target }: React.ChangeEvent<HTMLInputElement>) => {
         const { value: newValue } = target
+
         if (validInputValue(unformatValue(newValue))) {
           // some checks needed whether to broadcast changes or not
           FP.pipe(

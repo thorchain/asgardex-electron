@@ -1,3 +1,4 @@
+import Text from 'antd/lib/typography/Text'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -21,4 +22,8 @@ export const NightThemeIcon = styled(NightThemeIconUI)`
   & path {
     fill: ${palette('text', 0)};
   }
+`
+export const Label = styled(Text)`
+  text-transform: 'upercase';
+  color: ${palette('text', 0)};
 `
