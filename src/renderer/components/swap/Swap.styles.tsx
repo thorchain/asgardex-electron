@@ -70,6 +70,7 @@ export const CurrencyInfoContainer = styled('div')`
 
 export const ContentContainer = styled('div')`
   position: relative;
+  padding-bottom: 30px;
 `
 
 export const ValueItemContainer = styled('div')`
@@ -135,13 +136,6 @@ export const InValueLabel = styled(UILabel).attrs({
   font-size: 24px;
 `
 
-export const SubmitContainer = styled('div')`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`
-
 export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
   border-color: ${({ hasError }) => (hasError ? palette('error', 0) : palette('primary', 0))};
 
@@ -162,8 +156,8 @@ export const ErrorLabel = styled(UILabel)`
   text-align: center;
 `
 
-export const BalanceErrorLabel = styled(ErrorLabel)`
-  text-align: left;
+export const FeeErrorLabel = styled(ErrorLabel)`
+  text-align: center;
 `
 
 export const NoteLabel = styled(UILabel)`
@@ -172,6 +166,17 @@ export const NoteLabel = styled(UILabel)`
 
 export const AssetSelect = styled(AssetSelectUI)`
   justify-content: space-between;
+`
+
+export const FeeContainer = styled.div`
+  width: 100%;
+`
+
+export const SubmitContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `
 
 export const SubmitButton = styled(UIButton).attrs({

@@ -19,6 +19,7 @@ type Props = {
   inputProps?: AssetInputProps
   onChange: (value: BaseAmount) => void
   onBlur?: FP.Lazy<void>
+  onFocus?: FP.Lazy<void>
   disabled?: boolean
   className?: string
 }
@@ -43,6 +44,7 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
     className = '',
     onChange,
     onBlur: onBlurHandler = FP.constVoid,
+    onFocus: onFocusHandler = FP.constVoid,
     ...otherProps
   } = props
 
@@ -75,6 +77,7 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
           value={baseToAsset(amount).amount()}
           onChange={onChangeHandler}
           onBlur={onBlurHandler}
+          onFocus={onFocusHandler}
           size={'large'}
           {...inputProps}
           decimal={amount.decimal}

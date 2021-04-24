@@ -44,13 +44,13 @@ import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
-import { INITIAL_SWAP_STATE } from '../../services/chain/const'
+import { INITIAL_SWAP_STATE, ZERO_SWAP_FEES } from '../../services/chain/const'
 import {
   SwapState,
   SwapTxParams,
   SwapStateHandler,
   SwapFeesHandler,
-  LoadSwapFeesHandler,
+  ReloadSwapFeesHandler,
   SwapFeesRD,
   SwapFeesParams,
   SwapFees,
@@ -94,7 +94,7 @@ export type SwapProps = {
   walletBalances: O.Option<NonEmptyWalletBalances>
   goToTransaction: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
-  reloadFees: LoadSwapFeesHandler
+  reloadFees: ReloadSwapFeesHandler
   reloadBalances: FP.Lazy<void>
   fees$: SwapFeesHandler
   reloadApproveFee: LoadApproveFeeHandler
@@ -209,16 +209,20 @@ export const Swap = ({
     _setAmountToSwapMax1e8 /* private - never set it directly, use setAmountToSwap() instead */
   ] = useState(initialAmountToSwapMax1e8)
 
+  const isZeroAmountToSwap = useMemo(() => amountToSwapMax1e8.amount().isZero(), [amountToSwapMax1e8])
+
   const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
     return FP.pipe(
       sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
-      O.map(([{ source, target }, poolAddress, address]) => ({
-        poolAddress,
-        asset: source,
-        // Decimal needs to be converted back for using orginal decimal of source asset
-        amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
-        memo: getSwapMemo({ asset: target, address })
-      }))
+      O.map(([{ source, target }, poolAddress, address]) => {
+        return {
+          poolAddress,
+          asset: source,
+          // Decimal needs to be converted back for using orginal decimal of source asset
+          amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
+          memo: getSwapMemo({ asset: target, address })
+        }
+      })
     )
   }, [amountToSwapMax1e8, assetsToSwap, oPoolAddress, sourceAssetDecimal, targetWalletAddress])
 
@@ -266,80 +270,43 @@ export const Swap = ({
     )
   }, [oPoolAddress, sourceAssetProp])
 
-  // Flag for pending assets state
-  // needed to avoid race condition of fee errors and balances
-  // while switching assets and reloading fees
-  const [pendingSwitchAssets, _setPendingSwitchAssets] = useState(false)
-
-  const setPendingSwitchAssets = useCallback(
-    (value: boolean) => {
-      if (!isLocked(keystore)) {
-        _setPendingSwitchAssets(value)
-      }
-    },
-    [keystore]
-  )
-
-  const chainFees$ = useMemo(() => fees$, [fees$])
-  const approveFees$ = useMemo(() => approveFee$, [approveFee$])
-
-  const prevChainFees = useRef<O.Option<SwapFees>>(O.none)
-
-  const [chainFeesRD, swapFeesParamsUpdated] = useObservableState<SwapFeesRD, O.Option<SwapFeesParams>>(
-    (oSwapFeesParams$) => {
-      return oSwapFeesParams$.pipe(
-        RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), chainFees$))),
-        liveData.map((chainFees) => {
-          // store every successfully loaded chainFees to the ref value
-          prevChainFees.current = O.some(chainFees)
-          return chainFees
-        })
-      )
-    },
-    RD.initial
-  )
-
-  const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
-    (oApproveFeeParam$) => {
-      return oApproveFeeParam$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), approveFees$))))
-    },
-    RD.initial
-  )
-
   // Reload balances at `onMount`
   useEffect(() => {
     reloadBalances()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // whenever `oSwapFeesParams` has been updated,
-  // `swapFeesParamsUpdated` needs to be called to update `chainFeesRD`
-  useEffect(() => {
-    swapFeesParamsUpdated(oSwapFeesParams)
-  }, [swapFeesParamsUpdated, oSwapFeesParams])
+  const prevChainFees = useRef<O.Option<SwapFees>>(O.none)
 
+  const [chainFeesRD] = useObservableState<SwapFeesRD, O.Option<SwapFeesParams>>(() => {
+    return FP.pipe(
+      fees$(oSwapFeesParams),
+      liveData.map((chainFees) => {
+        // store every successfully loaded chainFees to the ref value
+        prevChainFees.current = O.some(chainFees)
+        return chainFees
+      })
+    )
+  }, RD.success(ZERO_SWAP_FEES))
+
+  // Be careful by using `reloadFeesHandler`!!!
+  // In most cases reloading fees are already called by `approveFeesParamsUpdated`
+  const reloadFeesHandler = useCallback(() => {
+    reloadFees(oSwapFeesParams)
+  }, [oSwapFeesParams, reloadFees])
+
+  const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
+    (oApproveFeeParam$) => {
+      return oApproveFeeParam$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), approveFee$))))
+    },
+    RD.initial
+  )
+
+  // whenever `oApproveParams` has been updated,
+  // `approveFeesParamsUpdated` needs to be called to update `approveFeesRD`
   useEffect(() => {
     approveFeesParamsUpdated(oApproveParams)
   }, [approveFeesParamsUpdated, oApproveParams])
-
-  // reset `pendingSwitchAssets`
-  // whenever chain fees will be succeeded or failed
-  useEffect(() => {
-    FP.pipe(
-      chainFeesRD,
-      RD.fold(
-        () => false,
-        () => true,
-        () => false,
-        () => false
-      ),
-      setPendingSwitchAssets
-    )
-  }, [chainFeesRD, setPendingSwitchAssets])
-
-  const reloadFeesHandler = useCallback(() => {
-    FP.pipe(oSwapFeesParams, O.map(reloadFees))
-  }, [oSwapFeesParams, reloadFees])
 
   const reloadApproveFeesHandler = useCallback(() => {
     FP.pipe(oApproveParams, O.map(reloadApproveFee))
@@ -350,10 +317,6 @@ export const Swap = ({
 
   const setSourceAsset = useCallback(
     async (asset: Asset) => {
-      // update `pendingSwitchAssets` state
-      setPendingSwitchAssets(true)
-      // Reset previously stored fees
-      prevChainFees.current = O.none
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -369,14 +332,11 @@ export const Swap = ({
         )
       )
     },
-    [onChangePath, setPendingSwitchAssets, targetAsset]
+    [onChangePath, targetAsset]
   )
 
   const setTargetAsset = useCallback(
     async (asset: Asset) => {
-      // update `pendingSwitchAssets` state
-      setPendingSwitchAssets(true)
-
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -392,7 +352,7 @@ export const Swap = ({
         )
       )
     },
-    [onChangePath, setPendingSwitchAssets, sourceAsset]
+    [onChangePath, sourceAsset]
   )
 
   // Max amount to swap
@@ -403,24 +363,8 @@ export const Swap = ({
     // make sure not logged in user can play around with swap
     if (unlockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
 
-    // max amount for sourc chain asset
-    const maxChainAssetAmount: BaseAmount = FP.pipe(
-      RD.toOption(chainFeesRD),
-      O.alt(() => prevChainFees.current),
-      O.fold(
-        // Ingnore fees and use balance of source chain asset for max.
-        () => sourceChainAssetAmount,
-        ({ inTx }) => {
-          let max = sourceChainAssetAmount.amount().minus(inTx.amount())
-          max = max.isGreaterThan(0) ? max : ZERO_BN
-          return baseAmount(max, sourceChainAssetAmount.decimal)
-        }
-      )
-    )
-    return eqAsset.equals(sourceChainAsset, sourceAssetProp)
-      ? max1e8BaseAmount(maxChainAssetAmount)
-      : sourceAssetAmountMax1e8
-  }, [unlockedWallet, sourceAssetAmountMax1e8, chainFeesRD, sourceChainAsset, sourceAssetProp, sourceChainAssetAmount])
+    return sourceAssetAmountMax1e8
+  }, [unlockedWallet, sourceAssetAmountMax1e8])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
@@ -446,8 +390,8 @@ export const Swap = ({
   )
 
   const setAmountToSwapFromPercentValue = useCallback(
-    (percents) => {
-      const amountFromPercentage = maxAmountToSwapMax1e8.amount().multipliedBy(Number(percents) / 100)
+    (percents: number) => {
+      const amountFromPercentage = maxAmountToSwapMax1e8.amount().multipliedBy(percents / 100)
       return setAmountToSwapMax1e8(baseAmount(amountFromPercentage, sourceAssetAmountMax1e8.decimal))
     },
     [maxAmountToSwapMax1e8, setAmountToSwapMax1e8, sourceAssetAmountMax1e8.decimal]
@@ -561,7 +505,7 @@ export const Swap = ({
         key={'swap percentage slider'}
         value={percentage}
         onChange={setAmountToSwapFromPercentValue}
-        onAfterChange={reloadFeesHandler}
+        onAfterChange={() => reloadFeesHandler()}
         tooltipVisible={true}
         withLabel={true}
         tooltipPlacement={'top'}
@@ -700,26 +644,26 @@ export const Swap = ({
     )
   }, [closePasswordModal, oSwapParams, subscribeSwapState, swap$])
 
-  const sourceChainError: boolean = useMemo(() => {
-    // never error while switching assets
-    if (pendingSwitchAssets) return false
+  const sourceChainFeeError: boolean = useMemo(() => {
+    // ignore check for zero amounts
+    if (isZeroAmountToSwap) return false
 
     return FP.pipe(
       chainFeesRD,
-      RD.getOrElse(() => ({ inTx: ZERO_BASE_AMOUNT, outTx: ZERO_BASE_AMOUNT })),
+      RD.getOrElse(() => ZERO_SWAP_FEES),
       ({ inTx }) => sourceChainAssetAmount.amount().minus(inTx.amount()).isNegative()
     )
-  }, [chainFeesRD, pendingSwitchAssets, sourceChainAssetAmount])
+  }, [chainFeesRD, isZeroAmountToSwap, sourceChainAssetAmount])
 
-  const sourceChainErrorLabel: JSX.Element = useMemo(() => {
-    if (!sourceChainError) {
+  const sourceChainFeeErrorLabel: JSX.Element = useMemo(() => {
+    if (!sourceChainFeeError) {
       return <></>
     }
 
     return FP.pipe(
       RD.toOption(chainFeesRD),
       O.map((fees) => (
-        <Styled.BalanceErrorLabel key="sourceChainErrorLabel">
+        <Styled.FeeErrorLabel key="sourceChainErrorLabel">
           {intl.formatMessage(
             { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
             {
@@ -735,16 +679,17 @@ export const Swap = ({
               })
             }
           )}
-        </Styled.BalanceErrorLabel>
+        </Styled.FeeErrorLabel>
       )),
       O.getOrElse(() => <></>)
     )
-  }, [sourceChainError, chainFeesRD, intl, sourceAssetProp, sourceAssetAmount, sourceChainAsset])
+  }, [sourceChainFeeError, chainFeesRD, intl, sourceAssetProp, sourceAssetAmount, sourceChainAsset])
 
+  // Helper to price target fees into target asset
   const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
-    const fees: SwapFees = FP.pipe(
+    const { outTx }: SwapFees = FP.pipe(
       chainFeesRD,
-      RD.getOrElse(() => ({ inTx: ZERO_BASE_AMOUNT, outTx: ZERO_BASE_AMOUNT }))
+      RD.getOrElse(() => ZERO_SWAP_FEES)
     )
 
     return FP.pipe(
@@ -759,17 +704,52 @@ export const Swap = ({
           O.fold(
             () => ZERO_BASE_AMOUNT,
             ([chainAssetPoolData, assetPoolData]) =>
+              // in case target asset is chain asset return fee (no need to price it)
               eqAsset.equals(chainAsset, asset)
-                ? fees.outTx
+                ? // outTX needs to be converted into 1e8 decimal (as same as pool data)
+                  to1e8BaseAmount(outTx)
                 : // pool data are always 1e8 decimal based
                   // and we have to convert fees to 1e8, too
-                  getValueOfAsset1InAsset2(to1e8BaseAmount(fees.outTx), chainAssetPoolData, assetPoolData)
+                  getValueOfAsset1InAsset2(to1e8BaseAmount(outTx), chainAssetPoolData, assetPoolData)
           )
         )
       }),
       O.getOrElse(() => ZERO_BASE_AMOUNT)
     )
   }, [chainFeesRD, targetAsset, poolsData])
+
+  const targetChainFeeError: boolean = useMemo(() => {
+    // ignore check for zero amounts
+    if (isZeroAmountToSwap) return false
+
+    return swapResultAmountMax1e8.amount().minus(targetChainFeeAmountInTargetAsset.amount()).isNegative()
+  }, [isZeroAmountToSwap, swapResultAmountMax1e8, targetChainFeeAmountInTargetAsset])
+
+  const targetChainFeeErrorLabel: JSX.Element = useMemo(() => {
+    if (!targetChainFeeError) {
+      return <></>
+    }
+
+    return (
+      <Styled.FeeErrorLabel key="targetChainErrorLabel">
+        {intl.formatMessage(
+          { id: 'swap.errors.amount.outputShouldCoverChainFee' },
+          {
+            amount: formatAssetAmountCurrency({
+              asset: targetAssetProp,
+              amount: baseToAsset(swapResultAmountMax1e8),
+              trimZeros: true
+            }),
+            fee: formatAssetAmountCurrency({
+              asset: targetAssetProp,
+              trimZeros: true,
+              amount: baseToAsset(targetChainFeeAmountInTargetAsset)
+            })
+          }
+        )}
+      </Styled.FeeErrorLabel>
+    )
+  }, [targetChainFeeError, intl, targetAssetProp, swapResultAmountMax1e8, targetChainFeeAmountInTargetAsset])
 
   const swapResultLabel = useMemo(
     () =>
@@ -802,8 +782,13 @@ export const Swap = ({
   )
 
   const isSwapDisabled: boolean = useMemo(
-    () => unlockedWallet || amountToSwapMax1e8.amount().isZero() || FP.pipe(walletBalances, O.isNone),
-    [unlockedWallet, amountToSwapMax1e8, walletBalances]
+    () =>
+      unlockedWallet ||
+      isZeroAmountToSwap ||
+      FP.pipe(walletBalances, O.isNone) ||
+      sourceChainFeeError ||
+      targetChainFeeError,
+    [isZeroAmountToSwap, sourceChainFeeError, targetChainFeeError, unlockedWallet, walletBalances]
   )
 
   const {
@@ -908,10 +893,10 @@ export const Swap = ({
     resetIsApprovedState()
     // zero amount to swap
     setAmountToSwapMax1e8(initialAmountToSwapMax1e8)
-    // reload fees
-    reloadFeesHandler()
     // check approved status
     checkApprovedStatus()
+    // reload fees
+    reloadFeesHandler()
   }, [
     checkApprovedStatus,
     initialAmountToSwapMax1e8,
@@ -935,36 +920,7 @@ export const Swap = ({
     }
   }, [checkApprovedStatus, oPoolAddress, reset, setAmountToSwapMax1e8, sourceAssetProp, targetAssetProp])
 
-  // Reload fees whenever swap params has been changed
-  useEffect(() => {
-    FP.pipe(oSwapFeesParams, O.map(reloadFees))
-  }, [oSwapFeesParams, reloadFees])
-
-  const canSwitchAssets = useMemo(() => {
-    const hasBalances = FP.pipe(
-      walletBalances,
-      (oAssetSymbols) => sequenceTOption(oAssetSymbols, targetAsset),
-      O.chain(([balances, targetAsset]) =>
-        FP.pipe(
-          balances,
-          A.findFirst(({ asset }) => eqAsset.equals(asset, targetAsset))
-        )
-      ),
-      O.map(({ amount }) => !eqBaseAmount.equals(amount, ZERO_BASE_AMOUNT)),
-      O.getOrElse(() => false)
-    )
-
-    // no switch if no balances or while switching assets
-    return hasBalances && !pendingSwitchAssets
-  }, [walletBalances, pendingSwitchAssets, targetAsset])
-
   const onSwitchAssets = useCallback(async () => {
-    if (!canSwitchAssets) {
-      return
-    }
-
-    // update `pendingSwitchAsset` state
-    setPendingSwitchAssets(true)
     // delay to avoid render issues while switching
     await delay(100)
 
@@ -979,7 +935,7 @@ export const Swap = ({
         )
       )
     )
-  }, [canSwitchAssets, setPendingSwitchAssets, assetsToSwap, onChangePath])
+  }, [assetsToSwap, onChangePath])
 
   return (
     <Styled.Container>
@@ -1004,10 +960,10 @@ export const Swap = ({
             <Styled.AssetInput
               title={intl.formatMessage({ id: 'swap.input' })}
               onChange={setAmountToSwapMax1e8}
-              onBlur={reloadFeesHandler}
+              onBlur={() => reloadFeesHandler()}
               amount={amountToSwapMax1e8}
               maxAmount={maxAmountToSwapMax1e8}
-              hasError={sourceChainError}
+              hasError={sourceChainFeeError}
               asset={sourceAssetProp}
               disabled={unlockedWallet}
             />
@@ -1020,7 +976,6 @@ export const Swap = ({
                     onSelect={setSourceAsset}
                     asset={asset}
                     balances={balancesToSwapFrom}
-                    disabled={pendingSwitchAssets}
                     network={network}
                   />
                 )
@@ -1029,11 +984,8 @@ export const Swap = ({
           </Styled.ValueItemContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-percent'}>
-            <Styled.SliderContainer>
-              {renderSlider}
-              {sourceChainErrorLabel}
-            </Styled.SliderContainer>
-            <Styled.SwapOutlined disabled={!canSwitchAssets} onClick={onSwitchAssets} />
+            <Styled.SliderContainer>{renderSlider}</Styled.SliderContainer>
+            <Styled.SwapOutlined onClick={onSwitchAssets} />
           </Styled.ValueItemContainer>
           <Styled.ValueItemContainer className={'valueItemContainer-in'}>
             <Styled.InValueContainer>
@@ -1049,7 +1001,6 @@ export const Swap = ({
                     onSelect={setTargetAsset}
                     asset={asset}
                     balances={balancesToSwapTo}
-                    disabled={pendingSwitchAssets}
                     network={network}
                   />
                 )
@@ -1062,10 +1013,16 @@ export const Swap = ({
         {!isLocked(keystore) ? (
           isApproved ? (
             <>
-              <Styled.SubmitButton color="success" sizevalue="big" onClick={onSwapConfirmed} disabled={isSwapDisabled}>
+              <Styled.SubmitButton
+                color="success"
+                sizevalue="xnormal"
+                onClick={onSwapConfirmed}
+                disabled={isSwapDisabled}>
                 {intl.formatMessage({ id: 'common.swap' })}
               </Styled.SubmitButton>
               {!RD.isInitial(fees) && <Fees fees={fees} reloadFees={reloadFeesHandler} />}
+              {sourceChainFeeErrorLabel}
+              {targetChainFeeErrorLabel}
             </>
           ) : (
             <>
@@ -1076,6 +1033,7 @@ export const Swap = ({
                 loading={RD.isPending(approveState)}>
                 {intl.formatMessage({ id: 'common.approve' })}
               </Styled.SubmitButton>
+
               {!RD.isInitial(approveFees) && <Fees fees={approveFees} reloadFees={reloadApproveFeesHandler} />}
               {renderApproveError}
             </>
