@@ -42,6 +42,7 @@ export type CommonMessageKey =
   | 'common.fee'
   | 'common.fees'
   | 'common.max'
+  | 'common.min'
   | 'common.search'
   | 'common.searchAsset'
   | 'common.retry'

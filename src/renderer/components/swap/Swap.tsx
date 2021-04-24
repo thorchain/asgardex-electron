@@ -6,7 +6,6 @@ import { Address, Balance } from '@xchainjs/xchain-client'
 import {
   Asset,
   assetToString,
-  formatBN,
   baseToAsset,
   BaseAmount,
   AssetRuneNative,
@@ -28,7 +27,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
+import { ZERO_BASE_AMOUNT } from '../../const'
 import {
   getEthTokenAddress,
   isEthAsset,
@@ -59,7 +58,7 @@ import {
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
 import { PoolDetails } from '../../services/midgard/types'
-import { getPoolDetailsHashMap } from '../../services/midgard/utils'
+import { getBUSDPoolData, getPoolDetailsHashMap } from '../../services/midgard/utils'
 import {
   ApiError,
   KeystoreState,
@@ -71,6 +70,7 @@ import {
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetWithDecimal } from '../../types/asgardex'
 import { WalletBalances } from '../../types/wallet'
+import { minPoolTxAmountUSD } from '../../views/pools/Pools.utils'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
@@ -210,6 +210,66 @@ export const Swap = ({
   ] = useState(initialAmountToSwapMax1e8)
 
   const isZeroAmountToSwap = useMemo(() => amountToSwapMax1e8.amount().isZero(), [amountToSwapMax1e8])
+
+  // TODO (@asgdx-team) Remove min. amount if xchain-* gets fee rates from THORChain
+  // @see: https://github.com/xchainjs/xchainjs-lib/issues/299
+  const minUSDAmount = useMemo(() => {
+    return FP.pipe(
+      targetAsset,
+      O.map((targetAsset) => minPoolTxAmountUSD(targetAsset)),
+      O.getOrElse(() => ZERO_BASE_AMOUNT)
+    )
+  }, [targetAsset])
+
+  // Helper to price target fees into target asset
+  const minAmountToSwapMax1e8: BaseAmount = useMemo(() => {
+    return FP.pipe(
+      sourceAsset,
+      O.map((sourceAsset) => {
+        const oAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(sourceAsset)])
+        const oUSDPoolData: O.Option<PoolData> = getBUSDPoolData(poolDetails)
+
+        return FP.pipe(
+          sequenceTOption(oAssetPoolData, oUSDPoolData),
+          O.fold(
+            () => ZERO_BASE_AMOUNT,
+            ([assetPoolData, usdPoolData]) =>
+              // pool data are always 1e8 decimal based
+              // and we have to convert fees to 1e8, too
+              getValueOfAsset1InAsset2(to1e8BaseAmount(minUSDAmount), usdPoolData, assetPoolData)
+          )
+        )
+      }),
+      O.getOrElse(() => ZERO_BASE_AMOUNT)
+    )
+  }, [sourceAsset, poolsData, poolDetails, minUSDAmount])
+
+  const minAmountError = useMemo(() => {
+    if (isZeroAmountToSwap) return false
+
+    return amountToSwapMax1e8.lt(minAmountToSwapMax1e8)
+  }, [amountToSwapMax1e8, isZeroAmountToSwap, minAmountToSwapMax1e8])
+
+  const minAmountLabel = useMemo(
+    () => (
+      <Styled.MinAmountLabel color={minAmountError ? 'error' : 'normal'}>
+        {intl.formatMessage({ id: 'common.min' })}
+        {': '}
+        {formatAssetAmountCurrency({
+          asset: sourceAssetProp,
+          amount: baseToAsset(minAmountToSwapMax1e8),
+          trimZeros: true
+        })}{' '}
+        (
+        {formatAssetAmountCurrency({
+          trimZeros: true,
+          amount: baseToAsset(minUSDAmount)
+        })}
+        )
+      </Styled.MinAmountLabel>
+    ),
+    [intl, minAmountError, minAmountToSwapMax1e8, minUSDAmount, sourceAssetProp]
+  )
 
   const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
     return FP.pipe(
@@ -645,15 +705,15 @@ export const Swap = ({
   }, [closePasswordModal, oSwapParams, subscribeSwapState, swap$])
 
   const sourceChainFeeError: boolean = useMemo(() => {
-    // ignore check for zero amounts
-    if (isZeroAmountToSwap) return false
+    // ignore error check by having zero amounts or min amount errors
+    if (isZeroAmountToSwap || minAmountError) return false
 
     return FP.pipe(
       chainFeesRD,
       RD.getOrElse(() => ZERO_SWAP_FEES),
       ({ inTx }) => sourceChainAssetAmount.amount().minus(inTx.amount()).isNegative()
     )
-  }, [chainFeesRD, isZeroAmountToSwap, sourceChainAssetAmount])
+  }, [chainFeesRD, isZeroAmountToSwap, minAmountError, sourceChainAssetAmount])
 
   const sourceChainFeeErrorLabel: JSX.Element = useMemo(() => {
     if (!sourceChainFeeError) {
@@ -719,11 +779,11 @@ export const Swap = ({
   }, [chainFeesRD, targetAsset, poolsData])
 
   const targetChainFeeError: boolean = useMemo(() => {
-    // ignore check for zero amounts
-    if (isZeroAmountToSwap) return false
+    // ignore error check by having zero amounts or min amount errors
+    if (isZeroAmountToSwap || minAmountError) return false
 
     return swapResultAmountMax1e8.amount().minus(targetChainFeeAmountInTargetAsset.amount()).isNegative()
-  }, [isZeroAmountToSwap, swapResultAmountMax1e8, targetChainFeeAmountInTargetAsset])
+  }, [isZeroAmountToSwap, minAmountError, swapResultAmountMax1e8, targetChainFeeAmountInTargetAsset])
 
   const targetChainFeeErrorLabel: JSX.Element = useMemo(() => {
     if (!targetChainFeeError) {
@@ -752,11 +812,7 @@ export const Swap = ({
   }, [targetChainFeeError, intl, targetAssetProp, swapResultAmountMax1e8, targetChainFeeAmountInTargetAsset])
 
   const swapResultLabel = useMemo(
-    () =>
-      FP.pipe(
-        O.some(formatAssetAmount({ amount: baseToAsset(swapResultAmountMax1e8), trimZeros: true })),
-        O.getOrElse(() => formatBN(ZERO_BN))
-      ),
+    () => formatAssetAmount({ amount: baseToAsset(swapResultAmountMax1e8), trimZeros: true }),
     [swapResultAmountMax1e8]
   )
 
@@ -785,10 +841,11 @@ export const Swap = ({
     () =>
       unlockedWallet ||
       isZeroAmountToSwap ||
-      FP.pipe(walletBalances, O.isNone) ||
+      O.isNone(walletBalances) ||
       sourceChainFeeError ||
-      targetChainFeeError,
-    [isZeroAmountToSwap, sourceChainFeeError, targetChainFeeError, unlockedWallet, walletBalances]
+      targetChainFeeError ||
+      minAmountError,
+    [isZeroAmountToSwap, minAmountError, sourceChainFeeError, targetChainFeeError, unlockedWallet, walletBalances]
   )
 
   const {
@@ -963,7 +1020,7 @@ export const Swap = ({
               onBlur={() => reloadFeesHandler()}
               amount={amountToSwapMax1e8}
               maxAmount={maxAmountToSwapMax1e8}
-              hasError={sourceChainFeeError}
+              hasError={sourceChainFeeError || minAmountError}
               asset={sourceAssetProp}
               disabled={unlockedWallet}
             />
@@ -982,6 +1039,7 @@ export const Swap = ({
               )
             )}
           </Styled.ValueItemContainer>
+          {minAmountLabel}
 
           <Styled.ValueItemContainer className={'valueItemContainer-percent'}>
             <Styled.SliderContainer>{renderSlider}</Styled.SliderContainer>

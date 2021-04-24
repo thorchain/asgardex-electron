@@ -123,6 +123,23 @@ export const getPoolDetailsHashMap = (poolDetails: PoolDetails, runeAsset: Asset
 }
 
 /**
+ * Helper to get PoolData of BUSD pool
+ */
+export const getBUSDPoolData = (poolDetails: PoolDetails): O.Option<PoolData> =>
+  FP.pipe(
+    poolDetails,
+    A.findFirst(({ asset }) =>
+      FP.pipe(
+        asset,
+        assetFromString,
+        O.fromNullable,
+        O.fold(() => false, isBUSDAsset)
+      )
+    ),
+    O.map(toPoolData)
+  )
+
+/**
  * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)
  */
 export const toPoolData = (detail: Pick<PoolDetail, 'assetDepth' | 'runeDepth'>): PoolData => ({

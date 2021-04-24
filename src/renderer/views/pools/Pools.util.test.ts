@@ -1,8 +1,4 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
-import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
-import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
-import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import {
   assetAmount,
   assetToBase,
@@ -13,15 +9,13 @@ import {
   AssetLTC,
   AssetBTC,
   AssetBCH,
-  ETHChain,
-  baseAmount
+  ETHChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
 import { AssetUSDTERC20 } from '../../const'
-import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqBaseAmount } from '../../helpers/fp/eq'
 import { LastblockItems } from '../../services/midgard/types'
 import { Constants as ThorchainConstants, PoolDetail } from '../../types/generated/midgard'
@@ -32,7 +26,7 @@ import {
   getBlocksLeftForPendingPool,
   getBlocksLeftForPendingPoolAsString,
   filterTableData,
-  minPoolTxAmount
+  minPoolTxAmountUSD
 } from './Pools.utils'
 
 describe('views/pools/utils', () => {
@@ -236,36 +230,32 @@ describe('filterTableData', () => {
 })
 
 describe.only('minPoolTxAmount', () => {
-  it('zero for testnet', () => {
-    const result = minPoolTxAmount({ asset: AssetBTC, decimal: BTC_DECIMAL, network: 'testnet' })
-    expect(eqBaseAmount.equals(result, baseAmount(0))).toBeTruthy()
-  })
   it('$200 for BTC', () => {
-    const result = minPoolTxAmount({ asset: AssetBTC, decimal: BTC_DECIMAL, network: 'mainnet' })
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(200, BTC_DECIMAL)))).toBeTruthy()
+    const result = minPoolTxAmountUSD(AssetBTC)
+    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(200, 8)))).toBeTruthy()
   })
   it('$50 for ETH', () => {
-    const result = minPoolTxAmount({ asset: AssetETH, decimal: ETH_DECIMAL, network: 'mainnet' })
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(50, ETH_DECIMAL)))).toBeTruthy()
+    const result = minPoolTxAmountUSD(AssetETH)
+    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(50, 8)))).toBeTruthy()
   })
   it('$100 for ERC20', () => {
-    const result = minPoolTxAmount({ asset: AssetUSDTERC20, decimal: 6, network: 'mainnet' })
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(100, 6)))).toBeTruthy()
+    const result = minPoolTxAmountUSD(AssetUSDTERC20)
+    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(100, 8)))).toBeTruthy()
   })
   it('$10 for others (BNB)', () => {
-    const result = minPoolTxAmount({ asset: AssetBNB, decimal: BNB_DECIMAL, network: 'mainnet' })
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, BNB_DECIMAL)))).toBeTruthy()
+    const result = minPoolTxAmountUSD(AssetBNB)
+    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
   })
   it('$10 for others (LTC)', () => {
-    const result = minPoolTxAmount({ asset: AssetLTC, decimal: LTC_DECIMAL, network: 'mainnet' })
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, LTC_DECIMAL)))).toBeTruthy()
+    const result = minPoolTxAmountUSD(AssetLTC)
+    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
   })
   it('$10 for others (BCH)', () => {
-    const result = minPoolTxAmount({ asset: AssetBCH, decimal: BCH_DECIMAL, network: 'mainnet' })
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, BCH_DECIMAL)))).toBeTruthy()
+    const result = minPoolTxAmountUSD(AssetBCH)
+    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
   })
   it('$10 for others (RUNE)', () => {
-    const result = minPoolTxAmount({ asset: AssetRuneNative, decimal: THORCHAIN_DECIMAL, network: 'mainnet' })
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, THORCHAIN_DECIMAL)))).toBeTruthy()
+    const result = minPoolTxAmountUSD(AssetRuneNative)
+    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
   })
 })
