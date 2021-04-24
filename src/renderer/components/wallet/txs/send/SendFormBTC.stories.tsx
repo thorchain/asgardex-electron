@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
-import { FeeRates } from '@xchainjs/xchain-bitcoin'
+import { FeeRates, validateAddress } from '@xchainjs/xchain-bitcoin'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { Fees } from '@xchainjs/xchain-client'
 import {
@@ -50,7 +50,7 @@ const defaultProps: ComponentProps = {
   onSubmit: ({ recipient, amount, feeOptionKey, memo }: SendTxParams) =>
     console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOptionKey}, memo: ${memo}`),
   isLoading: false,
-  addressValidation: (_) => true,
+  addressValidation: (address) => validateAddress(address, 'mainnet'),
   feesWithRates: RD.success({ fees, rates }),
   reloadFeesHandler: () => console.log('reload fees'),
   validatePassword$: mockValidatePassword$,

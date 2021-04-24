@@ -214,7 +214,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
       if (!value) {
         return Promise.reject(intl.formatMessage({ id: 'wallet.errors.address.empty' }))
       }
-      if (!addressValidation(value.toLowerCase())) {
+      if (!addressValidation(value)) {
         return Promise.reject(intl.formatMessage({ id: 'wallet.errors.address.invalid' }))
       }
     },
