@@ -131,9 +131,9 @@ export type SwapFeesParams = {
   readonly outTx: SwapOutTx
 }
 
-export type SwapFeesHandler = (p: SwapFeesParams) => SwapFeesLD
+export type SwapFeesHandler = (p: O.Option<SwapFeesParams>) => SwapFeesLD
 
-export type LoadSwapFeesHandler = (p: SwapFeesParams) => void
+export type ReloadSwapFeesHandler = (p: O.Option<SwapFeesParams>) => void
 
 /**
  * State to reflect status of an asym. deposit by doing different requests

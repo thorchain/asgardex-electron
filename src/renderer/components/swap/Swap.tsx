@@ -50,7 +50,7 @@ import {
   SwapTxParams,
   SwapStateHandler,
   SwapFeesHandler,
-  LoadSwapFeesHandler,
+  ReloadSwapFeesHandler,
   SwapFeesRD,
   SwapFeesParams,
   SwapFees,
@@ -96,7 +96,7 @@ export type SwapProps = {
   walletBalances: O.Option<NonEmptyWalletBalances>
   goToTransaction: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
-  reloadFees: LoadSwapFeesHandler
+  reloadFees: ReloadSwapFeesHandler
   reloadBalances: FP.Lazy<void>
   fees$: SwapFeesHandler
   reloadApproveFee: LoadApproveFeeHandler
@@ -142,7 +142,7 @@ export const Swap = ({
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
 
-  const [selectedInput, setSelectedInput] = useState<SelectedInput>('none')
+  const [_selectedInput, setSelectedInput] = useState<SelectedInput>('none')
 
   // convert to hash map here instead of using getPoolDetail
   const poolsData: PoolsDataMap = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [poolDetails])
@@ -282,33 +282,22 @@ export const Swap = ({
 
   const prevChainFees = useRef<O.Option<SwapFees>>(O.none)
 
-  const [chainFeesRD, swapFeesParamsUpdated] = useObservableState<SwapFeesRD, O.Option<SwapFeesParams>>(
-    (oSwapFeesParams$) => {
-      return oSwapFeesParams$.pipe(
-        RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), fees$))),
-        liveData.map((chainFees) => {
-          // store every successfully loaded chainFees to the ref value
-          prevChainFees.current = O.some(chainFees)
-          return chainFees
-        })
-      )
-    },
-    RD.success(ZERO_SWAP_FEES)
-  )
-
-  // whenever `oSwapFeesParams` has been updated,
-  // `swapFeesParamsUpdated` needs to be called to update `chainFeesRD`
-  useEffect(() => {
-    // Trigger changes only while users NOT typing into input field (to avoid too many requests)
-    if (selectedInput === 'none') {
-      swapFeesParamsUpdated(oSwapFeesParams)
-    }
-  }, [swapFeesParamsUpdated, oSwapFeesParams, selectedInput])
+  const [chainFeesRD] = useObservableState<SwapFeesRD, O.Option<SwapFeesParams>>(() => {
+    return FP.pipe(
+      fees$(oSwapFeesParams),
+      liveData.map((chainFees) => {
+        // store every successfully loaded chainFees to the ref value
+        prevChainFees.current = O.some(chainFees)
+        return chainFees
+      })
+    )
+  }, RD.success(ZERO_SWAP_FEES))
 
   // Be careful by using `reloadFeesHandler`!!!
   // In most cases reloading fees are already called by `approveFeesParamsUpdated`
   const reloadFeesHandler = useCallback(() => {
-    FP.pipe(oSwapFeesParams, O.map(reloadFees))
+    console.log('reloadFeesHandler:', oSwapFeesParams)
+    reloadFees(oSwapFeesParams)
   }, [oSwapFeesParams, reloadFees])
 
   const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
@@ -810,8 +799,13 @@ export const Swap = ({
   )
 
   const isSwapDisabled: boolean = useMemo(
-    () => unlockedWallet || isZeroAmountToSwap || FP.pipe(walletBalances, O.isNone),
-    [isZeroAmountToSwap, unlockedWallet, walletBalances]
+    () =>
+      unlockedWallet ||
+      isZeroAmountToSwap ||
+      FP.pipe(walletBalances, O.isNone) ||
+      sourceChainFeeError ||
+      targetChainFeeError,
+    [isZeroAmountToSwap, sourceChainFeeError, targetChainFeeError, unlockedWallet, walletBalances]
   )
 
   const {
@@ -918,9 +912,12 @@ export const Swap = ({
     setAmountToSwapMax1e8(initialAmountToSwapMax1e8)
     // check approved status
     checkApprovedStatus()
+    // reload fees
+    reloadFeesHandler()
   }, [
     checkApprovedStatus,
     initialAmountToSwapMax1e8,
+    reloadFeesHandler,
     resetApproveState,
     resetIsApprovedState,
     resetSwapState,

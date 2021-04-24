@@ -162,34 +162,45 @@ const txOutFee$ = ({ asset, memo }: SwapOutTx): FeeLD => {
 }
 
 // state for reloading swap fees
-const { get$: reloadSwapFees$, set: reloadSwapFees } = observableState<SwapFeesParams | undefined>(undefined)
+const { get$: reloadSwapFees$, set: reloadSwapFees } = observableState<O.Option<SwapFeesParams>>(O.none)
 
-const swapFees$: SwapFeesHandler = (params) => {
+const swapFees$: SwapFeesHandler = (oInitialParams) => {
   return reloadSwapFees$.pipe(
     RxOp.debounceTime(300),
-    RxOp.switchMap((reloadParams) => {
-      const { inTx, outTx } = reloadParams || params
+    RxOp.switchMap((oReloadParams) => {
+      return FP.pipe(
+        // (1) Always check reload params first
+        oReloadParams,
+        // (2) If reload params not set (which is by default), use initial params
+        O.alt(() => oInitialParams),
+        O.fold(
+          // If both (initial + reload params) are not set, return zero fees
+          () => Rx.of(RD.success(ZERO_SWAP_FEES)),
+          ({ inTx, outTx }) => {
+            console.log('swapFees$:', inTx.amount.amount().toString())
+            // in case of zero amount, return zero fees (no API request needed)
+            if (inTx.amount.amount().isZero()) return Rx.of(RD.success(ZERO_SWAP_FEES))
 
-      // in case of zero amount, return zero fees (no API request needed then)
-      if (inTx.amount.amount().isZero()) return Rx.of(RD.success(ZERO_SWAP_FEES))
+            // fee for pool IN tx
+            const in$ = txInFee$(inTx).pipe(RxOp.shareReplay(1))
+            // fee for pool OUT tx
+            const out$ = Rx.iif(
+              // In case chains of source and target are the same, but no ETH
+              // then we don't need to do another request
+              // and can use same fee provided by `in$` stream to fees for OUT tx
+              () => eqChain.equals(inTx.asset.chain, outTx.asset.chain) && !isEthChain(inTx.poolAddress.chain),
+              in$,
+              txOutFee$(outTx)
+            ) // Result needs to be 3 times as "normal" fee
+              .pipe(liveData.map((fee) => baseAmount(fee.amount().times(3), fee.decimal)))
 
-      // fee for pool IN tx
-      const in$ = txInFee$(inTx).pipe(RxOp.shareReplay(1))
-      // fee for pool OUT tx
-      const out$ = Rx.iif(
-        // In case chains of source and target are the same, but no ETH
-        // then we don't need to do another request
-        // and can use same fee provided by `in$` stream to fees for OUT tx
-        () => eqChain.equals(inTx.asset.chain, outTx.asset.chain) && !isEthChain(inTx.poolAddress.chain),
-        in$,
-        txOutFee$(outTx)
-      ) // Result needs to be 3 times as "normal" fee
-        .pipe(liveData.map((fee) => baseAmount(fee.amount().times(3), fee.decimal)))
-
-      return liveData.sequenceS({
-        inTx: in$,
-        outTx: out$
-      })
+            return liveData.sequenceS({
+              inTx: in$,
+              outTx: out$
+            })
+          }
+        )
+      )
     })
   )
 }
