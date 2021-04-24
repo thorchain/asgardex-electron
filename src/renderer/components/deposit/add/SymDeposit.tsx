@@ -38,15 +38,16 @@ import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import { LiveData } from '../../../helpers/rx/liveData'
 import { FundsCap } from '../../../hooks/useFundsCap'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
-import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
+import { INITIAL_SYM_DEPOSIT_STATE, ZERO_SYM_DEPOSIT_FEES } from '../../../services/chain/const'
 import {
   SymDepositMemo,
   SymDepositState,
   SymDepositParams,
   SymDepositStateHandler,
-  DepositFeesLD,
   DepositFeesRD,
-  FeeRD
+  FeeRD,
+  ReloadSymDepositFeesHandler,
+  SymDepositFeesHandler
 } from '../../../services/chain/types'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
 import { PoolAddress } from '../../../services/midgard/types'
@@ -72,8 +73,8 @@ export type Props = {
   poolAddress: O.Option<PoolAddress>
   memos: O.Option<SymDepositMemo>
   priceAsset?: Asset
-  reloadFees: (p: SymDepositParams) => void
-  fees$: (p: SymDepositParams) => DepositFeesLD
+  reloadFees: ReloadSymDepositFeesHandler
+  fees$: SymDepositFeesHandler
   reloadApproveFee: LoadApproveFeeHandler
   approveFee$: ApproveFeeHandler
   reloadBalances: FP.Lazy<void>
@@ -169,11 +170,17 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const initialAssetAmountToDepositMax1e8 = useMemo(() => baseAmount(0, assetBalanceMax1e8.decimal), [
     assetBalanceMax1e8.decimal
   ])
+
   const [
     /* max. 1e8 decimal */
     assetAmountToDepositMax1e8,
     _setAssetAmountToDepositMax1e8 /* private, never set it directly, use `setAssetAmountToDeposit` instead */
   ] = useState<BaseAmount>(initialAssetAmountToDepositMax1e8)
+
+  const isZeroAmountToDeposit = useMemo(
+    () => assetAmountToDepositMax1e8.amount().isZero() || runeAmountToDeposit.amount().isZero(),
+    [assetAmountToDepositMax1e8, runeAmountToDeposit]
+  )
 
   const [percentValueToDeposit, setPercentValueToDeposit] = useState(0)
 
@@ -239,20 +246,21 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const prevDepositFeesRD = useRef<DepositFeesRD>(RD.initial)
 
-  // Input: `oDepositParams` via depositParamsUpdated
-  // Output: `DepositFeesRD
-  const [depositFeesRD, depositParamsUpdated] = useObservableState<DepositFeesRD, O.Option<SymDepositParams>>(
-    (oDepositParams$) =>
-      oDepositParams$.pipe(
-        RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), fees$))),
+  const [depositFeesRD] = useObservableState<DepositFeesRD, O.Option<SymDepositParams>>(
+    () =>
+      FP.pipe(
+        oDepositParams,
+        fees$,
         RxOp.tap((feesRD) => {
-          if (RD.isSuccess(feesRD)) {
-            prevDepositFeesRD.current = feesRD
-          }
+          prevDepositFeesRD.current = feesRD
         })
       ),
-    RD.initial
+    RD.success(ZERO_SYM_DEPOSIT_FEES)
   )
+
+  const reloadFeesHandler = useCallback(() => {
+    reloadFees(oDepositParams)
+  }, [oDepositParams, reloadFees])
 
   const approveFees$ = useMemo(() => approveFee$, [approveFee$])
 
@@ -263,25 +271,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     RD.initial
   )
 
-  // whenever `oDepositParams` has been updated, `depositParamsUpdated` needs to be called to update `depositFeesRD`
-  useEffect(() => {
-    // Trigger changes only for users while NOT typing into input fields (to avoid too many requests)
-    if (selectedInput === 'none') depositParamsUpdated(oDepositParams)
-  }, [depositParamsUpdated, oDepositParams, selectedInput])
-
   useEffect(() => {
     approveFeesParamsUpdated(oApproveParams)
   }, [approveFeesParamsUpdated, oApproveParams])
-
-  const reloadFeesHandler = useCallback(() => {
-    FP.pipe(
-      oDepositParams,
-      O.map((params) => {
-        reloadFees(params)
-        return true
-      })
-    )
-  }, [oDepositParams, reloadFees])
 
   const reloadApproveFeesHandler = useCallback(() => {
     FP.pipe(oApproveParams, O.map(reloadApproveFee))
@@ -361,6 +353,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const setAssetAmountToDepositMax1e8 = useCallback(
     (amountToDeposit: BaseAmount) => {
       const newAmount = baseAmount(amountToDeposit.amount(), assetBalanceMax1e8.decimal)
+
       // dirty check - do nothing if prev. and next amounts are equal
       if (eqBaseAmount.equals(newAmount, assetAmountToDepositMax1e8)) return {}
 
@@ -538,12 +531,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const onChangeAssetHandler = useCallback(
     (asset: Asset) => {
-      depositParamsUpdated(O.none)
-      resetDepositState()
-      changePercentHandler(0)
       onChangeAsset(asset)
     },
-    [changePercentHandler, depositParamsUpdated, onChangeAsset, resetDepositState]
+    [onChangeAsset]
   )
 
   const onAfterSliderChangeHandler = useCallback(() => {
@@ -574,6 +564,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const isThorchainFeeError = useMemo(() => {
+    // ignore error check by having zero amounts
+    if (isZeroAmountToDeposit) return false
+
     return FP.pipe(
       sequenceTOption(
         oThorchainFee,
@@ -588,7 +581,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         ([fee, balance]) => balance.amount().isLessThan(fee.amount())
       )
     )
-  }, [oRuneBalance, oThorchainFee])
+  }, [oRuneBalance, oThorchainFee, isZeroAmountToDeposit])
 
   const renderThorchainFeeError = useMemo(() => {
     const amount = FP.pipe(
@@ -605,6 +598,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [oRuneBalance, oThorchainFee, renderFeeError])
 
   const isAssetChainFeeError = useMemo(() => {
+    // ignore error check by having zero amounts
+    if (isZeroAmountToDeposit) return false
     return FP.pipe(
       sequenceTOption(oAssetChainFee, FP.pipe(oChainAssetBalance)),
       O.fold(
@@ -613,7 +608,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         ([fee, balance]) => balance.amount().isLessThan(fee.amount())
       )
     )
-  }, [oAssetChainFee, oChainAssetBalance])
+  }, [oAssetChainFee, oChainAssetBalance, isZeroAmountToDeposit])
 
   const renderAssetChainFeeError = useMemo(() => {
     const amount = FP.pipe(
@@ -920,15 +915,18 @@ export const SymDeposit: React.FC<Props> = (props) => {
   useEffect(() => {
     if (!eqOPoolAddresses.equals(prevPoolAddresses.current, oPoolAddress)) {
       prevPoolAddresses.current = oPoolAddress
+      // reset deposit state
+      resetDepositState()
+      // set values to zero
+      changePercentHandler(0)
       // reset approve state
       resetApproveState()
       // reset isApproved state
       resetIsApprovedState()
       // check approved status
       checkApprovedStatus()
-
-      // for ETH/ETH20
-      if (O.isSome(oPoolAddress)) reloadFeesHandler()
+      // reload fees
+      reloadFeesHandler()
     }
   }, [
     asset,
@@ -938,7 +936,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     reloadFeesHandler,
     resetApproveState,
     resetIsApprovedState,
-    reloadSelectedPoolDetail
+    reloadSelectedPoolDetail,
+    resetDepositState,
+    changePercentHandler
   ])
 
   return (
@@ -1012,9 +1012,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
           <Styled.SubmitButtonWrapper>
             <Styled.SubmitButton
-              sizevalue="big"
+              sizevalue="xnormal"
               onClick={confirmDepositHandler}
-              disabled={disabledForm || runeAmountToDeposit.amount().isZero()}>
+              disabled={disabledForm || isZeroAmountToDeposit}>
               {intl.formatMessage({ id: 'common.add' })}
             </Styled.SubmitButton>
           </Styled.SubmitButtonWrapper>

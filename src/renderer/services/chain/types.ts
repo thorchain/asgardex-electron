@@ -67,6 +67,10 @@ export type SymDepositParams = {
   readonly memos: SymDepositMemo
 }
 
+export type SymDepositFeesHandler = (params: O.Option<SymDepositParams>) => DepositFeesLD
+
+export type ReloadSymDepositFeesHandler = (params: O.Option<SymDepositParams>) => void
+
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
 export type SendTxParams = {

@@ -340,7 +340,8 @@ export const Swap = ({
 
   const [chainFeesRD] = useObservableState<SwapFeesRD, O.Option<SwapFeesParams>>(() => {
     return FP.pipe(
-      fees$(oSwapFeesParams),
+      oSwapFeesParams,
+      fees$,
       liveData.map((chainFees) => {
         // store every successfully loaded chainFees to the ref value
         prevChainFees.current = O.some(chainFees)
@@ -349,8 +350,6 @@ export const Swap = ({
     )
   }, RD.success(ZERO_SWAP_FEES))
 
-  // Be careful by using `reloadFeesHandler`!!!
-  // In most cases reloading fees are already called by `approveFeesParamsUpdated`
   const reloadFeesHandler = useCallback(() => {
     reloadFees(oSwapFeesParams)
   }, [oSwapFeesParams, reloadFees])

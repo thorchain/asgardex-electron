@@ -31,8 +31,8 @@ import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import { PoolAddress } from '../../midgard/types'
 import * as THOR from '../../thorchain'
-import { FeeOptionKeys } from '../const'
-import { FeeLD, DepositFeesLD, Memo, SymDepositParams, AsymDepositParams } from '../types'
+import { FeeOptionKeys, ZERO_SYM_DEPOSIT_FEES } from '../const'
+import { FeeLD, DepositFeesLD, Memo, SymDepositParams, AsymDepositParams, SymDepositFeesHandler } from '../types'
 
 const depositFee$ = ({
   asset,
@@ -107,38 +107,53 @@ const depositFee$ = ({
 }
 
 // State to reload sym deposit fees
-const { get$: reloadSymDepositFees$, set: reloadSymDepositFees } = observableState<SymDepositParams | undefined>(
-  undefined
-)
+const { get$: reloadSymDepositFees$, set: reloadSymDepositFees } = observableState<O.Option<SymDepositParams>>(O.none)
 
-const symDepositFees$ = (params: SymDepositParams): DepositFeesLD => {
+const symDepositFees$: SymDepositFeesHandler = (oInitialParams) => {
   return FP.pipe(
     reloadSymDepositFees$,
     RxOp.debounceTime(300),
-    RxOp.switchMap((reloadParams) => {
-      const { amounts, poolAddress, asset, memos } = reloadParams || params
+    RxOp.switchMap((oReloadParams) => {
       return FP.pipe(
-        Rx.combineLatest([
-          // asset
-          depositFee$({
-            asset,
-            amount: amounts.asset,
-            poolAddress: O.some(poolAddress),
-            memo: memos.asset
-          }),
-          // rune
-          depositFee$({
-            asset: AssetRuneNative,
-            amount: amounts.rune,
-            memo: memos.rune,
-            poolAddress: O.none
-          })
-        ]),
-        RxOp.map(sequenceTRDFromArray),
-        liveData.map(([asset, thor]) => ({
-          asset,
-          thor: O.fromNullable(thor)
-        }))
+        // (1) Always check reload params first
+        oReloadParams,
+        // (2) If reload params not set (which is by default), use initial params
+        O.alt(() => oInitialParams),
+        O.fold(
+          // If both (initial + reload params) are not set, return zero fees
+          () => Rx.of(RD.success(ZERO_SYM_DEPOSIT_FEES)),
+          ({ amounts, poolAddress, asset, memos }) => {
+            const { asset: assetAmount, rune: runeAmount } = amounts
+
+            // in case of zero amount, return zero fees (no API request needed)
+            if (assetAmount.amount().isZero() || runeAmount.amount().isZero())
+              return Rx.of(RD.success(ZERO_SYM_DEPOSIT_FEES))
+
+            return FP.pipe(
+              Rx.combineLatest([
+                // asset
+                depositFee$({
+                  asset,
+                  amount: assetAmount,
+                  poolAddress: O.some(poolAddress),
+                  memo: memos.asset
+                }),
+                // rune
+                depositFee$({
+                  asset: AssetRuneNative,
+                  amount: runeAmount,
+                  memo: memos.rune,
+                  poolAddress: O.none
+                })
+              ]),
+              RxOp.map(sequenceTRDFromArray),
+              liveData.map(([asset, thor]) => ({
+                asset,
+                thor: O.fromNullable(thor)
+              }))
+            )
+          }
+        )
       )
     })
   )
