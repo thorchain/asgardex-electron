@@ -177,7 +177,6 @@ const swapFees$: SwapFeesHandler = (oInitialParams) => {
           // If both (initial + reload params) are not set, return zero fees
           () => Rx.of(RD.success(ZERO_SWAP_FEES)),
           ({ inTx, outTx }) => {
-            console.log('swapFees$:', inTx.amount.amount().toString())
             // in case of zero amount, return zero fees (no API request needed)
             if (inTx.amount.amount().isZero()) return Rx.of(RD.success(ZERO_SWAP_FEES))
 

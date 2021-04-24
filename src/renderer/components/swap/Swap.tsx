@@ -83,8 +83,6 @@ import { getSwapData, poolAssetDetailToAsset, pickPoolAsset, SwapData } from './
 
 export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string }
 
-type SelectedInput = 'input' | 'slider' | 'none'
-
 export type SwapProps = {
   keystore: KeystoreState
   availableAssets: PoolAssetDetails
@@ -141,8 +139,6 @@ export const Swap = ({
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
-
-  const [_selectedInput, setSelectedInput] = useState<SelectedInput>('none')
 
   // convert to hash map here instead of using getPoolDetail
   const poolsData: PoolsDataMap = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [poolDetails])
@@ -296,7 +292,6 @@ export const Swap = ({
   // Be careful by using `reloadFeesHandler`!!!
   // In most cases reloading fees are already called by `approveFeesParamsUpdated`
   const reloadFeesHandler = useCallback(() => {
-    console.log('reloadFeesHandler:', oSwapFeesParams)
     reloadFees(oSwapFeesParams)
   }, [oSwapFeesParams, reloadFees])
 
@@ -495,19 +490,6 @@ export const Swap = ({
     setShowPasswordModal(true)
   }, [setShowPasswordModal])
 
-  const sliderOnChange = useCallback(
-    (percents: number) => {
-      setSelectedInput('slider')
-      setAmountToSwapFromPercentValue(percents)
-    },
-    [setAmountToSwapFromPercentValue]
-  )
-
-  const sliderAfterChange = useCallback(() => {
-    setSelectedInput('none')
-    reloadFeesHandler()
-  }, [reloadFeesHandler])
-
   const renderSlider = useMemo(() => {
     const percentage = unlockedWallet
       ? 0
@@ -522,15 +504,15 @@ export const Swap = ({
       <Slider
         key={'swap percentage slider'}
         value={percentage}
-        onChange={sliderOnChange}
-        onAfterChange={sliderAfterChange}
+        onChange={setAmountToSwapFromPercentValue}
+        onAfterChange={() => reloadFeesHandler()}
         tooltipVisible={true}
         withLabel={true}
         tooltipPlacement={'top'}
         disabled={unlockedWallet}
       />
     )
-  }, [unlockedWallet, amountToSwapMax1e8, sourceAssetAmountMax1e8, sliderOnChange, sliderAfterChange])
+  }, [unlockedWallet, amountToSwapMax1e8, sourceAssetAmountMax1e8, setAmountToSwapFromPercentValue, reloadFeesHandler])
 
   const extraTxModalContent = useMemo(() => {
     return FP.pipe(
@@ -724,7 +706,8 @@ export const Swap = ({
             ([chainAssetPoolData, assetPoolData]) =>
               // in case target asset is chain asset return fee (no need to price it)
               eqAsset.equals(chainAsset, asset)
-                ? outTx
+                ? // outTX needs to be converted into 1e8 decimal (as same as pool data)
+                  to1e8BaseAmount(outTx)
                 : // pool data are always 1e8 decimal based
                   // and we have to convert fees to 1e8, too
                   getValueOfAsset1InAsset2(to1e8BaseAmount(outTx), chainAssetPoolData, assetPoolData)
@@ -954,11 +937,6 @@ export const Swap = ({
     )
   }, [assetsToSwap, onChangePath])
 
-  const inputOnBlur = useCallback(() => {
-    setSelectedInput('none')
-    reloadFeesHandler()
-  }, [reloadFeesHandler])
-
   return (
     <Styled.Container>
       <Styled.ContentContainer>
@@ -982,8 +960,7 @@ export const Swap = ({
             <Styled.AssetInput
               title={intl.formatMessage({ id: 'swap.input' })}
               onChange={setAmountToSwapMax1e8}
-              onBlur={inputOnBlur}
-              onFocus={() => setSelectedInput('input')}
+              onBlur={() => reloadFeesHandler()}
               amount={amountToSwapMax1e8}
               maxAmount={maxAmountToSwapMax1e8}
               hasError={sourceChainFeeError}
