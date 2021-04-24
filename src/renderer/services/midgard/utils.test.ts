@@ -25,16 +25,9 @@ import {
 import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, ZERO_BN } from '../../const'
 import { eqAsset, eqPoolShare, eqPoolShares } from '../../helpers/fp/eq'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { PoolDetail } from '../../types/generated/midgard'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
-import {
-  PoolAddress,
-  PoolAssetDetail,
-  PoolOverviewDetail,
-  PoolShare,
-  PoolShares,
-  PoolsState,
-  PoolsStateRD
-} from './types'
+import { PoolAddress, PoolAssetDetail, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
 import {
   getAssetDetail,
   getPricePools,
@@ -50,7 +43,8 @@ import {
   getSharesByAssetAndType,
   getPoolAssetDetail,
   getPoolAssetsDetail,
-  toPoolAddresses
+  toPoolAddresses,
+  getBUSDPoolData
 } from './utils'
 
 describe('services/midgard/utils/', () => {
@@ -70,11 +64,11 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('getPricePools', () => {
-    const tomob = { asset: 'BNB.TOMOB-1E1', assetDepth: '1', runeDepth: '11' } as PoolOverviewDetail
-    const eth = { asset: 'ETH.ETH', assetDepth: '2', runeDepth: '22' } as PoolOverviewDetail
-    const BUSDBAF = { asset: 'BNB.BUSD-BAF', assetDepth: '3', runeDepth: '33' } as PoolOverviewDetail
-    const btc = { asset: 'BTC.BTC', assetDepth: '4', runeDepth: '44' } as PoolOverviewDetail
-    const lok = { asset: 'BNB.LOK-3C0', assetDepth: '5', runeDepth: '5' } as PoolOverviewDetail
+    const tomob = { asset: 'BNB.TOMOB-1E1', assetDepth: '1', runeDepth: '11' } as PoolDetail
+    const eth = { asset: 'ETH.ETH', assetDepth: '2', runeDepth: '22' } as PoolDetail
+    const BUSDBAF = { asset: 'BNB.BUSD-BAF', assetDepth: '3', runeDepth: '33' } as PoolDetail
+    const btc = { asset: 'BTC.BTC', assetDepth: '4', runeDepth: '44' } as PoolDetail
+    const lok = { asset: 'BNB.LOK-3C0', assetDepth: '5', runeDepth: '5' } as PoolDetail
 
     it('returns list of price pools in a right order', () => {
       const result = getPricePools([tomob, eth, BUSDBAF, btc, lok], PRICE_POOLS_WHITELIST)
@@ -198,8 +192,8 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('getPoolDetail', () => {
-    const runeDetail = { asset: assetToString(AssetRuneNative) } as PoolOverviewDetail
-    const bnbDetail = { asset: assetToString(AssetBNB) } as PoolOverviewDetail
+    const runeDetail = { asset: assetToString(AssetRuneNative) } as PoolDetail
+    const bnbDetail = { asset: assetToString(AssetBNB) } as PoolDetail
 
     it('returns details of RUNE pool', () => {
       const result = getPoolDetail([runeDetail, bnbDetail], AssetRuneNative)
@@ -213,8 +207,8 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('getPoolDetailsHashMap', () => {
-    const runeDetail = { asset: assetToString(AssetRuneNative) } as PoolOverviewDetail
-    const bnbDetail = { asset: assetToString(AssetBNB) } as PoolOverviewDetail
+    const runeDetail = { asset: assetToString(AssetRuneNative) } as PoolDetail
+    const bnbDetail = { asset: assetToString(AssetBNB) } as PoolDetail
 
     it('returns hashMap of pool details', () => {
       const result = getPoolDetailsHashMap([runeDetail, bnbDetail], AssetRuneNative)
@@ -231,6 +225,21 @@ describe('services/midgard/utils/', () => {
           [assetToString(AssetBNB)]: toPoolData(bnbDetail)
         })
       )
+    })
+  })
+
+  describe.only('getBUSDPoolData', () => {
+    const runeDetail = { asset: assetToString(AssetRuneNative) } as PoolDetail
+    const bnbDetail = { asset: assetToString(AssetBNB) } as PoolDetail
+    const busdDetail = { asset: assetToString(AssetBUSDBAF) } as PoolDetail
+
+    it('returns pool data for BUD', () => {
+      const result = getBUSDPoolData([runeDetail, bnbDetail, busdDetail])
+      expect(O.isSome(result)).toBeTruthy()
+    })
+    it('returns no pool data for BUD', () => {
+      const result = getBUSDPoolData([runeDetail, bnbDetail])
+      expect(result).toBeNone()
     })
   })
 

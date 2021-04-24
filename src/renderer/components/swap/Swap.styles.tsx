@@ -164,6 +164,11 @@ export const NoteLabel = styled(UILabel)`
   color: ${palette('text', 2)};
 `
 
+export const MinAmountLabel = styled(UILabel)`
+  padding-top: 0;
+  text-transform: uppercase;
+`
+
 export const AssetSelect = styled(AssetSelectUI)`
   justify-content: space-between;
 `

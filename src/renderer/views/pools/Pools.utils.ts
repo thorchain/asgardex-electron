@@ -153,27 +153,22 @@ export const filterTableData = (oFilter: O.Option<PoolFilter> = O.none) => (
   )
 }
 
-export const minPoolTxAmount = ({
-  asset,
-  decimal,
-  network
-}: {
-  asset: Asset
-  decimal: number
-  network: Network
-}): BaseAmount => {
-  let value = 0
-
-  // testnet: zero min. value
-  if (network === 'testnet') value = 0
+/**
+ * Helper to get min. amount for pool txs
+ * We use these currently to make sure all fees are covered
+ *
+ * TODO (@asgdx-team) Remove min. amount if xchain-* gets fee rates from THORChain
+ * @see: https://github.com/xchainjs/xchainjs-lib/issues/299
+ */
+export const minPoolTxAmountUSD = (asset: Asset): BaseAmount => {
+  // BUSD has 8 decimal
+  const value = (v: number) => assetToBase(assetAmount(v, 8))
   // BTC $200
-  else if (isBtcAsset(asset)) value = 200
+  if (isBtcAsset(asset)) return value(200)
   // ETH $50
-  else if (isEthAsset(asset)) value = 50
+  else if (isEthAsset(asset)) return value(50)
   // ERC20 $100
-  else if (isEthTokenAsset(asset)) value = 100
+  else if (isEthTokenAsset(asset)) return value(100)
   // anything else $10
-  else value = 10
-
-  return assetToBase(assetAmount(value, decimal))
+  else return value(10)
 }

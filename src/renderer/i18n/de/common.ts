@@ -43,6 +43,7 @@ const common: CommonMessages = {
   'common.fee': 'Gebühr',
   'common.fees': 'Gebühren',
   'common.max': 'Max',
+  'common.min': 'Min',
   'common.search': 'Suche',
   'common.searchAsset': 'Suche Asset',
   'common.retry': 'Wiederholen',

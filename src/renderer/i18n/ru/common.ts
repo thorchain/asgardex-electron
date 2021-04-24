@@ -43,6 +43,7 @@ const common: CommonMessages = {
   'common.fee': 'Комиссия',
   'common.fees': 'Комиссии',
   'common.max': 'Макс.',
+  'common.min': 'Мin - RU',
   'common.search': 'Поиск',
   'common.searchAsset': 'Поиск Ассета',
   'common.retry': 'Повторить',
