@@ -54,7 +54,11 @@ export const sortBalances = (balances: WalletBalances, orders: string[]) => {
   )
 }
 
-export const getBalanceByAsset = (asset: Asset) => (balances: WalletBalances) =>
+//
+// TODO (asgdx-team)
+// `getBalanceByAsset` is very similar to `getWalletBalanceByAsset`
+// Move it to `walletHelper`
+export const getBalanceByAsset = (asset: Asset) => (balances: WalletBalances): O.Option<WalletBalance> =>
   FP.pipe(
     balances,
     A.findFirst((assetWithBalance) => eqAsset.equals(assetWithBalance.asset, asset))
