@@ -338,9 +338,10 @@ export const Swap = ({
 
   const prevChainFees = useRef<O.Option<SwapFees>>(O.none)
 
-  const [chainFeesRD] = useObservableState<SwapFeesRD, O.Option<SwapFeesParams>>(() => {
+  const [swapFeesRD] = useObservableState<SwapFeesRD>(() => {
     return FP.pipe(
-      fees$(oSwapFeesParams),
+      oSwapFeesParams,
+      fees$,
       liveData.map((chainFees) => {
         // store every successfully loaded chainFees to the ref value
         prevChainFees.current = O.some(chainFees)
@@ -349,8 +350,6 @@ export const Swap = ({
     )
   }, RD.success(ZERO_SWAP_FEES))
 
-  // Be careful by using `reloadFeesHandler`!!!
-  // In most cases reloading fees are already called by `approveFeesParamsUpdated`
   const reloadFeesHandler = useCallback(() => {
     reloadFees(oSwapFeesParams)
   }, [oSwapFeesParams, reloadFees])
@@ -709,11 +708,11 @@ export const Swap = ({
     if (isZeroAmountToSwap || minAmountError) return false
 
     return FP.pipe(
-      chainFeesRD,
+      swapFeesRD,
       RD.getOrElse(() => ZERO_SWAP_FEES),
       ({ inTx }) => sourceChainAssetAmount.amount().minus(inTx.amount()).isNegative()
     )
-  }, [chainFeesRD, isZeroAmountToSwap, minAmountError, sourceChainAssetAmount])
+  }, [swapFeesRD, isZeroAmountToSwap, minAmountError, sourceChainAssetAmount])
 
   const sourceChainFeeErrorLabel: JSX.Element = useMemo(() => {
     if (!sourceChainFeeError) {
@@ -721,7 +720,7 @@ export const Swap = ({
     }
 
     return FP.pipe(
-      RD.toOption(chainFeesRD),
+      RD.toOption(swapFeesRD),
       O.map((fees) => (
         <Styled.FeeErrorLabel key="sourceChainErrorLabel">
           {intl.formatMessage(
@@ -743,12 +742,12 @@ export const Swap = ({
       )),
       O.getOrElse(() => <></>)
     )
-  }, [sourceChainFeeError, chainFeesRD, intl, sourceAssetProp, sourceAssetAmount, sourceChainAsset])
+  }, [sourceChainFeeError, swapFeesRD, intl, sourceAssetProp, sourceAssetAmount, sourceChainAsset])
 
   // Helper to price target fees into target asset
   const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
     const { outTx }: SwapFees = FP.pipe(
-      chainFeesRD,
+      swapFeesRD,
       RD.getOrElse(() => ZERO_SWAP_FEES)
     )
 
@@ -776,7 +775,7 @@ export const Swap = ({
       }),
       O.getOrElse(() => ZERO_BASE_AMOUNT)
     )
-  }, [chainFeesRD, targetAsset, poolsData])
+  }, [swapFeesRD, targetAsset, poolsData])
 
   const targetChainFeeError: boolean = useMemo(() => {
     // ignore error check by having zero amounts or min amount errors
@@ -819,13 +818,13 @@ export const Swap = ({
   const fees: UIFeesRD = useMemo(
     () =>
       FP.pipe(
-        chainFeesRD,
+        swapFeesRD,
         RD.map((chainFee) => [
           { asset: getChainAsset(sourceAssetProp.chain), amount: chainFee.inTx },
           { asset: targetAssetProp, amount: targetChainFeeAmountInTargetAsset }
         ])
       ),
-    [chainFeesRD, targetChainFeeAmountInTargetAsset, sourceAssetProp.chain, targetAssetProp]
+    [swapFeesRD, targetChainFeeAmountInTargetAsset, sourceAssetProp.chain, targetAssetProp]
   )
 
   const approveFees: UIFeesRD = useMemo(
@@ -844,8 +843,17 @@ export const Swap = ({
       O.isNone(walletBalances) ||
       sourceChainFeeError ||
       targetChainFeeError ||
+      RD.isPending(swapFeesRD) ||
       minAmountError,
-    [isZeroAmountToSwap, minAmountError, sourceChainFeeError, targetChainFeeError, unlockedWallet, walletBalances]
+    [
+      isZeroAmountToSwap,
+      minAmountError,
+      sourceChainFeeError,
+      swapFeesRD,
+      targetChainFeeError,
+      unlockedWallet,
+      walletBalances
+    ]
   )
 
   const {

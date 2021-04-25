@@ -5,7 +5,6 @@ import { PoolData } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
-  AssetAmount,
   AssetRuneNative,
   baseAmount,
   BaseAmount,
@@ -22,31 +21,32 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { ZERO_BASE_AMOUNT } from '../../../const'
 import {
   convertBaseAmountDecimal,
   getEthTokenAddress,
-  isChainAsset,
   isEthAsset,
   isEthTokenAsset,
   max1e8BaseAmount,
   THORCHAIN_DECIMAL
 } from '../../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
-import { eqAsset, eqBaseAmount, eqOPoolAddresses } from '../../../helpers/fp/eq'
+import { eqBaseAmount, eqOPoolAddresses } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
-import { LiveData } from '../../../helpers/rx/liveData'
+import { liveData, LiveData } from '../../../helpers/rx/liveData'
 import { FundsCap } from '../../../hooks/useFundsCap'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
-import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
+import { INITIAL_SYM_DEPOSIT_STATE, ZERO_SYM_DEPOSIT_FEES } from '../../../services/chain/const'
 import {
   SymDepositMemo,
   SymDepositState,
   SymDepositParams,
   SymDepositStateHandler,
-  DepositFeesLD,
-  DepositFeesRD,
-  FeeRD
+  DepositFees,
+  FeeRD,
+  ReloadSymDepositFeesHandler,
+  SymDepositFeesHandler,
+  DepositFeesRD
 } from '../../../services/chain/types'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
 import { PoolAddress } from '../../../services/midgard/types'
@@ -72,8 +72,8 @@ export type Props = {
   poolAddress: O.Option<PoolAddress>
   memos: O.Option<SymDepositMemo>
   priceAsset?: Asset
-  reloadFees: (p: SymDepositParams) => void
-  fees$: (p: SymDepositParams) => DepositFeesLD
+  reloadFees: ReloadSymDepositFeesHandler
+  fees$: SymDepositFeesHandler
   reloadApproveFee: LoadApproveFeeHandler
   approveFee$: ApproveFeeHandler
   reloadBalances: FP.Lazy<void>
@@ -103,7 +103,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     memos: oMemos,
     assetBalance: oAssetBalance,
     runeBalance: oRuneBalance,
-    chainAssetBalance,
+    chainAssetBalance: oChainAssetBalance,
     poolAddress: oPoolAddress,
     viewAssetTx = (_) => {},
     viewRuneTx = (_) => {},
@@ -131,32 +131,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const prevPoolAddresses = useRef<O.Option<PoolAddress>>(O.none)
 
-  const prevChainBalance = useRef<O.Option<BaseAmount>>(O.none)
-  const oChainAssetBalance = useMemo(
-    () =>
-      FP.pipe(
-        chainAssetBalance,
-        O.map((balance) => {
-          prevChainBalance.current = O.some(balance)
-          return balance
-        }),
-        O.alt(() => prevChainBalance.current)
-      ),
-    [chainAssetBalance]
-  )
-
-  /** Prev. asset balance based on original decimal */
-  const prevAssetBalance = useRef<O.Option<BaseAmount>>(O.none)
   /** Asset balance based on original decimal */
   const assetBalance: BaseAmount = useMemo(
     () =>
       FP.pipe(
         oAssetBalance,
-        O.map((balance) => {
-          prevAssetBalance.current = O.some(balance)
-          return balance
-        }),
-        O.alt(() => prevAssetBalance.current),
         O.getOrElse(() => baseAmount(0, assetDecimal))
       ),
     [assetDecimal, oAssetBalance]
@@ -169,11 +148,17 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const initialAssetAmountToDepositMax1e8 = useMemo(() => baseAmount(0, assetBalanceMax1e8.decimal), [
     assetBalanceMax1e8.decimal
   ])
+
   const [
     /* max. 1e8 decimal */
     assetAmountToDepositMax1e8,
     _setAssetAmountToDepositMax1e8 /* private, never set it directly, use `setAssetAmountToDeposit` instead */
   ] = useState<BaseAmount>(initialAssetAmountToDepositMax1e8)
+
+  const isZeroAmountToDeposit = useMemo(
+    () => assetAmountToDepositMax1e8.amount().isZero() || runeAmountToDeposit.amount().isZero(),
+    [assetAmountToDepositMax1e8, runeAmountToDeposit]
+  )
 
   const [percentValueToDeposit, setPercentValueToDeposit] = useState(0)
 
@@ -188,19 +173,22 @@ export const SymDeposit: React.FC<Props> = (props) => {
   // Deposit start time
   const [depositStartTime, setDepositStartTime] = useState<number>(0)
 
-  const prevRuneBalance = useRef<O.Option<BaseAmount>>(O.none)
   const runeBalance: BaseAmount = useMemo(
     () =>
       FP.pipe(
         oRuneBalance,
-        O.map((balance) => {
-          prevRuneBalance.current = O.some(balance)
-          return balance
-        }),
-        O.alt(() => prevRuneBalance.current),
         O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
     [oRuneBalance]
+  )
+
+  const chainAssetBalance: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        oChainAssetBalance,
+        O.getOrElse(() => ZERO_BASE_AMOUNT)
+      ),
+    [oChainAssetBalance]
   )
 
   const oDepositParams: O.Option<SymDepositParams> = useMemo(
@@ -237,22 +225,25 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [oPoolAddress, asset])
 
-  const prevDepositFeesRD = useRef<DepositFeesRD>(RD.initial)
+  const prevDepositFees = useRef<O.Option<DepositFees>>(O.none)
 
-  // Input: `oDepositParams` via depositParamsUpdated
-  // Output: `DepositFeesRD
-  const [depositFeesRD, depositParamsUpdated] = useObservableState<DepositFeesRD, O.Option<SymDepositParams>>(
-    (oDepositParams$) =>
-      oDepositParams$.pipe(
-        RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), fees$))),
-        RxOp.tap((feesRD) => {
-          if (RD.isSuccess(feesRD)) {
-            prevDepositFeesRD.current = feesRD
-          }
+  const [depositFeesRD] = useObservableState<DepositFeesRD>(
+    () =>
+      FP.pipe(
+        oDepositParams,
+        fees$,
+        liveData.map((fees) => {
+          // store every successfully loaded chainFees to the ref value
+          prevDepositFees.current = O.some(fees)
+          return fees
         })
       ),
-    RD.initial
+    RD.success(ZERO_SYM_DEPOSIT_FEES)
   )
+
+  const reloadFeesHandler = useCallback(() => {
+    reloadFees(oDepositParams)
+  }, [oDepositParams, reloadFees])
 
   const approveFees$ = useMemo(() => approveFee$, [approveFee$])
 
@@ -263,57 +254,23 @@ export const SymDeposit: React.FC<Props> = (props) => {
     RD.initial
   )
 
-  // whenever `oDepositParams` has been updated, `depositParamsUpdated` needs to be called to update `depositFeesRD`
-  useEffect(() => {
-    // Trigger changes only for users while NOT typing into input fields (to avoid too many requests)
-    if (selectedInput === 'none') depositParamsUpdated(oDepositParams)
-  }, [depositParamsUpdated, oDepositParams, selectedInput])
-
   useEffect(() => {
     approveFeesParamsUpdated(oApproveParams)
   }, [approveFeesParamsUpdated, oApproveParams])
-
-  const reloadFeesHandler = useCallback(() => {
-    FP.pipe(
-      oDepositParams,
-      O.map((params) => {
-        reloadFees(params)
-        return true
-      })
-    )
-  }, [oDepositParams, reloadFees])
 
   const reloadApproveFeesHandler = useCallback(() => {
     FP.pipe(oApproveParams, O.map(reloadApproveFee))
   }, [oApproveParams, reloadApproveFee])
 
-  const oThorchainFee: O.Option<BaseAmount> = useMemo(
-    () =>
-      FP.pipe(
-        depositFeesRD,
-        Helper.getThorchainFees,
-        // Set previously loaded fees to have that values when fees are reloading
-        // in other case changing amount while reloading fees will set max amount to zero value
-        O.alt((): O.Option<BaseAmount> => Helper.getThorchainFees(prevDepositFeesRD.current))
-      ),
-    [depositFeesRD]
+  const oThorchainFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(depositFeesRD, Helper.getThorchainFees), [
+    depositFeesRD
+  ])
+
+  const maxRuneAmountToDeposit = useMemo(
+    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance }),
+
+    [assetBalance, poolData, runeBalance]
   )
-
-  const maxRuneAmountToDeposit = useMemo((): BaseAmount => {
-    const maxAmount = Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance })
-
-    // Consider fees
-    return FP.pipe(
-      oThorchainFee,
-      // Check: maxAmount > fee
-      O.filter((fee) => maxAmount.amount().isGreaterThan(fee.amount())),
-      // Substract fee from maxAmount
-      O.map((fee) => maxAmount.amount().minus(fee.amount())),
-      // Set maxAmount to zero as long as we dont have a feeRate
-      O.getOrElse(() => ZERO_BN),
-      (amount) => baseAmount(amount, THORCHAIN_DECIMAL)
-    )
-  }, [assetBalance, oThorchainFee, poolData, runeBalance])
 
   // Update `runeAmountToDeposit` if `maxRuneAmountToDeposit` has been updated
   useEffect(() => {
@@ -322,17 +279,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     }
   }, [maxRuneAmountToDeposit, runeAmountToDeposit])
 
-  const oAssetChainFee: O.Option<BaseAmount> = useMemo(
-    () =>
-      FP.pipe(
-        depositFeesRD,
-        Helper.getAssetChainFee,
-        // Set previously loaded fees to have that values when fees are reloading
-        // in other case changing amount while reloading fees will set max amount to zero value
-        O.alt((): O.Option<BaseAmount> => Helper.getAssetChainFee(prevDepositFeesRD.current))
-      ),
-    [depositFeesRD]
-  )
+  const oAssetChainFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(depositFeesRD, Helper.getAssetChainFee), [
+    depositFeesRD
+  ])
 
   /**
    * Max asset amount to deposit
@@ -340,27 +289,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
    */
   const maxAssetAmountToDepositMax1e8 = useMemo((): BaseAmount => {
     const maxAmount = Helper.maxAssetAmountToDeposit({ poolData, runeBalance, assetBalance })
-    // substract fees only if asset is as same as chain asset
-    if (isChainAsset(asset)) {
-      return FP.pipe(
-        oAssetChainFee,
-        // Check: maxAmount > fee
-        O.filter((fee) => maxAmount.amount().isGreaterThan(fee.amount())),
-        // Substract fee from maxAmount
-        O.map((fee) => maxAmount.amount().minus(fee.amount())),
-        // Set maxAmount to zero as long as we dont have a feeRate
-        O.getOrElse(() => ZERO_BN),
-        // make sure we still use same decimal
-        (amount) => baseAmount(amount, maxAmount.decimal),
-        max1e8BaseAmount
-      )
-    }
     return max1e8BaseAmount(maxAmount)
-  }, [asset, assetBalance, oAssetChainFee, poolData, runeBalance])
+  }, [assetBalance, poolData, runeBalance])
 
   const setAssetAmountToDepositMax1e8 = useCallback(
     (amountToDeposit: BaseAmount) => {
       const newAmount = baseAmount(amountToDeposit.amount(), assetBalanceMax1e8.decimal)
+
       // dirty check - do nothing if prev. and next amounts are equal
       if (eqBaseAmount.equals(newAmount, assetAmountToDepositMax1e8)) return {}
 
@@ -538,12 +473,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const onChangeAssetHandler = useCallback(
     (asset: Asset) => {
-      depositParamsUpdated(O.none)
-      resetDepositState()
-      changePercentHandler(0)
       onChangeAsset(asset)
     },
-    [changePercentHandler, depositParamsUpdated, onChangeAsset, resetDepositState]
+    [onChangeAsset]
   )
 
   const onAfterSliderChangeHandler = useCallback(() => {
@@ -559,12 +491,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [setShowPasswordModal])
 
   const renderFeeError = useCallback(
-    (fee: BaseAmount, balance: AssetAmount, asset: Asset) => {
+    (fee: BaseAmount, amount: BaseAmount, asset: Asset) => {
       const msg = intl.formatMessage(
         { id: 'deposit.add.error.chainFeeNotCovered' },
         {
           fee: formatFee({ amount: fee, asset }),
-          balance: formatAssetAmountCurrency({ amount: balance, asset, trimZeros: true })
+          balance: formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, trimZeros: true })
         }
       )
 
@@ -574,60 +506,52 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const isThorchainFeeError = useMemo(() => {
+    // ignore error check by having zero amounts
+    if (isZeroAmountToDeposit) return false
+
     return FP.pipe(
-      sequenceTOption(
-        oThorchainFee,
-        FP.pipe(
-          oRuneBalance,
-          O.alt(() => prevRuneBalance.current)
-        )
-      ),
+      sequenceTOption(oThorchainFee, oRuneBalance),
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oThorchainFee),
         ([fee, balance]) => balance.amount().isLessThan(fee.amount())
       )
     )
-  }, [oRuneBalance, oThorchainFee])
+  }, [oRuneBalance, oThorchainFee, isZeroAmountToDeposit])
 
   const renderThorchainFeeError = useMemo(() => {
-    const amount = FP.pipe(
-      oRuneBalance,
-      O.getOrElse(() => ZERO_BASE_AMOUNT),
-      baseToAsset
-    )
+    if (!isThorchainFeeError || isBalanceError /* Don't render anything in case of balance errors */) return <></>
 
     return FP.pipe(
       oThorchainFee,
-      O.map((fee) => renderFeeError(fee, amount, AssetRuneNative)),
+      O.map((fee) => renderFeeError(fee, runeBalance, AssetRuneNative)),
       O.getOrElse(() => <></>)
     )
-  }, [oRuneBalance, oThorchainFee, renderFeeError])
+  }, [isBalanceError, isThorchainFeeError, oThorchainFee, renderFeeError, runeBalance])
 
   const isAssetChainFeeError = useMemo(() => {
+    // ignore error check by having zero amounts
+    if (isZeroAmountToDeposit) return false
+
     return FP.pipe(
-      sequenceTOption(oAssetChainFee, FP.pipe(oChainAssetBalance)),
+      sequenceTOption(oAssetChainFee, oChainAssetBalance),
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oAssetChainFee),
         ([fee, balance]) => balance.amount().isLessThan(fee.amount())
       )
     )
-  }, [oAssetChainFee, oChainAssetBalance])
+  }, [oAssetChainFee, oChainAssetBalance, isZeroAmountToDeposit])
 
   const renderAssetChainFeeError = useMemo(() => {
-    const amount = FP.pipe(
-      oChainAssetBalance,
-      O.getOrElse(() => ZERO_BASE_AMOUNT),
-      baseToAsset
-    )
+    if (!isAssetChainFeeError || isBalanceError /* Don't render anything in case of balance errors */) return <></>
 
     return FP.pipe(
       oAssetChainFee,
-      O.map((fee) => renderFeeError(fee, amount, asset)),
+      O.map((fee) => renderFeeError(fee, chainAssetBalance, asset)),
       O.getOrElse(() => <></>)
     )
-  }, [oChainAssetBalance, oAssetChainFee, renderFeeError, asset])
+  }, [isAssetChainFeeError, isBalanceError, oAssetChainFee, renderFeeError, chainAssetBalance, asset])
 
   const txModalExtraContent = useMemo(() => {
     const stepDescriptions = [
@@ -783,16 +707,27 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oFundsCap]
   )
 
-  const disabledForm = useMemo(() => {
-    return (
-      isBalanceError ||
+  /**
+   * Disables form elements (input fields, slider)
+   */
+  const disabledForm = useMemo(
+    () =>
+      isBalanceError || fundsCapReached || disabled || assetBalance.amount().isZero() || runeBalance.amount().isZero(),
+    [assetBalance, disabled, fundsCapReached, isBalanceError, runeBalance]
+  )
+
+  /**
+   * Disables submit button
+   */
+  const disableSubmit = useMemo(
+    () =>
+      disabledForm ||
+      RD.isPending(depositFeesRD) ||
       isThorchainFeeError ||
-      fundsCapReached ||
-      disabled ||
-      balances.filter((balance) => eqAsset.equals(balance.asset, asset) && !balance.amount.amount().isZero()).length ===
-        0
-    )
-  }, [asset, balances, disabled, fundsCapReached, isBalanceError, isThorchainFeeError])
+      isAssetChainFeeError ||
+      isZeroAmountToDeposit,
+    [depositFeesRD, disabledForm, isAssetChainFeeError, isThorchainFeeError, isZeroAmountToDeposit]
+  )
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
@@ -920,15 +855,18 @@ export const SymDeposit: React.FC<Props> = (props) => {
   useEffect(() => {
     if (!eqOPoolAddresses.equals(prevPoolAddresses.current, oPoolAddress)) {
       prevPoolAddresses.current = oPoolAddress
+      // reset deposit state
+      resetDepositState()
+      // set values to zero
+      changePercentHandler(0)
       // reset approve state
       resetApproveState()
       // reset isApproved state
       resetIsApprovedState()
       // check approved status
       checkApprovedStatus()
-
-      // for ETH/ETH20
-      if (O.isSome(oPoolAddress)) reloadFeesHandler()
+      // reload fees
+      reloadFeesHandler()
     }
   }, [
     asset,
@@ -938,7 +876,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     reloadFeesHandler,
     resetApproveState,
     resetIsApprovedState,
-    reloadSelectedPoolDetail
+    reloadSelectedPoolDetail,
+    resetDepositState,
+    changePercentHandler
   ])
 
   return (
@@ -996,14 +936,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
               <Styled.FeeErrorRow>
                 <Col>
                   <>
-                    {
-                      // Don't show thorchain fee error if we already display a error of balances
-                      !isBalanceError && isThorchainFeeError && renderThorchainFeeError
-                    }
-                    {
-                      // Don't show asset chain fee error if we already display a error of balances
-                      !isBalanceError && isAssetChainFeeError && renderAssetChainFeeError
-                    }
+                    {renderAssetChainFeeError}
+                    {renderThorchainFeeError}
                   </>
                 </Col>
               </Styled.FeeErrorRow>
@@ -1011,10 +945,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           </Styled.FeesRow>
 
           <Styled.SubmitButtonWrapper>
-            <Styled.SubmitButton
-              sizevalue="big"
-              onClick={confirmDepositHandler}
-              disabled={disabledForm || runeAmountToDeposit.amount().isZero()}>
+            <Styled.SubmitButton sizevalue="xnormal" onClick={confirmDepositHandler} disabled={disableSubmit}>
               {intl.formatMessage({ id: 'common.add' })}
             </Styled.SubmitButton>
           </Styled.SubmitButtonWrapper>
@@ -1026,7 +957,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             onClick={onApprove}
             loading={RD.isPending(approveState)}
             color="warning">
-            {intl.formatMessage({ id: 'swap.approve' })}
+            {intl.formatMessage({ id: 'common.approve' })}
           </Styled.SubmitButton>
           {!RD.isInitial(approveFees) && <Fees fees={approveFees} reloadFees={reloadApproveFeesHandler} />}
           {renderApproveError}

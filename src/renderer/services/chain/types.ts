@@ -51,6 +51,9 @@ export type DepositFees = { thor: O.Option<BaseAmount>; asset: BaseAmount }
 export type DepositFeesRD = RD.RemoteData<Error, DepositFees>
 export type DepositFeesLD = LiveData<Error, DepositFees>
 
+export type SymDepositFeesHandler = (params: O.Option<SymDepositParams>) => DepositFeesLD
+export type ReloadSymDepositFeesHandler = (params: O.Option<SymDepositParams>) => void
+
 export type AsymDepositParams = {
   readonly poolAddress: PoolAddress
   readonly asset: Asset
