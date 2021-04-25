@@ -10,13 +10,13 @@ import {
   baseAmount,
   AssetBTC,
   AssetRuneNative,
-  Asset
+  Asset,
+  AssetETH
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
@@ -26,19 +26,21 @@ import { WalletBalance } from '../../../types/wallet'
 import { SymDeposit, Props as SymDepositProps } from './SymDeposit'
 
 const balanceBNB: WalletBalance = {
-  amount: baseAmount('1'),
+  amount: assetToBase(assetAmount(1)),
   asset: AssetBNB,
   walletAddress: ''
 }
 
 const balanceBTC: WalletBalance = {
-  ...balanceBNB,
-  asset: AssetBTC
+  asset: AssetBTC,
+  amount: assetToBase(assetAmount(2)),
+  walletAddress: ''
 }
 
 const balanceTOMO: WalletBalance = {
-  ...balanceBNB,
-  asset: ASSETS_MAINNET.TOMO
+  asset: AssetETH,
+  amount: assetToBase(assetAmount(3)),
+  walletAddress: ''
 }
 
 const defaultProps: SymDepositProps = {
@@ -53,8 +55,8 @@ const defaultProps: SymDepositProps = {
   fees$: () =>
     Rx.of(
       RD.success({
-        thor: O.some(baseAmount(100)),
-        asset: baseAmount(12300)
+        thor: O.some(assetToBase(assetAmount(0.2))),
+        asset: assetToBase(assetAmount(0.000075))
       })
     ),
   reloadApproveFee: () => console.log('reloadFees'),
@@ -116,9 +118,16 @@ BalanceError.storyName = 'balance error'
 export const FeeError: Story = () => {
   const props: SymDepositProps = {
     ...defaultProps,
-    assetBalance: O.some(baseAmount(1)),
-    runeBalance: O.some(baseAmount(1)),
-    chainAssetBalance: O.some(baseAmount(1))
+    fees$: () =>
+      Rx.of(
+        RD.success({
+          thor: O.some(assetToBase(assetAmount(2))),
+          asset: assetToBase(assetAmount(1))
+        })
+      ),
+    assetBalance: O.some(assetToBase(assetAmount(0.5))),
+    runeBalance: O.some(assetToBase(assetAmount(0.6))),
+    chainAssetBalance: O.some(assetToBase(assetAmount(0.5)))
   }
   return <SymDeposit {...props} />
 }

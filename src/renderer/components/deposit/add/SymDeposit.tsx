@@ -31,7 +31,7 @@ import {
   THORCHAIN_DECIMAL
 } from '../../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
-import { eqAsset, eqBaseAmount, eqOPoolAddresses } from '../../../helpers/fp/eq'
+import { eqBaseAmount, eqOPoolAddresses } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
 import { FundsCap } from '../../../hooks/useFundsCap'
@@ -520,8 +520,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [oRuneBalance, oThorchainFee, isZeroAmountToDeposit])
 
   const renderThorchainFeeError = useMemo(() => {
-    // Don't render anything in case of balance errors
-    if (!isThorchainFeeError || isBalanceError) return <></>
+    if (!isThorchainFeeError || isBalanceError /* Don't render anything in case of balance errors */) return <></>
 
     return FP.pipe(
       oThorchainFee,
@@ -545,8 +544,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [oAssetChainFee, oChainAssetBalance, isZeroAmountToDeposit])
 
   const renderAssetChainFeeError = useMemo(() => {
-    // Don't render anything in case of balance errors
-    if (!isAssetChainFeeError || isBalanceError) return <></>
+    if (!isAssetChainFeeError || isBalanceError /* Don't render anything in case of balance errors */) return <></>
 
     return FP.pipe(
       oAssetChainFee,
@@ -709,17 +707,27 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oFundsCap]
   )
 
-  const disabledForm = useMemo(() => {
-    return (
-      isBalanceError ||
-      isThorchainFeeError ||
-      fundsCapReached ||
-      disabled ||
+  /**
+   * Disables form elements (input fields, slider)
+   */
+  const disabledForm = useMemo(
+    () =>
+      isBalanceError || fundsCapReached || disabled || assetBalance.amount().isZero() || runeBalance.amount().isZero(),
+    [assetBalance, disabled, fundsCapReached, isBalanceError, runeBalance]
+  )
+
+  /**
+   * Disables submit button
+   */
+  const disableSubmit = useMemo(
+    () =>
+      disabledForm ||
       RD.isPending(depositFeesRD) ||
-      balances.filter((balance) => eqAsset.equals(balance.asset, asset) && !balance.amount.amount().isZero()).length ===
-        0
-    )
-  }, [asset, balances, depositFeesRD, disabled, fundsCapReached, isBalanceError, isThorchainFeeError])
+      isThorchainFeeError ||
+      isAssetChainFeeError ||
+      isZeroAmountToDeposit,
+    [depositFeesRD, disabledForm, isAssetChainFeeError, isThorchainFeeError, isZeroAmountToDeposit]
+  )
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
@@ -846,7 +854,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   useEffect(() => {
     if (!eqOPoolAddresses.equals(prevPoolAddresses.current, oPoolAddress)) {
-      console.log('useEffect:')
       prevPoolAddresses.current = oPoolAddress
       // reset deposit state
       resetDepositState()
@@ -938,10 +945,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           </Styled.FeesRow>
 
           <Styled.SubmitButtonWrapper>
-            <Styled.SubmitButton
-              sizevalue="xnormal"
-              onClick={confirmDepositHandler}
-              disabled={disabledForm || isZeroAmountToDeposit}>
+            <Styled.SubmitButton sizevalue="xnormal" onClick={confirmDepositHandler} disabled={disableSubmit}>
               {intl.formatMessage({ id: 'common.add' })}
             </Styled.SubmitButton>
           </Styled.SubmitButtonWrapper>

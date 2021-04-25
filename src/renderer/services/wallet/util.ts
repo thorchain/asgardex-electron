@@ -54,9 +54,8 @@ export const sortBalances = (balances: WalletBalances, orders: string[]) => {
   )
 }
 
-//
 // TODO (asgdx-team)
-// `getBalanceByAsset` is very similar to `getWalletBalanceByAsset`
+// `getBalanceByAsset` is very similar to `getWalletBalanceByAsset` in `walletHelper`
 // Move it to `walletHelper`
 export const getBalanceByAsset = (asset: Asset) => (balances: WalletBalances): O.Option<WalletBalance> =>
   FP.pipe(
