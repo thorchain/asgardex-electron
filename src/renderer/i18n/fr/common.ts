@@ -64,7 +64,7 @@ const common: CommonMessages = {
   'common.modal.confirmTitle': "Confirmer l'action",
   'common.value': 'Valeur',
   'common.manage': 'Gérer',
-  'common.analytics': 'Analytics - FR',
+  'common.analytics': 'Analyse',
   'common.asset.base': 'Base',
   'common.tx.type.swap': 'Échange',
   'common.tx.type.donate': 'Don',
@@ -72,13 +72,13 @@ const common: CommonMessages = {
   'common.tx.type.deposit': 'Dépôt',
   'common.tx.type.withdraw': 'Retrait',
   'common.detail': 'Détail',
-  'common.tx.type.upgrade': 'Upgrade - FR',
+  'common.tx.type.upgrade': 'Mise à jour',
   'common.filter': 'Filtre',
   'common.all': 'Tout',
   'common.time.week': 'Semaine',
   'common.time.all': 'Tout',
-  'common.theme.light': 'Day mode - FR',
-  'common.theme.dark': 'Night mode - FR'
+  'common.theme.light': 'Mode clair',
+  'common.theme.dark': 'Mode sombre'
 }
 
 export default common
