@@ -9,7 +9,7 @@ import { Button as UIButton } from '../../uielements/button'
 import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
 
-export const Container = styled('div')`
+export const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -105,7 +105,7 @@ export const ReloadFeeButton = styled(UIButton).attrs({
   margin-right: 10px;
 `
 
-export const ExtraContainer = styled('div')`
+export const ExtraContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -124,7 +124,7 @@ export const ErrorLabel = styled(UILabel)`
   text-align: center;
 `
 
-export const SubmitContainer = styled('div')`
+export const SubmitContainer = styled.div`
   margin-top: 50px;
   display: flex;
   flex-direction: column;
@@ -145,4 +145,8 @@ export const SubmitButton = styled(UIButton).attrs({
   min-width: 200px !important;
   padding-left: 30px;
   padding-right: 30px;
+`
+export const MinAmountLabel = styled(UILabel)`
+  padding-top: 0;
+  text-transform: uppercase;
 `

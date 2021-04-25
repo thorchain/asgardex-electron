@@ -95,6 +95,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   // store previous data to render it while reloading new data
   const prevPricePoolAssets = useRef<PricePoolAssets>()
 
+  // TODO (@Veado) Use `usePricePools` in parent view to provide pricePools
   const pricePoolAssets = useMemo(() => {
     const pools = RD.toNullable(poolsRD)
     if (!pools) {

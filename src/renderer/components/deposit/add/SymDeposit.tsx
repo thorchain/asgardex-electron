@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { PoolData } from '@thorchain/asgardex-util'
+import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
@@ -28,7 +28,8 @@ import {
   isEthAsset,
   isEthTokenAsset,
   max1e8BaseAmount,
-  THORCHAIN_DECIMAL
+  THORCHAIN_DECIMAL,
+  to1e8BaseAmount
 } from '../../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
 import { eqBaseAmount, eqOPoolAddresses } from '../../../helpers/fp/eq'
@@ -53,6 +54,8 @@ import { PoolAddress } from '../../../services/midgard/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { WalletBalances } from '../../../types/wallet'
+import { PricePool } from '../../../views/pools/Pools.types'
+import { minPoolTxAmountUSD } from '../../../views/pools/Pools.utils'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
@@ -65,10 +68,11 @@ import * as Styled from './Deposit.style'
 export type Props = {
   asset: AssetWithDecimal
   assetPrice: BigNumber
-  runePrice: BigNumber
   assetBalance: O.Option<BaseAmount>
+  runePrice: BigNumber
   runeBalance: O.Option<BaseAmount>
   chainAssetBalance: O.Option<BaseAmount>
+  usdPricePool: O.Option<PricePool>
   poolAddress: O.Option<PoolAddress>
   memos: O.Option<SymDepositMemo>
   priceAsset?: Asset
@@ -99,11 +103,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const {
     asset: { asset, decimal: assetDecimal },
     assetPrice,
-    runePrice,
-    memos: oMemos,
     assetBalance: oAssetBalance,
+    runePrice,
     runeBalance: oRuneBalance,
     chainAssetBalance: oChainAssetBalance,
+    usdPricePool: oUsdPricePool,
+    memos: oMemos,
     poolAddress: oPoolAddress,
     viewAssetTx = (_) => {},
     viewRuneTx = (_) => {},
@@ -158,6 +163,51 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const isZeroAmountToDeposit = useMemo(
     () => assetAmountToDepositMax1e8.amount().isZero() || runeAmountToDeposit.amount().isZero(),
     [assetAmountToDepositMax1e8, runeAmountToDeposit]
+  )
+
+  // TODO (@asgdx-team) Remove min. amount if xchain-* gets fee rates from THORChain
+  // @see: https://github.com/xchainjs/xchainjs-lib/issues/299
+  const minUSDAmount = useMemo(() => minPoolTxAmountUSD(asset), [asset])
+
+  // Helper to price target fees into target asset
+  const minAssetAmountToDepositMax1e8: BaseAmount = useMemo(() => {
+    return FP.pipe(
+      oUsdPricePool,
+      O.fold(
+        () => ZERO_BASE_AMOUNT,
+        ({ poolData: usdPoolData }) =>
+          // pool data are always 1e8 decimal based
+          // and we have to convert fees to 1e8, too
+          getValueOfAsset1InAsset2(to1e8BaseAmount(minUSDAmount), usdPoolData, poolData)
+      )
+    )
+  }, [oUsdPricePool, minUSDAmount, poolData])
+
+  const minAssetAmountError = useMemo(() => {
+    if (isZeroAmountToDeposit) return false
+
+    return assetAmountToDepositMax1e8.lt(minAssetAmountToDepositMax1e8)
+  }, [assetAmountToDepositMax1e8, isZeroAmountToDeposit, minAssetAmountToDepositMax1e8])
+
+  const minAssetAmountLabel = useMemo(
+    () => (
+      <Styled.MinAmountLabel color={minAssetAmountError ? 'error' : 'normal'}>
+        {intl.formatMessage({ id: 'common.min' })}
+        {': '}
+        {formatAssetAmountCurrency({
+          asset,
+          amount: baseToAsset(minAssetAmountToDepositMax1e8),
+          trimZeros: true
+        })}{' '}
+        (
+        {formatAssetAmountCurrency({
+          trimZeros: true,
+          amount: baseToAsset(minUSDAmount)
+        })}
+        )
+      </Styled.MinAmountLabel>
+    ),
+    [asset, intl, minAssetAmountError, minAssetAmountToDepositMax1e8, minUSDAmount]
   )
 
   const [percentValueToDeposit, setPercentValueToDeposit] = useState(0)
@@ -725,8 +775,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
       RD.isPending(depositFeesRD) ||
       isThorchainFeeError ||
       isAssetChainFeeError ||
-      isZeroAmountToDeposit,
-    [depositFeesRD, disabledForm, isAssetChainFeeError, isThorchainFeeError, isZeroAmountToDeposit]
+      isZeroAmountToDeposit ||
+      minAssetAmountError,
+    [depositFeesRD, disabledForm, isAssetChainFeeError, isThorchainFeeError, isZeroAmountToDeposit, minAssetAmountError]
   )
 
   const uiFeesRD: UIFeesRD = useMemo(
@@ -890,23 +941,26 @@ export const SymDeposit: React.FC<Props> = (props) => {
       )}
       <Styled.CardsRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
-          <Styled.AssetCard
-            disabled={disabledForm}
-            asset={asset}
-            selectedAmount={assetAmountToDepositMax1e8}
-            maxAmount={maxAssetAmountToDepositMax1e8}
-            onChangeAssetAmount={assetAmountChangeHandler}
-            inputOnFocusHandler={() => setSelectedInput('asset')}
-            inputOnBlurHandler={inputOnBlur}
-            price={assetPrice}
-            balances={balances}
-            percentValue={percentValueToDeposit}
-            onChangePercent={changePercentHandler}
-            onChangeAsset={onChangeAssetHandler}
-            priceAsset={priceAsset}
-            network={network}
-            onAfterSliderChange={onAfterSliderChangeHandler}
-          />
+          <div>
+            <Styled.AssetCard
+              disabled={disabledForm}
+              asset={asset}
+              selectedAmount={assetAmountToDepositMax1e8}
+              maxAmount={maxAssetAmountToDepositMax1e8}
+              onChangeAssetAmount={assetAmountChangeHandler}
+              inputOnFocusHandler={() => setSelectedInput('asset')}
+              inputOnBlurHandler={inputOnBlur}
+              price={assetPrice}
+              balances={balances}
+              percentValue={percentValueToDeposit}
+              onChangePercent={changePercentHandler}
+              onChangeAsset={onChangeAssetHandler}
+              priceAsset={priceAsset}
+              network={network}
+              onAfterSliderChange={onAfterSliderChangeHandler}
+            />
+            {minAssetAmountLabel}
+          </div>
         </Col>
 
         <Col xs={24} xl={12}>
