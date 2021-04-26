@@ -1,7 +1,7 @@
 {
   "name": "asgardex",
   "productName": "ASGARDEX",
-  "version": "0.1.0",
+  "version": "v0.1.0-alpha.3",
   "description": "WALLET AND EXCHANGE CLIENT FOR THORCHAIN",
   "main": "public/electron.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "dev": "concurrently --kill-others --success first \"yarn:dev:*\"",
     "dev:app": "cross-env BROWSER=none yarn start:web",
     "dev:electron": "wait-on http://localhost:3000 && nodemon -I --watch ./src/main/ --exec electron ./public/dev.js",
-    "build": "cross-env CI=false PUBLIC_URL=./ craco build",
+    "build": "cross-env NODE_OPTIONS=--max_old_space_size=4096 CI=false PUBLIC_URL=./ craco build",
     "prebuild": "webpack --config webpack.main.js --mode production",
     "test": "craco test",
     "package": "yarn build && yarn package:electron",
