@@ -4,7 +4,6 @@ import {
   BNBChain,
   THORChain,
   BTCChain,
-  baseAmount,
   ETHChain,
   CosmosChain,
   PolkadotChain,
@@ -191,7 +190,7 @@ const swapFees$: SwapFeesHandler = (oInitialParams) => {
               in$,
               txOutFee$(outTx)
             ) // Result needs to be 3 times as "normal" fee
-              .pipe(liveData.map((fee) => baseAmount(fee.amount().times(3), fee.decimal)))
+              .pipe(liveData.map((fee) => fee.times(3)))
 
             return liveData.sequenceS({
               inTx: in$,

@@ -54,7 +54,7 @@ const deposit: DepositMessages = {
   'deposit.withdraw.fees': 'Комиссия транзакции: {thorMemo}, Исходящие комиссии: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Важно: {fee} BNB останется на вашем кошельке для покрытия комисий.',
   'deposit.withdraw.error.feeNotCovered':
-    'Комиссия транзакции {fee} должна покрываться вашим балансом (баланс: {balance})'
+    'Transaction fee {fee} needs to be covered by your withdrawal {withdrawal}. - RU'
 }
 
 export default deposit

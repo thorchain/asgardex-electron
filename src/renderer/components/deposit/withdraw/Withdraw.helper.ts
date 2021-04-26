@@ -10,12 +10,9 @@ export const getWithdrawAmounts = (
   percentAmount: number
 ): { rune: BaseAmount; asset: BaseAmount } => {
   const percentBn = bn(percentAmount / 100)
-  const rune = baseAmount(percentBn.multipliedBy(runeShare.amount()))
-  const asset = baseAmount(percentBn.multipliedBy(assetShare.amount()), assetShare.decimal)
-
   return {
-    rune,
-    asset
+    rune: runeShare.times(percentBn),
+    asset: assetShare.times(percentBn)
   }
 }
 

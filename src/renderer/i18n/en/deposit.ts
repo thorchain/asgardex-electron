@@ -53,8 +53,7 @@ const deposit: DepositMessages = {
   'deposit.withdraw.receiveText': 'You should receive.',
   'deposit.withdraw.fees': 'Transaction fee: {thorMemo}, Outbounding fees: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Note: {fee} BNB will be left in your wallet for the transaction fees.',
-  'deposit.withdraw.error.feeNotCovered':
-    'Transaction fee {fee} needs to be covered by your balance (currently {balance}).'
+  'deposit.withdraw.error.feeNotCovered': 'Transaction fee {fee} needs to be covered by your withdrawal {withdrawal}.'
 }
 
 export default deposit

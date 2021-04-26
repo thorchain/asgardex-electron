@@ -201,6 +201,10 @@ export type SymWithdrawParams = {
 
 export type SymWithdrawStateHandler = (p: SymWithdrawParams) => WithdrawState$
 
+export type WithdrawFeesParams = { asset: Asset; percent: Number; memo: Memo }
+export type WithdrawFeesHandler = (params: O.Option<WithdrawFeesParams>) => FeeLD
+export type ReloadWithdrawFeesHandler = (params: O.Option<WithdrawFeesParams>) => void
+
 export type AsymWithdrawParams = {
   readonly poolAddress: PoolAddress
   readonly asset: Asset

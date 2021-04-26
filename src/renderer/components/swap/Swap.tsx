@@ -629,7 +629,8 @@ export const Swap = ({
     resetSwapState()
     reloadBalances()
     setAmountToSwapMax1e8(initialAmountToSwapMax1e8)
-  }, [resetSwapState, reloadBalances, setAmountToSwapMax1e8, initialAmountToSwapMax1e8])
+    reloadFeesHandler()
+  }, [resetSwapState, reloadBalances, setAmountToSwapMax1e8, initialAmountToSwapMax1e8, reloadFeesHandler])
 
   const renderTxModal = useMemo(() => {
     const { swapTx, swap } = swapState

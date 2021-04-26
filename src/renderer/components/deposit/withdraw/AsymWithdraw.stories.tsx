@@ -2,14 +2,14 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, baseAmount, bn, Chain } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
-import { Memo, WithdrawState$ } from '../../../services/chain/types'
+import { WithdrawState$ } from '../../../services/chain/types'
 import { AsymWithdraw, Props as AsymWitdrawProps } from './AsymWithdraw'
 
 const defaultProps: AsymWitdrawProps = {
@@ -41,7 +41,7 @@ const defaultProps: AsymWitdrawProps = {
           })
       )
     ),
-  fee$: (_chain: Chain, _memo: Memo) => Rx.of(RD.success(baseAmount(1000))),
+  fees$: (_) => Rx.of(RD.success(baseAmount(1000))),
   network: 'testnet'
 }
 
@@ -51,7 +51,7 @@ Default.storyName = 'default'
 export const ErrorNoFee: Story = () => {
   const props: AsymWitdrawProps = {
     ...defaultProps,
-    fee$: (_chain: Chain, _memo: Memo) => Rx.of(RD.failure(Error('no fees')))
+    fees$: (_) => Rx.of(RD.failure(Error('no fees')))
   }
   return <AsymWithdraw {...props} />
 }

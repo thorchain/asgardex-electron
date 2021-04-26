@@ -56,7 +56,7 @@ const deposit: DepositMessages = {
   'deposit.withdraw.feeNote':
     'Remarque: {fee} BNB seront laissés dans votre portefeuille pour les frais de transaction.',
   'deposit.withdraw.error.feeNotCovered':
-    'Les frais de transaction {fee} doivent être couverts par votre solde (actuellement {balance}).'
+    'Transaction fee {fee} needs to be covered by your withdrawal {withdrawal} - FR.'
 }
 
 export default deposit

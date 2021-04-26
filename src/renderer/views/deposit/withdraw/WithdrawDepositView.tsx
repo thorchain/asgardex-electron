@@ -1,13 +1,12 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, BaseAmount, bn } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, bn } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { map } from 'rxjs/operators'
-import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
 import { Withdraw } from '../../../components/deposit/withdraw'
@@ -20,7 +19,6 @@ import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as ShareHelpers from '../../../helpers/poolShareHelper'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolDetailRD, PoolShareRD, PoolShare } from '../../../services/midgard/types'
-import { getBalanceByAsset } from '../../../services/wallet/util'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { PoolDetail } from '../../../types/generated/midgard'
 
@@ -40,7 +38,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { withdrawFee$, reloadWithdrawFees, symWithdraw$, getExplorerUrlByAsset$ } = useChainContext()
+  const { withdrawFees$, reloadWithdrawFees, symWithdraw$, getExplorerUrlByAsset$ } = useChainContext()
 
   const runePrice = useObservableState(priceRatio$, bn(1))
 
@@ -62,29 +60,8 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   )
 
   const {
-    balancesState$,
-    keystoreService: { validatePassword$ },
-    reloadBalances
+    keystoreService: { validatePassword$ }
   } = useWalletContext()
-
-  const [balances] = useObservableState(
-    () =>
-      FP.pipe(
-        balancesState$,
-        RxOp.map((state) => state.balances)
-      ),
-    O.none
-  )
-
-  const runeBalance: O.Option<BaseAmount> = useMemo(
-    () =>
-      FP.pipe(
-        balances,
-        O.chain(getBalanceByAsset(AssetRuneNative)),
-        O.map(({ amount }) => amount)
-      ),
-    [balances]
-  )
 
   const getRuneExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(AssetRuneNative), [getExplorerUrlByAsset$])
   const runeExplorerUrl = useObservableState(getRuneExplorerUrl$, O.none)
@@ -102,18 +79,16 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const reloadBalancesAndShares = useCallback(() => {
-    reloadBalances()
+  const reloadSharesHandler = useCallback(() => {
     reloadShares(5000)
-  }, [reloadBalances, reloadShares])
+  }, [reloadShares])
 
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
-        fee$={withdrawFee$}
+        fees$={withdrawFees$}
         assetPrice={ZERO_BN}
         runePrice={runePrice}
-        runeBalance={runeBalance}
         selectedPriceAsset={AssetRuneNative}
         shares={{ rune: ZERO_BASE_AMOUNT, asset: ZERO_BASE_AMOUNT }}
         asset={assetWD}
@@ -121,20 +96,19 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         disabled
         validatePassword$={validatePassword$}
         viewRuneTx={viewRuneTx}
-        reloadBalances={reloadBalancesAndShares}
+        reloadShares={reloadSharesHandler}
         withdraw$={symWithdraw$}
         network={network}
       />
     ),
     [
-      withdrawFee$,
+      withdrawFees$,
       runePrice,
-      runeBalance,
       assetWD,
       reloadWithdrawFees,
       validatePassword$,
       viewRuneTx,
-      reloadBalancesAndShares,
+      reloadSharesHandler,
       symWithdraw$,
       network
     ]
@@ -155,32 +129,30 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       <Withdraw
         assetPrice={assetPrice}
         runePrice={runePrice}
-        runeBalance={runeBalance}
         selectedPriceAsset={selectedPriceAsset}
         shares={{
           rune: ShareHelpers.getRuneShare(liquidityUnits, poolDetail),
           asset: ShareHelpers.getAssetShare({ liquidityUnits, detail: poolDetail, assetDecimal })
         }}
         asset={assetWD}
-        fee$={withdrawFee$}
+        fees$={withdrawFees$}
         reloadFees={reloadWithdrawFees}
         validatePassword$={validatePassword$}
         viewRuneTx={viewRuneTx}
-        reloadBalances={reloadBalancesAndShares}
+        reloadShares={reloadSharesHandler}
         withdraw$={symWithdraw$}
         network={network}
       />
     ),
     [
       runePrice,
-      runeBalance,
       assetDecimal,
       assetWD,
-      withdrawFee$,
+      withdrawFees$,
       reloadWithdrawFees,
       validatePassword$,
       viewRuneTx,
-      reloadBalancesAndShares,
+      reloadSharesHandler,
       symWithdraw$,
       network
     ]

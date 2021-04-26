@@ -2,22 +2,20 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, baseAmount, bn, Chain } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/lib/Option'
+import { AssetBNB, AssetRuneNative, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
-import { Memo, WithdrawState$ } from '../../../services/chain/types'
+import { WithdrawState$ } from '../../../services/chain/types'
 import { Withdraw, Props as WitdrawProps } from './Withdraw'
 
 const defaultProps: WitdrawProps = {
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   runePrice: bn(1),
   assetPrice: bn(60.972),
-  runeBalance: O.some(assetToBase(assetAmount(100))),
   selectedPriceAsset: AssetRuneNative,
   reloadFees: () => console.log('reload fees'),
   shares: { rune: baseAmount('193011422'), asset: baseAmount('3202499') },
@@ -26,7 +24,7 @@ const defaultProps: WitdrawProps = {
   // mock password validation
   // Password: "123"
   validatePassword$: mockValidatePassword$,
-  reloadBalances: () => console.log('reload balances'),
+  reloadShares: () => console.log('reload balances'),
   // mock successfull result of withdraw$
   withdraw$: (params) =>
     Rx.of(params).pipe(
@@ -41,7 +39,7 @@ const defaultProps: WitdrawProps = {
           })
       )
     ),
-  fee$: (_chain: Chain, _memo: Memo) => Rx.of(RD.success(baseAmount(1000))),
+  fees$: (_) => Rx.of(RD.success(baseAmount(1000))),
   network: 'testnet'
 }
 
@@ -51,7 +49,7 @@ Default.storyName = 'default'
 export const ErrorNoFee: Story = () => {
   const props: WitdrawProps = {
     ...defaultProps,
-    fee$: (_chain: Chain, _memo: Memo) => Rx.of(RD.failure(Error('no fees')))
+    fees$: (_) => Rx.of(RD.failure(Error('no fees')))
   }
   return <Withdraw {...props} />
 }

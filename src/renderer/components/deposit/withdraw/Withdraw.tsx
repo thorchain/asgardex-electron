@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getWithdrawMemo } from '@thorchain/asgardex-util'
@@ -8,7 +8,6 @@ import {
   baseAmount,
   BaseAmount,
   baseToAsset,
-  Chain,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
@@ -22,10 +21,16 @@ import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { getTwoSigfigAssetAmount, THORCHAIN_DECIMAL, to1e8BaseAmount } from '../../../helpers/assetHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
-import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
-import { FeeLD, FeeRD, Memo, WithdrawState, SymWithdrawStateHandler } from '../../../services/chain/types'
+import {
+  FeeRD,
+  WithdrawState,
+  SymWithdrawStateHandler,
+  WithdrawFeesHandler,
+  ReloadWithdrawFeesHandler,
+  WithdrawFeesParams
+} from '../../../services/chain/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
@@ -42,12 +47,10 @@ export type Props = {
   runePrice: BigNumber
   /** Asset price (base amount) */
   assetPrice: BigNumber
-  /** Wallet balance of Rune */
-  runeBalance: O.Option<BaseAmount>
   /** Selected price asset */
   selectedPriceAsset: Asset
   /** Callback to reload fees */
-  reloadFees: (chain: Chain) => void
+  reloadFees: ReloadWithdrawFeesHandler
   /**
    * Shares of Rune and selected Asset.
    * Note: Decimal needs to be based on **original asset decimals**
@@ -57,9 +60,9 @@ export type Props = {
   disabled?: boolean
   viewRuneTx: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
-  reloadBalances: FP.Lazy<void>
+  reloadShares: FP.Lazy<void>
   withdraw$: SymWithdrawStateHandler
-  fee$: (chain: Chain, memo: Memo) => FeeLD
+  fees$: WithdrawFeesHandler
   network: Network
 }
 
@@ -73,16 +76,15 @@ export const Withdraw: React.FC<Props> = ({
   asset: assetWD,
   runePrice,
   assetPrice,
-  runeBalance: oRuneBalance,
   selectedPriceAsset,
   shares: { rune: runeShare, asset: assetShare },
   disabled,
   viewRuneTx = (_) => {},
   validatePassword$,
-  reloadBalances = FP.constVoid,
+  reloadShares,
   reloadFees,
   withdraw$,
-  fee$,
+  fees$,
   network
 }) => {
   const intl = useIntl()
@@ -90,6 +92,8 @@ export const Withdraw: React.FC<Props> = ({
   const { asset, decimal: assetDecimal } = assetWD
 
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
+
+  const isZeroWithdrawPercent = useMemo(() => withdrawPercent <= 0, [withdrawPercent])
 
   const {
     state: withdrawState,
@@ -113,35 +117,41 @@ export const Withdraw: React.FC<Props> = ({
     return baseAmount(priceBN, 8)
   }, [assetAmountToWithdraw, assetPrice])
 
-  const feeLD: FeeLD = useMemo(
-    () => fee$(AssetRuneNative.chain, memo),
-
-    [fee$, memo]
+  const oWithdrawFeesParams: O.Option<WithdrawFeesParams> = useMemo(
+    () =>
+      FP.pipe(
+        withdrawPercent,
+        // percent needs to be > 0
+        O.fromPredicate((percent) => percent > 0),
+        // we are always send RUNE tx for sym. withdraw only
+        O.map((percent) => ({ memo, asset: AssetRuneNative, percent }))
+      ),
+    [memo, withdrawPercent]
   )
 
-  const feeRD: FeeRD = useObservableState(feeLD, RD.initial)
+  // subscribe `fees$` once,
+  // updates will be triggered by calling `reloadFeesHandler`
+  const [feeRD] = useObservableState<FeeRD>(() => fees$(oWithdrawFeesParams), RD.success(ZERO_BASE_AMOUNT))
+
+  const reloadFeesHandler = useCallback(() => reloadFees(oWithdrawFeesParams), [oWithdrawFeesParams, reloadFees])
+
   const oFee: O.Option<BaseAmount> = useMemo(() => RD.toOption(feeRD), [feeRD])
 
   const isFeeError: boolean = useMemo(() => {
-    if (withdrawPercent <= 0) return false
+    if (isZeroWithdrawPercent) return false
 
     return FP.pipe(
-      sequenceTOption(oFee, oRuneBalance),
+      oFee,
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oFee),
-        ([fee, balance]) => balance.amount().isLessThan(fee.amount())
+        (fee) => runeAmountToWithdraw.lte(fee)
       )
     )
-  }, [oFee, oRuneBalance, withdrawPercent])
+  }, [isZeroWithdrawPercent, oFee, runeAmountToWithdraw])
 
   const renderFeeError = useMemo(() => {
     if (!isFeeError) return <></>
-
-    const runeBalance = FP.pipe(
-      oRuneBalance,
-      O.getOrElse(() => ZERO_BASE_AMOUNT)
-    )
 
     return FP.pipe(
       oFee,
@@ -152,20 +162,23 @@ export const Withdraw: React.FC<Props> = ({
             fee: formatAssetAmountCurrency({
               amount: baseToAsset(fee),
               asset: AssetRuneNative,
+              decimal: THORCHAIN_DECIMAL,
               trimZeros: true
             }),
-            balance: formatAssetAmountCurrency({
-              amount: baseToAsset(runeBalance),
+            withdrawal: formatAssetAmountCurrency({
+              amount: getTwoSigfigAssetAmount(baseToAsset(runeAmountToWithdraw)),
               asset: AssetRuneNative,
+              decimal: THORCHAIN_DECIMAL,
               trimZeros: true
             })
           }
         )
+
         return <Styled.FeeErrorLabel key="fee-error">{msg}</Styled.FeeErrorLabel>
       }),
       O.getOrElse(() => <></>)
     )
-  }, [isFeeError, oRuneBalance, oFee, intl])
+  }, [isFeeError, oFee, intl, runeAmountToWithdraw])
 
   // Withdraw start time
   const [withdrawStartTime, setWithdrawStartTime] = useState<number>(0)
@@ -203,8 +216,9 @@ export const Withdraw: React.FC<Props> = ({
   const onFinishTxModal = useCallback(() => {
     resetWithdrawState()
     setWithdrawPercent(0)
-    reloadBalances()
-  }, [reloadBalances, resetWithdrawState, setWithdrawPercent])
+    reloadFeesHandler()
+    reloadShares()
+  }, [reloadShares, reloadFeesHandler, resetWithdrawState])
 
   const renderTxModal = useMemo(() => {
     const { withdraw: withdrawRD, withdrawTx } = withdrawState
@@ -299,9 +313,21 @@ export const Withdraw: React.FC<Props> = ({
     [feeRD]
   )
 
-  const reloadFeesHandler = useCallback(() => reloadFees(AssetRuneNative.chain), [reloadFees])
+  const disabledSubmit = useMemo(() => disabled || isZeroWithdrawPercent || isFeeError, [
+    disabled,
+    isZeroWithdrawPercent,
+    isFeeError
+  ])
 
-  const disabledForm = useMemo(() => withdrawPercent <= 0 || disabled, [withdrawPercent, disabled])
+  // Reset states on `onUnmount()`
+  useEffect(() => {
+    return () => {
+      resetWithdrawState()
+      setWithdrawPercent(0)
+      reloadFeesHandler()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Styled.Container>
@@ -314,6 +340,7 @@ export const Withdraw: React.FC<Props> = ({
         key={'asset amount slider'}
         value={withdrawPercent}
         onChange={setWithdrawPercent}
+        onAfterChange={() => reloadFeesHandler()}
         disabled={disabled}
       />
       <Label weight={'bold'} textTransform={'uppercase'}>
@@ -375,7 +402,7 @@ export const Withdraw: React.FC<Props> = ({
         </Col>
       </Styled.FeesRow>
       <Styled.SubmitButtonWrapper>
-        <Styled.SubmitButton sizevalue="big" onClick={() => setShowPasswordModal(true)} disabled={disabledForm}>
+        <Styled.SubmitButton sizevalue="xnormal" onClick={() => setShowPasswordModal(true)} disabled={disabledSubmit}>
           {intl.formatMessage({ id: 'common.withdraw' })}
         </Styled.SubmitButton>
       </Styled.SubmitButtonWrapper>

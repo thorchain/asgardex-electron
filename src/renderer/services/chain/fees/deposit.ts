@@ -47,7 +47,7 @@ const depositFee$ = ({
 }): FeeLD => {
   switch (asset.chain) {
     case BNBChain:
-      return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
+      return BNB.fees$().pipe(liveData.map((fees) => fees[FeeOptionKeys.DEPOSIT]))
     case BTCChain: {
       return BTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees[FeeOptionKeys.DEPOSIT]))
     }
@@ -88,8 +88,10 @@ const depositFee$ = ({
             })
           }
         ),
-        // Actual gas fee changes time to time so in many cases, actual fast gas fee is bigger than estimated fast fee
-        // To avoid low gas fee error, we apply fastest fee for ETH only
+        // Gas fee have been changed from time to time and in many cases for ETH,
+        // with a result that `fast` gas fee is bigger than estimated `fast` fee
+        // To avoid low gas fee error, we apply `fastest` for ETH fee calculation
+        // (but still use `fast` fees for sending deposit txs )
         liveData.map((fees) => fees['fastest'])
       )
     }

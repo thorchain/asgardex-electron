@@ -36,7 +36,7 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { withdrawFee$, reloadWithdrawFees, symWithdraw$, getExplorerUrlByAsset$ } = useChainContext()
+  const { withdrawFees$, reloadWithdrawFees, symWithdraw$, getExplorerUrlByAsset$ } = useChainContext()
 
   const runePrice = useObservableState(priceRatio$, bn(1))
 
@@ -103,7 +103,7 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
   const renderEmptyForm = useCallback(
     () => (
       <AsymWithdraw
-        fee$={withdrawFee$}
+        fees$={withdrawFees$}
         assetPrice={ZERO_BN}
         runePrice={runePrice}
         chainAssetBalance={O.none}
@@ -121,7 +121,7 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
       />
     ),
     [
-      withdrawFee$,
+      withdrawFees$,
       runePrice,
       asset,
       reloadWithdrawFees,
@@ -151,7 +151,7 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
         share={poolShare.assetAddedAmount}
         asset={asset}
         poolAddresses={oPoolAddress}
-        fee$={withdrawFee$}
+        fees$={withdrawFees$}
         reloadFees={reloadWithdrawFees}
         validatePassword$={validatePassword$}
         viewRuneTx={viewRuneTx}
@@ -165,7 +165,7 @@ export const AsymWithdrawView: React.FC<Props> = (props): JSX.Element => {
       chainAssetBalance,
       asset,
       oPoolAddress,
-      withdrawFee$,
+      withdrawFees$,
       reloadWithdrawFees,
       validatePassword$,
       viewRuneTx,

@@ -25,6 +25,7 @@ import { ZERO_BASE_AMOUNT } from '../../../const'
 import {
   convertBaseAmountDecimal,
   getEthTokenAddress,
+  isChainAsset,
   isEthAsset,
   isEthTokenAsset,
   max1e8BaseAmount,
@@ -560,14 +561,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
     if (isZeroAmountToDeposit) return false
 
     return FP.pipe(
-      sequenceTOption(oThorchainFee, oRuneBalance),
+      oThorchainFee,
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oThorchainFee),
-        ([fee, balance]) => balance.amount().isLessThan(fee.amount())
+        (fee) => runeAmountToDeposit.lt(fee)
       )
     )
-  }, [oRuneBalance, oThorchainFee, isZeroAmountToDeposit])
+  }, [isZeroAmountToDeposit, oThorchainFee, runeAmountToDeposit])
 
   const renderThorchainFeeError = useMemo(() => {
     if (!isThorchainFeeError || isBalanceError /* Don't render anything in case of balance errors */) return <></>
@@ -588,10 +589,17 @@ export const SymDeposit: React.FC<Props> = (props) => {
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oAssetChainFee),
-        ([fee, balance]) => balance.amount().isLessThan(fee.amount())
+        ([fee, balance]) => {
+          // If asset is a chain asset, compare deposit result with fee
+          if (isChainAsset(asset)) {
+            return assetAmountToDepositMax1e8.lt(max1e8BaseAmount(fee))
+          }
+          // for others, compare fee with balance of chain asset
+          return balance.lt(fee)
+        }
       )
     )
-  }, [oAssetChainFee, oChainAssetBalance, isZeroAmountToDeposit])
+  }, [isZeroAmountToDeposit, oAssetChainFee, oChainAssetBalance, asset, assetAmountToDepositMax1e8])
 
   const renderAssetChainFeeError = useMemo(() => {
     if (!isAssetChainFeeError || isBalanceError /* Don't render anything in case of balance errors */) return <></>
