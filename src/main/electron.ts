@@ -149,7 +149,7 @@ const init = async () => {
   await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
-  ipcMain.emit(IPCMessages.LOG, 'before checkForUpdatesAndNotify')
+  ipcMain.emit(IPCMessages.LOG, 'v0.1.0-alpha.5 before checkForUpdatesAndNotify')
   autoUpdater.checkForUpdatesAndNotify().then((info) => {
     ipcMain.emit(IPCMessages.LOG, 'checkForUpdatesAndNotify')
     if (!info) {
