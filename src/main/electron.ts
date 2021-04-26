@@ -141,21 +141,19 @@ const initIPC = () => {
   })
 }
 
-log.transports.file.level = 'debug'
-autoUpdater.logger = log
-
 const init = async () => {
   await app.whenReady()
   await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
-  ipcMain.emit(IPCMessages.LOG, 'v0.1.0-alpha.5 before checkForUpdatesAndNotify')
+  mainWindow?.webContents.send(IPCMessages.LOG, 'before checkForUpdatesAndNotify')
+
   autoUpdater.checkForUpdatesAndNotify().then((info) => {
-    ipcMain.emit(IPCMessages.LOG, 'checkForUpdatesAndNotify')
+    mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdatesAndNotify')
     if (!info) {
-      ipcMain.emit(IPCMessages.LOG, 'checkForUpdatesAndNotify no info for updated')
+      mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdatesAndNotify no info for updated')
     } else {
-      ipcMain.emit(IPCMessages.LOG, 'checkForUpdatesAndNotify info for updates ', info)
+      mainWindow?.webContents.send(IPCMessages.LOG, `checkForUpdatesAndNotify info for updates ${JSON.stringify(info)}`)
     }
     return info
   })

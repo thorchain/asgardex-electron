@@ -29,6 +29,4 @@ contextBridge.exposeInMainWorld('apiHDWallet', apiHDWallet)
 contextBridge.exposeInMainWorld('apiCommonStorage', getFileStoreApi('common'))
 contextBridge.exposeInMainWorld('apiUserNodesStorage', getFileStoreApi('userNodes'))
 
-ipcRenderer.addListener(IPCMessages.LOG, (v) => console.log('--- log ---', v))
-
-contextBridge.exposeInMainWorld('logger', getFileStoreApi('userNodes'))
+ipcRenderer.on(IPCMessages.LOG, (...args) => console.log('--- log ---', ...args))
