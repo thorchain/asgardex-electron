@@ -35,7 +35,10 @@ export type Props = {
     poolDetail: PoolDetailRD
   }>
   AsymDepositContent: React.ComponentType<{ asset: Asset; poolDetail: PoolDetailRD }>
-  SymDepositContent: React.ComponentType<{ asset: AssetWithDecimal; poolDetail: PoolDetailRD }>
+  SymDepositContent: React.ComponentType<{
+    asset: AssetWithDecimal
+    poolDetail: PoolDetailRD
+  }>
   WidthdrawContent: React.ComponentType<{ asset: AssetWithDecimal; poolShare: PoolShareRD; poolDetail: PoolDetailRD }>
   AsymWidthdrawContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD; poolDetail: PoolDetailRD }>
   keystoreState: KeystoreState
