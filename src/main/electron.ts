@@ -8,6 +8,7 @@ import electronDebug from 'electron-debug'
 import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
+import { autoUpdater } from 'electron-updater'
 
 import { LedgerTxInfo, Network, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
@@ -145,6 +146,14 @@ const init = async () => {
   await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
+  autoUpdater.checkForUpdatesAndNotify().then((info) => {
+    if (!info) {
+      console.log('no info for updated')
+    } else {
+      console.log('info for updates ', info)
+    }
+    return info
+  })
 
   initIPC()
 }
