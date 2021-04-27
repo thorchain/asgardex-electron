@@ -64,7 +64,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
         selectedPricePoolAsset$,
         reloadSelectedPoolDetail,
         selectedPoolAddress$,
-        reloadPoolAddresses
+        reloadInboundAddresses
       },
       shares: { reloadShares }
     }
@@ -94,8 +94,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   // reload inbound addresses at `onMount` to get always latest `pool address`
   useEffect(() => {
-    reloadPoolAddresses()
-  }, [reloadPoolAddresses])
+    reloadInboundAddresses()
+  }, [reloadInboundAddresses])
 
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))

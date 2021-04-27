@@ -55,14 +55,14 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   const {
     service: {
-      pools: { poolAddressesByChain$, reloadPoolAddresses }
+      pools: { poolAddressesByChain$, reloadInboundAddresses }
     }
   } = useMidgardContext()
 
   // reload inbound addresses at `onMount` to get always latest `pool address`
   useEffect(() => {
-    reloadPoolAddresses()
-  }, [reloadPoolAddresses])
+    reloadInboundAddresses()
+  }, [reloadInboundAddresses])
 
   const [upgradeFeeRD] = useObservableState(
     () =>

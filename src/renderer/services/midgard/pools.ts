@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, assetToString, bn, Chain, currencySymbolByAsset } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, assetToString, bn, Chain, currencySymbolByAsset, isChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -14,7 +14,6 @@ import { isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHel
 import { isEnabledChain } from '../../helpers/chainHelper'
 import { eqAsset, eqOAsset, eqOPoolAddresses } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { RUNE_POOL_ADDRESS } from '../../helpers/poolHelper'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
 import {
@@ -55,7 +54,12 @@ import {
   DepthHistoryLD,
   ApiGetDepthHistoryParams,
   EarningsHistoryLD,
-  PoolEarningHistoryLD
+  PoolEarningHistoryLD,
+  InboundAddressesLD,
+  PoolAddresses,
+  InboundAddresses,
+  GasRateLD,
+  GasRate
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -63,7 +67,8 @@ import {
   getPricePools,
   pricePoolSelector,
   pricePoolSelectorFromRD,
-  toPoolAddresses
+  inboundToPoolAddresses,
+  getGasRateByChain
 } from './utils'
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
@@ -436,31 +441,55 @@ const createPoolsService = (
     RxOp.map(([poolsState, selectedPricePoolAsset]) => pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset))
   )
 
-  const loadInboundAddresses$ = (): PoolAddressesLD =>
+  const loadInboundAddresses$ = (): InboundAddressesLD =>
     FP.pipe(
       midgardDefaultApi$,
       liveData.chain((api) => {
         return FP.pipe(
           api.getProxiedInboundAddresses(),
-          RxOp.map(toPoolAddresses),
-          // Add "empty" rune "pool address" - we never had such pool, but do need it to calculate tx
-          RxOp.map(FP.flow(A.cons(RUNE_POOL_ADDRESS))),
           RxOp.map(RD.success),
-          RxOp.startWith(RD.pending),
-          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+          // Accept valid chains only
+          liveData.map(
+            FP.flow(A.filterMap(({ chain, ...rest }) => (isChain(chain) ? O.some({ chain, ...rest }) : O.none)))
+          ),
+          RxOp.catchError((e: Error) => Rx.of(RD.failure(e))),
+          RxOp.startWith(RD.pending)
         )
       })
     )
 
   // Trigger to reload pool addresses (`inbound_addresses`)
-  const { stream$: reloadPoolAddresses$, trigger: reloadPoolAddresses } = triggerStream()
+  const { stream$: reloadInboundAddresses$, trigger: reloadInboundAddresses } = triggerStream()
+  const inboundAddressesInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 60 * 1000 /* delay of 5 min  */)
 
-  const poolAddressesInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 60 * 1000 /* delay of 5 min  */)
-  const poolAddresses$: PoolAddressesLD = Rx.combineLatest([reloadPoolAddresses$, poolAddressesInterval$]).pipe(
-    RxOp.switchMap((_) => loadInboundAddresses$())
+  /**
+   * Get's inbound addresses once and share result by next subscription
+   *
+   * It will be updated using a timer defined in `inboundAddressesInterval`
+   * or by reloading of data possible by `reloadInboundAddresses`
+   */
+  const inboundAddressesShared$ = FP.pipe(
+    Rx.combineLatest([reloadInboundAddresses$, inboundAddressesInterval$]),
+    RxOp.switchMap((_) => loadInboundAddresses$()),
+    RxOp.shareReplay(1)
   )
 
-  const selectedPoolAddress$: PoolAddress$ = Rx.combineLatest([poolAddresses$, selectedPoolAsset$]).pipe(
+  /**
+   * Load pool addresses once
+   * Use it whenever you do need latest data (e.g. for validation)
+   */
+  const poolAddresses$ = (): PoolAddressesLD => FP.pipe(loadInboundAddresses$(), liveData.map(inboundToPoolAddresses))
+
+  /**
+   * Get's (cached) pool addresses
+   *
+   * It will be updated as soon as `inboundAddressesInterval` is triggered
+   * or by reloading via `reloadInboundAddresses`
+   * All defined in `inboundAddressesShared$`
+   */
+  const poolAddressesShared$: PoolAddressesLD = FP.pipe(inboundAddressesShared$, liveData.map(inboundToPoolAddresses))
+
+  const selectedPoolAddress$: PoolAddress$ = Rx.combineLatest([poolAddressesShared$, selectedPoolAsset$]).pipe(
     RxOp.map(([poolAddresses, oSelectedPoolAsset]) => {
       return FP.pipe(
         poolAddresses,
@@ -474,13 +503,39 @@ const createPoolsService = (
 
   const poolAddressesByChain$ = (chain: Chain): PoolAddressLD =>
     FP.pipe(
-      poolAddresses$,
-      liveData.map((addresses) => getPoolAddressesByChain(addresses, chain)),
+      poolAddressesShared$,
+      liveData.map((addresses: PoolAddresses) => getPoolAddressesByChain(addresses, chain)),
       RxOp.map((rd) =>
+        // Add error in case no address could be found
         FP.pipe(
           rd,
           // TODO @(Veado) Add i18n
-          RD.chain((oAddress) => RD.fromOption(oAddress, () => Error('Could not find pool address')))
+          RD.chain((oAddress: O.Option<PoolAddress>) =>
+            RD.fromOption(oAddress, () => Error('Could not find pool address'))
+          )
+        )
+      )
+    )
+
+  /**
+   * Get's (cached) gas rates by given chain
+   *
+   * It will be updated as soon as `inboundAddressesInterval` is triggered
+   * or by reloading via `reloadInboundAddresses`
+   * All defined in `inboundAddressesShared$`
+   */
+  const gasRateByChain$ = (chain: Chain): GasRateLD =>
+    FP.pipe(
+      inboundAddressesShared$,
+      liveData.map((addresses: InboundAddresses) => getGasRateByChain(addresses, chain)),
+      RxOp.map((rd) =>
+        // Add error in case no address could be found
+        FP.pipe(
+          rd,
+          // TODO @(Veado) Add i18n
+          RD.chain((oGasRate: O.Option<GasRate>) =>
+            RD.fromOption(oGasRate, () => Error(`Could not find gas rate for ${chain}`))
+          )
         )
       )
     )
@@ -511,7 +566,7 @@ const createPoolsService = (
    */
   const validatePool$ = (poolAddresses: PoolAddress, chain: Chain): ValidatePoolLD =>
     FP.pipe(
-      loadInboundAddresses$(),
+      poolAddresses$(),
       liveData.map((addresses) => getPoolAddressesByChain(addresses, chain)),
       liveData.chain((oAddresses) =>
         eqOPoolAddresses.equals(oAddresses, O.some(poolAddresses))
@@ -773,7 +828,7 @@ const createPoolsService = (
     reloadAllPools,
     selectedPoolAddress$,
     poolAddressesByChain$,
-    reloadPoolAddresses,
+    reloadInboundAddresses: reloadInboundAddresses,
     selectedPoolDetail$,
     reloadSelectedPoolDetail: (delayTime = 0) => _reloadSelectedPoolDetail(delayTime),
     reloadPoolStatsDetail,
@@ -789,7 +844,8 @@ const createPoolsService = (
     availableAssets$,
     validatePool$,
     poolsFilters$,
-    setPoolsFilter
+    setPoolsFilter,
+    gasRateByChain$
   }
 }
 

@@ -41,7 +41,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, reloadPools, selectedPoolAddress$, reloadPoolAddresses },
+    pools: { poolsState$, reloadPools, selectedPoolAddress$, reloadInboundAddresses },
     setSelectedPoolAsset
   } = midgardService
   const {
@@ -81,8 +81,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   // reload inbound addresses at `onMount` to get always latest `pool address`
   useEffect(() => {
-    reloadPoolAddresses()
-  }, [reloadPoolAddresses])
+    reloadInboundAddresses()
+  }, [reloadInboundAddresses])
 
   const sourceAssetDecimal$: AssetWithDecimalLD = useMemo(
     () =>
@@ -180,8 +180,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const reloadHandler = useCallback(() => {
     reloadBalances()
     reloadPools()
-    reloadPoolAddresses()
-  }, [reloadBalances, reloadPoolAddresses, reloadPools])
+    reloadInboundAddresses()
+  }, [reloadBalances, reloadInboundAddresses, reloadPools])
 
   const onChangePath = useCallback(
     (path) => {
