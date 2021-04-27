@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
+import { getApiAppUpdate } from './api/appUpdate'
 import { getFileStoreApi } from './api/fileStore'
 import { apiHDWallet } from './api/hdwallet'
 import { apiKeystore } from './api/keystore'
@@ -28,5 +29,7 @@ contextBridge.exposeInMainWorld('apiHDWallet', apiHDWallet)
 // api for storage objects
 contextBridge.exposeInMainWorld('apiCommonStorage', getFileStoreApi('common'))
 contextBridge.exposeInMainWorld('apiUserNodesStorage', getFileStoreApi('userNodes'))
+
+contextBridge.exposeInMainWorld('apiAppUpdate', getApiAppUpdate())
 
 ipcRenderer.on(IPCMessages.LOG, (...args) => console.log('--- log ---', ...args))

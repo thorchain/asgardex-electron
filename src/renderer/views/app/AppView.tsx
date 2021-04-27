@@ -13,6 +13,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { View } from '../View'
 import { ViewRoutes } from '../ViewRoutes'
+import { AppUpdateModalView } from './AppUpdateModalView'
 import * as Styled from './AppView.style'
 
 export const AppView: React.FC = (): JSX.Element => {
@@ -59,6 +60,7 @@ export const AppView: React.FC = (): JSX.Element => {
       <Styled.AppLayout>
         <Header />
         <View>
+          <AppUpdateModalView />
           {renderMidgardError}
           <ViewRoutes />
         </View>

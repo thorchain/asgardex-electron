@@ -141,6 +141,11 @@ const initIPC = () => {
   })
 }
 
+// const autoUpdater = new MacUpdater({
+//   url: 'https://github.com/thorchain/asgardex-electron/releases/download/untagged-9ec5268eed388477d237',
+//   provider: 'generic'
+// })
+
 autoUpdater.logger = log
 
 const init = async () => {
@@ -148,24 +153,24 @@ const init = async () => {
   await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
-  mainWindow?.webContents.send(IPCMessages.LOG, 'before checkForUpdatesAndNotify')
+  mainWindow?.webContents.send(IPCMessages.LOG, 'before checkForUpdates')
 
   autoUpdater
-    .checkForUpdatesAndNotify()
+    .checkForUpdates()
     .then((info) => {
-      mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdatesAndNotify')
+      mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdates')
       if (!info) {
-        mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdatesAndNotify no info for updated')
+        mainWindow?.webContents.send(IPCMessages.UPDATE_AVAILABLE, false)
+        mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdates no info for updated')
       } else {
-        mainWindow?.webContents.send(
-          IPCMessages.LOG,
-          `checkForUpdatesAndNotify info for updates ${JSON.stringify(info)}`
-        )
+        mainWindow?.webContents.send(IPCMessages.UPDATE_AVAILABLE, info.updateInfo.version, info.updateInfo.path)
+        mainWindow?.webContents.send(IPCMessages.LOG, `checkForUpdates info for updates ${JSON.stringify(info)}`)
       }
       return info
     })
     .catch((e) => {
-      mainWindow?.webContents.send(IPCMessages.LOG, `checkForUpdatesAndNotify failed for updates ${JSON.stringify(e)}`)
+      mainWindow?.webContents.send(IPCMessages.UPDATE_AVAILABLE, false)
+      mainWindow?.webContents.send(IPCMessages.LOG, `checkForUpdates failed for updates ${JSON.stringify(e)}`)
     })
 
   initIPC()

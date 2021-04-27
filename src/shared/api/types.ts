@@ -45,6 +45,13 @@ export type ApiFileStoreService<T> = {
   exists: () => Promise<boolean>
 }
 
+// Promise with a version string inside
+// If there is no туц version Promise will be rejected
+export type ApiAppUpdate = Promise<{
+  version: string
+  url: string
+}>
+
 export type ApiLang = {
   update: (locale: Locale) => void
 }
@@ -94,5 +101,6 @@ declare global {
     apiHDWallet: ApiHDWallet
     apiCommonStorage: ApiFileStoreService<StoreFileData<'common'>>
     apiUserNodesStorage: ApiFileStoreService<StoreFileData<'userNodes'>>
+    apiAppUpdate: ApiAppUpdate
   }
 }

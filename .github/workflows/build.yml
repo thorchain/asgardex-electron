@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest]
+        os: [windows-latest, macOS-latest, ubuntu-latest]
         node_version: [14]
     steps:
       - name: Checkout git repo
@@ -36,7 +36,6 @@ jobs:
 
       - uses: actions/setup-node@v1
         with:
-          tag_name: ${{ github.ref }}
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
@@ -69,7 +68,6 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          tag_name: ${{ github.ref }}
           name: ${{ runner.OS }}
           path: release
 
