@@ -14,7 +14,7 @@ labels: 'bug'
 
 - [ ] Using yarn
 - [ ] Using node 12.x
-- [ ] Using an up-to-date [master branch](https://github.com/thorchain/asgardex-electron/tree/master/)
+- [ ] Using the latest release or an up-to-date [master branch](https://github.com/thorchain/asgardex-electron/tree/master/)
 - [ ] Link to stacktrace in a Gist (for bugs)
 
 ## Expected Behavior
