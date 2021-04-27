@@ -36,6 +36,7 @@ jobs:
 
       - uses: actions/setup-node@v1
         with:
+          tag_name: ${{ github.ref }}
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
@@ -68,6 +69,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
+          tag_name: ${{ github.ref }}
           name: ${{ runner.OS }}
           path: release
 
