@@ -148,15 +148,23 @@ const init = async () => {
   app.on('activate', activateHandler)
   mainWindow?.webContents.send(IPCMessages.LOG, 'before checkForUpdatesAndNotify')
 
-  autoUpdater.checkForUpdatesAndNotify().then((info) => {
-    mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdatesAndNotify')
-    if (!info) {
-      mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdatesAndNotify no info for updated')
-    } else {
-      mainWindow?.webContents.send(IPCMessages.LOG, `checkForUpdatesAndNotify info for updates ${JSON.stringify(info)}`)
-    }
-    return info
-  })
+  autoUpdater
+    .checkForUpdatesAndNotify()
+    .then((info) => {
+      mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdatesAndNotify')
+      if (!info) {
+        mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdatesAndNotify no info for updated')
+      } else {
+        mainWindow?.webContents.send(
+          IPCMessages.LOG,
+          `checkForUpdatesAndNotify info for updates ${JSON.stringify(info)}`
+        )
+      }
+      return info
+    })
+    .catch((e) => {
+      mainWindow?.webContents.send(IPCMessages.LOG, `checkForUpdatesAndNotify failed for updates ${JSON.stringify(e)}`)
+    })
 
   initIPC()
 }
