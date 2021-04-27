@@ -141,6 +141,8 @@ const initIPC = () => {
   })
 }
 
+autoUpdater.logger = log
+
 const init = async () => {
   await app.whenReady()
   await initMainWindow()
