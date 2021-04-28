@@ -299,19 +299,12 @@ export const Swap = ({
     return max1e8BaseAmount(swapResultAmount)
   }, [swapData.swapResult, targetAssetDecimal])
 
-  const oSwapFeesParams: O.Option<SwapFeesParams> = useMemo(
-    () =>
-      FP.pipe(
-        oSwapParams,
-        O.map((swapParams) => ({
-          inTx: swapParams,
-          outTx: {
-            asset: targetAssetProp,
-            memo: swapParams.memo
-          }
-        }))
-      ),
-    [oSwapParams, targetAssetProp]
+  const swapFeesParams: SwapFeesParams = useMemo(
+    () => ({
+      inAsset: sourceAssetProp,
+      outAsset: targetAssetProp
+    }),
+    [sourceAssetProp, targetAssetProp]
   )
 
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
@@ -340,7 +333,7 @@ export const Swap = ({
 
   const [swapFeesRD] = useObservableState<SwapFeesRD>(() => {
     return FP.pipe(
-      oSwapFeesParams,
+      swapFeesParams,
       fees$,
       liveData.map((chainFees) => {
         // store every successfully loaded chainFees to the ref value
@@ -351,8 +344,8 @@ export const Swap = ({
   }, RD.success(ZERO_SWAP_FEES))
 
   const reloadFeesHandler = useCallback(() => {
-    reloadFees(oSwapFeesParams)
-  }, [oSwapFeesParams, reloadFees])
+    reloadFees(swapFeesParams)
+  }, [swapFeesParams, reloadFees])
 
   const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
     (oApproveFeeParam$) => {
@@ -710,7 +703,7 @@ export const Swap = ({
     return FP.pipe(
       swapFeesRD,
       RD.getOrElse(() => ZERO_SWAP_FEES),
-      ({ inTx }) => sourceChainAssetAmount.amount().minus(inTx.amount()).isNegative()
+      ({ inAmount }) => sourceChainAssetAmount.amount().minus(inAmount.amount()).isNegative()
     )
   }, [swapFeesRD, isZeroAmountToSwap, minAmountError, sourceChainAssetAmount])
 
@@ -734,7 +727,7 @@ export const Swap = ({
               fee: formatAssetAmountCurrency({
                 asset: sourceChainAsset,
                 trimZeros: true,
-                amount: baseToAsset(fees.inTx)
+                amount: baseToAsset(fees.inAmount)
               })
             }
           )}
@@ -746,7 +739,7 @@ export const Swap = ({
 
   // Helper to price target fees into target asset
   const targetChainFeeAmountInTargetAsset: BaseAmount = useMemo(() => {
-    const { outTx }: SwapFees = FP.pipe(
+    const { outAmount: out }: SwapFees = FP.pipe(
       swapFeesRD,
       RD.getOrElse(() => ZERO_SWAP_FEES)
     )
@@ -766,10 +759,10 @@ export const Swap = ({
               // in case target asset is chain asset return fee (no need to price it)
               eqAsset.equals(chainAsset, asset)
                 ? // outTX needs to be converted into 1e8 decimal (as same as pool data)
-                  to1e8BaseAmount(outTx)
+                  to1e8BaseAmount(out)
                 : // pool data are always 1e8 decimal based
                   // and we have to convert fees to 1e8, too
-                  getValueOfAsset1InAsset2(to1e8BaseAmount(outTx), chainAssetPoolData, assetPoolData)
+                  getValueOfAsset1InAsset2(to1e8BaseAmount(out), chainAssetPoolData, assetPoolData)
           )
         )
       }),
@@ -820,7 +813,7 @@ export const Swap = ({
       FP.pipe(
         swapFeesRD,
         RD.map((chainFee) => [
-          { asset: getChainAsset(sourceAssetProp.chain), amount: chainFee.inTx },
+          { asset: getChainAsset(sourceAssetProp.chain), amount: chainFee.inAmount },
           { asset: targetAssetProp, amount: targetChainFeeAmountInTargetAsset }
         ])
       ),

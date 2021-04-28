@@ -25,14 +25,6 @@ export type FeeLD = LiveData<Error, BaseAmount>
 export type FeesRD = RD.RemoteData<Error, Fees>
 export type FeesLD = LiveData<Error, Fees>
 
-export type SwapFees = {
-  inTx: BaseAmount
-  outTx: BaseAmount
-}
-
-export type SwapFeesRD = RD.RemoteData<Error, SwapFees>
-export type SwapFeesLD = LiveData<Error, SwapFees>
-
 export type Memo = string
 export type MemoRx = Rx.Observable<O.Option<Memo>>
 
@@ -124,19 +116,26 @@ export type SwapOutTx = {
   readonly asset: Asset
   readonly memo: Memo
 }
+
+export type SwapFees = {
+  inAmount: BaseAmount
+  outAmount: BaseAmount
+}
+
+export type SwapFeesRD = RD.RemoteData<Error, SwapFees>
+export type SwapFeesLD = LiveData<Error, SwapFees>
+
 /**
  * Fees to swap txs (IN/OUT)
  */
 export type SwapFeesParams = {
-  /** Fee for pool tx sent into (IN) a pool */
-  readonly inTx: SwapTxParams
+  readonly inAsset: Asset
   /** Fee for pool tx to sent OUT from a pool */
-  readonly outTx: SwapOutTx
+  readonly outAsset: Asset
 }
 
-export type SwapFeesHandler = (p: O.Option<SwapFeesParams>) => SwapFeesLD
-
-export type ReloadSwapFeesHandler = (p: O.Option<SwapFeesParams>) => void
+export type SwapFeesHandler = (p: SwapFeesParams) => SwapFeesLD
+export type ReloadSwapFeesHandler = (p: SwapFeesParams) => void
 
 /**
  * State to reflect status of an asym. deposit by doing different requests

@@ -17,7 +17,7 @@ import {
 
 export const MAX_SWAP_STEPS = 3
 
-export const ZERO_SWAP_FEES: SwapFees = { inTx: ZERO_BASE_AMOUNT, outTx: ZERO_BASE_AMOUNT }
+export const ZERO_SWAP_FEES: SwapFees = { inAmount: ZERO_BASE_AMOUNT, outAmount: ZERO_BASE_AMOUNT }
 
 /**
  * Default `FeeOptionKey`s for chain txs
