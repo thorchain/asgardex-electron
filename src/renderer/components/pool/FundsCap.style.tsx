@@ -5,7 +5,7 @@ export const Container = styled('div')`
   display: flex;
   justify-content: center;
   width: 100%;
-  background-color: solid ${palette('background', 0)};
+  color: ${palette('text', 1)};
   padding: 5px 10px;
   text-transform: uppercase;
 `
