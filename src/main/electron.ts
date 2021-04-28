@@ -152,9 +152,9 @@ interface SendUpdateMessage {
   (message: IPCMessages.UPDATE_AVAILABLE, version: string): void
   (message: IPCMessages.UPDATE_NOT_AVAILABLE): void
 }
-const sendUpdateMessage: SendUpdateMessage = (message: IPCMessages, version?: string, path?: string) => {
+const sendUpdateMessage: SendUpdateMessage = (message: IPCMessages, version?: string) => {
   if (mainWindow) {
-    mainWindow.webContents.send(message, version, path)
+    mainWindow.webContents.send(message, version)
   }
 }
 
@@ -176,6 +176,7 @@ const init = async () => {
       } else {
         sendUpdateMessage(IPCMessages.UPDATE_AVAILABLE, info.updateInfo.version)
       }
+      mainWindow?.webContents.send(IPCMessages.LOG, JSON.stringify(info))
       return info
     })
     .catch((_) => {
