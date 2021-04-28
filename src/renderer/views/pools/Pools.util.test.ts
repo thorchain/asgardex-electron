@@ -229,7 +229,7 @@ describe('filterTableData', () => {
   })
 })
 
-describe.only('minPoolTxAmount', () => {
+describe('minPoolTxAmount', () => {
   it('$200 for BTC', () => {
     const result = minPoolTxAmountUSD(AssetBTC)
     expect(eqBaseAmount.equals(result, assetToBase(assetAmount(200, 8)))).toBeTruthy()

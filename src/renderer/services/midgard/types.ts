@@ -26,7 +26,8 @@ import {
   GetDepthHistoryRequest,
   DepthHistory,
   DepthHistoryItem,
-  SwapHistoryItem
+  SwapHistoryItem,
+  InboundAddressesItem
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { Memo } from '../chain/types'
@@ -96,6 +97,13 @@ export type NativeFee = O.Option<BaseAmount>
 export type NativeFeeRD = RD.RemoteData<Error, NativeFee>
 export type NativeFeeLD = LiveData<Error, NativeFee>
 
+// To mMake sure we accept inbound addresses with valid chains only: chain:string -> chain:Chain
+export type InboundAddress = Omit<InboundAddressesItem, 'chain'> & { chain: Chain }
+export type InboundAddresses = InboundAddress[]
+export type InboundAddressesLD = LiveData<Error, InboundAddresses>
+
+export type GasRate = BigNumber
+export type GasRateLD = LiveData<Error, GasRate>
 /**
  * Type for addresses of a pool
  * A pool has a vault address
@@ -171,7 +179,7 @@ export type PoolsService = {
   reloadAllPools: FP.Lazy<void>
   selectedPoolAddress$: PoolAddress$
   poolAddressesByChain$: (chain: Chain) => PoolAddressLD
-  reloadPoolAddresses: FP.Lazy<void>
+  reloadInboundAddresses: FP.Lazy<void>
   selectedPoolDetail$: PoolDetailLD
   reloadSelectedPoolDetail: (delay?: number) => void
   reloadPoolStatsDetail: FP.Lazy<void>
@@ -188,6 +196,7 @@ export type PoolsService = {
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD
   poolsFilters$: Rx.Observable<Record<string, O.Option<PoolFilter>>>
   setPoolsFilter: (poolKey: string, filter: O.Option<PoolFilter>) => void
+  gasRateByChain$: (chain: Chain) => GasRateLD
 }
 
 export type PoolShareType = DepositType | 'all'

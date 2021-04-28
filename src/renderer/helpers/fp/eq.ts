@@ -13,9 +13,13 @@ import { WalletBalance } from '../../types/wallet'
 
 export const eqOString = O.getEq(Eq.eqString)
 
+export const eqONumber = O.getEq(Eq.eqNumber)
+
 export const eqBigNumber: Eq.Eq<BigNumber> = {
   equals: (x, y) => x.isEqualTo(y)
 }
+
+export const eqOBigNumber: Eq.Eq<O.Option<BigNumber>> = O.getEq(eqBigNumber)
 
 export const eqAsset: Eq.Eq<Asset> = {
   equals: (x, y) =>

@@ -1,6 +1,16 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { assetFromString, bnOrZero, baseAmount, Asset, assetToString, Chain, isChain } from '@xchainjs/xchain-util'
+import {
+  assetFromString,
+  bnOrZero,
+  baseAmount,
+  Asset,
+  assetToString,
+  Chain,
+  isValidBN,
+  bn
+} from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -11,8 +21,8 @@ import { isBUSDAsset } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
 import { eqAsset, eqChain } from '../../helpers/fp/eq'
 import { optionFromNullableString } from '../../helpers/fp/from'
-import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { InboundAddressesItem, PoolDetail } from '../../types/generated/midgard'
+import { RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import {
   PoolAssetDetails as PoolAssetsDetail,
@@ -24,7 +34,8 @@ import {
   PoolShare,
   PoolAddress,
   PoolAddresses,
-  PoolsDataMap
+  PoolsDataMap,
+  InboundAddress
 } from './types'
 
 export const getAssetDetail = (assets: PoolAssetsDetail, ticker: string): O.Option<PoolAssetDetail> =>
@@ -160,21 +171,38 @@ export const getPoolAddressesByChain = (addresses: PoolAddresses, chain: Chain):
     A.findFirst((address) => eqChain.equals(address.chain, chain))
   )
 
-export const toPoolAddresses = (
-  addresses: Pick<InboundAddressesItem, 'chain' | 'address' | 'router'>[]
+export const getGasRateByChain = (
+  addresses: Pick<InboundAddress, 'chain' | 'gas_rate'>[],
+  chain: Chain
+): O.Option<BigNumber> =>
+  FP.pipe(
+    addresses,
+    A.findFirst((address) => eqChain.equals(address.chain, chain)),
+    O.chain(({ gas_rate }) =>
+      FP.pipe(
+        gas_rate,
+        O.fromNullable,
+        // accept valid numbers only
+        O.filterMap((rate) => {
+          const rateBN = bn(rate)
+          return isValidBN(rateBN) ? O.some(rateBN) : O.none
+        })
+      )
+    )
+  )
+
+export const inboundToPoolAddresses = (
+  addresses: Pick<InboundAddress, 'chain' | 'address' | 'router'>[]
 ): PoolAddresses =>
   FP.pipe(
     addresses,
-    A.filterMap(({ address, router, chain }) =>
-      // filter out invalid chains
-      isChain(chain)
-        ? O.some({
-            chain,
-            address,
-            router: optionFromNullableString(router)
-          })
-        : O.none
-    )
+    A.map(({ address, router, chain }) => ({
+      chain,
+      address,
+      router: optionFromNullableString(router)
+    })),
+    // Add "empty" rune "pool address" - we never had such pool, but do need it to calculate tx
+    A.cons(RUNE_POOL_ADDRESS)
   )
 
 /**

@@ -10,6 +10,7 @@ import {
   bn,
   BNBChain,
   BTCChain,
+  Chain,
   ETHChain,
   THORChain
 } from '@xchainjs/xchain-util'
@@ -23,8 +24,8 @@ import {
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
 import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, ZERO_BN } from '../../const'
-import { eqAsset, eqPoolShare, eqPoolShares } from '../../helpers/fp/eq'
-import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { eqAsset, eqPoolShare, eqPoolShares, eqOBigNumber } from '../../helpers/fp/eq'
+import { RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
 import { PoolAddress, PoolAssetDetail, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
@@ -43,8 +44,9 @@ import {
   getSharesByAssetAndType,
   getPoolAssetDetail,
   getPoolAssetsDetail,
-  toPoolAddresses,
-  getBUSDPoolData
+  inboundToPoolAddresses,
+  getBUSDPoolData,
+  getGasRateByChain
 } from './utils'
 
 describe('services/midgard/utils/', () => {
@@ -228,7 +230,7 @@ describe('services/midgard/utils/', () => {
     })
   })
 
-  describe.only('getBUSDPoolData', () => {
+  describe('getBUSDPoolData', () => {
     const runeDetail = { asset: assetToString(AssetRuneNative) } as PoolDetail
     const bnbDetail = { asset: assetToString(AssetBNB) } as PoolDetail
     const busdDetail = { asset: assetToString(AssetBUSDBAF) } as PoolDetail
@@ -252,9 +254,21 @@ describe('services/midgard/utils/', () => {
     })
   })
 
-  describe('toPoolAddresses', () => {
-    it('returns empty list', () => {
-      expect(toPoolAddresses([])).toEqual([])
+  describe('inboundToPoolAddresses', () => {
+    it('adds rune pool address empty list', () => {
+      expect(inboundToPoolAddresses([])).toEqual([RUNE_POOL_ADDRESS])
+    })
+    it('adds two `PoolAddress`es', () => {
+      const result = inboundToPoolAddresses([{ chain: 'BNB', address: 'bnb-address', router: '' }])
+      expect(result.length).toEqual(2)
+      // RUNE `PoolAddress`
+      expect(result[0]).toEqual(RUNE_POOL_ADDRESS)
+      // bnb `PoolAddress`
+      expect(result[1]).toEqual({
+        chain: 'BNB',
+        address: 'bnb-address',
+        router: O.none
+      })
     })
   })
 
@@ -436,6 +450,33 @@ describe('services/midgard/utils/', () => {
       })
       it('returns empty list in case of invalid data', () => {
         expect(getPoolAssetsDetail([{ assetPrice: '1', asset: '' }])).toEqual([])
+      })
+    })
+
+    describe('getGasRateByChain', () => {
+      const data: { chain: Chain; gas_rate?: string }[] = [
+        { chain: 'BNB', gas_rate: '1' },
+        { chain: 'ETH', gas_rate: '2' },
+        { chain: 'BTC', gas_rate: '3' },
+        { chain: 'LTC' }, // no gas rate
+        { chain: 'BCH', gas_rate: 'invalid' } // invalid gas rate
+      ]
+
+      it('gas rate for BNB', () => {
+        const result = getGasRateByChain(data, 'BNB')
+        expect(eqOBigNumber.equals(result, O.some(bn(1)))).toBeTruthy()
+      })
+      it('gas rate for ETH', () => {
+        const result = getGasRateByChain(data, 'ETH')
+        expect(eqOBigNumber.equals(result, O.some(bn(2)))).toBeTruthy()
+      })
+      it('none for missing gas rate (LTC)', () => {
+        const result = getGasRateByChain(data, 'LTC')
+        expect(result).toBeNone()
+      })
+      it('none for invalid gas rate (BCH)', () => {
+        const result = getGasRateByChain(data, 'BCH')
+        expect(result).toBeNone()
       })
     })
   })
