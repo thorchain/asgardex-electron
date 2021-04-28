@@ -141,36 +141,45 @@ const initIPC = () => {
   })
 }
 
-// const autoUpdater = new MacUpdater({
-//   url: 'https://github.com/thorchain/asgardex-electron/releases/download/untagged-9ec5268eed388477d237',
-//   provider: 'generic'
-// })
+autoUpdater.logger = {
+  ...log,
+  // Set custom info logger for better understanding in common debug-flow
+  info(message?: any): void {
+    console.log('[AutoUpdater.info]', message)
+  }
+}
+interface SendUpdateMessage {
+  (message: IPCMessages.UPDATE_AVAILABLE, version: string, path: string): void
+  (message: IPCMessages.UPDATE_NOT_AVAILABLE): void
+}
+const sendUpdateMessage: SendUpdateMessage = (message: IPCMessages, version?: string, path?: string) => {
+  if (mainWindow) {
+    mainWindow.webContents.send(message, version, path)
+  }
+}
 
-autoUpdater.logger = log
+// Disable autoDownload
+autoUpdater.autoDownload = false
+autoUpdater.allowPrerelease = true
 
 const init = async () => {
   await app.whenReady()
   await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
-  mainWindow?.webContents.send(IPCMessages.LOG, 'before checkForUpdates')
 
   autoUpdater
     .checkForUpdates()
     .then((info) => {
-      mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdates')
       if (!info) {
-        mainWindow?.webContents.send(IPCMessages.UPDATE_AVAILABLE, false)
-        mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdates no info for updated')
+        sendUpdateMessage(IPCMessages.UPDATE_NOT_AVAILABLE)
       } else {
-        mainWindow?.webContents.send(IPCMessages.UPDATE_AVAILABLE, info.updateInfo.version, info.updateInfo.path)
-        mainWindow?.webContents.send(IPCMessages.LOG, `checkForUpdates info for updates ${JSON.stringify(info)}`)
+        sendUpdateMessage(IPCMessages.UPDATE_AVAILABLE, info.updateInfo.version, info.updateInfo.path)
       }
       return info
     })
     .catch((e) => {
-      mainWindow?.webContents.send(IPCMessages.UPDATE_AVAILABLE, false)
-      mainWindow?.webContents.send(IPCMessages.LOG, `checkForUpdates failed for updates ${JSON.stringify(e)}`)
+      sendUpdateMessage(IPCMessages.UPDATE_NOT_AVAILABLE)
     })
 
   initIPC()

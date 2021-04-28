@@ -10,6 +10,7 @@ enum IPCMessages {
   SEND_LEDGER_TX = 'SEND_LEDGER_TX',
   LOG = 'LOG ',
   UPDATE_AVAILABLE = 'UPDATE_AVAILABLE',
+  UPDATE_NOT_AVAILABLE = 'UPDATE_NOT_AVAILABLE',
   /**
    * IPC File interaction messages templates
    * @see getStoreFilesIPCMessages at /src/shared/ipc/fileStore.ts to check final results
