@@ -19,6 +19,8 @@ export const eqBigNumber: Eq.Eq<BigNumber> = {
   equals: (x, y) => x.isEqualTo(y)
 }
 
+export const eqOBigNumber: Eq.Eq<O.Option<BigNumber>> = O.getEq(eqBigNumber)
+
 export const eqAsset: Eq.Eq<Asset> = {
   equals: (x, y) =>
     Eq.eqString.equals(x.chain, y.chain) && Eq.eqString.equals(x.symbol.toUpperCase(), y.symbol.toUpperCase())

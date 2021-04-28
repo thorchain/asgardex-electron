@@ -102,7 +102,7 @@ export type InboundAddress = Omit<InboundAddressesItem, 'chain'> & { chain: Chai
 export type InboundAddresses = InboundAddress[]
 export type InboundAddressesLD = LiveData<Error, InboundAddresses>
 
-export type GasRate = number
+export type GasRate = BigNumber
 export type GasRateLD = LiveData<Error, GasRate>
 /**
  * Type for addresses of a pool

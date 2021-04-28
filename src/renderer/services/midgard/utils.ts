@@ -1,6 +1,16 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { assetFromString, bnOrZero, baseAmount, Asset, assetToString, Chain } from '@xchainjs/xchain-util'
+import {
+  assetFromString,
+  bnOrZero,
+  baseAmount,
+  Asset,
+  assetToString,
+  Chain,
+  isValidBN,
+  bn
+} from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -164,7 +174,7 @@ export const getPoolAddressesByChain = (addresses: PoolAddresses, chain: Chain):
 export const getGasRateByChain = (
   addresses: Pick<InboundAddress, 'chain' | 'gas_rate'>[],
   chain: Chain
-): O.Option<number> =>
+): O.Option<BigNumber> =>
   FP.pipe(
     addresses,
     A.findFirst((address) => eqChain.equals(address.chain, chain)),
@@ -173,7 +183,10 @@ export const getGasRateByChain = (
         gas_rate,
         O.fromNullable,
         // accept valid numbers only
-        O.filterMap((v) => (isNaN(Number(v)) ? O.none : O.some(Number(v))))
+        O.filterMap((rate) => {
+          const rateBN = bn(rate)
+          return isValidBN(rateBN) ? O.some(rateBN) : O.none
+        })
       )
     )
   )

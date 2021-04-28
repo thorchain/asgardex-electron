@@ -24,7 +24,7 @@ import {
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
 import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, ZERO_BN } from '../../const'
-import { eqAsset, eqPoolShare, eqPoolShares, eqONumber } from '../../helpers/fp/eq'
+import { eqAsset, eqPoolShare, eqPoolShares, eqOBigNumber } from '../../helpers/fp/eq'
 import { RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
@@ -259,7 +259,16 @@ describe('services/midgard/utils/', () => {
       expect(inboundToPoolAddresses([])).toEqual([RUNE_POOL_ADDRESS])
     })
     it('adds two `PoolAddress`es', () => {
-      expect(inboundToPoolAddresses([{ chain: 'BNB', address: 'bnb-address', router: '' }]).length).toEqual(2)
+      const result = inboundToPoolAddresses([{ chain: 'BNB', address: 'bnb-address', router: '' }])
+      expect(result.length).toEqual(2)
+      // RUNE `PoolAddress`
+      expect(result[0]).toEqual(RUNE_POOL_ADDRESS)
+      // bnb `PoolAddress`
+      expect(result[1]).toEqual({
+        chain: 'BNB',
+        address: 'bnb-address',
+        router: O.none
+      })
     })
   })
 
@@ -455,11 +464,11 @@ describe('services/midgard/utils/', () => {
 
       it('gas rate for BNB', () => {
         const result = getGasRateByChain(data, 'BNB')
-        expect(eqONumber.equals(result, O.some(1))).toBeTruthy()
+        expect(eqOBigNumber.equals(result, O.some(bn(1)))).toBeTruthy()
       })
       it('gas rate for ETH', () => {
         const result = getGasRateByChain(data, 'ETH')
-        expect(eqONumber.equals(result, O.some(2))).toBeTruthy()
+        expect(eqOBigNumber.equals(result, O.some(bn(2)))).toBeTruthy()
       })
       it('none for missing gas rate (LTC)', () => {
         const result = getGasRateByChain(data, 'LTC')
