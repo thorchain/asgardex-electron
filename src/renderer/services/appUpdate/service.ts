@@ -5,22 +5,14 @@ import * as RxOp from 'rxjs/operators'
 
 import { observableState } from '../../helpers/stateHelper'
 
-type AppUpdater = O.Option<{
-  nextRelease: string
-  nextReleasePath: string
-}>
+type AppUpdater = O.Option<string>
 
 const { get$: appUpdater$, set: setAppUpdater } = observableState<AppUpdater>(O.none)
 
 FP.pipe(
   Rx.from(window.apiAppUpdate),
   RxOp.catchError(() => Rx.EMPTY),
-  RxOp.map(({ version, url }) =>
-    O.some({
-      nextRelease: version,
-      nextReleasePath: url
-    })
-  )
+  RxOp.map((version) => O.some(version))
 ).subscribe(setAppUpdater)
 
 const resetAppUpdater = () => setAppUpdater(O.none)

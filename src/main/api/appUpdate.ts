@@ -8,11 +8,11 @@ const cleanUpListeners = () => {
 }
 
 const getApiAppUpdate = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     // based on src/main/electron.ts:SendUpdateMessage interface
-    ipcRenderer.addListener(IPCMessages.UPDATE_AVAILABLE, (_, version: string, url: string) => {
+    ipcRenderer.addListener(IPCMessages.UPDATE_AVAILABLE, (_, version: string) => {
       cleanUpListeners()
-      resolve({ version, url })
+      resolve(version)
     })
 
     ipcRenderer.addListener(IPCMessages.UPDATE_NOT_AVAILABLE, (_) => {

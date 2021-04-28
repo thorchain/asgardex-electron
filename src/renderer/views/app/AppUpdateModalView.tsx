@@ -18,9 +18,9 @@ export const AppUpdateModalView: React.FC = () => {
         appUpdater,
         O.fold(
           (): AppUpdateModalProps => ({ isOpen: false }),
-          ({ nextRelease, nextReleasePath }): AppUpdateModalProps => ({
+          (nextRelease): AppUpdateModalProps => ({
             isOpen: true,
-            goToUpdates: () => console.log(nextReleasePath),
+            goToUpdates: () => window.apiUrl.openExternal('https://github.com/thorchain/asgardex-electron/releases'),
             version: nextRelease,
             close: resetAppUpdater
           })

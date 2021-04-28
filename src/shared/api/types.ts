@@ -46,11 +46,8 @@ export type ApiFileStoreService<T> = {
 }
 
 // Promise with a version string inside
-// If there is no туц version Promise will be rejected
-export type ApiAppUpdate = Promise<{
-  version: string
-  url: string
-}>
+// If there is no new version Promise will be rejected
+export type ApiAppUpdate = Promise<string>
 
 export type ApiLang = {
   update: (locale: Locale) => void

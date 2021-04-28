@@ -144,12 +144,12 @@ const initIPC = () => {
 autoUpdater.logger = {
   ...log,
   // Set custom info logger for better understanding in common debug-flow
-  info(message?: any): void {
+  info(message?: unknown): void {
     console.log('[AutoUpdater.info]', message)
   }
 }
 interface SendUpdateMessage {
-  (message: IPCMessages.UPDATE_AVAILABLE, version: string, path: string): void
+  (message: IPCMessages.UPDATE_AVAILABLE, version: string): void
   (message: IPCMessages.UPDATE_NOT_AVAILABLE): void
 }
 const sendUpdateMessage: SendUpdateMessage = (message: IPCMessages, version?: string, path?: string) => {
@@ -174,11 +174,11 @@ const init = async () => {
       if (!info) {
         sendUpdateMessage(IPCMessages.UPDATE_NOT_AVAILABLE)
       } else {
-        sendUpdateMessage(IPCMessages.UPDATE_AVAILABLE, info.updateInfo.version, info.updateInfo.path)
+        sendUpdateMessage(IPCMessages.UPDATE_AVAILABLE, info.updateInfo.version)
       }
       return info
     })
-    .catch((e) => {
+    .catch((_) => {
       sendUpdateMessage(IPCMessages.UPDATE_NOT_AVAILABLE)
     })
 

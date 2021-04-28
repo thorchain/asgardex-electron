@@ -80,10 +80,16 @@ export type CommonMessageKey =
   | 'common.time.all'
   | 'common.theme.light'
   | 'common.theme.dark'
+  | 'common.app.update.available'
+  | 'common.go'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
 }
+
+type UpdateMessagesKeys = 'update.available' | 'update.description'
+
+export type UpdateMessages = { [key in UpdateMessagesKeys]: string }
 
 type RoutesMessageKey = 'routes.invalid.asset'
 
@@ -312,7 +318,8 @@ export type Messages = CommonMessages &
   DepositMessages &
   LedgerMessages &
   BondsMessages &
-  PoolSharesMessage
+  PoolSharesMessage &
+  UpdateMessages
 
 export type Translation = {
   locale: Locale

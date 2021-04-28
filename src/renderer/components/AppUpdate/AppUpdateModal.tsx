@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { useIntl } from 'react-intl'
+
 import { Modal } from '../uielements/modal'
 
 export type AppUpdateModalProps =
@@ -14,14 +16,15 @@ export type AppUpdateModalProps =
     }
 
 export const AppUpdateModal: React.FC<AppUpdateModalProps> = (props) => {
+  const intl = useIntl()
   return props.isOpen ? (
     <Modal
-      title={'New Version is available'}
+      title={intl.formatMessage({ id: 'app.update.available' })}
       visible={props.isOpen}
-      okText={'Download'}
+      okText={intl.formatMessage({ id: 'common.go' })}
       onOk={props.goToUpdates}
       onCancel={props.close}>
-      There is a new version {props.version} available. Here is a link or download it right here
+      {intl.formatMessage({ id: 'update.description' }, { version: props.version })}
     </Modal>
   ) : (
     <Modal visible={props.isOpen} />
