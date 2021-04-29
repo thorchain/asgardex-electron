@@ -1,0 +1,3 @@
+provider: generic
+# To mock available info for electron-updater run `serve ./release-info-mock/ -p 80`
+url: 'http://127.0.0.1'

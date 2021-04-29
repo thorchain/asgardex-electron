@@ -167,24 +167,17 @@ const init = async () => {
   await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
-
-  autoUpdater
-    .checkForUpdates()
-    .then((info) => {
-      mainWindow?.webContents.send(IPCMessages.LOG, JSON.stringify(info))
-      if (!info) {
-        sendUpdateMessage(IPCMessages.UPDATE_NOT_AVAILABLE)
-      } else {
-        sendUpdateMessage(IPCMessages.UPDATE_AVAILABLE, info.updateInfo.version)
-      }
-      return info
-    })
-    .catch((_) => {
-      sendUpdateMessage(IPCMessages.UPDATE_NOT_AVAILABLE)
-    })
-
   initIPC()
+  await autoUpdater.checkForUpdates()
 }
+
+autoUpdater.on('update-available', (info: { version: string }) => {
+  sendUpdateMessage(IPCMessages.UPDATE_AVAILABLE, info.version)
+})
+
+autoUpdater.on('update-not-available', () => {
+  sendUpdateMessage(IPCMessages.UPDATE_NOT_AVAILABLE)
+})
 
 try {
   init()

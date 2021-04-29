@@ -1,7 +1,7 @@
 {
   "name": "asgardex",
   "productName": "ASGARDEX",
-  "version": "v0.1.0-alpha.16",
+  "version": "v0.1.0-alpha.13",
   "description": "WALLET AND EXCHANGE CLIENT FOR THORCHAIN",
   "main": "public/electron.js",
   "scripts": {
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thorchain/asgardex.git"
+    "url": "https://github.com/thorchain/asgardex-electron"
   },
   "author": {
     "name": "ASGARDEX Maintainers",
