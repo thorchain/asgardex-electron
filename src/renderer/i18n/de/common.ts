@@ -79,7 +79,7 @@ const common: CommonMessages = {
   'common.time.all': 'Gesamt',
   'common.theme.light': 'Tag modus',
   'common.theme.dark': 'Nacht modus',
-  'common.go': 'Go'
+  'common.ok': 'Ok'
 }
 
 export default common

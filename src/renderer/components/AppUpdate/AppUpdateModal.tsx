@@ -21,7 +21,7 @@ export const AppUpdateModal: React.FC<AppUpdateModalProps> = (props) => {
     <Modal
       title={intl.formatMessage({ id: 'update.available' })}
       visible={props.isOpen}
-      okText={intl.formatMessage({ id: 'common.go' })}
+      okText={intl.formatMessage({ id: 'common.ok' })}
       onOk={props.goToUpdates}
       onCancel={props.close}>
       {intl.formatMessage({ id: 'update.description' }, { version: props.version })}

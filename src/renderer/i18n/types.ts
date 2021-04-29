@@ -80,7 +80,7 @@ export type CommonMessageKey =
   | 'common.time.all'
   | 'common.theme.light'
   | 'common.theme.dark'
-  | 'common.go'
+  | 'common.ok'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

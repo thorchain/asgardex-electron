@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge } from 'electron'
 
 import { getApiAppUpdate } from './api/appUpdate'
 import { getFileStoreApi } from './api/fileStore'
@@ -6,7 +6,6 @@ import { apiHDWallet } from './api/hdwallet'
 import { apiKeystore } from './api/keystore'
 import { apiLang } from './api/lang'
 import { apiUrl } from './api/url'
-import IPCMessages from './ipc/messages'
 
 // ContextBridge is used here to expose custom api objects on `window`
 // to be accessable at `renderer` processes,
@@ -31,5 +30,3 @@ contextBridge.exposeInMainWorld('apiCommonStorage', getFileStoreApi('common'))
 contextBridge.exposeInMainWorld('apiUserNodesStorage', getFileStoreApi('userNodes'))
 
 contextBridge.exposeInMainWorld('apiAppUpdate', getApiAppUpdate())
-
-ipcRenderer.on(IPCMessages.LOG, (...args) => console.log('--- log ---', ...args))
