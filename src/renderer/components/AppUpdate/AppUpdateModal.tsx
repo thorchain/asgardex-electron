@@ -19,7 +19,7 @@ export const AppUpdateModal: React.FC<AppUpdateModalProps> = (props) => {
   const intl = useIntl()
   return props.isOpen ? (
     <Modal
-      title={intl.formatMessage({ id: 'app.update.available' })}
+      title={intl.formatMessage({ id: 'update.available' })}
       visible={props.isOpen}
       okText={intl.formatMessage({ id: 'common.go' })}
       onOk={props.goToUpdates}
