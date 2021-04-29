@@ -6,32 +6,61 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { eqOSwapFeesParams } from '../../../helpers/fp/eq'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
-import { FeeOptionKeys } from '../const'
+import { FeeOptionKeys, ZERO_SWAP_FEES } from '../const'
 import { FeeLD, SwapFeesHandler, SwapFeesParams } from '../types'
-import { getInboundFee } from './utils'
+import { getInboundFee, getOutboundFee } from './utils'
 
 const {
-  pools: { gasRateByChain$ }
+  pools: { gasRateByChain$, reloadGasRates }
 } = midgardService
 
 /**
  * Fees for swap txs into a pool
  */
 const inboundFee$ = (asset: Asset): FeeLD => {
-  // special case for RUN
-  if (!isRuneNativeAsset(asset)) {
+  // special case for RUNE
+  if (isRuneNativeAsset(asset)) {
     return FP.pipe(
       THOR.fees$(),
       liveData.map((fees) => fees[FeeOptionKeys.SWAP])
     )
   } else {
-    FP.pipe(
+    return FP.pipe(
       gasRateByChain$(asset.chain),
       liveData.map((gasRate) => getInboundFee({ asset, gasRate })),
+      RxOp.map((inboundFeeRD) =>
+        FP.pipe(
+          inboundFeeRD,
+          // TODO @(Veado) Add i18n
+          RD.chain((oInboundFee: O.Option<BaseAmount>) =>
+            // Map to an error if inbound fee could not be found
+            RD.fromOption(oInboundFee, () => Error(`Could not find inbound fee for ${asset.chain}`))
+          )
+        )
+      )
+    )
+  }
+}
+
+/**
+ * Fees for swap txs outgoing from a pool
+ */
+const outboundFee$ = (asset: Asset): FeeLD => {
+  // special case for RUNE
+  if (isRuneNativeAsset(asset)) {
+    return FP.pipe(
+      THOR.fees$(),
+      liveData.map((fees) => fees[FeeOptionKeys.SWAP])
+    )
+  } else {
+    return FP.pipe(
+      gasRateByChain$(asset.chain),
+      liveData.map((gasRate) => getOutboundFee({ asset, gasRate })),
       RxOp.map((inboundFeeRD) =>
         // Add error in case no address could be found
         FP.pipe(
@@ -44,26 +73,51 @@ const inboundFee$ = (asset: Asset): FeeLD => {
       )
     )
   }
-
-  return Rx.of(RD.failure(Error('inboundFee$ has not been implemented yet')))
 }
 
-/**
- * Fees for swap txs outgoing from a pool
- */
-const outboundFee$ = (_: Asset): FeeLD => {
-  return Rx.of(RD.failure(Error('outboundFee$ has not been implemented yet')))
-}
+// state of `SwapFeesParams` used for reloading swap fees
+const { get$: updateSwapFeesParams$, get: updateSwapFeesParamsState, set: updateSwapFeesParams } = observableState<
+  O.Option<SwapFeesParams>
+>(O.none)
 
-// state for reloading swap fees
-const { get$: reloadSwapFees$, set: reloadSwapFees } = observableState<SwapFeesParams | undefined>(undefined)
+// To trigger reloading of swap fees accept `none` option values of `SwapFeesParams` only
+const reloadSwapFees = (params: SwapFeesParams) => {
+  const { inAsset, outAsset, inAmount } = params
+
+  // if prev. vs. new states are different, update params
+  if (!eqOSwapFeesParams.equals(O.some(params), updateSwapFeesParamsState())) {
+    updateSwapFeesParams(O.some(params))
+  }
+
+  if (inAmount.amount().isZero()) return {}
+
+  // (1) Trigger reload of fees for RUNE
+  if (isRuneNativeAsset(inAsset) || isRuneNativeAsset(outAsset)) {
+    console.log('RUNE reload fees:')
+    THOR.reloadFees()
+  }
+
+  // OR (2) for other fees, which all depend on gas rates
+  if (!isRuneNativeAsset(inAsset) || !isRuneNativeAsset(outAsset)) {
+    console.log('reload gas rates:')
+    reloadGasRates()
+  }
+}
 
 const swapFees$: SwapFeesHandler = (initialParams) => {
-  return reloadSwapFees$.pipe(
+  return updateSwapFeesParams$.pipe(
     RxOp.debounceTime(300),
-    RxOp.switchMap((reloadParams) => {
-      // reloadParams is `undefined` by default, that's `initialParams` will be used as default
-      const { inAsset, outAsset } = reloadParams || initialParams
+    RxOp.switchMap((oReloadParams) => {
+      // Since `oReloadParams` is `none` by default,
+      // `initialParams` will be used as first value
+      const { inAsset, outAsset, inAmount } = FP.pipe(
+        oReloadParams,
+        O.getOrElse(() => initialParams)
+      )
+
+      console.log('amount', inAmount.amount().toString())
+      // in case of zero amount, return zero fees (no API request needed)
+      if (inAmount.amount().isZero()) return Rx.of(RD.success(ZERO_SWAP_FEES))
 
       return liveData.sequenceS({
         inAmount: inboundFee$(inAsset),

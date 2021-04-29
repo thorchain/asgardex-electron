@@ -13,7 +13,11 @@ import { ONE_BN } from '../../const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { SwapState } from '../../services/chain/types'
+import { AssetWithDecimal } from '../../types/asgardex'
 import { Swap, SwapProps } from './Swap'
+
+const sourceAsset: AssetWithDecimal = { asset: AssetRuneNative, decimal: THORCHAIN_DECIMAL }
+const targetAsset: AssetWithDecimal = { asset: AssetBTC, decimal: BTC_DECIMAL }
 
 /* Mock all (default) data needed by `Swap` commponent */
 const defaultProps: SwapProps = {
@@ -22,8 +26,7 @@ const defaultProps: SwapProps = {
     { asset: AssetBTC, assetPrice: bn('56851.67420275761') },
     { asset: AssetRuneNative, assetPrice: ONE_BN }
   ],
-  sourceAsset: { asset: AssetRuneNative, decimal: THORCHAIN_DECIMAL },
-  targetAsset: { asset: AssetBTC, decimal: BTC_DECIMAL },
+  assets: { inAsset: sourceAsset, outAsset: targetAsset },
   poolAddress: O.some({ chain: 'BNB', address: 'vault-address', router: O.some('router-address') }),
   // mock successfull result of swap$
   swap$: (params) =>

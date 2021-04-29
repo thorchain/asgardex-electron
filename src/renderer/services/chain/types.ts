@@ -125,13 +125,10 @@ export type SwapFees = {
 export type SwapFeesRD = RD.RemoteData<Error, SwapFees>
 export type SwapFeesLD = LiveData<Error, SwapFees>
 
-/**
- * Fees to swap txs (IN/OUT)
- */
 export type SwapFeesParams = {
   readonly inAsset: Asset
-  /** Fee for pool tx to sent OUT from a pool */
   readonly outAsset: Asset
+  readonly inAmount: BaseAmount
 }
 
 export type SwapFeesHandler = (p: SwapFeesParams) => SwapFeesLD

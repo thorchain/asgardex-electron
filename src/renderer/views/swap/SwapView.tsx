@@ -219,8 +219,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   keystore={keystore}
                   validatePassword$={validatePassword$}
                   goToTransaction={goToTransaction}
-                  sourceAsset={sourceAsset}
-                  targetAsset={targetAsset}
+                  assets={{ inAsset: sourceAsset, outAsset: targetAsset }}
                   poolAddress={selectedPoolAddress}
                   availableAssets={availableAssets}
                   poolDetails={poolDetails}

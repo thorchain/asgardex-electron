@@ -518,6 +518,16 @@ const createPoolsService = (
     )
 
   /**
+   * Reloads gas rates
+   *
+   * Note: Since `gasRateByChain$` depends on `inboundAddressesShared`
+   * we do need to call `reloadInboundAddresses`
+   */
+  const reloadGasRates = () => {
+    console.log('reloadGasRates')
+    reloadInboundAddresses()
+  }
+  /**
    * Get's (cached) gas rates by given chain
    *
    * It will be updated as soon as `inboundAddressesInterval` is triggered
@@ -818,7 +828,7 @@ const createPoolsService = (
   return {
     poolsState$,
     pendingPoolsState$,
-    allPoolDetails$: allPoolDetails$,
+    allPoolDetails$,
     setSelectedPricePoolAsset,
     selectedPricePoolAsset$,
     selectedPricePool$,
@@ -828,7 +838,7 @@ const createPoolsService = (
     reloadAllPools,
     selectedPoolAddress$,
     poolAddressesByChain$,
-    reloadInboundAddresses: reloadInboundAddresses,
+    reloadInboundAddresses,
     selectedPoolDetail$,
     reloadSelectedPoolDetail: (delayTime = 0) => _reloadSelectedPoolDetail(delayTime),
     reloadPoolStatsDetail,
@@ -845,7 +855,8 @@ const createPoolsService = (
     validatePool$,
     poolsFilters$,
     setPoolsFilter,
-    gasRateByChain$
+    gasRateByChain$,
+    reloadGasRates
   }
 }
 
