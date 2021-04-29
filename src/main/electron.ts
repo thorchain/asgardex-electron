@@ -171,12 +171,12 @@ const init = async () => {
   autoUpdater
     .checkForUpdates()
     .then((info) => {
+      mainWindow?.webContents.send(IPCMessages.LOG, JSON.stringify(info))
       if (!info) {
         sendUpdateMessage(IPCMessages.UPDATE_NOT_AVAILABLE)
       } else {
         sendUpdateMessage(IPCMessages.UPDATE_AVAILABLE, info.updateInfo.version)
       }
-      mainWindow?.webContents.send(IPCMessages.LOG, JSON.stringify(info))
       return info
     })
     .catch((_) => {
