@@ -23,3 +23,5 @@ yarn-error.log*
 
 # don't share .env, but .env.sample
 .env
+
+dev-app-update.yml

@@ -1,0 +1,5 @@
+provider: github
+owner: 'thorchain'
+repo: 'asgardex-electron'
+# @see https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token
+token: githubPersonalAccessToken
