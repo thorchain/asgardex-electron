@@ -5,14 +5,6 @@ const defaultSubMenu = (intl: IntlShape): MenuItemConstructorOptions[] => [
   {
     label: intl.formatMessage({ id: 'menu.view.toggleFullscreen' }),
     role: 'togglefullscreen'
-  },
-  {
-    label: intl.formatMessage({ id: 'menu.view.reload' }),
-    role: 'reload'
-  },
-  {
-    label: intl.formatMessage({ id: 'menu.view.toggleDevTools' }),
-    role: 'toggleDevTools'
   }
 ]
 
