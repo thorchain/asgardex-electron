@@ -13,6 +13,7 @@ import { autoUpdater } from 'electron-updater'
 import { LedgerTxInfo, Network, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
 import { Locale } from '../shared/i18n/types'
+import { registerAppCheckUpdatedHandler } from './api/appUpdate'
 import { getFileStoreService } from './api/fileStore'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist, exportKeystore, loadKeystore } from './api/keystore'
 import { getAddress, sendTx } from './api/ledger'
@@ -135,6 +136,7 @@ const initIPC = () => {
     sendTx(chain, network, txInfo)
   )
 
+  registerAppCheckUpdatedHandler()
   // Register all file-stored data services
   Object.entries(DEFAULT_STORAGES).forEach(([name, defaultValue]) => {
     getFileStoreService(name as StoreFileName, defaultValue).registerIpcHandlersMain()
@@ -168,7 +170,6 @@ const init = async () => {
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
   initIPC()
-  await autoUpdater.checkForUpdates()
 }
 
 autoUpdater.on('update-available', (info: { version: string }) => {

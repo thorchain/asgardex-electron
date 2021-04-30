@@ -1,23 +1,22 @@
 import React, { useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/function'
-import * as O from 'fp-ts/Option'
-import { useObservableState } from 'observable-hooks'
 
 import packageInfo from '../../../../package.json'
 import { AppUpdateModal, AppUpdateModalProps } from '../../components/AppUpdate'
-import { useAppContext } from '../../contexts/AppContext'
+import { useAppUpdate } from '../../hooks/useAppUpdate'
 
 export const AppUpdateModalView: React.FC = () => {
-  const { resetAppUpdater, appUpdater$ } = useAppContext()
-
-  const appUpdater = useObservableState(appUpdater$, O.none)
+  const { appUpdater, resetAppUpdater } = useAppUpdate()
 
   const updateModalProps = useMemo(
     () =>
       FP.pipe(
         appUpdater,
-        O.fold(
+        RD.fold(
+          (): AppUpdateModalProps => ({ isOpen: false }),
+          (): AppUpdateModalProps => ({ isOpen: false }),
           (): AppUpdateModalProps => ({ isOpen: false }),
           (version): AppUpdateModalProps => ({
             isOpen: true,

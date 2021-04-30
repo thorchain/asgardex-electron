@@ -1,6 +1,6 @@
 import { contextBridge } from 'electron'
 
-import { getApiAppUpdate } from './api/appUpdate'
+import { apiAppUpdate } from './api/appUpdate'
 import { getFileStoreApi } from './api/fileStore'
 import { apiHDWallet } from './api/hdwallet'
 import { apiKeystore } from './api/keystore'
@@ -29,4 +29,4 @@ contextBridge.exposeInMainWorld('apiHDWallet', apiHDWallet)
 contextBridge.exposeInMainWorld('apiCommonStorage', getFileStoreApi('common'))
 contextBridge.exposeInMainWorld('apiUserNodesStorage', getFileStoreApi('userNodes'))
 
-contextBridge.exposeInMainWorld('apiAppUpdate', getApiAppUpdate())
+contextBridge.exposeInMainWorld('apiAppUpdate', apiAppUpdate)
