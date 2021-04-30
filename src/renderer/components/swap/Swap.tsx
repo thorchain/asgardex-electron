@@ -388,7 +388,14 @@ export const Swap = ({
 
   const prevMinAmountToSwapMax1e8 = useRef<O.Option<BaseAmount>>(O.none)
 
-  // Helper to price target fees into target asset
+  /**
+   * Helper to get min. amount to swap
+   *
+   * It's based on outbound OR outbound and inbound fees
+   *
+   * Formulas based on "Better Fees Handling #1381"
+   * @see https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
+   */
   const minAmountToSwapMax1e8: BaseAmount = useMemo(
     () =>
       FP.pipe(

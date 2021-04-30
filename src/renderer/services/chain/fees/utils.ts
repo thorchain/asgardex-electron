@@ -23,8 +23,8 @@ import { SwapFee, SwapFees } from '../types'
  *
  * Helper to get inbound fee for
  *
- * @see Better Fees Handling #1381
- * https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
+ * Formulas based on "Better Fees Handling #1381"
+ * @see https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
  */
 export const getInboundFee = ({ gasRate, asset }: { gasRate: BigNumber; asset: Asset }): O.Option<SwapFee> => {
   const gasRateGwei = gasRate.multipliedBy(10 ** 9)
