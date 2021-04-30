@@ -117,9 +117,18 @@ export type SwapOutTx = {
   readonly memo: Memo
 }
 
+export type SwapFee = {
+  /** fee amount */
+  readonly amount: BaseAmount
+  /** Asset, which fee is related to */
+  readonly asset: Asset
+}
+
+export type SwapFeeLD = LiveData<Error, SwapFee>
+
 export type SwapFees = {
-  inAmount: BaseAmount
-  outAmount: BaseAmount
+  readonly inFee: SwapFee
+  readonly outFee: SwapFee
 }
 
 export type SwapFeesRD = RD.RemoteData<Error, SwapFees>

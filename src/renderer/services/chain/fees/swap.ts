@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -11,9 +11,9 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
-import { FeeOptionKeys, ZERO_SWAP_FEES } from '../const'
-import { FeeLD, SwapFeesHandler, SwapFeesParams } from '../types'
-import { getInboundFee, getOutboundFee } from './utils'
+import { FeeOptionKeys } from '../const'
+import { SwapFee, SwapFeesHandler, SwapFeeLD, SwapFeesParams } from '../types'
+import { getInboundFee, getOutboundFee, getZeroSwapFees } from './utils'
 
 const {
   pools: { gasRateByChain$, reloadGasRates }
@@ -22,12 +22,12 @@ const {
 /**
  * Fees for swap txs into a pool
  */
-const inboundFee$ = (asset: Asset): FeeLD => {
+const inboundFee$ = (asset: Asset): SwapFeeLD => {
   // special case for RUNE
   if (isRuneNativeAsset(asset)) {
     return FP.pipe(
       THOR.fees$(),
-      liveData.map((fees) => fees[FeeOptionKeys.SWAP])
+      liveData.map((fees) => ({ amount: fees[FeeOptionKeys.SWAP], asset: AssetRuneNative }))
     )
   } else {
     return FP.pipe(
@@ -37,7 +37,7 @@ const inboundFee$ = (asset: Asset): FeeLD => {
         FP.pipe(
           inboundFeeRD,
           // TODO @(Veado) Add i18n
-          RD.chain((oInboundFee: O.Option<BaseAmount>) =>
+          RD.chain((oInboundFee: O.Option<SwapFee>) =>
             // Map to an error if inbound fee could not be found
             RD.fromOption(oInboundFee, () => Error(`Could not find inbound fee for ${asset.chain}`))
           )
@@ -50,12 +50,12 @@ const inboundFee$ = (asset: Asset): FeeLD => {
 /**
  * Fees for swap txs outgoing from a pool
  */
-const outboundFee$ = (asset: Asset): FeeLD => {
+const outboundFee$ = (asset: Asset): SwapFeeLD => {
   // special case for RUNE
   if (isRuneNativeAsset(asset)) {
     return FP.pipe(
       THOR.fees$(),
-      liveData.map((fees) => fees[FeeOptionKeys.SWAP])
+      liveData.map((fees) => ({ amount: fees[FeeOptionKeys.SWAP], asset: AssetRuneNative }))
     )
   } else {
     return FP.pipe(
@@ -66,7 +66,7 @@ const outboundFee$ = (asset: Asset): FeeLD => {
         FP.pipe(
           inboundFeeRD,
           // TODO @(Veado) Add i18n
-          RD.chain((oInboundFee: O.Option<BaseAmount>) =>
+          RD.chain((oInboundFee: O.Option<SwapFee>) =>
             RD.fromOption(oInboundFee, () => Error(`Could not find inbound fee for ${asset.chain}`))
           )
         )
@@ -117,11 +117,14 @@ const swapFees$: SwapFeesHandler = (initialParams) => {
 
       console.log('amount', inAmount.amount().toString())
       // in case of zero amount, return zero fees (no API request needed)
-      if (inAmount.amount().isZero()) return Rx.of(RD.success(ZERO_SWAP_FEES))
+      if (inAmount.amount().isZero()) {
+        const zeroSwapFees = getZeroSwapFees({ inAsset, outAsset })
+        return Rx.of(RD.success(zeroSwapFees))
+      }
 
       return liveData.sequenceS({
-        inAmount: inboundFee$(inAsset),
-        outAmount: outboundFee$(outAsset)
+        inFee: inboundFee$(inAsset),
+        outFee: outboundFee$(outAsset)
       })
     })
   )

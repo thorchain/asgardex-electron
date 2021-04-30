@@ -83,7 +83,13 @@ const defaultProps: SwapProps = {
   reloadFees: () => console.log('reloadFees'),
   reloadApproveFee: () => console.log('reloadFees'),
   reloadBalances: () => console.log('reloadBalances'),
-  fees$: () => Rx.of(RD.success({ inAmount: baseAmount(10000000), outAmount: baseAmount(1000000) })),
+  fees$: () =>
+    Rx.of(
+      RD.success({
+        inFee: { amount: baseAmount(10000000), asset: AssetRuneNative },
+        outFee: { amount: baseAmount(1000000), asset: AssetBTC }
+      })
+    ),
   approveFee$: () => Rx.of(RD.success(baseAmount(10000000))),
   targetWalletAddress: O.some('wallet-address'),
   onChangePath: (path) => console.log('change path', path),
