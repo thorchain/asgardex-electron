@@ -137,7 +137,6 @@ export type SwapFeesLD = LiveData<Error, SwapFees>
 export type SwapFeesParams = {
   readonly inAsset: Asset
   readonly outAsset: Asset
-  readonly inAmount: BaseAmount
 }
 
 export type SwapFeesHandler = (p: SwapFeesParams) => SwapFeesLD

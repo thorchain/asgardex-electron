@@ -104,8 +104,7 @@ export const eqOPoolAddresses = O.getEq(eqPoolAddresses)
 
 export const eqSwapFeesParams = Eq.getStructEq<SwapFeesParams>({
   inAsset: eqAsset,
-  outAsset: eqAsset,
-  inAmount: eqBaseAmount
+  outAsset: eqAsset
 })
 
 export const eqOSwapFeesParams = O.getEq(eqSwapFeesParams)

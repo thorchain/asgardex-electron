@@ -470,6 +470,8 @@ const createPoolsService = (
    */
   const inboundAddressesShared$ = FP.pipe(
     Rx.combineLatest([reloadInboundAddresses$, inboundAddressesInterval$]),
+    // debounce it, reloadInboundAddresses might be called by UI many times
+    RxOp.debounceTime(300),
     RxOp.switchMap((_) => loadInboundAddresses$()),
     RxOp.shareReplay(1)
   )

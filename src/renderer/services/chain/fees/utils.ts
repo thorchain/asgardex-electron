@@ -16,7 +16,7 @@ import {
   isEthTokenAsset,
   isLtcAsset
 } from '../../../helpers/assetHelper'
-import { getChainAsset } from '../../../helpers/chainHelper'
+import { getChainAsset, isBnbChain } from '../../../helpers/chainHelper'
 import { SwapFee, SwapFees } from '../types'
 
 /**
@@ -29,7 +29,7 @@ import { SwapFee, SwapFees } from '../types'
 export const getInboundFee = ({ gasRate, asset }: { gasRate: BigNumber; asset: Asset }): O.Option<SwapFee> => {
   const gasRateGwei = gasRate.multipliedBy(10 ** 9)
 
-  if (isBnbAsset(asset)) {
+  if (isBnbChain(asset.chain)) {
     // BNB = 1 * gasRate (sat/byte) * 1 (bytes)
     return O.some({
       amount: baseAmount(gasRate, BNB_DECIMAL),
@@ -81,7 +81,9 @@ export const getOutboundFee = ({ gasRate, asset }: { gasRate: BigNumber; asset: 
   const outGasRate = gasRate.multipliedBy(3)
   const gasRateGwei = outGasRate.multipliedBy(10 ** 9)
 
-  if (isBnbAsset(asset)) {
+  console.log('getOutboundFee asset:', asset)
+  console.log('getOutboundFee asset:', isBnbAsset(asset))
+  if (isBnbChain(asset.chain)) {
     // BNB = 3 * gasRate (sat/byte) * 1 (bytes)
     return O.some({
       amount: baseAmount(outGasRate, BNB_DECIMAL),
