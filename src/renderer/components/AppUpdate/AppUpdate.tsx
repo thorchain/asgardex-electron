@@ -8,9 +8,16 @@ import * as Styled from './AppUpdate.styles'
 export type AppUpdateModalProps =
   | {
       isOpen: true
+      type: 'success'
       goToUpdates: () => void
       version: string
       close: () => void
+    }
+  | {
+      isOpen: true
+      type: 'fail'
+      close: () => void
+      message: string
     }
   | {
       isOpen: false
@@ -28,18 +35,35 @@ export const AppUpdate: React.FC<AppUpdateModalProps> = (props) => {
     ),
     [intl]
   )
+  if (props.isOpen && props.type === 'success') {
+    return (
+      <Styled.Success
+        action={isDesktopView ? <Styled.OkButton onClick={props.goToUpdates}>{okContent}</Styled.OkButton> : null}
+        message={
+          <Styled.Content>
+            <Styled.Title>{intl.formatMessage({ id: 'update.description' }, { version: props.version })}</Styled.Title>
+            {!isDesktopView && <Styled.OkButton onClick={props.goToUpdates}>{okContent}</Styled.OkButton>}
+          </Styled.Content>
+        }
+        onClose={props.close}
+        closable
+      />
+    )
+  }
 
-  return props.isOpen ? (
-    <Styled.Alert
-      action={isDesktopView ? <Styled.OkButton onClick={props.goToUpdates}>{okContent}</Styled.OkButton> : null}
-      message={
-        <Styled.Content>
-          <Styled.Title>{intl.formatMessage({ id: 'update.description' }, { version: props.version })}</Styled.Title>
-          {!isDesktopView && <Styled.OkButton onClick={props.goToUpdates}>{okContent}</Styled.OkButton>}
-        </Styled.Content>
-      }
-      onClose={props.close}
-      closable
-    />
-  ) : null
+  if (props.isOpen && props.type === 'fail') {
+    return (
+      <Styled.Error
+        message={
+          <Styled.Content>
+            <Styled.Title>{intl.formatMessage({ id: 'update.checkFailed' }, { error: props.message })}</Styled.Title>
+          </Styled.Content>
+        }
+        onClose={props.close}
+        closable
+      />
+    )
+  }
+
+  return null
 }

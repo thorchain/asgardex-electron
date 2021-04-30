@@ -17,9 +17,10 @@ export const AppUpdateView: React.FC = () => {
         RD.fold(
           (): AppUpdateModalProps => ({ isOpen: false }),
           (): AppUpdateModalProps => ({ isOpen: false }),
-          (): AppUpdateModalProps => ({ isOpen: false }),
+          ({ message }): AppUpdateModalProps => ({ isOpen: true, type: 'fail', close: resetAppUpdater, message }),
           (version): AppUpdateModalProps => ({
             isOpen: true,
+            type: 'success',
             goToUpdates: () => window.apiUrl.openExternal(`${packageInfo.repository.url}/releases/tag/v${version}`),
             version,
             close: resetAppUpdater

@@ -5,8 +5,20 @@ import { Alert as AlertUI } from '../uielements/alert'
 import { Button as ButtonUI } from '../uielements/button'
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../uielements/common/Common.style'
 
-export const Alert = styled(AlertUI).attrs({
+export const Success = styled(AlertUI).attrs({
   type: 'success'
+})`
+  .anticon-close {
+    color: ${palette('text', 0)};
+  }
+
+  .ant-alert-close-icon {
+    align-self: flex-start;
+  }
+`
+
+export const Error = styled(AlertUI).attrs({
+  type: 'error'
 })`
   .anticon-close {
     color: ${palette('text', 0)};
