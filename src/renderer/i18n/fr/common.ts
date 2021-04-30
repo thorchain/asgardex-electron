@@ -78,8 +78,7 @@ const common: CommonMessages = {
   'common.time.week': 'Semaine',
   'common.time.all': 'Tout',
   'common.theme.light': 'Mode clair',
-  'common.theme.dark': 'Mode sombre',
-  'common.ok': 'Ok'
+  'common.theme.dark': 'Mode sombre'
 }
 
 export default common

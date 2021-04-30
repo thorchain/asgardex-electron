@@ -80,13 +80,12 @@ export type CommonMessageKey =
   | 'common.time.all'
   | 'common.theme.light'
   | 'common.theme.dark'
-  | 'common.ok'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
 }
 
-type UpdateMessagesKeys = 'update.available' | 'update.description'
+type UpdateMessagesKeys = 'update.description' | 'update.link'
 
 export type UpdateMessages = { [key in UpdateMessagesKeys]: string }
 

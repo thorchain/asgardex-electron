@@ -78,8 +78,7 @@ const common: CommonMessages = {
   'common.time.week': 'Неделя',
   'common.time.all': 'Все',
   'common.theme.light': 'Светлая тема',
-  'common.theme.dark': 'Темная тема',
-  'common.ok': 'Ok'
+  'common.theme.dark': 'Темная тема'
 }
 
 export default common

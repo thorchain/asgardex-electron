@@ -24,14 +24,14 @@ export const AppUpdate: React.FC<AppUpdateModalProps> = (props) => {
     <Styled.Alert
       action={
         isDesktopView ? (
-          <Styled.OkButton onClick={props.goToUpdates}>{intl.formatMessage({ id: 'common.ok' })}</Styled.OkButton>
+          <Styled.OkButton onClick={props.goToUpdates}>{intl.formatMessage({ id: 'update.link' })}</Styled.OkButton>
         ) : null
       }
       message={
         <Styled.Content>
           <Styled.Title>{intl.formatMessage({ id: 'update.description' }, { version: props.version })}</Styled.Title>
           {!isDesktopView && (
-            <Styled.OkButton onClick={props.goToUpdates}>{intl.formatMessage({ id: 'common.ok' })}</Styled.OkButton>
+            <Styled.OkButton onClick={props.goToUpdates}>{intl.formatMessage({ id: 'update.link' })}</Styled.OkButton>
           )}
         </Styled.Content>
       }
