@@ -8,7 +8,6 @@ import electronDebug from 'electron-debug'
 import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
-import { autoUpdater } from 'electron-updater'
 
 import { LedgerTxInfo, Network, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
@@ -143,27 +142,6 @@ const initIPC = () => {
   })
 }
 
-autoUpdater.logger = {
-  ...log,
-  // Set custom info logger for better understanding in common debug-flow
-  info(message?: unknown): void {
-    console.log('[AutoUpdater.info]', message)
-  }
-}
-interface SendUpdateMessage {
-  (message: IPCMessages.UPDATE_AVAILABLE, version: string): void
-  (message: IPCMessages.UPDATE_NOT_AVAILABLE): void
-}
-const sendUpdateMessage: SendUpdateMessage = (message: IPCMessages, version?: string) => {
-  if (mainWindow) {
-    mainWindow.webContents.send(message, version)
-  }
-}
-
-// Disable autoDownload
-autoUpdater.autoDownload = false
-autoUpdater.allowPrerelease = true
-
 const init = async () => {
   await app.whenReady()
   await initMainWindow()
@@ -171,14 +149,6 @@ const init = async () => {
   app.on('activate', activateHandler)
   initIPC()
 }
-
-autoUpdater.on('update-available', (info: { version: string }) => {
-  sendUpdateMessage(IPCMessages.UPDATE_AVAILABLE, info.version)
-})
-
-autoUpdater.on('update-not-available', () => {
-  sendUpdateMessage(IPCMessages.UPDATE_NOT_AVAILABLE)
-})
 
 try {
   init()
