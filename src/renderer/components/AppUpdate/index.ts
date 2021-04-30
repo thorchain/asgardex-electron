@@ -1,1 +1,1 @@
-export * from './AppUpdateModal'
+export * from './AppUpdate'

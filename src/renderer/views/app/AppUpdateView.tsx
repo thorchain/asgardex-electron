@@ -4,10 +4,10 @@ import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/function'
 
 import packageInfo from '../../../../package.json'
-import { AppUpdateModal, AppUpdateModalProps } from '../../components/AppUpdate'
+import { AppUpdate, AppUpdateModalProps } from '../../components/AppUpdate'
 import { useAppUpdate } from '../../hooks/useAppUpdate'
 
-export const AppUpdateModalView: React.FC = () => {
+export const AppUpdateView: React.FC = () => {
   const { appUpdater, resetAppUpdater } = useAppUpdate()
 
   const updateModalProps = useMemo(
@@ -28,5 +28,5 @@ export const AppUpdateModalView: React.FC = () => {
       ),
     [appUpdater, resetAppUpdater]
   )
-  return <AppUpdateModal {...updateModalProps} />
+  return <AppUpdate {...updateModalProps} />
 }

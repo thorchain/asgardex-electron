@@ -2,18 +2,19 @@ import React, { useMemo } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
+import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { Footer } from '../../components/footer'
-import { Header } from '../../components/header/Header'
+import { Header } from '../../components/header'
 import { Button } from '../../components/uielements/button'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { View } from '../View'
 import { ViewRoutes } from '../ViewRoutes'
-import { AppUpdateModalView } from './AppUpdateModalView'
+import { AppUpdateView } from './AppUpdateView'
 import * as Styled from './AppView.style'
 
 export const AppView: React.FC = (): JSX.Element => {
@@ -24,6 +25,8 @@ export const AppView: React.FC = (): JSX.Element => {
   } = useMidgardContext()
 
   const apiEndpoint = useObservableState(apiEndpoint$, RD.initial)
+
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   const renderMidgardAlert = useMemo(() => {
     const description = (
@@ -58,9 +61,11 @@ export const AppView: React.FC = (): JSX.Element => {
   return (
     <Styled.AppWrapper>
       <Styled.AppLayout>
+        {isDesktopView && <AppUpdateView />}
         <Header />
+        {!isDesktopView && <AppUpdateView />}
+
         <View>
-          <AppUpdateModalView />
           {renderMidgardError}
           <ViewRoutes />
         </View>
