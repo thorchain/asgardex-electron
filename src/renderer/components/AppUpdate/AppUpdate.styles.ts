@@ -3,6 +3,7 @@ import { palette } from 'styled-theme'
 
 import { Alert as AlertUI } from '../uielements/alert'
 import { Button as ButtonUI } from '../uielements/button'
+import { ExternalLinkIcon as ExternalLinkIconUI } from '../uielements/common/Common.style'
 
 export const Alert = styled(AlertUI).attrs({
   type: 'success'
@@ -29,7 +30,20 @@ export const Content = styled.div`
   flex-direction: column;
 `
 
+export const OkContent = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 export const OkButton = styled(ButtonUI).attrs({
   size: 'small',
   type: 'primary'
 })``
+
+export const ExternalLinkIcon = styled(ExternalLinkIconUI)`
+  margin-left: 10px;
+
+  svg {
+    color: inherit;
+  }
+`
