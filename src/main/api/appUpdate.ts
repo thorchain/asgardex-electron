@@ -1,16 +1,19 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { ipcRenderer, ipcMain } from 'electron'
+import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { autoUpdater } from 'electron-updater'
 
 import { AppUpdateRD } from '../../shared/api/types'
 import IPCMessages from '../ipc/messages'
 
-autoUpdater.logger = {
-  ...log,
-  // Set custom info logger for better understanding in common debug-flow
-  info(message?: unknown): void {
-    console.log('[AutoUpdater.info]', message)
+if (isDev) {
+  autoUpdater.logger = {
+    ...log,
+    // Set custom info logger for better understanding in common debug-flow
+    info(message?: unknown): void {
+      console.log('[AutoUpdater.info]', message)
+    }
   }
 }
 
