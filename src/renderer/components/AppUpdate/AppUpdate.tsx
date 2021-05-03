@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 
 import { Grid } from 'antd'
 import { useIntl } from 'react-intl'
@@ -27,22 +27,28 @@ export const AppUpdate: React.FC<AppUpdateModalProps> = (props) => {
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
-  const okContent = useMemo(
-    () => (
-      <Styled.OkContent>
-        {intl.formatMessage({ id: 'update.link' })} <Styled.ExternalLinkIcon />
-      </Styled.OkContent>
-    ),
-    [intl]
-  )
   if (props.isOpen && props.type === 'success') {
     return (
       <Styled.Success
-        action={isDesktopView ? <Styled.OkButton onClick={props.goToUpdates}>{okContent}</Styled.OkButton> : null}
+        action={
+          isDesktopView ? (
+            <Styled.OkButton onClick={props.goToUpdates}>
+              <Styled.OkContent>
+                {intl.formatMessage({ id: 'update.link' })} <Styled.ExternalLinkIcon />
+              </Styled.OkContent>
+            </Styled.OkButton>
+          ) : null
+        }
         message={
           <Styled.Content>
             <Styled.Title>{intl.formatMessage({ id: 'update.description' }, { version: props.version })}</Styled.Title>
-            {!isDesktopView && <Styled.OkButton onClick={props.goToUpdates}>{okContent}</Styled.OkButton>}
+            {!isDesktopView && (
+              <Styled.OkButton onClick={props.goToUpdates}>
+                <Styled.OkContent>
+                  <Styled.ExternalLinkIcon />
+                </Styled.OkContent>
+              </Styled.OkButton>
+            )}
           </Styled.Content>
         }
         onClose={props.close}
