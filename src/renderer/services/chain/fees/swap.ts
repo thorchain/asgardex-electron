@@ -1,4 +1,3 @@
-import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -11,7 +10,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
 import { FeeOptionKeys } from '../const'
-import { SwapFee, SwapFeesHandler, SwapFeeLD, SwapFeesParams } from '../types'
+import { SwapFeesHandler, SwapFeeLD, SwapFeesParams } from '../types'
 import { getInboundFee, getOutboundFee } from './utils'
 
 const {
@@ -32,16 +31,8 @@ const inboundFee$ = (asset: Asset): SwapFeeLD => {
     return FP.pipe(
       gasRateByChain$(asset.chain),
       liveData.map((gasRate) => getInboundFee({ asset, gasRate })),
-      RxOp.map((inboundFeeRD) =>
-        FP.pipe(
-          inboundFeeRD,
-          // TODO @(Veado) Add i18n
-          RD.chain((oInboundFee: O.Option<SwapFee>) =>
-            // Map to an error if inbound fee could not be found
-            RD.fromOption(oInboundFee, () => Error(`Could not find inbound fee for ${asset.chain}`))
-          )
-        )
-      )
+      // Map to an error if inbound fee could not be found
+      liveData.chain(liveData.fromOption(() => Error(`Could not find inbound fee for ${asset.chain}`)))
     )
   }
 }
@@ -60,16 +51,8 @@ const outboundFee$ = (asset: Asset): SwapFeeLD => {
     return FP.pipe(
       gasRateByChain$(asset.chain),
       liveData.map((gasRate) => getOutboundFee({ asset, gasRate })),
-      RxOp.map((outboundFeeRD) =>
-        // Add error in case no address could be found
-        FP.pipe(
-          outboundFeeRD,
-          // TODO @(Veado) Add i18n
-          RD.chain((oOutboundFeeRD: O.Option<SwapFee>) => {
-            return RD.fromOption(oOutboundFeeRD, () => Error(`Could not find outbound fee for ${asset.chain}`))
-          })
-        )
-      )
+      // Map to an error if outbound fee could not be found
+      liveData.chain(liveData.fromOption(() => Error(`Could not find outbound fee for ${asset.chain}`)))
     )
   }
 }

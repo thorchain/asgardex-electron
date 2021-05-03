@@ -58,8 +58,7 @@ import {
   InboundAddressesLD,
   PoolAddresses,
   InboundAddresses,
-  GasRateLD,
-  GasRate
+  GasRateLD
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -507,16 +506,8 @@ const createPoolsService = (
     FP.pipe(
       poolAddressesShared$,
       liveData.map((addresses: PoolAddresses) => getPoolAddressesByChain(addresses, chain)),
-      RxOp.map((rd) =>
-        // Add error in case no address could be found
-        FP.pipe(
-          rd,
-          // TODO @(Veado) Add i18n
-          RD.chain((oAddress: O.Option<PoolAddress>) =>
-            RD.fromOption(oAddress, () => Error('Could not find pool address'))
-          )
-        )
-      )
+      // Add error in case no address could be found
+      liveData.chain(liveData.fromOption(() => Error('Could not find pool address')))
     )
 
   /**
@@ -526,7 +517,6 @@ const createPoolsService = (
    * we do need to call `reloadInboundAddresses`
    */
   const reloadGasRates = () => {
-    console.log('reloadGasRates')
     reloadInboundAddresses()
   }
   /**
@@ -540,16 +530,8 @@ const createPoolsService = (
     FP.pipe(
       inboundAddressesShared$,
       liveData.map((addresses: InboundAddresses) => getGasRateByChain(addresses, chain)),
-      RxOp.map((rd) =>
-        // Add error in case no address could be found
-        FP.pipe(
-          rd,
-          // TODO @(Veado) Add i18n
-          RD.chain((oGasRate: O.Option<GasRate>) =>
-            RD.fromOption(oGasRate, () => Error(`Could not find gas rate for ${chain}`))
-          )
-        )
-      )
+      // Add error in case no address could be found
+      liveData.chain(liveData.fromOption(() => Error(`Could not find gas rate for ${chain}`)))
     )
 
   /**

@@ -10,7 +10,6 @@ import { ZERO_BASE_AMOUNT } from '../../../const'
 import {
   BNB_DECIMAL,
   isBchAsset,
-  isBnbAsset,
   isBtcAsset,
   isEthAsset,
   isEthTokenAsset,
@@ -81,8 +80,6 @@ export const getOutboundFee = ({ gasRate, asset }: { gasRate: BigNumber; asset: 
   const outGasRate = gasRate.multipliedBy(3)
   const gasRateGwei = outGasRate.multipliedBy(10 ** 9)
 
-  console.log('getOutboundFee asset:', asset)
-  console.log('getOutboundFee asset:', isBnbAsset(asset))
   if (isBnbChain(asset.chain)) {
     // BNB = 3 * gasRate (sat/byte) * 1 (bytes)
     return O.some({
