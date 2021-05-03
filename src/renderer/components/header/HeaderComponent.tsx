@@ -266,10 +266,25 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
   const color = useMemo(() => palette('text', 0)({ theme }), [theme])
 
+  const headerRef = useRef<O.Option<HTMLElement>>(O.none)
+  const setHeaderRef = useCallback((ref: HTMLElement | null) => {
+    headerRef.current = O.fromNullable(ref)
+  }, [])
+
+  const getHeaderBottomCoordinate = useCallback(
+    () =>
+      FP.pipe(
+        headerRef.current,
+        O.map((header) => header.getBoundingClientRect().bottom),
+        O.getOrElse(() => headerHeight)
+      ),
+    [headerHeight]
+  )
+
   return (
     <>
       <HeaderContainer>
-        <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
+        <Row justify="space-between" align="middle" style={{ height: headerHeight }} ref={setHeaderRef}>
           {isDesktopView && (
             <>
               <Col>
@@ -317,9 +332,9 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
         {!isDesktopView && (
           <HeaderDrawer
             style={{
-              marginTop: menuVisible ? headerHeight : 0,
+              marginTop: getHeaderBottomCoordinate(),
               backgroundColor: 'transparent',
-              maxHeight: `calc(100% - ${headerHeight})`,
+              maxHeight: `calc(100% - ${getHeaderBottomCoordinate()}px)`,
               overflow: 'auto'
             }}
             drawerStyle={{ backgroundColor: 'transparent' }}

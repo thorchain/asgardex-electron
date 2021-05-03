@@ -2,7 +2,6 @@ import React, { useMemo } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -25,8 +24,6 @@ export const AppView: React.FC = (): JSX.Element => {
   } = useMidgardContext()
 
   const apiEndpoint = useObservableState(apiEndpoint$, RD.initial)
-
-  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   const renderMidgardAlert = useMemo(() => {
     const description = (
@@ -61,9 +58,8 @@ export const AppView: React.FC = (): JSX.Element => {
   return (
     <Styled.AppWrapper>
       <Styled.AppLayout>
-        {isDesktopView && <AppUpdateView />}
+        <AppUpdateView />
         <Header />
-        {!isDesktopView && <AppUpdateView />}
 
         <View>
           {renderMidgardError}
