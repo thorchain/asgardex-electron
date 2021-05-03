@@ -271,12 +271,20 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     headerRef.current = O.fromNullable(ref)
   }, [])
 
-  const getHeaderBottomCoordinate = useCallback(
+  /**
+   * To display HeaderDrawer component right(!) after the Header one
+   * we need to check Header's bottom-edge position. In case there is something
+   * above the Header component at the layout (e.g. AppUpdate component) relying
+   * just on the Header's height is not enough.
+   */
+  const getHeaderBottomPosition = useCallback(
     () =>
       FP.pipe(
         headerRef.current,
         O.map((header) => header.getBoundingClientRect().bottom),
-        O.getOrElse(() => headerHeight)
+        // `headerHeight ` is styled-components based property and can contain "px" at the string value
+        // and parsingInt will get ONLY meaningful integer value
+        O.getOrElse(() => parseInt(headerHeight, 10))
       ),
     [headerHeight]
   )
@@ -332,9 +340,9 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
         {!isDesktopView && (
           <HeaderDrawer
             style={{
-              marginTop: getHeaderBottomCoordinate(),
+              marginTop: getHeaderBottomPosition(),
               backgroundColor: 'transparent',
-              maxHeight: `calc(100% - ${getHeaderBottomCoordinate()}px)`,
+              maxHeight: `calc(100% - ${getHeaderBottomPosition()}px)`,
               overflow: 'auto'
             }}
             drawerStyle={{ backgroundColor: 'transparent' }}
