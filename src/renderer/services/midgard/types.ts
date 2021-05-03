@@ -197,6 +197,7 @@ export type PoolsService = {
   poolsFilters$: Rx.Observable<Record<string, O.Option<PoolFilter>>>
   setPoolsFilter: (poolKey: string, filter: O.Option<PoolFilter>) => void
   gasRateByChain$: (chain: Chain) => GasRateLD
+  reloadGasRates: FP.Lazy<void>
 }
 
 export type PoolShareType = DepositType | 'all'

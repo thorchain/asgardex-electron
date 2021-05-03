@@ -58,8 +58,7 @@ import {
   InboundAddressesLD,
   PoolAddresses,
   InboundAddresses,
-  GasRateLD,
-  GasRate
+  GasRateLD
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -470,6 +469,8 @@ const createPoolsService = (
    */
   const inboundAddressesShared$ = FP.pipe(
     Rx.combineLatest([reloadInboundAddresses$, inboundAddressesInterval$]),
+    // debounce it, reloadInboundAddresses might be called by UI many times
+    RxOp.debounceTime(300),
     RxOp.switchMap((_) => loadInboundAddresses$()),
     RxOp.shareReplay(1)
   )
@@ -505,18 +506,19 @@ const createPoolsService = (
     FP.pipe(
       poolAddressesShared$,
       liveData.map((addresses: PoolAddresses) => getPoolAddressesByChain(addresses, chain)),
-      RxOp.map((rd) =>
-        // Add error in case no address could be found
-        FP.pipe(
-          rd,
-          // TODO @(Veado) Add i18n
-          RD.chain((oAddress: O.Option<PoolAddress>) =>
-            RD.fromOption(oAddress, () => Error('Could not find pool address'))
-          )
-        )
-      )
+      // Add error in case no address could be found
+      liveData.chain(liveData.fromOption(() => Error('Could not find pool address')))
     )
 
+  /**
+   * Reloads gas rates
+   *
+   * Note: Since `gasRateByChain$` depends on `inboundAddressesShared`
+   * we do need to call `reloadInboundAddresses`
+   */
+  const reloadGasRates = () => {
+    reloadInboundAddresses()
+  }
   /**
    * Get's (cached) gas rates by given chain
    *
@@ -528,16 +530,8 @@ const createPoolsService = (
     FP.pipe(
       inboundAddressesShared$,
       liveData.map((addresses: InboundAddresses) => getGasRateByChain(addresses, chain)),
-      RxOp.map((rd) =>
-        // Add error in case no address could be found
-        FP.pipe(
-          rd,
-          // TODO @(Veado) Add i18n
-          RD.chain((oGasRate: O.Option<GasRate>) =>
-            RD.fromOption(oGasRate, () => Error(`Could not find gas rate for ${chain}`))
-          )
-        )
-      )
+      // Add error in case no address could be found
+      liveData.chain(liveData.fromOption(() => Error(`Could not find gas rate for ${chain}`)))
     )
 
   /**
@@ -818,7 +812,7 @@ const createPoolsService = (
   return {
     poolsState$,
     pendingPoolsState$,
-    allPoolDetails$: allPoolDetails$,
+    allPoolDetails$,
     setSelectedPricePoolAsset,
     selectedPricePoolAsset$,
     selectedPricePool$,
@@ -828,7 +822,7 @@ const createPoolsService = (
     reloadAllPools,
     selectedPoolAddress$,
     poolAddressesByChain$,
-    reloadInboundAddresses: reloadInboundAddresses,
+    reloadInboundAddresses,
     selectedPoolDetail$,
     reloadSelectedPoolDetail: (delayTime = 0) => _reloadSelectedPoolDetail(delayTime),
     reloadPoolStatsDetail,
@@ -845,7 +839,8 @@ const createPoolsService = (
     validatePool$,
     poolsFilters$,
     setPoolsFilter,
-    gasRateByChain$
+    gasRateByChain$,
+    reloadGasRates
   }
 }
 

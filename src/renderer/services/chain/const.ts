@@ -11,13 +11,10 @@ import {
   UpgradeRuneTxState,
   SendTxState,
   TxTypes,
-  SwapFees,
   DepositFees
 } from './types'
 
 export const MAX_SWAP_STEPS = 3
-
-export const ZERO_SWAP_FEES: SwapFees = { inTx: ZERO_BASE_AMOUNT, outTx: ZERO_BASE_AMOUNT }
 
 /**
  * Default `FeeOptionKey`s for chain txs
