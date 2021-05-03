@@ -1,27 +1,26 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { ipcRenderer, ipcMain } from 'electron'
-import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { autoUpdater } from 'electron-updater'
 
 import { AppUpdateRD } from '../../shared/api/types'
 import IPCMessages from '../ipc/messages'
 
-if (isDev) {
-  autoUpdater.logger = {
-    ...log,
-    // Set custom info logger for better understanding in common debug-flow
-    info(message?: unknown): void {
-      console.log('[AutoUpdater.info]', message)
+export const registerAppCheckUpdatedHandler = (isDev = false) => {
+  // Disable autoDownload
+  autoUpdater.autoDownload = false
+  autoUpdater.allowPrerelease = true
+
+  if (isDev) {
+    autoUpdater.logger = {
+      ...log,
+      // Set custom info logger for better understanding in common debug-flow
+      info(message?: unknown): void {
+        console.log('[AutoUpdater.info]', message)
+      }
     }
   }
-}
 
-// Disable autoDownload
-autoUpdater.autoDownload = false
-autoUpdater.allowPrerelease = true
-
-export const registerAppCheckUpdatedHandler = () => {
   ipcMain.handle(
     IPCMessages.APP_CHECK_FOR_UPDATE,
     (): Promise<AppUpdateRD> => {

@@ -135,7 +135,7 @@ const initIPC = () => {
     sendTx(chain, network, txInfo)
   )
 
-  registerAppCheckUpdatedHandler()
+  registerAppCheckUpdatedHandler(IS_DEV)
   // Register all file-stored data services
   Object.entries(DEFAULT_STORAGES).forEach(([name, defaultValue]) => {
     getFileStoreService(name as StoreFileName, defaultValue).registerIpcHandlersMain()
