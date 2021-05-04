@@ -127,8 +127,12 @@ export type SwapFee = {
 export type SwapFeeLD = LiveData<Error, SwapFee>
 
 export type SwapFees = {
+  /** Inbound tx fee */
   readonly inFee: SwapFee
+  /** Outbound tx fee */
   readonly outFee: SwapFee
+  /** Refund tx fee */
+  readonly refundFee: SwapFee
 }
 
 export type SwapFeesRD = RD.RemoteData<Error, SwapFees>
