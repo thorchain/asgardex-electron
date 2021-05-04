@@ -3,12 +3,12 @@
   "productName": "ASGARDEX",
   "version": "0.1.0",
   "description": "WALLET AND EXCHANGE CLIENT FOR THORCHAIN",
-  "main": "public/electron.js",
+  "main": "index.js",
   "scripts": {
     "start:web": "craco start",
     "dev": "concurrently --kill-others --success first \"yarn:dev:*\"",
     "dev:app": "cross-env BROWSER=none yarn start:web",
-    "dev:electron": "wait-on http://localhost:3000 && nodemon -I --watch ./src/main/ --exec electron ./public/dev.js",
+    "dev:electron": "wait-on http://localhost:3000 && nodemon -I --watch ./src/main/ --exec electron .",
     "build": "cross-env CI=false PUBLIC_URL=./ craco build",
     "prebuild": "webpack --config webpack.main.js --mode production",
     "test": "craco test",
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thorchain/asgardex.git"
+    "url": "https://github.com/thorchain/asgardex-electron"
   },
   "author": {
     "name": "ASGARDEX Maintainers",
@@ -45,7 +45,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/thorchain/asgardex/issues"
+    "url": "https://github.com/thorchain/asgardex-electron/issues"
   },
   "keywords": [
     "thorchain",
@@ -92,6 +92,7 @@
     "cosmos-client": "^0.39.2",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.3.2",
+    "electron-updater": "^4.3.8",
     "ethers": "^5.1.0",
     "fp-ts": "^2.9.5",
     "fp-ts-rxjs": "^0.6.13",

@@ -43,7 +43,7 @@ const common: CommonMessages = {
   'common.fee': 'Комиссия',
   'common.fees': 'Комиссии',
   'common.max': 'Макс.',
-  'common.min': 'Мin - RU',
+  'common.min': 'Мин',
   'common.search': 'Поиск',
   'common.searchAsset': 'Поиск Ассета',
   'common.retry': 'Повторить',
@@ -64,7 +64,7 @@ const common: CommonMessages = {
   'common.modal.confirmTitle': 'Подтвердите действие',
   'common.value': 'Количество',
   'common.manage': 'Управлять',
-  'common.analytics': 'Analytics - RU',
+  'common.analytics': 'Аналитика',
   'common.asset.base': 'Базовый',
   'common.tx.type.swap': 'Обмен',
   'common.tx.type.donate': 'Донат',
@@ -76,9 +76,9 @@ const common: CommonMessages = {
   'common.filter': 'Фильтр',
   'common.all': 'Все',
   'common.time.week': 'Неделя',
-  'common.time.all': 'all',
-  'common.theme.light': 'Day mode - RU',
-  'common.theme.dark': 'Night mode - RU'
+  'common.time.all': 'Все',
+  'common.theme.light': 'Светлая тема',
+  'common.theme.dark': 'Темная тема'
 }
 
 export default common

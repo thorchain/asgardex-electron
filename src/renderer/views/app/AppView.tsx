@@ -7,12 +7,13 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { Footer } from '../../components/footer'
-import { Header } from '../../components/header/Header'
+import { Header } from '../../components/header'
 import { Button } from '../../components/uielements/button'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { View } from '../View'
 import { ViewRoutes } from '../ViewRoutes'
+import { AppUpdateView } from './AppUpdateView'
 import * as Styled from './AppView.style'
 
 export const AppView: React.FC = (): JSX.Element => {
@@ -57,7 +58,9 @@ export const AppView: React.FC = (): JSX.Element => {
   return (
     <Styled.AppWrapper>
       <Styled.AppLayout>
+        <AppUpdateView />
         <Header />
+
         <View>
           {renderMidgardError}
           <ViewRoutes />

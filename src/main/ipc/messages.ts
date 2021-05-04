@@ -8,6 +8,8 @@ enum IPCMessages {
   LOAD_KEYSTORE = 'LOAD_KEYSTORE',
   GET_LEDGER_ADDRESS = 'GET_LEDGER_ADDRESS',
   SEND_LEDGER_TX = 'SEND_LEDGER_TX',
+  UPDATE_AVAILABLE = 'UPDATE_AVAILABLE',
+  APP_CHECK_FOR_UPDATE = 'APP_CHECK_FOR_UPDATE',
   /**
    * IPC File interaction messages templates
    * @see getStoreFilesIPCMessages at /src/shared/ipc/fileStore.ts to check final results

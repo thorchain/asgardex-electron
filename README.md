@@ -114,6 +114,12 @@ visualize the bundle map using `source-map-explorer`
 yarn analyze
 ```
 
+### Auto updates
+
+To check locally if auto-update works correctly create `dev-app-update.yml` file at the root
+directory with a content based on [dev-app-update.sample.yml](./dev-app-update.sample.yml) with providing
+your GutHub personal access token. After that just play locally with version provided by `package.json`
+
 ## Folder structure
 
 ### `src`

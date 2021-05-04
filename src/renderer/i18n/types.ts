@@ -85,6 +85,10 @@ export type CommonMessages = {
   [key in CommonMessageKey]: string
 }
 
+type UpdateMessagesKeys = 'update.description' | 'update.link' | 'update.checkFailed'
+
+export type UpdateMessages = { [key in UpdateMessagesKeys]: string }
+
 type RoutesMessageKey = 'routes.invalid.asset'
 
 export type RoutesMessages = { [key in RoutesMessageKey]: string }
@@ -312,7 +316,8 @@ export type Messages = CommonMessages &
   DepositMessages &
   LedgerMessages &
   BondsMessages &
-  PoolSharesMessage
+  PoolSharesMessage &
+  UpdateMessages
 
 export type Translation = {
   locale: Locale

@@ -1,3 +1,4 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { FeeRate } from '@xchainjs/xchain-bitcoin'
 import { Address, TxParams } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
@@ -43,6 +44,14 @@ export type ApiFileStoreService<T> = {
   remove: () => Promise<void>
   get: () => Promise<T>
   exists: () => Promise<boolean>
+}
+
+export type AppUpdateRD = RD.RemoteData<Error, string>
+
+// Promise with a version string inside
+// If there is no new version Promise will be rejected
+export type ApiAppUpdate = {
+  checkForAppUpdates: () => Promise<AppUpdateRD>
 }
 
 export type ApiLang = {
@@ -94,5 +103,6 @@ declare global {
     apiHDWallet: ApiHDWallet
     apiCommonStorage: ApiFileStoreService<StoreFileData<'common'>>
     apiUserNodesStorage: ApiFileStoreService<StoreFileData<'userNodes'>>
+    apiAppUpdate: ApiAppUpdate
   }
 }

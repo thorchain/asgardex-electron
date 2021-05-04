@@ -9,6 +9,7 @@ import poolShares from './poolshares'
 import routes from './routes'
 import settings from './settings'
 import swap from './swap'
+import update from './update'
 import wallet from './wallet'
 
 export default {
@@ -22,5 +23,6 @@ export default {
   ...midgard,
   ...ledger,
   ...bonds,
-  ...poolShares
+  ...poolShares,
+  ...update
 } as Messages
