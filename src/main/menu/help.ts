@@ -1,7 +1,6 @@
 import { MenuItemConstructorOptions } from 'electron'
 import { IntlShape } from 'react-intl'
 
-import packageInfo from '../../../package.json'
 import { ExternalUrl } from '../../shared/const'
 import { apiUrl } from '../api/url'
 
@@ -29,7 +28,7 @@ const menu = (intl: IntlShape): MenuItemConstructorOptions => ({
     {
       label: intl.formatMessage({ id: 'menu.help.issues' }),
       click() {
-        apiUrl.openExternal(`${packageInfo.bugs.url}`)
+        apiUrl.openExternal(`${ExternalUrl.GITHUB_REPO}/issues`)
       }
     }
   ]

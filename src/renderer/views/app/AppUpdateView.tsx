@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/function'
 
-import packageInfo from '../../../../package.json'
+import { ExternalUrl } from '../../../shared/const'
 import { AppUpdate, AppUpdateModalProps } from '../../components/AppUpdate'
 import { useAppUpdate } from '../../hooks/useAppUpdate'
 
@@ -21,7 +21,7 @@ export const AppUpdateView: React.FC = () => {
           (version): AppUpdateModalProps => ({
             isOpen: true,
             type: 'success',
-            goToUpdates: () => window.apiUrl.openExternal(`${packageInfo.repository.url}/releases/tag/v${version}`),
+            goToUpdates: () => window.apiUrl.openExternal(`${ExternalUrl.GITHUB_REPO}/releases/tag/v${version}`),
             version,
             close: resetAppUpdater
           })

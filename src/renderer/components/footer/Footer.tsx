@@ -4,7 +4,6 @@ import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined, BugOutlined } 
 import { Row, Col, Grid } from 'antd'
 import { useHistory } from 'react-router-dom'
 
-import packageInfo from '../../../../package.json'
 import { ExternalUrl } from '../../../shared/const'
 import { ReactComponent as TelegramIcon } from '../../assets/svg/icon-telegram.svg'
 import { ReactComponent as ThorChainIcon } from '../../assets/svg/logo-thorchain.svg'
@@ -74,7 +73,7 @@ export const Footer: React.FC<Props> = (props): JSX.Element => {
               <GithubOutlined />
             </FooterIcon>
             {commitHash && (
-              <FooterIcon url={`${packageInfo.repository.url}/commit/${commitHash}`} onClick={clickIconHandler}>
+              <FooterIcon url={`${ExternalUrl.GITHUB_REPO}/commit/${commitHash}`} onClick={clickIconHandler}>
                 <BranchesOutlined />
               </FooterIcon>
             )}
