@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 
 import { ExternalUrl } from '../../../shared/const'
 import { AppUpdate, AppUpdateModalProps } from '../../components/AppUpdate'
@@ -27,6 +28,13 @@ export const AppUpdateView: React.FC = () => {
     () =>
       FP.pipe(
         appUpdater,
+        RD.chain<Error, O.Option<string>, string>((oVersion) =>
+          FP.pipe(
+            oVersion,
+            O.fold(() => RD.initial, RD.success)
+          )
+        ),
+        // TODO will be converted to the Option at all by #1393
         RD.fold(
           (): AppUpdateModalProps => ({ isOpen: false }),
           (): AppUpdateModalProps => ({ isOpen: false }),
@@ -39,7 +47,7 @@ export const AppUpdateView: React.FC = () => {
           (version): AppUpdateModalProps => ({
             isOpen: true,
             type: 'success',
-            goToUpdates: () => window.apiUrl.openExternal(`${ExternalUrl.GITHUB_REPO}/releases/tag/v${version}`),
+            goToUpdates: () => window.apiUrl.openExternal(`${ExternalUrl.GITHUB_RELEASE}${version}`),
             version,
             close: resetAppUpdater
           })

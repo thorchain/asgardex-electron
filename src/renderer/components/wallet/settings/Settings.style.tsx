@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { Button as UIButton } from '../../uielements/button'
+import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.style'
 import { Label as UILabel } from '../../uielements/label'
 
 export const TitleWrapper = styled.div`
@@ -93,6 +94,29 @@ export const Button = styled(UIButton)`
   }
 `
 
+export const UpdatesButton = styled(Button).attrs({
+  sizevalue: 'xnormal',
+  color: 'primary',
+  typevalue: 'outline',
+  round: 'true'
+})`
+  &:not(:last-child) {
+    margin-bottom: 10px;
+  }
+
+  .ant-btn-loading-icon {
+    margin-right: 10px;
+  }
+`
+
+export const ExternalLinkIcon = styled(ExternalLinkIconUI)`
+  margin-left: 10px;
+
+  svg {
+    color: inherit;
+  }
+`
+
 export const Placeholder = styled(UILabel)`
   display: block;
   padding: 0px;
@@ -108,6 +132,10 @@ export const ClientLabel = styled(UILabel)`
   color: ${palette('text', 1)};
   font-family: 'MainFontRegular';
   font-size: 16px;
+`
+
+export const ClientErrorLabel = styled(ClientLabel)`
+  color: ${palette('error', 1)};
 `
 
 export const ClientButton = styled(UILabel)`

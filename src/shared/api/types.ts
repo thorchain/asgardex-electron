@@ -4,6 +4,7 @@ import { Address, TxParams } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
+import * as O from 'fp-ts/Option'
 
 import { Locale } from '../i18n/types'
 
@@ -46,7 +47,9 @@ export type ApiFileStoreService<T> = {
   exists: () => Promise<boolean>
 }
 
-export type AppUpdateRD = RD.RemoteData<Error, string>
+// RemoteData itself tells us about the loading state
+// Option inside of RD tells us if there is a new version after succeed checking for updates
+export type AppUpdateRD = RD.RemoteData<Error, O.Option<string>>
 
 // Promise with a version string inside
 // If there is no new version Promise will be rejected
