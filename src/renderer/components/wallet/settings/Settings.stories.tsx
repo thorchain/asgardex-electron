@@ -1,5 +1,6 @@
 import React from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
@@ -27,6 +28,9 @@ storiesOf('Wallet/Settings', module).add('default', () => {
       clickAddressLinkHandler={(chain: Chain, address: Address) =>
         console.log('click address link handler', chain, address)
       }
+      appUpdateState={RD.initial}
+      checkForUpdates={() => console.log('click checkForUpdates handler')}
+      goToReleasePage={() => console.log('click goToReleasePage handler')}
     />
   )
 })

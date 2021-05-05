@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
@@ -24,6 +24,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { LedgerErrorId, Network } from '../../../shared/api/types'
+import { ExternalUrl } from '../../../shared/const'
 import { Settings } from '../../components/wallet/settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -38,6 +39,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { filterEnabledChains } from '../../helpers/chainHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
+import { useAppUpdate } from '../../hooks/useAppUpdate'
 import { OnlineStatus } from '../../services/app/types'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { getPhrase } from '../../services/wallet/util'
@@ -46,6 +48,7 @@ import { UserAccountType } from '../../types/wallet'
 export const SettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const { keystoreService } = useWalletContext()
+  const { appUpdater, checkForUpdates } = useAppUpdate()
   const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
   const { network$ } = useAppContext()
   const bnbContext = useBinanceContext()
@@ -332,6 +335,11 @@ export const SettingsView: React.FC = (): JSX.Element => {
     getLedgerErrorDescription(btcLedgerAddress, 'BTC')
   }, [bnbLedgerAddress, btcLedgerAddress, intl, removeLedgerAddress])
 
+  const goToReleasePage = useCallback(
+    (version: string) => window.apiUrl.openExternal(`${ExternalUrl.GITHUB_RELEASE}${version}`),
+    []
+  )
+
   return (
     <Row>
       <Col span={24}>
@@ -349,6 +357,9 @@ export const SettingsView: React.FC = (): JSX.Element => {
           phrase={phrase}
           clickAddressLinkHandler={clickAddressLinkHandler}
           validatePassword$={validatePassword$}
+          appUpdateState={appUpdater}
+          checkForUpdates={checkForUpdates}
+          goToReleasePage={goToReleasePage}
         />
       </Col>
     </Row>

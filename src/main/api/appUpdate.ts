@@ -2,6 +2,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { ipcRenderer, ipcMain } from 'electron'
 import log from 'electron-log'
 import { autoUpdater } from 'electron-updater'
+import * as O from 'fp-ts/Option'
 
 import { AppUpdateRD } from '../../shared/api/types'
 import IPCMessages from '../ipc/messages'
@@ -31,11 +32,11 @@ export const registerAppCheckUpdatedHandler = (isDev = false) => {
 
       return new Promise((resolve) => {
         autoUpdater.once('update-available', (info: { version: string }) => {
-          resolve(RD.success(info.version))
+          resolve(RD.success(O.some(info.version)))
         })
 
         autoUpdater.once('update-not-available', () => {
-          resolve(RD.initial)
+          resolve(RD.success(O.none))
         })
 
         autoUpdater

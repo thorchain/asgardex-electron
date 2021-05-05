@@ -1,10 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { Row, Col, List } from 'antd'
+import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
-import { pipe } from 'fp-ts/pipeable'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
@@ -31,6 +32,9 @@ type Props = {
   phrase?: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
+  appUpdateState: RD.RemoteData<Error, O.Option<string>>
+  checkForUpdates: () => void
+  goToReleasePage: (version: string) => void
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
@@ -52,7 +56,10 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     */
     phrase: oPhrase = O.none,
     clickAddressLinkHandler,
-    validatePassword$
+    validatePassword$,
+    appUpdateState = RD.initial,
+    checkForUpdates,
+    goToReleasePage = FP.constVoid
   } = props
 
   const [showPhraseModal, setShowPhraseModal] = useState(false)
@@ -82,7 +89,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   const phrase = useMemo(
     () =>
-      pipe(
+      FP.pipe(
         oPhrase,
         O.map((phrase) => phrase),
         O.getOrElse(() => '')
@@ -108,7 +115,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   const accounts = useMemo(
     () =>
-      pipe(
+      FP.pipe(
         userAccounts,
         O.map((accounts) => (
           <Col key={'accounts'} sm={{ span: 24 }} md={{ span: 12 }}>
@@ -168,6 +175,67 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     setShowPasswordModal(false)
     setShowPhraseModal(true)
   }, [setShowPasswordModal, setShowPhraseModal])
+
+  const checkUpdatesProps = useMemo(() => {
+    const commonProps = {
+      onClick: checkForUpdates,
+      children: <>{intl.formatMessage({ id: 'update.checkForUpdates' })}</>
+    }
+
+    return FP.pipe(
+      appUpdateState,
+      RD.fold(
+        () => commonProps,
+        () => ({
+          ...commonProps,
+          loading: true,
+          disabled: true
+        }),
+        () => ({
+          ...commonProps
+        }),
+        (oVersion) => ({
+          ...commonProps,
+          ...FP.pipe(
+            oVersion,
+            O.fold(
+              () => ({
+                onClick: checkForUpdates
+              }),
+              (version) => ({
+                onClick: () => goToReleasePage(version),
+                children: (
+                  <>
+                    {intl.formatMessage({ id: 'update.link' })} <Styled.ExternalLinkIcon />
+                  </>
+                )
+              })
+            )
+          )
+        })
+      )
+    )
+  }, [appUpdateState, checkForUpdates, goToReleasePage, intl])
+
+  const versionUpdateResult = useMemo(
+    () =>
+      FP.pipe(
+        appUpdateState,
+        RD.fold(
+          FP.constNull,
+          FP.constNull,
+          ({ message }) => (
+            <Styled.ClientErrorLabel>
+              {intl.formatMessage({ id: 'update.checkFailed' }, { error: message })}
+            </Styled.ClientErrorLabel>
+          ),
+          O.fold(FP.constNull, (version) => (
+            <Styled.Placeholder>{intl.formatMessage({ id: 'update.description' }, { version })}</Styled.Placeholder>
+          ))
+        )
+      ),
+    [appUpdateState, intl]
+  )
 
   return (
     <>
@@ -251,7 +319,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                 <Styled.Placeholder>{intl.formatMessage({ id: 'setting.midgard' })}</Styled.Placeholder>
 
                 <Styled.ClientLabel>
-                  {pipe(
+                  {FP.pipe(
                     clientUrl,
                     O.getOrElse(() => intl.formatMessage({ id: 'setting.notconnected' }))
                   )}
@@ -259,6 +327,8 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
                 <Styled.Placeholder>{intl.formatMessage({ id: 'setting.version' })}</Styled.Placeholder>
                 <Styled.ClientLabel>v{apiVersion}</Styled.ClientLabel>
+                <Styled.UpdatesButton {...checkUpdatesProps} />
+                {versionUpdateResult}
               </Col>
             </Row>
           </Styled.Card>
