@@ -196,7 +196,6 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         }),
         (oVersion) => ({
           ...commonProps,
-          // children: <>{intl.formatMessage({ id: 'update.link' })}</>,
           ...FP.pipe(
             oVersion,
             O.fold(
