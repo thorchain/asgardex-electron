@@ -423,9 +423,7 @@ export const Swap = ({
       // dirty check - do nothing if prev. and next amounts are equal
       if (eqBaseAmount.equals(newAmount, amountToSwapMax1e8)) return {}
 
-      const newAmountToSwap = newAmount.amount().isGreaterThan(maxAmountToSwapMax1e8.amount())
-        ? maxAmountToSwapMax1e8
-        : newAmount
+      const newAmountToSwap = newAmount.gt(maxAmountToSwapMax1e8) ? maxAmountToSwapMax1e8 : newAmount
       /**
        * New object instance of `amountToSwap` is needed to make
        * AssetInput component react to the new value.
