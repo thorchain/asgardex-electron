@@ -231,9 +231,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
             </Styled.ClientErrorLabel>
           ),
           O.fold(FP.constNull, (version) => (
-            <Styled.Placeholder>
-              {intl.formatMessage({ id: 'update.description' }, { version })} new version {version} available
-            </Styled.Placeholder>
+            <Styled.Placeholder>{intl.formatMessage({ id: 'update.description' }, { version })}</Styled.Placeholder>
           ))
         )
       ),
