@@ -24,8 +24,7 @@ const {
  */
 export const getZeroSwapFees = ({ inAsset, outAsset }: { inAsset: Asset; outAsset: Asset }): SwapFees => ({
   inFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(inAsset.chain) },
-  outFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outAsset.chain) },
-  refundFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outAsset.chain) }
+  outFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outAsset.chain) }
 })
 
 // state of `SwapFeesParams` used for reloading swap fees
@@ -68,14 +67,6 @@ const swapFees$: SwapFeesHandler = (initialParams) => {
         inFee: poolFee$(inAsset),
         outFee: FP.pipe(
           outAsset,
-          poolFee$,
-          liveData.map((chainFee) => ({
-            ...chainFee,
-            amount: chainFee.amount.times(3)
-          }))
-        ),
-        refundFee: FP.pipe(
-          inAsset,
           poolFee$,
           liveData.map((chainFee) => ({
             ...chainFee,

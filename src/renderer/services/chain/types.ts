@@ -131,8 +131,6 @@ export type SwapFees = {
   readonly inFee: SwapFee
   /** Outbound tx fee */
   readonly outFee: SwapFee
-  /** Refund tx fee */
-  readonly refundFee: SwapFee
 }
 
 export type SwapFeesRD = RD.RemoteData<Error, SwapFees>

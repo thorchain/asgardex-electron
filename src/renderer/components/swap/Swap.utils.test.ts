@@ -21,7 +21,9 @@ import {
   getSwapResult,
   getSwapData,
   pickPoolAsset,
-  poolAssetDetailToAsset
+  poolAssetDetailToAsset,
+  minBalanceToSwap,
+  calcRefundFee
 } from './Swap.utils'
 
 describe('components/swap/utils', () => {
@@ -291,6 +293,26 @@ describe('components/swap/utils', () => {
       expect(poolAssetDetailToAsset(O.some({ asset: AssetRuneNative, assetPrice: bn(0) }))).toEqual(
         O.some(AssetRuneNative)
       )
+    })
+  })
+
+  describe('calcRefundFee', () => {
+    it('should be 3 x inbound fee', () => {
+      const result = calcRefundFee(baseAmount(2))
+      expect(eqBaseAmount.equals(result, baseAmount(6))).toBeTruthy()
+    })
+  })
+
+  describe('minBalanceToSwap', () => {
+    it('returns min. amount to cover inbound + refund fees', () => {
+      const params = {
+        inFee: {
+          amount: baseAmount(100),
+          asset: AssetBNB
+        }
+      }
+      const result = minBalanceToSwap(params)
+      expect(eqBaseAmount.equals(result, baseAmount(600))).toBeTruthy()
     })
   })
 })
