@@ -87,7 +87,8 @@ const defaultProps: SwapProps = {
     Rx.of(
       RD.success({
         inFee: { amount: baseAmount(10000000), asset: AssetRuneNative },
-        outFee: { amount: baseAmount(1000000), asset: AssetBTC }
+        outFee: { amount: baseAmount(1000000), asset: AssetBTC },
+        refundFee: { amount: baseAmount(3000000), asset: AssetRuneNative }
       })
     ),
   approveFee$: () => Rx.of(RD.success(baseAmount(10000000))),

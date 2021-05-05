@@ -26,13 +26,13 @@ describe('helpers/addressHelper', () => {
     })
 
     it('bitcoin cash testnet', () => {
-      const result = truncateAddress('bchtest:qr20g55jd7x3dalp4qxjfgfvda0nwr8cfccrgxd0dw', BCHChain, 'testnet')
-      expect(result).toEqual('bchtest:qr2...0dw')
+      const result = truncateAddress('mzvxEYsFXBhfsZj2QNwQXfFX6KCoweqZpM', BCHChain, 'testnet')
+      expect(result).toEqual('mzvxEY...ZpM')
     })
 
     it('bitcoin cash mainnet', () => {
-      const result = truncateAddress('bitcoincash:qr20g55jd7x3dalp4qxjfgfvda0nwr8cfccrgxd0dw', BCHChain, 'mainnet')
-      expect(result).toEqual('bitcoincash:qr2...0dw')
+      const result = truncateAddress('13kwsEHsKn82UobM9WaTRbU2vCW5qXkY97', BCHChain, 'mainnet')
+      expect(result).toEqual('13kwsE...Y97')
     })
 
     it('binance testnet', () => {

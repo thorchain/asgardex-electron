@@ -44,7 +44,7 @@ import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../hel
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
-import { getZeroSwapFees } from '../../services/chain/fees/utils'
+import { getZeroSwapFees } from '../../services/chain/fees/swap'
 import {
   SwapState,
   SwapTxParams,
@@ -79,7 +79,8 @@ import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
 import * as Styled from './Swap.styles'
-import { getSwapData, poolAssetDetailToAsset, pickPoolAsset, SwapData } from './Swap.utils'
+import { SwapData } from './Swap.types'
+import * as Utils from './Swap.utils'
 
 export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string }
 
@@ -141,18 +142,22 @@ export const Swap = ({
   // convert to hash map here instead of using getPoolDetail
   const poolsData: PoolsDataMap = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [poolDetails])
 
-  const oSourcePoolAsset: O.Option<PoolAssetDetail> = useMemo(() => pickPoolAsset(availableAssets, sourceAssetProp), [
-    availableAssets,
-    sourceAssetProp
-  ])
+  const oSourcePoolAsset: O.Option<PoolAssetDetail> = useMemo(
+    () => Utils.pickPoolAsset(availableAssets, sourceAssetProp),
+    [availableAssets, sourceAssetProp]
+  )
 
-  const oTargetPoolAsset: O.Option<PoolAssetDetail> = useMemo(() => pickPoolAsset(availableAssets, targetAssetProp), [
-    availableAssets,
-    targetAssetProp
-  ])
+  const oTargetPoolAsset: O.Option<PoolAssetDetail> = useMemo(
+    () => Utils.pickPoolAsset(availableAssets, targetAssetProp),
+    [availableAssets, targetAssetProp]
+  )
 
-  const oSourceAsset: O.Option<Asset> = useMemo(() => poolAssetDetailToAsset(oSourcePoolAsset), [oSourcePoolAsset])
-  const oTargetAsset: O.Option<Asset> = useMemo(() => poolAssetDetailToAsset(oTargetPoolAsset), [oTargetPoolAsset])
+  const oSourceAsset: O.Option<Asset> = useMemo(() => Utils.poolAssetDetailToAsset(oSourcePoolAsset), [
+    oSourcePoolAsset
+  ])
+  const oTargetAsset: O.Option<Asset> = useMemo(() => Utils.poolAssetDetailToAsset(oTargetPoolAsset), [
+    oTargetPoolAsset
+  ])
 
   const assetsToSwap: O.Option<{ source: Asset; target: Asset }> = useMemo(
     () => sequenceSOption({ source: oSourceAsset, target: oTargetAsset }),
@@ -231,7 +236,7 @@ export const Swap = ({
 
   const swapData: SwapData = useMemo(
     () =>
-      getSwapData({
+      Utils.getSwapData({
         amountToSwap: amountToSwapMax1e8,
         sourceAsset: oSourceAsset,
         targetAsset: oTargetAsset,
@@ -357,68 +362,29 @@ export const Swap = ({
     [onChangePath, oSourceAsset]
   )
 
-  /**
-   * Helper to price target fee into source asset
-   *
-   * Note: Decimal is based on orinal sourceAssetDecimal
-   */
-  const targetFeeInSourceAsset: BaseAmount = useMemo(() => {
-    const {
-      outFee: { amount: outFeeAmount, asset: outFeeAsset }
-    }: SwapFees = FP.pipe(
-      swapFeesRD,
-      RD.getOrElse(() => zeroSwapFees)
-    )
-
-    const oTargetFeeAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(outFeeAsset)])
-    const oSourceAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(sourceAssetProp)])
-
-    return FP.pipe(
-      sequenceTOption(oTargetFeeAssetPoolData, oSourceAssetPoolData),
-      O.map(([targetFeeAssetPoolData, sourceAssetPoolData]) =>
-        // pool data are always 1e8 decimal based
-        // and we have to convert fees to 1e8, too
-        getValueOfAsset1InAsset2(to1e8BaseAmount(outFeeAmount), targetFeeAssetPoolData, sourceAssetPoolData)
-      ),
-      // convert decimal back to sourceAssetDecimal
-      O.map((amount) => convertBaseAmountDecimal(amount, sourceAssetDecimal)),
-      O.getOrElse(() => baseAmount(0, sourceAssetDecimal))
-    )
-  }, [swapFeesRD, poolsData, sourceAssetProp, zeroSwapFees, sourceAssetDecimal])
-
   const prevMinAmountToSwapMax1e8 = useRef<O.Option<BaseAmount>>(O.none)
 
-  /**
-   * Helper to get min. amount to swap
-   *
-   * It's based on outbound OR outbound and inbound fees
-   *
-   * Formulas based on "Better Fees Handling #1381"
-   * @see https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
-   */
   const minAmountToSwapMax1e8: BaseAmount = useMemo(
     () =>
       FP.pipe(
         RD.toOption(swapFeesRD),
-        O.map(({ inFee: { amount: inFeeAmount, asset: inFeeAsset } }) =>
-          // check whether min amount depends on one (outbound) or both (inbound + outbound) fees
-          eqAsset.equals(sourceAssetProp, inFeeAsset)
-            ? inFeeAmount.plus(targetFeeInSourceAsset)
-            : targetFeeInSourceAsset
+        O.map((swapFees) =>
+          Utils.minAmountToSwapMax1e8({
+            swapFees,
+            inAsset: sourceAssetProp,
+            inAssetDecimal: sourceAssetDecimal,
+            outAsset: targetAssetProp,
+            poolsData
+          })
         ),
-        // transform decimal to be `max1e8`
-        O.map(max1e8BaseAmount),
-        // Over-estimate fee by 50% to prevent issues
-        O.map((fees) => fees.times(1.5)),
-        // store fee
-        O.map((fees) => {
-          prevMinAmountToSwapMax1e8.current = O.some(fees)
-          return fees
+        O.map((minAmount) => {
+          prevMinAmountToSwapMax1e8.current = O.some(minAmount)
+          return minAmount
         }),
-        O.alt(() => prevMinAmountToSwapMax1e8.current),
+
         O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
-    [sourceAssetProp, swapFeesRD, targetFeeInSourceAsset]
+    [poolsData, sourceAssetDecimal, sourceAssetProp, swapFeesRD, targetAssetProp]
   )
 
   const minAmountError = useMemo(() => {
@@ -457,9 +423,7 @@ export const Swap = ({
       // dirty check - do nothing if prev. and next amounts are equal
       if (eqBaseAmount.equals(newAmount, amountToSwapMax1e8)) return {}
 
-      const newAmountToSwap = newAmount.amount().isGreaterThan(maxAmountToSwapMax1e8.amount())
-        ? maxAmountToSwapMax1e8
-        : newAmount
+      const newAmountToSwap = newAmount.gt(maxAmountToSwapMax1e8) ? maxAmountToSwapMax1e8 : newAmount
       /**
        * New object instance of `amountToSwap` is needed to make
        * AssetInput component react to the new value.
@@ -735,7 +699,7 @@ export const Swap = ({
     return FP.pipe(
       swapFeesRD,
       RD.getOrElse(() => zeroSwapFees),
-      ({ inFee: { amount: inAmount } }) => sourceChainAssetAmount.amount().minus(inAmount.amount()).isNegative()
+      (swapFees) => Utils.minBalanceToSwap(swapFees).gt(sourceChainAssetAmount)
     )
   }, [isZeroAmountToSwap, minAmountError, swapFeesRD, zeroSwapFees, sourceChainAssetAmount])
 

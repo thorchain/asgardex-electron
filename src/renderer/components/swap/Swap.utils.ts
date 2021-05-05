@@ -1,15 +1,30 @@
-import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip } from '@thorchain/asgardex-util'
-import { Asset, assetToString, bn, BaseAmount } from '@xchainjs/xchain-util'
+import {
+  getDoubleSwapOutput,
+  getDoubleSwapSlip,
+  getSwapOutput,
+  getSwapSlip,
+  getValueOfAsset1InAsset2,
+  PoolData
+} from '@thorchain/asgardex-util'
+import { Asset, assetToString, bn, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { isRuneNativeAsset, to1e8BaseAmount } from '../../helpers/assetHelper'
+import {
+  convertBaseAmountDecimal,
+  isChainAsset,
+  isRuneNativeAsset,
+  max1e8BaseAmount,
+  to1e8BaseAmount
+} from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { SwapFee, SwapFees } from '../../services/chain/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolsDataMap } from '../../services/midgard/types'
+import { SwapData } from './Swap.types'
 
 /**
  * @returns none - neither sourceAsset neither targetAsset is RUNE
@@ -104,11 +119,6 @@ export const getSwapResult = ({
   )
 }
 
-export type SwapData = {
-  readonly slip: BigNumber
-  readonly swapResult: BaseAmount
-}
-
 export const DEFAULT_SWAP_DATA: SwapData = {
   slip: ZERO_BN,
   swapResult: ZERO_BASE_AMOUNT
@@ -155,3 +165,117 @@ export const poolAssetDetailToAsset = (oAsset: O.Option<PoolAssetDetail>): O.Opt
     oAsset,
     O.map(({ asset }) => asset)
   )
+
+export const priceFeeAmountForInAsset = ({
+  fee,
+  inAsset,
+  inAssetDecimal,
+  poolsData
+}: {
+  fee: SwapFee
+  inAsset: Asset
+  inAssetDecimal: number
+  poolsData: PoolsDataMap
+}): BaseAmount => {
+  const { asset: feeAsset, amount: feeAmount } = fee
+
+  // no pricing needed if both assets are the same
+  if (eqAsset.equals(feeAsset, inAsset)) return feeAmount
+
+  const oFeeAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(feeAsset)])
+  const oAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(inAsset)])
+
+  return FP.pipe(
+    sequenceTOption(oFeeAssetPoolData, oAssetPoolData),
+    O.map(([feeAssetPoolData, assetPoolData]) =>
+      // pool data are always 1e8 decimal based
+      // and we have to convert fees to 1e8, too
+      getValueOfAsset1InAsset2(to1e8BaseAmount(feeAmount), feeAssetPoolData, assetPoolData)
+    ),
+    // convert decimal back to sourceAssetDecimal
+    O.map((amount) => convertBaseAmountDecimal(amount, inAssetDecimal)),
+    O.getOrElse(() => baseAmount(0, inAssetDecimal))
+  )
+}
+/**
+ * Helper to get min. amount to swap
+ *
+ * It checks fees for happy path (successfull swap) or unhappy path (failed swap)
+ *
+ * Formulas based on "Better Fees Handling #1381"
+ * @see https://github.com/thorchain/asgardex-electron/issues/1381
+ */
+export const minAmountToSwapMax1e8 = ({
+  swapFees,
+  inAsset,
+  inAssetDecimal,
+  outAsset,
+  poolsData
+}: {
+  swapFees: SwapFees
+  inAsset: Asset
+  inAssetDecimal: number
+  outAsset: Asset
+  poolsData: PoolsDataMap
+}): BaseAmount => {
+  const { inFee, outFee, refundFee } = swapFees
+
+  const inFeeInInboundAsset = priceFeeAmountForInAsset({
+    fee: inFee,
+    inAsset,
+    inAssetDecimal,
+    poolsData
+  })
+
+  const outFeeInInboundAsset = priceFeeAmountForInAsset({
+    fee: outFee,
+    inAsset,
+    inAssetDecimal,
+    poolsData
+  })
+
+  const refundFeeInInboundAsset = priceFeeAmountForInAsset({
+    fee: refundFee,
+    inAsset,
+    inAssetDecimal,
+    poolsData
+  })
+
+  const inAssetIsChainAsset = isChainAsset(inAsset)
+  const outAssetIsChainAsset = isChainAsset(outAsset)
+
+  const successSwapFee = inAssetIsChainAsset ? inFeeInInboundAsset.plus(outFeeInInboundAsset) : outFeeInInboundAsset
+  const failureSwapFee = outAssetIsChainAsset
+    ? inFeeInInboundAsset.plus(refundFeeInInboundAsset)
+    : refundFeeInInboundAsset
+
+  const feeToCover: BaseAmount = successSwapFee.gte(failureSwapFee) ? successSwapFee : failureSwapFee
+
+  return FP.pipe(
+    // Over-estimate fee by 50%
+    1.5,
+    feeToCover.times,
+    // transform decimal to be `max1e8`
+    max1e8BaseAmount
+  )
+}
+
+/**
+ * Returns min. balance to cover fees for inbound chain
+ *
+ * It checks fees for happy path (successfull swap) or unhappy path (failed swap)
+ *
+ * This helper is only needed if source asset is not a chain asset,
+ * In other case use `minAmountToSwapMax1e8` to get min value
+ */
+export const minBalanceToSwap = (swapFees: SwapFees): BaseAmount => {
+  const {
+    inFee: { amount: inFeeAmount },
+    refundFee: { amount: refundFeeAmount }
+  } = swapFees
+
+  // Sum inbound (success swap) + refund fee (failure swap)
+  const feeToCover: BaseAmount = inFeeAmount.plus(refundFeeAmount)
+  // Over-estimate balance by 50%
+  return feeToCover.times(1.5)
+}

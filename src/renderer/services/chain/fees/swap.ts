@@ -1,61 +1,32 @@
-import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as RxOp from 'rxjs/operators'
 
+import { ZERO_BASE_AMOUNT } from '../../../const'
 import { isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { getChainAsset } from '../../../helpers/chainHelper'
 import { eqOSwapFeesParams } from '../../../helpers/fp/eq'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
-import { FeeOptionKeys } from '../const'
-import { SwapFeesHandler, SwapFeeLD, SwapFeesParams } from '../types'
-import { getInboundFee, getOutboundFee } from './utils'
+import { SwapFeesHandler, SwapFeesParams, SwapFees } from '../types'
+import { poolFee$ } from './common'
 
 const {
-  pools: { gasRateByChain$, reloadGasRates }
+  pools: { reloadGasRates }
 } = midgardService
 
 /**
- * Fees for swap txs into a pool
+ * Returns zero swap fees
+ * by given `in` / `out` assets of a swap
  */
-const inboundFee$ = (asset: Asset): SwapFeeLD => {
-  // special case for RUNE
-  if (isRuneNativeAsset(asset)) {
-    return FP.pipe(
-      THOR.fees$(),
-      liveData.map((fees) => ({ amount: fees[FeeOptionKeys.SWAP], asset: AssetRuneNative }))
-    )
-  } else {
-    return FP.pipe(
-      gasRateByChain$(asset.chain),
-      liveData.map((gasRate) => getInboundFee({ asset, gasRate })),
-      // Map to an error if inbound fee could not be found
-      liveData.chain(liveData.fromOption(() => Error(`Could not find inbound fee for ${asset.chain}`)))
-    )
-  }
-}
-
-/**
- * Fees for swap txs outgoing from a pool
- */
-const outboundFee$ = (asset: Asset): SwapFeeLD => {
-  // special case for RUNE
-  if (isRuneNativeAsset(asset)) {
-    return FP.pipe(
-      THOR.fees$(),
-      liveData.map((fees) => ({ amount: fees[FeeOptionKeys.SWAP], asset: AssetRuneNative }))
-    )
-  } else {
-    return FP.pipe(
-      gasRateByChain$(asset.chain),
-      liveData.map((gasRate) => getOutboundFee({ asset, gasRate })),
-      // Map to an error if outbound fee could not be found
-      liveData.chain(liveData.fromOption(() => Error(`Could not find outbound fee for ${asset.chain}`)))
-    )
-  }
-}
+export const getZeroSwapFees = ({ inAsset, outAsset }: { inAsset: Asset; outAsset: Asset }): SwapFees => ({
+  inFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(inAsset.chain) },
+  outFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outAsset.chain) },
+  refundFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outAsset.chain) }
+})
 
 // state of `SwapFeesParams` used for reloading swap fees
 const { get$: updateSwapFeesParams$, get: updateSwapFeesParamsState, set: updateSwapFeesParams } = observableState<
@@ -94,8 +65,23 @@ const swapFees$: SwapFeesHandler = (initialParams) => {
       )
 
       return liveData.sequenceS({
-        inFee: inboundFee$(inAsset),
-        outFee: outboundFee$(outAsset)
+        inFee: poolFee$(inAsset),
+        outFee: FP.pipe(
+          outAsset,
+          poolFee$,
+          liveData.map((chainFee) => ({
+            ...chainFee,
+            amount: chainFee.amount.times(3)
+          }))
+        ),
+        refundFee: FP.pipe(
+          inAsset,
+          poolFee$,
+          liveData.map((chainFee) => ({
+            ...chainFee,
+            amount: chainFee.amount.times(3)
+          }))
+        )
       })
     })
   )
