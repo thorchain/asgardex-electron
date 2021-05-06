@@ -1,10 +1,10 @@
 import { UpdateMessages } from '../types'
 
 const update: UpdateMessages = {
-  'update.description': 'New version {version} available - FR',
-  'update.link': 'Release page - FR',
-  'update.checkFailed': 'Error while check for update: {error} - FR',
-  'update.checkForUpdates': 'Check for updates - FR'
+  'update.description': 'Nouvelle version {version} disponible',
+  'update.link': 'Page de mise à jour',
+  'update.checkFailed': 'Erreur pendant la vérification de mise à jour : {error}',
+  'update.checkForUpdates': 'Vérification des mises à jour'
 }
 
 export default update
