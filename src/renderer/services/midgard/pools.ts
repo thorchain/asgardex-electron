@@ -667,8 +667,8 @@ const createPoolsService = (
       liveData.chain((api) =>
         FP.pipe(
           api.getEarningsHistory({
-            from: roundToFiveMinutes(from),
-            to: roundToFiveMinutes(to),
+            from: O.toUndefined(roundToFiveMinutes(from)),
+            to: O.toUndefined(roundToFiveMinutes(to)),
             ...request
           }),
           RxOp.map(RD.success),
@@ -715,8 +715,8 @@ const createPoolsService = (
       liveData.chain((api) =>
         FP.pipe(
           api.getLiquidityHistory({
-            from: roundToFiveMinutes(from),
-            to: roundToFiveMinutes(to),
+            from: O.toUndefined(roundToFiveMinutes(from)),
+            to: O.toUndefined(roundToFiveMinutes(to)),
             ...request
           }),
           RxOp.map(RD.success),
@@ -753,8 +753,8 @@ const createPoolsService = (
         FP.pipe(
           api.getSwapHistory({
             pool: assetToString(poolAsset),
-            from: roundToFiveMinutes(from),
-            to: roundToFiveMinutes(to),
+            from: O.toUndefined(roundToFiveMinutes(from)),
+            to: O.toUndefined(roundToFiveMinutes(to)),
             ...otherParams
           }),
           RxOp.map(RD.success),
@@ -798,8 +798,8 @@ const createPoolsService = (
         FP.pipe(
           api.getDepthHistory({
             pool: assetToString(poolAsset),
-            from: roundToFiveMinutes(from),
-            to: roundToFiveMinutes(to),
+            from: O.toUndefined(roundToFiveMinutes(from)),
+            to: O.toUndefined(roundToFiveMinutes(to)),
             ...otherParams
           }),
           RxOp.map(RD.success),
