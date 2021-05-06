@@ -4,23 +4,18 @@ import { Meta, Story } from '@storybook/react'
 
 import { AppUpdate } from './AppUpdate'
 
-export const Default: Story<{ type: 'success' | 'fail'; goToUpdates: () => void; close: () => void }> = ({
-  type,
+export const Default: Story<{ isOpen: boolean; goToUpdates: () => void; close: () => void }> = ({
+  isOpen,
   close,
   goToUpdates
 }) => {
-  if (type === 'success') {
-    return <AppUpdate isOpen={true} type={type} goToUpdates={goToUpdates} close={close} version={'test version'} />
-  }
-
-  return <AppUpdate isOpen={true} type={type} close={close} message={'error message'} />
+  return <AppUpdate isOpen={isOpen} goToUpdates={goToUpdates} close={close} version={'test version'} />
 }
 
 const argTypes = {
-  type: {
+  isOpen: {
     control: {
-      type: 'select',
-      options: ['success', 'fail'] as const
+      type: 'boolean'
     }
   },
   goToUpdates: {
@@ -31,7 +26,7 @@ const argTypes = {
   }
 }
 
-Default.args = { type: argTypes.type.control.options[0] }
+Default.args = { isOpen: true }
 
 const meta: Meta = {
   title: 'AppUpdate',

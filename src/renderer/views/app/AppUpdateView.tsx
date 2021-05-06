@@ -28,25 +28,12 @@ export const AppUpdateView: React.FC = () => {
     () =>
       FP.pipe(
         appUpdater,
-        RD.chain<Error, O.Option<string>, string>((oVersion) =>
-          FP.pipe(
-            oVersion,
-            O.fold(() => RD.initial, RD.success)
-          )
-        ),
-        // TODO will be converted to the Option at all by #1393
-        RD.fold(
+        RD.toOption,
+        O.flatten,
+        O.fold(
           (): AppUpdateModalProps => ({ isOpen: false }),
-          (): AppUpdateModalProps => ({ isOpen: false }),
-          ({ message }): AppUpdateModalProps => ({
-            isOpen: true,
-            type: 'fail',
-            close: resetAppUpdater,
-            message
-          }),
           (version): AppUpdateModalProps => ({
             isOpen: true,
-            type: 'success',
             goToUpdates: () => window.apiUrl.openExternal(`${ExternalUrl.GITHUB_RELEASE}${version}`),
             version,
             close: resetAppUpdater
