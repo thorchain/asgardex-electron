@@ -197,6 +197,9 @@ export const priceFeeAmountForInAsset = ({
     O.getOrElse(() => baseAmount(0, inAssetDecimal))
   )
 }
+
+export const calcRefundFee = (inboundFee: BaseAmount): BaseAmount => inboundFee.times(3)
+
 /**
  * Helper to get min. amount to swap
  *
@@ -218,7 +221,7 @@ export const minAmountToSwapMax1e8 = ({
   outAsset: Asset
   poolsData: PoolsDataMap
 }): BaseAmount => {
-  const { inFee, outFee, refundFee } = swapFees
+  const { inFee, outFee } = swapFees
 
   const inFeeInInboundAsset = priceFeeAmountForInAsset({
     fee: inFee,
@@ -234,12 +237,7 @@ export const minAmountToSwapMax1e8 = ({
     poolsData
   })
 
-  const refundFeeInInboundAsset = priceFeeAmountForInAsset({
-    fee: refundFee,
-    inAsset,
-    inAssetDecimal,
-    poolsData
-  })
+  const refundFeeInInboundAsset = calcRefundFee(inFeeInInboundAsset)
 
   const inAssetIsChainAsset = isChainAsset(inAsset)
   const outAssetIsChainAsset = isChainAsset(outAsset)
@@ -268,14 +266,14 @@ export const minAmountToSwapMax1e8 = ({
  * This helper is only needed if source asset is not a chain asset,
  * In other case use `minAmountToSwapMax1e8` to get min value
  */
-export const minBalanceToSwap = (swapFees: SwapFees): BaseAmount => {
+export const minBalanceToSwap = (swapFees: Pick<SwapFees, 'inFee'>): BaseAmount => {
   const {
-    inFee: { amount: inFeeAmount },
-    refundFee: { amount: refundFeeAmount }
+    inFee: { amount }
   } = swapFees
 
   // Sum inbound (success swap) + refund fee (failure swap)
-  const feeToCover: BaseAmount = inFeeAmount.plus(refundFeeAmount)
+  const refundFee = calcRefundFee(amount)
+  const feeToCover: BaseAmount = amount.plus(refundFee)
   // Over-estimate balance by 50%
   return feeToCover.times(1.5)
 }
