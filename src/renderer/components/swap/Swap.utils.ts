@@ -22,8 +22,9 @@ import {
 } from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { SwapFee, SwapFees } from '../../services/chain/types'
+import { SwapFees } from '../../services/chain/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolsDataMap } from '../../services/midgard/types'
+import { AssetWithAmount } from '../../types/asgardex'
 import { SwapData } from './Swap.types'
 
 /**
@@ -172,7 +173,7 @@ export const priceFeeAmountForInAsset = ({
   inAssetDecimal,
   poolsData
 }: {
-  fee: SwapFee
+  fee: AssetWithAmount
   inAsset: Asset
   inAssetDecimal: number
   poolsData: PoolsDataMap

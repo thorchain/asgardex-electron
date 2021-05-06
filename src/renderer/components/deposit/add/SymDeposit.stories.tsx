@@ -55,8 +55,12 @@ const defaultProps: SymDepositProps = {
   fees$: () =>
     Rx.of(
       RD.success({
-        thor: O.some(assetToBase(assetAmount(0.2))),
-        asset: assetToBase(assetAmount(0.000075))
+        rune: { inFee: assetToBase(assetAmount(0.2)), outFee: assetToBase(assetAmount(0.6)) },
+        asset: {
+          asset: AssetBNB,
+          inFee: assetToBase(assetAmount(0.000075)),
+          outFee: assetToBase(assetAmount(0.000225))
+        }
       })
     ),
   reloadApproveFee: () => console.log('reloadFees'),
@@ -122,8 +126,12 @@ export const FeeError: Story = () => {
     fees$: () =>
       Rx.of(
         RD.success({
-          thor: O.some(assetToBase(assetAmount(2))),
-          asset: assetToBase(assetAmount(1))
+          rune: { inFee: assetToBase(assetAmount(2)), outFee: assetToBase(assetAmount(6)) },
+          asset: {
+            asset: AssetBNB,
+            inFee: assetToBase(assetAmount(1)),
+            outFee: assetToBase(assetAmount(3))
+          }
         })
       ),
     assetBalance: O.some(assetToBase(assetAmount(0.5))),

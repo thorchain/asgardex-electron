@@ -37,17 +37,18 @@ import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
 import { FundsCap } from '../../../hooks/useFundsCap'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
-import { INITIAL_SYM_DEPOSIT_STATE, ZERO_SYM_DEPOSIT_FEES } from '../../../services/chain/const'
+import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
+import { getZeroSymDepositFees } from '../../../services/chain/fees'
 import {
   SymDepositMemo,
   SymDepositState,
   SymDepositParams,
   SymDepositStateHandler,
-  DepositFees,
+  SymDepositFees,
   FeeRD,
   ReloadSymDepositFeesHandler,
   SymDepositFeesHandler,
-  DepositFeesRD
+  SymDepositFeesRD
 } from '../../../services/chain/types'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
 import { PoolAddress } from '../../../services/midgard/types'
@@ -275,12 +276,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [oPoolAddress, asset])
 
-  const prevDepositFees = useRef<O.Option<DepositFees>>(O.none)
+  const zeroDepositFees = useMemo(() => getZeroSymDepositFees(asset), [asset])
 
-  const [depositFeesRD] = useObservableState<DepositFeesRD>(
+  const prevDepositFees = useRef<O.Option<SymDepositFees>>(O.none)
+
+  const [depositFeesRD] = useObservableState<SymDepositFeesRD>(
     () =>
       FP.pipe(
-        oDepositParams,
+        asset,
         fees$,
         liveData.map((fees) => {
           // store every successfully loaded chainFees to the ref value
@@ -288,12 +291,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
           return fees
         })
       ),
-    RD.success(ZERO_SYM_DEPOSIT_FEES)
+    RD.success(zeroDepositFees)
   )
 
   const reloadFeesHandler = useCallback(() => {
-    reloadFees(oDepositParams)
-  }, [oDepositParams, reloadFees])
+    reloadFees(O.some(asset))
+  }, [asset, reloadFees])
 
   const approveFees$ = useMemo(() => approveFee$, [approveFee$])
 
@@ -312,9 +315,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
     FP.pipe(oApproveParams, O.map(reloadApproveFee))
   }, [oApproveParams, reloadApproveFee])
 
-  const oThorchainFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(depositFeesRD, Helper.getThorchainFees), [
-    depositFeesRD
-  ])
+  const oThorchainFee: O.Option<{ inFee: BaseAmount; outFee: BaseAmount }> = useMemo(
+    () => FP.pipe(depositFeesRD, Helper.getThorchainFees),
+    [depositFeesRD]
+  )
 
   const maxRuneAmountToDeposit = useMemo(
     (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance }),
@@ -329,9 +333,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
     }
   }, [maxRuneAmountToDeposit, runeAmountToDeposit])
 
-  const oAssetChainFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(depositFeesRD, Helper.getAssetChainFee), [
-    depositFeesRD
-  ])
+  const oAssetChainFee: O.Option<{ inFee: BaseAmount; outFee: BaseAmount }> = useMemo(
+    () => FP.pipe(depositFeesRD, Helper.getAssetChainFee),
+    [depositFeesRD]
+  )
 
   /**
    * Max asset amount to deposit
@@ -564,7 +569,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oThorchainFee),
-        ([fee, balance]) => balance.amount().isLessThan(fee.amount())
+        // TODO (@Veado) Fix check
+        ([fee, balance]) => balance.lt(fee.inFee.plus(fee.outFee))
       )
     )
   }, [oRuneBalance, oThorchainFee, isZeroAmountToDeposit])
@@ -574,7 +580,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     return FP.pipe(
       oThorchainFee,
-      O.map((fee) => renderFeeError(fee, runeBalance, AssetRuneNative)),
+      // TODO (@Veado) Fix fee calculation
+      O.map(({ inFee, outFee }) => renderFeeError(inFee.plus(outFee), runeBalance, AssetRuneNative)),
       O.getOrElse(() => <></>)
     )
   }, [isBalanceError, isThorchainFeeError, oThorchainFee, renderFeeError, runeBalance])
@@ -588,7 +595,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oAssetChainFee),
-        ([fee, balance]) => balance.amount().isLessThan(fee.amount())
+        // TODO (@Veado) Fix check
+        ([fee, balance]) => balance.lt(fee.inFee.plus(fee.outFee))
       )
     )
   }, [oAssetChainFee, oChainAssetBalance, isZeroAmountToDeposit])
@@ -598,7 +606,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     return FP.pipe(
       oAssetChainFee,
-      O.map((fee) => renderFeeError(fee, chainAssetBalance, asset)),
+      // TODO (@Veado) Fix fee calculation
+      O.map(({ inFee, outFee }) => renderFeeError(inFee.plus(outFee), chainAssetBalance, asset)),
       O.getOrElse(() => <></>)
     )
   }, [isAssetChainFeeError, isBalanceError, oAssetChainFee, renderFeeError, chainAssetBalance, asset])
@@ -784,17 +793,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
     () =>
       FP.pipe(
         depositFeesRD,
-        RD.map(({ asset: assetFeeAmount, thor }) =>
-          FP.pipe(
-            thor,
-            O.fold(
-              () => [{ asset, amount: assetFeeAmount }],
-              (thorAmount) => [
-                { asset: getChainAsset(asset.chain), amount: assetFeeAmount },
-                { asset: AssetRuneNative, amount: thorAmount }
-              ]
-            )
-          )
+        RD.map(({ asset: assetFee, rune }) =>
+          // TODO (@Veado) Fix fee calculation
+          [
+            { asset: getChainAsset(asset.chain), amount: assetFee.inFee.plus(assetFee.outFee) },
+            { asset: AssetRuneNative, amount: rune.inFee.plus(rune.outFee) }
+          ]
         )
       ),
     [depositFeesRD, asset]
