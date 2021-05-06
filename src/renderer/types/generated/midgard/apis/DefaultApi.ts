@@ -349,7 +349,11 @@ export class DefaultApi extends BaseAPI {
      * Retrieve lastest block infomation across all chains.
      * Proxied THORChain Lastblock
      */
-    getProxiedLastblock = (): Observable<Array<LastblockItem>> => {
+    /**
+     * !!! IMPORTANT NOTE !!!
+     * Fixed by hand for the sake of inconsistency of swagger spec
+     */
+  getProxiedLastblock = (): Observable<Array<LastblockItem>> => {
         return this.request<Array<LastblockItem>>({
             path: '/v2/thorchain/lastblock',
             method: 'GET',
