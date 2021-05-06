@@ -12,18 +12,22 @@
  */
 
 import {
-    MemberPool,
+    TVLHistoryItem,
 } from './';
 
 /**
  * @export
- * @interface MemberDetails
+ * @interface TVLHistory
  */
-export interface MemberDetails {
+export interface TVLHistory {
     /**
-     * List details of all the liquidity providers identified with the given address
-     * @type {Array<MemberPool>}
-     * @memberof MemberDetails
+     * @type {Array<TVLHistoryItem>}
+     * @memberof TVLHistory
      */
-    pools: Array<MemberPool>;
+    intervals: Array<TVLHistoryItem>;
+    /**
+     * @type {TVLHistoryItem}
+     * @memberof TVLHistory
+     */
+    meta: TVLHistoryItem;
 }
