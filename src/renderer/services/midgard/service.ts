@@ -74,6 +74,7 @@ const apiGetThorchainLastblock$ = byzantine$.pipe(
   liveData.chain((endpoint) =>
     FP.pipe(
       getMidgardDefaultApi(endpoint).getProxiedLastblock(),
+      RxOp.map(({ current }) => current),
       RxOp.map(RD.success),
       RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
     )
@@ -130,7 +131,7 @@ const thorchainConstantsState$: ThorchainConstantsLD = apiGetThorchainConstants$
 const nativeTxFee$: NativeFeeLD = thorchainConstantsState$.pipe(
   liveData.map((constants) =>
     FP.pipe(
-      O.fromNullable(constants.int_64_values?.NativeChainGasFee),
+      O.fromNullable(constants.int_64_values?.NativeTransactionFee),
       O.map((value) => baseAmount(value, THORCHAIN_DECIMAL))
     )
   )

@@ -42,7 +42,8 @@ export const poolStatsDetailMock: PoolStatsDetail = {
   withdrawAssetVolume: '0',
   withdrawCount: '0',
   withdrawRuneVolume: '0',
-  withdrawVolume: '0'
+  withdrawVolume: '0',
+  impermanentLossProtectionPaid: '0'
 }
 
 export const earningsHistoryItemPoolMock: EarningsHistoryItemPool = {
