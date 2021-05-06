@@ -16,6 +16,7 @@ import { eqAsset, eqOAsset, eqOPoolAddresses } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
+import { roundUnixTimestampToMinutes } from '../../helpers/timeHelper'
 import {
   DefaultApi,
   GetEarningsHistoryRequest,
@@ -80,6 +81,8 @@ const getStoredSelectedPricePoolAsset = (): SelectedPricePoolAsset =>
     O.chain(O.fromNullable),
     O.filter(isPricePoolAsset)
   )
+
+const roundToFiveMinutes = roundUnixTimestampToMinutes(5)
 
 const createPoolsService = (
   byzantine$: LiveData<Error, string>,
@@ -658,12 +661,16 @@ const createPoolsService = (
   )
 
   // Factory to get earning history
-  const apiGetEarningHistory$ = (request: GetEarningsHistoryRequest): EarningsHistoryLD =>
+  const apiGetEarningHistory$ = ({ from, to, ...request }: GetEarningsHistoryRequest): EarningsHistoryLD =>
     FP.pipe(
       midgardDefaultApi$,
       liveData.chain((api) =>
         FP.pipe(
-          api.getEarningsHistory(request),
+          api.getEarningsHistory({
+            from: O.toUndefined(roundToFiveMinutes(from)),
+            to: O.toUndefined(roundToFiveMinutes(to)),
+            ...request
+          }),
           RxOp.map(RD.success),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
@@ -701,13 +708,17 @@ const createPoolsService = (
   )
 
   // Factory to get pool liquidity history from Midgard
-  const apiGetPoolLiquidityHistory$ = (request: GetLiquidityHistoryRequest): PoolLiquidityHistoryLD =>
+  const apiGetPoolLiquidityHistory$ = ({ from, to, ...request }: GetLiquidityHistoryRequest): PoolLiquidityHistoryLD =>
     FP.pipe(
       Rx.combineLatest([midgardDefaultApi$, reloadPoolStatsDetail$]),
       RxOp.map(([api]) => api),
       liveData.chain((api) =>
         FP.pipe(
-          api.getLiquidityHistory(request),
+          api.getLiquidityHistory({
+            from: O.toUndefined(roundToFiveMinutes(from)),
+            to: O.toUndefined(roundToFiveMinutes(to)),
+            ...request
+          }),
           RxOp.map(RD.success),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
@@ -735,12 +746,17 @@ const createPoolsService = (
 
   // Factory to get swap history from Midgard
   const apiGetSwapHistory$ = (params: ApiGetSwapHistoryParams): SwapHistoryLD => {
-    const { poolAsset, ...otherParams } = params
+    const { poolAsset, from, to, ...otherParams } = params
     return FP.pipe(
       midgardDefaultApi$,
       liveData.chain((api) =>
         FP.pipe(
-          api.getSwapHistory({ pool: assetToString(poolAsset), ...otherParams }),
+          api.getSwapHistory({
+            pool: assetToString(poolAsset),
+            from: O.toUndefined(roundToFiveMinutes(from)),
+            to: O.toUndefined(roundToFiveMinutes(to)),
+            ...otherParams
+          }),
           RxOp.map(RD.success),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
@@ -774,12 +790,18 @@ const createPoolsService = (
 
   // Factory to get depth history from Midgard
   const apiGetDepthHistory$ = (params: ApiGetDepthHistoryParams): DepthHistoryLD => {
-    const { poolAsset, ...otherParams } = params
+    const { poolAsset, from, to, ...otherParams } = params
+
     return FP.pipe(
       midgardDefaultApi$,
       liveData.chain((api) =>
         FP.pipe(
-          api.getDepthHistory({ pool: assetToString(poolAsset), ...otherParams }),
+          api.getDepthHistory({
+            pool: assetToString(poolAsset),
+            from: O.toUndefined(roundToFiveMinutes(from)),
+            to: O.toUndefined(roundToFiveMinutes(to)),
+            ...otherParams
+          }),
           RxOp.map(RD.success),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
