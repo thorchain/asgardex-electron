@@ -13,19 +13,43 @@
 
 /**
  * @export
- * @interface DepthHistoryMeta
+ * @interface TVLHistoryItem
  */
-export interface DepthHistoryMeta {
+export interface TVLHistoryItem {
     /**
      * Int64, The end time of bucket in unix timestamp
      * @type {string}
-     * @memberof DepthHistoryMeta
+     * @memberof TVLHistoryItem
      */
     endTime: string;
     /**
+     * Float, the price of Rune based on the deepest USD pool at the end of the interval. 
+     * @type {string}
+     * @memberof TVLHistoryItem
+     */
+    runePriceUSD: string;
+    /**
      * Int64, The beginning time of bucket in unix timestamp
      * @type {string}
-     * @memberof DepthHistoryMeta
+     * @memberof TVLHistoryItem
      */
     startTime: string;
+    /**
+     * Int64(e8), the total amount of bonds at the end of the interval
+     * @type {string}
+     * @memberof TVLHistoryItem
+     */
+    totalBonds?: string;
+    /**
+     * Int64(e8), the total amount of Rune in all of the pools at the end of the interval
+     * @type {string}
+     * @memberof TVLHistoryItem
+     */
+    totalRuneDepth: string;
+    /**
+     * Int64(e8), total value locked in the chain (in rune). This equals `2*totalRuneDepth + totalBonds`, as it combines the liquidity pools (both assets and rune) and bonds of the nodes. 
+     * @type {string}
+     * @memberof TVLHistoryItem
+     */
+    totalValueLocked?: string;
 }

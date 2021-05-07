@@ -39,5 +39,7 @@ export * from './StringConstants';
 export * from './SwapHistory';
 export * from './SwapHistoryItem';
 export * from './SwapMetadata';
+export * from './TVLHistory';
+export * from './TVLHistoryItem';
 export * from './Transaction';
 export * from './WithdrawMetadata';
