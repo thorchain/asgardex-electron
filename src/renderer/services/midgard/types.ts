@@ -51,12 +51,14 @@ export type PoolDetailRD = RD.RemoteData<Error, PoolDetail>
 export type PoolDetailLD = LiveData<Error, PoolDetail>
 
 export type PoolDetails = PoolDetail[]
+export type PoolDetailsRD = RD.RemoteData<Error, PoolDetails>
 export type PoolDetailsLD = LiveData<Error, PoolDetails>
 
 /**
  * Hash map for storing `PoolData` (key: string of asset)
  */
 export type PoolsDataMap = Record<string /* asset as string */, PoolData>
+export type PoolsDataMapRD = RD.RemoteData<Error, PoolsDataMap>
 
 export type PriceDataIndex = {
   [symbol: string]: BigNumber
@@ -66,6 +68,7 @@ export type PoolsState = {
   assetDetails: PoolAssetDetails
   poolAssets: PoolAssets
   poolDetails: PoolDetails
+  poolsData: PoolsDataMap
   pricePools: O.Option<PricePools>
 }
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>

@@ -146,7 +146,3 @@ export const SubmitButton = styled(UIButton).attrs({
   padding-left: 30px;
   padding-right: 30px;
 `
-export const MinAmountLabel = styled(UILabel)`
-  padding-top: 0;
-  text-transform: uppercase;
-`

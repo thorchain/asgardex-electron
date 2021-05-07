@@ -3,7 +3,16 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
-import { assetAmount, AssetBTC, AssetRuneNative, assetToBase, baseAmount, bn } from '@xchainjs/xchain-util'
+import {
+  assetAmount,
+  AssetBNB,
+  AssetBTC,
+  AssetRuneNative,
+  assetToBase,
+  assetToString,
+  baseAmount,
+  bn
+} from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -36,30 +45,16 @@ const defaultProps: SwapProps = {
         Rx.of<SwapState>({ ...INITIAL_SWAP_STATE, step: 3, swapTx: RD.success('tx-hash'), swap: RD.success(true) })
       )
     ),
-  poolDetails: [
-    {
-      asset: 'BNB.BNB',
-      assetDepth: '3403524249',
-      assetPrice: '25.249547241877167',
-      assetPriceUSD: '272.13',
-      poolAPY: '0',
-      runeDepth: '85937446314',
-      status: 'available',
-      units: '200000000000',
-      volume24h: '0'
+  poolsData: {
+    [assetToString(AssetBNB)]: {
+      assetBalance: baseAmount(1),
+      runeBalance: baseAmount(20)
     },
-    {
-      asset: 'BTC.BTC',
-      assetDepth: '17970413',
-      assetPrice: '56851.67420275761',
-      assetPriceUSD: '59543.12',
-      poolAPY: '0',
-      runeDepth: '1021648065165',
-      status: 'available',
-      units: '700389963172',
-      volume24h: '0'
+    [assetToString(AssetBTC)]: {
+      assetBalance: baseAmount(1),
+      runeBalance: baseAmount(3000)
     }
-  ],
+  },
   walletBalances: O.some([
     {
       asset: AssetRuneNative,

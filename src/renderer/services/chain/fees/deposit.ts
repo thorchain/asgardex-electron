@@ -24,8 +24,13 @@ const {
  * by given `in` / `out` assets of a swap
  */
 export const getZeroSymDepositFees = (asset: Asset): SymDepositFees => ({
-  rune: { inFee: ZERO_BASE_AMOUNT, outFee: ZERO_BASE_AMOUNT },
-  asset: { asset: getChainAsset(asset.chain), inFee: ZERO_BASE_AMOUNT, outFee: ZERO_BASE_AMOUNT }
+  rune: { inFee: ZERO_BASE_AMOUNT, outFee: ZERO_BASE_AMOUNT, refundFee: ZERO_BASE_AMOUNT },
+  asset: {
+    asset: getChainAsset(asset.chain),
+    inFee: ZERO_BASE_AMOUNT,
+    outFee: ZERO_BASE_AMOUNT,
+    refundFee: ZERO_BASE_AMOUNT
+  }
 })
 
 // State to reload sym deposit fees
@@ -63,8 +68,13 @@ const symDepositFees$: SymDepositFeesHandler = (initialAsset) => {
           assetInFee: poolFee$(asset)
         }),
         liveData.map(({ runeInFee, assetInFee }) => ({
-          rune: { inFee: runeInFee.amount, outFee: runeInFee.amount.times(3) },
-          asset: { asset, inFee: assetInFee.amount, outFee: assetInFee.amount.times(3) }
+          rune: { inFee: runeInFee.amount, outFee: runeInFee.amount.times(3), refundFee: runeInFee.amount.times(3) },
+          asset: {
+            asset: getChainAsset(asset.chain),
+            inFee: assetInFee.amount,
+            outFee: assetInFee.amount.times(3),
+            refundFee: assetInFee.amount.times(3)
+          }
         }))
       )
     })

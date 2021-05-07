@@ -6,7 +6,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
 import * as O from 'fp-ts/lib/Option'
 
-import { SwapFeesParams } from '../../services/chain/types'
+import { DepositAssetFees, DepositFees, SwapFeesParams } from '../../services/chain/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
@@ -108,3 +108,20 @@ export const eqSwapFeesParams = Eq.getStructEq<SwapFeesParams>({
 })
 
 export const eqOSwapFeesParams = O.getEq(eqSwapFeesParams)
+
+export const eqDepositFees = Eq.getStructEq<DepositFees>({
+  inFee: eqBaseAmount,
+  outFee: eqBaseAmount,
+  refundFee: eqBaseAmount
+})
+
+export const eqODepositFees = O.getEq(eqDepositFees)
+
+export const eqDepositAssetFees = Eq.getStructEq<DepositAssetFees>({
+  inFee: eqBaseAmount,
+  outFee: eqBaseAmount,
+  refundFee: eqBaseAmount,
+  asset: eqAsset
+})
+
+export const eqODepositAssetFees = O.getEq(eqDepositAssetFees)

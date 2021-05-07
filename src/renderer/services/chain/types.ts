@@ -32,15 +32,17 @@ export type MemoRx = Rx.Observable<O.Option<Memo>>
 export type SymDepositMemo = { rune: Memo; asset: Memo }
 export type SymDepositMemoRx = Rx.Observable<O.Option<SymDepositMemo>>
 
+export type DepositFees = { inFee: BaseAmount; outFee: BaseAmount; refundFee: BaseAmount }
+export type DepositAssetFees = DepositFees & { asset: Asset }
 /**
  * Sym. deposit fees
  *
  */
 export type SymDepositFees = {
   /** fee for RUNE txs */
-  readonly rune: { inFee: BaseAmount; outFee: BaseAmount }
+  readonly rune: DepositFees
   /** fee for asset txs */
-  readonly asset: { inFee: BaseAmount; outFee: BaseAmount; asset: Asset }
+  readonly asset: DepositAssetFees
 }
 
 export type SymDepositFeesRD = RD.RemoteData<Error, SymDepositFees>

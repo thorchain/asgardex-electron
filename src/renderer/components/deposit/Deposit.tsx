@@ -127,7 +127,7 @@ export const Deposit: React.FC<Props> = (props) => {
       //   content: <AsymWidthdrawContent asset={asset} poolShare={asymPoolShareAsset} />
       // }
     ],
-    [intl, assetWD, SymDepositContent, hasSymPoolShare, WidthdrawContent, combinedPoolShare, poolDetailRD]
+    [intl, SymDepositContent, poolDetailRD, assetWD, hasSymPoolShare, WidthdrawContent, combinedPoolShare]
   )
 
   const alignTopShareContent: boolean = useMemo(

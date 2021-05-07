@@ -79,7 +79,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     }
   }, [oRouteSource, setSelectedPoolAsset])
 
-  // reload inbound addresses at `onMount` to get always latest `pool address`
+  // reload inbound addresses at `onMount` to get always latest `pool address` + `feeRates`
   useEffect(() => {
     reloadInboundAddresses()
   }, [reloadInboundAddresses])
@@ -207,7 +207,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
             () => <></>,
             () => <Spin size="large" />,
             renderError,
-            ([{ assetDetails: availableAssets, poolDetails }, sourceAsset, targetAsset]) => {
+            ([{ assetDetails: availableAssets, poolsData }, sourceAsset, targetAsset]) => {
               const hasRuneAsset = Boolean(availableAssets.find(({ asset }) => isRuneNativeAsset(asset)))
 
               if (!hasRuneAsset) {
@@ -222,7 +222,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   assets={{ inAsset: sourceAsset, outAsset: targetAsset }}
                   poolAddress={selectedPoolAddress}
                   availableAssets={availableAssets}
-                  poolDetails={poolDetails}
+                  poolsData={poolsData}
                   walletBalances={balances}
                   reloadFees={reloadSwapFees}
                   fees$={swapFees$}
