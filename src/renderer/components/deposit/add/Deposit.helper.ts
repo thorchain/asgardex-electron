@@ -139,3 +139,5 @@ export const getThorchainFees = (feesRD: SymDepositFeesRD): O.Option<{ inFee: Ba
     RD.map(({ rune }) => rune),
     RD.toOption
   )
+
+export const sumFees = ({ inFee, outFee }: { inFee: BaseAmount; outFee: BaseAmount }) => inFee.plus(outFee)

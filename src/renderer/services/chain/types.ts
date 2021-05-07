@@ -51,7 +51,7 @@ export type SymDepositFeesParams = {
 }
 
 export type SymDepositFeesHandler = (asset: Asset) => SymDepositFeesLD
-export type ReloadSymDepositFeesHandler = (params: O.Option<Asset>) => void
+export type ReloadSymDepositFeesHandler = (asset: Asset) => void
 
 export type AsymDepositParams = {
   readonly poolAddress: PoolAddress

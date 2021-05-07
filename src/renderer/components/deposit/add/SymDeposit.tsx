@@ -283,8 +283,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const [depositFeesRD] = useObservableState<SymDepositFeesRD>(
     () =>
       FP.pipe(
-        asset,
-        fees$,
+        fees$(asset),
         liveData.map((fees) => {
           // store every successfully loaded chainFees to the ref value
           prevDepositFees.current = O.some(fees)
@@ -295,7 +294,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const reloadFeesHandler = useCallback(() => {
-    reloadFees(O.some(asset))
+    reloadFees(asset)
   }, [asset, reloadFees])
 
   const approveFees$ = useMemo(() => approveFee$, [approveFee$])
@@ -580,8 +579,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     return FP.pipe(
       oThorchainFee,
-      // TODO (@Veado) Fix fee calculation
-      O.map(({ inFee, outFee }) => renderFeeError(inFee.plus(outFee), runeBalance, AssetRuneNative)),
+      O.map((fees) => renderFeeError(Helper.sumFees(fees), runeBalance, AssetRuneNative)),
       O.getOrElse(() => <></>)
     )
   }, [isBalanceError, isThorchainFeeError, oThorchainFee, renderFeeError, runeBalance])
@@ -595,8 +593,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oAssetChainFee),
-        // TODO (@Veado) Fix check
-        ([fee, balance]) => balance.lt(fee.inFee.plus(fee.outFee))
+        ([fee, balance]) => FP.pipe(fee, Helper.sumFees, balance.lt)
       )
     )
   }, [oAssetChainFee, oChainAssetBalance, isZeroAmountToDeposit])
@@ -606,8 +603,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     return FP.pipe(
       oAssetChainFee,
-      // TODO (@Veado) Fix fee calculation
-      O.map(({ inFee, outFee }) => renderFeeError(inFee.plus(outFee), chainAssetBalance, asset)),
+      O.map((fees) => renderFeeError(Helper.sumFees(fees), chainAssetBalance, asset)),
       O.getOrElse(() => <></>)
     )
   }, [isAssetChainFeeError, isBalanceError, oAssetChainFee, renderFeeError, chainAssetBalance, asset])
