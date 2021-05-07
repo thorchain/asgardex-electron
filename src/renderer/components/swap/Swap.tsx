@@ -52,7 +52,6 @@ import {
   SwapFeesHandler,
   ReloadSwapFeesHandler,
   SwapFeesRD,
-  SwapFeesParams,
   SwapFees,
   FeeRD
 } from '../../services/chain/types'
@@ -253,15 +252,6 @@ export const Swap = ({
     return max1e8BaseAmount(swapResultAmount)
   }, [swapData.swapResult, targetAssetDecimal])
 
-  const swapFeesParams: SwapFeesParams = useMemo(
-    () => ({
-      inAsset: sourceAssetProp,
-      outAsset: targetAssetProp,
-      inAmount: amountToSwapMax1e8
-    }),
-    [amountToSwapMax1e8, sourceAssetProp, targetAssetProp]
-  )
-
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     return FP.pipe(
       sequenceTOption(
@@ -288,8 +278,10 @@ export const Swap = ({
 
   const [swapFeesRD] = useObservableState<SwapFeesRD>(() => {
     return FP.pipe(
-      swapFeesParams,
-      fees$,
+      fees$({
+        inAsset: sourceAssetProp,
+        outAsset: targetAssetProp
+      }),
       liveData.map((chainFees) => {
         // store every successfully loaded chainFees to the ref value
         prevChainFees.current = O.some(chainFees)
@@ -299,8 +291,11 @@ export const Swap = ({
   }, RD.success(zeroSwapFees))
 
   const reloadFeesHandler = useCallback(() => {
-    reloadFees(swapFeesParams)
-  }, [swapFeesParams, reloadFees])
+    reloadFees({
+      inAsset: sourceAssetProp,
+      outAsset: targetAssetProp
+    })
+  }, [reloadFees, sourceAssetProp, targetAssetProp])
 
   const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
     (oApproveFeeParam$) => {
