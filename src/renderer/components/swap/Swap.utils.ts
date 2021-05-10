@@ -262,19 +262,19 @@ export const minAmountToSwapMax1e8 = ({
 /**
  * Returns min. balance to cover fees for inbound chain
  *
- * It checks fees for happy path (successfull swap) or unhappy path (failed swap)
+ * It sums fees for happy path (successfull swap) and unhappy path (failed swap)
  *
  * This helper is only needed if source asset is not a chain asset,
  * In other case use `minAmountToSwapMax1e8` to get min value
  */
 export const minBalanceToSwap = (swapFees: Pick<SwapFees, 'inFee'>): BaseAmount => {
   const {
-    inFee: { amount }
+    inFee: { amount: inFeeAmount }
   } = swapFees
 
   // Sum inbound (success swap) + refund fee (failure swap)
-  const refundFee = calcRefundFee(amount)
-  const feeToCover: BaseAmount = amount.plus(refundFee)
+  const refundFee = calcRefundFee(inFeeAmount)
+  const feeToCover: BaseAmount = inFeeAmount.plus(refundFee)
   // Over-estimate balance by 50%
   return feeToCover.times(1.5)
 }

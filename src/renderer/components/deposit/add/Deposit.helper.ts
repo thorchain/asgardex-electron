@@ -141,8 +141,6 @@ export const getThorchainFees = (feesRD: SymDepositFeesRD): O.Option<DepositFees
     RD.toOption
   )
 
-export const sumFees = ({ inFee, outFee }: { inFee: BaseAmount; outFee: BaseAmount }) => inFee.plus(outFee)
-
 export const priceFeeAmountForAsset = ({
   feeAmount,
   feeAsset,
@@ -245,4 +243,21 @@ export const minRuneAmountToDeposit = ({ inFee, outFee, refundFee }: DepositFees
     // transform decimal to be `max1e8`
     max1e8BaseAmount
   )
+}
+
+/**
+ * Returns min. balance to cover fees for deposit txs
+ *
+ * It sums fees for happy path (successfull deposit) or unhappy path (failed deposit)
+ *
+ * This helper is only needed if source asset is not a chain asset,
+ * In other case use `minAmountToSwapMax1e8` to get min value
+ */
+export const minBalanceToDeposit = (fees: Pick<DepositFees, 'inFee' | 'refundFee'>): BaseAmount => {
+  const { inFee, refundFee } = fees
+
+  // Sum inbound (success deposit) + refund fee (failure deposit)
+  const feeToCover: BaseAmount = inFee.plus(refundFee)
+  // Over-estimate balance by 50%
+  return feeToCover.times(1.5)
 }
