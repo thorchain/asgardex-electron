@@ -307,7 +307,7 @@ describe('components/swap/utils', () => {
   })
 
   describe('minBalanceToSwap', () => {
-    it('returns min. amount to cover inbound + refund fees', () => {
+    it('returns min. balance to cover inbound + refund fees', () => {
       const params = {
         inFee: {
           amount: baseAmount(100),

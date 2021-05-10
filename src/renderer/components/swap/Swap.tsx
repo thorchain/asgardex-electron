@@ -692,7 +692,7 @@ export const Swap = ({
     }
 
     const {
-      inFee: { amount: inFeeAmount, asset: inFeeAsset }
+      inFee: { asset: inFeeAsset }
     } = swapFees
 
     return (
@@ -708,7 +708,7 @@ export const Swap = ({
             fee: formatAssetAmountCurrency({
               asset: inFeeAsset,
               trimZeros: true,
-              amount: baseToAsset(inFeeAmount)
+              amount: baseToAsset(Utils.minBalanceToSwap(swapFees))
             })
           }
         )}
