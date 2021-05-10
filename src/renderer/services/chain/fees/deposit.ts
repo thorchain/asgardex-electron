@@ -34,9 +34,11 @@ export const getZeroSymDepositFees = (asset: Asset): SymDepositFees => ({
 })
 
 // State to reload sym deposit fees
-const { get$: reloadSymDepositFees$, get: reloadSymDepositFeesState, set: _reloadSymDepositFees } = observableState<
-  O.Option<Asset>
->(O.none)
+const {
+  get$: reloadSymDepositFees$,
+  get: reloadSymDepositFeesState,
+  set: _reloadSymDepositFees
+} = observableState<O.Option<Asset>>(O.none)
 
 // Triggers reloading of deposit fees
 const reloadSymDepositFees = (asset: Asset) => {

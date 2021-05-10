@@ -148,9 +148,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const [runeAmountToDeposit, setRuneAmountToDeposit] = useState<BaseAmount>(baseAmount(0, THORCHAIN_DECIMAL))
 
-  const initialAssetAmountToDepositMax1e8 = useMemo(() => baseAmount(0, assetBalanceMax1e8.decimal), [
-    assetBalanceMax1e8.decimal
-  ])
+  const initialAssetAmountToDepositMax1e8 = useMemo(
+    () => baseAmount(0, assetBalanceMax1e8.decimal),
+    [assetBalanceMax1e8.decimal]
+  )
 
   const [
     /* max. 1e8 decimal */
@@ -288,9 +289,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
     return assetAmountToDepositMax1e8.lt(minAssetAmountToDepositMax1e8)
   }, [assetAmountToDepositMax1e8, isZeroAmountToDeposit, minAssetAmountToDepositMax1e8])
 
-  const minRuneAmountToDeposit: BaseAmount = useMemo(() => Helper.minRuneAmountToDeposit(depositFees.rune), [
-    depositFees.rune
-  ])
+  const minRuneAmountToDeposit: BaseAmount = useMemo(
+    () => Helper.minRuneAmountToDeposit(depositFees.rune),
+    [depositFees.rune]
+  )
 
   const minRuneAmountError = useMemo(() => {
     if (isZeroAmountToDeposit) return false

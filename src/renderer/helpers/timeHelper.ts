@@ -6,9 +6,11 @@ import * as O from 'fp-ts/Option'
  * @example roundUnixTimestampToMinutes(5)(345) === O.some(300)
  * @param roundBasis - basis in minutes to round-down to
  */
-export const roundUnixTimestampToMinutes = (roundBasis = 5) => (timeStamp?: number): O.Option<number> =>
-  FP.pipe(
-    timeStamp,
-    O.fromNullable,
-    O.map((timeStamp) => timeStamp - (timeStamp % (roundBasis * 60)))
-  )
+export const roundUnixTimestampToMinutes =
+  (roundBasis = 5) =>
+  (timeStamp?: number): O.Option<number> =>
+    FP.pipe(
+      timeStamp,
+      O.fromNullable,
+      O.map((timeStamp) => timeStamp - (timeStamp % (roundBasis * 60)))
+    )

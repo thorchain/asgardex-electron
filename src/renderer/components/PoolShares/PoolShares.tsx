@@ -131,11 +131,10 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
     [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn, manageColumn]
   )
 
-  const mobileColumns: ColumnsType<PoolShareTableRowData> = useMemo(() => [iconColumn, valueColumn, manageColumn], [
-    iconColumn,
-    valueColumn,
-    manageColumn
-  ])
+  const mobileColumns: ColumnsType<PoolShareTableRowData> = useMemo(
+    () => [iconColumn, valueColumn, manageColumn],
+    [iconColumn, valueColumn, manageColumn]
+  )
 
   const renderAnalyticsInfo = useMemo(() => {
     return network !== 'testnet' ? (

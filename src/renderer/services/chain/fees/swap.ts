@@ -28,9 +28,11 @@ export const getZeroSwapFees = ({ inAsset, outAsset }: { inAsset: Asset; outAsse
 })
 
 // state of `SwapFeesParams` used for reloading swap fees
-const { get$: updateSwapFeesParams$, get: updateSwapFeesParamsState, set: updateSwapFeesParams } = observableState<
-  O.Option<SwapFeesParams>
->(O.none)
+const {
+  get$: updateSwapFeesParams$,
+  get: updateSwapFeesParamsState,
+  set: updateSwapFeesParams
+} = observableState<O.Option<SwapFeesParams>>(O.none)
 
 // To trigger reload of swap fees
 const reloadSwapFees = (params: SwapFeesParams) => {

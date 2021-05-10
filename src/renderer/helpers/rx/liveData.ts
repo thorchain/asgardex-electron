@@ -43,7 +43,10 @@ export const liveData = {
   sequenceT: sequenceT(instanceLiveData),
   sequenceArray: array.sequence(instanceLiveData),
   combine: coproductMapLeft(instanceLiveData),
-  mapLeft: <L, V, A>(f: (l: L) => V) => (fla: LiveData<L, A>): LiveData<V, A> => fla.pipe(RxOp.map(RD.mapLeft(f))),
+  mapLeft:
+    <L, V, A>(f: (l: L) => V) =>
+    (fla: LiveData<L, A>): LiveData<V, A> =>
+      fla.pipe(RxOp.map(RD.mapLeft(f))),
   /**
    * LiveData<L,A> => Observable<Option<A>>
    */
@@ -53,19 +56,23 @@ export const liveData = {
    *  2. LiveData<L,A> => Observable<Option<A>>
    *
    */
-  toOptionMap$: <L, A, B>(fab: (fa: A) => B) => (fla: LiveData<L, A>): Observable<O.Option<B>> =>
-    fla.pipe(RxOp.map(RD.map(fab)), RxOp.map(RD.toOption)),
-  altOnError: <L, A>(f: (l: L) => A) => (fla: LiveData<L, A>): LiveData<L, A> =>
-    fla.pipe(
-      RxOp.map(
-        RD.fold(
-          () => RD.initial,
-          () => RD.pending,
-          (e) => RD.success(f(e)),
-          (val) => RD.success(val)
+  toOptionMap$:
+    <L, A, B>(fab: (fa: A) => B) =>
+    (fla: LiveData<L, A>): Observable<O.Option<B>> =>
+      fla.pipe(RxOp.map(RD.map(fab)), RxOp.map(RD.toOption)),
+  altOnError:
+    <L, A>(f: (l: L) => A) =>
+    (fla: LiveData<L, A>): LiveData<L, A> =>
+      fla.pipe(
+        RxOp.map(
+          RD.fold(
+            () => RD.initial,
+            () => RD.pending,
+            (e) => RD.success(f(e)),
+            (val) => RD.success(val)
+          )
         )
       )
-    )
 }
 
 export type LiveDataInnerType<T> = T extends LiveData<unknown, infer K> ? K : never

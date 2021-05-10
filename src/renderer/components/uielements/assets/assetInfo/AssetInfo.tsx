@@ -95,10 +95,10 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
     [walletInfo, oAsset]
   )
 
-  const addressControls = useMemo(() => renderAddress(<Styled.QrcodeOutlined onClick={() => setShowQrModal(true)} />), [
-    renderAddress,
-    setShowQrModal
-  ])
+  const addressControls = useMemo(
+    () => renderAddress(<Styled.QrcodeOutlined onClick={() => setShowQrModal(true)} />),
+    [renderAddress, setShowQrModal]
+  )
 
   const assetString = useMemo(
     () =>

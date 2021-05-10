@@ -17,14 +17,8 @@ import { subscribeTransfers, miniTickers$ } from './ws'
 
 const { txs$, tx$, txStatus$, subscribeTx, resetTx, txRD$, sendTx } = createTransactionService(client$)
 const { reloadFees, fees$ } = createFeesService({ client$, chain: BNBChain })
-const {
-  ledgerAddress$,
-  retrieveLedgerAddress,
-  removeLedgerAddress,
-  ledgerTxRD$,
-  pushLedgerTx,
-  resetLedgerTx
-} = createLedgerService()
+const { ledgerAddress$, retrieveLedgerAddress, removeLedgerAddress, ledgerTxRD$, pushLedgerTx, resetLedgerTx } =
+  createLedgerService()
 
 export {
   client$,

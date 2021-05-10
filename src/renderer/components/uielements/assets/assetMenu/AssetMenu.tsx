@@ -62,9 +62,10 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
     [network, onSelect, priceIndex]
   )
 
-  const disableItemFilterHandler = useCallback(({ asset }: WalletBalance) => searchDisable.indexOf(asset.ticker) > -1, [
-    searchDisable
-  ])
+  const disableItemFilterHandler = useCallback(
+    ({ asset }: WalletBalance) => searchDisable.indexOf(asset.ticker) > -1,
+    [searchDisable]
+  )
 
   return (
     <FilterMenu

@@ -18,7 +18,11 @@ import { poolTxStatusByChain$, sendTx$ } from './common'
  */
 export const transfer$: SendTxStateHandler = (params) => {
   // Observable state of `SendTxState`
-  const { get$: getState$, get: getState, set: setState } = observableState<SendTxState>({
+  const {
+    get$: getState$,
+    get: getState,
+    set: setState
+  } = observableState<SendTxState>({
     ...INITIAL_SEND_STATE,
     status: RD.pending,
     steps: { current: 1, total: 2 }

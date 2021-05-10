@@ -59,18 +59,19 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const previousAssetsTableData = useRef<Balances[]>([])
 
   const onRowHandler = useCallback(
-    (oWalletAddress: O.Option<Address>) => ({ asset }: Balance) => {
-      const onClick = FP.pipe(
-        oWalletAddress,
-        O.map((walletAddress) => () => selectAssetHandler(asset, walletAddress)),
-        // TODO(@Veado) Add error message / alert
-        O.getOrElse(() => () => console.error('Unknown address'))
-      )
+    (oWalletAddress: O.Option<Address>) =>
+      ({ asset }: Balance) => {
+        const onClick = FP.pipe(
+          oWalletAddress,
+          O.map((walletAddress) => () => selectAssetHandler(asset, walletAddress)),
+          // TODO(@Veado) Add error message / alert
+          O.getOrElse(() => () => console.error('Unknown address'))
+        )
 
-      return {
-        onClick
-      }
-    },
+        return {
+          onClick
+        }
+      },
     [selectAssetHandler]
   )
 

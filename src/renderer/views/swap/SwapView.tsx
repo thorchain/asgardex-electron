@@ -44,14 +44,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     pools: { poolsState$, reloadPools, selectedPoolAddress$, reloadInboundAddresses },
     setSelectedPoolAsset
   } = midgardService
-  const {
-    reloadSwapFees,
-    swapFees$,
-    getExplorerUrlByAsset$,
-    addressByChain$,
-    swap$,
-    assetWithDecimal$
-  } = useChainContext()
+  const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, addressByChain$, swap$, assetWithDecimal$ } =
+    useChainContext()
 
   const {
     balancesState$,
@@ -130,10 +124,10 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   )
   const targetWalletAddress = useObservableState(address$, O.none)
 
-  const getExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())), [
-    source,
-    getExplorerUrlByAsset$
-  ])
+  const getExplorerUrl$ = useMemo(
+    () => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())),
+    [source, getExplorerUrlByAsset$]
+  )
   const explorerUrl = useObservableState(getExplorerUrl$, O.none)
 
   const goToTransaction = useCallback(

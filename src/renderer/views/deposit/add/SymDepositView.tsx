@@ -72,13 +72,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
     }
   } = useMidgardContext()
 
-  const {
-    symDepositFees$,
-    symDeposit$,
-    reloadSymDepositFees,
-    symDepositTxMemo$,
-    getExplorerUrlByAsset$
-  } = useChainContext()
+  const { symDepositFees$, symDeposit$, reloadSymDepositFees, symDepositTxMemo$, getExplorerUrlByAsset$ } =
+    useChainContext()
 
   const [poolsDataRD] = useObservableState(
     () =>

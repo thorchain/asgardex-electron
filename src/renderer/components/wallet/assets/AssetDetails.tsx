@@ -99,18 +99,19 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [loadTxsHandler]
   )
 
-  const oRuneBnbAsset: O.Option<Asset> = useMemo(() => FP.pipe(asset, O.fromPredicate(AssetHelper.isRuneBnbAsset)), [
-    asset
-  ])
+  const oRuneBnbAsset: O.Option<Asset> = useMemo(
+    () => FP.pipe(asset, O.fromPredicate(AssetHelper.isRuneBnbAsset)),
+    [asset]
+  )
 
   const isRuneBnbAsset: boolean = useMemo(() => AssetHelper.isRuneBnbAsset(asset), [asset])
 
   const isRuneNativeAsset: boolean = useMemo(() => eqAsset.equals(asset, AssetRuneNative), [asset])
 
-  const oRuneBnbBalance: O.Option<WalletBalance> = useMemo(() => getWalletBalanceByAsset(oBalances, oRuneBnbAsset), [
-    oRuneBnbAsset,
-    oBalances
-  ])
+  const oRuneBnbBalance: O.Option<WalletBalance> = useMemo(
+    () => getWalletBalanceByAsset(oBalances, oRuneBnbAsset),
+    [oRuneBnbAsset, oBalances]
+  )
 
   const oRuneBnbAmount: O.Option<BaseAmount> = useMemo(
     () =>

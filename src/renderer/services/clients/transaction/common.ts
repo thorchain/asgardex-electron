@@ -40,9 +40,7 @@ export const loadTxs$ = ({
   ).pipe(
     RxOp.map(RD.success),
     RxOp.catchError((error) =>
-      Rx.of(
-        RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() })
-      )
+      Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() }))
     ),
     RxOp.startWith(RD.pending)
   )
@@ -63,9 +61,7 @@ export const loadTx$ = ({
   Rx.from(client.getTransactionData(txHash, O.toUndefined(assetAddress))).pipe(
     RxOp.map(RD.success),
     RxOp.catchError((error) =>
-      Rx.of(
-        RD.failure<ApiError>({ errorId: ErrorId.GET_TX, msg: error?.message ?? error.toString() })
-      )
+      Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_TX, msg: error?.message ?? error.toString() }))
     ),
     RxOp.startWith(RD.pending)
   )

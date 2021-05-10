@@ -5,9 +5,11 @@ import { CommonStorage } from '../../../shared/api/types'
 import { observableState } from '../../helpers/stateHelper'
 import { StoragePartialState, StorageState } from './types'
 
-const { get$: getStorageState$, get: getStorageState, set: setStorageState } = observableState<
-  StorageState<CommonStorage>
->(O.none)
+const {
+  get$: getStorageState$,
+  get: getStorageState,
+  set: setStorageState
+} = observableState<StorageState<CommonStorage>>(O.none)
 
 export const removeStorage = async () => {
   await window.apiCommonStorage.remove()

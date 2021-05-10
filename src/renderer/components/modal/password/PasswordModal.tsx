@@ -19,10 +19,10 @@ export type Props = {
 export const PasswordModal: React.FC<Props> = ({ onSuccess, onClose, validatePassword$ }) => {
   const [passwordToValidate, setPasswordToValidate] = useState('')
 
-  const passwordValidationResult$ = useMemo(() => validatePassword$(passwordToValidate), [
-    passwordToValidate,
-    validatePassword$
-  ])
+  const passwordValidationResult$ = useMemo(
+    () => validatePassword$(passwordToValidate),
+    [passwordToValidate, validatePassword$]
+  )
 
   const passwordValidationRD = useObservableState(passwordValidationResult$, RD.initial)
 

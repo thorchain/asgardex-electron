@@ -51,15 +51,18 @@ export const poolColumnMobile = (title: string): ColumnType<PoolTableRowData> =>
   render: renderPoolColumnMobile
 })
 
-const renderPriceColumn = (pricePoolAsset: Asset) => ({ poolPrice }: PoolTableRowData) => (
-  <Styled.Label align="right" nowrap>
-    {formatAssetAmountCurrency({
-      amount: baseToAsset(poolPrice),
-      asset: pricePoolAsset,
-      decimal: 3
-    })}
-  </Styled.Label>
-)
+const renderPriceColumn =
+  (pricePoolAsset: Asset) =>
+  ({ poolPrice }: PoolTableRowData) =>
+    (
+      <Styled.Label align="right" nowrap>
+        {formatAssetAmountCurrency({
+          amount: baseToAsset(poolPrice),
+          asset: pricePoolAsset,
+          decimal: 3
+        })}
+      </Styled.Label>
+    )
 
 const sortPriceColumn = (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.poolPrice, b.poolPrice)
 
@@ -72,15 +75,18 @@ export const priceColumn = (title: string, pricePoolAsset: Asset): ColumnType<Po
   sortDirections: ['descend', 'ascend']
 })
 
-const renderDepthColumn = (pricePoolAsset: Asset) => ({ depthPrice }: PoolTableRowData) => (
-  <Styled.Label align="right" nowrap>
-    {formatAssetAmountCurrency({
-      amount: baseToAsset(depthPrice),
-      asset: pricePoolAsset,
-      decimal: 2
-    })}
-  </Styled.Label>
-)
+const renderDepthColumn =
+  (pricePoolAsset: Asset) =>
+  ({ depthPrice }: PoolTableRowData) =>
+    (
+      <Styled.Label align="right" nowrap>
+        {formatAssetAmountCurrency({
+          amount: baseToAsset(depthPrice),
+          asset: pricePoolAsset,
+          decimal: 2
+        })}
+      </Styled.Label>
+    )
 
 export const depthColumn = (title: string, pricePoolAsset: Asset): ColumnType<PoolTableRowData> => ({
   key: 'depth',
@@ -99,9 +105,10 @@ export const renderRefreshBtnColTitle = (title: string, clickHandler: FP.Lazy<vo
   </Styled.ActionColumn>
 )
 
-export const renderTableError = (reloadBtnLabel: string, reloadBtnAction: FP.Lazy<void>) => (error: Error) => (
-  <ErrorView
-    title={error?.toString() ?? ''}
-    extra={<ReloadButton onClick={reloadBtnAction}>{reloadBtnLabel}</ReloadButton>}
-  />
-)
+export const renderTableError = (reloadBtnLabel: string, reloadBtnAction: FP.Lazy<void>) => (error: Error) =>
+  (
+    <ErrorView
+      title={error?.toString() ?? ''}
+      extra={<ReloadButton onClick={reloadBtnAction}>{reloadBtnLabel}</ReloadButton>}
+    />
+  )
