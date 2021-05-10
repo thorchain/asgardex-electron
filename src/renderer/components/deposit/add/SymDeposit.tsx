@@ -760,13 +760,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
     () =>
       FP.pipe(
         depositFeesRD,
-        RD.map(({ asset: assetFee, rune }) =>
-          // TODO (@Veado) Fix fee calculation
-          [
-            { asset: getChainAsset(asset.chain), amount: assetFee.inFee.plus(assetFee.outFee) },
-            { asset: AssetRuneNative, amount: rune.inFee.plus(rune.outFee) }
-          ]
-        )
+        RD.map(({ asset: assetFee, rune }) => [
+          { asset: getChainAsset(asset.chain), amount: assetFee.inFee.plus(assetFee.outFee) },
+          { asset: AssetRuneNative, amount: rune.inFee.plus(rune.outFee) }
+        ])
       ),
     [depositFeesRD, asset]
   )
@@ -916,31 +913,29 @@ export const SymDeposit: React.FC<Props> = (props) => {
       )}
       <Styled.CardsRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
-          <>
-            <Styled.AssetCard
-              disabled={disabledForm}
-              asset={asset}
-              selectedAmount={assetAmountToDepositMax1e8}
-              maxAmount={maxAssetAmountToDepositMax1e8}
-              onChangeAssetAmount={assetAmountChangeHandler}
-              inputOnFocusHandler={() => setSelectedInput('asset')}
-              inputOnBlurHandler={inputOnBlur}
-              price={assetPrice}
-              balances={balances}
-              percentValue={percentValueToDeposit}
-              onChangePercent={changePercentHandler}
-              onChangeAsset={onChangeAssetHandler}
-              priceAsset={priceAsset}
-              network={network}
-              onAfterSliderChange={onAfterSliderChangeHandler}
-              minAmountError={minAssetAmountError}
-              minAmountLabel={`${intl.formatMessage({ id: 'common.min' })}: ${formatAssetAmountCurrency({
-                asset,
-                amount: baseToAsset(minAssetAmountToDepositMax1e8),
-                trimZeros: true
-              })}`}
-            />
-          </>
+          <Styled.AssetCard
+            disabled={disabledForm}
+            asset={asset}
+            selectedAmount={assetAmountToDepositMax1e8}
+            maxAmount={maxAssetAmountToDepositMax1e8}
+            onChangeAssetAmount={assetAmountChangeHandler}
+            inputOnFocusHandler={() => setSelectedInput('asset')}
+            inputOnBlurHandler={inputOnBlur}
+            price={assetPrice}
+            balances={balances}
+            percentValue={percentValueToDeposit}
+            onChangePercent={changePercentHandler}
+            onChangeAsset={onChangeAssetHandler}
+            priceAsset={priceAsset}
+            network={network}
+            onAfterSliderChange={onAfterSliderChangeHandler}
+            minAmountError={minAssetAmountError}
+            minAmountLabel={`${intl.formatMessage({ id: 'common.min' })}: ${formatAssetAmountCurrency({
+              asset,
+              amount: baseToAsset(minAssetAmountToDepositMax1e8),
+              trimZeros: true
+            })}`}
+          />
         </Col>
 
         <Col xs={24} xl={12}>

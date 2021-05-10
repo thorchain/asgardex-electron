@@ -219,9 +219,9 @@ export const minAssetAmountToDepositMax1e8 = ({
       })
 
   const successDepositFee = inFeeInAsset.plus(outFeeInAsset)
-  const failureSwapFee = inFeeInAsset.plus(refundFeeInAsset)
+  const failureDepositFee = inFeeInAsset.plus(refundFeeInAsset)
 
-  const feeToCover: BaseAmount = successDepositFee.gte(failureSwapFee) ? successDepositFee : failureSwapFee
+  const feeToCover: BaseAmount = successDepositFee.gte(failureDepositFee) ? successDepositFee : failureDepositFee
 
   return FP.pipe(
     // Over-estimate fee by 50%
@@ -234,9 +234,9 @@ export const minAssetAmountToDepositMax1e8 = ({
 
 export const minRuneAmountToDeposit = ({ inFee, outFee, refundFee }: DepositFees): BaseAmount => {
   const successDepositFee = inFee.plus(outFee)
-  const failureSwapFee = inFee.plus(refundFee)
+  const failureDepositFee = inFee.plus(refundFee)
 
-  const feeToCover: BaseAmount = successDepositFee.gte(failureSwapFee) ? successDepositFee : failureSwapFee
+  const feeToCover: BaseAmount = successDepositFee.gte(failureDepositFee) ? successDepositFee : failureDepositFee
 
   return FP.pipe(
     // Over-estimate fee by 50%

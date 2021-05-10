@@ -128,7 +128,6 @@ export type SwapOutTx = {
 
 export type PoolFeeLD = LiveData<Error, AssetWithAmount>
 
-// TODO (@Veado) Use `AssetWithAmount`
 export type SwapFees = {
   /** Inbound tx fee */
   readonly inFee: AssetWithAmount

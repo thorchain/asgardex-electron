@@ -60,9 +60,6 @@ import {
   PoolAddresses,
   InboundAddresses,
   GasRateLD,
-  PoolDetails,
-  PoolAssetDetails,
-  PoolAssets,
   PoolsState
 } from './types'
 import {
@@ -327,8 +324,8 @@ const createPoolsService = (
       Rx.combineLatest([poolAssets$, assetDetails$, poolDetails$, pricePools$]),
       RxOp.map((state) => RD.combine(...state)),
       RxOp.map(
-        RD.map<[PoolAssets, PoolAssetDetails, PoolDetails, O.Option<PricePools>], PoolsState>(
-          ([poolAssets, assetDetails, poolDetails, pricePools]) => {
+        RD.map(
+          ([poolAssets, assetDetails, poolDetails, pricePools]): PoolsState => {
             const prevAsset = getSelectedPricePoolAsset()
             const nullablePricePools = O.toNullable(pricePools)
             if (nullablePricePools) {
