@@ -112,26 +112,11 @@ export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<Pool
   )
 
 /**
- * Converts PoolDetails to the appropriate HashMap
+ * Converts `PoolDetails` to `PoolsDataMap`
  * Keys of the end HasMap is PoolDetails[i].asset
  */
-export const getPoolDetailsHashMap = (poolDetails: PoolDetails, runeAsset: Asset): PoolsDataMap => {
-  const res = poolDetails.reduce<PoolsDataMap>((acc, cur) => {
-    if (!cur.asset) {
-      return acc
-    }
-
-    return { ...acc, [cur.asset]: toPoolData(cur) }
-  }, {})
-
-  const runePricePool = RUNE_PRICE_POOL
-
-  res[assetToString(runeAsset)] = {
-    ...runePricePool.poolData
-  }
-
-  return res
-}
+export const toPoolsData = (poolDetails: Array<Pick<PoolDetail, 'asset' | 'assetDepth' | 'runeDepth'>>): PoolsDataMap =>
+  poolDetails.reduce<PoolsDataMap>((acc, cur) => ({ ...acc, [cur.asset]: toPoolData(cur) }), {})
 
 /**
  * Helper to get PoolData of BUSD pool

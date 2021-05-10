@@ -8,7 +8,6 @@ import {
   assetToString,
   baseToAsset,
   BaseAmount,
-  AssetRuneNative,
   baseAmount,
   formatAssetAmount,
   formatAssetAmountCurrency,
@@ -52,14 +51,11 @@ import {
   SwapFeesHandler,
   ReloadSwapFeesHandler,
   SwapFeesRD,
-  SwapFeesParams,
   SwapFees,
   FeeRD
 } from '../../services/chain/types'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
-import { PoolDetails } from '../../services/midgard/types'
-import { getPoolDetailsHashMap } from '../../services/midgard/utils'
 import {
   ApiError,
   KeystoreState,
@@ -90,7 +86,7 @@ export type SwapProps = {
   assets: { inAsset: AssetWithDecimal; outAsset: AssetWithDecimal }
   poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
-  poolDetails: PoolDetails
+  poolsData: PoolsDataMap
   walletBalances: O.Option<NonEmptyWalletBalances>
   goToTransaction: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
@@ -113,7 +109,7 @@ export const Swap = ({
   assets: { inAsset: sourceAssetWD, outAsset: targetAssetWD },
   poolAddress: oPoolAddress,
   swap$,
-  poolDetails,
+  poolsData,
   walletBalances,
   goToTransaction = (_) => {},
   validatePassword$,
@@ -138,9 +134,6 @@ export const Swap = ({
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
-
-  // convert to hash map here instead of using getPoolDetail
-  const poolsData: PoolsDataMap = useMemo(() => getPoolDetailsHashMap(poolDetails, AssetRuneNative), [poolDetails])
 
   const oSourcePoolAsset: O.Option<PoolAssetDetail> = useMemo(
     () => Utils.pickPoolAsset(availableAssets, sourceAssetProp),
@@ -253,15 +246,6 @@ export const Swap = ({
     return max1e8BaseAmount(swapResultAmount)
   }, [swapData.swapResult, targetAssetDecimal])
 
-  const swapFeesParams: SwapFeesParams = useMemo(
-    () => ({
-      inAsset: sourceAssetProp,
-      outAsset: targetAssetProp,
-      inAmount: amountToSwapMax1e8
-    }),
-    [amountToSwapMax1e8, sourceAssetProp, targetAssetProp]
-  )
-
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     return FP.pipe(
       sequenceTOption(
@@ -288,8 +272,10 @@ export const Swap = ({
 
   const [swapFeesRD] = useObservableState<SwapFeesRD>(() => {
     return FP.pipe(
-      swapFeesParams,
-      fees$,
+      fees$({
+        inAsset: sourceAssetProp,
+        outAsset: targetAssetProp
+      }),
       liveData.map((chainFees) => {
         // store every successfully loaded chainFees to the ref value
         prevChainFees.current = O.some(chainFees)
@@ -298,9 +284,23 @@ export const Swap = ({
     )
   }, RD.success(zeroSwapFees))
 
+  const swapFees: SwapFees = useMemo(
+    () =>
+      FP.pipe(
+        swapFeesRD,
+        RD.toOption,
+        O.alt(() => prevChainFees.current),
+        O.getOrElse(() => zeroSwapFees)
+      ),
+    [swapFeesRD, zeroSwapFees]
+  )
+
   const reloadFeesHandler = useCallback(() => {
-    reloadFees(swapFeesParams)
-  }, [swapFeesParams, reloadFees])
+    reloadFees({
+      inAsset: sourceAssetProp,
+      outAsset: targetAssetProp
+    })
+  }, [reloadFees, sourceAssetProp, targetAssetProp])
 
   const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
     (oApproveFeeParam$) => {
@@ -362,29 +362,16 @@ export const Swap = ({
     [onChangePath, oSourceAsset]
   )
 
-  const prevMinAmountToSwapMax1e8 = useRef<O.Option<BaseAmount>>(O.none)
-
   const minAmountToSwapMax1e8: BaseAmount = useMemo(
     () =>
-      FP.pipe(
-        RD.toOption(swapFeesRD),
-        O.map((swapFees) =>
-          Utils.minAmountToSwapMax1e8({
-            swapFees,
-            inAsset: sourceAssetProp,
-            inAssetDecimal: sourceAssetDecimal,
-            outAsset: targetAssetProp,
-            poolsData
-          })
-        ),
-        O.map((minAmount) => {
-          prevMinAmountToSwapMax1e8.current = O.some(minAmount)
-          return minAmount
-        }),
-
-        O.getOrElse(() => ZERO_BASE_AMOUNT)
-      ),
-    [poolsData, sourceAssetDecimal, sourceAssetProp, swapFeesRD, targetAssetProp]
+      Utils.minAmountToSwapMax1e8({
+        swapFees,
+        inAsset: sourceAssetProp,
+        inAssetDecimal: sourceAssetDecimal,
+        outAsset: targetAssetProp,
+        poolsData
+      }),
+    [poolsData, sourceAssetDecimal, sourceAssetProp, swapFees, targetAssetProp]
   )
 
   const minAmountError = useMemo(() => {
@@ -696,51 +683,44 @@ export const Swap = ({
     // ignore error check by having zero amounts or min amount errors
     if (isZeroAmountToSwap || minAmountError) return false
 
-    return FP.pipe(
-      swapFeesRD,
-      RD.getOrElse(() => zeroSwapFees),
-      (swapFees) => Utils.minBalanceToSwap(swapFees).gt(sourceChainAssetAmount)
-    )
-  }, [isZeroAmountToSwap, minAmountError, swapFeesRD, zeroSwapFees, sourceChainAssetAmount])
+    return Utils.minBalanceToSwap(swapFees).gt(sourceChainAssetAmount)
+  }, [isZeroAmountToSwap, minAmountError, swapFees, sourceChainAssetAmount])
 
   const sourceChainFeeErrorLabel: JSX.Element = useMemo(() => {
     if (!sourceChainFeeError) {
       return <></>
     }
 
-    return FP.pipe(
-      RD.toOption(swapFeesRD),
-      O.map(({ inFee }) => (
-        <Styled.FeeErrorLabel key="sourceChainErrorLabel">
-          {intl.formatMessage(
-            { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
-            {
-              balance: formatAssetAmountCurrency({
-                asset: sourceAssetProp,
-                amount: baseToAsset(sourceAssetAmount),
-                trimZeros: true
-              }),
-              fee: formatAssetAmountCurrency({
-                asset: inFee.asset,
-                trimZeros: true,
-                amount: baseToAsset(inFee.amount)
-              })
-            }
-          )}
-        </Styled.FeeErrorLabel>
-      )),
-      O.getOrElse(() => <></>)
+    const {
+      inFee: { amount: inFeeAmount, asset: inFeeAsset }
+    } = swapFees
+
+    return (
+      <Styled.FeeErrorLabel key="sourceChainErrorLabel">
+        {intl.formatMessage(
+          { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
+          {
+            balance: formatAssetAmountCurrency({
+              asset: sourceAssetProp,
+              amount: baseToAsset(sourceAssetAmount),
+              trimZeros: true
+            }),
+            fee: formatAssetAmountCurrency({
+              asset: inFeeAsset,
+              trimZeros: true,
+              amount: baseToAsset(inFeeAmount)
+            })
+          }
+        )}
+      </Styled.FeeErrorLabel>
     )
-  }, [sourceChainFeeError, swapFeesRD, intl, sourceAssetProp, sourceAssetAmount])
+  }, [sourceChainFeeError, swapFees, intl, sourceAssetProp, sourceAssetAmount])
 
   // Helper to price target fees into source asset
   const outFeeInTargetAsset: BaseAmount = useMemo(() => {
     const {
       outFee: { amount: outFeeAmount, asset: outFeeAsset }
-    }: SwapFees = FP.pipe(
-      swapFeesRD,
-      RD.getOrElse(() => zeroSwapFees)
-    )
+    } = swapFees
 
     // no pricing if target asset === target fee asset
     if (eqAsset.equals(targetAssetProp, outFeeAsset)) return outFeeAmount
@@ -758,7 +738,7 @@ export const Swap = ({
           getValueOfAsset1InAsset2(to1e8BaseAmount(outFeeAmount), targetFeeAssetPoolData, targetAssetPoolData)
       )
     )
-  }, [swapFeesRD, targetAssetProp, poolsData, zeroSwapFees])
+  }, [swapFees, targetAssetProp, poolsData])
 
   const swapResultLabel = useMemo(
     () => formatAssetAmount({ amount: baseToAsset(swapResultAmountMax1e8), trimZeros: true }),
@@ -981,7 +961,7 @@ export const Swap = ({
               onBlur={() => reloadFeesHandler()}
               amount={amountToSwapMax1e8}
               maxAmount={maxAmountToSwapMax1e8}
-              hasError={sourceChainFeeError || minAmountError}
+              hasError={minAmountError}
               asset={sourceAssetProp}
               disabled={unlockedWallet}
             />

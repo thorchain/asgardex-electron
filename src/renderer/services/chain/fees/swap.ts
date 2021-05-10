@@ -32,7 +32,7 @@ const { get$: updateSwapFeesParams$, get: updateSwapFeesParamsState, set: update
   O.Option<SwapFeesParams>
 >(O.none)
 
-// To trigger reloading of swap fees accept `none` option values of `SwapFeesParams` only
+// To trigger reload of swap fees
 const reloadSwapFees = (params: SwapFeesParams) => {
   const { inAsset, outAsset } = params
 

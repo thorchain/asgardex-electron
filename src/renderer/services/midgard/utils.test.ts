@@ -37,7 +37,7 @@ import {
   getPoolDetail,
   toPoolData,
   filterPoolAssets,
-  getPoolDetailsHashMap,
+  toPoolsData,
   getPoolAddressesByChain,
   combineShares,
   combineSharesByAsset,
@@ -151,12 +151,13 @@ describe('services/midgard/utils/', () => {
     const btc: PricePool = { asset: AssetBTC, poolData }
     const rune: PricePool = RUNE_PRICE_POOL
     const mockPoolsStateSuccess = (pricePools: PricePools): PoolsStateRD =>
-      RD.success({
+      RD.success<PoolsState>({
         assetDetails: [],
         poolAssets: [],
         poolDetails: [],
-        pricePools: O.some(pricePools)
-      } as PoolsState)
+        pricePools: O.some(pricePools),
+        poolsData: {}
+      })
 
     it('selects ETH pool', () => {
       const poolsRD = mockPoolsStateSuccess([rune, eth, BUSDBAF, btc])
@@ -213,7 +214,7 @@ describe('services/midgard/utils/', () => {
     const bnbDetail = { asset: assetToString(AssetBNB) } as PoolDetail
 
     it('returns hashMap of pool details', () => {
-      const result = getPoolDetailsHashMap([runeDetail, bnbDetail], AssetRuneNative)
+      const result = toPoolsData([runeDetail, bnbDetail])
 
       /**
        * Compare stringified structures 'cause

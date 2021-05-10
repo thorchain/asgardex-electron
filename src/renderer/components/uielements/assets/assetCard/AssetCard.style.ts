@@ -24,12 +24,12 @@ export const AssetCardWrapper = styled.div`
   }
 `
 
-export const CardBorderWrapper = styled.div`
+export const CardBorderWrapper = styled.div<{ error: boolean }>`
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
-
-  border: 1px solid ${palette('gray', 0)};
+  border: 1px solid;
+  border-color: ${({ error }) => (error ? palette('error', 0) : palette('gray', 0))};
   border-radius: 3px;
   background-color: ${palette('background', 1)};
 
@@ -67,6 +67,11 @@ export const FooterLabel = styled(Label).attrs({
 })`
   letter-spacing: 0.4px;
   padding: 0;
+`
+
+export const MinAmountLabel = styled(Label)`
+  padding-top: 0;
+  text-transform: uppercase;
 `
 
 export const AssetSelect = styled(BaseAssetSelect)`

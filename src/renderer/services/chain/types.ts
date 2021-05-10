@@ -7,6 +7,7 @@ import * as Rx from 'rxjs'
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithDecimal } from '../../types/asgardex'
+import { AssetWithAmount } from '../../types/asgardex'
 import { PoolAddress } from '../midgard/types'
 import { ApiError, TxHashRD } from '../wallet/types'
 
@@ -31,20 +32,28 @@ export type MemoRx = Rx.Observable<O.Option<Memo>>
 export type SymDepositMemo = { rune: Memo; asset: Memo }
 export type SymDepositMemoRx = Rx.Observable<O.Option<SymDepositMemo>>
 
+export type DepositFees = { inFee: BaseAmount; outFee: BaseAmount; refundFee: BaseAmount }
+export type DepositAssetFees = DepositFees & { asset: Asset }
 /**
- * Deposit fees
-
- * One fee (asymmetrical deposit) or two fees (symmetrical deposit):
+ * Sym. deposit fees
  *
- * thor: Fee for transaction on Thorchain. Needed for sym deposit txs. It's `O.none` for asym deposit txs
- * asset: Fee for transaction on asset chain
  */
-export type DepositFees = { thor: O.Option<BaseAmount>; asset: BaseAmount }
-export type DepositFeesRD = RD.RemoteData<Error, DepositFees>
-export type DepositFeesLD = LiveData<Error, DepositFees>
+export type SymDepositFees = {
+  /** fee for RUNE txs */
+  readonly rune: DepositFees
+  /** fee for asset txs */
+  readonly asset: DepositAssetFees
+}
 
-export type SymDepositFeesHandler = (params: O.Option<SymDepositParams>) => DepositFeesLD
-export type ReloadSymDepositFeesHandler = (params: O.Option<SymDepositParams>) => void
+export type SymDepositFeesRD = RD.RemoteData<Error, SymDepositFees>
+export type SymDepositFeesLD = LiveData<Error, SymDepositFees>
+
+export type SymDepositFeesParams = {
+  readonly asset: Asset
+}
+
+export type SymDepositFeesHandler = (asset: Asset) => SymDepositFeesLD
+export type ReloadSymDepositFeesHandler = (asset: Asset) => void
 
 export type AsymDepositParams = {
   readonly poolAddress: PoolAddress
@@ -117,20 +126,13 @@ export type SwapOutTx = {
   readonly memo: Memo
 }
 
-export type SwapFee = {
-  /** fee amount */
-  readonly amount: BaseAmount
-  /** Asset, which fee is related to */
-  readonly asset: Asset
-}
-
-export type SwapFeeLD = LiveData<Error, SwapFee>
+export type PoolFeeLD = LiveData<Error, AssetWithAmount>
 
 export type SwapFees = {
   /** Inbound tx fee */
-  readonly inFee: SwapFee
+  readonly inFee: AssetWithAmount
   /** Outbound tx fee */
-  readonly outFee: SwapFee
+  readonly outFee: AssetWithAmount
 }
 
 export type SwapFeesRD = RD.RemoteData<Error, SwapFees>

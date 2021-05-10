@@ -6,7 +6,7 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
 import { FeeOptionKeys } from '../const'
-import { SwapFeeLD } from '../types'
+import { PoolFeeLD } from '../types'
 import { getChainFeeByGasRate } from './utils'
 
 const {
@@ -16,7 +16,7 @@ const {
 /**
  * Fees for swap txs
  */
-export const poolFee$ = (asset: Asset): SwapFeeLD => {
+export const poolFee$ = (asset: Asset): PoolFeeLD => {
   // special case for RUNE
   if (isRuneNativeAsset(asset)) {
     return FP.pipe(

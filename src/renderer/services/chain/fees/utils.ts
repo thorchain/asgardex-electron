@@ -15,7 +15,7 @@ import {
   isLtcAsset
 } from '../../../helpers/assetHelper'
 import { isBnbChain } from '../../../helpers/chainHelper'
-import { SwapFee } from '../types'
+import { AssetWithAmount } from '../../../types/asgardex'
 
 /**
  *
@@ -24,7 +24,13 @@ import { SwapFee } from '../types'
  * Formulas based on "Better Fees Handling #1381"
  * @see https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
  */
-export const getChainFeeByGasRate = ({ gasRate, asset }: { gasRate: BigNumber; asset: Asset }): O.Option<SwapFee> => {
+export const getChainFeeByGasRate = ({
+  gasRate,
+  asset
+}: {
+  gasRate: BigNumber
+  asset: Asset
+}): O.Option<AssetWithAmount> => {
   const gasRateGwei = gasRate.multipliedBy(10 ** 9)
 
   if (isBnbChain(asset.chain)) {

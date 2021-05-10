@@ -22,9 +22,9 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
+import { liveData } from '../../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets } from '../../../helpers/walletHelper'
 import { FundsCap, useFundsCap } from '../../../hooks/useFundsCap'
-import { usePricePools } from '../../../hooks/usePricePools'
 import * as poolsRoutes from '../../../routes/pools'
 import { SymDepositMemo } from '../../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../../services/const'
@@ -47,6 +47,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
   const intl = useIntl()
 
   const { network$ } = useAppContext()
+
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const onChangeAsset = useCallback(
@@ -64,7 +65,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
         selectedPricePoolAsset$,
         reloadSelectedPoolDetail,
         selectedPoolAddress$,
-        reloadInboundAddresses
+        reloadInboundAddresses,
+        poolsState$
       },
       shares: { reloadShares }
     }
@@ -78,6 +80,15 @@ export const SymDepositView: React.FC<Props> = (props) => {
     getExplorerUrlByAsset$
   } = useChainContext()
 
+  const [poolsDataRD] = useObservableState(
+    () =>
+      FP.pipe(
+        poolsState$,
+        liveData.map(({ poolsData }) => poolsData)
+      ),
+    RD.initial
+  )
+
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
   const {
@@ -88,11 +99,9 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const { data: fundsCapRD } = useFundsCap()
 
-  const { usdPricePool } = usePricePools()
-
   const { approveERC20Token$, isApprovedERC20Token$, approveFee$, reloadApproveFee } = useEthereumContext()
 
-  // reload inbound addresses at `onMount` to get always latest `pool address`
+  // reload inbound addresses at `onMount` to get always latest `pool address` + `feeRates`
   useEffect(() => {
     reloadInboundAddresses()
   }, [reloadInboundAddresses])
@@ -222,7 +231,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           isApprovedERC20Token$={isApprovedERC20Token$}
           balances={[]}
           fundsCap={O.none}
-          usdPricePool={O.none}
+          poolsData={{}}
         />
       </>
     ),
@@ -246,12 +255,12 @@ export const SymDepositView: React.FC<Props> = (props) => {
   )
 
   return FP.pipe(
-    sequenceTRD(assetPriceRD, poolAssetsRD, poolDetailRD),
+    sequenceTRD(assetPriceRD, poolAssetsRD, poolDetailRD, poolsDataRD),
     RD.fold(
       renderDisabledAddDeposit,
       (_) => renderDisabledAddDeposit(),
       (error) => renderDisabledAddDeposit(error),
-      ([assetPrice, poolAssets, poolDetail]) => {
+      ([assetPrice, poolAssets, poolDetail, poolsData]) => {
         const filteredBalances = FP.pipe(
           walletBalances,
           O.map((balances) => filterWalletBalancesByAssets(balances, poolAssets)),
@@ -288,7 +297,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
               approveERC20Token$={approveERC20Token$}
               isApprovedERC20Token$={isApprovedERC20Token$}
               fundsCap={fundsCap}
-              usdPricePool={usdPricePool}
+              poolsData={poolsData}
             />
           </>
         )

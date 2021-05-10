@@ -59,7 +59,8 @@ import {
   InboundAddressesLD,
   PoolAddresses,
   InboundAddresses,
-  GasRateLD
+  GasRateLD,
+  PoolsState
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -68,7 +69,8 @@ import {
   pricePoolSelector,
   pricePoolSelectorFromRD,
   inboundToPoolAddresses,
-  getGasRateByChain
+  getGasRateByChain,
+  toPoolsData
 } from './utils'
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
@@ -158,7 +160,7 @@ const createPoolsService = (
    *
    * If status is not set (or undefined), `PoolDetails` of all Pools will be loaded
    */
-  const apiGetPoolsByStatus$ = (status?: GetPoolsStatusEnum) => {
+  const apiGetPoolsByStatus$ = (status?: GetPoolsStatusEnum): PoolDetailsLD => {
     switch (status) {
       case GetPoolsStatusEnum.Available:
         return apiGetPoolsEnabled$
@@ -202,7 +204,7 @@ const createPoolsService = (
     )
 
   /**
-   * `PoolDetails` data from Midgard
+   * `PoolDetails` data by given `GetPoolsStatusEnum`
    */
   const apiGetPoolDetails$: (assetOrAssets: string | string[], status?: GetPoolsStatusEnum) => PoolDetailsLD = (
     assetOrAssets,
@@ -322,20 +324,26 @@ const createPoolsService = (
       Rx.combineLatest([poolAssets$, assetDetails$, poolDetails$, pricePools$]),
       RxOp.map((state) => RD.combine(...state)),
       RxOp.map(
-        RD.map(([poolAssets, assetDetails, poolDetails, pricePools]) => {
-          const prevAsset = getSelectedPricePoolAsset()
-          const nullablePricePools = O.toNullable(pricePools)
-          if (nullablePricePools) {
-            const selectedPricePool = pricePoolSelector(nullablePricePools, prevAsset)
-            setSelectedPricePoolAsset(selectedPricePool.asset)
+        RD.map(
+          ([poolAssets, assetDetails, poolDetails, pricePools]): PoolsState => {
+            const prevAsset = getSelectedPricePoolAsset()
+            const nullablePricePools = O.toNullable(pricePools)
+            if (nullablePricePools) {
+              const selectedPricePool = pricePoolSelector(nullablePricePools, prevAsset)
+              setSelectedPricePoolAsset(selectedPricePool.asset)
+            }
+            // Provide `PoolData` map (needed for pricing)
+            const poolsData = toPoolsData(poolDetails)
+
+            return {
+              poolAssets,
+              assetDetails,
+              poolsData,
+              poolDetails,
+              pricePools
+            }
           }
-          return {
-            poolAssets,
-            assetDetails,
-            poolDetails,
-            pricePools
-          }
-        })
+        )
       ),
       RxOp.startWith(RD.pending),
       RxOp.catchError((error: Error) => Rx.of(RD.failure(error)))

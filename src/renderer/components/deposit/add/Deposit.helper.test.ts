@@ -1,10 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { baseAmount } from '@xchainjs/xchain-util'
+import { AssetBNB, baseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
-import { eqBaseAmount, eqOptionBaseAmount } from '../../../helpers/fp/eq'
-import { DepositFeesRD } from '../../../services/chain/types'
+import { eqBaseAmount, eqODepositAssetFees, eqODepositFees } from '../../../helpers/fp/eq'
+import { DepositAssetFees, DepositFees, SymDepositFeesRD } from '../../../services/chain/types'
 import {
   getAssetAmountToDeposit,
   getRuneAmountToDeposit,
@@ -80,26 +80,28 @@ describe('deposit/Deposit.helper', () => {
   })
 
   describe('fees getters', () => {
-    const depositFeesRD: DepositFeesRD = RD.success({
-      thor: O.some(baseAmount(100)),
-      asset: baseAmount(123)
+    const runeFee: DepositFees = { inFee: baseAmount(10), outFee: baseAmount(11), refundFee: baseAmount(12) }
+    const assetFee: DepositAssetFees = {
+      inFee: baseAmount(20),
+      outFee: baseAmount(21),
+      refundFee: baseAmount(22),
+      asset: AssetBNB
+    }
+    const feesRD: SymDepositFeesRD = RD.success({
+      rune: runeFee,
+      asset: assetFee
     })
 
     it('should return chain fees', () => {
-      expect(eqOptionBaseAmount.equals(getAssetChainFee(depositFeesRD), O.some(baseAmount(123)))).toBeTruthy()
+      const result = getAssetChainFee(feesRD)
+      const expected = O.some(assetFee)
+      expect(eqODepositAssetFees.equals(result, expected)).toBeTruthy()
     })
 
     it('should return ThorChain fees', () => {
-      expect(eqOptionBaseAmount.equals(getThorchainFees(depositFeesRD), O.some(baseAmount(100)))).toBeTruthy()
-
-      expect(
-        getThorchainFees(
-          RD.success({
-            thor: O.none,
-            asset: baseAmount(123)
-          })
-        )
-      ).toBeNone()
+      const result = getThorchainFees(feesRD)
+      const expected = O.some(runeFee)
+      expect(eqODepositFees.equals(result, expected)).toBeTruthy()
     })
   })
 })

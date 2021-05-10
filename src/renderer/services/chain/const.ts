@@ -1,8 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOptionKey } from '@xchainjs/xchain-client'
-import * as O from 'fp-ts/lib/Option'
 
-import { ZERO_BASE_AMOUNT } from '../../const'
 import {
   AsymDepositState,
   SwapState,
@@ -10,8 +8,7 @@ import {
   WithdrawState,
   UpgradeRuneTxState,
   SendTxState,
-  TxTypes,
-  DepositFees
+  TxTypes
 } from './types'
 
 export const MAX_SWAP_STEPS = 3
@@ -46,8 +43,6 @@ export const INITIAL_SYM_DEPOSIT_STATE: SymDepositState = {
   depositTxs: { rune: RD.initial, asset: RD.initial },
   deposit: RD.initial
 }
-
-export const ZERO_SYM_DEPOSIT_FEES: DepositFees = { thor: O.some(ZERO_BASE_AMOUNT), asset: ZERO_BASE_AMOUNT }
 
 export const INITIAL_WITHDRAW_STATE: WithdrawState = {
   step: 1,

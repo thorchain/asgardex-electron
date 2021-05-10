@@ -49,6 +49,8 @@ export type Props = {
   disabled?: boolean
   network: Network
   onAfterSliderChange?: (value: number) => void
+  minAmountError?: boolean
+  minAmountLabel?: string
 }
 
 export const AssetCard: React.FC<Props> = (props): JSX.Element => {
@@ -73,7 +75,9 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     maxAmount,
     disabled,
     network,
-    onAfterSliderChange
+    onAfterSliderChange,
+    minAmountError = false,
+    minAmountLabel = ''
   } = props
 
   const [openDropdown, setOpenDropdown] = useState(false)
@@ -148,7 +152,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
       {!!title && <Label className="title-label">{title}</Label>}
 
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
-        <Styled.CardBorderWrapper>
+        <Styled.CardBorderWrapper error={minAmountError}>
           <Styled.AssetLabel asset={asset} />
           <Styled.CardTopRow>
             <Styled.AssetSelect
@@ -179,6 +183,9 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
           </Styled.CardTopRow>
         </Styled.CardBorderWrapper>
       </Dropdown>
+      {minAmountLabel && (
+        <Styled.MinAmountLabel color={minAmountError ? 'error' : 'normal'}>{minAmountLabel}</Styled.MinAmountLabel>
+      )}
       {withPercentSlider && (
         <Styled.SliderWrapper>
           <Slider
