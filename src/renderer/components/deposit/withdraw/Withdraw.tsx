@@ -128,7 +128,6 @@ export const Withdraw: React.FC<Props> = ({
     () =>
       FP.pipe(
         fees$(AssetRuneNative),
-        // RxOp.map((v) => v),
         liveData.map((fees) => {
           // store every successfully loaded fees
           prevWithdrawFees.current = O.some(fees)
@@ -336,7 +335,7 @@ export const Withdraw: React.FC<Props> = ({
         key={'asset amount slider'}
         value={withdrawPercent}
         onChange={setWithdrawPercent}
-        onAfterChange={() => reloadFeesHandler()}
+        onAfterChange={reloadFeesHandler}
         disabled={disabled}
       />
       <Label weight={'bold'} textTransform={'uppercase'}>

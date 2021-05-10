@@ -67,6 +67,12 @@ const withdrawFee$: WithdrawFeesHandler = (initialAsset) =>
         liveData.map(({ asset: feeAsset, amount: feeAmount }) => ({
           asset: feeAsset,
           inFee: feeAmount,
+          // outbound fee is 3x inbound fee
+          // see "ADD: Better Fees Handling #1381" (search for OutboundFee):
+          // Check issue description
+          // https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
+          // and following comment
+          // https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
           outFee: feeAmount.times(3)
         }))
       )
