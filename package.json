@@ -156,7 +156,7 @@
     "lint-staged": "^11.0.0",
     "node-abi": "^2.26.0",
     "nodemon": "^2.0.7",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.0",
     "source-map-explorer": "^2.5.2",
     "testcafe": "^1.14.0",
     "testcafe-browser-provider-electron": "^0.0.16",
