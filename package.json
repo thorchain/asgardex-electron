@@ -96,7 +96,7 @@
     "ethers": "^5.1.4",
     "fp-ts": "^2.10.5",
     "fp-ts-rxjs": "^0.6.15",
-    "fs-extra": "^9.1.0",
+    "fs-extra": "^10.0.0",
     "lodash.shuffle": "^4.2.0",
     "observable-hooks": "^4.0.3",
     "qrcode": "^1.4.4",
