@@ -251,7 +251,7 @@ describe('deposit/Deposit.helper', () => {
   })
 
   describe('minRuneAmountToDeposit', () => {
-    it.only('deposit RUNE', () => {
+    it('deposit RUNE', () => {
       const fees: DepositFees = {
         inFee: assetToBase(assetAmount(0.02, THORCHAIN_DECIMAL)),
         outFee: assetToBase(assetAmount(0.06, THORCHAIN_DECIMAL)),

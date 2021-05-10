@@ -546,7 +546,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [isZeroAmountToDeposit, oRuneBalance, depositFees.rune])
 
   const renderThorchainFeeError = useMemo(() => {
-    if (!isThorchainFeeError || isBalanceError /* Don't render anything in case of balance errors */) return <></>
+    if (!isThorchainFeeError || isBalanceError /* Don't render anything in case of fees or balance errors */)
+      return <></>
 
     return renderFeeError(Helper.minBalanceToDeposit(depositFees.rune), runeBalance, AssetRuneNative)
   }, [depositFees.rune, isBalanceError, isThorchainFeeError, renderFeeError, runeBalance])
@@ -565,7 +566,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [isZeroAmountToDeposit, oChainAssetBalance, depositFees.asset])
 
   const renderAssetChainFeeError = useMemo(() => {
-    if (!isAssetChainFeeError || isBalanceError /* Don't render anything in case of balance errors */) return <></>
+    if (!isAssetChainFeeError || isBalanceError /* Don't render anything in case of fees or balance errors */)
+      return <></>
 
     return renderFeeError(Helper.minBalanceToDeposit(depositFees.asset), chainAssetBalance, asset)
   }, [isAssetChainFeeError, isBalanceError, renderFeeError, depositFees.asset, chainAssetBalance, asset])
