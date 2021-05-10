@@ -1,0 +1,6 @@
+# git-blame ignored revisions
+# Requires Git > 2.23
+# See https://git-scm.com/docs/git-blame#Documentation/git-blame.txt---ignore-revs-fileltfilegt
+
+# Prettier bump after release 2.3.0
+a7f35e28e85df0874faf2c0732f52dcdcd98e20b

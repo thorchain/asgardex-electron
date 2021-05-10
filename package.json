@@ -15,7 +15,7 @@
     "package": "yarn build && yarn package:electron",
     "package:electron": "electron-builder build -c.extraMetadata.main=build/electron.js --config .electronbuildrc",
     "package:ci": "yarn postinstall && yarn build && yarn package:electron --publish always",
-    "postinstall": "node scripts/fix.sr25519.js && electron-builder install-app-deps",
+    "postinstall": "git config blame.ignoreRevsFile .git-blame-ignore-revs && node scripts/fix.sr25519.js && electron-builder install-app-deps",
     "lint": "eslint \"{src,e2e,}/**/*.{ts,tsx}\" --fix",
     "_test:e2e": "yarn build && yarn test:cafe",
     "test:cafe": "cross-env NODE_ENV=production testcafe electron:./ ./e2e/**/*.e2e.ts",
