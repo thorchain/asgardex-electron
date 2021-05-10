@@ -8,7 +8,7 @@ import {
   reloadAsymDepositFee,
   asymDepositFee$,
   withdrawFee$,
-  reloadWithdrawFee,
+  reloadWithdrawFees,
   reloadSwapFees,
   swapFees$
 } from './fees'
@@ -35,7 +35,7 @@ export {
   reloadAsymDepositFee,
   asymDepositFee$,
   withdrawFee$,
-  reloadWithdrawFee,
+  reloadWithdrawFees,
   symDepositTxMemo$,
   asymDepositTxMemo$,
   getWithdrawMemo$,

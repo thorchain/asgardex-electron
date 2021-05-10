@@ -238,7 +238,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       FP.pipe(
         fees$(asset),
         liveData.map((fees) => {
-          // store every successfully loaded chainFees to the ref value
+          // store every successfully loaded fees
           prevDepositFees.current = O.some(fees)
           return fees
         })

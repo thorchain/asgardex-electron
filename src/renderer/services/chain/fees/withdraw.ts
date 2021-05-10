@@ -18,10 +18,10 @@ const {
 } = midgardService
 
 /**
- * Returns zero sym deposit fees
- * by given assets to deposit
+ * Returns zero withdraw fees
+ * by given asset to withdraw
  */
-export const getZeroWithdrawFees = (asset: Asset): WithdrawFees => ({
+const getZeroWithdrawFees = (asset: Asset): WithdrawFees => ({
   asset,
   inFee: ZERO_BASE_AMOUNT,
   outFee: ZERO_BASE_AMOUNT
@@ -29,13 +29,14 @@ export const getZeroWithdrawFees = (asset: Asset): WithdrawFees => ({
 
 // State to reload sym deposit fees
 const {
-  get$: reloadWithdrawFee$,
+  get$: reloadWithdrawFees$,
   get: reloadWithdrawFeeState,
   set: _reloadSymDepositFees
 } = observableState<O.Option<Asset>>(O.none)
 
 // Triggers reloading of deposit fees
 const reloadWithdrawFees = (asset: Asset) => {
+  console.log('reloadWithdrawFees:', asset)
   // (1) update reload state only, if prev. vs. current assets are different
   if (!eqOAsset.equals(O.some(asset), reloadWithdrawFeeState())) {
     _reloadSymDepositFees(O.some(asset))
@@ -45,14 +46,14 @@ const reloadWithdrawFees = (asset: Asset) => {
     // Reload fees for RUNE
     THOR.reloadFees()
   } else {
-    // OR Reload fees for asset
+    // OR reload fees for asset
     reloadGasRates()
   }
 }
 
 const withdrawFee$: WithdrawFeesHandler = (initialAsset) =>
   FP.pipe(
-    reloadWithdrawFee$,
+    reloadWithdrawFees$,
     RxOp.debounceTime(300),
     RxOp.switchMap((oAsset) => {
       // Since `oAsset` is `none` by default,
@@ -73,4 +74,4 @@ const withdrawFee$: WithdrawFeesHandler = (initialAsset) =>
     })
   )
 
-export { reloadWithdrawFees, withdrawFee$ }
+export { reloadWithdrawFees, withdrawFee$, getZeroWithdrawFees }
