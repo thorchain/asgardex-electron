@@ -245,7 +245,6 @@ describe('deposit/Deposit.helper', () => {
       // 1,5 * max(80, 80) = 1,5 * 80 = 120
 
       const result = minAssetAmountToDepositMax1e8(params)
-      console.log('result:', result.amount().toString())
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(120, depositAssetDecimal)))).toBeTruthy()
     })
   })

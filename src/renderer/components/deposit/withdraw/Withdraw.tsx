@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getWithdrawMemo } from '@thorchain/asgardex-util'
@@ -8,7 +8,6 @@ import {
   baseAmount,
   BaseAmount,
   baseToAsset,
-  Chain,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
@@ -22,10 +21,18 @@ import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { getTwoSigfigAssetAmount, THORCHAIN_DECIMAL, to1e8BaseAmount } from '../../../helpers/assetHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
-import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { liveData } from '../../../helpers/rx/liveData'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
-import { FeeLD, FeeRD, Memo, WithdrawState, SymWithdrawStateHandler } from '../../../services/chain/types'
+import { getZeroWithdrawFees } from '../../../services/chain/fees'
+import {
+  WithdrawState,
+  SymWithdrawStateHandler,
+  ReloadWithdrawFeesHandler,
+  WithdrawFeesHandler,
+  WithdrawFeesRD,
+  WithdrawFees
+} from '../../../services/chain/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
@@ -33,7 +40,7 @@ import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import { Label } from '../../uielements/label'
-import { getWithdrawAmounts } from './Withdraw.helper'
+import * as Helper from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
 export type Props = {
@@ -47,7 +54,7 @@ export type Props = {
   /** Selected price asset */
   selectedPriceAsset: Asset
   /** Callback to reload fees */
-  reloadFees: (chain: Chain) => void
+  reloadFees: ReloadWithdrawFeesHandler
   /**
    * Shares of Rune and selected Asset.
    * Note: Decimal needs to be based on **original asset decimals**
@@ -59,7 +66,7 @@ export type Props = {
   validatePassword$: ValidatePasswordHandler
   reloadBalances: FP.Lazy<void>
   withdraw$: SymWithdrawStateHandler
-  fee$: (chain: Chain, memo: Memo) => FeeLD
+  fees$: WithdrawFeesHandler
   network: Network
 }
 
@@ -82,7 +89,7 @@ export const Withdraw: React.FC<Props> = ({
   reloadBalances = FP.constVoid,
   reloadFees,
   withdraw$,
-  fee$,
+  fees$,
   network
 }) => {
   const intl = useIntl()
@@ -99,11 +106,13 @@ export const Withdraw: React.FC<Props> = ({
 
   const memo = useMemo(() => getWithdrawMemo({ asset, percent: withdrawPercent }), [asset, withdrawPercent])
 
-  const { rune: runeAmountToWithdraw, asset: assetAmountToWithdraw } = getWithdrawAmounts(
+  const { rune: runeAmountToWithdraw, asset: assetAmountToWithdraw } = Helper.getWithdrawAmounts(
     runeShare,
     assetShare,
     withdrawPercent
   )
+
+  const zeroWithdrawFees: WithdrawFees = useMemo(() => getZeroWithdrawFees(AssetRuneNative), [])
 
   const assetPriceToWithdraw1e8 = useMemo(() => {
     // Prices are always `1e8` based,
@@ -113,27 +122,43 @@ export const Withdraw: React.FC<Props> = ({
     return baseAmount(priceBN, 8)
   }, [assetAmountToWithdraw, assetPrice])
 
-  const feeLD: FeeLD = useMemo(
-    () => fee$(AssetRuneNative.chain, memo),
+  const prevWithdrawFees = useRef<O.Option<WithdrawFees>>(O.none)
 
-    [fee$, memo]
+  const [withdrawFeesRD] = useObservableState<WithdrawFeesRD>(
+    () =>
+      FP.pipe(
+        fees$(AssetRuneNative),
+        liveData.map((fees) => {
+          // store every successfully loaded fees
+          prevWithdrawFees.current = O.some(fees)
+          return fees
+        })
+      ),
+    RD.success(zeroWithdrawFees)
   )
 
-  const feeRD: FeeRD = useObservableState(feeLD, RD.initial)
-  const oFee: O.Option<BaseAmount> = useMemo(() => RD.toOption(feeRD), [feeRD])
+  const withdrawFees: WithdrawFees = useMemo(
+    () =>
+      FP.pipe(
+        withdrawFeesRD,
+        RD.toOption,
+        O.alt(() => prevWithdrawFees.current),
+        O.getOrElse(() => zeroWithdrawFees)
+      ),
+    [withdrawFeesRD, zeroWithdrawFees]
+  )
 
   const isFeeError: boolean = useMemo(() => {
     if (withdrawPercent <= 0) return false
 
     return FP.pipe(
-      sequenceTOption(oFee, oRuneBalance),
+      oRuneBalance,
       O.fold(
-        // Missing (or loading) fees does not mean we can't sent something. No error then.
-        () => !O.isNone(oFee),
-        ([fee, balance]) => balance.amount().isLessThan(fee.amount())
+        () => true,
+        (balance) => FP.pipe(withdrawFees, Helper.sumWithdrawFees, balance.lt)
       )
     )
-  }, [oFee, oRuneBalance, withdrawPercent])
+  }, [oRuneBalance, withdrawFees, withdrawPercent])
 
   const renderFeeError = useMemo(() => {
     if (!isFeeError) return <></>
@@ -143,29 +168,23 @@ export const Withdraw: React.FC<Props> = ({
       O.getOrElse(() => ZERO_BASE_AMOUNT)
     )
 
-    return FP.pipe(
-      oFee,
-      O.map((fee) => {
-        const msg = intl.formatMessage(
-          { id: 'deposit.withdraw.error.feeNotCovered' },
-          {
-            fee: formatAssetAmountCurrency({
-              amount: baseToAsset(fee),
-              asset: AssetRuneNative,
-              trimZeros: true
-            }),
-            balance: formatAssetAmountCurrency({
-              amount: baseToAsset(runeBalance),
-              asset: AssetRuneNative,
-              trimZeros: true
-            })
-          }
-        )
-        return <Styled.FeeErrorLabel key="fee-error">{msg}</Styled.FeeErrorLabel>
-      }),
-      O.getOrElse(() => <></>)
+    const msg = intl.formatMessage(
+      { id: 'deposit.withdraw.error.feeNotCovered' },
+      {
+        fee: formatAssetAmountCurrency({
+          amount: baseToAsset(Helper.sumWithdrawFees(withdrawFees)),
+          asset: AssetRuneNative,
+          trimZeros: true
+        }),
+        balance: formatAssetAmountCurrency({
+          amount: baseToAsset(runeBalance),
+          asset: AssetRuneNative,
+          trimZeros: true
+        })
+      }
     )
-  }, [isFeeError, oRuneBalance, oFee, intl])
+    return <Styled.FeeErrorLabel key="fee-error">{msg}</Styled.FeeErrorLabel>
+  }, [isFeeError, oRuneBalance, intl, withdrawFees])
 
   // Withdraw start time
   const [withdrawStartTime, setWithdrawStartTime] = useState<number>(0)
@@ -293,13 +312,15 @@ export const Withdraw: React.FC<Props> = ({
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
-        feeRD,
-        RD.map((fee) => [{ asset: AssetRuneNative, amount: fee }])
+        withdrawFeesRD,
+        RD.map((fees) => [{ asset: AssetRuneNative, amount: Helper.sumWithdrawFees(fees) }])
       ),
-    [feeRD]
+    [withdrawFeesRD]
   )
 
-  const reloadFeesHandler = useCallback(() => reloadFees(AssetRuneNative.chain), [reloadFees])
+  const reloadFeesHandler = useCallback(() => {
+    reloadFees(AssetRuneNative)
+  }, [reloadFees])
 
   const disabledForm = useMemo(() => withdrawPercent <= 0 || disabled, [withdrawPercent, disabled])
 
@@ -314,6 +335,7 @@ export const Withdraw: React.FC<Props> = ({
         key={'asset amount slider'}
         value={withdrawPercent}
         onChange={setWithdrawPercent}
+        onAfterChange={reloadFeesHandler}
         disabled={disabled}
       />
       <Label weight={'bold'} textTransform={'uppercase'}>
@@ -375,7 +397,7 @@ export const Withdraw: React.FC<Props> = ({
         </Col>
       </Styled.FeesRow>
       <Styled.SubmitButtonWrapper>
-        <Styled.SubmitButton sizevalue="big" onClick={() => setShowPasswordModal(true)} disabled={disabledForm}>
+        <Styled.SubmitButton sizevalue="xnormal" onClick={() => setShowPasswordModal(true)} disabled={disabledForm}>
           {intl.formatMessage({ id: 'common.withdraw' })}
         </Styled.SubmitButton>
       </Styled.SubmitButtonWrapper>

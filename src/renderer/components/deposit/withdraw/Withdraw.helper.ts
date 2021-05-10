@@ -3,6 +3,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
+import { WithdrawFees } from '../../../services/chain/types'
 
 export const getWithdrawAmounts = (
   runeShare: BaseAmount,
@@ -39,3 +40,6 @@ export const getAsymWithdrawAmount = ({
     (amountBN) => (amountBN.isLessThan(0) ? ZERO_BN : amountBN),
     baseAmount
   )
+
+export const sumWithdrawFees = ({ inFee, outFee }: Pick<WithdrawFees, 'inFee' | 'outFee'>): BaseAmount =>
+  inFee.plus(outFee)

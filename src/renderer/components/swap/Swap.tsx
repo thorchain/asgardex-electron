@@ -545,7 +545,7 @@ export const Swap = ({
         key={'swap percentage slider'}
         value={percentage}
         onChange={setAmountToSwapFromPercentValue}
-        onAfterChange={() => reloadFeesHandler()}
+        onAfterChange={reloadFeesHandler}
         tooltipVisible={true}
         withLabel={true}
         tooltipPlacement={'top'}
@@ -963,7 +963,7 @@ export const Swap = ({
             <Styled.AssetInput
               title={intl.formatMessage({ id: 'swap.input' })}
               onChange={setAmountToSwapMax1e8}
-              onBlur={() => reloadFeesHandler()}
+              onBlur={reloadFeesHandler}
               amount={amountToSwapMax1e8}
               maxAmount={maxAmountToSwapMax1e8}
               hasError={minAmountError}

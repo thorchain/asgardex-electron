@@ -1,72 +1,82 @@
-import * as RD from '@devexperts/remote-data-ts'
-import {
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  ETHChain,
-  LTCChain,
-  PolkadotChain,
-  THORChain
-} from '@xchainjs/xchain-util'
-import * as Rx from 'rxjs'
+import { Asset } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
+import * as RxOp from 'rxjs/operators'
 
+import { ZERO_BASE_AMOUNT } from '../../../const'
+import { isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { eqOAsset } from '../../../helpers/fp/eq'
 import { liveData } from '../../../helpers/rx/liveData'
-import * as BNB from '../../binance'
-import * as BTC from '../../bitcoin'
-import * as BCH from '../../bitcoincash'
-import * as LTC from '../../litecoin'
+import { observableState } from '../../../helpers/stateHelper'
+import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
-import { FeeLD, Memo } from '../types'
+import { WithdrawFees, WithdrawFeesHandler } from '../types'
+import { poolFee$ } from './common'
 
-const reloadWithdrawFee = (chain: Chain) => {
-  switch (chain) {
-    case BNBChain:
-      BNB.reloadFees()
-      break
-    case BTCChain:
-      BTC.reloadFees()
-      break
-    case THORChain:
-      THOR.reloadFees()
-      break
-    case LTCChain:
-      LTC.reloadFees()
-      break
-    case ETHChain:
-      // TODO (@asgdx-team) Implement it for asym. withdraw (not needed for sym withdraw, since txs are RUNE based then)
-      // see https://github.com/thorchain/asgardex-electron/issues/1071
-      break
-    case CosmosChain:
-      // not implemented yet
-      break
-    case PolkadotChain:
-      // not implemented yet
-      break
+const {
+  pools: { reloadGasRates }
+} = midgardService
+
+/**
+ * Returns zero withdraw fees
+ * by given asset to withdraw
+ */
+const getZeroWithdrawFees = (asset: Asset): WithdrawFees => ({
+  asset,
+  inFee: ZERO_BASE_AMOUNT,
+  outFee: ZERO_BASE_AMOUNT
+})
+
+// State to reload sym deposit fees
+const {
+  get$: reloadWithdrawFees$,
+  get: reloadWithdrawFeeState,
+  set: _reloadSymDepositFees
+} = observableState<O.Option<Asset>>(O.none)
+
+// Triggers reloading of deposit fees
+const reloadWithdrawFees = (asset: Asset) => {
+  // (1) update reload state only, if prev. vs. current assets are different
+  if (!eqOAsset.equals(O.some(asset), reloadWithdrawFeeState())) {
+    _reloadSymDepositFees(O.some(asset))
+  }
+
+  if (isRuneNativeAsset(asset)) {
+    // Reload fees for RUNE
+    THOR.reloadFees()
+  } else {
+    // OR reload fees for asset
+    reloadGasRates()
   }
 }
 
-const withdrawFee$ = (chain: Chain, memo: Memo): FeeLD => {
-  switch (chain) {
-    case BNBChain:
-      return BNB.fees$().pipe(liveData.map(({ fast }) => fast))
-    case BTCChain:
-      // withdraw fee for BTC txs based on withdraw memo
-      return BTC.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
-    case THORChain:
-      return THOR.fees$().pipe(liveData.map(({ fast }) => fast))
-    case ETHChain:
-      return Rx.of(RD.failure(Error(`Withdraw fee for ETH has not been implemented`)))
-    case CosmosChain:
-      return Rx.of(RD.failure(Error(`Withdraw fee for Cosmos has not been implemented`)))
-    case PolkadotChain:
-      return Rx.of(RD.failure(Error(`Withdraw fee for Polkadot has not been implemented`)))
-    case BCHChain:
-      return BCH.feesWithRates$(memo).pipe(liveData.map(({ fees }) => fees.fast))
-    case LTCChain:
-      return LTC.feesWithRates$(memo).pipe(liveData.map(({ fees: { fast } }) => fast))
-  }
-}
+const withdrawFee$: WithdrawFeesHandler = (initialAsset) =>
+  FP.pipe(
+    reloadWithdrawFees$,
+    RxOp.debounceTime(300),
+    RxOp.switchMap((oAsset) => {
+      // Since `oAsset` is `none` by default,
+      // `initialAsset` will be used as first value
+      const asset = FP.pipe(
+        oAsset,
+        O.getOrElse(() => initialAsset)
+      )
 
-export { reloadWithdrawFee, withdrawFee$ }
+      return FP.pipe(
+        poolFee$(asset),
+        liveData.map(({ asset: feeAsset, amount: feeAmount }) => ({
+          asset: feeAsset,
+          inFee: feeAmount,
+          // outbound fee is 3x inbound fee
+          // see "ADD: Better Fees Handling #1381" (search for OutboundFee):
+          // Check issue description
+          // https://github.com/thorchain/asgardex-electron/issues/1381
+          // and following comment
+          // https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
+          outFee: feeAmount.times(3)
+        }))
+      )
+    })
+  )
+
+export { reloadWithdrawFees, withdrawFee$, getZeroWithdrawFees }

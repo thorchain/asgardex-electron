@@ -110,7 +110,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
-        fee$={withdrawFee$}
+        fees$={withdrawFee$}
         assetPrice={ZERO_BN}
         runePrice={runePrice}
         runeBalance={runeBalance}
@@ -162,7 +162,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
           asset: ShareHelpers.getAssetShare({ liquidityUnits, detail: poolDetail, assetDecimal })
         }}
         asset={assetWD}
-        fee$={withdrawFee$}
+        fees$={withdrawFee$}
         reloadFees={reloadWithdrawFees}
         validatePassword$={validatePassword$}
         viewRuneTx={viewRuneTx}

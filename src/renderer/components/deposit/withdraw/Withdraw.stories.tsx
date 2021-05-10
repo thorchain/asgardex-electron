@@ -1,8 +1,6 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, baseAmount, bn, Chain } from '@xchainjs/xchain-util'
+import { Asset, assetAmount, AssetBNB, AssetRuneNative, assetToBase, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -10,7 +8,7 @@ import * as RxOp from 'rxjs/operators'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
-import { Memo, WithdrawState$ } from '../../../services/chain/types'
+import { WithdrawState$ } from '../../../services/chain/types'
 import { Withdraw, Props as WitdrawProps } from './Withdraw'
 
 const defaultProps: WitdrawProps = {
@@ -41,7 +39,14 @@ const defaultProps: WitdrawProps = {
           })
       )
     ),
-  fee$: (_chain: Chain, _memo: Memo) => Rx.of(RD.success(baseAmount(1000))),
+  fees$: (_: Asset) =>
+    Rx.of(
+      RD.success({
+        asset: AssetRuneNative,
+        inFee: assetToBase(assetAmount(0.2)),
+        outFee: assetToBase(assetAmount(0.6))
+      })
+    ),
   network: 'testnet'
 }
 
@@ -51,7 +56,7 @@ Default.storyName = 'default'
 export const ErrorNoFee: Story = () => {
   const props: WitdrawProps = {
     ...defaultProps,
-    fee$: (_chain: Chain, _memo: Memo) => Rx.of(RD.failure(Error('no fees')))
+    fees$: (_: Asset) => Rx.of(RD.failure(Error('no fees')))
   }
   return <Withdraw {...props} />
 }
