@@ -21,7 +21,7 @@ const {
 
 /**
  * Returns zero sym deposit fees
- * by given `in` / `out` assets of a swap
+ * by given paired asset to deposit
  */
 export const getZeroSymDepositFees = (asset: Asset): SymDepositFees => ({
   rune: { inFee: ZERO_BASE_AMOUNT, outFee: ZERO_BASE_AMOUNT, refundFee: ZERO_BASE_AMOUNT },
@@ -56,11 +56,11 @@ const symDepositFees$: SymDepositFeesHandler = (initialAsset) => {
   return FP.pipe(
     reloadSymDepositFees$,
     RxOp.debounceTime(300),
-    RxOp.switchMap((oReloadParams) => {
-      // Since `oReloadParams` is `none` by default,
+    RxOp.switchMap((oAsset) => {
+      // Since `oAsset` is `none` by default,
       // `initialAsset` will be used as first value
       const asset = FP.pipe(
-        oReloadParams,
+        oAsset,
         O.getOrElse(() => initialAsset)
       )
 
@@ -72,7 +72,7 @@ const symDepositFees$: SymDepositFeesHandler = (initialAsset) => {
         liveData.map(({ runeInFee, assetInFee }) => ({
           rune: { inFee: runeInFee.amount, outFee: runeInFee.amount.times(3), refundFee: runeInFee.amount.times(3) },
           asset: {
-            asset: getChainAsset(asset.chain),
+            asset: assetInFee.asset,
             inFee: assetInFee.amount,
             outFee: assetInFee.amount.times(3),
             refundFee: assetInFee.amount.times(3)
