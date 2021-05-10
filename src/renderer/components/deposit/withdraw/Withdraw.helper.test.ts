@@ -2,7 +2,7 @@ import { baseAmount } from '@xchainjs/xchain-util'
 
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { eqBaseAmount } from '../../../helpers/fp/eq'
-import { getWithdrawAmounts } from './Withdraw.helper'
+import { getWithdrawAmounts, sumWithdrawFees } from './Withdraw.helper'
 
 describe('stake/Withdraw.helper', () => {
   describe('getWithdrawAmounts', () => {
@@ -22,6 +22,17 @@ describe('stake/Withdraw.helper', () => {
       const withdraws = getWithdrawAmounts(baseAmount('193011422'), baseAmount('3202499'), 100)
       expect(eqBaseAmount.equals(withdraws.rune, baseAmount(193011422))).toBeTruthy()
       expect(eqBaseAmount.equals(withdraws.asset, baseAmount(3202499))).toBeTruthy()
+    })
+  })
+
+  describe('sumWithdrawFees', () => {
+    it('sums inFee + outFee', () => {
+      const fees = {
+        inFee: baseAmount(100),
+        outFee: baseAmount(300)
+      }
+      const result = sumWithdrawFees(fees)
+      expect(eqBaseAmount.equals(result, baseAmount(400))).toBeTruthy()
     })
   })
 })

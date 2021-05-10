@@ -41,4 +41,5 @@ export const getAsymWithdrawAmount = ({
     baseAmount
   )
 
-export const sumWithdrawFees = ({ inFee, outFee }: WithdrawFees): BaseAmount => inFee.plus(outFee)
+export const sumWithdrawFees = ({ inFee, outFee }: Pick<WithdrawFees, 'inFee' | 'outFee'>): BaseAmount =>
+  inFee.plus(outFee)
