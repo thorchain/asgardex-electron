@@ -11,7 +11,8 @@ import {
   maxAssetAmountToDeposit,
   maxRuneAmountToDeposit,
   getAssetChainFee,
-  getThorchainFees
+  getThorchainFees,
+  minBalanceToDeposit
 } from './Deposit.helper'
 
 describe('deposit/Deposit.helper', () => {
@@ -102,6 +103,17 @@ describe('deposit/Deposit.helper', () => {
       const result = getThorchainFees(feesRD)
       const expected = O.some(runeFee)
       expect(eqODepositFees.equals(result, expected)).toBeTruthy()
+    })
+  })
+
+  describe('minBalanceToDeposit', () => {
+    it('returns min. balance to cover deposit', () => {
+      const fees = {
+        inFee: baseAmount(100),
+        refundFee: baseAmount(300)
+      }
+      const result = minBalanceToDeposit(fees)
+      expect(eqBaseAmount.equals(result, baseAmount(600))).toBeTruthy()
     })
   })
 })
