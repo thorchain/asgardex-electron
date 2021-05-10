@@ -36,7 +36,6 @@ const {
 
 // Triggers reloading of deposit fees
 const reloadWithdrawFees = (asset: Asset) => {
-  console.log('reloadWithdrawFees:', asset)
   // (1) update reload state only, if prev. vs. current assets are different
   if (!eqOAsset.equals(O.some(asset), reloadWithdrawFeeState())) {
     _reloadSymDepositFees(O.some(asset))
